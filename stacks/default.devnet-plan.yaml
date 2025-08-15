@@ -1,0 +1,27 @@
+# Clarinet Devnet Deployment Plan
+# Defines initial deployment order and any post-deploy calls.
+
+contracts:
+  - name: sip-010-trait
+  - name: strategy-trait
+  - name: vault-admin-trait
+  - name: vault-trait
+  - name: mock-ft
+  - name: gov-token
+  - name: treasury
+  - name: vault
+  - name: timelock
+  - name: dao
+  - name: dao-governance
+  - name: analytics
+  - name: registry
+  - name: bounty-system
+  - name: creator-token
+
+# Example post deployments (queue / set admin relationships) could go here
+post_deploy:
+  - contract: vault
+    method: set-admin
+    args:
+      - 'SP000000000000000000002Q6VF78.timelock'
+    comment: Assign timelock admin (placeholder principal)
