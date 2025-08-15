@@ -1,0 +1,27 @@
+name: Chainhook Register
+
+on:
+  workflow_dispatch:
+    inputs:
+      vault_contract:
+        description: "Vault contract principal (e.g. SP...vault)"
+        required: true
+      webhook_url:
+        description: "Webhook URL to receive events"
+        required: true
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch chainhook template
+        run: |
+          sed -i "s|https://example.com/autonomics-hook|${{ github.event.inputs.webhook_url }}|" chainhooks/vault_autonomics_chainhook.json
+          sed -i "s|{VAULT_CONTRACT}|${{ github.event.inputs.vault_contract }}|" chainhooks/vault_autonomics_chainhook.json
+      - name: Register Chainhook
+        env:
+          HIRO_API_KEY: ${{ secrets.HIRO_API_KEY }}
+          VAULT_CONTRACT: ${{ github.event.inputs.vault_contract }}
+        run: |
+          bash scripts/register_chainhook.sh
