@@ -42,6 +42,13 @@
 (define-data-var min-withdraw-fee uint u5) ;; 0.05% min fee
 (define-data-var max-withdraw-fee uint u100) ;; 1.00% max fee
 
+;; Enhanced autonomic economics parameters (reserve bands & ramp configuration)
+(define-data-var reserve-target-low-bps uint u500)  ;; 5% of total-balance
+(define-data-var reserve-target-high-bps uint u1500) ;; 15% of total-balance
+(define-data-var deposit-fee-step-bps uint u5) ;; step change (0.05%) when adjusting
+(define-data-var withdraw-fee-step-bps uint u5) ;; step change (0.05%) when adjusting
+(define-data-var auto-economics-enabled bool false) ;; master switch for extended autonomics
+
 (define-read-only (get-balance (who principal))
   (let (
       (user-shares (default-to u0 (get amount (map-get? shares { user: who }))))
@@ -179,6 +186,36 @@
     min: (var-get min-withdraw-fee),
     max: (var-get max-withdraw-fee),
   }
+)
+
+(define-read-only (get-reserve-bands)
+  {
+    low: (var-get reserve-target-low-bps),
+    high: (var-get reserve-target-high-bps),
+  }
+)
+
+(define-read-only (get-fee-ramps)
+  {
+    deposit-step: (var-get deposit-fee-step-bps),
+    withdraw-step: (var-get withdraw-fee-step-bps),
+  }
+)
+
+(define-read-only (get-utilization)
+  (if (is-eq (var-get global-cap) u0)
+    u0
+    (/ (* (var-get total-balance) u10000) (var-get global-cap))
+  )
+)
+
+(define-read-only (get-reserve-ratio)
+  (let ((tb (var-get total-balance)))
+    (if (is-eq tb u0)
+      u0
+      (/ (* (var-get protocol-reserve) u10000) tb)
+    )
+  )
 )
 
 (define-public (set-admin (new principal))
@@ -361,6 +398,42 @@
       min: min,
       max: max,
     })
+    (ok true)
+  )
+)
+
+;; Set reserve target band (admin / timelock)
+(define-public (set-reserve-bands (low-bps uint) (high-bps uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) (err u100))
+    (asserts! (< low-bps high-bps) (err u107))
+    (asserts! (<= high-bps u10000) (err u101))
+    (var-set reserve-target-low-bps low-bps)
+    (var-set reserve-target-high-bps high-bps)
+    (print { event: "set-reserve-bands", low: low-bps, high: high-bps })
+    (ok true)
+  )
+)
+
+;; Set fee ramp step sizes (admin / timelock)
+(define-public (set-fee-ramps (deposit-step uint) (withdraw-step uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) (err u100))
+    (asserts! (> deposit-step u0) (err u1))
+    (asserts! (> withdraw-step u0) (err u1))
+    (var-set deposit-fee-step-bps deposit-step)
+    (var-set withdraw-fee-step-bps withdraw-step)
+    (print { event: "set-fee-ramps", dstep: deposit-step, wstep: withdraw-step })
+    (ok true)
+  )
+)
+
+;; Enable/disable extended autonomic economics (distinct from auto-fees-enabled)
+(define-public (set-auto-economics-enabled (enabled bool))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) (err u100))
+    (var-set auto-economics-enabled enabled)
+    (print { event: "set-auto-economics-enabled", enabled: enabled })
     (ok true)
   )
 )
@@ -664,6 +737,39 @@
       utilization: util,
     })
     (ok util)
+  )
+)
+
+;; Extended autonomic economics controller: adjusts withdraw & deposit fees
+;; based on utilization (re-uses update-fees-based-on-utilization) and reserve bands.
+;; Anyone may call when enabled to keep system permissionless (like a keeper).
+(define-public (update-autonomics)
+  (begin
+    (asserts! (is-eq (var-get auto-economics-enabled) true) (err u110))
+    ;; First adjust withdraw fees via existing utilization controller (if enabled)
+    (ignore (update-fees-based-on-utilization))
+    ;; Then adjust deposit fee based on reserve ratio vs target band
+    (let (
+        (ratio (unwrap! (ok (get-reserve-ratio)) (err u0)))
+        (low (var-get reserve-target-low-bps))
+        (high (var-get reserve-target-high-bps))
+        (dstep (var-get deposit-fee-step-bps))
+      )
+      (if (< ratio low)
+        (var-set fee-deposit-bps (min-uint BPS_DENOM (+ (var-get fee-deposit-bps) dstep)))
+        (if (> ratio high)
+          (var-set fee-deposit-bps (max-uint u0 (if (> (var-get fee-deposit-bps) dstep) (- (var-get fee-deposit-bps) dstep) u0)))
+          true
+        )
+      )
+      (print {
+        event: "update-autonomics",
+        reserve-ratio: ratio,
+        new-deposit-fee: (var-get fee-deposit-bps),
+        withdraw-fee: (var-get fee-withdraw-bps)
+      })
+      (ok true)
+    )
   )
 )
 

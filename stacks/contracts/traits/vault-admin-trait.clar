@@ -14,5 +14,8 @@
     (set-auto-fees-enabled (bool) (response bool uint))
     (set-util-thresholds (uint uint) (response bool uint))
     (set-fee-bounds (uint uint) (response bool uint))
+  (set-reserve-bands (uint uint) (response bool uint))
+  (set-fee-ramps (uint uint) (response bool uint))
+  (set-auto-economics-enabled (bool) (response bool uint))
   )
 )
