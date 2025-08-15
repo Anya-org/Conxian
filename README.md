@@ -1,6 +1,6 @@
 # AutoVault - Fully Decentralized DeFi Protocol
 
-[![CI](https://github.com/botshelomokoka/AutoVault/workflows/CI/badge.svg)](https://github.com/botshelomokoka/AutoVault/actions)
+[![CI](https://github.com/Anya-org/AutoVault/workflows/CI/badge.svg)](https://github.com/Anya-org/AutoVault/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A fully decentralized DeFi protocol built on Stacks blockchain with comprehensive DAO governance, creator token economics, and automated yield strategies.
@@ -57,7 +57,7 @@ A fully decentralized DeFi protocol built on Stacks blockchain with comprehensiv
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/botshelomokoka/AutoVault.git
+   git clone https://github.com/Anya-org/AutoVault.git
    cd AutoVault
    ```
 
@@ -171,9 +171,45 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🔗 Links
 
 - **Documentation**: [docs/](./docs/)
-- **GitHub**: [Repository](https://github.com/botshelomokoka/AutoVault)
-- **Issues**: [Bug Reports & Feature Requests](https://github.com/botshelomokoka/AutoVault/issues)
+- **GitHub**: [Repository](https://github.com/Anya-org/AutoVault)
+- **Issues**: [Bug Reports & Feature Requests](https://github.com/Anya-org/AutoVault/issues)
 
 ## 💡 Vision
 
 AutoVault represents the future of DeFi - fully decentralized, community-owned, and built on Bitcoin's security through Stacks. We're creating sustainable yield strategies while maintaining complete transparency and community governance.
+
+## 🤖 Autonomic Economics & Simulation
+
+The vault includes on-chain autonomic controllers to keep fees and treasury reserves within healthy bands while remaining fully governable:
+
+### On-Chain Controllers
+- Utilization-based withdraw fee adjustment (`update-fees-based-on-utilization`)
+- Reserve band driven deposit fee adjustment (`update-autonomics`)
+- Governance/timelock gated parameter setters:
+   - `set-reserve-bands`, `set-fee-ramps`, `set-auto-economics-enabled`
+   - `set-util-thresholds`, `set-fee-bounds`, `set-auto-fees-enabled`
+
+### Keeper Model
+Anyone may call `update-autonomics` once enabled, making the system permissionless while proposals still define bounds.
+
+### Off-Chain Simulation
+Use the economic simulator to stress-test fee dynamics:
+
+```bash
+python scripts/economic_simulation.py | jq '.final'
+```
+
+### ML Strategy Recommender (Placeholder)
+Prototype recommender emits governance proposal suggestions:
+
+```bash
+python scripts/ml_strategy_recommender.py --state-json '{"utilization_bps":8400,"reserve_ratio_bps":450,"global_cap":1000000}'
+```
+
+Outputs JSON with recommended parameter changes (future: integrate real ML / RL agent).
+
+### Analytics Integration
+Autonomic adjustments emit events (`update-autonomics`, analytics hook) enabling off-chain dashboards to track fee evolution, utilization, and reserve ratios.
+
+### Safety & Bounds
+All automatic adjustments obey governance-defined min/max bounds; disabling controllers is a single on-chain transaction (`set-auto-economics-enabled false`).

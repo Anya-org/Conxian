@@ -30,6 +30,9 @@ jobs:
       run: |
         cd stacks
         clarinet test
+    - name: Economic Simulation (dry-run)
+      run: |
+        python scripts/economic_simulation.py | head -n 30
         
     - name: Contract Security Check
       run: |

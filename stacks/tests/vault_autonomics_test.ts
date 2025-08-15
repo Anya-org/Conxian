@@ -31,7 +31,13 @@ Clarinet.test({
     block.receipts.forEach(r => r.result.expectOk());
 
     // Capture initial fees
-    const feesBefore = chain.callReadOnlyFn("vault", "get-fees", [], wallet1.address).result as any;
+  const feesBeforeRes = chain.callReadOnlyFn("vault", "get-fees", [], wallet1.address);
+  feesBeforeRes.result.expectTuple();
+  const feesBeforeTuple: any = feesBeforeRes.result; // Clarinet returns wrapper with .expectTuple() already asserting
+  // Clarinet testing lib usually exposes fields via .result.expectTuple().toObject() pattern; fallback using JSON parse
+  const beforeJson = JSON.parse(JSON.stringify(feesBeforeTuple));
+  const depositBefore = BigInt(beforeJson.value["deposit-bps"].value);
+  const withdrawBefore = BigInt(beforeJson.value["withdraw-bps"].value);
 
     // Trigger autonomics update several times to force adjustments
     for (let i = 0; i < 5; i++) {
@@ -42,8 +48,18 @@ Clarinet.test({
     }
 
     // Read back fees after adjustments
-    const feesAfter = chain.callReadOnlyFn("vault", "get-fees", [], wallet1.address).result as any;
-    // Ensure tuple structure
-    (feesAfter as any).expectTuple();
+  const feesAfterRes = chain.callReadOnlyFn("vault", "get-fees", [], wallet1.address);
+  feesAfterRes.result.expectTuple();
+  const afterJson = JSON.parse(JSON.stringify(feesAfterRes.result));
+  const depositAfter = BigInt(afterJson.value["deposit-bps"].value);
+  const withdrawAfter = BigInt(afterJson.value["withdraw-bps"].value);
+
+    // Basic assertions: fees remain within 0..10000 and may move
+  if (depositAfter < 0n || depositAfter > 10000n) throw new Error("deposit fee out of bounds");
+  if (withdrawAfter < 0n || withdrawAfter > 10000n) throw new Error("withdraw fee out of bounds");
+  if (depositBefore === depositAfter) {
+      // Not failing test yet (could be stable scenario) — log hint
+      console.log("Autonomics test: deposit fee unchanged; consider scenario amplification.");
+    }
   }
 });
