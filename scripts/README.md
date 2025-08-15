@@ -207,15 +207,6 @@ STACKS_PRIVKEY=your_hex_privkey VAULT_CONTRACT=SPXXXX.vault npm run update-auton
 ```
 Scheduled dry-run keeper action lives in `.github/workflows/keeper-cron.yml` (configure secrets `KEEPER_PRIVKEY` & `VAULT_CONTRACT`).
 
-### Chainhooks (Event Streaming)
-To stream on-chain autonomics updates off-chain via Hiro Chainhooks:
-1. Edit `chainhooks/vault_autonomics_chainhook.json` replacing `{VAULT_CONTRACT}` and webhook URL.
-2. Export `HIRO_API_KEY` and `VAULT_CONTRACT`, then run:
-```bash
-./scripts/register_chainhook.sh
-```
-3. Your webhook will receive payloads whenever `update-autonomics` executes (after testnet deployment).
-
 Python read-only snapshot + optional broadcast:
 ```bash
 STACKS_API_BASE=https://api.testnet.hiro.so VAULT_CONTRACT=SPXXXX.vault \

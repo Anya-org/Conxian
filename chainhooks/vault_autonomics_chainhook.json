@@ -1,0 +1,18 @@
+{
+  "name": "vault-autonomics-analytics",
+  "version": 1,
+  "network": "testnet",
+  "definition": {
+    "match_contract": "{VAULT_CONTRACT}",
+    "match_functions": ["update-autonomics"],
+    "trigger": "post_condition",
+    "max_reorg_depth": 10
+  },
+  "delivery": {
+    "type": "webhook",
+    "url": "https://example.com/autonomics-hook",
+    "auth_header": "Bearer CHANGE_ME"
+  },
+  "filter_keys": ["event", "reserve-ratio", "new-deposit-fee", "withdraw-fee"],
+  "notes": "Replace {VAULT_CONTRACT} and delivery URL before registering with Hiro Platform."
+}
