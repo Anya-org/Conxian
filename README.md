@@ -1,6 +1,6 @@
 # AutoVault - Fully Decentralized DeFi Protocol
 
-[![CI](https://github.com/botshelomokoka/anya-defi-prototype/workflows/CI/badge.svg)](https://github.com/botshelomokoka/anya-defi-prototype/actions)
+[![CI](https://github.com/botshelomokoka/AutoVault/workflows/CI/badge.svg)](https://github.com/botshelomokoka/AutoVault/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A fully decentralized DeFi protocol built on Stacks blockchain with comprehensive DAO governance, creator token economics, and automated yield strategies.
@@ -25,7 +25,7 @@ A fully decentralized DeFi protocol built on Stacks blockchain with comprehensiv
 
 ## 📁 Project Structure
 
-```
+```text
 ├── stacks/
 │   ├── contracts/           # Smart contracts
 │   │   ├── vault.clar      # Core vault functionality
@@ -57,8 +57,8 @@ A fully decentralized DeFi protocol built on Stacks blockchain with comprehensiv
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/botshelomokoka/anya-defi-prototype.git
-   cd anya-defi-prototype
+   git clone https://github.com/botshelomokoka/AutoVault.git
+   cd AutoVault
    ```
 
 2. **Run contract checks**
@@ -171,8 +171,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🔗 Links
 
 - **Documentation**: [docs/](./docs/)
-- **GitHub**: [Repository](https://github.com/botshelomokoka/anya-defi-prototype)
-- **Issues**: [Bug Reports & Feature Requests](https://github.com/botshelomokoka/anya-defi-prototype/issues)
+- **GitHub**: [Repository](https://github.com/botshelomokoka/AutoVault)
+- **Issues**: [Bug Reports & Feature Requests](https://github.com/botshelomokoka/AutoVault/issues)
 
 ## 💡 Vision
 
