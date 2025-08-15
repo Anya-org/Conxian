@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Documentation
-    url: https://github.com/botshelomokoka/AutoVault/blob/main/docs/
+    url: https://github.com/Anya-org/AutoVault/blob/main/docs/
     about: Check the docs for design and economics information
   - name: Discussions
-    url: https://github.com/botshelomokoka/AutoVault/discussions
+    url: https://github.com/Anya-org/AutoVault/discussions
     about: Ask questions and discuss ideas with the community
