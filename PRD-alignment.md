@@ -15,6 +15,7 @@ and analytics capabilities with the original Product Requirements Document.
 - Keeper watchdog scaffold for periodic autonomics updates
 
 ## Requirements Mapping
+
 | PRD Requirement | Implementation Artifact | Status |
 | --------------- | ----------------------- | ------ |
 | Dynamic fee adjustments | `stacks/contracts/vault.clar` autonomics logic | Complete |
