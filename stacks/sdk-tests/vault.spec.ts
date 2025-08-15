@@ -17,25 +17,25 @@ describe('vault: deposit then withdraw updates balances correctly (share-based)'
 
     // Mint tokens to wallet_1 and approve vault to spend
     let r1 = simnet.callPublicFn('mock-ft', 'mint', [Cl.standardPrincipal(wallet1), Cl.uint(1000)], deployer);
-    expect(r1.result.expectOk).toBeDefined();
+    expect(r1.result).toEqual(Cl.ok(Cl.bool(true)));
 
     let r2 = simnet.callPublicFn('mock-ft', 'approve', [vaultPrincipal, Cl.uint(1000)], wallet1);
-    expect(r2.result.expectOk).toBeDefined();
+    expect(r2.result).toEqual(Cl.ok(Cl.bool(true)));
 
     // Deposit 600
     const dep = simnet.callPublicFn('vault', 'deposit', [Cl.uint(600)], wallet1);
     // fee-deposit-bps = 30 (0.30%), fee = 600*30/10000 = 1, credited = 599
-    expect(dep.result.value).toBe(599n);
+    expect(dep.result).toEqual(Cl.ok(Cl.uint(599)));
 
     // get-balance reflects assets from shares
     const bal = simnet.callReadOnlyFn('vault', 'get-balance', [Cl.standardPrincipal(wallet1)], wallet1);
-    expect(bal.result.value).toBe(599n);
+    expect(bal.result).toEqual(Cl.uint(599));
 
     // Withdraw 100 (withdraw fee = 10 bps => 0 in integer math), payout 100
     const w = simnet.callPublicFn('vault', 'withdraw', [Cl.uint(100)], wallet1);
-    expect(w.result.value).toBe(100n);
+    expect(w.result).toEqual(Cl.ok(Cl.uint(100)));
 
     const bal2 = simnet.callReadOnlyFn('vault', 'get-balance', [Cl.standardPrincipal(wallet1)], wallet1);
-    expect(bal2.result.value).toBe(499n);
+    expect(bal2.result).toEqual(Cl.uint(499));
   });
 });

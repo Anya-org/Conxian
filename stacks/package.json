@@ -7,6 +7,7 @@
     "@stacks/network": "^6.16.0",
     "@stacks/transactions": "^6.16.0",
     "@types/node": "^18.19.0",
+    "bip39": "^3.1.0",
     "dotenv": "^16.4.5",
     "ts-node": "^10.9.1",
     "typescript": "^5.4.0",
