@@ -160,6 +160,28 @@
   )
 )
 
+;; Specialized autonomics adjustment record (syntactic sugar)
+(define-public (record-autonomics
+  (withdraw-fee uint)
+  (deposit-fee uint)
+  (utilization uint)
+  (reserve-ratio uint)
+)
+  (begin
+    ;; callable by vault or any keeper after an update (no sensitive mutation)
+    (try! (record-event EVENT_TYPES_VAULT .vault "autonomics" .vault 0
+      (unwrap-panic (to-utf8 (concat (to-string withdraw-fee) (to-string deposit-fee))))) )
+    (print {
+      event: "autonomics-metrics",
+      wfee: withdraw-fee,
+      dfee: deposit-fee,
+      util: utilization,
+      reserve: reserve-ratio
+    })
+    (ok true)
+  )
+)
+
 (define-public (record-governance-event 
   (event-name (string-ascii 50))
   (user principal)

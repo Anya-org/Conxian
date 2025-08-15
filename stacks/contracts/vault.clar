@@ -768,6 +768,8 @@
         new-deposit-fee: (var-get fee-deposit-bps),
         withdraw-fee: (var-get fee-withdraw-bps)
       })
+  ;; Analytics hook (best-effort). This will no-op if analytics contract not present at compile deployment time.
+  (ignore (as-contract (contract-call? .analytics record-vault-event "auto-update" tx-sender u0 "autonomics-adjust")))
       (ok true)
     )
   )

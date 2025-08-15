@@ -30,14 +30,20 @@ Clarinet.test({
     ]);
     block.receipts.forEach(r => r.result.expectOk());
 
-    // Trigger autonomics update
-    block = chain.mineBlock([
-      Tx.contractCall("vault", "update-autonomics", [], wallet1.address),
-    ]);
-    block.receipts[0].result.expectOk();
+    // Capture initial fees
+    const feesBefore = chain.callReadOnlyFn("vault", "get-fees", [], wallet1.address).result as any;
 
-    // Read back fees
-    const fees = chain.callReadOnlyFn("vault", "get-fees", [], wallet1.address);
-    fees.result.expectTuple();
+    // Trigger autonomics update several times to force adjustments
+    for (let i = 0; i < 5; i++) {
+      block = chain.mineBlock([
+        Tx.contractCall("vault", "update-autonomics", [], wallet1.address),
+      ]);
+      block.receipts[0].result.expectOk();
+    }
+
+    // Read back fees after adjustments
+    const feesAfter = chain.callReadOnlyFn("vault", "get-fees", [], wallet1.address).result as any;
+    // Ensure tuple structure
+    (feesAfter as any).expectTuple();
   }
 });
