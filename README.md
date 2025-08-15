@@ -138,6 +138,14 @@ A fully decentralized DeFi protocol built on Stacks blockchain with comprehensiv
 
 # Deploy to mainnet (requires multi-sig)
 ./scripts/deploy-mainnet.sh
+
+### SDK Deployment (Sequential)
+Automated broadcast of all contracts (testnet):
+```bash
+cd stacks
+DEPLOYER_PRIVKEY=your_testnet_privkey NETWORK=testnet npm run deploy-contracts
+```
+This writes/updates `deployment-registry-testnet.json` with txids & block heights.
 ```
 
 ## 🤝 Contributing
