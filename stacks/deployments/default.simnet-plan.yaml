@@ -1,0 +1,108 @@
+---
+id: 0
+name: "Simulated deployment, used as a default for `clarinet console`, `clarinet test` and `clarinet check`"
+network: simnet
+genesis:
+  wallets:
+    - name: deployer
+      address: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+      balance: "1000000000000000"
+      sbtc-balance: "1000000000"
+    - name: wallet_1
+      address: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+      balance: "500000000000000"
+      sbtc-balance: "1000000000"
+  contracts:
+    - genesis
+    - lockup
+    - bns
+    - cost-voting
+    - costs
+    - pox
+    - costs-2
+    - pox-2
+    - costs-3
+    - pox-3
+    - pox-4
+    - signers
+    - signers-voting
+plan:
+  batches:
+    - id: 0
+      transactions:
+        - emulated-contract-publish:
+            contract-name: analytics
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/analytics.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: sip-010-trait
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/traits/sip-010-trait.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: creator-token
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/creator-token.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: bounty-system
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/bounty-system.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: gov-token
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/gov-token.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: mock-ft
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/mock-ft.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: vault-admin-trait
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/traits/vault-admin-trait.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: vault
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/vault.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: timelock
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/timelock.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: dao
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/dao.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: treasury
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/treasury.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: dao-governance
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/dao-governance.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: registry
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/registry.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: strategy-trait
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/traits/strategy-trait.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: vault-trait
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/traits/vault-trait.clar
+            clarity-version: 2
+      epoch: "2.4"

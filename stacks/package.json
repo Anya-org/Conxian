@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "@hirosystems/clarinet-sdk": "^2.0.0",
+    "@hirosystems/clarinet-sdk": "^3.5.0",
     "@stacks/network": "^6.16.0",
     "@stacks/transactions": "^6.16.0",
     "@types/node": "^18.19.0",
