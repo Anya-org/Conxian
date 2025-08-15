@@ -1,0 +1,13 @@
+[network]
+name = "simnet"
+block_time = 3
+rpc_bind = "127.0.0.1:20443"
+
+[accounts.deployer]
+# 24-word test mnemonic for local simnet only. Do NOT use on real networks.
+mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
+balance = 1000000000000000
+
+[accounts.wallet_1]
+mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
+balance = 500000000000000

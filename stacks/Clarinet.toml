@@ -1,0 +1,29 @@
+[project]
+name = "autovault"
+
+[contracts.vault]
+path = "contracts/vault.clar"
+
+[contracts.sip-010-trait]
+path = "contracts/traits/sip-010-trait.clar"
+
+[contracts.mock-ft]
+path = "contracts/mock-ft.clar"
+
+[contracts.timelock]
+path = "contracts/timelock.clar"
+
+[contracts.gov-token]
+path = "contracts/gov-token.clar"
+
+[contracts.dao]
+path = "contracts/dao.clar"
+
+[contracts.registry]
+path = "contracts/registry.clar"
+
+[contracts.strategy-trait]
+path = "contracts/traits/strategy-trait.clar"
+
+[contracts.vault-admin-trait]
+path = "contracts/traits/vault-admin-trait.clar"

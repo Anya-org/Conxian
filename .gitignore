@@ -1,0 +1,26 @@
+# Node / tooling
+node_modules/
+
+# Python/cache
+__pycache__/
+*.pyc
+
+# Rust (legacy just in case)
+target/
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
+
+# Env
+.env
+.env.local
+
+# Clarinet/devnet artifacts
+stacks/simnet/
+clarinet.log
+
+# Build artifacts
+/dist/
+/build/
