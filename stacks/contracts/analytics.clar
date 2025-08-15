@@ -155,7 +155,7 @@
     ;; Only vault contract can record vault events
     (asserts! (is-eq tx-sender .vault) (err u100))
     (try! (record-event EVENT_TYPES_VAULT .vault event-name user amount metadata))
-    (try! (update-vault-metrics event-name user amount))
+  (update-vault-metrics event-name user amount)
     (ok true)
   )
 )
@@ -169,8 +169,8 @@
 )
   (begin
     ;; callable by vault or any keeper after an update (no sensitive mutation)
-    (try! (record-event EVENT_TYPES_VAULT .vault "autonomics" .vault 0
-      (unwrap-panic (to-utf8 (concat (to-string withdraw-fee) (to-string deposit-fee))))) )
+  ;; Record event with empty metadata (string-utf8 0) due to removal of to-string in current dialect
+  (try! (record-event EVENT_TYPES_VAULT .vault "autonomics" .vault 0 ""))
     (print {
       event: "autonomics-metrics",
       wfee: withdraw-fee,
@@ -191,8 +191,8 @@
   (begin
     ;; Only governance contract can record governance events
     (asserts! (is-eq tx-sender .dao-governance) (err u100))
-    (try! (record-event EVENT_TYPES_GOVERNANCE .dao-governance event-name user amount metadata))
-    (try! (update-governance-metrics event-name user amount))
+  (try! (record-event EVENT_TYPES_GOVERNANCE .dao-governance event-name user amount metadata))
+  (update-governance-metrics event-name user amount)
     (ok true)
   )
 )
@@ -206,8 +206,8 @@
   (begin
     ;; Only bounty system can record bounty events
     (asserts! (is-eq tx-sender .bounty-system) (err u100))
-    (try! (record-event EVENT_TYPES_BOUNTY .bounty-system event-name user amount metadata))
-    (try! (update-bounty-metrics event-name user amount))
+  (try! (record-event EVENT_TYPES_BOUNTY .bounty-system event-name user amount metadata))
+  (update-bounty-metrics event-name user amount)
     (ok true)
   )
 )
@@ -257,11 +257,11 @@
 (define-private (update-vault-metrics (event-name (string-ascii 50)) (user principal) (amount uint))
   (begin
     ;; Update daily metrics
-    (try! (update-period-vault-metrics METRIC_PERIODS_DAILY event-name user amount))
+  (update-period-vault-metrics METRIC_PERIODS_DAILY event-name user amount)
     ;; Update weekly metrics
-    (try! (update-period-vault-metrics METRIC_PERIODS_WEEKLY event-name user amount))
+  (update-period-vault-metrics METRIC_PERIODS_WEEKLY event-name user amount)
     ;; Update monthly metrics
-    (try! (update-period-vault-metrics METRIC_PERIODS_MONTHLY event-name user amount))
+  (update-period-vault-metrics METRIC_PERIODS_MONTHLY event-name user amount)
     (ok true)
   )
 )
