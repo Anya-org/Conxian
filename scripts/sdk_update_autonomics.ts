@@ -6,7 +6,7 @@
  *  VAULT_CONTRACT  (e.g. SPXXXXXXX.vault)
  *  NETWORK (optional, default testnet)
  */
-import { makeContractCall, broadcastTransaction, standardPrincipalCV, uintCV, AnchorMode } from '@stacks/transactions';
+import { makeContractCall, broadcastTransaction, AnchorMode } from '@stacks/transactions';
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 import 'dotenv/config';
 
@@ -31,9 +31,31 @@ async function main() {
     network,
     anchorMode: AnchorMode.Any,
   });
+  const serialized = tx.serialize().toString('hex');
 
-  const res = await broadcastTransaction(tx, network);
-  console.log(JSON.stringify(res, null, 2));
+  let attempt = 0; let lastErr: any = null; let result: any = null;
+  while (attempt < 3) {
+    try {
+      result = await broadcastTransaction(tx, network);
+      break;
+    } catch (e) {
+      lastErr = e;
+      attempt++;
+      await new Promise(r => setTimeout(r, 1000 * attempt));
+    }
+  }
+  if (!result) {
+    throw new Error(`Broadcast failed after retries: ${lastErr}`);
+  }
+  const txid = (result as any).txid || (result as any).transaction_hash || 'unknown';
+  console.log(JSON.stringify({
+    txid,
+    contract: vault,
+    attempts: attempt + 1,
+    raw_tx: serialized,
+    network: networkName,
+    response: result,
+  }, null, 2));
 }
 
 main().catch(e => { console.error(e); process.exit(1); });

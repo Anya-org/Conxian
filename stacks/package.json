@@ -14,6 +14,7 @@
   },
   "scripts": {
   "test": "vitest run",
-  "update-autonomics": "ts-node ../scripts/sdk_update_autonomics.ts"
+  "update-autonomics": "ts-node ../scripts/sdk_update_autonomics.ts",
+  "int-autonomics": "bash tests/integration_autonomics_sdk.sh"
   }
 }

@@ -199,6 +199,17 @@ STACKS_PRIVKEY=your_hex_privkey VAULT_CONTRACT=SPXXXX.vault npm run update-auton
 ```
 Scheduled dry-run keeper action lives in `.github/workflows/keeper-cron.yml` (configure secrets `KEEPER_PRIVKEY` & `VAULT_CONTRACT`).
 
+Python read-only snapshot + optional broadcast:
+```bash
+STACKS_API_BASE=https://api.testnet.hiro.so VAULT_CONTRACT=SPXXXX.vault \
+   python scripts/python_update_autonomics.py --broadcast
+```
+Integration harness (placeholder) to exercise SDK script:
+```bash
+cd stacks
+npm run int-autonomics
+```
+
 ### Off-Chain Simulation
  
 Use the economic simulator to stress-test fee dynamics:
