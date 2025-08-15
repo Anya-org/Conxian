@@ -15,9 +15,15 @@
   },
   "scripts": {
     "test": "vitest run",
+    "test:manual": "../scripts/manual-testing.sh",
     "update-autonomics": "ts-node ../scripts/sdk_update_autonomics.ts",
     "int-autonomics": "bash tests/integration_autonomics_sdk.sh",
     "deploy-contracts": "ts-node ../scripts/sdk_deploy_contracts.ts",
-    "verify-post": "ts-node ../scripts/post_deploy_verify.ts"
+    "deploy-testnet": "../scripts/deploy-testnet.sh",
+    "verify-post": "ts-node ../scripts/post_deploy_verify.ts",
+    "console": "clarinet console",
+    "console:testnet": "clarinet console --testnet",
+    "check": "clarinet check",
+    "pre-deploy": "npm run check && ../scripts/manual-testing.sh"
   }
 }

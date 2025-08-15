@@ -1,11 +1,28 @@
 [network]
 name = "simnet"
 rpc_bind = "127.0.0.1:20443"
+# Enhanced BIP alignment with standard test vectors
 
 [accounts.deployer]
+# BIP39 standard test vector - 24 words with proper entropy
 mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
 balance = 10000000000000000
+derivation = "m/44'/5757'/0'/0/0"  # BIP44 standard derivation path for Stacks
 
 [accounts.wallet_1]
-mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
+# Alternative BIP39 test vector for testing scenarios
+mnemonic = "legal winner thank year wave sausage worth useful legal winner thank year wave sausage worth useful legal winner thank year wave sausage worth title"
 balance = 5000000000000000
+derivation = "m/44'/5757'/0'/0/1"
+
+[accounts.wallet_2]
+# Third test account for comprehensive testing
+mnemonic = "letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic bless"
+balance = 5000000000000000
+derivation = "m/44'/5757'/0'/0/2"
+
+[accounts.vault_admin]
+# Dedicated vault administration account
+mnemonic = "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote"
+balance = 1000000000000000
+derivation = "m/44'/5757'/0'/0/3"
