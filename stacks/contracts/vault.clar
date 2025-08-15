@@ -14,7 +14,7 @@
 
 ;; Protocol parameters
 (define-constant BPS_DENOM u10000)
-(define-data-var admin principal tx-sender)
+(define-data-var admin principal .timelock)
 (define-data-var fee-deposit-bps uint u30) ;; 0.30%
 (define-data-var fee-withdraw-bps uint u10) ;; 0.10%
 (define-data-var protocol-reserve uint u0)
@@ -396,9 +396,9 @@
         )
         (map-set block-volume { height: h } { amount: (+ cur amount) })
       )
-      ;; Pull tokens from user into the vault using the default mock token; v2 entrypoint supports dynamic tokens
+      ;; Pull tokens from user into the vault using the stored token contract
       (unwrap!
-        (as-contract (contract-call? .mock-ft transfer-from user tx-sender amount))
+        (contract-call? .mock-ft transfer-from user (as-contract tx-sender) amount)
         (err u200)
       )
       ;; Mint shares proportional to current NAV
@@ -525,7 +525,7 @@
           (var-set protocol-reserve (+ (var-get protocol-reserve) pshare))
         )
         (var-set total-balance (- (var-get total-balance) amount))
-        ;; Send net payout using the default mock token; v2 entrypoint supports dynamic tokens
+        ;; Send net payout using the stored token contract
         (unwrap! (as-contract (contract-call? .mock-ft transfer user payout))
           (err u200)
         )

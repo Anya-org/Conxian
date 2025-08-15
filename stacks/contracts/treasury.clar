@@ -11,7 +11,7 @@
 (define-constant TREASURY_CATEGORIES_BOUNTIES u4)
 
 ;; Data Variables
-(define-data-var dao-governance principal .dao-governance)
+(define-data-var dao-governance principal .timelock)
 (define-data-var bounty-system principal .bounty-system)
 (define-data-var vault principal .vault)
 (define-data-var total-allocated uint u0)

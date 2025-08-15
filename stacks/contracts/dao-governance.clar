@@ -292,6 +292,41 @@
       "set-global-cap" (as-contract (contract-call? .vault set-global-cap
         (unwrap-panic (element-at params u0))
       ))
+      "set-user-cap" (as-contract (contract-call? .vault set-user-cap
+        (unwrap-panic (element-at params u0))
+      ))
+      "set-paused" (as-contract (contract-call? .vault set-paused
+        (if (is-eq (unwrap-panic (element-at params u0)) u1) true false)
+      ))
+      "set-treasury" (as-contract (contract-call? .vault set-treasury
+        (get target-contract proposal)
+      ))
+      "set-fee-split-bps" (as-contract (contract-call? .vault set-fee-split-bps
+        (unwrap-panic (element-at params u0))
+      ))
+      "set-rate-limit" (as-contract (contract-call? .vault set-rate-limit
+        (if (is-eq (unwrap-panic (element-at params u0)) u1) true false)
+        (unwrap-panic (element-at params u1))
+      ))
+      "set-auto-fees-enabled" (as-contract (contract-call? .vault set-auto-fees-enabled
+        (if (is-eq (unwrap-panic (element-at params u0)) u1) true false)
+      ))
+      "set-util-thresholds" (as-contract (contract-call? .vault set-util-thresholds
+        (unwrap-panic (element-at params u0))
+        (unwrap-panic (element-at params u1))
+      ))
+      "set-fee-bounds" (as-contract (contract-call? .vault set-fee-bounds
+        (unwrap-panic (element-at params u0))
+        (unwrap-panic (element-at params u1))
+      ))
+      "withdraw-reserve" (as-contract (contract-call? .vault withdraw-reserve
+        (get target-contract proposal)
+        (unwrap-panic (element-at params u0))
+      ))
+      "withdraw-treasury" (as-contract (contract-call? .vault withdraw-treasury
+        (get target-contract proposal)
+        (unwrap-panic (element-at params u0))
+      ))
       (err u111) ;; Unknown function
     )
   )
