@@ -192,6 +192,13 @@ The vault includes on-chain autonomic controllers to keep fees and treasury rese
  
 Anyone may call `update-autonomics` once enabled, making the system permissionless while proposals still define bounds. See `scripts/keeper_watchdog.py` for an automation scaffold.
 
+For testnet on-chain triggering via the Stacks SDK, use:
+```bash
+cd stacks
+STACKS_PRIVKEY=your_hex_privkey VAULT_CONTRACT=SPXXXX.vault npm run update-autonomics
+```
+Scheduled dry-run keeper action lives in `.github/workflows/keeper-cron.yml` (configure secrets `KEEPER_PRIVKEY` & `VAULT_CONTRACT`).
+
 ### Off-Chain Simulation
  
 Use the economic simulator to stress-test fee dynamics:

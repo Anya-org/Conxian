@@ -1,0 +1,32 @@
+name: Keeper Autonomics Dry-Run
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  update-autonomics:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install deps
+        run: |
+          cd stacks
+          npm ci
+      - name: Run autonomics update (dry)
+        env:
+          STACKS_PRIVKEY: ${{ secrets.KEEPER_PRIVKEY }}
+          VAULT_CONTRACT: ${{ secrets.VAULT_CONTRACT }}
+          NETWORK: testnet
+        run: |
+          cd stacks
+          npm run update-autonomics || true
+      - name: Note
+        run: echo "Transaction result above (ignored failures)."

@@ -27,3 +27,21 @@ path = "contracts/traits/strategy-trait.clar"
 
 [contracts.vault-admin-trait]
 path = "contracts/traits/vault-admin-trait.clar"
+
+[contracts.vault-trait]
+path = "contracts/traits/vault-trait.clar"
+
+[contracts.treasury]
+path = "contracts/treasury.clar"
+
+[contracts.analytics]
+path = "contracts/analytics.clar"
+
+[contracts.creator-token]
+path = "contracts/creator-token.clar"
+
+[contracts.dao-governance]
+path = "contracts/dao-governance.clar"
+
+[contracts.bounty-system]
+path = "contracts/bounty-system.clar"
