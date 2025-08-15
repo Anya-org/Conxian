@@ -44,7 +44,8 @@
     created-block: uint,
     deadline-block: uint,
     completion-block: uint,
-    milestone-count: uint
+  milestone-count: uint,
+  approved-milestones: uint
   }
 )
 
@@ -191,7 +192,8 @@
       created-block: block-height,
       deadline-block: (+ block-height deadline-blocks),
       completion-block: u0,
-      milestone-count: u0
+  milestone-count: u0,
+  approved-milestones: u0
     })
     
     (var-set bounty-count bounty-id)
@@ -385,6 +387,10 @@
           ;; Transfer milestone payment
           (unwrap! (as-contract (contract-call? .treasury pay-milestone 
             assignee milestone-reward)) (err u200))
+
+          ;; Increment approved milestones counter on bounty
+          (map-set bounties { id: bounty-id }
+            (merge bounty { approved-milestones: (+ (get approved-milestones bounty) u1) }))
           
           (emit-milestone-completed bounty-id milestone-id assignee)
           (ok true)
@@ -396,65 +402,20 @@
 )
 
 (define-public (complete-bounty (bounty-id uint))
-  (let (
-    (bounty (unwrap! (get-bounty bounty-id) (err u103)))
-    (assignee (unwrap! (get assignee bounty) (err u113)))
-  )
-    ;; Only bounty creator can mark complete
+  (let ((bounty (unwrap! (get-bounty bounty-id) (err u103)))
+        (assignee (unwrap! (get assignee bounty) (err u113))))
     (asserts! (is-eq tx-sender (get creator bounty)) (err u100))
-    
-    ;; Bounty must be assigned
     (asserts! (is-eq (get status bounty) BOUNTY_STATUS_ASSIGNED) (err u114))
-    
-    ;; Check if all milestones are approved
-    (asserts! (check-all-milestones-approved bounty-id (get milestone-count bounty)) (err u115))
-    
-    (let (
-      (reward (get reward-amount bounty))
-      (creator-tokens (get creator-token-reward bounty))
-    )
-      ;; Update bounty status
+  ;; All milestones approved iff approved-milestones == milestone-count
+  (asserts! (is-eq (get approved-milestones bounty) (get milestone-count bounty)) (err u115))
+    (let ((reward (get reward-amount bounty))
+          (creator-tokens (get creator-token-reward bounty)))
       (map-set bounties { id: bounty-id }
-        (merge bounty { 
-          status: BOUNTY_STATUS_COMPLETED,
-          completion-block: block-height
-        })
-      )
-      
-      ;; Update contributor stats
+        (merge bounty { status: BOUNTY_STATUS_COMPLETED, completion-block: block-height }))
       (update-contributor-stats assignee reward creator-tokens)
-      
-      ;; Mint creator tokens
       (unwrap! (as-contract (contract-call? .creator-token mint assignee creator-tokens)) (err u201))
-      
       (emit-bounty-completed bounty-id assignee reward)
-      (ok true)
-    )
-  )
-)
-
-;; Helper functions
-(define-private (check-all-milestones-approved (bounty-id uint) (milestone-count uint))
-  (if (is-eq milestone-count u0)
-    true ;; No milestones = automatically approved
-    (check-milestone-approved-recursive bounty-id u1 milestone-count)
-  )
-)
-
-(define-private (check-milestone-approved-recursive (bounty-id uint) (current uint) (total uint))
-  (if (> current total)
-    true
-    (let ((milestone (get-milestone bounty-id current)))
-      (match milestone
-        m (if (is-eq (get status m) MILESTONE_STATUS_APPROVED)
-            (check-milestone-approved-recursive bounty-id (+ current u1) total)
-            false
-          )
-        false
-      )
-    )
-  )
-)
+      (ok true))))
 
 (define-private (update-contributor-stats (contributor principal) (reward uint) (creator-tokens uint))
   (let (
