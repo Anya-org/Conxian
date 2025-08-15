@@ -1,0 +1,38 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install Clarinet
+      run: |
+        curl -sSfL https://github.com/hirosystems/clarinet/releases/latest/download/clarinet-installer.sh | sh
+        echo "$HOME/.clarinet/bin" >> $GITHUB_PATH
+        
+    - name: Verify Clarinet Installation
+      run: clarinet --version
+      
+    - name: Check Contract Syntax
+      run: |
+        cd stacks
+        clarinet check
+        
+    - name: Run Tests
+      run: |
+        cd stacks
+        clarinet test
+        
+    - name: Contract Security Check
+      run: |
+        cd stacks
+        # Add security scanning when available
+        echo "Security checks would run here"
