@@ -185,12 +185,10 @@ The vault includes on-chain autonomic controllers to keep fees and treasury rese
 ### On-Chain Controllers
 - Utilization-based withdraw fee adjustment (`update-fees-based-on-utilization`)
 - Reserve band driven deposit fee adjustment (`update-autonomics`)
-- Governance/timelock gated parameter setters:
-   - `set-reserve-bands`, `set-fee-ramps`, `set-auto-economics-enabled`
-   - `set-util-thresholds`, `set-fee-bounds`, `set-auto-fees-enabled`
+- Governance/timelock gated parameter setters: `set-reserve-bands`, `set-fee-ramps`, `set-auto-economics-enabled`, `set-util-thresholds`, `set-fee-bounds`, `set-auto-fees-enabled`
 
 ### Keeper Model
-Anyone may call `update-autonomics` once enabled, making the system permissionless while proposals still define bounds.
+Anyone may call `update-autonomics` once enabled, making the system permissionless while proposals still define bounds. See `scripts/keeper_watchdog.py` for an automation scaffold.
 
 ### Off-Chain Simulation
 Use the economic simulator to stress-test fee dynamics:
@@ -209,7 +207,10 @@ python scripts/ml_strategy_recommender.py --state-json '{"utilization_bps":8400,
 Outputs JSON with recommended parameter changes (future: integrate real ML / RL agent).
 
 ### Analytics Integration
-Autonomic adjustments emit events (`update-autonomics`, analytics hook) enabling off-chain dashboards to track fee evolution, utilization, and reserve ratios.
+Autonomic adjustments emit events (`update-autonomics` plus analytics hook `record-autonomics`) enabling off-chain dashboards to track fee evolution, utilization, and reserve ratios. Tested in `analytics_autonomics_event_test.ts`.
+
+### Proposal / Governance Tooling
+Generated recommendations can be converted into structured governance action bundles with `scripts/governance_proposal_builder.py`.
 
 ### Safety & Bounds
 All automatic adjustments obey governance-defined min/max bounds; disabling controllers is a single on-chain transaction (`set-auto-economics-enabled false`).
