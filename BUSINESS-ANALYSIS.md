@@ -1,3 +1,5 @@
+# AutoVault Business Model Analysis
+
 ## **🚀 BUSINESS MODEL ALIGNMENT ANALYSIS**
 
 ### **Revenue Sustainability Score: 9.5/10**

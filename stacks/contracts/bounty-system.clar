@@ -1,14 +1,20 @@
-;; On-Chain Bounty System - DAO Self-Managed Development Incentives
+;; Enhanced Bounty System - DAO Self-Managed Development Incentives
+;; Integrates with automated-bounty-system for Bitcoin-aligned governance
 ;; Fully autonomous bounty creation, management, and reward distribution
 
 (use-trait sip010 .sip-010-trait.sip-010-trait)
 
-;; Constants
+;; Integration with automated bounty system
+(define-constant AUTOMATED_BOUNTY_CONTRACT .automated-bounty-system)
+
+;; Constants - Aligned with automated system
 (define-constant BOUNTY_CATEGORIES_DEV u0)
 (define-constant BOUNTY_CATEGORIES_SECURITY u1)
 (define-constant BOUNTY_CATEGORIES_DOCS u2)
 (define-constant BOUNTY_CATEGORIES_ANALYTICS u3)
 (define-constant BOUNTY_CATEGORIES_DESIGN u4)
+(define-constant BOUNTY_CATEGORIES_OPTIMIZATION u5)
+(define-constant BOUNTY_CATEGORIES_FEATURE u6)
 
 (define-constant BOUNTY_STATUS_OPEN u0)
 (define-constant BOUNTY_STATUS_ASSIGNED u1)

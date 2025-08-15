@@ -13,24 +13,24 @@ Deploy foundational contracts without cross-dependencies:
 
 Deploy main business logic contracts:
 
-5. **Registry**: registry (contract registry)
-6. **Vault**: vault (core DeFi logic)
-7. **Timelock**: timelock (governance safety)
+1. **Registry**: registry (contract registry)
+2. **Vault**: vault (core DeFi logic)
+3. **Timelock**: timelock (governance safety)
 
 ## Phase 3: Governance & Analytics
 
 Deploy governance and monitoring:
 
-8. **DAO**: dao (basic governance)
-9. **Analytics**: analytics (metrics and events)
-10. **Treasury**: treasury (fund management)
+1. **DAO**: dao (basic governance)
+2. **Analytics**: analytics (metrics and events)
+3. **Treasury**: treasury (fund management)
 
 ## Phase 4: Advanced Features
 
 Deploy advanced governance and bounty system:
 
-11. **DAO Governance**: dao-governance (full governance)
-12. **Bounty System**: bounty-system (development incentives)
+1. **DAO Governance**: dao-governance (full governance)
+2. **Bounty System**: bounty-system (development incentives)
 
 ## Phase 5: Integration
 

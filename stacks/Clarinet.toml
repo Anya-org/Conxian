@@ -86,3 +86,8 @@ epoch = "2.4"
 path = "contracts/bounty-system.clar"
 clarity_version = 2
 epoch = "2.4"
+
+[contracts.automated-bounty-system]
+path = "contracts/automated-bounty-system.clar"
+clarity_version = 2
+epoch = "2.4"

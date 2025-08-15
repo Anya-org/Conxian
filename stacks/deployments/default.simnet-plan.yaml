@@ -41,6 +41,11 @@ plan:
             path: contracts/traits/sip-010-trait.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: automated-bounty-system
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/automated-bounty-system.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: creator-token
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/creator-token.clar
