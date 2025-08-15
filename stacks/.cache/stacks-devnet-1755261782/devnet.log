@@ -1,0 +1,13 @@
+Aug 15 12:43:16.401 INFO Checking contracts
+Aug 15 12:43:16.411 INFO Starting Devnet
+Aug 15 12:43:16.413 INFO Listening on port 20445 for Stacks chain events
+Aug 15 12:43:16.414 INFO Seeding block pool with 0 blocks
+Aug 15 12:43:16.414 WARN Default snapshot can not be used
+Aug 15 12:43:16.414 INFO Observing Bitcoin chain events via Stacks node
+Aug 15 12:43:16.415 INFO Initiating Devnet boot sequence (working_dir: /workspaces/AutoVault/stacks/.cache/stacks-devnet-1755261782)
+Aug 15 12:43:16.418 INFO Creating network autovault.devnet
+Aug 15 12:43:16.418 INFO Starting bitcoin-node
+Aug 15 12:43:24.235 WARN Ctrl+C received, initiating termination sequence.
+Aug 15 12:43:24.239 INFO Handling Termination command
+Aug 15 12:43:24.698 INFO Created container bitcoin-node: 1c7cac9dc582833a6b0d08f3781e9980689b71aa1d304831fcc202f4d5df172e
+Aug 15 12:43:41.311 INFO Created container postgres: 2495fb59cdb609a4a47c20503fe359af73d153b2a2ee0d5938c592eb5de888ce
