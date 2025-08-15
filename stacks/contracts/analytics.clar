@@ -154,8 +154,8 @@
   (begin
     ;; Only vault contract can record vault events
     (asserts! (is-eq tx-sender .vault) (err u100))
-    (try! (record-event EVENT_TYPES_VAULT .vault event-name user amount metadata))
-  (update-vault-metrics event-name user amount)
+    (unwrap! (record-event EVENT_TYPES_VAULT .vault event-name user amount metadata) (err u201))
+    (unwrap! (update-vault-metrics event-name user amount) (err u202))
     (ok true)
   )
 )
@@ -170,7 +170,7 @@
   (begin
     ;; callable by vault or any keeper after an update (no sensitive mutation)
   ;; Record event with empty metadata (string-utf8 0) due to removal of to-string in current dialect
-  (try! (record-event EVENT_TYPES_VAULT .vault "autonomics" .vault 0 ""))
+  (unwrap-panic (record-event EVENT_TYPES_VAULT .vault "autonomics" .vault u0 u""))
     (print {
       event: "autonomics-metrics",
       wfee: withdraw-fee,
@@ -191,8 +191,8 @@
   (begin
     ;; Only governance contract can record governance events
     (asserts! (is-eq tx-sender .dao-governance) (err u100))
-  (try! (record-event EVENT_TYPES_GOVERNANCE .dao-governance event-name user amount metadata))
-  (update-governance-metrics event-name user amount)
+    (unwrap! (record-event EVENT_TYPES_GOVERNANCE .dao-governance event-name user amount metadata) (err u201))
+    (unwrap! (update-governance-metrics event-name user amount) (err u202))
     (ok true)
   )
 )
@@ -206,8 +206,8 @@
   (begin
     ;; Only bounty system can record bounty events
     (asserts! (is-eq tx-sender .bounty-system) (err u100))
-  (try! (record-event EVENT_TYPES_BOUNTY .bounty-system event-name user amount metadata))
-  (update-bounty-metrics event-name user amount)
+    (unwrap! (record-event EVENT_TYPES_BOUNTY .bounty-system event-name user amount metadata) (err u201))
+    (unwrap! (update-bounty-metrics event-name user amount) (err u202))
     (ok true)
   )
 )
@@ -221,7 +221,7 @@
   (begin
     ;; Only treasury contract can record treasury events
     (asserts! (is-eq tx-sender .treasury) (err u100))
-    (try! (record-event EVENT_TYPES_TREASURY .treasury event-name user amount metadata))
+    (unwrap! (record-event EVENT_TYPES_TREASURY .treasury event-name user amount metadata) (err u201))
     (ok true)
   )
 )
@@ -257,11 +257,11 @@
 (define-private (update-vault-metrics (event-name (string-ascii 50)) (user principal) (amount uint))
   (begin
     ;; Update daily metrics
-  (update-period-vault-metrics METRIC_PERIODS_DAILY event-name user amount)
+    (unwrap-panic (update-period-vault-metrics METRIC_PERIODS_DAILY event-name user amount))
     ;; Update weekly metrics
-  (update-period-vault-metrics METRIC_PERIODS_WEEKLY event-name user amount)
+    (unwrap-panic (update-period-vault-metrics METRIC_PERIODS_WEEKLY event-name user amount))
     ;; Update monthly metrics
-  (update-period-vault-metrics METRIC_PERIODS_MONTHLY event-name user amount)
+    (unwrap-panic (update-period-vault-metrics METRIC_PERIODS_MONTHLY event-name user amount))
     (ok true)
   )
 )
@@ -320,11 +320,11 @@
 (define-private (update-governance-metrics (event-name (string-ascii 50)) (user principal) (amount uint))
   (begin
     ;; Update daily metrics
-    (try! (update-period-governance-metrics METRIC_PERIODS_DAILY event-name user amount))
+    (unwrap-panic (update-period-governance-metrics METRIC_PERIODS_DAILY event-name user amount))
     ;; Update weekly metrics  
-    (try! (update-period-governance-metrics METRIC_PERIODS_WEEKLY event-name user amount))
+    (unwrap-panic (update-period-governance-metrics METRIC_PERIODS_WEEKLY event-name user amount))
     ;; Update monthly metrics
-    (try! (update-period-governance-metrics METRIC_PERIODS_MONTHLY event-name user amount))
+    (unwrap-panic (update-period-governance-metrics METRIC_PERIODS_MONTHLY event-name user amount))
     (ok true)
   )
 )
@@ -379,11 +379,11 @@
 (define-private (update-bounty-metrics (event-name (string-ascii 50)) (user principal) (amount uint))
   (begin
     ;; Update daily metrics
-    (try! (update-period-bounty-metrics METRIC_PERIODS_DAILY event-name user amount))
+    (unwrap! (update-period-bounty-metrics METRIC_PERIODS_DAILY event-name user amount) (err u500))
     ;; Update weekly metrics
-    (try! (update-period-bounty-metrics METRIC_PERIODS_WEEKLY event-name user amount))
+    (unwrap! (update-period-bounty-metrics METRIC_PERIODS_WEEKLY event-name user amount) (err u500))
     ;; Update monthly metrics
-    (try! (update-period-bounty-metrics METRIC_PERIODS_MONTHLY event-name user amount))
+    (unwrap! (update-period-bounty-metrics METRIC_PERIODS_MONTHLY event-name user amount) (err u500))
     (ok true)
   )
 )
@@ -431,8 +431,8 @@
       )
     ))
       (map-set user-activity { user: user, period-type: period-type, period-start: period-start } updated-user-activity)
+      (ok true)
     )
-    (ok true)
   )
 )
 

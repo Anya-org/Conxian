@@ -4,10 +4,10 @@ block_time = 3
 rpc_bind = "127.0.0.1:20443"
 
 [accounts.deployer]
-# 24-word test mnemonic for local simnet only. Do NOT use on real networks.
-mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
+# Test mnemonic for local simnet only. Do NOT use on real networks.
+mnemonic = "twice kind fence tip hidden tilt action fragile skin nothing glory cousin green tomorrow spring wrist shed math olympic multiply hip blue scout claw"
 balance = 1000000000000000
 
 [accounts.wallet_1]
-mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
+mnemonic = "sell invite acquire kitten bamboo drastic jelly vivid peace spawn twice guilt pave pen trash pretty park cube fragile unaware remain midnight betray rebuild"
 balance = 500000000000000

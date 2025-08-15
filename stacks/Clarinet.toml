@@ -4,9 +4,9 @@ description = "AutoVault DeFi protocol - clarinet config"
 requirements = []
 
 [accounts]
-deployer = { mnemonic = "test test test test test test test test test test test junk", balance = 10_000_000_000 }
-wallet_1 = { mnemonic = "test test test test test test test test test test test junk", balance = 5_000_000_000, derivation = 1 }
-wallet_2 = { mnemonic = "test test test test test test test test test test test junk", balance = 5_000_000_000, derivation = 2 }
+deployer = { mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art", balance = 10_000_000_000 }
+wallet_1 = { mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art", balance = 5_000_000_000, derivation = 1 }
+wallet_2 = { mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art", balance = 5_000_000_000, derivation = 2 }
 
 [network]
 api_endpoint = "http://localhost:3999" # clarinet devnet default

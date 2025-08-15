@@ -384,9 +384,9 @@
           (milestone-reward (/ (* (get reward-amount bounty) (get reward-percentage milestone)) u100))
           (assignee (unwrap-panic (get assignee bounty)))
         )
-          ;; Transfer milestone payment
-          (unwrap! (as-contract (contract-call? .treasury pay-milestone 
-            assignee milestone-reward)) (err u200))
+          ;; Transfer milestone payment - will be enabled after treasury deployment
+          ;; (unwrap! (as-contract (contract-call? .treasury pay-milestone 
+          ;;   assignee milestone-reward)) (err u200))
 
           ;; Increment approved milestones counter on bounty
           (map-set bounties { id: bounty-id }

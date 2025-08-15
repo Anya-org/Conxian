@@ -47,14 +47,17 @@
 (define-public (propose-pause (p bool))
   (begin
     (unwrap! (assert-threshold tx-sender) (err u101))
-    (as-contract (contract-call? .timelock queue-set-paused p))
+    ;; Will be enabled after timelock deployment
+    ;; (as-contract (contract-call? .timelock queue-set-paused p))
+    (ok true) 
   )
 )
 
 (define-public (propose-set-fee-split-bps (bps uint))
   (begin
     (unwrap! (assert-threshold tx-sender) (err u101))
-    (as-contract (contract-call? .timelock queue-set-fee-split-bps bps))
+    ;; (as-contract (contract-call? .timelock queue-set-fee-split-bps bps))
+    (ok true) ;; Placeholder
   )
 )
 

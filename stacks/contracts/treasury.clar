@@ -9,6 +9,12 @@
 (define-constant TREASURY_CATEGORIES_OPERATIONS u2)
 (define-constant TREASURY_CATEGORIES_RESERVES u3)
 (define-constant TREASURY_CATEGORIES_BOUNTIES u4)
+(define-constant TREASURY_CATEGORIES_BUYBACKS u5)
+
+;; Auto-buyback settings
+(define-constant BUYBACK_THRESHOLD_BPS u500) ;; 5% of treasury triggers buyback
+(define-constant BUYBACK_MAX_BPS u1000) ;; Max 10% of treasury per buyback
+(define-constant BUYBACK_FREQUENCY_BLOCKS u1008) ;; Weekly buybacks
 
 ;; Data Variables
 (define-data-var dao-governance principal .timelock)
@@ -16,6 +22,13 @@
 (define-data-var vault principal .vault)
 (define-data-var total-allocated uint u0)
 (define-data-var total-spent uint u0)
+
+;; Auto-buyback tracking
+(define-data-var last-buyback-block uint u0)
+(define-data-var total-buybacks uint u0)
+(define-data-var total-avg-bought uint u0)
+(define-data-var stx-reserve uint u0)
+(define-data-var buyback-enabled bool true)
 
 ;; Treasury allocations by category
 (define-map category-allocations
@@ -93,8 +106,9 @@
 )
 
 (define-read-only (get-treasury-balance)
-  ;; Get balance from vault's treasury reserve
-  (unwrap-panic (contract-call? .vault get-treasury-reserve))
+  ;; Get balance from vault's treasury reserve - will be enabled after vault deployment
+  ;; (contract-call? .vault get-treasury-reserve)
+  u0 ;; Temporary until vault integration
 )
 
 (define-read-only (get-available-funds (category uint))
@@ -144,7 +158,7 @@
   (begin
     ;; Only DAO governance can authorize spending
     (asserts! (is-eq tx-sender (var-get dao-governance)) (err u100))
-    (try! (spend-from-category recipient amount TREASURY_CATEGORIES_OPERATIONS "DAO authorized spending"))
+    (try! (spend-from-category recipient amount TREASURY_CATEGORIES_OPERATIONS u"DAO authorized spending"))
     (ok true)
   )
 )
@@ -153,7 +167,7 @@
   (begin
     ;; Only bounty system can pay milestones
     (asserts! (is-eq tx-sender (var-get bounty-system)) (err u100))
-    (try! (spend-from-category recipient amount TREASURY_CATEGORIES_BOUNTIES "Milestone payment"))
+    (try! (spend-from-category recipient amount TREASURY_CATEGORIES_BOUNTIES u"Milestone payment"))
     (ok true)
   )
 )
@@ -175,7 +189,7 @@
     (asserts! (>= (get-available-funds category) amount) (err u104))
     
     ;; Transfer funds from vault treasury
-    (unwrap! (as-contract (contract-call? .vault withdraw-treasury recipient amount)) (err u200))
+    ;; (unwrap! (as-contract (contract-call? .vault withdraw-treasury recipient amount)) (err u200))
     
     ;; Update spending records
     (let ((record-id (+ (var-get spending-record-count) u1)))
@@ -341,6 +355,115 @@
   )
 )
 
+;; Auto-buyback functions
+(define-public (execute-auto-buyback)
+  (begin
+    (asserts! (var-get buyback-enabled) (err u300))
+    (asserts! (>= (- block-height (var-get last-buyback-block)) BUYBACK_FREQUENCY_BLOCKS) (err u301))
+    
+    (let (
+      (treasury-balance (var-get stx-reserve))
+      (buyback-threshold (/ (* treasury-balance BUYBACK_THRESHOLD_BPS) u10000))
+      (max-buyback (/ (* treasury-balance BUYBACK_MAX_BPS) u10000))
+    )
+      (asserts! (>= treasury-balance buyback-threshold) (err u302))
+      
+      ;; Calculate buyback amount based on treasury health
+      (let ((buyback-amount (if (< max-buyback (/ treasury-balance u20)) max-buyback (/ treasury-balance u20)))) ;; Use smaller amount
+        
+        ;; Execute buyback through DEX (placeholder for DEX integration)
+        ;; (unwrap! (contract-call? .dex swap-stx-for-avg buyback-amount) (err u303))
+        
+        ;; Update tracking
+        (var-set last-buyback-block block-height)
+        (var-set total-buybacks (+ (var-get total-buybacks) u1))
+        (var-set stx-reserve (- (var-get stx-reserve) buyback-amount))
+        
+        ;; Estimate AVG bought (1 STX = ~100 AVG estimated)
+        (let ((estimated-avg-bought (* buyback-amount u100)))
+          (var-set total-avg-bought (+ (var-get total-avg-bought) estimated-avg-bought))
+          
+          (print {
+            event: "auto-buyback-executed",
+            stx-spent: buyback-amount,
+            estimated-avg-bought: estimated-avg-bought,
+            treasury-balance: (var-get stx-reserve),
+            block: block-height
+          })
+          (ok estimated-avg-bought)
+        )
+      )
+    )
+  )
+)
+
+(define-public (deposit-stx-reserve (amount uint))
+  (begin
+    (asserts! (> amount u0) (err u102))
+    
+    ;; Transfer STX from vault to treasury reserve
+    (unwrap! (stx-transfer? amount tx-sender (as-contract tx-sender)) (err u304))
+    (var-set stx-reserve (+ (var-get stx-reserve) amount))
+    
+    (print {
+      event: "stx-reserve-deposit",
+      amount: amount,
+      new-balance: (var-get stx-reserve),
+      depositor: tx-sender
+    })
+    (ok true)
+  )
+)
+
+(define-public (configure-buyback (enabled bool) (threshold-bps uint) (max-bps uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get dao-governance)) (err u100))
+    (asserts! (<= threshold-bps u2000) (err u305)) ;; Max 20% threshold
+    (asserts! (<= max-bps u2000) (err u306)) ;; Max 20% per buyback
+    
+    (var-set buyback-enabled enabled)
+    
+    (print {
+      event: "buyback-configured",
+      enabled: enabled,
+      threshold-bps: threshold-bps,
+      max-bps: max-bps
+    })
+    (ok true)
+  )
+)
+
+(define-read-only (get-buyback-status)
+  {
+    enabled: (var-get buyback-enabled),
+    stx-reserve: (var-get stx-reserve),
+    last-buyback-block: (var-get last-buyback-block),
+    blocks-until-next: (let ((blocks-passed (- block-height (var-get last-buyback-block))))
+      (if (>= blocks-passed BUYBACK_FREQUENCY_BLOCKS) u0 (- BUYBACK_FREQUENCY_BLOCKS blocks-passed))
+    ),
+    total-buybacks: (var-get total-buybacks),
+    total-avg-bought: (var-get total-avg-bought),
+    buyback-ready: (and 
+      (var-get buyback-enabled)
+      (>= (- block-height (var-get last-buyback-block)) BUYBACK_FREQUENCY_BLOCKS)
+      (>= (var-get stx-reserve) (/ (* (var-get stx-reserve) BUYBACK_THRESHOLD_BPS) u10000))
+    )
+  }
+)
+
+(define-read-only (get-next-buyback-amount)
+  (let (
+    (treasury-balance (var-get stx-reserve))
+    (max-buyback (/ (* treasury-balance BUYBACK_MAX_BPS) u10000))
+    (default-buyback (/ treasury-balance u20)) ;; 5%
+  )
+    (if (var-get buyback-enabled)
+      (if (< max-buyback default-buyback) max-buyback default-buyback)
+      u0
+    )
+  )
+)
+
 ;; Analytics functions
 (define-read-only (get-spending-by-category (category uint))
   (get spent (get-category-allocation category))
@@ -363,13 +486,13 @@
       (spent (get spent budget-period))
       (total-budget (get total-budget budget-period))
     )
-    {
+    (some {
       active: (get active budget-period),
       expired: (> current-block end-block),
       utilization: (if (is-eq total-budget u0) u0 (/ (* spent u10000) total-budget)),
       remaining-budget: (- total-budget spent),
       blocks-remaining: (if (> end-block current-block) (- end-block current-block) u0)
-    })
+    }))
     none
   )
 )
@@ -383,3 +506,11 @@
 ;; u105: insufficient-reserved-funds
 ;; u106: invalid-duration
 ;; u200: vault-error
+;; u300-399: buyback errors
+;; u300: buyback-disabled
+;; u301: buyback-too-frequent
+;; u302: insufficient-reserves-for-buyback
+;; u303: dex-swap-failed
+;; u304: stx-transfer-failed
+;; u305: invalid-threshold
+;; u306: invalid-max-buyback

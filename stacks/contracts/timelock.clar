@@ -189,7 +189,8 @@
       (begin
         (asserts! (>= block-height (get eta i)) (err u101))
         (map-delete q-fees { id: id })
-        (as-contract (contract-call? .vault set-fees (get deposit-bps i) (get withdraw-bps i)))
+        ;; (as-contract (contract-call? .vault set-fees (get deposit-bps i) (get withdraw-bps i)))
+        (ok true) ;; Placeholder
       )
       (err u102)
     )

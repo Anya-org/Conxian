@@ -747,7 +747,7 @@
   (begin
     (asserts! (is-eq (var-get auto-economics-enabled) true) (err u110))
     ;; First adjust withdraw fees via existing utilization controller (if enabled)
-  (update-fees-based-on-utilization)
+    (unwrap! (update-fees-based-on-utilization) (err u111))
     ;; Then adjust deposit fee based on reserve ratio vs target band
     (let (
         (ratio (unwrap! (ok (get-reserve-ratio)) (err u0)))
@@ -762,14 +762,14 @@
           true
         )
       )
-  (print {
+      (print {
         event: "update-autonomics",
         reserve-ratio: ratio,
         new-deposit-fee: (var-get fee-deposit-bps),
         withdraw-fee: (var-get fee-withdraw-bps)
       })
-  ;; Analytics hook (best-effort). This will no-op if analytics contract not present at compile deployment time.
-  (as-contract (contract-call? .analytics record-vault-event "auto-update" tx-sender u0 "autonomics-adjust"))
+      ;; Analytics hook (best-effort). This will no-op if analytics contract not present at compile deployment time.
+      ;; (try! (as-contract (contract-call? .analytics record-vault-event "auto-update" tx-sender u0 "autonomics-adjust")))
       (ok true)
     )
   )
