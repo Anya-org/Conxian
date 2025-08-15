@@ -1,0 +1,77 @@
+name: Release Management
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Clarinet
+        run: |
+          curl -sSfL https://github.com/hirosystems/clarinet/releases/latest/download/clarinet-installer.sh | sh
+          echo "$HOME/.clarinet/bin" >> $GITHUB_PATH
+          
+      - name: Run Tests
+        run: |
+          cd stacks
+          clarinet check
+          clarinet test
+
+  create-release:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Generate Release Notes
+        id: release_notes
+        run: |
+          # Get the latest tag
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          
+          # Generate changelog
+          if [ -n "$LATEST_TAG" ]; then
+            CHANGELOG=$(git log $LATEST_TAG..HEAD --pretty=format:"- %s" --grep="feat:" --grep="fix:" --grep="BREAKING CHANGE:")
+          else
+            CHANGELOG=$(git log --pretty=format:"- %s" --grep="feat:" --grep="fix:" --grep="BREAKING CHANGE:")
+          fi
+          
+          # Create release notes
+          cat > release_notes.md << EOF
+          ## What's Changed
+          
+          $CHANGELOG
+          
+          ## Smart Contract Updates
+          - Contract verification and testing completed
+          - All tests passing on Simnet
+          
+          ## Deployment
+          This release includes tested smart contracts ready for deployment.
+          EOF
+          
+      - name: Create Release
+        uses: gh-actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name || github.event.inputs.version }}
+          release_name: AutoVault ${{ github.ref_name || github.event.inputs.version }}
+          body_path: release_notes.md
+          draft: false
+          prerelease: false

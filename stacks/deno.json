@@ -1,0 +1,10 @@
+{
+  "imports": {
+    "clarinet": "https://deno.land/x/clarinet@v0.28.0/index.ts"
+  },
+  "fmt": {
+    "useTabs": false,
+    "indentWidth": 2,
+    "lineWidth": 100
+  }
+}
