@@ -25,5 +25,9 @@
     "console:testnet": "clarinet console --testnet",
     "check": "clarinet check",
     "pre-deploy": "npm run check && ../scripts/manual-testing.sh"
+  },
+  "dependencies": {
+    "@types/node-fetch": "^2.6.13",
+    "node-fetch": "^3.3.2"
   }
 }
