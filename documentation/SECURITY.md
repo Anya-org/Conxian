@@ -1,6 +1,7 @@
 # AutoVault Security Documentation
 
-This document outlines AutoVault's security architecture, implemented protections, and audit readiness.
+This document outlines AutoVault's security architecture, implemented
+protections, and audit readiness.
 
 ## Security Overview
 
@@ -14,7 +15,7 @@ AutoVault implements enterprise-grade security with multiple layers of protectio
 
 ## Core Security Features
 
-**1. Emergency Pause System (AIP-1)**
+### 1. Emergency Pause System (AIP-1)
 
 Status: ACTIVE
 
@@ -34,7 +35,7 @@ Emergency Controls:
 - Granular control over individual system components
 - Automatic resume after investigation period
 
-**2. Time-Weighted Voting (AIP-2)**
+### 2. Time-Weighted Voting (AIP-2)
 
 Status: ACTIVE
 
@@ -54,7 +55,7 @@ Vote Weight Calculation:
 - Sybil voting schemes
 - Vote buying attempts
 
-**3. Treasury Multi-Signature (AIP-3)**
+### 3. Treasury Multi-Signature (AIP-3)
 
 Status: ACTIVE
 
@@ -74,7 +75,7 @@ Multi-Sig Requirements:
 - Regular key rotation procedures
 - Emergency recovery mechanisms
 
-**4. Bounty Security Hardening (AIP-4)**
+### 4. Bounty Security Hardening (AIP-4)
 
 Status: ACTIVE
 
@@ -94,7 +95,7 @@ Bounty Protections:
 - Payment escrow system
 - Community dispute resolution
 
-**5. Vault Precision (AIP-5)**
+### 5. Vault Precision (AIP-5)
 
 Status: ACTIVE
 
@@ -174,7 +175,7 @@ npm run test:integration
 
 ### Contract Security Layers
 
-```
+```text
 User Interface (Frontend)
 ├── Input Validation: Sanitize all user inputs
 ├── Rate Limiting: Prevent spam and abuse

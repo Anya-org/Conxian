@@ -5,41 +5,48 @@ Deployment, testing, and utility scripts for the AutoVault DeFi platform.
 ## Script Categories
 
 ### Deployment Scripts
+
 - `deploy-testnet.sh` - Deploy all contracts to Stacks testnet
 - `deploy-mainnet.sh` - Production deployment with multi-sig controls
 - `sdk_deploy_contracts.ts` - Automated SDK-based contract deployment
 - `post_deploy_verify.ts` - Post-deployment verification and testing
 
 ### Testing & Verification
+
 - `manual-testing.sh` - Interactive manual testing suite
 - `run-all-tests.sh` - Comprehensive test execution
 - `verify.sh` - Contract compilation and verification
 - `check_dependencies.py` - Dependency validation
 
 ### Maintenance & Monitoring
+
 - `monitor-health.sh` - Protocol health monitoring
 - `keeper_watchdog.py` - Automated parameter adjustment watchdog
 - `python_update_autonomics.py` - Python-based autonomic controller
 - `sync_issues.py` - GitHub issue synchronization
 
 ### Development Tools
+
 - `broadcast-tx.sh` - Transaction broadcasting utility
 - `call-read.sh` - Read-only contract call utility
 - `get-abi.sh` - Contract ABI extraction
 - `ping.sh` - Network connectivity testing
 
 ### Economic & Analytics
+
 - `economic_simulation.py` - Protocol economic modeling
 - `ml_strategy_recommender.py` - ML-based strategy recommendations
 - `governance_proposal_builder.py` - Structured proposal generation
 
 ### Integration & Automation
+
 - `integrate-aip-implementations.sh` - AIP feature integration
 - `sdk_update_autonomics.ts` - SDK-based autonomic updates
 - `register_chainhook.sh` - Chainhook registration
 - `local_chainhook_harness.py` - Local chainhook testing
 
 ### GitHub Integration
+
 - `label_completed_issues.py` - Automated issue labeling
 - `claim-creator-tokens.sh` - Creator token claiming automation
 
@@ -168,20 +175,6 @@ python local_chainhook_harness.py
 ./verify.sh
 ```
 
-## GitHub Integration
-
-**Sync project issues:**
-
-```bash
-python sync_issues.py
-```
-
-**Label completed work:**
-
-```bash
-python label_completed_issues.py
-```
-
 ## Configuration
 
 Most scripts use environment variables for configuration:
@@ -203,6 +196,7 @@ export TREASURY_CONTRACT=SP123.treasury
 ## Requirements
 
 **System Dependencies:**
+
 - Node.js (v18+)
 - Python (v3.8+)
 - Clarinet CLI
@@ -235,4 +229,5 @@ npm install @stacks/transactions @stacks/network
 4. **Monitor and verify** deployment
 5. **Deploy to mainnet** with multi-sig
 
-For detailed documentation on specific scripts, see individual script headers and the main [documentation](../documentation/) folder.
+For detailed documentation on specific scripts, see individual script
+headers and the main [documentation](../documentation/) folder.

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - Initial AutoVault implementation with Clarity smart contracts
 - Vault contract with per-user balances, admin functions, and fee system
 - DAO governance token contract
@@ -16,15 +17,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation for design and economics
 
 ### Changed
+
 - Migrated from Rust prototype to Clarity-only implementation
 
 ### Security
+
 - Admin-only functions protected with proper access controls
 - Fee calculations implemented with overflow protection
 
 ## Roadmap
 
 ### Planned Features
+
 - SIP-010 fungible token integration
 - Events and analytics system
 - Enhanced governance mechanisms

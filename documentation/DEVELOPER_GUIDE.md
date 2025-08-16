@@ -1,16 +1,17 @@
 # AutoVault Developer Guide
 
-This guide provides everything you need to develop, test, and deploy AutoVault smart contracts.
+This guide provides everything you need to develop, test, and deploy
+AutoVault smart contracts.
 
 ## Quick Start
 
-**Prerequisites**
+### Prerequisites
 
 - Clarinet CLI (v2.0+)
 - Node.js (v18+)
 - Git for version control
 
-**Setup**
+### Setup
 
 ```bash
 # Clone repository
@@ -27,7 +28,7 @@ npm test
 
 ## Project Structure
 
-```
+```text
 AutoVault/
 ├── stacks/                     # Smart contract development
 │   ├── contracts/              # Smart contract source files

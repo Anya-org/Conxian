@@ -1,10 +1,11 @@
 # AutoVault Stacks Smart Contracts
 
-Production-ready smart contracts for the AutoVault DeFi platform on Stacks blockchain.
+Production-ready smart contracts for the AutoVault DeFi platform on
+Stacks blockchain.
 
 ## Contracts Overview
 
-**Core System (6 contracts)**
+### Core System (6 contracts)
 
 - `vault.clar` - Share-based asset management with fee controls
 - `treasury.clar` - DAO fund management and automated buybacks  
@@ -13,14 +14,14 @@ Production-ready smart contracts for the AutoVault DeFi platform on Stacks block
 - `analytics.clar` - Protocol metrics and tracking
 - `registry.clar` - System coordination and contract discovery
 
-**Token Economics (4 contracts)**
+### Token Economics (4 contracts)
 
 - `avg-token.clar` - 10M governance token with voting power
 - `avlp-token.clar` - 5M liquidity token for progressive migration
 - `gov-token.clar` - Voting power distribution mechanism
 - `creator-token.clar` - Creator incentive alignment system
 
-**Security & Infrastructure (8 contracts)**
+### Security & Infrastructure (8 contracts)
 
 - `bounty-system.clar` - Merit-based development incentives
 - `automated-bounty-system.clar` - Automated bounty processing
@@ -35,7 +36,8 @@ Production-ready smart contracts for the AutoVault DeFi platform on Stacks block
 
 - **Clarinet CLI** (v2.0+)
   - macOS: `brew install hirosystems/tap/clarinet`
-  - Linux: `curl -sSfL https://github.com/hirosystems/clarinet/releases/latest/download/clarinet-installer.sh | sh`
+  - Linux: `curl -sSfL https://github.com/hirosystems/clarinet/releases/\
+    latest/download/clarinet-installer.sh | sh`
 - **Node.js** (v18+) for testing with clarinet-sdk v3.5.0
 - **Deno** (required for clarinet console)
 
@@ -199,7 +201,8 @@ python ../scripts/economic_simulation.py
 
 ```bash
 curl -X POST \
-  https://api.testnet.hiro.so/v2/contracts/call-read/ST1234.../vault/get-balance \
+  https://api.testnet.hiro.so/v2/contracts/call-read/ST1234.../vault/\
+get-balance \
   -H "Content-Type: application/json" \
   -d '{"sender":"ST1234...","arguments":["0x..."]}'
 ```
