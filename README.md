@@ -24,10 +24,12 @@ A production-ready DeFi platform on Stacks with enhanced tokenomics, automated D
 ## Quick Start
 
 ### Requirements
+
 - Clarinet CLI (v2.0+)
 - Node.js (v18+)
 
 ### Setup
+
 ```bash
 git clone https://github.com/Anya-org/AutoVault.git
 cd AutoVault/stacks
@@ -37,6 +39,7 @@ npm test          # ✅ 58/58 tests
 ```
 
 ### Deploy
+
 ```bash
 # Testnet
 ../scripts/deploy-testnet.sh
