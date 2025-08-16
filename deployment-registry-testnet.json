@@ -11,106 +11,106 @@
       "status": "dry-run"
     },
     "strategy-trait": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     },
     "vault-admin-trait": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     },
     "vault-trait": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     },
     "mock-ft": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     },
     "gov-token": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     },
     "treasury": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     },
     "vault": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     },
     "timelock": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     },
     "dao": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     },
     "dao-governance": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     },
     "analytics": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     },
     "registry": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     },
     "bounty-system": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     },
     "creator-token": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     },
     "dao-automation": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     },
     "avg-token": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     },
     "avlp-token": {
-      "txid": "<pending>",
+      "txid": "dry-run",
       "contract_id": "<pending>",
       "height": 0,
-      "status": "prepared"
+      "status": "dry-run"
     }
   },
   "deployment_order": [
@@ -207,5 +207,5 @@
     "4. Update registry with actual txids",
     "5. Execute post-deployment verification"
   ],
-  "timestamp_last_deploy": "2025-08-16T17:31:42.702Z"
+  "timestamp_last_deploy": "2025-08-16T17:34:46.132Z"
 }
