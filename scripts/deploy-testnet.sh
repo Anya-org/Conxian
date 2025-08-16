@@ -2,12 +2,53 @@
 set -euo pipefail
 # Enhanced testnet deployment script with manual testing procedures
 # Requires: clarinet, deployment environment variables
+# Added features:
+#  - DRY_RUN mode (export DRY_RUN=1) to avoid overwriting existing registry and skip mutating steps
+#  - Contract existence validation before registry generation
+#  - SHA256 hash of each contract source for integrity
+#  - Automatic timestamp population
+#  - Summary report with missing files / warnings
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_ROOT/stacks"
 
-echo "🚀 AutoVault Testnet Deployment - Enhanced"
-echo "============================================"
+echo "🚀 AutoVault Testnet Deployment - Enhanced (Dry-Run Aware)"
+echo "========================================================="
+
+DRY_RUN=${DRY_RUN:-0}
+
+# Contract list expected in deploy order / registry
+CONTRACTS=(
+  sip-010-trait strategy-trait vault-admin-trait vault-trait \
+  mock-ft gov-token treasury vault timelock dao dao-governance analytics registry \
+  bounty-system creator-token dao-automation avg-token avlp-token
+)
+
+MISSING=()
+HASH_JSON_ENTRIES=""
+SRC_DIR="stacks/contracts"
+
+echo "[0/5] Validating contract sources..."
+for c in "${CONTRACTS[@]}"; do
+  # traits live in traits/ folder
+  if [[ $c == *trait ]]; then
+    FILE="$SRC_DIR/traits/$c.clar"
+  else
+    FILE="$SRC_DIR/$c.clar"
+  fi
+  if [[ ! -f "$PROJECT_ROOT/$FILE" ]]; then
+    MISSING+=("$c")
+    continue
+  fi
+  SHA=$(sha256sum "$PROJECT_ROOT/$FILE" | awk '{print $1}')
+  HASH_JSON_ENTRIES+="    \"$c\": { \"sha256\": \"$SHA\" },"
+done
+
+if ((${#MISSING[@]} > 0)); then
+  echo "⚠️  Missing contract files: ${MISSING[*]}"
+else
+  echo "✅ All expected contract files present"
+fi
 
 # Pre-deployment validation
 echo "[1/5] Running contract validation..."
@@ -15,12 +56,18 @@ clarinet check
 echo "✅ All contracts compile successfully"
 
 # Enhanced deployment registry template
-echo "[2/5] Preparing deployment registry..."
-cat > ../deployment-registry-testnet.json <<'JSON'
+echo "[2/5] Preparing deployment registry (dry-run: $DRY_RUN)..."
+
+REG_FILE="../deployment-registry-testnet.json"
+if [[ $DRY_RUN == 1 && -f $REG_FILE ]]; then
+  echo "🔒 DRY_RUN=1 set and $REG_FILE exists; skipping overwrite." 
+else
+  TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  cat > "$REG_FILE" <<JSON
 {
   "network": "testnet",
   "deployment_strategy": "manual_verified",
-  "timestamp": "",
+  "timestamp": "$TS",
   "deployer_address": "",
   "contracts": {
     "sip-010-trait": {
@@ -148,6 +195,10 @@ cat > ../deployment-registry-testnet.json <<'JSON'
       "(contract-call? .treasury get-treasury-info)"
     ]
   },
+  "hashes": {
+$(echo "$HASH_JSON_ENTRIES" | sed 's/,$//' )
+  },
+  "missing": [$( if ((${#MISSING[@]}==0)); then echo; else printf '"%s"' "${MISSING[*]}"; fi )],
   "next_steps": [
     "1. Configure environment variables (DEPLOYER_PRIVKEY)",
     "2. Run: npm run deploy-contracts-ts", 
@@ -157,8 +208,9 @@ cat > ../deployment-registry-testnet.json <<'JSON'
   ]
 }
 JSON
+fi
 
-echo "✅ Enhanced deployment registry prepared"
+echo "✅ Deployment registry prepared (or preserved in dry-run)"
 
 # Verification checklist
 echo "[3/5] Pre-deployment verification checklist..."
@@ -170,11 +222,15 @@ echo "📋 Deployment Scripts: ✅ READY"
 
 # Environment check
 echo "[4/5] Environment configuration check..."
-if [ -z "${DEPLOYER_PRIVKEY:-}" ]; then
-    echo "⚠️  DEPLOYER_PRIVKEY not set - required for automated deployment"
-    echo "   Set with: export DEPLOYER_PRIVKEY=<your-testnet-private-key>"
+if [[ $DRY_RUN == 1 ]]; then
+  echo "🧪 DRY_RUN: Skipping DEPLOYER_PRIVKEY check"
 else
-    echo "✅ DEPLOYER_PRIVKEY configured"
+  if [ -z "${DEPLOYER_PRIVKEY:-}" ]; then
+      echo "⚠️  DEPLOYER_PRIVKEY not set - required for automated deployment"
+      echo "   Set with: export DEPLOYER_PRIVKEY=<your-testnet-private-key>"
+  else
+      echo "✅ DEPLOYER_PRIVKEY configured"
+  fi
 fi
 
 # Deployment options
@@ -184,7 +240,7 @@ echo "🎯 DEPLOYMENT OPTIONS:"
 echo "======================"
 echo ""
 echo "Option A - Automated TypeScript Deployment:"
-echo "  npm run deploy-contracts-ts"
+echo "  npm run deploy-contracts-ts   # (will broadcast if not dry-run)"
 echo ""
 echo "Option B - Manual Testing First:"
 echo "  clarinet console"
@@ -199,6 +255,14 @@ echo "  npm run verify-post"
 echo "  npm run monitor-health"
 echo ""
 echo "📚 DOCUMENTATION READY:"
+echo ""
+echo "================ DRY-RUN SUMMARY ================"
+echo "Missing Contracts: ${MISSING[*]:-none}"
+echo "Registry File   : $REG_FILE"
+echo "Timestamp       : ${TS:-(preserved)}"
+echo "Hashes Included : $( [[ -n $HASH_JSON_ENTRIES ]] && echo yes || echo no )"
+echo "Dry Run Mode    : $DRY_RUN"
+echo "================================================="
 echo "======================="
 echo "  - TESTING-STATUS.md: Alternative testing approaches"
 echo "  - BUSINESS-ANALYSIS.md: Economic model validation"

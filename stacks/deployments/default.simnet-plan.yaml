@@ -81,6 +81,11 @@ plan:
             path: contracts/bounty-system.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: bounty-system-original
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/bounty-system-original.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: gov-token
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/gov-token.clar
@@ -96,6 +101,11 @@ plan:
             path: contracts/dao.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: dao-automation
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/dao-automation.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: treasury
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/treasury.clar
@@ -106,6 +116,16 @@ plan:
             path: contracts/dao-governance.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: enhanced-dao-governance
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/enhanced-dao-governance.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: enhanced-governance
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/enhanced-governance.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: registry
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/registry.clar
@@ -114,6 +134,11 @@ plan:
             contract-name: strategy-trait
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/traits/strategy-trait.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: vault-original
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/vault-original.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: vault-trait

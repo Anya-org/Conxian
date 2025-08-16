@@ -82,6 +82,11 @@ path = "contracts/dao-governance.clar"
 clarity_version = 2
 epoch = "2.4"
 
+[contracts.dao-automation]
+path = "contracts/dao-automation.clar"
+clarity_version = 2
+epoch = "2.4"
+
 [contracts.bounty-system]
 path = "contracts/bounty-system.clar"
 clarity_version = 2
@@ -99,5 +104,26 @@ epoch = "2.4"
 
 [contracts.avlp-token]
 path = "contracts/avlp-token.clar"
+clarity_version = 2
+epoch = "2.4"
+
+# Optional enhanced / legacy variants (included for completeness)
+[contracts.vault-original]
+path = "contracts/vault-original.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.enhanced-dao-governance]
+path = "contracts/enhanced-dao-governance.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.enhanced-governance]
+path = "contracts/enhanced-governance.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.bounty-system-original]
+path = "contracts/bounty-system-original.clar"
 clarity_version = 2
 epoch = "2.4"

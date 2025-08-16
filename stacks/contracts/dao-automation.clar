@@ -277,10 +277,10 @@
       })
       
       ;; Auto-adjust strategy based on performance
+      ;; We don't use try!/expect here because adjust-strategy-based-on-performance never returns an (err ...) branch.
       (if (< strategy-effectiveness u70) ;; Less than 70% effective
-        (try! (adjust-strategy-based-on-performance strategy-effectiveness))
-        true
-      )
+        (begin (adjust-strategy-based-on-performance strategy-effectiveness) true)
+        true)
       
       ;; Advance to next epoch
       (var-set current-epoch (+ current-epoch-num u1))
