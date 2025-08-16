@@ -1,8 +1,8 @@
 ;; Enhanced DAO Governance with Time-Weighted Voting (AIP-2)
 ;; This contract extends the base DAO governance with time-weighted voting power
 
-;; Import SIP-010 fungible token trait
-(use-trait ft-trait .sip-010-trait)
+;; Import SIP-010 fungible token trait (alias ft-trait referencing trait identifier sip-010-trait in contract sip-010-trait)
+(use-trait ft-trait .sip-010-trait.sip-010-trait)
 
 ;; Error codes
 (define-constant ERR-NOT-AUTHORIZED (err u401))

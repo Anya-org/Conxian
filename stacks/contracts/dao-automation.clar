@@ -435,14 +435,14 @@
   (if (< effectiveness u50)
     (begin
       (var-set current-strategy CONSERVATIVE_STRATEGY)
-      (ok true)
+      true
     )
     (if (> effectiveness u90)
       (begin
         (var-set current-strategy AGGRESSIVE_STRATEGY)
-        (ok true)
+        true
       )
-      (ok false) ;; No change needed
+      false ;; No change needed
     )
   )
 )
