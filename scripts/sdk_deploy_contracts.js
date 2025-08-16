@@ -107,10 +107,16 @@ async function main(){
   registry.deployment_order = registry.deployment_order || ORDER;
   registry.contracts = registry.contracts || {};
 
+  registry.deployer_address = deployerAddress;
   for (const name of list){
-    if (registry.contracts?.[name]?.txid && !dryRun){ console.log(`[skip] ${name} already recorded`); continue; }
+    const existing = registry.contracts?.[name];
+    const existingTx = existing?.txid;
+    if (!dryRun && existingTx && existingTx !== 'dry-run' && existingTx !== '<pending>') {
+      console.log(`[skip] ${name} already deployed (txid=${existingTx})`);
+      continue;
+    }
     const meta = await deployOne(name, priv, network, dryRun);
-    registry.contracts[name] = { ...(registry.contracts[name]||{}), ...meta };
+    registry.contracts[name] = { ...(existing||{}), ...meta, contract_id: `${deployerAddress}.${name}` };
     registry.timestamp_last_deploy = new Date().toISOString();
     fs.writeFileSync(registryPath, JSON.stringify(registry,null,2));
   }
