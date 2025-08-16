@@ -9,8 +9,21 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "types": ["node"],
-    "noEmit": true
+    "noEmit": true,
+    "baseUrl": "./",
+    "paths": {
+      "@stacks/transactions": ["node_modules/@stacks/transactions/dist/index.d.ts", "node_modules/@stacks/transactions"],
+      "@stacks/network": ["node_modules/@stacks/network/dist/index.d.ts", "node_modules/@stacks/network"],
+      "@stacks/common": ["node_modules/@stacks/common"],
+      "@scure/bip32": ["node_modules/@scure/bip32"],
+      "@stacks/transactions/dist/esm/keys": ["node_modules/@stacks/transactions/dist/esm/keys.js"]
+    }
   },
-  "include": ["../scripts/**/*.ts", "tests/**/*.ts"],
+  "include": [
+    "../scripts/**/*.ts",
+    "../scripts/**/*.d.ts",
+    "scripts/**/*.d.ts",
+    "tests/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }

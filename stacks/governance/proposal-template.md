@@ -21,8 +21,11 @@ _The detailed specification of the proposed change._
 _Why particular design decisions were made._
 
 ## Test Cases
+
 _Test cases for implementation._
+
 ## Implementation
+
 _Link to implementation if available._
 
 ## Copyright
