@@ -91,3 +91,13 @@ epoch = "2.4"
 path = "contracts/automated-bounty-system.clar"
 clarity_version = 2
 epoch = "2.4"
+
+[contracts.avg-token]
+path = "contracts/avg-token.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.avlp-token]
+path = "contracts/avlp-token.clar"
+clarity_version = 2
+epoch = "2.4"

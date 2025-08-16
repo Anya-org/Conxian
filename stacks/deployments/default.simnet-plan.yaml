@@ -51,16 +51,6 @@ plan:
             path: contracts/creator-token.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: bounty-system
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/bounty-system.clar
-            clarity-version: 2
-        - emulated-contract-publish:
-            contract-name: gov-token
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/gov-token.clar
-            clarity-version: 2
-        - emulated-contract-publish:
             contract-name: mock-ft
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/mock-ft.clar
@@ -74,6 +64,26 @@ plan:
             contract-name: vault
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/vault.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: avg-token
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/avg-token.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: avlp-token
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/avlp-token.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: bounty-system
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/bounty-system.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: gov-token
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/gov-token.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: timelock

@@ -200,15 +200,20 @@
                          { min-blocks: u1008, bonus: u100000 }   ;; 1 week = 10% bonus  
                          { min-blocks: u4032, bonus: u200000 })) ;; 1 month = 20% bonus
   )
-    (fold check-loyalty-tier loyalty-tiers u0)))
+    (fold check-loyalty-tier loyalty-tiers u0)
+  )
   
-(define-private (check-loyalty-tier (tier { min-blocks: uint, bonus: uint }) (current-bonus uint))
-  (if (>= u0 (get min-blocks tier))  ;; Fix: removed invalid field access
-    (get bonus tier)
-    current-bonus))
+  (define-private (check-loyalty-tier (tier { min-blocks: uint, bonus: uint }) (current-bonus uint))
+    (if (>= blocks-held (get min-blocks tier))
+      (get bonus tier)
+      current-bonus
+    )
+  )
+)
 
 (define-read-only (get-liquidity-position (provider principal))
-  (map-get? liquidity-positions { provider: provider }))
+  (map-get? liquidity-positions { provider: provider })
+)
 
 (define-read-only (get-claimable-rewards (provider principal))
   (match (map-get? liquidity-positions { provider: provider })

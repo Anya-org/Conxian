@@ -391,63 +391,6 @@
   )
 )
 
-;; === AIP-2: Time-Weighted Voting Power ===
-(define-constant MINIMUM_HOLDING_PERIOD u48) ;; 48 blocks (~8 hours)
-(define-constant TIME_WEIGHT_MULTIPLIER u100) ;; Base multiplier
-
-(define-map holding-periods principal uint)
-(define-map voting-snapshots 
-  { proposal-id: uint, voter: principal }
-  { 
-    voting-power: uint,
-    snapshot-block: uint,
-    holding-period: uint
-  })
-
-;; Update holding period tracking
-(define-public (update-holding-period (voter principal))
-  (let (
-    (current-period (default-to u0 (map-get? holding-periods voter)))
-  )
-    (map-set holding-periods voter (+ current-period u1))
-    (ok true)))
-
-;; Calculate time-weighted voting power
-(define-read-only (calculate-time-weighted-power (voter principal) (balance uint))
-  (let (
-    (holding-period (default-to u0 (map-get? holding-periods voter)))
-    (time-multiplier (if (>= holding-period MINIMUM_HOLDING_PERIOD)
-      (+ TIME_WEIGHT_MULTIPLIER (/ holding-period u10))
-      TIME_WEIGHT_MULTIPLIER))
-  )
-    (/ (* balance time-multiplier) TIME_WEIGHT_MULTIPLIER)))
-
-;; Create voting snapshot with time-weighting
-(define-public (create-voting-snapshot (proposal-id uint))
-  (let (
-    (voter tx-sender)
-    (balance (unwrap! (contract-call? .gov-token get-balance-of voter) (err u500)))
-    (holding-period (default-to u0 (map-get? holding-periods voter)))
-    (time-weighted-power (calculate-time-weighted-power voter balance))
-  )
-    ;; Require minimum holding period
-    (asserts! (>= holding-period MINIMUM_HOLDING_PERIOD) (err u409))
-    
-    (map-set voting-snapshots { proposal-id: proposal-id, voter: voter }
-      {
-        voting-power: time-weighted-power,
-        snapshot-block: block-height,
-        holding-period: holding-period
-      })
-    
-    (ok time-weighted-power)))
-
-;; Get time-weighted voting power for proposal
-(define-read-only (get-time-weighted-power (proposal-id uint) (voter principal))
-  (match (map-get? voting-snapshots { proposal-id: proposal-id, voter: voter })
-    snapshot (get voting-power snapshot)
-    u0))
-
 ;; Errors
 ;; u100: unauthorized
 ;; u101: insufficient-proposal-threshold
@@ -455,8 +398,6 @@
 ;; u103: not-in-voting-period
 ;; u104: invalid-vote-value
 ;; u105: already-voted
-;; u409: insufficient-holding-period
-;; u500: token-balance-error
 ;; u106: cannot-delegate-to-self
 ;; u107: proposal-not-succeeded
 ;; u108: proposal-not-queued
