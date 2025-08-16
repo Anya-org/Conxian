@@ -1,25 +1,16 @@
-#V2
-cd /workspaces/AutoVault/stacks && echo "(contract-call? .vault get-total-shares)" | clarinet console
-check
-list
-help
-/?
---help
-send
-exit
-(contract-call? .vault get-total-balance)
-(contract-call? .vault get-total-shares)
-(contract-call? .vault get-admin)
-(contract-call? .vault get-paused)
 ;; Test DAO governance functions
 (contract-call? .dao-governance get-proposal u1)
+
 ;; Test treasury functions  
 (contract-call? .treasury get-treasury-balance)
 (contract-call? .treasury get-treasury-summary)
+
 ;; Test bounty system
 (contract-call? .bounty-system get-bounty u1)
+
 ;; Test token functions
 (contract-call? .avg-token get-total-supply)
 (contract-call? .gov-token get-total-supply)
+
 ;; Test registry
 (contract-call? .registry get-count)
