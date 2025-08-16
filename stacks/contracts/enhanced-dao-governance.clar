@@ -43,7 +43,7 @@
 (define-public (create-voting-snapshot (proposal-id uint))
     (let (
         (voter tx-sender)
-        (balance (unwrap! (contract-call? .gov-token get-balance voter) ERR-INSUFFICIENT-BALANCE))
+    (balance (unwrap! (contract-call? .gov-token get-balance-of voter) ERR-INSUFFICIENT-BALANCE))
         (holding-period (default-to u0 (map-get? holding-periods voter)))
     )
     (asserts! (>= holding-period MINIMUM-HOLDING-PERIOD) ERR-INSUFFICIENT-HOLDING-PERIOD)
@@ -72,7 +72,7 @@
 ;; Get time-weighted voting power
 (define-read-only (get-time-weighted-power (voter principal))
     (let (
-        (balance (unwrap! (contract-call? .gov-token get-balance voter) u0))
+    (balance (unwrap! (contract-call? .gov-token get-balance-of voter) u0))
     )
     (calculate-time-weighted-power voter balance)
     )
