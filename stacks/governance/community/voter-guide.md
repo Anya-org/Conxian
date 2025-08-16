@@ -1,6 +1,7 @@
 # AutoVault Governance: Voter Guide
 
 ## Getting Started
+
 1. **Acquire AVG tokens** - Minimum 1,000 tokens needed to vote
 2. **Connect wallet** - Use Hiro Wallet or other Stacks-compatible wallets
 3. **View proposals** - Browse active proposals at governance.autovault.defi

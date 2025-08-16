@@ -2,15 +2,15 @@
 
 ## Security Audit
 
-- **Date Completed:** [TBD]
-- **Performed By:** [Audit Firm]
-- **Full Report:** [Link to report]
+- **Date Completed:** _TBD_
+- **Performed By:** _Audit Firm_
+- **Full Report:** _Link to report_
 
 ## Key Findings & Resolutions
 
-[Summary of findings and how they were addressed]
+_Summary of findings and how they were addressed._
 
 ## Security Contacts
 
 - security@autovault.defi
-- [Bug Bounty Program Link]
+- [Bug Bounty Program](https://bugbounty.autovault.defi)

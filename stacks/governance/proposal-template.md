@@ -2,34 +2,28 @@
 
 ## Simple Summary
 
-[A simplified explanation of the proposal]
+_A simplified explanation of the proposal._
 
 ## Abstract
 
-[A short (~200 word) description of the technical issue being addressed]
+_A short (~200 word) description of the technical issue being addressed._
 
 ## Motivation
 
-[Why this should be implemented]
+_Why this should be implemented._
 
 ## Specification
 
-[The detailed specification of the proposed change]
+_The detailed specification of the proposed change._
 
 ## Rationale
 
-[Why particular design decisions were made]
+_Why particular design decisions were made._
 
 ## Test Cases
-
-
-[Test cases for implementation]
-
-
+_Test cases for implementation._
 ## Implementation
-
-[Link to implementation if available]
-
+_Link to implementation if available._
 
 ## Copyright
 

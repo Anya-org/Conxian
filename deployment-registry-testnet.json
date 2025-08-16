@@ -130,9 +130,26 @@
     ]
   },
   "hashes": {
-    "sip-010-trait": { "sha256": "9c49ed2842a688307f57ea7f121acdc531ec5696af5c953cc3b89506c06a265c" },\n    "strategy-trait": { "sha256": "778db3ce3a4bdcd91ec00d654aefa484aa2fa1f43d0c836393d3c83b71d2c49d" },\n    "vault-admin-trait": { "sha256": "477ce31a14c575dfa9bdf7047b2d6f352d95cdd79bbdca081d0a0c670694dbda" },\n    "vault-trait": { "sha256": "845e327853a5729ebc362080f6b6cb74aa4e54abf7aef41b03459896caec628f" },\n    "mock-ft": { "sha256": "036b03ab7709cb85dfce86fc77b74a1693c8042bf5e9f88da4fb1d928424b607" },\n    "gov-token": { "sha256": "997de2c79868ab2b94aec9419c3023868db8ad84caf00e760d430f01c098b1a4" },\n    "treasury": { "sha256": "11b22fd9da06908c0c010b5017a672d85bfac4eb56181904b48fc00c59e810ae" },\n    "vault": { "sha256": "eb7fc849f933e838fc978a0ff374821516017e1aacd9cab93a46ce221c86dba5" },\n    "timelock": { "sha256": "f51f6de9e0fa0e1a932fb4c258221a6b7febe209e494ffb1982cd0763019de53" },\n    "dao": { "sha256": "23ca0a0d403c7e0687fded1ca1dc8c50360264998d1f4a22f670349b807a0477" },\n    "dao-governance": { "sha256": "c197b4e6882b41a991f4292977d9fa1476c7d56c5867546a4cce0c3f2a896e1a" },\n    "analytics": { "sha256": "648ff64a98e770ad60b38d1ded4a0c3c8f822b589dee48fd21a0802b88448259" },\n    "registry": { "sha256": "57d271dd779200eacd5a826c166736745894c907d43e21eb0d2190c070ff5a23" },\n    "bounty-system": { "sha256": "6829c6bc7949497c140ec048ad4ecf87ba09ff3869c281ab2c7f61f300349505" },\n    "creator-token": { "sha256": "fb827d8947d61b240b8d31b9eedadedcd083e9d9250b319372ab43b04eaa9817" },\n    "dao-automation": { "sha256": "76ac7c890ff717c598704c5af4df9cd38e133a05c2a246040aa543056a7dcc3d" },\n    "avg-token": { "sha256": "910d95041f047de30659a95bcc981bebda543ec7ffc1d2cfdf98819fbb91adc1" },\n    "avlp-token": { "sha256": "3bf58a23bf0189725c7d27b8b8a85d2cbaf257abb1516cedffcab66dc06d20e0" },\n
+    "sip-010-trait": { "sha256": "9c49ed2842a688307f57ea7f121acdc531ec5696af5c953cc3b89506c06a265c" },
+    "strategy-trait": { "sha256": "778db3ce3a4bdcd91ec00d654aefa484aa2fa1f43d0c836393d3c83b71d2c49d" },
+    "vault-admin-trait": { "sha256": "477ce31a14c575dfa9bdf7047b2d6f352d95cdd79bbdca081d0a0c670694dbda" },
+    "vault-trait": { "sha256": "845e327853a5729ebc362080f6b6cb74aa4e54abf7aef41b03459896caec628f" },
+    "mock-ft": { "sha256": "036b03ab7709cb85dfce86fc77b74a1693c8042bf5e9f88da4fb1d928424b607" },
+    "gov-token": { "sha256": "997de2c79868ab2b94aec9419c3023868db8ad84caf00e760d430f01c098b1a4" },
+    "treasury": { "sha256": "11b22fd9da06908c0c010b5017a672d85bfac4eb56181904b48fc00c59e810ae" },
+    "vault": { "sha256": "eb7fc849f933e838fc978a0ff374821516017e1aacd9cab93a46ce221c86dba5" },
+    "timelock": { "sha256": "f51f6de9e0fa0e1a932fb4c258221a6b7febe209e494ffb1982cd0763019de53" },
+    "dao": { "sha256": "23ca0a0d403c7e0687fded1ca1dc8c50360264998d1f4a22f670349b807a0477" },
+    "dao-governance": { "sha256": "c197b4e6882b41a991f4292977d9fa1476c7d56c5867546a4cce0c3f2a896e1a" },
+    "analytics": { "sha256": "648ff64a98e770ad60b38d1ded4a0c3c8f822b589dee48fd21a0802b88448259" },
+    "registry": { "sha256": "57d271dd779200eacd5a826c166736745894c907d43e21eb0d2190c070ff5a23" },
+    "bounty-system": { "sha256": "6829c6bc7949497c140ec048ad4ecf87ba09ff3869c281ab2c7f61f300349505" },
+    "creator-token": { "sha256": "fb827d8947d61b240b8d31b9eedadedcd083e9d9250b319372ab43b04eaa9817" },
+    "dao-automation": { "sha256": "76ac7c890ff717c598704c5af4df9cd38e133a05c2a246040aa543056a7dcc3d" },
+    "avg-token": { "sha256": "910d95041f047de30659a95bcc981bebda543ec7ffc1d2cfdf98819fbb91adc1" },
+    "avlp-token": { "sha256": "3bf58a23bf0189725c7d27b8b8a85d2cbaf257abb1516cedffcab66dc06d20e0" }
   },
-  "missing": [""] ,
+  "missing": [],
   "next_steps": [
     "1. Configure environment variables (DEPLOYER_PRIVKEY)",
     "2. Run: npm run deploy-contracts-ts", 
