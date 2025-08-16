@@ -9,7 +9,7 @@
  * Output:
  *   deployment-registry-testnet.json updated/created with deployed txids + block heights (polled).
  */
-import { makeContractDeploy, broadcastTransaction, AnchorMode } from '@stacks/transactions';
+import { makeContractDeploy, broadcastTransaction, AnchorMode, getAddressFromPrivateKey } from '@stacks/transactions';
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 import fs from 'fs';
 import path from 'path';
@@ -37,7 +37,11 @@ const ORDER = [
   'analytics',
   'registry',
   'bounty-system',
-  'creator-token'
+  'creator-token',
+  // Newly added previously omitted deployable contracts
+  'dao-automation',
+  'avg-token',
+  'avlp-token'
 ];
 
 async function pollTx(txid: string, network: any, timeoutMs = 120000): Promise<{height?: number; status: string}> {
@@ -88,6 +92,15 @@ async function main() {
   if (!priv) throw new Error('DEPLOYER_PRIVKEY env required');
   const networkName = (process.env.NETWORK || 'testnet').toLowerCase();
   const network = networkName === 'mainnet' ? new StacksMainnet() : new StacksTestnet();
+  // Preflight: derive address & check balance
+  const deployerAddress = getAddressFromPrivateKey(priv, networkName === 'mainnet' ? 'mainnet' : 'testnet');
+  console.log(`[preflight] Deployer address: ${deployerAddress}`);
+  const balanceOk = await checkBalance(network, deployerAddress, 200000); // 0.0002 STX minimum (adjust as needed)
+  if (!balanceOk) {
+    console.error('[abort] Insufficient STX balance for deployment. Fund address then re-run.');
+    process.exit(1);
+  }
+
   const filterRaw = process.env.CONTRACT_FILTER;
   let list = ORDER;
   if (filterRaw) {
@@ -97,18 +110,42 @@ async function main() {
 
   console.log(`Deploying ${list.length} contracts to ${networkName}...`);
   const registryPath = path.join(PROJECT_ROOT, 'deployment-registry-testnet.json');
-  let registry: any = fs.existsSync(registryPath) ? JSON.parse(fs.readFileSync(registryPath, 'utf8')) : { network: networkName, contracts: {} };
+  let registry: any = fs.existsSync(registryPath) ? JSON.parse(fs.readFileSync(registryPath, 'utf8')) : {};
+
+  // Preserve existing structured fields if present
+  registry.network = registry.network || networkName;
+  registry.deployment_order = registry.deployment_order || ORDER;
+  registry.contracts = registry.contracts || {};
 
   for (const name of list) {
     if (registry.contracts?.[name]?.txid) {
-      console.log(`[skip] ${name} already recorded. Use CONTRACT_FILTER to redeploy.`);
+      console.log(`[skip] ${name} already recorded. Use CONTRACT_FILTER to force redeploy.`);
       continue;
     }
     const meta = await deployOne(name, priv, network);
-    registry.contracts[name] = meta;
+    registry.contracts[name] = { ...(registry.contracts[name] || {}), ...meta };
+    registry.timestamp_last_deploy = new Date().toISOString();
     fs.writeFileSync(registryPath, JSON.stringify(registry, null, 2));
   }
   console.log('Deployment complete. Registry saved at deployment-registry-testnet.json');
+}
+
+async function checkBalance(network: any, address: string, minMicroStx: number): Promise<boolean> {
+  const base = (network.coreApiUrl as string).replace(/\/$/, '');
+  try {
+    const r = await fetch(`${base}/extended/v1/address/${address}/balances`);
+    if (!r.ok) {
+      console.warn(`[warn] Balance query failed status=${r.status}`);
+      return false;
+    }
+    const j: any = await r.json();
+    const bal = Number(j.stx?.balance || 0);
+    console.log(`[preflight] STX balance: ${bal} microstx`);
+    return bal >= minMicroStx;
+  } catch (e) {
+    console.warn('[warn] Balance check error:', (e as Error).message);
+    return false;
+  }
 }
 
 main().catch(e => { console.error(e); process.exit(1); });
