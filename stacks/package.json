@@ -4,8 +4,8 @@
   "private": true,
   "devDependencies": {
     "@hirosystems/clarinet-sdk": "^3.5.0",
-    "@stacks/network": "^6.17.0",
-    "@stacks/transactions": "^6.17.0",
+  "@stacks/network": "^7.0.6",
+  "@stacks/transactions": "^7.0.6",
     "@types/node": "^18.19.0",
     "bip39": "^3.1.0",
     "dotenv": "^16.4.5",
