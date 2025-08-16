@@ -56,8 +56,12 @@ async function pollTx(txid, network, timeoutMs=120000){
 }
 
 async function deployOne(name, privKey, network, dryRun){
-  const file = path.join(CONTRACTS_DIR, `${name}.clar`);
-  if (!fs.existsSync(file)) throw new Error(`Missing contract file for ${name}`);
+  let file = path.join(CONTRACTS_DIR, `${name}.clar`);
+  if (!fs.existsSync(file)) {
+    // try traits subdir
+    const alt = path.join(CONTRACTS_DIR, 'traits', `${name}.clar`);
+    if (fs.existsSync(alt)) file = alt; else throw new Error(`Missing contract file for ${name}`);
+  }
   const source = fs.readFileSync(file,'utf8');
   const tx = await makeContractDeploy({ codeBody: source, contractName: name, senderKey: privKey, network, anchorMode: AnchorMode.Any });
   if (dryRun){ console.log(`[dry-run] built ${name}`); return {txid:'dry-run',status:'dry-run'}; }
