@@ -23,8 +23,8 @@ on:
         - testnet
 
 env:
-  NETWORK: ${{ github.event.inputs.target_network || 'mainnet' }}
-  FORCE_EXECUTION: ${{ github.event.inputs.force_execution || 'false' }}
+  NETWORK: ${{ github.event.inputs.target_network != '' && github.event.inputs.target_network || 'mainnet' }}
+  FORCE_EXECUTION: ${{ github.event.inputs.force_execution != '' && github.event.inputs.force_execution || 'false' }}
 
 jobs:
   # Pre-flight Health Check
@@ -153,8 +153,8 @@ jobs:
       - name: Execute ${{ matrix.operation.name }}
         timeout-minutes: ${{ matrix.operation.timeout }}
         env:
-          STACKS_PRIVKEY: ${{ secrets.STACKS_PRIVKEY }}
-          VAULT_CONTRACT: ${{ secrets.VAULT_CONTRACT_ADDRESS }}
+          STACKS_PRIVKEY: ${{ secrets.STACKS_PRIVKEY || 'unset' }}
+          VAULT_CONTRACT: ${{ secrets.VAULT_CONTRACT_ADDRESS || 'unset' }}
         run: |
           echo "🤖 Executing ${{ matrix.operation.name }}..."
           
