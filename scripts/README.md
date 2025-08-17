@@ -45,6 +45,15 @@ Deployment, testing, and utility scripts for the AutoVault DeFi platform.
 - `register_chainhook.sh` - Chainhook registration
 - `local_chainhook_harness.py` - Local chainhook testing
 
+### Oracle Orchestration (NEW)
+
+- `oracle_orchestrator.py` - Main oracle orchestration manager with median calculation
+- `oracle_manager.py` - Oracle management CLI for admin operations
+- `oracle_ops.sh` - Shell wrapper for convenient oracle operations
+- `price_coordinator.py` - Multi-source price feed coordination service
+- `oracle_health_monitor.py` - Comprehensive oracle health monitoring
+- `oracle.conf` - Complete orchestration system configuration
+
 ### GitHub Integration
 
 - `label_completed_issues.py` - Automated issue labeling
@@ -74,6 +83,76 @@ Deployment, testing, and utility scripts for the AutoVault DeFi platform.
 
 ```bash
 python python_update_autonomics.py --broadcast
+```
+
+## Oracle Orchestration System
+
+**Setup Oracle System:**
+
+```bash
+./oracle_ops.sh setup
+```
+
+**Manage Trading Pairs:**
+
+```bash
+# Add new trading pair
+./oracle_ops.sh pair add STX USD --min-sources 3
+
+# List all pairs
+./oracle_ops.sh pair list
+```
+
+**Oracle Management:**
+
+```bash
+# Add oracle to pair
+./oracle_ops.sh oracle add STX USD SP123...ORACLE
+
+# Remove oracle from pair  
+./oracle_ops.sh oracle remove STX USD SP123...ORACLE
+
+# Check oracle status
+./oracle_ops.sh oracle status STX USD SP123...ORACLE
+```
+
+**Price Operations:**
+
+```bash
+# Submit price manually
+./oracle_ops.sh price submit STX USD 123456
+
+# Get current price
+./oracle_ops.sh price get STX USD
+
+# Get median price
+./oracle_ops.sh price median STX USD
+```
+
+**Monitoring:**
+
+```bash
+# Monitor all pairs
+./oracle_ops.sh monitor --watch
+
+# Monitor specific pair
+./oracle_ops.sh monitor STX USD --watch
+
+# Health check
+./oracle_ops.sh health-check
+```
+
+**Start Orchestration Services:**
+
+```bash
+# Start full orchestrator
+./oracle_ops.sh start-orchestrator full
+
+# Start price coordinator only
+python price_coordinator.py --pairs STX/USD,BTC/USD --interval 60
+
+# Start health monitor
+python oracle_health_monitor.py --monitor-all
 ```
 
 ## Deployment Workflows
