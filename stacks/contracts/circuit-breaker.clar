@@ -2,7 +2,7 @@
 ;; Focus: basic monitoring (price, volume, liquidity) + emergency halt. Removed corrupted sections.
 
 ;; Error codes
-(define-constant ERR_UNAUTHORIZED u401)
+(define-constant ERR_UNAUTHORIZED u100) ;; aligned with test expectations (err code 100)
 (define-constant ERR_EMERGENCY_STOP u405)
 
 ;; Breaker types
@@ -61,6 +61,8 @@
 ;; Trigger breaker (internal use by monitors & manual)
 (define-public (trigger-circuit-breaker (breaker-type uint) (value uint))
   (begin
+    ;; Require admin to manually trigger (tests expect unauthorized error for non-admin)
+    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
     (asserts! (not (var-get system-paused)) (err ERR_EMERGENCY_STOP))
     (map-set breaker-states { breaker-type: breaker-type } {
       triggered: true,
@@ -104,6 +106,17 @@
             err-val (err ERR_UNAUTHORIZED)))
         (err ERR_UNAUTHORIZED))))
 
+;; Compatibility wrapper for tests expecting `set-oracle-enabled(bool)` instead of full config
+(define-public (set-oracle-enabled (enabled bool))
+  (begin
+    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
+    (var-set oracle-enabled enabled)
+    (if (not enabled)
+        (var-set oracle-contract none)
+        true)
+    (print { event: "cb-oracle-enabled", enabled: enabled })
+    (ok true)))
+
 ;; Volume spike monitor
 (define-public (monitor-volume-spike (pool principal) (amount uint))
   (let ((period u144) (p (/ block-height period)))
@@ -134,6 +147,23 @@
       (begin
         (map-set liquidity-tracking { pool: pool } { initial: current, current: current, drain: u0 })
         (ok true)))))
+
+;; Reset a specific breaker (needed by tests). If no breakers remain triggered, clear global flag.
+(define-public (reset-circuit-breaker (breaker-type uint))
+  (begin
+    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
+    (map-set breaker-states { breaker-type: breaker-type } {
+      triggered: false,
+      triggered-at: block-height,
+      trigger-value: u0
+    })
+    ;; Recompute global-circuit-breaker (simple scan of three known types)
+  (let ((price (default-to { triggered: false, triggered-at: u0, trigger-value: u0 } (map-get? breaker-states { breaker-type: BREAKER_PRICE_VOLATILITY })))
+      (vol (default-to { triggered: false, triggered-at: u0, trigger-value: u0 } (map-get? breaker-states { breaker-type: BREAKER_VOLUME_SPIKE })))
+      (liq (default-to { triggered: false, triggered-at: u0, trigger-value: u0 } (map-get? breaker-states { breaker-type: BREAKER_LIQUIDITY_DRAIN }))))
+      (var-set global-circuit-breaker (or (get triggered price) (or (get triggered vol) (get triggered liq)))))
+    (print { event: "breaker-reset", breaker-type: breaker-type, height: block-height })
+    (ok true)))
 
 ;; Emergency controls
 (define-public (emergency-pause)

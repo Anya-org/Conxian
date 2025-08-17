@@ -1,6 +1,6 @@
 # Benchmark: AutoVault vs Top DeFi Protocols (Stacks + EVM)
 
-PRD-aligned, living document tracking how AutoVault compares to best-in-class DeFi systems across security, governance, UX, cost, and sustainability. Update as features ship and metrics are collected.
+Living comparative analysis tracking how AutoVault ranks vs best-in-class DeFi systems across security, governance, UX, cost, and sustainability. Product requirement sources are centralized in `documentation/prd/` and this file reflects measured outcomes against those PRDs.
 
 ## Scope & Methodology
 

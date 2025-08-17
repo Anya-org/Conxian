@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Cl } from "@stacks/transactions";
+import { Cl, privateKeyToAddress, addressToString } from "@stacks/transactions";
+import { mnemonicToSeedSync } from 'bip39';
+import { HDKey } from '@scure/bip32';
 import { initSimnet } from "@hirosystems/clarinet-sdk";
 
 describe("oracle-aggregator proper authorization test", () => {
@@ -10,11 +12,15 @@ describe("oracle-aggregator proper authorization test", () => {
   let wallet2: any;
 
   beforeEach(async () => {
-    simnet = await initSimnet();
+  simnet = await initSimnet("./Clarinet.toml");
     accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
     wallet1 = accounts.get("wallet_1")!;
-    wallet2 = accounts.get("wallet_2")!;
+    wallet2 = accounts.get("wallet_2");
+    if (!wallet2) {
+      // Fallback deterministic testnet address (not whitelisted) used for unauthorized path tests
+      wallet2 = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+    }
   });
 
   it("tests authorization with different accounts", async () => {
@@ -81,18 +87,34 @@ describe("oracle-aggregator proper authorization test", () => {
     );
     console.log("Unauthorized result:", JSON.stringify(unauthorizedResult.result, null, 2));
 
-    console.log("=== TESTING DEPLOYER SUBMISSION ===");
-    // Submit as deployer (should fail - not whitelisted)
-    const deployerResult = simnet.callPublicFn(
-      "oracle-aggregator",
-      "submit-price",
-      [
-        Cl.principal(base),
-        Cl.principal(quote),
-        Cl.uint(2000)
-      ],
-      deployer
-    );
-    console.log("Deployer result:", JSON.stringify(deployerResult.result, null, 2));
+    // Helper normalizer for ok true shape per current SDK (can be {type:'true'} or {type:'bool', value:true})
+    const expectOkTrue = (r: any) => {
+      expect(r.type).toBe('ok');
+      const v = r.value;
+      if (v.type === 'true') return; // new shape
+      expect(v).toEqual({ type: 'bool', value: true });
+    };
+
+    // Assertions (map to PRD: ORACLE-REG-1, ORACLE-WL-1, ORACLE-SUBMIT-ACL)
+    expectOkTrue(registerResult.result);
+    expectOkTrue(addResult.result);
+    expect(authorizedResult.result.type).toBe('ok');
+    // Unauthorized submissions should err with code 102 (ERR_NOT_ORACLE)
+    expect(unauthorizedResult.result).toEqual({ type: 'err', value: { type: 'uint', value: 102n } });
+
+    // Optional deployer submission check: if deployer principal equals wallet1 (SDK duplicate), skip strict check
+    if (deployer !== wallet1) {
+      const deployerResult = simnet.callPublicFn(
+        "oracle-aggregator",
+        "submit-price",
+        [
+          Cl.principal(base),
+          Cl.principal(quote),
+          Cl.uint(2000)
+        ],
+        deployer
+      );
+      expect(deployerResult.result).toEqual({ type: 'err', value: { type: 'uint', value: 102n } });
+    }
   });
 });

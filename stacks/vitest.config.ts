@@ -5,5 +5,6 @@ export default defineConfig({
     include: ['tests/**/*.ts', 'sdk-tests/**/*.spec.ts'],
     testTimeout: 60000,
     globals: true,
+  setupFiles: ['global-vitest.setup.ts'],
   },
 });

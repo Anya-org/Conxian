@@ -18,7 +18,7 @@
 
 (define-constant ERR_NOT_AUTHORIZED (err u100))
 (define-constant ERR_ALREADY_REGISTERED (err u101))
-(define-constant ERR_NOT_ORACLE (err u102)) ;; reserved for future ACL use
+(define-constant ERR_NOT_ORACLE (err u102)) ;; used when caller not whitelisted
 (define-constant ERR_PAIR_NOT_FOUND (err u103))
 (define-constant ERR_ALREADY_ORACLE (err u104))
 (define-constant ERR_MIN_SOURCES (err u105))

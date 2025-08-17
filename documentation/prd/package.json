@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "@hirosystems/clarinet-sdk": "3.5.0",
-    "clarinet": "npm:@hirosystems/clarinet-sdk@3.5.0",
-    "@types/node": "^18.19.0",
+  "@hirosystems/clarinet-sdk": "3.5.0",
+    "@types/node": "24.3.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.4.0",
     "vitest": "^3.2.4"
