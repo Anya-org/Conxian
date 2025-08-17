@@ -138,3 +138,170 @@
     (ok (tuple (amount-out amount-in)))
   )
 )
+
+;; Enhanced Protocol Fee Collection and Optimization
+(define-data-var dynamic-fees-enabled bool true)
+(define-data-var volume-tracker uint u0)
+(define-data-var fee-optimization-period uint u144) ;; 24 hours in blocks
+(define-data-var last-fee-adjustment uint u0)
+(define-data-var total-protocol-revenue uint u0)
+
+;; Dynamic fee adjustment based on volume and market conditions
+(define-public (optimize-protocol-fees)
+  (begin
+    (let ((current-volume (var-get volume-tracker))
+          (blocks-since-adjustment (- block-height (var-get last-fee-adjustment)))
+          (adjustment-period (var-get fee-optimization-period)))
+      
+      ;; Only adjust fees periodically
+      (if (and (var-get dynamic-fees-enabled) 
+               (>= blocks-since-adjustment adjustment-period))
+        (begin
+          (let ((volume-threshold u1000000) ;; High volume threshold
+                (current-protocol-fee (var-get protocol-fee-bps))
+                (current-lp-fee (var-get lp-fee-bps)))
+            
+            ;; Adjust fees based on volume
+            (if (> current-volume volume-threshold)
+              ;; High volume - reduce fees to encourage more trading
+              (begin
+                (var-set protocol-fee-bps (max (- current-protocol-fee u1) u3))
+                (var-set lp-fee-bps (max (- current-lp-fee u5) u20))
+              )
+              ;; Low volume - increase fees for sustainability
+              (begin
+                (var-set protocol-fee-bps (min (+ current-protocol-fee u1) u10))
+                (var-set lp-fee-bps (min (+ current-lp-fee u5) u50))
+              )
+            )
+            
+            ;; Reset tracking
+            (var-set volume-tracker u0)
+            (var-set last-fee-adjustment block-height)
+            
+            (print {
+              event: "fees-optimized",
+              new-protocol-fee: (var-get protocol-fee-bps),
+              new-lp-fee: (var-get lp-fee-bps),
+              volume-period: current-volume,
+              block: block-height
+            })
+            (ok true)
+          )
+        )
+        (ok false)
+      )
+    )
+  )
+)
+
+;; Collect accumulated protocol fees
+(define-public (collect-protocol-fees)
+  (begin
+    (let ((fee-x (var-get protocol-fee-x))
+          (fee-y (var-get protocol-fee-y))
+          (total-collected (+ fee-x fee-y)))
+      
+      (if (> total-collected u0)
+        (begin
+          ;; Transfer fees to treasury (simplified - would need proper token transfers)
+          (var-set total-protocol-revenue (+ (var-get total-protocol-revenue) total-collected))
+          (var-set protocol-fee-x u0)
+          (var-set protocol-fee-y u0)
+          
+          (print {
+            event: "protocol-fees-collected",
+            fee-x: fee-x,
+            fee-y: fee-y,
+            total-revenue: (var-get total-protocol-revenue),
+            block: block-height
+          })
+          (ok total-collected)
+        )
+        (ok u0)
+      )
+    )
+  )
+)
+
+;; Enhanced swap function with optimized fee collection
+(define-public (swap-with-fee-optimization (amount-in uint) (min-amount-out uint) (x-to-y bool))
+  (begin
+    (asserts! (> amount-in u0) (err ERR_INVALID_AMOUNTS))
+    (update-cumulative)
+    
+    (let ((reserves (unwrap! (get-reserves) (err u300)))
+          (rx (get rx reserves))
+          (ry (get ry reserves))
+          (lp-fee (var-get lp-fee-bps))
+          (protocol-fee (var-get protocol-fee-bps)))
+      
+      ;; Calculate amounts with enhanced fee structure
+      (let ((fee-amount (/ (* amount-in lp-fee) BPS_DENOM))
+            (protocol-fee-amount (/ (* fee-amount protocol-fee) lp-fee))
+            (lp-fee-amount (- fee-amount protocol-fee-amount))
+            (amount-after-fees (- amount-in fee-amount)))
+        
+        ;; Update volume tracking for fee optimization
+        (var-set volume-tracker (+ (var-get volume-tracker) amount-in))
+        
+        ;; Calculate output using constant product formula
+        (let ((amount-out (if x-to-y
+                           (/ (* amount-after-fees ry) (+ rx amount-after-fees))
+                           (/ (* amount-after-fees rx) (+ ry amount-after-fees)))))
+          
+          (asserts! (>= amount-out min-amount-out) (err ERR_MIN_OUT))
+          
+          ;; Update reserves and protocol fees
+          (if x-to-y
+            (begin
+              (var-set reserve-x (+ rx amount-in))
+              (var-set reserve-y (- ry amount-out))
+              (var-set protocol-fee-x (+ (var-get protocol-fee-x) protocol-fee-amount))
+            )
+            (begin
+              (var-set reserve-y (+ ry amount-in))
+              (var-set reserve-x (- rx amount-out))
+              (var-set protocol-fee-y (+ (var-get protocol-fee-y) protocol-fee-amount))
+            )
+          )
+          
+          ;; Try to optimize fees if conditions are met
+          (try! (optimize-protocol-fees))
+          
+          (print {
+            event: "optimized-swap",
+            amount-in: amount-in,
+            amount-out: amount-out,
+            fee-collected: fee-amount,
+            protocol-fee: protocol-fee-amount,
+            x-to-y: x-to-y,
+            block: block-height
+          })
+          (ok amount-out)
+        )
+      )
+    )
+  )
+)
+
+;; Get comprehensive pool statistics
+(define-read-only (get-pool-stats)
+  {
+    reserves: (unwrap-panic (get-reserves)),
+    total-shares: (var-get total-shares),
+    protocol-fees: {
+      fee-x: (var-get protocol-fee-x),
+      fee-y: (var-get protocol-fee-y),
+      total-revenue: (var-get total-protocol-revenue)
+    },
+    fee-rates: {
+      lp-fee-bps: (var-get lp-fee-bps),
+      protocol-fee-bps: (var-get protocol-fee-bps)
+    },
+    volume-tracking: {
+      current-volume: (var-get volume-tracker),
+      last-adjustment: (var-get last-fee-adjustment)
+    }
+  }
+)
