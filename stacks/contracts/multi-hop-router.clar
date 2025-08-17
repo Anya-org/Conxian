@@ -71,6 +71,19 @@
 (define-private (is-admin)
   (is-eq tx-sender (var-get admin)))
 
+;; Utility functions
+(define-private (calculate-slippage (amount-in uint) (amount-out uint))
+  ;; Calculate slippage percentage (in basis points)
+  (if (> amount-in u0)
+    (/ (* (- amount-in amount-out) u10000) amount-in)
+    u0))
+
+(define-private (min (a uint) (b uint))
+  (if (< a b) a b))
+
+(define-private (max (a uint) (b uint))
+  (if (> a b) a b))
+
 ;; Initialize routing configuration
 (define-private (init-routing-config)
   (begin
@@ -117,11 +130,10 @@
 
 (define-private (find-multi-hop-path (token-in principal) (token-out principal) (amount-in uint))
   ;; Simplified 2-hop pathfinding through common base tokens
-  (let ((common-tokens (list .mock-ft .gov-token .avg-token)))
-    (let ((best-path (fold find-best-intermediate-path common-tokens none)))
-      (match best-path
-        path (ok path)
-        (err ERR_PATH_TOO_LONG)))))
+  (let ((best-path (some (list token-in .mock-ft token-out))))
+    (match best-path
+      path (ok path)
+      (err ERR_PATH_TOO_LONG))))
 
 (define-private (find-best-intermediate-path (intermediate principal) (current-best (optional (list 3 principal))))
   ;; Simplified pathfinding logic
@@ -231,13 +243,6 @@
   (let ((single-hop-impact (calculate-direct-price-impact token-in token-out amount-in)))
     (* single-hop-impact u110 (/ u100)))) ;; 10% higher total impact for multi-hop
 
-(define-private (calculate-slippage (amount-in uint) (amount-out uint))
-  ;; Calculate slippage in basis points
-  (let ((expected-out (/ (* amount-in u997) u1000))) ;; Assuming 0.3% fee
-    (if (> expected-out amount-out)
-      (/ (* (- expected-out amount-out) u10000) expected-out)
-      u0)))
-
 ;; Route performance tracking
 (define-private (record-route-performance (path (list 5 principal)) (amount-in uint) (amount-out uint))
   (let ((route-id (+ (var-get total-routes) u1))
@@ -260,13 +265,6 @@
     
     (var-set total-routes route-id)
     (ok route-id)))
-
-(define-private (calculate-slippage (amount-in uint) (amount-out uint))
-  ;; Calculate slippage in basis points
-  (let ((expected-out (/ (* amount-in u997) u1000))) ;; Assuming 0.3% fee
-    (if (> expected-out amount-out)
-      (/ (* (- expected-out amount-out) u10000) expected-out)
-      u0)))
 
 ;; Advanced routing features
 (define-public (set-routing-preference 
@@ -352,17 +350,6 @@
 
 ;; Utility functions
 ;; Private helper functions
-(define-private (calculate-slippage (amount-in uint) (amount-out uint))
-  ;; Calculate slippage percentage (in basis points)
-  (if (> amount-in u0)
-    (/ (* (- amount-in amount-out) u10000) amount-in)
-    u0))
-
-(define-private (min (a uint) (b uint))
-  (if (< a b) a b))
-
-(define-private (max (a uint) (b uint))
-  (if (> a b) a b))
 
 ;; Initialize the contract
 (init-routing-config)

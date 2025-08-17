@@ -84,35 +84,35 @@
     (asserts! (is-admin) (err ERR_UNAUTHORIZED))
     
     ;; Calculate trend (simplified)
-    (let ((previous-metric (map-get? performance-metrics { metric-type: metric-type, period: (- period u1) })))
-      (let ((trend (match previous-metric
-                     prev (if (> value (get value prev)) 1 -1)
-                     0)))
-        
-        (map-set performance-metrics 
-          { metric-type: metric-type, period: period }
-          {
-            value: value,
-            timestamp: block-height,
-            trend: trend,
-            alert-threshold: threshold
-          })
-        
-        ;; Check for alert conditions
-        (if (or (> value threshold) (< value (/ threshold u2)))
-          (begin
-            (unwrap! (trigger-alert metric-type value threshold) (err u500))
-            (ok true))
-          (ok true))
-        
-        (print {
-          event: "performance-metric-updated",
-          metric-type: metric-type,
+    (let ((previous-metric (map-get? performance-metrics { metric-type: metric-type, period: (- period u1) }))
+          (trend (match previous-metric
+                   prev (if (> value (get value prev)) 1 -1)
+                   0)))
+      
+      (map-set performance-metrics 
+        { metric-type: metric-type, period: period }
+        {
           value: value,
+          timestamp: block-height,
           trend: trend,
-          period: period
+          alert-threshold: threshold
         })
-        (ok true)))))
+      
+      ;; Check for alert conditions
+      (if (or (> value threshold) (< value (/ threshold u2)))
+        (begin 
+          (unwrap! (trigger-alert metric-type value threshold) (err u500))
+          true)
+        true)
+      
+      (print {
+        event: "performance-metric-updated",
+        metric-type: metric-type,
+        value: value,
+        trend: trend,
+        period: period
+      })
+      (ok true))))
 
 ;; Alert management
 (define-public (create-alert 

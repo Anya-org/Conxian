@@ -58,18 +58,18 @@
     (asserts! (not (var-get pool-paused)) (err ERR_POOL_PAUSED))
     (asserts! (> shares u0) (err ERR_INVALID_AMOUNTS))
     
-    (let ((current-reserve-x (var-get reserve-x))
-          (current-reserve-y (var-get reserve-y))
-          (current-total-supply (var-get total-supply)))
+    (let ((reserve-x (var-get reserve-x))
+          (reserve-y (var-get reserve-y))
+          (total-supply (var-get total-supply)))
       
-      (let ((amount-x (/ (* shares current-reserve-x) current-total-supply))
-            (amount-y (/ (* shares current-reserve-y) current-total-supply)))
+      (let ((amount-x (/ (* shares reserve-x) total-supply))
+            (amount-y (/ (* shares reserve-y) total-supply)))
         
         (asserts! (and (>= amount-x min-x) (>= amount-y min-y)) (err ERR_INSUFFICIENT_LIQUIDITY))
         
-        (var-set reserve-x (- current-reserve-x amount-x))
-        (var-set reserve-y (- current-reserve-y amount-y))
-        (var-set total-supply (- current-total-supply shares))
+        (var-set reserve-x (- reserve-x amount-x))
+        (var-set reserve-y (- reserve-y amount-y))
+        (var-set total-supply (- total-supply shares))
         
         (ok { dx: amount-x, dy: amount-y })))))
 
@@ -97,7 +97,7 @@
         (ok { amount-out: amount-out })))))
 
 ;; Read-only functions for trait compliance
-(define-public (get-reserves)
+(define-read-only (get-reserves)
   (ok { rx: (var-get reserve-x), ry: (var-get reserve-y) }))
 
 (define-read-only (get-fee-info)

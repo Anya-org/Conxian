@@ -12,6 +12,7 @@
 (define-constant ERR_POOL_PAUSED u305)
 (define-constant ERR_UNAUTHORIZED u306)
 (define-constant ERR_WEIGHT_SUM u307)
+(define-constant ERR_EXPIRED u308)
 
 ;; Mathematical constants
 (define-constant ONE_8 u100000000) ;; 1.0 in 8 decimal fixed point
@@ -97,13 +98,13 @@
       (+ ONE_8 (mul-down exponent (- base ONE_8))))))
 
 ;; Weighted pool invariant: (B_x / W_x)^W_x * (B_y / W_y)^W_y = k
-(define-private (calculate-invariant (balance-x uint) (balance-y uint) (weight-x uint) (weight-y uint))
+(define-private (calculate-invariant (balance-x uint) (balance-y uint) (token-weight-x uint) (token-weight-y uint))
   ;; k = (B_x / W_x)^W_x * (B_y / W_y)^W_y
-  (let ((normalized-x (div-down balance-x weight-x))
-        (normalized-y (div-down balance-y weight-y)))
+  (let ((normalized-x (div-down balance-x token-weight-x))
+        (normalized-y (div-down balance-y token-weight-y)))
     (mul-down 
-      (pow-fixed normalized-x weight-x)
-      (pow-fixed normalized-y weight-y))))
+      (pow-fixed normalized-x token-weight-x)
+      (pow-fixed normalized-y token-weight-y))))
 
 ;; Calculate output amount for weighted swap
 ;; amount_out = balance_out * (1 - (balance_in / (balance_in + amount_in))^(weight_in / weight_out))
@@ -130,26 +131,27 @@
       (/ (+ x (/ n x)) u2))))
 
 ;; Pool functions implementation
-(define-public (add-liquidity (amount-x uint) (amount-y uint) (min-shares uint))
+(define-public (add-liquidity (amount-x uint) (amount-y uint) (min-shares uint) (deadline uint))
   (begin
     (asserts! (not (var-get pool-paused)) (err ERR_POOL_PAUSED))
     (asserts! (and (> amount-x u0) (> amount-y u0)) (err ERR_INVALID_AMOUNTS))
+    (asserts! (>= deadline block-height) (err ERR_EXPIRED))
     
     (let ((current-supply (var-get total-supply))
-          (reserve-x (var-get reserve-x))
-          (reserve-y (var-get reserve-y)))
+          (current-reserve-x (var-get reserve-x))
+          (current-reserve-y (var-get reserve-y)))
       
       (let ((shares (if (is-eq current-supply u0)
                       ;; Initial liquidity: simplified calculation
                       (/ (+ amount-x amount-y) u2) ;; Simple average
                       ;; Calculate proportional shares for weighted pool
-                      (calculate-weighted-lp-shares amount-x amount-y reserve-x reserve-y current-supply))))
+                      (calculate-weighted-lp-shares amount-x amount-y current-reserve-x current-reserve-y current-supply))))
         
         (asserts! (>= shares min-shares) (err ERR_SLIPPAGE_EXCEEDED))
         
         ;; Update pool state
-        (var-set reserve-x (+ reserve-x amount-x))
-        (var-set reserve-y (+ reserve-y amount-y))
+        (var-set reserve-x (+ current-reserve-x amount-x))
+        (var-set reserve-y (+ current-reserve-y amount-y))
         (var-set total-supply (+ current-supply shares))
         
         ;; Update LP position
@@ -165,7 +167,7 @@
               { shares: shares, last-deposit: block-height, total-fees-earned: u0 })))
         
         ;; Update price history
-        (try! (update-price-history))
+        (unwrap! (update-price-history) (err u500))
         
         (print {
           event: "weighted-liquidity-added",
@@ -176,23 +178,23 @@
           weight-x: (var-get weight-x),
           weight-y: (var-get weight-y)
         })
-        (ok { shares: shares, amount-a: amount-x, amount-b: amount-y })))))
+        (ok { shares: shares })))))
 
 (define-private (calculate-weighted-lp-shares 
   (amount-x uint) (amount-y uint) 
-  (reserve-x uint) (reserve-y uint) 
+  (pool-reserve-x uint) (pool-reserve-y uint) 
   (current-supply uint))
   ;; For weighted pools, LP shares are proportional to value added
-  (let ((weight-x (var-get weight-x))
-        (weight-y (var-get weight-y)))
+  (let ((pool-weight-x (var-get weight-x))
+        (pool-weight-y (var-get weight-y)))
     
     ;; Calculate the proportional increase in pool value
-    (let ((value-ratio-x (if (> reserve-x u0) (div-down amount-x reserve-x) u0))
-          (value-ratio-y (if (> reserve-y u0) (div-down amount-y reserve-y) u0)))
+    (let ((value-ratio-x (if (> pool-reserve-x u0) (div-down amount-x pool-reserve-x) u0))
+          (value-ratio-y (if (> pool-reserve-y u0) (div-down amount-y pool-reserve-y) u0)))
       
       ;; Weight the contributions by pool weights
-      (let ((weighted-contribution (+ (mul-down value-ratio-x weight-x)
-                                      (mul-down value-ratio-y weight-y))))
+      (let ((weighted-contribution (+ (mul-down value-ratio-x pool-weight-x)
+                                      (mul-down value-ratio-y pool-weight-y))))
         (mul-down current-supply weighted-contribution)))))
 
 (define-public (remove-liquidity (shares uint) (min-x uint) (min-y uint))
@@ -263,7 +265,7 @@
           (var-set swap-count (+ (var-get swap-count) u1))
           
           ;; Update price history
-          (try! (update-price-history))
+          (unwrap! (update-price-history) (err u500))
           
           (print {
             event: "weighted-swap",
@@ -278,12 +280,12 @@
 
 ;; Price oracle updates
 (define-private (update-price-history)
-  (let ((reserve-x (var-get reserve-x))
-        (reserve-y (var-get reserve-y)))
+  (let ((current-reserve-x (var-get reserve-x))
+        (current-reserve-y (var-get reserve-y)))
     
-    (if (and (> reserve-x u0) (> reserve-y u0))
-      (let ((price-x-per-y (div-down reserve-y reserve-x))
-            (price-y-per-x (div-down reserve-x reserve-y)))
+    (if (and (> current-reserve-x u0) (> current-reserve-y u0))
+      (let ((price-x-per-y (div-down current-reserve-y current-reserve-x))
+            (price-y-per-x (div-down current-reserve-x current-reserve-y)))
         
         (map-set price-history
           { timestamp: block-height }
@@ -428,23 +430,36 @@
 (define-public (initialize-pool 
   (token-x principal) 
   (token-y principal) 
-  (weight-x uint) 
-  (weight-y uint))
+  (init-weight-x uint) 
+  (init-weight-y uint))
   (begin
     (asserts! (is-admin) (err ERR_UNAUTHORIZED))
-    (asserts! (is-eq (+ weight-x weight-y) ONE_8) (err ERR_WEIGHT_SUM))
+    (asserts! (is-eq (+ init-weight-x init-weight-y) ONE_8) (err ERR_WEIGHT_SUM))
     
     (var-set pool-token-x token-x)
     (var-set pool-token-y token-y)
-    (var-set weight-x weight-x)
-    (var-set weight-y weight-y)
+    (var-set weight-x init-weight-x)
+    (var-set weight-y init-weight-y)
     (var-set pool-created-at block-height)
     
     (print {
       event: "weighted-pool-initialized",
       token-x: token-x,
       token-y: token-y,
-      weight-x: weight-x,
-      weight-y: weight-y
+      weight-x: init-weight-x,
+      weight-y: init-weight-y
     })
     (ok true)))
+
+(define-read-only (get-fee-info)
+  (ok { lp-fee-bps: (var-get swap-fee-bps), protocol-fee-bps: u0 }))
+
+(define-read-only (get-price)
+  (let ((current-reserve-x (var-get reserve-x))
+        (current-reserve-y (var-get reserve-y)))
+    (if (and (> current-reserve-x u0) (> current-reserve-y u0))
+      (ok { 
+        price-x-y: (/ (* current-reserve-y u1000000) current-reserve-x),
+        price-y-x: (/ (* current-reserve-x u1000000) current-reserve-y)
+      })
+      (ok { price-x-y: u0, price-y-x: u0 }))))

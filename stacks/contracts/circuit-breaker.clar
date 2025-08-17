@@ -1,30 +1,129 @@
-;; Circuit Breaker Framework for AutoVault DEX
-;; Risk management system with automatic trading halts and protection mechanisms
-
-;; Constants
-(define-constant ERR_UNAUTHORIZED u401)
-(define-constant ERR_CIRCUIT_BREAKER_AC              ;; Check volatility threshold
-              (if (> volatility u2000) ;; 20% volatility threshold
-                (try! (trigger-circuit-breaker BREAKER_PRICE_VOLATILITY volatility))
-                (ok true)))
-          
-          ;; Initialize new window
-          (begin
-            (map-set price-tracking
-              { pool: pool, window: current-window }
-              {
-                high-price: current-price,
-                low-price: current-price,
-                start-price: current-price,
-                volatility-score: u0,
-                last-update: block-height
-              })
-            (ok true))))))))
+;; Simple Circuit Breaker for AutoVault DEX
+;; Basic risk management with emergency controls
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u401)
 (define-constant ERR_BREAKER_NOT_FOUND u402)
-(define-constant ERR_INVALID_THRESHOLD u403)
+(define-constant ERR_EMERGENCY_STOP u405)
+
+;; Circuit breaker types
+(define-constant BREAKER_PRICE_VOLATILITY u1)
+(define-constant BREAKER_VOLUME_SPIKE u2)
+(define-constant BREAKER_LIQUIDITY_DRAIN u3)
+
+;; Data variables
+(define-data-var admin principal tx-sender)
+(define-data-var emergency-admin principal tx-sender)
+(define-data-var system-paused bool false)
+(define-data-var global-circuit-breaker bool false)
+
+;; Circuit breaker states
+(define-map circuit-breaker-state
+  { breaker-type: uint }
+  {
+    triggered: bool,
+    trigger-time: uint,
+    trigger-value: uint,
+    cooldown-period: uint
+  }
+)
+
+;; Authorization
+(define-private (is-admin)
+  (is-eq tx-sender (var-get admin)))
+
+(define-private (is-emergency-admin)
+  (or (is-admin) (is-eq tx-sender (var-get emergency-admin))))
+
+;; Basic circuit breaker functions
+(define-public (trigger-circuit-breaker (breaker-type uint) (trigger-value uint))
+  (begin
+    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
+    
+    (map-set circuit-breaker-state
+      { breaker-type: breaker-type }
+      {
+        triggered: true,
+        trigger-time: block-height,
+        trigger-value: trigger-value,
+        cooldown-period: u144 ;; 24 hour cooldown
+      })
+    
+    (print {
+      event: "circuit-breaker-triggered",
+      breaker-type: breaker-type,
+      trigger-value: trigger-value,
+      block-height: block-height
+    })
+    (ok true)))
+
+(define-read-only (is-circuit-breaker-triggered (breaker-type uint))
+  (match (map-get? circuit-breaker-state { breaker-type: breaker-type })
+    state (get triggered state)
+    false))
+
+(define-public (reset-circuit-breaker (breaker-type uint))
+  (begin
+    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
+    
+    (map-set circuit-breaker-state
+      { breaker-type: breaker-type }
+      {
+        triggered: false,
+        trigger-time: u0,
+        trigger-value: u0,
+        cooldown-period: u0
+      })
+    (ok true)))
+
+;; Emergency functions
+(define-public (emergency-pause)
+  (begin
+    (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
+    (var-set system-paused true)
+    (var-set global-circuit-breaker true)
+    
+    (print {
+      event: "emergency-pause-activated",
+      admin: tx-sender,
+      block-height: block-height
+    })
+    (ok true)))
+
+(define-public (emergency-resume)
+  (begin
+    (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
+    (var-set system-paused false)
+    (var-set global-circuit-breaker false)
+    
+    (print {
+      event: "emergency-resume-activated",
+      admin: tx-sender,
+      block-height: block-height
+    })
+    (ok true)))
+
+;; System status
+(define-read-only (get-system-status)
+  {
+    system-paused: (var-get system-paused),
+    global-circuit-breaker: (var-get global-circuit-breaker),
+    admin: (var-get admin),
+    emergency-admin: (var-get emergency-admin)
+  })
+
+;; Admin functions
+(define-public (set-admin (new-admin principal))
+  (begin
+    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
+    (var-set admin new-admin)
+    (ok true)))
+
+(define-public (set-emergency-admin (new-admin principal))
+  (begin
+    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
+    (var-set emergency-admin new-admin)
+    (ok true)))
 (define-constant ERR_COOLDOWN_ACTIVE u404)
 (define-constant ERR_EMERGENCY_STOP u405)
 
