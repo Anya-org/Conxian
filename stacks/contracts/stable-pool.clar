@@ -100,7 +100,7 @@
 (define-public (get-reserves)
   (ok { rx: (var-get reserve-x), ry: (var-get reserve-y) }))
 
-(define-read-only (get-fee-info)
+(define-public (get-fee-info)
   (ok { lp-fee-bps: (var-get base-fee-bps), protocol-fee-bps: u0 }))
 
 (define-read-only (get-price)
