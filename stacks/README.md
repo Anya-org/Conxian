@@ -243,4 +243,4 @@ get-balance \
 
 For complete documentation, see [../documentation/](../documentation/)
 
-*Updated: Aug 17, 2025*
+### Updated: Aug 17, 2025
