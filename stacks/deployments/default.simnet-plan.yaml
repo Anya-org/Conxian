@@ -151,17 +151,27 @@ plan:
             path: contracts/multi-hop-router.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: registry
+            contract-name: oracle-aggregator
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/registry.clar
+            path: contracts/oracle-aggregator.clar
             clarity-version: 2
       epoch: "2.4"
     - id: 1
       transactions:
         - emulated-contract-publish:
+            contract-name: registry
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/registry.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: stable-pool
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/stable-pool.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: state-anchor
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/state-anchor.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: strategy-trait

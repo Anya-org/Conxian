@@ -4,14 +4,22 @@
 ;;          and compute a simple average price once minimum sources met.
 ;; SECURITY (scaffold):
 ;; - Registration gated to deployer for now (replace with governance gate).
-;; - Uses average (not median) – upgrade to median/TWAP before production reliance.
+;; - Uses simple average (NOT median/TWAP) - upgrade before production reliance.
+;; - NOW: Whitelist enforced per pair for submissions.
 ;; EVENTS:
 ;; - price-aggregate (code u3001)
+;; ROADMAP HARDENING:
+;; - Add oracle membership check (whitelist) via fixed-size tuple or bitmap
+;; - Support median + configurable decay-weighted TWAP
+;; - Governance-controlled parameter updates
 ;; ------------------------------------------------------------
 
 (define-constant ERR_NOT_AUTHORIZED (err u100))
 (define-constant ERR_ALREADY_REGISTERED (err u101))
-(define-constant ERR_NOT_ORACLE (err u102))
+(define-constant ERR_NOT_ORACLE (err u102)) ;; reserved for future ACL use
+(define-constant ERR_PAIR_NOT_FOUND (err u103))
+(define-constant ERR_ALREADY_ORACLE (err u104))
+(define-constant ERR_MIN_SOURCES (err u105))
 
 ;; Pair registration: list of oracle principals & min sources required
 (define-map pairs { base: principal, quote: principal }
@@ -28,59 +36,143 @@
 ;; Deployer captured at publish time
 (define-constant DEPLOYER tx-sender)
 
-;; Helper: check caller authorized (deployer placeholder)
+;; Admin (mutable so governance/timelock can assume control)
+(define-data-var admin principal DEPLOYER)
+
+;; Helper: check caller authorized (deployer placeholder). In future replace
+;; with governance / timelock principal.
 (define-read-only (is-authorized (sender principal))
   (ok (is-eq sender DEPLOYER)))
+
+(define-read-only (get-admin)
+  (ok (var-get admin)))
+
+(define-public (set-admin (p principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_NOT_AUTHORIZED)
+    (var-set admin p)
+    (print { event: "oa-set-admin", new: p })
+    (ok true)))
 
 ;; Register a pair with initial oracle list & min sources
 (define-public (register-pair (base principal) (quote principal) (oracles (list 10 principal)) (min-sources uint))
   (begin
-    (match (is-authorized tx-sender)
-      authorized (asserts! authorized ERR_NOT_AUTHORIZED))
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_NOT_AUTHORIZED)
     (asserts! (> (len oracles) u0) ERR_NOT_ORACLE)
-    (asserts! (<= min-sources (len oracles)) ERR_NOT_ORACLE)
+    (asserts! (<= min-sources (len oracles)) ERR_MIN_SOURCES)
     (let ((existing (map-get? pairs { base: base, quote: quote })))
       (asserts! (is-none existing) ERR_ALREADY_REGISTERED))
     (map-set pairs { base: base, quote: quote } { oracles: oracles, min-sources: min-sources })
+    (print { event: "oa-register-pair", base: base, quote: quote, min: min-sources, count: (len oracles) })
     (ok true)))
 
-;; Utility: check membership
-(define-read-only (contains? (items (list 10 principal)) (target principal))
-  (if (is-eq (len items) u0)
-      false
-      (let ((head (unwrap! (element-at items u0) false))
-            (tail (slice items u1 (len items))))
-        (if (is-eq head target) true (contains? tail target)))))
+;; Oracle whitelist (explicit) to enforce ACL without list iteration
+(define-map oracle-whitelist { base: principal, quote: principal, oracle: principal } { enabled: bool })
 
-;; Private recursive accumulator for average calculation
-(define-private (accumulate (base principal) (quote principal) (oracle-list (list 10 principal)) (sum uint) (count uint))
-  (if (is-eq (len oracle-list) u0)
-      (ok (tuple (sum sum) (count count)))
-      (let ((head (unwrap! (element-at oracle-list u0) ERR_NOT_ORACLE))
-            (tail (slice oracle-list u1 (len oracle-list))))
-        (let ((sub (map-get? submissions { base: base, quote: quote, oracle: head })))
-          (if (is-some sub)
-              (let ((val (unwrap! sub (err u999))))
-                (accumulate base quote tail (+ sum (get price val)) (+ count u1)))
-              (accumulate base quote tail sum count))))))
+(define-public (add-oracle (base principal) (quote principal) (oracle principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_NOT_AUTHORIZED)
+    (let ((pair (map-get? pairs { base: base, quote: quote })))
+      (asserts! (is-some pair) ERR_PAIR_NOT_FOUND))
+    (let ((entry (map-get? oracle-whitelist { base: base, quote: quote, oracle: oracle })))
+      (asserts! (is-none entry) ERR_ALREADY_ORACLE))
+    (map-set oracle-whitelist { base: base, quote: quote, oracle: oracle } { enabled: true })
+    (print { event: "oa-add-oracle", base: base, quote: quote, oracle: oracle })
+    (ok true)))
+
+(define-public (remove-oracle (base principal) (quote principal) (oracle principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_NOT_AUTHORIZED)
+    (map-delete oracle-whitelist { base: base, quote: quote, oracle: oracle })
+    (print { event: "oa-remove-oracle", base: base, quote: quote, oracle: oracle })
+    (ok true)))
+
+(define-public (set-min-sources (base principal) (quote principal) (min-sources uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_NOT_AUTHORIZED)
+    (let ((pair (map-get? pairs { base: base, quote: quote })))
+      (asserts! (is-some pair) ERR_PAIR_NOT_FOUND)
+      (let ((p (unwrap! pair ERR_PAIR_NOT_FOUND)))
+        (asserts! (>= min-sources u1) ERR_MIN_SOURCES)
+        (map-set pairs { base: base, quote: quote } { oracles: (get oracles p), min-sources: min-sources })
+        (print { event: "oa-set-min", base: base, quote: quote, min: min-sources })
+        (ok true)))))
+
+;; Incremental aggregation stats per pair (sum + number of distinct submitting
+;; sources). This avoids list iteration recursion limitations.
+(define-map stats { base: principal, quote: principal } { sum: uint, submitted: uint })
+
+;; Rolling history (for TWAP / future median). Fixed size ring buffer length 5.
+(define-constant HISTORY_SIZE u5)
+(define-map history { base: principal, quote: principal, slot: uint } { price: uint, height: uint })
+(define-map meta { base: principal, quote: principal } { count: uint, next: uint })
+
+(define-private (record-history (base principal) (quote principal) (price uint))
+  (let ((m (map-get? meta { base: base, quote: quote })))
+    (match m present
+      (let ((slot (get next present)) (count (get count present)))
+        (map-set history { base: base, quote: quote, slot: slot } { price: price, height: block-height })
+        (map-set meta { base: base, quote: quote } { count: (if (< count HISTORY_SIZE) (+ count u1) count), next: (mod (+ slot u1) HISTORY_SIZE) })
+        true)
+      (begin
+        (map-set history { base: base, quote: quote, slot: u0 } { price: price, height: block-height })
+        (map-set meta { base: base, quote: quote } { count: u1, next: u1 })
+        true))))
+
+(define-read-only (get-twap (base principal) (quote principal))
+  (let ((m (map-get? meta { base: base, quote: quote })))
+    (match m present
+      (let ((count (get count present)))
+        (if (is-eq count u0)
+            u0
+            (let ((s (+
+                      (default-to u0 (get price (map-get? history { base: base, quote: quote, slot: u0 })))
+                      (default-to u0 (get price (map-get? history { base: base, quote: quote, slot: u1 })))
+                      (default-to u0 (get price (map-get? history { base: base, quote: quote, slot: u2 })))
+                      (default-to u0 (get price (map-get? history { base: base, quote: quote, slot: u3 })))
+                      (default-to u0 (get price (map-get? history { base: base, quote: quote, slot: u4 }))))) )
+              (/ s count))))
+      u0)))
 
 ;; Submit a price for a pair as an authorized oracle
+;; Submit a price (any sender for now - add oracle ACL later). Distinct oracle
+;; tracking based on first submission per principal. Subsequent submissions
+;; update the sum (replace old price) but not submitted count.
 (define-public (submit-price (base principal) (quote principal) (price uint))
   (let ((pair (map-get? pairs { base: base, quote: quote })))
     (match pair
       pair-data
-        (let ((oracle-list (get oracles pair-data))
-              (min-src (get min-sources pair-data)))
-          (asserts! (is-eq true (contains? oracle-list tx-sender)) ERR_NOT_ORACLE)
-          (map-set submissions { base: base, quote: quote, oracle: tx-sender } { price: price, height: block-height })
-          (let ((agg (unwrap! (accumulate base quote oracle-list u0 u0) (err u998))))
-            (let ((src (get count agg)))
-              (if (>= src min-src)
-                  (let ((avg (/ (get sum agg) src)))
-                    (map-set prices { base: base, quote: quote } { price: avg, height: block-height, sources: src })
-                    (print { event: "price-aggregate", code: u3001, base: base, quote: quote, price: avg, sources: src, height: block-height })
-                    (ok { aggregated: true, sources: src, price: avg }))
-                  (ok { aggregated: false, sources: src, price: u0 }))))
+        (let ((min-src (get min-sources pair-data))
+              (existing (map-get? submissions { base: base, quote: quote, oracle: tx-sender }))
+              (stat (map-get? stats { base: base, quote: quote })))
+          ;; Enforce whitelist
+          (let ((auth (map-get? oracle-whitelist { base: base, quote: quote, oracle: tx-sender })))
+            (asserts! (is-some auth) ERR_NOT_ORACLE))
+          (let ((curr-sum (if (is-some stat) (get sum (unwrap! stat (err u998))) u0))
+                (curr-sub (if (is-some stat) (get submitted (unwrap! stat (err u998))) u0)))
+            (if (is-some existing)
+                (let ((prev (unwrap! existing (err u997))))
+                  (map-set submissions { base: base, quote: quote, oracle: tx-sender } { price: price, height: block-height })
+                  (let ((new-sum (+ (- curr-sum (get price prev)) price)))
+                    (map-set stats { base: base, quote: quote } { sum: new-sum, submitted: curr-sub })
+                    (if (>= curr-sub min-src)
+                        (let ((avg (/ new-sum curr-sub)))
+                          (map-set prices { base: base, quote: quote } { price: avg, height: block-height, sources: curr-sub })
+                          (record-history base quote avg)
+                          (print { event: "price-aggregate", code: u3001, base: base, quote: quote, price: avg, sources: curr-sub, height: block-height })
+                          (ok { aggregated: true, sources: curr-sub, price: avg }))
+                        (ok { aggregated: false, sources: curr-sub, price: price }))))
+                (begin
+                  (map-set submissions { base: base, quote: quote, oracle: tx-sender } { price: price, height: block-height })
+                  (let ((new-sub (+ curr-sub u1)) (new-sum (+ curr-sum price)))
+                    (map-set stats { base: base, quote: quote } { sum: new-sum, submitted: new-sub })
+                    (if (>= new-sub min-src)
+                        (let ((avg (/ new-sum new-sub)))
+                          (map-set prices { base: base, quote: quote } { price: avg, height: block-height, sources: new-sub })
+                          (record-history base quote avg)
+                          (print { event: "price-aggregate", code: u3001, base: base, quote: quote, price: avg, sources: new-sub, height: block-height })
+                          (ok { aggregated: true, sources: new-sub, price: avg }))
+                        (ok { aggregated: false, sources: new-sub, price: price })))))))
       (err u404))))
 
 ;; Read-only latest price

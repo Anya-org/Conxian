@@ -1,4 +1,4 @@
-;; BETA: Experimental DEX component – not audited; avoid production reliance.
+;; BETA: Experimental DEX component - not audited; avoid production reliance.
 ;; DEX Pool Contract - Constant Product AMM Implementation
 ;; Implements a Uniswap V2-style AMM with support for fee collection
 
