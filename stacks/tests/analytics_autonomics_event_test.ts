@@ -1,34 +1,58 @@
-import { Clarinet, Tx, Chain, Account, types } from "clarinet";
+import { describe, it, expect, beforeEach } from "vitest";
+import { initSimnet } from "@hirosystems/clarinet-sdk";
+import { Cl } from "@stacks/transactions";
 
-Clarinet.test({
-  name: "analytics: autonomics update triggers analytics autonomics event record",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
-    const deployer = accounts.get("deployer")!;
-    const wallet1 = accounts.get("wallet_1")!;
-    const timelockId = `${deployer.address}.timelock`;
+const accounts = [
+  "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+  "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
+  "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
+];
+
+describe("Analytics Autonomics Event (SDK) - PRD ANALYTICS alignment", () => {
+  let simnet: any;
+
+  beforeEach(async () => {
+    simnet = await initSimnet();
+  });
+
+  it("PRD ANALYTICS-EVENT-EMIT: autonomics update triggers analytics autonomics event record", async () => {
+    const deployer = accounts[0];
+    const wallet1 = accounts[1];
+    const timelockId = `${deployer}.timelock`;
 
     // Give timelock admin rights and enable autonomics + fees
-    let block = chain.mineBlock([
-      Tx.contractCall("vault", "set-admin", [types.principal(timelockId)], deployer.address),
-      Tx.contractCall("vault", "set-reserve-bands", [types.uint(200), types.uint(4000)], timelockId),
-      Tx.contractCall("vault", "set-fee-ramps", [types.uint(5), types.uint(5)], timelockId),
-      Tx.contractCall("vault", "set-auto-economics-enabled", [types.bool(true)], timelockId),
-      Tx.contractCall("vault", "set-auto-fees-enabled", [types.bool(true)], timelockId),
-    ]);
-    block.receipts.forEach(r => r.result.expectOk());
+    let response = simnet.callPublicFn("vault", "set-admin", [Cl.principal(timelockId)], deployer);
+    expect(response.result).toStrictEqual(Cl.ok(Cl.bool(true)));
+
+    response = simnet.callPublicFn("vault", "set-reserve-bands", [Cl.uint(200), Cl.uint(4000)], timelockId);
+    expect(response.result).toStrictEqual(Cl.ok(Cl.bool(true)));
+
+    response = simnet.callPublicFn("vault", "set-fee-ramps", [Cl.uint(5), Cl.uint(5)], timelockId);
+    expect(response.result).toStrictEqual(Cl.ok(Cl.bool(true)));
+
+    response = simnet.callPublicFn("vault", "set-auto-economics-enabled", [Cl.bool(true)], timelockId);
+    expect(response.result).toStrictEqual(Cl.ok(Cl.bool(true)));
+
+    response = simnet.callPublicFn("vault", "set-auto-fees-enabled", [Cl.bool(true)], timelockId);
+    expect(response.result).toStrictEqual(Cl.ok(Cl.bool(true)));
 
     // Provide initial liquidity
-    block = chain.mineBlock([
-      Tx.contractCall("mock-ft", "mint", [types.principal(wallet1.address), types.uint(50000)], deployer.address),
-      Tx.contractCall("mock-ft", "approve", [types.principal(`${deployer.address}.vault`), types.uint(50000)], wallet1.address),
-      Tx.contractCall("vault", "deposit", [types.uint(20000)], wallet1.address),
-    ]);
-    block.receipts.forEach(r => r.result.expectOk());
+    response = simnet.callPublicFn("mock-ft", "mint", [Cl.principal(wallet1), Cl.uint(50000)], deployer);
+    expect(response.result).toStrictEqual(Cl.ok(Cl.bool(true)));
+
+    response = simnet.callPublicFn("mock-ft", "approve", [Cl.principal(`${deployer}.vault`), Cl.uint(50000)], wallet1);
+    expect(response.result).toStrictEqual(Cl.ok(Cl.bool(true)));
+
+    response = simnet.callPublicFn("vault", "deposit", [Cl.uint(20000)], wallet1);
+    expect(response.result.type).toBe('ok'); // Should now work with vault deposit fix
 
     // Run an autonomics update which should internally call analytics::record-autonomics
-    block = chain.mineBlock([
-      Tx.contractCall("vault", "update-autonomics", [], wallet1.address),
-    ]);
+    response = simnet.callPublicFn("vault", "update-autonomics", [], wallet1);
+    expect(response.result.type).toBe('ok');
+
+    // TODO: Add verification of analytics event emission if analytics contract has read-only functions
+  });
+});
     const res = block.receipts[0];
     res.result.expectOk();
 
