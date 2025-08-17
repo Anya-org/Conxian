@@ -510,7 +510,7 @@
       )
       ;; Pull tokens from user into the vault using the stored token contract
       (unwrap!
-        (contract-call? .mock-ft transfer-from user (as-contract tx-sender) amount)
+        (as-contract (contract-call? .mock-ft transfer-from user tx-sender amount))
         (err u200)
       )
       ;; Mint shares proportional to current NAV

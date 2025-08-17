@@ -9,7 +9,12 @@ describe('Creator Token (SDK) - PRD CREATOR-TOKEN alignment', () => {
     accounts = simnet.getAccounts(); 
     deployer = accounts.get('deployer')!; 
     wallet1 = accounts.get('wallet_1')!; 
-    wallet2 = accounts.get('wallet_2') || 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6'; 
+    wallet2 = accounts.get('wallet_2') || 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+    
+    // Set up authorization: Make deployer the authorized bounty-system for testing
+    // First call as DAO governance (which is initially the deployer's .dao-governance contract)
+    const daoGovernance = "STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ"; // The actual DAO governance in simnet
+    simnet.callPublicFn('creator-token', 'set-bounty-system', [Cl.principal(deployer)], daoGovernance);
   });
 
   it('PRD CREATOR-META: Basic SIP-010 functionality works', () => {
@@ -26,11 +31,17 @@ describe('Creator Token (SDK) - PRD CREATOR-TOKEN alignment', () => {
     expect(result.result.type).toBe('ok');
     expect((result.result as any).value.value).toBe(6n);
     
+    // Debug: Try to set authorization as the actual DAO governance principal
+    const daoGovernance = "STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ";
+    const authSetup = simnet.callPublicFn('creator-token', 'set-bounty-system', [Cl.principal(deployer)], daoGovernance);
+    console.log('Authorization setup result:', JSON.stringify(authSetup.result));
+    
     // Test minting (as bounty system)
     const mint = simnet.callPublicFn('creator-token', 'mint', [
         Cl.principal(wallet1),
         Cl.uint(100000)
-    ], deployer); // Deployer acts as bounty system initially
+    ], deployer); // Deployer acts as bounty system after authorization
+    console.log('Mint result:', JSON.stringify(mint.result));
     expect(mint.result.type).toBe('ok');
     
     // Check balance
