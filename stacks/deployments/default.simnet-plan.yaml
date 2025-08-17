@@ -83,7 +83,7 @@ plan:
         - emulated-contract-publish:
             contract-name: circuit-breaker
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/circuit-breaker-simple.clar
+            path: contracts/circuit-breaker.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: gov-token

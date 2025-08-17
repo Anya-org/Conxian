@@ -158,11 +158,10 @@ clarity_version = 2
 epoch = "2.4"
 
 [contracts.circuit-breaker]
-path = "contracts/circuit-breaker-simple.clar"
+path = "contracts/circuit-breaker.clar"
 clarity_version = 2
 epoch = "2.4"
 
-# Optional enhanced / legacy variants (included for completeness)
 
 
 

@@ -98,20 +98,20 @@
 
 ;; Read-only functions for trait compliance
 (define-public (get-reserves)
-  (ok { rx: (var-get reserve-x), ry: (var-get reserve-y) }))
+  (ok (tuple (rx (var-get reserve-x)) (ry (var-get reserve-y)))))
 
 (define-public (get-fee-info)
-  (ok { lp-fee-bps: (var-get base-fee-bps), protocol-fee-bps: u0 }))
+  (ok (tuple (lp-fee-bps (var-get base-fee-bps)) (protocol-fee-bps u0))))
 
 (define-read-only (get-price)
-  (let ((reserve-x (var-get reserve-x))
-        (reserve-y (var-get reserve-y)))
-    (if (and (> reserve-x u0) (> reserve-y u0))
-      (ok { 
-        price-x-y: (/ (* reserve-y u1000000) reserve-x),
-        price-y-x: (/ (* reserve-x u1000000) reserve-y)
-      })
-      (ok { price-x-y: u0, price-y-x: u0 }))))
+  (let ((current-reserve-x (var-get reserve-x))
+        (current-reserve-y (var-get reserve-y)))
+    (if (and (> current-reserve-x u0) (> current-reserve-y u0))
+      (ok (tuple
+        (price-x-y (/ (* current-reserve-y u1000000) current-reserve-x))
+        (price-y-x (/ (* current-reserve-x u1000000) current-reserve-y))
+      ))
+      (ok (tuple (price-x-y u0) (price-y-x u0))))))
 
 ;; Admin functions
 (define-public (set-admin (new-admin principal))

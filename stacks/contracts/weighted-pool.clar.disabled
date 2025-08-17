@@ -233,8 +233,7 @@
           amount-x: amount-x,
           amount-y: amount-y
         })
-  ;; Trait requires (response (tuple (dx uint) (dy uint)) uint)
-  (ok { dx: amount-x, dy: amount-y })))))
+        (ok { amount-a: amount-x, amount-b: amount-y })))))
 
 (define-public (swap-exact-in (amount-in uint) (min-amount-out uint) (x-to-y bool) (deadline uint))
   (begin
@@ -279,8 +278,7 @@
             x-to-y: x-to-y,
             swap-count: (var-get swap-count)
           })
-          ;; Trait requires only (tuple (amount-out uint))
-          (ok { amount-out: amount-out }))))))
+          (ok { amount-out: amount-out, fee: swap-fee }))))))
 
 ;; Price oracle updates
 (define-private (update-price-history)
@@ -456,14 +454,14 @@
     (ok true)))
 
 (define-read-only (get-fee-info)
-  (ok (tuple (lp-fee-bps (var-get swap-fee-bps)) (protocol-fee-bps u0))))
+  (ok { lp-fee-bps: (var-get swap-fee-bps), protocol-fee-bps: u0 }))
 
 (define-read-only (get-price)
   (let ((current-reserve-x (var-get reserve-x))
         (current-reserve-y (var-get reserve-y)))
     (if (and (> current-reserve-x u0) (> current-reserve-y u0))
-      (ok (tuple 
-        (price-x-y (/ (* current-reserve-y u1000000) current-reserve-x))
-        (price-y-x (/ (* current-reserve-x u1000000) current-reserve-y))
-      ))
-      (ok (tuple (price-x-y u0) (price-y-x u0))))))
+      (ok { 
+        price-x-y: (/ (* current-reserve-y u1000000) current-reserve-x),
+        price-y-x: (/ (* current-reserve-x u1000000) current-reserve-y)
+      })
+      (ok { price-x-y: u0, price-y-x: u0 }))))
