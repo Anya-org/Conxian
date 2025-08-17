@@ -120,7 +120,7 @@ class OracleManager:
     
     # Price Management
     
-    async def submit_price(self, base: str, quote: str, price: int, oracle_privkey: Optional[str] =     clarity ch    npm test) -> bool:
+    async def submit_price(self, base: str, quote: str, price: int, oracle_privkey: Optional[str] = None) -> bool:
         """Submit price for trading pair"""
         logger.info(f"Submitting price {price} for {base}/{quote}")
         
