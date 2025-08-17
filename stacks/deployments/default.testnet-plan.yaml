@@ -2,7 +2,7 @@
 id: 0
 name: Testnet deployment
 network: testnet
-stacks-node: "https://stacks-node-api.testnet.stacks.co"
+stacks-node: "https://api.testnet.hiro.so"
 bitcoin-node: "http://blockstack:blockstacksystem@bitcoind.testnet.stacks.co:18332"
 plan:
   batches:
@@ -10,114 +10,229 @@ plan:
       transactions:
         - contract-publish:
             contract-name: analytics
-            expected-sender: ST35SMR4M57M7QP7ZNGCPMH83TSBH0H2D1H51KZVM
-            cost: 80373
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 170890
             path: contracts/analytics.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: sip-010-trait
-            expected-sender: ST35SMR4M57M7QP7ZNGCPMH83TSBH0H2D1H51KZVM
-            cost: 79144
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 6410
             path: contracts/traits/sip-010-trait.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: automated-bounty-system
-            expected-sender: ST35SMR4M57M7QP7ZNGCPMH83TSBH0H2D1H51KZVM
-            cost: 79443
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 47440
             path: contracts/automated-bounty-system.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: creator-token
-            expected-sender: ST35SMR4M57M7QP7ZNGCPMH83TSBH0H2D1H51KZVM
-            cost: 79743
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 86730
             path: contracts/creator-token.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
-            contract-name: bounty-system
-            expected-sender: ST35SMR4M57M7QP7ZNGCPMH83TSBH0H2D1H51KZVM
-            cost: 80216
-            path: contracts/bounty-system.clar
-            anchor-block-only: true
-            clarity-version: 2
-        - contract-publish:
-            contract-name: gov-token
-            expected-sender: ST35SMR4M57M7QP7ZNGCPMH83TSBH0H2D1H51KZVM
-            cost: 79333
-            path: contracts/gov-token.clar
-            anchor-block-only: true
-            clarity-version: 2
-        - contract-publish:
             contract-name: mock-ft
-            expected-sender: ST35SMR4M57M7QP7ZNGCPMH83TSBH0H2D1H51KZVM
-            cost: 79301
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 28170
             path: contracts/mock-ft.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: vault-admin-trait
-            expected-sender: ST35SMR4M57M7QP7ZNGCPMH83TSBH0H2D1H51KZVM
-            cost: 79159
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 9640
             path: contracts/traits/vault-admin-trait.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: vault
-            expected-sender: ST35SMR4M57M7QP7ZNGCPMH83TSBH0H2D1H51KZVM
-            cost: 80783
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 333200
             path: contracts/vault.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
+            contract-name: avg-token
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 97870
+            path: contracts/avg-token.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: avlp-token
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 117150
+            path: contracts/avlp-token.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: bounty-system
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 205740
+            path: contracts/bounty-system.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: oracle-aggregator
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 128770
+            path: contracts/oracle-aggregator.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: circuit-breaker
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 86860
+            path: contracts/circuit-breaker.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: gov-token
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 31880
+            path: contracts/gov-token.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
             contract-name: timelock
-            expected-sender: ST35SMR4M57M7QP7ZNGCPMH83TSBH0H2D1H51KZVM
-            cost: 80153
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 140800
             path: contracts/timelock.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: dao
-            expected-sender: ST35SMR4M57M7QP7ZNGCPMH83TSBH0H2D1H51KZVM
-            cost: 79254
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 20970
             path: contracts/dao.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
-            contract-name: treasury
-            expected-sender: ST35SMR4M57M7QP7ZNGCPMH83TSBH0H2D1H51KZVM
-            cost: 80231
-            path: contracts/treasury.clar
+            contract-name: dao-automation
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 190680
+            path: contracts/dao-automation.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: dao-governance
-            expected-sender: ST35SMR4M57M7QP7ZNGCPMH83TSBH0H2D1H51KZVM
-            cost: 80105
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 162200
             path: contracts/dao-governance.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
+            contract-name: dex-factory
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 21260
+            path: contracts/dex-factory.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: pool-trait
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 5830
+            path: contracts/pool-trait.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: dex-pool
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 116430
+            path: contracts/dex-pool.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: dex-router
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 31150
+            path: contracts/dex-router.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: enterprise-monitoring
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 96660
+            path: contracts/enterprise-monitoring.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: math-lib
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 100860
+            path: contracts/math-lib.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: mock-dex
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 4150
+            path: contracts/mock-dex.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: multi-hop-router
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 116460
+            path: contracts/multi-hop-router.clar
+            anchor-block-only: true
+            clarity-version: 2
+      epoch: "2.4"
+    - id: 1
+      transactions:
+        - contract-publish:
             contract-name: registry
-            expected-sender: ST35SMR4M57M7QP7ZNGCPMH83TSBH0H2D1H51KZVM
-            cost: 79238
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 20720
             path: contracts/registry.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
+            contract-name: stable-pool
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 50940
+            path: contracts/stable-pool.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: state-anchor
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 12050
+            path: contracts/state-anchor.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
             contract-name: strategy-trait
-            expected-sender: ST35SMR4M57M7QP7ZNGCPMH83TSBH0H2D1H51KZVM
-            cost: 79112
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 3660
             path: contracts/traits/strategy-trait.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
+            contract-name: treasury
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 264240
+            path: contracts/treasury.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
             contract-name: vault-trait
-            expected-sender: ST35SMR4M57M7QP7ZNGCPMH83TSBH0H2D1H51KZVM
-            cost: 79144
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 6270
             path: contracts/traits/vault-trait.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: weighted-pool
+            expected-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            cost: 176130
+            path: contracts/weighted-pool.clar
             anchor-block-only: true
             clarity-version: 2
       epoch: "2.4"

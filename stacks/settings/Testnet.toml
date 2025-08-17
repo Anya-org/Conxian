@@ -1,0 +1,16 @@
+[network]
+name = "testnet"
+node_rpc_address = "https://api.testnet.hiro.so"
+
+[accounts.deployer]
+# Testnet deployer account - funded with STX
+mnemonic = "light glare bench random limit flame change call boil wolf exercise bar test argue parade envelope execute chimney good seven warrior blue gorilla jaguar"
+balance = 499050000 
+
+[accounts.wallet_1]  
+mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
+balance = 50000000000
+
+[accounts.wallet_2]
+mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about" 
+balance = 50000000000
