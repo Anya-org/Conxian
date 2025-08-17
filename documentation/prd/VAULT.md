@@ -3,18 +3,22 @@
 Reference: AIP-5 (Precision), Architecture doc, `vault.clar` implementation.
 
 ### 1. Summary & Vision
+
 Core capital aggregation primitive providing share-based accounting, configurable fees, caps, and guarded parameterization via DAO & automation traits.
 
 ### 2. Goals
+
 - Deterministic share math w/ precision safety.
 - Fast deposits/withdrawals (O(1) storage writes typical).
 - Extensible via strategy & admin traits (no internal upgrade logic).
 
 ### 3. Non-Goals
+
 - Off-chain yield strategy definitions (handled by adapters).  
 - Complex rebalance batching (future v2).
 
 ### 4. User Stories
+
 | ID | Story | Priority |
 |----|-------|----------|
 | VAULT-US-01 | As a user I deposit tokens and receive proportional shares | P0 |
@@ -23,6 +27,7 @@ Core capital aggregation primitive providing share-based accounting, configurabl
 | VAULT-US-04 | As automation module I adjust parameters w/ constraints | P1 |
 
 ### 5. Functional Requirements
+
 | ID | Requirement |
 |----|-------------|
 | VAULT-FR-01 | Provide `deposit(amount)` returning minted shares. |
@@ -37,12 +42,14 @@ Core capital aggregation primitive providing share-based accounting, configurabl
 | VAULT-FR-10 | Reentrancy-safe via Clarity state model & single write order. |
 
 ### 6. Non-Functional Requirements
+
 - Gas efficiency: <= 2 map writes per deposit/withdraw (excluding fee param updates).  
 - Deterministic math: No overflow; rounding direction documented.  
 - Upgrade path: Migrate by deploying new vault & registry pointer update.  
 - Test coverage: 100% for invariants & FR IDs.
 
 ### 7. Invariants
+
 | ID | Invariant |
 |----|-----------|
 | VAULT-INV-01 | totalUnderlying == (sharePrice * totalShares) within rounding tolerance. |
@@ -51,12 +58,14 @@ Core capital aggregation primitive providing share-based accounting, configurabl
 | VAULT-INV-04 | Deposit after cap reached reverts. |
 
 ### 8. Data / State (Conceptual)
+
 ```
 maps: balances(principal) -> uint
 vars: totalUnderlying, totalShares, depositFeeBps, withdrawFeeBps, cap, paused
 ```
 
 ### 9. Public Interface (Key)
+
 - `deposit(u amount) -> (response (tuple (shares uint) (fee uint)) error)`
 - `withdraw(u shares) -> (response (tuple (amount uint) (fee uint)) error)`
 - `set-fees(u depBps, u wdBps)` (governance)
@@ -64,16 +73,19 @@ vars: totalUnderlying, totalShares, depositFeeBps, withdrawFeeBps, cap, paused
 - `pause()` / `unpause()` (multi-sig / governance)
 
 ### 10. Core Flows
-Deposit: validate !paused -> compute shares = (amount * totalShares)/totalUnderlying or bootstrap -> apply fee -> mint -> emit.  
-Withdraw: compute underlying = (shares * totalUnderlying)/totalShares -> fee -> burn shares -> transfer underlying.
+
+Deposit: validate !paused -> compute shares = (amount *totalShares)/totalUnderlying or bootstrap -> apply fee -> mint -> emit.  
+Withdraw: compute underlying = (shares* totalUnderlying)/totalShares -> fee -> burn shares -> transfer underlying.
 
 ### 11. Edge Cases
+
 - First deposit (bootstrap share price).  
 - Zero amount deposit (reject).  
 - Withdraw all shares → ensure totals zeroed consistently.  
 - Cap boundary exactly equal to cap.
 
 ### 12. Risks & Mitigations
+
 | Risk | Mitigation |
 |------|------------|
 | Rounding extraction arbitrage | Consistent direction & invariant tests |
@@ -81,17 +93,21 @@ Withdraw: compute underlying = (shares * totalUnderlying)/totalShares -> fee -> 
 | Pause abuse | Multi-sig + transparency events |
 
 ### 13. Metrics
+
 - TVL, sharePrice variance, deposit/withdraw counts, failed tx rate.  
 - Time from proposal→execution for fee changes.
 
 ### 14. Monitoring
+
 Circuit breaker ties into abnormal sharePrice delta > threshold. Health script logs metrics.
 
 ### 15. Open Questions
+
 - Should performance fee be introduced pre v2?  
 - Share price caching vs recompute each call.
 
 ### 16. Changelog
+
 v1.0 (2025-08-17): Initial stable PRD extracted from implementation & docs.
 
 Approved By: Protocol WG  

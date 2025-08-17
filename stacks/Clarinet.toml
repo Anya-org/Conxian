@@ -82,6 +82,7 @@ path = "contracts/dao-governance.clar"
 clarity_version = 2
 epoch = "2.4"
 
+
 [contracts.dao-automation]
 path = "contracts/dao-automation.clar"
 clarity_version = 2

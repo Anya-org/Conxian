@@ -1,13 +1,16 @@
 ## Security Layer PRD (v1.1 Living)
 
 ### Scope
+
 Consolidates AIP-1..5 + planned future hardening (rate limits, anomaly detection, formal verification checkpoints).
 
 ### Objectives
+
 - Minimize exploit surface via layered controls (pause, timelock, multi-sig, precision).  
 - Provide measurable security KPIs & automated monitoring.
 
 ### Control Matrix
+
 | Control | Domain | AIP | Status | Failure Mode Mitigated |
 |---------|--------|-----|--------|------------------------|
 | Emergency Pause | OpSec | 1 | Active | Ongoing exploit damage |
@@ -19,14 +22,17 @@ Consolidates AIP-1..5 + planned future hardening (rate limits, anomaly detection
 | Oracle Aggregation | Pricing | TBD | Planned | Single oracle failure |
 
 ### Metrics
+
 - MTTR (pause trigger to mitigation), invariant breach count, governance participation %, treasury anomaly alerts.
 
 ### Roadmap
+
 - Q3 2025: Circuit breaker integration w/ DEX pools.  
 - Q4 2025: Formal invariant spec & symbolic checks.  
 - Q1 2026: Oracle aggregator deployment & on-chain anomaly scoring.
 
 ### Open Questions
+
 - Threshold tuning methodology for circuit breaker (historical volatility vs static %).  
 - Incentive alignment for rapid disclosure.
 

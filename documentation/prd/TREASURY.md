@@ -1,9 +1,11 @@
 ## Treasury & Reserve PRD (v1.0)
 
 ### Summary
+
 Manages protocol-controlled value (fees, buybacks) with multi-sig & DAO oversight.
 
 ### Functional Requirements
+
 | ID | Requirement |
 |----|-------------|
 | TRE-FR-01 | Accept fee inflows from vault & DEX. |
@@ -13,6 +15,7 @@ Manages protocol-controlled value (fees, buybacks) with multi-sig & DAO oversigh
 | TRE-FR-05 | Emergency pause halts disbursements. |
 
 ### Risks
+
 | Risk | Mitigation |
 |------|------------|
 | Key compromise | Geographic signer distribution, rotation plan |

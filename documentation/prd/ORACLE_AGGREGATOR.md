@@ -1,9 +1,11 @@
 ## Oracle Aggregator PRD (v0.2 Draft)
 
 ### Summary
+
 Aggregate multiple oracle sources (internal DEX TWAP, external signed feeds) with configurable weighting & staleness limits feeding vault & risk modules.
 
 ### Functional Requirements
+
 | ID | Requirement |
 |----|-------------|
 | ORA-FR-01 | Register oracle sources with type + decimals. |
@@ -14,6 +16,7 @@ Aggregate multiple oracle sources (internal DEX TWAP, external signed feeds) wit
 | ORA-FR-06 | Circuit-break if deviation > threshold vs last TWAP. |
 
 ### Risks
+
 | Risk | Mitigation |
 |------|------------|
 | Stale data | Max age enforcement & monitoring |

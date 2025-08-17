@@ -3,14 +3,17 @@
 References: `dao-governance.clar`, `dao.clar`, AIP-2 (time-weighted voting), timelock.
 
 ### Summary
+
 On-chain proposal system with time-weighted voting & timelock execution ensuring resistance to flash accumulation & manipulation.
 
 ### Goals
+
 - Fair vote weighting over time.  
 - Transparent proposal lifecycle (create → queue → execute).  
 - Parameter changes governed (vault fees, caps, pause, treasury spends).
 
 ### Functional Requirements (FR)
+
 | ID | Requirement |
 |----|-------------|
 | DAO-FR-01 | Create proposal referencing target contracts + calldata. |
@@ -23,14 +26,17 @@ On-chain proposal system with time-weighted voting & timelock execution ensuring
 | DAO-FR-08 | Delegation supported without resetting time weight. |
 
 ### Non-Functional
+
 - Deterministic weight calculation; no loops > fixed constant per vote.  
 - Upgradability via new governor contract & registry pointer.
 
 ### Invariants
+
 - DAO-INV-01: A proposal cannot execute without passing quorum & delay.  
 - DAO-INV-02: Weight bonus cap enforced.
 
 ### Risks & Mitigations
+
 | Risk | Mitigation |
 |------|------------|
 | Vote buying | Time factor reduces incentive for short-term capture |
@@ -38,9 +44,11 @@ On-chain proposal system with time-weighted voting & timelock execution ensuring
 | Proposal spam | Min proposal threshold tokens |
 
 ### Metrics
+
 - Participation rate, average execution delay, proposal success %, delegation %.
 
 ### Open Questions
+
 - Should decay apply to inactive delegates beyond N epochs?
 
 Changelog: v1.0 (2025-08-17)

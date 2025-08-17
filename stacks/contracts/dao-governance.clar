@@ -8,6 +8,8 @@
 (define-constant EXECUTION_DELAY u144) ;; ~1 day in blocks
 (define-constant QUORUM_BPS u2000) ;; 20% of total supply
 (define-constant PROPOSAL_THRESHOLD u100000) ;; 100k tokens to propose
+;; Test mode support (non-production) to accelerate governance cycles in simnet
+(define-data-var test-mode bool false)
 
 ;; Data Variables
 (define-data-var proposal-count uint u0)
@@ -150,22 +152,23 @@
     (asserts! (>= proposer-balance PROPOSAL_THRESHOLD) (err u101))
     
     ;; Create proposal
-    (map-set proposals { id: proposal-id } {
-      proposer: tx-sender,
-      title: title,
-      description: description,
-      proposal-type: proposal-type,
-      target-contract: target-contract,
-      function-name: function-name,
-      parameters: parameters,
-      start-block: (+ block-height u144), ;; Start voting in 1 day
-      end-block: (+ block-height (+ u144 VOTING_PERIOD)),
-      for-votes: u0,
-      against-votes: u0,
-      abstain-votes: u0,
-      state: PROPOSAL_PENDING,
-      execution-block: u0
-    })
+    (let ((tm (var-get test-mode)))
+      (map-set proposals { id: proposal-id } {
+        proposer: tx-sender,
+        title: title,
+        description: description,
+        proposal-type: proposal-type,
+        target-contract: target-contract,
+        function-name: function-name,
+        parameters: parameters,
+        start-block: (if tm block-height (+ block-height u144)),
+        end-block: (if tm (+ block-height u10) (+ block-height (+ u144 VOTING_PERIOD))),
+        for-votes: u0,
+        against-votes: u0,
+        abstain-votes: u0,
+        state: PROPOSAL_PENDING,
+        execution-block: u0
+      }))
     
     (var-set proposal-count proposal-id)
     (emit-proposal-created proposal-id tx-sender title)
@@ -234,7 +237,7 @@
     (asserts! (is-eq state PROPOSAL_SUCCEEDED) (err u107))
     
     ;; Queue in timelock
-    (let ((execution-block (+ block-height EXECUTION_DELAY)))
+  (let ((execution-block (if (var-get test-mode) (+ block-height u2) (+ block-height EXECUTION_DELAY))))
       (map-set proposals { id: proposal-id } 
         (merge proposal { 
           state: PROPOSAL_QUEUED,
@@ -257,7 +260,7 @@
     (proposal (unwrap! (get-proposal proposal-id) (err u102)))
   )
     (asserts! (is-eq (get state proposal) PROPOSAL_QUEUED) (err u108))
-    (asserts! (>= block-height (get execution-block proposal)) (err u109))
+  (asserts! (>= block-height (get execution-block proposal)) (err u109))
     
     ;; Execute based on proposal type
     (let ((proposal-type (get proposal-type proposal)))
@@ -382,6 +385,18 @@
     (as-contract (contract-call? .vault set-paused true))
   )
 )
+
+;; === Test Mode Functions (Simnet Only) ===
+(define-public (set-test-mode (flag bool))
+  (begin
+    (asserts! (is-eq tx-sender (var-get emergency-multisig)) (err u100))
+    (var-set test-mode flag)
+    (ok true)))
+
+(define-public (test-noop)
+  (begin
+    (asserts! (var-get test-mode) (err u100))
+    (ok true)))
 
 ;; Admin functions (to be removed after full migration)
 (define-public (set-emergency-multisig (new-multisig principal))

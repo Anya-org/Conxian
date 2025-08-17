@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { Cl } from "@stacks/transactions";
 import { initSimnet } from "@hirosystems/clarinet-sdk";
 
-describe("circuit-breaker", () => {
+describe("Circuit Breaker (SDK) - PRD CB alignment", () => {
   let simnet: any;
   let accounts: Map<string, any>;
   let deployer: any;
@@ -15,7 +15,7 @@ describe("circuit-breaker", () => {
     wallet1 = accounts.get("wallet_1")!;
   });
 
-  it("triggers circuit breaker on price volatility", async () => {
+  it("PRD CB-PRICE-MONITOR: triggers circuit breaker on price volatility", async () => {
     const pool = `${deployer}.mock-pool`;
     const breakerType = 1; // BREAKER_PRICE
     const threshold = 2500; // 25%
@@ -31,7 +31,7 @@ describe("circuit-breaker", () => {
       deployer
     );
 
-    expect(result).toEqual({ type: 'ok', value: { type: 'bool', value: true } });
+    expect(result).toEqual({ type: 'ok', value: { type: 'true' } });
 
     // Check if circuit breaker is triggered
     const isTriggered = simnet.callReadOnlyFn(
@@ -41,14 +41,17 @@ describe("circuit-breaker", () => {
       deployer
     );
 
-    expect(isTriggered.result).toEqual({ type: 'bool', value: true });
+    expect(isTriggered.result).toEqual({ type: 'true' });
   });
 
-  it("rejects unauthorized circuit breaker operations", async () => {
+  it("PRD CB-UNAUTHORIZED: rejects unauthorized circuit breaker operations", async () => {
     const breakerType = 1;
     const threshold = 2500;
 
-    // Try to trigger from non-admin
+    // Use a hardcoded address that's definitely not the deployer
+    const unauthorizedAddress = "ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC";
+
+    // Try to trigger from non-admin account
     const { result } = simnet.callPublicFn(
       "circuit-breaker",
       "trigger-circuit-breaker",
@@ -56,13 +59,24 @@ describe("circuit-breaker", () => {
         Cl.uint(breakerType),
         Cl.uint(threshold)
       ],
-      wallet1 // non-admin
+      unauthorizedAddress
     );
 
-    expect(result).toEqual({ type: 'err', value: { type: 'uint', value: 100n } }); // err-unauthorized
+    // Should fail with ERR_UNAUTHORIZED (100)
+    expect(result).toStrictEqual({ type: 'err', value: { type: 'uint', value: 100n } });
+
+    // Also test unauthorized admin setting
+    const setAdminResult = simnet.callPublicFn(
+      "circuit-breaker",
+      "set-admin",
+      [Cl.principal(unauthorizedAddress)],
+      unauthorizedAddress
+    );
+
+    expect(setAdminResult.result).toStrictEqual({ type: 'err', value: { type: 'uint', value: 100n } });
   });
 
-  it("monitors price volatility successfully", async () => {
+  it("PRD CB-PRICE-MONITOR: monitors price volatility successfully", async () => {
     const pool = `${deployer}.mock-pool`;
     const currentPrice = 1000;
 
@@ -77,10 +91,10 @@ describe("circuit-breaker", () => {
       deployer
     );
 
-    expect(result).toEqual({ type: 'ok', value: { type: 'bool', value: true } });
+    expect(result).toEqual({ type: 'ok', value: { type: 'true' } });
   });
 
-  it("tests oracle integration when enabled", async () => {
+  it("PRD CB-ORACLE-INTEGRATION: tests oracle integration when enabled", async () => {
     const pool = `${deployer}.mock-pool`;
     const base = `${deployer}.token-a`;
     const quote = `${deployer}.token-b`;
@@ -93,7 +107,7 @@ describe("circuit-breaker", () => {
       deployer
     );
 
-    expect(enableResult.result).toEqual({ type: 'ok', value: { type: 'bool', value: true } });
+    expect(enableResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
 
     // Test oracle-based monitoring (will fail if oracle not set up)
     const monitorResult = simnet.callPublicFn(
@@ -111,7 +125,7 @@ describe("circuit-breaker", () => {
     expect(['ok', 'err']).toContain(monitorResult.result.type);
   });
 
-  it("resets circuit breaker state", async () => {
+  it("PRD CB-RESET: resets circuit breaker state", async () => {
     const breakerType = 1;
     const threshold = 2500;
 
@@ -133,7 +147,7 @@ describe("circuit-breaker", () => {
       [Cl.uint(breakerType)],
       deployer
     );
-    expect(isTriggered.result).toEqual({ type: 'bool', value: true });
+    expect(isTriggered.result).toEqual({ type: 'true' });
 
     // Reset the circuit breaker
     const resetResult = simnet.callPublicFn(
@@ -143,7 +157,7 @@ describe("circuit-breaker", () => {
       deployer
     );
 
-    expect(resetResult.result).toEqual({ type: 'ok', value: { type: 'bool', value: true } });
+    expect(resetResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
 
     // Verify it's no longer triggered
     isTriggered = simnet.callReadOnlyFn(
@@ -152,10 +166,10 @@ describe("circuit-breaker", () => {
       [Cl.uint(breakerType)],
       deployer
     );
-    expect(isTriggered.result).toEqual({ type: 'bool', value: false });
+    expect(isTriggered.result).toEqual({ type: 'false' });
   });
 
-  it("handles multiple breaker types independently", async () => {
+  it("PRD CB-MULTI-TYPE: handles multiple breaker types independently", async () => {
     const priceBreaker = 1;
     const volumeBreaker = 2;
     const liquidityBreaker = 3;
@@ -169,8 +183,8 @@ describe("circuit-breaker", () => {
     const volumeTriggered = simnet.callReadOnlyFn("circuit-breaker", "is-circuit-breaker-triggered", [Cl.uint(volumeBreaker)], deployer);
     const liquidityTriggered = simnet.callReadOnlyFn("circuit-breaker", "is-circuit-breaker-triggered", [Cl.uint(liquidityBreaker)], deployer);
 
-    expect(priceTriggered.result).toEqual({ type: 'bool', value: true });
-    expect(volumeTriggered.result).toEqual({ type: 'bool', value: false });
-    expect(liquidityTriggered.result).toEqual({ type: 'bool', value: true });
+    expect(priceTriggered.result).toEqual({ type: 'true' });
+    expect(volumeTriggered.result).toEqual({ type: 'false' });
+    expect(liquidityTriggered.result).toEqual({ type: 'true' });
   });
 });
