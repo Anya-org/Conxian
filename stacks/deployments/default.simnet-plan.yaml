@@ -81,6 +81,11 @@ plan:
             path: contracts/bounty-system.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: oracle-aggregator
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/oracle-aggregator.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: circuit-breaker
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/circuit-breaker.clar
@@ -149,11 +154,6 @@ plan:
             contract-name: multi-hop-router
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/multi-hop-router.clar
-            clarity-version: 2
-        - emulated-contract-publish:
-            contract-name: oracle-aggregator
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/oracle-aggregator.clar
             clarity-version: 2
       epoch: "2.4"
     - id: 1

@@ -8,7 +8,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "types": ["node"],
+    "types": ["node", "vitest/globals", "@hirosystems/clarinet-sdk/vitest-helpers/src/vitest"],
     "noEmit": true,
     "baseUrl": "./",
     "paths": {
@@ -23,7 +23,9 @@
     "../scripts/**/*.ts",
     "../scripts/**/*.d.ts",
     "scripts/**/*.d.ts",
-    "tests/**/*.ts"
+    "tests/**/*.ts",
+    "tests/vitest.d.ts",
+    "sdk-tests/**/*.spec.ts"
   ],
   "exclude": ["node_modules"]
 }

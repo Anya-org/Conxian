@@ -54,6 +54,7 @@ Traits & Interfaces: `vault-trait`, `vault-admin-trait`, `strategy-trait`, `pool
 ## Roadmap (Delta vs Original Plan)
 
 Completed (v1.1):
+
 1. SIP-010 token integration (governance & auxiliary tokens)
 2. Comprehensive test suites (unit, integration, production validation, circuit breaker)
 3. Governance + time-weighted voting + timelock + automation
@@ -61,10 +62,12 @@ Completed (v1.1):
 5. Circuit breaker & enterprise monitoring layer
 
 In Progress / Experimental:
+
 1. DEX Subsystem (AMM core, router, variants, math library)
 2. Multi-hop routing & advanced pool types (stable, weighted)
 
 Upcoming:
+
 1. Concentrated liquidity & oracle standardization
 2. Strategy adapter + oracle trait finalization
 3. sBTC integration & BTC-native strategies
@@ -79,6 +82,7 @@ Prototypes / Experimental: `stable-pool`, `weighted-pool`, `multi-hop-router`, `
 Design References: `DEX_DESIGN.md`, `DEX_IMPLEMENTATION_ROADMAP.md`, `DEX_ECOSYSTEM_BENCHMARK.md`.
 
 Next Steps:
+
 - Harden pool math (precision validation, invariant tests)
 - Integrate circuit-breaker hooks (volatility halts)
 - Add TWAP oracle surfaces & external oracle trait

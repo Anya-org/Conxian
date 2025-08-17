@@ -15,6 +15,17 @@
 (define-data-var emergency-admin principal tx-sender)
 (define-data-var system-paused bool false)
 (define-data-var global-circuit-breaker bool false)
+;; Optional external oracle integration
+(define-data-var oracle-enabled bool false)
+(define-data-var oracle-contract (optional principal) none)
+
+(define-public (set-oracle-config (enabled bool) (oracle principal))
+  (begin
+    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
+    (var-set oracle-enabled enabled)
+    (var-set oracle-contract (if enabled (some oracle) none))
+    (print { event: "cb-set-oracle", enabled: enabled, oracle: oracle })
+    (ok true)))
 
 ;; Breaker state
 (define-map breaker-states { breaker-type: uint } {
@@ -79,6 +90,19 @@
         (begin
           (map-set price-tracking { pool: pool, window: w } { high: price, low: price, start: price, vol: u0 })
           (ok true))))))
+
+;; Convenience wrapper pulling price from oracle when enabled
+;; NOTE: Currently simplified - in production, would use dynamic contract-call
+;; For now, oracle integration is feature-flagged but calls direct oracle-aggregator
+(define-public (monitor-price-volatility-oracle (pool principal) (base principal) (quote principal))
+  (let ((enabled (var-get oracle-enabled)))
+    (if enabled
+        (let ((res (contract-call? .oracle-aggregator get-price base quote)))
+          (match res 
+            price-data (let ((p (get price price-data)))
+                        (monitor-price-volatility pool p))
+            err-val (err ERR_UNAUTHORIZED)))
+        (err ERR_UNAUTHORIZED))))
 
 ;; Volume spike monitor
 (define-public (monitor-volume-spike (pool principal) (amount uint))
