@@ -37,8 +37,15 @@ const ORDER = [
 
 async function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
+function getCoreApiBase(network){
+  // Support multiple library shapes: legacy network.coreApiUrl or v7 network.client.baseUrl
+  const url = network.coreApiUrl || network.client?.baseUrl || process.env.CORE_API_URL;
+  if(!url) throw new Error('Unable to determine core API URL (set CORE_API_URL env)');
+  return url.replace(/\/$/,'');
+}
+
 async function pollTx(txid, network, timeoutMs=120000){
-  const base = network.coreApiUrl.replace(/\/$/,'');
+  const base = getCoreApiBase(network);
   const start = Date.now();
   while(Date.now()-start < timeoutMs){
     try {
@@ -75,7 +82,7 @@ async function deployOne(name, privKey, network, dryRun){
 }
 
 async function checkBalance(network,address,minMicro){
-  const base = network.coreApiUrl.replace(/\/$/,'');
+  const base = getCoreApiBase(network);
   try {
     const r = await fetch(`${base}/extended/v1/address/${address}/balances`);
     if(!r.ok){ console.warn(`[warn] balance query failed status=${r.status}`); return false; }

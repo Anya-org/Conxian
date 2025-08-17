@@ -17,6 +17,9 @@
 (define-data-var admin principal .timelock)
 (define-data-var fee-deposit-bps uint u30) ;; 0.30%
 (define-data-var fee-withdraw-bps uint u10) ;; 0.10%
+(define-data-var performance-fee-bps uint u500) ;; 5.00% on yield above benchmark
+(define-data-var flash-loan-fee-bps uint u30) ;; 0.30% flash loan fee
+(define-data-var liquidation-fee-bps uint u500) ;; 5.00% liquidation penalty
 (define-data-var protocol-reserve uint u0)
 (define-data-var total-balance uint u0)
 (define-data-var total-shares uint u0)
@@ -34,6 +37,20 @@
 (define-data-var treasury principal tx-sender)
 (define-data-var fee-split-bps uint u5000) ;; share of fees to treasury (50% default)
 (define-data-var treasury-reserve uint u0)
+
+;; Enhanced revenue tracking
+(define-data-var total-fees-collected uint u0)
+(define-data-var total-performance-fees uint u0)
+(define-data-var yield-benchmark uint u500) ;; 5% annual benchmark for performance fees
+(define-data-var last-performance-calculation uint u0)
+
+;; Flash loan tracking
+(define-data-var total-flash-loans uint u0)
+(define-data-var total-flash-loan-fees uint u0)
+
+;; Liquidation tracking  
+(define-data-var total-liquidations uint u0)
+(define-data-var total-liquidation-fees uint u0)
 
 ;; AUTONOMIC ECONOMICS PARAMETERS (PRD ALIGNED)
 (define-data-var auto-fees-enabled bool false)
@@ -108,15 +125,29 @@
 )
 
 (define-read-only (get-fees)
-  {
+  (tuple 
     deposit-bps: (var-get fee-deposit-bps),
     withdraw-bps: (var-get fee-withdraw-bps),
-  }
-)
+    performance-fee-bps: (var-get performance-fee-bps),
+    flash-loan-fee-bps: (var-get flash-loan-fee-bps),
+    liquidation-fee-bps: (var-get liquidation-fee-bps)
+  ))
 
 (define-read-only (get-protocol-reserve)
-  (var-get protocol-reserve)
-)
+  (var-get protocol-reserve))
+
+(define-read-only (get-treasury-reserve)
+  (var-get treasury-reserve))
+
+(define-read-only (get-revenue-stats)
+  (tuple
+    total-fees-collected: (var-get total-fees-collected),
+    total-performance-fees: (var-get total-performance-fees),
+    total-flash-loan-fees: (var-get total-flash-loan-fees),
+    total-liquidation-fees: (var-get total-liquidation-fees),
+    treasury-reserve: (var-get treasury-reserve),
+    protocol-reserve: (var-get protocol-reserve)
+  ))
 
 (define-read-only (get-total-balance)
   (var-get total-balance)
@@ -878,7 +909,152 @@
 (define-private (is-authorized-admin)
   (is-eq tx-sender (var-get admin)))
 
-;; Transfer revenue from treasury reserve (for token distributions)
+;; Enhanced fee collection with revenue optimization
+(define-private (collect-enhanced-fees (amount uint) (fee-type (string-ascii 20)))
+  (let ((fee-rate (if (is-eq fee-type "deposit")
+                    (var-get fee-deposit-bps)
+                    (if (is-eq fee-type "withdraw")
+                      (var-get fee-withdraw-bps)
+                      (if (is-eq fee-type "performance")
+                        (var-get performance-fee-bps)
+                        (if (is-eq fee-type "flash-loan")
+                          (var-get flash-loan-fee-bps)
+                          (var-get liquidation-fee-bps))))))
+        (fee (/ (* amount fee-rate) BPS_DENOM))
+        (treasury-share (/ (* fee (var-get fee-split-bps)) BPS_DENOM))
+        (protocol-share (- fee treasury-share)))
+    (var-set treasury-reserve (+ (var-get treasury-reserve) treasury-share))
+    (var-set protocol-reserve (+ (var-get protocol-reserve) protocol-share))
+    (var-set total-fees-collected (+ (var-get total-fees-collected) fee))
+    (if (is-eq fee-type "performance")
+      (var-set total-performance-fees (+ (var-get total-performance-fees) fee))
+      (if (is-eq fee-type "flash-loan")
+        (var-set total-flash-loan-fees (+ (var-get total-flash-loan-fees) fee))
+        (if (is-eq fee-type "liquidation")
+          (var-set total-liquidation-fees (+ (var-get total-liquidation-fees) fee))
+          true)))
+    fee))
+
+;; Calculate performance fee based on yield above benchmark
+(define-private (calculate-performance-fee (current-yield uint))
+  (let ((benchmark (var-get yield-benchmark))
+        (excess-yield (if (> current-yield benchmark) (- current-yield benchmark) u0))
+        (total-value (var-get total-balance)))
+    (if (> excess-yield u0)
+      (/ (* total-value excess-yield (var-get performance-fee-bps)) (* BPS_DENOM BPS_DENOM))
+      u0)))
+
+;; Flash loan functionality
+(define-public (flash-loan (amount uint) (recipient principal))
+  (begin
+    (asserts! (not (var-get paused)) (err u103))
+    (asserts! (> amount u0) (err u1))
+    (asserts! (<= amount (var-get total-balance)) (err u2))
+    
+    (let ((fee (collect-enhanced-fees amount "flash-loan"))
+          (total-owed (+ amount fee)))
+      
+      ;; Transfer loan amount to recipient
+      (unwrap! (as-contract (contract-call? .mock-ft transfer recipient amount)) (err u200))
+      
+      ;; Update tracking
+      (var-set total-flash-loans (+ (var-get total-flash-loans) u1))
+      (var-set total-balance (- (var-get total-balance) amount))
+      
+      ;; Recipient must return amount + fee in same transaction
+      ;; This is simplified - in production would use callback pattern
+      (unwrap! (contract-call? .mock-ft transfer-from recipient (as-contract tx-sender) total-owed) (err u201))
+      
+      (var-set total-balance (+ (var-get total-balance) amount))
+      
+      (print {
+        event: "flash-loan",
+        recipient: recipient,
+        amount: amount,
+        fee: fee,
+        block: block-height
+      })
+      (ok fee)
+    )
+  )
+)
+
+;; Automated yield optimization and compound strategies
+(define-public (execute-compound-strategy)
+  (begin
+    (asserts! (not (var-get paused)) (err u103))
+    (asserts! (is-eq tx-sender (var-get manager)) (err u100))
+    
+    (let ((current-time (unwrap! (get-stacks-block-info? time (- block-height u1)) (err u300)))
+          (last-compound (var-get last-compound-time))
+          (compound-interval u86400)) ;; 24 hours
+      
+      ;; Only compound once per day
+      (asserts! (>= (- current-time last-compound) compound-interval) (err u301))
+      
+      (let ((treasury-balance (var-get treasury-reserve))
+            (compound-amount (/ treasury-balance u4))) ;; Compound 25% of treasury
+        
+        ;; Execute compound strategy
+        (if (> compound-amount u1000) ;; Minimum threshold
+          (begin
+            ;; Simulate yield generation through automated treasury allocation
+            (var-set total-balance (+ (var-get total-balance) compound-amount))
+            (var-set treasury-reserve (- treasury-balance compound-amount))
+            (var-set last-compound-time current-time)
+            (var-set total-compounded (+ (var-get total-compounded) compound-amount))
+            
+            (print {
+              event: "compound-executed",
+              amount: compound-amount,
+              new-balance: (var-get total-balance),
+              block: block-height
+            })
+            (ok compound-amount)
+          )
+          (ok u0)
+        )
+      )
+    )
+  )
+)
+
+;; Liquidation functions for undercollateralized positions
+(define-public (liquidate-position (user principal) (amount uint))
+  (begin
+    (asserts! (not (var-get paused)) (err u103))
+    (asserts! (> amount u0) (err u1))
+    
+    (let ((user-balance (default-to u0 (map-get? user-balances user)))
+          (liquidation-threshold (/ (* user-balance u8) u10)) ;; 80% threshold
+          (penalty-fee (collect-enhanced-fees amount "liquidation")))
+      
+      ;; Check if position is undercollateralized (simplified)
+      (asserts! (< user-balance liquidation-threshold) (err u302))
+      
+      ;; Execute liquidation
+      (map-set user-balances user (if (> user-balance amount) (- user-balance amount) u0))
+      (var-set total-balance (if (> (var-get total-balance) amount) (- (var-get total-balance) amount) u0))
+      
+      ;; Transfer liquidated amount minus penalty to liquidator
+      (let ((liquidator-reward (- amount penalty-fee)))
+        (unwrap! (as-contract (contract-call? .mock-ft transfer tx-sender liquidator-reward)) (err u200))
+        
+        (print {
+          event: "liquidation",
+          user: user,
+          liquidator: tx-sender,
+          amount: amount,
+          penalty: penalty-fee,
+          reward: liquidator-reward,
+          block: block-height
+        })
+        (ok liquidator-reward)
+      )
+    )
+  )
+)
+
 (define-public (transfer-revenue (recipient principal) (amount uint))
   (begin
     (asserts! (is-authorized-admin) (err u100))

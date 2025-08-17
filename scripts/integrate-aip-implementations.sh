@@ -44,91 +44,10 @@ fi
 print_status "Integrating AIP-2: Time-Weighted Voting..."
 if [ -f "/workspaces/AutoVault/dao-governance-timeweight-implementation.clar" ]; then
     print_status "Backing up current dao-governance.clar..."
-    cp /workspaces/AutoVault/stacks/contracts/dao-governance.clar "$BACKUP_DIR/dao-governance-original.clar"
+    # Backup current dao-governance.clar (legacy original no longer tracked separately)
+    cp /workspaces/AutoVault/stacks/contracts/dao-governance.clar "$BACKUP_DIR/dao-governance-pre-aip2.clar"
     
-    print_status "Merging time-weighted voting features..."
-    # Create enhanced version
-    cat > /workspaces/AutoVault/stacks/contracts/enhanced-dao-governance.clar << 'EOF'
-;; Enhanced DAO Governance with Time-Weighted Voting (AIP-2)
-;; This contract extends the base DAO governance with time-weighted voting power
-
-(use-trait ft-trait .traits.sip-010-trait.sip-010-trait)
-
-;; Error codes
-(define-constant ERR-NOT-AUTHORIZED (err u401))
-(define-constant ERR-INSUFFICIENT-BALANCE (err u402))
-(define-constant ERR-PROPOSAL-NOT-FOUND (err u404))
-(define-constant ERR-VOTING-PERIOD-ENDED (err u405))
-(define-constant ERR-ALREADY-VOTED (err u406))
-(define-constant ERR-INSUFFICIENT-QUORUM (err u407))
-(define-constant ERR-PROPOSAL-DEFEATED (err u408))
-(define-constant ERR-INSUFFICIENT-HOLDING-PERIOD (err u409))
-
-;; Time-weighted voting constants
-(define-constant MINIMUM-HOLDING-PERIOD u48) ;; 48 blocks (~8 hours)
-(define-constant TIME-WEIGHT-MULTIPLIER u100) ;; Base 100% weight
-
-;; Data structures for time-weighted voting
-(define-map holding-periods principal uint)
-(define-map voting-snapshots uint {
-    voter: principal,
-    balance: uint,
-    holding-period: uint,
-    timestamp: uint
-})
-
-;; Enhanced voting power calculation
-(define-private (calculate-time-weighted-power (voter principal) (balance uint))
-    (let (
-        (holding-period (default-to u0 (map-get? holding-periods voter)))
-        (time-multiplier (if (>= holding-period MINIMUM-HOLDING-PERIOD)
-            (+ TIME-WEIGHT-MULTIPLIER (/ holding-period u10))
-            TIME-WEIGHT-MULTIPLIER))
-    )
-    (/ (* balance time-multiplier) TIME-WEIGHT-MULTIPLIER)
-    )
-)
-
-;; Create voting snapshot with time-weighting
-(define-public (create-voting-snapshot (proposal-id uint))
-    (let (
-        (voter tx-sender)
-        (balance (unwrap! (contract-call? .gov-token get-balance voter) ERR-INSUFFICIENT-BALANCE))
-        (holding-period (default-to u0 (map-get? holding-periods voter)))
-    )
-    (asserts! (>= holding-period MINIMUM-HOLDING-PERIOD) ERR-INSUFFICIENT-HOLDING-PERIOD)
-    
-    (map-set voting-snapshots proposal-id {
-        voter: voter,
-        balance: balance,
-        holding-period: holding-period,
-        timestamp: block-height
-    })
-    
-    (ok true)
-    )
-)
-
-;; Update holding period tracking
-(define-public (update-holding-period (voter principal))
-    (let (
-        (current-period (default-to u0 (map-get? holding-periods voter)))
-    )
-    (map-set holding-periods voter (+ current-period u1))
-    (ok true)
-    )
-)
-
-;; Get time-weighted voting power
-(define-read-only (get-time-weighted-power (voter principal))
-    (let (
-        (balance (unwrap! (contract-call? .gov-token get-balance voter) u0))
-    )
-    (calculate-time-weighted-power voter balance)
-    )
-)
-EOF
-    print_status "Time-weighted voting integration prepared"
+    print_status "Time-weighted voting features already integrated directly in dao-governance.clar (no variant file needed)"
 else
     print_error "Time-weighted voting implementation file not found"
 fi

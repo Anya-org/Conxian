@@ -107,23 +107,37 @@ path = "contracts/avlp-token.clar"
 clarity_version = 2
 epoch = "2.4"
 
+[contracts.pool-trait]
+path = "contracts/pool-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.math-lib]
+path = "contracts/math-lib.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.dex-factory]
+path = "contracts/dex-factory.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.dex-pool]
+path = "contracts/dex-pool.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.dex-router]
+path = "contracts/dex-router.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.mock-dex]
+path = "contracts/mock-dex.clar"
+clarity_version = 2
+epoch = "2.4"
+
 # Optional enhanced / legacy variants (included for completeness)
-[contracts.vault-original]
-path = "contracts/vault-original.clar"
-clarity_version = 2
-epoch = "2.4"
 
-[contracts.enhanced-dao-governance]
-path = "contracts/enhanced-dao-governance.clar"
-clarity_version = 2
-epoch = "2.4"
 
-[contracts.enhanced-governance]
-path = "contracts/enhanced-governance.clar"
-clarity_version = 2
-epoch = "2.4"
 
-[contracts.bounty-system-original]
-path = "contracts/bounty-system-original.clar"
-clarity_version = 2
-epoch = "2.4"

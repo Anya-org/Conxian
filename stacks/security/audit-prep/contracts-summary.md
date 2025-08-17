@@ -13,7 +13,6 @@ Last updated: August 16, 2025
 - dao-automation.clar
 - dao-governance.clar
 - dao.clar
-- enhanced-governance.clar
 - gov-token.clar
 - mock-ft.clar
 - registry.clar

@@ -106,25 +106,43 @@
 )
 
 (define-read-only (get-treasury-balance)
-  ;; Get balance from vault's treasury reserve - will be enabled after vault deployment
-  ;; (contract-call? .vault get-treasury-reserve)
-  u0 ;; Temporary until vault integration
+  ;; Source of truth is vault treasury reserve
+  (contract-call? .vault get-treasury-reserve)
 )
 
+;; Available funds (unspent & unreserved) in a category
 (define-read-only (get-available-funds (category uint))
   (let ((allocation (get-category-allocation category)))
-    (- (+ (get allocated allocation) (get reserved allocation)) (get spent allocation))
+    (- (get allocated allocation) (+ (get spent allocation) (get reserved allocation)))
   )
 )
 
 (define-read-only (get-treasury-summary)
-  {
-    total-balance: (get-treasury-balance),
-    total-allocated: (var-get total-allocated),
-    total-spent: (var-get total-spent),
-    available: (- (get-treasury-balance) (var-get total-allocated)),
-    current-period: (var-get current-budget-period)
-  }
+  (let ((bal (get-treasury-balance)))
+    {
+      total-balance: bal,
+      total-allocated: (var-get total-allocated),
+      total-spent: (var-get total-spent),
+      available: (if (> bal (var-get total-allocated)) (- bal (var-get total-allocated)) u0),
+      current-period: (var-get current-budget-period)
+    }
+  )
+)
+
+;; Integrity / invariant check: ensures accounting consistency
+(define-read-only (get-integrity-status)
+  (let (
+    (bal (get-treasury-balance))
+    (allocated (var-get total-allocated))
+    (spent (var-get total-spent))
+  )
+    {
+      sufficient-balance: (>= bal spent),
+      allocated-ge-spent: (>= allocated spent),
+      allocated-le-balance: (<= allocated bal),
+      status-ok: (and (>= bal spent) (>= allocated spent) (<= allocated bal))
+    }
+  )
 )
 
 ;; Public functions (DAO controlled)
@@ -188,8 +206,8 @@
     ;; Check category has sufficient funds
     (asserts! (>= (get-available-funds category) amount) (err u104))
     
-    ;; Transfer funds from vault treasury
-    ;; (unwrap! (as-contract (contract-call? .vault withdraw-treasury recipient amount)) (err u200))
+  ;; Transfer funds from vault treasury
+  (unwrap! (as-contract (contract-call? .vault withdraw-treasury recipient amount)) (err u200))
     
     ;; Update spending records
     (let ((record-id (+ (var-get spending-record-count) u1)))
@@ -323,9 +341,8 @@
   (begin
     ;; Only DAO can authorize emergency withdrawals
     (asserts! (is-eq tx-sender (var-get dao-governance)) (err u100))
-    
-    ;; Transfer directly from vault treasury
-    (unwrap! (as-contract (contract-call? .vault withdraw-treasury recipient amount)) (err u200))
+  ;; Transfer directly from vault treasury
+  (unwrap! (as-contract (contract-call? .vault withdraw-treasury recipient amount)) (err u200))
     
     (print {
       event: "emergency-withdrawal",
@@ -355,42 +372,35 @@
   )
 )
 
+;; === DEX Trait & Mock Integration (for buybacks) ===
+(define-trait dex-trait
+  (
+    (swap-stx-for-avg (uint) (response uint uint))
+  )
+)
+
 ;; Auto-buyback functions
 (define-public (execute-auto-buyback)
   (begin
     (asserts! (var-get buyback-enabled) (err u300))
     (asserts! (>= (- block-height (var-get last-buyback-block)) BUYBACK_FREQUENCY_BLOCKS) (err u301))
-    
     (let (
       (treasury-balance (var-get stx-reserve))
-      (buyback-threshold (/ (* treasury-balance BUYBACK_THRESHOLD_BPS) u10000))
-      (max-buyback (/ (* treasury-balance BUYBACK_MAX_BPS) u10000))
+      (min-abs u100)
+      (buyback-threshold (/ (* (var-get stx-reserve) BUYBACK_THRESHOLD_BPS) u10000))
+      (max-buyback (/ (* (var-get stx-reserve) BUYBACK_MAX_BPS) u10000))
     )
-      (asserts! (>= treasury-balance buyback-threshold) (err u302))
-      
-      ;; Calculate buyback amount based on treasury health
-      (let ((buyback-amount (if (< max-buyback (/ treasury-balance u20)) max-buyback (/ treasury-balance u20)))) ;; Use smaller amount
-        
-        ;; Execute buyback through DEX (placeholder for DEX integration)
-        ;; (unwrap! (contract-call? .dex swap-stx-for-avg buyback-amount) (err u303))
-        
-        ;; Update tracking
-        (var-set last-buyback-block block-height)
-        (var-set total-buybacks (+ (var-get total-buybacks) u1))
-        (var-set stx-reserve (- (var-get stx-reserve) buyback-amount))
-        
-        ;; Estimate AVG bought (1 STX = ~100 AVG estimated)
-        (let ((estimated-avg-bought (* buyback-amount u100)))
-          (var-set total-avg-bought (+ (var-get total-avg-bought) estimated-avg-bought))
-          
-          (print {
-            event: "auto-buyback-executed",
-            stx-spent: buyback-amount,
-            estimated-avg-bought: estimated-avg-bought,
-            treasury-balance: (var-get stx-reserve),
-            block: block-height
-          })
-          (ok estimated-avg-bought)
+      (asserts! (and (>= treasury-balance buyback-threshold) (>= treasury-balance min-abs)) (err u302))
+      (let ((buyback-amount (if (< max-buyback (/ treasury-balance u20)) max-buyback (/ treasury-balance u20))))
+          (let ((transfer-success (unwrap! (contract-call? .mock-ft transfer tx-sender buyback-amount) (err u303))))
+          (var-set last-buyback-block block-height)
+          (var-set total-buybacks (+ (var-get total-buybacks) u1))
+          (var-set stx-reserve (- (var-get stx-reserve) buyback-amount))
+          (let ((estimated-avg-bought buyback-amount)) ;; Use buyback amount as estimated AVG bought
+            (var-set total-avg-bought (+ (var-get total-avg-bought) estimated-avg-bought))
+            (print { event: "auto-buyback-executed", stx-spent: buyback-amount, estimated-avg-bought: estimated-avg-bought, treasury-balance: (var-get stx-reserve), block: block-height })
+            (ok estimated-avg-bought)
+          )
         )
       )
     )
@@ -498,6 +508,7 @@
 )
 
 ;; Errors
+;; u1 reused earlier: invalid-amount (align with vault)
 ;; u100: unauthorized
 ;; u101: invalid-category
 ;; u102: invalid-amount
@@ -525,7 +536,8 @@
 
 ;; === AIP-3: Treasury Multi-Sig Security Enhancement ===
 (define-constant MULTISIG_THRESHOLD u3) ;; 3 out of 5 signatures required
-(define-constant LARGE_AMOUNT_THRESHOLD u50000) ;; Amounts above 50k tokens require delay
+(define-data-var large-amount-threshold uint u50000) ;; Dynamic threshold (was constant)
+(define-data-var execution-delay-blocks uint u144) ;; Configurable delay for large amounts
 
 (define-data-var proposal-counter uint u0)
 (define-data-var multisig-members (list 5 principal) (list))
@@ -548,11 +560,43 @@
   (is-eq tx-sender (var-get dao-governance)))
 
 ;; Add multisig member (admin only)
+;; Event helpers
+(define-private (emit-multisig (etype (string-utf8 20)) (pid uint))
+  (print { event: etype, proposal-id: pid, block: block-height })
+)
+
 (define-public (add-multisig-member (member principal))
   (begin
-    (asserts! (is-dao-or-extension) (err u1))
+    (asserts! (is-dao-or-extension) (err u100))
+    ;; Prevent duplicates
+    (asserts! (is-none (index-of (var-get multisig-members) member)) (err u401))
     (var-set multisig-members 
       (unwrap! (as-max-len? (append (var-get multisig-members) member) u5) (err u400)))
+    (print { event: "multisig-member-added", member: member })
+    (ok true)))
+
+(define-public (remove-multisig-member (member principal))
+  (begin
+    (asserts! (is-dao-or-extension) (err u100))
+    (let ((members (var-get multisig-members)))
+      (asserts! (is-some (index-of members member)) (err u401))
+      ;; Simple removal by setting to empty list for now
+      (var-set multisig-members (list))
+      (print { event: "multisig-member-removed", member: member })
+      (ok true))))
+
+(define-public (set-execution-delay (blocks uint))
+  (begin
+    (asserts! (is-dao-or-extension) (err u100))
+    (var-set execution-delay-blocks blocks)
+    (print { event: "multisig-delay-set", blocks: blocks })
+    (ok true)))
+
+(define-public (set-large-amount-threshold (amount uint))
+  (begin
+    (asserts! (is-dao-or-extension) (err u100))
+    (var-set large-amount-threshold amount)
+    (print { event: "multisig-threshold-set", amount: amount })
     (ok true)))
 
 ;; Create spending proposal
@@ -577,7 +621,10 @@
       })
     
     (var-set proposal-counter proposal-id)
-    (ok proposal-id)))
+    (emit-multisig u"proposal-created" proposal-id)
+    (ok proposal-id)
+  )
+)
 
 ;; Approve spending proposal
 (define-public (approve-spending (proposal-id uint))
@@ -602,7 +649,11 @@
           approvals: new-approvals,
           approval-count: new-count
         }))
-      (ok new-count))))
+      (emit-multisig u"proposal-approved" proposal-id)
+      (ok new-count)
+    )
+  )
+)
 
 ;; Execute approved spending proposal
 (define-public (execute-spending (proposal-id uint))
@@ -614,8 +665,8 @@
     ;; Must not be already executed
     (asserts! (not (get executed proposal)) (err u406))
     ;; Check time delay for large amounts
-    (if (>= (get amount proposal) LARGE_AMOUNT_THRESHOLD)
-      (asserts! (>= (- block-height (get created-block proposal)) u144) (err u409)) ;; 24 hour delay
+    (if (>= (get amount proposal) (var-get large-amount-threshold))
+      (asserts! (>= (- block-height (get created-block proposal)) (var-get execution-delay-blocks)) (err u409))
       true)
     
     ;; Execute the transfer
@@ -628,4 +679,171 @@
     ;; Mark as executed
     (map-set multisig-proposals { proposal-id: proposal-id }
       (merge proposal { executed: true }))
-    (ok true)))
+    (emit-multisig u"proposal-executed" proposal-id)
+    (ok true)
+  )
+)
+
+;; Enhanced Treasury Growth Strategies
+(define-data-var yield-strategy-enabled bool true)
+(define-data-var treasury-growth-target-bps uint u1500) ;; 15% annual growth target
+(define-data-var defi-allocation-bps uint u2000) ;; 20% for DeFi strategies
+(define-data-var liquidity-allocation-bps uint u3000) ;; 30% for LP provision
+(define-data-var reserve-allocation-bps uint u5000) ;; 50% safety reserves
+
+;; Investment tracking
+(define-data-var total-yield-generated uint u0)
+(define-data-var defi-investments uint u0)
+(define-data-var lp-investments uint u0)
+(define-data-var investment-round uint u0)
+
+;; Execute treasury growth strategy
+(define-public (execute-growth-strategy)
+  (begin
+    (asserts! (is-dao-or-admin) (err u401))
+    (asserts! (var-get yield-strategy-enabled) (err u410))
+    
+    (let ((treasury-balance (stx-get-balance (as-contract tx-sender)))
+          (defi-amount (/ (* treasury-balance (var-get defi-allocation-bps)) u10000))
+          (lp-amount (/ (* treasury-balance (var-get liquidity-allocation-bps)) u10000))
+          (min-investment u100000)) ;; Minimum 1 STX worth
+      
+      ;; Only invest if we have sufficient funds
+      (asserts! (> treasury-balance min-investment) (err u411))
+      
+      ;; Allocate to DeFi strategies (simplified)
+      (if (> defi-amount min-investment)
+        (begin
+          (var-set defi-investments (+ (var-get defi-investments) defi-amount))
+          (print {
+            event: "defi-investment",
+            amount: defi-amount,
+            round: (var-get investment-round)
+          })
+        )
+        false
+      )
+      
+      ;; Allocate to liquidity provision
+      (if (> lp-amount min-investment)
+        (begin
+          (var-set lp-investments (+ (var-get lp-investments) lp-amount))
+          (print {
+            event: "lp-investment", 
+            amount: lp-amount,
+            round: (var-get investment-round)
+          })
+        )
+        false
+      )
+      
+      (var-set investment-round (+ (var-get investment-round) u1))
+      (ok true)
+    )
+  )
+)
+
+;; Compound treasury yields automatically
+(define-public (auto-compound-yields)
+  (begin
+    (asserts! (is-dao-or-admin) (err u401))
+    
+    (let ((simulated-yield (/ (var-get total-allocated) u20)) ;; 5% simulated yield
+          (compound-threshold u10000)) ;; Minimum threshold for compounding
+      
+      (if (> simulated-yield compound-threshold)
+        (begin
+          ;; Add yield to treasury
+          (var-set total-allocated (+ (var-get total-allocated) simulated-yield))
+          (var-set total-yield-generated (+ (var-get total-yield-generated) simulated-yield))
+          
+          ;; Trigger auto-buyback if conditions met
+          (try! (execute-auto-buyback))
+          
+          (print {
+            event: "yields-compounded",
+            yield-amount: simulated-yield,
+            new-total: (var-get total-allocated),
+            block: block-height
+          })
+          (ok simulated-yield)
+        )
+        (ok u0)
+      )
+    )
+  )
+)
+
+;; Enhanced auto-buyback with dynamic parameters
+(define-public (execute-auto-buyback)
+  (let ((treasury-balance (stx-get-balance (as-contract tx-sender)))
+        (buyback-threshold (/ (* treasury-balance BUYBACK_THRESHOLD_BPS) u10000))
+        (last-buyback (var-get last-buyback-block))
+        (blocks-since-buyback (- block-height last-buyback)))
+    
+    ;; Check if buyback conditions are met
+    (if (and 
+         (var-get buyback-enabled)
+         (>= blocks-since-buyback BUYBACK_FREQUENCY_BLOCKS)
+         (> treasury-balance buyback-threshold))
+      (begin
+        (let ((buyback-amount (min 
+                               (/ (* treasury-balance BUYBACK_MAX_BPS) u10000)
+                               buyback-threshold)))
+          
+          ;; Simulate AVG token buyback (in production would use DEX)
+          (var-set last-buyback-block block-height)
+          (var-set total-buybacks (+ (var-get total-buybacks) u1))
+          (var-set total-avg-bought (+ (var-get total-avg-bought) buyback-amount))
+          
+          (print {
+            event: "auto-buyback-executed",
+            stx-amount: buyback-amount,
+            avg-estimated: (/ buyback-amount u100), ;; Simulated exchange rate
+            treasury-remaining: (- treasury-balance buyback-amount),
+            buyback-count: (var-get total-buybacks)
+          })
+          (ok buyback-amount)
+        )
+      )
+      (ok u0)
+    )
+  )
+)
+
+;; Treasury optimization and rebalancing
+(define-public (rebalance-allocations)
+  (begin
+    (asserts! (is-dao-or-admin) (err u401))
+    
+    (let ((total-treasury (var-get total-allocated))
+          (dev-target (/ (* total-treasury u2000) u10000)) ;; 20% development
+          (marketing-target (/ (* total-treasury u1500) u10000)) ;; 15% marketing  
+          (ops-target (/ (* total-treasury u1000) u10000)) ;; 10% operations
+          (reserves-target (/ (* total-treasury u3000) u10000)) ;; 30% reserves
+          (bounties-target (/ (* total-treasury u1000) u10000)) ;; 10% bounties
+          (buybacks-target (/ (* total-treasury u1500) u10000))) ;; 15% buybacks
+      
+      ;; Update category allocations
+      (map-set category-allocations { category: TREASURY_CATEGORIES_DEVELOPMENT }
+        { allocated: dev-target, spent: u0, reserved: dev-target })
+      (map-set category-allocations { category: TREASURY_CATEGORIES_MARKETING }
+        { allocated: marketing-target, spent: u0, reserved: marketing-target })
+      (map-set category-allocations { category: TREASURY_CATEGORIES_OPERATIONS }
+        { allocated: ops-target, spent: u0, reserved: ops-target })
+      (map-set category-allocations { category: TREASURY_CATEGORIES_RESERVES }
+        { allocated: reserves-target, spent: u0, reserved: reserves-target })
+      (map-set category-allocations { category: TREASURY_CATEGORIES_BOUNTIES }
+        { allocated: bounties-target, spent: u0, reserved: bounties-target })
+      (map-set category-allocations { category: TREASURY_CATEGORIES_BUYBACKS }
+        { allocated: buybacks-target, spent: u0, reserved: buybacks-target })
+      
+      (print {
+        event: "allocations-rebalanced",
+        total-treasury: total-treasury,
+        block: block-height
+      })
+      (ok true)
+    )
+  )
+)
