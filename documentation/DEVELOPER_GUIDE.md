@@ -22,8 +22,8 @@ cd AutoVault/stacks
 npm install
 
 # Verify setup
-clarinet check
-npm test
+clarinet check   # ✅ 30 contracts
+npm test         # ✅ 65/65 tests
 ```
 
 ## Project Structure
@@ -440,5 +440,5 @@ This developer guide provides:
 
 Follow this guide to contribute effectively to the AutoVault project.
 
-*Last Updated: August 16, 2025*  
+*Last Updated: August 17, 2025*  
 *Framework Version: Clarinet v2.0+, clarinet-sdk v3.5.0*

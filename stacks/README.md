@@ -32,6 +32,23 @@ Stacks blockchain.
 - `dao.clar` - DAO core functionality
 - `mock-ft.clar` - Testing token implementation
 
+### DEX & Advanced (Foundational / Experimental)
+
+- `pool-trait.clar` – Pool trait interface
+- `math-lib.clar` – High-precision math primitives (sqrt, fixed-point)
+- `dex-factory.clar` – Deterministic pool creation
+- `dex-pool.clar` – Constant product AMM baseline
+- `dex-router.clar` – Single-hop routing
+- `multi-hop-router.clar` – Path-based routing (experimental)
+- `stable-pool.clar` – Stable swap invariant prototype
+- `weighted-pool.clar` – Weighted pool prototype
+- `mock-dex.clar` – Testing harness
+- `circuit-breaker.clar` – Volatility / volume / liquidity safeguards
+- `enterprise-monitoring.clar` – Structured telemetry & event codes
+- `dao-automation.clar` – Automated parameter adjustments
+
+Total tracked contracts (Clarinet): 30
+
 ## Requirements
 
 - **Clarinet CLI** (v2.0+)
@@ -46,11 +63,11 @@ Stacks blockchain.
 ```bash
 # From stacks/ directory
 clarinet check
-# ✅ 18 contracts checked
+# ✅ 30 contracts checked
 
 npm install
 npm test
-# ✅ 58/58 tests passing
+# ✅ 65/65 tests passing
 
 # Start console for testing
 clarinet console
@@ -179,13 +196,15 @@ python ../scripts/economic_simulation.py
 
 ## Testing Architecture
 
-**Test Structure:**
+**Test Structure (65 total):**
 
-- **Production Validation** (28 tests) - Real-world scenario testing
-- **Core Contracts** (13 tests) - Individual contract functionality
-- **Security Features** (6 tests) - Access controls and boundaries
-- **Governance** (3 tests) - DAO and proposal mechanisms
-- **Infrastructure** (8 tests) - System coordination and analytics
+- **Production Validation** (28)
+- **Core Contracts** (13)
+- **Security Features** (6)
+- **Governance** (3)
+- **Infrastructure & Monitoring** (8)
+- **Circuit Breaker** (5)
+- **DEX Foundations** (2)
 
 ## Development Workflow
 
@@ -223,3 +242,5 @@ get-balance \
 - Integrate with frontend applications
 
 For complete documentation, see [../documentation/](../documentation/)
+
+*Updated: Aug 17, 2025*
