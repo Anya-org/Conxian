@@ -1,3 +1,4 @@
+;; BETA: Experimental DEX component – not audited; avoid production reliance.
 ;; Multi-Hop Routing for AutoVault DEX
 ;; Optimized pathfinding and execution for complex trades
 

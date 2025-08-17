@@ -1,3 +1,4 @@
+;; BETA: Experimental DEX component - not audited; avoid production reliance.
 ;; Stable Pool Implementation (Curve-style AMM)
 ;; Optimized for low-slippage trading of correlated assets
 

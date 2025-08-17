@@ -1,3 +1,4 @@
+;; BETA: Pool trait foundation for experimental DEX components.
 (define-trait pool-trait
   (
     (add-liquidity (uint uint uint uint) (response (tuple (shares uint)) uint))

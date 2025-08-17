@@ -162,6 +162,16 @@ path = "contracts/circuit-breaker.clar"
 clarity_version = 2
 epoch = "2.4"
 
+[contracts.oracle-aggregator]
+path = "contracts/oracle-aggregator.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.state-anchor]
+path = "contracts/state-anchor.clar"
+clarity_version = 2
+epoch = "2.4"
+
 
 
 

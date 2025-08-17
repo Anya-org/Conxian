@@ -1,3 +1,4 @@
+;; BETA: Experimental DEX component - not audited; avoid production reliance.
 ;; Weighted Pool Implementation (Balancer-style AMM)
 ;; Supports arbitrary weight distributions for multi-asset pools
 

@@ -1,3 +1,4 @@
+;; BETA: Experimental DEX component – not audited; avoid production reliance.
 ;; DEX Router Contract - Multi-hop routing and convenience functions
 ;; Provides user-friendly interface for DEX operations
 
