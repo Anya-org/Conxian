@@ -120,7 +120,7 @@ class OracleManager:
     
     # Price Management
     
-    async def submit_price(self, base: str, quote: str, price: int, oracle_privkey: str = None) -> bool:
+    async def submit_price(self, base: str, quote: str, price: int, oracle_privkey: Optional[str] =     clarity ch    npm test) -> bool:
         """Submit price for trading pair"""
         logger.info(f"Submitting price {price} for {base}/{quote}")
         
@@ -189,7 +189,7 @@ class OracleManager:
             logger.error(f"Failed to get pair status: {e}")
             return {}
     
-    async def list_all_pairs(self) -> list:
+    async def list_all_pairs(self) -> list[dict[str, Any]]:
         """List all registered trading pairs"""
         logger.info("Listing all trading pairs")
         
@@ -204,7 +204,7 @@ class OracleManager:
             logger.error(f"Failed to list pairs: {e}")
             return []
     
-    async def monitor_prices(self, pairs: list, watch: bool = False):
+    async def monitor_prices(self, pairs: list[str], watch: bool = False):
         """Monitor price updates for specified pairs"""
         logger.info(f"Monitoring prices for {len(pairs)} pairs")
         
@@ -232,14 +232,14 @@ class OracleManager:
 
 # CLI Command Handlers
 
-async def handle_pair_command(args, manager: OracleManager):
+async def handle_pair_command(args: argparse.Namespace, manager: OracleManager):
     """Handle trading pair commands"""
     if args.pair_action == "add":
         if not all([args.base, args.quote]):
             print("Error: base and quote tokens required")
             return False
             
-        oracles = args.oracles.split(",") if args.oracles else []
+        oracles: list[str] = args.oracles.split(",") if args.oracles else []
         min_sources = args.min_sources or 1
         
         return await manager.register_pair(args.base, args.quote, oracles, min_sources)
@@ -256,7 +256,7 @@ async def handle_pair_command(args, manager: OracleManager):
         
     return False
 
-async def handle_oracle_command(args, manager: OracleManager):
+async def handle_oracle_command(args: argparse.Namespace, manager: OracleManager):
     """Handle oracle management commands"""
     if not all([args.base, args.quote]):
         print("Error: base and quote tokens required")
@@ -288,7 +288,7 @@ async def handle_oracle_command(args, manager: OracleManager):
         
     return False
 
-async def handle_price_command(args, manager: OracleManager):
+async def handle_price_command(args: argparse.Namespace, manager: OracleManager):
     """Handle price management commands"""
     if not all([args.base, args.quote]):
         print("Error: base and quote tokens required")
@@ -317,7 +317,7 @@ async def handle_price_command(args, manager: OracleManager):
         
     return False
 
-async def handle_status_command(args, manager: OracleManager):
+async def handle_status_command(args: argparse.Namespace, manager: OracleManager):
     """Handle status commands"""
     if args.base and args.quote:
         # Single pair status
@@ -334,9 +334,9 @@ async def handle_status_command(args, manager: OracleManager):
             print(json.dumps(status, indent=2))
     return True
 
-async def handle_monitor_command(args, manager: OracleManager):
+async def handle_monitor_command(args: argparse.Namespace, manager: OracleManager):
     """Handle monitoring commands"""
-    pairs = []
+    pairs: list[str] = []
     if args.base and args.quote:
         pairs = [f"{args.base}/{args.quote}"]
     else:
