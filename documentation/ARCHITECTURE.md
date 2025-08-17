@@ -58,3 +58,15 @@ This document outlines a Clarity-only, fully on-chain DeFi design on Stacks, lev
 3. Governance parameters and protocol reserve withdrawal
 4. Devnet profile and deployment scripts
 5. sBTC integration and BTC-native strategies
+
+## Planned DEX Subsystem (Design Complete)
+
+The forthcoming DEX adds constant-product automated market maker pools with a factory and router. See `DEX_DESIGN.md` for:
+
+- Pool invariant & fee model (LP + protocol fee split)
+- Registry/factory for deterministic pool creation
+- Router entrypoints (add/remove liquidity, swap with slippage + deadline guards)
+- Embedded cumulative price oracle (TWAP-ready)
+- Integration points (treasury buybacks, analytics, automation strategies)
+
+Future enhancements (post initial implementation): multi-hop routing, stable/weighted pools, compliance/circuit-breaker hooks, concentrated liquidity, external oracle contract, and enterprise monitoring extensions.
