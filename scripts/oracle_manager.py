@@ -49,7 +49,7 @@ class OracleManager:
         
     # Trading Pair Management
     
-    async def register_pair(self, base: str, quote: str, oracles: list, min_sources: int) -> bool:
+    async def register_pair(self, base: str, quote: str, oracles: list[str], min_sources: int) -> bool:
         """Register a new trading pair"""
         logger.info(f"Registering pair {base}/{quote} with {len(oracles)} oracles, min_sources={min_sources}")
         
