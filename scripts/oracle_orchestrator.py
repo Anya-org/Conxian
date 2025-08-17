@@ -95,7 +95,7 @@ class OracleOrchestrator:
         self.config = config
         self.trading_pairs: t.Dict[str, TradingPair] = {}
         self.oracle_registry: t.Dict[str, OracleInfo] = {}
-        self.price_feeds: t.Dict[str, t.List[t.Dict]] = {}
+        self.price_feeds: t.Dict[str, t.List[t.Dict[str, t.Any]]] = {}
         
     async def initialize(self):
         """Initialize orchestrator and load current state"""
@@ -228,7 +228,7 @@ class OracleOrchestrator:
         
         logger.info(f"Submitted {successful_submissions} prices for {pair_key}")
         
-    async def _fetch_external_prices(self, base: str, quote: str) -> t.List[t.Dict]:
+    async def _fetch_external_prices(self, base: str, quote: str) -> t.List[t.Dict[str, t.Any]]:
         """Fetch prices from external data sources"""
         # TODO: Implement actual price fetching from APIs like:
         # - CoinGecko, CoinMarketCap, Binance, etc.
@@ -239,7 +239,7 @@ class OracleOrchestrator:
             {"source": "kraken", "price": 123460, "timestamp": int(time.time())}
         ]
         
-    async def _detect_price_anomaly(self, pair_key: str, prices: t.List[t.Dict]) -> bool:
+    async def _detect_price_anomaly(self, pair_key: str, prices: t.List[t.Dict[str, t.Any]]) -> bool:
         """Detect price anomalies that might indicate market manipulation"""
         if len(prices) < 2:
             return False
@@ -256,7 +256,7 @@ class OracleOrchestrator:
                 
         return False
         
-    async def _select_oracle_price(self, external_prices: t.List[t.Dict], oracle: OracleInfo) -> int:
+    async def _select_oracle_price(self, external_prices: t.List[t.Dict[str, t.Any]], oracle: OracleInfo) -> int:
         """Select appropriate price for oracle submission"""
         # Simple strategy: use median of external prices
         prices = sorted([p["price"] for p in external_prices])
