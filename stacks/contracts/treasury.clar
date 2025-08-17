@@ -90,6 +90,14 @@
 )
 
 ;; Read-only functions
+(define-private (min (a uint) (b uint))
+  (if (< a b) a b))
+
+(define-read-only (is-dao-or-admin)
+  (or (is-eq tx-sender (var-get dao-governance))
+      (is-eq tx-sender .dao)
+      (is-eq tx-sender .timelock)))
+
 (define-read-only (get-category-allocation (category uint))
   (default-to 
     { allocated: u0, spent: u0, reserved: u0 }
@@ -720,6 +728,7 @@
             amount: defi-amount,
             round: (var-get investment-round)
           })
+          true
         )
         false
       )
@@ -733,6 +742,7 @@
             amount: lp-amount,
             round: (var-get investment-round)
           })
+          true
         )
         false
       )
@@ -770,43 +780,6 @@
         )
         (ok u0)
       )
-    )
-  )
-)
-
-;; Enhanced auto-buyback with dynamic parameters
-(define-public (execute-auto-buyback)
-  (let ((treasury-balance (stx-get-balance (as-contract tx-sender)))
-        (buyback-threshold (/ (* treasury-balance BUYBACK_THRESHOLD_BPS) u10000))
-        (last-buyback (var-get last-buyback-block))
-        (blocks-since-buyback (- block-height last-buyback)))
-    
-    ;; Check if buyback conditions are met
-    (if (and 
-         (var-get buyback-enabled)
-         (>= blocks-since-buyback BUYBACK_FREQUENCY_BLOCKS)
-         (> treasury-balance buyback-threshold))
-      (begin
-        (let ((buyback-amount (min 
-                               (/ (* treasury-balance BUYBACK_MAX_BPS) u10000)
-                               buyback-threshold)))
-          
-          ;; Simulate AVG token buyback (in production would use DEX)
-          (var-set last-buyback-block block-height)
-          (var-set total-buybacks (+ (var-get total-buybacks) u1))
-          (var-set total-avg-bought (+ (var-get total-avg-bought) buyback-amount))
-          
-          (print {
-            event: "auto-buyback-executed",
-            stx-amount: buyback-amount,
-            avg-estimated: (/ buyback-amount u100), ;; Simulated exchange rate
-            treasury-remaining: (- treasury-balance buyback-amount),
-            buyback-count: (var-get total-buybacks)
-          })
-          (ok buyback-amount)
-        )
-      )
-      (ok u0)
     )
   )
 )

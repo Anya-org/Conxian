@@ -30,6 +30,7 @@
 (define-map shares { owner: principal } { amount: uint })
 
 (define-private (min-uint (a uint) (b uint)) (if (< a b) a b))
+(define-private (max-uint (a uint) (b uint)) (if (> a b) a b))
 
 (define-public (get-reserves)
   (ok (tuple (rx (var-get reserve-x)) (ry (var-get reserve-y)))))
@@ -165,13 +166,13 @@
             (if (> current-volume volume-threshold)
               ;; High volume - reduce fees to encourage more trading
               (begin
-                (var-set protocol-fee-bps (max (- current-protocol-fee u1) u3))
-                (var-set lp-fee-bps (max (- current-lp-fee u5) u20))
+                (var-set protocol-fee-bps (max-uint (- current-protocol-fee u1) u3))
+                (var-set lp-fee-bps (max-uint (- current-lp-fee u5) u20))
               )
               ;; Low volume - increase fees for sustainability
               (begin
-                (var-set protocol-fee-bps (min (+ current-protocol-fee u1) u10))
-                (var-set lp-fee-bps (min (+ current-lp-fee u5) u50))
+                (var-set protocol-fee-bps (min-uint (+ current-protocol-fee u1) u10))
+                (var-set lp-fee-bps (min-uint (+ current-lp-fee u5) u50))
               )
             )
             
@@ -266,8 +267,8 @@
             )
           )
           
-          ;; Try to optimize fees if conditions are met
-          (try! (optimize-protocol-fees))
+          ;; Optimize fees if conditions are met (ignore errors)
+          (let ((optimization-result (optimize-protocol-fees))) true)
           
           (print {
             event: "optimized-swap",

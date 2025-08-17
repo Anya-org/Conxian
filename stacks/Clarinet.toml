@@ -137,6 +137,31 @@ path = "contracts/mock-dex.clar"
 clarity_version = 2
 epoch = "2.4"
 
+[contracts.enterprise-monitoring]
+path = "contracts/enterprise-monitoring.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.multi-hop-router]
+path = "contracts/multi-hop-router.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.stable-pool]
+path = "contracts/stable-pool.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.weighted-pool]
+path = "contracts/weighted-pool.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.circuit-breaker]
+path = "contracts/circuit-breaker.clar"
+clarity_version = 2
+epoch = "2.4"
+
 # Optional enhanced / legacy variants (included for completeness)
 
 

@@ -81,6 +81,11 @@ plan:
             path: contracts/bounty-system.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: circuit-breaker
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/circuit-breaker.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: gov-token
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/gov-token.clar
@@ -126,6 +131,11 @@ plan:
             path: contracts/dex-router.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: enterprise-monitoring
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/enterprise-monitoring.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: math-lib
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/math-lib.clar
@@ -136,9 +146,22 @@ plan:
             path: contracts/mock-dex.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: multi-hop-router
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/multi-hop-router.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: registry
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/registry.clar
+            clarity-version: 2
+      epoch: "2.4"
+    - id: 1
+      transactions:
+        - emulated-contract-publish:
+            contract-name: stable-pool
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/stable-pool.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: strategy-trait
@@ -154,5 +177,10 @@ plan:
             contract-name: vault-trait
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/traits/vault-trait.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: weighted-pool
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/weighted-pool.clar
             clarity-version: 2
       epoch: "2.4"

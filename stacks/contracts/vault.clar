@@ -12,6 +12,12 @@
   { amount: uint }
 )
 
+;; User balance tracking for enhanced features
+(define-map user-balances
+  { user: principal }
+  { balance: uint }
+)
+
 ;; Protocol parameters
 (define-constant BPS_DENOM u10000)
 (define-data-var admin principal .timelock)
@@ -47,6 +53,10 @@
 ;; Flash loan tracking
 (define-data-var total-flash-loans uint u0)
 (define-data-var total-flash-loan-fees uint u0)
+(define-data-var last-compound-time uint u0)
+
+;; Compound tracking
+(define-data-var total-compounded uint u0)
 
 ;; Liquidation tracking  
 (define-data-var total-liquidations uint u0)
@@ -125,13 +135,14 @@
 )
 
 (define-read-only (get-fees)
-  (tuple 
+  {
     deposit-bps: (var-get fee-deposit-bps),
     withdraw-bps: (var-get fee-withdraw-bps),
     performance-fee-bps: (var-get performance-fee-bps),
     flash-loan-fee-bps: (var-get flash-loan-fee-bps),
     liquidation-fee-bps: (var-get liquidation-fee-bps)
-  ))
+  }
+)
 
 (define-read-only (get-protocol-reserve)
   (var-get protocol-reserve))
@@ -140,14 +151,15 @@
   (var-get treasury-reserve))
 
 (define-read-only (get-revenue-stats)
-  (tuple
+  {
     total-fees-collected: (var-get total-fees-collected),
     total-performance-fees: (var-get total-performance-fees),
     total-flash-loan-fees: (var-get total-flash-loan-fees),
     total-liquidation-fees: (var-get total-liquidation-fees),
     treasury-reserve: (var-get treasury-reserve),
     protocol-reserve: (var-get protocol-reserve)
-  ))
+  }
+)
 
 (define-read-only (get-total-balance)
   (var-get total-balance)
@@ -195,10 +207,6 @@
 
 (define-read-only (get-fee-split-bps)
   (var-get fee-split-bps)
-)
-
-(define-read-only (get-treasury-reserve)
-  (var-get treasury-reserve)
 )
 
 (define-read-only (get-auto-fees-enabled)
@@ -983,14 +991,14 @@
 (define-public (execute-compound-strategy)
   (begin
     (asserts! (not (var-get paused)) (err u103))
-    (asserts! (is-eq tx-sender (var-get manager)) (err u100))
+    (asserts! (is-authorized-admin) (err u100))
     
-    (let ((current-time (unwrap! (get-stacks-block-info? time (- block-height u1)) (err u300)))
+    (let ((current-block block-height)
           (last-compound (var-get last-compound-time))
-          (compound-interval u86400)) ;; 24 hours
+          (compound-interval u144)) ;; 24 hours in blocks
       
       ;; Only compound once per day
-      (asserts! (>= (- current-time last-compound) compound-interval) (err u301))
+      (asserts! (>= (- current-block last-compound) compound-interval) (err u301))
       
       (let ((treasury-balance (var-get treasury-reserve))
             (compound-amount (/ treasury-balance u4))) ;; Compound 25% of treasury
@@ -1001,7 +1009,7 @@
             ;; Simulate yield generation through automated treasury allocation
             (var-set total-balance (+ (var-get total-balance) compound-amount))
             (var-set treasury-reserve (- treasury-balance compound-amount))
-            (var-set last-compound-time current-time)
+            (var-set last-compound-time current-block)
             (var-set total-compounded (+ (var-get total-compounded) compound-amount))
             
             (print {
@@ -1025,7 +1033,7 @@
     (asserts! (not (var-get paused)) (err u103))
     (asserts! (> amount u0) (err u1))
     
-    (let ((user-balance (default-to u0 (map-get? user-balances user)))
+    (let ((user-balance (default-to u0 (get balance (map-get? user-balances { user: user }))))
           (liquidation-threshold (/ (* user-balance u8) u10)) ;; 80% threshold
           (penalty-fee (collect-enhanced-fees amount "liquidation")))
       
@@ -1033,7 +1041,7 @@
       (asserts! (< user-balance liquidation-threshold) (err u302))
       
       ;; Execute liquidation
-      (map-set user-balances user (if (> user-balance amount) (- user-balance amount) u0))
+      (map-set user-balances { user: user } { balance: (if (> user-balance amount) (- user-balance amount) u0) })
       (var-set total-balance (if (> (var-get total-balance) amount) (- (var-get total-balance) amount) u0))
       
       ;; Transfer liquidated amount minus penalty to liquidator
