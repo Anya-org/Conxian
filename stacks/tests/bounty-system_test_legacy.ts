@@ -177,7 +177,7 @@ describe('Bounty System (SDK) - PRD BOUNTY alignment', () => {
         ], deployer.address);
         const milestone = milestoneResult.result.expectSome().expectTuple();
         assertEquals(milestone['status'], types.uint(2)); // APPROVED
-    },
+    }
 });
 
 Clarinet.test({
