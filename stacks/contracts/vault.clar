@@ -1174,5 +1174,16 @@
     (unwrap! (as-contract (stx-transfer? amount tx-sender recipient)) (err u200))
     (ok true)))
 
+;; Calculate shares for a given amount (used by multi-token strategies)
+(define-read-only (calculate-shares (amount uint))
+  (let ((ts (var-get total-shares)) 
+        (tb (var-get total-balance)))
+    (if (or (is-eq ts u0) (is-eq tb u0))
+      (ok amount)  ;; Bootstrap case: 1:1 ratio
+      (ok (mul-div-floor amount ts tb))  ;; Proportional shares
+    )
+  )
+)
+
 ;; u200: token-transfer-failed
 ;; u201: invalid-token

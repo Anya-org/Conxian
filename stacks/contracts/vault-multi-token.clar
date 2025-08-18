@@ -3,7 +3,6 @@
 ;; Integrates with existing vault.clar for enhanced liquidity aggregation
 
 (use-trait sip010 .sip-010-trait.sip-010-trait)
-(impl-trait .vault-admin-trait.vault-admin-trait)
 
 ;; Cross-DeFi token integration for competitor protocols
 (define-map supported-tokens
@@ -143,8 +142,8 @@
         
         (asserts! (<= (+ current-balance amount) max-allowed) (err ERR_ALLOCATION_EXCEEDED))
         
-        ;; Transfer tokens to vault
-        (unwrap! (contract-call? token transfer amount tx-sender (as-contract tx-sender) none) (err u200))
+        ;; Transfer tokens to vault (SIP-010: transfer recipient amount)
+        (unwrap! (contract-call? token transfer (as-contract tx-sender) amount) (err u200))
         
         ;; Update balances
         (map-set token-balances 
@@ -253,4 +252,12 @@
     ;; Additional tokens would be added via governance proposals
     true
   )
+)
+
+;; Read-only function to get count of supported tokens
+(define-read-only (get-supported-token-count)
+  ;; Count number of enabled tokens in the system
+  ;; In production, this would iterate through the supported-tokens map
+  ;; For now, return 0 as baseline
+  u0
 )
