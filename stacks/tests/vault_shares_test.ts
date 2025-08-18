@@ -13,22 +13,43 @@ describe("Vault Shares (SDK) - PRD VAULT-SHARES alignment", () => {
     accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
     wallet1 = accounts.get('wallet_1')!;
+    
+    // Debug: Check if accounts are distinct
+    console.log("Deployer address:", deployer);
+    console.log("Wallet1 address:", wallet1);
+    console.log("Accounts are different:", deployer !== wallet1);
   });
 
   it("PRD VAULT-SHARES-EQUAL: two users deposit equal amounts get equal shares and balances", async () => {
     const vaultContract = `${deployer}.vault`;
 
-  // Distinct users scenario
-  let r1 = simnet.callPublicFn("mock-ft", "mint", [Cl.principal(deployer), Cl.uint(1000)], deployer);
+    // Debug: Check vault status first
+    const vaultPaused = simnet.callReadOnlyFn("vault", "get-paused", [], deployer);
+    console.log("Vault paused:", vaultPaused.result);
+    
+    const vaultToken = simnet.callReadOnlyFn("vault", "get-token", [], deployer);
+    console.log("Vault token:", vaultToken.result);
+
+    // Use predefined addresses for distinct users (learned from oracle debugging)
+    const user1 = deployer; // Keep deployer as user1
+    const user2 = 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5'; // Use predefined address for user2
+
+  // Setup user1 (deployer) 
+  let r1 = simnet.callPublicFn("mock-ft", "mint", [Cl.principal(user1), Cl.uint(1000)], deployer);
   expect(r1.result.type).toBe('ok');
-  r1 = simnet.callPublicFn("mock-ft", "approve", [Cl.principal(vaultContract), Cl.uint(1000)], deployer);
+  r1 = simnet.callPublicFn("mock-ft", "approve", [Cl.principal(vaultContract), Cl.uint(1000)], user1);
   expect(r1.result.type).toBe('ok');
-  let r2 = simnet.callPublicFn("mock-ft", "mint", [Cl.principal(wallet1), Cl.uint(1000)], deployer);
+  
+  // Setup user2 (predefined address)
+  let r2 = simnet.callPublicFn("mock-ft", "mint", [Cl.principal(user2), Cl.uint(1000)], deployer);
   expect(r2.result.type).toBe('ok');
-  r2 = simnet.callPublicFn("mock-ft", "approve", [Cl.principal(vaultContract), Cl.uint(1000)], wallet1);
+  r2 = simnet.callPublicFn("mock-ft", "approve", [Cl.principal(vaultContract), Cl.uint(1000)], user2);
   expect(r2.result.type).toBe('ok');
-  const dep1 = simnet.callPublicFn("vault", "deposit", [Cl.uint(1000)], deployer);
-  const dep2 = simnet.callPublicFn("vault", "deposit", [Cl.uint(1000)], wallet1);
+  
+  const dep1 = simnet.callPublicFn("vault", "deposit", [Cl.uint(1000)], user1);
+  console.log("Deposit 1 result:", dep1.result);
+  const dep2 = simnet.callPublicFn("vault", "deposit", [Cl.uint(1000)], user2);
+  console.log("Deposit 2 result:", dep2.result);
   expect(dep1.result.type).toBe('ok');
   expect(dep2.result.type).toBe('ok');
   expect(dep1.result.value.value).toBe(dep2.result.value.value);
