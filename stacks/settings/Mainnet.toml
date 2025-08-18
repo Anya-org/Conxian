@@ -1,0 +1,58 @@
+[network]
+name = "mainnet"
+node_rpc_address = "https://api.mainnet.hiro.so"
+
+[accounts.deployer]
+# Mainnet deployer account - REQUIRES SECURE WALLET WITH SUFFICIENT STX
+# Estimated deployment cost: ~3-5 STX for all 32 contracts
+mnemonic = "TO_BE_GENERATED_FOR_MAINNET_DEPLOYMENT"
+balance = 50000000  # 50 STX buffer for deployment costs
+
+[accounts.treasury_admin]
+# Multi-signature treasury administrator - PRIMARY ADMIN
+mnemonic = "TO_BE_GENERATED_FOR_TREASURY_ADMIN"
+balance = 10000000  # 10 STX for operational transactions
+
+[accounts.dao_admin]
+# DAO governance administrator - SECONDARY ADMIN
+mnemonic = "TO_BE_GENERATED_FOR_DAO_ADMIN"
+balance = 5000000   # 5 STX for governance operations
+
+[accounts.emergency_admin]
+# Emergency controls administrator - EMERGENCY ACCESS
+mnemonic = "TO_BE_GENERATED_FOR_EMERGENCY_ADMIN"
+balance = 5000000   # 5 STX for emergency procedures
+
+[accounts.oracle_operator]
+# Oracle system operator - PRICE FEED MANAGEMENT
+mnemonic = "TO_BE_GENERATED_FOR_ORACLE_OPERATOR"
+balance = 5000000   # 5 STX for oracle operations
+
+# Production Configuration Notes:
+# 
+# SECURITY REQUIREMENTS:
+# - All mnemonics must be generated using hardware wallets
+# - Private keys should never be stored in plain text
+# - Use environment variables for sensitive data
+# - Implement proper key rotation procedures
+# 
+# DEPLOYMENT PROCEDURE:
+# 1. Generate secure mnemonics for all accounts
+# 2. Fund deployer account with sufficient STX
+# 3. Verify network connectivity to mainnet
+# 4. Execute deployment in controlled environment
+# 5. Verify all contracts deploy successfully
+# 6. Initialize system parameters
+# 7. Transfer admin controls to multi-sig
+# 
+# ESTIMATED COSTS:
+# - Contract Deployment: ~3 STX (based on testnet costs)
+# - Initial Operations: ~2 STX (parameter setting, etc.)
+# - Emergency Buffer: ~5 STX (unexpected costs)
+# - Total Recommended: 50+ STX in deployer wallet
+#
+# MULTI-SIG SETUP:
+# - Treasury operations require 3-of-5 signatures
+# - Emergency actions require 2-of-3 signatures  
+# - Key rotation requires 4-of-5 signatures
+# - Contract upgrades require 5-of-5 + DAO approval
