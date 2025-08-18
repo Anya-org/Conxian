@@ -51,7 +51,7 @@ Batch 2 (7 contracts): Registry, treasury, pools, final components
 Total Deployment Cost: 2.892210 STX
 Expected Duration: 2 blocks
 Network: Stacks Testnet (https://api.testnet.hiro.so)
-```text
+```
 
 ### 🔧 Next Steps for Live Deployment
 
