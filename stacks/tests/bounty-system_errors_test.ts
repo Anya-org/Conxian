@@ -19,8 +19,10 @@ describe('Bounty System (SDK) - Error Paths', () => {
     simnet = await initSimnet();
     accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
-    wallet1 = accounts.get('wallet_1')!; // creator / applicant
-  wallet2 = accounts.get('wallet_2')!;
+    
+    // Use predefined addresses to ensure distinct principals (learned from oracle debugging)
+    wallet1 = 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5';
+    wallet2 = 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG';
   });
 
   it('enforces cannot apply to own bounty (u106)', () => {
@@ -56,7 +58,7 @@ describe('Bounty System (SDK) - Error Paths', () => {
       Cl.uint(120)
     ], wallet1);
 
-    expect(wallet2.address).not.toBe(wallet1.address);
+    expect(wallet2).not.toBe(wallet1);
     const first = simnet.callPublicFn('bounty-system','apply-for-bounty', [
       Cl.uint(1), Cl.stringUtf8('First proposal'), Cl.uint(75)
     ], wallet2);
