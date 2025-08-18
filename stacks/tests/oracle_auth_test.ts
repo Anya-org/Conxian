@@ -1,26 +1,22 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Cl, privateKeyToAddress, addressToString } from "@stacks/transactions";
-import { mnemonicToSeedSync } from 'bip39';
-import { HDKey } from '@scure/bip32';
+import { Cl } from "@stacks/transactions";
 import { initSimnet } from "@hirosystems/clarinet-sdk";
 
 describe("oracle-aggregator proper authorization test", () => {
   let simnet: any;
-  let accounts: Map<string, any>;
-  let deployer: any;
-  let wallet1: any;
-  let wallet2: any;
+  let accounts: Map<string, string>;
+  let deployer: string;
+  let wallet1: string;
+  let wallet2: string;
 
   beforeEach(async () => {
-  simnet = await initSimnet("./Clarinet.toml");
+    simnet = await initSimnet();
     accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
-    wallet1 = accounts.get("wallet_1")!;
-    wallet2 = accounts.get("wallet_2");
-    if (!wallet2) {
-      // Fallback deterministic testnet address (not whitelisted) used for unauthorized path tests
-      wallet2 = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
-    }
+    
+    // Use standard testnet addresses (distinct from deployer)
+    wallet1 = "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5"; // Standard wallet_1 address
+    wallet2 = "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG"; // Standard wallet_2 address
   });
 
   it("tests authorization with different accounts", async () => {
@@ -100,7 +96,7 @@ describe("oracle-aggregator proper authorization test", () => {
     expectOkTrue(addResult.result);
     expect(authorizedResult.result.type).toBe('ok');
     // Unauthorized submissions should err with code 102 (ERR_NOT_ORACLE)
-    expect(unauthorizedResult.result).toEqual({ type: 'err', value: { type: 'uint', value: 102n } });
+    expect(unauthorizedResult.result).toEqual({ type: 'err', value: { type: 'uint', value: "102" } });
 
     // Optional deployer submission check: if deployer principal equals wallet1 (SDK duplicate), skip strict check
     if (deployer !== wallet1) {
