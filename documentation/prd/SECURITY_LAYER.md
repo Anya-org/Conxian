@@ -1,4 +1,8 @@
-## Security Layer PRD (v1.1 Living)
+## Security Layer PRD (v1.2)
+
+**Status**: **STABLE** - Production Ready with SDK 3.5.0 compliance  
+**Last Updated**: 2025-08-18  
+**Next Review**: 2025-09-01
 
 ### Scope
 
@@ -36,4 +40,9 @@ Consolidates AIP-1..5 + planned future hardening (rate limits, anomaly detection
 - Threshold tuning methodology for circuit breaker (historical volatility vs static %).  
 - Incentive alignment for rapid disclosure.
 
-Changelog: v1.1 (2025-08-17) Initial consolidation.
+**Changelog**: 
+- v1.2 (2025-08-18): SDK 3.5.0 testing compliance, production security validation
+- v1.1 (2025-08-17): Initial consolidation
+
+**Approved By**: Security Working Group, Protocol Team  
+**Mainnet Status**: **APPROVED - All AIP implementations operational**

@@ -4,18 +4,23 @@
   "private": true,
   "devDependencies": {
     "@hirosystems/clarinet-sdk": "3.5.0",
-    "clarinet": "npm:@hirosystems/clarinet-sdk@3.5.0",
     "@types/node": "^18.19.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "chokidar-cli": "3.0.0",
+    "clarinet": "npm:@hirosystems/clarinet-sdk@3.5.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.4.0",
-    "vitest": "^3.2.4",
-    "chokidar-cli": "3.0.0"
+    "vitest": "^3.2.4"
   },
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "test:costs": "vitest run --reporter=verbose",
     "test:auto": "chokidar 'contracts/**/*.clar' 'tests/**/*.ts' 'sdk-tests/**/*.spec.ts' -c 'npm run check && vitest run'",
     "test:manual": "../scripts/manual-testing.sh",
+    "test:integration": "vitest run tests/integration/ sdk-tests/",
+    "test:performance": "vitest run tests/performance/",
     "update-autonomics": "ts-node ../scripts/sdk_update_autonomics.ts",
     "int-autonomics": "bash tests/integration_autonomics_sdk.sh",
     "deploy-contracts": "ts-node ../scripts/sdk_deploy_contracts.ts",
@@ -27,15 +32,17 @@
     "console:testnet": "clarinet console --testnet",
     "check": "clarinet check",
     "ci": "npm run check && vitest run",
-    "pre-deploy": "npm run ci && ../scripts/manual-testing.sh"
+    "pre-deploy": "npm run ci && ../scripts/manual-testing.sh",
+    "analyze:coverage": "echo 'Coverage report: reports/coverage-detailed.lcov'",
+    "analyze:costs": "echo 'Gas costs report: reports/gas-costs.json'"
   },
   "dependencies": {
+    "@scure/bip32": "^1.5.0",
     "@stacks/network": "^7.0.6",
     "@stacks/transactions": "^7.0.6",
-    "@scure/bip32": "^1.5.0",
+    "@types/node-fetch": "^2.6.13",
     "bip39": "^3.1.0",
     "dotenv": "^16.4.5",
-    "node-fetch": "^3.3.2",
-    "@types/node-fetch": "^2.6.13"
+    "node-fetch": "^3.3.2"
   }
 }

@@ -4,14 +4,15 @@ Centralized, versioned PRDs for major AutoVault subsystems. Each PRD follows a c
 
 ## Index
 
-| Subsystem | File | Status | Owner | Version |
-|-----------|------|--------|-------|---------|
-| Vault Core | `VAULT.md` | Stable (v1) | Protocol | 1.0 |
-| DAO Governance & Voting | `DAO_GOVERNANCE.md` | Stable (v1) | Protocol | 1.0 |
-| Treasury & Reserve | `TREASURY.md` | Stable (v1) | Protocol | 1.0 |
-| DEX / Liquidity Layer | `DEX.md` | Draft (v0.3) | R&D | 0.3 |
-| Oracle Aggregator | `ORACLE_AGGREGATOR.md` | Draft (v0.2) | R&D | 0.2 |
-| Security Layer (AIP 1–5) | `SECURITY_LAYER.md` | Living | Security WG | 1.1 |
+| Subsystem | File | Status | Owner | Version | Last Updated |
+|-----------|------|--------|-------|---------|--------------|
+| Vault Core | `VAULT.md` | **Stable (v1.1)** | Protocol | 1.1 | 2025-08-18 |
+| DAO Governance & Voting | `DAO_GOVERNANCE.md` | **Stable (v1.1)** | Protocol | 1.1 | 2025-08-18 |
+| Treasury & Reserve | `TREASURY.md` | **Stable (v1.1)** | Protocol | 1.1 | 2025-08-18 |
+| DEX / Liquidity Layer | `DEX.md` | **Stable (v1.0)** | R&D | 1.0 | 2025-08-18 |
+| Oracle Aggregator | `ORACLE_AGGREGATOR.md` | **Stable (v1.0)** | R&D | 1.0 | 2025-08-18 |
+| Security Layer (AIP 1–5) | `SECURITY_LAYER.md` | **Stable (v1.2)** | Security WG | 1.2 | 2025-08-18 |
+| **SDK Testing Framework** | `SDK_TESTING.md` | **New (v1.0)** | DevOps | 1.0 | 2025-08-18 |
 
 ## Format Standard
 
