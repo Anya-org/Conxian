@@ -1,8 +1,8 @@
-# 🏗️ AutoVault System Architecture Graph
+# 🏗️ AutoVault System Architecture text
 
 ## 📊 **MASTER SYSTEM ARCHITECTURE**
 
-This document provides the comprehensive **architectural graph and dependency mapping** for the AutoVault DeFi ecosystem, ensuring systematic upgrades and maintenance.
+This document provides the comprehensive **architectural text and dependency mapping** for the AutoVault DeFi ecosystem, ensuring systematic upgrades and maintenance.
 
 ---
 
@@ -24,12 +24,12 @@ This document provides the comprehensive **architectural graph and dependency ma
 
 ---
 
-## 🔗 **SYSTEM DEPENDENCY GRAPH**
+## 🔗 **SYSTEM DEPENDENCY text**
 
 ```mermaid
-graph TB
+text TB
     %% FOUNDATION LAYER (Layer 0)
-    subgraph "🔧 FOUNDATION TRAITS"
+    subtext "🔧 FOUNDATION TRAITS"
         SIP010[sip-010-trait.clar]
         VT[vault-trait.clar]
         VAT[vault-admin-trait.clar]
@@ -39,7 +39,7 @@ graph TB
     end
 
     %% CORE INFRASTRUCTURE (Layer 1)
-    subgraph "🏦 CORE INFRASTRUCTURE"
+    subtext "🏦 CORE INFRASTRUCTURE"
         VAULT[vault.clar]
         TREASURY[treasury.clar]
         REGISTRY[registry.clar]
@@ -48,7 +48,7 @@ graph TB
     end
 
     %% TOKENOMICS LAYER (Layer 2)  
-    subgraph "💰 TOKENOMICS SYSTEM"
+    subtext "💰 TOKENOMICS SYSTEM"
         MOCKFT[mock-ft.clar]
         GOVTOKEN[gov-token.clar]
         AVGTOKEN[avg-token.clar]
@@ -57,7 +57,7 @@ graph TB
     end
 
     %% GOVERNANCE LAYER (Layer 3)
-    subgraph "🏛️ GOVERNANCE & DAO"
+    subtext "🏛️ GOVERNANCE & DAO"
         DAO[dao.clar]
         DAOAUTOMATION[dao-automation.clar]
         DAOGOV[dao-governance.clar]
@@ -67,7 +67,7 @@ graph TB
     end
 
     %% SECURITY LAYER (Layer 4)
-    subgraph "🛡️ SECURITY & MONITORING"
+    subtext "🛡️ SECURITY & MONITORING"
         CIRCUITBREAKER[circuit-breaker.clar]
         CIRCUITSIMPLE[circuit-breaker-simple.clar]
         ENTERPRISEMON[enterprise-monitoring.clar]
@@ -76,7 +76,7 @@ graph TB
     end
 
     %% DEX SUBSYSTEM (Layer 5) 
-    subgraph "🔄 DEX & AMM SYSTEM"
+    subtext "🔄 DEX & AMM SYSTEM"
         DEXFACTORY[dex-factory.clar]
         DEXPOOL[dex-pool.clar]
         DEXROUTER[dex-router.clar]
@@ -88,7 +88,7 @@ graph TB
     end
 
     %% ADVANCED FEATURES (Layer 6)
-    subgraph "🚀 ADVANCED DEFI FEATURES"
+    subtext "🚀 ADVANCED DEFI FEATURES"
         MULTIHOP[multi-hop-router.clar]
         MULTIHOPV2[multi-hop-router-v2.clar]
         TWAORACLE[twap-oracle-v2.clar]
@@ -96,7 +96,7 @@ graph TB
     end
 
     %% INCENTIVE SYSTEMS (Layer 7)
-    subgraph "🎯 BOUNTY & INCENTIVES"
+    subtext "🎯 BOUNTY & INCENTIVES"
         BOUNTY[bounty-system.clar]
         AUTOBOUNTY[automated-bounty-system.clar]
     end
@@ -314,7 +314,7 @@ graph TB
 
 #### **🚨 HIGH-IMPACT CHAINS**
 
-```
+```clarity
 vault.clar ← treasury.clar ← dao.clar ← Enhanced Governance
 vault.clar ← circuit-breaker.clar ← oracle-aggregator.clar ← TWAP Oracle
 math-lib.clar ← vault.clar + All Pool Contracts
@@ -322,7 +322,7 @@ math-lib.clar ← vault.clar + All Pool Contracts
 
 #### **⚠️ MEDIUM-IMPACT CHAINS**
 
-```
+```clarity
 pool-trait.clar ← All Pool Implementations
 registry.clar ← Discovery-dependent contracts
 analytics.clar ← Monitoring systems
@@ -330,7 +330,7 @@ analytics.clar ← Monitoring systems
 
 #### **✅ LOW-IMPACT CHAINS**
 
-```
+```clarityclarity
 bounty-system.clar ← automated-bounty-system.clar
 governance-test-helper.clar ← Testing infrastructure
 mock-ft.clar ← Development environment
@@ -462,4 +462,4 @@ mock-ft.clar ← Development environment
 
 ---
 
-*This architecture graph serves as the **master reference** for all AutoVault system modifications, ensuring systematic and safe upgrades while maintaining the comprehensive DeFi vision.*
+*This architecture text serves as the **master reference** for all AutoVault system modifications, ensuring systematic and safe upgrades while maintaining the comprehensive DeFi vision.*

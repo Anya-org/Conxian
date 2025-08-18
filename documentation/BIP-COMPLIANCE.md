@@ -32,7 +32,7 @@ vault_admin:  Dedicated admin account (governance)
 
 - All mnemonics pass BIP39 checksum validation
 - Proper word list compliance (English BIP39 wordlist)
-- Adequate entropy for cryptographic security
+- Adequate entropy for cryptotextic security
 
 ### Key Derivation
 

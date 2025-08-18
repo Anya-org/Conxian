@@ -43,7 +43,7 @@
 
 - `DEX_*.md` - **DEX infrastructure documentation**
 - `TOKENOMICS.md` - **Enhanced tokenomics (10M AVG / 5M AVLP)**
-- `BIP-COMPLIANCE.md` - **Enhanced cryptographic standards**
+- `BIP-COMPLIANCE.md` - **Enhanced cryptotextic standards**
 
 ---
 

@@ -18,15 +18,15 @@
 ```bash
 export DEPLOYER_PRIVKEY=ddf291b96c4b6c193440e3652470738bc064b587681edc76112c2695ac33644f01
 export NETWORK=testnet
-```
+```text
 
 ### Backup Information
 
 **Mnemonic** (store securely offline):
 
-```
+```text
 light glare bench random limit flame change call boil wolf exercise bar test argue parade envelope execute chimney good seven warrior blue gorilla jaguar
-```
+```text
 
 **Derivation Path**: `m/44'/5757'/0'/0/0`
 
@@ -39,7 +39,7 @@ cd /workspaces/AutoVault/stacks
 export DEPLOYER_PRIVKEY=ddf291b96c4b6c193440e3652470738bc064b587681edc76112c2695ac33644f01
 export NETWORK=testnet
 clarinet deployment apply --testnet
-```
+```text
 
 ## 📊 Balance Verification
 

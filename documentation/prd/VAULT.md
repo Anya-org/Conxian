@@ -1,4 +1,4 @@
-## VAULT PRD (v1.1)
+# VAULT PRD (v1.1)
 
 **Reference**: AIP-5 (Precision), Architecture doc, `vault.clar` implementation, SDK 3.5.0 testing compliance
 
@@ -6,7 +6,7 @@
 **Last Updated**: 2025-08-18  
 **Next Review**: 2025-09-15
 
-### 1. Summary & Vision
+## 1. Summary & Vision
 
 Core capital aggregation primitive providing share-based accounting, configurable fees, caps, and guarded parameterization via DAO & automation traits.
 
@@ -63,7 +63,10 @@ Core capital aggregation primitive providing share-based accounting, configurabl
 
 ### 8. Data / State (Conceptual)
 
-```
+```clarity
+### 8. Data / State (Conceptual)
+
+```clarity
 maps: balances(principal) -> uint
 vars: totalUnderlying, totalShares, depositFeeBps, withdrawFeeBps, cap, paused
 ```

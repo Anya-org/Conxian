@@ -1,10 +1,10 @@
-## DEX / Liquidity Layer PRD (v1.0)
+# DEX / Liquidity Layer PRD (v1.0)
 
 **Status**: **STABLE** - Production Ready  
 **Last Updated**: 2025-08-18  
 **Next Review**: 2025-09-15
 
-### Summary
+## Summary
 
 AMM subsystem (factory, pools, router, future variants) to support internal price discovery, vault strategy interactions, and external liquidity. **Production-ready core implementation with advanced features planned for v1.1.**
 
@@ -26,7 +26,7 @@ AMM subsystem (factory, pools, router, future variants) to support internal pric
 ### Out of Scope (Future Versions)
 
 - Concentrated liquidity (v2.0+)
-- MEV auctions (v2.0+) 
+- MEV auctions (v2.0+)
 - Batch matching (v2.0+)
 - Cross-chain bridges (v3.0+)
 
@@ -53,6 +53,7 @@ AMM subsystem (factory, pools, router, future variants) to support internal pric
 ### Production Implementation Status
 
 ✅ **READY FOR MAINNET**:
+
 - Core AMM functionality operational
 - Factory and router contracts deployed
 - LP token mechanisms functional
@@ -60,6 +61,7 @@ AMM subsystem (factory, pools, router, future variants) to support internal pric
 - Event emission complete
 
 🔄 **v1.1 ENHANCEMENTS**:
+
 - Advanced routing algorithms
 - TWAP oracle integration
 - Circuit breaker connectivity
@@ -76,19 +78,22 @@ AMM subsystem (factory, pools, router, future variants) to support internal pric
 ### Security & Risk Management
 
 ✅ **IMPLEMENTED CONTROLS**:
+
 - Slippage protection on all swaps
 - LP token burn/mint validation
 - Reentrancy protection via Clarity model
 - Mathematical invariant preservation
 
 🔄 **PLANNED ENHANCEMENTS**:
+
 - Circuit breaker integration for volatility events
 - Advanced MEV protection mechanisms
 - Sandwich attack detection and mitigation
 
 ---
 
-**Changelog**: 
+**Changelog**:
+
 - v1.0 (2025-08-18): Production stability assessment, mainnet readiness confirmation
 - v0.3 (2025-08-17): Initial draft consolidation
 

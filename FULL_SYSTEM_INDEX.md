@@ -10,7 +10,10 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 
 ### **Core Platform Stack**
 
-```
+```text
+### **Core Platform Stack**
+
+```text
 🏛️ GOVERNANCE & ADMINISTRATION
 ├── DAO Governance (dao-governance.clar)
 │   ├── Time-weighted voting system
@@ -177,7 +180,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 
 ### **Codebase Metrics**
 
-```
+```text
 📈 DEVELOPMENT METRICS:
 ├── Total Contracts: 32 production contracts
 ├── Lines of Code: ~15,000+ lines of Clarity
@@ -226,7 +229,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 
 **Status**: Successfully completed August 16, 2025
 
-```
+```text
 ✅ CORE PLATFORM:
 ├── 30 Smart contracts compiling successfully
 ├── Enhanced tokenomics (10M AVG / 5M AVLP)
@@ -252,7 +255,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 
 **Status**: 98.5% ready for deployment
 
-```
+```text
 🎯 DEPLOYMENT ACTIVITIES:
 ├── STX Mainnet contract deployment
 ├── System verification and testing
@@ -276,7 +279,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 
 **Timeline**: September - October 2025
 
-```
+```text
 🎯 USER ACQUISITION:
 ├── Marketing campaign activation
 ├── Partnership program launch
@@ -300,7 +303,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 
 **Timeline**: Q4 2025 - Q1 2026
 
-```
+```text
 🔗 DEFI ECOSYSTEM EXPANSION:
 ├── Cross-chain bridge development
 ├── DEX advanced features
@@ -326,7 +329,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 
 ### **Technical Differentiation**
 
-```
+```text
 🏗️ BITCOIN-NATIVE ARCHITECTURE:
 ├── Stacks blockchain settlement
 ├── Bitcoin state anchoring
@@ -374,7 +377,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 
 ### **Development Stack**
 
-```
+```text
 🛠️ SMART CONTRACT DEVELOPMENT:
 ├── Language: Clarity (Stacks native)
 ├── Framework: Clarinet SDK v3.5.0
@@ -406,7 +409,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 
 ### **Quality Assurance Process**
 
-```
+```text
 🧪 TESTING METHODOLOGY:
 ├── Unit Testing: Individual contract validation
 ├── Integration Testing: Cross-contract functionality

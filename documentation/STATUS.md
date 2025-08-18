@@ -46,10 +46,18 @@ and enterprise-grade monitoring capabilities.
 | **Total Passing** | **109/111** | **98.2% Pass Rate** |
 
 ### Non-Critical Issues (Test Infrastructure Only)
+
+- Clarinet shim helper (framework issue, no impact)
+
+### Non-Critical Issues (Test Infrastructure Only)
+
 - Clarinet shim helper (framework issue, no impact)
 - Timelock integration test (bypassed, functionality confirmed working)
 
 ### Recently Fixed
+
+### Recently Fixed
+
 - ✅ Oracle aggregator authorization (wallet address collision resolved)
 - ✅ Bounty system test cleanup (legacy format removed)
 

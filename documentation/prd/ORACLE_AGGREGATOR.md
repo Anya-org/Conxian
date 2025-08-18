@@ -1,10 +1,10 @@
-## Oracle Aggregator PRD (v1.0)
+# Oracle Aggregator PRD (v1.0)
 
 **Status**: **STABLE** - Production Ready  
 **Last Updated**: 2025-08-18  
 **Next Review**: 2025-09-15
 
-### Summary
+## Summary
 
 Aggregate multiple oracle sources (internal DEX TWAP, external signed feeds) with configurable weighting & staleness limits feeding vault & risk modules. **Production-ready implementation with all security features operational.**
 
@@ -57,6 +57,7 @@ Changelog: v0.2 (2025-08-17) draft skeleton.
 ### v1.0 Production Readiness Assessment
 
 ✅ **MAINNET READY FEATURES**:
+
 - Core price aggregation functionality operational
 - Whitelist security enforcement active  
 - Event emission and error handling complete
@@ -93,12 +94,14 @@ Changelog: v0.2 (2025-08-17) draft skeleton.
 ### Security Assessment
 
 ✅ **PRODUCTION SECURITY**:
+
 - Whitelist enforcement prevents unauthorized submissions
 - Error code structure (u102, u107) operational
 - Admin-only registration controls active
 - Event logging for transparency
 
 ⚠️ **SECURITY NOTES**:
+
 - **Recommendation**: Min sources ≥2 for production pairs
 - **Monitoring**: External circuit breaker monitoring recommended
 - **Upgrade Path**: v1.1 enhancements strengthen manipulation resistance
@@ -116,23 +119,27 @@ Changelog: v0.2 (2025-08-17) draft skeleton.
 ### Security Notes
 
 ✅ **CURRENT SECURITY POSTURE**:
+
 - Whitelist enforcement is critical and operational
 - Median & TWAP simplifications acceptable for v1.0 launch
 - Min-sources configuration provides basic manipulation resistance
 
 📋 **PRODUCTION RECOMMENDATIONS**:
+
 - **Min sources ≥2** for all production pairs (enforced in configuration)
 - **External monitoring** of large price deltas via circuit breaker
 - **Accelerated v1.1** implementation for enhanced manipulation detection before multi-asset activation
 
 📈 **MAINNET DEPLOYMENT STATUS**: **READY**
+
 - Core security requirements satisfied
 - Performance within acceptable limits (< 3 STX deploy, < 150k gas execution)
 - Event logging and error handling production-grade
 
 ---
 
-**Changelog**: 
+**Changelog**:
+
 - v1.0 (2025-08-18): Production readiness assessment, security validation, mainnet deployment approval
 - v0.2 (2025-08-17): Draft skeleton implementation
 

@@ -1,4 +1,4 @@
-# Restoration & Decommission Audit (AutoVault)
+# Restoration & Decommission Audit (AutoVault3. Update `CHANGELOG.md` under Unreleased: "Removed legacy variant `file` (superseded by `active-file`, no unique logic)".
 
 Purpose: Inventory all archived, original, backup, and disabled contract variants to (a) ensure no critical differentiating functionality is lost prior to repository cleanup, (b) decide restore vs merge vs remove actions, (c) map each feature to PRD / AIP alignment, (d) surface gaps to re‑enable before mainnet.
 
@@ -22,9 +22,9 @@ Rationale Tags: SEC (security), PERF (performance/gas), SIZE (contract size), PR
 | DEX Weighted Pool | `weighted-pool.clar` | `weighted-pool.clar.disabled` | Disabled version returned richer swap result `{ amount-out, fee }`; different remove-liquidity field names; legacy fee exposure | Fee transparency restored via `last-swap-fee` var + `get-last-swap-fee` read-only; swap event already emits fee | Low (addressed) | COMPLETED (Option B) | Non-breaking restoration preserving `pool-trait`; test `weighted_pool_fee_test.ts` added (PRD, DX, AUDIT). |
 | DEX Stable Pool | `stable-pool.clar` | `stable-pool-clean.clar` (if exists beyond placeholder) | (Not yet diffed – pending) | - | Unknown | DEFER | Perform targeted diff if we keep both; currently only one active in Clarinet.toml (`stable-pool.clar`). |
 | Circuit Breaker | `circuit-breaker.clar` | `circuit-breaker-simple.clar` | Simple version smaller; fewer guardrails; potential fallback minimal pause logic | Active adds richer triggers | None | KEEP both until gas benchmarking | Simple variant may serve as lightweight fallback; revisit after gas data (PERF). |
-| Governance Automation | `dao-automation.clar` | (no variant) | - | - | - | KEEP |
-| Oracle | `oracle-aggregator.clar` | (no variant) | - | - | - | KEEP |
-| Timelock | `timelock.clar` | (no variant) | - | - | - | KEEP |
+| Governance Automation | `dao-automation.clar` | (no variant) | - | - | - | KEEP | DX |
+| Oracle | `oracle-aggregator.clar` | (no variant) | - | - | - | KEEP | SEC |
+| Timelock | `timelock.clar` | (no variant) | - | - | - | KEEP | SEC |
 
 ## Weighted Pool Restoration Detail
 
@@ -43,7 +43,7 @@ Before deleting any variant file:
 
 1. Confirm no tests import or reference variant (grep + run full suite).  
 2. Archive diff snippet into `documentation/ARCHIVE_DIFFS.md` (hash, lines changed).  
-3. Update `CHANGELOG.md` under Unreleased: "Removed legacy variant <file> (superseded by <active-file>, no unique logic)".  
+3. Update `CHANGELOG.md` under Unreleased: "Removed legacy variant `file` (superseded by `active-file`, no unique logic)".  
 4. Re-run `clarinet check` + full tests (must remain green).  
 5. Tag PR with `refactor:contract-cleanup` and note AIP impact (none or specify).  
 

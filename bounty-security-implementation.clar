@@ -85,7 +85,7 @@
     (print { event: "secure-bounty-created", bounty-id: bounty-id, verification-required: requires-verification })
     (ok bounty-id)))
 
-;; Submit completion with cryptographic proof
+;; Submit completion with cryptotextic proof
 (define-public (submit-completion-with-proof
   (bounty-id uint)
   (completion-proof (buff 32))

@@ -126,7 +126,7 @@ This roadmap outlines the planned development and deployment phases for AutoVaul
 
 - [ ] **Zero-Knowledge Proofs**: Enhanced privacy features
 - [ ] **Layer 2 Solutions**: Scalability improvements
-- [ ] **Quantum Resistance**: Future-proof cryptography
+- [ ] **Quantum Resistance**: Future-proof cryptotexty
 - [ ] **Decentralized Identity**: Self-sovereign identity integration
 
 ### 🌟 Platform Evolution

@@ -178,7 +178,7 @@ Based on extensive analysis of leading DeFi and enterprise DEX systems, this doc
   ;; No implementation for optimal routing
 ```
 
-**Industry Standard**: Graph-based routing with gas optimization
+**Industry Standard**: text-based routing with gas optimization
 
 #### 3.2.3 Fee Tier Management
 

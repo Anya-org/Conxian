@@ -1,8 +1,16 @@
 # SDK Testing Framework PRD (v1.0)
 
-**Reference**: Clarinet SDK 3.5.0, `@hirosystems/clarinet-sdk`, Vitest integration
+**Reference**: Clarinet SDK 3.5.0, `@hirosystems/clarinet-sdk`, Vitest integrat### **Test Suite Organization**
 
-## Summary & Vision
+```text
+tests/
+├── unit/           # Individual contract functions
+├── integration/    # Multi-contract scenarios  
+├── sdk-tests/      # SDK-specific validations
+├── invariants/     # Fuzz testing and safety
+├── performance/    # Gas optimization tests
+└── simulation/     # Mainnet state tests
+```ary & Vision
 
 Comprehensive testing framework leveraging Clarinet SDK 3.5.0 advanced capabilities for production-grade smart contract validation, performance analysis, and mainnet simulation.
 
@@ -44,6 +52,7 @@ Comprehensive testing framework leveraging Clarinet SDK 3.5.0 advanced capabilit
 ### ✅ **IMPLEMENTED**
 
 1. **Core SDK 3.5.0 Integration**
+
    ```typescript
    // Global setup properly configured
    global.options = {
@@ -56,21 +65,24 @@ Comprehensive testing framework leveraging Clarinet SDK 3.5.0 advanced capabilit
    };
    ```
 
-2. **Modern Test Patterns**
-   - `initSimnet()` usage across 36 test files
-   - Predefined address solutions for distinct principals
-   - Structured error code validation (u100+ range)
-   - 124/124 tests passing (100% success rate)
+1.1. **Modern Test Patterns**
 
-3. **Advanced Testing Features**
-   - Custom matchers (`toBeOk`, `toBeErr`, etc.)
-   - Event validation with `toContainEqual`
-   - Multi-contract integration scenarios
-   - Fuzz testing for vault invariants
+- `initSimnet()` usage across 36 test files
+- Predefined address solutions for distinct principals
+- Structured error code validation (u100+ range)
+- 124/124 tests passing (100% success rate)
+
+1.2. **Advanced Testing Features**
+
+- Custom matchers (`toBeOk`, `toBeErr`, etc.)
+- Event validation with `toContainEqual`
+- Multi-contract integration scenarios
+- Fuzz testing for vault invariants
 
 ### ⚠️ **PARTIAL IMPLEMENTATION**
 
 1. **Coverage Reporting**
+
    ```typescript
    // Current: Basic coverage
    // Gap: Detailed metrics and reports
@@ -78,6 +90,7 @@ Comprehensive testing framework leveraging Clarinet SDK 3.5.0 advanced capabilit
    ```
 
 2. **Cost Analysis**
+
    ```typescript
    // Current: Manual gas estimation
    // Gap: Automated cost tracking
@@ -87,6 +100,7 @@ Comprehensive testing framework leveraging Clarinet SDK 3.5.0 advanced capabilit
 ### 🔄 **PLANNED ENHANCEMENTS**
 
 1. **Advanced SDK 3.5.0 Features**
+
    ```typescript
    // Custom boot contracts
    includeBootContracts: true,
@@ -98,6 +112,7 @@ Comprehensive testing framework leveraging Clarinet SDK 3.5.0 advanced capabilit
    ```
 
 2. **Mainnet Simulation**
+
    ```typescript
    // Fork mainnet state for testing
    const simnet = await initSimnet({
@@ -109,7 +124,8 @@ Comprehensive testing framework leveraging Clarinet SDK 3.5.0 advanced capabilit
 ## Testing Architecture
 
 ### **Test Suite Organization**
-```
+
+```text
 tests/
 ├── unit/           # Individual contract functions
 ├── integration/    # Multi-contract scenarios  
@@ -131,6 +147,7 @@ tests/
 ## Advanced SDK 3.5.0 Capabilities
 
 ### **1. Coverage Analysis**
+
 ```typescript
 // Enhanced coverage configuration
 global.options = {
@@ -147,6 +164,7 @@ global.options = {
 ```
 
 ### **2. Cost Optimization**
+
 ```typescript
 // Gas cost tracking
 costs: true,
@@ -158,6 +176,7 @@ costThreshold: {
 ```
 
 ### **3. Interface Analysis**
+
 ```typescript
 // Contract interface validation
 const interfaces = simnet.getContractsInterfaces();
@@ -169,6 +188,7 @@ expect(vaultInterface.functions.deposit.args).toHaveLength(1);
 ```
 
 ### **4. Event Pattern Matching**
+
 ```typescript
 // Advanced event validation
 expect(events).toContainEqual({
@@ -194,6 +214,7 @@ expect(events).toContainEqual({
 ## Immediate Action Items
 
 ### **Priority 1: Enable Advanced Features**
+
 ```typescript
 // Update global-vitest.setup.ts
 global.options = {
@@ -211,6 +232,7 @@ global.options = {
 ```
 
 ### **Priority 2: Add Performance Tests**
+
 ```typescript
 // Create tests/performance/gas-optimization.spec.ts
 describe('Gas Optimization', () => {
@@ -227,6 +249,7 @@ describe('Gas Optimization', () => {
 ```
 
 ### **Priority 3: Integration Test Enhancement**
+
 ```typescript
 // Create tests/integration/full-system.spec.ts
 describe('Full System Integration', () => {
@@ -240,16 +263,19 @@ describe('Full System Integration', () => {
 ## Migration Plan
 
 ### **Phase 1: Enable Advanced Features (Week 1)**
+
 1. Update `global-vitest.setup.ts` with coverage and costs
 2. Add performance test directory structure
 3. Enable detailed reporting
 
 ### **Phase 2: Enhanced Testing (Week 2)**
+
 1. Add mainnet simulation capabilities
 2. Implement custom boot contracts
 3. Create comprehensive integration tests
 
 ### **Phase 3: Production Optimization (Week 3)**
+
 1. Gas optimization based on cost reports
 2. Coverage gap elimination  
 3. Performance baseline establishment
