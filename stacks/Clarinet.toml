@@ -4,13 +4,10 @@ description = "AutoVault DeFi protocol - clarinet config"
 requirements = []
 
 [accounts]
-deployer = { mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art", balance = 10_000_000_000 }
-# Distinct mnemonic ensures unique principal for wallet_1 (removes aliasing with deployer)
-wallet_1 = { mnemonic = "legal winner thank year wave sausage worth useful legal winner thank yellow", balance = 5_000_000_000 }
-# Keep derivation-based account for backward compatibility tests (legacy assumptions)
-wallet_2 = { mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art", balance = 5_000_000_000, derivation = 2 }
-# Additional distinct account for multi-oracle / applicant scenarios
-wallet_3 = { mnemonic = "letter advice cage absurd amount doctor acoustic avoid letter advice cage above", balance = 5_000_000_000 }
+deployer = { mnemonic = "twice kind fence tip hidden tilt action fragile skin nothing glory cousin green tomorrow spring wrist shed math olympic multiply hip blue scout claw", balance = 100_000_000_000_000 }
+wallet_1 = { mnemonic = "sell invite acquire kitten bamboo drastic jelly vivid peace spawn twice guilt pave pen trash pretty park cube fragile unaware remain midnight betray rebuild", balance = 100_000_000_000_000 }
+wallet_2 = { mnemonic = "hold excess usual excess ring elephant install account glad dry fragile donkey gaze humble truck breeze nation gasp vacuum limb head keep delay hospital", balance = 100_000_000_000_000 }
+wallet_3 = { mnemonic = "cycle puppy glare enroll cost improve round trend wrist mushroom scorpion tower claim oppose clever elephant dinosaur eight problem before frozen dune wagon high", balance = 100_000_000_000_000 }
 
 [network]
 api_endpoint = "http://localhost:3999" # clarinet devnet default
