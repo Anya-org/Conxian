@@ -1,10 +1,8 @@
-## Security Layer PRD (v1.2)
+# Security Layer PRD (v1.2)
 
 **Status**: **STABLE** - Production Ready with SDK 3.5.0 compliance  
 **Last Updated**: 2025-08-18  
 **Next Review**: 2025-09-01
-
- 
 
 ## Scope
 

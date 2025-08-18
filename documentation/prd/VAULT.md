@@ -1,4 +1,4 @@
-## VAULT PRD (v1.1)
+# VAULT PRD (v1.1)
 
 **Reference**: AIP-5 (Precision), Architecture doc, `vault.clar` implementation, SDK 3.5.0 testing compliance
 

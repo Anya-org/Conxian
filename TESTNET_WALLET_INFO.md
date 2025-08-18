@@ -18,7 +18,7 @@
 ```bash
 export DEPLOYER_PRIVKEY=9d7465d4094ce95ab0a880faf59aa8479606b9397c0aecfe751778b454ed7f3c01
 export NETWORK=testnet
-```
+```text
 
 ### Backup Information
 
@@ -38,8 +38,8 @@ With the funded wallet configured, you can now proceed with testnet deployment:
 cd /workspaces/AutoVault/stacks
 export DEPLOYER_PRIVKEY=9d7465d4094ce95ab0a880faf59aa8479606b9397c0aecfe751778b454ed7f3c01
 export NETWORK=testnet
-npx clarinet deployment apply --testnet
-```
+clarinet deployment apply --testnet
+```text
 
 ## 📊 Balance Verification
 

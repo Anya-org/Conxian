@@ -1,10 +1,8 @@
-## Treasury & Reserve PRD (v1.1)
+# Treasury & Reserve PRD (v1.1)
 
 **Status**: **STABLE** - Production Ready with SDK 3.5.0 compliance  
 **Last Updated**: 2025-08-18  
 **Next Review**: 2025-09-15
-
- 
 
 ## Summary
 
@@ -28,6 +26,7 @@ Manages protocol-controlled value (fees, buybacks) with multi-sig & DAO oversigh
 | Spend inflation | DAO cap thresholds, transparency metrics |
 
 **Changelog**:
+
 - v1.1 (2025-08-18): SDK 3.5.0 compliance validation, production readiness confirmation
 - v1.0 (2025-08-17): Initial stable implementation
 
