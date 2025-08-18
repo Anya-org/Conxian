@@ -76,6 +76,12 @@
 (define-data-var withdraw-fee-step-bps uint u5) ;; step change (0.05%) when adjusting
 (define-data-var auto-economics-enabled bool false) ;; master switch for extended autonomics
 
+;; Performance benchmark configuration
+(define-data-var performance-benchmark-apy uint u500) ;; 5% APY benchmark for performance fees
+(define-data-var benchmark-update-interval uint u144) ;; 24 hours in blocks
+(define-data-var last-benchmark-update uint u0)
+(define-data-var competitive-yield-tracking bool false) ;; Track competitor yields for optimization
+
 (define-read-only (get-balance (who principal))
   (let (
       (user-shares (default-to u0 (get amount (map-get? shares { user: who }))))
@@ -238,6 +244,25 @@
   {
     deposit-step: (var-get deposit-fee-step-bps),
     withdraw-step: (var-get withdraw-fee-step-bps),
+  }
+)
+
+;; Performance benchmark and competitive yield tracking getters
+(define-read-only (get-performance-benchmark)
+  {
+    apy-bps: (var-get performance-benchmark-apy),
+    last-update: (var-get last-benchmark-update),
+    update-interval: (var-get benchmark-update-interval),
+    competitive-tracking: (var-get competitive-yield-tracking)
+  }
+)
+
+(define-read-only (get-autonomous-economics-status)
+  {
+    auto-fees-enabled: (var-get auto-fees-enabled),
+    auto-economics-enabled: (var-get auto-economics-enabled),
+    competitive-yield-tracking: (var-get competitive-yield-tracking),
+    performance-benchmark: (var-get performance-benchmark-apy)
   }
 )
 
@@ -474,6 +499,70 @@
     (var-set auto-economics-enabled enabled)
     (print { event: "set-auto-economics-enabled", enabled: enabled })
     (ok true)
+  )
+)
+
+;; Set performance benchmark APY for competitive yield optimization
+(define-public (set-performance-benchmark (apy-bps uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) (err u100))
+    (asserts! (<= apy-bps u2000) (err u108)) ;; Max 20% APY benchmark
+    (var-set performance-benchmark-apy apy-bps)
+    (var-set last-benchmark-update block-height)
+    (print { 
+      event: "performance-benchmark-updated", 
+      apy-bps: apy-bps,
+      timestamp: block-height 
+    })
+    (ok true)
+  )
+)
+
+;; Enable competitive yield tracking for cross-protocol optimization
+(define-public (set-competitive-yield-tracking (enabled bool))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) (err u100))
+    (var-set competitive-yield-tracking enabled)
+    (print { 
+      event: "competitive-yield-tracking", 
+      enabled: enabled,
+      timestamp: block-height 
+    })
+    (ok true)
+  )
+)
+
+;; Automated yield benchmark adjustment based on market conditions
+(define-public (adjust-benchmark-dynamically)
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) (err u100))
+    (asserts! (var-get competitive-yield-tracking) (err u109))
+    
+    (let ((current-block block-height)
+          (last-update (var-get last-benchmark-update))
+          (update-interval (var-get benchmark-update-interval)))
+      
+      ;; Only update benchmark every 24 hours
+      (asserts! (>= (- current-block last-update) update-interval) (err u110))
+      
+      ;; Simulate market-based benchmark adjustment
+      ;; Production would integrate with external yield aggregators
+      (let ((market-avg-yield u600) ;; 6% market average (simulated)
+            (adjustment-factor u50)) ;; 0.5% adjustment buffer
+        
+        (var-set performance-benchmark-apy (+ market-avg-yield adjustment-factor))
+        (var-set last-benchmark-update current-block)
+        
+        (print {
+          event: "benchmark-auto-adjusted",
+          old-benchmark: (var-get performance-benchmark-apy),
+          new-benchmark: (+ market-avg-yield adjustment-factor),
+          market-yield: market-avg-yield,
+          timestamp: current-block
+        })
+        (ok true)
+      )
+    )
   )
 )
 
@@ -787,6 +876,20 @@
     (asserts! (is-eq (var-get auto-economics-enabled) true) (err u110))
     ;; First adjust withdraw fees via existing utilization controller (if enabled)
     (unwrap! (update-fees-based-on-utilization) (err u111))
+    
+    ;; Update performance benchmark if competitive tracking enabled
+    (if (var-get competitive-yield-tracking)
+      (let ((current-block block-height)
+            (last-update (var-get last-benchmark-update))
+            (update-interval (var-get benchmark-update-interval)))
+        (if (>= (- current-block last-update) update-interval)
+          (unwrap! (adjust-benchmark-dynamically) (err u112))
+          true
+        )
+      )
+      true
+    )
+    
     ;; Then adjust deposit fee based on reserve ratio vs target band
     (let (
         (ratio (unwrap! (ok (get-reserve-ratio)) (err u0)))
