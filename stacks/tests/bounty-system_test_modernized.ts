@@ -10,8 +10,8 @@ describe("Bounty System", () => {
     accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
     wallet1 = accounts.get('wallet_1')!;
-  wallet2 = accounts.get('wallet_2') || deployer;
-  wallet3 = accounts.get('wallet_3') || deployer;
+  wallet2 = accounts.get('wallet_2')!;
+  wallet3 = accounts.get('wallet_3')!;
   });
 
   it("should create and manage bounties", () => {
@@ -48,16 +48,8 @@ describe("Bounty System", () => {
     ], wallet1);
 
     // Applicant selection with fallback if aliasing persists
-    const pool = [wallet2, wallet3, deployer];
-    const applicant = pool.find(a => a.address !== wallet1.address);
-    if (!applicant) {
-      const selfApply = simnet.callPublicFn('bounty-system','apply-for-bounty', [
-        Cl.uint(1), Cl.stringUtf8('Self attempt'), Cl.uint(500)
-      ], wallet1);
-      expect(selfApply.result.type).toBe('err');
-      if (selfApply.result.type === 'err') expect(selfApply.result.value.value).toBe(106n);
-      return;
-    }
+  const applicant = wallet2.address !== wallet1.address ? wallet2 : wallet3;
+  expect(applicant.address).not.toBe(wallet1.address);
 
     // Apply for bounty
     const applyBounty = simnet.callPublicFn('bounty-system', 'apply-for-bounty', [
@@ -92,16 +84,9 @@ describe("Bounty System", () => {
         Cl.uint(1),
         Cl.principal(wallet2)
     ], wallet2); // Wrong sender - only creator can assign
-    expect(['err','ok']).toContain(unauthorizedAssign.result.type);
-    if (unauthorizedAssign.result.type === 'ok') {
-      const bounty = simnet.callReadOnlyFn('bounty-system','get-bounty',[Cl.uint(1)], wallet1);
-      expect(bounty.result.type).toBe('some');
-    } else if (unauthorizedAssign.result.type === 'err') {
-      // Accept either generic unauthorized or specific code depending on implementation
-      // If code present, must be 100n
-      if (unauthorizedAssign.result.value?.value) {
-        expect([100n,108n]).toContain(unauthorizedAssign.result.value.value);
-      }
+    expect(unauthorizedAssign.result.type).toBe('err');
+    if (unauthorizedAssign.result.type === 'err') {
+      expect(unauthorizedAssign.result.value.value).toBe(100n);
     }
   });
 });

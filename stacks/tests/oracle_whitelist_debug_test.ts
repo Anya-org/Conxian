@@ -105,5 +105,9 @@ describe("oracle-aggregator whitelist debug", () => {
       wallet1
     );
     console.log("Wallet1 submit result:", JSON.stringify(wallet1SubmitResult.result, null, 2));
+    expect(wallet1SubmitResult.result.type).toBe('err');
+    if (wallet1SubmitResult.result.type === 'err') {
+      expect(wallet1SubmitResult.result.value.value).toBe(102n);
+    }
   });
 });

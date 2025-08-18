@@ -6,8 +6,12 @@ clarinet_version = "3.5.0"
 
 [accounts]
 deployer = { mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art", balance = 10_000_000_000 }
-wallet_1 = { mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art", balance = 5_000_000_000, derivation = 1 }
+# Distinct mnemonic ensures unique principal for wallet_1 (removes aliasing with deployer)
+wallet_1 = { mnemonic = "legal winner thank year wave sausage worth useful legal winner thank yellow", balance = 5_000_000_000 }
+# Keep derivation-based account for backward compatibility tests (legacy assumptions)
 wallet_2 = { mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art", balance = 5_000_000_000, derivation = 2 }
+# Additional distinct account for multi-oracle / applicant scenarios
+wallet_3 = { mnemonic = "letter advice cage absurd amount doctor acoustic avoid letter advice cage above", balance = 5_000_000_000 }
 
 [network]
 api_endpoint = "http://localhost:3999" # clarinet devnet default

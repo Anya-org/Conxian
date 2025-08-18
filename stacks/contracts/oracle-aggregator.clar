@@ -22,6 +22,8 @@
 (define-constant ERR_PAIR_NOT_FOUND (err u103))
 (define-constant ERR_ALREADY_ORACLE (err u104))
 (define-constant ERR_MIN_SOURCES (err u105))
+(define-constant ERR_STALE (err u106))
+(define-constant ERR_DEVIATION (err u107))
 
 ;; Pair registration: list of oracle principals & min sources required
 (define-map pairs { base: principal, quote: principal }
@@ -40,6 +42,20 @@
 
 ;; Admin (mutable so governance/timelock can assume control)
 (define-data-var admin principal DEPLOYER)
+
+;; Configuration for robustness
+(define-data-var max-stale uint u10)          ;; maximum blocks old a submission can be
+(define-data-var max-deviation-bps uint u2000) ;; 2000 = 20%; max allowed deviation vs last aggregate
+
+(define-public (set-params (new-max-stale uint) (new-max-dev-bps uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_NOT_AUTHORIZED)
+    (asserts! (> new-max-stale u0) ERR_NOT_AUTHORIZED)
+    (asserts! (<= new-max-dev-bps u5000) ERR_NOT_AUTHORIZED) ;; cap at 50%
+    (var-set max-stale new-max-stale)
+    (var-set max-deviation-bps new-max-dev-bps)
+    (print { event: "oa-set-params", max-stale: new-max-stale, max-dev-bps: new-max-dev-bps })
+    (ok true)))
 
 ;; Helper: check caller authorized (deployer placeholder). In future replace
 ;; with governance / timelock principal.
@@ -180,39 +196,50 @@
               (stat (map-get? stats { base: base, quote: quote })))
           ;; Enforce whitelist - CRITICAL SECURITY CHECK
           (let ((auth (map-get? oracle-whitelist { base: base, quote: quote, oracle: tx-sender })))
-            (asserts! (and (is-some auth) (get enabled (unwrap! auth ERR_NOT_ORACLE))) ERR_NOT_ORACLE))
-          (let ((curr-sum (if (is-some stat) (get sum (unwrap! stat (err u998))) u0))
-                (curr-sub (if (is-some stat) (get submitted (unwrap! stat (err u998))) u0)))
-            (if (is-some existing)
-                ;; Update existing submission
-                (let ((prev (unwrap! existing (err u997))))
-                  (map-set submissions { base: base, quote: quote, oracle: tx-sender } { price: price, height: block-height })
-                  (let ((new-sum (+ (- curr-sum (get price prev)) price)))
-                    ;; Update stats BEFORE calculating median to avoid race condition
-                    (map-set stats { base: base, quote: quote } { sum: new-sum, submitted: curr-sub })
-                    (let ((median-price (update-median base quote price tx-sender)))
-                      (if (>= curr-sub min-src)
-                          (begin
-                            (map-set prices { base: base, quote: quote } { price: median-price, height: block-height, sources: curr-sub })
-                            (record-history base quote median-price)
-                            (print { event: "price-aggregate", code: u3001, base: base, quote: quote, price: median-price, sources: curr-sub, height: block-height })
-                            (ok { aggregated: true, sources: curr-sub, price: median-price }))
-                          (ok { aggregated: false, sources: curr-sub, price: price })))))
-                ;; New submission
-                (begin
-                  (map-set submissions { base: base, quote: quote, oracle: tx-sender } { price: price, height: block-height })
-                  (let ((new-sub (+ curr-sub u1)) 
-                        (new-sum (+ curr-sum price)))
-                    ;; Update stats BEFORE calculating median to avoid race condition
-                    (map-set stats { base: base, quote: quote } { sum: new-sum, submitted: new-sub })
-                    (let ((median-price (update-median base quote price tx-sender)))
-                      (if (>= new-sub min-src)
-                          (begin
-                            (map-set prices { base: base, quote: quote } { price: median-price, height: block-height, sources: new-sub })
-                            (record-history base quote median-price)
-                            (print { event: "price-aggregate", code: u3001, base: base, quote: quote, price: median-price, sources: new-sub, height: block-height })
-                            (ok { aggregated: true, sources: new-sub, price: median-price }))
-                          (ok { aggregated: false, sources: new-sub, price: price }))))))))
+            (asserts! (and (is-some auth) (get enabled (unwrap! auth ERR_NOT_ORACLE))) ERR_NOT_ORACLE)
+            (let ((curr-sum (if (is-some stat) (get sum (unwrap! stat (err u998))) u0))
+                  (curr-sub (if (is-some stat) (get submitted (unwrap! stat (err u998))) u0))
+                  (prev-agg (map-get? prices { base: base, quote: quote }))
+                  (max-stale (var-get max-stale))
+                  (max-dev (var-get max-deviation-bps)))
+              ;; Deviation check if an aggregate exists
+              (begin
+                (if (is-some prev-agg)
+                  (let ((prev-price (get price (unwrap-panic prev-agg))))
+                    (let ((diff (if (> price prev-price) (- price prev-price) (- prev-price price)))
+                          (limit (/ (* prev-price max-dev) u10000)))
+                      (asserts! (<= diff limit) ERR_DEVIATION)))
+                  true)
+                (if (is-some existing)
+                    ;; Update existing submission
+                    (let ((prev (unwrap! existing (err u997))))
+                      (map-set submissions { base: base, quote: quote, oracle: tx-sender } { price: price, height: block-height })
+                      (let ((new-sum (+ (- curr-sum (get price prev)) price)))
+                        ;; Update stats BEFORE calculating median to avoid race condition
+                        (map-set stats { base: base, quote: quote } { sum: new-sum, submitted: curr-sub })
+                        (let ((median-price (update-median base quote price tx-sender)))
+                          (if (>= curr-sub min-src)
+                              (begin
+                                (map-set prices { base: base, quote: quote } { price: median-price, height: block-height, sources: curr-sub })
+                                (record-history base quote median-price)
+                                (print { event: "price-aggregate", code: u3001, base: base, quote: quote, price: median-price, sources: curr-sub, height: block-height })
+                                (ok { aggregated: true, sources: curr-sub, price: median-price }))
+                              (ok { aggregated: false, sources: curr-sub, price: price })))))
+                    ;; New submission
+                    (begin
+                      (map-set submissions { base: base, quote: quote, oracle: tx-sender } { price: price, height: block-height })
+                      (let ((new-sub (+ curr-sub u1)) 
+                            (new-sum (+ curr-sum price)))
+                        ;; Update stats BEFORE calculating median to avoid race condition
+                        (map-set stats { base: base, quote: quote } { sum: new-sum, submitted: new-sub })
+                        (let ((median-price (update-median base quote price tx-sender)))
+                          (if (>= new-sub min-src)
+                              (begin
+                                (map-set prices { base: base, quote: quote } { price: median-price, height: block-height, sources: new-sub })
+                                (record-history base quote median-price)
+                                (print { event: "price-aggregate", code: u3001, base: base, quote: quote, price: median-price, sources: new-sub, height: block-height })
+                                (ok { aggregated: true, sources: new-sub, price: median-price }))
+                              (ok { aggregated: false, sources: new-sub, price: price })))))))))
       (err u404))))
 
 ;; Read-only latest price
@@ -222,6 +249,9 @@
         (let ((v (unwrap! p (err u997))))
           (ok { price: (get price v), height: (get height v), sources: (get sources v) }))
         (err u404))))
+
+(define-read-only (get-params)
+  { max-stale: (var-get max-stale), max-deviation-bps: (var-get max-deviation-bps) })
 
 ;; Read-only median calculation for current sorted prices
 (define-read-only (get-median (base principal) (quote principal))
@@ -236,4 +266,4 @@
   (let ((auth (map-get? oracle-whitelist { base: base, quote: quote, oracle: oracle })))
     (match auth
       present (get enabled present)
-      false)))
+      false))

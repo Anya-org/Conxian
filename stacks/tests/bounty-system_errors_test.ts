@@ -20,7 +20,7 @@ describe('Bounty System (SDK) - Error Paths', () => {
     accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
     wallet1 = accounts.get('wallet_1')!; // creator / applicant
-  wallet2 = accounts.get('wallet_2') || deployer;
+  wallet2 = accounts.get('wallet_2')!;
   });
 
   it('enforces cannot apply to own bounty (u106)', () => {
@@ -56,15 +56,10 @@ describe('Bounty System (SDK) - Error Paths', () => {
       Cl.uint(120)
     ], wallet1);
 
-    const distinct = wallet2.address !== wallet1.address;
+    expect(wallet2.address).not.toBe(wallet1.address);
     const first = simnet.callPublicFn('bounty-system','apply-for-bounty', [
       Cl.uint(1), Cl.stringUtf8('First proposal'), Cl.uint(75)
-    ], distinct ? wallet2 : wallet1);
-    if (!distinct) {
-      expect(first.result.type).toBe('err');
-      if (first.result.type === 'err') expect(first.result.value.value).toBe(106n);
-      return;
-    }
+    ], wallet2);
     expect(first.result.type).toBe('ok');
 
     const second = simnet.callPublicFn('bounty-system','apply-for-bounty', [

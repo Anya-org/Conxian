@@ -18,22 +18,20 @@ describe("Vault Shares (SDK) - PRD VAULT-SHARES alignment", () => {
   it("PRD VAULT-SHARES-EQUAL: two users deposit equal amounts get equal shares and balances", async () => {
     const vaultContract = `${deployer}.vault`;
 
-    if (deployer === wallet1) {
-      // Single-user fallback path
-      let response = simnet.callPublicFn("mock-ft", "mint", [Cl.principal(deployer), Cl.uint(2000)], deployer);
-      expect(response.result.type).toBe('ok');
-      response = simnet.callPublicFn("mock-ft", "approve", [Cl.principal(vaultContract), Cl.uint(2000)], deployer);
-      expect(response.result.type).toBe('ok');
-      const d1 = simnet.callPublicFn("vault","deposit",[Cl.uint(1000)], deployer);
-      const d2 = simnet.callPublicFn("vault","deposit",[Cl.uint(1000)], deployer);
-      expect(d1.result.type).toBe('ok');
-      expect(d2.result.type).toBe('ok');
-      const credited = d1.result.value.value + d2.result.value.value;
-      const bal = simnet.callReadOnlyFn("vault","get-balance",[Cl.principal(deployer)], deployer);
-      expect(bal.result.value).toBe(credited);
-      return;
-    }
-    // Distinct users scenario (unreachable with current identical accounts)
+  // Distinct users scenario
+  let r1 = simnet.callPublicFn("mock-ft", "mint", [Cl.principal(deployer), Cl.uint(1000)], deployer);
+  expect(r1.result.type).toBe('ok');
+  r1 = simnet.callPublicFn("mock-ft", "approve", [Cl.principal(vaultContract), Cl.uint(1000)], deployer);
+  expect(r1.result.type).toBe('ok');
+  let r2 = simnet.callPublicFn("mock-ft", "mint", [Cl.principal(wallet1), Cl.uint(1000)], deployer);
+  expect(r2.result.type).toBe('ok');
+  r2 = simnet.callPublicFn("mock-ft", "approve", [Cl.principal(vaultContract), Cl.uint(1000)], wallet1);
+  expect(r2.result.type).toBe('ok');
+  const dep1 = simnet.callPublicFn("vault", "deposit", [Cl.uint(1000)], deployer);
+  const dep2 = simnet.callPublicFn("vault", "deposit", [Cl.uint(1000)], wallet1);
+  expect(dep1.result.type).toBe('ok');
+  expect(dep2.result.type).toBe('ok');
+  expect(dep1.result.value.value).toBe(dep2.result.value.value);
   });
 
   it("PRD VAULT-SHARES-ROUNDING: withdraw rounding uses ceil on shares burn and preserves NAV", async () => {
