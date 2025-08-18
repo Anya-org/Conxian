@@ -79,7 +79,7 @@ Comprehensive testing framework leveraging Clarinet SDK 3.5.0 advanced capabilit
 - Multi-contract integration scenarios
 - Fuzz testing for vault invariants
 
-### ⚠️ **PARTIAL IMPLEMENTATION**
+## ⚠️ **PARTIAL IMPLEMENTATION**
 
 1. **Coverage Reporting**
 
