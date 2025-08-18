@@ -7,12 +7,14 @@ describe("oracle-aggregator", () => {
   let accounts: Map<string, any>;
   let deployer: any;
   let wallet1: any;
+  let wallet2: any;
 
   beforeEach(async () => {
     simnet = await initSimnet();
     accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
     wallet1 = accounts.get("wallet_1")!;
+    wallet2 = accounts.get("wallet_2") || "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"; // fallback address
   });
 
   it("registers trading pair with ACL whitelist", async () => {
@@ -99,7 +101,7 @@ describe("oracle-aggregator", () => {
     const base = `${deployer}.token-a`;
     const quote = `${deployer}.token-b`;
 
-    // Register pair but don't whitelist deployer (we'll use deployer as non-whitelisted in this test)
+    // Register pair with only wallet1 as authorized oracle
     simnet.callPublicFn(
       "oracle-aggregator",
       "register-pair",
@@ -112,7 +114,7 @@ describe("oracle-aggregator", () => {
       deployer
     );
 
-    // Add only wallet1 to whitelist, leave deployer out
+    // Add only wallet1 to whitelist
     simnet.callPublicFn(
       "oracle-aggregator",
       "add-oracle",
@@ -124,7 +126,7 @@ describe("oracle-aggregator", () => {
       deployer
     );
 
-    // Try to submit price from deployer (not whitelisted for this pair)
+    // Try to submit price from wallet2 (not whitelisted for this pair)
     const { result } = simnet.callPublicFn(
       "oracle-aggregator",
       "submit-price",
@@ -133,7 +135,7 @@ describe("oracle-aggregator", () => {
         Cl.principal(quote),
         Cl.uint(1000)
       ],
-      deployer // deployer is not whitelisted for this pair
+      wallet2 // wallet2 is not whitelisted for this pair
     );
 
     expect(result).toEqual({ type: 'err', value: { type: 'uint', value: 102n } }); // err-not-oracle
