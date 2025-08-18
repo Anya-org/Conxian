@@ -134,7 +134,7 @@
     "avlp-token"
   ],
   "manual_testing": {
-    "clarinet_console": "npx clarinet console --testnet",
+    "clarinet_console": "clarinet console --testnet",
     "verification_commands": [
       "(contract-call? .vault get-vault-data)",
       "(contract-call? .avg-token get-total-supply)",
