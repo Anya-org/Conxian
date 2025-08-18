@@ -27,7 +27,7 @@ describe('AutoVault Autonomous Economics Features', () => {
         deployer
       );
       console.log('Auto fees status:', statusResult.result);
-      expect(statusResult.result).toEqual(false); // Default state
+      expect(statusResult.result).toEqual({ type: 'false' }); // Default state
       
       // Test admin functions exist (will require proper authorization in production)
       const enableResult = simnet.callPublicFn(
@@ -157,7 +157,7 @@ describe('AutoVault Autonomous Economics Features', () => {
         [],
         deployer
       );
-      expect(autoFeesReady.result).toEqual(false); // Default false state
+      expect(autoFeesReady.result).toEqual({ type: 'false' }); // Default false state
 
       // 2. Performance tracking - check revenue stats available
       const performanceReady = simnet.callReadOnlyFn(
