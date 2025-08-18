@@ -6,14 +6,14 @@
 (define-public (force-activate (id uint))
   (begin
     (asserts! (is-eq tx-sender ALLOWED) ERR_AUTH)
-    (contract-call? GOVERNANCE get-proposal id)))
+    (ok (contract-call? .dao-governance get-proposal id))))
 
 (define-public (force-succeed (id uint))
   (begin
     (asserts! (is-eq tx-sender ALLOWED) ERR_AUTH)
-    (contract-call? GOVERNANCE get-proposal id)))
+    (ok (contract-call? .dao-governance get-proposal id))))
 
 (define-public (force-queue (id uint))
   (begin
     (asserts! (is-eq tx-sender ALLOWED) ERR_AUTH)
-    (contract-call? GOVERNANCE get-proposal id)))
+    (ok (contract-call? .dao-governance get-proposal id))))

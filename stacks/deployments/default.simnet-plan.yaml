@@ -91,6 +91,11 @@ plan:
             path: contracts/circuit-breaker.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: circuit-breaker-simple
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/circuit-breaker-simple.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: gov-token
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/gov-token.clar
@@ -123,7 +128,7 @@ plan:
         - emulated-contract-publish:
             contract-name: pool-trait
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/pool-trait.clar
+            path: contracts/traits/pool-trait.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: dex-pool
@@ -136,9 +141,27 @@ plan:
             path: contracts/dex-router.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: enhanced-governance
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/enhanced-governance.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: enhanced-yield-strategy
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/enhanced-yield-strategy.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: enterprise-monitoring
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/enterprise-monitoring.clar
+            clarity-version: 2
+      epoch: "2.4"
+    - id: 1
+      transactions:
+        - emulated-contract-publish:
+            contract-name: governance-test-helper
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/governance-test-helper.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: math-lib
@@ -155,9 +178,21 @@ plan:
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/multi-hop-router.clar
             clarity-version: 2
-      epoch: "2.4"
-    - id: 1
-      transactions:
+        - emulated-contract-publish:
+            contract-name: multi-hop-router-v2
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/multi-hop-router-v2.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: ownable-trait
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/traits/ownable-trait.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: pool-factory
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/pool-factory.clar
+            clarity-version: 2
         - emulated-contract-publish:
             contract-name: registry
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
@@ -167,6 +202,11 @@ plan:
             contract-name: stable-pool
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/stable-pool.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: stable-pool-clean
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/stable-pool-clean.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: state-anchor
@@ -182,6 +222,11 @@ plan:
             contract-name: treasury
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/treasury.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: twap-oracle-v2
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/twap-oracle-v2.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: vault-trait

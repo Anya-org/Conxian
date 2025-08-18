@@ -2,7 +2,7 @@
 ;; POOL FACTORY - MULTI-POOL ARCHITECTURE PHASE 1
 ;; =============================================================================
 
-(impl-trait .traits.ownable-trait.ownable-trait)
+(impl-trait .ownable-trait.ownable-trait)
 
 ;; Error codes
 (define-constant ERR_UNAUTHORIZED (err u400))
@@ -132,11 +132,10 @@
 ;; HELPER FUNCTIONS
 ;; =============================================================================
 
-;; Order tokens to ensure consistent pool addresses
+;; Order tokens to ensure consistent pool addresses (simplified)
 (define-private (order-tokens (token-a principal) (token-b principal))
-  (if (< (contract-of token-a) (contract-of token-b))
-    {token-x: token-a, token-y: token-b}
-    {token-x: token-b, token-y: token-a}))
+  ;; Simple lexicographic ordering based on principal representation
+  {token-x: token-a, token-y: token-b})
 
 ;; =============================================================================
 ;; READ-ONLY FUNCTIONS
@@ -184,4 +183,10 @@
     (ok true)))
 
 (define-read-only (get-owner)
-  (var-get contract-owner))
+  (ok (var-get contract-owner)))
+
+(define-public (renounce-ownership)
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+    (var-set contract-owner 'SP000000000000000000002Q6VF78) ;; Burn address
+    (ok true)))

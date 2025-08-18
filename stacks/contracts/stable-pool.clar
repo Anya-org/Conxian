@@ -2,13 +2,12 @@
 ;; Stable Pool Implementation (Curve-style AMM)
 ;; Optimized for low-slippage trading of correlated assets
 
-(impl-trait .pool-trait.pool-trait)
 ;; =============================================================================
 ;; STABLE POOL IMPLEMENTATION - CURVE STABLESWAP STYLE
 ;; =============================================================================
 
-(impl-trait .traits.pool-trait.pool-trait)
-(use-trait ft-trait .traits.sip-010-trait.sip-010-trait)
+(impl-trait .pool-trait.pool-trait)
+(use-trait ft-trait .sip-010-trait.sip-010-trait)
 
 ;; Error codes
 (define-constant ERR_INVALID_POOL_ID (err u500))
@@ -18,6 +17,7 @@
 (define-constant ERR_POOL_PAUSED (err u504))
 (define-constant ERR_UNAUTHORIZED (err u505))
 (define-constant ERR_AMPLIFICATION_OUT_OF_RANGE (err u506))
+(define-constant ERR_EXPIRED (err u507))
 
 ;; Constants
 (define-constant ONE_8 u100000000) ;; 1.0 in 8-decimal fixed point
@@ -33,7 +33,7 @@
 (define-data-var amplification uint u100) ;; Default A = 100
 (define-data-var swap-fee uint u30) ;; 0.3% = 30 bps
 (define-data-var pool-paused bool false)
-(define-data-var pool-admin principal tx-sender)
+(define-data-var admin principal tx-sender)
 
 ;; Pool tokens
 (define-data-var token-x principal .mock-ft)
@@ -112,10 +112,10 @@
         (ok { amount-out: amount-out })))))
 
 ;; Read-only functions for trait compliance
-(define-public (get-reserves)
+(define-read-only (get-reserves)
   (ok (tuple (rx (var-get reserve-x)) (ry (var-get reserve-y)))))
 
-(define-public (get-fee-info)
+(define-read-only (get-fee-info)
   (ok (tuple (lp-fee-bps (var-get base-fee-bps)) (protocol-fee-bps u0))))
 
 (define-read-only (get-price)

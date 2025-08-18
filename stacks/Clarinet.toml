@@ -82,7 +82,6 @@ path = "contracts/dao-governance.clar"
 clarity_version = 2
 epoch = "2.4"
 
-
 [contracts.dao-automation]
 path = "contracts/dao-automation.clar"
 clarity_version = 2
@@ -109,7 +108,7 @@ clarity_version = 2
 epoch = "2.4"
 
 [contracts.pool-trait]
-path = "contracts/pool-trait.clar"
+path = "contracts/traits/pool-trait.clar"
 clarity_version = 2
 epoch = "2.4"
 
@@ -153,13 +152,23 @@ path = "contracts/stable-pool.clar"
 clarity_version = 2
 epoch = "2.4"
 
+[contracts.stable-pool-clean]
+path = "contracts/stable-pool-clean.clar"
+clarity_version = 2
+epoch = "2.4"
+
 [contracts.weighted-pool]
 path = "contracts/weighted-pool.clar"
 clarity_version = 2
 epoch = "2.4"
 
-[contracts.circuit-breaker]
-path = "contracts/circuit-breaker.clar"
+[contracts.ownable-trait]
+path = "contracts/traits/ownable-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.governance-test-helper]
+path = "contracts/governance-test-helper.clar"
 clarity_version = 2
 epoch = "2.4"
 
@@ -168,8 +177,44 @@ path = "contracts/oracle-aggregator.clar"
 clarity_version = 2
 epoch = "2.4"
 
+[contracts.circuit-breaker]
+path = "contracts/circuit-breaker.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.circuit-breaker-simple]
+path = "contracts/circuit-breaker-simple.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.enhanced-governance]
+path = "contracts/enhanced-governance.clar"
+clarity_version = 2
+epoch = "2.4"
+
 [contracts.state-anchor]
 path = "contracts/state-anchor.clar"
+clarity_version = 2
+epoch = "2.4"
+
+# NEW PHASE 1 & 2 IMPLEMENTATIONS
+[contracts.enhanced-yield-strategy]
+path = "contracts/enhanced-yield-strategy.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.pool-factory]
+path = "contracts/pool-factory.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.multi-hop-router-v2]
+path = "contracts/multi-hop-router-v2.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.twap-oracle-v2]
+path = "contracts/twap-oracle-v2.clar"
 clarity_version = 2
 epoch = "2.4"
 

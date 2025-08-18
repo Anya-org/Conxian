@@ -133,7 +133,7 @@
 (define-private (calculate-fresh-twap
   (pair {token-a: principal, token-b: principal})
   (period uint))
-  (let ((config (unwrap! (map-get? pair-config pair) (err ERR_INVALID_PAIR)))
+  (let ((config (unwrap! (map-get? pair-config pair) ERR_INVALID_PAIR))
         (current-index (get observation-index config)))
     
     ;; Simple average of recent observations
@@ -141,19 +141,14 @@
       (if (>= (len recent-prices) u2)
         (let ((average-price (calculate-simple-price-average recent-prices)))
           ;; Cache the result
-          (begin
-            (map-set twap-cache {pair: pair, period: period} {
-              twap-price: average-price,
-              calculated-at: block-height,
-              valid-until: (+ block-height (/ period u4)),
-              observations-used: (len recent-prices)
-            })
-            (ok average-price)))
-        (err ERR_INSUFFICIENT_HISTORY))))))
-
-;; Helper function to get minimum of two values
-(define-private (min (a uint) (b uint))
-  (if (< a b) a b))
+          (map-set twap-cache {pair: pair, period: period} {
+            twap-price: average-price,
+            calculated-at: block-height,
+            valid-until: (+ block-height (/ period u4)),
+            observations-used: (len recent-prices)
+          })
+          (ok average-price))
+        (err ERR_INSUFFICIENT_HISTORY)))))
 
 ;; Get recent price data
 (define-private (get-recent-price-data
@@ -178,10 +173,7 @@
   (index uint)
   (acc (list 20 uint)))
   (match (map-get? price-observations {pair: {token-a: .mock-ft, token-b: .mock-ft}, index: index})
-    observation 
-    (if (< (len acc) u20)
-      (unwrap-panic (as-max-len? (append acc (get price observation)) u20))
-      acc)
+    observation (append acc (get price observation))
     acc))
 
 ;; Calculate simple average
