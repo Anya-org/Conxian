@@ -3,9 +3,9 @@ name = "testnet"
 node_rpc_address = "https://api.testnet.hiro.so"
 
 [accounts.deployer]
-# Testnet deployer account - PRIVATE KEY STORED SECURELY OFFLINE
-mnemonic = "SECURE_MNEMONIC_STORED_OFFLINE_ONLY"
-balance = 499050000 
+# NEW SECURE TESTNET DEPLOYER - Generated 2025-08-18 - FUNDED ✅
+mnemonic = "shuffle muffin remove sphere laugh crop length zoo frown three donkey cage reward weather season bless all joy area bridge drama smart police empower"
+balance = 500000000  # FUNDED - Ready for deployment 
 
 [accounts.wallet_1]  
 mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
