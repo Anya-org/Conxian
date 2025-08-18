@@ -4,15 +4,19 @@ import { initSimnet } from "@hirosystems/clarinet-sdk";
 
 describe("oracle-aggregator whitelist debug", () => {
   let simnet: any;
-  let accounts: Map<string, any>;
-  let deployer: any;
-  let wallet1: any;
+  let accounts: Map<string, string>;
+  let deployer: string;
+  let wallet1: string;
+  let unauthorizedWallet: string;
 
   beforeEach(async () => {
     simnet = await initSimnet();
     accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
-    wallet1 = accounts.get("wallet_1")!;
+    
+    // Use distinct addresses to avoid account aliasing 
+    wallet1 = "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5"; // Standard wallet_1 address
+    unauthorizedWallet = "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG"; // Standard wallet_2 address
   });
 
   it("debugs whitelist state", async () => {
@@ -22,6 +26,10 @@ describe("oracle-aggregator whitelist debug", () => {
     console.log("=== INITIAL SETUP ===");
     console.log("deployer:", deployer);
     console.log("wallet1:", wallet1);
+    console.log("unauthorizedWallet:", unauthorizedWallet);
+    console.log("Are accounts distinct?");
+    console.log("deployer !== wallet1:", deployer !== wallet1);
+    console.log("deployer !== unauthorizedWallet:", deployer !== unauthorizedWallet);
 
     // Register pair with deployer as oracle
     const registerResult = simnet.callPublicFn(
@@ -93,8 +101,8 @@ describe("oracle-aggregator whitelist debug", () => {
     );
     console.log("Deployer submit result:", JSON.stringify(deployerSubmitResult.result, null, 2));
 
-    // Submit as wallet1 (should fail)
-    const wallet1SubmitResult = simnet.callPublicFn(
+    // Submit as unauthorizedWallet (should fail - not whitelisted)
+    const unauthorizedSubmitResult = simnet.callPublicFn(
       "oracle-aggregator",
       "submit-price",
       [
@@ -102,12 +110,12 @@ describe("oracle-aggregator whitelist debug", () => {
         Cl.principal(quote),
         Cl.uint(1500)
       ],
-      wallet1
+      unauthorizedWallet
     );
-    console.log("Wallet1 submit result:", JSON.stringify(wallet1SubmitResult.result, null, 2));
-    expect(wallet1SubmitResult.result.type).toBe('err');
-    if (wallet1SubmitResult.result.type === 'err') {
-      expect(wallet1SubmitResult.result.value.value).toBe(102n);
+    console.log("Unauthorized submit result:", JSON.stringify(unauthorizedSubmitResult.result, null, 2));
+    expect(unauthorizedSubmitResult.result.type).toBe('err');
+    if (unauthorizedSubmitResult.result.type === 'err') {
+      expect(unauthorizedSubmitResult.result.value.value).toBe(102n); // ERR_NOT_ORACLE
     }
   });
 });
