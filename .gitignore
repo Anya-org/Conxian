@@ -25,3 +25,7 @@ clarinet.log
 /dist/
 /build/
 stacks/.cache/
+
+# Prompt files (sensitive AI instructions)
+.github/prompts/
+.github/instructions/
