@@ -1,31 +1,112 @@
 # Node / tooling
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
 
 # Python/cache
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Rust (legacy just in case)
 target/
+Cargo.lock
 
 # OS/editor
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# Env
+# Environment & Configuration
 .env
 .env.local
+.env.development.local
+.env.test.local
+.env.production.local
+config.local.json
 
-# Clarinet/devnet artifacts
+# Clarinet/Stacks artifacts
 stacks/simnet/
+stacks/deployments/simnet/
+stacks/deployments/testnet/
+stacks/deployments/mainnet/
 clarinet.log
+.clarinet/
+stacks/.cache/
+*.devnet-plan.yaml.backup
 
 # Build artifacts
 /dist/
 /build/
 stacks/.cache/
+coverage/
+.nyc_output/
+
+# Testing artifacts
+test-results/
+junit.xml
+coverage.xml
+
+# Deployment artifacts
+deployment-registry-*.json
+wallet-*.json
+deployer-*.json
+private-keys-*.txt
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
 
 # Prompt files (sensitive AI instructions)
 .github/prompts/
 .github/instructions/
+*.prompt.md
+*-prompt.md
+prompt-*.md
+
+# Security & Private Keys (CRITICAL)
+*.pem
+*.key
+*.private
+private-key*
+deployer-key*
+wallet-seed*
+mnemonic*
+secrets*
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+.temp/
+
+# AutoVault specific
+oracle/data/
+chainhooks/data/
+monitoring/logs/
+analytics/cache/
+
+# Bitcoin/Stacks specific
+*.wallet
+*.seed
+stx-wallet*
+btc-wallet*
