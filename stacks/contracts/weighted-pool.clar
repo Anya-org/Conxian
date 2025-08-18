@@ -3,6 +3,7 @@
 ;; Supports arbitrary weight distributions for multi-asset pools
 
 (impl-trait .pool-trait.pool-trait)
+(use-trait pool-trait .pool-trait.pool-trait)
 (use-trait ft-trait .sip-010-trait.sip-010-trait)
 
 ;; Constants
@@ -362,7 +363,7 @@
 
 ;; Read-only functions
 (define-public (get-reserves)
-  (ok (tuple (rx (var-get reserve-x)) (ry (var-get reserve-y)))))
+  (ok {rx: (var-get reserve-x), ry: (var-get reserve-y)}))
 
 (define-read-only (get-weights)
   { weight-x: (var-get weight-x), weight-y: (var-get weight-y) })
@@ -460,18 +461,18 @@
     })
     (ok true)))
 
-(define-read-only (get-fee-info)
-  (ok (tuple (lp-fee-bps (var-get swap-fee-bps)) (protocol-fee-bps u0))))
+(define-public (get-fee-info)
+  (ok {lp-fee-bps: (var-get swap-fee-bps), protocol-fee-bps: u0}))
 
-(define-read-only (get-price)
+(define-public (get-price)
   (let ((current-reserve-x (var-get reserve-x))
         (current-reserve-y (var-get reserve-y)))
     (if (and (> current-reserve-x u0) (> current-reserve-y u0))
-      (ok (tuple 
-        (price-x-y (/ (* current-reserve-y u1000000) current-reserve-x))
-        (price-y-x (/ (* current-reserve-x u1000000) current-reserve-y))
-      ))
-      (ok (tuple (price-x-y u0) (price-y-x u0))))))
+      (ok { 
+        price-x-y: (/ (* current-reserve-y u1000000) current-reserve-x),
+        price-y-x: (/ (* current-reserve-x u1000000) current-reserve-y)
+      })
+      (ok {price-x-y: u0, price-y-x: u0}))))
 
 ;; Read-only accessor restoring fee transparency (not part of pool-trait to avoid signature drift)
 (define-read-only (get-last-swap-fee)

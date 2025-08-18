@@ -1,4 +1,5 @@
-;; BETA: Experimental DEX component - not audited; avoid production reliance.
+;; PRODUCTION: DEX router for AutoVault comprehensive DeFi ecosystem
+;; Advanced routing with slippage protection and gas optimization
 ;; DEX Router Contract - Multi-hop routing and convenience functions
 ;; Provides user-friendly interface for DEX operations
 

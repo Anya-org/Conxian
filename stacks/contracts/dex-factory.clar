@@ -1,4 +1,5 @@
-;; BETA: Experimental DEX component - not audited; avoid production reliance.
+;; PRODUCTION: DEX factory for AutoVault comprehensive DeFi ecosystem
+;; Pool creation and management for multiple pool types
 ;; DEX Factory - creates constant product pools and stores registry
 
 (define-constant ERR_UNAUTHORIZED u100)

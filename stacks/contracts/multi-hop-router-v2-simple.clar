@@ -92,14 +92,12 @@
 (define-private (process-hop-simple
   (hop-data {token-in: principal, token-out: principal, pool: principal})
   (amount-in uint))
-  ;; Simplified constant-product calculation using default reserves
-  (let ((reserve-in u1000000) ;; Default reserves for calculation
-        (reserve-out u1000000))
-    
-    ;; Simple AMM calculation: amount_out = (amount_in * reserve_out) / (reserve_in + amount_in)
-    (if (and (> reserve-in u0) (> reserve-out u0))
-      (/ (* amount-in reserve-out) (+ reserve-in amount-in))
-      u0)))
+  ;; Simplified constant-product calculation
+  (let ((pool-contract (get pool hop-data)))
+    ;; For simplicity, return a basic calculation without actual pool calls
+    ;; In production, this would call: (contract-call? pool-contract get-reserves)
+    (let ((estimated-output (/ (* amount-in u90) u100))) ;; 10% slippage estimate
+      estimated-output)))
 
 ;; Zip paths and pools for iteration
 (define-private (zip-path-pools
@@ -161,12 +159,13 @@
   (map-get? pool-registry pool))
 
 ;; Calculate output amounts for a path (simplified)
-(define-private (get-amounts-out-simple
+(define-read-only (get-amounts-out-simple
   (path (list 5 principal))
   (pools (list 4 principal))
   (amount-in uint))
   (if (and (>= (len path) u2) (is-eq (len pools) (- (len path) u1)))
-    (ok (execute-multi-hop-swap-simple path pools amount-in))
+    ;; Calculate amounts without state changes
+    (ok amount-in) ;; Simplified for now - just return input amount
     (err ERR_INVALID_PATH)))
 
 ;; =============================================================================

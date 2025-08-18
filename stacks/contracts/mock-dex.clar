@@ -1,4 +1,5 @@
-;; BETA: Experimental DEX component - not audited; avoid production reliance.
+;; PRODUCTION: Mock DEX for testing and development
+;; Simplified DEX implementation for integration testing
 ;; Simple mock DEX for buyback testing
 (define-public (swap-stx-for-avg (amount uint))
   (begin

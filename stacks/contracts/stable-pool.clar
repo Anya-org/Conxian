@@ -7,17 +7,18 @@
 ;; =============================================================================
 
 (impl-trait .pool-trait.pool-trait)
+(use-trait pool-trait .pool-trait.pool-trait)
 (use-trait ft-trait .sip-010-trait.sip-010-trait)
 
 ;; Error codes
-(define-constant ERR_INVALID_POOL_ID (err u500))
-(define-constant ERR_INSUFFICIENT_LIQUIDITY (err u501))
-(define-constant ERR_SLIPPAGE_EXCEEDED (err u502))
-(define-constant ERR_INVALID_AMOUNTS (err u503))
-(define-constant ERR_POOL_PAUSED (err u504))
-(define-constant ERR_UNAUTHORIZED (err u505))
-(define-constant ERR_AMPLIFICATION_OUT_OF_RANGE (err u506))
-(define-constant ERR_EXPIRED (err u507))
+(define-constant ERR_INVALID_POOL_ID u500)
+(define-constant ERR_INSUFFICIENT_LIQUIDITY u501)
+(define-constant ERR_SLIPPAGE_EXCEEDED u502)
+(define-constant ERR_INVALID_AMOUNTS u503)
+(define-constant ERR_POOL_PAUSED u504)
+(define-constant ERR_UNAUTHORIZED u505)
+(define-constant ERR_AMPLIFICATION_OUT_OF_RANGE u506)
+(define-constant ERR_EXPIRED u507)
 
 ;; Constants
 (define-constant ONE_8 u100000000) ;; 1.0 in 8-decimal fixed point
@@ -54,9 +55,9 @@
 ;; Pool functions for trait compliance
 (define-public (add-liquidity (amount-x uint) (amount-y uint) (min-shares uint) (deadline uint))
   (begin
-    (asserts! (< block-height deadline) (err ERR_EXPIRED))
-    (asserts! (not (var-get pool-paused)) (err ERR_POOL_PAUSED))
-    (asserts! (and (> amount-x u0) (> amount-y u0)) (err ERR_INVALID_AMOUNTS))
+  (asserts! (< block-height deadline) (err ERR_EXPIRED))
+  (asserts! (not (var-get pool-paused)) (err ERR_POOL_PAUSED))
+  (asserts! (and (> amount-x u0) (> amount-y u0)) (err ERR_INVALID_AMOUNTS))
     
     (let ((shares (/ (+ amount-x amount-y) u2))) ;; Simplified LP calculation
       (asserts! (>= shares min-shares) (err ERR_INSUFFICIENT_LIQUIDITY))
@@ -69,9 +70,9 @@
 
 (define-public (remove-liquidity (shares uint) (min-x uint) (min-y uint) (deadline uint))
   (begin
-    (asserts! (< block-height deadline) (err ERR_EXPIRED))
-    (asserts! (not (var-get pool-paused)) (err ERR_POOL_PAUSED))
-    (asserts! (> shares u0) (err ERR_INVALID_AMOUNTS))
+  (asserts! (< block-height deadline) (err ERR_EXPIRED))
+  (asserts! (not (var-get pool-paused)) (err ERR_POOL_PAUSED))
+  (asserts! (> shares u0) (err ERR_INVALID_AMOUNTS))
     
     (let ((current-reserve-x (var-get reserve-x))
           (current-reserve-y (var-get reserve-y))
@@ -112,21 +113,21 @@
         (ok { amount-out: amount-out })))))
 
 ;; Read-only functions for trait compliance
-(define-read-only (get-reserves)
-  (ok (tuple (rx (var-get reserve-x)) (ry (var-get reserve-y)))))
+(define-public (get-reserves)
+  (ok {rx: (var-get reserve-x), ry: (var-get reserve-y)}))
 
-(define-read-only (get-fee-info)
-  (ok (tuple (lp-fee-bps (var-get base-fee-bps)) (protocol-fee-bps u0))))
+(define-public (get-fee-info)
+  (ok {lp-fee-bps: (var-get base-fee-bps), protocol-fee-bps: u0}))
 
-(define-read-only (get-price)
+(define-public (get-price)
   (let ((current-reserve-x (var-get reserve-x))
         (current-reserve-y (var-get reserve-y)))
     (if (and (> current-reserve-x u0) (> current-reserve-y u0))
-      (ok (tuple
-        (price-x-y (/ (* current-reserve-y u1000000) current-reserve-x))
-        (price-y-x (/ (* current-reserve-x u1000000) current-reserve-y))
-      ))
-      (ok (tuple (price-x-y u0) (price-y-x u0))))))
+      (ok {
+        price-x-y: (/ (* current-reserve-y u1000000) current-reserve-x),
+        price-y-x: (/ (* current-reserve-x u1000000) current-reserve-y)
+      })
+      (ok {price-x-y: u0, price-y-x: u0}))))
 
 ;; Admin functions
 (define-public (set-admin (new-admin principal))

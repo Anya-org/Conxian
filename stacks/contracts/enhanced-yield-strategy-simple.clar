@@ -3,7 +3,8 @@
 ;; =============================================================================
 
 (use-trait ft-trait .sip-010-trait.sip-010-trait)
-(use-trait strategy-trait .strategy-trait.strategy-trait)
+;; Remove problematic strategy-trait import for now
+;; (use-trait strategy-trait .strategy-trait.strategy-trait)
 
 ;; Error codes
 (define-constant ERR_UNAUTHORIZED (err u400))

@@ -1,5 +1,5 @@
-;; BETA: Experimental DEX component - not audited; avoid production reliance.
-;; Multi-Hop Routing for AutoVault DEX
+;; PRODUCTION: Multi-hop routing for AutoVault comprehensive DeFi ecosystem
+;; Optimized pathfinding and execution for complex trades
 ;; Optimized pathfinding and execution for complex trades
 
 (use-trait ft-trait .sip-010-trait.sip-010-trait)

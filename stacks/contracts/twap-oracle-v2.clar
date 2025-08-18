@@ -75,8 +75,8 @@
   (token-b principal)
   (period uint))
   (let ((pair {token-a: token-a, token-b: token-b}))
-    (asserts! (is-some (map-get? pair-config pair)) ERR_INVALID_PAIR)
-    (asserts! (> period u0) ERR_INVALID_PERIOD)
+    (asserts! (is-some (map-get? pair-config pair)) (err ERR_INVALID_PAIR))
+    (asserts! (> period u0) (err ERR_INVALID_PERIOD))
     
     ;; Check cache first
     (match (map-get? twap-cache {pair: pair, period: period})
@@ -94,36 +94,36 @@
   (liquidity uint)
   (volume uint))
   (let ((pair {token-a: token-a, token-b: token-b}))
-    (asserts! (is-some (map-get? pair-config pair)) ERR_INVALID_PAIR)
-    (asserts! (> price u0) ERR_INVALID_PAIR)
+    (asserts! (is-some (map-get? pair-config pair)) (err ERR_INVALID_PAIR))
+    (asserts! (> price u0) (err ERR_INVALID_PAIR))
     
-    (let ((config (unwrap-panic (map-get? pair-config pair)))
-          (current-index (get observation-index config))
-          (new-index (if (< current-index (- MAX_OBSERVATIONS u1))
-                       (+ current-index u1)
-                       u0)))
-      
-      ;; Store the observation
-      (map-set price-observations
-        {pair: pair, index: new-index}
-        {
-          timestamp: (unwrap-panic (get-block-info? time (- block-height u1))),
-          price: price,
-          liquidity: liquidity,
-          volume: volume,
-          block-height: block-height
-        })
-      
-      ;; Update config with new index
-      (map-set pair-config pair
-        (merge config {observation-index: new-index}))
-      
-      ;; Check for manipulation if enabled
-      (if (var-get manipulation-detection-enabled)
-        (check-for-manipulation pair price volume)
-        (ok true))
-      
-      (ok true))))
+    (match (map-get? pair-config pair)
+      config
+      (let ((current-index (get observation-index config))
+            (new-index (if (< current-index (- MAX_OBSERVATIONS u1))
+                         (+ current-index u1)
+                         u0)))
+        
+        ;; Store the observation
+        (map-set price-observations
+          {pair: pair, index: new-index}
+          {
+            timestamp: block-height,
+            price: price,
+            liquidity: liquidity,
+            volume: volume,
+            block-height: block-height
+          })
+        
+        ;; Update config with new index
+        (map-set pair-config pair
+          (merge config {observation-index: new-index}))
+        
+        ;; Check for manipulation if enabled
+        (if (var-get manipulation-detection-enabled)
+          (check-for-manipulation pair price volume)
+          (ok true)))
+      (err ERR_INVALID_PAIR))))
 
 ;; =============================================================================
 ;; HELPER FUNCTIONS (Non-circular)
@@ -149,7 +149,7 @@
               observations-used: (len recent-prices)
             })
             (ok average-price)))
-        (err ERR_INSUFFICIENT_HISTORY))))))
+        (err ERR_INSUFFICIENT_HISTORY)))))
 
 ;; Helper function to get minimum of two values
 (define-private (min (a uint) (b uint))
@@ -204,7 +204,7 @@
         
         (if (> deviation MANIPULATION_THRESHOLD)
           (begin
-            (map-set manipulation-flags pair {
+            (map-set manipulation-flags {pair: pair} {
               detected: true,
               detection-block: block-height,
               price-deviation: deviation,
@@ -248,8 +248,9 @@
       config (map-get? price-observations {pair: pair, index: (get observation-index config)})
       none)))
 
+;; Check manipulation status
 (define-read-only (get-manipulation-status (token-a principal) (token-b principal))
-  (map-get? manipulation-flags {token-a: token-a, token-b: token-b}))
+  (map-get? manipulation-flags {pair: {token-a: token-a, token-b: token-b}}))
 
 (define-read-only (is-price-stale (token-a principal) (token-b principal))
   (match (get-latest-price token-a token-b)
