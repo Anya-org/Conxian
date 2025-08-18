@@ -42,6 +42,8 @@
 (define-data-var total-volume uint u0)
 (define-data-var total-fees-collected uint u0)
 (define-data-var swap-count uint u0)
+;; Track last swap fee for external analytics (restores visibility present in disabled variant without breaking trait signature)
+(define-data-var last-swap-fee uint u0)
 
 ;; Liquidity provider tracking
 (define-map lp-balances
@@ -280,6 +282,8 @@
             x-to-y: x-to-y,
             swap-count: (var-get swap-count)
           })
+          ;; Persist last fee (gas cost minimal single var-set); provides read-only access
+          (var-set last-swap-fee swap-fee)
           ;; Trait requires only (tuple (amount-out uint))
           (ok { amount-out: amount-out }))))))
 
@@ -468,3 +472,7 @@
         (price-y-x (/ (* current-reserve-x u1000000) current-reserve-y))
       ))
       (ok (tuple (price-x-y u0) (price-y-x u0))))))
+
+;; Read-only accessor restoring fee transparency (not part of pool-trait to avoid signature drift)
+(define-read-only (get-last-swap-fee)
+  (var-get last-swap-fee))

@@ -7,12 +7,14 @@ describe("state-anchor", () => {
   let accounts: Map<string, any>;
   let deployer: any;
   let wallet1: any;
+  let wallet2: any;
 
   beforeEach(async () => {
     simnet = await initSimnet();
     accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
-    wallet1 = accounts.get("wallet_1")!;
+  wallet1 = accounts.get("wallet_1")!;
+  wallet2 = accounts.get("wallet_2") || 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
   });
 
   it("should anchor state with proper authority", () => {
@@ -25,14 +27,12 @@ describe("state-anchor", () => {
     expect(result).toEqual({ type: 'ok', value: { type: 'true' } });
   });
 
-  it.skip('should reject anchor from unauthorized caller', () => {
-    // Note: Skipping this test as simnet seems to treat all calls as authorized in current setup
+  it('should reject anchor from unauthorized caller', () => {
     const root = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
-    
+    // Attempt with wallet2 (distinct from deployer) expecting authorization error u100
     const { result } = simnet.callPublicFn('state-anchor', 'anchor-state', [
       Cl.bufferFromHex(root)
-    ], wallet1);
-
+    ], wallet2);
     expect(result).toEqual({ type: 'err', value: { type: 'uint', value: 100n } });
   });
 

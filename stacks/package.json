@@ -8,22 +8,26 @@
     "@types/node": "^18.19.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.4.0",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "chokidar-cli": "3.0.0"
   },
   "scripts": {
     "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:auto": "chokidar 'contracts/**/*.clar' 'tests/**/*.ts' 'sdk-tests/**/*.spec.ts' -c 'npm run check && vitest run'",
     "test:manual": "../scripts/manual-testing.sh",
     "update-autonomics": "ts-node ../scripts/sdk_update_autonomics.ts",
     "int-autonomics": "bash tests/integration_autonomics_sdk.sh",
     "deploy-contracts": "ts-node ../scripts/sdk_deploy_contracts.ts",
     "deploy-testnet": "../scripts/deploy-testnet.sh",
     "verify-post": "ts-node ../scripts/post_deploy_verify.ts",
-  "generate-deployer-key": "node -r ts-node/register ../scripts/generate-deployer-key.ts",
-  "gen-key": "node generate-deployer-key.js",
+    "generate-deployer-key": "node -r ts-node/register ../scripts/generate-deployer-key.ts",
+    "gen-key": "node generate-deployer-key.js",
     "console": "clarinet console",
     "console:testnet": "clarinet console --testnet",
     "check": "clarinet check",
-    "pre-deploy": "npm run check && ../scripts/manual-testing.sh"
+    "ci": "npm run check && vitest run",
+    "pre-deploy": "npm run ci && ../scripts/manual-testing.sh"
   },
   "dependencies": {
     "@stacks/network": "^7.0.6",

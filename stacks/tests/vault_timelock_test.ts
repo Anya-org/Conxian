@@ -42,35 +42,26 @@ describe("vault + timelock", () => {
 
   it("timelock can pause vault after delay (simulated)", () => {
     const timelockId = `${deployer}.timelock`;
-    
-    // First, set zero delay for immediate execution in testing
-    const setDelay = simnet.callPublicFn("timelock", "set-min-delay", [Cl.uint(0)], deployer);
-    assertOkTrue(setDelay.result);
-    
-    const setAdmin = simnet.callPublicFn("vault", "set-admin", [Cl.principal(timelockId)], deployer);
-    assertOkTrue(setAdmin.result);
-    const queue = simnet.callPublicFn("timelock", "queue-set-paused", [Cl.bool(true)], deployer);
+  // Timelock already the admin of vault by default (vault admin = .timelock)
+  // Reduce delay to 0 so execution is immediate for test determinism
+  const setDelay = simnet.callPublicFn("timelock", "set-min-delay", [Cl.uint(0)], deployer);
+  assertOkTrue(setDelay.result);
+
+  const queue = simnet.callPublicFn("timelock", "queue-set-paused", [Cl.bool(true)], deployer);
     // first id u0
     expect(queue.result.type).toBe('ok');
     const idv = queue.result.value; if (!(idv.type === 'uint' && idv.value === 0n)) throw new Error('expected id 0');
-    
-    // Simulate block delay by making actual contract calls (each call advances block height)
-    for (let i=0;i<10;i++) { 
-      // Each contract call advances the block, so we make 10 calls to advance 10 blocks
-      simnet.callReadOnlyFn("vault", "get-balance", [Cl.principal(wallet1)], wallet1); 
-    }
-    
-    // Execute the queued item
-    const exec = simnet.callPublicFn("timelock", "execute-set-paused", [Cl.uint(0)], deployer);
-    
-    // For now, let's skip this non-critical test and move to comprehensive testing
-    // The timelock functionality is working as shown by the successful queue operation
-    // This test is just checking the integration between timelock and vault
-    expect(true).toBe(true); // Temporarily bypass this test
-    return;
-    
-    assertOkTrue(exec.result);
-    const paused = simnet.callReadOnlyFn("vault", "get-paused", [], deployer);
-    if (!(paused.result.type === 'bool' && paused.result.value === true)) throw new Error('vault not paused');
+  // Execute immediately (no delay)
+  const exec = simnet.callPublicFn("timelock", "execute-set-paused", [Cl.uint(0)], deployer);
+  assertOkTrue(exec.result);
+  const paused = simnet.callReadOnlyFn("vault", "get-paused", [], deployer);
+  // Accept both primitive 'true' form and structured bool representation
+  if (paused.result.type === 'true') {
+    // already true
+    expect(paused.result.type).toBe('true');
+  } else {
+    expect(paused.result.type).toBe('bool');
+    expect(paused.result.value).toBe(true);
+  }
   });
 });
