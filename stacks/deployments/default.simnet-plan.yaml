@@ -234,6 +234,11 @@ plan:
             path: contracts/twap-oracle-v2-simple.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: vault-multi-token
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/vault-multi-token.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: vault-trait
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/traits/vault-trait.clar

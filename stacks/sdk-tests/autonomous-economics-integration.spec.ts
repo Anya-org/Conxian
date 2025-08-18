@@ -8,22 +8,26 @@ import { initSimnet } from '@hirosystems/clarinet-sdk';
  * and competitor token liquidity acceptance for maximum yield optimization
  */
 
-const accounts = simnet.getAccounts();
-const admin = accounts.get('deployer')!;
-const user1 = accounts.get('wallet_1')!;
-const user2 = accounts.get('wallet_2')!;
-
-const CONTRACTS = {
-  vault: `${admin}.vault`,
-  vaultMultiToken: `${admin}.vault-multi-token`,
-  mockFt: `${admin}.mock-ft`,
-};
-
 describe('AutoVault Autonomous Economics Integration', () => {
   let simnet: any;
+  let accounts: Map<string, string>;
+  let admin: string;
+  let user1: string;
+  let user2: string;
+  let CONTRACTS: any;
 
   beforeEach(async () => {
     simnet = await initSimnet();
+    accounts = simnet.getAccounts();
+    admin = accounts.get('deployer')!;
+    user1 = accounts.get('wallet_1')!;
+    user2 = accounts.get('wallet_2')!;
+    
+    CONTRACTS = {
+      vault: `${admin}.vault`,
+      vaultMultiToken: `${admin}.vault-multi-token`,
+      mockFt: `${admin}.mock-ft`,
+    };
   });
 
   describe('Autonomous Fee Adjustments', () => {
@@ -319,7 +323,7 @@ describe('AutoVault Autonomous Economics Integration', () => {
         [Cl.principal(`${admin}.mock-ft`)],
         admin
       );
-      expect(isSupported.result).toBeFalse();
+      expect(isSupported.result).toBeFalsy();
     });
 
     it('should get portfolio allocation status', () => {
