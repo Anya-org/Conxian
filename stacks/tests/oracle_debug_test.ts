@@ -72,6 +72,14 @@ describe("oracle-aggregator debug", () => {
       wallet1  // wallet1 is NOT whitelisted
     );
     console.log("Unauthorized result:", JSON.stringify(unauthorizedResult.result, null, 2));
+    if (wallet1.address !== deployer.address) {
+      expect(unauthorizedResult.result.type).toBe('err');
+      if (unauthorizedResult.result.type === 'err') {
+        expect(unauthorizedResult.result.value.value).toBe(102n); // ERR_NOT_ORACLE
+      }
+    } else {
+      console.log("Skipping unauthorized assertion due to account aliasing (wallet1 == deployer)");
+    }
 
     console.log("=== STEP 5: Get price ===");
     const priceResult = simnet.callReadOnlyFn(
