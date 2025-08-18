@@ -3,30 +3,44 @@
 ;; Optimized for low-slippage trading of correlated assets
 
 (impl-trait .pool-trait.pool-trait)
-(use-trait ft-trait .sip-010-trait.sip-010-trait)
+;; =============================================================================
+;; STABLE POOL IMPLEMENTATION - CURVE STABLESWAP STYLE
+;; =============================================================================
+
+(impl-trait .traits.pool-trait.pool-trait)
+(use-trait ft-trait .traits.sip-010-trait.sip-010-trait)
+
+;; Error codes
+(define-constant ERR_INVALID_POOL_ID (err u500))
+(define-constant ERR_INSUFFICIENT_LIQUIDITY (err u501))
+(define-constant ERR_SLIPPAGE_EXCEEDED (err u502))
+(define-constant ERR_INVALID_AMOUNTS (err u503))
+(define-constant ERR_POOL_PAUSED (err u504))
+(define-constant ERR_UNAUTHORIZED (err u505))
+(define-constant ERR_AMPLIFICATION_OUT_OF_RANGE (err u506))
 
 ;; Constants
-(define-constant ERR_INSUFFICIENT_LIQUIDITY u201)
-(define-constant ERR_INVALID_AMOUNTS u202)
-(define-constant ERR_SLIPPAGE_EXCEEDED u203)
-(define-constant ERR_POOL_PAUSED u204)
-(define-constant ERR_UNAUTHORIZED u205)
-(define-constant ERR_EXPIRED u206)
+(define-constant ONE_8 u100000000) ;; 1.0 in 8-decimal fixed point
+(define-constant MAX_AMPLIFICATION u10000) ;; Maximum A parameter
+(define-constant MIN_AMPLIFICATION u1) ;; Minimum A parameter
+(define-constant FEE_DENOMINATOR u10000) ;; Fee denominator (100% = 10000)
+(define-constant MAX_ITERATIONS u255) ;; Maximum iterations for D calculation
 
-;; StableSwap parameters
-(define-constant A u100) ;; Amplification parameter
-(define-constant N_COINS u2) ;; Number of coins in pool
-(define-constant PRECISION u1000000) ;; 6 decimal precision
-(define-constant MAX_ITERATIONS u255) ;; For Newton's method
-
-;; Pool state
-(define-data-var pool-token-x principal .mock-ft)
-(define-data-var pool-token-y principal .mock-ft)
+;; State variables
+(define-data-var total-supply uint u0)
 (define-data-var reserve-x uint u0)
 (define-data-var reserve-y uint u0)
-(define-data-var total-supply uint u0)
+(define-data-var amplification uint u100) ;; Default A = 100
+(define-data-var swap-fee uint u30) ;; 0.3% = 30 bps
 (define-data-var pool-paused bool false)
-(define-data-var admin principal tx-sender)
+(define-data-var pool-admin principal tx-sender)
+
+;; Pool tokens
+(define-data-var token-x principal .mock-ft)
+(define-data-var token-y principal .mock-ft)
+
+;; LP token balances
+(define-map balances principal uint)
 
 ;; Fee structure optimized for stable assets
 (define-data-var base-fee-bps uint u4) ;; 0.04% base fee

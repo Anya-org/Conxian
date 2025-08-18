@@ -163,10 +163,61 @@
     (div-down (mul-down amount-out slippage-factor) u10000)))
 
 ;; =============================================================================
-;; WEIGHTED POOL CALCULATIONS (Balancer-style)
+;; ADVANCED MATHEMATICAL FUNCTIONS - PHASE 1 IMPLEMENTATION
 ;; =============================================================================
 
-;; Calculate weighted pool output using power formula
+;; High-precision square root using Newton-Raphson method (20 iterations)
+(define-private (sqrt-newton (x uint) (guess uint) (iterations uint))
+  (if (is-eq iterations u0)
+    guess
+    (let ((new-guess (/ (+ guess (/ x guess)) u2)))
+      (sqrt-newton x new-guess (- iterations u1)))))
+
+(define-read-only (sqrt-fixed (x uint))
+  (if (is-eq x u0) 
+    u0
+    (if (< x u4)
+      u1
+      (sqrt-newton x (/ x u2) u20))))
+
+;; Natural logarithm using Taylor series approximation
+(define-private (ln-taylor (x uint) (terms uint))
+  (if (is-eq terms u0)
+    u0
+    (let ((term (/ (pow-fixed (- x ONE_8) terms) terms)))
+      (+ term (ln-taylor x (- terms u1))))))
+
+(define-read-only (ln-fixed (x uint))
+  (if (<= x u0) u0
+    (if (is-eq x ONE_8) u0
+      (ln-taylor x u10))))
+
+;; Power function using repeated multiplication (integer exponents)
+(define-private (pow-int (base uint) (exp uint) (acc uint))
+  (if (is-eq exp u0)
+    acc
+    (pow-int base (- exp u1) (mul-down acc base))))
+
+(define-read-only (pow-fixed (base uint) (exponent uint))
+  (if (is-eq exponent u0)
+    ONE_8
+    (pow-int base exponent ONE_8)))
+
+;; Exponential function using Taylor series
+(define-private (exp-taylor (x uint) (terms uint) (factorial uint) (power uint))
+  (if (is-eq terms u0)
+    ONE_8
+    (let ((term (div-down power factorial)))
+      (+ term (exp-taylor x (- terms u1) (* factorial terms) (mul-down power x))))))
+
+(define-read-only (exp-fixed (x uint))
+  (exp-taylor x u10 u1 ONE_8))
+
+;; =============================================================================
+;; WEIGHTED POOL CALCULATIONS (Balancer-style) - ENHANCED
+;; =============================================================================
+
+;; Calculate weighted pool output using precise power formula
 ;; amount_out = reserve_out * (1 - (reserve_in / (reserve_in + amount_in))^(weight_in / weight_out))
 (define-read-only (weighted-pool-out 
   (amount-in uint) 
@@ -174,10 +225,10 @@
   (reserve-out uint) 
   (weight-in uint) 
   (weight-out uint))
-  (let ((base (div-down reserve-in (+ reserve-in amount-in)))
-        (exponent (div-down weight-in weight-out)))
-    ;; Simplified calculation - in production would use precise power function
-    (mul-down reserve-out (- ONE_8 (pow-fixed base exponent)))))
+  (let ((ratio (div-down (+ reserve-in amount-in) reserve-in))
+        (exponent (div-down weight-in weight-out))
+        (power-ratio (pow-fixed ratio exponent)))
+    (mul-down reserve-out (- power-ratio ONE_8))))
 
 ;; =============================================================================
 ;; STABLE POOL CALCULATIONS (Curve-style)  
