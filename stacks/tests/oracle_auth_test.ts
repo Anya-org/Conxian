@@ -96,7 +96,7 @@ describe("oracle-aggregator proper authorization test", () => {
     expectOkTrue(addResult.result);
     expect(authorizedResult.result.type).toBe('ok');
     // Unauthorized submissions should err with code 102 (ERR_NOT_ORACLE)
-    expect(unauthorizedResult.result).toEqual({ type: 'err', value: { type: 'uint', value: "102" } });
+    expect(unauthorizedResult.result).toEqual({ type: 'err', value: { type: 'uint', value: 102n } });
 
     // Optional deployer submission check: if deployer principal equals wallet1 (SDK duplicate), skip strict check
     if (deployer !== wallet1) {
