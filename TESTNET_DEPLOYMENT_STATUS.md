@@ -51,7 +51,7 @@ Batch 2 (7 contracts): Registry, treasury, pools, final components
 Total Deployment Cost: 2.892210 STX
 Expected Duration: 2 blocks
 Network: Stacks Testnet (https://api.testnet.hiro.so)
-```
+```text
 
 ### 🔧 Next Steps for Live Deployment
 
@@ -64,7 +64,7 @@ Network: Stacks Testnet (https://api.testnet.hiro.so)
 
    ```bash
    cd /workspaces/AutoVault/stacks
-   npx clarinet deployment apply --testnet
+   clarinet deployment apply --testnet
    ```
 
 3. **Post-Deployment Verification**
@@ -102,8 +102,8 @@ The system is awaiting only testnet STX funding to execute the live deployment.
 
 ```bash
 # When testnet STX is available:
-cd /workspaces/AutoVault/stacks && npx clarinet deployment apply --testnet
-```
+cd /workspaces/AutoVault/stacks && clarinet deployment apply --testnet
+```text
 
 **Success Metrics Achieved:**
 

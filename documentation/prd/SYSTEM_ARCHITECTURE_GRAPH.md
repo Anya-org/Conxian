@@ -62,6 +62,7 @@ text TB
         DAOAUTOMATION[dao-automation.clar]
         DAOGOV[dao-governance.clar]
         TIMELOCK[timelock.clar]
+        ENHANCEDGOV[enhanced-governance.clar]
         GOVHELPER[governance-test-helper.clar]
     end
 
@@ -81,6 +82,7 @@ text TB
         DEXROUTER[dex-router.clar]
         POOLfactory[pool-factory.clar]
         STABLEPOOL[stable-pool.clar]
+        STABLEPOOLCLEAN[stable-pool-clean.clar]
         WEIGHTEDPOOL[weighted-pool.clar]
         MOCKDEX[mock-dex.clar]
     end
@@ -133,6 +135,7 @@ text TB
     %% Token Dependencies
     GOVTOKEN --> DAO
     GOVTOKEN --> DAOGOV
+    GOVTOKEN --> ENHANCEDGOV
     AVGTOKEN --> TREASURY
     AVGTOKEN --> VAULT
     AVLPTOKEN --> VAULT
@@ -144,6 +147,7 @@ text TB
     TIMELOCK --> VAULT
     DAO --> DAOGOV
     DAO --> DAOAUTOMATION
+    DAOGOV --> ENHANCEDGOV
     
     %% Security Dependencies
     CIRCUITBREAKER --> VAULT
@@ -152,7 +156,7 @@ text TB
     ORACLEAGG --> VAULT
     ENTERPRISEMON --> VAULT
     ENTERPRISEMON --> TREASURY
-    %% STATEANCHOR previously pointed to Enhanced Governance (placeholder). Pending final governance integration, no direct arrow.
+    STATEANCHOR --> ENHANCEDGOV
     
     %% DEX Dependencies
     DEXFACTORY --> DEXPOOL
@@ -186,9 +190,9 @@ text TB
     class SIP010,VT,VAT,ST,PT,OT foundation
     class VAULT,TREASURY,REGISTRY,ANALYTICS,MATHLIB core
     class MOCKFT,GOVTOKEN,AVGTOKEN,AVLPTOKEN,CREATORTOKEN token
-    class DAO,DAOAUTOMATION,DAOGOV,TIMELOCK,GOVHELPER governance
+    class DAO,DAOAUTOMATION,DAOGOV,TIMELOCK,ENHANCEDGOV,GOVHELPER governance
     class CIRCUITBREAKER,CIRCUITSIMPLE,ENTERPRISEMON,ORACLEAGG,STATEANCHOR security
-    class DEXFACTORY,DEXPOOL,DEXROUTER,POOLFACTORY,STABLEPOOL,WEIGHTEDPOOL,MOCKDEX dex
+    class DEXFACTORY,DEXPOOL,DEXROUTER,POOLFACTORY,STABLEPOOL,STABLEPOOLCLEAN,WEIGHTEDPOOL,MOCKDEX dex
     class MULTIHOP,MULTIHOPV2,TWAORACLE,ENHANCEDYIELD advanced
     class BOUNTY,AUTOBOUNTY bounty
 ```
@@ -224,7 +228,7 @@ text TB
 |----------|---------|------------|---------|
 | `avg-token.clar` | Governance token | 10M | treasury, vault, dao |
 | `avlp-token.clar` | Liquidity pool token | 5M | vault |
-| `gov-token.clar` | DAO voting token | Variable | dao |
+| `gov-token.clar` | DAO voting token | Variable | dao, enhanced-governance |
 | `creator-token.clar` | Merit-based rewards | Variable | bounty-system |
 | `mock-ft.clar` | Testing token | Unlimited | Development only |
 
@@ -234,6 +238,7 @@ text TB
 |----------|---------|--------------|-------------------|
 | `dao.clar` | Basic governance | gov-token, timelock | Timelock delays |
 | `dao-governance.clar` | Advanced voting | dao, gov-token | Time-weighted voting |
+| `enhanced-governance.clar` | Enterprise governance | dao-governance, state-anchor | Multi-sig + timelock |
 | `timelock.clar` | Security delays | None | 24-48h delays |
 | `dao-automation.clar` | Parameter optimization | dao | Automated proposals |
 
@@ -244,7 +249,7 @@ text TB
 | `circuit-breaker.clar` | Volatility protection | vault, oracle-aggregator | >5% price deviation |
 | `enterprise-monitoring.clar` | System health | vault, treasury | Performance metrics |
 | `oracle-aggregator.clar` | Price feed management | twap-oracle-v2 | Price validation |
-| `state-anchor.clar` | State verification | None (pending integration) | Critical state changes |
+| `state-anchor.clar` | State verification | enhanced-governance | Critical state changes |
 
 ### **🔄 DEX & AMM SYSTEM (Layer 5)**
 
