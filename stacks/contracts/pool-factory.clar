@@ -134,7 +134,7 @@
 
 ;; Order tokens to ensure consistent pool addresses (simplified)
 (define-private (order-tokens (token-a principal) (token-b principal))
-  ;; Simple lexicographic ordering based on principal representation
+  ;; Simple lexicotextic ordering based on principal representation
   {token-x: token-a, token-y: token-b})
 
 ;; =============================================================================

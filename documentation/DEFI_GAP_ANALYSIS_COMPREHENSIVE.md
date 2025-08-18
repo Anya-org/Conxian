@@ -216,7 +216,7 @@ Based on extensive analysis of 15+ leading DeFi protocols across Stacks and Ethe
 
 **Industry Standard**: Sophisticated routing algorithms
 
-- **Uniswap**: Graph-based routing with gas optimization
+- **Uniswap**: text-based routing with gas optimization
 - **1inch**: Aggregated routing across multiple DEXes
 - **Expected Impact**: 15-30% better pricing for complex swaps
 
@@ -382,7 +382,7 @@ Based on extensive analysis of 15+ leading DeFi protocols across Stacks and Ethe
   (token-in principal) 
   (token-out principal) 
   (amount-in uint))
-  ;; Graph-based routing algorithm
+  ;; text-based routing algorithm
   ;; Gas cost optimization
   ;; Slippage minimization
 )

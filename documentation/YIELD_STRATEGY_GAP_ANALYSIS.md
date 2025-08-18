@@ -15,7 +15,7 @@ Analysis of AutoVault's yield strategy architecture against 8 leading yield prot
 
 ### 1.1 Yearn Finance V3 (Yield Optimization Gold Standard)
 
-#### Architecture Strengths
+#### Architecture Strengths (Yearn V3)
 
 ```solidity
 // Yearn V3 Strategy Framework
@@ -48,7 +48,7 @@ contract Strategy {
 
 ### 1.2 Beefy Finance (Multi-Chain Yield Aggregator)
 
-#### Architecture Strengths
+#### Beefy Finance Strengths
 
 - **Cross-Chain**: 20+ blockchains with unified experience
 - **Auto-Compounding**: Automated reward reinvestment

@@ -71,7 +71,7 @@ Multi-Sig Requirements:
 **Key Management**:
 
 - Hardware wallet integration for production keys
-- Geographic distribution of signers
+- Geotextic distribution of signers
 - Regular key rotation procedures
 - Emergency recovery mechanisms
 

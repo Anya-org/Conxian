@@ -527,7 +527,7 @@
 ;; u416: dispute-already-resolved
 
 ;; === AIP-4: Bounty Security Hardening ===
-(define-constant MIN_PROOF_LENGTH u32) ;; Minimum cryptographic proof length
+(define-constant MIN_PROOF_LENGTH u32) ;; Minimum cryptotextic proof length
 
 (define-map submission-proofs
   { bounty-id: uint, milestone: uint }
@@ -551,7 +551,7 @@
 
 (define-data-var dispute-counter uint u0)
 
-;; Submit cryptographic proof for milestone completion
+;; Submit cryptotextic proof for milestone completion
 (define-public (submit-milestone-proof (bounty-id uint) (milestone uint) (proof-hash (buff 32)))
   (let (
     (bounty (unwrap! (map-get? bounties { id: bounty-id }) (err u107)))

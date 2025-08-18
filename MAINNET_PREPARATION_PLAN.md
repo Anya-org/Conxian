@@ -25,7 +25,7 @@ AutoVault represents a **production-ready DeFi ecosystem** on Stacks with:
 
 ### **Core Infrastructure (Production Ready)**
 
-```
+```text
 AutoVault Ecosystem Architecture:
 
 📊 GOVERNANCE LAYER
@@ -61,7 +61,7 @@ AutoVault Ecosystem Architecture:
 
 ### **Contract Dependencies**
 
-```
+```text
 Deployment Order (Production Tested):
 
 Phase 1: Foundation Contracts
@@ -96,7 +96,7 @@ Phase 4: Advanced Features
 
 ### **Test Suite Results (108/111 Passing)**
 
-```
+```text
 🎯 CRITICAL SYSTEMS (ALL PASSING):
 ✅ Vault Operations: Deposit, withdraw, yield generation
 ✅ DAO Governance: Proposal creation, voting, execution
@@ -120,7 +120,7 @@ Phase 4: Advanced Features
 
 ### **Security Audit Readiness**
 
-```
+```text
 🛡️ SECURITY FEATURES IMPLEMENTED:
 ✅ AIP-1: Emergency Pause Integration
 ✅ AIP-2: Time-Weighted Voting
@@ -340,7 +340,7 @@ balance = 5000000
 
 ### **Weekly Execution Plan**
 
-```
+```text
 Week 1 (Aug 18-24):
 ├── Monday: Fix remaining test issues
 ├── Tuesday: Complete security audit preparation
@@ -386,7 +386,7 @@ Week 4 (Sep 8-14):
 
 ### **Emergency Procedures**
 
-```
+```text
 Incident Response Plan:
 
 Level 1 (Minor Issue):

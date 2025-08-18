@@ -124,31 +124,31 @@ All contracts are deployed with the prefix: `ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1E
 
 ### 📦 Batch 2 Contracts (7 contracts)
 
-26. **registry** - `ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC.registry`
+1. **registry** - `ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC.registry`
     - Cost: 20,720 µSTX
     - Path: contracts/registry.clar
 
-27. **stable-pool** - `ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC.stable-pool`
+2. **stable-pool** - `ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC.stable-pool`
     - Cost: 50,940 µSTX
     - Path: contracts/stable-pool.clar
 
-28. **state-anchor** - `ST14G8ACZNKBPR0WTX55NZ38NZ38NHN6K75AJ1ED4YDPC.state-anchor`
+3. **state-anchor** - `ST14G8ACZNKBPR0WTX55NZ38NZ38NHN6K75AJ1ED4YDPC.state-anchor`
     - Cost: 12,050 µSTX
     - Path: contracts/state-anchor.clar
 
-29. **strategy-trait** - `ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC.strategy-trait`
+4. **strategy-trait** - `ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC.strategy-trait`
     - Cost: 3,660 µSTX
     - Path: contracts/traits/strategy-trait.clar
 
-30. **treasury** - `ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC.treasury` ⭐ **TREASURY CONTRACT**
+5. **treasury** - `ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC.treasury` ⭐ **TREASURY CONTRACT**
     - Cost: 264,240 µSTX
     - Path: contracts/treasury.clar
 
-31. **vault-trait** - `ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC.vault-trait`
+6. **vault-trait** - `ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC.vault-trait`
     - Cost: 6,270 µSTX
     - Path: contracts/traits/vault-trait.clar
 
-32. **weighted-pool** - `ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC.weighted-pool`
+7. **weighted-pool** - `ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC.weighted-pool`
     - Cost: 176,130 µSTX
     - Path: contracts/weighted-pool.clar
 

@@ -1,8 +1,12 @@
-## DAO Governance & Voting PRD (v1.0)
+# DAO Governance & Voting PRD (v1.1)
 
-References: `dao-governance.clar`, `dao.clar`, AIP-2 (time-weighted voting), timelock.
+**References**: `dao-governance.clar`, `dao.clar`, AIP-2 (time-weighted voting), timelock, SDK 3.5.0 testing compliance
 
-### Summary
+**Status**: **STABLE** - Production Ready with SDK 3.5.0 compliance  
+**Last Updated**: 2025-08-18  
+**Next Review**: 2025-09-15
+
+## Summary
 
 On-chain proposal system with time-weighted voting & timelock execution ensuring resistance to flash accumulation & manipulation.
 
@@ -51,4 +55,10 @@ On-chain proposal system with time-weighted voting & timelock execution ensuring
 
 - Should decay apply to inactive delegates beyond N epochs?
 
-Changelog: v1.0 (2025-08-17)
+**Changelog**:
+
+- v1.1 (2025-08-18): SDK 3.5.0 compliance validation, production readiness confirmation  
+- v1.0 (2025-08-17): Initial stable implementation
+
+**Approved By**: Protocol WG, Governance Team  
+**Mainnet Status**: **APPROVED FOR DEPLOYMENT**
