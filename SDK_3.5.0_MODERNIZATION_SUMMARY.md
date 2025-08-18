@@ -111,7 +111,7 @@ stacks/
    bootContractsPath: 'tests/boot-contracts/'
    ```
 
-2. **Mainnet State Simulation** (v1.1)
+1. **Mainnet State Simulation** (v1.1)
 
    ```typescript
    const simnet = await initSimnet({
@@ -120,7 +120,7 @@ stacks/
    });
    ```
 
-3. **Advanced Analysis** (v1.2)
+2. **Advanced Analysis** (v1.2)
 
    ```typescript
    analysis: true,

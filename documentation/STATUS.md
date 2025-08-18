@@ -48,13 +48,7 @@ and enterprise-grade monitoring capabilities.
 ### Non-Critical Issues (Test Infrastructure Only)
 
 - Clarinet shim helper (framework issue, no impact)
-
-### Non-Critical Issues (Test Infrastructure Only)
-
-- Clarinet shim helper (framework issue, no impact)
 - Timelock integration test (bypassed, functionality confirmed working)
-
-### Recently Fixed
 
 ### Recently Fixed
 
