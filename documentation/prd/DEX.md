@@ -1,8 +1,10 @@
-# DEX / Liquidity Layer PRD (v1.0)
+## DEX / Liquidity Layer PRD (v1.0)
 
 **Status**: **STABLE** - Production Ready  
 **Last Updated**: 2025-08-18  
 **Next Review**: 2025-09-15
+
+ 
 
 ## Summary
 

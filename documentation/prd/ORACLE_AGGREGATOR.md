@@ -1,4 +1,4 @@
-# Oracle Aggregator PRD (v1.0)
+## Oracle Aggregator PRD (v1.0)
 
 **Status**: **STABLE** - Production Ready  
 **Last Updated**: 2025-08-18  

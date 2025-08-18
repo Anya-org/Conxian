@@ -1,4 +1,4 @@
-# VAULT PRD (v1.1)
+## VAULT PRD (v1.1)
 
 **Reference**: AIP-5 (Precision), Architecture doc, `vault.clar` implementation, SDK 3.5.0 testing compliance
 
@@ -61,9 +61,6 @@ Core capital aggregation primitive providing share-based accounting, configurabl
 | VAULT-INV-03 | Fees collected cannot exceed configured bps bounds. |
 | VAULT-INV-04 | Deposit after cap reached reverts. |
 
-### 8. Data / State (Conceptual)
-
-```clarity
 ### 8. Data / State (Conceptual)
 
 ```clarity
