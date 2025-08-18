@@ -1,8 +1,10 @@
-# Security Layer PRD (v1.2)
+## Security Layer PRD (v1.2)
 
 **Status**: **STABLE** - Production Ready with SDK 3.5.0 compliance  
 **Last Updated**: 2025-08-18  
 **Next Review**: 2025-09-01
+
+ 
 
 ## Scope
 
@@ -41,7 +43,6 @@ Consolidates AIP-1..5 + planned future hardening (rate limits, anomaly detection
 - Incentive alignment for rapid disclosure.
 
 **Changelog**:
-
 - v1.2 (2025-08-18): SDK 3.5.0 testing compliance, production security validation
 - v1.1 (2025-08-17): Initial consolidation
 
