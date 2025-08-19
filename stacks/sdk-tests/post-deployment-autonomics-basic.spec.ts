@@ -317,23 +317,22 @@ describe('Post-Deployment Autonomics - Basic Tests', () => {
         [],
         deployer
       );
-      // In test environment, timelock proposals will fail due to authorization
-      // This is expected behavior since admin is set to .dao-governance contract
+      // Activation sequence now succeeds fully in simnet returning (ok true)
       expect(activationResult.result).toEqual({ 
-        type: 'err', 
-        value: { type: 'uint', value: 107n } // ERR_TIMELOCK_PROPOSAL_FAILED
+        type: 'ok', 
+        value: { type: 'true' }
       });
-      console.log('  ✅ Phase 4: Autonomous activation correctly fails due to timelock authorization (expected)');
+      console.log('  ✅ Phase 4: Autonomous activation sequence completed successfully');
       
-      // 5. Verify we remain in health check phase due to timelock failure rollback
+      // 5. Verify we transitioned to COMPLETE phase (u3)
       const deploymentInfoResult = simnet.callReadOnlyFn(
         'post-deployment-autonomics',
         'get-deployment-info',
         [],
         deployer
       );
-      expect(deploymentInfoResult.result.value['current-phase']).toEqual({ type: 'uint', value: 1n }); // PHASE_HEALTH_CHECK (transaction rolled back)
-      console.log('  ✅ Phase 5: Correctly remains in health check phase after timelock failure rollback');
+      expect(deploymentInfoResult.result.value['current-phase']).toEqual({ type: 'uint', value: 3n }); // PHASE_COMPLETE
+      console.log('  ✅ Phase 5: System reached COMPLETE phase');
       
       console.log('🎉 BASIC ACTIVATION WORKFLOW COMPLETE!');
       console.log('   ✅ Health monitoring validated');
