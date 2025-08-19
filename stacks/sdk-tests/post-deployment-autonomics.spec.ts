@@ -34,7 +34,8 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         deployer
       );
       
-      expect(initResult.result).toEqual({ type: 'ok', value: { type: 'bool', value: true } });
+  // New SDK represents booleans as { type: 'true' } / { type: 'false' }
+  expect(initResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
       
       // Check deployment info
       const deploymentInfo = simnet.callReadOnlyFn(
@@ -200,7 +201,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         deployer
       );
       
-      expect(readinessResult.result).toEqual({ type: 'bool', value: false });
+  expect(readinessResult.result).toEqual({ type: 'false' });
       
       console.log('✅ Correctly detects system not ready initially');
     });
@@ -243,7 +244,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
       );
       
       // Should be ready now
-      expect(readinessResult.result).toEqual({ type: 'bool', value: true });
+  expect(readinessResult.result).toEqual({ type: 'true' });
       
       // Trigger activation
       const activationResult = simnet.callPublicFn(
@@ -253,7 +254,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         deployer
       );
       
-      expect(activationResult.result).toEqual({ type: 'ok', value: { type: 'bool', value: true } });
+  expect(activationResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
       
       console.log('✅ Activation triggered successfully when requirements met');
     });
@@ -295,7 +296,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         deployer
       );
       
-      expect(proposalResult.result).toEqual({ type: 'ok', value: { type: 'uint', value: 1n } });
+  expect(proposalResult.result).toEqual({ type: 'ok', value: { type: 'uint', value: 1n } });
       
       console.log('✅ Auto fees proposal created');
     });
@@ -308,7 +309,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         deployer
       );
       
-      expect(proposalResult.result).toEqual({ type: 'ok', value: { type: 'uint', value: 2n } });
+  expect(proposalResult.result).toEqual({ type: 'ok', value: { type: 'uint', value: 2n } });
       
       console.log('✅ Utilization thresholds proposal created');
     });
@@ -321,7 +322,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         deployer
       );
       
-      expect(proposalResult.result).toEqual({ type: 'ok', value: { type: 'uint', value: 3n } });
+  expect(proposalResult.result).toEqual({ type: 'ok', value: { type: 'uint', value: 3n } });
       
       console.log('✅ Fee bounds proposal created');
     });
@@ -334,7 +335,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         deployer
       );
       
-      expect(proposalResult.result).toEqual({ type: 'ok', value: { type: 'uint', value: 4n } });
+  expect(proposalResult.result).toEqual({ type: 'ok', value: { type: 'uint', value: 4n } });
       
       console.log('✅ Autonomous economics proposal created');
     });
@@ -347,7 +348,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         deployer
       );
       
-      expect(proposalResult.result).toEqual({ type: 'ok', value: { type: 'uint', value: 5n } });
+  expect(proposalResult.result).toEqual({ type: 'ok', value: { type: 'uint', value: 5n } });
       
       console.log('✅ Performance benchmark proposal created');
     });
@@ -371,7 +372,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         deployer
       );
       
-      expect(pauseResult.result).toEqual({ type: 'ok', value: { type: 'bool', value: true } });
+  expect(pauseResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
       
       // Check that phase was reset
       const deploymentInfo = simnet.callReadOnlyFn(
@@ -403,7 +404,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         deployer
       );
       
-      expect(resetResult.result).toEqual({ type: 'ok', value: { type: 'bool', value: true } });
+  expect(resetResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
       
       // Check that health was reset
       const healthInfo = simnet.callReadOnlyFn(
@@ -479,7 +480,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
       const updateResult = simnet.callPublicFn(
         'post-deployment-autonomics',
         'update-prd-compliance',
-        [Cl.ascii("VAULT-AUTONOMICS-AUTO-FEES"), Cl.bool(true), Cl.uint(100)],
+  [Cl.stringAscii("VAULT-AUTONOMICS-AUTO-FEES"), Cl.bool(true), Cl.uint(100)],
         deployer
       );
       
@@ -506,7 +507,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
       const updateResult = simnet.callPublicFn(
         'post-deployment-autonomics',
         'update-aip-status',
-        [Cl.uint(1), Cl.ascii("ACTIVE"), Cl.uint(100)],
+  [Cl.uint(1), Cl.stringAscii("ACTIVE"), Cl.uint(100)],
         deployer
       );
       
@@ -531,9 +532,9 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
     it('should provide mainnet readiness assessment', () => {
       // Update various compliance metrics
       simnet.callPublicFn('post-deployment-autonomics', 'update-prd-compliance', 
-                         [Cl.ascii("VAULT-AUTONOMICS-AUTO-FEES"), Cl.bool(true), Cl.uint(100)], deployer);
+                         [Cl.stringAscii("VAULT-AUTONOMICS-AUTO-FEES"), Cl.bool(true), Cl.uint(100)], deployer);
       simnet.callPublicFn('post-deployment-autonomics', 'update-aip-status', 
-                         [Cl.uint(1), Cl.ascii("ACTIVE"), Cl.uint(100)], deployer);
+                         [Cl.uint(1), Cl.stringAscii("ACTIVE"), Cl.uint(100)], deployer);
       
       // Get mainnet readiness report
       const readinessResult = simnet.callReadOnlyFn(
@@ -560,7 +561,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
       simnet.callPublicFn('post-deployment-autonomics', 'update-health-metrics', 
                          [Cl.uint(100), Cl.uint(2)], deployer);
       simnet.callPublicFn('post-deployment-autonomics', 'update-prd-compliance', 
-                         [Cl.ascii("VAULT-AUTONOMICS-PERFORMANCE"), Cl.bool(true), Cl.uint(100)], deployer);
+                         [Cl.stringAscii("VAULT-AUTONOMICS-PERFORMANCE"), Cl.bool(true), Cl.uint(100)], deployer);
       
       // Get comprehensive status
       const statusResult = simnet.callReadOnlyFn(
@@ -586,7 +587,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
       const metricResult = simnet.callReadOnlyFn(
         'post-deployment-autonomics',
         'get-system-metrics',
-        [Cl.ascii("vault-health")],
+  [Cl.stringAscii("vault-health")],
         deployer
       );
       
@@ -612,7 +613,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         [],
         deployer
       );
-      expect(initResult.result).toEqual({ type: 'ok', value: { type: 'bool', value: true } });
+  expect(initResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
       console.log('  ✅ Phase 1: Initialization complete');
       
       // Step 2: Build up health over time
@@ -634,7 +635,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         [],
         deployer
       );
-      expect(readinessResult.result).toEqual({ type: 'bool', value: true });
+  expect(readinessResult.result).toEqual({ type: 'true' });
       console.log('  ✅ Phase 3: System ready for activation confirmed');
       
       // Step 4: Trigger activation
@@ -644,7 +645,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         [],
         deployer
       );
-      expect(activationResult.result).toEqual({ type: 'ok', value: { type: 'bool', value: true } });
+  expect(activationResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
       console.log('  ✅ Phase 4: Autonomous activation triggered');
       
       // Step 5: Create all timelock proposals
@@ -663,7 +664,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
           [],
           deployer
         );
-        expect(result.result).toEqual({ type: 'ok', value: { type: 'uint', value: BigInt(index + 1) } });
+  expect(result.result).toEqual({ type: 'ok', value: { type: 'uint', value: BigInt(index + 1) } });
       });
       console.log('  ✅ Phase 5: All timelock proposals created');
       
@@ -689,7 +690,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
       // 1. Initialize post-deployment system
       console.log('   1. Initializing post-deployment tracking...');
       const initResult = simnet.callPublicFn('post-deployment-autonomics', 'initialize-post-deployment', [], deployer);
-      expect(initResult.result).toEqual({ type: 'ok', value: { type: 'bool', value: true } });
+  expect(initResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
 
       // 2. Update PRD compliance tracking
       console.log('   2. Updating PRD compliance status...');
@@ -702,15 +703,15 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
       ];
       
       prdRequirements.forEach(req => {
-        simnet.callPublicFn('post-deployment-autonomics', 'update-prd-compliance', 
-                           [Cl.ascii(req), Cl.bool(true), Cl.uint(100)], deployer);
+  simnet.callPublicFn('post-deployment-autonomics', 'update-prd-compliance', 
+         [Cl.stringAscii(req), Cl.bool(true), Cl.uint(100)], deployer);
       });
 
       // 3. Update AIP implementation tracking
       console.log('   3. Confirming AIP implementations...');
       for (let i = 1; i <= 5; i++) {
-        simnet.callPublicFn('post-deployment-autonomics', 'update-aip-status', 
-                           [Cl.uint(i), Cl.ascii("ACTIVE"), Cl.uint(100)], deployer);
+  simnet.callPublicFn('post-deployment-autonomics', 'update-aip-status', 
+         [Cl.uint(i), Cl.stringAscii("ACTIVE"), Cl.uint(100)], deployer);
       }
 
       // 4. Simulate excellent system health over time
@@ -736,12 +737,12 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
       // 7. Verify activation readiness
       console.log('   7. Verifying activation readiness...');
       const activationReady = simnet.callReadOnlyFn('post-deployment-autonomics', 'is-ready-for-activation', [], deployer);
-      expect(activationReady.result).toEqual({ type: 'bool', value: true });
+  expect(activationReady.result).toEqual({ type: 'true' });
 
       // 8. Trigger autonomous activation
       console.log('   8. Triggering autonomous activation...');
       const activationResult = simnet.callPublicFn('post-deployment-autonomics', 'trigger-autonomous-activation', [], deployer);
-      expect(activationResult.result).toEqual({ type: 'ok', value: { type: 'bool', value: true } });
+  expect(activationResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
 
       // 9. Create all autonomous economics proposals
       console.log('   9. Creating all autonomous economics timelock proposals...');

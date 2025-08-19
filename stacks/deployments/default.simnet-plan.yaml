@@ -146,6 +146,16 @@ plan:
             path: contracts/enhanced-yield-strategy.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: strategy-trait
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/traits/strategy-trait.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: enhanced-yield-strategy-complex
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/enhanced-yield-strategy-complex.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: enhanced-yield-strategy-simple
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/enhanced-yield-strategy-simple.clar
@@ -182,6 +192,11 @@ plan:
             contract-name: multi-hop-router-v2
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/multi-hop-router-v2.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: multi-hop-router-v2-complex
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/multi-hop-router-v2-complex.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: multi-hop-router-v2-simple
@@ -224,11 +239,6 @@ plan:
             path: contracts/state-anchor.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: strategy-trait
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/traits/strategy-trait.clar
-            clarity-version: 2
-        - emulated-contract-publish:
             contract-name: treasury
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/treasury.clar
@@ -237,6 +247,11 @@ plan:
             contract-name: twap-oracle-v2
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/twap-oracle-v2.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: twap-oracle-v2-complex
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/twap-oracle-v2-complex.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: twap-oracle-v2-simple

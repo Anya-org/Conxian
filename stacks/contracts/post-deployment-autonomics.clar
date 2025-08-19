@@ -150,7 +150,8 @@
 
 (define-public (update-prd-compliance (requirement-id (string-ascii 100)) (validated bool) (test-coverage uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_NOT_AUTHORIZED))
+    ;; Allow either deployer (during post-deployment stabilization) or admin (DAO) to update tracking
+    (asserts! (is-authorized-sender) (err ERR_NOT_AUTHORIZED))
     
     (match (map-get? prd-requirements { requirement-id: requirement-id })
       existing-req (begin
@@ -173,7 +174,8 @@
 
 (define-public (update-aip-status (aip-number uint) (status (string-ascii 20)) (compliance-score uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_NOT_AUTHORIZED))
+    ;; Allow either deployer (initial tracking) or admin (governance) to update AIP status
+    (asserts! (is-authorized-sender) (err ERR_NOT_AUTHORIZED))
     
     (map-set aip-implementations { aip-number: aip-number }
              { status: status, compliance-score: compliance-score, last-audit: block-height })
@@ -523,7 +525,8 @@
 
 (define-public (propose-enable-auto-fees)
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_NOT_AUTHORIZED))
+    ;; Use authorized-sender so deployer can orchestrate activation sequence before full DAO handoff
+    (asserts! (is-authorized-sender) (err ERR_NOT_AUTHORIZED))
     (asserts! (is-eq (var-get current-phase) PHASE_ACTIVATION) (err ERR_PHASE_INVALID))
     
     ;; This would create a timelock proposal to enable autonomous fees
@@ -539,7 +542,7 @@
 
 (define-public (propose-configure-thresholds)
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_NOT_AUTHORIZED))
+    (asserts! (is-authorized-sender) (err ERR_NOT_AUTHORIZED))
     (asserts! (is-eq (var-get current-phase) PHASE_ACTIVATION) (err ERR_PHASE_INVALID))
     
     (print {
@@ -553,7 +556,7 @@
 
 (define-public (propose-configure-fee-bounds)
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_NOT_AUTHORIZED))
+    (asserts! (is-authorized-sender) (err ERR_NOT_AUTHORIZED))
     (asserts! (is-eq (var-get current-phase) PHASE_ACTIVATION) (err ERR_PHASE_INVALID))
     
     (print {
@@ -567,7 +570,7 @@
 
 (define-public (propose-enable-auto-economics)
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_NOT_AUTHORIZED))
+    (asserts! (is-authorized-sender) (err ERR_NOT_AUTHORIZED))
     (asserts! (is-eq (var-get current-phase) PHASE_ACTIVATION) (err ERR_PHASE_INVALID))
     
     (print {
@@ -580,7 +583,7 @@
 
 (define-public (propose-set-performance-benchmark)
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_NOT_AUTHORIZED))
+    (asserts! (is-authorized-sender) (err ERR_NOT_AUTHORIZED))
     (asserts! (is-eq (var-get current-phase) PHASE_ACTIVATION) (err ERR_PHASE_INVALID))
     
     (print {
