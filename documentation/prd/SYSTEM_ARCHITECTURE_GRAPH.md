@@ -325,7 +325,7 @@ analytics.clar ← Monitoring systems
 
 #### **✅ LOW-IMPACT CHAINS**
 
-```clarityclarity
+```clarity
 bounty-system.clar ← automated-bounty-system.clar
 governance-test-helper.clar ← Testing infrastructure
 mock-ft.clar ← Development environment
