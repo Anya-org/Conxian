@@ -76,7 +76,39 @@
 ;; CORE ORACLE FUNCTIONS
 ;; =============================================================================
 
-;; (moved get-twap-price below helper functions to reduce interdependency parsing issues)
+;; Move recent observation helpers above manipulation check to satisfy ordering
+;; (Removed duplicate later definitions of get-recent-observations / recent-obs-iter)
+
+;; Check for price manipulation (moved after helper)
+(define-private (check-manipulation
+  (pair {token-a: principal, token-b: principal})
+  (new-price uint)
+  (new-liquidity uint)
+  (new-volume uint))
+  (let ((recent-obs (get-recent-observations pair u10))) ;; Last 10 observations
+    (if (>= (len recent-obs) u3)
+      (let ((price-deviation (calculate-price-deviation recent-obs new-price))
+            (volume-spike (calculate-volume-spike recent-obs new-volume)))
+        (if (or (> price-deviation MANIPULATION_THRESHOLD)
+                (> volume-spike (* u5 MANIPULATION_THRESHOLD)))
+          (begin
+            (map-set manipulation-alerts pair {
+              detected-at: block-height,
+              severity: (if (> price-deviation (* u2 MANIPULATION_THRESHOLD)) u2 u1),
+              price-deviation: price-deviation,
+              volume-spike: volume-spike,
+              recovery-block: (+ block-height u72)
+            })
+            (print {
+              event: "manipulation-detected",
+              pair: pair,
+              price-deviation: price-deviation,
+              volume-spike: volume-spike,
+              severity: (if (> price-deviation (* u2 MANIPULATION_THRESHOLD)) u2 u1)
+            })
+            (err ERR_MANIPULATION_DETECTED))
+          (ok true)))
+      (ok true))))
 
 ;; Record new price observation
 (define-public (observe-price
@@ -208,43 +240,8 @@
 
 ;; =============================================================================
 ;; MANIPULATION DETECTION
+;; (definition moved above)
 ;; =============================================================================
-
-;; Check for price manipulation
-(define-private (check-manipulation
-  (pair {token-a: principal, token-b: principal})
-  (new-price uint)
-  (new-liquidity uint)
-  (new-volume uint))
-  (let ((recent-obs (get-recent-observations pair u10))) ;; Last 10 observations
-    (if (>= (len recent-obs) u3)
-      (let ((price-deviation (calculate-price-deviation recent-obs new-price))
-            (volume-spike (calculate-volume-spike recent-obs new-volume)))
-        
-        ;; Check for manipulation indicators
-        (if (or (> price-deviation MANIPULATION_THRESHOLD)
-                (> volume-spike (* u5 MANIPULATION_THRESHOLD))) ;; 5x volume spike
-          (begin
-            ;; Record manipulation alert
-            (map-set manipulation-alerts pair {
-              detected-at: block-height,
-              severity: (if (> price-deviation (* u2 MANIPULATION_THRESHOLD)) u2 u1),
-              price-deviation: price-deviation,
-              volume-spike: volume-spike,
-              recovery-block: (+ block-height u72) ;; ~12 hour recovery
-            })
-            
-            (print {
-              event: "manipulation-detected",
-              pair: pair,
-              price-deviation: price-deviation,
-              volume-spike: volume-spike,
-              severity: (if (> price-deviation (* u2 MANIPULATION_THRESHOLD)) u2 u1)
-            })
-            
-            (err ERR_MANIPULATION_DETECTED))
-          (ok true)))
-      (ok true)))) ;; Not enough history to detect manipulation
 
 ;; Calculate price deviation from recent average
 (define-private (calculate-price-deviation
@@ -299,7 +296,7 @@
             (get-observations-iter pair start-block end-block card (mod (+ current-index u1) card) (+ count u1) acc)))
         acc))))
 
-;; Get recent observations
+;; Get recent observations (duplicate removed earlier)
 (define-private (get-recent-observations (pair {token-a: principal, token-b: principal}) (count uint))
   (let ((config (map-get? pair-config pair)))
     (if (is-some config)
@@ -309,14 +306,7 @@
         (recent-obs-iter pair card idx u0 count (list)))
       (list))))
 
-(define-private (recent-obs-iter (pair {token-a: principal, token-b: principal}) (card uint) (current-index uint) (collected uint) (target uint) (acc (list 256 {timestamp: uint, price: uint, liquidity: uint})))
-  (if (or (>= collected target) (>= (len acc) u256))
-    acc
-    (let ((obs (map-get? price-observations {pair: pair, index: current-index})))
-      (if (is-some obs)
-        (let ((o (unwrap-panic obs)))
-          (recent-obs-iter pair card (mod (+ current-index (if (> current-index u0) (- card u1) u0)) card) (+ collected u1) target (unwrap-panic (as-max-len? (append acc {timestamp: (get timestamp o), price: (get price o), liquidity: (get liquidity o)}) u256)))
-        acc))))
+;; recent-obs-iter already defined above with primary helper location
 
 ;; Calculate simple average price
 (define-private (calculate-simple-average
@@ -447,4 +437,4 @@
     (asserts! (is-some (map-get? pair-config pair)) ERR_INVALID_PAIR)
     (match (map-get? twap-cache {pair: pair, period: period})
       cached-twap (if (<= block-height (get valid-until cached-twap)) (ok (get twap-price cached-twap)) (calculate-and-cache-twap pair period))
-      (calculate-and-cache-twap pair period))) )
+      (calculate-and-cache-twap pair period))))
