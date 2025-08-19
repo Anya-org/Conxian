@@ -120,7 +120,10 @@
         (try! (check-manipulation pair price liquidity volume))
         (ok true))
       
-      ;; Record observation
+  ;; Enforce minimum liquidity
+  (asserts! (>= liquidity (get min-liquidity config)) ERR_INVALID_PRICE)
+
+  ;; Record observation
       (let ((new-index (mod (+ (get observation-index config) u1) (get observation-cardinality config)))
             (cumulative-price (calculate-cumulative-price pair price)))
         
@@ -295,15 +298,62 @@
   (pair {token-a: principal, token-b: principal})
   (start-block uint)
   (end-block uint))
-  ;; Simplified implementation - would traverse observation ring buffer
-  (list))
+  (let ((config (map-get? pair-config pair)))
+    (if (is-some config)
+      (let ((cfg (unwrap-panic config))
+            (card (get observation-cardinality (unwrap-panic config)))
+            (idx (get observation-index (unwrap-panic config))))
+        (get-observations-iter pair start-block end-block card idx u0 (list)))
+      (list)))
+
+(define-private (get-observations-iter
+  (pair {token-a: principal, token-b: principal})
+  (start-block uint)
+  (end-block uint)
+  (card uint)
+  (current-index uint)
+  (count uint)
+  (acc (list 256 {timestamp: uint, price: uint, liquidity: uint})))
+  (if (or (>= count card) (>= (len acc) u256))
+    acc
+    (let ((obs (map-get? price-observations {pair: pair, index: current-index})))
+      (if (is-some obs)
+        (let ((o (unwrap-panic obs)))
+          (if (and (>= (get block-height o) start-block) (<= (get block-height o) end-block))
+            (get-observations-iter pair start-block end-block card (mod (+ current-index u1) card) (+ count u1)
+              (unwrap-panic (as-max-len? (append acc {timestamp: (get timestamp o), price: (get price o), liquidity: (get liquidity o)}) u256)))
+            (get-observations-iter pair start-block end-block card (mod (+ current-index u1) card) (+ count u1) acc)))
+        acc)))
 
 ;; Get recent observations
 (define-private (get-recent-observations
   (pair {token-a: principal, token-b: principal})
   (count uint))
-  ;; Simplified implementation
-  (list))
+  (let ((config (map-get? pair-config pair)))
+    (if (is-some config)
+      (let ((cfg (unwrap-panic config))
+            (card (get observation-cardinality (unwrap-panic config)))
+            (idx (get observation-index (unwrap-panic config))))
+        (recent-obs-iter pair card idx u0 count (list)))
+      (list)))
+
+(define-private (recent-obs-iter
+  (pair {token-a: principal, token-b: principal})
+  (card uint)
+  (current-index uint)
+  (collected uint)
+  (target uint)
+  (acc (list 256 {timestamp: uint, price: uint, liquidity: uint})))
+  (if (or (>= collected target) (>= (len acc) u256))
+    acc
+    (let ((obs (map-get? price-observations {pair: pair, index: current-index})))
+      (if (is-some obs)
+        (let ((o (unwrap-panic obs)))
+          (recent-obs-iter pair card (mod (+ current-index (if (> current-index u0) (- card u1) u0)) card)
+            (+ collected u1)
+            target
+            (unwrap-panic (as-max-len? (append acc {timestamp: (get timestamp o), price: (get price o), liquidity: (get liquidity o)}) u256))))
+        acc)))
 
 ;; Calculate simple average price
 (define-private (calculate-simple-average
@@ -335,8 +385,12 @@
 ;; Invalidate TWAP cache for all periods
 (define-private (invalidate-twap-cache
   (pair {token-a: principal, token-b: principal}))
-  ;; Simplified - would invalidate all cached TWAP values for this pair
-  true)
+  ;; Invalidate by scanning limited periods (heuristic: common windows 12, 24, 72 blocks)
+  (begin
+    (map-delete twap-cache {pair: pair, period: u12})
+    (map-delete twap-cache {pair: pair, period: u24})
+    (map-delete twap-cache {pair: pair, period: u72})
+    true))
 
 ;; =============================================================================
 ;; PAIR MANAGEMENT

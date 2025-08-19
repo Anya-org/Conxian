@@ -71,20 +71,24 @@
     (asserts! (> amount-in u0) ERR_INVALID_ROUTE)
     
     ;; Execute multi-hop swap
-    (let ((final-amount (try! (execute-multi-hop-swap path pools amount-in u0))))
-      (asserts! (>= final-amount min-amount-out) ERR_SLIPPAGE_EXCEEDED)
-      
-      ;; Emit routing event
-      (print {
-        event: "multi-hop-swap",
-        path: path,
-        amount-in: amount-in,
-        amount-out: final-amount,
-        pools-used: (len pools),
-        trader: tx-sender
-      })
-      
-      (ok final-amount))))
+    (let ((gross-final (try! (execute-multi-hop-swap path pools amount-in u0))))
+      (asserts! (>= gross-final min-amount-out) ERR_SLIPPAGE_EXCEEDED)
+      ;; Apply routing fee if configured
+      (let ((fee-bps (var-get routing-fee-bps))
+            (net-final (if (is-eq (var-get routing-fee-bps) u0)
+                         gross-final
+                         (- gross-final (/ (* gross-final fee-bps) FEE_DENOMINATOR)))))
+        (print {
+          event: "multi-hop-swap",
+          path: path,
+          amount-in: amount-in,
+          gross-out: gross-final,
+          net-out: net-final,
+          fee-bps: fee-bps,
+          pools-used: (len pools),
+          trader: tx-sender
+        })
+        (ok net-final)))))
 
 ;; Multi-hop swap with exact output
 (define-public (swap-exact-out-multi-hop
@@ -103,18 +107,24 @@
       (asserts! (<= required-input max-amount-in) ERR_SLIPPAGE_EXCEEDED)
       
       ;; Execute swap
-      (let ((final-amount (try! (execute-multi-hop-swap path pools required-input u0))))
-        
-        (print {
-          event: "multi-hop-swap-exact-out",
-          path: path,
-          amount-in: required-input,
-          amount-out: final-amount,
-          pools-used: (len pools),
-          trader: tx-sender
-        })
-        
-        (ok required-input)))))
+      (let ((gross-final (try! (execute-multi-hop-swap path pools required-input u0))))
+        (asserts! (>= gross-final amount-out) ERR_INSUFFICIENT_OUTPUT)
+        (let ((fee-bps (var-get routing-fee-bps))
+              (net-final (if (is-eq (var-get routing-fee-bps) u0)
+                           gross-final
+                           (- gross-final (/ (* gross-final fee-bps) FEE_DENOMINATOR)))))
+          (print {
+            event: "multi-hop-swap-exact-out",
+            path: path,
+            required-out: amount-out,
+            gross-out: gross-final,
+            net-out: net-final,
+            fee-bps: fee-bps,
+            amount-in: required-input,
+            pools-used: (len pools),
+            trader: tx-sender
+          })
+          (ok required-input)))))
 
 ;; =============================================================================
 ;; PATH EXECUTION LOGIC
@@ -126,20 +136,13 @@
   (pools (list 4 <pool-trait>))
   (current-amount uint)
   (hop-index uint))
-  (if (is-eq hop-index (- (len pools) u1))
-    ;; Last hop - return final amount
-    (execute-single-hop 
-      (unwrap-panic (element-at path hop-index))
-      (unwrap-panic (element-at path (+ hop-index u1)))
-      (unwrap-panic (element-at pools hop-index))
-      current-amount)
-    ;; Intermediate hop - continue recursively
-    (let ((hop-result (try! (execute-single-hop
-                              (unwrap-panic (element-at path hop-index))
-                              (unwrap-panic (element-at path (+ hop-index u1)))
-                              (unwrap-panic (element-at pools hop-index))
-                              current-amount))))
-      (execute-multi-hop-swap path pools hop-result (+ hop-index u1)))))
+  (if (>= hop-index (len pools))
+    (ok current-amount)
+    (let ((token-in (unwrap! (element-at path hop-index) ERR_INVALID_PATH))
+          (token-out (unwrap! (element-at path (+ hop-index u1)) ERR_INVALID_PATH))
+          (pool (unwrap! (element-at pools hop-index) ERR_INVALID_PATH)))
+      (let ((hop-result (try! (execute-single-hop token-in token-out pool current-amount))))
+        (execute-multi-hop-swap path pools hop-result (+ hop-index u1))))))
 
 ;; Execute single hop in the route
 (define-private (execute-single-hop
@@ -179,8 +182,8 @@
                         amount-in 
                         u0 ;; No slippage check here - handled at route level
                         true)
-    success (ok (get amount-out success))
-    error (err ERR_NO_LIQUIDITY)))
+  success (ok (get amount-out success))
+  error (err ERR_NO_LIQUIDITY)))
 
 ;; Execute stable swap
 (define-private (execute-stable-swap

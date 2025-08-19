@@ -1,11 +1,15 @@
 ;; =============================================================================
-;; ENHANCED YIELD STRATEGY - PHASE 2 IMPLEMENTATION
+;; ENHANCED YIELD STRATEGY (COMPLEX VARIANT) – HARDENED
+;; Implements multi-strategy management with share-based accounting.
+;; Added: trait compliance wrappers, accurate share supply tracking, events for
+;; all admin/state transitions, safer math placeholders (still simplified).
 ;; =============================================================================
 
 (use-trait ft-trait .sip-010-trait.sip-010-trait)
-(use-trait strategy-trait .strategy-trait.strategy-trait)
+;; Correct trait name inside strategy-trait contract
+(use-trait strategy-trait .strategy-trait.auto-strategy-trait)
 
-;; Error codes
+;; Error codes (u800+ reserved for strategy complex)
 (define-constant ERR_UNAUTHORIZED (err u800))
 (define-constant ERR_STRATEGY_PAUSED (err u801))
 (define-constant ERR_INSUFFICIENT_BALANCE (err u802))
@@ -19,17 +23,17 @@
 (define-constant MAX_STRATEGIES u10)
 (define-constant MAX_ALLOCATION_BPS u10000) ;; 100%
 (define-constant REBALANCE_COOLDOWN u144) ;; ~24 hours
-(define-constant MIN_HARVEST_INTERVAL u6) ;; Minimum 6 blocks between harvests
-(define-constant PERFORMANCE_FEE_BPS u500) ;; 5% performance fee
+(define-constant MIN_HARVEST_INTERVAL u6)
+(define-constant PERFORMANCE_FEE_BPS u500) ;; 5%
 
-;; Strategy information
+;; Strategy registry
 (define-map strategies
   uint
   {
     name: (string-ascii 50),
     contract: principal,
     active: bool,
-    risk-level: uint, ;; 1-5 scale
+    risk-level: uint,
     target-apy: uint,
     current-allocation: uint,
     max-allocation: uint,
@@ -38,7 +42,7 @@
     performance-fee: uint
   })
 
-;; Yield tracking
+;; Optional yield period history (simplified)
 (define-map yield-history
   {strategy-id: uint, period: uint}
   {
@@ -50,7 +54,7 @@
     apy-achieved: uint
   })
 
-;; User allocations
+;; User allocations (amount & shares)
 (define-map user-allocations
   {user: principal, strategy-id: uint}
   {
@@ -60,7 +64,7 @@
     last-compound: uint
   })
 
-;; Strategy performance metrics
+;; Performance metrics (simplified placeholders)
 (define-map performance-metrics
   uint
   {
@@ -73,13 +77,18 @@
     max-drawdown: uint
   })
 
+;; Total issued shares per strategy
+(define-map strategy-share-supply uint uint)
+
 ;; State variables
 (define-data-var strategy-manager principal tx-sender)
 (define-data-var next-strategy-id uint u1)
 (define-data-var total-assets-under-management uint u0)
 (define-data-var auto-compound-enabled bool true)
-(define-data-var risk-tolerance uint u3) ;; 1-5 scale, 3 = moderate
+(define-data-var risk-tolerance uint u3)
 (define-data-var last-rebalance uint u0)
+(define-data-var default-strategy-id uint u0) ;; for trait wrapper
+(define-data-var default-token principal 'SP000000000000000000002Q6VF78) ;; placeholder
 
 ;; =============================================================================
 ;; CORE YIELD STRATEGY FUNCTIONS
@@ -100,11 +109,12 @@
     (let ((new-allocation (+ (get current-allocation strategy) amount)))
       (asserts! (<= new-allocation (get max-allocation strategy)) ERR_INVALID_ALLOCATION)
       
-      ;; Calculate shares (simplified - would use more sophisticated formula)
-      (let ((shares (if (is-eq (get total-assets strategy) u0)
-                      amount ;; Initial deposit
-                      (/ (* amount (get-strategy-total-shares strategy-id)) 
-                         (get total-assets strategy)))))
+  ;; Calculate shares: proportional to existing supply
+  (let ((existing-total (get total-assets strategy))
+    (issued (get-strategy-total-shares strategy-id)))
+    (let ((shares (if (is-eq existing-total u0)
+        amount
+        (/ (* amount issued) existing-total))))
         
         (asserts! (>= shares min-shares) ERR_SLIPPAGE_EXCEEDED)
         
@@ -114,13 +124,15 @@
         ;; Execute strategy-specific deposit
         (try! (execute-strategy-deposit strategy-id amount))
         
-        ;; Update user allocation
+  ;; Update user allocation (mint shares)
         (map-set user-allocations {user: tx-sender, strategy-id: strategy-id} {
           amount: (+ amount (get-user-allocation tx-sender strategy-id)),
           shares: (+ shares (get-user-shares tx-sender strategy-id)),
           entry-block: block-height,
           last-compound: block-height
         })
+  ;; Update share supply
+  (map-set strategy-share-supply strategy-id (+ shares issued))
         
         ;; Update strategy state
         (map-set strategies strategy-id (merge strategy {
@@ -155,20 +167,26 @@
     (asserts! (>= (get shares user-allocation) shares) ERR_INSUFFICIENT_BALANCE)
     
     ;; Calculate withdrawal amount
-    (let ((withdrawal-amount (/ (* shares (get total-assets strategy)) 
-                               (get-strategy-total-shares strategy-id))))
+  (let ((total-shares (get-strategy-total-shares strategy-id))
+      (strategy-assets (get total-assets strategy)))
+    (let ((withdrawal-amount (if (or (is-eq total-shares u0) (is-eq strategy-assets u0))
+                 u0
+                 (/ (* shares strategy-assets) total-shares))))
       
       (asserts! (>= withdrawal-amount min-amount) ERR_SLIPPAGE_EXCEEDED)
       
       ;; Execute strategy-specific withdrawal
       (let ((actual-amount (try! (execute-strategy-withdrawal strategy-id withdrawal-amount))))
         
-        ;; Update user allocation
+        ;; Update user allocation (burn shares)
         (map-set user-allocations {user: tx-sender, strategy-id: strategy-id} 
                  (merge user-allocation {
                    amount: (- (get amount user-allocation) actual-amount),
                    shares: (- (get shares user-allocation) shares)
                  }))
+        ;; Decrease share supply safely
+        (let ((s (get-strategy-total-shares strategy-id)))
+          (map-set strategy-share-supply strategy-id (if (> s shares) (- s shares) u0)))
         
         ;; Update strategy state
         (map-set strategies strategy-id (merge strategy {
@@ -449,10 +467,9 @@
     {amount: u0, shares: u0, entry-block: u0, last-compound: u0}
     (map-get? user-allocations {user: user, strategy-id: strategy-id})))
 
-;; Get strategy total shares
+;; Total issued shares (u0 if none)
 (define-private (get-strategy-total-shares (strategy-id uint))
-  ;; Simplified - would calculate actual total shares
-  u1000000)
+  (default-to u0 (map-get? strategy-share-supply strategy-id)))
 
 ;; Update performance metrics
 (define-private (update-performance-metrics (strategy-id uint) (yield-earned uint))
@@ -505,6 +522,7 @@
   (begin
     (asserts! (is-eq tx-sender (var-get strategy-manager)) ERR_UNAUTHORIZED)
     (var-set auto-compound-enabled enabled)
+    (print {event: "set-auto-compound", enabled: enabled})
     (ok true)))
 
 (define-public (set-risk-tolerance (new-tolerance uint))
@@ -512,6 +530,7 @@
     (asserts! (is-eq tx-sender (var-get strategy-manager)) ERR_UNAUTHORIZED)
     (asserts! (<= new-tolerance u5) ERR_INVALID_STRATEGY)
     (var-set risk-tolerance new-tolerance)
+    (print {event: "set-risk-tolerance", value: new-tolerance})
     (ok true)))
 
 (define-public (pause-strategy (strategy-id uint))
@@ -527,4 +546,37 @@
   (begin
     (asserts! (is-eq tx-sender (var-get strategy-manager)) ERR_UNAUTHORIZED)
     (var-set strategy-manager new-manager)
+    (print {event: "strategy-manager-transferred", new-manager: new-manager})
     (ok true)))
+
+;; =============================
+;; Trait compliance wrappers
+;; =============================
+(define-public (set-default-strategy (strategy-id uint) (token <ft-trait>))
+  (begin
+    (asserts! (is-eq tx-sender (var-get strategy-manager)) ERR_UNAUTHORIZED)
+    (asserts! (is-some (map-get? strategies strategy-id)) ERR_INVALID_STRATEGY)
+    (var-set default-strategy-id strategy-id)
+    (var-set default-token (contract-of token))
+    (print {event: "default-strategy-set", strategy-id: strategy-id, token: (var-get default-token)})
+    (ok true)))
+
+(define-private (ensure-default-config)
+  (asserts! (> (var-get default-strategy-id) u0) ERR_INVALID_STRATEGY))
+
+(define-public (deposit (amount uint))
+  (begin (ensure-default-config) (deposit-to-strategy (var-get default-strategy-id) (var-get default-token) amount amount)))
+
+(define-public (withdraw (shares uint))
+  (begin (ensure-default-config) (withdraw-from-strategy (var-get default-strategy-id) shares shares)))
+
+(define-public (harvest)
+  (begin (ensure-default-config) (harvest-strategy (var-get default-strategy-id))))
+
+(define-public (get-tvl)
+  (begin
+    (ensure-default-config)
+    (let ((sid (var-get default-strategy-id)))
+      (match (map-get? strategies sid)
+        strategy (ok (get total-assets strategy))
+        ERR_INVALID_STRATEGY))))
