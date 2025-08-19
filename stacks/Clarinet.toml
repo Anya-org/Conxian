@@ -105,10 +105,17 @@ path = "contracts/dao-automation.clar"
 clarity_version = 2
 epoch = "2.4"
 
-[contracts.enhanced-governance]
-path = "contracts/enhanced-governance.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.enhanced-governance]  # DISABLED: placeholder file
+# path = "contracts/enhanced-governance.clar"
+# clarity_version = 2
+# epoch = "2.4"
+
+# NOTE 2025-08-19: enhanced-governance.clar is currently an empty placeholder (0 bytes).
+# Commenting out to prevent build failures. Re-enable once implementation lands and tests are added.
+# [contracts.enhanced-governance]
+# path = "contracts/enhanced-governance.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 [contracts.governance-test-helper]
 path = "contracts/governance-test-helper.clar"
@@ -210,10 +217,17 @@ path = "contracts/stable-pool.clar"
 clarity_version = 2
 epoch = "2.4"
 
-[contracts.stable-pool-clean]
-path = "contracts/stable-pool-clean.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.stable-pool-clean]  # DISABLED: placeholder file
+# path = "contracts/stable-pool-clean.clar"
+# clarity_version = 2
+# epoch = "2.4"
+
+# NOTE 2025-08-19: stable-pool-clean.clar is currently an empty placeholder (0 bytes).
+# Commenting out to prevent build failures. Re-enable once implementation and tests are available.
+# [contracts.stable-pool-clean]
+# path = "contracts/stable-pool-clean.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 [contracts.weighted-pool]
 path = "contracts/weighted-pool.clar"
