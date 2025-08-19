@@ -19,6 +19,7 @@
 (define-constant ERR_COOLDOWN_ACTIVE (err u806))
 (define-constant ERR_INVALID_ALLOCATION (err u807))
 (define-constant ERR_STRATEGY_NOT_FOUND (err u808))
+(define-constant ERR_STRATEGY_INACTIVE (err u809))
 
 ;; Constants
 (define-constant MAX_STRATEGIES u10)
@@ -39,6 +40,7 @@
     current-allocation: uint,
     max-allocation: uint,
     total-assets: uint,
+    total-shares: uint,
     last-harvest: uint,
     performance-fee: uint
   })
@@ -230,7 +232,7 @@
       (map-set strategies strategy-id (merge strategy-info {
         total-assets: (+ current-nav amount),
         total-shares: (+ total-shares shares-to-mint),
-        last-update: block-height
+        last-harvest: block-height
       }))
       
       ;; Update user position
@@ -277,7 +279,7 @@
         (map-set strategies strategy-id (merge strategy-info {
           total-assets: (- total-assets withdrawal-amount),
           total-shares: (- total-shares shares),
-          last-update: block-height
+          last-harvest: block-height
         }))
         
         ;; Update user position
@@ -311,7 +313,7 @@
         (map-set strategies strategy-id (merge strategy-info {
           total-assets: (+ current-assets yield-earned),
           last-harvest: block-height,
-          last-update: block-height
+          last-harvest: block-height
         }))
         
         (print {
@@ -469,6 +471,7 @@
       current-allocation: u0,
       max-allocation: max-allocation,
       total-assets: u0,
+      total-shares: u0,
       last-harvest: block-height,
       performance-fee: PERFORMANCE_FEE_BPS
     })
@@ -600,7 +603,7 @@
         (map-set strategies strategy-id (merge strategy-info {
           total-assets: (+ current-nav amount),
           total-shares: (+ total-shares shares-to-mint),
-          last-update: block-height
+          last-harvest: block-height
         }))
         
         (let ((user-key {strategy-id: strategy-id, user: tx-sender})
