@@ -76,25 +76,7 @@
 ;; CORE ORACLE FUNCTIONS
 ;; =============================================================================
 
-;; Get TWAP price with manipulation resistance
-(define-public (get-twap-price
-  (token-a principal)
-  (token-b principal)
-  (period uint))
-  (let ((pair {token-a: token-a, token-b: token-b}))
-    
-    ;; Validate inputs
-    (asserts! (> period u0) ERR_INVALID_PERIOD)
-    (asserts! (is-some (map-get? pair-config pair)) ERR_INVALID_PAIR)
-    
-    ;; Check for cached TWAP
-    (match (map-get? twap-cache {pair: pair, period: period})
-      cached-twap
-        (if (<= block-height (get valid-until cached-twap))
-          (ok (get twap-price cached-twap))
-          (calculate-and-cache-twap pair period))
-      ;; No cache, calculate fresh
-      (calculate-and-cache-twap pair period))))
+;; (moved get-twap-price below helper functions to reduce interdependency parsing issues)
 
 ;; Record new price observation
 (define-public (observe-price
@@ -457,3 +439,12 @@
     (asserts! (is-eq tx-sender (var-get oracle-admin)) ERR_UNAUTHORIZED)
     (var-set oracle-admin new-admin)
     (ok true)))
+
+;; Get TWAP price with manipulation resistance (placed last)
+(define-public (get-twap-price (token-a principal) (token-b principal) (period uint))
+  (let ((pair {token-a: token-a, token-b: token-b}))
+    (asserts! (> period u0) ERR_INVALID_PERIOD)
+    (asserts! (is-some (map-get? pair-config pair)) ERR_INVALID_PAIR)
+    (match (map-get? twap-cache {pair: pair, period: period})
+      cached-twap (if (<= block-height (get valid-until cached-twap)) (ok (get twap-price cached-twap)) (calculate-and-cache-twap pair period))
+      (calculate-and-cache-twap pair period)))

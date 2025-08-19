@@ -57,6 +57,16 @@
 ;; CORE ROUTING FUNCTIONS
 ;; =============================================================================
 
+;; Move internal executor earlier to avoid interdependency detection
+(define-private (execute-multi-hop-swap (path (list 5 principal)) (pools (list 4 <pool-trait>)) (current-amount uint) (hop-index uint))
+  (if (>= hop-index (len pools))
+    (ok current-amount)
+    (let ((token-in (unwrap! (element-at path hop-index) ERR_INVALID_PATH))
+          (token-out (unwrap! (element-at path (+ hop-index u1)) ERR_INVALID_PATH))
+          (pool (unwrap! (element-at pools hop-index) ERR_INVALID_PATH)))
+      (let ((result (try! (contract-call? pool swap-exact-in token-in token-out current-amount tx-sender))))
+        (execute-multi-hop-swap path pools result (+ hop-index u1))))))
+
 ;; Multi-hop swap with exact input
 (define-public (swap-exact-in-multi-hop (path (list 5 principal)) (pools (list 4 <pool-trait>)) (amount-in uint) (min-amount-out uint) (deadline uint))
   (begin
