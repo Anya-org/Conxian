@@ -48,4 +48,4 @@ jobs:
               }
             }
 
-            core.info('PR Policy checks passed.');
+            core.info('PR Policy checks passed.')
