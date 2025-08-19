@@ -7,26 +7,26 @@
 
 ### Primary Deployer Account
 
-- **Testnet Address**: `ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC`
-- **Mainnet Address**: `SP14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1CWEMN41`
-- **Current Balance**: 4.9905 STX (499,050,000 µSTX)
+- **Testnet Address**: `ST2Z52FZD0RB2KSR7K4416V7RHXQZKDRJ9KW2RS2P`
+- **Mainnet Address**: `SP2Z52FZD0RB2KSR7K4416V7RHXQZKDRJ9G06DJSH`
+- **Current Balance**: 0.0 STX (NEEDS FUNDING)
 - **Deployment Cost**: ~2.89 STX
-- **Remaining After Deployment**: ~2.1 STX
+- **Required Funding**: ~5.0 STX minimum
 
 ### Environment Setup
 
 ```bash
-export DEPLOYER_PRIVKEY=ddf291b96c4b6c193440e3652470738bc064b587681edc76112c2695ac33644f01
+export DEPLOYER_PRIVKEY=9d7465d4094ce95ab0a880faf59aa8479606b9397c0aecfe751778b454ed7f3c01
 export NETWORK=testnet
-```text
+```
 
 ### Backup Information
 
 **Mnemonic** (store securely offline):
 
 ```text
-light glare bench random limit flame change call boil wolf exercise bar test argue parade envelope execute chimney good seven warrior blue gorilla jaguar
-```text
+shuffle muffin remove sphere laugh crop length zoo frown three donkey cage reward weather season bless all joy area bridge drama smart police empower
+```
 
 **Derivation Path**: `m/44'/5757'/0'/0/0`
 
@@ -36,9 +36,9 @@ With the funded wallet configured, you can now proceed with testnet deployment:
 
 ```bash
 cd /workspaces/AutoVault/stacks
-export DEPLOYER_PRIVKEY=ddf291b96c4b6c193440e3652470738bc064b587681edc76112c2695ac33644f01
+export DEPLOYER_PRIVKEY=9d7465d4094ce95ab0a880faf59aa8479606b9397c0aecfe751778b454ed7f3c01
 export NETWORK=testnet
-clarinet deployment apply --testnet
+npm run deploy-contracts-ts
 ```text
 
 ## 📊 Balance Verification

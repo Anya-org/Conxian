@@ -2,9 +2,9 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    include: ['tests/**/*.ts', 'sdk-tests/**/*.spec.ts'],
+    environment: 'node',
     testTimeout: 60000,
-    globals: true,
-  setupFiles: ['global-vitest.setup.ts'],
+    include: ['tests/**/*.ts', 'sdk-tests/**/*.spec.ts'],
+    setupFiles: ['./global-vitest.setup.ts']
   },
 });

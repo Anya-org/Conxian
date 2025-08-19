@@ -79,9 +79,19 @@ lerna-debug.log*
 # Prompt files (sensitive AI instructions)
 .github/prompts/
 .github/instructions/
+.github/chatmodes/
 *.prompt.md
 *-prompt.md
 prompt-*.md
+*.chatmode.md
+
+# Backup files (automatically generated)
+*.backup
+*.bak
+*.tmp
+*~
+.#*
+#*#
 
 # Security & Private Keys (CRITICAL)
 *.pem
