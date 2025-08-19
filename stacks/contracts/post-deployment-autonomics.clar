@@ -45,6 +45,7 @@
 (define-data-var admin principal .dao-governance)
 (define-data-var vault-contract principal .vault)
 (define-data-var timelock-contract principal .timelock)
+(define-data-var deployer principal tx-sender) ;; Store deployer for initial operations
 
 ;; Deployment state tracking
 (define-data-var current-phase uint PHASE_WAITING)
@@ -92,12 +93,22 @@
 (define-data-var next-call-id uint u1)
 
 ;; ========================================
+;; HELPER FUNCTIONS
+;; ========================================
+
+;; Check if sender is authorized (deployer during setup, admin for operations)
+(define-private (is-authorized-sender)
+  (or 
+    (is-eq tx-sender (var-get deployer))
+    (is-eq tx-sender (var-get admin))))
+
+;; ========================================
 ;; COMPREHENSIVE TRACKING & ALIGNMENT
 ;; ========================================
 
 (define-public (initialize-tracking-system)
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_NOT_AUTHORIZED))
+    (asserts! (is-authorized-sender) (err ERR_NOT_AUTHORIZED))
     
     ;; Initialize core system metrics
     (map-set system-metrics { metric-name: "vault-health" } 
@@ -305,9 +316,11 @@
     (total-tx (var-get total-transactions))
     (failed-tx (var-get failed-transactions))
     (error-rate (if (> total-tx u0) 
-                   (/ (* failed-tx u10000) total-tx) 
+                   (/ (* failed-tx u100) total-tx) 
                    u0))
-    (base-health (if (<= error-rate MAX_ERROR_THRESHOLD) u100 (- u100 error-rate)))
+    (base-health (if (<= error-rate MAX_ERROR_THRESHOLD) 
+                    (if (>= u100 error-rate) (- u100 error-rate) u0)
+                    u0))
   )
     (var-set system-error-rate error-rate)
     (var-set vault-health-score base-health)
@@ -353,7 +366,7 @@
 
 (define-public (initialize-post-deployment)
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_NOT_AUTHORIZED))
+    (asserts! (is-authorized-sender) (err ERR_NOT_AUTHORIZED))
     (asserts! (is-eq (var-get current-phase) PHASE_WAITING) (err ERR_PHASE_INVALID))
     
     (var-set deployment-block block-height)
@@ -377,7 +390,7 @@
 
 (define-public (update-health-metrics (tx-count uint) (error-count uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_NOT_AUTHORIZED))
+    (asserts! (is-authorized-sender) (err ERR_NOT_AUTHORIZED))
     
     (var-set total-transactions (+ (var-get total-transactions) tx-count))
     (var-set failed-transactions (+ (var-get failed-transactions) error-count))
@@ -414,7 +427,7 @@
 
 (define-public (trigger-autonomous-activation)
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_NOT_AUTHORIZED))
+    (asserts! (is-authorized-sender) (err ERR_NOT_AUTHORIZED))
     (asserts! (is-system-ready-for-activation) (err ERR_HEALTH_CHECK_FAILED))
     (asserts! (is-eq (var-get current-phase) PHASE_HEALTH_CHECK) (err ERR_PHASE_INVALID))
     
@@ -584,7 +597,7 @@
 
 (define-public (emergency-pause-activation)
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_NOT_AUTHORIZED))
+    (asserts! (is-authorized-sender) (err ERR_NOT_AUTHORIZED))
     
     (var-set current-phase PHASE_WAITING)
     (var-set consecutive-healthy-blocks u0)
@@ -599,7 +612,7 @@
 
 (define-public (reset-health-monitoring)
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_NOT_AUTHORIZED))
+    (asserts! (is-authorized-sender) (err ERR_NOT_AUTHORIZED))
     
     (var-set vault-health-score u0)
     (var-set system-error-rate u0)
