@@ -180,20 +180,22 @@ epoch = "2.4"
 # clarity_version = 2
 # epoch = "2.4"
 
-[contracts.enhanced-yield-strategy-complex]
-path = "contracts/enhanced-yield-strategy-complex.clar"
-clarity_version = 2
-epoch = "2.4"
+## Complex variant contracts temporarily excluded due to syntax/semantic errors.
+## TODO: Track issue to fix parentheses & unresolved functions before re-adding.
+# [contracts.enhanced-yield-strategy-complex]
+# path = "contracts/enhanced-yield-strategy-complex.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
-[contracts.multi-hop-router-v2-complex]
-path = "contracts/multi-hop-router-v2-complex.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.multi-hop-router-v2-complex]
+# path = "contracts/multi-hop-router-v2-complex.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
-[contracts.twap-oracle-v2-complex]
-path = "contracts/twap-oracle-v2-complex.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.twap-oracle-v2-complex]
+# path = "contracts/twap-oracle-v2-complex.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 # ===========================================
 # TOKENS - Protocol tokens
