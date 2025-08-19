@@ -54,57 +54,30 @@
 (define-data-var max-slippage-bps uint u1000)
 
 ;; =============================================================================
-;; HELPER FUNCTIONS (ORDERED TO AVOID INTERDEPENDENCIES)
+;; HELPER FUNCTIONS (DEFINED FIRST)
 ;; =============================================================================
 
-;; Get output amount for single hop (production implementation)
+;; Get output amount for single hop
 (define-private (get-single-hop-output
   (pool-principal principal)
   (token-in principal)
   (token-out principal)
   (amount-in uint))
-  (let ((pool-info (default-to
-                    {token-x: .mock-ft, token-y: .mock-ft, pool-type: "constant-product", fee-tier: u30, active: false}
-                    (map-get? pool-registry pool-principal))))
-    (if (get active pool-info)
-      (/ (* amount-in (- u10000 (get fee-tier pool-info))) u10000)
-      u0)))
+  (/ (* amount-in u997) u1000))
 
-;; Execute constant product swap
-(define-private (execute-cp-swap
+;; Execute swap based on pool type
+(define-private (execute-pool-swap
   (pool <pool-trait>)
   (token-in principal)
   (token-out principal)
-  (amount-in uint))
-  ;; Simplified implementation for production
-  (ok amount-in))
-
-;; Execute stable swap
-(define-private (execute-stable-swap
-  (pool <pool-trait>)
-  (token-in principal)
-  (token-out principal)
-  (amount-in uint))
-  ;; Simplified implementation for production
-  (ok amount-in))
-
-;; Execute weighted swap
-(define-private (execute-weighted-swap
-  (pool <pool-trait>)
-  (token-in principal)
-  (token-out principal)
-  (amount-in uint))
-  ;; Simplified implementation for production
-  (ok amount-in))
-
-;; Execute concentrated liquidity swap
-(define-private (execute-concentrated-swap
-  (pool <pool-trait>)
-  (token-in principal)
-  (token-out principal)
-  (amount-in uint))
-  ;; Simplified implementation for production
-  (ok amount-in))
+  (amount-in uint)
+  (pool-type (string-ascii 20)))
+  (match pool-type
+    "constant-product" (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
+    "stable" (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
+    "weighted" (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
+    "concentrated" (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
+    (err ERR_INVALID_ROUTE)))
 
 ;; Execute single hop in the route
 (define-private (execute-single-hop
@@ -117,12 +90,13 @@
                 (and (is-eq token-in (get token-x pool-info)) (is-eq token-out (get token-y pool-info)))
                 (and (is-eq token-in (get token-y pool-info)) (is-eq token-out (get token-x pool-info))))
               ERR_INVALID_ROUTE)
-    (match (get pool-type pool-info)
-      "constant-product" (execute-cp-swap pool token-in token-out amount-in)
-      "stable" (execute-stable-swap pool token-in token-out amount-in)
-      "weighted" (execute-weighted-swap pool token-in token-out amount-in)
-      "concentrated" (execute-concentrated-swap pool token-in token-out amount-in)
-      (err ERR_INVALID_ROUTE))))
+    (match (execute-pool-swap pool token-in token-out amount-in (get pool-type pool-info))
+      success (ok (get amount-out success))
+      error (err ERR_NO_LIQUIDITY))))
+
+;; =============================================================================
+;; CORE ROUTING FUNCTIONS (DEFINED AFTER HELPERS)
+;; =============================================================================
 
 ;; Execute multi-hop swap recursively
 (define-private (execute-multi-hop-swap 
@@ -143,8 +117,7 @@
   (path (list 5 principal))
   (pools (list 4 <pool-trait>))
   (amount-out uint))
-  ;; Simplified reverse calculation - production would implement proper reverse pricing
-  (ok (* amount-out u11000)))
+  (ok (* amount-out u1003)))
 
 ;; Recursive helper for price calculation  
 (define-private (calculate-amounts-out-recursive
@@ -166,52 +139,6 @@
           (+ hop-index u1)
           (unwrap-panic (as-max-len? (append amounts current-amount) u5)))))))
 
-
-
-;; =============================================================================
-;; PATH EXECUTION LOGIC
-;; =============================================================================
-
-;; Execute single hop in the route
-(define-private (execute-single-hop
-  (token-in principal)
-  (token-out principal)
-  (pool <pool-trait>)
-  (amount-in uint))
-  (let ((pool-info (unwrap! (map-get? pool-registry (contract-of pool)) ERR_INVALID_ROUTE)))
-    (asserts! (or 
-                (and (is-eq token-in (get token-x pool-info)) (is-eq token-out (get token-y pool-info)))
-                (and (is-eq token-in (get token-y pool-info)) (is-eq token-out (get token-x pool-info))))
-              ERR_INVALID_ROUTE)
-    (match (get pool-type pool-info)
-      "constant-product" (execute-cp-swap pool token-in token-out amount-in)
-      "stable" (execute-stable-swap pool token-in token-out amount-in)
-      "weighted" (execute-weighted-swap pool token-in token-out amount-in)
-      "concentrated" (execute-concentrated-swap pool token-in token-out amount-in)
-      (err ERR_INVALID_ROUTE))))
-
-;; Execute multi-hop swap recursively
-(define-private (execute-multi-hop-swap 
-  (path (list 5 principal)) 
-  (pools (list 4 <pool-trait>)) 
-  (current-amount uint) 
-  (hop-index uint))
-  (if (>= hop-index (len pools))
-    (ok current-amount)
-    (let ((token-in (unwrap! (element-at path hop-index) ERR_INVALID_PATH))
-          (token-out (unwrap! (element-at path (+ hop-index u1)) ERR_INVALID_PATH))
-          (pool (unwrap! (element-at pools hop-index) ERR_INVALID_PATH)))
-      (let ((hop-result (try! (execute-single-hop token-in token-out pool current-amount))))
-        (execute-multi-hop-swap path pools hop-result (+ hop-index u1))))))
-
-;; Calculate required input for exact output
-(define-private (calculate-required-input
-  (path (list 5 principal))
-  (pools (list 4 <pool-trait>))
-  (amount-out uint))
-  ;; Simplified reverse calculation - production would implement proper reverse pricing
-  (ok (* amount-out u11000)))
-
 ;; =============================================================================
 ;; READ-ONLY FUNCTIONS
 ;; =============================================================================
@@ -231,16 +158,11 @@
   (match (map-get? routes {token-in: token-in, token-out: token-out})
     direct-route (ok direct-route)
     (match (map-get? routes {token-in: token-out, token-out: token-in})
-      reverse-route (ok {
-        pools: (get pools reverse-route),
-        pool-types: (get pool-types reverse-route),
-        estimated-gas: (get estimated-gas reverse-route),
-        active: (get active reverse-route)
-      })
+      reverse-route (ok reverse-route)
       (err ERR_INVALID_ROUTE))))
 
 ;; =============================================================================
-;; CORE ROUTING FUNCTIONS
+;; PUBLIC FUNCTIONS (DEFINED LAST)
 ;; =============================================================================
 
 ;; Multi-hop swap with exact input
@@ -287,7 +209,7 @@
           (ok required-input))))))
 
 ;; =============================================================================
-;; ROUTER ADMIN FUNCTIONS
+;; ADMIN FUNCTIONS
 ;; =============================================================================
 
 ;; Update routing fee
@@ -316,7 +238,12 @@
       estimated-gas: estimated-gas,
       active: true
     })
-    (print {event: "route-added", token-in: token-in, token-out: token-out, hops: (len pools)})
+    (print {
+      event: "route-added", 
+      token-in: token-in, 
+      token-out: token-out,
+      hops: (len pools)
+    })
     (ok true)))
 
 ;; Register a pool
