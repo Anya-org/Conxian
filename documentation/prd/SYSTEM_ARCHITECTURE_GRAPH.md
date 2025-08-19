@@ -309,7 +309,7 @@ graph TB
 
 #### **🚨 HIGH-IMPACT CHAINS**
 
-```
+```text
 vault.clar ← treasury.clar ← dao.clar ← dao-governance.clar
 vault.clar ← circuit-breaker.clar ← oracle-aggregator.clar ← TWAP Oracle
 math-lib.clar ← vault.clar + All Pool Contracts
@@ -317,7 +317,7 @@ math-lib.clar ← vault.clar + All Pool Contracts
 
 #### **⚠️ MEDIUM-IMPACT CHAINS**
 
-```
+```text
 pool-trait.clar ← All Pool Implementations
 registry.clar ← Discovery-dependent contracts
 analytics.clar ← Monitoring systems
@@ -325,7 +325,7 @@ analytics.clar ← Monitoring systems
 
 #### **✅ LOW-IMPACT CHAINS**
 
-```
+```text
 bounty-system.clar ← automated-bounty-system.clar
 governance-test-helper.clar ← Testing infrastructure
 mock-ft.clar ← Development environment
