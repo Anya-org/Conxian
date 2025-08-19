@@ -235,12 +235,14 @@
         last-harvest: block-height
       }))
       
-      ;; Update user position
-      (let ((user-key {strategy-id: strategy-id, user: tx-sender})
-            (current-position (default-to {shares: u0, last-deposit: u0} (map-get? user-positions user-key))))
-        (map-set user-positions user-key (merge current-position {
-          shares: (+ (get shares current-position) shares-to-mint),
-          last-deposit: block-height
+      ;; Update user allocation
+      (let ((user-key {user: tx-sender, strategy-id: strategy-id})
+            (current-allocation (default-to {amount: u0, shares: u0, entry-block: u0, last-compound: u0} (map-get? user-allocations user-key))))
+        (map-set user-allocations user-key (merge current-allocation {
+          amount: (+ (get amount current-allocation) amount),
+          shares: (+ (get shares current-allocation) shares-to-mint),
+          entry-block: block-height,
+          last-compound: block-height
         })))
       
       (print {
@@ -260,9 +262,9 @@
     (asserts! (is-some (map-get? strategies strategy-id)) ERR_STRATEGY_NOT_FOUND)
     
     (let ((strategy-info (unwrap-panic (map-get? strategies strategy-id)))
-          (user-key {strategy-id: strategy-id, user: tx-sender})
-          (user-position (unwrap! (map-get? user-positions user-key) ERR_INSUFFICIENT_BALANCE))
-          (user-shares (get shares user-position)))
+          (user-key {user: tx-sender, strategy-id: strategy-id})
+          (user-allocation (unwrap! (map-get? user-allocations user-key) ERR_INSUFFICIENT_BALANCE))
+          (user-shares (get shares user-allocation)))
       
       ;; Verify user has sufficient shares
       (asserts! (>= user-shares shares) ERR_INSUFFICIENT_BALANCE)
@@ -282,8 +284,8 @@
           last-harvest: block-height
         }))
         
-        ;; Update user position
-        (map-set user-positions user-key (merge user-position {
+        ;; Update user allocation
+        (map-set user-allocations user-key (merge user-allocation {
           shares: (- user-shares shares)
         }))
         
@@ -312,7 +314,6 @@
         ;; Update strategy with harvested yield
         (map-set strategies strategy-id (merge strategy-info {
           total-assets: (+ current-assets yield-earned),
-          last-harvest: block-height,
           last-harvest: block-height
         }))
         
@@ -327,48 +328,6 @@
 ;; =============================================================================
 ;; YIELD HARVESTING & COMPOUNDING
 ;; =============================================================================
-
-;; Harvest yields from strategy
-;; Fixed function signature - simplify
-(define-public (harvest-strategy (strategy-id uint))
-  (begin
-    (let ((strategy (unwrap! (map-get? strategies strategy-id) ERR_INVALID_STRATEGY)))
-    
-      (asserts! (get active strategy) ERR_STRATEGY_PAUSED)
-      (asserts! (>= (- block-height (get last-harvest strategy)) MIN_HARVEST_INTERVAL) 
-                ERR_COOLDOWN_ACTIVE)
-      
-      ;; Execute harvest
-      (let ((yield-earned (try! (execute-strategy-harvest strategy-id))))
-        
-        ;; Calculate performance fee
-        (let ((performance-fee (/ (* yield-earned PERFORMANCE_FEE_BPS) MAX_ALLOCATION_BPS))
-              (net-yield (- yield-earned performance-fee)))
-          
-          ;; Update strategy state
-          (map-set strategies strategy-id (merge strategy {
-            last-harvest: block-height,
-            total-assets: (+ (get total-assets strategy) net-yield)
-          }))
-          
-          ;; Update performance metrics
-          (update-performance-metrics strategy-id yield-earned)
-          
-          ;; Auto-compound if enabled
-          (if (var-get auto-compound-enabled)
-            (try! (compound-strategy strategy-id net-yield))
-            true)
-          
-          ;; Emit harvest event
-          (print {
-            event: "strategy-harvested",
-            strategy-id: strategy-id,
-            yield-earned: yield-earned,
-            performance-fee: performance-fee,
-            net-yield: net-yield
-          })
-          
-          (ok yield-earned))))))
 
 ;; =============================================================================
 ;; PORTFOLIO REBALANCING
@@ -579,7 +538,7 @@
 ;; Production-grade deposit function with proper token handling
 (define-public (deposit (token <ft-trait>) (amount uint))
   (begin 
-    (try! (ensure-default-config))
+    (asserts! (> (var-get default-strategy-id) u0) ERR_INVALID_STRATEGY)
     (deposit-to-strategy (var-get default-strategy-id) token amount amount)))
 
 ;; Convenience deposit using default token (requires trait cast)
@@ -606,11 +565,13 @@
           last-harvest: block-height
         }))
         
-        (let ((user-key {strategy-id: strategy-id, user: tx-sender})
-              (current-position (default-to {shares: u0, last-deposit: u0} (map-get? user-positions user-key))))
-          (map-set user-positions user-key (merge current-position {
-            shares: (+ (get shares current-position) shares-to-mint),
-            last-deposit: block-height
+        (let ((user-key {user: tx-sender, strategy-id: strategy-id})
+              (current-allocation (default-to {amount: u0, shares: u0, entry-block: u0, last-compound: u0} (map-get? user-allocations user-key))))
+          (map-set user-allocations user-key (merge current-allocation {
+            amount: (+ (get amount current-allocation) amount),
+            shares: (+ (get shares current-allocation) shares-to-mint),
+            entry-block: block-height,
+            last-compound: block-height
           })))
         
         (print {
