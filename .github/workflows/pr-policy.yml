@@ -1,0 +1,51 @@
+name: PR Policy Enforcement
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled]
+
+jobs:
+  enforce:
+    name: Enforce Base Branch & Labels
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Enforce Policy
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              core.info('No PR found in context.');
+              return;
+            }
+            const base = pr.base.ref;
+            const title = pr.title || '';
+            const labels = (pr.labels || []).map(l => l.name);
+
+            const isEnhancement = labels.some(n => /enhancement|feat|feature/i.test(n)) || /^(feat|enhancement)/i.test(title);
+            const allowedBases = ['main','enhancements','develop'];
+
+            if (!allowedBases.includes(base)) {
+              core.setFailed(`PR base '${base}' is not allowed. Use one of: ${allowedBases.join(', ')}`);
+            }
+
+            // 1) Enhancement PRs must NOT target main
+            if (base === 'main' && isEnhancement) {
+              core.setFailed('Enhancement PRs must target the "enhancements" branch, not "main".');
+            }
+
+            // 2) PRs to main must be production-only and carry an appropriate label
+            if (base === 'main') {
+              const allowedLabels = ['production','bugfix','security','hotfix','docs'];
+              const ok = labels.some(l => allowedLabels.includes(l));
+              if (!ok) {
+                core.setFailed(`PRs to main must include one of labels: ${allowedLabels.join(', ')}`);
+              }
+              if (/experimental|WIP|prototype/i.test(title)) {
+                core.setFailed('WIP/Experimental/Prototype PRs cannot target main.');
+              }
+            }
+
+            core.info('PR Policy checks passed.');

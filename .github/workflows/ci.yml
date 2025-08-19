@@ -2,9 +2,9 @@ name: AutoVault CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, enhancements ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, enhancements ]
   workflow_dispatch: {}
 
 env:
@@ -62,6 +62,14 @@ jobs:
         run: cd stacks && npm ci --no-audit --no-fund
       - name: Verify Clarinet Installation (pinned via npx)
         run: cd stacks && npx clarinet --version
+      - name: Enforce Clarinet SDK version
+        run: |
+          set -e
+          VER=$(cd stacks && npx --yes clarinet --version | awk '{print $2}')
+          if [ "$VER" != "${{ env.CLARINET_VERSION }}" ]; then
+            echo "Expected Clarinet ${{ env.CLARINET_VERSION }} but got $VER"
+            exit 1
+          fi
       - name: Contract Compilation (pinned Clarinet)
         run: cd stacks && npx clarinet check
 
