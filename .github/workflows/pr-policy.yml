@@ -31,9 +31,9 @@ jobs:
               core.setFailed(`PR base '${base}' is not allowed. Use one of: ${allowedBases.join(', ')}`);
             }
 
-            // 1) Enhancement PRs must NOT target main
-            if (base === 'main' && isEnhancement) {
-              core.setFailed('Enhancement PRs must target the "enhancements" branch, not "main".');
+            // 1) Enhancement PRs must target 'enhancements' only
+            if (isEnhancement && base !== 'enhancements') {
+              core.setFailed(`Enhancement PRs must target the 'enhancements' branch (current base: '${base}').`);
             }
 
             // 2) PRs to main must be production-only and carry an appropriate label

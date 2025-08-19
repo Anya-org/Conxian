@@ -1,0 +1,25 @@
+# Auto-labeler configuration
+# See: https://github.com/actions/labeler
+
+enhancement:
+  - 'stacks/contracts/**/*.clar'
+  - 'stacks/src/**/*.ts'
+  - 'scripts/**/*.ts'
+  - 'stacks/tests/**/*.ts'
+
+docs:
+  - '**/*.md'
+  - 'documentation/**'
+  - 'README.md'
+
+bugfix:
+  - 'stacks/**/*.ts'
+  - 'scripts/**/*.sh'
+  - '.github/workflows/**'
+
+contracts:
+  - 'stacks/contracts/**/*.clar'
+
+security:
+  - 'stacks/contracts/**/*.clar'
+  - 'documentation/SECURITY.md'
