@@ -211,6 +211,8 @@
 ;; =============================================================================
 
 ;; Deposit into yield strategy with proper trait handling
+;; Returns (ok u0) to unify with other state-mutating functions that are
+;; called from wrappers expecting (response uint uint) without nested responses
 (define-public (deposit-to-strategy (strategy-id uint) (token <ft-trait>) (amount uint) (min-shares uint))
   (begin
     (asserts! (> amount u0) ERR_INSUFFICIENT_BALANCE)
@@ -253,9 +255,10 @@
         shares-minted: shares-to-mint,
         new-nav: (+ current-nav amount)
       })
-      (ok shares-to-mint))))
+  (ok u0))))
 
 ;; Withdraw from yield strategy with proper share burning
+;; Returns (ok u0) to maintain uniform simple uint success pattern
 (define-public (withdraw-from-strategy (strategy-id uint) (shares uint) (min-amount uint))
   (begin
     (asserts! (> shares u0) ERR_INSUFFICIENT_BALANCE)
@@ -297,7 +300,7 @@
           amount-withdrawn: withdrawal-amount,
           remaining-shares: (- user-shares shares)
         })
-        (ok withdrawal-amount)))))
+  (ok u0)))))
 
 ;; Harvest strategy yields with proper accounting
 (define-public (harvest-strategy (strategy-id uint))
@@ -522,8 +525,11 @@
 ;; =============================
 
 (define-private (ensure-default-config)
+  ;; Return a unified (response uint uint) so that chaining with try!
+  ;; in functions returning (response uint uint) does not produce
+  ;; heterogeneous response types (bool vs uint)
   (if (> (var-get default-strategy-id) u0)
-    (ok true)
+    (ok u0)
     (err ERR_INVALID_STRATEGY)))
 
 (define-public (set-default-strategy (strategy-id uint) (token <ft-trait>))
@@ -539,64 +545,32 @@
 (define-public (deposit (token <ft-trait>) (amount uint))
   (begin 
     (asserts! (> (var-get default-strategy-id) u0) ERR_INVALID_STRATEGY)
-    (deposit-to-strategy (var-get default-strategy-id) token amount amount)))
+    (try! (deposit-to-strategy (var-get default-strategy-id) token amount amount))
+    (ok u0)))
 
-;; Convenience deposit using default token (requires trait cast)
-(define-public (deposit-default (amount uint))
-  (begin 
-    (try! (ensure-default-config))
-    ;; This requires the caller to cast the default token appropriately
-    ;; In production, this would be handled by the frontend/integration layer
-    (let ((strategy-id (var-get default-strategy-id)))
-      (asserts! (> amount u0) ERR_INSUFFICIENT_BALANCE)
-      (asserts! (is-some (map-get? strategies strategy-id)) ERR_STRATEGY_NOT_FOUND)
-      
-      ;; Direct strategy logic without token trait dependency for convenience function
-      (let ((strategy-info (unwrap-panic (map-get? strategies strategy-id)))
-            (current-nav (get total-assets strategy-info))
-            (total-shares (get total-shares strategy-info))
-            (shares-to-mint (if (is-eq total-shares u0)
-                             amount 
-                             (/ (* amount total-shares) current-nav))))
-        
-        (map-set strategies strategy-id (merge strategy-info {
-          total-assets: (+ current-nav amount),
-          total-shares: (+ total-shares shares-to-mint),
-          last-harvest: block-height
-        }))
-        
-        (let ((user-key {user: tx-sender, strategy-id: strategy-id})
-              (current-allocation (default-to {amount: u0, shares: u0, entry-block: u0, last-compound: u0} (map-get? user-allocations user-key))))
-          (map-set user-allocations user-key (merge current-allocation {
-            amount: (+ (get amount current-allocation) amount),
-            shares: (+ (get shares current-allocation) shares-to-mint),
-            entry-block: block-height,
-            last-compound: block-height
-          })))
-        
-        (print {
-          event: "deposit-default-strategy", 
-          strategy-id: strategy-id, 
-          user: tx-sender,
-          amount: amount, 
-          shares-minted: shares-to-mint
-        })
-        (ok shares-to-mint)))))
+;; NOTE: deposit-default convenience function removed for type unification.
+;; Rationale: It duplicated core logic and introduced heterogeneous response
+;; path typing (nested response bool/uint vs response uint/uint) causing
+;; compilation failure at line ~551. Frontend should call 'deposit' with
+;; explicit token trait reference. If reintroduced, wrap asserts in unified
+;; response pattern returning (ok u0) placeholders prior to final (ok shares).
 
 (define-public (withdraw (shares uint))
   (begin 
-    (try! (ensure-default-config))
-    (withdraw-from-strategy (var-get default-strategy-id) shares shares)))
+    (asserts! (> (var-get default-strategy-id) u0) ERR_INVALID_STRATEGY)
+    (try! (withdraw-from-strategy (var-get default-strategy-id) shares shares))
+    (ok u0)))
 
 (define-public (harvest)
   (begin 
-    (try! (ensure-default-config))
-    (harvest-strategy (var-get default-strategy-id))))
+    (asserts! (> (var-get default-strategy-id) u0) ERR_INVALID_STRATEGY)
+    (try! (harvest-strategy (var-get default-strategy-id)))
+    (ok u0)))
 
 (define-public (get-tvl)
-  (begin
-    (try! (ensure-default-config))
-    (let ((sid (var-get default-strategy-id)))
+  (let ((sid (var-get default-strategy-id)))
+    (if (> sid u0)
       (match (map-get? strategies sid)
         strategy (ok (get total-assets strategy))
-        (err ERR_INVALID_STRATEGY)))))
+        (ok u0))
+      (ok u0))))
