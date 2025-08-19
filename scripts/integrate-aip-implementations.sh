@@ -101,7 +101,8 @@ fi
 
 # Deploy to testnet for verification
 print_status "Preparing testnet deployment..."
-clarinet deployments generate --testnet 2>&1 | tee deployment-prep.log
+
+npx clarinet deployments generate --testnet 2>&1 | tee deployment-prep.log
 
 print_status "🎉 AIP Implementation Integration Complete!"
 echo "================================================="

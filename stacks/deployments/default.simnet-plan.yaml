@@ -1,6 +1,6 @@
 ---
 id: 0
-name: "Simulated deployment, used as a default for `clarinet console`, `clarinet test` and `clarinet check`"
+name: "Simulated deployment, used as a default for `npx clarinet console`, `npx clarinet test` and `npx clarinet check`"
 network: simnet
 genesis:
   wallets:

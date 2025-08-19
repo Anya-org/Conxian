@@ -44,7 +44,7 @@ Before deleting any variant file:
 1. Confirm no tests import or reference variant (grep + run full suite).  
 2. Archive diff snippet into `documentation/ARCHIVE_DIFFS.md` (hash, lines changed).  
 3. Update `CHANGELOG.md` under Unreleased: "Removed legacy variant <file> (superseded by <active-file>, no unique logic)".  
-4. Re-run `clarinet check` + full tests (must remain green).  
+4. Re-run `npx clarinet check` + full tests (must remain green).  
 5. Tag PR with `refactor:contract-cleanup` and note AIP impact (none or specify).  
 
 ## Planned Actions (Ordered)

@@ -18,7 +18,7 @@ Closes #(issue number)
 - [ ] Change 3
 
 ## Testing
-- [ ] Unit tests pass (`clarinet test`)
+- [ ] Unit tests pass (`npx clarinet test`)
 - [ ] Integration tests pass
 - [ ] Manual testing completed
 - [ ] Contract deployment tested on Simnet

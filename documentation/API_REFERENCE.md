@@ -47,7 +47,7 @@ curl -s \
   }'
 ```
 
-Arguments for read-only are Clarity Value hex-encoded. For principals, use their CV encoding (e.g., via stacks.js or clarinet console).
+Arguments for read-only are Clarity Value hex-encoded. For principals, use their CV encoding (e.g., via stacks.js or npx clarinet console).
 
 ## Broadcast a signed transaction
 
@@ -113,8 +113,10 @@ export HIRO_API_KEY="<your-key>"
 
 ## Local development (Clarinet)
 
-- `clarinet check` — compile and static analysis.
-- `clarinet console` — ephemeral devnet + REPL to call functions:
+Note: This repo pins Clarinet SDK v3.5.0 via npm. Use `npx clarinet` to ensure the correct version.
+
+- `npx clarinet check` — compile and static analysis.
+- `npx clarinet console` — ephemeral devnet + REPL to call functions:
 
 ```clj
 ;; inside console

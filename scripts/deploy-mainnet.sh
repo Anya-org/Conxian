@@ -12,7 +12,7 @@ fi
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_ROOT/stacks"
 
-clarinet check
+npx clarinet check
 
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)
 FILE="deployment-registry-mainnet-${STAMP}.json"

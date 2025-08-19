@@ -12,7 +12,7 @@ echo "====================================="
 
 # Pre-test validation
 echo "[1/4] Contract validation..."
-clarinet check
+npx clarinet check
 if [ $? -eq 0 ]; then
     echo "✅ All contracts compile successfully"
 else
@@ -148,7 +148,7 @@ echo ""
 echo "🎯 MANUAL TESTING INSTRUCTIONS:"
 echo "==============================="
 echo ""
-echo "1. Run: clarinet console"
+echo "1. Run: npx clarinet console"
 echo "2. Copy commands from manual_test_commands.clar"
 echo "3. Execute them one by one in the console"
 echo "4. Verify expected outputs"
@@ -174,7 +174,7 @@ for contract_file in "$CONTRACTS_DIR"/*.clar; do
         echo "  Checking $contract_name..."
         
         # Basic syntax validation (already done by clarinet check, but double-checking)
-        if ! clarinet check "$contract_file" &>/dev/null; then
+        if ! npx clarinet check "$contract_file" &>/dev/null; then
             echo "    ❌ Syntax error in $contract_name"
             ((ERROR_COUNT++))
         else
@@ -189,7 +189,7 @@ if [ $ERROR_COUNT -eq 0 ]; then
     echo "🚀 READY FOR MANUAL TESTING"
     echo "==========================="
     echo ""
-    echo "Start with: clarinet console"
+    echo "Start with: npx clarinet console"
     echo "Then use commands from: manual_test_commands.clar"
 else
     echo "❌ $ERROR_COUNT contracts have issues"

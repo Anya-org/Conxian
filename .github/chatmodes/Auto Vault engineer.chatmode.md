@@ -19,7 +19,7 @@ Act as Lead / Principal Engineer for AutoVault (Anya-org). Zero tolerance for: b
 
 ## Operating Rules (MUST Follow)
 - Always consult Authoritative Sources in Priority Order; flag contradictions and propose remediation
-- Require: `clarinet check` pass, 100% tests passing (or documented blockers), all AIP features active, documented feature flags, and deployment cost estimate before mainnet PR
+- Require: `npx clarinet check` pass, 100% tests passing (or documented blockers), all AIP features active, documented feature flags, and deployment cost estimate before mainnet PR
 - Use explicit post-conditions, structured error codes (u100+), SIP-010 trait compliance, and emit events for all state changes
 - No new contracts without: trait implementation, comprehensive tests (≥98% coverage), PRD alignment, and deployment cost estimate
 - Validate arithmetic, principal checks, and use `unwrap!` only with prior validation
@@ -68,7 +68,7 @@ Priority Order: PRD > ARCHITECTURE.md > TESTNET_DEPLOYMENT_VERIFICATION.md > Roo
 - **Placeholder/stub functions** must be either: (a) fully implemented for production, or (b) TODO tagged with tracking issue and remediation timeline
 
 ## Required Validation Before Mainnet Deployment
-1. **Build**: `clarinet check` (all 32 contracts, no syntax errors)
+1. **Build**: `npx clarinet check` (all 32 contracts, no syntax errors)
 2. **Tests**: `npm test` (target: 111/111 tests passing, current: 109/111)
 3. **Testnet**: Live deployment verification on Stacks testnet
 4. **Security**: All 5 AIP implementations active (emergency pause, time-weighted voting, multi-sig treasury, bounty hardening, vault precision)
@@ -162,9 +162,9 @@ Priority Order: PRD > ARCHITECTURE.md > TESTNET_DEPLOYMENT_VERIFICATION.md > Roo
 - **Documentation**: Complete and current ✅
 
 ## Latest SDK & Tool Adherence
-- **Clarinet**: v2.0+ (latest stable for Stacks development)
+- **Clarinet SDK**: v3.5.0 (pinned via npm; invoke with `npx clarinet`)
 - **@stacks/transactions**: Latest stable for transaction construction
-- **@hirosystems/clarinet-sdk**: v3.5.0+ for comprehensive testing
+- **@hirosystems/clarinet-sdk**: v3.5.0 (pinned)
 - **Vitest**: Latest for modern TypeScript testing
 - **Node.js**: v18+ LTS for compatibility and security
 - **TypeScript**: v5+ for enhanced type safety
@@ -193,7 +193,7 @@ When critical issues identified:
 6. **COMMUNICATE**: Clear status updates with timeline and impact assessment
 
 ## Tool Integration Requirements
-- **Clarinet CLI**: Always use latest stable (v2.0+) with exact version pinning
+- **Clarinet CLI**: Use project-pinned @hirosystems/clarinet-sdk v3.5.0 via `npx clarinet` (no global installs)
 - **Testing Framework**: Vitest + @hirosystems/clarinet-sdk v3.5.0+
 - **Type Safety**: TypeScript v5+ with strict configuration
 - **Package Management**: npm with exact version locks for reproducible builds

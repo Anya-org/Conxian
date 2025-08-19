@@ -7,7 +7,7 @@ AutoVault smart contracts.
 
 ### Prerequisites
 
-- Clarinet CLI (v2.0+)
+- Clarinet SDK (pinned via npm to v3.5.0 in `stacks/package.json`)
 - Node.js (v18+)
 - Git for version control
 
@@ -22,8 +22,8 @@ cd AutoVault/stacks
 npm install
 
 # Verify setup
-clarinet check   # ✅ 30 contracts
-npm test         # ✅ 65/65 tests
+npx clarinet check   # ✅ 30 contracts
+npm test             # ✅ 65/65 tests
 ```
 
 ## Project Structure
@@ -152,16 +152,16 @@ npm run test:watch
 
 ```bash
 # Check all contracts
-clarinet check
+npx clarinet check
 
 # Check specific contract
-clarinet check --contract my-contract
+npx clarinet check --contract my-contract
 
 # Format contracts
-clarinet format
+npx clarinet format
 
 # Generate documentation
-clarinet docs
+npx clarinet docs
 ```
 
 ## Testing Framework
@@ -244,13 +244,13 @@ const testAmounts = [
 
 ```bash
 # Start local blockchain
-clarinet devnet start
+npx clarinet devnet start
 
 # Deploy contracts locally
-clarinet devnet deploy
+npx clarinet devnet deploy
 
 # Interact with contracts
-clarinet console
+npx clarinet console
 ```
 
 ### Testnet Deployment
@@ -261,10 +261,10 @@ clarinet console
 node_rpc_api = "https://stacks-node-api.testnet.stacks.co"
 
 # Deploy to testnet
-clarinet deploy --testnet
+npx clarinet deploy --testnet
 
 # Verify deployment
-clarinet deployment describe --testnet
+npx clarinet deployment describe --testnet
 ```
 
 ### Mainnet Deployment
@@ -275,10 +275,10 @@ clarinet deployment describe --testnet
 node_rpc_api = "https://stacks-node-api.mainnet.stacks.co"
 
 # Deploy to mainnet (requires careful preparation)
-clarinet deploy --mainnet
+npx clarinet deploy --mainnet
 
 # Monitor deployment
-clarinet deployment status --mainnet
+npx clarinet deployment status --mainnet
 ```
 
 ## Debugging
@@ -289,10 +289,11 @@ clarinet deployment status --mainnet
 
 ```bash
 # Check syntax errors
-clarinet check --contract problematic-contract
+npx clarinet check --contract problematic-contract --sdk-version 3.5.0
 
 # View detailed error messages
-clarinet check --verbose
+npx clarinet check --verbose --sdk-version 3.5.0
+npx clarinet check --verbose
 ```
 
 #### Test Failures
@@ -313,13 +314,13 @@ console.log(simnet.getAssetsMap());
 
 ```bash
 # Check network connectivity
-clarinet network status
+npx clarinet network status
 
 # Verify account balances
-clarinet accounts
+npx clarinet accounts
 
 # Check transaction status
-clarinet tx status <tx-id>
+npx clarinet tx status <tx-id>
 ```
 
 ### Debugging Tools

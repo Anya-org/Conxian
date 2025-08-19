@@ -30,8 +30,9 @@ enterprise monitoring, and Bitcoin-aligned principles.
 
 ### Requirements
 
-- Clarinet CLI (v2.0+)
 - Node.js (v18+)
+  
+Note: This repo pins Clarinet SDK v3.5.0 via npm. Always use `npx clarinet`.
 
 ### Setup
 
@@ -39,7 +40,7 @@ enterprise monitoring, and Bitcoin-aligned principles.
 git clone https://github.com/Anya-org/AutoVault.git
 cd AutoVault/stacks
 npm install
-clarinet check    # ✅ 30 contracts
+npx clarinet check    # ✅ 30 contracts
 npm test          # ✅ 65/65 tests
 ```
 

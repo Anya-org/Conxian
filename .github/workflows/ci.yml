@@ -9,7 +9,7 @@ on:
 
 env:
   NODE_VERSION: '20'
-  CLARINET_VERSION: 'latest'
+  CLARINET_VERSION: '3.5.0'
 
 jobs:
   lint-typecheck:
@@ -53,14 +53,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Clarinet
-        run: |
-          curl -sSfL https://github.com/hirosystems/clarinet/releases/latest/download/clarinet-installer.sh | sh
-          echo "$HOME/.clarinet/bin" >> $GITHUB_PATH
-      - name: Verify Clarinet Installation
-        run: clarinet --version
-      - name: Contract Compilation
-        run: cd stacks && clarinet check
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: stacks/package-lock.json
+      - name: Install deps
+        run: cd stacks && npm ci --no-audit --no-fund
+      - name: Verify Clarinet Installation (pinned via npx)
+        run: cd stacks && npx clarinet --version
+      - name: Contract Compilation (pinned Clarinet)
+        run: cd stacks && npx clarinet check
 
   static-analysis:
     name: Contract Static Analysis (Placeholder)
@@ -94,12 +97,10 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           cache-dependency-path: stacks/package-lock.json
-      - name: Setup Clarinet
-        run: |
-          curl -sSfL https://github.com/hirosystems/clarinet/releases/latest/download/clarinet-installer.sh | sh
-          echo "$HOME/.clarinet/bin" >> $GITHUB_PATH
       - name: Install deps
         run: cd stacks && npm ci --no-audit --no-fund
+      - name: Verify Clarinet Installation (pinned via npx)
+        run: cd stacks && npx clarinet --version
       - name: Run ${{ matrix.test-suite.name }}
         run: cd stacks && echo "🧪 ${{ matrix.test-suite.description }}" && ${{ matrix.test-suite.command }}
 
@@ -170,12 +171,10 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           cache-dependency-path: stacks/package-lock.json
-      - name: Setup Clarinet
-        run: |
-          curl -sSfL https://github.com/hirosystems/clarinet/releases/latest/download/clarinet-installer.sh | sh
-          echo "$HOME/.clarinet/bin" >> $GITHUB_PATH
       - name: Install deps
         run: cd stacks && npm ci --no-audit --no-fund
+      - name: Verify Clarinet Installation (pinned via npx)
+        run: cd stacks && npx clarinet --version
       - name: Pre-deployment Validation
         run: cd stacks && npm run pre-deploy
       - name: Package

@@ -51,26 +51,23 @@ Total tracked contracts (Clarinet): 30
 
 ## Requirements
 
-- **Clarinet CLI** (v2.0+)
-  - macOS: `brew install hirosystems/tap/clarinet`
-  - Linux: `curl -sSfL https://github.com/hirosystems/clarinet/releases/\
-    latest/download/clarinet-installer.sh | sh`
-- **Node.js** (v18+) for testing with clarinet-sdk v3.5.0
-- **Deno** (required for clarinet console)
+- **Clarinet SDK** (pinned v3.5.0 via npm in `stacks/package.json`)
+- **Node.js** (v18+) to run SDK and tests
+- **Deno** (optional; required for console features)
 
 ## Quick Start
 
 ```bash
 # From stacks/ directory
-clarinet check
+npm ci
+npx clarinet check
 # ✅ 30 contracts checked
 
-npm install
 npm test
 # ✅ 65/65 tests passing
 
 # Start console for testing
-clarinet console
+npx clarinet console
 ```
 
 ## Basic Usage
@@ -210,7 +207,7 @@ python ../scripts/economic_simulation.py
 
 1. **Write contracts** in `contracts/`
 2. **Add tests** in `sdk-tests/`
-3. **Run checks** with `clarinet check`
+3. **Run checks** with `npx clarinet check`
 4. **Test functionality** with `npm test`
 5. **Deploy to testnet** for integration testing
 

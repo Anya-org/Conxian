@@ -38,7 +38,7 @@ With the funded wallet configured, you can now proceed with testnet deployment:
 cd /workspaces/AutoVault/stacks
 export DEPLOYER_PRIVKEY=ddf291b96c4b6c193440e3652470738bc064b587681edc76112c2695ac33644f01
 export NETWORK=testnet
-clarinet deployment apply --testnet
+npx clarinet deployment apply --testnet
 ```
 
 ## 📊 Balance Verification
