@@ -7,11 +7,11 @@ set -euo pipefail
 ROOT_DIR=$(cd "$(dirname "$0")/.." && pwd)
 CLARINET_VERSION=${1:-3.5.0}
 
-echo "==> TypeScript typecheck (no emit)"
-( cd "$ROOT_DIR/stacks" && npx tsc --noEmit )
-
 echo "==> npm ci (stacks)"
 ( cd "$ROOT_DIR/stacks" && npm ci --no-audit --no-fund )
+
+echo "==> TypeScript typecheck (no emit)"
+( cd "$ROOT_DIR/stacks" && npx tsc --noEmit )
 
 echo "==> Clarinet version"
 VER=$(cd "$ROOT_DIR/stacks" && npx --yes clarinet --version | awk '{print $2}')
