@@ -329,6 +329,9 @@ analytics.clar ← Monitoring systems
 bounty-system.clar ← automated-bounty-system.clar
 governance-test-helper.clar ← Testing infrastructure
 mock-ft.clar ← Development environment
+pool-trait.clar ← All Pool Implementations
+registry.clar ← Discovery-dependent contracts
+analytics.clar ← Monitoring systems
 ```
 
 ---
