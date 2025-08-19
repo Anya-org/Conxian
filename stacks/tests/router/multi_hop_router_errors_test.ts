@@ -73,7 +73,8 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
         Cl.uint(1)
       ], deployer);
       
-      expect(result.result).toBeErr(Cl.uint(608));
+      expect(result.result.type).toBe('err');
+      expect(result.result.value.value).toBe(608n);
     });
   });
 
