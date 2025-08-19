@@ -27,7 +27,9 @@
     "console:testnet": "npx clarinet console --testnet",
     "check": "npx clarinet check",
     "ci": "../scripts/ensure-deps.sh && npm run check && npx vitest run",
-    "pre-deploy": "../scripts/ensure-deps.sh && npm run ci && ../scripts/manual-testing.sh"
+    "pre-deploy": "../scripts/ensure-deps.sh && npm run ci && ../scripts/manual-testing.sh",
+    "analyze:coverage": "echo 'Coverage report: reports/coverage-detailed.lcov'",
+    "analyze:costs": "echo 'Gas costs report: reports/gas-costs.json'"
   },
   "dependencies": {
     "@scure/bip32": "^1.5.0",
