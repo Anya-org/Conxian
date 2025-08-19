@@ -1,4 +1,5 @@
-import { initSimnet, Cl, Tx } from '@hirosystems/clarinet-sdk';
+import { initSimnet } from '@hirosystems/clarinet-sdk';
+import { Cl } from '@stacks/transactions';
 import { describe, it, expect, beforeAll } from 'vitest';
 
 // Error codes under test (new hardening error codes u607-u611)
@@ -42,7 +43,8 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
         Cl.uint(simnet.blockHeight + 10)
       ], wallet1);
       
-      expect(result.result).toBeErr(Cl.uint(608));
+      expect(result.result.type).toBe('err');
+      expect(result.result.value.value).toBe(608n);
     });
 
     it('rejects add-route with identical input/output tokens', () => {
@@ -56,7 +58,8 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
         Cl.uint(50000)
       ], deployer);
       
-      expect(result.result).toBeErr(Cl.uint(608));
+      expect(result.result.type).toBe('err');
+      expect(result.result.value.value).toBe(608n);
     });
 
     it('rejects register-pool with identical token-x and token-y', () => {
@@ -84,7 +87,8 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
         Cl.uint(1)
       ], deployer);
       
-      expect(result.result).toBeErr(Cl.uint(607));
+      expect(result.result.type).toBe('err');
+      expect(result.result.value.value).toBe(607n);
     });
 
     it('rejects add-route with invalid pool type in validation chain', () => {
@@ -96,7 +100,8 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
         Cl.uint(50000)
       ], deployer);
       
-      expect(result.result).toBeErr(Cl.uint(607));
+      expect(result.result.type).toBe('err');
+      expect(result.result.value.value).toBe(607n);
     });
 
     it('accepts valid pool types from whitelist', () => {
@@ -111,7 +116,7 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
           Cl.uint(1)
         ], deployer);
         
-        expect(result.result).toBeOk(Cl.bool(true));
+        expect(result.result.type).toBe('ok');
       });
     });
   });
@@ -126,7 +131,8 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
         Cl.uint(9999) // non-existent fee tier
       ], deployer);
       
-      expect(result.result).toBeErr(Cl.uint(610));
+      expect(result.result.type).toBe('err');
+      expect(result.result.value.value).toBe(610n);
     });
 
     it('rejects register-pool with disabled fee-tier', () => {
@@ -141,7 +147,8 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
         Cl.uint(999) // assume not configured as enabled
       ], deployer);
       
-      expect(result.result).toBeErr(Cl.uint(610));
+      expect(result.result.type).toBe('err');
+      expect(result.result.value.value).toBe(610n);
     });
   });
 
@@ -162,7 +169,8 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
       ], wallet1);
       
       // Expect INVALID_ROUTE (u603) since pool not in registry, but validates the path
-      expect(result.result).toBeErr(Cl.uint(603));
+      expect(result.result.type).toBe('err');
+      expect(result.result.value.value).toBe(603n);
     });
   });
 
@@ -182,7 +190,8 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
       ], wallet1);
       
       // Will likely get INVALID_PATH (u600) first due to empty pools
-      expect(result.result).toBeErr(Cl.uint(600));
+      expect(result.result.type).toBe('err');
+      expect(result.result.value.value).toBe(600n);
     });
 
     it('enforces maximum input policy in swap-exact-out', () => {
@@ -198,7 +207,8 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
       ], wallet1);
       
       // Will likely get INVALID_PATH (u600) first due to empty pools
-      expect(result.result).toBeErr(Cl.uint(600));
+      expect(result.result.type).toBe('err');
+      expect(result.result.value.value).toBe(600n);
     });
   });
 
@@ -208,7 +218,8 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
         Cl.uint(100)
       ], wallet1); // non-admin caller
       
-      expect(result.result).toBeErr(Cl.uint(606));
+      expect(result.result.type).toBe('err');
+      expect(result.result.value.value).toBe(606n);
     });
 
     it('allows admin functions from router admin', () => {
@@ -216,7 +227,7 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
         Cl.uint(25)
       ], deployer); // admin caller
       
-      expect(result.result).toBeOk(Cl.bool(true));
+      expect(result.result.type).toBe('ok');
     });
 
     it('validates route parameters in add-route', () => {
@@ -236,7 +247,8 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
         Cl.uint(50000)
       ], deployer);
       
-      expect(result.result).toBeErr(Cl.uint(600)); // ERR_INVALID_PATH
+      expect(result.result.type).toBe('err');
+      expect(result.result.value.value).toBe(600n); // ERR_INVALID_PATH
     });
   });
 });
