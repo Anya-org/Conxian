@@ -199,6 +199,16 @@ plan:
             path: contracts/pool-factory.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: vault-trait
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/traits/vault-trait.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: post-deployment-autonomics
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/post-deployment-autonomics.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: registry
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/registry.clar
@@ -237,11 +247,6 @@ plan:
             contract-name: vault-multi-token
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/vault-multi-token.clar
-            clarity-version: 2
-        - emulated-contract-publish:
-            contract-name: vault-trait
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/traits/vault-trait.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: weighted-pool

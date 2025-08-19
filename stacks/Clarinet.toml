@@ -311,6 +311,11 @@ path = "contracts/vault-multi-token.clar"
 clarity_version = 2
 epoch = "2.4"
 
+[contracts.post-deployment-autonomics]
+path = "contracts/post-deployment-autonomics.clar"
+clarity_version = 2
+epoch = "2.4"
+
 
 
 
