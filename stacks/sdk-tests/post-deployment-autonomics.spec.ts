@@ -297,7 +297,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         [],
         deployer
       );
-
+      
       // Phase is COMPLETE so further proposals should ERR_PHASE_INVALID (u101)
       expect(proposalResult.result).toEqual({ type: 'err', value: { type: 'uint', value: 101n } });
       console.log('✅ Duplicate auto fees proposal properly rejected');
@@ -366,7 +366,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         deployer
       );
       
-  expect(pauseResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
+      expect(pauseResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
       
       // Check that phase was reset
       const deploymentInfo = simnet.callReadOnlyFn(
@@ -398,7 +398,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         deployer
       );
       
-  expect(resetResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
+      expect(resetResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
       
       // Check that health was reset
       const healthInfo = simnet.callReadOnlyFn(
@@ -474,11 +474,11 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
       const updateResult = simnet.callPublicFn(
         'post-deployment-autonomics',
         'update-prd-compliance',
-  [Cl.stringAscii("VAULT-AUTONOMICS-AUTO-FEES"), Cl.bool(true), Cl.uint(100)],
+        [Cl.stringAscii("VAULT-AUTONOMICS-AUTO-FEES"), Cl.bool(true), Cl.uint(100)],
         deployer
       );
       
-  expect(updateResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
+      expect(updateResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
       
       // Get PRD compliance summary
       const complianceResult = simnet.callReadOnlyFn(
@@ -489,24 +489,24 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
       );
       
       expect(complianceResult.result.type).toEqual('tuple');
-  // Actual tuple keys are the individual PRD requirements
-  const prdTuple = complianceResult.result.value;
-  expect(prdTuple['auto-fees']).toBeDefined();
-  expect(prdTuple['performance']).toBeDefined();
-  expect(prdTuple['multi-token']).toBeDefined();
-  // Spot-check structure of one updated requirement and one default requirement
-  const autoFees = prdTuple['auto-fees'];
-  expect(autoFees.type).toEqual('tuple');
-  expect(autoFees.value['implemented']).toBeDefined();
-  expect(autoFees.value['validated']).toBeDefined();
-  expect(autoFees.value['test-coverage']).toBeDefined();
-  expect(autoFees.value['last-check']).toBeDefined();
-  const performance = prdTuple['performance'];
-  expect(performance.type).toEqual('tuple');
-  expect(performance.value['implemented']).toBeDefined();
-  expect(performance.value['validated']).toBeDefined();
-  expect(performance.value['test-coverage']).toBeDefined();
-  expect(performance.value['last-check']).toBeDefined();
+      // Actual tuple keys are the individual PRD requirements
+      const prdTuple = complianceResult.result.value;
+      expect(prdTuple['auto-fees']).toBeDefined();
+      expect(prdTuple['performance']).toBeDefined();
+      expect(prdTuple['multi-token']).toBeDefined();
+      // Spot-check structure of one updated requirement and one default requirement
+      const autoFees = prdTuple['auto-fees'];
+      expect(autoFees.type).toEqual('tuple');
+      expect(autoFees.value['implemented']).toBeDefined();
+      expect(autoFees.value['validated']).toBeDefined();
+      expect(autoFees.value['test-coverage']).toBeDefined();
+      expect(autoFees.value['last-check']).toBeDefined();
+      const performance = prdTuple['performance'];
+      expect(performance.type).toEqual('tuple');
+      expect(performance.value['implemented']).toBeDefined();
+      expect(performance.value['validated']).toBeDefined();
+      expect(performance.value['test-coverage']).toBeDefined();
+      expect(performance.value['last-check']).toBeDefined();
       
       console.log('✅ PRD compliance tracking operational');
     });
@@ -516,11 +516,11 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
       const updateResult = simnet.callPublicFn(
         'post-deployment-autonomics',
         'update-aip-status',
-  [Cl.uint(1), Cl.stringAscii("ACTIVE"), Cl.uint(100)],
+        [Cl.uint(1), Cl.stringAscii("ACTIVE"), Cl.uint(100)],
         deployer
       );
       
-  expect(updateResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
+      expect(updateResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
       
       // Get AIP status summary
       const aipResult = simnet.callReadOnlyFn(
@@ -531,20 +531,20 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
       );
       
       expect(aipResult.result.type).toEqual('tuple');
-  const aipTuple = aipResult.result.value;
-  // Ensure each AIP entry exists
-  ['aip-1','aip-2','aip-3','aip-4','aip-5'].forEach(k => expect(aipTuple[k]).toBeDefined());
-  // Spot-check structure for updated AIP (aip-1) and a default one (aip-2)
-  const aip1 = aipTuple['aip-1'];
-  expect(aip1.type).toEqual('tuple');
-  expect(aip1.value['status']).toBeDefined();
-  expect(aip1.value['compliance-score']).toBeDefined();
-  expect(aip1.value['last-audit']).toBeDefined();
-  const aip2 = aipTuple['aip-2'];
-  expect(aip2.type).toEqual('tuple');
-  expect(aip2.value['status']).toBeDefined();
-  expect(aip2.value['compliance-score']).toBeDefined();
-  expect(aip2.value['last-audit']).toBeDefined();
+      const aipTuple = aipResult.result.value;
+      // Ensure each AIP entry exists
+      ['aip-1','aip-2','aip-3','aip-4','aip-5'].forEach(k => expect(aipTuple[k]).toBeDefined());
+      // Spot-check structure for updated AIP (aip-1) and a default one (aip-2)
+      const aip1 = aipTuple['aip-1'];
+      expect(aip1.type).toEqual('tuple');
+      expect(aip1.value['status']).toBeDefined();
+      expect(aip1.value['compliance-score']).toBeDefined();
+      expect(aip1.value['last-audit']).toBeDefined();
+      const aip2 = aipTuple['aip-2'];
+      expect(aip2.type).toEqual('tuple');
+      expect(aip2.value['status']).toBeDefined();
+      expect(aip2.value['compliance-score']).toBeDefined();
+      expect(aip2.value['last-audit']).toBeDefined();
       
       console.log('✅ AIP implementation tracking operational');
     });
@@ -607,7 +607,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
       const metricResult = simnet.callReadOnlyFn(
         'post-deployment-autonomics',
         'get-system-metrics',
-  [Cl.stringAscii("vault-health")],
+        [Cl.stringAscii("vault-health")],
         deployer
       );
       
@@ -633,7 +633,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         [],
         deployer
       );
-  expect(initResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
+      expect(initResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
       console.log('  ✅ Phase 1: Initialization complete');
       
       // Step 2: Build up health over time
@@ -655,7 +655,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         [],
         deployer
       );
-  expect(readinessResult.result).toEqual({ type: 'true' });
+      expect(readinessResult.result).toEqual({ type: 'true' });
       console.log('  ✅ Phase 3: System ready for activation confirmed');
       
       // Step 4: Trigger activation
@@ -665,7 +665,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         [],
         deployer
       );
-  expect(activationResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
+      expect(activationResult.result).toEqual({ type: 'ok', value: { type: 'true' } });
       console.log('  ✅ Phase 4: Autonomous activation triggered');
       
       // Step 5: Create all timelock proposals
@@ -677,7 +677,7 @@ describe('Post-Deployment Autonomous Feature Activation', () => {
         'propose-set-performance-benchmark'
       ];
       
-      proposals.forEach((_proposal) => {
+      proposals.forEach((_proposal, index) => {
         // All proposals already executed during activation sequence; expect phase invalid errors
         const result = simnet.callPublicFn(
           'post-deployment-autonomics',
