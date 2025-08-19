@@ -1,5 +1,5 @@
 ;; =============================================================================
-;; MULTI-HOP ROUTER - PRODUCTION IMPLEMENTATION (FIXED)
+;; MULTI-HOP ROUTER - PRODUCTION IMPLEMENTATION
 ;; =============================================================================
 
 (use-trait ft-trait .sip-010-trait.sip-010-trait)
@@ -54,7 +54,7 @@
 (define-data-var max-slippage-bps uint u1000)
 
 ;; =============================================================================
-;; CORE HELPER FUNCTIONS (NON-INTERDEPENDENT)
+;; HELPER FUNCTIONS (DEFINED FIRST)
 ;; =============================================================================
 
 ;; Get output amount for single hop
@@ -65,7 +65,21 @@
   (amount-in uint))
   (/ (* amount-in u997) u1000))
 
-;; Execute single hop swap
+;; Execute swap based on pool type
+(define-private (execute-pool-swap
+  (pool <pool-trait>)
+  (token-in principal)
+  (token-out principal)
+  (amount-in uint)
+  (pool-type (string-ascii 20)))
+  (match pool-type
+    "constant-product" (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
+    "stable" (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
+    "weighted" (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
+    "concentrated" (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
+    (err ERR_INVALID_ROUTE)))
+
+;; Execute single hop in the route
 (define-private (execute-single-hop
   (token-in principal)
   (token-out principal)
@@ -76,55 +90,65 @@
                 (and (is-eq token-in (get token-x pool-info)) (is-eq token-out (get token-y pool-info)))
                 (and (is-eq token-in (get token-y pool-info)) (is-eq token-out (get token-x pool-info))))
               ERR_INVALID_ROUTE)
-    (match (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
+    (match (execute-pool-swap pool token-in token-out amount-in (get pool-type pool-info))
       success (ok (get amount-out success))
       error (err ERR_NO_LIQUIDITY))))
 
-;; Execute multi-hop swap iteratively (no recursion)
-(define-private (execute-multi-hop-iteration
+;; =============================================================================
+;; CORE ROUTING FUNCTIONS (DEFINED AFTER HELPERS)
+;; =============================================================================
+
+;; Execute multi-hop swap recursively
+(define-private (execute-multi-hop-swap 
+  (path (list 5 principal)) 
+  (pools (list 4 <pool-trait>)) 
+  (current-amount uint) 
+  (hop-index uint))
+  (if (>= hop-index (len pools))
+    (ok current-amount)
+    (let ((token-in (unwrap! (element-at path hop-index) ERR_INVALID_PATH))
+          (token-out (unwrap! (element-at path (+ hop-index u1)) ERR_INVALID_PATH))
+          (pool (unwrap! (element-at pools hop-index) ERR_INVALID_PATH)))
+      (let ((hop-result (try! (execute-single-hop token-in token-out pool current-amount))))
+        (execute-multi-hop-swap path pools hop-result (+ hop-index u1))))))
+
+;; Calculate required input for exact output
+(define-private (calculate-required-input
   (path (list 5 principal))
   (pools (list 4 <pool-trait>))
-  (amount-in uint))
-  (if (is-eq (len pools) u1)
-    ;; Single hop case
-    (let ((pool (unwrap! (element-at pools u0) ERR_INVALID_PATH))
-          (token-in (unwrap! (element-at path u0) ERR_INVALID_PATH))
-          (token-out (unwrap! (element-at path u1) ERR_INVALID_PATH)))
-      (execute-single-hop token-in token-out pool amount-in))
-    ;; Multi-hop case - execute first hop and estimate remainder
-    (let ((pool (unwrap! (element-at pools u0) ERR_INVALID_PATH))
-          (token-in (unwrap! (element-at path u0) ERR_INVALID_PATH))
-          (token-out (unwrap! (element-at path u1) ERR_INVALID_PATH)))
-      (let ((first-hop-result (try! (execute-single-hop token-in token-out pool amount-in))))
-        ;; For multi-hop, estimate remaining hops with simplified calculation
-        (ok (/ (* first-hop-result u995) u1000))))))
+  (amount-out uint))
+  (ok (* amount-out u1003)))
 
-;; Simplified price calculation without recursion
-(define-private (estimate-output-simple
+;; Recursive helper for price calculation  
+(define-private (calculate-amounts-out-recursive
   (path (list 5 principal))
   (pools (list 4 principal))
-  (amount-in uint))
-  (let ((hop-count (len pools)))
-    (if (<= hop-count u1)
-      ;; Single hop
-      (let ((pool-principal (unwrap-panic (element-at pools u0)))
-            (token-in (unwrap-panic (element-at path u0)))
-            (token-out (unwrap-panic (element-at path u1))))
-        (get-single-hop-output pool-principal token-in token-out amount-in))
-      ;; Multi-hop: estimate with cascading fee calculation
-      (let ((fee-per-hop u3)) ;; 0.3% per hop
-        (/ (* amount-in (pow u997 hop-count)) (pow u1000 hop-count))))))
+  (current-amount uint)
+  (hop-index uint)
+  (amounts (list 5 uint)))
+  (if (>= hop-index (len pools))
+    (ok (unwrap-panic (as-max-len? (append amounts current-amount) u5)))
+    (let ((pool-principal (unwrap-panic (element-at pools hop-index)))
+          (token-in (unwrap-panic (element-at path hop-index)))
+          (token-out (unwrap-panic (element-at path (+ hop-index u1)))))
+      (let ((amount-out (get-single-hop-output pool-principal token-in token-out current-amount)))
+        (calculate-amounts-out-recursive 
+          path 
+          pools 
+          amount-out 
+          (+ hop-index u1)
+          (unwrap-panic (as-max-len? (append amounts current-amount) u5)))))))
 
 ;; =============================================================================
 ;; READ-ONLY FUNCTIONS
 ;; =============================================================================
 
-;; Calculate output for a given route (simplified, non-recursive)
+;; Calculate output for a given route
 (define-read-only (get-amounts-out
   (path (list 5 principal))
   (pools (list 4 principal))
   (amount-in uint))
-  (ok (list (estimate-output-simple path pools amount-in))))
+  (calculate-amounts-out-recursive path pools amount-in u0 (list)))
 
 ;; Find optimal route between two tokens
 (define-read-only (find-optimal-route
@@ -137,14 +161,8 @@
       reverse-route (ok reverse-route)
       (err ERR_INVALID_ROUTE))))
 
-;; Get estimated gas for route
-(define-read-only (estimate-gas
-  (path (list 5 principal)))
-  (let ((hop-count (- (len path) u1)))
-    (* hop-count u50000))) ;; 50k gas per hop estimate
-
 ;; =============================================================================
-;; PUBLIC FUNCTIONS
+;; PUBLIC FUNCTIONS (DEFINED LAST)
 ;; =============================================================================
 
 ;; Multi-hop swap with exact input
@@ -159,23 +177,13 @@
     (asserts! (>= (len path) u2) ERR_INVALID_PATH)
     (asserts! (is-eq (len pools) (- (len path) u1)) ERR_INVALID_PATH)
     (asserts! (> amount-in u0) ERR_INVALID_ROUTE)
-    
-    (let ((gross-final (try! (execute-multi-hop-iteration path pools amount-in))))
+    (let ((gross-final (try! (execute-multi-hop-swap path pools amount-in u0))))
       (asserts! (>= gross-final min-amount-out) ERR_SLIPPAGE_EXCEEDED)
       (let ((fee-bps (var-get routing-fee-bps))
             (net-final (if (is-eq fee-bps u0) 
                          gross-final 
                          (- gross-final (/ (* gross-final fee-bps) FEE_DENOMINATOR)))))
-        (print {
-          event: "multi-hop-swap", 
-          path: path, 
-          amount-in: amount-in, 
-          gross-out: gross-final, 
-          net-out: net-final, 
-          fee-bps: fee-bps, 
-          pools-used: (len pools), 
-          trader: tx-sender
-        })
+        (print {event: "multi-hop-swap", path: path, amount-in: amount-in, gross-out: gross-final, net-out: net-final, fee-bps: fee-bps, pools-used: (len pools), trader: tx-sender})
         (ok net-final)))))
 
 ;; Multi-hop swap with exact output
@@ -189,27 +197,15 @@
     (asserts! (>= deadline block-height) ERR_EXPIRED)
     (asserts! (>= (len path) u2) ERR_INVALID_PATH)
     (asserts! (is-eq (len pools) (- (len path) u1)) ERR_INVALID_PATH)
-    
-    ;; Estimate required input (simplified calculation)
-    (let ((required-input (* amount-out u1003))) ;; 0.3% buffer
+    (let ((required-input (try! (calculate-required-input path pools amount-out))))
       (asserts! (<= required-input max-amount-in) ERR_SLIPPAGE_EXCEEDED)
-      (let ((gross-final (try! (execute-multi-hop-iteration path pools required-input))))
+      (let ((gross-final (try! (execute-multi-hop-swap path pools required-input u0))))
         (asserts! (>= gross-final amount-out) ERR_INSUFFICIENT_OUTPUT)
         (let ((fee-bps (var-get routing-fee-bps))
               (net-final (if (is-eq fee-bps u0) 
                            gross-final 
                            (- gross-final (/ (* gross-final fee-bps) FEE_DENOMINATOR)))))
-          (print {
-            event: "multi-hop-swap-exact-out", 
-            path: path, 
-            required-out: amount-out, 
-            gross-out: gross-final, 
-            net-out: net-final, 
-            fee-bps: fee-bps, 
-            amount-in: required-input, 
-            pools-used: (len pools), 
-            trader: tx-sender
-          })
+          (print {event: "multi-hop-swap-exact-out", path: path, required-out: amount-out, gross-out: gross-final, net-out: net-final, fee-bps: fee-bps, amount-in: required-input, pools-used: (len pools), trader: tx-sender})
           (ok required-input))))))
 
 ;; =============================================================================
