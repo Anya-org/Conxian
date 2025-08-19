@@ -447,4 +447,4 @@
     (asserts! (is-some (map-get? pair-config pair)) ERR_INVALID_PAIR)
     (match (map-get? twap-cache {pair: pair, period: period})
       cached-twap (if (<= block-height (get valid-until cached-twap)) (ok (get twap-price cached-twap)) (calculate-and-cache-twap pair period))
-      (calculate-and-cache-twap pair period)))
+      (calculate-and-cache-twap pair period))) )
