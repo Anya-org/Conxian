@@ -102,21 +102,8 @@
 
 ;; =============================================================================
 ;; PATH EXECUTION LOGIC
+;; (duplicate execute-multi-hop-swap removed; single definition kept above)
 ;; =============================================================================
-
-;; Execute swap across multiple pools
-(define-private (execute-multi-hop-swap
-  (path (list 5 principal))
-  (pools (list 4 <pool-trait>))
-  (current-amount uint)
-  (hop-index uint))
-  (if (>= hop-index (len pools))
-    (ok current-amount)
-    (let ((token-in (unwrap! (element-at path hop-index) ERR_INVALID_PATH))
-          (token-out (unwrap! (element-at path (+ hop-index u1)) ERR_INVALID_PATH))
-          (pool (unwrap! (element-at pools hop-index) ERR_INVALID_PATH)))
-      (let ((hop-result (try! (execute-single-hop token-in token-out pool current-amount))))
-        (execute-multi-hop-swap path pools hop-result (+ hop-index u1))))))
 
 ;; Execute single hop in the route
 (define-private (execute-single-hop

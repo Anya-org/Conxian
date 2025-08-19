@@ -111,6 +111,7 @@
 ;; =============================================================================
 
 ;; Execute strategy-specific deposit (balanced)
+;; NOTE: Balanced parentheses count => define-private(1) + let(2) + 4 nested ifs (6) => 6 closing parens at end
 (define-private (execute-strategy-deposit (strategy-id uint) (amount uint))
   (let ((strategy (unwrap! (map-get? strategies strategy-id) ERR_INVALID_STRATEGY))
         (strategy-name (get name strategy)))
@@ -122,9 +123,10 @@
           (execute-lm-deposit strategy-id amount)
           (if (is-eq strategy-name "yield-aggregator")
             (execute-aggregator-deposit strategy-id amount)
-            (ok amount))))))
+            (ok amount)))))))
 
 ;; Execute strategy-specific withdrawal (balanced)
+;; Balanced parentheses: same structure as deposit path
 (define-private (execute-strategy-withdrawal (strategy-id uint) (amount uint))
   (let ((strategy (unwrap! (map-get? strategies strategy-id) ERR_INVALID_STRATEGY))
         (strategy-name (get name strategy)))
@@ -136,7 +138,7 @@
           (execute-lm-withdrawal strategy-id amount)
           (if (is-eq strategy-name "yield-aggregator")
             (execute-aggregator-withdrawal strategy-id amount)
-            (ok amount))))))
+            (ok amount)))))))
 
 ;; =============================================================================
 ;; SPECIFIC STRATEGY IMPLEMENTATIONS
