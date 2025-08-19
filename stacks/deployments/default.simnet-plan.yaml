@@ -1,6 +1,6 @@
 ---
 id: 0
-name: "Simulated deployment, used as a default for `npx clarinet console`, `npx clarinet test` and `npx clarinet check`"
+name: "Simulated deployment, used as a default for `clarinet console`, `clarinet test` and `clarinet check`"
 network: simnet
 genesis:
   wallets:
@@ -141,11 +141,6 @@ plan:
             path: contracts/dex-router.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: enhanced-governance
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/enhanced-governance.clar
-            clarity-version: 2
-        - emulated-contract-publish:
             contract-name: enhanced-yield-strategy
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/enhanced-yield-strategy.clar
@@ -155,14 +150,14 @@ plan:
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/enhanced-yield-strategy-simple.clar
             clarity-version: 2
-      epoch: "2.4"
-    - id: 1
-      transactions:
         - emulated-contract-publish:
             contract-name: enterprise-monitoring
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/enterprise-monitoring.clar
             clarity-version: 2
+      epoch: "2.4"
+    - id: 1
+      transactions:
         - emulated-contract-publish:
             contract-name: governance-test-helper
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
@@ -212,11 +207,6 @@ plan:
             contract-name: stable-pool
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/stable-pool.clar
-            clarity-version: 2
-        - emulated-contract-publish:
-            contract-name: stable-pool-clean
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/stable-pool-clean.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: state-anchor
