@@ -18,6 +18,7 @@
 (define-constant ERR_RISK_LIMIT_EXCEEDED (err u805))
 (define-constant ERR_COOLDOWN_ACTIVE (err u806))
 (define-constant ERR_INVALID_ALLOCATION (err u807))
+(define-constant ERR_STRATEGY_NOT_FOUND (err u808))
 
 ;; Constants
 (define-constant MAX_STRATEGIES u10)
