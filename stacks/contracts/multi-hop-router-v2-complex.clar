@@ -100,9 +100,9 @@
   (amount-in uint))
   (/ (* amount-in u997) u1000))
 
-;; Execute swap based on pool type
+;; Execute swap based on pool type (accept contract principal)
 (define-private (execute-pool-swap
-  (pool <pool-trait>)
+  (pool principal)
   (token-in principal)
   (token-out principal)
   (amount-in uint)
@@ -118,10 +118,10 @@
 (define-private (execute-single-hop
   (token-in principal)
   (token-out principal)
-  (pool <pool-trait>)
+  (pool principal)
   (amount-in uint))
-  (let ((pool-info (unwrap! (map-get? pool-registry (contract-of pool)) ERR_INVALID_ROUTE)))
-  (validate-pool-active pool-info)
+  (let ((pool-info (unwrap! (map-get? pool-registry pool) ERR_INVALID_ROUTE)))
+    (validate-pool-active pool-info)
     (asserts! (or 
                 (and (is-eq token-in (get token-x pool-info)) (is-eq token-out (get token-y pool-info)))
                 (and (is-eq token-in (get token-y pool-info)) (is-eq token-out (get token-x pool-info))))
@@ -136,7 +136,7 @@
 ;; =============================================================================
 
 ;; Iterative multi-hop executor (unrolled up to MAX_HOPS) to avoid recursive cycle warnings
-(define-private (compute-multi-hop-out (path (list 5 principal)) (pools (list 4 <pool-trait>)) (amount-in uint))
+(define-private (compute-multi-hop-out (path (list 5 principal)) (pools (list 4 principal)) (amount-in uint))
   (asserts! (is-eq (len pools) (- (len path) u1)) ERR_INVALID_PATH)
   (let ((hops (len pools)))
     (asserts! (> hops u0) ERR_INVALID_PATH)
@@ -163,7 +163,7 @@
                   (ok out4))))))))))
 
 ;; Placeholder reverse pricing (improve with pool math in future AIP)
-(define-private (calculate-required-input (path (list 5 principal)) (pools (list 4 <pool-trait>)) (amount-out uint))
+(define-private (calculate-required-input (path (list 5 principal)) (pools (list 4 principal)) (amount-out uint))
   (ok (* amount-out u1003)))
 
 ;; Tail-recursive amounts-out accumulator (read-only safe: uses only pure helper)
@@ -215,7 +215,7 @@
 ;; =============================================================================
 
 ;; Multi-hop swap with exact input
-(define-public (swap-exact-in-multi-hop (path (list 5 principal)) (pools (list 4 <pool-trait>)) (amount-in uint) (min-amount-out uint) (deadline uint))
+(define-public (swap-exact-in-multi-hop (path (list 5 principal)) (pools (list 4 principal)) (amount-in uint) (min-amount-out uint) (deadline uint))
   (begin
     (asserts! (>= deadline block-height) ERR_EXPIRED)
     (asserts! (>= (len path) u2) ERR_INVALID_PATH)
@@ -233,7 +233,7 @@
         (ok net-final)))))
 
 ;; Multi-hop swap with exact output
-(define-public (swap-exact-out-multi-hop (path (list 5 principal)) (pools (list 4 <pool-trait>)) (amount-out uint) (max-amount-in uint) (deadline uint))
+(define-public (swap-exact-out-multi-hop (path (list 5 principal)) (pools (list 4 principal)) (amount-out uint) (max-amount-in uint) (deadline uint))
   (begin
     (asserts! (>= deadline block-height) ERR_EXPIRED)
     (asserts! (>= (len path) u2) ERR_INVALID_PATH)
