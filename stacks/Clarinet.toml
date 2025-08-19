@@ -147,11 +147,11 @@ path = "contracts/enhanced-yield-strategy-simple.clar"
 clarity_version = 2
 epoch = "2.4"
 
-# REMOVED TEMPORARILY: complex implementations with compilation issues
-# [contracts.enhanced-yield-strategy-complex]
-# path = "contracts/enhanced-yield-strategy-complex.clar"
-# clarity_version = 2
-# epoch = "2.4"
+## ENABLED: complex yield strategy (experimental)
+[contracts.enhanced-yield-strategy-complex]
+path = "contracts/enhanced-yield-strategy-complex.clar"
+clarity_version = 2
+epoch = "2.4"
 
 # [contracts.multi-hop-router-v2-complex]
 # path = "contracts/multi-hop-router-v2-complex.clar"
@@ -260,10 +260,11 @@ path = "contracts/multi-hop-router-v2-simple.clar"
 clarity_version = 2
 epoch = "2.4"
 
-# [contracts.multi-hop-router-v2-complex]
-# path = "contracts/multi-hop-router-v2-complex.clar"
-# clarity_version = 2
-# epoch = "2.4"
+## ENABLED: multi-hop router v2 complex (experimental)
+[contracts.multi-hop-router-v2-complex]
+path = "contracts/multi-hop-router-v2-complex.clar"
+clarity_version = 2
+epoch = "2.4"
 
 [contracts.mock-dex]
 path = "contracts/mock-dex.clar"
@@ -289,10 +290,11 @@ path = "contracts/twap-oracle-v2-simple.clar"
 clarity_version = 2
 epoch = "2.4"
 
-# [contracts.twap-oracle-v2-complex]
-# path = "contracts/twap-oracle-v2-complex.clar"
-# clarity_version = 2
-# epoch = "2.4"
+## ENABLED: advanced TWAP oracle v2 complex (experimental)
+[contracts.twap-oracle-v2-complex]
+path = "contracts/twap-oracle-v2-complex.clar"
+clarity_version = 2
+epoch = "2.4"
 
 # ===========================================
 # BOUNTY & ANALYTICS - Monitoring and rewards
