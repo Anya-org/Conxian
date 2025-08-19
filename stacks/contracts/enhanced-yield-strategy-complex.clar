@@ -1,5 +1,5 @@
 ;; =============================================================================
-;; ENHANCED YIELD STRATEGY (COMPLEX VARIANT) – HARDENED
+;; ENHANCED YIELD STRATEGY (COMPLEX VARIANT) - HARDENED
 ;; Implements multi-strategy management with share-based accounting.
 ;; Added: trait compliance wrappers, accurate share supply tracking, events for
 ;; all admin/state transitions, safer math placeholders (still simplified).
@@ -94,152 +94,86 @@
 ;; CORE YIELD STRATEGY FUNCTIONS
 ;; =============================================================================
 
-;; Deposit into yield strategy
-(define-public (deposit-to-strategy
-  (strategy-id uint)
-  (token <ft-trait>)
-  (amount uint)
-  (min-shares uint))
+;; Deposit into yield strategy (simplified balanced structure)
+(define-public (deposit-to-strategy (strategy-id uint) (token <ft-trait>) (amount uint) (min-shares uint))
   (let ((strategy (unwrap! (map-get? strategies strategy-id) ERR_INVALID_STRATEGY)))
-    
     (asserts! (get active strategy) ERR_STRATEGY_PAUSED)
     (asserts! (> amount u0) ERR_INSUFFICIENT_BALANCE)
-    
-    ;; Check allocation limits
     (let ((new-allocation (+ (get current-allocation strategy) amount)))
       (asserts! (<= new-allocation (get max-allocation strategy)) ERR_INVALID_ALLOCATION)
-      
-  ;; Calculate shares: proportional to existing supply
-  (let ((existing-total (get total-assets strategy))
-    (issued (get-strategy-total-shares strategy-id)))
-    (let ((shares (if (is-eq existing-total u0)
-        amount
-        (/ (* amount issued) existing-total))))
-        
-        (asserts! (>= shares min-shares) ERR_SLIPPAGE_EXCEEDED)
-        
-        ;; Execute deposit
-        (try! (contract-call? token transfer amount tx-sender (get contract strategy) none))
-        
-        ;; Execute strategy-specific deposit
-        (try! (execute-strategy-deposit strategy-id amount))
-        
-  ;; Update user allocation (mint shares)
-        (map-set user-allocations {user: tx-sender, strategy-id: strategy-id} {
-          amount: (+ amount (get-user-allocation tx-sender strategy-id)),
-          shares: (+ shares (get-user-shares tx-sender strategy-id)),
-          entry-block: block-height,
-          last-compound: block-height
-        })
-  ;; Update share supply
-  (map-set strategy-share-supply strategy-id (+ shares issued))
-        
-        ;; Update strategy state
-        (map-set strategies strategy-id (merge strategy {
-          current-allocation: new-allocation,
-          total-assets: (+ (get total-assets strategy) amount)
-        }))
-        
-        ;; Update global state
-        (var-set total-assets-under-management 
-                 (+ (var-get total-assets-under-management) amount))
-        
-        ;; Emit event
-        (print {
-          event: "strategy-deposit",
-          user: tx-sender,
-          strategy-id: strategy-id,
-          amount: amount,
-          shares: shares,
-          new-total: new-allocation
-        })
-        
-        (ok shares)))))
+      (let ((existing-total (get total-assets strategy))
+            (issued (get-strategy-total-shares strategy-id)))
+        (let ((shares (if (is-eq existing-total u0)
+                        amount
+                        (/ (* amount issued) (if (is-eq existing-total u0) u1 existing-total)))))
+          (asserts! (>= shares min-shares) ERR_SLIPPAGE_EXCEEDED)
+          (try! (contract-call? token transfer amount tx-sender (get contract strategy) none))
+          (try! (execute-strategy-deposit strategy-id amount))
+          (map-set user-allocations {user: tx-sender, strategy-id: strategy-id} {
+            amount: (+ amount (get-user-allocation tx-sender strategy-id)),
+            shares: (+ shares (get-user-shares tx-sender strategy-id)),
+            entry-block: block-height,
+            last-compound: block-height
+          })
+          (map-set strategy-share-supply strategy-id (+ shares issued))
+          (map-set strategies strategy-id (merge strategy {
+            current-allocation: new-allocation,
+            total-assets: (+ (get total-assets strategy) amount)
+          }))
+          (var-set total-assets-under-management (+ (var-get total-assets-under-management) amount))
+          (print {event: "strategy-deposit", user: tx-sender, strategy-id: strategy-id, amount: amount, shares: shares, new-total: new-allocation})
+          (ok shares)))))
 
-;; Withdraw from yield strategy
-(define-public (withdraw-from-strategy
-  (strategy-id uint)
-  (shares uint)
-  (min-amount uint))
+;; Withdraw from yield strategy (simplified balanced structure)
+(define-public (withdraw-from-strategy (strategy-id uint) (shares uint) (min-amount uint))
   (let ((strategy (unwrap! (map-get? strategies strategy-id) ERR_INVALID_STRATEGY))
         (user-allocation (get-user-allocation-record tx-sender strategy-id)))
-    
     (asserts! (>= (get shares user-allocation) shares) ERR_INSUFFICIENT_BALANCE)
-    
-    ;; Calculate withdrawal amount
-  (let ((total-shares (get-strategy-total-shares strategy-id))
-      (strategy-assets (get total-assets strategy)))
-    (let ((withdrawal-amount (if (or (is-eq total-shares u0) (is-eq strategy-assets u0))
-                 u0
-                 (/ (* shares strategy-assets) total-shares))))
-      
-      (asserts! (>= withdrawal-amount min-amount) ERR_SLIPPAGE_EXCEEDED)
-      
-      ;; Execute strategy-specific withdrawal
-      (let ((actual-amount (try! (execute-strategy-withdrawal strategy-id withdrawal-amount))))
-        
-        ;; Update user allocation (burn shares)
-        (map-set user-allocations {user: tx-sender, strategy-id: strategy-id} 
-                 (merge user-allocation {
-                   amount: (- (get amount user-allocation) actual-amount),
-                   shares: (- (get shares user-allocation) shares)
-                 }))
-        ;; Decrease share supply safely
-        (let ((s (get-strategy-total-shares strategy-id)))
-          (map-set strategy-share-supply strategy-id (if (> s shares) (- s shares) u0)))
-        
-        ;; Update strategy state
-        (map-set strategies strategy-id (merge strategy {
-          current-allocation: (- (get current-allocation strategy) actual-amount),
-          total-assets: (- (get total-assets strategy) actual-amount)
-        }))
-        
-        ;; Update global state
-        (var-set total-assets-under-management 
-                 (- (var-get total-assets-under-management) actual-amount))
-        
-        ;; Emit event
-        (print {
-          event: "strategy-withdrawal",
-          user: tx-sender,
-          strategy-id: strategy-id,
-          shares: shares,
-          amount: actual-amount
-        })
-        
-        (ok actual-amount)))))
+    (let ((total-shares (get-strategy-total-shares strategy-id))
+          (strategy-assets (get total-assets strategy)))
+      (let ((withdrawal-amount (if (or (is-eq total-shares u0) (is-eq strategy-assets u0)) u0 (/ (* shares strategy-assets) (if (is-eq total-shares u0) u1 total-shares)))))
+        (asserts! (>= withdrawal-amount min-amount) ERR_SLIPPAGE_EXCEEDED)
+        (let ((actual-amount (try! (execute-strategy-withdrawal strategy-id withdrawal-amount))))
+          (map-set user-allocations {user: tx-sender, strategy-id: strategy-id}
+            (merge user-allocation {amount: (- (get amount user-allocation) actual-amount), shares: (- (get shares user-allocation) shares)}))
+          (let ((s (get-strategy-total-shares strategy-id)))
+            (map-set strategy-share-supply strategy-id (if (> s shares) (- s shares) u0)))
+          (map-set strategies strategy-id (merge strategy {current-allocation: (- (get current-allocation strategy) actual-amount), total-assets: (- (get total-assets strategy) actual-amount)}))
+          (var-set total-assets-under-management (- (var-get total-assets-under-management) actual-amount))
+          (print {event: "strategy-withdrawal", user: tx-sender, strategy-id: strategy-id, shares: shares, amount: actual-amount})
+          (ok actual-amount))))))
 
 ;; =============================================================================
 ;; STRATEGY EXECUTION
 ;; =============================================================================
 
-;; Execute strategy-specific deposit
+;; Execute strategy-specific deposit (balanced)
 (define-private (execute-strategy-deposit (strategy-id uint) (amount uint))
-  (let ((strategy (unwrap! (map-get? strategies strategy-id) ERR_INVALID_STRATEGY)))
-    (let ((strategy-name (get name strategy)))
-      (if (is-eq strategy-name "stacking")
-        (execute-stacking-deposit strategy-id amount)
-        (if (is-eq strategy-name "alex-farming")
-          (execute-alex-farming-deposit strategy-id amount)
-          (if (is-eq strategy-name "liquidity-mining")
-            (execute-lm-deposit strategy-id amount)
-            (if (is-eq strategy-name "yield-aggregator")
-              (execute-aggregator-deposit strategy-id amount)
-              (ok amount))))))) ;; Default passthrough
+  (let ((strategy (unwrap! (map-get? strategies strategy-id) ERR_INVALID_STRATEGY))
+        (strategy-name (get name strategy)))
+    (if (is-eq strategy-name "stacking")
+      (execute-stacking-deposit strategy-id amount)
+      (if (is-eq strategy-name "alex-farming")
+        (execute-alex-farming-deposit strategy-id amount)
+        (if (is-eq strategy-name "liquidity-mining")
+          (execute-lm-deposit strategy-id amount)
+          (if (is-eq strategy-name "yield-aggregator")
+            (execute-aggregator-deposit strategy-id amount)
+            (ok amount))))))
 
-;; Execute strategy-specific withdrawal
+;; Execute strategy-specific withdrawal (balanced)
 (define-private (execute-strategy-withdrawal (strategy-id uint) (amount uint))
-  (let ((strategy (unwrap! (map-get? strategies strategy-id) ERR_INVALID_STRATEGY)))
-    (let ((strategy-name (get name strategy)))
-      (if (is-eq strategy-name "stacking")
-        (execute-stacking-withdrawal strategy-id amount)
-        (if (is-eq strategy-name "alex-farming")
-          (execute-alex-farming-withdrawal strategy-id amount)
-          (if (is-eq strategy-name "liquidity-mining")
-            (execute-lm-withdrawal strategy-id amount)
-            (if (is-eq strategy-name "yield-aggregator")
-              (execute-aggregator-withdrawal strategy-id amount)
-              (ok amount)))))))  ;; Default passthrough
+  (let ((strategy (unwrap! (map-get? strategies strategy-id) ERR_INVALID_STRATEGY))
+        (strategy-name (get name strategy)))
+    (if (is-eq strategy-name "stacking")
+      (execute-stacking-withdrawal strategy-id amount)
+      (if (is-eq strategy-name "alex-farming")
+        (execute-alex-farming-withdrawal strategy-id amount)
+        (if (is-eq strategy-name "liquidity-mining")
+          (execute-lm-withdrawal strategy-id amount)
+          (if (is-eq strategy-name "yield-aggregator")
+            (execute-aggregator-withdrawal strategy-id amount)
+            (ok amount))))))
 
 ;; =============================================================================
 ;; SPECIFIC STRATEGY IMPLEMENTATIONS

@@ -58,73 +58,33 @@
 ;; =============================================================================
 
 ;; Multi-hop swap with exact input
-(define-public (swap-exact-in-multi-hop
-  (path (list 5 principal))
-  (pools (list 4 <pool-trait>))
-  (amount-in uint)
-  (min-amount-out uint)
-  (deadline uint))
+(define-public (swap-exact-in-multi-hop (path (list 5 principal)) (pools (list 4 <pool-trait>)) (amount-in uint) (min-amount-out uint) (deadline uint))
   (begin
     (asserts! (>= deadline block-height) ERR_EXPIRED)
     (asserts! (>= (len path) u2) ERR_INVALID_PATH)
     (asserts! (is-eq (len pools) (- (len path) u1)) ERR_INVALID_PATH)
     (asserts! (> amount-in u0) ERR_INVALID_ROUTE)
-    
-    ;; Execute multi-hop swap
     (let ((gross-final (try! (execute-multi-hop-swap path pools amount-in u0))))
       (asserts! (>= gross-final min-amount-out) ERR_SLIPPAGE_EXCEEDED)
-      ;; Apply routing fee if configured
       (let ((fee-bps (var-get routing-fee-bps))
-            (net-final (if (is-eq (var-get routing-fee-bps) u0)
-                         gross-final
-                         (- gross-final (/ (* gross-final fee-bps) FEE_DENOMINATOR)))))
-        (print {
-          event: "multi-hop-swap",
-          path: path,
-          amount-in: amount-in,
-          gross-out: gross-final,
-          net-out: net-final,
-          fee-bps: fee-bps,
-          pools-used: (len pools),
-          trader: tx-sender
-        })
+            (net-final (if (is-eq (var-get routing-fee-bps) u0) gross-final (- gross-final (/ (* gross-final fee-bps) FEE_DENOMINATOR)))))
+        (print {event: "multi-hop-swap", path: path, amount-in: amount-in, gross-out: gross-final, net-out: net-final, fee-bps: fee-bps, pools-used: (len pools), trader: tx-sender})
         (ok net-final)))))
 
 ;; Multi-hop swap with exact output
-(define-public (swap-exact-out-multi-hop
-  (path (list 5 principal))
-  (pools (list 4 <pool-trait>))
-  (amount-out uint)
-  (max-amount-in uint)
-  (deadline uint))
+(define-public (swap-exact-out-multi-hop (path (list 5 principal)) (pools (list 4 <pool-trait>)) (amount-out uint) (max-amount-in uint) (deadline uint))
   (begin
     (asserts! (>= deadline block-height) ERR_EXPIRED)
     (asserts! (>= (len path) u2) ERR_INVALID_PATH)
     (asserts! (is-eq (len pools) (- (len path) u1)) ERR_INVALID_PATH)
-    
-    ;; Calculate required input through reverse path
     (let ((required-input (try! (calculate-required-input path pools amount-out))))
       (asserts! (<= required-input max-amount-in) ERR_SLIPPAGE_EXCEEDED)
-      
-      ;; Execute swap
       (let ((gross-final (try! (execute-multi-hop-swap path pools required-input u0))))
         (asserts! (>= gross-final amount-out) ERR_INSUFFICIENT_OUTPUT)
         (let ((fee-bps (var-get routing-fee-bps))
-              (net-final (if (is-eq (var-get routing-fee-bps) u0)
-                           gross-final
-                           (- gross-final (/ (* gross-final fee-bps) FEE_DENOMINATOR)))))
-          (print {
-            event: "multi-hop-swap-exact-out",
-            path: path,
-            required-out: amount-out,
-            gross-out: gross-final,
-            net-out: net-final,
-            fee-bps: fee-bps,
-            amount-in: required-input,
-            pools-used: (len pools),
-            trader: tx-sender
-          })
-          (ok required-input)))))
+              (net-final (if (is-eq (var-get routing-fee-bps) u0) gross-final (- gross-final (/ (* gross-final fee-bps) FEE_DENOMINATOR)))))
+          (print {event: "multi-hop-swap-exact-out", path: path, required-out: amount-out, gross-out: gross-final, net-out: net-final, fee-bps: fee-bps, amount-in: required-input, pools-used: (len pools), trader: tx-sender})
+          (ok required-input))))))
 
 ;; =============================================================================
 ;; PATH EXECUTION LOGIC
@@ -412,5 +372,5 @@
     (map-set fee-tiers u3 {fee-bps: u100, tick-spacing: u200, enabled: true})
     true))
 
-;; Initialize fee tiers on deployment
-(initialize-fee-tiers)
+;; NOTE: Fee tiers initialization must be called manually post-deploy via a governance transaction.
+;; (initialize-fee-tiers) removed to avoid implicit execution in some environments.
