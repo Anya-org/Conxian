@@ -67,6 +67,10 @@
       (let ((result (try! (contract-call? pool swap-exact-in token-in token-out current-amount tx-sender))))
         (execute-multi-hop-swap path pools result (+ hop-index u1))))))
 
+;; Forward calculation helpers placed before public functions to avoid cycle detection
+(define-private (calculate-required-input (path (list 5 principal)) (pools (list 4 <pool-trait>)) (amount-out uint))
+  (ok amount-out))
+
 ;; Multi-hop swap with exact input
 (define-public (swap-exact-in-multi-hop (path (list 5 principal)) (pools (list 4 <pool-trait>)) (amount-in uint) (min-amount-out uint) (deadline uint))
   (begin
