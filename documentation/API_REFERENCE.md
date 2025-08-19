@@ -136,3 +136,40 @@ Clarinet console uses a local stacks-devnet under the hood; to interact programm
 - Always test on testnet/devnet before mainnet.
 - Use post-conditions in contract-calls to guard against unintended transfers.
 - Keep arguments small to minimize gas and payload size.
+
+## Router Error Codes (Multi-Hop Router)
+
+| Code | Symbol | Description |
+|------|--------|-------------|
+| u600 | ERR_INVALID_PATH | Path or pools list length mismatch / invalid structure |
+| u601 | ERR_INSUFFICIENT_OUTPUT | Final output less than required (exact-out safety) |
+| u602 | ERR_SLIPPAGE_EXCEEDED | User slippage bound breached (legacy check) |
+| u603 | ERR_INVALID_ROUTE | Route/pool mismatch or unsupported params |
+| u604 | ERR_NO_LIQUIDITY | Pool returned insufficient liquidity |
+| u605 | ERR_EXPIRED | Deadline lower than current block-height |
+| u606 | ERR_UNAUTHORIZED | Caller lacks admin rights |
+| u607 | ERR_INVALID_POOL_TYPE | Pool type not in allowed whitelist |
+| u608 | ERR_IDENTICAL_TOKENS | Identical input/output token in path or pool registration |
+| u609 | ERR_INACTIVE_POOL | Pool flagged inactive in registry |
+| u610 | ERR_INVALID_FEE_TIER | Fee tier not present or disabled in `fee-tiers` map |
+| u611 | ERR_SLIPPAGE_POLICY | User-specified min/max violates protocol slippage policy |
+
+### Slippage Policy Enforcement
+
+Global variable: `max-slippage-bps` (basis points, denominator 10000). Default: `u1000` (10%).
+
+Rules:
+1. swap-exact-in-multi-hop: `min-amount-out >= gross-out - (gross-out * max-slippage-bps / 10000)` or `ERR_SLIPPAGE_POLICY`.
+2. swap-exact-out-multi-hop: `max-amount-in <= required-in + (required-in * max-slippage-bps / 10000)` or `ERR_SLIPPAGE_POLICY`.
+
+Rationale: Prevents overly permissive parameters that expand MEV extraction surface or silent value leakage.
+
+### Pool Type Validation
+Allowed types (constant list): `constant-product`, `stable`, `weighted`, `concentrated`.
+
+### Fee Tier Validation
+`register-pool` checks `fee-tiers` map for an enabled record; otherwise `ERR_INVALID_FEE_TIER`.
+
+### Path / Hop Constraints
+`MAX_HOPS = 5`; pools length must equal `path length - 1`; iterative unrolled execution avoids recursion limits in Clarity.
+

@@ -140,27 +140,23 @@
   (asserts! (is-eq (len pools) (- (len path) u1)) ERR_INVALID_PATH)
   (let ((hops (len pools)))
     (asserts! (> hops u0) ERR_INVALID_PATH)
-  (asserts! (<= hops MAX_HOPS) ERR_INVALID_PATH)
-    ;; Hop 0
+    (asserts! (<= hops MAX_HOPS) ERR_INVALID_PATH)
     (let ((token0 (unwrap! (element-at path u0) ERR_INVALID_PATH))
           (token1 (unwrap! (element-at path u1) ERR_INVALID_PATH))
           (pool0 (unwrap! (element-at pools u0) ERR_INVALID_PATH))
           (out1 (try! (execute-single-hop token0 token1 pool0 amount-in))))
       (if (is-eq hops u1)
         (ok out1)
-        ;; Hop 1
         (let ((token2 (unwrap! (element-at path u2) ERR_INVALID_PATH))
               (pool1 (unwrap! (element-at pools u1) ERR_INVALID_PATH))
               (out2 (try! (execute-single-hop token1 token2 pool1 out1))))
           (if (is-eq hops u2)
             (ok out2)
-            ;; Hop 2
             (let ((token3 (unwrap! (element-at path u3) ERR_INVALID_PATH))
                   (pool2 (unwrap! (element-at pools u2) ERR_INVALID_PATH))
                   (out3 (try! (execute-single-hop token2 token3 pool2 out2))))
               (if (is-eq hops u3)
                 (ok out3)
-                ;; Hop 3
                 (let ((token4 (unwrap! (element-at path u4) ERR_INVALID_PATH))
                       (pool3 (unwrap! (element-at pools u3) ERR_INVALID_PATH))
                       (out4 (try! (execute-single-hop token3 token4 pool3 out3))))
