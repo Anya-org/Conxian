@@ -64,7 +64,7 @@ Network: Stacks Testnet (https://api.testnet.hiro.so)
 
    ```bash
    cd /workspaces/AutoVault/stacks
-   clarinet deployment apply --testnet
+   npx clarinet deployment apply --testnet
    ```
 
 3. **Post-Deployment Verification**
@@ -102,7 +102,7 @@ The system is awaiting only testnet STX funding to execute the live deployment.
 
 ```bash
 # When testnet STX is available:
-cd /workspaces/AutoVault/stacks && clarinet deployment apply --testnet
+cd /workspaces/AutoVault/stacks && npx clarinet deployment apply --testnet
 ```
 
 **Success Metrics Achieved:**

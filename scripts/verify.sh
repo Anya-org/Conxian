@@ -7,27 +7,14 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 STACKS_DIR="$ROOT_DIR/stacks"
-CLARINET_BIN="$ROOT_DIR/bin/clarinet"
-
-if [[ -x "$CLARINET_BIN" ]]; then
-  CLARINET_CMD="$CLARINET_BIN"
-else
-  if command -v clarinet >/dev/null 2>&1; then
-    CLARINET_CMD="clarinet"
-  else
-    echo "Error: Clarinet binary not found at $CLARINET_BIN and not on PATH." >&2
-    echo "Install Clarinet or place the binary in bin/ (see stacks/README.md)." >&2
-    exit 1
-  fi
-fi
 
 pushd "$STACKS_DIR" >/dev/null
 
-echo "==> clarinet --version"
-"$CLARINET_CMD" --version || true
+echo "==> npx clarinet --version"
+npx clarinet --version || true
 
-echo "==> clarinet check"
-"$CLARINET_CMD" check
+echo "==> npx clarinet check"
+npx clarinet check
 
 cat <<'EOF'
 
@@ -36,7 +23,7 @@ Local console verification (Guided)
 =====================================
 From a new terminal:
   $ cd stacks
-  $ clarinet console
+  $ npx clarinet console
 
 In the console, run:
   ;; Mint mock tokens to yourself (tx-sender)

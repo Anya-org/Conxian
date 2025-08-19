@@ -1,4 +1,4 @@
-# Restoration & Decommission Audit (AutoVault3. Update `CHANGELOG.md` under Unreleased: "Removed legacy variant `file` (superseded by `active-file`, no unique logic)"
+# Restoration & Decommission Audit (AutoVault)
 
 Purpose: Inventory all archived, original, backup, and disabled contract variants to (a) ensure no critical differentiating functionality is lost prior to repository cleanup, (b) decide restore vs merge vs remove actions, (c) map each feature to PRD / AIP alignment, (d) surface gaps to re‑enable before mainnet.
 
@@ -43,8 +43,8 @@ Before deleting any variant file:
 
 1. Confirm no tests import or reference variant (grep + run full suite).  
 2. Archive diff snippet into `documentation/ARCHIVE_DIFFS.md` (hash, lines changed).  
-3. Update `CHANGELOG.md` under Unreleased: "Removed legacy variant `file` (superseded by `active-file`, no unique logic)".  
-4. Re-run `clarinet check` + full tests (must remain green).  
+3. Update `CHANGELOG.md` under Unreleased: "Removed legacy variant `<file>` (superseded by `<active-file>`, no unique logic)".  
+4. Re-run `npx clarinet check` + full tests (must remain green).  
 5. Tag PR with `refactor:contract-cleanup` and note AIP impact (none or specify).  
 
 ## Planned Actions (Ordered)

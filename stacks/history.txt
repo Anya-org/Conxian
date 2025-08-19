@@ -1,5 +1,5 @@
 #V2
-cd /workspaces/AutoVault/stacks && echo "(contract-call? .vault get-total-shares)" | clarinet console
+cd /workspaces/AutoVault/stacks && echo "(contract-call? .vault get-total-shares)" | npx clarinet console
 check
 list
 help

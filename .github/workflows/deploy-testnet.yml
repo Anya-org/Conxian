@@ -51,10 +51,6 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           cache-dependency-path: stacks/package-lock.json
-      - name: Install Clarinet
-        run: |
-          curl -sSfL https://github.com/hirosystems/clarinet/releases/latest/download/clarinet-installer.sh | sh
-          echo "$HOME/.clarinet/bin" >> $GITHUB_PATH
       - name: Install Deps
         run: |
           cd stacks
@@ -62,7 +58,7 @@ jobs:
       - name: Compile Contracts
         run: |
           cd stacks
-          clarinet check
+          npx clarinet check
       - name: Artifact Summary
         run: |
           echo "Contracts:"; ls -1 stacks/contracts | wc -l
@@ -76,10 +72,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: Install Clarinet
+          cache: 'npm'
+          cache-dependency-path: stacks/package-lock.json
+      - name: Install Deps
         run: |
-          curl -sSfL https://github.com/hirosystems/clarinet/releases/latest/download/clarinet-installer.sh | sh
-          echo "$HOME/.clarinet/bin" >> $GITHUB_PATH
+          cd stacks
+          npm ci --no-audit --no-fund
       - name: Deployment (Dry / Placeholder)
         run: |
           set -e

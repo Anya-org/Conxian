@@ -1,5 +1,5 @@
 ;; AutoVault Manual Testing Commands
-;; Copy and paste these into clarinet console for interactive testing
+;; Copy and paste these into npx clarinet console for interactive testing
 
 ;; === BASIC CONTRACT VERIFICATION ===
 

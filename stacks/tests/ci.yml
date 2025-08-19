@@ -13,27 +13,36 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Install Clarinet
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: stacks/package-lock.json
+      
+    - name: Install Dependencies
       run: |
-        curl -sSfL https://github.com/hirosystems/clarinet/releases/latest/download/clarinet-installer.sh | sh
-        echo "$HOME/.clarinet/bin" >> $GITHUB_PATH
+        cd stacks
+        npm ci --no-audit --no-fund
         
     - name: Verify Clarinet Installation
-      run: clarinet --version
+      run: |
+        cd stacks
+        npx clarinet --version
       
     - name: Check Contract Syntax
       run: |
         cd stacks
-        clarinet check
+        npx clarinet check
         
     - name: Run Tests
       run: |
         cd stacks
-        clarinet test
+        npx clarinet test
     - name: Invariant / Additional Tests (same clarinet invocation picks up new tests)
       run: |
         cd stacks
-        clarinet test --filter invariants || true
+        npx clarinet test --filter invariants || true
     - name: Economic Simulation (dry-run)
       run: |
         python scripts/economic_simulation.py | head -n 30

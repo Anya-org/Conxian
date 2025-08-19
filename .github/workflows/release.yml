@@ -67,8 +67,7 @@ jobs:
 
       - name: Install Clarinet
         run: |
-          curl -sSfL https://github.com/hirosystems/clarinet/releases/latest/download/clarinet-installer.sh | sh
-          echo "$HOME/.clarinet/bin" >> $GITHUB_PATH
+          echo "Using project-pinned Clarinet via npx"
 
       - name: Install Dependencies
         run: |
@@ -78,7 +77,7 @@ jobs:
       - name: Contract Compilation
         run: |
           cd stacks
-          clarinet check
+          npx clarinet check
 
       - name: Full Test Suite
         run: |
@@ -151,8 +150,7 @@ jobs:
 
       - name: Install Clarinet
         run: |
-          curl -sSfL https://github.com/hirosystems/clarinet/releases/latest/download/clarinet-installer.sh | sh
-          echo "$HOME/.clarinet/bin" >> $GITHUB_PATH
+          echo "Using project-pinned Clarinet via npx"
 
       - name: Install Dependencies
         run: |
