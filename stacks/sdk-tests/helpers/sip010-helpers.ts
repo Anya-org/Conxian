@@ -72,18 +72,19 @@ export function getVaultReserves(simnet: Simnet, caller?: Account) {
 export function setVaultTokenViaTimelock(simnet: Simnet, tokenPrincipal: string) {
   const { deployer } = principals(simnet);
   const qPause = queueSetPaused(simnet, true, deployer);
-  const idPause = (qPause.result.ok as any).value;
-  const delay = (getMinDelay(simnet).result.ok as any).value as bigint;
+  // Clarinet SDK 3.5.0 exposes results as { type, value }
+  const idPause = (qPause.result as any).value.value;
+  const delay = (getMinDelay(simnet).result as any).value as bigint;
   mine(simnet, Number(delay));
   executeSetPaused(simnet, idPause, deployer);
 
   const qTok = queueSetToken(simnet, tokenPrincipal, deployer);
-  const idTok = (qTok.result.ok as any).value;
+  const idTok = (qTok.result as any).value.value;
   mine(simnet, Number(delay));
   executeSetToken(simnet, idTok, deployer);
 
   const qUnpause = queueSetPaused(simnet, false, deployer);
-  const idUnpause = (qUnpause.result.ok as any).value;
+  const idUnpause = (qUnpause.result as any).value.value;
   mine(simnet, Number(delay));
   executeSetPaused(simnet, idUnpause, deployer);
 }

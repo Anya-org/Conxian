@@ -58,17 +58,18 @@ describe('vault: SIP-010 deposit-v2 / withdraw-v2', () => {
 
     // Withdraw 5,000 via withdraw-v2 -> 0.10% fee => 5,000 * 0.001 = 5
     const withdraw = simnet.callPublicFn('vault', 'withdraw-v2', [Cl.uint(5_000), ftRef], user);
-    expect(withdraw.result).toEqual({ type: 'ok', value: { type: 'uint', value: 4990n } });
+    // payout = amount - fee = 5000 - 5 = 4995
+    expect(withdraw.result).toEqual({ type: 'ok', value: { type: 'uint', value: 4995n } });
 
     // Totals after withdraw: tb 9970 - 5000 = 4970; ts 9970 - ceil(5000*9970/9970)=9970-5000=4970
     const { tb: tbAfterW, ts: tsAfterW } = getVaultTotals(simnet, deployer);
     expect(tbAfterW.result).toEqual({ type: 'uint', value: 4970n });
     expect(tsAfterW.result).toEqual({ type: 'uint', value: 4970n });
 
-    // Reserves after withdraw: fee 5 split 50/50 => +5 to treasury and +5 to protocol => totals 20/20
+    // Reserves after withdraw: fee 5 split 50/50 with integer division => +2 to treasury, +3 to protocol => totals 17/18
     const { tres: tresAfterW, pres: presAfterW } = getVaultReserves(simnet, deployer);
-    expect(tresAfterW.result).toEqual({ type: 'uint', value: 20n });
-    expect(presAfterW.result).toEqual({ type: 'uint', value: 20n });
+    expect(tresAfterW.result).toEqual({ type: 'uint', value: 17n });
+    expect(presAfterW.result).toEqual({ type: 'uint', value: 18n });
 
     // User shares after burn should be 4970
     const userSharesAfterW = getVaultShare(simnet, user, deployer);
