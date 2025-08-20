@@ -93,6 +93,13 @@ plan:
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
+            contract-name: circuit-breaker-simple
+            expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
+            cost: 34600
+            path: contracts/circuit-breaker-simple.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
             contract-name: gov-token
             expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
             cost: 31880
@@ -130,29 +137,43 @@ plan:
         - contract-publish:
             contract-name: dex-factory
             expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
-            cost: 21260
+            cost: 21740
             path: contracts/dex-factory.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: pool-trait
             expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
-            cost: 5830
-            path: contracts/pool-trait.clar
+            cost: 6670
+            path: contracts/traits/pool-trait.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: dex-pool
             expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
-            cost: 116430
+            cost: 118050
             path: contracts/dex-pool.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: dex-router
             expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
-            cost: 31150
+            cost: 31720
             path: contracts/dex-router.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: enhanced-yield-strategy
+            expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
+            cost: 75180
+            path: contracts/enhanced-yield-strategy.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: enhanced-yield-strategy-simple
+            expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
+            cost: 76310
+            path: contracts/enhanced-yield-strategy-simple.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
@@ -162,30 +183,65 @@ plan:
             path: contracts/enterprise-monitoring.clar
             anchor-block-only: true
             clarity-version: 2
+      epoch: "2.4"
+    - id: 1
+      transactions:
+        - contract-publish:
+            contract-name: governance-test-helper
+            expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
+            cost: 7120
+            path: contracts/governance-test-helper.clar
+            anchor-block-only: true
+            clarity-version: 2
         - contract-publish:
             contract-name: math-lib
             expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
-            cost: 100860
+            cost: 101550
             path: contracts/math-lib.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: mock-dex
             expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
-            cost: 4150
+            cost: 4460
             path: contracts/mock-dex.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: multi-hop-router
             expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
-            cost: 116460
+            cost: 116630
             path: contracts/multi-hop-router.clar
             anchor-block-only: true
             clarity-version: 2
-      epoch: "2.4"
-    - id: 1
-      transactions:
+        - contract-publish:
+            contract-name: multi-hop-router-v2
+            expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
+            cost: 67480
+            path: contracts/multi-hop-router-v2.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: multi-hop-router-v2-simple
+            expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
+            cost: 67680
+            path: contracts/multi-hop-router-v2-simple.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: ownable-trait
+            expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
+            cost: 3430
+            path: contracts/traits/ownable-trait.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: pool-factory
+            expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
+            cost: 59430
+            path: contracts/pool-factory.clar
+            anchor-block-only: true
+            clarity-version: 2
         - contract-publish:
             contract-name: registry
             expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
@@ -196,7 +252,7 @@ plan:
         - contract-publish:
             contract-name: stable-pool
             expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
-            cost: 50940
+            cost: 57060
             path: contracts/stable-pool.clar
             anchor-block-only: true
             clarity-version: 2
@@ -222,6 +278,20 @@ plan:
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
+            contract-name: twap-oracle-v2
+            expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
+            cost: 93750
+            path: contracts/twap-oracle-v2.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: twap-oracle-v2-simple
+            expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
+            cost: 110910
+            path: contracts/twap-oracle-v2-simple.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
             contract-name: vault-trait
             expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
             cost: 6270
@@ -231,7 +301,7 @@ plan:
         - contract-publish:
             contract-name: weighted-pool
             expected-sender: ST14G8ACZNKBPR0WTX55NZ38NHN6K75AJ1ED4YDPC
-            cost: 176130
+            cost: 180940
             path: contracts/weighted-pool.clar
             anchor-block-only: true
             clarity-version: 2
