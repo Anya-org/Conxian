@@ -37,7 +37,10 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
       
       const result = simnet.callPublicFn(ROUTER, 'swap-exact-in-multi-hop', [
         Cl.list(path.map(Cl.principal)),
-        Cl.list(pools.map(Cl.contractPrincipal)),
+        Cl.list(pools.map((p) => {
+          const [addr, name] = p.split('.');
+          return Cl.contractPrincipal(addr, name);
+        })),
         Cl.uint(1000),
         Cl.uint(900),
         Cl.uint(simnet.blockHeight + 10)
@@ -163,7 +166,10 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
       
       const result = simnet.callPublicFn(ROUTER, 'swap-exact-in-multi-hop', [
         Cl.list([Cl.principal(tokenA), Cl.principal(tokenB)]),
-        Cl.list(pools.map(Cl.contractPrincipal)),
+        Cl.list(pools.map((p) => {
+          const [addr, name] = p.split('.');
+          return Cl.contractPrincipal(addr, name);
+        })),
         Cl.uint(1000),
         Cl.uint(900),
         Cl.uint(simnet.blockHeight + 10)

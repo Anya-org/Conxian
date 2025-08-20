@@ -216,11 +216,11 @@
   (begin
     (asserts! (>= deadline block-height) ERR_EXPIRED)
     (asserts! (>= (len path) u2) ERR_INVALID_PATH)
-    (asserts! (is-eq (len pools) (- (len path) u1)) ERR_INVALID_PATH)
-    (asserts! (> amount-in u0) ERR_INVALID_ROUTE)
     (let ((first (unwrap! (element-at path u0) ERR_INVALID_PATH))
           (last (unwrap! (element-at path (- (len path) u1)) ERR_INVALID_PATH)))
       (asserts! (not (is-eq first last)) ERR_IDENTICAL_TOKENS))
+    (asserts! (is-eq (len pools) (- (len path) u1)) ERR_INVALID_PATH)
+    (asserts! (> amount-in u0) ERR_INVALID_ROUTE)
     (let ((gross-final (try! (execute-multi-hop-swap path pools amount-in))))
       (asserts! (>= gross-final min-amount-out) ERR_SLIPPAGE_EXCEEDED)
       (let ((fee-bps (var-get routing-fee-bps))
@@ -259,6 +259,7 @@
 ;; Update routing fee
 (define-public (update-routing-fee (new-fee-bps uint))
   (begin
+    (print {event: "auth-check", tx: tx-sender, admin: (var-get router-admin)})
     (asserts! (is-eq tx-sender (var-get router-admin)) ERR_UNAUTHORIZED)
     (asserts! (<= new-fee-bps u500) ERR_INVALID_ROUTE)
     (var-set routing-fee-bps new-fee-bps)
