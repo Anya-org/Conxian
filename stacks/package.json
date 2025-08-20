@@ -12,22 +12,22 @@
     "vitest": "^3.2.4"
   },
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest watch",
-    "test:auto": "chokidar 'contracts/**/*.clar' 'tests/**/*.ts' 'sdk-tests/**/*.spec.ts' -c 'npm run check && vitest run'",
+    "test": "../scripts/ensure-deps.sh && npx vitest run",
+    "test:watch": "../scripts/ensure-deps.sh && npx vitest watch",
+    "test:auto": "chokidar 'contracts/**/*.clar' 'tests/**/*.ts' 'sdk-tests/**/*.spec.ts' -c '../scripts/ensure-deps.sh && npm run check && npx vitest run'",
     "test:manual": "../scripts/manual-testing.sh",
-    "update-autonomics": "ts-node ../scripts/sdk_update_autonomics.ts",
+    "update-autonomics": "../scripts/ensure-deps.sh && ts-node ../scripts/sdk_update_autonomics.ts",
     "int-autonomics": "bash tests/integration_autonomics_sdk.sh",
-    "deploy-contracts": "ts-node ../scripts/sdk_deploy_contracts.ts",
+    "deploy-contracts": "../scripts/ensure-deps.sh && ts-node ../scripts/sdk_deploy_contracts.ts",
     "deploy-testnet": "../scripts/deploy-testnet.sh",
-    "verify-post": "ts-node ../scripts/post_deploy_verify.ts",
+    "verify-post": "../scripts/ensure-deps.sh && ts-node ../scripts/post_deploy_verify.ts",
     "generate-deployer-key": "node -r ts-node/register ../scripts/generate-deployer-key.ts",
     "gen-key": "node generate-deployer-key.js",
     "console": "npx clarinet console",
     "console:testnet": "npx clarinet console --testnet",
     "check": "npx clarinet check",
-    "ci": "npm run check && vitest run",
-    "pre-deploy": "npm run ci && ../scripts/manual-testing.sh"
+    "ci": "../scripts/ensure-deps.sh && npm run check && npx vitest run",
+    "pre-deploy": "../scripts/ensure-deps.sh && npm run ci && ../scripts/manual-testing.sh"
   },
   "dependencies": {
     "@scure/bip32": "^1.5.0",
