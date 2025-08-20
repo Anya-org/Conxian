@@ -2,6 +2,7 @@
 name = "autovault"
 description = "AutoVault DeFi protocol - clarinet config"
 requirements = []
+clarinet_version = "3.5.0"
 
 [accounts]
 deployer = { mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art", balance = 10_000_000_000 }
