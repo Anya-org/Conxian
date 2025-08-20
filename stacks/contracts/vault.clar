@@ -992,7 +992,7 @@
       )
       ;; Pull tokens from user into the vault
       (unwrap!
-        (contract-call? .mock-ft transfer-from user (as-contract tx-sender) amount)
+        (as-contract (contract-call? .mock-ft transfer-from user tx-sender amount))
         (err u200)
       )
       ;; Update shares with precision calculation
