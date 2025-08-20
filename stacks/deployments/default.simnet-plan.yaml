@@ -141,11 +141,6 @@ plan:
             path: contracts/dex-router.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: enhanced-governance
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/enhanced-governance.clar
-            clarity-version: 2
-        - emulated-contract-publish:
             contract-name: enhanced-yield-strategy
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/enhanced-yield-strategy.clar
@@ -222,11 +217,6 @@ plan:
             contract-name: stable-pool
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/stable-pool.clar
-            clarity-version: 2
-        - emulated-contract-publish:
-            contract-name: stable-pool-clean
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/stable-pool-clean.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: state-anchor
