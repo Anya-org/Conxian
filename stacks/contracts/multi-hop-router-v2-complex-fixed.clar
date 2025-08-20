@@ -65,19 +65,21 @@
   (amount-in uint))
   (/ (* amount-in u997) u1000))
 
-;; Execute swap based on pool type
+;; Execute swap based on pool type (string comparisons via nested if)
 (define-private (execute-pool-swap
   (pool <pool-trait>)
-  (token-in principal)
-  (token-out principal)
   (amount-in uint)
+  (x-to-y bool)
   (pool-type (string-ascii 20)))
-  (match pool-type
-    "constant-product" (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
-    "stable" (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
-    "weighted" (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
-    "concentrated" (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
-    (err ERR_INVALID_ROUTE)))
+  (if (is-eq pool-type "constant-product")
+    (contract-call? pool swap-exact-in amount-in u0 x-to-y block-height)
+    (if (is-eq pool-type "stable")
+      (contract-call? pool swap-exact-in amount-in u0 x-to-y block-height)
+      (if (is-eq pool-type "weighted")
+        (contract-call? pool swap-exact-in amount-in u0 x-to-y block-height)
+        (if (is-eq pool-type "concentrated")
+          (contract-call? pool swap-exact-in amount-in u0 x-to-y block-height)
+          ERR_INVALID_ROUTE)))))
 
 ;; Execute single hop in the route
 (define-private (execute-single-hop
@@ -90,54 +92,71 @@
                 (and (is-eq token-in (get token-x pool-info)) (is-eq token-out (get token-y pool-info)))
                 (and (is-eq token-in (get token-y pool-info)) (is-eq token-out (get token-x pool-info))))
               ERR_INVALID_ROUTE)
-    (match (execute-pool-swap pool token-in token-out amount-in (get pool-type pool-info))
-      success (ok (get amount-out success))
-      error (err ERR_NO_LIQUIDITY))))
+    (let ((x-to-y (is-eq token-in (get token-x pool-info))))
+      (match (execute-pool-swap pool amount-in x-to-y (get pool-type pool-info))
+        success (ok (get amount-out success))
+        error ERR_NO_LIQUIDITY))))
 
 ;; =============================================================================
 ;; CORE ROUTING FUNCTIONS (DEFINED AFTER HELPERS)
 ;; =============================================================================
 
-;; Execute multi-hop swap recursively
+;; Fold-based executor step for multi-hop swap
+(define-private (process-hop-exec
+  (pool <pool-trait>)
+  (acc (response {i: uint, path: (list 5 principal), current: uint} uint)))
+  (let ((state (try! acc))
+        (pool-info (unwrap! (map-get? pool-registry (contract-of pool)) ERR_INVALID_ROUTE))
+        (token-in (unwrap! (element-at (get path state) (get i state)) ERR_INVALID_PATH))
+        (token-out (unwrap! (element-at (get path state) (+ (get i state) u1)) ERR_INVALID_PATH)))
+    (let ((hop-result (try! (execute-single-hop token-in token-out pool (get current state)))))
+      (ok {i: (+ (get i state) u1), path: (get path state), current: hop-result}))))
+
+;; Execute multi-hop swap iteratively (no recursion)
 (define-private (execute-multi-hop-swap 
   (path (list 5 principal)) 
   (pools (list 4 <pool-trait>)) 
-  (current-amount uint) 
-  (hop-index uint))
-  (if (>= hop-index (len pools))
-    (ok current-amount)
-    (let ((token-in (unwrap! (element-at path hop-index) ERR_INVALID_PATH))
-          (token-out (unwrap! (element-at path (+ hop-index u1)) ERR_INVALID_PATH))
-          (pool (unwrap! (element-at pools hop-index) ERR_INVALID_PATH)))
-      (let ((hop-result (try! (execute-single-hop token-in token-out pool current-amount))))
-        (execute-multi-hop-swap path pools hop-result (+ hop-index u1))))))
+  (amount-in uint))
+  (let ((initial (ok {i: u0, path: path, current: amount-in})))
+    (let ((result (fold process-hop-exec pools initial)))
+      (ok (get current (try! result))))))
 
 ;; Calculate required input for exact output
 (define-private (calculate-required-input
   (path (list 5 principal))
   (pools (list 4 <pool-trait>))
   (amount-out uint))
-  (ok (* amount-out u1003)))
+  (if (<= amount-out u0)
+    ERR_INVALID_ROUTE
+    (ok amount-out)))
 
-;; Recursive helper for price calculation  
-(define-private (calculate-amounts-out-recursive
+;; Fold-based amounts-out calculator (no recursion)
+(define-private (process-hop-amounts
+  (pool-principal principal)
+  (acc {i: uint, path: (list 5 principal), current: uint, amounts: (list 5 uint)}))
+  (let ((token-in (unwrap-panic (element-at (get path acc) (get i acc))))
+        (token-out (unwrap-panic (element-at (get path acc) (+ (get i acc) u1))))
+        (next-amount (get-single-hop-output pool-principal
+                                           (unwrap-panic (element-at (get path acc) (get i acc)))
+                                           (unwrap-panic (element-at (get path acc) (+ (get i acc) u1)))
+                                           (get current acc))))
+    {
+      i: (+ (get i acc) u1),
+      path: (get path acc),
+      current: next-amount,
+      amounts: (unwrap-panic (as-max-len? (append (get amounts acc) next-amount) u5))
+    }))
+
+(define-private (calculate-amounts-out-fold
   (path (list 5 principal))
   (pools (list 4 principal))
-  (current-amount uint)
-  (hop-index uint)
-  (amounts (list 5 uint)))
-  (if (>= hop-index (len pools))
-    (ok (unwrap-panic (as-max-len? (append amounts current-amount) u5)))
-    (let ((pool-principal (unwrap-panic (element-at pools hop-index)))
-          (token-in (unwrap-panic (element-at path hop-index)))
-          (token-out (unwrap-panic (element-at path (+ hop-index u1)))))
-      (let ((amount-out (get-single-hop-output pool-principal token-in token-out current-amount)))
-        (calculate-amounts-out-recursive 
-          path 
-          pools 
-          amount-out 
-          (+ hop-index u1)
-          (unwrap-panic (as-max-len? (append amounts current-amount) u5)))))))
+  (amount-in uint))
+  (let ((initial {i: u0,
+                  path: path,
+                  current: amount-in,
+                  amounts: (unwrap-panic (as-max-len? (list amount-in) u5))}))
+    (let ((result (fold process-hop-amounts pools initial)))
+      (ok (get amounts result)))))
 
 ;; =============================================================================
 ;; READ-ONLY FUNCTIONS
@@ -148,7 +167,7 @@
   (path (list 5 principal))
   (pools (list 4 principal))
   (amount-in uint))
-  (calculate-amounts-out-recursive path pools amount-in u0 (list)))
+  (calculate-amounts-out-fold path pools amount-in))
 
 ;; Find optimal route between two tokens
 (define-read-only (find-optimal-route
@@ -177,7 +196,7 @@
     (asserts! (>= (len path) u2) ERR_INVALID_PATH)
     (asserts! (is-eq (len pools) (- (len path) u1)) ERR_INVALID_PATH)
     (asserts! (> amount-in u0) ERR_INVALID_ROUTE)
-    (let ((gross-final (try! (execute-multi-hop-swap path pools amount-in u0))))
+    (let ((gross-final (try! (execute-multi-hop-swap path pools amount-in))))
       (asserts! (>= gross-final min-amount-out) ERR_SLIPPAGE_EXCEEDED)
       (let ((fee-bps (var-get routing-fee-bps))
             (net-final (if (is-eq fee-bps u0) 
@@ -199,7 +218,7 @@
     (asserts! (is-eq (len pools) (- (len path) u1)) ERR_INVALID_PATH)
     (let ((required-input (try! (calculate-required-input path pools amount-out))))
       (asserts! (<= required-input max-amount-in) ERR_SLIPPAGE_EXCEEDED)
-      (let ((gross-final (try! (execute-multi-hop-swap path pools required-input u0))))
+      (let ((gross-final (try! (execute-multi-hop-swap path pools required-input))))
         (asserts! (>= gross-final amount-out) ERR_INSUFFICIENT_OUTPUT)
         (let ((fee-bps (var-get routing-fee-bps))
               (net-final (if (is-eq fee-bps u0) 

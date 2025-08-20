@@ -196,7 +196,7 @@ plan:
         - emulated-contract-publish:
             contract-name: multi-hop-router-v2-complex
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/multi-hop-router-v2-complex.clar
+            path: contracts/multi-hop-router-v2-complex-fixed.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: multi-hop-router-v2-simple
