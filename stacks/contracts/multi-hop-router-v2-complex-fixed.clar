@@ -325,6 +325,14 @@
     (print {event: "router-admin-transferred", new-admin: new-admin})
     (ok true)))
 
+;; Bootstrap default fee tiers (admin-only, idempotent)
+(define-public (bootstrap-fee-tiers)
+  (begin
+    (asserts! (is-eq tx-sender (var-get router-admin)) ERR_UNAUTHORIZED)
+    (initialize-fee-tiers)
+    (print {event: "fee-tiers-bootstrapped"})
+    (ok true)))
+
 ;; =============================================================================
 ;; BOOTSTRAP DEFAULTS (FEE TIERS)
 ;; =============================================================================
@@ -340,5 +348,5 @@
     (map-set fee-tiers u3 {fee-bps: u100, tick-spacing: u200, enabled: true})
     true))
 
-;; Invoke initialization at deploy time
-(initialize-fee-tiers)
+;; Note: Removed top-level invocation to avoid deploy-time side effects. Use
+;; `bootstrap-fee-tiers` (admin-only) to initialize after deployment.

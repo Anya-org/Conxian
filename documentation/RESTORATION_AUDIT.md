@@ -22,9 +22,9 @@ Rationale Tags: SEC (security), PERF (performance/gas), SIZE (contract size), PR
 | DEX Weighted Pool | `weighted-pool.clar` | `weighted-pool.clar.disabled` | Disabled version returned richer swap result `{ amount-out, fee }`; different remove-liquidity field names; legacy fee exposure | Fee transparency restored via `last-swap-fee` var + `get-last-swap-fee` read-only; swap event already emits fee | Low (addressed) | COMPLETED (Option B) | Non-breaking restoration preserving `pool-trait`; test `weighted_pool_fee_test.ts` added (PRD, DX, AUDIT). |
 | DEX Stable Pool | `stable-pool.clar` | `stable-pool-clean.clar` (if exists beyond placeholder) | (Not yet diffed – pending) | - | Unknown | DEFER | Perform targeted diff if we keep both; currently only one active in Clarinet.toml (`stable-pool.clar`). |
 | Circuit Breaker | `circuit-breaker.clar` | `circuit-breaker-simple.clar` | Simple version smaller; fewer guardrails; potential fallback minimal pause logic | Active adds richer triggers | None | KEEP both until gas benchmarking | Simple variant may serve as lightweight fallback; revisit after gas data (PERF). |
-| Governance Automation | `dao-automation.clar` | (no variant) | - | - | - | KEEP |
-| Oracle | `oracle-aggregator.clar` | (no variant) | - | - | - | KEEP |
-| Timelock | `timelock.clar` | (no variant) | - | - | - | KEEP |
+| Governance Automation | `dao-automation.clar` | (no variant) | - | - | - | KEEP | - |
+| Oracle | `oracle-aggregator.clar` | (no variant) | - | - | - | KEEP | - |
+| Timelock | `timelock.clar` | (no variant) | - | - | - | KEEP | - |
 
 ## Weighted Pool Restoration Detail
 

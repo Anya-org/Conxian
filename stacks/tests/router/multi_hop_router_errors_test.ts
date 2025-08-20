@@ -25,6 +25,9 @@ beforeAll(async () => {
   const accounts = simnet.getAccounts();
   wallet1 = accounts.get('wallet_1') || '';
   wallet2 = accounts.get('wallet_2') || '';
+
+  // Bootstrap default fee tiers (admin-only) to enable tier u1/u2/u3 in tests
+  simnet.callPublicFn(ROUTER, 'bootstrap-fee-tiers', [], deployer);
 });
 
 describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
@@ -44,7 +47,7 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
         Cl.uint(1000),
         Cl.uint(900),
         Cl.uint(simnet.blockHeight + 10)
-      ], wallet1);
+      ], wallet2);
       
       expect(result.result.type).toBe('err');
       expect(result.result.value.value).toBe(608n);
@@ -162,7 +165,7 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
       // For now, test the validation exists by trying to use non-existent pool
       const tokenA = `${deployer}.avg-token`;
       const tokenB = `${deployer}.avlp-token`;
-      const pools = [`${deployer}.nonexistent-pool`];
+      const pools = [`${deployer}.dex-pool`];
       
       const result = simnet.callPublicFn(ROUTER, 'swap-exact-in-multi-hop', [
         Cl.list([Cl.principal(tokenA), Cl.principal(tokenB)]),
@@ -223,7 +226,7 @@ describe('Multi-hop Router Error Code Validation (SDK 3.5.0)', () => {
     it('ERR_UNAUTHORIZED (u606) on admin functions from non-admin', () => {
       const result = simnet.callPublicFn(ROUTER, 'update-routing-fee', [
         Cl.uint(100)
-      ], wallet1); // non-admin caller
+      ], wallet2); // non-admin caller (ensure distinct from deployer)
       
       expect(result.result.type).toBe('err');
       expect(result.result.value.value).toBe(606n);
