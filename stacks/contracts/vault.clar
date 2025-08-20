@@ -30,6 +30,7 @@
 (define-data-var total-balance uint u0)
 (define-data-var total-shares uint u0)
 (define-data-var paused bool false)
+(define-data-var precision-enabled bool false)
 (define-data-var global-cap uint u340282366920938463463374607431768211455) ;; max uint
 ;; Risk controls
 (define-data-var user-cap uint u340282366920938463463374607431768211455)
@@ -972,7 +973,7 @@
     (ok true)
   )
 )
-    (ok true)))
+
 
 ;; Helper function for admin authorization
 (define-private (is-authorized-admin)
@@ -1131,6 +1132,17 @@
     (var-set treasury-reserve (- (var-get treasury-reserve) amount))
     (unwrap! (as-contract (stx-transfer? amount tx-sender recipient)) (err u200))
     (ok true)))
+
+;; Precision share calculation returning raw uint (used by deposit-precise)
+(define-private (calculate-shares-precise (amount uint))
+  (let ((ts (var-get total-shares))
+        (tb (var-get total-balance)))
+    (if (or (is-eq ts u0) (is-eq tb u0))
+      amount
+      (mul-div-floor amount ts tb)
+    )
+  )
+)
 
 ;; Calculate shares for a given amount (used by multi-token strategies)
 (define-read-only (calculate-shares (amount uint))
