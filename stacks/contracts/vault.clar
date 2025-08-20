@@ -30,6 +30,7 @@
 (define-data-var total-balance uint u0)
 (define-data-var total-shares uint u0)
 (define-data-var paused bool false)
+(define-data-var precision-enabled bool false)
 (define-data-var global-cap uint u340282366920938463463374607431768211455) ;; max uint
 ;; Risk controls
 (define-data-var user-cap uint u340282366920938463463374607431768211455)
@@ -570,6 +571,8 @@
   (begin
     (asserts! (is-eq (var-get paused) false) (err u103))
     (asserts! (> amount u0) (err u1))
+    ;; Guard: legacy path requires DEV mock token; use deposit-v2 for prod
+    (asserts! (is-eq (var-get token) .mock-ft) (err u201))
     (let (
         (user tx-sender)
         (current-shares (default-to u0 (get amount (map-get? shares { user: tx-sender }))))
@@ -698,6 +701,8 @@
   (begin
     (asserts! (is-eq (var-get paused) false) (err u103))
     (asserts! (> amount u0) (err u1))
+    ;; Guard: legacy path requires DEV mock token; use withdraw-v2 for prod
+    (asserts! (is-eq (var-get token) .mock-ft) (err u201))
     (let (
         (user tx-sender)
         (current-shares (default-to u0 (get amount (map-get? shares { user: tx-sender }))))
@@ -798,6 +803,8 @@
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err u100))
     (asserts! (> amount u0) (err u1))
+    ;; Guard: legacy transfer path requires DEV mock token
+    (asserts! (is-eq (var-get token) .mock-ft) (err u201))
     (let ((res (var-get protocol-reserve)))
       (asserts! (>= res amount) (err u2))
       (var-set protocol-reserve (- res amount))
@@ -822,6 +829,8 @@
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err u100))
     (asserts! (> amount u0) (err u1))
+    ;; Guard: legacy transfer path requires DEV mock token
+    (asserts! (is-eq (var-get token) .mock-ft) (err u201))
     (let ((tres (var-get treasury-reserve)))
       (asserts! (>= tres amount) (err u2))
       (var-set treasury-reserve (- tres amount))
@@ -917,69 +926,13 @@
   )
 )
 
-;; Errors
-;; u1: invalid-amount
-;; u2: insufficient-balance
-;; u100: unauthorized
-;; u101: invalid-fee
-;; u102: cap-exceeded
-;; u103: paused
-;; u104: user-cap-exceeded
-;; u105: rate-limit-exceeded
-;; u106: invalid-thresholds (high <= low)
-;; u107: invalid-fee-bounds (min >= max)
-;; u108: token-change-requires-empty-vault
-;; u109: token-change-requires-paused
-
-;; === AIP-5: Vault Precision Enhancements ===
-(define-constant PRECISION_MULTIPLIER u1000000) ;; 6 decimal places for precision
-(define-constant MINIMUM_WITHDRAWAL u1000) ;; Dust protection
-
-(define-data-var precision-enabled bool true)
-
-;; Enhanced precision share calculation
-(define-read-only (calculate-shares-precise (amount uint))
-  (if (var-get precision-enabled)
-    (let (
-      (total-bal (var-get total-balance))
-      (total-sh (var-get total-shares))
-    )
-    (if (is-eq total-sh u0)
-      (* amount PRECISION_MULTIPLIER)
-      (/ (* amount total-sh PRECISION_MULTIPLIER) total-bal)))
-    ;; Fallback to original calculation
-    (let (
-      (total-bal (var-get total-balance))
-      (total-sh (var-get total-shares))
-    )
-    (if (is-eq total-sh u0)
-      amount
-      (/ (* amount total-sh) total-bal)))))
-
-;; Enhanced precision balance calculation  
-(define-read-only (calculate-balance-precise (share-amount uint))
-  (if (var-get precision-enabled)
-    (let (
-      (total-bal (var-get total-balance))
-      (total-sh (var-get total-shares))
-    )
-    (if (is-eq total-sh u0)
-      u0
-      (/ (* share-amount total-bal PRECISION_MULTIPLIER) total-sh)))
-    ;; Fallback to original calculation
-    (let (
-      (total-bal (var-get total-balance))
-      (total-sh (var-get total-shares))
-    )
-    (if (is-eq total-sh u0)
-      u0
-      (/ (* share-amount total-bal) total-sh)))))
-
 ;; Precision-enhanced deposit function
 (define-public (deposit-precise (amount uint))
   (begin
     (asserts! (is-eq (var-get paused) false) (err u103))
     (asserts! (> amount u0) (err u1))
+    ;; Guard: legacy precise path requires DEV mock token; prefer deposit-v2 in prod
+    (asserts! (is-eq (var-get token) .mock-ft) (err u201))
     (let (
         (user tx-sender)
         (current-shares (default-to u0 (get amount (map-get? shares { user: tx-sender }))))
@@ -1007,14 +960,20 @@
         (var-set treasury-reserve (+ (var-get treasury-reserve) tshare))
         (var-set protocol-reserve (+ (var-get protocol-reserve) pshare))
       )
-      (ok minted-shares))))
+      (ok minted-shares)
+    )
+  )
+)
 
 ;; Admin function to toggle precision mode
 (define-public (set-precision-enabled (enabled bool))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err u100))
     (var-set precision-enabled enabled)
-    (ok true)))
+    (ok true)
+  )
+)
+
 
 ;; Helper function for admin authorization
 (define-private (is-authorized-admin)
@@ -1173,6 +1132,17 @@
     (var-set treasury-reserve (- (var-get treasury-reserve) amount))
     (unwrap! (as-contract (stx-transfer? amount tx-sender recipient)) (err u200))
     (ok true)))
+
+;; Precision share calculation returning raw uint (used by deposit-precise)
+(define-private (calculate-shares-precise (amount uint))
+  (let ((ts (var-get total-shares))
+        (tb (var-get total-balance)))
+    (if (or (is-eq ts u0) (is-eq tb u0))
+      amount
+      (mul-div-floor amount ts tb)
+    )
+  )
+)
 
 ;; Calculate shares for a given amount (used by multi-token strategies)
 (define-read-only (calculate-shares (amount uint))

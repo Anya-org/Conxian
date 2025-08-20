@@ -249,11 +249,6 @@ plan:
             path: contracts/twap-oracle-v2.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: twap-oracle-v2-complex
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/twap-oracle-v2-complex.clar
-            clarity-version: 2
-        - emulated-contract-publish:
             contract-name: twap-oracle-v2-simple
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/twap-oracle-v2-simple.clar
