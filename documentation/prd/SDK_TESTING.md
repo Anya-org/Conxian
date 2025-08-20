@@ -1,9 +1,11 @@
 # SDK Testing Framework PRD (v1.0)
 
 ## Reference
+
 Clarinet SDK 3.5.0, `@hirosystems/clarinet-sdk`, Vitest integration
 
 ## Summary and Vision
+
 Comprehensive testing framework leveraging Clarinet SDK 3.5.0 advanced capabilities for production-grade smart contract validation, performance analysis, and mainnet simulation.
 
 ## Goals
