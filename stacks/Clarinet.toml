@@ -308,10 +308,13 @@ clarity_version = 2
 epoch = "2.4"
 
 ## ENABLED: advanced TWAP oracle v2 complex (experimental)
-[contracts.twap-oracle-v2-complex]
-path = "contracts/twap-oracle-v2-complex.clar"
-clarity_version = 2
-epoch = "2.4"
+# DISABLED 2025-08-20: twap-oracle-v2-complex is an empty placeholder file.
+# Re-enable only after full implementation, tests (≥98% coverage), PRD alignment,
+# and deployment cost estimate are completed.
+# [contracts.twap-oracle-v2-complex]
+# path = "contracts/twap-oracle-v2-complex.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 # ===========================================
 # BOUNTY & ANALYTICS - Monitoring and rewards

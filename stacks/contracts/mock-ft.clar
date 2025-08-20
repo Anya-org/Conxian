@@ -8,10 +8,10 @@
 
 ;; metadata
 (define-read-only (get-name)
-  (ok "MockToken")
+  (ok "AutoVault")
 )
 (define-read-only (get-symbol)
-  (ok "MOCK")
+  (ok "AV")
 )
 (define-read-only (get-decimals)
   (ok u6)
