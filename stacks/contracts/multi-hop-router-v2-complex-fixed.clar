@@ -13,6 +13,10 @@
 (define-constant ERR_NO_LIQUIDITY (err u604))
 (define-constant ERR_EXPIRED (err u605))
 (define-constant ERR_UNAUTHORIZED (err u606))
+(define-constant ERR_INVALID_POOL_TYPE (err u607))
+(define-constant ERR_IDENTICAL_TOKENS (err u608))
+(define-constant ERR_INACTIVE_POOL (err u609))
+(define-constant ERR_INVALID_FEE_TIER (err u610))
 
 ;; Constants
 (define-constant MAX_HOPS u5)
@@ -22,8 +26,8 @@
 (define-map routes
   {token-in: principal, token-out: principal}
   {
-    pools: (list 5 principal),
-    pool-types: (list 5 (string-ascii 20)),
+    pools: (list 10 principal),
+    pool-types: (list 10 (string-ascii 20)),
     estimated-gas: uint,
     active: bool
   })
@@ -56,6 +60,27 @@
 ;; =============================================================================
 ;; HELPER FUNCTIONS (DEFINED FIRST)
 ;; =============================================================================
+
+;; Pool type whitelist check
+(define-private (is-valid-pool-type (t (string-ascii 20)))
+  (or (is-eq t "constant-product")
+      (is-eq t "stable")
+      (is-eq t "weighted")
+      (is-eq t "concentrated")))
+
+;; Fold helper to validate all pool types in a list
+(define-private (process-validate-type
+  (t (string-ascii 20))
+  (acc (response bool uint)))
+  (if (is-err acc)
+    acc
+    (if (is-valid-pool-type t)
+      (ok true)
+      ERR_INVALID_POOL_TYPE)))
+
+(define-private (validate-pool-types (types (list 10 (string-ascii 20))))
+  (let ((initial (ok true)))
+    (fold process-validate-type types initial)))
 
 ;; Get output amount for single hop
 (define-private (get-single-hop-output
@@ -92,14 +117,11 @@
                 (and (is-eq token-in (get token-x pool-info)) (is-eq token-out (get token-y pool-info)))
                 (and (is-eq token-in (get token-y pool-info)) (is-eq token-out (get token-x pool-info))))
               ERR_INVALID_ROUTE)
+    (asserts! (get active pool-info) ERR_INACTIVE_POOL)
     (let ((x-to-y (is-eq token-in (get token-x pool-info))))
       (match (execute-pool-swap pool amount-in x-to-y (get pool-type pool-info))
         success (ok (get amount-out success))
         error ERR_NO_LIQUIDITY))))
-
-;; =============================================================================
-;; CORE ROUTING FUNCTIONS (DEFINED AFTER HELPERS)
-;; =============================================================================
 
 ;; Fold-based executor step for multi-hop swap
 (define-private (process-hop-exec
@@ -196,6 +218,9 @@
     (asserts! (>= (len path) u2) ERR_INVALID_PATH)
     (asserts! (is-eq (len pools) (- (len path) u1)) ERR_INVALID_PATH)
     (asserts! (> amount-in u0) ERR_INVALID_ROUTE)
+    (let ((first (unwrap! (element-at path u0) ERR_INVALID_PATH))
+          (last (unwrap! (element-at path (- (len path) u1)) ERR_INVALID_PATH)))
+      (asserts! (not (is-eq first last)) ERR_IDENTICAL_TOKENS))
     (let ((gross-final (try! (execute-multi-hop-swap path pools amount-in))))
       (asserts! (>= gross-final min-amount-out) ERR_SLIPPAGE_EXCEEDED)
       (let ((fee-bps (var-get routing-fee-bps))
@@ -244,13 +269,16 @@
 (define-public (add-route
   (token-in principal)
   (token-out principal)
-  (pools (list 5 principal))
-  (pool-types (list 5 (string-ascii 20)))
+  (pools (list 10 principal))
+  (pool-types (list 10 (string-ascii 20)))
   (estimated-gas uint))
   (begin
     (asserts! (is-eq tx-sender (var-get router-admin)) ERR_UNAUTHORIZED)
     (asserts! (is-eq (len pools) (len pool-types)) ERR_INVALID_PATH)
     (asserts! (> (len pools) u0) ERR_INVALID_PATH)
+    (asserts! (<= (len pools) MAX_HOPS) ERR_INVALID_PATH)
+    (asserts! (not (is-eq token-in token-out)) ERR_IDENTICAL_TOKENS)
+    (try! (validate-pool-types pool-types))
     (map-set routes {token-in: token-in, token-out: token-out} {
       pools: pools,
       pool-types: pool-types,
@@ -274,6 +302,10 @@
   (fee-tier uint))
   (begin
     (asserts! (is-eq tx-sender (var-get router-admin)) ERR_UNAUTHORIZED)
+    (asserts! (not (is-eq token-x token-y)) ERR_IDENTICAL_TOKENS)
+    (asserts! (is-valid-pool-type pool-type) ERR_INVALID_POOL_TYPE)
+    (let ((tier (unwrap! (map-get? fee-tiers fee-tier) ERR_INVALID_FEE_TIER)))
+      (asserts! (get enabled tier) ERR_INVALID_FEE_TIER))
     (map-set pool-registry pool {
       token-x: token-x,
       token-y: token-y,
@@ -291,3 +323,21 @@
     (var-set router-admin new-admin)
     (print {event: "router-admin-transferred", new-admin: new-admin})
     (ok true)))
+
+;; =============================================================================
+;; BOOTSTRAP DEFAULTS (FEE TIERS)
+;; =============================================================================
+
+;; Initialize default fee tiers on deployment
+(define-private (initialize-fee-tiers)
+  (begin
+    ;; 0.05% tier
+    (map-set fee-tiers u1 {fee-bps: u5, tick-spacing: u10, enabled: true})
+    ;; 0.3% tier
+    (map-set fee-tiers u2 {fee-bps: u30, tick-spacing: u60, enabled: true})
+    ;; 1% tier
+    (map-set fee-tiers u3 {fee-bps: u100, tick-spacing: u200, enabled: true})
+    true))
+
+;; Invoke initialization at deploy time
+(initialize-fee-tiers)
