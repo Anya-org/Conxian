@@ -1,5 +1,5 @@
 ;; =============================================================================
-;; MULTI-HOP ROUTER - PRODUCTION IMPLEMENTATION
+;; MULTI-HOP ROUTER - PHASE 2 IMPLEMENTATION
 ;; =============================================================================
 
 (use-trait ft-trait .sip-010-trait.sip-010-trait)
@@ -13,15 +13,9 @@
 (define-constant ERR_NO_LIQUIDITY (err u604))
 (define-constant ERR_EXPIRED (err u605))
 (define-constant ERR_UNAUTHORIZED (err u606))
-;; Extended hardening error codes
-(define-constant ERR_INVALID_POOL_TYPE (err u607))
-(define-constant ERR_IDENTICAL_TOKENS (err u608))
-(define-constant ERR_INACTIVE_POOL (err u609))
-(define-constant ERR_INVALID_FEE_TIER (err u610))
-(define-constant ERR_SLIPPAGE_POLICY (err u611))
 
 ;; Constants
-(define-constant MAX_HOPS u5)
+(define-constant MAX_HOPS u5) ;; Maximum number of hops in a route
 (define-constant FEE_DENOMINATOR u10000)
 
 ;; Route information
@@ -56,215 +50,242 @@
 
 ;; State variables
 (define-data-var router-admin principal tx-sender)
-(define-data-var routing-fee-bps uint u0)
-(define-data-var max-slippage-bps uint u1000)
-
-;; Allowed pool type whitelist (simple ascii list) - future: move to governance-managed map
-(define-constant ALLOWED-POOL-TYPES (list "constant-product" "stable" "weighted" "concentrated"))
+(define-data-var routing-fee-bps uint u0) ;; Router fee in basis points
+(define-data-var max-slippage-bps uint u1000) ;; 10% max slippage
 
 ;; =============================================================================
-;; VALIDATION HELPERS
-;; =============================================================================
-
-(define-private (is-valid-pool-type (t (string-ascii 20)))
-  (or (is-eq t "constant-product")
-      (is-eq t "stable")
-      (is-eq t "weighted")
-      (is-eq t "concentrated")))
-
-(define-private (validate-pool-active (pool-info {token-x: principal, token-y: principal, pool-type: (string-ascii 20), fee-tier: uint, active: bool}))
-  (asserts! (get active pool-info) ERR_INACTIVE_POOL))
-
-(define-private (validate-slippage-in (gross uint) (min-out uint))
-  ;; Enforce that user-specified min-out is not looser than policy cap.
-  ;; Policy: min-out >= gross * (1 - max-slippage-bps / FEE_DENOMINATOR)
-  (let ((policy-min (- gross (/ (* gross (var-get max-slippage-bps)) FEE_DENOMINATOR))))
-    (asserts! (>= min-out policy-min) ERR_SLIPPAGE_POLICY)
-    (ok true)))
-
-(define-private (validate-slippage-out (required-in uint) (user-max-in uint))
-  ;; User's max-in must not exceed policy allowance: required * (1 + max-slippage-bps/denom)
-  (let ((policy-max (+ required-in (/ (* required-in (var-get max-slippage-bps)) FEE_DENOMINATOR))))
-    (asserts! (<= user-max-in policy-max) ERR_SLIPPAGE_POLICY)
-    (ok true)))
-
-;; =============================================================================
-;; HELPER FUNCTIONS (DEFINED FIRST)
-;; =============================================================================
-
-;; Get output amount for single hop
-(define-private (get-single-hop-output
-  (pool-principal principal)
-  (token-in principal)
-  (token-out principal)
-  (amount-in uint))
-  (/ (* amount-in u997) u1000))
-
-;; Execute swap based on pool type (accept contract principal)
-(define-private (execute-pool-swap
-  (pool principal)
-  (token-in principal)
-  (token-out principal)
-  (amount-in uint)
-  (pool-type (string-ascii 20)))
-  (match pool-type
-    "constant-product" (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
-    "stable" (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
-    "weighted" (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
-    "concentrated" (contract-call? pool swap-exact-in token-in token-out amount-in u0 true)
-    (err ERR_INVALID_ROUTE)))
-
-;; Execute single hop in the route
-(define-private (execute-single-hop
-  (token-in principal)
-  (token-out principal)
-  (pool principal)
-  (amount-in uint))
-  (let ((pool-info (unwrap! (map-get? pool-registry pool) ERR_INVALID_ROUTE)))
-    (validate-pool-active pool-info)
-    (asserts! (or 
-                (and (is-eq token-in (get token-x pool-info)) (is-eq token-out (get token-y pool-info)))
-                (and (is-eq token-in (get token-y pool-info)) (is-eq token-out (get token-x pool-info))))
-              ERR_INVALID_ROUTE)
-  (asserts! (is-valid-pool-type (get pool-type pool-info)) ERR_INVALID_POOL_TYPE)
-    (match (execute-pool-swap pool token-in token-out amount-in (get pool-type pool-info))
-      success (ok (get amount-out success))
-      error (err ERR_NO_LIQUIDITY))))
-
-;; =============================================================================
-;; CORE ROUTING FUNCTIONS (DEFINED AFTER HELPERS)
-;; =============================================================================
-
-;; Iterative multi-hop executor (unrolled up to MAX_HOPS) to avoid recursive cycle warnings
-(define-private (compute-multi-hop-out (path (list 5 principal)) (pools (list 4 principal)) (amount-in uint))
-  (asserts! (is-eq (len pools) (- (len path) u1)) ERR_INVALID_PATH)
-  (let ((hops (len pools)))
-    (asserts! (> hops u0) ERR_INVALID_PATH)
-    (asserts! (<= hops MAX_HOPS) ERR_INVALID_PATH)
-    (let ((token0 (unwrap! (element-at path u0) ERR_INVALID_PATH))
-          (token1 (unwrap! (element-at path u1) ERR_INVALID_PATH))
-          (pool0 (unwrap! (element-at pools u0) ERR_INVALID_PATH))
-          (out1 (try! (execute-single-hop token0 token1 pool0 amount-in))))
-      (if (is-eq hops u1)
-        (ok out1)
-        (let ((token2 (unwrap! (element-at path u2) ERR_INVALID_PATH))
-              (pool1 (unwrap! (element-at pools u1) ERR_INVALID_PATH))
-              (out2 (try! (execute-single-hop token1 token2 pool1 out1))))
-          (if (is-eq hops u2)
-            (ok out2)
-            (let ((token3 (unwrap! (element-at path u3) ERR_INVALID_PATH))
-                  (pool2 (unwrap! (element-at pools u2) ERR_INVALID_PATH))
-                  (out3 (try! (execute-single-hop token2 token3 pool2 out2))))
-              (if (is-eq hops u3)
-                (ok out3)
-                (let ((token4 (unwrap! (element-at path u4) ERR_INVALID_PATH))
-                      (pool3 (unwrap! (element-at pools u3) ERR_INVALID_PATH))
-                      (out4 (try! (execute-single-hop token3 token4 pool3 out3))))
-                  (ok out4))))))))))
-
-;; Placeholder reverse pricing (improve with pool math in future AIP)
-(define-private (calculate-required-input (path (list 5 principal)) (pools (list 4 principal)) (amount-out uint))
-  (ok (* amount-out u1003)))
-
-;; Tail-recursive amounts-out accumulator (read-only safe: uses only pure helper)
-;; Inline iterative builder to avoid recursive private function set
-(define-private (build-amounts-out (path (list 5 principal)) (pools (list 4 principal)) (amount-in uint))
-  (asserts! (is-eq (len pools) (- (len path) u1)) ERR_INVALID_PATH)
-  (let ((hops (len pools)))
-    (if (is-eq hops u0)
-      (ok (unwrap-panic (as-max-len? (list amount-in) u5)))
-      (let ((token0 (unwrap! (element-at path u0) ERR_INVALID_PATH))
-            (token1 (unwrap! (element-at path u1) ERR_INVALID_PATH))
-            (pool0 (unwrap! (element-at pools u0) ERR_INVALID_PATH))
-            (out1 (get-single-hop-output pool0 token0 token1 amount-in)))
-        (if (is-eq hops u1)
-          (ok (unwrap-panic (as-max-len? (list amount-in out1) u5)))
-          (let ((token2 (unwrap! (element-at path u2) ERR_INVALID_PATH))
-                (pool1 (unwrap! (element-at pools u1) ERR_INVALID_PATH))
-                (out2 (get-single-hop-output pool1 token1 token2 out1)))
-            (if (is-eq hops u2)
-              (ok (unwrap-panic (as-max-len? (list amount-in out1 out2) u5)))
-              (let ((token3 (unwrap! (element-at path u3) ERR_INVALID_PATH))
-                    (pool2 (unwrap! (element-at pools u2) ERR_INVALID_PATH))
-                    (out3 (get-single-hop-output pool2 token2 token3 out2)))
-                (if (is-eq hops u3)
-                  (ok (unwrap-panic (as-max-len? (list amount-in out1 out2 out3) u5)))
-                  (let ((token4 (unwrap! (element-at path u4) ERR_INVALID_PATH))
-                        (pool3 (unwrap! (element-at pools u3) ERR_INVALID_PATH))
-                        (out4 (get-single-hop-output pool3 token3 token4 out3)))
-                    (ok (unwrap-panic (as-max-len? (list amount-in out1 out2 out3 out4) u5)))))))))))))
-
-;; =============================================================================
-;; READ-ONLY FUNCTIONS
-;; =============================================================================
-
-;; Calculate output for a given route
-(define-read-only (get-amounts-out (path (list 5 principal)) (pools (list 4 principal)) (amount-in uint))
-  (build-amounts-out path pools amount-in))
-
-;; Find optimal route between two tokens
-(define-read-only (find-optimal-route (token-in principal) (token-out principal) (amount-in uint))
-  (match (map-get? routes {token-in: token-in, token-out: token-out})
-    direct-route (ok direct-route)
-    (match (map-get? routes {token-in: token-out, token-out: token-in})
-      reverse-route (ok reverse-route)
-      (err ERR_INVALID_ROUTE))))
-
-;; =============================================================================
-;; PUBLIC FUNCTIONS (DEFINED LAST)
+;; CORE ROUTING FUNCTIONS
 ;; =============================================================================
 
 ;; Multi-hop swap with exact input
-(define-public (swap-exact-in-multi-hop (path (list 5 principal)) (pools (list 4 principal)) (amount-in uint) (min-amount-out uint) (deadline uint))
+(define-public (swap-exact-in-multi-hop
+  (path (list 5 principal))
+  (pools (list 4 <pool-trait>))
+  (amount-in uint)
+  (min-amount-out uint)
+  (deadline uint))
   (begin
     (asserts! (>= deadline block-height) ERR_EXPIRED)
     (asserts! (>= (len path) u2) ERR_INVALID_PATH)
     (asserts! (is-eq (len pools) (- (len path) u1)) ERR_INVALID_PATH)
     (asserts! (> amount-in u0) ERR_INVALID_ROUTE)
-    (asserts! (not (is-eq (unwrap! (element-at path u0) ERR_INVALID_PATH) (unwrap! (element-at path (- (len path) u1)) ERR_INVALID_PATH))) ERR_IDENTICAL_TOKENS)
-    (let ((gross-final (try! (compute-multi-hop-out path pools amount-in))))
-      (try! (validate-slippage-in gross-final min-amount-out))
-      (asserts! (>= gross-final min-amount-out) ERR_SLIPPAGE_EXCEEDED)
-      (let ((fee-bps (var-get routing-fee-bps))
-            (net-final (if (is-eq fee-bps u0)
-                         gross-final
-                         (- gross-final (/ (* gross-final fee-bps) FEE_DENOMINATOR)))))
-        (print {event: "multi-hop-swap", path: path, amount-in: amount-in, gross-out: gross-final, net-out: net-final, fee-bps: fee-bps, pools-used: (len pools), trader: tx-sender})
-        (ok net-final)))))
+    
+    ;; Execute multi-hop swap
+    (let ((final-amount (try! (execute-multi-hop-swap path pools amount-in u0))))
+      (asserts! (>= final-amount min-amount-out) ERR_SLIPPAGE_EXCEEDED)
+      
+      ;; Emit routing event
+      (print {
+        event: "multi-hop-swap",
+        path: path,
+        amount-in: amount-in,
+        amount-out: final-amount,
+        pools-used: (len pools),
+        trader: tx-sender
+      })
+      
+      (ok final-amount))))
 
 ;; Multi-hop swap with exact output
-(define-public (swap-exact-out-multi-hop (path (list 5 principal)) (pools (list 4 principal)) (amount-out uint) (max-amount-in uint) (deadline uint))
+(define-public (swap-exact-out-multi-hop
+  (path (list 5 principal))
+  (pools (list 4 <pool-trait>))
+  (amount-out uint)
+  (max-amount-in uint)
+  (deadline uint))
   (begin
     (asserts! (>= deadline block-height) ERR_EXPIRED)
     (asserts! (>= (len path) u2) ERR_INVALID_PATH)
     (asserts! (is-eq (len pools) (- (len path) u1)) ERR_INVALID_PATH)
+    
+    ;; Calculate required input through reverse path
     (let ((required-input (try! (calculate-required-input path pools amount-out))))
-  (try! (validate-slippage-out required-input max-amount-in))
-  (asserts! (<= required-input max-amount-in) ERR_SLIPPAGE_EXCEEDED)
-  (let ((gross-final (try! (compute-multi-hop-out path pools required-input))))
-    (asserts! (>= gross-final amount-out) ERR_INSUFFICIENT_OUTPUT)
-    (let ((fee-bps (var-get routing-fee-bps))
-      (net-final (if (is-eq fee-bps u0)
-           gross-final
-           (- gross-final (/ (* gross-final fee-bps) FEE_DENOMINATOR)))))
-      (print {event: "multi-hop-swap-exact-out", path: path, required-out: amount-out, gross-out: gross-final, net-out: net-final, fee-bps: fee-bps, amount-in: required-input, pools-used: (len pools), trader: tx-sender})
-      (ok required-input))))))
+      (asserts! (<= required-input max-amount-in) ERR_SLIPPAGE_EXCEEDED)
+      
+      ;; Execute swap
+      (let ((final-amount (try! (execute-multi-hop-swap path pools required-input u0))))
+        
+        (print {
+          event: "multi-hop-swap-exact-out",
+          path: path,
+          amount-in: required-input,
+          amount-out: final-amount,
+          pools-used: (len pools),
+          trader: tx-sender
+        })
+        
+        (ok required-input)))))
 
 ;; =============================================================================
-;; ADMIN FUNCTIONS
+;; PATH EXECUTION LOGIC
 ;; =============================================================================
 
-;; Update routing fee
-(define-public (update-routing-fee (new-fee-bps uint))
-  (begin
-    (asserts! (is-eq tx-sender (var-get router-admin)) ERR_UNAUTHORIZED)
-    (asserts! (<= new-fee-bps u500) ERR_INVALID_ROUTE)
-    (var-set routing-fee-bps new-fee-bps)
-    (print {event: "routing-fee-updated", new-fee-bps: new-fee-bps})
-    (ok true)))
+;; Execute swap across multiple pools
+(define-private (execute-multi-hop-swap
+  (path (list 5 principal))
+  (pools (list 4 <pool-trait>))
+  (current-amount uint)
+  (hop-index uint))
+  (if (is-eq hop-index (- (len pools) u1))
+    ;; Last hop - return final amount
+    (execute-single-hop 
+      (unwrap-panic (element-at path hop-index))
+      (unwrap-panic (element-at path (+ hop-index u1)))
+      (unwrap-panic (element-at pools hop-index))
+      current-amount)
+    ;; Intermediate hop - continue recursively
+    (let ((hop-result (try! (execute-single-hop
+                              (unwrap-panic (element-at path hop-index))
+                              (unwrap-panic (element-at path (+ hop-index u1)))
+                              (unwrap-panic (element-at pools hop-index))
+                              current-amount))))
+      (execute-multi-hop-swap path pools hop-result (+ hop-index u1)))))
 
-;; Add new route
-(define-public (add-route
+;; Execute single hop in the route
+(define-private (execute-single-hop
+  (token-in principal)
+  (token-out principal)
+  (pool <pool-trait>)
+  (amount-in uint))
+  (let ((pool-info (unwrap! (map-get? pool-registry (contract-of pool)) ERR_INVALID_ROUTE)))
+    
+    ;; Verify pool tokens match route
+    (asserts! (or 
+                (and (is-eq token-in (get token-x pool-info)) (is-eq token-out (get token-y pool-info)))
+                (and (is-eq token-in (get token-y pool-info)) (is-eq token-out (get token-x pool-info))))
+              ERR_INVALID_ROUTE)
+    
+    ;; Execute swap based on pool type
+    (match (get pool-type pool-info)
+      "constant-product" (execute-cp-swap pool token-in token-out amount-in)
+      "stable" (execute-stable-swap pool token-in token-out amount-in)
+      "weighted" (execute-weighted-swap pool token-in token-out amount-in)
+      "concentrated" (execute-concentrated-swap pool token-in token-out amount-in)
+      (err ERR_INVALID_ROUTE))))
+
+;; =============================================================================
+;; POOL-SPECIFIC SWAP EXECUTION
+;; =============================================================================
+
+;; Execute constant product swap
+(define-private (execute-cp-swap
+  (pool <pool-trait>)
+  (token-in principal)
+  (token-out principal)
+  (amount-in uint))
+  (match (contract-call? pool swap-exact-in 
+                        token-in 
+                        token-out 
+                        amount-in 
+                        u0 ;; No slippage check here - handled at route level
+                        true)
+    success (ok (get amount-out success))
+    error (err ERR_NO_LIQUIDITY)))
+
+;; Execute stable swap
+(define-private (execute-stable-swap
+  (pool <pool-trait>)
+  (token-in principal)
+  (token-out principal)
+  (amount-in uint))
+  ;; Placeholder - would call stable pool specific function
+  (execute-cp-swap pool token-in token-out amount-in))
+
+;; Execute weighted swap
+(define-private (execute-weighted-swap
+  (pool <pool-trait>)
+  (token-in principal)
+  (token-out principal)
+  (amount-in uint))
+  ;; Placeholder - would call weighted pool specific function
+  (execute-cp-swap pool token-in token-out amount-in))
+
+;; Execute concentrated liquidity swap
+(define-private (execute-concentrated-swap
+  (pool <pool-trait>)
+  (token-in principal)
+  (token-out principal)
+  (amount-in uint))
+  ;; Placeholder - would call concentrated pool specific function
+  (execute-cp-swap pool token-in token-out amount-in))
+
+;; =============================================================================
+;; ROUTING OPTIMIZATION
+;; =============================================================================
+
+;; Find optimal route between two tokens
+(define-read-only (find-optimal-route
+  (token-in principal)
+  (token-out principal)
+  (amount-in uint))
+  (match (map-get? routes {token-in: token-in, token-out: token-out})
+    direct-route (ok direct-route)
+    ;; Try reverse route
+    (match (map-get? routes {token-in: token-out, token-out: token-in})
+      reverse-route (ok {
+        pools: (get pools reverse-route),
+        pool-types: (get pool-types reverse-route),
+        estimated-gas: (get estimated-gas reverse-route),
+        active: (get active reverse-route)
+      })
+      ;; No direct route found - would implement pathfinding here
+      (err ERR_INVALID_ROUTE))))
+
+;; Calculate output for a given route (read-only)
+(define-read-only (get-amounts-out
+  (path (list 5 principal))
+  (pools (list 4 principal))
+  (amount-in uint))
+  (calculate-amounts-out-recursive path pools amount-in u0 (list)))
+
+(define-private (calculate-amounts-out-recursive
+  (path (list 5 principal))
+  (pools (list 4 principal))
+  (current-amount uint)
+  (hop-index uint)
+  (amounts (list 5 uint)))
+  (if (>= hop-index (len pools))
+    (ok (unwrap-panic (as-max-len? (append amounts current-amount) u5)))
+    (let ((pool-principal (unwrap-panic (element-at pools hop-index)))
+          (token-in (unwrap-panic (element-at path hop-index)))
+          (token-out (unwrap-panic (element-at path (+ hop-index u1)))))
+      
+      ;; Get amount out for this hop (simplified)
+      (let ((amount-out (get-single-hop-output pool-principal token-in token-out current-amount)))
+        (calculate-amounts-out-recursive 
+          path 
+          pools 
+          amount-out 
+          (+ hop-index u1)
+          (unwrap-panic (as-max-len? (append amounts current-amount) u5)))))))
+
+;; =============================================================================
+;; PRICING AND ESTIMATION
+;; =============================================================================
+
+;; Get output amount for single hop (simplified)
+(define-private (get-single-hop-output
+  (pool-principal principal)
+  (token-in principal)
+  (token-out principal)
+  (amount-in uint))
+  ;; Simplified calculation - would query actual pool
+  (/ (* amount-in u997) u1000)) ;; Assume 0.3% fee
+
+;; Calculate required input for exact output
+(define-private (calculate-required-input
+  (path (list 5 principal))
+  (pools (list 4 <pool-trait>))
+  (amount-out uint))
+  ;; Simplified - would implement reverse calculation
+  (ok amount-out))
+
+;; =============================================================================
+;; ROUTE MANAGEMENT
+;; =============================================================================
+
+;; Register a new route
+(define-public (register-route
   (token-in principal)
   (token-out principal)
   (pools (list 5 principal))
@@ -272,67 +293,121 @@
   (estimated-gas uint))
   (begin
     (asserts! (is-eq tx-sender (var-get router-admin)) ERR_UNAUTHORIZED)
-    (asserts! (is-eq (len pools) (len pool-types)) ERR_INVALID_PATH)
-    (asserts! (> (len pools) u0) ERR_INVALID_PATH)
-    (asserts! (<= (len pools) MAX_HOPS) ERR_INVALID_PATH)
-    (asserts! (not (is-eq token-in token-out)) ERR_IDENTICAL_TOKENS)
-    (asserts! (> estimated-gas u0) ERR_INVALID_ROUTE)
-    ;; Validate each pool-type and pool registration
-    (let ((i u0)) (begin (ok true))) ;; placeholder to satisfy block form (no-op)
-    ;; NOTE: SDK lacks loop; rely on pattern asserts for present length subset
-    (if (>= (len pools) u1)
-      (let ((t0 (unwrap! (element-at pool-types u0) ERR_INVALID_PATH))) (asserts! (is-valid-pool-type t0) ERR_INVALID_POOL_TYPE)) (ok true))
-    (if (>= (len pools) u2)
-      (let ((t1 (unwrap! (element-at pool-types u1) ERR_INVALID_PATH))) (asserts! (is-valid-pool-type t1) ERR_INVALID_POOL_TYPE)) (ok true))
-    (if (>= (len pools) u3)
-      (let ((t2 (unwrap! (element-at pool-types u2) ERR_INVALID_PATH))) (asserts! (is-valid-pool-type t2) ERR_INVALID_POOL_TYPE)) (ok true))
-    (if (>= (len pools) u4)
-      (let ((t3 (unwrap! (element-at pool-types u3) ERR_INVALID_PATH))) (asserts! (is-valid-pool-type t3) ERR_INVALID_POOL_TYPE)) (ok true))
-    (if (>= (len pools) u5)
-      (let ((t4 (unwrap! (element-at pool-types u4) ERR_INVALID_PATH))) (asserts! (is-valid-pool-type t4) ERR_INVALID_POOL_TYPE)) (ok true))
+    
     (map-set routes {token-in: token-in, token-out: token-out} {
       pools: pools,
       pool-types: pool-types,
       estimated-gas: estimated-gas,
       active: true
     })
+    
     (print {
-      event: "route-added", 
-      token-in: token-in, 
+      event: "route-registered",
+      token-in: token-in,
       token-out: token-out,
       hops: (len pools)
     })
+    
     (ok true)))
 
-;; Register a pool
-(define-public (register-pool
-  (pool principal)
+;; Register pool in routing registry
+(define-public (register-pool-for-routing
+  (pool-principal principal)
   (token-x principal)
   (token-y principal)
   (pool-type (string-ascii 20))
   (fee-tier uint))
   (begin
     (asserts! (is-eq tx-sender (var-get router-admin)) ERR_UNAUTHORIZED)
-    (asserts! (not (is-eq token-x token-y)) ERR_IDENTICAL_TOKENS)
-    (asserts! (is-valid-pool-type pool-type) ERR_INVALID_POOL_TYPE)
-    ;; Optional: fee-tier presence check (if fee-tiers configured)
-    (match (map-get? fee-tiers fee-tier)
-      tier (asserts! (get enabled tier) ERR_INVALID_FEE_TIER)
-      (ok true))
-    (map-set pool-registry pool {
+    
+    (map-set pool-registry pool-principal {
       token-x: token-x,
       token-y: token-y,
       pool-type: pool-type,
       fee-tier: fee-tier,
       active: true
     })
-    (print {event: "pool-registered", pool: pool, token-x: token-x, token-y: token-y})
+    
     (ok true)))
 
-;; Transfer router admin
-(define-public (transfer-router-admin (new-admin principal))
+;; =============================================================================
+;; FEE TIER MANAGEMENT
+;; =============================================================================
+
+;; Configure fee tier
+(define-public (configure-fee-tier
+  (tier-id uint)
+  (fee-bps uint)
+  (tick-spacing uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get router-admin)) ERR_UNAUTHORIZED)
+    (asserts! (<= fee-bps u1000) ERR_INVALID_ROUTE) ;; Max 10% fee
+    
+    (map-set fee-tiers tier-id {
+      fee-bps: fee-bps,
+      tick-spacing: tick-spacing,
+      enabled: true
+    })
+    
+    (print {
+      event: "fee-tier-configured",
+      tier-id: tier-id,
+      fee-bps: fee-bps,
+      tick-spacing: tick-spacing
+    })
+    
+    (ok true)))
+
+;; =============================================================================
+;; READ-ONLY FUNCTIONS
+;; =============================================================================
+
+(define-read-only (get-route (token-in principal) (token-out principal))
+  (map-get? routes {token-in: token-in, token-out: token-out}))
+
+(define-read-only (get-pool-info (pool-principal principal))
+  (map-get? pool-registry pool-principal))
+
+(define-read-only (get-fee-tier (tier-id uint))
+  (map-get? fee-tiers tier-id))
+
+(define-read-only (get-routing-fee)
+  (var-get routing-fee-bps))
+
+;; =============================================================================
+;; ADMIN FUNCTIONS
+;; =============================================================================
+
+(define-public (set-routing-fee (new-fee-bps uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get router-admin)) ERR_UNAUTHORIZED)
+    (asserts! (<= new-fee-bps u100) ERR_INVALID_ROUTE) ;; Max 1% routing fee
+    (var-set routing-fee-bps new-fee-bps)
+    (ok true)))
+
+(define-public (set-max-slippage (new-slippage-bps uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get router-admin)) ERR_UNAUTHORIZED)
+    (asserts! (<= new-slippage-bps u5000) ERR_INVALID_ROUTE) ;; Max 50% slippage
+    (var-set max-slippage-bps new-slippage-bps)
+    (ok true)))
+
+(define-public (transfer-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get router-admin)) ERR_UNAUTHORIZED)
     (var-set router-admin new-admin)
-    (print {event: "router-admin-transferred", new-admin: new-admin})
     (ok true)))
+
+;; Initialize default fee tiers
+(define-private (initialize-fee-tiers)
+  (begin
+    ;; 0.05% tier
+    (map-set fee-tiers u1 {fee-bps: u5, tick-spacing: u10, enabled: true})
+    ;; 0.3% tier
+    (map-set fee-tiers u2 {fee-bps: u30, tick-spacing: u60, enabled: true})
+    ;; 1% tier
+    (map-set fee-tiers u3 {fee-bps: u100, tick-spacing: u200, enabled: true})
+    true))
+
+;; Initialize fee tiers on deployment
+(initialize-fee-tiers)
