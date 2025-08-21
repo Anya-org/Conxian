@@ -223,7 +223,7 @@ AutoVault has successfully achieved **100% test coverage** (199/199 tests passin
 
 #### **Tokenomics Validation**
 
-- [ ] Verify supply cap enforcement (10M AVG, 5M AVLP)
+- [ ] Verify supply cap enforcement (100M AVG, 50M AVLP)
 - [ ] Test deflationary mechanisms
 - [ ] Check for potential inflation attacks
 - [ ] Validate governance token distribution

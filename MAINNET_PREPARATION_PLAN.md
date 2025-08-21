@@ -15,7 +15,7 @@
 AutoVault represents a **production-ready DeFi ecosystem** on Stacks with:
 
 - **Complete Architecture**: 32 smart contracts covering vault, DAO, DEX, treasury, and monitoring
-- **Enhanced Tokenomics**: 10M AVG / 5M AVLP supply with progressive migration
+- **Enhanced Tokenomics**: 100M AVG / 50M AVLP supply with progressive migration
 - **Enterprise Security**: 5 AIP implementations, multi-sig treasury, emergency controls
 - **Bitcoin Integration**: Native Stacks settlement with sBTC readiness
 - **Institutional Features**: Circuit breaker, enterprise monitoring, compliance tools

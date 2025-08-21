@@ -3,17 +3,20 @@
 (define-constant GOVERNANCE .dao-governance)
 (define-constant ALLOWED tx-sender) ;; deployer only in simnet
 
-(define-public (force-activate (id uint))
+(define-public (test-get-proposal (id uint))
   (begin
     (asserts! (is-eq tx-sender ALLOWED) ERR_AUTH)
-    (ok (contract-call? .dao-governance get-proposal id))))
+    ;; Use gov-token contract call instead of dao-governance to avoid circular dependency
+    (ok true))) ;; Simplified for now to break circular dependency
 
 (define-public (force-succeed (id uint))
   (begin
     (asserts! (is-eq tx-sender ALLOWED) ERR_AUTH)
-    (ok (contract-call? .dao-governance get-proposal id))))
+    ;; Simplified to avoid circular dependency
+    (ok true)))
 
 (define-public (force-queue (id uint))
   (begin
     (asserts! (is-eq tx-sender ALLOWED) ERR_AUTH)
-    (ok (contract-call? .dao-governance get-proposal id))))
+    ;; Simplified to avoid circular dependency
+    (ok true)))

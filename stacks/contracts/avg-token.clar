@@ -7,12 +7,14 @@
 (define-constant TOKEN_NAME "AutoVault Governance")
 (define-constant TOKEN_SYMBOL "AVG")
 (define-constant TOKEN_DECIMALS u6)
-(define-constant MAX_SUPPLY u10000000000000) ;; 10M AVG total supply
+(define-constant MAX_SUPPLY u100000000000000) ;; 100M AVG total supply (expanded for broader accessibility)
 
-;; Migration epochs
-(define-constant EPOCH_1_END u1008) ;; ~1 week
-(define-constant EPOCH_2_END u2016) ;; ~2 weeks  
-(define-constant EPOCH_3_END u3024) ;; ~3 weeks (final migration)
+;; Migration epochs (extended to 3-year phased program)
+;; Approximate Stacks block cadence ~10 minutes => ~144 blocks/day => ~52,560 blocks/year
+(define-constant BLOCKS_PER_YEAR u52560)
+(define-constant EPOCH_1_END u52560)   ;; ~ Year 1 end
+(define-constant EPOCH_2_END u105120)  ;; ~ Year 2 end
+(define-constant EPOCH_3_END u157680)  ;; ~ Year 3 end (final migration)
 
 ;; Revenue sharing
 (define-constant REVENUE_SHARE_BPS u8000) ;; 80% to governance holders
@@ -29,6 +31,28 @@
 (define-data-var migrated-actr uint u0)
 (define-data-var migrated-avlp uint u0)
 (define-data-var total-revenue-distributed uint u0)
+
+;; Founder allocation & bounty reallocation state
+(define-constant FOUNDER_ALLOCATION u20000000000) ;; 20,000,000 AVG (micro units) reserved
+(define-data-var founder-reallocation-enabled bool false)
+(define-data-var founder-initialized bool false)
+(define-data-var founder-address principal tx-sender)
+(define-data-var founder-remaining uint FOUNDER_ALLOCATION)
+(define-data-var reallocated-to-bounty uint u0)
+(define-data-var realloc-rate-bps uint u200) ;; 2% per epoch baseline (bps of original founder allocation)
+(define-data-var realloc-accelerated bool false)
+(define-data-var bounty-system principal .bounty-stream-intake)
+
+;; Events (print-based)
+(define-read-only (get-founder-reallocation-state)
+  {
+    enabled: (var-get founder-reallocation-enabled),
+    remaining: (var-get founder-remaining),
+    reallocated: (var-get reallocated-to-bounty),
+    rate-bps: (var-get realloc-rate-bps),
+    accelerated: (var-get realloc-accelerated)
+  }
+)
 
 ;; Maps
 (define-map balances { owner: principal } { amount: uint })
@@ -161,33 +185,112 @@
 )
 
 ;; Epoch management
+;; Dynamic AVLP migration rate computation (in micro-AVG per AVLP)
+;; Adapts incentive curve based on remaining AVLP supply to encourage timely migration
+;; To reduce circular dependency complexity we cache an external AVLP supply snapshot
+(define-data-var avlp-supply-snapshot uint u0)
+
+(define-public (set-avlp-supply-snapshot (supply uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get dao-governance)) (err u100))
+    (var-set avlp-supply-snapshot supply)
+    (ok true)))
+
+(define-read-only (compute-dynamic-avlp-rate (epoch uint))
+  (let (
+    (avlp-supply (var-get avlp-supply-snapshot))
+    (migrated (var-get migrated-avlp))
+    (remaining (if (> avlp-supply migrated) (- avlp-supply migrated) u0))
+    (base u1000000) ;; 1.0
+  )
+    (if (is-eq epoch u1)
+      base
+      (if (is-eq epoch u2)
+        (if (> (* remaining u100) (/ (* avlp-supply u60) u1)) u1300000 u1100000)
+        (if (> (* remaining u100) (/ (* avlp-supply u30) u1)) u1600000 u1300000)
+      )
+    )
+  )
+)
+
+;; Guard that epoch advancement only occurs after its scheduled block height
+(define-private (epoch-block-threshold (epoch uint))
+  (if (is-eq epoch u1) EPOCH_1_END (if (is-eq epoch u2) EPOCH_2_END EPOCH_3_END))
+)
+
 (define-public (advance-epoch)
   (begin
     (asserts! (is-eq tx-sender (var-get dao-governance)) (err u100))
-    
-    (let ((new-epoch (+ (var-get current-epoch) u1)))
-      (asserts! (<= new-epoch u3) (err u305)) ;; Max 3 epochs
-      
-      ;; Update AVLP migration rate based on liquidity performance
-      (if (is-eq new-epoch u2)
-        (map-set avlp-migration-rate { epoch: u2 } { avg-per-avlp: u1200000 }) ;; 1.2 AVG per AVLP
-        (if (is-eq new-epoch u3)
-          (map-set avlp-migration-rate { epoch: u3 } { avg-per-avlp: u1500000 }) ;; 1.5 AVG per AVLP (final bonus)
+    (let ((current (var-get current-epoch)))
+      (asserts! (< current u3) (err u305)) ;; cannot advance past epoch 3
+      (let ((new-epoch (+ current u1)))
+        ;; Ensure wall-clock (block height) progression
+        (asserts! (>= block-height (epoch-block-threshold current)) (err u307))
+        ;; Compute and store dynamic migration rate for new epoch (if > 1)
+        (if (> new-epoch u1)
+          (map-set avlp-migration-rate { epoch: new-epoch } { avg-per-avlp: (compute-dynamic-avlp-rate new-epoch) })
           true
         )
+        (var-set current-epoch new-epoch)
+        (if (is-eq new-epoch u3) (var-set migration-enabled false) true)
+        ;; Founder reallocation hook (if enabled)
+        (if (var-get founder-reallocation-enabled)
+          (let (
+            (base-allocation FOUNDER_ALLOCATION)
+            (remaining (var-get founder-remaining))
+            (rate (var-get realloc-rate-bps))
+            (epoch-delta (/ (* base-allocation rate) u10000))
+            (transfer-amount (if (> remaining epoch-delta) epoch-delta remaining))
+          )
+            (if (> transfer-amount u0)
+              (begin
+                ;; Mint reallocated tokens directly to bounty stream intake for controlled distribution
+                (try! (mint-to (var-get bounty-system) transfer-amount))
+                (var-set founder-remaining (- remaining transfer-amount))
+                (var-set reallocated-to-bounty (+ (var-get reallocated-to-bounty) transfer-amount))
+                ;; Emit event for stream creation to avoid circular dependency
+                (print { event: "founder-realloc", epoch: new-epoch, amount: transfer-amount, remaining: (var-get founder-remaining), stream-request: true })
+                true)
+              true))
+          true)
+        (print { event: "epoch-advanced", new-epoch: new-epoch, dynamic-rate: (get avg-per-avlp (default-to { avg-per-avlp: u1000000 } (map-get? avlp-migration-rate { epoch: new-epoch }))) })
+        (ok new-epoch)
       )
-      
-      (var-set current-epoch new-epoch)
-      
-      ;; Disable migration after epoch 3
-      (if (is-eq new-epoch u3)
-        (var-set migration-enabled false)
-        true
-      )
-      
-      (print { event: "epoch-advanced", new-epoch: new-epoch })
-      (ok new-epoch)
     )
+  )
+)
+
+;; Enable or adjust founder reallocation (DAO only)
+(define-public (configure-founder-reallocation (enabled bool) (new-rate-bps uint) (accelerate bool))
+  (begin
+    (asserts! (is-eq tx-sender (var-get dao-governance)) (err u100))
+    (if (not (var-get founder-initialized))
+      (begin
+        ;; Initial mint of founder allocation to founder address if not yet distributed
+        (try! (mint-to (var-get founder-address) FOUNDER_ALLOCATION))
+        (var-set founder-initialized true)
+        true)
+      true)
+    (asserts! (<= new-rate-bps u1000) (err u308)) ;; Cap 10% per epoch
+    (var-set founder-reallocation-enabled enabled)
+    (if (> new-rate-bps u0) (var-set realloc-rate-bps new-rate-bps) true)
+    (if accelerate (var-set realloc-accelerated true) true)
+    (print { event: "founder-realloc-config", enabled: enabled, rate-bps: (var-get realloc-rate-bps), accelerated: (var-get realloc-accelerated) })
+    (ok true)
+  )
+)
+
+;; Accelerate (higher rate trigger) if participation < threshold (called by governance off metrics)
+(define-public (adaptive-realloc-adjust (participation-bps uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get dao-governance)) (err u100))
+    (let ((current-rate (var-get realloc-rate-bps)))
+      (if (< participation-bps u5500) ;; 55% threshold
+        (let ((new-rate (if (< current-rate u400) (+ current-rate u50) current-rate)))
+          (var-set realloc-rate-bps new-rate)
+          (print { event: "founder-realloc-adapt", new-rate-bps: new-rate, participation-bps: participation-bps })
+          (ok new-rate))
+        (ok current-rate)))
   )
 )
 
@@ -301,3 +404,6 @@
 ;; u100: unauthorized
 ;; u200-299: revenue claim errors
 ;; u300-399: migration errors
+;; u306: max-supply-exceeded
+;; u307: premature-epoch-advance
+;; u308: reallocation-rate-too-high

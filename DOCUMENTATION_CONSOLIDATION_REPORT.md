@@ -42,7 +42,7 @@
 ### **Specialized Documentation** (documentation/)
 
 - `DEX_*.md` - **DEX infrastructure documentation**
-- `TOKENOMICS.md` - **Enhanced tokenomics (10M AVG / 5M AVLP)**
+- `TOKENOMICS.md` - **Enhanced tokenomics (100M AVG / 50M AVLP)**
 - `BIP-COMPLIANCE.md` - **Enhanced cryptotextic standards**
 
 ---

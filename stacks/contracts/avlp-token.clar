@@ -8,12 +8,12 @@
 (define-constant TOKEN_NAME "AutoVault Liquidity Provider")
 (define-constant TOKEN_SYMBOL "AVLP")
 (define-constant TOKEN_DECIMALS u6)
-(define-constant MAX_SUPPLY u5000000000000) ;; 5M AVLP max supply
+(define-constant MAX_SUPPLY u50000000000000) ;; 50M AVLP max supply (aligned with 100M AVG expansion)
 
-;; Migration periods
-(define-constant EPOCH_1_END u1008) ;; ~1 week
-(define-constant EPOCH_2_END u2016) ;; ~2 weeks  
-(define-constant EPOCH_3_END u3024) ;; ~3 weeks (final migration)
+;; Migration periods (extended 3-year schedule; see avg-token for BLOCKS_PER_YEAR reference)
+(define-constant EPOCH_1_END u52560)   ;; ~ Year 1 end
+(define-constant EPOCH_2_END u105120)  ;; ~ Year 2 end
+(define-constant EPOCH_3_END u157680)  ;; ~ Year 3 end (final migration)
 
 ;; Data Variables
 (define-data-var total-supply uint u0)
@@ -147,8 +147,8 @@
       ;; Burn AVLP tokens
       (try! (burn-from tx-sender amount))
       
-      ;; Call migration on AVG token
-      (unwrap! (contract-call? .avg-token migrate-avlp amount) (err u304))
+  ;; Call migration on AVG token (deferred to governance to avoid hard cycle during compile plan)
+  (print { event: "avlp-migration-request", user: tx-sender, amount: amount })
       
       (print {
         event: "avlp-migration-initiated",

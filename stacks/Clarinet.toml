@@ -330,6 +330,16 @@ path = "contracts/automated-bounty-system.clar"
 clarity_version = 2
 epoch = "2.4"
 
+[contracts.governance-metrics]
+path = "contracts/governance-metrics.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.bounty-stream-intake]
+path = "contracts/bounty-stream-intake.clar"
+clarity_version = 2
+epoch = "2.4"
+
 [contracts.analytics]
 path = "contracts/analytics.clar"
 clarity_version = 2

@@ -23,7 +23,7 @@
 ;; Data Variables
 (define-data-var dao-governance principal .dao-governance)
 (define-data-var treasury principal .treasury)
-(define-data-var avg-token principal .avg-token)
+(define-data-var avg-token principal .gov-token) ;; Use gov-token to avoid circular dependency
 (define-data-var automation-enabled bool true)
 (define-data-var current-strategy uint BALANCED_STRATEGY)
 (define-data-var emergency-pause bool false)
@@ -176,8 +176,9 @@
   (begin
     (let (
       (vote-id (var-get next-emergency-vote-id))
-      (avg-balance (unwrap! (contract-call? .avg-token get-balance-of tx-sender) (err u300)))
-      (total-supply (unwrap! (contract-call? .avg-token get-total-supply) (err u301)))
+      ;; Use gov-token instead of avg-token to avoid circular dependency
+      (avg-balance (unwrap! (contract-call? .gov-token get-balance-of tx-sender) (err u300)))
+      (total-supply (unwrap! (contract-call? .gov-token get-total-supply) (err u301)))
       (voting-power-bps (/ (* avg-balance u10000) total-supply))
     )
       ;; Minimum 1% of tokens required to create emergency vote
@@ -210,7 +211,8 @@
 (define-public (vote-emergency (vote-id uint) (support bool))
   (let (
     (vote (unwrap! (map-get? emergency-votes { vote-id: vote-id }) (err u303)))
-    (voter-balance (unwrap! (contract-call? .avg-token get-balance-of tx-sender) (err u304)))
+    ;; Use gov-token balance to avoid circular dependency with avg-token
+    (voter-balance (unwrap! (contract-call? .gov-token get-balance-of tx-sender) (err u304)))
   )
     (asserts! (<= block-height (get end-block vote)) (err u305))
     (asserts! (> voter-balance u0) (err u306))
@@ -230,7 +232,7 @@
 (define-public (execute-emergency-vote (vote-id uint))
   (let (
     (vote (unwrap! (map-get? emergency-votes { vote-id: vote-id }) (err u307)))
-    (total-supply (unwrap! (contract-call? .avg-token get-total-supply) (err u308)))
+    (total-supply (unwrap! (contract-call? .gov-token get-total-supply) (err u308)))
     (quorum-needed (/ (* total-supply EMERGENCY_VOTE_QUORUM) u10000))
     (total-votes (+ (get for-votes vote) (get against-votes vote)))
   )

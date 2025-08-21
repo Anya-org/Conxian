@@ -147,6 +147,7 @@
   (let (
     (proposer-balance (unwrap! (contract-call? .gov-token get-balance-of tx-sender) (err u200)))
     (proposal-id (+ (var-get proposal-count) u1))
+    (total-supply (unwrap! (contract-call? .gov-token get-total-supply) (err u200)))
   )
     ;; Check proposal threshold
     (asserts! (>= proposer-balance PROPOSAL_THRESHOLD) (err u101))
@@ -172,6 +173,13 @@
     
     (var-set proposal-count proposal-id)
     (emit-proposal-created proposal-id tx-sender title)
+    ;; Metrics hook: record proposal created (best effort); ignore errors to prevent breaking proposal creation
+    (let ((tm2 (var-get test-mode)))
+      (match (as-contract (contract-call? .governance-metrics record-proposal-created proposal-id (if tm2 block-height (+ block-height u144)) (if tm2 (+ block-height u10) (+ block-height (+ u144 VOTING_PERIOD))) total-supply QUORUM_BPS))
+        success true
+        error true ;; Ignore metrics errors
+      )
+    )
     (ok proposal-id)
   )
 )
@@ -195,6 +203,11 @@
     (map-set votes 
       { proposal-id: proposal-id, voter: tx-sender }
       { vote: vote, weight: voter-power }
+    )
+    ;; Metrics hook: record vote weight (best effort)
+    (match (as-contract (contract-call? .governance-metrics record-vote proposal-id voter-power))
+      success true
+      error true ;; Ignore metrics errors
     )
     
     ;; Update proposal vote counts
@@ -250,6 +263,11 @@
         proposal-id: proposal-id,
         execution-block: execution-block
       })
+      ;; Metrics finalize (succeeded & queued) - best effort
+      (match (as-contract (contract-call? .governance-metrics finalize-proposal proposal-id (get for-votes proposal) (get against-votes proposal) (get abstain-votes proposal) true true false))
+        success true
+        error true ;; Ignore metrics errors
+      )
       (ok true)
     )
   )
@@ -289,6 +307,11 @@
       proposal-id: proposal-id,
       block: block-height
     })
+    ;; Metrics finalize (executed already finalized earlier for queue, but ensure executed flag) - best effort
+    (match (as-contract (contract-call? .governance-metrics finalize-proposal proposal-id (get for-votes proposal) (get against-votes proposal) (get abstain-votes proposal) true true true))
+      success true
+      error true ;; Ignore metrics errors
+    )
     (ok true)
   )
 )

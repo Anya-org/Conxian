@@ -120,6 +120,19 @@
     max-bounty: (var-get max-bounty-amount)
   })
 
+;; === Governance Stream Intake ===
+;; AVG tokens reallocated from founder pool arrive here; system tracks cumulative intake
+(define-data-var governance-stream-total uint u0)
+(define-public (record-governance-stream (amount uint))
+  (begin
+    ;; Only AVG token contract (as-contract) should call; simplified auth by requiring contract context
+    (asserts! (is-eq tx-sender (as-contract tx-sender)) ERR_NOT_AUTHORIZED)
+    (var-set governance-stream-total (+ (var-get governance-stream-total) amount))
+    (print { event: "governance-stream", amount: amount, cumulative: (var-get governance-stream-total) })
+    (ok true)))
+
+(define-read-only (get-governance-stream-total) (var-get governance-stream-total))
+
 ;; === DAO GOVERNANCE FUNCTIONS ===
 (define-public (update-policy (policy-type (string-ascii 32)) (enabled bool) (min-reputation uint) (category-premium uint))
   (begin

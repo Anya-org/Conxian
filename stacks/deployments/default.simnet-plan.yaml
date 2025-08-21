@@ -76,6 +76,11 @@ plan:
             path: contracts/avlp-token.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: bounty-stream-intake
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/bounty-stream-intake.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: bounty-system
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/bounty-system.clar
@@ -116,6 +121,11 @@ plan:
             path: contracts/dao-automation.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: governance-metrics
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/governance-metrics.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: dao-governance
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/dao-governance.clar
@@ -145,6 +155,9 @@ plan:
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/enhanced-yield-strategy.clar
             clarity-version: 2
+      epoch: "2.4"
+    - id: 1
+      transactions:
         - emulated-contract-publish:
             contract-name: strategy-trait
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
@@ -155,9 +168,6 @@ plan:
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/enhanced-yield-strategy-complex.clar
             clarity-version: 2
-      epoch: "2.4"
-    - id: 1
-      transactions:
         - emulated-contract-publish:
             contract-name: enhanced-yield-strategy-simple
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ

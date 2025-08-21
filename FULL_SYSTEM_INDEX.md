@@ -244,7 +244,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 ```text
 ✅ CORE PLATFORM:
 ├── 30 Smart contracts compiling successfully
-├── Enhanced tokenomics (10M AVG / 5M AVLP)
+├── Enhanced tokenomics (100M AVG / 50M AVLP)
 ├── Automated DAO governance system
 ├── Multi-signature treasury controls
 ├── Emergency pause mechanisms
@@ -523,9 +523,9 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 
 ### **Community Channels**
 
-- **Discord**: [To be announced at launch]
+- **Discord**: To be announced at launch
 - **GitHub**: Active development and issue tracking
-- **Documentation Portal**: [To be deployed with mainnet]
+- **Documentation Portal**: To be deployed with mainnet
 - **Support**: Multi-channel user support system
 
 ---

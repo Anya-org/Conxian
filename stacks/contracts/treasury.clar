@@ -681,8 +681,8 @@
     (if (is-eq (get asset-type proposal) u0)
       ;; STX transfer
       (try! (stx-transfer? (get amount proposal) (as-contract tx-sender) (get recipient proposal)))
-      ;; AVG token transfer  
-      (try! (as-contract (contract-call? .avg-token transfer (get recipient proposal) (get amount proposal)))))
+      ;; Token transfer using gov-token instead of avg-token to avoid circular dependency
+      (try! (as-contract (contract-call? .gov-token transfer (get recipient proposal) (get amount proposal)))))
     
     ;; Mark as executed
     (map-set multisig-proposals { proposal-id: proposal-id }

@@ -17,7 +17,7 @@ enterprise monitoring, and Bitcoin-aligned principles.
 
 ## Features
 
-- **Enhanced Tokenomics**: 10M AVG governance token, 5M AVLP liquidity token with progressive migration & revenue sharing
+- **Enhanced Tokenomics**: 100M AVG governance token, 50M AVLP liquidity token with progressive migration & revenue sharing
 - **Automated DAO**: Time-weighted voting, timelock, automation & buybacks
 - **DEX Foundations**: Factory, pool, router, math-lib, multi-hop & pool variants (design + partial impl)
 - **Circuit Breaker & Monitoring**: Structured numeric event codes for volatility, volume & liquidity safeguards
