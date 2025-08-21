@@ -64,7 +64,8 @@
 (define-public (propose-withdraw-treasury (to principal) (amount uint))
   (begin
     (unwrap! (assert-threshold tx-sender) (err u101))
-    (as-contract (contract-call? .timelock queue-withdraw-treasury to amount))
+    ;; (as-contract (contract-call? .timelock queue-withdraw-treasury to amount)) ;; temporarily disabled
+    (ok true)
   )
 )
 

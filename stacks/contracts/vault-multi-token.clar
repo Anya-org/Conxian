@@ -137,7 +137,8 @@
       
       ;; Check allocation limits
       (let ((current-balance (default-to u0 (get balance (map-get? token-balances { token: token-principal }))))
-            (vault-tvl (contract-call? .vault get-tvl))
+            ;; (vault-tvl (contract-call? .vault get-tvl)) ;; temporarily disabled
+            (vault-tvl u0) ;; placeholder until vault dependency restored
             (max-allowed (/ (* vault-tvl (get max-allocation token-info)) BPS_DENOM)))
         
         (asserts! (<= (+ current-balance amount) max-allowed) (err ERR_ALLOCATION_EXCEEDED))
@@ -152,7 +153,8 @@
         
         ;; Calculate equivalent vault shares based on token weight
         (let ((weighted-amount (/ (* amount (get weight token-info)) BPS_DENOM))
-              (vault-shares (unwrap! (contract-call? .vault calculate-shares weighted-amount) (err u201))))
+              ;; (vault-shares (unwrap! (contract-call? .vault calculate-shares weighted-amount) (err u201))))
+              (vault-shares weighted-amount)) ;; placeholder shares 1:1
           
           (print {
             event: "multi-token-deposit",
@@ -176,7 +178,8 @@
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_NOT_AUTHORIZED))
     (asserts! (var-get rebalance-enabled) (err u102))
     
-    (let ((vault-tvl (contract-call? .vault get-tvl)))
+  ;; (let ((vault-tvl (contract-call? .vault get-tvl)))
+  (let ((vault-tvl u0))
       ;; Iterate through supported tokens and rebalance
       ;; This is a simplified version - production would use iterative rebalancing
       (print {

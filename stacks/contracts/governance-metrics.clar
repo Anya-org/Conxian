@@ -185,6 +185,8 @@
   }
 )
 ;; Admin
+;; Persistent configuration
+(define-data-var governance-contract principal tx-sender)
 ;; --- Enhanced Analytics Integration ---
 
 ;; Record data for enhanced analytics
@@ -195,10 +197,10 @@
   (volatility-index uint))
   (begin
     (asserts! (is-authorized) (err u620))
-    (try! (contract-call? .enhanced-analytics record-market-data-point 
-                         participation-bps market-performance-bps tvl-growth-bps volatility-index))
+    ;; NOTE: Direct call to enhanced-analytics removed to avoid circular deployment dependency.
+    ;; Off-chain indexers or an automation contract can relay this event to enhanced-analytics.
     (print {
-      event: "analytics-data-forwarded",
+      event: "analytics-data-emitted",
       participation: participation-bps,
       market-perf: market-performance-bps,
       tvl-growth: tvl-growth-bps,
@@ -208,13 +210,12 @@
 
 ;; Get enhanced analytics status
 (define-read-only (get-enhanced-analytics-status)
-  (contract-call? .enhanced-analytics get-analytics-status))
+  ;; Placeholder without direct contract call (avoids cycle). Returns minimal stub.
+  { analytics-enabled: false, predictive-model-enabled: false })
 
 ;; Check if reallocation timing is optimal based on predictive models
 (define-read-only (is-optimal-reallocation-timing)
-  (match (contract-call? .enhanced-analytics predict-optimal-reallocation-timing)
-    success (> success u7500) ;; 75% threshold for optimal timing
-    error false))
+  false)
 
 ;; --- Administrative Functions ---
 

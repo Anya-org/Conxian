@@ -46,34 +46,19 @@ plan:
             path: contracts/automated-bounty-system.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: automation-trigger
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/automation-trigger.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: creator-token
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/creator-token.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: mock-ft
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/mock-ft.clar
-            clarity-version: 2
-        - emulated-contract-publish:
-            contract-name: vault-admin-trait
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/traits/vault-admin-trait.clar
-            clarity-version: 2
-        - emulated-contract-publish:
-            contract-name: vault
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/vault.clar
-            clarity-version: 2
-        - emulated-contract-publish:
             contract-name: avg-token
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/avg-token.clar
-            clarity-version: 2
-        - emulated-contract-publish:
-            contract-name: automation-trigger
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/automation-trigger.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: avlp-token
@@ -106,11 +91,6 @@ plan:
             path: contracts/circuit-breaker-simple.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: enhanced-analytics
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/enhanced-analytics.clar
-            clarity-version: 2
-        - emulated-contract-publish:
             contract-name: governance-metrics
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/governance-metrics.clar
@@ -124,11 +104,6 @@ plan:
             contract-name: gov-token
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/gov-token.clar
-            clarity-version: 2
-        - emulated-contract-publish:
-            contract-name: timelock
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/timelock.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: dao
@@ -151,13 +126,15 @@ plan:
             path: contracts/dex-factory.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: mock-ft
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/mock-ft.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: pool-trait
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/traits/pool-trait.clar
             clarity-version: 2
-      epoch: "2.4"
-    - id: 1
-      transactions:
         - emulated-contract-publish:
             contract-name: dex-pool
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
@@ -169,10 +146,18 @@ plan:
             path: contracts/dex-router.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: enhanced-analytics
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/enhanced-analytics.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: enhanced-yield-strategy
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/enhanced-yield-strategy.clar
             clarity-version: 2
+      epoch: "2.4"
+    - id: 1
+      transactions:
         - emulated-contract-publish:
             contract-name: strategy-trait
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
@@ -264,6 +249,16 @@ plan:
             path: contracts/state-anchor.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: vault-admin-trait
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/traits/vault-admin-trait.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: timelock
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/timelock.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: treasury
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/treasury.clar
@@ -277,6 +272,11 @@ plan:
             contract-name: twap-oracle-v2-simple
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/twap-oracle-v2-simple.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: vault
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/vault.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: vault-multi-token

@@ -115,8 +115,9 @@
       (var-set last-correlation-update current-index)
       
       ;; Trigger correlation calculation if we have enough data
+      ;; Side-effect only: ensure both branches return bool to satisfy type checker
       (if (>= current-index u10)
-        (try! (calculate-cross-correlation))
+        (let ((ignored (try! (calculate-cross-correlation)))) true)
         true)
       
       (print {
@@ -144,7 +145,7 @@
       (print {
         event: "correlation-calculated",
         coefficient: correlation,
-        confidence: (abs correlation),
+        confidence: (if (< correlation 0) (- 0 correlation) correlation),
         interpretation: (if (> correlation 5000) "strong-positive"
                        (if (< correlation -5000) "strong-negative" "weak-correlation"))
       })
@@ -206,7 +207,6 @@
     (let ((participation-trend (get-participation-trend))
           (market-trend (get-market-trend))
           (model (unwrap! (map-get? prediction-models { model-type: "participation-market" }) (err u704))))
-      
       (if (>= (get confidence model) PREDICTION_CONFIDENCE_THRESHOLD)
         (let ((predicted-score (calculate-prediction-score participation-trend market-trend (get coefficients model))))
           (print {
@@ -219,56 +219,18 @@
             market-trend: market-trend
           })
           (ok predicted-score))
-        (err u705)))) ;; Insufficient confidence
+        (err u705))))) ;; Insufficient confidence (u705)
 
 ;; --- Dynamic Cap Management ---
 
-;; Calculate and update dynamic caps based on TVL growth and market conditions
-(define-public (update-dynamic-caps (current-tvl uint) (market-volatility uint))
-  (begin
-    (asserts! (is-authorized) (err u706))
-    (asserts! (var-get dynamic-caps-enabled) (err u707))
-    
-    (let ((baseline (var-get baseline-tvl))
-          (tvl-growth (if (> baseline u0) 
-                        (/ (* (- current-tvl baseline) u10000) baseline) 
-                        u0))
-          (current-epoch (/ block-height u144))) ;; Simplified epoch calculation
-      
-      (let ((base-cap (unwrap! (contract-call? (var-get vault-contract) get-cap) (err u708)))
-            (tvl-adjustment (calculate-tvl-adjustment tvl-growth))
-            (volatility-adjustment (calculate-volatility-adjustment market-volatility)))
-        
-        (let ((adjusted-cap (+ base-cap (+ tvl-adjustment volatility-adjustment))))
-          (map-set dynamic-cap-history { epoch: current-epoch } {
-            base-cap: base-cap,
-            tvl-adjusted-cap: (+ base-cap tvl-adjustment),
-            market-adjusted-cap: (+ base-cap volatility-adjustment),
-            final-cap: adjusted-cap,
-            adjustment-reason: (format-adjustment-reason tvl-growth market-volatility)
-          })
-          
-          ;; Only update if significant change (>5%)
-          (if (> (abs (- adjusted-cap base-cap)) (/ base-cap u20))
-            (begin
-              (try! (as-contract (contract-call? (var-get vault-contract) set-cap adjusted-cap)))
-              (print {
-                event: "dynamic-cap-updated",
-                old-cap: base-cap,
-                new-cap: adjusted-cap,
-                tvl-growth: tvl-growth,
-                volatility: market-volatility,
-                epoch: current-epoch
-              }))
-            true)
-          
-          (ok adjusted-cap))))))
+;; Dynamic cap recommendation function temporarily disabled to remove vault dependency
+;; (define-public (update-dynamic-caps (base-cap uint) (current-tvl uint) (market-volatility uint)) ... )
 
 ;; --- Cross-Chain Participation Aggregation ---
 
 ;; Record L2 participation data
 (define-public (record-l2-participation 
-  (chain-id uint)
+  (l2-chain-id uint)
   (participants uint)
   (voting-power uint)
   (weight-bps uint))
@@ -276,7 +238,7 @@
     (asserts! (is-authorized) (err u709))
     (asserts! (var-get l2-aggregation-enabled) (err u710))
     
-    (map-set l2-participation-data { chain-id: chain-id } {
+  (map-set l2-participation-data { chain-id: l2-chain-id } {
       participants: participants,
       total-voting-power: voting-power,
       last-update: block-height,
@@ -285,29 +247,26 @@
     })
     
     ;; Update total L2 participants
-    (var-set total-l2-participants (+ (var-get total-l2-participants) participants))
+  (var-set total-l2-participants (+ (var-get total-l2-participants) participants))
     
     (print {
       event: "l2-participation-recorded",
-      chain-id: chain-id,
+  chain-id: l2-chain-id,
       participants: participants,
       voting-power: voting-power,
       weight: weight-bps
     })
     (ok true)))
 
-;; Calculate aggregated cross-chain participation
-(define-public (calculate-aggregated-participation)
+;; Calculate aggregated cross-chain participation (external passes L1 participation)
+(define-public (calculate-aggregated-participation (l1-participation uint))
   (begin
     (asserts! (var-get l2-aggregation-enabled) (err u711))
-    (let ((l1-participation (unwrap! (contract-call? .governance-metrics get-rolling-participation-bps) (err u712)))
-          (l2-weight (var-get cross-chain-weight-bps))
+    (let ((l2-weight (var-get cross-chain-weight-bps))
           (l2-adjusted-participation (calculate-l2-weighted-participation)))
-      
       (let ((aggregated-participation 
               (+ (/ (* l1-participation (- u10000 l2-weight)) u10000)
                  (/ (* l2-adjusted-participation l2-weight) u10000))))
-        
         (print {
           event: "aggregated-participation-calculated",
           l1-participation: l1-participation,

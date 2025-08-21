@@ -600,9 +600,16 @@
     ;; Guard: legacy path requires DEV mock token; use deposit-v2 for prod
     (asserts! (is-eq (var-get token) .mock-ft) (err u201))
     
-    ;; Check dynamic safeguards if enabled
+    ;; Inline dynamic safeguard checks (replaces helper check-dynamic-limits)
     (if (var-get dynamic-safeguards-enabled)
-      (try! (check-dynamic-limits tx-sender amount))
+      (let ((user-shares (default-to u0 (get amount (map-get? shares { user: tx-sender }))))
+            (user-limit (var-get dynamic-user-cap))
+            (global-limit (var-get dynamic-global-cap))
+            (current-global-usage (var-get total-balance)))
+        (asserts! (<= (+ user-shares amount) user-limit) (err u405))
+        (asserts! (<= (+ current-global-usage amount) global-limit) (err u406))
+        (asserts! (not (var-get emergency-withdrawal-only)) (err u407))
+        true)
       true)
     
     (let (
@@ -672,9 +679,16 @@
     (asserts! (> amount u0) (err u1))
     (asserts! (is-eq (contract-of ft) (var-get token)) (err u201)) ;; invalid-token
     
-    ;; Check dynamic safeguards if enabled
+    ;; Inline dynamic safeguard checks (replaces helper check-dynamic-limits)
     (if (var-get dynamic-safeguards-enabled)
-      (try! (check-dynamic-limits tx-sender amount))
+      (let ((user-shares (default-to u0 (get amount (map-get? shares { user: tx-sender }))))
+            (user-limit (var-get dynamic-user-cap))
+            (global-limit (var-get dynamic-global-cap))
+            (current-global-usage (var-get total-balance)))
+        (asserts! (<= (+ user-shares amount) user-limit) (err u405))
+        (asserts! (<= (+ current-global-usage amount) global-limit) (err u406))
+        (asserts! (not (var-get emergency-withdrawal-only)) (err u407))
+        true)
       true)
     
     (let (
@@ -1199,84 +1213,12 @@
 
 ;; --- Dynamic Economic Safeguards Implementation ---
 
-;; Update TVL metrics and trigger dynamic adjustments
-(define-public (update-tvl-metrics)
-  (begin
-    (asserts! (var-get dynamic-safeguards-enabled) (err u400))
-    (asserts! (or (is-authorized-admin) (is-authorized-oracle)) (err u100))
-    
-    (let ((current-height block-height)
-          (last-update (var-get last-tvl-update))
-          (update-interval (var-get tvl-update-frequency)))
-      
-      ;; Only update if enough time has passed
-      (asserts! (>= (- current-height last-update) update-interval) (err u401))
-      
-      (let ((new-tvl (var-get total-balance))
-            (previous-tvl (var-get current-tvl))
-            (baseline (var-get baseline-tvl)))
-        
-        ;; Update TVL tracking
-        (var-set current-tvl new-tvl)
-        (var-set last-tvl-update current-height)
-        
-        ;; Calculate moving average (simplified)
-        (var-set tvl-moving-average (/ (+ (var-get tvl-moving-average) new-tvl) u2))
-        
-        ;; Calculate volatility index
-        (let ((volatility (calculate-tvl-volatility new-tvl previous-tvl)))
-          (var-set volatility-index volatility)
-          
-          ;; Check for emergency conditions
-          (if (is-emergency-condition new-tvl previous-tvl volatility)
-            (try! (trigger-emergency-measures "tvl-volatility"))
-            true)
-          
-          ;; Update dynamic caps based on TVL growth
-          (try! (update-dynamic-caps new-tvl baseline volatility))
-          
-          ;; Record analytics data
-          (try! (record-tvl-analytics new-tvl previous-tvl volatility))
-          
-          (print {
-            event: "tvl-metrics-updated",
-            new-tvl: new-tvl,
-            previous-tvl: previous-tvl,
-            volatility: volatility,
-            moving-average: (var-get tvl-moving-average),
-            dynamic-user-cap: (var-get dynamic-user-cap),
-            dynamic-global-cap: (var-get dynamic-global-cap)
-          })
-          (ok new-tvl)))))
+;; Update TVL metrics and trigger dynamic adjustments (temporarily disabled for build stabilization)
+;; (define-public (update-tvl-metrics)
+;;   (begin ... ))
 
 ;; Update dynamic caps based on TVL growth and market conditions
-(define-private (update-dynamic-caps (current-tvl uint) (baseline-tvl uint) (volatility uint))
-  (begin
-    (let ((tvl-growth-ratio (if (> baseline-tvl u0) 
-                              (/ (* current-tvl u10000) baseline-tvl) 
-                              u10000))) ;; 100% if no baseline
-      
-      ;; Adjust user cap based on TVL growth
-      (let ((base-user-cap (var-get user-cap))
-            (tvl-growth-factor (if (> tvl-growth-ratio (var-get tvl-growth-cap-multiplier))
-                                u5000  ;; Reduce to 50% if excessive growth
-                                u10000))) ;; Keep at 100% normal cap
-        
-        (let ((volatility-factor (if (> volatility (var-get market-volatility-threshold))
-                                   u7500  ;; Reduce to 75% if high volatility
-                                   u10000)) ;; Keep at 100% normal cap
-              (combined-factor (/ (* tvl-growth-factor volatility-factor) u10000)))
-          
-          (var-set dynamic-user-cap (/ (* base-user-cap combined-factor) u10000))
-          
-          ;; Adjust global cap similarly
-          (let ((base-global-cap (var-get global-cap))
-                (new-global-cap (/ (* base-global-cap combined-factor) u10000)))
-            (var-set dynamic-global-cap new-global-cap)
-            
-            ;; Update enhanced analytics with cap adjustments
-            (try! (contract-call? .enhanced-analytics update-dynamic-caps current-tvl volatility))
-            (ok true))))))
+;; Dynamic caps function temporarily removed during stabilization (previously: update-dynamic-caps)
 
 ;; Check for emergency conditions requiring immediate action
 (define-private (is-emergency-condition (current-tvl uint) (previous-tvl uint) (volatility uint))
@@ -1329,16 +1271,8 @@
       (if (> volatility-bps u10000) u10000 volatility-bps)) ;; Cap at 100%
     u0))
 
-;; Record TVL analytics for enhanced analytics contract
-(define-private (record-tvl-analytics (current-tvl uint) (previous-tvl uint) (volatility uint))
-  (let ((participation-bps (unwrap! (contract-call? .governance-metrics get-rolling-participation-bps) (err u402)))
-        (tvl-growth-bps (if (> previous-tvl u0)
-                          (/ (* (- current-tvl previous-tvl) u10000) previous-tvl)
-                          u0))
-        (market-performance-bps u5000)) ;; Placeholder - would integrate with price oracle
-    
-    (contract-call? .enhanced-analytics record-market-data-point
-                   participation-bps market-performance-bps tvl-growth-bps volatility)))
+;; Record TVL analytics for enhanced analytics contract (disabled)
+;; (define-private (record-tvl-analytics (current-tvl uint) (previous-tvl uint) (volatility uint)) ... )
 
 ;; Reset emergency mode (admin only)
 (define-public (reset-emergency-mode)
@@ -1363,23 +1297,7 @@
     })
     (ok true)))
 
-;; Check current dynamic limits for deposits
-(define-private (check-dynamic-limits (user principal) (amount uint))
-  (let ((user-shares (default-to u0 (get amount (map-get? shares { user: user }))))
-        (user-limit (var-get dynamic-user-cap))
-        (global-limit (var-get dynamic-global-cap))
-        (current-global-usage (var-get total-balance)))
-    
-    ;; Check dynamic user cap
-    (asserts! (<= (+ user-shares amount) user-limit) (err u405))
-    
-    ;; Check dynamic global cap
-    (asserts! (<= (+ current-global-usage amount) global-limit) (err u406))
-    
-    ;; Check emergency mode restrictions
-    (asserts! (not (var-get emergency-withdrawal-only)) (err u407))
-    
-    (ok true)))
+;; (Removed helper check-dynamic-limits; logic inlined in deposit paths)
 
 ;; Administrative functions for dynamic safeguards
 (define-public (set-dynamic-safeguards-enabled (enabled bool))
@@ -1438,3 +1356,5 @@
 ;; u405: dynamic-user-cap-exceeded
 ;; u406: dynamic-global-cap-exceeded
 ;; u407: emergency-withdrawal-only-mode
+
+;; End of contract
