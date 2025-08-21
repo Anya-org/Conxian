@@ -56,7 +56,9 @@ On-chain proposal system with time-weighted voting & timelock execution ensuring
 - Should decay apply to inactive delegates beyond N epochs?
 
 **Changelog**:
- - v1.1 (2025-08-18): SDK 3.5.0 compliance validation, production readiness confirmation  
+
+
+- v1.1 (2025-08-18): SDK 3.5.0 compliance validation, production readiness confirmation  
  - v1.0 (2025-08-17): Initial stable implementation
 
 **Approved By**: Protocol WG, Governance Team  
