@@ -19,7 +19,7 @@ identified bounty double spending vulnerabilities.
 
 ## Specification
 
-- Add cryptotextic proof requirements for bounty completion
+- Add cryptographic proof requirements for bounty completion
 - Implement milestone-based payments with validation
 - Add dispute resolution mechanism for bounty conflicts
 - Require independent verification for high-value bounties (>5,000 tokens)
