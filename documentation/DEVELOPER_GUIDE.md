@@ -382,6 +382,7 @@ If it fails, rename only the parameter (keep storage variable identifiers stable
 Strict Mode (optional / CI only):
 
 Set `AUTOVAULT_STRICT_PARAM_GUARD=1` to additionally scan for any public/read-only parameter that exactly matches a data var (with a small temporary allowlist). Use this in hardened branches prior to release freezes.
+
 ```
 
 ### TypeScript Style Guide

@@ -245,38 +245,36 @@
           (distr (var-get fin-distributions))
          )
       (let ((net (if (> gross rebates) (- gross rebates) u0)))
-        (let ((net-after net))
-          (let ((ebitda (if (> net-after opx) (- net-after opx) u0)))
-            (let ((base (+ ebitda extra)))
-              (let ((after-buybacks (if (> base buyb) (- base buyb) u0)))
-                (let ((adjusted (if (> after-buybacks distr) (- after-buybacks distr) u0)))
-                  (map-set financial-period-ledger { period-type: period-type, period-id: period-id } {
-                    gross-revenue: gross,
-                    performance-fees: perf,
-                    rebates: rebates,
-                    net-revenue: net,
-                    operating-expenses: opx,
-                    extraordinary-items: extra,
-                    buybacks: buyb,
-                    distributions: distr,
-                    adjusted-ebitda: adjusted,
-                    snapshot-block: block-height,
-                    closed: true,
-                    data-complete: data-complete,
-                    notes-hash: notes-hash
-                  })
-                  ;; reset accumulators for next period
-                  (var-set fin-gross-revenue u0)
-                  (var-set fin-performance-fees u0)
-                  (var-set fin-rebates u0)
-                  (var-set fin-operating-expenses u0)
-                  (var-set fin-extraordinary-items u0)
-                  (var-set fin-buybacks u0)
-                  (var-set fin-distributions u0)
-                  (print { event: "fin-period-finalized", period-type: period-type, period-id: period-id, gross: gross, net: net, adjusted-ebitda: adjusted })
-                  (ok { gross: gross, adjusted-ebitda: adjusted })
-                )))))))
-  )
+        (let ((ebitda (if (> net opx) (- net opx) u0)))
+          (let ((base (+ ebitda extra)))
+            (let ((after-buybacks (if (> base buyb) (- base buyb) u0)))
+              (let ((adjusted (if (> after-buybacks distr) (- after-buybacks distr) u0)))
+                (map-set financial-period-ledger { period-type: period-type, period-id: period-id } {
+                  gross-revenue: gross,
+                  performance-fees: perf,
+                  rebates: rebates,
+                  net-revenue: net,
+                  operating-expenses: opx,
+                  extraordinary-items: extra,
+                  buybacks: buyb,
+                  distributions: distr,
+                  adjusted-ebitda: adjusted,
+                  snapshot-block: block-height,
+                  closed: true,
+                  data-complete: data-complete,
+                  notes-hash: notes-hash
+                })
+                ;; reset accumulators
+                (var-set fin-gross-revenue u0)
+                (var-set fin-performance-fees u0)
+                (var-set fin-rebates u0)
+                (var-set fin-operating-expenses u0)
+                (var-set fin-extraordinary-items u0)
+                (var-set fin-buybacks u0)
+                (var-set fin-distributions u0)
+                (print { event: "fin-period-finalized", period-type: period-type, period-id: period-id, gross: gross, net: net, adjusted-ebitda: adjusted })
+                (ok { gross: gross, adjusted-ebitda: adjusted })
+              ))))))))
 
 ;; Read-only accessors
 (define-read-only (get-financial-period (period-type uint) (period-id uint))
