@@ -1059,6 +1059,21 @@
         (if (is-eq fee-type "liquidation")
           (var-set total-liquidation-fees (+ (var-get total-liquidation-fees) fee))
           true)))
+    ;; Attempt to forward fee accounting to enhanced-analytics ledger if feature flag enabled.
+    ;; Non-fatal: ignore any errors (contract absent, flag disabled, unauthorized).
+    (let ((fee-src (if (is-eq fee-type "deposit") u0
+                    (if (is-eq fee-type "withdraw") u1
+                      (if (is-eq fee-type "performance") u2
+                        (if (is-eq fee-type "flash-loan") u3
+                          (if (is-eq fee-type "liquidation") u4 u7)))))))
+      (let ((enabled-ledger (contract-call? .enhanced-analytics get-financial-ledger-enabled)))
+        (if enabled-ledger
+          (begin
+            (match (contract-call? .enhanced-analytics record-fee fee-src fee)
+              ok-val true
+              err-val true)
+            true)
+          true)))
     fee))
 
 ;; Calculate performance fee based on yield above benchmark

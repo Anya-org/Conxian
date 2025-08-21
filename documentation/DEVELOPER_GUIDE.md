@@ -385,6 +385,79 @@ Set `AUTOVAULT_STRICT_PARAM_GUARD=1` to additionally scan for any public/read-on
 
 ```
 
+### Financial Ledger & Revenue Accounting (Feature Flag)
+
+The `enhanced-analytics` contract (CONTRACT_VERSION u2) now includes a feature‑flagged on-chain financial ledger for standardized revenue and expense periodization.
+
+Key elements:
+
+- Feature Flag: `financial-ledger-enabled` (default `false`). Enable via:
+  ```clarity
+  (contract-call? .enhanced-analytics set-financial-ledger-enabled true)
+  ```
+- Period Map: `financial-period-ledger` keyed by `{ period-type, period-id }` storing immutable snapshots once finalized.
+- Accumulators (reset each finalization): gross / performance fees / rebates / operating expenses / extraordinary items / buybacks / distributions.
+- Fee Source Enumeration (standard event indexing):
+  - `FEE_SRC_DEPOSIT = u0`
+  - `FEE_SRC_WITHDRAW = u1`
+  - `FEE_SRC_PERFORMANCE = u2`
+  - `FEE_SRC_FLASH_LOAN = u3`
+  - `FEE_SRC_LIQUIDATION = u4`
+  - `FEE_SRC_TRADING = u5`
+  - `FEE_SRC_STRATEGY = u6`
+  - `FEE_SRC_MISC = u7`
+- Unified Fee Recording:
+  ```clarity
+  (define-public (record-fee (source uint) (amount uint)) ...)
+  ```
+  Emits: `{ event: "fee-accrued", source, amount, performance }` where `performance` is auto true when `source = FEE_SRC_PERFORMANCE`.
+- Backward Compatibility: `(record-revenue amount is-performance)` wrapper remains; new integrations must migrate to `record-fee`.
+- Adjusted EBITDA Formula (current implementation):
+  ```text
+  net = max(gross - rebates, 0)
+  ebitda = max(net - operating-expenses, 0)
+  adjusted-ebitda = max( max(ebitda + extraordinary-items - buybacks, 0) - distributions, 0)
+  ```
+  (All math is clamped at zero to avoid unsigned underflow.)
+- Period Finalization:
+  ```clarity
+  (finalize-financial-period period-type period-id data-complete notes-hash)
+  ```
+  Stores snapshot & resets accumulators. Rejects duplicate keys (`err u802`).
+
+Error Codes (u800+):
+- `u800` ledger disabled
+- `u801` unauthorized (non-admin/non-oracle/non-governance-metrics)
+- `u802` period already finalized
+- `u804` invalid period type (must be <= yearly)
+
+Events (ledger):
+- `fee-accrued`
+- `fin-rebate-recorded`
+- `fin-op-ex-recorded`
+- `fin-extraordinary-recorded`
+- `fin-buyback-recorded`
+- `fin-distribution-recorded`
+- `fin-period-finalized`
+- `fin-ledger-toggled`
+
+Testing Guidelines:
+1. Enable flag, record multiple fee types, finalize, assert snapshot tuple fields.
+2. Verify performance fee counts increase both gross and performance buckets.
+3. Attempt duplicate finalization (expect `err u802`).
+4. Attempt recording while disabled (expect `err u800`).
+5. Ensure accumulators reset post-finalization (second period starts at zero).
+
+Future Enhancements (tracked):
+- Automatic period-id derivation helpers (epoch, monthly, quarterly) – pending.
+- Cross-contract hooks from `vault` and DEX pools to call `record-fee` automatically – pending integration PR.
+- Strategy adapter standardized yield fee forwarding.
+
+Security & Governance Considerations:
+- Only authorized actors can mutate ledger state; snapshots are immutable once finalized.
+- Avoid calling ledger write functions inside high-frequency loops; aggregate off-chain where possible to minimize gas.
+- Indexers should rely on `fee-accrued` + `fin-period-finalized` events for real-time dashboards.
+
 ### TypeScript Style Guide
 
 ```typescript

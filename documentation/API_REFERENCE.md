@@ -139,6 +139,78 @@ Clarinet console uses a local stacks-devnet under the hood; to interact programm
 - Use post-conditions in contract-calls to guard against unintended transfers.
 - Keep arguments small to minimize gas and payload size.
 
+## Financial Ledger & Fee Event Indexing (enhanced-analytics)
+
+When `financial-ledger-enabled` is true in `enhanced-analytics`, the protocol emits standardized events for revenue & expenses enabling deterministic off‑chain indexing:
+
+Event Shapes (JSON printed via Clarity `print`):
+
+1. Fee Accrual
+```json
+{ "event": "fee-accrued", "source": <uint>, "amount": <uint>, "performance": <bool> }
+```
+`source` enumeration:
+| Code | Constant | Description |
+|------|----------|-------------|
+| 0 | FEE_SRC_DEPOSIT | Deposit fee |
+| 1 | FEE_SRC_WITHDRAW | Withdrawal fee |
+| 2 | FEE_SRC_PERFORMANCE | Performance / carry fee |
+| 3 | FEE_SRC_FLASH_LOAN | Flash loan fee |
+| 4 | FEE_SRC_LIQUIDATION | Liquidation penalty fee |
+| 5 | FEE_SRC_TRADING | AMM / trading fee |
+| 6 | FEE_SRC_STRATEGY | Strategy harvest skim |
+| 7 | FEE_SRC_MISC | Miscellaneous / uncategorized |
+
+2. Rebate / Incentive
+```json
+{ "event": "fin-rebate-recorded", "amount": <uint> }
+```
+
+3. Operating Expense
+```json
+{ "event": "fin-op-ex-recorded", "amount": <uint> }
+```
+
+4. Extraordinary Item
+```json
+{ "event": "fin-extraordinary-recorded", "amount": <uint> }
+```
+
+5. Buyback
+```json
+{ "event": "fin-buyback-recorded", "amount": <uint> }
+```
+
+6. Distribution
+```json
+{ "event": "fin-distribution-recorded", "amount": <uint> }
+```
+
+7. Period Finalization
+```json
+{ "event": "fin-period-finalized", "period-type": <uint>, "period-id": <uint>, "gross": <uint>, "net": <uint>, "adjusted-ebitda": <uint> }
+```
+
+8. Ledger Toggle
+```json
+{ "event": "fin-ledger-toggled", "enabled": <bool> }
+```
+
+Indexing Recommendations:
+- Treat each `fee-accrued` as atomic line item; aggregate by (source, period-id) off‑chain.
+- Reconstruct period snapshots by joining `fin-period-finalized` (authoritative) with accumulated events inside the period for audit replay.
+- Use `derive-epoch-period-id`, `derive-month-period-id`, `derive-quarter-period-id` (read-only) for deterministic bucketing alignment with on-chain finalization keys.
+- Ignore any fee forwarding attempt failures silently (vault integration intentionally non-reverting); absence of events may indicate feature flag disabled or authorization constraints.
+
+Integrity Tips:
+- Cross-check `gross` in finalized snapshot equals sum(fee-accrued.amount where period + performance rebates adjustments) minus rebates (clipped at zero).
+- `adjusted-ebitda` formula: `(net - operating-expenses) + extraordinary-items - buybacks - distributions` with zero floor applied per subtraction step.
+
+Planned Extensions:
+- Strategy adapters to emit `fee-accrued` directly (source=6) during harvests.
+- DEX pools to map swap fee distribution to source=5.
+
+
 ## Router Error Codes (Multi-Hop Router)
 
 | Code | Symbol | Description |

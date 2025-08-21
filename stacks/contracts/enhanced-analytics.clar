@@ -283,6 +283,32 @@
 (define-read-only (get-financial-ledger-enabled)
   (var-get financial-ledger-enabled))
 
+;; Helper period id derivation (simple deterministic formulas; can evolve)
+;; Epoch: use block-height directly (caller may bucket externally).
+(define-read-only (derive-epoch-period-id)
+  block-height)
+
+;; Monthly (approx): block-height / 4320 (~30 days @ 10 min blocks) -> coarse integer bucket.
+(define-read-only (derive-month-period-id)
+  (/ block-height u4320))
+
+;; Quarterly: month-bucket / 3.
+(define-read-only (derive-quarter-period-id)
+  (/ (/ block-height u4320) u3))
+
+;; Preview current (unfinalized) accumulator snapshot (does not imply an open period structure on-chain)
+(define-read-only (get-financial-unfinalized)
+  {
+    enabled: (var-get financial-ledger-enabled),
+    gross-revenue: (var-get fin-gross-revenue),
+    performance-fees: (var-get fin-performance-fees),
+    rebates: (var-get fin-rebates),
+    operating-expenses: (var-get fin-operating-expenses),
+    extraordinary-items: (var-get fin-extraordinary-items),
+    buybacks: (var-get fin-buybacks),
+    distributions: (var-get fin-distributions)
+  })
+
 ;; Governance toggle for ledger feature
 (define-public (set-financial-ledger-enabled (enabled bool))
   (begin
