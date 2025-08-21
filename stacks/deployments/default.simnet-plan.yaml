@@ -71,6 +71,11 @@ plan:
             path: contracts/avg-token.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: automation-trigger
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/automation-trigger.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: avlp-token
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/avlp-token.clar
@@ -150,14 +155,14 @@ plan:
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/dex-router.clar
             clarity-version: 2
+      epoch: "2.4"
+    - id: 1
+      transactions:
         - emulated-contract-publish:
             contract-name: enhanced-yield-strategy
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/enhanced-yield-strategy.clar
             clarity-version: 2
-      epoch: "2.4"
-    - id: 1
-      transactions:
         - emulated-contract-publish:
             contract-name: strategy-trait
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ

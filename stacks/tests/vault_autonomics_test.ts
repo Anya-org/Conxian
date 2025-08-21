@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { initSimnet } from "@hirosystems/clarinet-sdk";
 import { Cl } from "@stacks/transactions";
+import { getUintValue } from '../utils/clarity-helpers';
 
 describe("Vault Autonomics (SDK) - PRD VAULT-AUTONOMICS alignment", () => {
   let simnet: any;
@@ -38,12 +39,12 @@ describe("Vault Autonomics (SDK) - PRD VAULT-AUTONOMICS alignment", () => {
     const feesResult = simnet.callReadOnlyFn("vault", "get-fees", [], wallet1);
     expect(feesResult.result.type).toBe('tuple'); // get-fees returns tuple directly
     const feesTuple = feesResult.result;
-    const depositFee = feesTuple.value["deposit-bps"].value;
-    const withdrawFee = feesTuple.value["withdraw-bps"].value;
+    const depositFee = getUintValue(feesTuple.value["deposit-bps"]);
+    const withdrawFee = getUintValue(feesTuple.value["withdraw-bps"]);
 
     // Validate fee bounds (should be within 0-10000 bps)
-    expect(depositFee >= 0n && depositFee <= 10000n).toBe(true);
-    expect(withdrawFee >= 0n && withdrawFee <= 10000n).toBe(true);
+    expect(depositFee >= 0 && depositFee <= 10000).toBe(true);
+    expect(withdrawFee >= 0 && withdrawFee <= 10000).toBe(true);
     
     console.log(`Current fees - Deposit: ${depositFee}bps, Withdraw: ${withdrawFee}bps`);
 

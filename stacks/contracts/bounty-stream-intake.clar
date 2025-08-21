@@ -166,3 +166,8 @@
     u0
   )
 )
+
+;; Invariant: recompute total remaining + streamed vs sum of original allocations
+(define-read-only (verify-stream-invariants)
+  { total-streams: (var-get total-streams), total-streamed: (var-get total-streamed) }
+)

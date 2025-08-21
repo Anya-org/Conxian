@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { initSimnet } from "@hirosystems/clarinet-sdk";
 import { Cl } from "@stacks/transactions";
+import { getUintValue } from '../utils/clarity-helpers';
 
 describe("Vault Shares (SDK) - PRD VAULT-SHARES alignment", () => {
   let simnet: any;
@@ -52,7 +53,7 @@ describe("Vault Shares (SDK) - PRD VAULT-SHARES alignment", () => {
   console.log("Deposit 2 result:", dep2.result);
   expect(dep1.result.type).toBe('ok');
   expect(dep2.result.type).toBe('ok');
-  expect(dep1.result.value.value).toBe(dep2.result.value.value);
+  expect(getUintValue(dep1.result)).toBe(getUintValue(dep2.result));
   });
 
   it("PRD VAULT-SHARES-ROUNDING: withdraw rounding uses ceil on shares burn and preserves NAV", async () => {
@@ -68,19 +69,19 @@ describe("Vault Shares (SDK) - PRD VAULT-SHARES alignment", () => {
     const deposit = simnet.callPublicFn("vault", "deposit", [Cl.uint(100)], wallet1);
     expect(deposit.result.type).toBe('ok');
     // fee = floor(100*30/10000)=0; credited=100
-    expect(deposit.result.value.value).toBe(100n);
+    expect(getUintValue(deposit.result)).toBe(100);
 
     // Withdraw 1 unit; fee withdraw 10 bps => floor(1*10/10000)=0; payout = 1
     const withdraw = simnet.callPublicFn("vault", "withdraw", [Cl.uint(1)], wallet1);
     expect(withdraw.result.type).toBe('ok');
-    expect(withdraw.result.value.value).toBe(1n);
+    expect(getUintValue(withdraw.result)).toBe(1);
 
     // NAV decreases by exactly 1
     const tvl = simnet.callReadOnlyFn("vault", "get-total-balance", [], deployer);
-    expect(tvl.result.value).toBe(99n);
+    expect(getUintValue(tvl.result)).toBe(99);
 
     // Balance equals 99
     const b1 = simnet.callReadOnlyFn("vault", "get-balance", [Cl.principal(wallet1)], wallet1);
-    expect(b1.result.value).toBe(99n);
+    expect(getUintValue(b1.result)).toBe(99);
   });
 });

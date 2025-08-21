@@ -166,6 +166,15 @@
   (get-rolling-participation-bps)
 )
 
+;; Simplified invariant view (full recompute omitted for cost efficiency)
+(define-read-only (verify-rolling-window)
+  {
+    stored-votes: (var-get rolling-votes),
+    stored-supply: (var-get rolling-supply-sum),
+    last-index: (var-get last-window-index),
+    window-size: WINDOW_SIZE
+  }
+)
 ;; Admin
 (define-public (set-dao-governance (new-dao principal))
   (begin

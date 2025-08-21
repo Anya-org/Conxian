@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { initSimnet } from '@hirosystems/clarinet-sdk';
 import { Cl } from '@stacks/transactions';
+import { getUintValue } from '../utils/clarity-helpers';
 
 let simnet: any; let accounts: Map<string, any>; let deployer: any; let wallet1: any; let wallet2: any; let wallet3: any;
 
@@ -36,7 +37,7 @@ describe("Bounty System", () => {
     const bountyOpt = getBounty.result as any; // optional wrapper
     const bountyTuple = bountyOpt.value.value; // unwrap option then tuple
     expect(bountyTuple['title'].value).toBe('Bug Fix');
-    expect(bountyTuple['reward-amount'].value).toBe(10000n);
+    expect(getUintValue(bountyTuple['reward-amount'])).toBe(10000);
   });
 
   it("should handle bounty applications", () => {
@@ -89,7 +90,7 @@ describe("Bounty System", () => {
     expect(unauthorizedAssign.result.type).toBe('err');
     if (unauthorizedAssign.result.type === 'err') {
       // Contract checks application existence before authorization, so we get APPLICATION_NOT_FOUND (108)
-      expect(unauthorizedAssign.result.value.value).toBe(108n);
+      expect(getUintValue(unauthorizedAssign.result)).toBe(108);
     }
   });
 });

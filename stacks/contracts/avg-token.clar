@@ -220,7 +220,7 @@
 
 (define-public (advance-epoch)
   (begin
-    (asserts! (is-eq tx-sender (var-get dao-governance)) (err u100))
+  (asserts! (or (is-eq tx-sender (var-get dao-governance)) (is-eq tx-sender .automation-trigger)) (err u100))
     (let ((current (var-get current-epoch)))
       (asserts! (< current u3) (err u305)) ;; cannot advance past epoch 3
       (let ((new-epoch (+ current u1)))
@@ -283,7 +283,7 @@
 ;; Accelerate (higher rate trigger) if participation < threshold (called by governance off metrics)
 (define-public (adaptive-realloc-adjust (participation-bps uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get dao-governance)) (err u100))
+  (asserts! (or (is-eq tx-sender (var-get dao-governance)) (is-eq tx-sender .automation-trigger)) (err u100))
     (let ((current-rate (var-get realloc-rate-bps)))
       (if (< participation-bps u5500) ;; 55% threshold
         (let ((new-rate (if (< current-rate u400) (+ current-rate u50) current-rate)))
@@ -307,6 +307,10 @@
     migrated-avlp: (var-get migrated-avlp),
     blocks-remaining: (if (<= block-height EPOCH_3_END) (- EPOCH_3_END block-height) u0)
   }
+)
+
+(define-read-only (get-realloc-rate-bps)
+  (var-get realloc-rate-bps)
 )
 
 (define-read-only (get-claimable-revenue (user principal) (epoch uint))
