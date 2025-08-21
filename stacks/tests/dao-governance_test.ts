@@ -82,18 +82,17 @@ describe('DAO Governance (SDK) - PRD alignment', () => {
 
   it('PRD GOV-EMERGENCY: emergency pause authorization', () => {
     // Test that emergency pause requires proper authorization
-    // First test with unauthorized caller (deployer) - should fail with err 100
-    const ep1 = simnet.callPublicFn('dao-governance','emergency-pause',[], deployer);
+    // First test with unauthorized caller (wallet2) - should fail with err 100
+    const ep1 = simnet.callPublicFn('dao-governance','emergency-pause',[], wallet2);
     expect(ep1.result.type).toBe('err');
     expect((ep1.result as any).value.value).toBe(100n); // ERR_UNAUTHORIZED
     
     // Test with the actual emergency multisig (the contract deployer in simnet)
-    const actualEmergencyMultisig = "STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ";
-    const ep2 = simnet.callPublicFn('dao-governance','emergency-pause',[], actualEmergencyMultisig);
+    const ep2 = simnet.callPublicFn('dao-governance','emergency-pause',[], deployer);
     
-    // This should work if the multisig is set correctly, or fail with different error if vault issue
+    // This should work if the multisig is set correctly
     console.log('Emergency pause result:', JSON.stringify(ep2.result));
-    expect(['ok','err']).toContain(ep2.result.type); // Accept either - main point is authorization check
+    expect(ep2.result.type).toBe('ok');
   });
   
   it('PRD GOV-DELEGATE: vote delegation', () => {
