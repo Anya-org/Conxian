@@ -46,11 +46,6 @@ plan:
             path: contracts/automated-bounty-system.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: automation-trigger
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/automation-trigger.clar
-            clarity-version: 2
-        - emulated-contract-publish:
             contract-name: creator-token
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/creator-token.clar
@@ -59,6 +54,11 @@ plan:
             contract-name: avg-token
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/avg-token.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: automation-trigger
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/automation-trigger.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: avlp-token
@@ -254,6 +254,11 @@ plan:
             path: contracts/traits/vault-admin-trait.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: vault
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/vault.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: timelock
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/timelock.clar
@@ -272,11 +277,6 @@ plan:
             contract-name: twap-oracle-v2-simple
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/twap-oracle-v2-simple.clar
-            clarity-version: 2
-        - emulated-contract-publish:
-            contract-name: vault
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/vault.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: vault-multi-token

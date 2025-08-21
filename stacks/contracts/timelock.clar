@@ -203,8 +203,7 @@
       (begin
         (asserts! (>= block-height (get eta i)) (err u101))
         (map-delete q-paused { id: id })
-  ;; (as-contract (contract-call? .vault set-paused (get p i))) ;; Temporarily disabled to resolve build ordering
-        (ok true)
+        (as-contract (contract-call? .vault set-paused (get p i)))
       )
       (err u102)
     )
