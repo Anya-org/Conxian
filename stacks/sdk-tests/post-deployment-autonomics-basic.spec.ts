@@ -111,9 +111,25 @@ describe('Post-Deployment Autonomics - Basic Tests', () => {
   });
 
   describe('📋 Authorization Model', () => {
-    it.skip('should require authorization for initialization (SDK issue)', () => {
-      // Skip this test due to SDK TypeError issue with user account calls
-      console.log('⚠️ Skipped due to SDK TypeError with user accounts');
+    it('should require authorization for initialization', () => {
+      // Test that unauthorized users cannot initialize the system
+      // Use predefined wallet addresses since SDK account mapping has limitations
+      const unauthorizedUser = 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5'; // wallet_1 equivalent
+      
+      const initResult = simnet.callPublicFn(
+        'post-deployment-autonomics',
+        'initialize-post-deployment',
+        [],
+        unauthorizedUser
+      );
+      
+      // Should fail with ERR_NOT_AUTHORIZED (u100)
+      expect(initResult.result).toEqual({ 
+        type: 'err', 
+        value: { type: 'uint', value: 100n } 
+      });
+      
+      console.log('✅ Unauthorized initialization properly rejected');
     });
 
     it('should allow deployer to initialize', () => {
