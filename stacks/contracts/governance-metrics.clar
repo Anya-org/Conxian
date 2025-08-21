@@ -54,6 +54,15 @@
   )
 )
 
+;; Authorization for enhanced analytics integration
+(define-private (is-authorized)
+  (or (is-eq tx-sender (var-get dao-governance))
+      (is-eq tx-sender (var-get admin))
+      (is-eq tx-sender .enhanced-analytics)))
+
+;; Add admin variable
+(define-data-var admin principal tx-sender)
+
 ;; --- Recording Functions (called by dao-governance) ---
 (define-public (record-proposal-created (proposal-id uint) (start-block uint) (end-block uint) (supply-snapshot uint) (quorum-bps uint))
   (begin
@@ -176,16 +185,47 @@
   }
 )
 ;; Admin
-(define-public (set-dao-governance (new-dao principal))
+;; --- Enhanced Analytics Integration ---
+
+;; Record data for enhanced analytics
+(define-public (record-enhanced-analytics-data 
+  (participation-bps uint)
+  (market-performance-bps uint)
+  (tvl-growth-bps uint)
+  (volatility-index uint))
   (begin
-    ;; Allow first call by deployer (dao-initialized = false), subsequent updates require current DAO auth
-    (if (var-get dao-initialized)
-      (try! (assert-dao tx-sender))
-      (asserts! (is-eq tx-sender (var-get dao-governance)) (err u600))
-    )
-    (var-set dao-governance new-dao)
-    (var-set dao-initialized true)
-    (print { event: "gm-dao-set", dao: new-dao })
-    (ok true)
-  )
-)
+    (asserts! (is-authorized) (err u620))
+    (try! (contract-call? .enhanced-analytics record-market-data-point 
+                         participation-bps market-performance-bps tvl-growth-bps volatility-index))
+    (print {
+      event: "analytics-data-forwarded",
+      participation: participation-bps,
+      market-perf: market-performance-bps,
+      tvl-growth: tvl-growth-bps,
+      volatility: volatility-index
+    })
+    (ok true)))
+
+;; Get enhanced analytics status
+(define-read-only (get-enhanced-analytics-status)
+  (contract-call? .enhanced-analytics get-analytics-status))
+
+;; Check if reallocation timing is optimal based on predictive models
+(define-read-only (is-optimal-reallocation-timing)
+  (match (contract-call? .enhanced-analytics predict-optimal-reallocation-timing)
+    success (> success u7500) ;; 75% threshold for optimal timing
+    error false))
+
+;; --- Administrative Functions ---
+
+(define-public (set-admin (new-admin principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) (err u601))
+    (var-set admin new-admin)
+    (ok true)))
+
+(define-public (set-governance-contract (new-governance principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) (err u602))
+    (var-set governance-contract new-governance)
+    (ok true)))

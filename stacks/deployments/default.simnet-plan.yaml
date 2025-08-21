@@ -106,6 +106,21 @@ plan:
             path: contracts/circuit-breaker-simple.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: enhanced-analytics
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/enhanced-analytics.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: governance-metrics
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/governance-metrics.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: cross-chain-infrastructure
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/cross-chain-infrastructure.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: gov-token
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/gov-token.clar
@@ -126,11 +141,6 @@ plan:
             path: contracts/dao-automation.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: governance-metrics
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/governance-metrics.clar
-            clarity-version: 2
-        - emulated-contract-publish:
             contract-name: dao-governance
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/dao-governance.clar
@@ -145,6 +155,9 @@ plan:
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/traits/pool-trait.clar
             clarity-version: 2
+      epoch: "2.4"
+    - id: 1
+      transactions:
         - emulated-contract-publish:
             contract-name: dex-pool
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
@@ -155,9 +168,6 @@ plan:
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/dex-router.clar
             clarity-version: 2
-      epoch: "2.4"
-    - id: 1
-      transactions:
         - emulated-contract-publish:
             contract-name: enhanced-yield-strategy
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
@@ -273,6 +283,9 @@ plan:
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/vault-multi-token.clar
             clarity-version: 2
+      epoch: "2.4"
+    - id: 2
+      transactions:
         - emulated-contract-publish:
             contract-name: weighted-pool
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ

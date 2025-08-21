@@ -21,6 +21,7 @@
 ;; Protocol parameters
 (define-constant BPS_DENOM u10000)
 (define-data-var admin principal .timelock)
+(define-data-var oracle-address principal .oracle-aggregator)
 (define-data-var fee-deposit-bps uint u30) ;; 0.30%
 (define-data-var fee-withdraw-bps uint u10) ;; 0.10%
 (define-data-var performance-fee-bps uint u500) ;; 5.00% on yield above benchmark
@@ -48,6 +49,31 @@
 ;; Enhanced revenue tracking
 (define-data-var total-fees-collected uint u0)
 (define-data-var total-performance-fees uint u0)
+
+;; --- Dynamic Economic Safeguards ---
+(define-data-var dynamic-safeguards-enabled bool false)
+(define-data-var baseline-tvl uint u0)
+(define-data-var tvl-growth-cap-multiplier uint u15000) ;; 150% of baseline TVL growth triggers cap adjustment
+(define-data-var market-volatility-threshold uint u1500) ;; 15% volatility triggers safety measures
+(define-data-var emergency-brake-threshold uint u5000) ;; 50% rapid TVL decline triggers emergency measures
+
+;; Dynamic parameters
+(define-data-var current-tvl uint u0)
+(define-data-var tvl-moving-average uint u0)
+(define-data-var volatility-index uint u0)
+(define-data-var dynamic-user-cap uint u340282366920938463463374607431768211455)
+(define-data-var dynamic-global-cap uint u340282366920938463463374607431768211455)
+
+;; Market condition tracking
+(define-data-var last-tvl-update uint u0)
+(define-data-var tvl-update-frequency uint u144) ;; Update every ~24 hours (144 blocks)
+(define-data-var consecutive-decline-blocks uint u0)
+(define-data-var max-decline-blocks uint u72) ;; 12 hours of consecutive decline triggers safety
+
+;; Emergency controls
+(define-data-var emergency-mode bool false)
+(define-data-var emergency-withdrawal-only bool false)
+(define-data-var emergency-triggered-block uint u0)
 (define-data-var yield-benchmark uint u500) ;; 5% annual benchmark for performance fees
 (define-data-var last-performance-calculation uint u0)
 
@@ -573,6 +599,12 @@
     (asserts! (> amount u0) (err u1))
     ;; Guard: legacy path requires DEV mock token; use deposit-v2 for prod
     (asserts! (is-eq (var-get token) .mock-ft) (err u201))
+    
+    ;; Check dynamic safeguards if enabled
+    (if (var-get dynamic-safeguards-enabled)
+      (try! (check-dynamic-limits tx-sender amount))
+      true)
+    
     (let (
         (user tx-sender)
         (current-shares (default-to u0 (get amount (map-get? shares { user: tx-sender }))))
@@ -639,6 +671,12 @@
     (asserts! (is-eq (var-get paused) false) (err u103))
     (asserts! (> amount u0) (err u1))
     (asserts! (is-eq (contract-of ft) (var-get token)) (err u201)) ;; invalid-token
+    
+    ;; Check dynamic safeguards if enabled
+    (if (var-get dynamic-safeguards-enabled)
+      (try! (check-dynamic-limits tx-sender amount))
+      true)
+    
     (let (
         (user tx-sender)
         (current-shares (default-to u0 (get amount (map-get? shares { user: tx-sender }))))
@@ -979,6 +1017,10 @@
 (define-private (is-authorized-admin)
   (is-eq tx-sender (var-get admin)))
 
+;; Oracle authorization check
+(define-private (is-authorized-oracle)
+  (is-eq tx-sender (var-get oracle-address)))
+
 ;; Enhanced fee collection with revenue optimization
 (define-private (collect-enhanced-fees (amount uint) (fee-type (string-ascii 20)))
   (let ((fee-rate (if (is-eq fee-type "deposit")
@@ -1155,5 +1197,244 @@
   )
 )
 
+;; --- Dynamic Economic Safeguards Implementation ---
+
+;; Update TVL metrics and trigger dynamic adjustments
+(define-public (update-tvl-metrics)
+  (begin
+    (asserts! (var-get dynamic-safeguards-enabled) (err u400))
+    (asserts! (or (is-authorized-admin) (is-authorized-oracle)) (err u100))
+    
+    (let ((current-height block-height)
+          (last-update (var-get last-tvl-update))
+          (update-interval (var-get tvl-update-frequency)))
+      
+      ;; Only update if enough time has passed
+      (asserts! (>= (- current-height last-update) update-interval) (err u401))
+      
+      (let ((new-tvl (var-get total-balance))
+            (previous-tvl (var-get current-tvl))
+            (baseline (var-get baseline-tvl)))
+        
+        ;; Update TVL tracking
+        (var-set current-tvl new-tvl)
+        (var-set last-tvl-update current-height)
+        
+        ;; Calculate moving average (simplified)
+        (var-set tvl-moving-average (/ (+ (var-get tvl-moving-average) new-tvl) u2))
+        
+        ;; Calculate volatility index
+        (let ((volatility (calculate-tvl-volatility new-tvl previous-tvl)))
+          (var-set volatility-index volatility)
+          
+          ;; Check for emergency conditions
+          (if (is-emergency-condition new-tvl previous-tvl volatility)
+            (try! (trigger-emergency-measures "tvl-volatility"))
+            true)
+          
+          ;; Update dynamic caps based on TVL growth
+          (try! (update-dynamic-caps new-tvl baseline volatility))
+          
+          ;; Record analytics data
+          (try! (record-tvl-analytics new-tvl previous-tvl volatility))
+          
+          (print {
+            event: "tvl-metrics-updated",
+            new-tvl: new-tvl,
+            previous-tvl: previous-tvl,
+            volatility: volatility,
+            moving-average: (var-get tvl-moving-average),
+            dynamic-user-cap: (var-get dynamic-user-cap),
+            dynamic-global-cap: (var-get dynamic-global-cap)
+          })
+          (ok new-tvl)))))
+
+;; Update dynamic caps based on TVL growth and market conditions
+(define-private (update-dynamic-caps (current-tvl uint) (baseline-tvl uint) (volatility uint))
+  (begin
+    (let ((tvl-growth-ratio (if (> baseline-tvl u0) 
+                              (/ (* current-tvl u10000) baseline-tvl) 
+                              u10000))) ;; 100% if no baseline
+      
+      ;; Adjust user cap based on TVL growth
+      (let ((base-user-cap (var-get user-cap))
+            (tvl-growth-factor (if (> tvl-growth-ratio (var-get tvl-growth-cap-multiplier))
+                                u5000  ;; Reduce to 50% if excessive growth
+                                u10000))) ;; Keep at 100% normal cap
+        
+        (let ((volatility-factor (if (> volatility (var-get market-volatility-threshold))
+                                   u7500  ;; Reduce to 75% if high volatility
+                                   u10000)) ;; Keep at 100% normal cap
+              (combined-factor (/ (* tvl-growth-factor volatility-factor) u10000)))
+          
+          (var-set dynamic-user-cap (/ (* base-user-cap combined-factor) u10000))
+          
+          ;; Adjust global cap similarly
+          (let ((base-global-cap (var-get global-cap))
+                (new-global-cap (/ (* base-global-cap combined-factor) u10000)))
+            (var-set dynamic-global-cap new-global-cap)
+            
+            ;; Update enhanced analytics with cap adjustments
+            (try! (contract-call? .enhanced-analytics update-dynamic-caps current-tvl volatility))
+            (ok true))))))
+
+;; Check for emergency conditions requiring immediate action
+(define-private (is-emergency-condition (current-tvl uint) (previous-tvl uint) (volatility uint))
+  (let ((decline-percentage (if (> previous-tvl u0)
+                              (/ (* (- previous-tvl current-tvl) u10000) previous-tvl)
+                              u0)))
+    (or 
+      ;; Rapid TVL decline exceeds emergency threshold
+      (> decline-percentage (var-get emergency-brake-threshold))
+      ;; Extremely high volatility
+      (> volatility (* (var-get market-volatility-threshold) u3))
+      ;; Consecutive decline blocks exceed maximum
+      (> (var-get consecutive-decline-blocks) (var-get max-decline-blocks)))))
+
+;; Trigger emergency safety measures
+(define-private (trigger-emergency-measures (reason (string-ascii 32)))
+  (begin
+    (var-set emergency-mode true)
+    (var-set emergency-triggered-block block-height)
+    
+    ;; Enable withdrawal-only mode for safety
+    (var-set emergency-withdrawal-only true)
+    
+    ;; Reduce caps to minimum safe levels
+    (var-set dynamic-user-cap (/ (var-get dynamic-user-cap) u10)) ;; 10% of current cap
+    (var-set dynamic-global-cap (/ (var-get dynamic-global-cap) u10))
+    
+    ;; Pause new deposits if not already paused
+    (if (not (var-get paused))
+      (var-set paused true)
+      true)
+    
+    (print {
+      event: "emergency-measures-triggered",
+      reason: reason,
+      block: block-height,
+      emergency-mode: true,
+      withdrawal-only: true,
+      reduced-caps: true
+    })
+    (ok true)))
+
+;; Calculate TVL volatility index
+(define-private (calculate-tvl-volatility (current-tvl uint) (previous-tvl uint))
+  (if (> previous-tvl u0)
+    (let ((change (if (> current-tvl previous-tvl) 
+                    (- current-tvl previous-tvl) 
+                    (- previous-tvl current-tvl)))
+          (volatility-bps (/ (* change u10000) previous-tvl)))
+      (if (> volatility-bps u10000) u10000 volatility-bps)) ;; Cap at 100%
+    u0))
+
+;; Record TVL analytics for enhanced analytics contract
+(define-private (record-tvl-analytics (current-tvl uint) (previous-tvl uint) (volatility uint))
+  (let ((participation-bps (unwrap! (contract-call? .governance-metrics get-rolling-participation-bps) (err u402)))
+        (tvl-growth-bps (if (> previous-tvl u0)
+                          (/ (* (- current-tvl previous-tvl) u10000) previous-tvl)
+                          u0))
+        (market-performance-bps u5000)) ;; Placeholder - would integrate with price oracle
+    
+    (contract-call? .enhanced-analytics record-market-data-point
+                   participation-bps market-performance-bps tvl-growth-bps volatility)))
+
+;; Reset emergency mode (admin only)
+(define-public (reset-emergency-mode)
+  (begin
+    (asserts! (is-authorized-admin) (err u100))
+    (asserts! (var-get emergency-mode) (err u403))
+    
+    ;; Ensure sufficient time has passed since emergency triggered
+    (asserts! (>= (- block-height (var-get emergency-triggered-block)) u144) (err u404)) ;; 24 hours
+    
+    (var-set emergency-mode false)
+    (var-set emergency-withdrawal-only false)
+    
+    ;; Restore normal caps (admin should review before unpausing)
+    (var-set dynamic-user-cap (var-get user-cap))
+    (var-set dynamic-global-cap (var-get global-cap))
+    
+    (print {
+      event: "emergency-mode-reset",
+      block: block-height,
+      time-since-emergency: (- block-height (var-get emergency-triggered-block))
+    })
+    (ok true)))
+
+;; Check current dynamic limits for deposits
+(define-private (check-dynamic-limits (user principal) (amount uint))
+  (let ((user-shares (default-to u0 (get amount (map-get? shares { user: user }))))
+        (user-limit (var-get dynamic-user-cap))
+        (global-limit (var-get dynamic-global-cap))
+        (current-global-usage (var-get total-balance)))
+    
+    ;; Check dynamic user cap
+    (asserts! (<= (+ user-shares amount) user-limit) (err u405))
+    
+    ;; Check dynamic global cap
+    (asserts! (<= (+ current-global-usage amount) global-limit) (err u406))
+    
+    ;; Check emergency mode restrictions
+    (asserts! (not (var-get emergency-withdrawal-only)) (err u407))
+    
+    (ok true)))
+
+;; Administrative functions for dynamic safeguards
+(define-public (set-dynamic-safeguards-enabled (enabled bool))
+  (begin
+    (asserts! (is-authorized-admin) (err u100))
+    (var-set dynamic-safeguards-enabled enabled)
+    (ok true)))
+
+(define-public (set-baseline-tvl (tvl uint))
+  (begin
+    (asserts! (is-authorized-admin) (err u100))
+    (var-set baseline-tvl tvl)
+    (ok true)))
+
+(define-public (set-safeguard-parameters 
+  (tvl-growth-multiplier uint)
+  (volatility-threshold uint)
+  (emergency-threshold uint))
+  (begin
+    (asserts! (is-authorized-admin) (err u100))
+    (var-set tvl-growth-cap-multiplier tvl-growth-multiplier)
+    (var-set market-volatility-threshold volatility-threshold)
+    (var-set emergency-brake-threshold emergency-threshold)
+    (ok true)))
+
+;; Read-only functions for monitoring
+(define-read-only (get-dynamic-safeguards-status)
+  {
+    enabled: (var-get dynamic-safeguards-enabled),
+    emergency-mode: (var-get emergency-mode),
+    withdrawal-only: (var-get emergency-withdrawal-only),
+    current-tvl: (var-get current-tvl),
+    baseline-tvl: (var-get baseline-tvl),
+    volatility-index: (var-get volatility-index),
+    dynamic-user-cap: (var-get dynamic-user-cap),
+    dynamic-global-cap: (var-get dynamic-global-cap),
+    consecutive-decline-blocks: (var-get consecutive-decline-blocks)
+  })
+
+(define-read-only (get-tvl-metrics)
+  {
+    current-tvl: (var-get current-tvl),
+    moving-average: (var-get tvl-moving-average),
+    volatility-index: (var-get volatility-index),
+    last-update: (var-get last-tvl-update),
+    update-frequency: (var-get tvl-update-frequency)
+  })
+
 ;; u200: token-transfer-failed
 ;; u201: invalid-token
+;; u400: dynamic-safeguards-disabled
+;; u401: tvl-update-too-frequent
+;; u402: analytics-recording-failed
+;; u403: not-in-emergency-mode
+;; u404: emergency-cooldown-not-elapsed
+;; u405: dynamic-user-cap-exceeded
+;; u406: dynamic-global-cap-exceeded
+;; u407: emergency-withdrawal-only-mode

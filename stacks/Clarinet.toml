@@ -370,6 +370,20 @@ path = "contracts/post-deployment-autonomics.clar"
 clarity_version = 2
 epoch = "2.4"
 
+# ===========================================
+# ENHANCED ANALYTICS & CROSS-CHAIN INFRASTRUCTURE
+# ===========================================
+
+[contracts.enhanced-analytics]
+path = "contracts/enhanced-analytics.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.cross-chain-infrastructure]
+path = "contracts/cross-chain-infrastructure.clar"
+clarity_version = 2
+epoch = "2.4"
+
 
 
 
