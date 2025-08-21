@@ -146,7 +146,7 @@ function main() {
   lines.push('  1. Record mnemonic on paper (ink, not erasable).');
   lines.push('  2. Store in two geotextically separate secure locations.');
   lines.push('  3. Optionally store encrypted in a password manager (never plain text cloud docs).');
-  lines.push('  4. Do NOT phototext or email the mnemonic.');
+  lines.push('  4. Do NOT photograph or email the mnemonic.');
   lines.push('  5. Consider using a hardware wallet for production if available.');
 
   const output = lines.join('\n');
