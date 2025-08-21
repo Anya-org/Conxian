@@ -13,7 +13,12 @@ describe('Financial Ledger Feature Flag & Period Finalization', () => {
   it('enables ledger, records fees & expenses, finalizes period with adjusted EBITDA', () => {
     // Initially disabled
     let enabled = simnet.callReadOnlyFn('enhanced-analytics','get-financial-ledger-enabled',[],deployer);
-    expect(enabled.result).toStrictEqual({ type: 'bool', value: false });
+    // Expect a boolean primitive wrapper; normalize forms like {type:'bool',value:false} or {type:'false'}
+    if (enabled.result.type === 'bool') {
+      expect(enabled.result).toStrictEqual({ type: 'bool', value: false });
+    } else {
+      expect(enabled.result.type).toBe('false');
+    }
 
     // Enable (admin = deployer)
     let resp = simnet.callPublicFn('enhanced-analytics','set-financial-ledger-enabled',[Cl.bool(true)], deployer);
