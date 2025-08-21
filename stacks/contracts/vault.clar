@@ -1221,9 +1221,10 @@
 ;; Dynamic caps function temporarily removed during stabilization (previously: update-dynamic-caps)
 
 ;; Check for emergency conditions requiring immediate action
-(define-private (is-emergency-condition (current-tvl uint) (previous-tvl uint) (volatility uint))
-  (let ((decline-percentage (if (> previous-tvl u0)
-                              (/ (* (- previous-tvl current-tvl) u10000) previous-tvl)
+;; NOTE: parameter names intentionally differ from data vars to avoid name shadowing errors
+(define-private (is-emergency-condition (tvl-current uint) (tvl-previous uint) (volatility uint))
+  (let ((decline-percentage (if (> tvl-previous u0)
+                              (/ (* (- tvl-previous tvl-current) u10000) tvl-previous)
                               u0)))
     (or 
       ;; Rapid TVL decline exceeds emergency threshold
@@ -1262,12 +1263,12 @@
     (ok true)))
 
 ;; Calculate TVL volatility index
-(define-private (calculate-tvl-volatility (current-tvl uint) (previous-tvl uint))
-  (if (> previous-tvl u0)
-    (let ((change (if (> current-tvl previous-tvl) 
-                    (- current-tvl previous-tvl) 
-                    (- previous-tvl current-tvl)))
-          (volatility-bps (/ (* change u10000) previous-tvl)))
+(define-private (calculate-tvl-volatility (tvl-current uint) (tvl-previous uint))
+  (if (> tvl-previous u0)
+    (let ((change (if (> tvl-current tvl-previous) 
+                    (- tvl-current tvl-previous) 
+                    (- tvl-previous tvl-current)))
+          (volatility-bps (/ (* change u10000) tvl-previous)))
       (if (> volatility-bps u10000) u10000 volatility-bps)) ;; Cap at 100%
     u0))
 

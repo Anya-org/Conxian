@@ -349,6 +349,39 @@ npx clarinet tx status <tx-id>
 ;; Error codes (descriptive)
 (define-constant ERR_INSUFFICIENT_BALANCE (err u100))
 (define-constant ERR_UNAUTHORIZED_MINT (err u101))
+
+### Chain ID Parameter Naming Convention (NEW)
+
+To prevent the prior `NameAlreadyUsed("chain-id")` compiler error, public & read-only functions must NOT declare parameters exactly named `(chain-id uint)`. Use a prefixed variant such as `p-chain-id`.
+
+Enforcement:
+
+- Static script: `npm run clarity:shadow-check` (see `scripts/static-check.sh`). Fails CI if any `(chain-id uint)` parameter remains.
+- Existing refactors renamed parameters to `p-chain-id` across cross-chain & analytics modules.
+
+Example (bad → good):
+
+```clarity
+;; BAD
+(define-public (sync-chain (chain-id uint)) ...)
+
+;; GOOD
+(define-public (sync-chain (p-chain-id uint))
+  (let ((info (map-get? chain-registry { chain-id: p-chain-id })))
+    ...))
+```
+
+Run before committing:
+
+```bash
+npm run clarity:shadow-check
+```
+
+If it fails, rename only the parameter (keep storage variable identifiers stable unless a formal migration is approved).
+
+Strict Mode (optional / CI only):
+
+Set `AUTOVAULT_STRICT_PARAM_GUARD=1` to additionally scan for any public/read-only parameter that exactly matches a data var (with a small temporary allowlist). Use this in hardened branches prior to release freezes.
 ```
 
 ### TypeScript Style Guide

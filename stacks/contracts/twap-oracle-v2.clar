@@ -258,10 +258,10 @@
     true))
 
 ;; Admin functions
-(define-public (set-manipulation-detection (enabled bool))
+(define-public (set-manipulation-detection (p-enabled bool))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (var-set manipulation-detection-enabled enabled)
+  (var-set manipulation-detection-enabled p-enabled)
     (ok true)))
 
 (define-public (set-max-price-age (new-age uint))

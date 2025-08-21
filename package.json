@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "clarity:shadow-check": "bash scripts/static-check.sh"
+  },
   "dependencies": {
     "npm-cli": "^0.1.0"
   }

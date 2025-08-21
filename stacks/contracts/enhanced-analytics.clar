@@ -88,11 +88,211 @@
 (define-data-var admin principal tx-sender)
 (define-data-var oracle-address principal tx-sender)
 (define-data-var vault-contract principal .vault)
+;; Financial reporting feature flag (default disabled until governance enables)
+(define-data-var financial-ledger-enabled bool false)
 
+;; ---------------- Financial Ledger Data Structures (Feature Flagged) ----------------
+;; Period types: 0=epoch,1=monthly,2=quarterly,3=yearly
+(define-constant PERIOD_TYPE_EPOCH u0)
+(define-constant PERIOD_TYPE_MONTHLY u1)
+(define-constant PERIOD_TYPE_QUARTERLY u2)
+(define-constant PERIOD_TYPE_YEARLY u3)
+
+;; Enumerated fee sources (standardized for analytics + DAO reporting)
+;; These constants allow unified event indexing across vault, DEX pools, treasury, etc.
+;; 0=deposit fee,1=withdraw fee,2=performance fee,3=flash-loan fee,4=liquidation fee,
+;; 5=trading/amm fee,6=strategy yield fee (harvest skim),7=misc/other
+(define-constant FEE_SRC_DEPOSIT u0)
+(define-constant FEE_SRC_WITHDRAW u1)
+(define-constant FEE_SRC_PERFORMANCE u2)
+(define-constant FEE_SRC_FLASH_LOAN u3)
+(define-constant FEE_SRC_LIQUIDATION u4)
+(define-constant FEE_SRC_TRADING u5)
+(define-constant FEE_SRC_STRATEGY u6)
+(define-constant FEE_SRC_MISC u7)
+
+;; Error codes (u800+ reserved for financial ledger)
+;; u800: ledger-disabled
+;; u801: unauthorized
+;; u802: already-finalized
+;; u803: period-open-required
+;; u804: invalid-period-type
+;; u805: not-found
+;; u806: finalize-preconditions-failed
+
+;; Ledger map
+(define-map financial-period-ledger
+  { period-type: uint, period-id: uint }
+  {
+    gross-revenue: uint,
+    performance-fees: uint,
+    rebates: uint,
+    net-revenue: uint,
+    operating-expenses: uint,
+    extraordinary-items: uint,
+    buybacks: uint,
+    distributions: uint,
+    adjusted-ebitda: uint,
+    snapshot-block: uint,
+    closed: bool,
+    data-complete: bool,
+    notes-hash: (string-ascii 64)
+  }
+)
+
+;; Mutable accumulators (reset each period or aggregated externally)
+(define-data-var fin-gross-revenue uint u0)
+(define-data-var fin-performance-fees uint u0)
+(define-data-var fin-rebates uint u0)
+(define-data-var fin-operating-expenses uint u0)
+(define-data-var fin-extraordinary-items uint u0)
+(define-data-var fin-buybacks uint u0)
+(define-data-var fin-distributions uint u0)
+
+;; Helper: ensure ledger feature is enabled
+(define-private (assert-ledger-enabled)
+  (if (var-get financial-ledger-enabled)
+    (ok true)
+    (err u800)))
+
+;; Authorization helper (moved up to avoid forward reference issues in some tooling)
 (define-private (is-authorized)
-  (or (is-eq tx-sender (var-get admin)) 
+  (or (is-eq tx-sender (var-get admin))
       (is-eq tx-sender (var-get oracle-address))
       (is-eq tx-sender .governance-metrics)))
+
+;; Record revenue incrementally (authorized: admin/oracle)
+;; Unified fee recording (supersedes record-revenue).
+;; Adds amount to gross revenue; if source is performance it also increments performance-fees.
+;; Emits standardized event {event: "fee-accrued", source, amount, performance} for indexers.
+(define-public (record-fee (source uint) (amount uint))
+  (begin
+    (try! (assert-ledger-enabled))
+    (asserts! (is-authorized) (err u801))
+    (var-set fin-gross-revenue (+ (var-get fin-gross-revenue) amount))
+    (if (is-eq source FEE_SRC_PERFORMANCE)
+      (var-set fin-performance-fees (+ (var-get fin-performance-fees) amount))
+      true)
+    (print { event: "fee-accrued", source: source, amount: amount, performance: (is-eq source FEE_SRC_PERFORMANCE) })
+    (ok true)))
+
+;; Backward-compatible wrapper (DEPRECATED): retained for any off-chain scripts using old boolean interface.
+;; Maps is-performance=true -> FEE_SRC_PERFORMANCE else FEE_SRC_MISC.
+(define-public (record-revenue (amount uint) (is-performance bool))
+  (begin
+    (try! (record-fee (if is-performance FEE_SRC_PERFORMANCE FEE_SRC_MISC) amount))
+    (ok true)))
+
+;; Record a rebate/incentive (reduces gross to net)
+(define-public (record-rebate (amount uint))
+  (begin
+    (try! (assert-ledger-enabled))
+    (asserts! (is-authorized) (err u801))
+    (var-set fin-rebates (+ (var-get fin-rebates) amount))
+    (print { event: "fin-rebate-recorded", amount: amount })
+    (ok true)))
+
+;; Record operating expense (scheduled or ad-hoc)
+(define-public (record-operating-expense (amount uint))
+  (begin
+    (try! (assert-ledger-enabled))
+    (asserts! (is-authorized) (err u801))
+    (var-set fin-operating-expenses (+ (var-get fin-operating-expenses) amount))
+    (print { event: "fin-op-ex-recorded", amount: amount })
+    (ok true)))
+
+;; Record extraordinary item (security incident, one-off)
+(define-public (record-extraordinary-item (amount uint))
+  (begin
+    (try! (assert-ledger-enabled))
+    (asserts! (is-authorized) (err u801))
+    (var-set fin-extraordinary-items (+ (var-get fin-extraordinary-items) amount))
+    (print { event: "fin-extraordinary-recorded", amount: amount })
+    (ok true)))
+
+;; Record buyback amount
+(define-public (record-buyback (amount uint))
+  (begin
+    (try! (assert-ledger-enabled))
+    (asserts! (is-authorized) (err u801))
+    (var-set fin-buybacks (+ (var-get fin-buybacks) amount))
+    (print { event: "fin-buyback-recorded", amount: amount })
+    (ok true)))
+
+;; Record distribution amount (e.g., to governance / staking)
+(define-public (record-distribution (amount uint))
+  (begin
+    (try! (assert-ledger-enabled))
+    (asserts! (is-authorized) (err u801))
+    (var-set fin-distributions (+ (var-get fin-distributions) amount))
+    (print { event: "fin-distribution-recorded", amount: amount })
+    (ok true)))
+
+;; Finalize a period snapshot. Computes adjusted EBITDA and stores immutable record.
+(define-public (finalize-financial-period (period-type uint) (period-id uint) (data-complete bool) (notes-hash (string-ascii 64)))
+  (begin
+    (try! (assert-ledger-enabled))
+    (asserts! (is-authorized) (err u801))
+    (asserts! (<= period-type PERIOD_TYPE_YEARLY) (err u804))
+    (asserts! (is-none (map-get? financial-period-ledger { period-type: period-type, period-id: period-id })) (err u802))
+    (let (
+          (gross (var-get fin-gross-revenue))
+          (perf (var-get fin-performance-fees))
+          (rebates (var-get fin-rebates))
+          (opx (var-get fin-operating-expenses))
+          (extra (var-get fin-extraordinary-items))
+          (buyb (var-get fin-buybacks))
+          (distr (var-get fin-distributions))
+         )
+      (let ((net (if (> gross rebates) (- gross rebates) u0)))
+        (let ((net-after net))
+          (let ((ebitda (if (> net-after opx) (- net-after opx) u0)))
+            (let ((base (+ ebitda extra)))
+              (let ((after-buybacks (if (> base buyb) (- base buyb) u0)))
+                (let ((adjusted (if (> after-buybacks distr) (- after-buybacks distr) u0)))
+                  (map-set financial-period-ledger { period-type: period-type, period-id: period-id } {
+                    gross-revenue: gross,
+                    performance-fees: perf,
+                    rebates: rebates,
+                    net-revenue: net,
+                    operating-expenses: opx,
+                    extraordinary-items: extra,
+                    buybacks: buyb,
+                    distributions: distr,
+                    adjusted-ebitda: adjusted,
+                    snapshot-block: block-height,
+                    closed: true,
+                    data-complete: data-complete,
+                    notes-hash: notes-hash
+                  })
+                  ;; reset accumulators for next period
+                  (var-set fin-gross-revenue u0)
+                  (var-set fin-performance-fees u0)
+                  (var-set fin-rebates u0)
+                  (var-set fin-operating-expenses u0)
+                  (var-set fin-extraordinary-items u0)
+                  (var-set fin-buybacks u0)
+                  (var-set fin-distributions u0)
+                  (print { event: "fin-period-finalized", period-type: period-type, period-id: period-id, gross: gross, net: net, adjusted-ebitda: adjusted })
+                  (ok { gross: gross, adjusted-ebitda: adjusted })
+                )))))))
+  )
+
+;; Read-only accessors
+(define-read-only (get-financial-period (period-type uint) (period-id uint))
+  (map-get? financial-period-ledger { period-type: period-type, period-id: period-id }))
+
+(define-read-only (get-financial-ledger-enabled)
+  (var-get financial-ledger-enabled))
+
+;; Governance toggle for ledger feature
+(define-public (set-financial-ledger-enabled (enabled bool))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) (err u801))
+    (var-set financial-ledger-enabled enabled)
+    (print { event: "fin-ledger-toggled", enabled: enabled })
+    (ok enabled)))
+
 
 ;; --- Core Analytics Functions ---
 
@@ -230,7 +430,7 @@
 
 ;; Record L2 participation data
 (define-public (record-l2-participation 
-  (l2-chain-id uint)
+  (p-chain-id uint)
   (participants uint)
   (voting-power uint)
   (weight-bps uint))
@@ -238,7 +438,7 @@
     (asserts! (is-authorized) (err u709))
     (asserts! (var-get l2-aggregation-enabled) (err u710))
     
-  (map-set l2-participation-data { chain-id: l2-chain-id } {
+  (map-set l2-participation-data { chain-id: p-chain-id } {
       participants: participants,
       total-voting-power: voting-power,
       last-update: block-height,
@@ -251,7 +451,7 @@
     
     (print {
       event: "l2-participation-recorded",
-  chain-id: l2-chain-id,
+  chain-id: p-chain-id,
       participants: participants,
       voting-power: voting-power,
       weight: weight-bps
@@ -395,8 +595,8 @@
 (define-read-only (get-dynamic-cap-history (epoch uint))
   (map-get? dynamic-cap-history { epoch: epoch }))
 
-(define-read-only (get-l2-participation (chain-id uint))
-  (map-get? l2-participation-data { chain-id: chain-id }))
+(define-read-only (get-l2-participation (p-chain-id uint))
+  (map-get? l2-participation-data { chain-id: p-chain-id }))
 
 (define-read-only (get-enhancement-metrics)
   {
@@ -407,3 +607,5 @@
     tvl-growth-multiplier: (var-get tvl-growth-multiplier),
     cross-chain-weight: (var-get cross-chain-weight-bps)
   })
+
+;; EOF safeguard: ensure all parens closed

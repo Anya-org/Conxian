@@ -91,11 +91,6 @@ plan:
             path: contracts/circuit-breaker-simple.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: governance-metrics
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/governance-metrics.clar
-            clarity-version: 2
-        - emulated-contract-publish:
             contract-name: cross-chain-infrastructure
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/cross-chain-infrastructure.clar
@@ -114,6 +109,11 @@ plan:
             contract-name: dao-automation
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/dao-automation.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: governance-metrics
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/governance-metrics.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: dao-governance

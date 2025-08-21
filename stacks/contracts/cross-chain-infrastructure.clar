@@ -90,7 +90,7 @@
 ;; --- Administrative Functions ---
 
 (define-public (register-chain 
-  (chain-id uint)
+  (p-chain-id uint)
   (chain-name (string-ascii 32))
   (contract-address (string-ascii 64))
   (weight-bps uint)
@@ -100,13 +100,13 @@
     (asserts! (is-eq tx-sender (var-get admin)) (err u100))
     (asserts! (< (var-get total-registered-chains) MAX_SUPPORTED_CHAINS) (err u101))
     (asserts! (and (>= weight-bps MIN_CHAIN_WEIGHT_BPS) (<= weight-bps MAX_CHAIN_WEIGHT_BPS)) (err u102))
-    (asserts! (is-none (map-get? chain-registry { chain-id: chain-id })) (err u103))
+  (asserts! (is-none (map-get? chain-registry { chain-id: p-chain-id })) (err u103))
     
     ;; Verify total L2 weight doesn't exceed limit
     (let ((current-l2-weight (calculate-total-l2-weight)))
       (asserts! (<= (+ current-l2-weight weight-bps) (var-get total-l2-weight-bps)) (err u104)))
     
-    (map-set chain-registry { chain-id: chain-id } {
+  (map-set chain-registry { chain-id: p-chain-id } {
       chain-name: chain-name,
       contract-address: contract-address,
       weight-bps: weight-bps,
@@ -122,31 +122,31 @@
     
     (print {
       event: "chain-registered",
-      chain-id: chain-id,
+  chain-id: p-chain-id,
       chain-name: chain-name,
       weight-bps: weight-bps,
       total-chains: (var-get total-registered-chains)
     })
-    (ok chain-id)))
+  (ok p-chain-id)))
 
 ;; --- Cross-Chain Participation Tracking ---
 
 (define-public (record-l2-participation-snapshot
-  (chain-id uint)
+  (p-chain-id uint)
   (snapshot-id uint)
   (participants uint)
   (voting-power uint)
   (proposals-voted uint))
   (begin
     (asserts! (or (is-eq tx-sender (var-get admin)) (is-eq tx-sender (var-get cross-chain-oracle))) (err u105))
-    (let ((chain-info (unwrap! (map-get? chain-registry { chain-id: chain-id }) (err u106))))
+  (let ((chain-info (unwrap! (map-get? chain-registry { chain-id: p-chain-id }) (err u106))))
       (asserts! (get active chain-info) (err u107))
       
       (let ((participation-rate (if (> (get total-participants chain-info) u0)
                                   (/ (* participants u10000) (get total-participants chain-info))
                                   u0)))
         
-        (map-set participation-snapshots { chain-id: chain-id, snapshot-id: snapshot-id } {
+  (map-set participation-snapshots { chain-id: p-chain-id, snapshot-id: snapshot-id } {
           participants: participants,
           voting-power: voting-power,
           proposals-voted: proposals-voted,
@@ -156,7 +156,7 @@
         })
         
         ;; Update chain registry with latest data
-        (map-set chain-registry { chain-id: chain-id } 
+  (map-set chain-registry { chain-id: p-chain-id } 
           (merge chain-info {
             total-participants: participants,
             total-voting-power: voting-power,
@@ -169,7 +169,7 @@
         
         (print {
           event: "l2-participation-recorded",
-          chain-id: chain-id,
+          chain-id: p-chain-id,
           snapshot-id: snapshot-id,
           participants: participants,
           voting-power: voting-power,
@@ -217,7 +217,7 @@
 ;; Record voting results from a specific chain
 (define-public (record-chain-voting-result
   (proposal-id uint)
-  (chain-id uint)
+  (p-chain-id uint)
   (votes-for uint)
   (votes-against uint)
   (abstain uint)
@@ -226,13 +226,13 @@
   (begin
     (asserts! (or (is-eq tx-sender (var-get admin)) (is-eq tx-sender (var-get cross-chain-oracle))) (err u111))
     
-    (let ((proposal (unwrap! (map-get? cross-chain-proposals { proposal-id: proposal-id }) (err u112)))
-          (chain-info (unwrap! (map-get? chain-registry { chain-id: chain-id }) (err u113))))
+  (let ((proposal (unwrap! (map-get? cross-chain-proposals { proposal-id: proposal-id }) (err u112)))
+      (chain-info (unwrap! (map-get? chain-registry { chain-id: p-chain-id }) (err u113))))
       
       (asserts! (get active chain-info) (err u114))
       (asserts! (< block-height (get voting-deadline proposal)) (err u115)) ;; Still in voting period
       
-      (map-set chain-voting-results { proposal-id: proposal-id, chain-id: chain-id } {
+  (map-set chain-voting-results { proposal-id: proposal-id, chain-id: p-chain-id } {
         votes-for: votes-for,
         votes-against: votes-against,
         abstain: abstain,
@@ -245,7 +245,7 @@
       (print {
         event: "chain-voting-result-recorded",
         proposal-id: proposal-id,
-        chain-id: chain-id,
+  chain-id: p-chain-id,
         votes-for: votes-for,
         votes-against: votes-against,
         participation-rate: participation-rate
@@ -318,8 +318,8 @@
   ;; Sum all registered L2 chain weights
   (fold sum-chain-weights (list u1 u2 u3 u4 u5 u6 u7 u8 u9 u10) u0))
 
-(define-private (sum-chain-weights (chain-id uint) (acc uint))
-  (match (map-get? chain-registry { chain-id: chain-id })
+(define-private (sum-chain-weights (p-chain-id uint) (acc uint))
+  (match (map-get? chain-registry { chain-id: p-chain-id })
     chain-info (+ acc (get weight-bps chain-info))
     acc))
 
@@ -331,8 +331,8 @@
   ;; Sum voting power from all active L2 chains
   (fold sum-l2-voting-power (list u1 u2 u3 u4 u5 u6 u7 u8 u9 u10) u0))
 
-(define-private (sum-l2-voting-power (chain-id uint) (acc uint))
-  (match (map-get? chain-registry { chain-id: chain-id })
+(define-private (sum-l2-voting-power (p-chain-id uint) (acc uint))
+  (match (map-get? chain-registry { chain-id: p-chain-id })
     chain-info (if (get active chain-info) 
                   (+ acc (get total-voting-power chain-info)) 
                   acc)
@@ -344,11 +344,11 @@
         { l2-for: u0, l2-against: u0 }))
 
 (define-private (aggregate-chain-votes 
-  (chain-id uint) 
+  (p-chain-id uint) 
   (acc { l2-for: uint, l2-against: uint }))
-  (match (map-get? chain-voting-results { proposal-id: u0, chain-id: chain-id }) ;; Using u0 as placeholder
+  (match (map-get? chain-voting-results { proposal-id: u0, chain-id: p-chain-id }) ;; Using u0 as placeholder
     voting-result 
-      (match (map-get? chain-registry { chain-id: chain-id })
+  (match (map-get? chain-registry { chain-id: p-chain-id })
         chain-info
           (let ((weight (get weight-bps chain-info))
                 (weighted-for (/ (* (get votes-for voting-result) weight) u10000))
@@ -362,17 +362,17 @@
   ;; Calculate weighted average of L2 participation
   (fold sum-weighted-l2-participation (list u1 u2 u3 u4 u5 u6 u7 u8 u9 u10) u0))
 
-(define-private (sum-weighted-l2-participation (chain-id uint) (acc uint))
-  (match (map-get? chain-registry { chain-id: chain-id })
+(define-private (sum-weighted-l2-participation (p-chain-id uint) (acc uint))
+  (match (map-get? chain-registry { chain-id: p-chain-id })
     chain-info 
       (if (get active chain-info)
-        (let ((latest-snapshot (get-latest-participation-snapshot chain-id))
+  (let ((latest-snapshot (get-latest-participation-snapshot p-chain-id))
               (weight (get weight-bps chain-info)))
           (+ acc (/ (* latest-snapshot weight) u10000)))
         acc)
     acc))
 
-(define-private (get-latest-participation-snapshot (chain-id uint))
+(define-private (get-latest-participation-snapshot (p-chain-id uint))
   ;; Get the most recent participation rate for a chain
   u5000) ;; Placeholder - would query latest snapshot
 
@@ -397,11 +397,11 @@
     (var-set total-l2-weight-bps l2-total-weight)
     (ok true)))
 
-(define-public (update-chain-status (chain-id uint) (active bool))
+(define-public (update-chain-status (p-chain-id uint) (active bool))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err u127))
-    (let ((chain-info (unwrap! (map-get? chain-registry { chain-id: chain-id }) (err u128))))
-      (map-set chain-registry { chain-id: chain-id }
+  (let ((chain-info (unwrap! (map-get? chain-registry { chain-id: p-chain-id }) (err u128))))
+  (map-set chain-registry { chain-id: p-chain-id }
         (merge chain-info { active: active }))
       (ok true))))
 
@@ -417,17 +417,17 @@
     last-sync: (var-get last-global-sync)
   })
 
-(define-read-only (get-chain-info (chain-id uint))
-  (map-get? chain-registry { chain-id: chain-id }))
+(define-read-only (get-chain-info (p-chain-id uint))
+  (map-get? chain-registry { chain-id: p-chain-id }))
 
-(define-read-only (get-participation-snapshot (chain-id uint) (snapshot-id uint))
-  (map-get? participation-snapshots { chain-id: chain-id, snapshot-id: snapshot-id }))
+(define-read-only (get-participation-snapshot (p-chain-id uint) (snapshot-id uint))
+  (map-get? participation-snapshots { chain-id: p-chain-id, snapshot-id: snapshot-id }))
 
 (define-read-only (get-cross-chain-proposal (proposal-id uint))
   (map-get? cross-chain-proposals { proposal-id: proposal-id }))
 
-(define-read-only (get-chain-voting-result (proposal-id uint) (chain-id uint))
-  (map-get? chain-voting-results { proposal-id: proposal-id, chain-id: chain-id }))
+(define-read-only (get-chain-voting-result (proposal-id uint) (p-chain-id uint))
+  (map-get? chain-voting-results { proposal-id: proposal-id, chain-id: p-chain-id }))
 
 (define-read-only (calculate-global-participation)
   ;; Decoupled version returns weighted participation using placeholder L1 participation (u5000)
