@@ -54,8 +54,8 @@ and purpose.
 
 ### Enhanced Features
 
-- 10M AVG governance token supply
-- 5M AVLP liquidity token supply
+- 100M AVG governance token supply
+- 50M AVLP liquidity token supply
 - Automated DAO buybacks and treasury management
 - Multi-signature security controls
 - Emergency pause mechanisms

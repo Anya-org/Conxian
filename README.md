@@ -1,23 +1,20 @@
 # AutoVault
 
-[![Tests](https://img.shields.io/badge/Tests-65%2F65%20Passing-green)](https://github.com/Anya-org/AutoVault)
-[![Contracts](https://img.shields.io/badge/Contracts-30%20Compiled-blue)](https://github.com/Anya-org/AutoVault)
+[![Tests](https://img.shields.io/badge/Tests-204%2F204%20Passing-green)](https://github.com/Anya-org/AutoVault)
+[![Contracts](https://img.shields.io/badge/Contracts-51%20Compiled-blue)](https://github.com/Anya-org/AutoVault)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A production-ready DeFi platform on Stacks with enhanced tokenomics,
-automated DAO governance, DEX subsystem groundwork, circuit breaker &
-enterprise monitoring, and Bitcoin-aligned principles.
+A production-ready DeFi platform on Stacks with enhanced tokenomics, automated DAO governance, DEX subsystem groundwork, circuit breaker & enterprise monitoring, and Bitcoin-aligned principles.
 
 ## Status
 
-✅ **Production Ready** – 30 contracts compile successfully with
-65/65 tests passing (unit, integration, production validation, security).
+✅ **Production Ready** – 51 contracts compile successfully with 204/204 tests passing (unit, integration, security, SDK suites; 47/47 test files).
 
 [View Complete Status](./documentation/STATUS.md)
 
 ## Features
 
-- **Enhanced Tokenomics**: 10M AVG governance token, 5M AVLP liquidity token with progressive migration & revenue sharing
+- **Enhanced Tokenomics**: 100M AVG governance token, 50M AVLP liquidity token with progressive migration & revenue sharing
 - **Automated DAO**: Time-weighted voting, timelock, automation & buybacks
 - **DEX Foundations**: Factory, pool, router, math-lib, multi-hop & pool variants (design + partial impl)
 - **Circuit Breaker & Monitoring**: Structured numeric event codes for volatility, volume & liquidity safeguards
@@ -40,8 +37,8 @@ Note: This repo pins Clarinet SDK v3.5.0 via npm. Always use `npx clarinet`.
 git clone https://github.com/Anya-org/AutoVault.git
 cd AutoVault/stacks
 npm install
-npx clarinet check    # ✅ 30 contracts
-npm test          # ✅ 65/65 tests
+npx clarinet check    # ✅ 51 contracts
+npm test              # ✅ 204/204 tests
 ```
 
 ### Deploy
@@ -58,7 +55,7 @@ npm test          # ✅ 65/65 tests
 
 📚 **[Complete Architecture Documentation](./documentation/)**
 
-## Documentation (Aligned – Updated Aug 17, 2025)
+## Documentation (Aligned – Updated Aug 22, 2025)
 
 | Topic | Description |
 |-------|-------------|
@@ -82,4 +79,4 @@ MIT License
 - **Issues**: [Report bugs or request features](https://github.com/Anya-org/AutoVault/issues)
 - **Documentation**: [Complete documentation](./documentation/)
 
-*Counts reflect repository state as of Aug 17, 2025.*
+*Counts reflect repository state as of Aug 22, 2025.*

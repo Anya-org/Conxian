@@ -20,6 +20,7 @@
 - All deployment transactions and blocks anchored
 
 Active security features:
+
 - Emergency pause
 - Time-weighted voting
 - Multi-sig treasury
@@ -40,11 +41,13 @@ Active security features:
 **Testnet Upgrade Plan**
 
 Phases:
+
 - Phase 1 — Non-breaking fixes: oracle auth patch, expanded tests, monitoring enhancements
 - Phase 2 — Feature activations: governance features, DEX routing optimizations, analytics UI improvements
 - Phase 3 — Performance: gas optimizations, cross-contract efficiency, scaling
 
 Execution (local):
+
 ```bash
 cd /workspaces/AutoVault/stacks
 npm run build
@@ -55,6 +58,7 @@ npm run verify-post
 ```
 
 Expected outcome:
+
 - All tests passing (see [STATUS.md](./documentation/STATUS.md))
 - Oracle and timelock integration validated
 - Gas and cross-contract performance improved
@@ -64,12 +68,13 @@ Expected outcome:
 **Pre-Mainnet Checklist**
 
 - [x] 204/204 tests passing
-- [ ] Security audits complete & all 5 AIP implementations verified (see [STATUS.md](./documentation/STATUS.md))
+- [ ] Security audits + AIP verification complete
 - [ ] Full testnet integration verified (timelock, multi-sig, pause)
 - [ ] Deployment guides & feature flags documented in README
 - [ ] Deployment cost and gas profile within target
 
 Operational readiness:
+
 - Governance flow (propose → vote → execute)
 - Vault ops (deposit/withdraw, fees)
 - DEX flows (swap, LP, multi-hop)
