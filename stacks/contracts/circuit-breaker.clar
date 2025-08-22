@@ -19,6 +19,7 @@
 (define-data-var oracle-enabled bool false)
 (define-data-var oracle-contract (optional principal) none)
 
+
 (define-public (set-oracle-config (enabled bool) (oracle principal))
   (begin
     (asserts! (is-admin) (err ERR_UNAUTHORIZED))

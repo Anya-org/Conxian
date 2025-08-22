@@ -120,38 +120,99 @@
 ;; sources). This avoids list iteration recursion limitations.
 (define-map stats { base: principal, quote: principal } { sum: uint, submitted: uint })
 
-;; MEDIAN CALCULATION SYSTEM - Simplified Version
+;; MEDIAN CALCULATION SYSTEM
 ;; Current prices map per oracle for median calculation
 (define-map oracle-prices { base: principal, quote: principal, oracle: principal } uint)
 (define-map price-count { base: principal, quote: principal } uint)
 
 ;; Get current prices and calculate median
 (define-private (collect-prices-and-median (base principal) (quote principal))
-  (let ((count (default-to u0 (map-get? price-count { base: base, quote: quote }))))
-    (if (is-eq count u0)
-        u0
-        ;; For simplicity, use weighted average until we have more oracles
-        ;; In production, this would gather all prices and sort them
-        (let ((stat (map-get? stats { base: base, quote: quote })))
-          (if (is-some stat)
-              (let ((s (unwrap-panic stat)))
-                (/ (get sum s) (get submitted s)))
-              u0)))))
+  ;; Gather fresh prices from current oracles, build sorted list, then pick median
+  (let ((pair (map-get? pairs { base: base, quote: quote })))
+    (match pair p
+      (let ((max-age (var-get max-stale))
+            (oracle-list (get oracles p)))
+        (let ((fresh-prices (collect-fresh-prices base quote oracle-list max-age)))
+          (if (is-eq (len fresh-prices) u0)
+              u0
+              (median-from-sorted (sort-prices fresh-prices)))))
+      u0)))
 
 ;; Update median calculation (simplified for now)
 (define-private (update-median (base principal) (quote principal) (new-price uint) (oracle principal))
   (let ((existing (map-get? oracle-prices { base: base, quote: quote, oracle: oracle }))
         (count (default-to u0 (map-get? price-count { base: base, quote: quote }))))
-    (if (is-some existing)
-        ;; Update existing price
-        (begin
+    (begin
+      (if (is-some existing)
           (map-set oracle-prices { base: base, quote: quote, oracle: oracle } new-price)
-          (collect-prices-and-median base quote))
-        ;; Add new price
-        (begin
-          (map-set oracle-prices { base: base, quote: quote, oracle: oracle } new-price)
-          (map-set price-count { base: base, quote: quote } (+ count u1))
-          (collect-prices-and-median base quote)))))
+          (begin
+            (map-set oracle-prices { base: base, quote: quote, oracle: oracle } new-price)
+            (map-set price-count { base: base, quote: quote } (+ count u1))))
+      (collect-prices-and-median base quote))))
+
+;; Build a list of fresh prices by iterating over oracle principals for this pair
+(define-private (collect-fresh-prices (base principal) (quote principal) (oracle-list (list 10 principal)) (max-age uint))
+  (let ((state { prices: (list), base: base, quote: quote, max-age: max-age }))
+    (get prices (fold collect-fresh-step oracle-list state))))
+
+(define-private (collect-fresh-step (oracle principal) (state { prices: (list 10 uint), base: principal, quote: principal, max-age: uint }))
+  (let ((auth (map-get? oracle-whitelist { base: (get base state), quote: (get quote state), oracle: oracle })))
+    (if (and (is-some auth) (get enabled (unwrap-panic auth)))
+        (let ((sub (map-get? submissions { base: (get base state), quote: (get quote state), oracle: oracle })))
+          (match sub s
+            (let ((age (- block-height (get height s))))
+              (if (<= age (get max-age state))
+                  (merge state { prices: (unwrap-panic (as-max-len? (append (get prices state) (get price s)) u10)) })
+                  state))
+            state))
+        state)))
+
+;; Sort collected prices using insertion into accumulator with a fold
+;; Sorting helpers (no lambdas in Clarity). Insert one element into sorted list.
+(define-private (sorted-insert-scan (y uint) (state { x: uint, inserted: bool, out: (list 10 uint) }))
+  (if (get inserted state)
+      { x: (get x state), inserted: true, out: (unwrap-panic (as-max-len? (append (get out state) y) u10)) }
+      (if (<= (get x state) y)
+          { x: (get x state), inserted: true, out: (unwrap-panic (as-max-len? (append (unwrap-panic (as-max-len? (append (get out state) (get x state)) u10)) y) u10)) }
+          { x: (get x state), inserted: false, out: (unwrap-panic (as-max-len? (append (get out state) y) u10)) })) )
+
+(define-private (sorted-insert-one (x uint) (acc (list 10 uint)))
+  (let ((final (fold sorted-insert-scan acc { x: x, inserted: false, out: (list) })))
+    (if (get inserted final)
+        (get out final)
+        (unwrap-panic (as-max-len? (append (get out final) x) u10)))) )
+
+(define-private (sort-step (x uint) (acc (list 10 uint)))
+  (sorted-insert-one x acc))
+
+(define-private (sort-prices (vals (list 10 uint)))
+  (fold sort-step vals (list)))
+
+;; Compute median from a sorted list
+;; nth helper (0-based) via fold
+(define-private (nth-scan (x uint) (state { idx: uint, target: uint, found: (optional uint) }))
+  (if (is-none (get found state))
+      (if (is-eq (get idx state) (get target state))
+          { idx: (+ (get idx state) u1), target: (get target state), found: (some x) }
+          { idx: (+ (get idx state) u1), target: (get target state), found: none })
+      state))
+
+(define-private (nth (xs (list 10 uint)) (i uint))
+  (let ((res (fold nth-scan xs { idx: u0, target: i, found: none })))
+    (default-to u0 (get found res))))
+
+(define-private (median-from-sorted (xs (list 10 uint)))
+  (let ((n (len xs)))
+    (if (is-eq n u0)
+        u0
+        (let ((mid (/ n u2)))
+          (if (is-eq (* mid u2) n)
+              ;; even: average two middle
+              (let ((a (nth xs (- mid u1)))
+                    (b (nth xs mid)))
+                (/ (+ a b) u2))
+              ;; odd: take middle
+              (nth xs mid))))))
 
 ;; Rolling history (for TWAP / future median). Fixed size ring buffer length 5.
 (define-constant HISTORY_SIZE u5)
@@ -170,6 +231,7 @@
         (map-set meta { base: base, quote: quote } { count: u1, next: u1 })
         true))))
 
+;; Simple average over history (equal-weight). NOTE: Can be upgraded to true time-weighted window.
 (define-read-only (get-twap (base principal) (quote principal))
   (let ((m (map-get? meta { base: base, quote: quote })))
     (match m present
@@ -181,7 +243,7 @@
                       (default-to u0 (get price (map-get? history { base: base, quote: quote, slot: u1 })))
                       (default-to u0 (get price (map-get? history { base: base, quote: quote, slot: u2 })))
                       (default-to u0 (get price (map-get? history { base: base, quote: quote, slot: u3 })))
-                      (default-to u0 (get price (map-get? history { base: base, quote: quote, slot: u4 }))))) )
+                      (default-to u0 (get price (map-get? history { base: base, quote: quote, slot: u4 }))) )))
               (/ s count))))
       u0)))
 
@@ -243,7 +305,10 @@
   (let ((p (map-get? prices { base: base, quote: quote })))
     (if (is-some p)
         (let ((v (unwrap! p (err u997))))
-          (ok { price: (get price v), height: (get height v), sources: (get sources v) }))
+          (let ((age (- block-height (get height v))))
+            (if (> age (var-get max-stale))
+                ERR_STALE
+                (ok { price: (get price v), height: (get height v), sources: (get sources v) }))))
         (err u404))))
 
 (define-read-only (get-params)
