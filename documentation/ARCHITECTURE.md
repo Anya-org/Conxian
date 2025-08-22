@@ -11,21 +11,15 @@ For detailed product-level requirements, see `documentation/prd/` (e.g., `VAULT.
 - Sustainable economics: fee capture to protocol reserve, transparent emissions (if any)
 - BTC-native differentiation: accept BTC-derivatives (e.g., sBTC) and anchor state to Bitcoin
 
-## Core Contracts (Implemented)
 
-- `vault.clar` – Share-based accounting, caps, dynamic fees, precision math integration
-- `treasury.clar` – Buybacks, reserve management, DAO-controlled disbursements
-- `dao-governance.clar` / `dao.clar` – Proposals, time‑weighted voting (AIP-2), execution
-- `timelock.clar` – Queued admin actions & enforced delays
-- `analytics.clar` – Event indexing hook surface
-- `registry.clar` – Contract discovery & coordination
-- `creator-token.clar`, `avg-token.clar`, `avlp-token.clar`, `gov-token.clar` – Token layer & migration logic
-- `bounty-system*.clar` – Manual + automated bounty flows
-- `dao-automation.clar` – Parameter tuning (bounds-enforced)
-- `circuit-breaker.clar` – Volatility / volume / liquidity triggers with numeric event codes
-- `enterprise-monitoring.clar` – Structured telemetry tuples for indexers
-  
-Traits & Interfaces: `vault-trait`, `vault-admin-trait`, `strategy-trait`, `pool-trait`, `sip-010-trait`.
+## Core Contracts (See [`STATUS.md`](./STATUS.md) for live list)
+
+- Vault, Treasury, DAO Governance, Timelock, Analytics, Registry
+- Token Layer: AVG, AVLP, gov-token, creator-token
+- Security: Circuit Breaker, Emergency Pause, Multi-sig Treasury
+- Infrastructure: Bounty System, Monitoring, Traits (SIP-010, vault-trait, etc.)
+
+For detailed product requirements, see [`prd/`](./prd/) and for deployment/test status, see [`TESTNET_DEPLOYMENT_VERIFICATION.md`](../TESTNET_DEPLOYMENT_VERIFICATION.md).
 
 ## Differentiation via Bitcoin Layers (Planned / Partially Enabled)
 

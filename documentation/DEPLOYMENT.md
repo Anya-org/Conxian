@@ -6,6 +6,16 @@
 **Status**: All 32 contracts successfully deployed on Stacks Testnet  
 **Next Phase**: Testnet upgrades and mainnet preparation
 
+---
+
+## Canonical Deployment Status
+
+See [`TESTNET_DEPLOYMENT_VERIFICATION.md`](../TESTNET_DEPLOYMENT_VERIFICATION.md) for:
+- Contract deployment status
+- Deployment cost
+- Upgrade strategy
+- Mainnet readiness
+
 ### ✅ Completed Deployment (August 17, 2025)
 
 All phases completed successfully on Stacks Testnet:

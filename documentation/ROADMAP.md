@@ -208,6 +208,15 @@ AutoVault is committed to:
 
 *This roadmap represents our current vision and may be adjusted based on community input, market conditions, and technological developments.*
 
+
 **Last Updated**: August 17, 2025  
 **Next Review**: September 1, 2025  
 **Status**: Production Ready - Phase 2 In Progress
+
+---
+
+## Canonical Status Reference
+
+See [`STATUS.md`](./STATUS.md) and [`TESTNET_DEPLOYMENT_VERIFICATION.md`](../TESTNET_DEPLOYMENT_VERIFICATION.md) for live status, contract/test counts, and security features.
+
+All roadmap phases are validated against these sources for accuracy.
