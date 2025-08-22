@@ -27,7 +27,6 @@ run_check() {
     
     if eval "$cmd" >/tmp/autocheck_$TOTAL_CHECKS.log 2>&1; then
         echo "✅ PASS"
-        return 0
     else
         echo "❌ FAIL"
         if [[ "$required" == "true" ]]; then
@@ -38,8 +37,9 @@ run_check() {
         else
             echo "   (non-critical - continuing)"
         fi
-        return 1
     fi
+    # Never return non-zero to avoid 'set -e' aborting the script; we track failures via FAILURES
+    return 0
 }
 
 # 1. DEPENDENCIES & ENVIRONMENT
