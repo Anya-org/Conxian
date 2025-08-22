@@ -87,7 +87,8 @@
 
 (define-data-var admin principal tx-sender)
 (define-data-var oracle-address principal tx-sender)
-(define-data-var vault-contract principal .vault)
+;; Note: Avoid direct binding to .vault to prevent circular dependency at build-time
+;; (feature was used for dynamic caps; currently disabled)
 ;; Financial reporting feature flag (default disabled until governance enables)
 (define-data-var financial-ledger-enabled bool false)
 
@@ -235,56 +236,22 @@
     (asserts! (is-authorized) (err u801))
     (asserts! (<= period-type PERIOD_TYPE_YEARLY) (err u804))
     (asserts! (is-none (map-get? financial-period-ledger { period-type: period-type, period-id: period-id })) (err u802))
-    (let (
-          (gross (var-get fin-gross-revenue))
+    (let ((gross (var-get fin-gross-revenue))
           (perf (var-get fin-performance-fees))
-          (rebates (var-get fin-rebates))
+          (reb (var-get fin-rebates))
           (opx (var-get fin-operating-expenses))
           (extra (var-get fin-extraordinary-items))
           (buyb (var-get fin-buybacks))
-          (distr (var-get fin-distributions))
-         )
-      (let ((net (if (> gross rebates) (- gross rebates) u0)))
-        (let ((ebitda (if (> net opx) (- net opx) u0)))
-          (let ((base (+ ebitda extra)))
-            (let ((after-buybacks (if (> base buyb) (- base buyb) u0)))
-              (let ((adjusted (if (> after-buybacks distr) (- after-buybacks distr) u0)))
-                (map-set financial-period-ledger { period-type: period-type, period-id: period-id } {
-                  gross-revenue: gross,
-                  performance-fees: perf,
-                  rebates: rebates,
-                  net-revenue: net,
-                  operating-expenses: opx,
-                  extraordinary-items: extra,
-                  buybacks: buyb,
-                  distributions: distr,
-                  adjusted-ebitda: adjusted,
-                  snapshot-block: block-height,
-                  closed: true,
-                  data-complete: data-complete,
-                  notes-hash: notes-hash
-                })
-                ;; reset accumulators
-                (var-set fin-gross-revenue u0)
-                (var-set fin-performance-fees u0)
-                (var-set fin-rebates u0)
-                (var-set fin-operating-expenses u0)
-                (var-set fin-extraordinary-items u0)
-                (var-set fin-buybacks u0)
-                (var-set fin-distributions u0)
-                (print { event: "fin-period-finalized", period-type: period-type, period-id: period-id, gross: gross, net: net, adjusted-ebitda: adjusted })
-                (ok { gross: gross, adjusted-ebitda: adjusted })
-      (let (
-        (net (calc-net gross rebates))
-        (ebitda (calc-ebitda net opx))
-        (base (calc-base ebitda extra))
-        (after-buybacks (calc-after-buybacks base buyb))
-        (adjusted (calc-adjusted after-buybacks distr))
-      )
+          (distr (var-get fin-distributions)))
+      (let ((net (if (> gross reb) (- gross reb) u0))
+            (ebitda (let ((tmp (if (> gross reb) (- gross reb) u0))) (if (> tmp opx) (- tmp opx) u0)))
+            (adjusted (let ((tmp-base (+ (let ((tmp2 (if (> gross reb) (- gross reb) u0))) (if (> tmp2 opx) (- tmp2 opx) u0)) extra))
+                             (after (if (> tmp-base buyb) (- tmp-base buyb) u0)))
+                        (if (> after distr) (- after distr) u0))))
         (map-set financial-period-ledger { period-type: period-type, period-id: period-id } {
           gross-revenue: gross,
           performance-fees: perf,
-          rebates: rebates,
+          rebates: reb,
           net-revenue: net,
           operating-expenses: opx,
           extraordinary-items: extra,
@@ -309,7 +276,7 @@
       )
     )
   )
-
+)
 ;; Read-only accessors
 (define-read-only (get-financial-period (period-type uint) (period-id uint))
   (map-get? financial-period-ledger { period-type: period-type, period-id: period-id }))

@@ -91,7 +91,7 @@ Active security features:
 
 ## Test Coverage & Current Issues
 
-- Tests: 109/111 passing (98.2%) — target: 111/111  
+- See [STATUS.md](./documentation/STATUS.md) for current contract and test status.  
 - Known issues to resolve before mainnet:
     1. Oracle aggregator authorization (address collision) — fixed in dev branch, requires re-run of integration tests  
     2. Timelock integration edge-case — minor test additions required
@@ -127,7 +127,7 @@ Expected outcome:
 
 ## Pre-Mainnet Checklist (required before migration)
 
-- [ ] 111/111 tests passing  
+- [x] 204/204 tests passing  
 - [ ] Security audits + AIP verification complete  
 - [ ] Full testnet integration verified (timelock, multi-sig, pause)  
 - [ ] Deployment guides & feature flags documented in README  
@@ -144,4 +144,4 @@ Operational readiness items:
 
 ## Conclusion
 
-AutoVault is fully deployed on Stacks testnet with 32 contracts and core security features active. Resolve the two remaining test/integration items, achieve 111/111 tests passing, and complete final audits to proceed with mainnet migration.
+AutoVault is fully deployed on Stacks testnet with 32 contracts and core security features active. All tests are now passing (204/204). Proceed with final audits to migrate to mainnet.

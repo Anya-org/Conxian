@@ -203,7 +203,8 @@
       (begin
         (asserts! (>= block-height (get eta i)) (err u101))
         (map-delete q-paused { id: id })
-        (as-contract (contract-call? .vault set-paused (get p i)))
+  ;; Execute directly against the vault; timelock is the admin by default
+  (as-contract (contract-call? .vault set-paused (get p i)))
       )
       (err u102)
     )
