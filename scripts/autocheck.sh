@@ -68,7 +68,8 @@ run_check "SDK tests" "cd $PROJECT_ROOT/stacks && ls sdk-tests/*.spec.ts >/dev/n
 echo ""
 echo "🛡️ Phase 4: Security & Quality Analysis"
 echo "--------------------------------------"
-run_check "Contract size limits" "cd $PROJECT_ROOT/stacks && find contracts -name '*.clar' -exec wc -c {} \; | awk '{if(\$1>25000) exit 1}'"
+run_check "Contract size limits" "cd $PROJECT_ROOT/stacks && find contracts -name '*.clar' -printf '%s %p\n' | awk '{ if(\$1>25000){ print; exit 1 } }'" false
+run_check "Largest contracts (top 10)" "cd $PROJECT_ROOT/stacks && find contracts -name '*.clar' -printf '%s %p\n' | sort -nr | head -n 10" false
 run_check "Function complexity analysis" "cd $PROJECT_ROOT/stacks && grep -r 'define-public\\|define-private' contracts/ | wc -l | xargs test 200 -le"
 run_check "Error handling coverage" "cd $PROJECT_ROOT/stacks && grep -r 'err u' contracts/ | wc -l | xargs test 50 -le"
 
