@@ -121,7 +121,7 @@ describe("oracle-aggregator median/stale/TWAP", () => {
     });
 
   // TWAP should be average of the 5 values = (100+150+200+250+300)/5 = 200
-    const twap = simnet.callReadOnlyFn("oracle-aggregator", "get-twap", [Cl.principal(base), Cl.principal(quote)], deployer);
-  expect(twap.result).toEqual({ type: "ok", value: { type: "uint", value: 200n } });
+  const twap = simnet.callReadOnlyFn("oracle-aggregator", "get-twap", [Cl.principal(base), Cl.principal(quote)], deployer);
+  expect(twap.result).toEqual({ type: "uint", value: 200n });
   });
 });
