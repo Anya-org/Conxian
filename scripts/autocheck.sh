@@ -53,8 +53,8 @@ run_check "Git status clean" "git diff --quiet && git diff --cached --quiet"
 echo ""
 echo "📜 Phase 2: Contract Compilation & Syntax"
 echo "----------------------------------------"
-run_check "Clarinet contract compilation" "cd $PROJECT_ROOT/stacks && npx clarinet check --no-hints"
-run_check "Contract count verification" "cd $PROJECT_ROOT/stacks && [ \$(npx clarinet check --no-hints 2>/dev/null | grep -o '[0-9]\+ contracts checked' | cut -d' ' -f1) -ge 46 ]"
+run_check "Clarinet contract compilation" "cd $PROJECT_ROOT/stacks && npx clarinet check"
+run_check "Contract count verification" "cd $PROJECT_ROOT/stacks && [ \$(npx clarinet check 2>/dev/null | grep -o '[0-9]\+ contracts checked' | cut -d' ' -f1) -ge 46 ]"
 
 # 3. COMPREHENSIVE TEST SUITE
 echo ""
