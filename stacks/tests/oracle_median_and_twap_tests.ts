@@ -53,8 +53,8 @@ describe("oracle-aggregator median/stale/TWAP", () => {
     const base = `${deployer}.token-a`;
     const quote = `${deployer}.token-b`;
 
-  // Three oracles (odd). Use min-sources=3 so first aggregate occurs on third submission
-  setupPair(base, quote, [deployer, w1, w2], 3);
+  // Four declared oracles, but we'll initially submit from 3 (odd). Use min-sources=3 so first aggregate occurs on third submission
+  setupPair(base, quote, [deployer, w1, w2, w3], 3);
 
     // submissions: 100, 10000 (outlier), 200
     simnet.callPublicFn("oracle-aggregator", "submit-price", [Cl.principal(base), Cl.principal(quote), Cl.uint(100)], deployer);
@@ -69,8 +69,7 @@ describe("oracle-aggregator median/stale/TWAP", () => {
   // Even case: add a 300. Relax deviation guard to 50% so 300 vs 200 passes
   const loosenDev = simnet.callPublicFn("oracle-aggregator", "set-params", [Cl.uint(10), Cl.uint(5000)], deployer);
   expect(loosenDev.result.type).toBe("ok");
-  // Add fourth oracle and submit 300
-    simnet.callPublicFn("oracle-aggregator", "add-oracle", [Cl.principal(base), Cl.principal(quote), Cl.principal(w3)], deployer);
+  // Submit 300 from the fourth oracle declared at registration
     simnet.callPublicFn("oracle-aggregator", "submit-price", [Cl.principal(base), Cl.principal(quote), Cl.uint(300)], w3);
     const medEven = simnet.callReadOnlyFn("oracle-aggregator", "get-median", [Cl.principal(base), Cl.principal(quote)], deployer);
     // sorted [100,200,300,10000] -> median = (200+300)/2 = 250
@@ -110,8 +109,8 @@ describe("oracle-aggregator median/stale/TWAP", () => {
   const loosenDev = simnet.callPublicFn("oracle-aggregator", "set-params", [Cl.uint(10), Cl.uint(5000)], deployer);
   expect(loosenDev.result.type).toBe("ok");
 
-    // Submit sequential prices: 100, 200, 300, 400, 500
-    const vals = [100, 200, 300, 400, 500];
+  // Submit sequential prices that respect 50% deviation cap: 100, 150, 200, 250, 300
+  const vals = [100, 150, 200, 250, 300];
     vals.forEach((v) => {
       const r = simnet.callPublicFn("oracle-aggregator", "submit-price", [Cl.principal(base), Cl.principal(quote), Cl.uint(v)], deployer);
       expect(r.result.type).toBe("ok");
@@ -121,8 +120,8 @@ describe("oracle-aggregator median/stale/TWAP", () => {
       simnet.mineEmptyBlock();
     });
 
-    // TWAP should be average of the 5 values = 300
+  // TWAP should be average of the 5 values = (100+150+200+250+300)/5 = 200
     const twap = simnet.callReadOnlyFn("oracle-aggregator", "get-twap", [Cl.principal(base), Cl.principal(quote)], deployer);
-    expect(twap.result).toEqual({ type: "ok", value: { type: "uint", value: 300n } });
+  expect(twap.result).toEqual({ type: "ok", value: { type: "uint", value: 200n } });
   });
 });
