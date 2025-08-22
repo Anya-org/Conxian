@@ -38,11 +38,11 @@ jobs:
     - name: Run Tests
       run: |
         cd stacks
-        npx clarinet test
+        npm test
     - name: Invariant / Additional Tests (same clarinet invocation picks up new tests)
       run: |
         cd stacks
-        npx clarinet test --filter invariants || true
+        npm test -- -t invariants
     - name: Economic Simulation (dry-run)
       run: |
         python scripts/economic_simulation.py | head -n 30
@@ -53,7 +53,7 @@ jobs:
       run: |
         cd stacks
         npm ci --no-audit --no-fund
-        NETWORK=testnet npm run verify-post || true
+        NETWORK=testnet npm run verify-post
         
     - name: Contract Security Check
       run: |
