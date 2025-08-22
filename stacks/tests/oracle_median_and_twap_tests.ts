@@ -53,8 +53,8 @@ describe("oracle-aggregator median/stale/TWAP", () => {
     const base = `${deployer}.token-a`;
     const quote = `${deployer}.token-b`;
 
-    // Three oracles (odd)
-    setupPair(base, quote, [deployer, w1, w2], 2);
+  // Three oracles (odd). Use min-sources=3 so first aggregate occurs on third submission
+  setupPair(base, quote, [deployer, w1, w2], 3);
 
     // submissions: 100, 10000 (outlier), 200
     simnet.callPublicFn("oracle-aggregator", "submit-price", [Cl.principal(base), Cl.principal(quote), Cl.uint(100)], deployer);
@@ -66,7 +66,10 @@ describe("oracle-aggregator median/stale/TWAP", () => {
     const medOdd = simnet.callReadOnlyFn("oracle-aggregator", "get-median", [Cl.principal(base), Cl.principal(quote)], deployer);
     expect(medOdd.result).toEqual({ type: "ok", value: { type: "uint", value: 200n } });
 
-    // Even case: add a 300
+  // Even case: add a 300. Relax deviation guard to 50% so 300 vs 200 passes
+  const loosenDev = simnet.callPublicFn("oracle-aggregator", "set-params", [Cl.uint(10), Cl.uint(5000)], deployer);
+  expect(loosenDev.result.type).toBe("ok");
+  // Add fourth oracle and submit 300
     simnet.callPublicFn("oracle-aggregator", "add-oracle", [Cl.principal(base), Cl.principal(quote), Cl.principal(w3)], deployer);
     simnet.callPublicFn("oracle-aggregator", "submit-price", [Cl.principal(base), Cl.principal(quote), Cl.uint(300)], w3);
     const medEven = simnet.callReadOnlyFn("oracle-aggregator", "get-median", [Cl.principal(base), Cl.principal(quote)], deployer);
@@ -102,6 +105,10 @@ describe("oracle-aggregator median/stale/TWAP", () => {
     const quote = `${deployer}.token-b`;
 
     setupPair(base, quote, [deployer, w1], 1);
+
+  // Loosen deviation guard to allow increasing sequence without rejections
+  const loosenDev = simnet.callPublicFn("oracle-aggregator", "set-params", [Cl.uint(10), Cl.uint(5000)], deployer);
+  expect(loosenDev.result.type).toBe("ok");
 
     // Submit sequential prices: 100, 200, 300, 400, 500
     const vals = [100, 200, 300, 400, 500];
