@@ -25,7 +25,7 @@ run_check() {
     TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
     echo -n "[$TOTAL_CHECKS] $name... "
     
-    if eval "$cmd" >/tmp/autocheck_$TOTAL_CHECKS.log 2>&1; then
+    if (cd "$PROJECT_ROOT" && bash -c "$cmd") >/tmp/autocheck_$TOTAL_CHECKS.log 2>&1; then
         echo "✅ PASS"
     else
         echo "❌ FAIL"
