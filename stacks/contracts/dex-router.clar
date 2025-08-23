@@ -39,35 +39,28 @@
 ;; DIRECT POOL INTERACTION
 ;; =============================================================================
 
-;; Add liquidity through factory pool lookup
-(define-public (add-liquidity (token-x principal) (token-y principal) (dx uint) (dy uint) (min-shares uint) (deadline uint))
+;; Add liquidity via trait-typed pool reference
+(define-public (add-liquidity-direct (pool <pool-trait>) (dx uint) (dy uint) (min-shares uint) (deadline uint))
   (begin
     (asserts! (not (< deadline block-height)) ERR_DEADLINE)
-    ;; Ensure a pool mapping exists via factory
-  (unwrap! (resolve-pool token-x token-y) ERR_INVALID_POOL)
-  (as-contract (contract-call? .dex-pool add-liquidity dx dy min-shares deadline))
-  )
-)
+    (as-contract (contract-call? pool add-liquidity dx dy min-shares deadline))
+  ))
 
-;; Remove liquidity through factory pool lookup
-(define-public (remove-liquidity (token-x principal) (token-y principal) (shares uint) (min-dx uint) (min-dy uint) (deadline uint))
+;; Remove liquidity via trait-typed pool reference
+(define-public (remove-liquidity-direct (pool <pool-trait>) (shares uint) (min-dx uint) (min-dy uint) (deadline uint))
   (begin
     (asserts! (not (< deadline block-height)) ERR_DEADLINE)
-  (unwrap! (resolve-pool token-x token-y) ERR_INVALID_POOL)
-  (as-contract (contract-call? .dex-pool remove-liquidity shares min-dx min-dy deadline))
-  )
-)
+    (as-contract (contract-call? pool remove-liquidity shares min-dx min-dy deadline))
+  ))
 
-;; Swap through factory pool lookup
-(define-public (swap-exact-in (token-x principal) (token-y principal) (amount-in uint) (min-out uint) (x-to-y bool) (deadline uint))
+;; Swap via trait-typed pool reference
+(define-public (swap-exact-in-direct (pool <pool-trait>) (amount-in uint) (min-out uint) (x-to-y bool) (deadline uint))
   (begin
     (asserts! (not (< deadline block-height)) ERR_DEADLINE)
     (asserts! (> amount-in u0) ERR_INVALID_AMOUNTS)
     (asserts! (> min-out u0) ERR_INVALID_AMOUNTS)
-  (unwrap! (resolve-pool token-x token-y) ERR_INVALID_POOL)
-  (as-contract (contract-call? .dex-pool swap-exact-in amount-in min-out x-to-y deadline))
-  )
-)
+    (as-contract (contract-call? pool swap-exact-in amount-in min-out x-to-y deadline))
+  ))
 
 ;; =============================================================================
 ;; MULTI-HOP ROUTING (Future implementation)
@@ -88,9 +81,14 @@
 ;; UTILITY FUNCTIONS
 ;; =============================================================================
 
-;; Get quote for swap without executing
-(define-read-only (get-amount-out (token-x principal) (token-y principal) (amount-in uint) (x-to-y bool))
-  (match (resolve-pool token-x token-y) p
-    (let ((pr (unwrap-panic (contract-call? .dex-pool get-price))))
-      (if x-to-y (get price-x-y pr) (get price-y-x pr)))
-    u0))
+;; Get quote for swap without executing (via trait-typed pool reference)
+;; Public to support pools that expose get-price as public in some implementations
+(define-public (get-amount-out-direct (pool <pool-trait>) (amount-in uint) (x-to-y bool))
+  (match (contract-call? pool get-price)
+    pr
+    (ok (if x-to-y (get price-x-y pr) (get price-y-x pr)))
+    e
+    (ok u0)))
+
+;; Note: dynamic dispatch by token pair is not supported directly due to Clarity's static type system.
+;; Use the *-direct functions with a pool that implements <pool-trait>.

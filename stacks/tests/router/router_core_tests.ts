@@ -28,10 +28,9 @@ describe("DEX Router + Factory core", () => {
     ], deployer);
     expect(reg.result.type).toBe("ok");
 
-    // Provide initial liquidity via router (which resolves pool through factory)
-    const liq = simnet.callPublicFn("dex-router", "add-liquidity", [
-      Cl.principal(tokenX),
-      Cl.principal(tokenY),
+    // Provide initial liquidity by passing the pool reference to router's direct function
+    const liq = simnet.callPublicFn("dex-router", "add-liquidity-direct", [
+      Cl.contractPrincipal(deployer, "dex-pool"),
       Cl.uint(10000),
       Cl.uint(10000),
       Cl.uint(1),
@@ -42,9 +41,8 @@ describe("DEX Router + Factory core", () => {
     // Swap exact-in via router with slippage bound
     const amountIn = 1000;
     const deadline = simnet.blockHeight + 10;
-    const swap = simnet.callPublicFn("dex-router", "swap-exact-in", [
-      Cl.principal(tokenX),
-      Cl.principal(tokenY),
+    const swap = simnet.callPublicFn("dex-router", "swap-exact-in-direct", [
+      Cl.contractPrincipal(deployer, "dex-pool"),
       Cl.uint(amountIn),
       Cl.uint(800), // min-amount-out slippage bound
       Cl.bool(true),

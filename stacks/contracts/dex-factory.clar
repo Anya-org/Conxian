@@ -2,6 +2,8 @@
 ;; Pool creation and management for multiple pool types
 ;; DEX Factory - creates constant product pools and stores registry
 
+;; Note: we store pool principals, not trait references, to comply with Clarity storage rules.
+
 (define-constant ERR_UNAUTHORIZED u100)
 (define-constant ERR_POOL_EXISTS u101)
 (define-constant ERR_INVALID_FEE u102)
@@ -44,9 +46,7 @@
 
     (let ((id (+ (var-get pool-count) u1)))
       (var-set pool-count id)
-      ;; For now pool contract deployed separately; factory only records mapping.
-      ;; Expect a deploy naming scheme: dex-pool-{id}.clar referencing this registry.
-      (map-set pools { token-x: token-x, token-y: token-y } { pool: (as-contract tx-sender) })
+      ;; Pool deployment occurs separately; use register-pool to record mapping.
       (print { event: "pool-created", id: id, token-x: token-x, token-y: token-y, lp-fee-bps: lp-fee-bps, protocol-fee-bps: protocol-fee-bps })
       (ok id)
     )
