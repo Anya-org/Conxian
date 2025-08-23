@@ -41,7 +41,7 @@
 (define-public (get-fee-info)
   (ok {lp-fee-bps: (var-get lp-fee-bps), protocol-fee-bps: (var-get protocol-fee-bps)}))
 
-(define-public (get-price)
+(define-read-only (get-price)
   (let ((rx (var-get reserve-x)) (ry (var-get reserve-y)))
     (if (or (is-eq rx u0) (is-eq ry u0))
       (ok {price-x-y: u0, price-y-x: u0})

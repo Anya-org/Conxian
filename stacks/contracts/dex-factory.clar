@@ -52,3 +52,14 @@
     )
   )
 )
+
+;; Test helper: register an existing pool principal for a token pair
+(define-public (register-pool (token-x principal) (token-y principal) (pool principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-none (map-get? pools { token-x: token-x, token-y: token-y })) (err ERR_POOL_EXISTS))
+    (map-set pools { token-x: token-x, token-y: token-y } { pool: pool })
+    (print { event: "pool-registered", token-x: token-x, token-y: token-y, pool: pool })
+    (ok true)
+  )
+)

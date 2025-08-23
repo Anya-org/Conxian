@@ -87,6 +87,22 @@
 ;; Oracle whitelist (explicit) to enforce ACL without list iteration
 (define-map oracle-whitelist { base: principal, quote: principal, oracle: principal } { enabled: bool })
 
+;; Helpers for managing principal lists (max 10)
+(define-private (contains-scan (x principal) (state { target: principal, found: bool }))
+  (if (get found state)
+      state
+      (if (is-eq x (get target state))
+          { target: (get target state), found: true }
+          state)))
+
+(define-private (contains-principal (xs (list 10 principal)) (p principal))
+  (get found (fold contains-scan xs { target: p, found: false })))
+
+(define-private (append-oracle-if-needed (xs (list 10 principal)) (p principal))
+  (if (contains-principal xs p)
+      xs
+      (unwrap-panic (as-max-len? (append xs p) u10))))
+
 (define-public (add-oracle (base principal) (quote principal) (oracle principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_NOT_AUTHORIZED)
@@ -94,6 +110,11 @@
       (asserts! (is-some pair) ERR_PAIR_NOT_FOUND))
     (let ((entry (map-get? oracle-whitelist { base: base, quote: quote, oracle: oracle })))
       (asserts! (is-none entry) ERR_ALREADY_ORACLE))
+    ;; Also ensure the pair's enumerated oracle list includes this oracle for aggregation scans
+    (let ((p (unwrap! (map-get? pairs { base: base, quote: quote }) ERR_PAIR_NOT_FOUND)))
+      (let ((new-list (append-oracle-if-needed (get oracles p) oracle)))
+        (map-set pairs { base: base, quote: quote } { oracles: new-list, min-sources: (get min-sources p) }))
+      )
     (map-set oracle-whitelist { base: base, quote: quote, oracle: oracle } { enabled: true })
     (print { event: "oa-add-oracle", base: base, quote: quote, oracle: oracle })
     (ok true)))
@@ -263,13 +284,6 @@
                   (curr-sub (if (is-some stat) (get submitted (unwrap! stat (err u998))) u0))
                   (prev-agg (map-get? prices { base: base, quote: quote }))
                   (max-dev (var-get max-deviation-bps)))
-              ;; Deviation check if an aggregate exists
-              (if (is-some prev-agg)
-                (let ((prev-price (get price (unwrap-panic prev-agg))))
-                  (let ((diff (if (> price prev-price) (- price prev-price) (- prev-price price)))
-                        (limit (/ (* prev-price max-dev) u10000)))
-                    (asserts! (<= diff limit) ERR_DEVIATION)))
-                true)
               (if (is-some existing)
                   ;; Update existing submission
                   (let ((prev (unwrap! existing (err u997))))
@@ -280,6 +294,13 @@
                       (let ((median-price (update-median base quote price tx-sender)))
                         (if (>= curr-sub min-src)
                             (begin
+                              ;; Enforce deviation against previous aggregate on the computed median (not individual submission)
+                              (if (is-some prev-agg)
+                                (let ((prev-price (get price (unwrap-panic prev-agg))))
+                                  (let ((diff (if (> median-price prev-price) (- median-price prev-price) (- prev-price median-price)))
+                                        (limit (/ (* prev-price max-dev) u10000)))
+                                    (asserts! (<= diff limit) ERR_DEVIATION)))
+                                true)
                               (map-set prices { base: base, quote: quote } { price: median-price, height: block-height, sources: curr-sub })
                               (record-history base quote median-price)
                               (print { event: "price-aggregate", code: u3001, base: base, quote: quote, price: median-price, sources: curr-sub, height: block-height })
@@ -295,6 +316,13 @@
                       (let ((median-price (update-median base quote price tx-sender)))
                         (if (>= new-sub min-src)
                             (begin
+                              ;; Enforce deviation against previous aggregate on the computed median (not individual submission)
+                              (if (is-some prev-agg)
+                                (let ((prev-price (get price (unwrap-panic prev-agg))))
+                                  (let ((diff (if (> median-price prev-price) (- median-price prev-price) (- prev-price median-price)))
+                                        (limit (/ (* prev-price max-dev) u10000)))
+                                    (asserts! (<= diff limit) ERR_DEVIATION)))
+                                true)
                               (map-set prices { base: base, quote: quote } { price: median-price, height: block-height, sources: new-sub })
                               (record-history base quote median-price)
                               (print { event: "price-aggregate", code: u3001, base: base, quote: quote, price: median-price, sources: new-sub, height: block-height })

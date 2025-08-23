@@ -20,27 +20,28 @@ describe("DEX Router + Factory core", () => {
     const tokenX = `${deployer}.avg-token`;
     const tokenY = `${deployer}.avlp-token`;
 
-    // Assume factory has a register method and router uses it or reads registry
-    const reg = simnet.callPublicFn("dex-factory", "create-pool", [
+    // Register existing pool implementation for the pair in factory
+    const reg = simnet.callPublicFn("dex-factory", "register-pool", [
       Cl.principal(tokenX),
       Cl.principal(tokenY),
-      Cl.uint(30),      // lp-fee-bps
-      Cl.uint(5)        // protocol-fee-bps (< lp-fee)
+      Cl.contractPrincipal(deployer, "dex-pool"),
     ], deployer);
     expect(reg.result.type).toBe("ok");
 
-    // Provide initial liquidity to the pool
-    const liq = simnet.callPublicFn("dex-pool", "add-liquidity", [
+    // Provide initial liquidity via router (which resolves pool through factory)
+    const liq = simnet.callPublicFn("dex-router", "add-liquidity", [
+      Cl.principal(tokenX),
+      Cl.principal(tokenY),
       Cl.uint(10000),
       Cl.uint(10000),
       Cl.uint(1),
-      Cl.uint(999999)
+      Cl.uint(simnet.blockHeight + 10)
     ], deployer);
     expect(liq.result.type).toBe("ok");
 
     // Swap exact-in via router with slippage bound
     const amountIn = 1000;
-    const deadline = 999999;
+    const deadline = simnet.blockHeight + 10;
     const swap = simnet.callPublicFn("dex-router", "swap-exact-in", [
       Cl.principal(tokenX),
       Cl.principal(tokenY),
