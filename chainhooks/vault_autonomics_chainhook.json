@@ -10,9 +10,11 @@
   },
   "delivery": {
     "type": "webhook",
-    "url": "https://example.com/autonomics-hook",
-    "auth_header": "Bearer CHANGE_ME"
+  "url": "https://example.com/autonomics-hook",
+  "auth_header": "Bearer CHANGE_ME",
+  "signature_header": "x-chainhook-signature",
+  "signature_algo": "HMAC-SHA256"
   },
   "filter_keys": ["event", "reserve-ratio", "new-deposit-fee", "withdraw-fee"],
-  "notes": "Replace {VAULT_CONTRACT} and delivery URL before registering with Hiro Platform."
+  "notes": "Replace {VAULT_CONTRACT}, delivery URL, and auth/signature settings before registering with Hiro Platform."
 }

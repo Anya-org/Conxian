@@ -175,3 +175,22 @@ Allowed types (constant list): `constant-product`, `stable`, `weighted`, `concen
 ### Path / Hop Constraints
 `MAX_HOPS = 5`; pools length must equal `path length - 1`; iterative unrolled execution avoids recursion limits in Clarity.
 
+## DEX Router Direct API (Integration Guide)
+
+The DEX router exposes direct trait-typed entry points. Resolve your pool from the factory and call the "-direct" functions with the pool contract principal.
+
+Public functions:
+- add-liquidity-direct(pool, dx, dy, min-shares, deadline)
+- remove-liquidity-direct(pool, shares, min-dx, min-dy, deadline)
+- swap-exact-in-direct(pool, amount-in, min-out, x-to-y, deadline)
+- get-amount-out-direct(pool, amount-in, x-to-y) -> response uint uint
+
+Factory read-only:
+- get-pool(token-x, token-y) -> (optional { pool: principal })
+
+Integration steps:
+1) Call `dex-factory.get-pool(token-x, token-y)` (order-insensitive) to get the pool principal.
+2) Pass the pool principal into router "-direct" calls as a contract principal argument.
+
+Tip: See `stacks/tests/helpers/routerSdk.ts` for a tiny helper that abstracts these steps in tests.
+
