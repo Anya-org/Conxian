@@ -102,7 +102,23 @@ class OracleOrchestrator:
         logger.info("Initializing Oracle Orchestrator...")
         await self._load_trading_pairs()
         await self._load_oracle_registry()
+        await self._load_config_file()
         logger.info(f"Loaded {len(self.trading_pairs)} trading pairs and {len(self.oracle_registry)} oracles")
+
+    async def _load_config_file(self):
+        """Load additional config from file if provided via ORACLE_CONFIG."""
+        cfg_path = os.getenv("ORACLE_CONFIG")
+        if not cfg_path:
+            return
+        try:
+            with open(cfg_path, 'r') as f:
+                data = json.load(f)
+            for k, v in data.items():
+                if hasattr(self.config, k):
+                    setattr(self.config, k, v)
+            logger.info("Oracle config loaded from %s", cfg_path)
+        except Exception as e:
+            logger.warning("Failed to load ORACLE_CONFIG %s: %s", cfg_path, e)
         
     async def _load_trading_pairs(self):
         """Load all registered trading pairs from blockchain"""
@@ -230,13 +246,13 @@ class OracleOrchestrator:
         
     async def _fetch_external_prices(self, base: str, quote: str) -> t.List[t.Dict[str, t.Any]]:
         """Fetch prices from external data sources"""
-        # TODO: Implement actual price fetching from APIs like:
-        # - CoinGecko, CoinMarketCap, Binance, etc.
-        # For now, return mock data
+        # TODO: Implement real adapters (CoinGecko, CEXs). Placeholder with slight jitter.
+        now = int(time.time())
+        base_px = 123456
         return [
-            {"source": "coinbase", "price": 123456, "timestamp": int(time.time())},
-            {"source": "binance", "price": 123450, "timestamp": int(time.time())},
-            {"source": "kraken", "price": 123460, "timestamp": int(time.time())}
+            {"source": "coinbase", "price": base_px, "timestamp": now},
+            {"source": "binance", "price": base_px - 6, "timestamp": now},
+            {"source": "kraken", "price": base_px + 4, "timestamp": now}
         ]
         
     async def _detect_price_anomaly(self, pair_key: str, prices: t.List[t.Dict[str, t.Any]]) -> bool:
@@ -258,10 +274,16 @@ class OracleOrchestrator:
         
     async def _select_oracle_price(self, external_prices: t.List[t.Dict[str, t.Any]], oracle: OracleInfo) -> int:
         """Select appropriate price for oracle submission"""
-        # Simple strategy: use median of external prices
-        prices = sorted([p["price"] for p in external_prices])
-        median_idx = len(prices) // 2
-        return prices[median_idx]
+        # Trimmed mean around median to resist outliers
+        prices = sorted([int(p["price"]) for p in external_prices])
+        n = len(prices)
+        if n == 0:
+            return 0
+        if n <= 2:
+            return prices[n // 2]
+        trim = max(1, n // 5)  # ~20% trim
+        trimmed = prices[trim: n - trim] if (n - 2*trim) >= 1 else prices
+        return sum(trimmed) // len(trimmed)
         
     async def _submit_oracle_price(self, pair: TradingPair, oracle: OracleInfo, price: int) -> bool:
         """Submit price through specific oracle"""

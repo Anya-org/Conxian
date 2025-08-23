@@ -1,14 +1,29 @@
 #!/usr/bin/env bash
 # Register the vault autonomics chainhook with Hiro Platform API.
 # Requires: HIRO_PLATFORM_API (e.g. https://api.testnet.hiro.so), HIRO_API_KEY, VAULT_CONTRACT
+# Optional: CHAINHOOK_URL (delivery URL), CHAINHOOK_BEARER (delivery bearer token)
 set -euo pipefail
 : "${HIRO_PLATFORM_API:=https://api.testnet.hiro.so}" || true
 : "${VAULT_CONTRACT:?VAULT_CONTRACT env required}" || true
 : "${HIRO_API_KEY:?HIRO_API_KEY env required}" || true
 
+# Optional delivery overrides
+: "${CHAINHOOK_URL:=}" || true
+: "${CHAINHOOK_BEARER:=}" || true
+
 HOOK_FILE="chainhooks/vault_autonomics_chainhook.json"
 TMP=$(mktemp)
-sed "s/{VAULT_CONTRACT}/${VAULT_CONTRACT}/g" "$HOOK_FILE" > "$TMP"
+
+# Substitute contract, optional URL and bearer
+SED_SCRIPT="s/{VAULT_CONTRACT}/${VAULT_CONTRACT}/g"
+if [[ -n "$CHAINHOOK_URL" ]]; then
+  SED_SCRIPT+=$'\n'"s#https://example.com/autonomics-hook#${CHAINHOOK_URL//\//#\\/}#g"
+fi
+if [[ -n "$CHAINHOOK_BEARER" ]]; then
+  SED_SCRIPT+=$'\n'"s/Bearer CHANGE_ME/Bearer ${CHAINHOOK_BEARER//\//#\\/}/g"
+fi
+
+sed -e "$SED_SCRIPT" "$HOOK_FILE" > "$TMP"
 
 echo "[+] Registering chainhook from $HOOK_FILE for $VAULT_CONTRACT"
 HTTP_RES=$(curl -s -w "\n%{http_code}" -X POST \
