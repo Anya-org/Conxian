@@ -398,13 +398,26 @@
 )
 
 (define-private (get-epoch-revenue (epoch uint))
-  ;; Placeholder - would query analytics contract
-  u50000000000 ;; 50K STX
+  ;; Query analytics contract for revenue data using direct contract call
+  (let (
+    (period-start (- block-height (* epoch u1008))) ;; Approximate epoch to blocks conversion
+    (metrics (contract-call? .analytics get-period-metrics u0 period-start))
+    (deposit-volume (get vault-deposit-volume metrics))
+  )
+    ;; Calculate revenue as a percentage of deposit volume (simplified)
+    (/ (* deposit-volume u5) u100) ;; 5% of deposit volume as revenue
+  )
 )
 
 (define-private (get-avg-holder-count)
-  ;; Placeholder - would query token contract
-  u1500 ;; 1500 holders
+  ;; Query token contract for holder count approximation using direct contract call
+  (let (
+    (total-supply (unwrap-panic (contract-call? .avg-token get-total-supply)))
+  )
+    ;; Estimate holder count based on total supply (simplified heuristic)
+    ;; Assume average holder has 1000 tokens (1M micro-tokens)
+    (/ total-supply u1000000)
+  )
 )
 
 (define-private (calculate-strategy-effectiveness (epoch uint))
