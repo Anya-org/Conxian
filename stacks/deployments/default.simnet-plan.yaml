@@ -121,6 +121,31 @@ plan:
             path: contracts/dao-governance.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: enhanced-caller-admin-trait
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/traits/enhanced-caller-admin-trait.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: oracle-aggregator-trait
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/traits/oracle-aggregator-trait.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: sip-009-trait
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/traits/sip-009-trait.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: vault-init-trait
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/traits/vault-init-trait.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: deployment-orchestrator
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/deployment-orchestrator.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: dex-factory
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/dex-factory.clar
@@ -130,6 +155,9 @@ plan:
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/traits/pool-trait.clar
             clarity-version: 2
+      epoch: "2.4"
+    - id: 1
+      transactions:
         - emulated-contract-publish:
             contract-name: dex-pool
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
@@ -139,6 +167,31 @@ plan:
             contract-name: dex-router
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/dex-router.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: dynamic-load-distribution
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/dynamic-load-distribution.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: vault-production-trait
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/traits/vault-production-trait.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: vault-trait
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/traits/vault-trait.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: enhanced-caller
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/enhanced-caller.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: enhanced-governance
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/enhanced-governance.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: enhanced-yield-strategy
@@ -155,9 +208,6 @@ plan:
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/enhanced-yield-strategy-complex.clar
             clarity-version: 2
-      epoch: "2.4"
-    - id: 1
-      transactions:
         - emulated-contract-publish:
             contract-name: enhanced-yield-strategy-simple
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
@@ -214,11 +264,6 @@ plan:
             path: contracts/pool-factory.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: vault-trait
-            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
-            path: contracts/traits/vault-trait.clar
-            clarity-version: 2
-        - emulated-contract-publish:
             contract-name: post-deployment-autonomics
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/post-deployment-autonomics.clar
@@ -233,6 +278,14 @@ plan:
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/stable-pool.clar
             clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: stable-pool-clean
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/stable-pool-clean.clar
+            clarity-version: 2
+      epoch: "2.4"
+    - id: 2
+      transactions:
         - emulated-contract-publish:
             contract-name: state-anchor
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
@@ -249,6 +302,11 @@ plan:
             path: contracts/twap-oracle-v2.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: twap-oracle-v2-complex
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/twap-oracle-v2-complex.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: twap-oracle-v2-simple
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/twap-oracle-v2-simple.clar
@@ -257,6 +315,11 @@ plan:
             contract-name: vault-multi-token
             emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
             path: contracts/vault-multi-token.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: vault-production
+            emulated-sender: STC5KHM41H6WHAST7MWWDD807YSPRQKJ68T330BQ
+            path: contracts/vault-production.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: weighted-pool

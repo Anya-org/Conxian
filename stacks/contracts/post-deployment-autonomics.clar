@@ -744,5 +744,5 @@
 ;; ========================================
 
 ;; Initialize contract state
-(var-set deployment-block block-height)
+;; Note: deployment-block remains u0 until initialize-post-deployment is called
 (print { event: "post-deployment-autonomics-deployed", block: block-height })
