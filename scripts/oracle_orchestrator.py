@@ -37,6 +37,21 @@ logging.basicConfig(
 )
 logger = logging.getLogger("oracle-orchestrator")
 
+# Optional external price adapters
+try:
+    from oracle_sources import fetch_prices as fetch_external_prices  # type: ignore
+except Exception:
+    # Try adding the scripts directory to sys.path and retry
+    try:
+        import sys
+        from pathlib import Path as _Path
+        _scripts_dir = str(_Path(__file__).parent)
+        if _scripts_dir not in sys.path:
+            sys.path.append(_scripts_dir)
+        from oracle_sources import fetch_prices as fetch_external_prices  # type: ignore
+    except Exception:
+        fetch_external_prices = None  # type: ignore
+
 @dataclasses.dataclass
 class OracleConfig:
     """Oracle orchestration configuration"""
@@ -65,6 +80,9 @@ class OracleConfig:
     price_volatility_threshold_bps: int = 1000  # 10%
     
     dry_run: bool = os.getenv("DRY_RUN", "true").lower() == "true"
+    # External adapter settings
+    external_sources: t.List[str] = dataclasses.field(default_factory=lambda: ["coingecko", "binance", "kraken", "alex"])  # noqa: E501
+    offline: bool = (os.getenv("OFFLINE", os.getenv("ORACLE_OFFLINE", "0")) == "1")
 
 @dataclasses.dataclass
 class OracleInfo:
@@ -123,8 +141,9 @@ class OracleOrchestrator:
     async def _load_trading_pairs(self):
         """Load all registered trading pairs from blockchain"""
         # TODO: Implement blockchain query to get all pairs
-        # For now, create example pairs
+        # For now, create comprehensive Stacks ecosystem pairs
         self.trading_pairs = {
+            # Major pairs
             "STX/USD": TradingPair(
                 base="STX",
                 quote="USD", 
@@ -142,7 +161,85 @@ class OracleOrchestrator:
                 last_update_height=0,
                 source_count=0,
                 oracles=[]
-            )
+            ),
+            
+            # Stacks DeFi tokens
+            "ALEX/USD": TradingPair(
+                base="ALEX",
+                quote="USD",
+                min_sources=2,
+                current_price=0,
+                last_update_height=0,
+                source_count=0,
+                oracles=[]
+            ),
+            "DIKO/USD": TradingPair(
+                base="DIKO",
+                quote="USD",
+                min_sources=2,
+                current_price=0,
+                last_update_height=0,
+                source_count=0,
+                oracles=[]
+            ),
+            "USDA/USD": TradingPair(
+                base="USDA",
+                quote="USD",
+                min_sources=2,
+                current_price=0,
+                last_update_height=0,
+                source_count=0,
+                oracles=[]
+            ),
+            "XBTC/USD": TradingPair(
+                base="XBTC",
+                quote="USD",
+                min_sources=2,
+                current_price=0,
+                last_update_height=0,
+                source_count=0,
+                oracles=[]
+            ),
+            
+            # Stacks pairs vs STX
+            "ALEX/STX": TradingPair(
+                base="ALEX",
+                quote="STX",
+                min_sources=1,
+                current_price=0,
+                last_update_height=0,
+                source_count=0,
+                oracles=[]
+            ),
+            "DIKO/STX": TradingPair(
+                base="DIKO",
+                quote="STX",
+                min_sources=1,
+                current_price=0,
+                last_update_height=0,
+                source_count=0,
+                oracles=[]
+            ),
+            
+            # Popular Stacks tokens
+            "WELSH/USD": TradingPair(
+                base="WELSH",
+                quote="USD",
+                min_sources=1,
+                current_price=0,
+                last_update_height=0,
+                source_count=0,
+                oracles=[]
+            ),
+            "AUTO/USD": TradingPair(
+                base="AUTO",
+                quote="USD",
+                min_sources=1,
+                current_price=0,
+                last_update_height=0,
+                source_count=0,
+                oracles=[]
+            ),
         }
         
     async def _load_oracle_registry(self):
@@ -245,14 +342,27 @@ class OracleOrchestrator:
         logger.info(f"Submitted {successful_submissions} prices for {pair_key}")
         
     async def _fetch_external_prices(self, base: str, quote: str) -> t.List[t.Dict[str, t.Any]]:
-        """Fetch prices from external data sources"""
-        # TODO: Implement real adapters (CoinGecko, CEXs). Placeholder with slight jitter.
+        """Fetch prices from external data sources.
+
+        Attempts to use async adapters (CoinGecko, Binance, Kraken) when available.
+        Falls back to local jittered placeholders when adapters are unavailable or offline.
+        """
+        # Prefer external adapters unless offline or unavailable
+        if not self.config.offline and fetch_external_prices is not None:
+            try:
+                prices = await fetch_external_prices(base, quote, self.config.external_sources)  # type: ignore
+                if prices:
+                    return prices
+            except Exception as e:
+                logger.warning("External adapter fetch failed (%s/%s): %s", base, quote, e)
+
+        # Fallback: local jittered placeholder data
         now = int(time.time())
         base_px = 123456
         return [
-            {"source": "coinbase", "price": base_px, "timestamp": now},
-            {"source": "binance", "price": base_px - 6, "timestamp": now},
-            {"source": "kraken", "price": base_px + 4, "timestamp": now}
+            {"source": "placeholder-a", "price": base_px, "timestamp": now},
+            {"source": "placeholder-b", "price": base_px - 6, "timestamp": now},
+            {"source": "placeholder-c", "price": base_px + 4, "timestamp": now}
         ]
         
     async def _detect_price_anomaly(self, pair_key: str, prices: t.List[t.Dict[str, t.Any]]) -> bool:

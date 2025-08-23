@@ -47,12 +47,31 @@ Deployment, testing, and utility scripts for the AutoVault DeFi platform.
 
 ### Oracle Orchestration (NEW)
 
-- `oracle_orchestrator.py` - Main oracle orchestration manager with median calculation
+- `oracle_orchestrator.py` - Main oracle orchestration manager with trimmed-mean aggregation and external adapters
 - `oracle_manager.py` - Oracle management CLI for admin operations
 - `oracle_ops.sh` - Shell wrapper for convenient oracle operations
 - `price_coordinator.py` - Multi-source price feed coordination service
 - `oracle_health_monitor.py` - Comprehensive oracle health monitoring
 - `oracle.conf` - Complete orchestration system configuration
+
+External price adapters (async):
+
+- `oracle_sources.py` - CoinGecko, Binance, Kraken, ALEX DEX adapters returning normalized integer prices
+
+**Stacks Ecosystem Support:**
+- Comprehensive mappings for 30+ Stacks tokens (STX, ALEX, DIKO, USDA, XBTC, WELSH, AUTO, etc.)
+- ALEX DEX integration for Stacks-native token prices
+- StacksSwap adapter (when API available)
+- Stacks blockchain API integration (planned)
+- Support for DeFi protocols: ALEX, Arkadiko, CityCoins
+- Meme tokens: WELSH, BANANA, CORGI, PEPE
+- Stablecoins: USDA, XUSD
+
+Environment variables:
+
+- `OFFLINE=1` or `ORACLE_OFFLINE=1` to disable network calls and use placeholders
+- `ORACLE_CONFIG` path to JSON file overriding orchestrator fields (e.g., `external_sources`)
+- `external_sources` list in config to select adapters, default: `["coingecko","binance","kraken","alex"]`
 
 ### GitHub Integration
 
@@ -285,6 +304,8 @@ export TREASURY_CONTRACT=SP123.treasury
 
 ```bash
 pip install requests stacks-transactions python-dotenv
+# Optional for live external price adapters
+pip install aiohttp
 ```
 
 **Node.js Packages:**
