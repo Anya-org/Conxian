@@ -12,7 +12,7 @@
     "vitest": "^3.2.4"
   },
   "scripts": {
-    "test": "../scripts/ensure-deps.sh && npx vitest run",
+  "test": "../scripts/ensure-deps.sh && npx vitest run",
     "test:watch": "../scripts/ensure-deps.sh && npx vitest watch",
     "test:auto": "chokidar 'contracts/**/*.clar' 'tests/**/*.ts' 'sdk-tests/**/*.spec.ts' -c '../scripts/ensure-deps.sh && npm run check && npx vitest run'",
     "test:manual": "../scripts/manual-testing.sh",
@@ -20,7 +20,9 @@
     "int-autonomics": "bash tests/integration_autonomics_sdk.sh",
     "deploy-contracts": "../scripts/ensure-deps.sh && ts-node ../scripts/sdk_deploy_contracts.ts",
     "deploy-testnet": "../scripts/deploy-testnet.sh",
-    "verify-post": "../scripts/ensure-deps.sh && ts-node ../scripts/post_deploy_verify.ts",
+  "verify-post": "../scripts/ensure-deps.sh && ts-node ../scripts/post_deploy_verify.ts",
+  "verify-post:enhanced": "../scripts/ensure-deps.sh && NODE_PATH=./node_modules node -r ts-node/register ../scripts/enhanced-post-deployment-verification.ts",
+  "quality-gates": "../scripts/ensure-deps.sh && npm run check && npx vitest run && NODE_PATH=./node_modules node -r ts-node/register ../scripts/enhanced-post-deployment-verification.ts",
     "generate-deployer-key": "node -r ts-node/register ../scripts/generate-deployer-key.ts",
     "gen-key": "node generate-deployer-key.js",
     "console": "npx clarinet console",
