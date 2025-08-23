@@ -17,7 +17,8 @@
 (define-constant BPS_DENOM u10000)
 (define-constant MINIMUM_LIQUIDITY u1000)
 
-(define-data-var token-x principal .mock-ft)
+;; Production token configuration - defaults to governance tokens
+(define-data-var token-x principal .avg-token)
 (define-data-var token-y principal .avg-token)
 (define-data-var lp-fee-bps uint u30)
 (define-data-var protocol-fee-bps uint u5)

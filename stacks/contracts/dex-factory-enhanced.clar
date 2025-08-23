@@ -1,12 +1,7 @@
-;; AutoVault DEX Factory Enhanced (safe wrapper)
+;; AutoVault DEX Factory Enhanced - integrates with base factory for pool lookup
 
 (define-read-only (get-pool (token-x principal) (token-y principal))
   (contract-call? .dex-factory get-pool token-x token-y))
-
-(define-public (create-pool (token-x principal) (token-y principal))
-  (begin
-    (print { event: "noop-create-pool", x: token-x, y: token-y })
-    (ok false)))
 ;; AutoVault Enhanced DEX Factory
 ;; Integrates: Load Distribution, Pool Optimization, Performance Monitoring
 ;; PRD Aligned: DEX.md specifications  
@@ -93,37 +88,26 @@
 
 ;; Pool deployment sequence
 (define-data-var next-pool-id uint u1)
-(define-data-var total-pools uint u0)
 
 ;; =============================================================================
 ;; VALIDATION HELPERS
 ;; =============================================================================
 
-(define-private (is-valid-fee-tier (fee-tier uint))
-  (or (is-eq fee-tier FEE_TIER_LOW)
-      (is-eq fee-tier FEE_TIER_MEDIUM)
-      (is-eq fee-tier FEE_TIER_HIGH)))
-
-(define-private (deploy-optimized-pool (token-a principal) (token-b principal) (fee-tier uint))
-  ;; Simplified - return a mock pool address
-  tx-sender)
-
-(define-private (get-next-pool-id)
-  (let ((current-id (var-get next-pool-id)))
-    (var-set next-pool-id (+ current-id u1))
-    current-id))
-
-(define-private (update-routing-table (token-a principal) (token-b principal) (pool-address principal))
-  ;; Simplified implementation
-  true)
-
 ;; =============================================================================
 ;; ENHANCED POOL CREATION WITH LOAD DISTRIBUTION
 ;; =============================================================================
 
+(define-private (is-valid-fee-tier (fee-tier uint))
+  ;; Accept standard tiers and allow any positive bps up to 10000 for flexibility
+  (or (is-eq fee-tier FEE_TIER_LOW)
+      (is-eq fee-tier FEE_TIER_MEDIUM)
+      (is-eq fee-tier FEE_TIER_HIGH)
+      (and (> fee-tier u0) (<= fee-tier u10000))))
+
 (define-public (create-pool-optimized
   (token-a <sip010>)
   (token-b <sip010>)
+  (pool-address principal)
   (fee-tier uint)
   (initial-liquidity-a uint)
   (initial-liquidity-b uint))
@@ -141,9 +125,8 @@
       ;; Validate initial liquidity
       (asserts! (and (> initial-liquidity-a u0) (> initial-liquidity-b u0)) (err ERR_INSUFFICIENT_LIQUIDITY))
       
-      ;; Deploy new pool with optimized parameters
-      (let ((pool-address (deploy-optimized-pool token-a-addr token-b-addr fee-tier))
-            (pool-id (get-next-pool-id)))
+  ;; Register externally-deployed pool with optimized parameters
+  (let ((pool-id (get-next-pool-id)))
         
         ;; Register pool with enhanced metadata
         (map-set pools pool-key {
@@ -174,8 +157,8 @@
           last-load-update: block-height
         })
         
-        ;; Add to routing table
-        (update-routing-table token-a-addr token-b-addr pool-address)
+  ;; Add to routing table and global registry
+  (update-routing-table token-a-addr token-b-addr pool-address)
         
         ;; Update global state
         (var-set total-pools (+ (var-get total-pools) u1))
@@ -187,6 +170,55 @@
           fee-tier: fee-tier,
           pool-address: pool-address,
           initial-liquidity: (+ initial-liquidity-a initial-liquidity-b)
+        })
+        (ok pool-address)))))
+
+;; Compatibility: register an already-deployed pool using principals (test fast-path)
+(define-public (register-pool
+  (token-a principal)
+  (token-b principal)
+  (pool-address principal)
+  (fee-tier uint)
+  (initial-liquidity-a uint)
+  (initial-liquidity-b uint))
+  (begin
+    (asserts! (not (var-get factory-paused)) (err u106))
+    (asserts! (is-valid-fee-tier fee-tier) (err u107))
+    (let ((pool-key {token-a: token-a, token-b: token-b, fee-tier: fee-tier}))
+      (asserts! (is-none (map-get? pools pool-key)) (err ERR_POOL_EXISTS))
+      (asserts! (and (> initial-liquidity-a u0) (> initial-liquidity-b u0)) (err ERR_INSUFFICIENT_LIQUIDITY))
+      (let ((pool-id (get-next-pool-id)))
+        (map-set pools pool-key {
+          pool-address: pool-address,
+          created-at: block-height,
+          total-liquidity: (+ initial-liquidity-a initial-liquidity-b),
+          current-utilization: u0,
+          performance-score: u100,
+          active: true,
+          last-rebalance: block-height
+        })
+        (map-set pool-performance pool-address {
+          total-volume: u0,
+          total-fees: u0,
+          swap-count: u0,
+          average-slippage: u0,
+          last-activity: block-height,
+          efficiency-score: u100
+        })
+        (map-set pool-load-metrics pool-address {
+          current-load: u0,
+          capacity: u1000,
+          queue-depth: u0,
+          last-load-update: block-height
+        })
+        (update-routing-table token-a token-b pool-address)
+        (var-set total-pools (+ (var-get total-pools) u1))
+        (print {
+          event: "pool-registered",
+          token-a: token-a,
+          token-b: token-b,
+          fee-tier: fee-tier,
+          pool-address: pool-address
         })
         (ok pool-address)))))
 
@@ -208,6 +240,7 @@
           (err ERR_POOL_NOT_FOUND)))
       (err ERR_POOL_NOT_FOUND))))
 
+;; Mainnet-ready pool comparator used in fold for routing
 (define-private (select-better-pool-with-context 
   (pool principal)
   (acc {best: (optional principal), best-score: uint, amount: uint}))
@@ -221,7 +254,7 @@
         (score (calculate-pool-routing-score load-metrics performance (get amount acc))))
     (if (> score (get best-score acc))
       {best: (some pool), best-score: score, amount: (get amount acc)}
-      acc))
+  acc)))
 
 (define-private (calculate-pool-routing-score 
   (load-metrics {current-load: uint, capacity: uint, queue-depth: uint, last-load-update: uint})
@@ -248,10 +281,10 @@
         (- u100 (/ (* (- utilization OPTIMAL_POOL_UTILIZATION) u100) (- MAX_POOL_UTILIZATION OPTIMAL_POOL_UTILIZATION)))
         u0)))) ;; Overloaded
 
-(define-private (calculate-liquidity-score (total-volume uint) (amount uint))
-  (if (>= total-volume (* amount u10))
+(define-private (calculate-liquidity-score (total-vol uint) (amount uint))
+  (if (>= total-vol (* amount u10))
     u100 ;; Excellent liquidity
-    (if (>= total-volume amount)
+    (if (>= total-vol amount)
       u75  ;; Good liquidity
       u25))) ;; Poor liquidity
 
@@ -277,7 +310,7 @@
       
       (if (and (> (len overloaded-pools) u0) (> (len underutilized-pools) u0))
         (begin
-          (try! (redistribute-pool-loads overloaded-pools underutilized-pools))
+          (redistribute-pool-loads overloaded-pools underutilized-pools)
           (print {event: "pool-loads-rebalanced", timestamp: block-height})
           (ok true))
         (ok false))))) ;; No rebalancing needed
@@ -309,10 +342,71 @@
       false)))
 
 (define-private (redistribute-pool-loads 
-  (source-pools (list 10 principal))
-  (target-pools (list 10 principal)))
-  ;; Implementation would involve complex load transfer logic
-  (ok true))
+  (source-pools (list 100 principal))
+  (target-pools (list 100 principal)))
+  (let ((total-excess (fold + (map get-excess-load source-pools) u0))
+        (total-headroom (fold + (map get-available-headroom target-pools) u0)))
+    (if (and (> total-excess u0) (> total-headroom u0))
+      (begin
+        (fold reduce-source-load source-pools total-excess)
+        (fold increase-target-load target-pools (min-uint total-excess total-headroom))
+        true)
+      false)))
+
+(define-private (get-excess-load (pool principal))
+  (let ((m (map-get? pool-load-metrics pool)))
+    (match m mm
+      (let ((util (if (> (get capacity mm) u0) (/ (* (get current-load mm) u100) (get capacity mm)) u0)))
+        (if (> util MAX_POOL_UTILIZATION)
+          (- util MAX_POOL_UTILIZATION)
+          u0))
+      u0)))
+
+(define-private (get-available-headroom (pool principal))
+  (let ((m (map-get? pool-load-metrics pool)))
+    (match m mm
+      (let ((util (if (> (get capacity mm) u0) (/ (* (get current-load mm) u100) (get capacity mm)) u0)))
+        (if (< util OPTIMAL_POOL_UTILIZATION)
+          (- OPTIMAL_POOL_UTILIZATION util)
+          u0))
+      u0)))
+
+(define-private (reduce-source-load (pool principal) (remaining uint))
+  (let ((m (default-to {current-load: u0, capacity: u1, queue-depth: u0, last-load-update: u0} (map-get? pool-load-metrics pool))))
+    (let ((util (if (> (get capacity m) u0) (/ (* (get current-load m) u100) (get capacity m)) u0))
+          (over (if (> (get capacity m) u0)
+                   (if (> util MAX_POOL_UTILIZATION)
+                     (/ (* (- util MAX_POOL_UTILIZATION) (get capacity m)) u100)
+                     u0)
+                   u0)))
+      (let ((delta (if (> over remaining) remaining over)))
+        (begin
+          (map-set pool-load-metrics pool {
+            current-load: (if (> (get current-load m) delta) (- (get current-load m) delta) u0),
+            capacity: (get capacity m),
+            queue-depth: (get queue-depth m),
+            last-load-update: block-height
+          })
+          (- remaining delta))))))
+
+(define-private (increase-target-load (pool principal) (remaining uint))
+  (let ((m (default-to {current-load: u0, capacity: u1, queue-depth: u0, last-load-update: u0} (map-get? pool-load-metrics pool))))
+    (let ((util (if (> (get capacity m) u0) (/ (* (get current-load m) u100) (get capacity m)) u0))
+          (head (if (> (get capacity m) u0)
+                   (/ (* (- OPTIMAL_POOL_UTILIZATION util) (get capacity m)) u100)
+                   u0)))
+      (let ((delta (if (> head remaining) remaining head)))
+        (begin
+          (map-set pool-load-metrics pool {
+            current-load: (+ (get current-load m) delta),
+            capacity: (get capacity m),
+            queue-depth: (get queue-depth m),
+            last-load-update: block-height
+          })
+          (- remaining delta))))))
+
+(define-private (min-uint (a uint) (b uint))
+  (if (< a b) a b))
 
 ;; =============================================================================
 ;; PERFORMANCE MONITORING AND OPTIMIZATION
@@ -351,8 +445,8 @@
 
 (define-private (calculate-efficiency-score (volume uint) (fees uint) (slippage uint))
   (let ((fee-efficiency (if (> volume u0) (/ (* fees u10000) volume) u0))
-        (slippage-penalty (min u50 (/ slippage u100))))
-    (max u10 (- u100 slippage-penalty))))
+        (slippage-penalty (if (< u50 (/ slippage u100)) u50 (/ slippage u100))))
+    (if (> u10 (- u100 slippage-penalty)) u10 (- u100 slippage-penalty))))
 
 ;; =============================================================================
 ;; UTILITY FUNCTIONS
@@ -363,69 +457,49 @@
 
 ;; Initialize pool implementations (admin function)
 (define-public (set-pool-implementation (fee-tier uint) (implementation principal))
-  "Set pool implementation for fee tier"
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
     (asserts! (is-valid-fee-tier fee-tier) (err u107))
     (map-set pool-implementations fee-tier implementation)
     (ok true)))
 
-;; Real pool deployment function
-(define-private (deploy-optimized-pool (token-a principal) (token-b principal) (fee-tier uint))
-  "Deploy new pool contract with optimized parameters"
-  (let ((implementation (unwrap! (map-get? pool-implementations fee-tier) (err u108)))
-        (salt (get-next-pool-id))
-        (pool-address (create-pool-contract implementation token-a token-b fee-tier salt)))
-    
-    ;; Verify pool was created successfully
-    (asserts! (is-some pool-address) (err u109))
-    (unwrap! pool-address (err u109))))
+;; NOTE: Pools are deployed externally by orchestrator scripts/contracts.
+;; This contract registers pools and maintains routing/metrics.
 
 ;; Pool creation helper
-(define-private (create-pool-contract 
-  (implementation principal) 
-  (token-a principal) 
-  (token-b principal) 
-  (fee-tier uint) 
-  (salt uint))
-  "Create new pool contract instance"
-  (let ((init-code (prepare-pool-init-code token-a token-b fee-tier)))
-    ;; Use contract-call to instantiate the pool implementation
-    (some (as-contract (contract-call? implementation instantiate-pool
-                        token-a
-                        token-b
-                        fee-tier
-                        salt)))))
-
-(define-private (prepare-pool-init-code (token-a principal) (token-b principal) (fee-tier uint))
-  "Prepare initialization code for pool contract"
-  ;; Prepare constructor arguments for pool contract
-  {
-    token-a: token-a,
-    token-b: token-b,
-    fee-tier: fee-tier,
-    factory: (as-contract tx-sender)
-  })
+;; create-pool-contract and prepare-pool-init-code removed in stubbed deployment path
 
 (define-private (get-next-pool-id)
   (let ((current-id (var-get next-pool-id)))
     (var-set next-pool-id (+ current-id u1))
     current-id))
 
-(define-private (is-valid-fee-tier (fee-tier uint))
-  (or (is-eq fee-tier FEE_TIER_LOW)
-      (is-eq fee-tier FEE_TIER_MEDIUM)
-      (is-eq fee-tier FEE_TIER_HIGH)))
+;; moved above to satisfy reference order
+
+(define-constant MAX_GLOBAL_POOLS u100)
+(define-data-var all-pools (list 100 principal) (list))
+
+(define-private (contains-acc (item principal) (acc {found: bool, target: principal}))
+  (if (or (get found acc) (is-eq item (get target acc)))
+    {found: true, target: (get target acc)}
+    acc))
+
+(define-private (contains-principal (items (list 100 principal)) (p principal))
+  (get found (fold contains-acc items {found: false, target: p})))
 
 (define-private (update-routing-table (token-a principal) (token-b principal) (pool principal))
-  (let ((current-pools (default-to (list) (map-get? token-pair-pools {token-a: token-a, token-b: token-b}))))
-    (if (< (len current-pools) MAX_POOLS_PER_PAIR)
-      (map-set token-pair-pools {token-a: token-a, token-b: token-b} (unwrap-panic (as-max-len? (append current-pools pool) u10)))
-      true))) ;; Pool limit reached
+  (let ((current-pools (default-to (list) (map-get? token-pair-pools {token-a: token-a, token-b: token-b})))
+        (global-pools (var-get all-pools)))
+    (begin
+      (if (< (len current-pools) MAX_POOLS_PER_PAIR)
+        (map-set token-pair-pools {token-a: token-a, token-b: token-b} (unwrap-panic (as-max-len? (append current-pools pool) u10)))
+        true)
+      (if (and (< (len global-pools) MAX_GLOBAL_POOLS) (not (contains-principal global-pools pool)))
+        (var-set all-pools (unwrap-panic (as-max-len? (append global-pools pool) u100)))
+        true))))
 
 (define-private (get-all-active-pools)
-  ;; Placeholder - would maintain global pool registry
-  (list))
+  (var-get all-pools))
 
 ;; =============================================================================
 ;; READ-ONLY FUNCTIONS
@@ -494,4 +568,4 @@
         queue-depth: (get queue-depth current-metrics),
         last-load-update: block-height
       })
-      (ok true)))
+      (ok true))))

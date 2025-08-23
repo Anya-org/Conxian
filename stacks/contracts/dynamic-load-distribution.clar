@@ -122,13 +122,13 @@
       (ok false)))) ;; No rebalancing needed
 
 (define-private (get-all-active-pools)
-  (list tx-sender)) ;; Simplified - return list with single principal for typing
-
+  ;; Pull from factory-enhanced; returns (list 10 principal)
+  (contract-call? .dex-factory-enhanced get-available-pools tx-sender tx-sender))
 (define-private (identify-overutilized-pools)
-  (list)) ;; Simplified - return empty list
+  (filter is-overutilized (get-all-active-pools)))
 
 (define-private (identify-underutilized-pools) 
-  (list)) ;; Simplified - return empty list
+  (filter is-underutilized (get-all-active-pools)))
 
 (define-private (is-overutilized (pool principal))
   (let ((metrics (map-get? pool-metrics pool)))
@@ -300,10 +300,49 @@
       u0)))
 
 (define-private (drain-excess-liquidity (pools (list 10 principal)) (amount uint))
-  (ok true)) ;; Placeholder implementation
+  ;; Model capacity reduction proportional to amount across pools
+  (let ((per-pool (if (> (len pools) u0) (/ amount (len pools)) u0)))
+    (begin
+      (fold reduce-one pools per-pool)
+      (ok true))))
+
+(define-private (reduce-one (pool principal) (delta uint))
+  (let ((m (map-get? pool-metrics pool)))
+    (match m mm
+      (begin
+        (map-set pool-metrics pool {
+          current-utilization: (if (> (get current-utilization mm) delta) (- (get current-utilization mm) delta) u0),
+          total-liquidity: (get total-liquidity mm),
+          average-fee: (get average-fee mm),
+          performance-score: (get performance-score mm),
+          last-update: block-height,
+          transaction-count: (get transaction-count mm),
+          volume-24h: (get volume-24h mm)
+        })
+        delta)
+      delta)))
 
 (define-private (distribute-liquidity (pools (list 10 principal)) (amount uint))
-  (ok true)) ;; Placeholder implementation
+  (let ((per-pool (if (> (len pools) u0) (/ amount (len pools)) u0)))
+    (begin
+      (fold add-one pools per-pool)
+      (ok true))))
+
+(define-private (add-one (pool principal) (delta uint))
+  (let ((m (map-get? pool-metrics pool)))
+    (match m mm
+      (begin
+        (map-set pool-metrics pool {
+          current-utilization: (+ (get current-utilization mm) delta),
+          total-liquidity: (get total-liquidity mm),
+          average-fee: (get average-fee mm),
+          performance-score: (get performance-score mm),
+          last-update: block-height,
+          transaction-count: (get transaction-count mm),
+          volume-24h: (get volume-24h mm)
+        })
+        delta)
+      delta)))
 
 (define-private (update-global-rebalance-state)
   (let ((current-state (default-to 
@@ -323,6 +362,15 @@
 
 (define-read-only (get-pool-metrics (pool principal))
   (map-get? pool-metrics pool))
+
+(define-read-only (get-pool-utilization (pool principal))
+  (let ((metrics (map-get? pool-metrics pool)))
+    (match metrics
+      pool-data (ok (get current-utilization pool-data))
+      (ok u0))))
+
+(define-public (get-pool-utilization-public (pool principal))
+  (get-pool-utilization pool))
 
 (define-read-only (get-pool-performance (pool principal))
   (map-get? pool-performance pool))

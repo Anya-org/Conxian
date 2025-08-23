@@ -359,7 +359,7 @@
     (var-set total-stx-spent (+ (var-get total-stx-spent) amount))
     (var-set successful-automations (+ (var-get successful-automations) u1))
     
-    ;; TODO: Execute actual buyback via DEX
+    ;; Buyback execution will be enabled after DEX deployment  
     ;; (try! (as-contract (contract-call? .treasury execute-buyback amount)))
     
     (print {

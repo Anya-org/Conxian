@@ -46,6 +46,15 @@
 (define-data-var cache-misses uint u0)
 (define-data-var total-cache-requests uint u0)
 
+;; Lightweight generic pool cache (compatibility for TPS tests)
+(define-map generic-pool-cache principal {
+  reserve-x: uint,
+  reserve-y: uint,
+  total-supply: uint,
+  fee-rate: uint,
+  last-update: uint
+})
+
 ;; =============================================================================
 ;; PRICE CACHING FUNCTIONS
 ;; =============================================================================
@@ -228,6 +237,24 @@
       (ok result))))
 
 ;; =============================================================================
+;; COMPATIBILITY: POOL CACHE APIS USED BY TPS TESTS
+;; =============================================================================
+
+(define-public (cache-pool-data (pool principal) (data {reserve-x: uint, reserve-y: uint, total-supply: uint, fee-rate: uint}))
+  (begin
+    (map-set generic-pool-cache pool {
+      reserve-x: (get reserve-x data),
+      reserve-y: (get reserve-y data),
+      total-supply: (get total-supply data),
+      fee-rate: (get fee-rate data),
+      last-update: block-height
+    })
+    (ok true)))
+
+(define-public (get-cached-data (pool principal))
+  (ok (map-get? generic-pool-cache pool)))
+
+;; =============================================================================
 ;; CACHE INVALIDATION FUNCTIONS
 ;; =============================================================================
 
@@ -289,13 +316,6 @@
       })
       (ok {hits: u0, misses: u0, total-requests: u0, hit-rate: u0, efficiency: u0}))))
 
-(define-private (calculate-cache-efficiency)
-  (let ((hits (var-get cache-hits))
-        (misses (var-get cache-misses)))
-    (if (> (+ hits misses) u0)
-      (/ (* hits u10000) (+ hits misses))
-      u0)))
-
 ;; =============================================================================
 ;; ADAPTIVE CACHE MANAGEMENT
 ;; =============================================================================
@@ -306,12 +326,12 @@
     (if (< hit-rate u7000) ;; Less than 70% hit rate
       ;; Reduce cache duration for fresher data
       (if (is-eq cache-type "price") 
-        (max u3 (- ORACLE_CACHE_DURATION u2))
-        (max u5 (- CACHE_DURATION u5)))
+        (if (> u3 (- ORACLE_CACHE_DURATION u2)) u3 (- ORACLE_CACHE_DURATION u2))
+        (if (> u5 (- CACHE_DURATION u5)) u5 (- CACHE_DURATION u5)))
       ;; Increase cache duration for better performance
       (if (is-eq cache-type "price")
-        (min u15 (+ ORACLE_CACHE_DURATION u2))
-        (min u30 (+ CACHE_DURATION u5))))))
+        (if (< u15 (+ ORACLE_CACHE_DURATION u2)) u15 (+ ORACLE_CACHE_DURATION u2))
+        (if (< u30 (+ CACHE_DURATION u5)) u30 (+ CACHE_DURATION u5))))))
 
 ;; =============================================================================
 ;; EMERGENCY CACHE FUNCTIONS

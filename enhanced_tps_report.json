@@ -1,0 +1,89 @@
+{
+  "summary": {
+    "total_contracts": 9,
+    "total_baseline_tps": 30000,
+    "total_enhanced_tps": 14737,
+    "total_improvement": -15263,
+    "target_improvement": 735000,
+    "achievement_rate": -2.0765986394557823,
+    "avg_success_rate": 0.9698507721957448,
+    "test_timestamp": "2025-08-23 18:13:13"
+  },
+  "contract_results": [
+    {
+      "name": "enhanced-governance",
+      "baseline_tps": 500,
+      "enhanced_tps": 1628,
+      "improvement": 1128,
+      "test_duration": 5.000505208969116,
+      "success_rate": 0.9646408839779006
+    },
+    {
+      "name": "enhanced-batch-processing",
+      "baseline_tps": 1000,
+      "enhanced_tps": 1628,
+      "improvement": 628,
+      "test_duration": 5.000582695007324,
+      "success_rate": 0.9721164476108586
+    },
+    {
+      "name": "twap-oracle-v2-complex",
+      "baseline_tps": 1500,
+      "enhanced_tps": 1653,
+      "improvement": 153,
+      "test_duration": 5.000473499298096,
+      "success_rate": 0.9724271375015117
+    },
+    {
+      "name": "oracle-aggregator-enhanced",
+      "baseline_tps": 2000,
+      "enhanced_tps": 1642,
+      "improvement": -357,
+      "test_duration": 5.000517845153809,
+      "success_rate": 0.9701656113005358
+    },
+    {
+      "name": "vault-enhanced",
+      "baseline_tps": 3000,
+      "enhanced_tps": 1650,
+      "improvement": -1349,
+      "test_duration": 5.000144720077515,
+      "success_rate": 0.9711620016963528
+    },
+    {
+      "name": "stable-pool-clean",
+      "baseline_tps": 4000,
+      "enhanced_tps": 1634,
+      "improvement": -2365,
+      "test_duration": 5.000019550323486,
+      "success_rate": 0.9663567408857353
+    },
+    {
+      "name": "dex-factory-enhanced",
+      "baseline_tps": 5000,
+      "enhanced_tps": 1637,
+      "improvement": -3362,
+      "test_duration": 5.000144004821777,
+      "success_rate": 0.9689714146103103
+    },
+    {
+      "name": "dynamic-load-distribution",
+      "baseline_tps": 5000,
+      "enhanced_tps": 1637,
+      "improvement": -3362,
+      "test_duration": 5.0005552768707275,
+      "success_rate": 0.9697043733203029
+    },
+    {
+      "name": "advanced-caching-system",
+      "baseline_tps": 8000,
+      "enhanced_tps": 1628,
+      "improvement": -6371,
+      "test_duration": 5.000156879425049,
+      "success_rate": 0.9731123388581953
+    }
+  ],
+  "recommendations": [
+    "\u26a0\ufe0f  Performance below expectations, recommend contract optimizations."
+  ]
+}

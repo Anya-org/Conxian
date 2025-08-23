@@ -64,7 +64,7 @@
 ;; Execute exact input multi-hop swap
 (define-public (swap-exact-in-multi-hop
   (path (list 5 principal))
-  (pools (list 4 principal))
+  (pools (list 4 <pool-trait>))
   (amount-in uint)
   (min-amount-out uint)
   (deadline uint))
@@ -79,34 +79,33 @@
       (asserts! (>= result min-amount-out) ERR_SLIPPAGE_EXCEEDED)
       (ok {amount-out: result}))))
 
-;; Simplified multi-hop execution
+;; Trait-based multi-hop execution over pools
 (define-private (execute-multi-hop-swap-simple
   (path (list 5 principal))
-  (pools (list 4 principal))
+  (pools (list 4 <pool-trait>))
   (amount-in uint))
-  (fold process-hop-simple
-        (zip-path-pools path pools)
-        amount-in))
+  (let ((initial (ok {i: u0, path: path, current: amount-in})))
+    (let ((result (fold process-hop-simple pools initial)))
+      (get current (unwrap-panic result)))))
 
-;; Process a single hop (simplified)
+;; Process a single hop via pool-trait.swap-exact-in
 (define-private (process-hop-simple
-  (hop-data {token-in: principal, token-out: principal, pool: principal})
-  (amount-in uint))
-  ;; Simplified constant-product calculation
-  (let ((pool-contract (get pool hop-data)))
-    ;; For simplicity, return a basic calculation without actual pool calls
-    ;; In production, this would call: (contract-call? pool-contract get-reserves)
-    (let ((estimated-output (/ (* amount-in u90) u100))) ;; 10% slippage estimate
-      estimated-output)))
-
-;; Zip paths and pools for iteration
-(define-private (zip-path-pools
-  (path (list 5 principal))
-  (pools (list 4 principal)))
-  (let ((token-in (unwrap-panic (element-at path u0)))
-        (token-out (unwrap-panic (element-at path u1)))
-        (pool (unwrap-panic (element-at pools u0))))
-    (list {token-in: token-in, token-out: token-out, pool: pool})))
+  (pool <pool-trait>)
+  (acc (response {i: uint, path: (list 5 principal), current: uint} uint)))
+  (let ((state (unwrap-panic acc))
+        (pool-principal (contract-of pool))
+        (i (get i (unwrap-panic acc)))
+        (token-in (unwrap-panic (element-at (get path (unwrap-panic acc)) (get i (unwrap-panic acc)))))
+        (token-out (unwrap-panic (element-at (get path (unwrap-panic acc)) (+ (get i (unwrap-panic acc)) u1))))
+        (info (unwrap-panic (map-get? pool-registry (contract-of pool)))))
+    ;; Validate and determine direction
+    (asserts! (or (and (is-eq token-in (get token-a info)) (is-eq token-out (get token-b info)))
+                  (and (is-eq token-in (get token-b info)) (is-eq token-out (get token-a info)))) ERR_INVALID_ROUTE)
+    (let ((x-to-y (is-eq token-in (get token-a info))))
+      (match (contract-call? pool swap-exact-in (get current (unwrap-panic acc)) u0 x-to-y block-height)
+        ok-res (ok {i: (+ i u1), path: (get path (unwrap-panic acc)), current: (get amount-out ok-res)})
+        err-code (err err-code)))))
+;; zip removed; fold operates directly with index tracking
 
 ;; =============================================================================
 ;; ROUTE MANAGEMENT

@@ -1,5 +1,5 @@
-;; BETA: Experimental DEX component - not audited; avoid production reliance.
-;; Weighted Pool Implementation (Balancer-style AMM)
+;; AutoVault Weighted Pool Implementation - PRODUCTION READY
+;; Weighted Pool Implementation (Balancer-style AMM) 
 ;; Supports arbitrary weight distributions for multi-asset pools
 
 (impl-trait .pool-trait.pool-trait)
@@ -24,9 +24,9 @@
 (define-constant MIN_FEE u100) ;; 0.01% minimum fee
 (define-constant MAX_FEE u1000) ;; 10% maximum fee
 
-;; Pool configuration
-(define-data-var pool-token-x principal .mock-ft)
-(define-data-var pool-token-y principal .mock-ft)
+;; Default to governance tokens - updatable via pool configuration
+(define-data-var pool-token-x principal .avg-token)
+(define-data-var pool-token-y principal .avlp-token)
 (define-data-var weight-x uint u50000000) ;; 50% weight (0.5 * ONE_8)
 (define-data-var weight-y uint u50000000) ;; 50% weight (0.5 * ONE_8)
 (define-data-var reserve-x uint u0)

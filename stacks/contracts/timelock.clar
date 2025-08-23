@@ -217,8 +217,9 @@
       (begin
         (asserts! (>= block-height (get eta i)) (err u101))
         (map-delete q-gcap { id: id })
-  ;; (as-contract (contract-call? .vault set-global-cap (get cap i))) ;; Temporarily disabled
-  (ok true)
+        ;; Execute global cap update with timelock protection  
+        (try! (as-contract (contract-call? .vault set-global-cap (get cap i))))
+        (ok true)
       )
       (err u102)
     )
@@ -231,8 +232,9 @@
       (begin
         (asserts! (>= block-height (get eta i)) (err u101))
         (map-delete q-ucap { id: id })
-  ;; (as-contract (contract-call? .vault set-user-cap (get cap i))) ;; Temporarily disabled
-  (ok true)
+        ;; Execute user cap update with timelock protection
+        (try! (as-contract (contract-call? .vault set-user-cap (get cap i))))
+        (ok true)
       )
       (err u102)
     )

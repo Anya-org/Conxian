@@ -12,7 +12,11 @@ describe("oracle-aggregator debug", () => {
     simnet = await initSimnet();
     accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
-    wallet1 = accounts.get("wallet_1")!;
+    wallet1 = accounts.get("wallet_1");
+    // Ensure wallet1 exists and is different from deployer (fallback to a known alternate principal)
+    if (!wallet1 || wallet1 === deployer) {
+      wallet1 = "STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6";
+    }
   });
 
   it("DEBUG: Check whitelist status for deployer", () => {
@@ -22,8 +26,8 @@ describe("oracle-aggregator debug", () => {
     console.log("Deployer address:", deployer);
     console.log("Wallet1 address:", wallet1);
 
-    // Check initial state - both should be false
-    let deployerAuth = simnet.callReadOnlyFn(
+  // Check initial state - both should be false
+  let deployerAuth = simnet.callReadOnlyFn(
       "oracle-aggregator",
       "is-oracle",
       [Cl.principal(base), Cl.principal(quote), Cl.principal(deployer)],
@@ -38,6 +42,8 @@ describe("oracle-aggregator debug", () => {
     
     console.log("INITIAL - Deployer is oracle:", deployerAuth.result);
     console.log("INITIAL - Wallet1 is oracle:", wallet1Auth.result);
+  expect(deployerAuth.result.type).toBe('false');
+  expect(wallet1Auth.result.type).toBe('false');
 
     // Register pair with only wallet1
     simnet.callPublicFn(
@@ -52,7 +58,7 @@ describe("oracle-aggregator debug", () => {
       deployer
     );
 
-    // Check after register-pair
+  // Check after register-pair - still false for both (registering pair doesn't whitelist)
     deployerAuth = simnet.callReadOnlyFn(
       "oracle-aggregator",
       "is-oracle",
@@ -68,6 +74,8 @@ describe("oracle-aggregator debug", () => {
     
     console.log("AFTER REGISTER-PAIR - Deployer is oracle:", deployerAuth.result);
     console.log("AFTER REGISTER-PAIR - Wallet1 is oracle:", wallet1Auth.result);
+  expect(deployerAuth.result.type).toBe('false');
+  expect(wallet1Auth.result.type).toBe('false');
 
     // Add only wallet1 to whitelist
     simnet.callPublicFn(
@@ -81,7 +89,7 @@ describe("oracle-aggregator debug", () => {
       deployer
     );
 
-    // Check final state
+  // Check final state - only wallet1 should be whitelisted
     deployerAuth = simnet.callReadOnlyFn(
       "oracle-aggregator",
       "is-oracle",
@@ -98,8 +106,8 @@ describe("oracle-aggregator debug", () => {
     console.log("FINAL - Deployer is oracle:", deployerAuth.result);
     console.log("FINAL - Wallet1 is oracle:", wallet1Auth.result);
 
-  // Current behavior: both deployer and wallet1 appear whitelisted (result.type 'true') after sequence
-  expect(deployerAuth.result.type).toBe('true');
+  // Production behavior: only explicitly added oracles are whitelisted
+  expect(deployerAuth.result.type).toBe('false');
   expect(wallet1Auth.result.type).toBe('true');
   });
 });

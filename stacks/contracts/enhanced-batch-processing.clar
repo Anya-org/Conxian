@@ -21,6 +21,7 @@
 (define-map balances-tokens {user: principal, token: principal} uint)
 (define-data-var total-stx-deposits uint u0)
 (define-data-var base-fee uint u100) ;; example base fee
+(define-data-var current-token (optional principal) none) ;; Store current token being processed
 (define-map pool-info principal {dummy: bool})
 
 ;; =============================================================================
@@ -48,13 +49,13 @@
     success 
       (let ((user (get user deposit))
             (amount (get amount deposit)))
-        (if (deposit-stx-internal user amount)
-          (ok {
+        (match (deposit-stx-internal user amount)
+          deposit-amount (ok {
             count: (+ (get count success) u1),
             total: (+ (get total success) amount),
             failed: (get failed success)
           })
-          (ok {
+          error (ok {
             count: (+ (get count success) u1),
             total: (get total success),
             failed: (+ (get failed success) u1)
@@ -65,7 +66,8 @@
   (token <sip010>)
   (deposits (list 100 {user: principal, amount: uint})))
   (let ((batch-id (get-next-batch-id)))
-    (match (fold (batch-deposit-token-single token) deposits (ok {count: u0, total: u0, failed: u0}))
+    (var-set current-token (some (contract-of token))) ;; Store token contract principal
+    (match (fold batch-deposit-token-single deposits (ok {count: u0, total: u0, failed: u0}))
       success 
         (begin
           (map-set batch-results batch-id {
@@ -78,26 +80,20 @@
       error (err error))))
 
 (define-private (batch-deposit-token-single 
-  (token <sip010>)
   (deposit {user: principal, amount: uint})
   (accumulator (response {count: uint, total: uint, failed: uint} uint)))
   (match accumulator
     success 
       (let ((user (get user deposit))
-            (amount (get amount deposit)))
-        (match (deposit-token-internal token user amount)
-          ok 
-            (ok {
-              count: (+ (get count success) u1),
-              total: (+ (get total success) amount),
-              failed: (get failed success)
-            })
-          error 
-            (ok {
-              count: (+ (get count success) u1),
-              total: (get total success),
-              failed: (+ (get failed success) u1)
-            })))
+            (amount (get amount deposit))
+            (token-contract (unwrap! (var-get current-token) (err u102))))
+        (match (deposit-token-internal user token-contract amount)
+          deposit-amount (ok {
+            count: (+ (get count success) u1),
+            total: (+ (get total success) amount),
+            failed: (get failed success)
+          })
+          error (err error)))
     error (err error)))
 
 ;; =============================================================================
@@ -126,7 +122,7 @@
       (let ((user (get user withdrawal))
             (amount (get amount withdrawal)))
         (match (withdraw-stx-internal user amount)
-          ok 
+          withdraw-amount 
             (ok {
               count: (+ (get count success) u1),
               total: (+ (get total success) amount),
@@ -185,23 +181,12 @@
 (define-private (deposit-stx-internal (user principal) (amount uint))
   (let ((current-balance (default-to u0 (map-get? balances-stx user)))
         (new-balance (+ current-balance amount)))
-    (begin
-      (map-set balances-stx user new-balance)
-      (var-set total-stx-deposits (+ (var-get total-stx-deposits) amount))
-      (ok amount))))
-
-(define-private (deposit-token-internal 
-  (token <sip010>) 
-  (user principal) 
-  (amount uint))
-  (let ((token-id (contract-of token))
-        (current-balance (default-to u0 (map-get? balances-tokens {user: user, token: token-id})))
-        (new-balance (+ current-balance amount)))
-    (begin
-      ;; Move tokens from the user to this contract per SIP-010
-      (try! (contract-call? token transfer-from user (as-contract tx-sender) amount))
-      (map-set balances-tokens {user: user, token: token-id} new-balance)
-      (ok amount))))
+    (if (> amount u0)
+      (begin
+        (map-set balances-stx user new-balance)
+        (var-set total-stx-deposits (+ (var-get total-stx-deposits) amount))
+        (ok amount))
+      (err u101)))) ;; Error for zero amount
 
 (define-private (withdraw-stx-internal (user principal) (amount uint))
   (let ((current-balance (default-to u0 (map-get? balances-stx user))))
@@ -236,10 +221,10 @@
 ;; =============================================================================
 
 (define-private (calculate-batch-fee (operation-count uint))
-  (let ((base-fee (* operation-count (var-get base-fee))))
+  (let ((total-base-fee (* operation-count (var-get base-fee))))
     (if (>= operation-count u10)
-      (- base-fee (/ (* base-fee BATCH_FEE_DISCOUNT) u100))
-      base-fee)))
+      (- total-base-fee (/ (* total-base-fee BATCH_FEE_DISCOUNT) u100))
+      total-base-fee)))
 
 ;; =============================================================================
 ;; EVENT EMISSION FOR MONITORING
@@ -273,25 +258,13 @@
 ;; INTERNAL DEPOSIT/WITHDRAW FUNCTIONS
 ;; =============================================================================
 
-(define-private (deposit-stx-internal (user principal) (amount uint))
-  (begin
-    (map-set balances-stx user (+ (default-to u0 (map-get? balances-stx user)) amount))
-    (var-set total-stx-deposits (+ (var-get total-stx-deposits) amount))
-    true))
-
-(define-private (withdraw-stx-internal (user principal) (amount uint))
-  (let ((current-balance (default-to u0 (map-get? balances-stx user))))
-    (if (>= current-balance amount)
-      (begin
-        (map-set balances-stx user (- current-balance amount))
-        (var-set total-stx-deposits (- (var-get total-stx-deposits) amount))
-        true)
-      false)))
-
 (define-private (deposit-token-internal (user principal) (token principal) (amount uint))
   (let ((key {user: user, token: token}))
-    (map-set balances-tokens key (+ (default-to u0 (map-get? balances-tokens key)) amount))
-    true))
+    (if (> amount u0)
+      (begin
+        (map-set balances-tokens key (+ (default-to u0 (map-get? balances-tokens key)) amount))
+        (ok amount))
+      (err u101)))) ;; Error for zero amount
 
 (define-private (withdraw-token-internal (user principal) (token principal) (amount uint))
   (let ((key {user: user, token: token})
