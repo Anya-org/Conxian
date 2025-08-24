@@ -14,13 +14,16 @@ set -euo pipefail
 HOOK_FILE="chainhooks/vault_autonomics_chainhook.json"
 TMP=$(mktemp)
 
-# Substitute contract, optional URL and bearer
-SED_SCRIPT="s/{VAULT_CONTRACT}/${VAULT_CONTRACT}/g"
+# Substitute contract, optional URL and bearer.
+# Use '|' as the sed delimiter to avoid escaping slashes in URLs and tokens.
+SED_SCRIPT="s|{VAULT_CONTRACT}|${VAULT_CONTRACT}|g"
 if [[ -n "$CHAINHOOK_URL" ]]; then
-  SED_SCRIPT+=$'\n'"s#https://example.com/autonomics-hook#${CHAINHOOK_URL//\//#\\/}#g"
+  # Replace the example delivery URL with the provided CHAINHOOK_URL.
+  SED_SCRIPT+=$'\n'"s|https://example.com/autonomics-hook|${CHAINHOOK_URL}|g"
 fi
 if [[ -n "$CHAINHOOK_BEARER" ]]; then
-  SED_SCRIPT+=$'\n'"s/Bearer CHANGE_ME/Bearer ${CHAINHOOK_BEARER//\//#\\/}/g"
+  # Replace the example bearer token with the provided CHAINHOOK_BEARER.
+  SED_SCRIPT+=$'\n'"s|Bearer CHANGE_ME|Bearer ${CHAINHOOK_BEARER}|g"
 fi
 
 sed -e "$SED_SCRIPT" "$HOOK_FILE" > "$TMP"
