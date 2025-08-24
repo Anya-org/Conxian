@@ -265,8 +265,7 @@
         (memory-issues (if (< memory-efficiency u90) u1 u0)))
     (+ tps-issues (+ finality-issues memory-issues))))
 
-(define-private (trigger-nakamoto-alert (component (string-ascii 30)) (issue-count uint))
-  (response uint uint) ;; Add explicit return type
+(define-private (trigger-nakamoto-alert (component (string-ascii 30)) (issue-count uint) (response uint uint))
   (let ((alert-id (+ (var-get alert-count) u1))
         (severity (if (> issue-count u2) SEVERITY_CRITICAL SEVERITY_WARNING)))
     
