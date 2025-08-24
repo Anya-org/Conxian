@@ -93,8 +93,7 @@
 ;;
 =======================================================================
 ======
-(define-private (initialize-yield-calculation (deposit-id uint) (amount
-uint))
+(define-private (initialize-yield-calculation (deposit-id uint) (amount uint))
 ;; Initialize yield calculation
 (map-set yield-calculations deposit-id {
 user: tx-sender,
