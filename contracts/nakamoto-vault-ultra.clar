@@ -74,11 +74,9 @@
     })
     
     ;; Start yield calculation immediately
-    (try! (initialize-yield-calculation deposit-id amount yield-preference))
-    
+    (initialize-yield-calculation deposit-id amount)
     ;; Update vault metrics
-    (try! (update-vault-metrics "deposit" amount))
-    
+    (update-vault-metrics "deposit" amount)
     (ok {
       deposit-id: deposit-id,
       amount: amount,
@@ -88,25 +86,29 @@
       confirmation-type: "nakamoto-fast"
     })))
 
-;; Define helpers before any usage to satisfy Clarity's no-forward-ref rule
-(define-private (initialize-yield-calculation
-  (deposit-id uint)
-  (amount uint)
-  (preference (string-ascii 20)))
-  ;; Initialize yield calculation
-  (map-set yield-calculations deposit-id {
-    user: tx-sender,
-    principal-amount: amount,
-    yield-rate: u5, ;; 5%
-    calculation-method: preference,
-    last-updated: block-height,
-    compounded: true
-  })
-  (ok true))
-
-(define-private (update-vault-metrics (operation (string-ascii 10)) (amount uint))
-  ;; Update vault metrics
-  (ok true))
+;;
+=======================================================================
+======
+;; MICROBLOCK DEPOSIT SYSTEM
+;;
+=======================================================================
+======
+(define-private (initialize-yield-calculation (deposit-id uint) (amount
+uint))
+;; Initialize yield calculation
+(map-set yield-calculations deposit-id {
+user: tx-sender,
+principal-amount: amount,
+yield-rate: u5, ;; 5%
+calculation-method: "default",
+last-updated: block-height,
+compounded: true
+})
+true)
+(define-private (update-vault-metrics (operation (string-ascii 10))
+(amount uint))
+;; Update vault metrics
+true)
 
 ;; =============================================================================
 ;; ULTRA-FAST BATCH DEPOSITS
