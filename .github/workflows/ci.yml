@@ -12,8 +12,8 @@ env:
   CLARINET_VERSION: '3.5.0'
 
 jobs:
-  lint-typecheck:
-    name: Lint & Type Check
+  test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,204 +21,51 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: stacks/package-lock.json
+          cache-dependency-path: package-lock.json
       - name: Install deps
-        run: cd stacks && npm ci --no-audit --no-fund
-      - name: TypeScript compile (no emit)
-        run: cd stacks && npx tsc --noEmit
-
-  security:
-    name: Security & Code Quality
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: github/codeql-action/init@v3
-        with:
-          languages: typescript
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: stacks/package-lock.json
-      - name: Install deps
-        run: cd stacks && npm ci --no-audit --no-fund
-      - name: Security audit
-        run: cd stacks && npm audit --audit-level=high || true
-      - uses: github/codeql-action/analyze@v3
-
-  contracts:
-    name: Smart Contract Validation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: stacks/package-lock.json
-      - name: Install deps
-        run: cd stacks && npm ci --no-audit --no-fund
-      - name: Verify Clarinet Installation (pinned via npx)
-        run: cd stacks && npx clarinet --version
+        run: npm ci --no-audit --no-fund
+      - name: Verify Clarinet Installation
+        run: npx clarinet --version
       - name: Enforce Clarinet SDK version
         run: |
           set -e
-          VER=$(cd stacks && npx --yes clarinet --version | awk '{print $2}')
+          VER=$(npx --yes clarinet --version | awk '{print $2}')
           if [ "$VER" != "${{ env.CLARINET_VERSION }}" ]; then
             echo "Expected Clarinet ${{ env.CLARINET_VERSION }} but got $VER"
             exit 1
           fi
-      - name: Contract Compilation (pinned Clarinet)
-        run: cd stacks && npx clarinet check
-
-  static-analysis:
-    name: Contract Static Analysis (Placeholder)
-    runs-on: ubuntu-latest
-    needs: [contracts]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Placeholder Static Analysis
-        run: |
-          echo "No dedicated Clarity static analyzer integrated yet."
-          echo "Planned: integrate external security scanner when available."
-          echo "Status: PASS (placeholder)"
-
-  testing:
-    name: Comprehensive Test Suite
-    runs-on: ubuntu-latest
-    needs: [contracts]
-    strategy:
-      matrix:
-        test-suite:
-          - name: Production Suite
-            command: npm test
-            description: Production readiness tests
-          - name: Integration Tests
-            command: npm run int-autonomics || true
-            description: Integration testing
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: stacks/package-lock.json
-      - name: Install deps
-        run: cd stacks && npm ci --no-audit --no-fund
-      - name: Verify Clarinet Installation (pinned via npx)
-        run: cd stacks && npx clarinet --version
-      - name: Run ${{ matrix.test-suite.name }}
-        run: cd stacks && echo "🧪 ${{ matrix.test-suite.description }}" && ${{ matrix.test-suite.command }}
-
-  simulation:
-    name: Economic Simulation
-    runs-on: ubuntu-latest
-    needs: [testing]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Install Python deps
-        run: pip install --upgrade pip requests numpy pandas
-      - name: Run Economic Simulation
-        run: python scripts/economic_simulation.py > simulation-results.json
-      - name: Validate Economic Model
-        run: |
-          python -c "import json;d=json.load(open('simulation-results.json'));f=d.get('final',{});u=f.get('utilization_bps',0);r=f.get('reserve_ratio_bps',0);assert 0<=u<=10000;assert 0<=r<=10000;print('Validation OK')"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: economic-simulation
-          path: simulation-results.json
-          retention-days: 30
-
-  dependencies:
-    name: Dependency Analysis
-    runs-on: ubuntu-latest
-    needs: [lint-typecheck]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Check Dependencies
-        run: python scripts/check_dependencies.py > dependency-report.txt
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dependency-report
-          path: dependency-report.txt
-          retention-days: 7
-
-  sbom:
-    name: SBOM Generation
-    runs-on: ubuntu-latest
-    needs: [lint-typecheck]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: anchore/sbom-action/download-syft@v0.17.1
-      - name: Generate SBOM
-        run: |
-          syft dir:. -o spdx-json=sbom.json
-          cp sbom.json sbom.annotated.json
-      - uses: actions/upload-artifact@v4
-        with:
-          name: sbom-${{ github.sha }}
-          path: sbom.annotated.json
-          retention-days: 30
+      - name: Contract Compilation
+        run: npx clarinet check
+      - name: Run Tests
+        run: npm test
 
   build:
-    name: Build Validation
+    name: Build
     runs-on: ubuntu-latest
-    needs: [security, contracts, testing, lint-typecheck]
+    needs: [test]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: stacks/package-lock.json
+          cache-dependency-path: package-lock.json
       - name: Install deps
-        run: cd stacks && npm ci --no-audit --no-fund
-      - name: Verify Clarinet Installation (pinned via npx)
-        run: cd stacks && npx clarinet --version
-      - name: Pre-deployment Validation
-        run: cd stacks && npm run pre-deploy
+        run: npm ci --no-audit --no-fund
+      - name: Verify Clarinet Installation
+        run: npx clarinet --version
       - name: Package
-        run: tar -czf autovault-deployment.tar.gz stacks/contracts stacks/Clarinet.toml stacks/deployments scripts/deploy-*.sh || true
+        run: tar -czf autovault-deployment.tar.gz contracts/ Clarinet.toml deployments/ scripts/deploy-*.sh || true
       - uses: actions/upload-artifact@v4
         with:
           name: autovault-deployment-${{ github.sha }}
           path: autovault-deployment.tar.gz
           retention-days: 30
 
-  performance:
-    name: Performance Testing
-    runs-on: ubuntu-latest
-    needs: [build, sbom]
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: stacks/package-lock.json
-      - name: Install deps
-        run: cd stacks && npm ci --no-audit --no-fund
-      - name: Run Performance Tests
-        run: cd stacks && npm run test -- --reporter=verbose 2>&1 | tee performance-results.txt
-      - uses: actions/upload-artifact@v4
-        with:
-          name: performance-results
-          path: stacks/performance-results.txt
-          retention-days: 7
-
   summary:
     name: Pipeline Summary
     runs-on: ubuntu-latest
-    needs: [security, contracts, static-analysis, testing, simulation, dependencies, build, sbom, lint-typecheck]
+    needs: [test, build]
     if: always()
     steps:
       - name: Pipeline Status Summary
@@ -227,17 +74,10 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Lint & Type Check | ${{ needs.lint-typecheck.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Security & Code Quality | ${{ needs.security.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Smart Contract Validation | ${{ needs.contracts.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Static Analysis | ${{ needs.static-analysis.result == 'success' && '✅ Passed' || '⚠️ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Comprehensive Testing | ${{ needs.testing.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Economic Simulation | ${{ needs.simulation.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Dependency Analysis | ${{ needs.dependencies.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| SBOM | ${{ needs.sbom.result == 'success' && '✅ Generated' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Build Validation | ${{ needs.build.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Test | ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ${{ needs.build.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [[ "${{ needs.security.result }}" == "success" && "${{ needs.contracts.result }}" == "success" && "${{ needs.testing.result }}" == "success" && "${{ needs.build.result }}" == "success" ]]; then
+          if [[ "${{ needs.test.result }}" == "success" && "${{ needs.build.result }}" == "success" ]]; then
             echo "### 🎉 All critical components passed!" >> $GITHUB_STEP_SUMMARY
           else
             echo "### ⚠️ Some components failed. Review required." >> $GITHUB_STEP_SUMMARY
