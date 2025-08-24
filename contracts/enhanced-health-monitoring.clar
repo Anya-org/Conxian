@@ -362,8 +362,8 @@
   (alert-id uint)
   (component (string-ascii 30))
   (metric-type (string-ascii 30))
-  (severity uint))
-  (response bool uint) ;; Add explicit return type
+  (severity uint)
+  (response bool uint)) ;; Add explicit return type
   (let ((notification-target (get-notification-target severity)))
     
     ;; Determine notification recipient based on environment
