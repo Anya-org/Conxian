@@ -128,8 +128,11 @@ class EnhancedPostDeploymentVerifier {
 
       // Update deployer address from any contract id if available
       const anyId: string | undefined = Object.values(this.config.contracts)[0];
-      if (anyId && anyId.includes('.')) {
+      // Validate contract ID format: 'address.contract-name'
+      if (anyId && /^[a-zA-Z0-9]{1,}\.[a-zA-Z0-9\-_]{1,}$/.test(anyId)) {
         this.config.deployerAddr = anyId.split('.')[0];
+      } else if (anyId) {
+        this.warnings.push(`Malformed contract ID found in deployment registry: "${anyId}". Expected format 'address.contract-name'.`);
       }
       console.log(`Using deployment registry: ${fullPath}`);
     } catch (e) {
