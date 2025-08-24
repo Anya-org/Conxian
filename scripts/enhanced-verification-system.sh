@@ -148,16 +148,18 @@ verify_code_quality() {
     
     # Check for mock dependencies
     log "Checking for mock dependencies..."
-    local mock_count=$(find "$STACKS_DIR/contracts" -name "*.clar" -exec grep -l "\.mock" {} \; 2>/dev/null | wc -l)
+    local mock_files
+    mock_files=$(find "$STACKS_DIR/contracts" -name "*.clar" -exec grep -l "\.mock" {} \; 2>/dev/null)
+    local mock_count=$(echo "$mock_files" | grep -c '^' || echo 0)
     ((max_quality_score += 10))
     if [[ $mock_count -eq 0 ]]; then
         success "No mock dependencies found in production contracts"
         ((quality_score += 10))
     else
         fail "Found $mock_count contracts with mock dependencies"
-        find "$STACKS_DIR/contracts" -name "*.clar" -exec grep -l "\.mock" {} \; 2>/dev/null | while read -r file; do
-            warn "  Mock dependency in: $(basename "$file")"
-        done
+        while read -r file; do
+            [[ -n "$file" ]] && warn "  Mock dependency in: $(basename "$file")"
+        done <<< "$mock_files"
     fi
     
     # Check for TODO/FIXME/placeholder
