@@ -201,10 +201,10 @@
         })
       
       ;; Check for alert conditions
-      (try! (check-alert-conditions component metric-type value threshold-warning threshold-critical consecutive-violations))
-      
-      ;; Update component status
-      (unwrap-panic (update-component-health-status component))
+      (let ((result (try! (check-alert-conditions component metric-type value threshold-warning threshold-critical consecutive-violations))))
+
+        ;; Update component status
+        (unwrap-panic (update-component-health-status component)))
       
       (print {
         event: "health-metric-updated",
@@ -267,7 +267,6 @@
     (+ tps-issues (+ finality-issues memory-issues))))
 
 (define-private (trigger-nakamoto-alert (component (string-ascii 30)) (issue-count uint))
-  (response uint uint)  ;; Add explicit return type
   (let ((alert-id (+ (var-get alert-count) u1))
         (severity (if (> issue-count u2) SEVERITY_CRITICAL SEVERITY_WARNING)))
     
@@ -365,7 +364,6 @@
   (component (string-ascii 30))
   (metric-type (string-ascii 30))
   (severity uint))
-  (response bool uint)  ;; Add explicit return type
   (let ((notification-target (get-notification-target severity)))
     
     ;; Determine notification recipient based on environment

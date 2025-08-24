@@ -171,7 +171,7 @@
   } (map-get? memory-pool pool-id))))
     (begin
       (map-set memory-pool pool-id {
-        available: (concat (get available pool) items),
+        available: (take u100 (concat (get available pool) items)),
         allocated: (filter-out-items (get allocated pool) items),
         pool-type: (get pool-type pool),
         utilization: (if (>= (get utilization pool) (len items))
@@ -301,23 +301,6 @@
   ;; Ultra-fast batch balance updates
   true)
 
-(define-private (take (lst (list 100 uint)) (n uint))
-  ;; Take first n elements
-  (if (> n u0)
-    (list (unwrap-panic (element-at lst u0)))
-    (list)))
-
-(define-private (drop (lst (list 100 uint)) (n uint))
-  ;; Drop first n elements
-  lst) ;; Simplified
-
-(define-private (concat (lst1 (list 100 uint)) (lst2 (list 100 uint)))
-  ;; Concatenate lists
-  lst1) ;; Simplified
-
-(define-private (filter-out-items (allocated (list 100 uint)) (items (list 100 uint)))
-  ;; Filter out items
-  allocated) ;; Simplified
 
 ;; =============================================================================
 ;; READ-ONLY PERFORMANCE METRICS

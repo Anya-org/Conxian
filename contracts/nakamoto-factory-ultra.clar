@@ -92,7 +92,7 @@
         (start-time block-height))
     
     ;; Process in ultra-fast microblock batches
-    (let ((results (process-pool-batch-nakamoto pool-specs batch-id)))
+    (let ((results (process-pool-batch-nakamoto batch-id pool-specs)))
       
       ;; Calculate performance metrics
       (let ((duration (- block-height start-time))
@@ -111,7 +111,7 @@
           results: results
         })))))
 
-(define-private (process-pool-batch-nakamoto (specs (list 5000 {token-a: principal, token-b: principal, liquidity-a: uint, liquidity-b: uint})) (batch-id uint))
+(define-private (process-pool-batch-nakamoto (batch-id uint) (specs (list 5000 {token-a: principal, token-b: principal, liquidity-a: uint, liquidity-b: uint})))
   (map create-single-pool-nakamoto specs))
 
 (define-private (create-single-pool-nakamoto

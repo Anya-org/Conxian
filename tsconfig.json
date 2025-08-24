@@ -20,12 +20,12 @@
     }
   },
   "include": [
-    "../scripts/**/*.ts",
-    "../scripts/**/*.d.ts",
+    "scripts/**/*.ts",
     "scripts/**/*.d.ts",
-    "tests/**/*.ts",
-    "tests/vitest.d.ts",
-    "sdk-tests/**/*.spec.ts"
+    "stacks/scripts/**/*.d.ts",
+    "stacks/tests/**/*.ts",
+    "stacks/tests/vitest.d.ts",
+    "stacks/sdk-tests/**/*.spec.ts"
   ],
   "exclude": ["node_modules"]
 }
