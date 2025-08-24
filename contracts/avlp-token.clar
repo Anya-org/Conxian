@@ -8,7 +8,7 @@
 (define-constant TOKEN_NAME "AutoVault Liquidity Provider")
 (define-constant TOKEN_SYMBOL "AVLP")
 (define-constant TOKEN_DECIMALS u6)
-(define-constant MAX_SUPPLY u5000000000000) ;; 5M AVLP max supply
+(define-constant MAX_SUPPLY u50000000000000) ;; 50M AVLP max supply
 
 ;; Migration periods
 (define-constant EPOCH_1_END u1008) ;; ~1 week

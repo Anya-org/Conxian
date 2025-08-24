@@ -7,7 +7,7 @@
 (define-constant TOKEN_NAME "AutoVault Governance")
 (define-constant TOKEN_SYMBOL "AVG")
 (define-constant TOKEN_DECIMALS u6)
-(define-constant MAX_SUPPLY u10000000000000) ;; 10M AVG total supply
+(define-constant MAX_SUPPLY u100000000000000) ;; 100M AVG total supply
 
 ;; Migration epochs
 (define-constant EPOCH_1_END u1008) ;; ~1 week

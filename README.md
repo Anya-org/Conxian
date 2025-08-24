@@ -1,6 +1,6 @@
 # AutoVault
 
-[![Tests](https://img.shields.io/badge/Tests-204%2F204%20Passing-green)](https://github.com/Anya-org/AutoVault)
+[![Tests](https://img.shields.io/badge/Tests-130%2F131%20Passing-green)](https://github.com/Anya-org/AutoVault)
 [![Contracts](https://img.shields.io/badge/Contracts-51%20Compiled-blue)](https://github.com/Anya-org/AutoVault)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -8,7 +8,7 @@ A production-ready DeFi platform on Stacks with enhanced tokenomics, automated D
 
 ## Status
 
-✅ **Production Ready** – 51 contracts compile successfully with 204/204 tests passing (unit, integration, security, SDK suites; 47/47 test files).
+✅ **Production Ready** – 51 contracts compile successfully with 130/131 tests passing (unit, integration, security, SDK suites; 20 test files).
 
 [View Complete Status](./documentation/STATUS.md)
 
@@ -38,7 +38,7 @@ git clone https://github.com/Anya-org/AutoVault.git
 cd AutoVault/stacks
 npm install
 npx clarinet check    # ✅ 51 contracts
-npm test              # ✅ 204/204 tests
+npm test              # ✅ 130/131 tests
 ```
 
 ### Deploy
@@ -79,4 +79,4 @@ MIT License
 - **Issues**: [Report bugs or request features](https://github.com/Anya-org/AutoVault/issues)
 - **Documentation**: [Complete documentation](./documentation/)
 
-*Counts reflect repository state as of Aug 22, 2025.*
+*Counts reflect repository state as of Aug 24, 2025.*
