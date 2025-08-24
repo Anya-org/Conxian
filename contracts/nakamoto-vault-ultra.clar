@@ -74,10 +74,10 @@
     })
     
     ;; Start yield calculation immediately
-  (initialize-yield-calculation deposit-id amount yield-preference)
+    (try! (initialize-yield-calculation deposit-id amount yield-preference))
     
     ;; Update vault metrics
-    (update-vault-metrics "deposit" amount)
+    (try! (update-vault-metrics "deposit" amount))
     
     (ok {
       deposit-id: deposit-id,
@@ -89,7 +89,10 @@
     })))
 
 ;; Define helpers before any usage to satisfy Clarity's no-forward-ref rule
-(define-private (initialize-yield-calculation (deposit-id uint) (amount uint) (preference (string-ascii 20)))
+(define-private (initialize-yield-calculation
+  (deposit-id uint)
+  (amount uint)
+  (preference (string-ascii 20)))
   ;; Initialize yield calculation
   (map-set yield-calculations deposit-id {
     user: tx-sender,
@@ -99,11 +102,11 @@
     last-updated: block-height,
     compounded: true
   })
-  true)
+  (ok true))
 
 (define-private (update-vault-metrics (operation (string-ascii 10)) (amount uint))
   ;; Update vault metrics
-  true)
+  (ok true))
 
 ;; =============================================================================
 ;; ULTRA-FAST BATCH DEPOSITS
@@ -136,7 +139,7 @@
         })))))
 
 (define-private (process-deposit-batch-nakamoto
-  (deposits (list 10000 {user: principal, amount: uint, yield-preference: (string-ascii 20)}))
+  (deposits (list 10000 (tuple (user principal) (amount uint) (yield-preference (string-ascii 20)))))
   (batch-id uint))
   (map process-single-deposit-nakamoto deposits))
 

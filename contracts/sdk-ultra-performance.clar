@@ -50,6 +50,25 @@
 ;; HELPER FUNCTIONS
 ;; =============================================================================
 
+(define-private (concat (lst1 (list 200 uint)) (lst2 (list 200 uint)))
+  (fold append lst2 lst1))
+
+(define-private (take-helper (lst (list 200 uint)) (n uint) (acc (list 200 uint)))
+  (if (or (is-eq (len lst) u0) (is-eq n u0))
+    acc
+    (take-helper
+      (unwrap-panic (slice? lst u1 (len lst)))
+      (- n u1)
+      (append acc (unwrap-panic (element-at lst u0)))
+    )
+  )
+)
+
+(define-private (take (lst (list 200 uint)) (n uint))
+  (take-helper lst n (list))
+)
+
+
 (define-private (get-next-batch-id)
   (+ block-height (var-get ultra-tps-peak)))
 
@@ -60,6 +79,32 @@
 
 (define-private (ref-to-data (ref uint))
   (+ ref u1000)) ;; Simulate data lookup
+
+(define-private (concat (lst1 (list 200 uint)) (lst2 (list 200 uint)))
+  (fold append lst2 lst1))
+
+(define-private (take-helper (lst (list 200 uint)) (n uint) (acc (list 200 uint)))
+  (if (or (is-eq (len lst) u0) (is-eq n u0))
+    acc
+    (take-helper
+      (unwrap-panic (slice? lst u1 (len lst)))
+      (- n u1)
+      (append acc (unwrap-panic (element-at lst u0)))
+    )
+  )
+)
+
+(define-private (take (lst (list 200 uint)) (n uint))
+  (take-helper lst n (list))
+)
+
+(define-private (drop (lst (list 100 uint)) (n uint))
+  ;; Drop first n elements
+  lst) ;; Simplified
+
+(define-private (filter-out-items (allocated (list 100 uint)) (items (list 100 uint)))
+  ;; Filter out items
+  allocated) ;; Simplified
 
 ;; =============================================================================
 ;; ZERO-COPY OPERATIONS
@@ -156,22 +201,22 @@
         (new-allocated (concat (get allocated pool) allocated-items)))
         (map-set memory-pool pool-id {
           available: remaining,
-          allocated: (get allocated pool),
+          allocated: new-allocated,
           pool-type: (get pool-type pool),
           utilization: (+ (get utilization pool) (len allocated-items))
         })
         (ok allocated-items)))))
 
-(define-public (deallocate-to-pool (pool-id uint) (items (list 100 uint)))
+(define-public (deallocate-to-pool (pool-id uint) (items (list 200 uint)))
   (let ((pool (default-to {
     available: (list),
     allocated: (list),
     pool-type: "general", 
     utilization: u0
   } (map-get? memory-pool pool-id))))
-    (begin
+    (let ((new-available (concat (get available pool) items)))
       (map-set memory-pool pool-id {
-        available: (concat (get available pool) items),
+        available: (take new-available MEMORY_POOL_SIZE),
         allocated: (filter-out-items (get allocated pool) items),
         pool-type: (get pool-type pool),
         utilization: (if (>= (get utilization pool) (len items))
@@ -300,24 +345,6 @@
 (define-private (batch-update-balances (users (list 10000 principal)) (amounts (list 5000 uint)))
   ;; Ultra-fast batch balance updates
   true)
-
-(define-private (take (lst (list 100 uint)) (n uint))
-  ;; Take first n elements
-  (if (> n u0)
-    (list (unwrap-panic (element-at lst u0)))
-    (list)))
-
-(define-private (drop (lst (list 100 uint)) (n uint))
-  ;; Drop first n elements
-  lst) ;; Simplified
-
-(define-private (concat (lst1 (list 100 uint)) (lst2 (list 100 uint)))
-  ;; Concatenate lists
-  lst1) ;; Simplified
-
-(define-private (filter-out-items (allocated (list 100 uint)) (items (list 100 uint)))
-  ;; Filter out items
-  allocated) ;; Simplified
 
 ;; =============================================================================
 ;; READ-ONLY PERFORMANCE METRICS

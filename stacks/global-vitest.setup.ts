@@ -2,10 +2,13 @@
 import path from 'path';
 
 export default function setup() {
+  console.log('__dirname:', __dirname);
+  const manifestPath = path.resolve(__dirname, '../Clarinet.toml');
+  console.log('manifestPath:', manifestPath);
   // Set up global options required by clarinet SDK
   global.options = {
     clarinet: {
-      manifestPath: path.resolve(__dirname, 'Clarinet.toml'),
+      manifestPath: manifestPath,
       initBeforeEach: true,
       coverage: false,
       coverageFilename: 'coverage.lcov',

@@ -244,11 +244,11 @@
     
     ;; Check Nakamoto performance thresholds
     (let ((performance-issues (check-nakamoto-performance component microblock-tps bitcoin-finality-time memory-efficiency)))
-      (begin
-        (if (> performance-issues u0)
-          (begin (try! (trigger-nakamoto-alert component performance-issues)) true)
-          true)
-        (ok true)))
+      (if (> performance-issues u0)
+          (match (trigger-nakamoto-alert component performance-issues)
+            success (ok true)
+            error (err error))
+          (ok true)))
     
     (print {
       event: "nakamoto-metrics-updated",
@@ -267,7 +267,6 @@
     (+ tps-issues (+ finality-issues memory-issues))))
 
 (define-private (trigger-nakamoto-alert (component (string-ascii 30)) (issue-count uint))
-  (response uint uint)  ;; Add explicit return type
   (let ((alert-id (+ (var-get alert-count) u1))
         (severity (if (> issue-count u2) SEVERITY_CRITICAL SEVERITY_WARNING)))
     
@@ -365,7 +364,6 @@
   (component (string-ascii 30))
   (metric-type (string-ascii 30))
   (severity uint))
-  (response bool uint)  ;; Add explicit return type
   (let ((notification-target (get-notification-target severity)))
     
     ;; Determine notification recipient based on environment

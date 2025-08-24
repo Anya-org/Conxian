@@ -87,7 +87,7 @@
 ;; =============================================================================
 
 (define-public (create-pools-batch-nakamoto
-  (pool-specs (list 5000 {token-a: principal, token-b: principal, liquidity-a: uint, liquidity-b: uint})))
+  (pool-specs (list 5000 (tuple (token-a principal) (token-b principal) (liquidity-a uint) (liquidity-b uint)))))
   (let ((batch-id (get-next-batch-id))
         (start-time block-height))
     
@@ -111,7 +111,9 @@
           results: results
         })))))
 
-(define-private (process-pool-batch-nakamoto (specs (list 5000 {token-a: principal, token-b: principal, liquidity-a: uint, liquidity-b: uint})) (batch-id uint))
+(define-private (process-pool-batch-nakamoto
+  (specs (list 5000 (tuple (token-a principal) (token-b principal) (liquidity-a uint) (liquidity-b uint))))
+  (batch-id uint))
   (map create-single-pool-nakamoto specs))
 
 (define-private (create-single-pool-nakamoto

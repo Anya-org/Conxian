@@ -12,7 +12,7 @@
     "vitest": "^3.2.4"
   },
   "scripts": {
-  "test": "../scripts/ensure-deps.sh && npx vitest run",
+  "test": "cd .. && ./scripts/ensure-deps.sh && npx vitest run --config ./vitest.config.ts",
     "test:watch": "../scripts/ensure-deps.sh && npx vitest watch",
     "test:auto": "chokidar 'contracts/**/*.clar' 'tests/**/*.ts' 'sdk-tests/**/*.spec.ts' -c '../scripts/ensure-deps.sh && npm run check && npx vitest run'",
     "test:manual": "../scripts/manual-testing.sh",
