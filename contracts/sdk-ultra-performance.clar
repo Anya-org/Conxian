@@ -50,6 +50,25 @@
 ;; HELPER FUNCTIONS
 ;; =============================================================================
 
+(define-private (concat (lst1 (list 200 uint)) (lst2 (list 200 uint)))
+  (fold append lst2 lst1))
+
+(define-private (take-helper (lst (list 200 uint)) (n uint) (acc (list 200 uint)))
+  (if (or (is-eq (len lst) u0) (is-eq n u0))
+    acc
+    (take-helper
+      (unwrap-panic (slice? lst u1 (len lst)))
+      (- n u1)
+      (append acc (unwrap-panic (element-at lst u0)))
+    )
+  )
+)
+
+(define-private (take (lst (list 200 uint)) (n uint))
+  (take-helper lst n (list))
+)
+
+
 (define-private (get-next-batch-id)
   (+ block-height (var-get ultra-tps-peak)))
 
