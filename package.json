@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "npm-cli": "^0.1.0"
+    "vittest": "^1.0.2"
   }
 }
