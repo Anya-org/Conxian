@@ -58,8 +58,9 @@ check_prerequisites() {
     local contract_count=$(find stacks/contracts -name "*.clar" | wc -l)
     log "${GREEN}✓ Found ${contract_count} contracts${NC}"
     
-    if [ "$contract_count" -ne "71" ]; then
-        log "${YELLOW}⚠️  Expected 71 contracts, found ${contract_count}${NC}"
+    local expected_contract_count=${EXPECTED_CONTRACT_COUNT:-$contract_count}
+    if [ "$contract_count" -ne "$expected_contract_count" ]; then
+        log "${YELLOW}⚠️  Expected ${expected_contract_count} contracts, found ${contract_count}${NC}"
     fi
     
     # Check Nakamoto contracts
