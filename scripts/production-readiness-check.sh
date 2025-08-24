@@ -346,29 +346,29 @@ estimate_performance() {
     # Check batch processing configuration
     if [[ -f "$ROOT_DIR/contracts/enhanced-batch-processing.clar" ]]; then
         local batch_lines=$(grep -c "batch\|process\|queue" "$ROOT_DIR/contracts/enhanced-batch-processing.clar" 2>/dev/null || echo 0)
-        if [[ $batch_lines -ge 10 ]]; then
-            batch_size=180000
+        if [[ $batch_lines -ge $BATCH_LINES_THRESHOLD ]]; then
+            batch_size=$BATCH_TPS
         fi
     fi
     
     # Check caching system
     if [[ -f "$ROOT_DIR/contracts/advanced-caching-system.clar" ]]; then
         local cache_lines=$(grep -c "cache\|store\|retrieve" "$ROOT_DIR/contracts/advanced-caching-system.clar" 2>/dev/null || echo 0)
-        if [[ $cache_lines -ge 8 ]]; then
-            cache_config=40000
+        if [[ $cache_lines -ge $CACHE_LINES_THRESHOLD ]]; then
+            cache_config=$CACHE_TPS
         fi
     fi
     
     # Check load distribution
     if [[ -f "$ROOT_DIR/contracts/dynamic-load-distribution.clar" ]]; then
         local load_lines=$(grep -c "load\|balance\|distribute" "$ROOT_DIR/contracts/dynamic-load-distribution.clar" 2>/dev/null || echo 0)
-        if [[ $load_lines -ge 5 ]]; then
-            load_dist=35000
+        if [[ $load_lines -ge $LOAD_LINES_THRESHOLD ]]; then
+            load_dist=$LOAD_TPS
         fi
     fi
     
     local total_estimated_tps=$((batch_size + cache_config + load_dist))
-    local target_tps=735000
+    local target_tps=$TARGET_TPS
     
     if [[ $total_estimated_tps -ge $((target_tps * 80 / 100)) ]]; then
         success "Performance Estimation: ~${total_estimated_tps} TPS potential (target: ${target_tps})"
