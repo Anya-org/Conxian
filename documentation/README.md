@@ -43,23 +43,6 @@ and purpose.
 | Check current status | [Status](./STATUS.md) |
 | Deploy to production | [Deployment](./DEPLOYMENT.md) |
 
-## System Overview
-
-**18 Smart Contracts** - Production ready with 58/58 tests passing
-
-- 6 Core system contracts (vault, treasury, governance, timelock,
-  analytics, registry)
-- 4 Token economic contracts (AVG, AVLP, gov-token, creator-token)  
-- 8 Security & infrastructure contracts (bounty systems, traits, testing)
-
-### Enhanced Features
-
-- 100M AVG governance token supply
-- 50M AVLP liquidity token supply
-- Automated DAO buybacks and treasury management
-- Multi-signature security controls
-- Emergency pause mechanisms
-
 ## Documentation Standards
 
 All documentation follows these principles:
@@ -69,8 +52,3 @@ All documentation follows these principles:
 - **Current**: Reflects actual implementation
 - **Concise**: No redundancy or outdated information
 - **Searchable**: Well-structured with clear headings
-
----
-
-*Last Updated: August 16, 2025*
-*Version: 1.0 (Production Ready)*

@@ -284,3 +284,24 @@ The platform is designed for maximum security while maintaining usability and de
 *Last Updated: August 17, 2025*  
 *Security Version: 1.0*  
 *Audit Status: Ready for External Review*
+
+---
+
+## Audits
+
+This section contains information about security audits performed on the AutoVault platform.
+
+### Security Audit
+
+- **Date Completed:** _TBD_
+- **Performed By:** _Audit Firm_
+- **Full Report:** _Link to report_
+
+### Key Findings & Resolutions
+
+_Summary of findings and how they were addressed._
+
+### Security Contacts
+
+- security@autovault.defi
+- [Bug Bounty Program](https://bugbounty.autovault.defi)
