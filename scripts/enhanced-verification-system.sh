@@ -226,24 +226,32 @@ verify_contract_compilation() {
     
     cd "$STACKS_DIR"
     
+    # Create temporary log files
+    CLARINET_LOG="$(mktemp)"
+    ANALYSIS_LOG="$(mktemp)"
+    
     log "Running clarinet check for syntax verification..."
-    if npx clarinet check > /tmp/clarinet_check.log 2>&1; then
+    if npx clarinet check > "$CLARINET_LOG" 2>&1; then
         success "All contracts compiled successfully"
         PASSED_GATES+=("Contract Compilation")
     else
         fail "Contract compilation failed"
-        cat /tmp/clarinet_check.log
+        cat "$CLARINET_LOG"
+        # Clean up temp files before returning
+        rm -f "$CLARINET_LOG" "$ANALYSIS_LOG"
         return 1
     fi
     
     # Enhanced contract analysis
     log "Analyzing contract dependencies..."
-    if npx clarinet run --allow-write scripts/analyze-contracts.ts > /tmp/analysis.log 2>&1; then
+    if npx clarinet run --allow-write scripts/analyze-contracts.ts > "$ANALYSIS_LOG" 2>&1; then
         success "Contract dependency analysis passed"
     else
         warn "Contract dependency analysis had issues"
-        cat /tmp/analysis.log
+        cat "$ANALYSIS_LOG"
     fi
+    # Clean up temp files at the end
+    rm -f "$CLARINET_LOG" "$ANALYSIS_LOG"
 }
 
 # =============================================================================
