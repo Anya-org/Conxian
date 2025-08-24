@@ -47,6 +47,21 @@
 })
 
 ;; =============================================================================
+;; HELPER FUNCTIONS
+;; =============================================================================
+
+(define-private (get-next-batch-id)
+  (+ block-height (var-get ultra-tps-peak)))
+
+;; Zero-copy helpers must be defined before use
+(define-private (get-data-by-refs (refs (list 1000 uint)))
+  ;; Simulate zero-copy data access
+  (map ref-to-data refs))
+
+(define-private (ref-to-data (ref uint))
+  (+ ref u1000)) ;; Simulate data lookup
+
+;; =============================================================================
 ;; ZERO-COPY OPERATIONS
 ;; =============================================================================
 
@@ -125,38 +140,27 @@
 ;; =============================================================================
 
 (define-public (allocate-from-pool (pool-id uint) (size uint))
-  (let ((pool (default-to {
-    available: (list),
-    allocated: (list),
-    pool-type: "general",
-    utilization: u0
-  } (map-get? memory-pool pool-id))))
-    
-    (if (>= (len (get available pool)) size)
-      (let ((allocated-items (take (get available pool) size))
-            (remaining (drop (get available pool) size))
-            (current-allocated (get allocated pool))
-            (max-additional (- u100 (len current-allocated)))
-            (safe-allocated-items (if (> (len allocated-items) max-additional)
-                                     (take allocated-items max-additional)
-                                     allocated-items))
-            (truncated-allocated (if (> (len safe-allocated-items) max-additional)
-                                    (take safe-allocated-items max-additional)
-                                    safe-allocated-items))
-            (final-allocated (if (> (+ (len current-allocated) (len truncated-allocated)) u100)
-                               (concat current-allocated (take truncated-allocated (- u100 (len current-allocated))))
-                               (concat current-allocated truncated-allocated)))
-        (if (<= (len final-allocated) u100)
-          (begin
-            (map-set memory-pool pool-id {
-              available: remaining,
-              allocated: final-allocated,
-              pool-type: (get pool-type pool),
-              utilization: (+ (get utilization pool) (len truncated-allocated))
-            })
-            (ok truncated-allocated))
-          (err u601))) ;; Error: would exceed allocated list size
-      (err u600))))
+  (let (
+    (pool (default-to {
+      available: (list),
+      allocated: (list),
+      pool-type: "general",
+      utilization: u0
+    } (map-get? memory-pool pool-id)))
+    (available (get available pool)))
+    (if (< (len available) size)
+      (err u600)
+      (let (
+        (allocated-items (take available size))
+        (remaining (drop available size))
+        (new-allocated (concat (get allocated pool) allocated-items)))
+        (map-set memory-pool pool-id {
+          available: remaining,
+          allocated: (get allocated pool),
+          pool-type: (get pool-type pool),
+          utilization: (+ (get utilization pool) (len allocated-items))
+        })
+        (ok allocated-items)))))
 
 (define-public (deallocate-to-pool (pool-id uint) (items (list 100 uint)))
   (let ((pool (default-to {
@@ -165,16 +169,16 @@
     pool-type: "general", 
     utilization: u0
   } (map-get? memory-pool pool-id))))
-    
-    (map-set memory-pool pool-id {
-      available: (concat (get available pool) items),
-      allocated: (filter-out-items (get allocated pool) items),
-      pool-type: (get pool-type pool),
-      utilization: (if (>= (get utilization pool) (len items))
-                     (- (get utilization pool) (len items))
-                     u0)
-    })
-    (ok true)))
+    (begin
+      (map-set memory-pool pool-id {
+        available: (concat (get available pool) items),
+        allocated: (filter-out-items (get allocated pool) items),
+        pool-type: (get pool-type pool),
+        utilization: (if (>= (get utilization pool) (len items))
+                       (- (get utilization pool) (len items))
+                       u0)
+      })
+      (ok true))))
 
 ;; =============================================================================
 ;; ULTRA-HIGH PERFORMANCE BATCH OPERATIONS
@@ -287,16 +291,6 @@
 ;; SDK 4.0 UTILITY FUNCTIONS
 ;; =============================================================================
 
-(define-private (get-next-batch-id)
-  (+ block-height (var-get ultra-tps-peak)))
-
-(define-private (get-data-by-refs (refs (list 1000 uint)))
-  ;; Simulate zero-copy data access
-  (map ref-to-data refs))
-
-(define-private (ref-to-data (ref uint))
-  (+ ref u1000)) ;; Simulate data lookup
-
 (define-private (get-deposit-amount (deposit {user: principal, amount: uint}))
   (get amount deposit))
 
@@ -328,7 +322,6 @@
 ;; =============================================================================
 ;; READ-ONLY PERFORMANCE METRICS
 ;; =============================================================================
-
 (define-read-only (get-sdk-performance-metrics)
   {
     sdk-version: SDK_VERSION,

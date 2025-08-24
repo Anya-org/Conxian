@@ -362,6 +362,7 @@
   (component (string-ascii 30))
   (severity uint)
   (message (string-ascii 200)))
+  (response bool uint)
   (let ((network (var-get network-type))
         (target (map-get? notification-targets { network: network, severity: severity })))
     

@@ -111,9 +111,7 @@
           results: results
         })))))
 
-(define-private (process-pool-batch-nakamoto
-  (specs (list 5000 {token-a: principal, token-b: principal, liquidity-a: uint, liquidity-b: uint}))
-  (batch-id uint))
+(define-private (process-pool-batch-nakamoto (specs (list 5000 {token-a: principal, token-b: principal, liquidity-a: uint, liquidity-b: uint})) (batch-id uint))
   (map create-single-pool-nakamoto specs))
 
 (define-private (create-single-pool-nakamoto
@@ -272,7 +270,8 @@
 
 (define-private (initialize-liquidity-fast (pool principal) (amount-a uint) (amount-b uint))
   ;; Fast liquidity initialization
-  (ok true))
+  ;; Ensure concrete response type for try!
+  (if false (err u101) (ok true)))
 
 (define-private (update-fast-block-metrics (pool-id uint))
   ;; Update fast block performance metrics
@@ -294,7 +293,8 @@
   (amount-b uint)
   (provider principal))
   ;; Fast liquidity processing
-  (ok true))
+  ;; Ensure concrete response type for try!
+  (if false (err u102) (ok true)))
 
 (define-private (calculate-swap-output (amount-in uint))
   ;; Calculate swap output
@@ -307,7 +307,8 @@
   (amount-out uint)
   (trader principal))
   ;; Execute fast swap
-  (ok true))
+  ;; Ensure concrete response type for try!
+  (if false (err u103) (ok true)))
 
 ;; =============================================================================
 ;; READ-ONLY FUNCTIONS

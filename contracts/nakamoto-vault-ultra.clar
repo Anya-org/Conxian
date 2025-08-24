@@ -74,7 +74,7 @@
     })
     
     ;; Start yield calculation immediately
-    (initialize-yield-calculation deposit-id amount yield-preference)
+  (initialize-yield-calculation deposit-id amount yield-preference)
     
     ;; Update vault metrics
     (update-vault-metrics "deposit" amount)
@@ -87,6 +87,23 @@
       yield-active: true,
       confirmation-type: "nakamoto-fast"
     })))
+
+;; Define helpers before any usage to satisfy Clarity's no-forward-ref rule
+(define-private (initialize-yield-calculation (deposit-id uint) (amount uint) (preference (string-ascii 20)))
+  ;; Initialize yield calculation
+  (map-set yield-calculations deposit-id {
+    user: tx-sender,
+    principal-amount: amount,
+    yield-rate: u5, ;; 5%
+    calculation-method: preference,
+    last-updated: block-height,
+    compounded: true
+  })
+  true)
+
+(define-private (update-vault-metrics (operation (string-ascii 10)) (amount uint))
+  ;; Update vault metrics
+  true)
 
 ;; =============================================================================
 ;; ULTRA-FAST BATCH DEPOSITS
@@ -309,22 +326,6 @@
 
 (define-private (get-deposit-amount (deposit {user: principal, amount: uint, yield-preference: (string-ascii 20)}))
   (get amount deposit))
-
-(define-private (initialize-yield-calculation (deposit-id uint) (amount uint) (preference (string-ascii 20)))
-  ;; Initialize yield calculation
-  (map-set yield-calculations deposit-id {
-    user: tx-sender,
-    principal-amount: amount,
-    yield-rate: u5, ;; 5%
-    calculation-method: preference,
-    last-updated: block-height,
-    compounded: true
-  })
-  true)
-
-(define-private (update-vault-metrics (operation (string-ascii 10)) (amount uint))
-  ;; Update vault metrics
-  true)
 
 (define-private (execute-fast-withdrawal (withdrawal-id uint) (amount uint))
   ;; Execute fast withdrawal
