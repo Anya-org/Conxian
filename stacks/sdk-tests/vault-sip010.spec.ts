@@ -13,13 +13,13 @@ import {
 } from './helpers/sip010-helpers';
 
 /**
- * SIP-010 integration tests for vault deposit-v2 and withdraw-v2 paths.
+ * SIP-010 integration tests for vault deposit and withdraw paths.
  * Uses timelock to set token principal, enforces min-delay by mining blocks,
  * and validates fee, shares, and reserves accounting.
  */
 
-describe('vault: SIP-010 deposit-v2 / withdraw-v2', () => {
-  it('timelock set-token -> deposit-v2 -> withdraw-v2 with correct fees/shares', async () => {
+describe('vault: SIP-010 deposit / withdraw', () => {
+  it('timelock set-token -> deposit -> withdraw with correct fees/shares', async () => {
     const simnet = await initSimnet();
     const accounts = simnet.getAccounts();
     const deployer = accounts.get('deployer')!;
@@ -37,9 +37,9 @@ describe('vault: SIP-010 deposit-v2 / withdraw-v2', () => {
     const approveRes = approve(simnet, 'mock-ft', user, vault, 25_000);
     expect(['ok', 'err']).toContain(approveRes.result.type);
 
-    // Deposit 10,000 via deposit-v2 using SIP-010 trait reference
+    // Deposit 10,000 via deposit using SIP-010 trait reference
     const ftRef = contractPrincipal('mock-ft', deployer);
-    const deposit = simnet.callPublicFn('vault', 'deposit-v2', [Cl.uint(10_000), ftRef], user);
+    const deposit = simnet.callPublicFn('vault', 'deposit', [Cl.uint(10_000), ftRef], user);
     expect(deposit.result).toEqual({ type: 'ok', value: { type: 'uint', value: 9970n } }); // 0.30% fee => 30
 
     // Totals after deposit
@@ -56,8 +56,8 @@ describe('vault: SIP-010 deposit-v2 / withdraw-v2', () => {
     const userSharesAfterDep = getVaultShare(simnet, user, deployer);
     expect(userSharesAfterDep.result).toEqual({ type: 'uint', value: 9970n });
 
-    // Withdraw 5,000 via withdraw-v2 -> 0.10% fee => 5,000 * 0.001 = 5
-    const withdraw = simnet.callPublicFn('vault', 'withdraw-v2', [Cl.uint(5_000), ftRef], user);
+    // Withdraw 5,000 via withdraw -> 0.10% fee => 5,000 * 0.001 = 5
+    const withdraw = simnet.callPublicFn('vault', 'withdraw', [Cl.uint(5_000), ftRef], user);
     // payout = amount - fee = 5000 - 5 = 4995
     expect(withdraw.result).toEqual({ type: 'ok', value: { type: 'uint', value: 4995n } });
 
@@ -76,7 +76,7 @@ describe('vault: SIP-010 deposit-v2 / withdraw-v2', () => {
     expect(userSharesAfterW.result).toEqual({ type: 'uint', value: 4970n });
   });
 
-  it('rejects deposit-v2 when token principal mismatches (invalid-token)', async () => {
+  it('rejects deposit when token principal mismatches (invalid-token)', async () => {
     const simnet = await initSimnet();
     const accounts = simnet.getAccounts();
     const deployer = accounts.get('deployer')!;
@@ -88,7 +88,7 @@ describe('vault: SIP-010 deposit-v2 / withdraw-v2', () => {
     setVaultTokenViaTimelock(simnet, avg);
 
     const ftMock = contractPrincipal('mock-ft', deployer);
-    const badDeposit = simnet.callPublicFn('vault', 'deposit-v2', [Cl.uint(1_000), ftMock], user);
+    const badDeposit = simnet.callPublicFn('vault', 'deposit', [Cl.uint(1_000), ftMock], user);
     expect(badDeposit.result.type).toBe('err'); // err u201 (invalid-token)
   });
 });

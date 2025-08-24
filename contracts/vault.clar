@@ -567,74 +567,7 @@
   )
 )
 
-(define-public (deposit (amount uint))
-  (begin
-    (asserts! (is-eq (var-get paused) false) (err u103))
-    (asserts! (> amount u0) (err u1))
-    ;; Guard: legacy path requires DEV mock token; use deposit-v2 for prod
-    (asserts! (is-eq (var-get token) .mock-ft) (err u201))
-    (let (
-        (user tx-sender)
-        (current-shares (default-to u0 (get amount (map-get? shares { user: tx-sender }))))
-        (fee (/ (* amount (var-get fee-deposit-bps)) BPS_DENOM))
-        (credited (- amount fee))
-      )
-      (asserts! (<= (+ (var-get total-balance) credited) (var-get global-cap))
-        (err u102)
-      )
-      (let ((ts (var-get total-shares)) (tb (var-get total-balance)))
-        (let ((cur-assets (if (is-eq ts u0) u0 (/ (* current-shares tb) ts))))
-          (asserts! (<= (+ cur-assets credited) (var-get user-cap)) (err u104))
-        )
-      )
-      ;; rate limit check/update
-      (let (
-          (h block-height)
-          (cur (default-to u0
-            (get amount (map-get? block-volume { height: block-height }))
-          ))
-        )
-        (if (var-get rate-limit-enabled)
-          (asserts! (<= (+ cur amount) (var-get block-limit)) (err u105))
-          true
-        )
-        (map-set block-volume { height: h } { amount: (+ cur amount) })
-      )
-      ;; Pull tokens from user into the vault using the stored token contract
-      (unwrap!
-        (as-contract (contract-call? .mock-ft transfer-from user tx-sender amount))
-        (err u200)
-      )
-      ;; Mint shares proportional to current NAV
-      (let ((ts (var-get total-shares)) (tb (var-get total-balance)))
-        (let ((minted (if (or (is-eq ts u0) (is-eq tb u0))
-                        credited
-                        (mul-div-floor credited ts tb))))
-          (map-set shares { user: tx-sender } { amount: (+ current-shares minted) })
-          (var-set total-shares (+ ts minted))
-        )
-      )
-      (let (
-          (tshare (/ (* fee (var-get fee-split-bps)) BPS_DENOM))
-          (pshare (- fee (/ (* fee (var-get fee-split-bps)) BPS_DENOM)))
-        )
-        (var-set treasury-reserve (+ (var-get treasury-reserve) tshare))
-        (var-set protocol-reserve (+ (var-get protocol-reserve) pshare))
-      )
-      (var-set total-balance (+ (var-get total-balance) credited))
-      (print {
-        event: "deposit",
-        user: tx-sender,
-        gross: amount,
-        fee: fee,
-        net: credited,
-      })
-      (ok credited)
-    )
-  )
-)
-
-(define-public (deposit-v2 (amount uint) (ft <sip010>))
+(define-public (deposit (amount uint) (ft <sip010>))
   (begin
     (asserts! (is-eq (var-get paused) false) (err u103))
     (asserts! (> amount u0) (err u1))
@@ -686,7 +619,7 @@
       )
       (var-set total-balance (+ (var-get total-balance) credited))
       (print {
-        event: "deposit-v2",
+        event: "deposit",
         user: tx-sender,
         gross: amount,
         fee: fee,
@@ -697,58 +630,7 @@
   )
 )
 
-(define-public (withdraw (amount uint))
-  (begin
-    (asserts! (is-eq (var-get paused) false) (err u103))
-    (asserts! (> amount u0) (err u1))
-    ;; Guard: legacy path requires DEV mock token; use withdraw-v2 for prod
-    (asserts! (is-eq (var-get token) .mock-ft) (err u201))
-    (let (
-        (user tx-sender)
-        (current-shares (default-to u0 (get amount (map-get? shares { user: tx-sender }))))
-      )
-      (let ((ts (var-get total-shares)) (tb (var-get total-balance)))
-        (let ((cur-assets (if (is-eq ts u0) u0 (/ (* current-shares tb) ts))))
-          (asserts! (>= cur-assets amount) (err u2))
-        )
-      )
-      (let (
-          (fee (/ (* amount (var-get fee-withdraw-bps)) BPS_DENOM))
-          (payout (- amount fee))
-        )
-        (let ((ts (var-get total-shares)) (tb (var-get total-balance)))
-          (let ((burn (mul-div-ceil amount ts tb)))
-            (asserts! (>= current-shares burn) (err u2))
-            (map-set shares { user: tx-sender } { amount: (- current-shares burn) })
-            (var-set total-shares (- ts burn))
-          )
-        )
-        (let (
-            (tshare (/ (* fee (var-get fee-split-bps)) BPS_DENOM))
-            (pshare (- fee (/ (* fee (var-get fee-split-bps)) BPS_DENOM)))
-          )
-          (var-set treasury-reserve (+ (var-get treasury-reserve) tshare))
-          (var-set protocol-reserve (+ (var-get protocol-reserve) pshare))
-        )
-        (var-set total-balance (- (var-get total-balance) amount))
-        ;; Send net payout using the stored token contract
-        (unwrap! (as-contract (contract-call? .mock-ft transfer user payout))
-          (err u200)
-        )
-        (print {
-          event: "withdraw",
-          user: tx-sender,
-          gross: amount,
-          fee: fee,
-          net: payout,
-        })
-        (ok payout)
-      )
-    )
-  )
-)
-
-(define-public (withdraw-v2 (amount uint) (ft <sip010>))
+(define-public (withdraw (amount uint) (ft <sip010>))
   (begin
     (asserts! (is-eq (var-get paused) false) (err u103))
     (asserts! (> amount u0) (err u1))
@@ -784,7 +666,7 @@
         ;; Send net payout using the provided SIP-010 token
         (unwrap! (as-contract (contract-call? ft transfer user payout)) (err u200))
         (print {
-          event: "withdraw-v2",
+          event: "withdraw",
           user: tx-sender,
           gross: amount,
           fee: fee,

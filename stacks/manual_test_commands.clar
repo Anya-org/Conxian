@@ -18,7 +18,7 @@
 (contract-call? .vault get-utilization)
 
 ;; Test deposit functionality (10 STX)
-(contract-call? .vault deposit u10000000)
+(contract-call? .vault deposit u10000000 .mock-ft)
 
 ;; Check vault state after deposit
 (contract-call? .vault get-total-balance)
@@ -59,7 +59,7 @@
 ;; === WITHDRAWAL TESTS ===
 
 ;; Test withdrawal (5 STX worth)
-(contract-call? .vault withdraw u5000000)
+(contract-call? .vault withdraw u5000000 .mock-ft)
 
 ;; Check final state
 (contract-call? .vault get-total-balance)
