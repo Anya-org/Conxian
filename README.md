@@ -25,23 +25,28 @@ A production-ready DeFi platform on Stacks with enhanced tokenomics, automated D
 
 ## Quick Start
 
-### Requirements
+### For Users
+**New to AutoVault?** → [**User Manual**](./documentation/USER_MANUAL.md) | [Quick Start Guide](./documentation/QUICK_START.md)
+
+### For Developers
+
+#### Requirements
 
 - Node.js (v18+)
   
 Note: This repo pins Clarinet SDK v3.5.0 via npm. Always use `npx clarinet`.
 
-### Setup
+#### Setup
 
 ```bash
 git clone https://github.com/Anya-org/AutoVault.git
 cd AutoVault/stacks
 npm install
-npx clarinet check    # ✅ 51 contracts
+npx clarinet check    # ✅ 65 contracts
 npm test              # ✅ 130/131 tests
 ```
 
-### Deploy
+#### Deploy
 
 ```bash
 # Testnet
@@ -55,8 +60,15 @@ npm test              # ✅ 130/131 tests
 
 📚 **[Complete Architecture Documentation](./documentation/)**
 
-## Documentation (Aligned – Updated Aug 22, 2025)
+## Documentation (Updated Aug 25, 2025)
 
+### For Users
+| Guide | Description |
+|-------|-------------|
+| [**User Manual**](./documentation/USER_MANUAL.md) | **Complete user guide and onboarding** |
+| [Quick Start](./documentation/QUICK_START.md) | 5-minute getting started guide |
+
+### For Developers & Stakeholders
 | Topic | Description |
 |-------|-------------|
 | [Architecture](./documentation/ARCHITECTURE.md) | System design (incl. DEX, breaker, monitoring) |
