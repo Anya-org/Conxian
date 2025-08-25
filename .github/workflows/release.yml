@@ -63,26 +63,20 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: stacks/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install Clarinet
         run: |
           echo "Using project-pinned Clarinet via npx"
 
       - name: Install Dependencies
-        run: |
-          cd stacks
-          npm ci --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Contract Compilation
-        run: |
-          cd stacks
-          npx clarinet check
+        run: npx clarinet check
 
       - name: Full Test Suite
-        run: |
-          cd stacks
-          npm test
+        run: npm test
 
   version-management:
     name: Version Management
@@ -146,22 +140,20 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: stacks/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install Clarinet
         run: |
           echo "Using project-pinned Clarinet via npx"
 
       - name: Install Dependencies
-        run: |
-          cd stacks
-          npm ci --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Build Production Package
         run: |
           mkdir -p release-artifacts
           tar -czf release-artifacts/autovault-contracts-${{ needs.version-management.outputs.new-version }}.tar.gz \
-            stacks/contracts/ stacks/Clarinet.toml stacks/deployments/
+            contracts/ Clarinet.toml deployments/
           tar -czf release-artifacts/autovault-scripts-${{ needs.version-management.outputs.new-version }}.tar.gz \
             scripts/deploy-*.sh scripts/post_deploy_verify.ts scripts/sdk_deploy_contracts.ts || true
           (cd release-artifacts && sha256sum *.tar.gz > checksums.txt)

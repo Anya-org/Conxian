@@ -46,7 +46,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: stacks/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -55,7 +55,6 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          cd stacks
           npm ci --no-audit --no-fund
           python -m pip install --upgrade pip requests
 
@@ -72,15 +71,14 @@ jobs:
           fi
           
           # Vault status check (read-only)
-          cd stacks
-          if npm run health-check > health.log 2>&1; then
+          if bash scripts/oracle_ops.sh health-check > health.log 2>&1; then
             echo "vault-status=healthy" >> $GITHUB_OUTPUT
           else
             echo "vault-status=degraded" >> $GITHUB_OUTPUT
           fi
           
           # Treasury status check
-          if python ../scripts/monitor-health.sh &> treasury.log; then
+          if python scripts/monitor-health.sh &> treasury.log; then
             echo "treasury-status=healthy" >> $GITHUB_OUTPUT
           else
             echo "treasury-status=degraded" >> $GITHUB_OUTPUT
@@ -114,7 +112,7 @@ jobs:
             script: "python scripts/ml_strategy_recommender.py"
             timeout: 5
           - name: "Vault Rebalancing"
-            script: "cd stacks && npm run update-autonomics"
+            script: "npm run update-autonomics"
             timeout: 10
           - name: "DAO Proposals"
             script: "python scripts/governance_proposal_builder.py"
@@ -128,7 +126,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: stacks/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -137,7 +135,6 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          cd stacks
           npm ci --no-audit --no-fund
           python -m pip install --upgrade pip requests numpy pandas scikit-learn
 

@@ -7,8 +7,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 PROJECT_ROOT="$SCRIPT_DIR/.."
 STACKS_DIR="$PROJECT_ROOT/stacks"
 
-# Check if node_modules exists
-if [ ! -d "$STACKS_DIR/node_modules" ]; then
-  echo "Node modules not found in stacks directory. Installing dependencies with 'npm ci'..."
-  (cd "$STACKS_DIR" && npm ci)
+# Check if node_modules exists in the clarinet-wrapper directory
+if [ ! -d "$STACKS_DIR/clarinet-wrapper/node_modules" ]; then
+  echo "Node modules not found in stacks/clarinet-wrapper directory. Installing dependencies with 'npm install'..."
+  (cd "$STACKS_DIR/clarinet-wrapper" && npm install)
 fi
