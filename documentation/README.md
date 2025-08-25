@@ -8,8 +8,9 @@ and purpose.
 
 ### For Users
 
-- [`API_REFERENCE.md`](./API_REFERENCE.md) - Smart contract function
-  reference
+- [`USER_MANUAL.md`](./USER_MANUAL.md) - Comprehensive user guide and onboarding
+- [`QUICK_START.md`](./QUICK_START.md) - 5-minute getting started guide  
+- [`API_REFERENCE.md`](./API_REFERENCE.md) - Smart contract function reference
 
 ### For Developers
 
@@ -36,6 +37,8 @@ and purpose.
 
 | I want to... | Read this |
 |---------------|-----------|
+| Get started as a user | [User Manual](./USER_MANUAL.md) |
+| Quick 5-minute setup | [Quick Start](./QUICK_START.md) |
 | Integrate with contracts | [API Reference](./API_REFERENCE.md) |
 | Contribute code | [Developer Guide](./DEVELOPER_GUIDE.md) |
 | Understand the economics | [Tokenomics](./TOKENOMICS.md) |
