@@ -50,18 +50,14 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: stacks/package-lock.json
+          cache-dependency-path: package-lock.json
       - name: Install Deps
-        run: |
-          cd stacks
-          npm ci --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
       - name: Compile Contracts
-        run: |
-          cd stacks
-          npx clarinet check
+        run: npx clarinet check
       - name: Artifact Summary
         run: |
-          echo "Contracts:"; ls -1 stacks/contracts | wc -l
+          echo "Contracts:"; ls -1 contracts | wc -l
 
   deploy:
     name: Deploy to Testnet
@@ -73,11 +69,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: stacks/package-lock.json
+          cache-dependency-path: package-lock.json
       - name: Install Deps
-        run: |
-          cd stacks
-          npm ci --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
       - name: Deployment (Dry / Placeholder)
         run: |
           set -e
@@ -90,9 +84,7 @@ jobs:
             exit 1
           fi
       - name: Post Verification (Read-Only)
-        run: |
-          cd stacks
-          NETWORK=testnet npm run verify-post || echo "Post verification issues (non-blocking)"
+        run: NETWORK=testnet npm run verify-post || echo "Post verification issues (non-blocking)"
 
   summary:
     name: Deployment Summary
