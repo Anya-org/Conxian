@@ -42,7 +42,7 @@ Note: This repo pins Clarinet SDK v3.5.0 via npm. Always use `npx clarinet`.
 git clone https://github.com/Anya-org/AutoVault.git
 cd AutoVault/stacks
 npm install
-npx clarinet check    # ✅ 65 contracts
+npx clarinet check    # ✅ 51 contracts
 npm test              # ✅ 130/131 tests
 ```
 
