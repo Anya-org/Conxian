@@ -17,7 +17,7 @@
     "gen-key": "node stacks/generate-deployer-key.js",
     "console": "npx clarinet console",
     "console:testnet": "npx clarinet console --testnet",
-    "check": "npx clarinet check",
+    "check": "./stacks/clarinet-wrapper/index.js check",
     "ci": "./scripts/ensure-deps.sh && npm run check && npx vitest run",
     "pre-deploy": "./scripts/ensure-deps.sh && npm run ci && ./scripts/manual-testing.sh",
     "analyze:coverage": "echo 'Coverage report: reports/coverage-detailed.lcov'",

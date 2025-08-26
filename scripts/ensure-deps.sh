@@ -12,3 +12,9 @@ if [ ! -d "$STACKS_DIR/clarinet-wrapper/node_modules" ]; then
   echo "Node modules not found in stacks/clarinet-wrapper directory. Installing dependencies with 'npm install'..."
   (cd "$STACKS_DIR/clarinet-wrapper" && npm install)
 fi
+
+# Check if node_modules exists in the project root
+if [ ! -d "$PROJECT_ROOT/node_modules" ]; then
+  echo "Node modules not found in project root. Installing dependencies with 'npm install'..."
+  (cd "$PROJECT_ROOT" && npm install)
+fi
