@@ -8,11 +8,13 @@
 (define-constant ERR_BOUNTY_NOT_FOUND (err u404))
 (define-constant ERR_INSUFFICIENT_FUNDS (err u402))
 (define-constant ERR_INVALID_POLICY (err u403))
+(define-constant ERR_BOUNTY_NOT_OPEN (err u405))
 
 ;; === DAO-ADJUSTABLE POLICY VARIABLES ===
 (define-data-var min-bounty-amount uint u10000)
 (define-data-var max-bounty-amount uint u1000000)
 (define-data-var creator-token-multiplier uint u10)
+(define-data-var contract-balance uint u0)
 
 ;; === COUNTERS ===
 (define-data-var next-bounty-id uint u1)
@@ -60,9 +62,11 @@
   (let ((bounty-amount (calculate-fair-bounty-amount category difficulty))
         (bounty-id (+ (var-get next-bounty-id) u1)))
     
+    (asserts! (>= (var-get contract-balance) bounty-amount) ERR_INSUFFICIENT_FUNDS)
     (asserts! (is-valid-bounty-request description difficulty) ERR_INVALID_POLICY)
     (asserts! (is-policy-enabled category) ERR_INVALID_POLICY)
     
+    (var-set contract-balance (- (var-get contract-balance) bounty-amount))
     (map-set automated-bounties { bounty-id: bounty-id } {
       category: category,
       description: description,
@@ -146,3 +150,40 @@
     
     (print { event: "bounty-limits-adjusted", min: new-min, max: new-max })
     (ok true)))
+
+(define-public (deposit-funds (amount uint) (sender principal))
+  (begin
+    (asserts! (is-eq tx-sender .dao-governance) ERR_NOT_AUTHORIZED)
+    (try! (as-contract (contract-call? .avg-token transfer-from sender (as-contract tx-sender) amount)))
+    (var-set contract-balance (+ (var-get contract-balance) amount))
+    (print { event: "funds-deposited", amount: amount })
+    (ok true)
+  )
+)
+
+(define-public (award-bounty (bounty-id uint) (winner principal))
+  (begin
+    (asserts! (is-eq tx-sender .dao-governance) ERR_NOT_AUTHORIZED)
+    (let ((bounty (unwrap! (map-get? automated-bounties { bounty-id: bounty-id }) ERR_BOUNTY_NOT_FOUND)))
+      (asserts! (is-eq (get status bounty) "open") ERR_BOUNTY_NOT_OPEN)
+
+      ;; Transfer bounty reward to winner
+      (try! (as-contract (contract-call? .avg-token transfer winner (get reward-amount bounty))))
+
+      ;; Mint reputation tokens for winner
+      (try! (as-contract (contract-call? .reputation-token mint winner u1)))
+
+      ;; Update bounty status
+      (map-set automated-bounties { bounty-id: bounty-id } (merge bounty { status: "closed" }))
+
+      (print {
+        event: "bounty-awarded",
+        bounty-id: bounty-id,
+        winner: winner,
+        reward-amount: (get reward-amount bounty),
+        reputation-awarded: u1
+      })
+      (ok true)
+    )
+  )
+)

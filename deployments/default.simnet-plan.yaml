@@ -54,16 +54,6 @@ plan:
             path: contracts/traits/sip-010-trait.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: automated-bounty-system
-            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/automated-bounty-system.clar
-            clarity-version: 2
-        - emulated-contract-publish:
-            contract-name: autovault-registry
-            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/autovault-registry.clar
-            clarity-version: 2
-        - emulated-contract-publish:
             contract-name: creator-token
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/creator-token.clar
@@ -87,6 +77,21 @@ plan:
             contract-name: avg-token
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/avg-token.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: reputation-token
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/reputation-token.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: automated-bounty-system
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/automated-bounty-system.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: autovault-registry
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/autovault-registry.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: avlp-token
@@ -134,6 +139,11 @@ plan:
             path: contracts/dao-automation.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: governance-metrics
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/governance-metrics.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: dao-governance
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/dao-governance.clar
@@ -153,6 +163,9 @@ plan:
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/traits/sip-009-trait.clar
             clarity-version: 2
+      epoch: "2.4"
+    - id: 1
+      transactions:
         - emulated-contract-publish:
             contract-name: vault-init-trait
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
@@ -163,9 +176,6 @@ plan:
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/deployment-orchestrator.clar
             clarity-version: 2
-      epoch: "2.4"
-    - id: 1
-      transactions:
         - emulated-contract-publish:
             contract-name: dex-factory
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
@@ -281,6 +291,9 @@ plan:
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/multi-hop-router-v2-complex-fixed.clar
             clarity-version: 2
+      epoch: "2.4"
+    - id: 2
+      transactions:
         - emulated-contract-publish:
             contract-name: multi-hop-router-v2-simple
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
@@ -291,9 +304,6 @@ plan:
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/oracle-aggregator-enhanced.clar
             clarity-version: 2
-      epoch: "2.4"
-    - id: 2
-      transactions:
         - emulated-contract-publish:
             contract-name: ownable-trait
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
