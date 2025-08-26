@@ -1,147 +1,147 @@
-# Oracle Aggregator PRD (v1.0)
+# AutoVault PRD: Oracle Aggregator
 
-**Status**: **STABLE** - Production Ready  
-**Last Updated**: 2025-08-18  
-**Next Review**: 2025-09-15
-
-## Summary
-
-Aggregate multiple oracle sources (internal DEX TWAP, external signed feeds) with configurable weighting & staleness limits feeding vault & risk modules. **Production-ready implementation with all security features operational.**
-
-### Functional Requirements
-
-| ID | Requirement | Status | Priority |
-|----|-------------|--------|----------|
-| ORA-FR-01 | Register oracle sources with type + decimals. | ✅ Implemented | P0 |
-| ORA-FR-02 | Validate update freshness (max age). | ⚠️ In Progress | P0 |
-| ORA-FR-03 | Compute median or weighted median price. | ✅ Implemented | P0 |
-| ORA-FR-04 | Expose read-only `get-price(asset)` with last update block. | ✅ Implemented | P0 |
-| ORA-FR-05 | Emit events on source add/remove & price update. | ✅ Implemented | P0 |
-| ORA-FR-06 | Circuit-break if deviation > threshold vs last TWAP. | ⚠️ In Progress | P0 |
-
-### Non-Functional Requirements
-
-- **Gas Efficiency**: Deployment < 3 STX, execution < 150k gas typical ✅
-- **Security**: Whitelist enforcement with ERR_NOT_ORACLE (u102) ✅  
-- **Precision**: 18-decimal calculation consistency ✅
-- **Determinism**: Median calculation reproducible across nodes ✅
-
-### Risks
-
-| Risk | Mitigation |
-|------|------------|
-| Stale data | Max age enforcement & monitoring |
-| Single-source manipulation | Require min N sources for consensus |
-| Precision mismatch | Normalize decimals & invariant tests |
-
-Changelog: v0.2 (2025-08-17) draft skeleton.
-
-### Production Implementation Status (2025-08-18)
-
-| Area | Status | Implementation Details |
-|------|--------|----------------------|
-| **Pair Registration** | ✅ **Complete** | `register-pair` enforces admin + min-sources ≤ oracles length |
-| **Oracle Whitelist** | ✅ **Complete** | Explicit map `oracle-whitelist`; enforced in `submit-price` (ERR_NOT_ORACLE u102) |
-| **Price Submission** | ✅ **Complete** | Aggregates when min-sources reached; returns tuple `{ aggregated, sources, price }` |
-| **Median Calculation** | ✅ **Complete** | Simplified median implementation operational; weighted median for v1.1 |
-| **History / TWAP** | ✅ **Basic** | Fixed-size ring buffer (size 5) + simple average in `get-twap` |
-| **Authorization** | ✅ **Complete** | Strict whitelist enforcement with add/remove oracle capabilities |
-| **Event Emission** | ✅ **Complete** | `oa-register-pair`, `oa-add-oracle`, `price-aggregate` events |
-| **Error Handling** | ✅ **Complete** | Structured error codes: u102 (NOT_ORACLE), u107 (DEVIATION) |
-| **Staleness / Max Age** | 🔄 **Phase 2** | Block-age guard planned for v1.1 enhancement |
-| **Decimals Normalization** | 🔄 **Phase 2** | Uniform precision assumption for v1.0, normalization in v1.1 |
-| **Governance Controls** | ⚠️ **Partial** | Admin mutable; timelock/DAO integration planned for v1.1 |
-| **Manipulation Detection** | 🔄 **Phase 2** | Basic deviation check; advanced detection for v1.1 |
-| **Circuit Breaker Hook** | 🔄 **Phase 2** | Integration with circuit-breaker contract planned |
-
-### v1.0 Production Readiness Assessment
-
-✅ **MAINNET READY FEATURES**:
-
-- Core price aggregation functionality operational
-- Whitelist security enforcement active  
-- Event emission and error handling complete
-- Basic TWAP calculation sufficient for launch
-- Gas optimization within production limits
-
-🔄 **v1.1 ENHANCEMENT ROADMAP**:
-
-1. **Staleness Detection** (Priority: High)
-   - Implement block-age validation in `submit-price`
-   - Add configurable max-age thresholds per pair
-   - Consumer read paths with staleness checks
-
-2. **Advanced Manipulation Detection** (Priority: High)
-   - Configurable deviation thresholds (beyond current u107)
-   - Time-weighted deviation analysis
-   - Integration with circuit-breaker contract
-
-3. **Enhanced Median Calculation** (Priority: Medium)
-   - Deterministic weighted median with >5 sources
-   - Gas-optimized sorting for larger oracle sets
-   - Benchmark documentation for performance
-
-4. **Governance Integration** (Priority: Medium)
-   - Route admin mutations via timelock + DAO vote
-   - Align with AIP control framework
-   - Multi-sig approval for critical parameters
-
-5. **Decimal Normalization** (Priority: Low)
-   - Per-source metadata (decimals, reliability score)
-   - Precision conversion utilities
-   - Source type categorization
-
-### Security Assessment
-
-✅ **PRODUCTION SECURITY**:
-
-- Whitelist enforcement prevents unauthorized submissions
-- Error code structure (u102, u107) operational
-- Admin-only registration controls active
-- Event logging for transparency
-
-⚠️ **SECURITY NOTES**:
-
-- **Recommendation**: Min sources ≥2 for production pairs
-- **Monitoring**: External circuit breaker monitoring recommended
-- **Upgrade Path**: v1.1 enhancements strengthen manipulation resistance
-
-### Test Coverage Summary
-
-| Test Suite | Coverage Intent |
-|------------|-----------------|
-| `oracle_aggregator_test.ts` | Happy path: whitelist add, submit, reject non-whitelisted |
-| `oracle_auth_verification_test.ts` | Add/remove whitelist, ensure ERR_NOT_ORACLE after removal |
-| `oracle_debug_test.ts` | Debug flow; now asserts unauthorized submission rejected (strict) |
-| `oracle_whitelist_debug_test.ts` | Confirms multiple whitelisted oracles can submit |
-| `oracle_median_debug_test.ts` | Verifies price count, median progression |
-
-### Security Notes
-
-✅ **CURRENT SECURITY POSTURE**:
-
-- Whitelist enforcement is critical and operational
-- Median & TWAP simplifications acceptable for v1.0 launch
-- Min-sources configuration provides basic manipulation resistance
-
-📋 **PRODUCTION RECOMMENDATIONS**:
-
-- **Min sources ≥2** for all production pairs (enforced in configuration)
-- **External monitoring** of large price deltas via circuit breaker
-- **Accelerated v1.1** implementation for enhanced manipulation detection before multi-asset activation
-
-📈 **MAINNET DEPLOYMENT STATUS**: **READY**
-
-- Core security requirements satisfied
-- Performance within acceptable limits (< 3 STX deploy, < 150k gas execution)
-- Event logging and error handling production-grade
+| | |
+|---|---|
+| **Status** | 🔶 Draft |
+| **Version** | 0.3 |
+| **Owner** | R&D WG |
+| **Last Updated** | 2025-08-26 |
+| **References** | [`oracle-aggregator.clar`](../../contracts/oracle-aggregator.clar) |
 
 ---
 
-**Changelog**:
+## 1. Summary & Vision
 
-- v1.0 (2025-08-18): Production readiness assessment, security validation, mainnet deployment approval
-- v0.2 (2025-08-17): Draft skeleton implementation
+The Oracle Aggregator is a critical security component of the AutoVault ecosystem. It is designed to provide reliable, manipulation-resistant price data by aggregating feeds from multiple independent sources, such as internal DEX TWAPs and external, signed price feeds. The vision is to create a robust and configurable oracle system that can safely power the protocol's most sensitive operations, from vault liquidations to strategy rebalancing, by ensuring data freshness, accuracy, and integrity.
 
-**Approved By**: Security Working Group, Protocol Team  
-**Mainnet Approval**: **GRANTED** with v1.1 enhancement timeline
+## 2. Goals / Non-Goals
+
+### Goals
+- **Aggregation**: Combine prices from multiple whitelisted sources to produce a single, trusted price point.
+- **Manipulation Resistance**: Use techniques like medianization, source diversification, and staleness checks to resist price manipulation from a single compromised source.
+- **Configurability**: Allow governance to register new oracle sources, set weights, and define security parameters like maximum data age.
+- **Reliability**: Provide a highly available and dependable price feed for all on-chain consumers.
+
+### Non-Goals
+- **Primary Oracle Source**: The aggregator is not an oracle itself; it is a consumer and processor of data from other oracles.
+- **Complex Arbitrage**: The system is not designed to perform complex arbitrage between sources, only to find a reliable median price.
+
+## 3. User Stories
+
+| ID | As a... | I want to... | So that... | Priority |
+|---|---|---|---|---|
+| ORA-US-01 | Vault Contract | To request a reliable price for an asset | I can accurately value collateral and calculate share prices. | P0 |
+| ORA-US-02 | Oracle Provider | To submit my signed price data on-chain | I can contribute to the security and accuracy of the protocol's price feeds. | P0 |
+| ORA-US-03 | Governance | To add a new, trusted oracle source | I can increase the decentralization and resilience of the price feed. | P0 |
+| ORA-US-04 | Security Auditor | To review the list of sources and their parameters | I can assess the risk profile of the oracle system. | P0 |
+
+## 4. Functional Requirements
+
+| ID | Requirement | Status |
+|---|---|---|
+| ORA-FR-01 | Allow an admin to register new oracle sources and define their type (e.g., internal, external). | ✅ Implemented |
+| ORA-FR-02 | For each submitted price, validate that the source is on the whitelist. | ✅ Implemented |
+| ORA-FR-03 | For each submitted price, validate its freshness against a configurable maximum age (`max-age`). | 🔄 Planned (v1.1) |
+| ORA-FR-04 | Compute a median price from the set of valid, recent prices. | ✅ Implemented (Simple Median) |
+| ORA-FR-05 | Expose a public, read-only `get-price(asset)` function that returns the latest aggregated price and its update timestamp. | ✅ Implemented |
+| ORA-FR-06 | Emit events for `SourceAdded`, `SourceRemoved`, and `PriceUpdated`. | ✅ Implemented |
+| ORA-FR-07 | Integrate with the circuit breaker to halt consumers if price deviation between sources exceeds a critical threshold. | 🔄 Planned (v1.1) |
+| ORA-FR-08 | Support weighted medians to give more trusted oracles greater influence. | 🔄 Planned (v1.1) |
+
+## 5. Non-Functional Requirements (NFRs)
+
+| ID | Requirement | Metric / Verification |
+|---|---|---|
+| ORA-NFR-01 | **Gas Efficiency** | A `get-price` call should be highly efficient. `submit-price` should have a predictable gas cost. |
+| ORA-NFR-02 | **Security** | Unauthorized submissions must be rejected. Stale data must be ignored. |
+| ORA-NFR-03 | **Precision** | All internal calculations must handle 18-decimal precision consistently. Normalization for sources with different decimals is a future requirement. |
+
+## 6. Invariants & Safety Properties
+
+| ID | Property | Description |
+|---|---|---|
+| ORA-INV-01 | **Whitelist Enforcement** | Only prices from whitelisted oracles can be included in the median calculation. |
+| ORA-INV-02 | **Staleness Rejection** | A price older than `max-age` must never be included in the aggregated price. |
+| ORA-INV-03 | **Minimum Sources** | An aggregated price should only be considered valid if it is derived from a minimum number of independent sources (e.g., >= 2). |
+
+## 7. Data Model / State & Maps
+
+```clarity
+;; Conceptual State
+(define-map oracle-sources principal (tuple (type symbol) (decimals uint)))
+(define-map last-prices (tuple (source principal) (asset principal)) (tuple (price uint) (timestamp uint)))
+(define-data-var admin principal)
+```
+
+## 8. Public Interface (Contract Functions / Events)
+
+### Functions
+- `get-price(asset: principal)`: Returns the latest aggregated price for an asset.
+- `submit-price(asset: principal, price: uint)`: (Whitelisted Oracles) Submits a price from a source.
+- `add-oracle(source: principal, metadata: tuple)`: (Admin) Adds a new oracle source to the whitelist.
+- `remove-oracle(source: principal)`: (Admin) Removes an oracle source from the whitelist.
+
+### Events
+- `(print (tuple 'event "price-updated" ...))`
+- `(print (tuple 'event "source-added" ...))`
+
+## 9. Core Flows (Sequence Narratives)
+
+### Price Update Flow
+1. **Submission**: An external, whitelisted oracle (e.g., a keeper bot) calls `submit-price` with a new price for an asset.
+2. **Validation**: The contract checks that the caller (`tx-sender`) is in the `oracle-sources` whitelist. It also checks the timestamp of the update for freshness (v1.1).
+3. **Storage**: The submitted price is stored in the `last-prices` map.
+4. **Aggregation**: The contract re-calculates the median price for the asset using all fresh prices available.
+5. **Event**: A `PriceUpdated` event is emitted.
+
+## 10. Edge Cases & Failure Modes
+
+- **Stale Data**: If oracles stop submitting prices, the data could become stale, posing a risk to consumers.
+- **Correlated Failures**: If multiple oracle sources get their data from the same upstream provider (e.g., the same centralized exchange), they may all fail or report bad data simultaneously.
+- **Governance Capture**: A malicious actor controlling governance could whitelist a compromised oracle.
+
+## 11. Risks & Mitigations (Technical / Economic / Operational)
+
+| Risk | Mitigation |
+|---|---|
+| **Stale Data** | A strict, on-chain `max-age` check for all prices is the primary mitigation. Off-chain monitoring should provide a secondary alert. |
+| **Single Source Manipulation** | Requiring a minimum number of sources (e.g., >= 2) for a price to be considered valid. The median calculation further blunts the impact of a single outlier. |
+| **Precision Mismatch** | For v1.0, all sources are assumed to use the same precision. For v1.1, a normalization mechanism will be introduced to handle sources with different decimal counts. |
+| **Governance Attack** | Oracle administration functions should be placed behind a timelock, giving the community time to react to a malicious change in the oracle configuration. |
+
+## 12. Metrics & KPIs
+
+| ID | Metric | Description |
+|---|---|---|
+| ORA-M-01 | **Price Staleness** | The time elapsed since the last successful price update for each asset. |
+| ORA-M-02 | **Inter-source Deviation** | The percentage difference between the prices reported by different oracles for the same asset. |
+| ORA-M-03 | **Update Frequency** | The number of price updates per hour for each asset. |
+
+## 13. Rollout / Migration Plan
+
+- **v1.0 (Production Ready Core)**: The core aggregation logic, whitelist, and simple median calculation are ready for deployment.
+- **v1.1 (Planned Enhancements)**: Critical security features like on-chain staleness detection, advanced manipulation detection, and full governance integration (timelock) will be added in a subsequent release.
+
+## 14. Monitoring & Observability
+
+- Off-chain agents must monitor the `Price Staleness` metric and alert if any feed has not been updated within its expected frequency.
+- Dashboards will track the `Inter-source Deviation` to identify oracles that are consistently out of line with their peers.
+
+## 15. Open Questions
+
+- What is the optimal set of initial oracle sources to ensure decentralization?
+- How should the weights be determined for the weighted median calculation in v1.1?
+
+## 16. Changelog & Version Sign-off
+
+- **v0.3 (2025-08-26)**:
+    - Refactored PRD into the 16-point standard format.
+    - Corrected status to "Draft" and clarified the phased rollout plan.
+    - Reorganized status tables and security notes into the new structure.
+- **v1.0 (2025-08-18)**:
+    - *Note: This version was incorrectly marked as stable.* Assessed production readiness of the v1.0 feature set.
+- **v0.2 (2025-08-17)**:
+    - Initial draft skeleton implementation.
+
+**Approved By**: R&D WG, Security WG
+**Mainnet Status**: **Core Features (v1.0) APPROVED FOR DEPLOYMENT**, pending v1.1 enhancements for full functionality.

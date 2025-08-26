@@ -1,108 +1,155 @@
-# DEX / Liquidity Layer PRD (v1.0)
+# AutoVault PRD: DEX & Liquidity Layer
 
-**Status**: **STABLE** - Production Ready  
-**Last Updated**: 2025-08-18  
-**Next Review**: 2025-09-15
-
-## Summary
-
-AMM subsystem (factory, pools, router, future variants) to support internal price discovery, vault strategy interactions, and external liquidity. **Production-ready core implementation with advanced features planned for v1.1.**
-
-### Current Scope (v1.0 - Production Ready)
-
-- ✅ **Constant product pools** (baseline implementation)  
-- ✅ **Router single-hop swaps** (operational)
-- ✅ **Factory for pool creation** (deployed)
-- ✅ **Basic fee accrual tracking** (implemented)
-- ✅ **Event emission** (swap, add, remove events)
-
-### Planned (v1.1 - Advanced Features)
-
-- 🔄 **Multi-hop routing** (path discovery algorithms)  
-- 🔄 **Stable & weighted pool math** (hardening for complex assets)
-- 🔄 **Circuit breaker hooks** (volatility protection)
-- 🔄 **TWAP oracle surfaces** (price feed integration)
-
-### Out of Scope (Future Versions)
-
-- Concentrated liquidity (v2.0+)
-- MEV auctions (v2.0+)
-- MEV auctions (v2.0+)
-- Batch matching (v2.0+)
-- Cross-chain bridges (v3.0+)
-
-### Key Functional Requirements
-
-| ID | Requirement | Status | Priority |
-|----|-------------|--------|----------|
-| DEX-FR-01 | Create pool with token pair & fee tier. | ✅ Implemented | P0 |
-| DEX-FR-02 | Add/remove liquidity receiving LP tokens. | ✅ Implemented | P0 |
-| DEX-FR-03 | Swap exact-in & exact-out paths (single hop). | ✅ Implemented | P0 |
-| DEX-FR-04 | Fee accrual tracked per pool. | ✅ Implemented | P0 |
-| DEX-FR-05 | Events for swap, add, remove, fee-update. | ✅ Implemented | P0 |
-| DEX-FR-06 | Circuit-breaker integration halts abnormal price delta. | 🔄 v1.1 | P1 |
-| DEX-FR-07 | Oracle interface exposes cumulative price for TWAP. | 🔄 v1.1 | P1 |
-| DEX-FR-08 | Multi-hop routing for complex trading paths. | 🔄 v1.1 | P1 |
-
-### Non-Functional Requirements
-
-- **Gas Efficiency**: < 200k gas per swap, < 150k per liquidity operation ✅
-- **Precision**: 18-decimal arithmetic with overflow protection ✅
-- **Security**: Slippage protection and MEV resistance ✅
-- **Scalability**: Support 100+ trading pairs without performance degradation ✅
-
-### Production Implementation Status
-
-✅ **READY FOR MAINNET**:
-
-
-- Core AMM functionality operational
-- Factory and router contracts deployed
-- LP token mechanisms functional
-- Fee collection and distribution active
-- Event emission complete
-
-🔄 **v1.1 ENHANCEMENTS**:
-
-
-- Advanced routing algorithms
-- TWAP oracle integration
-- Circuit breaker connectivity
-- Yield optimization features
-
-### Metrics
-
-- **Liquidity Depth**: Track total value locked per pool ✅
-- **Swap Volume**: 24h, 7d, 30d trading volume ✅  
-- **Fee APR**: Annualized returns for liquidity providers ✅
-- **Price Divergence**: Monitor vs external exchanges ✅
-- **Slippage Analysis**: Track execution efficiency ✅
-
-### Security & Risk Management
-
-✅ **IMPLEMENTED CONTROLS**:
-
-
-- Slippage protection on all swaps
-- LP token burn/mint validation
-- Reentrancy protection via Clarity model
-- Mathematical invariant preservation
-
-🔄 **PLANNED ENHANCEMENTS**:
-
-
-- Circuit breaker integration for volatility events
-- Advanced MEV protection mechanisms
-- Sandwich attack detection and mitigation
+| | |
+|---|---|
+| **Status** | 🔶 Draft |
+| **Version** | 0.4 |
+| **Owner** | R&D WG |
+| **Last Updated** | 2025-08-26 |
+| **References** | [`dex-factory.clar`](../../contracts/dex-factory.clar), [`dex-router.clar`](../../contracts/dex-router.clar) |
 
 ---
 
-**Changelog**:
+## 1. Summary & Vision
 
-**Changelog**:
+The AutoVault DEX is the native liquidity layer of the ecosystem, providing an on-chain automated market maker (AMM) for internal price discovery, efficient trading, and deep liquidity for vault strategies. The vision is to develop a comprehensive trading infrastructure, starting with foundational constant-product pools and evolving to include more sophisticated pool types, advanced routing, and robust oracle services, making it a cornerstone of AutoVault's DeFi offerings.
 
-- v1.0 (2025-08-18): Production stability assessment, mainnet readiness confirmation
-- v0.3 (2025-08-17): Initial draft consolidation
+## 2. Goals / Non-Goals
 
-**Approved By**: R&D Team, Protocol Working Group  
-**Mainnet Status**: **READY FOR DEPLOYMENT**
+### Goals
+- **Core AMM Functionality (v1.0)**: Implement a secure and reliable AMM with a factory for creating constant-product pools, a router for single-hop swaps, and standard liquidity provision mechanisms.
+- **Advanced Routing (v1.1)**: Introduce multi-hop routing to find the most efficient trading paths across multiple pools.
+- **Diverse Pool Types (v1.1+)**: Expand beyond constant-product pools to include stable and weighted pool mathematics for different asset classes.
+- **Ecosystem Integration**: Serve as the primary liquidity source for AutoVault's yield strategies and provide reliable price data for internal oracles.
+
+### Non-Goals (Future Versions)
+- **Concentrated Liquidity**: Advanced capital efficiency models like concentrated liquidity are planned for v2.0 or later.
+- **MEV Auctions & Batch Matching**: Complex MEV mitigation and trade execution models are out of scope for v1.x.
+- **Cross-chain Bridges**: Direct integration with cross-chain bridging technology is planned for v3.0+.
+
+## 3. User Stories
+
+| ID | As a... | I want to... | So that... | Priority |
+|---|---|---|---|---|
+| DEX-US-01 | Liquidity Provider | Add liquidity to a token pair | I can earn trading fees on my assets. | P0 |
+| DEX-US-02 | Trader | Swap one token for another in a single transaction | I can easily trade assets with low slippage. | P0 |
+| DEX-US-03 | Protocol Developer | Create a new trading pool for a new token | I can bootstrap liquidity for a new project token. | P0 |
+| DEX-US-04 | Advanced Trader | To have my trades routed through multiple pools | I can get a better price for my trade than any single pool can offer. | P1 |
+
+## 4. Functional Requirements
+
+| ID | Requirement | Status |
+|---|---|---|
+| DEX-FR-01 | The factory must allow anyone to create a new constant-product pool for a unique token pair. | ✅ Implemented |
+| DEX-FR-02 | Users must be able to add and remove liquidity and receive standard LP tokens in return. | ✅ Implemented |
+| DEX-FR-03 | The router must support `swap-exact-in` and `swap-exact-out` for single-hop trades. | ✅ Implemented |
+| DEX-FR-04 | Each pool must accrue trading fees, which are then claimable by liquidity providers. | ✅ Implemented |
+| DEX-FR-05 | Emit events for `Swap`, `AddLiquidity`, and `RemoveLiquidity`. | ✅ Implemented |
+| DEX-FR-06 | Integrate with the system-wide circuit breaker to halt trading on abnormal price movements. | 🔄 Planned (v1.1) |
+| DEX-FR-07 | Expose a cumulative price interface to allow for the construction of on-chain TWAP oracles. | 🔄 Planned (v1.1) |
+| DEX-FR-08 | The router must support multi-hop routing to find optimal paths for trades. | 🔄 Planned (v1.1) |
+
+## 5. Non-Functional Requirements (NFRs)
+
+| ID | Requirement | Metric / Verification |
+|---|---|---|
+| DEX-NFR-01 | **Gas Efficiency** | A standard swap should consume < 200k gas. A liquidity operation should consume < 150k gas. |
+| DEX-NFR-02 | **Precision** | All calculations must use 18-decimal arithmetic with overflow protection. |
+| DEX-NFR-03 | **Security** | All swaps must include slippage protection parameters. Reentrancy must be prevented. |
+| DEX-NFR-04 | **Scalability** | The factory and router architecture should support over 100 trading pairs without performance degradation. |
+
+## 6. Invariants & Safety Properties
+
+| ID | Property | Description |
+|---|---|---|
+| DEX-INV-01 | **Constant Product** | For any swap in a pool, `x * y` must remain `k` (or `k'` after fees). |
+| DEX-INV-02 | **LP Token Conservation** | The total supply of an LP token should only change when liquidity is added or removed. |
+| DEX-INV-03 | **Slippage Protection** | A trade must revert if the final price is worse than the user's specified slippage limit. |
+
+## 7. Data Model / State & Maps
+
+```clarity
+;; --- Factory
+(define-map pools (tuple principal principal) principal) ;; (token-a, token-b) -> pool-contract
+
+;; --- Pool
+(define-map reserves (tuple principal uint)) ;; asset -> balance
+(define-data-var total-lp-supply uint)
+
+;; --- Router
+;; (stateless)
+```
+
+## 8. Public Interface (Contract Functions / Events)
+
+### Functions
+- `factory::create-pool(token-a: principal, token-b: principal)`
+- `pool::add-liquidity(...)`
+- `pool::remove-liquidity(...)`
+- `router::swap-exact-tokens-for-tokens(...)`
+
+### Events
+- `(print (tuple 'event "swap" ...))`
+- `(print (tuple 'event "add-liquidity" ...))`
+- `(print (tuple 'event "remove-liquidity" ...))`
+
+## 9. Core Flows (Sequence Narratives)
+
+### Swap Flow
+1. **Path Selection**: The user (or a frontend) selects a trade path. For v1.0, this is a single pool.
+2. **Call Router**: The user calls `swap-exact-tokens-for-tokens` on the router, specifying the path and a minimum amount out (for slippage protection).
+3. **Transfer In**: The router transfers the input tokens from the user to the relevant pool.
+4. **Pool Swap**: The pool calculates the output amount based on its reserves and transfers the output tokens to the user.
+5. **Event**: The pool emits a `Swap` event.
+
+## 10. Edge Cases & Failure Modes
+
+- **Low Liquidity Pools**: Trades in pools with low liquidity will incur very high slippage.
+- **Incorrect Path**: A user providing an invalid trading path to the router will cause the transaction to revert.
+
+## 11. Risks & Mitigations (Technical / Economic / Operational)
+
+| Risk | Mitigation |
+|---|---|
+| **Impermanent Loss** | This is an inherent risk of providing liquidity to a standard AMM. It must be clearly documented for users. |
+| **Sandwich Attacks** | While hard to prevent entirely, setting tight slippage limits can reduce the profitability of sandwich attacks for MEV bots. |
+| **Oracle Manipulation** | If the DEX is used as a price oracle, flash loan attacks could manipulate the price. Using a time-weighted average price (TWAP) is the primary mitigation. |
+
+## 12. Metrics & KPIs
+
+| ID | Metric | Description |
+|---|---|---|
+| DEX-M-01 | **Total Value Locked (TVL)** | The total value of all assets held across all liquidity pools. |
+| DEX-M-02 | **Trading Volume** | The total value of all swaps, measured over 24h, 7d, and 30d periods. |
+| DEX-M-03 | **Fee APR** | The annualized return for liquidity providers, calculated from trading fees. |
+| DEX-M-04 | **Price Divergence** | The difference between the DEX price and prices on major external exchanges, used to measure market efficiency. |
+| DEX-M-05 | **Slippage** | The average difference between the expected and executed price of a trade. |
+
+## 13. Rollout / Migration Plan
+
+- **v1.0 (Production Ready)**: The core constant-product AMM (factory, pools, router) is ready for mainnet deployment.
+- **v1.1 (Planned)**: Advanced features like multi-hop routing and circuit breaker hooks will be added in a subsequent release. This will likely involve deploying a new, upgraded router contract.
+
+## 14. Monitoring & Observability
+
+- A public analytics dashboard (e.g., a Dune dashboard) will be created to track all key metrics (TVL, volume, etc.).
+- Off-chain bots will monitor for large, anomalous swaps that could indicate an economic attack.
+
+## 15. Open Questions
+
+- What is the optimal fee tier for the initial set of pools?
+- What are the best algorithms for multi-hop path discovery to implement in v1.1?
+
+## 16. Changelog & Version Sign-off
+
+- **v0.4 (2025-08-26)**:
+    - Refactored PRD into the 16-point standard format.
+    - Corrected status to "Draft" and clarified the phased rollout plan.
+    - Organized existing content into the new structure.
+- **v1.0 (2025-08-18)**:
+    - *Note: This version was incorrectly marked as stable.* Assessed production stability and mainnet readiness of the v1.0 feature set.
+- **v0.3 (2025-08-17)**:
+    - Initial draft consolidating design notes and requirements.
+
+**Approved By**: R&D WG, Protocol WG
+**Mainnet Status**: **Core Features (v1.0) APPROVED FOR DEPLOYMENT**
