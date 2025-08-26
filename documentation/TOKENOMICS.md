@@ -10,15 +10,15 @@ The AutoVault tokenomics system has been **successfully implemented** with enhan
 
 - **AVG Token**: 100,000,000 total supply for broader governance participation
 - **AVLP Token**: 50,000,000 total supply for liquidity provision with migration bonuses
-- **Progressive Auto Migration**: Epochs 1-3 with increasing conversion rates
+- **Progressive Auto Migration**: Epochs 1-4 with increasing, dynamically-calculated conversion rates
 - **Revenue Sharing**: 80% to AVG holders, 20% to protocol treasury
 
 ### 2. **Production-Ready Implementation**
 
 - **Smart Contract Deployed**: All tokenomics logic implemented in Clarity
-- **Migration Mechanics**: Automated epoch-based AVLP→AVG conversion  
+- **Migration Mechanics**: Automated, permissionless epoch-based AVLP→AVG conversion
 - **Liquidity Mining**: Block-based rewards with loyalty bonuses
-- **DAO Integration**: Full governance control over parameters
+- **DAO Integration**: Full governance control over parameters, with automated checks for founder vesting
 
 ## **📊 ACTUAL SMART CONTRACT IMPLEMENTATION**
 
@@ -29,10 +29,11 @@ Token: AutoVault Governance (AVG)
 Max Supply: 100,000,000 AVG (100M for broader participation)
 Decimals: 6 (micro-AVG precision)
 
-Migration Epochs (Extended 3-Year Schedule):
+Migration Epochs (Extended 4-Year Schedule):
 ├── Epoch 1 (Blocks 1 – ~52,560): 1.0 AVG per AVLP baseline
 ├── Epoch 2 (Blocks ~52,561 – ~105,120): Dynamic 1.1–1.3 AVG per AVLP (incentive based on remaining AVLP)
-└── Epoch 3 (Blocks ~105,121 – ~157,680): Dynamic 1.3–1.6 AVG per AVLP (final incentive band)
+├── Epoch 3 (Blocks ~105,121 – ~157,680): Dynamic 1.3–1.6 AVG per AVLP (incentive based on remaining AVLP)
+└── Epoch 4 (Blocks ~157,681 – ~210,240): Dynamic 1.6–2.0 AVG per AVLP (final incentive band)
 
 Revenue Distribution:
 ├── 80% to AVG holders (REVENUE_SHARE_BPS: 8000)
@@ -51,7 +52,7 @@ Liquidity Mining:
 ├── Base Rewards: Per-block emissions based on epoch
 ├── Loyalty Bonuses: 5-25% extra for long-term LPs
 ├── Progressive Migration: Increasing AVG conversion rates
-└── Emergency Migration: Auto-convert after Epoch 3
+└── Emergency Migration: Auto-convert after Epoch 4
 ```
 
 ## **🚀 PRODUCTION TOKENOMICS FEATURES**
@@ -77,16 +78,20 @@ Loyalty Bonuses:
 └── Long-term (1000+ blocks): +25% bonus
 ```
 
-### **Phase 3: Migration Mechanics (AUTOMATED)**
+### **Phase 3: Migration Mechanics (AUTOMATED & DYNAMIC)**
 
 ```clarity
 Migration Rates (implemented in avg-token.clar):
-├── Epoch 1: 1,000,000 micro-AVG per AVLP (1:1 baseline)
-├── Epoch 2: 1,200,000 micro-AVG per AVLP (1.2:1 bonus)
-└── Epoch 3: 1,500,000 micro-AVG per AVLP (1.5:1 final)
+├── Epoch 1: 1.0 AVG per AVLP (1:1 baseline)
+├── Epoch 2: Dynamically 1.1x - 1.3x, based on remaining AVLP supply
+├── Epoch 3: Dynamically 1.3x - 1.6x, based on remaining AVLP supply
+└── Epoch 4: Dynamically 1.6x - 2.0x, based on remaining AVLP supply
+
+Epoch Advancement:
+└── Permissionless function call after each epoch's block height is reached.
 
 Emergency Protection:
-└── Auto-migration after block 3024 at final rate
+└── Auto-migration after block 210240 at final rate
 ```
 
 ### **Phase 4: Governance Revenue (PRODUCTION)**
@@ -134,7 +139,7 @@ After the initial **Team/Founders 20,000,000 AVG** allocation vests (standard li
 | P0 (Active) | Pre-vesting | Standard founder voting + vesting locks | Stable initial stewardship |
 | P1 (Transition Start) | 50% of founder allocation vested | Begin metering idle (non-voted for N epochs) founder-controlled voting power into Bounty Allocation Queue (BAQ) at 2% per epoch | Reduce passive concentration |
 | P2 (Acceleration) | 75% vested & <60% avg founder vote participation (rolling 90d) | Increase reallocation rate to 4% per epoch (capped) | Incentivize active governance or dilution |
-| P3 (Completion) | 100% vested OR 36 months elapsed | Lock remaining unreleased founder incentive pool; mint equivalent bounty-backed escrow (BES) entries | Full decentralization of surplus |
+| P3 (Completion) | 100% vested OR 48 months elapsed | Lock remaining unreleased founder incentive pool; mint equivalent bounty-backed escrow (BES) entries | Full decentralization of surplus |
 
 Reallocated governance units are not dumped to market; they are streamed into the **Automated Bounty System** (see `automated-bounty-system.clar`) via:
 
