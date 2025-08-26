@@ -1,14 +1,14 @@
 # AutoVault
 
 [![Tests](https://img.shields.io/badge/Tests-130%2F131%20Passing-green)](https://github.com/Anya-org/AutoVault)
-[![Contracts](https://img.shields.io/badge/Contracts-51%20Compiled-blue)](https://github.com/Anya-org/AutoVault)
+[![Contracts](https://img.shields.io/badge/Contracts-75%20Compiled-blue)](https://github.com/Anya-org/AutoVault)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A production-ready DeFi platform on Stacks with enhanced tokenomics, automated DAO governance, DEX subsystem groundwork, circuit breaker & enterprise monitoring, and Bitcoin-aligned principles.
 
 ## Status
 
-✅ **Production Ready** – 51 contracts compile successfully with 130/131 tests passing (unit, integration, security, SDK suites; 20 test files).
+✅ **Production Ready** – 75 contracts compile successfully with 130/131 tests passing (unit, integration, security, SDK suites; 20 TypeScript test files and 1 Clarity test file).
 
 [View Complete Status](./documentation/STATUS.md)
 
@@ -40,11 +40,18 @@ Note: This repo pins Clarinet SDK v3.5.0 via npm. Always use `npx clarinet`.
 
 ```bash
 git clone https://github.com/Anya-org/AutoVault.git
-cd AutoVault/stacks
-npm install
-npx clarinet check    # ✅ 51 contracts
-npm test              # ✅ 130/131 tests
+cd AutoVault
+npm run ci
 ```
+
+This will:
+1.  Install all dependencies.
+2.  Run the Clarity contract checker (`npx clarinet check`).
+3.  Run all TypeScript tests (`npx vitest run`).
+
+Expected output:
+- ✅ 75 contracts checked
+- ✅ 130 tests passed, 1 skipped
 
 #### Deploy
 
