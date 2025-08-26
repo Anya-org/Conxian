@@ -671,6 +671,8 @@ For critical issues affecting fund safety:
 - **[API Reference](./API_REFERENCE.md)**: Smart contract functions
 - **[Security Documentation](./SECURITY.md)**: Security features and audits
 - **[Developer Guide](./DEVELOPER_GUIDE.md)**: Development and integration
+- **[Developer & Contract Guides](./contract-guides/README.md)**: Detailed guides for core smart contracts
+
 
 ### Educational Resources
 
