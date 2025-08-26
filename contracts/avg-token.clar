@@ -24,6 +24,7 @@
 (define-data-var vault principal .vault)
 (define-data-var migration-enabled bool true)
 (define-data-var current-epoch uint u1)
+(define-data-var founder-reallocation-enabled bool false)
 
 ;; Migration tracking
 (define-data-var migrated-actr uint u0)
@@ -290,6 +291,15 @@
   (begin
     (asserts! (is-eq tx-sender (var-get dao-governance)) (err u100))
     (var-set dao-governance new-dao)
+    (ok true)
+  )
+)
+
+(define-public (enable-founder-reallocation)
+  (begin
+    (asserts! (is-eq tx-sender (var-get dao-governance)) (err u100))
+    (var-set founder-reallocation-enabled true)
+    (print { event: "founder-reallocation-enabled" })
     (ok true)
   )
 )

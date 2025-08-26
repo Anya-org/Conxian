@@ -172,6 +172,11 @@
     
     (var-set proposal-count proposal-id)
     (emit-proposal-created proposal-id tx-sender title)
+
+    ;; Increment proposal count in governance-metrics
+    (let ((status (contract-call? .avg-token get-migration-status)))
+      (try! (as-contract (contract-call? .governance-metrics increment-proposal-count (get current-epoch status))))
+    )
     (ok proposal-id)
   )
 )
@@ -211,6 +216,14 @@
     )
     
     (emit-vote-cast proposal-id tx-sender vote voter-power)
+
+    ;; Increment vote count in governance-metrics if the voter is a founder
+    (if (contract-call? .governance-metrics is-founder tx-sender)
+      (let ((status (contract-call? .avg-token get-migration-status)))
+        (try! (as-contract (contract-call? .governance-metrics increment-vote-count tx-sender (get current-epoch status))))
+      )
+      true
+    )
     (ok true)
   )
 )
@@ -404,6 +417,29 @@
     (asserts! (is-eq tx-sender (var-get emergency-multisig)) (err u100))
     (var-set emergency-multisig new-multisig)
     (ok true)
+  )
+)
+
+;; This function must be called by an external keeper or a trusted party at the end of each epoch
+;; to check the participation of founders and reallocate their tokens if necessary.
+(define-public (check-and-reallocate-founder-tokens (founder principal) (epoch uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get emergency-multisig)) (err u100))
+    (let ((participation-rate (unwrap! (contract-call? .governance-metrics get-participation-rate founder epoch) (err u702))))
+      (if (< participation-rate u60)
+        (let ((founder-balance (unwrap! (contract-call? .avg-token get-balance-of founder) (err u703)))
+              (reallocation-amount (/ (* founder-balance u2) u100)))
+          (try! (as-contract (contract-call? .avg-token transfer-from founder .automated-bounty-system reallocation-amount)))
+          (print {
+            event: "founder-reallocation",
+            founder: founder,
+            amount: reallocation-amount
+          })
+          (ok true)
+        )
+        (ok false)
+      )
+    )
   )
 )
 

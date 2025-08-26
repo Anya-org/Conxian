@@ -61,3 +61,29 @@ On-chain proposal system with time-weighted voting & timelock execution ensuring
 
 **Approved By**: Protocol WG, Governance Team  
 **Mainnet Status**: **APPROVED FOR DEPLOYMENT**
+
+## Founder Token Reallocation
+
+**Status**: **IMPLEMENTED** - Production Ready
+
+### Summary
+
+To ensure long-term decentralization and incentivize active governance, a portion of founder tokens are subject to reallocation to the automated bounty system if founder participation drops below a certain threshold.
+
+### Functional Requirements (FR)
+
+| ID | Requirement |
+|----|-------------|
+| DAO-FR-09 | Track founder voting participation per epoch. |
+| DAO-FR-10 | If a founder's participation drops below 60% in an epoch, reallocate 2% of their token holdings to the automated bounty system. |
+| DAO-FR-11 | The reallocation check must be triggered manually by a trusted party at the end of each epoch. |
+
+### New Contracts
+
+- **`governance-metrics.clar`**: A new contract to track founder participation metrics without using recursion.
+- **`reputation-token.clar`**: A new non-transferable token to reward contributors.
+
+### Integration
+
+- The `dao-governance.clar` contract is integrated with `governance-metrics.clar` to track participation and `automated-bounty-system.clar` to fund bounties.
+- The `automated-bounty-system.clar` is integrated with `reputation-token.clar` to award reputation tokens to bounty winners.

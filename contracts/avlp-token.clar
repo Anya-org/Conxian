@@ -196,16 +196,18 @@
 (define-read-only (get-loyalty-bonus (position { amount: uint, entry-block: uint, total-rewards: uint, last-claim-block: uint }))
   (let (
     (blocks-held (- block-height (get entry-block position)))
-    (loyalty-tiers (list { min-blocks: u144, bonus: u50000 }    ;; 1 day = 5% bonus
-                         { min-blocks: u1008, bonus: u100000 }   ;; 1 week = 10% bonus  
-                         { min-blocks: u4032, bonus: u200000 })) ;; 1 month = 20% bonus
   )
-    (fold check-loyalty-tier loyalty-tiers u0)))
-  
-(define-private (check-loyalty-tier (tier { min-blocks: uint, bonus: uint }) (current-bonus uint))
-  (if (>= u0 (get min-blocks tier))  ;; Fix: removed invalid field access
-    (get bonus tier)
-    current-bonus))
+    (if (>= blocks-held u4032) ;; 1 month = 20% bonus
+      u200000
+      (if (>= blocks-held u1008) ;; 1 week = 10% bonus
+        u100000
+        (if (>= blocks-held u144) ;; 1 day = 5% bonus
+          u50000
+          u0
+        )
+      )
+    )
+  ))
 
 (define-read-only (get-liquidity-position (provider principal))
   (map-get? liquidity-positions { provider: provider }))
