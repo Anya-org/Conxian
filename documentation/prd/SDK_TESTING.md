@@ -1,5 +1,47 @@
 # SDK Testing Framework PRD (v1.0)
 
+## Clarity SDK Adherence Assessment
+
+**Date:** 2025-08-25
+
+**Assessor:** Jules
+
+### Findings
+
+*   **`@stacks/transactions` is outdated:** The project is using version `^7.0.6`, while the latest version is `7.2.0`.
+*   **Test suite gaps:** The test suite is a good starting point, but it has some major gaps:
+    *   **No transaction tests:** The tests only use `callReadOnlyFn` and do not test any transactions that change the state of the contracts.
+    *   **Inefficient `initSimnet` usage:** `initSimnet` is called in every `it` block, which is inefficient. It should be called once per `describe` block using a `beforeAll` or `beforeEach` hook.
+    *   **Weak assertions:** Many tests only check the `type` of the result, not the actual value.
+
+### Recommendations
+
+*   Update the `@stacks/transactions` library to the latest version.
+*   Add tests for transactions that change the state of the contracts.
+*   Use `beforeAll` or `beforeEach` hooks to initialize the simnet.
+*   Add stronger assertions on the return values of the functions.
+
+## Nakamoto Adherence Assessment
+
+**Date:** 2025-08-25
+
+**Assessor:** Jules
+
+### Findings
+
+*   **No Nakamoto features:** The contracts are not using any Nakamoto features, such as sBTC or the `pox-4` contract.
+*   **`nakamoto-vault-ultra.clar` is a proof-of-concept:** The `nakamoto-vault-ultra.clar` contract is a good starting point for a Nakamoto-native vault, but it is not a complete or production-ready implementation.
+*   **Clarity 2:** The contracts are written in Clarity 2 and need to be updated to Clarity 3.
+
+### Recommendations
+
+*   Update the contracts to be compatible with Clarity 3.
+*   Integrate sBTC into the `vault.clar` contract.
+*   Complete the implementation of the `nakamoto-vault-ultra.clar` contract.
+*   Complete the implementation of the `dao.clar` contract.
+
+---
+
 ## Reference
 
 Clarinet SDK 3.5.0, `@hirosystems/clarinet-sdk`, Vitest integration
