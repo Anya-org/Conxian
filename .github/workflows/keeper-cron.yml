@@ -78,7 +78,7 @@ jobs:
           fi
           
           # Treasury status check
-          if python scripts/monitor-health.sh &> treasury.log; then
+          if bash scripts/monitor-health.sh &> treasury.log; then
             echo "treasury-status=healthy" >> $GITHUB_OUTPUT
           else
             echo "treasury-status=degraded" >> $GITHUB_OUTPUT
