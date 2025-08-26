@@ -1,5 +1,25 @@
 # VAULT PRD (v1.1)
 
+## Nakamoto Adherence Assessment
+
+**Date:** 2025-08-25
+
+**Assessor:** Jules
+
+### Findings
+
+*   **No Nakamoto features:** The `vault.clar` contract is not using any Nakamoto features, such as sBTC or the `pox-4` contract.
+*   **`nakamoto-vault-ultra.clar` is a proof-of-concept:** The `nakamoto-vault-ultra.clar` contract is a good starting point for a Nakamoto-native vault, but it is not a complete or production-ready implementation.
+*   **Clarity 2:** The contracts are written in Clarity 2 and need to be updated to Clarity 3.
+
+### Recommendations
+
+*   Update the `vault.clar` contract to be compatible with Clarity 3.
+*   Integrate sBTC into the `vault.clar` contract to allow users to deposit and withdraw Bitcoin.
+*   Complete the implementation of the `nakamoto-vault-ultra.clar` contract and consider it for a future release.
+
+---
+
 **Reference**: AIP-5 (Precision), Architecture doc, `vault.clar` implementation, SDK 3.5.0 testing compliance
 
 **Status**: **STABLE** - Production Ready with SDK 3.5.0 compliance  
