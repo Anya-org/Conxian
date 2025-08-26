@@ -76,7 +76,7 @@ To ensure long-term decentralization and incentivize active governance, a portio
 |----|-------------|
 | DAO-FR-09 | Track founder voting participation per epoch. |
 | DAO-FR-10 | If a founder's participation drops below 60% in an epoch, reallocate 2% of their token holdings to the automated bounty system. |
-| DAO-FR-11 | The reallocation check must be triggered manually by a trusted party at the end of each epoch. |
+| DAO-FR-11 | The reallocation check for each founder can be triggered by anyone after the epoch has concluded. An off-chain keeper is expected to perform this action. |
 
 ### New Contracts
 

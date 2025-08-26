@@ -9,10 +9,13 @@
 (define-constant TOKEN_DECIMALS u6)
 (define-constant MAX_SUPPLY u100000000000000) ;; 100M AVG total supply
 
-;; Migration epochs
-(define-constant EPOCH_1_END u1008) ;; ~1 week
-(define-constant EPOCH_2_END u2016) ;; ~2 weeks  
-(define-constant EPOCH_3_END u3024) ;; ~3 weeks (final migration)
+;; Migration epochs - 4-year schedule
+(define-constant EPOCH_1_END u52560) ;; ~1 year
+(define-constant EPOCH_2_END u105120) ;; ~2 years
+(define-constant EPOCH_3_END u157680) ;; ~3 years
+(define-constant EPOCH_4_END u210240) ;; ~4 years (final migration)
+
+(define-constant TOTAL_MIGRATABLE_AVLP u50000000000000) ;; 50M AVLP
 
 ;; Revenue sharing
 (define-constant REVENUE_SHARE_BPS u8000) ;; 80% to governance holders
@@ -64,7 +67,7 @@
 (define-public (migrate-actr (amount uint))
   (begin
     (asserts! (var-get migration-enabled) (err u301))
-    (asserts! (<= block-height EPOCH_3_END) (err u302))
+    (asserts! (<= block-height EPOCH_4_END) (err u302))
     
     ;; Burn ACTR and mint AVG at 1:1 ratio
     (unwrap! (contract-call? .creator-token burn amount) (err u303))
@@ -79,7 +82,7 @@
 (define-public (migrate-avlp (amount uint))
   (begin
     (asserts! (var-get migration-enabled) (err u301))
-    (asserts! (<= block-height EPOCH_3_END) (err u302))
+    (asserts! (<= block-height EPOCH_4_END) (err u302))
     
     (let (
       (current-epoch-num (var-get current-epoch))
@@ -162,26 +165,49 @@
 )
 
 ;; Epoch management
-(define-public (advance-epoch)
-  (begin
-    (asserts! (is-eq tx-sender (var-get dao-governance)) (err u100))
-    
-    (let ((new-epoch (+ (var-get current-epoch) u1)))
-      (asserts! (<= new-epoch u3) (err u305)) ;; Max 3 epochs
-      
-      ;; Update AVLP migration rate based on liquidity performance
-      (if (is-eq new-epoch u2)
-        (map-set avlp-migration-rate { epoch: u2 } { avg-per-avlp: u1200000 }) ;; 1.2 AVG per AVLP
-        (if (is-eq new-epoch u3)
-          (map-set avlp-migration-rate { epoch: u3 } { avg-per-avlp: u1500000 }) ;; 1.5 AVG per AVLP (final bonus)
-          true
+(define-private (calculate-migration-rate (epoch uint) (migrated-avlp-total uint))
+  (let
+    ((remaining-ratio (/ (* (- TOTAL_MIGRATABLE_AVLP migrated-avlp-total) u10000) TOTAL_MIGRATABLE_AVLP)))
+    (if (is-eq epoch u2)
+      (+ u1100000 (/ (* u200000 remaining-ratio) u10000)) ;; 1.1 to 1.3
+      (if (is-eq epoch u3)
+        (+ u1300000 (/ (* u300000 remaining-ratio) u10000)) ;; 1.3 to 1.6
+        (if (is-eq epoch u4)
+          (+ u1600000 (/ (* u400000 remaining-ratio) u10000)) ;; 1.6 to 2.0
+          u1000000 ;; Default for epoch 1
         )
       )
+    )
+  )
+)
+
+(define-public (advance-epoch)
+  (begin
+    (let ((current-epoch-num (var-get current-epoch))
+          (new-epoch (+ (var-get current-epoch) u1)))
+
+      (asserts! (<= new-epoch u4) (err u305)) ;; Max 4 epochs
+
+      ;; Ensure epoch can only be advanced after it has ended
+      (if (is-eq current-epoch-num u1)
+        (asserts! (>= block-height EPOCH_1_END) (err u307))
+        (if (is-eq current-epoch-num u2)
+          (asserts! (>= block-height EPOCH_2_END) (err u307))
+          (if (is-eq current-epoch-num u3)
+            (asserts! (>= block-height EPOCH_3_END) (err u307))
+            true ;; epoch 4 cannot be advanced
+          )
+        )
+      )
+
+      ;; Update AVLP migration rate based on dynamic formula
+      (let ((new-rate (calculate-migration-rate new-epoch (var-get migrated-avlp))))
+        (map-set avlp-migration-rate { epoch: new-epoch } { avg-per-avlp: new-rate }))
       
       (var-set current-epoch new-epoch)
       
-      ;; Disable migration after epoch 3
-      (if (is-eq new-epoch u3)
+      ;; Disable migration after epoch 4
+      (if (is-eq new-epoch u4)
         (var-set migration-enabled false)
         true
       )
@@ -203,8 +229,20 @@
     current-epoch: (var-get current-epoch),
     migrated-actr: (var-get migrated-actr),
     migrated-avlp: (var-get migrated-avlp),
-    blocks-remaining: (if (<= block-height EPOCH_3_END) (- EPOCH_3_END block-height) u0)
+    blocks-remaining: (if (<= block-height EPOCH_4_END) (- EPOCH_4_END block-height) u0)
   }
+)
+
+(define-read-only (get-epoch-end-block (epoch uint))
+  (ok (if (is-eq epoch u1) EPOCH_1_END
+    (if (is-eq epoch u2) EPOCH_2_END
+      (if (is-eq epoch u3) EPOCH_3_END
+        (if (is-eq epoch u4) EPOCH_4_END
+          u0
+        )
+      )
+    )
+  ))
 )
 
 (define-read-only (get-claimable-revenue (user principal) (epoch uint))
@@ -311,3 +349,4 @@
 ;; u100: unauthorized
 ;; u200-299: revenue claim errors
 ;; u300-399: migration errors
+;; u307: epoch-not-ended

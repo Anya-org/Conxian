@@ -66,6 +66,8 @@
   { delegate: principal }
 )
 
+(define-map reallocation-checks { founder: principal, epoch: uint } { checked: bool })
+
 ;; Events
 (define-private (emit-proposal-created (id uint) (proposer principal) (title (string-utf8 100)))
   (print {
@@ -420,12 +422,19 @@
   )
 )
 
-;; This function must be called by an external keeper or a trusted party at the end of each epoch
-;; to check the participation of founders and reallocate their tokens if necessary.
+;; This function can be called by anyone at the end of an epoch
+;; to check the participation of a founder and reallocate their tokens if necessary.
 (define-public (check-and-reallocate-founder-tokens (founder principal) (epoch uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get emergency-multisig)) (err u100))
+    ;; Check that epoch has ended
+    (let ((epoch-end-block (unwrap! (contract-call? .avg-token get-epoch-end-block epoch) (err u701))))
+      (asserts! (>= block-height epoch-end-block) (err u700)))
+
+    ;; Check if this has been run before
+    (asserts! (is-none (map-get? reallocation-checks { founder: founder, epoch: epoch })) (err u704))
+
     (let ((participation-rate (unwrap! (contract-call? .governance-metrics get-participation-rate founder epoch) (err u702))))
+      (map-set reallocation-checks { founder: founder, epoch: epoch } { checked: true })
       (if (< participation-rate u60)
         (let ((founder-balance (unwrap! (contract-call? .avg-token get-balance-of founder) (err u703)))
               (reallocation-amount (/ (* founder-balance u2) u100)))
@@ -516,3 +525,8 @@
 ;; u110: unsupported-proposal-type
 ;; u111: unknown-function
 ;; u200: token-error
+;; u700: epoch-not-ended
+;; u701: avg-token-error
+;; u702: governance-metrics-error
+;; u703: avg-token-balance-error
+;; u704: reallocation-check-already-performed
