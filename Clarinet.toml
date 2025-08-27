@@ -96,6 +96,12 @@ path = "contracts/math-lib-advanced.clar"
 clarity_version = 2
 epoch = "2.4"
 
+# Enhanced math library with sqrt, pow, ln functions for Phase 3
+[contracts.math-lib-enhanced]
+path = "contracts/math-lib-enhanced.clar"
+clarity_version = 2
+epoch = "2.4"
+
 [contracts.fixed-point-math]
 path = "contracts/fixed-point-math.clar"
 clarity_version = 2
@@ -369,6 +375,36 @@ epoch = "2.4"
 # Advanced Multi-Hop Router V3 with Dijkstra's algorithm
 [contracts.multi-hop-router-v3]
 path = "contracts/multi-hop-router-v3.clar"
+clarity_version = 2
+epoch = "2.4"
+
+# Fee tier management system for Phase 3
+[contracts.fee-tier-manager]
+path = "contracts/fee-tier-manager.clar"
+clarity_version = 2
+epoch = "2.4"
+
+# Enhanced TWAP oracle with manipulation resistance
+[contracts.twap-oracle-enhanced]
+path = "contracts/twap-oracle-enhanced.clar"
+clarity_version = 2
+epoch = "2.4"
+
+# Professional LP tools and analytics for Phase 3
+[contracts.professional-lp-tools]
+path = "contracts/professional-lp-tools.clar"
+clarity_version = 2
+epoch = "2.4"
+
+# Institutional APIs and risk management for Phase 3
+[contracts.institutional-apis]
+path = "contracts/institutional-apis.clar"
+clarity_version = 2
+epoch = "2.4"
+
+# Compliance integration for regulated entities
+[contracts.compliance-integration]
+path = "contracts/compliance-integration.clar"
 clarity_version = 2
 epoch = "2.4"
 
