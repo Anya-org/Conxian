@@ -100,7 +100,7 @@
 (define-public (monitor-price-volatility-oracle (pool principal) (base principal) (quote principal))
   (let ((enabled (var-get oracle-enabled)))
     (if enabled
-        (let ((res (contract-call? .oracle-aggregator get-price base quote)))
+        (let ((res (contract-call? .oracle-aggregator-enhanced get-price base quote)))
           (match res 
             price-data (let ((p (get price price-data)))
                         (monitor-price-volatility pool p))

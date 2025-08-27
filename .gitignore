@@ -33,11 +33,11 @@ Thumbs.db
 *~
 
 # Environment & Configuration
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+#.env
+#.env.local
+#.env.development.local
+#.env.test.local
+#.env.production.local
 config.local.json
 
 # Clarinet/Stacks artifacts
@@ -116,7 +116,7 @@ monitoring/logs/
 analytics/cache/
 
 # Kiro IDE specific files
-.kiro/*
+#.kiro/*
 
 # Bitcoin/Stacks specific
 *.wallet

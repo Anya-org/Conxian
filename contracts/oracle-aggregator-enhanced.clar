@@ -6,7 +6,7 @@
 
 ;; Read-only price query: route to canonical implementation and surface price only
 (define-read-only (get-price-simple (pair {base: principal, quote: principal}))
-  (let ((res (contract-call? .oracle-aggregator get-price (get base pair) (get quote pair))))
+  (let ((res (contract-call? .oracle-aggregator-enhanced get-price (get base pair) (get quote pair))))
     (match res
       value (ok (get price value))
       err-code (err err-code))))
@@ -18,7 +18,7 @@
 
 ;; Read-only TWAP: route to canonical TWAP and wrap in response for uniform API
 (define-read-only (get-twap-simple (pair {base: principal, quote: principal}) (window uint))
-  (let ((twap (contract-call? .oracle-aggregator get-twap (get base pair) (get quote pair))))
+  (let ((twap (contract-call? .oracle-aggregator-enhanced get-twap (get base pair) (get quote pair))))
     (ok twap)))
 ;; AutoVault Enhanced Oracle Aggregator 
 ;; Integrates: Advanced Caching, Load Distribution, Performance Optimization
