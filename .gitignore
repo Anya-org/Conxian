@@ -115,6 +115,9 @@ chainhooks/data/
 monitoring/logs/
 analytics/cache/
 
+# Kiro IDE specific files
+.kiro/*
+
 # Bitcoin/Stacks specific
 *.wallet
 *.seed

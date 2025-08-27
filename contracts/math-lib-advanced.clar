@@ -16,8 +16,8 @@
 (define-constant ERR_INVALID_INPUT u1005)
 
 ;; Mathematical constants in fixed-point format
-(define-constant E_FIXED u2718281828459045235) ;; e ≈ 2.718281828459045235
-(define-constant LN_2_FIXED u693147180559945309) ;; ln(2) ≈ 0.693147180559945309
+(define-constant E_FIXED u2718281828459045235) ;; e = 2.718281828459045235
+(define-constant LN_2_FIXED u693147180559945309) ;; ln(2) = 0.693147180559945309
 
 ;; Advanced math trait for external contracts
 (define-trait advanced-math-trait

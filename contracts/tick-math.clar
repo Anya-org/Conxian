@@ -41,8 +41,8 @@
 
 ;; Handle positive ticks
 (define-private (tick-to-sqrt-price-positive (abs-tick uint))
-  (let ((ratio (if (and abs-tick u1)
-                 u340282366920938463463374607431768211455 ;; 2^128 - 1
+  (let ((ratio (if (> abs-tick u0)
+                 u79228162514264337593543950336 ;; 2^96
                  Q96)))
     
     ;; Apply bit-by-bit calculation for precision
