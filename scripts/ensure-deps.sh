@@ -1,4 +1,4 @@
-#!/bin/bash
+./scripts/ensure-deps.sh && npx vitest run --config ./vitest.config.ts mobile --features=unified#!/bin/bash
 set -e
 
 # Get the directory of this script, which is /scripts

@@ -28,27 +28,30 @@ function loadEnv() {
     return envVars;
 }
 
-// Make HTTP request with API key
-function makeRequest(url, options = {}) {
+// Make HTTP request with minimal redirect support
+function makeRequest(url, options = {}, redirects = 0) {
     return new Promise((resolve, reject) => {
         const req = https.request(url, options, (res) => {
+            // Follow common redirect status codes up to 3 hops
+            if ([301, 302, 307, 308].includes(res.statusCode) && res.headers.location && redirects < 3) {
+                const nextUrl = new URL(res.headers.location, url).toString();
+                // Drain and follow
+                res.resume();
+                return makeRequest(nextUrl, options, redirects + 1).then(resolve).catch(reject);
+            }
+
             let data = '';
             res.on('data', chunk => data += chunk);
             res.on('end', () => {
+                // Try JSON parse, fall back to raw text
                 try {
-                    resolve({
-                        statusCode: res.statusCode,
-                        data: JSON.parse(data)
-                    });
-                } catch (e) {
-                    resolve({
-                        statusCode: res.statusCode,
-                        data: data
-                    });
+                    resolve({ statusCode: res.statusCode, data: JSON.parse(data) });
+                } catch (_) {
+                    resolve({ statusCode: res.statusCode, data });
                 }
             });
         });
-        
+
         req.on('error', reject);
         req.end();
     });

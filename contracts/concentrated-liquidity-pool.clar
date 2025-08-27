@@ -81,7 +81,7 @@
   (fee uint)
   (initial-sqrt-price uint))
   (begin
-    (asserts! (is-eq tx-sender CONTRACT_OWNER) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_UNAUTHORIZED)
     (var-set token-0 token-0-contract)
     (var-set token-1 token-1-contract)
     (var-set fee-tier fee)

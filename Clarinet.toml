@@ -132,11 +132,6 @@ path = "contracts/circuit-breaker.clar"
 clarity_version = 2
 epoch = "2.4"
 
-[contracts.circuit-breaker-simple]
-path = "contracts/circuit-breaker-simple.clar"
-clarity_version = 2
-epoch = "2.4"
-
 # ===========================================
 # GOVERNANCE - DAO and governance system
 # ===========================================
@@ -399,12 +394,6 @@ epoch = "2.4"
 # Institutional APIs and risk management for Phase 3
 [contracts.institutional-apis]
 path = "contracts/institutional-apis.clar"
-clarity_version = 2
-epoch = "2.4"
-
-# Compliance integration for regulated entities
-[contracts.compliance-integration]
-path = "contracts/compliance-integration.clar"
 clarity_version = 2
 epoch = "2.4"
 
