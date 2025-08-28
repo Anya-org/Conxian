@@ -187,7 +187,7 @@ async function runTests() {
     }
     
     console.log(`🔗 API Base: ${apiBase}`);
-    console.log(`🔑 API Key: ${apiKey.substring(0, 8)}...\n`);
+    console.log(`🔑 API Key is set.\n`);
     
     const tests = [
         () => testNetworkStatus(apiKey, apiBase),
