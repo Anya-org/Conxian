@@ -1,7 +1,7 @@
-# AutoVault
+# Conxian
 
-[![Tests](https://img.shields.io/badge/Tests-130%2F131%20Passing-green)](https://github.com/Anya-org/AutoVault)
-[![Contracts](https://img.shields.io/badge/Contracts-75%20Compiled-blue)](https://github.com/Anya-org/AutoVault)
+[![Tests](https://img.shields.io/badge/Tests-130%2F131%20Passing-green)](https://github.com/Anya-org/Conxian)
+[![Contracts](https://img.shields.io/badge/Contracts-75%20Compiled-blue)](https://github.com/Anya-org/Conxian)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A production-ready DeFi platform on Stacks with enhanced tokenomics, automated DAO governance, DEX subsystem groundwork, circuit breaker & enterprise monitoring, and Bitcoin-aligned principles.
@@ -26,7 +26,7 @@ A production-ready DeFi platform on Stacks with enhanced tokenomics, automated D
 ## Quick Start
 
 ### For Users
-**New to AutoVault?** → [**User Manual**](./documentation/USER_MANUAL.md) | [Quick Start Guide](./documentation/QUICK_START.md)
+**New to Conxian?** → [**User Manual**](./documentation/USER_MANUAL.md) | [Quick Start Guide](./documentation/QUICK_START.md)
 
 ### For Developers
 
@@ -39,8 +39,8 @@ Note: This repo pins Clarinet SDK v3.5.0 via npm. Always use `npx clarinet`.
 #### Setup
 
 ```bash
-git clone https://github.com/Anya-org/AutoVault.git
-cd AutoVault
+git clone https://github.com/Anya-org/Conxian.git
+cd Conxian
 npm run ci
 ```
 
@@ -94,8 +94,8 @@ MIT License
 
 ## Links
 
-- **Repository**: [github.com/Anya-org/AutoVault](https://github.com/Anya-org/AutoVault)
-- **Issues**: [Report bugs or request features](https://github.com/Anya-org/AutoVault/issues)
+- **Repository**: [github.com/Anya-org/Conxian](https://github.com/Anya-org/Conxian)
+- **Issues**: [Report bugs or request features](https://github.com/Anya-org/Conxian/issues)
 - **Documentation**: [Complete documentation](./documentation/)
 
 *Counts reflect repository state as of Aug 26, 2025.*

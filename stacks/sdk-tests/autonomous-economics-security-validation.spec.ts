@@ -3,7 +3,7 @@ import { Cl } from '@stacks/transactions';
 import { initSimnet } from '@hirosystems/clarinet-sdk';
 
 /**
- * AutoVault Autonomous Economics Security Validation
+ * Conxian Autonomous Economics Security Validation
  * Validates that autonomous economics features are properly deployed and secured
  * 
  * ✅ This test validates CORRECT SECURITY BEHAVIOR:
@@ -17,7 +17,7 @@ import { initSimnet } from '@hirosystems/clarinet-sdk';
  * 3. READY ✅ - Can be activated via timelock when needed
  */
 
-describe('AutoVault Autonomous Economics - Security Validation', () => {
+describe('Conxian Autonomous Economics - Security Validation', () => {
   let simnet: any;
   let deployer: string;
   let user1: string;

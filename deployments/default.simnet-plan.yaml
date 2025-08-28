@@ -89,9 +89,9 @@ plan:
             path: contracts/automated-bounty-system.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: autovault-registry
+            contract-name: Conxian-registry
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/autovault-registry.clar
+            path: contracts/Conxian-registry.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: avlp-token

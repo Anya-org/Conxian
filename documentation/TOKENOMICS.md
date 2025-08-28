@@ -1,8 +1,8 @@
-# AutoVault Enhanced Tokenomics - Production Implementation
+# Conxian Enhanced Tokenomics - Production Implementation
 
 ## **Executive Summary**
 
-The AutoVault tokenomics system has been **successfully implemented** with enhanced supply distribution for broader participation. This document reflects the actual production-ready smart contract implementation.
+The Conxian tokenomics system has been **successfully implemented** with enhanced supply distribution for broader participation. This document reflects the actual production-ready smart contract implementation.
 
 ## **✅ IMPLEMENTED FEATURES**
 
@@ -25,7 +25,7 @@ The AutoVault tokenomics system has been **successfully implemented** with enhan
 ### **AVG Token (avg-token.clar)**
 
 ```clarity
-Token: AutoVault Governance (AVG)
+Token: Conxian Governance (AVG)
 Max Supply: 100,000,000 AVG (100M for broader participation)
 Decimals: 6 (micro-AVG precision)
 
@@ -43,7 +43,7 @@ Revenue Distribution:
 ### **AVLP Token (avlp-token.clar)**
 
 ```clarity
-Token: AutoVault Liquidity Provider (AVLP)
+Token: Conxian Liquidity Provider (AVLP)
 Max Supply: 50,000,000 AVLP (50M for enhanced liquidity)
 Decimals: 6 (micro-AVLP precision)
 Purpose: Temporary token that migrates to AVG
@@ -266,7 +266,7 @@ Long-term Viability:
 
 ## **💡 FINAL PRODUCTION ASSESSMENT**
 
-**The AutoVault tokenomics system represents a mature, well-designed implementation that:**
+**The Conxian tokenomics system represents a mature, well-designed implementation that:**
 
 ✅ **Achieves Broader Participation**: 100M AVG supply enables community-wide governance  
 ✅ **Protects Liquidity Providers**: Progressive migration bonuses retain essential capital  

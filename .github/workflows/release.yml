@@ -1,4 +1,4 @@
-name: AutoVault Release Pipeline
+name: Conxian Release Pipeline
 
 on:
   push:
@@ -152,9 +152,9 @@ jobs:
       - name: Build Production Package
         run: |
           mkdir -p release-artifacts
-          tar -czf release-artifacts/autovault-contracts-${{ needs.version-management.outputs.new-version }}.tar.gz \
+          tar -czf release-artifacts/conxian-contracts-${{ needs.version-management.outputs.new-version }}.tar.gz \
             contracts/ Clarinet.toml deployments/
-          tar -czf release-artifacts/autovault-scripts-${{ needs.version-management.outputs.new-version }}.tar.gz \
+          tar -czf release-artifacts/conxian-scripts-${{ needs.version-management.outputs.new-version }}.tar.gz \
             scripts/deploy-*.sh scripts/post_deploy_verify.ts scripts/sdk_deploy_contracts.ts || true
           (cd release-artifacts && sha256sum *.tar.gz > checksums.txt)
 
@@ -184,7 +184,7 @@ jobs:
       - name: Prepare Release Body
         run: |
           cat > body.md <<'EOF'
-          # AutoVault Release
+          # Conxian Release
           
           ## What's New
           EOF
@@ -205,7 +205,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.version-management.outputs.new-version }}
-          name: AutoVault ${{ needs.version-management.outputs.new-version }}
+          name: Conxian ${{ needs.version-management.outputs.new-version }}
           body_path: body.md
           draft: false
           prerelease: ${{ github.event.inputs.pre_release || false }}

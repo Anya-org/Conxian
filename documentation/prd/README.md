@@ -1,36 +1,38 @@
 # Product Requirements Documents (PRDs)
 
-Centralized, versioned PRDs for major AutoVault subsystems. Each PRD follows a consistent format to reduce ambiguity between architecture intent, governance proposals (AIPs), and implementation.
+Centralized, versioned PRDs for major Conxian subsystems.
+Each PRD follows a consistent format to reduce ambiguity between architecture intent, 
+governance proposals (AIPs), and implementation.
 
 ## Index
 
 | Subsystem | File | Status | Owner | Version |
 |-----------|------|--------|-------|---------|
-| Vault Core | `VAULT.md` | Stable (v1) | Protocol | 1.0 |
-| DAO Governance & Voting | `DAO_GOVERNANCE.md` | Stable (v1) | Protocol | 1.0 |
-| Treasury & Reserve | `TREASURY.md` | Stable (v1) | Protocol | 1.0 |
-| DEX / Liquidity Layer | `DEX.md` | Draft (v0.3) | R&D | 0.3 |
-| Oracle Aggregator | `ORACLE_AGGREGATOR.md` | Draft (v0.2) | R&D | 0.2 |
-| Security Layer (AIP 1–5) | `SECURITY_LAYER.md` | Living | Security WG | 1.1 |
+| Vault Core | `VAULT.md` | Stable (v1) | Protocol | 1.1 |
+| DAO Governance & Voting | `DAO_GOVERNANCE.md` | Stable (v1) | Protocol | 1.3 |
+| Treasury & Reserve | `TREASURY.md` | Stable (v1) | Protocol | 1.1 |
+| DEX / Liquidity Layer | `DEX.md` | Draft (v0.5) | R&D | 0.5 |
+| Oracle Aggregator | `ORACLE_AGGREGATOR.md` | Draft (v0.4) | R&D | 0.4 |
+| Security Layer (AIP 1–5) | `SECURITY_LAYER.md` | Living | Security WG | 1.2 |
 
 ## Format Standard
 
-1. Summary & Vision  
-2. Goals / Non‑Goals  
-3. User Stories  
-4. Functional Requirements  
-5. Non‑Functional Requirements (NFRs)  
-6. Invariants & Safety Properties  
-7. Data Model / State & Maps  
-8. Public Interface (Contract Functions / Events)  
-9. Core Flows (Sequence Narratives)  
-10. Edge Cases & Failure Modes  
-11. Risks & Mitigations (Technical / Economic / Operational)  
-12. Metrics & KPIs  
-13. Rollout / Migration Plan  
-14. Monitoring & Observability  
-15. Open Questions  
-16. Changelog & Version Sign‑off  
+* Summary & Vision
+* Goals / Non‑Goals
+* User Stories
+* Functional Requirements
+* Non‑Functional Requirements (NFRs)
+* Invariants & Safety Properties
+* Data Model / State & Maps
+* Public Interface (Contract Functions / Events)
+* Core Flows (Sequence Narratives)
+* Edge Cases & Failure Modes
+* Risks & Mitigations (Technical / Economic / Operational)
+* Metrics & KPIs
+* Rollout / Migration Plan
+* Monitoring & Observability
+* Open Questions
+* Changelog & Version Sign‑off
 
 ## Lifecycle
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * AutoVault Deployer Key Generator (JS Runtime Version)
+ * Conxian Deployer Key Generator (JS Runtime Version)
  * -----------------------------------------------------
  * Generates a BIP39 mnemonic and derives Stacks private keys + addresses.
  * SECURITY: Never share production mnemonics or private keys in chat/logs.
@@ -72,7 +72,7 @@ function usage() {
 }
 
 function banner() {
-  return '================ AutoVault Deployer Key Generator ================';
+  return '================ Conxian Deployer Key Generator ================';
 }
 
 function main() {

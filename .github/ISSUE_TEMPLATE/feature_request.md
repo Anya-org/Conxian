@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Suggest a new feature for AutoVault
+about: Suggest a new feature for Conxian
 title: '[FEATURE] '
 labels: ['enhancement']
 assignees: ''

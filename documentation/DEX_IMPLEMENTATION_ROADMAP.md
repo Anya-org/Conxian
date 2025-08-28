@@ -1,4 +1,4 @@
-# AutoVault DEX Implementation Roadmap
+# Conxian DEX Implementation Roadmap
 
 ## Phase 1: Critical Foundation Fixes (2-4 weeks)
 
@@ -384,4 +384,4 @@
 - **Testing**: 1 QA engineer + automated testing suite
 - **Documentation**: Technical writer for enterprise onboarding
 
-The roadmap provides a systematic approach to transforming AutoVault's DEX from its current foundational state into an enterprise-grade trading platform that rivals the best in DeFi while pioneering new standards for the Stacks ecosystem.
+The roadmap provides a systematic approach to transforming Conxian's DEX from its current foundational state into an enterprise-grade trading platform that rivals the best in DeFi while pioneering new standards for the Stacks ecosystem.

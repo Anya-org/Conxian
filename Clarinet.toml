@@ -1,6 +1,6 @@
 [project]
-name = "autovault"
-description = "AutoVault DeFi protocol - clarinet config"
+name = "conxian"
+description = "Conxian DeFi protocol - clarinet config"
 requirements = []
 clarinet_version = "3.5.0"
 
@@ -496,8 +496,8 @@ path = "contracts/deployment-orchestrator.clar"
 clarity_version = 2
 epoch = "2.4"
 
-[contracts.autovault-registry]
-path = "contracts/autovault-registry.clar"
+[contracts.conxian-registry]
+path = "contracts/conxian-registry.clar"
 clarity_version = 2
 epoch = "2.4"
 

@@ -12,7 +12,7 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_ROOT/stacks"
 
-echo "🚀 AutoVault Testnet Deployment - Enhanced (Dry-Run Aware)"
+echo "🚀 Conxian Testnet Deployment - Enhanced (Dry-Run Aware)"
 echo "========================================================="
 
 DRY_RUN=${DRY_RUN:-0}
@@ -22,7 +22,7 @@ CONTRACTS=(
   sip-010-trait strategy-trait vault-admin-trait vault-trait oracle-aggregator-trait \
   ownable-trait enhanced-caller-admin-trait math-lib-advanced oracle-aggregator-enhanced \
   dex-factory-enhanced multi-hop-router-v3 concentrated-liquidity-pool vault-production \
-  treasury dao-governance autovault-registry analytics bounty-system \
+  treasury dao-governance conxian-registry analytics bounty-system \
   mock-ft gov-token creator-token avg-token avlp-token
 )
 

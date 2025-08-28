@@ -1,4 +1,4 @@
-# 📋 AutoVault Full System Index - Complete Project Vision
+# 📋 Conxian Full System Index - Complete Project Vision
 
 **Last Updated**: August 26, 2025
 
@@ -8,7 +8,7 @@ This document now focuses on vision, architecture, and roadmap only.
 
 ## 🎯 **PROJECT VISION SUMMARY**
 
-AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pioneering Bitcoin-native DeFi with institutional-grade features and community governance. The platform combines traditional DeFi primitives with innovative Bitcoin integration and enterprise-level security.
+Conxian represents the **most comprehensive DeFi ecosystem on Stacks**, pioneering Bitcoin-native DeFi with institutional-grade features and community governance. The platform combines traditional DeFi primitives with innovative Bitcoin integration and enterprise-level security.
 
 ### **🚀 LATEST SYSTEM VERIFICATION**
 
@@ -72,7 +72,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 🛡️ SECURITY & MONITORING (15)
 ├── advanced-caching-system.clar
 ├── analytics.clar
-├── autovault-health-monitor.clar
+├── conxian-health-monitor.clar
 ├── circuit-breaker-simple.clar
 ├── circuit-breaker.clar
 ├── enhanced-analytics.clar
@@ -91,7 +91,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 └── bounty-system.clar
 
 🔧 INFRASTRUCTURE & UTILITIES (25)
-├── autovault-registry.clar
+├── conxian-registry.clar
 ├── deployment-orchestrator.clar
 ├── dynamic-load-distribution.clar
 ├── enhanced-batch-processing.clar
@@ -415,7 +415,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 
 ## 🌟 **VISION STATEMENT**
 
-> **"AutoVault aspires to become the premier Bitcoin-native DeFi platform, combining the security and settlement finality of Bitcoin with the programmability and innovation of Stacks. We envision a future where institutional and retail users alike can access sophisticated DeFi products with the highest standards of security, transparency, and community governance."**
+> **"Conxian aspires to become the premier Bitcoin-native DeFi platform, combining the security and settlement finality of Bitcoin with the programmability and innovation of Stacks. We envision a future where institutional and retail users alike can access sophisticated DeFi products with the highest standards of security, transparency, and community governance."**
 
 ### **Core Principles**
 
@@ -429,7 +429,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 ### **Strategic Objectives**
 
 - **Technical Excellence**: Maintain industry-leading code quality and security standards
-- **Market Leadership**: Establish AutoVault as the go-to DeFi platform on Stacks
+- **Market Leadership**: Establish Conxian as the go-to DeFi platform on Stacks
 - **Community Building**: Foster a vibrant, engaged community of users and developers
 - **Partnership Growth**: Build strategic alliances within the broader Bitcoin and DeFi ecosystem
 - **Innovation Leadership**: Pioneer new DeFi primitives and Bitcoin integration features
@@ -440,7 +440,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 
 ### **Development Resources**
 
-- **Repository**: GitHub.com/Anya-org/AutoVault
+- **Repository**: GitHub.com/Anya-org/Conxian
 - **Documentation**: Complete technical documentation in `/documentation`
 - **Test Suite**: Comprehensive testing in `/stacks/tests`
 - **Deployment**: Automated scripts in `/scripts`
@@ -465,7 +465,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 
 ### **Readiness Summary**
 
-**AutoVault represents a mature, production-ready DeFi ecosystem** that successfully combines:
+**Conxian represents a mature, production-ready DeFi ecosystem** that successfully combines:
 
 ✅ **Comprehensive Architecture**: 51 smart contracts covering all major DeFi primitives
 ✅ **Advanced Security**: 5 AIP implementations plus circuit breaker technology  
@@ -476,7 +476,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 
 ### **Competitive Position**
 
-AutoVault is positioned to become **the premier DeFi platform on Stacks** by offering:
+Conxian is positioned to become **the premier DeFi platform on Stacks** by offering:
 
 - **Most Comprehensive Feature Set**: Beyond basic DeFi to enterprise-grade tools
 - **Strongest Security Foundation**: Industry-leading security implementations
@@ -491,7 +491,7 @@ AutoVault is positioned to become **the premier DeFi platform on Stacks** by off
 **Timeline**: Ready for launch within 2-4 weeks  
 **Success Probability**: Very High based on comprehensive preparation  
 
-AutoVault represents **the culmination of thoughtful DeFi architecture**, combining proven primitives with innovative Bitcoin-native features and institutional-grade security. The platform is ready to pioneer the next generation of Bitcoin DeFi.
+Conxian represents **the culmination of thoughtful DeFi architecture**, combining proven primitives with innovative Bitcoin-native features and institutional-grade security. The platform is ready to pioneer the next generation of Bitcoin DeFi.
 
 ---
 

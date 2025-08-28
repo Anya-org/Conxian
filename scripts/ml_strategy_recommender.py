@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 ML Strategy Recommender - Minimal implementation for workflow
-Provides basic market analysis and strategy recommendations for AutoVault
+Provides basic market analysis and strategy recommendations for Conxian
 """
 
 import json

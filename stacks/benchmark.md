@@ -1,6 +1,6 @@
-# Benchmark: AutoVault vs Top DeFi Protocols (Stacks + EVM)
+# Benchmark: Conxian vs Top DeFi Protocols (Stacks + EVM)
 
-Living comparative analysis tracking how AutoVault ranks vs best-in-class DeFi systems across security, governance, UX, cost, and sustainability. Product requirement sources are centralized in `documentation/prd/` and this file reflects measured outcomes against those PRDs.
+Living comparative analysis tracking how Conxian ranks vs best-in-class DeFi systems across security, governance, UX, cost, and sustainability. Product requirement sources are centralized in `documentation/prd/` and this file reflects measured outcomes against those PRDs.
 
 ## Scope & Methodology
 
@@ -18,7 +18,7 @@ Living comparative analysis tracking how AutoVault ranks vs best-in-class DeFi s
   - BTC-Native Edge: sBTC readiness, Bitcoin anchoring/finality messaging, BTC LSTs
 - Data sources: public docs, GitHub repos, on-chain explorers, indexers (Hiro, Etherscan, DefiLlama for reference), and our own tx/event logs.
 
-## AutoVault Positioning (current)
+## Conxian Positioning (current)
 
 - Security/Governance: timelock-admin MVP; DAO governor planned post-MVP. Explicit invariants and tests.
 - UX: Hiro API scripts; Clarinet devnet; dApp UI TBD.
@@ -64,7 +64,7 @@ Template JSON (fill per release cycle):
 
 ```json
 {
-  "autovault": {
+  "conxian": {
     "fees_bps": {"deposit": 30, "withdraw": 10, "performance": 0},
     "tx_costs": {"deposit": null, "withdraw": null, "harvest": null},
     "governance": {"timelock": true, "dao_governor": false},

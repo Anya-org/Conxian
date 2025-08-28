@@ -1,12 +1,12 @@
 ---
-description: autovault instructions
+description: Conxian instructions
 auto_execution_mode: 3
 ---
 
 1. Task Receipt & Bitcoin Context
 User requested understanding of post-deployment system behavior: "how system will work after deployment, is it self init as funds come in"
 
-Bitcoin/DeFi Context: AutoVault is a Bitcoin-native DeFi vault system that operates on Stacks blockchain to leverage Bitcoin's security and finality. The system is designed for self-sovereignty (users control keys), sound money principles (deflationary tokenomics), and trustless automation (smart contract-driven operations).
+Bitcoin/DeFi Context: Conxian is a Bitcoin-native DeFi vault system that operates on Stacks blockchain to leverage Bitcoin's security and finality. The system is designed for self-sovereignty (users control keys), sound money principles (deflationary tokenomics), and trustless automation (smart contract-driven operations).
 
 2. Contract & Security Verification
 AIP Security Features: ✅ All 5 AIP implementations active and tested
@@ -19,7 +19,7 @@ Based on PRD analysis and contract examination, I'll explain the operational beh
 
 4. Post-Deployment System Behavior Analysis
 Initialization & Self-Starting Mechanism
-The AutoVault system is designed for automatic initialization as funds flow in:
+The Conxian system is designed for automatic initialization as funds flow in:
 
 1. Bootstrap State (Initial Deployment)
 

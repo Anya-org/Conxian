@@ -1,11 +1,11 @@
-# AutoVault Security Documentation
+# Conxian Security Documentation
 
-This document outlines AutoVault's security architecture, implemented
+This document outlines Conxian's security architecture, implemented
 protections, and audit readiness.
 
 ## Security Overview
 
-AutoVault implements enterprise-grade security with multiple layers of protection:
+Conxian implements enterprise-grade security with multiple layers of protection:
 
 - 5 AIP Security Implementations active
 - Multi-signature Treasury controls
@@ -254,7 +254,7 @@ Network Security
 
 ### Reporting Security Issues
 
-- **Email**: <security@autovault.org> (when available)
+- **Email**: <security@conxian.org> (when available)
 - **GitHub**: Private security advisories
 - **Discord**: #security channel (when available)
 - **PGP Key**: Available on request
@@ -271,7 +271,7 @@ For immediate security concerns:
 
 ## Security Summary
 
-AutoVault implements **institutional-grade security** with:
+Conxian implements **institutional-grade security** with:
 
 - **5 Active AIP Security Features**
 - **Multi-signature Treasury Protection**
@@ -289,7 +289,7 @@ The platform is designed for maximum security while maintaining usability and de
 
 ## Audits
 
-This section contains information about security audits performed on the AutoVault platform.
+This section contains information about security audits performed on the Conxian platform.
 
 ### Security Audit
 
@@ -303,5 +303,5 @@ _Summary of findings and how they were addressed._
 
 ### Security Contacts
 
-- security@autovault.defi
-- [Bug Bounty Program](https://bugbounty.autovault.defi)
+- security@conxian.defi
+- [Bug Bounty Program](https://bugbounty.conxian.defi)

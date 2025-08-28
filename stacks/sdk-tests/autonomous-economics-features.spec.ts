@@ -3,12 +3,12 @@ import { Cl } from '@stacks/transactions';
 import { initSimnet } from '@hirosystems/clarinet-sdk';
 
 /**
- * AutoVault Autonomous Economics Features Tests
+ * Conxian Autonomous Economics Features Tests
  * Testing implementation of autonomous fee adjustments, performance benchmarks,
  * and competitor token liquidity acceptance as requested
  */
 
-describe('AutoVault Autonomous Economics Features', () => {
+describe('Conxian Autonomous Economics Features', () => {
   let simnet: any;
   let deployer: string;
 

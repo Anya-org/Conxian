@@ -1,6 +1,6 @@
-# AutoVault Roadmap
+# Conxian Roadmap
 
-This roadmap outlines the planned development and deployment phases for AutoVault.
+This roadmap outlines the planned development and deployment phases for Conxian.
 
 ## 🎯 Current Status: **PRODUCTION READY**
 
@@ -199,7 +199,7 @@ This roadmap is **community-driven** and will evolve based on:
 
 ## ✅ Commitment
 
-AutoVault is committed to:
+Conxian is committed to:
 
 - **Transparency**: Open development and regular updates
 - **Security**: Continuous security improvements and audits

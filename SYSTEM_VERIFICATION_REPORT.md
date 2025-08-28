@@ -1,6 +1,6 @@
-# AutoVault System Verification Report
+# Conxian System Verification Report
 
-This report verifies the implementation of the features listed in the `FULL_SYSTEM_INDEX.md` by mapping them to the corresponding files in the AutoVault repository.
+This report verifies the implementation of the features listed in the `FULL_SYSTEM_INDEX.md` by mapping them to the corresponding files in the Conxian repository.
 
 ## 🏛️ Governance & Administration (7)
 
@@ -63,7 +63,7 @@ This report verifies the implementation of the features listed in the `FULL_SYST
 |------|------------------------------------|---------------------|----------------------------------------------|
 | SM-01| `advanced-caching-system.clar`     | 🟡 Partial          | `contracts/advanced-caching-system.clar`     |
 | SM-02| `analytics.clar`                   | ✅ Verified         | `contracts/analytics.clar`                   |
-| SM-03| `autovault-health-monitor.clar`    | 🟡 Partial          | `contracts/autovault-health-monitor.clar`    |
+| SM-03| `conxian-health-monitor.clar`    | 🟡 Partial          | `contracts/conxian-health-monitor.clar`    |
 | SM-04| `circuit-breaker-simple.clar`      | 🟡 Partial          | `contracts/circuit-breaker-simple.clar`      |
 | SM-05| `circuit-breaker.clar`             | ✅ Verified         | `contracts/circuit-breaker.clar`             |
 | SM-06| `enhanced-analytics.clar`          | 🟡 Partial          | `contracts/enhanced-analytics.clar`          |
@@ -88,7 +88,7 @@ This report verifies the implementation of the features listed in the `FULL_SYST
 
 | ID   | Contract                                   | Verification Status | Evidence                                             |
 |------|--------------------------------------------|---------------------|------------------------------------------------------|
-| IU-01| `autovault-registry.clar`                  | 🟡 Partial          | `contracts/autovault-registry.clar`                  |
+| IU-01| `conxian-registry.clar`                  | 🟡 Partial          | `contracts/conxian-registry.clar`                  |
 | IU-02| `deployment-orchestrator.clar`             | 🟡 Partial          | `contracts/deployment-orchestrator.clar`             |
 | IU-03| `dynamic-load-distribution.clar`           | 🟡 Partial          | `contracts/dynamic-load-distribution.clar`           |
 | IU-04| `enhanced-batch-processing.clar`           | 🟡 Partial          | `contracts/enhanced-batch-processing.clar`           |

@@ -2,7 +2,7 @@ import { initSimnet } from '@hirosystems/clarinet-sdk';
 import { describe, it, expect } from 'vitest';
 import { Cl } from '@stacks/transactions';
 
-describe('AutoVault Production Test Suite', () => {
+describe('Conxian Production Test Suite', () => {
   
   describe('Enhanced Tokenomics (10M AVG / 5M AVLP)', () => {
     it('should verify AVG token supply is 10,000,000', async () => {
@@ -178,4 +178,4 @@ describe('AutoVault Production Test Suite', () => {
   });
 });
 
-console.log('🚀 AutoVault Production Test Suite Ready for Deployment!');
+console.log('🚀 Conxian Production Test Suite Ready for Deployment!');

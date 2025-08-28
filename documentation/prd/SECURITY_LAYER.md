@@ -1,4 +1,4 @@
-# AutoVault PRD: System Security Layer
+# Conxian PRD: System Security Layer
 
 | | |
 |---|---|
@@ -12,7 +12,7 @@
 
 ## 1. Summary & Vision
 
-The System Security Layer is not a single contract but a holistic set of controls, best practices, and monitoring systems that work in concert to protect the AutoVault ecosystem from internal and external threats. It consolidates the implementations of AIPs 1 through 5 and defines the roadmap for future security enhancements. The vision is to create a defense-in-depth security posture that minimizes the attack surface, provides rapid response capabilities, and ensures the safety of user funds through multiple, overlapping safeguards.
+The System Security Layer is not a single contract but a holistic set of controls, best practices, and monitoring systems that work in concert to protect the Conxian ecosystem from internal and external threats. It consolidates the implementations of AIPs 1 through 5 and defines the roadmap for future security enhancements. The vision is to create a defense-in-depth security posture that minimizes the attack surface, provides rapid response capabilities, and ensures the safety of user funds through multiple, overlapping safeguards.
 
 ## 2. Goals / Non-Goals
 

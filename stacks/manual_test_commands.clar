@@ -1,4 +1,4 @@
-;; AutoVault Manual Testing Commands
+;; Conxian Manual Testing Commands
 ;; Copy and paste these into clarinet console for interactive testing
 
 ;; === BASIC CONTRACT VERIFICATION ===

@@ -1,6 +1,6 @@
-# AutoVault Documentation
+# Conxian Documentation
 
-This is the central documentation hub for the AutoVault DeFi platform.
+This is the central documentation hub for the Conxian DeFi platform.
 All documentation follows best practices and is organized by audience
 and purpose.
 

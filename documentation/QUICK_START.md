@@ -1,6 +1,6 @@
-# AutoVault Quick Start Guide
+# Conxian Quick Start Guide
 
-**Get started with AutoVault in 5 minutes** - Your fast track to Bitcoin-native DeFi.
+**Get started with Conxian in 5 minutes** - Your fast track to Bitcoin-native DeFi.
 
 ## 🚀 Quick Setup (2 minutes)
 
@@ -10,7 +10,7 @@
 - Get supported tokens (STX, sBTC)
 
 ### 2. Connect & Deposit
-1. Connect wallet to AutoVault
+1. Connect wallet to Conxian
 2. Enter deposit amount
 3. Confirm transaction (0.30% fee)
 4. Receive vault shares automatically
@@ -71,7 +71,7 @@ DEX Swaps → Provide Liquidity → Earn Trading Fees + AVLP Rewards
 - **Multi-sig Treasury**: Requires multiple approvals
 
 ### Your Security Checklist
-- [ ] Use official AutoVault interface only
+- [ ] Use official Conxian interface only
 - [ ] Verify all transaction details
 - [ ] Start with small amounts
 - [ ] Keep wallet software updated
@@ -157,12 +157,12 @@ DEX Swaps → Provide Liquidity → Earn Trading Fees + AVLP Rewards
 
 ## 🔗 Essential Links
 
-- **Platform**: [AutoVault Interface]
+- **Platform**: [Conxian Interface]
 - **Full Manual**: [Complete User Guide](./USER_MANUAL.md)
 - **Technical Docs**: [Developer Documentation](./DEVELOPER_GUIDE.md)
 - **Security**: [Security Guide](./SECURITY.md)
 - **Community**: [Discord Server]
-- **Code**: [GitHub Repository](https://github.com/Anya-org/AutoVault)
+- **Code**: [GitHub Repository](https://github.com/Anya-org/Conxian)
 
 ---
 

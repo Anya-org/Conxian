@@ -1,6 +1,6 @@
-# AutoVault Scripts
+# Conxian Scripts
 
-Deployment, testing, and utility scripts for the AutoVault DeFi platform.
+Deployment, testing, and utility scripts for the Conxian DeFi platform.
 
 ## Script Categories
 

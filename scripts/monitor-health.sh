@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Monitor AutoVault health via Hiro API and contract read-only calls.
+# Monitor Conxian health via Hiro API and contract read-only calls.
 # Requirements: curl, jq, and scripts/call-read.sh in this repo.
 # Env:
 #  - STACKS_API_BASE (default https://api.testnet.hiro.so)

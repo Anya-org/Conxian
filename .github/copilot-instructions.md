@@ -1,6 +1,6 @@
-# AutoVault DeFi Protocol
+# Conxian DeFi Protocol
 
-AutoVault is a production-ready DeFi platform on Stacks with 75 Clarity smart contracts (traits, governance, vault system, DEX foundations), comprehensive TypeScript testing, and advanced development tooling.
+Conxian is a production-ready DeFi platform on Stacks with 75 Clarity smart contracts (traits, governance, vault system, DEX foundations), comprehensive TypeScript testing, and advanced development tooling.
 
 **Always reference these instructions first and fallback to search or bash commands only when you encounter unexpected information that does not match the info here.**
 
@@ -54,7 +54,7 @@ AutoVault is a production-ready DeFi platform on Stacks with 75 Clarity smart co
 
 ### Repository Layout
 ```
-/home/runner/work/AutoVault/AutoVault/    # Use ABSOLUTE paths
+/home/runner/work/Conxian/Conxian/    # Use ABSOLUTE paths
 ├── contracts/                           # 75 Clarity smart contracts (.clar files)
 │   ├── traits/                         # Core interfaces (10 trait contracts)
 │   ├── vault.clar, treasury.clar       # Core DeFi contracts
@@ -176,7 +176,7 @@ npm run ci                     # Full validation (NEVER CANCEL - 60 seconds)
 ## Important Notes
 
 ### Development Best Practices
-- **Always use absolute paths**: `/home/runner/work/AutoVault/AutoVault/[file]`
+- **Always use absolute paths**: `/home/runner/work/Conxian/Conxian/[file]`
 - **Use npm scripts**: Prefer `npm run [script]` over direct command execution
 - **Timeout appropriately**: Set 2x expected time for all builds and tests
 - **Test interactively**: Use `npx clarinet console` for contract validation

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# AutoVault Deployment Script with Hiro API Integration
+# Conxian Deployment Script with Hiro API Integration
 # Uses Hiro API key for enhanced testing and deployment capabilities
 
 set -e
@@ -20,7 +20,7 @@ fi
 NETWORK=${NETWORK:-testnet}
 STACKS_API_BASE=${STACKS_API_BASE:-https://api.testnet.hiro.so}
 
-echo "🚀 AutoVault Deployment with Hiro API Integration"
+echo "🚀 Conxian Deployment with Hiro API Integration"
 echo "📡 Network: $NETWORK"
 echo "🔗 API Base: $STACKS_API_BASE"
 echo "🔑 API Key: ${HIRO_API_KEY:0:8}..."
@@ -120,7 +120,7 @@ monitor_deployment() {
 
 # Main execution
 main() {
-    echo "🎯 Starting AutoVault deployment process..."
+    echo "🎯 Starting Conxian deployment process..."
     
     check_network_status
     

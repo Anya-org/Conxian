@@ -1,4 +1,4 @@
-# AutoVault Governance Parameters
+# Conxian Governance Parameters
 
 ## Voting Parameters
 

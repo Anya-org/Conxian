@@ -1,4 +1,4 @@
-# AutoVault Smart Contracts Summary
+# Conxian Smart Contracts Summary
 
 Last updated: August 16, 2025
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Sequential deployment of AutoVault contracts (JS version).
+ * Sequential deployment of Conxian contracts (JS version).
  * Env:
  *   DEPLOYER_PRIVKEY   (hex) required unless DRY_RUN
  *   NETWORK=testnet|mainnet (default testnet)

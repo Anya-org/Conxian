@@ -1,4 +1,4 @@
-name: AutoVault CI/CD Pipeline
+name: Conxian CI/CD Pipeline
 
 on:
   push:
@@ -55,11 +55,11 @@ jobs:
       - name: Verify Clarinet Installation
         run: npx clarinet --version
       - name: Package
-        run: tar -czf autovault-deployment.tar.gz contracts/ Clarinet.toml deployments/ scripts/deploy-*.sh || true
+        run: tar -czf conxian-deployment.tar.gz contracts/ Clarinet.toml deployments/ scripts/deploy-*.sh || true
       - uses: actions/upload-artifact@v4
         with:
-          name: autovault-deployment-${{ github.sha }}
-          path: autovault-deployment.tar.gz
+          name: conxian-deployment-${{ github.sha }}
+          path: conxian-deployment.tar.gz
           retention-days: 30
 
   summary:
@@ -70,7 +70,7 @@ jobs:
     steps:
       - name: Pipeline Status Summary
         run: |
-          echo "## 🚀 AutoVault CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## 🚀 Conxian CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY

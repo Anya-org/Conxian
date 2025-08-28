@@ -59,5 +59,5 @@ Note: Source byte size is not a direct deterministic indicator of runtime execut
 | Trait compliance audit (SIP-010 & internal) | Automated CI script | Planned |
 
 ---
-Prepared by: AutoVault Core Agent  
+Prepared by: Conxian Core Agent  
 Focus: Maintain security & auditability while optimizing for Bitcoin-aligned minimalism.

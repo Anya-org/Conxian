@@ -109,7 +109,7 @@ temp/
 .tmp/
 .temp/
 
-# AutoVault specific
+# Conxian specific
 oracle/data/
 chainhooks/data/
 monitoring/logs/

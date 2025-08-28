@@ -1,6 +1,6 @@
-# AutoVault User Manual
+# Conxian User Manual
 
-**Welcome to AutoVault** - The most comprehensive DeFi ecosystem on Stacks blockchain, designed to offer Bitcoin-native DeFi with institutional-grade security and community governance.
+**Welcome to Conxian** - The most comprehensive DeFi ecosystem on Stacks blockchain, designed to offer Bitcoin-native DeFi with institutional-grade security and community governance.
 
 *Last Updated: August 25, 2025*
 
@@ -8,7 +8,7 @@
 
 ## 📋 Table of Contents
 
-1. [What is AutoVault?](#what-is-autovault)
+1. [What is Conxian?](#what-is-conxian)
 2. [Getting Started](#getting-started)
 3. [Core Features Overview](#core-features-overview)
 4. [Vault Operations](#vault-operations)
@@ -21,9 +21,9 @@
 
 ---
 
-## What is AutoVault?
+## What is Conxian?
 
-AutoVault is a production-ready DeFi platform built on the Stacks blockchain that brings Bitcoin-native decentralized finance to users worldwide. The platform combines traditional DeFi primitives with innovative Bitcoin integration and enterprise-level security.
+Conxian is a production-ready DeFi platform built on the Stacks blockchain that brings Bitcoin-native decentralized finance to users worldwide. The platform combines traditional DeFi primitives with innovative Bitcoin integration and enterprise-level security.
 
 ### Key Benefits
 
@@ -56,12 +56,12 @@ AutoVault is a production-ready DeFi platform built on the Stacks blockchain tha
    - Acquire STX tokens for transaction fees
    - Obtain supported tokens for deposits (STX, sBTC when available)
 
-### Step 2: Connect to AutoVault
+### Step 2: Connect to Conxian
 
-1. Navigate to the AutoVault platform
+1. Navigate to the Conxian platform
 2. Click "Connect Wallet"
 3. Select your wallet and approve the connection
-4. You're now ready to use AutoVault!
+4. You're now ready to use Conxian!
 
 ### Step 3: Your First Deposit
 
@@ -77,7 +77,7 @@ AutoVault is a production-ready DeFi platform built on the Stacks blockchain tha
 
 ### 🏦 Yield Vault
 
-The core AutoVault feature that automatically optimizes yield on your deposited assets.
+The core Conxian feature that automatically optimizes yield on your deposited assets.
 
 **Key Features:**
 - Multi-asset support
@@ -280,7 +280,7 @@ Multiple layers of protection for user funds and platform stability.
 
 ### Understanding DAO Governance
 
-AutoVault is governed by its community through a decentralized autonomous organization (DAO). AVG token holders can propose and vote on changes to the platform.
+Conxian is governed by its community through a decentralized autonomous organization (DAO). AVG token holders can propose and vote on changes to the platform.
 
 ### Governance Process
 
@@ -361,7 +361,7 @@ AutoVault is governed by its community through a decentralized autonomous organi
 
 ### Overview
 
-AutoVault includes an integrated decentralized exchange (DEX) that enables seamless token swapping and liquidity provision without leaving the platform.
+Conxian includes an integrated decentralized exchange (DEX) that enables seamless token swapping and liquidity provision without leaving the platform.
 
 ### Trading Features
 
@@ -449,7 +449,7 @@ AutoVault includes an integrated decentralized exchange (DEX) that enables seaml
 
 #### Platform Interaction
 
-1. **Official Channels**: Only use official AutoVault interfaces
+1. **Official Channels**: Only use official Conxian interfaces
 2. **Verify URLs**: Ensure you're on the correct website
 3. **Stay Informed**: Follow official announcements for updates
 4. **Report Issues**: Immediately report suspicious activity
@@ -562,8 +562,8 @@ AutoVault includes an integrated decentralized exchange (DEX) that enables seaml
 
 #### General Platform
 
-**Q: Is AutoVault safe to use?**
-A: AutoVault includes multiple security layers including circuit breakers, emergency controls, multi-signature treasury management, and comprehensive testing. However, all DeFi protocols carry smart contract and market risks.
+**Q: Is Conxian safe to use?**
+A: Conxian includes multiple security layers including circuit breakers, emergency controls, multi-signature treasury management, and comprehensive testing. However, all DeFi protocols carry smart contract and market risks.
 
 **Q: What are the fees?**
 A: Current fees are 0.30% for deposits, 0.10% for withdrawals, and 5% performance fees on yield above benchmark. Fees are adjustable through governance.
@@ -572,7 +572,7 @@ A: Current fees are 0.30% for deposits, 0.10% for withdrawals, and 5% performanc
 A: AVG tokens can be earned by migrating AVLP tokens during migration epochs, participating in governance, or through secondary markets when available.
 
 **Q: When will mainnet launch?**
-A: AutoVault is production-ready and deployed on testnet. Mainnet launch timing depends on final testing completion and community governance decisions.
+A: Conxian is production-ready and deployed on testnet. Mainnet launch timing depends on final testing completion and community governance decisions.
 
 #### Vault Operations
 
@@ -660,9 +660,9 @@ For critical issues affecting fund safety:
 
 ### Official Links
 
-- **Platform Website**: [AutoVault Official Site]
+- **Platform Website**: [Conxian Official Site]
 - **Documentation**: `/documentation/`
-- **GitHub Repository**: [github.com/Anya-org/AutoVault](https://github.com/Anya-org/AutoVault)
+- **GitHub Repository**: [github.com/Anya-org/Conxian](https://github.com/Anya-org/Conxian)
 - **Community Discord**: [Official Discord Link]
 
 ### Technical Documentation
@@ -682,7 +682,7 @@ For critical issues affecting fund safety:
 
 ---
 
-*This manual is maintained by the AutoVault community. For suggestions or corrections, please submit issues or pull requests to the GitHub repository.*
+*This manual is maintained by the Conxian community. For suggestions or corrections, please submit issues or pull requests to the GitHub repository.*
 
 **Version**: 1.0  
 **Last Updated**: August 25, 2025  

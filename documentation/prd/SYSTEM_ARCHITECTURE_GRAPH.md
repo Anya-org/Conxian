@@ -1,8 +1,8 @@
-# 🏗️ AutoVault System Architecture Graph
+# 🏗️ Conxian System Architecture Graph
 
 ## 📊 **MASTER SYSTEM ARCHITECTURE**
 
-This document provides the comprehensive **architectural graph and dependency mapping** for the AutoVault DeFi ecosystem, ensuring systematic upgrades and maintenance.
+This document provides the comprehensive **architectural graph and dependency mapping** for the Conxian DeFi ecosystem, ensuring systematic upgrades and maintenance.
 
 ---
 
@@ -465,4 +465,4 @@ analytics.clar ← Monitoring systems
 
 ---
 
-*This architecture graph serves as the **master reference** for all AutoVault system modifications, ensuring systematic and safe upgrades while maintaining the comprehensive DeFi vision.*
+*This architecture graph serves as the **master reference** for all Conxian system modifications, ensuring systematic and safe upgrades while maintaining the comprehensive DeFi vision.*

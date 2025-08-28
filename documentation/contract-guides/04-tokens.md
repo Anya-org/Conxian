@@ -4,7 +4,7 @@
 
 ## 1. Introduction
 
-The AutoVault ecosystem utilizes a multi-token model to facilitate governance, reward liquidity providers, and incentivize contributors. All protocol tokens adhere to the Stacks `SIP-010` standard for fungible tokens. This guide provides an overview of each token's purpose and utility within the protocol.
+The Conxian ecosystem utilizes a multi-token model to facilitate governance, reward liquidity providers, and incentivize contributors. All protocol tokens adhere to the Stacks `SIP-010` standard for fungible tokens. This guide provides an overview of each token's purpose and utility within the protocol.
 
 The primary tokens are:
 -   **AVG Token (`avg-token`):** The core governance token.
@@ -16,7 +16,7 @@ The primary tokens are:
 
 ### AVG Token (`avg-token.clar`)
 
--   **Purpose:** `AVG` is the main governance token of the AutoVault protocol. Its primary role is to give holders a say in the future direction of the platform.
+-   **Purpose:** `AVG` is the main governance token of the Conxian protocol. Its primary role is to give holders a say in the future direction of the platform.
 -   **Utility:**
     -   **Revenue Share:** A significant portion of the protocol's revenue is distributed to `AVG` holders.
     -   **Governance:** While `.gov-token` is used for voting, `AVG` may be the token that is staked or locked to receive `.gov-token`. The exact mechanism is defined in the tokenomics.
@@ -27,13 +27,13 @@ The primary tokens are:
 
 ### AVLP Token (`avlp-token.clar`)
 
--   **Purpose:** `AVLP` is a reward token for users who provide liquidity to the AutoVault protocol, either by depositing into the main vault or by adding liquidity to the DEX.
+-   **Purpose:** `AVLP` is a reward token for users who provide liquidity to the Conxian protocol, either by depositing into the main vault or by adding liquidity to the DEX.
 -   **Utility:**
     -   **Migration to AVG:** `AVLP` tokens can be converted into `AVG` tokens. The conversion rate may change over time to incentivize early liquidity providers.
     -   **Yield Farming:** `AVLP` can be staked in yield farms to earn additional rewards.
 -   **How to Acquire:**
     -   Automatically earned by depositing assets into the `vault.clar` contract.
-    -   Earned by providing liquidity to pools in the AutoVault DEX.
+    -   Earned by providing liquidity to pools in the Conxian DEX.
 
 ### Governance Token (`gov-token.clar`)
 
@@ -46,7 +46,7 @@ The primary tokens are:
 
 ### Creator Token (`creator-token.clar`)
 
--   **Purpose:** A unique, merit-based token designed to reward individuals who contribute to the AutoVault ecosystem through non-financial means.
+-   **Purpose:** A unique, merit-based token designed to reward individuals who contribute to the Conxian ecosystem through non-financial means.
 -   **Utility:**
     -   **Bounties:** Awarded for completing development bounties, fixing bugs, or creating new features.
     -   **Community Contributions:** Can be awarded for creating documentation, tutorials, providing community support, or other valuable contributions.

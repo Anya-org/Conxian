@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Manual Testing Framework for AutoVault
+# Manual Testing Framework for Conxian
 # Alternative to automated testing while SDK issues persist
 
 set -euo pipefail
@@ -7,7 +7,7 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_ROOT/stacks"
 
-echo "🧪 AutoVault Manual Testing Framework"
+echo "🧪 Conxian Manual Testing Framework"
 echo "====================================="
 
 # Pre-test validation
@@ -24,7 +24,7 @@ fi
 echo "[2/4] Preparing enhanced console testing..."
 
 cat > manual_test_commands.clar <<'CLARITY'
-;; AutoVault Manual Testing Commands
+;; Conxian Manual Testing Commands
 ;; Copy and paste these into clarinet console for interactive testing
 
 ;; === BASIC CONTRACT VERIFICATION ===

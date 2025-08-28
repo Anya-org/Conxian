@@ -1,4 +1,4 @@
-# AutoVault PRD: Vault Core
+# Conxian PRD: Vault Core
 
 | | |
 |---|---|
@@ -12,7 +12,7 @@
 
 ## 1. Summary & Vision
 
-The Vault is AutoVault's core capital aggregation primitive. It provides a standardized, secure, and efficient mechanism for users to deposit assets and receive proportional shares in return. The vision is to create a foundational layer for yield strategies that is simple, robust, and highly extensible through traits, while ensuring maximum security and deterministic, precision-safe accounting.
+The Vault is Conxian's core capital aggregation primitive. It provides a standardized, secure, and efficient mechanism for users to deposit assets and receive proportional shares in return. The vision is to create a foundational layer for yield strategies that is simple, robust, and highly extensible through traits, while ensuring maximum security and deterministic, precision-safe accounting.
 
 ## 2. Goals / Non-Goals
 
@@ -25,7 +25,7 @@ The Vault is AutoVault's core capital aggregation primitive. It provides a stand
 ### Non-Goals
 - **Internal Strategy Logic**: The vault does not define or execute yield strategies. This is delegated to external strategy contracts.
 - **Complex Rebalancing**: On-chain rebalancing logic is not a feature of this core vault.
-- **Direct Governance**: The vault itself is not a DAO; it is administered by the AutoVault DAO via timelocked calls.
+- **Direct Governance**: The vault itself is not a DAO; it is administered by the Conxian DAO via timelocked calls.
 
 ## 3. User Stories
 
@@ -148,7 +148,7 @@ The Vault is AutoVault's core capital aggregation primitive. It provides a stand
 
 ## 13. Rollout / Migration Plan
 
-- **Initial Deployment**: The vault will be deployed as part of the initial AutoVault mainnet launch. The address will be registered in the `autovault-registry.clar` contract.
+- **Initial Deployment**: The vault will be deployed as part of the initial Conxian mainnet launch. The address will be registered in the `Conxian-registry.clar` contract.
 - **Upgrades**: Future versions of the vault will be deployed as new, separate contracts. Migration will be facilitated by the DAO, which will vote to update the vault pointer in the registry. Users will need to manually migrate their funds, guided by a provided migration interface.
 
 ## 14. Monitoring & Observability
@@ -166,7 +166,7 @@ The Vault is AutoVault's core capital aggregation primitive. It provides a stand
 - **v1.2 (2025-08-26)**:
     - Refactored PRD to align with the 16-point standard format.
     - Updated content to reflect full system context from `FULL_SYSTEM_INDEX.md`.
-    - Added Appendix A for Nakamoto/Clarity3 compliance assessment.
+    - Removed Appendix A and referenced the consolidated document `SDK_AND_NAKAMOTO_UPDATES.md` for Nakamoto/Clarity3 compliance assessment.
 - **v1.1 (2025-08-18)**:
     - Validated SDK 3.5.0 compliance and confirmed production readiness for mainnet.
 - **v1.0 (2025-08-17)**:
@@ -177,17 +177,4 @@ The Vault is AutoVault's core capital aggregation primitive. It provides a stand
 
 ---
 
-## Appendix A: Nakamoto & Clarity3 Adherence Assessment
-
-**Date:** 2025-08-25
-**Assessor:** Jules
-
-### Findings
-1.  **No Nakamoto Features**: The current `vault.clar` implementation does not use any Nakamoto-specific features (e.g., sBTC, new `pox-4` capabilities). It is a Clarity 2 compatible contract.
-2.  **PoC for Future**: The `nakamoto-vault-ultra.clar` contract exists as a proof-of-concept for a future, Nakamoto-native vault but is not production-ready.
-3.  **Clarity2 Syntax**: The contract is written in Clarity 2. An upgrade to Clarity 3 is required to leverage Nakamoto features.
-
-### Recommendations
-1.  **Future Upgrade**: Plan a future upgrade path to a new vault implementation that is Clarity 3 compatible.
-2.  **sBTC Integration**: As part of the Clarity 3 upgrade, integrate sBTC to allow for direct deposit and withdrawal of Bitcoin.
-3.  **Complete PoC**: Mature the `nakamoto-vault-ultra.clar` PoC into a fully-featured, audited contract for a future release.
+For Nakamoto and Clarity3 compliance assessment, see [SDK_AND_NAKAMOTO_UPDATES.md](../SDK_AND_NAKAMOTO_UPDATES.md).

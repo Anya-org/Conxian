@@ -1,4 +1,4 @@
-# AutoVault Deployment Strategy
+# Conxian Deployment Strategy
 
 ## 🎯 Current Status: DEPLOYED ON TESTNET
 
