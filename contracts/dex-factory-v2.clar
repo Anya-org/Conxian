@@ -83,12 +83,7 @@
       (if (< a b) {token-0: a, token-1: b} {token-0: b, token-1: a})))
 
 (define-private (contains-uint (xs (list 10 uint)) (x uint))
-  (begin
-    (if (is-eq (len xs) u0)
-        false
-        (let ((head (element-at xs u0))
-              (tail (slice xs u1 (len xs))))
-          (if (is-eq head x) true (contains-uint (unwrap-panic (as-max-len? tail u10)) x))))))
+  (fold (lambda (item acc) (if (is-eq item x) true acc)) false xs))
 
 ;; Append a principal to pair list (bounded)
 (define-private (append-pair-pool (t0 principal) (t1 principal) (pool principal))
@@ -193,8 +188,8 @@
 
     ;; Validate parameters
     (match (validate-params-internal pool-type optional-params)
-      ok? (asserts! ok? (err ERR_INVALID_PARAMETERS))
-      _ (err ERR_INVALID_PARAMETERS))
+      (ok ok?) (asserts! ok? (err ERR_INVALID_PARAMETERS))
+      e (err ERR_INVALID_PARAMETERS))
 
     (let ((ordered (order-tokens token-a token-b))
           (impl (get implementation (unwrap-panic (get-impl-or-none pool-type))))
@@ -252,8 +247,8 @@
     (asserts! (is-some (get-impl-or-none pool-type)) (err ERR_INVALID_POOL_TYPE))
     (asserts! (is-valid-fee-tier pool-type fee-tier) (err ERR_INVALID_FEE_TIER))
     (match (validate-params-internal pool-type optional-params)
-      ok? (if ok? (ok true) (err ERR_INVALID_PARAMETERS))
-      _ (err ERR_INVALID_PARAMETERS))))
+      (ok ok?) (if ok? (ok true) (err ERR_INVALID_PARAMETERS))
+      e (err ERR_INVALID_PARAMETERS))))
 
 ;; Migrate a pool to a new implementation principal (preserve metadata)
 (define-public (migrate-pool (pool-id uint) (new-implementation principal))

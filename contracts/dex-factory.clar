@@ -4,6 +4,7 @@
 
 
 (define-constant DEFAULT_FEE_TIER u300)
+(define-constant DEFAULT_POOL_TYPE "constant-product")
 
 (define-read-only (get-pool (token-x principal) (token-y principal))
   (match (contract-call? .dex-factory-v2 get-pool token-x token-y DEFAULT_POOL_TYPE DEFAULT_FEE_TIER)
