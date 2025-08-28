@@ -104,9 +104,9 @@ plan:
             path: contracts/bounty-system.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: oracle-aggregator
+            contract-name: oracle-aggregator-enhanced
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/oracle-aggregator.clar
+            path: contracts/oracle-aggregator-enhanced.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: circuit-breaker
@@ -114,9 +114,19 @@ plan:
             path: contracts/circuit-breaker.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: circuit-breaker-simple
+            contract-name: math-lib-advanced
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/circuit-breaker-simple.clar
+            path: contracts/math-lib-advanced.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: concentrated-liquidity-pool
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/concentrated-liquidity-pool.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: concentrated-swap-logic
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/concentrated-swap-logic.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: gov-token
@@ -153,6 +163,9 @@ plan:
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/traits/enhanced-caller-admin-trait.clar
             clarity-version: 2
+      epoch: "2.4"
+    - id: 1
+      transactions:
         - emulated-contract-publish:
             contract-name: oracle-aggregator-trait
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
@@ -163,9 +176,6 @@ plan:
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/traits/sip-009-trait.clar
             clarity-version: 2
-      epoch: "2.4"
-    - id: 1
-      transactions:
         - emulated-contract-publish:
             contract-name: vault-init-trait
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
@@ -175,6 +185,11 @@ plan:
             contract-name: deployment-orchestrator
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/deployment-orchestrator.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: dex-factory-v2
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/dex-factory-v2.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: dex-factory
@@ -237,14 +252,14 @@ plan:
             path: contracts/enhanced-governance.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: enhanced-yield-strategy
-            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/enhanced-yield-strategy.clar
-            clarity-version: 2
-        - emulated-contract-publish:
             contract-name: strategy-trait
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/traits/strategy-trait.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: enhanced-yield-strategy
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/enhanced-yield-strategy.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: enhanced-yield-strategy-complex
@@ -262,14 +277,37 @@ plan:
             path: contracts/enterprise-monitoring.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: fee-tier-manager
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/fee-tier-manager.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: fixed-point-math
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/fixed-point-math.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: governance-test-helper
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/governance-test-helper.clar
+            clarity-version: 2
+      epoch: "2.4"
+    - id: 2
+      transactions:
+        - emulated-contract-publish:
+            contract-name: institutional-apis
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/institutional-apis.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: math-lib
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/math-lib.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: math-lib-enhanced
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/math-lib-enhanced.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: mock-dex
@@ -282,27 +320,14 @@ plan:
             path: contracts/multi-hop-router.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: multi-hop-router-v2
+            contract-name: multi-hop-router-v3
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/multi-hop-router-v2.clar
+            path: contracts/multi-hop-router-v3.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: multi-hop-router-v2-complex
+            contract-name: oracle-aggregator
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/multi-hop-router-v2-complex-fixed.clar
-            clarity-version: 2
-      epoch: "2.4"
-    - id: 2
-      transactions:
-        - emulated-contract-publish:
-            contract-name: multi-hop-router-v2-simple
-            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/multi-hop-router-v2-simple.clar
-            clarity-version: 2
-        - emulated-contract-publish:
-            contract-name: oracle-aggregator-enhanced
-            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/oracle-aggregator-enhanced.clar
+            path: contracts/oracle-aggregator.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: ownable-trait
@@ -315,9 +340,19 @@ plan:
             path: contracts/pool-factory.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: position-nft
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/position-nft.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: post-deployment-autonomics
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/post-deployment-autonomics.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: precision-calculator
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/precision-calculator.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: registry
@@ -335,9 +370,19 @@ plan:
             path: contracts/stable-pool-clean.clar
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: stable-pool-enhanced
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/stable-pool-enhanced.clar
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: state-anchor
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/state-anchor.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: tick-math
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/tick-math.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: treasury
@@ -374,6 +419,9 @@ plan:
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/vault-multi-token.clar
             clarity-version: 2
+      epoch: "2.4"
+    - id: 3
+      transactions:
         - emulated-contract-publish:
             contract-name: weighted-pool
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM

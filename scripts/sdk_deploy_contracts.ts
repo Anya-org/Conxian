@@ -40,25 +40,30 @@ interface DeployedMeta { txid: string; height?: number; status?: string }
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const STACKS_DIR = path.join(PROJECT_ROOT, 'stacks');
-const CONTRACTS_DIR = path.join(STACKS_DIR, 'contracts');
+const CONTRACTS_DIR = path.join(PROJECT_ROOT, 'contracts');
 
 const ORDER = [
   'sip-010-trait',
   'strategy-trait',
   'vault-admin-trait',
   'vault-trait',
+  'oracle-aggregator-trait',
+  'ownable-trait',
+  'enhanced-caller-admin-trait',
+  'math-lib-advanced',
+  'oracle-aggregator-enhanced',
+  'dex-factory-enhanced',
+  'multi-hop-router-v3',
+  'concentrated-liquidity-pool',
+  'vault-production',
+  'treasury',
+  'dao-governance',
+  'autovault-registry',
+  'analytics',
+  'bounty-system',
   'mock-ft',
   'gov-token',
-  'treasury',
-  'vault',
-  'timelock',
-  'dao',
-  'dao-governance',
-  'analytics',
-  'registry',
-  'bounty-system',
   'creator-token',
-  'dao-automation',
   'avg-token',
   'avlp-token'
 ];

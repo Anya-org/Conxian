@@ -19,14 +19,16 @@ DRY_RUN=${DRY_RUN:-0}
 
 # Contract list expected in deploy order / registry
 CONTRACTS=(
-  sip-010-trait strategy-trait vault-admin-trait vault-trait \
-  mock-ft gov-token treasury vault timelock dao dao-governance analytics registry \
-  bounty-system creator-token dao-automation avg-token avlp-token
+  sip-010-trait strategy-trait vault-admin-trait vault-trait oracle-aggregator-trait \
+  ownable-trait enhanced-caller-admin-trait math-lib-advanced oracle-aggregator-enhanced \
+  dex-factory-enhanced multi-hop-router-v3 concentrated-liquidity-pool vault-production \
+  treasury dao-governance autovault-registry analytics bounty-system \
+  mock-ft gov-token creator-token avg-token avlp-token
 )
 
 MISSING=()
 HASH_JSON_ENTRIES=""
-SRC_DIR="stacks/contracts"
+SRC_DIR="contracts"
 
 echo "[0/5] Validating contract sources..."
 for c in "${CONTRACTS[@]}"; do
