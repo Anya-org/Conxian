@@ -351,21 +351,21 @@ path = "contracts/multi-hop-router.clar"
 clarity_version = 2
 epoch = "2.4"
 
-[contracts.multi-hop-router-v2]
-path = "contracts/multi-hop-router-v2.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.multi-hop-router-v2]
+# path = "contracts/multi-hop-router-v2.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
-[contracts.multi-hop-router-v2-simple]
-path = "contracts/multi-hop-router-v2-simple.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.multi-hop-router-v2-simple]
+# path = "contracts/multi-hop-router-v2-simple.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
-## ENABLED: multi-hop router v2 complex (experimental)
-[contracts.multi-hop-router-v2-complex]
-path = "contracts/multi-hop-router-v2-complex-fixed.clar"
-clarity_version = 2
-epoch = "2.4"
+# ## ENABLED: multi-hop router v2 complex (experimental)
+# [contracts.multi-hop-router-v2-complex]
+# path = "contracts/multi-hop-router-v2-complex-fixed.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 # Advanced Multi-Hop Router V3 with Dijkstra's algorithm
 [contracts.multi-hop-router-v3]
@@ -373,23 +373,23 @@ path = "contracts/multi-hop-router-v3.clar"
 clarity_version = 2
 epoch = "2.4"
 
-# Fee tier management system for Phase 3
-[contracts.fee-tier-manager]
-path = "contracts/fee-tier-manager.clar"
-clarity_version = 2
-epoch = "2.4"
+  # Fee tier management system for Phase 3
+  [contracts.fee-tier-manager]
+  path = "contracts/fee-tier-manager.clar"
+  clarity_version = 2
+  epoch = "2.4"
 
-# Enhanced TWAP oracle with manipulation resistance
-[contracts.twap-oracle-enhanced]
-path = "contracts/twap-oracle-enhanced.clar"
-clarity_version = 2
-epoch = "2.4"
+  # Enhanced TWAP oracle with manipulation resistance (disabled: file missing)
+  # [contracts.twap-oracle-enhanced]
+  # path = "contracts/twap-oracle-enhanced.clar"
+  # clarity_version = 2
+  # epoch = "2.4"
 
-# Professional LP tools and analytics for Phase 3
-[contracts.professional-lp-tools]
-path = "contracts/professional-lp-tools.clar"
-clarity_version = 2
-epoch = "2.4"
+  # Professional LP tools and analytics for Phase 3 (disabled: file missing)
+  # [contracts.professional-lp-tools]
+  # path = "contracts/professional-lp-tools.clar"
+  # clarity_version = 2
+  # epoch = "2.4"
 
 # Institutional APIs and risk management for Phase 3
 [contracts.institutional-apis]

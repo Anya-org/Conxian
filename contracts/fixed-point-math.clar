@@ -1,4 +1,4 @@
-;; Fixed-Point Mathematics Utility Contract
+;; Fixed-Point Mathematics Utility Contractnpm install
 ;; Provides precise arithmetic operations with configurable decimal precision
 ;; Implements rounding modes and conversion functions for DeFi calculations
 

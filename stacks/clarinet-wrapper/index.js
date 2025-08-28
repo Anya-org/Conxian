@@ -7,6 +7,8 @@ const candidates = [
   path.resolve(__dirname, '..', '..', 'bin', 'clarinet'), // stacks/bin/clarinet when installed into node_modules
   path.resolve(process.cwd(), '..', 'bin', 'clarinet'),   // running from stacks/
   path.resolve(process.cwd(), 'bin', 'clarinet'),         // running from repo root
+  // Windows winget install location
+  'C:\\Program Files\\clarinet\\clarinet.exe',
 ];
 
 const binPath = candidates.find(p => {
