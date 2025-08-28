@@ -47,14 +47,14 @@ Conxian is a production-ready DeFi platform built on the Stacks blockchain that 
 
 ### Step 1: Set Up Your Stacks Wallet
 
-1. **Install a Stacks Wallet**:
+1. **Install a Stacks Wallet**: 
    - [Hiro Wallet](https://wallet.hiro.so/) (Recommended)
    - [Xverse Wallet](https://www.xverse.app/)
    - [Leather Wallet](https://leather.io/)
 
 2. **Fund Your Wallet**:
    - Acquire STX tokens for transaction fees
-   - Obtain supported tokens for deposits (STX, sBTC when available)
+   - Obtain supported tokens: **Native (STX, sBTC) or Cross-chain (wETH, wBTC, USDC)**
 
 ### Step 2: Connect to Conxian
 
@@ -81,8 +81,9 @@ The core Conxian feature that automatically optimizes yield on your deposited as
 
 **Key Features:**
 
-- Multi-asset support
+- Multi-asset support (**including cross-chain assets**)
 - Automated yield strategies
+- Cross-chain liquidity optimization
 - Precise share accounting
 - Dynamic fee optimization
 - Flash loan capabilities
@@ -131,6 +132,32 @@ Multiple layers of protection for user funds and platform stability.
 - Multi-signature treasury controls
 - Rate limiting for large transactions
 
+### 🌉 Cross-Chain Liquidity Integration
+
+Conxian now supports cross-chain liquidity, enabling assets from other blockchains to participate in our DeFi ecosystem while maintaining Nakamoto compatibility.
+
+**Key Features:**
+- **Bridge Contracts**: Secure asset transfers between chains using SDK 3.5.0
+- **Wrapped Assets**: Use wrapped versions of popular assets (wETH, wBTC)
+- **Unified Liquidity Pools**: Combine assets from multiple chains in single pools
+- **Automatic Yield Optimization**: Cross-chain assets earn yield like native assets
+
+**Supported Cross-Chain Assets:**
+- wETH (Ethereum)
+- wBTC (Bitcoin)
+- USDC (Multi-chain)
+- SOL (Solana)
+
+**How to Use Cross-Chain Assets:**
+1. Bridge assets to Stacks using supported bridges
+2. Deposit wrapped tokens into Conxian vaults
+3. Earn yield and participate in governance like native assets
+
+**Security Considerations:**
+- All cross-chain operations use Nakamoto-compatible security features
+- Bridge contracts are audited and governance-approved
+- Circuit breakers monitor cross-chain price feeds
+
 ---
 
 ## Vault Operations
@@ -141,7 +168,7 @@ Multiple layers of protection for user funds and platform stability.
 
 1. **Navigate to Vault**: Go to the main vault interface
 2. **Enter Amount**: Specify how much you want to deposit
-3. **Select Asset**: Choose from supported tokens
+3. **Select Asset**: Choose from supported assets
 4. **Review Details**:
    - Deposit amount
    - Current fee rate (0.30% default)
@@ -149,6 +176,16 @@ Multiple layers of protection for user funds and platform stability.
    - Current vault APY
 5. **Confirm Transaction**: Approve wallet transaction
 6. **Track Progress**: Monitor transaction confirmation
+
+#### Supported Assets:
+- Native: STX, sBTC
+- **Cross-chain: wETH, wBTC, USDC, SOL**
+
+#### Cross-chain Deposit Process:
+1. Bridge assets to Stacks
+2. Wrap assets if needed (automated for supported chains)
+3. Deposit wrapped tokens like native assets
+4. Earn yield on cross-chain positions
 
 #### Fee Structure
 

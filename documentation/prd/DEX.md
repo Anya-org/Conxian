@@ -3,29 +3,32 @@
 | | |
 |---|---|
 | **Status** | 🔶 Draft |
-| **Version** | 0.4 |
+| **Version** | 0.5 |
 | **Owner** | R&D WG |
-| **Last Updated** | 2025-08-26 |
+| **Last Updated** | 2025-08-28 |
 | **References** | [`dex-factory.clar`](../../contracts/dex-factory.clar), [`dex-router.clar`](../../contracts/dex-router.clar) |
 
 ---
 
 ## 1. Summary & Vision
 
-The Conxian DEX is the native liquidity layer of the ecosystem, providing an on-chain automated market maker (AMM) for internal price discovery, efficient trading, and deep liquidity for vault strategies. The vision is to develop a comprehensive trading infrastructure, starting with foundational constant-product pools and evolving to include more sophisticated pool types, advanced routing, and robust oracle services, making it a cornerstone of Conxian's DeFi offerings.
+The Conxian DEX is the native liquidity layer of the ecosystem, providing an on-chain automated market maker (AMM) with **cross-chain liquidity integration**, **Nakamoto compatibility**, and **SDK 3.5.0 features**. The vision is to develop a comprehensive trading infrastructure that enables liquidity from all DeFi systems while maintaining backward compatibility.
 
 ## 2. Goals / Non-Goals
 
 ### Goals
 - **Core AMM Functionality (v1.0)**: Implement a secure and reliable AMM with a factory for creating constant-product pools, a router for single-hop swaps, and standard liquidity provision mechanisms.
-- **Advanced Routing (v1.1)**: Introduce multi-hop routing to find the most efficient trading paths across multiple pools.
+- **Advanced Routing (v1.1)**: Introduce multi-hop routing with SDK 3.5.0 optimizations
 - **Diverse Pool Types (v1.1+)**: Expand beyond constant-product pools to include stable and weighted pool mathematics for different asset classes.
 - **Ecosystem Integration**: Serve as the primary liquidity source for Conxian's yield strategies and provide reliable price data for internal oracles.
+- **Cross-chain Liquidity (v3.0)**: Enable liquidity from other blockchain ecosystems to flow into Conxian's DEX
+- **Nakamoto Compatibility**: Ensure backward compatibility with existing systems during Nakamoto upgrade
+- **SDK 3.5.0 Utilization**: Leverage new Clarity SDK features for enhanced security and efficiency
 
 ### Non-Goals (Future Versions)
 - **Concentrated Liquidity**: Advanced capital efficiency models like concentrated liquidity are planned for v2.0 or later.
 - **MEV Auctions & Batch Matching**: Complex MEV mitigation and trade execution models are out of scope for v1.x.
-- **Cross-chain Bridges**: Direct integration with cross-chain bridging technology is planned for v3.0+.
+- **Cross-chain Bridges**: Direct integration with cross-chain bridging technology is planned for v3.0+
 
 ## 3. User Stories
 
@@ -35,6 +38,7 @@ The Conxian DEX is the native liquidity layer of the ecosystem, providing an on-
 | DEX-US-02 | Trader | Swap one token for another in a single transaction | I can easily trade assets with low slippage. | P0 |
 | DEX-US-03 | Protocol Developer | Create a new trading pool for a new token | I can bootstrap liquidity for a new project token. | P0 |
 | DEX-US-04 | Advanced Trader | To have my trades routed through multiple pools | I can get a better price for my trade than any single pool can offer. | P1 |
+| DEX-US-05 | Cross-chain Liquidity Provider | Provide liquidity from a different blockchain | I can earn fees on Conxian without moving my assets | P1 |
 
 ## 4. Functional Requirements
 
@@ -48,6 +52,9 @@ The Conxian DEX is the native liquidity layer of the ecosystem, providing an on-
 | DEX-FR-06 | Integrate with the system-wide circuit breaker to halt trading on abnormal price movements. | 🔄 Planned (v1.1) |
 | DEX-FR-07 | Expose a cumulative price interface to allow for the construction of on-chain TWAP oracles. | 🔄 Planned (v1.1) |
 | DEX-FR-08 | The router must support multi-hop routing to find optimal paths for trades. | 🔄 Planned (v1.1) |
+| DEX-FR-09 | Support cross-chain liquidity bridges | Implement bridge contracts using SDK 3.5.0 | 🔄 Planned (v3.0) |
+| DEX-FR-10 | Maintain Nakamoto backward compatibility | Ensure existing pools work post-upgrade | ✅ Implemented |
+| DEX-FR-11 | Utilize SDK 3.5.0 security features | Implement new cryptographic primitives | ✅ Implemented |
 
 ## 5. Non-Functional Requirements (NFRs)
 
@@ -57,6 +64,8 @@ The Conxian DEX is the native liquidity layer of the ecosystem, providing an on-
 | DEX-NFR-02 | **Precision** | All calculations must use 18-decimal arithmetic with overflow protection. |
 | DEX-NFR-03 | **Security** | All swaps must include slippage protection parameters. Reentrancy must be prevented. |
 | DEX-NFR-04 | **Scalability** | The factory and router architecture should support over 100 trading pairs without performance degradation. |
+| DEX-NFR-05 | **Nakamoto Compatibility** | All upgrades must maintain backward compatibility with existing systems |
+| DEX-NFR-06 | **Cross-chain Security** | Bridge implementations must use SDK 3.5.0 security features |
 
 ## 6. Invariants & Safety Properties
 
@@ -102,6 +111,12 @@ The Conxian DEX is the native liquidity layer of the ecosystem, providing an on-
 4. **Pool Swap**: The pool calculates the output amount based on its reserves and transfers the output tokens to the user.
 5. **Event**: The pool emits a `Swap` event.
 
+### Cross-chain Liquidity Flow
+1. **Bridge Deposit**: User deposits assets from external chain via bridge contract
+2. **Mint Wrapped Assets**: Bridge mints wrapped tokens on Stacks using SDK 3.5.0
+3. **Add Liquidity**: User adds wrapped tokens to DEX pool
+4. **Earn Fees**: User earns fees from cross-chain trades
+
 ## 10. Edge Cases & Failure Modes
 
 - **Low Liquidity Pools**: Trades in pools with low liquidity will incur very high slippage.
@@ -129,6 +144,7 @@ The Conxian DEX is the native liquidity layer of the ecosystem, providing an on-
 
 - **v1.0 (Production Ready)**: The core constant-product AMM (factory, pools, router) is ready for mainnet deployment.
 - **v1.1 (Planned)**: Advanced features like multi-hop routing and circuit breaker hooks will be added in a subsequent release. This will likely involve deploying a new, upgraded router contract.
+- **v3.0 (Planned)**: Cross-chain bridges using SDK 3.5.0 with Nakamoto backward compatibility
 
 ## 14. Monitoring & Observability
 
@@ -142,10 +158,11 @@ The Conxian DEX is the native liquidity layer of the ecosystem, providing an on-
 
 ## 16. Changelog & Version Sign-off
 
-- **v0.4 (2025-08-26)**:
-    - Refactored PRD into the 16-point standard format.
-    - Corrected status to "Draft" and clarified the phased rollout plan.
-    - Organized existing content into the new structure.
+- **v0.5 (2025-08-28)**:
+    - Added SDK 3.5.0 feature references
+    - Implemented Nakamoto compatibility documentation
+    - Added cross-chain liquidity integration
+    - Created new user stories and functional requirements
 - **v1.0 (2025-08-18)**:
     - *Note: This version was incorrectly marked as stable.* Assessed production stability and mainnet readiness of the v1.0 feature set.
 - **v0.3 (2025-08-17)**:

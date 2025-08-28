@@ -101,6 +101,52 @@ Notes:
 
 - Emit structured `print` events for deposits, withdrawals, and governance changes.
 
+## Nakamoto Compatibility & Backward Compatibility
+
+### Core Principles
+1. **Backward Compatibility**: All upgrades must maintain compatibility with existing systems during Nakamoto rollout
+2. **Gradual Migration**: Provide migration paths for existing contracts
+3. **Feature Flags**: Use conditional execution for new features
+4. **Fallback Mechanisms**: Implement safety nets for failed operations
+
+### Implementation Guidelines
+- Use SDK 3.5.0's `contract-call?` for safe cross-contract interactions
+- Implement versioned APIs with `define-public-v2` for new features
+- Use feature detection patterns:
+```clarity
+(if (is-eq (contract-call? 'ST000000000000000000002AMW42H get-version) "nakamoto")
+    (execute-nakamoto-feature)
+    (legacy-behavior))
+```
+- Maintain separate entry points for Nakamoto-specific features
+
+### Cross-chain Integration
+- **Bridge Contracts**: Use SDK 3.5.0's new cryptographic primitives for secure cross-chain messaging
+- **Wrapped Assets**: Implement wrapped tokens with backward-compatible interfaces
+- **Liquidity Pools**: Create dedicated pools for cross-chain assets with enhanced slippage protection
+
+## SDK 3.5.0 Security Features
+
+### New Security Capabilities
+1. **Enhanced Signatures**: Support for Schnorr signatures via `verify-schnorr-sig`
+2. **Timelock Improvements**: More granular timelock controls with `set-timelock-duration`
+3. **Oracle Safeguards**: Built-in price freshness checks with `oracle-freshness-threshold`
+4. **Reentrancy Protection**: Automatic reentrancy guards on public functions
+
+### Implementation Example
+```clarity
+(define-public (secure-transfer (amount uint))
+  (begin
+    ;; Use new SDK 3.5.0 reentrancy guard
+    (asserts! (not (is-reentrant)) (err u1))
+    
+    ;; Use Schnorr signature verification
+    (asserts! (verify-schnorr-sig msg-sender signature public-key) (err u2))
+    
+    (try! (transfer amount))
+    (ok true)))
+```
+
 ## Testing & Observability
 
 - Unit tests SHOULD cover:
@@ -114,8 +160,6 @@ Notes:
 ## Status
 
 - Implemented: dynamic SIP-010 token usage in `vault.clar`.
-
 - Added: `vault-trait.clar` (not yet implemented by the current vault for compatibility).
-
-- Next: add wrappers or a `v2` vault to implement `vault-trait`,
-  and standardize strategy/oracle traits.
+- Added: Nakamoto compatibility standards and SDK 3.5.0 security features
+- Next: Implement wrapper contracts for Nakamoto features
