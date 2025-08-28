@@ -226,10 +226,10 @@ describe('🏢 PRODUCTION VALIDATION - INSTITUTIONAL & PUBLIC USERS', () => {
       const accounts = simnet.getAccounts();
       const deployer = accounts.get('deployer')!;
       
-      // Check AVG token integration
-      const avgTotalSupply = simnet.callReadOnlyFn("avg-token", "get-total-supply", [], deployer);
-      expect(avgTotalSupply.result).toBeDefined();
-      console.log("✅ AVG token integration verified");
+      // Check CXG token integration
+      const CXGTotalSupply = simnet.callReadOnlyFn("CXG-token", "get-total-supply", [], deployer);
+      expect(CXGTotalSupply.result).toBeDefined();
+      console.log("✅ CXG token integration verified");
       
       // Check creator token integration
       const creatorTotalSupply = simnet.callReadOnlyFn("creator-token", "get-total-supply", [], deployer);

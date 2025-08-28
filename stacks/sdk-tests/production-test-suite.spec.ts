@@ -4,26 +4,26 @@ import { Cl } from '@stacks/transactions';
 
 describe('Conxian Production Test Suite', () => {
   
-  describe('Enhanced Tokenomics (10M AVG / 5M AVLP)', () => {
-    it('should verify AVG token supply is 10,000,000', async () => {
+  describe('Enhanced Tokenomics (10M CXG / 5M CVLP)', () => {
+    it('should verify CXG token supply is 10,000,000', async () => {
       const simnet = await initSimnet();
       const deployer = simnet.getAccounts().get('deployer')!;
       
-      // Test when AVG token contract is deployed (will be handled in integration)
+      // Test when CXG token contract is deployed (will be handled in integration)
       // For now, verify the mock token functionality
       const totalSupply = simnet.callReadOnlyFn('mock-ft', 'get-total-supply', [], deployer);
       expect(totalSupply.result.type).toEqual('ok'); // v3.5.0 returns 'ok' for successful responses
       console.log('✅ Token supply verification ready');
     });
 
-    it('should verify AVLP migration pool is 5,000,000', async () => {
+    it('should verify CVLP migration pool is 5,000,000', async () => {
       const simnet = await initSimnet();
       const deployer = simnet.getAccounts().get('deployer')!;
       
       // Verify vault initialization
       const vaultBalance = simnet.callReadOnlyFn('vault', 'get-total-balance', [], deployer);
       expect(vaultBalance.result).toEqual({ type: 'uint', value: 0n });
-      console.log('✅ AVLP migration pool verification ready');
+      console.log('✅ CVLP migration pool verification ready');
     });
   });
 

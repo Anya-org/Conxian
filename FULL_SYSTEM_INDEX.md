@@ -36,8 +36,8 @@ Conxian represents the **most comprehensive DeFi ecosystem on Stacks**, pioneeri
 └── traits/ownable-trait.clar
 
 💰 TOKENOMICS & ECONOMICS (5)
-├── avg-token.clar
-├── avlp-token.clar
+├── CXG-token.clar
+├── CVLP-token.clar
 ├── creator-token.clar
 ├── gov-token.clar
 └── reputation-token.clar
@@ -174,7 +174,7 @@ Conxian represents the **most comprehensive DeFi ecosystem on Stacks**, pioneeri
 ```text
 ✅ CORE PLATFORM:
 ├── 51 Smart contracts compiling successfully
-├── Enhanced tokenomics (100M AVG / 50M AVLP)
+├── Enhanced tokenomics (100M CXG / 50M CVLP)
 ├── Automated DAO governance system
 ├── Multi-signature treasury controls
 ├── Emergency pause mechanisms

@@ -51,8 +51,8 @@ graph TB
     subgraph "💰 TOKENOMICS SYSTEM"
         MOCKFT[mock-ft.clar]
         GOVTOKEN[gov-token.clar]
-        AVGTOKEN[avg-token.clar]
-        AVLPTOKEN[avlp-token.clar]
+        CXGTOKEN[CXG-token.clar]
+        CVLPTOKEN[CVLP-token.clar]
         CREATORTOKEN[creator-token.clar]
     end
 
@@ -104,8 +104,8 @@ graph TB
     %% DEPENDENCY FLOWS
     %% Foundation Dependencies
     SIP010 --> GOVTOKEN
-    SIP010 --> AVGTOKEN  
-    SIP010 --> AVLPTOKEN
+    SIP010 --> CXGTOKEN  
+    SIP010 --> CVLPTOKEN
     SIP010 --> CREATORTOKEN
     SIP010 --> MOCKFT
     
@@ -136,9 +136,9 @@ graph TB
     GOVTOKEN --> DAO
     GOVTOKEN --> DAOGOV
     GOVTOKEN --> ENHANCEDGOV
-    AVGTOKEN --> TREASURY
-    AVGTOKEN --> VAULT
-    AVLPTOKEN --> VAULT
+    CXGTOKEN --> TREASURY
+    CXGTOKEN --> VAULT
+    CVLPTOKEN --> VAULT
     CREATORTOKEN --> BOUNTY
     
     %% Governance Dependencies
@@ -189,7 +189,7 @@ graph TB
     
     class SIP010,VT,VAT,ST,PT,OT foundation
     class VAULT,TREASURY,REGISTRY,ANALYTICS,MATHLIB core
-    class MOCKFT,GOVTOKEN,AVGTOKEN,AVLPTOKEN,CREATORTOKEN token
+    class MOCKFT,GOVTOKEN,CXGTOKEN,CVLPTOKEN,CREATORTOKEN token
     class DAO,DAOAUTOMATION,DAOGOV,TIMELOCK,ENHANCEDGOV,GOVHELPER governance
     class CIRCUITBREAKER,CIRCUITSIMPLE,ENTERPRISEMON,ORACLEAGG,STATEANCHOR security
     class DEXFACTORY,DEXPOOL,DEXROUTER,POOLFACTORY,STABLEPOOL,STABLEPOOLCLEAN,WEIGHTEDPOOL,MOCKDEX dex
@@ -226,8 +226,8 @@ graph TB
 
 | Contract | Purpose | Max Supply | Used By |
 |----------|---------|------------|---------|
-| `avg-token.clar` | Governance token | 10M | treasury, vault, dao |
-| `avlp-token.clar` | Liquidity pool token | 5M | vault |
+| `CXG-token.clar` | Governance token | 10M | treasury, vault, dao |
+| `CVLP-token.clar` | Liquidity pool token | 5M | vault |
 | `gov-token.clar` | DAO voting token | Variable | dao, enhanced-governance |
 | `creator-token.clar` | Merit-based rewards | Variable | bounty-system |
 | `mock-ft.clar` | Testing token | Unlimited | Development only |

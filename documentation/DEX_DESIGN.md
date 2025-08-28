@@ -9,7 +9,7 @@ This document specifies the architecture for the Conxian decentralized exchange 
 3. Router (`dex-router`) for add/remove liquidity + single hop swaps (multi-hop deferred)
 4. Oracle (embedded cumulative price + TWAP view fn) inside pool (external contract deferred)
 5. Events & Accounting (fee growth per share; protocol fee skim)
-6. Treasury Buyback Integration (treasury -> router path STX->AVG)
+6. Treasury Buyback Integration (treasury -> router path STX->CXG)
 7. Analytics hooks to existing `analytics` contract (best-effort)
 
 Deferred to Phase A (after design):
@@ -80,7 +80,7 @@ TWAP consumer queries reserves & cumulative values to compute average over windo
 
 ## Buyback Flow
 
-Treasury calls router.swapExactIn STX->AVG path using pool id, with min-out based on on-chain spot minus tolerance (initial) – later replace with TWAP consult.
+Treasury calls router.swapExactIn STX->CXG path using pool id, with min-out based on on-chain spot minus tolerance (initial) – later replace with TWAP consult.
 
 ## Security Considerations
 

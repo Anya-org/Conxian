@@ -74,9 +74,9 @@ plan:
             path: contracts/vault.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: avg-token
+            contract-name: CXG-token
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/avg-token.clar
+            path: contracts/CXG-token.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: reputation-token
@@ -94,9 +94,9 @@ plan:
             path: contracts/Conxian-registry.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: avlp-token
+            contract-name: CVLP-token
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/avlp-token.clar
+            path: contracts/CVLP-token.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: bounty-system

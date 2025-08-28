@@ -20,11 +20,11 @@ Note: Source byte size is not a direct deterministic indicator of runtime execut
 | 10 | timelock.clar | 14,080 | Core governance safety; monitor if function pruning possible without reducing guarantees |
 | 11 | dao-governance-original.clar | 13,486 | Duplicate; removal planned |
 | 12 | oracle-aggregator.clar | 12,877 | Oracle logic; future sBTC integration hooks expected (watch size growth) |
-| 13 | avlp-token.clar | 11,715 | LP token; standard SIP-010 overhead |
+| 13 | CVLP-token.clar | 11,715 | LP token; standard SIP-010 overhead |
 | 14 | multi-hop-router.clar | 11,646 | Pathfinding complexity; potential optimization of list operations |
 | 15 | dex-pool.clar | 11,643 | Base DEX pool; compare with weighted & stable variants for consolidation |
 | 16 | math-lib.clar | 10,086 | Shared math; ensure weighted invariant migration here to dedupe |
-| 17 | avg-token.clar | 9,787 | Governance token with migration logic; review for unnecessary duplication |
+| 17 | CXG-token.clar | 9,787 | Governance token with migration logic; review for unnecessary duplication |
 | 18 | enterprise-monitoring.clar | 9,666 | Operational analytics; some events may migrate off-chain |
 | 19 | circuit-breaker.clar | 8,686 | Full circuit breaker; gas-critical pathways to benchmark |
 | 20 | creator-token.clar | 8,673 | Creator incentive token; ensure mint controls audited |

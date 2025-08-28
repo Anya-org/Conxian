@@ -41,7 +41,7 @@ Conxian is a production-ready DeFi platform on Stacks with 75 Clarity smart cont
 2. **Interactive Console Testing**: 
    - Run `npx clarinet console` 
    - Execute commands from `stacks/manual_test_commands.clar`
-   - Verify contract interactions work (example: `(contract-call? .avg-token get-total-supply)` returns `(ok u0)`)
+   - Verify contract interactions work (example: `(contract-call? .CXG-token get-total-supply)` returns `(ok u0)`)
 3. **Contract Format Validation**: `npx clarinet format --file contracts/[CONTRACT].clar --check`
 
 ### Pre-Commit Validation
@@ -58,7 +58,7 @@ Conxian is a production-ready DeFi platform on Stacks with 75 Clarity smart cont
 ├── contracts/                           # 75 Clarity smart contracts (.clar files)
 │   ├── traits/                         # Core interfaces (10 trait contracts)
 │   ├── vault.clar, treasury.clar       # Core DeFi contracts
-│   ├── avg-token.clar, avlp-token.clar # Protocol tokens  
+│   ├── CXG-token.clar, CVLP-token.clar # Protocol tokens  
 │   └── dao-governance.clar             # DAO governance
 ├── stacks/                             # Development environment
 │   ├── sdk-tests/                      # 20 TypeScript test files (.spec.ts)
@@ -82,7 +82,7 @@ Conxian is a production-ready DeFi platform on Stacks with 75 Clarity smart cont
 - **Traits** (10): Core interfaces - `sip-010-trait`, `vault-trait`, `strategy-trait`
 - **Governance** (5): DAO system - `dao`, `dao-governance`, `timelock`, `gov-token`
 - **Vault System** (8): Core DeFi - `vault`, `treasury`, `vault-enhanced`, `vault-production`
-- **Tokens** (3): Protocol tokens - `avg-token`, `avlp-token`, `creator-token`
+- **Tokens** (3): Protocol tokens - `CXG-token`, `CVLP-token`, `creator-token`
 - **DEX Foundations** (15): AMM infrastructure - `dex-factory`, `dex-pool`, `multi-hop-router`
 - **Analytics** (5): Monitoring - `analytics`, `enterprise-monitoring`, `bounty-system`
 
@@ -117,13 +117,13 @@ npx clarinet console          # Interactive REPL
 ### Console Testing Examples
 ```clarity
 ;; Basic contract verification
-(contract-call? .avg-token get-total-supply)      ;; Expected: (ok u0)
+(contract-call? .CXG-token get-total-supply)      ;; Expected: (ok u0)
 (contract-call? .vault get-admin)                 ;; Verify vault admin
 (contract-call? .dao-governance get-governance-data) ;; Check governance
 
 ;; Test token interactions
-(contract-call? .avg-token get-name)              ;; Token metadata
-(contract-call? .avlp-token get-total-supply)     ;; AVLP supply
+(contract-call? .CXG-token get-name)              ;; Token metadata
+(contract-call? .CVLP-token get-total-supply)     ;; CVLP supply
 ```
 
 ### Known Working Commands (Validated)

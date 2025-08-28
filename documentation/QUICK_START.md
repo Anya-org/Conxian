@@ -31,15 +31,15 @@ Deposit → Get Shares → Earn Automatic Yield → Withdraw Anytime
 
 ### 🗳️ Governance
 ```
-Hold AVG → Vote on Proposals → Earn Revenue Share (80%)
+Hold CXG → Vote on Proposals → Earn Revenue Share (80%)
 ```
-- **Requirement**: Any amount of AVG tokens
+- **Requirement**: Any amount of CXG tokens
 - **Revenue**: 80% of protocol revenue distributed
 - **Voting**: 1 week periods, 1 day execution delay
 
 ### 💱 Trading
 ```
-DEX Swaps → Provide Liquidity → Earn Trading Fees + AVLP Rewards
+DEX Swaps → Provide Liquidity → Earn Trading Fees + CVLP Rewards
 ```
 - **Multi-hop**: Automatic optimal routing
 - **Pools**: Stable and weighted pool types
@@ -51,14 +51,14 @@ DEX Swaps → Provide Liquidity → Earn Trading Fees + AVLP Rewards
 
 | Token | Purpose | Supply | How to Get |
 |-------|---------|---------|------------|
-| **AVG** | Governance + Revenue | 100M | Migrate AVLP tokens |
-| **AVLP** | Liquidity Rewards | 50M | Vault deposits, DEX liquidity |
+| **CXG** | Governance + Revenue | 100M | Migrate CVLP tokens |
+| **CVLP** | Liquidity Rewards | 50M | Vault deposits, DEX liquidity |
 | **Creator** | Merit Rewards | Variable | Contribute to platform |
 
 ### Migration Schedule
-- **Epoch 1**: 1 AVLP = 1 AVG (Week 1)
-- **Epoch 2**: 1 AVLP = 0.8 AVG (Weeks 2-3)  
-- **Epoch 3**: 1 AVLP = 0.6 AVG (Weeks 3-4, final)
+- **Epoch 1**: 1 CVLP = 1 CXG (Week 1)
+- **Epoch 2**: 1 CVLP = 0.8 CXG (Weeks 2-3)  
+- **Epoch 3**: 1 CVLP = 0.6 CXG (Weeks 3-4, final)
 
 ---
 
@@ -117,10 +117,10 @@ DEX Swaps → Provide Liquidity → Earn Trading Fees + AVLP Rewards
 1. Deposit assets to vault
 2. Monitor APY and performance
 3. Consider providing DEX liquidity
-4. Accumulate AVLP for AVG migration
+4. Accumulate CVLP for CXG migration
 
 ### For Governance Participants
-1. Acquire AVG tokens
+1. Acquire CXG tokens
 2. Join community discussions
 3. Review and vote on proposals
 4. Claim revenue distributions

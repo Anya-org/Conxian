@@ -15,7 +15,7 @@ This roadmap outlines the planned development and deployment phases for Conxian.
 ### 🚀 Core Platform
 
 - ✅ 30 Smart contracts compiling (core + extended modules)
-- ✅ Enhanced tokenomics (10M AVG / 5M AVLP)
+- ✅ Enhanced tokenomics (10M CXG / 5M CVLP)
 - ✅ Automated DAO governance system
 - ✅ Multi-signature treasury controls
 - ✅ Emergency pause mechanisms

@@ -64,8 +64,8 @@ const ORDER = [
   'mock-ft',
   'gov-token',
   'creator-token',
-  'avg-token',
-  'avlp-token'
+  'CXG-token',
+  'CVLP-token'
 ];
 
 async function pollTx(txid: string, network: any, timeoutMs = 120000): Promise<{ height?: number; status: string }> {

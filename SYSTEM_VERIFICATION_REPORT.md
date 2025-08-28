@@ -18,8 +18,8 @@ This report verifies the implementation of the features listed in the `FULL_SYST
 
 | ID   | Contract              | Verification Status | Evidence                            |
 |------|-----------------------|---------------------|-------------------------------------|
-| TE-01| `avg-token.clar`      | ✅ Verified         | `contracts/avg-token.clar`          |
-| TE-02| `avlp-token.clar`     | ✅ Verified         | `contracts/avlp-token.clar`         |
+| TE-01| `CXG-token.clar`      | ✅ Verified         | `contracts/CXG-token.clar`          |
+| TE-02| `CVLP-token.clar`     | ✅ Verified         | `contracts/CVLP-token.clar`         |
 | TE-03| `creator-token.clar`  | ✅ Verified         | `contracts/creator-token.clar`      |
 | TE-04| `gov-token.clar`      | ✅ Verified         | `contracts/gov-token.clar`          |
 | TE-05| `reputation-token.clar`| ⚪ Not Verified     | `contracts/reputation-token.clar`   |

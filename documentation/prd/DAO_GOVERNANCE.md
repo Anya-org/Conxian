@@ -123,7 +123,7 @@ The Conxian DAO (Decentralized Autonomous Organization) provides a transparent, 
 |---|---|---|
 | DAO-M-01 | **Participation Rate** | Percentage of total eligible voting power that participates in a typical proposal. |
 | DAO-M-02 | **Proposal Success Rate** | Percentage of proposals that are successfully passed and executed. |
-| DAO-M-03 | **Avg. Execution Delay** | The average time from proposal creation to execution. |
+| DAO-M-03 | **CXG. Execution Delay** | The average time from proposal creation to execution. |
 | DAO-M-04 | **Delegation Rate** | Percentage of voting power that is delegated. |
 | DAO-M-05 | **Founder Participation** | The voting participation rate of founders, tracked per epoch. |
 

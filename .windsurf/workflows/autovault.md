@@ -48,7 +48,7 @@ Core Withdrawal Flow:
 Treasury Management (Autonomous):
 
 Fee Collection: Automatic 50% split to treasury reserve
-Buyback Mechanism: DAO-controlled AVG token buybacks
+Buyback Mechanism: DAO-controlled CXG token buybacks
 Multi-Sig Security: Treasury operations require multi-signature approval
 Autonomous Economics Activation
 Utilization-Based Fee Adjustments (if enabled):

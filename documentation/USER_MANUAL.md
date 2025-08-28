@@ -28,7 +28,7 @@ Conxian is a production-ready DeFi platform built on the Stacks blockchain that 
 ### Key Benefits
 
 - **Bitcoin-Native**: Built on Stacks, inheriting Bitcoin's security while enabling smart contracts
-- **Community-Governed**: Fully decentralized governance through AVG token holders
+- **Community-Governed**: Fully decentralized governance through CXG token holders
 - **Multi-Asset Support**: Supports various cryptocurrencies with automatic yield optimization
 - **Enterprise Security**: Multiple safety mechanisms including circuit breakers and emergency controls
 - **Revenue Sharing**: Token holders receive 80% of protocol revenue
@@ -80,6 +80,7 @@ Conxian is a production-ready DeFi platform built on the Stacks blockchain that 
 The core Conxian feature that automatically optimizes yield on your deposited assets.
 
 **Key Features:**
+
 - Multi-asset support
 - Automated yield strategies
 - Precise share accounting
@@ -91,6 +92,7 @@ The core Conxian feature that automatically optimizes yield on your deposited as
 Community-driven decision making for all platform parameters and upgrades.
 
 **Key Features:**
+
 - Proposal creation and voting
 - Time-weighted voting power
 - Execution delays for security
@@ -102,8 +104,9 @@ Community-driven decision making for all platform parameters and upgrades.
 Three-token system designed for sustainable growth and fair distribution.
 
 **Tokens:**
-- **AVG**: Governance token (100M max supply)
-- **AVLP**: Liquidity provider token (50M max supply)
+
+- **CXG**: Governance token (100M max supply)
+- **CXLP**: Liquidity provider token (50M max supply)
 - **Creator**: Merit-based rewards for contributors
 
 ### 💱 DEX Integration
@@ -111,6 +114,7 @@ Three-token system designed for sustainable growth and fair distribution.
 Built-in decentralized exchange for seamless token swapping and liquidity provision.
 
 **Features:**
+
 - Multi-hop routing
 - Stable and weighted pools
 - Liquidity mining rewards
@@ -121,6 +125,7 @@ Built-in decentralized exchange for seamless token swapping and liquidity provis
 Multiple layers of protection for user funds and platform stability.
 
 **Security Features:**
+
 - Circuit breakers for volatility protection
 - Emergency pause mechanisms
 - Multi-signature treasury controls
@@ -204,43 +209,49 @@ Multiple layers of protection for user funds and platform stability.
 
 ## Token Economics Guide
 
-### AVG Token (Governance)
+### CXG Token (Governance)
 
 **Purpose**: Main governance token providing voting rights and revenue sharing
 
 **Key Features:**
-- **Max Supply**: 100,000,000 AVG
+
+- **Max Supply**: 100,000,000 CXG
 - **Revenue Share**: 80% of protocol revenue distributed to holders
 - **Voting Power**: Proportional to token balance and holding duration
-- **Migration Path**: AVLP tokens can migrate to AVG
+- **Migration Path**: CXLP tokens can migrate to CXG
 
-**How to Earn AVG:**
-1. **Migration**: Convert AVLP tokens to AVG (time-limited epochs)
+**How to Earn CXG:**
+
+1. **Migration**: Convert CXLP tokens to CXG (time-limited epochs)
 2. **Governance Rewards**: Earn through active participation
 3. **Secondary Markets**: Purchase from other users (when available)
 
 **Benefits of Holding:**
+
 - Vote on governance proposals
 - Receive revenue distributions
 - Influence platform direction
 - Priority access to new features
 
-### AVLP Token (Liquidity Provider)
+### CXLP Token (Liquidity Provider)
 
 **Purpose**: Rewards for providing liquidity to the platform
 
 **Key Features:**
-- **Max Supply**: 50,000,000 AVLP
-- **Migration**: Can convert to AVG during specific epochs
+
+- **Max Supply**: 50,000,000 CXLP
+- **Migration**: Can convert to CXG during specific epochs
 - **Earning Mechanism**: Provided as rewards for vault deposits and DEX liquidity
 
 **Migration Schedule:**
-- **Epoch 1**: 1:1 AVLP to AVG ratio (first ~1 week)
+
+- **Epoch 1**: 1:1 CXLP to CXG ratio (first ~1 week)
 - **Epoch 2**: 1:0.8 ratio (weeks 2-3)
 - **Epoch 3**: 1:0.6 ratio (weeks 3-4, final)
 
-**How to Earn AVLP:**
-1. **Vault Deposits**: Receive AVLP rewards for vault participation
+**How to Earn CXLP:**
+
+1. **Vault Deposits**: Receive CXLP rewards for vault participation
 2. **DEX Liquidity**: Provide liquidity to trading pairs
 3. **Long-term Staking**: Bonus rewards for extended deposits
 
@@ -249,11 +260,13 @@ Multiple layers of protection for user funds and platform stability.
 **Purpose**: Merit-based rewards for platform contributors
 
 **Key Features:**
+
 - **Merit-Based**: Awarded for valuable contributions
 - **Quality Assurance**: Tied to contribution quality metrics
 - **Bounty System**: Earned through development and community work
 
 **Ways to Earn:**
+
 1. **Development Bounties**: Code contributions and bug fixes
 2. **Community Building**: Educational content and user support
 3. **Quality Assurance**: Testing and feedback provision
@@ -270,7 +283,7 @@ Multiple layers of protection for user funds and platform stability.
 
 #### Distribution Mechanism
 
-- **80% to Token Holders**: Distributed proportionally to AVG holders
+- **80% to Token Holders**: Distributed proportionally to CXG holders
 - **20% to Treasury**: Used for development and platform growth
 - **Automated Buybacks**: Treasury funds used to buy and burn tokens
 
@@ -280,18 +293,20 @@ Multiple layers of protection for user funds and platform stability.
 
 ### Understanding DAO Governance
 
-Conxian is governed by its community through a decentralized autonomous organization (DAO). AVG token holders can propose and vote on changes to the platform.
+Conxian is governed by its community through a decentralized autonomous organization (DAO). CXG token holders can propose and vote on changes to the platform.
 
 ### Governance Process
 
 #### 1. Proposal Creation
 
 **Requirements:**
-- Hold minimum 100,000 AVG tokens
+
+- Hold minimum 100,000 CXG tokens
 - Provide detailed proposal description
 - Specify implementation parameters
 
 **Proposal Types:**
+
 - **Parameter Changes**: Adjust fees, caps, limits
 - **Treasury Spending**: Allocate funds for development
 - **Emergency Actions**: Critical security measures
@@ -301,10 +316,11 @@ Conxian is governed by its community through a decentralized autonomous organiza
 #### 2. Voting Process
 
 **Voting Period**: ~1 week (1,008 blocks)
-**Quorum Requirement**: 20% of total AVG supply must participate
+**Quorum Requirement**: 20% of total CXG supply must participate
 **Voting Options**: For, Against, Abstain
 
 **Time-Weighted Voting:**
+
 - Longer holding periods = more voting power
 - Prevents last-minute token accumulation for votes
 - Rewards committed community members
@@ -320,7 +336,7 @@ Conxian is governed by its community through a decentralized autonomous organiza
 #### Creating Proposals
 
 1. **Prepare Proposal**: Draft detailed description and implementation plan
-2. **Meet Requirements**: Ensure you hold enough AVG tokens
+2. **Meet Requirements**: Ensure you hold enough CXG tokens
 3. **Submit Proposal**: Use governance interface to submit
 4. **Community Discussion**: Engage with community for feedback
 5. **Voting Campaign**: Advocate for your proposal
@@ -396,7 +412,7 @@ Conxian includes an integrated decentralized exchange (DEX) that enables seamles
 #### Benefits
 
 - **Trading Fees**: Earn from every trade in your pool
-- **AVLP Rewards**: Receive liquidity provider tokens
+- **CXLP Rewards**: Receive liquidity provider tokens
 - **Yield Farming**: Additional rewards for long-term liquidity
 
 #### Risks
@@ -416,11 +432,13 @@ Conxian includes an integrated decentralized exchange (DEX) that enables seamles
 **Purpose**: Automatically pause operations during extreme market conditions
 
 **Triggers:**
+
 - High price volatility (>10% in short period)
 - Unusual trading volume spikes
 - Liquidity drops below safety thresholds
 
 **User Impact:**
+
 - Temporary pause of deposits/withdrawals
 - Protection from adverse market conditions
 - Automatic resume when conditions normalize
@@ -479,12 +497,14 @@ Conxian includes an integrated decentralized exchange (DEX) that enables seamles
 **Goal**: Earn yield on cryptocurrency holdings with minimal effort
 
 **Process:**
+
 1. Deposit supported tokens into vault
 2. Receive shares that automatically appreciate
 3. Earn from automated yield strategies
 4. Withdraw anytime with accumulated gains
 
 **Benefits:**
+
 - No active management required
 - Automated optimization
 - Transparent fee structure
@@ -495,12 +515,14 @@ Conxian includes an integrated decentralized exchange (DEX) that enables seamles
 **Goal**: Earn additional rewards by providing trading liquidity
 
 **Process:**
+
 1. Provide liquidity to DEX pools
 2. Receive LP tokens representing pool ownership
 3. Earn trading fees from swaps
-4. Receive AVLP token rewards
+4. Receive CXLP token rewards
 
 **Benefits:**
+
 - Multiple revenue streams
 - Higher potential returns
 - Support platform growth
@@ -511,12 +533,14 @@ Conxian includes an integrated decentralized exchange (DEX) that enables seamles
 **Goal**: Influence platform direction and earn governance rewards
 
 **Process:**
-1. Acquire and hold AVG tokens
+
+1. Acquire and hold CXG tokens
 2. Participate in proposal discussions
 3. Vote on governance proposals
 4. Receive revenue sharing distributions
 
 **Benefits:**
+
 - Platform governance rights
 - Revenue sharing (80% distribution)
 - Long-term value alignment
@@ -527,12 +551,14 @@ Conxian includes an integrated decentralized exchange (DEX) that enables seamles
 **Goal**: Regularly invest in DeFi with consistent strategy
 
 **Process:**
+
 1. Set up regular deposit schedule
 2. Deposit fixed amounts at intervals
 3. Accumulate shares over time
 4. Benefit from compound growth
 
 **Benefits:**
+
 - Reduces timing risk
 - Builds position systematically
 - Leverages compound growth
@@ -543,12 +569,14 @@ Conxian includes an integrated decentralized exchange (DEX) that enables seamles
 **Goal**: Manage organizational funds with DeFi yields
 
 **Process:**
+
 1. Deposit treasury funds to vault
 2. Maintain liquidity for operations
 3. Earn yield on idle funds
 4. Withdraw as needed for expenses
 
 **Benefits:**
+
 - Treasury diversification
 - Professional-grade security
 - Transparent reporting
@@ -568,8 +596,8 @@ A: Conxian includes multiple security layers including circuit breakers, emergen
 **Q: What are the fees?**
 A: Current fees are 0.30% for deposits, 0.10% for withdrawals, and 5% performance fees on yield above benchmark. Fees are adjustable through governance.
 
-**Q: How do I earn AVG tokens?**
-A: AVG tokens can be earned by migrating AVLP tokens during migration epochs, participating in governance, or through secondary markets when available.
+**Q: How do I earn CXG tokens?**
+A: CXG tokens can be earned by migrating CXLP tokens during migration epochs, participating in governance, or through secondary markets when available.
 
 **Q: When will mainnet launch?**
 A: Conxian is production-ready and deployed on testnet. Mainnet launch timing depends on final testing completion and community governance decisions.
@@ -587,8 +615,8 @@ A: Share values can decrease during market downturns, but the platform includes 
 
 #### Governance
 
-**Q: How much AVG do I need to vote?**
-A: Any amount of AVG provides voting power, but creating proposals requires 100,000 AVG tokens.
+**Q: How much CXG do I need to vote?**
+A: Any amount of CXG provides voting power, but creating proposals requires 100,000 CXG tokens.
 
 **Q: How long do proposals take?**
 A: Voting periods last about 1 week, with an additional 1-day execution delay for approved proposals.
@@ -602,6 +630,7 @@ A: New proposals can modify previous decisions, but implemented changes may have
 
 **Problem**: Transaction failed or is stuck
 **Solutions:**
+
 1. Check gas fees and wallet balance
 2. Verify transaction details are correct
 3. Wait for network congestion to clear
@@ -609,6 +638,7 @@ A: New proposals can modify previous decisions, but implemented changes may have
 
 **Problem**: Cannot connect wallet
 **Solutions:**
+
 1. Refresh browser and try again
 2. Check wallet is unlocked and on correct network
 3. Clear browser cache and cookies
@@ -618,6 +648,7 @@ A: New proposals can modify previous decisions, but implemented changes may have
 
 **Problem**: Cannot access platform features
 **Solutions:**
+
 1. Verify wallet connection is active
 2. Check if platform is in emergency pause mode
 3. Ensure sufficient gas for transactions
@@ -625,6 +656,7 @@ A: New proposals can modify previous decisions, but implemented changes may have
 
 **Problem**: Incorrect balance or position display
 **Solutions:**
+
 1. Refresh page and wait for sync
 2. Check transaction confirmations
 3. Verify wallet address is correct
@@ -649,6 +681,7 @@ A: New proposals can modify previous decisions, but implemented changes may have
 #### Emergency Situations
 
 For critical issues affecting fund safety:
+
 1. **Immediate Action**: Stop all platform interactions
 2. **Emergency Contacts**: Use official emergency channels
 3. **Document Everything**: Screenshots, transaction details, error messages
@@ -672,7 +705,6 @@ For critical issues affecting fund safety:
 - **[Security Documentation](./SECURITY.md)**: Security features and audits
 - **[Developer Guide](./DEVELOPER_GUIDE.md)**: Development and integration
 - **[Developer & Contract Guides](./contract-guides/README.md)**: Detailed guides for core smart contracts
-
 
 ### Educational Resources
 

@@ -9,7 +9,7 @@ export function principals(simnet: any) {
     vault: `${deployer}.vault`,
     timelock: `${deployer}.timelock`,
     mockFt: `${deployer}.mock-ft`,
-    avg: `${deployer}.avg-token`,
+    CXG: `${deployer}.CXG-token`,
   };
 }
 
@@ -25,7 +25,7 @@ export function mintMock(simnet: any, to: string, amount: number | bigint, admin
   return simnet.callPublicFn('mock-ft', 'mint', [Cl.principal(to), Cl.uint(amount)], admin);
 }
 
-export function approve(simnet: any, tokenName: 'mock-ft' | 'avg-token', owner: string, spender: string, amount: number | bigint) {
+export function approve(simnet: any, tokenName: 'mock-ft' | 'CXG-token', owner: string, spender: string, amount: number | bigint) {
   return simnet.callPublicFn(tokenName, 'approve', [Cl.principal(spender), Cl.uint(amount)], owner);
 }
 

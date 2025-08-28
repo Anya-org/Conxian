@@ -23,7 +23,7 @@ CONTRACTS=(
   ownable-trait enhanced-caller-admin-trait math-lib-advanced oracle-aggregator-enhanced \
   dex-factory-enhanced multi-hop-router-v3 concentrated-liquidity-pool vault-production \
   treasury dao-governance conxian-registry analytics bounty-system \
-  mock-ft gov-token creator-token avg-token avlp-token
+  mock-ft gov-token creator-token CXG-token CVLP-token
 )
 
 MISSING=()
@@ -168,13 +168,13 @@ else
       "height": 0,
       "status": "prepared"
     },
-    "avg-token": {
+    "CXG-token": {
       "txid": "<pending>",
       "contract_id": "<pending>",
       "height": 0,
       "status": "prepared"
     },
-    "avlp-token": {
+    "CVLP-token": {
       "txid": "<pending>",
       "contract_id": "<pending>",
       "height": 0,
@@ -185,14 +185,14 @@ else
     "sip-010-trait", "strategy-trait", "vault-admin-trait", "vault-trait",
     "mock-ft", "gov-token", "treasury", "vault", "timelock", "dao",
     "dao-governance", "analytics", "registry", "bounty-system", 
-    "creator-token", "dao-automation", "avg-token", "avlp-token"
+    "creator-token", "dao-automation", "CXG-token", "CVLP-token"
   ],
   "manual_testing": {
     "clarinet_console": "npx clarinet console --testnet",
     "verification_commands": [
       "(contract-call? .vault get-vault-data)",
-      "(contract-call? .avg-token get-total-supply)",
-      "(contract-call? .avlp-token get-total-supply)",
+      "(contract-call? .CXG-token get-total-supply)",
+      "(contract-call? .CVLP-token get-total-supply)",
       "(contract-call? .dao-governance get-governance-data)",
       "(contract-call? .treasury get-treasury-info)"
     ]

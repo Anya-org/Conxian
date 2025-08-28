@@ -1,8 +1,9 @@
-import { describe, expect, it, beforeEach } from '@jest/globals';
+import { describe, it, expect } from 'vitest';
+import { simnet } from '@hirosystems/clarinet-sdk';
 import { Cl } from '@stacks/transactions';
 
 // Test suite for comprehensive mathematical function validation
-describe('AutoVault Mathematical Functions Tests', () => {
+describe('Conxian Mathematical Functions Tests', () => {
   let deployer: string;
   let mathLibContract: string;
   let fixedPointContract: string;

@@ -132,7 +132,7 @@
 
 - **Stacks Integration**: Bitcoin settlement finality
 - **sBTC Readiness**: First-mover advantage for Bitcoin DeFi
-- **Sound Money**: Deflationary tokenomics (10M AVG, 5M AVLP caps)
+- **Sound Money**: Deflationary tokenomics (10M CXG, 5M CVLP caps)
 
 ### Technical Excellence
 

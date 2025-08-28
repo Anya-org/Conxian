@@ -82,10 +82,10 @@ describe('vault: SIP-010 deposit / withdraw', () => {
     const deployer = accounts.get('deployer')!;
     const user = accounts.get('wallet_1')!;
 
-    const { avg } = principals(simnet);
+    const { CXG } = principals(simnet);
 
-    // Switch token to AVG via timelock (vault must be paused and empty; true at init)
-    setVaultTokenViaTimelock(simnet, avg);
+    // Switch token to CXG via timelock (vault must be paused and empty; true at init)
+    setVaultTokenViaTimelock(simnet, CXG);
 
     const ftMock = contractPrincipal('mock-ft', deployer);
     const badDeposit = simnet.callPublicFn('vault', 'deposit', [Cl.uint(1_000), ftMock], user);

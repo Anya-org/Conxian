@@ -16,8 +16,8 @@ Stacks blockchain.
 
 ### Token Economics (4 contracts)
 
-- `avg-token.clar` - 10M governance token with voting power
-- `avlp-token.clar` - 5M liquidity token for progressive migration
+- `CXG-token.clar` - 10M governance token with voting power
+- `CVLP-token.clar` - 5M liquidity token for progressive migration
 - `gov-token.clar` - Voting power distribution mechanism
 - `creator-token.clar` - Creator incentive alignment system
 

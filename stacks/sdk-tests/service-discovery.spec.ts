@@ -41,7 +41,7 @@ describe('Service Discovery Implementation', () => {
       );
       
       expect(tokenService.result).toStrictEqual(
-        Cl.some(Cl.contractPrincipal(deployer, 'avg-token'))
+        Cl.some(Cl.contractPrincipal(deployer, 'CXG-token'))
       );
       console.log('✅ Token service found via registry');
     });
