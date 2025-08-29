@@ -6,8 +6,8 @@
 (use-trait fixed-point-trait .fixed-point-math.fixed-point-trait)
 
 ;; Constants for tick mathematics
-(define-constant MIN_TICK -887272) ;; Minimum tick (price ≈ 0)
-(define-constant MAX_TICK 887272)  ;; Maximum tick (price ≈ ∞)
+(define-constant MIN_TICK -887272) ;; Minimum tick (price  0)
+(define-constant MAX_TICK 887272)  ;; Maximum tick (price  )
 (define-constant Q96 u79228162514264337593543950336) ;; 2^96 for price calculations
 (define-constant PRECISION u1000000000000000000) ;; 18 decimal precision
 

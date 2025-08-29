@@ -250,8 +250,8 @@
 
 ;; Deprecate a contract version
 (define-public (deprecate-version 
-  (contract-type (string-ascii 20))
-  (version (string-ascii 10)))
+  contract-type (string-ascii 20)
+  version (string-ascii 10))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
     (let ((contract-info (unwrap! (map-get? contract-registry {contract-type: contract-type, version: version})

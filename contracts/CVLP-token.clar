@@ -15,7 +15,7 @@
 (define-constant BLOCKS_PER_WEEK u1008)
 (define-constant BLOCKS_PER_MONTH u4032) ;; ~4 weeks
 (define-constant BLOCKS_PER_QUARTER u13140) ;; ~91.25 days
-(define-constant BLOCKS_PER_YEAR u52560) ;; 365 days ≈ 1 year
+(define-constant BLOCKS_PER_YEAR u52560) ;; 365 days  1 year
 
 ;; Migration periods (years)
 (define-constant EPOCH_1_END u52560) ;; ~1 year

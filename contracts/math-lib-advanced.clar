@@ -105,7 +105,7 @@
         result))))
 
 ;; Natural logarithm using Taylor series expansion
-;; ln(1+x) = x - x²/2 + x³/3 - x⁴/4 + ...
+;; ln(1+x) = x - x/2 + x/3 - x/4 + ...
 ;; For x in range (0, 2), we use ln(x) = ln(1 + (x-1))
 (define-public (ln-fixed (x uint))
   (if (is-eq x u0)
@@ -143,7 +143,7 @@
                       (- remaining u1)))))
 
 ;; Exponential function using Taylor series expansion
-;; e^x = 1 + x + x²/2! + x³/3! + x⁴/4! + ...
+;; e^x = 1 + x + x/2! + x/3! + x/4! + ...
 (define-public (exp-fixed (x uint))
   (if (is-eq x u0)
     (ok PRECISION) ;; e^0 = 1
