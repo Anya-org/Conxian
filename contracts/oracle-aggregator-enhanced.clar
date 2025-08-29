@@ -241,13 +241,16 @@
       cached-data
         (let ((cached-price (get price cached-data))
               (volatility (get volatility cached-data))
+              (cache-age (- block-height (get block-height cached-data)))
               (deviation (if (> price cached-price) 
                           (/ (* (- price cached-price) u10000) cached-price)
                           (/ (* (- cached-price price) u10000) cached-price))))
-          
-          ;; Dynamic deviation threshold based on volatility
-          (let ((max-deviation (+ MAX_DEVIATION_BPS (* volatility u2))))
-            {valid: (<= deviation max-deviation), deviation: deviation}))
+          ;; If cache is too old, skip deviation check
+          (if (> cache-age MAX_PRICE_AGE)
+            {valid: true, deviation: u0}
+            ;; Else, check deviation
+            (let ((max-deviation (+ MAX_DEVIATION_BPS (* volatility u2))))
+              {valid: (<= deviation max-deviation), deviation: deviation})))
       ;; No existing data, allow submission
       {valid: true, deviation: u0})))
 
