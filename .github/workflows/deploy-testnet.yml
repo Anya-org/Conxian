@@ -3,6 +3,10 @@ name: Protected Testnet Deployment
 env:
   NODE_VERSION: '20'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   workflow_dispatch:
     inputs:
@@ -24,6 +28,7 @@ jobs:
   guardrails:
     name: Pre-Deployment Guardrails
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     steps:
       - name: Validate Confirmation
         run: |
@@ -42,6 +47,7 @@ jobs:
     name: Prepare Environment
     runs-on: ubuntu-latest
     needs: guardrails
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -63,6 +69,7 @@ jobs:
     name: Deploy to Testnet
     runs-on: ubuntu-latest
     needs: prepare
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -91,6 +98,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: deploy
     if: always()
+    timeout-minutes: 5
     steps:
       - name: Summarize
         run: |

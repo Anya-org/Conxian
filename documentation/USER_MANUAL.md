@@ -2,7 +2,7 @@
 
 **Welcome to Conxian** - The most comprehensive DeFi ecosystem on Stacks blockchain, designed to offer Bitcoin-native DeFi with institutional-grade security and community governance.
 
-*Last Updated: August 25, 2025*
+*Last Updated: August 28, 2025*
 
 ---
 
@@ -47,29 +47,29 @@ Conxian is a production-ready DeFi platform built on the Stacks blockchain that 
 
 ### Step 1: Set Up Your Stacks Wallet
 
-1. **Install a Stacks Wallet**: 
-   - [Hiro Wallet](https://wallet.hiro.so/) (Recommended)
-   - [Xverse Wallet](https://www.xverse.app/)
-   - [Leather Wallet](https://leather.io/)
+1. **Install a Stacks Wallet**:
+    - [Hiro Wallet](https://wallet.hiro.so/) (Recommended)
+    - [Xverse Wallet](https://www.xverse.app/)
+    - [Leather Wallet](https://leather.io/)
 
-2. **Fund Your Wallet**:
+1. **Fund Your Wallet**:
    - Acquire STX tokens for transaction fees
    - Obtain supported tokens: **Native (STX, sBTC) or Cross-chain (wETH, wBTC, USDC)**
 
 ### Step 2: Connect to Conxian
 
 1. Navigate to the Conxian platform
-2. Click "Connect Wallet"
-3. Select your wallet and approve the connection
-4. You're now ready to use Conxian!
+1. Click "Connect Wallet"
+1. Select your wallet and approve the connection
+1. You're now ready to use Conxian!
 
 ### Step 3: Your First Deposit
 
 1. **Choose Amount**: Enter the amount you want to deposit
-2. **Select Token**: Choose from supported assets
-3. **Review Fees**: Check deposit fee (default 0.30%)
-4. **Confirm Transaction**: Approve in your wallet
-5. **Receive Shares**: Get vault shares representing your ownership
+1. **Select Token**: Choose from supported assets
+1. **Review Fees**: Check deposit fee (default 0.30%)
+1. **Confirm Transaction**: Approve in your wallet
+1. **Receive Shares**: Get vault shares representing your ownership
 
 ---
 
@@ -134,26 +134,32 @@ Multiple layers of protection for user funds and platform stability.
 
 ### 🌉 Cross-Chain Liquidity Integration
 
-Conxian now supports cross-chain liquidity, enabling assets from other blockchains to participate in our DeFi ecosystem while maintaining Nakamoto compatibility.
+Conxian now supports cross-chain liquidity, enabling assets from other blockchains
+to participate in our DeFi ecosystem while maintaining
+Nakamoto compatibility.
 
 **Key Features:**
+
 - **Bridge Contracts**: Secure asset transfers between chains using SDK 3.5.0
 - **Wrapped Assets**: Use wrapped versions of popular assets (wETH, wBTC)
 - **Unified Liquidity Pools**: Combine assets from multiple chains in single pools
 - **Automatic Yield Optimization**: Cross-chain assets earn yield like native assets
 
 **Supported Cross-Chain Assets:**
+
 - wETH (Ethereum)
 - wBTC (Bitcoin)
 - USDC (Multi-chain)
 - SOL (Solana)
 
 **How to Use Cross-Chain Assets:**
+
 1. Bridge assets to Stacks using supported bridges
-2. Deposit wrapped tokens into Conxian vaults
-3. Earn yield and participate in governance like native assets
+1. Deposit wrapped tokens into Conxian vaults
+1. Earn yield and participate in governance like native assets
 
 **Security Considerations:**
+
 - All cross-chain operations use Nakamoto-compatible security features
 - Bridge contracts are audited and governance-approved
 - Circuit breakers monitor cross-chain price feeds
@@ -167,25 +173,27 @@ Conxian now supports cross-chain liquidity, enabling assets from other blockchai
 #### Standard Deposit Process
 
 1. **Navigate to Vault**: Go to the main vault interface
-2. **Enter Amount**: Specify how much you want to deposit
-3. **Select Asset**: Choose from supported assets
-4. **Review Details**:
-   - Deposit amount
-   - Current fee rate (0.30% default)
-   - Expected shares received
-   - Current vault APY
-5. **Confirm Transaction**: Approve wallet transaction
-6. **Track Progress**: Monitor transaction confirmation
+1. **Enter Amount**: Specify how much you want to deposit
+1. **Select Asset**: Choose from supported assets
+1. **Review Details**:
+    - Deposit amount
+    - Current fee rate (0.30% default)
+    - Expected shares received
+    - Current vault APY
+1. **Confirm Transaction**: Approve wallet transaction
+1. **Track Progress**: Monitor transaction confirmation
 
-#### Supported Assets:
+#### Supported Assets
+
 - Native: STX, sBTC
-- **Cross-chain: wETH, wBTC, USDC, SOL**
+- Cross-chain: wETH, wBTC, USDC, SOL
 
-#### Cross-chain Deposit Process:
+#### Cross-chain Deposit Process
+
 1. Bridge assets to Stacks
-2. Wrap assets if needed (automated for supported chains)
-3. Deposit wrapped tokens like native assets
-4. Earn yield on cross-chain positions
+1. Wrap assets if needed (automated for supported chains)
+1. Deposit wrapped tokens like native assets
+1. Earn yield on cross-chain positions
 
 #### Fee Structure
 
@@ -204,14 +212,14 @@ Conxian now supports cross-chain liquidity, enabling assets from other blockchai
 #### Standard Withdrawal Process
 
 1. **Access Withdrawal**: Navigate to withdraw section
-2. **Enter Amount**: Specify shares or underlying assets to withdraw
-3. **Review Details**:
-   - Withdrawal amount
-   - Current fee rate (0.10% default)
-   - Expected tokens received
-   - Impact on your position
-4. **Confirm Transaction**: Approve wallet transaction
-5. **Receive Assets**: Tokens sent to your wallet
+1. **Enter Amount**: Specify shares or underlying assets to withdraw
+1. **Review Details**:
+    - Withdrawal amount
+    - Current fee rate (0.10% default)
+    - Expected tokens received
+    - Impact on your position
+1. **Confirm Transaction**: Approve wallet transaction
+1. **Receive Assets**: Tokens sent to your wallet
 
 #### Withdrawal Options
 
@@ -741,7 +749,7 @@ For critical issues affecting fund safety:
 - **[API Reference](./API_REFERENCE.md)**: Smart contract functions
 - **[Security Documentation](./SECURITY.md)**: Security features and audits
 - **[Developer Guide](./DEVELOPER_GUIDE.md)**: Development and integration
-- **[Developer & Contract Guides](./contract-guides/README.md)**: Detailed guides for core smart contracts
+- **[Standards](./standards.md)**: Interoperability and security guidelines
 
 ### Educational Resources
 
@@ -754,5 +762,5 @@ For critical issues affecting fund safety:
 *This manual is maintained by the Conxian community. For suggestions or corrections, please submit issues or pull requests to the GitHub repository.*
 
 **Version**: 1.0  
-**Last Updated**: August 25, 2025  
+**Last Updated**: August 28, 2025  
 **Next Review**: Quarterly or upon major platform updates

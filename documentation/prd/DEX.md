@@ -6,7 +6,7 @@
 | **Version** | 0.5 |
 | **Owner** | R&D WG |
 | **Last Updated** | 2025-08-28 |
-| **References** | [`dex-factory.clar`](../../contracts/dex-factory.clar), [`dex-router.clar`](../../contracts/dex-router.clar) |
+| **References** | `dex-factory.clar`, `dex-router.clar` |
 
 ---
 

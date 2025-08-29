@@ -253,8 +253,9 @@ describe('Full System Integration', () => {
   });
 });
 
-For Clarity SDK and Nakamoto adherence assessments, see [SDK_AND_NAKAMOTO_UPDATES.md](../SDK_AND_NAKAMOTO_UPDATES.md).
 ```
+
+For Nakamoto and Clarity3 compliance assessment, see [standards.md](../standards.md).
 
 ## Migration Plan
 

@@ -14,15 +14,29 @@ function dirExists(p) {
 
 function runNpmInstall(cwd) {
   const rel = path.relative(projectRoot, cwd) || '.';
-  console.log(`Installing dependencies with 'npm install' in ${rel} ...`);
-  const result = spawnSync('npm', ['install'], {
+  const npmArgs = ['ci', '--no-audit', '--no-fund'];
+  const timeoutMs = Number(process.env.NPM_INSTALL_TIMEOUT_MS || 300000); // default 5 minutes
+  console.log(`Installing dependencies with 'npm ${npmArgs.join(' ')}' in ${rel} (timeout ${timeoutMs}ms) ...`);
+  const result = spawnSync('npm', npmArgs, {
     cwd,
     stdio: 'inherit',
     shell: process.platform === 'win32',
+    timeout: timeoutMs,
+    env: Object.assign({}, process.env, {
+      CI: 'true',
+      npm_config_audit: 'false',
+      npm_config_fund: 'false',
+      npm_config_progress: 'false',
+      npm_config_loglevel: 'error',
+    }),
   });
   if (result.error) {
-    console.error(`Failed to run npm install in ${cwd}: ${result.error.message}`);
-    process.exit(result.status || 1);
+    const code = result.error.code || 'UNKNOWN';
+    console.error(`Failed to run npm in ${cwd}: ${result.error.message} (code=${code})`);
+    if (code === 'ETIMEDOUT') {
+      console.error('npm operation timed out. You can adjust timeout via NPM_INSTALL_TIMEOUT_MS.');
+    }
+    process.exit(typeof result.status === 'number' ? result.status : 1);
   }
   if (result.status !== 0) {
     process.exit(result.status);

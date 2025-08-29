@@ -6,7 +6,7 @@
 | **Version** | 1.2 |
 | **Owner** | Protocol WG |
 | **Last Updated** | 2025-08-26 |
-| **References** | [AIP-1](...), [AIP-5](...), [Architecture](./ARCHITECTURE.md), [`vault.clar`](../../contracts/vault.clar) |
+| **References** | [AIP-1](...), [AIP-5](...), [Architecture](./ARCHITECTURE.md), `vault.clar` |
 
 ---
 
@@ -166,7 +166,7 @@ The Vault is Conxian's core capital aggregation primitive. It provides a standar
 - **v1.2 (2025-08-26)**:
     - Refactored PRD to align with the 16-point standard format.
     - Updated content to reflect full system context from `FULL_SYSTEM_INDEX.md`.
-    - Removed Appendix A and referenced the consolidated document `SDK_AND_NAKAMOTO_UPDATES.md` for Nakamoto/Clarity3 compliance assessment.
+    - Removed Appendix A and referenced the consolidated document `standards.md` for Nakamoto/Clarity3 compliance assessment.
 - **v1.1 (2025-08-18)**:
     - Validated SDK 3.5.0 compliance and confirmed production readiness for mainnet.
 - **v1.0 (2025-08-17)**:
@@ -177,4 +177,4 @@ The Vault is Conxian's core capital aggregation primitive. It provides a standar
 
 ---
 
-For Nakamoto and Clarity3 compliance assessment, see [SDK_AND_NAKAMOTO_UPDATES.md](../SDK_AND_NAKAMOTO_UPDATES.md).
+For Nakamoto and Clarity3 compliance assessment, see [standards.md](../standards.md).

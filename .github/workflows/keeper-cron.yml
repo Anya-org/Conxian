@@ -1,5 +1,9 @@
 name: Conxian Keeper & Autonomics
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   schedule:
     # Run every 10 minutes during active hours (9 AM - 9 PM UTC)
@@ -31,6 +35,7 @@ jobs:
   health-check:
     name: System Health Check
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
     outputs:
@@ -100,6 +105,7 @@ jobs:
   autonomics:
     name: Autonomics & Rebalancing
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
     needs: [health-check]
@@ -180,6 +186,7 @@ jobs:
   watchdog:
     name: Keeper Watchdog
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
     needs: [health-check, autonomics]
@@ -252,6 +259,7 @@ jobs:
   emergency-response:
     name: Emergency Response
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
     needs: [health-check, autonomics, watchdog]
@@ -288,6 +296,7 @@ jobs:
   summary:
     name: Keeper Summary
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       contents: read
     needs: [health-check, autonomics, watchdog]

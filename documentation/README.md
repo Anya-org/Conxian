@@ -30,8 +30,7 @@ and purpose.
 - [`STATUS.md`](./STATUS.md) - Current project status
 - [`ROADMAP.md`](./ROADMAP.md) - Future development plans
 - [`CHANGELOG.md`](./CHANGELOG.md) - Version history and changes
-- [`BIP-COMPLIANCE.md`](./BIP-COMPLIANCE.md) - Bitcoin integration
-  compliance
+- [`standards.md`](./standards.md) - Standards and compliance guidelines
 
 ## Quick Navigation
 

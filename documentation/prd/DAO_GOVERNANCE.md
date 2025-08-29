@@ -6,7 +6,7 @@
 | **Version** | 1.2 |
 | **Owner** | Governance WG |
 | **Last Updated** | 2025-08-26 |
-| **References** | [AIP-2](...), [`dao-governance.clar`](../../contracts/dao-governance.clar), [`timelock.clar`](../../contracts/timelock.clar) |
+| **References** | [AIP-2](...), `dao-governance.clar`, `timelock.clar` |
 
 ---
 
@@ -148,7 +148,7 @@ The Conxian DAO (Decentralized Autonomous Organization) provides a transparent, 
     - Refactored PRD to the 16-point standard.
     - Merged "Founder Token Reallocation" into the main document for a unified view.
     - Updated content to align with `FULL_SYSTEM_INDEX.md`.
-    - Removed Appendix A and referenced the consolidated document `SDK_AND_NAKAMOTO_UPDATES.md` for Nakamoto/Clarity3 compliance assessment.
+    - Removed Appendix A and referenced the consolidated document `standards.md` for Nakamoto/Clarity3 compliance assessment.
 - **v1.1 (2025-08-18)**:
     - Validated SDK 3.5.0 compliance and confirmed production readiness.
 - **v1.0 (2025-08-17)**:
@@ -159,4 +159,4 @@ The Conxian DAO (Decentralized Autonomous Organization) provides a transparent, 
 
 ---
 
-For Nakamoto and Clarity3 compliance assessment, see [SDK_AND_NAKAMOTO_UPDATES.md](../SDK_AND_NAKAMOTO_UPDATES.md).
+For Nakamoto and Clarity3 compliance assessment, see [standards.md](../standards.md).

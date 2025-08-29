@@ -24,7 +24,7 @@ to ensure security, efficiency, and seamless interoperability with other systems
 ## Vault Interface Standard (ERC‑4626 inspired)
 
 Introduce a standard vault trait for cross-system composability.
-This trait is defined at `stacks/contracts/traits/vault-trait.clar`.
+This trait is defined at `contracts.bak/traits/vault-trait.clar`.
 
 ```clarity
 (define-trait vault-trait

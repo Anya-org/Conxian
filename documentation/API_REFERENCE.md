@@ -192,5 +192,4 @@ Integration steps:
 1) Call `dex-factory.get-pool(token-x, token-y)` (order-insensitive) to get the pool principal.
 2) Pass the pool principal into router "-direct" calls as a contract principal argument.
 
-Tip: See `stacks/tests/helpers/routerSdk.ts` for a tiny helper that abstracts these steps in tests.
-
+Tip: See `stacks/sdk-tests/multi-hop-router-v2-complex.spec.ts` for example routing flows and helper patterns used in tests.

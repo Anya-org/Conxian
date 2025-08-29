@@ -11,10 +11,15 @@ env:
   NODE_VERSION: '20'
   CLARINET_VERSION: '3.5.0'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -43,6 +48,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     needs: [test]
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -67,6 +73,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test, build]
     if: always()
+    timeout-minutes: 5
     steps:
       - name: Pipeline Status Summary
         run: |
