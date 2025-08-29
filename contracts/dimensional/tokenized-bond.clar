@@ -1,107 +1,155 @@
 ;; tokenized-bond.clar
-;; A SIP-010 compliant token representing a tokenized bond.
+;;
+;; This contract implements a SIP-010 tokenized bond.
+;; It represents a single series of bonds with uniform characteristics.
+;;
+;; Features:
+;; - SIP-010 compliant fungible token for secondary market trading.
+;; - Periodic coupon payments that can be claimed by bondholders.
+;; - Principal payout at maturity.
 
 (impl-trait .sip-010-trait.sip-010-trait)
 
+(define-constant ERR_UNAUTHORIZED u201)
+(define-constant ERR_NOT_YET_MATURED u202)
+(define-constant ERR_ALREADY_MATURED u203)
+(define-constant ERR_NO_COUPONS_DUE u204)
+(define-constant ERR_BOND_NOT_ISSUED u205)
+(define-constant ERR_ALREADY_ISSUED u210)
+
+;; --- SIP-010 Data ---
 (define-fungible-token tokenized-bond)
+(define-data-var token-name (string-ascii 32) "Tokenized Bond")
+(define-data-var token-symbol (string-ascii 10) "BOND")
+(define-data-var token-decimals uint u8)
+(define-data-var token-uri (optional (string-utf8 256)) none)
 
-(define-constant ERR_UNAUTHORIZED u101)
-(define-constant ERR_NOT_OWNER u102)
-(define-constant ERR_BOND_NOT_MATURE u103)
-(define-constant ERR_INSUFFICIENT_FUNDS u104)
-(define-constant ERR_INVALID_BOND_ID u105)
-(define-constant ERR_ALREADY_REDEEMED u106)
-
+;; --- Bond Characteristics ---
+(define-data-var bond-issued bool false)
+(define-data-var issue-block uint u0)
+(define-data-var maturity-block uint u0)
+(define-data-var coupon-rate uint u0) ;; Scaled by 10000 (e.g., 500 = 5%)
+(define-data-var coupon-frequency uint u0) ;; In blocks
+(define-data-var face-value uint u0) ;; In the smallest unit of the payment token
+(define-data-var payment-token principal 'ST000000000000000000002AMW42H.some-token) ;; placeholder
 (define-data-var contract-owner principal tx-sender)
-(define-data-var bond-id-counter uint u0)
 
-(define-map bonds uint {
-  issuer: principal,
-  principal-amount: uint,
-  coupon-rate: uint, ;; scaled by 10000
-  maturity-height: uint,
-  is-redeemed: bool
-})
+;; Map to track the last coupon period claimed by each user
+(define-map last-claimed-coupon {user: principal} {period: uint})
 
-;; --- Owner Functions ---
+(use-trait payment-token .sip-010-trait.sip-010-trait)
 
-(define-public (set-contract-owner (new-owner principal))
-  (begin
-    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
-    (var-set contract-owner new-owner)
-    (ok true)
-  )
+;; --- Contract Setup ---
+
+(define-public (issue-bond
+      (name (string-ascii 32))
+      (symbol (string-ascii 10))
+      (decimals uint)
+      (initial-supply uint)
+      (maturity-in-blocks uint)
+      (coupon-rate-scaled uint)
+      (frequency-in-blocks uint)
+      (bond-face-value uint)
+      (payment-token-address principal)
+    )
+    (begin
+        (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+        (asserts! (not (var-get bond-issued)) (err ERR_ALREADY_ISSUED))
+
+        (var-set token-name name)
+        (var-set token-symbol symbol)
+        (var-set token-decimals decimals)
+        (var-set issue-block block-height)
+        (var-set maturity-block (+ block-height maturity-in-blocks))
+        (var-set coupon-rate coupon-rate-scaled)
+        (var-set coupon-frequency frequency-in-blocks)
+        (var-set face-value bond-face-value)
+        (var-set payment-token payment-token-address)
+
+        (try! (ft-mint? tokenized-bond initial-supply (var-get contract-owner)))
+
+        (var-set bond-issued true)
+        (ok true)
+    )
 )
 
-;; --- Public Functions ---
+;; --- Coupon and Maturity Functions ---
 
-(define-public (issue-bond (principal-amount uint) (coupon-rate uint) (maturity-period uint))
-  (let ((issuer tx-sender)
-        (new-bond-id (+ (var-get bond-id-counter) u1)))
-    (var-set bond-id-counter new-bond-id)
-    (map-set bonds new-bond-id {
-      issuer: issuer,
-      principal-amount: principal-amount,
-      coupon-rate: coupon-rate,
-      maturity-height: (+ block-height maturity-period),
-      is-redeemed: false
-    })
-    (try! (ft-mint? tokenized-bond principal-amount issuer))
-    (ok new-bond-id)
-  )
-)
+(define-public (claim-coupons)
+  (let (
+      (user tx-sender)
+      (last-period (default-to u0 (get period (map-get? last-claimed-coupon {user: user}))))
+      (current-period (/ (- block-height (var-get issue-block)) (var-get coupon-frequency)))
+      (balance (ft-get-balance tokenized-bond user))
+      (payment-token-contract (var-get payment-token))
+    )
+    (asserts! (var-get bond-issued) (err ERR_BOND_NOT_ISSUED))
+    (asserts! (< block-height (var-get maturity-block)) (err ERR_ALREADY_MATURED))
+    (asserts! (> current-period last-period) (err ERR_NO_COUPONS_DUE))
 
-(define-public (redeem-bond (bond-id uint))
-  (let ((redeemer tx-sender)
-        (bond (unwrap! (map-get? bonds bond-id) (err ERR_INVALID_BOND_ID))))
-    (asserts! (is-eq redeemer (get issuer bond)) (err ERR_NOT_OWNER))
-    (asserts! (>= block-height (get maturity-height bond)) (err ERR_BOND_NOT_MATURE))
-    (asserts! (not (get is-redeemed bond)) (err ERR_ALREADY_REDEEMED))
-
-    (let ((principal-amount (get principal-amount bond))
-          (coupon-rate (get coupon-rate bond))
-          (interest (/ (* principal-amount coupon-rate) u10000)))
-      (try! (ft-burn? tokenized-bond principal-amount redeemer))
-      ;; This assumes the contract holds funds to pay interest.
-      ;; A real implementation would need a treasury to pay from.
-      (try! (as-contract (stx-transfer? interest tx-sender redeemer)))
-      (map-set bonds bond-id (merge bond {is-redeemed: true}))
-      (ok interest)
+    (let (
+        (periods-to-claim (- current-period last-period))
+        (coupon-per-token-per-period
+            (/ (* (var-get face-value) (* (var-get coupon-rate) (var-get coupon-frequency))) u525600000)
+        )
+        (total-coupon-payment (* balance (* periods-to-claim coupon-per-token-per-period)))
+      )
+      (try! (as-contract (contract-call? 'ST000000000000000000002AMW42H.some-token .transfer total-coupon-payment tx-sender user none)))
+      (map-set last-claimed-coupon {user: user} {period: current-period})
+      (ok total-coupon-payment)
     )
   )
 )
 
+(define-public (redeem-at-maturity)
+  (let (
+      (user tx-sender)
+      (balance (ft-get-balance tokenized-bond user))
+      (payment-token-contract (var-get payment-token))
+      (maturity (var-get maturity-block))
+    )
+    (asserts! (var-get bond-issued) (err ERR_BOND_NOT_ISSUED))
+    (asserts! (>= block-height maturity) (err ERR_NOT_YET_MATURED))
 
-;; --- SIP-010 Trait Implementation ---
-
-(define-read-only (get-total-supply)
-  (ok (ft-get-supply tokenized-bond))
-)
-
-(define-read-only (get-name)
-  (ok "TokenizedBond")
-)
-
-(define-read-only (get-symbol)
-  (ok "TBOND")
-)
-
-(define-read-only (get-decimals)
-  (ok u6)
-)
-
-(define-read-only (get-balance (who principal))
-  (ok (ft-get-balance tokenized-bond who))
-)
-
-(define-public (transfer (amount uint) (from principal) (to principal) (memo (optional (buff 34))))
-  (begin
-    (asserts! (is-eq from tx-sender) (err ERR_UNAUTHORIZED))
-    (try! (ft-transfer? tokenized-bond amount from to))
-    (ok true)
+    (let (
+        (last-claim-period (default-to u0 (get period (map-get? last-claimed-coupon {user: user}))))
+        (maturity-period (/ (- maturity (var-get issue-block)) (var-get coupon-frequency)))
+        (periods-to-claim (if (> maturity-period last-claim-period) (- maturity-period last-claim-period) u0))
+        (coupon-per-token-per-period
+            (/ (* (var-get face-value) (* (var-get coupon-rate) (var-get coupon-frequency))) u525600000)
+        )
+        (final-coupon-payment (* balance (* periods-to-claim coupon-per-token-per-period)))
+        (principal-payment (* balance (var-get face-value)))
+        (total-payment (+ final-coupon-payment principal-payment))
+      )
+      (asserts! (> balance u0) (err u0))
+      (try! (as-contract (contract-call? 'ST000000000000000000002AMW42H.some-token .transfer total-payment tx-sender user none)))
+      (try! (ft-burn? tokenized-bond balance user))
+      (map-set last-claimed-coupon {user: user} {period: maturity-period})
+      (ok {principal: principal-payment, coupon: final-coupon-payment})
+    )
   )
 )
 
-(define-read-only (get-token-uri)
-    (ok (some u"https://autovault.finance/token/tokenized-bond"))
+;; --- SIP-010 Trait Implementation ---
+(define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
+    (begin
+        (asserts! (is-eq sender tx-sender) (err u4))
+        (try! (ft-transfer? tokenized-bond amount sender recipient))
+        (ok true)
+    )
+)
+
+(define-read-only (get-name) (ok (var-get token-name)))
+(define-read-only (get-symbol) (ok (var-get token-symbol)))
+(define-read-only (get-decimals) (ok (var-get token-decimals)))
+(define-read-only (get-balance (who principal)) (ok (ft-get-balance tokenized-bond who)))
+(define-read-only (get-total-supply) (ok (ft-get-total-supply tokenized-bond)))
+(define-read-only (get-token-uri) (ok (var-get token-uri)))
+(define-public (set-token-uri (value (optional (string-utf8 256))))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (var-set token-uri value)
+    (ok true)
+  )
 )

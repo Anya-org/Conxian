@@ -123,3 +123,6 @@ analytics/cache/
 *.seed
 stx-wallet*
 btc-wallet*
+.kiro/specs/system-consolidation-enhancement/design.md
+.kiro/specs/system-consolidation-enhancement/requirements.md
+.kiro/specs/system-consolidation-enhancement/tasks.md
