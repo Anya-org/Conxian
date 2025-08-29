@@ -82,6 +82,57 @@ clarity_version = 2
 epoch = "2.4"
 
 # ===========================================
+# DIMENSIONAL DEFI - Metrics-driven system
+# ===========================================
+
+[contracts.dimensional-oracle-trait]
+path = "contracts/traits/dimensional-oracle-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.dim-registry-trait]
+path = "contracts/traits/dim-registry-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.dim-registry]
+path = "contracts/dimensional/dim-registry.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = []
+
+[contracts.dim-graph]
+path = "contracts/dimensional/dim-graph.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = []
+
+[contracts.dim-metrics]
+path = "contracts/dimensional/dim-metrics.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = []
+
+[contracts.dim-oracle-automation]
+path = "contracts/dimensional/dim-oracle-automation.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["dim-registry", "dimensional-oracle-trait"]
+
+[contracts.dim-yield-stake]
+path = "contracts/dimensional/dim-yield-stake.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["dim-metrics", "sip-010-trait"]
+
+[contracts.tokenized-bond]
+path = "contracts/dimensional/tokenized-bond.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["sip-010-trait"]
+
+
+# ===========================================
 # INFRASTRUCTURE - Core system contracts
 # ===========================================
 
@@ -91,26 +142,26 @@ clarity_version = 2
 epoch = "2.4"
 
 # Enhanced mathematical libraries for DeFi operations
-[contracts.math-lib-advanced]
-path = "contracts/math-lib-advanced.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.math-lib-advanced]
+# path = "contracts/math-lib-advanced.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
-# Enhanced math library with sqrt, pow, ln functions for Phase 3
-[contracts.math-lib-enhanced]
-path = "contracts/math-lib-enhanced.clar"
-clarity_version = 2
-epoch = "2.4"
+# # Enhanced math library with sqrt, pow, ln functions for Phase 3
+# [contracts.math-lib-enhanced]
+# path = "contracts/math-lib-enhanced.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
-[contracts.fixed-point-math]
-path = "contracts/fixed-point-math.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.fixed-point-math]
+# path = "contracts/fixed-point-math.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
-[contracts.precision-calculator]
-path = "contracts/precision-calculator.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.precision-calculator]
+# path = "contracts/precision-calculator.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 [contracts.mock-ft]
 path = "contracts/mock-ft.clar"
@@ -127,10 +178,10 @@ path = "contracts/timelock.clar"
 clarity_version = 2
 epoch = "2.4"
 
-[contracts.circuit-breaker]
-path = "contracts/circuit-breaker.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.circuit-breaker]
+# path = "contracts/circuit-breaker.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 # ===========================================
 # GOVERNANCE - DAO and governance system
@@ -146,10 +197,10 @@ path = "contracts/dao.clar"
 clarity_version = 2
 epoch = "2.4"
 
-[contracts.dao-governance]
-path = "contracts/dao-governance.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.dao-governance]
+# path = "contracts/dao-governance.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 [contracts.dao-automation]
 path = "contracts/dao-automation.clar"
@@ -161,10 +212,10 @@ path = "contracts/enhanced-governance.clar"
 clarity_version = 2
 epoch = "2.4"
 
-[contracts.governance-test-helper]
-path = "contracts/governance-test-helper.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.governance-test-helper]
+# path = "contracts/governance-test-helper.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 # ===========================================
 # VAULT SYSTEM - Core vault functionality
@@ -190,21 +241,21 @@ path = "contracts/treasury.clar"
 clarity_version = 2
 epoch = "2.4"
 
-[contracts.enhanced-yield-strategy]
-path = "contracts/enhanced-yield-strategy.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.enhanced-yield-strategy]
+# path = "contracts/enhanced-yield-strategy.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
-[contracts.enhanced-yield-strategy-simple]
-path = "contracts/enhanced-yield-strategy-simple.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.enhanced-yield-strategy-simple]
+# path = "contracts/enhanced-yield-strategy-simple.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 ## ENABLED: complex yield strategy (experimental)
-[contracts.enhanced-yield-strategy-complex]
-path = "contracts/enhanced-yield-strategy-complex.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.enhanced-yield-strategy-complex]
+# path = "contracts/enhanced-yield-strategy-complex.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 # [contracts.multi-hop-router-v2-complex]
 # path = "contracts/multi-hop-router-v2-complex.clar"
@@ -273,21 +324,21 @@ epoch = "2.4"
 # DEX ECOSYSTEM - AMM and liquidity pools
 # ===========================================
 
-[contracts.dex-factory-enhanced]
-path = "contracts/dex-factory-enhanced.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.dex-factory-enhanced]
+# path = "contracts/dex-factory-enhanced.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
-[contracts.dex-factory]
-path = "contracts/dex-factory.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.dex-factory]
+# path = "contracts/dex-factory.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 # Enhanced DEX Factory V2 with multi-pool type support
-[contracts.dex-factory-v2]
-path = "contracts/dex-factory-v2.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.dex-factory-v2]
+# path = "contracts/dex-factory-v2.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 [contracts.dex-pool]
 path = "contracts/dex-pool.clar"
@@ -305,10 +356,10 @@ clarity_version = 2
 epoch = "2.4"
 
 # Enhanced stable pool with Curve-style StableSwap invariant
-[contracts.stable-pool-enhanced]
-path = "contracts/stable-pool-enhanced.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.stable-pool-enhanced]
+# path = "contracts/stable-pool-enhanced.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 [contracts.weighted-pool]
 path = "contracts/weighted-pool.clar"
@@ -316,68 +367,68 @@ clarity_version = 2
 epoch = "2.4"
 
 # Concentrated liquidity system (Uniswap V3 style)
-[contracts.concentrated-liquidity-pool]
-path = "contracts/concentrated-liquidity-pool.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.concentrated-liquidity-pool]
+# path = "contracts/concentrated-liquidity-pool.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
-[contracts.concentrated-swap-logic]
-path = "contracts/concentrated-swap-logic.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.concentrated-swap-logic]
+# path = "contracts/concentrated-swap-logic.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
-[contracts.tick-math]
-path = "contracts/tick-math.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.tick-math]
+# path = "contracts/tick-math.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
-[contracts.position-nft]
-path = "contracts/position-nft.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.position-nft]
+# path = "contracts/position-nft.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 [contracts.pool-factory]
 path = "contracts/pool-factory.clar"
 clarity_version = 2
 epoch = "2.4"
 
-[contracts.dex-router]
-path = "contracts/dex-router.clar"
-clarity_version = 2
-epoch = "2.4"
-
-[contracts.multi-hop-router]
-path = "contracts/multi-hop-router.clar"
-clarity_version = 2
-epoch = "2.4"
-
-# [contracts.multi-hop-router-v2]
-# path = "contracts/multi-hop-router-v2.clar"
+# [contracts.dex-router]
+# path = "contracts/dex-router.clar"
 # clarity_version = 2
 # epoch = "2.4"
 
-# [contracts.multi-hop-router-v2-simple]
-# path = "contracts/multi-hop-router-v2-simple.clar"
+# [contracts.multi-hop-router]
+# path = "contracts/multi-hop-router.clar"
 # clarity_version = 2
 # epoch = "2.4"
 
-# ## ENABLED: multi-hop router v2 complex (experimental)
-# [contracts.multi-hop-router-v2-complex]
-# path = "contracts/multi-hop-router-v2-complex-fixed.clar"
+# # [contracts.multi-hop-router-v2]
+# # path = "contracts/multi-hop-router-v2.clar"
+# # clarity_version = 2
+# # epoch = "2.4"
+
+# # [contracts.multi-hop-router-v2-simple]
+# # path = "contracts/multi-hop-router-v2-simple.clar"
+# # clarity_version = 2
+# # epoch = "2.4"
+
+# # ## ENABLED: multi-hop router v2 complex (experimental)
+# # [contracts.multi-hop-router-v2-complex]
+# # path = "contracts/multi-hop-router-v2-complex-fixed.clar"
+# # clarity_version = 2
+# # epoch = "2.4"
+
+# # Advanced Multi-Hop Router V3 with Dijkstra's algorithm
+# [contracts.multi-hop-router-v3]
+# path = "contracts/multi-hop-router-v3.clar"
 # clarity_version = 2
 # epoch = "2.4"
 
-# Advanced Multi-Hop Router V3 with Dijkstra's algorithm
-[contracts.multi-hop-router-v3]
-path = "contracts/multi-hop-router-v3.clar"
-clarity_version = 2
-epoch = "2.4"
-
-  # Fee tier management system for Phase 3
-  [contracts.fee-tier-manager]
-  path = "contracts/fee-tier-manager.clar"
-  clarity_version = 2
-  epoch = "2.4"
+  # # Fee tier management system for Phase 3
+  # [contracts.fee-tier-manager]
+  # path = "contracts/fee-tier-manager.clar"
+  # clarity_version = 2
+  # epoch = "2.4"
 
   # Enhanced TWAP oracle with manipulation resistance (disabled: file missing)
   # [contracts.twap-oracle-enhanced]
@@ -392,10 +443,10 @@ epoch = "2.4"
   # epoch = "2.4"
 
 # Institutional APIs and risk management for Phase 3
-[contracts.institutional-apis]
-path = "contracts/institutional-apis.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.institutional-apis]
+# path = "contracts/institutional-apis.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 [contracts.mock-dex]
 path = "contracts/mock-dex.clar"
@@ -406,10 +457,10 @@ epoch = "2.4"
 # ORACLE SYSTEM - Price feeds and TWAP
 # ===========================================
 
-[contracts.oracle-aggregator-enhanced]
-path = "contracts/oracle-aggregator-enhanced.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.oracle-aggregator-enhanced]
+# path = "contracts/oracle-aggregator-enhanced.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 [contracts.oracle-aggregator]
 path = "contracts/oracle-aggregator.clar"
@@ -427,10 +478,10 @@ clarity_version = 2
 epoch = "2.4"
 
 ## ENABLED: advanced TWAP oracle v2 complex (experimental)
-[contracts.twap-oracle-v2-complex]
-path = "contracts/twap-oracle-v2-complex.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.twap-oracle-v2-complex]
+# path = "contracts/twap-oracle-v2-complex.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 # ===========================================
 # BOUNTY & ANALYTICS - Monitoring and rewards
@@ -446,20 +497,20 @@ path = "contracts/advanced-caching-system.clar"
 clarity_version = 2
 epoch = "2.4"
 
-[contracts.dynamic-load-distribution]
-path = "contracts/dynamic-load-distribution.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.dynamic-load-distribution]
+# path = "contracts/dynamic-load-distribution.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 [contracts.bounty-system]
 path = "contracts/bounty-system.clar"
 clarity_version = 2
 epoch = "2.4"
 
-[contracts.automated-bounty-system]
-path = "contracts/automated-bounty-system.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.automated-bounty-system]
+# path = "contracts/automated-bounty-system.clar"
+# clarity_version = 2
+# epoch = "2.4"
 
 [contracts.analytics]
 path = "contracts/analytics.clar"
@@ -529,22 +580,22 @@ epoch = "2.4"
 # ENHANCED ANALYTICS - Advanced monitoring
 # ===========================================
 
-[contracts.enhanced-analytics]
-path = "contracts/enhanced-analytics.clar"
-clarity_version = 2
-epoch = "2.4"
-
-# [contracts.enhanced-health-monitoring]
-# path = "contracts/enhanced-health-monitoring.clar"
+# [contracts.enhanced-analytics]
+# path = "contracts/enhanced-analytics.clar"
 # clarity_version = 2
 # epoch = "2.4"
 
-[contracts.governance-metrics]
-path = "contracts/governance-metrics.clar"
-clarity_version = 2
-epoch = "2.4"
+# # [contracts.enhanced-health-monitoring]
+# # path = "contracts/enhanced-health-monitoring.clar"
+# # clarity_version = 2
+# # epoch = "2.4"
 
-[contracts.reputation-token]
-path = "contracts/reputation-token.clar"
-clarity_version = 2
-epoch = "2.4"
+# [contracts.governance-metrics]
+# path = "contracts/governance-metrics.clar"
+# clarity_version = 2
+# epoch = "2.4"
+
+# [contracts.reputation-token]
+# path = "contracts/reputation-token.clar"
+# clarity_version = 2
+# epoch = "2.4"

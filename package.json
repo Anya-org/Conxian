@@ -1,44 +1,29 @@
 {
   "name": "autovault",
   "version": "0.1.1",
-  "private": true,
+  "description": "AutoVault is a sophisticated DeFi yield optimization protocol on Stacks, designed to automate and enhance returns from liquidity provision and yield farming.",
   "scripts": {
-    "test": "node ./scripts/ensure-deps.js && npx vitest run --config ./vitest.config.ts",
-    "test:watch": "node ./scripts/ensure-deps.js && npx vitest watch --config ./vitest.config.ts",
-    "test:auto": "chokidar 'contracts/**/*.clar' 'tests/**/*.ts' 'stacks/sdk-tests/**/*.spec.ts' -c 'node ./scripts/ensure-deps.js && npm run check && npx vitest run --config ./vitest.config.ts'",
-    "test:manual": "./scripts/manual-testing.sh",
-    "update-autonomics": "node ./scripts/ensure-deps.js && ts-node ./scripts/sdk_update_autonomics.ts",
-    "deploy-contracts": "node ./scripts/ensure-deps.js && ts-node ./scripts/sdk_deploy_contracts.ts",
-    "deploy-testnet": "./scripts/deploy-testnet.sh",
-    "verify-post": "node ./scripts/ensure-deps.js && ts-node ./scripts/post_deploy_verify.ts",
-    "verify-post:enhanced": "node ./scripts/ensure-deps.js && NODE_PATH=./node_modules node -r ts-node/register ./scripts/enhanced-post-deployment-verification.ts",
-    "quality-gates": "node ./scripts/ensure-deps.js && npm run check && npx vitest run && NODE_PATH=./node_modules node -r ts-node/register ./scripts/enhanced-post-deployment-verification.ts",
-    "generate-deployer-key": "node -r ts-node/register ./scripts/generate-deployer-key.ts",
-    "gen-key": "node stacks/generate-deployer-key.js",
-    "console": "npx clarinet console",
-    "console:testnet": "npx clarinet console --testnet",
-    "check": "node ./stacks/clarinet-wrapper/index.js check",
-    "ci": "node ./scripts/ensure-deps.js && npm run check && npx vitest run",
-    "pre-deploy": "node ./scripts/ensure-deps.js && npm run ci && ./scripts/manual-testing.sh",
-    "analyze:coverage": "echo 'Coverage report: reports/coverage-detailed.lcov'",
-    "analyze:costs": "echo 'Gas costs report: reports/gas-costs.json'"
-  },
-  "devDependencies": {
-    "@hirosystems/clarinet-sdk": "3.5.0",
-    "@types/node": "^18.19.0",
-    "chokidar-cli": "3.0.0",
-    "clarinet": "file:stacks/clarinet-wrapper",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.4.0",
-    "vitest": "^3.2.4"
+    "start": "npx nodemon",
+    "test": "npx vitest",
+    "ci": "node ./scripts/ensure-deps.js && npx vitest run",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@scure/bip32": "^1.5.0",
-    "@stacks/network": "^7.0.6",
-    "@stacks/transactions": "^7.0.6",
-    "@types/node-fetch": "^2.6.13",
-    "bip39": "^3.1.0",
-    "dotenv": "^16.4.5",
+    "@scure/base": "^1.1.6",
+    "@scure/btc-signer": "^1.1.0",
+    "@stacks/blockchain-api-client": "^7.8.0",
+    "@stacks/network": "^6.10.0",
+    "@stacks/stacking": "^6.11.0",
+    "@stacks/transactions": "^6.10.0",
+    "@hirosystems/clarinet-sdk": "^3.5.0",
+    "bignumber.js": "^9.1.2",
     "node-fetch": "^3.3.2"
-  }
+  },
+  "devDependencies": {
+    "@vitest/coverage-c8": "^0.33.0",
+    "typescript": "^5.4.5",
+    "vitest": "^0.34.6",
+    "clarigen": "^2.2.0"
+  },
+  "private": true
 }
