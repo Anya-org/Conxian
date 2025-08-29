@@ -47,7 +47,7 @@ jobs:
       - name: Security Scanning
         id: security
         run: |
-          echo "🔒 Running security scanning..."
+          echo " Running security scanning..."
           # Basic grep for potential secrets (non-blocking)
           if git grep -i -n "PRIVATE KEY" || true; then
             echo "Review potential secret findings above (if any)."

@@ -122,7 +122,7 @@ CXG Supply: 100,000,000 tokens
 ├── DAO Community: 30,000,000 (30%) - Broad participation
 ├── Team/Founders: 20,000,000 (20%) - Vested over time
 ├── Treasury Ops: 20,000,000 (20%) - Protocol operations  
-├── Migration Pool: 20,000,000 (20%) - ACTR/CVLP conversion
+├── Migration Pool: 20,000,000 (20%) - CXTR/CVLP conversion
 └── Reserve Fund: 10,000,000 (10%) - Emergency expansion
 
 CVLP Supply: 50,000,000 tokens (migrates to CXG)
