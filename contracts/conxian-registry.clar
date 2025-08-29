@@ -249,9 +249,7 @@
       (ok true))))
 
 ;; Deprecate a contract version
-(define-public (deprecate-version 
-  contract-type (string-ascii 20)
-  version (string-ascii 10))
+(define-public (deprecate-version (contract-type (string-ascii 20)) (version (string-ascii 10)))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
     (let ((contract-info (unwrap! (map-get? contract-registry {contract-type: contract-type, version: version})
@@ -330,4 +328,4 @@
   (var-get registry-active))
 
 ;; Initialize the registry with core contracts on deployment
-(initialize-core-contracts)
+(initialize-core-contracts))
