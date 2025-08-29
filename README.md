@@ -1,6 +1,6 @@
 # AutoVault
 
-[![Tests](https://img.shields.io/badge/Tests-130%2F131%20Passing-green)](https://github.com/Anya-org/AutoVault)
+[![Tests](https://img.shields.io/badge/Tests-0%2F131%20Passing-red)](https://github.com/Anya-org/AutoVault)
 [![Contracts](https://img.shields.io/badge/Contracts-75%20Compiled-blue)](https://github.com/Anya-org/AutoVault)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -22,6 +22,12 @@ A production-ready DeFi platform on Stacks with enhanced tokenomics, automated D
 - **Security & Precision**: Multi-sig treasury, emergency pause, precision math, enterprise monitoring
 
 [Complete Feature Documentation](./documentation/)
+
+## Core Principles
+
+- **Security-First & Bitcoin-Aligned**: Every contract is designed with the highest level of security and certainty in mind, reflecting the robustness expected from a Bitcoin-aligned system.
+- **High-Value Asset Management**: The platform is built as a financial-grade system for high-value assets, ensuring all logic is sound, transparent, and aligns with best practices in asset management.
+- **Code-Rooted Financial Engineering**: All complex financial logic is implemented directly and transparently on-chain in Clarity, ensuring the system's core value is derived from verifiable code, not off-chain processes.
 
 ## Quick Start
 
