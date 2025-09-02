@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# AutoVault verification helper
+# Conxian verification helper
 # - Runs Clarinet compile checks
 # - Prints guided steps for local console and testnet verification
 

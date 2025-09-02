@@ -1,8 +1,8 @@
-# 🏗️ AutoVault System Architecture Graph
+# 🏗️ Conxian System Architecture Graph
 
 ## 📊 **MASTER SYSTEM ARCHITECTURE**
 
-This document provides the comprehensive **architectural graph and dependency mapping** for the AutoVault DeFi ecosystem, ensuring systematic upgrades and maintenance.
+This document provides the comprehensive **architectural graph and dependency mapping** for the Conxian DeFi ecosystem, ensuring systematic upgrades and maintenance.
 
 ---
 
@@ -52,7 +52,7 @@ graph TB
         MOCKFT[mock-ft.clar]
         GOVTOKEN[gov-token.clar]
         CXVGTOKEN[cxvg-token.clar]
-        AVLPTOKEN[avlp-token.clar]
+        AVLPTOKEN[cxlp-token.clar]
         CREATORTOKEN[creator-token.clar]
     end
 
@@ -227,7 +227,7 @@ graph TB
 | Contract | Purpose | Max Supply | Used By |
 |----------|---------|------------|---------|
 | `cxvg-token.clar` | Governance token | 10M | treasury, vault, dao |
-| `avlp-token.clar` | Liquidity pool token | 5M | vault |
+| `cxlp-token.clar` | Liquidity pool token | 5M | vault |
 | `gov-token.clar` | DAO voting token | Variable | dao, enhanced-governance |
 | `creator-token.clar` | Merit-based rewards | Variable | bounty-system |
 | `mock-ft.clar` | Testing token | Unlimited | Development only |
@@ -465,4 +465,4 @@ analytics.clar ← Monitoring systems
 
 ---
 
-*This architecture graph serves as the **master reference** for all AutoVault system modifications, ensuring systematic and safe upgrades while maintaining the comprehensive DeFi vision.*
+*This architecture graph serves as the **master reference** for all Conxian system modifications, ensuring systematic and safe upgrades while maintaining the comprehensive DeFi vision.*

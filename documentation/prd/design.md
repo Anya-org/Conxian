@@ -1,10 +1,10 @@
-# AutoVault System Upgrade Design Document
+# Conxian System Upgrade Design Document
 
 ## Overview
 
-This design document outlines the architectural enhancements needed to transform AutoVault from a Tier 2 to Tier 1 DeFi protocol. The design maintains backward compatibility while adding enterprise-grade features, advanced mathematical capabilities, and multiple pool types to compete with leading protocols like Uniswap V3, Curve, and Aave.
+This design document outlines the architectural enhancements needed to transform Conxian from a Tier 2 to Tier 1 DeFi protocol. The design maintains backward compatibility while adding enterprise-grade features, advanced mathematical capabilities, and multiple pool types to compete with leading protocols like Uniswap V3, Curve, and Aave.
 
-The upgrade leverages AutoVault's existing strengths (Bitcoin-native positioning, security-first architecture, comprehensive governance) while addressing critical gaps in capital efficiency, mathematical sophistication, and enterprise features.
+The upgrade leverages Conxian's existing strengths (Bitcoin-native positioning, security-first architecture, comprehensive governance) while addressing critical gaps in capital efficiency, mathematical sophistication, and enterprise features.
 
 ## Architecture
 
@@ -12,7 +12,7 @@ The upgrade leverages AutoVault's existing strengths (Bitcoin-native positioning
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    AutoVault Enhanced Platform                   │
+│                    Conxian Enhanced Platform                   │
 ├─────────────────────────────────────────────────────────────────┤
 │  Frontend Layer                                                 │
 │  ├── User Interface (Enhanced)                                  │
@@ -511,4 +511,4 @@ The design implements a **dual-layer architecture** where:
 - Deploy monitoring and analytics
 - Launch user migration tools
 
-This design provides a comprehensive roadmap for transforming AutoVault into a Tier 1 DeFi protocol while maintaining its unique Bitcoin-native advantages and ensuring complete backward compatibility with existing user positions and integrations.
+This design provides a comprehensive roadmap for transforming Conxian into a Tier 1 DeFi protocol while maintaining its unique Bitcoin-native advantages and ensuring complete backward compatibility with existing user positions and integrations.

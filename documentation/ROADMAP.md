@@ -1,6 +1,6 @@
-# AutoVault Roadmap
+# Conxian Roadmap
 
-This roadmap outlines the planned development and deployment phases for AutoVault.
+This roadmap outlines the planned development and deployment phases for Conxian.
 
 ## 🎯 Current Status: **PRODUCTION READY**
 
@@ -15,7 +15,7 @@ This roadmap outlines the planned development and deployment phases for AutoVaul
 ### 🚀 Core Platform
 
 - ✅ 30 Smart contracts compiling (core + extended modules)
-- ✅ Enhanced tokenomics (10M CXVG / 5M AVLP)
+- ✅ Enhanced tokenomics (10M CXVG / 5M CXLP)
 - ✅ Automated DAO governance system
 - ✅ Multi-signature treasury controls
 - ✅ Emergency pause mechanisms
@@ -199,7 +199,7 @@ This roadmap is **community-driven** and will evolve based on:
 
 ## ✅ Commitment
 
-AutoVault is committed to:
+Conxian is committed to:
 
 - **Transparency**: Open development and regular updates
 - **Security**: Continuous security improvements and audits

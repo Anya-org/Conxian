@@ -2,7 +2,7 @@ import { describe, expect, it, beforeEach } from '@jest/globals';
 import { Cl } from '@stacks/transactions';
 
 // Comprehensive Pool Type Integration Tests
-describe('AutoVault Pool Type Integration Tests', () => {
+describe('Conxian Pool Type Integration Tests', () => {
   let deployer: string;
   let user1: string;
   let user2: string;

@@ -61,7 +61,7 @@
     (asserts! (> amount u0) (err ERR_INVALID_AMOUNT))
     (asserts! (is-some (map-get? dimension-params {dim-id: dim-id})) (err ERR_DIMENSION_NOT_CONFIGURED))
     (let ((staker tx-sender))
-      (try! (contract-call? (var-get token-contract) .transfer amount staker (as-contract tx-sender) none))
+      (try! (contract-call? (var-get token-contract) transfer amount staker (as-contract tx-sender) none))
       (map-set stakes
         {staker: staker, dim-id: dim-id}
         {amount: amount, unlock-height: (+ block-height lock-period), lock-period: lock-period}
@@ -86,9 +86,9 @@
     ;; Calculate rewards
     (let ((rewards (try! (calculate-rewards-for-stake stake-info dim-id))))
       ;; Mint rewards to the staker
-      (try! (contract-call? (var-get token-contract) .mint rewards staker))
+      (try! (contract-call? (var-get token-contract) mint rewards staker))
       ;; Return principal to the staker
-      (try! (as-contract (contract-call? (var-get token-contract) .transfer staked-amount tx-sender staker none)))
+      (try! (as-contract (contract-call? (var-get token-contract) transfer staked-amount tx-sender staker none)))
       ;; Delete stake info
       (map-delete stakes {staker: staker, dim-id: dim-id})
       (ok {rewards: rewards, principal: staked-amount})
@@ -108,7 +108,7 @@
       (k (get k params))
       (metrics-contract (var-get dim-metrics-contract))
       ;; Metric ID for utilization is u1
-      (metric-optional (try! (contract-call? metrics-contract .get-metric dim-id u1)))
+      (metric-optional (try! (contract-call? metrics-contract get-metric dim-id u1)))
       (utilization-metric (unwrap! metric-optional (err ERR_METRIC_NOT_FOUND)))
       (utilization (get value utilization-metric))
     )

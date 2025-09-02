@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Governance Proposal Builder - Minimal implementation for workflow
-Builds and validates governance proposals for AutoVault DAO
+Builds and validates governance proposals for Conxian DAO
 """
 
 import json

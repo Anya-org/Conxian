@@ -24,11 +24,19 @@ The current system demonstrates sophisticated architecture with a proven dimensi
 **Consolidation Priorities:**
 
  
-- 🔄 Activate commented-out contracts in Clarinet.toml configuration
-- 🔄 Consolidate multiple vault implementations into single production system
-- 🔄 Integrate existing DEX components into unified ecosystem
-- ➕ Complete 4-token system with missing CXD revenue-sharing token
-- 🧹 Remove experimental/duplicate contracts and clean architecture
+- Activate commented-out contracts in Clarinet.toml configuration
+- Consolidate multiple vault implementations into single production system
+- Integrate existing DEX components into unified ecosystem
+- Complete 4-token system with missing CXD revenue-sharing token
+- Remove experimental/duplicate contracts and clean architecture
+
+## Dynamic SIP-010 Dispatch (Implementation Notes)
+
+Dynamic dispatch implementation and testing guidance is centralized to avoid duplication.
+Refer to:
+
+- `.windsurf/workflows/token-standards.md` → "Dynamic Dispatch Notes (SIP-010)"
+- `.windsurf/workflows/design.md` → "Tokenized-Bond Dynamic SIP-010 Dispatch"
 
 ## Requirements
 
@@ -89,7 +97,7 @@ The current system demonstrates sophisticated architecture with a proven dimensi
 1. WHEN activating security systems THEN existing circuit-breaker.clar SHALL be integrated with all core contracts for automated protection
 2. WHEN monitoring operations THEN enterprise-monitoring.clar and enhanced-analytics.clar SHALL provide comprehensive real-time visibility
 3. WHEN managing access THEN existing multi-signature and timelock contracts SHALL be properly integrated for institutional controls
-4. WHEN tracking system health THEN autovault-health-monitor.clar SHALL provide automated alerting and status reporting
+4. WHEN tracking system health THEN a system health monitoring contract SHALL provide automated alerting and status reporting
 5. WHEN assessing performance THEN existing performance-optimizer.clar SHALL provide institutional-grade optimization and reporting
 
 ### Requirement 6: Complete 4-Token Economic System

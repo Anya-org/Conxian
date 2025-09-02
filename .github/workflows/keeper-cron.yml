@@ -1,4 +1,4 @@
-name: AutoVault Keeper & Autonomics
+name: Conxian Keeper & Autonomics
 
 on:
   schedule:
@@ -295,7 +295,7 @@ jobs:
     steps:
       - name: Generate Summary Report
         run: |
-          echo "## 🤖 AutoVault Keeper Report" >> $GITHUB_STEP_SUMMARY
+          echo "## 🤖 Conxian Keeper Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Execution Time:** $(date -u)" >> $GITHUB_STEP_SUMMARY
           echo "**Network:** ${{ env.NETWORK }}" >> $GITHUB_STEP_SUMMARY

@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug in AutoVault
+about: Report a bug in Conxian
 title: '[BUG] '
 labels: ['bug']
 assignees: ''

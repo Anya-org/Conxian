@@ -15,7 +15,7 @@ HIRO_API_HEADER=${HIRO_API_HEADER:-Authorization: Bearer}
 
 if [[ -z "${VESTING_CONTRACT_ADDR:-}" || -z "${VESTING_CONTRACT_NAME:-}" ]]; then
   cat <<'EOF'
-[AutoVault] Creator vesting contract not configured.
+[Conxian] Creator vesting contract not configured.
 Provide env vars and re-run:
   export VESTING_CONTRACT_ADDR=SP...
   export VESTING_CONTRACT_NAME=vesting

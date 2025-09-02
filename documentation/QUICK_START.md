@@ -1,6 +1,6 @@
-# AutoVault Quick Start Guide
+# Conxian Quick Start Guide
 
-**Get started with AutoVault in 5 minutes** - Your fast track to Bitcoin-native DeFi.
+**Get started with Conxian in 5 minutes** - Your fast track to Bitcoin-native DeFi.
 
 ## 🚀 Quick Setup (2 minutes)
 
@@ -12,7 +12,7 @@
 
 ### 2. Connect & Deposit
 
-1. Connect wallet to AutoVault
+1. Connect wallet to Conxian
 2. Enter deposit amount
 3. Confirm transaction (0.30% fee)
 4. Receive vault shares automatically
@@ -46,7 +46,7 @@ Hold CXVG → Vote on Proposals → Earn Revenue Share (80%)
 ### 💱 Trading
 
 ```
-DEX Swaps → Provide Liquidity → Earn Trading Fees + AVLP Rewards
+DEX Swaps → Provide Liquidity → Earn Trading Fees + CXLP Rewards
 ```
 
 - **Multi-hop**: Automatic optimal routing
@@ -59,15 +59,15 @@ DEX Swaps → Provide Liquidity → Earn Trading Fees + AVLP Rewards
 
 | Token | Purpose | Supply | How to Get |
 |-------|---------|---------|------------|
-| **CXVG** | Governance + Revenue | 100M | Migrate AVLP tokens |
-| **AVLP** | Liquidity Rewards | 50M | Vault deposits, DEX liquidity |
+| **CXVG** | Governance + Revenue | 100M | Migrate CXLP tokens |
+| **CXLP** | Liquidity Rewards | 50M | Vault deposits, DEX liquidity |
 | **Creator** | Merit Rewards | Variable | Contribute to platform |
 
 ### Migration Schedule
 
-- **Epoch 1**: 1 AVLP = 1 CXVG (Week 1)
-- **Epoch 2**: 1 AVLP = 0.8 CXVG (Weeks 2-3)  
-- **Epoch 3**: 1 AVLP = 0.6 CXVG (Weeks 3-4, final)
+- **Epoch 1**: 1 CXLP = 1 CXVG (Week 1)
+- **Epoch 2**: 1 CXLP = 0.8 CXVG (Weeks 2-3)  
+- **Epoch 3**: 1 CXLP = 0.6 CXVG (Weeks 3-4, final)
 
 ---
 
@@ -82,7 +82,7 @@ DEX Swaps → Provide Liquidity → Earn Trading Fees + AVLP Rewards
 
 ### Your Security Checklist
 
-- [ ] Use official AutoVault interface only
+- [ ] Use official Conxian interface only
 - [ ] Verify all transaction details
 - [ ] Start with small amounts
 - [ ] Keep wallet software updated
@@ -133,7 +133,7 @@ DEX Swaps → Provide Liquidity → Earn Trading Fees + AVLP Rewards
 1. Deposit assets to vault
 2. Monitor APY and performance
 3. Consider providing DEX liquidity
-4. Accumulate AVLP for CXVG migration
+4. Accumulate CXLP for CXVG migration
 
 ### For Governance Participants
 
@@ -178,12 +178,12 @@ DEX Swaps → Provide Liquidity → Earn Trading Fees + AVLP Rewards
 
 ## 🔗 Essential Links
 
-- **Platform**: [AutoVault Interface]
+- **Platform**: [Conxian Interface]
 - **Full Manual**: [Complete User Guide](./USER_MANUAL.md)
 - **Technical Docs**: [Developer Documentation](./DEVELOPER_GUIDE.md)
 - **Security**: [Security Guide](./SECURITY.md)
 - **Community**: [Discord Server]
-- **Code**: [GitHub Repository](https://github.com/Anya-org/AutoVault)
+- **Code**: [GitHub Repository](https://github.com/Anya-org/Conxian)
 
 ---
 

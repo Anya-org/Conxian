@@ -1,8 +1,8 @@
-# AutoVault System Upgrade Requirements
+# Conxian System Upgrade Requirements
 
 ## Introduction
 
-AutoVault is a comprehensive Bitcoin-native DeFi platform built on Stacks with 75+ production-ready contracts and 130/131 passing tests. While the system demonstrates strong foundational architecture and security features, analysis against leading DeFi protocols reveals critical gaps that must be addressed to achieve enterprise-grade competitive positioning. This requirements document outlines the necessary enhancements to transform AutoVault from a Tier 2 to Tier 1 DeFi protocol while maintaining backward compatibility and leveraging its unique Bitcoin-native advantages.
+Conxian is a comprehensive Bitcoin-native DeFi platform built on Stacks with 75+ production-ready contracts and 130/131 passing tests. While the system demonstrates strong foundational architecture and security features, analysis against leading DeFi protocols reveals critical gaps that must be addressed to achieve enterprise-grade competitive positioning. This requirements document outlines the necessary enhancements to transform Conxian from a Tier 2 to Tier 1 DeFi protocol while maintaining backward compatibility and leveraging its unique Bitcoin-native advantages.
 
 ## Requirements
 
@@ -92,7 +92,7 @@ AutoVault is a comprehensive Bitcoin-native DeFi platform built on Stacks with 7
 
 ### Requirement 8: Enterprise Integration Features
 
-**User Story:** As an institutional user, I want enterprise-grade features (APIs, compliance, risk management) so that I can integrate AutoVault into professional trading and treasury management systems.
+**User Story:** As an institutional user, I want enterprise-grade features (APIs, compliance, risk management) so that I can integrate Conxian into professional trading and treasury management systems.
 
 #### Acceptance Criteria
 
@@ -116,7 +116,7 @@ AutoVault is a comprehensive Bitcoin-native DeFi platform built on Stacks with 7
 
 ### Requirement 10: Cross-Protocol Integration
 
-**User Story:** As a DeFi user, I want seamless integration with other Stacks protocols so that I can access broader DeFi functionality while maintaining my AutoVault positions.
+**User Story:** As a DeFi user, I want seamless integration with other Stacks protocols so that I can access broader DeFi functionality while maintaining my Conxian positions.
 
 #### Acceptance Criteria
 
@@ -128,7 +128,7 @@ AutoVault is a comprehensive Bitcoin-native DeFi platform built on Stacks with 7
 
 ### Requirement 11: Backward Compatibility Assurance
 
-**User Story:** As an existing AutoVault user, I want all new features to be backward compatible so that my existing positions and integrations continue to work without disruption.
+**User Story:** As an existing Conxian user, I want all new features to be backward compatible so that my existing positions and integrations continue to work without disruption.
 
 #### Acceptance Criteria
 

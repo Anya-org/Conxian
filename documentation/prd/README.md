@@ -1,6 +1,6 @@
 # Product Requirements Documents (PRDs)
 
-Centralized, versioned PRDs for major AutoVault subsystems. Each PRD follows a consistent format to reduce ambiguity between architecture intent, governance proposals (AIPs), and implementation.
+Centralized, versioned PRDs for major Conxian subsystems. Each PRD follows a consistent format to reduce ambiguity between architecture intent, governance proposals (AIPs), and implementation.
 
 ## Index
 

@@ -3,18 +3,6 @@ description: System Consolidation & Enhancement Design
 auto_execution_mode: 3
 ---
 
-## Overview
-
-This design document outlines the technical approach for consolidating and enhancing the Conxian protocol (formerly AutoVault) to achieve competitive positioning in the Bitcoin-native DeFi space. The design focuses on eliminating contract duplication, implementing missing mathematical foundations, and creating a clean, enterprise-grade architecture that leverages Bitcoin's security model through Stacks.
-
-**Current State Analysis**: The system currently has 51+ contracts defined in Clarinet.toml but only 8 actual contract files exist, with most being dimensional logic contracts. This presents a significant opportunity to rebuild the system properly around the existing dimensional architecture.
-
-**Enhanced System Requirements**: The system will be rebuilt with comprehensive tokenomics (CXD revenue-sharing token, 100M CXVG governance, 50M CXLP liquidity with 4-year financial cycles), fully automated DAO with metrics-driven operations, complete DEX ecosystem supporting all Stacks DeFi tokens, circuit breaker monitoring, and creator economy integration.
-
-**Dimensional Logic Foundation**: The existing dimensional contracts provide a sophisticated foundation that will be enhanced with full SDK 3.5.0 functionality, comprehensive tokenomics integration, and enterprise-grade automation.
-
-## Architecture
-
 ### High-Level System Architecture
 - Dimensional core: `dim-registry`, `dim-metrics`, `dim-oracle-automation`, `dim-yield-stake`, `tokenized-bond`, `dim-graph`
 - DeFi layer: consolidated vault, treasury, strategy manager, governance
@@ -23,14 +11,10 @@ This design document outlines the technical approach for consolidating and enhan
 - Security & monitoring: circuit breaker, enterprise monitoring, multi-sig
 - All layers wired via dimensional metrics for automation and safety
 
-### Contract Consolidation Strategy
-
 #### Current State Analysis
 - **Existing Contracts**: 8 actual contracts (mostly dimensional logic)
 - **Clarinet Configuration**: 51+ contract definitions but files missing
 - **Dimensional Foundation**: Strong base with registry, metrics, oracle automation, yield staking
-
-#### Target Architecture (28-32 contracts total)
 
 **Enhanced Tokenomics System (4)**:
 1. `cxd-token.clar` - Main system token with revenue sharing
@@ -46,7 +30,14 @@ This design document outlines the technical approach for consolidating and enhan
 5. `tokenized-bond.clar` - SIP-010 bond implementation
 6. `dim-graph.clar` - Dimensional relationship mapping
 
-## Components and Interfaces
+Canonical guidance dynamic SIP-010 dispatch centralized refer to:
+
+- `.windsurf/workflows/token-standards.md` → "Dynamic Dispatch Notes (SIP-010)"
+- `.windsurf/workflows/design.md` (this file) cross-references components using the
+  SIP-010 approach; see contract references below.
+Key references:
+- Contract: `contracts/dimensional/tokenized-bond.clar`
+- Trait: `contracts/traits/sip-010-trait.clar`
 
 ### Dimensional-Aware Vault Component
 ```clarity
@@ -70,32 +61,25 @@ This design document outlines the technical approach for consolidating and enhan
 ```clarity
 (define-trait dex-trait ((create-pool (principal principal uint) (response uint uint)) (swap (uint uint principal (list 5 principal)) (response uint uint))))
 ```
-
 ### Strategy Manager Component
 ```clarity
 (define-trait strategy-trait ((deploy-funds (uint) (response uint uint)) (harvest-rewards () (response uint uint))))
 ```
-
-## Data Models
 
 ### Vault State Model
 ```clarity
 (define-map vault-state {vault-id: uint} {total-shares: uint, total-assets: uint})
 (define-map user-positions {user: principal, vault-id: uint} {shares: uint})
 ```
-
 ### Pool State Model
 ```clarity
 (define-map pool-state {pool-id: uint} {token-a: principal, token-b: principal, reserve-a: uint, reserve-b: uint})
 (define-map cl-positions {position-id: uint} {pool-id: uint, owner: principal})
 ```
-
 ### Strategy State Model
 ```clarity
 (define-map strategy-state {strategy-id: uint} {total-deployed: uint, current-value: uint})
 ```
-## Error Handling
-
 ### Comprehensive Error Code System
 ```clarity
 (define-constant ERR_UNAUTHORIZED u1001)
@@ -138,8 +122,6 @@ This design document outlines the technical approach for consolidating and enhan
 - **Property Tests**: All critical invariants verified
 - **Security Tests**: All identified attack vectors tested
 
-### Multi-Layer Security Architecture
-
 #### Contract-Level Security
 1. **Input Validation**: Comprehensive parameter checking
 2. **Access Controls**: Role-based permissions with multi-sig requirements
@@ -161,8 +143,6 @@ This design document outlines the technical approach for consolidating and enhan
 4. **Bug Bounty Program**: Community-driven security testing
 5. **Upgrade Procedures**: Secure contract upgrade mechanisms
 
-### Risk Mitigation Strategies
-
 #### Smart Contract Risk
 - **Formal Verification**: Mathematical proofs for critical functions
 - **Multiple Audits**: Independent security reviews from reputable firms
@@ -180,8 +160,6 @@ This design document outlines the technical approach for consolidating and enhan
 - **Monitoring**: Comprehensive system health monitoring
 - **Automation**: Reduced reliance on manual operations
 - **Documentation**: Complete operational procedures and runbooks
-
-### Gas Optimization Strategies
 
 #### Storage Optimization
 1. **Minimal Map Writes**: Batch updates to reduce storage costs
@@ -212,8 +190,6 @@ This design document outlines the technical approach for consolidating and enhan
 2. **Data Structure Optimization**: Use more efficient data representations
 3. **Caching Strategies**: Reduce redundant computations
 4. **Batch Processing**: Group operations for efficiency
-
-## Deployment Strategy
 
 #### Phase 1: Core Infrastructure 
 1. **Mathematical Library**: Deploy and test advanced math functions
@@ -257,8 +233,6 @@ This design document outlines the technical approach for consolidating and enhan
 3. **Support**: Dedicated support during migration period
 4. **Incentives**: Migration incentives to encourage adoption
 
-### Real-Time Monitoring
-
 #### System Health Metrics
 1. **Contract Status**: All contracts operational and responsive
 2. **Transaction Success Rate**: >99.5% successful transactions
@@ -271,13 +245,10 @@ This design document outlines the technical approach for consolidating and enhan
 3. **Yield Performance**: APY tracking across all strategies
 4. **Capital Efficiency**: Utilization and efficiency metrics
 
-#### Security Metrics
 1. **Anomaly Detection**: Unusual patterns in user behavior or system state
 2. **Circuit Breaker Triggers**: Monitoring of protection mechanism activations
 3. **Oracle Health**: Price feed accuracy and staleness monitoring
 4. **Access Control**: Monitoring of privileged operations
-
-### Analytics Dashboard
 
 #### User Interface
 1. **Real-Time Data**: Live updates of all key metrics

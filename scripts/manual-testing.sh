@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Manual Testing Framework for AutoVault
+# Manual Testing Framework for Conxian
 # Alternative to automated testing while SDK issues persist
 
 set -euo pipefail
@@ -7,7 +7,7 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_ROOT/stacks"
 
-echo "🧪 AutoVault Manual Testing Framework"
+echo "🧪 Conxian Manual Testing Framework"
 echo "====================================="
 
 # Pre-test validation
@@ -24,7 +24,7 @@ fi
 echo "[2/4] Preparing enhanced console testing..."
 
 cat > manual_test_commands.clar <<'CLARITY'
-;; AutoVault Manual Testing Commands
+;; Conxian Manual Testing Commands
 ;; Copy and paste these into clarinet console for interactive testing
 
 ;; === BASIC CONTRACT VERIFICATION ===
@@ -40,8 +40,8 @@ cat > manual_test_commands.clar <<'CLARITY'
 ;; Check CXVG token supply (should be 10,000,000)
 (contract-call? .cxvg-token get-total-supply)
 
-;; Check AVLP token supply (should be 5,000,000)
-(contract-call? .avlp-token get-total-supply)
+;; Check CXLP token supply (should be 5,000,000)
+(contract-call? .cxlp-token get-total-supply)
 
 ;; Verify token metadata
 (contract-call? .cxvg-token get-name)
@@ -156,7 +156,7 @@ echo ""
 echo "📋 EXPECTED RESULTS:"
 echo "==================="
 echo "- CXVG Total Supply: u10000000000000 (10M tokens)"
-echo "- AVLP Total Supply: u5000000000000 (5M tokens)"
+echo "- CXLP Total Supply: u5000000000000 (5M tokens)"
 echo "- All contract calls should return valid data"
 echo "- No runtime errors or panics"
 echo ""

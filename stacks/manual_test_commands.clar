@@ -1,4 +1,4 @@
-;; AutoVault Manual Testing Commands
+;; Conxian Manual Testing Commands
 ;; Copy and paste these into clarinet console for interactive testing
 
 ;; === BASIC CONTRACT VERIFICATION ===
@@ -14,8 +14,8 @@
 ;; Check CXVG token supply (should be 10,000,000)
 (contract-call? .cxvg-token get-total-supply)
 
-;; Check AVLP token supply (should be 5,000,000)
-(contract-call? .avlp-token get-total-supply)
+;; Check CXLP token supply (should be 5,000,000)
+(contract-call? .cxlp-token get-total-supply)
 
 ;; Verify token metadata
 (contract-call? .cxvg-token get-name)

@@ -1,7 +1,7 @@
 {
-  "name": "autovault",
+  "name": "conxian",
   "version": "0.1.1",
-  "description": "AutoVault is a sophisticated DeFi yield optimization protocol on Stacks, designed to automate and enhance returns from liquidity provision and yield farming.",
+  "description": "Conxian is a sophisticated DeFi yield optimization protocol on Stacks, designed to automate and enhance returns from liquidity provision and yield farming.",
   "scripts": {
     "start": "npx nodemon",
     "test": "npx vitest",

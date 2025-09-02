@@ -1,4 +1,4 @@
-# AutoVault PRD: Vault Core
+# Conxian PRD: Vault Core
 
 | | |
 |---|---|
@@ -12,7 +12,7 @@
 
 ## 1. Summary & Vision
 
-The Vault is AutoVault's core capital aggregation primitive. It provides a standardized, secure, and efficient mechanism for users to deposit assets and receive proportional shares in return. The vision is to create a foundational layer for yield strategies that is simple, robust, and highly extensible through traits, while ensuring maximum security and deterministic, precision-safe accounting.
+The Vault is Conxian's core capital aggregation primitive. It provides a standardized, secure, and efficient mechanism for users to deposit assets and receive proportional shares in return. The vision is to create a foundational layer for yield strategies that is simple, robust, and highly extensible through traits, while ensuring maximum security and deterministic, precision-safe accounting.
 
 ## 2. Goals / Non-Goals
 
@@ -25,7 +25,7 @@ The Vault is AutoVault's core capital aggregation primitive. It provides a stand
 ### Non-Goals
 - **Internal Strategy Logic**: The vault does not define or execute yield strategies. This is delegated to external strategy contracts.
 - **Complex Rebalancing**: On-chain rebalancing logic is not a feature of this core vault.
-- **Direct Governance**: The vault itself is not a DAO; it is administered by the AutoVault DAO via timelocked calls.
+- **Direct Governance**: The vault itself is not a DAO; it is administered by the Conxian DAO via timelocked calls.
 
 ## 3. User Stories
 
@@ -148,7 +148,7 @@ The Vault is AutoVault's core capital aggregation primitive. It provides a stand
 
 ## 13. Rollout / Migration Plan
 
-- **Initial Deployment**: The vault will be deployed as part of the initial AutoVault mainnet launch. The address will be registered in the `autovault-registry.clar` contract.
+- **Initial Deployment**: The vault will be deployed as part of the initial Conxian mainnet launch. The address will be registered in the `conxian-registry.clar` contract.
 - **Upgrades**: Future versions of the vault will be deployed as new, separate contracts. Migration will be facilitated by the DAO, which will vote to update the vault pointer in the registry. Users will need to manually migrate their funds, guided by a provided migration interface.
 
 ## 14. Monitoring & Observability

@@ -1,6 +1,6 @@
-# AutoVault DEX Design (Phase B)
+# Conxian DEX Design (Phase B)
 
-This document specifies the architecture for the AutoVault decentralized exchange subsystem prior to implementation.
+This document specifies the architecture for the Conxian decentralized exchange subsystem prior to implementation.
 
 ## Scope (Phase B Ordered First)
 

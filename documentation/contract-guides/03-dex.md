@@ -1,11 +1,11 @@
-# Contract Guide: The AutoVault DEX
+# Contract Guide: The Conxian DEX
 
 **Primary Contracts:** `contracts/dex-router.clar`, `contracts/dex-factory.clar`, `contracts/dex-pool.clar`
 **Trait:** `contracts/traits/pool-trait.clar`
 
 ## 1. Introduction to the DEX Architecture
 
-The AutoVault Decentralized Exchange (DEX) is a suite of smart contracts that allows users to trade SIP-010 tokens and provide liquidity to earn fees. The architecture is designed to be modular and extensible, separating the logic for routing, pool creation, and the pools themselves.
+The Conxian Decentralized Exchange (DEX) is a suite of smart contracts that allows users to trade SIP-010 tokens and provide liquidity to earn fees. The architecture is designed to be modular and extensible, separating the logic for routing, pool creation, and the pools themselves.
 
 The three main components are:
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env ts-node
 /**
- * Sequential deployment of AutoVault contracts.
+ * Sequential deployment of Conxian contracts.
  * Env:
  *   DEPLOYER_PRIVKEY   (hex) required
  *   NETWORK=testnet|mainnet (default testnet)
@@ -58,14 +58,14 @@ const ORDER = [
   'vault-production',
   'treasury',
   'dao-governance',
-  'autovault-registry',
+  'conxian-registry',
   'analytics',
   'bounty-system',
   'mock-ft',
   'gov-token',
   'creator-token',
   'cxvg-token',
-  'avlp-token'
+  'cxlp-token'
 ];
 
 async function pollTx(txid: string, network: any, timeoutMs = 120000): Promise<{ height?: number; status: string }> {

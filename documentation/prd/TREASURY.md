@@ -1,4 +1,4 @@
-# AutoVault PRD: Treasury & Reserve
+# Conxian PRD: Treasury & Reserve
 
 | | |
 |---|---|
@@ -12,7 +12,7 @@
 
 ## 1. Summary & Vision
 
-The AutoVault Treasury is the central contract responsible for managing all protocol-controlled value (PCV). It serves as the secure vault for assets generated from fees, buybacks, and other protocol activities. The Treasury is governed by a combination of multi-signature and DAO controls, ensuring a robust and decentralized approach to fund management. The vision is to create a transparent, resilient, and community-owned treasury that supports the long-term growth and sustainability of the AutoVault ecosystem.
+The Conxian Treasury is the central contract responsible for managing all protocol-controlled value (PCV). It serves as the secure vault for assets generated from fees, buybacks, and other protocol activities. The Treasury is governed by a combination of multi-signature and DAO controls, ensuring a robust and decentralized approach to fund management. The vision is to create a transparent, resilient, and community-owned treasury that supports the long-term growth and sustainability of the Conxian ecosystem.
 
 ## 2. Goals / Non-Goals
 

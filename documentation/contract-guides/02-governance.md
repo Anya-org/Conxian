@@ -4,7 +4,7 @@
 
 ## 1. Introduction
 
-Decentralized governance is a critical component of the AutoVault ecosystem, ensuring that the protocol is managed by its community of stakeholders. The `dao-governance.clar` contract is the engine of this system. It allows holders of the governance token (`.gov-token`) to create proposals, vote on them, and execute approved changes on-chain in a transparent and permissionless manner.
+Decentralized governance is a critical component of the Conxian ecosystem, ensuring that the protocol is managed by its community of stakeholders. The `dao-governance.clar` contract is the engine of this system. It allows holders of the governance token (`.gov-token`) to create proposals, vote on them, and execute approved changes on-chain in a transparent and permissionless manner.
 
 The contract manages the entire lifecycle of a proposal, from creation to execution, and includes features like vote delegation and time-weighted voting to promote fair and robust decision-making.
 

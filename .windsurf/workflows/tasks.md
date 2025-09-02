@@ -3,19 +3,6 @@ description: System Consolidation & Enhancement Implementation Plan
 auto_execution_mode: 3
 ---
 
-Overview
-
-This implementation plan consolidates and activates the existing Conxian protocol's 75+ smart contracts into a unified, production-ready Bitcoin-native DeFi ecosystem. Rather than building from scratch, this plan focuses on **consolidation, activation, and integration** of existing sophisticated components including the proven dimensional logic foundation, advanced mathematical libraries, comprehensive DEX infrastructure, and enterprise-grade monitoring systems.
-
-**Key Strategy Shift**: From "build missing components" to "consolidate and activate existing components"
-- ✅ Preserve: Dimensional foundation (production-ready)
-- 🔄 Consolidate: Multiple implementations → single production systems  
-- 🔄 Activate: Commented-out contracts in Clarinet.toml
-- ➕ Complete: 4-token system with missing CXD token
-- 🧹 Clean: Remove experimental/duplicate contracts
-
-**Revised Timeline**: 12-16 weeks (vs. original 28-38 weeks) due to existing comprehensive codebase.
-
 ## Enhanced Tokenomics Overview (4-Token Ecosystem)
 
 ### CXD Token (Main System Token)
@@ -54,12 +41,18 @@ This implementation plan consolidates and activates the existing Conxian protoco
 
 - [ ] 1. Clarinet Configuration Cleanup & Contract Activation
 
-
   - Audit Clarinet.toml against actual contract files (75+ files vs 51+ definitions)
   - Remove or activate all commented-out contract definitions based on production readiness
   - Establish proper dependency chains for existing contracts
   - Optimize deployment order for dimensional foundation → infrastructure → DeFi layers
   - Validate all contracts compile successfully with `clarinet check`
+  - Update Vitest setup: use `stacks/global-vitest.setup.ts` with `initBeforeEach: false`
+         (init once per spec file). Assign `simnet` in `beforeAll` and retrieve accounts in
+         `beforeEach` to avoid undefined principals.
+  - Testing principals: pass SIP-010 token as a contract principal using
+         `Cl.contractPrincipal(deployer, 'mock-token')` in specs (do not use standard principals).
+  - Diagnostics: ensure `tokenized-bond` exposes `(get-payment-token-contract)` to verify the
+         stored payment token principal during tests.
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
 - [ ] 2. Mathematical Library Completion & Integration
@@ -192,7 +185,7 @@ This implementation plan consolidates and activates the existing Conxian protoco
   - [ ] 6.1 Activate existing circuit breaker and security systems
     - Activate existing circuit-breaker.clar with numeric event codes
     - Integrate circuit breaker with all core contracts (vault, DEX, governance)
-    - Connect existing autovault-health-monitor.clar for system health monitoring
+    - Connect the system health monitoring contract for system-wide health checks and alerting
     - Implement graduated response protocols based on threat levels
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
@@ -221,7 +214,7 @@ This implementation plan consolidates and activates the existing Conxian protoco
   - [ ] 7.2 Activate institutional API and integration systems
     - Activate existing institutional-apis.clar for professional-grade integration
     - Integrate existing deployment-orchestrator.clar for complex multi-contract operations
-    - Connect existing autovault-registry.clar for contract discovery and coordination
+    - Connect existing dim-registry.clar for contract discovery and coordination
     - Activate existing state-anchor.clar for institutional state management
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
@@ -265,7 +258,7 @@ This implementation plan consolidates and activates the existing Conxian protoco
 
   - [ ] 9.3 Finalize infrastructure and registry systems
     - Enhance existing registry.clar for comprehensive contract discovery
-    - Integrate existing autovault-registry.clar with main registry system
+    - Integrate existing dim-registry.clar with main registry system
     - Connect existing mock-dex.clar and mock-ft.clar for testing infrastructure
     - Finalize deployment orchestration with existing deployment-orchestrator.clar
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
@@ -334,19 +327,3 @@ This implementation plan consolidates and activates the existing Conxian protoco
 - **Phase 5-6 (DEX Integration & Security Activation)**: 4-5 weeks
 - **Phase 7-9 (Creator Economy & Performance Integration)**: 3-4 weeks
 - **Phase 10 (Testing & Validation)**: 2-3 weeks
-
-
-- ✅ Existing comprehensive codebase (75+ contracts)
-- ✅ Proven dimensional foundation already implemented
-- ✅ Advanced mathematical libraries partially complete
-- ✅ DEX ecosystem components already built
-- ✅ Enterprise monitoring and security systems exist
-- 🔄 Focus on consolidation/activation vs. building from scratch
-
-## Risk Mitigation
-
-- Incremental development with continuous testing
-- Regular security audits at each major milestone
-- Comprehensive documentation and code review processes
-- Gradual rollout with limited exposure initially
-- Emergency procedures and rollback capabilities

@@ -1,6 +1,6 @@
-# AutoVault Contract Guides
+# Conxian Contract Guides
 
-Welcome to the detailed contract guides for the AutoVault ecosystem. This documentation is intended for developers, auditors, and anyone interested in understanding the technical implementation of the AutoVault smart contracts.
+Welcome to the detailed contract guides for the Conxian ecosystem. This documentation is intended for developers, auditors, and anyone interested in understanding the technical implementation of the Conxian smart contracts.
 
 These guides provide in-depth explanations of the core contracts, their functions, key concepts, and how they interact with each other.
 
@@ -13,7 +13,7 @@ These guides provide in-depth explanations of the core contracts, their function
     -   An explanation of the `dao-governance.clar` contract and the entire decentralized governance process, from proposal creation to execution.
 
 3.  **[DEX Guide (`03-dex.md`)](./03-dex.md)**
-    -   A guide to the AutoVault Decentralized Exchange, covering the router, factory, and pool architecture.
+    -   A guide to the Conxian Decentralized Exchange, covering the router, factory, and pool architecture.
 
 4.  **[Tokenomics Guide (`04-tokens.md`)](./04-tokens.md)**
     -   An overview of the various SIP-010 tokens used in the protocol, including the governance, liquidity, and creator tokens.

@@ -1,4 +1,4 @@
-# Restoration & Decommission Audit (AutoVault)
+# Restoration & Decommission Audit (Conxian)
 
 Purpose: Inventory all archived, original, backup, and disabled contract variants to (a) ensure no critical differentiating functionality is lost prior to repository cleanup, (b) decide restore vs merge vs remove actions, (c) map each feature to PRD / AIP alignment, (d) surface gaps to re‑enable before mainnet.
 
@@ -9,7 +9,7 @@ Contracts Checked: 32 active (+ archived variants)
 ## Legend
 
 Action Codes: KEEP (retain as-is), MERGE (fold unique logic into active), RESTORE (reactivate variant), REMOVE (safe to delete after merge), DEFER (needs design/spec + tests first).  
-Rationale Tags: SEC (security), PERF (performance/gas), SIZE (contract size), PRD (product requirement), AIP (AutoVault Improvement Proposal), DX (developer clarity), AUDIT (3rd-party audit friendliness), LEG (legacy reference value).
+Rationale Tags: SEC (security), PERF (performance/gas), SIZE (contract size), PRD (product requirement), AIP (Conxian Improvement Proposal), DX (developer clarity), AUDIT (3rd-party audit friendliness), LEG (legacy reference value).
 
 ## Variant Inventory Matrix
 
@@ -71,5 +71,5 @@ Before deleting any variant file:
 Current unique, beneficial logic not present in active code: ONLY weighted pool richer swap return (fee). All other variants are supersets in active contracts; safe to remove after documentation.
 
 ---
-Prepared by: AutoVault Core Agent  
+Prepared by: Conxian Core Agent  
 Rationale: Reduce audit surface, ensure critical differentiators retained, advance mainnet readiness.

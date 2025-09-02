@@ -1,6 +1,6 @@
-# AutoVault User Manual
+# Conxian User Manual
 
-**Welcome to AutoVault** - The most comprehensive DeFi ecosystem on Stacks blockchain, designed to offer Bitcoin-native DeFi with institutional-grade security and community governance.
+**Welcome to Conxian** - The most comprehensive DeFi ecosystem on Stacks blockchain, designed to offer Bitcoin-native DeFi with institutional-grade security and community governance.
 
 *Last Updated: August 25, 2025*
 
@@ -8,7 +8,7 @@
 
 ## 📋 Table of Contents
 
-1. [What is AutoVault?](#what-is-autovault)
+1. [What is Conxian?](#what-is-conxian)
 2. [Getting Started](#getting-started)
 3. [Core Features Overview](#core-features-overview)
 4. [Vault Operations](#vault-operations)
@@ -21,9 +21,9 @@
 
 ---
 
-## What is AutoVault?
+## What is Conxian?
 
-AutoVault is a production-ready DeFi platform built on the Stacks blockchain that brings Bitcoin-native decentralized finance to users worldwide. The platform combines traditional DeFi primitives with innovative Bitcoin integration and enterprise-level security.
+Conxian is a production-ready DeFi platform built on the Stacks blockchain that brings Bitcoin-native decentralized finance to users worldwide. The platform combines traditional DeFi primitives with innovative Bitcoin integration and enterprise-level security.
 
 ### Key Benefits
 
@@ -56,12 +56,12 @@ AutoVault is a production-ready DeFi platform built on the Stacks blockchain tha
    - Acquire STX tokens for transaction fees
    - Obtain supported tokens for deposits (STX, sBTC when available)
 
-### Step 2: Connect to AutoVault
+### Step 2: Connect to Conxian
 
-1. Navigate to the AutoVault platform
+1. Navigate to the Conxian platform
 2. Click "Connect Wallet"
 3. Select your wallet and approve the connection
-4. You're now ready to use AutoVault!
+4. You're now ready to use Conxian!
 
 ### Step 3: Your First Deposit
 
@@ -77,9 +77,10 @@ AutoVault is a production-ready DeFi platform built on the Stacks blockchain tha
 
 ### 🏦 Yield Vault
 
-The core AutoVault feature that automatically optimizes yield on your deposited assets.
+The core Conxian feature that automatically optimizes yield on your deposited assets.
 
 **Key Features:**
+
 - Multi-asset support
 - Automated yield strategies
 - Precise share accounting
@@ -91,6 +92,7 @@ The core AutoVault feature that automatically optimizes yield on your deposited 
 Community-driven decision making for all platform parameters and upgrades.
 
 **Key Features:**
+
 - Proposal creation and voting
 - Time-weighted voting power
 - Execution delays for security
@@ -102,8 +104,9 @@ Community-driven decision making for all platform parameters and upgrades.
 Three-token system designed for sustainable growth and fair distribution.
 
 **Tokens:**
+
 - **CXVG**: Governance token (100M max supply)
-- **AVLP**: Liquidity provider token (50M max supply)
+- **CXLP**: Liquidity provider token (50M max supply)
 - **Creator**: Merit-based rewards for contributors
 
 ### 💱 DEX Integration
@@ -111,6 +114,7 @@ Three-token system designed for sustainable growth and fair distribution.
 Built-in decentralized exchange for seamless token swapping and liquidity provision.
 
 **Features:**
+
 - Multi-hop routing
 - Stable and weighted pools
 - Liquidity mining rewards
@@ -121,6 +125,7 @@ Built-in decentralized exchange for seamless token swapping and liquidity provis
 Multiple layers of protection for user funds and platform stability.
 
 **Security Features:**
+
 - Circuit breakers for volatility protection
 - Emergency pause mechanisms
 - Multi-signature treasury controls
@@ -209,38 +214,44 @@ Multiple layers of protection for user funds and platform stability.
 **Purpose**: Main governance token providing voting rights and revenue sharing
 
 **Key Features:**
+
 - **Max Supply**: 100,000,000 CXVG
 - **Revenue Share**: 80% of protocol revenue distributed to holders
 - **Voting Power**: Proportional to token balance and holding duration
-- **Migration Path**: AVLP tokens can migrate to CXVG
+- **Migration Path**: CXLP tokens can migrate to CXVG
 
 **How to Earn CXVG:**
-1. **Migration**: Convert AVLP tokens to CXVG (time-limited epochs)
+
+1. **Migration**: Convert CXLP tokens to CXVG (time-limited epochs)
 2. **Governance Rewards**: Earn through active participation
 3. **Secondary Markets**: Purchase from other users (when available)
 
 **Benefits of Holding:**
+
 - Vote on governance proposals
 - Receive revenue distributions
 - Influence platform direction
 - Priority access to new features
 
-### AVLP Token (Liquidity Provider)
+### CXLP Token (Liquidity Provider)
 
 **Purpose**: Rewards for providing liquidity to the platform
 
 **Key Features:**
-- **Max Supply**: 50,000,000 AVLP
+
+- **Max Supply**: 50,000,000 CXLP
 - **Migration**: Can convert to CXVG during specific epochs
 - **Earning Mechanism**: Provided as rewards for vault deposits and DEX liquidity
 
 **Migration Schedule:**
-- **Epoch 1**: 1:1 AVLP to CXVG ratio (first ~1 week)
+
+- **Epoch 1**: 1:1 CXLP to CXVG ratio (first ~1 week)
 - **Epoch 2**: 1:0.8 ratio (weeks 2-3)
 - **Epoch 3**: 1:0.6 ratio (weeks 3-4, final)
 
-**How to Earn AVLP:**
-1. **Vault Deposits**: Receive AVLP rewards for vault participation
+**How to Earn CXLP:**
+
+1. **Vault Deposits**: Receive CXLP rewards for vault participation
 2. **DEX Liquidity**: Provide liquidity to trading pairs
 3. **Long-term Staking**: Bonus rewards for extended deposits
 
@@ -249,11 +260,13 @@ Multiple layers of protection for user funds and platform stability.
 **Purpose**: Merit-based rewards for platform contributors
 
 **Key Features:**
+
 - **Merit-Based**: Awarded for valuable contributions
 - **Quality Assurance**: Tied to contribution quality metrics
 - **Bounty System**: Earned through development and community work
 
 **Ways to Earn:**
+
 1. **Development Bounties**: Code contributions and bug fixes
 2. **Community Building**: Educational content and user support
 3. **Quality Assurance**: Testing and feedback provision
@@ -280,18 +293,20 @@ Multiple layers of protection for user funds and platform stability.
 
 ### Understanding DAO Governance
 
-AutoVault is governed by its community through a decentralized autonomous organization (DAO). CXVG token holders can propose and vote on changes to the platform.
+Conxian is governed by its community through a decentralized autonomous organization (DAO). CXVG token holders can propose and vote on changes to the platform.
 
 ### Governance Process
 
 #### 1. Proposal Creation
 
 **Requirements:**
+
 - Hold minimum 100,000 CXVG tokens
 - Provide detailed proposal description
 - Specify implementation parameters
 
 **Proposal Types:**
+
 - **Parameter Changes**: Adjust fees, caps, limits
 - **Treasury Spending**: Allocate funds for development
 - **Emergency Actions**: Critical security measures
@@ -305,6 +320,7 @@ AutoVault is governed by its community through a decentralized autonomous organi
 **Voting Options**: For, Against, Abstain
 
 **Time-Weighted Voting:**
+
 - Longer holding periods = more voting power
 - Prevents last-minute token accumulation for votes
 - Rewards committed community members
@@ -361,7 +377,7 @@ AutoVault is governed by its community through a decentralized autonomous organi
 
 ### Overview
 
-AutoVault includes an integrated decentralized exchange (DEX) that enables seamless token swapping and liquidity provision without leaving the platform.
+Conxian includes an integrated decentralized exchange (DEX) that enables seamless token swapping and liquidity provision without leaving the platform.
 
 ### Trading Features
 
@@ -396,7 +412,7 @@ AutoVault includes an integrated decentralized exchange (DEX) that enables seaml
 #### Benefits
 
 - **Trading Fees**: Earn from every trade in your pool
-- **AVLP Rewards**: Receive liquidity provider tokens
+- **CXLP Rewards**: Receive liquidity provider tokens
 - **Yield Farming**: Additional rewards for long-term liquidity
 
 #### Risks
@@ -416,11 +432,13 @@ AutoVault includes an integrated decentralized exchange (DEX) that enables seaml
 **Purpose**: Automatically pause operations during extreme market conditions
 
 **Triggers:**
+
 - High price volatility (>10% in short period)
 - Unusual trading volume spikes
 - Liquidity drops below safety thresholds
 
 **User Impact:**
+
 - Temporary pause of deposits/withdrawals
 - Protection from adverse market conditions
 - Automatic resume when conditions normalize
@@ -449,7 +467,7 @@ AutoVault includes an integrated decentralized exchange (DEX) that enables seaml
 
 #### Platform Interaction
 
-1. **Official Channels**: Only use official AutoVault interfaces
+1. **Official Channels**: Only use official Conxian interfaces
 2. **Verify URLs**: Ensure you're on the correct website
 3. **Stay Informed**: Follow official announcements for updates
 4. **Report Issues**: Immediately report suspicious activity
@@ -479,12 +497,14 @@ AutoVault includes an integrated decentralized exchange (DEX) that enables seaml
 **Goal**: Earn yield on cryptocurrency holdings with minimal effort
 
 **Process:**
+
 1. Deposit supported tokens into vault
 2. Receive shares that automatically appreciate
 3. Earn from automated yield strategies
 4. Withdraw anytime with accumulated gains
 
 **Benefits:**
+
 - No active management required
 - Automated optimization
 - Transparent fee structure
@@ -495,12 +515,14 @@ AutoVault includes an integrated decentralized exchange (DEX) that enables seaml
 **Goal**: Earn additional rewards by providing trading liquidity
 
 **Process:**
+
 1. Provide liquidity to DEX pools
 2. Receive LP tokens representing pool ownership
 3. Earn trading fees from swaps
-4. Receive AVLP token rewards
+4. Receive CXLP token rewards
 
 **Benefits:**
+
 - Multiple revenue streams
 - Higher potential returns
 - Support platform growth
@@ -511,12 +533,14 @@ AutoVault includes an integrated decentralized exchange (DEX) that enables seaml
 **Goal**: Influence platform direction and earn governance rewards
 
 **Process:**
+
 1. Acquire and hold CXVG tokens
 2. Participate in proposal discussions
 3. Vote on governance proposals
 4. Receive revenue sharing distributions
 
 **Benefits:**
+
 - Platform governance rights
 - Revenue sharing (80% distribution)
 - Long-term value alignment
@@ -527,12 +551,14 @@ AutoVault includes an integrated decentralized exchange (DEX) that enables seaml
 **Goal**: Regularly invest in DeFi with consistent strategy
 
 **Process:**
+
 1. Set up regular deposit schedule
 2. Deposit fixed amounts at intervals
 3. Accumulate shares over time
 4. Benefit from compound growth
 
 **Benefits:**
+
 - Reduces timing risk
 - Builds position systematically
 - Leverages compound growth
@@ -543,12 +569,14 @@ AutoVault includes an integrated decentralized exchange (DEX) that enables seaml
 **Goal**: Manage organizational funds with DeFi yields
 
 **Process:**
+
 1. Deposit treasury funds to vault
 2. Maintain liquidity for operations
 3. Earn yield on idle funds
 4. Withdraw as needed for expenses
 
 **Benefits:**
+
 - Treasury diversification
 - Professional-grade security
 - Transparent reporting
@@ -562,17 +590,17 @@ AutoVault includes an integrated decentralized exchange (DEX) that enables seaml
 
 #### General Platform
 
-**Q: Is AutoVault safe to use?**
-A: AutoVault includes multiple security layers including circuit breakers, emergency controls, multi-signature treasury management, and comprehensive testing. However, all DeFi protocols carry smart contract and market risks.
+**Q: Is Conxian safe to use?**
+A: Conxian includes multiple security layers including circuit breakers, emergency controls, multi-signature treasury management, and comprehensive testing. However, all DeFi protocols carry smart contract and market risks.
 
 **Q: What are the fees?**
 A: Current fees are 0.30% for deposits, 0.10% for withdrawals, and 5% performance fees on yield above benchmark. Fees are adjustable through governance.
 
 **Q: How do I earn CXVG tokens?**
-A: CXVG tokens can be earned by migrating AVLP tokens during migration epochs, participating in governance, or through secondary markets when available.
+A: CXVG tokens can be earned by migrating CXLP tokens during migration epochs, participating in governance, or through secondary markets when available.
 
 **Q: When will mainnet launch?**
-A: AutoVault is production-ready and deployed on testnet. Mainnet launch timing depends on final testing completion and community governance decisions.
+A: Conxian is production-ready and deployed on testnet. Mainnet launch timing depends on final testing completion and community governance decisions.
 
 #### Vault Operations
 
@@ -602,6 +630,7 @@ A: New proposals can modify previous decisions, but implemented changes may have
 
 **Problem**: Transaction failed or is stuck
 **Solutions:**
+
 1. Check gas fees and wallet balance
 2. Verify transaction details are correct
 3. Wait for network congestion to clear
@@ -609,6 +638,7 @@ A: New proposals can modify previous decisions, but implemented changes may have
 
 **Problem**: Cannot connect wallet
 **Solutions:**
+
 1. Refresh browser and try again
 2. Check wallet is unlocked and on correct network
 3. Clear browser cache and cookies
@@ -618,6 +648,7 @@ A: New proposals can modify previous decisions, but implemented changes may have
 
 **Problem**: Cannot access platform features
 **Solutions:**
+
 1. Verify wallet connection is active
 2. Check if platform is in emergency pause mode
 3. Ensure sufficient gas for transactions
@@ -625,6 +656,7 @@ A: New proposals can modify previous decisions, but implemented changes may have
 
 **Problem**: Incorrect balance or position display
 **Solutions:**
+
 1. Refresh page and wait for sync
 2. Check transaction confirmations
 3. Verify wallet address is correct
@@ -649,6 +681,7 @@ A: New proposals can modify previous decisions, but implemented changes may have
 #### Emergency Situations
 
 For critical issues affecting fund safety:
+
 1. **Immediate Action**: Stop all platform interactions
 2. **Emergency Contacts**: Use official emergency channels
 3. **Document Everything**: Screenshots, transaction details, error messages
@@ -660,9 +693,9 @@ For critical issues affecting fund safety:
 
 ### Official Links
 
-- **Platform Website**: [AutoVault Official Site]
+- **Platform Website**: [Conxian Official Site]
 - **Documentation**: `/documentation/`
-- **GitHub Repository**: [github.com/Anya-org/AutoVault](https://github.com/Anya-org/AutoVault)
+- **GitHub Repository**: [github.com/Anya-org/Conxian](https://github.com/Anya-org/Conxian)
 - **Community Discord**: [Official Discord Link]
 
 ### Technical Documentation
@@ -673,7 +706,6 @@ For critical issues affecting fund safety:
 - **[Developer Guide](./DEVELOPER_GUIDE.md)**: Development and integration
 - **[Developer & Contract Guides](./contract-guides/README.md)**: Detailed guides for core smart contracts
 
-
 ### Educational Resources
 
 - **[Tokenomics Guide](./TOKENOMICS.md)**: Complete economic model
@@ -682,7 +714,7 @@ For critical issues affecting fund safety:
 
 ---
 
-*This manual is maintained by the AutoVault community. For suggestions or corrections, please submit issues or pull requests to the GitHub repository.*
+*This manual is maintained by the Conxian community. For suggestions or corrections, please submit issues or pull requests to the GitHub repository.*
 
 **Version**: 1.0  
 **Last Updated**: August 25, 2025  

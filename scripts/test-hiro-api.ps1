@@ -1,4 +1,4 @@
-# AutoVault Hiro API Integration Test (PowerShell)
+# Conxian Hiro API Integration Test (PowerShell)
 # Tests the Hiro API key and basic functionality
 
 param(
@@ -6,7 +6,7 @@ param(
     [string]$ApiBase = "https://api.testnet.hiro.so"
 )
 
-Write-Host "🚀 AutoVault Hiro API Integration Test" -ForegroundColor Green
+Write-Host "🚀 Conxian Hiro API Integration Test" -ForegroundColor Green
 Write-Host ""
 Write-Host "🔗 API Base: $ApiBase" -ForegroundColor Cyan
 Write-Host "🔑 API Key: $($ApiKey.Substring(0,8))..." -ForegroundColor Cyan

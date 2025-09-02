@@ -1,4 +1,4 @@
-# Archived Contract Diffs (AutoVault)
+# Archived Contract Diffs (Conxian)
 
 Purpose: Document differences between removed variant contracts and their active counterparts for audit trail and potential future reference.
 
@@ -51,5 +51,5 @@ All identified enhancements from archive audit have been accounted for:
 No functionality lost in cleanup process.
 
 ---
-Prepared by: AutoVault Core Agent  
+Prepared by: Conxian Core Agent  
 Rationale: Maintain audit trail while reducing attack surface for mainnet deployment.

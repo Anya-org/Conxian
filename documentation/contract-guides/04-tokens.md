@@ -1,14 +1,14 @@
 # Contract Guide: Protocol Tokens (SIP-010)
 
-**Primary Contracts:** `contracts/cxvg-token.clar`, `contracts/avlp-token.clar`, `contracts/gov-token.clar`, `contracts/creator-token.clar`
+**Primary Contracts:** `contracts/cxvg-token.clar`, `contracts/cxlp-token.clar`, `contracts/gov-token.clar`, `contracts/creator-token.clar`
 
 ## 1. Introduction
 
-The AutoVault ecosystem utilizes a multi-token model to facilitate governance, reward liquidity providers, and incentivize contributors. All protocol tokens adhere to the Stacks `SIP-010` standard for fungible tokens. This guide provides an overview of each token's purpose and utility within the protocol.
+The Conxian ecosystem utilizes a multi-token model to facilitate governance, reward liquidity providers, and incentivize contributors. All protocol tokens adhere to the Stacks `SIP-010` standard for fungible tokens. This guide provides an overview of each token's purpose and utility within the protocol.
 
 The primary tokens are:
 -   **CXVG Token (`cxvg-token`):** The core governance token.
--   **AVLP Token (`avlp-token`):** The liquidity provider (LP) token.
+-   **CXLP Token (`cxlp-token`):** The liquidity provider (LP) token.
 -   **Governance Token (`gov-token`):** The token used for voting in the DAO. (Note: This may be the same as CXVG or a separate token depending on the final tokenomics).
 -   **Creator Token (`creator-token`):** A merit-based rewards token for contributors.
 
@@ -16,24 +16,24 @@ The primary tokens are:
 
 ### CXVG Token (`cxvg-token.clar`)
 
--   **Purpose:** `CXVG` is the main governance token of the AutoVault protocol. Its primary role is to give holders a say in the future direction of the platform.
+-   **Purpose:** `CXVG` is the main governance token of the Conxian protocol. Its primary role is to give holders a say in the future direction of the platform.
 -   **Utility:**
     -   **Revenue Share:** A significant portion of the protocol's revenue is distributed to `CXVG` holders.
     -   **Governance:** While `.gov-token` is used for voting, `CXVG` may be the token that is staked or locked to receive `.gov-token`. The exact mechanism is defined in the tokenomics.
 -   **How to Acquire:**
-    -   Migrating from `AVLP` tokens during specific epochs.
+    -   Migrating from `CXLP` tokens during specific epochs.
     -   Purchasing on the open market (DEX).
     -   Receiving as a reward for certain protocol activities.
 
-### AVLP Token (`avlp-token.clar`)
+### CXLP Token (`cxlp-token.clar`)
 
--   **Purpose:** `AVLP` is a reward token for users who provide liquidity to the AutoVault protocol, either by depositing into the main vault or by adding liquidity to the DEX.
+-   **Purpose:** `CXLP` is a reward token for users who provide liquidity to the Conxian protocol, either by depositing into the main vault or by adding liquidity to the DEX.
 -   **Utility:**
-    -   **Migration to CXVG:** `AVLP` tokens can be converted into `CXVG` tokens. The conversion rate may change over time to incentivize early liquidity providers.
-    -   **Yield Farming:** `AVLP` can be staked in yield farms to earn additional rewards.
+    -   **Migration to CXVG:** `CXLP` tokens can be converted into `CXVG` tokens. The conversion rate may change over time to incentivize early liquidity providers.
+    -   **Yield Farming:** `CXLP` can be staked in yield farms to earn additional rewards.
 -   **How to Acquire:**
     -   Automatically earned by depositing assets into the `vault.clar` contract.
-    -   Earned by providing liquidity to pools in the AutoVault DEX.
+    -   Earned by providing liquidity to pools in the Conxian DEX.
 
 ### Governance Token (`gov-token.clar`)
 
@@ -46,7 +46,7 @@ The primary tokens are:
 
 ### Creator Token (`creator-token.clar`)
 
--   **Purpose:** A unique, merit-based token designed to reward individuals who contribute to the AutoVault ecosystem through non-financial means.
+-   **Purpose:** A unique, merit-based token designed to reward individuals who contribute to the Conxian ecosystem through non-financial means.
 -   **Utility:**
     -   **Bounties:** Awarded for completing development bounties, fixing bugs, or creating new features.
     -   **Community Contributions:** Can be awarded for creating documentation, tutorials, providing community support, or other valuable contributions.
@@ -58,8 +58,8 @@ The primary tokens are:
 
 The tokens are designed to work together to create a balanced and sustainable economic system.
 
-1.  **Users provide liquidity** (to the vault or DEX) and receive **`AVLP`** tokens as a reward.
-2.  **`AVLP` holders can choose to migrate** their tokens to **`CXVG`** tokens to gain governance rights and a share of protocol revenue.
+1.  **Users provide liquidity** (to the vault or DEX) and receive **`CXLP`** tokens as a reward.
+2.  **`CXLP` holders can choose to migrate** their tokens to **`CXVG`** tokens to gain governance rights and a share of protocol revenue.
 3.  **`CXVG` holders can stake or lock** their tokens to receive **`gov-token`**, which is used to vote on DAO proposals.
 4.  **Contributors perform work**, complete bounties, and are rewarded with **`creator-token`**, which may grant them special status or future benefits.
 
