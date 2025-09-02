@@ -79,9 +79,9 @@ plan:
             path: contracts/vault.clar
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: avg-token
+            contract-name: cxvg-token
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/avg-token.clar
+            path: contracts/cxvg-token.clar
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: avlp-token

@@ -36,7 +36,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 └── traits/ownable-trait.clar
 
 💰 TOKENOMICS & ECONOMICS (5)
-├── avg-token.clar
+├── cxvg-token.clar
 ├── avlp-token.clar
 ├── creator-token.clar
 ├── gov-token.clar
@@ -174,7 +174,7 @@ AutoVault represents the **most comprehensive DeFi ecosystem on Stacks**, pionee
 ```text
 ✅ CORE PLATFORM:
 ├── 51 Smart contracts compiling successfully
-├── Enhanced tokenomics (100M AVG / 50M AVLP)
+├── Enhanced tokenomics (100M CXVG / 50M AVLP)
 ├── Automated DAO governance system
 ├── Multi-signature treasury controls
 ├── Emergency pause mechanisms

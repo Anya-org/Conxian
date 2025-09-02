@@ -28,7 +28,7 @@ AutoVault is a production-ready DeFi platform built on the Stacks blockchain tha
 ### Key Benefits
 
 - **Bitcoin-Native**: Built on Stacks, inheriting Bitcoin's security while enabling smart contracts
-- **Community-Governed**: Fully decentralized governance through AVG token holders
+- **Community-Governed**: Fully decentralized governance through CXVG token holders
 - **Multi-Asset Support**: Supports various cryptocurrencies with automatic yield optimization
 - **Enterprise Security**: Multiple safety mechanisms including circuit breakers and emergency controls
 - **Revenue Sharing**: Token holders receive 80% of protocol revenue
@@ -102,7 +102,7 @@ Community-driven decision making for all platform parameters and upgrades.
 Three-token system designed for sustainable growth and fair distribution.
 
 **Tokens:**
-- **AVG**: Governance token (100M max supply)
+- **CXVG**: Governance token (100M max supply)
 - **AVLP**: Liquidity provider token (50M max supply)
 - **Creator**: Merit-based rewards for contributors
 
@@ -204,18 +204,18 @@ Multiple layers of protection for user funds and platform stability.
 
 ## Token Economics Guide
 
-### AVG Token (Governance)
+### CXVG Token (Governance)
 
 **Purpose**: Main governance token providing voting rights and revenue sharing
 
 **Key Features:**
-- **Max Supply**: 100,000,000 AVG
+- **Max Supply**: 100,000,000 CXVG
 - **Revenue Share**: 80% of protocol revenue distributed to holders
 - **Voting Power**: Proportional to token balance and holding duration
-- **Migration Path**: AVLP tokens can migrate to AVG
+- **Migration Path**: AVLP tokens can migrate to CXVG
 
-**How to Earn AVG:**
-1. **Migration**: Convert AVLP tokens to AVG (time-limited epochs)
+**How to Earn CXVG:**
+1. **Migration**: Convert AVLP tokens to CXVG (time-limited epochs)
 2. **Governance Rewards**: Earn through active participation
 3. **Secondary Markets**: Purchase from other users (when available)
 
@@ -231,11 +231,11 @@ Multiple layers of protection for user funds and platform stability.
 
 **Key Features:**
 - **Max Supply**: 50,000,000 AVLP
-- **Migration**: Can convert to AVG during specific epochs
+- **Migration**: Can convert to CXVG during specific epochs
 - **Earning Mechanism**: Provided as rewards for vault deposits and DEX liquidity
 
 **Migration Schedule:**
-- **Epoch 1**: 1:1 AVLP to AVG ratio (first ~1 week)
+- **Epoch 1**: 1:1 AVLP to CXVG ratio (first ~1 week)
 - **Epoch 2**: 1:0.8 ratio (weeks 2-3)
 - **Epoch 3**: 1:0.6 ratio (weeks 3-4, final)
 
@@ -270,7 +270,7 @@ Multiple layers of protection for user funds and platform stability.
 
 #### Distribution Mechanism
 
-- **80% to Token Holders**: Distributed proportionally to AVG holders
+- **80% to Token Holders**: Distributed proportionally to CXVG holders
 - **20% to Treasury**: Used for development and platform growth
 - **Automated Buybacks**: Treasury funds used to buy and burn tokens
 
@@ -280,14 +280,14 @@ Multiple layers of protection for user funds and platform stability.
 
 ### Understanding DAO Governance
 
-AutoVault is governed by its community through a decentralized autonomous organization (DAO). AVG token holders can propose and vote on changes to the platform.
+AutoVault is governed by its community through a decentralized autonomous organization (DAO). CXVG token holders can propose and vote on changes to the platform.
 
 ### Governance Process
 
 #### 1. Proposal Creation
 
 **Requirements:**
-- Hold minimum 100,000 AVG tokens
+- Hold minimum 100,000 CXVG tokens
 - Provide detailed proposal description
 - Specify implementation parameters
 
@@ -301,7 +301,7 @@ AutoVault is governed by its community through a decentralized autonomous organi
 #### 2. Voting Process
 
 **Voting Period**: ~1 week (1,008 blocks)
-**Quorum Requirement**: 20% of total AVG supply must participate
+**Quorum Requirement**: 20% of total CXVG supply must participate
 **Voting Options**: For, Against, Abstain
 
 **Time-Weighted Voting:**
@@ -320,7 +320,7 @@ AutoVault is governed by its community through a decentralized autonomous organi
 #### Creating Proposals
 
 1. **Prepare Proposal**: Draft detailed description and implementation plan
-2. **Meet Requirements**: Ensure you hold enough AVG tokens
+2. **Meet Requirements**: Ensure you hold enough CXVG tokens
 3. **Submit Proposal**: Use governance interface to submit
 4. **Community Discussion**: Engage with community for feedback
 5. **Voting Campaign**: Advocate for your proposal
@@ -511,7 +511,7 @@ AutoVault includes an integrated decentralized exchange (DEX) that enables seaml
 **Goal**: Influence platform direction and earn governance rewards
 
 **Process:**
-1. Acquire and hold AVG tokens
+1. Acquire and hold CXVG tokens
 2. Participate in proposal discussions
 3. Vote on governance proposals
 4. Receive revenue sharing distributions
@@ -568,8 +568,8 @@ A: AutoVault includes multiple security layers including circuit breakers, emerg
 **Q: What are the fees?**
 A: Current fees are 0.30% for deposits, 0.10% for withdrawals, and 5% performance fees on yield above benchmark. Fees are adjustable through governance.
 
-**Q: How do I earn AVG tokens?**
-A: AVG tokens can be earned by migrating AVLP tokens during migration epochs, participating in governance, or through secondary markets when available.
+**Q: How do I earn CXVG tokens?**
+A: CXVG tokens can be earned by migrating AVLP tokens during migration epochs, participating in governance, or through secondary markets when available.
 
 **Q: When will mainnet launch?**
 A: AutoVault is production-ready and deployed on testnet. Mainnet launch timing depends on final testing completion and community governance decisions.
@@ -587,8 +587,8 @@ A: Share values can decrease during market downturns, but the platform includes 
 
 #### Governance
 
-**Q: How much AVG do I need to vote?**
-A: Any amount of AVG provides voting power, but creating proposals requires 100,000 AVG tokens.
+**Q: How much CXVG do I need to vote?**
+A: Any amount of CXVG provides voting power, but creating proposals requires 100,000 CXVG tokens.
 
 **Q: How long do proposals take?**
 A: Voting periods last about 1 week, with an additional 1-day execution delay for approved proposals.

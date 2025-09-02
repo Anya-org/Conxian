@@ -9,7 +9,7 @@
 (contract-call? .bounty-system get-bounty u1)
 
 ;; Test token functions
-(contract-call? .avg-token get-total-supply)
+(contract-call? .cxvg-token get-total-supply)
 (contract-call? .gov-token get-total-supply)
 
 ;; Test registry

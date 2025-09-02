@@ -11,16 +11,16 @@
 
 ;; === TOKENOMICS VERIFICATION ===
 
-;; Check AVG token supply (should be 10,000,000)
-(contract-call? .avg-token get-total-supply)
+;; Check CXVG token supply (should be 10,000,000)
+(contract-call? .cxvg-token get-total-supply)
 
 ;; Check AVLP token supply (should be 5,000,000)
 (contract-call? .avlp-token get-total-supply)
 
 ;; Verify token metadata
-(contract-call? .avg-token get-name)
-(contract-call? .avg-token get-symbol)
-(contract-call? .avg-token get-decimals)
+(contract-call? .cxvg-token get-name)
+(contract-call? .cxvg-token get-symbol)
+(contract-call? .cxvg-token get-decimals)
 
 ;; === VAULT FUNCTIONALITY ===
 
@@ -109,6 +109,6 @@
 ;; Test revenue distribution (simulated)
 ;; 1. Generate fees
 ;; 2. Trigger distribution
-;; 3. Check AVG holder rewards
+;; 3. Check CXVG holder rewards
 ;; 4. Verify buyback execution
 

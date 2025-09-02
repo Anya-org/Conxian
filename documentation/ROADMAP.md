@@ -15,7 +15,7 @@ This roadmap outlines the planned development and deployment phases for AutoVaul
 ### 🚀 Core Platform
 
 - ✅ 30 Smart contracts compiling (core + extended modules)
-- ✅ Enhanced tokenomics (10M AVG / 5M AVLP)
+- ✅ Enhanced tokenomics (10M CXVG / 5M AVLP)
 - ✅ Automated DAO governance system
 - ✅ Multi-signature treasury controls
 - ✅ Emergency pause mechanisms

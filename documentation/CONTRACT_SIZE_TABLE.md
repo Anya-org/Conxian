@@ -24,7 +24,7 @@ Note: Source byte size is not a direct deterministic indicator of runtime execut
 | 14 | multi-hop-router.clar | 11,646 | Pathfinding complexity; potential optimization of list operations |
 | 15 | dex-pool.clar | 11,643 | Base DEX pool; compare with weighted & stable variants for consolidation |
 | 16 | math-lib.clar | 10,086 | Shared math; ensure weighted invariant migration here to dedupe |
-| 17 | avg-token.clar | 9,787 | Governance token with migration logic; review for unnecessary duplication |
+| 17 | cxvg-token.clar | 9,787 | Governance token with migration logic; review for unnecessary duplication |
 | 18 | enterprise-monitoring.clar | 9,666 | Operational analytics; some events may migrate off-chain |
 | 19 | circuit-breaker.clar | 8,686 | Full circuit breaker; gas-critical pathways to benchmark |
 | 20 | creator-token.clar | 8,673 | Creator incentive token; ensure mint controls audited |

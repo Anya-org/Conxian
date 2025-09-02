@@ -14,7 +14,7 @@ const contracts = [
   'mock-ft.clar',
   'gov-token.clar',
   'creator-token.clar',
-  'avg-token.clar',
+  'cxvg-token.clar',
   'avlp-token.clar',
   'registry.clar',
   'timelock.clar',

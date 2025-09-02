@@ -125,7 +125,7 @@ Based on extensive analysis of 15+ leading DeFi protocols across Stacks and Ethe
 
 - **Stacks Integration**: Bitcoin settlement finality
 - **sBTC Readiness**: Prepared for Bitcoin DeFi
-- **Sound Money Principles**: Deflationary tokenomics (10M AVG, 5M AVLP caps)
+- **Sound Money Principles**: Deflationary tokenomics (100M CXVG, 50M CXLP caps)
 
 ### 2.2 Current Limitations ⚠️
 

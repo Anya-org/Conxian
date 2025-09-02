@@ -51,7 +51,7 @@ graph TB
     subgraph "💰 TOKENOMICS SYSTEM"
         MOCKFT[mock-ft.clar]
         GOVTOKEN[gov-token.clar]
-        AVGTOKEN[avg-token.clar]
+        AVGTOKEN[cxvg-token.clar]
         AVLPTOKEN[avlp-token.clar]
         CREATORTOKEN[creator-token.clar]
     end
@@ -226,7 +226,7 @@ graph TB
 
 | Contract | Purpose | Max Supply | Used By |
 |----------|---------|------------|---------|
-| `avg-token.clar` | Governance token | 10M | treasury, vault, dao |
+| `cxvg-token.clar` | Governance token | 10M | treasury, vault, dao |
 | `avlp-token.clar` | Liquidity pool token | 5M | vault |
 | `gov-token.clar` | DAO voting token | Variable | dao, enhanced-governance |
 | `creator-token.clar` | Merit-based rewards | Variable | bounty-system |

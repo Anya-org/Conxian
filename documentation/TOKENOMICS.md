@@ -8,35 +8,35 @@ The AutoVault tokenomics system has been **successfully implemented** with enhan
 
 ### 1. **Enhanced Token Supply (100M/50M Model)**
 
-- **AVG Token**: 100,000,000 total supply for broader governance participation
+- **CXVG Token**: 100,000,000 total supply for broader governance participation
 - **AVLP Token**: 50,000,000 total supply for liquidity provision with migration bonuses
 - **Progressive Auto Migration**: Epochs 1-4 with increasing, dynamically-calculated conversion rates
-- **Revenue Sharing**: 80% to AVG holders, 20% to protocol treasury
+- **Revenue Sharing**: 80% to CXVG holders, 20% to protocol treasury
 
 ### 2. **Production-Ready Implementation**
 
 - **Smart Contract Deployed**: All tokenomics logic implemented in Clarity
-- **Migration Mechanics**: Automated, permissionless epoch-based AVLP→AVG conversion
+- **Migration Mechanics**: Automated, permissionless epoch-based AVLP→CXVG conversion
 - **Liquidity Mining**: Block-based rewards with loyalty bonuses
 - **DAO Integration**: Full governance control over parameters, with automated checks for founder vesting
 
 ## **📊 ACTUAL SMART CONTRACT IMPLEMENTATION**
 
-### **AVG Token (avg-token.clar)**
+### **CXVG Token (cxvg-token.clar)**
 
 ```clarity
-Token: AutoVault Governance (AVG)
-Max Supply: 100,000,000 AVG (100M for broader participation)
-Decimals: 6 (micro-AVG precision)
+Token: AutoVault Governance (CXVG)
+Max Supply: 100,000,000 CXVG (100M for broader participation)
+Decimals: 6 (micro-CXVG precision)
 
 Migration Epochs (Extended 4-Year Schedule):
-├── Epoch 1 (Blocks 1 – ~52,560): 1.0 AVG per AVLP baseline
-├── Epoch 2 (Blocks ~52,561 – ~105,120): Dynamic 1.1–1.3 AVG per AVLP (incentive based on remaining AVLP)
-├── Epoch 3 (Blocks ~105,121 – ~157,680): Dynamic 1.3–1.6 AVG per AVLP (incentive based on remaining AVLP)
-└── Epoch 4 (Blocks ~157,681 – ~210,240): Dynamic 1.6–2.0 AVG per AVLP (final incentive band)
+├── Epoch 1 (Blocks 1 – ~52,560): 1.0 CXVG per AVLP baseline
+├── Epoch 2 (Blocks ~52,561 – ~105,120): Dynamic 1.1–1.3 CXVG per AVLP (incentive based on remaining AVLP)
+├── Epoch 3 (Blocks ~105,121 – ~157,680): Dynamic 1.3–1.6 CXVG per AVLP (incentive based on remaining AVLP)
+└── Epoch 4 (Blocks ~157,681 – ~210,240): Dynamic 1.6–2.0 CXVG per AVLP (final incentive band)
 
 Revenue Distribution:
-├── 80% to AVG holders (REVENUE_SHARE_BPS: 8000)
+├── 80% to CXVG holders (REVENUE_SHARE_BPS: 8000)
 └── 20% to protocol treasury (TREASURY_RESERVE_BPS: 2000)
 ```
 
@@ -46,12 +46,12 @@ Revenue Distribution:
 Token: AutoVault Liquidity Provider (AVLP)
 Max Supply: 50,000,000 AVLP (50M for enhanced liquidity)
 Decimals: 6 (micro-AVLP precision)
-Purpose: Temporary token that migrates to AVG
+Purpose: Temporary token that migrates to CXVG
 
 Liquidity Mining:
 ├── Base Rewards: Per-block emissions based on epoch
 ├── Loyalty Bonuses: 5-25% extra for long-term LPs
-├── Progressive Migration: Increasing AVG conversion rates
+├── Progressive Migration: Increasing CXVG conversion rates
 └── Emergency Migration: Auto-convert after Epoch 4
 ```
 
@@ -59,7 +59,7 @@ Liquidity Mining:
 
 ### **Phase 1: Enhanced Token Launch (IMPLEMENTED)**
 
-- **AVG**: 100M supply for broad governance participation ✅
+- **CXVG**: 100M supply for broad governance participation ✅
 - **AVLP**: 50M supply for enhanced liquidity mining ✅
 - **Progressive Migration**: Automated epoch-based conversion ✅
 - **Revenue Sharing**: 80/20 split to holders/treasury ✅
@@ -81,8 +81,8 @@ Loyalty Bonuses:
 ### **Phase 3: Migration Mechanics (AUTOMATED & DYNAMIC)**
 
 ```clarity
-Migration Rates (implemented in avg-token.clar):
-├── Epoch 1: 1.0 AVG per AVLP (1:1 baseline)
+Migration Rates (implemented in cxvg-token.clar):
+├── Epoch 1: 1.0 CXVG per AVLP (1:1 baseline)
 ├── Epoch 2: Dynamically 1.1x - 1.3x, based on remaining AVLP supply
 ├── Epoch 3: Dynamically 1.3x - 1.6x, based on remaining AVLP supply
 └── Epoch 4: Dynamically 1.6x - 2.0x, based on remaining AVLP supply
@@ -100,7 +100,7 @@ Emergency Protection:
 Revenue Distribution (implemented):
 ├── Collection: Vault fees → Treasury accumulation
 ├── Snapshot: Per-epoch revenue calculation  
-├── Distribution: 80% to AVG holders proportionally
+├── Distribution: 80% to CXVG holders proportionally
 ├── Claims: On-demand revenue claiming by holders
 └── Reserve: 20% retained for protocol operations
 ```
@@ -112,41 +112,41 @@ Revenue Distribution (implemented):
 ```clarity
 Revenue Distribution Model (implemented):
 ├── Monthly Protocol Revenue → Treasury Collection
-├── Epoch Snapshots → Revenue per AVG calculation  
-├── Proportional Distribution → 80% to AVG holders
+├── Epoch Snapshots → Revenue per CXVG calculation  
+├── Proportional Distribution → 80% to CXVG holders
 ├── On-Demand Claims → Users claim earned revenue
 └── Treasury Reserve → 20–40% for protocol sustainability (governance adjustable target band)
 
 Token Distribution (implemented in contracts):
-AVG Supply: 100,000,000 tokens
+CXVG Supply: 100,000,000 tokens
 ├── DAO Community: 30,000,000 (30%) - Broad participation
 ├── Team/Founders: 20,000,000 (20%) - Vested over time
 ├── Treasury Ops: 20,000,000 (20%) - Protocol operations  
 ├── Migration Pool: 20,000,000 (20%) - ACTR/AVLP conversion
 └── Reserve Fund: 10,000,000 (10%) - Emergency expansion
 
-AVLP Supply: 50,000,000 tokens (migrates to AVG)
+AVLP Supply: 50,000,000 tokens (migrates to CXVG)
 ├── LP Rewards: 30,000,000 (60%) - Mining incentives
 └── Migration Pool: 20,000,000 (40%) - Direct conversion
 ```
 
 ### Post-Vesting Ownership Transition & Bounty Alignment
 
-After the initial **Team/Founders 20,000,000 AVG** allocation vests (standard linear unlock with cliffs as defined in governance policy), any unutilized governance influence (unvoted, idle, or treasury-held remainder earmarked for team incentives) transitions under a structured bounty mandate to ensure long-term decentralization and continued innovation.
+After the initial **Team/Founders 20,000,000 CXVG** allocation vests (standard linear unlock with cliffs as defined in governance policy), any unutilized governance influence (unvoted, idle, or treasury-held remainder earmarked for team incentives) transitions under a structured bounty mandate to ensure long-term decentralization and continued innovation.
 
 | Phase | Trigger Condition | Action | Target Outcome |
 |-------|-------------------|--------|----------------|
 | P0 (Active) | Pre-vesting | Standard founder voting + vesting locks | Stable initial stewardship |
 | P1 (Transition Start) | 50% of founder allocation vested | Begin metering idle (non-voted for N epochs) founder-controlled voting power into Bounty Allocation Queue (BAQ) at 2% per epoch | Reduce passive concentration |
-| P2 (Acceleration) | 75% vested & <60% avg founder vote participation (rolling 90d) | Increase reallocation rate to 4% per epoch (capped) | Incentivize active governance or dilution |
+| P2 (Acceleration) | 75% vested & <60% cxvg founder vote participation (rolling 90d) | Increase reallocation rate to 4% per epoch (capped) | Incentivize active governance or dilution |
 | P3 (Completion) | 100% vested OR 48 months elapsed | Lock remaining unreleased founder incentive pool; mint equivalent bounty-backed escrow (BES) entries | Full decentralization of surplus |
 
 Reallocated governance units are not dumped to market; they are streamed into the **Automated Bounty System** (see `automated-bounty-system.clar`) via:
 
 1. Emission Registry Entry: `bounty-governance-stream` (epoch-indexed)
-2. Rate Governor: Caps BAQ inflow to max 1% of circulating AVG per 30-day window
+2. Rate Governor: Caps BAQ inflow to max 1% of circulating CXVG per 30-day window
 3. Merit Filters: Bounty categories (security, core feature, protocol research) weighted by DAO-approved priority multipliers
-4. Vest-on-Award: Granted AVG to bounty winners vests over 3 months with 1-month cliff to mitigate instant sell pressure
+4. Vest-on-Award: Granted CXVG to bounty winners vests over 3 months with 1-month cliff to mitigate instant sell pressure
 
 ### DAO & Metrics System Enhancements (Post-Ownership Transition)
 
@@ -156,7 +156,7 @@ Reallocated governance units are not dumped to market; they are streamed into th
 | Dynamic Delegation Router | Auto-suggests delegate assignments for idle holders | DAO interface + off-chain agent | Delegated voting coverage |
 | Bounty Performance Index | Measures ROI of bounty spend (reward / merged LOC quality score) | Add map + event in bounty system | Cost efficiency score |
 | Contribution Reputation Layer | Non-transferable reputation for high-signal contributors affecting bounty weight | New `reputation-token` (soulbound) | Reputation distribution Gini |
-| Emission Transparency Dashboard | Real-time stream of founder-to-bounty reallocations | Indexer + events (`founder-realloc`) | Reallocated AVG %, epoch cadence |
+| Emission Transparency Dashboard | Real-time stream of founder-to-bounty reallocations | Indexer + events (`founder-realloc`) | Reallocated CXVG %, epoch cadence |
 
 #### Metrics Auto-Adjustment Logic
 
@@ -182,7 +182,7 @@ If proposal_latency_median > target_latency:
 
 | Component | Change | Priority |
 |----------|--------|----------|
-| `avg-token.clar` | Add `founder-reallocation-enabled` flag + event | High |
+| `cxvg-token.clar` | Add `founder-reallocation-enabled` flag + event | High |
 | `dao-governance.clar` | Hook: check participation metric; compute realloc delta | High |
 | `automated-bounty-system.clar` | Accept governance stream deposits | High |
 | New `governance-metrics.clar` | Track participation, quorum, latency | Medium |
@@ -193,7 +193,7 @@ If proposal_latency_median > target_latency:
 
 ### **Economic Projections (Conservative Estimates)**
 
-| Timeline | Monthly Revenue | AVG Holder Share | Revenue per Token |
+| Timeline | Monthly Revenue | CXVG Holder Share | Revenue per Token |
 |----------|-----------------|------------------|-------------------|
 | **Month 1-3** | $50K-100K | $40K-80K | 1.3-2.7 cents |
 | **Month 4-6** | $100K-250K | $80K-200K | 2.7-6.7 cents |
@@ -244,7 +244,7 @@ Long-term Viability:
 
 ### **✅ SUCCESSFULLY IMPLEMENTED**
 
-1. **Enhanced Tokenomics**: 100M AVG / 50M AVLP supplies deployed
+1. **Enhanced Tokenomics**: 100M CXVG / 50M AVLP supplies deployed
 2. **Migration Mechanics**: Progressive bonus system operational  
 3. **Revenue Distribution**: 80/20 split implemented in contracts
 4. **Liquidity Mining**: Epoch-based rewards with loyalty bonuses
@@ -268,7 +268,7 @@ Long-term Viability:
 
 **The AutoVault tokenomics system represents a mature, well-designed implementation that:**
 
-✅ **Achieves Broader Participation**: 100M AVG supply enables community-wide governance  
+✅ **Achieves Broader Participation**: 100M CXVG supply enables community-wide governance  
 ✅ **Protects Liquidity Providers**: Progressive migration bonuses retain essential capital  
 ✅ **Generates Sustainable Revenue**: 80% distribution to holders creates long-term value  
 ✅ **Prevents Common DeFi Failures**: Multiple safeguards and emergency mechanisms  

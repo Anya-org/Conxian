@@ -37,16 +37,16 @@ cat > manual_test_commands.clar <<'CLARITY'
 
 ;; === TOKENOMICS VERIFICATION ===
 
-;; Check AVG token supply (should be 10,000,000)
-(contract-call? .avg-token get-total-supply)
+;; Check CXVG token supply (should be 10,000,000)
+(contract-call? .cxvg-token get-total-supply)
 
 ;; Check AVLP token supply (should be 5,000,000)
 (contract-call? .avlp-token get-total-supply)
 
 ;; Verify token metadata
-(contract-call? .avg-token get-name)
-(contract-call? .avg-token get-symbol)
-(contract-call? .avg-token get-decimals)
+(contract-call? .cxvg-token get-name)
+(contract-call? .cxvg-token get-symbol)
+(contract-call? .cxvg-token get-decimals)
 
 ;; === VAULT FUNCTIONALITY ===
 
@@ -135,7 +135,7 @@ cat > manual_test_commands.clar <<'CLARITY'
 ;; Test revenue distribution (simulated)
 ;; 1. Generate fees
 ;; 2. Trigger distribution
-;; 3. Check AVG holder rewards
+;; 3. Check CXVG holder rewards
 ;; 4. Verify buyback execution
 
 CLARITY
@@ -155,7 +155,7 @@ echo "4. Verify expected outputs"
 echo ""
 echo "📋 EXPECTED RESULTS:"
 echo "==================="
-echo "- AVG Total Supply: u10000000000000 (10M tokens)"
+echo "- CXVG Total Supply: u10000000000000 (10M tokens)"
 echo "- AVLP Total Supply: u5000000000000 (5M tokens)"
 echo "- All contract calls should return valid data"
 echo "- No runtime errors or panics"

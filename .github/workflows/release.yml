@@ -122,7 +122,7 @@ jobs:
           echo "" >> changelog.md
           echo "## Metrics" >> changelog.md
           echo "- Contracts: 16" >> changelog.md
-          echo "- Tokenomics: 10M AVG / 5M AVLP" >> changelog.md
+          echo "- Tokenomics: 10M CXVG / 5M AVLP" >> changelog.md
           echo "content<<EOF" >> $GITHUB_OUTPUT
           cat changelog.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT

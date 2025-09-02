@@ -64,7 +64,7 @@ const ORDER = [
   'mock-ft',
   'gov-token',
   'creator-token',
-  'avg-token',
+  'cxvg-token',
   'avlp-token'
 ];
 
