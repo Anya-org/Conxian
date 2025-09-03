@@ -61,7 +61,7 @@ class EnhancedPostDeploymentVerifier {
         loadDistribution: `${deployerAddr}.dynamic-load-distribution`,
         timelock: `${deployerAddr}.timelock`,
         dao: `${deployerAddr}.dao`,
-        govToken: `${deployerAddr}.gov-token`,
+        govToken: `${deployerAddr}.CXVG`,
         treasury: `${deployerAddr}.treasury`,
       },
       performanceTargets: {
@@ -123,7 +123,7 @@ class EnhancedPostDeploymentVerifier {
       setIf('loadDistribution', 'dynamic-load-distribution', 'load-distribution');
       setIf('timelock', 'timelock');
       setIf('dao', 'dao', 'dao-governance');
-      setIf('govToken', 'gov-token');
+      setIf('govToken', 'CXVG');
       setIf('treasury', 'treasury');
 
       // Update deployer address from any contract id if available

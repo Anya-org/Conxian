@@ -32,7 +32,7 @@ const STACKS_DIR = path.join(PROJECT_ROOT, 'stacks');
 const CONTRACTS_DIR = path.join(STACKS_DIR, 'contracts');
 
 const ORDER = [
-  'sip-010-trait','strategy-trait','vault-admin-trait','vault-trait','mock-ft','gov-token','treasury','vault','timelock','dao','dao-governance','analytics','registry','bounty-system','creator-token','dao-automation','cxvg-token','cxlp-token'
+  'sip-010-trait','strategy-trait','vault-admin-trait','vault-trait','mock-ft','CXVG','treasury','vault','timelock','dao','dao-governance','analytics','registry','bounty-system','creator-token','dao-automation','cxvg-token','cxlp-token'
 ];
 
 async function sleep(ms){return new Promise(r=>setTimeout(r,ms));}

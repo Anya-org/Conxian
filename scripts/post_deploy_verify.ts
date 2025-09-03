@@ -12,7 +12,7 @@ const CONTRACTS = {
   vault: `${DEPLOYER}.vault`,
   timelock: `${DEPLOYER}.timelock`,
   dao: `${DEPLOYER}.dao`,
-  gov: `${DEPLOYER}.gov-token`,
+  gov: `${DEPLOYER}.CXVG`,
 };
 
 async function ro(addr: string, name: string, fn: string) {

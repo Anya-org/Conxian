@@ -26,7 +26,7 @@ cat > "$FILE" <<'JSON'
     "treasury": "<tbd>",
     "bounty-system": "<tbd>",
     "creator-token": "<tbd>",
-    "gov-token": "<tbd>",
+    "CXVG": "<tbd>",
     "timelock": "<tbd>",
     "analytics": "<tbd>"
   }

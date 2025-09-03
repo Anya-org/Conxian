@@ -62,7 +62,7 @@ const ORDER = [
   'analytics',
   'bounty-system',
   'mock-ft',
-  'gov-token',
+  'CXVG',
   'creator-token',
   'cxvg-token',
   'cxlp-token'

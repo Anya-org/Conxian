@@ -23,7 +23,7 @@ CONTRACTS=(
   ownable-trait enhanced-caller-admin-trait math-lib-advanced oracle-aggregator-enhanced \
   dex-factory-enhanced multi-hop-router-v3 concentrated-liquidity-pool vault-production \
   treasury dao-governance conxian-registry analytics bounty-system \
-  mock-ft gov-token creator-token cxvg-token cxlp-token
+  mock-ft CXVG creator-token cxvg-token cxlp-token
 )
 
 MISSING=()
@@ -102,7 +102,7 @@ else
       "height": 0,
       "status": "prepared"
     },
-    "gov-token": {
+    "CXVG": {
       "txid": "<pending>",
       "contract_id": "<pending>",
       "height": 0,
@@ -183,7 +183,7 @@ else
   },
   "deployment_order": [
     "sip-010-trait", "strategy-trait", "vault-admin-trait", "vault-trait",
-    "mock-ft", "gov-token", "treasury", "vault", "timelock", "dao",
+    "mock-ft", "CXVG", "treasury", "vault", "timelock", "dao",
     "dao-governance", "analytics", "registry", "bounty-system", 
     "creator-token", "dao-automation", "cxvg-token", "cxlp-token"
   ],
