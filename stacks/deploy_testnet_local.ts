@@ -12,7 +12,7 @@ const contracts = [
   'vault-admin-trait.clar',
   'strategy-trait.clar',
   'mock-ft.clar',
-  'gov-token.clar',
+  'CXVG.clar',
   'creator-token.clar',
   'cxvg-token.clar',
   'cxlp-token.clar',

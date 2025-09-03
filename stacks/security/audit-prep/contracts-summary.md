@@ -13,7 +13,7 @@ Last updated: August 16, 2025
 - dao-automation.clar
 - dao-governance.clar
 - dao.clar
-- gov-token.clar
+- CXVG.clar
 - mock-ft.clar
 - registry.clar
 - timelock.clar

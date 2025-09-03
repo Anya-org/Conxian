@@ -10,7 +10,7 @@
 
 ;; Test token functions
 (contract-call? .cxvg-token get-total-supply)
-(contract-call? .gov-token get-total-supply)
+(contract-call? .CXVG get-total-supply)
 
 ;; Test registry
 (contract-call? .registry get-count)

@@ -18,7 +18,7 @@ Stacks blockchain.
 
 - `cxvg-token.clar` - 10M governance token with voting power
 - `cxlp-token.clar` - 5M liquidity token for progressive migration
-- `gov-token.clar` - Voting power distribution mechanism
+- `CXVG.clar` - Voting power distribution mechanism
 - `creator-token.clar` - Creator incentive alignment system
 
 ### Security & Infrastructure (8 contracts)

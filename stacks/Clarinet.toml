@@ -8,6 +8,9 @@ clarinet_version = "3.5.0"
 deployer = { mnemonic = "twice kind fence tip hidden tilt action fragile skin nothing glory cousin green tomorrow spring wrist shed math olympic multiply hip blue scout claw", balance = 100_000_000_000_000 }
 wallet_1 = { mnemonic = "sell invite acquire kitten bamboo drastic jelly vivid peace spawn twice guilt pave pen trash pretty park cube fragile unaware remain midnight betray rebuild", balance = 100_000_000_000_000 }
 
+# DEPRECATED: This stacks/Clarinet.toml is not used by tests/CI.
+# Use the root-level Clarinet.toml and Clarinet.test.toml instead to avoid drift.
+# This file remains for historical reference; paths may be stale.
 # Traits
 [contracts.sip-010-trait]
 path = "../contracts/traits/sip-010-trait.clar"
