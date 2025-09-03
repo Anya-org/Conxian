@@ -11,32 +11,45 @@ The Conxian tokenomics system has been **successfully implemented** with enhance
 - **CXVG Token**: 100,000,000 total supply for broader governance participation
 - **CXLP Token**: 50,000,000 total supply for liquidity provision with migration bonuses
 - **Progressive Auto Migration**: Epochs 1-4 with increasing, dynamically-calculated conversion rates
-- **Revenue Sharing**: 80% to CXVG holders, 20% to protocol treasury
+- **Revenue Sharing**: 80% to CXD holders, 20% to protocol treasury
 
 ### 2. **Production-Ready Implementation**
 
 - **Smart Contract Deployed**: All tokenomics logic implemented in Clarity
-- **Migration Mechanics**: Automated, permissionless epoch-based CXLP→CXVG conversion
+- **Migration Mechanics**: Automated, permissionless epoch-based CXLP→CXD conversion
 - **Liquidity Mining**: Block-based rewards with loyalty bonuses
 - **DAO Integration**: Full governance control over parameters, with automated checks for founder vesting
 
+## **Status: Implemented vs Planned (Current Repo)**
+
+- **Standards**: SIP-010 (FT), SIP-009 (NFT) — used across tokens (Planned where not present)
+- **Tokens**:
+  - CXVG (Governance): Planned — not in `Clarinet.toml` yet
+  - CXD (Revenue/Main): Planned — not in `Clarinet.toml` yet
+  - CXLP (Liquidity Mining): Planned — not in `Clarinet.toml` yet
+  - CXTR (Creator/Contributor): Planned — not in `Clarinet.toml` yet
+  - CXS (Soulbound Reputation, SIP-009): Planned — not in `Clarinet.toml` yet
+- **Modules**:
+  - `revenue-router.clar`, `treasury.clar`, `governance-metrics.clar`, `automated-bounty-system.clar`: Planned
+- **Reference**: See `Clarinet.toml` — currently registers dimensional modules only.
+
 ## **📊 ACTUAL SMART CONTRACT IMPLEMENTATION**
 
-### **CXVG Token (cxvg-token.clar)**
+### **CXD Token (cxd-token.clar)**
 
 ```clarity
-Token: Conxian Governance (CXVG)
-Max Supply: 100,000,000 CXVG (100M for broader participation)
-Decimals: 6 (micro-CXVG precision)
+Token: Conxian Domain/Revenue (CXD)
+Soft Cap: 1,000,000,000 CXD (1B, KPI-adaptive emissions within bounds)
+Decimals: 6 (micro-CXD precision)
 
-Migration Epochs (Extended 4-Year Schedule):
-├── Epoch 1 (Blocks 1 – ~52,560): 1.0 CXVG per CXLP baseline
-├── Epoch 2 (Blocks ~52,561 – ~105,120): Dynamic 1.1–1.3 CXVG per CXLP (incentive based on remaining CXLP)
-├── Epoch 3 (Blocks ~105,121 – ~157,680): Dynamic 1.3–1.6 CXVG per CXLP (incentive based on remaining CXLP)
-└── Epoch 4 (Blocks ~157,681 – ~210,240): Dynamic 1.6–2.0 CXVG per CXLP (final incentive band)
+Migration Epochs (CXLP → CXD, Extended 4-Year Schedule):
+├── Epoch 1 (Blocks 1 – ~52,560): 1.0 CXD per CXLP baseline
+├── Epoch 2 (Blocks ~52,561 – ~105,120): Dynamic 1.1–1.3 CXD per CXLP (bounded by policy)
+├── Epoch 3 (Blocks ~105,121 – ~157,680): Dynamic 1.3–1.6 CXD per CXLP (bounded by policy)
+└── Epoch 4 (Blocks ~157,681 – ~210,240): Dynamic 1.6–2.0 CXD per CXLP (final incentive band)
 
 Revenue Distribution:
-├── 80% to CXVG holders (REVENUE_SHARE_BPS: 8000)
+├── 80% to CXD holders (REV_HOLDERS_BPS: 8000)
 └── 20% to protocol treasury (TREASURY_RESERVE_BPS: 2000)
 ```
 
@@ -46,12 +59,12 @@ Revenue Distribution:
 Token: Conxian Liquidity Provider (CXLP)
 Max Supply: 50,000,000 CXLP (50M for enhanced liquidity)
 Decimals: 6 (micro-CXLP precision)
-Purpose: Temporary token that migrates to CXVG
+Purpose: Temporary token that migrates to CXD
 
 Liquidity Mining:
 ├── Base Rewards: Per-block emissions based on epoch
 ├── Loyalty Bonuses: 5-25% extra for long-term LPs
-├── Progressive Migration: Increasing CXVG conversion rates
+├── Progressive Migration: Increasing CXD conversion rates
 └── Emergency Migration: Auto-convert after Epoch 4
 ```
 
@@ -59,10 +72,10 @@ Liquidity Mining:
 
 ### **Phase 1: Enhanced Token Launch (IMPLEMENTED)**
 
-- **CXVG**: 100M supply for broad governance participation ✅
-- **CXLP**: 50M supply for enhanced liquidity mining ✅
-- **Progressive Migration**: Automated epoch-based conversion ✅
-- **Revenue Sharing**: 80/20 split to holders/treasury ✅
+- **CXVG**: 100M supply for broad governance participation 
+- **CXLP**: 50M supply for enhanced liquidity mining 
+- **Progressive Migration**: Automated epoch-based conversion 
+- **Revenue Sharing**: 80/20 split to holders/treasury 
 
 ### **Phase 2: Liquidity Mining (ACTIVE)**
 
@@ -81,8 +94,8 @@ Loyalty Bonuses:
 ### **Phase 3: Migration Mechanics (AUTOMATED & DYNAMIC)**
 
 ```clarity
-Migration Rates (implemented in cxvg-token.clar):
-├── Epoch 1: 1.0 CXVG per CXLP (1:1 baseline)
+Migration Rates (implemented in cxd-token.clar):
+├── Epoch 1: 1.0 CXD per CXLP (1:1 baseline)
 ├── Epoch 2: Dynamically 1.1x - 1.3x, based on remaining CXLP supply
 ├── Epoch 3: Dynamically 1.3x - 1.6x, based on remaining CXLP supply
 └── Epoch 4: Dynamically 1.6x - 2.0x, based on remaining CXLP supply
@@ -100,7 +113,7 @@ Emergency Protection:
 Revenue Distribution (implemented):
 ├── Collection: Vault fees → Treasury accumulation
 ├── Snapshot: Per-epoch revenue calculation  
-├── Distribution: 80% to CXVG holders proportionally
+├── Distribution: 80% to CXD holders proportionally
 ├── Claims: On-demand revenue claiming by holders
 └── Reserve: 20% retained for protocol operations
 ```
@@ -112,12 +125,13 @@ Revenue Distribution (implemented):
 ```clarity
 Revenue Distribution Model (implemented):
 ├── Monthly Protocol Revenue → Treasury Collection
-├── Epoch Snapshots → Revenue per CXVG calculation  
-├── Proportional Distribution → 80% to CXVG holders
+├── Epoch Snapshots → Revenue per CXD calculation  
+├── Proportional Distribution → 80% to CXD holders
 ├── On-Demand Claims → Users claim earned revenue
-└── Treasury Reserve → 20–40% for protocol sustainability (governance adjustable target band)
+└── Treasury Reserve → 20–40% for protocol sustainability 
+        * (governance adjustable target band)
 
-Token Distribution (implemented in contracts):
+Token Distribution (planned; to be implemented):
 CXVG Supply: 100,000,000 tokens
 ├── DAO Community: 30,000,000 (30%) - Broad participation
 ├── Team/Founders: 20,000,000 (20%) - Vested over time
@@ -125,10 +139,20 @@ CXVG Supply: 100,000,000 tokens
 ├── Migration Pool: 20,000,000 (20%) - ACTR/CXLP conversion
 └── Reserve Fund: 10,000,000 (10%) - Emergency expansion
 
-CXLP Supply: 50,000,000 tokens (migrates to CXVG)
+CXLP Supply: 50,000,000 tokens (migrates to CXD)
 ├── LP Rewards: 30,000,000 (60%) - Mining incentives
 └── Migration Pool: 20,000,000 (40%) - Direct conversion
 ```
+
+## **Parameters & Guardrails (Governance-Bounded)**
+
+- **Revenue Split (CXD holders / Treasury)**: 60–90% / 10–40% (default 80/20); change ≤5% per 30 days; 48–96h timelock.
+- **Migration Bands (CXLP→CXD)**: 1.0x; 1.1–1.3x; 1.3–1.6x; 1.6–2.0x; epoch length 30–60 days; emergency auto‑migrate after E4.
+- **Emissions (CXD)**: ≤0.20% daily of remaining supply; decay 8–15%/epoch; KPI‑adaptive.
+- **Loyalty Bonus**: ≤+25% with anti‑reset decay; cap per wallet tranche to limit whale capture.
+- **Founder Vote Cap (CXVG)**: 15% of circulating; excess auto‑escrowed (no vote).
+- **Founder Reallocation Throttle**: ≤1% of circulating per 30d; total ≤ founder pool; 14‑day circuit breaker.
+- **Timelocks & Breakers**: Timelock all tunables; scope‑specific circuit breakers (emissions, migration, claims, global).
 
 ### Post-Vesting Ownership Transition & Bounty Alignment
 
@@ -138,7 +162,7 @@ After the initial **Team/Founders 20,000,000 CXVG** allocation vests (standard l
 |-------|-------------------|--------|----------------|
 | P0 (Active) | Pre-vesting | Standard founder voting + vesting locks | Stable initial stewardship |
 | P1 (Transition Start) | 50% of founder allocation vested | Begin metering idle (non-voted for N epochs) founder-controlled voting power into Bounty Allocation Queue (BAQ) at 2% per epoch | Reduce passive concentration |
-| P2 (Acceleration) | 75% vested & <60% cxvg founder vote participation (rolling 90d) | Increase reallocation rate to 4% per epoch (capped) | Incentivize active governance or dilution |
+| P2 (Acceleration) | 75% vested & <60% CXVG founder vote participation (rolling 90d) | Increase reallocation rate to 4% per epoch (capped) | Incentivize active governance or dilution |
 | P3 (Completion) | 100% vested OR 48 months elapsed | Lock remaining unreleased founder incentive pool; mint equivalent bounty-backed escrow (BES) entries | Full decentralization of surplus |
 
 Reallocated governance units are not dumped to market; they are streamed into the **Automated Bounty System** (see `automated-bounty-system.clar`) via:
@@ -193,7 +217,7 @@ If proposal_latency_median > target_latency:
 
 ### **Economic Projections (Conservative Estimates)**
 
-| Timeline | Monthly Revenue | CXVG Holder Share | Revenue per Token |
+| Timeline | Monthly Revenue | CXD Holder Share | Revenue per Token |
 |----------|-----------------|------------------|-------------------|
 | **Month 1-3** | $50K-100K | $40K-80K | 1.3-2.7 cents |
 | **Month 4-6** | $100K-250K | $80K-200K | 2.7-6.7 cents |

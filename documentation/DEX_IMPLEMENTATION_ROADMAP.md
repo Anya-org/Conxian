@@ -292,7 +292,7 @@
 ;; contracts/dex-governance.clar
 (define-public (propose-fee-change (pool-id uint) (new-fee uint))
   (let ((proposal-id (+ (var-get proposal-count) u1)))
-    (asserts! (>= (unwrap! (contract-call? .gov-token get-balance tx-sender) ERR_GOVERNANCE_TOKEN_ERROR) PROPOSAL_THRESHOLD) ERR_INSUFFICIENT_GOVERNANCE_TOKENS)
+    (asserts! (>= (unwrap! (contract-call? .CXVG get-balance tx-sender) ERR_GOVERNANCE_TOKEN_ERROR) PROPOSAL_THRESHOLD) ERR_INSUFFICIENT_GOVERNANCE_TOKENS)
     (map-set proposals proposal-id 
       {proposer: tx-sender, 
        action: "fee-change", 

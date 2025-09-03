@@ -36,11 +36,11 @@ Deposit → Get Shares → Earn Automatic Yield → Withdraw Anytime
 ### 🗳️ Governance
 
 ```
-Hold CXVG → Vote on Proposals → Earn Revenue Share (80%)
+Hold CXVG → Vote on Proposals
 ```
 
 - **Requirement**: Any amount of CXVG tokens
-- **Revenue**: 80% of protocol revenue distributed
+- **Revenue**: 80% of protocol revenue distributed to CXD holders
 - **Voting**: 1 week periods, 1 day execution delay
 
 ### 💱 Trading
@@ -59,15 +59,16 @@ DEX Swaps → Provide Liquidity → Earn Trading Fees + CXLP Rewards
 
 | Token | Purpose | Supply | How to Get |
 |-------|---------|---------|------------|
-| **CXVG** | Governance + Revenue | 100M | Migrate CXLP tokens |
+| **CXVG** | Governance | 100M | Acquire; governance rewards |
+| **CXD** | Revenue/Main | 1B (soft cap) | Migrate CXLP; DAO emissions/reserve |
 | **CXLP** | Liquidity Rewards | 50M | Vault deposits, DEX liquidity |
-| **Creator** | Merit Rewards | Variable | Contribute to platform |
+| **CXTR** | Merit Rewards | Variable | Contribute to platform |
+| **CXS**  | Soulbound Token | Reputation aligned
 
 ### Migration Schedule
 
-- **Epoch 1**: 1 CXLP = 1 CXVG (Week 1)
-- **Epoch 2**: 1 CXLP = 0.8 CXVG (Weeks 2-3)  
-- **Epoch 3**: 1 CXLP = 0.6 CXVG (Weeks 3-4, final)
+- **Epoch Bands**: Increasing CXLP→CXD conversion across 4 bands (1.0x → up to 2.0x)
+- **Timelocked & Bounded**: DAO-governed within guardrails; emergency auto‑migrate after E4
 
 ---
 
@@ -133,14 +134,14 @@ DEX Swaps → Provide Liquidity → Earn Trading Fees + CXLP Rewards
 1. Deposit assets to vault
 2. Monitor APY and performance
 3. Consider providing DEX liquidity
-4. Accumulate CXLP for CXVG migration
+4. Accumulate CXLP for CXD migration
 
 ### For Governance Participants
 
 1. Acquire CXVG tokens
 2. Join community discussions
 3. Review and vote on proposals
-4. Claim revenue distributions
+4. Track CXD revenue distributions
 
 ### For Traders
 

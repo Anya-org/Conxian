@@ -6,7 +6,7 @@
 | **Version** | 1.2 |
 | **Owner** | Protocol WG |
 | **Last Updated** | 2025-08-26 |
-| **References** | [AIP-1](...), [AIP-5](...), [Architecture](./ARCHITECTURE.md), [`vault.clar`](../../contracts/vault.clar) |
+| **References** | AIP-1, AIP-5, [Architecture](../ARCHITECTURE.md), `vault.clar` (planned) |
 
 ---
 

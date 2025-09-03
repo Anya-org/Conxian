@@ -50,7 +50,7 @@ graph TB
     %% TOKENOMICS LAYER (Layer 2)  
     subgraph "💰 TOKENOMICS SYSTEM"
         MOCKFT[mock-ft.clar]
-        GOVTOKEN[gov-token.clar]
+        GOVTOKEN[CXVG.clar]
         CXVGTOKEN[cxvg-token.clar]
         AVLPTOKEN[cxlp-token.clar]
         CREATORTOKEN[creator-token.clar]
@@ -228,7 +228,7 @@ graph TB
 |----------|---------|------------|---------|
 | `cxvg-token.clar` | Governance token | 10M | treasury, vault, dao |
 | `cxlp-token.clar` | Liquidity pool token | 5M | vault |
-| `gov-token.clar` | DAO voting token | Variable | dao, enhanced-governance |
+| `CXVG.clar` | DAO voting token | Variable | dao, enhanced-governance |
 | `creator-token.clar` | Merit-based rewards | Variable | bounty-system |
 | `mock-ft.clar` | Testing token | Unlimited | Development only |
 
@@ -236,8 +236,8 @@ graph TB
 
 | Contract | Purpose | Dependencies | Security Features |
 |----------|---------|--------------|-------------------|
-| `dao.clar` | Basic governance | gov-token, timelock | Timelock delays |
-| `dao-governance.clar` | Advanced voting | dao, gov-token | Time-weighted voting |
+| `dao.clar` | Basic governance | CXVG, timelock | Timelock delays |
+| `dao-governance.clar` | Advanced voting | dao, CXVG | Time-weighted voting |
 | `enhanced-governance.clar` | Enterprise governance | dao-governance, state-anchor | Multi-sig + timelock |
 | `timelock.clar` | Security delays | None | 24-48h delays |
 | `dao-automation.clar` | Parameter optimization | dao | Automated proposals |

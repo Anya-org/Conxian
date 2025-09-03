@@ -6,7 +6,7 @@
 | **Version** | 1.3 |
 | **Owner** | Security WG |
 | **Last Updated** | 2025-08-26 |
-| **References** | [AIP-1](...), [AIP-2](...), [AIP-3](...), [AIP-4](...), [AIP-5](...) |
+| **References** | AIP-1, AIP-2, AIP-3, AIP-4, AIP-5 |
 
 ---
 

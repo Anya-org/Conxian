@@ -1,12 +1,12 @@
 # Conxian PRD: Treasury & Reserve
 
-| | |
+|  |  |
 |---|---|
 | **Status** | ✅ Stable |
 | **Version** | 1.2 |
 | **Owner** | Treasury WG |
 | **Last Updated** | 2025-08-26 |
-| **References** | [AIP-3](...), [`treasury.clar`](../../contracts/treasury.clar) |
+| **References** | [AIP-3: Treasury Management](https://spl_governance.crsp.ac/), `treasury.clar` (planned) |
 
 ---
 

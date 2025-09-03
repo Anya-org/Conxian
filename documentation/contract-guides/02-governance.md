@@ -4,7 +4,7 @@
 
 ## 1. Introduction
 
-Decentralized governance is a critical component of the Conxian ecosystem, ensuring that the protocol is managed by its community of stakeholders. The `dao-governance.clar` contract is the engine of this system. It allows holders of the governance token (`.gov-token`) to create proposals, vote on them, and execute approved changes on-chain in a transparent and permissionless manner.
+Decentralized governance is a critical component of the Conxian ecosystem, ensuring that the protocol is managed by its community of stakeholders. The `dao-governance.clar` contract is the engine of this system. It allows holders of the governance token (`.CXVG`) to create proposals, vote on them, and execute approved changes on-chain in a transparent and permissionless manner.
 
 The contract manages the entire lifecycle of a proposal, from creation to execution, and includes features like vote delegation and time-weighted voting to promote fair and robust decision-making.
 
@@ -12,7 +12,7 @@ The contract manages the entire lifecycle of a proposal, from creation to execut
 
 ### Governance Token
 
--   **`.gov-token`**: The SIP-010 token that represents voting power in the DAO. The more tokens a user holds, the more weight their vote carries.
+-   **`.CXVG`**: The SIP-010 token that represents voting power in the DAO. The more tokens a user holds, the more weight their vote carries.
 
 ### Proposal Threshold
 
@@ -50,7 +50,7 @@ A proposal moves through several states from its creation to its final execution
 
 ### Creating a Proposal
 
-Any user holding at least `100,000` `.gov-token` can create a proposal.
+Any user holding at least `100,000` `.CXVG` can create a proposal.
 
 -   **Function:** `create-proposal`
 -   **Parameters:**
@@ -73,7 +73,7 @@ Any user holding at least `100,000` `.gov-token` can create a proposal.
 
 ### Casting a Vote
 
-Once a proposal is active, any holder of the `.gov-token` can vote.
+Once a proposal is active, any holder of the `.CXVG` can vote.
 
 -   **Function:** `cast-vote`
 -   **Parameters:**

@@ -6,7 +6,7 @@
 | **Version** | 0.3 |
 | **Owner** | R&D WG |
 | **Last Updated** | 2025-08-26 |
-| **References** | [`oracle-aggregator.clar`](../../contracts/oracle-aggregator.clar) |
+| **References** | `oracle-aggregator.clar` (planned) |
 
 ---
 

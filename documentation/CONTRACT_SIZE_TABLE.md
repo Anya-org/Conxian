@@ -31,7 +31,7 @@ Note: Source byte size is not a direct deterministic indicator of runtime execut
 | 21 | stable-pool.clar | 5,094 | Stable swap; compare function overlap with dex-pool & weighted-pool |
 | 22 | automated-bounty-system.clar | 4,744 | Automation overlay; verify event necessity |
 | 23 | circuit-breaker-simple.clar | 3,460 | Minimal breaker variant; candidate for removal or retention as fallback |
-| 24 | gov-token.clar | 3,188 | Lightweight governance token support |
+| 24 | CXVG.clar | 3,188 | Lightweight governance token support |
 | 25 | dex-router.clar | 3,115 | Routing aggregator; potential inlining trade-offs |
 | 26 | mock-ft.clar | 2,817 | Test fixture; ensure excluded from mainnet deploy set |
 | 27 | enhanced-dao-governance.clar | 2,711 | Redundant time-weight file; removal planned |

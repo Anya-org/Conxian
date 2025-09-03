@@ -30,8 +30,9 @@ Conxian is a production-ready DeFi platform built on the Stacks blockchain that 
 - **Bitcoin-Native**: Built on Stacks, inheriting Bitcoin's security while enabling smart contracts
 - **Community-Governed**: Fully decentralized governance through CXVG token holders
 - **Multi-Asset Support**: Supports various cryptocurrencies with automatic yield optimization
-- **Enterprise Security**: Multiple safety mechanisms including circuit breakers and emergency controls
-- **Revenue Sharing**: Token holders receive 80% of protocol revenue
+- **Enterprise Security**: Multiple safety mechanisms:
+                           - Circuit breakers and emergency controls
+- **Revenue Sharing**: CXD holders receive 80% of protocol revenue
 - **Automated Operations**: Self-managing system with minimal manual intervention required
 
 ### Platform Status
@@ -101,11 +102,12 @@ Community-driven decision making for all platform parameters and upgrades.
 
 ### 🪙 Token Economics
 
-Three-token system designed for sustainable growth and fair distribution.
+Multi-token system designed for sustainable growth and fair distribution.
 
 **Tokens:**
 
 - **CXVG**: Governance token (100M max supply)
+- **CXD**: Revenue token (soft cap 1B; DAO-controlled emissions)
 - **CXLP**: Liquidity provider token (50M max supply)
 - **Creator**: Merit-based rewards for contributors
 
@@ -211,25 +213,24 @@ Multiple layers of protection for user funds and platform stability.
 
 ### CXVG Token (Governance)
 
-**Purpose**: Main governance token providing voting rights and revenue sharing
+**Purpose**: Governance token providing voting rights (no direct revenue share)
 
 **Key Features:**
 
 - **Max Supply**: 100,000,000 CXVG
-- **Revenue Share**: 80% of protocol revenue distributed to holders
+- **Revenue Share**: None (protocol revenue accrues to CXD holders)
 - **Voting Power**: Proportional to token balance and holding duration
-- **Migration Path**: CXLP tokens can migrate to CXVG
+- **Migration Path**: None; CXLP migrates to CXD (revenue token)
 
 **How to Earn CXVG:**
 
-1. **Migration**: Convert CXLP tokens to CXVG (time-limited epochs)
+1. **DAO Programs**: Governance rewards or grants (if approved)
 2. **Governance Rewards**: Earn through active participation
 3. **Secondary Markets**: Purchase from other users (when available)
 
 **Benefits of Holding:**
 
 - Vote on governance proposals
-- Receive revenue distributions
 - Influence platform direction
 - Priority access to new features
 
@@ -240,14 +241,13 @@ Multiple layers of protection for user funds and platform stability.
 **Key Features:**
 
 - **Max Supply**: 50,000,000 CXLP
-- **Migration**: Can convert to CXVG during specific epochs
+- **Migration**: Can convert to CXD during defined epoch bands
 - **Earning Mechanism**: Provided as rewards for vault deposits and DEX liquidity
 
 **Migration Schedule:**
 
-- **Epoch 1**: 1:1 CXLP to CXVG ratio (first ~1 week)
-- **Epoch 2**: 1:0.8 ratio (weeks 2-3)
-- **Epoch 3**: 1:0.6 ratio (weeks 3-4, final)
+- **Epoch Bands**: Increasing CXLP→CXD conversion across 4 bands (1.0x → up to 2.0x)
+- **Timelocked & Bounded**: DAO-governed within guardrails; emergency auto‑migrate after E4
 
 **How to Earn CXLP:**
 
@@ -283,7 +283,7 @@ Multiple layers of protection for user funds and platform stability.
 
 #### Distribution Mechanism
 
-- **80% to Token Holders**: Distributed proportionally to CXVG holders
+- **80% to Token Holders**: Distributed proportionally to CXD holders
 - **20% to Treasury**: Used for development and platform growth
 - **Automated Buybacks**: Treasury funds used to buy and burn tokens
 
@@ -536,8 +536,8 @@ Conxian includes an integrated decentralized exchange (DEX) that enables seamles
 
 1. Acquire and hold CXVG tokens
 2. Participate in proposal discussions
-3. Vote on governance proposals
-4. Receive revenue sharing distributions
+3. Review and vote on proposals
+4. Track CXD revenue distributions
 
 **Benefits:**
 
@@ -597,7 +597,7 @@ A: Conxian includes multiple security layers including circuit breakers, emergen
 A: Current fees are 0.30% for deposits, 0.10% for withdrawals, and 5% performance fees on yield above benchmark. Fees are adjustable through governance.
 
 **Q: How do I earn CXVG tokens?**
-A: CXVG tokens can be earned by migrating CXLP tokens during migration epochs, participating in governance, or through secondary markets when available.
+A: CXLP migrates to CXD (revenue token), not to CXVG. Acquire CXVG via governance rewards/programs or secondary markets when available.
 
 **Q: When will mainnet launch?**
 A: Conxian is production-ready and deployed on testnet. Mainnet launch timing depends on final testing completion and community governance decisions.
