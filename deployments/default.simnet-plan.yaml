@@ -36,6 +36,46 @@ plan:
     - id: 0
       transactions:
         - emulated-contract-publish:
+            contract-name: ft-mintable-trait
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: "contracts\\traits\\ft-mintable-trait.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: sip-010-trait
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: "contracts\\traits\\sip-010-trait.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: cxd-token
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: "contracts\\cxd-token.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: cxlp-token
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: "contracts\\cxlp-token.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: sip-009-trait
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: "contracts\\traits\\sip-009-trait.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: cxs-token
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: "contracts\\cxs-token.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: cxtr-token
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: "contracts\\cxtr-token.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: cxvg-token
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: "contracts\\cxvg-token.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: dim-graph
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: "contracts\\dimensional\\dim-graph.clar"
@@ -44,16 +84,6 @@ plan:
             contract-name: dim-metrics
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: "contracts\\dimensional\\dim-metrics.clar"
-            clarity-version: 2
-        - emulated-contract-publish:
-            contract-name: dimensional-oracle-trait
-            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: "contracts\\traits\\dimensional-oracle-trait.clar"
-            clarity-version: 2
-        - emulated-contract-publish:
-            contract-name: dim-oracle-automation
-            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: "contracts\\dimensional\\dim-oracle-automation.clar"
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: dim-registry-trait
@@ -66,9 +96,14 @@ plan:
             path: "contracts\\dimensional\\dim-registry.clar"
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: sip-010-trait
+            contract-name: dimensional-oracle-trait
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: "contracts\\traits\\sip-010-trait.clar"
+            path: "contracts\\traits\\dimensional-oracle-trait.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: dim-oracle-automation
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: "contracts\\dimensional\\dim-oracle-automation.clar"
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: dim-yield-stake

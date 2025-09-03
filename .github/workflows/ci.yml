@@ -36,6 +36,8 @@ jobs:
           fi
       - name: Contract Compilation
         run: npx clarinet check
+      - name: Docs and Naming Guard
+        run: npm run validate:docs
       - name: Run Tests
         run: npm test
 

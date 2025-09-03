@@ -5,7 +5,8 @@
   "scripts": {
     "start": "npx nodemon",
     "test": "npx vitest",
-    "ci": "node ./scripts/ensure-deps.js && npx vitest run",
+    "validate:docs": "node ./scripts/validate-docs.js",
+    "ci": "node ./scripts/ensure-deps.js && node ./scripts/validate-docs.js && npx vitest run",
     "coverage": "vitest run --coverage"
   },
   "dependencies": {

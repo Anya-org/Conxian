@@ -21,7 +21,7 @@ This report verifies the implementation of the features listed in the `FULL_SYST
 | TE-01| `cxvg-token.clar`      | ✅ Verified         | `contracts/cxvg-token.clar`          |
 | TE-02| `cxlp-token.clar`     | ✅ Verified         | `contracts/cxlp-token.clar`         |
 | TE-03| `creator-token.clar`  | ✅ Verified         | `contracts/creator-token.clar`      |
-| TE-04| `gov-token.clar`      | ✅ Verified         | `contracts/gov-token.clar`          |
+| TE-04| `CXVG.clar`      | ✅ Verified         | `contracts/CXVG.clar`          |
 | TE-05| `reputation-token.clar`| ⚪ Not Verified     | `contracts/reputation-token.clar`   |
 
 ## 🏦 Vault & Yield Infrastructure (9)

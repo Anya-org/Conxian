@@ -1,0 +1,214 @@
+# development-config.yaml
+# Development environment configuration for Conxian Enhanced Tokenomics
+
+# =============================================================================
+# ENVIRONMENT SETTINGS
+# =============================================================================
+environment: development
+network: simnet
+auto_confirm: true
+gas_limit: 1000000
+gas_price: 1
+
+# =============================================================================
+# TOKEN CONFIGURATION
+# =============================================================================
+tokens:
+  cxd:
+    name: "Conxian Revenue Token"
+    symbol: "CXD"
+    decimals: 6
+    initial_supply: 0
+    max_supply: 21000000000000  # 21M tokens
+    emission_per_block: 1000000000000  # 1M tokens per epoch
+    epoch_length: 10080  # 1 week in blocks
+    
+  cxvg:
+    name: "Conxian Governance Token" 
+    symbol: "CXVG"
+    decimals: 6
+    initial_supply: 0
+    max_supply: 10500000000000  # 10.5M tokens
+    emission_per_block: 500000000000  # 500K tokens per epoch
+    epoch_length: 10080
+    
+  cxlp:
+    name: "Conxian Liquidity Provider Token"
+    symbol: "CXLP" 
+    decimals: 6
+    initial_supply: 1000000000000  # 1M tokens for testing
+    migration_start_delay: 100  # blocks
+    
+  cxtr:
+    name: "Conxian Contributor Token"
+    symbol: "CXTR"
+    decimals: 6
+    initial_supply: 0
+    max_supply: 2100000000000  # 2.1M tokens
+    emission_per_block: 100000000000  # 100K tokens per epoch
+    epoch_length: 10080
+
+# =============================================================================
+# STAKING CONFIGURATION
+# =============================================================================
+staking:
+  warmup_period: 1440  # 1 day in blocks (dev)
+  cooldown_period: 1440  # 1 day in blocks (dev)  
+  min_stake_amount: 1000000  # 1 token minimum
+  max_stake_amount: 100000000000  # 100K tokens maximum
+  reward_distribution_frequency: 1440  # Daily (dev)
+
+# =============================================================================
+# GOVERNANCE CONFIGURATION  
+# =============================================================================
+governance:
+  min_lock_duration: 10080  # 1 week minimum
+  max_lock_duration: 525600  # 1 year maximum
+  proposal_bond_amount: 1000000000  # 1K tokens
+  fee_discount_tiers:
+    - threshold: 1000000000     # 1K CXVG locked
+      discount: 500             # 5% discount
+    - threshold: 10000000000    # 10K CXVG locked  
+      discount: 1000            # 10% discount
+    - threshold: 100000000000   # 100K CXVG locked
+      discount: 2000            # 20% discount
+
+# =============================================================================
+# REVENUE DISTRIBUTION
+# =============================================================================
+revenue_distribution:
+  staker_share: 7000      # 70% to stakers
+  treasury_share: 2000    # 20% to treasury
+  reserve_share: 1000     # 10% to reserves
+  distribution_frequency: 1440  # Daily (dev)
+  
+fee_collectors:
+  - contract: "cxd-token"
+    fee_rate: 100  # 1%
+  - contract: "vault-manager"  
+    fee_rate: 50   # 0.5%
+
+# =============================================================================
+# MIGRATION CONFIGURATION
+# =============================================================================
+migration:
+  epoch_cap: 100000000000      # 100K CXD per epoch
+  user_base_cap: 1000000000    # 1K CXD base
+  user_max_cap: 50000000000    # 50K CXD max
+  duration_factor: 100
+  midyear_blocks: 525600
+  adjustment_factor: 11000     # 10% bonus
+
+# =============================================================================
+# SECURITY SETTINGS
+# =============================================================================
+security:
+  circuit_breaker_enabled: true
+  invariant_monitoring_enabled: true
+  pause_on_violation: true
+  emergency_contacts:
+    - "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"  # Dev admin
+  
+monitoring:
+  health_check_frequency: 144  # Every 2 hours (dev)
+  max_violation_count: 5
+  auto_pause_threshold: 3
+
+# =============================================================================
+# DIMENSIONAL INTEGRATION
+# =============================================================================
+dimensional:
+  yield_adapter_enabled: true
+  bond_adapter_enabled: true
+  revenue_routing_enabled: true
+  
+yield_staking:
+  min_yield_amount: 100000  # 0.1 tokens
+  yield_distribution_frequency: 1440  # Daily
+  
+tokenized_bonds:
+  min_coupon_amount: 100000  # 0.1 tokens  
+  coupon_distribution_frequency: 10080  # Weekly
+  auto_bond_registration: false  # Manual in dev
+
+# =============================================================================
+# TESTING CONFIGURATION
+# =============================================================================
+testing:
+  unit_tests_enabled: true
+  integration_tests_enabled: true
+  system_validation_enabled: true
+  
+test_accounts:
+  - "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
+  - "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5"  
+  - "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG"
+
+test_amounts:
+  small: 5000000       # 5 tokens
+  medium: 50000000     # 50 tokens  
+  large: 500000000     # 500 tokens
+
+# =============================================================================
+# DEPLOYMENT SEQUENCE
+# =============================================================================
+deployment_phases:
+  - name: "Core Tokens"
+    contracts:
+      - "cxd-token"
+      - "cxvg-token" 
+      - "cxlp-token"
+      - "cxtr-token"
+    dependencies: []
+    
+  - name: "System Infrastructure"
+    contracts:
+      - "protocol-invariant-monitor"
+      - "token-emission-controller"
+      - "revenue-distributor" 
+      - "token-system-coordinator"
+    dependencies: ["Core Tokens"]
+    
+  - name: "Enhanced Mechanisms"
+    contracts:
+      - "cxd-staking"
+      - "cxvg-utility"
+      - "cxlp-migration-queue"
+    dependencies: ["Core Tokens", "System Infrastructure"]
+    
+  - name: "Dimensional Adapters"
+    contracts:
+      - "dim-revenue-adapter"
+      - "tokenized-bond-adapter" 
+    dependencies: ["System Infrastructure"]
+    
+  - name: "System Configuration"
+    tasks:
+      - "configure-protocol-monitor"
+      - "configure-emission-controller"
+      - "configure-revenue-distributor"
+      - "configure-system-coordinator"
+      - "enable-token-integration"
+      - "configure-dimensional-adapters"
+    dependencies: ["Enhanced Mechanisms", "Dimensional Adapters"]
+
+# =============================================================================
+# POST-DEPLOYMENT VALIDATION
+# =============================================================================
+validation:
+  required_tests:
+    - "tokenomics-unit-tests"
+    - "tokenomics-integration-tests"
+    - "system-validation-tests"
+  
+  health_checks:
+    - "contract-deployment-verification"
+    - "system-configuration-verification"
+    - "integration-verification"
+    - "security-verification"
+    
+  success_criteria:
+    - all_contracts_deployed: true
+    - all_tests_passing: true
+    - system_health_ok: true
+    - no_critical_issues: true

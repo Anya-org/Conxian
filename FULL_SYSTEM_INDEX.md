@@ -39,7 +39,7 @@ Conxian represents the **most comprehensive DeFi ecosystem on Stacks**, pioneeri
 ├── cxvg-token.clar
 ├── cxlp-token.clar
 ├── creator-token.clar
-├── gov-token.clar
+├── CXVG.clar
 └── reputation-token.clar
 
 🏦 VAULT & YIELD INFRASTRUCTURE (9)

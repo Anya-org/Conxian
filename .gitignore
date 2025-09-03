@@ -124,5 +124,3 @@ analytics/cache/
 stx-wallet*
 btc-wallet*
 .kiro/specs/
-.windsurf/
-.windsurf/workflows/*
