@@ -65,10 +65,10 @@
          (protocol-fee (var-get protocol-fee-bps))))
 
 ;; Private functions
-(define-private (only-owner-guard)
+(define-public (only-owner-guard)
   (if (is-eq tx-sender (var-get owner))
       (ok true)
-      ERR_UNAUTHORIZED))
+      (err ERR_UNAUTHORIZED)))
 
 (define-private (normalize-token-pair (token-a principal) (token-b principal))
   (tuple (token-a token-a) (token-b token-b)))
@@ -185,14 +185,14 @@
 (define-public (set-default-fee (new-fee-bps uint))
   (begin
     (try! (only-owner-guard))
-    (asserts! (<= new-fee-bps MAX_FEE_BPS) ERR_INVALID_FEE)
+    (asserts! (<= new-fee-bps MAX_FEE_BPS) (err ERR_INVALID_FEE))
     (var-set default-fee-bps new-fee-bps)
     (ok true)))
 
 (define-public (set-protocol-fee (new-fee-bps uint))
   (begin
     (try! (only-owner-guard))
-    (asserts! (<= new-fee-bps u100) ERR_INVALID_FEE) ;; Max 1%
+    (asserts! (<= new-fee-bps u100) (err ERR_INVALID_FEE)) ;; Max 1%
     (var-set protocol-fee-bps new-fee-bps)
     (ok true)))
 

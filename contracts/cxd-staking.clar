@@ -306,6 +306,12 @@
 (define-read-only (get-token-uri)
   (ok (var-get token-uri)))
 
+(define-public (set-token-uri (uri (optional (string-utf8 256))))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (var-set token-uri uri)
+    (ok true)))
+
 ;; --- Read-Only Functions ---
 (define-read-only (get-user-info (user principal))
   (let ((xcxd-balance (default-to u0 (map-get? user-balances user)))

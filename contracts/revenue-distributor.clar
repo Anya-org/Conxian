@@ -316,8 +316,8 @@
   (begin
     (asserts! (default-to false (map-get? authorized-collectors tx-sender)) (err ERR_UNAUTHORIZED))
     (if (> migration-fee u0)
-      (try! (collect-revenue migration-fee fee-token FEE_TYPE_MIGRATION_FEE))
-      (ok u0))))
+      (collect-revenue migration-fee fee-token FEE_TYPE_MIGRATION_FEE)
+      (ok true))))
 
 ;; --- Buyback Mechanism (Future Integration) ---
 
@@ -359,7 +359,9 @@
     total-distributed: (var-get total-revenue-distributed),
     current-epoch: (var-get current-distribution-epoch),
     pending-distribution: (get total-pending (default-to { total-pending: u0, last-distribution: u0 } 
-                                                         (map-get? pending-distributions (var-get cxd-token-contract)))),
+                                                         (match (var-get cxd-token-contract)
+                                                           cxd-addr (map-get? pending-distributions cxd-addr)
+                                                           none))),
     treasury-address: (var-get treasury-address),
     reserve-address: (var-get reserve-address),
     staking-contract-ref: (var-get staking-contract-ref)

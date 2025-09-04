@@ -255,11 +255,10 @@
   (ok (var-get token-uri))
 )
 
-(define-public (set-token-uri (value (optional (string-utf8 256))))
-  (begin
-    (asserts! (is-owner tx-sender) (err ERR_UNAUTHORIZED))
-    (var-set token-uri value)
-    (ok true)
+(define-public (set-token-uri (new-uri (optional (string-utf8 256))))
+  (if (is-eq tx-sender (var-get contract-owner))
+    (ok (var-set token-uri new-uri))
+    (err ERR_UNAUTHORIZED)
   )
 )
 
