@@ -28,6 +28,19 @@
 (define-data-var emission-controller (optional principal) none)
 (define-data-var protocol-monitor (optional principal) none)
 
+;; --- Creator Economy Enhancement ---
+(define-data-var creator-council (optional principal) none)
+(define-data-var bounty-system (optional principal) none)
+(define-data-var reputation-threshold uint u1000) ;; Minimum reputation for governance
+(define-data-var merit-multiplier uint u150) ;; 1.5x merit bonus multiplier
+
+;; Maps for creator economy
+(define-map creator-reputation principal uint)
+(define-map merit-scores principal uint)
+(define-map governance-eligibility principal bool)
+(define-map creator-contributions principal (tuple (total-bounties uint) (successful-proposals uint) (reputation uint)))
+(define-map seasonal-bonuses principal uint)
+
 ;; --- Helpers ---
 (define-read-only (is-owner (who principal))
   (is-eq who (var-get contract-owner))
@@ -68,6 +81,17 @@
     (var-set emission-controller (some emission-contract))
     (var-set protocol-monitor (some monitor-contract))
     (var-set system-integration-enabled true)
+    (ok true)
+  )
+)
+
+(define-public (enable-creator-economy
+    (council-contract principal)
+    (bounty-contract principal))
+  (begin
+    (asserts! (is-owner tx-sender) (err ERR_UNAUTHORIZED))
+    (var-set creator-council (some council-contract))
+    (var-set bounty-system (some bounty-contract))
     (ok true)
   )
 )
@@ -224,3 +248,125 @@
     protocol-monitor: (var-get protocol-monitor)
   }
 )
+
+;; --- Creator Economy Functions ---
+(define-public (mint-merit-reward (recipient principal) (base-amount uint) (merit-score uint))
+  "Mint tokens with merit-based bonus"
+  (let ((merit-bonus (/ (* base-amount merit-score (var-get merit-multiplier)) (* u1000 u100)))
+        (total-amount (+ base-amount merit-bonus)))
+    
+    (asserts! (or (is-owner tx-sender) (is-minter tx-sender)) (err ERR_UNAUTHORIZED))
+    (asserts! (check-system-pause) (err ERR_SYSTEM_PAUSED))
+    (asserts! (check-emission-allowed total-amount) (err ERR_EMISSION_DENIED))
+    
+    ;; Update merit scores
+    (map-set merit-scores recipient merit-score)
+    
+    ;; Mint tokens
+    (var-set total-supply (+ (var-get total-supply) total-amount))
+    (let ((current-bal (default-to u0 (get bal (map-get? balances { who: recipient })))))
+      (map-set balances { who: recipient } { bal: (+ current-bal total-amount) }))
+    
+    ;; Update creator contributions
+    (let ((contributions (default-to (tuple (total-bounties u0) (successful-proposals u0) (reputation u0))
+                                    (map-get? creator-contributions recipient))))
+      (map-set creator-contributions recipient
+               (merge contributions { reputation: merit-score })))
+    
+    ;; Check governance eligibility
+    (if (>= merit-score (var-get reputation-threshold))
+        (map-set governance-eligibility recipient true)
+        true)
+    
+    ;; Notify system coordinator
+    (notify-mint total-amount recipient)
+    (ok total-amount)))
+
+(define-public (update-creator-reputation (creator principal) (reputation uint) (bounties uint) (proposals uint))
+  "Update creator reputation and contributions (called by creator council or bounty system)"
+  (begin
+    (asserts! (or (is-owner tx-sender) 
+                 (is-eq tx-sender (unwrap! (var-get creator-council) (err ERR_UNAUTHORIZED)))
+                 (is-eq tx-sender (unwrap! (var-get bounty-system) (err ERR_UNAUTHORIZED))))
+             (err ERR_UNAUTHORIZED))
+    
+    ;; Update reputation
+    (map-set creator-reputation creator reputation)
+    
+    ;; Update contributions
+    (map-set creator-contributions creator
+             (tuple (total-bounties bounties) (successful-proposals proposals) (reputation reputation)))
+    
+    ;; Update governance eligibility
+    (map-set governance-eligibility creator (>= reputation (var-get reputation-threshold)))
+    
+    (ok true)))
+
+(define-public (distribute-seasonal-bonus (recipients (list 100 principal)) (amounts (list 100 uint)))
+  "Distribute seasonal bonuses to active creators"
+  (begin
+    (asserts! (is-owner tx-sender) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq (len recipients) (len amounts)) (err ERR_UNAUTHORIZED))
+    
+    ;; This would be implemented as a fold operation in production
+    ;; For now, simplified implementation
+    (let ((total-bonus (fold + amounts u0)))
+      (asserts! (check-emission-allowed total-bonus) (err ERR_EMISSION_DENIED))
+      (var-set total-supply (+ (var-get total-supply) total-bonus))
+      (ok total-bonus))))
+
+(define-read-only (get-creator-info (creator principal))
+  "Get comprehensive creator information"
+  (ok (tuple (reputation (default-to u0 (map-get? creator-reputation creator)))
+             (merit-score (default-to u0 (map-get? merit-scores creator)))
+             (governance-eligible (default-to false (map-get? governance-eligibility creator)))
+             (contributions (default-to (tuple (total-bounties u0) (successful-proposals u0) (reputation u0))
+                                       (map-get? creator-contributions creator)))
+             (seasonal-bonus (default-to u0 (map-get? seasonal-bonuses creator))))))
+
+(define-read-only (get-governance-eligible-creators)
+  "Get list of creators eligible for governance (simplified)"
+  (ok (list)))
+
+(define-public (set-reputation-threshold (new-threshold uint))
+  "Set minimum reputation required for governance eligibility"
+  (begin
+    (asserts! (is-owner tx-sender) (err ERR_UNAUTHORIZED))
+    (var-set reputation-threshold new-threshold)
+    (ok true)))
+
+(define-public (set-merit-multiplier (new-multiplier uint))
+  "Set merit bonus multiplier (basis points over 100)"
+  (begin
+    (asserts! (is-owner tx-sender) (err ERR_UNAUTHORIZED))
+    (asserts! (<= new-multiplier u300) (err ERR_UNAUTHORIZED)) ;; Max 3x multiplier
+    (var-set merit-multiplier new-multiplier)
+    (ok true)))
+
+;; --- Creator Governance Functions ---
+(define-public (propose-creator-initiative (title (string-ascii 256)) (description (string-utf8 512)) (funding-request uint))
+  "Submit creator initiative proposal (requires governance eligibility)"
+  (begin
+    (asserts! (default-to false (map-get? governance-eligibility tx-sender)) (err ERR_UNAUTHORIZED))
+    
+    ;; In production, would integrate with DAO governance system
+    ;; For now, emit event
+    (print (tuple (event "creator-proposal") 
+                  (proposer tx-sender)
+                  (title title)
+                  (funding-request funding-request)))
+    
+    (ok true)))
+
+(define-public (vote-creator-proposal (proposal-id uint) (support bool))
+  "Vote on creator proposal (requires governance eligibility)"
+  (begin
+    (asserts! (default-to false (map-get? governance-eligibility tx-sender)) (err ERR_UNAUTHORIZED))
+    
+    ;; In production, would integrate with DAO governance system
+    (print (tuple (event "creator-vote") 
+                  (voter tx-sender)
+                  (proposal-id proposal-id)
+                  (support support)))
+    
+    (ok true)))

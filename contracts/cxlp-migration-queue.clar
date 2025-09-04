@@ -1,5 +1,5 @@
 ;; cxlp-migration-queue.clar
-;; Intent queue system for CXLP → CXD migration with pro-rata settlement
+;; Intent queue system for CXLP to CXD migration with pro-rata settlement
 ;; Prevents FCFS races and enables fair distribution based on duration-weighted requests
 
 (use-trait ft-mintable .ft-mintable-trait.ft-mintable-trait)
@@ -131,22 +131,20 @@
 
 ;; Submit intent for current epoch
 (define-public (submit-intent (cxlp-amount uint))
-  (let ((current-epoch-result (get-current-epoch))
+  (let ((current-epoch-num (unwrap! (get-current-epoch) (err ERR_MIGRATION_NOT_STARTED)))
         (user-duration (get-user-duration tx-sender)))
-    (match current-epoch-result
-      current-epoch-num
-      (begin
-        (asserts! (> cxlp-amount u0) (err ERR_INVALID_AMOUNT))
-        (asserts! (>= current-epoch-num u1) (err ERR_MIGRATION_NOT_STARTED))
+    (begin
+      (asserts! (> cxlp-amount u0) (err ERR_INVALID_AMOUNT))
+      (asserts! (>= current-epoch-num u1) (err ERR_MIGRATION_NOT_STARTED))
+      
+      ;; Ensure epoch is active for intents
+      (let ((epoch-start (+ (var-get migration-start-height) (* current-epoch-num (var-get epoch-length))))
+            (intent-deadline (- (+ epoch-start (var-get epoch-length)) (var-get intent-window))))
         
-        ;; Ensure epoch is active for intents
-        (let ((epoch-start (+ (var-get migration-start-height) (* current-epoch-num (var-get epoch-length))))
-              (intent-deadline (- (+ epoch-start (var-get epoch-length)) (var-get intent-window))))
-          
-          (asserts! (<= block-height intent-deadline) (err ERR_EPOCH_NOT_ACTIVE))
-          
-          ;; Check user has sufficient CXLP balance
-          (let ((user-balance (unwrap! (contract-call? .cxlp-token get-balance tx-sender) (err ERR_INSUFFICIENT_BALANCE))))
+        (asserts! (<= block-height intent-deadline) (err ERR_EPOCH_NOT_ACTIVE))
+        
+        ;; Check user has sufficient CXLP balance
+        (let ((user-balance (unwrap! (contract-call? .cxlp-token get-balance tx-sender) (err ERR_INSUFFICIENT_BALANCE))))
             (asserts! (>= user-balance cxlp-amount) (err ERR_INSUFFICIENT_BALANCE))
             
             ;; Calculate weight for this intent
@@ -178,8 +176,7 @@
                       total-weight: (+ (get total-weight current-epoch-info) weight)
                     }))
                 
-                (ok { epoch: current-epoch-num, weight: weight, duration: user-duration }))))))
-      error error)))
+                (ok { epoch: current-epoch-num, weight: weight, duration: user-duration })))))
 
 ;; Settle epoch with pro-rata allocation
 (define-public (settle-epoch (epoch uint))

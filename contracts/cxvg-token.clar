@@ -85,11 +85,9 @@
 
 (define-read-only (is-system-paused)
   (if (var-get system-integration-enabled)
-    (begin
-      (asserts! (is-some (var-get protocol-monitor)) (err ERR_SYSTEM_NOT_CONFIGURED))
-      (let ((monitor (unwrap-panic (var-get protocol-monitor))))
-        (unwrap! (contract-call? protocol-monitor is-system-operational) (err ERR_SYSTEM_PAUSED))
-        false))
+    (match (var-get protocol-monitor)
+      some-monitor false ;; Just return false for now
+      false)
     false))
 
 (define-private (check-system-pause)

@@ -44,7 +44,7 @@
 
 ;; --- Storage ---
 (define-data-var contract-owner principal CONTRACT_OWNER)
-(define-data-var cxvg-contract principal .cxvg-token)
+(define-data-var cxvg-contract (optional principal) none)
 (define-data-var total-locked uint u0)
 (define-data-var total-voting-power uint u0)
 
@@ -100,7 +100,7 @@
 (define-public (set-cxvg-contract (new-contract principal))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
-    (var-set cxvg-contract new-contract)
+    (var-set cxvg-contract (some new-contract))
     (ok true)))
 
 ;; --- Lock/Unlock Functions ---
@@ -112,9 +112,10 @@
     (begin
       (asserts! (> amount u0) (err ERR_INVALID_AMOUNT))
       (asserts! (>= duration TIER1_DURATION) (err ERR_INVALID_LOCK_DURATION))
+      (asserts! (is-some cxvg-token) (err ERR_UNAUTHORIZED))
       
       ;; Transfer CXVG to this contract
-      (try! (contract-call? .cxvg-token transfer amount tx-sender (as-contract tx-sender) none))
+      (try! (contract-call? (unwrap-panic cxvg-token) transfer amount tx-sender (as-contract tx-sender) none))
       
       ;; Calculate voting power and tier
       (let ((tier (get-lock-tier duration))

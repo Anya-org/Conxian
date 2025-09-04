@@ -41,6 +41,47 @@ path = "contracts/traits/dim-registry-trait.clar"
 clarity_version = 2
 epoch = "2.4"
 
+[contracts.ft-mintable-trait]
+path = "contracts/traits/ft-mintable-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.sip-009-trait]
+path = "contracts/traits/sip-009-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.monitor-trait]
+path = "contracts/traits/monitor-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+# NEW INFRASTRUCTURE TRAITS
+[contracts.vault-trait]
+path = "contracts/traits/vault-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.vault-admin-trait]
+path = "contracts/traits/vault-admin-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.strategy-trait]
+path = "contracts/traits/strategy-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.pool-trait]
+path = "contracts/traits/pool-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.ownable-trait]
+path = "contracts/traits/ownable-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
 # ===========================================
 # DIMENSIONAL DEFI - Metrics-driven system
 # ===========================================
@@ -92,16 +133,6 @@ epoch = "2.4"
 # PROTOCOL TOKENS - SIP-010 / SIP-009
 # ===========================================
 
-[contracts.ft-mintable-trait]
-path = "contracts/traits/ft-mintable-trait.clar"
-clarity_version = 2
-epoch = "2.4"
-
-[contracts.sip-009-trait]
-path = "contracts/traits/sip-009-trait.clar"
-clarity_version = 2
-epoch = "2.4"
-
 [contracts.cxvg-token]
 path = "contracts/cxvg-token.clar"
 clarity_version = 2
@@ -124,22 +155,13 @@ depends_on = ["sip-010-trait", "ft-mintable-trait"]
 path = "contracts/cxtr-token.clar"
 clarity_version = 2
 epoch = "2.4"
-depends_on = ["sip-010-trait"]
+depends_on = ["sip-010-trait", "ft-mintable-trait"]
 
 [contracts.cxs-token]
 path = "contracts/cxs-token.clar"
 clarity_version = 2
 epoch = "2.4"
 depends_on = ["sip-009-trait"]
-
-# ===========================================
-# ENHANCED TOKENOMICS TRAITS
-# ===========================================
-
-[contracts.monitor-trait]
-path = "contracts/traits/monitor-trait.clar"
-clarity_version = 2
-epoch = "2.4"
 
 # ===========================================
 # ENHANCED TOKENOMICS SYSTEM
@@ -186,3 +208,37 @@ path = "contracts/token-system-coordinator.clar"
 clarity_version = 2
 epoch = "2.4"
 depends_on = ["sip-010-trait", "ft-mintable-trait", "protocol-invariant-monitor", "revenue-distributor", "token-emission-controller", "cxd-staking", "cxlp-migration-queue", "cxvg-utility"]
+
+# ===========================================
+# VAULT & DEX INFRASTRUCTURE  
+# ===========================================
+
+[contracts.vault]
+path = "contracts/vault.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["vault-trait", "vault-admin-trait", "sip-010-trait", "strategy-trait", "protocol-invariant-monitor", "revenue-distributor"]
+
+[contracts.enhanced-yield-strategy]
+path = "contracts/enhanced-yield-strategy.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["strategy-trait", "sip-010-trait", "revenue-distributor", "dim-registry", "token-system-coordinator"]
+
+[contracts.dex-factory]
+path = "contracts/dex-factory.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["ownable-trait", "sip-010-trait", "revenue-distributor"]
+
+[contracts.dex-pool]
+path = "contracts/dex-pool.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["pool-trait", "sip-010-trait", "revenue-distributor", "token-system-coordinator"]
+
+[contracts.dex-router]
+path = "contracts/dex-router.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["sip-010-trait", "pool-trait", "dex-factory", "token-system-coordinator"]
