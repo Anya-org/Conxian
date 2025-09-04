@@ -181,10 +181,12 @@
       (asserts! (>= bond-amount required-bond) (err ERR_INSUFFICIENT_BOND))
       
       ;; Check user has sufficient voting power (anti-spam)
-      (match (map-get? user-locks tx-sender)
-        lock-info
-        (asserts! (>= (get voting-power lock-info) required-bond) (err ERR_INSUFFICIENT_BOND))
-        (err ERR_NO_LOCK_FOUND))
+      (try! (match (map-get? user-locks tx-sender)
+              lock-info
+              (if (>= (get voting-power lock-info) required-bond)
+                (ok true)
+                (err ERR_INSUFFICIENT_BOND))
+              (err ERR_NO_LOCK_FOUND)))
       
       ;; Lock additional CXVG as bond - simplified for enhanced deployment
       ;; (try! (contract-call? .cxvg-token transfer bond-amount tx-sender (as-contract tx-sender) none))

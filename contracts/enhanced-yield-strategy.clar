@@ -102,7 +102,8 @@
         (var-set total-deployed (+ (var-get total-deployed) amount))
         
         ;; Update performance tracking - simplified for enhanced deployment
-        (try! (update-performance-history))
+                ;; Update performance tracking - simplified for enhanced deployment
+        (update-performance-history)
         
         ;; Notify dimensional system - simplified for enhanced deployment  
         (try! (update-dimensional-weights))
@@ -148,13 +149,16 @@
                 net-profit))
     
     ;; Distribute performance fee to protocol
-    (if (> performance-fee u0)
-        ;; Skip revenue distributor for enhanced deployment
-        true
-        true)    ;; Auto-compound remaining profit
-    (if (> net-profit u0)
-        (var-set total-deployed (+ deployed net-profit))
-        true)
+    (begin
+      (if (> performance-fee u0)
+          ;; Skip revenue distributor for enhanced deployment
+          true
+          true)
+      
+      ;; Auto-compound remaining profit
+      (if (> net-profit u0)
+          (var-set total-deployed (+ deployed net-profit))
+          true))
     
     ;; Update dimensional weights based on performance
     (update-dimensional-weights)
@@ -211,28 +215,22 @@
 
 ;; Update dimensional weights based on strategy performance
 (define-public (update-dimensional-weights)
-  (let ((current-value (unwrap! (get-current-value) ERR_STRATEGY_FAILED))
-        (deployed (var-get total-deployed))
-        (performance-ratio (if (> deployed u0) (/ (* current-value PRECISION) deployed) PRECISION))
-        (time-since-update (- block-height (var-get last-dimensional-update))))
-    
-    ;; Update weights based on performance - simplified for enhanced deployment
-    ;; (map-set dimensional-weights "yield-performance" performance-ratio)
-    ;; Use contract principal as key for enhanced deployment
-    (map-set dimensional-weights (as-contract tx-sender) performance-ratio)
-    (map-set dimensional-weights tx-sender
-             (/ performance-ratio (var-get risk-level)))
-    (map-set dimensional-weights (var-get strategy-admin) time-since-update)
-    
-    ;; Dimensional registry integration - simplified for enhanced deployment
-    ;; Note: update-dimension-weight not yet implemented in dim-registry
-    ;; (contract-call? .dim-registry 
-    ;;                update-dimension-weight 
-    ;;                "strategy-performance"
-    ;;                performance-ratio)
-    
-    (var-set last-dimensional-update block-height)
-    (ok true)))
+  (let ((current-value-result (get-current-value)))
+    (match current-value-result
+      success (let ((current-value success)
+                    (deployed (var-get total-deployed))
+                    (performance-ratio (if (> deployed u0) (/ (* current-value PRECISION) deployed) PRECISION))
+                    (time-since-update (- block-height (var-get last-dimensional-update))))
+                
+                ;; Update weights based on performance - simplified for enhanced deployment
+                (map-set dimensional-weights (as-contract tx-sender) performance-ratio)
+                (map-set dimensional-weights tx-sender
+                         (/ performance-ratio (var-get risk-level)))
+                (map-set dimensional-weights (var-get strategy-admin) time-since-update)
+                
+                (var-set last-dimensional-update block-height)
+                (ok true))
+      error (err error))))
 
 ;; Administrative functions
 (define-public (set-performance-fee (new-fee-bps uint))

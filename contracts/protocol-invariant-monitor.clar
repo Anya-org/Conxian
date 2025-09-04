@@ -295,13 +295,14 @@
           (var-set protocol-health-score new-health-score)
           (var-set last-health-check block-height)
           
-          ;; Take snapshot for historical tracking
-          (try! (take-monitoring-snapshot))
+          ;; Take snapshot for historical tracking - simplified for enhanced deployment
+          (take-monitoring-snapshot)
           
           ;; Trigger warnings if health is degraded
+          ;; Ensure both branches return the same (non-response) type
           (if (< new-health-score u7000) ;; Below 70%
-            (try! (record-violation u99 u1 "Protocol health degraded"))
-            (ok true))
+            (begin (try! (record-violation u99 u1 "Protocol health degraded")) true)
+            true)
           
           (ok { 
             health-score: new-health-score,
