@@ -1,0 +1,68 @@
+[project]
+name = "conxian-enhanced"
+description = "Enhanced tokenomics with circular dependency fixes via staged deployment"
+clarinet_version = "3.5.0"
+
+[accounts]
+deployer = { mnemonic = "twice kind fence tip hidden tilt action fragile skin nothing glory cousin green tomorrow spring wrist shed math olympic multiply hip blue scout claw", balance = 100_000_000_000_000 }
+wallet_1 = { mnemonic = "sell invite acquire kitten bamboo drastic jelly vivid peace spawn twice guilt pave pen trash pretty park cube fragile unaware remain midnight betray rebuild", balance = 100_000_000_000_000 }
+wallet_2 = { mnemonic = "hold excess usual excess ring elephant install account glad dry fragile donkey gaze humble truck breeze nation gasp vacuum limb head keep delay hospital", balance = 100_000_000_000_000 }
+
+# Stage 1: Core traits and basic tokens (no circular dependencies)
+[contracts.sip-010-trait]
+path = "contracts/traits/sip-010-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.ft-mintable-trait]
+path = "contracts/traits/ft-mintable-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.sip-009-trait]
+path = "contracts/traits/sip-009-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.monitor-trait]
+path = "contracts/traits/monitor-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+# Stage 2: Basic tokens without system integration
+[contracts.cxlp-token]
+path = "contracts/cxlp-token.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["sip-010-trait", "ft-mintable-trait"]
+
+[contracts.cxs-token]
+path = "contracts/cxs-token.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["sip-009-trait"]
+
+# Stage 3: Staking contract (no external dependencies)
+[contracts.cxd-staking]
+path = "contracts/cxd-staking.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["sip-010-trait"]
+
+# Stage 4: Core token with modified integration (breaks circular dependency)
+[contracts.cxd-token]
+path = "contracts/cxd-token.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["sip-010-trait", "ft-mintable-trait"]
+# Note: Removed protocol-invariant-monitor dependency to break circular chain
+
+# Note: Enhanced tokenomics contracts excluded due to unresolved circular dependencies:
+# - protocol-invariant-monitor: calls cxd-token, token-emission-controller, revenue-distributor
+# - token-emission-controller: calls cxd-token and other tokens
+# - revenue-distributor: depends on protocol-invariant-monitor
+# - token-system-coordinator: calls all system contracts
+# - cxlp-migration-queue: calls tokens
+# - cxvg-utility: has system integration issues
+# - cxvg-token: has system integration issues  
+# - cxtr-token: uses monitor-contract trait

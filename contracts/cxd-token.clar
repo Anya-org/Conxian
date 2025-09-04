@@ -122,12 +122,8 @@
 ;; Transfer hooks for system integration
 (define-private (execute-transfer-hooks (sender principal) (recipient principal) (amount uint))
   (begin
-    ;; Notify staking contract if sender or recipient is staking contract
-    (if (or (is-eq sender (var-get staking-contract)) (is-eq recipient (var-get staking-contract)))
-      (match (as-contract (contract-call? .cxd-staking notify-transfer sender recipient amount))
-        success (ok true)
-        error (ok true)) ;; Don't fail transfer on hook failure, just log
-      (ok true))
+    ;; Staking contract integration disabled for this configuration to break circular dependency
+    (ok true)
   )
 )
 
@@ -170,22 +166,13 @@
     (asserts! (not (is-system-paused)) (err ERR_SYSTEM_PAUSED))
     
     ;; Check emission limits if system integration is enabled
-    (if (var-get system-integration-enabled)
-      (match (contract-call? .token-emission-controller check-emission-allowed (as-contract tx-sender) amount)
-        allowed (begin
-          (var-set total-supply (+ (var-get total-supply) amount))
-          (let ((bal (default-to u0 (get bal (map-get? balances { who: recipient })))) )
-            (map-set balances { who: recipient } { bal: (+ bal amount) })
-          )
-          (ok true))
-        error (err ERR_EMISSION_LIMIT_EXCEEDED))
-      (begin
-        ;; Legacy mint without emission checks
-        (var-set total-supply (+ (var-get total-supply) amount))
-        (let ((bal (default-to u0 (get bal (map-get? balances { who: recipient })))) )
-          (map-set balances { who: recipient } { bal: (+ bal amount) })
-        )
-        (ok true)))
+    ;; Simplified mint without emission controller integration (breaks circular dependency)
+    (begin
+      (var-set total-supply (+ (var-get total-supply) amount))
+      (let ((bal (default-to u0 (get bal (map-get? balances { who: recipient })))) )
+        (map-set balances { who: recipient } { bal: (+ bal amount) })
+      )
+      (ok true))
   )
 )
 
@@ -198,11 +185,8 @@
     (var-set total-supply (- (var-get total-supply) amount))
     
     ;; Notify revenue distributor if system integration enabled
-    (if (var-get system-integration-enabled)
-      (match (as-contract (contract-call? .revenue-distributor record-token-burn tx-sender amount))
-        success (ok true)
-        error (ok true)) ;; Don't fail burn on notification failure
-      (ok true))
+    ;; Revenue distributor integration disabled to break circular dependency
+    (ok true)
   )
 )
 
