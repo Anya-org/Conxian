@@ -214,26 +214,27 @@
 
 ;; Step 2: Complete unstake (after cool-down period)
 (define-public (complete-unstake)
-  (let ((unstake-result (get-pending-unstake tx-sender)))
-    (match unstake-result
-      unstake-info
-      (begin
-        (asserts! (>= block-height (+ (get created-at unstake-info) COOL_DOWN_BLOCKS)) (err ERR_COOL_DOWN_ACTIVE))
-        
-        (let ((cxd-amount (get cxd-amount unstake-info))
-              (cxd-token-ref (var-get cxd-token-contract)))
+  (begin
+    (let ((unstake-result (get-pending-unstake tx-sender)))
+      (match unstake-result
+        unstake-info
+        (begin
+          (asserts! (>= block-height (+ (get created-at unstake-info) COOL_DOWN_BLOCKS)) (err ERR_COOL_DOWN_ACTIVE))
           
-          ;; Transfer CXD back to user if contract is configured
-          (if (is-some cxd-token-ref)
-            (begin
-              (try! (as-contract (contract-call? (unwrap-panic cxd-token-ref) transfer cxd-amount (as-contract tx-sender) tx-sender none)))
-              ;; Update total staked
-              (var-set total-staked-cxd (- (var-get total-staked-cxd) cxd-amount))
-              ;; Clear pending unstake  
-              (map-delete pending-unstakes tx-sender)
-              (ok cxd-amount))
-            (err ERR_UNAUTHORIZED))))
-      (err ERR_NO_PENDING_UNSTAKE))))
+          (let ((cxd-amount (get cxd-amount unstake-info))
+                (cxd-token-ref (var-get cxd-token-contract)))
+            
+            ;; Transfer CXD back to user if contract is configured
+            (if (is-some cxd-token-ref)
+              (begin
+                (try! (as-contract (contract-call? (unwrap-panic cxd-token-ref) transfer cxd-amount (as-contract tx-sender) tx-sender none)))
+                ;; Update total staked
+                (var-set total-staked-cxd (- (var-get total-staked-cxd) cxd-amount))
+                ;; Clear pending unstake  
+                (map-delete pending-unstakes tx-sender)
+                (ok cxd-amount))
+              (err ERR_UNAUTHORIZED))))
+        (err ERR_NO_PENDING_UNSTAKE)))))
 
 ;; --- Revenue Distribution ---
 

@@ -292,11 +292,15 @@
     
     (let ((total-fees (+ performance-fee management-fee)))
       (if (> performance-fee u0)
-        (try! (collect-revenue performance-fee fee-token FEE_TYPE_VAULT_PERFORMANCE))
+        (begin
+          (try! (collect-revenue performance-fee fee-token FEE_TYPE_VAULT_PERFORMANCE))
+          (ok true))
         (ok true))
       
       (if (> management-fee u0)
-        (try! (collect-revenue management-fee fee-token FEE_TYPE_VAULT_MANAGEMENT))
+        (begin
+          (try! (collect-revenue management-fee fee-token FEE_TYPE_VAULT_MANAGEMENT))
+          (ok true))
         (ok true))
       
       (ok total-fees))))

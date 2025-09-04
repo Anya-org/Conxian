@@ -223,9 +223,8 @@
     (if (and (var-get system-integration-enabled) (is-some (var-get revenue-distributor)))
       (match (var-get revenue-distributor)
         revenue-ref
-          (match (contract-call? revenue-ref record-mint-event recipient amount)
-            success true
-            error true) ;; Ignore errors, don't fail mint
+          ;; Skip revenue recording for enhanced deployment
+          true
         true)
       true)
     (ok true)))
