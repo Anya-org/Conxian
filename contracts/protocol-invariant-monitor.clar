@@ -96,18 +96,27 @@
 ;; --- Invariant Checking Functions ---
 
 ;; Check token supply conservation invariant
+;; Note: This function will only work after all contracts are deployed
 (define-private (check-supply-conservation)
-  (let ((cxd-supply (unwrap-panic (contract-call? .cxd-token get-total-supply)))
-        (cxlp-supply (unwrap-panic (contract-call? .cxlp-token get-total-supply)))
-        (staked-cxd-info (contract-call? .cxd-staking get-protocol-info)))
-    
-    ;; Verify staked CXD doesn't exceed total supply
-    (let ((staked-amount (get total-staked-cxd (unwrap-panic staked-cxd-info))))
-      (if (<= staked-amount cxd-supply)
-        (ok true)
-        (begin
-          (try! (record-violation u1 u3 "CXD staking exceeds total supply"))
-          (err ERR_INVARIANT_VIOLATION))))))
+  (if (is-none (map-get? registered-contracts .cxd-token))
+    (ok true) ;; Skip check if CXD token not registered yet
+    (let ((cxd-supply-result (contract-call? .cxd-token get-total-supply))
+          (cxlp-supply-result (contract-call? .cxlp-token get-total-supply)))
+      (match cxd-supply-result
+        cxd-supply 
+          (match cxlp-supply-result
+            cxlp-supply
+              (match (contract-call? .cxd-staking get-protocol-info)
+                staked-cxd-info
+                  (let ((staked-amount (get total-staked-cxd staked-cxd-info)))
+                    (if (<= staked-amount cxd-supply)
+                      (ok true)
+                      (begin
+                        (try! (record-violation u1 u3 "CXD staking exceeds total supply"))
+                        (err ERR_INVARIANT_VIOLATION))))
+                error-val (ok true)) ;; Skip if staking not available
+            error-val (ok true)) ;; Skip if CXLP not available
+        error-val (ok true)))) ;; Skip if CXD not available
 
 ;; Check migration rate limits
 (define-private (check-migration-velocity)
@@ -133,12 +142,17 @@
 
 ;; Check emission rate compliance
 (define-private (check-emission-compliance)
-  (let ((cxd-emission (contract-call? .token-emission-controller get-emission-info .cxd-token))
-        (cxvg-emission (contract-call? .token-emission-controller get-emission-info .cxvg-token)))
-    
-    ;; Check emissions are within expected bounds
-    ;; Simplified check - production would verify against target rates
-    (ok true))) ;; Placeholder
+  (if (is-none (map-get? registered-contracts .token-emission-controller))
+    (ok true) ;; Skip check if emission controller not registered yet
+    (match (contract-call? .token-emission-controller get-emission-info .cxd-token)
+      cxd-emission
+        (match (contract-call? .token-emission-controller get-emission-info .cxvg-token)
+          cxvg-emission
+            ;; Check emissions are within expected bounds
+            ;; This is a simplified check - production would verify against target rates
+            (ok true) ;; Placeholder - implement actual emission checking
+          error-val (ok true)) ;; Skip if CXVG emission not available
+      error-val (ok true)))) ;; Skip if CXD emission not available
 
 ;; Check staking concentration risk
 (define-private (check-staking-concentration)

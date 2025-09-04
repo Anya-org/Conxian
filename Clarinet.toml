@@ -112,7 +112,7 @@ depends_on = ["sip-010-trait"]
 path = "contracts/cxd-token.clar"
 clarity_version = 2
 epoch = "2.4"
-depends_on = ["sip-010-trait", "ft-mintable-trait"]
+depends_on = ["sip-010-trait", "ft-mintable-trait", "protocol-invariant-monitor"]
 
 [contracts.cxlp-token]
 path = "contracts/cxlp-token.clar"
@@ -131,3 +131,58 @@ path = "contracts/cxs-token.clar"
 clarity_version = 2
 epoch = "2.4"
 depends_on = ["sip-009-trait"]
+
+# ===========================================
+# ENHANCED TOKENOMICS TRAITS
+# ===========================================
+
+[contracts.monitor-trait]
+path = "contracts/traits/monitor-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+# ===========================================
+# ENHANCED TOKENOMICS SYSTEM
+# ===========================================
+
+[contracts.protocol-invariant-monitor]
+path = "contracts/protocol-invariant-monitor.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["monitor-trait"]
+
+[contracts.token-emission-controller]
+path = "contracts/token-emission-controller.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["sip-010-trait", "ft-mintable-trait"]
+
+[contracts.revenue-distributor]
+path = "contracts/revenue-distributor.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["sip-010-trait", "protocol-invariant-monitor"]
+
+[contracts.cxd-staking]
+path = "contracts/cxd-staking.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["sip-010-trait", "cxd-token", "protocol-invariant-monitor"]
+
+[contracts.cxlp-migration-queue]
+path = "contracts/cxlp-migration-queue.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["sip-010-trait", "cxlp-token", "cxd-token", "protocol-invariant-monitor"]
+
+[contracts.cxvg-utility]
+path = "contracts/cxvg-utility.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["sip-010-trait", "cxvg-token"]
+
+[contracts.token-system-coordinator]
+path = "contracts/token-system-coordinator.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["sip-010-trait", "ft-mintable-trait", "protocol-invariant-monitor", "revenue-distributor", "token-emission-controller", "cxd-staking", "cxlp-migration-queue", "cxvg-utility"]
