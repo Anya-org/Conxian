@@ -1,7 +1,9 @@
+> **Note:** This document has been updated to reflect the current state of the codebase as of September 2025. It describes a mix of implemented and planned contracts.
+
 # Conxian Stacks DeFi — Design
 
-This document outlines the live Conxian on-chain DeFi architecture (current implementation + in-progress subsystems) on Stacks, leveraging Bitcoin anchoring and future BTC bridges (e.g., sBTC) for differentiation.  
-For detailed product-level requirements, see `documentation/prd/` (e.g., `VAULT.md`, `DAO_GOVERNANCE.md`, `DEX.md`).
+This document outlines the live Conxian on-chain DeFi architecture (current implementation + in-progress subsystems) on Stacks.
+For detailed product-level requirements, see `documentation/prd/`.
 
 ## Principles
 
@@ -11,21 +13,29 @@ For detailed product-level requirements, see `documentation/prd/` (e.g., `VAULT.
 - Sustainable economics: fee capture to protocol reserve, transparent emissions (if any)
 - BTC-native differentiation: accept BTC-derivatives (e.g., sBTC) and anchor state to Bitcoin
 
-## Core Contracts (Implemented)
+## Core Contracts
 
-- `vault.clar` – Share-based accounting, caps, dynamic fees, precision math integration
-- `treasury.clar` – Buybacks, reserve management, DAO-controlled disbursements
-- `dao-governance.clar` / `dao.clar` – Proposals, time‑weighted voting (AIP-2), execution
-- `timelock.clar` – Queued admin actions & enforced delays
-- `analytics.clar` – Event indexing hook surface
-- `registry.clar` – Contract discovery & coordination
-- `creator-token.clar`, `cxvg-token.clar`, `cxlp-token.clar`, `CXVG.clar` – Token layer & migration logic
-- `bounty-system*.clar` – Manual + automated bounty flows
-- `dao-automation.clar` – Parameter tuning (bounds-enforced)
-- `circuit-breaker.clar` – Volatility / volume / liquidity triggers with numeric event codes
-- `enterprise-monitoring.clar` – Structured telemetry tuples for indexers
-  
-Traits & Interfaces: `vault-trait`, `vault-admin-trait`, `strategy-trait`, `pool-trait`, `sip-010-trait`.
+_**Note:** This section describes the intended architecture. Not all contracts are implemented._
+
+- **Implemented:**
+    - `vault.clar` – Share-based accounting, caps, dynamic fees, precision math integration
+    - `cxvg-token.clar`, `cxd-token.clar`, `cxlp-token.clar`, `cxtr-token.clar`, `cxs-token.clar` – Token layer & migration logic
+    - `protocol-invariant-monitor.clar` - Monitors key invariants and triggers automated protection mechanisms. _(Note: Contains bugs that prevent tests from passing)_
+- **Partially Implemented (DEX Subsystem):**
+    - `dex-factory.clar`, `dex-pool.clar`, `dex-router.clar`
+- **Not Implemented:**
+    - `treasury.clar`
+    - `dao-governance.clar` / `dao.clar`
+    - `timelock.clar`
+    - `analytics.clar`
+    - `registry.clar`
+    - `bounty-system*.clar`
+    - `dao-automation.clar`
+    - `circuit-breaker.clar`
+    - `enterprise-monitoring.clar`
+
+- **Traits & Interfaces (All Implemented):**
+    - `vault-trait`, `vault-admin-trait`, `strategy-trait`, `pool-trait`, `sip-010-trait`.
 
 ## Differentiation via Bitcoin Layers (Planned / Partially Enabled)
 
@@ -40,27 +50,15 @@ Traits & Interfaces: `vault-trait`, `vault-admin-trait`, `strategy-trait`, `pool
 - Use events for all state-changing actions; support off-chain indexing
 - Exhaustive input checks; prefer u* operations and explicit bounds
 
-## Gas/Cost Optimization
-
-- Minimize map writes; write only when balances change
-- Batch parameter updates; avoid per-user loops
-- Use read-only calls for getters and price queries
-- Compact events; avoid oversized payloads
-
-## Oracles & Pricing (Planned)
-
-- Prefer on-chain TWAPs or signed-oracle updates with minimal cadence
-- Price-dependent logic behind caps/limits rather than per-tx dynamic heavy math
-
 ## Roadmap (Delta vs Original Plan)
 
 Completed (v1.1):
 
 1. SIP-010 token integration (governance & auxiliary tokens)
-2. Comprehensive test suites (unit, integration, production validation, circuit breaker)
-3. Governance + time-weighted voting + timelock + automation
-4. Treasury reserve & buyback logic
-5. Circuit breaker & enterprise monitoring layer
+2. ~~Comprehensive test suites (unit, integration, production validation, circuit breaker)~~ _(Note: Test suite is currently failing)_
+3. ~~Governance + time-weighted voting + timelock + automation~~ _(Note: Not implemented)_
+4. ~~Treasury reserve & buyback logic~~ _(Note: Not implemented)_
+5. ~~Circuit breaker & enterprise monitoring layer~~ _(Note: Not implemented)_
 
 In Progress / Experimental:
 
@@ -91,4 +89,4 @@ Next Steps:
 
 Deferred: Concentrated liquidity, compliance hooks, external oracle aggregator, batch auction / MEV protections.
 
-Updated: Aug 17, 2025
+Updated: Sep 04, 2025
