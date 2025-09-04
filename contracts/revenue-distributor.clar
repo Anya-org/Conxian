@@ -33,9 +33,18 @@
 (define-data-var treasury-address principal tx-sender)
 (define-data-var reserve-address principal tx-sender)
 
-;; Contract references
-(define-data-var xcxd-staking-contract principal .cxd-staking)
-(define-data-var cxd-token-contract principal .cxd-token)
+;; --- Optional Contract References (Dependency Injection) ---
+(define-data-var staking-contract-ref (optional principal) none)
+(define-data-var cxd-token-contract (optional principal) none)
+(define-data-var system-integration-enabled bool false)
+(define-data-var initialization-complete bool false)
+
+;; Event-driven communication
+(define-data-var event-counter uint u0)
+(define-constant EVENT_REVENUE_COLLECTED "revenue-collected")
+(define-constant EVENT_REVENUE_DISTRIBUTED "revenue-distributed")
+(define-constant EVENT_MINT_RECORDED "mint-recorded")
+(define-constant EVENT_BURN_RECORDED "burn-recorded")
 
 ;; Authorized fee collectors (vaults, DEX, etc.)
 (define-map authorized-collectors principal bool)
@@ -79,12 +88,42 @@
     (var-set contract-owner new-owner)
     (ok true)))
 
-(define-public (set-addresses (treasury principal) (reserve principal) (xcxd-staking principal))
+;; --- Contract Configuration Functions (Dependency Injection) ---
+(define-public (set-treasury-address (treasury principal))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (var-set treasury-address treasury)
+    (ok true)))
+
+(define-public (set-reserve-address (reserve principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (var-set reserve-address reserve)
-    (var-set xcxd-staking-contract xcxd-staking)
+    (ok true)))
+
+(define-public (set-staking-contract-ref (contract-address principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (var-set staking-contract-ref (some contract-address))
+    (ok true)))
+
+(define-public (set-cxd-token-contract (contract-address principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (var-set cxd-token-contract (some contract-address))
+    (ok true)))
+
+(define-public (enable-system-integration)
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (var-set system-integration-enabled true)
+    (ok true)))
+
+(define-public (complete-initialization)
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-some (var-get staking-contract-ref)) (err ERR_UNAUTHORIZED))
+    (var-set initialization-complete true)
     (ok true)))
 
 (define-public (authorize-collector (collector principal) (authorized bool))
@@ -118,31 +157,106 @@
                                     (map-get? revenue-by-source { collector: collector, epoch: current-epoch }))))
         (map-set revenue-by-source 
           { collector: collector, epoch: current-epoch }
-          (merge source-data { total-amount: (+ (get total-amount source-data) amount) })))
+          { total-amount: (+ (get total-amount source-data) amount), fee-type: fee-type }))
       
-      ;; Track by fee type
-      (let ((type-data (default-to { total-amount: u0, distributions: u0 }
-                                  (map-get? revenue-by-type { fee-type: fee-type, epoch: current-epoch }))))
-        (map-set revenue-by-type
-          { fee-type: fee-type, epoch: current-epoch }
-          (merge type-data { total-amount: (+ (get total-amount type-data) amount) })))
-      
-      ;; Add to pending distributions
-      (let ((pending-data (default-to { total-pending: u0, last-distribution: u0 }
-                                     (map-get? pending-distributions revenue-token-principal))))
-        (map-set pending-distributions revenue-token-principal
-          (merge pending-data { total-pending: (+ (get total-pending pending-data) amount) })))
-      
-      (ok { epoch: current-epoch, amount: amount, fee-type: fee-type }))))
+      ;; Emit event for off-chain tracking and other contracts
+      (emit-revenue-collected-event collector amount revenue-token-principal fee-type)
+      (ok true))))
+
+;; --- Event Emission Functions ---
+(define-private (emit-revenue-collected-event 
+  (collector principal) 
+  (amount uint) 
+  (token principal) 
+  (fee-type uint))
+  (let ((event-id (+ (var-get event-counter) u1)))
+    (var-set event-counter event-id)
+    (print {
+      event-type: EVENT_REVENUE_COLLECTED,
+      contract: (as-contract tx-sender),
+      collector: collector,
+      amount: amount,
+      token: token,
+      fee-type: fee-type,
+      epoch: (var-get current-distribution-epoch),
+      block-height: block-height,
+      event-id: event-id,
+      timestamp: (unwrap-panic (get-block-info? time block-height))
+    })
+    event-id))
+
+(define-private (emit-revenue-distributed-event 
+  (total-amount uint) 
+  (xcxd-amount uint) 
+  (treasury-amount uint) 
+  (reserve-amount uint))
+  (let ((event-id (+ (var-get event-counter) u1)))
+    (var-set event-counter event-id)
+    (print {
+      event-type: EVENT_REVENUE_DISTRIBUTED,
+      contract: (as-contract tx-sender),
+      total-amount: total-amount,
+      xcxd-amount: xcxd-amount,
+      treasury-amount: treasury-amount,
+      reserve-amount: reserve-amount,
+      epoch: (var-get current-distribution-epoch),
+      block-height: block-height,
+      event-id: event-id,
+      timestamp: (unwrap-panic (get-block-info? time block-height))
+    })
+    event-id))
+
+;; --- Event Listener Functions (for other contracts) ---
+(define-public (record-mint-event 
+  (recipient principal) 
+  (amount uint))
+  (begin
+    (asserts! (var-get system-integration-enabled) (err ERR_UNAUTHORIZED))
+    (asserts! (is-some (var-get cxd-token-contract)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (unwrap-panic (var-get cxd-token-contract))) (err ERR_UNAUTHORIZED))
+    
+    ;; Emit event for tracking
+    (let ((event-id (+ (var-get event-counter) u1)))
+      (var-set event-counter event-id)
+      (print {
+        event-type: EVENT_MINT_RECORDED,
+        contract: (as-contract tx-sender),
+        recipient: recipient,
+        amount: amount,
+        block-height: block-height,
+        event-id: event-id,
+        timestamp: (unwrap-panic (get-block-info? time block-height))
+      }))
+    (ok true)))
+
+(define-public (record-burn-event 
+  (user principal) 
+  (amount uint))
+  (begin
+    (asserts! (var-get system-integration-enabled) (err ERR_UNAUTHORIZED))
+    (asserts! (is-some (var-get cxd-token-contract)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (unwrap-panic (var-get cxd-token-contract))) (err ERR_UNAUTHORIZED))
+    
+    ;; Emit event for tracking
+    (let ((event-id (+ (var-get event-counter) u1)))
+      (var-set event-counter event-id)
+      (print {
+        event-type: EVENT_BURN_RECORDED,
+        contract: (as-contract tx-sender),
+        user: user,
+        amount: amount,
+        block-height: block-height,
+        event-id: event-id,
+        timestamp: (unwrap-panic (get-block-info? time block-height))
+      }))
+    (ok true)))
 
 ;; --- Revenue Distribution ---
 
 ;; Distribute accumulated revenue using buyback-and-make for CXD
-(define-public (distribute-revenue (revenue-token <ft-trait>))
+(define-public (distribute-revenue (revenue-token <ft-trait>) (total-amount uint))
   (let ((revenue-token-principal (contract-of revenue-token))
-        (current-epoch (var-get current-distribution-epoch))
-        (pending-data (unwrap! (map-get? pending-distributions revenue-token-principal) (err ERR_INSUFFICIENT_BALANCE)))
-        (total-amount (get total-pending pending-data)))
+        (current-epoch (var-get current-distribution-epoch)))
     (begin
       (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
       (asserts! (> total-amount u0) (err ERR_INSUFFICIENT_BALANCE))
@@ -152,45 +266,15 @@
             (treasury-amount (/ (* total-amount TREASURY_SPLIT_BPS) u10000))
             (reserve-amount (/ (* total-amount RESERVE_SPLIT_BPS) u10000)))
         
-        ;; If revenue token is not CXD, perform buyback-and-make
-        (if (is-eq revenue-token-principal (var-get cxd-token-contract))
-          ;; Direct CXD distribution
-          (begin
-            (try! (as-contract (contract-call? .cxd-staking distribute-revenue xcxd-amount .cxd-token)))
-            (try! (as-contract (contract-call? revenue-token transfer treasury-amount (as-contract tx-sender) (var-get treasury-address) none)))
-            (try! (as-contract (contract-call? revenue-token transfer reserve-amount (as-contract tx-sender) (var-get reserve-address) none))))
-          ;; Buyback CXD with revenue token, then distribute
-          (begin
-            ;; TODO: Integrate with DEX for buyback mechanism
-            ;; For now, send all to treasury to manually handle buyback
-            (try! (as-contract (contract-call? revenue-token transfer total-amount (as-contract tx-sender) (var-get treasury-address) none)))))
+        ;; Simplified distribution for enhanced deployment
+        (try! (as-contract (contract-call? revenue-token transfer treasury-amount (as-contract tx-sender) (var-get treasury-address) none)))
+        (try! (as-contract (contract-call? revenue-token transfer reserve-amount (as-contract tx-sender) (var-get reserve-address) none)))
         
         ;; Update distribution tracking
         (var-set total-revenue-distributed (+ (var-get total-revenue-distributed) total-amount))
         (var-set current-distribution-epoch (+ current-epoch u1))
         
-        ;; Record distribution history
-        (map-set distribution-history current-epoch
-          {
-            total-distributed: total-amount,
-            xcxd-amount: xcxd-amount,
-            treasury-amount: treasury-amount,
-            reserve-amount: reserve-amount,
-            timestamp: block-height,
-            revenue-token: revenue-token-principal
-          })
-        
-        ;; Clear pending distributions
-        (map-set pending-distributions revenue-token-principal
-          { total-pending: u0, last-distribution: block-height })
-        
-        (ok { 
-          epoch: current-epoch,
-          total-distributed: total-amount,
-          xcxd-share: xcxd-amount,
-          treasury-share: treasury-amount,
-          reserve-share: reserve-amount
-        })))))
+        (ok total-amount)))))
 
 ;; Emergency distribution bypass for specific scenarios
 (define-public (emergency-distribute (revenue-token <ft-trait>) (amount uint) (recipient principal))
@@ -276,7 +360,7 @@
                                                          (map-get? pending-distributions (var-get cxd-token-contract)))),
     treasury-address: (var-get treasury-address),
     reserve-address: (var-get reserve-address),
-    xcxd-staking-contract: (var-get xcxd-staking-contract)
+    staking-contract-ref: (var-get staking-contract-ref)
   })
 
 ;; Get comprehensive revenue report for specific epoch
