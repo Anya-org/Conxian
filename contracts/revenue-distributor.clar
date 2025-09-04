@@ -291,19 +291,16 @@
     (asserts! (default-to false (map-get? authorized-collectors tx-sender)) (err ERR_UNAUTHORIZED))
     
     (let ((total-fees (+ performance-fee management-fee)))
-      (if (> performance-fee u0)
-        (begin
-          (try! (collect-revenue performance-fee fee-token FEE_TYPE_VAULT_PERFORMANCE))
-          (ok true))
-        (ok true))
-      
-      (if (> management-fee u0)
-        (begin
-          (try! (collect-revenue management-fee fee-token FEE_TYPE_VAULT_MANAGEMENT))
-          (ok true))
-        (ok true))
-      
-      (ok total-fees))))
+      (begin
+        (if (> performance-fee u0)
+          (unwrap! (collect-revenue performance-fee fee-token FEE_TYPE_VAULT_PERFORMANCE) (err ERR_DISTRIBUTION_FAILED))
+          true)
+        
+        (if (> management-fee u0)
+          (unwrap! (collect-revenue management-fee fee-token FEE_TYPE_VAULT_MANAGEMENT) (err ERR_COLLECTION_FAILED))
+          true)
+        
+        (ok total-fees)))))
 
 ;; Called by DEX contracts to report trading fees
 (define-public (report-dex-fees (trading-fee uint) (fee-token <ft-trait>))

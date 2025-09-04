@@ -73,22 +73,22 @@
                     (map-get? daily-stats (int-to-ascii today))))))
 
 ;; Private functions
+;; Simplified square root using Newton's method
 (define-private (sqrt (x uint))
-  "Simplified square root using Newton's method"
   (if (<= x u1)
       x
       (let ((guess (/ x u2)))
         (/ (+ guess (/ x guess)) u2))))
 
+;; Calculate output amount for constant product formula with fees
 (define-private (calculate-swap-amount (amount-in uint) (reserve-in uint) (reserve-out uint))
-  "Calculate output amount for constant product formula with fees"
   (let ((amount-in-with-fee (- amount-in (/ (* amount-in (var-get lp-fee-bps)) u10000)))
         (numerator (* amount-in-with-fee reserve-out))
         (denominator (+ reserve-in amount-in-with-fee)))
     (/ numerator denominator)))
 
+;; Update time-weighted average price
 (define-private (update-cumulative-prices)
-  "Update time-weighted average price"
   (let ((current-time block-height)
         (time-elapsed (- current-time 
                         (default-to current-time 
@@ -105,8 +105,8 @@
           (map-set last-update-time "price-b" current-time))
         false)))
 
+;; Update daily trading statistics
 (define-private (update-daily-stats (volume uint) (fees uint))
-  "Update daily trading statistics"
   (let ((today (/ block-height u144))
         (today-key (int-to-ascii today))
         (current-stats (default-to (tuple (volume u0) (fees u0) (trades u0))

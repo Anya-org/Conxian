@@ -352,7 +352,7 @@
     epoch-start-height: (var-get epoch-start-height),
     epoch-progress: (- block-height (var-get epoch-start-height)),
     cxd-info: (get-emission-info (default-to .cxd-token (var-get cxd-contract))),
-    cxvg-info: (get-emission-info (var-get cxvg-contract)),
-    cxlp-info: (get-emission-info (var-get cxlp-contract)),
-    cxtr-info: (get-emission-info (var-get cxtr-contract))
+    cxvg-info: (get-emission-info (default-to .cxvg-token (var-get cxvg-contract))),
+    cxlp-info: (get-emission-info (default-to .cxlp-token (var-get cxlp-contract))),
+    cxtr-info: (get-emission-info (default-to .cxtr-token (var-get cxtr-contract)))
   })

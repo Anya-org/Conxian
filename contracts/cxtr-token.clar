@@ -250,8 +250,8 @@
 )
 
 ;; --- Creator Economy Functions ---
+;; Mint tokens with merit-based bonus  
 (define-public (mint-merit-reward (recipient principal) (base-amount uint) (merit-score uint))
-  "Mint tokens with merit-based bonus"
   (let ((merit-bonus (/ (* base-amount merit-score (var-get merit-multiplier)) (* u1000 u100)))
         (total-amount (+ base-amount merit-bonus)))
     
@@ -282,8 +282,8 @@
     (notify-mint total-amount recipient)
     (ok total-amount)))
 
+;; Update creator reputation and contributions (called by creator council or bounty system)
 (define-public (update-creator-reputation (creator principal) (reputation uint) (bounties uint) (proposals uint))
-  "Update creator reputation and contributions (called by creator council or bounty system)"
   (begin
     (asserts! (or (is-owner tx-sender) 
                  (is-eq tx-sender (unwrap! (var-get creator-council) (err ERR_UNAUTHORIZED)))
@@ -302,8 +302,8 @@
     
     (ok true)))
 
+;; Distribute seasonal bonuses to active creators
 (define-public (distribute-seasonal-bonus (recipients (list 100 principal)) (amounts (list 100 uint)))
-  "Distribute seasonal bonuses to active creators"
   (begin
     (asserts! (is-owner tx-sender) (err ERR_UNAUTHORIZED))
     (asserts! (is-eq (len recipients) (len amounts)) (err ERR_UNAUTHORIZED))
@@ -315,8 +315,8 @@
       (var-set total-supply (+ (var-get total-supply) total-bonus))
       (ok total-bonus))))
 
+;; Get comprehensive creator information
 (define-read-only (get-creator-info (creator principal))
-  "Get comprehensive creator information"
   (ok (tuple (reputation (default-to u0 (map-get? creator-reputation creator)))
              (merit-score (default-to u0 (map-get? merit-scores creator)))
              (governance-eligible (default-to false (map-get? governance-eligibility creator)))

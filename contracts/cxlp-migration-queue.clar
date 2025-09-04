@@ -176,7 +176,7 @@
                       total-weight: (+ (get total-weight current-epoch-info) weight)
                     }))
                 
-                (ok { epoch: current-epoch-num, weight: weight, duration: user-duration })))))
+                (ok { epoch: current-epoch-num, weight: weight, duration: user-duration }))))))))
 
 ;; Settle epoch with pro-rata allocation
 (define-public (settle-epoch (epoch uint))

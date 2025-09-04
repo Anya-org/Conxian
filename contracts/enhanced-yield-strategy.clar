@@ -83,9 +83,9 @@
              (tuple (timestamp block-height) (value current-value) (apy current-apy)))
     true))
 
-;; Core strategy functions
+;; Core strategy functions  
+;; Deploy funds to yield-generating positions
 (define-public (deploy-funds (amount uint))
-  "Deploy funds to yield-generating positions"
   (begin
     (asserts! (not (var-get paused)) ERR_PAUSED)
     (asserts! (not (var-get emergency-mode)) ERR_EMERGENCY_ONLY)
@@ -95,12 +95,8 @@
     ;; In production, would interact with actual protocols
     (let ((position-id (+ (var-get total-deployed) u1)))
       
-      ;; Record position
-      (map-set strategy-positions (unwrap-panic (principal-construct? 
-                                               (unwrap-panic (as-max-len? 
-                                                            (concat "pos-" (unwrap-panic (to-ascii position-id))) 
-                                                            u128))))
-               amount)
+      ;; Record position - simplified without string conversion
+      (map-set strategy-positions tx-sender amount)
       
       ;; Update total deployed
       (var-set total-deployed (+ (var-get total-deployed) amount))
@@ -116,8 +112,8 @@
       
       (ok amount))))
 
+;; Withdraw funds from strategy positions
 (define-public (withdraw-funds (amount uint))
-  "Withdraw funds from strategy positions"
   (let ((current-deployed (var-get total-deployed)))
     
     (asserts! (not (var-get paused)) ERR_PAUSED)
@@ -219,8 +215,8 @@
     
     (ok total-harvested)))
 
+;; Update dimensional weights based on strategy performance
 (define-public (update-dimensional-weights)
-  "Update dimensional weights based on strategy performance"
   (let ((current-value (unwrap! (get-current-value) ERR_STRATEGY_FAILED))
         (deployed (var-get total-deployed))
         (performance-ratio (if (> deployed u0) (/ (* current-value PRECISION) deployed) PRECISION))
