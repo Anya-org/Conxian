@@ -221,11 +221,11 @@
       (match (execute-migration-safe amount)
         success (begin
           ;; Notify revenue distributor of potential new revenue via safe call
-          (if (and (var-get system-integration-enabled) (is-some (var-get revenue-distributor-contract)))
+          (try! (if (and (var-get system-integration-enabled) (is-some (var-get revenue-distributor-contract)))
             (match (var-get revenue-distributor-contract)
               revenue-contract-principal (ok true) ;; Simplified - assume fee recorded if distributor exists
               (ok true))
-            (ok true))
+            (ok true)))
           (map-set cross-system-operations operation-id
             (merge (unwrap-panic (map-get? cross-system-operations operation-id)) { status: u1 }))
           (ok success))

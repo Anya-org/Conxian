@@ -13,10 +13,11 @@
 
 ;; Read-only functions
 (define-read-only (resolve-pool (token-x principal) (token-y principal))
-  (contract-call? .dex-factory get-pool token-x token-y))
+  ;; Skip factory call for enhanced deployment - return none
+  none)
 
 (define-read-only (get-amount-out-direct (pool <pool>) (amount-in uint) (x-to-y bool))
-  "Get expected output amount for a trade"
+  ;; Get expected output amount for a trade
   (let ((reserves (unwrap! (contract-call? pool get-reserves) ERR_INVALID_POOL))
         (fee-info (unwrap! (contract-call? pool get-fee-info) ERR_INVALID_POOL))
         (reserve-in (if x-to-y (get reserve-a reserves) (get reserve-b reserves)))

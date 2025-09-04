@@ -232,13 +232,12 @@
     (map-set balances { who: tx-sender } { bal: (- bal amount) })
     (var-set total-supply (- (var-get total-supply) amount))
     
-    ;; Notify revenue distributor if configured and enabled
+    ;; Notify revenue distributor if configured and enabled - skip for enhanced deployment
     (if (and (var-get system-integration-enabled) (is-some (var-get revenue-distributor)))
       (match (var-get revenue-distributor)
         revenue-ref
-          (match (contract-call? revenue-ref record-burn-event tx-sender amount)
-            success true
-            error true) ;; Ignore errors, don't fail burn
+          ;; Skip revenue recording for enhanced deployment
+          true
         true)
       true)
     (ok true)

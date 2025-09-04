@@ -297,7 +297,7 @@
           true)
         
         (if (> management-fee u0)
-          (unwrap! (collect-revenue management-fee fee-token FEE_TYPE_VAULT_MANAGEMENT) (err ERR_COLLECTION_FAILED))
+          (unwrap! (collect-revenue management-fee fee-token FEE_TYPE_VAULT_MANAGEMENT) (err ERR_DISTRIBUTION_FAILED))
           true)
         
         (ok total-fees)))))
@@ -308,7 +308,8 @@
     (asserts! (default-to false (map-get? authorized-collectors tx-sender)) (err ERR_UNAUTHORIZED))
     (if (> trading-fee u0)
       (try! (collect-revenue trading-fee fee-token FEE_TYPE_DEX_TRADING))
-      (ok u0))))
+      true)
+    (ok u0)))
 
 ;; Called by migration system to report migration fees
 (define-public (report-migration-fees (migration-fee uint) (fee-token <ft-trait>))

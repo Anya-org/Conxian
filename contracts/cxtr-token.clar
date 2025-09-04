@@ -325,11 +325,11 @@
              (seasonal-bonus (default-to u0 (map-get? seasonal-bonuses creator))))))
 
 (define-read-only (get-governance-eligible-creators)
-  "Get list of creators eligible for governance (simplified)"
+  ;; Get list of creators eligible for governance (simplified)
   (ok (list)))
 
 (define-public (set-reputation-threshold (new-threshold uint))
-  "Set minimum reputation required for governance eligibility"
+  ;; Set minimum reputation threshold for governance participation
   (begin
     (asserts! (is-owner tx-sender) (err ERR_UNAUTHORIZED))
     (var-set reputation-threshold new-threshold)

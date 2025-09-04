@@ -125,10 +125,11 @@
     (ok true)))
 
 (define-public (get-pool-implementation (pool-type (string-ascii 32)))
-  (map-get? pool-implementations pool-type))
+  ;; Return pool implementation wrapped in response
+  (ok (map-get? pool-implementations pool-type)))
 
 (define-public (recommend-pool (token-a principal) (token-b principal) (amount uint))
-  "Recommend best pool for trade based on liquidity and fees"
+  ;; Recommend best pool for trade based on liquidity and fees
   (match (get-pool token-a token-b)
     pool (let ((stats (get-pool-stats pool)))
            (ok (tuple (pool pool) 

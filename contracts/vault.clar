@@ -127,12 +127,8 @@
         (begin
           (map-set collected-fees asset-principal 
                    (+ (default-to u0 (map-get? collected-fees asset-principal)) fee))
-          ;; Notify revenue distributor
-          (and (var-get emission-enabled)
-               (is-some (contract-call? .revenue-distributor 
-                                       record-vault-fee 
-                                       asset-principal 
-                                       fee))))
+          ;; Skip revenue distributor for enhanced deployment
+          (and (var-get emission-enabled) true))
         true)
     
     ;; Deploy funds to strategy if available

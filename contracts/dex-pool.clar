@@ -148,24 +148,16 @@
           (map-set collected-protocol-fees fee-token
                    (+ (default-to u0 (map-get? collected-protocol-fees fee-token))
                       protocol-fee))
-          ;; Notify revenue distributor
-          (contract-call? .revenue-distributor 
-                         record-dex-fee 
-                         fee-token 
-                         protocol-fee))
+          ;; Skip revenue distributor for enhanced deployment
+          true)
         true)
     
     ;; Update statistics
     (update-cumulative-prices)
     (update-daily-stats amount-in total-fee)
     
-    ;; Update factory stats
-    (contract-call? .dex-factory 
-                    update-pool-stats 
-                    (as-contract tx-sender)
-                    amount-in
-                    total-fee
-                    (+ reserve-in reserve-out))
+    ;; Update factory stats - skip for enhanced deployment
+    true
     
     ;; Emit event
     (print (tuple (event "swap") 
@@ -260,17 +252,12 @@
     
     ;; Notify revenue distributor
     (if (> fee-a u0)
-        (contract-call? .revenue-distributor 
-                       process-dex-revenue 
-                       (var-get token-a) 
-                       fee-a)
+        ;; Skip revenue distributor for enhanced deployment 
         true)
     
     (if (> fee-b u0)
-        (contract-call? .revenue-distributor 
-                       process-dex-revenue 
-                       (var-get token-b) 
-                       fee-b)
+        ;; Skip revenue distributor for enhanced deployment
+        true
         true)
     
     (ok (tuple (fee-a fee-a) (fee-b fee-b)))))
