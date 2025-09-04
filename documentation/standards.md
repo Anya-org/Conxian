@@ -1,6 +1,6 @@
 # Standards and Interoperability Guide
 
-This document codifies standards for AutoVault’s Stacks DeFi system to ensure security, efficiency, and seamless interoperability with other systems.
+This document codifies standards for Conxian’s Stacks DeFi system to ensure security, efficiency, and seamless interoperability with other systems.
 
 ## Token Standard: SIP-010 (Fungible Tokens)
 

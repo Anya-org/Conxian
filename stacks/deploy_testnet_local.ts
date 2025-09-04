@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 // Simulate deployment process for testing
-console.log("🚀 AutoVault Testnet Deployment Simulation");
+console.log("🚀 Conxian Testnet Deployment Simulation");
 console.log("==========================================");
 
 const contractsDir = join(process.cwd(), 'contracts');
@@ -12,10 +12,10 @@ const contracts = [
   'vault-admin-trait.clar',
   'strategy-trait.clar',
   'mock-ft.clar',
-  'gov-token.clar',
+  'CXVG.clar',
   'creator-token.clar',
-  'avg-token.clar',
-  'avlp-token.clar',
+  'cxvg-token.clar',
+  'cxlp-token.clar',
   'registry.clar',
   'timelock.clar',
   'dao.clar',
@@ -71,4 +71,4 @@ console.log("3. Monitor deployment transactions");
 console.log("4. Update deployment registry");
 console.log("5. Verify contract addresses");
 
-console.log("\n🎉 AutoVault is READY for STX.CITY deployment!");
+console.log("\n🎉 Conxian is READY for STX.CITY deployment!");

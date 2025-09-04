@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// AutoVault Hiro API Integration Test
+// Conxian Hiro API Integration Test
 // Tests the Hiro API key and basic functionality
 
 const https = require('https');
@@ -175,7 +175,7 @@ async function testTransactionBroadcast(apiKey, apiBase) {
 
 // Main test function
 async function runTests() {
-    console.log('🚀 AutoVault Hiro API Integration Test\n');
+    console.log('🚀 Conxian Hiro API Integration Test\n');
     
     const env = loadEnv();
     const apiKey = env.HIRO_API_KEY;

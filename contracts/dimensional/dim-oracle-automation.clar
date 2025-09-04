@@ -40,7 +40,7 @@
 (define-private (update-weight-iter (update {dim-id: uint, new-wt: uint}) (prev-result (response bool uint)))
   (begin
     (try! prev-result)
-    (match (contract-call? (var-get dim-registry-contract) .update-weight (get dim-id update) (get new-wt update))
+    (match (contract-call? .dim-registry update-weight (get dim-id update) (get new-wt update))
       success-val (ok true)
       error-val (err error-val)
     )

@@ -1,25 +1,31 @@
 // global-vitest.setup.ts
-import path from 'path';
+import { getSDK } from '@hirosystems/clarinet-sdk';
 
-export default function setup() {
-  console.log('__dirname:', __dirname);
-  const manifestPath = path.resolve(__dirname, '../Clarinet.toml');
-  console.log('manifestPath:', manifestPath);
-  // Set up global options required by clarinet SDK
-  global.options = {
-    clarinet: {
-      manifestPath: manifestPath,
-      initBeforeEach: true,
-      coverage: false,
-      coverageFilename: 'coverage.lcov',
-      costs: false,
-      costsFilename: 'costs.json',
-      includeBootContracts: false,
-      bootContractsPath: '',
-    },
-  };
+// Use a minimal test manifest at project root to avoid loading optional/missing contracts
+const manifestPath = 'Clarinet.test.toml';
 
-  global.testEnvironment = 'clarinet';
-  global.coverageReports = [];
-  global.costsReports = [];
-}
+// Configure Clarinet SDK options for tests at module load time
+global.options = {
+  clarinet: {
+    manifestPath,
+    initBeforeEach: false,
+    coverage: false,
+    coverageFilename: 'coverage.lcov',
+    costs: false,
+    costsFilename: 'costs.json',
+    includeBootContracts: false,
+    bootContractsPath: '',
+  },
+};
+
+global.testEnvironment = 'clarinet';
+global.coverageReports = [];
+global.costsReports = [];
+
+// Initialize a global simnet instance so Clarinet vitest helpers can manage sessions
+const sdk = await getSDK({
+  trackCosts: global.options.clarinet.costs,
+  trackCoverage: global.options.clarinet.coverage,
+});
+// @ts-ignore assign to declared global from SDK helpers
+global.simnet = sdk;

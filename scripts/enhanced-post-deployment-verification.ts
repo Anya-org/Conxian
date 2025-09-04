@@ -2,7 +2,7 @@
 
 /**
  * Enhanced Post-Deployment Verification System
- * Comprehensive validation of deployed AutoVault contracts
+ * Comprehensive validation of deployed Conxian contracts
  * Covers: Performance, Security, Functionality, Production Readiness
  */
 
@@ -61,7 +61,7 @@ class EnhancedPostDeploymentVerifier {
         loadDistribution: `${deployerAddr}.dynamic-load-distribution`,
         timelock: `${deployerAddr}.timelock`,
         dao: `${deployerAddr}.dao`,
-        govToken: `${deployerAddr}.gov-token`,
+        govToken: `${deployerAddr}.CXVG`,
         treasury: `${deployerAddr}.treasury`,
       },
       performanceTargets: {
@@ -123,7 +123,7 @@ class EnhancedPostDeploymentVerifier {
       setIf('loadDistribution', 'dynamic-load-distribution', 'load-distribution');
       setIf('timelock', 'timelock');
       setIf('dao', 'dao', 'dao-governance');
-      setIf('govToken', 'gov-token');
+      setIf('govToken', 'CXVG');
       setIf('treasury', 'treasury');
 
       // Update deployer address from any contract id if available
@@ -864,7 +864,7 @@ class EnhancedPostDeploymentVerifier {
         ? 'NEEDS MINOR FIXES'
         : 'NOT PRODUCTION READY';
 
-    let report = `# AutoVault Enhanced Contracts - Post-Deployment Verification Report
+    let report = `# Conxian Enhanced Contracts - Post-Deployment Verification Report
 
 **Generated:** ${timestamp}
 **Network:** ${this.config.networkName}
@@ -992,7 +992,7 @@ class EnhancedPostDeploymentVerifier {
   // =============================================================================
 
   async runFullVerification(): Promise<void> {
-    console.log('🔍 AutoVault Enhanced Contracts - Post-Deployment Verification');
+    console.log('🔍 Conxian Enhanced Contracts - Post-Deployment Verification');
     console.log('==================================================================');
     console.log(`Network: ${this.config.networkName}`);
     console.log(`Deployer: ${this.config.deployerAddr}`);

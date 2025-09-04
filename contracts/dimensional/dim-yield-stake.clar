@@ -56,12 +56,12 @@
 
 ;; --- Staking Functions ---
 
-(define-public (stake-dimension (dim-id uint) (amount uint) (lock-period uint))
+(define-public (stake-dimension (dim-id uint) (amount uint) (lock-period uint) (token <sip-010>))
   (begin
     (asserts! (> amount u0) (err ERR_INVALID_AMOUNT))
     (asserts! (is-some (map-get? dimension-params {dim-id: dim-id})) (err ERR_DIMENSION_NOT_CONFIGURED))
     (let ((staker tx-sender))
-      (try! (contract-call? (var-get token-contract) .transfer amount staker (as-contract tx-sender) none))
+      (try! (contract-call? token transfer amount staker (as-contract tx-sender) none))
       (map-set stakes
         {staker: staker, dim-id: dim-id}
         {amount: amount, unlock-height: (+ block-height lock-period), lock-period: lock-period}
@@ -73,22 +73,21 @@
 
 ;; --- Claiming Functions ---
 
-(define-public (claim-rewards (dim-id uint))
+(define-public (claim-rewards (dim-id uint) (token <sip-010>))
   (let (
       (staker tx-sender)
       (stake-info (unwrap! (map-get? stakes {staker: staker, dim-id: dim-id}) (err ERR_NO_STAKE_FOUND)))
       (unlock-height (get unlock-height stake-info))
       (staked-amount (get amount stake-info))
-      (token (var-get token-contract))
     )
     (asserts! (>= block-height unlock-height) (err ERR_LOCKUP_NOT_EXPIRED))
 
     ;; Calculate rewards
     (let ((rewards (try! (calculate-rewards-for-stake stake-info dim-id))))
-      ;; Mint rewards to the staker
-      (try! (contract-call? (var-get token-contract) .mint rewards staker))
-      ;; Return principal to the staker
-      (try! (as-contract (contract-call? (var-get token-contract) .transfer staked-amount tx-sender staker none)))
+      ;; Transfer rewards from contract to the staker
+      (try! (as-contract (contract-call? token transfer rewards tx-sender staker none)))
+      ;; Return principal to the staker from contract
+      (try! (as-contract (contract-call? token transfer staked-amount tx-sender staker none)))
       ;; Delete stake info
       (map-delete stakes {staker: staker, dim-id: dim-id})
       (ok {rewards: rewards, principal: staked-amount})
@@ -106,19 +105,24 @@
       (params (unwrap! (map-get? dimension-params {dim-id: dim-id}) (err ERR_DIMENSION_NOT_CONFIGURED)))
       (base-rate (get base-rate params))
       (k (get k params))
-      (metrics-contract (var-get dim-metrics-contract))
       ;; Metric ID for utilization is u1
-      (metric-optional (try! (contract-call? metrics-contract .get-metric dim-id u1)))
-      (utilization-metric (unwrap! metric-optional (err ERR_METRIC_NOT_FOUND)))
-      (utilization (get value utilization-metric))
+      (metric-opt (contract-call? .dim-metrics get-metric dim-id u1))
     )
-    ;; APR = baseRate + k * Utilization
-    ;; We assume base-rate, k and utilization are scaled by 10000 (e.g., 100 = 1%)
-    (let ((apr (+ base-rate (/ (* k utilization) u10000))))
-      ;; Reward = amount * APR * lock_period_in_years
-      ;; We approximate 1 year = 52560 blocks
-      ;; To avoid floating points, we calculate: (amount * apr * lock_period) / (10000 * 52560)
-      (ok (/ (* staked-amount (* apr lock-period)) u525600000))
+    (match metric-opt
+      utilization-metric
+        (let (
+            (utilization (get value utilization-metric))
+          )
+          ;; APR = baseRate + k * Utilization
+          ;; We assume base-rate, k and utilization are scaled by 10000 (e.g., 100 = 1%)
+          (let ((apr (+ base-rate (/ (* k utilization) u10000))))
+            ;; Reward = amount * APR * lock_period_in_years
+            ;; We approximate 1 year = 52560 blocks
+            ;; To avoid floating points, we calculate: (amount * apr * lock_period) / (10000 * 52560)
+            (ok (/ (* staked-amount (* apr lock-period)) u525600000))
+          )
+        )
+      (err ERR_METRIC_NOT_FOUND)
     )
   )
 )

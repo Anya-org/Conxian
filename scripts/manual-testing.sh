@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Manual Testing Framework for AutoVault
+# Manual Testing Framework for Conxian
 # Alternative to automated testing while SDK issues persist
 
 set -euo pipefail
@@ -7,7 +7,7 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_ROOT/stacks"
 
-echo "🧪 AutoVault Manual Testing Framework"
+echo "🧪 Conxian Manual Testing Framework"
 echo "====================================="
 
 # Pre-test validation
@@ -24,7 +24,7 @@ fi
 echo "[2/4] Preparing enhanced console testing..."
 
 cat > manual_test_commands.clar <<'CLARITY'
-;; AutoVault Manual Testing Commands
+;; Conxian Manual Testing Commands
 ;; Copy and paste these into clarinet console for interactive testing
 
 ;; === BASIC CONTRACT VERIFICATION ===
@@ -37,16 +37,16 @@ cat > manual_test_commands.clar <<'CLARITY'
 
 ;; === TOKENOMICS VERIFICATION ===
 
-;; Check AVG token supply (should be 10,000,000)
-(contract-call? .avg-token get-total-supply)
+;; Check CXVG token supply (should be 10,000,000)
+(contract-call? .cxvg-token get-total-supply)
 
-;; Check AVLP token supply (should be 5,000,000)
-(contract-call? .avlp-token get-total-supply)
+;; Check CXLP token supply (should be 5,000,000)
+(contract-call? .cxlp-token get-total-supply)
 
 ;; Verify token metadata
-(contract-call? .avg-token get-name)
-(contract-call? .avg-token get-symbol)
-(contract-call? .avg-token get-decimals)
+(contract-call? .cxvg-token get-name)
+(contract-call? .cxvg-token get-symbol)
+(contract-call? .cxvg-token get-decimals)
 
 ;; === VAULT FUNCTIONALITY ===
 
@@ -135,7 +135,7 @@ cat > manual_test_commands.clar <<'CLARITY'
 ;; Test revenue distribution (simulated)
 ;; 1. Generate fees
 ;; 2. Trigger distribution
-;; 3. Check AVG holder rewards
+;; 3. Check CXVG holder rewards
 ;; 4. Verify buyback execution
 
 CLARITY
@@ -155,8 +155,8 @@ echo "4. Verify expected outputs"
 echo ""
 echo "📋 EXPECTED RESULTS:"
 echo "==================="
-echo "- AVG Total Supply: u10000000000000 (10M tokens)"
-echo "- AVLP Total Supply: u5000000000000 (5M tokens)"
+echo "- CXVG Total Supply: u10000000000000 (10M tokens)"
+echo "- CXLP Total Supply: u5000000000000 (5M tokens)"
 echo "- All contract calls should return valid data"
 echo "- No runtime errors or panics"
 echo ""

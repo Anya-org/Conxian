@@ -12,7 +12,7 @@ from datetime import datetime
 
 def main():
     """Main function for keeper watchdog"""
-    parser = argparse.ArgumentParser(description='AutoVault Keeper Watchdog')
+    parser = argparse.ArgumentParser(description='Conxian Keeper Watchdog')
     parser.add_argument('--network', default='mainnet', help='Network to monitor')
     parser.add_argument('--health-status', default='unknown', help='Health status from previous checks')
     parser.add_argument('--autonomics-status', default='unknown', help='Autonomics operation status')

@@ -1,4 +1,4 @@
-# AutoVault PRD: DAO Governance & Voting
+# Conxian PRD: DAO Governance & Voting
 
 | | |
 |---|---|
@@ -6,23 +6,25 @@
 | **Version** | 1.2 |
 | **Owner** | Governance WG |
 | **Last Updated** | 2025-08-26 |
-| **References** | [AIP-2](...), [`dao-governance.clar`](../../contracts/dao-governance.clar), [`timelock.clar`](../../contracts/timelock.clar) |
+| **References** | AIP-2, `dao-governance.clar` (planned), `timelock.clar` (planned) |
 
 ---
 
 ## 1. Summary & Vision
 
-The AutoVault DAO (Decentralized Autonomous Organization) provides a transparent, secure, and decentralized mechanism for governing the entire AutoVault ecosystem. The system is centered around an on-chain proposal and voting process, featuring time-weighted voting to promote long-term stakeholder alignment and a timelock mechanism to ensure safe and predictable execution of proposals. The vision is to create a fully community-driven governance model that is resistant to manipulation and empowers token holders to collectively manage the protocol's future.
+The Conxian DAO (Decentralized Autonomous Organization) provides a transparent, secure, and decentralized mechanism for governing the entire Conxian ecosystem. The system is centered around an on-chain proposal and voting process, featuring time-weighted voting to promote long-term stakeholder alignment and a timelock mechanism to ensure safe and predictable execution of proposals. The vision is to create a fully community-driven governance model that is resistant to manipulation and empowers token holders to collectively manage the protocol's future.
 
 ## 2. Goals / Non-Goals
 
 ### Goals
+
 - **Fair & Secure Voting**: Implement time-weighted voting (AIP-2) to reward long-term token holders and mitigate the risk of flash loan governance attacks.
 - **Transparent Lifecycle**: Ensure every proposal follows a clear, on-chain lifecycle: submission, voting, queuing (timelock), and execution.
-- **Comprehensive Control**: Enable the DAO to govern all critical aspects of the AutoVault protocol, including contract upgrades, fee changes, and treasury management.
+- **Comprehensive Control**: Enable the DAO to govern all critical aspects of the Conxian protocol, including contract upgrades, fee changes, and treasury management.
 - **Founder Accountability**: Incentivize active participation from founders through an automated token reallocation mechanism tied to voting activity.
 
 ### Non-Goals
+
 - **Off-Chain Voting**: All binding governance decisions must occur on-chain.
 - **Instant Execution**: No proposal can be executed without passing through the mandatory timelock delay.
 - **Subjective Decisions**: The DAO operates on programmatic rules; it does not handle subjective disputes.
@@ -31,7 +33,7 @@ The AutoVault DAO (Decentralized Autonomous Organization) provides a transparent
 
 | ID | As a... | I want to... | So that... | Priority |
 |---|---|---|---|---|
-| DAO-US-01 | Token Holder | Propose changes to the protocol | I can participate in shaping the future of AutoVault. | P0 |
+| DAO-US-01 | Token Holder | Propose changes to the protocol | I can participate in shaping the future of Conxian. | P0 |
 | DAO-US-02 | Token Holder | Vote on active proposals with time-weighted power | My long-term commitment to the project is reflected in my influence. | P0 |
 | DAO-US-03 | Token Holder | Delegate my voting power to a trusted representative | I can participate in governance without having to vote on every proposal myself. | P1 |
 | DAO-US-04 | Protocol User | Be certain that approved proposals have a delay before execution | I have time to react and exit my positions if I disagree with a change. | P0 |
@@ -57,7 +59,7 @@ The AutoVault DAO (Decentralized Autonomous Organization) provides a transparent
 | ID | Requirement | Metric / Verification |
 |---|---|---|
 | DAO-NFR-01 | **Gas Efficiency** | Voting weight calculation must be performed with a fixed number of operations, avoiding loops over voter counts. |
-| DAO-NFR-02 | **Upgradeability** | The governance contract address must be updatable in the `autovault-registry.clar`, allowing for future DAO upgrades. |
+| DAO-NFR-02 | **Upgradeability** | The governance contract address must be updatable in the `conxian-registry.clar`, allowing for future DAO upgrades. |
 | DAO-NFR-03 | **Liveness** | The system must not be susceptible to being frozen by a malicious proposal. Cancellation mechanisms must be in place. |
 
 ## 6. Invariants & Safety Properties
@@ -83,6 +85,7 @@ The AutoVault DAO (Decentralized Autonomous Organization) provides a transparent
 ## 8. Public Interface (Contract Functions / Events)
 
 ### Functions
+
 - `create-proposal(target: principal, calldata: bytes, ...)`: Creates a new governance proposal.
 - `vote(proposal-id: uint, for: bool)`: Casts a vote on an active proposal.
 - `queue(proposal-id: uint)`: Queues a passed proposal for timelock execution.
@@ -91,21 +94,23 @@ The AutoVault DAO (Decentralized Autonomous Organization) provides a transparent
 - `check-founder-participation(founder: principal)`: Triggers the reallocation check for a given founder.
 
 ### Events
+
 - `(print (tuple 'event "proposal-created" ...))`
 - `(print (tuple 'event "vote-cast" ...))`
 
 ## 9. Core Flows (Sequence Narratives)
 
 ### Proposal Lifecycle
-1.  **Creation**: A token holder calls `create-proposal`. The system validates their token balance and creates the proposal with a `pending` status.
-2.  **Voting**: During the voting window, other token holders call `vote`. The contract calculates their time-weighted voting power and records their vote.
-3.  **Queuing**: After the voting window closes, anyone can call `queue` if the proposal has met the quorum. The proposal status changes to `queued` and the execution timelock begins.
-4.  **Execution**: Once the timelock delay has passed, anyone can call `execute`. The contract executes the proposal's calldata against the target contract. The status becomes `executed`.
+
+1. **Creation**: A token holder calls `create-proposal`. The system validates their token balance and creates the proposal with a `pending` status.
+2. **Voting**: During the voting window, other token holders call `vote`. The contract calculates their time-weighted voting power and records their vote.
+3. **Queuing**: After the voting window closes, anyone can call `queue` if the proposal has met the quorum. The proposal status changes to `queued` and the execution timelock begins.
+4. **Execution**: Once the timelock delay has passed, anyone can call `execute`. The contract executes the proposal's calldata against the target contract. The status becomes `executed`.
 
 ## 10. Edge Cases & Failure Modes
 
 - **Low Participation**: If a proposal does not meet quorum, it will fail and cannot be executed.
-- **Proposal Spam**: A minimum token holding is required to create proposals, mitigating spam.
+- **Proposal Spam**: Min token holding needed to create proposals, mitigating spam.
 - **Tied Vote**: In case of a tie, the proposal does not pass.
 - **Guardian Override**: A multi-sig guardian has the power to cancel any proposal, even if passed, as a final safety measure.
 
@@ -129,7 +134,7 @@ The AutoVault DAO (Decentralized Autonomous Organization) provides a transparent
 
 ## 13. Rollout / Migration Plan
 
-- **Initial Deployment**: The DAO contracts (`dao-governance.clar`, `timelock.clar`, `governance-metrics.clar`) will be deployed with the initial mainnet launch. The DAO will be granted ownership of all ownable contracts in the ecosystem.
+- **Initial Deployment**: The DAO contracts (`dao-governance.clar`, `timelock.clar`, `governance-metrics.clar`) are planned for a future phase and are not present in the current repository. Upon deployment, the DAO will be granted ownership of all ownable contracts in the ecosystem.
 - **Upgrades**: A new governance implementation can be deployed, and the DAO itself can vote to transfer ownership to the new contract.
 
 ## 14. Monitoring & Observability
@@ -145,14 +150,14 @@ The AutoVault DAO (Decentralized Autonomous Organization) provides a transparent
 ## 16. Changelog & Version Sign-off
 
 - **v1.2 (2025-08-26)**:
-    - Refactored PRD to the 16-point standard.
-    - Merged "Founder Token Reallocation" into the main document for a unified view.
-    - Updated content to align with `FULL_SYSTEM_INDEX.md`.
-    - Added Appendix A for Nakamoto/Clarity3 compliance assessment.
+  - Refactored PRD to the 16-point standard.
+  - Merged "Founder Token Reallocation" into the main document for a unified view.
+  - Updated content to align with `FULL_SYSTEM_INDEX.md`.
+  - Added Appendix A for Nakamoto/Clarity3 compliance assessment.
 - **v1.1 (2025-08-18)**:
-    - Validated SDK 3.5.0 compliance and confirmed production readiness.
+  - Validated SDK 3.5.0 compliance and confirmed production readiness.
 - **v1.0 (2025-08-17)**:
-    - Initial stable PRD based on the core implementation.
+  - Initial stable PRD based on the core implementation.
 
 **Approved By**: Protocol WG, Governance Team
 **Mainnet Status**: **APPROVED FOR DEPLOYMENT**
@@ -165,10 +170,12 @@ The AutoVault DAO (Decentralized Autonomous Organization) provides a transparent
 **Assessor:** Jules
 
 ### Findings
-1.  **No Nakamoto Features**: The `dao-governance.clar` contract does not utilize any Nakamoto-specific features.
-2.  **Clarity2 Syntax**: The contract is written in Clarity 2. An upgrade is required to leverage future Nakamoto capabilities.
-3.  **Incomplete Implementation**: The timelock integration is minimal and could be enhanced in a future version.
+
+1. **No Nakamoto Features**: The `dao-governance.clar` contract does not utilize any Nakamoto-specific features.
+2. **Clarity2 Syntax**: The contract is written in Clarity 2. An upgrade is required to leverage future Nakamoto capabilities.
+3. **Incomplete Implementation**: The timelock integration is minimal and could be enhanced in a future version.
 
 ### Recommendations
-1.  **Future Upgrade**: Plan for a future upgrade to a Clarity 3 compatible DAO contract.
-2.  **Complete Timelock**: Enhance the timelock contract with more granular controls in a future release.
+
+1. **Future Upgrade**: Plan for a future upgrade to a Clarity 3 compatible DAO contract.
+2. **Complete Timelock**: Enhance the timelock contract with more granular controls in a future release.

@@ -1,6 +1,6 @@
-# AutoVault Stacks Smart Contracts
+# Conxian Stacks Smart Contracts
 
-Production-ready smart contracts for the AutoVault DeFi platform on
+Production-ready smart contracts for the Conxian DeFi platform on
 Stacks blockchain.
 
 ## Contracts Overview
@@ -16,9 +16,9 @@ Stacks blockchain.
 
 ### Token Economics (4 contracts)
 
-- `avg-token.clar` - 10M governance token with voting power
-- `avlp-token.clar` - 5M liquidity token for progressive migration
-- `gov-token.clar` - Voting power distribution mechanism
+- `cxvg-token.clar` - 10M governance token with voting power
+- `cxlp-token.clar` - 5M liquidity token for progressive migration
+- `CXVG.clar` - Voting power distribution mechanism
 - `creator-token.clar` - Creator incentive alignment system
 
 ### Security & Infrastructure (8 contracts)

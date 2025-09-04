@@ -1,4 +1,4 @@
-# AutoVault PRD: DEX & Liquidity Layer
+# Conxian PRD: DEX & Liquidity Layer
 
 | | |
 |---|---|
@@ -6,13 +6,13 @@
 | **Version** | 0.4 |
 | **Owner** | R&D WG |
 | **Last Updated** | 2025-08-26 |
-| **References** | [`dex-factory.clar`](../../contracts/dex-factory.clar), [`dex-router.clar`](../../contracts/dex-router.clar) |
+| **References** | `dex-factory.clar` (planned), `dex-router.clar` (planned) |
 
 ---
 
 ## 1. Summary & Vision
 
-The AutoVault DEX is the native liquidity layer of the ecosystem, providing an on-chain automated market maker (AMM) for internal price discovery, efficient trading, and deep liquidity for vault strategies. The vision is to develop a comprehensive trading infrastructure, starting with foundational constant-product pools and evolving to include more sophisticated pool types, advanced routing, and robust oracle services, making it a cornerstone of AutoVault's DeFi offerings.
+The Conxian DEX is the native liquidity layer of the ecosystem, providing an on-chain automated market maker (AMM) for internal price discovery, efficient trading, and deep liquidity for vault strategies. The vision is to develop a comprehensive trading infrastructure, starting with foundational constant-product pools and evolving to include more sophisticated pool types, advanced routing, and robust oracle services, making it a cornerstone of Conxian's DeFi offerings.
 
 ## 2. Goals / Non-Goals
 
@@ -20,7 +20,7 @@ The AutoVault DEX is the native liquidity layer of the ecosystem, providing an o
 - **Core AMM Functionality (v1.0)**: Implement a secure and reliable AMM with a factory for creating constant-product pools, a router for single-hop swaps, and standard liquidity provision mechanisms.
 - **Advanced Routing (v1.1)**: Introduce multi-hop routing to find the most efficient trading paths across multiple pools.
 - **Diverse Pool Types (v1.1+)**: Expand beyond constant-product pools to include stable and weighted pool mathematics for different asset classes.
-- **Ecosystem Integration**: Serve as the primary liquidity source for AutoVault's yield strategies and provide reliable price data for internal oracles.
+- **Ecosystem Integration**: Serve as the primary liquidity source for Conxian's yield strategies and provide reliable price data for internal oracles.
 
 ### Non-Goals (Future Versions)
 - **Concentrated Liquidity**: Advanced capital efficiency models like concentrated liquidity are planned for v2.0 or later.

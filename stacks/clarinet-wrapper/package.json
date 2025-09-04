@@ -1,6 +1,6 @@
 {
   "name": "clarinet",
-  "version": "0.0.0-autovault",
+  "version": "0.0.0-conxian",
   "private": true,
   "bin": {
     "clarinet": "./index.js"

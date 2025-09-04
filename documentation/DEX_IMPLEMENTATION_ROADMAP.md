@@ -1,4 +1,4 @@
-# AutoVault DEX Implementation Roadmap
+# Conxian DEX Implementation Roadmap
 
 ## Phase 1: Critical Foundation Fixes (2-4 weeks)
 
@@ -292,7 +292,7 @@
 ;; contracts/dex-governance.clar
 (define-public (propose-fee-change (pool-id uint) (new-fee uint))
   (let ((proposal-id (+ (var-get proposal-count) u1)))
-    (asserts! (>= (unwrap! (contract-call? .gov-token get-balance tx-sender) ERR_GOVERNANCE_TOKEN_ERROR) PROPOSAL_THRESHOLD) ERR_INSUFFICIENT_GOVERNANCE_TOKENS)
+    (asserts! (>= (unwrap! (contract-call? .CXVG get-balance tx-sender) ERR_GOVERNANCE_TOKEN_ERROR) PROPOSAL_THRESHOLD) ERR_INSUFFICIENT_GOVERNANCE_TOKENS)
     (map-set proposals proposal-id 
       {proposer: tx-sender, 
        action: "fee-change", 
@@ -384,4 +384,4 @@
 - **Testing**: 1 QA engineer + automated testing suite
 - **Documentation**: Technical writer for enterprise onboarding
 
-The roadmap provides a systematic approach to transforming AutoVault's DEX from its current foundational state into an enterprise-grade trading platform that rivals the best in DeFi while pioneering new standards for the Stacks ecosystem.
+The roadmap provides a systematic approach to transforming Conxian's DEX from its current foundational state into an enterprise-grade trading platform that rivals the best in DeFi while pioneering new standards for the Stacks ecosystem.

@@ -7,7 +7,7 @@ contracts:
   - name: vault-admin-trait
   - name: vault-trait
   - name: mock-ft
-  - name: gov-token
+  - name: CXVG
   - name: treasury
   - name: vault
   - name: timelock

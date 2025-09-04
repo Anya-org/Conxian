@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# AutoVault Production Quality Gates - Comprehensive Autocheck
+# Conxian Production Quality Gates - Comprehensive Autocheck
 # Runs complete validation pipeline before each commit
 # Exit code 0 = all checks pass, ready for commit/deployment
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_ROOT"
 
-echo "🚀 AutoVault Production Quality Gates"
+echo "🚀 Conxian Production Quality Gates"
 echo "======================================"
 echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo ""

@@ -1,8 +1,8 @@
-# AutoVault Governance Parameters
+# Conxian Governance Parameters
 
 ## Voting Parameters
 
-- **Minimum Token Threshold:** 1,000 AVG tokens
+- **Minimum Token Threshold:** 1,000 CXVG tokens
 - **Quorum Requirement:** 15% of circulating supply
 - **Voting Period:** 5 days
 - **Execution Delay:** 2 days

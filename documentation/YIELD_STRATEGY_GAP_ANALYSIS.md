@@ -1,13 +1,13 @@
-# AutoVault Yield Strategy & Vault Architecture Gap Analysis
+# Conxian Yield Strategy & Vault Architecture Gap Analysis
 
 **Date**: August 18, 2025  
 **Focus**: Vault strategies, yield optimization, and automated yield farming compared to industry leaders
 
 ## Executive Summary
 
-Analysis of AutoVault's yield strategy architecture against 8 leading yield protocols reveals **significant opportunities** for yield optimization enhancements. Current vault implementation provides solid foundation but lacks advanced yield strategies, auto-compounding mechanisms, and multi-protocol integration that define industry leaders.
+Analysis of Conxian's yield strategy architecture against 8 leading yield protocols reveals **significant opportunities** for yield optimization enhancements. Current vault implementation provides solid foundation but lacks advanced yield strategies, auto-compounding mechanisms, and multi-protocol integration that define industry leaders.
 
-**Key Finding**: AutoVault vault mechanism is **technically sound** but **strategically limited** compared to sophisticated yield optimization platforms.
+**Key Finding**: Conxian vault mechanism is **technically sound** but **strategically limited** compared to sophisticated yield optimization platforms.
 
 ---
 
@@ -92,14 +92,14 @@ contract Strategy {
 
 ---
 
-## 2. AutoVault Current Yield Strategy Assessment
+## 2. Conxian Current Yield Strategy Assessment
 
 ### 2.1 Current Implementation ✅
 
 #### Vault Core Functionality
 
 ```clarity
-;; AutoVault Current Architecture
+;; Conxian Current Architecture
 (define-public (deposit (amount uint))
   ;; Share-based accounting with fees
   ;; Simple deposit → mint shares mechanism
@@ -408,9 +408,9 @@ contract Strategy {
 | **Beefy BTC Vault** | BTC | 2.8% | ✅ | Low | $12M |
 | **StackingDAO** | STX | 5.2% | ✅ | Low | $35M |
 | **ALEX Farming** | ALEX/STX LP | 12.5% | Manual | High | $8M |
-| **AutoVault** | Mock-FT | 0% | ❌ | Low | <$1M |
+| **Conxian** | Mock-FT | 0% | ❌ | Low | <$1M |
 
-**Gap Analysis**: AutoVault currently offers 0% yield vs 3-12% industry standard
+**Gap Analysis**: Conxian currently offers 0% yield vs 3-12% industry standard
 
 ### 5.2 Target Yield Performance (Post-Implementation)
 
@@ -564,7 +564,7 @@ contract Strategy {
 
 ### 9.4 Final Assessment
 
-AutoVault has **exceptional potential** to become the **leading yield platform** in the Bitcoin/Stacks ecosystem. The technical foundation is solid, the market opportunity is substantial, and the competitive landscape is still developing. With proper execution of yield strategies, AutoVault can capture significant market share and establish a defensible position.
+Conxian has **exceptional potential** to become the **leading yield platform** in the Bitcoin/Stacks ecosystem. The technical foundation is solid, the market opportunity is substantial, and the competitive landscape is still developing. With proper execution of yield strategies, Conxian can capture significant market share and establish a defensible position.
 
 **Recommended Action**: Proceed immediately with Phase 1 strategy implementation while securing funding for full yield platform development.
 

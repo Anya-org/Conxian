@@ -1,114 +1,62 @@
-;; AutoVault Manual Testing Commands
+;; Conxian Manual Testing Commands
 ;; Copy and paste these into clarinet console for interactive testing
 
 ;; === BASIC CONTRACT VERIFICATION ===
 
-;; Test trait contracts exist
-(contract-call? .sip-010-trait)
-(contract-call? .strategy-trait) 
-(contract-call? .vault-admin-trait)
-(contract-call? .vault-trait)
+;; Traits and interfaces
+;; - sip-010-trait is an interface (not directly callable). Implemented by tokenized-bond and mock-token.
 
-;; === TOKENOMICS VERIFICATION ===
+;; === MOCK TOKEN (SIP-010) ===
 
-;; Check AVG token supply (should be 10,000,000)
-(contract-call? .avg-token get-total-supply)
+;; Verify token metadata and state
+(contract-call .mock-token get-name)
+(contract-call .mock-token get-symbol)
+(contract-call .mock-token get-decimals)
+(contract-call .mock-token get-total-supply)
+;; Example: set token URI (public, no auth in mock)
+(contract-call? .mock-token set-token-uri (some "https://example.com/mock.json"))
 
-;; Check AVLP token supply (should be 5,000,000)
-(contract-call? .avlp-token get-total-supply)
+;; === TOKENIZED BOND (SIP-010) ===
 
-;; Verify token metadata
-(contract-call? .avg-token get-name)
-(contract-call? .avg-token get-symbol)
-(contract-call? .avg-token get-decimals)
+;; Read-only queries
+(contract-call .tokenized-bond get-name)
+(contract-call .tokenized-bond get-symbol)
+(contract-call .tokenized-bond get-decimals)
+(contract-call .tokenized-bond get-total-supply)
+(contract-call .tokenized-bond get-payment-token-contract)
+;; Example issuance (must be called by contract owner)
+;; name, symbol, decimals, initial-supply, maturity-in-blocks, coupon-rate-scaled, frequency-in-blocks, face-value, payment-token-address
+(contract-call? .tokenized-bond issue-bond "Conxian Bond 2025" "B25" u6 u1000000 u10000 u144 u1000 .mock-token)
+;; Claim coupons (requires bond issued and periods elapsed)
+(contract-call? .tokenized-bond claim-coupons .mock-token)
+;; Redeem at maturity (after maturity block)
+(contract-call? .tokenized-bond redeem-at-maturity .mock-token)
 
-;; === VAULT FUNCTIONALITY ===
+;; === DIMENSIONAL REGISTRY ===
 
-;; Get vault configuration
-(contract-call? .vault get-vault-data)
-
-;; Check vault admin functions
-(contract-call? .vault get-admin)
-
-;; Test fee structures
-(contract-call? .vault get-management-fee)
-(contract-call? .vault get-performance-fee)
-
-;; === DAO GOVERNANCE ===
-
-;; Check governance configuration
-(contract-call? .dao-governance get-governance-data)
-
-;; Verify voting parameters
-(contract-call? .dao-governance get-voting-period)
-(contract-call? .dao-governance get-execution-delay)
-
-;; Test proposal thresholds
-(contract-call? .dao-governance get-proposal-threshold)
-
-;; === TREASURY MANAGEMENT ===
-
-;; Get treasury information
-(contract-call? .treasury get-treasury-info)
-
-;; Check STX reserves for buybacks
-(contract-call? .treasury get-stx-balance)
-
-;; === DAO AUTOMATION ===
-
-;; Verify automation configuration
-(contract-call? .dao-automation get-automation-config)
-
-;; Check market analysis parameters
-(contract-call? .dao-automation get-market-thresholds)
-
-;; Test buyback mechanisms
-(contract-call? .dao-automation should-trigger-buyback)
-
-;; === ANALYTICS ===
-
-;; Get performance metrics
-(contract-call? .analytics get-performance-data)
-
-;; Check revenue tracking
-(contract-call? .analytics get-revenue-metrics)
-
-;; === BOUNTY SYSTEM ===
-
-;; Verify bounty configuration
-(contract-call? .bounty-system get-bounty-config)
-
-;; Check active bounties
-(contract-call? .bounty-system get-active-bounties)
-
-;; === CREATOR TOKENS ===
-
-;; Test creator token functionality
-(contract-call? .creator-token get-creator-data tx-sender)
-
-;; === TIMELOCK VERIFICATION ===
-
-;; Check timelock configuration
-(contract-call? .timelock get-admin)
-(contract-call? .timelock get-delay)
+;; Read an existing dimension weight (if registered)
+(contract-call .dim-registry get-dimension-weight u1)
+;; Register a new dimension (owner only)
+(contract-call? .dim-registry register-dimension u1 u100)
+;; Update a dimension weight (oracle principal only)
+(contract-call? .dim-registry update-weight u1 u110)
 
 ;; === INTEGRATION TESTS ===
 
-;; Test full deposit flow (simulated)
-;; 1. Approve tokens
-;; 2. Deposit to vault  
-;; 3. Check share allocation
-;; 4. Verify fee calculations
+;; Tokenized bond flow (simulated)
+;; 1. Issue bond as deployer (see above)
+;; 2. Transfer bond tokens (example):
+;;    (contract-call? .tokenized-bond transfer u100 tx-sender 'ST1J2... none)
+;; 3. After some blocks, claim coupons using mock token:
+;;    (contract-call? .tokenized-bond claim-coupons .mock-token)
+;; 4. After maturity, redeem principal + final coupon:
+;;    (contract-call? .tokenized-bond redeem-at-maturity .mock-token)
 
-;; Test governance flow (simulated)
-;; 1. Create proposal
-;; 2. Vote on proposal
-;; 3. Execute after timelock
-;; 4. Verify state changes
+;; Dimensional registry flow
+;; 1. (contract-call? .dim-registry register-dimension u42 u100) ; as owner
+;; 2. (contract-call? .dim-registry update-weight u42 u125)      ; as oracle
+;; 3. (contract-call .dim-registry get-dimension-weight u42)
 
-;; Test revenue distribution (simulated)
-;; 1. Generate fees
-;; 2. Trigger distribution
-;; 3. Check AVG holder rewards
-;; 4. Verify buyback execution
-
+;; Notes:
+;; - Use the accounts defined in Clarinet.toml (e.g., deployer, wallet_1) when switching tx-sender.
+;; - Some calls require specific authorization (contract owner or oracle) and will fail otherwise.

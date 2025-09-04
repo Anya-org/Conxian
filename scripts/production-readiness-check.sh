@@ -418,7 +418,7 @@ generate_report() {
 }
 
 main() {
-    echo -e "${BLUE}🔍 AutoVault Production Readiness Check${NC}"
+    echo -e "${BLUE}🔍 Conxian Production Readiness Check${NC}"
     echo -e "${BLUE}=======================================${NC}"
     echo
     

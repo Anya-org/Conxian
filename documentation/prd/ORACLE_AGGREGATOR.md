@@ -1,4 +1,4 @@
-# AutoVault PRD: Oracle Aggregator
+# Conxian PRD: Oracle Aggregator
 
 | | |
 |---|---|
@@ -6,13 +6,13 @@
 | **Version** | 0.3 |
 | **Owner** | R&D WG |
 | **Last Updated** | 2025-08-26 |
-| **References** | [`oracle-aggregator.clar`](../../contracts/oracle-aggregator.clar) |
+| **References** | `oracle-aggregator.clar` (planned) |
 
 ---
 
 ## 1. Summary & Vision
 
-The Oracle Aggregator is a critical security component of the AutoVault ecosystem. It is designed to provide reliable, manipulation-resistant price data by aggregating feeds from multiple independent sources, such as internal DEX TWAPs and external, signed price feeds. The vision is to create a robust and configurable oracle system that can safely power the protocol's most sensitive operations, from vault liquidations to strategy rebalancing, by ensuring data freshness, accuracy, and integrity.
+The Oracle Aggregator is a critical security component of the Conxian ecosystem. It is designed to provide reliable, manipulation-resistant price data by aggregating feeds from multiple independent sources, such as internal DEX TWAPs and external, signed price feeds. The vision is to create a robust and configurable oracle system that can safely power the protocol's most sensitive operations, from vault liquidations to strategy rebalancing, by ensuring data freshness, accuracy, and integrity.
 
 ## 2. Goals / Non-Goals
 

@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Based on extensive analysis of leading DeFi and enterprise DEX systems, this document provides a comprehensive benchmark of AutoVault's DEX implementation against industry standards and identifies critical gaps for achieving enterprise-grade functionality.
+Based on extensive analysis of leading DeFi and enterprise DEX systems, this document provides a comprehensive benchmark of Conxian's DEX implementation against industry standards and identifies critical gaps for achieving enterprise-grade functionality.
 
 ## 1. Industry Benchmark Analysis
 
@@ -68,7 +68,7 @@ Based on extensive analysis of leading DeFi and enterprise DEX systems, this doc
 - **Asset Managers**: External yield generation for idle assets
 - **Composable Pools**: Advanced pool-in-pool structures
 
-## 2. AutoVault DEX Current Implementation Analysis
+## 2. Conxian DEX Current Implementation Analysis
 
 ### 2.1 Implemented Components ✅
 
@@ -412,8 +412,8 @@ Based on extensive analysis of leading DeFi and enterprise DEX systems, this doc
 
 ## Conclusion
 
-AutoVault's DEX implementation shows strong foundational architecture but requires significant development to achieve enterprise-grade functionality. The identified gaps, while substantial, are addressable through systematic implementation of proven DeFi patterns adapted for the Stacks ecosystem.
+Conxian's DEX implementation shows strong foundational architecture but requires significant development to achieve enterprise-grade functionality. The identified gaps, while substantial, are addressable through systematic implementation of proven DeFi patterns adapted for the Stacks ecosystem.
 
 **Priority Focus**: Resolve critical compilation issues, implement essential mathematical functions, and establish stable foundation before pursuing advanced features.
 
-**Competitive Position**: With proper execution, AutoVault can become the premier enterprise DEX on Stacks, filling a significant gap in the current ecosystem.
+**Competitive Position**: With proper execution, Conxian can become the premier enterprise DEX on Stacks, filling a significant gap in the current ecosystem.

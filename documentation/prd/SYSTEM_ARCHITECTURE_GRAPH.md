@@ -1,8 +1,8 @@
-# 🏗️ AutoVault System Architecture Graph
+# 🏗️ Conxian System Architecture Graph
 
 ## 📊 **MASTER SYSTEM ARCHITECTURE**
 
-This document provides the comprehensive **architectural graph and dependency mapping** for the AutoVault DeFi ecosystem, ensuring systematic upgrades and maintenance.
+This document provides the comprehensive **architectural graph and dependency mapping** for the Conxian DeFi ecosystem, ensuring systematic upgrades and maintenance.
 
 ---
 
@@ -50,9 +50,9 @@ graph TB
     %% TOKENOMICS LAYER (Layer 2)  
     subgraph "💰 TOKENOMICS SYSTEM"
         MOCKFT[mock-ft.clar]
-        GOVTOKEN[gov-token.clar]
-        AVGTOKEN[avg-token.clar]
-        AVLPTOKEN[avlp-token.clar]
+        GOVTOKEN[CXVG.clar]
+        CXVGTOKEN[cxvg-token.clar]
+        AVLPTOKEN[cxlp-token.clar]
         CREATORTOKEN[creator-token.clar]
     end
 
@@ -104,7 +104,7 @@ graph TB
     %% DEPENDENCY FLOWS
     %% Foundation Dependencies
     SIP010 --> GOVTOKEN
-    SIP010 --> AVGTOKEN  
+    SIP010 --> CXVGTOKEN  
     SIP010 --> AVLPTOKEN
     SIP010 --> CREATORTOKEN
     SIP010 --> MOCKFT
@@ -136,8 +136,8 @@ graph TB
     GOVTOKEN --> DAO
     GOVTOKEN --> DAOGOV
     GOVTOKEN --> ENHANCEDGOV
-    AVGTOKEN --> TREASURY
-    AVGTOKEN --> VAULT
+    CXVGTOKEN --> TREASURY
+    CXVGTOKEN --> VAULT
     AVLPTOKEN --> VAULT
     CREATORTOKEN --> BOUNTY
     
@@ -189,7 +189,7 @@ graph TB
     
     class SIP010,VT,VAT,ST,PT,OT foundation
     class VAULT,TREASURY,REGISTRY,ANALYTICS,MATHLIB core
-    class MOCKFT,GOVTOKEN,AVGTOKEN,AVLPTOKEN,CREATORTOKEN token
+    class MOCKFT,GOVTOKEN,CXVGTOKEN,AVLPTOKEN,CREATORTOKEN token
     class DAO,DAOAUTOMATION,DAOGOV,TIMELOCK,ENHANCEDGOV,GOVHELPER governance
     class CIRCUITBREAKER,CIRCUITSIMPLE,ENTERPRISEMON,ORACLEAGG,STATEANCHOR security
     class DEXFACTORY,DEXPOOL,DEXROUTER,POOLFACTORY,STABLEPOOL,STABLEPOOLCLEAN,WEIGHTEDPOOL,MOCKDEX dex
@@ -226,9 +226,9 @@ graph TB
 
 | Contract | Purpose | Max Supply | Used By |
 |----------|---------|------------|---------|
-| `avg-token.clar` | Governance token | 10M | treasury, vault, dao |
-| `avlp-token.clar` | Liquidity pool token | 5M | vault |
-| `gov-token.clar` | DAO voting token | Variable | dao, enhanced-governance |
+| `cxvg-token.clar` | Governance token | 10M | treasury, vault, dao |
+| `cxlp-token.clar` | Liquidity pool token | 5M | vault |
+| `CXVG.clar` | DAO voting token | Variable | dao, enhanced-governance |
 | `creator-token.clar` | Merit-based rewards | Variable | bounty-system |
 | `mock-ft.clar` | Testing token | Unlimited | Development only |
 
@@ -236,8 +236,8 @@ graph TB
 
 | Contract | Purpose | Dependencies | Security Features |
 |----------|---------|--------------|-------------------|
-| `dao.clar` | Basic governance | gov-token, timelock | Timelock delays |
-| `dao-governance.clar` | Advanced voting | dao, gov-token | Time-weighted voting |
+| `dao.clar` | Basic governance | CXVG, timelock | Timelock delays |
+| `dao-governance.clar` | Advanced voting | dao, CXVG | Time-weighted voting |
 | `enhanced-governance.clar` | Enterprise governance | dao-governance, state-anchor | Multi-sig + timelock |
 | `timelock.clar` | Security delays | None | 24-48h delays |
 | `dao-automation.clar` | Parameter optimization | dao | Automated proposals |
@@ -465,4 +465,4 @@ analytics.clar ← Monitoring systems
 
 ---
 
-*This architecture graph serves as the **master reference** for all AutoVault system modifications, ensuring systematic and safe upgrades while maintaining the comprehensive DeFi vision.*
+*This architecture graph serves as the **master reference** for all Conxian system modifications, ensuring systematic and safe upgrades while maintaining the comprehensive DeFi vision.*

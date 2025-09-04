@@ -1,7 +1,7 @@
-# AutoVault Developer Guide
+# Conxian Developer Guide
 
 This guide provides everything you need to develop, test, and deploy
-AutoVault smart contracts.
+Conxian smart contracts.
 
 ## Quick Start
 
@@ -15,8 +15,8 @@ AutoVault smart contracts.
 
 ```bash
 # Clone repository
-git clone https://github.com/Anya-org/AutoVault.git
-cd AutoVault/stacks
+git clone https://github.com/Anya-org/Conxian.git
+cd Conxian/stacks
 
 # Install dependencies
 npm install
@@ -29,7 +29,7 @@ npm test             # ✅ 65/65 tests
 ## Project Structure
 
 ```text
-AutoVault/
+Conxian/
 ├── stacks/                     # Smart contract development
 │   ├── contracts/              # Smart contract source files
 │   ├── sdk-tests/              # TypeScript test files
@@ -417,7 +417,7 @@ git push origin feature/my-feature
 ### Getting Help
 
 - **Documentation**: Check `/documentation/` directory
-- **GitHub Issues**: [Report bugs or request features](https://github.com/Anya-org/AutoVault/issues)
+- **GitHub Issues**: [Report bugs or request features](https://github.com/Anya-org/Conxian/issues)
 - **Code Examples**: See `sdk-tests/` for comprehensive examples
 - **Community**: Join development discussions
 
@@ -439,7 +439,7 @@ This developer guide provides:
 - **Code standards** and best practices
 - **Debugging tools** and troubleshooting guides
 
-Follow this guide to contribute effectively to the AutoVault project.
+Follow this guide to contribute effectively to the Conxian project.
 
 *Last Updated: August 17, 2025*  
 *Framework Version: Clarinet v2.0+, clarinet-sdk v3.5.0*

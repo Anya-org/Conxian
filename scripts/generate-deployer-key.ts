@@ -1,6 +1,6 @@
 #!/usr/bin/env ts-node
 /*
- * AutoVault Deployer Key Generator
+ * Conxian Deployer Key Generator
  * ------------------------------------------------------------
  * Generates a BIP39 mnemonic and derives Stacks private keys + addresses.
  * Safe usage guidelines:
@@ -96,7 +96,7 @@ function usageAndExit(code: number) {
 }
 
 function banner() {
-  return `================ AutoVault Deployer Key Generator ================\nSECURITY WARNING: Secrets only generated when --confirm is supplied.\n=====================================================================`;
+  return `================ Conxian Deployer Key Generator ================\nSECURITY WARNING: Secrets only generated when --confirm is supplied.\n=====================================================================`;
 }
 
 function main() {

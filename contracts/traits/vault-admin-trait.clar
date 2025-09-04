@@ -1,21 +1,24 @@
-;; Vault admin trait for timelock to call via trait-typed parameters
+;; Vault Admin Trait - Administrative interface for vault management
+;; Provides governance and operational controls
+
 (define-trait vault-admin-trait
   (
-    (set-fees (uint uint) (response bool uint))
+    ;; Administrative controls
+    (set-deposit-fee (uint) (response bool uint))
+    (set-withdrawal-fee (uint) (response bool uint))
+    (set-vault-cap (principal uint) (response bool uint))
     (set-paused (bool) (response bool uint))
-    (set-global-cap (uint) (response bool uint))
-    (set-user-cap (uint) (response bool uint))
-    (set-rate-limit (bool uint) (response bool uint))
-    (set-token (principal) (response bool uint))
-    (withdraw-reserve (principal uint) (response bool uint))
-    (set-treasury (principal) (response bool uint))
-    (set-fee-split-bps (uint) (response bool uint))
-    (withdraw-treasury (principal uint) (response bool uint))
-    (set-auto-fees-enabled (bool) (response bool uint))
-    (set-util-thresholds (uint uint) (response bool uint))
-    (set-fee-bounds (uint uint) (response bool uint))
-  (set-reserve-bands (uint uint) (response bool uint))
-  (set-fee-ramps (uint uint) (response bool uint))
-  (set-auto-economics-enabled (bool) (response bool uint))
+    
+    ;; Asset management
+    (emergency-withdraw (principal uint principal) (response uint uint))
+    (rebalance-vault (principal) (response bool uint))
+    
+    ;; Enhanced tokenomics integration
+    (set-revenue-share (uint) (response bool uint))
+    (update-integration-settings ((tuple (monitor-enabled bool) (emission-enabled bool))) (response bool uint))
+    
+    ;; Governance
+    (transfer-admin (principal) (response bool uint))
+    (get-admin () (response principal uint))
   )
 )

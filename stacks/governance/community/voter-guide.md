@@ -1,10 +1,10 @@
-# AutoVault Governance: Voter Guide
+# Conxian Governance: Voter Guide
 
 ## Getting Started
 
-1. **Acquire AVG tokens** - Minimum 1,000 tokens needed to vote
+1. **Acquire CXVG tokens** - Minimum 1,000 tokens needed to vote
 2. **Connect wallet** - Use Hiro Wallet or other Stacks-compatible wallets
-3. **View proposals** - Browse active proposals at governance.autovault.defi
+3. **View proposals** - Browse active proposals at governance.conxian.defi
 
 ## How Voting Works
 
@@ -16,5 +16,5 @@
 ## Best Practices
 
 - Research proposals thoroughly before voting
-- Participate in forum discussions at forum.autovault.defi
+- Participate in forum discussions at forum.conxian.defi
 - Consider delegation if you can't actively participate

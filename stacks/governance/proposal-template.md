@@ -1,4 +1,4 @@
-# AIP-1: AutoVault Improvement Proposal Template
+# AIP-1: Conxian Improvement Proposal Template
 
 ## Simple Summary
 

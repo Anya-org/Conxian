@@ -1,0 +1,32 @@
+[project]
+name = "conxian-tests"
+description = "Minimal Clarinet manifest for Vitest"
+clarinet_version = "3.5.0"
+
+# DEPRECATED: This stacks/Clarinet.test.toml is not used by CI/tests.
+# Use the root-level Clarinet.test.toml instead. Relative paths below are incorrect from stacks/.
+[accounts]
+deployer = { mnemonic = "twice kind fence tip hidden tilt action fragile skin nothing glory cousin green tomorrow spring wrist shed math olympic multiply hip blue scout claw", balance = 100_000_000_000_000 }
+wallet_1 = { mnemonic = "sell invite acquire kitten bamboo drastic jelly vivid peace spawn twice guilt pave pen trash pretty park cube fragile unaware remain midnight betray rebuild", balance = 100_000_000_000_000 }
+
+[contracts.sip-010-trait]
+path = "contracts/traits/sip-010-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.dim-registry-trait]
+path = "contracts/traits/dim-registry-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.dim-registry]
+path = "contracts/dimensional/dim-registry.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["dim-registry-trait"]
+
+[contracts.tokenized-bond]
+path = "contracts/dimensional/tokenized-bond.clar"
+clarity_version = 2
+epoch = "2.4"
+depends_on = ["sip-010-trait"]

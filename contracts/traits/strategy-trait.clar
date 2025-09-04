@@ -1,9 +1,26 @@
-;; Strategy trait definition for AutoVault
-(define-trait auto-strategy-trait
+;; Strategy Trait - Yield strategy interface for vault integration
+;; Supports multiple yield strategies with enhanced tokenomics integration
+
+(define-trait strategy-trait
   (
-    (deposit (uint) (response uint uint))       ;; returns shares or received amount
-    (withdraw (uint) (response uint uint))      ;; returns underlying withdrawn
-    (harvest () (response uint uint))           ;; returns harvested amount
-    (get-tvl () (response uint uint))
+    ;; Core strategy operations
+    (deploy-funds (uint) (response uint uint))
+    (withdraw-funds (uint) (response uint uint))
+    (harvest-rewards () (response uint uint))
+    
+    ;; Strategy information
+    (get-total-deployed () (response uint uint))
+    (get-current-value () (response uint uint))
+    (get-expected-apy () (response uint uint))
+    (get-strategy-risk-level () (response uint uint))
+    
+    ;; Asset management
+    (get-underlying-asset () (response principal uint))
+    (emergency-exit () (response uint uint))
+    
+    ;; Enhanced tokenomics integration  
+    (distribute-rewards () (response uint uint))
+    (get-performance-fee () (response uint uint))
+    (update-dimensional-weights () (response bool uint))
   )
 )

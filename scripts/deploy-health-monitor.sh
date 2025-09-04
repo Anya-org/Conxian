@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# AutoVault Health Monitor Deployment Script
+# Conxian Health Monitor Deployment Script
 # Deploys health monitoring contract with network-aware alert routing
 
 set -e
@@ -13,10 +13,10 @@ source "$PROJECT_ROOT/scripts/common/logging.sh"
 source "$PROJECT_ROOT/scripts/common/validation.sh"
 
 # Configuration
-HEALTH_CONTRACT="autovault-health-monitor"
+HEALTH_CONTRACT="conxian-health-monitor"
 TESTNET_CONFIG="$PROJECT_ROOT/Testnet.toml"
 
-log_info "🏥 Starting AutoVault Health Monitor Deployment"
+log_info "🏥 Starting Conxian Health Monitor Deployment"
 
 # Check if we're in testnet or mainnet mode
 NETWORK_TYPE="testnet"
@@ -163,7 +163,7 @@ generate_deployment_report() {
     local report_file="$PROJECT_ROOT/health-monitor-deployment-$timestamp.md"
     
     cat > "$report_file" << EOF
-# AutoVault Health Monitor Deployment Report
+# Conxian Health Monitor Deployment Report
 
 **Deployment Date:** $(date)
 **Network:** $NETWORK_TYPE
@@ -258,7 +258,7 @@ EOF
 
 # Main deployment workflow
 main() {
-    log_info "🚀 Starting AutoVault Health Monitor deployment process"
+    log_info "🚀 Starting Conxian Health Monitor deployment process"
     
     # Step 1: Deploy contract
     deploy_health_monitor || exit 1
@@ -275,7 +275,7 @@ main() {
     # Step 5: Generate report
     generate_deployment_report
     
-    log_success "🎉 AutoVault Health Monitor deployment completed successfully!"
+    log_success "🎉 Conxian Health Monitor deployment completed successfully!"
     
     # Display summary
     echo ""

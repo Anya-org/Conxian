@@ -20,18 +20,18 @@ Note: Source byte size is not a direct deterministic indicator of runtime execut
 | 10 | timelock.clar | 14,080 | Core governance safety; monitor if function pruning possible without reducing guarantees |
 | 11 | dao-governance-original.clar | 13,486 | Duplicate; removal planned |
 | 12 | oracle-aggregator.clar | 12,877 | Oracle logic; future sBTC integration hooks expected (watch size growth) |
-| 13 | avlp-token.clar | 11,715 | LP token; standard SIP-010 overhead |
+| 13 | cxlp-token.clar | 11,715 | LP token; standard SIP-010 overhead |
 | 14 | multi-hop-router.clar | 11,646 | Pathfinding complexity; potential optimization of list operations |
 | 15 | dex-pool.clar | 11,643 | Base DEX pool; compare with weighted & stable variants for consolidation |
 | 16 | math-lib.clar | 10,086 | Shared math; ensure weighted invariant migration here to dedupe |
-| 17 | avg-token.clar | 9,787 | Governance token with migration logic; review for unnecessary duplication |
+| 17 | cxvg-token.clar | 9,787 | Governance token with migration logic; review for unnecessary duplication |
 | 18 | enterprise-monitoring.clar | 9,666 | Operational analytics; some events may migrate off-chain |
 | 19 | circuit-breaker.clar | 8,686 | Full circuit breaker; gas-critical pathways to benchmark |
 | 20 | creator-token.clar | 8,673 | Creator incentive token; ensure mint controls audited |
 | 21 | stable-pool.clar | 5,094 | Stable swap; compare function overlap with dex-pool & weighted-pool |
 | 22 | automated-bounty-system.clar | 4,744 | Automation overlay; verify event necessity |
 | 23 | circuit-breaker-simple.clar | 3,460 | Minimal breaker variant; candidate for removal or retention as fallback |
-| 24 | gov-token.clar | 3,188 | Lightweight governance token support |
+| 24 | CXVG.clar | 3,188 | Lightweight governance token support |
 | 25 | dex-router.clar | 3,115 | Routing aggregator; potential inlining trade-offs |
 | 26 | mock-ft.clar | 2,817 | Test fixture; ensure excluded from mainnet deploy set |
 | 27 | enhanced-dao-governance.clar | 2,711 | Redundant time-weight file; removal planned |
@@ -59,5 +59,5 @@ Note: Source byte size is not a direct deterministic indicator of runtime execut
 | Trait compliance audit (SIP-010 & internal) | Automated CI script | Planned |
 
 ---
-Prepared by: AutoVault Core Agent  
+Prepared by: Conxian Core Agent  
 Focus: Maintain security & auditability while optimizing for Bitcoin-aligned minimalism.

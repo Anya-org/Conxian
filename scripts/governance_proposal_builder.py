@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Governance Proposal Builder - Minimal implementation for workflow
-Builds and validates governance proposals for AutoVault DAO
+Builds and validates governance proposals for Conxian DAO
 """
 
 import json
@@ -20,7 +20,7 @@ def main():
     proposal = {
         "timestamp": datetime.utcnow().isoformat(),
         "status": "success",
-        "proposal_id": f"AVG-{int(time.time())}",
+        "proposal_id": f"CXVG-{int(time.time())}",
         "title": "Automated Protocol Parameter Update",
         "description": "Routine update of protocol parameters based on current market conditions",
         "proposal_type": "parameter_update",

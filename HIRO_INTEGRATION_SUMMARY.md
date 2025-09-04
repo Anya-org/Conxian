@@ -1,8 +1,8 @@
-# AutoVault Hiro API Integration Summary
+# Conxian Hiro API Integration Summary
 
 ## ✅ Integration Complete
 
-The AutoVault project has been successfully integrated with Hiro API services for enhanced testing and deployment capabilities.
+The Conxian project has been successfully integrated with Hiro API services for enhanced testing and deployment capabilities.
 
 ### 🔧 Configuration Added
 
@@ -122,4 +122,4 @@ powershell -ExecutionPolicy Bypass -File scripts/simple-api-test.ps1
 - **Pool Types**: 4 different AMM implementations
 - **Routing**: Up to 5-hop paths with optimization
 
-The AutoVault system is now ready for enhanced testing and deployment using Hiro's infrastructure!
+The Conxian system is now ready for enhanced testing and deployment using Hiro's infrastructure!

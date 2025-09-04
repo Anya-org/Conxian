@@ -1,6 +1,6 @@
-# AutoVault DEX Design (Phase B)
+# Conxian DEX Design (Phase B)
 
-This document specifies the architecture for the AutoVault decentralized exchange subsystem prior to implementation.
+This document specifies the architecture for the Conxian decentralized exchange subsystem prior to implementation.
 
 ## Scope (Phase B Ordered First)
 
@@ -9,7 +9,7 @@ This document specifies the architecture for the AutoVault decentralized exchang
 3. Router (`dex-router`) for add/remove liquidity + single hop swaps (multi-hop deferred)
 4. Oracle (embedded cumulative price + TWAP view fn) inside pool (external contract deferred)
 5. Events & Accounting (fee growth per share; protocol fee skim)
-6. Treasury Buyback Integration (treasury -> router path STX->AVG)
+6. Treasury Buyback Integration (treasury -> router path STX->CXVG)
 7. Analytics hooks to existing `analytics` contract (best-effort)
 
 Deferred to Phase A (after design):
@@ -80,7 +80,7 @@ TWAP consumer queries reserves & cumulative values to compute average over windo
 
 ## Buyback Flow
 
-Treasury calls router.swapExactIn STX->AVG path using pool id, with min-out based on on-chain spot minus tolerance (initial) – later replace with TWAP consult.
+Treasury calls router.swapExactIn STX->CXVG path using pool id, with min-out based on on-chain spot minus tolerance (initial) – later replace with TWAP consult.
 
 ## Security Considerations
 

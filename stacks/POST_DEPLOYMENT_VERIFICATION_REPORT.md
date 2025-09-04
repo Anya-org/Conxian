@@ -1,4 +1,4 @@
-# AutoVault Enhanced Contracts - Post-Deployment Verification Report
+# Conxian Enhanced Contracts - Post-Deployment Verification Report
 
 **Generated:** 2025-08-23T11:02:57.511Z
 **Network:** testnet
@@ -92,7 +92,7 @@
 - ❌ **Contract Deployment: govToken**
   ```json
   {
-  "address": "SP000000000000000000002Q6VF78.gov-token",
+  "address": "SP000000000000000000002Q6VF78.CXVG",
   "error": "Contract not found on network"
 }
   ```
@@ -239,7 +239,7 @@
 - ❌ Contract Deployment: loadDistribution: {"address":"SP000000000000000000002Q6VF78.dynamic-load-distribution","error":"Contract not found on network"}
 - ❌ Contract Deployment: timelock: {"address":"SP000000000000000000002Q6VF78.timelock","error":"Contract not found on network"}
 - ❌ Contract Deployment: dao: {"address":"SP000000000000000000002Q6VF78.dao","error":"Contract not found on network"}
-- ❌ Contract Deployment: govToken: {"address":"SP000000000000000000002Q6VF78.gov-token","error":"Contract not found on network"}
+- ❌ Contract Deployment: govToken: {"address":"SP000000000000000000002Q6VF78.CXVG","error":"Contract not found on network"}
 - ❌ Contract Deployment: treasury: {"address":"SP000000000000000000002Q6VF78.treasury","error":"Contract not found on network"}
 - ❌ Enhanced Vault: Deployment: {"error":"Enhanced vault not deployed"}
 - ❌ Batch Processing: Deployment: {"error":"Batch processor not deployed"}
@@ -283,5 +283,5 @@
 - **loadDistribution:** `SP000000000000000000002Q6VF78.dynamic-load-distribution`
 - **timelock:** `SP000000000000000000002Q6VF78.timelock`
 - **dao:** `SP000000000000000000002Q6VF78.dao`
-- **govToken:** `SP000000000000000000002Q6VF78.gov-token`
+- **govToken:** `SP000000000000000000002Q6VF78.CXVG`
 - **treasury:** `SP000000000000000000002Q6VF78.treasury`

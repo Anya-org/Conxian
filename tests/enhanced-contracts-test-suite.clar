@@ -1,4 +1,4 @@
-;; AutoVault Enhanced Contracts Test Suite
+;; Conxian Enhanced Contracts Test Suite
 ;; Comprehensive testing for all optimization systems
 ;; Target: Validate +735K TPS improvements
 
@@ -397,7 +397,7 @@
 (define-public (run-all-tests)
   "Run complete test suite for enhanced contracts"
   (begin
-    (print "Starting AutoVault Enhanced Contracts Test Suite")
+    (print "Starting Conxian Enhanced Contracts Test Suite")
     
     ;; Batch Processing Tests
     (print "=== Batch Processing Tests ===")

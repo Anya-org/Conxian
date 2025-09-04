@@ -4,7 +4,7 @@
 
 ## 1. Introduction
 
-The `vault.clar` contract is the heart of the AutoVault ecosystem. It is a sophisticated smart contract that serves as the primary repository for user-deposited assets. Its main purpose is to manage these assets, apply automated yield-generating strategies, and provide a secure, efficient, and feature-rich experience for users and other protocol contracts.
+The `vault.clar` contract is the heart of the Conxian ecosystem. It is a sophisticated smart contract that serves as the primary repository for user-deposited assets. Its main purpose is to manage these assets, apply automated yield-generating strategies, and provide a secure, efficient, and feature-rich experience for users and other protocol contracts.
 
 The vault uses a share-based accounting system, where depositors receive "shares" that represent their proportional ownership of the vault's total assets. As the vault generates yield, the value of each share increases.
 

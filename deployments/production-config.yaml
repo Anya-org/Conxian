@@ -1,0 +1,366 @@
+# production-config.yaml
+# Production environment configuration for Conxian Enhanced Tokenomics
+
+# =============================================================================
+# ENVIRONMENT SETTINGS
+# =============================================================================
+environment: production
+network: mainnet
+auto_confirm: false
+gas_limit: 3000000
+gas_price: 1
+require_manual_approval: true
+
+# =============================================================================
+# TOKEN CONFIGURATION
+# =============================================================================
+tokens:
+  cxd:
+    name: "Conxian Revenue Token"
+    symbol: "CXD"
+    decimals: 6
+    initial_supply: 0
+    max_supply: 21000000000000  # 21M tokens
+    emission_per_block: 1000000000000  # 1M tokens per epoch
+    epoch_length: 10080  # 1 week in blocks
+    
+  cxvg:
+    name: "Conxian Governance Token" 
+    symbol: "CXVG"
+    decimals: 6
+    initial_supply: 0
+    max_supply: 10500000000000  # 10.5M tokens
+    emission_per_block: 500000000000  # 500K tokens per epoch
+    epoch_length: 10080
+    
+  cxlp:
+    name: "Conxian Liquidity Provider Token"
+    symbol: "CXLP" 
+    decimals: 6
+    initial_supply: 0  # No initial supply in production
+    migration_start_delay: 10080  # 1 week delay
+    
+  cxtr:
+    name: "Conxian Contributor Token"
+    symbol: "CXTR"
+    decimals: 6
+    initial_supply: 0
+    max_supply: 2100000000000  # 2.1M tokens
+    emission_per_block: 100000000000  # 100K tokens per epoch
+    epoch_length: 10080
+
+# =============================================================================
+# STAKING CONFIGURATION
+# =============================================================================
+staking:
+  warmup_period: 20160  # 2 weeks in blocks
+  cooldown_period: 40320  # 4 weeks in blocks  
+  min_stake_amount: 1000000  # 1 token minimum
+  max_stake_amount: 10000000000000  # 10M tokens maximum
+  reward_distribution_frequency: 10080  # Weekly
+
+# =============================================================================
+# GOVERNANCE CONFIGURATION  
+# =============================================================================
+governance:
+  min_lock_duration: 262800  # 6 months minimum
+  max_lock_duration: 1051200  # 2 years maximum
+  proposal_bond_amount: 10000000000  # 10K tokens
+  fee_discount_tiers:
+    - threshold: 10000000000    # 10K CXVG locked
+      discount: 500             # 5% discount
+    - threshold: 100000000000   # 100K CXVG locked  
+      discount: 1000            # 10% discount
+    - threshold: 1000000000000  # 1M CXVG locked
+      discount: 2000            # 20% discount
+    - threshold: 5000000000000  # 5M CXVG locked
+      discount: 3000            # 30% discount (max)
+
+# =============================================================================
+# REVENUE DISTRIBUTION
+# =============================================================================
+revenue_distribution:
+  staker_share: 7000      # 70% to stakers
+  treasury_share: 2000    # 20% to treasury
+  reserve_share: 1000     # 10% to reserves
+  distribution_frequency: 10080  # Weekly
+  
+fee_collectors:
+  - contract: "cxd-token"
+    fee_rate: 100  # 1%
+  - contract: "vault-manager"  
+    fee_rate: 50   # 0.5%
+  - contract: "dex-core"
+    fee_rate: 30   # 0.3%
+  - contract: "dimensional-core"
+    fee_rate: 25   # 0.25%
+
+# =============================================================================
+# MIGRATION CONFIGURATION
+# =============================================================================
+migration:
+  epoch_cap: 1000000000000     # 1M CXD per epoch
+  user_base_cap: 10000000000   # 10K CXD base
+  user_max_cap: 500000000000   # 500K CXD max
+  duration_factor: 100
+  midyear_blocks: 525600
+  adjustment_factor: 11000     # 10% bonus
+
+# =============================================================================
+# SECURITY SETTINGS
+# =============================================================================
+security:
+  circuit_breaker_enabled: true
+  invariant_monitoring_enabled: true
+  pause_on_violation: true
+  multi_sig_required: true
+  emergency_contacts:
+    - "${PROD_ADMIN_1}"  # Production admin 1
+    - "${PROD_ADMIN_2}"  # Production admin 2
+    - "${PROD_ADMIN_3}"  # Production admin 3
+  
+monitoring:
+  health_check_frequency: 72   # Every hour
+  max_violation_count: 2
+  auto_pause_threshold: 1
+  
+audit_trail:
+  enabled: true
+  retention_period: 2102400  # 4 years
+  compliance_logging: true
+
+# =============================================================================
+# DIMENSIONAL INTEGRATION
+# =============================================================================
+dimensional:
+  yield_adapter_enabled: true
+  bond_adapter_enabled: true
+  revenue_routing_enabled: true
+  
+yield_staking:
+  min_yield_amount: 10000000  # 10 tokens
+  yield_distribution_frequency: 10080  # Weekly
+  
+tokenized_bonds:
+  min_coupon_amount: 10000000  # 10 tokens  
+  coupon_distribution_frequency: 10080  # Weekly
+  auto_bond_registration: false  # Manual approval in production
+
+# =============================================================================
+# TESTING CONFIGURATION
+# =============================================================================
+testing:
+  unit_tests_enabled: true
+  integration_tests_enabled: true
+  system_validation_enabled: true
+  performance_tests_enabled: true
+  stress_tests_enabled: true
+  
+# Production accounts (use environment variables)
+test_accounts:
+  - "${PROD_TEST_ACCOUNT_1}"
+  - "${PROD_TEST_ACCOUNT_2}"  
+  - "${PROD_TEST_ACCOUNT_3}"
+
+test_amounts:
+  small: 1000000000    # 1K tokens
+  medium: 10000000000  # 10K tokens  
+  large: 100000000000  # 100K tokens
+  whale: 1000000000000 # 1M tokens
+
+# =============================================================================
+# DEPLOYMENT SEQUENCE
+# =============================================================================
+deployment_phases:
+  - name: "Pre-deployment Security Audit"
+    tasks:
+      - "security-audit-verification"
+      - "multi-sig-setup-verification"
+      - "emergency-procedures-verification"
+    
+  - name: "Mainnet Pre-flight Checks"
+    tasks:
+      - "validate-production-configuration"
+      - "verify-admin-accounts"
+      - "check-gas-estimates"
+      - "validate-contract-bytecode"
+    
+  - name: "Core Tokens Deployment"
+    contracts:
+      - "cxd-token"
+      - "cxvg-token" 
+      - "cxlp-token"
+      - "cxtr-token"
+    dependencies: []
+    require_manual_approval: true
+    post_deploy:
+      - "verify-token-deployment"
+      - "test-basic-operations"
+      - "audit-deployment"
+    
+  - name: "System Infrastructure Deployment"
+    contracts:
+      - "protocol-invariant-monitor"
+      - "token-emission-controller"
+      - "revenue-distributor" 
+      - "token-system-coordinator"
+    dependencies: ["Core Tokens Deployment"]
+    require_manual_approval: true
+    post_deploy:
+      - "verify-system-deployment"
+      - "test-system-interactions"
+      - "security-verification"
+    
+  - name: "Enhanced Mechanisms Deployment"
+    contracts:
+      - "cxd-staking"
+      - "cxvg-utility"
+      - "cxlp-migration-queue"
+    dependencies: ["System Infrastructure Deployment"]
+    require_manual_approval: true
+    post_deploy:
+      - "verify-mechanism-deployment"
+      - "test-staking-governance"
+      - "migration-testing"
+    
+  - name: "Dimensional Adapters Deployment"
+    contracts:
+      - "dim-revenue-adapter"
+      - "tokenized-bond-adapter" 
+    dependencies: ["System Infrastructure Deployment"]
+    require_manual_approval: true
+    post_deploy:
+      - "verify-adapter-deployment"
+      - "test-dimensional-integration"
+    
+  - name: "System Configuration"
+    tasks:
+      - "configure-protocol-monitor"
+      - "configure-emission-controller"
+      - "configure-revenue-distributor"
+      - "configure-system-coordinator"
+      - "enable-token-integration"
+      - "configure-dimensional-adapters"
+    dependencies: ["Enhanced Mechanisms Deployment", "Dimensional Adapters Deployment"]
+    require_manual_approval: true
+    
+  - name: "Production Validation"
+    tasks:
+      - "run-comprehensive-test-suite"
+      - "validate-system-health"
+      - "security-final-check"
+      - "performance-validation"
+      - "compliance-verification"
+    dependencies: ["System Configuration"]
+
+# =============================================================================
+# MONITORING AND ALERTING
+# =============================================================================
+monitoring:
+  metrics_collection: true
+  performance_monitoring: true
+  error_tracking: true
+  compliance_monitoring: true
+  
+alerts:
+  contract_failures: true
+  system_pauses: true
+  invariant_violations: true
+  performance_degradation: true
+  security_incidents: true
+  compliance_violations: true
+  
+notification_channels:
+  - type: "pagerduty"
+    api_key: "${PROD_PAGERDUTY_KEY}"
+  - type: "email"
+    address: "production-alerts@conxian.com"
+  - type: "slack" 
+    webhook: "${PROD_SLACK_WEBHOOK}"
+  - type: "sms"
+    numbers: ["${PROD_EMERGENCY_PHONE_1}", "${PROD_EMERGENCY_PHONE_2}"]
+
+# =============================================================================
+# BACKUP AND RECOVERY
+# =============================================================================
+backup:
+  state_snapshots: true
+  snapshot_frequency: 1440  # Daily
+  retention_period: 525600  # 1 year
+  
+recovery:
+  rollback_procedures: true
+  emergency_pause_procedures: true
+  multi_sig_recovery: true
+  
+disaster_recovery:
+  enabled: true
+  recovery_time_objective: 1440  # 24 hours
+  recovery_point_objective: 144  # 2 hours
+
+# =============================================================================
+# COMPLIANCE AND GOVERNANCE
+# =============================================================================
+compliance:
+  audit_requirements: true
+  regulatory_reporting: true
+  kyc_integration: false  # As needed
+  aml_monitoring: false   # As needed
+  
+governance:
+  multi_sig_threshold: 3  # 3 of 5 signatures required
+  timelock_duration: 172800  # 48 hours
+  emergency_override_threshold: 4  # 4 of 5 for emergency
+  
+legal:
+  terms_of_service_hash: "${PROD_TOS_HASH}"
+  privacy_policy_hash: "${PROD_PRIVACY_HASH}"
+  compliance_framework: "DEFI_BEST_PRACTICES"
+
+# =============================================================================
+# POST-DEPLOYMENT VALIDATION
+# =============================================================================
+validation:
+  required_tests:
+    - "tokenomics-unit-tests"
+    - "tokenomics-integration-tests"
+    - "system-validation-tests"
+    - "performance-stress-tests"
+    - "security-penetration-tests"
+    - "compliance-verification-tests"
+  
+  health_checks:
+    - "contract-deployment-verification"
+    - "system-configuration-verification"
+    - "integration-verification"
+    - "security-verification"
+    - "performance-verification"
+    - "compliance-verification"
+    
+  success_criteria:
+    - all_contracts_deployed: true
+    - all_tests_passing: true
+    - system_health_ok: true
+    - no_critical_issues: true
+    - performance_within_sla: true
+    - security_audit_passed: true
+    - compliance_verified: true
+    
+  rollback_triggers:
+    - critical_test_failures: true
+    - system_health_failures: true
+    - security_violations: true
+    - compliance_failures: true
+    
+# =============================================================================
+# PRODUCTION SLAS
+# =============================================================================
+slas:
+  uptime: 99.9   # 99.9% uptime SLA
+  response_time: 2000  # 2 second max response time
+  throughput: 1000     # 1000 transactions per minute
+  
+maintenance_windows:
+  - day: "sunday"
+    time: "02:00-04:00"
+    frequency: "monthly"

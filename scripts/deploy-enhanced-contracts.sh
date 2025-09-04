@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# AutoVault Enhanced Contracts Deployment Script
+# Conxian Enhanced Contracts Deployment Script
 # Deploys all optimization systems for +735K TPS potential
 # PRD Aligned with comprehensive error handling
 
@@ -367,7 +367,7 @@ generate_deployment_report() {
     local report_file="deployment-report-${NETWORK}-$(date +%Y%m%d-%H%M%S).md"
     
     cat > "$report_file" << EOF
-# AutoVault Enhanced Contracts Deployment Report
+# Conxian Enhanced Contracts Deployment Report
 
 **Network:** ${NETWORK}
 **Deployment Date:** $(date)
@@ -423,7 +423,7 @@ EOF
 
 # Main deployment function
 main() {
-    log "AutoVault Enhanced Contracts Deployment"
+    log "Conxian Enhanced Contracts Deployment"
     log "Network: ${NETWORK}"
     log "Target TPS Improvement: +735,000 TPS"
     

@@ -1,4 +1,4 @@
-# AutoVault Smart Contracts Summary
+# Conxian Smart Contracts Summary
 
 Last updated: August 16, 2025
 
@@ -6,14 +6,14 @@ Last updated: August 16, 2025
 
 - analytics.clar
 - automated-bounty-system.clar
-- avg-token.clar
-- avlp-token.clar
+- cxvg-token.clar
+- cxlp-token.clar
 - bounty-system.clar
 - creator-token.clar
 - dao-automation.clar
 - dao-governance.clar
 - dao.clar
-- gov-token.clar
+- CXVG.clar
 - mock-ft.clar
 - registry.clar
 - timelock.clar

@@ -1,0 +1,274 @@
+# staging-config.yaml
+# Staging environment configuration for Conxian Enhanced Tokenomics
+
+# =============================================================================
+# ENVIRONMENT SETTINGS
+# =============================================================================
+environment: staging
+network: testnet
+auto_confirm: false
+gas_limit: 2000000
+gas_price: 1
+
+# =============================================================================
+# TOKEN CONFIGURATION
+# =============================================================================
+tokens:
+  cxd:
+    name: "Conxian Revenue Token"
+    symbol: "CXD"
+    decimals: 6
+    initial_supply: 0
+    max_supply: 21000000000000  # 21M tokens
+    emission_per_block: 1000000000000  # 1M tokens per epoch
+    epoch_length: 10080  # 1 week in blocks
+    
+  cxvg:
+    name: "Conxian Governance Token" 
+    symbol: "CXVG"
+    decimals: 6
+    initial_supply: 0
+    max_supply: 10500000000000  # 10.5M tokens
+    emission_per_block: 500000000000  # 500K tokens per epoch
+    epoch_length: 10080
+    
+  cxlp:
+    name: "Conxian Liquidity Provider Token"
+    symbol: "CXLP" 
+    decimals: 6
+    initial_supply: 100000000000  # 100K tokens for staging
+    migration_start_delay: 1440  # 1 day
+    
+  cxtr:
+    name: "Conxian Contributor Token"
+    symbol: "CXTR"
+    decimals: 6
+    initial_supply: 0
+    max_supply: 2100000000000  # 2.1M tokens
+    emission_per_block: 100000000000  # 100K tokens per epoch
+    epoch_length: 10080
+
+# =============================================================================
+# STAKING CONFIGURATION
+# =============================================================================
+staking:
+  warmup_period: 10080  # 1 week in blocks
+  cooldown_period: 20160  # 2 weeks in blocks  
+  min_stake_amount: 1000000  # 1 token minimum
+  max_stake_amount: 1000000000000  # 1M tokens maximum
+  reward_distribution_frequency: 10080  # Weekly
+
+# =============================================================================
+# GOVERNANCE CONFIGURATION  
+# =============================================================================
+governance:
+  min_lock_duration: 52560  # 1 month minimum
+  max_lock_duration: 525600  # 1 year maximum
+  proposal_bond_amount: 5000000000  # 5K tokens
+  fee_discount_tiers:
+    - threshold: 5000000000     # 5K CXVG locked
+      discount: 500             # 5% discount
+    - threshold: 50000000000    # 50K CXVG locked  
+      discount: 1000            # 10% discount
+    - threshold: 500000000000   # 500K CXVG locked
+      discount: 2000            # 20% discount
+
+# =============================================================================
+# REVENUE DISTRIBUTION
+# =============================================================================
+revenue_distribution:
+  staker_share: 7000      # 70% to stakers
+  treasury_share: 2000    # 20% to treasury
+  reserve_share: 1000     # 10% to reserves
+  distribution_frequency: 10080  # Weekly
+  
+fee_collectors:
+  - contract: "cxd-token"
+    fee_rate: 100  # 1%
+  - contract: "vault-manager"  
+    fee_rate: 50   # 0.5%
+  - contract: "dex-core"
+    fee_rate: 30   # 0.3%
+
+# =============================================================================
+# MIGRATION CONFIGURATION
+# =============================================================================
+migration:
+  epoch_cap: 500000000000      # 500K CXD per epoch
+  user_base_cap: 5000000000    # 5K CXD base
+  user_max_cap: 100000000000   # 100K CXD max
+  duration_factor: 100
+  midyear_blocks: 525600
+  adjustment_factor: 11000     # 10% bonus
+
+# =============================================================================
+# SECURITY SETTINGS
+# =============================================================================
+security:
+  circuit_breaker_enabled: true
+  invariant_monitoring_enabled: true
+  pause_on_violation: true
+  emergency_contacts:
+    - "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"  # Staging admin
+    - "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5"  # Backup admin
+  
+monitoring:
+  health_check_frequency: 144  # Every 2 hours
+  max_violation_count: 3
+  auto_pause_threshold: 2
+
+# =============================================================================
+# DIMENSIONAL INTEGRATION
+# =============================================================================
+dimensional:
+  yield_adapter_enabled: true
+  bond_adapter_enabled: true
+  revenue_routing_enabled: true
+  
+yield_staking:
+  min_yield_amount: 1000000  # 1 token
+  yield_distribution_frequency: 10080  # Weekly
+  
+tokenized_bonds:
+  min_coupon_amount: 1000000  # 1 token  
+  coupon_distribution_frequency: 10080  # Weekly
+  auto_bond_registration: true  # Auto in staging
+
+# =============================================================================
+# TESTING CONFIGURATION
+# =============================================================================
+testing:
+  unit_tests_enabled: true
+  integration_tests_enabled: true
+  system_validation_enabled: true
+  performance_tests_enabled: true
+  
+test_accounts:
+  - "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
+  - "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5"  
+  - "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG"
+  - "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP"
+
+test_amounts:
+  small: 50000000      # 50 tokens
+  medium: 500000000    # 500 tokens  
+  large: 5000000000    # 5K tokens
+  whale: 50000000000   # 50K tokens
+
+# =============================================================================
+# DEPLOYMENT SEQUENCE
+# =============================================================================
+deployment_phases:
+  - name: "Pre-deployment Validation"
+    tasks:
+      - "validate-configuration"
+      - "check-dependencies"
+      - "verify-accounts"
+    
+  - name: "Core Tokens"
+    contracts:
+      - "cxd-token"
+      - "cxvg-token" 
+      - "cxlp-token"
+      - "cxtr-token"
+    dependencies: []
+    post_deploy:
+      - "verify-token-deployment"
+      - "test-basic-operations"
+    
+  - name: "System Infrastructure"
+    contracts:
+      - "protocol-invariant-monitor"
+      - "token-emission-controller"
+      - "revenue-distributor" 
+      - "token-system-coordinator"
+    dependencies: ["Core Tokens"]
+    post_deploy:
+      - "verify-system-deployment"
+      - "test-system-interactions"
+    
+  - name: "Enhanced Mechanisms"
+    contracts:
+      - "cxd-staking"
+      - "cxvg-utility"
+      - "cxlp-migration-queue"
+    dependencies: ["Core Tokens", "System Infrastructure"]
+    post_deploy:
+      - "verify-mechanism-deployment"
+      - "test-staking-governance"
+    
+  - name: "Dimensional Adapters"
+    contracts:
+      - "dim-revenue-adapter"
+      - "tokenized-bond-adapter" 
+    dependencies: ["System Infrastructure"]
+    post_deploy:
+      - "verify-adapter-deployment"
+      - "test-dimensional-integration"
+    
+  - name: "System Configuration"
+    tasks:
+      - "configure-protocol-monitor"
+      - "configure-emission-controller"
+      - "configure-revenue-distributor"
+      - "configure-system-coordinator"
+      - "enable-token-integration"
+      - "configure-dimensional-adapters"
+    dependencies: ["Enhanced Mechanisms", "Dimensional Adapters"]
+    
+  - name: "Integration Testing"
+    tasks:
+      - "run-unit-tests"
+      - "run-integration-tests"
+      - "run-system-validation"
+      - "run-performance-tests"
+    dependencies: ["System Configuration"]
+
+# =============================================================================
+# MONITORING AND ALERTING
+# =============================================================================
+monitoring:
+  metrics_collection: true
+  performance_monitoring: true
+  error_tracking: true
+  
+alerts:
+  contract_failures: true
+  system_pauses: true
+  invariant_violations: true
+  performance_degradation: true
+  
+notification_channels:
+  - type: "email"
+    address: "staging-alerts@conxian.com"
+  - type: "slack" 
+    webhook: "${STAGING_SLACK_WEBHOOK}"
+
+# =============================================================================
+# POST-DEPLOYMENT VALIDATION
+# =============================================================================
+validation:
+  required_tests:
+    - "tokenomics-unit-tests"
+    - "tokenomics-integration-tests"
+    - "system-validation-tests"
+    - "performance-stress-tests"
+  
+  health_checks:
+    - "contract-deployment-verification"
+    - "system-configuration-verification"
+    - "integration-verification"
+    - "security-verification"
+    - "performance-verification"
+    
+  success_criteria:
+    - all_contracts_deployed: true
+    - all_tests_passing: true
+    - system_health_ok: true
+    - no_critical_issues: true
+    - performance_within_limits: true
+    
+  rollback_triggers:
+    - critical_test_failures: true
+    - system_health_failures: true
+    - security_violations: true

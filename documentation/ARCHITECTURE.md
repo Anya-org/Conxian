@@ -1,6 +1,6 @@
-# AutoVault Stacks DeFi — Design
+# Conxian Stacks DeFi — Design
 
-This document outlines the live AutoVault on-chain DeFi architecture (current implementation + in-progress subsystems) on Stacks, leveraging Bitcoin anchoring and future BTC bridges (e.g., sBTC) for differentiation.  
+This document outlines the live Conxian on-chain DeFi architecture (current implementation + in-progress subsystems) on Stacks, leveraging Bitcoin anchoring and future BTC bridges (e.g., sBTC) for differentiation.  
 For detailed product-level requirements, see `documentation/prd/` (e.g., `VAULT.md`, `DAO_GOVERNANCE.md`, `DEX.md`).
 
 ## Principles
@@ -19,7 +19,7 @@ For detailed product-level requirements, see `documentation/prd/` (e.g., `VAULT.
 - `timelock.clar` – Queued admin actions & enforced delays
 - `analytics.clar` – Event indexing hook surface
 - `registry.clar` – Contract discovery & coordination
-- `creator-token.clar`, `avg-token.clar`, `avlp-token.clar`, `gov-token.clar` – Token layer & migration logic
+- `creator-token.clar`, `cxvg-token.clar`, `cxlp-token.clar`, `CXVG.clar` – Token layer & migration logic
 - `bounty-system*.clar` – Manual + automated bounty flows
 - `dao-automation.clar` – Parameter tuning (bounds-enforced)
 - `circuit-breaker.clar` – Volatility / volume / liquidity triggers with numeric event codes
