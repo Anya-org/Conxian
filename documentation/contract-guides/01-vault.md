@@ -98,8 +98,6 @@ These functions can only be called by the contract's admin, ensuring changes go 
 | `add-supported-asset`| `asset principal`, `strategy-contract principal`| Adds a new token to the list of supported assets and links it to a strategy. |
 | `update-integration-settings`| `settings (tuple (monitor-enabled bool) (emission-enabled bool))`| Updates the flags for monitor and emission integrations. |
 | `collect-protocol-fees`| `asset principal`| Collects the accumulated fees for a given asset. |
-| `emergency-withdraw`| `asset principal`, `amount uint`, `recipient principal`| *Note: Placeholder function.* |
-| `rebalance-vault`| `asset principal`| *Note: Placeholder function.* |
 
 ## 6. Read-Only Functions
 
