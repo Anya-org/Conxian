@@ -6,7 +6,7 @@
 
 The `vault.clar` contract is the heart of the Conxian ecosystem. It is a sophisticated smart contract that serves as the primary repository for user-deposited assets. Its main purpose is to manage these assets, apply automated yield-generating strategies, and provide a secure, efficient, and feature-rich experience for users and other protocol contracts.
 
-This vault is a **multi-asset** contract, meaning it can hold and manage multiple different SIP-010 tokens simultaneously.
+This vault is a **multi-asset** contract, meaning it can hold and manage multiple different SIP-010 tokens simultaneously. In contrast, traditional single-asset vaults are designed to hold only one type of token, requiring a separate contract for each asset. The multi-asset approach streamlines asset management and user experience by allowing all supported tokens to be managed within a single vault contract.
 
 The vault uses a share-based accounting system, where depositors receive "shares" that represent their proportional ownership of a specific asset's pool within the vault. As the vault generates yield for a specific asset, the value of each share for that asset increases.
 
