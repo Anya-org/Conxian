@@ -2,17 +2,17 @@
 
 | | |
 |---|---|
-| **Status** | 🔶 Draft |
-| **Version** | 0.4 |
+| **Status** | 🟢 Stable (v1.0 Core) / 🔶 In Development (v1.1+) |
+| **Version** | 1.0 |
 | **Owner** | R&D WG |
 | **Last Updated** | 2025-08-26 |
-| **References** | `dex-factory.clar` (planned), `dex-router.clar` (planned) |
+| **References** | `dex-factory.clar`, `dex-router.clar` |
 
 ---
 
 ## 1. Summary & Vision
 
-The Conxian DEX is the native liquidity layer of the ecosystem, providing an on-chain automated market maker (AMM) for internal price discovery, efficient trading, and deep liquidity for vault strategies. The vision is to develop a comprehensive trading infrastructure, starting with foundational constant-product pools and evolving to include more sophisticated pool types, advanced routing, and robust oracle services, making it a cornerstone of Conxian's DeFi offerings.
+The Conxian DEX is the native liquidity layer of the ecosystem, providing an on-chain automated market maker (AMM) for internal price discovery, efficient trading, and deep liquidity for vault strategies. The core v1.0 AMM functionality is stable and production-ready, while advanced features like multi-hop routing (v1.1+) are in development. The vision is to develop a comprehensive trading infrastructure, starting with foundational constant-product pools and evolving to include more sophisticated pool types, advanced routing, and robust oracle services, making it a cornerstone of Conxian's DeFi offerings.
 
 ## 2. Goals / Non-Goals
 
