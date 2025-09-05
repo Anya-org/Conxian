@@ -1,14 +1,14 @@
 # Conxian
 
-[![Tests](https://img.shields.io/badge/Tests-0%2F131%20Passing-red)](https://github.com/Anya-org/Conxian)
-[![Contracts](https://img.shields.io/badge/Contracts-75%20Compiled-blue)](https://github.com/Anya-org/Conxian)
+[![Tests](https://img.shields.io/badge/Tests-Failing-red)](https://github.com/Anya-org/Conxian/issues)
+[![Contracts](https://img.shields.io/badge/Contracts-Partially%20Compiling-orange)](https://github.com/Anya-org/Conxian/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A production-ready DeFi platform on Stacks with enhanced tokenomics, automated DAO governance, DEX subsystem groundwork, circuit breaker & enterprise monitoring, and Bitcoin-aligned principles.
 
 ## Status
 
-✅ **Production Ready** – 75 contracts compile successfully with 130/131 tests passing (unit, integration, security, SDK suites; 20 TypeScript test files and 1 Clarity test file).
+⚠️ **Tests Failing** – The test suite is currently failing due to a compilation error in the `protocol-invariant-monitor.clar` contract. This prevents a full assessment of the project's health. While many contracts compile, the overall system is not passing its checks.
 
 [View Complete Status](./documentation/STATUS.md)
 
