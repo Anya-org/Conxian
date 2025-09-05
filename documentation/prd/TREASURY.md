@@ -6,9 +6,13 @@
 | **Version** | 1.2 |
 | **Owner** | Treasury WG |
 | **Last Updated** | 2025-08-26 |
-| **References** | [AIP-3: Treasury Management](https://spl_governance.crsp.ac/), `treasury.clar` (planned) |
+| **References** | [AIP-3: Treasury Management](https://spl_governance.crsp.ac/), `treasury.clar` (Future Implementation) |
 
 ---
+
+> 📝 **Note on Implementation Status**
+>
+> This document describes the requirements for the Conxian Treasury contract. As of the last update, this contract is a **future implementation** and is not yet present in the repository. It serves as the target destination for funds sent from active contracts like the `revenue-distributor.clar`.
 
 ## 1. Summary & Vision
 

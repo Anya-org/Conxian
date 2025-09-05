@@ -2,13 +2,17 @@
 
 | | |
 |---|---|
-| **Status** | 🔶 Draft |
+| **Status** | 🔵 Conceptual |
 | **Version** | 0.3 |
 | **Owner** | R&D WG |
 | **Last Updated** | 2025-08-26 |
-| **References** | `oracle-aggregator.clar` (planned) |
+| **References** | `oracle-aggregator.clar` (Future Implementation) |
 
 ---
+
+> 📝 **Note on Implementation Status**
+>
+> This document describes the requirements for a future Conxian Oracle Aggregator system. As of the last update, the contracts described herein are **conceptual** and are not yet present in the repository.
 
 ## 1. Summary & Vision
 

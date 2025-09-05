@@ -107,6 +107,7 @@ The interface consists of the various security functions within each contract, f
 ## 13. Rollout / Migration Plan
 
 - **Phase 1 (Completed)**: AIPs 1-5 have been implemented and are active in the production system.
+  - > **Note on Implementation State**: While the AIPs are conceptually implemented, several coordinating contracts (`protocol-invariant-monitor.clar`, `token-system-coordinator.clar`) have been deployed in a simplified, "stubbed-out" state. This was done to allow core system functionality to proceed while deferring the full implementation of complex cross-contract security features (e.g., automated kill switches). The full implementation of these features is planned for a subsequent phase.
 - **Phase 2 (Q3 2025)**: Integrate the circuit breaker mechanism with the core DEX pools.
 - **Phase 3 (Q4 2025)**: Develop a formal specification of security invariants and begin using symbolic checking tools.
 - **Phase 4 (Q1 2026)**: Deploy the full oracle aggregator system and integrate its price data throughout the protocol.

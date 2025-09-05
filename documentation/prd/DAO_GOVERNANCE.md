@@ -6,9 +6,13 @@
 | **Version** | 1.2 |
 | **Owner** | Governance WG |
 | **Last Updated** | 2025-08-26 |
-| **References** | AIP-2, `dao-governance.clar` (planned), `timelock.clar` (planned) |
+| **References** | AIP-2, `dao-governance.clar` (Future Implementation), `timelock.clar` (Future Implementation) |
 
 ---
+
+> 📝 **Note on Implementation Status**
+>
+> This document describes the requirements for the Conxian DAO governance system. As of the last update, the contracts described herein (`dao-governance.clar`, `timelock.clar`, etc.) are a **future implementation** and are not yet present in the repository.
 
 ## 1. Summary & Vision
 
