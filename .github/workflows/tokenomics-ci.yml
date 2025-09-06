@@ -262,7 +262,6 @@ jobs:
     name: Testnet Deployment
     needs: [system-validation, deployment-validation]
     if: github.ref == 'refs/heads/main'
-    environment: testnet
     
     steps:
     - name: Checkout code
@@ -271,6 +270,17 @@ jobs:
     - name: Install Clarinet
       run: |
         echo "Using project-pinned Clarinet via npx"
+        
+    - name: Validate secrets
+      env:
+        TESTNET_DEPLOYER_KEY: ${{ secrets.TESTNET_DEPLOYER_KEY }}
+      run: |
+        if [ -z "$TESTNET_DEPLOYER_KEY" ]; then
+          echo "⚠️ TESTNET_DEPLOYER_KEY secret not configured"
+          echo "Please add this secret in repository Settings → Secrets and variables → Actions"
+          exit 1
+        fi
+        echo "✅ Required secrets validated"
         
     - name: Configure testnet environment
       env:

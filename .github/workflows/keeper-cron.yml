@@ -155,11 +155,31 @@ jobs:
           echo "OPERATION_MODE=automated" >> $GITHUB_ENV
           echo "TIMESTAMP=$(date -u +%Y%m%d_%H%M%S)" >> $GITHUB_ENV
 
+      - name: Validate secrets
+        env:
+          STACKS_PRIVKEY: ${{ secrets.STACKS_PRIVKEY }}
+          VAULT_CONTRACT_ADDRESS: ${{ secrets.VAULT_CONTRACT_ADDRESS }}
+        run: |
+          MISSING_SECRETS=""
+          if [ -z "$STACKS_PRIVKEY" ]; then
+            MISSING_SECRETS="$MISSING_SECRETS STACKS_PRIVKEY"
+          fi
+          if [ -z "$VAULT_CONTRACT_ADDRESS" ]; then
+            MISSING_SECRETS="$MISSING_SECRETS VAULT_CONTRACT_ADDRESS"
+          fi
+          
+          if [ -n "$MISSING_SECRETS" ]; then
+            echo "⚠️ Missing required secrets:$MISSING_SECRETS"
+            echo "Please add these secrets in repository Settings → Secrets and variables → Actions"
+            exit 1
+          fi
+          echo "✅ Required secrets validated"
+
       - name: Execute ${{ matrix.operation.name }}
         timeout-minutes: ${{ matrix.operation.timeout }}
         env:
-          STACKS_PRIVKEY: ${{ secrets.STACKS_PRIVKEY || 'unset' }}
-          VAULT_CONTRACT: ${{ secrets.VAULT_CONTRACT_ADDRESS || 'unset' }}
+          STACKS_PRIVKEY: ${{ secrets.STACKS_PRIVKEY }}
+          VAULT_CONTRACT: ${{ secrets.VAULT_CONTRACT_ADDRESS }}
         run: |
           echo "🤖 Executing ${{ matrix.operation.name }}..."
           
