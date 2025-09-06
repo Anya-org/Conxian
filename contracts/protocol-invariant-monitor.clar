@@ -301,7 +301,7 @@
           (var-set last-health-check block-height)
           
           ;; Take snapshot for historical tracking - simplified for enhanced deployment
-          (unwrap! (take-monitoring-snapshot) (err ERR_INVARIANT_VIOLATION))
+          (unwrap-panic (take-monitoring-snapshot))
           
           ;; Trigger warnings if health is degraded
           (begin

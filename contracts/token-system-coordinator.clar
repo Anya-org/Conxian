@@ -363,11 +363,13 @@
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     
     ;; Pause all subsystems - simplified for enhanced deployment
-    (match (var-get cxd-staking-contract)
-      staking-ref true ;; Simplified - assume pause successful
+    (begin
+      (match (var-get cxd-staking-contract)
+        staking-ref true ;; Simplified - assume pause successful
+        true)
+      ;; Skip migration queue for enhanced deployment
+      ;; (try! (as-contract (contract-call? .protocol-invariant-monitor trigger-emergency-pause u8888)))
       true)
-    ;; Skip migration queue for enhanced deployment
-    ;; (try! (as-contract (contract-call? .protocol-invariant-monitor trigger-emergency-pause u8888)))
     
     (var-set system-paused true)
     (ok true)))

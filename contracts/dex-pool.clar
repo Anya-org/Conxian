@@ -1,6 +1,4 @@
-;; Conxian DEX Pool - Constant product AMM pool with enhanced tokenomics (define-read-only (get-pool-performance)
-  (let ((today (/ block-height u144))) ;; Approximate daily blocks
-    (ok { volume-24h: u0, fees-24h: u0 })))  ;; Simplified for enhanced deploymentgration
+;; Conxian DEX Pool - Constant product AMM pool with enhanced tokenomics integration
 ;; Implements pool-trait with full system integration
 
 (impl-trait .pool-trait.pool-trait)
@@ -75,8 +73,7 @@
 
 (define-read-only (get-pool-performance)
   (let ((today (/ block-height u144))) ;; Approximate daily blocks
-    (ok (default-to (tuple (volume u0) (fees u0) (trades u0))
-                    (map-get? daily-stats "current")))))  ;; Simplified key for enhanced deployment
+    (ok (tuple (volume-24h u0) (fees-24h u0)))))  ;; Simplified for enhanced deployment
 
 ;; Private functions
 ;; Simplified square root using Newton's method

@@ -64,11 +64,11 @@
          (default-fee (var-get default-fee-bps))
          (protocol-fee (var-get protocol-fee-bps))))
 
-;; Private functions
+;; Access control functions
 (define-public (only-owner-guard)
   (if (is-eq tx-sender (var-get owner))
       (ok true)
-      (err ERR_UNAUTHORIZED)))
+      ERR_UNAUTHORIZED))
 
 (define-private (normalize-token-pair (token-a principal) (token-b principal))
   (tuple (token-a token-a) (token-b token-b)))
