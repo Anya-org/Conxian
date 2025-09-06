@@ -116,6 +116,11 @@ path = "contracts/traits/ownable-trait.clar"
 clarity_version = 2
 epoch = "2.4"
 
+[contracts.staking-trait]
+path = "contracts/traits/staking-trait.clar"
+clarity_version = 2
+epoch = "2.4"
+
 # ===========================================
 # DIMENSIONAL DEFI - Metrics-driven system
 # ===========================================
@@ -205,7 +210,7 @@ depends_on = ["sip-009-trait"]
 path = "contracts/protocol-invariant-monitor.clar"
 clarity_version = 2
 epoch = "2.4"
-depends_on = ["monitor-trait"]
+depends_on = ["monitor-trait", "staking-trait"]
 
 [contracts.token-emission-controller]
 path = "contracts/token-emission-controller.clar"
@@ -217,7 +222,7 @@ depends_on = ["sip-010-trait", "ft-mintable-trait"]
 path = "contracts/revenue-distributor.clar"
 clarity_version = 2
 epoch = "2.4"
-depends_on = ["sip-010-trait", "protocol-invariant-monitor"]
+depends_on = ["sip-010-trait", "protocol-invariant-monitor", "staking-trait"]
 
 [contracts.cxd-staking]
 path = "contracts/cxd-staking.clar"

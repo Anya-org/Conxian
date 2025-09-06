@@ -66,11 +66,11 @@
 (define-data-var current-batch-created uint u0)
 
 ;; Read-only functions
-(define-read-only (get-batch-info (batch-id uint))
-  (map-get? transaction-batches batch-id))
+(define-read-only (get-batch-info (batch-id-param uint))
+  (map-get? transaction-batches batch-id-param))
 
-(define-read-only (get-batch-metrics (batch-id uint))
-  (map-get? batch-metrics batch-id))
+(define-read-only (get-batch-metrics (batch-id-param uint))
+  (map-get? batch-metrics batch-id-param))
 
 (define-read-only (get-current-batch-size)
   (var-get current-batch-size))

@@ -36,11 +36,6 @@ plan:
     - id: 0
       transactions:
         - emulated-contract-publish:
-            contract-name: ownable-trait
-            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: "contracts\\traits\\ownable-trait.clar"
-            clarity-version: 2
-        - emulated-contract-publish:
             contract-name: automated-circuit-breaker
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: "contracts\\automated-circuit-breaker.clar"
@@ -59,6 +54,11 @@ plan:
             contract-name: ft-mintable-trait
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: "contracts\\traits\\ft-mintable-trait.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: monitor-trait
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: "contracts\\traits\\monitor-trait.clar"
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: cxd-token
@@ -91,11 +91,6 @@ plan:
             path: "contracts\\cxtr-token.clar"
             clarity-version: 2
         - emulated-contract-publish:
-            contract-name: monitor-trait
-            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: "contracts\\traits\\monitor-trait.clar"
-            clarity-version: 2
-        - emulated-contract-publish:
             contract-name: cxvg-token
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: "contracts\\cxvg-token.clar"
@@ -104,6 +99,11 @@ plan:
             contract-name: cxvg-utility
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: "contracts\\cxvg-utility.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: ownable-trait
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: "contracts\\traits\\ownable-trait.clar"
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: dex-factory
@@ -192,6 +192,11 @@ plan:
             contract-name: predictive-scaling-system
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: "contracts\\predictive-scaling-system.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: staking-trait
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: "contracts\\traits\\staking-trait.clar"
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: protocol-invariant-monitor

@@ -2,8 +2,6 @@
 ;; Provides intelligent scaling predictions based on transaction patterns,
 ;; historical data analysis, and proactive resource allocation
 
-(impl-trait .ownable-trait.ownable-trait)
-
 ;; Error codes
 (define-constant ERR_UNAUTHORIZED (err u401))
 (define-constant ERR_INVALID_PARAMS (err u400))
@@ -327,7 +325,8 @@
       (prediction-id "proactive-scale")
       (horizon (if (>= urgency-level u2) HORIZON_SHORT HORIZON_MEDIUM))
     )
-      (try! (generate-scaling-prediction prediction-id horizon))
+      (let ((prediction-result (unwrap-panic (generate-scaling-prediction prediction-id horizon))))
+        prediction-result)
       (ok true)
     )
   )

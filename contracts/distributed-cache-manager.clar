@@ -265,11 +265,12 @@
 
 ;; Update promotion statistics
 (define-private (update-promotion-stats (key (string-ascii 64)))
-  (match (map-get? cache-stats key)
-    stats (map-set cache-stats key
-            (merge stats { promotion-count: (+ (get promotion-count stats) u1) }))
-    true)
-  true)
+  (begin
+    (match (map-get? cache-stats key)
+      stats (map-set cache-stats key
+              (merge stats { promotion-count: (+ (get promotion-count stats) u1) }))
+      true)
+    true))
 
 ;; Clean up expired entries
 (define-public (cleanup-expired-entries)

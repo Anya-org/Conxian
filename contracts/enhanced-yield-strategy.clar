@@ -55,7 +55,9 @@
   (ok (var-get risk-level)))
 
 (define-read-only (get-underlying-asset)
-  (ok (var-get underlying-asset)))
+  (match (var-get underlying-asset)
+    some-asset (ok some-asset)
+    ERR_INVALID_ASSET))
 
 (define-read-only (get-performance-fee)
   (ok (var-get performance-fee-bps)))
@@ -111,7 +113,7 @@
         ;; Emit event
         (print (tuple (event "funds-deployed") (user tx-sender) (amount amount) (position-id position-id)))
         
-        (ok (tuple (position-id position-id) (amount amount))))))
+        (ok amount))))
 
 ;; Withdraw funds from strategy positions
 (define-public (withdraw-funds (amount uint))
@@ -231,6 +233,7 @@
           (var-set last-dimensional-update block-height)
           (ok true))
         (err u999)))
+)
 
 ;; Administrative functions
 (define-public (set-performance-fee (new-fee-bps uint))

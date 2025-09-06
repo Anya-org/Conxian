@@ -424,7 +424,7 @@
     })))
 
 ;; Get system-wide statistics
-(define-public (get-system-statistics)
+(define-read-only (get-system-statistics)
   (let ((staking-stats (match (var-get cxd-staking-contract)
                         staking-ref { total-staked-cxd: u0, total-supply: u0, total-revenue-distributed: u0, current-epoch: u0 }
                         { total-staked-cxd: u0, total-supply: u0, total-revenue-distributed: u0, current-epoch: u0 }))
@@ -433,7 +433,7 @@
                         { total-collected: u0, total-distributed: u0, current-epoch: u0, pending-distribution: u0, treasury-address: tx-sender, reserve-address: tx-sender, staking-contract-ref: none }))
         (health-status (ok true))) ;; Simplified for compilation
         ;; (health-status (contract-call? .protocol-invariant-monitor get-circuit-breaker-status)))
-    
+  
     (ok {
       staking: staking-stats,
       migration: { total-queued: u0, total-migrated: u0, queue-health: true }, ;; Simplified for enhanced deployment

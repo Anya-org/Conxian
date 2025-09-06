@@ -2,8 +2,6 @@
 ;; Protects system from cascading failures by monitoring error rates and automatically 
 ;; cutting off requests when thresholds are exceeded
 
-(impl-trait .ownable-trait.ownable-trait)
-
 ;; Error codes
 (define-constant ERR_UNAUTHORIZED (err u401))
 (define-constant ERR_CIRCUIT_OPEN (err u502))
@@ -147,7 +145,7 @@
           )
           (ok STATE_HALF_OPEN)
         )
-        (err ERR_CIRCUIT_OPEN)
+        ERR_CIRCUIT_OPEN
       )
       (ok (get state circuit))
     )

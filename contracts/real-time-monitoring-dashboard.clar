@@ -2,8 +2,6 @@
 ;; Provides comprehensive system monitoring, alerting, and metrics collection
 ;; for the enhanced tokenomics system with real-time dashboards
 
-(impl-trait .ownable-trait.ownable-trait)
-
 ;; Error codes
 (define-constant ERR_UNAUTHORIZED (err u401))
 (define-constant ERR_INVALID_PARAMS (err u400))
@@ -296,7 +294,7 @@
   (begin
     (try! (only-owner-guard))
     (let (
-      (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+      (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
     )
       (map-set performance-baselines
         { metric-name: metric-name }
@@ -318,7 +316,7 @@
   (begin
     (try! (only-owner-guard))
     (let (
-      (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+      (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
     )
       (var-set uptime-start current-time)
       (var-set monitoring-enabled true)

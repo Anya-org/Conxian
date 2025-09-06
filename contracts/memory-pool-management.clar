@@ -2,8 +2,6 @@
 ;; Optimizes memory usage and resource allocation for the enhanced tokenomics system
 ;; Provides dynamic memory allocation, garbage collection, and pool optimization
 
-(impl-trait .ownable-trait.ownable-trait)
-
 ;; Error codes
 (define-constant ERR_UNAUTHORIZED (err u401))
 (define-constant ERR_INVALID_PARAMS (err u400))

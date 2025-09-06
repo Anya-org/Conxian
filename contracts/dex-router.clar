@@ -13,8 +13,8 @@
 
 ;; Read-only functions
 (define-read-only (resolve-pool (token-x principal) (token-y principal))
-  ;; Skip factory call for enhanced deployment - return none
-  none)
+  ;; Skip factory call for enhanced deployment - return typed optional principal
+  (if false (some tx-sender) none))
 
 (define-read-only (get-amount-out-direct (pool-ctr <pool>) (amount-in uint) (x-to-y bool))
   ;; Get expected output amount for a trade - simplified for enhanced deployment
@@ -23,11 +23,11 @@
 (define-read-only (get-amounts-out (amount-in uint) (path (list 3 principal)))
   (if (is-eq (len path) u2)
       ;; Single hop
-      (match (resolve-pool (unwrap! (element-at path u0) ERR_INVALID_PATH)
-                          (unwrap! (element-at path u1) ERR_INVALID_PATH))
-        pool-addr (let ((pool-contract (unwrap! (contract-of pool-addr) ERR_INVALID_POOL)))
+      (match (resolve-pool (unwrap-panic (element-at path u0))
+                          (unwrap-panic (element-at path u1)))
+        some-pool (let ((pool-contract (unwrap! (contract-of some-pool) ERR_INVALID_POOL)))
                     (get-amount-out-direct pool-contract amount-in true))
-        ERR_INVALID_POOL)
+        none ERR_INVALID_POOL)
       ;; Multi-hop not implemented yet
       ERR_INVALID_PATH))
 
@@ -124,12 +124,12 @@
     
     (if (is-eq (len path) u2)
         ;; Single hop swap
-        (let ((token-a (unwrap! (element-at path u0) ERR_INVALID_PATH))
-              (token-b (unwrap! (element-at path u1) ERR_INVALID_PATH)))
+        (let ((token-a (unwrap-panic (element-at path u0)))
+              (token-b (unwrap-panic (element-at path u1))))
           (match (resolve-pool token-a token-b)
-            pool-addr (let ((pool-contract (unwrap! (contract-of pool-addr) ERR_INVALID_POOL)))
+            some-pool (let ((pool-contract (unwrap! (contract-of some-pool) ERR_INVALID_POOL)))
                         (swap-exact-in-direct pool-contract amount-in min-amount-out true deadline))
-            ERR_INVALID_POOL))
+            none ERR_INVALID_POOL))
         ;; Multi-hop not implemented
         ERR_INVALID_PATH)))
 
