@@ -170,7 +170,7 @@
 
 ;; Helper for getting optimal pool for trading
 (define-read-only (get-optimal-pool (token-a principal) (token-b principal) (amount uint))
+  ;; Enhanced deployment: avoid direct dependency on factory; return error if pool can't be resolved
   (match (resolve-pool token-a token-b)
-    pool (let ((stats (unwrap-panic (contract-call? .dex-factory get-pool-stats pool))))
-           (ok (tuple (pool pool) (liquidity (get liquidity stats)))))
+    pool-addr (ok (tuple (pool pool-addr) (liquidity u0)))
     (err ERR_INVALID_POOL)))

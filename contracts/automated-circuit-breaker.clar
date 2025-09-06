@@ -135,7 +135,7 @@
   (let (
     (circuit (unwrap! (map-get? service-circuits { service-name: service-name }) ERR_SERVICE_NOT_FOUND))
     (config (unwrap! (map-get? service-configs { service-name: service-name }) ERR_SERVICE_NOT_FOUND))
-    (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+    (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
   )
     (if (is-eq (get state circuit) STATE_OPEN)
       ;; Check if timeout has passed to transition to half-open
@@ -211,7 +211,7 @@
     (new-failure-count (+ (get failure-count circuit) u1))
     (new-failed-requests (+ (get failed-requests circuit) u1))
     (new-total-requests (+ (get total-requests circuit) u1))
-    (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+    (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
   )
     (if (or (is-eq (get state circuit) STATE_HALF_OPEN) 
             (>= new-failure-count (get failure-threshold config)))
@@ -253,7 +253,7 @@
     (try! (only-owner-guard))
     (let (
       (circuit (unwrap! (map-get? service-circuits { service-name: service-name }) ERR_SERVICE_NOT_FOUND))
-      (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+      (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
     )
       (map-set service-circuits
         { service-name: service-name }
