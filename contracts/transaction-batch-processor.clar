@@ -185,13 +185,17 @@
   (accumulator { success-count: uint, failure-count: uint, gas-used: uint }))
   
   (let ((tx-type (get tx-type tx))
-        (processing-result (match tx-type
-          TX_TYPE_TRANSFER (process-transfer-tx tx)
-          TX_TYPE_MINT (process-mint-tx tx)
-          TX_TYPE_STAKE (process-stake-tx tx)
-          TX_TYPE_UNSTAKE (process-unstake-tx tx)
-          TX_TYPE_REVENUE_COLLECT (process-revenue-tx tx)
-          (err u9999))))
+        (processing-result (if (is-eq (get tx-type tx) TX_TYPE_TRANSFER)
+                               (process-transfer-tx tx)
+                               (if (is-eq (get tx-type tx) TX_TYPE_MINT)
+                                   (process-mint-tx tx)
+                                   (if (is-eq (get tx-type tx) TX_TYPE_STAKE)
+                                       (process-stake-tx tx)
+                                       (if (is-eq (get tx-type tx) TX_TYPE_UNSTAKE)
+                                           (process-unstake-tx tx)
+                                           (if (is-eq (get tx-type tx) TX_TYPE_REVENUE_COLLECT)
+                                               (process-revenue-tx tx)
+                                               (err u9999))))))))
     
     (if (is-ok processing-result)
         {

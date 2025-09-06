@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach } from 'vitest';
+import { describe, expect, it, beforeEach, beforeAll } from 'vitest';
 import { Cl, ClarityType } from '@stacks/transactions';
 import { initSimnet } from '@hirosystems/clarinet-sdk/vitest';
 
@@ -180,7 +180,7 @@ describe('System Infrastructure Contracts', () => {
     });
 
     it('should get system statistics', () => {
-      const result = simnet.callPublicFn('token-system-coordinator', 'get-system-statistics', [], deployer);
+      const result = simnet.callReadOnlyFn('token-system-coordinator', 'get-system-statistics', [], deployer);
       // The actual result includes initialized: true and total-operations field
       expect(result.result).toBeOk(Cl.tuple({
         'staking': Cl.tuple({

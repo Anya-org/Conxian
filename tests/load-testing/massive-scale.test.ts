@@ -6,7 +6,6 @@
 
 import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 import { Cl } from '@stacks/transactions';
-import { simnet } from '@hirosystems/clarinet-sdk';
 
 interface SystemMetrics {
   transactionCount: number;
@@ -81,7 +80,8 @@ describe('Massive Scale Load Testing', () => {
 
   beforeAll(async () => {
     testStartTime = Date.now();
-    accounts = simnet.getAccounts();
+    const sdk: any = (globalThis as any).simnet;
+    accounts = sdk.getAccounts();
     systemMetrics = initializeMetrics();
     
     // Initialize all contracts and system components
@@ -114,18 +114,19 @@ describe('Massive Scale Load Testing', () => {
     const deployer = accounts.get('deployer')!;
     
     // Initialize core token contracts
-    const cxdInit = simnet.callPublicFn('cxd-token', 'set-minter', [Cl.principal(deployer)], deployer);
+    const sdk: any = (globalThis as any).simnet;
+    const cxdInit = sdk.callPublicFn('cxd-token', 'set-minter', [Cl.principal(deployer), Cl.bool(true)], deployer);
     trackMetrics('cxd-token', 'set-minter', cxdInit);
     
-    const cxvgInit = simnet.callPublicFn('cxvg-token', 'set-minter', [Cl.principal(deployer)], deployer);
+    const cxvgInit = sdk.callPublicFn('cxvg-token', 'set-minter', [Cl.principal(deployer), Cl.bool(true)], deployer);
     trackMetrics('cxvg-token', 'set-minter', cxvgInit);
     
     // Initialize system contracts
-    const coordinatorInit = simnet.callPublicFn('token-system-coordinator', 'initialize-system', [], deployer);
+    const coordinatorInit = sdk.callPublicFn('token-system-coordinator', 'initialize-system', [], deployer);
     trackMetrics('token-system-coordinator', 'initialize-system', coordinatorInit);
     
     // Set up revenue distributor
-    const revenueInit = simnet.callPublicFn('revenue-distributor', 'authorize-collector', [
+    const revenueInit = sdk.callPublicFn('revenue-distributor', 'authorize-collector', [
       Cl.principal(deployer), Cl.bool(true)
     ], deployer);
     trackMetrics('revenue-distributor', 'authorize-collector', revenueInit);
@@ -278,16 +279,18 @@ describe('Massive Scale Load Testing', () => {
 
   async function executeTokenMint(deployer: string, recipient: string) {
     const amount = Math.floor(Math.random() * 1000000) + 100000; // 100K-1.1M tokens
-    const result = simnet.callPublicFn('cxd-token', 'mint', [
-      Cl.uint(amount),
-      Cl.principal(recipient)
+    const sdk: any = (globalThis as any).simnet;
+    const result = sdk.callPublicFn('cxd-token', 'mint', [
+      Cl.principal(recipient),
+      Cl.uint(amount)
     ], deployer);
     trackMetrics('cxd-token', 'mint', result);
   }
 
   async function executeBasicTransfer(sender: string, recipient: string) {
     const amount = Math.floor(Math.random() * 10000) + 1000; // 1K-11K tokens
-    const result = simnet.callPublicFn('cxd-token', 'transfer', [
+    const sdk: any = (globalThis as any).simnet;
+    const result = sdk.callPublicFn('cxd-token', 'transfer', [
       Cl.uint(amount),
       Cl.principal(sender),
       Cl.principal(recipient),
@@ -298,15 +301,15 @@ describe('Massive Scale Load Testing', () => {
 
   async function executeStaking(user: string) {
     const amount = Math.floor(Math.random() * 50000) + 5000; // 5K-55K tokens
-    const result = simnet.callPublicFn('cxd-staking', 'stake', [
-      Cl.uint(amount)
-    ], user);
+    const sdk: any = (globalThis as any).simnet;
+    const result = sdk.callPublicFn('cxd-staking', 'initiate-stake', [Cl.uint(amount)], user);
     trackMetrics('cxd-staking', 'stake', result);
   }
 
   async function executeRevenueCollection(collector: string) {
     const amount = Math.floor(Math.random() * 100000) + 10000; // 10K-110K tokens
-    const result = simnet.callPublicFn('revenue-distributor', 'collect-revenue', [
+    const sdk: any = (globalThis as any).simnet;
+    const result = sdk.callPublicFn('revenue-distributor', 'collect-revenue', [
       Cl.uint(amount),
       Cl.contractPrincipal(accounts.get('deployer')!, 'cxd-token'),
       Cl.uint(1) // FEE_TYPE_VAULT_PERFORMANCE
@@ -316,7 +319,8 @@ describe('Massive Scale Load Testing', () => {
 
   async function executeCrossContractCalls(caller: string) {
     // System coordinator calling multiple contracts
-    const result = simnet.callPublicFn('token-system-coordinator', 'get-system-statistics', [], caller);
+    const sdk: any = (globalThis as any).simnet;
+    const result = sdk.callReadOnlyFn('token-system-coordinator', 'get-system-statistics', [], caller);
     trackMetrics('token-system-coordinator', 'get-system-statistics', result);
   }
 
@@ -330,7 +334,7 @@ describe('Massive Scale Load Testing', () => {
 
   async function executeStressPatterns(deployer: string, wallet1: string, wallet2: string) {
     // Rapid-fire transactions to test concurrency and rate limiting
-    const promises = [];
+    const promises: Promise<any>[] = [];
     for (let i = 0; i < 5; i++) {
       promises.push(executeBasicTransfer(wallet1, wallet2));
     }
@@ -339,7 +343,8 @@ describe('Massive Scale Load Testing', () => {
 
   async function performHealthCheck(phase: LoadTestPhase, batchIndex: number) {
     // Check system health metrics
-    const healthResult = simnet.callReadOnlyFn('protocol-invariant-monitor', 'run-health-check', [], accounts.get('deployer')!);
+    const sdk: any = (globalThis as any).simnet;
+    const healthResult = sdk.callPublicFn('protocol-invariant-monitor', 'run-health-check', [], accounts.get('deployer')!);
     
     if (healthResult.result && typeof healthResult.result === 'object') {
       // Health check passed

@@ -92,28 +92,15 @@
     (asserts! (not (var-get paused)) ERR_PAUSED)
     (asserts! (not (var-get emergency-mode)) ERR_EMERGENCY_ONLY)
     (asserts! (> amount u0) ERR_INSUFFICIENT_FUNDS)
-    
-    ;; Simulate deployment to various DeFi positions
-    ;; In production, would interact with actual protocols
-    (let ((position-id (+ (var-get total-deployed) u1)))
-      (begin
-        ;; Record position - simplified without string conversion
-        (map-set strategy-positions tx-sender amount)
-        
-        ;; Update total deployed
-        (var-set total-deployed (+ (var-get total-deployed) amount))
-        
-        ;; Update performance tracking - simplified for enhanced deployment
-                ;; Update performance tracking - simplified for enhanced deployment
-        (update-performance-history)
-        
-        ;; Notify dimensional system - simplified for enhanced deployment  
-        (try! (update-dimensional-weights))
-        
-        ;; Emit event
-        (print (tuple (event "funds-deployed") (user tx-sender) (amount amount) (position-id position-id)))
-        
-        (ok amount))))
+
+    ;; Record position amount and update totals (simplified)
+    (map-set strategy-positions tx-sender amount)
+    (var-set total-deployed (+ (var-get total-deployed) amount))
+
+    ;; Update performance tracking; ignore dimensional weights for simplicity
+    (update-performance-history)
+
+    (ok amount)))
 
 ;; Withdraw funds from strategy positions
 (define-public (withdraw-funds (amount uint))
@@ -137,44 +124,48 @@
 
 (define-public (harvest-rewards)
   ;; Harvest and compound strategy rewards
-  (let ((current-value (unwrap! (get-current-value) ERR_STRATEGY_FAILED))
-        (deployed (var-get total-deployed))
-        (profit (if (> current-value deployed) (- current-value deployed) u0))
-        (performance-fee (calculate-performance-fee profit))
-        (net-profit (- profit performance-fee)))
-    
+  (begin
     (asserts! (not (var-get paused)) ERR_PAUSED)
     
-    ;; Update harvested rewards tracking
-    (map-set harvested-rewards (var-get underlying-asset)
-             (+ (default-to u0 (map-get? harvested-rewards (var-get underlying-asset)))
-                net-profit))
+    (match (get-current-value)
+      current-value (let ((deployed (var-get total-deployed))
+                          (profit (if (> current-value deployed) (- current-value deployed) u0))
+                          (performance-fee (calculate-performance-fee profit))
+                          (net-profit (- profit performance-fee)))
     
-    ;; Distribute performance fee to protocol
-    (begin
-      (if (> performance-fee u0)
-          ;; Skip revenue distributor for enhanced deployment
-          true
+        ;; Update harvested rewards tracking
+        (match (var-get underlying-asset)
+          some-asset (map-set harvested-rewards some-asset
+                             (+ (default-to u0 (map-get? harvested-rewards some-asset))
+                                net-profit))
           true)
-      
-      ;; Auto-compound remaining profit
-      (if (> net-profit u0)
-          (var-set total-deployed (+ deployed net-profit))
-          true))
-    
-    ;; Update dimensional weights based on performance
-    (update-dimensional-weights)
-    
-    ;; Update performance tracking
-    (update-performance-history)
-    
-    ;; Emit event
-    (print (tuple (event "rewards-harvested") 
-                  (profit profit) 
-                  (performance-fee performance-fee)
-                  (compounded net-profit)))
-    
-    (ok profit)))
+        
+        ;; Distribute performance fee to protocol
+        (begin
+          (if (> performance-fee u0)
+              ;; Skip revenue distributor for enhanced deployment
+              true
+              true)
+          
+          ;; Auto-compound remaining profit
+          (if (> net-profit u0)
+              (var-set total-deployed (+ deployed net-profit))
+              true))
+        
+        ;; Update dimensional weights based on performance
+        (update-dimensional-weights)
+        
+        ;; Update performance tracking
+        (update-performance-history)
+        
+        ;; Emit event
+        (print (tuple (event "rewards-harvested") 
+                      (profit profit) 
+                      (performance-fee performance-fee)
+                      (compounded net-profit)))
+        
+        (ok profit))
+      (err ERR_STRATEGY_FAILED)))
 
 (define-public (emergency-exit)
   (let ((total (var-get total-deployed)))

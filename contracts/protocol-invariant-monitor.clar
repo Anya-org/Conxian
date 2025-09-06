@@ -255,7 +255,7 @@
       ;; Unpause critical contracts
       (if (and (var-get system-integration-enabled) (is-some (var-get staking-contract-ref)))
         (match (var-get staking-contract-ref)
-          staking-ref
+          staking-contract
             (ok true) ;; Simplified for enhanced deployment - assume unpause successful
           (ok true))
         (ok true)))))
@@ -324,12 +324,12 @@
 ;; Take monitoring snapshot
 (define-private (take-monitoring-snapshot)
   (let ((staking-info (match (var-get staking-contract-ref)
-                        staking-ref 
+                        staking-contract-addr 
                         ;; Simplified for enhanced deployment - avoid undeclared trait calls
                         { total-staked-cxd: u0, total-supply: u0, total-revenue-distributed: u0, current-epoch: u0 }
                         { total-staked-cxd: u0, total-supply: u0, total-revenue-distributed: u0, current-epoch: u0 }))
         (revenue-stats (match (var-get revenue-distributor-ref)
-                        revenue-ref 
+                        revenue-contract-addr 
                         ;; Simplified for enhanced deployment - avoid undeclared trait calls
                         { total-collected: u0, total-distributed: u0, current-epoch: u0, pending-distribution: u0, treasury-address: tx-sender, reserve-address: tx-sender, staking-contract-ref: none }
                         { total-collected: u0, total-distributed: u0, current-epoch: u0, pending-distribution: u0, treasury-address: tx-sender, reserve-address: tx-sender, staking-contract-ref: none })))
@@ -356,7 +356,7 @@
     ;; Activate kill switches across all contracts (using safe contract calls)
     ;; Simplified for enhanced deployment - avoid undeclared trait calls
     (unwrap! (match (var-get staking-contract-ref)
-               staking-ref (ok true) ;; Would activate kill switch on staking contract
+               staking-addr (ok true) ;; Would activate kill switch on staking contract
                (ok true))
              (err ERR_INVARIANT_VIOLATION))
     (try! (trigger-emergency-pause u9999)) ;; Kill switch reason code

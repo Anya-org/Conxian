@@ -16,7 +16,7 @@ export default defineConfig({
     include: [
       'stacks/tests/**/*.test.ts',
       'stacks/sdk-tests/**/*.spec.ts',
-      'tests/load-testing/**/*.ts'
+      'tests/load-testing/**/*.test.ts'
     ],
     exclude: [
       'stacks/tests/helpers/**',
@@ -29,14 +29,15 @@ export default defineConfig({
     testTimeout: 60000, // Extended timeout for load tests
     hookTimeout: 30000,
     
-    // Parallel execution for performance
-    threads: true,
-    maxThreads: 4,
-    minThreads: 1,
+    // Parallel execution defaults used (remove explicit thread options for compatibility)
     
     // Global setup and teardown
     globalSetup: ['./stacks/tests/helpers/global-setup.ts'],
-    setupFiles: ['./stacks/tests/helpers/test-setup.ts'],
+    setupFiles: [
+      './stacks/global-vitest.setup.ts',
+      './node_modules/@hirosystems/clarinet-sdk/vitest-helpers/src/vitest.setup.ts',
+      './stacks/tests/helpers/test-setup.ts'
+    ],
     
     // Coverage configuration
     coverage: {
@@ -65,14 +66,10 @@ export default defineConfig({
     },
     
     // Enhanced reporting
-    reporter: [
+    reporters: [
       'verbose',
       'json'
     ],
-    outputFile: {
-      json: './test-results/results.json',
-      html: './test-results/report.html'
-    },
     
     // Performance benchmarking
     benchmark: {

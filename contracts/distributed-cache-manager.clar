@@ -203,29 +203,31 @@
              }))
     
     ;; Update cache entry access count based on level
-    (match level
-      CACHE_LEVEL_L1 (match (map-get? l1-cache key)
-                       entry (map-set l1-cache key
-                               (merge entry { 
-                                 access-count: (+ (get access-count entry) u1),
-                                 last-accessed: block-height
-                               }))
-                       true)
-      CACHE_LEVEL_L2 (match (map-get? l2-cache key)
-                       entry (map-set l2-cache key
-                               (merge entry { 
-                                 access-count: (+ (get access-count entry) u1),
-                                 last-accessed: block-height
-                               }))
-                       true)
-      CACHE_LEVEL_L3 (match (map-get? l3-cache key)
-                       entry (map-set l3-cache key
-                               (merge entry { 
-                                 access-count: (+ (get access-count entry) u1),
-                                 last-accessed: block-height
-                               }))
-                       true)
-      true)
+    (if (is-eq level CACHE_LEVEL_L1)
+        (match (map-get? l1-cache key)
+          entry (map-set l1-cache key
+                  (merge entry { 
+                    access-count: (+ (get access-count entry) u1),
+                    last-accessed: block-height
+                  }))
+          true)
+        (if (is-eq level CACHE_LEVEL_L2)
+            (match (map-get? l2-cache key)
+              entry (map-set l2-cache key
+                      (merge entry { 
+                        access-count: (+ (get access-count entry) u1),
+                        last-accessed: block-height
+                      }))
+              true)
+            (if (is-eq level CACHE_LEVEL_L3)
+                (match (map-get? l3-cache key)
+                  entry (map-set l3-cache key
+                          (merge entry { 
+                            access-count: (+ (get access-count entry) u1),
+                            last-accessed: block-height
+                          }))
+                  true)
+                true)))
     true))
 
 ;; Promote cache entry between levels
@@ -233,32 +235,36 @@
   (if (and (is-eq from-level CACHE_LEVEL_L2) (is-eq to-level CACHE_LEVEL_L1))
       ;; L2 to L1 promotion
       (match (map-get? l2-cache key)
-        l2-entry (let ((promoted-entry {
-                         value: (unwrap! (as-max-len? (get value l2-entry) u256) (err u9999)),
-                         created-at: (get created-at l2-entry),
-                         ttl: (get ttl l2-entry),
-                         access-count: (get access-count l2-entry),
-                         last-accessed: block-height
-                       }))
-                   (map-set l1-cache key promoted-entry)
-                   (map-delete l2-cache key)
-                   (update-promotion-stats key)
+        l2-entry (match (as-max-len? (get value l2-entry) u256)
+                   truncated-value (let ((promoted-entry {
+                                           value: truncated-value,
+                                           created-at: (get created-at l2-entry),
+                                           ttl: (get ttl l2-entry),
+                                           access-count: (get access-count l2-entry),
+                                           last-accessed: block-height
+                                         }))
+                                     (map-set l1-cache key promoted-entry)
+                                     (map-delete l2-cache key)
+                                     (update-promotion-stats key)
+                                     true)
                    true)
         true)
       
       ;; L3 to L2 promotion
       (if (and (is-eq from-level CACHE_LEVEL_L3) (is-eq to-level CACHE_LEVEL_L2))
           (match (map-get? l3-cache key)
-            l3-entry (let ((promoted-entry {
-                             value: (unwrap! (as-max-len? (get value l3-entry) u512) (err u9999)),
-                             created-at: (get created-at l3-entry),
-                             ttl: (get ttl l3-entry),
-                             access-count: (get access-count l3-entry),
-                             last-accessed: block-height
-                           }))
-                       (map-set l2-cache key promoted-entry)
-                       (map-delete l3-cache key)
-                       (update-promotion-stats key)
+            l3-entry (match (as-max-len? (get value l3-entry) u512)
+                       truncated-value (let ((promoted-entry {
+                                               value: truncated-value,
+                                               created-at: (get created-at l3-entry),
+                                               ttl: (get ttl l3-entry),
+                                               access-count: (get access-count l3-entry),
+                                               last-accessed: block-height
+                                             }))
+                                         (map-set l2-cache key promoted-entry)
+                                         (map-delete l3-cache key)
+                                         (update-promotion-stats key)
+                                         true)
                        true)
             true)
           true)))

@@ -162,8 +162,8 @@
             (var-set total-metrics (+ (var-get total-metrics) u1))
           )
         )
-        ;; Check for alert conditions
-        (try! (check-alert-conditions metric-name value))
+        ;; Check for alert conditions (explicit unwrap with typed error)
+        (unwrap! (check-alert-conditions metric-name value) (err u9900))
         (ok true)
       )
       (ok false)
