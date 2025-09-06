@@ -16,7 +16,7 @@
   ;; Skip factory call for enhanced deployment - return none
   none)
 
-(define-read-only (get-amount-out-direct (pool <pool>) (amount-in uint) (x-to-y bool))
+(define-read-only (get-amount-out-direct (pool-ctr <pool>) (amount-in uint) (x-to-y bool))
   ;; Get expected output amount for a trade - simplified for enhanced deployment
   (ok (/ (* amount-in u997) u1000))) ;; Simplified calculation with 0.3% fee assumption
 
@@ -32,77 +32,77 @@
       ERR_INVALID_PATH))
 
 ;; Core router functions
-(define-public (add-liquidity-direct (pool <pool>) (dx uint) (dy uint) (min-shares uint) (deadline uint))
+(define-public (add-liquidity-direct (pool-ctr <pool>) (dx uint) (dy uint) (min-shares uint) (deadline uint))
   (begin
     (asserts! (<= block-height deadline) ERR_DEADLINE_PASSED)
     (asserts! (and (> dx u0) (> dy u0)) ERR_INVALID_AMOUNT)
     
     ;; Get pool tokens for transfers
-    (let ((token-a (unwrap! (contract-call? pool get-token-a) ERR_INVALID_POOL))
-          (token-b (unwrap! (contract-call? pool get-token-b) ERR_INVALID_POOL)))
+    (let ((token-a (unwrap! (contract-call? pool-ctr get-token-a) ERR_INVALID_POOL))
+          (token-b (unwrap! (contract-call? pool-ctr get-token-b) ERR_INVALID_POOL)))
       
       ;; Transfer tokens from user to pool
-      (try! (contract-call? token-a transfer dx tx-sender (contract-of pool) none))
-      (try! (contract-call? token-b transfer dy tx-sender (contract-of pool) none))
+      (try! (contract-call? token-a transfer dx tx-sender (contract-of pool-ctr) none))
+      (try! (contract-call? token-b transfer dy tx-sender (contract-of pool-ctr) none))
       
       ;; Add liquidity to pool
-      (contract-call? pool add-liquidity dx dy min-shares))))
+      (contract-call? pool-ctr add-liquidity dx dy min-shares))))
 
-(define-public (remove-liquidity-direct (pool <pool>) (shares uint) (min-dx uint) (min-dy uint) (deadline uint))
+(define-public (remove-liquidity-direct (pool-ctr <pool>) (shares uint) (min-dx uint) (min-dy uint) (deadline uint))
   (begin
     (asserts! (<= block-height deadline) ERR_DEADLINE_PASSED)
     (asserts! (> shares u0) ERR_INVALID_AMOUNT)
     
     ;; Remove liquidity from pool
-    (let ((result (try! (contract-call? pool remove-liquidity shares min-dx min-dy))))
+    (let ((result (try! (contract-call? pool-ctr remove-liquidity shares min-dx min-dy))))
       
       ;; Get pool tokens for transfers
-      (let ((token-a (unwrap! (contract-call? pool get-token-a) ERR_INVALID_POOL))
-            (token-b (unwrap! (contract-call? pool get-token-b) ERR_INVALID_POOL))
+      (let ((token-a (unwrap! (contract-call? pool-ctr get-token-a) ERR_INVALID_POOL))
+            (token-b (unwrap! (contract-call? pool-ctr get-token-b) ERR_INVALID_POOL))
             (amount-a (get amount-a result))
             (amount-b (get amount-b result)))
         
         ;; Transfer tokens from pool to user
         (try! (as-contract (contract-call? token-a transfer amount-a 
-                                         (contract-of pool) tx-sender none)))
+                                         (contract-of pool-ctr) tx-sender none)))
         (try! (as-contract (contract-call? token-b transfer amount-b 
-                                         (contract-of pool) tx-sender none)))
+                                         (contract-of pool-ctr) tx-sender none)))
         
         (ok result)))))
 
-(define-public (swap-exact-in-direct (pool <pool>) (amount-in uint) (min-out uint) (x-to-y bool) (deadline uint))
+(define-public (swap-exact-in-direct (pool-ctr <pool>) (amount-in uint) (min-out uint) (x-to-y bool) (deadline uint))
   (begin
     (asserts! (<= block-height deadline) ERR_DEADLINE_PASSED)
     (asserts! (> amount-in u0) ERR_INVALID_AMOUNT)
     
     ;; Get pool tokens
-    (let ((token-a (unwrap! (contract-call? pool get-token-a) ERR_INVALID_POOL))
-          (token-b (unwrap! (contract-call? pool get-token-b) ERR_INVALID_POOL))
+    (let ((token-a (unwrap! (contract-call? pool-ctr get-token-a) ERR_INVALID_POOL))
+          (token-b (unwrap! (contract-call? pool-ctr get-token-b) ERR_INVALID_POOL))
           (token-in (if x-to-y token-a token-b))
           (token-out (if x-to-y token-b token-a)))
       
       ;; Transfer input token from user to pool
-      (try! (contract-call? token-in transfer amount-in tx-sender (contract-of pool) none))
+      (try! (contract-call? token-in transfer amount-in tx-sender (contract-of pool-ctr) none))
       
       ;; Execute swap
-      (let ((swap-result (try! (contract-call? pool swap-exact-in amount-in min-out x-to-y deadline))))
+      (let ((swap-result (try! (contract-call? pool-ctr swap-exact-in amount-in min-out x-to-y deadline))))
         
         ;; Transfer output token from pool to user
         (try! (as-contract (contract-call? token-out transfer 
                                          (get amount-out swap-result)
-                                         (contract-of pool) tx-sender none)))
+                                         (contract-of pool-ctr) tx-sender none)))
         
         (ok swap-result)))))
 
-(define-public (swap-exact-out-direct (pool <pool>) (max-in uint) (amount-out uint) (x-to-y bool) (deadline uint))
+(define-public (swap-exact-out-direct (pool-ctr <pool>) (max-in uint) (amount-out uint) (x-to-y bool) (deadline uint))
   (begin
     (asserts! (<= block-height deadline) ERR_DEADLINE_PASSED)
     (asserts! (> amount-out u0) ERR_INVALID_AMOUNT)
     
     ;; For now, calculate required input and use swap-exact-in
     ;; In production, would need actual swap-exact-out implementation
-    (let ((reserves (unwrap! (contract-call? pool get-reserves) ERR_INVALID_POOL))
-          (fee-info (unwrap! (contract-call? pool get-fee-info) ERR_INVALID_POOL))
+    (let ((reserves (unwrap! (contract-call? pool-ctr get-reserves) ERR_INVALID_POOL))
+          (fee-info (unwrap! (contract-call? pool-ctr get-fee-info) ERR_INVALID_POOL))
           (reserve-in (if x-to-y (get reserve-a reserves) (get reserve-b reserves)))
           (reserve-out (if x-to-y (get reserve-b reserves) (get reserve-a reserves)))
           (lp-fee-bps (get lp-fee-bps fee-info))
@@ -113,7 +113,7 @@
       (asserts! (<= required-input-with-fee max-in) ERR_INSUFFICIENT_OUTPUT)
       
       ;; Use swap-exact-in with calculated input
-      (swap-exact-in-direct pool required-input-with-fee amount-out x-to-y deadline))))
+      (swap-exact-in-direct pool-ctr required-input-with-fee amount-out x-to-y deadline))))
 
 ;; Multi-hop trading (basic implementation)
 (define-public (swap-exact-tokens-for-tokens (amount-in uint) (min-amount-out uint) (path (list 3 principal)) (deadline uint))

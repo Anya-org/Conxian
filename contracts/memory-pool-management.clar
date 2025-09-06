@@ -115,7 +115,7 @@
     (try! (only-owner-guard))
     (asserts! (and (> initial-size u0) (>= max-size initial-size) (<= strategy STRATEGY_WORST_FIT)) ERR_INVALID_PARAMS)
     (let (
-      (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+      (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
     )
       (map-set memory-pools
         { pool-name: pool-name }
@@ -166,7 +166,7 @@
 (define-public (allocate-memory (allocation-id (string-ascii 64)) (pool-name (string-ascii 64)) (size uint))
   (let (
     (pool (unwrap! (map-get? memory-pools { pool-name: pool-name }) ERR_POOL_NOT_FOUND))
-    (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+    (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
     (new-used-size (+ (get used-size pool) size))
   )
     (asserts! (> size u0) ERR_INVALID_PARAMS)
@@ -231,7 +231,7 @@
 (define-public (update-allocation-access (allocation-id (string-ascii 64)))
   (let (
     (allocation (unwrap! (map-get? memory-allocations { allocation-id: allocation-id }) ERR_POOL_NOT_FOUND))
-    (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+    (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
   )
     (map-set memory-allocations
       { allocation-id: allocation-id }
@@ -247,7 +247,7 @@
   (begin
     (try! (only-owner-guard))
     (let (
-      (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+      (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
       (gc-run-id (var-get total-gc-runs))
     )
       ;; Record GC start

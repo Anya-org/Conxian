@@ -132,7 +132,7 @@
 
 (define-public (record-transaction-pattern (time-window uint) (pattern-id uint) (tps uint) (peak-tps uint) (tx-count uint) (gas-usage uint) (error-rate uint))
   (let (
-    (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+    (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
   )
     (if (var-get prediction-enabled)
       (begin
@@ -156,7 +156,7 @@
 
 (define-public (update-resource-metrics (resource-type (string-ascii 32)) (current-usage uint) (predicted-usage uint) (capacity-limit uint))
   (let (
-    (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+    (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
     (time-window (/ current-time u300)) ;; 5-minute windows
     (utilization (if (> capacity-limit u0)
                     (/ (* current-usage u100) capacity-limit)
@@ -182,7 +182,7 @@
 
 (define-public (generate-scaling-prediction (prediction-id (string-ascii 64)) (horizon uint))
   (let (
-    (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+    (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
     ;; Simplified prediction logic - in reality this would use ML models
     (predicted-tps (+ u1000 (* (/ horizon u300) u100))) ;; Simple linear prediction
     (confidence (if (>= horizon HORIZON_LONG) CONFIDENCE_HIGH
@@ -256,7 +256,7 @@
     (let (
       (prediction (unwrap! (map-get? scaling-predictions { prediction-id: prediction-id }) ERR_PREDICTION_NOT_FOUND))
       (action-id (var-get total-scaling-actions))
-      (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+      (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
     )
       (asserts! (>= (get confidence-level prediction) (var-get min-confidence-threshold)) ERR_INSUFFICIENT_DATA)
       
@@ -299,7 +299,7 @@
   (begin
     (try! (only-owner-guard))
     (let (
-      (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+      (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
     )
       (map-set model-parameters
         { model-name: model-name }
@@ -387,7 +387,7 @@
 
 (define-read-only (is-scaling-recommended (resource-type (string-ascii 32)))
   (let (
-    (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+    (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
     (time-window (/ current-time u300))
     (metrics (map-get? resource-metrics { resource-type: resource-type, time-window: time-window }))
   )

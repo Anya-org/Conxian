@@ -87,9 +87,9 @@
 ;; Deploy funds to yield-generating positions
 (define-public (deploy-funds (amount uint))
   (begin
-    (asserts! (not (var-get paused)) (err ERR_PAUSED))
-    (asserts! (not (var-get emergency-mode)) (err ERR_EMERGENCY_ONLY))
-    (asserts! (> amount u0) (err ERR_INSUFFICIENT_FUNDS))
+    (asserts! (not (var-get paused)) ERR_PAUSED)
+    (asserts! (not (var-get emergency-mode)) ERR_EMERGENCY_ONLY)
+    (asserts! (> amount u0) ERR_INSUFFICIENT_FUNDS)
     
     ;; Simulate deployment to various DeFi positions
     ;; In production, would interact with actual protocols
@@ -109,9 +109,9 @@
         (try! (update-dimensional-weights))
         
         ;; Emit event
-        (print { event: "funds-deployed", user: tx-sender, amount: amount, position-id: position-id })
+        (print (tuple (event "funds-deployed") (user tx-sender) (amount amount) (position-id position-id)))
         
-        (ok { position-id: position-id, amount: amount })))))
+        (ok (tuple (position-id position-id) (amount amount))))))
 
 ;; Withdraw funds from strategy positions
 (define-public (withdraw-funds (amount uint))
@@ -275,4 +275,4 @@
     (ok true)))
 
 ;; Initialize strategy
-(map-set dimensional-weights "initial-weight" PRECISION)
+;; Note: Removed invalid top-level map-set initializer. The map will be populated during runtime calls.

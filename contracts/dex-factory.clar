@@ -135,7 +135,7 @@
            (ok (tuple (pool pool) 
                       (liquidity (get liquidity stats))
                       (estimated-slippage u100)))) ;; Simplified calculation
-    (err ERR_POOL_NOT_FOUND)))
+    ERR_POOL_NOT_FOUND))
 
 ;; Update pool statistics (called by pools)
 (define-public (update-pool-stats (pool principal) (volume uint) (fees uint) (liquidity uint))
@@ -185,14 +185,14 @@
 (define-public (set-default-fee (new-fee-bps uint))
   (begin
     (try! (only-owner-guard))
-    (asserts! (<= new-fee-bps MAX_FEE_BPS) (err ERR_INVALID_FEE))
+    (asserts! (<= new-fee-bps MAX_FEE_BPS) ERR_INVALID_FEE)
     (var-set default-fee-bps new-fee-bps)
     (ok true)))
 
 (define-public (set-protocol-fee (new-fee-bps uint))
   (begin
     (try! (only-owner-guard))
-    (asserts! (<= new-fee-bps u100) (err ERR_INVALID_FEE)) ;; Max 1%
+    (asserts! (<= new-fee-bps u100) ERR_INVALID_FEE) ;; Max 1%
     (var-set protocol-fee-bps new-fee-bps)
     (ok true)))
 

@@ -130,7 +130,7 @@
 
 (define-public (record-metric (metric-name (string-ascii 64)) (value uint) (metric-type uint))
   (let (
-    (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+    (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
     (window-id (/ current-time u300)) ;; 5-minute windows
     (existing-metric (map-get? system-metrics { metric-name: metric-name, timestamp-window: window-id }))
   )
@@ -180,7 +180,7 @@
     (try! (only-owner-guard))
     (asserts! (> refresh-interval u10) ERR_INVALID_PARAMS)
     (let (
-      (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+      (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
     )
       (map-set dashboard-configs
         { dashboard-name: dashboard-name }
@@ -244,7 +244,7 @@
 
 (define-private (check-alert-conditions (metric-name (string-ascii 64)) (current-value uint))
   (let (
-    (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+    (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
   )
     ;; Note: In a real implementation, we'd iterate through all alert rules
     ;; For now, this serves as a template for alert checking logic
@@ -256,7 +256,7 @@
   (begin
     (try! (only-owner-guard))
     (let (
-      (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+      (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
     )
       (map-set active-alerts
         { alert-id: alert-id }
@@ -359,7 +359,7 @@
 
 (define-read-only (get-monitoring-stats)
   (let (
-    (current-time (unwrap-panic (get-stacks-block-info? time (- stacks-block-height u1))))
+    (current-time (unwrap-panic (get-block-info? time (- block-height u1))))
     (uptime (if (> (var-get uptime-start) u0)
               (- current-time (var-get uptime-start))
               u0))
