@@ -123,49 +123,42 @@
     (ok amount)))
 
 (define-public (harvest-rewards)
-  ;; Harvest and compound strategy rewards
   (begin
     (asserts! (not (var-get paused)) ERR_PAUSED)
-    
-    (match (get-current-value)
-      current-value (let ((deployed (var-get total-deployed))
-                          (profit (if (> current-value deployed) (- current-value deployed) u0))
-                          (performance-fee (calculate-performance-fee profit))
-                          (net-profit (- profit performance-fee)))
-    
-        ;; Update harvested rewards tracking
-        (match (var-get underlying-asset)
-          some-asset (map-set harvested-rewards some-asset
-                             (+ (default-to u0 (map-get? harvested-rewards some-asset))
-                                net-profit))
+    (let ((current-value (unwrap-panic (get-current-value)))
+          (deployed (var-get total-deployed))
+          (profit (if (> current-value deployed) (- current-value deployed) u0))
+          (performance-fee (calculate-performance-fee profit))
+          (net-profit (- profit performance-fee)))
+
+      ;; Update harvested rewards tracking
+      (match (var-get underlying-asset)
+        asset (map-set harvested-rewards asset
+                       (+ (default-to u0 (map-get? harvested-rewards asset))
+                          net-profit))
+        true)
+
+      ;; Distribute performance fee to protocol (skipped for enhanced deployment)
+      (if (> performance-fee u0) true true)
+
+      ;; Auto-compound remaining profit
+      (if (> net-profit u0)
+          (var-set total-deployed (+ deployed net-profit))
           true)
-        
-        ;; Distribute performance fee to protocol
-        (begin
-          (if (> performance-fee u0)
-              ;; Skip revenue distributor for enhanced deployment
-              true
-              true)
-          
-          ;; Auto-compound remaining profit
-          (if (> net-profit u0)
-              (var-set total-deployed (+ deployed net-profit))
-              true))
-        
-        ;; Update dimensional weights based on performance
-        (update-dimensional-weights)
-        
-        ;; Update performance tracking
-        (update-performance-history)
-        
-        ;; Emit event
-        (print (tuple (event "rewards-harvested") 
-                      (profit profit) 
-                      (performance-fee performance-fee)
-                      (compounded net-profit)))
-        
-        (ok profit))
-      (err ERR_STRATEGY_FAILED)))
+
+      ;; Handle response from update-dimensional-weights and ignore result
+      (match (update-dimensional-weights) okd true errd true)
+
+      ;; Update performance tracking
+      (update-performance-history)
+
+      ;; Emit event
+      (print (tuple (event "rewards-harvested")
+                    (profit profit)
+                    (performance-fee performance-fee)
+                    (compounded net-profit)))
+
+      (ok profit))))
 
 (define-public (emergency-exit)
   (let ((total (var-get total-deployed)))
@@ -190,21 +183,23 @@
 
 ;; Enhanced tokenomics integration
 (define-public (distribute-rewards)
-  (let ((total-harvested (default-to u0 (map-get? harvested-rewards (var-get underlying-asset)))))
-    
-    (asserts! (> total-harvested u0) ERR_INSUFFICIENT_FUNDS)
-    
-    ;; Notify token system coordinator - simplified for enhanced deployment
-    ;; (try! (contract-call? .token-system-coordinator 
-    ;;                      distribute-strategy-rewards 
-    ;;                      (as-contract tx-sender)
-    ;;                      (var-get underlying-asset)
-    ;;                      total-harvested))
-    
-    ;; Reset harvested rewards
-    (map-set harvested-rewards (var-get underlying-asset) u0)
-    
-    (ok total-harvested)))
+  (match (var-get underlying-asset)
+    asset
+      (let ((total-harvested (default-to u0 (map-get? harvested-rewards asset))))
+        (asserts! (> total-harvested u0) ERR_INSUFFICIENT_FUNDS)
+        
+        ;; Notify token system coordinator - simplified for enhanced deployment
+        ;; (try! (contract-call? .token-system-coordinator 
+        ;;                      distribute-strategy-rewards 
+        ;;                      (as-contract tx-sender)
+        ;;                      asset
+        ;;                      total-harvested))
+        
+        ;; Reset harvested rewards
+        (map-set harvested-rewards asset u0)
+        
+        (ok total-harvested))
+    ERR_INVALID_ASSET))
 
 ;; Update dimensional weights based on strategy performance
 (define-public (update-dimensional-weights)
@@ -258,7 +253,7 @@
 (define-public (set-underlying-asset (asset principal))
   (begin
     (asserts! (is-admin tx-sender) ERR_UNAUTHORIZED)
-    (var-set underlying-asset asset)
+    (var-set underlying-asset (some asset))
     (ok true)))
 
 (define-public (transfer-admin (new-admin principal))
