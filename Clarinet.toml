@@ -51,6 +51,40 @@ path = "contracts/traits/sip-009-trait.clar"
 clarity_version = 2
 epoch = "2.4"
 
+# ===========================================
+# PERFORMANCE ENHANCEMENT CONTRACTS
+# ===========================================
+
+[contracts.transaction-batch-processor]
+path = "contracts/transaction-batch-processor.clar"
+clarity_version = 2
+epoch = "2.4"
+
+[contracts.distributed-cache-manager]
+path = "contracts/distributed-cache-manager.clar"
+clarity_version = 2
+epoch = 2.4
+
+[contracts.automated-circuit-breaker]
+path = "contracts/automated-circuit-breaker.clar" 
+clarity_version = 2
+epoch = 2.4
+
+[contracts.real-time-monitoring-dashboard]
+path = "contracts/real-time-monitoring-dashboard.clar"
+clarity_version = 2
+epoch = 2.4
+
+[contracts.memory-pool-management]
+path = "contracts/memory-pool-management.clar"
+clarity_version = 2
+epoch = 2.4
+
+[contracts.predictive-scaling-system]
+path = "contracts/predictive-scaling-system.clar"
+clarity_version = 2
+epoch = 2.4
+
 [contracts.monitor-trait]
 path = "contracts/traits/monitor-trait.clar"
 clarity_version = 2
