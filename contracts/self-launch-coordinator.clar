@@ -104,6 +104,23 @@
   )
 )
 
+;; Allow founder to claim launch fund allocation (50% of contributions)
+(define-public (claim-launch-funds)
+  (let ((available (var-get launch-fund-allocation)))
+    (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+    (asserts! (> available u0) ERR_INSUFFICIENT_BALANCE)
+    (try! (as-contract (stx-transfer? available tx-sender (var-get contract-owner))))
+    (var-set launch-fund-allocation u0)
+    (print {
+      event: "launch-funds-claimed",
+      amount: available,
+      recipient: (var-get contract-owner),
+      timestamp: block-height,
+    })
+    (ok available)
+  )
+)
+
 ;; Calculate funding curve price
 (define-read-only (get-funding-curve-price (funding-received uint))
   (let (

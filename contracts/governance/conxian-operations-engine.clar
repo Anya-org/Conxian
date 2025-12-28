@@ -224,10 +224,6 @@
 ;; These functions aggregate data from various system contracts
 ;; Uses static contract references for production reliability
 
-;; Get user's lending health factor from comprehensive lending system
-(define-public (get-user-lending-health (user principal))
-  (contract-call? .comprehensive-lending-system get-health-factor user)
-)
 
 ;; Get user's insurance coverage summary
 (define-public (get-user-insurance-dashboard (user principal))

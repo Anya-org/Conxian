@@ -57,7 +57,7 @@
     (asserts! (is-eq issuer-tier TIER_GOLD) ERR_ISSUER_NOT_GOLD)
 
     ;; Verify Signature
-    (let ((hash (sha256 (merge (to-le-bytes nonce) (merge (to-le-bytes issuer-tier) (principal-to-buff tx-sender))))))
+    (let ((hash (sha256 (merge (to-le-uint nonce) (merge (to-le-uint issuer-tier) (principal-to-buff tx-sender))))))
       (asserts! (is-none (map-get? used-nonces hash)) ERR_NONCE_REPLAY)
       (unwrap! (match (contract-call? .sip-018-signed-messages get-signer hash signature)
         (signer-pubkey
