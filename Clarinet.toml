@@ -547,12 +547,12 @@ depends_on = ["lending-manager-trait", "sip-standards"]
 [contracts.liquidation-manager]
 path = "contracts/lending/liquidation-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["comprehensive-lending-system"]
+depends_on = []
 
 [contracts.keeper-coordinator]
 path = "contracts/automation/keeper-coordinator.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["controller-traits", "security-monitoring", "automation-traits", "points-oracle", "gamification-manager", "self-launch-coordinator"]
+depends_on = ["controller-traits", "security-monitoring", "automation-traits"]
 
 [contracts.guardian-registry]
 path = "contracts/automation/guardian-registry.clar"
@@ -624,7 +624,6 @@ depends_on = [
     "mev-protection-nft",
     "insurance-protection-nft",
     "bridge-nft",
-    "comprehensive-lending-system",
     "token-system-coordinator",
     "circuit-breaker",
 ]
@@ -918,7 +917,7 @@ depends_on = ["cxlp-token", "cxvg-token", "points-oracle"]
 [contracts.points-oracle]
 path = "contracts/oracle/points-oracle.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["gamification-manager"]
+depends_on = []
 
 # Note: gamification-manager and points-oracle have a circular dependency
 # They are designed to be deployed together. Use stub implementations if needed.

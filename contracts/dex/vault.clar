@@ -170,17 +170,17 @@
       (total-shares (unwrap-panic (get-total-shares asset)))
     )
     (if (is-eq total-shares u0)
-      ;; First deposit: burn 1000 shares (dead shares) to prevent inflation attack
-      (if (> amount u1000)
-        (begin
-          ;; Mint 1000 dead shares to burn address
-          (map-set user-shares {
-            user: 'ST000000000000000000002AMW42H,
-            asset: asset
-          } u1000)
+      (begin
+        ;; Burn 1000 shares to dead address
+        (map-set user-shares {
+          user: 'ST000000000000000000002AMW42H,
+          asset: asset
+        } u1000)
+        (map-set vault-shares asset u1000)
+        (if (> amount u1000)
           (- amount u1000)
+          u0
         )
-        u0
       )
       (/ (* amount total-shares) total-balance)
     )
@@ -250,6 +250,10 @@
     (asserts!
       (or (is-eq vault-cap u0) (<= (+ current-balance net-amount) vault-cap))
       ERR_CAP_EXCEEDED
+    )
+    (if (is-eq current-shares u0)
+        (asserts! (> amount u1000) ERR_INVALID_AMOUNT)
+        true
     )
 
     ;; Transfer tokens from user to vault
