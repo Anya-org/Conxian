@@ -866,6 +866,28 @@ path = "contracts/automation/migration-adapter.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = ["native-stacking-operator", "block-automation-manager", "defi-traits"]
 
+# ---------- Viral Launch System ----------
+
+[contracts.conxian-access]
+path = "contracts/core/conxian-access.clar"
+depends_on = ["sip-standards"]
+
+[contracts.conxian-gatekeeper]
+path = "contracts/core/conxian-gatekeeper.clar"
+depends_on = ["conxian-access"]
+
+[contracts.rewards]
+path = "contracts/staking/rewards.clar"
+depends_on = ["conxian-access"]
+
+[contracts.conxian-exit-queue]
+path = "contracts/core/conxian-exit-queue.clar"
+depends_on = ["sip-standards"]
+
+[contracts.launch-limits]
+path = "contracts/config/launch-limits.clar"
+depends_on = ["conxian-access"]
+
 # ---------- Legacy Contracts (Being Phased Out) ----------
 # Legacy contracts are now properly integrated in their original sections
 
