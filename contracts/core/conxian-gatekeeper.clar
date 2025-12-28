@@ -8,25 +8,29 @@
 (define-constant ERR_UNAUTHORIZED (err u2001))
 (define-constant ERR_INVALID_SIGNATURE (err u2002))
 (define-constant ERR_USER_NOT_SILVER (err u2003))
+(define-constant ERR_NONCE_REPLAY (err u2004))
 
 ;; --- Data Variables ---
 (define-data-var contract-owner principal tx-sender)
 (define-data-var oracle-principal principal tx-sender)
 (define-data-var conxian-access-contract principal .conxian-access)
+(define-map used-oracle-nonces uint bool)
 
 ;; --- Public Functions ---
 
 ;; @desc Upgrade a user to Gold Tier via Oracle signature
-(define-public (upgrade-to-gold (signature (buff 65)))
+(define-public (upgrade-to-gold (signature (buff 65)) (nonce uint))
   (begin
     (let ((access-contract (var-get conxian-access-contract)))
       ;; Check that the user is currently Silver Tier
       (asserts! (is-eq (try! (contract-call? access-contract get-user-tier tx-sender)) u1) ERR_USER_NOT_SILVER)
 
       ;; Verify the signature is from the oracle
-      (let ((hash (sha256 tx-sender))
+      (let ((hash (sha256 (merge (to-le-bytes nonce) (principal-to-buff tx-sender))))
             (recovered-pubkey (unwrap! (secp256k1-recover hash signature) ERR_INVALID_SIGNATURE)))
+        (asserts! (is-none (map-get? used-oracle-nonces nonce)) ERR_NONCE_REPLAY)
         (asserts! (is-eq (principal-of recovered-pubkey) (var-get oracle-principal)) ERR_INVALID_SIGNATURE)
+        (map-set used-oracle-nonces nonce true)
       )
 
       ;; Upgrade the user's tier in the access contract

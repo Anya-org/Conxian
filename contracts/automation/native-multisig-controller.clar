@@ -14,7 +14,8 @@
 
 ;; Pending operations
 (define-map pending-operations
-    { operation-id: (buff 32) }
+  { operation-id: (buff 32) }
+  {
     operation-type: (string 32),
     target-contract: principal,
     function-name: (string 64),
@@ -22,7 +23,7 @@
     signatures: (list 10 principal),
     created-at: uint,
     expires-at: uint,
-    is-emergency: bool,
+    is-emergency: bool
   }
 )
 
@@ -241,22 +242,6 @@
   )
 )
 
-(define-map thresholds
-  { proposal-id: uint }
-  { amount: uint, required: uint }
-)
-
-;; Map: (controller-principal, signer) -> { weight: uint, signed: bool }
-(define-map signers
-  {
-    controller: principal,
-    signer: principal,
-  }
-  {
-    weight: uint,
-    signed: bool,
-  }
-)
 
 ;; Read-only views
 (define-read-only (get-pending-operation (operation-id (buff 32)))

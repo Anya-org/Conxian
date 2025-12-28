@@ -51,12 +51,13 @@
 )
 
 ;; @desc Claim an invite using an off-chain signature
-(define-public (claim-invite (signature (buff 65)) (issuer principal) (nonce uint))
+(define-public (claim-invite (signature (buff 65)) (issuer principal) (nonce uint) (issuer-tier uint))
   (begin
     (asserts! (is-none (map-get? member-badges tx-sender)) ERR_ALREADY_A_MEMBER)
+    (asserts! (is-eq issuer-tier TIER_GOLD) ERR_ISSUER_NOT_GOLD)
 
     ;; Verify Signature
-    (let ((hash (sha256 (merge (to-le-bytes nonce) (principal-to-buff tx-sender)))))
+    (let ((hash (sha256 (merge (to-le-bytes nonce) (merge (to-le-bytes issuer-tier) (principal-to-buff tx-sender))))))
       (asserts! (is-none (map-get? used-nonces hash)) ERR_NONCE_REPLAY)
       (unwrap! (match (contract-call? .sip-018-signed-messages get-signer hash signature)
         (signer-pubkey
