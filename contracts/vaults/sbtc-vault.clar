@@ -98,6 +98,7 @@
   )
   (begin
     (try! (check-not-paused))
+    (try! (contract-call? .launch-limits enforce-deposit-limits tx-sender (get-balance tx-sender) amount))
     (try! (contract-call? token-contract transfer amount tx-sender
       (as-contract tx-sender) none
     ))

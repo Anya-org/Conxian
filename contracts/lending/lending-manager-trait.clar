@@ -10,10 +10,10 @@
 (define-trait lending-manager-trait
   (
     ;; Public Functions
-    (supply (asset <ft>) (amount uint) (response bool uint))
-    (withdraw (asset <ft>) (amount uint) (response bool uint))
-    (borrow (asset <ft>) (amount uint) (response bool uint))
-    (repay (asset <ft>) (amount uint) (response bool uint))
+    (supply (asset <ft-trait>) (amount uint) (response bool uint))
+    (withdraw (asset <ft-trait>) (amount uint) (response bool uint))
+    (borrow (asset <ft-trait>) (amount uint) (response bool uint))
+    (repay (asset <ft-trait>) (amount uint) (response bool uint))
 
     ;; Read-Only Functions
     (get-user-borrow-balance (user principal) (asset principal) (response (optional uint) uint))

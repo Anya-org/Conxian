@@ -45,24 +45,20 @@
 
 (define-public (claim-completed-exit (ticket-id uint))
   (begin
-    (let ((ticket-owner (unwrap! (nft-get-owner? ExitTicket-NFT ticket-id) ERR_TICKET_NOT_FOUND)))
-      (asserts! (is-eq tx-sender ticket-owner) ERR_NOT_TICKET_OWNER)
+    (let ((exit-info (unwrap! (map-get? pending-exits ticket-id) ERR_TICKET_NOT_FOUND)))
+      ;; 1. Burn the NFT. This implicitly verifies that tx-sender is the owner.
+      (try! (nft-burn? ExitTicket-NFT ticket-id tx-sender))
 
-      (let ((exit-info (unwrap! (map-get? pending-exits ticket-id) ERR_TICKET_NOT_FOUND)))
-        ;; 1. Burn the NFT
-        (try! (nft-burn? ExitTicket-NFT ticket-id tx-sender))
+      ;; 2. Send BTC to the current owner of the NFT (which is tx-sender)
+      ;; This is a simulated transfer event
+      (print {
+        event: "btc-transfer",
+        to: tx-sender,
+        amount: (get amount exit-info),
+      })
 
-        ;; 2. Send BTC to the current owner of the NFT
-        ;; This is a simulated transfer event
-        (print {
-          event: "btc-transfer",
-          to: ticket-owner,
-          amount: (get amount exit-info),
-        })
-
-        (map-delete pending-exits ticket-id)
-        (ok true)
-      )
+      (map-delete pending-exits ticket-id)
+      (ok true)
     )
   )
 )
