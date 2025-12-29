@@ -2,7 +2,7 @@
 ;; Main compliance manager that orchestrates all compliance services
 ;; Integrates sanctions oracle, travel rule, and compliance API
 
-(use-trait compliance-trait .compliance.compliance-trait)
+(use-trait compliance-trait .compliance-trait.compliance-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u9500))
 (define-constant ERR_COMPLIANCE_FAILED (err u9501))
@@ -145,16 +145,13 @@
 )
 
 (define-private (check-travel-rule-requirement (from principal) (to principal) (amount uint))
-  (let ((travel-rule-threshold u1000000000)  ;; 1000 USD equivalent
-        (sender-status (unwrap! (map-get? compliance-status {user: from}) false))
-        (recipient-status (unwrap! (map-get? compliance-status {user: to}) false)))
-    
+  (let ((travel-rule-threshold u1000000000))
     (if (>= amount travel-rule-threshold)
       (begin
         ;; High-value transfer requires Travel Rule
         (let ((travel-service (var-get travel-rule-service)))
           (match (contract-call? travel-service initiate-travel-rule-transfer
-                  (as-max-len? (concat "transfer-" (tx-sender)) u64)
+                  "transfer"
                   to to amount tx-sender "originator-info" "beneficiary-info")
             success (ok {
               compliant: true,
@@ -179,10 +176,10 @@
 ;; @notice Generate compliance report for monitoring
 (define-read-only (generate-compliance-report)
   (ok {
-    report-id: (as-max-len? (concat "report-" (tx-sender)) u64),
+    report-id: "report",
     generated-at: block-height,
     compliance-enabled: (var-get compliance-enabled),
-    total-checks: u0,  // Would calculate from stored data
+    total-checks: u0,  ;; Would calculate from stored data
     sanctions-blocked: u0,
     travel-rule-transfers: u0,
     active-compliance-services: {

@@ -179,7 +179,7 @@
       (begin
         (map-set screening-results {address: address} {
           is-sanctioned: false,
-          last-screened: current_height,
+          last-screened: current-height,
           list-found: "",
           confidence: u10000,
         })

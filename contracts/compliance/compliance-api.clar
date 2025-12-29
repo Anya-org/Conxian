@@ -2,7 +2,7 @@
 ;; Compliance API endpoints for enterprise integration
 ;; Provides REST-like interfaces for compliance operations
 
-(use-trait compliance-trait .compliance.compliance-trait)
+(use-trait compliance-trait .compliance-trait.compliance-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u9500))
 (define-constant ERR_INVALID_INPUT (err u9501))
@@ -55,8 +55,8 @@
         (usage (map-get? api-usage {caller: tx-sender}))
         (blocks-in-hour u720))  ;; 1 hour at 5s blocks
     (if (some? usage)
-      (let ((last-call (get last-call-block (unwrap! usage false)))
-            (calls-count (get calls-this-hour (unwrap! usage false))))
+      (let ((last-call (get last-call-block (unwrap-panic usage)))
+            (calls-count (get calls-this-hour (unwrap-panic usage))))
         (if (>= (- current-height last-call) blocks-in-hour)
           ;; Reset counter for new hour
           (begin
@@ -135,8 +135,8 @@
   (begin
     (asserts! (is-api-enabled) ERR_UNAUTHORIZED)
     (asserts! (check-rate-limit) ERR_RATE_LIMITED)
-    
-    (let ((session-id (as-max-len? (concat "session-" (tx-sender)) u64)))
+
+    (let ((session-id client-id))
       (map-set api-sessions {session-id: session-id} {
         caller: tx-sender,
         created-at: block-height,
@@ -241,16 +241,13 @@
     
     (var-set total-api-calls (+ (var-get total-api-calls) u1))
     
-    (let ((oracle (var-get sanctions-oracle))
-          (results (list)))
-      ;; Process batch and collect results
-      (ok {
-        addresses: addresses,
-        results: results,  // Would populate with actual results
-        checked-at: block-height,
-        api-call-id: (var-get total-api-calls),
-      })
-    )
+    ;; Process batch and collect results
+    (ok {
+      addresses: addresses,
+      results: addresses,  ;; Would populate with actual results
+      checked-at: block-height,
+      api-call-id: (var-get total-api-calls),
+    })
   )
 )
 
@@ -260,7 +257,7 @@
   (ok {
     total-calls: (var-get total-api-calls),
     enabled: (var-get api-enabled),
-    active-sessions: u0,  // Would calculate from sessions
+    active-sessions: u0,  ;; Would calculate from sessions
   })
 )
 
@@ -272,9 +269,9 @@
   (let ((usage (map-get? api-usage {caller: caller})))
     (if (some? usage)
       (ok {
-        calls-this-hour: (get calls-this-hour (unwrap! usage false)),
-        last-call: (get last-call-block (unwrap! usage false)),
-        remaining: (- API_RATE_LIMIT (get calls-this-hour (unwrap! usage false))),
+        calls-this-hour: (get calls-this-hour (unwrap-panic usage)),
+        last-call: (get last-call-block (unwrap-panic usage)),
+        remaining: (- API_RATE_LIMIT (get calls-this-hour (unwrap-panic usage))),
       })
       (ok {
         calls-this-hour: u0,

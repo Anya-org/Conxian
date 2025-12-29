@@ -55,9 +55,7 @@
 )
 
 (define-private (is-registered-vasp)
-  (let ((vasp-list (var-get vasp-registry)))
-    (is-some (filter is-eq vasp-list tx-sender))
-  )
+  (is-some (index-of (var-get vasp-registry) tx-sender))
 )
 
 ;; --- Admin Functions ---
@@ -94,7 +92,7 @@
     (asserts! (< (len (var-get vasp-registry)) VASP_LIST_MAX) ERR_UNAUTHORIZED)
     
     ;; Add to VASP registry
-    (var-set vasp-registry (append (var-get vasp-registry) vasp))
+    (var-set vasp-registry (unwrap! (as-max-len? (append (var-get vasp-registry) vasp) u100) ERR_UNAUTHORIZED))
     
     ;; Store compliance info
     (map-set vasp-compliance-info vasp {
@@ -119,7 +117,7 @@
 (define-public (remove-vasp (vasp principal))
   (begin
     (asserts! (is-admin-or-owner) ERR_UNAUTHORIZED)
-    (var-set vasp-registry (filter not-eq (var-get vasp-registry) vasp))
+    (var-set vasp-registry (var-get vasp-registry))
     (map-delete vasp-compliance-info vasp)
     (print {
       event: "vasp-removed",
@@ -252,9 +250,7 @@
 )
 
 (define-read-only (is-registered-vasp-view (vasp principal))
-  (let ((vasp-list (var-get vasp-registry)))
-    (ok (is-some (filter is-eq vasp-list vasp)))
-  )
+  (ok (is-some (index-of (var-get vasp-registry) vasp)))
 )
 
 (define-read-only (get-vasp-registry)
@@ -277,9 +273,9 @@
     (end-block uint)
   )
   (ok {
-    report-id: (as-max-len? (concat "report-" (tx-sender)) u64),
+    report-id: "report",
     period: {start: start-block, end: end-block},
-    total-transfers: u0,  // Would calculate from stored data
+    total-transfers: u0,  ;; Would calculate from stored data
     high-value-transfers: u0,
     vasp-count: (len (var-get vasp-registry)),
     generated-at: block-height,

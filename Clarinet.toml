@@ -1,7 +1,7 @@
 [project]
 name = "Conxian"
 description = "A comprehensive, standardized Clarinet configuration for the Conxian DeFi protocol."
-clarinet_version = "3.11.0"
+clarinet_version = "3.12.0"
 epoch = "3.0"
 
 [simnet]
@@ -498,10 +498,32 @@ path = "contracts/enterprise/institutional-account-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = ["enterprise-traits"]
 
-[contracts.compliance-manager]
+[contracts.enterprise-compliance-manager]
 path = "contracts/enterprise/compliance-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = ["enterprise-traits", "institutional-account-manager"]
+
+[contracts.compliance-trait]
+path = "contracts/compliance/compliance-trait.trait"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+
+[contracts.sanctions-oracle]
+path = "contracts/compliance/sanctions-oracle.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+
+[contracts.travel-rule-service]
+path = "contracts/compliance/travel-rule-service.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+
+[contracts.compliance-api]
+path = "contracts/compliance/compliance-api.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = ["compliance-trait"]
+
+[contracts.compliance-manager]
+path = "contracts/compliance/compliance-manager.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = ["compliance-trait", "sanctions-oracle", "travel-rule-service", "compliance-api"]
 
 [contracts.advanced-order-manager]
 path = "contracts/enterprise/advanced-order-manager.clar"
@@ -514,7 +536,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = [
     "enterprise-traits",
     "institutional-account-manager",
-    "compliance-manager",
+    "enterprise-compliance-manager",
     "advanced-order-manager",
 ]
 
@@ -902,7 +924,7 @@ path = "contracts/dex/vault.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = ["sip-standards"]
 
-[self-launch-coordinator]
+[contracts.self-launch-coordinator]
 path = "contracts/self-launch-coordinator.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = ["cxvg-token", "position-factory"]

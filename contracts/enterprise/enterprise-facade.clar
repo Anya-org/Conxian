@@ -90,7 +90,7 @@
       ERR_PROTOCOL_PAUSED
     )
     (asserts! (var-get enterprise-active) ERR_ENTERPRISE_DISABLED)
-    (try! (contract-call? .compliance-manager check-kyc-compliance tx-sender))
+    (try! (contract-call? .enterprise-compliance-manager check-kyc-compliance tx-sender))
     (try! (contract-call? .institutional-account-manager check-and-update-daily-spent
       tx-sender total-amount
     ))
@@ -111,7 +111,7 @@
       ERR_PROTOCOL_PAUSED
     )
     (asserts! (var-get enterprise-active) ERR_ENTERPRISE_DISABLED)
-    (try! (contract-call? .compliance-manager check-kyc-compliance tx-sender))
+    (try! (contract-call? .enterprise-compliance-manager check-kyc-compliance tx-sender))
     (try! (contract-call? .institutional-account-manager check-and-update-daily-spent
       tx-sender total-amount
     ))
