@@ -22,6 +22,7 @@
 (define-constant REQUIRED_APPROVALS u3)
 (define-constant EMERGENCY_TIMELOCK u240) ;; ~20 minutes
 (define-constant MIN_DELAY u2073600) ;; u144 * 120~24 hours
+(define-constant ROLLBACK_WINDOW_BLOCKS u2000) ;; Window to propose rollback after execution
 
 ;; ===== Data Variables =====
 (define-data-var contract-owner principal tx-sender)
@@ -312,7 +313,7 @@
         proposer: tx-sender,
         created-at: block-height,
         execute-after: (+ block-height EMERGENCY_TIMELOCK),
-        expires-at: (+ block-height ROLLBACK_WINDOW),
+        expires-at: (+ block-height ROLLBACK_WINDOW_BLOCKS),
         executed: false,
         approvals: u1,
         rollback-data: (get rollback-data original)

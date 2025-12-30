@@ -3,7 +3,7 @@
 ;; Integrates with AccessControl for role-based access
 
 ;; --- Traits ---
-(use-trait token .defi-traits.sip-010-ft-trait)
+(use-trait token .sip-standards.sip-010-ft-trait)
 (define-constant TRAIT_REGISTRY .central-traits-registry)
 (define-constant ERR_UNAUTHORIZED (err u8001))
 (define-constant ERR_PROPOSAL_NOT_FOUND (err u8002))

@@ -3,7 +3,7 @@
 ;; delegation certificates, and reputation tracking
 
 (use-trait sip-009-nft-trait .defi-traits.sip-009-nft-trait)
-(use-trait sip-010-ft-trait .defi-traits.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 (impl-trait .defi-traits.sip-009-nft-trait)
 

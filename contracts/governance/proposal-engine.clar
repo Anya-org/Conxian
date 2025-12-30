@@ -8,7 +8,7 @@
 ;; `proposal-executor` for execution.
 ;;
 
-(use-trait protocol-support-trait .core-traits.protocol-support-trait)
+(use-trait voting-trait .governance-traits.voting-trait)
 
 ;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED (err u100))
@@ -43,24 +43,25 @@
 (define-public (propose (description (string-ascii 256)) (targets (list 10 principal)) (values (list 10 uint)) (signatures (list 10 (string-ascii 64))) (calldatas (list 10 (buff 1024))) (start-block uint) (end-block uint))
   (begin
     (asserts! (not (is-protocol-paused)) ERR_PROTOCOL_PAUSED)
-    (let ((proposal-id (try! (contract-call? (var-get proposal-registry) create-proposal tx-sender description start-block end-block))))
+    (let ((proposal-id (try! (contract-call? .proposal-registry create-proposal tx-sender description start-block end-block))))
       (print { event: "proposal-created", proposal-id: proposal-id, proposer: tx-sender, start-block: start-block, end-block: end-block })
       (ok proposal-id)
     )
   )
 )
 
-(define-public (vote (proposal-id uint) (support bool))
+(define-public (vote (proposal-id uint) (support bool) (voting-contract <voting-trait>))
   (begin
     (asserts! (not (is-protocol-paused)) ERR_PROTOCOL_PAUSED)
-    (let ((maybe-proposal (try! (contract-call? (var-get proposal-registry) get-proposal proposal-id))))
+    (let ((maybe-proposal (try! (contract-call? .proposal-registry get-proposal proposal-id))))
       (match maybe-proposal
         proposal (begin
           (asserts! (is-eq (get executed proposal) false) ERR_VOTING_CLOSED)
           (asserts! (is-eq (get canceled proposal) false) ERR_VOTING_CLOSED)
           (asserts! (>= burn-block-height (get start-block proposal)) ERR_PROPOSAL_NOT_ACTIVE)
           (asserts! (<= burn-block-height (get end-block proposal)) ERR_VOTING_CLOSED)
-          (try! (contract-call? (var-get voting) vote proposal-id support tx-sender))
+          (asserts! (is-eq (contract-of voting-contract) (var-get voting)) ERR_UNAUTHORIZED)
+          (try! (contract-call? voting-contract vote proposal-id support tx-sender))
           (print { event: "vote-cast", proposal-id: proposal-id, voter: tx-sender, support: support })
           (ok true)
         )
@@ -73,20 +74,20 @@
 (define-public (execute (proposal-id uint))
   (begin
     (asserts! (not (is-protocol-paused)) ERR_PROTOCOL_PAUSED)
-    (contract-call? (var-get proposal-executor) execute proposal-id (var-get quorum-percentage))
+    (contract-call? .proposal-executor execute proposal-id (var-get quorum-percentage))
   )
 )
 
 (define-public (cancel (proposal-id uint))
   (begin
     (asserts! (not (is-protocol-paused)) ERR_PROTOCOL_PAUSED)
-    (let ((maybe-proposal (try! (contract-call? (var-get proposal-registry) get-proposal proposal-id))))
+    (let ((maybe-proposal (try! (contract-call? .proposal-registry get-proposal proposal-id))))
       (match maybe-proposal
         proposal (begin
           (asserts! (or (is-eq tx-sender (get proposer proposal)) (is-contract-owner)) ERR_UNAUTHORIZED)
           (asserts! (not (get executed proposal)) ERR_VOTING_CLOSED)
           (asserts! (not (get canceled proposal)) ERR_VOTING_CLOSED)
-          (try! (contract-call? (var-get proposal-registry) set-canceled proposal-id))
+          (try! (contract-call? .proposal-registry set-canceled proposal-id))
           (print { event: "proposal-canceled", proposal-id: proposal-id, canceled-by: tx-sender })
           (ok true)
         )
@@ -98,11 +99,11 @@
 
 ;; --- Read-Only Functions ---
 (define-read-only (get-proposal (proposal-id uint))
-  (contract-call? (var-get proposal-registry) get-proposal proposal-id)
+  (contract-call? .proposal-registry get-proposal proposal-id)
 )
 
-(define-read-only (get-vote (proposal-id uint) (voter principal))
-  (contract-call? (var-get voting) get-vote proposal-id voter)
+(define-read-only (get-vote (proposal-id uint) (voter principal) (voting-contract <voting-trait>))
+  (contract-call? voting-contract get-vote proposal-id voter)
 )
 
 (define-read-only (get-quorum-percentage)

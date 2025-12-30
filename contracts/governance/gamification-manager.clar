@@ -1,7 +1,7 @@
 ;; Gamification Manager
 ;; Manages points-to-token conversion, claim windows, and auto-conversion
 
-(use-trait sip-010-trait .defi-traits.sip-010-ft-trait)
+(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
 (define-constant CONTRACT_OWNER tx-sender)
@@ -187,7 +187,7 @@
     (asserts! (is-none (map-get? user-claims { user: tx-sender, epoch: epoch })) ERR_ALREADY_CLAIMED)
     
     ;; Verify Merkle proof (delegated to points-oracle)
-    (try! (contract-call? .points-oracle get-points user))
+    (try! (contract-call? .points-oracle verify-user-points tx-sender epoch liquidity-points governance-points proof))
     
     ;; Verify sufficient pool
     (asserts! (<= cxlp-amount (get cxlp-pool epoch-data)) ERR_INSUFFICIENT_POOL)
