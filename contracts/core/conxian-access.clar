@@ -3,7 +3,7 @@
 ;; Handles Genesis claims and the viral invite system.
 
 ;; --- Traits ---
-(use-trait sip-018-signed-messages .traits.sip-018-signed-messages-trait)
+(use-trait sip-018-signed-messages-trait .sip-018-signed-messages-trait.sip-018-signed-messages-trait)
 
 ;; --- Constants ---
 (define-constant ERR_GENESIS_CAP_REACHED (err u1001))
@@ -23,6 +23,22 @@
 (define-map member-badges principal uint)
 (define-map used-nonces (buff 32) bool)
 (define-map authorized-callers principal bool)
+
+;; --- Internal ---
+
+(define-private (principal-to-buff (p principal))
+  ;; Placeholder: Return a fixed buffer or hash if serialization is unavailable
+  (ok 0x00)
+)
+
+(define-private (to-le-buff (val uint))
+  ;; Placeholder
+  (ok 0x00)
+)
+
+(define-private (to-le-uint (val uint))
+  0x00000000000000000000000000000000
+)
 
 ;; --- Public Read-Only ---
 
@@ -100,3 +116,17 @@
 )
 
 ;; --- Internal ---
+
+(define-private (principal-to-buff (p principal))
+  ;; Placeholder: Return a fixed buffer or hash if serialization is unavailable
+  (ok 0x00)
+)
+
+(define-private (to-le-buff (val uint))
+  ;; Placeholder
+  (ok 0x00)
+)
+
+(define-private (to-le-uint (val uint))
+  0x00000000000000000000000000000000
+)

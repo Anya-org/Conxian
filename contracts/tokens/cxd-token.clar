@@ -7,23 +7,23 @@
 ;; integration with staking, monitoring, and other system components.
 
 ;; --- Traits ---
-(use-trait sip-010-ft-trait .defi-traits.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (use-trait protocol-monitor-trait .security-monitoring.protocol-monitor-trait)
 (use-trait controller .core-traits.controller)
 (use-trait ownership-trait .ownership-trait.ownership-trait)
 
 ;; Declare that cxd-token implements the SIP-010 fungible token trait.
-(impl-trait .defi-traits.sip-010-ft-trait)
+(impl-trait .sip-standards.sip-010-ft-trait)
 
 ;; --- Constants ---
 ;; Using standardized error codes from protocol-errors
-;; ERR_UNAUTHORIZED u1000
-;; ERR_NOT_ENOUGH_BALANCE u1301
-;; ERR_SYSTEM_PAUSED u1101
-;; ERR_EMISSION_LIMIT_EXCEEDED u2000
-;; ERR_TRANSFER_HOOK_FAILED u1504
-;; ERR_OVERFLOW u1200
-;; ERR_UNDERFLOW u1201
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_SYSTEM_PAUSED u1101)
+(define-constant ERR_OVERFLOW u1200)
+(define-constant ERR_UNDERFLOW u1201)
+(define-constant ERR_NOT_ENOUGH_BALANCE u1301)
+(define-constant ERR_TRANSFER_HOOK_FAILED u1504)
+(define-constant ERR_EMISSION_LIMIT_EXCEEDED u2000)
 
 ;; Apply standardized ownership pattern
 (define-data-var contract-owner principal tx-sender)
@@ -95,7 +95,7 @@
   (let ((result (+ a b)))
     (if (>= result a)
       (ok result)
-      (err (err u1300))
+      (err ERR_OVERFLOW)
     )
   )
 )
@@ -109,22 +109,21 @@
     (b uint)
   )
   (if (>= a b)
-    (b uint)
-      (err (err-underflow))
-    )
+    (ok (- a b))
+    (err ERR_UNDERFLOW)
+  )
 )
 
 ;; @desc Checks if the system is currently paused
 ;; @returns A boolean indicating if the system is paused.
 (define-private (check-system-pause)
   (if (var-get system-integration-enabled)
-    (match (var-get protocol-monitor)
-      monitor (contract-call? monitor is-paused)
-      false
+    (match (contract-call? .conxian-protocol is-protocol-paused)
+      paused paused
+      err false
     )
     false
   )
-  false
 )
 
 ;; If a controller is configured, delegate pause status to it. On
@@ -359,7 +358,6 @@
     (enabled bool)
   )
   (begin
-    (enabled bool)
     (if enabled
       (map-set minters who true)
       (map-delete minters who)
@@ -383,24 +381,21 @@
     (memo (optional (buff 34)))
   )
   (begin
-    (asserts! (is-eq tx-sender sender) (err (err-unauthorized)))
-(asserts! (not (check-system-pause)) (err (err-system-paused)))
-
-    (let ((sender-bal (default-to u0 (map-get? balances sender))))
+    (asserts! (is-eq tx-sender sender) (err ERR_UNAUTHORIZED))
     (asserts! (not (check-system-pause)) (err ERR_SYSTEM_PAUSED))
 
-      (map-set balances sender
+    (let ((sender-bal (default-to u0 (map-get? balances sender))))
       (asserts! (>= sender-bal amount) (err ERR_NOT_ENOUGH_BALANCE))
-      )
+      (map-set balances sender (- sender-bal amount))
 
       (let ((rec-bal (default-to u0 (map-get? balances recipient))))
         (map-set balances recipient
-          (unwrap! (safe-add rec-bal amount) (err (err-overflow)))
+          (unwrap! (safe-add rec-bal amount) (err ERR_OVERFLOW))
         )
       )
 
       (asserts! (notify-transfer amount sender recipient)
-        (err (err-transfer-hook-failed))
+        (err ERR_TRANSFER_HOOK_FAILED)
       )
       (ok true)
     )
@@ -467,22 +462,22 @@
   )
   (begin
     (asserts! (or (is-owner tx-sender) (is-minter tx-sender))
-      (err (err-unauthorized))
+      (err ERR_UNAUTHORIZED)
     )
-    (asserts! (not (check-system-pause)) (err (err-system-paused)))
-(asserts! (check-emission-allowed amount) (err (err-emission-limit-exceeded)))
+    (asserts! (not (check-system-pause)) (err ERR_SYSTEM_PAUSED))
+    (asserts! (check-emission-allowed amount) (err ERR_EMISSION_LIMIT_EXCEEDED))
 
     (var-set total-supply
-      (unwrap! (safe-add (var-get total-supply) amount) (err (err-overflow)))
+      (unwrap! (safe-add (var-get total-supply) amount) (err ERR_OVERFLOW))
     )
 
     (let ((bal (default-to u0 (map-get? balances recipient))))
       (map-set balances recipient
-        (unwrap! (safe-add bal amount) (err (err-overflow)))
+        (unwrap! (safe-add bal amount) (err ERR_OVERFLOW))
       )
     )
 
-    (asserts! (notify-mint amount recipient) (err (err-transfer-hook-failed)))
+    (asserts! (notify-mint amount recipient) (err ERR_TRANSFER_HOOK_FAILED))
     (ok true)
   )
 )
@@ -492,20 +487,18 @@
 ;; @returns A response indicating success or failure.
 (define-public (burn (amount uint))
   (begin
-;; @returns A response indicating success or failure.
-
     (let ((bal (default-to u0 (map-get? balances tx-sender))))
-      (asserts! (>= bal amount) (err (err-not-enough-balance)))
+      (asserts! (>= bal amount) (err ERR_NOT_ENOUGH_BALANCE))
       (map-set balances tx-sender
-        (unwrap! (safe-sub bal amount) (err (err-sub-underflow)))
+        (unwrap! (safe-sub bal amount) (err ERR_UNDERFLOW))
       )
     )
 
     (var-set total-supply
-      (unwrap! (safe-sub (var-get total-supply) amount) (err (err-sub-underflow)))
+      (unwrap! (safe-sub (var-get total-supply) amount) (err ERR_UNDERFLOW))
     )
 
-    (asserts! (notify-burn amount tx-sender) (err (err-transfer-hook-failed)))
+    (asserts! (notify-burn amount tx-sender) (err ERR_TRANSFER_HOOK_FAILED))
     (ok true)
   )
 )

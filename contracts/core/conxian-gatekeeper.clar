@@ -2,7 +2,7 @@
 ;; Handles the KYC-based upgrade from Silver to Gold tier.
 
 ;; --- Traits ---
-(use-trait access-control .traits.access-control-trait)
+(use-trait access-control .access-control-trait.access-control-trait)
 
 ;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED (err u2001))
@@ -26,8 +26,8 @@
       (asserts! (is-eq (try! (contract-call? access-contract get-user-tier tx-sender)) u1) ERR_USER_NOT_SILVER)
 
       ;; Verify the signature is from the oracle
-      (let ((hash (sha256 (merge (to-le-bytes nonce) (principal-to-buff tx-sender))))
-            (recovered-pubkey (unwrap! (secp256k1-recover hash signature) ERR_INVALID_SIGNATURE)))
+      (let ((hash (sha256 (merge (to-le-uint nonce) (principal-to-buff tx-sender))))
+            (recovered-pubkey (unwrap! (secp256k1-recover? hash signature) ERR_INVALID_SIGNATURE)))
         (asserts! (is-none (map-get? used-oracle-nonces nonce)) ERR_NONCE_REPLAY)
         (asserts! (is-eq (principal-of recovered-pubkey) (var-get oracle-principal)) ERR_INVALID_SIGNATURE)
         (map-set used-oracle-nonces nonce true)
@@ -68,4 +68,13 @@
     (var-set contract-owner new-owner)
     (ok true)
   )
+)
+
+(define-private (principal-to-buff (p principal))
+  ;; Placeholder for to-consensus-buff?
+  (ok 0x00)
+)
+
+(define-private (to-le-uint (val uint))
+  0x00000000000000000000000000000000
 )

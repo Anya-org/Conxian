@@ -2,7 +2,7 @@
 ;; Manages the "Pending Exit" queue for sBTC withdrawals.
 
 ;; --- Traits ---
-(use-trait sip-009-nft .traits.sip-009-nft-trait)
+(use-trait sip-009-nft .sip-standards.sip-009-nft-trait)
 
 ;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED (err u4001))

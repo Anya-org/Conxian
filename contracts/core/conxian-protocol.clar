@@ -121,7 +121,7 @@
       )
       (begin
         (asserts! (is-authorized-contract contract-principal)
-          (err (err-contract-not-authorized))
+          (err u1002)
         )
         (map-delete authorized-contracts contract-principal)
         (log-protocol-event "contract-revoked" "contract authorization revoked")

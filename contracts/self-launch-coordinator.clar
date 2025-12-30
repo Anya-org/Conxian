@@ -2,7 +2,7 @@
 ;; Coordinates autonomous contract deployment through funding curve mechanism
 ;; Implements self-funded launch system with progressive bootstrapping
 
-(use-trait token-trait .defi-traits.sip-010-ft-trait)
+(use-trait token-trait .sip-standards.sip-010-ft-trait)
 ;; governance-trait and oracle-trait removed as these contracts don't exist yet
 
 ;; Constants
@@ -31,6 +31,13 @@
 
 ;; Enhanced funding system with OPEX integration
 (define-data-var contract-owner principal tx-sender)
+(define-data-var base-system-cost uint u0)
+(define-data-var funding-target uint u0)
+(define-data-var funding-curve-rate uint u0)
+(define-data-var self-launch-enabled bool false)
+(define-data-var funding-curve-active bool false)
+(define-data-var total-funding-received uint u0)
+(define-data-var launch-phase uint PHASE_BOOTSTRAP)
 (define-data-var launch-fund-allocation uint u0) ;;
 (define-data-var opex-fund-allocation uint u0)        ;; 50% to operations
 (define-data-var opex-loan-principal uint u0)         ;; Total OPEX loan amount
@@ -332,8 +339,8 @@
       {total-contributed: u0, contribution-count: u0, last-contribution: block-height, contributor-level: "new"}
       (map-get? community-contributions contributor)
     ))
-    (new-total (+ (get current-contrib total-contributed) amount))
-    (new-count (+ (get current-contrib contribution-count) u1))
+    (new-total (+ (get total-contributed current-contrib) amount))
+    (new-count (+ (get contribution-count current-contrib) u1))
     (new-level (calculate-contributor-level new-total))
   )
     (map-set community-contributions contributor {
@@ -467,9 +474,9 @@
 ;; Calculate system health score
 (define-private (calculate-system-health)
   (let (
-    (funding-health (if (>= (var-get total-funding-received) (var-get base-system-cost))
+    (funding-health (if (>= (var-get total-funding-received) (var-get base-launch-cost))
                      u100
-                     (/ (* (var-get total-funding-received) u100) (var-get base-system-cost))))
+                     (/ (* (var-get total-funding-received) u100) (var-get base-launch-cost))))
     (deployment-health (get-deployment-health))
     (alignment-health (get-alignment-health))
   )
@@ -855,14 +862,14 @@ u75
 
 (define-private (get-all-contracts)
   (list
-    .traits folder .utils-encoding .utils-utils .lib-error-codes
+    .encoding .utils .error-utils
     .cxd-token .cxlp-token .cxvg-token .cxtr-token .cxs-token
     .governance-token .proposal-engine .timelock-controller
-    .dex-factory .dex-router .dex-pool .dex-vault .fee-manager
-    .dim-registry .dim-metrics .position-nft .dimensional-core
-    .oracle .oracle-aggregator .btc-adapter
+    .dex-factory-v2 .multi-hop-router-v3 .concentrated-liquidity-pool .vault .fee-manager
+    .dim-registry .dim-metrics .cxlp-position-nft .dimensional-engine
+    .oracle .oracle-aggregator-v2 .btc-adapter
     .circuit-breaker .pausable .mev-protector
-    .analytics-aggregator .monitoring-dashboard
+    .analytics-aggregator .system-monitor
   )
 )
 
