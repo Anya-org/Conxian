@@ -133,34 +133,58 @@
 
 ;; Placeholder executions
 (define-private (execute-interest-accrual)
-  (ok true)
+  (begin
+    (print { event: "task-executed", task: "interest-accrual", block: block-height })
+    (ok true)
+  )
 )
 (define-private (execute-oracle-update)
-  (ok true)
+  (begin
+    (print { event: "task-executed", task: "oracle-update", block: block-height })
+    (ok true)
+  )
 )
 (define-private (execute-liquidation-check)
-  (ok true)
+  (begin
+    (print { event: "task-executed", task: "liquidation-check", block: block-height })
+    (ok true)
+  )
 )
 (define-private (execute-rebalance-strategies)
-  (ok true)
+  (begin
+    (print { event: "task-executed", task: "rebalance-strategies", block: block-height })
+    (ok true)
+  )
 )
 (define-private (execute-fee-distribution)
-  (ok true)
+  (begin
+    (print { event: "task-executed", task: "fee-distribution", block: block-height })
+    (ok true)
+  )
 )
 (define-private (execute-bond-processing)
-  (ok true)
+  (begin
+    (print { event: "task-executed", task: "bond-processing", block: block-height })
+    (ok true)
+  )
 )
 (define-private (execute-metrics-update)
-  (ok true)
+  (begin
+    (print { event: "task-executed", task: "metrics-update", block: block-height })
+    (ok true)
+  )
 )
 (define-private (execute-automation-manager)
-  (ok true)
+  (begin
+    (print { event: "task-executed", task: "automation-manager", block: block-height })
+    (ok true)
+  )
 )
 
 ;; Gamification Tasks
 (define-private (execute-epoch-transition (epoch-id uint))
   (begin
-    (try! (contract-call? .points-oracle finalize-epoch (- epoch-id u1)))
+          (try! (contract-call? .points-oracle finalize-epoch (- epoch-id u1)))
     (try! (contract-call? .gamification-manager initialize-epoch epoch-id block-height
       (+ block-height u518400) u45833 u45833
     ))
@@ -184,7 +208,7 @@
 (define-private (execute-opex-repayment)
   (begin
     ;; Check OPEX loan repayment conditions
-    (try! (contract-call? (var-get self-launch-coordinator) check-automatic-repayment))
+    (try! (contract-call? .self-launch-coordinator check-automatic-repayment))
     (ok true)
   )
 )

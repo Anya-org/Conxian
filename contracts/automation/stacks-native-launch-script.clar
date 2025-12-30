@@ -194,45 +194,32 @@
     (print {event: "starting-stacks-native-launch"})
     
     ;; Phase 1: Token System
-    (let ((token-system (try! (deploy-token-system))))
-      (match token-system
-        ((ok result) (begin
-          (print {event: "token-system-deployed"})
-        ))
-        ((err error) (begin
-          (print {event: "token-system-deployment-failed"})
-          (err error)
-        ))
-        ((some response) (begin
-          (print {event: "token-system-deployment-unknown-response"})
-          (err "unknown-response")
-        ))
-      )
-    )
+    (try! (as-contract (deploy-token-system)))
+    (print {event: "token-system-deployed"})
     
     ;; Phase 2: Native Operators
-    (try! (setup-native-operators))
+    (try! (as-contract (setup-native-operators)))
     
     ;; Phase 3: Block Automation
-    (try! (setup-block-automation))
+    (try! (as-contract (setup-block-automation)))
     
     ;; Phase 4: Native Multi-sig
-    (try! (setup-native-multisig))
+    (try! (as-contract (setup-native-multisig)))
     
     ;; Phase 5: DEX System
-    (try! (launch-dex-system))
+    (try! (as-contract (launch-dex-system)))
     
     ;; Phase 6: Lending System
-    (try! (launch-lending-system))
+    (try! (as-contract (launch-lending-system)))
     
     ;; Phase 7: Compliance System
-    (try! (launch-compliance-system))
+    (try! (as-contract (launch-compliance-system)))
     
     ;; Phase 8: Treasury System
-    (try! (setup-treasury-system))
+    (try! (as-contract (setup-treasury-system)))
     
     ;; Phase 9: Governance System
-    (try! (launch-governance-system))
+    (try! (as-contract (launch-governance-system)))
     
     (let ((result (contract-call? .self-launch-coordinator claim-launch-funds (as-contract tx-sender))))
       (ok result)

@@ -3,7 +3,7 @@
 ;; @desc Manages guardian registration with actual CXD token bonding.
 ;; Guardians must stake CXD to register, ensuring economic alignment.
 
-(use-trait sip-010-ft-trait .defi-traits.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u7000))
 (define-constant ERR_INVALID_AMOUNT (err u7001))

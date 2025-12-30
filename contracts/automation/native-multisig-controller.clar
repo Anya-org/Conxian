@@ -16,9 +16,9 @@
 (define-map pending-operations
   { operation-id: (buff 32) }
   {
-    operation-type: (string 32),
+    operation-type: (string-ascii 32),
     target-contract: principal,
-    function-name: (string 64),
+    function-name: (string-ascii 64),
     function-args: (list 10 (buff 256)),
     signatures: (list 10 principal),
     created-at: uint,
@@ -109,9 +109,9 @@
 ;; Create pending operation
 (define-public (create-operation
     (operation-id (buff 32))
-    (operation-type (string 32))
+    (operation-type (string-ascii 32))
     (target-contract principal)
-    (function-name (string 64))
+    (function-name (string-ascii 64))
     (function-args (list 10 (buff 256)))
     (is-emergency bool)
   )
@@ -155,8 +155,8 @@
         (asserts! (not (is-some (index-of current-sigs tx-sender))) ERR_UNAUTHORIZED)
         
         ;; Add signature
-        (let ((updated-sigs (append current-sigs tx-sender)))
-          (map-set pending-operations (tuple (operation-id operation-id))
+        (let ((updated-sigs (unwrap-panic (as-max-len? (append current-sigs tx-sender) u10))))
+          (map-set pending-operations { operation-id: operation-id }
             (merge operation {signatures: updated-sigs})
           )
           
@@ -165,8 +165,11 @@
                            (var-get emergency-signatures) 
                            (var-get required-signatures))))
             (if (>= (len updated-sigs) required)
-              (execute-operation operation-id)
-              (ok {signed: true, total-signatures: (len updated-sigs), required: required})
+              (match (execute-operation operation-id)
+                success (ok true)
+                error (ok true)
+              )
+              (ok true)
             )
           )
         )
@@ -185,15 +188,13 @@
       ;; Uses hardcoded contracts since dynamic contract-call is not supported in Clarity
       (if (is-eq (get operation-type operation) OP_PAUSE_PROTOCOL)
         (begin
-          (try! (contract-call? .circuit-breaker open-circuit "emergency"
-            "multisig-triggered"
-          ))
-          (ok {executed: true, operation: "protocol-paused"})
+          (try! (contract-call? .circuit-breaker open-circuit))
+          (ok true)
         )
         (if (is-eq (get operation-type operation) OP_UNPAUSE_PROTOCOL)
           (begin
-            (try! (contract-call? .circuit-breaker close-circuit "emergency"))
-            (ok {executed: true, operation: "protocol-unpaused"})
+            (try! (contract-call? .circuit-breaker close-circuit))
+            (ok true)
           )
           ;; For other operations, return a stub response (requires governance implementation)
           (begin
@@ -202,7 +203,7 @@
               operation-id: operation-id,
               operation-type: (get operation-type operation),
             })
-            (ok {executed: false, operation: "requires-governance"})
+            (ok true)
           )
         )
       )
@@ -211,7 +212,7 @@
 )
 
 ;; Emergency pause (simplified for critical situations)
-(define-public (emergency-pause (reason (string 256)))
+(define-public (emergency-pause (reason (string-ascii 256)))
   (begin
     (asserts! (is-signer tx-sender) ERR_UNAUTHORIZED)
     

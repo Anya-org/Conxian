@@ -2,7 +2,7 @@
 ;; Compatibility layer for transitioning from guardian system to Stacks native architecture
 ;; Provides backward compatibility during migration period
 
-(use-trait sip-010-ft-trait .defi-traits.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u9000))
 (define-constant ERR_MIGRATION_COMPLETE (err u9001))
@@ -235,7 +235,7 @@
 ;; Helper function for filtering migrated guardians
 (define-private (is-migrated (guardian principal))
   (let ((status (map-get? migration-status guardian)))
-    (if (some? status)
+    (if (is-some status)
       (get guardian-migrated (unwrap! status false))
       false
     )
@@ -252,12 +252,12 @@
 )
 
 ;; Batch migration for all legacy guardians
-(define-public (migrate-all-guardians)
+(define-public (migrate-all-guardians (guardian-list (list 200 principal)))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
     
-    (let ((guardian-list (map-keys legacy-guardians)))
-      (fold migrate-guardian-helper guardian-list true)
+    (let ((guardians guardian-list))
+      (fold migrate-guardian-helper guardians true)
     )
   )
 )
@@ -268,8 +268,7 @@
     (match (map-get? legacy-guardians guardian)
       legacy-data (if (not (get migrated-to-native legacy-data))
         (begin
-          ;; Use hardcoded contract reference
-          (match (contract-call? 'STXS4928S95SEP4YNJMH7V9Z8RY8J7PZ5RG74TXF.native-stacking-operator-v3 register-operator guardian)
+          (match (contract-call? .native-stacking-operator register-operator guardian)
             success (begin
               (map-set legacy-guardians guardian
                 (merge legacy-data {migrated-to-native: true})
