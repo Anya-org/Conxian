@@ -20,10 +20,10 @@
 (define-map compliance-status {
   user: principal,
 } {
-  is-sanctioned bool,
-  kyc-level uint,
-  last-checked uint,
-  requires-travel-rule bool,
+  is-sanctioned: bool,
+  kyc-level: uint,
+  last-checked: uint,
+  requires-travel-rule: bool,
 })
 
 ;; --- Authorization ---
@@ -55,15 +55,13 @@
 )
 
 (define-public (set-compliance-services
-    (sanctions-oracle principal)
-    (travel-rule-service principal)
-    (compliance-api principal)
+    (new-sanctions-oracle principal)
   )
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (var-set sanctions-oracle sanctions-oracle)
-    (var-set travel-rule-service travel-rule-service)
-    (var-set compliance-api compliance-api)
+    (var-set sanctions-oracle new-sanctions-oracle)
+    (var-set travel-rule-service new-travel-rule-service)
+    (var-set compliance-api new-compliance-api)
     (ok true)
   )
 )
@@ -79,7 +77,7 @@
           (current-height block-height))
       
       ;; Check sanctions
-      (match (contract-call? oracle is-sanctioned user)
+      (match (contract-call? .sanctions-oracle is-sanctioned user)
         is-sanctioned 
         (if is-sanctioned
           (begin

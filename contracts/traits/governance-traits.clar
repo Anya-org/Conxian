@@ -107,7 +107,7 @@
 ;; ===========================================
 (define-trait voting-trait (
   (vote
-    (uint bool uint principal)
+    (uint bool principal)
     (response bool uint)
   )
   (get-vote
@@ -121,3 +121,4 @@
     )
   )
 ))
+

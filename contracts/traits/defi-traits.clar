@@ -1,6 +1,6 @@
 ;; DeFi Traits
 ;; Defines standard interfaces for tokens, pools, vaults, and oracles.
-(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
+(use-trait ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; ===========================================
 ;; FEE MANAGER TRAIT
@@ -15,7 +15,7 @@
     (response uint uint)
   )
   (route-fees
-    (<sip-010-ft-trait> uint bool (string-ascii 32))
+    (<ft-trait> uint bool (string-ascii 32))
     (response uint uint)
   )
 ))
@@ -45,7 +45,7 @@
 ;; ===========================================
 (define-trait pool-factory-trait (
   (create-pool
-    (<sip-010-ft-trait> <sip-010-ft-trait> (optional (string-ascii 64)) uint (optional {
+    (<ft-trait> <ft-trait> (optional (string-ascii 64)) uint (optional {
       tick-spacing: uint,
       initial-price: uint,
     }))
@@ -58,7 +58,7 @@
 ;; ===========================================
 (define-trait factory-trait (
   (create-pool
-    (<sip-010-ft-trait> <sip-010-ft-trait> (optional (string-ascii 64)) uint (optional {
+    (<ft-trait> <ft-trait> (optional (string-ascii 64)) uint (optional {
       tick-spacing: uint,
       initial-price: uint,
     }))
@@ -137,7 +137,7 @@
       hashes: (list 12 (buff 32)),
       tree-depth: uint,
     }
-      <sip-010-ft-trait>
+      <ft-trait>
     )
     (response uint uint)
   )
@@ -173,15 +173,15 @@
 ;; ===========================================
 (define-trait pool-trait (
   (swap
-    (uint <sip-010-ft-trait> <sip-010-ft-trait>)
+    (uint <ft-trait> <ft-trait>)
     (response uint uint)
   )
   (add-liquidity
-    (uint uint <sip-010-ft-trait> <sip-010-ft-trait>)
+    (uint uint <ft-trait> <ft-trait>)
     (response uint uint)
   )
   (remove-liquidity
-    (uint <sip-010-ft-trait> <sip-010-ft-trait>)
+    (uint <ft-trait> <ft-trait>)
     (
       response       {
       amount0: uint,

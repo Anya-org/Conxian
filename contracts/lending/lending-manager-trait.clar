@@ -5,18 +5,18 @@
 ;; borrowing operations, which will be implemented by the lending-manager
 ;; contract and called by the lending facade.
 
-(use-trait ft-trait .defi-traits.sip-010-ft-trait)
+(use-trait ft-trait .sip-standards.sip-010-ft-trait)
 
 (define-trait lending-manager-trait
   (
     ;; Public Functions
-    (supply (asset <ft-trait>) (amount uint) (response bool uint))
-    (withdraw (asset <ft-trait>) (amount uint) (response bool uint))
-    (borrow (asset <ft-trait>) (amount uint) (response bool uint))
-    (repay (asset <ft-trait>) (amount uint) (response bool uint))
+    (supply (<ft-trait> uint) (response bool uint))
+    (withdraw (<ft-trait> uint) (response bool uint))
+    (borrow (<ft-trait> uint) (response bool uint))
+    (repay (<ft-trait> uint) (response bool uint))
 
     ;; Read-Only Functions
-    (get-user-borrow-balance (user principal) (asset principal) (response (optional uint) uint))
-    (get-user-supply-balance (user principal) (asset principal) (response (optional uint) uint))
+    (get-user-borrow-balance (principal principal) (response (optional uint) uint))
+    (get-user-supply-balance (principal principal) (response (optional uint) uint))
   )
 )

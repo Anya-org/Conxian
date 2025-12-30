@@ -1,0 +1,1711 @@
+A new deployment plan was computed and differs from the default deployment plan currently saved on disk:
+  ---
+  id: 0
+  name: "Simulated deployment, used as a default for `clarinet console`, `clarinet test` and `clarinet check`"
+  network: simnet
+  genesis:
+    wallets:
+      - name: deployer
+-       address: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++       address: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+        balance: "0"
+        sbtc-balance: "1000000000"
+    contracts:
+      - genesis
+      - lockup
+      - bns
+      - cost-voting
+      - costs
+      - pox
+      - costs-2
+      - pox-2
+      - costs-3
+      - pox-3
+      - pox-4
+      - signers
+      - signers-voting
+      - costs-4
+  plan:
+    batches:
+      - id: 0
+        transactions:
+          - emulated-contract-publish:
+              contract-name: enterprise-traits
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\enterprise-traits.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: advanced-order-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\enterprise\\advanced-order-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: allocation-policy
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\treasury\\allocation-policy.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: analytics-aggregator
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\monitoring\\analytics-aggregator.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: audit-badge-nft
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\audit-registry\\audit-badge-nft.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: governance-traits
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\governance-traits.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: audit-registry
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\audit-registry\\audit-registry.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: automation-traits
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\automation-traits.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: core-traits
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\core-traits.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: base-contract
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\base\\base-contract.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: batch-auction
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dex\\batch-auction.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: block-automation-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\automation\\block-automation-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: block-utils
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\utils\\block-utils.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: sip-standards
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\sip-standards.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: defi-traits
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\defi-traits.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: bridge-nft
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\cross-chain\\bridge-nft.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: clarity-bitcoin
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\lib\\clarity-bitcoin.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: btc-adapter
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\sbtc\\btc-adapter.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: budget-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\budget-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: security-monitoring
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\security-monitoring.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: circuit-breaker
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\security\\circuit-breaker.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: dimensional-traits
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\dimensional-traits.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: collateral-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\core\\collateral-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: comparison-helpers
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\utils\\comparison-helpers.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: compliance-api
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\compliance\\compliance-api.clar"
+              clarity-version: 1
+        epoch: "2.05"
+      - id: 1
+        transactions:
+          - emulated-contract-publish:
+              contract-name: identity-badge
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\identity\\identity-badge.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: kyc-registry
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\identity\\kyc-registry.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: compliance-hooks
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\enterprise\\compliance-hooks.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: compliance-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\compliance\\compliance-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: compliance-trait
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\compliance\\compliance-trait.trait"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: conxian-protocol
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\core\\conxian-protocol.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: interest-rate-model
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\lending\\interest-rate-model.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: lending-manager-trait
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\lending\\lending-manager-trait.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: lending-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\lending\\lending-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: comprehensive-lending-system
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\lending\\comprehensive-lending-system.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: math-lib-concentrated
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\math\\math-lib-concentrated.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: tier-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\core\\tier-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: protocol-fee-switch
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\core\\protocol-fee-switch.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: concentrated-liquidity-pool
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dex\\concentrated-liquidity-pool.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: controller-traits
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\controller-traits.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: conxian-access
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\core\\conxian-access.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: conxian-exit-queue
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\core\\conxian-exit-queue.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: conxian-gatekeeper
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\core\\conxian-gatekeeper.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: conxian-insurance-fund
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\security\\conxian-insurance-fund.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: conxian-math
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\lib\\conxian-math.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: token-emission-controller
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\yield\\token-emission-controller.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: ownership-trait
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\ownership-trait.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: cxd-token
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\tokens\\cxd-token.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: cxvg-token
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\tokens\\cxvg-token.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: founder-vesting
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\governance\\founder-vesting.clar"
+              clarity-version: 1
+        epoch: "2.05"
+      - id: 2
+        transactions:
+          - emulated-contract-publish:
+              contract-name: revenue-distributor
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\treasury\\revenue-distributor.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: token-system-coordinator
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\tokens\\token-system-coordinator.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: conxian-operations-engine
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\governance\\conxian-operations-engine.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: conxian-token-factory
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\core\\conxian-token-factory.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: conxian-vaults
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\treasury\\conxian-vaults.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: custody
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\vaults\\custody.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: governance-token
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\governance-token.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: cxd-price-initializer
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\tokens\\cxd-price-initializer.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: protocol-invariant-monitor
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dex\\protocol-invariant-monitor.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: cxd-staking
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\yield\\cxd-staking.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: cxlp-token
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\tokens\\cxlp-token.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: cxlp-position-nft
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\tokens\\cxlp-position-nft.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: roles
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\access\\roles.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: cxs-token
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\tokens\\cxs-token.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: cxtr-token
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\tokens\\cxtr-token.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: decentralized-trait-registry
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\decentralized-trait-registry.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: defi-primitives
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\defi-primitives.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: dex-factory-v2
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dex\\dex-factory-v2.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: dia-oracle-mock
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\mocks\\dia-oracle-mock.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: oracle-pricing
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\oracle-pricing.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: dia-oracle-adapter
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\integrations\\dia-oracle-adapter.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: dim-graph
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dimensional\\dim-graph.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: dim-metrics
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dimensional\\dim-metrics.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: dim-oracle-automation
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dimensional\\dim-oracle-automation.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: dim-registry
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dimensional\\dim-registry.clar"
+              clarity-version: 1
+        epoch: "2.05"
+      - id: 3
+        transactions:
+          - emulated-contract-publish:
+              contract-name: dim-revenue-adapter
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dimensional\\dim-revenue-adapter.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: dim-yield-stake
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dimensional\\dim-yield-stake.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: oracle-aggregator-v2
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dex\\oracle-aggregator-v2.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: position-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\core\\position-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: funding-rate-calculator
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\core\\funding-rate-calculator.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: risk-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\risk\\risk-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: dimensional-engine
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\core\\dimensional-engine.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: dimensional-oracle
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\oracle\\dimensional-oracle.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: dlc-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\sbtc\\dlc-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: economic-policy-engine
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\core\\economic-policy-engine.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: encoding
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\utils\\encoding.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: enterprise-compliance-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\enterprise\\compliance-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: institutional-account-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\enterprise\\institutional-account-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: enterprise-facade
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\enterprise\\enterprise-facade.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: enterprise-loan-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\enterprise\\enterprise-loan-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: error-utils
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\utils\\error-utils.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: errors-trait
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\trait-errors.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: exponentiation
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\math\\exponentiation.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: rbac
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\utils\\rbac.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: external-oracle-adapter
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\oracle\\external-oracle-adapter.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: fee-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\vaults\\fee-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: finance-metrics
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\monitoring\\finance-metrics.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: fixed-point-math
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\math\\fixed-point-math.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: funding-calculator
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\risk\\funding-calculator.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: points-oracle
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\oracle\\points-oracle.clar"
+              clarity-version: 1
+        epoch: "2.05"
+      - id: 4
+        transactions:
+          - emulated-contract-publish:
+              contract-name: gamification-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\governance\\gamification-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: governance
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dimensional\\governance.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: governance-voting
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\governance\\voting.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: guardian-registry
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\automation\\guardian-registry.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: insurance-protection-nft
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\insurance\\insurance-protection-nft.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: keeper-coordinator
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\automation\\keeper-coordinator.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: launch-limits
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\config\\launch-limits.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: legal-representative-registry
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\governance\\legal-representative-registry.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: lending-protocol-governance
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\governance\\lending-protocol-governance.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: liquidation-engine
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\risk\\liquidation-engine.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: liquidation-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\lending\\liquidation-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: liquidity-optimization-engine
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dex\\liquidity-optimization-engine.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: math-lib-advanced
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\lib\\math-lib-advanced.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: math-utilities
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\math\\math-utilities.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: math-utilities-traits
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\math-utilities.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: mev-protection-nft
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\mev\\mev-protection-nft.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: mev-protector
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\security\\mev-protector.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: native-stacking-operator
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\automation\\native-stacking-operator.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: migration-adapter
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\automation\\migration-adapter.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: migration-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\utils\\migration-manager.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: mock-lending-pool
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\mocks\\mock-lending-pool.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: mock-pool
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\mocks\\mock-pool.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: mock-token
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\mocks\\mock-token.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: mock-usda-token
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\mocks\\mock-usda-token.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: swap-manager
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dex\\swap-manager.clar"
+              clarity-version: 1
+        epoch: "2.05"
+      - id: 5
+        transactions:
+          - emulated-contract-publish:
+              contract-name: multi-hop-router-v3
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dex\\multi-hop-router-v3.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: nakamoto-constants
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\constants\\nakamoto-constants.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: native-multisig-controller
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\automation\\native-multisig-controller.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: nft-marketplace
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\marketplace\\nft-marketplace.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: on-chain-router-helper
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dex\\on-chain-router-helper.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: operational-treasury
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\core\\operational-treasury.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: oracle
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dex\\oracle.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: oracle-adapter
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\oracle\\oracle-adapter-stub.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: ownable
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\base\\ownable.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: pausable
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\base\\pausable.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: pool-registry
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\pools\\pool-registry.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: pool-template
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dex\\pool-template.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: position-factory
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\position-factory.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: precision-calculator
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\lib\\precision-calculator.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: price-stability-monitor
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\monitoring\\price-stability-monitor.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: proposal-engine
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\governance\\proposal-engine.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: proposal-registry
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\governance\\proposal-registry.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: proposal-executor
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\governance\\proposal-executor.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: protocol-errors
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\errors\\protocol-errors.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: pyth-traits
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\pyth-traits.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: pyth-oracle-v2-mock
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\mocks\\pyth-oracle-v2-mock.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: pyth-store-mock
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\mocks\\pyth-store-mock.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: pyth-oracle-adapter
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\integrations\\pyth-oracle-adapter.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: queue-traits
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\queue-traits.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: real-time-monitoring-dashboard
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dex\\real-time-monitoring-dashboard.clar"
+              clarity-version: 1
+        epoch: "2.05"
+      - id: 6
+        transactions:
+          - emulated-contract-publish:
+              contract-name: rebalancing-rules
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dex\\rebalancing-rules.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: redstone-oracle-mock
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\mocks\\redstone-oracle-mock.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: redstone-oracle-adapter
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\integrations\\redstone-oracle-adapter.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: revenue-router
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\treasury\\revenue-router.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: rewards
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\staking\\rewards.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: sanctions-oracle
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\compliance\\sanctions-oracle.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: sbtc-integration
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\sbtc\\sbtc-integration.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: sbtc-token
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\mocks\\mock-token.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: yield-aggregator
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\vaults\\yield-aggregator.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: sbtc-vault
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\vaults\\sbtc-vault.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: self-launch-coordinator
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\self-launch-coordinator.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: stacks-native-launch-script
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\automation\\stacks-native-launch-script.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: system-monitor
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\monitoring\\system-monitor.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: tiered-pools
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\pools\\tiered-pools.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: timelock-controller
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dex\\timelock-controller.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: trait-errors
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\traits\\trait-errors.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: travel-rule-service
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\compliance\\travel-rule-service.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: twap-oracle
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\integrations\\twap-oracle.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: upgrade-controller
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\governance\\upgrade-controller.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: utils
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\utils\\utils.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: validation
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\utils\\validation.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: vault
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\dex\\vault.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: voting
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\governance\\voting.clar"
+              clarity-version: 1
+          - emulated-contract-publish:
+              contract-name: yield-optimizer
+-             emulated-sender: ST3B98JR6KZ13Y3WH885CY0TNVWYFTTVCVZBG0H7P
++             emulated-sender: ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE
+              path: "contracts\\yield\\yield-optimizer.clar"
+              clarity-version: 1
+        epoch: "2.05"
+Overwrite? [Y/n]
+note: using deployments/default.simnet-plan.yaml
+error: detected two execution paths, returning two different expression types (got '(response UnknownType uint)' and '(response UnknownType (response UnknownType uint))')
+--> contracts\oracle\points-oracle.clar:143:5
+    (try! (verify-merkle-proof leaf proof (get root root-data)))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+error: use of unresolved contract 'ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE.conxian-protocol'
+--> contracts\governance\proposal-engine.clar:34:4
+  (match (contract-call? .conxian-protocol is-protocol-paused)
+   ^~~~~
+  (match (contract-call? .conxian-protocol is-protocol-paused)
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    paused (unwrap-panic paused)
+    ^~~~~~
+    paused (unwrap-panic paused)
+           ^~~~~~~~~~~~~~~~~~~~~
+    err true
+    ^~~
+    err true
+        ^~~~
+error: use of unresolved function 'to-le-uint'
+--> contracts\core\conxian-access.clar:55:4
+  (begin
+   ^~~~~
+    (asserts! (is-none (map-get? member-badges tx-sender)) ERR_ALREADY_A_MEMBER)
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (is-eq issuer-tier TIER_GOLD) ERR_ISSUER_NOT_GOLD)
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (let ((hash (sha256 (merge (to-le-uint nonce) (merge (to-le-uint issuer-tier) (principal-to-buff tx-sender))))))
+      (asserts! (is-none (map-get? used-nonces hash)) ERR_NONCE_REPLAY)
+      (unwrap! (match (contract-call? .sip-018-signed-messages get-signer hash signature)
+        (signer-pubkey
+          (if (is-eq (principal-of signer-pubkey) issuer)
+            (ok (map-set used-nonces hash true))
+            (err ERR_INVALID_SIGNATURE)
+          )
+        )
+        (err-val (err err-val))
+      ) ERR_INVALID_SIGNATURE)
+    ^
+    (map-set member-badges tx-sender TIER_SILVER)
+^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (var-set total-members (+ (var-get total-members) u1))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (print {
+      event: "invite-claimed",
+      user: tx-sender,
+      issuer: issuer,
+    ^
+    (ok true)
+    ^~~~~~~~~
+error: use of unresolved contract 'ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE.native-stacking-operator'
+--> contracts\automation\migration-adapter.clar:98:4
+  (begin
+   ^~~~~
+    (asserts! (var-get migration-active) ERR_MIGRATION_COMPLETE)
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (let ((legacy-data (map-get? legacy-guardians guardian)))
+      (if (is-some legacy-data)
+        (let ((data (unwrap-panic legacy-data)))
+          (if (not (get migrated-to-native data))
+            (begin
+              ;; Register as native operator
+              (try! (contract-call? .native-stacking-operator register-operator
+                guardian
+              ))
+              
+              ;; Update legacy record
+              (map-set legacy-guardians guardian
+                (merge data {migrated-to-native: true})
+              )
+              
+              ;; Track migration status
+              (map-set migration-status guardian {
+                guardian-migrated: true,
+                native-operator-registered: true,
+                migration-date: block-height,
+              })
+              
+              (print {
+                event: "guardian-migrated-to-native",
+                guardian: guardian,
+                migrated-at: block-height,
+              })
+              (ok true)
+            )
+            (ok { already-migrated: true })
+          )
+        )
+        (err ERR_UNAUTHORIZED)
+      )
+    ^
+error: detected interdependent functions (withdraw, borrow-with-hook, do-withdraw, do-supply, do-repay, supply-with-hook, withdraw-checked, do-borrow, borrow, repay, borrow-checked, supply, withdraw-with-hook, repay-with-hook)
+error: use of unresolved contract 'ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE.conxian-protocol'
+--> contracts\lending\comprehensive-lending-system.clar:33:4
+  (unwrap! (contract-call? .conxian-protocol is-protocol-paused) true)
+   ^~~~~~~
+  (unwrap! (contract-call? .conxian-protocol is-protocol-paused) true)
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  (unwrap! (contract-call? .conxian-protocol is-protocol-paused) true)
+                                                                 ^~~~
+error: use of unresolved contract 'ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE.launch-limits'
+--> contracts\vaults\sbtc-vault.clar:99:4
+  (begin
+   ^~~~~
+    (try! (check-not-paused))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~
+    (try! (contract-call? .launch-limits enforce-deposit-limits tx-sender (get-balance tx-sender) amount))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (try! (contract-call? token-contract transfer amount tx-sender
+      (as-contract tx-sender) none
+    ^
+    (as-contract (contract-call? .custody deposit amount tx-sender))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+error: Tuple literal construction expects a colon at index 1
+error: use of unresolved contract 'ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE.points-oracle'
+--> contracts\automation\keeper-coordinator.clar:162:4
+  (begin
+   ^~~~~
+    (try! (contract-call? .points-oracle finalize-epoch (- epoch-id u1)))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (try! (contract-call? .gamification-manager initialize-epoch epoch-id block-height
+      (+ block-height u518400) u45833 u45833
+    ^
+    (try! (contract-call? .points-oracle start-epoch epoch-id))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (ok true)
+    ^~~~~~~~~
+error: use of unresolved contract 'ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE.cxlp-token'
+--> contracts\tokens\cxlp-position-nft.clar:89:4
+  (let ((position-id (+ (var-get next-position-id) u1)))
+   ^~~
+  (let ((position-id (+ (var-get next-position-id) u1)))
+       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (begin
+      (asserts! (is-eq owner tx-sender) (err ERR_UNAUTHORIZED))
+      (asserts! (> cxlp-amount u0) (err ERR_NO_SUCH_POSITION))
+      (asserts! (not (check-system-pause)) (err ERR_TRANSFER_DISABLED))
+
+      ;; Transfer CXLP from the user to this contract.
+      ;; CXLP.transfer enforces tx-sender == sender. Here, tx-sender == owner,
+      ;; so we can call transfer directly from the owner to this contract.
+      (try! (contract-call? .cxlp-token transfer cxlp-amount owner .cxlp-position-nft
+        none
+      ))
+
+      (var-set next-position-id position-id)
+      (map-set position-owners position-id owner)
+      (map-set positions position-id {
+        pool-id: pool-id,
+        cxlp-amount: cxlp-amount,
+        created-at: block-height,
+        last-updated-at: block-height,
+      })
+      (print {
+        event: "cxlp-position-created",
+        position-id: position-id,
+        owner: owner,
+        pool-id: pool-id,
+        cxlp-amount: cxlp-amount,
+      })
+      (ok position-id)
+    ^
+error: use of unresolved contract 'ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE.points-oracle'
+--> contracts\governance\gamification-manager.clar:177:4
+  (let (
+   ^~~
+  (let (
+    (epoch-data (unwrap! (map-get? epoch-info epoch) ERR_INVALID_EPOCH))
+    (rates (unwrap! (map-get? conversion-rates epoch) ERR_INVALID_EPOCH))
+    (cxlp-amount (/ (* liquidity-points (get cxlp-per-point rates)) u1000000))
+    (cxvg-amount (/ (* governance-points (get cxvg-per-point rates)) u1000000))
+       ^
+    (asserts! (is-claim-window-open epoch) ERR_CLAIM_WINDOW_CLOSED)
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (is-none (map-get? user-claims { user: tx-sender, epoch: epoch })) ERR_ALREADY_CLAIMED)
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (try! (contract-call? .points-oracle get-points user))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (<= cxlp-amount (get cxlp-pool epoch-data)) ERR_INSUFFICIENT_POOL)
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (<= cxvg-amount (get cxvg-pool epoch-data)) ERR_INSUFFICIENT_POOL)
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (if (> cxlp-amount u0)
+      true
+      true
+    ^
+    (if (> cxvg-amount u0)
+      true
+      true
+    ^
+    (map-set user-claims { user: tx-sender, epoch: epoch } {
+      liquidity-points: liquidity-points,
+      governance-points: governance-points,
+      cxlp-claimed: cxlp-amount,
+      cxvg-claimed: cxvg-amount,
+      claimed: true,
+      claim-block: block-height
+    ^
+    (map-set epoch-info epoch (merge epoch-data {
+      cxlp-pool: (- (get cxlp-pool epoch-data) cxlp-amount),
+      cxvg-pool: (- (get cxvg-pool epoch-data) cxvg-amount)
+    ^
+    (print {
+      event: "rewards-claimed",
+      user: tx-sender,
+      epoch: epoch,
+      cxlp-amount: cxlp-amount,
+      cxvg-amount: cxvg-amount
+    ^
+    (ok { cxlp: cxlp-amount, cxvg: cxvg-amount })
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+error: use of unresolved contract 'ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE.token-system-coordinator'
+--> contracts\tokens\cxtr-token.clar:151:4
+  (if (var-get system-integration-enabled)
+   ^~
+  (if (var-get system-integration-enabled)
+      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (match (var-get token-coordinator)
+      some-coordinator
+      (unwrap!
+        (contract-call? .token-system-coordinator on-transfer amount sender
+          recipient
+        )
+        true
+      )
+      true ;; if no coordinator is set, do not revert the transfer
+    ^
+    true
+    ^~~~
+error: Tuple literal construction expects a colon at index 1
+error: use of unresolved function 'to-le-bytes'
+--> contracts\core\conxian-gatekeeper.clar:23:4
+  (begin
+   ^~~~~
+    (let ((access-contract (var-get conxian-access-contract)))
+      ;; Check that the user is currently Silver Tier
+      (asserts! (is-eq (try! (contract-call? access-contract get-user-tier tx-sender)) u1) ERR_USER_NOT_SILVER)
+
+      ;; Verify the signature is from the oracle
+      (let ((hash (sha256 (merge (to-le-bytes nonce) (principal-to-buff tx-sender))))
+            (recovered-pubkey (unwrap! (secp256k1-recover hash signature) ERR_INVALID_SIGNATURE)))
+        (asserts! (is-none (map-get? used-oracle-nonces nonce)) ERR_NONCE_REPLAY)
+        (asserts! (is-eq (principal-of recovered-pubkey) (var-get oracle-principal)) ERR_INVALID_SIGNATURE)
+        (map-set used-oracle-nonces nonce true)
+      )
+
+      ;; Upgrade the user's tier in the access contract
+      (try! (contract-call? access-contract set-user-tier tx-sender u2))
+      (print {
+        event: "gold-upgrade",
+        user: tx-sender,
+      })
+      (ok true)
+    ^
+error: use of unresolved contract 'ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE.conxian-protocol'
+--> contracts\core\dimensional-engine.clar:28:4
+  (unwrap! (contract-call? .conxian-protocol is-protocol-paused) true)
+   ^~~~~~~
+  (unwrap! (contract-call? .conxian-protocol is-protocol-paused) true)
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  (unwrap! (contract-call? .conxian-protocol is-protocol-paused) true)
+                                                                 ^~~~
+error: use of unresolved contract 'ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE.traits'
+--> contracts\core\conxian-exit-queue.clar:5:1
+(use-trait sip-009-nft .traits.sip-009-nft-trait)
+^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+error: use of unresolved contract 'ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE.token-system-coordinator'
+--> contracts\governance\conxian-operations-engine.clar:176:4
+  (let (
+   ^~~
+  (let (
+      (health (unwrap-panic (contract-call? .token-system-coordinator get-system-health)))
+      (circuit-result (contract-call? .circuit-breaker is-circuit-open))
+       ^
+    (let ((circuit-open (if (is-ok circuit-result)
+        (unwrap-panic circuit-result)
+        false
+      )))
+      {
+        is-paused: (get is-paused health),
+        emergency-mode: (get emergency-mode health),
+        total-registered-tokens: (get total-registered-tokens health),
+        total-users: (get total-users health),
+        coordinator-version: (get coordinator-version health),
+        circuit-open: circuit-open,
+      }
+    ^
+error: Tuple literal construction expects a colon at index 1
+error: use of unresolved persisted variable 'base-system-cost'
+--> contracts\self-launch-coordinator.clar:91:1
+    (var-set base-system-cost base-cost)
+^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+error: use of unresolved contract 'ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE.token-system-coordinator'
+--> contracts\dex\vault.clar:321:4
+  (let (
+   ^~~
+  (let (
+      (user tx-sender)
+      (asset (contract-of asset-trait))
+      (amount (calculate-amount asset shares))
+      (fee (calculate-fee amount (var-get withdrawal-fee-bps)))
+      (net-amount (- amount fee))
+      (current-balance (unwrap! (get-total-balance asset) ERR_INVALID_ASSET))
+      (current-shares (unwrap! (get-total-shares asset) ERR_INVALID_ASSET))
+      (user-current-shares (unwrap! (get-user-shares user asset) ERR_INVALID_ASSET))
+       ^
+    (asserts! (not (var-get paused)) ERR_PAUSED)
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (> shares u0) ERR_INVALID_AMOUNT)
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (>= user-current-shares shares) ERR_INSUFFICIENT_BALANCE)
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (>= current-balance amount) ERR_INSUFFICIENT_BALANCE)
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (map-set vault-balances asset (- current-balance amount))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (map-set vault-shares asset (- current-shares shares))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (map-set user-shares {
+      user: user,
+      asset: asset,
+    }
+      (- user-current-shares shares)
+    ^
+    (if (> fee u0)
+      (begin
+        (map-set collected-fees asset
+          (+ (default-to u0 (map-get? collected-fees asset)) fee)
+        )
+        (if (var-get emission-enabled)
+          (try! (contract-call? .token-system-coordinator trigger-revenue-distribution
+            asset fee
+          ))
+          true
+        )
+        true
+      )
+      true
+    ^
+    (try! (contract-call? asset-trait transfer net-amount (as-contract tx-sender) user
+      none
+    ^
+    (notify-protocol-monitor "withdraw" {
+      asset: asset,
+      amount: net-amount,
+    ^
+    (print {
+      event: "vault-withdraw",
+      user: user,
+      asset: asset,
+      amount: net-amount,
+      shares: shares,
+      fee: fee,
+    ^
+    (ok {
+      amount: net-amount,
+      fee: fee,
+    ^
+error: invalid map definition
+--> contracts\automation\native-multisig-controller.clar:16:1
+(define-map pending-operations
+^
+error: use of undeclared trait <lending-manager-trait>
+traits should be either defined, with define-trait, or imported, with use-trait.
+error: use of unresolved contract 'ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE.conxian-protocol'
+--> contracts\enterprise\enterprise-facade.clar:24:4
+  (contract-call? .conxian-protocol is-protocol-paused)
+   ^~~~~~~~~~~~~~
+  (contract-call? .conxian-protocol is-protocol-paused)
+                  ^~~~~~~~~~~~~~~~~
+  (contract-call? .conxian-protocol is-protocol-paused)
+                                    ^~~~~~~~~~~~~~~~~~
+error: missing contract name for call
+--> contracts\staking\rewards.clar:38:4
+  (contract-call? (var-get conxian-access-contract) get-user-tier user)
+   ^~~~~~~~~~~~~~
+  (contract-call? (var-get conxian-access-contract) get-user-tier user)
+                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  (contract-call? (var-get conxian-access-contract) get-user-tier user)
+                                                    ^~~~~~~~~~~~~
+  (contract-call? (var-get conxian-access-contract) get-user-tier user)
+                                                                  ^~~~
+error: use of unresolved contract 'ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE.cxd-token'
+--> contracts\tokens\token-system-coordinator.clar:423:4
+  (let (
+   ^~~
+  (let (
+      (founder-amt-cxd (/ (* GENESIS_SUPPLY_CXD ALLOC_FOUNDER) u10000))
+      (treasury-amt-cxd (/ (* GENESIS_SUPPLY_CXD ALLOC_TREASURY) u10000))
+      (community-amt-cxd (/ (* GENESIS_SUPPLY_CXD ALLOC_COMMUNITY) u10000))
+      (founder-amt-cxvg (/ (* GENESIS_SUPPLY_CXVG ALLOC_FOUNDER) u10000))
+      (treasury-amt-cxvg (/ (* GENESIS_SUPPLY_CXVG ALLOC_TREASURY) u10000))
+      ;; Community CXVG might be minted via liquidity mining, not pre-mine
+       ^
+    (asserts! (is-contract-owner) (err ERR_UNAUTHORIZED))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (not (var-get distribution-complete)) (err u105))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (try! (contract-call? .cxd-token mint .founder-vesting founder-amt-cxd))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (try! (contract-call? .founder-vesting add-vesting-allocation .cxd-token
+      founder-amt-cxd
+    ^
+    (try! (contract-call? .cxvg-token mint founder-amt-cxvg .founder-vesting))
+^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (try! (contract-call? .founder-vesting add-vesting-allocation .cxvg-token
+      founder-amt-cxvg
+    ^
+    (try! (contract-call? .cxd-token mint treasury treasury-amt-cxd))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (try! (contract-call? .cxvg-token mint treasury-amt-cxvg treasury))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (try! (contract-call? .cxd-token mint tx-sender community-amt-cxd))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (var-set distribution-complete true)
+^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (print {
+      event: "genesis-distribution",
+      founder-vesting: founder-vesting,
+      treasury: treasury,
+      cxd-founder: founder-amt-cxd,
+      cxd-treasury: treasury-amt-cxd,
+    ^
+    (ok true)
+    ^~~~~~~~~
+error: Failed to lex input remainder: '
+;; Core compliance trait for regulated DeFi operations
+;; Implements FATF Travel Rule, sanctions screening, and compliance reporting
+
+(define-trait compliance-trait
+  ;; Travel Rule compliance
+  (transfer-with-travel-rule (sender principal recipient principal amount uint transfer-id (string 256)) (response bool uint))
+
+  ;; Sanctions screening
+  (check-sanctions (address principal) (response bool (string 256)))
+
+  ;; Compliance reporting
+  (report-transaction (tx-data (string 1024)) (response bool uint))
+
+  ;; KYC/AML verification
+  (verify-kyc (user principal verification-level uint) (response bool uint))
+
+  ;; Compliance status
+  (is-compliant (user principal) (response bool))
+)
+'
+error: use of unresolved contract 'ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE.cxd-token'
+--> contracts\tokens\cxlp-token.clar:564:4
+  (let (
+   ^~~
+  (let (
+      (start (unwrap! (var-get migration-start-height) (err ERR_MIGRATION_NOT_SET)))
+      (len (var-get epoch-length))
+      (cxd-stored (unwrap! (var-get cxd-contract) (err ERR_CXD_NOT_SET)))
+      (sender-bal (default-to u0 (map-get? balances tx-sender)))
+       ^
+    (begin
+      (asserts! (not (check-system-pause)) (err ERR_SYSTEM_PAUSED))
+      (maybe-auto-adjust)
+      (asserts! (> len u0) (err ERR_MIGRATION_NOT_SET))
+      (asserts! (>= block-height start) (err ERR_MIGRATION_NOT_STARTED))
+      (asserts! (is-eq cxd-stored cxd-contract-param) (err ERR_CXD_MISMATCH))
+      (asserts! (>= sender-bal amount) (err ERR_NOT_ENOUGH_BALANCE))
+
+      (map-set balances tx-sender
+        (unwrap! (safe-sub sender-bal amount) (err ERR_SUB_UNDERFLOW))
+      )
+      (var-set total-supply
+        (unwrap! (safe-sub (var-get total-supply) amount) (err ERR_SUB_UNDERFLOW))
+      )
+
+      (let (
+          (band (unwrap! (current-band) (err u999)))
+          (mult (unwrap! (band-multiplier band) (err ERR_OVERFLOW)))
+          (cxd-to-mint (/ (* amount mult) u10000))
+        )
+        (try! (as-contract (contract-call? .cxd-token mint recipient cxd-to-mint)))
+        (ok cxd-to-mint)
+      )
+    ^
+error: use of unresolved contract 'ST2ABGVBG5M5T6CS929MNZ7T1JF9WZ0QSRGP7JJDE.conxian-protocol'
+--> contracts\dex\multi-hop-router-v3.clar:29:4
+  (unwrap! (contract-call? .conxian-protocol is-protocol-paused) true)
+   ^~~~~~~
+  (unwrap! (contract-call? .conxian-protocol is-protocol-paused) true)
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  (unwrap! (contract-call? .conxian-protocol is-protocol-paused) true)
+                                                                 ^~~~
+error: supplied type description is invalid
+--> contracts\lending\lending-manager-trait.clar:9:1
+
+^
+error: Tuple literal construction expects a colon at index 1
+error: missing contract name for call
+--> contracts\config\launch-limits.clar:16:4
+  (let ((tier (try! (contract-call? .conxian-access.get-user-tier user)))
+   ^~~
+  (let ((tier (try! (contract-call? .conxian-access.get-user-tier user)))
+       ^
+    (asserts! (< new-total-tvl GLOBAL_TVL_CAP) (err u5001))
+^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (if (is-eq tier u1) ;; Silver Tier
+      (asserts! (<= (+ user-balance deposit-amount) SILVER_CAP) (err u5002))
+      (if (is-eq tier u2) ;; Gold Tier
+        (asserts! (<= (+ user-balance deposit-amount) GOLD_CAP) (err u5003))
+        (err u5004) ;; User has no tier
+      )
+^
+error: use of unresolved function 'b'
+--> contracts\tokens\cxd-token.clar:111:4
+  (if (>= a b)
+   ^~
+  (if (>= a b)
+      ^~~~~~~~
+    (b uint)
+    ^~~~~~~~
+      (err (err-underflow))
+      ^~~~~~~~~~~~~~~~~~~~~
+error: use of unresolved variable 'ROLLBACK_WINDOW'
+--> contracts\governance\upgrade-controller.clar:315:37
+        expires-at: (+ block-height ROLLBACK_WINDOW),
+                                    ^~~~~~~~~~~~~~~
+error: use of unresolved function 'err-contract-not-authorized'
+--> contracts\core\conxian-protocol.clar:108:4
+  (begin
+   ^~~~~
+    (asserts! (is-protocol-owner) (err u1000))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (if authorized
+      (begin
+        (asserts! (not (is-authorized-contract contract-principal))
+          (err u1001)
+        )
+        (map-set authorized-contracts contract-principal {
+          authorized: true,
+          authorized-at: block-height,
+          authorized-by: tx-sender,
+        })
+        (log-protocol-event "contract-authorized" "contract authorized")
+      )
+      (begin
+        (asserts! (is-authorized-contract contract-principal)
+          (err (err-contract-not-authorized))
+        )
+        (map-delete authorized-contracts contract-principal)
+        (log-protocol-event "contract-revoked" "contract authorization revoked")
+      )
+    ^
+    (ok true)
+    ^~~~~~~~~
+error: expecting expression of type function
+--> contracts\automation\stacks-native-launch-script.clar:193:4
+  (begin
+   ^~~~~
+    (print {event: "starting-stacks-native-launch"})
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (let ((token-system (try! (deploy-token-system))))
+      (match token-system
+        ((ok result) (begin
+          (print {event: "token-system-deployed"})
+        ))
+        ((err error) (begin
+          (print {event: "token-system-deployment-failed"})
+          (err error)
+        ))
+        ((some response) (begin
+          (print {event: "token-system-deployment-unknown-response"})
+          (err "unknown-response")
+        ))
+      )
+    ^
+    (try! (setup-native-operators))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (try! (setup-block-automation))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (try! (setup-native-multisig))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (try! (launch-dex-system))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~
+    (try! (launch-lending-system))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (try! (launch-compliance-system))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (try! (setup-treasury-system))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (try! (launch-governance-system))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (let ((result (contract-call? .self-launch-coordinator claim-launch-funds (as-contract tx-sender))))
+      (ok result)
+    ^
+    (print {
+      event: "stacks-native-launch-complete",
+      launched-at: block-height,
+      total-phases: u9,
+      architecture: "stacks-native",
+    ^
+    (ok {
+      launch-success: true,
+      launched-at: block-height,
+      architecture: "stacks-native",
+      phases-completed: u9,
+    ^
+x 35 errors detected
+
+----------------------------
+Hint: what's next?
+Once you are ready to write TypeScript unit tests for your contract, run the following command:
+
+  $ npm install
+  $ npm test
+    Run all run tests in the ./tests folder.
+
+Find more information on testing with Clarinet here: https://docs.hiro.so/stacks/clarinet-js-sdk
+These hints can be disabled in the ~/.clarinet/clarinetrc.toml file.
+  $ mkdir -p ~/.clarinet; echo "enable_hints = false" >> ~/.clarinet/clarinetrc.toml
+----------------------------

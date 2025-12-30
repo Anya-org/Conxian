@@ -2,7 +2,7 @@
 
 ;; auto-compounder.clar
 
-(use-trait sip-010-ft-trait .defi-traits.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (use-trait metrics-trait .math-utilities.finance-metrics-trait)
 (use-trait rbac-trait .core-traits.rbac-trait)
 (use-trait circuit-breaker-trait .security-monitoring.circuit-breaker-trait)

@@ -49,3 +49,27 @@
     (response uint uint)
   )
 ))
+
+;; --------------------------------------------------------------------------------
+;; Sanctions Oracle Trait
+;; --------------------------------------------------------------------------------
+(define-trait sanctions-oracle-trait (
+  (is-sanctioned (principal) (response bool uint))
+))
+
+;; --------------------------------------------------------------------------------
+;; Travel Rule Trait
+;; --------------------------------------------------------------------------------
+(define-trait travel-rule-trait (
+  (initiate-travel-rule-transfer 
+    ((string-ascii 64) principal principal uint principal (string-ascii 512) (string-ascii 512)) 
+    (response bool uint)
+  )
+))
+
+;; --------------------------------------------------------------------------------
+;; KYC Registry Trait
+;; --------------------------------------------------------------------------------
+(define-trait kyc-registry-trait (
+  (get-kyc-tier (principal) (response uint uint))
+))

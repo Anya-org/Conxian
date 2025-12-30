@@ -3,6 +3,9 @@
 ;; Provides REST-like interfaces for compliance operations
 
 (use-trait compliance-trait .compliance-trait.compliance-trait)
+(use-trait sanctions-oracle-trait .enterprise-traits.sanctions-oracle-trait)
+(use-trait travel-rule-trait .enterprise-traits.travel-rule-trait)
+(use-trait kyc-registry-trait .enterprise-traits.kyc-registry-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u9500))
 (define-constant ERR_INVALID_INPUT (err u9501))
@@ -22,18 +25,18 @@
 (define-map api-usage {
   caller: principal,
 } {
-  calls-this-hour uint,
-  last-call-block uint,
+  calls-this-hour: uint,
+  last-call-block: uint,
 })
 
 ;; --- API Endpoints State ---
 (define-map api-sessions {
-  session-id: (string 64),
+  session-id: (string-ascii 64),
 } {
-  caller principal,
-  created-at uint,
-  last-access uint,
-  requests-count uint,
+  caller: principal,
+  created-at: uint,
+  last-access: uint,
+  requests-count: uint,
 })
 
 ;; --- Compliance Service References ---
@@ -54,7 +57,7 @@
   (let ((current-height block-height)
         (usage (map-get? api-usage {caller: tx-sender}))
         (blocks-in-hour u720))  ;; 1 hour at 5s blocks
-    (if (some? usage)
+    (if (is-some usage)
       (let ((last-call (get last-call-block (unwrap-panic usage)))
             (calls-count (get calls-this-hour (unwrap-panic usage))))
         (if (>= (- current-height last-call) blocks-in-hour)
@@ -115,15 +118,13 @@
 )
 
 (define-public (set-compliance-services
-    (sanctions-oracle principal)
-    (travel-rule-service principal)
-    (kyc-registry principal)
+    (new-sanctions-oracle principal) (new-travel-rule-service principal) (new-kyc-registry principal)
   )
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (var-set sanctions-oracle sanctions-oracle)
-    (var-set travel-rule-service travel-rule-service)
-    (var-set kyc-registry kyc-registry)
+    (var-set sanctions-oracle new-sanctions-oracle)
+    (var-set travel-rule-service new-travel-rule-service)
+    (var-set kyc-registry new-kyc-registry)
     (ok true)
   )
 )
@@ -131,7 +132,7 @@
 ;; --- API Session Management ---
 
 ;; @notice Create an API session for enterprise clients
-(define-public (create-api-session (client-id (string 64)))
+(define-public (create-api-session (client-id (string-ascii 64)))
   (begin
     (asserts! (is-api-enabled) ERR_UNAUTHORIZED)
     (asserts! (check-rate-limit) ERR_RATE_LIMITED)
@@ -158,76 +159,80 @@
 ;; --- Compliance API Endpoints ---
 
 ;; @notice API endpoint: Check if address is sanctioned
-(define-public (api-check-sanctions (address principal))
+(define-public (api-check-sanctions (address principal) (oracle <sanctions-oracle-trait>))
   (begin
     (asserts! (is-api-enabled) ERR_UNAUTHORIZED)
     (asserts! (check-rate-limit) ERR_RATE_LIMITED)
+    (asserts! (is-eq (contract-of oracle) (var-get sanctions-oracle))
+      ERR_UNAUTHORIZED
+    )
     
     (var-set total-api-calls (+ (var-get total-api-calls) u1))
     
-    (let ((oracle (var-get sanctions-oracle)))
-      (match (contract-call? oracle is-sanctioned address)
-        is-sanctioned (ok {
-          address: address,
-          is-sanctioned: is-sanctioned,
-          checked-at: block-height,
-          api-call-id: (var-get total-api-calls),
-        })
-        error (err error)
-      )
+    (match (contract-call? oracle is-sanctioned address)
+      is-sanctioned (ok {
+        address: address,
+        is-sanctioned: is-sanctioned,
+        checked-at: block-height,
+        api-call-id: (var-get total-api-calls),
+      })
+      error (err error)
     )
   )
 )
 
 ;; @notice API endpoint: Get KYC verification level
-(define-public (api-get-kyc-level (user principal))
+(define-public (api-get-kyc-level (user principal) (kyc-contract <kyc-registry-trait>))
   (begin
     (asserts! (is-api-enabled) ERR_UNAUTHORIZED)
     (asserts! (check-rate-limit) ERR_RATE_LIMITED)
+    (asserts! (is-eq (contract-of kyc-contract) (var-get kyc-registry))
+      ERR_UNAUTHORIZED
+    )
     
     (var-set total-api-calls (+ (var-get total-api-calls) u1))
     
-    (let ((kyc-contract (var-get kyc-registry)))
-      (match (contract-call? kyc-contract get-verification-level user)
-        level (ok {
-          user: user,
-          verification-level: level,
-          checked-at: block-height,
-          api-call-id: (var-get total-api-calls),
-        })
-        error (err error)
-      )
+    (match (contract-call? kyc-contract get-kyc-tier user)
+      level (ok {
+        user: user,
+        verification-level: level,
+        checked-at: block-height,
+        api-call-id: (var-get total-api-calls),
+      })
+      error (err error)
     )
   )
 )
 
 ;; @notice API endpoint: Initiate Travel Rule transfer
 (define-public (api-initiate-travel-rule
-    (transfer-id (string 64))
+    (transfer-id (string-ascii 64))
     (to-vasp principal)
     (to-address principal)
     (amount uint)
     (token principal)
-    (originator-info (string 512))
-    (beneficiary-info (string 512))
+    (originator-info (string-ascii 512))
+    (beneficiary-info (string-ascii 512))
+    (travel-service <travel-rule-trait>)
   )
   (begin
     (asserts! (is-api-enabled) ERR_UNAUTHORIZED)
     (asserts! (check-rate-limit) ERR_RATE_LIMITED)
+    (asserts! (is-eq (contract-of travel-service) (var-get travel-rule-service))
+      ERR_UNAUTHORIZED
+    )
     
     (var-set total-api-calls (+ (var-get total-api-calls) u1))
     
-    (let ((travel-service (var-get travel-rule-service)))
-      (match (contract-call? travel-service initiate-travel-rule-transfer
-              transfer-id to-vasp to-address amount token originator-info beneficiary-info)
-        success (ok {
-          transfer-id: transfer-id,
-          status: "initiated",
-          initiated-at: block-height,
-          api-call-id: (var-get total-api-calls),
-        })
-        error (err error)
-      )
+    (match (contract-call? travel-service initiate-travel-rule-transfer
+            transfer-id to-vasp to-address amount token originator-info beneficiary-info)
+      success (ok {
+        transfer-id: transfer-id,
+        status: "initiated",
+        initiated-at: block-height,
+        api-call-id: (var-get total-api-calls),
+      })
+      error (err error)
     )
   )
 )
@@ -261,13 +266,13 @@
   })
 )
 
-(define-read-only (get-session-info (session-id (string 64)))
+(define-read-only (get-session-info (session-id (string-ascii 64)))
   (map-get? api-sessions {session-id: session-id})
 )
 
 (define-read-only (get-rate-limit-status (caller principal))
   (let ((usage (map-get? api-usage {caller: caller})))
-    (if (some? usage)
+    (if (is-some usage)
       (ok {
         calls-this-hour: (get calls-this-hour (unwrap-panic usage)),
         last-call: (get last-call-block (unwrap-panic usage)),

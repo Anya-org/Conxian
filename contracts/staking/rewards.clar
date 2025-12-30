@@ -35,7 +35,7 @@
 ;; --- Private Read-Only ---
 
 (define-private (get-user-tier (user principal))
-  (contract-call? (var-get conxian-access-contract) get-user-tier user)
+  (contract-call? .conxian-access get-user-tier user)
 )
 
 ;; --- Admin Functions ---

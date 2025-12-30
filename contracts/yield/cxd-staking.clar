@@ -2,7 +2,7 @@
 ;; Minimal CXD staking facade used by high-level SDK tests.
 
 ;; --- Traits ---
-(use-trait sip-010-ft-trait .defi-traits.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; --- Error Codes ---
 ;; Aligned with SDK expectations for staking security tests

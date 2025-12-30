@@ -9,6 +9,10 @@ mnemonic = "cute bird surprise boring old news cake design aisle helmet choose t
 
 # ---------- Core Contracts ----------
 
+[contracts.access-control-trait]
+path = "contracts/traits/access-control-trait.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+
 [contracts.ownable]
 path = "contracts/base/ownable.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
@@ -163,6 +167,7 @@ depends_on = [
     "collateral-manager",
     "funding-rate-calculator",
     "risk-manager",
+    "conxian-protocol",
 ]
 
 [contracts.position-manager]
@@ -436,6 +441,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.yield-optimizer]
 path = "contracts/yield/yield-optimizer.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = ["defi-traits", "security-monitoring"]
 
 [contracts.oracle]
 path = "contracts/dex/oracle.clar"
@@ -559,7 +565,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.comprehensive-lending-system]
 path = "contracts/lending/comprehensive-lending-system.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["lending-manager-trait"]
+depends_on = ["lending-manager-trait", "lending-manager"]
 
 [contracts.lending-manager]
 path = "contracts/lending/lending-manager.clar"
@@ -574,7 +580,7 @@ depends_on = []
 [contracts.keeper-coordinator]
 path = "contracts/automation/keeper-coordinator.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["controller-traits", "security-monitoring", "automation-traits"]
+depends_on = ["controller-traits", "security-monitoring", "automation-traits", "points-oracle"]
 
 [contracts.guardian-registry]
 path = "contracts/automation/guardian-registry.clar"
@@ -624,7 +630,7 @@ depends_on = ["cxvg-token"]
 [contracts.proposal-engine]
 path = "contracts/governance/proposal-engine.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["voting", "proposal-registry", "proposal-executor"]
+depends_on = ["governance-voting", "proposal-registry", "proposal-executor", "conxian-protocol"]
 
 [contracts.proposal-registry]
 path = "contracts/governance/proposal-registry.clar"
@@ -701,6 +707,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.cxlp-position-nft]
 path = "contracts/tokens/cxlp-position-nft.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = ["cxlp-token", "sip-standards"]
 
 [contracts.cxs-token]
 path = "contracts/tokens/cxs-token.clar"
@@ -709,6 +716,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.cxtr-token]
 path = "contracts/tokens/cxtr-token.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = ["sip-standards", "security-monitoring", "token-system-coordinator"]
 
 [contracts.cxvg-token]
 path = "contracts/tokens/cxvg-token.clar"
@@ -787,7 +795,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.governance-voting]
 path = "contracts/governance/voting.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["governance-token"]
+depends_on = ["cxvg-token"]
 
 
 [contracts.founder-vesting]
@@ -840,6 +848,15 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/mocks/redstone-oracle-mock.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
+[contracts.sip-018-signed-messages-trait]
+path = "contracts/traits/sip-018-signed-messages-trait.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+
+[contracts.sip-018-signed-messages]
+path = "contracts/utils/sip-018-signed-messages.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = ["sip-018-signed-messages-trait"]
+
 # ---------- Vault Contracts ----------
 
 [contracts.custody]
@@ -863,6 +880,7 @@ depends_on = [
     "custody",
     "yield-aggregator",
     "fee-manager",
+    "launch-limits",
 ]
 
 # ---------- Stacks Native Automation ----------
@@ -871,7 +889,7 @@ path = "contracts/automation/block-automation-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.native-stacking-operator]
-path = "contracts/automation/native-stacking-operator.clar"
+path = "contracts/staking/native-stacking-operator.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.native-multisig-controller]
@@ -882,6 +900,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/automation/stacks-native-launch-script.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
+depends_on = ["self-launch-coordinator"]
 [contracts.migration-adapter]
 path = "contracts/automation/migration-adapter.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
@@ -891,7 +910,7 @@ depends_on = ["native-stacking-operator", "block-automation-manager", "defi-trai
 
 [contracts.conxian-access]
 path = "contracts/core/conxian-access.clar"
-depends_on = ["sip-standards"]
+depends_on = ["sip-standards", "sip-018-signed-messages-trait"]
 
 [contracts.conxian-gatekeeper]
 path = "contracts/core/conxian-gatekeeper.clar"
@@ -922,12 +941,7 @@ depends_on = ["kyc-registry"]
 [contracts.vault]
 path = "contracts/dex/vault.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["sip-standards"]
-
-[contracts.self-launch-coordinator]
-path = "contracts/self-launch-coordinator.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["cxvg-token", "position-factory"]
+depends_on = ["sip-standards", "token-system-coordinator"]
 
 # ---------- Gamification System ----------
 

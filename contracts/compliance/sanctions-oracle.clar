@@ -13,28 +13,28 @@
 
 ;; --- Sanctions Lists ---
 (define-map sanctioned-addresses principal {
-  list-name (string 64),
-  added-at uint,
-  reason (string 256),
+  list-name: (string-ascii 64),
+  added-at: uint,
+  reason: (string-ascii 256),
 })
 
 (define-map screening-results {
   address: principal,
 } {
-  is-sanctioned bool,
-  last-screened uint,
-  list-found (string 64),
-  confidence uint,  ;; 0-10000 basis points
+  is-sanctioned: bool,
+  last-screened: uint,
+  list-found: (string-ascii 64),
+  confidence: uint,  ;; 0-10000 basis points
 })
 
 ;; --- Chainhook Integration ---
 (define-map chainhook-events {
-  event-id (string 128),
+  event-id: (string-ascii 128),
 } {
-  address principal,
-  sanction-status bool,
-  timestamp uint,
-  source-list (string 64),
+  address: principal,
+  sanction-status: bool,
+  timestamp: uint,
+  source-list: (string-ascii 64),
 })
 
 ;; --- Authorization ---
@@ -70,8 +70,7 @@
 ;; @notice Add an address to sanctions list (oracle admin only)
 (define-public (add-sanctioned-address
     (address principal)
-    (list-name (string 64))
-    (reason (string 256))
+    (list-name (string-ascii 64)) (reason (string-ascii 256))
   )
   (begin
     (asserts! (is-admin-or-owner) ERR_UNAUTHORIZED)
@@ -109,16 +108,16 @@
 
 ;; @notice Process sanctions update from Chainhook
 (define-public (process-chainhook-update
-    (event-id (string 128))
+    (event-id (string-ascii 128))
     (address principal)
     (sanction-status bool)
-    (source-list (string 64))
+    (source-list (string-ascii 64))
   )
   (begin
     (asserts! (is-admin-or-owner) ERR_UNAUTHORIZED)
     
     ;; Store chainhook event
-    (map-set chainhook-events event-id {
+    (map-set chainhook-events { event-id: event-id } {
       address: address,
       sanction-status: sanction-status,
       timestamp: block-height,
@@ -160,7 +159,7 @@
 (define-public (screen-address (address principal))
   (let ((current-height block-height)
         (sanctioned (map-get? sanctioned-addresses address)))
-    (if (some? sanctioned)
+    (if (is-some sanctioned)
       (begin
         (map-set screening-results {address: address} {
           is-sanctioned: true,
@@ -198,7 +197,7 @@
 
 (define-read-only (is-sanctioned (address principal))
   (let ((result (map-get? sanctioned-addresses address)))
-    (ok (some? result))
+    (ok (is-some result))
   )
 )
 
@@ -208,7 +207,6 @@
 
 (define-read-only (get-sanctioned-addresses (start-index uint) (limit uint))
   (begin
-    (var-set last-update-block block-height)
     (ok {
       addresses: (map-get? sanctioned-addresses tx-sender),  ;; Simplified for demo
       total-count: (var-get last-update-block),
@@ -220,8 +218,8 @@
   (ok (var-get last-update-block))
 )
 
-(define-read-only (get-chainhook-event (event-id (string 128)))
-  (map-get? chainhook-events event-id)
+(define-read-only (get-chainhook-event (event-id (string-ascii 128)))
+  (map-get? chainhook-events { event-id: event-id })
 )
 
 ;; --- Batch Operations ---
@@ -235,7 +233,7 @@
 )
 
 (define-private (batch-screen-helper (address principal) (results (list 20 bool)))
-  (let ((screened (try! (contract-call? .self screen-address address))))
+  (let ((screened (unwrap-panic (screen-address address))))
     (append results screened)
   )
 )

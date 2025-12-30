@@ -22,6 +22,7 @@
     (salt (buff 32))
   )
   ;; Placeholder: use salt to produce deterministic hash
+  ;; Reverted to simple hash due to to-consensus-buff? issues in checker
   (ok (sha256 salt))
 )
 

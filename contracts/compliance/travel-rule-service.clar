@@ -20,28 +20,28 @@
 
 ;; --- Travel Rule Data ---
 (define-map travel-rule-transfers {
-  transfer-id: (string 64),
+  transfer-id: (string-ascii 64),
 } {
-  from-vasp principal,
-  to-vasp principal,
-  from-address principal,
-  to-address principal,
-  amount uint,
-  token principal,
-  timestamp uint,
-  originator-info (string 512),
-  beneficiary-info (string 512),
-  status (string 32),  ;; "pending", "sent", "received", "completed"
+  from-vasp: principal,
+  to-vasp: principal,
+  from-address: principal,
+  to-address: principal,
+  amount: uint,
+  token: principal,
+  timestamp: uint,
+  originator-info: (string-ascii 512),
+  beneficiary-info: (string-ascii 512),
+  status: (string-ascii 32),  ;; "pending", "sent", "received", "completed"
 })
 
 (define-map vasp-compliance-info {
   vasp: principal,
 } {
-  compliance-email (string 128),
-  compliance-phone (string 32),
-  jurisdiction (string 8),
-  registration-number (string 64),
-  contact-person (string 128),
+  compliance-email: (string-ascii 128),
+  compliance-phone: (string-ascii 32),
+  jurisdiction: (string-ascii 8),
+  registration-number: (string-ascii 64),
+  contact-person: (string-ascii 128),
 })
 
 ;; --- Authorization ---
@@ -81,11 +81,7 @@
 ;; @notice Register a VASP in the compliance registry
 (define-public (register-vasp
     (vasp principal)
-    (compliance-email (string 128))
-    (compliance-phone (string 32))
-    (jurisdiction (string 8))
-    (registration-number (string 64))
-    (contact-person (string 128))
+    (compliance-email (string-ascii 128)) (compliance-phone (string-ascii 32)) (jurisdiction (string-ascii 8)) (registration-number (string-ascii 64)) (contact-person (string-ascii 128))
   )
   (begin
     (asserts! (is-admin-or-owner) ERR_UNAUTHORIZED)
@@ -95,7 +91,7 @@
     (var-set vasp-registry (unwrap! (as-max-len? (append (var-get vasp-registry) vasp) u100) ERR_UNAUTHORIZED))
     
     ;; Store compliance info
-    (map-set vasp-compliance-info vasp {
+    (map-set vasp-compliance-info { vasp: vasp } {
       compliance-email: compliance-email,
       compliance-phone: compliance-phone,
       jurisdiction: jurisdiction,
@@ -118,7 +114,7 @@
   (begin
     (asserts! (is-admin-or-owner) ERR_UNAUTHORIZED)
     (var-set vasp-registry (var-get vasp-registry))
-    (map-delete vasp-compliance-info vasp)
+    (map-delete vasp-compliance-info { vasp: vasp })
     (print {
       event: "vasp-removed",
       vasp: vasp,
@@ -132,18 +128,18 @@
 
 ;; @notice Initiate a Travel Rule transfer
 (define-public (initiate-travel-rule-transfer
-    (transfer-id (string 64))
+    (transfer-id (string-ascii 64))
     (to-vasp principal)
     (to-address principal)
     (amount uint)
     (token principal)
-    (originator-info (string 512))
-    (beneficiary-info (string 512))
+    (originator-info (string-ascii 512))
+    (beneficiary-info (string-ascii 512))
   )
   (begin
     (asserts! (is-registered-vasp) ERR_UNAUTHORIZED)
     (asserts! (>= amount TRAVEL_RULE_THRESHOLD) ERR_THRESHOLD_NOT_MET)
-    (asserts! (none? (map-get? travel-rule-transfers {transfer-id: transfer-id})) ERR_TRANSFER_EXISTS)
+    (asserts! (is-none (map-get? travel-rule-transfers {transfer-id: transfer-id})) ERR_TRANSFER_EXISTS)
     
     ;; Store travel rule data
     (map-set travel-rule-transfers {transfer-id: transfer-id} {
@@ -172,7 +168,7 @@
 )
 
 ;; @notice Confirm receipt of Travel Rule data by receiving VASP
-(define-public (confirm-travel-rule-receipt (transfer-id (string 64)))
+(define-public (confirm-travel-rule-receipt (transfer-id (string-ascii 64)))
   (let ((transfer (unwrap! (map-get? travel-rule-transfers {transfer-id: transfer-id}) ERR_TRANSFER_EXISTS)))
     (asserts! (is-registered-vasp) ERR_UNAUTHORIZED)
     (asserts! (is-eq tx-sender (get to-vasp transfer)) ERR_UNAUTHORIZED)
@@ -194,7 +190,7 @@
 )
 
 ;; @notice Send Travel Rule data to receiving VASP
-(define-public (send-travel-rule-data (transfer-id (string 64)))
+(define-public (send-travel-rule-data (transfer-id (string-ascii 64)))
   (let ((transfer (unwrap! (map-get? travel-rule-transfers {transfer-id: transfer-id}) ERR_TRANSFER_EXISTS)))
     (asserts! (is-registered-vasp) ERR_UNAUTHORIZED)
     (asserts! (is-eq tx-sender (get from-vasp transfer)) ERR_UNAUTHORIZED)
@@ -217,7 +213,7 @@
 )
 
 ;; @notice Mark transfer as completed after on-chain execution
-(define-public (complete-travel-rule-transfer (transfer-id (string 64)))
+(define-public (complete-travel-rule-transfer (transfer-id (string-ascii 64)))
   (let ((transfer (unwrap! (map-get? travel-rule-transfers {transfer-id: transfer-id}) ERR_TRANSFER_EXISTS)))
     (asserts! (is-registered-vasp) ERR_UNAUTHORIZED)
     (asserts! (or (is-eq tx-sender (get from-vasp transfer))
@@ -241,12 +237,12 @@
 
 ;; --- Read-Only Views ---
 
-(define-read-only (get-travel-rule-transfer (transfer-id (string 64)))
+(define-read-only (get-travel-rule-transfer (transfer-id (string-ascii 64)))
   (map-get? travel-rule-transfers {transfer-id: transfer-id})
 )
 
 (define-read-only (get-vasp-info (vasp principal))
-  (map-get? vasp-compliance-info vasp)
+  (map-get? vasp-compliance-info { vasp: vasp })
 )
 
 (define-read-only (is-registered-vasp-view (vasp principal))
@@ -257,7 +253,7 @@
   (ok (var-get vasp-registry))
 )
 
-(define-read-only (get-transfers-by-vasp (vasp principal) (status (string 32)))
+(define-read-only (get-transfers-by-vasp (vasp principal) (status (string-ascii 32)))
   ;; Simplified for demo - would need proper filtering in production
   (ok {
     transfers: (map-get? travel-rule-transfers {transfer-id: "demo"}),

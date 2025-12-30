@@ -2,7 +2,7 @@
 ;; Enhanced factory contract for creating and managing differentiated position NFTs.
 
 ;; SIP-010: Fungible Token Standard
-(use-trait sip-010-ft-trait .defi-traits.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 ;; SIP-009: Non-Fungible Token Standard
 (use-trait sip-009-nft-trait .defi-traits.sip-009-nft-trait)
 
