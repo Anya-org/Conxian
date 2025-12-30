@@ -3,7 +3,7 @@
 ;; Consolidates ALL revenue flows: DEX fees, vault performance, lending interest, migration fees
 ;; Replaces separate revenue-distributor.clar with dimensional architecture
 
-(use-trait sip-010-ft-trait .defi-traits.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (use-trait pausable-trait .core-traits.pausable-trait)
 (use-trait revenue-distributor-trait .core-traits.revenue-distributor-trait)
 (use-trait token-coordinator-trait .core-traits.token-coordinator-trait)

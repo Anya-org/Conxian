@@ -6,7 +6,7 @@
 (use-trait oracle-aggregator-v2-trait .oracle-pricing.oracle-aggregator-v2-trait)
 (use-trait dimensional-trait .dimensional-traits.dimensional-trait)
 (use-trait position-manager-trait .dimensional-traits.position-manager-trait)
-(use-trait ft-trait .defi-traits.sip-010-ft-trait)
+(use-trait ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; ===== Constants =====
 (define-constant ERR_UNAUTHORIZED (err u4000))

@@ -2,8 +2,8 @@
 ;; Comprehensive insurance protection NFT system for the Conxian ecosystem
 ;; Provides coverage for smart contract failures, liquidation events, and systemic risks
 
-(use-trait sip-009-nft-trait .defi-traits.sip-009-nft-trait)
-(use-trait sip-010-ft-trait .defi-traits.sip-010-ft-trait)
+(use-trait sip-009-nft-trait .sip-standards.sip-009-nft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 (impl-trait .defi-traits.sip-009-nft-trait)
 

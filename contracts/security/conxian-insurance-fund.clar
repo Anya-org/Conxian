@@ -6,7 +6,7 @@
 ;; In exchange, they receive a portion of protocol fees (routed here via protocol-fee-switch).
 ;; In a shortfall event, funds can be slashed by governance to cover deficits.
 
-(use-trait sip-010-ft-trait .defi-traits.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; --- Constants ---
 

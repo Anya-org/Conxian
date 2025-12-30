@@ -4,7 +4,7 @@
 
 (use-trait rbac-trait .core-traits.rbac-trait)
 (use-trait oracle-trait .oracle-pricing.oracle-trait)
-(use-trait sip-010-ft-trait .defi-traits.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (define-constant ERR_INVALID_ORACLE_SOURCE (err u1001))
 (define-constant ERR_INVALID_PRICE_DATA (err u1002))
 (define-constant ERR_PRICE_TOO_OLD (err u1003))

@@ -140,7 +140,7 @@
     (asserts! (get finalized root-data) ERR_EPOCH_NOT_FINALIZED)
     
     ;; Verify Merkle proof
-    (try! (verify-merkle-proof leaf proof (get root root-data)))
+    (unwrap! (verify-merkle-proof leaf proof (get root root-data)) ERR_INVALID_PROOF)
     
     ;; Store verified points
     (map-set user-point-proofs { user: user, epoch: epoch } {
