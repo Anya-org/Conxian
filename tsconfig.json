@@ -8,6 +8,6 @@
     "skipLibCheck": true,
     "types": ["vitest/globals"]
   },
-  "include": ["tests/**/*.ts"],
+  "include": ["tests/**/*.ts", "scripts/**/*.ts", "*.ts"],
   "exclude": ["node_modules"]
 }
