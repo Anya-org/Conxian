@@ -654,6 +654,7 @@ depends_on = [
     "bridge-nft",
     "token-system-coordinator",
     "circuit-breaker",
+    "governance-traits",
 ]
 
 [contracts.mev-protection-nft]
@@ -899,7 +900,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.stacks-native-launch-script]
 path = "contracts/automation/stacks-native-launch-script.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-
 depends_on = ["self-launch-coordinator"]
 [contracts.migration-adapter]
 path = "contracts/automation/migration-adapter.clar"
