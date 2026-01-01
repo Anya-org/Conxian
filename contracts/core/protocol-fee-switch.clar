@@ -178,6 +178,10 @@
     (is-total bool)
     (module (string-ascii 32))
   )
+  ;; BOLT: Consolidate state reads for gas efficiency.
+  ;; This `let` block reads all fee configuration from contract storage at once.
+  ;; This avoids one redundant read of `treasury-address` (for the burn transfer)
+  ;; and improves readability and gas cost on this hot path.
   (let (
       (sender tx-sender)
       (fee-amount (if is-total
@@ -189,10 +193,19 @@
     )
     (if (> fee-amount u0)
       (let (
-          (treasury-amt (/ (* fee-amount (var-get treasury-share-bps)) MAX_BPS))
-          (staking-amt (/ (* fee-amount (var-get staking-share-bps)) MAX_BPS))
-          (insurance-amt (/ (* fee-amount (var-get insurance-share-bps)) MAX_BPS))
-          ;; Burn is remainder to avoid dust
+          ;; Cache all storage reads to local variables
+          (treasury-share (var-get treasury-share-bps))
+          (staking-share (var-get staking-share-bps))
+          (insurance-share (var-get insurance-share-bps))
+          (treasury-addr (var-get treasury-address))
+          (staking-addr (var-get staking-address))
+          (insurance-addr (var-get insurance-address))
+
+          ;; Calculate amounts based on cached shares
+          (treasury-amt (/ (* fee-amount treasury-share) MAX_BPS))
+          (staking-amt (/ (* fee-amount staking-share) MAX_BPS))
+          (insurance-amt (/ (* fee-amount insurance-share) MAX_BPS))
+          ;; Burn is remainder to avoid dust, sent to treasury
           (burn-amt (- fee-amount (+ (+ treasury-amt staking-amt) insurance-amt)))
         )
         ;; Emit Reporting Event
@@ -208,36 +221,28 @@
           timestamp: block-height,
         })
 
-        ;; Execute Transfers
-        ;; We assume the calling module has already transferred `fee-amount` to
-        ;; this contract, so CXD balances are held by this contract. Inside
-        ;; as-contract, tx-sender resolves to this contract's principal.
-        (as-contract (print {
-          event: "debug-contract-tx-sender",
-          sender: tx-sender,
-        }))
-
+        ;; Execute Transfers using cached addresses
         (if (> treasury-amt u0)
           (try! (as-contract (contract-call? token transfer treasury-amt tx-sender
-            (var-get treasury-address) none
+            treasury-addr none
           )))
           true
         )
         (if (> staking-amt u0)
           (try! (as-contract (contract-call? token transfer staking-amt tx-sender
-            (var-get staking-address) none
+            staking-addr none
           )))
           true
         )
         (if (> insurance-amt u0)
           (try! (as-contract (contract-call? token transfer insurance-amt tx-sender
-            (var-get insurance-address) none
+            insurance-addr none
           )))
           true
         )
         (if (> burn-amt u0)
           (try! (as-contract (contract-call? token transfer burn-amt tx-sender
-            (var-get treasury-address) none
+            treasury-addr none ;; Burn amount is sent to treasury
           )))
           true
         )
