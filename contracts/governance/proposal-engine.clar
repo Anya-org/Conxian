@@ -32,8 +32,8 @@
 
 (define-private (is-protocol-paused)
   (match (contract-call? .conxian-protocol is-protocol-paused)
-    paused (unwrap-panic paused)
-    err true
+    response (unwrap-or response true)
+    true
   )
 )
 
@@ -116,6 +116,7 @@
     (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
     (asserts! (> new-period u0) ERR_INVALID_VOTING_PERIOD)
     (var-set voting-period-blocks new-period)
+    (print { event: "set-voting-period", new-period: new-period, sender: tx-sender })
     (ok true)
   )
 )
@@ -125,6 +126,7 @@
     (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
     (asserts! (and (>= new-quorum MIN_QUORUM) (<= new-quorum u10000)) ERR_UNAUTHORIZED)
     (var-set quorum-percentage new-quorum)
+    (print { event: "set-quorum-percentage", new-quorum: new-quorum, sender: tx-sender })
     (ok true)
   )
 )
@@ -133,6 +135,7 @@
   (begin
     (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
     (var-set proposal-executor executor-address)
+    (print { event: "set-proposal-executor", executor-address: executor-address, sender: tx-sender })
     (ok true)
   )
 )
@@ -141,6 +144,7 @@
   (begin
     (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
     (var-set contract-owner new-owner)
+    (print { event: "transfer-ownership", new-owner: new-owner, sender: tx-sender })
     (ok true)
   )
 )
@@ -149,6 +153,7 @@
   (begin
     (asserts! (is-contract-owner) (err u1000))
     (var-set protocol-coordinator new-coordinator)
+    (print { event: "set-protocol-coordinator", new-coordinator: new-coordinator, sender: tx-sender })
     (ok true)
   )
 )
