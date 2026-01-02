@@ -1,11 +1,11 @@
 ;;
-;; @title Comprehensive Lending System (Facade)
+;; @title Comprehensive Lending System (Logic-Rich Facade)
 ;; @author Conxian Protocol
-;; @desc This contract is the primary facade for the lending module. It provides a
-;; single, secure entry point for all lending and borrowing operations,
-;; delegating the core logic to the `lending-manager` contract. This modular
-;; design enhances security, simplifies user interaction, and improves
-;; maintainability.
+;; @desc This contract is the primary controller for the lending module. It serves
+;; as the secure, unified entry point for all user operations. It enforces
+;; business logic such as health factor checks and circuit breaker state, while
+;; delegating core operations like supply, borrow, and repay to the
+;; `lending-manager` contract.
 ;;
 
 ;; Traits

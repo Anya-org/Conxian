@@ -86,14 +86,11 @@ For more detailed information about each module's architecture and function, ple
 -   [Security Module](./contracts/security/README.md)
 -   [Monitoring Module](./contracts/monitoring/README.md)
 
-## Project Documentation
+## Documentation
 
-For a deeper understanding of the protocol's vision, architecture, and operational procedures, we recommend starting with these documents:
+For a comprehensive overview of the protocol's vision, architecture, and operational procedures, please refer to our complete documentation set.
 
--   **[Strategic Overview](./documentation/STRATEGIC_OVERVIEW.md)**: Our vision, business goals, current status, and strategic roadmap.
--   **[Whitepaper](./documentation/whitepaper/Conxian-Whitepaper.md)**: The complete technical vision and protocol design.
--   **[Architecture Specification](./documentation/guides/ARCHITECTURE_SPEC.md)**: A high-level overview of the system design and module interactions.
--   **[Developer Guide](./documentation/developer/DEVELOPER_GUIDE.md)**: A comprehensive guide for developers.
+-   **[View Complete Documentation](./documentation/README.md)**
 
 ## Development Setup
 
