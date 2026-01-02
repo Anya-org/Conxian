@@ -4,29 +4,29 @@
 
 The Governance Module provides the framework for decentralized decision-making and protocol upgrades. It is designed to be secure, transparent, and flexible, enabling the community to propose, vote on, and execute changes. The module also features the **Conxian Operations Engine**, an automated on-chain agent that participates in governance.
 
-## Architecture: Facade with Specialized Managers
+## Architecture: Logic-Rich Facade and Specialized Managers
 
-Following the protocol's standard architectural pattern, the Governance Module is built around a central **facade**. The `proposal-engine.clar` contract acts as this single, secure entry point for all governance-related actions, delegating all logic to a set of specialized manager contracts.
+The Governance Module is architected around a **logic-rich facade**. The `proposal-engine.clar` contract serves as the primary controller, acting as the secure, unified entry point for all governance actions.
 
-This facade design ensures a clear and secure process for protocol governance, from proposal creation to execution.
+Unlike a pure facade, the `proposal-engine.clar` contains significant business logic. It is responsible for enforcing the core rules of the governance process, such as validating proposal timings, checking voting eligibility, and managing the overall state of a proposal. While it orchestrates the process, it delegates specialized tasks to the manager contracts below.
 
 ### Control Flow Diagram
 
 ```
-[User/DAO] -> [proposal-engine.clar] (Facade)
+[User/DAO] -> [proposal-engine.clar] (Logic-Rich Facade & Controller)
     |
-    |-- (submit-proposal) --> [proposal-registry.clar]
-    |-- (cast-vote) --> [voting.clar]
-    |-- (execute-proposal) --> [proposal-executor.clar]
-
+    |-- (submit-proposal logic) --> [proposal-registry.clar] (Stores Data)
+    |-- (cast-vote logic) --> [voting.clar] (Records Vote)
+    |-- (execute-proposal logic) --> [proposal-executor.clar] (Executes Payload)
+    |
 [Metrics] -> [conxian-operations-engine.clar] -> [proposal-engine.clar] (Automated Vote)
 ```
 
 ## Core Contracts
 
-### Facade
+### Logic-Rich Facade
 
--   **`proposal-engine.clar`**: The primary **facade** for the governance module. It provides a unified interface for creating proposals, casting votes, and executing the outcomes, delegating all underlying logic to the appropriate manager contracts. It contains no business logic itself.
+-   **`proposal-engine.clar`**: The primary **controller** for the governance module. It provides a unified interface for creating proposals, casting votes, and executing the outcomes. It enforces the core business logic of the governance process and delegates specialized tasks like data storage and vote counting to the manager contracts.
 
 ### Manager Contracts
 
