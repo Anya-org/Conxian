@@ -2,6 +2,8 @@
 ;; Automated operations & resilience governance seat for the Conxian Protocol.
 ;; Configuration, read-only views, and a first safe execute-vote implementation.
 
+(use-trait voting-trait .governance-traits.voting-trait)
+
 (define-constant ERR_UNAUTHORIZED (err u7000))
 
 ;; --- Core Configuration ---

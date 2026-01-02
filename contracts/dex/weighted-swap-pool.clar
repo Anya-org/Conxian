@@ -34,12 +34,16 @@
 
 (define-public (swap (amount-in uint) (token-in <sip-010-ft-trait>) (token-out <sip-010-ft-trait>))
   (let (
+    ;; BOLT OPTIMIZATION: Cache token principals to reduce redundant `var-get` calls from 5 to 2.
+    ;; This saves significant gas on every swap by minimizing storage reads.
+    (token-x-principal (var-get token-x))
+    (token-y-principal (var-get token-y))
     (in-principal (contract-of token-in))
     (out-principal (contract-of token-out))
-    (is-x-in (is-eq in-principal (var-get token-x)))
+    (is-x-in (is-eq in-principal token-x-principal))
   )
-    (asserts! (or is-x-in (is-eq in-principal (var-get token-y))) ERR_INVALID_TOKEN)
-    (asserts! (is-eq out-principal (if is-x-in (var-get token-y) (var-get token-x))) ERR_INVALID_TOKEN)
+    (asserts! (or is-x-in (is-eq in-principal token-y-principal)) ERR_INVALID_TOKEN)
+    (asserts! (is-eq out-principal (if is-x-in token-y-principal token-x-principal)) ERR_INVALID_TOKEN)
     
     (if is-x-in
       (swap-internal amount-in token-in token-out true)
@@ -69,10 +73,16 @@
 )
 
 (define-public (add-liquidity (amount-x uint) (amount-y uint) (token-x-trait <sip-010-ft-trait>) (token-y-trait <sip-010-ft-trait>))
-  (let ((current-balance-x (var-get balance-x))
-        (current-balance-y (var-get balance-y)))
-    (asserts! (is-eq (contract-of token-x-trait) (var-get token-x)) ERR_INVALID_TOKEN)
-    (asserts! (is-eq (contract-of token-y-trait) (var-get token-y)) ERR_INVALID_TOKEN)
+  (let (
+    ;; BOLT OPTIMIZATION: Cache state variables to reduce redundant `var-get` calls.
+    ;; This saves gas on every liquidity provision by minimizing storage reads.
+    (current-balance-x (var-get balance-x))
+    (current-balance-y (var-get balance-y))
+    (token-x-principal (var-get token-x))
+    (token-y-principal (var-get token-y))
+  )
+    (asserts! (is-eq (contract-of token-x-trait) token-x-principal) ERR_INVALID_TOKEN)
+    (asserts! (is-eq (contract-of token-y-trait) token-y-principal) ERR_INVALID_TOKEN)
     (asserts! (and (> amount-x u0) (> amount-y u0)) ERR_INVALID_AMOUNTS)
     
     (try! (contract-call? token-x-trait transfer amount-x tx-sender (as-contract tx-sender) none))
@@ -86,17 +96,23 @@
 
 (define-public (remove-liquidity (lp-amount uint) (token-x-trait <sip-010-ft-trait>) (token-y-trait <sip-010-ft-trait>))
   (let (
-    (amount-x (/ (* lp-amount (var-get balance-x)) u100000000))
-    (amount-y (/ (* lp-amount (var-get balance-y)) u100000000))
+    ;; BOLT OPTIMIZATION: Cache state variables to reduce redundant `var-get` calls.
+    ;; This saves gas on every liquidity removal by minimizing storage reads.
+    (current-balance-x (var-get balance-x))
+    (current-balance-y (var-get balance-y))
+    (token-x-principal (var-get token-x))
+    (token-y-principal (var-get token-y))
+    (amount-x (/ (* lp-amount current-balance-x) u100000000))
+    (amount-y (/ (* lp-amount current-balance-y) u100000000))
   )
-    (asserts! (is-eq (contract-of token-x-trait) (var-get token-x)) ERR_INVALID_TOKEN)
-    (asserts! (is-eq (contract-of token-y-trait) (var-get token-y)) ERR_INVALID_TOKEN)
+    (asserts! (is-eq (contract-of token-x-trait) token-x-principal) ERR_INVALID_TOKEN)
+    (asserts! (is-eq (contract-of token-y-trait) token-y-principal) ERR_INVALID_TOKEN)
     
     (try! (as-contract (contract-call? token-x-trait transfer amount-x tx-sender tx-sender none)))
     (try! (as-contract (contract-call? token-y-trait transfer amount-y tx-sender tx-sender none)))
     
-    (var-set balance-x (- (var-get balance-x) amount-x))
-    (var-set balance-y (- (var-get balance-y) amount-y))
+    (var-set balance-x (- current-balance-x amount-x))
+    (var-set balance-y (- current-balance-y amount-y))
     (ok { amount0: amount-x, amount1: amount-y })
   )
 )
