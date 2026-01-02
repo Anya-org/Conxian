@@ -5,7 +5,7 @@
 
 ;; Traits
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
-(use-trait strategy-trait .traits folder.strategy-trait)
+(use-trait strategy-trait .strategy-trait)
 
 ;; Error codes
 (define-constant ERR_UNAUTHORIZED (err u9501))

@@ -18,6 +18,22 @@
   )
 ))
 
+;; --- Authorization ---
+(define-data-var admin principal tx-sender)
+(define-data-var sbtc-vault-principal principal tx-sender)
+(define-constant ERR_UNAUTHORIZED (err u100))
+
+(define-private (is-admin) (is-eq tx-sender (var-get admin)))
+
+;; --- Admin Functions ---
+(define-public (set-sbtc-vault-principal (vault principal))
+  (begin
+    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (var-set sbtc-vault-principal vault)
+    (ok true)
+  )
+)
+
 ;; --- Data Storage ---
 
 ;; @desc Stores the deposit information for each user.
@@ -106,7 +122,7 @@
     (recipient principal)
   )
   (begin
-    (asserts! (is-eq tx-sender .sbtc-vault) (err u100))
+    (asserts! (is-eq tx-sender (var-get sbtc-vault-principal)) ERR_UNAUTHORIZED)
     (let ((shares (calculate-shares-to-mint amount)))
       (match (map-get? user-deposits recipient)
         existing (map-set user-deposits recipient {
@@ -150,7 +166,7 @@
     (recipient principal)
   )
   (begin
-    (asserts! (is-eq tx-sender .sbtc-vault) (err u100))
+    (asserts! (is-eq tx-sender (var-get sbtc-vault-principal)) ERR_UNAUTHORIZED)
     (let ((user-shares (default-to u0 (map-get? share-balances recipient))))
       (asserts! (>= user-shares shares) (err u2002))
       (let ((sbtc-amount (calculate-sbtc-from-shares shares)))
@@ -174,7 +190,7 @@
 ;; @returns (response uint uint) The amount of sBTC withdrawn.
 (define-public (complete-withdrawal (recipient principal))
   (begin
-    (asserts! (is-eq tx-sender .sbtc-vault) (err u100))
+    (asserts! (is-eq tx-sender (var-get sbtc-vault-principal)) ERR_UNAUTHORIZED)
     (let ((request (unwrap! (map-get? withdrawal-requests recipient) (err u2001))))
       (asserts! (>= burn-block-height (get unlock-at request)) (err u2005))
       (let ((amount (get amount request)))

@@ -1,13 +1,16 @@
-// stacks/setup-test-env.ts
-import { initSimnet } from '@stacks/clarinet-sdk';
-import { resolve } from 'path';
-import { beforeAll } from 'vitest';
+import { initSimnet, Simnet } from '@stacks/clarinet-sdk';
+import { beforeEach } from 'vitest';
 
-const manifestPath = process.env.CLARINET_MANIFEST_PATH
-  ? resolve(process.cwd(), process.env.CLARINET_MANIFEST_PATH)
-  : resolve(__dirname, '../Clarinet.toml');
+const manifestPath = process.env.CLARINET_MANIFEST_PATH!;
 
-beforeAll(async () => {
-  const simnet = await initSimnet(manifestPath);
-  globalThis.simnet = simnet;
+const simnet = await initSimnet(manifestPath);
+
+beforeEach(async () => {
+  await simnet.reload();
 });
+
+declare global {
+  var simnet: Simnet;
+}
+
+globalThis.simnet = simnet;

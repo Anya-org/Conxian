@@ -8,7 +8,7 @@
     ;; @param pool-type (string-ascii 64) The string identifier of the pool type.
     ;; @param implementation-contract principal The principal of the implementation contract for the pool type.
     ;; @returns (response bool uint) A response indicating success or an error if the pool type is invalid or unauthorized.
-    (register-pool-implementation ((string-ascii 64), principal) (response bool uint))
+    (register-pool-implementation ((string-ascii 64) principal) (response bool uint))
 
     ;; @desc Retrieves the implementation contract for a given pool type.
     ;; @param pool-type (string-ascii 64) The string identifier of the pool type.
@@ -24,6 +24,22 @@
 ;; @param value principal The principal of the implementation contract.
 (define-map pool-implementations (string-ascii 64) principal)
 
+;; --- Authorization ---
+(define-data-var contract-owner principal tx-sender)
+(define-data-var factory-principal principal tx-sender)
+(define-constant ERR_UNAUTHORIZED (err u100))
+
+(define-private (is-owner) (is-eq tx-sender (var-get contract-owner)))
+
+;; --- Admin Functions ---
+(define-public (set-factory-principal (new-factory principal))
+  (begin
+    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (var-set factory-principal new-factory)
+    (ok true)
+  )
+)
+
 ;; --- Public Functions ---
 
 ;; @desc Registers a pool implementation contract for a specific pool type. Can only be called by the DEX factory.
@@ -32,7 +48,7 @@
 ;; @returns (response bool uint) A response indicating `(ok true)` on success or an error if the caller is not authorized.
 (define-public (register-pool-implementation (pool-type (string-ascii 64)) (implementation-contract principal))
   (begin
-    (asserts! (is-eq tx-sender .dex-factory) (err u100))
+    (asserts! (is-eq tx-sender (var-get factory-principal)) ERR_UNAUTHORIZED)
     (map-set pool-implementations pool-type implementation-contract)
     (ok true)
   )

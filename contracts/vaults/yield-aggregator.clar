@@ -13,6 +13,22 @@
   )
 ))
 
+;; --- Authorization ---
+(define-data-var admin principal tx-sender)
+(define-data-var sbtc-vault-principal principal tx-sender)
+(define-constant ERR_UNAUTHORIZED (err u100))
+
+(define-private (is-admin) (is-eq tx-sender (var-get admin)))
+
+;; --- Admin Functions ---
+(define-public (set-sbtc-vault-principal (vault principal))
+  (begin
+    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (var-set sbtc-vault-principal vault)
+    (ok true)
+  )
+)
+
 ;; --- Data Storage ---
 
 ;; @desc Stores the allocation details for each yield-generating strategy.
@@ -40,7 +56,7 @@
     (amount uint)
   )
   (begin
-    (asserts! (is-eq tx-sender .sbtc-vault) (err u100))
+    (asserts! (is-eq tx-sender (var-get sbtc-vault-principal)) ERR_UNAUTHORIZED)
     (map-set strategy-allocations strategy {
       allocated-amount: amount,
       current-value: amount,
@@ -56,7 +72,7 @@
 ;; @returns (response uint uint) The amount of yield earned.
 (define-public (harvest-yield (strategy principal))
   (begin
-    (asserts! (is-eq tx-sender .sbtc-vault) (err u100))
+    (asserts! (is-eq tx-sender (var-get sbtc-vault-principal)) ERR_UNAUTHORIZED)
     (match (map-get? strategy-allocations strategy)
       allocation (let ((yield-earned (- (get current-value allocation) (get allocated-amount allocation))))
         (var-set total-yield-generated

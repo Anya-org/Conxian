@@ -10,7 +10,6 @@ let wallet1: string;
 
 describe('Nakamoto Architecture Verification', () => {
   beforeAll(async () => {
-    simnet = await initSimnet("Clarinet.toml");
   });
 
   beforeEach(async () => {

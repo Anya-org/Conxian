@@ -13,14 +13,14 @@
     ;; @param start-block uint The block height at which the voting period begins.
     ;; @param end-block uint The block height at which the voting period ends.
     ;; @returns (response uint uint) A response containing the ID of the newly created proposal, or an error.
-    (propose ((string-ascii 256), (list 10 principal), (list 10 uint), (list 10 (string-ascii 64)), (list 10 (buff 1024)), uint, uint) (response uint uint))
+    (propose ((string-ascii 256) (list 10 principal) (list 10 uint) (list 10 (string-ascii 64)) (list 10 (buff 1024)) uint uint) (response uint uint))
 
     ;; @desc Casts a vote on an active proposal.
     ;; @param proposal-id uint The ID of the proposal to vote on.
     ;; @param support bool A boolean indicating the voter's support for the proposal (`true` for "for", `false` for "against").
     ;; @param votes uint The number of votes to cast, based on the voter's token holdings.
     ;; @returns (response bool uint) A response indicating `(ok true)` on a successful vote, or an error.
-    (vote (uint, bool, uint) (response bool uint))
+    (vote (uint bool uint) (response bool uint))
 
     ;; @desc Executes a proposal that has successfully passed the voting process.
     ;; @param proposal-id uint The ID of the proposal to execute.
@@ -41,6 +41,6 @@
     ;; @param proposal-id uint The ID of the proposal.
     ;; @param voter principal The principal of the voter.
     ;; @returns (response (optional { ... }) (err uint)) A response containing an optional tuple with the vote's details, or an error if not found.
-    (get-vote (uint, principal) (response (optional { support: bool, votes: uint }) (err uint)))
+    (get-vote (uint principal) (response (optional { support: bool, votes: uint }) (err uint)))
   )
 )

@@ -4,7 +4,7 @@
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 ;; Dynamic dispatch for yield distribution
-(use-trait yield-distribution-trait .traits.yield-distribution-trait.yield-distribution-trait)
+(use-trait yield-distribution-trait .yield-distribution-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u7001))

@@ -56,7 +56,7 @@
       )
       (asserts! (> token-x-reserve amount-x) ERR-INSufficient-LIQUIDITY)
       
-      ;; Price impact formula: [( (R_y * (R_x / (R_x - Δx)) ) - R_y ) / R_y ] * 10000
+      ;; Price impact formula: [( (R_y * (R_x / (R_x - delta-x)) ) - R_y ) / R_y ] * 10000
       (let
         ((new-y-reserve (* token-y-reserve (/ token-x-reserve (- token-x-reserve amount-x))))
          (delta-y (- new-y-reserve token-y-reserve))
