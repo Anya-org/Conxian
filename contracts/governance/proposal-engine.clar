@@ -1,11 +1,12 @@
 ;;
-;; @title Proposal Engine (Facade)
+;; @title Proposal Engine (Logic-Rich Facade)
 ;; @author Conxian Protocol
-;; @desc This contract serves as the central governance facade, providing a unified
-;; interface for creating, voting on, and executing proposals. It delegates the
-;; underlying logic to specialized contracts, such as `proposal-registry` for
-;; storing proposal data, `voting` for managing the voting process, and
-;; `proposal-executor` for execution.
+;; @desc This contract is the primary controller for the governance module. It
+;; provides a unified interface for creating proposals, casting votes, and
+;; executing the outcomes. It enforces the core business logic of the
+;; governance process (e.g., timing, state checks) and delegates specialized
+;; tasks like data storage (`proposal-registry`) and vote counting (`voting`)
+;; to manager contracts.
 ;;
 
 (use-trait voting-trait .governance-traits.voting-trait)

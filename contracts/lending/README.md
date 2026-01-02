@@ -4,18 +4,21 @@
 
 The Lending Module provides the core infrastructure for decentralized lending and borrowing within the Conxian Protocol. It is designed as a secure, multi-asset system for managing collateral, algorithmic interest rates, and orderly liquidations.
 
-## Architecture: Facade with Specialized Managers
+## Architecture: Logic-Rich Facade and Specialized Managers
 
-The Lending Module follows a pure **facade pattern**. The `comprehensive-lending-system.clar` contract acts as the central **facade**, providing a single, secure entry point for all lending and borrowing operations. All business logic and state are delegated to a network of specialized manager contracts.
+The Lending Module is architected around a **logic-rich facade**. The `comprehensive-lending-system.clar` contract serves as the primary controller, acting as the secure, unified entry point for all lending and borrowing operations.
 
-This design simplifies user interaction, enhances security by centralizing entry points, and improves maintainability by separating distinct business logic into modular components.
+Unlike a pure facade, this contract contains significant business logic. It is responsible for enforcing health factor checks and integrating with the protocol-wide circuit breaker, serving as the primary policy enforcement point for the module. While it orchestrates the core user actions, it delegates specialized tasks to the manager contracts below.
 
 ### Control Flow Diagram
 
 ```
-[User] -> [comprehensive-lending-system.clar] (Facade)
+[User] -> [comprehensive-lending-system.clar] (Logic-Rich Facade & Controller)
     |
-    |-- (supply, borrow, etc.) --> [lending-manager.clar]
+    |-- (supply, borrow logic) --> [lending-manager.clar] (Core Logic)
+    |-- (health-factor logic) ---^
+    |-- (circuit-breaker logic) --^
+    |
     |-- (calculate-interest) --> [interest-rate-model.clar]
     |-- (liquidate-loan) --> [liquidation-manager.clar]
     |-- (mint-position) --> [lending-position-nft.clar]
@@ -23,9 +26,9 @@ This design simplifies user interaction, enhances security by centralizing entry
 
 ## Core Contracts
 
-### Facade
+### Logic-Rich Facade
 
--   **`comprehensive-lending-system.clar`**: The main **facade** for the lending module. It contains no business logic and delegates all calls to the appropriate manager contracts.
+-   **`comprehensive-lending-system.clar`**: The primary **controller** for the lending module. It enforces business logic such as health factor checks and circuit breaker state, while delegating core operations like supply, borrow, and repay to the `lending-manager`.
 
 ### Manager Contracts
 
