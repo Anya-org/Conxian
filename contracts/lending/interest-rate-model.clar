@@ -8,7 +8,7 @@
 (define-constant ERR_INVALID_PARAMETER (err u4002))
 (define-constant ERR_LENDING_SYSTEM_NOT_SET (err u4004))
 (define-constant PRECISION u1000000000000000000) ;; 1e18
-(define-constant BLOCKS_PER_YEAR u6307200) ;; Nakamoto-adjusted: (365 * 24 * 60 * 60) / 5
+(define-constant BLOCKS_PER_YEAR u52560) ;; (365 * 24 * 6)
 (define-constant RESERVE_FACTOR u100000000000000000) ;; 10% reserve factor
 
 ;; ===== Data Variables =====
@@ -151,7 +151,7 @@
 ;; ===== Interest Accrual =====
 (define-public (accrue-interest (asset principal))
   (match (map-get? market-state { asset: asset })
-    market (let ((blocks-elapsed (- block-height (get last-update-block market))))
+    market (let ((blocks-elapsed (- burn-block-height (get last-update-block market))))
       (if (is-eq blocks-elapsed u0)
         (ok market)
         (let (
@@ -188,7 +188,7 @@
                 total-supplies: new-total-supplies,
                 borrow-index: new-borrow-index,
                 supply-index: new-supply-index,
-                last-update-block: block-height,
+                last-update-block: burn-block-height,
               })))
               (map-set market-state { asset: asset } updated-market)
               (ok updated-market)
@@ -215,7 +215,7 @@
       total-reserves: u0,
       borrow-index: PRECISION,
       supply-index: PRECISION,
-      last-update-block: block-height,
+      last-update-block: burn-block-height,
     })
     (ok true)
   )

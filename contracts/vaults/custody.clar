@@ -113,14 +113,14 @@
           sbtc-amount: (+ (get sbtc-amount existing) amount),
           shares: (+ (get shares existing) shares),
           deposited-at: (get deposited-at existing),
-          last-claim: block-height,
+          last-claim: burn-block-height,
           total-claimed: (get total-claimed existing),
         })
         (map-set user-deposits recipient {
           sbtc-amount: amount,
           shares: shares,
-          deposited-at: block-height,
-          last-claim: block-height,
+          deposited-at: burn-block-height,
+          last-claim: burn-block-height,
           total-claimed: u0,
         })
       )

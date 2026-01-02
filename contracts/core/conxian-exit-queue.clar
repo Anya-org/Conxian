@@ -30,7 +30,7 @@
     ;; 2. Mint ExitTicket-NFT
     (let ((ticket-id (var-get last-token-id)))
       (try! (nft-mint? ExitTicket-NFT ticket-id tx-sender))
-      (map-set pending-exits ticket-id { amount: amount, user: tx-sender, timestamp: block-height })
+      (map-set pending-exits ticket-id { amount: amount, user: tx-sender, timestamp: burn-block-height })
       (var-set last-token-id (+ ticket-id u1))
 
       (print {

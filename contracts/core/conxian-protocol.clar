@@ -70,7 +70,7 @@
     (map-set protocol-events { event-id: event-id } {
       event-type: event-type,
       data: data,
-      timestamp: block-height,
+      timestamp: burn-block-height,
     })
     (var-set next-event-id (+ event-id u1))
     event-id
@@ -90,7 +90,7 @@
     (asserts! (is-protocol-owner) (err u1000))
     (map-set protocol-config { key: key } {
       value: value,
-      updated-at: block-height,
+      updated-at: burn-block-height,
     })
     (log-protocol-event "config-updated" (concat key " updated"))
     (ok true)
@@ -114,7 +114,7 @@
         )
         (map-set authorized-contracts contract-principal {
           authorized: true,
-          authorized-at: block-height,
+          authorized-at: burn-block-height,
           authorized-by: tx-sender,
         })
         (log-protocol-event "contract-authorized" "contract authorized")
@@ -217,17 +217,17 @@
   ;; Set initial configuration
   (map-set protocol-config { key: "max-slippage" } {
     value: u1000,
-    updated-at: block-height,
+    updated-at: burn-block-height,
   })
   ;; 10% max slippage
   (map-set protocol-config { key: "min-liquidity" } {
     value: u1000000,
-    updated-at: block-height,
+    updated-at: burn-block-height,
   })
   ;; 1M min liquidity
   (map-set protocol-config { key: "emergency-delay" } {
     value: u1008,
-    updated-at: block-height,
+    updated-at: burn-block-height,
   })
   ;; ~1 week in blocks
 

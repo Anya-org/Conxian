@@ -80,7 +80,7 @@
     ;; Update burn tracking (Simplified moving average)
     (let (
         (current-burn (var-get rolling-burn-rate))
-        (blocks-diff (- block-height (var-get last-spend-block)))
+        (blocks-diff (- burn-block-height (var-get last-spend-block)))
       )
       (if (> blocks-diff u0)
         (var-set rolling-burn-rate (/ (+ current-burn amount) u2)) ;; Simple smoothing
@@ -88,7 +88,7 @@
       )
     )
 
-    (var-set last-spend-block block-height)
+    (var-set last-spend-block burn-block-height)
     (var-set total-stx-spent (+ (var-get total-stx-spent) amount))
 
     (as-contract (stx-transfer? amount tx-sender tx-sender))

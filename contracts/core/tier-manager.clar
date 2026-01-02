@@ -96,7 +96,7 @@
     (let ((config (unwrap! (map-get? tier-config tier-id) ERR_INVALID_TIER)))
       (map-set user-tiers user {
         tier: tier-id,
-        expiry: (+ block-height duration),
+        expiry: (+ burn-block-height duration),
         discount-bps: (get discount-bps config),
         api-credits: (get api-limit config),
       })
@@ -116,7 +116,7 @@
     }
       (map-get? user-tiers user)
     )))
-    (if (< (get expiry info) block-height)
+    (if (< (get expiry info) burn-block-height)
       (ok {
         tier: TIER_FREE,
         expiry: u0,

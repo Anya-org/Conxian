@@ -46,7 +46,7 @@
       ERR_UNAUTHORIZED
     )
     (let (
-        (current-time block-height)
+        (current-time burn-block-height)
         (last-update (default-to {
           timestamp: u0,
           cumulative-funding: 0,
@@ -105,7 +105,7 @@
   )
   (let (
       (position (try! (contract-call? .position-manager get-position position-id)))
-      (current-time block-height)
+      (current-time burn-block-height)
       (asset (get asset position))
       (last-update (unwrap! (map-get? last-funding-update { asset: asset }) ERR_TASK_NOT_READY))
     )

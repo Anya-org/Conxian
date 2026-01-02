@@ -655,6 +655,7 @@ depends_on = [
     "token-system-coordinator",
     "circuit-breaker",
     "governance-traits",
+    "sanctions-oracle",
 ]
 
 [contracts.mev-protection-nft]
@@ -882,6 +883,7 @@ depends_on = [
     "yield-aggregator",
     "fee-manager",
     "launch-limits",
+    "sanctions-oracle",
 ]
 
 # ---------- Stacks Native Automation ----------
@@ -904,29 +906,29 @@ depends_on = ["self-launch-coordinator"]
 [contracts.migration-adapter]
 path = "contracts/automation/migration-adapter.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["native-stacking-operator", "block-automation-manager", "defi-traits"]
+depends_on = ["native-stacking-operator", "block-automation-manager", "defi-traits", "sanctions-oracle"]
 
 # ---------- Viral Launch System ----------
 
 [contracts.conxian-access]
 path = "contracts/core/conxian-access.clar"
-depends_on = ["sip-standards", "sip-018-signed-messages-trait"]
+depends_on = ["sip-standards", "sip-018-signed-messages-trait", "sanctions-oracle"]
 
 [contracts.conxian-gatekeeper]
 path = "contracts/core/conxian-gatekeeper.clar"
-depends_on = ["conxian-access"]
+depends_on = ["conxian-access", "sanctions-oracle"]
 
 [contracts.rewards]
 path = "contracts/staking/rewards.clar"
-depends_on = ["conxian-access"]
+depends_on = ["conxian-access", "sanctions-oracle"]
 
 [contracts.conxian-exit-queue]
 path = "contracts/core/conxian-exit-queue.clar"
-depends_on = ["sip-standards"]
+depends_on = ["sip-standards", "sanctions-oracle"]
 
 [contracts.launch-limits]
 path = "contracts/config/launch-limits.clar"
-depends_on = ["conxian-access"]
+depends_on = ["conxian-access", "sanctions-oracle"]
 
 # ---------- Legacy Contracts (Being Phased Out) ----------
 # Legacy contracts are now properly integrated in their original sections
@@ -936,24 +938,24 @@ depends_on = ["conxian-access"]
 [contracts.compliance-hooks]
 path = "contracts/enterprise/compliance-hooks.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["kyc-registry"]
+depends_on = ["kyc-registry", "sanctions-oracle"]
 
 [contracts.vault]
 path = "contracts/dex/vault.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["sip-standards", "token-system-coordinator"]
+depends_on = ["sip-standards", "token-system-coordinator", "sanctions-oracle"]
 
 # ---------- Gamification System ----------
 
 [contracts.gamification-manager]
 path = "contracts/governance/gamification-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["cxlp-token", "cxvg-token", "points-oracle"]
+depends_on = ["cxlp-token", "cxvg-token", "points-oracle", "sanctions-oracle"]
 
 [contracts.points-oracle]
 path = "contracts/oracle/points-oracle.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = []
+depends_on = ["sanctions-oracle"]
 
 # Note: gamification-manager and points-oracle have a circular dependency
 # They are designed to be deployed together. Use stub implementations if needed.

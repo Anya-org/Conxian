@@ -88,8 +88,8 @@
   canceled: bool,
 }))
   (and
-    (>= block-height (get start-block proposal))
-    (<= block-height (get end-block proposal))
+    (>= burn-block-height (get start-block proposal))
+    (<= burn-block-height (get end-block proposal))
     (not (get canceled proposal))
   )
 )
@@ -161,8 +161,8 @@
       target: target,
       function: function,
       args: args,
-      start-block: (+ block-height (var-get voting-delay)),
-      end-block: (+ block-height (var-get voting-delay) (var-get voting-period)),
+      start-block: (+ burn-block-height (var-get voting-delay)),
+      end-block: (+ burn-block-height (var-get voting-delay) (var-get voting-period)),
       for-votes: u0,
       against-votes: u0,
       executed: false,
@@ -217,7 +217,7 @@
 (define-public (execute-proposal (proposal-id uint))
   (let ((proposal (unwrap! (map-get? proposals { id: proposal-id }) ERR_PROPOSAL_NOT_FOUND)))
     (asserts! (is-eq tx-sender (get proposer proposal)) ERR_UNAUTHORIZED)
-    (asserts! (>= block-height (get end-block proposal)) ERR_VOTING_NOT_ACTIVE)
+    (asserts! (>= burn-block-height (get end-block proposal)) ERR_VOTING_NOT_ACTIVE)
     (asserts! (not (get executed proposal)) ERR_VOTING_CLOSED)
     (asserts! (not (get canceled proposal)) ERR_VOTING_CLOSED)
     (asserts! (is-proposal-successful proposal) ERR_PROPOSAL_FAILED)
