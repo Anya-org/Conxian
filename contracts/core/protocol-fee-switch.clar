@@ -218,7 +218,7 @@
           staking: staking-amt,
           insurance: insurance-amt,
           burn: burn-amt,
-          timestamp: block-height,
+          timestamp: burn-block-height,
         })
 
         ;; Execute Transfers using cached addresses

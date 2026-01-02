@@ -86,7 +86,7 @@
     (try! (contract-call? .collateral-manager withdraw-funds total-cost asset))
     (let (
         (position-id (var-get next-position-id))
-        (current-time block-height)
+        (current-time burn-block-height)
         (price (try! (get-price asset)))
         (position-size (* collateral leverage))
         (current-oi (default-to {
@@ -147,7 +147,7 @@
   )
   (let (
       (position (try! (get-position position-id)))
-      (current-time block-height)
+      (current-time burn-block-height)
       (price (try! (get-price (get asset position))))
       (entry-price (get entry-price position))
       (collateral (get collateral position))
@@ -257,7 +257,7 @@
           leverage: new-leverage,
           stop-loss: new-stop-loss,
           take-profit: new-take-profit,
-          last-updated: block-height,
+          last-updated: burn-block-height,
         })
       )
       (ok true)

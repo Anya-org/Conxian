@@ -26,18 +26,6 @@
 )
 
 ;; ===========================================
-;; BITCOIN BRIDGE TRAIT
-;; ===========================================
-(define-trait btc-bridge-trait
-  (
-    (deposit-btc (uint (buff 32)) (response uint uint))
-    (withdraw-btc (uint (buff 128)) (response bool uint))
-    (get-btc-balance (principal) (response uint uint))
-    (validate-btc-finality (uint) (response bool uint))
-  )
-)
-
-;; ===========================================
 ;; CROSS-CHAIN VERIFIER TRAIT
 ;; ===========================================
 (define-trait cross-chain-verifier-trait

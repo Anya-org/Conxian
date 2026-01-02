@@ -7,7 +7,7 @@
 
 ;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant BLOCKS_PER_DAY u17280) ;; 1 day at 5s blocks (Nakamoto)
+(define-constant BLOCKS_PER_DAY u144) ;; 1 day at 10m blocks
 (define-constant ERR_STALE_DATA (err u1001))
 
 ;; Thresholds
@@ -44,7 +44,7 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED) ;; Keepers only
     (asserts!
-      (> (- block-height (var-get last-adjustment-block))
+      (> (- burn-block-height (var-get last-adjustment-block))
         (var-get adjustment-cooldown)
       )
       ERR_STALE_DATA
@@ -67,7 +67,7 @@
     ;; 2. Adjust Interest Rates based on Utilization
     ;; (Simplified logic - normally would call interest-rate-model setter)
 
-    (var-set last-adjustment-block block-height)
+    (var-set last-adjustment-block burn-block-height)
     (ok true)
   )
 )

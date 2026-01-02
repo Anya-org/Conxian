@@ -165,7 +165,7 @@
       (event event-type)
       (data event-data)
       (nonce nonce)
-      (block block-height)
+      (block burn-block-height)
     ))
   )
 )
@@ -275,10 +275,10 @@
   (let (
       (issuer tx-sender)
       (bond-id (var-get next-bond-id))
-      (issue-block block-height)
+      (issue-block burn-block-height)
       (maturity-block (if (is-eq maturity-blocks MATURITY_PERPETUAL)
                          u0  ;; Perpetual bonds have no maturity block
-                         (unwrap! (safe-add block-height maturity-blocks) (err ERR_OVERFLOW))))
+                         (unwrap! (safe-add burn-block-height maturity-blocks) (err ERR_OVERFLOW))))
       (bond-status BOND_STATUS_ACTIVE)
     )
     ;; Input validation with safe math
@@ -320,7 +320,7 @@
       issuer: issuer,
       bond-id: bond-id,
       amount: principal-amount,
-      timestamp: block-height
+      timestamp: burn-block-height
     }))
       (emit-event "bond_created" event-data)
     )

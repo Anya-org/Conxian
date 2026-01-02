@@ -15,8 +15,8 @@
 (define-constant ERR_INSUFFICIENT_DATA (err u5004))
 (define-constant PRECISION u1000000000000000000) ;; 1e18
 (define-constant BASIS_POINTS u10000) ;; 100%
-(define-constant ONE_DAY u17280) ;; Nakamoto-adjusted: (24 * 60 * 60) / 5
-(define-constant BLOCKS_PER_YEAR u6307200) ;; Nakamoto-adjusted: 365 * 17280
+(define-constant ONE_DAY u144) ;; (24 * 6)
+(define-constant BLOCKS_PER_YEAR u52560) ;; (365 * 24 * 6)
 (define-constant DAYS_PER_YEAR u365)
 
 ;; Metric types
@@ -281,7 +281,7 @@
     (map-set asset-tvl asset {
       amount: amount,
       usd-value: usd-value,
-      last-updated: block-height,
+      last-updated: burn-block-height,
     })
     (ok true)
   )
@@ -304,7 +304,7 @@
       fee-revenue-24h: fee-revenue-24h,
       apy: apy,
       utilization: utilization,
-      last-updated: block-height,
+      last-updated: burn-block-height,
     })
     (ok true)
   )
@@ -325,7 +325,7 @@
       total-shares: total-shares,
       apy: apy,
       performance-fee: performance-fee,
-      last-harvest: block-height,
+      last-harvest: burn-block-height,
     })
     (ok true)
   )
@@ -347,14 +347,14 @@
         total-withdrawals: (+ (get total-withdrawals existing) withdrawal-amount),
         total-fees-paid: (+ (get total-fees-paid existing) fees-paid),
         total-rewards-earned: (+ (get total-rewards-earned existing) rewards-earned),
-        last-active: block-height,
+        last-active: burn-block-height,
       })
       (map-set user-metrics user {
         total-deposits: deposit-amount,
         total-withdrawals: withdrawal-amount,
         total-fees-paid: fees-paid,
         total-rewards-earned: rewards-earned,
-        last-active: block-height,
+        last-active: burn-block-height,
       })
     )
     (ok true)

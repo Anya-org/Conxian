@@ -61,7 +61,7 @@
     (map-set deployed-assets { symbol: symbol } {
       contract: token-contract,
       deployer: tx-sender,
-      created-at: block-height,
+      created-at: burn-block-height,
     })
     (ok true)
   )
