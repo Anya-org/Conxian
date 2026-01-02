@@ -5,7 +5,7 @@ export default defineConfig({
     environment: 'node',
     setupFiles: ['./stacks/setup-test-env.ts'],
     env: {
-      CLARINET_MANIFEST_PATH: 'Clarinet.toml',
+      CLARINET_MANIFEST_PATH: 'stacks/Clarinet.test.toml',
     },
     testTimeout: 300000,
     hookTimeout: 90000,
