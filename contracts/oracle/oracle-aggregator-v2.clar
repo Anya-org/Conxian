@@ -63,7 +63,7 @@
 
 (define-public (set-circuit-breaker (cb principal))
   (begin
-    (asserts! (contract-call? .access-control.access-control-contract has-role "contract-owner" tx-sender) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
     (var-set circuit-breaker (some cb))
     (ok true)
   )
@@ -71,7 +71,7 @@
 
 (define-public (set-params (new-threshold-bps uint) (new-alpha-bps uint))
   (begin
-    (asserts! (contract-call? .access-control.access-control-contract has-role "contract-owner" tx-sender) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
     (var-set manipulation-threshold-bps new-threshold-bps)
     (var-set twap-alpha-bps new-alpha-bps)
     (ok true)

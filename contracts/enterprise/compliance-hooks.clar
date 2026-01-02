@@ -11,13 +11,8 @@
 )
 
 (define-public (check-aml (user principal))
-  (let ((status (unwrap! (contract-call? .kyc-registry get-identity-status user)
-      ERR_UNAUTHORIZED
-    )))
-    ;; Check if Sanctioned bit (0x2) is set
-    (asserts! (is-eq (mod (/ (get status-flags status) u2) u2) u0)
-      ERR_UNAUTHORIZED
-    )
+  (let ((is-sanctioned (unwrap! (contract-call? .kyc-registry is-sanctioned user) ERR_UNAUTHORIZED)))
+    (asserts! (not is-sanctioned) ERR_UNAUTHORIZED)
     (ok true)
   )
 )
