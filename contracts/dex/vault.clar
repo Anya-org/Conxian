@@ -14,6 +14,7 @@
 (define-constant ERR_INVALID_ASSET (err u1006))
 (define-constant ERR_STRATEGY_FAILED (err u1007))
 (define-constant ERR_TRANSFER_FAILED (err u1008))
+(define-constant ERR_ASSET_ALREADY_SUPPORTED (err u1009))
 
 ;; Configuration Constants
 (define-constant MAX_BPS u10000)
@@ -169,12 +170,10 @@
       (total-balance (unwrap-panic (get-total-balance asset)))
       (total-shares (unwrap-panic (get-total-shares asset)))
     )
-    (if (is-eq total-shares u0)
-      ;; First deposit: burn 1000 shares (dead shares) to prevent inflation attack
-      (if (> amount u1000)
-        (- amount u1000)
-        u0
-      )
+    (if (is-eq total-balance u0)
+      ;; If there is no balance, shares are minted 1:1 with the amount deposited.
+      amount
+      ;; Otherwise, calculate shares based on the current ratio of assets to shares.
       (/ (* amount total-shares) total-balance)
     )
   )
@@ -250,13 +249,7 @@
 
     ;; Update vault state
     (map-set vault-balances asset (+ current-balance net-amount))
-    (map-set vault-shares asset
-      (+ current-shares
-        (if (is-eq current-shares u0)
-          (+ shares u1000)
-          shares
-        ))
-    )
+    (map-set vault-shares asset (+ current-shares shares))
     (map-set user-shares {
       user: user,
       asset: asset,
@@ -587,8 +580,14 @@
   )
   (begin
     (asserts! (is-admin tx-sender) ERR_UNAUTHORIZED)
+    (asserts! (not (is-asset-supported asset)) ERR_ASSET_ALREADY_SUPPORTED)
+
     (map-set supported-assets asset true)
     (map-set asset-strategies asset strategy-contract)
+
+    ;; Mitigate inflation attack by creating 1000 dead shares upon initialization.
+    ;; This ensures total-shares is never zero, preventing share price manipulation.
+    (map-set vault-shares asset u1000)
     (ok true)
   )
 )
