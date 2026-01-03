@@ -92,6 +92,16 @@ For a comprehensive overview of the protocol's vision, architecture, and operati
 
 -   **[View Complete Documentation](./documentation/README.md)**
 
+## Project Documentation
+
+Key project documents are organized within the `/documentation` directory:
+
+-   **[Changelog](./documentation/CHANGELOG.md)**: A log of all notable changes to the protocol.
+-   **[Roadmap](./documentation/ROADMAP.md)**: The development roadmap for the Conxian Protocol.
+-   **[Contributing Guide](./documentation/guides/CONTRIBUTING.md)**: Guidelines for contributing to the project.
+-   **[Audit Reports](./documentation/reports/)**: Security audit reports.
+-   **[System Review](./documentation/reports/SYSTEM_REVIEW.md)**: A detailed review of the system architecture and components.
+
 ## Development Setup
 
 ### Prerequisites
