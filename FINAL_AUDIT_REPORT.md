@@ -24,10 +24,11 @@ This section details the most severe, P0-level issues that pose a direct threat 
 **Analysis:** The `contracts/vaults/custody.clar` contract contains a textbook implementation of the vault inflation attack vulnerability. The `calculate-shares-to-mint` function fails to correctly establish an initial, non-zero share price when the vault is empty. Instead of minting a minimum number of shares to a dead address, the logic simply subtracts from the depositor's amount.
 
 **Impact:** A malicious attacker can exploit this flaw to steal the entire deposit of the next user by:
+
 1. Depositing a minuscule amount (e.g., 1 wei) to receive 0 shares.
-2. Transferring a large amount of the underlying asset directly to the vault.
-3. Waiting for an honest user to deposit, who will also receive 0 shares due to rounding errors.
-4. Withdrawing their initial deposit, which will now entitle them to a disproportionately large share of the vault's assets, including the honest user's funds.
+1. Transferring a large amount of the underlying asset directly to the vault.
+1. Waiting for an honest user to deposit, who will also receive 0 shares due to rounding errors.
+1. Withdrawing their initial deposit, which will now entitle them to a disproportionately large share of the vault's assets, including the honest user's funds.
 
 This vulnerability renders all vaults built on this logic fundamentally insecure.
 
@@ -124,9 +125,10 @@ This final section provides recommendations for improving the protocol's on-chai
 **Recommendation:** The most significant business logic gap is the project's inconsistent and partial adoption of the necessary changes for the Stacks Nakamoto upgrade. While some contracts have been fixed, others remain critically vulnerable to timing bugs. This indicates a lack of a unified strategy.
 
 The project must immediately:
-1.  **Halt all non-essential development.**
-2.  **Conduct a full, systematic audit** of every contract to identify all instances of `block-height` used for time-based logic.
-3.  **Create a comprehensive migration plan** that details the required changes, the correct constants to be used, and the testing strategy to verify the fixes.
-4.  **Implement the plan** in a single, coordinated effort to bring the entire protocol into alignment with Nakamoto standards.
+
+1. **Halt all non-essential development.**
+1. **Conduct a full, systematic audit** of every contract to identify all instances of `block-height` used for time-based logic.
+1. **Create a comprehensive migration plan** that details the required changes, the correct constants to be used, and the testing strategy to verify the fixes.
+1. **Implement the plan** in a single, coordinated effort to bring the entire protocol into alignment with Nakamoto standards.
 
 Until this is completed, the project cannot be considered secure or feature-complete.

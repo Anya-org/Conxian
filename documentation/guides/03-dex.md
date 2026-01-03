@@ -10,8 +10,8 @@ The `multi-hop-router-v3.clar` contract is the main entry point for executing tr
 
 The `multi-hop-router-v3` contract does not compute routes or manage their execution directly. Instead, it delegates calls to the following specialized contracts:
 
--   **`dijkstra-pathfinder.clar`**: This contract is responsible for computing the most efficient path for a token swap using Dijkstra's algorithm.
--   **`route-manager.clar`**: This contract manages the lifecycle of a trade, from proposal to execution.
+- **`dijkstra-pathfinder.clar`**: This contract is responsible for computing the most efficient path for a token swap using Dijkstra's algorithm.
+- **`route-manager.clar`**: This contract manages the lifecycle of a trade, from proposal to execution.
 
 This architecture separates the core logic of the DEX router from the more specialized tasks of route computation and execution management.
 
@@ -21,11 +21,11 @@ This architecture separates the core logic of the DEX router from the more speci
 
 Call the `propose-route` function with the following parameters:
 
--   `token-in principal`: The token you want to sell.
--   `token-out principal`: The token you want to buy.
--   `amount-in uint`: The amount of `token-in` you want to sell.
--   `min-amount-out uint`: The minimum amount of `token-out` you are willing to accept.
--   `route-timeout uint`: The number of blocks after which the proposed route expires.
+- `token-in principal`: The token you want to sell.
+- `token-out principal`: The token you want to buy.
+- `amount-in uint`: The amount of `token-in` you want to sell.
+- `min-amount-out uint`: The minimum amount of `token-out` you are willing to accept.
+- `route-timeout uint`: The number of blocks after which the proposed route expires.
 
 This function will return a `route-id`.
 
@@ -33,9 +33,9 @@ This function will return a `route-id`.
 
 Call the `execute-route` function with the following parameters:
 
--   `route-id uint`: The ID of the route you want to execute.
--   `min-amount-out uint`: The minimum amount of the output token you are willing to accept.
--   `recipient principal`: The address that will receive the output tokens.
+- `route-id uint`: The ID of the route you want to execute.
+- `min-amount-out uint`: The minimum amount of the output token you are willing to accept.
+- `recipient principal`: The address that will receive the output tokens.
 
 ## 4. Key Functions
 

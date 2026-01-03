@@ -17,12 +17,14 @@ This document outlines the current Conxian protocol architecture, a comprehensiv
 The Conxian protocol is organized into a series of specialized modules, each located in a dedicated subdirectory within the `contracts` directory.
 
 ### Core Modules
+
 - **`core`**: Contains the core logic of the dimensional engine, which is responsible for coordinating the various dimensions of the protocol.
 - **`dex`**: A feature-complete decentralized exchange with a modular router, a factory for creating liquidity pools, and support for concentrated liquidity.
 - **`governance`**: A modular proposal and voting system that allows the community to manage the protocol, including the `conxian-operations-engine.clar` contract as an automated Operations & Resilience governance seat that reads metrics from core subsystems and casts policy-constrained votes.
 - **`lending`**: A feature-complete, multi-asset lending and borrowing system, centered around the `comprehensive-lending-system.clar` contract.
 
 ### Supporting Modules
+
 - **`access`**: Role-based access control and permissions management.
 - **`audit-registry`**: A registry for audit information and security-related data.
 - **`automation`**: Contracts for automating routine tasks and managing keepers.

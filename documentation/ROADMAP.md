@@ -19,29 +19,49 @@ The phases below incorporate the agreed recommendations around:
 
 ## Phase 0: Technical Alpha & Nakamoto Alignment (Current Phase)
 
-- **Objective**: Solidify the protocol's foundation by aligning all core components with the modular, facade-based architecture and ensuring full compliance with the upcoming Stacks Nakamoto upgrade. This phase is about building a stable, future-proof base for all subsequent development.
+- **Objective**: Solidify the protocol's foundation by aligning all core components with the modular, facade-based
+  architecture and ensuring full compliance with the upcoming Stacks Nakamoto upgrade. This phase is about building a
+  stable, future-proof base for all subsequent development.
 
 - **Key Activities**:
   - **Architectural Integrity & Test Environment Stabilization (In Progress)**:
-    - **Dependency Graph Overhaul**: The project's dependency analysis tooling (`build_graph.py`, `align_contracts.py`) has been completely rewritten. The new system accurately parses all contract files to detect dependencies from `use-trait`, `impl-trait`, and direct `contract-call?` statements, generating a correct topological ordering for deployment and testing.
-    - **Circular Dependency Resolution**: The enhanced tooling successfully identified and enabled the resolution of multiple critical circular dependencies within the contract architecture. This was a major blocker preventing the test suite from initializing and has been a significant step toward stabilizing the system.
-    - **Test Suite Status**: The test environment has been stabilized to the point where it can now reliably load the entire contract suite and report specific, actionable compilation errors. While many tests are still failing, the errors are no longer due to a broken environment but to issues within the contracts themselves, which can now be addressed systematically.
+    - **Dependency Graph Overhaul**: The project's dependency analysis tooling (`build_graph.py`, `align_contracts.py`)
+      has been completely rewritten. The new system accurately parses all contract files to detect dependencies from
+      `use-trait`, `impl-trait`, and direct `contract-call?` statements, generating a correct topological ordering for
+      deployment and testing. This overhaul enables the project to better manage its complex dependencies and ensures
+      that the contract suite can be deployed and tested in a reliable and efficient manner.
+    - **Circular Dependency Resolution**: The enhanced tooling successfully identified and enabled the resolution of
+      multiple critical circular dependencies within the contract architecture. This was a major blocker preventing the
+      test suite from initializing and has been a significant step toward stabilizing the system. By resolving these
+      circular dependencies, the project can now move forward with confidence, knowing that its core components are
+      properly aligned and functioning as intended.
+    - **Test Suite Status**: The test environment has been stabilized to the point where it can now reliably load the
+      entire contract suite and report specific, actionable compilation errors. While many tests are still failing, the
+      errors are no longer due to a broken environment but to issues within the contracts themselves, which can now be
+      addressed systematically. This marks a significant milestone in the project's development, as it enables the team
+      to focus on resolving the remaining issues and moving forward with the development of the protocol, allowing for
+      systematic addressing of the issues.
 
   - **Nakamoto Compliance (Next)**:
-    - Audit all contracts for dependencies on `block-height` for time-based logic and rescale constants to align with faster block times.
+    - Audit all contracts for dependencies on `block-height` for time-based logic and rescale constants to align with
+      faster block times.
     - Transition long-term logic to `burn-block-height` where appropriate.
     - Deprecate the custom BTC bridge and integrate the official, native sBTC protocol.
 
   - **Architectural Alignment (Planned)**:
-    - Refactor the `enterprise-api.clar` from a prototype into a true facade, delegating logic to specialized manager contracts.
-    - Solidify the `proposal-engine.clar` as the central facade for governance and clearly define the interfaces for its manager contracts.
+    - Refactor the `enterprise-api.clar` from a prototype into a true facade, delegating logic to specialized manager
+      contracts.
+    - Solidify the `proposal-engine.clar` as the central facade for governance and clearly define the interfaces for
+      its manager contracts.
 
   - **Documentation Overhaul (Planned)**:
-    - Complete the comprehensive documentation alignment to ensure all `README.md` files and strategic documents accurately reflect the current state and target architecture of the protocol.
+    - Complete the comprehensive documentation alignment to ensure all `README.md` files and strategic documents
+      accurately reflect the current state and target architecture of the protocol.
 
 ## Phase 1: Feature Hardening & Security (Planned)
 
-- **Objective**: Move the protocol from a "Technical Alpha" to a "Beta" stage by hardening all existing features, expanding security measures, and preparing for a formal audit.
+- **Objective**: Move the protocol from a "Technical Alpha" to a "Beta" stage by hardening all existing features,
+  expanding security measures, and preparing for a formal audit.
 
 - **Key Activities**:
   - **Contract Hardening**:
@@ -51,7 +71,8 @@ The phases below incorporate the agreed recommendations around:
   - **Testing Infrastructure**:
     - Achieve comprehensive test coverage for all core modules, including economic and security stress tests.
   - **Security & Monitoring**:
-    - Implement and test advanced security features, including MEV protection, a robust circuit breaker, and oracle failure modes.
+    - Implement and test advanced security features, including MEV protection, a robust circuit breaker, and oracle
+      failure modes.
     - Prepare detailed architecture diagrams and threat models for an external security review.
 
 ## Phase 2: Advanced Governance & Feature Completion (Planned)

@@ -309,37 +309,37 @@ user_cxvg = (user_governance_points / total_governance_points) * epoch_cxvg_pool
 
 ### 2.2 Handoff Procedure
 
-**Phase 1: Preparation (Week 1-2)**
+**1: Preparation **
 
 1. **Deploy Timelock Contracts**
    - 2-week timelock for normal proposals
    - 1-day timelock for emergency actions
    - 3-of-5 multisig for execution
 
-2. **Initialize DAO Treasury**
+1. **Initialize DAO Treasury**
    - Transfer 10% of protocol fees
    - Initialize governance token distribution
    - Set up budget allocation system
 
-3. **Document All Procedures**
+1. **Document All Procedures**
    - Emergency response procedures
    - Upgrade procedures
    - Parameter change procedures
    - Treasury management procedures
 
-**Phase 2: Gradual Transfer (Week 3-8)**
+**2: Gradual Transfer (Week 3-8)**
 
 1. **Week 3-4: Parameter Control**
    - Transfer fee rate control to DAO
    - Transfer emission rate control to DAO
    - Maintain emergency pause with founder
 
-2. **Week 5-6: Treasury Control**
+1. **Week 5-6: Treasury Control**
    - Transfer 50% treasury control to DAO
    - Require DAO approval for large expenditures (>$50K)
    - Maintain founder veto for 90 days
 
-3. **Week 7-8: Full Contract Control**
+1. **Week 7-8: Full Contract Control**
    - Transfer all contract ownership to DAO
    - Transfer upgrade authority to DAO
    - Maintain emergency multisig (3-of-5 with founder)
@@ -351,7 +351,7 @@ user_cxvg = (user_governance_points / total_governance_points) * epoch_cxvg_pool
    - Transfer emergency pause to DAO multisig
    - Document final state
 
-2. **Week 11-12: Verification & Monitoring**
+1. **Week 11-12: Verification & Monitoring**
    - Verify all controls transferred
    - Monitor DAO operations
    - Provide ongoing support as needed
@@ -372,13 +372,13 @@ user_cxvg = (user_governance_points / total_governance_points) * epoch_cxvg_pool
 1. **Parameter Changes** (Simple majority, 1-week voting)
    - Fee rates, emission rates, collateral ratios
 
-2. **Contract Upgrades** (66.67% supermajority, 2-week voting)
+1. **Contract Upgrades** (66.67% supermajority, 2-week voting)
    - Smart contract upgrades, new feature deployments
 
-3. **Treasury Spending** (Simple majority, 1-week voting)
+1. **Treasury Spending** (Simple majority, 1-week voting)
    - Budget allocations, grants, partnerships
 
-4. **Emergency Actions** (3-of-5 multisig, immediate)
+1. **Emergency Actions** (3-of-5 multisig, immediate)
    - Circuit breaker activation, protocol pause
 
 **Quorum Requirements:**
@@ -406,36 +406,36 @@ user_cxvg = (user_governance_points / total_governance_points) * epoch_cxvg_pool
 **Sources:**
 
 1. **Self-Launch Contributions:** $500K - $1M (50% to launch fund)
-2. **Founder Allocation:** $300K - $500K (from treasury)
-3. **Strategic Partners:** $300K - $500K (pre-launch agreements)
-4. **Market Makers:** $250K - $500K (professional liquidity)
+1. **Founder Allocation:** $300K - $500K (from treasury)
+1. **Strategic Partners:** $300K - $500K (pre-launch agreements)
+1. **Market Makers:** $250K - $500K (professional liquidity)
 
 ### 3.2 Liquidity Bootstrapping Process
 
-**Week 1-2: Pre-Launch**
+#### Week 1-2: Pre-Launch
 
 - Secure strategic partner commitments
 - Finalize market maker agreements
 - Prepare liquidity deployment scripts
 
-**Week 3-4: Initial Deployment**
+#### Week 3-4: Initial Deployment
 
 ```typescript
 // Liquidity deployment sequence
 1. Deploy CXD/STX pool (highest priority)
-2. Deploy CXVG/STX pool
-3. Deploy CXLP/STX pool
-4. Deploy sBTC/STX pool
-5. Deploy secondary pairs (CXD/CXVG, etc.)
+1. Deploy CXVG/STX pool
+1. Deploy CXLP/STX pool
+1. Deploy sBTC/STX pool
+1. Deploy secondary pairs (CXD/CXVG, etc.)
 ```
 
-**Week 5-8: Liquidity Mining Launch**
+#### Week 5-8: Liquidity Mining Launch
 
 - Activate liquidity mining rewards
 - Monitor pool health and rebalancing
 - Adjust incentives based on TVL growth
 
-**Week 9-12: Stabilization**
+#### Week 9-12: Stabilization
 
 - Reduce founder-provided liquidity gradually
 - Transition to community-provided liquidity
@@ -472,9 +472,9 @@ user_cxvg = (user_governance_points / total_governance_points) * epoch_cxvg_pool
 **Epoch Phases:**
 
 1. **Accumulation Phase** (Days 1-28): Points earned
-2. **Calculation Phase** (Days 29-30): Off-chain calculation
-3. **Claim Phase** (Days 31-60): 30-day claim window
-4. **Auto-Conversion** (Day 61): Keeper executes unclaimed
+1. **Calculation Phase** (Days 29-30): Off-chain calculation
+1. **Claim Phase** (Days 31-60): 30-day claim window
+1. **Auto-Conversion** (Day 61): Keeper executes unclaimed
 
 ### 4.2 Epoch Transitions
 
@@ -607,12 +607,12 @@ async function calculateEpochPoints(epochId: number) {
    - Recommendations and fixes
    - Risk assessment
 
-2. **Code Quality Report**
+1. **Code Quality Report**
    - Best practices compliance
    - Gas optimization opportunities
    - Code maintainability
 
-3. **Economic Analysis**
+1. **Economic Analysis**
    - Tokenomics review
    - Incentive alignment
    - Game theory analysis
@@ -762,14 +762,14 @@ async function calculateEpochPoints(epochId: number) {
 
 ### Phase 1: Pre-Launch (Weeks 1-4)
 
-**Week 1-2: Final Development**
+#### Week 1-2: Final Development
 
 - ✅ Complete P0 security fixes
 - 🟡 Resolve compilation errors
 - ⚪ Implement gamification contracts
 - ⚪ Complete test coverage
 
-**Week 3-4: Testing & Audit Prep**
+#### Week 3-4: Testing & Audit Prep
 
 - ⚪ Run full test suite
 - ⚪ Conduct internal security review
@@ -778,14 +778,14 @@ async function calculateEpochPoints(epochId: number) {
 
 ### Phase 2: Audit & Refinement (Weeks 5-8)
 
-**Week 5-6: Security Audit**
+#### Week 5-6: Security Audit
 
 - ⚪ Third-party audit begins
 - ⚪ Address audit findings
 - ⚪ Re-test affected components
 - ⚪ Document all changes
 
-**Week 7-8: Bug Bounty**
+#### Week 7-8: Bug Bounty
 
 - ⚪ Launch bug bounty program
 - ⚪ Monitor for issues
@@ -794,14 +794,14 @@ async function calculateEpochPoints(epochId: number) {
 
 ### Phase 3: Testnet Launch (Weeks 9-12)
 
-**Week 9: Deployment**
+#### Week 9: Deployment
 
 - ⚪ Deploy all contracts
 - ⚪ Initialize systems
 - ⚪ Verify deployment
 - ⚪ Open for testing
 
-**Week 10-12: Community Testing**
+#### Week 10-12: Community Testing
 
 - ⚪ Onboard early users
 - ⚪ Monitor system performance
@@ -810,21 +810,21 @@ async function calculateEpochPoints(epochId: number) {
 
 ### Phase 4: Mainnet Preparation (Months 4-12)
 
-**Months 4-6: Gamification Phase 1**
+#### Months 4-6: Gamification Phase 1
 
 - ⚪ Points accumulation
 - ⚪ Community growth
 - ⚪ Feature refinement
 - ⚪ TVL growth
 
-**Months 7-9: DAO Transition**
+#### Months 7-9: DAO Transition
 
 - ⚪ Gradual control transfer
 - ⚪ Governance activation
 - ⚪ Treasury initialization
 - ⚪ Full decentralization
 
-**Months 10-12: Mainnet Launch**
+#### Months 10-12: Mainnet Launch
 
 - ⚪ Final security review
 - ⚪ Mainnet deployment
@@ -870,54 +870,54 @@ async function calculateEpochPoints(epochId: number) {
 
 ### Technical Risks
 
-**Smart Contract Exploit**
+#### Smart Contract Exploit
 
 - **Mitigation:** Audit, bug bounty, insurance fund
 - **Contingency:** Emergency pause, rollback plan, user compensation
 
-**Oracle Manipulation**
+#### Oracle Manipulation
 
 - **Mitigation:** TWAP, circuit breaker, multiple sources
 - **Contingency:** Pause trading, manual price override, investigation
 
-**Scalability Issues**
+#### Scalability Issues
 
 - **Mitigation:** Gas optimization, batching, L2 integration
 - **Contingency:** Fee adjustments, transaction limits, upgrade plan
 
 ### Economic Risks
 
-**Liquidity Crisis**
+#### Liquidity Crisis
 
 - **Mitigation:** Insurance fund, circuit breaker, reserves
 - **Contingency:** Emergency liquidity injection, trading pause, restructuring
 
-**Token Price Collapse**
+#### Token Price Collapse
 
 - **Mitigation:** Utility-first design, buy-back mechanism, vesting
 - **Contingency:** Reduce emissions, increase utility, market support
 
-**OPEX Loan Default**
+#### OPEX Loan Default
 
 - **Mitigation:** Conservative projections, reserves, monitoring
 - **Contingency:** Restructure terms, seek additional funding, reduce expenses
 
 ### Regulatory Risks
 
-**Securities Classification**
+#### Securities Classification
 
-- **Mitigation:** No pre-sale, work-based earning, utility-first
-- **Contingency:** Legal defense, token restructure, geographic restrictions
+1. **Mitigation:** No pre-sale, work-based earning, utility-first
+2. **Contingency:** Legal defense, token restructure, geographic restrictions
 
-**KYC/AML Non-Compliance**
+#### KYC/AML Non-Compliance
 
-- **Mitigation:** Tiered system, attestors, compliance tools
-- **Contingency:** Enhanced verification, user restrictions, regulatory cooperation
+1. **Mitigation:** Tiered system, attestors, compliance tools
+2. **Contingency:** Enhanced verification, user restrictions, regulatory cooperation
 
-**Geographic Restrictions**
+#### Geographic Restrictions
 
-- **Mitigation:** IP blocking, sanctioned list, region tracking
-- **Contingency:** Expand restrictions, user migration, legal compliance
+1. **Mitigation:** IP blocking, sanctioned list, region tracking
+2. **Contingency:** Expand restrictions, user migration, legal compliance
 
 ---
 
@@ -926,26 +926,26 @@ async function calculateEpochPoints(epochId: number) {
 ### Priority 1 (This Week)
 
 1. ✅ Complete remaining compilation fixes
-2. ⚪ Run full clarinet check
-3. ⚪ Create gamification-manager.clar
-4. ⚪ Create points-oracle.clar
-5. ⚪ Update automation-keeper.clar
+1. ⚪ Run full clarinet check
+1. ⚪ Create gamification-manager.clar
+1. ⚪ Create points-oracle.clar
+1. ⚪ Update automation-keeper.clar
 
 ### Priority 2 (Next Week)
 
 1. ⚪ Write comprehensive test suite
-2. ⚪ Deploy to testnet
-3. ⚪ Initialize all systems
-4. ⚪ Begin internal testing
-5. ⚪ Prepare audit documentation
+1. ⚪ Deploy to testnet
+1. ⚪ Initialize all systems
+1. ⚪ Begin internal testing
+1. ⚪ Prepare audit documentation
 
 ### Priority 3 (Weeks 3-4)
 
 1. ⚪ Engage security auditor
-2. ⚪ Launch bug bounty
-3. ⚪ Onboard early testers
-4. ⚪ Monitor and iterate
-5. ⚪ Prepare for public launch
+1. ⚪ Launch bug bounty
+1. ⚪ Onboard early testers
+1. ⚪ Monitor and iterate
+1. ⚪ Prepare for public launch
 
 ---
 
@@ -959,17 +959,17 @@ The Conxian Protocol represents a comprehensive DeFi ecosystem with:
 - **Regulatory compliance** via tiered KYC/AML
 - **Sustainable economics** through OPEX loan and emissions
 
-**Current Status:** P0 fixes complete, compilation in progress  
-**Next Milestone:** Complete gamification contracts and testing  
+**Current Status:** P0 fixes complete, compilation in progress
+**Next Milestone:** Complete gamification contracts and testing
 **Launch Target:** 10 weeks to testnet, 12 months to mainnet
 
 **Key to Success:**
 
 1. Complete all technical work with high quality
-2. Engage community early and often
-3. Maintain security as top priority
-4. Execute DAO transition smoothly
-5. Deliver on promises and iterate based on feedback
+1. Engage community early and often
+1. Maintain security as top priority
+1. Execute DAO transition smoothly
+1. Deliver on promises and iterate based on feedback
 
 ---
 

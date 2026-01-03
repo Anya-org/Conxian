@@ -425,7 +425,7 @@ These are the **single source of truth** for all contract interfaces used by Con
   - When designing new screens, anchor them to explicit modules and traits from this document.
 
 - **Protocol engineers**
-  - Use this as a checklist when 
+  - Use this as a checklist when
     - adding new contracts to `Clarinet.toml`,  
     - updating traits, or  
     - adjusting deployment/test plans.

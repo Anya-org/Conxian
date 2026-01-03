@@ -45,6 +45,7 @@ npm run test:all            # Full suite
 ### ❌ Self-Launch Coordinator (0 tests, 898 lines)
 
 **Missing Test Coverage:**
+
 1. Contribution flow with 50/50 split
 2. Phase advancement logic (funding + contributor thresholds)
 3. OPEX loan initialization + tracking
@@ -55,6 +56,7 @@ npm run test:all            # Full suite
 8. ⚠️ Missing `claim-launch-funds()` function
 
 **Recommended Tests:**
+
 ```typescript
 describe('Self-Launch Coordinator', () => {
   it('splits contributions 50/50 between launch and OPEX')
@@ -73,6 +75,7 @@ describe('Self-Launch Coordinator', () => {
 ### ❌ Founder Vesting (0 tests, 135 lines)
 
 **Missing Test Coverage:**
+
 1. Cliff enforcement (no claims before 1 year)
 2. Linear vesting calculation
 3. Multi-token support (CXD, CXVG, CXLP, etc.)
@@ -80,6 +83,7 @@ describe('Self-Launch Coordinator', () => {
 5. Full vesting after 4 years
 
 **Recommended Tests:**
+
 ```typescript
 describe('Founder Vesting', () => {
   it('blocks claims before cliff period')
@@ -96,6 +100,7 @@ describe('Founder Vesting', () => {
 ### ❌ Behavior Reputation System (0 tests, 877 lines)
 
 **Missing Test Coverage:**
+
 1. Score calculation (weighted sum of 6 components)
 2. Tier advancement (Bronze → Silver → Gold → Platinum)
 3. Multiplier application (1.0x → 2.0x)
@@ -103,6 +108,7 @@ describe('Founder Vesting', () => {
 5. Dashboard aggregation functions
 
 **Recommended Tests:**
+
 ```typescript
 describe('Behavior Reputation System', () => {
   it('calculates behavior score from weighted components')
@@ -120,6 +126,7 @@ describe('Behavior Reputation System', () => {
 ### ❌ Compliance/KYC E2E Flow (0 tests)
 
 **Missing Test Coverage:**
+
 1. KYC tier assignment → badge minting
 2. Badge verification → enterprise feature access
 3. Sanctioned user blocking
@@ -127,6 +134,7 @@ describe('Behavior Reputation System', () => {
 5. Tier upgrade/downgrade
 
 **Recommended Tests:**
+
 ```typescript
 describe('Compliance E2E Flow', () => {
   it('mints identity badge when KYC tier set to 1+')
@@ -143,11 +151,13 @@ describe('Compliance E2E Flow', () => {
 ### ❌ Vault Inflation Attack Prevention (0 tests)
 
 **Missing Test Coverage:**
+
 1. Dead shares mechanism (first 1000 shares burned)
 2. Share price manipulation resistance
 3. Rounding attack prevention
 
 **Recommended Tests:**
+
 ```typescript
 describe('Vault Inflation Attack Prevention', () => {
   it('burns first 1000 shares on initial deposit')
@@ -162,11 +172,13 @@ describe('Vault Inflation Attack Prevention', () => {
 ### ⚠️ Governance Execution (PARTIAL)
 
 **Current Coverage:**
+
 - ✅ Proposal creation
 - ✅ Voting
 - ❌ Execution (contract-call to targets)
 
 **Missing Tests:**
+
 ```typescript
 describe('Governance Execution', () => {
   it('executes proposal by calling targets with signatures/calldatas')
@@ -181,11 +193,13 @@ describe('Governance Execution', () => {
 ### ⚠️ Lending Liquidations (PARTIAL)
 
 **Current Coverage:**
+
 - ✅ Health factor calculation
 - ❌ Liquidation execution
 - ❌ Liquidator incentives
 
 **Missing Tests:**
+
 ```typescript
 describe('Lending Liquidations', () => {
   it('liquidates unhealthy position (HF < 1.0)')
@@ -205,6 +219,7 @@ describe('Lending Liquidations', () => {
 **File:** `tests/integration/full-system-fee-insurance.test.ts`
 
 **Coverage:**
+
 - CXD mint → protocol-fee-switch → route to recipients
 - Fee split calculation (20% treasury, 60% staking, 20% insurance)
 - Balance verification after routing
@@ -216,6 +231,7 @@ describe('Lending Liquidations', () => {
 **File:** `tests/integration/token-system-coordinator.test.ts`
 
 **Coverage:**
+
 - Initialize 5 tokens (CXD, CXVG, CXLP, CXTR, CXS)
 - Multi-token operations
 - Emergency pause/resume
@@ -228,6 +244,7 @@ describe('Lending Liquidations', () => {
 **File:** `tests/security/attack-vectors.test.ts`
 
 **Coverage:**
+
 - Slippage exploitation (0 min-out)
 - Oracle manipulation (>10% deviation blocked)
 - Unauthorized fee configuration
@@ -241,6 +258,7 @@ describe('Lending Liquidations', () => {
 **File:** `tests/system/full-protocol-journey.test.ts`
 
 **Coverage:**
+
 - Commit-reveal flow
 - Batch execution
 - Enterprise TWAP orders
@@ -256,6 +274,7 @@ describe('Lending Liquidations', () => {
 **Impact:** Each test must re-initialize pools, mint tokens, set up contracts
 
 **Example:**
+
 ```typescript
 // EVERY test must do this:
 simnet.callPublicFn('concentrated-liquidity-pool', 'initialize', [...], deployer);
@@ -272,10 +291,12 @@ simnet.callPublicFn('concentrated-liquidity-pool', 'mint', [...], deployer);
 **Issue:** Some tests use mocks, others use real contracts (inconsistent)
 
 **Examples:**
+
 - `mock-token` vs `cxd-token`
 - `mock-pool` vs `concentrated-liquidity-pool`
 
-**Recommendation:** 
+**Recommendation:**
+
 - Unit tests: Use mocks for dependencies
 - Integration tests: Use real contracts
 - E2E tests: All real contracts
@@ -287,12 +308,14 @@ simnet.callPublicFn('concentrated-liquidity-pool', 'mint', [...], deployer);
 **Issue:** Many tests check `toBeOk()` but don't verify returned values
 
 **Example:**
+
 ```typescript
 const receipt = simnet.callPublicFn('vault', 'deposit', [...]);
 expect(receipt.result).toBeOk();  // ❌ Doesn't check shares minted
 ```
 
 **Recommendation:**
+
 ```typescript
 expect(receipt.result).toBeOk(Cl.tuple({
   shares: Cl.uint(expectedShares),
@@ -307,6 +330,7 @@ expect(receipt.result).toBeOk(Cl.tuple({
 ### Priority 1: Critical Path Tests
 
 **1. Self-Launch E2E Test**
+
 ```typescript
 describe('Self-Launch E2E', () => {
   it('executes full launch from contribution to phase 7', async () => {
@@ -322,6 +346,7 @@ describe('Self-Launch E2E', () => {
 ```
 
 **2. Genesis Distribution Test**
+
 ```typescript
 describe('Genesis Distribution', () => {
   it('distributes 100M CXD correctly (15% founder, 30% treasury, 55% community)', async () => {
@@ -335,6 +360,7 @@ describe('Genesis Distribution', () => {
 ```
 
 **3. Founder Vesting E2E Test**
+
 ```typescript
 describe('Founder Vesting E2E', () => {
   it('enforces cliff and linear vesting over 4 years', async () => {
@@ -351,6 +377,7 @@ describe('Founder Vesting E2E', () => {
 ```
 
 **4. Vault Inflation Attack Test**
+
 ```typescript
 describe('Vault Inflation Attack Prevention', () => {
   it('prevents inflation attack via dead shares', async () => {
@@ -364,6 +391,7 @@ describe('Vault Inflation Attack Prevention', () => {
 ```
 
 **5. Compliance E2E Test**
+
 ```typescript
 describe('Compliance E2E', () => {
   it('enforces KYC for enterprise features', async () => {
@@ -381,6 +409,7 @@ describe('Compliance E2E', () => {
 ### Priority 2: Integration Tests
 
 **6. OPEX Loan Repayment Test**
+
 ```typescript
 describe('OPEX Loan Repayment', () => {
   it('triggers automatic repayment when conditions met', async () => {
@@ -394,6 +423,7 @@ describe('OPEX Loan Repayment', () => {
 ```
 
 **7. Behavior Score Calculation Test**
+
 ```typescript
 describe('Behavior Score Calculation', () => {
   it('calculates weighted score from all components', async () => {
@@ -407,6 +437,7 @@ describe('Behavior Score Calculation', () => {
 ```
 
 **8. Cross-Module Fee Flow Test**
+
 ```typescript
 describe('Cross-Module Fee Flow', () => {
   it('routes lending fees through fee-switch to recipients', async () => {
@@ -423,6 +454,7 @@ describe('Cross-Module Fee Flow', () => {
 ### Priority 3: Edge Cases
 
 **9. Emergency Pause Cascade Test**
+
 ```typescript
 describe('Emergency Pause Cascade', () => {
   it('pauses all modules when protocol paused', async () => {
@@ -438,6 +470,7 @@ describe('Emergency Pause Cascade', () => {
 ```
 
 **10. Circuit Breaker Isolation Test**
+
 ```typescript
 describe('Circuit Breaker Isolation', () => {
   it('opens lending circuit without affecting DEX', async () => {
@@ -483,6 +516,7 @@ describe('Circuit Breaker Isolation', () => {
 **Use Case:** Math operations, share calculations, interest accrual
 
 **Example:**
+
 ```typescript
 import { fc } from 'fast-check';
 
@@ -505,12 +539,14 @@ it('vault share calculation is always fair', () => {
 ### 7.2 Add Invariant Testing
 
 **Protocol Invariants:**
+
 1. Total supply = sum of all balances
 2. Vault total shares = sum of user shares
 3. Lending total borrows ≤ total supplies
 4. Fee splits always sum to 100%
 
 **Example:**
+
 ```typescript
 afterEach(() => {
   // Check invariants after every test
@@ -525,6 +561,7 @@ afterEach(() => {
 **Current:** `tests/load-testing/fuzz-system.test.ts` exists but coverage unknown
 
 **Recommended Fuzz Targets:**
+
 - Vault deposit/withdraw (random amounts, random timing)
 - Lending borrow/repay (random health factors)
 - DEX swaps (random amounts, random slippage)
@@ -539,6 +576,7 @@ afterEach(() => {
 **Test Command:** `npm test` (vitest)
 
 **Config:** `vitest.config.enhanced.ts`
+
 - Timeout: 300s
 - Hook timeout: 90s
 - File parallelism: false (sequential)
@@ -595,11 +633,13 @@ jobs:
 **Metrics:** TPS (transactions per second)
 
 **Issue (from AUDIT_REPORT_FINAL.md):**
+
 - Baseline TPS: 30,000
 - Enhanced TPS: 14,737
 - **Regression:** ~50% performance drop
 
 **Recommendation:**
+
 1. Profile slow contracts (identify bottlenecks)
 2. Optimize math operations (e.g., `mev-protector.pow-decimals`)
 3. Reduce unnecessary contract-calls
@@ -612,15 +652,18 @@ jobs:
 ### Known Issues
 
 **1. Timeout Errors:**
+
 - Some tests timeout at 300s
 - Likely due to complex contract interactions
 - **Fix:** Increase timeout or optimize contracts
 
 **2. State Pollution:**
+
 - Tests fail when run together but pass individually
 - **Fix:** Ensure proper cleanup in `afterEach`
 
 **3. Mock Dependency Confusion:**
+
 - Some tests fail due to mock vs real contract mismatches
 - **Fix:** Standardize on real contracts for integration tests
 
@@ -629,6 +672,7 @@ jobs:
 ## Summary
 
 **Critical Gaps:**
+
 - ❌ Self-launch coordinator (0% coverage)
 - ❌ Founder vesting (0% coverage)
 - ❌ Behavior reputation (0% coverage)
@@ -636,6 +680,7 @@ jobs:
 - ❌ Vault inflation attack (0% coverage)
 
 **Recommended Actions:**
+
 1. Add 50+ tests for missing coverage areas
 2. Implement property-based testing for math
 3. Add invariant checks after each test
@@ -643,6 +688,7 @@ jobs:
 5. Target 90%+ coverage before mainnet
 
 **Estimated Effort:**
+
 - Priority 1 tests: 2 weeks
 - Priority 2 tests: 1 week
 - Priority 3 tests: 1 week

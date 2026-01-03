@@ -28,6 +28,7 @@ Each category maps to a default strategy contract implementing `.traits folder.s
 ## Metrics-Driven Selection
 
 Primary metrics:
+
 - APY (basis points), TVL, efficiency scores
 - Liquidity depth, slippage bounds
 - Risk score (protocol-defined scale)
@@ -49,7 +50,7 @@ The engine integrates with `finance-metrics-trait` for aggregated metrics and us
 ## Testing and Validation
 
 - Backtests across historical market conditions per category.
-- Stress tests for extreme scenarios (volatility spikes, liquidity crunches, oracle manipulation). 
+- Stress tests for extreme scenarios (volatility spikes, liquidity crunches, oracle manipulation).
 - Benchmarks: target minimum APY, maximum drawdown, time-to-liquidity metrics per category.
 
 ## Reporting & Transparency

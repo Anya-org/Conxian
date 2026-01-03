@@ -18,15 +18,16 @@ Conxian implements enterprise-grade security with multiple layers of protection:
 
 Status: ACTIVE
 
-```
+```markdown
 Access Control Roles:
-├── Admin: Full system access and role management
-├── Emergency Admin: Can pause/unpause the system
-├── Operator: Day-to-day operations
-└── Multi-sig: Required for critical operations
+  - Admin: Full system access and role management
+  - Emergency Admin: Can pause/unpause the system
+  - Operator: Day-to-day operations
+  - Multi-sig: Required for critical operations
 ```
 
 **Implementation**:
+
 - Role-based permissions for all critical functions
 - Granular role assignments with proper separation of duties
 - Multi-signature requirements for sensitive operations
@@ -138,27 +139,29 @@ Precision Protections:
 ### Immediate Response (0-1 hour)
 
 1. **Trigger Emergency Pause**: Halt all operations
-2. **Assess Threat**: Determine scope and impact
-3. **Secure Assets**: Protect treasury and user funds
-4. **Communication**: Alert users and stakeholders
+1. **Assess Threat**: Determine scope and impact
+1. **Secure Assets**: Protect treasury and user funds
+1. **Communication**: Alert users and stakeholders
 
 ### Investigation Phase (1-24 hours)
 
 1. **Root Cause Analysis**: Identify attack vector
-2. **Impact Assessment**: Calculate potential losses
-3. **Fix Development**: Prepare security patches
-4. **Community Update**: Transparent communication
+1. **Impact Assessment**: Calculate potential losses
+1. **Fix Development**: Prepare security patches
+1. **Community Update**: Transparent communication
 
 ### Recovery Phase (24-72 hours)
 
 1. **Deploy Fixes**: Implement security improvements
-2. **System Testing**: Verify all functions work correctly
-3. **Gradual Resume**: Phased restoration of services
-4. **Post-Incident Review**: Document lessons learned
+1. **System Testing**: Verify all functions work correctly
+1. **Gradual Resume**: Phased restoration of services
+1. **Post-Incident Review**: Document lessons learned
 
 ## 🔍 Audit Readiness
 
-The Conxian protocol is currently in a pre-audit phase. The codebase has undergone a significant refactoring to improve modularity and clarity, but the test suite is not yet stable. An external security audit will be conducted after the test suite has been stabilized and the codebase has been frozen.
+The Conxian protocol is currently in a pre-audit phase. The codebase has undergone a significant refactoring to improve
+modularity and clarity, but the test suite is not yet stable. An external security audit will be conducted after the
+test suite has been stabilized and the codebase has been frozen.
 
 ### Security Testing
 

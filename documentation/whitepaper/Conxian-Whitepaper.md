@@ -255,8 +255,10 @@ ensure the long-term stability of the ecosystem.
   triggered in the event of a black swan event or other unforeseen market
   conditions. These circuit breakers can pause critical functions of the
   protocol to protect user funds.
-- **Rate Limiting**: To prevent market manipulation and other forms of abuse, the protocol includesrate-limiting mechanisms on key functions.
-- **Role-Based Access Control**: The protocol uses a robust role-based,   access control (RBAC) system to ensure that only authorized addresses can perform critical administrative functions.
+- **Rate Limiting**: To prevent market manipulation and other forms of abuse, the protocol includes rate-limiting
+  mechanisms on key functions.
+- **Role-Based Access Control**: The protocol uses a robust role-based, access control (RBAC) system to ensure that
+  only authorized addresses can perform critical administrative functions.
 
 ## 6. Roadmap & Implementation Status
 

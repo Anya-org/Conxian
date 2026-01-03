@@ -1,9 +1,11 @@
 # 2. Oracle System Design
 
 ## Context and Problem Statement
+
 We need a reliable oracle system to provide price feeds for various assets in the Conxian DeFi protocol. The system must be secure, decentralized, and resistant to manipulation.
 
 ## Decision
+
 We will implement a multi-feed oracle system with the following characteristics:
 
 1. **Multiple Data Sources**: Aggregate prices from multiple independent sources
@@ -13,9 +15,11 @@ We will implement a multi-feed oracle system with the following characteristics:
 5. **Emergency Override**: Admin ability to manually set prices in case of emergency
 
 ## Status
+
 Implemented
 
 ## Consequences
+
 - Increased security through decentralization
 - Protection against flash loan attacks
 - More reliable price feeds

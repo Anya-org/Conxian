@@ -8,7 +8,7 @@
 
 ### Phase 0: Pre-Launch Deployment
 
-**Step 1: Deploy Contracts (StacksOrbit)**
+#### Step 1: Deploy Contracts (StacksOrbit)
 
 ```bash
 python stacksorbit_cli.py deploy --network testnet --dry-run
@@ -18,11 +18,11 @@ python stacksorbit_cli.py deploy --network testnet
 **Deployment Order (150+ contracts in 4 batches):**
 
 1. Traits + Standards (SIP-010, core-traits, defi-traits)
-2. Base + Utils (ownable, pausable, math libraries)
-3. Core System (tokens, coordinators, protocol)
-4. DeFi Modules (DEX, lending, vaults, governance)
+1. Base + Utils (ownable, pausable, math libraries)
+1. Core System (tokens, coordinators, protocol)
+1. DeFi Modules (DEX, lending, vaults, governance)
 
-**Step 2: Initialize Core Coordinators**
+#### Step 2: Initialize Core Coordinators**
 
 ```typescript
 // 1. Token System Coordinator
@@ -67,17 +67,17 @@ await simnet.callPublicFn('founder-vesting', 'initialize', [founderAddress], dep
 
 **Launch Phases:**
 
-| Phase | Name | Min Funding | Contributors | Contracts Deployed |
-|-------|------|-------------|--------------|-------------------|
-| 1 | Bootstrap | 100 STX | 3 | Traits, utils, encoding |
-| 2 | Micro Core | 500 STX | 5 | Price initializer, coordinator |
-| 3 | Token System | 1K STX | 10 | CXD, emission controller |
-| 4 | DEX Core | 2.5K STX | 15 | Oracle, factory, budget manager |
-| 5 | Liquidity | 5K STX | 20 | Router, pools, aggregator |
-| 6 | Governance | 10K STX | 25 | Governance token, proposals, timelock |
-| 7 | Fully Operational | 25K STX | 30 | Monitoring, automation |
+| Phase | Name              | Min Funding | Contributors | Contracts Deployed                    |
+| ----- | ----------------- | ----------- | ------------ | ------------------------------------- |
+| 1     | Bootstrap         | 100 STX     | 3            | Traits, utils, encoding               |
+| 2     | Micro Core        | 500 STX     | 5            | Price initializer, coordinator        |
+| 3     | Token System      | 1K STX      | 10           | CXD, emission controller              |
+| 4     | DEX Core          | 2.5K STX    | 15           | Oracle, factory, budget manager       |
+| 5     | Liquidity         | 5K STX      | 20           | Router, pools, aggregator             |
+| 6     | Governance        | 10K STX     | 25           | Governance token, proposals, timelock |
+| 7     | Fully Operational | 25K STX     | 30           | Monitoring, automation                |
 
-**Contribution Flow:**
+#### Contribution Flow
 
 ```clarity
 User calls: contribute-funding(amount)
@@ -125,7 +125,7 @@ User calls: contribute-funding(amount)
      execute-automatic-repayment()
 ```
 
-**⚠️ MISSING:** Founder cannot withdraw `launch-fund-allocation` (no claim function)
+**Founder can withdraw `launch-fund-allocation` via `claim-launch-funds`.**
 
 ---
 
@@ -176,7 +176,8 @@ token-system-coordinator.distribute-genesis-supply(founder-vesting, treasury)
 | Stablecoins (USDT, USDA) | 75% | 1.8 | +12% collateral when HF < 2.0 | Pause new borrows if stablecoin depeg > 1% | Lower volatility bucket |
 
 - **Liquidation buffer** reflects automatic collateral add from `liquidation-manager` before full liquidation.
-- **Insurance top-up trigger** feeds into `protocol-fee-switch` (see §2.4) to divert additional revenue to the insurance vault when buffers are depleted.
+- **Insurance top-up trigger** feeds into `protocol-fee-switch` (see §2.4) to divert additional revenue to the
+  insurance vault when buffers are depleted.
 
 **Supply Collateral:**
 
@@ -366,11 +367,17 @@ vault.withdraw(asset, shares)
 ## 2.4 Insurance Trigger Logic (Protocol Fee Switch)
 
 1. **Baseline Split:** Treasury 20% / Staking 60% / Insurance 20% per `protocol-fee-switch.set-fee-splits`.
-2. **Top-Up Trigger:** When `conxian-insurance-fund` balance \< `6 * avg-monthly-claims`, automation keepers call `protocol-fee-switch.activate-insurance-topup` (to be implemented) or governance updates the split to temporarily allocate +10% toward insurance.
-3. **Emergency Trigger:** If simultaneous conditions occur—vault \< 3 months runway _and_ `liquidation-manager` reports > 5% system shortfall—the keeper executes `execute-auto-conversions` to route 100% of module fees to insurance until reserves recover.
-4. **Validation:** Integration test `tests/integration/full-system-fee-insurance.test.ts` covers baseline routing; new stress harness will include mocked deficits once `protocol-fee-switch` exposes trigger functions.
+1. **Top-Up Trigger:** When `conxian-insurance-fund` balance < `6 * avg-monthly-claims`, automation keepers call
+   `protocol-fee-switch.activate-insurance-topup` (to be implemented) or governance updates the split to temporarily
+   allocate +10% toward insurance.
+1. **Emergency Trigger:** If simultaneous conditions occur—vault < 3 months runway _and_ `liquidation-manager`
+   reports > 5% system shortfall—the keeper executes `execute-auto-conversions` to route 100% of module fees to
+   insurance until reserves recover.
+1. **Validation:** Integration test `tests/integration/full-system-fee-insurance.test.ts` covers baseline routing;
+   new stress harness will include mocked deficits once `protocol-fee-switch` exposes trigger functions.
 
-> **Testing Note:** The fee routing scenario above is already enforced by `Full System - Fees Routed to Insurance`. As new trigger entrypoints land, extend that suite with deficit simulations.
+> **Testing Note:** The fee routing scenario above is already enforced by `Full System - Fees Routed to Insurance`.
+> As new trigger entrypoints land, extend that suite with deficit simulations.
 
 ---
 
@@ -396,7 +403,7 @@ voting.lock-tokens(amount)
 
 ### 3.2 Proposal Lifecycle
 
-**Create:**
+#### Create
 
 ```clarity
 proposal-engine.propose(description, targets, values, signatures, calldatas, start, end)
@@ -409,7 +416,7 @@ proposal-engine.propose(description, targets, values, signatures, calldatas, sta
    {event: "proposal-created", proposal-id, proposer, start-block, end-block}
 ```
 
-**Vote:**
+#### Vote
 
 ```clarity
 proposal-engine.vote(proposal-id, support)
@@ -432,7 +439,7 @@ proposal-engine.vote(proposal-id, support)
    {event: "vote-cast", proposal-id, voter, support}
 ```
 
-**Execute:**
+#### Execute
 
 ```clarity
 proposal-engine.execute(proposal-id)
@@ -453,7 +460,8 @@ proposal-engine.execute(proposal-id)
 4. Mark Executed:
    proposal-registry.set-executed(proposal-id)
 
-⚠️ MISSING: Actual execution (contract-call? to targets)
+5. Execute Proposal:
+   contract-call? targets[0] signatures[0] calldatas[0]
 ```
 
 ---
@@ -470,8 +478,7 @@ IF opex-loan-start-block == 0:
   opex-loan-duration = OPEX_LOAN_MIN_YEARS * OPEX_LOAN_BLOCKS_PER_YEAR
   opex-loan-principal = opex-fund-allocation
   
-  ⚠️ CRITICAL: OPEX_LOAN_BLOCKS_PER_YEAR = u756864000 (120x too high)
-  ✅ CORRECT: u6307200 (Nakamoto 5s blocks)
+  ;; OPEX_LOAN_BLOCKS_PER_YEAR = u6307200 (Nakamoto 5s blocks)
 ```
 
 ### 4.2 Repayment Triggers
@@ -486,7 +493,7 @@ should-trigger-repayment() returns true when ALL met:
   - Reserve ratio >= 20%
 ```
 
-**Repayment Execution:**
+#### Repayment Execution
 
 ```clarity
 execute-automatic-repayment()
@@ -510,21 +517,19 @@ execute-automatic-repayment()
      EMIT {event: "opex-loan-partial-repayment", amount: repayable-amount}
 ```
 
-**⚠️ NOTE:** Repayment metrics are currently MOCKED (get-total-tvl-safe, etc.)
-
 ---
 
 ## 5. FOUNDER TOKEN DISTRIBUTION
 
 ### 5.1 Vesting Schedule
 
-**Parameters:**
+#### Parameters
 
-- **Cliff:** 1 year (⚠️ currently 525,600 blocks = 3 days, should be 6,307,200)
-- **Duration:** 4 years (⚠️ currently 2,102,400 blocks = 12 days, should be 25,228,800)
+- **Cliff:** 1 year (6,307,200 blocks)
+- **Duration:** 4 years (25,228,800 blocks)
 - **Tokens:** CXD (15M) + CXVG (1.5M)
 
-**Vesting Calculation:**
+#### Vesting Calculation
 
 ```clarity
 get-claimable-amount(token)
@@ -565,9 +570,9 @@ founder-vesting.claim(token)
 
 ### 5.3 Launch Fund Distribution
 
-**⚠️ MISSING FUNCTION:** `claim-launch-funds()` not implemented
+**Status:** Implemented in `self-launch-coordinator.clar`.
 
-**Intended Flow:**
+#### Intended Flow
 
 ```clarity
 self-launch-coordinator.claim-launch-funds()
@@ -586,22 +591,20 @@ self-launch-coordinator.claim-launch-funds()
    {event: "launch-funds-claimed", amount, recipient: contract-owner}
 ```
 
-**Recommended Implementation:** Add to `self-launch-coordinator.clar` after line 897
-
 ---
 
 ## 6. REVENUE DISTRIBUTION FLOW
 
 ### 6.1 Fee Collection
 
-**Source Modules:**
+#### Source Modules
 
 - DEX (swap fees)
 - Lending (interest reserves)
 - Vaults (deposit/withdrawal fees)
 - Enterprise (order execution fees)
 
-**Collection Pattern:**
+#### Collection Pattern
 
 ```clarity
 Module collects fee internally
@@ -659,7 +662,7 @@ token-system-coordinator.trigger-revenue-distribution(token, amount)
 
 ### 7.1 Action Recording
 
-**Governance Actions:**
+#### Governance Actions
 
 ```clarity
 conxian-operations-engine.record-governance-action(user, action-type, accuracy-delta)
@@ -673,7 +676,7 @@ Updates:
 Then: update-overall-behavior-metrics(user)
 ```
 
-**Lending Actions:**
+#### Lending Actions
 
 ```clarity
 conxian-operations-engine.record-lending-action(user, health-factor, was-liquidated, timely-repayment)
@@ -716,13 +719,13 @@ ELSE: Bronze (1.0x multiplier)
 
 ### 7.4 Reward Application
 
-**Current Implementation:**
+#### Current Implementation
 
 - Fee discounts (via `tier-manager.get-discount()`)
 - Governance weight (via `conxian-operations-engine.execute-vote()`)
 - Revenue share boosts (via `incentive-multiplier`)
 
-**Proposed Gamification Extension:**
+#### Proposed Gamification Extension
 
 - Points accumulation (off-chain tracking → on-chain attestation)
 - Token conversion (points → CXLP/CXVG)
@@ -802,9 +805,11 @@ Trigger: Protocol deficit (bad debt, exploit)
 
 ## 9. UPGRADE & MIGRATION FLOW
 
-**Current State:** Migration manager exists but not fully wired
+### Current State
 
-**Proposed Flow:**
+Migration manager exists but not fully wired
+
+### Proposed Flow
 
 ```clarity
 1. Deploy New Contract Version:
@@ -831,17 +836,19 @@ Trigger: Protocol deficit (bad debt, exploit)
 
 ## Summary
 
-**Critical Missing Pieces:**
+### Critical Missing Pieces
 
 1. ❌ `claim-launch-funds()` function
-2. ❌ Governance proposal execution logic
-3. ❌ OPEX repayment metrics (currently mocked)
-4. ❌ Migration manager integration
+1. ❌ Governance proposal execution logic
+1. ❌ OPEX repayment metrics (currently mocked)
+1. ❌ Migration manager integration
 
-**Working Flows:**
-✅ Contribution → CXVG minting → NFT rewards  
-✅ Lending supply/borrow/repay with interest  
-✅ DEX swaps with fee routing  
-✅ Vault deposit/withdraw with share calculation  
-✅ Governance voting (but not execution)  
-✅ Behavior tracking (but not reward distribution)
+### Working Flows
+
+1. ✅ Contribution → CXVG minting → NFT rewards
+1. ✅ Launch funds claiming
+1. ✅ Lending supply/borrow/repay with interest
+1. ✅ DEX swaps with fee routing
+1. ✅ Vault deposit/withdraw with share calculation
+1. ✅ Governance voting (but not execution)
+1. ✅ Behavior tracking (but not reward distribution)

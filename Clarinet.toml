@@ -102,6 +102,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.proposal-registry]
 path = "contracts/governance/proposal-registry.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = ["governance-token"]
 
 [contracts.tiered-pools]
 path = "contracts/pools/tiered-pools.clar"
@@ -163,6 +164,10 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/traits/enterprise-traits.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
+[contracts.compliance-trait]
+path = "contracts/compliance/compliance-trait.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+
 [contracts.optimization-helpers]
 path = "contracts/helpers/optimization-helpers.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
@@ -186,6 +191,11 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.legacy-adapter]
 path = "contracts/migration/legacy-adapter.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+
+[contracts.enterprise-compliance-manager]
+path = "contracts/enterprise/compliance-manager.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = ["enterprise-traits", "kyc-registry"]
 
 [contracts.liquidity-manager]
 path = "contracts/dex/liquidity-manager.clar"
@@ -768,7 +778,7 @@ depends_on = [ "governance-token", "governance-token",]
 [contracts.proposal-executor]
 path = "contracts/governance/proposal-executor.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "proposal-registry", "governance-token", "proposal-registry",]
+depends_on = ["proposal-registry", "governance-token", "governance-traits"]
 
 [contracts.cxd-bonding-curve-amm]
 path = "contracts/bonding/cxd-bonding-curve-amm.clar"
@@ -777,7 +787,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.voting]
 path = "contracts/governance/voting.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "cxvg-token", "cxvg-token",]
+depends_on = ["cxvg-token", "sip-standards", "governance-traits"]
 
 [contracts.kyc-registry]
 path = "contracts/identity/kyc-registry.clar"
@@ -837,7 +847,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.protocol-fee-switch]
 path = "contracts/core/protocol-fee-switch.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "tier-manager",]
+depends_on = ["tier-manager", "sip-standards", "defi-traits"]
 
 [contracts.conxian-token-factory]
 path = "contracts/core/conxian-token-factory.clar"
@@ -968,12 +978,12 @@ depends_on = [ "cxd-price-initializer",]
 [contracts.proposal-engine]
 path = "contracts/governance/proposal-engine.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-protocol", "proposal-registry", "proposal-registry", "proposal-executor", "proposal-registry", "proposal-registry", "proposal-registry",]
+depends_on = ["conxian-protocol", "proposal-registry", "voting", "proposal-executor", "governance-traits"]
 
 [contracts.compliance-manager]
-path = "contracts/enterprise/compliance-manager.clar"
+path = "contracts/compliance/compliance-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "kyc-registry",]
+depends_on = ["kyc-registry", "compliance-trait", "enterprise-traits", "sanctions-oracle", "travel-rule-service"]
 
 [contracts.compliance-hooks]
 path = "contracts/enterprise/compliance-hooks.clar"

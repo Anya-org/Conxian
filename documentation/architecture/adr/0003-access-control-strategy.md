@@ -1,9 +1,11 @@
 # 3. Access Control Strategy
 
 ## Context and Problem Statement
+
 We need a consistent and secure way to manage access control across all smart contracts in the Conxian protocol.
 
 ## Decision
+
 We will implement a role-based access control (RBAC) system with the following roles:
 
 1. **DEFAULT_ADMIN_ROLE**: Can grant and revoke all roles
@@ -13,9 +15,11 @@ We will implement a role-based access control (RBAC) system with the following r
 5. **STRATEGIST**: Can manage investment strategies
 
 ## Status
+
 Proposed
 
 ## Consequences
+
 - Fine-grained permission control
 - Better security through principle of least privilege
 - More complex role management

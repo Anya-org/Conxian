@@ -80,7 +80,7 @@ Operational safety and observability are first-class concerns:
 ## What Makes Conxian Different
 
 ### 1. Trait-First Modular Architecture (15 Trait Files)
- 
+
  Conxian is built around **15 modular trait files** that define protocol interfaces:
 
 - Clear separation between **interfaces** (traits) and **implementations** (contracts)
