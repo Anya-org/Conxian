@@ -10,7 +10,6 @@ let wallet1: string;
 
 describe("Grand Unified System Journey", () => {
   beforeAll(async () => {
-    simnet = await initSimnet("Clarinet.toml");
   });
 
   beforeEach(async () => {

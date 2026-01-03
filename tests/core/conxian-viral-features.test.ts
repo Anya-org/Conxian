@@ -18,7 +18,6 @@ describe('Conxian Viral Features', () => {
   let exitQueueContract: string;
 
   beforeEach(async () => {
-    simnet = await initSimnet();
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
     wallet1 = accounts.get('wallet_1')!;

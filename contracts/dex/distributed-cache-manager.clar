@@ -1,5 +1,5 @@
 ;; ===== Imports =====
-(use-trait cache-manager-trait .traits.cache-manager-trait.cache-manager-trait)
+(use-trait cache-manager-trait .cache-manager-trait)
 
 ;; Distributed Cache Manager - Reduces latency by 60-80%
 ;; Implements multi-level caching with TTL and invalidation strategies

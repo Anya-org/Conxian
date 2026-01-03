@@ -33,6 +33,21 @@
   { token-id: uint }
 )
 
+(define-data-var admin principal tx-sender)
+(define-data-var audit-registry-principal principal tx-sender)
+
+(define-private (is-admin)
+  (is-eq tx-sender (var-get admin))
+)
+
+(define-public (set-audit-registry-principal (registry principal))
+  (begin
+    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (var-set audit-registry-principal registry)
+    (ok true)
+  )
+)
+
 ;; --- Private Helper Functions ---
 ;; @desc Checks if the caller is the contract owner.
 ;; @returns (response bool uint): An `ok` response with `true` if the caller is the owner, or an error code.
@@ -106,7 +121,7 @@
     (recipient principal)
   )
   (let ((token-id (var-get next-token-id)))
-    (asserts! (is-eq tx-sender .audit-registry) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get audit-registry-principal)) ERR_UNAUTHORIZED)
     (asserts! (is-none (map-get? audit-to-token audit-id)) ERR_ALREADY_CLAIMED)
 
     (try! (nft-mint? audit-badge-nft token-id recipient))

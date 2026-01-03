@@ -10,13 +10,13 @@
     ;; @param description (string-ascii 128) A description of the pool type.
     ;; @param is-active bool A boolean indicating if the pool type is active.
     ;; @returns (response bool uint) A response indicating success or an unauthorized error.
-    (register-pool-type ((string-ascii 64), (string-ascii 32), (string-ascii 128), bool) (response bool uint))
+    (register-pool-type ((string-ascii 64) (string-ascii 32) (string-ascii 128) bool) (response bool uint))
 
     ;; @desc Sets the active status of a registered pool type.
     ;; @param pool-type (string-ascii 64) The string identifier of the pool type.
     ;; @param is-active bool A boolean indicating whether the pool type should be active.
     ;; @returns (response bool uint) A response indicating success or an error if the pool type is invalid or unauthorized.
-    (set-pool-type-active ((string-ascii 64), bool) (response bool uint))
+    (set-pool-type-active ((string-ascii 64) bool) (response bool uint))
 
     ;; @desc Retrieves detailed information for a given pool type.
     ;; @param pool-type (string-ascii 64) The string identifier of the pool type.
@@ -26,6 +26,22 @@
     ;; @desc Retrieves a list of all registered pool types.
     ;; @returns (response (list (string-ascii 64)) uint) A response containing a list of all registered pool type strings.
     (get-all-pool-types () (response (list (string-ascii 64)) uint))
+  )
+)
+
+;; --- Authorization ---
+(define-data-var admin principal tx-sender)
+(define-data-var factory-principal principal tx-sender)
+(define-constant ERR_UNAUTHORIZED (err u100))
+
+(define-private (is-admin) (is-eq tx-sender (var-get admin)))
+
+;; --- Admin Functions ---
+(define-public (set-factory-principal (factory principal))
+  (begin
+    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (var-set factory-principal factory)
+    (ok true)
   )
 )
 
@@ -50,7 +66,7 @@
 ;; @returns (response bool uint) A response indicating `(ok true)` on success or an error if the caller is not authorized.
 (define-public (register-pool-type (pool-type (string-ascii 64)) (name (string-ascii 32)) (description (string-ascii 128)) (is-active bool))
   (begin
-    (asserts! (is-eq tx-sender .dex-factory) (err u100))
+    (asserts! (is-eq tx-sender (var-get factory-principal)) ERR_UNAUTHORIZED)
     (map-set pool-type-info pool-type {
       name: name,
       description: description,
@@ -66,7 +82,7 @@
 ;; @returns (response bool uint) A response indicating `(ok true)` on success or an error if the caller is not authorized or the pool type does not exist.
 (define-public (set-pool-type-active (pool-type (string-ascii 64)) (is-active bool))
   (begin
-    (asserts! (is-eq tx-sender .dex-factory) (err u100))
+    (asserts! (is-eq tx-sender (var-get factory-principal)) ERR_UNAUTHORIZED)
     (let ((pti (unwrap-panic (map-get? pool-type-info pool-type))))
       (map-set pool-type-info pool-type {
         name: (get name pti),

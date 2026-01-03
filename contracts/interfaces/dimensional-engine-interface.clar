@@ -49,7 +49,7 @@
     ) (response bool uint)
     
     ;; ======================
-    /// RISK MANAGEMENT
+    ;; RISK MANAGEMENT
     ;; ======================
     
     ;; Update position risk parameters
@@ -70,7 +70,7 @@
     ) (response bool uint)
     
     ;; ======================
-    /// ORACLE & PRICING
+    ;; ORACLE & PRICING
     ;; ======================
     
     ;; Update oracle address
@@ -84,7 +84,7 @@
     ) (response (tuple (price uint) (confidence uint) (last-updated uint)) uint)
     
     ;; ======================
-    /// FUNDING RATES
+    ;; FUNDING RATES
     ;; ======================
     
     ;; Update funding rate
@@ -98,15 +98,15 @@
     ) (response int uint)
     
     ;; ======================
-    /// INSURANCE & FEES
+    ;; INSURANCE & FEES
     ;; ======================
     
     ;; Withdraw protocol fees
     (withdraw-fees 
       (token principal) 
       (amount uint) 
-      (recipient principal
-    )) (response bool uint)
+      (recipient principal)
+    ) (response bool uint)
     
     ;; Update fee parameters
     (update-fee-parameters 
@@ -115,7 +115,7 @@
     ) (response bool uint)
     
     ;; ======================
-    /// VIEW FUNCTIONS
+    ;; VIEW FUNCTIONS
     ;; ======================
     
     ;; Get position details
@@ -162,7 +162,8 @@
 ;; ======================
 
 (define-event PositionOpened
-  ((position-id uint)
+  (
+   (position-id uint)
    (owner principal)
    (asset principal)
    (collateral uint)
@@ -173,7 +174,8 @@
 )
 
 (define-event PositionClosed
-  ((position-id uint)
+  (
+   (position-id uint)
    (owner principal)
    (collateral-returned uint)
    (pnl int)
@@ -181,7 +183,8 @@
 )
 
 (define-event PositionLiquidated
-  ((position-id uint)
+  (
+   (position-id uint)
    (owner principal)
    (liquidator principal)
    (collateral-returned uint)
@@ -190,19 +193,22 @@
 )
 
 (define-event FundingRateUpdated
-  ((asset principal)
+  (
+   (asset principal)
    (rate int)
    (timestamp uint))
 )
 
 (define-event RiskParametersUpdated
-  ((max-leverage uint)
+  (
+   (max-leverage uint)
    (maintenance-margin uint)
    (liquidation-penalty uint))
 )
 
 (define-event FeeParametersUpdated
-  ((protocol-fee uint)
+  (
+   (protocol-fee uint)
    (liquidation-fee uint))
 )
 

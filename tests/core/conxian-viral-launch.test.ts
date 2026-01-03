@@ -15,7 +15,6 @@ describe('Conxian Viral Launch System', () => {
   let wallet2: string;
 
   beforeEach(async () => {
-    simnet = await initSimnet();
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
     wallet1 = accounts.get('wallet_1')!;

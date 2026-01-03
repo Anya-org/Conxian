@@ -14,13 +14,13 @@
     ;; @param fee-bps uint The fee for the pool, expressed in basis points (e.g., 30 for 0.30%).
     ;; @param additional-params (optional { tick-spacing: uint, initial-price: uint }) An optional tuple containing additional parameters that may be required for specific pool types, such as `tick-spacing` for concentrated liquidity pools.
     ;; @returns (response principal uint) A response containing the principal of the newly created pool contract or an error code.
-    (create-pool (trait_reference, trait_reference, (optional (string-ascii 64)), uint, (optional { tick-spacing: uint, initial-price: uint })) (response principal uint))
+    (create-pool (trait_reference trait_reference (optional (string-ascii 64)) uint (optional { tick-spacing: uint, initial-price: uint })) (response principal uint))
 
     ;; @desc Registers a pool implementation contract for a specific pool type. This allows the factory to be extended with new pool types.
     ;; @param pool-type (string-ascii 64) The string identifier for the pool type.
     ;; @param implementation-contract principal The principal of the smart contract that implements the logic for this pool type.
     ;; @returns (response bool uint) A response indicating `(ok true)` on success or an error if the operation fails.
-    (register-pool-implementation ((string-ascii 64), principal) (response bool uint))
+    (register-pool-implementation ((string-ascii 64) principal) (response bool uint))
 
     ;; @desc Registers a new pool type with its metadata, making it available for use in the factory.
     ;; @param pool-type (string-ascii 64) The string identifier for the new pool type.
@@ -28,7 +28,7 @@
     ;; @param description (string-ascii 128) A description of the pool type and its characteristics.
     ;; @param is-active bool A boolean indicating if the pool type is currently active and can be used for new pool creations.
     ;; @returns (response bool uint) A response indicating `(ok true)` on success or an error if the operation fails.
-    (register-pool-type ((string-ascii 64), (string-ascii 32), (string-ascii 128), bool) (response bool uint))
+    (register-pool-type ((string-ascii 64) (string-ascii 32) (string-ascii 128) bool) (response bool uint))
 
     ;; @desc Sets the default pool type for the factory. This pool type will be used when `create-pool` is called without specifying a `pool-type`.
     ;; @param new-default-pool-type (string-ascii 64) The string identifier of the pool type to be set as the new default.
@@ -39,7 +39,7 @@
     ;; @param token-a principal The principal of the first token in the pair.
     ;; @param token-b principal The principal of the second token in the pair.
     ;; @returns (response (optional principal) uint) A response containing the optional principal of the pool contract if it exists, or `(ok none)` if no pool is found for the pair.
-    (get-pool (principal, principal) (response (optional principal) uint))
+    (get-pool (principal principal) (response (optional principal) uint))
 
     ;; @desc Retrieves the pool type for a given pool principal.
     ;; @param pool-principal principal The principal of the pool contract.
