@@ -59,7 +59,7 @@
     )
 )
 
-;; @desc Withdraws collateral (Signature aligned with tests)
+;; @desc Withdraws collateral
 (define-public (withdraw-funds
         (amount uint)
 ;; @desc Withdraws collateral

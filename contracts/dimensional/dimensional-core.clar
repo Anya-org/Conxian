@@ -111,10 +111,10 @@
     last-updated: block-height
   }))
 
-(define-public (get-health-factor (user principal) (position-id uint) (oracle-trait <oracle-trait>))
+(define-public (get-health-factor (user principal) (position-id uint) (oracle-ref <oracle-trait>))
   (let (
     (position (unwrap! (get-position user position-id) ERR_INVALID_POSITION))
-    (current-price (try! (get-oracle-price (var-get dimensional-token) oracle-trait)))
+    (current-price (try! (get-oracle-price (var-get dimensional-token) oracle-ref)))
     (collateral-value (get collateral position))
     (pnl (calculate-pnl position current-price))
     (maintenance-margin (/ (* collateral-value (get maintenance-margin position)) PROTOCOL_FEE_DENOMINATOR))
@@ -162,9 +162,9 @@
 ;; ===== Public Functions - Oracle =====
 (define-private (get-oracle-price
     (token principal)
-    (oracle <oracle-trait>)
+    (oracle-ref <oracle-trait>)
   )
-  (contract-call? oracle get-price token)
+  (contract-call? oracle-ref get-price token)
 )
 
 ;; ===== Public Functions - State =====
@@ -187,14 +187,14 @@
     (tags (list 10 (string-utf8 32)))
     (metadata (optional (string-utf8 1024)))
     (token-trait <sip-010-ft-trait>)
-    (oracle-trait <oracle-trait>)
+    (oracle-ref <oracle-trait>)
   )
   (begin
     (try! (check-bitcoin-finality))
     (let (
     (position-id (var-get next-position-id))
     (current-block block-height)
-    (price (try! (get-oracle-price token oracle-trait)))
+    (price (try! (get-oracle-price token oracle-ref)))
     (is-long (or (is-eq position-type "LONG") (is-eq position-type "PERPETUAL")))
     (size (* collateral-amount leverage))
   )
@@ -309,7 +309,7 @@
     )
     (if (> total-amount u0)
       (try! (as-contract (contract-call? token-trait transfer total-amount tx-sender
-        (get owner position) none
+        tx-sender none
       )))
       true
     )
@@ -327,12 +327,12 @@
     })
     (ok true))))
 
-(define-public (liquidate-position (user principal) (position-id uint) (oracle-trait <oracle-trait>))
+(define-public (liquidate-position (user principal) (position-id uint) (oracle-ref <oracle-trait>))
   (begin
     (try! (check-bitcoin-finality))
     (let (
       (position (unwrap! (get-position user position-id) ERR_INVALID_POSITION))
-      (current-price (try! (get-oracle-price (var-get dimensional-token) oracle-trait)))
+      (current-price (try! (get-oracle-price (var-get dimensional-token) oracle-ref)))
       (pnl (calculate-pnl position current-price))
       (collateral-value (get collateral position))
       (maintenance-margin (/ (* collateral-value (get maintenance-margin position))

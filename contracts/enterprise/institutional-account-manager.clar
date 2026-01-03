@@ -56,6 +56,28 @@
     )
 )
 
+;; @desc Updates the limit for an institution
+(define-public (set-limit (institution principal) (new-limit uint))
+    (begin
+        (asserts! 
+            (or 
+                (is-eq contract-caller .enterprise-facade)
+                (unwrap-panic (contract-call? .conxian-access has-role tx-sender u1))
+            ) 
+            ERR_UNAUTHORIZED
+        )
+        (match (map-get? institutional-accounts institution)
+            account 
+            (begin
+                (map-set institutional-accounts institution (merge account { limit-per-trade: new-limit }))
+                (print { event: "limit-updated", institution: institution, new-limit: new-limit })
+                (ok true)
+            )
+            (err u5002) ;; ERR_NOT_REGISTERED
+        )
+    )
+)
+
 ;; @desc Institutional Yield Boost Logic
 (define-read-only (get-yield-multiplier (institution principal))
     (match (map-get? institutional-accounts institution)

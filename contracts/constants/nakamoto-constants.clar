@@ -21,6 +21,10 @@
     BLOCKS_PER_YEAR
 )
 
+(define-read-only (get-blocks-per-day)
+    BLOCKS_PER_DAY
+)
+
 (define-read-only (get-epoch-length)
     EPOCH_LENGTH
 )

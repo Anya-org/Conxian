@@ -40,10 +40,10 @@
             (print {
                 event: "pyth-price-update",
                 asset: asset,
-                price: (get price price-data),
+                price: price-data,
                 tenure-id: tenure-id
             })
-            (ok (get price price-data))
+            (ok price-data)
         )
     )
 )

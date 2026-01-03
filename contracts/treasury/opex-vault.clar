@@ -22,7 +22,7 @@
         )
         ;; Check limits
         (if (> (- block-height (var-get last-spend-block))
-                (contract-call? .nakamoto-constants BLOCKS_PER_DAY)
+                (contract-call? .nakamoto-constants get-blocks-per-day)
             )
             (begin
                 (var-set daily-spend amount)
@@ -38,6 +38,6 @@
                 (var-set daily-spend (+ (var-get daily-spend) amount))
             )
         )
-        (as-contract (contract-call? token transfer amount recipient none))
+        (as-contract (contract-call? token transfer amount tx-sender recipient none))
     )
 )

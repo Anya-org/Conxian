@@ -7,8 +7,6 @@
 (use-trait vault-trait .vault-trait.vault-trait)
 (define-constant ERR_UNAUTHORIZED (err u1000))
 
-(define-constant ERR_UNAUTHORIZED (err u1000))
-
 ;; Data
 (define-map vault-balances
     {
@@ -32,7 +30,8 @@
             (sender tx-sender)
             (token-contract (contract-of token))
         )
-        (asserts! (is-access-allowed? (as-contract .conxian-access) sender)
+        (asserts!
+            (unwrap-panic (contract-call? .conxian-access has-role sender u4))
             ERR_UNAUTHORIZED
         )
         (try! (contract-call? token transfer amount sender (as-contract tx-sender) none))

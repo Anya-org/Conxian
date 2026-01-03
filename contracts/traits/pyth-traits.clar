@@ -3,7 +3,7 @@
 
 (define-trait pyth-core-trait
     (
-        (verify-and-update-price-feeds ((buff 2048) (list 10 (buff 2048))) (response (list 10 uint) uint))
+        (verify-and-update-price-feeds ((buff 2048)) (response (list 10 uint) uint))
         (get-price (principal) (response uint uint))
     )
 )

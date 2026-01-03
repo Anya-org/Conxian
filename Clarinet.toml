@@ -526,7 +526,7 @@ depends_on = ["sip-standards", "nakamoto-constants", "conxian-protocol"]
 [contracts.conxian-vaults]
 path = "contracts/treasury/conxian-vaults.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["sip-standards", "vault-trait"]
+depends_on = ["sip-standards", "vault-trait", "conxian-access"]
 
 [contracts.insurance-fund]
 path = "contracts/risk/insurance-fund.clar"
@@ -734,6 +734,7 @@ depends_on = [ "redstone-oracle-mock", "block-utils", "oracle-pricing"]
 [contracts.pyth-oracle-v2-mock]
 path = "contracts/mocks/pyth-oracle-v2-mock.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = ["defi-traits", "pyth-traits"]
 
 [contracts.pyth-store-mock]
 path = "contracts/mocks/pyth-store-mock.clar"
