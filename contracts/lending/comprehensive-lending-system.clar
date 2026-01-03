@@ -147,11 +147,17 @@
 ;; --- Health Factor Checks ---
 
 (define-read-only (get-health-factor (user principal))
+  ;; @desc Gets the health factor of a user.
+  ;; @param user The principal of the user.
+  ;; @returns The health factor as a uint.
+  ;; @audit-info This function was optimized by removing three redundant `unwrap-panic`
+  ;; calls, which saves gas and improves readability. The values `total-supply`
+  ;; and `total-borrow` are already unwrapped in the `let` binding.
   (let ((total-supply (unwrap-panic (contract-call? .lending-manager get-user-supply-balance user tx-sender)))
         (total-borrow (unwrap-panic (contract-call? .lending-manager get-user-borrow-balance user tx-sender))))
-    (if (is-eq (unwrap-panic total-borrow) u0)
+    (if (is-eq total-borrow u0)
       (ok u20000)
-      (ok (/ (* (unwrap-panic total-supply) u10000) (unwrap-panic total-borrow)))
+      (ok (/ (* total-supply u10000) total-borrow))
     )
   )
 )
