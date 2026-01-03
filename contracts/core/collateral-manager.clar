@@ -7,6 +7,7 @@
 
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_INSUFFICIENT_BALANCE (err u2000))
+(define-constant ROLE_PROTOCOL u2)
 
 ;; Map: User -> Token -> Amount
 (define-map user-collateral
@@ -120,7 +121,7 @@
         (asserts!
             (or
                 (contract-call? .conxian-protocol is-contract-owner)
-                (contract-call? .rbac has-role tx-sender .rbac.ROLE_PROTOCOL)
+                (contract-call? .rbac has-role tx-sender ROLE_PROTOCOL)
             )
             ERR_UNAUTHORIZED
         )

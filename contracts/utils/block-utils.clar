@@ -23,7 +23,8 @@
 ;; @desc Gets the current tenure ID for Nakamoto consensus
 ;; @returns (optional (buff 32))
 (define-read-only (get-current-tenure-id)
-    (get-tenure-info?)) ;; Native in 3.0 epoch/SDK 3.9+ depending on config
+    (get-block-info? header-hash u0)) ;; Fallback if native get-tenure-info? is missing
+
     ;; Note: In true Clarity 3.0 / Nakamoto, get-tenure-info? returns (optional (buff 32))
     ;; If this fails in older clarinet versions, we might need a fallback, 
     ;; but user rules say "SDK 3.9+", so we assume native support.

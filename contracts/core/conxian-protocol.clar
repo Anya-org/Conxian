@@ -31,13 +31,15 @@
 
 ;; Administrative Functions
 
+(define-constant ROLE_EMERGENCY u3)
+
 ;; @desc Pauses the protocol globally
 ;; @param new-paused bool
 ;; @returns (response bool uint)
 (define-public (set-paused (new-paused bool))
     (begin
         (asserts!
-            (or (is-contract-owner) (contract-call? .rbac has-role tx-sender .rbac.ROLE_EMERGENCY))
+            (or (is-contract-owner) (contract-call? .rbac has-role tx-sender ROLE_EMERGENCY))
             ERR_UNAUTHORIZED
         )
         (var-set paused new-paused)

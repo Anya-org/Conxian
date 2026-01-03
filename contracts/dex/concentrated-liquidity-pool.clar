@@ -62,3 +62,28 @@
         (ok pool-id)
     )
 )
+
+;; @desc Adds liquidity to a pool (Mint)
+;; @param pool-id uint
+;; @param tick-lower int
+;; @param tick-upper int
+;; @param amount uint
+;; @returns (response bool uint)
+(define-public (mint
+        (pool-id uint)
+        (tick-lower int)
+        (tick-upper int)
+        (amount uint)
+    )
+    (begin
+        (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1000))
+        ;; Simple mock implementation for now
+        (print {
+            event: "mint",
+            pool-id: pool-id,
+            amount: amount,
+            tenure-id: (contract-call? .block-utils get-current-tenure-id),
+        })
+        (ok true)
+    )
+)

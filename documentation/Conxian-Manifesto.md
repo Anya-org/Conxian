@@ -6,7 +6,7 @@ We prioritize safety over speed. We cap risk so we can scale trust.
 
 ## The Velvet Rope
 
-Scarcity ensures quality. Access to the Conxian Protocol is limited to 1,000 Genesis members. After that, the only way in is through an invite from a verified member.
+Scarcity ensures quality. Access to the Conxian Protocol is limited to 10,000 Genesis members. After that, the only way in is through an invite from a verified member.
 
 ## The Viral Key
 

@@ -8,6 +8,8 @@
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_ALREADY_VOTED (err u1001))
 (define-constant ERR_VOTING_CLOSED (err u1002))
+(define-constant ERR_START_BLOCK_IN_PAST (err u2000))
+(define-constant ROLE_GOVERNANCE u1)
 
 ;; Data Maps
 (define-map proposals
@@ -35,10 +37,12 @@
         (tenure-id (contract-call? .block-utils get-current-tenure-id))
     )
         ;; Check Authentication (RBAC Governance Role)
-        (asserts! (contract-call? .rbac has-role tx-sender .rbac.ROLE_GOVERNANCE) ERR_UNAUTHORIZED)
+        (asserts! (contract-call? .rbac has-role tx-sender ROLE_GOVERNANCE)
+            ERR_UNAUTHORIZED
+        )
         
         ;; Ensure start block is in the future
-        (asserts! (> start-block block-height) (err u2000))
+        (asserts! (> start-block block-height) ERR_START_BLOCK_IN_PAST)
         
         (map-set proposals proposal-id {
             start-block: start-block,

@@ -39,6 +39,7 @@ This module provides a comprehensive multi-dimensional DeFi framework with:
 - `dim-oracle-automation.clar`: Automated oracle updates for dimensional metrics
 
 ### Other Contracts
+
 - `concentrated-liquidity-pool-v2.clar`
 - `concentrated-liquidity-pool.clar`
 - `governance.clar`
@@ -98,6 +99,6 @@ Enterprise APIs with compliance integration and advanced order types.
 
 ## Related Documentation
 
-- [Conxian Protocol Architecture](../../documentation/SYSTEM_ARCHITECTURE.md)
+- [Conxian Protocol Architecture](../../documentation/architecture/OVERVIEW.md)
 - [Multi-Hop Router Documentation](../dex/README.md)
 - [Oracle Integration Guide](../../guides/oracle-integration.md)
