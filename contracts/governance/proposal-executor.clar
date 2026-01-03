@@ -15,7 +15,7 @@
 (define-constant ERR_INVALID_PROPOSAL_CONTRACT (err u3008))
 
 (define-public (execute (proposal-id uint) (proposal-contract <proposal-trait>) (quorum-percentage uint))
-  (let ((maybe-proposal (try! (contract-call? .proposal-registry get-proposal proposal-id))))
+  (let ((maybe-proposal (contract-call? .proposal-registry get-proposal proposal-id)))
     (match maybe-proposal
       proposal (let (
           (total-votes (+ (get for-votes proposal) (get against-votes proposal)))

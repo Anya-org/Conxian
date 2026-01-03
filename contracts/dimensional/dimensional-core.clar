@@ -7,9 +7,9 @@
 ;;; Conforms to: Clarinet SDK 3.9+, Nakamoto Standard
 
 ;; Standard traits
-(use-trait oracle-trait .oracle-pricing.oracle-trait)
+(use-trait oracle-trait .defi-traits.oracle-trait)
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
-(use-trait pausable-trait .core-traits.pausable-trait)
+(use-trait pausable-trait .pausable.pausable-trait)
 (use-trait rbac-trait .core-traits.rbac-trait)
 (use-trait circuit-breaker-trait .security-monitoring.circuit-breaker-trait)
 
@@ -69,7 +69,7 @@
   tags: (list 10 (string-utf8 32)),
   version: uint,
   metadata: (optional (string-utf8 1024)),
-  tenure-id: uint ;; Added for Nakamoto tenure tracking
+  tenure-id: (buff 32) ;; Updated for Nakamoto tenure tracking (buff 32)
 })
 
 (define-map position-ids
@@ -233,7 +233,7 @@
         tags: tags,
         version: (var-get positions-version),
         metadata: metadata,
-        tenure-id: block-height ;; Use block-height as proxy for tenure-id in epoch 3.0
+        tenure-id: (unwrap-panic (contract-call? .block-utils get-current-tenure-id))
       })
 
     ;; Fix size calculation for short
@@ -267,11 +267,11 @@
       position-type: position-type,
       token: token,
       price: price,
-      tenure-id: block-height
+      tenure-id: (unwrap-panic (contract-call? .block-utils get-current-tenure-id))
     })
     (ok position-id)
   )
-)
+))
 
 (define-public (close-position
     (position-id uint)
@@ -323,9 +323,9 @@
       owner: tx-sender,
       pnl: pnl,
       fees: fees,
-      tenure-id: block-height
+      tenure-id: (unwrap-panic (contract-call? .block-utils get-current-tenure-id))
     })
-    (ok true)))
+    (ok true))))
 
 (define-public (liquidate-position (owner principal) (position-id uint) (oracle-trait <oracle-trait>))
   (begin
@@ -351,10 +351,7 @@
         ERR_INSUFFICIENT_COLLATERAL
       )
 
-      (map-set positions {
-        owner: owner,
-        id: position-id,
-      }
+      (map-set positions { owner: owner, id: position-id }
         (merge position {
           status: "LIQUIDATED",
           last-updated: block-height,
@@ -371,7 +368,7 @@
         position-id: position-id,
         owner: owner,
         liquidator: tx-sender,
-        tenure-id: block-height
+        tenure-id: (unwrap-panic (contract-call? .block-utils get-current-tenure-id))
       })
 
       (ok true)
@@ -387,28 +384,18 @@
       is-paused? (if is-paused? (err u3001) (ok true))
       error (err u3002))))
 
-;; ===== Public Functions;; --- Nakamoto Consensus Integration ---
+;; --- Nakamoto Consensus Integration ---
 (define-private (check-bitcoin-finality)
-  (let (
-    ;; Verify we can read state from 6 blocks ago (Bitcoin finality)
-    (finality-height (- burn-block-height u6))
-    (burn-header (get-burn-block-info? header-hash finality-height))
-  )
-    (asserts! (is-some burn-header) ERR_BITCOIN_NOT_FINALIZED)
-    (ok true)
-  )
+    (contract-call? .block-utils check-finality)
 )
 
 ;; ===== Initialization =====
 (define-public (initialize (new-owner principal) (oracle principal))
-  "@dev Initialize the contract (can only be called once)"
   (begin
     (asserts! (is-eq tx-sender (var-get owner)) ERR_UNAUTHORIZED)
-
     (var-set owner new-owner)
     (var-set oracle-contract-principal oracle)
-    (var-set protocol-fee-rate u30)  ;; 0.3%
-
+    (var-set protocol-fee-rate u30) ;; 0.3%
     (ok true)
   )
 )
@@ -431,7 +418,7 @@
   tags: (list 10 (string-utf8 32)),
   version: uint,
   metadata: (optional (string-utf8 1024)),
-  tenure-id: uint
+  tenure-id: (buff 32)
 }))
   (let (
       (size (get size position))
@@ -467,7 +454,7 @@
       tags: (list 10 (string-utf8 32)),
       version: uint,
       metadata: (optional (string-utf8 1024)),
-      tenure-id: uint
+      tenure-id: (buff 32)
     })
     (current-price uint)
   )

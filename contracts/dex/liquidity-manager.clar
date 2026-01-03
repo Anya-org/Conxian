@@ -55,8 +55,8 @@
         ;; Note: The pool contract must implement (mint (uint int int uint) (response bool uint))
         ;; We use a specific ID if known, or pass as principal. 
         ;; For this integration, we call the pool principal directly assuming standard interface.
-        (try! (contract-call? .concentrated-liquidity-pool mint u1 tick-lower
-            tick-upper liquidity
+        (try! (contract-call? .concentrated-liquidity-pool mint tx-sender tick-lower
+            tick-upper liquidity token0 token1
         ))
 
         ;; 3. Record position

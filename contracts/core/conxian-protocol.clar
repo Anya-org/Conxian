@@ -4,6 +4,7 @@
 
 ;; Traits
 (use-trait compliance-trait .compliance-trait.compliance-trait)
+(use-trait rbac-trait .core-traits.rbac-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))
@@ -14,6 +15,7 @@
 ;; Data Vars
 (define-data-var paused bool false)
 (define-data-var protocol-admin principal tx-sender)
+(define-data-var access-control principal .conxian-access)
 
 ;; Maps
 (define-map modules
@@ -39,7 +41,7 @@
 (define-public (set-paused (new-paused bool))
     (begin
         (asserts!
-            (or (is-contract-owner) (contract-call? .rbac has-role tx-sender ROLE_EMERGENCY))
+            (or (is-contract-owner) (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_EMERGENCY)))
             ERR_UNAUTHORIZED
         )
         (var-set paused new-paused)
@@ -80,6 +82,10 @@
 )
 
 ;; Read Only
+
+(define-read-only (get-admin)
+    (var-get protocol-admin)
+)
 
 (define-read-only (is-paused)
     (var-get paused)
