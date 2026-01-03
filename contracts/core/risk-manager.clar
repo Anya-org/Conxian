@@ -1,16 +1,17 @@
 ;; risk-manager.clar
 ;; Assesses position health and manages liquidations
+;; Core Backend Contract - Accessed via Dimensional Engine Facade
 
 (impl-trait .core-traits.risk-manager-trait)
 
 (define-constant ERR_NOT_AUTHORIZED (err u1000))
 (define-constant ERR_HEALTHY_POSITION (err u6000))
 
-(define-data-var dimensional-engine principal tx-sender)
+(define-data-var dimensional-engine principal .dimensional-engine)
 
 (define-public (set-dimensional-engine (engine principal))
     (begin
-        ;; Needs proper auth check
+        (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender u1)) ERR_NOT_AUTHORIZED)
         (var-set dimensional-engine engine)
         (ok true)
     )

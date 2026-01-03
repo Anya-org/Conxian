@@ -8,11 +8,11 @@
 
 (define-data-var backend principal .institutional-account-manager)
 
-(define-public (register-institution (name (string-ascii 64)) (limit uint))
+(define-public (register-institution (institution principal) (tier (string-ascii 20)) (limit uint))
     (begin
         ;; Access check handled by facade
         (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender u1)) ERR_UNAUTHORIZED)
-        (contract-call? .institutional-account-manager register-institution name limit)
+        (contract-call? .institutional-account-manager register-institution institution tier limit)
     )
 )
 

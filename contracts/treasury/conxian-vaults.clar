@@ -1,9 +1,11 @@
 ;; conxian-vaults.clar
 ;; Core Vault Implementation
 ;; Manages asset custody and yield strategies
+;; Decentralized: Uses Unified RBAC via .conxian-access
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 (use-trait vault-trait .vault-trait.vault-trait)
+(define-constant ERR_UNAUTHORIZED (err u1000))
 
 (define-constant ERR_UNAUTHORIZED (err u1000))
 
@@ -29,6 +31,9 @@
     (let (
             (sender tx-sender)
             (token-contract (contract-of token))
+        )
+        (asserts! (is-access-allowed? (as-contract .conxian-access) sender)
+            ERR_UNAUTHORIZED
         )
         (try! (contract-call? token transfer amount sender (as-contract tx-sender) none))
         (map-set vault-balances {
@@ -66,8 +71,12 @@
             ))
         )
         (asserts! (>= user-balance amount) (err u1001))
+        (asserts!
+            (unwrap-panic (contract-call? .conxian-access has-role sender u4))
+            ERR_UNAUTHORIZED
+        )
 
-        (try! (as-contract (contract-call? token transfer amount sender none)))
+        (try! (as-contract (contract-call? token transfer amount tx-sender sender none)))
 
         (map-set vault-balances {
             user: sender,

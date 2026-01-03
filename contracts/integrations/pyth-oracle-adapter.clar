@@ -41,7 +41,7 @@
                 event: "pyth-price-update",
                 asset: asset,
                 price: (get price price-data),
-                tenure-id: tenure-id,
+                tenure-id: tenure-id
             })
             (ok (get price price-data))
         )

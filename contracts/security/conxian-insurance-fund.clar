@@ -1,6 +1,7 @@
 ;; conxian-insurance-fund.clar
 ;; Emergency insolvency protection for the protocol
 ;; Collects fees and covers bad debt
+;; Decentralized: Uses Unified RBAC via .conxian-access
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
@@ -8,7 +9,9 @@
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_INSUFFICIENT_BALANCE (err u1001))
 
-(define-data-var governance principal tx-sender)
+;; Roles from conxian-access
+(define-constant ROLE_ADMIN u1)
+(define-constant ROLE_EMERGENCY u3)
 
 ;; State
 (define-map balances
@@ -38,20 +41,19 @@
         (amount uint)
     )
     (begin
-        (asserts! (is-eq tx-sender (var-get governance)) ERR_UNAUTHORIZED)
+        ;; Access Control: Must be Admin or Emergency role
+        (asserts! 
+            (or 
+                (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_ADMIN))
+                (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_EMERGENCY))
+            )
+            ERR_UNAUTHORIZED
+        )
         (let ((current-balance (default-to u0 (map-get? balances (contract-of token)))))
             (asserts! (>= current-balance amount) ERR_INSUFFICIENT_BALANCE)
             (map-set balances (contract-of token) (- current-balance amount))
-            (as-contract (contract-call? token transfer amount recipient none))
+            (as-contract (contract-call? token transfer amount tx-sender recipient none))
         )
-    )
-)
-
-(define-public (set-governance (new-gov principal))
-    (begin
-        (asserts! (is-eq tx-sender (var-get governance)) ERR_UNAUTHORIZED)
-        (var-set governance new-gov)
-        (ok true)
     )
 )
 

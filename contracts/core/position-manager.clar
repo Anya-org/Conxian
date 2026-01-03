@@ -1,5 +1,6 @@
 ;; position-manager.clar
 ;; Manages the lifecycle of trading positions
+;; Core Backend Contract - Accessed via Dimensional Engine Facade
 
 (impl-trait .core-traits.position-manager-trait)
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
@@ -7,7 +8,8 @@
 (define-constant ERR_NOT_AUTHORIZED (err u1000))
 (define-constant ERR_POSITION_NOT_FOUND (err u3000))
 
-(define-data-var dimensional-engine principal tx-sender)
+;; State - Engine Address
+(define-data-var dimensional-engine principal .dimensional-engine)
 
 (define-map positions
     uint
@@ -25,9 +27,14 @@
 
 (define-data-var next-position-id uint u1)
 
+;; Authorization: Only the Facade (Dimensional Engine) can call state-changing functions
+(define-private (is-engine)
+    (is-eq tx-sender (var-get dimensional-engine))
+)
+
 (define-public (set-dimensional-engine (engine principal))
     (begin
-        ;; Needs proper auth check in production
+        (user principal)(token principal)
         (var-set dimensional-engine engine)
         (ok true)
     )
@@ -41,9 +48,7 @@
         (long bool)
     )
     (let ((pos-id (var-get next-position-id)))
-        (asserts! (is-eq tx-sender (var-get dimensional-engine))
-            ERR_NOT_AUTHORIZED
-        )
+        (asserts! (is-engine) ERR_NOT_AUTHORIZED)
 
         (map-set positions pos-id {
             owner: user,
@@ -51,7 +56,7 @@
             size: (* amount leverage),
             collateral: amount,
             leverage: leverage,
-            entry-price: u0, ;; To be fetched from oracle
+            entry-price: u0, ;; To be fetched from oracle via engine
             is-long: long,
             open: true,
         })
@@ -65,9 +70,7 @@
         (position-id uint)
     )
     (begin
-        (asserts! (is-eq tx-sender (var-get dimensional-engine))
-            ERR_NOT_AUTHORIZED
-        )
+            (ok true)
         (let ((pos (unwrap! (map-get? positions position-id) ERR_POSITION_NOT_FOUND)))
             (asserts! (is-eq (get owner pos) user) ERR_NOT_AUTHORIZED)
             (map-set positions position-id (merge pos { open: false }))

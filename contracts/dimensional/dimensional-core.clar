@@ -95,8 +95,8 @@
     active: (- (var-get total-positions-opened) (var-get total-positions-closed))
   }))
 
-(define-read-only (get-position (owner principal) (position-id uint))
-  (map-get? positions {owner: owner, id: position-id}))
+(define-read-only (get-position (user principal) (position-id uint))
+  (map-get? positions {owner: user, id: position-id}))
 
 (define-read-only (calculate-tvl)
   (ok (var-get total-value-locked)))
@@ -111,9 +111,9 @@
     last-updated: block-height
   }))
 
-(define-public (get-health-factor (owner principal) (position-id uint) (oracle-trait <oracle-trait>))
+(define-public (get-health-factor (user principal) (position-id uint) (oracle-trait <oracle-trait>))
   (let (
-    (position (unwrap! (get-position owner position-id) ERR_INVALID_POSITION))
+    (position (unwrap! (get-position user position-id) ERR_INVALID_POSITION))
     (current-price (try! (get-oracle-price (var-get dimensional-token) oracle-trait)))
     (collateral-value (get collateral position))
     (pnl (calculate-pnl position current-price))
@@ -327,11 +327,11 @@
     })
     (ok true))))
 
-(define-public (liquidate-position (owner principal) (position-id uint) (oracle-trait <oracle-trait>))
+(define-public (liquidate-position (user principal) (position-id uint) (oracle-trait <oracle-trait>))
   (begin
     (try! (check-bitcoin-finality))
     (let (
-      (position (unwrap! (get-position owner position-id) ERR_INVALID_POSITION))
+      (position (unwrap! (get-position user position-id) ERR_INVALID_POSITION))
       (current-price (try! (get-oracle-price (var-get dimensional-token) oracle-trait)))
       (pnl (calculate-pnl position current-price))
       (collateral-value (get collateral position))
@@ -351,7 +351,7 @@
         ERR_INSUFFICIENT_COLLATERAL
       )
 
-      (map-set positions { owner: owner, id: position-id }
+      (map-set positions { owner: user, id: position-id }
         (merge position {
           status: "LIQUIDATED",
           last-updated: block-height,
@@ -361,12 +361,12 @@
       (var-set total-value-locked
         (- (var-get total-value-locked) collateral-value)
       )
-(var-set total-positions-closed (+ (var-get total-positions-closed) u1))
+      (var-set total-positions-closed (+ (var-get total-positions-closed) u1))
 
       (print {
         event: "liquidate-position",
         position-id: position-id,
-        owner: owner,
+        owner: user,
         liquidator: tx-sender,
         tenure-id: (unwrap-panic (contract-call? .block-utils get-current-tenure-id))
       })

@@ -36,7 +36,7 @@
         (claimable (- vested-amount (get claimed allocation)))
     )
         (asserts! (> claimable u0) ERR_LOCKED)
-        (try! (as-contract (contract-call? token transfer claimable sender none)))
+        (try! (as-contract (contract-call? token transfer claimable tx-sender sender none)))
         (map-set allocations { beneficiary: sender, token: (contract-of token) }
             { total: (get total allocation), claimed: vested-amount }
         )

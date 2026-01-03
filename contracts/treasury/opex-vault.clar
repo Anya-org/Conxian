@@ -17,9 +17,7 @@
     )
     (begin
         (asserts!
-            (contract-call? .roles has-role tx-sender
-                (contract-call? .roles ROLE_OPERATOR)
-            )
+            (unwrap-panic (contract-call? .conxian-access has-role tx-sender u4)) ;; ROLE_OPERATOR
             ERR_UNAUTHORIZED
         )
         ;; Check limits

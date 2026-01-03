@@ -8,7 +8,7 @@
 (use-trait collateral-manager-trait .core-traits.collateral-manager-trait)
 (use-trait risk-manager-trait .core-traits.risk-manager-trait)
 (use-trait funding-rate-trait .core-traits.funding-rate-trait)
-(use-trait sip-010-trait .all-traits.sip-010-ft-trait)
+(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))

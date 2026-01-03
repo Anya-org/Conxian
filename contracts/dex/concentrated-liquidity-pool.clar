@@ -4,6 +4,7 @@
 
 ;; Traits
 (use-trait ft-trait .sip-standards.sip-010-ft-trait)
+(use-trait rbac-trait .core-traits.rbac-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))
@@ -33,7 +34,8 @@
 (define-public (initialize
         (token0 principal)
         (token1 principal)
-        (sqrt-price uint)(tick int)
+        (sqrt-price uint)
+        (tick int)
         (fee uint)
     )
     (begin
@@ -79,7 +81,9 @@
         (recipient principal)
         (tick-lower int)
         (tick-upper int)
-        (liquidity uint)(token0 <ft-trait>)(token1 <ft-trait>)
+        (liquidity uint)
+        (token0 <ft-trait>)
+        (token1 <ft-trait>)
     )
     (let (
         (tenure-id (contract-call? .block-utils get-current-tenure-id))
