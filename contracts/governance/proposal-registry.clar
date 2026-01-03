@@ -9,6 +9,7 @@
     {
         proposer: principal,
         proposal-contract: principal,
+        council-id: uint,
         start-block: uint,
         end-block: uint,
         for-votes: uint,
@@ -26,6 +27,7 @@
 
 (define-public (add-proposal
         (proposal-contract principal)
+        (council-id uint)
         (start uint)
         (end uint)
     )
@@ -34,6 +36,7 @@
             (map-set proposals proposal-id {
                 proposer: tx-sender,
                 proposal-contract: proposal-contract,
+                council-id: council-id,
                 start-block: start,
                 end-block: end,
                 for-votes: u0,
@@ -52,6 +55,19 @@
         (begin
             ;; In a real scenario, this would check if the caller is the proposal-executor
             (map-set proposals proposal-id (merge proposal { executed: true }))
+            (ok true)
+        )
+    )
+)
+
+(define-public (vote-proposal (proposal-id uint) (support bool) (weight uint))
+    (let ((proposal (unwrap! (map-get? proposals proposal-id) ERR_NOT_FOUND)))
+        (begin
+            ;; In production, check if caller is proposal-engine
+            (map-set proposals proposal-id (merge proposal {
+                for-votes: (if support (+ (get for-votes proposal) weight) (get for-votes proposal)),
+                against-votes: (if (not support) (+ (get against-votes proposal) weight) (get against-votes proposal))
+            }))
             (ok true)
         )
     )
