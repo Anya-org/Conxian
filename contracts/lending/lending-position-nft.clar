@@ -14,6 +14,7 @@
 (define-constant ERR_ZERO_AMOUNT (err u7003))
 (define-constant ERR_INVALID_ASSET (err u7004))
 (define-constant ERR_POSITION_CLOSED (err u7005))
+(define-constant ERR_INVALID_INPUT (err u7006))
 
 ;; NFT Type Constants
 (define-constant NFT_TYPE_BORROW_POSITION u1)     ;; Borrower loan position
@@ -316,7 +317,7 @@
   (let ((position (unwrap! (map-get? lending-position-metadata { token-id: token-id }) ERR_POSITION_NOT_FOUND)))
     (asserts! (is-eq tx-sender (get owner position)) ERR_UNAUTHORIZED)
     (asserts! (> interest-amount u0) ERR_ZERO_AMOUNT)
-    (asserts! (= (get position-status position) u1) ERR_POSITION_CLOSED) ;; Must be active
+    (asserts! (is-eq (get position-status position) u1) ERR_POSITION_CLOSED) ;; Must be active
     
     (map-set lending-position-metadata
       { token-id: token-id }
@@ -343,7 +344,7 @@
 (define-public (close-position (token-id uint))
   (let ((position (unwrap! (map-get? lending-position-metadata { token-id: token-id }) ERR_POSITION_NOT_FOUND)))
     (asserts! (is-eq tx-sender (get owner position)) ERR_UNAUTHORIZED)
-    (asserts! (= (get position-status position) u1) ERR_POSITION_CLOSED) ;; Must be active
+    (asserts! (is-eq (get position-status position) u1) ERR_POSITION_CLOSED) ;; Must be active
     
     (map-set lending-position-metadata
       { token-id: token-id }
@@ -380,7 +381,7 @@
 (define-public (transfer (token-id uint) (sender principal) (recipient principal))
   (let ((position (unwrap! (map-get? lending-position-metadata { token-id: token-id }) ERR_POSITION_NOT_FOUND)))
     (asserts! (is-eq sender (get owner position)) ERR_UNAUTHORIZED)
-    (asserts! (= (get position-status position) u1) ERR_POSITION_CLOSED) ;; Only active positions can be transferred
+    (asserts! (is-eq (get position-status position) u1) ERR_POSITION_CLOSED) ;; Only active positions can be transferred
     
     ;; Transfer NFT ownership
     (nft-transfer? lending-position-nft token-id sender recipient)
@@ -455,7 +456,7 @@
           (map-get? user-positions { user: from, position-type: position-type })))
         (to-positions (default-to (list)
           (map-get? user-positions { user: to, position-type: position-type })))
-        (new-from-positions (filter (lambda (id) (not (= id token-id))) from-positions))
+        (new-from-positions (filter (lambda (id) (not (is-eq id token-id))) from-positions))
         (new-to-positions (append to-positions (list token-id)))
        )
     (map-set user-positions { user: from, position-type: position-type }

@@ -97,7 +97,11 @@
   principal
   uint
 )
+(define-data-var admin principal tx-sender)
 
+(define-private (is-admin)
+  (is-eq tx-sender (var-get admin))
+)
 ;; --- Private Functions ---
 
 ;; @desc Checks if the system is paused.
@@ -113,27 +117,29 @@
   ;; v1 stub: emission controller integration is disabled; always allow
   (if (not (var-get system-integration-enabled))
     true
-    (let ((limits-response (contract-call? .token-emission-controller get-token-emission-limits
-        .cxtr-token
-      )))
-      (if (is-ok limits-response)
-        (match (unwrap-panic limits-response)
-          some-limits (let (
-              (current-supply (var-get total-supply))
-              (max-single-mint-bps (get max-single-mint-bps some-limits))
-            )
-            ;; Allow bootstrap when supply is zero
-            (if (is-eq current-supply u0)
-              true
-              (let ((single-mint-cap (/ (* current-supply max-single-mint-bps) u10000)))
-                (<= amount single-mint-cap)
+    (match (var-get emission-controller)
+      some-controller
+        (let ((limits-response (contract-call? some-controller get-token-emission-limits .cxtr-token)))
+          (if (is-ok limits-response)
+            (match (unwrap-panic limits-response)
+              some-limits (let (
+                  (current-supply (var-get total-supply))
+                  (max-single-mint-bps (get max-single-mint-bps some-limits))
+                )
+                ;; Allow bootstrap when supply is zero
+                (if (is-eq current-supply u0)
+                  true
+                  (let ((single-mint-cap (/ (* current-supply max-single-mint-bps) u10000)))
+                    (<= amount single-mint-cap)
+                  )
+                )
               )
+              true
             )
+            true
           )
-          true
         )
-        true
-      )
+      true
     )
   )
 )
@@ -152,7 +158,7 @@
     (match (var-get token-coordinator)
       some-coordinator
       (unwrap!
-        (contract-call? .token-system-coordinator on-transfer amount sender
+        (contract-call? some-coordinator on-transfer amount sender
           recipient
         )
         true
@@ -174,7 +180,7 @@
   (if (var-get system-integration-enabled)
     (match (var-get token-coordinator)
       some-coordinator (unwrap!
-        (contract-call? .token-system-coordinator on-mint amount recipient)
+        (contract-call? some-coordinator on-mint amount recipient)
         true
       )
       true
@@ -193,7 +199,7 @@
   )
   (if (var-get system-integration-enabled)
     (match (var-get token-coordinator)
-      some-coordinator (unwrap! (contract-call? .token-system-coordinator on-burn amount burner)
+      some-coordinator (unwrap! (contract-call? some-coordinator on-burn amount burner)
         true
       )
       true
@@ -258,6 +264,14 @@
 )
 
 ;; --- Admin Functions ---
+
+(define-public (set-token-coordinator (coordinator principal))
+  (begin
+    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (var-set token-coordinator (some coordinator))
+    (ok true)
+  )
+)
 
 ;; @desc Sets the contract owner.
 ;; @param new-owner The new contract owner.
