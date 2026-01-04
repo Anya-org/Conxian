@@ -10,6 +10,7 @@
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_INVALID_POOL (err u2001))
 (define-constant ERR_SLIPPAGE (err u2002))
+(define-constant ERR_NON_COMPLIANT (err u2003))
 
 ;; Data Maps
 ;; positions: position-id -> { pool: principal, owner: principal, liquidity: uint, tick-lower: int, tick-upper: int }
@@ -25,6 +26,18 @@
 )
 
 (define-data-var position-nonce uint u0)
+
+;; Compliance Helper
+(define-private (check-compliance (user principal))
+    (let (
+        (compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user))
+    )
+        (if (is-ok compliance-status)
+            true
+            false
+        )
+    )
+)
 
 ;; Core Logic
 
@@ -50,8 +63,11 @@
         )
         ;; 1. Check Global Pause via Facade
         (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1001))
+        
+        ;; 2. Compliance Check
+        (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
 
-        ;; 2. Interaction: Call Pool Mint
+        ;; 3. Interaction: Call Pool Mint
         ;; Note: The pool contract must implement (mint (uint int int uint) (response bool uint))
         ;; We use a specific ID if known, or pass as principal. 
         ;; For this integration, we call the pool principal directly assuming standard interface.
@@ -59,7 +75,7 @@
             tick-upper liquidity token0 token1
         ))
 
-        ;; 3. Record position
+        ;; 4. Record position
         (map-set positions position-id {
             pool: pool,
             owner: tx-sender,
@@ -90,6 +106,9 @@
     (let ((position (unwrap! (map-get? positions position-id) (err u404))))
         (asserts! (is-eq (get owner position) tx-sender) ERR_UNAUTHORIZED)
         (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1001))
+        
+        ;; Compliance Check
+        (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
 
         (map-delete positions position-id)
 

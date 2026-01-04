@@ -2,6 +2,7 @@
 ;; The Autonomous CFO (Chief Financial Officer)
 ;; Implements autonomous, on-chain capital management, including automated
 ;; revenue distribution and allocation policy management.
+;; Tier 0: Ops-Engine Controlled
 
 ;; ---
 ;; @SECTION
@@ -21,13 +22,16 @@
 (define-constant ERR_UNAUTHORIZED (err u8000))
 (define-constant ERR_INVALID_SHARE (err u8001))
 (define-constant ERR_DISTRIBUTION_FAILED (err u8002))
+;; ---
 
 ;; ---
 ;; @SECTION
 ;; STATE & CONFIGURATION
 ;; ---
 
-(define-data-var contract-owner principal tx-sender) ;; Retained for initial setup
+
+;; Allocation percentages (in basis points, 10000 = 100%)
+
 (define-data-var rbac-contract principal .rbac)
 
 ;; Allocation percentages (in basis points, 10000 = 100%)
@@ -37,13 +41,23 @@
 
 ;; Destination vaults for revenue distribution
 (define-data-var staking-vault principal .cxd-staking)
-(define-data-var dev-fund-vault principal .dev-fund)
+;; @SECTION
 (define-data-var insurance-vault principal .conxian-insurance-fund)
 
 ;; ---
 ;; @SECTION
 ;; CORE LOGIC
 ;; ---
+
+;; Compliance Check Helper
+(define-private (check-compliance (user principal))
+    (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
+        (if (is-ok compliance-status)
+            true
+            false
+        )
+    )
+)
 
 ;; @desc The core autonomous function of the CFO. It receives tokens (protocol fees)
 ;; and distributes them to the various protocol vaults based on the on-chain allocation policy.
@@ -61,6 +75,10 @@
         )
         (begin
             ;; Ensure the revenue is sent from an authorized source (e.g., the DEX facade)
+            ;; AND verify compliance of the sender/source if needed
+;; For distribution, we prioritize getting the funds, but let's ensure the sender is not sanctioned if possible.
+;; (asserts! (check-compliance sender) ERR_NON_COMPLIANT) ;; Optional strictness
+
             (try! (contract-call? token transfer amount sender (as-contract tx-sender) none))
 
             ;; Distribute funds
@@ -99,22 +117,26 @@
 ;; ---
 ;; @SECTION
 ;; ADMIN & CONFIGURATION
+
+;; ---
+;; @SECTION
+;; ADMIN & CONFIGURATION
 ;; ---
 
-;; @desc Sets the allocation percentages for revenue distribution.
-;; @param staking The new share for staking rewards (in basis points).
-;; @param dev The new share for the development fund (in basis points).
-;; @param insurance The new share for the insurance fund (in basis points).
-(define-private (is-authorized (role uint))
-    (if (is-eq tx-sender (var-get contract-owner))
-        true
-        (contract-call? .rbac has-role tx-sender role)
+;; @desc Checks if the sender has the required authorization (Ops Engine or Admin).
+(define-private (is-authorized)
+    (or 
+        (is-eq tx-sender OPS_ENGINE)
+        (contract-call? .rbac has-role tx-sender ROLE_ADMIN)
     )
 )
 
+        ;; Enforce Clean Hands for Admin actions
 (define-public (set-allocations (staking uint) (dev uint) (insurance uint))
     (begin
-        (asserts! (is-authorized ROLE_ADMIN) ERR_UNAUTHORIZED)
+        (asserts! (is-eq (+ staking dev insurance) u10000) ERR_INVALID_SHARE)
+(var-set staking-share staking)
+(var-set dev-fund-share dev)
         (asserts! (is-eq (+ staking dev insurance) u10000) ERR_INVALID_SHARE)
         (var-set staking-share staking)
         (var-set dev-fund-share dev)
@@ -125,7 +147,7 @@
 
 (define-public (set-staking-vault (address principal))
   (begin
-    (asserts! (is-authorized ROLE_ADMIN) ERR_UNAUTHORIZED)
+    (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (var-set staking-vault address)
     (ok true)
   )
@@ -133,7 +155,7 @@
 
 (define-public (set-dev-fund-vault (address principal))
   (begin
-    (asserts! (is-authorized ROLE_ADMIN) ERR_UNAUTHORIZED)
+    (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (var-set dev-fund-vault address)
     (ok true)
   )
@@ -141,7 +163,7 @@
 
 (define-public (set-insurance-vault (address principal))
   (begin
-    (asserts! (is-authorized ROLE_ADMIN) ERR_UNAUTHORIZED)
+    (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (var-set insurance-vault address)
     (ok true)
   )

@@ -22,8 +22,8 @@
 (define-constant ROLE_ADMIN u1)
 
 ;; State
-(define-map queued-transactions 
-    (buff 32) 
+(define-map queued-proposals
+    principal ;; proposal contract address
     uint ;; eta
 )
 
@@ -33,6 +33,7 @@
 (define-public (set-delay (new-delay uint))
     (begin
         (var-set delay new-delay)
+(asserts! (>= new-delay MIN_DELAY) ERR_INVALID_DELAY)
         (asserts! (>= new-delay MIN_DELAY) ERR_INVALID_DELAY)
         (asserts! (<= new-delay MAX_DELAY) ERR_INVALID_DELAY)
         (var-set delay new-delay)
@@ -40,45 +41,42 @@
     )
 )
 
-(define-public (queue-transaction 
-        (target principal) 
-        (value uint) 
-        (signature (string-ascii 48)) 
-        (data (buff 128)) 
-        (eta uint)
-    )
+        (target principal)
     (let (
-        (tx-hash 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20)
-        ;; (tx-hash (keccak256 (unwrap-panic (to-consensus-buff? {target: target, value: value, signature: signature, data: data, eta: eta}))))
+        (signature (string-ascii 48))(data (buff 128))
     )
+        ;; Only Admin/Governance can queue
         (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_ADMIN)) ERR_UNAUTHORIZED)
-        (asserts! (>= eta (+ block-height (var-get delay))) ERR_INVALID_DELAY)
-        (asserts! (is-none (map-get? queued-transactions tx-hash)) ERR_ALREADY_QUEUED)
+        (tx-hash 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20)
         
-        (map-set queued-transactions tx-hash eta)
-        (ok tx-hash)
+        (map-set queued-proposals proposal-principal eta)
+        (print { event: "queue", proposal: proposal-principal, eta: eta })
+        (ok eta)
     )
 )
 
-(define-public (execute-transaction
-        (target principal) 
-        (value uint) 
-        (signature (string-ascii 48)) 
-        (data (buff 128)) 
-        (eta uint)
-    )
+        (ok tx-hash)
     (let (
-        (tx-hash 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20);; (tx-hash (keccak256 (unwrap-panic (to-consensus-buff? {target: target, value: value, signature: signature, data: data, eta: eta}))))
-        (queued-eta (unwrap! (map-get? queued-transactions tx-hash) ERR_NOT_QUEUED))
+        (proposal-principal (contract-of proposal))
+        (queued-eta (unwrap! (map-get? queued-proposals proposal-principal) ERR_NOT_QUEUED))
     )
-        (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_ADMIN)) ERR_UNAUTHORIZED)
+        (target principal)
         (asserts! (>= block-height queued-eta) ERR_TOO_EARLY)
         (asserts! (<= block-height (+ queued-eta GRACE_PERIOD)) ERR_EXPIRED)
 
-        (map-delete queued-transactions tx-hash)
-        ;; Note: Actual execution would require trait invocation or specific logic
-        ;; In Clarity, generic execution of arbitrary signatures is limited.
-        ;; This is a standard pattern for governance signaling/gating.
-        (ok true)
+        (map-delete queued-proposals proposal-principal)
+        
+        ;; Execute as the Timelock Contract
+        ;; This sets 'tx-sender' to .timelock in the proposal execution context
+        (as-contract (contract-call? proposal execute tx-sender))
     )
 )
+
+(define-read-only (get-delay)
+    (ok (var-get delay))
+)
+
+(define-read-only (get-eta (proposal principal))
+    (map-get? queued-proposals proposal)
+)
+

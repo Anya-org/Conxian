@@ -12,9 +12,11 @@
 (define-constant ERR_MODULE_EXISTS (err u1002))
 (define-constant ERR_MODULE_NOT_FOUND (err u1003))
 
+(define-constant ROLE_EMERGENCY u3)
+
 ;; Data Vars
 (define-data-var paused bool false)
-(define-data-var protocol-admin principal tx-sender)
+(define-data-var contract-owner principal tx-sender) ;; Replaces protocol-admin
 (define-data-var access-control principal .conxian-access)
 
 ;; Maps
@@ -27,13 +29,11 @@
 )
 
 ;; Authorization
-(define-read-only (is-contract-owner)
-    (is-eq tx-sender (var-get protocol-admin))
+(define-read-only (is-owner)
+    (is-eq tx-sender (var-get contract-owner))
 )
 
 ;; Administrative Functions
-
-(define-constant ROLE_EMERGENCY u3)
 
 ;; @desc Pauses the protocol globally
 ;; @param new-paused bool
@@ -41,10 +41,16 @@
 (define-public (set-paused (new-paused bool))
     (begin
         (asserts!
-            (or (is-contract-owner) (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_EMERGENCY)))
+            (or 
+                (is-owner) 
+                (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_EMERGENCY))
+                (is-eq tx-sender .conxian-operations-engine) ;; Allow Ops Engine to pause (Fail-Safe)
+                (is-eq tx-sender .agent-risk) ;; Allow Risk Agent to pause (Systemic Risk)
+            )
             ERR_UNAUTHORIZED
         )
         (var-set paused new-paused)
+        (print { event: "protocol-pause-status", paused: new-paused, sender: tx-sender })
         (ok true)
     )
 )
@@ -58,7 +64,7 @@
         (contract principal)
     )
     (begin
-        (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+        (asserts! (is-owner) ERR_UNAUTHORIZED)
         (map-set modules { name: name } {
             contract: contract,
             active: true,
@@ -74,17 +80,30 @@
     )
     (let ((module (unwrap! (map-get? modules { name: name }) ERR_MODULE_NOT_FOUND)))
         (begin
-            (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+            (asserts! (is-owner) ERR_UNAUTHORIZED)
             (map-set modules { name: name } (merge module { active: active }))
             (ok true)
         )
     )
 )
 
+;; Admin Handover
+(define-public (set-contract-owner (new-owner principal))
+    (begin
+        (asserts! (is-owner) ERR_UNAUTHORIZED)
+        (var-set contract-owner new-owner)
+        (ok true)
+    )
+)
+
 ;; Read Only
 
+(define-read-only (get-contract-owner)
+    (ok (var-get contract-owner))
+)
+
 (define-read-only (get-admin)
-    (var-get protocol-admin)
+    (var-get contract-owner)
 )
 
 (define-read-only (is-paused)

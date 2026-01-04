@@ -14,6 +14,18 @@
 (define-constant ERR_PROPOSAL_FAILED (err u3007))
 (define-constant ERR_INVALID_PROPOSAL_CONTRACT (err u3008))
 
+(define-data-var ops-engine principal tx-sender)
+
+(define-public (set-ops-engine (new-engine principal))
+  (begin
+    ;; Simple admin check (in production, use RBAC)
+    ;; For now, we assume initial deployer sets this up
+    (asserts! (is-eq tx-sender (var-get ops-engine)) ERR_UNAUTHORIZED)
+    (var-set ops-engine new-engine)
+    (ok true)
+  )
+)
+
 (define-public (execute (proposal-id uint) (proposal-contract <proposal-trait>) (quorum-percentage uint))
   (let ((proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id) ERR_PROPOSAL_NOT_FOUND)))
     (let (
@@ -25,24 +37,28 @@
           (unwrap-panic (contract-call? .enhanced-governance-nft get-total-council-power
             council-id
           ))
-          (unwrap-panic (contract-call? .governance-token get-total-supply))
+          (unwrap-panic (contract-call? .cxvg-token get-total-supply))
         ))
-;; Avoid division by zero
+        ;; Avoid division by zero
         (safe-supply (if (is-eq total-supply u0)
           u1
           total-supply
         ))
-(quorum (/ (* total-votes u10000) safe-supply))
+        (quorum (/ (* total-votes u10000) safe-supply))
       )
       (begin
-        (asserts! (is-eq tx-sender (get proposer proposal)) ERR_UNAUTHORIZED)
+        ;; Authorization: Proposer OR Ops Engine
+(asserts!
+          (or (is-eq tx-sender (get proposer proposal)) (is-eq tx-sender (var-get ops-engine)))
+          ERR_UNAUTHORIZED
+        )
         (asserts! (>= block-height (get end-block proposal)) ERR_PROPOSAL_NOT_ACTIVE)
         (asserts! (not (get executed proposal)) ERR_VOTING_CLOSED)
         (asserts! (not (get canceled proposal)) ERR_VOTING_CLOSED)
         (asserts! (> (get for-votes proposal) (get against-votes proposal)) ERR_PROPOSAL_FAILED)
         
         ;; Verify Quorum (If supply is 0, we can't pass)
-(asserts! (> total-supply u0) ERR_QUORUM_NOT_REACHED)
+        (asserts! (> total-supply u0) ERR_QUORUM_NOT_REACHED)
         (asserts! (>= quorum quorum-percentage) ERR_QUORUM_NOT_REACHED)
         
         ;; Verify that the passed contract matches the one in the proposal

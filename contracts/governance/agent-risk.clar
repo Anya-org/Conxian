@@ -23,6 +23,7 @@
 (define-constant ERR_UNAUTHORIZED (err u7000))
 (define-constant ERR_VOLATILITY_THRESHOLD_EXCEEDED (err u7001))
 (define-constant ERR_INVALID_THRESHOLD (err u7002))
+(define-constant ERR_PEG_LOSS (err u7003))
 
 ;; ---
 ;; @SECTION
@@ -33,6 +34,7 @@
 (define-data-var rbac-contract principal .rbac)
 (define-data-var oracle-contract principal .oracle)
 (define-data-var volatility-threshold uint u1000) ;; 10% price deviation
+(define-data-var peg-threshold uint u500) ;; 5% deviation from 1:1
 
 ;; Map of paused contracts
 (define-map paused-contracts principal bool)
@@ -61,6 +63,50 @@
         (map-set paused-contracts target paused)
         (print { event: "set-contract-paused", target: target, paused: paused, triggered-by: tx-sender })
         (ok true)
+    )
+)
+
+;; @desc Monitor sBTC Peg Stability (Tier 0 Systemic Risk)
+;; Checks if sBTC price deviates significantly from BTC price (assumed 1:1 target).
+;; In a real scenario, this fetches sBTC/USD and BTC/USD from the Oracle.
+(define-public (monitor-sbtc-peg
+        (sbtc-symbol (string-ascii 64))
+        (btc-symbol (string-ascii 64))
+    )
+    (begin
+        (asserts! (is-authorized ROLE_KEEPER) ERR_UNAUTHORIZED)
+
+        (let (
+                (sbtc-data (try! (contract-call? .oracle get-price sbtc-symbol)))
+                (btc-data (try! (contract-call? .oracle get-price btc-symbol)))
+                (sbtc-price (get price sbtc-data))
+                (btc-price (get price btc-data))
+                (deviation (if (> sbtc-price btc-price)
+                    (- sbtc-price btc-price)
+                    (- btc-price sbtc-price)
+                ))
+                ;; Calculate deviation in basis points: (deviation * 10000) / btc-price
+                (deviation-bps (/ (* deviation u10000) btc-price))
+            )
+            (if (> deviation-bps (var-get peg-threshold))
+                (begin
+                    ;; Trigger Emergency Pause on sBTC Vault and Protocol
+                    ;; We use a hardcoded reference or a lookup in a real system.
+                    ;; For Tier 0, we target the critical vault.
+                    (try! (set-contract-paused .sbtc-vault true))
+                    (try! (set-contract-paused .conxian-protocol true))
+
+                    (print {
+                        event: "peg-loss-detected",
+                        sbtc: sbtc-price,
+                        btc: btc-price,
+                        deviation: deviation-bps,
+                    })
+                    (err ERR_PEG_LOSS)
+                )
+                (ok true)
+            )
+        )
     )
 )
 
@@ -107,6 +153,10 @@
 ;; @returns (response bool bool)
 (define-read-only (is-contract-paused (target principal))
     (ok (default-to false (map-get? paused-contracts target)))
+)
+
+(define-read-only (get-contract-owner)
+    (ok (var-get contract-owner))
 )
 
 ;; ---

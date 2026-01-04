@@ -11,11 +11,11 @@
 (define-constant ERR_SOULBOUND (err u6003))
 
 ;; Council IDs
-(define-constant COUNCIL_PROTOCOL u1)
-(define-constant COUNCIL_RISK u2)
-(define-constant COUNCIL_TREASURY u3)
-(define-constant COUNCIL_TECH u4)
-(define-constant COUNCIL_OPS u5)
+(define-constant COUNCIL_CXD u1) ;; Core Protocol & Architecture
+(define-constant COUNCIL_CXVG u2) ;; Risk & Vault Management
+(define-constant COUNCIL_CXTR u3) ;; Treasury & Capital Allocation
+(define-constant COUNCIL_CXS u4) ;; Staking & Yield Curves
+(define-constant COUNCIL_CXLP u5) ;; Liquidity & AMM Weighting
 
 ;; Assets
 (define-non-fungible-token seat uint)
