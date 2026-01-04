@@ -1138,3 +1138,13 @@ depends_on = ["rbac", "conxian-protocol", "block-utils"]
 [contracts.redstone-traits]
 path = "contracts/traits/redstone-traits.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+
+[contracts.agent-risk]
+path = "contracts/governance/agent-risk.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = ["core-traits", "oracle", "rbac"]
+
+[contracts.agent-treasury]
+path = "contracts/governance/agent-treasury.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = ["sip-standards", "cxd-staking", "conxian-insurance-fund"]

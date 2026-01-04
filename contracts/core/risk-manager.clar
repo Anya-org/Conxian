@@ -69,22 +69,23 @@
   (begin
     ;; Check cache first
     (match (map-get? position-health position-id)
-      health-data
-      (begin
-        ;; Return cached value if fresh (within 10 blocks)
-        (if (< (- block-height (get last-update health-data)) u10)
-          (ok (get health-factor health-data))
-          ;; Recalculate if stale
-          (let ((new-hf (calculate-health-factor 
-                          (get collateral-value health-data)
-                          (get debt-value health-data))))
-            (map-set position-health position-id {
-              health-factor: new-hf,
-              collateral-value: (get collateral-value health-data),
-              debt-value: (get debt-value health-data),
-              last-update: block-height,
-            })
-            (ok new-hf)
+      (health-data
+        (begin
+          ;; Return cached value if fresh (within 10 blocks)
+          (if (< (- block-height (get last-update health-data)) u10)
+            (ok (get health-factor health-data))
+            ;; Recalculate if stale
+            (let ((new-hf (calculate-health-factor
+                            (get collateral-value health-data)
+                            (get debt-value health-data))))
+              (map-set position-health position-id {
+                health-factor: new-hf,
+                collateral-value: (get collateral-value health-data),
+                debt-value: (get debt-value health-data),
+                last-update: block-height,
+              })
+              (ok new-hf)
+            )
           )
         )
       )
@@ -194,8 +195,9 @@
 
 (define-read-only (is-liquidatable (position-id uint))
   (match (map-get? position-health position-id)
-    health-data
-    (ok (not (is-position-healthy (get health-factor health-data))))
+    (health-data
+      (ok (not (is-position-healthy (get health-factor health-data))))
+    )
     (ok false)
   )
 )

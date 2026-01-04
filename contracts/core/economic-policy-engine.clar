@@ -196,11 +196,11 @@
 
 ;; System Health Monitoring
 (define-read-only (get-system-health)
-  {
+  (ok {
     last-update: (var-get last-price-update),
     blocks-since-update: (- block-height (var-get last-price-update)),
     current-rate: (var-get current-interest-rate),
     utilization: (var-get utilization-rate),
     collateral-factor: (var-get collateral-factor),
-  }
+  })
 )

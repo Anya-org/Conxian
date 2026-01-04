@@ -50,11 +50,16 @@
     )
 )
 
-;; @desc Automated Emergency Response (OaaS)
+;; @desc Automated Emergency Response (OaaS) - DELEGATED TO CRO
+;; This function is triggered by the operator and instructs the CRO
+;; agent to pause the main protocol contract.
 (define-public (trigger-emergency-pause)
     (begin
-        ;; Logic: Trigger pause if certain analytics thresholds are met
-        (contract-call? .conxian-protocol set-paused true)
+        (asserts! (is-eq tx-sender (var-get operator-controller)) ERR_UNAUTHORIZED)
+        ;; As the CEO agent, call the CRO agent to pause the main protocol contract.
+        (try! (as-contract (contract-call? .agent-risk set-contract-paused .conxian-protocol true)))
+        (print { event: "ceo-triggered-emergency-pause", target: .conxian-protocol })
+        (ok true)
     )
 )
 
