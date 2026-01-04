@@ -226,9 +226,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/dex/pool-template.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.manipulation-detector]
-path = "contracts/risk/manipulation-detector.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.factory-trait]
 path = "contracts/dex/factory-trait.clar"
@@ -378,10 +375,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/interoperability/wormhole-handlers.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.risk-management]
-path = "contracts/traits/risk-management.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-
 [contracts.core-protocol]
 path = "contracts/traits/core-protocol.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
@@ -518,11 +511,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/automation/guardian-registry.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.conxian-insurance-fund]
-path = "contracts/security/conxian-insurance-fund.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["sip-standards", "conxian-access"]
-
 [contracts.bond-token]
 path = "contracts/bonding/bond-token.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
@@ -542,9 +530,6 @@ path = "contracts/treasury/conxian-vaults.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = ["sip-standards", "vault-trait", "conxian-access"]
 
-[contracts.insurance-fund]
-path = "contracts/risk/insurance-fund.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.defi-primitives]
 path = "contracts/traits/defi-primitives.clar"
@@ -710,13 +695,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/sbtc/dlc-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.funding-calculator]
-path = "contracts/risk/funding-calculator.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-
-[contracts.liquidation-engine]
-path = "contracts/risk/liquidation-engine.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.mock-lending-pool]
 path = "contracts/mocks/mock-lending-pool.clar"
@@ -772,9 +750,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/staking/dual-stacking-orchestrator.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.risk-oracle]
-path = "contracts/risk/risk-oracle.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.signed-data-base]
 path = "contracts/governance/signed-data-base.clar"
@@ -1103,7 +1078,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = [ "oracle-aggregator-v2", "oracle-aggregator-v2", "position-manager", "position-manager", "roles", "position-manager",]
 
 [contracts.risk-manager]
-path = "contracts/risk/risk-manager.clar"
+path = "contracts/core/risk-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = [ "roles", "position-manager",]
 

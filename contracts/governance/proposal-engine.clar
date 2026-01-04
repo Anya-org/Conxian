@@ -32,9 +32,9 @@
         ;; Check if sender holds a seat on this council (or is admin)
         (asserts!
             (>
-                (unwrap-panic (try! (contract-call? .enhanced-governance-nft get-seat-power tx-sender
+                (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender
                     council-id
-                )))
+                ))
                 u0
             )
             ERR_UNAUTHORIZED
@@ -50,9 +50,9 @@
     (let (
         (proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id) ERR_NOT_FOUND))
         (council-id (get council-id proposal))
-        (voter-power (unwrap-panic (try! (contract-call? .enhanced-governance-nft get-seat-power tx-sender
+        (voter-power (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender
             council-id
-        ))))
+        )))
     )
         ;; Assert Voting Period
         (asserts! (>= block-height (get start-block proposal)) ERR_NOT_FOUND) ;; Should be ERR_NOT_STARTED but reusing

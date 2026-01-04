@@ -15,22 +15,23 @@
 (define-constant ERR_INVALID_PROPOSAL_CONTRACT (err u3008))
 
 (define-public (execute (proposal-id uint) (proposal-contract <proposal-trait>) (quorum-percentage uint))
-  (let ((proposal (contract-call? .proposal-registry get-proposal proposal-id)))
+  (let ((proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id) ERR_PROPOSAL_NOT_FOUND)))
     (let (
         (total-votes (+ (get for-votes proposal) (get against-votes proposal)))
         (council-id (get council-id proposal))
-;; Determine Total Supply based on Context (Council vs Global)
-(total-supply (if (> council-id u0)
-            (unwrap-panic (contract-call? .enhanced-governance-nft get-total-council-power
-              council-id
-            ))
-            (unwrap-panic (contract-call? .governance-token get-total-supply)))
+        
+        ;; Determine Total Supply based on Context (Council vs Global)
+        (total-supply (if (> council-id u0)
+          (unwrap-panic (contract-call? .enhanced-governance-nft get-total-council-power
+            council-id
           ))
+          (unwrap-panic (contract-call? .governance-token get-total-supply))
+        ))
 ;; Avoid division by zero
-(safe-supply (if (is-eq total-supply u0)
-            u1
-            total-supply
-          ))
+        (safe-supply (if (is-eq total-supply u0)
+          u1
+          total-supply
+        ))
 (quorum (/ (* total-votes u10000) safe-supply))
       )
       (begin
@@ -63,3 +64,4 @@
       )
     )
   )
+)
