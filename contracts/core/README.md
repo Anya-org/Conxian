@@ -59,18 +59,10 @@ The following functions are exposed by the `dimensional-engine.clar` facade.
 -   `deposit-funds`: Deposits funds into the `collateral-manager`.
 -   `withdraw-funds`: Withdraws funds from the `collateral-manager`.
 
-### Funding Rate Management
-
--   `update-funding-rate`: Triggers an update of the funding rate via the `funding-rate-calculator`.
--   `apply-funding-to-position`: Applies the current funding rate to a specific position via the `funding-rate-calculator`.
-
 ### Risk Management
 
 -   `check-position-health`: Checks the health of a position by delegating to the `risk-manager`.
 -   `liquidate-position`: Initiates the liquidation of an unhealthy position via the `risk-manager`.
--   `set-risk-parameters`: Configures the risk parameters for the protocol.
--   `set-liquidation-rewards`: Configures the rewards for liquidators.
--   `set-insurance-fund`: Sets the insurance fund contract address.
 
 ### Protocol Administration
 

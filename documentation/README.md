@@ -58,7 +58,5 @@ readiness.
   here for historical context.**
 - **[System Analysis](./SYSTEM_ANALYSIS.md)**: Analysis of the protocol's market, competitive landscape, and risks.
 - **[Security Documentation](./security/SECURITY.md)**: Overview of security strategy.
-- **[System Review](./reports/2025-11-MONTHLY-REPORT.md)**: Detailed system review (Nov 2025).
-- **[Test Coverage Report](./reports/2025-12-MONTHLY-REPORT.md)**: Latest test coverage (Dec 2025).
 - **[Launch Strategy](./strategy/COMPREHENSIVE_LAUNCH_STRATEGY.md)**: Comprehensive launch strategy.
 - **[Gamification Strategy](./strategy/GAMIFICATION_STRATEGY.md)**: Gamification strategy.

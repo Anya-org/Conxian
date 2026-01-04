@@ -29,6 +29,8 @@
 
 ;; --- Configuration ---
 
+;; @desc Sets the protocol coordinator address.
+;; @param new-coordinator: The principal of the new protocol coordinator contract.
 (define-public (set-protocol-coordinator (new-coordinator principal))
     (begin
         (asserts! (is-authorized) ERR_UNAUTHORIZED)
@@ -75,6 +77,9 @@
 
 ;; --- Facade Functions: Collateral Management ---
 
+;; @desc Deposits funds into the collateral manager.
+;; @param amount: The amount of tokens to deposit.
+;; @param token: The SIP-010 token contract to deposit.
 (define-public (deposit-funds
         (amount uint)
         (token <sip-010-trait>)
@@ -85,6 +90,9 @@
     )
 )
 
+;; @desc Withdraws funds from the collateral manager.
+;; @param amount: The amount of tokens to withdraw.
+;; @param token: The SIP-010 token contract to withdraw.
 (define-public (withdraw-funds
         (amount uint)
         (token <sip-010-trait>)
@@ -97,10 +105,14 @@
 
 ;; --- Facade Functions: Risk Management ---
 
+;; @desc Checks the health factor of a position.
+;; @param position-id: The ID of the position to check.
 (define-public (check-position-health (position-id uint))
     (contract-call? .risk-manager get-health-factor position-id)
 )
 
+;; @desc Liquidates an unhealthy position.
+;; @param position-id: The ID of the position to liquidate.
 (define-public (liquidate-position (position-id uint))
     (begin
         (try! (contract-call? .block-utils check-finality))
