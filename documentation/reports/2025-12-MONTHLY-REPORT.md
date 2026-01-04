@@ -30,8 +30,8 @@ implementation layer.
 ### Recommendations
 
 1. **Activate Revenue Collection**: Implement `transfer-fee` logic and create a Treasury contract.
-2. **Fix Lending Economics**: Implement `accrue-interest` logic.
-3. **Automate sBTC Revenue**: Mint fee sBTC to the Treasury.
+1. **Fix Lending Economics**: Implement `accrue-interest` logic.
+1. **Automate sBTC Revenue**: Mint fee sBTC to the Treasury.
 
 ---
 
@@ -44,8 +44,8 @@ implementation layer.
 ### Critical Findings (P0)
 
 1. **Inflation Attack Vulnerability (`vault.clar`)**: Vulnerable to share price manipulation via donation.
-2. **Circuit Breaker Logic Flaw**: Hardcoded dependency mismatch in `oracle-aggregator-v2.clar`.
-3. **Compliance Bypass**: KYC/AML hooks are non-functional stubs.
+1. **Circuit Breaker Logic Flaw**: Hardcoded dependency mismatch in `oracle-aggregator-v2.clar`.
+1. **Compliance Bypass**: KYC/AML hooks are non-functional stubs.
 
 ### Performance
 
@@ -109,4 +109,4 @@ The system has undergone significant stabilization.
 ### Next Steps (Path to Mainnet)
 
 1. **Testnet Deployment**: Deploy Core and DEX layers.
-2. **Audit Prep**: Legacy cleanup and final panic removal.
+1. **Audit Prep**: Legacy cleanup and final panic removal.

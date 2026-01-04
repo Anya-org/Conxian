@@ -29,5 +29,5 @@ chronological record of the project's evolution and health.
 ## Best Practices for Reporting
 
 1. **Immutability**: Once a monthly report is finalized, it should be kept as a historical record.
-2. **Consolidation**: Do not create individual files for every small update. Aggregate findings into the monthly report.
-3. **Central Indexing**: All monthly reports must be linked in this `PROJECT_LOG.md` file.
+1. **Consolidation**: Do not create individual files for every small update. Aggregate findings into the monthly report.
+1. **Central Indexing**: All monthly reports must be linked in this `PROJECT_LOG.md` file.

@@ -62,18 +62,18 @@ trading, lending, or providing liquidity.
 **For Hiro Wallet (Desktop):**
 
 1. Go to [wallet.hiro.so](https://wallet.hiro.so/)
-2. Click "Create a new wallet"
-3. Save your 12-word recovery phrase (write it down!)
-4. Set a strong password
-5. Fund with STX (at least 10 STX for fees)
+1. Click "Create a new wallet"
+1. Save your 12-word recovery phrase (write it down!)
+1. Set a strong password
+1. Fund with STX (at least 10 STX for fees)
 
 **For Xverse Wallet (Mobile):**
 
 1. Download from App Store or Google Play
-2. Create new wallet
-3. Save recovery phrase securely
-4. Enable biometric login (fingerprint/face)
-5. Add STX and your favorite crypto
+1. Create new wallet
+1. Save recovery phrase securely
+1. Enable biometric login (fingerprint/face)
+1. Add STX and your favorite crypto
 
 ### Step 2: Connect to Conxian
 
@@ -116,11 +116,11 @@ The trading feature lets you swap one cryptocurrency for another instantly.
 **How to Trade:**
 
 1. **Go to the "Trade" page**
-2. **Choose what to sell** - Click the top box, pick your crypto
-3. **Choose what to buy** - Click the bottom box, pick desired crypto
-4. **Enter amount** - Type how much you want to sell
-5. **Check the details** - Review the exchange rate and any fees
-6. **Confirm trade** - Click "Swap" and approve in your wallet
+1. **Choose what to sell** - Click the top box, pick your crypto
+1. **Choose what to buy** - Click the bottom box, pick desired crypto
+1. **Enter amount** - Type how much you want to sell
+1. **Check the details** - Review the exchange rate and any fees
+1. **Confirm trade** - Click "Swap" and approve in your wallet
 
 **Example:**
 
@@ -145,10 +145,10 @@ Yield vaults are like high-interest savings accounts for crypto. Deposit your cr
 **How it works:**
 
 1. **Navigate to the "Earn" page** from your dashboard.
-2. **Select a vault** for your desired crypto (e.g., STX, sBTC).
-3. **Enter the amount** you wish to deposit. The interface will show you an estimate of your earnings.
-4. **Confirm the deposit** in the app and approve the transaction in your wallet.
-5. **That's it!** You'll receive vault "shares" and can track your growing interest from your dashboard.
+1. **Select a vault** for your desired crypto (e.g., STX, sBTC).
+1. **Enter the amount** you wish to deposit. The interface will show you an estimate of your earnings.
+1. **Confirm the deposit** in the app and approve the transaction in your wallet.
+1. **That's it!** You'll receive vault "shares" and can track your growing interest from your dashboard.
 
 **Current Rates (Example):**
 
@@ -192,9 +192,9 @@ Conxian is owned by its users. You can vote on important decisions.
 **How to participate:**
 
 1. **Get CXVG tokens** (governance tokens)
-2. **Join discussions** on community forums
-3. **Vote on proposals** - Changes to fees, new features, etc.
-4. **Share in rewards** - 80% of platform fees go to CXVG holders
+1. **Join discussions** on community forums
+1. **Vote on proposals** - Changes to fees, new features, etc.
+1. **Share in rewards** - 80% of platform fees go to CXVG holders
 
 **Why it matters:**
 
@@ -349,10 +349,10 @@ Stay informed about all your activity with a dedicated transaction history.
 **Help Options:**
 
 1. **💡 In-App Tooltips:** Look for help icons throughout the app for quick explanations of key terms and features.
-2. **📖 Check this guide** - Many answers here
-3. **💬 Community Discord** - Real-time help from users
-4. **🔍 Search issues** - GitHub for technical problems
-5. **📧 Email support** - For account-specific issues
+1. **📖 Check this guide** - Many answers here
+1. **💬 Community Discord** - Real-time help from users
+1. **🔍 Search issues** - GitHub for technical problems
+1. **📧 Email support** - For account-specific issues
 
 **Response Times:**
 
@@ -722,10 +722,10 @@ Conxian works great on mobile! Here's everything you need to know for the best m
 **Xverse Wallet (Recommended for Mobile):**
 
 1. **Download:** Search "Xverse" in App Store or Google Play
-2. **Create Wallet:** Tap "Create a new wallet"
-3. **Secure Backup:** Write down your 12-word recovery phrase
-4. **Enable Security:** Turn on biometric login (Touch ID/Face ID)
-5. **Add Funds:** Transfer STX and other crypto from exchanges
+1. **Create Wallet:** Tap "Create a new wallet"
+1. **Secure Backup:** Write down your 12-word recovery phrase
+1. **Enable Security:** Turn on biometric login (Touch ID/Face ID)
+1. **Add Funds:** Transfer STX and other crypto from exchanges
 
 **Why Xverse?**
 
@@ -777,10 +777,10 @@ Conxian works great on mobile! Here's everything you need to know for the best m
 **Deposit on Mobile:**
 
 1. **Tap "Earn" tab**
-2. **Select vault** (STX, sBTC, etc.)
-3. **Enter amount** or tap "Max"
-4. **Review details** (APY, fees, rewards)
-5. **Confirm** with wallet signature
+1. **Select vault** (STX, sBTC, etc.)
+1. **Enter amount** or tap "Max"
+1. **Review details** (APY, fees, rewards)
+1. **Confirm** with wallet signature
 
 **Mobile Dashboard:**
 
@@ -1322,9 +1322,9 @@ Basics       Strategies   Optimization
 **Ready to Join?**
 
 1. **Join Discord** - [discord.gg/conxian](https://discord.gg/conxian)
-2. **Follow Twitter** - [@ConxianProtocol](https://twitter.com/ConxianProtocol)
-3. **Read Forum** - [forum.conxian.com](https://forum.conxian.com)
-4. **Subscribe YouTube** - [youtube.com/conxian](https://youtube.com/conxian)
+1. **Follow Twitter** - [@ConxianProtocol](https://twitter.com/ConxianProtocol)
+1. **Read Forum** - [forum.conxian.com](https://forum.conxian.com)
+1. **Subscribe YouTube** - [youtube.com/conxian](https://youtube.com/conxian)
 
 **Your First Steps:**
 

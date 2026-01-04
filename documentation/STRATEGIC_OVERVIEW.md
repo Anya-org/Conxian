@@ -29,21 +29,13 @@ Our core mission is to address the critical challenges limiting the growth of de
 - **Future-Proof Architecture**: Our trait-driven, modular design allows for continuous innovation and adaptation to
   the evolving DeFi landscape and the upcoming Stacks Nakamoto upgrade.
 
-## 3. Core Architecture: The Facade Pattern
+## 3. Core Architecture: A Foundation for Strategy
 
-The Conxian Protocol is built on a **facade pattern**. This modern, modular architecture ensures security,
-maintainability, and clarity by separating concerns. Core contracts act as unified, secure entry points (**facades**)
-that route all user-facing calls to a network of specialized, single-responsibility **manager contracts**.
+The Conxian Protocol is built on a secure and modular **facade-based, trait-driven architecture**. This design is a cornerstone of our strategy, providing the security and flexibility needed to serve both retail and institutional users. Each core module (e.g., DEX, Lending) is accessed through a single, secure entry point contract (a "facade") that delegates complex logic to specialized "manager" contracts.
 
-- **User Interaction**: Users and external systems interact only with the facade contracts, which provide a simplified
-  and secure API.
-- **Delegated Logic**: Facades contain minimal business logic. Their primary role is to validate inputs and delegate
-  the actual work to the appropriate manager contract via `contract-call?`.
-- **Trait-Driven Interfaces**: The connections between facades and manager contracts are defined by a standardized set
-  of traits. This enforces a clean, consistent, and maintainable interface system across the entire protocol.
+This architectural choice directly supports our business goals by enhancing security, simplifying audits, and enabling the rapid, parallel development of both retail features and our long-term enterprise offerings.
 
-This architectural choice is the foundation of our strategy, enabling both the rapid development of retail features and
-the careful, secure construction of our enterprise offerings.
+> For a complete technical breakdown of the architecture, please see the [**Architecture Overview**](./architecture/OVERVIEW.md).
 
 ## 4. Core Business Value Proposition
 

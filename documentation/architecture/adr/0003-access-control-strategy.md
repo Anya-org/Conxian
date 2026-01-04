@@ -9,10 +9,10 @@ We need a consistent and secure way to manage access control across all smart co
 We will implement a role-based access control (RBAC) system with the following roles:
 
 1. **DEFAULT_ADMIN_ROLE**: Can grant and revoke all roles
-2. **PAUSER_ROLE**: Can pause the contract in case of emergency
-3. **ORACLE_UPDATER**: Can update oracle prices
-4. **LIQUIDATOR**: Can perform liquidations
-5. **STRATEGIST**: Can manage investment strategies
+1. **PAUSER_ROLE**: Can pause the contract in case of emergency
+1. **ORACLE_UPDATER**: Can update oracle prices
+1. **LIQUIDATOR**: Can perform liquidations
+1. **STRATEGIST**: Can manage investment strategies
 
 ## Status
 

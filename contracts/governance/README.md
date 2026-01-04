@@ -15,8 +15,7 @@ Unlike a pure facade, the `proposal-engine.clar` contains significant business l
 ```
 [User/DAO] -> [proposal-engine.clar] (Logic-Rich Facade & Controller)
     |
-    |-- (submit-proposal logic) --> [proposal-registry.clar] (Stores Data)
-    |-- (cast-vote logic) --> [voting.clar] (Records Vote)
+    |-- (submit-proposal & cast-vote logic) --> [proposal-registry.clar] (Stores Data & Votes)
     |-- (execute-proposal logic) --> [proposal-executor.clar] (Executes Payload)
     |
 [Metrics] -> [conxian-operations-engine.clar] -> [proposal-engine.clar] (Automated Vote)
@@ -30,10 +29,9 @@ Unlike a pure facade, the `proposal-engine.clar` contains significant business l
 
 ### Manager Contracts
 
--   **`proposal-registry.clar`**: A specialized contract for storing and managing all governance proposals, ensuring data integrity from creation to execution.
--   **`voting.clar`**: Manages the entire voting process, including recording votes, calculating results, and enforcing voting rules.
+-   **`proposal-registry.clar`**: A specialized contract responsible for both storing proposal data and recording all votes cast against them.
 -   **`proposal-executor.clar`**: A dedicated contract for executing general governance proposals after they have passed.
--   **`upgrade-controller.clar`**: A dedicated contract for managing the execution of sensitive protocol upgrades, incorporating security features like timelocks and multi-signature requirements.
+-   **`upgrade-controller.clar`**: A specialized, high-security contract for managing the execution of sensitive protocol upgrades. This contract is independent of the main proposal engine and incorporates additional safety features like timelocks.
 
 ### Automated Governance Agent
 

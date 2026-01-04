@@ -32,7 +32,7 @@ Truth" for all documentation.
 
 1. **Fix Routing**: Acknowledge the Dijkstra limitation and rename `dijkstra-pathfinder.clar` to reflect its role as a
    verifier.
-2. **Standardize Traits**: Verify `sip-010` imports across all contracts.
+1. **Standardize Traits**: Verify `sip-010` imports across all contracts.
 
 ---
 

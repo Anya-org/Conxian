@@ -79,9 +79,9 @@ The Conxian protocol is organized into a series of specialized layers, each cont
   SIP-009 NFTs.
 - **Range Fees**: Precise fee accumulation logic within active liquidity ranges.
 
-#### 2. Advanced Routing Engine
+#### 2. Advanced Routing Engine (Target Design)
 
-*Implemented in `multi-hop-router-v3.clar`*
+*Target Implementation: `multi-hop-router-v3.clar`*
 
 - **Dijkstra's Algorithm**: Optimal path finding across constant-product,
   stable-swap, and concentrated liquidity pools.
@@ -89,6 +89,8 @@ The Conxian protocol is organized into a series of specialized layers, each cont
   slippage protection.
 - **Price Impact Modeling**: Accurate estimation of trade impact on pool
   reserves.
+
+**Note**: The current implementation is a simpler `swap-router.clar` that handles single-pool swaps. The multi-hop router is a target feature for a future release.
 
 #### 3. MEV Protection Layer
 

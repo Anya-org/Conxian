@@ -11,26 +11,26 @@ Provide a unified, automated view of protocol health across contracts (DEX, lend
 - Contracts compiled: total, errors, warnings
 - Traits: implemented vs used ratio, unresolved references
 
-2. Oracle & Pricing
+1. Oracle & Pricing
 
 - Price update frequency per asset
 - TWAP window coverage (e.g., 30/60/120 blocks)
 - Deviation alerts (threshold breaches)
 
-3. Strategy & Vault Performance
+1. Strategy & Vault Performance
 
 - APY per strategy (bps)
 - TVL per strategy/asset
 - Efficiency scores (reward per unit risk)
 - Rebalance events (count, amount, rationale)
 
-4. Risk & Liquidations
+1. Risk & Liquidations
 
 - Health factor distribution for borrowers
 - Liquidation events (count/value)
 - Close-factor usage analytics
 
-5. MEV & Protection
+1. MEV & Protection
 
 - Commitments pending
 - Batch executions

@@ -41,7 +41,7 @@ enhancement.
 - Emergency pause function exists and is accessible
 - Vault admin controls verified in testing
 
-## Implementation Status 
+## Implementation Status
 
 - Emergency pause function exists in DAO governance
 - Vault admin controls verified through testing

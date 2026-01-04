@@ -206,10 +206,10 @@ python ../scripts/economic_simulation.py
 ## Development Workflow
 
 1. **Write contracts** in `contracts/`
-2. **Add tests** in `sdk-tests/`
-3. **Run checks** with `npx clarinet check`
-4. **Test functionality** with `npm test`
-5. **Deploy to testnet** for integration testing
+1. **Add tests** in `sdk-tests/`
+1. **Run checks** with `npx clarinet check`
+1. **Test functionality** with `npm test`
+1. **Deploy to testnet** for integration testing
 
 ## API Integration
 

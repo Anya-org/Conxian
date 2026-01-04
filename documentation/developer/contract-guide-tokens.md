@@ -101,8 +101,8 @@ The primary tokens are:
 The tokens are designed to work together to create a balanced and sustainable economic system.
 
 1. **Users provide liquidity** (to the sBTC vault or DEX) and receive **`CXLP`** tokens as a reward.
-2. **`CXLP` holders can choose to migrate** their tokens to **`CXD`** tokens to gain revenue exposure; governance rights are via **`CXVG`**.
-3. **`CXVG` holders vote** on DAO proposals (optionally via derived `CXVG` if adopted).
-4. **Contributors perform work**, complete bounties, and are rewarded with **`CXTR`**; the DAO may also issue **`CXS`** soulbound badges to recognize reputation.
+1. **`CXLP` holders can choose to migrate** their tokens to **`CXD`** tokens to gain revenue exposure; governance rights are via **`CXVG`**.
+1. **`CXVG` holders vote** on DAO proposals (optionally via derived `CXVG` if adopted).
+1. **Contributors perform work**, complete bounties, and are rewarded with **`CXTR`**; the DAO may also issue **`CXS`** soulbound badges to recognize reputation.
 
 This system aligns the incentives of different user groups: liquidity providers are rewarded, long-term holders govern the protocol, and valuable contributors are recognized and compensated.
