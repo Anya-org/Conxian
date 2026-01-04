@@ -19,7 +19,7 @@ The new AccessControl system provides:
 (use-trait access-control .access-control-trait.access-control-trait)
 ```
 
-2. Update your contract's trait implementation to include the access control trait:
+1. Update your contract's trait implementation to include the access control trait:
 
 ```clarity
 (impl-trait
@@ -177,10 +177,10 @@ describe('Admin functions', () => {
 ## Best Practices
 
 1. **Principle of Least Privilege**: Only grant the minimum permissions necessary
-2. **Use Roles**: Define clear roles with specific responsibilities
-3. **Time-Delay Critical Operations**: Add delays for sensitive operations
-4. **Test Thoroughly**: Ensure all access control paths are tested
-5. **Monitor Events**: Set up monitoring for role changes and access control events
+1. **Use Roles**: Define clear roles with specific responsibilities
+1. **Time-Delay Critical Operations**: Add delays for sensitive operations
+1. **Test Thoroughly**: Ensure all access control paths are tested
+1. **Monitor Events**: Set up monitoring for role changes and access control events
 
 ## Troubleshooting
 

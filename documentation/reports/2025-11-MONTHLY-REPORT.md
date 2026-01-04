@@ -86,5 +86,5 @@ Current governance uses a standard token-voting model. Stacks allows for "Stacki
 ### Immediate Actions
 
 1. **Scan & Fix Constants**: Identify all `uint` constants representing time (Script provided: `scripts/analyze_nakamoto_impact.py`).
-2. **Refactor `btc-adapter`**: Prototype `clarity-bitcoin` integration.
-3. **Update Tests**: Configure `Clarinet.toml` to simulate Nakamoto block times.
+1. **Refactor `btc-adapter`**: Prototype `clarity-bitcoin` integration.
+1. **Update Tests**: Configure `Clarinet.toml` to simulate Nakamoto block times.

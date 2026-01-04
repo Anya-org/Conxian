@@ -24,9 +24,9 @@ This document outlines the liquidation process in the Conxian protocol, includin
 ### Standard Liquidation
 
 1. **Initiation:** Any user can call the `liquidate-position` function on the `liquidation-manager` contract.
-2. **Verification:** The `liquidation-manager` checks if the position is underwater by calling the `is-position-underwater` function on the `comprehensive-lending-system`.
-3. **Execution:** If the position is underwater, the `liquidation-manager` calls the `liquidate` function on the `comprehensive-lending-system`.
-4. **Completion:** The `comprehensive-lending-system` updates the borrower's debt and collateral, transfers the collateral to the liquidator, and emits a liquidation event.
+1. **Verification:** The `liquidation-manager` checks if the position is underwater by calling the `is-position-underwater` function on the `comprehensive-lending-system`.
+1. **Execution:** If the position is underwater, the `liquidation-manager` calls the `liquidate` function on the `comprehensive-lending-system`.
+1. **Completion:** The `comprehensive-lending-system` updates the borrower's debt and collateral, transfers the collateral to the liquidator, and emits a liquidation event.
 
 ### Emergency Liquidation (Admin-Only)
 

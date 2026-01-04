@@ -31,9 +31,9 @@ Encoding and security
 Quick start
 
 1) Install Node 18+ and dependencies: `npm install`
-2) Run tests: `npm test`
-3) Check manifests: `npx clarinet check` (if Clarinet CLI available)
-4) Add contracts under `contracts/` and implement traits via alias imports.
+1) Run tests: `npm test`
+1) Check manifests: `npx clarinet check` (if Clarinet CLI available)
+1) Add contracts under `contracts/` and implement traits via alias imports.
 
 Policy checks
 

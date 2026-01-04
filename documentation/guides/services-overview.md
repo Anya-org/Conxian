@@ -130,7 +130,7 @@ All core services—DEX, lending, vaults, NFTs, oracles, risk, and monitoring—
 ## Where to Learn More
 
 - **Project Overview & Status** – see the root [`README.md`](../../README.md)
-- **Architecture & Design** – [`architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md)
+- **Architecture & Design** – [`architecture/OVERVIEW.md`](../architecture/OVERVIEW.md)
 - **Technical Whitepaper** – [`whitepaper/Conxian-Whitepaper.md`](../whitepaper/Conxian-Whitepaper.md)
 - **Roadmap & Phased Goals** – root [`ROADMAP.md`](../../ROADMAP.md)
 - **Operational Guides** –

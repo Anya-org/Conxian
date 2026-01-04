@@ -7,10 +7,10 @@ The Conxian Protocol implements a comprehensive behavior metrics and reputation 
 ## Core Principles
 
 1. **Transparency**: All metrics are on-chain and publicly verifiable
-2. **Fairness**: Weighted scoring across multiple dimensions prevents gaming
-3. **Progressive Rewards**: Higher tiers unlock better incentive multipliers
-4. **Continuous Improvement**: Scores update dynamically based on recent behavior
-5. **Multi-Dimensional**: No single activity dominates the overall score
+1. **Fairness**: Weighted scoring across multiple dimensions prevents gaming
+1. **Progressive Rewards**: Higher tiers unlock better incentive multipliers
+1. **Continuous Improvement**: Scores update dynamically based on recent behavior
+1. **Multi-Dimensional**: No single activity dominates the overall score
 
 ## Behavior Dimensions
 
@@ -396,26 +396,26 @@ if (tier >= 3) {
 ### For Users
 
 1. **Participate Actively**: Vote on proposals to build governance reputation
-2. **Manage Risk**: Maintain healthy collateral ratios to avoid liquidations
-3. **Use Protection**: Enable MEV protection to demonstrate security awareness
-4. **Pay Premiums**: Keep insurance premiums current for reliability score
-5. **Bridge Carefully**: Test with small amounts before large transfers
+1. **Manage Risk**: Maintain healthy collateral ratios to avoid liquidations
+1. **Use Protection**: Enable MEV protection to demonstrate security awareness
+1. **Pay Premiums**: Keep insurance premiums current for reliability score
+1. **Bridge Carefully**: Test with small amounts before large transfers
 
 ### For Developers
 
 1. **Record All Actions**: Ensure all user actions are recorded for accurate metrics
-2. **Handle Errors**: Gracefully handle metric recording failures
-3. **Display Clearly**: Show users their tier and how to improve
-4. **Incentivize**: Use multipliers in reward calculations
-5. **Monitor**: Track aggregate behavior metrics for protocol health
+1. **Handle Errors**: Gracefully handle metric recording failures
+1. **Display Clearly**: Show users their tier and how to improve
+1. **Incentivize**: Use multipliers in reward calculations
+1. **Monitor**: Track aggregate behavior metrics for protocol health
 
 ## Security Considerations
 
 1. **Owner-Only Updates**: Only contract owner can record behavior actions
-2. **No Direct Manipulation**: Users cannot directly modify their scores
-3. **Transparent Calculations**: All scoring logic is on-chain and auditable
-4. **Gradual Changes**: Scores update incrementally to prevent gaming
-5. **Multi-Dimensional**: Prevents focus on single dimension for score manipulation
+1. **No Direct Manipulation**: Users cannot directly modify their scores
+1. **Transparent Calculations**: All scoring logic is on-chain and auditable
+1. **Gradual Changes**: Scores update incrementally to prevent gaming
+1. **Multi-Dimensional**: Prevents focus on single dimension for score manipulation
 
 ## Future Enhancements
 

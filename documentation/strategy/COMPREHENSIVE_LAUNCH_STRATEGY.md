@@ -309,7 +309,7 @@ user_cxvg = (user_governance_points / total_governance_points) * epoch_cxvg_pool
 
 ### 2.2 Handoff Procedure
 
-**1: Preparation **
+**1: Preparation**
 
 1. **Deploy Timelock Contracts**
    - 2-week timelock for normal proposals
@@ -907,17 +907,17 @@ async function calculateEpochPoints(epochId: number) {
 #### Securities Classification
 
 1. **Mitigation:** No pre-sale, work-based earning, utility-first
-2. **Contingency:** Legal defense, token restructure, geographic restrictions
+1. **Contingency:** Legal defense, token restructure, geographic restrictions
 
 #### KYC/AML Non-Compliance
 
 1. **Mitigation:** Tiered system, attestors, compliance tools
-2. **Contingency:** Enhanced verification, user restrictions, regulatory cooperation
+1. **Contingency:** Enhanced verification, user restrictions, regulatory cooperation
 
 #### Geographic Restrictions
 
 1. **Mitigation:** IP blocking, sanctioned list, region tracking
-2. **Contingency:** Expand restrictions, user migration, legal compliance
+1. **Contingency:** Expand restrictions, user migration, legal compliance
 
 ---
 

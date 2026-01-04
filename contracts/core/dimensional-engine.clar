@@ -29,8 +29,9 @@
 
 ;; --- Configuration ---
 
-;; @desc Sets the protocol coordinator address.
+;; @desc Sets the protocol coordinator address, which controls administrative functions.
 ;; @param new-coordinator: The principal of the new protocol coordinator contract.
+;; @returns (response bool)
 (define-public (set-protocol-coordinator (new-coordinator principal))
     (begin
         (asserts! (is-authorized) ERR_UNAUTHORIZED)
@@ -41,7 +42,14 @@
 
 ;; --- Facade Functions: Position Management ---
 
-;; @desc Opens a new position (Signature matched to Integration Tests)
+;; @desc Opens a new trading position by delegating to the position manager.
+;; @param token: The principal of the token being traded.
+;; @param amount: The amount of the token to use for the position.
+;; @param leverage: The leverage to apply to the position.
+;; @param long: A boolean indicating if the position is long (true) or short (false).
+;; @param slippage-limit: An optional slippage limit for the trade.
+;; @param metadata: Optional metadata for the position.
+;; @returns (response uint) The ID of the new position.
 (define-public (open-position
         (token principal)
         (amount uint)
@@ -63,7 +71,11 @@
     )
 )
 
-;; @desc Closes a position (Signature matched to Integration Tests)
+;; @desc Closes an existing trading position by delegating to the position manager.
+;; @param position-id: The ID of the position to close.
+;; @param token: The principal of the token being traded.
+;; @param slippage-limit: An optional slippage limit for the trade.
+;; @returns (response bool)
 (define-public (close-position 
         (position-id uint)
         (token principal)
@@ -80,6 +92,7 @@
 ;; @desc Deposits funds into the collateral manager.
 ;; @param amount: The amount of tokens to deposit.
 ;; @param token: The SIP-010 token contract to deposit.
+;; @returns (response bool)
 (define-public (deposit-funds
         (amount uint)
         (token <sip-010-trait>)
@@ -93,6 +106,7 @@
 ;; @desc Withdraws funds from the collateral manager.
 ;; @param amount: The amount of tokens to withdraw.
 ;; @param token: The SIP-010 token contract to withdraw.
+;; @returns (response bool)
 (define-public (withdraw-funds
         (amount uint)
         (token <sip-010-trait>)
@@ -105,14 +119,16 @@
 
 ;; --- Facade Functions: Risk Management ---
 
-;; @desc Checks the health factor of a position.
+;; @desc Checks the health factor of a position by delegating to the risk manager.
 ;; @param position-id: The ID of the position to check.
+;; @returns (response uint) The health factor of the position.
 (define-public (check-position-health (position-id uint))
     (contract-call? .risk-manager get-health-factor position-id)
 )
 
-;; @desc Liquidates an unhealthy position.
+;; @desc Liquidates an unhealthy position by delegating to the risk manager.
 ;; @param position-id: The ID of the position to liquidate.
+;; @returns (response bool)
 (define-public (liquidate-position (position-id uint))
     (begin
         (try! (contract-call? .block-utils check-finality))

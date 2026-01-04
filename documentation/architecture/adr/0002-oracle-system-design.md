@@ -9,10 +9,10 @@ We need a reliable oracle system to provide price feeds for various assets in th
 We will implement a multi-feed oracle system with the following characteristics:
 
 1. **Multiple Data Sources**: Aggregate prices from multiple independent sources
-2. **Deviation Checking**: Reject prices that deviate significantly from the median
-3. **Circuit Breaker**: Automatically disable oracle updates if anomalies are detected
-4. **Monitoring**: Comprehensive monitoring of oracle health and performance
-5. **Emergency Override**: Admin ability to manually set prices in case of emergency
+1. **Deviation Checking**: Reject prices that deviate significantly from the median
+1. **Circuit Breaker**: Automatically disable oracle updates if anomalies are detected
+1. **Monitoring**: Comprehensive monitoring of oracle health and performance
+1. **Emergency Override**: Admin ability to manually set prices in case of emergency
 
 ## Status
 

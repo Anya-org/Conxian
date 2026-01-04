@@ -19,9 +19,9 @@ This architecture separates the core logic of the proposal engine from the more 
 ## 3. The Proposal Lifecycle
 
 1. **Creation:** A user creates a proposal by calling the `propose` function on the `proposal-engine`. This call is delegated to the `proposal-registry` to create a new proposal.
-2. **Active:** Once a proposal is created, it becomes active, and token holders can cast their votes by calling the `vote` function. This call is delegated to the `voting` contract.
-3. **Execution:** After the voting period has ended, if a proposal has met the quorum and has more "for" votes than "against" votes, it can be executed by calling the `execute` function.
-4. **Cancellation:** A proposal can be cancelled by its proposer or the contract owner by calling the `cancel` function.
+1. **Active:** Once a proposal is created, it becomes active, and token holders can cast their votes by calling the `vote` function. This call is delegated to the `voting` contract.
+1. **Execution:** After the voting period has ended, if a proposal has met the quorum and has more "for" votes than "against" votes, it can be executed by calling the `execute` function.
+1. **Cancellation:** A proposal can be cancelled by its proposer or the contract owner by calling the `cancel` function.
 
 ## 4. How to Participate in Governance
 

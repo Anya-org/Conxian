@@ -21,8 +21,6 @@ graph TD
     B -- close-position --> C;
     B -- deposit-funds --> D[collateral-manager.clar];
     B -- withdraw-funds --> D;
-    B -- update-funding-rate --> E[funding-rate-calculator.clar];
-    B -- apply-funding-to-position --> E;
     B -- check-position-health --> F[risk-manager.clar];
     B -- liquidate-position --> F;
 ```
@@ -31,19 +29,17 @@ graph TD
 
 ### Facade
 
--   **`dimensional-engine.clar`**: The central **facade** for the Core Module. It acts as the single, secure entry point for all position management, collateral, and risk-related calls. It implements no core logic itself; instead, it delegates every call to the specialized manager contracts.
+-   **`dimensional-engine.clar`**: The central **facade** for the Core Module. It acts as the single, secure entry point for all position management, collateral, and risk-related calls. It implements no core logic itself; instead, it delegates every call to the specialized manager contracts. It also integrates with `block-utils.clar` to perform checks on block properties.
 
 ### Manager Contracts (Single-Responsibility)
 
 -   **`position-manager.clar`**: Manages the entire lifecycle of user trading positions, including opening, closing, and modifying them.
 -   **`collateral-manager.clar`**: Handles all operations related to user collateral, including deposits, withdrawals, and balance tracking.
--   **`funding-rate-calculator.clar`**: Responsible for calculating and applying funding rates for perpetual markets, ensuring market balance.
--   **`risk-manager.clar`** (Located in `contracts/risk/`): Assesses the health of all open positions and manages the liquidation process for those that are under-collateralized.
+-   **`risk-manager.clar`**: Assesses the health of all open positions and manages the liquidation process for those that are under-collateralized.
 
 ### Protocol-Wide Contracts
 
 -   **`conxian-protocol.clar`**: The main protocol coordinator, responsible for managing system-wide configurations, authorized contract addresses, and emergency controls.
--   **`protocol-fee-switch.clar`**: A centralized switch for routing protocol fees to their designated destinations, such as the treasury, staking rewards, or insurance funds.
 
 ## Public Functions (`dimensional-engine.clar`)
 

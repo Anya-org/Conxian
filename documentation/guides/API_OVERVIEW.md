@@ -20,7 +20,7 @@ The primary, canonical API for the Conxian Protocol is the set of Clarity contra
   - Internal test harnesses (`tests/` in Conxian repo).
   - External integrators building their own frontends or automation.
 - **Documentation**:
-  - Contract modules and traits are documented in `documentation/architecture/ARCHITECTURE.md` and `contracts/traits/README-TRAIT-ARCHITECTURE.md`.
+  - Contract modules and traits are documented in `documentation/architecture/OVERVIEW.md` and `contracts/traits/README-TRAIT-ARCHITECTURE.md`.
 
 ## 2. Deployment & Tooling APIs (StacksOrbit)
 
@@ -82,8 +82,8 @@ These are **client-side integrations** built on top of the on-chain APIs describ
 Enterprise documents (`COMPLIANCE_SECURITY.md`, `BUSINESS_VALUE_ROI.md`) describe a **target design** for additional REST APIs. These are not yet implemented but are expected to cover at least three domains:
 
 1. **Compliance APIs** (AML/KYC, sanctions, Travel Rule)
-2. **User data & privacy APIs** (GDPR exports, erasure)
-3. **Risk, analytics, and audit APIs** (portfolio risk, transaction logs, system health)
+1. **User data & privacy APIs** (GDPR exports, erasure)
+1. **Risk, analytics, and audit APIs** (portfolio risk, transaction logs, system health)
 
 ### 4.1 Example: GDPR Data Export API (Planned)
 

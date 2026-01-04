@@ -7,13 +7,13 @@
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_SLIPPAGE (err u3000))
 
-;; @desc Execute an exact input swap
-;; @param pool-id uint
-;; @param token-in <sip-010-trait>
-;; @param token-out <sip-010-trait>
-;; @param amount-in uint
-;; @param min-amount-out uint
-;; @returns (response uint uint) - amount-out
+;; @desc Executes a swap for an exact input amount against a single concentrated liquidity pool.
+;; @param pool-id: The ID of the concentrated liquidity pool to use for the swap.
+;; @param token-in: The SIP-010 contract of the token being provided.
+;; @param token-out: The SIP-010 contract of the token being received.
+;; @param amount-in: The amount of the input token to swap.
+;; @param min-amount-out: The minimum amount of the output token that must be received, otherwise the transaction is reverted.
+;; @returns (response uint) The amount of the output token received.
 (define-public (exact-input-single
         (pool-id uint)
         (token-in <sip-010-trait>)

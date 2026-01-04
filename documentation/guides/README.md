@@ -6,11 +6,7 @@ This directory contains practical guides and manuals for interacting with the Co
 
 ### 🛍️ User Guides
 
-- **[Retail User Guide](../retail/USER_GUIDE.md)**: Complete onboarding and usage guide for retail users.
-- **[Vault Operations](./01-vault.md)**: How to deposit, withdraw, and manage assets in Conxian Vaults.
-- **[Governance Participation](./02-governance.md)**: How to vote and create proposals in the Conxian DAO.
-- **[DEX Trading](./03-dex.md)**: Guide to swapping tokens and providing liquidity.
-- **[Token Management](./04-tokens.md)**: Details on CXD, CXS, and other protocol tokens.
+- **[Retail User Guide](../retail/USER_GUIDE.md)**: The primary, comprehensive guide for all retail users, covering everything from wallet setup to advanced trading and governance.
 
 ### 📖 Technical References
 

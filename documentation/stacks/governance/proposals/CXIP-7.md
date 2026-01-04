@@ -41,9 +41,9 @@ The current implementation lacks granular access controls and emergency mechanis
 ## Implementation Plan
 
 1. Update `ownable-trait.clar` with new role-based controls
-2. Implement time-lock functionality in a new `timelock-controller.clar`
-3. Add emergency pause functionality to all critical contracts
-4. Deploy and test in staging environment
+1. Implement time-lock functionality in a new `timelock-controller.clar`
+1. Add emergency pause functionality to all critical contracts
+1. Deploy and test in staging environment
 
 ## Security Considerations
 

@@ -199,10 +199,10 @@ app.post('/api/gdpr/export', async (req, res) => {
 #### Incident Response Plan
 
 1. **Detection**: 24/7 monitoring and automated alerting
-2. **Assessment**: Rapid triage and impact assessment
-3. **Containment**: Immediate isolation of affected systems
-4. **Recovery**: Restored systems from clean backups
-5. **Lessons Learned**: Post-incident analysis and improvements
+1. **Assessment**: Rapid triage and impact assessment
+1. **Containment**: Immediate isolation of affected systems
+1. **Recovery**: Restored systems from clean backups
+1. **Lessons Learned**: Post-incident analysis and improvements
 
 #### Security Incident Categories
 

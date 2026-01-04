@@ -19,13 +19,13 @@
 - Applied default strategy name and quick metrics (APY bps, TVL, efficiency)
 - CTA: "Use Default" (primary), "Customize" (secondary)
 
-2. Strategy Details
+1. Strategy Details
 
 - Strategy info: description, risks, fees
 - Metrics panel: historical APY chart, TVL, rebalance events
 - Buttons: "Apply to Asset", "Backtest", "Stress Test"
 
-3. Advanced Customization
+1. Advanced Customization
 
 - Strategy selector (dropdown from available strategies implementing strategy-trait)
 - Parameter inputs: min-liquidity, max-slippage-bps, risk-score

@@ -3,6 +3,7 @@
 ## Pre-Deployment
 
 ### 1. Testing
+
 - [ ] Run all unit tests: `npm test`
   - [ ] Access control unit tests
   - [ ] Role management tests
@@ -30,6 +31,7 @@
   - [ ] Execution with required approvals
 
 ### 2. Security Review
+
 - [ ] Verify all admin functions are protected
   - [ ] Only callable by admin role
   - [ ] Protected by multi-sig where required
@@ -52,6 +54,7 @@
   - [ ] Transaction replay protection
 
 ### 3. Deployment Plan
+
 - [ ] Deploy to testnet first
 - [ ] Verify contract deployment
 - [ ] Initialize with admin roles
@@ -61,22 +64,26 @@
 ## Deployment Steps
 
 ### 1. Deploy AccessControl Contract
+
 ```bash
 npm run deploy:access-control --network=mainnet
 ```
 
 ### 2. Initialize Roles
+
 ```bash
 npm run init:roles --network=mainnet \
   --admin=SP3FBR2AGK5H9QBDH3EBN6Q87HWJ3H15Y8EP5J2S6
 ```
 
 ### 3. Update Existing Contracts
+
 ```bash
 npm run migrate:access-control --network=mainnet
 ```
 
 ### 4. Verify Deployment
+
 ```bash
 npm run verify:deployment --network=mainnet
 ```
@@ -84,6 +91,7 @@ npm run verify:deployment --network=mainnet
 ## Post-Deployment
 
 ### 1. Monitoring and Maintenance
+
 - [ ] Set up event monitoring for:
   - [ ] Role changes
   - [ ] Emergency pauses
@@ -92,48 +100,56 @@ npm run verify:deployment --network=mainnet
 - [ ] Incident response plan
 
 ### 2. Documentation Updates
+
 - [ ] Update developer documentation
 - [ ] Add security guidelines
 - [ ] Document emergency procedures
 
 ### 3. Continuous Improvement
+
 - [ ] Gather feedback from users
 - [ ] Monitor for potential issues
 - [ ] Plan for future upgrades
 
 ### 1. Monitoring
+
 - [ ] Set up event monitoring
 - [ ] Monitor for failed transactions
 - [ ] Track role changes
 - [ ] Monitor time-delayed operations
 
 ### 2. Documentation
+
 - [ ] Update contract addresses
 - [ ] Document role assignments
 - [ ] Update API documentation
 - [ ] Update user guides
 
 ### 3. Team Training
+
 - [ ] Train team on new access control
 - [ ] Document emergency procedures
 - [ ] Review incident response plan
 
 ## Rollback Plan
 
-### If issues occur:
+### If issues occur
+
 1. Pause all critical operations
-2. Deploy previous version
-3. Restore from backup if needed
-4. Investigate root cause
+1. Deploy previous version
+1. Restore from backup if needed
+1. Investigate root cause
 
 ## Emergency Contacts
-- **Security Lead**: security@example.com
-- **DevOps**: ops@example.com
-- **Management**: management@example.com
+
+- **Security Lead**: <security@example.com>
+- **DevOps**: <ops@example.com>
+- **Management**: <management@example.com>
 
 ## Verification Scripts
 
 ### Check Role Assignment
+
 ```typescript
 import { simnet } from '../.stacks/Clarigen';
 
@@ -149,6 +165,7 @@ async function checkRole(account: string, role: string) {
 ```
 
 ### Verify Time-Delayed Operations
+
 ```typescript
 async function verifyOperation(operationId: number) {
   const op = await simnet.callReadOnlyFn(
