@@ -13,3 +13,11 @@
         (ok true)
     )
 )
+
+(define-public (liquidate (position-id uint))
+    (begin
+        ;; Logic for liquidation would go here
+        (print { event: "liquidate", position-id: position-id })
+        (ok true)
+    )
+)

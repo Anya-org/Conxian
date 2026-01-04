@@ -34,7 +34,6 @@
 
 (define-public (set-dimensional-engine (engine principal))
     (begin
-        (user principal)(token principal)
         (var-set dimensional-engine engine)
         (ok true)
     )
@@ -65,12 +64,11 @@
     )
 )
 
-(define-public (close-position
+    (define-public (close-position
         (user principal)
         (position-id uint)
     )
     (begin
-            (ok true)
         (let ((pos (unwrap! (map-get? positions position-id) ERR_POSITION_NOT_FOUND)))
             (asserts! (is-eq (get owner pos) user) ERR_NOT_AUTHORIZED)
             (map-set positions position-id (merge pos { open: false }))

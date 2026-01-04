@@ -45,7 +45,8 @@
         (amount uint)
         (leverage uint)
         (long bool)
-        (slippage-limit (optional uint))(metadata (optional (string-utf8 1024)))
+        (slippage-limit (optional uint))
+        (metadata (optional (string-utf8 1024)))
     )
     (begin
         (try! (contract-call? .block-utils check-finality))

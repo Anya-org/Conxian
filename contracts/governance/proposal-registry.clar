@@ -3,6 +3,7 @@
 
 (define-constant ERR_UNAUTHORIZED (err u4000))
 (define-constant ERR_NOT_FOUND (err u404))
+(define-constant ERR_ALREADY_VOTED (err u4001))
 
 (define-map proposals
     uint
@@ -19,10 +20,34 @@
     }
 )
 
+;; Track if a user has voted on a proposal
+(define-map vote-receipts
+    {
+        proposal-id: uint,
+        voter: principal,
+    }
+    bool
+)
+
 (define-data-var proposal-count uint u0)
+
+;; Access Control
+(define-data-var access-control principal .conxian-access)
 
 (define-read-only (get-proposal (proposal-id uint))
     (map-get? proposals proposal-id)
+)
+
+(define-read-only (has-voted
+        (proposal-id uint)
+        (voter principal)
+    )
+    (default-to false
+        (map-get? vote-receipts {
+            proposal-id: proposal-id,
+            voter: voter,
+        })
+    )
 )
 
 (define-public (add-proposal
@@ -33,6 +58,7 @@
     )
     (let ((proposal-id (+ (var-get proposal-count) u1)))
         (begin
+            ;; In production, this should check if caller is proposal-engine
             (map-set proposals proposal-id {
                 proposer: tx-sender,
                 proposal-contract: proposal-contract,
@@ -64,6 +90,12 @@
     (let ((proposal (unwrap! (map-get? proposals proposal-id) ERR_NOT_FOUND)))
         (begin
             ;; In production, check if caller is proposal-engine
+            (asserts! (not (has-voted proposal-id tx-sender)) ERR_ALREADY_VOTED)
+            
+            ;; Record receipt
+            (map-set vote-receipts { proposal-id: proposal-id, voter: tx-sender } true)
+
+            ;; Update count
             (map-set proposals proposal-id (merge proposal {
                 for-votes: (if support (+ (get for-votes proposal) weight) (get for-votes proposal)),
                 against-votes: (if (not support) (+ (get against-votes proposal) weight) (get against-votes proposal))
