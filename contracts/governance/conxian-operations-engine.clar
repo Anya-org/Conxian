@@ -1,10 +1,6 @@
 ;; conxian-operations-engine.clar
 ;; Conxian Enterprise Standard: Operations Engine (OaaS)
 ;; Automated DAO Governance and Operational Controls
-
-;; conxian-operations-engine.clar
-;; Conxian Enterprise Standard: Operations Engine (OaaS)
-;; Automated DAO Governance and Operational Controls
 ;; Tier 1: Seat-Based Integration
 
 ;; Constants
@@ -32,7 +28,9 @@
 ;; @desc Cast a vote as the Operations Council Seat
 (define-public (cast-council-vote (proposal-id uint) (support bool))
     (let (
-        (my-power (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power (as-contract tx-sender) COUNCIL_OPS)))
+        (my-power (unwrap-panic (try! (contract-call? .enhanced-governance-nft get-seat-power
+            (as-contract tx-sender) COUNCIL_OPS
+        ))))
     )
         (asserts! (is-eq tx-sender (var-get operator-controller)) ERR_UNAUTHORIZED)
         (asserts! (var-get auto-governance-enabled) ERR_UNAUTHORIZED)

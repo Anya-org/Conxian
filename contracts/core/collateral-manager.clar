@@ -23,10 +23,10 @@
 ;; @desc Deposits collateral (Signature aligned with tests)
 (define-public (deposit-funds
         (amount uint)
-        (token <sip-010-trait>)
+        (token-trait <sip-010-trait>)
     )
     (let (
-            (token-principal (contract-of token))
+            (token-principal (contract-of token-trait))
             (current-balance (default-to u0
                 (map-get? user-collateral {
                     user: tx-sender,
@@ -38,7 +38,9 @@
         (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1001))
 
         ;; Transfer tokens to this contract
-        ;; Transfer tokens to this contract
+        (try! (contract-call? token-trait transfer amount tx-sender
+            (as-contract tx-sender) none
+        ))
 
         (map-set user-collateral {
             user: tx-sender,
@@ -62,10 +64,10 @@
 ;; @desc Withdraws collateral
 (define-public (withdraw-funds
         (amount uint)
-;; @desc Withdraws collateral
+        (token-trait <sip-010-trait>)
     )
     (let (
-            (token-principal (contract-of token))
+            (token-principal (contract-of token-trait))
             (current-balance (default-to u0
                 (map-get? user-collateral {
                     user: tx-sender,
@@ -77,7 +79,7 @@
         (asserts! (>= current-balance amount) ERR_INSUFFICIENT_BALANCE)
 
         ;; Transfer tokens back
-        (try! (as-contract (contract-call? token transfer amount tx-sender tx-sender none)))
+        (try! (as-contract (contract-call? token-trait transfer amount tx-sender tx-sender none)))
 
         (map-set user-collateral {
             user: tx-sender,

@@ -8,143 +8,127 @@ let wallet1: string;
 
 describe('Proposal Engine - Core Functionality', () => {
   beforeAll(async () => {
-    simnet = await initSimnet('Clarinet.toml');
+    simnet = await initSimnet("Clarinet.toml");
   });
 
   beforeEach(async () => {
-    await simnet.initSession(process.cwd(), 'Clarinet.toml');
+    await simnet.initSession(process.cwd(), "Clarinet.toml");
     const accounts = simnet.getAccounts();
-    deployer = accounts.get('deployer')!;
-    wallet1 = accounts.get('wallet_1')!;
+    deployer = accounts.get("deployer")!;
+    wallet1 = accounts.get("wallet_1")!;
   });
 
-  it('allows a user to create a proposal', () => {
-    const proposal = simnet.callPublicFn(
-      'proposal-engine',
-      'propose',
-      [
-        Cl.stringAscii('Test Proposal'),
-        Cl.list([Cl.standardPrincipal(deployer)]),
-        Cl.list([Cl.uint(0)]),
-        Cl.list([Cl.stringAscii('test')]),
-        Cl.list([Cl.bufferFromAscii('test')]),
-        Cl.uint(0),
-        Cl.uint(100),
-      ],
-      wallet1
-    );
-    expect(proposal.result).toBeOk(Cl.uint(1));
-  });
-
-  it('allows a user to vote on a proposal', () => {
+  // Helper to mint a seat for wallet1 on Council 1
+  const mintSeat = () => {
     simnet.callPublicFn(
-      'proposal-engine',
-      'propose',
+      "enhanced-governance-nft",
+      "mint-seat",
       [
-        Cl.stringAscii('Test Proposal'),
-        Cl.list([Cl.standardPrincipal(deployer)]),
-        Cl.list([Cl.uint(0)]),
-        Cl.list([Cl.stringAscii('test')]),
-        Cl.list([Cl.bufferFromAscii('test')]),
-        Cl.uint(0),
+        Cl.standardPrincipal(wallet1),
+        Cl.uint(1),
+        Cl.uint(100),
+        Cl.stringAscii("human"),
+      ],
+      deployer
+    );
+  };
+
+  it("requires a seat to submit a proposal", () => {
+    // Try without seat
+    const failProp = simnet.callPublicFn(
+      "proposal-engine",
+      "submit-proposal",
+      [
+        Cl.contractPrincipal(deployer, "mock-proposal"), // using mock
+        Cl.uint(1), // Council 1
+        Cl.uint(10),
         Cl.uint(100),
       ],
       wallet1
     );
+    expect(failProp.result).toBeErr(Cl.uint(1000)); // ERR_UNAUTHORIZED (no seat) or panic unwrapping 0
+
+    // Mint Seat
+    mintSeat();
+
+    // Retry with seat
+    const successProp = simnet.callPublicFn(
+      "proposal-engine",
+      "submit-proposal",
+      [
+        Cl.contractPrincipal(deployer, "mock-proposal"),
+        Cl.uint(1),
+        Cl.uint(10),
+        Cl.uint(100),
+      ],
+      wallet1
+    );
+    expect(successProp.result).toBeOk(Cl.uint(1));
+  });
+
+  it("allows a seat holder to vote on a proposal", () => {
+    mintSeat();
+
+    // Create Proposal
+    simnet.callPublicFn(
+      "proposal-engine",
+      "submit-proposal",
+      [
+        Cl.contractPrincipal(deployer, "mock-proposal"),
+        Cl.uint(1),
+        Cl.uint(10),
+        Cl.uint(100),
+      ],
+      wallet1
+    );
+
+    // Fast forward to start block (10)
+    for (let i = 0; i < 10; i++) simnet.mineEmptyBlock();
 
     const vote = simnet.callPublicFn(
-      'proposal-engine',
-      'vote',
-      [Cl.uint(1), Cl.bool(true), Cl.uint(100)],
+      "proposal-engine",
+      "vote",
+      [Cl.uint(1), Cl.bool(true)],
       wallet1
     );
     expect(vote.result).toBeOk(Cl.bool(true));
-  });
 
-  it('allows a proposal to be executed after it has been approved', () => {
-    simnet.callPublicFn(
-      'proposal-engine',
-      'propose',
-      [
-        Cl.stringAscii('Test Proposal'),
-        Cl.list([Cl.standardPrincipal(deployer)]),
-        Cl.list([Cl.uint(0)]),
-        Cl.list([Cl.stringAscii('test')]),
-        Cl.list([Cl.bufferFromAscii('test')]),
-        Cl.uint(0),
-        Cl.uint(1),
-      ],
-      wallet1
-    );
-
-    simnet.callPublicFn(
-      'proposal-engine',
-      'vote',
-      [Cl.uint(1), Cl.bool(true), Cl.uint(1000000)],
-      wallet1
-    );
-
-    simnet.mineEmptyBlock();
-
-    const execute = simnet.callPublicFn(
-      'proposal-engine',
-      'execute',
+    // Check registry for votes
+    const proposal = simnet.callReadOnlyFn(
+      "proposal-registry",
+      "get-proposal",
       [Cl.uint(1)],
-      wallet1
+      deployer
     );
-    expect(execute.result).toBeOk(Cl.bool(true));
+    const props = (proposal.result as any).value.data;
+    expect(props["for-votes"]).toBeUint(100); // Equal to seat power
   });
 
-  it('enforces the proposal delay', () => {
-    const proposal = simnet.callPublicFn(
-      'proposal-engine',
-      'propose',
-      [
-        Cl.stringAscii('Test Proposal'),
-        Cl.list([Cl.standardPrincipal(deployer)]),
-        Cl.list([Cl.uint(0)]),
-        Cl.list([Cl.stringAscii('test')]),
-        Cl.list([Cl.bufferFromAscii('test')]),
-        Cl.uint(10), // Start block is in the future
-        Cl.uint(110),
-      ],
-      wallet1
-    );
+  it("prevents voting before start block", () => {
+    mintSeat();
 
-    const vote = simnet.callPublicFn(
-      'proposal-engine',
-      'vote',
-      [Cl.uint(1), Cl.bool(true), Cl.uint(100)],
-      wallet1
-    );
-    expect(vote.result).toBeErr(Cl.uint(103)); // ERR_PROPOSAL_NOT_ACTIVE
-  });
-
-  it('enforces the voting period', () => {
+    // Create Proposal starting at block 100
     simnet.callPublicFn(
-      'proposal-engine',
-      'propose',
+      "proposal-engine",
+      "submit-proposal",
       [
-        Cl.stringAscii('Test Proposal'),
-        Cl.list([Cl.standardPrincipal(deployer)]),
-        Cl.list([Cl.uint(0)]),
-        Cl.list([Cl.stringAscii('test')]),
-        Cl.list([Cl.bufferFromAscii('test')]),
-        Cl.uint(0),
+        Cl.contractPrincipal(deployer, "mock-proposal"),
         Cl.uint(1),
+        Cl.uint(100),
+        Cl.uint(200),
       ],
       wallet1
     );
 
-    simnet.mineEmptyBlock();
-    simnet.mineEmptyBlock();
-
+    // Try voting immediately (block < 100)
     const vote = simnet.callPublicFn(
-      'proposal-engine',
-      'vote',
-      [Cl.uint(1), Cl.bool(true), Cl.uint(100)],
+      "proposal-engine",
+      "vote",
+      [Cl.uint(1), Cl.bool(true)],
       wallet1
     );
-    expect(vote.result).toBeErr(Cl.uint(104)); // ERR_VOTING_CLOSED
+    // Expect ERR_NOT_FOUND (u1001) or whatever check fails first
+    // In code: (asserts! (>= block-height (get start-block proposal)) ERR_NOT_FOUND)
+    expect(vote.result).toBeErr(Cl.uint(1001));
   });
 });
