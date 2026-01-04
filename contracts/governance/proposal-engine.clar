@@ -4,6 +4,7 @@
 
 (use-trait proposal-trait .governance-traits.proposal-trait)
 (use-trait nft-trait .sip-standards.sip-009-nft-trait)
+(use-trait reputation-trait .reputation-engine-trait.reputation-engine-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))
@@ -18,6 +19,7 @@
 ;; Routes
 (define-data-var registry principal .proposal-registry)
 (define-data-var seat-token principal .enhanced-governance-nft)
+(define-data-var reputation-engine principal .reputation-engine)
 
 ;; @desc Submits a new proposal to a specific council for voting.
 ;; @param proposal-contract: The contract principal of the proposal to be voted on. Must implement the proposal-trait.
@@ -58,21 +60,21 @@
     (let (
         (proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id) ERR_NOT_FOUND))
         (council-id (get council-id proposal))
-        (voter-power (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender
-            council-id
-        )))
+        (raw-voter-power (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender council-id)))
+        (weighted-voter-power (unwrap-panic (contract-call? .reputation-engine get-weighted-voting-power tx-sender raw-voter-power)))
     )
         ;; Assert Voting Period
         (asserts! (>= block-height (get start-block proposal)) ERR_NOT_FOUND) ;; Should be ERR_NOT_STARTED but reusing
         (asserts! (< block-height (get end-block proposal)) ERR_PROPOSAL_ENDED)
         
         ;; Assert Voter Power
-        (asserts! (> voter-power u0) ERR_UNAUTHORIZED)
+        (asserts! (> weighted-voter-power u0) ERR_UNAUTHORIZED)
+
+        ;; Update activity score
+        (try! (contract-call? .reputation-engine update-activity-score tx-sender))
 
         ;; Record Vote
-(contract-call? .proposal-registry vote-proposal proposal-id support
-            voter-power
-        )
+        (contract-call? .proposal-registry vote-proposal proposal-id support weighted-voter-power)
     )
 )
 
