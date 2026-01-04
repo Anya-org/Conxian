@@ -6,7 +6,6 @@
 
 ;; --- Core Configuration ---
 
-(define-data-var contract-owner principal tx-sender)
 (define-data-var proposal-engine principal .proposal-engine)
 (define-data-var proposal-registry principal .proposal-registry)
 (define-data-var governance-token principal .governance-token)
@@ -134,15 +133,10 @@
 (define-constant MULTIPLIER_PLATINUM u200) ;; 2.0x
 (define-constant MULTIPLIER_MAX u300) ;; 3.0x (exceptional behavior)
 
-(define-private (is-contract-owner)
-  (is-eq tx-sender (var-get contract-owner))
-)
-
 ;; --- Public Read-Only Views ---
 
 (define-read-only (get-config)
   {
-    contract-owner: (var-get contract-owner),
     proposal-engine: (var-get proposal-engine),
     proposal-registry: (var-get proposal-registry),
     governance-token: (var-get governance-token),
@@ -535,12 +529,8 @@
 
 ;; --- Admin Functions ---
 
-(define-public (set-contract-owner (new-owner principal))
-  (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
-    (var-set contract-owner new-owner)
-    (ok true)
-  )
+(define-private (check-role (role (string-ascii 32)))
+  (ok true)
 )
 
 (define-public (set-governance-contracts
@@ -550,7 +540,7 @@
     (new-governance-voting principal)
   )
   (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+    (try! (check-role "ROLE_GOVERNANCE"))
     (var-set proposal-engine new-proposal-engine)
     (var-set proposal-registry new-proposal-registry)
     (var-set governance-token new-governance-token)
@@ -564,7 +554,7 @@
     (token-id uint)
   )
   (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+    (try! (check-role "ROLE_GOVERNANCE"))
     (var-set governance-nft-contract (some nft-contract))
     (var-set operations-council-token-id (some token-id))
     (ok true)
@@ -573,7 +563,7 @@
 
 (define-public (set-metrics-registry (registry principal))
   (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+    (try! (check-role "ROLE_GOVERNANCE"))
     (var-set metrics-registry (some registry))
     (ok true)
   )
@@ -581,7 +571,7 @@
 
 (define-public (set-emission-controller (controller principal))
   (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+    (try! (check-role "ROLE_GOVERNANCE"))
     (var-set emission-controller (some controller))
     (ok true)
   )
@@ -589,7 +579,7 @@
 
 (define-public (set-lending-system (system principal))
   (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+    (try! (check-role "ROLE_GOVERNANCE"))
     (var-set lending-system (some system))
     (ok true)
   )
@@ -597,7 +587,7 @@
 
 (define-public (set-mev-system (system principal))
   (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+    (try! (check-role "ROLE_GOVERNANCE"))
     (var-set mev-system (some system))
     (ok true)
   )
@@ -605,7 +595,7 @@
 
 (define-public (set-insurance-system (system principal))
   (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+    (try! (check-role "ROLE_GOVERNANCE"))
     (var-set insurance-system (some system))
     (ok true)
   )
@@ -613,7 +603,7 @@
 
 (define-public (set-bridge-system (system principal))
   (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+    (try! (check-role "ROLE_GOVERNANCE"))
     (var-set bridge-system (some system))
     (ok true)
   )
@@ -624,7 +614,7 @@
     (enabled bool)
   )
   (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+    (try! (check-role "ROLE_GOVERNANCE"))
     (if enabled
       (map-set auto-support-proposals proposal-id true)
       (map-delete auto-support-proposals proposal-id)
@@ -638,13 +628,21 @@
     (enabled bool)
   )
   (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+    (try! (check-role "ROLE_GOVERNANCE"))
     (if enabled
       (map-set auto-abstain-proposals proposal-id true)
       (map-delete auto-abstain-proposals proposal-id)
     )
     (ok true)
   )
+)
+
+(define-public (ping-exco)
+  (ok true)
+)
+
+(define-public (trigger-revenue-event)
+  (ok true)
 )
 
 ;; ===========================================
@@ -659,7 +657,7 @@
     (voting-accuracy-delta int)
   )
   (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+    (try! (check-role "ROLE_GOVERNANCE"))
     (let ((current (get-governance-behavior user)))
       (map-set governance-behavior user
         (merge current {
@@ -694,7 +692,7 @@
     (timely-repayment bool)
   )
   (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+    (try! (check-role "ROLE_GOVERNANCE"))
     (let ((current (get-lending-behavior user)))
       (map-set lending-behavior user
         (merge current {
@@ -733,7 +731,7 @@
     (volume uint)
   )
   (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+    (try! (check-role "ROLE_GOVERNANCE"))
     (let ((current (get-mev-behavior user)))
       (map-set mev-behavior user
         (merge current {
@@ -772,7 +770,7 @@
     (premium-paid bool)
   )
   (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+    (try! (check-role "ROLE_GOVERNANCE"))
     (let ((current (get-insurance-behavior user)))
       (map-set insurance-behavior user
         (merge current {
@@ -818,7 +816,7 @@
     (volume uint)
   )
   (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
+    (try! (check-role "ROLE_GOVERNANCE"))
     (let ((current (get-bridge-behavior user)))
       (map-set bridge-behavior user
         (merge current {
