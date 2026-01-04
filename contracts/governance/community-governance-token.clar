@@ -19,6 +19,10 @@
 ;; Token
 (define-fungible-token cgt)
 
+;; Delegation Maps
+(define-map delegates principal principal) ;; user -> delegatee
+(define-map votes-delegated-to principal uint) ;; user -> total votes delegated to them
+
 ;; Authorization
 (define-private (is-owner)
     (is-eq tx-sender (var-get contract-owner))
@@ -31,6 +35,105 @@
     )
 )
 
+;; --- Delegation Logic ---
+
+(define-private (get-delegated-votes (user principal))
+    (default-to u0 (map-get? votes-delegated-to user))
+)
+
+(define-private (increase-delegated-votes (delegatee principal) (amount uint))
+    (map-set votes-delegated-to delegatee (+ (get-delegated-votes delegatee) amount))
+)
+
+(define-private (decrease-delegated-votes (delegatee principal) (amount uint))
+    (let ((current-votes (get-delegated-votes delegatee)))
+        (if (>= current-votes amount)
+            (map-set votes-delegated-to delegatee (- current-votes amount))
+            (map-set votes-delegated-to delegatee u0)
+        )
+    )
+)
+
+;; Updates delegation power when tokens move
+(define-private (move-delegation (sender principal) (recipient principal) (amount uint))
+    (begin
+        ;; If sender delegates, decrease delegatee's power
+        (match (map-get? delegates sender)
+            delegatee (decrease-delegated-votes delegatee amount)
+            true ;; Do nothing if not delegating
+        )
+        ;; If recipient delegates, increase delegatee's power
+        (match (map-get? delegates recipient)
+            delegatee (increase-delegated-votes delegatee amount)
+            true
+        )
+    )
+)
+
+;; Public Delegation Functions
+
+;; @desc Delegate voting power to another address
+(define-public (delegate (delegatee principal))
+    (let (
+        (delegator tx-sender)
+        (balance (ft-get-balance cgt delegator))
+    )
+        (asserts! (check-compliance delegator) ERR_NON_COMPLIANT)
+        (asserts! (check-compliance delegatee) ERR_NON_COMPLIANT)
+        (asserts! (not (is-eq delegator delegatee)) ERR_UNAUTHORIZED) ;; Cannot delegate to self (undelegate instead)
+
+        ;; Remove old delegation
+        (match (map-get? delegates delegator)
+            old-delegatee (decrease-delegated-votes old-delegatee balance)
+            true
+        )
+
+        ;; Set new delegation
+        (map-set delegates delegator delegatee)
+        (increase-delegated-votes delegatee balance)
+        
+        (print { event: "delegate", delegator: delegator, delegatee: delegatee, amount: balance })
+        (ok true)
+    )
+)
+
+;; @desc Revoke delegation (Self-Representation)
+(define-public (revoke-delegation)
+    (let (
+        (delegator tx-sender)
+        (balance (ft-get-balance cgt delegator))
+    )
+        (match (map-get? delegates delegator)
+            delegatee 
+            (begin
+                (decrease-delegated-votes delegatee balance)
+                (map-delete delegates delegator)
+                (print { event: "revoke-delegation", delegator: delegator, old-delegatee: delegatee })
+                (ok true)
+            )
+            (err u1003) ;; ERR_NOT_DELEGATING
+        )
+    )
+)
+
+;; @desc Get current voting power (Balance + Delegated In - Delegated Out)
+(define-read-only (get-voting-power (user principal))
+    (let (
+        (balance (ft-get-balance cgt user))
+        (delegated-in (get-delegated-votes user))
+        (is-delegating (is-some (map-get? delegates user)))
+    )
+        (if is-delegating
+            delegated-in ;; If delegating, own balance doesn't count for self
+            (+ balance delegated-in)
+        )
+    )
+)
+
+(define-read-only (get-delegate (user principal))
+    (map-get? delegates user)
+)
+
 ;; SIP-010 Interface
 (define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
     (begin
@@ -41,6 +144,10 @@
         (asserts! (check-compliance recipient) ERR_NON_COMPLIANT)
 
         (try! (ft-transfer? cgt amount sender recipient))
+        
+        ;; Adjust Voting Power
+        (move-delegation sender recipient amount)
+
         (match memo to-print (print to-print) 0x)
         (ok true)
     )
@@ -75,7 +182,14 @@
 (define-public (mint (amount uint) (recipient principal))
     (begin
         (asserts! (is-owner) ERR_UNAUTHORIZED)
-        (ft-mint? cgt amount recipient)
+        (try! (ft-mint? cgt amount recipient))
+        
+        ;; Update delegation power if recipient is delegating
+        (match (map-get? delegates recipient)
+            delegatee (increase-delegated-votes delegatee amount)
+            true
+        )
+        (ok true)
     )
 )
 

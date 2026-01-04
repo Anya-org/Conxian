@@ -470,10 +470,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.cxvg-token]
 path = "contracts/tokens/cxvg-token.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-
-[contracts.token-emission-controller]
-path = "contracts/yield/token-emission-controller.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = ["sip-standards", "regulatory-adapter"]
 
 [contracts.liquidity-provider]
 path = "contracts/dex/liquidity-provider.clar"
@@ -796,6 +793,11 @@ path = "contracts/yield/token-emission-controller.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = ["conxian-operations-engine", "token-system-coordinator", "sip-standards"]
 
+[contracts.community-voting-engine]
+path = "contracts/governance/community-voting-engine.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = ["cxvg-token", "reputation-engine", "regulatory-adapter"]
+
 [contracts.kyc-registry]
 path = "contracts/identity/kyc-registry.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
@@ -979,7 +981,7 @@ depends_on = [ "cxd-price-initializer",]
 [contracts.proposal-engine]
 path = "contracts/governance/proposal-engine.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["conxian-protocol", "proposal-registry", "proposal-executor", "governance-traits", "enhanced-governance-nft"]
+depends_on = ["conxian-protocol", "proposal-registry", "proposal-executor", "governance-traits", "enhanced-governance-nft", "reputation-engine"]
 
 [contracts.compliance-manager]
 path = "contracts/compliance/compliance-manager.clar"
@@ -1028,7 +1030,7 @@ depends_on = [ "cxd-token",]
 [contracts.cxd-staking]
 path = "contracts/yield/cxd-staking.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "protocol-invariant-monitor",]
+depends_on = [ "protocol-invariant-monitor", "regulatory-adapter"]
 
 [contracts.early-lp-rewards]
 path = "contracts/rewards/early-lp-rewards.clar"

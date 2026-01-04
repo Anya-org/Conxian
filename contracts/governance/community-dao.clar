@@ -15,10 +15,9 @@
 
 ;; Data Vars
 (define-data-var dao-name (string-ascii 64) "Community DAO")
-(define-data-var governance-token principal .community-governance-token) ;; Placeholder
+(define-data-var governance-token principal .community-governance-token) ;; Default, updateable
 (define-data-var proposal-count uint u0)
-(define-data-var voting-delay uint u144) ;; ~1 day (144 blocks @ 10m, but 5s -> 17280)
-;; Using Nakamoto 5s blocks: 1 day = 17280 blocks.
+(define-data-var voting-delay uint u144) ;; ~1 day
 (define-data-var voting-period uint u51840) ;; ~3 days
 
 (define-map proposals
@@ -44,6 +43,18 @@
     )
 )
 
+;; Admin (DAO Bootstrap)
+(define-public (set-governance-token (new-token principal))
+    (begin
+        ;; Only allowing this if no proposals exist yet to prevent takeover, 
+        ;; OR restrict to specific deployer role. 
+        ;; For simplicity/template: allow if proposal-count is 0 (initialization phase)
+        (asserts! (is-eq (var-get proposal-count) u0) ERR_UNAUTHORIZED)
+        (var-set governance-token new-token)
+        (ok true)
+    )
+)
+
 ;; Core Logic
 
 (define-public (create-proposal (title (string-ascii 64)) (description (string-ascii 256)))
@@ -51,12 +62,14 @@
         (proposal-id (+ (var-get proposal-count) u1))
         (start (+ block-height (var-get voting-delay)))
         (end (+ start (var-get voting-period)))
+        (token (var-get governance-token))
     )
         ;; Compliance Check
         (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
         
         ;; Token Balance Check (Prevent spam)
-        (let ((balance (unwrap-panic (contract-call? .community-governance-token get-balance tx-sender))))
+        ;; Dynamic contract call to the configured token
+        (let ((balance (unwrap-panic (contract-call? token get-balance tx-sender))))
             (asserts! (> balance u0) ERR_UNAUTHORIZED)
         )
 
@@ -81,7 +94,8 @@
     (let (
         (proposal (unwrap! (map-get? proposals proposal-id) ERR_PROPOSAL_NOT_FOUND))
         (voter tx-sender)
-        (balance (unwrap-panic (contract-call? .community-governance-token get-balance voter)))
+        (token (var-get governance-token))
+        (balance (unwrap-panic (contract-call? token get-balance voter)))
     )
         ;; Compliance Check
         (asserts! (check-compliance voter) ERR_NON_COMPLIANT)

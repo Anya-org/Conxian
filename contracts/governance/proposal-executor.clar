@@ -5,6 +5,7 @@
 ;;
 
 (use-trait proposal-trait .governance-traits.proposal-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u3000))
 (define-constant ERR_PROPOSAL_NOT_FOUND (err u3001))
