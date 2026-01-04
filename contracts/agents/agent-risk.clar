@@ -146,3 +146,9 @@
     })
   )
 )
+
+(define-data-var cxvg-seat-nft-id uint u0)
+
+(define-public (vote-on-solvency)
+  (ok true)
+)

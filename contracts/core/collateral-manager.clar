@@ -13,7 +13,7 @@
 
 ;; @data-vars
 (define-map internal-balances
-  principal
+  { user: principal, token: principal }
   uint
 )
 
@@ -26,9 +26,10 @@
     (asserts! (> amount u0) ERR_INVALID_AMOUNT)
     (let (
         (user tx-sender)
-        (current-balance (default-to u0 (map-get? internal-balances user)))
+        (key { user: user, token: token })
+        (current-balance (default-to u0 (map-get? internal-balances key)))
       )
-      (map-set internal-balances user (+ current-balance amount))
+      (map-set internal-balances key (+ current-balance amount))
       (ok true)
     )
   )
@@ -42,17 +43,18 @@
     (asserts! (> amount u0) ERR_INVALID_AMOUNT)
     (let (
         (user tx-sender)
-        (current-balance (default-to u0 (map-get? internal-balances user)))
+        (key { user: user, token: token })
+        (current-balance (default-to u0 (map-get? internal-balances key)))
       )
       (asserts! (>= current-balance amount) ERR_INSUFFICIENT_BALANCE)
-      (map-set internal-balances user (- current-balance amount))
+      (map-set internal-balances key (- current-balance amount))
       (ok true)
     )
   )
 )
 
-(define-read-only (get-balance (user principal))
-  (ok (default-to u0 (map-get? internal-balances user)))
+(define-read-only (get-balance (user principal) (token principal))
+  (ok (default-to u0 (map-get? internal-balances { user: user, token: token })))
 )
 
 (define-public (get-protocol-fee-rate)
