@@ -9,7 +9,8 @@
 (define-constant ERR_POSITION_NOT_FOUND (err u3000))
 
 ;; State - Engine Address
-(define-data-var dimensional-engine principal .dimensional-engine)
+(define-data-var contract-owner principal tx-sender)
+(define-data-var dimensional-engine principal tx-sender)
 
 (define-map positions
     uint
@@ -32,12 +33,14 @@
     (is-eq tx-sender (var-get dimensional-engine))
 )
 
+(define-private (is-owner)
+  (is-eq tx-sender (var-get contract-owner)))
+
 (define-public (set-dimensional-engine (engine principal))
-    (begin
-        (var-set dimensional-engine engine)
-        (ok true)
-    )
-)
+  (begin
+    (asserts! (is-owner) ERR_NOT_AUTHORIZED)
+    (var-set dimensional-engine engine)
+    (ok true)))
 
 (define-public (open-position
         (user principal)

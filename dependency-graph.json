@@ -2,208 +2,69 @@
   "batch-auction": [],
   "math-lib-concentrated": [],
   "budget-manager": [],
-  "self-launch-coordinator": [
-    "position-nft",
-    "traits",
-    "fee-manager",
-    "dex-pool",
-    "pausable",
-    "cxd-token",
-    "timelock-controller",
-    "utils-encoding",
-    "oracle-aggregator",
-    "token-system-coordinator",
-    "analytics-aggregator",
-    "error-utils",
-    "predictive-scaling-system",
-    "dex-router",
-    "protocol-invariant-monitor",
-    "token-emission-controller",
-    "vault",
-    "sip-standards",
-    "dex-factory-v2",
-    "position-factory",
-    "dim-metrics",
-    "utils-utils",
-    "utils",
-    "oracle",
-    "block-automation-manager",
-    "concentrated-liquidity-pool",
-    "encoding",
-    "cxlp-position-nft",
-    "governance-token",
-    "dim-registry",
-    "dimensional-engine",
-    "monitoring-dashboard",
-    "real-time-monitoring-dashboard",
-    "multi-hop-router-v3",
-    "cxlp-token",
-    "mev-protector",
-    "oracle-aggregator-v2",
-    "cxtr-token",
-    "circuit-breaker",
-    "cxd-price-initializer",
-    "dex-factory",
-    "cxs-token",
-    "cxvg-token",
-    "budget-manager",
-    "proposal-engine",
-    "system-monitor",
-    "btc-adapter"
-  ],
+  "self-launch-coordinator": [],
   "position-factory": [
-    "sip-standards",
-    "defi-traits"
+    "sip-standards"
   ],
   "btc-adapter": [],
   "governance-token": [
     "sip-standards"
   ],
   "rebalancing-rules": [],
-  "decentralized-trait-registry": [
-    "governance-traits",
-    "core-traits",
-    "roles"
-  ],
+  "decentralized-trait-registry": [],
   "proposal-engine": [
     "governance-traits",
-    "conxian-protocol",
-    "proposal-registry",
     "proposal-executor",
-    "governance-voting"
-  ],
-  "tiered-pools": [],
-  "multi-hop-router-v3": [
-    "conxian-protocol",
     "sip-standards",
-    "swap-manager",
-    "defi-traits"
-  ],
-  "launch-limits": [
+    "proposal-registry",
+    "enhanced-governance-nft",
     "conxian-access"
   ],
-  "tokenized-bond-adapter": [
-    "sip-standards",
-    "traits",
-    "sip-000-governance-trait"
-  ],
+  "tiered-pools": [],
+  "multi-hop-router-v3": [],
+  "launch-limits": [],
+  "tokenized-bond-adapter": [],
   "dimensional-core": [
-    "security-monitoring",
+    "pausable",
     "core-traits",
-    "oracle-pricing",
     "sip-standards",
+    "defi-traits",
+    "security-monitoring",
     "block-utils"
   ],
   "dim-oracle-automation": [],
-  "governance": [
-    "sip-standards"
-  ],
-  "tokenized-bond": [
-    "sip-standards"
-  ],
-  "position-nft": [
-    "defi-traits"
-  ],
+  "governance": [],
+  "tokenized-bond": [],
+  "position-nft": [],
   "dim-metrics": [],
   "dim-graph": [],
-  "dim-revenue-adapter": [
-    "core-traits",
-    "sip-standards"
-  ],
-  "dim-registry": [
-    "trait-registry"
-  ],
-  "dim-yield-stake": [
-    "sip-standards"
-  ],
-  "cxd-price-initializer": [
-    "governance-token",
-    "governance-traits"
-  ],
+  "dim-revenue-adapter": [],
+  "dim-registry": [],
+  "dim-yield-stake": [],
+  "cxd-price-initializer": [],
   "token-system-coordinator": [
     "core-traits",
-    "cxtr-token",
-    "cxd-token",
-    "revenue-distributor",
-    "cxs-token",
-    "cxvg-token",
-    "founder-vesting",
-    "cxlp-token"
+    "conxian-access"
   ],
-  "cxlp-token": [
-    "core-traits",
-    "cxd-token",
-    "sip-standards"
-  ],
-  "cxvg-token": [
-    "sip-standards"
-  ],
-  "cxs-token": [
-    "security-monitoring",
-    "core-traits",
-    "roles",
-    "sip-standards"
-  ],
-  "cxtr-token": [
-    "security-monitoring",
-    "sip-standards",
-    "trait-registry"
-  ],
-  "cxlp-position-nft": [
-    "sip-standards",
-    "cxlp-token"
-  ],
-  "cxd-token": [
-    "security-monitoring",
-    "conxian-protocol",
-    "core-traits",
-    "ownership-trait",
-    "sip-standards"
-  ],
-  "token-emission-controller": [
-    "sip-standards"
-  ],
-  "cxd-staking": [
-    "cxd-token",
-    "sip-standards",
-    "protocol-invariant-monitor"
-  ],
-  "yield-optimizer": [
-    "access",
-    "core-traits",
-    "sip-standards",
-    "dex-traits"
-  ],
-  "yield-distribution-engine": [
-    "math-utilities"
-  ],
-  "cross-protocol-integrator": [
-    "security-monitoring",
-    "core-traits",
-    "sip-standards"
-  ],
+  "cxlp-token": [],
+  "cxvg-token": [],
+  "cxs-token": [],
+  "cxtr-token": [],
+  "cxlp-position-nft": [],
+  "cxd-token": [],
+  "token-emission-controller": [],
+  "cxd-staking": [],
+  "yield-optimizer": [],
+  "yield-distribution-engine": [],
+  "cross-protocol-integrator": [],
   "auto-compounder": [
-    "security-monitoring",
-    "core-traits",
-    "sip-standards",
-    "math-utilities"
+    "vault-trait"
   ],
-  "enhanced-yield-strategy": [
-    "strategy-trait",
-    "token-system-coordinator"
-  ],
-  "external-oracle-adapter": [
-    "oracle-pricing",
-    "sip-standards",
-    "rbac",
-    "core-traits"
-  ],
+  "enhanced-yield-strategy": [],
+  "external-oracle-adapter": [],
   "points-oracle": [],
-  "dimensional-oracle": [],
-  "oracle-aggregator-v2": [
-    "oracle-pricing",
-    "circuit-breaker",
-    "security-monitoring"
+  "dimensional-oracle": [
+    "defi-traits"
   ],
   "oracle": [
     "oracle-pricing"
@@ -211,394 +72,213 @@
   "oracle-adapter-stub": [],
   "sanctions-oracle": [],
   "travel-rule-service": [],
-  "compliance-manager": [
-    "kyc-registry",
-    "enterprise-traits"
-  ],
-  "compliance-api": [
-    "compliance-trait",
-    "enterprise-traits"
-  ],
+  "compliance-manager": [],
+  "compliance-trait": [],
+  "compliance-api": [],
   "optimization-helpers": [],
-  "enterprise-loan-manager": [
-    "yield-distribution-trait",
-    "sip-standards",
-    "bond-issuance-system",
-    "comprehensive-lending-system"
-  ],
-  "advanced-order-manager": [
-    "enterprise-traits"
-  ],
+  "enterprise-loan-manager": [],
+  "advanced-order-manager": [],
   "institutional-account-manager": [
-    "enterprise-traits"
+    "conxian-access",
+    "block-utils"
   ],
-  "compliance-hooks": [
-    "kyc-registry"
-  ],
+  "compliance-hooks": [],
   "enterprise-facade": [
-    "advanced-order-manager",
-    "conxian-protocol",
-    "institutional-account-manager",
     "core-traits",
-    "enterprise-compliance-manager",
-    "enterprise-traits"
+    "conxian-access",
+    "institutional-account-manager"
   ],
-  "on-chain-router-helper": [
-    "sip-standards",
-    "defi-traits"
-  ],
-  "cxlp-migration-queue": [
-    "cxd-token",
-    "cxlp-token"
-  ],
+  "on-chain-router-helper": [],
+  "cxlp-migration-queue": [],
   "monitoring-dashboard": [],
   "pool-implementation-registry": [],
-  "liquidity-provider": [
-    "sip-standards"
-  ],
-  "real-time-monitoring-dashboard": [
-    "defi-traits"
-  ],
-  "dex-registrar": [
-    "dex-factory-v2",
-    "multi-hop-router-v3"
-  ],
+  "liquidity-provider": [],
+  "real-time-monitoring-dashboard": [],
+  "dex-registrar": [],
   "pool-type-registry": [],
   "transaction-batch-processor": [],
-  "weighted-swap-pool": [
-    "sip-standards",
-    "defi-traits"
-  ],
+  "weighted-swap-pool": [],
   "migration-manager": [],
   "predictive-scaling-system": [],
-  "route-manager": [
-    "dijkstra-pathfinder-trait",
-    "core-traits",
-    "route-manager-trait",
-    "defi-traits"
-  ],
-  "pool-registry": [
-    "core-traits"
-  ],
+  "route-manager": [],
+  "pool-registry": [],
   "legacy-adapter": [],
   "timelock-controller": [],
-  "price-impact-calculator": [
-    "sip-standards"
+  "oracle-aggregator-v2": [
+    "defi-traits",
+    "pyth-oracle-adapter",
+    "switchboard-oracle-adapter",
+    "redstone-oracle-adapter",
+    "block-utils"
   ],
-  "performance-optimizer": [
-    "monitored-contract"
-  ],
+  "price-impact-calculator": [],
+  "performance-optimizer": [],
   "concentrated-liquidity-pool": [
-    "protocol-fee-switch",
+    "conxian-protocol",
+    "core-traits",
     "sip-standards",
-    "math-lib-concentrated",
-    "defi-traits"
+    "block-utils",
+    "dex-factory"
   ],
-  "liquidity-manager": [],
+  "liquidity-manager": [
+    "conxian-protocol",
+    "vault-trait",
+    "sip-standards",
+    "concentrated-liquidity-pool",
+    "block-utils"
+  ],
   "protocol-invariant-monitor": [],
-  "swap-manager": [
+  "swap-manager": [],
+  "vault": [],
+  "swap-router": [
     "sip-standards",
-    "defi-traits"
-  ],
-  "vault": [
-    "sip-standards",
-    "token-system-coordinator",
-    "defi-traits"
+    "concentrated-liquidity-pool",
+    "block-utils",
+    "conxian-protocol"
   ],
   "liquidity-optimization-engine": [],
   "pool-template": [],
   "manipulation-detector": [],
   "factory-trait": [],
   "nakamoto-compatibility": [],
-  "stable-swap-pool": [
-    "sip-standards",
-    "defi-traits"
-  ],
-  "distributed-cache-manager": [
-    "cache-manager-trait"
-  ],
-  "dex-factory": [
-    "security-monitoring",
-    "pool-registry",
-    "core-traits",
-    "dimensional-traits",
-    "pool-implementation-registry",
-    "circuit-breaker",
-    "roles",
-    "access-control",
-    "dim-registry",
-    "pool-type-registry",
-    "sip-standards",
-    "dex-traits"
-  ],
-  "cxvg-utility": [
-    "governance-traits",
-    "sip-standards"
-  ],
+  "stable-swap-pool": [],
+  "distributed-cache-manager": [],
+  "dex-factory": [],
+  "cxvg-utility": [],
   "memory-pool-management": [],
-  "dex-factory-v2": [
-    "sip-standards",
-    "defi-traits"
-  ],
-  "nft-marketplace": [
-    "protocol-fee-switch",
-    "sip-standards",
-    "defi-traits"
-  ],
+  "dex-factory-v2": [],
+  "nft-marketplace": [],
   "rbac": [],
   "block-utils": [],
   "utils": [],
-  "sip-018-signed-messages": [
-    "sip-018-signed-messages-trait"
-  ],
+  "sip-018-signed-messages": [],
   "encoding": [],
   "comparison-helpers": [],
   "validation": [],
   "error-utils": [],
-  "pool-factory": [
-    "core-traits"
-  ],
+  "pool-factory": [],
   "audit-badge-nft": [],
-  "audit-registry": [
-    "governance-traits",
-    "audit-badge-nft"
-  ],
-  "ownable": [
-    "core-traits"
-  ],
-  "pausable": [
-    "roles",
-    "core-traits"
-  ],
-  "base-contract": [
-    "core-traits"
-  ],
-  "insurance-protection-nft": [
-    "sip-standards",
-    "defi-traits"
+  "audit-registry": [],
+  "ownable": [],
+  "pausable": [],
+  "base-contract": [],
+  "insurance-protection-nft": [],
+  "risk-manager": [
+    "core-traits",
+    "conxian-access"
   ],
   "conxian-access": [
-    "sip-018-signed-messages-trait",
-    "sip-018-signed-messages"
-  ],
-  "funding-rate-calculator": [
-    "roles",
-    "oracle-aggregator-v2",
-    "position-manager",
-    "dimensional-traits"
-  ],
-  "conxian-protocol": [
     "core-traits"
   ],
-  "protocol-fee-switch": [
-    "tier-manager",
-    "sip-standards",
-    "defi-traits"
+  "funding-rate-calculator": [
+    "core-traits"
   ],
+  "conxian-protocol": [
+    "core-traits",
+    "conxian-access",
+    "compliance-trait"
+  ],
+  "protocol-fee-switch": [],
   "tier-manager": [],
   "economic-policy-engine": [
-    "operational-treasury",
-    "protocol-fee-switch",
-    "tier-manager",
-    "sip-standards",
+    "core-traits",
     "defi-traits"
   ],
   "position-manager": [
     "core-traits",
-    "oracle-aggregator-v2",
-    "dimensional-traits",
-    "collateral-manager",
-    "oracle-pricing",
     "sip-standards"
   ],
   "dimensional-engine": [
-    "conxian-protocol",
-    "core-traits",
-    "funding-rate-calculator",
-    "dimensional-traits",
     "collateral-manager",
-    "position-manager",
-    "risk-manager"
-  ],
-  "conxian-gatekeeper": [
-    "conxian-access",
-    "access-control-trait"
-  ],
-  "conxian-exit-queue": [
-    "sip-standards"
-  ],
-  "operational-treasury": [
-    "sip-standards"
-  ],
-  "conxian-token-factory": [
-    "sip-standards",
-    "defi-traits"
-  ],
-  "collateral-manager": [
     "core-traits",
     "sip-standards",
-    "dimensional-traits"
+    "risk-manager",
+    "position-manager",
+    "block-utils"
   ],
-  "identity-badge": [
-    "sip-standards"
+  "conxian-gatekeeper": [],
+  "conxian-exit-queue": [],
+  "operational-treasury": [],
+  "conxian-token-factory": [],
+  "collateral-manager": [
+    "conxian-protocol",
+    "compliance-trait",
+    "sip-standards",
+    "block-utils",
+    "rbac"
   ],
+  "identity-badge": [],
   "kyc-registry": [
-    "identity-badge"
+    "sip-standards",
+    "block-utils"
   ],
   "interest-rate-model": [],
-  "comprehensive-lending-system": [
-    "security-monitoring",
-    "conxian-protocol",
-    "core-traits",
-    "lending-manager",
-    "circuit-breaker",
-    "lending-manager-trait",
-    "sip-standards",
-    "defi-traits"
-  ],
-  "lending-manager-trait": [
-    "sip-standards"
-  ],
-  "lending-position-nft": [
-    "sip-standards",
-    "defi-traits"
-  ],
-  "lending-manager": [
-    "lending-manager-trait",
-    "sip-standards",
-    "interest-rate-model"
-  ],
-  "liquidation-manager": [
-    "dimensional-traits"
-  ],
-  "roles": [
-    "core-traits"
-  ],
+  "comprehensive-lending-system": [],
+  "lending-manager-trait": [],
+  "lending-position-nft": [],
+  "lending-manager": [],
+  "liquidation-manager": [],
+  "roles": [],
   "position-factory-root": [],
   "mev-protection-nft": [],
-  "dia-oracle-adapter": [
-    "oracle-pricing",
-    "dia-oracle-mock"
-  ],
-  "chainlink-adapter": [
-    "sip-standards"
-  ],
-  "twap-oracle": [
-    "sip-standards"
+  "dia-oracle-adapter": [],
+  "chainlink-adapter": [],
+  "twap-oracle": [],
+  "switchboard-oracle-adapter": [
+    "block-utils",
+    "rbac",
+    "conxian-protocol"
   ],
   "redstone-oracle-adapter": [
-    "oracle-pricing",
+    "redstone-traits",
+    "defi-traits",
+    "block-utils",
     "redstone-oracle-mock"
   ],
-  "federated-oracle-adapter": [
-    "oracle-pricing"
-  ],
+  "federated-oracle-adapter": [],
   "pyth-oracle-adapter": [
-    "oracle-pricing",
-    "pyth-traits",
     "pyth-oracle-v2-mock",
-    "pyth-store-mock"
+    "conxian-protocol",
+    "defi-traits",
+    "pyth-traits",
+    "block-utils"
   ],
   "protocol-errors": [],
   "standard-errors": [],
   "order-book": [],
-  "automation-manager": [
-    "risk-oracle-trait",
-    "lending-system-trait",
-    "risk-trait"
-  ],
-  "block-automation-manager-old": [
-    "comprehensive-lending-system",
-    "protocol-fee-switch",
-    "gamification-manager",
-    "liquidation-manager",
-    "analytics-aggregator"
-  ],
-  "stacks-native-launch-script": [
-    "self-launch-coordinator"
-  ],
-  "keeper-coordinator": [
-    "security-monitoring",
-    "automation-traits",
-    "self-launch-coordinator",
-    "controller-traits",
-    "points-oracle",
-    "gamification-manager"
-  ],
-  "guardian-registry": [
-    "sip-standards"
-  ],
-  "native-multisig-controller": [
-    "circuit-breaker"
-  ],
+  "automation-manager": [],
+  "block-automation-manager-old": [],
+  "stacks-native-launch-script": [],
+  "keeper-coordinator": [],
+  "guardian-registry": [],
+  "native-multisig-controller": [],
   "block-automation-manager": [],
   "batch-processor": [],
   "native-stacking-operator": [],
-  "migration-adapter": [
-    "block-automation-manager",
-    "sip-standards",
-    "native-stacking-operator"
-  ],
+  "migration-adapter": [],
   "math-utils": [],
-  "concentrated-math": [
-    "math-lib-advanced"
-  ],
-  "default-strategy-engine": [
-    "strategy-trait",
-    "sip-standards"
-  ],
-  "early-lp-rewards": [
-    "cxd-token",
-    "treasury-manager"
-  ],
-  "rewards-distributor": [
-    "circuit-breaker",
-    "age000-governance-token"
-  ],
-  "Pausable": [
-    "pausable-trait",
-    "core-traits"
-  ],
-  "role-manager": [
-    "core-traits",
-    "access-control-trait"
-  ],
-  "enhanced-circuit-breaker": [
-    "oracle-pricing",
-    "oracle",
-    "compliance-trait",
-    "core-traits"
-  ],
+  "concentrated-math": [],
+  "default-strategy-engine": [],
+  "early-lp-rewards": [],
+  "rewards-distributor": [],
+  "role-manager": [],
+  "enhanced-circuit-breaker": [],
   "proof-of-reserves": [],
   "circuit-breaker": [
-    "security-monitoring"
+    "core-traits",
+    "rbac"
   ],
-  "mev-protector": [
-    "oracle-pricing",
-    "sip-standards",
-    "defi-traits"
-  ],
+  "mev-protector": [],
   "rate-limiter": [],
   "conxian-insurance-fund": [
-    "sip-standards"
+    "sip-standards",
+    "conxian-access"
   ],
-  "role-nft": [
-    "defi-traits"
-  ],
-  "bond-token": [
-    "sip-standards"
-  ],
-  "bond-factory": [
-    "bond-traits"
-  ],
-  "bond-issuance-system": [
-    "circuit-breaker"
-  ],
-  "cxd-bonding-curve-amm": [
-    "oracle-pricing",
-    "governance",
-    "sip-standards"
-  ],
+  "role-nft": [],
+  "bond-token": [],
+  "bond-factory": [],
+  "bond-issuance-system": [],
+  "cxd-bonding-curve-amm": [],
   "fixed-point-math": [],
   "clarity-bitcoin": [],
   "math-lib-advanced": [],
@@ -607,90 +287,43 @@
   "error-codes": [],
   "revenue-router": [
     "sip-standards",
-    "conxian-vaults",
-    "allocation-policy"
+    "revenue-distributor"
   ],
   "allocation-policy": [],
   "opex-vault": [
-    "sip-standards"
+    "sip-standards",
+    "nakamoto-constants",
+    "conxian-access"
   ],
   "revenue-distributor": [
-    "core-traits",
-    "sip-standards"
+    "sip-standards",
+    "allocation-policy"
   ],
   "founder-vault": [
-    "sip-standards"
+    "sip-standards",
+    "nakamoto-constants",
+    "conxian-protocol"
   ],
   "conxian-vaults": [
-    "sip-standards"
-  ],
-  "dual-stacking-orchestrator": [
-    "staking-traits",
-    "sip-standards"
-  ],
-  "staking-yield-nft": [
-    "sip-standards",
-    "defi-traits"
-  ],
-  "rewards": [
     "conxian-access",
-    "traits"
+    "sip-standards",
+    "vault-trait"
   ],
+  "dual-stacking-orchestrator": [],
+  "staking-yield-nft": [],
+  "rewards": [],
   "wormhole-inbox": [],
   "wormhole-outbox": [],
   "wormhole-handlers": [],
-  "sbtc-oracle-adapter": [
-    "circuit-breaker"
-  ],
+  "sbtc-oracle-adapter": [],
   "dlc-manager": [
-    "dimensional-traits"
+    "conxian-access"
   ],
-  "sbtc-bond-integration": [
-    "enhanced-yield-strategy",
-    "sip-standards",
-    "sbtc-token",
-    "sbtc-integration"
-  ],
-  "sbtc-flash-loan-vault": [
-    "circuit-breaker",
-    "sip-standards",
-    "flash-loan-receiver-trait"
-  ],
-  "sbtc-lending-integration": [
-    "sip-010-trait",
-    "sbtc-integration"
-  ],
-  "sbtc-integration": [
-    "oracle-pricing",
-    "sip-standards"
-  ],
-  "sbtc-flash-loan-extension": [
-    "sip-010-trait",
-    "bond-issuance-system",
-    "flash-loan-receiver-trait"
-  ],
-  "risk-manager": [
-    "roles",
-    "core-traits",
-    "position-manager",
-    "dimensional-traits"
-  ],
-  "funding-calculator": [
-    "oracle-pricing",
-    "dimensional-traits"
-  ],
-  "risk-oracle": [
-    "oracle-pricing",
-    "risk-management"
-  ],
-  "insurance-fund": [
-    "sip-standards"
-  ],
-  "liquidation-engine": [
-    "oracle-pricing",
-    "sip-standards",
-    "dimensional-traits"
-  ],
+  "sbtc-bond-integration": [],
+  "sbtc-flash-loan-vault": [],
+  "sbtc-lending-integration": [],
+  "sbtc-integration": [],
+  "sbtc-flash-loan-extension": [],
   "risk-management": [],
   "security-monitoring": [],
   "governance-traits": [],
@@ -700,14 +333,10 @@
   "bond-traits": [],
   "ownership-trait": [],
   "controller-traits": [],
-  "defi-primitives": [
-    "sip-standards"
-  ],
+  "defi-primitives": [],
   "trait-errors": [],
   "sip-standards": [],
-  "defi-traits": [
-    "sip-standards"
-  ],
+  "defi-traits": [],
   "cross-chain-traits": [],
   "sip-018-signed-messages-trait": [],
   "queue-traits": [],
@@ -716,137 +345,110 @@
   "pyth-traits": [],
   "dimensional-traits": [],
   "math-utilities": [],
+  "redstone-traits": [],
   "access-control-trait": [],
-  "analytics-aggregator": [],
-  "system-monitor": [],
-  "price-stability-monitor": [
-    "cxd-price-initializer"
-  ],
-  "finance-metrics": [
+  "analytics-aggregator": [
+    "sip-standards",
     "block-utils"
   ],
-  "ico-offering": [
-    "governance-token",
-    "sip-standards",
-    "defi-traits"
-  ],
-  "governance-handover": [
-    "governance-traits"
-  ],
+  "system-monitor": [],
+  "price-stability-monitor": [],
+  "finance-metrics": [],
+  "ico-offering": [],
+  "governance-handover": [],
   "upgrade-controller": [],
-  "lending-protocol-governance": [
-    "central-traits-registry",
-    "governance-token",
-    "cxvg-utility",
-    "cxvg-token",
-    "sip-standards"
-  ],
+  "lending-protocol-governance": [],
   "emergency-governance": [],
   "proposal-executor": [
     "governance-token",
-    "proposal-registry"
+    "enhanced-governance-nft",
+    "proposal-registry",
+    "governance-traits"
   ],
-  "founder-vesting": [
-    "sip-standards"
-  ],
-  "dao-treasury": [
-    "governance-traits",
-    "sip-standards",
-    "proposal-engine"
-  ],
+  "founder-vesting": [],
+  "dao-treasury": [],
   "proposal-engine-trait": [],
   "conxian-operations-engine": [
-    "governance-traits",
-    "circuit-breaker",
-    "proposal-registry",
-    "governance-token",
-    "governance-voting",
-    "token-emission-controller",
+    "conxian-protocol",
+    "agent-risk",
     "proposal-engine",
-    "token-system-coordinator"
+    "enhanced-governance-nft",
+    "block-utils"
   ],
-  "governance-signature-verifier": [
-    "signed-data-base",
-    "lending-protocol-governance"
-  ],
+  "governance-signature-verifier": [],
   "legal-representative-registry": [],
-  "gamification-manager": [
+  "agent-treasury": [
+    "dev-fund",
+    "core-traits",
     "sip-standards",
-    "points-oracle"
+    "conxian-insurance-fund",
+    "cxd-staking",
+    "rbac"
   ],
-  "proposal-registry": [],
+  "agent-risk": [
+    "core-traits",
+    "oracle",
+    "oracle-pricing",
+    "rbac"
+  ],
+  "gamification-manager": [],
+  "proposal-registry": [
+    "conxian-access"
+  ],
   "enhanced-governance-nft": [
     "sip-standards",
-    "defi-traits"
+    "conxian-access"
   ],
-  "signed-data-base": [
-    "sip-018-trait"
-  ],
+  "signed-data-base": [],
   "timelock": [
-    "ownable-trait"
+    "conxian-access",
+    "governance-traits"
   ],
   "voting": [
-    "cxvg-token",
-    "sip-standards"
+    "rbac",
+    "sip-standards",
+    "block-utils"
   ],
   "nakamoto-constants": [],
-  "yield-aggregator": [],
-  "vault-registrar": [
-    "dim-registry-trait",
-    "sbtc-vault",
-    "core-traits"
+  "yield-aggregator": [
+    "vault-trait"
   ],
+  "vault-registrar": [],
   "vault-trait": [],
-  "sbtc-vault": [
-    "fee-manager",
-    "launch-limits",
-    "yield-aggregator",
-    "sbtc-token",
-    "custody",
-    "sip-standards",
-    "defi-traits"
-  ],
+  "sbtc-vault": [],
   "fee-manager": [],
   "custody": [],
   "test-access": [],
-  "dimensional-engine-interface": [
-    "oracle-pricing",
-    "base-contract",
-    "risk-trait",
-    "sip-standards"
-  ],
+  "dimensional-engine-interface": [],
   "exponentiation": [],
-  "mock-strategy-a": [
-    "sip-standards"
-  ],
+  "mock-strategy-a": [],
   "pyth-oracle-v2-mock": [
+    "defi-traits",
     "pyth-traits"
   ],
-  "pyth-store-mock": [
-    "pyth-traits"
+  "pyth-store-mock": [],
+  "oracle-mock": [
+    "defi-traits"
   ],
-  "oracle-mock": [],
   "mock-token": [
     "sip-standards"
   ],
-  "mock-lending-pool": [
-    "dimensional-traits"
-  ],
-  "mock-oracle": [],
-  "mock-usda-token": [
-    "sip-standards"
-  ],
-  "mock-pool": [
-    "sip-standards",
+  "mock-lending-pool": [],
+  "mock-oracle": [
     "defi-traits"
   ],
-  "redstone-oracle-mock": [],
+  "mock-usda-token": [],
+  "mock-pool": [],
+  "redstone-oracle-mock": [
+    "redstone-traits"
+  ],
   "mock-metrics": [],
   "mock-strategy-b": [],
-  "dia-oracle-mock": [],
-  "mock-dao": [],
-  "bridge-nft": [
-    "sip-standards",
+  "dia-oracle-mock": [
     "defi-traits"
-  ]
+  ],
+  "mock-dao": [
+    "core-traits"
+  ],
+  "bridge-nft": []
 }

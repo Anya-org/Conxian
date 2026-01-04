@@ -46,9 +46,15 @@ def align_clarinet_file(file_path, sorted_contract_names):
 
         # Check if the contract is in the active or disabled list from the original file
         if contract_name in active_in_toml:
-            sorted_contracts_section[contract_name] = active_in_toml[contract_name]
+            contract_data = active_in_toml[contract_name]
+            if "depends_on" in contract_data:
+                contract_data["depends_on"] = list(OrderedDict.fromkeys(contract_data["depends_on"]))
+            sorted_contracts_section[contract_name] = contract_data
         elif contract_name in disabled_in_toml:
-            sorted_disabled_section[contract_name] = disabled_in_toml[contract_name]
+            contract_data = disabled_in_toml[contract_name]
+            if "depends_on" in contract_data:
+                contract_data["depends_on"] = list(OrderedDict.fromkeys(contract_data["depends_on"]))
+            sorted_disabled_section[contract_name] = contract_data
 
     # Replace the old contract sections with the new sorted ones
     data[CONTRACTS_SECTION_KEY] = sorted_contracts_section

@@ -178,16 +178,14 @@
   (begin
     ;; Process all assets in single transaction
     (fold
-      lambda (asset-price-confi result)
+      (lambda (asset-price-confi result)
         (let ((asset (get 0 asset-price-confi))
               (price (get 1 asset-price-confi))
               (confidence (get 2 asset-price-confi)))
           (match result
             success (update-price-feed asset price confidence)
             error error
-          )
-        )
-      )
+          )))
       (ok true)
       (zip assets prices confidences)
     )

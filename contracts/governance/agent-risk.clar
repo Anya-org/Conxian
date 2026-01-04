@@ -9,7 +9,7 @@
 ;; ---
 
 (use-trait roles-trait .core-traits.rbac-trait)
-(use-trait oracle-trait .oracle.oracle-trait)
+(use-trait oracle-trait .oracle-pricing.oracle-trait)
 
 ;; ---
 ;; @SECTION
@@ -36,6 +36,7 @@
 
 ;; Map of paused contracts
 (define-map paused-contracts principal bool)
+(define-map last-prices principal uint)
 
 ;; ---
 ;; @SECTION
@@ -67,9 +68,9 @@
 ;; @desc The core autonomous function of the CRO. A keeper calls this function to check
 ;; the price volatility of a given asset. If the volatility exceeds the threshold,
 ;; it triggers a circuit breaker for a specified target contract.
-;; @param token The token to check (as a string identifier).
+;; @param token The token to check (as a principal).
 ;; @param target-contract The contract to pause if the threshold is exceeded.
-(define-public (monitor-market-volatility (token (string-ascii 64)) (target-contract principal))
+(define-public (monitor-market-volatility (token principal) (target-contract principal))
     (begin
         (asserts! (is-authorized ROLE_KEEPER) ERR_UNAUTHORIZED)
 
@@ -77,9 +78,8 @@
         ;; Here, we simulate by fetching the price and comparing it to a mock baseline.
         (let
             (
-                (price-data (try! (contract-call? .oracle get-price token)))
-                (price (get price price-data))
-                (last-price (get last-price price-data)) ;; Assuming oracle provides this
+                (price (try! (contract-call? .oracle get-price token)))
+                (last-price (default-to price (map-get? last-prices token)))
                 (deviation (if (> price last-price)
                     (- price last-price)
                     (- last-price price)
@@ -88,10 +88,14 @@
             )
             (if threshold-breached
                 (begin
+                    (map-set last-prices token price)
                     (try! (set-contract-paused target-contract true))
                     (err ERR_VOLATILITY_THRESHOLD_EXCEEDED)
                 )
-                (ok true)
+                (begin
+                    (map-set last-prices token price)
+                    (ok true)
+                )
             )
         )
     )

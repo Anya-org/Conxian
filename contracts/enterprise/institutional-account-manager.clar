@@ -6,6 +6,10 @@
 (define-constant ERR_UNAUTHORIZED (err u5000))
 (define-constant ERR_INVALID_TIER (err u5001))
 
+;; State
+(define-data-var contract-owner principal tx-sender)
+(define-data-var facade-address principal tx-sender)
+
 ;; Maps
 (define-map institutional-accounts
     principal
@@ -18,6 +22,15 @@
 )
 
 ;; @desc Registers an institutional account (BaaS)
+(define-private (is-owner)
+  (is-eq tx-sender (var-get contract-owner)))
+
+(define-public (set-facade-address (address principal))
+  (begin
+    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (var-set facade-address address)
+    (ok true)))
+
 (define-public (register-institution
         (institution principal)
         (tier (string-ascii 20))
@@ -25,11 +38,11 @@
     )
     (begin
         ;; Authorization check: Must be Enterprise Facade or Admin (via Access)
-        (asserts! 
-            (or 
-                (is-eq contract-caller .enterprise-facade)
+        (asserts!
+            (or
+                (is-eq contract-caller (var-get facade-address))
                 (unwrap-panic (contract-call? .conxian-access has-role tx-sender u1))
-            ) 
+            )
             ERR_UNAUTHORIZED
         )
         (map-set institutional-accounts institution {
@@ -59,11 +72,11 @@
 ;; @desc Updates the limit for an institution
 (define-public (set-limit (institution principal) (new-limit uint))
     (begin
-        (asserts! 
-            (or 
-                (is-eq contract-caller .enterprise-facade)
+        (asserts!
+            (or
+                (is-eq contract-caller (var-get facade-address))
                 (unwrap-panic (contract-call? .conxian-access has-role tx-sender u1))
-            ) 
+            )
             ERR_UNAUTHORIZED
         )
         (match (map-get? institutional-accounts institution)

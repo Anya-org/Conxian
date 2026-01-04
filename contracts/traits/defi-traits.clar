@@ -7,13 +7,6 @@
     )
 )
 
-(define-trait oracle-trait
-    (
-        (get-price (principal) (response uint uint))
-        (fetch-price (principal) (response uint uint))
-    )
-)
-
 (define-trait fee-receiver-trait
     (
         (receive-fee (uint principal) (response bool uint))

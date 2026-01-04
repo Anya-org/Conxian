@@ -148,7 +148,7 @@
     
     ;; Process all positions in single transaction
     (fold
-      lambda (pos-coll-debt result)
+      (lambda (pos-coll-debt result)
         (let ((pos (get 0 pos-coll-debt))
               (coll (get 1 pos-coll-debt))
               (debt (get 2 pos-coll-debt)))
@@ -156,9 +156,7 @@
             success
             (update-position-health pos coll debt)
             error error
-          )
-        )
-      )
+          )))
       (ok true)
       (zip positions collateral-values debt-values)
     )
