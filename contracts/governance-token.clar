@@ -91,8 +91,27 @@
       (map-set token-balances { account: recipient } { amount: (+ recipient-balance amount) })
 
       ;; Update voting power
-      (unwrap-panic (update-voting-power sender))
-      (unwrap-panic (update-voting-power recipient))
+      (match (update-voting-power sender)
+        success
+        success
+        error (begin
+          (print {
+            error: "Failed to update sender voting power",
+            sender: sender,
+          })
+          error
+        )
+      )(match (update-voting-power recipient)
+        success
+        success
+        error (begin
+          (print {
+            error: "Failed to update recipient voting power",
+            recipient: recipient,
+          })
+          error
+        )
+      )
 
       (print {
         event: "transfer",
@@ -173,8 +192,27 @@
     )
 
     ;; Update voting power
-    (unwrap-panic (update-voting-power tx-sender))
-    (unwrap-panic (update-voting-power delegate))
+    (match (update-voting-power tx-sender)
+      success
+      success
+      error (begin
+        (print {
+          error: "Failed to update delegator voting power",
+          delegator: tx-sender,
+        })
+        error
+      )
+    )(match (update-voting-power delegate)
+      success
+      success
+      error (begin
+        (print {
+          error: "Failed to update delegate voting power",
+          delegate: delegate,
+        })
+        error
+      )
+    )
     (ok true)
   )
 )
@@ -235,8 +273,27 @@
       )
     )
 
-    (unwrap-panic (update-voting-power tx-sender))
-    (unwrap-panic (update-voting-power delegate))
+    (match (update-voting-power tx-sender)
+      success
+      success
+      error (begin
+        (print {
+          error: "Failed to update delegator voting power",
+          delegator: tx-sender,
+        })
+        error
+      )
+    )(match (update-voting-power delegate)
+      success
+      success
+      error (begin
+        (print {
+          error: "Failed to update delegate voting power",
+          delegate: delegate,
+        })
+        error
+      )
+    )
     (ok true)
   )
 )
@@ -284,7 +341,17 @@
     (asserts! (is-eq tx-sender (var-get minter-contract)) ERR_UNAUTHORIZED)
     (var-set token-supply (+ (var-get token-supply) amount))
     (map-set token-balances { account: recipient } { amount: (+ (unwrap! (get-balance recipient) ERR_UNAUTHORIZED) amount) })
-    (unwrap-panic (update-voting-power recipient))
+    (match (update-voting-power recipient)
+      success
+      success
+      error (begin
+        (print {
+          error: "Failed to update recipient voting power after mint",
+          recipient: recipient,
+        })
+        error
+      )
+    )
     (print {
       event: "mint",
       recipient: recipient,
@@ -304,7 +371,17 @@
       (asserts! (>= owner-balance amount) ERR_INSUFFICIENT_FUNDS)
       (var-set token-supply (- (var-get token-supply) amount))
       (map-set token-balances { account: owner } { amount: (- owner-balance amount) })
-      (unwrap-panic (update-voting-power owner))
+      (match (update-voting-power owner)
+        success
+        success
+        error (begin
+          (print {
+            error: "Failed to update owner voting power after burn",
+            owner: owner,
+          })
+          error
+        )
+      )
       (print {
         event: "burn",
         owner: owner,
