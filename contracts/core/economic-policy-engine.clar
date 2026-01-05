@@ -192,7 +192,6 @@
       (zip assets prices confidences)
     )
   )
-)
 
 ;; System Health Monitoring
 (define-read-only (get-system-health)

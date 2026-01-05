@@ -19,6 +19,15 @@
     }
 )
 
+(define-map identity-status
+    principal
+    {
+        status-flags: uint,
+        last-updated: uint,
+        updated-by: principal,
+    }
+)
+
 ;; @desc Sets the KYC tier for a user
 (define-public (set-kyc-tier (user principal) (tier uint) (expiry uint))
     (begin
@@ -48,8 +57,9 @@
 
 ;; @desc Checks if a user has a minimum KYC tier
 (define-read-only (has-min-tier (user principal) (min-tier uint))
-    (let ((current-tier (unwrap-panic (get-kyc-tier user))))
-        (ok (>= current-tier min-tier))
+    (match (get-kyc-tier user)
+        current-tier (ok (>= current-tier min-tier))
+        error (ok false) ;; Default to false if error
     )
 )
 

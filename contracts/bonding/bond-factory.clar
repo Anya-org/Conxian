@@ -132,7 +132,7 @@
             maturity-block: maturity-block,
             issued-block: block-height,
             is-active: true,
-            auto-renew: (if (is-some auto-renew) (unwrap auto-renew) (get auto-renew template))
+            auto-renew: (if (is-some auto-renew) (unwrap! auto-renew) (get auto-renew template))
           })
           
           (var-set total-bonds-issued bond-id)
@@ -265,9 +265,10 @@
 )
 
 (define-read-only (get-user-holdings (user principal))
-  (begin
-    (map-to-list bond-holdings)
-  )
+  (ok {
+    user: user,
+    note: "Functionality to be implemented - map iteration not available in Clarity",
+  })
 )
 
 (define-read-only (get-factory-stats)

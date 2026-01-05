@@ -15,7 +15,7 @@
 (define-constant ERR_NON_COMPLIANT (err u2001))
 
 ;; Data Vars
-(define-data-var voting-delay uint u144) ;; ~1 day (144 blocks @ 10m, but 5s -> 17280)
+(define-data-var voting-delay u17280) ;; 1 day in Nakamoto blocks (5s blocks)
 (define-data-var voting-period uint u51840) ;; ~3 days
 
 ;; Data Maps

@@ -5,7 +5,7 @@
 ;; Trait imports
 (use-trait rbac-trait .core-traits.rbac-trait)
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
-(use-trait oracle-trait .oracle.oracle-trait)
+(use-trait oracle-trait .defi-traits.oracle-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u9300))

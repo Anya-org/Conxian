@@ -163,7 +163,6 @@
       (zip positions collateral-values debt-values)
     )
   )
-)
 
 ;; Configuration Functions
 (define-public (set-asset-collateral-factor

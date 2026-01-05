@@ -3,7 +3,7 @@
 ;; Manages sustainable, epoch-based token emission with automated decay.
 ;; Tier 0: Automated Value Distribution
 
-(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))

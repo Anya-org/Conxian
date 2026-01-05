@@ -102,6 +102,10 @@
     (ok (var-get contract-owner))
 )
 
+(define-read-only (get-contract-owner)
+    (ok (var-get contract-owner))
+)
+
 (define-read-only (get-admin)
     (var-get contract-owner)
 )
