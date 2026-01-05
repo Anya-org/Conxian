@@ -2,7 +2,11 @@
 
 ## Overview
 
-Conxian provides institutional-grade compliance and security infrastructure designed to meet the stringent requirements of regulated financial institutions, professional trading firms, and enterprise users. This document outlines our comprehensive compliance framework, security measures, and regulatory certifications.
+Conxian provides institutional-grade security infrastructure and a
+policy-integration surface intended to support institutional control frameworks
+(Status: Prototype/Planned).
+This document describes target controls and mappings;
+it is not a statement of regulatory compliance or certification.
 
 > **Maturity & Availability (as of 2025-12-06)**
 >
@@ -10,14 +14,14 @@ Conxian provides institutional-grade compliance and security infrastructure desi
 > - The controls, processes, and certifications described here represent the **target compliance and security design** for future institutional deployments.
 > - For an up-to-date view of which services are live, in pilot, or planned, see `documentation/SERVICE_CATALOG.md` and `documentation/ENTERPRISE_BUY_OVERVIEW.md`.
 
-## Regulatory Compliance Framework
+## Policy & Control Framework (Status: Planned)
 
-### FATF Compliance (Anti-Money Laundering)
+### FATF-aligned AML control mapping (Status: Planned)
 
 #### Travel Rule Implementation
 
 - **Transaction Monitoring**: All transactions ≥ €15,000 automatically flagged
-- **VASPs Registry**: Integrated with FATF-compliant VASP identification systems
+- **VASPs Registry**: Integrated with VASP identification systems (FATF-aligned)
 - **Information Sharing**: Secure P2P data exchange with counterparties
 - **Record Keeping**: 5-year retention of all transaction records
 
@@ -44,7 +48,7 @@ const transaction = {
 const complianceResult = await checkAMLCompliance(transaction);
 ```
 
-### OFAC Sanctions Compliance
+### Sanctions screening integration (Status: Planned)
 
 #### Sanctions Screening
 
@@ -56,7 +60,7 @@ const complianceResult = await checkAMLCompliance(transaction);
 #### Screening Implementation
 
 ```typescript
-// OFAC sanctions screening
+// Sanctions screening
 const screening = await screenAddress(walletAddress);
 
 if (screening.status === 'blocked') {
@@ -72,7 +76,7 @@ if (transaction.amount > 10000) {
 }
 ```
 
-### GDPR Compliance (Data Protection)
+### Privacy and data handling controls (GDPR-aligned) (Status: Planned)
 
 #### Data Processing Principles
 
@@ -82,7 +86,7 @@ if (transaction.amount > 10000) {
 - **Accuracy**: Data kept up-to-date and accurate
 - **Storage Limitation**: Data retained only as long as necessary
 - **Integrity & Confidentiality**: Data protected against unauthorized access
-- **Accountability**: Demonstrable compliance with principles
+- **Accountability**: Demonstrable adherence to principles
 
 #### Data Subject Rights
 
@@ -95,7 +99,7 @@ if (transaction.amount > 10000) {
 #### GDPR Implementation
 
 ```typescript
-// GDPR-compliant data handling
+// GDPR-aligned data handling
 const userData = {
   walletAddress: 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7',
   kycStatus: 'verified',
@@ -119,7 +123,7 @@ app.post('/api/gdpr/export', async (req, res) => {
 });
 ```
 
-### SOC 2 Type II Compliance
+### Operational control framework mapping (SOC 2 categories) (Status: Planned)
 
 #### Security Criteria
 
@@ -127,7 +131,7 @@ app.post('/api/gdpr/export', async (req, res) => {
 - **Change Management**: Formal change approval processes
 - **Risk Mitigation**: Regular risk assessments and controls
 - **Logical Access**: Secure authentication and authorization
-- **System Operations**: 24/7 monitoring and incident response
+- **System Operations**: Target 24/7 monitoring and incident response (Status: Planned)
 
 #### Availability Criteria
 
@@ -148,7 +152,7 @@ app.post('/api/gdpr/export', async (req, res) => {
 - **Access Logging**: Comprehensive audit trails for data access
 - **Data Classification**: Proper classification and handling procedures
 
-### MiCA Compliance (EU Markets in Crypto-Assets)
+### MiCA-aligned governance and disclosure considerations (Status: Planned)
 
 #### Crypto-Asset Service Provider Requirements
 
@@ -161,7 +165,8 @@ app.post('/api/gdpr/export', async (req, res) => {
 
 - **Accurate Information**: All information in white papers must be accurate
 - **Warning Notices**: Prominent risk warnings for crypto investments
-- **Marketing Communications**: Compliant marketing and advertising
+- **Marketing Communications**: Marketing and advertising controls aligned to 
+                                MiCA requirements
 
 #### Consumer Protection
 
@@ -244,9 +249,9 @@ const vulnerability = {
 };
 ```
 
-## Enterprise Access Controls
+## Enterprise Access Controls (Status: Planned)
 
-### Account Tiers
+### Account Tiers (Status: Planned)
 
 #### Standard Institutional
 
@@ -333,9 +338,10 @@ const multiSigTransaction = {
 - **Business Continuity Planning**: Comprehensive disaster recovery
 - **Vendor Risk Management**: Third-party risk assessments
 - **Insurance Coverage**: Cyber insurance and operational insurance
-- **Regulatory Reporting**: Automated regulatory filings
+- **Regulatory reporting**: Report generation primitives and workflow 
+                            integrations (Status: Planned)
 
-## Certification Status
+## Assurance and certification roadmap (Status: Planned)
 
 ### Current Certifications
 
@@ -356,7 +362,7 @@ Enterprise clients receive access to:
 
 - Real-time audit dashboard
 - Historical audit reports
-- Compliance status updates
+- Control mapping status updates
 - Incident reports and remediation plans
 
 ## Enterprise Support
@@ -382,4 +388,9 @@ Enterprise clients receive access to:
 - **Emergency Communications**: Multiple channels for critical updates
 - **Regulatory Updates**: Proactive communication of regulatory changes
 
-This comprehensive compliance and security framework ensures that Conxian meets the highest standards required by regulated financial institutions while maintaining the flexibility and innovation of decentralized finance.
+- **Security Advisories**: Target immediate notification of security updates (Status: Planned; subject to contract)
+- **Maintenance Windows**: Target 48 hours notice for scheduled maintenance windows (Status: Planned; subject to contract)
+- **Emergency Communications**: Target multiple channels for critical updates (Status: Planned; subject to contract)
+- **Regulatory Updates**: Target proactive communication of regulatory changes (Status: Planned; subject to contract)
+
+This security and policy-control roadmap is intended to support institutional deployments when paired with an institution's compliance program, third-party assessments, and ongoing operational governance (Status: Planned).

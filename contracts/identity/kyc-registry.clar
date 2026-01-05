@@ -52,3 +52,10 @@
         (ok (>= current-tier min-tier))
     )
 )
+
+(define-read-only (is-sanctioned (subject principal))
+  (match (map-get? identity-status subject)
+    data (is-eq (mod (/ (get status-flags data) u2) u2) u1)
+    false
+  )
+)

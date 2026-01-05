@@ -356,9 +356,9 @@ Stay informed about all your activity with a dedicated transaction history.
 
 **Response Times:**
 
-- Community help: Usually within 1 hour
-- Official support: Within 24 hours
-- Urgent security: Within 2 hours
+- Community help: Best-effort; response times vary
+- Official support: Best-effort; response times vary
+- Urgent security: Best-effort escalation; response times vary
 
 ## Success Strategies
 
@@ -598,7 +598,7 @@ A: Blockchain transactions need to be verified by the network, which takes time.
 A: Decentralized Finance - financial services without banks, running on blockchain.
 
 **Q: How is DeFi different from traditional finance?**
-A: No intermediaries, operates 24/7, global access, and you control your assets.
+A: No intermediaries, operates continuously, global access, and you control your assets.
 
 **Q: What makes Conxian special?**
 A: Multi-dimensional approach, Bitcoin security, user-friendly design, and strong community.
@@ -961,7 +961,7 @@ Conxian works great on mobile! Here's everything you need to know for the best m
 
 - Mobile support: 24/7 via chat
 - Phone support: Business hours
-- Emergency: Always available
+- Emergency: Best-effort escalation (availability may vary)
 
 ### Mobile Resources
 

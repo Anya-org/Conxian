@@ -4,7 +4,7 @@
 
 ## Overview
 
-Conxian is a sophisticated, multi-dimensional DeFi protocol on Stacks, designed to provide a unified, secure, and efficient ecosystem for advanced financial operations. It has been architected from the ground up to be modular, decentralized, and compliant with the latest Stacks (Nakamoto) standards.
+Conxian is a sophisticated, multi-dimensional DeFi protocol on Stacks, designed to provide a unified, secure, and efficient ecosystem for advanced financial operations. It has been architected from the ground up to be modular, decentralized, and compatible with the latest Stacks (Nakamoto) standards.
 
 The protocol aggregates yield from multiple sources (Lending, DEX, Stacking), provides institutional-grade features for asset management, and is hardened against common security threats like MEV exploitation.
 
