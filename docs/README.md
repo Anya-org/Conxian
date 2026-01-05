@@ -52,6 +52,9 @@ For system operators and maintainers
 - [Whitepaper](../whitepaper.md) - Technical whitepaper
 - [ROADMAP](../ROADMAP.md) - Development roadmap
 - [CHANGELOG](../CHANGELOG.md) - Version history
+- [CONTRIBUTING](../CONTRIBUTING.md) - Contribution guidelines
+- [LICENSE](../LICENSE) - MIT License
+- [Business Classification Analysis](../BUSINESS_CLASSIFICATION_ANALYSIS.md) - Business model and SAB classification
 
 ---
 

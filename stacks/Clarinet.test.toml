@@ -497,7 +497,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = ["enterprise-traits", "institutional-account-manager"]
 
 [contracts.advanced-order-manager]
-path = "/app/contracts/enterprise/advanced-order-manager.clar"
+path = "contracts/enterprise/advanced-order-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = ["enterprise-traits"]
 

@@ -194,6 +194,65 @@ This runbook maps key on-chain contracts, events, and admin controls to operatio
   - Maintain an off-chain log of proposal IDs, parameters, and outcomes.
   - For parameter-change proposals (fees, risk, circuit policies): link proposal IDs to change tickets.
 
+### 4.2 LEGEX (Legal Exchange) Routing
+
+- **Purpose**
+  - Centralizes every on-chain legal action that requires off-chain review (licensing, regulatory filings, commercial agreements).
+  - Acts as the DAO’s single source of truth for legal workflows, ensuring alignment with the Business Source License 1.1 (BUSL-1.1) policy and any subsequent MIT conversion.
+- **Process Overview**
+  1. **Trigger**: Any governance proposal, protocol upgrade, or enterprise request referencing licensing, trademarks, patents, or off-chain contracts must specify `requires-legex = true`.
+  2. **Capture**: The proposal engine writes a LEGEX event (`legex-routing-request`) containing:
+     - Proposal ID or change ticket
+     - Scope (e.g., licensing update, enterprise contract, regulatory notice)
+     - Required deliverables (legal opinion, off-chain filing, trademark action, etc.)
+  3. **Queue**: LEGEX events feed into the operations dashboard where the legal workstream triages requests and assigns them to the internal LEGEX coordinator.
+  4. **Off-Chain Execution**: The LEGEX coordinator triggers the appropriate off-chain system (e.g., legal document management, external counsel portal) and tracks deliverables.
+  5. **Return Proof**: When legal work is complete, the coordinator posts a notarized hash or signature to the `legex-registry` contract, binding the off-chain document to its on-chain reference.
+  6. **Finalize**: Governance proposals requiring LEGEX approval cannot execute until the associated LEGEX hash is recorded and `legex-registry::verify` returns `(ok true)`.
+- **Key Requirements**
+  - **BUSL-1.1 Alignment**: Any request touching code distribution must reference the current BUSL-1.1 parameters (change date 2029-01-01, change license MIT) and state whether the action influences the post-change licensing plan.
+  - **Data Structure**: Store LEGEX metadata in `legex-registry.clar` (planned) with fields for `proposal-id`, `document-hash`, `document-type`, `status`, and `timestamp`.
+  - **Audit Trail**: Maintain an immutable sequence of LEGEX events (on-chain `print` logs and off-chain ticket IDs) to satisfy audit/compliance requirements.
+  - **Emergency Overrides**: During incidents, the Operations & Resilience Council may fast-track LEGEX requests by emitting an emergency LEGEX event that requires post-incident ratification.
+  - **DAO Notifications**: Once a LEGEX item is completed, publish a governance forum summary linking the document hash, proposal ID, and any follow-up actions.
+
+### 4.3 Expense System Matrix (CapEx / OpEx / RegEx / LegEx / DevEx / InvEx)
+
+- **Core Principle**: Every expenditure path must flow through an auditable on-chain registry before any tokens leave treasury vaults. Each “Ex” has its own registry contract plus a shared reporting trait consumed by the Operations Engine.
+- **Shared Components**
+  - `expense-registry-trait` – defines `register-expense`, `approve-expense`, `stream-expense`, `get-expense-metrics`.
+  - `expense-router.clar` – canonical dispatcher that enforces budgeting guardrails and emits `expense-routed` events for downstream analytics.
+  - `ops-expense-dashboard` – off-chain dashboard that subscribes to registry events, rendering KPIs for councils.
+- **Expense Categories**
+  1. **CapEx (Capital Expenditures)**  
+     - Registry: `capex-registry.clar`  
+     - Scope: Large, infrequent deployments (infrastructure, new protocol modules).  
+     - Controls: Multi-sig approval (`>= 2` councils) plus LEGEX hash before funds unlock.
+  2. **OpEx (Operational Expenditures)**  
+     - Registry: `opex-registry.clar`  
+     - Scope: Recurring spend (Guardian rewards, hosting, monitoring).  
+     - Controls: Budget ceilings enforced per epoch; auto-stream via `expense-router`.
+  3. **RegEx (Regulatory Expenditures)**  
+     - Registry: `regex-registry.clar`  
+     - Scope: Compliance filings, audits, counsel retainers.  
+     - Controls: Requires linkage to LEGEX request IDs and `regulatory-adapter` attestations.
+  4. **LegEx (Legal Exchange)**  
+     - Registry: `legex-registry.clar` (described above).  
+     - Scope: Licensing, IP protection, trademark/patent costs.  
+     - Controls: No disbursement until LEGEX coordinator posts notarized proof hash.
+  5. **DevEx (Developer Experience / R&D)**  
+     - Registry: `devex-registry.clar`  
+     - Scope: Grants, hackathons, SDK/tooling budgets.  
+     - Controls: Milestone-based releases; requires `dev-rel council` approval plus post-milestone proof.
+  6. **InvEx (Investment / Treasury Allocations)**  
+     - Registry: `invex-registry.clar`  
+     - Scope: Strategic investments, liquidity provisioning, venture partnerships.  
+     - Controls: Uses a risk scoring model; proposals must include stress-test outputs before approval.
+- **KPIs & Reporting**
+  - Every registry publishes monthly metrics (`get-expense-metrics`) consumed by the Operations Engine and mirrored in `ops-monthly-report.md`.
+  - Threshold alerts: If any category exceeds its quarterly allocation, `expense-router` emits `expense-threshold-breached` and automatically queues a governance review.
+  - Data retention: All registries store immutable event hashes, enabling auditors to reconcile on-chain flows with off-chain LEGEX/RegEx artifacts.
+
 ---
 
 ## 5. Incident Response Checklist

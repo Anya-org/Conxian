@@ -43,10 +43,9 @@ Truth" for all documentation.
 
 ### Actions Taken
 
-* **Consolidated Architecture**: Merged `SYSTEM_ARCHITECTURE.md` and `architecture/ARCHITECTURE.md` into
-  **`documentation/architecture/OVERVIEW.md`**.
-* **Unified Roadmap**: Consolidated multiple roadmap files into **`documentation/ROADMAP.md`**.
-* **Streamlined Structure**: Organized `documentation/` into clear categories (`guides/`, `reference/`, `reports/`).
+* **Consolidated Architecture**: Merged architecture documentation into [Developer Architecture](../developer/architecture.md).
+* **Unified Roadmap**: Consolidated multiple roadmap files into [ROADMAP.md](../../ROADMAP.md).
+* **Streamlined Structure**: Organized documentation into clear categories (user/, developer/, enterprise/, operations/).
 
 ### Result
 

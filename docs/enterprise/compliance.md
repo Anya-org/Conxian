@@ -12,7 +12,7 @@ it is not a statement of regulatory compliance or certification.
 >
 > - The underlying Conxian Protocol is currently in a **stabilization & alignment phase on testnet** and is **not yet production-ready for mainnet**.
 > - The controls, processes, and certifications described here represent the **target compliance and security design** for future institutional deployments.
-> - For an up-to-date view of which services are live, in pilot, or planned, see `documentation/SERVICE_CATALOG.md` and `documentation/ENTERPRISE_BUY_OVERVIEW.md`.
+> - For an up-to-date view of which services are live, in pilot, or planned, see [Enterprise Integration](./integration.md) and [Enterprise Onboarding](./onboarding.md).
 
 ## Policy & Control Framework (Status: Planned)
 

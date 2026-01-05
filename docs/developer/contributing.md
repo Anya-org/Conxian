@@ -8,7 +8,7 @@ Canonical layout
 - Canonical contracts: `contracts/`
 - Deployment plans: `deployments/`
 - Tests: `tests/` (Vitest, Clarinet SDK)
-- Documentation: `documentation/`
+- Documentation: `docs/`
 
 Testing and manifests
 
@@ -42,4 +42,4 @@ Policy checks
 
 Questions
 
-- See `README.md` Quick Start and `documentation/architecture/ARCHITECTURE.md` for architecture and requirements.
+- See `README.md` Quick Start and [Architecture Overview](./architecture.md) for architecture and requirements.

@@ -16,15 +16,15 @@ This document is for institutional buyers, procurement teams, risk/compliance of
 
 For a detailed technical view, see:
 
-- `README.md` and `documentation/architecture/ARCHITECTURE.md` (system architecture).
-- `documentation/guides/REGULATORY_ALIGNMENT.md` (mapping to regulatory-style objectives).
-- `documentation/guides/OPERATIONS_RUNBOOK.md` (incident procedures and operational controls).
-- `documentation/guides/SERVICE_CATALOG.md` (service inventory and maturity levels).
-- `documentation/guides/API_OVERVIEW.md` (API surfaces and planned REST services).
+- `README.md` and [Architecture Overview](../developer/architecture.md) (system architecture).
+- [Compliance Documentation](./compliance.md) (mapping to regulatory-style objectives).
+- [Operations Documentation](../operations/maintenance.md) (incident procedures and operational controls).
+- [Enterprise Services](./onboarding.md) (service inventory and maturity levels).
+- [Developer API Reference](../developer/architecture.md) (API surfaces and planned REST services).
 
 ## 2. Services & Scope
 
-High-level service categories (see `SERVICE_CATALOG.md` for details):
+High-level service categories (see [Enterprise Onboarding](./onboarding.md) for details):
 
 - **Conxian DeFi Protocol (On-Chain)** – smart contracts providing trading, lending, derivatives, governance, and risk primitives.
 - **Conxian Portal (Web UI)** – reference interface for interacting with the protocol on testnet.
@@ -34,7 +34,7 @@ High-level service categories (see `SERVICE_CATALOG.md` for details):
 
 ## 3. Security & Policy/Assurance Posture
 
-See `documentation/enterprise/COMPLIANCE_SECURITY.md` for full details. Key points:
+See [Enterprise Security](./security.md) for full details. Key points:
 
 - **Frameworks referenced**: FATF, OFAC, GDPR, SOC 2, ISO 27001, MiCA-style requirements.
 - **Assurance & certification roadmap (targets)**:

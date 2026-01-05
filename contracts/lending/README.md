@@ -2,8 +2,21 @@
 
 ## Overview
 
-This directory is a placeholder for the future Conxian Protocol Lending Module. The architectural and functional details for this system have been designed but are not yet implemented.
+This directory contains the future Conxian Protocol Lending Module contracts. Currently, only stub implementations are available.
 
 ## Status
 
-**Placeholder - Not Implemented**: The contracts in this module are currently empty stubs. They do not contain any functional logic and are not ready for integration, review, or production use. The detailed documentation previously in this file described the target design, not the current implementation.
+**Stub Implementation - Not Production Ready**: The contracts in this module are minimal stubs with basic error handling. They do not contain functional lending logic and are not ready for integration or production use.
+
+## Current Files
+
+- `comprehensive-lending-system.clar` - Basic stub with error constants
+- `interest-rate-model.clar` - Stub implementation
+- `lending-manager-trait.clar` - Trait definition stub
+- `lending-manager.clar` - Manager stub
+- `lending-position-nft.clar` - NFT position stub
+- `liquidation-manager.clar` - Liquidation stub
+
+## Next Steps
+
+Full lending system implementation is planned for Phase 2 of the roadmap. See [ROADMAP.md](../../ROADMAP.md) for timeline details.

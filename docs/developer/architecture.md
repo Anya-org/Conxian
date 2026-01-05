@@ -16,7 +16,7 @@ This guide provides everything you need to develop, test, and deploy Conxian sma
 
 ```bash
 # Clone repository
-git clone https://github.com/Anya-org/Conxian.git
+git clone https://github.com/Conxian/Conxian.git
 cd Conxian
 
 # Install dependencies
@@ -45,7 +45,6 @@ Conxian/
 │   ├── tokens/
 │   └── traits/
 ├── tests/
-├── documentation/
 ├── deployments/
 ├── Clarinet.toml
 ├── package.json
@@ -278,7 +277,7 @@ describe('Vault Contract Tests', () => {
 
 ### Getting Help
 
-- **Documentation**: Check `/documentation/` directory
+- **Documentation**: Check `docs/` directory
 - **GitHub Issues**: [Report bugs or request features](https://github.com/Anya-org/Conxian/issues)
 - **Code Examples**: See `tests/` for comprehensive examples
 

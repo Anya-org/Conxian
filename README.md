@@ -32,7 +32,7 @@ and provides a clear, logical map of the protocol's operations.
 
 > **For a complete technical breakdown of the architecture, including diagrams
 > and control flow examples, see our
-> [Architecture Overview](./documentation/architecture/OVERVIEW.md).**
+> [Architecture Overview](./docs/developer/architecture.md).**
 
 ## Core Modules
 
@@ -48,12 +48,18 @@ The protocol's functionality is organized into the following key modules:
 - [Security Module](./contracts/security/README.md)
 - [Monitoring Module](./contracts/monitoring/README.md)
 
+## License
+
+Conxian Protocol core contracts and tooling are distributed under the **Business Source License 1.1 (BUSL‑1.1)** with a change date of **2029‑01‑01**, after which the code reverts to the MIT License. See [LICENSE](./LICENSE) for the full terms.
+
 ## Documentation
 
 - **[Documentation Hub](./docs/)** - Complete documentation organized by user type
 - **[Whitepaper](./whitepaper.md)** - Technical whitepaper
 - **[ROADMAP](./ROADMAP.md)** - Development roadmap
 - **[CHANGELOG](./CHANGELOG.md)** - Version history
+- **[CONTRIBUTING](./CONTRIBUTING.md)** - Contribution guidelines
+- **[LICENSE](./LICENSE)** - Business Source License 1.1 (change date 2029‑01‑01)
 
 ## Development Setup
 

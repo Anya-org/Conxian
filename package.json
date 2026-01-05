@@ -40,13 +40,23 @@
     "@stacks/transactions": "^7.3.1",
     "@types/elliptic": "^6.4.18",
     "@types/node": "^24.5.2",
-    "@vitest/coverage-v8": "^2.0.4",
+    "@vitest/coverage-v8": "^4.0.16",
     "artillery": "^2.0.26",
     "chokidar-cli": "3.0.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.7.1",
     "typescript": "^5.4.5",
-    "vitest": "^2.0.4"
+    "vite": "^6.0.0",
+    "vitest": "^4.0.16"
   },
-  "private": true
+  "private": true,
+  "license": "BUSL-1.1",
+  "licenses": [
+    {
+      "type": "BUSL-1.1",
+      "url": "https://github.com/Anya-org/Conxian/blob/main/LICENSE",
+      "changeDate": "2029-01-01",
+      "changeLicense": "MIT"
+    }
+  ]
 }

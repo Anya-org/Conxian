@@ -132,7 +132,7 @@
             maturity-block: maturity-block,
             issued-block: block-height,
             is-active: true,
-            auto-renew: (if (is-some auto-renew) (unwrap! auto-renew) (get auto-renew template))
+            auto-renew: auto-renew
           })
           
           (var-set total-bonds-issued bond-id)
@@ -280,7 +280,7 @@
 )
 
 (define-read-only (is-authorized (caller principal))
-  (ok (is-eq caller (var-get factory-admin)))
+  (is-eq caller (var-get factory-admin))
 )
 
 ;; Initialize templates on deployment

@@ -287,9 +287,9 @@ production-ready**.
   across lending, risk, liquidation, DEX, vault, yield, automation, and sBTC
   vault modules, including the use of mocks for liquidation and routing
   behavior.
-- **Enterprise Documentation Set**: Publication of SERVICE_CATALOG,
-  ENTERPRISE_BUYER_OVERVIEW, REGULATORY_ALIGNMENT, OPERATIONS_RUNBOOK, and
-  BUSINESS_VALUE_ROI to describe target institutional services and ROI while
+- **Enterprise Documentation Set**: Publication of [Enterprise Integration](./docs/enterprise/integration.md),
+  [Enterprise Compliance](./docs/enterprise/compliance.md), [Enterprise Security](./docs/enterprise/security.md),
+  and [Business Classification Analysis](./BUSINESS_CLASSIFICATION_ANALYSIS.md) to describe target institutional services and ROI while
   clearly marking the protocol as testnet-only.
 
 ### Future Work (Phase 2 & 3)
