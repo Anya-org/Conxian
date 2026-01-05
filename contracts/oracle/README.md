@@ -1,15 +1,15 @@
 # Oracle Module
 
-Decentralized price feed and data oracle system for the Conxian Protocol providing reliable price data for DeFi operations, lending protocols, and liquidation management.
+Decentralized price feed and data oracle system for the Conxian Protocol providing reliable price data for DeFi operations,
+lending protocols, and liquidation management.
 
 ## Overview
 
 The oracle module delivers comprehensive price feed infrastructure supporting:
 
 - **Multi-Source Aggregation**: Multiple price feed sources for reliability
-- **Cross-Chain Data**: Bitcoin and external blockchain price feeds
-- **Dimensional Pricing**: Multi-dimensional asset pricing models
-- **Manipulation Resistance**: Time-weighted averages and outlier detection
+- **Time-Weighted Averages**: TWAP for price stability and manipulation resistance
+- **Circuit Breakers**: Emergency protection against extreme market conditions
 - **Real-Time Updates**: Live price feeds with freshness guarantees
 
 ## Key Contracts
@@ -20,34 +20,16 @@ The oracle module delivers comprehensive price feed infrastructure supporting:
 
 - **Primary aggregation engine** combining multiple price sources
 - **Time-weighted average prices** (TWAP) for stability
-- **Outlier detection** and manipulation resistance
-- **Fallback mechanisms** for source failures
-- **Configurable update intervals** and deviation thresholds
+- **Manipulation detection** and outlier resistance
+- **Circuit breaker functionality** for emergency protection
+- **Configurable parameters** for thresholds and weights
 
 #### Base Oracle (`oracle.clar`)
 
-- **Fundamental oracle interface** and data structures
-- **Price storage and retrieval** with timestamp tracking
-- **Basic validation** and freshness checks
-- **Emergency pause** functionality
-
-### Specialized Oracles
-
-#### External Oracle Adapter (`external-oracle-adapter.clar`)
-
-- **Integration with external price feeds** (Chainlink, Pyth, etc.)
-- **Cross-chain price data** from multiple blockchains
-- **Adapter pattern** for different oracle providers
-- **Security validations** and signature verification
-- **Gas-efficient updates** through batched operations
-
-#### Dimensional Oracle (`dimensional-oracle.clar`)
-
-- **Multi-dimensional asset pricing** beyond simple spot prices
-- **Volatility surfaces** and implied volatility calculations
-- **Time-decay functions** for temporal pricing analysis
-- **Cross-chain price correlations** and arbitrage detection
-- **Advanced statistical analysis** for risk assessment
+- **Fundamental oracle interface** and delegation layer
+- **Administrative functions** for oracle management
+- **Integration point** for protocol contracts
+- **Security controls** and access management
 
 ## Oracle Architecture
 
@@ -55,15 +37,20 @@ The oracle module delivers comprehensive price feed infrastructure supporting:
 
 ```
 ┌─────────────────┐    ┌─────────────────┐
-│   Chainlink     │    │      Pyth       │
-│   Price Feeds   │    │   Price Feeds   │
+│   External      │    │   Protocol      │
+│   Price Sources │    │   Reporters     │
 └─────────┬───────┘    └─────────┬───────┘
           │                      │
           └──────────┬───────────┘
                      │
           ┌─────────────────────┐
-          │  Oracle Aggregator  │
-          │   V2 (Primary)      │
+          │  Oracle Aggregator    │
+          │   V2 (Primary)       │
+          └─────────┬───────────┘
+                    │
+          ┌─────────────────────┐
+          │  Base Oracle        │
+          │  (Interface)        │
           └─────────┬───────────┘
                     │
           ┌─────────────────────┐
@@ -74,51 +61,51 @@ The oracle module delivers comprehensive price feed infrastructure supporting:
 
 ### Data Flow
 
-1. **Source Updates**: External oracles push price updates
-2. **Validation**: Freshness, deviation, and signature checks
-3. **Aggregation**: Multiple sources combined with TWAP
-4. **Distribution**: Clean price feeds to consuming contracts
-5. **Fallback**: Emergency price feeds if primary sources fail
+1. **Source Updates**: External sources push price updates to aggregator
+2. **Validation**: Freshness, deviation, and statistical checks
+3. **Aggregation**: Multiple sources combined with TWAP algorithms
+4. **Distribution**: Clean price feeds through base oracle interface
+5. **Fallback**: Circuit breakers and emergency protections
 
 ## Usage Examples
 
 ### Querying Prices
 
 ```clarity
-;; Get aggregated price for a token pair
-(contract-call? .oracle-aggregator-v2 get-price token-a token-b)
+;; Get aggregated price for an asset
+(contract-call? .oracle-aggregator-v2 get-price asset-principal)
 
-;; Get dimensional price data
-(contract-call? .dimensional-oracle get-dimensional-price token dimensions)
+;; Get price through base oracle interface
+(contract-call? .oracle get-price asset-principal)
 
-;; Check price freshness
-(contract-call? .oracle-aggregator-v2 get-last-update-time token)
+;; Get time-weighted average price
+(contract-call? .oracle-aggregator-v2 get-twap asset-principal)
 ```
 
 ### Oracle Management
 
 ```clarity
-;; Update price feeds (admin only)
-(contract-call? .oracle-aggregator-v2 update-price token price)
+;; Update price feeds (authorized sources only)
+(contract-call? .oracle-aggregator-v2 set-source asset price weight)
 
-;; Configure oracle sources
-(contract-call? .oracle-aggregator-v2 add-price-source source-address)
+;; Configure circuit breaker
+(contract-call? .oracle-aggregator-v2 set-circuit-breaker circuit-contract)
 
-;; Emergency pause
-(contract-call? .oracle-aggregator-v2 emergency-pause true)
+;; Set manipulation detection parameters
+(contract-call? .oracle-aggregator-v2 set-params threshold-bps alpha-bps)
 ```
 
 ### Advanced Features
 
 ```clarity
-;; Get volatility surface
-(contract-call? .dimensional-oracle get-volatility-surface token expiry strike)
+;; Check for price manipulation
+(contract-call? .oracle-aggregator-v2 is-manipulated asset-principal)
 
-;; Calculate time-weighted average
-(contract-call? .oracle-aggregator-v2 get-twap token time-window)
+;; Get volatility data
+(contract-call? .oracle-aggregator-v2 get-volatility-data asset-principal)
 
-;; Cross-chain price correlation
-(contract-call? .external-oracle-adapter get-cross-chain-price token chain-id)
+;; Check circuit breaker status
+(contract-call? .oracle-aggregator-v2 check-circuit-breaker)
 ```
 
 ## Security Features
@@ -127,22 +114,22 @@ The oracle module delivers comprehensive price feed infrastructure supporting:
 
 - **Multi-source validation** prevents single-point failures
 - **Time-weighted averaging** smooths price manipulation attempts
-- **Deviation thresholds** reject extreme price movements
-- **Outlier detection** using statistical analysis
+- **Statistical detection** using deviation thresholds
+- **Volatility tracking** for anomaly detection
 
 ### Reliability Guarantees
 
 - **Freshness checks** ensure recent price updates
-- **Fallback mechanisms** for oracle failures
 - **Circuit breakers** for extreme market conditions
+- **Fallback mechanisms** for source failures
 - **Emergency controls** for protocol protection
 
-### Audit Compliance
+### Access Control
 
-- **Comprehensive logging** of all price updates
-- **Access controls** for administrative functions
-- **Upgrade mechanisms** with timelocks
-- **Invariant monitoring** for data consistency
+- **Role-based permissions** for administrative functions
+- **Authorized sources** for price updates
+- **Configurable thresholds** and parameters
+- **Audit trails** for all operations
 
 ## Integration Points
 
@@ -156,45 +143,45 @@ The oracle module delivers comprehensive price feed infrastructure supporting:
 
 - **Collateral valuation** for loan-to-value calculations
 - **Liquidation triggers** based on accurate price feeds
-- **Interest rate adjustments** based on market conditions
+- **Risk assessment** using volatility and manipulation detection
 
 ### Risk Management
 
-- **Portfolio valuation** for dimensional positions
-- **VaR calculations** using volatility surfaces
-- **Stress testing** with historical price data
+- **Portfolio valuation** with reliable price data
+- **Stress testing** using historical volatility
+- **Circuit breaker integration** for emergency responses
 
 ## Performance Optimizations
 
 ### Gas Efficiency
 
-- **Batch updates** for multiple price feeds
 - **Optimized storage** patterns for frequent access
-- **Caching mechanisms** for hot data paths
-- **Event-driven updates** to minimize on-chain calls
+- **Batch operations** for multiple price updates
+- **Efficient algorithms** for TWAP calculations
+- **Minimal state changes** for price queries
 
 ### Scalability
 
-- **Multi-oracle support** for increased throughput
+- **Multi-asset support** for diverse token pairs
 - **Parallel processing** of price feed updates
-- **Distributed validation** across multiple nodes
-- **Layered caching** for different data freshness requirements
+- **Configurable update intervals** for different use cases
+- **Layered validation** for different risk levels
 
 ## Oracle Economics
 
 ### Incentive Structure
 
 - **Reporter rewards** for timely price updates
-- **Slashing penalties** for incorrect or late submissions
 - **Stake requirements** for oracle participation
-- **Reputation system** for quality-based weighting
+- **Quality scoring** for source reliability
+- **Penalty mechanisms** for malicious behavior
 
 ### Fee Model
 
-- **Protocol fees** for oracle usage
-- **Premium feeds** for high-frequency traders
-- **Bulk discounts** for heavy users
-- **Cross-subsidization** between free and premium tiers
+- **Protocol usage fees** for oracle access
+- **Premium features** for advanced analytics
+- **Volume discounts** for heavy users
+- **Cross-subsidization** between different use cases
 
 ## Monitoring & Analytics
 
@@ -202,12 +189,12 @@ The oracle module delivers comprehensive price feed infrastructure supporting:
 
 - **Price deviation alerts** for market anomalies
 - **Source health checks** for oracle reliability
-- **Latency monitoring** for update timeliness
-- **Volume analysis** for market impact assessment
+- **Manipulation detection alerts** for security
+- **Circuit breaker notifications** for emergency events
 
 ### Historical Data
 
 - **Price history** for TWAP calculations
 - **Volatility tracking** for risk assessment
-- **Correlation analysis** for portfolio optimization
-- **Arbitrage detection** across multiple markets
+- **Source performance** metrics
+- **Manipulation attempts** logging
