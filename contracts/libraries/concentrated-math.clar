@@ -1,98 +1,132 @@
-;; @desc Math utilities for concentrated liquidity.
-;; This library provides functions for calculating square root prices from ticks and vice versa,
-;; as well as calculating liquidity amounts for given price ranges.
+;; concentrated-math.clar
+;; Conxian Standard: Q64.64 Fixed Point Math
+;; Essential for SqrtPriceX96 and Tick calculations
+;; Adheres to Decentralized Modularity and Bitcoin Ethos
 
-;; @uses .math-lib-advanced
+(define-constant Q96 u79228162514264337593543950336) ;; 2^96
+(define-constant ERR_OVERFLOW (err u3000))
+(define-constant ERR_DIV_ZERO (err u3001))
 
-;; @constants
-;; @var Q64: 2^64, used for fixed-point arithmetic.
-(define-constant Q64 u18446744073709551616)
-;; @var MAX_TICK: Corresponds to sqrt(2^128).
-(define-constant MAX_TICK 776363)
-;; @var MIN_TICK: The minimum tick value.
-(define-constant MIN_TICK (- MAX_TICK))
-;; @var TICK_BASE: 1.0001 in fixed-point with 4 decimals.
-(define-constant TICK_BASE u10000)
-;; @var MATH_CONTRACT: The contract for the math library.
-(define-constant MATH_CONTRACT .math-lib-advanced)
-
-;; @errors
-;; @var ERR_INVALID_TICK: The provided tick is invalid.
-(define-constant ERR_INVALID_TICK (err u2001))
-;; @var ERR_INVALID_SQRT_PRICE: The provided square root price is invalid.
-(define-constant ERR_INVALID_SQRT_PRICE (err u2002))
-;; @var ERR_MATH_OVERFLOW: A math overflow occurred.
-(define-constant ERR_MATH_OVERFLOW (err u2003))
-
-;; @desc Calculate the square root price from a tick using fixed-point arithmetic.
-;; @param tick: The tick to convert.
-;; @returns (response uint uint): The square root price, or an error code.
-(define-read-only (tick-to-sqrt-price (tick int))
-  (begin
-    (asserts! (and (>= tick MIN_TICK) (<= tick MAX_TICK)) ERR_INVALID_TICK)
-    (if (>= tick 0)
-      (let ((base-power (try! (contract-call? MATH_CONTRACT pow-fixed TICK_BASE (to-uint tick)))))
-        (contract-call? MATH_CONTRACT sqrt base-power))
-      (let ((base-power (try! (contract-call? MATH_CONTRACT pow-fixed TICK_BASE (to-uint (- tick))))))
-        (let ((sqrt-result (try! (contract-call? MATH_CONTRACT sqrt base-power))))
-          (ok (/ Q64 sqrt-result))))
+;; @desc Multiplies two numbers and divides by a third with full precision
+(define-read-only (mul-div (a uint) (b uint) (denominator uint))
+    (let ((prod-a-b (* a b)))
+        (if (is-eq denominator u0)
+            ERR_DIV_ZERO
+            (ok (/ prod-a-b denominator))
+        )
     )
-  )
 )
 
-;; @desc Calculate the tick from a square root price using fixed-point arithmetic.
-;; @param sqrt-price: The square root price to convert.
-;; @returns (response int uint): The tick, or an error code.
-(define-read-only (sqrt-price-to-tick (sqrt-price uint))
-  (begin
-    (asserts! (> sqrt-price u0) ERR_INVALID_SQRT_PRICE)
-    (let ((price-squared (try! (contract-call? MATH_CONTRACT multiply sqrt-price sqrt-price)))
-          (ratio (/ price-squared Q64))
-          (log-sqrt (try! (contract-call? MATH_CONTRACT log2 ratio)))
-          (log-tick-base (try! (contract-call? MATH_CONTRACT log2 TICK_BASE))))
-      (ok (to-int (/ (* log-sqrt Q64) log-tick-base)))
+;; @desc Iterative Square Root Implementation (Babylonian method)
+;; Clarity does not support recursion; using fold over a fixed range
+(define-read-only (sqrt (y uint))
+    (if (> y u3)
+        (let (
+                (z y)
+                (x (+ (/ y u2) u1))
+            )
+            ;; 16 iterations is usually enough for uint precision
+            (fold sqrt-iter-step
+                (list u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 u13 u14 u15 u16) {
+                y: y,
+                x: x,
+            })
+        )
+        (if (is-eq y u0)
+            {
+                y: y,
+                x: u0,
+            }
+            {
+                y: y,
+                x: u1,
+            }
+        )
     )
-  )
 )
 
-;; @desc Calculate the liquidity for given amounts and price ranges.
-;; @param sqrt-price-current: The current square root price.
-;; @param sqrt-price-lower: The lower bound of the price range.
-;; @param sqrt-price-upper: The upper bound of the price range.
-;; @param amount-x: The amount of token X.
-;; @param amount-y: The amount of token Y.
-;; @returns (response uint uint): The liquidity, or an error code.
-(define-read-only (get-liquidity-for-amounts 
-    (sqrt-price-current uint) 
-    (sqrt-price-lower uint) 
-    (sqrt-price-upper uint) 
-    (amount-x uint) 
-    (amount-y uint))
-  (begin
-    (asserts! (< sqrt-price-lower sqrt-price-upper) ERR_INVALID_SQRT_PRICE)
+(define-private (sqrt-iter-step
+        (unused uint)
+        (state {
+            y: uint,
+            x: uint,
+        })
+    )
     (let (
-      (liquidity-x (if (<= sqrt-price-current sqrt-price-lower)
-        u0
-        (/ (* amount-x sqrt-price-current) (- sqrt-price-current sqrt-price-lower))
-      ))
-      (liquidity-y (if (>= sqrt-price-current sqrt-price-upper)
-        u0
-        (/ amount-y (- sqrt-price-upper sqrt-price-current))
-      ))
+            (y (get y state))
+            (x (get x state))
+            (next-x (/ (+ x (/ y x)) u2))
+        )
+        (if (is-eq next-x x)
+            state
+            {
+                y: y,
+                x: next-x,
+            }
+        )
     )
-      (ok (if (< sqrt-price-current sqrt-price-upper)
-        (if (< liquidity-x liquidity-y) liquidity-x liquidity-y)
-        liquidity-x
-      ))
-    )
-  )
 )
 
-;; @desc Calculate the fee.
-;; @param liquidity: The liquidity.
-;; @param fee-rate: The fee rate.
-;; @param time-in-seconds: The time in seconds.
-;; @returns (response uint uint): The fee, or an error code.
-(define-read-only (calculate-fee (liquidity uint) (fee-rate uint) (time-in-seconds uint))
-  (ok (/ (* (* liquidity fee-rate) time-in-seconds) u1000000))
+;; @desc Wrapper to return just the sqrt value
+(define-read-only (get-sqrt (y uint))
+    (get x (sqrt y))
+)
+
+;; @desc Converts a price to a sqrt-price X96
+(define-read-only (get-sqrt-price-x96 (price uint))
+    (* (get-sqrt price) Q96)
+)
+
+(define-read-only (get-next-sqrt-price
+        (sqrt-price-current uint)
+        (liquidity uint)
+        (amount uint)
+        (add bool)
+    )
+    (if add
+        (+ sqrt-price-current (/ (* amount Q96) liquidity))
+        (- sqrt-price-current (/ (* amount Q96) liquidity))
+    )
+)
+
+;; @desc Calculates the amount of token0 for a price range
+(define-read-only (get-amount0-delta
+        (sqrt-ratio-a uint)
+        (sqrt-ratio-b uint)
+        (liquidity uint)
+    )
+    (let (
+            (sqrt-ratio-lower (if (< sqrt-ratio-a sqrt-ratio-b)
+                sqrt-ratio-a
+                sqrt-ratio-b
+            ))
+            (sqrt-ratio-upper (if (< sqrt-ratio-a sqrt-ratio-b)
+                sqrt-ratio-b
+                sqrt-ratio-a
+            ))
+        )
+        (/ (* liquidity (- sqrt-ratio-upper sqrt-ratio-lower) Q96)
+            (* sqrt-ratio-upper sqrt-ratio-lower)
+        )
+    )
+)
+
+;; @desc Calculates the amount of token1 for a price range
+(define-read-only (get-amount1-delta
+        (sqrt-ratio-a uint)
+        (sqrt-ratio-b uint)
+        (liquidity uint)
+    )
+    (let (
+            (sqrt-ratio-lower (if (< sqrt-ratio-a sqrt-ratio-b)
+                sqrt-ratio-a
+                sqrt-ratio-b
+            ))
+            (sqrt-ratio-upper (if (< sqrt-ratio-a sqrt-ratio-b)
+                sqrt-ratio-b
+                sqrt-ratio-a
+            ))
+        )
+        (/ (* liquidity (- sqrt-ratio-upper sqrt-ratio-lower)) Q96)
+    )
 )

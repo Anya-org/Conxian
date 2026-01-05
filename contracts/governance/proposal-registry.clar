@@ -1,203 +1,106 @@
-;; SPDX-License-Identifier: TBD
+;; proposal-registry.clar
+;; Registry for Conxian Governance Proposals
 
-;; Proposal Registry
-;; This contract stores and manages proposal data.
-(define-trait proposal-registry-trait (
-  (create-proposal
-    (principal (string-ascii 256) uint uint)
-    (response uint uint)
-  )
-  (update-votes
-    (uint uint uint)
-    (response bool uint)
-  )
-  (set-executed
-    (uint)
-    (response bool uint)
-  )
-  (set-canceled
-    (uint)
-    (response bool uint)
-  )
-  (get-proposal
-    (uint)
-    (
-      response
-      (optional {
-      proposer: principal,
-      start-block: uint,
-      end-block: uint,
-      for-votes: uint,
-      against-votes: uint,
-      executed: bool,
-      canceled: bool,
-      description: (string-ascii 256),
-    })
-      uint
-    )
-  )
-))
+(define-constant ERR_UNAUTHORIZED (err u4000))
+(define-constant ERR_NOT_FOUND (err u404))
+(define-constant ERR_ALREADY_VOTED (err u4001))
 
-;; --- Constants ---
-(define-constant ERR_UNAUTHORIZED u100)
-(define-constant ERR_PROPOSAL_NOT_FOUND u101)
-
-;; --- Data Storage ---
-
-;; @desc Stores the details of each proposal, keyed by proposal ID.
 (define-map proposals
-  { id: uint }
-  {
-    proposer: principal,
-    start-block: uint,
-    end-block: uint,
-    for-votes: uint,
-    against-votes: uint,
-    executed: bool,
-    canceled: bool,
-    description: (string-ascii 256),
-  }
+    uint
+    {
+        proposer: principal,
+        proposal-contract: principal,
+        council-id: uint,
+        start-block: uint,
+        end-block: uint,
+        for-votes: uint,
+        against-votes: uint,
+        executed: bool,
+        canceled: bool,
+    }
 )
 
-;; @desc A counter for the next proposal ID.
-(define-data-var next-proposal-id uint u1)
-
-;; Contract references
-(define-data-var proposal-engine-contract (optional principal) none)
-(define-data-var voting-contract (optional principal) none)
-(define-data-var contract-owner principal tx-sender)
-
-;; --- Public Functions ---
-
-(define-public (set-proposal-engine-contract (contract principal))
-  (begin
-    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
-    (var-set proposal-engine-contract (some contract))
-    (ok true)
-  )
+;; Track if a user has voted on a proposal
+(define-map vote-receipts
+    {
+        proposal-id: uint,
+        voter: principal,
+    }
+    bool
 )
 
-(define-public (set-voting-contract (contract principal))
-  (begin
-    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
-    (var-set voting-contract (some contract))
-    (ok true)
-  )
-)
+(define-data-var proposal-count uint u0)
 
-;; @desc Creates a new proposal. Can only be called by the proposal engine.
-;; @param proposer principal The address of the user creating the proposal.
-;; @param description (string-ascii 256) A description of the proposal.
-;; @param start-block uint The block height at which voting begins.
-;; @param end-block uint The block height at which voting ends.
-;; @returns (response uint uint) The ID of the newly created proposal.
-(define-public (create-proposal
-    (proposer principal)
-    (description (string-ascii 256))
-    (start-block uint)
-    (end-block uint)
-  )
-  (begin
-    (asserts!
-      (is-eq tx-sender
-        (unwrap! (var-get proposal-engine-contract) (err ERR_UNAUTHORIZED))
-      )
-      (err ERR_UNAUTHORIZED)
-    )
-    (let ((proposal-id (var-get next-proposal-id)))
-      (map-set proposals { id: proposal-id } {
-        proposer: proposer,
-        start-block: start-block,
-        end-block: end-block,
-        for-votes: u0,
-        against-votes: u0,
-        executed: false,
-        canceled: false,
-        description: description,
-      })
-      (var-set next-proposal-id (+ proposal-id u1))
-      (ok proposal-id)
-    )
-  )
-)
+;; Access Control
+(define-data-var access-control principal .conxian-access)
 
-;; @desc Updates the vote counts for a proposal. Can only be called by the voting contract.
-;; @param proposal-id uint The ID of the proposal to update.
-;; @param for-votes uint The new total of "for" votes.
-;; @param against-votes uint The new total of "against" votes.
-;; @returns (response bool uint) `(ok true)` if the update is successful.
-(define-public (update-votes
-    (proposal-id uint)
-    (for-votes uint)
-    (against-votes uint)
-  )
-  (begin
-    (asserts!
-      (is-eq tx-sender (unwrap! (var-get voting-contract) (err ERR_UNAUTHORIZED)))
-      (err ERR_UNAUTHORIZED)
-    )
-    (let ((proposal (unwrap! (map-get? proposals { id: proposal-id })
-        (err ERR_PROPOSAL_NOT_FOUND)
-      )))
-      (map-set proposals { id: proposal-id }
-        (merge proposal {
-          for-votes: for-votes,
-          against-votes: against-votes,
-        })
-      )
-      (ok true)
-    )
-  )
-)
-
-;; @desc Marks a proposal as executed. Can only be called by the proposal engine.
-;; @param proposal-id uint The ID of the proposal to mark as executed.
-;; @returns (response bool uint) `(ok true)` if successful.
-(define-public (set-executed (proposal-id uint))
-  (begin
-    (asserts!
-      (is-eq tx-sender
-        (unwrap! (var-get proposal-engine-contract) (err ERR_UNAUTHORIZED))
-      )
-      (err ERR_UNAUTHORIZED)
-    )
-    (let ((proposal (unwrap! (map-get? proposals { id: proposal-id })
-        (err ERR_PROPOSAL_NOT_FOUND)
-      )))
-      (map-set proposals { id: proposal-id } (merge proposal { executed: true }))
-      (ok true)
-    )
-  )
-)
-
-;; @desc Marks a proposal as canceled. Can only be called by the proposal engine.
-;; @param proposal-id uint The ID of the proposal to mark as canceled.
-;; @returns (response bool uint) `(ok true)` if successful.
-(define-public (set-canceled (proposal-id uint))
-  (begin
-    (asserts!
-      (is-eq tx-sender
-        (unwrap! (var-get proposal-engine-contract) (err ERR_UNAUTHORIZED))
-      )
-      (err ERR_UNAUTHORIZED)
-    )
-    (let ((proposal (unwrap! (map-get? proposals { id: proposal-id })
-        (err ERR_PROPOSAL_NOT_FOUND)
-      )))
-      (map-set proposals { id: proposal-id } (merge proposal { canceled: true }))
-      (ok true)
-    )
-  )
-)
-
-;; --- Read-Only Functions ---
-
-;; @desc Retrieves the details of a proposal.
-;; @param proposal-id uint The ID of the proposal.
-;; @returns (response (optional { ... }) uint) An optional tuple containing the proposal details.
 (define-read-only (get-proposal (proposal-id uint))
-  (if true
-    (ok (map-get? proposals { id: proposal-id }))
-    (err u0)
-  )
+    (map-get? proposals proposal-id)
+)
+
+(define-read-only (has-voted
+        (proposal-id uint)
+        (voter principal)
+    )
+    (default-to false
+        (map-get? vote-receipts {
+            proposal-id: proposal-id,
+            voter: voter,
+        })
+    )
+)
+
+(define-public (add-proposal
+        (proposal-contract principal)
+        (council-id uint)
+        (start uint)
+        (end uint)
+    )
+    (let ((proposal-id (+ (var-get proposal-count) u1)))
+        (begin
+            ;; In production, this should check if caller is proposal-engine
+            (map-set proposals proposal-id {
+                proposer: tx-sender,
+                proposal-contract: proposal-contract,
+                council-id: council-id,
+                start-block: start,
+                end-block: end,
+                for-votes: u0,
+                against-votes: u0,
+                executed: false,
+                canceled: false,
+            })
+            (var-set proposal-count proposal-id)
+            (ok proposal-id)
+        )
+    )
+)
+
+(define-public (set-executed (proposal-id uint))
+    (let ((proposal (unwrap! (map-get? proposals proposal-id) ERR_NOT_FOUND)))
+        (begin
+            ;; In a real scenario, this would check if the caller is the proposal-executor
+            (map-set proposals proposal-id (merge proposal { executed: true }))
+            (ok true)
+        )
+    )
+)
+
+(define-public (vote-proposal (proposal-id uint) (support bool) (weight uint))
+    (let ((proposal (unwrap! (map-get? proposals proposal-id) ERR_NOT_FOUND)))
+        (begin
+            ;; In production, check if caller is proposal-engine
+            (asserts! (not (has-voted proposal-id tx-sender)) ERR_ALREADY_VOTED)
+            
+            ;; Record receipt
+            (map-set vote-receipts { proposal-id: proposal-id, voter: tx-sender } true)
+
+            ;; Update count
+            (map-set proposals proposal-id (merge proposal {
+                for-votes: (if support (+ (get for-votes proposal) weight) (get for-votes proposal)),
+                against-votes: (if (not support) (+ (get against-votes proposal) weight) (get against-votes proposal))
+            }))
+            (ok true)
+        )
+    )
 )

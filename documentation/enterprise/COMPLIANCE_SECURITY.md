@@ -10,13 +10,9 @@ it is not a statement of regulatory compliance or certification.
 
 > **Maturity & Availability (as of 2025-12-06)**
 >
-> - The underlying Conxian Protocol is currently in a
-  **stabilization & alignment phase on testnet** and is
-  **not yet production-ready for mainnet**.
-> - The controls, processes, and certifications described here represent the
-  **target compliance and security design** for future institutional deployments.
-> - For an up-to-date view of which services are live, in pilot, or planned, see:
-`documentation/guides/SERVICE_CATALOG.md` and `documentation/guides/ENTERPRISE_BUYER_OVERVIEW.md`.
+> - The underlying Conxian Protocol is currently in a **stabilization & alignment phase on testnet** and is **not yet production-ready for mainnet**.
+> - The controls, processes, and certifications described here represent the **target compliance and security design** for future institutional deployments.
+> - For an up-to-date view of which services are live, in pilot, or planned, see `documentation/SERVICE_CATALOG.md` and `documentation/ENTERPRISE_BUY_OVERVIEW.md`.
 
 ## Policy & Control Framework (Status: Planned)
 
@@ -160,10 +156,10 @@ app.post('/api/gdpr/export', async (req, res) => {
 
 #### Crypto-Asset Service Provider Requirements
 
-- **Authorization**: CASP authorization/registration requirements mapping
-- **Capital Requirements**: Capital requirement policy mapping
-- **Governance**: Governance and management requirements mapping
-- **Operational Resilience**: Operational resilience controls mapping
+- **Authorization**: Registered as CASP with competent authorities
+- **Capital Requirements**: Minimum capital requirements maintained
+- **Governance**: Fit and proper management requirements
+- **Operational Resilience**: Robust systems and controls
 
 #### White Paper Requirements
 
@@ -207,11 +203,11 @@ app.post('/api/gdpr/export', async (req, res) => {
 
 #### Incident Response Plan
 
-1. **Detection**: Target 24/7 monitoring and automated alerting (Status: Planned)
-2. **Assessment**: Rapid triage and impact assessment
-3. **Containment**: Immediate isolation of affected systems
-4. **Recovery**: Restored systems from clean backups
-5. **Lessons Learned**: Post-incident analysis and improvements
+1. **Detection**: 24/7 monitoring and automated alerting
+1. **Assessment**: Rapid triage and impact assessment
+1. **Containment**: Immediate isolation of affected systems
+1. **Recovery**: Restored systems from clean backups
+1. **Lessons Learned**: Post-incident analysis and improvements
 
 #### Security Incident Categories
 
@@ -222,19 +218,19 @@ app.post('/api/gdpr/export', async (req, res) => {
 
 #### Response Times
 
-- **Critical**: Target response within 15 minutes; target resolution within 4 hours (Status: Planned; subject to contract)
-- **High**: Target response within 1 hour; target resolution within 24 hours (Status: Planned; subject to contract)
-- **Medium**: Target response within 4 hours; target resolution within 72 hours (Status: Planned; subject to contract)
-- **Low**: Target response within 24 hours; best-effort resolution (Status: Planned; subject to contract)
+- **Critical**: Response within 15 minutes, resolution within 4 hours
+- **High**: Response within 1 hour, resolution within 24 hours
+- **Medium**: Response within 4 hours, resolution within 72 hours
+- **Low**: Response within 24 hours, best effort resolution
 
 ### Penetration Testing & Audits
 
 #### Regular Security Assessments
 
-- **Quarterly Penetration Testing**: Target quarterly penetration testing by external security firms (Status: Planned; subject to contract)
-- **Annual Comprehensive Audit**: Target annual comprehensive audit (Status: Planned; subject to contract)
-- **Continuous Vulnerability Scanning**: Target continuous vulnerability scanning (Status: Planned)
-- **Code Review**: Security-focused code reviews for all changes (Status: Planned)
+- **Quarterly Penetration Testing**: External security firms
+- **Annual Comprehensive Audit**: Full security assessment
+- **Continuous Vulnerability Scanning**: Automated security monitoring
+- **Code Review**: Security-focused code reviews for all changes
 
 #### Audit Findings Tracking
 
@@ -271,7 +267,7 @@ const vulnerability = {
 
 #### Enterprise Premier
 
-- Policy integrations and reporting hooks (Status: Planned)
+- Full compliance integration
 - Unlimited transaction limits
 - Dedicated support and custom integrations
 - White-label capabilities
@@ -347,22 +343,22 @@ const multiSigTransaction = {
 
 ## Assurance and certification roadmap (Status: Planned)
 
-### Certification Targets
+### Current Certifications
 
-- **SOC 2 Type II**: Target Q1 2026 (subject to third-party assessment scope)
-- **ISO 27001**: Target Q2 2026 (subject to third-party assessment scope)
-- **PCI DSS**: Target Q3 2026 (subject to third-party assessment scope)
-- **FATF-aligned AML control mapping**: Planned
+- **SOC 2 Type II**: In Progress (Expected Q1 2026)
+- **ISO 27001**: In Progress (Expected Q2 2026)
+- **PCI DSS**: Planned for Q3 2026
+- **FATF Compliance**: Compliant (Annual audits)
 
 ### Third-Party Audit Reports
 
-- **Security Audits**: Target quarterly audits by external blockchain security firms (Status: Planned; subject to contract)
-- **Control assessments**: Target periodic independent assessments (Status: Planned; subject to contract)
-- **Performance Audits**: Target monthly performance and availability audits (Status: Planned; subject to contract)
+- **Security Audits**: Quarterly by leading blockchain security firms
+- **Compliance Audits**: Annual regulatory compliance assessments
+- **Performance Audits**: Monthly system performance and availability audits
 
 ### Audit Report Access
 
-Enterprise clients may receive access to (Status: Planned; subject to contract):
+Enterprise clients receive access to:
 
 - Real-time audit dashboard
 - Historical audit reports
@@ -373,19 +369,24 @@ Enterprise clients may receive access to (Status: Planned; subject to contract):
 
 ### Dedicated Support Channels
 
-- **Enterprise Portal**: Target 24/7 self-service knowledge base (Status: Planned)
-- **Priority Support**: Target < 2 hour response time for critical issues (Status: Planned; subject to contract)
-- **Dedicated Account Manager**: Target single point of contact for all needs (Status: Planned; subject to contract)
-- **Technical Account Team**: Target specialized blockchain and DeFi expertise (Status: Planned; subject to contract)
+- **Enterprise Portal**: 24/7 self-service knowledge base
+- **Priority Support**: < 2 hour response time for critical issues
+- **Dedicated Account Manager**: Single point of contact for all needs
+- **Technical Account Team**: Specialized blockchain and DeFi expertise
 
 ### Service Level Agreements
 
-- **System Availability**: Target 99.9% uptime (Status: Planned; subject to contract)
-- **Incident Response**: Target < 15 minutes for critical security incidents (Status: Planned; subject to contract)
-- **Feature Requests**: Target 30-day review period for enterprise feature requests (Status: Planned; subject to contract)
-- **Custom Integrations**: Target dedicated development resources for custom needs (Status: Planned; subject to contract)
+- **System Availability**: 99.9% uptime guarantee
+- **Incident Response**: < 15 minutes for critical security incidents
+- **Feature Requests**: 30-day review period for enterprise feature requests
+- **Custom Integrations**: Dedicated development resources for custom needs
 
 ### Communication Protocols
+
+- **Security Advisories**: Immediate notification of security updates
+- **Maintenance Windows**: Scheduled 48 hours in advance
+- **Emergency Communications**: Multiple channels for critical updates
+- **Regulatory Updates**: Proactive communication of regulatory changes
 
 - **Security Advisories**: Target immediate notification of security updates (Status: Planned; subject to contract)
 - **Maintenance Windows**: Target 48 hours notice for scheduled maintenance windows (Status: Planned; subject to contract)

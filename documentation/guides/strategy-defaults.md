@@ -19,15 +19,16 @@ Each category maps to a default strategy contract implementing `.traits folder.s
 ## Assignment and Automation
 
 1. Category defaults are configured via `set-category-default(category, strategy)`.
-2. Assets receive defaults via `apply-default-to-asset(asset, category)`.
-3. Optimization parameters per asset are set via `set-asset-params(asset, min-liquidity, max-slippage-bps, risk-score)`.
-4. The engine exposes `select-default-strategy(asset, category)` for optimizers (e.g., yield-optimizer) and routers.
-5. Performance snapshots are recorded via `update-performance(asset)`.
-6. Rebalancing is initiated via `rebalance-asset(asset)` (future expansions to withdraw/deposit hooks with vault).
+1. Assets receive defaults via `apply-default-to-asset(asset, category)`.
+1. Optimization parameters per asset are set via `set-asset-params(asset, min-liquidity, max-slippage-bps, risk-score)`.
+1. The engine exposes `select-default-strategy(asset, category)` for optimizers (e.g., yield-optimizer) and routers.
+1. Performance snapshots are recorded via `update-performance(asset)`.
+1. Rebalancing is initiated via `rebalance-asset(asset)` (future expansions to withdraw/deposit hooks with vault).
 
 ## Metrics-Driven Selection
 
 Primary metrics:
+
 - APY (basis points), TVL, efficiency scores
 - Liquidity depth, slippage bounds
 - Risk score (protocol-defined scale)
@@ -49,7 +50,7 @@ The engine integrates with `finance-metrics-trait` for aggregated metrics and us
 ## Testing and Validation
 
 - Backtests across historical market conditions per category.
-- Stress tests for extreme scenarios (volatility spikes, liquidity crunches, oracle manipulation). 
+- Stress tests for extreme scenarios (volatility spikes, liquidity crunches, oracle manipulation).
 - Benchmarks: target minimum APY, maximum drawdown, time-to-liquidity metrics per category.
 
 ## Reporting & Transparency

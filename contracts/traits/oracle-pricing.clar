@@ -1,75 +1,22 @@
-;; Oracle & Pricing Traits - Price Feeds and TWAP
+;; oracle-pricing.clar
+;; Trait definitions for Conxian Protocol Oracles
 
-;; ===========================================
-;; ORACLE TRAIT (Single Price Source)
-;; ===========================================
 (define-trait oracle-trait (
-  (get-price
-    (principal)
-    (response uint uint)
-  )
-  (update-price
-    (principal uint)
-    (response bool uint)
-  )
-  (get-price-with-timestamp
-    (principal)
-    (
-      response       {
-      price: uint,
-      timestamp: uint,
-    }
-      uint
-    )
-  )
+    (get-price (principal) (response uint uint))
+    (get-name () (response (string-ascii 32) uint))
 ))
 
-;; ===========================================
-;; ORACLE AGGREGATOR V2 TRAIT (Multi-Source)
-;; ===========================================
 (define-trait oracle-aggregator-v2-trait (
-  (get-real-time-price
-    (principal)
-    (response uint uint)
-  )
-  (get-twap
-    (principal uint)
-    (response uint uint)
-  )
-  (add-oracle-source
-    (principal principal)
-    (response bool uint)
-  )
-  (remove-oracle-source
-    (principal principal)
-    (response bool uint)
-  )
+    (get-price (principal) (response uint uint))
+    (get-price-by-intent (principal (string-ascii 20)) (response uint uint))
+    (get-weights (principal) (response (list 10 uint) uint))
 ))
 
-;; ===========================================
-;; PRICE INITIALIZER TRAIT
-;; ===========================================
-(define-trait price-initializer-trait (
-  (initialize-price
-    (principal uint)
-    (response bool uint)
-  )
-  (get-initial-price
-    (principal)
-    (response uint uint)
-  )
+(define-trait pyth-core-trait (
+    (verify-and-update-price-feeds ((buff 2048)) (response bool uint))
+    (get-price (principal) (response { price: uint, expo: int, publish-time: uint } uint))
 ))
 
-;; ===========================================
-;; DIMENSIONAL ORACLE TRAIT (Multi-Dimensional Prices)
-;; ===========================================
-(define-trait dimensional-oracle-trait (
-  (get-dimensional-price
-    (principal (string-ascii 32))
-    (response uint uint)
-  )
-  (update-dimensional-metrics
-    (principal (string-ascii 32) uint)
-    (response bool uint)
-  )
+(define-trait redstone-core-trait (
+    (recover-signer (uint (list 10 { asset: (buff 32), value: uint }) (buff 65)) (response bool uint))
 ))

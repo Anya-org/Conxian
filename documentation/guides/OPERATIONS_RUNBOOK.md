@@ -200,15 +200,15 @@ This runbook maps key on-chain contracts, events, and admin controls to operatio
 
 1. **Detect**
    - Alert from monitoring (oracle, lending, DEX, governance).
-2. **Assess**
+1. **Assess**
    - Check `circuit-breaker.is-circuit-open` and `token-system-coordinator.get-system-health`.
-3. **Contain**
+1. **Contain**
    - Open circuit and/or pause token system as required.
-4. **Diagnose**
+1. **Diagnose**
    - Review relevant contract events (`fee-routed`, `reserves-withdrawn`, `twap-updated`, governance actions).
-5. **Remediate**
+1. **Remediate**
    - Apply governance-approved configuration changes.
-6. **Restore**
+1. **Restore**
    - Close circuit, resume systems, and confirm tests (including integration and system tests) pass.
-7. **Post-mortem**
+1. **Post-mortem**
    - Document root cause, impacts, and improvements.

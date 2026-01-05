@@ -10,98 +10,54 @@ The protocol aggregates yield from multiple sources (Lending, DEX, Stacking), pr
 
 ## System Status
 
--   **Maturity Level**: 🔵 **Technical Alpha (Testnet)**
--   **Architectural Pattern**: Facade-Based & Trait-Driven
--   **Next Steps**: Comprehensive testing, third-party security audits, and preparation for mainnet.
+- **Maturity Level**: 🔵 **Technical Alpha (Testnet)**
+- **Architectural Pattern**: Facade-Based & Trait-Driven
+- **Next Steps**: Comprehensive testing, third-party security audits, and preparation for mainnet.
 
-## Core Architecture: The Facade Pattern
+## Core Architecture
 
-The Conxian Protocol is built on a **facade pattern**. This modern, modular architecture ensures security, maintainability, and clarity by separating concerns. Core contracts act as unified, secure entry points (**facades**) that route all user-facing calls to a network of specialized, single-responsibility **manager contracts**.
+The Conxian Protocol is built on a secure, modern, and modular **facade pattern**. Each core piece of functionality (e.g., Core, DEX, Lending) is exposed through a single, unified entry point contract (a "facade"). These facades delegate all complex logic to a network of specialized, single-responsibility "manager" contracts.
 
--   **User Interaction**: Users and external systems interact only with the facade contracts, which provide a simplified and secure API.
--   **Delegated Logic**: Facades contain minimal business logic. Their primary role is to validate inputs and delegate the actual work to the appropriate manager contract via `contract-call?`.
--   **Trait-Driven Interfaces**: The connections between facades and manager contracts are defined by a standardized set of traits located in the `/contracts/traits/` directory. This enforces a clean, consistent, and maintainable interface system across the entire protocol.
+This architecture reduces the system's attack surface, improves maintainability, and provides a clear, logical map of the protocol's operations.
 
-### The Protocol Coordinator
+> **For a complete technical breakdown of the architecture, including diagrams and control flow examples, see our [Architecture Overview](./documentation/architecture/OVERVIEW.md).**
 
-While the facade pattern decentralizes the logic of individual modules, the Conxian Protocol is unified by a central coordinator contract: `conxian-protocol.clar`. This critical contract serves as the single source of truth for protocol-wide state and provides a global layer of security and control, including a system-wide emergency pause feature.
+## Core Modules
 
-### 1. Core Module (`contracts/core/`)
+The protocol's functionality is organized into the following key modules:
 
-The Core Module is the heart of the protocol's dimensional trading and risk management capabilities.
+- [Core Module](./contracts/core/README.md)
+- [DEX Module](./contracts/dex/README.md)
+- [Lending Module](./contracts/lending/README.md)
+- [Governance Module](./contracts/governance/README.md)
+- [Enterprise Module](./contracts/enterprise/README.md)
+- [Tokens Module](./contracts/tokens/README.md)
+- [Vaults Module](./contracts/vaults/README.md)
+- [Security Module](./contracts/security/README.md)
+- [Monitoring Module](./contracts/monitoring/README.md)
 
--   **`dimensional-engine.clar`**: The central **facade** for the Core Module. It routes all calls related to position management, collateral, and risk assessment to the specialized contracts below.
--   **Manager Contracts**:
-    -   **Position Manager**: Handles the lifecycle of trading positions (open, close, modify).
-    -   **Collateral Manager**: Manages the deposit, withdrawal, and accounting of user collateral.
-    -   **Risk Manager**: Assesses position health and manages the liquidation process.
-    -   **Funding Rate Calculator**: Calculates and applies funding rates to open positions.
+## Documentation
 
-### 2. DEX Module (`contracts/dex/`)
+For a comprehensive overview of the protocol's vision, architecture, and operational procedures, please refer to our complete documentation set.
 
-The DEX Module provides a highly efficient and capital-aware trading environment.
-
--   **`multi-hop-router-v3.clar`**: The **facade** for the DEX. It finds the optimal trading path and executes swaps across multiple liquidity pools, including 1-hop, 2-hop, and 3-hop routes.
--   **Manager Contracts**:
-    -   **`concentrated-liquidity-pool.clar`**: Implements the concentrated liquidity AMM for maximum capital efficiency.
-    -   **`dex-factory.clar`**: A factory contract for creating and managing liquidity pools.
-
-### 3. Lending Module (`contracts/lending/`)
-
-The Lending Module provides a fully collateralized and secure lending market.
-
--   **`comprehensive-lending-system.clar`**: The primary **facade** for the lending module. It manages user deposits, loans, and collateral, and delegates complex operations like liquidations to specialized contracts.
--   **Manager Contracts**:
-    -   **`liquidation-manager.clar`**: A dedicated contract responsible for managing the liquidation process for under-collateralized loans, ensuring the solvency of the protocol.
-
-### 4. Governance Module (`contracts/governance/`)
-
-The Governance Module facilitates decentralized control over the protocol.
-
--   **`proposal-engine.clar`**: The **facade** for all governance-related actions, including proposal creation, voting, and execution.
--   **Manager Contracts**:
-    -   **`conxian-operations-engine.clar`**: An automated "DAO Seat" that programmatically participates in governance by consuming on-chain metrics and casting policy-constrained votes.
-
-### 5. Enterprise Module (`contracts/enterprise/`)
-
-The Enterprise Module provides institutional-grade financial tooling (Status: Prototype/Planned).
-
--   **`enterprise-facade.clar`**: The **facade** for all enterprise-related actions, including institutional account management, policy checks (e.g., KYC status checks), and advanced order types.
--   **Manager Contracts**:
-    -   **`institutional-account-manager.clar`**: Manages the lifecycle of institutional accounts.
-    -   **`compliance-manager.clar`**: Provides policy checks (e.g., KYC status checks) and integration points for institution-defined control workflows (Status: Prototype/Planned).
-    -   **`advanced-order-manager.clar`**: Manages sophisticated order types like TWAP and Iceberg orders.
-
-## Modules
-
-For more detailed information about each module's architecture and function, please refer to the `README.md` files in the `contracts` directory:
-
--   [Core Module](./contracts/core/README.md)
--   [DEX Module](./contracts/dex/README.md)
--   [Lending Module](./contracts/lending/README.md)
--   [Governance Module](./contracts/governance/README.md)
--   [Enterprise Module](./contracts/enterprise/README.md)
--   [Tokens Module](./contracts/tokens/README.md)
--   [Vaults Module](./contracts/vaults/README.md)
--   [Security Module](./contracts/security/README.md)
--   [Monitoring Module](./contracts/monitoring/README.md)
+- **[View Complete Documentation](./documentation/README.md)**
 
 ## Project Documentation
 
-For a deeper understanding of the protocol's vision, architecture, and operational procedures, we recommend starting with these documents:
+Key project documents are organized within the `/documentation` directory:
 
--   **[Strategic Overview](./documentation/STRATEGIC_OVERVIEW.md)**: Our vision, business goals, current status, and strategic roadmap.
--   **[Whitepaper](./documentation/whitepaper/Conxian-Whitepaper.md)**: The complete technical vision and protocol design.
--   **[Architecture Specification](./documentation/guides/ARCHITECTURE_SPEC.md)**: A high-level overview of the system design and module interactions.
--   **[Developer Guide](./documentation/developer/DEVELOPER_GUIDE.md)**: A comprehensive guide for developers.
+- **[Changelog](./documentation/CHANGELOG.md)**: A log of all notable changes to the protocol.
+- **[Roadmap](./documentation/ROADMAP.md)**: The development roadmap for the Conxian Protocol.
+- **[Contributing Guide](./documentation/guides/CONTRIBUTING.md)**: Guidelines for contributing to the project.
+- **[Audit Reports](./documentation/reports/)**: Security audit reports.
 
 ## Development Setup
 
 ### Prerequisites
 
-1.  Clarinet 2.0+
-2.  Node.js 18+
-3.  Git
+1. Clarinet 2.0+
+1. Node.js 18+
+1. Git
 
 ### Installation
 
@@ -121,10 +77,10 @@ npm test
 
 **Advanced Testing Suites:**
 
--   **System End-to-End**: `npm run test:system`
--   **Performance Benchmark**: `npm run test:performance`
--   **Fuzz Testing**: `npm run test:fuzz`
--   **Security Audit**: `npm run test:security`
+- **System End-to-End**: `npm run test:system`
+- **Performance Benchmark**: `npm run test:performance`
+- **Fuzz Testing**: `npm run test:fuzz`
+- **Security Audit**: `npm run test:security`
 
 ## Deployment
 

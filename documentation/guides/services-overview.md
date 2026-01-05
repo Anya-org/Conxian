@@ -80,7 +80,7 @@ Operational safety and observability are first-class concerns:
 ## What Makes Conxian Different
 
 ### 1. Trait-First Modular Architecture (15 Trait Files)
- 
+
  Conxian is built around **15 modular trait files** that define protocol interfaces:
 
 - Clear separation between **interfaces** (traits) and **implementations** (contracts)
@@ -130,7 +130,7 @@ All core services—DEX, lending, vaults, NFTs, oracles, risk, and monitoring—
 ## Where to Learn More
 
 - **Project Overview & Status** – see the root [`README.md`](../../README.md)
-- **Architecture & Design** – [`architecture/ARCHITECTURE.md`](../architecture/ARCHITECTURE.md)
+- **Architecture & Design** – [`architecture/OVERVIEW.md`](../architecture/OVERVIEW.md)
 - **Technical Whitepaper** – [`whitepaper/Conxian-Whitepaper.md`](../whitepaper/Conxian-Whitepaper.md)
 - **Roadmap & Phased Goals** – root [`ROADMAP.md`](../../ROADMAP.md)
 - **Operational Guides** –

@@ -1,40 +1,16 @@
-;; @trait Pyth Storage Trait
-;; @desc Trait for Pyth storage contract interaction
+;; pyth-traits.clar
+;; Traits for Pyth Network integration
 
-(define-trait pyth-storage-trait (
-  (read-price-info
-    ((buff 32))
+(define-trait pyth-core-trait
     (
-      response       {
-      price: int,
-      conf: uint,
-      expo: int,
-      publish-time: uint,
-      prev-publish-time: uint,
-      ema-price: int,
-      ema-conf: uint,
-    }
-      uint
+        (verify-and-update-price-feeds ((buff 2048)) (response (list 10 uint) uint))
+        (get-price (principal) (response uint uint))
     )
-  )
-))
+)
 
-;; @trait Pyth Decoder Trait
-(define-trait pyth-decoder-trait (
-  (decode-price-feed
-    ((buff 8192))
+(define-trait pyth-store-trait
     (
-      response       {
-      price-identifier: (buff 32),
-      price: int,
-      conf: uint,
-      expo: int,
-      publish-time: uint,
-      prev-publish-time: uint,
-      ema-price: int,
-      ema-conf: uint,
-    }
-      uint
+        (add-price (principal uint uint) (response bool uint))
+        (get-price (principal) (response uint uint))
     )
-  )
-))
+)

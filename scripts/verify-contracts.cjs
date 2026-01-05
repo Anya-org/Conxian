@@ -69,6 +69,26 @@ function parseClarinetToml(filePath) {
   return { contracts, remappings };
 }
 
+function resolveRemappedContractName(remappedValue) {
+  if (!remappedValue) return null;
+  // Expected form: ".contract-name" but some legacy entries may contain dotted segments.
+  // Prefer the full name first; if not present, fall back to the last segment.
+  const withoutDot = remappedValue.startsWith('.') ? remappedValue.substring(1) : remappedValue;
+  if (!withoutDot) return null;
+  return withoutDot;
+}
+
+function resolveRemappedContractCandidates(remappedValue) {
+  const name = resolveRemappedContractName(remappedValue);
+  if (!name) return [];
+  const candidates = [name];
+  if (name.includes('.')) {
+    const last = name.split('.').pop();
+    if (last && last !== name) candidates.push(last);
+  }
+  return candidates;
+}
+
 // Find all test files and extract contract references
 function findContractReferences(testDir) {
   const contractRefs = new Set();
@@ -84,27 +104,29 @@ function findContractReferences(testDir) {
         scanDirectory(fullPath);
       } else if (file.endsWith('.ts') || file.endsWith('.spec.ts') || file.endsWith('.test.ts')) {
         const content = fs.readFileSync(fullPath, 'utf8');
-        
-        // Find contract calls
-        const contractCallMatches = content.match(/contractCall\s*\(\s*['"`]([^'"`]+)['"`]/g);
-        if (contractCallMatches) {
-          for (const match of contractCallMatches) {
-            const contractMatch = match.match(/contractCall\s*\(\s*['"`]([^'"`]+)['"`]/);
-            if (contractMatch) {
-              contractRefs.add(contractMatch[1]);
-            }
-          }
+
+        // Clarinet SDK Simnet patterns
+        const simnetContractRefRe = /\bsimnet\.(?:callPublicFn|callReadOnlyFn|getDataVar|getMapEntry|getMap|callPrivateFn)\s*\(\s*['"`]([^'"`]+)['"`]/g;
+        let match;
+        while ((match = simnetContractRefRe.exec(content))) {
+          if (match[1]) contractRefs.add(match[1]);
         }
-        
-        // Find read-only function calls
-        const readOnlyMatches = content.match(/callReadOnlyFn\s*\(\s*['"`]([^'"`]+)['"`]/g);
-        if (readOnlyMatches) {
-          for (const match of readOnlyMatches) {
-            const readOnlyMatch = match.match(/callReadOnlyFn\s*\(\s*['"`]([^'"`]+)['"`]/);
-            if (readOnlyMatch) {
-              contractRefs.add(readOnlyMatch[1]);
-            }
-          }
+
+        // Legacy patterns used in some test utilities
+        const legacyContractCallRe = /\bcontractCall\s*\(\s*['"`]([^'"`]+)['"`]/g;
+        while ((match = legacyContractCallRe.exec(content))) {
+          if (match[1]) contractRefs.add(match[1]);
+        }
+
+        const legacyReadOnlyRe = /\bcallReadOnlyFn\s*\(\s*['"`]([^'"`]+)['"`]/g;
+        while ((match = legacyReadOnlyRe.exec(content))) {
+          if (match[1]) contractRefs.add(match[1]);
+        }
+
+        // Network-broadcast tests may specify contractName inside makeContractCall({ ... }) objects
+        const makeContractCallNameRe = /\bcontractName\s*:\s*['"`]([^'"`]+)['"`]/g;
+        while ((match = makeContractCallNameRe.exec(content))) {
+          if (match[1]) contractRefs.add(match[1]);
         }
       }
     }
@@ -173,9 +195,9 @@ function main() {
     if (!contracts[ref]) {
       // Check remappings
       const remapped = remappings[ref];
-      if (!remapped || !contracts[remapped.substring(1)]) {
-        missingContracts.push(ref);
-      }
+      const candidates = resolveRemappedContractCandidates(remapped);
+      const resolved = candidates.find((c) => contracts[c]);
+      if (!resolved) missingContracts.push(ref);
     }
   }
   

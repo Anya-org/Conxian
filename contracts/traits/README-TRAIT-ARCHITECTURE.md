@@ -54,7 +54,6 @@
 
 ;; MODULE 07: CROSS-CHAIN & BITCOIN (File: cross-chain-traits.clar)
 ;; - dlc-manager-trait ✨ Key for native Bitcoin lending
-;; - btc-bridge-trait
 ;; - cross-chain-verifier-trait
 ;; - sbtc-trait
 

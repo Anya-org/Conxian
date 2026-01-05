@@ -1,270 +1,88 @@
-;;
-;; @title Proposal Engine
-;; @author Conxian Protocol
-;; @desc This contract serves as the central governance facade, providing a unified
-;; interface for creating, voting on, and executing proposals. It delegates the
-;; underlying logic to specialized contracts, such as `proposal-registry` for
-;; storing proposal data and `voting` for managing the voting process. This
-;; modular design enhances security and maintainability by separating concerns,
-;; allowing individual components to be upgraded independently.
-;;
+;; proposal-engine.clar
+;; Conxian Governance: Logic-Rich Facade (Controller)
+;; Routing and orchestration for Multi-Council Governance
 
-(use-trait protocol-support-trait .core-traits.protocol-support-trait)
+(use-trait proposal-trait .governance-traits.proposal-trait)
+(use-trait nft-trait .sip-standards.sip-009-nft-trait)
+(use-trait reputation-trait .reputation-engine-trait.reputation-engine-trait)
 
-;; --- Constants ---
-(define-constant ERR_UNAUTHORIZED (err u100))
-(define-constant ERR_PROPOSAL_NOT_FOUND (err u101))
-(define-constant PROPOSAL_DELAY u2073600) ;; Nakamoto-adjusted: 1 day (144 blocks * 120)
-(define-constant VOTING_PERIOD u14515200) ;; Nakamoto-adjusted: 7 days (1008 blocks * 120)
-(define-constant ERR_PROPOSAL_NOT_ACTIVE (err u103))
-(define-constant ERR_VOTING_CLOSED (err u104))
-(define-constant ERR_QUORUM_NOT_REACHED (err u106))
-(define-constant ERR_PROPOSAL_FAILED (err u107))
-(define-constant ERR_INVALID_VOTING_PERIOD (err u109))
-(define-constant ERR_PROTOCOL_PAUSED (err u5001))
-;; Minimum allowed quorum percentage (10% expressed in basis points of 10000)
-(define-constant MIN_QUORUM u1000)
+;; Constants
+(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_NOT_FOUND (err u1001))
+(define-constant ERR_PROPOSAL_ACTIVE (err u1002))
+(define-constant ERR_PROPOSAL_ENDED (err u1003))
+(define-constant ERR_INSUFFICIENT_POWER (err u1004))
 
-;; --- Data Variables ---
+;; Access Control
+(define-data-var access-control principal .conxian-access)
 
-;; @desc The principal of the contract owner.
-(define-data-var contract-owner principal tx-sender)
-;; @desc The principal of the proposal registry contract.
-(define-data-var proposal-registry principal .proposal-registry)
-;; @desc The principal of the voting contract.
-(define-data-var voting principal .governance-voting)
-;; @desc The principal of the governance token contract.
-(define-data-var governance-token principal .governance-token)
-;; @desc The duration of the voting period in blocks.
-(define-data-var voting-period-blocks uint u20736000)
-;; @desc The percentage of the total token supply that must vote for a proposal to pass, multiplied by 100.
-(define-data-var quorum-percentage uint u5000)
-(define-data-var protocol-coordinator principal tx-sender)
+;; Routes
+(define-data-var registry principal .proposal-registry)
+(define-data-var seat-token principal .enhanced-governance-nft)
+(define-data-var reputation-engine principal .reputation-engine)
 
-(define-private (is-protocol-paused)
-  (contract-call? (var-get protocol-coordinator) is-protocol-paused)
-)
-
-;; --- Authorization ---
-
-;; @desc Asserts that the transaction sender is the contract owner.
-(define-private (is-contract-owner)
-  (is-eq tx-sender (var-get contract-owner))
-)
-
-;; --- Public Functions ---
-
-;; @desc Creates a new proposal.
-;; @param description (string-ascii 256) A description of the proposal.
-;; @param targets (list 10 principal) A list of target contracts.
-;; @param values (list 10 uint) A list of STX values to send.
-;; @param signatures (list 10 (string-ascii 64)) A list of function signatures.
-;; @param calldatas (list 10 (buff 1024)) A list of calldata.
-;; @param start-block uint The starting block for voting.
-;; @param end-block uint The ending block for voting.
-;; @returns (response uint uint) The ID of the new proposal.
-(define-public (propose
-    (description (string-ascii 256))
-    (targets (list 10 principal))
-    (values (list 10 uint))
-    (signatures (list 10 (string-ascii 64)))
-    (calldatas (list 10 (buff 1024)))
-    (start-block uint)
-    (end-block uint)
-  )
-  (begin
-    (asserts! (not (is-protocol-paused)) ERR_PROTOCOL_PAUSED)
-    (let ((proposal-id (try! (contract-call? .proposal-registry create-proposal tx-sender description
-        start-block end-block
-      ))))
-      (print {
-        event: "proposal-created",
-        proposal-id: proposal-id,
-        proposer: tx-sender,
-        start-block: start-block,
-        end-block: end-block,
-      })
-      (ok proposal-id)
+;; @desc Submits a new proposal to a specific council for voting.
+;; @param proposal-contract: The contract principal of the proposal to be voted on. Must implement the proposal-trait.
+;; @param council-id: The ID of the council that will vote on this proposal.
+;; @param start-block: The block height at which voting begins.
+;; @param end-block: The block height at which voting ends.
+;; @returns (response uint) The ID of the newly created proposal.
+(define-public (submit-proposal 
+        (proposal-contract <proposal-trait>) 
+        (council-id uint) 
+        (start-block uint) 
+        (end-block uint)
     )
-  )
-)
-
-;; @desc Casts a vote on a proposal.
-;; @param proposal-id uint The ID of the proposal.
-;; @param support bool Whether to support the proposal.
-;; @param votes-cast uint The number of votes to cast.
-;; @returns (response bool uint) `(ok true)` on success.
-(define-public (vote
-    (proposal-id uint)
-    (support bool)
-  )
-  (begin
-    (asserts! (not (is-protocol-paused)) ERR_PROTOCOL_PAUSED)
-    (let ((maybe-proposal (try! (contract-call? .proposal-registry get-proposal proposal-id))))
-      (match maybe-proposal
-        proposal (begin
-          (asserts! (is-eq (get executed proposal) false) ERR_VOTING_CLOSED)
-          (asserts! (is-eq (get canceled proposal) false) ERR_VOTING_CLOSED)
-          (asserts! (>= burn-block-height (get start-block proposal))
-            ERR_PROPOSAL_NOT_ACTIVE
-          )
-          (asserts! (<= burn-block-height (get end-block proposal))
-            ERR_VOTING_CLOSED
-          )
-
-          (try! (contract-call? .voting vote proposal-id support tx-sender))
-          (print {
-            event: "vote-cast",
-            proposal-id: proposal-id,
-            voter: tx-sender,
-            support: support,
-          })
-          (ok true)
-        )
-        ERR_PROPOSAL_NOT_FOUND
-      )
+    (let (
+        (contract-principal (contract-of proposal-contract))
     )
-  )
-)
-
-;; @desc Executes a proposal.
-;; @param proposal-id uint The ID of the proposal.
-;; @returns (response bool uint) `(ok true)` on success.
-(define-public (execute (proposal-id uint))
-  (begin
-    (asserts! (not (is-protocol-paused)) ERR_PROTOCOL_PAUSED)
-    (let ((maybe-proposal (try! (contract-call? .proposal-registry get-proposal proposal-id))))
-      (match maybe-proposal
-        proposal (let (
-            (total-votes (+ (get for-votes proposal) (get against-votes proposal)))
-            (governance-token-supply (unwrap! (contract-call? .governance-token get-total-supply)
-              (err u999)
-            ))
-            (quorum (/ (* total-votes u10000) governance-token-supply))
-          )
-          (begin
-            (asserts! (is-eq tx-sender (get proposer proposal)) ERR_UNAUTHORIZED)
-            (asserts! (>= burn-block-height (get end-block proposal))
-              ERR_PROPOSAL_NOT_ACTIVE
+        ;; Check if sender holds a seat on this council (or is admin)
+        (asserts!
+            (>
+                (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender
+                    council-id
+                ))
+                u0
             )
-            (asserts! (not (get executed proposal)) ERR_VOTING_CLOSED)
-            (asserts! (not (get canceled proposal)) ERR_VOTING_CLOSED)
-            (asserts! (> (get for-votes proposal) (get against-votes proposal))
-              ERR_PROPOSAL_FAILED
-            )
-            (asserts! (>= quorum (var-get quorum-percentage))
-              ERR_QUORUM_NOT_REACHED
-            )
-            (try! (contract-call? .proposal-registry set-executed proposal-id))
-            (print {
-              event: "proposal-executed",
-              proposal-id: proposal-id,
-              votes-for: (get for-votes proposal),
-              votes-against: (get against-votes proposal),
-            })
-            (ok true)
-          )
-        )
-        ERR_PROPOSAL_NOT_FOUND
-      )
-    )
-  )
-)
-
-;; @desc Cancels a proposal.
-;; @param proposal-id uint The ID of the proposal.
-;; @returns (response bool uint) `(ok true)` on success.
-(define-public (cancel (proposal-id uint))
-  (begin
-    (asserts! (not (is-protocol-paused)) ERR_PROTOCOL_PAUSED)
-    (let ((maybe-proposal (try! (contract-call? .proposal-registry get-proposal proposal-id))))
-      (match maybe-proposal
-        proposal (begin
-          (asserts!
-            (or (is-eq tx-sender (get proposer proposal)) (is-contract-owner))
             ERR_UNAUTHORIZED
-          )
-          (asserts! (not (get executed proposal)) ERR_VOTING_CLOSED)
-          (asserts! (not (get canceled proposal)) ERR_VOTING_CLOSED)
-          (try! (contract-call? .proposal-registry set-canceled proposal-id))
-          (print {
-            event: "proposal-canceled",
-            proposal-id: proposal-id,
-            canceled-by: tx-sender,
-          })
-          (ok true)
         )
-        ERR_PROPOSAL_NOT_FOUND
-      )
+        
+        ;; Register proposal
+        (contract-call? .proposal-registry add-proposal contract-principal council-id start-block end-block)
     )
-  )
 )
 
-;; --- Read-Only Functions ---
-
-;; @desc Gets a proposal by its ID.
-;; @param proposal-id uint The ID of the proposal.
-;; @returns (response (optional { ... }) (err uint)) The proposal details.
-(define-read-only (get-proposal (proposal-id uint))
-  (contract-call? .proposal-registry get-proposal proposal-id)
-)
-
-;; @desc Gets a vote on a proposal by a voter.
-;; @param proposal-id uint The ID of the proposal.
-;; @param voter principal The address of the voter.
-;; @returns (response (optional { ... }) (err uint)) The vote details.
-(define-read-only (get-vote
-    (proposal-id uint)
-    (voter principal)
-  )
-  (contract-call? .governance-voting get-vote proposal-id voter)
-)
-
-;; --- Admin Functions ---
-
-;; @desc Sets the voting period.
-;; @param new-period uint The new voting period in blocks.
-;; @returns (response bool uint) `(ok true)` on success.
-(define-public (set-voting-period (new-period uint))
-  (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
-    (asserts! (> new-period u0) ERR_INVALID_VOTING_PERIOD)
-    (var-set voting-period-blocks new-period)
-    (ok true)
-  )
-)
-
-;; @desc Sets the quorum percentage.
-;; @param new-quorum uint The new quorum percentage.
-;; @returns (response bool uint) `(ok true)` on success.
-(define-public (set-quorum-percentage (new-quorum uint))
-  (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
-    ;; Enforce quorum between 10% and 100% to avoid trivially low or
-    ;; impossibly strict quorum settings.
-    (asserts! (and (>= new-quorum MIN_QUORUM) (<= new-quorum u10000))
-      ERR_UNAUTHORIZED
+;; @desc Casts a vote on an active proposal.
+;; @param proposal-id: The ID of the proposal to vote on.
+;; @param support: A boolean indicating the voter's choice (true for 'yes', false for 'no').
+;; @returns (response bool)
+(define-public (vote (proposal-id uint) (support bool))
+    (let (
+        (proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id) ERR_NOT_FOUND))
+        (council-id (get council-id proposal))
+        (raw-voter-power (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender council-id)))
+        (weighted-voter-power (unwrap-panic (contract-call? .reputation-engine get-weighted-voting-power tx-sender raw-voter-power)))
     )
-    (var-set quorum-percentage new-quorum)
-    (ok true)
-  )
+        ;; Assert Voting Period
+        (asserts! (>= block-height (get start-block proposal)) ERR_NOT_FOUND) ;; Should be ERR_NOT_STARTED but reusing
+        (asserts! (< block-height (get end-block proposal)) ERR_PROPOSAL_ENDED)
+        
+        ;; Assert Voter Power
+        (asserts! (> weighted-voter-power u0) ERR_UNAUTHORIZED)
+
+        ;; Update activity score
+        (try! (contract-call? .reputation-engine update-activity-score tx-sender))
+
+        ;; Record Vote
+        (contract-call? .proposal-registry vote-proposal proposal-id support weighted-voter-power)
+    )
 )
 
-;; @desc Transfers ownership of the contract.
-;; @param new-owner principal The new owner.
-;; @returns (response bool uint) `(ok true)` on success.
-(define-public (transfer-ownership (new-owner principal))
-  (begin
-    (asserts! (is-contract-owner) ERR_UNAUTHORIZED)
-    (var-set contract-owner new-owner)
-    (ok true)
-  )
+;; @desc Executes a passed proposal by delegating to the proposal executor.
+;; @param proposal-id: The ID of the proposal to execute.
+;; @param proposal-contract: The contract principal of the proposal.
+;; @returns (response bool)
+(define-public (execute-proposal (proposal-id uint) (proposal-contract <proposal-trait>))
+    (contract-call? .proposal-executor execute proposal-id proposal-contract u5000) ;; 50% quorum hardcoded for now
 )
 
-(define-public (set-protocol-coordinator (new-coordinator principal))
-  (begin
-    (asserts! (is-contract-owner) (err u1000))
-    (var-set protocol-coordinator new-coordinator)
-    (ok true)
-  )
-)

@@ -7,10 +7,10 @@ The Conxian Protocol implements a comprehensive behavior metrics and reputation 
 ## Core Principles
 
 1. **Transparency**: All metrics are on-chain and publicly verifiable
-2. **Fairness**: Weighted scoring across multiple dimensions prevents gaming
-3. **Progressive Rewards**: Higher tiers unlock better incentive multipliers
-4. **Continuous Improvement**: Scores update dynamically based on recent behavior
-5. **Multi-Dimensional**: No single activity dominates the overall score
+1. **Fairness**: Weighted scoring across multiple dimensions prevents gaming
+1. **Progressive Rewards**: Higher tiers unlock better incentive multipliers
+1. **Continuous Improvement**: Scores update dynamically based on recent behavior
+1. **Multi-Dimensional**: No single activity dominates the overall score
 
 ## Behavior Dimensions
 
@@ -26,16 +26,19 @@ Tracks participation and quality of governance engagement:
 - **Emergency Response Count**: Participation in emergency actions
 
 **Scoring Formula**:
+
 ```
 governance_score = (voting_accuracy * 2000) / 10000
 ```
 
 **Positive Actions**:
+
 - Voting on proposals: +1 to proposals_voted
 - Creating proposals: +1 to proposals_created
 - Accurate voting: +100 to voting_accuracy per aligned vote
 
 **Negative Actions**:
+
 - Inaccurate voting: -50 to voting_accuracy per misaligned vote
 
 ### 2. Lending Behavior (25% Weight)
@@ -49,16 +52,19 @@ Tracks responsible borrowing and collateral management:
 - **Lending Volume**: Total lending activity volume
 
 **Scoring Formula**:
+
 ```
 lending_score = (collateral_management_score * 2500) / 10000
 ```
 
 **Positive Actions**:
+
 - Maintaining high health factor: +50 to collateral_management_score
 - Timely repayments: +1 to timely_repayment_count
 - No liquidations: Preserves collateral_management_score
 
 **Negative Actions**:
+
 - Liquidation: +1 to liquidation_count, -5% to collateral_management_score
 - Low health factor: Reduces average_health_factor
 
@@ -72,11 +78,13 @@ Tracks awareness and usage of MEV protection:
 - **MEV Awareness Score**: Understanding of MEV risks (0-10000)
 
 **Scoring Formula**:
+
 ```
 mev_score = (mev_awareness_score * 1500) / 10000
 ```
 
 **Positive Actions**:
+
 - Using MEV protection: +1 to protection_usage_count, +100 to mev_awareness_score
 - Preventing attacks: +1 to attacks_prevented
 - Protecting volume: Adds to protected_volume
@@ -92,15 +100,18 @@ Tracks insurance coverage quality and claims management:
 - **Risk Management Score**: Overall risk management quality (0-10000)
 
 **Scoring Formula**:
+
 ```
 insurance_score = (risk_management_score * 1500) / 10000
 ```
 
 **Positive Actions**:
+
 - Paying premiums on time: +100 to premium_payment_reliability
 - Approved claims: +1 to claims_approved, +50 to risk_management_score
 
 **Negative Actions**:
+
 - Missed premium payments: -5% to premium_payment_reliability
 - Rejected claims: +1 to claims_filed, -10% to risk_management_score
 
@@ -115,16 +126,19 @@ Tracks cross-chain bridge reliability and security awareness:
 - **Security Awareness Score**: Bridge security awareness (0-10000)
 
 **Scoring Formula**:
+
 ```
 bridge_score = (bridge_reliability * 1500) / 10000
 bridge_reliability = (successful_bridges * 10000) / (successful_bridges + failed_bridges)
 ```
 
 **Positive Actions**:
+
 - Successful bridge: +1 to successful_bridges, +50 to security_awareness_score
 - High success rate: Improves bridge_reliability
 
 **Negative Actions**:
+
 - Failed bridge: +1 to failed_bridges, -5% to security_awareness_score
 
 ### 6. Participation Bonus (10% Weight)
@@ -132,6 +146,7 @@ bridge_reliability = (successful_bridges * 10000) / (successful_bridges + failed
 Rewards active protocol participation:
 
 **Scoring Formula**:
+
 ```
 participation_bonus = governance_participation * 10
 ```
@@ -175,6 +190,7 @@ Maximum possible score: **10,000**
 ### Read-Only Functions
 
 #### `get-user-behavior-metrics`
+
 Returns overall behavior metrics for a user.
 
 ```clarity
@@ -182,6 +198,7 @@ Returns overall behavior metrics for a user.
 ```
 
 **Returns**:
+
 ```clarity
 {
   reputation-score: uint,
@@ -198,6 +215,7 @@ Returns overall behavior metrics for a user.
 ```
 
 #### `get-governance-behavior`
+
 Returns governance-specific behavior metrics.
 
 ```clarity
@@ -205,6 +223,7 @@ Returns governance-specific behavior metrics.
 ```
 
 #### `get-lending-behavior`
+
 Returns lending-specific behavior metrics.
 
 ```clarity
@@ -212,6 +231,7 @@ Returns lending-specific behavior metrics.
 ```
 
 #### `get-mev-behavior`
+
 Returns MEV protection behavior metrics.
 
 ```clarity
@@ -219,6 +239,7 @@ Returns MEV protection behavior metrics.
 ```
 
 #### `get-insurance-behavior`
+
 Returns insurance behavior metrics.
 
 ```clarity
@@ -226,6 +247,7 @@ Returns insurance behavior metrics.
 ```
 
 #### `get-bridge-behavior`
+
 Returns bridge behavior metrics.
 
 ```clarity
@@ -233,6 +255,7 @@ Returns bridge behavior metrics.
 ```
 
 #### `calculate-behavior-score`
+
 Calculates the comprehensive weighted behavior score.
 
 ```clarity
@@ -240,6 +263,7 @@ Calculates the comprehensive weighted behavior score.
 ```
 
 #### `get-behavior-tier`
+
 Determines tier based on score.
 
 ```clarity
@@ -247,6 +271,7 @@ Determines tier based on score.
 ```
 
 #### `get-incentive-multiplier`
+
 Returns multiplier for a given tier.
 
 ```clarity
@@ -254,6 +279,7 @@ Returns multiplier for a given tier.
 ```
 
 #### `get-user-behavior-dashboard`
+
 Returns complete behavior dashboard with all metrics.
 
 ```clarity
@@ -263,6 +289,7 @@ Returns complete behavior dashboard with all metrics.
 ### Update Functions (Owner-Only)
 
 #### `record-governance-action`
+
 Records a governance action (vote, proposal creation).
 
 ```clarity
@@ -273,6 +300,7 @@ Records a governance action (vote, proposal creation).
 ```
 
 #### `record-lending-action`
+
 Records a lending action (borrow, repay, liquidation).
 
 ```clarity
@@ -284,6 +312,7 @@ Records a lending action (borrow, repay, liquidation).
 ```
 
 #### `record-mev-action`
+
 Records MEV protection usage.
 
 ```clarity
@@ -295,6 +324,7 @@ Records MEV protection usage.
 ```
 
 #### `record-insurance-action`
+
 Records insurance activity (claims, premium payments).
 
 ```clarity
@@ -306,6 +336,7 @@ Records insurance activity (claims, premium payments).
 ```
 
 #### `record-bridge-action`
+
 Records cross-chain bridge activity.
 
 ```clarity
@@ -365,26 +396,26 @@ if (tier >= 3) {
 ### For Users
 
 1. **Participate Actively**: Vote on proposals to build governance reputation
-2. **Manage Risk**: Maintain healthy collateral ratios to avoid liquidations
-3. **Use Protection**: Enable MEV protection to demonstrate security awareness
-4. **Pay Premiums**: Keep insurance premiums current for reliability score
-5. **Bridge Carefully**: Test with small amounts before large transfers
+1. **Manage Risk**: Maintain healthy collateral ratios to avoid liquidations
+1. **Use Protection**: Enable MEV protection to demonstrate security awareness
+1. **Pay Premiums**: Keep insurance premiums current for reliability score
+1. **Bridge Carefully**: Test with small amounts before large transfers
 
 ### For Developers
 
 1. **Record All Actions**: Ensure all user actions are recorded for accurate metrics
-2. **Handle Errors**: Gracefully handle metric recording failures
-3. **Display Clearly**: Show users their tier and how to improve
-4. **Incentivize**: Use multipliers in reward calculations
-5. **Monitor**: Track aggregate behavior metrics for protocol health
+1. **Handle Errors**: Gracefully handle metric recording failures
+1. **Display Clearly**: Show users their tier and how to improve
+1. **Incentivize**: Use multipliers in reward calculations
+1. **Monitor**: Track aggregate behavior metrics for protocol health
 
 ## Security Considerations
 
 1. **Owner-Only Updates**: Only contract owner can record behavior actions
-2. **No Direct Manipulation**: Users cannot directly modify their scores
-3. **Transparent Calculations**: All scoring logic is on-chain and auditable
-4. **Gradual Changes**: Scores update incrementally to prevent gaming
-5. **Multi-Dimensional**: Prevents focus on single dimension for score manipulation
+1. **No Direct Manipulation**: Users cannot directly modify their scores
+1. **Transparent Calculations**: All scoring logic is on-chain and auditable
+1. **Gradual Changes**: Scores update incrementally to prevent gaming
+1. **Multi-Dimensional**: Prevents focus on single dimension for score manipulation
 
 ## Future Enhancements
 

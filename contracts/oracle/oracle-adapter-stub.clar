@@ -1,8 +1,4 @@
-;; oracle-adapter-stub.clar
-;; Minimal stub contract used while the full external-oracle-adapter is being redesigned.
+;; Tier 0 Stub
+(define-constant ERR_NOT_IMPLEMENTED (err u9999))
+(define-read-only (stub-func) (ok true))
 
-(define-data-var oracle-adapter-initialized bool true)
-
-(define-read-only (is-initialized)
-  (ok (var-get oracle-adapter-initialized))
-)

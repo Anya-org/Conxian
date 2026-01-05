@@ -1,67 +1,87 @@
 ;; institutional-account-manager.clar
-;;
-;; Manages the lifecycle of institutional accounts, including registration,
-;; tiering, and permissions.
+;; Conxian Enterprise Standard: Institutional Account Management (BaaS)
+;; Adheres to Decentralized Modularity and Bitcoin Ethos
 
-(impl-trait .enterprise-traits.account-manager-trait)
-
+;; Constants
 (define-constant ERR_UNAUTHORIZED (err u5000))
-(define-constant ERR_LIMIT_EXCEEDED (err u5001))
+(define-constant ERR_INVALID_TIER (err u5001))
 
-(define-data-var contract-owner principal tx-sender)
-
+;; Maps
 (define-map institutional-accounts
-  { account: principal }
-  {
-    tier: uint,
-    daily-limit: uint,
-    daily-spent: uint,
-    last-reset: uint,
-    kyc-verified: bool,
-  }
+    principal
+    {
+        tier: (string-ascii 20),
+        status: (string-ascii 20),
+        limit-per-trade: uint,
+        total-deployed: uint
+    }
 )
 
-(define-public (register-account
-    (account principal)
-    (tier uint)
-    (limit uint)
-  )
-  (begin
-    (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
-    (map-set institutional-accounts { account: account } {
-      tier: tier,
-      daily-limit: limit,
-      daily-spent: u0,
-      last-reset: block-height,
-      kyc-verified: true,
-    })
-    (ok true)
-  )
-)
-
-(define-read-only (get-account-details (account principal))
-  (map-get? institutional-accounts { account: account })
-)
-
-(define-public (check-and-update-daily-spent
-    (account principal)
-    (amount uint)
-  )
-  (let ((info (unwrap! (map-get? institutional-accounts { account: account })
-      ERR_UNAUTHORIZED
-    )))
-    (let ((new-spent (if (> (- block-height (get last-reset info)) u144)
-        amount
-        (+ (get daily-spent info) amount)
-      )))
-      (asserts! (<= new-spent (get daily-limit info)) ERR_LIMIT_EXCEEDED)
-      (map-set institutional-accounts { account: account }
-        (merge info {
-          daily-spent: new-spent,
-          last-reset: block-height,
-        })
-      )
-      (ok true)
+;; @desc Registers an institutional account (BaaS)
+(define-public (register-institution
+        (institution principal)
+        (tier (string-ascii 20))
+        (limit uint)
     )
-  )
+    (begin
+        ;; Authorization check: Must be Enterprise Facade or Admin (via Access)
+        (asserts! 
+            (or 
+                (is-eq contract-caller .enterprise-facade)
+                (unwrap-panic (contract-call? .conxian-access has-role tx-sender u1))
+            ) 
+            ERR_UNAUTHORIZED
+        )
+        (map-set institutional-accounts institution {
+            tier: tier,
+            status: "ACTIVE",
+            limit-per-trade: limit,
+            total-deployed: u0
+        })
+        (print {
+            event: "institution-registered",
+            institution: institution,
+            tier: tier,
+            tenure-id: (contract-call? .block-utils get-current-tenure-id)
+        })
+        (ok true)
+    )
+)
+
+;; @desc Validates if an institution can execute a large deployment
+(define-read-only (is-deployment-authorized (institution principal) (amount uint))
+    (match (map-get? institutional-accounts institution)
+        account (ok (<= amount (get limit-per-trade account)))
+        (err u5002) ;; ERR_NOT_REGISTERED
+    )
+)
+
+;; @desc Updates the limit for an institution
+(define-public (set-limit (institution principal) (new-limit uint))
+    (begin
+        (asserts! 
+            (or 
+                (is-eq contract-caller .enterprise-facade)
+                (unwrap-panic (contract-call? .conxian-access has-role tx-sender u1))
+            ) 
+            ERR_UNAUTHORIZED
+        )
+        (match (map-get? institutional-accounts institution)
+            account 
+            (begin
+                (map-set institutional-accounts institution (merge account { limit-per-trade: new-limit }))
+                (print { event: "limit-updated", institution: institution, new-limit: new-limit })
+                (ok true)
+            )
+            (err u5002) ;; ERR_NOT_REGISTERED
+        )
+    )
+)
+
+;; @desc Institutional Yield Boost Logic
+(define-read-only (get-yield-multiplier (institution principal))
+    (match (map-get? institutional-accounts institution)
+        account (if (is-eq (get tier account) "PLATINUM") (ok u120) (ok u100)) ;; 1.2x or 1.0x
+        (ok u100)
+    )
 )

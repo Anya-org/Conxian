@@ -1,44 +1,62 @@
-# Conxian Documentation
+# Conxian Protocol Documentation
 
-This directory is the canonical source of truth for Conxian documentation.
+Welcome to the central documentation hub for the Conxian Protocol. This repository contains all of the technical
+specifications, architectural diagrams, strategic documents, and developer guides for the protocol.
 
-## Start here
+The documentation is organized to provide a clear path for various audiences, from new community members to
+institutional partners and core developers.
 
-- [`guides/SERVICE_CATALOG.md`](./guides/SERVICE_CATALOG.md)
-- [`architecture/ARCHITECTURE.md`](./architecture/ARCHITECTURE.md)
-- [`SYSTEM_ARCHITECTURE.md`](./SYSTEM_ARCHITECTURE.md)
-- [`whitepaper/Conxian-Whitepaper.md`](./whitepaper/Conxian-Whitepaper.md)
-- [`security/SECURITY.md`](./security/SECURITY.md)
+## 1. Core Documents
 
-## By audience
+If you are new to the Conxian Protocol, we recommend starting with these key documents to understand our vision,
+architecture, and technical design.
 
-### Retail users
+- **[Project README](../README.md)**: The main project README. It provides a high-level overview of the protocol, its
+  core architecture, and instructions for development setup.
+- **[Strategic Overview](./STRATEGIC_OVERVIEW.md)**: Our vision, business goals, current status, and strategic roadmap.
+- **[Whitepaper](./whitepaper/Conxian-Whitepaper.md)**: The complete technical vision and protocol design.
+- **[Roadmap](./ROADMAP.md)**: The unified development roadmap for the Conxian Protocol.
 
-- [`retail/USER_GUIDE.md`](./retail/USER_GUIDE.md)
-- [`guides/01-vault.md`](./guides/01-vault.md)
-- [`guides/02-governance.md`](./guides/02-governance.md)
-- [`guides/03-dex.md`](./guides/03-dex.md)
-- [`guides/04-tokens.md`](./guides/04-tokens.md)
+## 2. Technical & Architectural Documentation
 
-### Enterprise & institutions
+This section contains the detailed technical specifications and architectural decision records (ADRs).
 
-- [`guides/ENTERPRISE_BUYER_OVERVIEW.md`](./guides/ENTERPRISE_BUYER_OVERVIEW.md)
-- [`enterprise/ONBOARDING.md`](./enterprise/ONBOARDING.md)
-- [`enterprise/BUSINESS_VALUE_ROI.md`](./enterprise/BUSINESS_VALUE_ROI.md)
-- [`enterprise/COMPLIANCE_SECURITY.md`](./enterprise/COMPLIANCE_SECURITY.md)
+- **[Architecture Overview](./architecture/OVERVIEW.md)**: A comprehensive guide to the protocol's modular,
+  facade-based architecture.
+- **[Smart Contract `README`s](../contracts/)**: Specific module architecture details (found in each contract
+  subdirectory).
+- **[Architecture Decision Records](./architecture/adr/)**: Records of key architectural decisions.
+- **[Naming Standards](./reference/NAMING_STANDARDS.md)**: Official naming conventions for tokens and governance
+  bodies.
 
-### Developers
+## 3. Guides & Manuals
 
-- [`developer/DEVELOPER_GUIDE.md`](./developer/DEVELOPER_GUIDE.md)
-- [`developer/MIGRATION_GUIDE_ACCESS_CONTROL.md`](./developer/MIGRATION_GUIDE_ACCESS_CONTROL.md)
-- [`guides/CONTRIBUTING.md`](./guides/CONTRIBUTING.md)
+This section provides practical guides for different user groups.
 
-## Other documentation
+### For Developers
 
-- [`STRATEGIC_OVERVIEW.md`](./STRATEGIC_OVERVIEW.md)
-- [`GOVERNANCE_MODEL.md`](./GOVERNANCE_MODEL.md)
-- [`deployment`](./deployment)
-- [`standards`](./standards)
-- [`api`](./api)
-- [`reports/`](./reports/)
-- [`review/`](./review/)
+- **[Developer Guide](./developer/DEVELOPER_GUIDE.md)**: Comprehensive guide for building on or contributing to
+  Conxian.
+- **[Contributing Guide](./guides/CONTRIBUTING.md)**: Guidelines for contributing code and documentation.
+
+### For Enterprise & Institutional Users
+
+- **[Enterprise Onboarding](./enterprise/ONBOARDING.md)**: Integration guide for institutional partners.
+- **[Compliance & Security](./enterprise/COMPLIANCE_SECURITY.md)**: Overview of compliance features and security
+  posture.
+
+### For Governance Participants
+
+- **[Governance Model](./GOVERNANCE_MODEL.md)**: Explanation of the Conxian DAO, council structure, and voting process.
+
+## 4. System Analysis, Strategy & Reports
+
+This section contains in-depth analysis and reports related to the protocol's risk profile, security, and overall
+readiness.
+
+- **[Project Log](./PROJECT_LOG.md)**: The central index for all project reports, audits, and status updates. **Start
+  here for historical context.**
+- **[System Analysis](./SYSTEM_ANALYSIS.md)**: Analysis of the protocol's market, competitive landscape, and risks.
+- **[Security Documentation](./security/SECURITY.md)**: Overview of security strategy.
+- **[Launch Strategy](./strategy/COMPREHENSIVE_LAUNCH_STRATEGY.md)**: Comprehensive launch strategy.
+- **[Gamification Strategy](./strategy/GAMIFICATION_STRATEGY.md)**: Gamification strategy.

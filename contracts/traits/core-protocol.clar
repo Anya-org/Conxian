@@ -1,29 +1,10 @@
-;; Core Protocol Traits - Production Module
+;; core-protocol.clar
+;; Core Protocol Traits
 
-;; ===========================================
-;; UPGRADEABLE TRAIT
-;; ===========================================
-(define-trait upgradeable-trait
-  (
-    (upgrade-contract (principal) (response bool uint))
-    (get-implementation () (response principal uint))
-  )
-)
-
-;; ===========================================
-;; REVENUE DISTRIBUTOR TRAIT
-;; ===========================================
-(define-trait revenue-distributor-trait
-  (
-    (report-revenue (principal uint principal) (response bool uint))
-  )
-)
-
-;; ===========================================
-;; TOKEN COORDINATOR TRAIT
-;; ===========================================
-(define-trait token-coordinator-trait
-  (
-    (on-dimensional-yield (uint uint uint) (response bool uint))
-  )
+(define-trait protocol-manager-trait
+    (
+        (is-paused () (response bool uint))
+        (get-admin () (response principal uint))
+        (set-paused (bool) (response bool uint))
+    )
 )

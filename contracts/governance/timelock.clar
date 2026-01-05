@@ -1,96 +1,82 @@
-;; ===========================================
-;; TIMELOCK CONTRACT
-;; ===========================================
-;; Version: 1.0.0
-;; Clarity SDK 3.9+ & Nakamoto Standard
+;; timelock.clar
+;; Time-delayed execution controller for critical protocol changes
+;; Aligned with Nakamoto 5s block times
+;; Decentralized: Uses Unified RBAC via .conxian-access
 
-;; Use decentralized traits
-(use-trait "ownable-trait" .ownable-trait.ownable-trait)
+(use-trait proposal-trait .governance-traits.proposal-trait)
 
-;; ===========================================
-;; DATA STRUCTURES
-;; ===========================================
-(define-constant TIMELOCK_DELAY u248832000) ;; u144 * 120 blocks (approx 24 hours)
-(define-constant MIN_DELAY u2073600)  ;; 1 day
-(define-constant MAX_DELAY u145152000) ;; 1 week
+;; Constants
+(define-constant MIN_DELAY u17280) ;; 1 day (at 5s/block)
+(define-constant MAX_DELAY u241920) ;; 14 days (at 5s/block)
+(define-constant GRACE_PERIOD u120960) ;; 7 days (at 5s/block)
 
-(define-data-var delay uint u20736000)  ;; 10 days
+;; Errors
+(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_INVALID_DELAY (err u1001))
+(define-constant ERR_NOT_QUEUED (err u1002))
+(define-constant ERR_ALREADY_QUEUED (err u1003))
+(define-constant ERR_TOO_EARLY (err u1004))
+(define-constant ERR_EXPIRED (err u1005))
 
-(define-map queue 
-  {tx-id: (buff 32)}
-  {
-    target: principal,
-    value: uint,
-    data: (buff 1024),
-    eta: uint
-  }
+;; Roles from conxian-access
+(define-constant ROLE_ADMIN u1)
+
+;; State
+(define-map queued-proposals
+    principal ;; proposal contract address
+    uint ;; eta
 )
 
-;; ===========================================
-;; PUBLIC FUNCTIONS
-;; ===========================================
+(define-data-var delay uint MIN_DELAY)
 
-;; Queue a transaction
-(define-public (queue-transaction
-    (target principal)
-    (value uint)
-    (data (buff 1024))
-    (eta uint)
-  )
-  (begin
-    (asserts! (>= eta (+ block-height (var-get delay))) ERR_INSUFFICIENT_DELAY)
-    (asserts! (<= eta (+ block-height (var-get MAX_DELAY))) ERR_EXCESSIVE_DELAY)
-    
-    (let ((tx-id (sha256 (concat (as-max-len? (to-consensus-buff? target) u160) (to-consensus-buff? value) data))))
-      (map-set queue {tx-id: tx-id} {
-        target: target,
-        value: value,
-        data: data,
-        eta: eta
-      })
-      (ok tx-id)
-    )
-  )
-)
-
-;; Execute a queued transaction
-(define-public (execute-transaction
-    (target principal)
-    (value uint)
-    (data (buff 1024))
-    (eta uint)
-  )
-  (begin
-    (let ((tx-id (sha256 (concat (as-max-len? (to-consensus-buff? target) u160) (to-consensus-buff? value) data))))
-      (match (map-get? queue {tx-id: tx-id})
-        queued (begin
-          (asserts! (>= block-height (get eta queued)) ERR_EXECUTION_TOO_EARLY)
-          (asserts! (<= block-height (+ (get eta queued) (var-get GRACE_PERIOD))) ERR_EXECUTION_EXPIRED)
-          
-          ;; Execute
-          (let ((result (contract-call? (get target queued) 
-                           (unwrap-panic (from-consensus-buff? (get data queued))) 
-                           (get value queued))))
-            (map-delete queue {tx-id: tx-id})
-            result
-          )
-        )
-        (err ERR_TX_NOT_FOUND)
-      )
-    )
-  )
-)
-
-;; ===========================================
-;; ADMIN FUNCTIONS
-;; ===========================================
+;; Governance
 (define-public (set-delay (new-delay uint))
-  (begin
-    (asserts! (is-owner) ERR_NOT_OWNER)
-    (asserts! (>= new-delay MIN_DELAY) ERR_DELAY_TOO_SHORT)
-    (asserts! (<= new-delay MAX_DELAY) ERR_DELAY_TOO_LONG)
-    
-    (var-set delay new-delay)
-    (ok true)
-  )
+    (begin
+        (var-set delay new-delay)
+(asserts! (>= new-delay MIN_DELAY) ERR_INVALID_DELAY)
+        (asserts! (>= new-delay MIN_DELAY) ERR_INVALID_DELAY)
+        (asserts! (<= new-delay MAX_DELAY) ERR_INVALID_DELAY)
+        (var-set delay new-delay)
+        (ok true)
+    )
 )
+
+        (target principal)
+    (let (
+        (signature (string-ascii 48))(data (buff 128))
+    )
+        ;; Only Admin/Governance can queue
+        (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_ADMIN)) ERR_UNAUTHORIZED)
+        (tx-hash 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20)
+        
+        (map-set queued-proposals proposal-principal eta)
+        (print { event: "queue", proposal: proposal-principal, eta: eta })
+        (ok eta)
+    )
+)
+
+        (ok tx-hash)
+    (let (
+        (proposal-principal (contract-of proposal))
+        (queued-eta (unwrap! (map-get? queued-proposals proposal-principal) ERR_NOT_QUEUED))
+    )
+        (target principal)
+        (asserts! (>= block-height queued-eta) ERR_TOO_EARLY)
+        (asserts! (<= block-height (+ queued-eta GRACE_PERIOD)) ERR_EXPIRED)
+
+        (map-delete queued-proposals proposal-principal)
+        
+        ;; Execute as the Timelock Contract
+        ;; This sets 'tx-sender' to .timelock in the proposal execution context
+        (as-contract (contract-call? proposal execute tx-sender))
+    )
+)
+
+(define-read-only (get-delay)
+    (ok (var-get delay))
+)
+
+(define-read-only (get-eta (proposal principal))
+    (map-get? queued-proposals proposal)
+)
+

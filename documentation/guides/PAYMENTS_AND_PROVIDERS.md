@@ -134,9 +134,9 @@ These packs can be generated periodically or on demand for regulators, auditors,
 - Conxian Labs keeps a significant portion of Ops budget in BTC/stables.
 - Steps:
   1. DAO funds Ops / Labs Vault via Revenue Router.
-  2. Labs withdraws BTC/stables to its custody.
-  3. Labs funds BTC payroll provider.
-  4. Provider pays employees/contractors in BTC or local fiat.
+  1. Labs withdraws BTC/stables to its custody.
+  1. Labs funds BTC payroll provider.
+  1. Provider pays employees/contractors in BTC or local fiat.
 - Compliance load:
   - Conxian Labs manages KYB/KYC with provider.
   - Provider manages end-recipient rails and AML.

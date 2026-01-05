@@ -1,114 +1,57 @@
 ;; operational-treasury.clar
-;; Central Operational Treasury for Conxian Protocol
-;; Manages OpEx funds (Keepers, Oracles, Gas Stipends)
-;; Tracks burn rate and runway
+;; Conxian Enterprise Standard: Operational Treasury
+;; Collects fees from PaaS Factory, AMM, and other modules.
+;; Tier 0: "Hands-Off" Management via Agent Treasury / Timelock.
 
-(use-trait sip-010-trait .defi-traits.sip-010-ft-trait)
+(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
-;; --- Constants ---
+;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_INSUFFICIENT_FUNDS (err u1001))
-(define-constant ERR_LIMIT_EXCEEDED (err u1002))
 
-;; --- Data Variables ---
+;; Data Vars
 (define-data-var contract-owner principal tx-sender)
-(define-data-var economic-policy-engine principal tx-sender)
 
-;; Track expenses
-(define-data-var total-stx-spent uint u0)
-(define-data-var total-tokens-spent uint u0)
-(define-data-var last-spend-block uint u0)
-(define-data-var rolling-burn-rate uint u0) ;; Avg spend per 100 blocks
-
-;; Allowances for Keepers/Oracles
-(define-map authorized-spenders
-  principal
-  uint
-)
-;; spender -> daily limit
-
-;; --- Authorization ---
-(define-private (is-owner)
-  (is-eq tx-sender (var-get contract-owner))
-)
-
+;; Authorization
 (define-private (is-authorized)
-  (or (is-owner) (is-eq tx-sender (var-get economic-policy-engine)))
+    (or 
+        (is-eq tx-sender (var-get contract-owner))
+        (is-eq tx-sender .agent-treasury) ;; The Autonomous CFO
+        (is-eq tx-sender .conxian-operations-engine) ;; The Executive
+    )
 )
 
-;; --- Admin ---
-(define-public (set-contract-owner (new-owner principal))
-  (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (var-set contract-owner new-owner)
-    (ok true)
-  )
-)
+;; Core Logic
 
-(define-public (set-policy-engine (engine principal))
-  (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (var-set economic-policy-engine engine)
-    (ok true)
-  )
-)
-
-(define-public (set-spender-limit
-    (spender principal)
-    (limit uint)
-  )
-  (begin
-    (asserts! (is-authorized) ERR_UNAUTHORIZED)
-    (map-set authorized-spenders spender limit)
-    (ok true)
-  )
-)
-
-;; --- Operational Functions ---
-
-;; @desc Fund the treasury
+;; @desc Deposit STX (Fee Collection)
 (define-public (deposit-stx (amount uint))
-  (stx-transfer? amount tx-sender (as-contract tx-sender))
+    (stx-transfer? amount tx-sender (as-contract tx-sender))
 )
 
-;; @desc Withdraw funds for operations (Keepers/Oracles)
-(define-public (withdraw-stx (amount uint))
-  (let ((limit (default-to u0 (map-get? authorized-spenders tx-sender))))
-    (asserts! (> limit u0) ERR_UNAUTHORIZED)
-    (asserts! (<= amount limit) ERR_LIMIT_EXCEEDED)
-
-    ;; Update burn tracking (Simplified moving average)
-    (let (
-        (current-burn (var-get rolling-burn-rate))
-        (blocks-diff (- block-height (var-get last-spend-block)))
-      )
-      (if (> blocks-diff u0)
-        (var-set rolling-burn-rate (/ (+ current-burn amount) u2)) ;; Simple smoothing
-        true
-      )
+;; @desc Withdraw STX (Budget Allocation / Ops Expenses)
+(define-public (withdraw-stx (amount uint) (recipient principal))
+    (begin
+        (asserts! (is-authorized) ERR_UNAUTHORIZED)
+        (as-contract (stx-transfer? amount tx-sender recipient))
     )
-
-    (var-set last-spend-block block-height)
-    (var-set total-stx-spent (+ (var-get total-stx-spent) amount))
-
-    (as-contract (stx-transfer? amount tx-sender tx-sender))
-  )
 )
 
-;; --- Read Only ---
-
-(define-read-only (get-burn-rate)
-  (ok (var-get rolling-burn-rate))
+;; @desc Withdraw SIP-010 Tokens
+(define-public (withdraw-token (token <sip-010-trait>) (amount uint) (recipient principal))
+    (begin
+        (asserts! (is-authorized) ERR_UNAUTHORIZED)
+        (as-contract (contract-call? token transfer amount tx-sender recipient none))
+    )
 )
 
-(define-read-only (get-runway)
-  (let (
-      (balance (stx-get-balance (as-contract tx-sender)))
-      (burn (var-get rolling-burn-rate))
+;; Admin
+(define-public (set-contract-owner (new-owner principal))
+    (begin
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+        (var-set contract-owner new-owner)
+        (ok true)
     )
-    (if (> burn u0)
-      (ok (/ balance burn))
-      (ok u999999) ;; Infinite runway
-    )
-  )
+)
+
+(define-read-only (get-contract-owner)
+    (ok (var-get contract-owner))
 )

@@ -1,82 +1,71 @@
 ;; circuit-breaker.clar
+;; Implements automated pause triggers for volatility and emergency stops
 
-(use-trait circuit-breaker-trait .security-monitoring.circuit-breaker-trait)
+(use-trait roles-trait .core-traits.rbac-trait)
 
-(define-constant ERR_UNAUTHORIZED (err u5000))
+(define-constant ROLE_ADMIN u1)
+(define-constant ROLE_KEEPER u2)
 
-(define-data-var circuit-open bool false)
-(define-data-var admin principal tx-sender)
+(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_NOT_FOUND (err u1001))
+(define-constant ERR_ALREADY_PAUSED (err u1002))
 
-(define-public (set-admin (new-admin principal))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (var-set admin new-admin)
-    (ok true)
-  )
+;; Data Vars
+(define-data-var contract-owner principal tx-sender)
+(define-data-var rbac-contract principal .rbac)
+
+;; Map of paused contracts
+(define-map paused-contracts principal bool)
+
+;; Map of specific function pauses: { contract, function-name } -> bool
+(define-map paused-functions { contract: principal, func: (string-ascii 64) } bool)
+
+;; Authorization check
+(define-private (is-authorized (role uint))
+    (if (is-eq tx-sender (var-get contract-owner))
+        true
+        (contract-call? .rbac has-role tx-sender role)
+    )
 )
 
-(define-read-only (is-circuit-open)
-  (ok (var-get circuit-open))
+;; Admin Functions
+
+(define-public (set-contract-paused (target principal) (paused bool))
+    (begin
+        (asserts! (is-authorized ROLE_ADMIN) ERR_UNAUTHORIZED) ;; u1 = Admin/Guardian role
+        (map-set paused-contracts target paused)
+        (ok true)
+    )
 )
 
-(define-public (open-circuit)
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (var-set circuit-open true)
-    (ok true)
-  )
+(define-public (set-function-paused (target principal) (func-name (string-ascii 64)) (paused bool))
+    (begin
+        (asserts! (is-authorized u1) ERR_UNAUTHORIZED)
+        (map-set paused-functions { contract: target, func: func-name } paused)
+        (ok true)
+    )
 )
 
-(define-public (close-circuit)
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (var-set circuit-open false)
-    (ok true)
-  )
+;; Read-Only Checks
+
+(define-read-only (is-contract-paused (target principal))
+    (default-to false (map-get? paused-contracts target))
 )
 
-;; --- Implemented for comprehensive-lending-system compatibility ---
-
-(define-public (record-success (service (string-ascii 32)))
-  (ok true)
+(define-read-only (is-function-paused (target principal) (func-name (string-ascii 64)))
+    (or 
+        (is-contract-paused target)
+        (default-to false (map-get? paused-functions { contract: target, func: func-name }))
+    )
 )
 
-(define-public (record-failure (service (string-ascii 32)))
-  (ok true)
-)
-
-(define-public (check-circuit-state (service (string-ascii 32)))
-  (if (var-get circuit-open)
-    (err u5007) ;; ERR_CIRCUIT_BREAKER_OPEN
-    (ok true)
-  )
-)
-
-;; --- Trait Implementation ---
-
-(define-public (trigger-circuit-breaker (reason (string-utf8 200)))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (var-set circuit-open true)
-    (ok true)
-  )
-)
-
-(define-public (reset-circuit-breaker)
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (var-set circuit-open false)
-    (ok true)
-  )
-)
-
-(define-public (is-circuit-broken)
-  (ok (var-get circuit-open))
-)
-
-(define-public (assert-operational)
-  (if (var-get circuit-open)
-    (err u5007)
-    (ok true)
-  )
+;; Trigger mechanism for automated systems (e.g., from an Oracle or Risk Manager)
+(define-public (trigger-circuit-breaker (target principal))
+    (begin
+        ;; Only specific automated roles can trigger this
+        (asserts! (is-authorized u2) ERR_UNAUTHORIZED) ;; u2 = Automation/Keeper role
+        (map-set paused-contracts target true)
+        (print { event: "circuit-breaker-triggered", target: target, triggered-by: tx-sender })
+        (ok true)
+    )
 )

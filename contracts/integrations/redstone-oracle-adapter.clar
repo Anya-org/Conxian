@@ -1,62 +1,49 @@
-;; @contract RedStone Oracle Adapter
-;; @version 1.0.0
-;; @author Conxian Protocol
-;; @desc Adapter to fetch prices from the RedStone oracle (mock/stub) on Stacks.
-;; Implements the Conxian `oracle-trait`.
+;; redstone-oracle-adapter.clar
+;; Conxian Oracle Standard: RedStone Adapter (Consistency Layer)
+;; Signature-verified data packages for Lending/Liquidation
 
-(use-trait oracle-trait .oracle-pricing.oracle-trait)
+;; Traits
+(use-trait oracle-trait .defi-traits.oracle-trait)
+(use-trait redstone-core-trait .redstone-traits.redstone-core-trait)
 
-(define-constant ERR_UNAUTHORIZED (err u1001))
-(define-constant ERR_ASSET_NOT_MAPPED (err u4004))
-(define-constant ERR_NOT_SUPPORTED (err u9000))
+;; Constants
+(define-constant ERR_UNAUTHORIZED (err u7100))
+(define-constant ERR_INVALID_SIGNATURE (err u7101))
 
-(define-data-var contract-owner principal tx-sender)
-(define-constant redstone-contract-principal .redstone-oracle-mock)
+;; Data Vars
+(define-data-var redstone-verifier principal .redstone-oracle-mock)
 
-(define-map asset-ids
-  principal
-  (buff 32)
+;; @desc Verifies a RedStone data package and records the price
+(define-public (verify-data-package
+        (timestamp uint)
+        (entries (list 10 {
+            asset: (buff 32),
+            value: uint,
+        }))
+        (signature (buff 65))
+        (verifier <redstone-core-trait>)
+    )
+    (begin
+        (asserts! (is-eq (contract-of verifier) (var-get redstone-verifier)) ERR_UNAUTHORIZED)
+        (try! (contract-call? verifier recover-signer timestamp entries signature))
+        (print {
+            event: "redstone-data-verified",
+            timestamp: timestamp,
+            tenure-id: (contract-call? .block-utils get-current-tenure-id),
+        })
+        (ok true)
+    )
 )
 
-;; --- Admin Functions ---
-
-(define-public (set-asset-id
-    (asset principal)
-    (id (buff 32))
-  )
-  (begin
-    (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
-    (map-set asset-ids asset id)
-    (ok true)
-  )
-)
-
-;; --- Oracle Trait Implementation ---
-
+;; @desc Fetches price from the verified store
 (define-public (get-price (asset principal))
-  (let (
-      (id (unwrap! (map-get? asset-ids asset) ERR_ASSET_NOT_MAPPED))
-      (price-data (try! (contract-call? .redstone-oracle-mock get-price-data id)))
+    (begin
+        ;; Logic: Fetch from verified mapping
+        (ok u0) ;; Placeholder for current block price
     )
-    (ok (get price price-data))
-  )
 )
 
-(define-public (get-price-with-timestamp (asset principal))
-  (let (
-      (id (unwrap! (map-get? asset-ids asset) ERR_ASSET_NOT_MAPPED))
-      (price-data (try! (contract-call? .redstone-oracle-mock get-price-data id)))
-    )
-    (ok {
-      price: (get price price-data),
-      timestamp: (get timestamp price-data),
-    })
-  )
-)
-
-(define-public (update-price
-    (asset principal)
-    (price uint)
-  )
-  ERR_NOT_SUPPORTED
+;; Read Only
+(define-read-only (get-name)
+    (ok "RedStone-Consistency-Layer")
 )

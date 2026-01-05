@@ -1,27 +1,11 @@
-;; @contract Pyth Oracle V2 Mock
-;; @version 1.0.0
-;; @desc Mock implementation of Pyth Oracle for testing and devnet.
+;; Tier 0 Stub - Decentralized Oracle
+(impl-trait .defi-traits.oracle-trait)
+(impl-trait .pyth-traits.pyth-core-trait)
 
-(use-trait pyth-storage-trait .pyth-traits.pyth-storage-trait)
+(define-public (get-price (asset principal)) (ok u100000000))
+(define-public (fetch-price (asset principal)) (ok u100000000))
 
-(define-public (read-price-feed
-    (feed-id (buff 32))
-    (storage <pyth-storage-trait>)
-  )
-  (if false
-    (err u0)
-    (ok {
-      price: 100000000000, ;; 1000 * 10^8
-      conf: u100,
-      expo: -8,
-      publish-time: block-height,
-      prev-publish-time: (- block-height u1),
-      ema-price: 100000000000,
-      ema-conf: u100,
-    })
-  )
+(define-public (verify-and-update-price-feeds (vaa (buff 2048)))
+    (ok (list u100000000))
 )
 
-;; (define-public (verify-and-update-price (vaa (buff 8192)) (storage <pyth-storage-trait>))
-;;    (ok u0)
-;; )

@@ -1,95 +1,45 @@
-# Contributing to Conxian
+# Conxian Contribution Guide
 
-Thank you for your interest in contributing to the Conxian project! This document provides guidelines and workflows to ensure consistent and high-quality contributions.
+We maintain a single source of truth for contracts and manifests to keep development simple and consistent.
 
-## Development Workflow
+Canonical layout
 
-### Branch Strategy
+- Root Clarinet manifest: `Clarinet.toml`
+- Canonical contracts: `contracts/`
+- Deployment plans: `deployments/`
+- Tests: `tests/` (Vitest, Clarinet SDK)
+- Documentation: `documentation/`
 
-- `main` - Production-ready code
-- `develop` - Integration branch for features
-- `feature/*` - Feature development branches
-- `fix/*` - Bug fix branches
-- `release/*` - Release preparation branches
+Testing and manifests
 
-### Commit Guidelines
+- Default test runs compile the root manifest (`Clarinet.toml`).
+- The `stacks/` directory is for test harnesses only (alternate manifests, mocks). It must reference root contracts and must not contain production logic duplicates.
 
-All commits must follow the [Conventional Commits](https://www.conventionalcommits.org/) format:
+Traits and interfaces
 
-```
-<type>(<scope>): <subject>
-```
+- Import traits from their respective modules, e.g., `(use-trait sip-010-ft-trait .dex-traits.sip-010-ft-trait)`
+- Implement traits via alias: `(impl-trait .dex-traits.sip-010-ft-trait)`
+- The `.traits folder` contract is being phased out; please use modular imports for all new development.
+- Do not use principal-qualified traits; avoid hardcoded ST* principals. Configure external contract principals via admin functions.
 
-#### Types
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Formatting changes
-- `refactor`: Code refactoring
-- `test`: Test additions or modifications
-- `chore`: Maintenance tasks
-- `perf`: Performance improvements
-- `security`: Security fixes
+Encoding and security
 
-#### Scopes
-- `contracts`: Smart contracts
-- `dex`: Decentralized exchange components
-- `oracle`: Oracle system
-- `math`: Mathematical libraries
-- `traits`: Trait definitions
-- `utils`: Utility functions
-- `vaults`: Vault implementations
-- `tests`: Test files
-- `docs`: Documentation
-- `ci`: Continuous integration
-- `deps`: Dependencies
-- `all`: Multiple scopes
+- Use canonical encoding: `sha256(unwrap-panic (to-consensus-buff? payload))`
+- MEV protection: commit-reveal and circuit breaker hooks; use admin-set principal for breaker.
+- Oracle: centralized dimensional-oracle (oracle-aggregator-v2) naming and interfaces.
 
-### Pull Request Process
+Quick start
 
-1. Create a feature or fix branch from `develop`
-2. Implement your changes with appropriate tests
-3. Ensure all tests pass with `clarinet test`
-4. Submit a pull request to the `develop` branch
-5. Address any review comments
+1) Install Node 18+ and dependencies: `npm install`
+1) Run tests: `npm test`
+1) Check manifests: `npx clarinet check` (if Clarinet CLI available)
+1) Add contracts under `contracts/` and implement traits via alias imports.
 
-## Code Standards
+Policy checks
 
-### Clarity Code Style
+- CI runs static scans to catch principal-qualified traits, path-form `impl-trait`, and hardcoded principals.
+- Tests publish performance and verification artifacts for benchmarking.
 
-- Use 2-space indentation
-- Keep functions focused and small
-- Document public functions with comments
-- Follow trait interfaces precisely
-- Use meaningful variable names
+Questions
 
-### Testing Requirements
-
-- All new features must include unit tests
-- Integration tests for complex interactions
-- Test edge cases and error conditions
-- Maintain test coverage above 80%
-
-## Documentation
-
-- Update documentation for all new features
-- Include inline comments for complex logic
-- Provide examples for public interfaces
-- Keep the README and other docs up to date
-
-## Security Considerations
-
-- Never commit secrets or private keys
-- Follow security best practices
-- Report security issues privately
-- Consider economic attack vectors
-
-## Getting Help
-
-If you need assistance, please:
-- Check existing documentation
-- Review open and closed issues
-- Join the community chat
-- Reach out to maintainers
-
-Thank you for contributing to Conxian!
+- See `README.md` Quick Start and `documentation/architecture/ARCHITECTURE.md` for architecture and requirements.

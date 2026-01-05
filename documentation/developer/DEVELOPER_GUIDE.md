@@ -66,13 +66,13 @@ When developing new contracts, follow these patterns for trait integration per *
    (use-trait rbac-trait .core-protocol.rbac-trait)
    ```
 
-2. **Implement Traits**
+1. **Implement Traits**
 
    ```clarity
    (impl-trait .sip-standards.sip-010-ft-trait)
    ```
 
-3. **Trait Pattern**: Always use `.contract-name.trait-name` format per official Stacks documentation
+1. **Trait Pattern**: Always use `.contract-name.trait-name` format per official Stacks documentation
 
 ### 2. Smart Contract Development
 
@@ -261,10 +261,10 @@ describe('Vault Contract Tests', () => {
 ### Development Process
 
 1. **Fork Repository**: Create your own fork
-2. **Create Branch**: `git checkout -b feature/new-feature`
-3. **Develop & Test**: Write code and comprehensive tests
-4. **Documentation**: Update relevant documentation
-5. **Pull Request**: Submit for review
+1. **Create Branch**: `git checkout -b feature/new-feature`
+1. **Develop & Test**: Write code and comprehensive tests
+1. **Documentation**: Update relevant documentation
+1. **Pull Request**: Submit for review
 
 ### Code Review Checklist
 

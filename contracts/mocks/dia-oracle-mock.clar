@@ -1,13 +1,5 @@
-;; @contract DIA Oracle Mock
-;; @version 1.0.0
-;; @desc Mock implementation of DIA Oracle for testing and devnet.
+;; Tier 0 Stub - Decentralized Oracle
+(impl-trait .defi-traits.oracle-trait)
+(define-public (get-price (asset principal)) (ok u100000000))
+(define-public (fetch-price (asset principal)) (ok u100000000))
 
-(define-read-only (get-value (key (string-ascii 32)))
-  (if true
-    (ok {
-      value: u100000000000, ;; 1000 * 10^8
-      timestamp: block-height,
-    })
-    (err u1) ;; Force error type inference
-  )
-)

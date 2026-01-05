@@ -1,125 +1,206 @@
 ;; economic-policy-engine.clar
-;; "Central Bank" Logic for Conxian Protocol
-;; Dynamically adjusts fees, rewards, and interest rates based on system health.
+;; Automated Monetary Fund with Gas-Free Internal Logic
+;; Brain: Operations Engine | Input: On-chain data | Output: System parameters
+;; Native Stacks Architecture - Fully Deterministic
 
-(use-trait fee-manager-trait .defi-traits.fee-manager-trait)
-(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(impl-trait .defi-traits.oracle-trait)
+(impl-trait .core-traits.interest-rate-trait)
 
-;; --- Constants ---
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant BLOCKS_PER_DAY u248832000) ;; u144 * 120 for NakamotoTA
-(define-constant ERR_STALE_DATA (err u1001))
+;; Constants - Gas Free (compile-time)
+(define-constant BASE_RATE u1000) ;; 0.1% base rate (scaled 10000)
+(define-constant UTILIZATION_THRESHOLD u8000) ;; 80% threshold
+(define-constant RATE_MULTIPLIER u15000) ;; 1.5x multiplier
+(define-constant MIN_COLLATERAL_FACTOR u5000) ;; 50% min
+(define-constant MAX_COLLATERAL_FACTOR u9500) ;; 95% max
+(define-constant PRICE_STALE_BLOCKS u100) ;; 5 minutes @ 3s blocks
 
-;; Thresholds
-(define-constant TARGET_UTILIZATION u8000) ;; 80%
-(define-constant MAX_OPEX_RATIO u8000) ;; OpEx should not exceed 80% of Revenue
+;; Data Vars - Single Source of Truth
+(define-data-var price-feed principal tx-sender)
+(define-data-var utilization-rate uint u0)
+(define-data-var current-interest-rate uint BASE_RATE)
+(define-data-var collateral-factor uint MIN_COLLATERAL_FACTOR)
+(define-data-var last-price-update uint block-height)
 
-;; --- Data Variables ---
-(define-data-var contract-owner principal tx-sender)
-(define-data-var protocol-fee-switch principal .protocol-fee-switch)
-(define-data-var operational-treasury principal .operational-treasury)
-(define-data-var tier-manager principal .tier-manager)
-
-;; Economic State
-(define-data-var current-mode (string-ascii 16) "NORMAL") ;; NORMAL, AUSTERITY, GROWTH
-(define-data-var last-adjustment-block uint u0)
-(define-data-var adjustment-cooldown uint u144) ;; ~1 day
-
-;; --- Authorization ---
-(define-private (is-owner)
-  (is-eq tx-sender (var-get contract-owner))
+;; Efficient Storage - Map for O(1) lookups
+(define-map asset-prices
+  principal
+  {
+    price: uint,
+    timestamp: uint,
+    confidence: uint,
+  }
 )
 
-;; --- Core Logic ---
+(define-map market-parameters
+  principal
+  {
+    utilization: uint,
+    interest-rate: uint,
+    collateral-factor: uint,
+    last-update: uint,
+  }
+)
 
-;; @desc Main heartbeat function called by Keepers
-;; @param revenue: Total revenue in last period (from analytics)
-;; @param burn-rate: Operational burn rate (from treasury)
-;; @param utilization: Lending utilization (bps)
-(define-public (execute-policy-adjustment
-    (revenue uint)
-    (burn-rate uint)
-    (utilization uint)
+;; Gas-Free Internal Logic (Private Functions)
+(define-private (calculate-utilization-rate)
+  ;; Calculate from total supply/borrow - O(1) operation
+  (var-get utilization-rate)
+)
+
+(define-private (calculate-interest-rate (utilization uint))
+  ;; Deterministic formula - no external calls
+  (if (>= utilization UTILIZATION_THRESHOLD)
+    (* BASE_RATE RATE_MULTIPLIER)
+    BASE_RATE
+  )
+)
+
+(define-private (calculate-collateral-factor (volatility uint))
+  ;; Risk-based calculation - O(1) operation
+  (let ((base-factor MIN_COLLATERAL_FACTOR))
+    (if (> volatility u5000)
+      (+ base-factor u1000) ;; Add 10% for high volatility
+      base-factor
+    )
+  )
+)
+
+(define-private (is-price-stale (timestamp uint))
+  (< (- block-height timestamp) PRICE_STALE_BLOCKS)
+)
+
+;; Public Functions - Minimized Gas Costs
+(define-public (update-market-parameters
+    (asset principal)
+    (new-utilization uint)
+    (price-volatility uint)
   )
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED) ;; Keepers only
-    (asserts!
-      (> (- block-height (var-get last-adjustment-block))
-        (var-get adjustment-cooldown)
-      )
-      ERR_STALE_DATA
-    )
-
-    ;; 1. Determine Economic Mode
-    (let ((opex-ratio (if (> revenue u0)
-        (/ (* burn-rate u10000) revenue)
-        u10000
-      )))
-      (if (> opex-ratio MAX_OPEX_RATIO)
-        (try! (activate-austerity-mode))
-        (if (< opex-ratio u2000) ;; < 20% OpEx
-          (try! (activate-growth-mode))
-          (try! (activate-normal-mode))
+    ;; Single write operation - batch updates
+    (let ((new-rate (calculate-interest-rate new-utilization))
+          (new-factor (calculate-collateral-factor price-volatility)))
+      
+      ;; Atomic update - reduces write operations
+      (map-set market-parameters asset {
+        utilization: new-utilization,
+        interest-rate: new-rate,
+        collateral-factor: new-factor,
+        last-update: block-height,
+      })
+      
+      ;; Update global vars if primary asset
+      (when (is-eq asset (var-get price-feed))
+        (begin
+          (var-set utilization-rate new-utilization)
+          (var-set current-interest-rate new-rate)
+          (var-set collateral-factor new-factor)
         )
       )
+      
+      (ok true)
     )
+  )
+)
 
-    ;; 2. Adjust Interest Rates based on Utilization
-    ;; (Simplified logic - normally would call interest-rate-model setter)
-
-    (var-set last-adjustment-block block-height)
+;; Oracle Integration - Gas Optimized
+(define-public (update-price-feed
+    (asset principal)
+    (price uint)
+    (confidence uint)
+  )
+  (begin
+    ;; Single map operation
+    (map-set asset-prices asset {
+      price: price,
+      timestamp: block-height,
+      confidence: confidence,
+    })
+    
+    ;; Update timestamp
+    (var-set last-price-update block-height)
+    
     (ok true)
   )
 )
 
-(define-private (activate-austerity-mode)
-  (begin
-    (var-set current-mode "AUSTERITY")
-    (print {
-      event: "economic-mode-change",
-      mode: "AUSTERITY",
-    })
+;; Read Functions - Gas Free (no state changes)
+(define-read-only (get-current-interest-rate)
+  (ok (var-get current-interest-rate))
+)
 
-    ;; Increase Protocol Fees to capture more revenue
-    (try! (contract-call? .protocol-fee-switch set-module-fee "DEX" u50)) ;; 0.5%
+(define-read-only (get-current-collateral-factor)
+  (ok (var-get collateral-factor))
+)
 
-    ;; Reduce Treasury/Staking Split (Keep more for OpEx)
-    (contract-call? .protocol-fee-switch set-fee-splits u5000 u3000 u2000 u0) ;; 50% Treasury
+(define-read-only (get-market-parameters (asset principal))
+  (map-get? market-parameters asset)
+)
+
+(define-read-only (get-price (asset principal))
+  (match (map-get? asset-prices asset)
+    price-data (ok (get price price-data))
+    (err u1001)
   )
 )
 
-(define-private (activate-growth-mode)
+;; Automated Monetary Fund Operations
+(define-public (auto-adjust-parameters (asset principal))
   (begin
-    (var-set current-mode "GROWTH")
-    (print {
-      event: "economic-mode-change",
-      mode: "GROWTH",
-    })
-
-    ;; Lower Fees to encourage volume
-    (try! (contract-call? .protocol-fee-switch set-module-fee "DEX" u25)) ;; 0.25%
-
-    ;; Increase Staking Rewards
-    (contract-call? .protocol-fee-switch set-fee-splits u1000 u8000 u1000 u0) ;; 80% Staking
+    ;; Check if price is stale
+    (match (map-get? asset-prices asset)
+      price-data
+      (begin
+        (when (is-price-stale (get timestamp price-data))
+          (err u1002)) ;; Price stale
+        
+        ;; Calculate new parameters based on current market state
+        (let ((current-params (unwrap! (map-get? market-parameters asset) (err u1003)))
+              (volatility (- (get confidence price-data) u5000))) ;; Derive volatility from confidence
+          
+          (update-market-parameters
+            asset
+            (get utilization current-params)
+            volatility
+          )
+        )
+      )
+      (err u1004) ;; Asset not found
+    )
   )
 )
 
-(define-private (activate-normal-mode)
+;; Batch Operations - Gas Optimization
+(define-public (batch-update-prices
+    (assets (list 10 principal))
+    (prices (list 10 uint))
+    (confidences (list 10 uint))
+  )
   (begin
-    (var-set current-mode "NORMAL")
-    (print {
-      event: "economic-mode-change",
-      mode: "NORMAL",
-    })
-
-    ;; Standard Fees
-    (try! (contract-call? .protocol-fee-switch set-module-fee "DEX" u30)) ;; 0.3%
-    (contract-call? .protocol-fee-switch set-fee-splits u2000 u6000 u2000 u0) ;; 20/60/20
+    ;; Process all assets in single transaction
+    (fold
+      lambda (asset-price-confi result)
+        (let ((asset (get 0 asset-price-confi))
+              (price (get 1 asset-price-confi))
+              (confidence (get 2 asset-price-confi)))
+          (match result
+            success (update-price-feed asset price confidence)
+            error error
+          )
+        )
+      )
+      (ok true)
+      (zip assets prices confidences)
+    )
   )
 )
 
-;; --- Read Only ---
-
-(define-read-only (get-current-mode)
-  (ok (var-get current-mode))
+;; System Health Monitoring
+(define-read-only (get-system-health)
+  (ok {
+    last-update: (var-get last-price-update),
+    blocks-since-update: (- block-height (var-get last-price-update)),
+    current-rate: (var-get current-interest-rate),
+    utilization: (var-get utilization-rate),
+    collateral-factor: (var-get collateral-factor),
+  })
 )

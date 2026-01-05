@@ -1,874 +1,153 @@
 ;; conxian-operations-engine.clar
-;; Automated operations & resilience governance seat for the Conxian Protocol.
-;; Configuration, read-only views, and a first safe execute-vote implementation.
+;; Conxian Enterprise Standard: Operations Engine (V2)
+;; The "Executive Branch" - Signal Aggregation & Governance Degradation Prevention
+;; Acts as the central coordinator for the 5-Tier Sovereign Autonomous Business (SAB)
 
-(define-constant ERR_UNAUTHORIZED (err u7000))
+(use-trait service-trait .conxian-service-trait.conxian-service-trait)
+(use-trait proposal-trait .governance-traits.proposal-trait)
 
-;; --- Core Configuration ---
+;; Constants
+(define-constant ERR_UNAUTHORIZED (err u6000))
+(define-constant ERR_STAGNATION_DETECTED (err u6001))
+(define-constant ERR_NO_SIGNAL (err u6002))
+(define-constant ERR_INVALID_SERVICE (err u6003))
+(define-constant ERR_NON_COMPLIANT (err u6004))
 
-(define-data-var proposal-engine principal .proposal-engine)
-(define-data-var proposal-registry principal .proposal-registry)
-(define-data-var governance-token principal .governance-token)
-(define-data-var governance-voting principal .governance-voting)
-(define-data-var governance-nft-contract (optional principal) none)
-(define-data-var operations-council-token-id (optional uint) none)
-(define-data-var metrics-registry (optional principal) none)
+;; Governance Thresholds
+(define-constant STAGNATION_WINDOW u1440) ;; ~10 days (assuming 144 blocks/day roughly, needs adjustment for Nakamoto 5s)
+;; Nakamoto: 5s blocks = 17,280 blocks/day. 10 days = 172,800.
+(define-constant NAKAMOTO_STAGNATION_WINDOW u172800)
 
-(define-data-var emission-controller (optional principal) none)
+;; 5-Tier Council IDs
+(define-constant COUNCIL_CXD u1) ;; Core Protocol
+(define-constant COUNCIL_CXVG u2) ;; Risk
+(define-constant COUNCIL_CXTR u3) ;; Treasury
+(define-constant COUNCIL_CXS u4) ;; Staking
+(define-constant COUNCIL_CXLP u5) ;; Liquidity
 
-(define-data-var lending-system (optional principal) none)
+;; State
+(define-data-var last-governance-action uint u0)
+(define-data-var failsafe-active bool false)
+(define-data-var operator-controller principal tx-sender)
 
-(define-data-var mev-system (optional principal) none)
+;; Registered Services (for Zero-Drift Engineering)
+(define-map registered-services principal bool)
 
-(define-data-var insurance-system (optional principal) none)
-
-(define-data-var bridge-system (optional principal) none)
-
-(define-map auto-support-proposals
-  uint
-  bool
-)
-(define-map auto-abstain-proposals
-  uint
-  bool
-)
-
-;; ===========================================
-;; BEHAVIOR METRICS & REPUTATION SYSTEM
-;; ===========================================
-;; Track and incentivize excellent behavior across the protocol
-
-;; User behavior metrics
-(define-map user-behavior-metrics
-  principal
-  {
-    reputation-score: uint, ;; 0-10000 reputation score
-    governance-participation: uint, ;; Number of proposals voted on
-    lending-health-score: uint, ;; Average health factor (0-10000)
-    mev-protection-score: uint, ;; MEV protection usage score
-    insurance-coverage-score: uint, ;; Insurance coverage score
-    bridge-reliability-score: uint, ;; Cross-chain bridge reliability
-    total-protocol-value: uint, ;; Total value contributed to protocol
-    last-updated: uint, ;; Last metrics update block
-    behavior-tier: uint, ;; 1=bronze, 2=silver, 3=gold, 4=platinum
-    incentive-multiplier: uint, ;; Reward multiplier (100-300)
-  }
+;; Events
+(define-private (emit-event (event (string-ascii 32)) (data (optional (buff 256))))
+    (print { event: event, data: data, block: block-height })
 )
 
-;; Governance behavior tracking
-(define-map governance-behavior
-  principal
-  {
-    proposals-voted: uint,
-    proposals-created: uint,
-    voting-accuracy: uint, ;; Alignment with successful outcomes (0-10000)
-    delegation-trust-score: uint, ;; Trust score as delegatee
-    council-participation: uint, ;; Council meeting participation
-    emergency-response-count: uint, ;; Participation in emergency actions
-    last-vote-block: uint,
-  }
-)
-
-;; Lending behavior tracking
-(define-map lending-behavior
-  principal
-  {
-    average-health-factor: uint, ;; Historical average health factor
-    liquidation-count: uint, ;; Number of liquidations (lower is better)
-    timely-repayment-count: uint, ;; On-time repayments
-    collateral-management-score: uint, ;; Quality of collateral management
-    lending-volume: uint, ;; Total lending activity volume
-    last-updated: uint,
-  }
-)
-
-;; MEV protection behavior
-(define-map mev-behavior
-  principal
-  {
-    protection-usage-count: uint, ;; Times MEV protection was used
-    attacks-prevented: uint, ;; Attacks successfully prevented
-    protected-volume: uint, ;; Total volume protected
-    mev-awareness-score: uint, ;; Understanding of MEV risks (0-10000)
-    last-updated: uint,
-  }
-)
-
-;; Insurance behavior
-(define-map insurance-behavior
-  principal
-  {
-    coverage-utilization: uint, ;; How well coverage is utilized
-    claims-filed: uint, ;; Number of claims
-    claims-approved: uint, ;; Approved claims (quality indicator)
-    premium-payment-reliability: uint, ;; Payment reliability score
-    risk-management-score: uint, ;; Overall risk management quality
-    last-updated: uint,
-  }
-)
-
-;; Bridge behavior
-(define-map bridge-behavior
-  principal
-  {
-    successful-bridges: uint, ;; Successful cross-chain transfers
-    failed-bridges: uint, ;; Failed transfers
-    bridge-volume: uint, ;; Total bridged volume
-    bridge-reliability: uint, ;; Reliability score (0-10000)
-    security-awareness-score: uint, ;; Bridge security awareness
-    last-updated: uint,
-  }
-)
-
-;; Behavior tier thresholds
-(define-constant TIER_BRONZE_THRESHOLD u1000)
-(define-constant TIER_SILVER_THRESHOLD u3000)
-(define-constant TIER_GOLD_THRESHOLD u6000)
-(define-constant TIER_PLATINUM_THRESHOLD u9000)
-
-;; Incentive multipliers by tier
-(define-constant MULTIPLIER_BRONZE u100) ;; 1.0x
-(define-constant MULTIPLIER_SILVER u125) ;; 1.25x
-(define-constant MULTIPLIER_GOLD u150) ;; 1.5x
-(define-constant MULTIPLIER_PLATINUM u200) ;; 2.0x
-(define-constant MULTIPLIER_MAX u300) ;; 3.0x (exceptional behavior)
-
-;; --- Public Read-Only Views ---
-
-(define-read-only (get-config)
-  {
-    proposal-engine: (var-get proposal-engine),
-    proposal-registry: (var-get proposal-registry),
-    governance-token: (var-get governance-token),
-    governance-voting: (var-get governance-voting),
-    governance-nft-contract: (var-get governance-nft-contract),
-    operations-council-token-id: (var-get operations-council-token-id),
-    metrics-registry: (var-get metrics-registry),
-    emission-controller: (var-get emission-controller),
-    lending-system: (var-get lending-system),
-    mev-system: (var-get mev-system),
-    insurance-system: (var-get insurance-system),
-    bridge-system: (var-get bridge-system),
-  }
-)
-
-;; Placeholder policy fields. These will be expanded into structured
-;; parameters as the engine is wired to real risk/treasury thresholds.
-(define-read-only (get-policy)
-  {
-    legex-policy: u0,
-    devex-policy: u0,
-    opex-policy: u0,
-    capex-policy: u0,
-    invex-policy: u0,
-  }
-)
-
-;; --- Operations Status ---
-
-(define-read-only (get-operations-status)
-  (let (
-      (health (unwrap-panic (contract-call? .token-system-coordinator get-system-health)))
-      (circuit-result (contract-call? .circuit-breaker is-circuit-open))
-    )
-    (let ((circuit-open (if (is-ok circuit-result)
-        (unwrap-panic circuit-result)
-        false
-      )))
-      {
-        is-paused: (get is-paused health),
-        emergency-mode: (get emergency-mode health),
-        total-registered-tokens: (get total-registered-tokens health),
-        total-users: (get total-users health),
-        coordinator-version: (get coordinator-version health),
-        circuit-open: circuit-open,
-      }
-    )
-  )
-)
-
-(define-read-only (get-ops-dashboard)
-  (let (
-      (ops (get-operations-status))
-      (policy (get-policy))
-    )
-    {
-      is-paused: (get is-paused ops),
-      emergency-mode: (get emergency-mode ops),
-      circuit-open: (get circuit-open ops),
-      total-registered-tokens: (get total-registered-tokens ops),
-      total-users: (get total-users ops),
-      coordinator-version: (get coordinator-version ops),
-      legex-policy: (get legex-policy policy),
-      devex-policy: (get devex-policy policy),
-      opex-policy: (get opex-policy policy),
-      capex-policy: (get capex-policy policy),
-      invex-policy: (get invex-policy policy),
-    }
-  )
-)
-
-(define-public (get-emission-limits (token principal))
-  (contract-call? .token-emission-controller get-token-emission-limits token)
-)
-
-;; ===========================================
-;; DASHBOARD AGGREGATION FUNCTIONS
-;; ===========================================
-;; These functions aggregate data from various system contracts
-;; Uses static contract references for production reliability
-
-;; Get user's lending health factor from comprehensive lending system
-(define-public (get-user-lending-health (user principal))
-  (contract-call? .comprehensive-lending-system get-health-factor user)
-)
-
-;; Get user's insurance coverage summary
-(define-public (get-user-insurance-dashboard (user principal))
-  ;; Returns basic insurance metrics
-  ;; TODO: Integrate with actual insurance contract when available
-  (ok {
-    has-coverage: false,
-    total-coverage: u0,
-    active-policies: u0,
-    last-updated: block-height,
-  })
-)
-
-;; Get user's MEV protection status
-(define-public (get-user-mev-dashboard (user principal))
-  ;; Returns MEV protection metrics
-  ;; TODO: Integrate with mev-protector contract
-  (ok {
-    protection-active: false,
-    protected-volume: u0,
-    attacks-prevented: u0,
-    last-updated: block-height,
-  })
-)
-
-;; Get user's bridge positions
-(define-public (get-user-bridge-dashboard (user principal))
-  ;; Returns cross-chain bridge positions
-  ;; TODO: Integrate with bridge contracts
-  (ok {
-    active-bridges: u0,
-    total-bridged: u0,
-    pending-transfers: u0,
-    last-updated: block-height,
-  })
-)
-
-;; Get emission governance metrics for a token
-(define-public (get-emission-governance-dashboard (token principal))
-  ;; Aggregates emission data from token-emission-controller
-  ;; Returns structured emission metrics or defaults if data unavailable
-  (ok {
-    token: token,
-    current-block: block-height,
-    last-updated: block-height,
-    note: "Call get-emission-limits and get-emission-epoch directly for detailed metrics",
-  })
-)
-
-;; Get comprehensive operations dashboard
-(define-read-only (get-operations-dashboard)
-  {
-    system-status: (get-operations-status),
-    config: (get-config),
-    block-height: block-height,
-    timestamp: block-height,
-  }
-)
-
-;; ===========================================
-
-(define-public (get-emission-epoch
-    (token principal)
-    (epoch uint)
-  )
-  (contract-call? .token-emission-controller get-epoch-emissions token epoch)
-)
-
-;; ===========================================
-;; BEHAVIOR METRICS READ-ONLY FUNCTIONS
-;; ===========================================
-
-(define-read-only (get-user-behavior-metrics (user principal))
-  (default-to {
-    reputation-score: u0,
-    governance-participation: u0,
-    lending-health-score: u0,
-    mev-protection-score: u0,
-    insurance-coverage-score: u0,
-    bridge-reliability-score: u0,
-    total-protocol-value: u0,
-    last-updated: u0,
-    behavior-tier: u1,
-    incentive-multiplier: MULTIPLIER_BRONZE,
-  }
-    (map-get? user-behavior-metrics user)
-  )
-)
-
-(define-read-only (get-governance-behavior (user principal))
-  (default-to {
-    proposals-voted: u0,
-    proposals-created: u0,
-    voting-accuracy: u0,
-    delegation-trust-score: u0,
-    council-participation: u0,
-    emergency-response-count: u0,
-    last-vote-block: u0,
-  }
-    (map-get? governance-behavior user)
-  )
-)
-
-(define-read-only (get-lending-behavior (user principal))
-  (default-to {
-    average-health-factor: u0,
-    liquidation-count: u0,
-    timely-repayment-count: u0,
-    collateral-management-score: u0,
-    lending-volume: u0,
-    last-updated: u0,
-  }
-    (map-get? lending-behavior user)
-  )
-)
-
-(define-read-only (get-mev-behavior (user principal))
-  (default-to {
-    protection-usage-count: u0,
-    attacks-prevented: u0,
-    protected-volume: u0,
-    mev-awareness-score: u0,
-    last-updated: u0,
-  }
-    (map-get? mev-behavior user)
-  )
-)
-
-(define-read-only (get-insurance-behavior (user principal))
-  (default-to {
-    coverage-utilization: u0,
-    claims-filed: u0,
-    claims-approved: u0,
-    premium-payment-reliability: u0,
-    risk-management-score: u0,
-    last-updated: u0,
-  }
-    (map-get? insurance-behavior user)
-  )
-)
-
-(define-read-only (get-bridge-behavior (user principal))
-  (default-to {
-    successful-bridges: u0,
-    failed-bridges: u0,
-    bridge-volume: u0,
-    bridge-reliability: u0,
-    security-awareness-score: u0,
-    last-updated: u0,
-  }
-    (map-get? bridge-behavior user)
-  )
-)
-
-;; Calculate comprehensive behavior score
-(define-read-only (calculate-behavior-score (user principal))
-  (let (
-      (metrics (get-user-behavior-metrics user))
-      (gov (get-governance-behavior user))
-      (lending (get-lending-behavior user))
-      (mev (get-mev-behavior user))
-      (insurance (get-insurance-behavior user))
-      (bridge (get-bridge-behavior user))
-    )
+;; Compliance Helper
+(define-private (check-compliance (user principal))
     (let (
-        ;; Weight each component (total = 10000)
-        (gov-score (/ (* (get voting-accuracy gov) u2000) u10000)) ;; 20% weight
-        (lending-score (/ (* (get collateral-management-score lending) u2500) u10000)) ;; 25% weight
-        (mev-score (/ (* (get mev-awareness-score mev) u1500) u10000)) ;; 15% weight
-        (insurance-score (/ (* (get risk-management-score insurance) u1500) u10000)) ;; 15% weight
-        (bridge-score (/ (* (get bridge-reliability bridge) u1500) u10000)) ;; 15% weight
-        (participation-bonus (/ (* (+ (get proposals-voted gov) (get proposals-created gov)) u10) u1)) ;; 10% weight
-      )
-      (+ gov-score lending-score mev-score insurance-score bridge-score
-        participation-bonus
-      )
+        (compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user))
     )
-  )
-)
-
-;; Determine behavior tier based on score
-(define-read-only (get-behavior-tier (score uint))
-  (if (>= score TIER_PLATINUM_THRESHOLD)
-    u4
-    (if (>= score TIER_GOLD_THRESHOLD)
-      u3
-      (if (>= score TIER_SILVER_THRESHOLD)
-        u2
-        u1
-      )
-    )
-  )
-)
-
-;; Get incentive multiplier based on tier
-(define-read-only (get-incentive-multiplier (tier uint))
-  (if (is-eq tier u4)
-    MULTIPLIER_PLATINUM
-    (if (is-eq tier u3)
-      MULTIPLIER_GOLD
-      (if (is-eq tier u2)
-        MULTIPLIER_SILVER
-        MULTIPLIER_BRONZE
-      )
-    )
-  )
-)
-
-;; Comprehensive behavior dashboard
-(define-read-only (get-user-behavior-dashboard (user principal))
-  (let (
-      (score (calculate-behavior-score user))
-      (tier (get-behavior-tier score))
-      (multiplier (get-incentive-multiplier tier))
-    )
-    {
-      user: user,
-      overall-score: score,
-      behavior-tier: tier,
-      incentive-multiplier: multiplier,
-      metrics: (get-user-behavior-metrics user),
-      governance: (get-governance-behavior user),
-      lending: (get-lending-behavior user),
-      mev: (get-mev-behavior user),
-      insurance: (get-insurance-behavior user),
-      bridge: (get-bridge-behavior user),
-      last-updated: block-height,
-    }
-  )
-)
-
-;; Check that an operations council NFT seat is configured. Full ownership
-;; verification would require a static NFT contract; for now we require both
-;; contract and token-id to be set before allowing automated votes.
-(define-private (has-operations-seat)
-  (and
-    (is-some (var-get governance-nft-contract))
-    (is-some (var-get operations-council-token-id))
-  )
-)
-
-;; --- Evaluation & Voting ---
-
-(define-read-only (evaluate-proposal (proposal-id uint))
-  (let ((ops (get-operations-status)))
-    (if (or
-        (get is-paused ops)
-        (get emergency-mode ops)
-        (get circuit-open ops)
-      )
-      (ok {
-        support: false,
-        abstain: true,
-        reason-code: u1, ;; SYSTEM_STRESSED
-      })
-      (let (
-          (support-flag (default-to false (map-get? auto-support-proposals proposal-id)))
-          (abstain-flag (default-to false (map-get? auto-abstain-proposals proposal-id)))
+        (if (is-ok compliance-status)
+            true
+            false
         )
-        (if support-flag
-          (ok {
-            support: true,
-            abstain: false,
-            reason-code: u2,
-          })
-          (if abstain-flag
-            (ok {
-              support: false,
-              abstain: true,
-              reason-code: u3,
-            })
-            (ok {
-              support: false,
-              abstain: true,
-              reason-code: u0,
-            })
-          )
+    )
+)
+
+;; --- 1. Signal Aggregation & Execution ---
+
+;; @desc Monitor signals from granular councils and execute if valid
+;; @param proposal-id: The proposal to check and execute
+;; @param proposal-contract: The contract to execute
+(define-public (process-governance-signal (proposal-id uint) (proposal-contract <proposal-trait>))
+    (let (
+        (proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id) ERR_NO_SIGNAL))
+        (council-id (get council-id proposal))
+    )
+        ;; 0. Verify "Clean-Hands" Compliance of the Trigger
+        (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+
+        ;; 1. Check if proposal passed (Vote counting happens in proposal-registry/executor)
+        ;; This function acts as the "Automated Executor" that ensures policy compliance
+        
+        ;; 2. Verify System Health (Anti-Degradation)
+        (asserts! (not (var-get failsafe-active)) ERR_STAGNATION_DETECTED)
+
+        ;; 3. Execute via Proposal Executor
+        ;; The Executor will validate the vote counts and quorum
+        (try! (as-contract (contract-call? .proposal-executor execute proposal-id proposal-contract u5000)))
+        
+        ;; 4. Update Heartbeat
+        (var-set last-governance-action block-height)
+        (emit-event "governance-signal-processed" none)
+        (ok true)
+    )
+)
+
+;; --- 2. Degradation Prevention (Fail-Safe) ---
+
+;; @desc Check for Governance Stagnation and trigger Fail-Safe if needed
+;; Can be called by anyone (Keeper/Bot) to protect the system
+(define-public (check-and-trigger-failsafe)
+    (let (
+        (blocks-since-action (- block-height (var-get last-governance-action)))
+    )
+        (if (> blocks-since-action NAKAMOTO_STAGNATION_WINDOW)
+            (begin
+                (var-set failsafe-active true)
+                ;; Trigger Emergency Pause on Critical Systems via Risk Agent
+                (try! (as-contract (contract-call? .agent-risk set-contract-paused .conxian-protocol true)))
+                (emit-event "failsafe-triggered" none)
+                (ok true)
+            )
+            (ok false)
         )
-      )
     )
-  )
 )
 
-;; First safe execute-vote: only forwards a vote when the system is healthy.
-;; The caller supplies support and votes-cast; the engine enforces ops guardrails.
-(define-public (execute-vote
-    (proposal-id uint)
-    (support bool)
-    (votes-cast uint)
-  )
-  (let ((ops (get-operations-status)))
-    (if (or
-        (get is-paused ops)
-        (get emergency-mode ops)
-        (get circuit-open ops)
-      )
-      (ok false)
-      (if (not (has-operations-seat))
-        (ok false)
-        (as-contract (contract-call? .proposal-engine vote proposal-id support votes-cast))
-      )
+;; @desc Reset Fail-Safe (Requires High-Tier Governance or Admin)
+(define-public (reset-failsafe)
+    (begin
+        (asserts! (is-eq tx-sender (var-get operator-controller)) ERR_UNAUTHORIZED)
+        ;; Operator must also be compliant to reset
+(asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+        
+        (var-set failsafe-active false)
+(var-set last-governance-action block-height)
+(emit-event "failsafe-reset" none)(ok true)
     )
-  )
 )
 
-;; --- Admin Functions ---
+;; --- 3. Zero-Drift Service Integration ---
 
-(define-private (check-role (role (string-ascii 32)))
-  (ok true)
-)
-
-(define-public (set-governance-contracts
-    (new-proposal-engine principal)
-    (new-proposal-registry principal)
-    (new-governance-token principal)
-    (new-governance-voting principal)
-  )
-  (begin
-    (try! (check-role "ROLE_GOVERNANCE"))
-    (var-set proposal-engine new-proposal-engine)
-    (var-set proposal-registry new-proposal-registry)
-    (var-set governance-token new-governance-token)
-    (var-set governance-voting new-governance-voting)
-    (ok true)
-  )
-)
-
-(define-public (set-governance-nft
-    (nft-contract principal)
-    (token-id uint)
-  )
-  (begin
-    (try! (check-role "ROLE_GOVERNANCE"))
-    (var-set governance-nft-contract (some nft-contract))
-    (var-set operations-council-token-id (some token-id))
-    (ok true)
-  )
-)
-
-(define-public (set-metrics-registry (registry principal))
-  (begin
-    (try! (check-role "ROLE_GOVERNANCE"))
-    (var-set metrics-registry (some registry))
-    (ok true)
-  )
-)
-
-(define-public (set-emission-controller (controller principal))
-  (begin
-    (try! (check-role "ROLE_GOVERNANCE"))
-    (var-set emission-controller (some controller))
-    (ok true)
-  )
-)
-
-(define-public (set-lending-system (system principal))
-  (begin
-    (try! (check-role "ROLE_GOVERNANCE"))
-    (var-set lending-system (some system))
-    (ok true)
-  )
-)
-
-(define-public (set-mev-system (system principal))
-  (begin
-    (try! (check-role "ROLE_GOVERNANCE"))
-    (var-set mev-system (some system))
-    (ok true)
-  )
-)
-
-(define-public (set-insurance-system (system principal))
-  (begin
-    (try! (check-role "ROLE_GOVERNANCE"))
-    (var-set insurance-system (some system))
-    (ok true)
-  )
-)
-
-(define-public (set-bridge-system (system principal))
-  (begin
-    (try! (check-role "ROLE_GOVERNANCE"))
-    (var-set bridge-system (some system))
-    (ok true)
-  )
-)
-
-(define-public (set-auto-support-proposal
-    (proposal-id uint)
-    (enabled bool)
-  )
-  (begin
-    (try! (check-role "ROLE_GOVERNANCE"))
-    (if enabled
-      (map-set auto-support-proposals proposal-id true)
-      (map-delete auto-support-proposals proposal-id)
+;; @desc Register a new service trait compliance (Clean-Hands Compliance)
+(define-public (register-service (service-principal principal))
+    (begin
+        (asserts! (is-eq tx-sender (var-get operator-controller)) ERR_UNAUTHORIZED)
+        (map-set registered-services service-principal true)
+        (ok true)
     )
-    (ok true)
-  )
 )
 
-(define-public (set-auto-abstain-proposal
-    (proposal-id uint)
-    (enabled bool)
-  )
-  (begin
-    (try! (check-role "ROLE_GOVERNANCE"))
-    (if enabled
-      (map-set auto-abstain-proposals proposal-id true)
-      (map-delete auto-abstain-proposals proposal-id)
-    )
-    (ok true)
-  )
-)
-
-(define-public (ping-exco)
-  (ok true)
-)
-
-(define-public (trigger-revenue-event)
-  (ok true)
-)
-
-;; ===========================================
-;; BEHAVIOR METRICS UPDATE FUNCTIONS
-;; ===========================================
-;; These functions update behavior metrics based on user actions
-
-;; Update governance behavior after voting
-(define-public (record-governance-action
-    (user principal)
-    (action-type (string-ascii 32))
-    (voting-accuracy-delta int)
-  )
-  (begin
-    (try! (check-role "ROLE_GOVERNANCE"))
-    (let ((current (get-governance-behavior user)))
-      (map-set governance-behavior user
-        (merge current {
-          proposals-voted: (if (is-eq action-type "vote")
-            (+ (get proposals-voted current) u1)
-            (get proposals-voted current)
-          ),
-          proposals-created: (if (is-eq action-type "create")
-            (+ (get proposals-created current) u1)
-            (get proposals-created current)
-          ),
-          voting-accuracy: (let ((new-accuracy (+ (to-int (get voting-accuracy current)) voting-accuracy-delta)))
-            (if (< new-accuracy 0)
-              u0
-              (to-uint new-accuracy)
+;; @desc Execute an operation on a registered service (Policy-Constrained Execution)
+(define-public (execute-service-operation (service <service-trait>) (op-data (buff 2048)))
+    (begin
+        (asserts!
+            (default-to false
+                (map-get? registered-services (contract-of service))
             )
-          ),
-          last-vote-block: block-height,
-        })
-      )
-      (unwrap-panic (update-overall-behavior-metrics user))
-      (ok true)
+            ERR_INVALID_SERVICE
+        )
+(asserts! (not (var-get failsafe-active)) ERR_STAGNATION_DETECTED)
+
+;; Verify "Clean-Hands" Compliance
+(asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+
+;; Execute
+(try! (contract-call? service execute-service-op op-data))
+(emit-event "service-op-executed" none)
+        (ok true)
     )
-  )
 )
 
-;; Update lending behavior
-(define-public (record-lending-action
-    (user principal)
-    (health-factor uint)
-    (was-liquidated bool)
-    (timely-repayment bool)
-  )
-  (begin
-    (try! (check-role "ROLE_GOVERNANCE"))
-    (let ((current (get-lending-behavior user)))
-      (map-set lending-behavior user
-        (merge current {
-          average-health-factor: (/ (+ (* (get average-health-factor current) u9) health-factor) u10),
-          liquidation-count: (if was-liquidated
-            (+ (get liquidation-count current) u1)
-            (get liquidation-count current)
-          ),
-          timely-repayment-count: (if timely-repayment
-            (+ (get timely-repayment-count current) u1)
-            (get timely-repayment-count current)
-          ),
-          collateral-management-score: (if was-liquidated
-            (/ (* (get collateral-management-score current) u95) u100)
-            (let ((new-score (+ (get collateral-management-score current) u50)))
-              (if (> new-score u10000)
-                u10000
-                new-score
-              )
-            )
-          ),
-          last-updated: block-height,
-        })
-      )
-      (unwrap-panic (update-overall-behavior-metrics user))
-      (ok true)
-    )
-  )
-)
+;; --- 4. Initialization ---
 
-;; Update MEV protection behavior
-(define-public (record-mev-action
-    (user principal)
-    (protection-used bool)
-    (attack-prevented bool)
-    (volume uint)
-  )
-  (begin
-    (try! (check-role "ROLE_GOVERNANCE"))
-    (let ((current (get-mev-behavior user)))
-      (map-set mev-behavior user
-        (merge current {
-          protection-usage-count: (if protection-used
-            (+ (get protection-usage-count current) u1)
-            (get protection-usage-count current)
-          ),
-          attacks-prevented: (if attack-prevented
-            (+ (get attacks-prevented current) u1)
-            (get attacks-prevented current)
-          ),
-          protected-volume: (+ (get protected-volume current) volume),
-          mev-awareness-score: (if protection-used
-            (let ((new-score (+ (get mev-awareness-score current) u100)))
-              (if (> new-score u10000)
-                u10000
-                new-score
-              )
-            )
-            (get mev-awareness-score current)
-          ),
-          last-updated: block-height,
-        })
-      )
-      (unwrap-panic (update-overall-behavior-metrics user))
-      (ok true)
-    )
-  )
-)
-
-;; Update insurance behavior
-(define-public (record-insurance-action
-    (user principal)
-    (claim-filed bool)
-    (claim-approved bool)
-    (premium-paid bool)
-  )
-  (begin
-    (try! (check-role "ROLE_GOVERNANCE"))
-    (let ((current (get-insurance-behavior user)))
-      (map-set insurance-behavior user
-        (merge current {
-          claims-filed: (if claim-filed
-            (+ (get claims-filed current) u1)
-            (get claims-filed current)
-          ),
-          claims-approved: (if claim-approved
-            (+ (get claims-approved current) u1)
-            (get claims-approved current)
-          ),
-          premium-payment-reliability: (if premium-paid
-            (let ((new-score (+ (get premium-payment-reliability current) u100)))
-              (if (> new-score u10000)
-                u10000
-                new-score
-              )
-            )
-            (/ (* (get premium-payment-reliability current) u95) u100)
-          ),
-          risk-management-score: (if (and claim-filed (not claim-approved))
-            (/ (* (get risk-management-score current) u90) u100)
-            (let ((new-score (+ (get risk-management-score current) u50)))
-              (if (> new-score u10000)
-                u10000
-                new-score
-              )
-            )
-          ),
-          last-updated: block-height,
-        })
-      )
-      (unwrap-panic (update-overall-behavior-metrics user))
-      (ok true)
-    )
-  )
-)
-
-;; Update bridge behavior
-(define-public (record-bridge-action
-    (user principal)
-    (bridge-successful bool)
-    (volume uint)
-  )
-  (begin
-    (try! (check-role "ROLE_GOVERNANCE"))
-    (let ((current (get-bridge-behavior user)))
-      (map-set bridge-behavior user
-        (merge current {
-          successful-bridges: (if bridge-successful
-            (+ (get successful-bridges current) u1)
-            (get successful-bridges current)
-          ),
-          failed-bridges: (if (not bridge-successful)
-            (+ (get failed-bridges current) u1)
-            (get failed-bridges current)
-          ),
-          bridge-volume: (+ (get bridge-volume current) volume),
-          bridge-reliability: (let (
-              (total-bridges (+ (get successful-bridges current) (get failed-bridges current) u1))
-              (success-rate (/ (* (get successful-bridges current) u10000) total-bridges))
-            )
-            success-rate
-          ),
-          security-awareness-score: (if bridge-successful
-            (let ((new-score (+ (get security-awareness-score current) u50)))
-              (if (> new-score u10000)
-                u10000
-                new-score
-              )
-            )
-            (/ (* (get security-awareness-score current) u95) u100)
-          ),
-          last-updated: block-height,
-        })
-      )
-      (unwrap-panic (update-overall-behavior-metrics user))
-      (ok true)
-    )
-  )
-)
-
-;; Update overall behavior metrics and tier
-(define-private (update-overall-behavior-metrics (user principal))
-  (let (
-      (score (calculate-behavior-score user))
-      (tier (get-behavior-tier score))
-      (multiplier (get-incentive-multiplier tier))
-      (current (get-user-behavior-metrics user))
-    )
-    (map-set user-behavior-metrics user
-      (merge current {
-        reputation-score: score,
-        behavior-tier: tier,
-        incentive-multiplier: multiplier,
-        last-updated: block-height,
-      })
-    )
-    (ok true)
-  )
+(begin
+    (var-set last-governance-action block-height)
 )

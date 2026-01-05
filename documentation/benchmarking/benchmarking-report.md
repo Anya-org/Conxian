@@ -5,6 +5,7 @@
 Conxian’s dimensional DeFi stack is being standardized on advanced-router-dijkstra, canonical encoding, centralized traits, and strengthened oracle/MEV protections. We benchmarked Conxian against Tier‑1, multi-dimensional DeFi platforms across transaction speed, security, liquidity depth, yield capabilities, and user experience. The assessment highlights strong architectural direction, with notable gaps in production instrumentation, liquidity scale, and UX polish. We present quantitative targets, a gap remediation roadmap, and a quarterly review framework to reach or exceed industry-leading standards.
 
 Key recommendations:
+
 - Enforce router standardization end-to-end; instrument pathfinding latency and quote quality.
 - Harden oracle TWAP/manipulation detection with measurable thresholds; integrate circuit breaker telemetry.
 - Scale liquidity depth via partner pools and incentives; track top-pair TVL and slippage bands.
@@ -46,18 +47,21 @@ Note: Populate the “Current” column via instrumentation; “Benchmark” ref
 ## Strategic Roadmap (Parity → Superiority)
 
 Phase A (0–90 days)
+
 - Router and encoding unification complete; deploy instrumentation for pathfinding, quotes, slippage.
 - Set oracle TWAP/manip thresholds; integrate circuit breaker telemetry; add dashboards.
 - Launch liquidity campaigns for 5 flagship pairs; target slippage bounds at $10k.
 - UX updates: fee breakdown, route transparency; basic session analytics.
 
 Phase B (90–180 days)
+
 - Route caching and graph optimizations; achieve ≤ 40–50 ms p95 pathfinding.
 - Adversarial tests for MEV and oracle manipulation; batch auction fairness metrics.
 - Expand liquidity depth to top 10 pairs; target $50M aggregate TVL.
 - Yield optimizer integrations; auto‑compounding frequency tuning; APR reporting.
 
 Phase C (180–360 days)
+
 - Cross‑protocol integrations; institutional APIs; policy‑driven risk limits.
 - Advanced strategy analytics; risk‑adjusted yield targeting.
 - UX polish: personalization, route confidence scores; A/B experiments to lift conversion.

@@ -1,17 +1,10 @@
-;; Queue Contract Trait
-;; Defines interface for queue operations in token transfers
+;; queue-traits.clar
+;; Standard Queue Traits
 
-(define-trait queue-contract (
-  (on-transfer
-    (principal principal uint)
-    (response bool uint)
-  )
-  (on-cxlp-transfer
-    (principal principal uint)
-    (response bool uint)
-  )
-  (initialize-duration-tracking
-    (principal)
-    (response bool uint)
-  )
-))
+(define-trait queue-trait
+    (
+        (enqueue (principal uint) (response bool uint))
+        (dequeue () (response (optional { user: principal, amount: uint }) uint))
+        (get-length () (response uint uint))
+    )
+)

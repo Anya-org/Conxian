@@ -79,6 +79,7 @@ Actual implementation details will be finalised alongside governance integration
 - **Mechanism**: Streams defined in `PAYROLL_AND_REWARDS.md` (e.g. `create-stream` with tags like `LEGAL_SA_RETAINER`).
 
 Retainers are subject to:
+
 - DAO approval and periodic review.
 - Caps expressed as a percentage of protocol revenues.
 
@@ -134,6 +135,7 @@ All legal representatives and wrappers are subject to the identity standards in 
   - Ensures contracts and engagement letters align with DAO intent.
 
 Disputes about quality or conflicts of interest can be:
+
 - Addressed through governance (status changes, termination of retainers).
 - Supplemented by on-chain dispute resolution mechanisms where appropriate.
 
