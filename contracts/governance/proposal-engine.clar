@@ -62,15 +62,15 @@
             council-id
         )))
     )
+        ;; Assert Voter Power (Fail Fast)
+        (asserts! (> voter-power u0) ERR_INSUFFICIENT_POWER)
+
         ;; Assert Voting Period
         (asserts! (>= block-height (get start-block proposal)) ERR_NOT_FOUND) ;; Should be ERR_NOT_STARTED but reusing
         (asserts! (< block-height (get end-block proposal)) ERR_PROPOSAL_ENDED)
-        
-        ;; Assert Voter Power
-        (asserts! (> voter-power u0) ERR_UNAUTHORIZED)
 
         ;; Record Vote
-(contract-call? .proposal-registry vote-proposal proposal-id support
+        (contract-call? .proposal-registry vote-proposal proposal-id support
             voter-power
         )
     )
