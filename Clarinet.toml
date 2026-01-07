@@ -415,8 +415,8 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/vaults/yield-aggregator.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.vault-trait]
-path = "contracts/vaults/vault-trait.clar"
+[contracts.vault-traits]
+path = "contracts/traits/vault-traits.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.custody]
@@ -525,7 +525,7 @@ depends_on = ["sip-standards", "nakamoto-constants", "conxian-protocol"]
 [contracts.conxian-vaults]
 path = "contracts/treasury/conxian-vaults.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["sip-standards", "vault-trait", "conxian-access"]
+depends_on = ["sip-standards", "vault-traits", "conxian-access"]
 
 
 [contracts.defi-primitives]
@@ -658,7 +658,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.auto-compounder]
 path = "contracts/yield/auto-compounder.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["vault-trait"]
+depends_on = ["vault-traits"]
 
 [contracts.default-strategy-engine]
 path = "contracts/rewards/default-strategy-engine.clar"

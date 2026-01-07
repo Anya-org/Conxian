@@ -16,50 +16,49 @@
 
 ;; @desc Updates the price feed with a VAA (Pull Model)
 (define-public (update-price-feed
-        (vaa (buff 2048))
-        (pyth <pyth-core-trait>)
-    )
-    (begin
-        (asserts! (is-eq (contract-of pyth) (var-get pyth-contract))
-            ERR_UNAUTHORIZED
-        )
-        (contract-call? pyth verify-and-update-price-feeds vaa)
-    )
+    (vaa (buff 2048))
+    (pyth <pyth-core-trait>)
+  )
+  (begin
+    (asserts! (is-eq (contract-of pyth) (var-get pyth-contract)) ERR_UNAUTHORIZED)
+    (contract-call? pyth verify-and-update-price-feeds vaa)
+  )
 )
 
 ;; @desc Fetches the price from Pyth (Normalized to 8 decimals)
 (define-public (get-price (asset principal))
-    (let (
-            (tenure-id (contract-call? .block-utils get-current-tenure-id))
-            ;; Static call to the default mock to avoid trait complexity in get-price for now
-            (price-data (unwrap! (contract-call? .pyth-oracle-v2-mock get-price asset)
-                (err u7002)
-            ))
-        )
-        (begin
-            (print {
-                event: "pyth-price-update",
-                asset: asset,
-                price: price-data,
-                tenure-id: tenure-id
-            })
-            (ok price-data)
-        )
+  (let (
+      (tenure-id (contract-call? .block-utils get-current-tenure-id))
+      ;; Static call to the default mock to avoid trait complexity in get-price for now
+      (price-data (unwrap! (contract-call? .pyth-oracle-v2-mock get-price asset) (err u7002)))
     )
+    (begin
+      (print {
+        event: "pyth-price-update",
+        asset: asset,
+        price: price-data,
+        tenure-id: tenure-id,
+      })
+      (ok price-data)
+    )
+  )
 )
 
 ;; @desc Admin function to switch the Pyth provider
 (define-public (set-pyth-provider (new-provider principal))
-    (begin
-        (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-admin))
-            ERR_UNAUTHORIZED
-        )
-        (var-set pyth-contract new-provider)
-        (ok true)
+  (begin
+    (asserts!
+      (is-eq tx-sender
+        (unwrap-panic (contract-call? .conxian-protocol get-admin))
+      )
+      ERR_UNAUTHORIZED
     )
+    (var-set pyth-contract new-provider)
+    (ok true)
+  )
 )
 
 ;; Read Only
 (define-read-only (get-name)
-    (ok "Pyth-Efficiency-Layer")
+  (ok "Pyth-Efficiency-Layer")
 )

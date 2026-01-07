@@ -15,20 +15,20 @@
 
 ;; Public Functions
 (define-public (update-funding-rate
-        (mark-price uint)
-        (index-price uint)
+    (mark-price uint)
+    (index-price uint)
+  )
+  (begin
+    ;; Funding Rate = Clamp(Ma - Ia, -0.05%, 0.05%)
+    ;; Simplified gas-free calculation
+    (let ((diff (- (to-int mark-price) (to-int index-price))))
+      (var-set current-funding-rate diff)
+      (var-set last-funding-time block-height)
+      (ok diff)
     )
-    (begin
-        ;; Funding Rate = Clamp(Ma - Ia, -0.05%, 0.05%)
-        ;; Simplified gas-free calculation
-        (let ((diff (- (to-int mark-price) (to-int index-price))))
-            (var-set current-funding-rate diff)
-            (var-set last-funding-time block-height)
-            (ok diff)
-        )
-    )
+  )
 )
 
 (define-read-only (get-funding-rate (id uint))
-    (ok (to-uint (var-get current-funding-rate)))
+  (ok (to-uint (var-get current-funding-rate)))
 )

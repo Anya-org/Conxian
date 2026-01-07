@@ -1,12 +1,12 @@
 # CODEOWNERS: require reviews for sensitive paths
 
 # Centralized traits and trait policy
-/contracts/traits/* @Anya-org/Conxian
+/contracts/traits/* @Conxian/Conxian
 
 # Deployments
-/deployments/** @Anya-org/devops @Anya-org/Conxian
+/deployments/** @Conxian/devops @Conxian/Conxian
 # Stacks runtime & tests
-/stacks/** @Anya-org/Conxian
+/stacks/** @Conxian/Conxian
 
 # All contracts (catch-all for review)
-/contracts/** @Anya-org/Conxian
+/contracts/** @Conxian/Conxian

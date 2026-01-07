@@ -15,28 +15,26 @@
 ;; Data Maps
 ;; positions: position-id -> { pool: principal, owner: principal, liquidity: uint, tick-lower: int, tick-upper: int }
 (define-map positions
-    uint
-    {
-        pool: principal,
-        owner: principal,
-        liquidity: uint,
-        tick-lower: int,
-        tick-upper: int,
-    }
+  uint
+  {
+    pool: principal,
+    owner: principal,
+    liquidity: uint,
+    tick-lower: int,
+    tick-upper: int,
+  }
 )
 
 (define-data-var position-nonce uint u0)
 
 ;; Compliance Helper
 (define-private (check-compliance (user principal))
-    (let (
-        (compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user))
+  (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
+    (if (is-ok compliance-status)
+      true
+      false
     )
-        (if (is-ok compliance-status)
-            true
-            false
-        )
-    )
+  )
 )
 
 ;; Core Logic
@@ -50,74 +48,74 @@
 ;; @param liquidity uint
 ;; @returns (response uint uint) - position-id
 (define-public (open-position
-        (pool principal)
-        (token0 <sip-010-trait>)
-        (token1 <sip-010-trait>)
-        (tick-lower int)
-        (tick-upper int)
-        (liquidity uint)
+    (pool principal)
+    (token0 <sip-010-trait>)
+    (token1 <sip-010-trait>)
+    (tick-lower int)
+    (tick-upper int)
+    (liquidity uint)
+  )
+  (let (
+      (position-id (+ (var-get position-nonce) u1))
+      (tenure-id (contract-call? .block-utils get-current-tenure-id))
     )
-    (let (
-            (position-id (+ (var-get position-nonce) u1))
-            (tenure-id (contract-call? .block-utils get-current-tenure-id))
-        )
-        ;; 1. Check Global Pause via Facade
-        (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1001))
-        
-        ;; 2. Compliance Check
-        (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+    ;; 1. Check Global Pause via Facade
+    (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1001))
 
-        ;; 3. Interaction: Call Pool Mint
-        ;; Note: The pool contract must implement (mint (uint int int uint) (response bool uint))
-        ;; We use a specific ID if known, or pass as principal. 
-        ;; For this integration, we call the pool principal directly assuming standard interface.
-        (try! (contract-call? .concentrated-liquidity-pool mint tx-sender tick-lower
-            tick-upper liquidity token0 token1
-        ))
+    ;; 2. Compliance Check
+    (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
 
-        ;; 4. Record position
-        (map-set positions position-id {
-            pool: pool,
-            owner: tx-sender,
-            liquidity: liquidity,
-            tick-lower: tick-lower,
-            tick-upper: tick-upper,
-        })
+    ;; 3. Interaction: Call Pool Mint
+    ;; Note: The pool contract must implement (mint (uint int int uint) (response bool uint))
+    ;; We use a specific ID if known, or pass as principal. 
+    ;; For this integration, we call the pool principal directly assuming standard interface.
+    (try! (contract-call? .concentrated-liquidity-pool mint tx-sender tick-lower
+      tick-upper liquidity token0 token1
+    ))
 
-        (var-set position-nonce position-id)
+    ;; 4. Record position
+    (map-set positions position-id {
+      pool: pool,
+      owner: tx-sender,
+      liquidity: liquidity,
+      tick-lower: tick-lower,
+      tick-upper: tick-upper,
+    })
 
-        ;; Event with tenure-id for indexing
-        (print {
-            event: "open-position",
-            position-id: position-id,
-            owner: tx-sender,
-            pool: pool,
-            tenure-id: tenure-id,
-        })
+    (var-set position-nonce position-id)
 
-        (ok position-id)
-    )
+    ;; Event with tenure-id for indexing
+    (print {
+      event: "open-position",
+      position-id: position-id,
+      owner: tx-sender,
+      pool: pool,
+      tenure-id: tenure-id,
+    })
+
+    (ok position-id)
+  )
 )
 
 ;; @desc Closes a position
 ;; @param position-id uint
 ;; @returns (response bool uint)
 (define-public (close-position (position-id uint))
-    (let ((position (unwrap! (map-get? positions position-id) (err u404))))
-        (asserts! (is-eq (get owner position) tx-sender) ERR_UNAUTHORIZED)
-        (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1001))
-        
-        ;; Compliance Check
-        (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+  (let ((position (unwrap! (map-get? positions position-id) (err u404))))
+    (asserts! (is-eq (get owner position) tx-sender) ERR_UNAUTHORIZED)
+    (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1001))
 
-        (map-delete positions position-id)
+    ;; Compliance Check
+    (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
 
-        (print {
-            event: "close-position",
-            position-id: position-id,
-            owner: tx-sender,
-            tenure-id: (contract-call? .block-utils get-current-tenure-id),
-        })
-        (ok true)
-    )
+    (map-delete positions position-id)
+
+    (print {
+      event: "close-position",
+      position-id: position-id,
+      owner: tx-sender,
+      tenure-id: (contract-call? .block-utils get-current-tenure-id),
+    })
+    (ok true)
+  )
 )

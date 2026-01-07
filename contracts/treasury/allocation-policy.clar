@@ -12,20 +12,24 @@
 (define-data-var admin principal tx-sender)
 
 (define-read-only (get-allocation-percentages)
-    (ok {
-        staking: (var-get staking-share),
-        dev: (var-get dev-fund-share),
-        insurance: (var-get insurance-share)
-    })
+  (ok {
+    staking: (var-get staking-share),
+    dev: (var-get dev-fund-share),
+    insurance: (var-get insurance-share),
+  })
 )
 
-(define-public (set-allocations (staking uint) (dev uint) (insurance uint))
-    (begin
-        (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-        (asserts! (is-eq (+ staking (+ dev insurance)) u10000) ERR_INVALID_SHARE)
-        (var-set staking-share staking)
-        (var-set dev-fund-share dev)
-        (var-set insurance-share insurance)
-        (ok true)
-    )
+(define-public (set-allocations
+    (staking uint)
+    (dev uint)
+    (insurance uint)
+  )
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq (+ staking (+ dev insurance)) u10000) ERR_INVALID_SHARE)
+    (var-set staking-share staking)
+    (var-set dev-fund-share dev)
+    (var-set insurance-share insurance)
+    (ok true)
+  )
 )

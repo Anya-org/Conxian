@@ -53,18 +53,14 @@
 
 ;; @desc Full user check (Aggregated)
 (define-public (check-user-compliance (user principal))
-  (let (
-      (current-height block-height)
-    )
+  (let ((current-height block-height))
     (begin
       (asserts! (var-get compliance-enabled) (ok true))
       ;; 1. Check Sanctions (Mock integration)
-      (let (
-          (sanction-check (unwrap-panic (contract-call? .sanctions-oracle is-sanctioned user)))
-        )
+      (let ((sanction-check (unwrap-panic (contract-call? .sanctions-oracle is-sanctioned user))))
         (if sanction-check
           (begin
-            (map-set compliance-status {user: user} {
+            (map-set compliance-status { user: user } {
               is-sanctioned: true,
               kyc-level: u0,
               last-checked: current-height,
@@ -81,11 +77,10 @@
 
 ;; Read Only
 (define-read-only (is-compliant (user principal))
-  (let (
-      (status (map-get? compliance-status {user: user}))
-    )
+  (let ((status (map-get? compliance-status { user: user })))
     (match status
-      data (ok (not (get is-sanctioned data)))
+      data
+      (ok (not (get is-sanctioned data)))
       (ok true) ;; Assume compliant if never checked
     )
   )

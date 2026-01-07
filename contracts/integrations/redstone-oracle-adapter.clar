@@ -15,35 +15,37 @@
 
 ;; @desc Verifies a RedStone data package and records the price
 (define-public (verify-data-package
-        (timestamp uint)
-        (entries (list 10 {
-            asset: (buff 32),
-            value: uint,
-        }))
-        (signature (buff 65))
-        (verifier <redstone-core-trait>)
+    (timestamp uint)
+    (entries (list 10 {
+      asset: (buff 32),
+      value: uint,
+    }))
+    (signature (buff 65))
+    (verifier <redstone-core-trait>)
+  )
+  (begin
+    (asserts! (is-eq (contract-of verifier) (var-get redstone-verifier))
+      ERR_UNAUTHORIZED
     )
-    (begin
-        (asserts! (is-eq (contract-of verifier) (var-get redstone-verifier)) ERR_UNAUTHORIZED)
-        (try! (contract-call? verifier recover-signer timestamp entries signature))
-        (print {
-            event: "redstone-data-verified",
-            timestamp: timestamp,
-            tenure-id: (contract-call? .block-utils get-current-tenure-id),
-        })
-        (ok true)
-    )
+    (try! (contract-call? verifier recover-signer timestamp entries signature))
+    (print {
+      event: "redstone-data-verified",
+      timestamp: timestamp,
+      tenure-id: (contract-call? .block-utils get-current-tenure-id),
+    })
+    (ok true)
+  )
 )
 
 ;; @desc Fetches price from the verified store
 (define-public (get-price (asset principal))
-    (begin
-        ;; Logic: Fetch from verified mapping
-        (ok u0) ;; Placeholder for current block price
-    )
+  (begin
+    ;; Logic: Fetch from verified mapping
+    (ok u0) ;; Placeholder for current block price
+  )
 )
 
 ;; Read Only
 (define-read-only (get-name)
-    (ok "RedStone-Consistency-Layer")
+  (ok "RedStone-Consistency-Layer")
 )

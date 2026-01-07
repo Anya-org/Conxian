@@ -27,62 +27,77 @@
 ;; @param start-block: The block height at which voting begins.
 ;; @param end-block: The block height at which voting ends.
 ;; @returns (response uint) The ID of the newly created proposal.
-(define-public (submit-proposal 
-        (proposal-contract <proposal-trait>) 
-        (council-id uint) 
-        (start-block uint) 
-        (end-block uint)
+(define-public (submit-proposal
+    (proposal-contract <proposal-trait>)
+    (council-id uint)
+    (start-block uint)
+    (end-block uint)
+  )
+  (let ((contract-principal (contract-of proposal-contract)))
+    ;; Check if sender holds a seat on this council (or is admin)
+    (asserts!
+      (>
+        (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender
+          council-id
+        ))
+        u0
+      )
+      ERR_UNAUTHORIZED
     )
-    (let (
-        (contract-principal (contract-of proposal-contract))
+
+    ;; Register proposal
+    (contract-call? .proposal-registry add-proposal contract-principal council-id
+      start-block end-block
     )
-        ;; Check if sender holds a seat on this council (or is admin)
-        (asserts!
-            (>
-                (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender
-                    council-id
-                ))
-                u0
-            )
-            ERR_UNAUTHORIZED
-        )
-        
-        ;; Register proposal
-        (contract-call? .proposal-registry add-proposal contract-principal council-id start-block end-block)
-    )
+  )
 )
 
 ;; @desc Casts a vote on an active proposal.
 ;; @param proposal-id: The ID of the proposal to vote on.
 ;; @param support: A boolean indicating the voter's choice (true for 'yes', false for 'no').
 ;; @returns (response bool)
-(define-public (vote (proposal-id uint) (support bool))
-    (let (
-        (proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id) ERR_NOT_FOUND))
-        (council-id (get council-id proposal))
-        (raw-voter-power (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender council-id)))
-        (weighted-voter-power (unwrap-panic (contract-call? .reputation-engine get-weighted-voting-power tx-sender raw-voter-power)))
+(define-public (vote
+    (proposal-id uint)
+    (support bool)
+  )
+  (let (
+      (proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id)
+        ERR_NOT_FOUND
+      ))
+      (council-id (get council-id proposal))
+      (raw-voter-power (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender
+        council-id
+      )))
+      (weighted-voter-power (unwrap-panic (contract-call? .reputation-engine get-weighted-voting-power tx-sender
+        raw-voter-power
+      )))
     )
-        ;; Assert Voting Period
-        (asserts! (>= block-height (get start-block proposal)) ERR_NOT_FOUND) ;; Should be ERR_NOT_STARTED but reusing
-        (asserts! (< block-height (get end-block proposal)) ERR_PROPOSAL_ENDED)
-        
-        ;; Assert Voter Power
-        (asserts! (> weighted-voter-power u0) ERR_UNAUTHORIZED)
+    ;; Assert Voting Period
+    (asserts! (>= block-height (get start-block proposal)) ERR_NOT_FOUND)
+    ;; Should be ERR_NOT_STARTED but reusing
+    (asserts! (< block-height (get end-block proposal)) ERR_PROPOSAL_ENDED)
 
-        ;; Update activity score
-        (try! (contract-call? .reputation-engine update-activity-score tx-sender))
+    ;; Assert Voter Power
+    (asserts! (> weighted-voter-power u0) ERR_UNAUTHORIZED)
 
-        ;; Record Vote
-        (contract-call? .proposal-registry vote-proposal proposal-id support weighted-voter-power)
+    ;; Update activity score
+    (try! (contract-call? .reputation-engine update-activity-score tx-sender))
+
+    ;; Record Vote
+    (contract-call? .proposal-registry vote-proposal proposal-id support
+      weighted-voter-power
     )
+  )
 )
 
 ;; @desc Executes a passed proposal by delegating to the proposal executor.
 ;; @param proposal-id: The ID of the proposal to execute.
 ;; @param proposal-contract: The contract principal of the proposal.
 ;; @returns (response bool)
-(define-public (execute-proposal (proposal-id uint) (proposal-contract <proposal-trait>))
-    (contract-call? .proposal-executor execute proposal-id proposal-contract u5000) ;; 50% quorum hardcoded for now
+(define-public (execute-proposal
+    (proposal-id uint)
+    (proposal-contract <proposal-trait>)
+  )
+  (contract-call? .proposal-executor execute proposal-id proposal-contract u5000)
+  ;; 50% quorum hardcoded for now
 )
-

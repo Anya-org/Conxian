@@ -25,22 +25,28 @@
 
 ;; Seat Metadata
 (define-map seat-data
-    uint ;; token-id
-    {
-        council-id: uint,
-        voting-power: uint,
-        member-type: (string-ascii 20), ;; "human", "autonomous-agent"
-        created-at: uint
-    }
+  uint ;; token-id
+  {
+    council-id: uint,
+    voting-power: uint,
+    member-type: (string-ascii 20), ;; "human", "autonomous-agent"
+    created-at: uint,
+  }
 )
 
 ;; Mapping: Principal -> Council -> Seat ID (Enforce 1 seat per council)
-(define-map member-seats { user: principal, council-id: uint } uint)
+(define-map member-seats
+  {
+    user: principal,
+    council-id: uint,
+  }
+  uint
+)
 
 ;; Tracking Total Power per Council
 (define-map council-power
-    uint
-    uint
+  uint
+  uint
 )
 
 ;; Access Control
@@ -48,97 +54,133 @@
 
 ;; SIP-009 Interface
 (define-read-only (get-last-token-id)
-    (ok (var-get last-seat-id))
+  (ok (var-get last-seat-id))
 )
 
 (define-read-only (get-token-uri (token-id uint))
-    (ok none)
+  (ok none)
 )
 
 (define-read-only (get-owner (token-id uint))
-    (ok (nft-get-owner? seat token-id))
+  (ok (nft-get-owner? seat token-id))
 )
 
-(define-public (transfer (token-id uint) (sender principal) (recipient principal))
-    (begin
-        (asserts! (is-eq tx-sender sender) ERR_UNAUTHORIZED)
-        ;; Governance seats are soulbound by default in this version
-        ;; Only admin can revoke/transfer via separate admin functions
-        ERR_SOULBOUND
-    )
+(define-public (transfer
+    (token-id uint)
+    (sender principal)
+    (recipient principal)
+  )
+  (begin
+    (asserts! (is-eq tx-sender sender) ERR_UNAUTHORIZED)
+    ;; Governance seats are soulbound by default in this version
+    ;; Only admin can revoke/transfer via separate admin functions
+    ERR_SOULBOUND
+  )
 )
 
 ;; Core Logic
 
-(define-public (mint-seat (recipient principal) (council-id uint) (voting-power uint) (member-type (string-ascii 20)))
-    (let (
-        (new-id (+ (var-get last-seat-id) u1))
-        (current-power (default-to u0 (map-get? council-power council-id)))
+(define-public (mint-seat
+    (recipient principal)
+    (council-id uint)
+    (voting-power uint)
+    (member-type (string-ascii 20))
+  )
+  (let (
+      (new-id (+ (var-get last-seat-id) u1))
+      (current-power (default-to u0 (map-get? council-power council-id)))
     )
-        ;; Check Admin Role via Conxian Access
-        (asserts! (unwrap! (contract-call? .conxian-access has-role tx-sender u1) ERR_UNAUTHORIZED) ERR_UNAUTHORIZED)
-        
-        ;; Ensure user doesn't already have a seat on this council
-        (asserts! (is-none (map-get? member-seats { user: recipient, council-id: council-id })) ERR_SEAT_TAKEN)
+    ;; Check Admin Role via Conxian Access
+    (asserts!
+      (unwrap! (contract-call? .conxian-access has-role tx-sender u1)
+        ERR_UNAUTHORIZED
+      )
+      ERR_UNAUTHORIZED
+    )
 
-        (try! (nft-mint? seat new-id recipient))
-        
-        (map-set seat-data new-id {
-            council-id: council-id,
-            voting-power: voting-power,
-            member-type: member-type,
-            created-at: block-height
-        })
-        
-        (map-set member-seats { user: recipient, council-id: council-id } new-id)
-        (map-set council-power council-id (+ current-power voting-power))
-        (var-set last-seat-id new-id)
-        (ok new-id)
+    ;; Ensure user doesn't already have a seat on this council
+    (asserts!
+      (is-none (map-get? member-seats {
+        user: recipient,
+        council-id: council-id,
+      }))
+      ERR_SEAT_TAKEN
     )
+
+    (try! (nft-mint? seat new-id recipient))
+
+    (map-set seat-data new-id {
+      council-id: council-id,
+      voting-power: voting-power,
+      member-type: member-type,
+      created-at: block-height,
+    })
+
+    (map-set member-seats {
+      user: recipient,
+      council-id: council-id,
+    }
+      new-id
+    )
+    (map-set council-power council-id (+ current-power voting-power))
+    (var-set last-seat-id new-id)
+    (ok new-id)
+  )
 )
 
 (define-public (burn-seat (seat-id uint))
-    (let (
-        (owner (unwrap! (nft-get-owner? seat seat-id) ERR_NOT_FOUND))
-        (metadata (unwrap! (map-get? seat-data seat-id) ERR_NOT_FOUND))
-        (council-id (get council-id metadata))
-        (power (get voting-power metadata))
-        (current-council-power (default-to u0 (map-get? council-power council-id)))
+  (let (
+      (owner (unwrap! (nft-get-owner? seat seat-id) ERR_NOT_FOUND))
+      (metadata (unwrap! (map-get? seat-data seat-id) ERR_NOT_FOUND))
+      (council-id (get council-id metadata))
+      (power (get voting-power metadata))
+      (current-council-power (default-to u0 (map-get? council-power council-id)))
     )
-        (asserts! (unwrap! (contract-call? .conxian-access has-role tx-sender u1) ERR_UNAUTHORIZED) ERR_UNAUTHORIZED)
-        (try! (nft-burn? seat seat-id owner))
-        (map-delete seat-data seat-id)
-        (map-delete member-seats {
-            user: owner,
-            council-id: council-id,
-        })
+    (asserts!
+      (unwrap! (contract-call? .conxian-access has-role tx-sender u1)
+        ERR_UNAUTHORIZED
+      )
+      ERR_UNAUTHORIZED
+    )
+    (try! (nft-burn? seat seat-id owner))
+    (map-delete seat-data seat-id)
+    (map-delete member-seats {
+      user: owner,
+      council-id: council-id,
+    })
 
-;; Update Total Power (Protect against underflow though shouldn't happen)
-(if (>= current-council-power power)
-            (map-set council-power council-id (- current-council-power power))
-            (map-set council-power council-id u0)
-        )
-        (ok true)
+    ;; Update Total Power (Protect against underflow though shouldn't happen)
+    (if (>= current-council-power power)
+      (map-set council-power council-id (- current-council-power power))
+      (map-set council-power council-id u0)
     )
+    (ok true)
+  )
 )
 
 ;; Read-Only Helpers
 
-(define-read-only (get-seat-power (user principal) (council-id uint))
-    (let ((power (match (map-get? member-seats { user: user, council-id: council-id })
-        seat-id (get voting-power (unwrap-panic (map-get? seat-data seat-id)))
-        u0
+(define-read-only (get-seat-power
+    (user principal)
+    (council-id uint)
+  )
+  (let ((power (match (map-get? member-seats {
+      user: user,
+      council-id: council-id,
+    })
+      seat-id (get voting-power (unwrap-panic (map-get? seat-data seat-id)))
+      u0
     )))
-        (ok power)
-    )
+    (ok power)
+  )
 )
 
 (define-read-only (get-total-council-power (council-id uint))
-    (let ((power (default-to u0 (map-get? council-power council-id))))
-        (ok power)
-    )
+  (let ((power (default-to u0 (map-get? council-power council-id))))
+    (ok power)
+  )
 )
 
 (define-read-only (get-seat-info (seat-id uint))
-    (map-get? seat-data seat-id)
+  (map-get? seat-data seat-id)
 )

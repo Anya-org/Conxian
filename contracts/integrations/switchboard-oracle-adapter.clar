@@ -15,7 +15,9 @@
     (begin
         ;; Only the Sentinel role or DAO can call this
         (asserts! (or 
-            (is-eq tx-sender (contract-call? .conxian-protocol get-admin))
+            (is-eq tx-sender
+                (unwrap-panic (contract-call? .conxian-protocol get-admin))
+            )
             (contract-call? .rbac has-role tx-sender ROLE_SENTINEL)
         ) ERR_UNAUTHORIZED)
         

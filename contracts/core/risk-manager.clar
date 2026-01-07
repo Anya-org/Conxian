@@ -69,15 +69,13 @@
   (begin
     ;; Check cache first
     (match (map-get? position-health position-id)
-      (health-data
+      health-data
         (begin
           ;; Return cached value if fresh (within 10 blocks)
           (if (< (- block-height (get last-update health-data)) u10)
             (ok (get health-factor health-data))
-            ;; Recalculate if stale
-            (let ((new-hf (calculate-health-factor
-                            (get collateral-value health-data)
-                            (get debt-value health-data))))
+            ;; Calculate new if not cached
+            (let ((new-hf (calculate-health-factor (get collateral-value health-data) (get debt-value health-data))))
               (map-set position-health position-id {
                 health-factor: new-hf,
                 collateral-value: (get collateral-value health-data),
@@ -88,9 +86,8 @@
             )
           )
         )
-      )
-      ;; Calculate new if not cached
-      (ok u20000) ;; Default safe value
+      else
+(ok u20000) ;; Default safe value
     )
   )
 )
@@ -99,6 +96,7 @@
     (position-id uint)
     (collateral-value uint)
     (debt-value uint)
+    (asset principal)
   )
   (begin
     (asserts! (is-eq tx-sender (var-get dimensional-engine)) ERR_NOT_AUTHORIZED)
@@ -120,20 +118,17 @@
   (begin
     (asserts! (is-eq tx-sender (var-get dimensional-engine)) ERR_NOT_AUTHORIZED)
     
-    ;; Get health factor efficiently
     (match (map-get? position-health position-id)
       health-data
-      (let ((hf (get health-factor health-data)))
-        (asserts! (not (is-position-healthy hf)) ERR_HEALTHY_POSITION)
-        
-        ;; Execute liquidation logic here
-        ;; Remove position after liquidation
-        (map-delete position-health position-id)
-        
-        (ok u0) ;; Return amount liquidated
-      )
-      (err u1001) ;; Position not found
+        (ok (get health-factor health-data))
+      else
+        (ok u20000) ;; Default safe value
     )
+    (asserts! (not (is-position-healthy hf)) ERR_HEALTHY_POSITION)
+      
+      ;; Execute liquidation logic here
+      ;; Remove position after liquidation
+      (map-delete position-health position-id)
   )
 )
 
@@ -147,21 +142,13 @@
     (asserts! (is-eq tx-sender (var-get dimensional-engine)) ERR_NOT_AUTHORIZED)
     
     ;; Process all positions in single transaction
-    (fold
-      lambda (pos-coll-debt result)
-        (let ((pos (get 0 pos-coll-debt))
-              (coll (get 1 pos-coll-debt))
-              (debt (get 2 pos-coll-debt)))
-          (match result
-            success
-            (update-position-health pos coll debt)
-            error error
-          )
-        )
-      )
-      (ok true)
-      (zip positions collateral-values debt-values)
-    )
+    (map-set position-health (get 0 (element-at positions 0)) {
+      health-factor: u10000,
+      collateral-value: (get 0 (element-at collateral-values 0)),
+      debt-value: (get 0 (element-at debt-values 0)),
+      last-update: block-height,
+    })
+(ok true)
   )
 )
 
@@ -195,9 +182,9 @@
 
 (define-read-only (is-liquidatable (position-id uint))
   (match (map-get? position-health position-id)
-    (health-data
-      (ok (not (is-position-healthy (get health-factor health-data))))
-    )
-    (ok false)
+    data
+(ok (not (is-position-healthy (get health-factor data))))
+else
+(ok false)
   )
 )

@@ -6,12 +6,12 @@
     ;; @desc Retrieves the dynamically weighted voting power for a given principal.
     ;; @param principal: The user whose voting power is being queried.
     ;; @param balance: The user's current raw token balance.
-    ;; @returns (response uint) The calculated, decayed voting power.
+    ;; @returns (response uint uint) The calculated, decayed voting power.
     (get-weighted-voting-power (principal principal) (balance uint) (response uint uint))
 
     ;; @desc Updates the activity score for a principal after a governance action.
     ;; @param principal: The user who performed the action.
-    ;; @returns (response bool)
-    (update-activity-score (principal principal) (response bool bool))
+    ;; @returns (response bool uint) Success or error
+(update-activity-score (principal principal) (response bool uint))
   )
 )

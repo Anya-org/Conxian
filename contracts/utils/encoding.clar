@@ -13,13 +13,14 @@
 ;; @param data (buff 2048)
 ;; @returns (buff 32)
 (define-read-only (hash-data (data (buff 2048)))
-    (sha256 data)
+  (sha256 data)
 )
 
 ;; @desc Integer serialization to big-endian buffer
 ;; @param value uint
 ;; @returns (buff 16)
 (define-read-only (uint-to-buff (value uint))
-    ;; (unwrap-panic (to-consensus-buff? value))
-    0x00 ;; Placeholder
+  ;; (unwrap-panic (to-consensus-buff? value))
+  0x00
+  ;; Placeholder
 )

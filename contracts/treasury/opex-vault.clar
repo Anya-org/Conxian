@@ -11,33 +11,30 @@
 (define-data-var daily-spend uint u0)
 
 (define-public (withdraw-opex
-        (token <sip-010-trait>)
-        (amount uint)
-        (recipient principal)
+    (token <sip-010-trait>)
+    (amount uint)
+    (recipient principal)
+  )
+  (begin
+    (asserts!
+      (unwrap-panic (contract-call? .conxian-access has-role tx-sender u4))
+      ;; ROLE_OPERATOR ERR_UNAUTHORIZED
     )
-    (begin
-        (asserts!
-            (unwrap-panic (contract-call? .conxian-access has-role tx-sender u4)) ;; ROLE_OPERATOR
-            ERR_UNAUTHORIZED
+    ;; Check limits
+    (if (> (- block-height (var-get last-spend-block))
+        (contract-call? .nakamoto-constants get-blocks-per-day)
+      )
+      (begin
+        (var-set daily-spend amount)
+        (var-set last-spend-block block-height)
+      )
+      (begin
+        (asserts! (<= (+ (var-get daily-spend) amount) (var-get allowance-limit))
+          (err u1001)
         )
-        ;; Check limits
-        (if (> (- block-height (var-get last-spend-block))
-                (contract-call? .nakamoto-constants get-blocks-per-day)
-            )
-            (begin
-                (var-set daily-spend amount)
-                (var-set last-spend-block block-height)
-            )
-            (begin
-                (asserts!
-                    (<= (+ (var-get daily-spend) amount)
-                        (var-get allowance-limit)
-                    )
-                    (err u1001)
-                )
-                (var-set daily-spend (+ (var-get daily-spend) amount))
-            )
-        )
-        (as-contract (contract-call? token transfer amount tx-sender recipient none))
+        (var-set daily-spend (+ (var-get daily-spend) amount))
+      )
     )
+    (as-contract (contract-call? token transfer amount tx-sender recipient none))
+  )
 )

@@ -5,11 +5,11 @@
 (impl-trait .defi-traits.oracle-trait)
 
 (define-public (get-price (asset principal))
-    (ok u100000000)
-    ;; Stub
+  (ok u100000000)
+  ;; Stub
 )
 
 (define-public (fetch-price (asset principal))
-    (ok u100000000)
-    ;; Stub
+  (ok u100000000)
+  ;; Stub
 )

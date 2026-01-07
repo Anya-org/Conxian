@@ -7,34 +7,37 @@
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_INVALID_PARAMS (err u1001))
 
-(define-map positions 
-    uint 
-    {
-        owner: principal,
-        pool: principal,
-        amount: uint,
-        created: uint
-    }
+(define-map positions
+  uint
+  {
+    owner: principal,
+    pool: principal,
+    amount: uint,
+    created: uint,
+  }
 )
 
 (define-data-var position-nonce uint u0)
 
-(define-public (create-position (pool principal) (amount uint))
-    (let (
-        (id (+ (var-get position-nonce) u1))
-        (sender tx-sender)
+(define-public (create-position
+    (pool principal)
+    (amount uint)
+  )
+  (let (
+      (id (+ (var-get position-nonce) u1))
+      (sender tx-sender)
     )
-        (map-set positions id {
-            owner: sender,
-            pool: pool,
-            amount: amount,
-            created: block-height
-        })
-        (var-set position-nonce id)
-        (ok id)
-    )
+    (map-set positions id {
+      owner: sender,
+      pool: pool,
+      amount: amount,
+      created: block-height,
+    })
+    (var-set position-nonce id)
+    (ok id)
+  )
 )
 
 (define-read-only (get-position (id uint))
-    (map-get? positions id)
+  (map-get? positions id)
 )

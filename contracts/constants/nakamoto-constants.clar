@@ -18,13 +18,13 @@
 (define-constant STAKING_CYCLE u24192) ;; ~2 weeks (aligned with PoX cycle approx)
 
 (define-read-only (get-blocks-per-year)
-    BLOCKS_PER_YEAR
+  BLOCKS_PER_YEAR
 )
 
 (define-read-only (get-blocks-per-day)
-    BLOCKS_PER_DAY
+  BLOCKS_PER_DAY
 )
 
 (define-read-only (get-epoch-length)
-    EPOCH_LENGTH
+  EPOCH_LENGTH
 )

@@ -5,7 +5,7 @@ import { resolve } from 'path';
 let simnet: any;
 
 beforeAll(async () => {
-  simnet = await initSimnet(resolve(__dirname, '../Clarinet.toml'));
+  simnet = await initSimnet(resolve(__dirname, "../stacks/Clarinet.test.toml"));
 });
 
 describe('Simple Test', () => {

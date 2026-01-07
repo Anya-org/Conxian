@@ -77,9 +77,10 @@
   )
   (begin
     ;; Single write operation - batch updates
-    (let ((new-rate (calculate-interest-rate new-utilization))
-          (new-factor (calculate-collateral-factor price-volatility)))
-      
+    (let (
+        (new-rate (calculate-interest-rate new-utilization))
+        (new-factor (calculate-collateral-factor price-volatility))
+      )
       ;; Atomic update - reduces write operations
       (map-set market-parameters asset {
         utilization: new-utilization,
@@ -87,16 +88,16 @@
         collateral-factor: new-factor,
         last-update: block-height,
       })
-      
+
       ;; Update global vars if primary asset
-      (when (is-eq asset (var-get price-feed))
+      (if (is-eq asset (var-get price-feed))
         (begin
           (var-set utilization-rate new-utilization)
           (var-set current-interest-rate new-rate)
           (var-set collateral-factor new-factor)
         )
       )
-      
+
       (ok true)
     )
   )
@@ -115,10 +116,10 @@
       timestamp: block-height,
       confidence: confidence,
     })
-    
+
     ;; Update timestamp
     (var-set last-price-update block-height)
-    
+
     (ok true)
   )
 )
@@ -150,16 +151,19 @@
     (match (map-get? asset-prices asset)
       price-data
       (begin
-        (when (is-price-stale (get timestamp price-data))
-          (err u1002)) ;; Price stale
-        
+        (if (is-price-stale (get timestamp price-data))
+          (err u1002) ;; Price stale
+          (ok true)
+        )
+
         ;; Calculate new parameters based on current market state
-        (let ((current-params (unwrap! (map-get? market-parameters asset) (err u1003)))
-              (volatility (- (get confidence price-data) u5000))) ;; Derive volatility from confidence
-          
-          (update-market-parameters
-            asset
-            (get utilization current-params)
+        (let (
+            (current-params (unwrap! (map-get? market-parameters asset) (err u1003)))
+            (volatility (- (get confidence price-data) u5000))
+          )
+          ;; Derive volatility from confidence
+
+          (update-market-parameters asset (get utilization current-params)
             volatility
           )
         )
@@ -177,19 +181,19 @@
   )
   (begin
     ;; Process all assets in single transaction
-    (fold
-      lambda (asset-price-confi result)
-        (let ((asset (get 0 asset-price-confi))
-              (price (get 1 asset-price-confi))
-              (confidence (get 2 asset-price-confi)))
-          (match result
-            success (update-price-feed asset price confidence)
-            error error
-          )
+    (fold lambda (asset-price-confi result)
+      (let (
+          (asset (get 0 asset-price-confi))
+          (price (get 1 asset-price-confi))
+          (confidence (get 2 asset-price-confi))
+        )
+        (match result
+          success (update-price-feed asset price confidence)
+          error
+          error
         )
       )
-      (ok true)
-      (zip assets prices confidences)
+      (ok true) (zip assets prices)
     )
   )
 )
