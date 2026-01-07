@@ -87,7 +87,7 @@
           )
         )
       else
-(ok u20000) ;; Default safe value
+        (ok u20000) ;; Default safe value
     )
   )
 )
@@ -118,17 +118,16 @@
   (begin
     (asserts! (is-eq tx-sender (var-get dimensional-engine)) ERR_NOT_AUTHORIZED)
     
-    (match (map-get? position-health position-id)
-      health-data
-        (ok (get health-factor health-data))
-      else
-        (ok u20000) ;; Default safe value
-    )
-    (asserts! (not (is-position-healthy hf)) ERR_HEALTHY_POSITION)
+    (let ((hf (match (map-get? position-health position-id)
+                health-data (get health-factor health-data)
+                u20000 ;; Default safe value
+              )))
+      (asserts! (not (is-position-healthy hf)) ERR_HEALTHY_POSITION)
       
       ;; Execute liquidation logic here
       ;; Remove position after liquidation
       (map-delete position-health position-id)
+      ;; Remove position after liquidation
   )
 )
 
@@ -148,7 +147,7 @@
       debt-value: (get 0 (element-at debt-values 0)),
       last-update: block-height,
     })
-(ok true)
+    (ok true)
   )
 )
 

@@ -17,12 +17,11 @@
 
 (define-trait reputation-engine-trait (
   (get-weighted-voting-power
-    (principal principal)
-    (balance uint)
+    (principal uint)
     (response uint uint)
   )
   (update-activity-score
-    (principal principal)
+    (principal)
     (response bool uint)
   )
 ))

@@ -67,6 +67,11 @@
   )
 )
 
+;; Helper function: Convert principal to bytes
+(define-private (principal-to-bytes (user principal))
+  (unwrap! (buff-to-bytes? (principal-to-buff? user)) (err u1000))
+)
+
 ;; @desc Recover the message hash for verification
 (define-read-only (get-verification-message-hash
     (user principal)

@@ -9,7 +9,6 @@
 ;; ---
 
 (use-trait rbac-trait .core-traits.rbac-trait)
-(use-trait oracle-trait .oracle-trait.oracle-trait)
 
 ;; ---
 ;; @SECTION
@@ -32,7 +31,7 @@
 
 (define-data-var contract-owner principal tx-sender)
 (define-data-var rbac-contract principal .rbac)
-(define-data-var oracle-contract principal .oracle)
+(define-data-var rbac-contract principal .rbac)
 (define-data-var volatility-threshold uint u1000) ;; 10% price deviation
 (define-data-var peg-threshold uint u500) ;; 5% deviation from 1:1
 

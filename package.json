@@ -4,6 +4,7 @@
   "type": "module",
   "description": "Conxian is a sophisticated DeFi yield optimization protocol on Stacks, designed to automate and enhance returns from liquidity provision and yield farming.",
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "test": "vitest run",
     "clarinet:check": "clarinet check",
     "check": "clarinet check",
@@ -24,6 +25,7 @@
     "derive:wallets": "tsx scripts/derive_wallets.ts"
   },
   "dependencies": {
+    "@opentelemetry/api": "1.9.0",
     "@stacks/wallet-sdk": "^7.2.0",
     "bignumber.js": "^9.1.2",
     "dotenv": "17.2.2",
@@ -40,13 +42,18 @@
     "@stacks/transactions": "^7.3.1",
     "@types/elliptic": "^6.4.18",
     "@types/node": "^24.5.2",
-    "@vitest/coverage-v8": "^2.0.4",
-    "artillery": "^2.0.26",
+    "@vitest/coverage-v8": "^4.0.16",
+    "artillery": "^2.0.27",
     "chokidar-cli": "3.0.0",
+    "npm-force-resolutions": "^0.0.10",
     "ts-node": "^10.9.2",
     "tsx": "^4.7.1",
     "typescript": "^5.4.5",
-    "vitest": "^2.0.4"
+    "vitest": "^4.0.16"
+  },
+  "resolutions": {
+    "@opentelemetry/api": "1.9.0",
+    "**/@opentelemetry/api": "1.9.0"
   },
   "private": true
 }
