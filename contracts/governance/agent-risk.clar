@@ -32,7 +32,7 @@
 
 (define-data-var contract-owner principal tx-sender)
 (define-data-var rbac-contract principal .rbac)
-(define-data-var oracle-contract principal .oracle)
+(define-data-var oracle-contract principal .oracle-trait)
 (define-data-var volatility-threshold uint u1000) ;; 10% price deviation
 (define-data-var peg-threshold uint u500) ;; 5% deviation from 1:1
 
@@ -77,8 +77,7 @@
         (asserts! (is-authorized ROLE_KEEPER) ERR_UNAUTHORIZED)
 
         (let (
-                (sbtc-data (try! (contract-call? .oracle get-price sbtc-symbol)))
-                (btc-data (try! (contract-call? .oracle get-price btc-symbol)))
+                (sbtc-data (try! (contract-call? (var-get oracle-contract) get-price sbtc-symbol)))(btc-data (try! (contract-call? (var-get oracle-contract) get-price btc-symbol)))
                 (sbtc-price (get price sbtc-data))
                 (btc-price (get price btc-data))
                 (deviation (if (> sbtc-price btc-price)
@@ -123,7 +122,7 @@
         ;; Here, we simulate by fetching the price and comparing it to a mock baseline.
         (let
             (
-                (price-data (try! (contract-call? .oracle get-price token)))
+                (price-data (try! (contract-call? (var-get oracle-contract) get-price token)))
                 (price (get price price-data))
                 (last-price (get last-price price-data)) ;; Assuming oracle provides this
                 (deviation (if (> price last-price)

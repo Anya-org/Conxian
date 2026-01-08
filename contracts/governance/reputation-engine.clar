@@ -25,12 +25,12 @@
 
 (define-public (get-weighted-voting-power (user principal) (balance uint))
   (match (map-get? activity-scores user)
-    (user-activity
+    user-activity
       (let ((current-score (get score user-activity))
             (last-voted (get last-voted-block user-activity))
             (decayed-score (calculate-decayed-score last-voted current-score)))
         ;; Weight = Balance * (Score / 1000)
-        (ok (/ (* balance decayed-score) MAX_SCORE))))
+        (ok (/ (* balance decayed-score) MAX_SCORE)))
     ;; If no activity record, default to 100% (or 0%? usually new users start neutral or 0. Request implies decay for *failure* to participate. Let's assume start at 100% or 0? 
     ;; "Seat holders who fail to participate... lose voting weight". Implies they start with weight.
     ;; However, to incentivize participation, maybe start at 100%?

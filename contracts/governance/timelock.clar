@@ -55,12 +55,11 @@
     )
 )
 
-        (ok tx-hash)
+(define-public (execute (proposal <proposal-trait>))
     (let (
         (proposal-principal (contract-of proposal))
         (queued-eta (unwrap! (map-get? queued-proposals proposal-principal) ERR_NOT_QUEUED))
     )
-        (target principal)
         (asserts! (>= block-height queued-eta) ERR_TOO_EARLY)
         (asserts! (<= block-height (+ queued-eta GRACE_PERIOD)) ERR_EXPIRED)
 

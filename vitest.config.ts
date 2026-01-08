@@ -6,7 +6,8 @@ export default defineConfig({
     environment: "node",
     setupFiles: ["./tests/setup-test-env.ts", vitestSetupFilePath],
     env: {
-        CLARINET_MANIFEST_PATH: "./stacks/Clarinet.test.toml"
-    }
+      CLARINET_MANIFEST_PATH: "./stacks/Clarinet.test.toml",
+    },
+    pool: "threads",
   },
 });

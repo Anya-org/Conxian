@@ -1,0 +1,45 @@
+# Conxian Contribution Guide
+
+We maintain a single source of truth for contracts and manifests to keep development simple and consistent.
+
+Canonical layout
+
+- Root Clarinet manifest: `Clarinet.toml`
+- Canonical contracts: `contracts/`
+- Deployment plans: `deployments/`
+- Tests: `tests/` (Vitest, Clarinet SDK)
+- Documentation: `docs/`
+
+Testing and manifests
+
+- Default test runs compile the root manifest (`Clarinet.toml`).
+- The `stacks/` directory is for test harnesses only (alternate manifests, mocks). It must reference root contracts and must not contain production logic duplicates.
+
+Traits and interfaces
+
+- Import traits from their respective modules, e.g., `(use-trait sip-010-ft-trait .dex-traits.sip-010-ft-trait)`
+- Implement traits via alias: `(impl-trait .dex-traits.sip-010-ft-trait)`
+- The `.traits folder` contract is being phased out; please use modular imports for all new development.
+- Do not use principal-qualified traits; avoid hardcoded ST* principals. Configure external contract principals via admin functions.
+
+Encoding and security
+
+- Use canonical encoding: `sha256(unwrap-panic (to-consensus-buff? payload))`
+- MEV protection: commit-reveal and circuit breaker hooks; use admin-set principal for breaker.
+- Oracle: centralized dimensional-oracle (oracle-aggregator-v2) naming and interfaces.
+
+Quick start
+
+1) Install Node 18+ and dependencies: `npm install`
+1) Run tests: `npm test`
+1) Check manifests: `npx clarinet check` (if Clarinet CLI available)
+1) Add contracts under `contracts/` and implement traits via alias imports.
+
+Policy checks
+
+- CI runs static scans to catch principal-qualified traits, path-form `impl-trait`, and hardcoded principals.
+- Tests publish performance and verification artifacts for benchmarking.
+
+Questions
+
+- See `README.md` Quick Start and [Architecture Overview](./architecture.md) for architecture and requirements.

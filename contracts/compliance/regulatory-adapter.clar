@@ -60,7 +60,9 @@
 
 ;; @desc Recover the message hash for verification
 (define-read-only (get-verification-message-hash (user principal) (expiry uint) (jurisdiction (string-ascii 3)))
-    (sha256 (unwrap-panic (to-consensus-buff? { user: user, expiry: expiry, jurisdiction: jurisdiction })))
+    (sha256 (concat (concat (hash160 user) (to-ascii expiry))
+        jurisdiction
+    ))
 )
 
 ;; @desc Submit a ZK-Proof/Signed Attestation of compliance (User-Sovereign)

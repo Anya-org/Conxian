@@ -3,8 +3,8 @@
 ;; This token is non-transferable by users to act as a "loyalty point" or "status" metric.
 
 ;; Traits
-(use-trait sip-010-ft-trait .defi-traits.sip-010-ft-trait)
-(impl-trait .defi-traits.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
+(impl-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u100))

@@ -99,6 +99,6 @@ Enterprise APIs with compliance integration and advanced order types.
 
 ## Related Documentation
 
-- [Conxian Protocol Architecture](../../documentation/architecture/OVERVIEW.md)
+- [Conxian Protocol Architecture](../../docs/developer/architecture.md)
 - [Multi-Hop Router Documentation](../dex/README.md)
-- [Oracle Integration Guide](../../guides/oracle-integration.md)
+- [Oracle Integration Guide](../../docs/developer/tokens-guide.md)

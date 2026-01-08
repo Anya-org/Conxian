@@ -1,5 +1,8 @@
 ;; risk-manager.clar
 ;; Assesses position health and manages liquidations
+;;
+;; risk-manager.clar
+;; Assesses position health and manages liquidations
 ;; Gas-Optimized Core Backend Contract - Accessed via Dimensional Engine Facade
 
 (impl-trait .core-traits.risk-manager-trait)
@@ -69,29 +72,33 @@
   (begin
     ;; Check cache first
     (match (map-get? position-health position-id)
-      (health-data
+      {
+        health-factor: hf,
+        collateral-value: cv,
+        debt-value: dv,
+        last-update: lu,
+      }
         (begin
           ;; Return cached value if fresh (within 10 blocks)
-          (if (< (- block-height (get last-update health-data)) u10)
-            (ok (get health-factor health-data))
+          (if (< (- block-height lu) u10)
+            (ok hf)
             ;; Recalculate if stale
-            (let ((new-hf (calculate-health-factor
-                            (get collateral-value health-data)
-                            (get debt-value health-data))))
+            (let ((new-hf (calculate-health-factor cv dv)))
               (map-set position-health position-id {
                 health-factor: new-hf,
-                collateral-value: (get collateral-value health-data),
-                debt-value: (get debt-value health-data),
+                collateral-value: cv,
+                debt-value: dv,
                 last-update: block-height,
               })
               (ok new-hf)
+      ;; Calc
+        )
+     (ok new-hf)
             )
-          )
+          ;; Calculate new if not cached
+          (ok u20000) ;; Default safe value
         )
       )
-      ;; Calculate new if not cached
-      (ok u20000) ;; Default safe value
-    )
   )
 )
 
@@ -122,8 +129,13 @@
     
     ;; Get health factor efficiently
     (match (map-get? position-health position-id)
-      health-data
-      (let ((hf (get health-factor health-data)))
+      {
+        health-factor: hf,
+        collateral-value: cv,
+        debt-value: dv,
+        last-update: lu,
+      }
+      (begin
         (asserts! (not (is-position-healthy hf)) ERR_HEALTHY_POSITION)
         
         ;; Execute liquidation logic here
@@ -133,6 +145,19 @@
         (ok u0) ;; Return amount liquidated
       )
       (err u1001) ;; Position not found
+    )
+  )
+)
+
+;; Helper function for batch position updates
+(define-private (process-position-update (pos-coll-debt (tuple 0 uint 1 uint 2 uint)) (result (response uint uint)))
+  (let ((pos (get 0 pos-coll-debt))
+        (coll (get 1 pos-coll-debt))
+        (debt (get 2 pos-coll-debt)))
+    (match result
+      success
+      (update-position-health pos coll debt)
+      error error
     )
   )
 )
@@ -148,19 +173,9 @@
     
     ;; Process all positions in single transaction
     (fold
-      lambda (pos-coll-debt result)
-        (let ((pos (get 0 pos-coll-debt))
-              (coll (get 1 pos-coll-debt))
-              (debt (get 2 pos-coll-debt)))
-          (match result
-            success
-            (update-position-health pos coll debt)
-            error error
-          )
-        )
-      )
-      (ok true)
       (zip positions collateral-values debt-values)
+      (ok u0)
+      process-position-update
     )
   )
 )
@@ -195,9 +210,13 @@
 
 (define-read-only (is-liquidatable (position-id uint))
   (match (map-get? position-health position-id)
-    (health-data
-      (ok (not (is-position-healthy (get health-factor health-data))))
-    )
+(define-read-only (get-asset-factor (asset principal))
+  (ok (get-asset-collateral-factor asset))
+)
+
+(define-read-only (get-global-collateral-factor)
+  (ok (var-get global-collateral-factor))
+)
     (ok false)
   )
 )

@@ -1,5 +1,8 @@
 ;; economic-policy-engine.clar
 ;; Automated Monetary Fund with Gas-Free Internal Logic
+;;
+;; economic-policy-engine.clar
+;; Automated Monetary Fund with Gas-Free Internal Logic
 ;; Brain: Operations Engine | Input: On-chain data | Output: System parameters
 ;; Native Stacks Architecture - Fully Deterministic
 
@@ -89,7 +92,7 @@
       })
       
       ;; Update global vars if primary asset
-      (when (is-eq asset (var-get price-feed))
+      (if (is-eq asset (var-get price-feed))
         (begin
           (var-set utilization-rate new-utilization)
           (var-set current-interest-rate new-rate)
@@ -150,8 +153,10 @@
     (match (map-get? asset-prices asset)
       price-data
       (begin
-        (when (is-price-stale (get timestamp price-data))
-          (err u1002)) ;; Price stale
+        (if (is-price-stale (get timestamp price-data))
+          (err u1002) ;; Price stale
+          (ok true) ;; Continue if price is fresh
+        )
         
         ;; Calculate new parameters based on current market state
         (let ((current-params (unwrap! (map-get? market-parameters asset) (err u1003)))
@@ -169,6 +174,18 @@
   )
 )
 
+;; Helper function for batch price updates
+(define-private (process-price-update (asset-price-confi (tuple 0 principal 1 uint 2 uint)) (result (response uint uint)))
+  (let ((asset (get 0 asset-price-confi))
+        (price (get 1 asset-price-confi))
+        (confidence (get 2 asset-price-confi)))
+    (match result
+      success (update-price-feed asset price confidence)
+      error error
+    )
+  )
+)
+
 ;; Batch Operations - Gas Optimization
 (define-public (batch-update-prices
     (assets (list 10 principal))
@@ -178,18 +195,9 @@
   (begin
     ;; Process all assets in single transaction
     (fold
-      lambda (asset-price-confi result)
-        (let ((asset (get 0 asset-price-confi))
-              (price (get 1 asset-price-confi))
-              (confidence (get 2 asset-price-confi)))
-          (match result
-            success (update-price-feed asset price confidence)
-            error error
-          )
-        )
-      )
-      (ok true)
       (zip assets prices confidences)
+      (ok u0)
+      process-price-update
     )
   )
 )

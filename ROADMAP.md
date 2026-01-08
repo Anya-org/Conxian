@@ -3,9 +3,10 @@
 ## Overview
 
 This roadmap outlines the development phases and status of the Conxian Protocol.
-The project is currently in the **Stabilization & Alignment Phase**, with a focus
-on correctness, security, governance architecture, and alignment with
-regulatory-style objectives.
+We operate as a **Sovereign Autonomous Business (SAB)** — a Tier 0 Bitcoin-native
+financial infrastructure platform. The project is currently in the
+**Stabilization & Alignment Phase**, with a focus on correctness, security,
+governance architecture, and alignment with regulatory-style objectives.
 
 The phases below incorporate the agreed recommendations around:
 
@@ -135,8 +136,8 @@ The phases below incorporate the agreed recommendations around:
     - Prepare architecture diagrams, threat models, and documentation to
       support an external security review of the full system, including the
       governance and Conxian Operations Engine design.
-    - Keep the CHANGELOG, SERVICE_CATALOG, ENTERPRISE_BUYER_OVERVIEW, and
-      BUSINESS_VALUE_ROI documents aligned with the actual deployed contracts,
+    - Keep the CHANGELOG, [Enterprise Integration](./docs/enterprise/integration.md), and
+      [Business Classification Analysis](./BUSINESS_CLASSIFICATION_ANALYSIS.md) documents aligned with the actual deployed contracts,
       test coverage, and current testnet-only status.
 
 ## Phase 3: Scenario Testing, Stress & Regulatory Formalization (Planned)
