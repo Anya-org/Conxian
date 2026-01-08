@@ -668,7 +668,7 @@ path = "/app/contracts/tokens/cxvg-token.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.cxd-staking]
-path = "/app/contracts/dex/cxd-staking.clar"
+path = "/app/contracts/yield/cxd-staking.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.token-system-coordinator]
