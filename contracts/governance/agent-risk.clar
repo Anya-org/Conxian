@@ -9,7 +9,7 @@
 ;; ---
 
 (use-trait roles-trait .core-traits.rbac-trait)
-(use-trait oracle-trait .defi-traits.oracle-trait)
+(use-trait oracle-trait .oracle-pricing.oracle-pricing)
 
 ;; ---
 ;; @SECTION
