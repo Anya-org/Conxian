@@ -24,11 +24,15 @@
 
 ;; --- Authorization ---
 
+;; @desc Checks if the transaction sender is the authorized protocol coordinator.
+;; @returns bool
 (define-private (is-authorized)
   (is-eq tx-sender (var-get protocol-coordinator))
 )
 
-;; Compliance Helper
+;; @desc Checks if a user is compliant by calling the regulatory adapter.
+;; @param user: The principal of the user to check.
+;; @returns bool
 (define-private (check-compliance (user principal))
   (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
     (if (is-ok compliance-status)
