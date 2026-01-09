@@ -2,9 +2,51 @@
 
 ## Overview
 
-Conxian is a sophisticated, multi-dimensional DeFi protocol on Stacks, designed to provide a unified, secure, and efficient ecosystem for advanced financial operations. It has been architected from the ground up to be modular, decentralized, and compatible with the latest Stacks (Nakamoto) standards.
+🏦 Conxian Protocol: The Sovereign Autonomous Bank (SAB)
 
-## Documentation Hub
+A Multi-Dimensional, Stacks-Native Automated Monetary Platform.
+
+📜 I. The SAB Manifesto
+> "Code is Law, Logic is Sovereign."
+
+Conxian is not a financial service provider; it is an autonomous digital organism. It operates as a Sovereign Autonomous Bank (SAB) where human discretion is replaced by mathematical certainty.
+ * Autonomous: Decisions are executed by code, not committees.
+ * Neutral: The protocol is a public utility, indifferent to borders or identities.
+ * Sovereign: Conxian lives on the "Pure Chain," anchored by the immutable security of Bitcoin.
+
+📖 II. Whitepaper Summary (v2.0)
+
+Conxian provides a Platform-as-a-Service (PaaS) model for decentralized, multi-dimensional finance.
+⚡ Core Services
+ * Money Markets: Algorithmic lending with real-time risk adjustment.
+ * Sovereign Bonds: Automated fixed-yield debt instruments.
+ * Flash Loans: Atomic, uncollateralized liquidity for arbitrage and rebalancing.
+ * Wormhole NTT: Native Token Transfers for cross-chain sovereignty without "wrapping."
+🗳️ Granulated Automated DAO Seats
+Governance is segmented into five specialized automated seats that respond to on-chain metrics:
+ * CXD (Debt): Automates stability and collateral ratios.
+ * CXVG (Governance): Manages systemic logic and upgrades.
+ * CXTR (Treasury): Rebalances reserves against BTC/STX volatility.
+ * CXS (Staking): Manages yield distribution and reputation logic.
+ * CXLP (Liquidity): Optimizes AMM depth and fee structures.
+
+🏢 III. Enterprise Integration Guide
+
+Conxian is designed for "Compliance at the Edge." ### 🔗 Connecting to the PaaS
+Institutions can leverage Conxian's liquidity and debt structures while maintaining their own regulatory requirements through:
+ * Custom NTT Transceivers: Plug in KYC-filtered transceivers for cross-chain movement.
+ * Metric Oracles: Provide institutional-grade data feeds to trigger automated DAO seat actions.
+
+⚖️ IV. License & Regulatory Decoupling
+
+This project is licensed under the GNU General Public License v3 (GPLv3).
+Why GPLv3?
+ * Hands-Off Sovereignty: It establishes the protocol as a "public good." No central "manager" owns the commercial rights, which decouples the Architect from the financial actions of the users.
+ * Permissionless Growth: It allows anyone to fork or build on Conxian, provided their contributions remain open-source.
+
+🛠️ V. Developer Setup
+
+Conxian is built with Clarity 4 and tested using the Clarinet SDK.
 
 **For a comprehensive overview of the protocol's vision, architecture, smart contracts, and operational procedures, please visit our complete documentation hub:**
 
