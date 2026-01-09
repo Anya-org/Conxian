@@ -26,6 +26,18 @@
 (define-map user-reward-per-token-paid principal uint)
 (define-map user-rewards principal uint)
 
+;; --- Authorization ---
+(define-data-var admin-principal principal tx-sender)
+
+(define-private (is-admin)
+  (is-eq tx-sender (var-get admin-principal)))
+
+(define-public (set-admin (new-admin principal))
+  (begin
+    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (var-set admin-principal new-admin)
+    (ok true)))
+
 ;; --- Compliance ---
 (define-private (check-compliance (user principal))
     (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
@@ -171,8 +183,8 @@
 
 (define-public (set-reward-rate (rate uint))
     (begin
-        ;; Controlled by Agent Treasury or Ops Engine
-        (asserts! (or (is-eq tx-sender .agent-treasury) (is-eq tx-sender .conxian-operations-engine)) ERR_UNAUTHORIZED)
+        ;; Controlled by Admin (Treasury or Ops Engine)
+        (asserts! (is-admin) ERR_UNAUTHORIZED)
         (update-reward tx-sender)
         (var-set reward-rate rate)
         (ok true)
@@ -181,8 +193,8 @@
 
 (define-public (set-paused (paused bool))
     (begin
-        ;; Controlled by Ops Engine or Risk Agent (Emergency)
-        (asserts! (or (is-eq tx-sender .conxian-operations-engine) (is-eq tx-sender .agent-risk)) ERR_UNAUTHORIZED)
+        ;; Controlled by Admin (Ops Engine or Risk Agent)
+        (asserts! (is-admin) ERR_UNAUTHORIZED)
         (var-set staking-paused paused)
         (print { event: "staking-pause-update", paused: paused })
         (ok true)

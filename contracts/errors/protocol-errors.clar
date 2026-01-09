@@ -233,7 +233,7 @@
                   total-errors: (+ (get stats total-errors) u1),
                   error-types: (update-error-types (get stats error-types) error-code),
                   last-error: block-height,
-                  error-rate: (get stats error-rate) // Would calculate actual rate
+                  error-rate: (get stats error-rate)
                 })
               )
             )
@@ -555,7 +555,7 @@
     reporting-enabled: (var-get error-reporting-enabled),
     total-errors: (var-get total-errors-reported),
     threshold: (var-get error-threshold),
-    active-categories: u0 // Would count active categories
+    active-categories: u0
   }
 )
 

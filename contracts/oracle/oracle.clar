@@ -3,7 +3,7 @@
 ;; Provides fundamental price feed operations with security and reliability
 ;; Integrates with oracle-aggregator-v2 for advanced features
 
-(use-trait oracle-trait .oracle-trait)
+(use-trait oracle-trait .oracle-trait.oracle-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u8000))
@@ -29,9 +29,7 @@
 (impl-trait .defi-traits.oracle-trait)
 
 ;; Public functions
-(define-public (get-price 
-  (base (string-ascii 32))(quote (string-ascii 32))
-) 
+(define-public (get-price (base (string-ascii 32)) (quote (string-ascii 32)))
   (begin
     (asserts! (var-get is-active) (err u9999))
     
@@ -52,14 +50,11 @@
   )
 )
 
-(define-public (get-price-with-confidence 
-  (base (string-ascii 32)) 
-  (quote (string-ascii 32))
-) 
+(define-public (get-price-with-confidence (base (string-ascii 32)) (quote (string-ascii 32)))
   (begin
     (asserts! (var-get is-active) (err u9999))
     
-    (match (map-get? price-fees { base: base, quote: quote })
+    (match (map-get? price-feeds { base: base, quote: quote })
       price-data 
       (begin
         (asserts! 
@@ -98,7 +93,7 @@
     (asserts! (<= confidence u10000) ERR_INVALID_PRICE) ;; Confidence as basis points
     
     ;; Store price data
-    (map-set price-fees 
+    (map-set price-feeds
       { base: base, quote: quote }
       { 
         price: price, 
@@ -116,11 +111,8 @@
   (ok (and (var-get is-active) (> block-height u0)))
 )
 
-(define-read-only (get-last-update 
-  (base (string-ascii 32)) 
-  (quote (string-ascii 32))
-) 
-  (match (map-get? price-fees { base: base, quote: quote })
+(define-read-only (get-last-update (base (string-ascii 32)) (quote (string-ascii 32)))
+  (match (map-get? price-feeds { base: base, quote: quote })
     price-data 
     (ok (get timestamp price-data))
     (err u9999)
@@ -151,4 +143,3 @@
     (ok true)
   )
 )
-

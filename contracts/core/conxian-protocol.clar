@@ -41,12 +41,7 @@
 (define-public (set-paused (new-paused bool))
     (begin
         (asserts!
-            (or 
-                (is-owner) 
-                (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_EMERGENCY))
-                (is-eq tx-sender .conxian-operations-engine) ;; Allow Ops Engine to pause (Fail-Safe)
-                (is-eq tx-sender .agent-risk) ;; Allow Risk Agent to pause (Systemic Risk)
-            )
+            (or (is-owner) (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_EMERGENCY)))
             ERR_UNAUTHORIZED
         )
         (var-set paused new-paused)
@@ -97,10 +92,6 @@
 )
 
 ;; Read Only
-
-(define-read-only (get-contract-owner)
-    (ok (var-get contract-owner))
-)
 
 (define-read-only (get-contract-owner)
     (ok (var-get contract-owner))

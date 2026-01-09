@@ -242,8 +242,8 @@
 ;; Trigonometric functions (approximations)
 (define-read-only (fixed-sin (x uint))
   (begin
-    ;; Normalize x to [-π, π] range
-    (let ((normalized-x (fixed-mod x (* PRECISION u314)) ;; π ≈ 3.14
+    ;; Normalize x to [-pi, pi] range
+    (let ((normalized-x (fixed-mod x (* PRECISION u314))) ;; pi approx 3.14
           (pi (* PRECISION u314))))
       (fixed-sin-series normalized-x u10)
     )
@@ -265,8 +265,8 @@
 ;; Cosine function
 (define-read-only (fixed-cos (x uint))
   (begin
-    ;; Normalize x to [-π, π] range
-    (let ((normalized-x (fixed-mod x (* PRECISION u314))) ;; π ≈ 3.14
+    ;; Normalize x to [-pi, pi] range
+    (let ((normalized-x (fixed-mod x (* PRECISION u314))) ;; pi approx 3.14
           (pi (* PRECISION u314)))
       (fixed-cos-series normalized-x u10)
     )

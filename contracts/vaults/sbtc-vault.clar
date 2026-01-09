@@ -23,6 +23,18 @@
     uint
 )
 
+;; --- Authorization ---
+(define-data-var admin-principal principal tx-sender)
+
+(define-private (is-admin)
+  (is-eq tx-sender (var-get admin-principal)))
+
+(define-public (set-admin (new-admin principal))
+  (begin
+    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (var-set admin-principal new-admin)
+    (ok true)))
+
 ;; Compliance Check Helper
 (define-private (check-compliance (user principal))
     (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
@@ -113,9 +125,7 @@
 ;; @desc Admin: Set sBTC Token Principal
 (define-public (set-sbtc-token (new-token principal))
     (begin
-        ;; In production, use RBAC/Governance
-        ;; Checks if tx-sender is the Operations Engine or Deployer (simplified)
-        (asserts! (is-eq tx-sender .conxian-operations-engine) ERR_UNAUTHORIZED)
+        (asserts! (is-admin) ERR_UNAUTHORIZED)
         (var-set sbtc-token new-token)
         (ok true)
     )

@@ -2,8 +2,8 @@
 ;; Conxian Protocol: Price impact calculation for trading operations
 
 ;; Dependencies
-(use-trait .defi-traits .defi-traits.defi-traits)
-(use-trait .core-traits .core-traits.core-traits)
+(use-trait defi-traits .defi-traits.defi-traits)
+(use-trait core-traits .core-traits.core-traits)
 
 ;; Constants
 (define-constant ERR_INVALID_TRADE_SIZE (err 27001))
@@ -360,9 +360,9 @@
               (map-set trade-impact-history { pool: pool, trade-id: trade-id } {
                 trade-size: trade-size,
                 calculated-impact: (get impact-result impact),
-                actual-impact: u0, // Will be updated when actual trade executes
+                actual-impact: u0, ;; Will be updated when actual trade executes
                 timestamp: block-height,
-                accuracy: u0 // Will be calculated when actual impact is known
+                accuracy: u0 ;; Will be calculated when actual impact is known
               })
             )
             
@@ -405,7 +405,7 @@
         
         {
           impact: price-impact,
-          slippage: price-impact, // Simplified - would calculate actual slippage
+          slippage: price-impact, ;; Simplified - would calculate actual slippage
           effective-price: effective-price
         }
       )
@@ -454,7 +454,7 @@
                                   (get current-stats average-impact)),
                 max-impact: (max (get current-stats max-impact) calculated-impact),
                 min-impact: (min (get current-stats min-impact) calculated-impact),
-                total-volume: (get current-stats total-volume), // Would update with actual trade volume
+                total-volume: (get current-stats total-volume), ;; Would update with actual trade volume
                 last-trade: block-height
               })
             )
@@ -465,7 +465,7 @@
             average-impact: (if (> actual-impact u0) actual-impact calculated-impact),
             max-impact: calculated-impact,
             min-impact: calculated-impact,
-            total-volume: u0, // Would update with actual trade volume
+            total-volume: u0, ;; Would update with actual trade volume
             last-trade: block-height
           })
       )
@@ -505,7 +505,7 @@
     active: (var-get calculator-active),
     total-calculations: (var-get total-calculations),
     average-impact: (var-get average-impact),
-    cache-size: u0 // Would count actual cache entries
+    cache-size: u0 ;; Would count actual cache entries
   }
 )
 

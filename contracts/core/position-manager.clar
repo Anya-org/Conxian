@@ -8,8 +8,8 @@
 (define-constant ERR_NOT_AUTHORIZED (err u1000))
 (define-constant ERR_POSITION_NOT_FOUND (err u3000))
 
-;; State - Engine Address
-(define-data-var dimensional-engine principal .dimensional-engine)
+;; State - Engine Address - Initialized to deployer, must be set to the correct facade.
+(define-data-var dimensional-engine principal tx-sender)
 
 (define-map positions
     uint

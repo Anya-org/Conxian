@@ -2,8 +2,8 @@
 ;; Conxian DEX: Registry for pool implementations and factory contracts
 
 ;; Dependencies
-(use-trait .defi-traits .defi-traits.defi-traits)
-(use-trait .factory-trait .factory-trait.factory-trait)
+(use-trait defi-traits .defi-traits.defi-traits)
+(use-trait factory-trait .factory-trait.factory-trait)
 
 ;; Constants
 (define-constant ERR_INVALID_IMPLEMENTATION (err 22001))

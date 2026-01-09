@@ -2,23 +2,23 @@
 ;; Conxian Protocol: Timelock controller for time-locked operations and governance
 
 ;; Dependencies
-(use-trait .core-traits .core-traits.core-traits)
-(use-trait .defi-traits .defi-traits.defi-traits)
+(use-trait core-traits .core-traits.core-traits)
+(use-trait defi-traits .defi-traits.defi-traits)
 
 ;; Constants
 (define-constant ERR_TIMELOCK_NOT_FOUND (err 36001))
 (define-constant ERR_TIMELOCK_ALREADY_EXISTS (err 36002))
-(define-ERROR_TIMELOCK_NOT_EXPIRED (err 36003))
+(define-constant ERR_TIMELOCK_NOT_EXPIRED (err 36003))
 (define-constant ERR_TIMELOCK_NOT_ACTIVE (err 36004))
-(define-ERROR_INSUFFICIENT_PERMISSIONS (err 36005))
-(define-ERROR_INVALID_DURATION (err 36006))
+(define-constant ERR_INSUFFICIENT_PERMISSIONS (err 36005))
+(define-constant ERR_INVALID_DURATION (err 36006))
 
 ;; Timelock parameters
 (define-constant MIN_DURATION u10) ;; Minimum 10 blocks
 (define-constant MAX_DURATION u1000000) ;; Maximum 1M blocks
 (define-constant DEFAULT_DURATION u1000) ;; Default 1000 blocks
 (define-constant MAX_TIMELOCKS u100) ;; Maximum timelocks per user
-(define-constant TIMELOCK_PRECISION u1 ;; Block-level precision
+(define-constant TIMELOCK_PRECISION u1) ;; Block-level precision
 
 ;; Data variables
 (define-data-var timelock-active bool true)
@@ -70,52 +70,52 @@
 (define-event (timelock-created (timelock-id (buff 32)) (creator principal) (target-contract principal) (unlock-height uint)))
 (define-event (timelock-executed (timelock-id (buff 32)) (executor principal) (success bool)))
 (define-event (timelock-cancelled (timelock-id (buff 32)) (canceller principal)))
-(define-event (timelock-expired (timelock-id (buff 32)))
-(define-event (timelock-activated (timelock-id (buff 32)))
-(define-event (timelock-deactivated (timelock-id (buff 32)))
+(define-event (timelock-expired (timelock-id (buff 32))))
+(define-event (timelock-activated (timelock-id (buff 32))))
+(define-event (timelock-deactivated (timelock-id (buff 32))))
 
 ;; Read-only functions
 
 (define-read-only (get-timelock (timelock-id (buff 32)))
-  (map-get? timelocks { timelock-id: timelock_id }))
+  (map-get? timelocks { timelock-id: timelock-id }))
 
 (define-read-only (get-timelock-creator (timelock-id (buff 32)))
-  (match (get-timelock timelock_id)
+  (match (get-timelock timelock-id)
     timelock (ok (get timelock creator))
     none (ok tx-sender)
   )
 )
 
 (define-read-only (get-timelock-target (timelock-id (buff 32)))
-  (match (get-timelock timelock_id)
+  (match (get-timelock timelock-id)
     timelock (ok (get timelock target-contract))
     none (ok tx-sender)
   )
 )
 
 (define-read-only (get-timelock-unlock-height (timelock-id (buff 32)))
-  (match (get-timelock timelock_id)
+  (match (get-timelock timelock-id)
     timelock (ok (get timelock unlock-height))
     none (ok u0)
   )
 )
 
 (define-read-only (is-timelock-active (timelock-id (buff 32)))
-  (match (get-timelock timelock_id)
+  (match (get-timelock timelock-id)
     timelock (ok (get timelock active))
     none (ok false)
   )
 )
 
 (define-read-only (is-timelock-executed (timelock-id (buff 32)))
-  (match (get-timelock timelock_id)
+  (match (get-timelock timelock-id)
     timelock (ok (get timelock executed))
     none (ok false)
   )
 )
 
 (define-read-only (is-timelock-cancelled (timelock-id (buff 32)))
-  (match (get-timelock timelock_id)
+  (match (get-timelock timelock-id)
     timelock (ok (get timelock cancelled))
     none (ok false)
   )
@@ -237,7 +237,7 @@
         (var-set active-timelocks (+ (var-get active-timelocks) u1))
         
         ;; Emit event
-        (emit-event (timelock-created timelock_id tx-sender target-contract unlock-height))
+        (emit-event (timelock-created timelock-id tx-sender target-contract unlock-height))
         
         (ok {
           timelock-id: timelock-id,
@@ -256,7 +256,7 @@
     (asserts! (var-get timelock-active) ERR_TIMELOCK_NOT_ACTIVE)
     
     ;; Check if timelock exists
-    (let ((timelock_info (get-timelock timelock_id)))
+    (let ((timelock_info (get-timelock timelock-id)))
       (asserts! (is-some timelock_info) ERR_TIMELOCK_NOT_FOUND)
       
       (let ((timelock (unwrap-optional timelock_info)))
@@ -269,7 +269,7 @@
         (asserts! (>= block-height (get timelock unlock-height)) ERR_TIMELOCK_NOT_EXPIRED)
         
         ;; Generate execution ID
-        (let ((execution-id (hash160 (concat timelock_id (principal-to-buff? tx-sender)))))
+        (let ((execution-id (hash160 (concat timelock-id (principal-to-buff? tx-sender)))))
           
           ;; Execute timelock (simplified - would call target contract)
           (let ((execution_result (execute-target-function timelock)))
@@ -277,7 +277,7 @@
               success
                 (begin
                   ;; Update timelock state
-                  (map-set timelocks { timelock-id: timelock_id } {
+                  (map-set timelocks { timelock-id: timelock-id } {
                     creator: (get timelock creator),
                     target-contract: (get timelock target-contract),
                     target-function: (get timelock target-function),
@@ -294,7 +294,7 @@
                   
                   ;; Create execution record
                   (map-set timelock-executions { execution-id: execution-id } {
-                    timelock-id: timelock_id,
+                    timelock-id: timelock-id,
                     executor: tx-sender,
                     execution-height: block-height,
                     result: (some (get success result)),
@@ -343,10 +343,10 @@
                   (var-set active-timelocks (- (var-get active-timelocks) u1))
                   
                   ;; Emit event
-                  (emit-event (timelock-executed timelock_id tx-sender true))
+                  (emit-event (timelock-executed timelock-id tx-sender true))
                   
                   (ok {
-                    timelock-id: timelock_id,
+                    timelock-id: timelock-id,
                     execution-id: execution-id,
                     result: (get success result),
                     gas-used: (get success gas-used)
@@ -356,7 +356,7 @@
                 (begin
                   ;; Create failed execution record
                   (map-set timelock-executions { execution-id: execution-id } {
-                    timelock-id: timelock_id,
+                    timelock-id: timelock-id,
                     executor: tx-sender,
                     execution-height: block-height,
                     result: (some (unwrap-panic error)),
@@ -385,7 +385,7 @@
                   )
                   
                   ;; Emit event
-                  (emit-event (timelock-executed timelock_id tx-sender false))
+                  (emit-event (timelock-executed timelock-id tx-sender false))
                   
                   error
                 )
@@ -403,7 +403,7 @@
     (asserts! (var-get timelock-active) ERR_TIMELOCK_NOT_ACTIVE)
     
     ;; Check if timelock exists
-    (let ((timelock_info (get-timelock timelock_id)))
+    (let ((timelock_info (get-timelock timelock-id)))
       (asserts! (is-some timelock_info) ERR_TIMELOCK_NOT_FOUND)
       
       (let ((timelock (unwrap-optional timelock_info)))
@@ -416,7 +416,7 @@
         (asserts! (or (is-eq tx-sender (get timelock creator)) (is-eq tx-sender (contract-call? .conxian-protocol get-admin))) ERR_INSUFFICIENT_PERMISSIONS)
         
         ;; Cancel timelock
-        (map-set timelocks { timelock-id: timelock_id } {
+        (map-set timelocks { timelock-id: timelock-id } {
           creator: (get timelock creator),
           target-contract: (get timelock target-contract),
           target-function: (get timelock target-function),
@@ -452,7 +452,7 @@
         (var-set active-timelocks (- (var-get active-timelocks) u1))
         
         ;; Emit event
-        (emit-event (timelock-cancelled timelock_id tx-sender))
+        (emit-event (timelock-cancelled timelock-id tx-sender))
         
         (ok true)
       )
@@ -466,7 +466,7 @@
     (asserts! (var-get timelock-active) ERR_TIMELOCK_NOT_ACTIVE)
     
     ;; Check if timelock exists
-    (let ((timelock_info (get-timelock timelock_id)))
+    (let ((timelock_info (get-timelock timelock-id)))
       (asserts! (is-some timelock_info) ERR_TIMELOCK_NOT_FOUND)
       
       (let ((timelock (unwrap-optional timelock_info)))
@@ -474,7 +474,7 @@
         (asserts! (not (get timelock active)) ERR_TIMELOCK_NOT_ACTIVE)
         
         ;; Activate timelock
-        (map-set timelocks { timelock-id: timelock_id } {
+        (map-set timelocks { timelock-id: timelock-id } {
           creator: (get timelock creator),
           target-contract: (get timelock target-contract),
           target-function: (get timelock target-function),
@@ -493,7 +493,7 @@
         (var-set active-timelocks (+ (var-get active-timelocks) u1))
         
         ;; Emit event
-        (emit-event (timelock-activated timelock_id))
+        (emit-event (timelock-activated timelock-id))
         
         (ok true)
       )
@@ -507,7 +507,7 @@
     (asserts! (var-get timelock-active) ERR_TIMELOCK_NOT_ACTIVE)
     
     ;; Check if timelock exists
-    (let ((timelock_info (get-timelock timelock_id)))
+    (let ((timelock_info (get-timelock timelock-id)))
       (asserts! (is-some timelock_info) ERR_TIMELOCK_NOT_FOUND)
       
       (let ((timelock (unwrap-optional timelock)))
@@ -515,7 +515,7 @@
         (asserts! (get timelock active) ERR_TIMELOCK_NOT_ACTIVE)
         
         ;; Deactivate timelock
-        (map-set timelocks { timelock-id: timelock_id } {
+        (map-set timelocks { timelock-id: timelock-id } {
           creator: (get timelock creator),
           target-contract: (get timelock target-contract),
           target-function: (get timelock target-function),
@@ -534,7 +534,7 @@
         (var-set active-timelocks (- (var-get active-timelocks) u1))
         
         ;; Emit event
-        (emit-event (timelock-deactivated timelock_id))
+        (emit-event (timelock-deactivated timelock-id))
         
         (ok true)
       )
@@ -588,7 +588,7 @@
     
     (ok {
       result: (concat "Executed " (get timelock target-function) " with parameters"),
-      gas-used: u200000 // Mock gas usage
+      gas-used: u200000
     })
   )
 )
@@ -605,10 +605,10 @@
 )
 
 (define-read-only (get-timelock-summary (timelock-id (buff 32)))
-  (match (get-timelock timelock_id)
+  (match (get-timelock timelock-id)
     timelock
       (ok {
-        timelock-id: timelock_id,
+        timelock-id: timelock-id,
         creator: (get timelock creator),
         target-contract: (get timelock target-contract),
         target-function: (get timelock target-function),

@@ -2,8 +2,8 @@
 ;; Conxian Protocol: Swap manager for coordinating trades across multiple pools
 
 ;; Dependencies
-(use-trait .defi-traits .defi-traits.defi-traits)
-(use-trait .core-traits .core-traits.core-traits)
+(use-trait defi-traits .defi-traits.defi-traits)
+(use-trait core-traits .core-traits.core-traits)
 
 ;; Constants
 (define-constant ERR_INVALID_SWAP (err 35001))
@@ -16,15 +16,15 @@
 (define-constant MAX_SLIPPAGE u500) ;; 5% max slippage
 (define-constant MIN_TRADE_AMOUNT u1000) ;; Minimum trade amount
 (define-constant MAX_TRADE_AMOUNT u1000000000) ;; Maximum trade amount
-(define-constant SWAP_TIMEOUT u100 ;; 100 blocks timeout
+(define-constant SWAP_TIMEOUT u100) ;; 100 blocks timeout
 (define-constant MAX_ROUTES u10) ;; Maximum routes to consider
-(define-constant ROUTE_CACHE_DURATION u50 ;; Cache routes for 50 blocks
+(define-constant ROUTE_CACHE_DURATION u50) ;; Cache routes for 50 blocks
 
 ;; Data variables
 (define-data-var swap-manager-active bool true)
 (define-data-var total-swaps uint u0)
 (define-data-var total-volume uint u0)
-(define-data-var last-route-cleanup uint u0
+(define-data-var last-route-cleanup uint u0)
 
 ;; Storage maps
 (define-map swap-routes { route-id: (buff 32) } { 
@@ -91,28 +91,28 @@
   (map-get? swap-routes { route-id: route-id }))
 
 (define-read-only (get-route-pools (route-id (buff 32)))
-  (match (get-swap-route route_id)
+  (match (get-swap-route route-id)
     route (ok (get route pools))
     none (ok (list 0 principal))
   )
 )
 
 (define-read-only (get-route-estimated-output (route-id (buff 32)))
-  (match (get-swap-route route_id)
+  (match (get-swap-route route-id)
     route (ok (get route estimated-output))
     none (ok u0)
   )
 )
 
 (define-read-only (get-route-slippage (route-id (buff 32)))
-  (match (get-swap-route route_id)
+  (match (get-swap-route route-id)
     route (ok (get route slippage))
     none (ok u0)
   )
 )
 
 (define-read-only (is-route-active (route-id (buff 32)))
-  (match (get-swap-route route_id)
+  (match (get-swap-route route-id)
     route (ok (get route active))
     none (ok false)
   )
@@ -153,7 +153,7 @@
     (asserts! (var-get swap-manager-active) ERR_SWAP_FAILED)
     
     ;; Check cache first
-    (let ((token-pair (create-token-pair token-in token_out)))
+    (let ((token-pair (create-token-pair token-in token-out)))
       (let ((cached-routes (get-route-cache token-pair)))
         (if (is-some cached-routes)
             (begin
@@ -178,17 +178,17 @@
                               })
                             )
                             ;; Cache expired, find new routes
-                            (find-new-routes token-in token_out amount_in)
+                            (find-new-routes token-in token-out amount-in)
                         )
                       )
                     )
                     ;; Cache expired, find new routes
-                    (find-new-routes token-in token_out amount_in)
+                    (find-new-routes token-in token-out amount-in)
                 )
               )
             )
             ;; No cache entry, find new routes
-            (find-new-routes token-in token_out amount_in)
+            (find-new-routes token-in token-out amount-in)
         )
       )
     )
@@ -204,7 +204,7 @@
     (asserts! (var-get swap-manager-active) ERR_SWAP_FAILED)
     
     ;; Check if route exists and is active
-    (let ((route_info (get-swap-route route_id)))
+    (let ((route_info (get-swap-route route-id)))
       (asserts! (is-some route_info) ERR_POOL_NOT_FOUND)
       
       (let ((route (unwrap-optional route_info)))
@@ -214,7 +214,7 @@
         (asserts! (<= (get route slippage) max-slippage) ERR_SLIPPAGE_EXCEEDED)
         
         ;; Generate swap ID
-        (let ((swap-id (hash160 (concat (principal-to-buff? tx-sender) (int-to-buff block-height))))
+        (let ((swap-id (hash160 (concat (principal-to-buff? tx-sender) (int-to-buff block-height)))))
           
           ;; Execute swap (simplified - would use actual pool contracts)
           (let ((swap_result (execute-multi-hop-swap route amount-in)))
@@ -229,11 +229,11 @@
                     (if (> actual-slippage max-slippage)
                         (begin
                           ;; Emit high slippage event
-                          (emit-event (high-slippage-detected swap_id actual-slippage))
+                          (emit-event (high-slippage-detected swap-id actual-slippage))
                           
                           ;; Create failed swap record
-                          (map-set swap-executions { swap-id: swap_id } {
-                            route-id: route_id,
+                          (map-set swap-executions { swap-id: swap-id } {
+                            route-id: route-id,
                             user: tx-sender,
                             token-in: (get route token-in),
                             amount-in: amount-in,
@@ -250,14 +250,14 @@
                           (update-user-history tx-sender false u0)
                           
                           ;; Emit event
-                          (emit-event (swap-failed swap_id "Slippage exceeded"))
+                          (emit-event (swap-failed swap-id "Slippage exceeded"))
                           
-                          err ERR_SLIPPAGE_EXCEEDED
+                          (err ERR_SLIPPAGE_EXCEEDED)
                         )
                         (begin
                           ;; Create successful swap record
-                          (map-set swap-executions { swap-id: swap_id } {
-                            route-id: route_id,
+                          (map-set swap-executions { swap-id: swap-id } {
+                            route-id: route-id,
                             user: tx-sender,
                             token-in: (get route token-in),
                             amount-in: amount-in,
@@ -271,7 +271,7 @@
                           })
                           
                           ;; Update route usage
-                          (map-set swap-routes { route-id: route_id } {
+                          (map-set swap-routes { route-id: route-id } {
                             token-in: (get route token-in),
                             token-out: (get route token-out),
                             pools: (get route pools),
@@ -295,7 +295,7 @@
                           (var-set total-volume (+ (var-get total-volume) amount-in))
                           
                           ;; Emit event
-                          (emit-event (swap-executed swap_id tx-sender amount-in (get success amount-out)))
+                          (emit-event (swap-executed swap-id tx-sender amount-in (get success amount-out)))
                           
                           (ok {
                             swap-id: swap-id,
@@ -310,8 +310,8 @@
               error
                 (begin
                   ;; Create failed swap record
-                  (map-set swap-executions { swap-id: swap_id } {
-                    route-id: route_id,
+                  (map-set swap-executions { swap-id: swap-id } {
+                    route-id: route-id,
                     user: tx-sender,
                     token-in: (get route token-in),
                     amount-in: amount-in,
@@ -328,7 +328,7 @@
                   (update-user-history tx-sender false u0)
                   
                   ;; Emit event
-                  (emit-event (swap-failed swap_id (unwrap-panic error)))
+                  (emit-event (swap-failed swap-id (unwrap-panic error)))
                   
                   error
                 )
@@ -340,20 +340,20 @@
   )
 )
 
-(define-public (batch-execute-swaps (swaps (list 10 { route-id: (buff 32), amount-in: uint, min-amount-out: uint, max-slippage uint })))
+(define-public (batch-execute-swaps (swaps (list 10 { route-id: (buff 32), amount-in: uint, min-amount-out: uint, max-slippage: uint })))
   (begin
     ;; Validate list size
     (asserts! (<= (len swaps) u10) ERR_INVALID_SWAP)
     
     ;; Execute each swap
     (fold swaps u0
-      (lambda ((result uint) (swap { route-id: (buff 32), amount-in: uint, min-amount-out: uint, max-slippage uint }))
+      (lambda ((result uint) (swap { route-id: (buff 32), amount-in: uint, min-amount-out: uint, max-slippage: uint }))
         (match (execute-swap (get swap route-id) (get swap amount-in) (get swap min-amount-out) (get swap max-slippage))
           success (+ result u1)
           error result
         )
       )
-    
+    )
     (ok true)
   )
 )
@@ -367,10 +367,10 @@
     (asserts! (var-get swap-manager-active) ERR_SWAP_FAILED)
     
     ;; Find best routes for the pair
-    (let ((best-routes (find-all-routes token-in token_out)))
+    (let ((best-routes (find-all-routes token-in token-out)))
       
       ;; Update cache
-      (let ((token-pair (create-token-pair token-in token_out)))
+      (let ((token-pair (create-token-pair token-in token-out)))
         (map-set route-cache { token-pair: token-pair } {
           routes: best-routes,
           last-updated: block-height,
@@ -393,11 +393,11 @@
     (asserts! (var-get swap-manager-active) ERR_SWAP_FAILED)
     
     ;; Check if route exists
-    (let ((route_info (get-swap-route route_id)))
+    (let ((route_info (get-swap-route route-id)))
       (asserts! (is-some route_info) ERR_POOL_NOT_FOUND)
       
       ;; Deactivate route
-      (map-set swap-routes { route-id: route_id } {
+      (map-set swap-routes { route-id: route-id } {
         token-in: (get-optional route_info).token-in,
         token-out: (get-optional route_info).token-out,
         pools: (get-optional route_info).pools,
@@ -457,20 +457,20 @@
 (define-private (create-token-pair (token-in principal) (token-out principal))
   (begin
     ;; Create standardized token pair representation
-    (concat (principal-to-string token-in) (principal-to-string token_out))
+    (concat (principal-to-string token-in) (principal-to-string token-out))
   )
 )
 
 (define-private (find-new-routes (token-in principal) (token-out principal) (amount-in uint))
   (begin
     ;; Find all possible routes between tokens
-    (let ((all-routes (find-all-routes token-in token_out)))
+    (let ((all-routes (find-all-routes token-in token-out)))
       
       ;; Sort routes by output amount
       (let ((sorted-routes (sort-routes-by-output all-routes)))
         
         ;; Store best routes
-        (store-best-routes token-in token_out sorted-routes)
+        (store-best-routes token-in token-out sorted-routes)
         
         ;; Return best route
         (if (> (len sorted-routes) u0)
@@ -513,7 +513,7 @@
 (define-private (store-best-routes (token-in principal) (token-out principal) (routes (list 10 { route-id: (buff 32), pools: (list 5 principal), estimated-output: uint, slippage: uint, confidence: uint })))
   (begin
     ;; Store top 5 routes in cache
-    (let ((token-pair (create-token-pair token-in token_out))
+    (let ((token-pair (create-token-pair token-in token-out))
           (top-routes (if (> (len routes) u5) (slice routes u0 u5) routes)))
       
       (map-set route-cache { token-pair: token-pair } {
@@ -541,8 +541,8 @@
     ;; Simplified implementation
     
     (ok {
-      amount-out: (/ (* amount-in u9500) u10000), // Mock 95% efficiency
-      gas-used: u500000, // Mock gas usage
+      amount-out: (/ (* amount-in u9500) u10000),
+      gas-used: u500000,
       pools-used: (len (get route pools))
     })
   )
@@ -592,7 +592,7 @@
                   (map-set pool-performance { pool: pool } {
                     total-swaps: (+ total-swaps u1),
                     successful-swaps: (+ (get performance successful-swaps) (if success u1 u0)),
-                    total-volume: (get performance total-volume), // Would update with actual volume
+                    total-volume: (get performance total-volume),
                     average-slippage: (/ (+ (* (get performance average-slippage) total-swaps) slippage) (+ total-swaps u1)),
                     last-swap: block-height,
                     performance-score: (calculate-performance-score (+ total-swaps u1) (+ (get performance successful-swaps) (if success u1 u0)))
@@ -637,10 +637,10 @@
 )
 
 (define-read-only (get-route-summary (route-id (buff 32)))
-  (match (get-swap-route route_id)
+  (match (get-swap-route route-id)
     route
       (ok {
-        route-id: route_id,
+        route-id: route-id,
         token-in: (get route token-in),
         token-out: (get route token-out),
         pools: (get route pools),
