@@ -42,6 +42,22 @@
   )
 )
 
+;; --- Internal Guards ---
+
+;; @desc Centralized entry guard for standard pre-flight checks.
+;; @returns (response bool)
+(define-private (guard-entry)
+  (begin
+    ;; ⚡ Bolt Optimization: Fail Fast Guard
+    ;; 💡 What: Centralized pre-flight checks (`check-finality`, `check-compliance`) into a single private function.
+    ;; 🎯 Why: Avoids code duplication and improves maintainability.
+    ;; 📊 Impact: Reduces contract bytecode size, which lowers one-time deployment costs. This introduces a negligible increase in runtime gas for each call due to the added function hop, a trade-off made for better code structure.
+    (try! (contract-call? .block-utils check-finality))
+    (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+    (ok true)
+  )
+)
+
 ;; --- Configuration ---
 
 ;; @desc Sets the protocol coordinator address, which controls administrative functions.
@@ -74,8 +90,7 @@
     (metadata (optional (string-utf8 1024)))
   )
   (begin
-    (try! (contract-call? .block-utils check-finality))
-    (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+    (try! (guard-entry))
     (let ((result (contract-call? .position-manager open-position tx-sender token amount
         leverage long
       )))
@@ -100,12 +115,11 @@
     (slippage-limit (optional uint))
   )
   (begin
-    (try! (contract-call? .block-utils check-finality))
+    (try! (guard-entry))
     ;; Note: Closing positions might be allowed even if non-compliant to reduce risk (Unwinding),
     ;; but strictly "Clean-Hands" implies no interaction. 
     ;; We will enforce it for consistency, or allow "Reduce Only" mode.
     ;; For Tier 0 strictness: Enforce.
-    (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
     (contract-call? .position-manager close-position tx-sender position-id)
   )
 )
@@ -121,8 +135,7 @@
     (token <sip-010-trait>)
   )
   (begin
-    (try! (contract-call? .block-utils check-finality))
-    (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+    (try! (guard-entry))
     (contract-call? .collateral-manager deposit-funds amount token)
   )
 )
@@ -136,8 +149,7 @@
     (token <sip-010-trait>)
   )
   (begin
-    (try! (contract-call? .block-utils check-finality))
-    (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+    (try! (guard-entry))
     (contract-call? .collateral-manager withdraw-funds amount token)
   )
 )
