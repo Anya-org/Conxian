@@ -127,7 +127,8 @@
       ;; Execute liquidation logic here
       ;; Remove position after liquidation
       (map-delete position-health position-id)
-      ;; Remove position after liquidation
+      (ok true)
+    )
   )
 )
 

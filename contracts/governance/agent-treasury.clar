@@ -39,7 +39,9 @@
 (define-data-var insurance-share uint u2000) ;; 20%
 
 ;; Destination vaults for revenue distribution
-(define-data-var staking-vault principal .cxd-staking)
+;; The initial value is set to the deployer. It MUST be updated to the correct
+;; staking contract principal via `set-staking-vault` post-deployment.
+(define-data-var staking-vault principal tx-sender)
 ;; @SECTION
 (define-data-var insurance-vault principal .conxian-insurance-fund)
 

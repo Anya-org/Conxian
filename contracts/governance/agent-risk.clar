@@ -31,7 +31,6 @@
 
 (define-data-var contract-owner principal tx-sender)
 (define-data-var rbac-contract principal .rbac)
-(define-data-var rbac-contract principal .rbac)
 (define-data-var volatility-threshold uint u1000) ;; 10% price deviation
 (define-data-var peg-threshold uint u500) ;; 5% deviation from 1:1
 
@@ -82,15 +81,15 @@
 ;; Checks if sBTC price deviates significantly from BTC price (assumed 1:1 target).
 ;; In a real scenario, this fetches sBTC/USD and BTC/USD from the Oracle.
 (define-public (monitor-sbtc-peg
-    (sbtc-symbol (string-ascii 64))
-    (btc-symbol (string-ascii 64))
+    (sbtc-token principal)
+    (btc-token principal)
   )
   (begin
     (asserts! (is-authorized ROLE_KEEPER) ERR_UNAUTHORIZED)
 
     (let (
-        (sbtc-data (try! (contract-call? .oracle get-price sbtc-symbol)))
-        (btc-data (try! (contract-call? .oracle get-price btc-symbol)))
+        (sbtc-data (try! (contract-call? .oracle get-price sbtc-token)))
+        (btc-data (try! (contract-call? .oracle get-price btc-token)))
         (sbtc-price (get price sbtc-data))
         (btc-price (get price btc-data))
         (deviation (if (> sbtc-price btc-price)

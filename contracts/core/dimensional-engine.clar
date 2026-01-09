@@ -43,10 +43,9 @@
 ;; @returns (response bool)
 (define-private (guard-entry)
   (begin
-    ;; ⚡ Bolt Optimization: Fail Fast Guard
-    ;; 💡 What: Centralized pre-flight checks (`check-finality`, `check-compliance`) into a single private function.
-    ;; 🎯 Why: Avoids code duplication and improves maintainability.
-    ;; 📊 Impact: Reduces contract bytecode size, which lowers one-time deployment costs. This introduces a negligible increase in runtime gas for each call due to the added function hop, a trade-off made for better code structure.
+    ;; Optimization: Centralized pre-flight checks (`check-finality`, `check-compliance`) into a single private function.
+    ;; This avoids code duplication and improves maintainability.
+    ;; It reduces contract bytecode size, which lowers one-time deployment costs. This introduces a negligible increase in runtime gas for each call due to the added function hop, a trade-off made for better code structure.
     (try! (contract-call? .block-utils check-finality))
     (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
     (ok true)
