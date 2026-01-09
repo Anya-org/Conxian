@@ -2,7 +2,7 @@
 ;; Conxian Protocol: SIP-018 signed messages implementation for off-chain data verification
 
 ;; Dependencies
-(use-trait .sip-018-signed-messages-trait .sip-standards.sip-018-signed-messages-trait)
+(use-trait sip-018-signed-messages-trait .sip-standards.sip-018-signed-messages-trait)
 
 ;; Constants
 (define-constant ERR_INVALID_SIGNATURE (err 32001))
@@ -13,8 +13,8 @@
 
 ;; SIP-018 parameters
 (define-constant MESSAGE_VERSION u1)
-(define-constant MAX_MESSAGE_SIZE u1024
-(define-constant SIGNATURE_EXPIRY_BLOCKS u1000 ;; 1000 blocks ~ 1 hour
+(define-constant MAX_MESSAGE_SIZE u1024)
+(define-constant SIGNATURE_EXPIRY_BLOCKS u1000) ;; 1000 blocks ~ 1 hour
 (define-constant MAX_NONCE u4294967295) ;; 2^32 - 1
 (define-constant DOMAIN_SEPARATOR "conxian-protocol")
 
@@ -166,9 +166,9 @@
     
     ;; Check if domain is active
     (let ((domain-info (get-domain-info domain)))
-      (asserts! (is-some domain_info) ERR_INVALID_DOMAIN)
+      (asserts! (is-some domain-info) ERR_INVALID_DOMAIN)
       
-      (let ((domain-active (unwrap-optional domain_info)))
+      (let ((domain-active (unwrap-optional domain-info)))
         (asserts! (get domain-active active) ERR_INVALID_DOMAIN)
         
         ;; Check if nonce is already used
@@ -313,7 +313,7 @@
                   signature: (get message signature),
                   timestamp: (get message timestamp),
                   nonce: (get message nonce),
-                  verified: false, // Expired messages are considered unverified
+                  verified: false,
                   verification-count: (get message verification-count)
                 })
                 
@@ -512,7 +512,7 @@
     active: (var-get signing-active),
     total-messages-verified: (var-get total-messages_verified),
     total-signatures-verified: (var-get total-signatures_verified),
-    active-domains: u0 // Would count actual active domains
+    active-domains: u0
   }
 )
 

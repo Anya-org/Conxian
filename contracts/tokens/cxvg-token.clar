@@ -27,6 +27,17 @@
     (is-eq tx-sender (var-get contract-owner))
 )
 
+;; Minter Authorization
+(define-map authorized-minters principal bool)
+
+(define-public (set-minter-status (minter principal) (status bool))
+    (begin
+        (asserts! (is-owner) ERR_UNAUTHORIZED)
+        (map-set authorized-minters minter status)
+        (ok true)
+    )
+)
+
 ;; Compliance Check
 (define-private (check-compliance (user principal))
     (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
@@ -177,11 +188,11 @@
 )
 
 ;; Core Privileged Functions
-;; Minting is restricted to the Protocol Coordinator or Emission Controller
+;; Minting is restricted to authorized minters set by the owner.
 (define-public (mint (amount uint) (recipient principal))
     (begin
-        ;; Access Control: Only specific modules can mint
-        (asserts! (or (is-owner) (is-eq tx-sender .token-system-coordinator) (is-eq tx-sender .token-emission-controller)) ERR_UNAUTHORIZED)
+        ;; Access Control: Only owner or authorized minters can mint
+        (asserts! (or (is-owner) (default-to false (map-get? authorized-minters tx-sender))) ERR_UNAUTHORIZED)
         
         (try! (ft-mint? cxvg amount recipient))
         
