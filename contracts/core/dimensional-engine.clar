@@ -34,12 +34,7 @@
 ;; @param user: The principal of the user to check.
 ;; @returns bool
 (define-private (check-compliance (user principal))
-  (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
-    (if (is-ok compliance-status)
-      true
-      false
-    )
-  )
+  (is-ok (contract-call? .regulatory-adapter check-clean-hands-compliance user))
 )
 
 ;; --- Internal Guards ---
