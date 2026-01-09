@@ -2,7 +2,7 @@
 
 ## Overview
 
-🏦 Conxian Protocol: The Sovereign Autonomous Bank (SAB)
+🏦 Conxian Protocol:
 
 A Multi-Dimensional, Stacks-Native Automated Monetary Platform.
 
