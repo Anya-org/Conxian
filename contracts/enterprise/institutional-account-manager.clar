@@ -18,20 +18,23 @@
 )
 
 ;; @desc Registers an institutional account (BaaS)
+(define-data-var contract-owner principal tx-sender)
+(define-data-var facade-address principal tx-sender)
+
+(define-private (is-authorized)
+  (or
+    (is-eq tx-sender (var-get facade-address))
+    (is-eq tx-sender (var-get contract-owner))
+  )
+)
+
 (define-public (register-institution
     (institution principal)
     (tier (string-ascii 20))
     (limit uint)
   )
   (begin
-    ;; Authorization check: Must be Enterprise Facade or Admin (via Access)
-    (asserts!
-      (or
-        (is-eq contract-caller .enterprise-facade)
-        (unwrap-panic (contract-call? .conxian-access has-role tx-sender u1))
-      )
-      ERR_UNAUTHORIZED
-    )
+    (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (map-set institutional-accounts institution {
       tier: tier,
       status: "ACTIVE",
@@ -66,13 +69,7 @@
     (new-limit uint)
   )
   (begin
-    (asserts!
-      (or
-        (is-eq contract-caller .enterprise-facade)
-        (unwrap-panic (contract-call? .conxian-access has-role tx-sender u1))
-      )
-      ERR_UNAUTHORIZED
-    )
+    (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (match (map-get? institutional-accounts institution)
       account
       (begin

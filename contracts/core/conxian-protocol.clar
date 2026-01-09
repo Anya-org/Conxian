@@ -44,8 +44,6 @@
       (or
         (is-owner)
         (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_EMERGENCY))
-        (is-eq tx-sender .conxian-operations-engine) ;; Allow Ops Engine to pause (Fail-Safe)
-        (is-eq tx-sender .agent-risk) ;; Allow Risk Agent to pause (Systemic Risk)
       )
       ERR_UNAUTHORIZED
     )

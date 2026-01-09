@@ -9,7 +9,8 @@
 (define-constant ERR_POSITION_NOT_FOUND (err u3000))
 
 ;; State - Engine Address
-(define-data-var dimensional-engine principal .dimensional-engine)
+(define-data-var contract-owner principal tx-sender)
+(define-data-var dimensional-engine principal tx-sender)
 
 (define-map positions
   uint
@@ -28,13 +29,26 @@
 (define-data-var next-position-id uint u1)
 
 ;; Authorization: Only the Facade (Dimensional Engine) can call state-changing functions
+(define-private (is-owner)
+  (is-eq tx-sender (var-get contract-owner))
+)
+
 (define-private (is-engine)
   (is-eq tx-sender (var-get dimensional-engine))
 )
 
 (define-public (set-dimensional-engine (engine principal))
   (begin
+    (asserts! (is-owner) ERR_NOT_AUTHORIZED)
     (var-set dimensional-engine engine)
+    (ok true)
+  )
+)
+
+(define-public (set-contract-owner (new-owner principal))
+  (begin
+    (asserts! (is-owner) ERR_NOT_AUTHORIZED)
+    (var-set contract-owner new-owner)
     (ok true)
   )
 )

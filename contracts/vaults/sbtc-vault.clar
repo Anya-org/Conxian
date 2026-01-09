@@ -112,12 +112,20 @@
 )
 
 ;; @desc Admin: Set sBTC Token Principal
+(define-data-var contract-owner principal tx-sender)
+
 (define-public (set-sbtc-token (new-token principal))
     (begin
-        ;; In production, use RBAC/Governance
-        ;; Checks if tx-sender is the Operations Engine or Deployer (simplified)
-        (asserts! (is-eq tx-sender .conxian-operations-engine) ERR_UNAUTHORIZED)
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
         (var-set sbtc-token new-token)
+        (ok true)
+    )
+)
+
+(define-public (set-owner (new-owner principal))
+    (begin
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+        (var-set contract-owner new-owner)
         (ok true)
     )
 )
