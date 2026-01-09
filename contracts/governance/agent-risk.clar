@@ -9,6 +9,8 @@
 ;; ---
 
 (use-trait rbac-trait .core-traits.rbac-trait)
+(use-trait oracle-trait .oracle-pricing.oracle-trait)
+(use-trait circuit-breaker-trait .security-monitoring.circuit-breaker-trait)
 
 ;; ---
 ;; @SECTION
@@ -31,6 +33,9 @@
 
 (define-data-var contract-owner principal tx-sender)
 (define-data-var rbac-contract principal .rbac)
+(define-data-var oracle-contract principal .oracle)
+(define-data-var sbtc-vault-contract principal .sbtc-vault)
+(define-data-var conxian-protocol-contract principal .conxian-protocol)
 (define-data-var volatility-threshold uint u1000) ;; 10% price deviation
 (define-data-var peg-threshold uint u500) ;; 5% deviation from 1:1
 
@@ -51,7 +56,7 @@
 (define-private (is-authorized (role uint))
   (if (is-eq tx-sender (var-get contract-owner))
     true
-    (contract-call? .rbac has-role tx-sender role)
+    (contract-call? (var-get rbac-contract) .rbac-trait.has-role tx-sender role)
   )
 )
 
@@ -77,6 +82,22 @@
   )
 )
 
+(define-public (set-sbtc-vault-contract (new-vault principal))
+  (begin
+    (asserts! (is-authorized ROLE_ADMIN) ERR_UNAUTHORIZED)
+    (var-set sbtc-vault-contract new-vault)
+    (ok true)
+  )
+)
+
+(define-public (set-conxian-protocol-contract (new-protocol principal))
+  (begin
+    (asserts! (is-authorized ROLE_ADMIN) ERR_UNAUTHORIZED)
+    (var-set conxian-protocol-contract new-protocol)
+    (ok true)
+  )
+)
+
 ;; @desc Monitor sBTC Peg Stability (Tier 0 Systemic Risk)
 ;; Checks if sBTC price deviates significantly from BTC price (assumed 1:1 target).
 ;; In a real scenario, this fetches sBTC/USD and BTC/USD from the Oracle.
@@ -88,10 +109,8 @@
     (asserts! (is-authorized ROLE_KEEPER) ERR_UNAUTHORIZED)
 
     (let (
-        (sbtc-data (try! (contract-call? .oracle get-price sbtc-token)))
-        (btc-data (try! (contract-call? .oracle get-price btc-token)))
-        (sbtc-price (get price sbtc-data))
-        (btc-price (get price btc-data))
+        (sbtc-price (try! (contract-call? (var-get oracle-contract) .oracle-trait.get-price sbtc-token)))
+        (btc-price (try! (contract-call? (var-get oracle-contract) .oracle-trait.get-price btc-token)))
         (deviation (if (> sbtc-price btc-price)
           (- sbtc-price btc-price)
           (- btc-price sbtc-price)
@@ -104,8 +123,8 @@
           ;; Trigger Emergency Pause on sBTC Vault and Protocol
           ;; We use a hardcoded reference or a lookup in a real system.
           ;; For Tier 0, we target the critical vault.
-          (try! (set-contract-paused .sbtc-vault true))
-          (try! (set-contract-paused .conxian-protocol true))
+          (try! (contract-call? (var-get sbtc-vault-contract) .circuit-breaker-trait.set-contract-paused true))
+          (try! (contract-call? (var-get conxian-protocol-contract) .circuit-breaker-trait.set-contract-paused true))
 
           (print {
             event: "peg-loss-detected",
@@ -124,10 +143,10 @@
 ;; @desc The core autonomous function of the CRO. A keeper calls this function to check
 ;; the price volatility of a given asset. If the volatility exceeds the threshold,
 ;; it triggers a circuit breaker for a specified target contract.
-;; @param token The token to check (as a string identifier).
+;; @param token The token to check.
 ;; @param target-contract The contract to pause if the threshold is exceeded.
 (define-public (monitor-market-volatility
-    (token (string-ascii 64))
+    (token principal)
     (target-contract principal)
   )
   (begin
@@ -136,7 +155,7 @@
     ;; In a real implementation, this would involve comparing two oracle prices over time.
     ;; Here, we simulate by fetching the price and comparing it to a mock baseline.
     (let (
-        (price-data (try! (contract-call? .oracle get-price token)))
+        (price-data (try! (contract-call? (var-get oracle-contract) .oracle-trait.get-price token)))
         (price (get price price-data))
         (last-price (get last-price price-data)) ;; Assuming oracle provides this
         (deviation (if (> price last-price)

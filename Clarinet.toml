@@ -48,6 +48,14 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/dex/rebalancing-rules.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
+[contracts.oracle-trait]
+path = "contracts/traits/oracle-trait.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+
+[contracts.pausable-trait]
+path = "contracts/traits/pausable-trait.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+
 [contracts.decentralized-trait-registry]
 path = "contracts/decentralized-trait-registry.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
@@ -1020,7 +1028,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.sbtc-vault]
 path = "contracts/vaults/sbtc-vault.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "launch-limits", "custody", "fee-manager", "yield-aggregator", "regulatory-adapter", "conxian-operations-engine", "sip-standards", "travel-rule-service",]
+depends_on = [ "launch-limits", "custody", "fee-manager", "yield-aggregator", "regulatory-adapter", "conxian-operations-engine", "sip-standards", "travel-rule-service", "security-monitoring",]
 
 [contracts.token-system-coordinator]
 path = "contracts/tokens/token-system-coordinator.clar"
@@ -1035,7 +1043,7 @@ depends_on = [ "roles", "position-manager",]
 [contracts.conxian-protocol]
 path = "contracts/core/conxian-protocol.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-access",]
+depends_on = [ "conxian-access", "security-monitoring",]
 
 [contracts.opex-vault]
 path = "contracts/treasury/opex-vault.clar"
@@ -1093,7 +1101,7 @@ depends_on = [ "sip-standards", "regulatory-adapter",]
 [contracts.agent-risk]
 path = "contracts/governance/agent-risk.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "core-traits", "oracle", "rbac", "sbtc-vault", "conxian-protocol", "oracle-pricing",]
+depends_on = [ "core-traits", "oracle-pricing", "security-monitoring", "oracle", "rbac", "sbtc-vault", "conxian-protocol",]
 
 [contracts.route-manager]
 path = "contracts/dex/route-manager.clar"
