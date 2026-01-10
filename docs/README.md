@@ -1,61 +1,30 @@
-# Conxian Protocol Documentation
+# Conxian Protocol: Documentation Hub
 
-Welcome to the Conxian Protocol documentation hub. This directory contains all documentation organized by user type and purpose.
+Welcome to the central documentation hub for the Conxian Protocol. All project documentation, from the high-level vision to detailed developer guides, is organized and accessible from this location.
 
-## 📚 Documentation Structure
+## 📄 Core Project Documents
 
-### 👥 [User Documentation](./user/)
+These documents provide the strategic overview, technical details, and development trajectory for the protocol.
 
-For end users interacting with the Conxian Protocol
+- **[Whitepaper](./whitepaper.md)** - A detailed technical explanation of the protocol's design and objectives.
+- **[Roadmap](./ROADMAP.md)** - The development roadmap and future milestones.
+- **[Changelog](./CHANGELOG.md)** - A complete record of all versions and updates.
+- **[Business Classification Analysis](./BUSINESS_CLASSIFICATION_ANALYSIS.md)** - An analysis of the protocol's classification as a Sovereign Autonomous Business (SAB).
+- **[License](../LICENSE)** - The Business Source License 1.1 (BUSL-1.1) governing the codebase.
 
-- Getting started guides
-- User tutorials
-- Troubleshooting
+## 👥 Audience-Specific Guides
 
-### 👨‍💻 [Developer Documentation](./developer/)
+This documentation is tailored to the needs of different audiences interacting with the protocol.
 
-For developers building on or contributing to Conxian
+- **[User Documentation](./user/)** - For end-users of the Conxian Protocol. Includes getting started guides and tutorials.
+- **[Developer Documentation](./developer/)** - For developers building on top of or contributing to the protocol.
+  - **[Getting Started Guide](./developer/getting-started.md)** - **Start here!** Set up your environment, run tests, and deploy.
+- **[Enterprise Documentation](./enterprise/)** - For institutional clients and partners. Includes integration and compliance guides.
+- **[Operations Documentation](./operations/)** - For system operators and maintainers. Includes monitoring and incident response procedures.
 
-- Architecture overview
-- API reference
-- Contributing guidelines
-- Deployment guides
+## 🤝 Contribution & Standards
 
-### 🏢 [Enterprise Documentation](./enterprise/)
+Information for contributors and a reference for project standards.
 
-For institutional clients and enterprise partners
-
-- Integration guides
-- Compliance documentation
-- Security overview
-- Onboarding process
-
-### 🔧 [Operations Documentation](./operations/)
-
-For system operators and maintainers
-
-- Monitoring guides
-- Maintenance procedures
-- Incident response
-- Audit reports
-
-## 🚀 Quick Start
-
-- **New Users**: Start with [User Documentation](./user/)
-- **Developers**: Check [Developer Documentation](./developer/)
-- **Enterprise Partners**: See [Enterprise Documentation](./enterprise/)
-- **System Operators**: Review [Operations Documentation](./operations/)
-
-## 📖 Additional Resources
-
-- [Main README](../README.md) - Project overview
-- [Whitepaper](../whitepaper.md) - Technical whitepaper
-- [ROADMAP](../ROADMAP.md) - Development roadmap
-- [CHANGELOG](../CHANGELOG.md) - Version history
-- [CONTRIBUTING](../CONTRIBUTING.md) - Contribution guidelines
-- [LICENSE](../LICENSE) - MIT License
-- [Business Classification Analysis](../BUSINESS_CLASSIFICATION_ANALYSIS.md) - Business model and SAB classification
-
----
-
-*This documentation follows GitHub best practices with a single source of truth for each topic. For questions or contributions, please refer to the contributing guidelines.*
+- **[Contributing Guidelines](./CONTRIBUTING.md)** - The process for contributing code, documentation, or raising issues.
+- **[Naming Standards](./NAMING_STANDARDS.md)** - The naming conventions used throughout the Clarity codebase.
