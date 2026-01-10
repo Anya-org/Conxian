@@ -33,6 +33,8 @@ Conxian's mission is to address these challenges by building a unified, secure, 
 
 ## 3. Target Architecture: The Sovereign Autonomous Business (SAB)
 
+***Disclaimer**: The following sections describe the **target architecture** for the Conxian Protocol. As the project is in a **Technical Alpha** stage, many of these components are either in early development or are planned for future implementation. For the current status of the code, please refer to the module-specific `README` files.*
+
 The following sections describe the **target architecture** for the Conxian Protocol.
 
 ### 3.1 Governance: The Autonomous ExCo & Multi-Council Model

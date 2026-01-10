@@ -2,72 +2,87 @@
 
 ## Overview
 
-The Core Module is the foundational layer of the Conxian Protocol, responsible for dimensional trading, position management, and system-wide risk assessment. It is designed around a secure, modular **facade pattern** where the `dimensional-engine.clar` contract serves as the single, unified entry point for all user-facing operations.
+The Core Module is the foundational layer and central nervous system of the Conxian Protocol. It is responsible for managing global state, system-wide security, and routing all core user interactions for dimensional trading, position management, and risk assessment.
 
-This architecture enhances security by abstracting the underlying complexity and ensures maintainability by routing calls to a set of specialized, single-responsibility manager contracts.
+The module is designed around a secure, modular **facade pattern**. The `dimensional-engine.clar` contract serves as the primary, user-facing entry point, while the `conxian-protocol.clar` contract acts as the central administrative hub.
 
-## Architecture: Facade Pattern
+## Architecture: Facade and Coordinator
 
-The Core Module's architecture is a clear implementation of the facade pattern. All external calls are directed to the `dimensional-engine.clar` contract, which contains minimal business logic. Its primary function is to validate inputs and delegate the actual work to the appropriate manager contract.
+The Core Module's architecture separates user interaction from protocol administration.
 
-This interaction is governed by a set of standardized interfaces defined in `/contracts/traits/`.
+1.  **`dimensional-engine.clar` (User Facade)**: This contract is the single entry point for all standard user operations like opening positions or depositing funds. It contains minimal business logic, instead validating inputs and delegating work to specialized manager contracts. Crucially, it performs pre-flight checks by querying the `conxian-protocol.clar` contract for pause status and checking user compliance.
+
+2.  **`conxian-protocol.clar` (Protocol Coordinator)**: This is the administrative heart of the protocol. It manages a system-wide emergency pause switch, maintains a registry of all authorized module contracts, and handles ownership and administrative permissions.
 
 ### Control Flow Diagram
 
 ```mermaid
 graph TD
-    A[User] --> B{dimensional-engine.clar};
-    B -- Guards --> G[regulatory-adapter.clar];
-    B -- open-position --> C[position-manager.clar];
-    B -- close-position --> C;
-    B -- deposit-funds --> D[collateral-manager.clar];
-    B -- withdraw-funds --> D;
-    B -- check-position-health --> F[risk-manager.clar];
-    B -- liquidate-position --> F;
-    B -- get-funding-rate --> H[funding-rate-calculator.clar];
-    B -- admin functions --> I[conxian-protocol.clar];
+    subgraph "User Actions"
+        A[User] --> B{dimensional-engine.clar};
+    end
+
+    subgraph "Protocol State & Security"
+        G[Admin] --> H{conxian-protocol.clar};
+        H -- set-paused --> H;
+        H -- register-module --> H;
+    end
+
+    B -- 1. Pre-flight Checks --> H;
+    B -- 2. Delegate `open-position` --> C[position-manager.clar];
+    B -- 2. Delegate `deposit-funds` --> D[collateral-manager.clar];
+    B -- 2. Delegate `liquidate-position` --> F[risk-manager.clar];
+
+    H -- "is-paused?" --> B;
 ```
 
 ## Core Contracts
 
-### Facade
+### Facade & Coordinator
 
--   **`dimensional-engine.clar`**: The central **facade** for the Core Module. It acts as the single, secure entry point for all position management, collateral, and risk-related calls. It implements no core logic itself; instead, it delegates every call to the specialized manager contracts. It also integrates with `block-utils.clar` to perform checks on block properties and `regulatory-adapter.clar` for compliance checks.
+-   **`dimensional-engine.clar`**: The user-facing **facade** for the Core Module. It is the single, secure entry point for all position management, collateral, and risk-related calls. It performs critical pre-flight checks before delegating calls to the appropriate manager contracts.
+-   **`conxian-protocol.clar`**: The central **protocol coordinator**. It is responsible for managing system-wide configurations, the module contract registry, and the global emergency pause feature. All administrative actions are routed through this contract.
 
 ### Manager Contracts (Single-Responsibility)
 
--   **`position-manager.clar`**: Manages the entire lifecycle of user trading positions, including opening, closing, and modifying them.
--   **`collateral-manager.clar`**: Handles all operations related to user collateral, including deposits, withdrawals, and balance tracking.
--   **`risk-manager.clar`**: Assesses the health of all open positions and manages the liquidation process for those that are under-collateralized.
--   **`funding-rate-calculator.clar`**: Calculates the funding rate for perpetual swaps.
--   **`regulatory-adapter.clar`**: Provides a hook for off-chain compliance checks, ensuring that users meet the required regulatory standards.
+-   **`position-manager.clar`**: Manages the entire lifecycle of user trading positions.
+-   **`collateral-manager.clar`**: Handles all operations related to user collateral.
+-   **`risk-manager.clar`**: Assesses the health of all open positions and manages the liquidation process.
 
-### Protocol-Wide Contracts
+## Public Functions
 
--   **`conxian-protocol.clar`**: The main protocol coordinator, responsible for managing system-wide configurations, authorized contract addresses, and emergency controls. The `dimensional-engine.clar` is owned by this contract.
+### `dimensional-engine.clar` (User-Facing)
 
-## Public Functions (`dimensional-engine.clar`)
+#### Position Management
+-   `open-position`: Opens a new trading position.
+-   `close-position`: Closes an existing position.
 
-The following functions are exposed by the `dimensional-engine.clar` facade.
+#### Collateral Management
+-   `deposit-funds`: Deposits funds into the collateral manager.
+-   `withdraw-funds`: Withdraws funds from the collateral manager.
 
-### Position Management
+#### Risk Management
+-   `check-position-health`: Checks the health factor of a specific position.
+-   `liquidate-position`: Initiates the liquidation of an unhealthy position.
 
--   `open-position`: Opens a new trading position by delegating to the `position-manager`.
--   `close-position`: Closes an existing position by delegating to the `position-manager`.
+#### Configuration
+-   `set-protocol-coordinator`: (Owner Only) Sets the address of the main protocol coordinator contract.
 
-### Collateral Management
+### `conxian-protocol.clar` (Admin-Facing)
 
--   `deposit-funds`: Deposits funds into the `collateral-manager`.
--   `withdraw-funds`: Withdraws funds from the `collateral-manager`.
+#### Global State
+-   `set-paused`: (Admin Only) Pauses or unpauses all state-changing protocol functions.
+-   `is-paused`: (Read-Only) Returns the current pause status of the protocol.
+-   `get-protocol-status`: (Read-Only) Returns the pause status and the current Nakamoto tenure ID.
 
-### Risk Management
+#### Module Registry
+-   `register-module`: (Admin Only) Adds a new module contract to the protocol registry.
+-   `set-module-active`: (Admin Only) Activates or deactivates a registered module.
+-   `get-module`: (Read-Only) Retrieves the address and status of a registered module.
 
--   `check-position-health`: Checks the health of a position by delegating to the `risk-manager`.
--   `liquidate-position`: Initiates the liquidation of an unhealthy position via the `risk-manager`.
-
-### Protocol Administration
-
--   `set-protocol-coordinator`: Sets the address of the main protocol coordinator contract.
+#### Ownership
+-   `set-contract-owner`: (Owner Only) Transfers ownership of the protocol to a new address.
+-   `get-contract-owner`: (Read-Only) Returns the current owner of the protocol.
 
 ## Status
 

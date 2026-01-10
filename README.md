@@ -69,6 +69,8 @@ This central hub contains all key documents, including:
 -   **Architectural Pattern**: Facade-Based & Trait-Driven
 -   **Next Steps**: Comprehensive testing, third-party security audits, and preparation for mainnet.
 
+***Disclaimer**: This project is in a Technical Alpha stage. The features and architecture described in the documentation represent the target design of the protocol, and not all functionality is fully implemented. Please refer to the module-specific `README` files for the most accurate information on the current state of the code.*
+
 ## Development Setup
 
 ### Prerequisites
