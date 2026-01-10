@@ -107,15 +107,14 @@
   )
   (begin
     (asserts! (is-authorized ROLE_KEEPER) ERR_UNAUTHORIZED)
-
-    (let (
-        (sbtc-price (try! (contract-call? (var-get oracle-contract) .oracle-trait.get-price sbtc-token)))
-        (btc-price (try! (contract-call? (var-get oracle-contract) .oracle-trait.get-price btc-token)))
+    (let 
+      (
+        (sbtc-price (try! (contract-call? .oracle .oracle-trait.get-price sbtc-token)))
+        (btc-price (try! (contract-call? .oracle .oracle-trait.get-price btc-token)))
         (deviation (if (> sbtc-price btc-price)
           (- sbtc-price btc-price)
           (- btc-price sbtc-price)
         ))
-        ;; Calculate deviation in basis points: (deviation * 10000) / btc-price
         (deviation-bps (/ (* deviation u10000) btc-price))
       )
       (if (> deviation-bps (var-get peg-threshold))
@@ -138,7 +137,6 @@
       )
     )
   )
-)
 
 ;; @desc The core autonomous function of the CRO. A keeper calls this function to check
 ;; the price volatility of a given asset. If the volatility exceeds the threshold,

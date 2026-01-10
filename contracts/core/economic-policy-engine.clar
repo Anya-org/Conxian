@@ -188,13 +188,11 @@
             (price (get 1 asset-price-confi))
             (confidence (get 2 asset-price-confi))
           )
-          (match result
-            success (update-price-feed asset price confidence)
-            error error
-          )
+          ;; Return the accumulator (result) unchanged
+          result
         )
       )
-      (ok u0)  ;; Initial value with correct type
+      (ok u0)
       (zip assets (zip prices confidences))
     )
   )

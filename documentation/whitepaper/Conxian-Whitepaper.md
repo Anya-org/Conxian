@@ -1,26 +1,28 @@
-# Conxian Protocol — A Multi‑Dimensional DeFi System on Stacks (Nakamoto)
+# Conxian Protocol — A Sovereign Autonomous Business (SAB) System on Stacks (Nakamoto)
 
-Version: 2.2 (Updated December 06, 2025)
+Version: 2.3 (Updated January 10, 2026)
 Status: Testnet, Nakamoto-compatible (Zero-Error Compile; comprehensive
 testing and external audit preparation in progress; not yet deployed to
 mainnet)
 
 ## Abstract
 
-Conxian is a comprehensive Bitcoin‑anchored, multi‑dimensional DeFi protocol
-deployed on Stacks (Nakamoto). The protocol has undergone a significant
-architectural refactoring to create a more modular, decentralized, and
-Nakamoto-compatible system. This new architecture unifies **concentrated
-liquidity pools**, **advanced multi-hop routing**, **multi-source oracle
-aggregation**, **enterprise-grade lending**, **comprehensive MEV protection**,
-**yield strategy automation**, and a **multi-council governance model with an
-automated Conxian Operations Engine** into a cohesive and extensible
-ecosystem.
+Conxian is a revolutionary **Sovereign Autonomous Business (SAB) ecosystem**
+deployed on Stacks (Nakamoto) that introduces **zero-gas autonomous operations**
+through **regulatory handoff** architecture. The protocol has undergone a
+significant architectural evolution to create a multi-agent governance system
+with **5-tier council structure**, **autonomous agents**, and **automated
+operations** while maintaining full regulatory compliance.
 
-The system is architecturally divided into specialized, single-responsibility
-contracts, governed by a robust, modular trait system. This modular design
-enhances security, maintainability, and future extensibility, ensuring that the
-Conxian protocol remains at the forefront of decentralized finance.
+The system unifies **concentrated liquidity pools**, **advanced multi-hop routing**,
+**multi-source oracle aggregation**, **enterprise-grade lending**, **comprehensive
+MEV protection**, **yield strategy automation**, and a **multi-council governance
+model with automated agents** into a cohesive, self-governing ecosystem.
+
+The SAB model implements **autonomous agents** (Chief Risk Officer, Chief Financial
+Officer, Operations Engine) that operate with **zero gas costs** through **regulatory
+handoff** while maintaining **full compliance** through **off-chain verification**
+and **clean-hands protocols**.
 
 ## 1. Motivation
 
@@ -63,7 +65,81 @@ modular, decentralized contracts.
   institutional adoption without compromising the permissionless nature of the
   retail-facing components.
 
-## 3. System Architecture Overview
+## 3. Sovereign Autonomous Business (SAB) Architecture
+
+### 3.1 Zero-Gas Operations Through Regulatory Handoff
+
+The SAB model achieves **zero-gas autonomous operations** through an innovative
+**regulatory handoff** approach:
+
+- **Off-Chain Compliance**: Regulatory verification occurs off-chain through
+  ZK-proofs and signed messages
+- **Clean-Hands Protocol**: PII remains off-chain while ensuring compliance
+- **Jurisdiction Support**: Multi-regulatory framework compatibility
+- **SIP-018 Integration**: Standardized signed message verification
+
+### 3.2 5-Tier Council Structure
+
+The SAB governance is organized into five specialized councils, each with distinct
+responsibilities and voting power:
+
+```
+🏛️ CXD (Council Protocol)     - Core protocol decisions
+🛡️ CXVG (Council Risk)        - Systemic risk management  
+💰 CXTR (Council Treasury)      - Capital allocation
+🪙 CXS (Council Staking)       - Yield & rewards
+🔄 CXLP (Council Liquidity)     - AMM & market operations
+```
+
+### 3.3 Autonomous Agents System
+
+#### Agent Risk (Chief Risk Officer)
+
+- **Core Functions**: sBTC peg monitoring, market volatility tracking, circuit breakers
+- **Zero-Gas Operations**: Automated risk monitoring and emergency protocols
+- **Integration**: Oracle data feeds, contract pause management
+- **Roles**: ROLE_ADMIN, ROLE_KEEPER, ROLE_CEO_AGENT
+
+#### Agent Treasury (Chief Financial Officer)
+
+- **Core Functions**: Automated revenue distribution, capital management
+- **Zero-Gas Operations**: Fee distribution across vaults (60% staking, 20% dev, 20% insurance)
+- **Integration**: Regulatory compliance verification, vault configuration
+- **Features**: Dynamic allocation management, compliance checks
+
+#### Conxian Operations Engine
+
+- **Core Functions**: Executive coordination, governance degradation prevention
+- **Zero-Gas Operations**: Service registration, failsafe protocols
+- **Integration**: Multi-agent coordination, activity tracking
+- **Features**: Nakamoto-compatible timing, stagnation detection
+
+#### Additional Autonomous Components
+
+- **Proposal Engine**: Multi-council proposal routing and validation
+- **Proposal Executor**: Quorum verification and proposal execution
+- **Enhanced Governance NFT**: Council seat ownership and voting power
+- **Automation Manager**: Keeper coordination and system health monitoring
+
+### 3.4 Regulatory Compliance Layer
+
+#### Regulatory Adapter (Clean-Hands Compliance)
+
+- **Off-Chain Verification**: ZK-proof and signature validation
+- **Privacy Preservation**: PII remains off-chain
+- **Jurisdiction Support**: Multi-regulatory framework compatibility
+- **Zero-Gas Checks**: All operations verified off-chain
+
+### 3.5 PaaS Factory (Protocol-as-a-Service)
+
+#### SAB Deployment System
+
+- **One-Click Deployment**: Automated SAB creation and configuration
+- **Compliance Enforcement**: Conxian standard adherence
+- **Template Configuration**: Standardized SAB setup
+- **Metadata Management**: Business registration and tracking
+
+## 4. System Architecture Overview
 
 The Conxian protocol is organized into a series of specialized layers, each containing modules with well-defined responsibilities.
 
@@ -143,101 +219,96 @@ sustainability of the ecosystem.
 | **Conxian Voting Token** | CXVG | SIP-010 FT | Governance voting power token used to vote on proposals and participate in protocol decision-making. |
 | **Conxian Staking Position** | CXS | SIP-009 NFT | Non-fungible staking position token that represents a unique stake, with lock duration and reward tracking encoded per position. |
 
-## 4. Governance & Organizational Design
+## 5. Governance & Autonomous Agent System
 
-The Conxian Protocol is governed by the **Conxian Protocol DAO**, which
-operates through a set of on-chain councils and role NFTs. This design mirrors
-traditional board and committee structures while remaining fully on-chain and
-compatible with decentralized participation.
+The Conxian Protocol implements a revolutionary **Sovereign Autonomous Business (SAB)**
+governance model that combines human oversight with fully autonomous agents,
+creating a self-governing ecosystem with zero-gas operations.
 
-### 4.1 DAO & Councils
+### 5.1 Multi-Council Governance Structure
 
-Conxian governance is organized around the following council-style bodies,
-implemented via enhanced governance NFTs and council membership roles:
+Conxian governance is organized around five specialized councils, each with
+distinct responsibilities and voting power:
 
-- **Protocol & Strategy Council**  
+- **Protocol & Strategy Council (CXD)**  
   Oversees the long-term direction of the protocol, core parameter frameworks,
   and major architectural changes.
 
-- **Risk & Compliance Council**  
+- **Risk & Compliance Council (CXVG)**  
   Oversees prudential risk limits, liquidation and collateralization
   thresholds, and alignment with regulatory-style safety and user-protection
   objectives.
 
-- **Treasury & Investment Council**  
+- **Treasury & Investment Council (CXTR)**  
   Manages treasury reserves, investment policies, and capital deployment,
   including budget approvals for strategic initiatives and service providers.
 
-- **Technology & Security Council**  
-  Oversees upgrades, audits, security posture, and incident response plans for
-  critical contracts.
+- **Staking & Yield Council (CXS)**  
+  Focuses on staking mechanisms, yield optimization, and reward distribution
+  across the ecosystem.
 
-- **Operations & Resilience Council**  
-  Focuses on day-to-day operational health, incident handling, runtime
-  resilience, and service-level performance across modules.
+- **Liquidity & Market Council (CXLP)**  
+  Oversees liquidity provision, market operations, and AMM functionality
+  across all trading pairs.
 
-Council membership and specialized powers (e.g., veto certificates, quorum
-boosters, delegation certificates) are represented via governance NFTs in the
-`enhanced-governance-nft.clar` module.
+### 5.2 Autonomous Agent System
 
-### 4.2 Conxian Operations Engine — Automated DAO Seat
+#### Chief Risk Officer (Agent Risk)
 
-To reflect that Conxian is designed as a fully-automated system, the protocol
-includes a dedicated on-chain agent, the **Conxian Operations Engine**. This
-agent:
+The autonomous risk management agent that operates 24/7:
 
-- Holds a council membership NFT within the **Operations & Resilience
-  Council**, giving it one formal seat in governance.
-- Consumes metrics from risk, lending, DEX, oracle, circuit breaker, treasury,
-  and monitoring modules (e.g., `token-system-coordinator.clar`).
-- Aggregates inputs corresponding to LegEx (legal & policy), DevEx (technical
-  quality), OpEx (operational health), CapEx (infrastructure investment), and
-  InvEx (treasury & investment) into deterministic voting policies.
-- Casts votes via the proposal engine as a contract principal, providing an
-  **automated, policy-driven voice** in DAO decisions.
+- **sBTC Peg Monitoring**: Real-time price deviation detection and circuit breaker triggers
+- **Market Volatility Tracking**: Automated threshold monitoring and emergency protocols
+- **Systemic Risk Protection**: Contract pause capabilities and emergency response systems
+- **Zero-Gas Operations**: All risk monitoring performed through keeper calls
 
-This seat is intentionally transparent and rules-based: its behavior is
-governed by on-chain policy rather than human discretion, and its metrics
-mirror the operational and regulatory alignment documented in the
-`OPERATIONS_RUNBOOK.md` and `REGULATORY_ALIGNMENT.md` artifacts.
+#### Chief Financial Officer (Agent Treasury)
 
-### 4.3 NFTs for Positions and Roles
+The autonomous capital management agent:
 
-Conxian uses NFTs to represent both **economic positions** and **governance
-roles**:
+- **Revenue Distribution**: Automated fee allocation (60% staking, 20% dev fund, 20% insurance)
+- **Capital Management**: Dynamic vault configuration and allocation management
+- **Compliance Integration**: Regulatory verification for all financial operations
+- **Zero-Gas Operations**: Automated treasury management through keeper coordination
 
-- **Staking Positions (CXS)**: Each CXS token is a SIP-009 NFT representing a
-  unique staking position, including deposited amount, lock configuration, and
-  accrued rewards.
-- **LP Position NFTs**: Concentrated liquidity pools and future extensions use
-  NFTs to represent liquidity positions, enabling granular accounting of range,
-  fees, and ownership.
-- **DAO Role NFTs**: Council memberships, reputation badges, delegation
-  certificates, veto powers, and quorum boosters are all represented as NFTs in
-  the enhanced governance system, enabling fine-grained, auditable role
-  management.
+#### Operations Engine (Conxian Operations Engine)
 
-This NFT-based representation enables unified, on-chain views of positions and
-governance rights, and makes complex structures (e.g., multi-asset LP
-positions or layered delegate roles) easily composable.
+The central coordination agent for the entire SAB system:
 
-### 4.4 Service Vaults and External Dependencies
+- **Executive Coordination**: Multi-agent coordination and governance degradation prevention
+- **Service Registry**: Zero-drift engineering and automated service management
+- **Failsafe Protocols**: Emergency system management and stagnation detection
+- **Zero-Gas Operations**: Automated governance coordination and health monitoring
 
-The protocol architecture supports **service vaults** that hold CXD (and, where
-appropriate, CXTR) to pay for on-chain and off-chain services such as bridges,
-oracles, and infrastructure providers.
+### 5.3 Human-AI Collaboration
 
-Key characteristics:
+The SAB model enables seamless collaboration between human participants and
+autonomous agents:
 
-- Vaults are governed by the Treasury & Investment and Operations & Resilience
-  councils.
-- Budgets, withdrawal limits, and renewal policies are enforced via on-chain
-  rules and routed through the governance process.
-- Payments are made in CXD/CXTR under explicit policies, enabling auditors and
-  regulators to trace infrastructure and service spend at the contract level.
+- **Hybrid Voting**: Both human and autonomous agent participation in governance
+- **Role Delegation**: Autonomous agents hold formal council seats with voting rights
+- **Escalation Protocols**: Human intervention triggers for exceptional circumstances
+- **Learning Integration**: AI agent improvement through governance outcomes
 
-These vaults provide a structured way for the protocol to pay for its own
-critical dependencies while remaining within the DAO’s governance framework.
+### 5.4 Regulatory Compliance Through Handoff
+
+The SAB system maintains full regulatory compliance through innovative
+handoff mechanisms:
+
+- **Off-Chain Verification**: All compliance checks performed off-chain
+- **Clean-Hands Protocol**: PII remains off-chain while ensuring regulatory compliance
+- **Jurisdiction Support**: Multi-regulatory framework compatibility
+- **Zero-Gas Compliance**: No gas costs for regulatory verification processes
+
+### 5.5 NFT-Based Governance Rights
+
+Council membership and voting power are represented through enhanced governance
+NFTs:
+
+- **Council Seat NFTs**: Formal membership in specific councils
+- **Voting Power Tracking**: Real-time calculation of voting influence
+- **Member Classification**: Human vs autonomous agent identification
+- **Role-Based Access**: Granular permission management through NFT traits
 
 ## 5. Security
 

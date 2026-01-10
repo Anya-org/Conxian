@@ -73,9 +73,7 @@
     (expiry uint)
     (jurisdiction (string-ascii 3))
   )
-  (sha256 (concat (unwrap-panic (principal-to-buff user))
-    (concat (uint-to-buff expiry) (ascii-to-buff jurisdiction))
-  ))
+  (sha256 (concat (to-uint expiry) (ascii-to-buff jurisdiction)))
 )
 
 ;; @desc Submit a ZK-Proof/Signed Attestation of compliance (User-Sovereign)
