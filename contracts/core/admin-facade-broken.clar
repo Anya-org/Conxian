@@ -6,6 +6,9 @@
 (use-trait rbac-trait .core-traits.rbac-trait)
 (use-trait pausable-trait .pausable-trait.pausable-trait)
 
+;; Types for Admin Operations (using tuples instead of custom types)
+;; admin-operation: { type: uint, params: (list 10 principal) }
+
 ;; Constants
 (define-constant ERR_NOT_AUTHORIZED (err u1000))
 (define-constant ERR_INVALID_OPERATION (err u1001))
@@ -30,44 +33,19 @@
 )
 
 ;; Helper Functions for Batch Operations
-(define-private (execute-role-grant
-    (user principal)
-    (role uint)
-  )
-  (match (contract-call? .rbac grant-role user role)
-    success
-    success
-    error (err ERR_BATCH_LIMIT_EXCEEDED)
-  )
-)
-
-(define-private (execute-role-revoke
-    (user principal)
-    (role uint)
-  )
-  (match (contract-call? .rbac revoke-role user role)
-    success
-    success
-    error (err ERR_BATCH_LIMIT_EXCEEDED)
-  )
-)
-
 (define-private (process-role-update (result (response bool uint)) (update { user: principal, role: uint, active: bool }))
   (match result
-    success (if (get active update)
-      (execute-role-grant (get user update) (get role update))
-      (execute-role-revoke (get user update) (get role update))
+    success_result (if (get active update)
+      (match (contract-call? .rbac grant-role (get user update) (get role update))
+        success_result success_result
+        error_result (err ERR_BATCH_LIMIT_EXCEEDED)
+      )
+      (match (contract-call? .rbac revoke-role (get user update) (get role update))
+        success_result success_result
+        error_result (err ERR_BATCH_LIMIT_EXCEEDED)
+      )
     )
-    error error
-  )
-)
-
-(define-private (execute-admin-operation-wrapper (operation { type: uint, params: (list 10 principal) }))
-  (match (get type operation)
-    1 (execute-emergency-operation (get params operation))
-    2 (execute-protocol-operation (get params operation))
-    3 (execute-treasury-operation (get params operation))
-    default (err ERR_INVALID_OPERATION)
+    error_result error_result
   )
 )
 
@@ -79,7 +57,11 @@
     })
   )
   (match result
-    success (execute-admin-operation-wrapper operation)error error
+    success_result (match (execute-admin-operation operation)
+      success_result success_result
+      error_result error_result
+    )
+    error_result error_result
   )
 )
 
@@ -99,8 +81,8 @@
   (begin
     (asserts! (has-role ROLE_EMERGENCY_PAUSE) ERR_NOT_AUTHORIZED)
     ;; Note: In a real implementation, this would delegate to a pausable contract
-    ;; For now, we just log the pause request
-    (print {
+;; For now, we just log the pause request
+(print {
       event: "contract-pause-requested",
       target: target,
     })
@@ -113,8 +95,8 @@
   (begin
     (asserts! (has-role ROLE_GLOBAL_ADMIN) ERR_NOT_AUTHORIZED)
     ;; Note: In a real implementation, this would delegate to a pausable contract
-    ;; For now, we just log the unpause request
-    (print {
+;; For now, we just log the unpause request
+(print {
       event: "contract-unpause-requested",
       target: target,
     })
@@ -152,13 +134,16 @@
     (asserts! (<= (len updates) (var-get max-batch-size)) ERR_BATCH_LIMIT_EXCEEDED)
     
     ;; Process each role update with proper error handling
-    (fold process-role-update (ok true) updates)
+(fold process-role-update (ok true) updates)
   )
 )
 
 ;; Batch Admin Operations (1000x more efficient)
 (define-public (batch-admin-operations 
-    (operations (list 200 { type: uint, params: (list 10 principal) }))
+    (operations (list 200 {
+      type: uint,
+      params: (list 10 principal),
+    }))
   )
   (begin
     (asserts! (is-global-admin) ERR_NOT_AUTHORIZED)
@@ -281,5 +266,5 @@
 
 ;; Utility Functions
 (define-private (is-valid-principal (principal principal))
-  true ;; Simple validation - all principals are valid in this context
+  true
 )
