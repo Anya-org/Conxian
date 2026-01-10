@@ -6,134 +6,98 @@
 // architecture is working as expected.
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { TestProvider, getTestProvider, tx, RO } from '@stacks/clarinet-sdk';
-import { principal, uint } from '@stacks/transactions';
+import { Simnet, initSimnet } from '@stacks/clarinet-sdk';
+import { Cl, principal, uint } from '@stacks/transactions';
 
 describe('Refactor Verification Suite', () => {
-  let provider: TestProvider;
+  let simnet: Simnet;
   let deployer: string;
   let wallet1: string;
 
   beforeEach(async () => {
-    provider = await getTestProvider();
-    const accounts = await provider.getAccounts();
+    simnet = await initSimnet();
+    const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
     wallet1 = accounts.get('wallet_1')!;
   });
 
-  it('Lending Module - should supply and withdraw through the facade', async () => {
+  it('Lending Module - should supply and withdraw through the facade', () => {
     const asset = `${deployer}.mock-token`;
     const amount = 1000;
 
     // Supply
-    let receipt = await provider.eval(
-      tx(
-        {
-          sender: wallet1,
-          contract: `${deployer}.comprehensive-lending-system`,
-          method: 'supply',
-          args: [principal(asset), uint(amount)],
-        },
-        {
-          accounts: {
-            wallet_1: {
-              balances: {
-                stx: 1000000,
-                'mock-token': 10000,
-              },
-            },
-          },
-        }
-      )
+    let receipt = simnet.callPublicFn(
+      `${deployer}.comprehensive-lending-system`,
+      'supply',
+      [Cl.principal(asset), Cl.uint(amount)],
+      wallet1
     );
-    expect(receipt.success).toBe(true);
+    expect(receipt.result).toBeOk(Cl.bool(true));
 
     // Verify supply balance
-    let balance = await provider.eval(
-      RO(
-        {
-          contract: `${deployer}.lending-manager`,
-          method: 'get-user-supply-balance',
-          args: [principal(wallet1), principal(asset)],
-        }
-      )
+    let balance = simnet.callReadOnlyFn(
+      `${deployer}.lending-manager`,
+      'get-user-supply-balance',
+      [Cl.principal(wallet1), Cl.principal(asset)],
+      wallet1
     );
-    expect(balance.result).toBeSome(uint(amount));
+    expect(balance.result).toBeSome(Cl.uint(amount));
 
     // Withdraw
-    receipt = await provider.eval(
-      tx(
-        {
-          sender: wallet1,
-          contract: `${deployer}.comprehensive-lending-system`,
-          method: 'withdraw',
-          args: [principal(asset), uint(amount)],
-        }
-      )
+    receipt = simnet.callPublicFn(
+      `${deployer}.comprehensive-lending-system`,
+      'withdraw',
+      [Cl.principal(asset), Cl.uint(amount)],
+      wallet1
     );
-    expect(receipt.success).toBe(true);
+    expect(receipt.result).toBeOk(Cl.bool(true));
   });
 
-  it('Governance Module - should create and execute a proposal through the facade', async () => {
+  it('Governance Module - should create and execute a proposal through the facade', () => {
     // Create Proposal
-    let receipt = await provider.eval(
-        tx(
-            {
-                sender: deployer,
-                contract: `${deployer}.proposal-engine`,
-                method: 'propose',
-                args: [
-                    '0x746573742070726f706f73616c', // "test proposal"
-                    `[${deployer}.mock-token]`,
-                    '[u100]',
-                    '["transfer"]',
-                    `[0x01${deployer.replace('ST', '0x')}${wallet1.replace('ST', '0x')}000000000000000000000000000000000000000a]`,
-                    'u1',
-                    'u100',
-                ],
-            },
-        )
+    let receipt = simnet.callPublicFn(
+      `${deployer}.proposal-engine`,
+      'propose',
+      [
+        Cl.bufferFromAscii('test proposal'),
+        Cl.list([Cl.principal(`${deployer}.mock-token`)]),
+        Cl.list([Cl.uint(100)]),
+        Cl.list([Cl.stringAscii('transfer')]),
+        Cl.list([Cl.tuple({ to: Cl.principal(wallet1), amount: Cl.uint(10) })]),
+        Cl.uint(1),
+        Cl.uint(100),
+      ],
+      deployer
     );
-    expect(receipt.success).toBe(true);
+    expect(receipt.result).toBeOk(Cl.uint(1));
 
     // Vote
-    receipt = await provider.eval(
-      tx(
-        {
-          sender: deployer,
-          contract: `${deployer}.proposal-engine`,
-          method: 'vote',
-          args: ['u1', 'true'],
-        }
-      )
+    receipt = simnet.callPublicFn(
+      `${deployer}.proposal-engine`,
+      'vote',
+      [Cl.uint(1), Cl.bool(true)],
+      deployer
     );
-    expect(receipt.success).toBe(true);
+    expect(receipt.result).toBeOk(Cl.bool(true));
 
     // Execute
-    receipt = await provider.eval(
-      tx(
-        {
-          sender: deployer,
-          contract: `${deployer}.proposal-engine`,
-          method: 'execute',
-          args: ['u1'],
-        }
-      )
+    receipt = simnet.callPublicFn(
+      `${deployer}.proposal-engine`,
+      'execute',
+      [Cl.uint(1)],
+      deployer
     );
-    expect(receipt.success).toBe(true);
+    expect(receipt.result).toBeOk(Cl.bool(true));
 
     // Verify proposal was executed
-    const proposal = await provider.eval(
-      RO(
-        {
-          contract: `${deployer}.proposal-registry`,
-          method: 'get-proposal',
-          args: ['u1'],
-        }
-      )
+    const proposal = simnet.callReadOnlyFn(
+      `${deployer}.proposal-registry`,
+      'get-proposal',
+      [Cl.uint(1)],
+      deployer
     );
-    expect(proposal.result).toBeSomeTuple({
-      executed: 'true',
-    });
+    expect(proposal.result).toBeSome(Cl.tuple({
+      executed: Cl.bool(true),
+    }));
   });
 });

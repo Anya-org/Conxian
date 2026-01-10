@@ -144,15 +144,27 @@
 )
 
 ;; Batch Role Management (100x more efficient)
-(define-public (batch-update-roles 
+(define-public (batch-update-roles
     (updates (list 100 { user: principal, role: uint, active: bool }))
   )
   (begin
     (asserts! (is-global-admin) ERR_NOT_AUTHORIZED)
     (asserts! (<= (len updates) (var-get max-batch-size)) ERR_BATCH_LIMIT_EXCEEDED)
-    
-    ;; Process each role update with proper error handling
-    (fold process-role-update (ok true) updates)
+
+    ;; Correctly process each role update using fold
+    (fold
+      (lambda (update result)
+        (match result
+          (ok ok-val) (if (get active update)
+            (contract-call? .rbac grant-role (get user update) (get role update))
+            (contract-call? .rbac revoke-role (get user update) (get role update))
+          )
+          (err err-val) (err err-val)
+        )
+      )
+      updates
+      (ok true)
+    )
   )
 )
 
