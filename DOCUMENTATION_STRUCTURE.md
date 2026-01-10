@@ -1,40 +1,53 @@
 # Documentation Structure
 
-## Required Files Only
+## 1. Overview
 
-### Root Level
-- `README.md` - Project overview and setup
-- `PRD.md` - Product Requirements Document
-- `CHANGELOG.md` - Version history
-- `CONTRIBUTING.md` - Development guidelines
-- `LICENSE` - GPL-3.0 license
+This document outlines the official, audience-centric structure for all documentation in the Conxian Protocol repository. The goal is to provide a clear, consistent, and easily navigable "codewiki" for all stakeholders, from core developers to community members.
 
-### Documentation Directory
-- `/documentation/README.md` - Documentation overview
-- `/documentation/SYSTEM_ARCHITECTURE.md` - System architecture
-- `/documentation/LIFECYCLE_FLOWS.md` - Lifecycle flows
-- `/documentation/GOVERNANCE_MODEL.md` - Governance
-- `/documentation/ROADMAP.md` - Project roadmap
-- `/documentation/Conxian-Manifesto.md` - Protocol manifesto
+## 2. Core Principles
 
-### Module Documentation
-- `/contracts/[module]/README.md` - Module-specific docs (only if needed)
-- `/contracts/traits/README.md` - Trait architecture
+1.  **Audience-Centric**: All documentation should be organized based on its primary audience (e.g., developers, enterprise users, governance participants).
+2.  **Single Source of Truth**: There should be no duplicate information. Documents should link to a single, canonical source whenever possible.
+3.  **Code-Adjacent**: All technical documentation, especially for smart contract modules, must live as close to the code as possible (i.e., in a `README.md` file within the module's directory).
+4.  **Minimal but Complete**: Documentation should be concise but provide all necessary information for the target audience to understand and interact with the system.
 
-### Reports
-- `/documentation/reports/` - Monthly reports and audit reports only
+## 3. Directory Structure
 
-## Forbidden Files
-- No analysis documents
-- No research documents (except in `/documentation/research/`)
-- No progress reports
-- No conversation summaries
-- No duplicate documentation
-- No evaluation documents
+The canonical source for all high-level documentation is the `/documentation/` directory.
 
-## Documentation Principles
-1. Single source of truth
-2. Minimal but complete
-3. Action-oriented content
-4. No redundant information
-5. Clear file organization
+### 3.1 Top-Level Documents (`/documentation/`)
+
+This directory serves as the main hub and should contain the following key documents:
+
+-   `README.md`: The main entry point and table of contents for all documentation.
+-   `SYSTEM_ARCHITECTURE.md`: A high-level overview of the protocol's architectural patterns and a map of the core modules.
+-   `ROADMAP.md`: The unified development roadmap.
+-   `CHANGELOG.md`: A log of all notable changes to the protocol.
+-   `GOVERNANCE_MODEL.md`: An explanation of the Conxian DAO, council structure, and voting process.
+
+### 3.2 Audience-Specific Subdirectories
+
+-   `/documentation/developer/`: Guides and resources specifically for developers contributing to or building on top of the protocol.
+-   `/documentation/enterprise/`: Integration guides and documentation for institutional partners.
+-   `/documentation/whitepaper/`: The complete technical vision and protocol design.
+-   `/documentation/security/`: Security policies, audit reports, and best practices.
+
+## 4. Module-Level Documentation (`/contracts/[module]/`)
+
+Every smart contract module directory (e.g., `/contracts/core/`, `/contracts/governance/`) **must** contain a `README.md` file. This file is the single source of truth for the module's architecture, functionality, and public-facing functions.
+
+A module `README.md` should include:
+
+1.  An **Overview** of the module's purpose and role in the protocol.
+2.  An **Architecture** section describing the design patterns used (e.g., Pure Facade, Logic-Rich Facade).
+3.  A **Control Flow Diagram** (using Mermaid) to visualize the interactions between the contracts in the module.
+4.  A complete list of all **Public Functions** with their signatures and a brief description.
+5.  A **Status** section indicating the current state of the module (e.g., Under Review, Production-Ready).
+
+## 5. Forbidden Files
+
+To maintain a clean and focused documentation suite, the following types of files are forbidden:
+
+-   Duplicate or outdated documentation.
+-   Temporary analysis or progress reports.
+-   Conversation summaries or meeting notes.

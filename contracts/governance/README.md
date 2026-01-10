@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Governance Module provides the framework for decentralized decision-making and protocol upgrades. It is designed to be secure, transparent, and flexible, enabling the community to propose, vote on, and execute changes. The module also features the **Conxian Operations Engine**, an automated on-chain agent that participates in governance.
+The Governance Module provides the framework for decentralized decision-making and protocol upgrades. It is designed to be secure, transparent, and flexible, enabling the community to propose, vote on, and execute changes. The module also features the **Conxian Operations Engine**, an automated on-chain agent that can participate in governance.
 
 ## Architecture: Logic-Rich Facade and Specialized Managers
 
@@ -12,35 +12,56 @@ Unlike a pure facade, the `proposal-engine.clar` contains significant business l
 
 ### Control Flow Diagram
 
-```
-[User/DAO] -> [proposal-engine.clar] (Logic-Rich Facade & Controller)
-    |
-    |-- (submit-proposal & cast-vote logic) --> [proposal-registry.clar] (Stores Data & Votes)
-    |-- (execute-proposal logic) --> [proposal-executor.clar] (Executes Payload)
-    |
-[Metrics] -> [conxian-operations-engine.clar] -> [proposal-engine.clar] (Automated Vote)
+```mermaid
+graph TD
+    subgraph "Voting Power Calculation"
+        A[enhanced-governance-nft.clar] -- 1. Raw Seat Power --> B{proposal-engine.clar};
+        C[reputation-engine.clar] -- 2. Adjusts for Activity --> B;
+    end
+
+    subgraph "Governance Workflow"
+        D[User/DAO] -- 3. submit-proposal() --> B;
+        B -- 4. Stores Proposal --> E[proposal-registry.clar];
+        F[Voter] -- 5. vote() --> B;
+        B -- 6. Records Weighted Vote --> E;
+        G[Proposer/Admin] -- 7. execute-proposal() --> H[proposal-executor.clar];
+        H -- 8. Executes Payload --> I[Target Contract];
+        H -- 9. Marks as Executed --> E;
+    end
 ```
 
 ## Core Contracts
 
 ### Logic-Rich Facade
 
--   **`proposal-engine.clar`**: The primary **controller** for the governance module. It provides a unified interface for creating proposals, casting votes, and executing the outcomes. It enforces the core business logic of the governance process and delegates specialized tasks like data storage and vote counting to the manager contracts.
+-   **`proposal-engine.clar`**: The primary **controller** for the governance module. It provides a unified interface for creating proposals, casting votes, and queuing execution. It enforces the core business logic of the governance process and delegates specialized tasks like data storage and vote counting to the manager contracts.
 
 ### Manager Contracts
 
 -   **`proposal-registry.clar`**: A specialized contract responsible for both storing proposal data and recording all votes cast against them.
--   **`proposal-executor.clar`**: A dedicated contract for executing general governance proposals after they have passed.
+-   **`proposal-executor.clar`**: A dedicated contract for executing general governance proposals after they have passed. It validates quorum requirements before executing a proposal's payload.
 -   **`upgrade-controller.clar`**: A specialized, high-security contract for managing the execution of sensitive protocol upgrades. This contract is independent of the main proposal engine and incorporates additional safety features like timelocks.
-
-### Automated Governance Agent
-
--   **`conxian-operations-engine.clar`**: An automated agent that holds a formal seat in the DAO. It consumes on-chain metrics from core protocol modules, aggregates them into policy-constrained votes, and participates in governance by calling the `proposal-engine.clar`.
 
 ### Supporting Contracts
 
 -   **`enhanced-governance-nft.clar`**: Implements the NFT-based council and role system. It is the source of a voter's "raw" voting power, based on which council seats they hold.
 -   **`reputation-engine.clar`**: A supporting contract that adjusts a voter's raw power based on their activity and historical participation. The `proposal-engine.clar` queries this contract to get a "weighted" voting power, which is used to calculate the final vote.
+
+### Automated Governance Agent
+
+-   **`conxian-operations-engine.clar`**: An automated agent that can hold a formal seat in the DAO. It is designed to consume on-chain metrics and participate in governance by calling the `proposal-engine.clar`, although its logic is currently under development.
+
+## Public Functions
+
+### `proposal-engine.clar` (User-Facing)
+
+-   `submit-proposal(proposal-contract <proposal-trait>, council-id uint, start-block uint, end-block uint)`: Submits a new proposal for voting.
+-   `vote(proposal-id uint, support bool)`: Casts a vote on an active proposal. The weight of the vote is determined by the combination of the voter's NFT-based seat power and their reputation score.
+-   `execute-proposal(proposal-id uint, proposal-contract <proposal-trait>)`: Triggers the execution of a passed proposal by calling the `proposal-executor`.
+
+### `proposal-executor.clar` (System-Facing)
+
+-   `execute(proposal-id uint, proposal-contract <proposal-trait>, quorum-percentage uint)`: Called by the `proposal-engine` to execute a passed proposal. It verifies that the voting period is over, the proposal passed, and the quorum was met before executing the proposal's logic.
 
 ## Status
 
