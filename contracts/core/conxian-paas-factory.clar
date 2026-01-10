@@ -4,7 +4,7 @@
 ;; Tier 0: "One-Click" Compliant DAO/Business Spawning
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
-(use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
+(use-trait regulatory-adapter-trait .core-traits.compliance.regulatory-adapter-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u10000))
@@ -50,7 +50,7 @@
 
     ;; 2. Compliance Check (Deployer must be Clean-Hands)
     (asserts!
-      (is-eq (ok true) (contract-call? .regulatory-adapter check-clean-hands-compliance deployer))
+      (is-eq (ok true) (contract-call? .compliance.regulatory-adapter check-clean-hands-compliance deployer))
       ERR_UNAUTHORIZED
     )
 

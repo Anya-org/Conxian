@@ -10,7 +10,7 @@
 (define-data-var last-spend-block uint u0)
 (define-data-var daily-spend uint u0)
 
-(use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
+(use-trait regulatory-adapter-trait .core-traits.compliance.regulatory-adapter-trait)
 
 
 (define-public (withdraw-opex
@@ -22,7 +22,7 @@
       ;; ROLE_OPERATOR ERR_UN
     (asserts!
       (is-eq (ok true)
-        (contract-call? .regulatory-adapter check-clean-hands-compliance
+        (contract-call? .compliance.regulatory-adapter check-clean-hands-compliance
           tx-sender
         ))
       ERR_UNAUTHORIZED

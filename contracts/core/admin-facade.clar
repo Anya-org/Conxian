@@ -79,7 +79,8 @@
     })
   )
   (match result
-    success (execute-admin-operation-wrapper operation)error error
+    success (execute-admin-operation-wrapper operation)
+    error error
   )
 )
 

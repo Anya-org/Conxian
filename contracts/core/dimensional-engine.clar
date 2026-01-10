@@ -9,7 +9,7 @@
 (use-trait risk-manager-trait .core-traits.risk-manager-trait)
 (use-trait funding-rate-trait .core-traits.funding-rate-trait)
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
-(use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
+(use-trait regulatory-adapter-trait .core-traits.compliance.regulatory-adapter-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))
@@ -35,7 +35,7 @@
 ;; @param user: The principal of the user to check.
 ;; @returns bool
 (define-private (check-compliance (user principal))
-  (is-ok (contract-call? .regulatory-adapter check-clean-hands-compliance user))
+  (is-ok (contract-call? .compliance.regulatory-adapter check-clean-hands-compliance user))
 )
 
 ;; --- Internal Guards ---

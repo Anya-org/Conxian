@@ -263,7 +263,7 @@
 (define-private (convert-compliance-to-batch-operation (user principal))
   {
     type: BATCH_TYPE_COMPLIANCE_CHECK,
-    target: .regulatory-adapter,
+    target: .compliance.regulatory-adapter,
     function: "check-clean-hands-compliance",
     params: (list user),
     gas-limit: u15000,
@@ -331,5 +331,5 @@
 )
 
 (define-private (is-valid-principal (principal principal))
-  (is-eq (len (unwrap! (principal-to-buff principal) (err u100))) u33)
+  (is-eq (len (unwrap! (principal-to-bytes principal) (err u100))) u33)
 )

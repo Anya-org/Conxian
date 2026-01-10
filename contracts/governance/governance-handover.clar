@@ -14,7 +14,7 @@
   .conxian-protocol
   .agent-risk
   .agent-treasury
-  .regulatory-adapter
+  .compliance.regulatory-adapter
   .conxian-access
 ))
 
@@ -42,7 +42,7 @@
       (protocol-owner (unwrap-panic (contract-call? .conxian-protocol get-admin)))
       (risk-owner (unwrap-panic (contract-call? .agent-risk get-contract-owner)))
       (treasury-owner (unwrap-panic (contract-call? .agent-treasury get-contract-owner)))
-      (reg-owner (unwrap-panic (contract-call? .regulatory-adapter get-contract-owner)))
+      (reg-owner (unwrap-panic (contract-call? .compliance.regulatory-adapter get-contract-owner)))
       (access-owner (unwrap-panic (contract-call? .conxian-access get-contract-owner)))
     )
     ;; Check Conxian Protocol
