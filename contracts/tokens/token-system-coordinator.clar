@@ -5,6 +5,7 @@
 ;; Tier 0: "Hands-Off" Coordination with Compliance.
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))

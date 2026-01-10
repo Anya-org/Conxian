@@ -27,6 +27,13 @@
   )
 ))
 
+(define-trait regulatory-adapter-trait (
+  (check-clean-hands-compliance
+    (principal)
+    (response bool uint)
+  )
+))
+
 (define-trait position-manager-trait (
   (open-position
     (principal principal uint uint bool)
@@ -56,7 +63,7 @@
   )
   (liquidate
     (uint)
-    (response uint uint)
+    (response bool uint)
   )
 ))
 

@@ -4,7 +4,7 @@
 ;; Decentralized: Uses Unified RBAC via .conxian-access
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
-(use-trait vault-trait .vault-trait.vault-trait)
+(use-trait vault-trait .vault-traits.vault-trait)
 (define-constant ERR_UNAUTHORIZED (err u1000))
 
 ;; Data

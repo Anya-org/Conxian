@@ -3,7 +3,7 @@
 ;; Verifies Off-Chain ZK-Proofs/Signatures of compliance to keep PII off-chain.
 ;; Tier 0: User-Sovereign Verification (SIP-018 Style)
 
-(use-trait compliance-trait .compliance-trait.compliance-trait)
+(impl-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u6000))
@@ -67,18 +67,13 @@
   )
 )
 
-;; Helper function: Convert principal to bytes
-(define-private (principal-to-bytes (user principal))
-  (unwrap! (buff-to-bytes? (principal-to-buff? user)) (err u1000))
-)
-
 ;; @desc Recover the message hash for verification
 (define-read-only (get-verification-message-hash
     (user principal)
     (expiry uint)
     (jurisdiction (string-ascii 3))
   )
-  (sha256 (concat (principal-to-bytes user)
+  (sha256 (concat (unwrap-panic (principal-to-buff user))
     (concat (uint-to-buff expiry) (ascii-to-buff jurisdiction))
   ))
 )

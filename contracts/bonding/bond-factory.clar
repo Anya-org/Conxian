@@ -3,6 +3,7 @@
 ;; Implements SIP-010 FT standard for bond tokens
 
 (impl-trait .sip-standards.sip-010-ft-trait)
+(use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))
@@ -34,24 +35,33 @@
 )
 
 ;; Public Functions
+
 (define-public (create-bond
-    (principal-amount uint)
-    (interest-rate uint)
-    (maturity-block uint)
+    (user principal)
+    (amount uint)
+    (duration uint)
   )
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    ;; Check compliance first
+(asserts!
+      (is-eq (ok true)
+        (contract-call? .regulatory-adapter check-clean-hands-compliance user)
+      )
+      ERR_UNAUTHORIZED
+    )
 
     (let (
         (bond-id (+ (var-get bond-nonce) u1))
-        (mint-result (ft-mint? bond-token principal-amount tx-sender))
+        (mint-result (ft-mint? bond-token amount tx-sender
+          (some 0x0000000000000000000000000000000000000000)
+        ))
       )
       (asserts! (is-ok mint-result) ERR_INVALID_AMOUNT)
       (map-set bonds bond-id {
         issuer: tx-sender,
-        principal-amount: principal-amount,
-        interest-rate: interest-rate,
-        maturity-block: maturity-block,
+        principal-amount: amount,
+        interest-rate: u0,
+        maturity-block: (+ (block-height) duration),
         is-active: true,
       })
       (var-set bond-nonce bond-id)

@@ -3,7 +3,8 @@
 ;; Standard SIP-010 Token with Governance Checkpoints (Vote Weighting)
 ;; Tier 0: "Hands-Off" DAO Token
 
-(impl-trait .sip-standards.sip-010-ft-trait)
+(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))

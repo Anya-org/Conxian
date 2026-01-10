@@ -34,8 +34,9 @@
 
 (define-public (get-weighted-voting-power (user principal) (balance uint))
   (let (
+    (activity-data (map-get? activity-scores user))
     (effective-score
-      (match (map-get? activity-scores user)
+      (match activity-data
         user-activity
           (let (
             (current-score (get score user-activity))
@@ -43,10 +44,10 @@
           )
             (calculate-decayed-score last-voted current-score)
           )
-        (none MAX_SCORE)
+        MAX_SCORE
       )
     )
-  )
+   )
     (ok (/ (* balance effective-score) MAX_SCORE))
   )
 )

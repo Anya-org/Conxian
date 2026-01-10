@@ -4,6 +4,7 @@
 ;; Tier 0: "Clean-Hands" Compliance Enforced.
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))
@@ -19,11 +20,8 @@
 
 ;; Compliance
 (define-private (check-compliance (user principal))
-  (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
-    (if (is-ok compliance-status)
-      true
-      false
-    )
+  (is-eq (ok true)
+    (contract-call? .regulatory-adapter check-clean-hands-compliance user)
   )
 )
 

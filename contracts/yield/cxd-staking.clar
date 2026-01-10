@@ -4,6 +4,7 @@
 ;; Pausable Staking (Deposits paused on emergency, Withdrawals always open).
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u8000))

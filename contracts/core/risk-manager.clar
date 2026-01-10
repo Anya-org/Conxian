@@ -70,24 +70,25 @@
     ;; Check cache first
     (match (map-get? position-health position-id)
       health-data
-        (begin
-          ;; Return cached value if fresh (within 10 blocks)
-          (if (< (- block-height (get last-update health-data)) u10)
-            (ok (get health-factor health-data))
-            ;; Calculate new if not cached
-            (let ((new-hf (calculate-health-factor (get collateral-value health-data) (get debt-value health-data))))
-              (map-set position-health position-id {
-                health-factor: new-hf,
-                collateral-value: (get collateral-value health-data),
-                debt-value: (get debt-value health-data),
-                last-update: block-height,
-              })
-              (ok new-hf)
-            )
+      (begin
+        ;; Return cached value if fresh (within 10 blocks)
+        (if (< (- block-height (get last-update health-data)) u10)
+          (ok (get health-factor health-data))
+          ;; Calculate new if not cached
+          (let ((new-hf (calculate-health-factor (get collateral-value health-data)
+              (get debt-value health-data)
+            )))
+            (map-set position-health position-id {
+              health-factor: new-hf,
+              collateral-value: (get collateral-value health-data),
+              debt-value: (get debt-value health-data),
+              last-update: block-height,
+            })
+            (ok new-hf)
           )
         )
-      else
-        (ok u20000) ;; Default safe value
+      )
+      (ok u20000) ;; Default safe value
     )
   )
 )
@@ -142,10 +143,10 @@
     (asserts! (is-eq tx-sender (var-get dimensional-engine)) ERR_NOT_AUTHORIZED)
     
     ;; Process all positions in single transaction
-    (map-set position-health (get 0 (element-at positions 0)) {
+    (map-set position-health (unwrap-panic (element-at positions u0)) {
       health-factor: u10000,
-      collateral-value: (get 0 (element-at collateral-values 0)),
-      debt-value: (get 0 (element-at debt-values 0)),
+      collateral-value: (default-to u0 (element-at collateral-values u0)),
+      debt-value: (default-to u0 (element-at debt-values u0)),
       last-update: block-height,
     })
     (ok true)
@@ -182,9 +183,7 @@
 
 (define-read-only (is-liquidatable (position-id uint))
   (match (map-get? position-health position-id)
-    data
-(ok (not (is-position-healthy (get health-factor data))))
-else
+    data (ok (not (is-position-healthy (get health-factor data))))
 (ok false)
   )
 )

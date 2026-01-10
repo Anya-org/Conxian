@@ -3,7 +3,8 @@
 ;; Tier 0 Compliance: "Clean-Hands" Enforcement on Transfer
 ;; Represents governance power in the 5-Tier DAO.
 
-(impl-trait .sip-standards.sip-010-ft-trait)
+(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))

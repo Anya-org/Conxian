@@ -10,14 +10,22 @@
 (define-data-var last-spend-block uint u0)
 (define-data-var daily-spend uint u0)
 
+(use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
+
+
 (define-public (withdraw-opex
     (token <sip-010-trait>)
     (amount uint)
     (recipient principal)
   )
   (begin
+      ;; ROLE_OPERATOR ERR_UN
     (asserts!
-      (unwrap-panic (contract-call? .conxian-access has-role tx-sender u4))
+      (is-eq (ok true) (contract-call? .regulatory-adapter check-clean-hands-compliance tx-sender))
+      ERR_UNAUTHORIZED
+    )
+    (asserts!
+      (contract-call? .conxian-access has-role tx-sender u4)
       ;; ROLE_OPERATOR ERR_UNAUTHORIZED
     )
     ;; Check limits

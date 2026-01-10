@@ -29,7 +29,7 @@
     (amount uint)
   )
   (begin
-    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-admin))
+    (asserts! (is-eq tx-sender (unwrap-panic (contract-call? .conxian-protocol get-admin)))
       ERR_UNAUTHORIZED
     )
     (try! (contract-call? token transfer amount tx-sender (as-contract tx-sender) none))

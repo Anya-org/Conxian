@@ -109,8 +109,10 @@
   (begin
     (asserts!
       (or
-        (unwrap-panic (contract-call? .conxian-protocol is-contract-owner tx-sender))
-        (contract-call? .rbac has-role tx-sender ROLE_PROTOCOL)
+        (is-eq tx-sender
+          (unwrap-panic (contract-call? .conxian-protocol get-admin))
+        )
+(contract-call? .rbac has-role tx-sender ROLE_PROTOCOL)
       )
       ERR_UNAUTHORIZED
     )

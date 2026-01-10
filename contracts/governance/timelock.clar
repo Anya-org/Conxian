@@ -10,9 +10,10 @@
 (define-constant MAX_DELAY u10000) ;; 10000 blocks maximum
 (define-constant GRACE_PERIOD u1000) ;; 1000 blocks grace period
 (define-constant ERR_NOT_QUEUED (err u1000))
-(define-constant ERR_TOO_EARLY (err u1001))
-(define-constant ERR_EXPIRED (err u1002))
-(define-constant ERR_UNAUTHORIZED (err u1003))
+(define-constant ERR_INVALID_DELAY (err u1001))
+(define-constant ERR_TOO_EARLY (err u1002))
+(define-constant ERR_EXPIRED (err u1003))
+(define-constant ERR_UNAUTHORIZED (err u1004))
 
 ;; Roles from conxian-access
 (define-constant ROLE_ADMIN u1)
@@ -61,10 +62,12 @@
 
         (map-delete queued-proposals proposal-principal)
         
-        ;; Execute as the Timelock Contract
-        ;; This sets 'tx-sender' to .timelock in the proposal execution context
-        (as-contract (contract-call? proposal execute tx-sender))
-        (ok 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20)
+        (begin
+            (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+            
+            (as-contract (contract-call? proposal-principal execute tx-sender))
+        )
+        (ok true)
     )
 )
 
