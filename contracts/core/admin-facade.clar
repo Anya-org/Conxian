@@ -90,43 +90,51 @@
 )
 
 ;; Batch Role Management (100x more efficient)
-(define-public (batch-update-roles 
+(define-public (batch-update-roles
     (updates (list 100 { user: principal, role: uint, active: bool }))
   )
   (begin
     (asserts! (is-global-admin) ERR_UNAUTHORIZED)
     (asserts! (<= (len updates) (var-get max-batch-size)) ERR_BATCH_LIMIT_EXCEEDED)
-    
-    ;; Process each role update
-    (fold 
-      (lambda (result update)
+
+    ;; Correctly process each role update using fold
+    (fold
+      (lambda (update result)
         (match result
-          success (if (get active update)
+          (ok ok-val) (if (get active update)
             (contract-call? .rbac grant-role (get user update) (get role update))
             (contract-call? .rbac revoke-role (get user update) (get role update))
           )
-          error error
+          (err err-val) (err err-val)
         )
       )
-      (ok true)
       updates
+      (ok true)
     )
   )
 )
 
 ;; Batch Admin Operations (1000x more efficient)
-(define-public (batch-admin-operations 
-    (operations (list 200 admin-operation))
+(define-public (batch-admin-operations
+    (operations (list 200 { type: uint, params: (list 10 principal) }))
   )
   (begin
     (asserts! (is-global-admin) ERR_UNAUTHORIZED)
     (asserts! (<= (len operations) (var-get max-batch-size)) ERR_BATCH_LIMIT_EXCEEDED)
-    
-    ;; Validate all operations first (fail fast)
-    (let ((validated (map validate-admin-operation operations)))
-      
-      ;; Execute in batch (single transaction)
-      (fold execute-admin-operation (ok true) validated)
+
+    ;; Efficiently validate and execute in a single fold
+    (fold
+      (lambda (op result)
+        (match result
+          (ok ok-val) (begin
+            (try! (validate-admin-operation op))
+            (execute-admin-operation op)
+          )
+          (err err-val) (err err-val)
+        )
+      )
+      operations
+      (ok true)
     )
   )
 )

@@ -1,14 +1,13 @@
-import { describe, it, expect, beforeAll } from 'vitest';
-import { initSimnet } from '@stacks/clarinet-sdk';
-import { resolve } from 'path';
-
-let simnet: any;
-
-beforeAll(async () => {
-  simnet = await initSimnet(resolve(__dirname, "../Clarinet.toml"));
-});
+import { describe, it, expect, beforeEach } from 'vitest';
+import { Simnet, initSimnet } from '@stacks/clarinet-sdk';
 
 describe('Single Contract Compilation Test', () => {
+  let simnet: Simnet;
+
+  beforeEach(async () => {
+    simnet = await initSimnet();
+  });
+
   it('should successfully deploy the ownable contract', () => {
     const contractSource = simnet.getContractSource('ownable');
     expect(contractSource).toBeDefined();
