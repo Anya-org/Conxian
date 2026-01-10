@@ -72,9 +72,9 @@ Conxian is designed to deliver quantifiable value to both retail and institution
 Transparency is a core principle of the Conxian project. It is crucial for all stakeholders to understand the current
 maturity of our services, which are built on the core architecture described above.
 
-- **Retail DeFi Services (Core, DEX, Lending)**: **Technical Alpha**. The core retail modules are implemented with a
-  sound, facade-based architecture. The contracts are deployed on testnet and are undergoing continuous development and
-  testing. They are not yet audited or ready for mainnet deployment, and require updates for full Nakamoto compliance.
+- **Retail DeFi Services**:
+  - **Core & DEX**: **Technical Alpha**. The core retail modules are implemented with a sound, facade-based architecture. The contracts are deployed on testnet and are undergoing continuous development and testing.
+  - **Lending**: **Placeholder**. The lending module is not implemented. The contracts are stubs and do not contain functional logic. This component is part of the long-term vision but is not in active development.
 
 - **Enterprise Platform**: **Prototype**. The foundational elements for enterprise-grade services exist in prototype
   form (`enterprise-api.clar`). This includes proof-of-concept implementations for tiered accounts, compliance checks,

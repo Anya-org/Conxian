@@ -17,29 +17,34 @@ This interaction is governed by a set of standardized interfaces defined in `/co
 ```mermaid
 graph TD
     A[User] --> B{dimensional-engine.clar};
+    B -- Guards --> G[regulatory-adapter.clar];
     B -- open-position --> C[position-manager.clar];
     B -- close-position --> C;
     B -- deposit-funds --> D[collateral-manager.clar];
     B -- withdraw-funds --> D;
     B -- check-position-health --> F[risk-manager.clar];
     B -- liquidate-position --> F;
+    B -- get-funding-rate --> H[funding-rate-calculator.clar];
+    B -- admin functions --> I[conxian-protocol.clar];
 ```
 
 ## Core Contracts
 
 ### Facade
 
--   **`dimensional-engine.clar`**: The central **facade** for the Core Module. It acts as the single, secure entry point for all position management, collateral, and risk-related calls. It implements no core logic itself; instead, it delegates every call to the specialized manager contracts. It also integrates with `block-utils.clar` to perform checks on block properties.
+-   **`dimensional-engine.clar`**: The central **facade** for the Core Module. It acts as the single, secure entry point for all position management, collateral, and risk-related calls. It implements no core logic itself; instead, it delegates every call to the specialized manager contracts. It also integrates with `block-utils.clar` to perform checks on block properties and `regulatory-adapter.clar` for compliance checks.
 
 ### Manager Contracts (Single-Responsibility)
 
 -   **`position-manager.clar`**: Manages the entire lifecycle of user trading positions, including opening, closing, and modifying them.
 -   **`collateral-manager.clar`**: Handles all operations related to user collateral, including deposits, withdrawals, and balance tracking.
 -   **`risk-manager.clar`**: Assesses the health of all open positions and manages the liquidation process for those that are under-collateralized.
+-   **`funding-rate-calculator.clar`**: Calculates the funding rate for perpetual swaps.
+-   **`regulatory-adapter.clar`**: Provides a hook for off-chain compliance checks, ensuring that users meet the required regulatory standards.
 
 ### Protocol-Wide Contracts
 
--   **`conxian-protocol.clar`**: The main protocol coordinator, responsible for managing system-wide configurations, authorized contract addresses, and emergency controls.
+-   **`conxian-protocol.clar`**: The main protocol coordinator, responsible for managing system-wide configurations, authorized contract addresses, and emergency controls. The `dimensional-engine.clar` is owned by this contract.
 
 ## Public Functions (`dimensional-engine.clar`)
 

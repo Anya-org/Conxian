@@ -49,14 +49,12 @@ The Conxian Protocol is organized into a series of distinct modules, each respon
   - `proposal-registry.clar`: A specialized contract for storing and managing all governance proposals.
   - `voting.clar`: Manages the voting process for all proposals.
 
-### 2.4 Lending Module
+### 2.4 Lending Module (Placeholder)
 
 - **Location**: `contracts/lending/`
-- **Responsibility**: The core infrastructure for decentralized lending and borrowing.
+- **Responsibility**: This module is a placeholder for future development of decentralized lending and borrowing.
 - **Key Contracts**:
-  - `comprehensive-lending-system.clar`: The main contract for the lending module, managing user deposits, loans, and collateral.
-  - `interest-rate-model.clar`: A specialized contract that calculates interest rates based on market conditions.
-  - `liquidation-manager.clar`: A contract responsible for managing the liquidation process for under-collateralized loans.
+  - The contracts in this directory are **unimplemented stubs** and do not contain functional logic.
 
 ---
 

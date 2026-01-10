@@ -16,7 +16,7 @@ This catalog summarizes the main services provided by the Conxian ecosystem (on-
 - **Primary users**: Institutional integrators, advanced DeFi users, Conxian UI, third-party frontends.
 - **Scope**:
   - DEX module (factory, router, pools, MEV protection, circuit breaker).
-  - Lending module (`comprehensive-lending-system`, interest-rate model, liquidation engine).
+  - Lending module (**Placeholder**): The contracts for this module are unimplemented stubs.
   - Dimensional engine (position-manager, funding-rate-calculator, dim-metrics).
   - Token system (CXD, CXVG, CXTR, CXS, CXLP, emission controller, token-system-coordinator).
   - Governance (governance-token, proposal engine/registry, councils, role NFTs, operations engine – planned).

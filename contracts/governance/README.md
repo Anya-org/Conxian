@@ -39,7 +39,8 @@ Unlike a pure facade, the `proposal-engine.clar` contains significant business l
 
 ### Supporting Contracts
 
--   **`enhanced-governance-nft.clar`**: Implements the NFT-based council and role system, allowing for sophisticated, on-chain representation of governance powers and responsibilities.
+-   **`enhanced-governance-nft.clar`**: Implements the NFT-based council and role system. It is the source of a voter's "raw" voting power, based on which council seats they hold.
+-   **`reputation-engine.clar`**: A supporting contract that adjusts a voter's raw power based on their activity and historical participation. The `proposal-engine.clar` queries this contract to get a "weighted" voting power, which is used to calculate the final vote.
 
 ## Status
 

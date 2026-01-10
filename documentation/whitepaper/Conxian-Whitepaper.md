@@ -114,11 +114,13 @@ distinct responsibilities and voting power:
   Oversees liquidity provision, market operations, and AMM functionality
   across all trading pairs.
 
-### 5.2 Autonomous Agent System
+### 5.2 Autonomous Agent System (Target Design)
+
+The following autonomous agents are a core part of the Conxian Protocol's long-term vision. They are not yet implemented and represent the target design for a fully autonomous governance system.
 
 #### Chief Risk Officer (Agent Risk)
 
-The autonomous risk management agent that operates 24/7:
+The planned autonomous risk management agent will be designed to operate 24/7:
 
 - **sBTC Peg Monitoring**: Real-time price deviation detection and circuit breaker triggers
 - **Market Volatility Tracking**: Automated threshold monitoring and emergency protocols

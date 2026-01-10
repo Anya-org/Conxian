@@ -17,11 +17,13 @@ Conxian is not a financial service provider; it is an autonomous digital organis
 📖 II. Whitepaper Summary (v2.0)
 
 Conxian provides a Platform-as-a-Service (PaaS) model for decentralized, multi-dimensional finance.
-⚡ Core Services
- * Money Markets: Algorithmic lending with real-time risk adjustment.
+⚡ Core Services (Current Implementation)
  * Sovereign Bonds: Automated fixed-yield debt instruments.
- * Flash Loans: Atomic, uncollateralized liquidity for arbitrage and rebalancing.
  * Wormhole NTT: Native Token Transfers for cross-chain sovereignty without "wrapping."
+
+**Planned Features (Not Yet Implemented):**
+ * Money Markets: Algorithmic lending with real-time risk adjustment.
+ * Flash Loans: Atomic, uncollateralized liquidity for arbitrage and rebalancing.
 🗳️ Granulated Automated DAO Seats
 Governance is segmented into five specialized automated seats that respond to on-chain metrics:
  * CXD (Debt): Automates stability and collateral ratios.
