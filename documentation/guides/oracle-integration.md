@@ -1,8 +1,12 @@
 # Oracle Integration Guide
 
+> **Note on Implementation Status**
+>
+> The Conxian Lending Module is currently a **placeholder** and has not been implemented. This document describes the **target design** for a future integration between the oracle and the lending protocol. The integration described herein does not yet exist in the codebase.
+
 ## Overview
 
-This document outlines the oracle system architecture and integration with the Conxian lending protocol. The oracle system provides a simple and secure way to manage price feeds for assets in the Conxian protocol.
+This document outlines the **planned** oracle system architecture and its **proposed** integration with the Conxian lending protocol. The oracle system provides a simple and secure way to manage price feeds for assets in the Conxian protocol.
 
 ## Oracle Contract
 
