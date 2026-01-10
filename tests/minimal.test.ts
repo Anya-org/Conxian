@@ -5,7 +5,7 @@ import { resolve } from 'path';
 let simnet: any;
 
 beforeAll(async () => {
-  simnet = await initSimnet(resolve(__dirname, '../Clarinet.minimal.toml'));
+  simnet = await initSimnet(resolve(__dirname, "../Clarinet.toml"));
 });
 
 describe('Single Contract Compilation Test', () => {

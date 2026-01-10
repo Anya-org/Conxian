@@ -13,7 +13,7 @@ describe('Nakamoto Architecture Verification', () => {
   });
 
   beforeEach(async () => {
-    await simnet.initSession(process.cwd(), "Clarinet.toml");
+    
     accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
     wallet1 =

@@ -116,7 +116,6 @@ describe('Conxian Viral Features', () => {
     simnet.callPublicFn('sbtc-vault', 'set-custody-contract', [Cl.principal(vault.contractAddress)], deployer);
     simnet.callPublicFn('sbtc-vault', 'set-sbtc-token-contract', [Cl.principal(sbtcTokenContract)], deployer);
 
-
     let response = simnet.callPublicFn('sbtc-vault', 'deposit', [Cl.contractPrincipal(sbtcTokenContract), Cl.uint(500000001)], wallet1);
     expect(response.result).toBeErr(Cl.uint(5002));
   });

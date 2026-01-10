@@ -11,8 +11,7 @@ describe("Conxian Operations Engine", () => {
     simnet = await initSimnet("Clarinet.toml");
   });
 
-  beforeEach(async () => {
-    await simnet.initSession(process.cwd(), "Clarinet.toml");
+  beforeEach(() => {
     const accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
     wallet1 = accounts.get("wallet_1")!;
@@ -34,7 +33,7 @@ describe("Conxian Operations Engine", () => {
       [opsEngine, Cl.uint(5), Cl.uint(100), Cl.stringAscii("autonomous-agent")],
       deployer
     );
-    expect(mint.result).toBeOk(Cl.uint(1));
+    expect(mint.result).toEqual(Cl.ok(Cl.uint(1)));
   };
 
   it("allows the operator controller to execute operational adjustments", () => {
@@ -46,7 +45,7 @@ describe("Conxian Operations Engine", () => {
       [params],
       deployer // Default controller is deployer
     );
-    expect(exec.result).toBeOk(Cl.bool(true));
+    expect(exec.result).toEqual(Cl.ok(Cl.bool(true)));
   });
 
   it("prevents unauthorized users from executing adjustments", () => {

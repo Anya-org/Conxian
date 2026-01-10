@@ -14,7 +14,7 @@ describe('P0 Policy Enforcement Bypass Mitigation Tests', () => {
   let kycRegistryContract: any;
 
   beforeEach(async () => {
-    const manifestPath = resolve(__dirname, '../../stacks/Clarinet.test.toml');
+    const manifestPath = resolve(__dirname, '../../Clarinet.toml');
     simnet = await initSimnet(manifestPath);
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;

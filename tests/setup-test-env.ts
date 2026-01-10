@@ -1,6 +1,6 @@
 import { initSimnet, Simnet } from '@stacks/clarinet-sdk';
 
-const manifestPath = process.env.CLARINET_MANIFEST_PATH!;
+const manifestPath = process.env.CLARINET_MANIFEST_PATH || "./Clarinet.toml";
 
 const simnet = await initSimnet(manifestPath);
 

@@ -13,7 +13,7 @@ describe("Grand Unified System Journey", () => {
   });
 
   beforeEach(async () => {
-    await simnet.initSession(process.cwd(), "Clarinet.toml");
+    
     const accounts = simnet.getAccounts();
     console.log("Available accounts:", [...accounts.keys()]);
     deployer = (accounts.get("deployer") ??

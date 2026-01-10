@@ -12,7 +12,7 @@ describe('Conxian Protocol Core Tests', () => {
   let wallet2: any;
 
   beforeEach(async () => {
-    const manifestPath = resolve(__dirname, '../../stacks/Clarinet.test.toml');
+    const manifestPath = resolve(__dirname, '../../Clarinet.toml');
     simnet = await initSimnet(manifestPath);
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;

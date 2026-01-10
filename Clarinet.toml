@@ -1186,22 +1186,3 @@ depends_on = [ "core-traits"]
 path = "contracts/core/batch-operations.clar"
 depends_on = [ "core-traits"]
 
-[contracts.regulatory-adapter]
-path = "contracts/compliance/regulatory-adapter.clar"
-address = "ST3R4NQXM850DV58XZG1JJARWA861"
-depends_on = [ "core-traits"]
-
-[contracts.conxian-protocol]
-path = "contracts/core/conxian-protocol.clar"
-address = "ST3YEM57QE76FD1R4"
-depends_on = [ "core-traits", "admin-facade"]
-
-[contracts.proposal-executor]
-path = "contracts/governance/proposal-executor.clar"
-address = "ST2W3MYGRZM492CBK"
-depends_on = [ "governance-traits", "proposal-registry"]
-
-[contracts.token-system-coordinator]
-path = "contracts/tokens/token-system-coordinator.clar"
-address = "ST1GR7RMTRP4442JC"
-depends_on = [ "tokens", "core-traits"]

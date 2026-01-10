@@ -12,7 +12,7 @@ describe('Proposal Engine - Core Functionality', () => {
   });
 
   beforeEach(async () => {
-    await simnet.initSession(process.cwd(), "Clarinet.toml");
+    
     const accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
     wallet1 = accounts.get("wallet_1")!;
