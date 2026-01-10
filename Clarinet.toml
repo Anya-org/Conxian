@@ -1180,9 +1180,13 @@ depends_on = [ "cxd-token", "token-system-coordinator", "regulatory-adapter", "o
 
 [contracts.admin-facade]
 path = "contracts/core/admin-facade.clar"
-depends_on = [ "core-traits"]
+depends_on = [ "core-traits" ]
 
 [contracts.batch-operations]
 path = "contracts/core/batch-operations.clar"
-depends_on = [ "core-traits"]
+depends_on = [ "core-traits" ]
 
+[contracts.swap-router]
+path = "contracts/dex/swap-router.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = [ "concentrated-liquidity-pool", "pool-registry" ]
