@@ -117,6 +117,7 @@
         ))
         (deviation-bps (/ (* deviation u10000) btc-price))
       )
+      )
       (if (> deviation-bps (var-get peg-threshold))
         (begin
           ;; Trigger Emergency Pause on sBTC Vault and Protocol

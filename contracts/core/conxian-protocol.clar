@@ -40,10 +40,11 @@
 ;; @returns (response bool uint)
 (define-public (set-paused (new-paused bool))
   (begin
+    ;; Use centralized admin facade for ultra-low gas authorization
     (asserts!
       (or
-        (is-owner)
-        (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_EMERGENCY))
+        (contract-call? .admin-facade is-global-admin)
+(contract-call? .admin-facade has-role tx-sender ROLE_EMERGENCY_PAUSE)
       )
       ERR_UNAUTHORIZED
     )
@@ -66,7 +67,10 @@
     (contract principal)
   )
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts!
+      (contract-call? .admin-facade has-role tx-sender ROLE_PROTOCOL_ADMIN)
+      ERR_UNAUTHORIZED
+    )
     (map-set modules { name: name } {
       contract: contract,
       active: true,
@@ -76,13 +80,19 @@
 )
 
 ;; @desc update module status
+;; @param name (string-ascii 32)
+;; @param active bool
+;; @returns (response bool uint)
 (define-public (set-module-active
     (name (string-ascii 32))
     (active bool)
   )
   (let ((module (unwrap! (map-get? modules { name: name }) ERR_MODULE_NOT_FOUND)))
     (begin
-      (asserts! (is-owner) ERR_UNAUTHORIZED)
+      (asserts!
+        (contract-call? .admin-facade has-role tx-sender ROLE_PROTOCOL_ADMIN)
+        ERR_UNAUTHORIZED
+      )
       (map-set modules { name: name } (merge module { active: active }))
       (ok true)
     )
@@ -92,7 +102,7 @@
 ;; Admin Handover
 (define-public (set-contract-owner (new-owner principal))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (contract-call? .admin-facade is-global-admin) ERR_UNAUTHORIZED)
     (var-set contract-owner new-owner)
     (ok true)
   )
