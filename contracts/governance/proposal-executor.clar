@@ -16,12 +16,45 @@
 (define-constant ERR_INVALID_PROPOSAL_CONTRACT (err u3008))
 
 (define-data-var ops-engine principal tx-sender)
+(define-data-var proposal-registry-contract principal .proposal-registry)
+(define-data-var governance-nft-contract principal .enhanced-governance-nft)
+(define-data-var cxvg-token-contract principal .cxvg-token)
+
+(define-private (is-ops-engine)
+  (is-eq tx-sender (var-get ops-engine))
+)
+
+(define-private (get-total-supply-for-proposal (council-id uint))
+  (if (> council-id u0)
+    ;; Council-scoped proposal: currently use global CXVG supply
+    (unwrap-panic
+      (contract-call? (var-get cxvg-token-contract) get-total-supply)
+    )
+    ;; Global proposal: also use global CXVG supply
+    (unwrap-panic
+      (contract-call? (var-get cxvg-token-contract) get-total-supply)
+    )
+  )
+)
+
+(define-private (get-safe-supply (raw-supply uint))
+  (if (is-eq raw-supply u0) u1 raw-supply)
+)
+
+(define-private (calculate-quorum
+    (total-votes uint)
+    (safe-supply uint)
+  )
+  (/ (* total-votes u10000) safe-supply)
+)
+
+(define-private (is-authorized-executor (proposer principal))
+  (or (is-eq tx-sender proposer) (is-ops-engine))
+)
 
 (define-public (set-ops-engine (new-engine principal))
   (begin
-    ;; Simple admin check (in production, use RBAC)
-    ;; For now, we assume initial deployer sets this up
-    (asserts! (is-eq tx-sender (var-get ops-engine)) ERR_UNAUTHORIZED)
+    (asserts! (is-ops-engine) ERR_UNAUTHORIZED)
     (var-set ops-engine new-engine)
     (ok true)
   )
@@ -32,65 +65,57 @@
     (proposal-contract <proposal-trait>)
     (quorum-percentage uint)
   )
-  (let ((proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id)
-      ERR_PROPOSAL_NOT_FOUND
-    )))
-    (let (
-        (total-votes (+ (get for-votes proposal) (get against-votes proposal)))
-        (council-id (get council-id proposal))
-        ;; Determine Total Supply based on Context (Council vs Global)
-        (total-supply (if (> council-id u0)
-          (unwrap-panic (contract-call? .enhanced-governance-nft get-total-council-power
-            council-id
-          ))
-          (unwrap-panic (contract-call? .cxvg-token get-total-supply))
-        ))
-        ;; Avoid division by zero
-        (safe-supply (if (is-eq total-supply u0)
-          u1
-          total-supply
-        ))
-        (quorum (/ (* total-votes u10000) safe-supply))
+  (let (
+      (proposal
+        (unwrap! (contract-call? (var-get proposal-registry-contract) get-proposal proposal-id)
+          ERR_PROPOSAL_NOT_FOUND
+        )
       )
-      (begin
-        ;; Authorization: Proposer OR Ops Engine
-        (asserts!
-          (or (is-eq tx-sender (get proposer proposal)) (is-eq tx-sender (var-get ops-engine)))
-          ERR_UNAUTHORIZED
-        )
-        (asserts! (>= block-height (get end-block proposal))
-          ERR_PROPOSAL_NOT_ACTIVE
-        )
-        (asserts! (not (get executed proposal)) ERR_VOTING_CLOSED)
-        (asserts! (not (get canceled proposal)) ERR_VOTING_CLOSED)
-        (asserts! (> (get for-votes proposal) (get against-votes proposal))
-          ERR_PROPOSAL_FAILED
-        )
+      (total-votes (+ (get for-votes proposal) (get against-votes proposal)))
+      (council-id (get council-id proposal))
+      (total-supply (get-total-supply-for-proposal council-id))
+      (safe-supply (get-safe-supply total-supply))
+      (quorum (calculate-quorum total-votes safe-supply))
+    )
+    (begin
+      ;; Authorization: Proposer OR Ops Engine
+      (asserts! (is-authorized-executor (get proposer proposal)) ERR_UNAUTHORIZED)
 
-        ;; Verify Quorum (If supply is 0, we can't pass)
-        (asserts! (> total-supply u0) ERR_QUORUM_NOT_REACHED)
-        (asserts! (>= quorum quorum-percentage) ERR_QUORUM_NOT_REACHED)
+      ;; Time/state checks
+      (asserts! (>= block-height (get end-block proposal)) ERR_PROPOSAL_NOT_ACTIVE)
+      (asserts! (not (get executed proposal)) ERR_VOTING_CLOSED)
+      (asserts! (not (get canceled proposal)) ERR_VOTING_CLOSED)
 
-        ;; Verify that the passed contract matches the one in the proposal
-        (asserts!
-          (is-eq (contract-of proposal-contract) (get proposal-contract proposal))
-          ERR_INVALID_PROPOSAL_CONTRACT
-        )
-
-        ;; Execute the proposal logic
-        (try! (contract-call? proposal-contract execute tx-sender))
-
-        (try! (contract-call? .proposal-registry set-executed proposal-id))
-        (print {
-          event: "proposal-executed",
-          proposal-id: proposal-id,
-          votes-for: (get for-votes proposal),
-          votes-against: (get against-votes proposal),
-          contract: (contract-of proposal-contract),
-          council-id: council-id,
-        })
-        (ok true)
+      ;; Outcome check
+      (asserts! (> (get for-votes proposal) (get against-votes proposal))
+        ERR_PROPOSAL_FAILED
       )
+
+      ;; Quorum checks
+      (asserts! (> total-supply u0) ERR_QUORUM_NOT_REACHED)
+      (asserts! (>= quorum quorum-percentage) ERR_QUORUM_NOT_REACHED)
+
+      ;; Verify that the passed contract matches the one in the proposal
+      (asserts!
+        (is-eq (contract-of proposal-contract) (get proposal-contract proposal))
+        ERR_INVALID_PROPOSAL_CONTRACT
+      )
+
+      ;; Execute the proposal logic
+      (try! (contract-call? proposal-contract execute tx-sender))
+
+      ;; Mark as executed in registry
+      (try! (contract-call? (var-get proposal-registry-contract) set-executed proposal-id))
+
+      (print {
+        event: "proposal-executed",
+        proposal-id: proposal-id,
+        votes-for: (get for-votes proposal),
+        votes-against: (get against-votes proposal),
+        contract: (contract-of proposal-contract),
+        council-id: council-id,
+      })
+      (ok true)
     )
   )
 )

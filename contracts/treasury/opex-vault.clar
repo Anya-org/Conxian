@@ -3,6 +3,7 @@
 ;; Managed by multi-sig or governance for ongoing costs
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u1000))
 
@@ -10,7 +11,11 @@
 (define-data-var last-spend-block uint u0)
 (define-data-var daily-spend uint u0)
 
-(use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
+(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
+(define-data-var conxian-access-contract principal .conxian-access)
+(define-data-var nakamoto-constants-contract principal .nakamoto-constants)
+
+(define-constant ROLE_OPERATOR u4)
 
 
 (define-public (withdraw-opex
@@ -22,18 +27,19 @@
       ;; ROLE_OPERATOR ERR_UN
     (asserts!
       (is-eq (ok true)
-        (contract-call? .compliance.regulatory-adapter check-clean-hands-compliance
-          tx-sender
-        ))
+        (contract-call? (var-get regulatory-adapter-contract) check-clean-hands-compliance tx-sender)
+      )
       ERR_UNAUTHORIZED
     )
     (asserts!
-      (contract-call? .conxian-access has-role tx-sender u4)
+      (contract-call? (var-get conxian-access-contract) has-role tx-sender
+        ROLE_OPERATOR
+      )
       ;; ROLE_OPERATOR ERR_UNAUTHORIZED
     )
     ;; Check limits
     (if (> (- block-height (var-get last-spend-block))
-        (contract-call? .nakamoto-constants get-blocks-per-day)
+        (contract-call? (var-get nakamoto-constants-contract) get-blocks-per-day)
       )
       (begin
         (var-set daily-spend amount)

@@ -25,6 +25,7 @@
 ;; Authorization
 ;; Only Ops Engine or Admin can add targets
 (define-data-var admin principal .conxian-operations-engine)
+(define-data-var token-system-coordinator-contract principal .token-system-coordinator)
 
 (define-private (is-admin)
     (is-eq tx-sender (var-get admin))
@@ -100,7 +101,9 @@
         ;; In production, validate `amount <= emission_rate * delta_blocks * weight / total_weight`
         
         ;; Mint via Coordinator (Minting CXVG Governance Token)
-        (try! (contract-call? .token-system-coordinator mint-cxvg amount recipient))
+        (try! (contract-call? (var-get token-system-coordinator-contract) mint-cxvg
+            amount recipient
+        ))
         
         (print { event: "emission-minted", target: tx-sender, recipient: recipient, amount: amount })
         (ok true)

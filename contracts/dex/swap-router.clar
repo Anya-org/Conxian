@@ -10,6 +10,10 @@
 ;; @desc Executes a swap for an exact input amount against a single concentrated liquidity pool.
 ;; @param pool-id: The ID of the concentrated liquidity pool to use for the swap.
 ;; @param token-in: The SIP-010 contract of the token being provided.
+
+;; @desc Executes a swap for an exact input amount against a single concentrated liquidity pool.
+;; @param pool-id: The ID of the concentrated liquidity pool to use for the swap.
+;; @param token-in: The SIP-010 contract of the token being provided.
 ;; @param token-out: The SIP-010 contract of the token being received.
 ;; @param amount-in: The amount of the input token to swap.
 ;; @param min-amount-out: The minimum amount of the output token that must be received, otherwise the transaction is reverted.
@@ -26,17 +30,17 @@
         ;; This single call fetches both the pause status and tenure ID,
         ;; reducing cross-contract calls from two to one. This saves ~15%
         ;; on read operations for this function.
-        (let ((protocol-status (try! (contract-call? .conxian-protocol get-protocol-status))))
+        (let ((protocol-status (try! (contract-call? (var-get conxian-protocol-contract) get-protocol-status))))
             (asserts! (not (get paused protocol-status)) (err u1001))
 
             ;; 2. Pull tokens from user
-            (try! (contract-call? token-in transfer amount-in tx-sender .concentrated-liquidity-pool none))
+            (try! (contract-call? token-in transfer amount-in tx-sender (var-get concentrated-liquidity-pool-contract) none))
             
             ;; 3. Execute swap on pool
             ;; Note: simplified zero-for-one check based on principal matching
             (let (
                 (zero-for-one true) ;; Dynamic logic would go here
-                (amount-out (try! (contract-call? .concentrated-liquidity-pool swap pool-id zero-for-one amount-in)))
+                (amount-out (try! (contract-call? (var-get concentrated-liquidity-pool-contract) swap pool-id zero-for-one amount-in)))
             )
                 ;; 4. Slippage check
                 (asserts! (>= amount-out min-amount-out) ERR_SLIPPAGE)

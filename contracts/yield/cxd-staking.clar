@@ -16,6 +16,7 @@
 ;; State
 (define-data-var staking-token principal .cxd-token)
 (define-data-var rewards-token principal .cxd-token) ;; Rewards in CXD (can be changed to other token)
+(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
 (define-data-var total-staked uint u0)
 (define-data-var reward-rate uint u0) ;; Rewards per block
 (define-data-var last-update-block uint block-height)
@@ -38,7 +39,7 @@
 
 ;; --- Compliance ---
 (define-private (check-compliance (user principal))
-  (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
+  (let ((compliance-status (contract-call? (var-get regulatory-adapter-contract) check-clean-hands-compliance user)))
     (if (is-ok compliance-status)
       true
       false

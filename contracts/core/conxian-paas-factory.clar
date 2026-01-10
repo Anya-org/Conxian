@@ -14,6 +14,9 @@
 ;; Data Vars
 (define-data-var deployment-fee uint u1000000000) ;; 1000 STX (example)
 (define-data-var fee-collector principal .operational-treasury)
+(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
+(define-data-var conxian-operations-engine-contract principal .conxian-operations-engine)
+(define-data-var agent-risk-contract principal .agent-risk)
 
 ;; Registry of deployed businesses
 (define-map deployed-sabs
@@ -50,7 +53,7 @@
 
     ;; 2. Compliance Check (Deployer must be Clean-Hands)
     (asserts!
-      (is-eq (ok true) (contract-call? .compliance.regulatory-adapter check-clean-hands-compliance deployer))
+      (is-ok (contract-call? (var-get regulatory-adapter-contract) check-clean-hands-compliance deployer))
       ERR_UNAUTHORIZED
     )
 
@@ -89,7 +92,7 @@
   (let ((sab (unwrap! (map-get? deployed-sabs name) ERR_DEPLOYMENT_FAILED)))
     ;; Only Ops Engine or Risk Agent can suspend
     (asserts!
-      (or (is-eq tx-sender .conxian-operations-engine) (is-eq tx-sender .agent-risk))
+      (or (is-eq tx-sender (var-get conxian-operations-engine-contract)) (is-eq tx-sender (var-get agent-risk-contract)))
       ERR_UNAUTHORIZED
     )
 

@@ -10,7 +10,12 @@
 
 ;; Vesting Schedule (using block height)
 (define-constant VESTING_START block-height)
-(define-constant VESTING_DURATION (contract-call? .nakamoto-constants get-blocks-per-year)) ;; 1 Year Linear
+(define-data-var conxian-protocol-contract principal .conxian-protocol)
+(define-data-var nakamoto-constants-contract principal .nakamoto-constants)
+
+(define-read-only (get-vesting-duration)
+  (contract-call? (var-get nakamoto-constants-contract) get-blocks-per-year)
+)
 
 (define-map allocations
   {
@@ -29,7 +34,7 @@
     (amount uint)
   )
   (begin
-    (asserts! (is-eq tx-sender (unwrap-panic (contract-call? .core.conxian-protocol get-admin)))
+    (asserts! (is-eq tx-sender (unwrap-panic (contract-call? (var-get conxian-protocol-contract) get-admin)))
       ERR_UNAUTHORIZED
     )
     (try! (contract-call? token transfer amount tx-sender (as-contract tx-sender) none))
@@ -71,8 +76,9 @@
 )
 
 (define-read-only (calculate-vested (total uint))
-  (if (>= block-height (+ VESTING_START VESTING_DURATION))
-    total
-    (/ (* total (- block-height VESTING_START)) VESTING_DURATION)
-  )
+  (let ((vesting-duration (unwrap-panic (get-vesting-duration))))
+    (if (>= block-height (+ VESTING_START vesting-duration))
+      total
+      (/ (* total (- block-height VESTING_START)) vesting-duration)
+    ))
 )

@@ -20,6 +20,7 @@
 (define-data-var proposal-count uint u0)
 (define-data-var voting-delay uint u144) ;; ~1 day
 (define-data-var voting-period uint u51840) ;; ~3 days
+(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
 
 (define-map proposals
   uint
@@ -45,7 +46,9 @@
 
 ;; Authorization
 (define-private (check-compliance (user principal))
-  (let ((compliance-status (contract-call? .compliance.regulatory-adapter check-clean-hands-compliance user)))
+  (let (
+      (compliance-status (contract-call? (var-get regulatory-adapter-contract) check-clean-hands-compliance user))
+    )
     (if (is-ok compliance-status)
       true
       false

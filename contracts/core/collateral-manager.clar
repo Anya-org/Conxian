@@ -11,6 +11,11 @@
 (define-constant ERR_INSUFFICIENT_BALANCE (err u2000))
 (define-constant ROLE_PROTOCOL u2)
 
+;; Contracts
+(define-data-var conxian-protocol-contract principal .conxian-protocol)
+(define-data-var rbac-contract principal .rbac)
+(define-data-var block-utils-contract principal .block-utils)
+
 ;; Map: User -> Token -> Amount
 (define-map user-collateral
   {
@@ -33,9 +38,12 @@
           token: token-principal,
         })
       ))
-      (tenure-id (contract-call? .block-utils get-current-tenure-id))
+      (tenure-id (contract-call? (var-get block-utils-contract) get-current-tenure-id))
     )
-    (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1001))
+    (asserts!
+      (not (contract-call? (var-get conxian-protocol-contract) is-paused))
+      (err u1001)
+    )
 
     ;; Transfer tokens to this contract
     (try! (contract-call? token-trait transfer amount tx-sender (as-contract tx-sender)
@@ -110,9 +118,9 @@
     (asserts!
       (or
         (is-eq tx-sender
-          (unwrap-panic (contract-call? .conxian-protocol get-admin))
+          (unwrap-panic (contract-call? (var-get conxian-protocol-contract) get-admin))
         )
-(contract-call? .rbac has-role tx-sender ROLE_PROTOCOL)
+        (contract-call? (var-get rbac-contract) has-role tx-sender ROLE_PROTOCOL)
       )
       ERR_UNAUTHORIZED
     )

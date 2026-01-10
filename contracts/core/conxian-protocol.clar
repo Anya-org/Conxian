@@ -18,6 +18,7 @@
 (define-data-var paused bool false)
 (define-data-var contract-owner principal tx-sender) ;; Replaces protocol-admin
 (define-data-var access-control principal .conxian-access)
+(define-data-var admin-facade-contract principal .admin-facade)
 
 ;; Maps
 (define-map modules
@@ -43,8 +44,10 @@
     ;; Use centralized admin facade for ultra-low gas authorization
     (asserts!
       (or
-        (contract-call? .admin-facade is-global-admin)
-(contract-call? .admin-facade has-role tx-sender ROLE_EMERGENCY_PAUSE)
+        (contract-call? (var-get admin-facade-contract) is-global-admin)
+(contract-call? (var-get admin-facade-contract) has-role tx-sender
+          ROLE_EMERGENCY_PAUSE
+        )
       )
       ERR_UNAUTHORIZED
     )
@@ -68,7 +71,9 @@
   )
   (begin
     (asserts!
-      (contract-call? .admin-facade has-role tx-sender ROLE_PROTOCOL_ADMIN)
+      (contract-call? (var-get admin-facade-contract) has-role tx-sender
+        ROLE_PROTOCOL_ADMIN
+      )
       ERR_UNAUTHORIZED
     )
     (map-set modules { name: name } {
@@ -90,7 +95,9 @@
   (let ((module (unwrap! (map-get? modules { name: name }) ERR_MODULE_NOT_FOUND)))
     (begin
       (asserts!
-        (contract-call? .admin-facade has-role tx-sender ROLE_PROTOCOL_ADMIN)
+        (contract-call? (var-get admin-facade-contract) has-role tx-sender
+          ROLE_PROTOCOL_ADMIN
+        )
         ERR_UNAUTHORIZED
       )
       (map-set modules { name: name } (merge module { active: active }))
@@ -102,7 +109,9 @@
 ;; Admin Handover
 (define-public (set-contract-owner (new-owner principal))
   (begin
-    (asserts! (contract-call? .admin-facade is-global-admin) ERR_UNAUTHORIZED)
+    (asserts! (contract-call? (var-get admin-facade-contract) is-global-admin)
+      ERR_UNAUTHORIZED
+    )
     (var-set contract-owner new-owner)
     (ok true)
   )

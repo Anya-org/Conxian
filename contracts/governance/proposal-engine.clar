@@ -10,8 +10,14 @@
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_NOT_FOUND (err u1001))
 (define-constant ERR_PROPOSAL_ACTIVE (err u1002))
+(define-constant ERR_PROPOSAL_ALREADY_EXISTS (err u7004))
 (define-constant ERR_PROPOSAL_ENDED (err u1003))
 (define-constant ERR_INSUFFICIENT_POWER (err u1004))
+
+(define-data-var proposal-counter uint u0)
+(define-data-var proposal-executor-contract principal .proposal-executor)
+(define-data-var proposal-registry-contract principal .proposal-registry)
+(define-data-var reputation-engine-contract principal .reputation-engine)
 
 ;; Access Control
 (define-data-var access-control principal .conxian-access)
@@ -81,10 +87,12 @@
     (asserts! (> weighted-voter-power u0) ERR_UNAUTHORIZED)
 
     ;; Update activity score
-    (try! (contract-call? .reputation-engine update-activity-score tx-sender))
+    (try! (contract-call? (var-get reputation-engine-contract) update-activity-score
+      tx-sender
+    ))
 
     ;; Record Vote
-    (contract-call? .proposal-registry vote-proposal proposal-id support
+    (contract-call? (var-get proposal-registry-contract) vote-proposal proposal-id support
       weighted-voter-power
     )
   )
@@ -98,6 +106,8 @@
     (proposal-id uint)
     (proposal-contract <proposal-trait>)
   )
-  (contract-call? .proposal-executor execute proposal-id proposal-contract u5000)
+  (contract-call? (var-get proposal-executor-contract) execute proposal-id
+    proposal-contract u5000
+  )
   ;; 50% quorum hardcoded for now
 )

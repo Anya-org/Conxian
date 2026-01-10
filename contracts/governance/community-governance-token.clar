@@ -16,6 +16,7 @@
 (define-data-var token-symbol (string-ascii 10) "CGT")
 (define-data-var token-uri (optional (string-utf8 256)) none)
 (define-data-var contract-owner principal tx-sender)
+(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
 
 ;; Token
 (define-fungible-token cgt)
@@ -39,7 +40,12 @@
 
 ;; Compliance
 (define-private (check-compliance (user principal))
-  (let ((compliance-status (contract-call? .compliance.regulatory-adapter check-clean-hands-compliance user)))
+  (let (
+      (compliance-status (contract-call? (var-get regulatory-adapter-contract)
+        check-clean-hands-compliance
+        user
+      ))
+    )
     (if (is-ok compliance-status)
       true
       false

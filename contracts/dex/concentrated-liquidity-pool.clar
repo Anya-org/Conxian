@@ -12,6 +12,11 @@
 (define-constant ERR_INSUFFICIENT_LIQUIDITY (err u1002))
 (define-constant ERR_INVALID_TICK (err u2000))
 
+;; Contract Principals
+(define-data-var conxian-protocol-contract principal .conxian-protocol)
+(define-data-var block-utils-contract principal .block-utils)
+(define-data-var dex-factory-contract principal .dex-factory)
+
 ;; State
 (define-map pools
   uint ;; pool-id
@@ -53,11 +58,16 @@
   )
   (let (
       (pool-id (+ (var-get pool-nonce) u1))
-      (tenure-id (contract-call? .block-utils get-current-tenure-id))
+      (tenure-id (contract-call? (var-get block-utils-contract) get-current-tenure-id))
     )
-    (asserts! (not (contract-call? .conxian-protocol is-paused)) ERR_UNAUTHORIZED)
+    (asserts!
+      (not (contract-call? (var-get conxian-protocol-contract) is-paused))
+      ERR_UNAUTHORIZED
+    )
     ;; Restrict to Factory
-    (asserts! (is-eq contract-caller .dex-factory) ERR_UNAUTHORIZED)
+    (asserts! (is-eq contract-caller (var-get dex-factory-contract))
+      ERR_UNAUTHORIZED
+    )
 
     (map-set pools pool-id {
       token0: token0,
@@ -89,8 +99,8 @@
     (token0 <ft-trait>)
     (token1 <ft-trait>)
   )
-  (let ((tenure-id (contract-call? .block-utils get-current-tenure-id)))
-    (asserts! (not (contract-call? .conxian-protocol is-paused)) ERR_UNAUTHORIZED)
+  (let ((tenure-id (contract-call? (var-get block-utils-contract) get-current-tenure-id)))
+    (asserts! (not (contract-call? (var-get conxian-protocol-contract) is-paused)) ERR_UNAUTHORIZED)
     ;; Logic: Transfer tokens from recipient, update reserves
     (print {
       event: "mint",
@@ -110,7 +120,7 @@
     (token-out <ft-trait>)
   )
   (begin
-    (asserts! (not (contract-call? .conxian-protocol is-paused)) ERR_UNAUTHORIZED)
+    (asserts! (not (contract-call? (var-get conxian-protocol-contract) is-paused)) ERR_UNAUTHORIZED)
     (ok amount-in)
   )
 )

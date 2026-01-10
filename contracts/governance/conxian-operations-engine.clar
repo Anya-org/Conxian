@@ -29,6 +29,11 @@
 (define-data-var last-governance-action uint u0)
 (define-data-var failsafe-active bool false)
 (define-data-var operator-controller principal tx-sender)
+(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
+(define-data-var proposal-registry-contract principal .proposal-registry)
+(define-data-var proposal-executor-contract principal .proposal-executor)
+(define-data-var agent-risk-contract principal .agent-risk)
+(define-data-var conxian-protocol-contract principal .conxian-protocol)
 
 ;; Registered Services (for Zero-Drift Engineering)
 (define-map registered-services
@@ -50,7 +55,9 @@
 
 ;; Compliance Helper
 (define-private (check-compliance (user principal))
-  (let ((compliance-status (contract-call? .compliance.regulatory-adapter check-clean-hands-compliance user)))
+  (let (
+      (compliance-status (contract-call? (var-get regulatory-adapter-contract) check-clean-hands-compliance user))
+    )
     (if (is-ok compliance-status)
       true
       false
@@ -68,7 +75,7 @@
     (proposal-contract <proposal-trait>)
   )
   (let (
-      (proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id)
+      (proposal (unwrap! (contract-call? (var-get proposal-registry-contract) get-proposal proposal-id)
         ERR_NO_SIGNAL
       ))
       (council-id (get council-id proposal))
@@ -84,7 +91,7 @@
 
     ;; 3. Execute via Proposal Executor
     ;; The Executor will validate the vote counts and quorum
-    (try! (as-contract (contract-call? .proposal-executor execute proposal-id proposal-contract
+    (try! (as-contract (contract-call? (var-get proposal-executor-contract) execute proposal-id proposal-contract
       u5000
     )))
 
@@ -105,7 +112,7 @@
       (begin
         (var-set failsafe-active true)
         ;; Trigger Emergency Pause on Critical Systems via Risk Agent
-        (try! (as-contract (contract-call? .agent-risk set-contract-paused .conxian-protocol true)))
+        (try! (as-contract (contract-call? (var-get agent-risk-contract) set-contract-paused (var-get conxian-protocol-contract) true)))
         (emit-event "failsafe-triggered" none)
         (ok true)
       )

@@ -6,6 +6,11 @@
 (define-constant ERR_UNAUTHORIZED (err u7200))
 (define-constant ROLE_SENTINEL u5)
 
+;; Contract Principals
+(define-data-var conxian-protocol-contract principal .conxian-protocol)
+(define-data-var rbac-contract principal .rbac)
+(define-data-var block-utils-contract principal .block-utils)
+
 ;; State
 (define-data-var system-alert-level uint u0) ;; 0 = Normal, 1 = Caution, 2 = Emergency
 (define-data-var last-alert-message (string-ascii 64) "Status: Green")
@@ -16,9 +21,11 @@
         ;; Only the Sentinel role or DAO can call this
         (asserts! (or 
             (is-eq tx-sender
-                (unwrap-panic (contract-call? .conxian-protocol get-admin))
+                (unwrap-panic (contract-call? (var-get conxian-protocol-contract) get-admin))
             )
-            (contract-call? .rbac has-role tx-sender ROLE_SENTINEL)
+            (contract-call? (var-get rbac-contract) has-role tx-sender
+                ROLE_SENTINEL
+            )
         ) ERR_UNAUTHORIZED)
         
         (var-set system-alert-level level)
@@ -28,12 +35,12 @@
             event: "system-alert-pushed",
             level: level,
             message: message,
-            tenure-id: (contract-call? .block-utils get-current-tenure-id)
+            tenure-id: (contract-call? (var-get block-utils-contract) get-current-tenure-id)
         })
         
         ;; If emergency, trigger protocol-wide pause
         (if (>= level u2)
-            (contract-call? .conxian-protocol set-paused true)
+            (contract-call? (var-get conxian-protocol-contract) set-paused true)
             (ok true)
         )
     )

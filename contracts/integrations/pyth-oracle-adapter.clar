@@ -13,6 +13,8 @@
 
 ;; Data Vars
 (define-data-var pyth-contract principal .pyth-oracle-v2-mock)
+(define-data-var block-utils-contract principal .block-utils)
+(define-data-var conxian-protocol-contract principal .conxian-protocol)
 
 ;; @desc Updates the price feed with a VAA (Pull Model)
 (define-public (update-price-feed
@@ -28,9 +30,11 @@
 ;; @desc Fetches the price from Pyth (Normalized to 8 decimals)
 (define-public (get-price (asset principal))
   (let (
-      (tenure-id (contract-call? .block-utils get-current-tenure-id))
+      (tenure-id (contract-call? (var-get block-utils-contract) get-current-tenure-id))
       ;; Static call to the default mock to avoid trait complexity in get-price for now
-      (price-data (unwrap! (contract-call? .pyth-oracle-v2-mock get-price asset) (err u7002)))
+      (price-data (unwrap! (contract-call? (var-get pyth-contract) get-price asset)
+        (err u7002)
+      ))
     )
     (begin
       (print {
@@ -49,7 +53,7 @@
   (begin
     (asserts!
       (is-eq tx-sender
-        (unwrap-panic (contract-call? .conxian-protocol get-admin))
+        (unwrap-panic (contract-call? (var-get conxian-protocol-contract) get-admin))
       )
       ERR_UNAUTHORIZED
     )

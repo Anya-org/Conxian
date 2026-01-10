@@ -15,6 +15,7 @@
 (define-data-var token-symbol (string-ascii 10) "CXVG")
 (define-data-var token-uri (optional (string-utf8 256)) none)
 (define-data-var contract-owner principal tx-sender)
+(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
 
 ;; Token
 (define-fungible-token cxvg)
@@ -38,7 +39,7 @@
 
 ;; Compliance Check
 (define-private (check-compliance (user principal))
-  (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
+  (let ((compliance-status (contract-call? (var-get regulatory-adapter-contract) check-clean-hands-compliance user)))
     (if (is-ok compliance-status)
       true
       false

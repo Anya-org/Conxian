@@ -8,6 +8,13 @@
 (define-constant ERR_HANDOVER_INCOMPLETE (err u10001))
 (define-constant TARGET_OWNER .timelock)
 
+;; Contract Principals
+(define-data-var conxian-protocol-contract principal .conxian-protocol)
+(define-data-var agent-risk-contract principal .agent-risk)
+(define-data-var agent-treasury-contract principal .agent-treasury)
+(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
+(define-data-var conxian-access-contract principal .conxian-access)
+
 ;; Critical System Contracts to Audit
 ;; These must all be owned by .timelock for the system to be considered "Tier 0"
 (define-constant CONTRACTS_TO_VERIFY (list
@@ -27,7 +34,7 @@
       ;; For this aggregator, we might need explicit checks if they don't share a trait.
       ;; However, we added 'get-contract-owner' to the agents.
       ;; We will use a try! to catch failures if function doesn't exist (though it should).
-      (owner (unwrap-panic (contract-call? .conxian-access get-contract-owner))) ;; Placeholder logic for loop
+      (owner (unwrap-panic (contract-call? (var-get conxian-access-contract) get-contract-owner)))
     )
     ;; Real implementation requires explicit calls or a trait. 
     ;; Since lists in Clarity are strict, we'll implement an explicit check function.
@@ -39,11 +46,11 @@
 ;; Returns true if ALL critical systems are owned by the Timelock.
 (define-public (verify-full-handover)
   (let (
-      (protocol-owner (unwrap-panic (contract-call? .conxian-protocol get-admin)))
-      (risk-owner (unwrap-panic (contract-call? .agent-risk get-contract-owner)))
-      (treasury-owner (unwrap-panic (contract-call? .agent-treasury get-contract-owner)))
-      (reg-owner (unwrap-panic (contract-call? .compliance.regulatory-adapter get-contract-owner)))
-      (access-owner (unwrap-panic (contract-call? .conxian-access get-contract-owner)))
+      (protocol-owner (unwrap-panic (contract-call? (var-get conxian-protocol-contract) get-admin)))
+      (risk-owner (unwrap-panic (contract-call? (var-get agent-risk-contract) get-contract-owner)))
+      (treasury-owner (unwrap-panic (contract-call? (var-get agent-treasury-contract) get-contract-owner)))
+      (reg-owner (unwrap-panic (contract-call? (var-get regulatory-adapter-contract) get-contract-owner)))
+      (access-owner (unwrap-panic (contract-call? (var-get conxian-access-contract) get-contract-owner)))
     )
     ;; Check Conxian Protocol
     (asserts! (is-eq protocol-owner TARGET_OWNER)

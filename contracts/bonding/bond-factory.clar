@@ -13,6 +13,7 @@
 ;; Data Vars
 (define-data-var contract-owner principal tx-sender)
 (define-data-var bond-nonce uint u0)
+(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
 
 ;; Bond Token
 (define-fungible-token bond-token)
@@ -43,10 +44,11 @@
   )
   (begin
     ;; Check compliance first
-(asserts!
-      (is-eq (ok true)
-        (contract-call? .compliance.regulatory-adapter check-clean-hands-compliance user)
-      )
+    (asserts!
+      (is-ok (contract-call? (var-get regulatory-adapter-contract)
+        check-clean-hands-compliance
+        user
+      ))
       ERR_UNAUTHORIZED
     )
 

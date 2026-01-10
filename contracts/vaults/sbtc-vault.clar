@@ -18,6 +18,7 @@
 ;; State
 (define-data-var sbtc-token principal .sbtc-token) ;; Placeholder for actual sBTC contract
 (define-data-var total-deposits uint u0)
+(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
 
 ;; Maps
 (define-map user-balances
@@ -27,7 +28,7 @@
 
 ;; Compliance Check Helper
 (define-private (check-compliance (user principal))
-    (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
+    (let ((compliance-status (contract-call? (var-get regulatory-adapter-contract) check-clean-hands-compliance user)))
         (if (is-ok compliance-status)
             true
             false

@@ -18,6 +18,9 @@
 
 ;; Data Vars
 (define-data-var protocol-coordinator principal tx-sender)
+(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
+(define-data-var block-utils-contract principal .block-utils)
+(define-data-var conxian-protocol-contract principal .conxian-protocol)
 
 ;; --- Authorization ---
 
@@ -31,7 +34,7 @@
 ;; @param user: The principal of the user to check.
 ;; @returns bool
 (define-private (check-compliance (user principal))
-  (is-ok (contract-call? .compliance.regulatory-adapter check-clean-hands-compliance user))
+  (is-ok (contract-call? (var-get regulatory-adapter-contract) check-clean-hands-compliance user))
 )
 
 ;; --- Internal Guards ---
@@ -40,8 +43,11 @@
 ;; @returns (response bool)
 (define-private (guard-entry)
   (begin
-    (try! (contract-call? .block-utils check-finality))
-    (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) ERR_CONTRACT_PAUSED)
+    (try! (contract-call? (var-get block-utils-contract) check-finality))
+(asserts!
+      (not (unwrap-panic (contract-call? (var-get conxian-protocol-contract) is-paused)))
+      ERR_CONTRACT_PAUSED
+    )
     (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
     (ok true)
   )
@@ -87,7 +93,7 @@
       (print {
         event: "facade-open-position",
         sender: tx-sender,
-        tenure-id: (contract-call? .block-utils get-current-tenure-id),
+        tenure-id: (contract-call? (var-get block-utils-contract) get-current-tenure-id),
       })
       result
     )

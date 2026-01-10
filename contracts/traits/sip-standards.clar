@@ -32,6 +32,18 @@
     )
 ))
 
+;; Mintable FT extension
+(define-trait ft-mintable-trait (
+    (mint
+        (uint principal)
+        (response bool uint)
+    )
+    (burn
+        (uint principal)
+        (response bool uint)
+    )
+))
+
 (define-trait sip-009-nft-trait (
     (get-last-token-id
         ()

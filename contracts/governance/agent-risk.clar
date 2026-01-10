@@ -109,8 +109,8 @@
     (asserts! (is-authorized ROLE_KEEPER) ERR_UNAUTHORIZED)
 
     (let (
-        (sbtc-price (try! (contract-call? (var-get oracle-contract) .oracle-trait.get-price sbtc-token)))
-        (btc-price (try! (contract-call? (var-get oracle-contract) .oracle-trait.get-price btc-token)))
+        (sbtc-price (try! (contract-call? (var-get oracle-contract) oracle-trait.get-price sbtc-token)))
+        (btc-price (try! (contract-call? (var-get oracle-contract) oracle-trait.get-price btc-token)))
         (deviation (if (> sbtc-price btc-price)
           (- sbtc-price btc-price)
           (- btc-price sbtc-price)
