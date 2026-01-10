@@ -18,10 +18,6 @@
 
 ;; Data Vars
 (define-data-var protocol-coordinator principal tx-sender)
-(define-data-var position-manager principal tx-sender)
-(define-data-var collateral-manager principal tx-sender)
-(define-data-var risk-manager principal tx-sender)
-(define-data-var funding-rate-calculator principal tx-sender)
 
 ;; --- Authorization ---
 
@@ -44,10 +40,8 @@
 ;; @returns (response bool)
 (define-private (guard-entry)
   (begin
-    ;; Optimization: Centralized pre-flight checks (`check-finality`, `check-compliance`) into a single private function.
-    ;; This avoids code duplication and improves maintainability.
-    ;; It reduces contract bytecode size, which lowers one-time deployment costs. This introduces a negligible increase in runtime gas for each call due to the added function hop, a trade-off made for better code structure.
     (try! (contract-call? .block-utils check-finality))
+    (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) ERR_CONTRACT_PAUSED)
     (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
     (ok true)
   )
@@ -86,9 +80,10 @@
   )
   (begin
     (try! (guard-entry))
-    (let ((result (contract-call? .position-manager open-position tx-sender token amount
-        leverage long
-      )))
+    (let ((position-manager (get-module-contract "position-manager"))
+          (result (contract-call? position-manager open-position tx-sender token amount
+              leverage long
+            )))
       (print {
         event: "facade-open-position",
         sender: tx-sender,
@@ -111,11 +106,9 @@
   )
   (begin
     (try! (guard-entry))
-    ;; Note: Closing positions might be allowed even if non-compliant to reduce risk (Unwinding),
-    ;; but strictly "Clean-Hands" implies no interaction. 
-    ;; We will enforce it for consistency, or allow "Reduce Only" mode.
-    ;; For Tier 0 strictness: Enforce.
-    (contract-call? .position-manager close-position tx-sender position-id)
+    (let ((position-manager (get-module-contract "position-manager")))
+      (contract-call? position-manager close-position tx-sender position-id)
+    )
   )
 )
 
@@ -131,7 +124,9 @@
   )
   (begin
     (try! (guard-entry))
-    (contract-call? .collateral-manager deposit-funds amount token)
+    (let ((collateral-manager (get-module-contract "collateral-manager")))
+      (contract-call? collateral-manager deposit-funds amount token)
+    )
   )
 )
 
@@ -145,7 +140,9 @@
   )
   (begin
     (try! (guard-entry))
-    (contract-call? .collateral-manager withdraw-funds amount token)
+    (let ((collateral-manager (get-module-contract "collateral-manager")))
+      (contract-call? collateral-manager withdraw-funds amount token)
+    )
   )
 )
 
@@ -155,7 +152,9 @@
 ;; @param position-id: The ID of the position to check.
 ;; @returns (response uint) The health factor of the position.
 (define-public (check-position-health (position-id uint))
-  (contract-call? .risk-manager get-health-factor position-id)
+  (let ((risk-manager (get-module-contract "risk-manager")))
+    (contract-call? risk-manager get-health-factor position-id)
+  )
 )
 
 ;; @desc Liquidates an unhealthy position by delegating to the risk manager.
@@ -164,6 +163,15 @@
 (define-public (liquidate-position (position-id uint))
   (begin
     (try! (contract-call? .block-utils check-finality))
-    (contract-call? .risk-manager liquidate position-id)
+    (let ((risk-manager (get-module-contract "risk-manager")))
+      (contract-call? risk-manager liquidate position-id)
+    )
+  )
+)
+
+(define-private (get-module-contract (name (string-ascii 32)))
+  (let ((module-data (unwrap-panic (contract-call? .conxian-protocol get-module name))))
+    (asserts! (get active module-data) (err u5002))
+    (get contract module-data)
   )
 )

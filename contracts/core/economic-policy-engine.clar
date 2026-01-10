@@ -184,7 +184,9 @@
     (fold
       (lambda (asset-price-confidence result)
         (let (
-            (asset (get 0 asset-price-confi))(price (get 1 asset-price-confi))(confidence (get 2 asset-price-confi))
+            (asset (get 0 asset-price-confidence))
+            (price (get 1 asset-price-confidence))
+            (confidence (get 2 asset-price-confidence))
           )
           ;; Return the accumulator (result) unchanged
           result

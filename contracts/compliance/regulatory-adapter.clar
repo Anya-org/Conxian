@@ -3,7 +3,7 @@
 ;; Verifies Off-Chain ZK-Proofs/Signatures of compliance to keep PII off-chain.
 ;; Tier 0: User-Sovereign Verification (SIP-018 Style)
 
-(impl-trait .core-traits.compliance.regulatory-adapter-trait)
+(impl-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u6000))
