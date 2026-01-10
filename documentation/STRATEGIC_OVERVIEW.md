@@ -18,6 +18,8 @@ compliant with the Stacks Nakamoto upgrade.
 This document provides a transparent overview of our strategic direction, business value, core architecture, current
 capabilities, and future roadmap.
 
+***Disclaimer**: This document outlines the strategic vision and target architecture for the Conxian Protocol. The project is currently in a **Technical Alpha** stage, and not all features described herein are fully implemented. For the most accurate information on the current state of the code, please refer to the module-specific `README` files in the `contracts` directory.*
+
 ## 2. The Conxian Vision: Unifying Retail and Enterprise DeFi
 
 Our core mission is to address the critical challenges limiting the growth of decentralized finance:

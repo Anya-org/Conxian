@@ -101,10 +101,10 @@ The protocol is organized into specialized modules within the `contracts` direct
 
 ### Core Modules
 
-- **`core`**: Dimensional engine logic coordinating protocol dimensions.
-- **`dex`**: Feature-complete decentralized exchange (Multi-hop Router, Concentrated Liquidity).
+- **`core`**: Manages the core logic of the protocol. It includes the `dimensional-engine.clar` facade for user interactions and the `conxian-protocol.clar` contract, which acts as the central protocol coordinator, managing a system-wide emergency pause and a registry of authorized contracts.
+- **`dex`**: A decentralized exchange module. The current implementation provides a basic single-pool swap router (`swap-router.clar`). The target design includes a feature-complete, multi-hop router, which is not yet implemented.
 - **`governance`**: Proposal and voting system, including the `conxian-operations-engine.clar` (Automated Operations Seat).
-- **`lending`**: Multi-asset lending and borrowing system (`comprehensive-lending-system.clar`).
+- **`lending`**: A placeholder for a future multi-asset lending and borrowing system. This module is not yet implemented.
 
 ### Supporting Modules
 
