@@ -56,7 +56,7 @@
 (define-private (is-authorized (role uint))
   (if (is-eq tx-sender (var-get contract-owner))
     true
-    (contract-call? (var-get rbac-contract) .rbac-trait.has-role tx-sender role)
+    (contract-call? (var-get rbac-contract) rbac-trait.has-role tx-sender role)
   )
 )
 
