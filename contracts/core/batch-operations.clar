@@ -331,5 +331,5 @@
 )
 
 (define-private (is-valid-principal (principal principal))
-  (is-eq (len (unwrap! (principal-to-buff? principal) (err u100))) u33)
+  (is-eq (len (unwrap! (principal-to-buff principal) (err u100))) u33)
 )

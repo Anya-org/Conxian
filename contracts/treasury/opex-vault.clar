@@ -21,7 +21,10 @@
   (begin
       ;; ROLE_OPERATOR ERR_UN
     (asserts!
-      (is-eq (ok true) (contract-call? .regulatory-adapter check-clean-hands-compliance tx-sender))
+      (is-eq (ok true)
+        (contract-call? .regulatory-adapter check-clean-hands-compliance
+          tx-sender
+        ))
       ERR_UNAUTHORIZED
     )
     (asserts!

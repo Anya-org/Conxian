@@ -7,7 +7,7 @@
 (use-trait pausable-trait .pausable-trait.pausable-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_NOT_AUTHORIZED (err u1000))
 (define-constant ERR_INVALID_OPERATION (err u1001))
 (define-constant ERR_BATCH_LIMIT_EXCEEDED (err u1002))
 
@@ -29,6 +29,60 @@
   bool
 )
 
+;; Helper Functions for Batch Operations
+(define-private (execute-role-grant
+    (user principal)
+    (role uint)
+  )
+  (match (contract-call? .rbac grant-role user role)
+    success
+    success
+    error (err ERR_BATCH_LIMIT_EXCEEDED)
+  )
+)
+
+(define-private (execute-role-revoke
+    (user principal)
+    (role uint)
+  )
+  (match (contract-call? .rbac revoke-role user role)
+    success
+    success
+    error (err ERR_BATCH_LIMIT_EXCEEDED)
+  )
+)
+
+(define-private (process-role-update (result (response bool uint)) (update { user: principal, role: uint, active: bool }))
+  (match result
+    success (if (get active update)
+      (execute-role-grant (get user update) (get role update))
+      (execute-role-revoke (get user update) (get role update))
+    )
+    error error
+  )
+)
+
+(define-private (execute-admin-operation-wrapper (operation { type: uint, params: (list 10 principal) }))
+  (match (get type operation)
+    1 (execute-emergency-operation (get params operation))
+    2 (execute-protocol-operation (get params operation))
+    3 (execute-treasury-operation (get params operation))
+    default (err ERR_INVALID_OPERATION)
+  )
+)
+
+(define-private (process-admin-operation
+    (result (response bool uint))
+    (operation {
+      type: uint,
+      params: (list 10 principal),
+    })
+  )
+  (match result
+    success (execute-admin-operation-wrapper operation)error error
+  )
+)
+
 ;; Authorization
 (define-private (has-role (role uint))
   (contract-call? .rbac has-role tx-sender role)
@@ -43,10 +97,10 @@
 ;; @desc Pause a contract (emergency only)
 (define-public (pause-contract (target principal))
   (begin
-    (asserts! (has-role ROLE_EMERGENCY_PAUSE) ERR_UNAUTHORIZED)
+    (asserts! (has-role ROLE_EMERGENCY_PAUSE) ERR_NOT_AUTHORIZED)
     ;; Note: In a real implementation, this would delegate to a pausable contract
-;; For now, we just log the pause request
-(print {
+    ;; For now, we just log the pause request
+    (print {
       event: "contract-pause-requested",
       target: target,
     })
@@ -57,10 +111,10 @@
 ;; @desc Unpause a contract
 (define-public (unpause-contract (target principal))
   (begin
-    (asserts! (has-role ROLE_GLOBAL_ADMIN) ERR_UNAUTHORIZED)
+    (asserts! (has-role ROLE_GLOBAL_ADMIN) ERR_NOT_AUTHORIZED)
     ;; Note: In a real implementation, this would delegate to a pausable contract
-;; For now, we just log the unpause request
-(print {
+    ;; For now, we just log the unpause request
+    (print {
       event: "contract-unpause-requested",
       target: target,
     })
@@ -71,7 +125,7 @@
 ;; @desc Update RBAC role for a principal
 (define-public (set-role (user principal) (role uint) (enabled bool))
   (begin
-    (asserts! (has-role ROLE_GLOBAL_ADMIN) ERR_UNAUTHORIZED)
+    (asserts! (has-role ROLE_GLOBAL_ADMIN) ERR_NOT_AUTHORIZED)
     (if enabled
       (try! (contract-call? .rbac grant-role user role))
       (try! (contract-call? .rbac revoke-role user role))
@@ -83,7 +137,7 @@
 ;; @desc Set the RBAC contract address
 (define-public (set-rbac-contract (new-contract principal))
   (begin
-    (asserts! (has-role ROLE_GLOBAL_ADMIN) ERR_UNAUTHORIZED)
+    (asserts! (has-role ROLE_GLOBAL_ADMIN) ERR_NOT_AUTHORIZED)
     (var-set rbac-contract new-contract)
     (ok true)
   )
@@ -94,7 +148,7 @@
     (updates (list 100 { user: principal, role: uint, active: bool }))
   )
   (begin
-    (asserts! (is-global-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-global-admin) ERR_NOT_AUTHORIZED)
     (asserts! (<= (len updates) (var-get max-batch-size)) ERR_BATCH_LIMIT_EXCEEDED)
 
     ;; Correctly process each role update using fold
@@ -115,26 +169,18 @@
 )
 
 ;; Batch Admin Operations (1000x more efficient)
-(define-public (batch-admin-operations
+(define-public (batch-admin-operations 
     (operations (list 200 { type: uint, params: (list 10 principal) }))
   )
   (begin
-    (asserts! (is-global-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-global-admin) ERR_NOT_AUTHORIZED)
     (asserts! (<= (len operations) (var-get max-batch-size)) ERR_BATCH_LIMIT_EXCEEDED)
-
-    ;; Efficiently validate and execute in a single fold
-    (fold
-      (lambda (op result)
-        (match result
-          (ok ok-val) (begin
-            (try! (validate-admin-operation op))
-            (execute-admin-operation op)
-          )
-          (err err-val) (err err-val)
-        )
-      )
-      operations
-      (ok true)
+    
+    ;; Validate all operations first (fail fast)
+    (let ((validated (map validate-admin-operation operations)))
+      
+      ;; Execute in batch (single transaction) with proper error handling
+      (fold process-admin-operation (ok true) validated)
     )
   )
 )
@@ -147,7 +193,7 @@
         (is-global-admin)
         (has-role tx-sender ROLE_EMERGENCY_PAUSE)
       )
-      ERR_UNAUTHORIZED
+      ERR_NOT_AUTHORIZED
     )
     (var-set emergency-pause paused)
     (print {
@@ -163,7 +209,7 @@
 ;; Global Admin Management
 (define-public (set-global-admin (new-admin principal))
   (begin
-    (asserts! (is-global-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-global-admin) ERR_NOT_AUTHORIZED)
     (var-set global-admin new-admin)
     (print {
       event: "global-admin-changed",
@@ -186,7 +232,7 @@
   )
 )
 
-(define-private (validate-admin-operation (operation admin-operation))
+(define-private (validate-admin-operation (operation { type: uint, params: (list 10 principal) }))
   (begin
     (match (get type operation)
       1 (validate-emergency-operation (get params operation))
@@ -197,7 +243,7 @@
   )
 )
 
-(define-private (execute-admin-operation (operation admin-operation))
+(define-private (execute-admin-operation (operation { type: uint, params: (list 10 principal) }))
   (match (get type operation)
     1 (execute-emergency-operation (get params operation))
     2 (execute-protocol-operation (get params operation))
@@ -247,5 +293,5 @@
 
 ;; Utility Functions
 (define-private (is-valid-principal (principal principal))
-  true
+  true ;; Simple validation - all principals are valid in this context
 )

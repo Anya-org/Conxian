@@ -1,8 +1,12 @@
 # Liquidation Flow Documentation
 
+> **Note on Implementation Status**
+>
+> The Conxian Lending Module is currently a **placeholder** and has not been implemented. The liquidation flow described in this document is a **target design** for a future version of the protocol and does not reflect any existing functionality.
+
 ## Overview
 
-This document outlines the liquidation process in the Conxian protocol, including the interactions between the `comprehensive-lending-system` and `liquidation-manager` contracts.
+This document outlines the **planned** liquidation process in the Conxian protocol, including the **proposed** interactions between the `comprehensive-lending-system` and `liquidation-manager` contracts.
 
 ## Key Components
 

@@ -27,7 +27,7 @@
 
 ;; Compliance Check Helper
 (define-private (check-compliance (user principal))
-    (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
+    (let ((compliance-status (contract-call? .compliance.regulatory-adapter check-clean-hands-compliance user)))
         (if (is-ok compliance-status)
             true
             false
