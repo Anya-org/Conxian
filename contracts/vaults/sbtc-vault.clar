@@ -3,7 +3,7 @@
 ;; Secure Custody with "Clean-Hands" Enforcement and Travel Rule Hooks
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
-(use-trait regulatory-adapter-trait .core-traits.compliance.regulatory-adapter-trait)
+(use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 (use-trait vault-trait .vault-traits.vault-trait)
 
 ;; Constants
@@ -27,7 +27,7 @@
 
 ;; Compliance Check Helper
 (define-private (check-compliance (user principal))
-    (let ((compliance-status (contract-call? .compliance.compliance.regulatory-adapter check-clean-hands-compliance user)))
+    (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
         (if (is-ok compliance-status)
             true
             false

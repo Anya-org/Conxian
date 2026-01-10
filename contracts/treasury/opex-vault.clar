@@ -10,7 +10,7 @@
 (define-data-var last-spend-block uint u0)
 (define-data-var daily-spend uint u0)
 
-(use-trait regulatory-adapter-trait .core-traits.compliance.regulatory-adapter-trait)
+(use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 
 (define-public (withdraw-opex

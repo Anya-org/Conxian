@@ -550,11 +550,6 @@ address = "STL0M1N2O3P4Q5R6S7T8U9V0W1X2Y3Z4A5B6C7"
 path = "contracts/automation/automation-manager.clar"
 address = "STM1N2O3P4Q5R6S7T8U9V0W1X2Y3Z4A5B6C8"
 
-[contracts.block-automation-manager-old]
-path = "contracts/automation/block-automation-manager-old.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "comprehensive-lending-system", "protocol-fee-switch", "liquidation-manager", "analytics-aggregator", "gamification-manager"]
-
 [contracts.stacks-native-launch-script]
 path = "contracts/automation/stacks-native-launch-script.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
