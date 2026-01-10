@@ -18,7 +18,7 @@ If you are new to the Conxian Protocol, we recommend starting with these key doc
 
 This section contains the detailed technical specifications and architectural decision records (ADRs).
 
--   **[Architecture Overview](./architecture/OVERVIEW.md)**: A comprehensive guide to the protocol's modular, facade-based architecture.
+-   **[Architecture Overview](./SYSTEM_ARCHITECTURE.md)**: A comprehensive guide to the protocol's modular, facade-based architecture.
 -   **[Smart Contract `README`s](../contracts/)**: Specific module architecture details (found in each contract subdirectory).
 -   **[Naming Standards](./reference/NAMING_STANDARDS.md)**: Official naming conventions for tokens and governance bodies.
 

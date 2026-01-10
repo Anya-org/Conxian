@@ -8,108 +8,69 @@ The Conxian Protocol is engineered with a modern, modular architecture designed 
 - **Maintainability**: Ensuring the long-term health and scalability of the protocol by separating concerns and creating a clean, understandable codebase.
 - **Extensibility**: Building a flexible foundation that allows for the seamless addition of new features and modules without compromising the stability of the core system.
 
-To achieve these goals, the entire protocol is built upon a single, powerful architectural pattern: the **Facade Pattern**.
+To achieve these goals, the protocol is built upon two distinct but complementary architectural patterns: the **Pure Facade** and the **Logic-Rich Facade**.
 
-## 2. Core Architectural Pattern: The Facade Pattern
+## 2. Core Architectural Patterns
 
-The Conxian Protocol is a strict and consistent implementation of the **facade pattern**. This pattern is the foundational concept that governs the structure and interaction of all core modules within the system.
+The Conxian Protocol uses a facade-based architecture to provide a secure and manageable interface to its complex underlying systems. However, we apply two different types of facades depending on the needs of the module.
 
-### 2.1 How It Works
+### 2.1 Pattern 1: The Pure Facade (Core Module)
 
-The facade pattern provides a simple, unified interface to a more complex underlying system. In the context of the Conxian Protocol, this means that for each major piece of functionality (e.g., Core, DEX, Lending), there is a single, on-chain entry point contract known as a **facade**.
+The "Pure Facade" pattern provides a simple, stateless, and highly secure entry point to a module's functionality. This pattern is used in the `core` module, where security and clarity are paramount.
 
-- **User Interaction**: All user-facing calls and all interactions from other contracts are directed exclusively to these facade contracts. They provide a clean, simplified, and secure API for the module's functionality.
+- **How It Works**: The `dimensional-engine.clar` contract serves as the facade. It contains almost no business logic. Its sole responsibility is to perform critical pre-flight checks (e.g., is the protocol paused? is the user compliant?) and then delegate the call to the appropriate specialized manager contract.
+- **Benefits**: This pattern offers the highest level of security by minimizing the attack surface. The logic is decentralized into single-responsibility contracts, making them easier to audit and maintain.
 
-- **Delegated Logic**: The facade contracts themselves contain minimal business logic. Their primary responsibility is to perform initial input validation and then securely delegate the actual work to a network of specialized, single-responsibility **manager contracts**.
+### 2.2 Pattern 2: The Logic-Rich Facade (Governance Module)
 
-- **Trait-Driven Interfaces**: The connection between a facade and its manager contracts is defined by a set of standardized **traits**. These traits act as formal, on-chain interfaces, ensuring that the communication between the components is predictable, secure, and easy to maintain.
+The "Logic-Rich Facade" pattern provides a centralized controller that manages a complex workflow. This pattern is used in the `governance` module, where the process itself is as important as the individual actions.
 
-### 2.2 Control Flow Diagram (Example: Core Module)
-
-```
-[User] -> [dimensional-engine.clar] (Facade)
-    |
-    |-- (open-position via dimensional-trait) --> [position-manager.clar]
-    |-- (deposit-funds via collateral-manager-trait) --> [collateral-manager.clar]
-    |-- (check-position-health via risk-manager-trait) --> [risk-manager.clar]
-```
-
-### 2.3 Benefits of the Facade Pattern
-
-- **Enhanced Security**: By funneling all calls through a single entry point, we dramatically reduce the attack surface of the protocol. Audits can be focused on these well-defined facades, and access controls can be managed in a single, reliable location.
-- **Improved Maintainability**: The separation of concerns makes the system far easier to understand, debug, and upgrade. A change to the `position-manager.clar` contract, for example, is isolated from the logic in the `collateral-manager.clar`, reducing the risk of unintended side effects.
-- **Increased Clarity**: The architecture provides a clear and logical map of the system. Developers can immediately understand the high-level functionality by reviewing the facade, and then dive into the specific implementation details in the relevant manager contract.
+- **How It Works**: The `proposal-engine.clar` contract serves as the facade. Unlike a pure facade, it contains significant business logic related to the governance process. It manages the state of proposals, validates voting eligibility, and orchestrates the entire lifecycle of a proposal, while still delegating specific tasks like data storage (`proposal-registry`) and final execution (`proposal-executor`).
+- **Benefits**: This pattern is ideal for complex, multi-step processes. It provides a single point of control and a clear, sequential workflow, which is essential for a secure and predictable governance system.
 
 ## 3. The Protocol Coordinator: `conxian-protocol.clar`
 
-While the facade pattern decentralizes the logic of individual modules,
-the Conxian Protocol is unified by a central coordinator contract:
-`conxian-protocol.clar`. This critical contract serves as the single
-source of truth for protocol-wide state and provides a global layer of
-security and control.
+While the facade patterns decentralize the logic of individual modules, the Conxian Protocol is unified by a central coordinator contract: `conxian-protocol.clar`. This critical contract serves as the single source of truth for protocol-wide state and provides a global layer of security and control.
 
 ### 3.1 Key Responsibilities
 
-- **Emergency Pause**: The coordinator implements a global `emergency-paused` flag.
-                       this flag is active, all state-changing functions in the
-                       module facades are disabled, providing a single switch
-                       to halt the protocol in a critical situation.
-- **Contract Registry**: The coordinator maintains a registry of authorized
-                         contracts, ensuring that only verified and approved
-                         components can interact with the core system.
-- **Protocol-Wide Configuration**: The coordinator manages global configuration
-                        Parameters, such as fee rates and collateralization ratios,
-                        providing a centralized point of control for these key variables.
-
-### 3.2 Integration with Facades
-
-All module facades are integrated with the protocol coordinator. They use the `protocol-support-trait` to check the `is-protocol-paused` status before executing any state-changing logic. This ensures that the global emergency pause is respected across the entire system.
+- **Emergency Pause**: The coordinator implements a global `emergency-paused` flag. When this flag is active, all state-changing functions in the module facades are disabled.
+- **Contract Registry**: The coordinator maintains a registry of all authorized module contracts, ensuring that only verified components can interact with the core system.
+- **Protocol-Wide Configuration**: The coordinator manages global configuration parameters, providing a centralized point of control.
 
 ## 4. High-Level System Diagram
 
-The Conxian Protocol is composed of several core modules, each with its own facade, all of which are connected to the central protocol coordinator. These modules are designed to be highly cohesive and loosely coupled, interacting with each other through their public, trait-defined interfaces.
+```mermaid
+graph TD
+    subgraph "Protocol Coordination"
+        A[conxian-protocol.clar]
+    end
 
-```
-+----------------------------------------------------------------------------------+
-|                                Conxian Protocol                                  |
-|                                                                                  |
-|    +--------------------------------------------------------------------------+  |
-|    |                        Protocol Coordinator                              |  |
-|    |                       (conxian-protocol.clar)                              |  |
-|    +----------------------------------^----------------------------------------+  |
-|                                       |                                          |
-|    +-----------------+                |                 +-----------------+      |
-|    |   Core Module   |----------------+-----------------|   DEX Module    |      |
-|    |    (Facade)     |                |                 |    (Facade)     |      |
-|    +-------+---------+      +---------+--------+        +--------+--------+      |
-|            |              |  Lending Module  |                 |               |
-|            |              |     (Facade)     |                 |               |
-|    +-------v---------+      +------------------+        +--------v--------+      |
-|    | Manager         |                                  | Manager         |      |
-|    | Contracts       |      +---------------------+     | Contracts       |      |
-|    +-----------------+      |  Governance Module  |     +-----------------+      |
-|                             |       (Facade)      |                            |
-|    +----------------------+ +----------+----------+     +----------------------+ |
-|    |  Enterprise Module   |            |               |  Manager Contracts   | |
-|    |  (Facade - Target)   |            |               +----------------------+ |
-|    +----------+-----------+ +----------v----------+                            |
-|               |            | Manager Contracts   |                            |
-|    +----------v-----------+ +---------------------+                            |
-|    | Manager Contracts    |                                                  |
-|    +----------------------+                                                  |
-|                                                                                  |
-+----------------------------------------------------------------------------------+
+    subgraph "Core Module (Pure Facade)"
+        B[dimensional-engine.clar] --> C[position-manager.clar]
+        B --> D[collateral-manager.clar]
+        B --> E[risk-manager.clar]
+    end
+
+    subgraph "Governance Module (Logic-Rich Facade)"
+        F[proposal-engine.clar] --> G[proposal-registry.clar]
+        F --> H[proposal-executor.clar]
+        F --> I[reputation-engine.clar]
+    end
+
+    B -- Checks Pause Status --> A
+    F -- Interacts with Protocol State --> A
 ```
 
 ## 5. Module Breakdown
 
 For a detailed understanding of each module's specific architecture and functionality, please refer to their individual `README.md` files:
 
-- **[Core Module](./contracts/core/README.md)**: Manages dimensional trading, position management, and system-wide risk.
-- **[DEX Module](./contracts/dex/README.md)**: Provides a highly efficient decentralized exchange with multiple AMM models.
-- **[Lending Module](./contracts/lending/README.md)**: Manages a multi-asset system for decentralized lending and borrowing.
-- **[Governance Module](./contracts/governance/README.md)**: Provides the framework for decentralized decision-making and protocol upgrades.
-- **[Enterprise Module](./contracts/enterprise/README.md)**: Provides institutional-grade financial tooling with a policy-integration surface (Status: Prototype/Planned).
+- **[Core Module](../contracts/core/README.md)**: Manages dimensional trading, position management, and system-wide risk.
+- **[DEX Module](../contracts/dex/README.md)**: Provides a decentralized exchange. (Status: Under Development)
+- **[Lending Module](../contracts/lending/README.md)**: Manages decentralized lending and borrowing. (Status: Under Development)
+- **[Governance Module](../contracts/governance/README.md)**: Provides the framework for decentralized decision-making and protocol upgrades.
+- **[Enterprise Module](../contracts/enterprise/README.md)**: Provides institutional-grade financial tooling. (Status: Planned)
 
 ## 6. Architectural Goals: Nakamoto Compatibility
 
