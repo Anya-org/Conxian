@@ -24,8 +24,11 @@
 (define-data-var max-batch-size uint u100)
 
 ;; Role Cache for Ultra-Low Gas Lookups
-(define-map role-cache 
-  { user: principal, role: uint } 
+(define-map role-cache
+  {
+    user: principal,
+    role: uint,
+  }
   bool
 )
 
@@ -52,17 +55,28 @@
   )
 )
 
-(define-private (process-role-update (result (response bool uint)) (update { user: principal, role: uint, active: bool }))
+(define-private (process-role-update
+    (result (response bool uint))
+    (update {
+      user: principal,
+      role: uint,
+      active: bool,
+    })
+  )
   (match result
     success (if (get active update)
       (execute-role-grant (get user update) (get role update))
       (execute-role-revoke (get user update) (get role update))
     )
-    error error
+    error
+    error
   )
 )
 
-(define-private (execute-admin-operation-wrapper (operation { type: uint, params: (list 10 principal) }))
+(define-private (execute-admin-operation-wrapper (operation {
+  type: uint,
+  params: (list 10 principal),
+}))
   (match (get type operation)
     1 (execute-emergency-operation (get params operation))
     2 (execute-protocol-operation (get params operation))
@@ -80,7 +94,8 @@
   )
   (match result
     success (execute-admin-operation-wrapper operation)
-    error error
+    error
+    error
   )
 )
 
@@ -124,7 +139,11 @@
 )
 
 ;; @desc Update RBAC role for a principal
-(define-public (set-role (user principal) (role uint) (enabled bool))
+(define-public (set-role
+    (user principal)
+    (role uint)
+    (enabled bool)
+  )
   (begin
     (asserts! (has-role ROLE_GLOBAL_ADMIN) ERR_NOT_AUTHORIZED)
     (if enabled
@@ -145,41 +164,47 @@
 )
 
 ;; Batch Role Management (100x more efficient)
-(define-public (batch-update-roles
-    (updates (list 100 { user: principal, role: uint, active: bool }))
-  )
+(define-public (batch-update-roles (updates (list 100 {
+  user: principal,
+  role: uint,
+  active: bool,
+})))
   (begin
     (asserts! (is-global-admin) ERR_NOT_AUTHORIZED)
-    (asserts! (<= (len updates) (var-get max-batch-size)) ERR_BATCH_LIMIT_EXCEEDED)
+    (asserts! (<= (len updates) (var-get max-batch-size))
+      ERR_BATCH_LIMIT_EXCEEDED
+    )
 
     ;; Correctly process each role update using fold
     (fold
       (lambda (update result)
         (match result
-          (ok ok-val) (if (get active update)
+          (ok ok-val)
+          (if (get active update)
             (contract-call? .rbac grant-role (get user update) (get role update))
             (contract-call? .rbac revoke-role (get user update) (get role update))
           )
-          (err err-val) (err err-val)
-        )
-      )
-      updates
-      (ok true)
+          (err err-val)
+          (err err-val)
+        ))
+      updates (ok true)
     )
   )
 )
 
 ;; Batch Admin Operations (1000x more efficient)
-(define-public (batch-admin-operations 
-    (operations (list 200 { type: uint, params: (list 10 principal) }))
-  )
+(define-public (batch-admin-operations (operations (list 200 {
+  type: uint,
+  params: (list 10 principal),
+})))
   (begin
     (asserts! (is-global-admin) ERR_NOT_AUTHORIZED)
-    (asserts! (<= (len operations) (var-get max-batch-size)) ERR_BATCH_LIMIT_EXCEEDED)
-    
+    (asserts! (<= (len operations) (var-get max-batch-size))
+      ERR_BATCH_LIMIT_EXCEEDED
+    )
+
     ;; Validate all operations first (fail fast)
     (let ((validated (map validate-admin-operation operations)))
-      
       ;; Execute in batch (single transaction) with proper error handling
       (fold process-admin-operation (ok true) validated)
     )
@@ -189,8 +214,8 @@
 ;; Emergency Pause (Ultra-low gas)
 (define-public (set-emergency-pause (paused bool))
   (begin
-    (asserts! 
-      (or 
+    (asserts!
+      (or
         (is-global-admin)
         (has-role tx-sender ROLE_EMERGENCY_PAUSE)
       )
@@ -222,18 +247,33 @@
 )
 
 ;; Helper Functions
-(define-private (validate-role-update (update { user: principal, role: uint, active: bool }))
+(define-private (validate-role-update (update {
+  user: principal,
+  role: uint,
+  active: bool,
+}))
   (begin
     (asserts! (is-valid-principal (get user update)) ERR_INVALID_OPERATION)
     (if (get active update)
-      (map-set role-cache { user: (get user update), role: (get role update) } true)
-      (map-delete role-cache { user: (get user update), role: (get role update) })
+      (map-set role-cache {
+        user: (get user update),
+        role: (get role update),
+      }
+        true
+      )
+      (map-delete role-cache {
+        user: (get user update),
+        role: (get role update),
+      })
     )
     (ok true)
   )
 )
 
-(define-private (validate-admin-operation (operation { type: uint, params: (list 10 principal) }))
+(define-private (validate-admin-operation (operation {
+  type: uint,
+  params: (list 10 principal),
+}))
   (begin
     (match (get type operation)
       1 (validate-emergency-operation (get params operation))
@@ -244,7 +284,10 @@
   )
 )
 
-(define-private (execute-admin-operation (operation { type: uint, params: (list 10 principal) }))
+(define-private (execute-admin-operation (operation {
+  type: uint,
+  params: (list 10 principal),
+}))
   (match (get type operation)
     1 (execute-emergency-operation (get params operation))
     2 (execute-protocol-operation (get params operation))
@@ -261,7 +304,10 @@
 (define-private (execute-emergency-operation (params (list 10 principal)))
   (begin
     (var-set emergency-pause true)
-    (print { event: "emergency-operation-executed", operation: "emergency" })
+    (print {
+      event: "emergency-operation-executed",
+      operation: "emergency",
+    })
     (ok true)
   )
 )
@@ -274,7 +320,10 @@
 (define-private (execute-protocol-operation (params (list 10 principal)))
   (begin
     ;; Delegate to specific protocol contracts
-    (print { event: "protocol-operation-executed", operation: "protocol" })
+    (print {
+      event: "protocol-operation-executed",
+      operation: "protocol",
+    })
     (ok true)
   )
 )
@@ -287,12 +336,16 @@
 (define-private (execute-treasury-operation (params (list 10 principal)))
   (begin
     ;; Delegate to treasury contracts
-    (print { event: "treasury-operation-executed", operation: "treasury" })
+    (print {
+      event: "treasury-operation-executed",
+      operation: "treasury",
+    })
     (ok true)
   )
 )
 
 ;; Utility Functions
 (define-private (is-valid-principal (principal principal))
-  true ;; Simple validation - all principals are valid in this context
+  true
+  ;; Simple validation - all principals are valid in this context
 )
