@@ -11,6 +11,7 @@
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 (use-trait roles-trait .core-traits.rbac-trait)
+(use-trait compliance-trait .compliance-trait.compliance-trait)
 
 ;; ---
 ;; @SECTION
@@ -32,6 +33,7 @@
 ;; Allocation percentages (in basis points, 10000 = 100%)
 
 (define-data-var rbac-contract principal .rbac)
+(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
 
 ;; Allocation percentages (in basis points, 10000 = 100%)
 (define-data-var staking-share uint u6000) ;; 60%
@@ -52,9 +54,7 @@
 
 ;; Compliance Check Helper
 (define-private (check-compliance (user principal))
-  (let ((compliance-status (contract-call? .compliance.regulatory-adapter check-clean-hands-compliance
-      user
-    )))
+  (let ((compliance-status (contract-call? (var-get regulatory-adapter-contract) check-clean-hands-compliance user)))
     (if (is-ok compliance-status)
       true
       false
@@ -157,6 +157,14 @@
     (var-set staking-share staking)
     (var-set dev-fund-share dev)
     (var-set insurance-share insurance)
+    (ok true)
+  )
+)
+
+(define-public (set-regulatory-adapter-contract (address principal))
+  (begin
+    (asserts! (is-authorized) ERR_UNAUTHORIZED)
+    (var-set regulatory-adapter-contract address)
     (ok true)
   )
 )

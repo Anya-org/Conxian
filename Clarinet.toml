@@ -46,15 +46,7 @@ address = "ST5K6L7M8N9O0P1Q2R3S4T5U6V7W8X9Y0Z1A2B3C4D5E6"
 
 [contracts.rebalancing-rules]
 path = "contracts/dex/rebalancing-rules.clar"
-address = "ST6L7M8N9O0P1Q2R3S4T5U6V7W8X9Y0Z1A2B3C4D5E6F7"
-
-[contracts.oracle-trait]
-path = "contracts/traits/oracle-trait.clar"
-address = "ST7M8N9O0P1Q2R3S4T5U6V7W8X9Y0Z1A2B3C4D5E6F7G8"
-
-[contracts.pausable-trait]
-path = "contracts/traits/pausable-trait.clar"
-address = "ST8N9O0P1Q2R3S4T5U6V7W8X9Y0Z1A2B3C4D5E6F7G8H9"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.decentralized-trait-registry]
 path = "contracts/decentralized-trait-registry.clar"
@@ -88,7 +80,8 @@ address = "STE4T5U6V7W8X9Y0Z1A2B3C4D5E6F7G8H9I0J1K2L3M4N5"
 
 [contracts.rbac]
 path = "contracts/utils/rbac.clar"
-address = "STN3O4P5Q6R7S8T9U0V1W2X3Y4Z5A6B7C8D9E0F1G2"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = ["core-traits"]
 
 [contracts.core-traits]
 path = "contracts/traits/core-traits.clar"
@@ -163,8 +156,8 @@ depends_on = [ "cxd-token"]
 
 [contracts.regulatory-adapter]
 path = "contracts/compliance/regulatory-adapter.clar"
-address = "ST3R4NQXM850DV58XZG1JJARWA861"
-depends_on = [ "core-traits"]
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = [ "compliance-trait", "sip-standards",]
 
 [contracts.cxs-token]
 path = "contracts/tokens/cxs-token.clar"
@@ -1090,10 +1083,10 @@ path = "contracts/tokens/cxvg-token.clar"
 address = "STB5C6D7E8F9G0H1I2J3K4L5M6N7O8P9Q0R5"
 depends_on = [ "sip-standards", "regulatory-adapter"]
 
-[contracts.agent-risk]
-path = "contracts/governance/agent-risk.clar"
-address = "STY2Z3A4B5C6D7E8F9G0H1I2J3K4L5M6N7O8P9Q0R2"
-depends_on = [ "core-traits", "oracle-pricing", "security-monitoring", "oracle", "rbac", "sbtc-vault", "conxian-protocol"]
+# [contracts.agent-risk]
+# path = "contracts/governance/agent-risk.clar"
+# address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+# depends_on = [ "core-traits", "oracle-pricing", "security-monitoring", "oracle", "rbac", "sbtc-vault", "conxian-protocol",]
 
 [contracts.route-manager]
 path = "contracts/dex/route-manager.clar"
@@ -1184,4 +1177,4 @@ depends_on = [ "core-traits" ]
 [contracts.swap-router]
 path = "contracts/dex/swap-router.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "concentrated-liquidity-pool", "pool-registry" ]
+depends_on = [ "cxd-token", "token-system-coordinator", "regulatory-adapter", "operational-treasury", "sip-standards"]

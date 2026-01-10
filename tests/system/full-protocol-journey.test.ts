@@ -13,13 +13,16 @@ describe("Grand Unified System Journey", () => {
   });
 
   beforeEach(async () => {
-    
     const accounts = simnet.getAccounts();
-    console.log("Available accounts:", [...accounts.keys()]);
     deployer = (accounts.get("deployer") ??
       "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ") as string;
     wallet1 = (accounts.get("wallet_1") ??
       "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5") as string;
+
+    simnet.deployContract("compliance-trait", "contracts/compliance/compliance-trait.clar", null, deployer);
+    simnet.deployContract("sip-standards", "contracts/traits/sip-standards.clar", null, deployer);
+    simnet.deployContract("regulatory-adapter", "contracts/compliance/regulatory-adapter.clar", null, deployer);
+    simnet.callPublicFn("agent-treasury", "set-regulatory-adapter-contract", [Cl.contractPrincipal(deployer, "regulatory-adapter")], deployer);
   });
 
   const tokenCollateral = "mock-token"; // e.g., wBTC

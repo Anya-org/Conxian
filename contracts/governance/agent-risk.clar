@@ -56,7 +56,7 @@
 (define-private (is-authorized (role uint))
   (if (is-eq tx-sender (var-get contract-owner))
     true
-    (contract-call? .rbac has-role tx-sender role)
+    (contract-call? (var-get rbac-contract) rbac-trait.has-role tx-sender role)
   )
 )
 
@@ -107,37 +107,35 @@
   )
   (begin
     (asserts! (is-authorized ROLE_KEEPER) ERR_UNAUTHORIZED)
+
     (let (
-        (sbtc-price (try! (contract-call? .oracle .oracle-trait.get-price sbtc-token)))
-        (btc-price (try! (contract-call? .oracle .oracle-trait.get-price btc-token)))
+        (sbtc-price (try! (contract-call? (var-get oracle-contract) .oracle-trait.get-price sbtc-token)))
+        (btc-price (try! (contract-call? (var-get oracle-contract) .oracle-trait.get-price btc-token)))
         (deviation (if (> sbtc-price btc-price)
           (- sbtc-price btc-price)
           (- btc-price sbtc-price)
         ))
+        ;; Calculate deviation in basis points: (deviation * 10000) / btc-price
         (deviation-bps (/ (* deviation u10000) btc-price))
       )
-    )
-    (if (> deviation-bps (var-get peg-threshold))
-      (begin
-        ;; Trigger Emergency Pause on sBTC Vault and Protocol
-        ;; We use a hardcoded reference or a lookup in a real system.
-        ;; For Tier 0, we target the critical vault.
-        (try! (contract-call? (var-get sbtc-vault-contract)
-          .circuit-breaker-trait.set-contract-paused true
-        ))
-        (try! (contract-call? (var-get conxian-protocol-contract)
-          .circuit-breaker-trait.set-contract-paused true
-        ))
+      (if (> deviation-bps (var-get peg-threshold))
+        (begin
+          ;; Trigger Emergency Pause on sBTC Vault and Protocol
+          ;; We use a hardcoded reference or a lookup in a real system.
+          ;; For Tier 0, we target the critical vault.
+          (try! (contract-call? (var-get sbtc-vault-contract) .circuit-breaker-trait.set-contract-paused true))
+          (try! (contract-call? (var-get conxian-protocol-contract) .circuit-breaker-trait.set-contract-paused true))
 
-        (print {
-          event: "peg-loss-detected",
-          sbtc: sbtc-price,
-          btc: btc-price,
-          deviation: deviation-bps,
-        })
-        (err ERR_PEG_LOSS)
+          (print {
+            event: "peg-loss-detected",
+            sbtc: sbtc-price,
+            btc: btc-price,
+            deviation: deviation-bps,
+          })
+          (err ERR_PEG_LOSS)
+        )
+        (ok true)
       )
-      (ok true)
     )
   )
 )

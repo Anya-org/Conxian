@@ -1,12 +1,11 @@
 import { defineConfig } from "vitest/config";
-import { vitestSetupFilePath } from "@stacks/clarinet-sdk/vitest";
 
 export default defineConfig({
   test: {
     environment: "node",
-    setupFiles: ["./tests/setup-test-env.ts", vitestSetupFilePath],
+    setupFiles: ["./tests/vitest.setup.ts"],
     env: {
-      CLARINET_MANIFEST_PATH: "./Clarinet.toml",
-    },
+        CLARINET_MANIFEST_PATH: "./Clarinet.toml"
+    }
   },
 });

@@ -1,11 +1,7 @@
-import { initSimnet, Simnet } from '@stacks/clarinet-sdk';
+import { initSimnet } from '@stacks/clarinet-sdk';
 
-const manifestPath = process.env.CLARINET_MANIFEST_PATH || "./Clarinet.toml";
-
-const simnet = await initSimnet(manifestPath);
-
-declare global {
-  var simnet: Simnet;
+export async function setup() {
+    const manifestPath = process.env.CLARINET_MANIFEST_PATH!;
+    const simnet = await initSimnet(manifestPath);
+    return { simnet };
 }
-
-globalThis.simnet = simnet;
