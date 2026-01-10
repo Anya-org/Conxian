@@ -107,8 +107,7 @@
   )
   (begin
     (asserts! (is-authorized ROLE_KEEPER) ERR_UNAUTHORIZED)
-    (let 
-      (
+    (let (
         (sbtc-price (try! (contract-call? .oracle .oracle-trait.get-price sbtc-token)))
         (btc-price (try! (contract-call? .oracle .oracle-trait.get-price btc-token)))
         (deviation (if (> sbtc-price btc-price)
@@ -117,27 +116,31 @@
         ))
         (deviation-bps (/ (* deviation u10000) btc-price))
       )
-      )
-      (if (> deviation-bps (var-get peg-threshold))
-        (begin
-          ;; Trigger Emergency Pause on sBTC Vault and Protocol
-          ;; We use a hardcoded reference or a lookup in a real system.
-          ;; For Tier 0, we target the critical vault.
-          (try! (contract-call? (var-get sbtc-vault-contract) .circuit-breaker-trait.set-contract-paused true))
-          (try! (contract-call? (var-get conxian-protocol-contract) .circuit-breaker-trait.set-contract-paused true))
+    )
+    (if (> deviation-bps (var-get peg-threshold))
+      (begin
+        ;; Trigger Emergency Pause on sBTC Vault and Protocol
+        ;; We use a hardcoded reference or a lookup in a real system.
+        ;; For Tier 0, we target the critical vault.
+        (try! (contract-call? (var-get sbtc-vault-contract)
+          .circuit-breaker-trait.set-contract-paused true
+        ))
+        (try! (contract-call? (var-get conxian-protocol-contract)
+          .circuit-breaker-trait.set-contract-paused true
+        ))
 
-          (print {
-            event: "peg-loss-detected",
-            sbtc: sbtc-price,
-            btc: btc-price,
-            deviation: deviation-bps,
-          })
-          (err ERR_PEG_LOSS)
-        )
-        (ok true)
+        (print {
+          event: "peg-loss-detected",
+          sbtc: sbtc-price,
+          btc: btc-price,
+          deviation: deviation-bps,
+        })
+        (err ERR_PEG_LOSS)
       )
+      (ok true)
     )
   )
+)
 
 ;; @desc The core autonomous function of the CRO. A keeper calls this function to check
 ;; the price volatility of a given asset. If the volatility exceeds the threshold,

@@ -163,13 +163,6 @@ plan:
             anchor-block-only: true
             clarity-version: 1
         - contract-publish:
-            contract-name: block-automation-manager-old
-            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 0
-            path: "contracts\\automation\\block-automation-manager-old.clar"
-            anchor-block-only: true
-            clarity-version: 1
-        - contract-publish:
             contract-name: bond-factory
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 16600

@@ -19,7 +19,7 @@ plan:
             contract-name: governance-token
             expected-sender: STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ
             cost: 10000
-            path: "contracts/governance/governance-token.clar"
+            path: "contracts/governance-token.clar"
             anchor-block-only: true
             clarity-version: 3
             epoch: "3.0"
