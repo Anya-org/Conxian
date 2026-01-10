@@ -4,6 +4,7 @@
 
 ;; Traits
 (use-trait rbac-trait .core-traits.rbac-trait)
+(use-trait admin-facade-trait .core-traits.admin-facade-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))
@@ -330,5 +331,5 @@
 )
 
 (define-private (is-valid-principal (principal principal))
-  (is-eq (len (principal-to-buff? principal)) u33)
+  (is-eq (len (unwrap! (principal-to-buff? principal) (err u100))) u33)
 )

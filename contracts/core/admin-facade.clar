@@ -16,7 +16,8 @@
 (define-constant ROLE_PROTOCOL_ADMIN u2)
 (define-constant ROLE_TREASURY_ADMIN u3)
 
-;; Data Vars
+;; State
+(define-data-var rbac-contract principal .rbac)
 (define-data-var global-admin principal tx-sender)
 (define-data-var emergency-pause bool false)
 (define-data-var max-batch-size uint u100)
@@ -27,22 +28,49 @@
   bool
 )
 
-;; Admin Operations Batch Type (inline tuple definition)
-;; Note: define-type is not available in Clarity 4, using inline tuples
-
-;; Ultra-Low Gas Role Checking
-(define-read-only (has-role (user principal) (role uint))
-  (default-to false (map-get? role-cache { user: user, role: role }))
+;; Authorization
+(define-private (has-role (role uint))
+  (contract-call? (var-get rbac-contract) has-role tx-sender role)
 )
 
-;; Role Update Function (for batch operations)
-(define-public (update-role (user principal) (role uint) (active bool))
+(define-read-only (is-global-admin)
+  (is-eq tx-sender (var-get global-admin))
+)
+
+;; Core Functions
+
+;; @desc Pause a contract (emergency only)
+(define-public (pause-contract (target principal))
   (begin
-    (asserts! (is-global-admin) ERR_UNAUTHORIZED)
-    (if active
-      (map-set role-cache { user: user, role: role } true)
-      (map-delete role-cache { user: user, role: role })
-    )
+    (asserts! (has-role ROLE_EMERGENCY_PAUSE) ERR_UNAUTHORIZED)
+    (try! (contract-call? target set-paused true))
+    (ok true)
+  )
+)
+
+;; @desc Unpause a contract
+(define-public (unpause-contract (target principal))
+  (begin
+    (asserts! (has-role ROLE_GLOBAL_ADMIN) ERR_UNAUTHORIZED)
+    (try! (contract-call? target set-paused false))
+    (ok true)
+  )
+)
+
+;; @desc Update RBAC role for a principal
+(define-public (set-role (user principal) (role uint) (enabled bool))
+  (begin
+    (asserts! (has-role ROLE_GLOBAL_ADMIN) ERR_UNAUTHORIZED)
+    (try! (contract-call? (var-get rbac-contract) set-role user role enabled))
+    (ok true)
+  )
+)
+
+;; @desc Set the RBAC contract address
+(define-public (set-rbac-contract (new-contract principal))
+  (begin
+    (asserts! (has-role ROLE_GLOBAL_ADMIN) ERR_UNAUTHORIZED)
+    (var-set rbac-contract new-contract)
     (ok true)
   )
 )
@@ -100,10 +128,6 @@
 )
 
 ;; Global Admin Management
-(define-read-only (is-global-admin)
-  (is-eq tx-sender (var-get global-admin))
-)
-
 (define-public (set-global-admin (new-admin principal))
   (begin
     (asserts! (is-global-admin) ERR_UNAUTHORIZED)
@@ -190,5 +214,5 @@
 
 ;; Utility Functions
 (define-private (is-valid-principal (principal principal))
-  (is-eq (len (principal-to-buff? principal)) u33)
+  (is-eq (len (principal-to-buff principal)) u33)
 )
