@@ -101,7 +101,7 @@
         ;; In production, validate `amount <= emission_rate * delta_blocks * weight / total_weight`
         
         ;; Mint via Coordinator (Minting CXVG Governance Token)
-        (try! (contract-call? (var-get token-system-coordinator-contract) mint-cxvg
+        (try! (contract-call? .token-system-coordinator mint-cxvg
             amount recipient
         ))
         

@@ -14,7 +14,7 @@
 (define-data-var nakamoto-constants-contract principal .nakamoto-constants)
 
 (define-read-only (get-vesting-duration)
-  (contract-call? (var-get nakamoto-constants-contract) get-blocks-per-year)
+  (contract-call? .nakamoto-constants get-blocks-per-year)
 )
 
 (define-map allocations
@@ -37,6 +37,7 @@
     (asserts! (is-eq tx-sender (unwrap-panic (contract-call? (var-get conxian-protocol-contract) get-admin)))
       ERR_UNAUTHORIZED
     )
+    (try! (contract-call? token transfer amount tx-sender (as-contract tx-sender) none))
     (try! (contract-call? token transfer amount tx-sender (as-contract tx-sender) none))
     (map-set allocations {
       beneficiary: beneficiary,

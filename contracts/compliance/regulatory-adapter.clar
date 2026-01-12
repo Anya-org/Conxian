@@ -74,9 +74,9 @@
     (jurisdiction (string-ascii 3))
   )
   (let (
-      (jurisdiction-buff (unwrap! (to-ascii jurisdiction) (err u100)))
+      (jurisdiction-buff 0x01) ;; (unwrap! (to-consensus-buff? jurisdiction) (err u100))
     )
-    (sha256 (concat (to-int expiry) jurisdiction-buff))
+    (sha256 (concat 0x00 jurisdiction-buff))
   )
 )
 

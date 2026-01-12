@@ -182,18 +182,21 @@
   (begin
     ;; Process all assets in single transaction
     (fold
-      (lambda (asset-price-confidence result)
+      (lambda (entry result)
         (let (
-            (asset (get 0 asset-price-confidence))
-            (price (get 1 asset-price-confidence))
-            (confidence (get 2 asset-price-confidence))
+            (asset (get a entry))
+            (data (get b entry))
+            (price (get a data))
+            (confidence (get b data))
           )
-          ;; Return the accumulator (result) unchanged
-          result
+          (begin
+            (unwrap-panic (update-price-feed asset price confidence))
+            result
+          )
         )
       )
-      (ok u0)
       (zip assets (zip prices confidences))
+      (ok u0)
     )
   )
 )

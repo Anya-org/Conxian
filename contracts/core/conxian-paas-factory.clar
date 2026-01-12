@@ -53,7 +53,7 @@
 
     ;; 2. Compliance Check (Deployer must be Clean-Hands)
     (asserts!
-      (is-ok (contract-call? (var-get regulatory-adapter-contract) check-clean-hands-compliance deployer))
+      (is-ok (contract-call? .regulatory-adapter check-clean-hands-compliance deployer))
       ERR_UNAUTHORIZED
     )
 

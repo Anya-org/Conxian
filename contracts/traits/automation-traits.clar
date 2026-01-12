@@ -1,12 +1,12 @@
 ;; automation-traits.clar
 ;; Traits for Automation Systems (Keepers, etc.)
 
-(define-trait keeper-trait (
-  (check-upkeep
+(define-trait office-job-trait (
+  (check-work-needed
     ()
     (response bool uint)
   )
-  (perform-upkeep
+  (do-work
     ((buff 2048))
     (response bool uint)
   )

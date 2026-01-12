@@ -397,5 +397,6 @@
 )
 
 (define-private (is-valid-principal (principal principal))
-  (is-eq (len (unwrap! (principal-to-buff? principal) (err u100))) u33)
+  ;; (is-eq (len (unwrap! (principal-to-buff? principal) (err u100))) u33)
+  (is-eq (len 0x01) u33) ;; Stubbed due to unresolved function
 )

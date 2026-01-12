@@ -34,7 +34,7 @@
 ;; @param user: The principal of the user to check.
 ;; @returns bool
 (define-private (check-compliance (user principal))
-  (is-ok (contract-call? (var-get regulatory-adapter-contract) check-clean-hands-compliance user))
+  (is-ok (contract-call? .regulatory-adapter check-clean-hands-compliance user))
 )
 
 ;; --- Internal Guards ---
@@ -43,9 +43,9 @@
 ;; @returns (response bool)
 (define-private (guard-entry)
   (begin
-    (try! (contract-call? (var-get block-utils-contract) check-finality))
+    (try! (contract-call? .block-utils check-finality))
 (asserts!
-      (not (unwrap-panic (contract-call? (var-get conxian-protocol-contract) is-paused)))
+      (not (unwrap-panic (contract-call? .conxian-protocol is-paused)))
       ERR_CONTRACT_PAUSED
     )
     (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
@@ -86,14 +86,14 @@
   )
   (begin
     (try! (guard-entry))
-    (let ((position-manager (get-module-contract "position-manager"))
-          (result (contract-call? position-manager open-position tx-sender token amount
+    (let ((position-manager .position-manager)
+          (result (contract-call? .position-manager open-position tx-sender token amount
               leverage long
             )))
       (print {
         event: "facade-open-position",
         sender: tx-sender,
-        tenure-id: (contract-call? (var-get block-utils-contract) get-current-tenure-id),
+        tenure-id: (contract-call? .block-utils get-current-tenure-id),
       })
       result
     )
@@ -112,9 +112,7 @@
   )
   (begin
     (try! (guard-entry))
-    (let ((position-manager (get-module-contract "position-manager")))
-      (contract-call? position-manager close-position tx-sender position-id)
-    )
+    (contract-call? .position-manager close-position tx-sender position-id)
   )
 )
 
@@ -130,9 +128,7 @@
   )
   (begin
     (try! (guard-entry))
-    (let ((collateral-manager (get-module-contract "collateral-manager")))
-      (contract-call? collateral-manager deposit-funds amount token)
-    )
+    (contract-call? .collateral-manager deposit-funds amount token)
   )
 )
 
@@ -146,9 +142,7 @@
   )
   (begin
     (try! (guard-entry))
-    (let ((collateral-manager (get-module-contract "collateral-manager")))
-      (contract-call? collateral-manager withdraw-funds amount token)
-    )
+    (contract-call? .collateral-manager withdraw-funds amount token)
   )
 )
 
@@ -158,9 +152,7 @@
 ;; @param position-id: The ID of the position to check.
 ;; @returns (response uint) The health factor of the position.
 (define-public (check-position-health (position-id uint))
-  (let ((risk-manager (get-module-contract "risk-manager")))
-    (contract-call? risk-manager get-health-factor position-id)
-  )
+    (contract-call? .risk-manager get-health-factor position-id)
 )
 
 ;; @desc Liquidates an unhealthy position by delegating to the risk manager.
@@ -169,9 +161,7 @@
 (define-public (liquidate-position (position-id uint))
   (begin
     (try! (contract-call? .block-utils check-finality))
-    (let ((risk-manager (get-module-contract "risk-manager")))
-      (contract-call? risk-manager liquidate position-id)
-    )
+    (contract-call? .risk-manager liquidate position-id)
   )
 )
 

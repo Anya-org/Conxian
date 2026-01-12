@@ -23,7 +23,7 @@
 
 ;; Compliance
 (define-private (check-compliance (user principal))
-  (let ((compliance-status (contract-call? (var-get regulatory-adapter-contract) check-clean-hands-compliance user)))
+  (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
     (if (is-ok compliance-status)
       true
       false
@@ -41,7 +41,7 @@
 
 (define-read-only (get-buy-quote (amount-cxd uint))
   (let (
-      (supply (unwrap-panic (contract-call? (var-get cxd-token-contract) get-total-supply)))
+      (supply (unwrap-panic (contract-call? .cxd-token get-total-supply)))
       (price-start (get-price supply))
       (price-end (get-price (+ supply amount-cxd)))
       (average-price (/ (+ price-start price-end) u2))
@@ -54,7 +54,7 @@
 
 (define-read-only (get-sell-quote (amount-cxd uint))
   (let (
-      (supply (unwrap-panic (contract-call? (var-get cxd-token-contract) get-total-supply)))
+      (supply (unwrap-panic (contract-call? .cxd-token get-total-supply)))
       (price-start (get-price supply))
       (price-end (get-price (- supply amount-cxd)))
       (average-price (/ (+ price-start price-end) u2))
@@ -92,7 +92,7 @@
 
     ;; Mint CXD via Coordinator
     ;; Coordinator must have authorized this contract as a minter
-    (try! (contract-call? (var-get token-system-coordinator-contract) mint-cxd
+    (try! (contract-call? .token-system-coordinator mint-cxd
       amount-cxd buyer
     ))
 
@@ -119,7 +119,7 @@
     (asserts! (>= quote min-receive-stx) ERR_SLIPPAGE)
 
     ;; Burn CXD
-    (try! (contract-call? (var-get token-system-coordinator-contract) burn-cxd
+    (try! (contract-call? .token-system-coordinator burn-cxd
       amount-cxd seller
     ))
 

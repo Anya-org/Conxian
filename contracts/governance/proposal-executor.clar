@@ -105,6 +105,9 @@
       (try! (contract-call? proposal-contract execute tx-sender))
 
       ;; Mark as executed in registry
+      (try! (contract-call? (var-get proposal-registry-contract) set-executed
+        proposal-id
+      ))
       (try! (contract-call? (var-get proposal-registry-contract) set-executed proposal-id))
 
       (print {

@@ -44,8 +44,8 @@
     ;; Use centralized admin facade for ultra-low gas authorization
     (asserts!
       (or
-        (contract-call? (var-get admin-facade-contract) is-global-admin)
-(contract-call? (var-get admin-facade-contract) has-role tx-sender
+        (contract-call? .admin-facade is-global-admin)
+(contract-call? .admin-facade has-role tx-sender
           ROLE_EMERGENCY_PAUSE
         )
       )
@@ -71,7 +71,7 @@
   )
   (begin
     (asserts!
-      (contract-call? (var-get admin-facade-contract) has-role tx-sender
+      (contract-call? .admin-facade has-role tx-sender
         ROLE_PROTOCOL_ADMIN
       )
       ERR_UNAUTHORIZED
@@ -95,7 +95,7 @@
   (let ((module (unwrap! (map-get? modules { name: name }) ERR_MODULE_NOT_FOUND)))
     (begin
       (asserts!
-        (contract-call? (var-get admin-facade-contract) has-role tx-sender
+        (contract-call? .admin-facade has-role tx-sender
           ROLE_PROTOCOL_ADMIN
         )
         ERR_UNAUTHORIZED
@@ -109,7 +109,7 @@
 ;; Admin Handover
 (define-public (set-contract-owner (new-owner principal))
   (begin
-    (asserts! (contract-call? (var-get admin-facade-contract) is-global-admin)
+    (asserts! (contract-call? .admin-facade is-global-admin)
       ERR_UNAUTHORIZED
     )
     (var-set contract-owner new-owner)

@@ -58,10 +58,10 @@
   )
   (let (
       (pool-id (+ (var-get pool-nonce) u1))
-      (tenure-id (contract-call? (var-get block-utils-contract) get-current-tenure-id))
+      (tenure-id (contract-call? .block-utils get-current-tenure-id))
     )
     (asserts!
-      (not (contract-call? (var-get conxian-protocol-contract) is-paused))
+      (not (contract-call? .conxian-protocol is-paused))
       ERR_UNAUTHORIZED
     )
     ;; Restrict to Factory
@@ -99,8 +99,8 @@
     (token0 <ft-trait>)
     (token1 <ft-trait>)
   )
-  (let ((tenure-id (contract-call? (var-get block-utils-contract) get-current-tenure-id)))
-    (asserts! (not (contract-call? (var-get conxian-protocol-contract) is-paused)) ERR_UNAUTHORIZED)
+  (let ((tenure-id (contract-call? .block-utils get-current-tenure-id)))
+    (asserts! (not (contract-call? .conxian-protocol is-paused)) ERR_UNAUTHORIZED)
     ;; Logic: Transfer tokens from recipient, update reserves
     (print {
       event: "mint",
@@ -120,7 +120,7 @@
     (token-out <ft-trait>)
   )
   (begin
-    (asserts! (not (contract-call? (var-get conxian-protocol-contract) is-paused)) ERR_UNAUTHORIZED)
+    (asserts! (not (contract-call? .conxian-protocol is-paused)) ERR_UNAUTHORIZED)
     (ok amount-in)
   )
 )

@@ -21,11 +21,9 @@
         ;; Only the Sentinel role or DAO can call this
         (asserts! (or 
             (is-eq tx-sender
-                (unwrap-panic (contract-call? (var-get conxian-protocol-contract) get-admin))
+                (unwrap-panic (contract-call? .conxian-protocol get-admin))
             )
-            (contract-call? (var-get rbac-contract) has-role tx-sender
-                ROLE_SENTINEL
-            )
+            (contract-call? .rbac has-role tx-sender ROLE_SENTINEL)
         ) ERR_UNAUTHORIZED)
         
         (var-set system-alert-level level)
@@ -35,12 +33,12 @@
             event: "system-alert-pushed",
             level: level,
             message: message,
-            tenure-id: (contract-call? (var-get block-utils-contract) get-current-tenure-id)
+            tenure-id: (contract-call? .block-utils get-current-tenure-id)
         })
         
         ;; If emergency, trigger protocol-wide pause
         (if (>= level u2)
-            (contract-call? (var-get conxian-protocol-contract) set-paused true)
+            (contract-call? .conxian-protocol set-paused true)
             (ok true)
         )
     )

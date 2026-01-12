@@ -30,7 +30,7 @@
         ;; This single call fetches both the pause status and tenure ID,
         ;; reducing cross-contract calls from two to one. This saves ~15%
         ;; on read operations for this function.
-        (let ((protocol-status (try! (contract-call? (var-get conxian-protocol-contract) get-protocol-status))))
+        (let ((protocol-status (try! (contract-call? .conxian-protocol get-protocol-status))))
             (asserts! (not (get paused protocol-status)) (err u1001))
 
             ;; 2. Pull tokens from user

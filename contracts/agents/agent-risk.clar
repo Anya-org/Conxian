@@ -2,6 +2,8 @@
 (use-trait rbac-trait .core-traits.rbac-trait)
 
 (impl-trait .dimensional-traits.risk-manager-trait)
+(impl-trait .automation-traits.office-job-trait)
+(use-trait office-job-trait .automation-traits.office-job-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u1001))
 (define-constant ERR_INVALID_PARAMETERS (err u1005))
@@ -151,4 +153,34 @@
 
 (define-public (vote-on-solvency)
   (ok true)
+)
+
+;; --- Office Worker Implementation ---
+
+(define-public (check-work-needed)
+  (begin
+    ;; In a real implementation, this would iterate over a registry of open positions.
+    ;; For now, we return none as we don't have an iterable list of positions in this contract state.
+    ;; This is a placeholder to satisfy the trait.
+    (ok none)
+  )
+)
+
+(define-public (do-work (job-data (buff 2048)))
+  (let (
+      (position-id (buff-to-uint-be job-data))
+      ;; Check work needed logic would go here to validate
+    )
+    (begin
+      ;; Call the internal liquidation
+      ;; We don't have a private liquidate function, so we call the public one? 
+      ;; Or we assume do-work IS the liquidation trigger.
+      ;; Let's assume we call liquidate-position.
+      (try! (liquidate-position (unwrap-panic position-id) tx-sender))
+      
+      ;; Payout
+      ;; We assume the job pays 5 uSTX for now (placeholder)
+      (contract-call? .office-manager payout tx-sender u5)
+    )
+  )
 )

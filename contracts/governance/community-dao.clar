@@ -47,7 +47,7 @@
 ;; Authorization
 (define-private (check-compliance (user principal))
   (let (
-      (compliance-status (contract-call? (var-get regulatory-adapter-contract) check-clean-hands-compliance user))
+      (compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user))
     )
     (if (is-ok compliance-status)
       true

@@ -87,6 +87,9 @@
     (asserts! (> weighted-voter-power u0) ERR_UNAUTHORIZED)
 
     ;; Update activity score
+    (asserts! (contract-call? .conxian-protocol is-module-active "governance")
+      ERR_UNAUTHORIZED
+    )
     (try! (contract-call? (var-get reputation-engine-contract) update-activity-score
       tx-sender
     ))
@@ -106,7 +109,7 @@
     (proposal-id uint)
     (proposal-contract <proposal-trait>)
   )
-  (contract-call? (var-get proposal-executor-contract) execute proposal-id
+  (contract-call? .proposal-executor execute proposal-id
     proposal-contract u5000
   )
   ;; 50% quorum hardcoded for now

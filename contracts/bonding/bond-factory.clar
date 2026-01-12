@@ -45,7 +45,7 @@
   (begin
     ;; Check compliance first
     (asserts!
-      (is-ok (contract-call? (var-get regulatory-adapter-contract)
+      (is-ok (contract-call? .regulatory-adapter
         check-clean-hands-compliance
         user
       ))

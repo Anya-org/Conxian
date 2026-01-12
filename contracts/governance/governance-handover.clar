@@ -34,7 +34,7 @@
       ;; For this aggregator, we might need explicit checks if they don't share a trait.
       ;; However, we added 'get-contract-owner' to the agents.
       ;; We will use a try! to catch failures if function doesn't exist (though it should).
-      (owner (unwrap-panic (contract-call? (var-get conxian-access-contract) get-contract-owner)))
+      (owner (unwrap-panic (contract-call? .conxian-access get-contract-owner)))
     )
     ;; Real implementation requires explicit calls or a trait. 
     ;; Since lists in Clarity are strict, we'll implement an explicit check function.
@@ -52,6 +52,8 @@
       (reg-owner (unwrap-panic (contract-call? (var-get regulatory-adapter-contract) get-contract-owner)))
       (access-owner (unwrap-panic (contract-call? (var-get conxian-access-contract) get-contract-owner)))
     )
+    (asserts! (contract-call? .admin-facade is-global-admin) ERR_NOT_AUTHORIZED) ;; Added this line based on the instruction's context.
+
     ;; Check Conxian Protocol
     (asserts! (is-eq protocol-owner TARGET_OWNER)
       (err {
