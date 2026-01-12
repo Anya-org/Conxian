@@ -3,55 +3,51 @@
 ;; Handles Governance Alerts, Circuit Breakers, and System Health
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u7200))
-(define-constant ROLE_SENTINEL u5)
 
-;; Contract Principals
-(define-data-var conxian-protocol-contract principal .conxian-protocol)
-(define-data-var rbac-contract principal .rbac)
+;; Constants
+(define-constant ERR_UNAUTHORIZED (err u6200))
+(define-constant ERR_NO_PRICE (err u6201))
+(define-constant ERR_CONFIDENCE_TOO_LOW (err u6202))
+
 (define-data-var block-utils-contract principal .block-utils)
 
 ;; State
-(define-data-var system-alert-level uint u0) ;; 0 = Normal, 1 = Caution, 2 = Emergency
-(define-data-var last-alert-message (string-ascii 64) "Status: Green")
 
-;; @desc Pushes a system-wide alert signal (Simulating Switchboard intelligence)
-(define-public (push-system-alert (level uint) (message (string-ascii 64)))
-    (begin
-        ;; Only the Sentinel role or DAO can call this
-        (asserts! (or 
-            (is-eq tx-sender
-                (unwrap-panic (contract-call? .conxian-protocol get-admin))
-            )
-            (contract-call? .rbac has-role tx-sender ROLE_SENTINEL)
-        ) ERR_UNAUTHORIZED)
-        
-        (var-set system-alert-level level)
-        (var-set last-alert-message message)
-        
-        (print {
-            event: "system-alert-pushed",
-            level: level,
-            message: message,
-            tenure-id: (contract-call? .block-utils get-current-tenure-id)
-        })
-        
-        ;; If emergency, trigger protocol-wide pause
-        (if (>= level u2)
-            (contract-call? .conxian-protocol set-paused true)
-            (ok true)
-        )
+;; Price Storage
+(define-map switchboard-feeds
+    principal ;; Asset
+    {
+        price: uint,
+        confidence: uint,
+        timestamp: uint
+    }
+)
+
+;; Read-only: Get Price
+(define-public (get-price (asset principal))
+    (let (
+        (feed (unwrap! (map-get? switchboard-feeds asset) (err ERR_NO_PRICE)))
+    )
+        (asserts! (>= (get confidence feed) (var-get min-confidence)) (err ERR_CONFIDENCE_TOO_LOW))
+        (ok (get price feed))
     )
 )
 
-;; Read Only
-(define-read-only (get-alert-status)
-    (ok {
-        level: (var-get system-alert-level),
-        message: (var-get last-alert-message)
-    })
+;; Admin: Update Price with Confidence
+(define-public (update-price (asset principal) (price uint) (confidence uint))
+    (begin
+        (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
+        (map-set switchboard-feeds asset {
+            price: price,
+            confidence: confidence,
+            timestamp: block-height
+        })
+        (print { event: "switchboard-price-update", asset: asset, price: price, confidence: confidence })
+        (ok true)
+    )
 )
 
+;; Read-only: Get Name
 (define-read-only (get-name)
-    (ok "Switchboard-System-Sentinel")
+    (ok "Switchboard-Adapter")
 )

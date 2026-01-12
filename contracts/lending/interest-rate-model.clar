@@ -3,3 +3,4 @@
 (define-read-only (stub-func)
   (ok true)
 )
+)

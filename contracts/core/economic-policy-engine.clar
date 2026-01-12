@@ -20,6 +20,10 @@
 (define-data-var current-interest-rate uint BASE_RATE)
 (define-data-var collateral-factor uint MIN_COLLATERAL_FACTOR)
 (define-data-var last-price-update uint block-height)
+(define-data-var treasury-address principal tx-sender)
+
+;; Subscription State
+(define-map subscribers principal bool)
 
 ;; Efficient Storage - Map for O(1) lookups
 (define-map asset-prices
@@ -144,9 +148,30 @@
   )
 )
 
+;; Subscription Management
+(define-public (subscribe)
+  (begin
+    ;; Payment to treasury
+    (try! (stx-transfer? SUBSCRIPTION_COST tx-sender (var-get treasury-address)))
+    
+    ;; Grant subscription
+    (map-set subscribers tx-sender true)
+    
+    (print { event: "subscription-activated", subscriber: tx-sender })
+    (ok true)
+  )
+)
+
+(define-read-only (is-subscribed (user principal))
+  (default-to false (map-get? subscribers user))
+)
+
 ;; Automated Monetary Fund Operations
 (define-public (auto-adjust-parameters (asset principal))
   (begin
+    ;; Subscription Gate
+    (asserts! (is-subscribed tx-sender) ERR_NO_SUBSCRIPTION)
+    
     ;; Check if price is stale
     (match (map-get? asset-prices asset)
       price-data

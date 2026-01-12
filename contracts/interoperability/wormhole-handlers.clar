@@ -1,4 +1,17 @@
-;; Tier 0 Stub
+;; --- Error Definitions ---
 (define-constant ERR_NOT_IMPLEMENTED (err u9999))
-(define-read-only (stub-func) (ok true))
 
+;; --- Protocol Configuration ---
+(define-constant BRIDGE_FEE u1000)
+
+;; --- Read-Only API ---
+
+;; @desc Returns the current bridge fee for cross-chain operations
+(define-read-only (get-bridge-fee)
+    (ok BRIDGE_FEE)
+)
+
+;; @desc Tier 0 operational heartbeat for the sovereign handler
+(define-read-only (is-operational)
+    (ok true)
+)

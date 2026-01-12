@@ -448,17 +448,11 @@ address = "STX3M4N5O6P7Q8R9S0T1U2V3W4X5Y6Z7A8B9C0D1E2F3G4"
 path = "contracts/core/tier-manager.clar"
 address = "STE0T1U2V3W4X5Y6Z7A8B9C0D1E2F3G4H5I6J7K8L9M0N1"
 
-[contracts.conxian-gatekeeper]
-path = "contracts/core/conxian-gatekeeper.clar"
-address = "STF1U2V3W4X5Y6Z7A8B9C0D1E2F3G4H5I6J7K8L9M0N1O2"
 
 [contracts.conxian-exit-queue]
 path = "contracts/core/conxian-exit-queue.clar"
 address = "STJ2V3W4X5Y6Z7A8B9C0D1E2F3G4H5I6J7K8L9M0N1O2P3"
 
-[contracts.conxian-token-factory]
-path = "contracts/core/conxian-token-factory.clar"
-address = "STK3W4X5Y6Z7A8B9C0D1E2F3G4H5I6J7K8L9M0N1O2P3Q4"
 
 [contracts.identity-badge]
 path = "contracts/identity/identity-badge.clar"
@@ -1119,8 +1113,14 @@ address = "STI7P8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D1E2F3G4H5I6"
 depends_on = [ "sip-standards", "nakamoto-constants", "conxian-protocol"]
 
 [contracts.agent-treasury]
-path = "contracts/governance/agent-treasury.clar"
-address = "STZ3A4B5C6D7E8F9G0H1I2J3K4L5M6N7O8P9Q0R3"
+path = "contracts/agents/agent-treasury.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = [ "office-manager", "automation-traits" ]
+
+[contracts.agent-risk]
+path = "contracts/agents/agent-risk.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = [ "office-manager", "automation-traits", "conxian-protocol", "dimensional-traits" ]
 
 [contracts.proposal-executor]
 path = "contracts/governance/proposal-executor.clar"
@@ -1170,10 +1170,6 @@ depends_on = [ "cxd-token", "token-system-coordinator", "regulatory-adapter", "o
 path = "contracts/core/admin-facade.clar"
 depends_on = [ "core-traits" ]
 
-[contracts.batch-operations]
-path = "contracts/core/batch-operations.clar"
-clarity-version = 3
-depends_on = [ "core-traits" ]
 
 [contracts.swap-router]
 path = "contracts/dex/swap-router.clar"
@@ -1184,3 +1180,7 @@ depends_on = [ "cxd-token", "token-system-coordinator", "regulatory-adapter", "o
 path = "contracts/automation/office-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = [ "rbac" ]
+
+[contracts.pausable-trait]
+path = "contracts/traits/pausable-trait.clar"
+address = "STP1Q2R3S4T5U6V7W8X9Y0Z1A2B3C4D5E6F7G8H9I0"

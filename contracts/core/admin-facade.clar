@@ -177,10 +177,10 @@
 
     ;; Correctly process each role update using fold
     (fold
-      (lambda (update result) ;; Corrected fold order: update then result/accumulator
+      (lambda (update result)
+        ;; Corrected fold order: update then result/accumulator
         (match result
-          ok-val
-          (if (get active update)
+          ok-val (if (get active update)
             (contract-call? .rbac grant-role (get user update) (get role update))
             (contract-call? .rbac revoke-role (get user update) (get role update))
           )

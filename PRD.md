@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary
 
-Conxian is a Bitcoin-anchored DeFi protocol built on Stacks, following the Nakamoto consensus model. It provides a comprehensive suite of financial primitives including DEX operations, lending, vaults, and governance while maintaining Bitcoin finality as the root of truth.
+Conxian is a **Sovereign Autonomous Business (SAB)** operating on the Stacks blockchain with Bitcoin finality via Nakamoto consensus. The protocol implements a full **Everything-as-a-Service (XAAS)** model, providing autonomous DeFi primitives (DEX, Lending, Vaults), multi-council governance, and monetized services. The system generates revenue through subscription fees, transaction fees, and protocol operations, distributing it autonomously via smart contracts.
 
 ## 2. Core Architecture
 
@@ -54,7 +54,22 @@ All traits must be defined in `/contracts/traits/` with standardized naming:
 - `10-math-utilities.clar` - math, fixed-point
 - `11-vault-traits.clar` - vault, custody, fee-manager
 
-### 3.3. Error Handling
+### 3.3. Sovereign Autonomous Business (SAXAAS) Model
+
+**Vision**: Conxian operates as a fully autonomous on-chain organization that:
+1. **Generates Revenue**: Via subscription fees, transaction fees, and service charges
+2. **Distributes Revenue**: Autonomously splits revenue (60% Staking, 20% Dev, 20% Insurance)
+3. **Self-Governs**: Multi-council DAO with on-chain proposal execution
+4. **Self-Operates**: Office Worker system for autonomous liquidations and treasury ops
+
+**Current Implementation Status**:
+- ✅ **Revenue Generation**: `economic-policy-engine` requires subscription (1 STX)
+- ✅ **Revenue Distribution**: `revenue-distributor` implements 60/20/20 split
+- ✅ **Multi-Council Governance**: 10 governance contracts (treasury, emergency, vesting, etc.)
+- ✅ **Office Workers**: `office-manager`, `agent-risk`, `agent-treasury` for automation
+- ✅ **Oracle Infrastructure**: 7 oracle adapters (Chainlink, Pyth, Redstone, DIA, Switchboard, Federated, TWAP)
+
+### 3.4. Error Handling
 Standardized error codes from `trait-errors.clar`:
 - `u1001` - Unauthorized
 - `u1002` - Insufficient funds
@@ -64,16 +79,27 @@ Standardized error codes from `trait-errors.clar`:
 
 ## 4. Feature Requirements
 
-### 4.1. Core Features
-- [x] Token swaps (DEX)
-- [x] Liquidity provision
-- [x] Lending and borrowing
-- [x] Vault management
-- [x] Governance voting
-- [x] Oracle price feeds
-- [x] Cross-chain bridges
+### 4.1. Core DeFi Features
+- [x] Token swaps (DEX) - `swap-manager`, `multi-hop-router-v3`
+- [x] Liquidity provision - `concentrated-liquidity-pool`, `stable-swap-pool`
+- [x] Lending and borrowing - `lending-manager`, `interest-rate-model`
+- [x] Vault management - `sbtc-vault`, `yield-aggregator`
+- [x] **Monetized Policy Engine** - `economic-policy-engine` (subscription-gated)
+- [x] Oracle price feeds - 7 oracle adapters
+- [x] Cross-chain bridges - Wormhole handlers (stub)
 
-### 4.2. Security Features
+### 4.2. SAXAAS Business Features
+- [x] **Revenue Distribution** - `revenue-distributor` (60/20/20 split)
+- [x] **DAO Treasury** - `dao-treasury` with vault trait
+- [x] **Emergency Governance** - `emergency-governance` (circuit breaker)
+- [x] **Founder Vesting** - `founder-vesting` (linear unlock)
+- [x] **Gamification** - `gamification-manager` (XP system)
+- [x] **Legal Registry** - `legal-representative-registry` (KYC mapping)
+- [x] **ICO System** - `ico-offering` (token sale logic)
+- [x] **Signature Verification** - `governance-signature-verifier` (SIP-018)
+- [x] **Upgrade Control** - `upgrade-controller` (governance-gated)
+
+### 4.3. Security Features
 - [x] Circuit breaker functionality
 - [x] MEV protection
 - [x] Role-based access control

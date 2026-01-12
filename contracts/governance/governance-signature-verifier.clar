@@ -1,5 +1,17 @@
-;; Tier 0 Stub
-(define-constant ERR_NOT_IMPLEMENTED (err u9999))
-(define-read-only (stub-func)
-  (ok true)
+;; governance-signature-verifier.clar
+;; Verifies off-chain signatures for proposals (SIP-018)
+;; Enables "Zero-Gas" voting (vote signing)
+
+(define-constant ERR_INVALID_SIGNATURE (err u1000))
+
+;; Public Functions
+(define-public (verify-message-signature (message (buff 32)) (signature (buff 65)) (pubkey (buff 33)))
+    (begin
+        (asserts! (secp256k1-verify message signature pubkey) ERR_INVALID_SIGNATURE)
+        (ok true)
+    )
+)
+
+(define-read-only (verify-signature-read-only (message (buff 32)) (signature (buff 65)) (pubkey (buff 33)))
+    (ok (secp256k1-verify message signature pubkey))
 )

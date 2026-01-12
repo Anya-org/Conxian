@@ -5,3 +5,8 @@
 (define-read-only (stub-func)
   (ok true)
 )
+
+;; Calculate Liquidation Reward
+(define-read-only (calculate-liquidation-reward (repay-amount uint))
+    (ok (/ (* repay-amount LIQUIDATION_BONUS) u10000))
+)
