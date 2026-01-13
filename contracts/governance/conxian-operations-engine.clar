@@ -3,8 +3,8 @@
 ;; The "Executive Branch" - Signal Aggregation & Governance Degradation Prevention
 ;; Acts as the central coordinator for the 5-Tier Sovereign Autonomous Business (SAB)
 
-(use-trait service-trait .conxian-service-trait.conxian-service-trait)
-(use-trait proposal-trait .governance-traits.proposal-trait)
+(use-trait service-trait .traits.conxian-service-trait)
+(use-trait proposal-trait .traits.proposal-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u6000))
@@ -110,7 +110,8 @@
         
         (var-set failsafe-active false)
 (var-set last-governance-action block-height)
-(emit-event "failsafe-reset" none)(ok true)
+(emit-event "failsafe-reset" none)
+(ok true)
     )
 )
 

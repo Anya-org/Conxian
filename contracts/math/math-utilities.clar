@@ -126,9 +126,7 @@
 
 ;; Round down (floor)
 (define-read-only (floor (value uint))
-  (- value (mod value PRECISION))
-  )
-)
+  (- value (mod value PRECISION)))
 
 ;; Round up (ceil)
 (define-read-only (ceil (value uint))
@@ -418,11 +416,11 @@
 )
 
 ;; Error constants for math utilities
-(define-constant ERR_INVALID_INPUT (err 15027))
-(define-constant ERR_OVERFLOW (err 15028))
-(define-ERR_UNDERFLOW (err 15029))
-(define-ERR_DIVISION_BY_ZERO (err 15030))
-(define-ERR_NEGATIVE_INPUT (err 15031))
-(define-ERR_INVALID_RANGE (err 15032))
-(define-ERR_INVALID_PERCENTAGE (err 15033))
-(define-ERR_MAX_ITERATIONS (err 15034))
+(define-constant ERR_INVALID_INPUT (err u15027))
+(define-constant ERR_OVERFLOW (err u15028))
+(define-constant ERR_UNDERFLOW (err u15029))
+(define-constant ERR_DIVISION_BY_ZERO (err u15030))
+(define-constant ERR_NEGATIVE_INPUT (err u15031))
+(define-constant ERR_INVALID_RANGE (err u15032))
+(define-constant ERR_INVALID_PERCENTAGE (err u15033))
+(define-constant ERR_MAX_ITERATIONS (err u15034))
