@@ -3,7 +3,7 @@
 ;; Aligned with Nakamoto 5s block times
 ;; Decentralized: Uses Unified RBAC via .conxian-access
 
-(use-trait proposal-trait .governance-traits.proposal-trait)
+(use-trait proposal-trait .traits.proposal-trait)
 
 ;; Constants
 (define-constant MIN_DELAY u17280) ;; 1 day (at 5s/block)
@@ -32,8 +32,7 @@
 ;; Governance
 (define-public (set-delay (new-delay uint))
     (begin
-        (var-set delay new-delay)
-(asserts! (>= new-delay MIN_DELAY) ERR_INVALID_DELAY)
+        (asserts! (is-eq tx-sender (contract-of .conxian-access)) ERR_UNAUTHORIZED)
         (asserts! (>= new-delay MIN_DELAY) ERR_INVALID_DELAY)
         (asserts! (<= new-delay MAX_DELAY) ERR_INVALID_DELAY)
         (var-set delay new-delay)
@@ -41,14 +40,13 @@
     )
 )
 
-        (target principal)
-    (let (
-        (signature (string-ascii 48))(data (buff 128))
-    )
-        ;; Only Admin/Governance can queue
+(define-public (queue (proposal-principal principal))
+    (let
+      (
+        (eta (+ block-height (var-get delay)))
+      )
+        (asserts! (is-none (map-get? queued-proposals proposal-principal)) ERR_ALREADY_QUEUED)
         (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_ADMIN)) ERR_UNAUTHORIZED)
-        (tx-hash 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20)
-        
         (map-set queued-proposals proposal-principal eta)
         (print { event: "queue", proposal: proposal-principal, eta: eta })
         (ok eta)
@@ -78,4 +76,3 @@
 (define-read-only (get-eta (proposal principal))
     (map-get? queued-proposals proposal)
 )
-

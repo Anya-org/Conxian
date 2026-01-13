@@ -6,7 +6,7 @@
 ;; builder's wallet, and 50% are automatically reinvested into the protocol's
 ;; primary liquidity pool.
 
-(use-trait sip-010-ft-trait .defi-traits.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .traits.sip-010-ft-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u1001))
 (define-constant ERR_NO_VESTING_SCHEDULE (err u9001))

@@ -57,9 +57,9 @@
 )
 
 ;; Bitcoin network constants
-(define-constant BITCOIN_MAINNET_MAGIC u0xf9beb4d9)
-(define-constant BITCOIN_TESTNET_MAGIC u0x0709110b)
-(define-constant BITCOIN_REGTEST_MAGIC u0xfabfb5da)
+(define-constant BITCOIN_MAINNET_MAGIC u4190027225)
+(define-constant BITCOIN_TESTNET_MAGIC u118034315)
+(define-constant BITCOIN_REGTEST_MAGIC u4207822298)
 
 (define-read-only (get-network-magic)
   ;; Get current network magic (mock: mainnet)
