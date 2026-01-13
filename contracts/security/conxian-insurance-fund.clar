@@ -21,7 +21,7 @@
 
 ;; Events
 (define-public (deposit
-        (token <sip-010-trait>)
+        (token .sip-standards.sip-010-ft-trait)
         (amount uint)
     )
     (begin
@@ -36,7 +36,7 @@
 )
 
 (define-public (cover-loss
-        (token <sip-010-trait>)
+        (token .sip-standards.sip-010-ft-trait)
         (recipient principal)
         (amount uint)
     )

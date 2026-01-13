@@ -40,7 +40,7 @@
 
 ;; @desc Withdraw SIP-010 Tokens
 (define-public (withdraw-token
-    (token <sip-010-trait>)
+    (token .sip-standards.sip-010-ft-trait)
     (amount uint)
     (recipient principal)
   )

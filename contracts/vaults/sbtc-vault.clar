@@ -40,7 +40,7 @@
 ;; Enforces: Sender must be compliant.
 (define-public (deposit
         (amount uint)
-        (token <sip-010-trait>)
+        (token .sip-standards.sip-010-ft-trait)
     )
     (let ((sender tx-sender))
         ;; 1. Validate Token
@@ -74,7 +74,7 @@
 (define-public (withdraw
         (amount uint)
         (recipient principal)
-        (token <sip-010-trait>)
+        (token .sip-standards.sip-010-ft-trait)
     )
     (let (
             (sender tx-sender)

@@ -28,7 +28,7 @@
 ;; @desc Deposits collateral (Signature aligned with tests)
 (define-public (deposit-funds
     (amount uint)
-    (token-trait <sip-010-trait>)
+    (token-trait .sip-standards.sip-010-ft-trait)
   )
   (let (
       (token-principal (contract-of token-trait))
@@ -72,7 +72,7 @@
 ;; @desc Withdraws collateral
 (define-public (withdraw-funds
     (amount uint)
-    (token-trait <sip-010-trait>)
+    (token-trait .sip-standards.sip-010-ft-trait)
   )
   (let (
       (token-principal (contract-of token-trait))

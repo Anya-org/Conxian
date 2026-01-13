@@ -124,7 +124,7 @@
 ;; @returns (response bool)
 (define-public (deposit-funds
     (amount uint)
-    (token <sip-010-trait>)
+    (token .sip-standards.sip-010-ft-trait)
   )
   (begin
     (try! (guard-entry))
@@ -138,7 +138,7 @@
 ;; @returns (response bool)
 (define-public (withdraw-funds
     (amount uint)
-    (token <sip-010-trait>)
+    (token .sip-standards.sip-010-ft-trait)
   )
   (begin
     (try! (guard-entry))

@@ -68,7 +68,7 @@
 ;; @param amount The total amount of the token to distribute.
 ;; @param sender The original sender of the fees.
 (define-public (distribute
-    (token <sip-010-trait>)
+    (token .sip-standards.sip-010-ft-trait)
     (amount uint)
     (sender principal)
   )

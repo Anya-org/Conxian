@@ -11,7 +11,7 @@
 (define-data-var dev-treasury principal .operational-treasury)
 (define-data-var insurance-vault principal .operational-treasury) ;; Placeholder
 
-(define-public (distribute (token <sip-010-trait>) (amount uint))
+(define-public (distribute (token .sip-standards.sip-010-ft-trait) (amount uint))
     (let (
         (policy (unwrap-panic (contract-call? .allocation-policy get-allocation-percentages)))
         (staking-amt (/ (* amount (get staking policy)) u10000))
