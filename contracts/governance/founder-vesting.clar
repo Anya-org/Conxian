@@ -3,11 +3,11 @@
 (define-read-only (stub-func)
   (ok true)
 )
-    )
-)
+
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; Beneficiary Functions
-(define-public (claim-vested-tokens (token <sip-010-trait>))
+(define-public (claim-vested-tokens (token <sip-010-ft-trait>))
     (let (
         (schedule (unwrap! (map-get? vesting-schedules tx-sender) ERR_NO_VESTING_SCHEDULE))
         (current-block block-height)

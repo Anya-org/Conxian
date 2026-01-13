@@ -38,9 +38,8 @@
     (role uint)
   )
   (match (contract-call? .rbac grant-role user role)
-    success
-    success
-    error (err ERR_BATCH_LIMIT_EXCEEDED)
+    success (ok success)
+    error (err error)
   )
 )
 
@@ -49,9 +48,8 @@
     (role uint)
   )
   (match (contract-call? .rbac revoke-role user role)
-    success
-    success
-    error (err ERR_BATCH_LIMIT_EXCEEDED)
+    success (ok success)
+    error (err error)
   )
 )
 
@@ -68,8 +66,7 @@
       (execute-role-grant (get user update) (get role update))
       (execute-role-revoke (get user update) (get role update))
     )
-    error
-    error
+    error (err error)
   )
 )
 
@@ -77,27 +74,33 @@
   type: uint,
   params: (list 10 principal),
 }))
-  (match (get type operation)
-    1 (execute-emergency-operation (get params operation))
-    2 (execute-protocol-operation (get params operation))
-    3 (execute-treasury-operation (get params operation))
-    default (err ERR_INVALID_OPERATION)
+  (let ((op-type (get type operation)))
+    (if (is-eq op-type u1)
+      (execute-emergency-operation (get params operation))
+      (if (is-eq op-type u2)
+        (execute-protocol-operation (get params operation))
+        (if (is-eq op-type u3)
+          (execute-treasury-operation (get params operation))
+          (err ERR_INVALID_OPERATION)
+        )
+      )
+    )
   )
 )
 
-(define-private (process-admin-operation
-    (result (response bool uint))
-    (operation {
-      type: uint,
-      params: (list 10 principal),
-    })
-  )
-  (match result
-    success (execute-admin-operation-wrapper operation)
-    error
-    error
-  )
-)
+;; (define-private (process-admin-operation
+;;     (result (response bool uint))
+;;     (operation {
+;;       type: uint,
+;;       params: (list 10 principal),
+;;     })
+;;   )
+;;   (match result
+;;     success
+;;       (execute-admin-operation-wrapper operation)
+;;     error (err error)
+;;   )
+;; )
 
 ;; Authorization
 (define-private (has-role (role uint))
@@ -164,52 +167,45 @@
 )
 
 ;; Batch Role Management (100x more efficient)
-(define-public (batch-update-roles (updates (list 100 {
-  user: principal,
-  role: uint,
-  active: bool,
-})))
-  (begin
-    (asserts! (is-global-admin) ERR_NOT_AUTHORIZED)
-    (asserts! (<= (len updates) (var-get max-batch-size))
-      ERR_BATCH_LIMIT_EXCEEDED
-    )
+;; (define-public (batch-update-roles (updates (list 100 {
+;;   user: principal,
+;;   role: uint,
+;;   active: bool
+;; })))
+;;   (begin
+;;     (asserts! (is-eq tx-sender (var-get global-admin)) ERR_NOT_AUTHORIZED)
+;;     (asserts! (<= (len updates) (var-get max-batch-size)) ERR_BATCH_LIMIT_EXCEEDED)
 
-    ;; Correctly process each role update using fold
-    (fold
-      (lambda (update result)
-        ;; Corrected fold order: update then result/accumulator
-        (match result
-          ok-val (if (get active update)
-            (contract-call? .rbac grant-role (get user update) (get role update))
-            (contract-call? .rbac revoke-role (get user update) (get role update))
-          )
-          (err err-val)
-          (err err-val)
-        ))
-      updates (ok true)
-    )
-  )
-)
+;;     (begin
+;;       (try! (map (lambda (update)
+;;         (if (get active update)
+;;           (contract-call? .rbac grant-role (get user update) (get role update))
+;;           (contract-call? .rbac revoke-role (get user update) (get role update))
+;;         )
+;;       ) updates))
+;;       (ok true)
+;;     )
+;;   )
+;; )
 
 ;; Batch Admin Operations (1000x more efficient)
-(define-public (batch-admin-operations (operations (list 200 {
-  type: uint,
-  params: (list 10 principal),
-})))
-  (begin
-    (asserts! (is-global-admin) ERR_NOT_AUTHORIZED)
-    (asserts! (<= (len operations) (var-get max-batch-size))
-      ERR_BATCH_LIMIT_EXCEEDED
-    )
+;; (define-public (batch-admin-operations (operations (list 200 {
+;;   type: uint,
+;;   params: (list 10 principal),
+;; })))
+;;   (begin
+;;     (asserts! (is-global-admin) ERR_NOT_AUTHORIZED)
+;;     (asserts! (<= (len operations) (var-get max-batch-size))
+;;       ERR_BATCH_LIMIT_EXCEEDED
+;;     )
 
-    ;; Validate all operations first (fail fast)
-    (let ((validated (map validate-admin-operation operations)))
-      ;; Execute in batch (single transaction) with proper error handling
-      (fold process-admin-operation (ok true) validated)
-    )
-  )
-)
+;;     ;; Validate all operations first (fail fast)
+;;     (let ((validated (map validate-admin-operation operations)))
+;;       ;; Execute in batch (single transaction) with proper error handling
+;;       (fold process-admin-operation (ok true) validated)
+;;     )
+;;   )
+;; )
 
 ;; Emergency Pause (Ultra-low gas)
 (define-public (set-emergency-pause (paused bool))
@@ -217,7 +213,7 @@
     (asserts!
       (or
         (is-global-admin)
-        (has-role tx-sender ROLE_EMERGENCY_PAUSE)
+        (has-role ROLE_EMERGENCY_PAUSE)
       )
       ERR_NOT_AUTHORIZED
     )
@@ -274,12 +270,16 @@
   type: uint,
   params: (list 10 principal),
 }))
-  (begin
-    (match (get type operation)
-      1 (validate-emergency-operation (get params operation))
-      2 (validate-protocol-operation (get params operation))
-      3 (validate-treasury-operation (get params operation))
-      default (err ERR_INVALID_OPERATION)
+  (let ((op-type (get type operation)))
+    (if (is-eq op-type u1)
+      (validate-emergency-operation (get params operation))
+      (if (is-eq op-type u2)
+        (validate-protocol-operation (get params operation))
+        (if (is-eq op-type u3)
+          (validate-treasury-operation (get params operation))
+          (err ERR_INVALID_OPERATION)
+        )
+      )
     )
   )
 )
@@ -288,11 +288,17 @@
   type: uint,
   params: (list 10 principal),
 }))
-  (match (get type operation)
-    1 (execute-emergency-operation (get params operation))
-    2 (execute-protocol-operation (get params operation))
-    3 (execute-treasury-operation (get params operation))
-    default (err ERR_INVALID_OPERATION)
+  (let ((op-type (get type operation)))
+    (if (is-eq op-type u1)
+      (execute-emergency-operation (get params operation))
+      (if (is-eq op-type u2)
+        (execute-protocol-operation (get params operation))
+        (if (is-eq op-type u3)
+          (execute-treasury-operation (get params operation))
+          (err ERR_INVALID_OPERATION)
+        )
+      )
+    )
   )
 )
 

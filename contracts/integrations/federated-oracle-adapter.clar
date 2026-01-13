@@ -3,8 +3,6 @@
 (define-read-only (stub-func)
   (ok true)
 )
-    )
-)
 
 ;; Read-only: Get Name
 (define-read-only (get-name)

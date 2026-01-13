@@ -2,8 +2,8 @@
 ;; Central Treasury for Conxian DAO
 ;; Implements standard vault traits for compatibility
 
-(impl-trait .traits.vault-traits .vault-trait)
-(use-trait sip-010-trait .traits.sip-standards .sip-010-ft-trait)
+(impl-trait .vault-traits.vault-trait)
+(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))

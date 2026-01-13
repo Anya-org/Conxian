@@ -3,8 +3,6 @@
 (define-read-only (stub-func)
   (ok true)
 )
-    )
-)
 
 ;; Read-Only
 (define-read-only (get-loan (borrower principal) (loan-id uint))

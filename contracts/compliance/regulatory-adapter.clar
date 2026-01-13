@@ -8,40 +8,35 @@
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u6000))
 (define-constant ERR_INVALID_PROOF (err u6001))
+(define-constant ERR_BLACKLISTED (err u6002))
 
 ;; Data Vars
 (define-data-var admin principal tx-sender)
-
 (define-data-var contract-owner principal tx-sender) ;; The Admin (DAO/Timelock)
 (define-data-var regulatory-authority principal tx-sender) ;; The Oracle (Signer)
 (define-data-var authority-pubkey (buff 33) 0x00) ;; Compressed public key of the authority
 
-        clean-hands: bool,
-        verified-at: uint,
-        jurisdiction: (string-ascii 64)
-    }
-)
+;; Data Maps
+(define-map compliance-status principal {
+    clean-hands: bool,
+    verified-at: uint,
+    jurisdiction: (string-ascii 64)
+})
 
 ;; Blacklist for sanctioned addresses
 (define-map blacklist principal bool)
 
 ;; Read-only: Check Clean-Hands Compliance
 (define-public (check-clean-hands-compliance (user principal))
-    (let (
-        (status (map-get? compliance-status user))
-        (is-blacklisted (default-to false (map-get? blacklist user)))
+  (let ((is-blacklisted (default-to false (map-get? blacklist user))))
+    (if is-blacklisted
+      (err ERR_BLACKLISTED)
+      (match (map-get? compliance-status user)
+        (some record) (ok (get clean-hands record))
+        none (ok false)
+      )
     )
-        (if is-blacklisted
-            (err ERR_BLACKLISTED)
-            (match status
-                record (if (get clean-hands record)
-                    (ok true)
-    (var-set contract-owner new-owner)
-                )
-                (ok false) ;; Default: not verified
-      new-own
-        )
-    )
+  )
 )
 
 ;; Admin: Add to Whitelist
@@ -53,7 +48,6 @@
             verified-at: block-height,
             jurisdiction: jurisdiction
         })
-    (new-pubkey (buff 33))
         (ok true)
     )
 )
