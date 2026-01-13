@@ -29,7 +29,7 @@
 )
 
 (define-public (create-allocation
-    (token <sip-010-trait>)
+    (token .sip-standards.sip-010-ft-trait)
     (beneficiary principal)
     (amount uint)
   )
@@ -50,7 +50,7 @@
   )
 )
 
-(define-public (claim (token <sip-010-trait>))
+(define-public (claim (token .sip-standards.sip-010-ft-trait))
   (let (
       (sender tx-sender)
       (allocation (unwrap!

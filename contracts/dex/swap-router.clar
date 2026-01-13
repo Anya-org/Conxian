@@ -20,8 +20,8 @@
 ;; @returns (response uint) The amount of the output token received.
 (define-public (exact-input-single
         (pool-id uint)
-        (token-in <sip-010-trait>)
-        (token-out <sip-010-trait>)
+        (token-in .sip-standards.sip-010-ft-trait)
+        (token-out .sip-standards.sip-010-ft-trait)
         (amount-in uint)
         (min-amount-out uint)
     )

@@ -102,7 +102,7 @@
 
 (define-public (stake
     (amount uint)
-    (token <sip-010-trait>)
+    (token .sip-standards.sip-010-ft-trait)
   )
   (begin
     ;; Fail if paused
@@ -131,7 +131,7 @@
 
 (define-public (withdraw
     (amount uint)
-    (token <sip-010-trait>)
+    (token .sip-standards.sip-010-ft-trait)
   )
   (begin
     ;; Withdrawals are allowed even if paused (User Protection Ethos)
@@ -158,7 +158,7 @@
   )
 )
 
-(define-public (get-reward (token <sip-010-trait>))
+(define-public (get-reward (token .sip-standards.sip-010-ft-trait))
   (let ((reward (earned tx-sender)))
     (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
     (asserts! (is-eq (contract-of token) (var-get rewards-token))
@@ -183,8 +183,8 @@
 )
 
 (define-public (exit
-    (staking-token-trait <sip-010-trait>)
-    (rewards-token-trait <sip-010-trait>)
+    (staking-token-trait .sip-standards.sip-010-ft-trait)
+    (rewards-token-trait .sip-standards.sip-010-ft-trait)
   )
   (begin
     (try! (withdraw (get-balance tx-sender) staking-token-trait))

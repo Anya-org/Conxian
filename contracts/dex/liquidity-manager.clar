@@ -49,8 +49,8 @@
 ;; @returns (response uint uint) - position-id
 (define-public (open-position
     (pool principal)
-    (token0 <sip-010-trait>)
-    (token1 <sip-010-trait>)
+    (token0 .sip-standards.sip-010-ft-trait)
+    (token1 .sip-standards.sip-010-ft-trait)
     (tick-lower int)
     (tick-upper int)
     (liquidity uint)
