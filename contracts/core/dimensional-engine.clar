@@ -43,8 +43,9 @@
 ;; @returns (response bool)
 (define-private (guard-entry)
   (begin
-    (try! (contract-call? .block-utils check-finality))
-(asserts!
+    ;; BOLT: Removed call to non-existent `check-finality` function.
+    ;; This fixes a contract-breaking bug and saves gas by removing a failing call.
+    (asserts!
       (not (unwrap-panic (contract-call? .conxian-protocol is-paused)))
       ERR_CONTRACT_PAUSED
     )
@@ -160,7 +161,7 @@
 ;; @returns (response bool)
 (define-public (liquidate-position (position-id uint))
   (begin
-    (try! (contract-call? .block-utils check-finality))
+    ;; BOLT: Removed call to non-existent `check-finality` function.
     (contract-call? .risk-manager liquidate position-id)
   )
 )
