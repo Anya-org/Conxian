@@ -747,9 +747,9 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/governance/emergency-governance.clar"
 address = "STH6O7P8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D1E2F3G4H5"
 
-#[contracts.founder-vesting]
-#path = "contracts/governance/founder-vesting.clar"
-#address = "ST8F9G0H1I2J3K4L5M6N7O8P9Q0R1S2T3U4V5W6X7Y8"
+[contracts.founder-vesting]
+path = "contracts/core/founder-vesting.clar"
+address = "ST8F9G0H1I2J3K4L5M6N7O8P9Q0R1S2T3U4V5W6X7Y8"
 
 [contracts.dao-treasury]
 path = "contracts/governance/dao-treasury.clar"
