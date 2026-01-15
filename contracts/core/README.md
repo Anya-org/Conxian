@@ -1,3 +1,9 @@
+---
+layout: default
+title: Core Module
+permalink: /modules/core/
+---
+
 # Core Module
 
 ## Overview
@@ -10,7 +16,7 @@ The module is designed around a secure, modular **facade pattern**. The `dimensi
 
 The Core Module's architecture separates user interaction from protocol administration.
 
-1.  **`dimensional-engine.clar` (User Facade)**: This contract is the single entry point for all standard user operations. It contains minimal business logic, instead validating inputs and delegating work to specialized manager contracts. Crucially, it performs pre-flight checks by querying other contracts for pause status (`conxian-protocol`), regulatory compliance (`regulatory-adapter`), and chain finality (`block-utils`).
+1.  **`dimensional-engine.clar` (User Facade)**: This contract is the single entry point for all standard user operations. It contains minimal business logic, instead validating inputs and delegating work to specialized manager contracts. Crucially, it performs pre-flight checks by querying other contracts for pause status (`conxian-protocol`) and regulatory compliance (`regulatory-adapter`).
 
 2.  **`conxian-protocol.clar` (Protocol Coordinator)**: This is the administrative heart of the protocol. It manages a system-wide emergency pause switch, maintains a registry of all authorized module contracts, and handles ownership and administrative permissions.
 
@@ -30,11 +36,9 @@ graph TD
 
     subgraph "External Dependencies"
         I[regulatory-adapter.clar]
-        J[block-utils.clar]
     end
 
     B -- 1. Pre-flight: Check Compliance --> I;
-    B -- 1. Pre-flight: Check Finality --> J;
     B -- 1. Pre-flight: Check Pause Status --> H;
 
     B -- 2. Delegate `open-position` --> C[position-manager.clar];
@@ -60,7 +64,6 @@ graph TD
 ### Key Dependencies
 
 -   **`regulatory-adapter.clar`**: A compliance contract that verifies a user's status via off-chain signed attestations, keeping PII off-chain.
--   **`block-utils.clar`**: A utility contract that provides functions to check for Bitcoin finality and query Nakamoto-aware block information.
 
 ## Public Functions
 

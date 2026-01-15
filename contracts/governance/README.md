@@ -1,3 +1,9 @@
+---
+layout: default
+title: Governance Module
+permalink: /modules/governance/
+---
+
 # Governance Module
 
 ## Overview
