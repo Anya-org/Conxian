@@ -51,7 +51,7 @@ The following contracts are temporarily quarantined in the `contracts/drafts` di
 
 | Contract                        | Reason for Quarantine                                       |
 | ------------------------------- | ----------------------------------------------------------- |
-| `federated-oracle-adapter.clar` | Undergoing refactoring for Nakamoto compatibility.          |
+| `federated-oracle-adapter.clar` | Non-functional stub awaiting implementation.                |
 | `interest-rate-model.clar`      | Pending a comprehensive security review.                    |
 | `lending-manager.clar`          | Awaiting architectural redesign to align with the new PRD. |
 | `regulatory-adapter.clar`       | Being updated to support the latest SIP-018 standards.    |
