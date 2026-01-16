@@ -3,7 +3,7 @@
 ;; Implements Decentralized Architecture and Tenure Awareness
 
 ;; Traits
-(use-trait ft-trait .sip-standards.sip-010-ft-trait)
+(use-trait sip-010-trait .sip-standards.sip-010-trait)
 (use-trait rbac-trait .core-traits.rbac-trait)
 
 ;; Constants
@@ -11,11 +11,10 @@
 (define-constant ERR_ALREADY_INITIALIZED (err u1001))
 (define-constant ERR_INSUFFICIENT_LIQUIDITY (err u1002))
 (define-constant ERR_INVALID_TICK (err u2000))
+(define-constant ERR_POSITION_NOT_FOUND (err u2004))
 
 ;; Contract Principals
-(define-data-var conxian-protocol-contract principal .conxian-protocol)
-(define-data-var block-utils-contract principal .block-utils)
-(define-data-var dex-factory-contract principal .dex-factory)
+(define-data-var dex-factory-contract principal .dex-factory-v2)
 
 ;; State
 (define-map pools
@@ -27,112 +26,116 @@
     sqrt-price: uint,
     liquidity: uint,
     tick: int,
-    reserve0: uint,
-    reserve1: uint,
+    fee-growth-global-0: uint,
+    fee-growth-global-1: uint
   }
 )
 
-(define-data-var pool-nonce uint u0)
-(define-data-var pool-initialized bool false)
-
-;; @desc Initializes the pool module (one-time setup)
-(define-public (initialize
-    (token0 principal)
-    (token1 principal)
-    (sqrt-price uint)
-    (tick int)
-    (fee uint)
-  )
-  (begin
-    (asserts! (not (var-get pool-initialized)) ERR_ALREADY_INITIALIZED)
-    (var-set pool-initialized true)
-    (ok true)
-  )
+;; Ticks info
+(define-map ticks
+    { pool-id: uint, tick: int }
+    {
+        liquidity-gross: uint,
+        liquidity-net: int,
+        fee-growth-outside-0: uint,
+        fee-growth-outside-1: uint,
+        seconds-outside: uint
+    }
 )
 
-;; @desc Creates a new pool
+;; Positions info
+(define-map positions
+    { pool-id: uint, owner: principal, tick-lower: int, tick-upper: int }
+    {
+        liquidity: uint,
+        fee-growth-inside-0-last: uint,
+        fee-growth-inside-1-last: uint,
+        tokens-owed-0: uint,
+        tokens-owed-1: uint
+    }
+)
+
+(define-data-var pool-nonce uint u0)
+
+;; @desc Initializes a new pool
+;; @param token0 First token principal
+;; @param token1 Second token principal
+;; @param fee Fee tier
+;; @param sqrt-price Initial price
+;; @param tick Initial tick
 (define-public (create-pool
     (token0 principal)
     (token1 principal)
     (fee uint)
+    (sqrt-price uint)
+    (tick int)
   )
-  (let (
+  (let
+    (
       (pool-id (+ (var-get pool-nonce) u1))
-      (tenure-id (contract-call? .block-utils get-current-tenure-id))
     )
-    (asserts!
-      (not (contract-call? .conxian-protocol is-paused))
-      ERR_UNAUTHORIZED
-    )
-    ;; Restrict to Factory
-    (asserts! (is-eq contract-caller (var-get dex-factory-contract))
-      ERR_UNAUTHORIZED
-    )
-
     (map-set pools pool-id {
-      token0: token0,
-      token1: token1,
-      fee: fee,
-      sqrt-price: u0,
-      liquidity: u0,
-      tick: 0,
-      reserve0: u0,
-      reserve1: u0,
+        token0: token0,
+        token1: token1,
+        fee: fee,
+        sqrt-price: sqrt-price,
+        liquidity: u0,
+        tick: tick,
+        fee-growth-global-0: u0,
+        fee-growth-global-1: u0
     })
     (var-set pool-nonce pool-id)
-    (print {
-      event: "create-pool",
-      pool-id: pool-id,
-      tenure-id: tenure-id,
-      block: burn-block-height,
-    })
     (ok pool-id)
   )
 )
 
-;; @desc Mint Position (Add Liquidity)
+;; @desc Mints a new position
+;; @param pool-id Pool identifier
+;; @param tick-lower Lower tick bound
+;; @param tick-upper Upper tick bound
+;; @param amount Liquidity amount
 (define-public (mint
-    (recipient principal)
+    (pool-id uint)
     (tick-lower int)
     (tick-upper int)
-    (liquidity uint)
-    (token0 <ft-trait>)
-    (token1 <ft-trait>)
-  )
-  (let ((tenure-id (contract-call? .block-utils get-current-tenure-id)))
-    (asserts! (not (contract-call? .conxian-protocol is-paused)) ERR_UNAUTHORIZED)
-    ;; Logic: Transfer tokens from recipient, update reserves
-    (print {
-      event: "mint",
-      recipient: recipient,
-      liquidity: liquidity,
-      tenure-id: tenure-id,
-    })
-    (ok u1)
-    ;; Return position ID
-  )
+    (amount uint)
+)
+    (let
+        (
+            (pool (unwrap! (map-get? pools pool-id) ERR_INSUFFICIENT_LIQUIDITY))
+            (position-key { pool-id: pool-id, owner: tx-sender, tick-lower: tick-lower, tick-upper: tick-upper })
+            (position (default-to 
+                { liquidity: u0, fee-growth-inside-0-last: u0, fee-growth-inside-1-last: u0, tokens-owed-0: u0, tokens-owed-1: u0 }
+                (map-get? positions position-key)
+            ))
+        )
+        ;; Logic to update ticks and position would go here
+        ;; Transfer tokens from user to contract would happen here
+        
+        (map-set positions position-key 
+            (merge position { liquidity: (+ (get liquidity position) amount) })
+        )
+        
+        (ok true)
+    )
 )
 
-;; @desc Swap Tokens
+;; @desc Swaps tokens
+;; @param pool-id Pool identifier
+;; @param zero-for-one Direction of swap
+;; @param amount-specified Amount to swap
 (define-public (swap
-    (amount-in uint)
-    (token-in <ft-trait>)
-    (token-out <ft-trait>)
-  )
-  (begin
-    (asserts! (not (contract-call? .conxian-protocol is-paused)) ERR_UNAUTHORIZED)
-    (ok amount-in)
-  )
+    (pool-id uint)
+    (zero-for-one bool)
+    (amount-specified uint)
 )
-
-;; Read Only
-(define-read-only (get-reserves)
-  (ok {
-    reserve0: u0,
-    reserve1: u0,
-  })
-)
-
-(define-read-only (is-initialized)
-  (var-get pool-initialized)
+    (let
+        (
+            (pool (unwrap! (map-get? pools pool-id) ERR_INSUFFICIENT_LIQUIDITY))
+        )
+        ;; Logic to execute swap against liquidity
+        ;; Traverse ticks
+        ;; Update protocol fees
+        (ok u0) ;; Returns amount calculated
+    )
 )

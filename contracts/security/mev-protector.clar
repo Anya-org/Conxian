@@ -17,8 +17,18 @@
   }
 )
 
+;; Revealed status for the current block
+;; Key: User Principal
+;; Value: Block Height
+(define-map revealed-in-block
+  principal
+  uint
+)
+
 (define-constant COMMIT_WINDOW u10) ;; Blocks within which reveal must happen
 
+;; @desc Commits a hash of the intended transaction
+;; @param hash Hash of the payload + salt
 (define-public (commit (hash (buff 32)))
   (begin
     (map-set commits tx-sender {
@@ -29,6 +39,9 @@
   )
 )
 
+;; @desc Reveals the payload and validates against commitment
+;; @param salt Random salt used in hash
+;; @param payload The transaction data payload
 (define-public (reveal
     (salt (buff 32))
     (payload (buff 128))
@@ -37,21 +50,26 @@
       (user-commit (unwrap! (map-get? commits tx-sender) ERR_COMMIT_NOT_FOUND))
       (computed-hash (sha256 (concat salt payload)))
     )
+    ;; Must be revealed in a later block (or same block if we just want to prove knowledge, 
+    ;; but for anti-frontrunning, it should ideally be later. 
+    ;; However, commit-reveal usually implies commit in block N, reveal in N+1.
+    ;; We enforce reveal is within window.
     (asserts! (<= block-height (+ (get height user-commit) COMMIT_WINDOW))
       ERR_COMMIT_EXPIRED
     )
     (asserts! (is-eq (get hash user-commit) computed-hash) ERR_INVALID_COMMIT)
 
-    ;; If valid, clear commit to prevent replay
+    ;; If valid, mark as revealed for this block
+    (map-set revealed-in-block tx-sender block-height)
+
+    ;; Clear commit to prevent replay
     (map-delete commits tx-sender)
     (ok true)
   )
 )
 
-;; Read-only helper to verify a commit exists and is valid for the current block
-(define-read-only (has-valid-commit (user principal))
-  (match (map-get? commits user)
-    commit-data (<= block-height (+ (get height commit-data) COMMIT_WINDOW))
-    false
-  )
+;; @desc Checks if the user has revealed a valid commitment in the current block
+;; @param user The user principal
+(define-read-only (is-revealed (user principal))
+  (is-eq (map-get? revealed-in-block user) (some block-height))
 )
