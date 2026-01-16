@@ -98,6 +98,8 @@ clarinet.log
 .vscode/
 .idea/
 *~
+clarinet-current.txt
+*.txt
 .#*
 *.swp
 *.swo

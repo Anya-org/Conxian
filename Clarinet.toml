@@ -1146,7 +1146,9 @@ depends_on = [
 ]
 
 [contracts.admin-facade]
-path = "contracts/core/admin-facade.clar
+path = "contracts/core/admin-facade.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+depends_on = ["rbac"]
 
 [contracts.swap-router]
 path = "contracts/dex/swap-router.clar"
