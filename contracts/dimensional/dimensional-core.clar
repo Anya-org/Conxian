@@ -9,7 +9,7 @@
 ;; Standard traits
 (use-trait oracle-trait .defi-traits.oracle-trait)
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
-(use-trait pausable-trait .pausable.pausable-trait)
+(use-trait pausable-trait .pausable-trait.pausable-trait)
 (use-trait rbac-trait .core-traits.rbac-trait)
 (use-trait circuit-breaker-trait .security-monitoring.circuit-breaker-trait)
 
@@ -74,7 +74,7 @@
     tags: (list 10 (string-utf8 32)),
     version: uint,
     metadata: (optional (string-utf8 1024)),
-    tenure-id: (buff 32), ;; Updated for Nakamoto tenure tracking (buff 32)
+    tenure-id: uint, ;; Updated for Nakamoto tenure tracking (uint)
   }
 )
 
@@ -283,7 +283,7 @@
         tags: tags,
         version: (var-get positions-version),
         metadata: metadata,
-        tenure-id: (unwrap-panic (contract-call? .block-utils get-current-tenure-id)),
+        tenure-id: (contract-call? .block-utils get-current-tenure-id),
       })
 
       ;; Fix size calculation for short

@@ -2,7 +2,7 @@
 ;; Advanced Router supporting multi-hop paths
 ;; Implements atomic execution and slippage protection
 
-(use-trait sip-010-trait .sip-standards.sip-010-trait)
+(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 (use-trait swap-pool-trait .defi-primitives.swap-pool-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u1000))
@@ -45,20 +45,20 @@
 
 ;; Helper to execute a single swap
 ;; Handles the trait call
+(define-private (execute-swap (p <swap-pool-trait>) (amount-in uint) (ti <sip-010-trait>) (to <sip-010-trait>))
+    (contract-call? p swap amount-in (contract-of ti) (contract-of to))
+)
+
 (define-private (swap-helper
     (amount-in uint)
     (pool (optional <swap-pool-trait>))
     (token-in (optional <sip-010-trait>))
     (token-out (optional <sip-010-trait>))
 )
-    (match pool
-        p (match token-in
-            ti (match token-out
-                to (contract-call? p swap amount-in (contract-of ti) (contract-of to))
-                ERR_INVALID_INPUT
-            )
-            ERR_INVALID_INPUT
-        )
-        (ok amount-in) ;; If no pool, return amount (should not happen if logic is correct)
+    (let (
+        (ti (unwrap! token-in ERR_INVALID_INPUT))
+        (to (unwrap! token-out ERR_INVALID_INPUT))
+    )
+        (execute-swap (unwrap! pool (ok amount-in)) amount-in ti to)
     )
 )

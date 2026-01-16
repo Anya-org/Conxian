@@ -160,15 +160,15 @@
 (define-public (check-work-needed)
   (begin
     ;; In a real implementation, this would iterate over a registry of open positions.
-    ;; For now, we return none as we don't have an iterable list of positions in this contract state.
+    ;; For now, we return false as we don't have an iterable list of positions in this contract state.
     ;; This is a placeholder to satisfy the trait.
-    (ok none)
+    (ok false)
   )
 )
 
 (define-public (do-work (job-data (buff 2048)))
   (let (
-      (position-id (buff-to-uint-be job-data))
+      (position-id (buff-to-uint-be (unwrap-panic (slice? job-data u0 u16))))
       ;; Check work needed logic would go here to validate
     )
     (begin

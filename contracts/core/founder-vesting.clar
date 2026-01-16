@@ -1,8 +1,7 @@
 ;; contracts/drafts/founder-vesting.clar
 ;; BOLT: Refactored for Clarity 4, Nakamoto compatibility, and secure state management.
 
-(define-contract founder-vesting
-  (use-trait sip-010 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sip-standards.sip-010-ft-trait)
+(use-trait sip-010 .sip-standards.sip-010-ft-trait)
 
   ;; --- Constants and Errors ---
   (define-constant CONTRACT_OWNER tx-sender)
@@ -48,15 +47,16 @@
   ;; --- Beneficiary Functions ---
   (define-public (claim-vested-tokens (token <sip-010>))
     (let (
-      (schedule (unwrap! (map-get? vesting-schedules tx-sender) ERR_NO_VESTING_SCHEDULE))
+      (beneficiary tx-sender)
+      (schedule (unwrap! (map-get? vesting-schedules beneficiary) ERR_NO_VESTING_SCHEDULE))
       (vested-amount (calculate-vested-amount schedule))
       (claimable-amount (- vested-amount (get claimed-amount schedule)))
     )
       (asserts! (> claimable-amount u0) ERR_NOTHING_TO_CLAIM)
 
-      (try! (as-contract (contract-call? token transfer claimable-amount tx-sender none)))
+      (try! (as-contract (contract-call? token transfer claimable-amount tx-sender beneficiary none)))
 
-      (map-set vesting-schedules tx-sender
+      (map-set vesting-schedules beneficiary
         (merge schedule { claimed-amount: (+ (get claimed-amount schedule) claimable-amount) })
       )
       (ok claimable-amount)
@@ -88,4 +88,3 @@
       )
     )
   )
-)

@@ -6,7 +6,7 @@
 (define-constant ERR_MATH_OVERFLOW (err u2001))
 
 ;; Min and Max Ticks (simplified for Clarity limits)
-(define-constant MIN_TICK (bit-not 887272)) ;; -887272
+(define-constant MIN_TICK -887272)
 (define-constant MAX_TICK 887272)
 
 ;; Square root of 1.0001 in Q64.96 format (approximate for 1e18 precision here)

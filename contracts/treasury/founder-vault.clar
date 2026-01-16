@@ -50,7 +50,7 @@
   )
 )
 
-(define-public (claim (token .sip-standards.sip-010-ft-trait))
+(define-public (claim (token <sip-010-trait>))
   (let (
       (sender tx-sender)
       (allocation (unwrap!
