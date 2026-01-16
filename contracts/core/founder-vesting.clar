@@ -2,7 +2,7 @@
 ;; BOLT: Refactored for Clarity 4, Nakamoto compatibility, and secure state management.
 
 (define-contract founder-vesting
-  (use-trait sip-010 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sip-standards.sip-010-ft-trait)
+  (use-trait sip-010 .sip-standards.sip-010-ft-trait)
 
   ;; --- Constants and Errors ---
   (define-constant CONTRACT_OWNER tx-sender)
@@ -88,4 +88,3 @@
       )
     )
   )
-)

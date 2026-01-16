@@ -24,6 +24,7 @@
 )
 
 (define-map votes { proposal-id: uint, voter: principal } bool)
+(define-map proposal-councils uint uint)
 
 ;; Core Logic
 
@@ -79,6 +80,7 @@
 (define-public (vote (proposal-id uint) (support bool))
     (let (
         (proposal (unwrap! (map-get? proposals proposal-id) (err u404)))
+        (voter-power u1)
         
         ;; Update Vote Counts (Simplified, assuming 1 vote per call for now, real logic would pull token balance)
     )

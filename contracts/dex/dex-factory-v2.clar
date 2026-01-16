@@ -80,5 +80,13 @@
 )
 
 (define-private (is-less-than (a principal) (b principal))
-    (< (buff-to-uint-be (unwrap-panic (to-consensus-buff? a))) (buff-to-uint-be (unwrap-panic (to-consensus-buff? b))))
+    (let (
+        (buff-a (unwrap-panic (to-consensus-buff? a)))
+        (buff-b (unwrap-panic (to-consensus-buff? b)))
+    )
+        (if (is-eq buff-a buff-b)
+            false
+            (< (buff-to-uint-be (unwrap-panic (slice? buff-a u0 u16))) (buff-to-uint-be (unwrap-panic (slice? buff-b u0 u16))))
+        )
+    )
 )

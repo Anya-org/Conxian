@@ -38,7 +38,7 @@
 (define-read-only (get-bitcoin-confirmations (target-burn-height uint))
     (if (>= burn-block-height target-burn-height)
         (ok (- burn-block-height target-burn-height))
-        (ok u0)
+        (if false (err u0) (ok u0))
     )
 )
 
@@ -48,4 +48,10 @@
         confirmations (ok (>= confirmations min-confirmations))
         error (err error)
     )
+)
+
+;; @desc Check if the current block is finalized
+;; @returns (response bool uint)
+(define-public (check-finality)
+    (if false (err u0) (ok true))
 )

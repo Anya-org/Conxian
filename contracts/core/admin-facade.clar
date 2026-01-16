@@ -39,7 +39,7 @@
   )
   (match (contract-call? .rbac grant-role user role)
     success
-    success
+    (ok success)
     error (err ERR_BATCH_LIMIT_EXCEEDED)
   )
 )
@@ -50,7 +50,7 @@
   )
   (match (contract-call? .rbac revoke-role user role)
     success
-    success
+    (ok success)
     error (err ERR_BATCH_LIMIT_EXCEEDED)
   )
 )
@@ -163,6 +163,16 @@
   )
 )
 
+(define-private (batch-update-role-helper (update { user: principal, role: uint, active: bool }) (result (response bool uint)))
+  (match result
+    ok-val (if (get active update)
+      (contract-call? .rbac grant-role (get user update) (get role update))
+      (contract-call? .rbac revoke-role (get user update) (get role update))
+    )
+    err-val (err err-val)
+  )
+)
+
 ;; Batch Role Management (100x more efficient)
 (define-public (batch-update-roles (updates (list 100 {
   user: principal,
@@ -176,19 +186,7 @@
     )
 
     ;; Correctly process each role update using fold
-    (fold
-      (lambda (update result)
-        ;; Corrected fold order: update then result/accumulator
-        (match result
-          ok-val (if (get active update)
-            (contract-call? .rbac grant-role (get user update) (get role update))
-            (contract-call? .rbac revoke-role (get user update) (get role update))
-          )
-          (err err-val)
-          (err err-val)
-        ))
-      updates (ok true)
-    )
+    (fold batch-update-role-helper updates (ok true))
   )
 )
 
@@ -206,7 +204,7 @@
     ;; Validate all operations first (fail fast)
     (let ((validated (map validate-admin-operation operations)))
       ;; Execute in batch (single transaction) with proper error handling
-      (fold process-admin-operation (ok true) validated)
+      (fold process-admin-operation validated (ok true))
     )
   )
 )

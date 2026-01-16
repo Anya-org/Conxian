@@ -198,6 +198,24 @@
   )
 )
 
+(define-private (batch-update-helper (entry {a: principal, b: {a: uint, b: uint}}) (result (response uint uint)))
+  (let (
+      (asset (get a entry))
+      (data (get b entry))
+      (price (get a data))
+      (confidence (get b data))
+    )
+    (begin
+      (unwrap-panic (update-price-feed asset price confidence))
+      result
+    )
+  )
+)
+
+(define-private (make-entry (asset principal) (price uint) (confidence uint))
+  {a: asset, b: {a: price, b: confidence}}
+)
+
 ;; Batch Operations - Gas Optimization
 (define-public (batch-update-prices
     (assets (list 10 principal))
@@ -206,23 +224,7 @@
   )
   (begin
     ;; Process all assets in single transaction
-    (fold
-      (lambda (entry result)
-        (let (
-            (asset (get a entry))
-            (data (get b entry))
-            (price (get a data))
-            (confidence (get b data))
-          )
-          (begin
-            (unwrap-panic (update-price-feed asset price confidence))
-            result
-          )
-        )
-      )
-      (zip assets (zip prices confidences))
-      (ok u0)
-    )
+    (fold batch-update-helper (map make-entry assets prices confidences) (ok u0))
   )
 )
 

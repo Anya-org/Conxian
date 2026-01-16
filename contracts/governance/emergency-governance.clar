@@ -2,7 +2,7 @@
 ;; "Break Glass" Emergency Protocol
 ;; Allows specific roles to pause the protocol in crisis
 
-(use-trait pausable-trait .traits.pausable-trait .pausable-trait)
+(use-trait pausable-trait .pausable-trait.pausable-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))

@@ -23,7 +23,7 @@
 )
 
 ;; Read-only: Get Price
-(define-public (get-price (asset principal))
+(define-read-only (get-price (asset principal))
     (let (
         (price-data (unwrap! (map-get? dia-prices asset) (err ERR_NO_PRICE)))
     )

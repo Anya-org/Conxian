@@ -65,7 +65,7 @@
 
 ;; Send Token (Cross-Chain Transfer)
 (define-public (send-token
-        (token .sip-standards.sip-010-ft-trait)
+        (token <sip-010-trait>)
         (amount uint)
         (target-chain uint)
         (recipient (buff 32))

@@ -2,6 +2,7 @@
 ;; All functions within this contract are non-operational. Do not integrate with this contract.
 
 (define-constant ERR_NOT_IMPLEMENTED (err u9999))
+(define-constant LIQUIDATION_BONUS u10500)
 (define-read-only (stub-func)
   (ok true)
 )

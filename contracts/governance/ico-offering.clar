@@ -15,7 +15,7 @@
 (define-data-var treasury-address principal tx-sender)
 
 ;; Public Interface
-(define-public (buy-tokens (amount uint) (token .sip-standards.sip-010-ft-trait))
+(define-public (buy-tokens (amount uint) (token <sip-010-trait>))
     (begin
         (asserts! (var-get sale-active) ERR_SALE_NOT_ACTIVE)
         
