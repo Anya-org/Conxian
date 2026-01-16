@@ -61,13 +61,13 @@ graph TD
 
 ### `proposal-engine.clar` (User-Facing)
 
--   `submit-proposal(proposal-contract <proposal-trait>, council-id uint, start-block uint, end-block uint)`: Submits a new proposal for voting.
+-   `submit-proposal(proposal-contract <.governance-traits.proposal-trait>, council-id uint, start-block uint, end-block uint)`: Submits a new proposal for voting.
 -   `vote(proposal-id uint, support bool)`: Casts a vote on an active proposal. The weight of the vote is determined by the combination of the voter's NFT-based seat power and their reputation score.
--   `execute-proposal(proposal-id uint, proposal-contract <proposal-trait>)`: Triggers the execution of a passed proposal by calling the `proposal-executor`.
+-   `execute-proposal(proposal-id uint, proposal-contract <.governance-traits.proposal-trait>)`: Triggers the execution of a passed proposal by calling the `proposal-executor`.
 
 ### `proposal-executor.clar` (System-Facing)
 
--   `execute(proposal-id uint, proposal-contract <proposal-trait>, quorum-percentage uint)`: Called by the `proposal-engine` to execute a passed proposal. It verifies that the voting period is over, the proposal passed, and the quorum was met before executing the proposal's logic.
+-   `execute(proposal-id uint, proposal-contract <.governance-traits.proposal-trait>, quorum-percentage uint)`: Called by the `proposal-engine` to execute a passed proposal. It verifies that the voting period is over, the proposal passed, and the quorum was met before executing the proposal's logic.
 
 ## Status
 

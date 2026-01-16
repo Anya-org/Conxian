@@ -17,8 +17,7 @@ Unlike other modules that are built around a central facade, the Security Module
 
 ### Emergency Controls
 
--   **`circuit-breaker.clar`**: A contract that allows a designated administrator to pause critical, high-value functions in other contracts in the event of a black swan event or a detected exploit. This is a critical safety mechanism for protecting user funds.
--   **`Pausable.clar`**: Provides a simple, inheritable `(emergency-pause)` function that can be implemented by any contract to provide a basic emergency stop capability.
+-   **`circuit-breaker.clar`**: A contract that allows a designated administrator to pause critical, high-value functions in other contracts in the event of a black swan event or a detected exploit. This contract supports both pausing an entire contract and pausing specific functions within a contract. It also includes a `trigger-circuit-breaker` function that can be called by an authorized automated system (e.g., a risk manager) to pause a contract. This is a critical safety mechanism for protecting user funds.
 
 ### Access Control
 
