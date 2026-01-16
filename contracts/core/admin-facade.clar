@@ -38,9 +38,9 @@
     (role uint)
   )
   (match (contract-call? .rbac grant-role user role)
-    success
-    (ok success)
-    error (err ERR_BATCH_LIMIT_EXCEEDED)
+    success (ok success)
+    error
+    ERR_BATCH_LIMIT_EXCEEDED
   )
 )
 
@@ -49,9 +49,9 @@
     (role uint)
   )
   (match (contract-call? .rbac revoke-role user role)
-    success
-    (ok success)
-    error (err ERR_BATCH_LIMIT_EXCEEDED)
+    success (ok success)
+    error
+    ERR_BATCH_LIMIT_EXCEEDED
   )
 )
 
@@ -68,8 +68,7 @@
       (execute-role-grant (get user update) (get role update))
       (execute-role-revoke (get user update) (get role update))
     )
-    error
-    error
+    error (err error)
   )
 )
 
@@ -81,7 +80,8 @@
     1 (execute-emergency-operation (get params operation))
     2 (execute-protocol-operation (get params operation))
     3 (execute-treasury-operation (get params operation))
-    default (err ERR_INVALID_OPERATION)
+    default
+    ERR_INVALID_OPERATION
   )
 )
 
@@ -94,8 +94,7 @@
   )
   (match result
     success (execute-admin-operation-wrapper operation)
-    error
-    error
+    error (err error)
   )
 )
 
@@ -163,7 +162,14 @@
   )
 )
 
-(define-private (batch-update-role-helper (update { user: principal, role: uint, active: bool }) (result (response bool uint)))
+(define-private (batch-update-role-helper
+    (update {
+      user: principal,
+      role: uint,
+      active: bool,
+    })
+    (result (response bool uint))
+  )
   (match result
     ok-val (if (get active update)
       (contract-call? .rbac grant-role (get user update) (get role update))

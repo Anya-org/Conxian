@@ -14,6 +14,9 @@
 (define-constant MAX_COLLATERAL_FACTOR u9500) ;; 95% max
 (define-constant PRICE_STALE_BLOCKS u100) ;; 5 minutes @ 3s blocks
 
+(define-constant SUBSCRIPTION_COST u1000000) ;; 1 STX
+(define-constant ERR_NO_SUBSCRIPTION (err u1006))
+
 ;; Data Vars - Single Source of Truth
 (define-data-var price-feed principal tx-sender)
 (define-data-var utilization-rate uint u0)
@@ -100,6 +103,7 @@
           (var-set current-interest-rate new-rate)
           (var-set collateral-factor new-factor)
         )
+        true
       )
 
       (ok true)

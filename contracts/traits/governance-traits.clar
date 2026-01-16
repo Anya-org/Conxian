@@ -8,6 +8,13 @@
   )
 ))
 
+(define-trait proposal-executor-trait (
+  (execute
+    (uint <proposal-trait> uint)
+    (response bool uint)
+  )
+))
+
 (define-trait voting-trait (
   (vote
     (uint bool)

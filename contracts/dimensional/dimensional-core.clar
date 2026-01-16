@@ -74,7 +74,7 @@
     tags: (list 10 (string-utf8 32)),
     version: uint,
     metadata: (optional (string-utf8 1024)),
-    tenure-id: (buff 32), ;; Updated for Nakamoto tenure tracking (buff 32)
+    tenure-id: uint, ;; Updated for Nakamoto tenure tracking (uint)
   }
 )
 

@@ -73,6 +73,7 @@
 (define-public (process-governance-signal
     (proposal-id uint)
     (proposal-contract <proposal-trait>)
+    (executor <proposal-executor-trait>)
   )
   (let (
       (proposal (unwrap! (contract-call? (var-get proposal-registry-contract) get-proposal proposal-id)
@@ -88,10 +89,11 @@
 
     ;; 2. Verify System Health (Anti-Degradation)
     (asserts! (not (var-get failsafe-active)) ERR_STAGNATION_DETECTED)
+    (asserts! (is-eq (contract-of executor) (var-get proposal-executor-contract)) ERR_UNAUTHORIZED)
 
     ;; 3. Execute via Proposal Executor
     ;; The Executor will validate the vote counts and quorum
-    (try! (as-contract (contract-call? (var-get proposal-executor-contract) execute proposal-id proposal-contract
+    (try! (as-contract (contract-call? executor execute proposal-id proposal-contract
       u5000
     )))
 
