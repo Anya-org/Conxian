@@ -20,10 +20,8 @@ The canonical source for all high-level documentation is the `/documentation/` d
 This directory serves as the main hub and should contain the following key documents:
 
 -   `README.md`: The main entry point and table of contents for all documentation.
--   `SYSTEM_ARCHITECTURE.md`: A high-level overview of the protocol's architectural patterns and a map of the core modules.
--   `ROADMAP.md`: The unified development roadmap.
+-   `PRD.md`: The central "source of truth" for the Conxian Protocol, outlining its architecture, governance model, and development roadmap.
 -   `CHANGELOG.md`: A log of all notable changes to the protocol.
--   `GOVERNANCE_MODEL.md`: An explanation of the Conxian DAO, council structure, and voting process.
 
 ### 3.2 Audience-Specific Subdirectories
 

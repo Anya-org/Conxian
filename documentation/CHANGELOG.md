@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Documentation
+
+- **Comprehensive Documentation Realignment**: Initiated a full-scale documentation overhaul to align all `.md` files with the current codebase.
+- **Centralized `PRD.md`**: Updated `DOCUMENTATION_STRUCTURE.md` to establish `PRD.md` as the single source of truth for high-level architecture, governance, and the project roadmap.
+- **Module-Level `README.md` Scaffolding**: Created placeholder `README.md` files for all contract modules that were missing them, establishing a consistent documentation structure.
+- **Populated Module Documentation**: Added detailed documentation for the `config`, `agents`, `compliance`, `helpers`, and `marketplace` modules, including overviews, architecture descriptions, and public function lists.
+
 ### Added
 
 - **Enhanced Circuit Breaker**: Implemented `contracts/security/circuit-breaker.clar` with comprehensive interface support for lending systems, including `record-success`, `record-failure`, and `check-circuit-state`.
