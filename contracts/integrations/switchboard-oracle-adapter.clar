@@ -10,6 +10,8 @@
 (define-constant ERR_CONFIDENCE_TOO_LOW (err u6202))
 
 (define-data-var block-utils-contract principal .block-utils)
+(define-data-var admin principal tx-sender)
+(define-data-var min-confidence uint u100)
 
 ;; State
 

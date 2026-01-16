@@ -16,8 +16,8 @@
       (balance (stx-get-balance (as-contract tx-sender)))
     )
     (if (> balance (var-get rebalance-threshold))
-      (ok (some 0x01)) ;; Job "0x01" means "Invest surplus"
-      (ok none)
+      (ok true)
+      (ok false)
     )
   )
 )

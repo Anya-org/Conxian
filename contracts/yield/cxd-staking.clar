@@ -102,7 +102,7 @@
 
 (define-public (stake
     (amount uint)
-    (token .sip-standards.sip-010-ft-trait)
+    (token <sip-010-trait>)
   )
   (begin
     ;; Fail if paused

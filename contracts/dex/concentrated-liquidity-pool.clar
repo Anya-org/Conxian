@@ -3,7 +3,7 @@
 ;; Implements Decentralized Architecture and Tenure Awareness
 
 ;; Traits
-(use-trait sip-010-trait .sip-standards.sip-010-trait)
+(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 (use-trait rbac-trait .core-traits.rbac-trait)
 
 ;; Constants

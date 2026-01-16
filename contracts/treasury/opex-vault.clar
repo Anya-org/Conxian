@@ -19,7 +19,7 @@
 
 
 (define-public (withdraw-opex
-    (token .sip-standards.sip-010-ft-trait)
+    (token <sip-010-trait>)
     (amount uint)
     (recipient principal)
   )

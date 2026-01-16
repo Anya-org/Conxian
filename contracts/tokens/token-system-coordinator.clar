@@ -108,30 +108,50 @@
 
 ;; @desc Mints CXD (Revenue Token)
 ;; Only authorized minters (e.g. Emission Controller) can trigger this via the coordinator.
-(define-public (mint-cxd (amount uint) (recipient principal))
-  (let ((token (var-get cxd-token-contract)))
+(define-public (mint-cxd
+    (token <ft-mintable-trait>)
+    (amount uint)
+    (recipient principal)
+  )
+  (begin
+    (asserts! (is-eq (contract-of token) (var-get cxd-token-contract)) ERR_INVALID_TOKEN)
     (mint-token token amount recipient)
   )
 )
 
 ;; @desc Mints CXVG (Voting Token)
 ;; Only authorized minters can trigger this.
-(define-public (mint-cxvg (amount uint) (recipient principal))
-  (let ((token (var-get cxvg-token-contract)))
+(define-public (mint-cxvg
+    (token <ft-mintable-trait>)
+    (amount uint)
+    (recipient principal)
+  )
+  (begin
+    (asserts! (is-eq (contract-of token) (var-get cxvg-token-contract)) ERR_INVALID_TOKEN)
     (mint-token token amount recipient)
   )
 )
 
 ;; --- Facade: Burning ---
 
-(define-public (burn-cxd (amount uint) (sender principal))
-  (let ((token (var-get cxd-token-contract)))
-    (burn-token token amount sender)
+(define-public (burn-cxd
+    (token <ft-mintable-trait>)
+    (amount uint)
+    (owner principal)
+  )
+  (begin
+    (asserts! (is-eq (contract-of token) (var-get cxd-token-contract)) ERR_INVALID_TOKEN)
+    (burn-token token amount owner)
   )
 )
 
-(define-public (burn-cxvg (amount uint) (sender principal))
-  (let ((token (var-get cxvg-token-contract)))
-    (burn-token token amount sender)
+(define-public (burn-cxvg
+    (token <ft-mintable-trait>)
+    (amount uint)
+    (owner principal)
+  )
+  (begin
+    (asserts! (is-eq (contract-of token) (var-get cxvg-token-contract)) ERR_INVALID_TOKEN)
+    (burn-token token amount owner)
   )
 )

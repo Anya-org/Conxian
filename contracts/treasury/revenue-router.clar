@@ -4,7 +4,7 @@
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
-(define-public (route-fees (token .sip-standards.sip-010-ft-trait) (amount uint))
+(define-public (route-fees (token <sip-010-trait>) (amount uint))
     (begin
         ;; Logic to transfer to self then call distributor
         (try! (contract-call? token transfer amount tx-sender (as-contract tx-sender) none))

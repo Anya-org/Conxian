@@ -23,7 +23,7 @@
 
 ;; Public Functions
 (define-public (deposit
-    (token .sip-standards.sip-010-ft-trait)
+    (token <sip-010-trait>)
     (amount uint)
   )
   (let (
@@ -55,7 +55,7 @@
 )
 
 (define-public (withdraw
-    (token .sip-standards.sip-010-ft-trait)
+    (token <sip-010-trait>)
     (amount uint)
   )
   (let (
