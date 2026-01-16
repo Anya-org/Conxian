@@ -20,6 +20,8 @@ The Core Module's architecture separates user interaction from protocol administ
 
 2.  **`conxian-protocol.clar` (Protocol Coordinator)**: This is the administrative heart of the protocol. It manages a system-wide emergency pause switch, maintains a registry of all authorized module contracts, and handles ownership and administrative permissions.
 
+***Architectural Note**: The current implementation of `dimensional-engine.clar` uses hardcoded contract dependencies for its manager contracts (e.g., `.position-manager`, `.collateral-manager`). This is a deviation from the originally intended dynamic module registry pattern, where dependencies would be looked up from `conxian-protocol.clar` at runtime. While the module registry exists in `conxian-protocol.clar`, `dimensional-engine.clar` does not currently utilize it.*
+
 ### Control Flow Diagram
 
 ```mermaid
@@ -34,17 +36,19 @@ graph TD
         H -- register-module --> H;
     end
 
-    subgraph "External Dependencies"
+    subgraph "Hardcoded Dependencies"
+        C[position-manager.clar]
+        D[collateral-manager.clar]
+        F[risk-manager.clar]
         I[regulatory-adapter.clar]
     end
 
     B -- 1. Pre-flight: Check Compliance --> I;
     B -- 1. Pre-flight: Check Pause Status --> H;
 
-    B -- 2. Delegate `open-position` --> C[position-manager.clar];
-    B -- 2. Delegate `deposit-funds` --> D[collateral-manager.clar];
-    B -- 2. Delegate `liquidate-position` --> F[risk-manager.clar];
-    B -- 2. Delegate `get-funding-rate` --> E[funding-rate-calculator.clar];
+    B -- 2. Delegate `open-position` --> C;
+    B -- 2. Delegate `deposit-funds` --> D;
+    B -- 2. Delegate `liquidate-position` --> F;
 ```
 
 ## Core Contracts
@@ -63,22 +67,22 @@ graph TD
 
 ### Key Dependencies
 
--   **`regulatory-adapter.clar`**: A compliance contract that verifies a user's status via off-chain signed attestations, keeping PII off-chain.
+-   **`regulatory-adapter.clar`**: A compliance contract that verifies a user's status.
 
 ## Public Functions
 
 ### `dimensional-engine.clar` (User-Facing)
 
 #### Configuration
--   `set-protocol-coordinator(new-coordinator principal)`: (Owner Only) Sets the address of the main protocol coordinator contract.
+-   `set-protocol-coordinator(new-coordinator principal)`: (Authorized Only) Sets the address of the main protocol coordinator contract.
 
 #### Position Management
 -   `open-position(token principal, amount uint, leverage uint, long bool, slippage-limit (optional uint), metadata (optional (string-utf8 1024)))`: Opens a new trading position.
 -   `close-position(position-id uint, token principal, slippage-limit (optional uint))`: Closes an existing position.
 
 #### Collateral Management
--   `deposit-funds(amount uint, token <sip-010-trait>)`: Deposits funds into the collateral manager.
--   `withdraw-funds(amount uint, token <sip-010-trait>)`: Withdraws funds from the collateral manager.
+-   `deposit-funds(amount uint, token <.sip-standards.sip-010-ft-trait>)`: Deposits funds into the collateral manager.
+-   `withdraw-funds(amount uint, token <.sip-standards.sip-010-ft-trait>)`: Withdraws funds from the collateral manager.
 
 #### Risk Management
 -   `check-position-health(position-id uint)`: (Read-Only) Checks the health factor of a specific position.
@@ -97,7 +101,7 @@ graph TD
 -   `get-module(name (string-ascii 32))`: (Read-Only) Retrieves the address and status of a registered module.
 
 #### Ownership
--   `set-contract-owner(new-owner principal)`: (Owner Only) Transfers ownership of the protocol to a new address.
+-   `set-contract-owner(new-owner principal)`: (Admin Only) Transfers ownership of the protocol to a new address.
 -   `get-contract-owner()`: (Read-Only) Returns the current owner of the protocol.
 
 ## Status

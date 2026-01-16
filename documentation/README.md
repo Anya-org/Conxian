@@ -9,9 +9,9 @@ The documentation is organized to provide a clear path for various audiences, fr
 If you are new to the Conxian Protocol, we recommend starting with these key documents to understand our vision, architecture, and technical design.
 
 -   **[Project README](../README.md)**: The main project README. It provides a high-level overview of the protocol and instructions for development setup.
--   **[Product Requirement Document (PRD)](./PRD.md)**: The central "source of truth" for the Conxian Protocol, outlining its architecture, governance model, and development roadmap.
+-   **[Product Requirement Document (PRD)](../PRD.md)**: The central "source of truth" for the Conxian Protocol, outlining its architecture, governance model, and development roadmap.
 -   **[Whitepaper](./whitepaper/Conxian-Whitepaper.md)**: The complete technical vision and protocol design.
--   **[Changelog](./CHANGELOG.md)**: A log of all notable changes to the protocol.
+-   **[Changelog](../CHANGELOG.md)**: A log of all notable changes to the protocol.
 
 ## 2. Technical & Architectural Documentation
 
@@ -35,7 +35,7 @@ This section provides practical guides for different user groups.
 
 ### For Governance Participants
 
--   **[Governance Model](./PRD.md#3-governance-model)**: Explanation of the Conxian DAO, council structure, and voting process.
+-   **[Governance Model](../PRD.md#3-governance-model)**: Explanation of the Conxian DAO, council structure, and voting process.
 
 ## 4. System Analysis, Strategy & Reports
 

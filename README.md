@@ -52,7 +52,7 @@ Conxian is built with Clarity 4 and tested using the Clarinet SDK.
 
 **For a comprehensive overview of the protocol's vision, architecture, smart contracts, and operational procedures, please visit our complete documentation hub:**
 
--   **[View Complete Documentation](./documentation/README.md)**
+-   **[View Complete Documentation](documentation/README.md)**
 
 This central hub contains all key documents, including:
 
