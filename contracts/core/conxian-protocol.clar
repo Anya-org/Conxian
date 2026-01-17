@@ -151,3 +151,12 @@
     tenure-id: (contract-call? .block-utils get-current-tenure-id),
   })
 )
+
+;; @desc Gets the global pause status and the current Nakamoto tenure ID in a single call.
+;; @returns (response { paused: bool, tenure-id: (optional (buff 32)) } uint)
+(define-read-only (get-protocol-status)
+  (ok {
+    paused: (var-get paused),
+    tenure-id: (contract-call? .block-utils get-current-tenure-id),
+  })
+)
