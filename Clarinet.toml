@@ -492,9 +492,9 @@ address = "STE2M3N4O5P6Q7R8S9T1U2V3W4X5Y6Z7A8B9C0D1E2F3"
 path = "contracts/traits/redstone-traits.clar"
 address = "STF3N4O5P6Q7R8S9T1U2V3W4X5Y6Z7A8B9C0D1E2F3G4"
 
-[contracts.federated-oracle-adapter]
-path = "contracts/integrations/federated-oracle-adapter.clar"
-address = "STG4O5P6Q7R8S9T1U2V3W4X5Y6Z7A8B9C0D1E2F3G4H5"
+#[contracts.federated-oracle-adapter]
+#path = "contracts/integrations/federated-oracle-adapter.clar"
+#address = "STG4O5P6Q7R8S9T1U2V3W4X5Y6Z7A8B9C0D1E2F3G4H5"
 
 [contracts.pyth-traits]
 path = "contracts/traits/pyth-traits.clar"
