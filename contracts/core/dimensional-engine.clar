@@ -73,6 +73,18 @@
 ;; @param slippage-limit: An optional slippage limit for the trade.
 ;; @param metadata: Optional metadata for the position.
 ;; @returns (response uint) The ID of the new position.
+(define-private (get-module-contract (name (string-ascii 32)))
+  (let ((module-data (try! (contract-call? .conxian-protocol get-module name))))
+    (match module-data
+      data (begin
+        (asserts! (get active data) (err u5002))
+        (ok (get contract data))
+      )
+      (err u5003)
+    )
+  )
+)
+
 (define-public (open-position
     (token principal)
     (amount uint)
@@ -82,19 +94,22 @@
     (metadata (optional (string-utf8 1024)))
   )
   (begin
-    (let ((protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
-          (is-paused (get paused protocol-status)))
-      (try! (guard-entry is-paused)))
-    (let ((position-manager .position-manager)
-          (result (contract-call? .position-manager open-position tx-sender token amount
-              leverage long
-            )))
-      (print {
-        event: "facade-open-position",
-        sender: tx-sender,
-        tenure-id: (get tenure-id protocol-status),
-      })
-      result
+    (let (
+        (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
+        (is-paused (get paused protocol-status))
+        (position-manager (try! (get-module-contract "position-manager")))
+      )
+      (try! (guard-entry is-paused))
+      (let ((result (contract-call? position-manager open-position tx-sender token amount
+          leverage long
+        )))
+        (print {
+          event: "facade-open-position",
+          sender: tx-sender,
+          tenure-id: (get tenure-id protocol-status),
+        })
+        result
+      )
     )
   )
 )
@@ -110,9 +125,13 @@
     (slippage-limit (optional uint))
   )
   (begin
-    (let ((is-paused (unwrap-panic (contract-call? .conxian-protocol is-paused))))
-      (try! (guard-entry is-paused)))
-    (contract-call? .position-manager close-position tx-sender position-id)
+    (let (
+        (is-paused (unwrap-panic (contract-call? .conxian-protocol is-paused)))
+        (position-manager (try! (get-module-contract "position-manager")))
+      )
+      (try! (guard-entry is-paused))
+      (contract-call? position-manager close-position tx-sender position-id)
+    )
   )
 )
 
@@ -127,9 +146,13 @@
     (token .sip-standards.sip-010-ft-trait)
   )
   (begin
-    (let ((is-paused (unwrap-panic (contract-call? .conxian-protocol is-paused))))
-      (try! (guard-entry is-paused)))
-    (contract-call? .collateral-manager deposit-funds amount token)
+    (let (
+        (is-paused (unwrap-panic (contract-call? .conxian-protocol is-paused)))
+        (collateral-manager (try! (get-module-contract "collateral-manager")))
+      )
+      (try! (guard-entry is-paused))
+      (contract-call? collateral-manager deposit-funds amount token)
+    )
   )
 )
 
@@ -142,9 +165,13 @@
     (token .sip-standards.sip-010-ft-trait)
   )
   (begin
-    (let ((is-paused (unwrap-panic (contract-call? .conxian-protocol is-paused))))
-      (try! (guard-entry is-paused)))
-    (contract-call? .collateral-manager withdraw-funds amount token)
+    (let (
+        (is-paused (unwrap-panic (contract-call? .conxian-protocol is-paused)))
+        (collateral-manager (try! (get-module-contract "collateral-manager")))
+      )
+      (try! (guard-entry is-paused))
+      (contract-call? collateral-manager withdraw-funds amount token)
+    )
   )
 )
 
@@ -154,7 +181,9 @@
 ;; @param position-id: The ID of the position to check.
 ;; @returns (response uint) The health factor of the position.
 (define-public (check-position-health (position-id uint))
-    (contract-call? .risk-manager get-health-factor position-id)
+  (let ((risk-manager (try! (get-module-contract "risk-manager"))))
+    (contract-call? risk-manager get-health-factor position-id)
+  )
 )
 
 ;; @desc Liquidates an unhealthy position by delegating to the risk manager.
@@ -162,14 +191,9 @@
 ;; @returns (response bool)
 (define-public (liquidate-position (position-id uint))
   (begin
-    ;; Removed call to non-existent `check-finality` function.
-    (contract-call? .risk-manager liquidate position-id)
-  )
-)
-
-(define-private (get-module-contract (name (string-ascii 32)))
-  (let ((module-data (unwrap-panic (contract-call? .conxian-protocol get-module name))))
-    (asserts! (get active module-data) (err u5002))
-    (get contract module-data)
+    ;; BOLT: Removed call to non-existent `check-finality` function.
+    (let ((risk-manager (try! (get-module-contract "risk-manager"))))
+      (contract-call? risk-manager liquidate position-id)
+    )
   )
 )
