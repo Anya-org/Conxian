@@ -3,21 +3,6 @@
 ;; Central entry point for position management, collateral, and risk.
 ;; Adheres to Decentralized Modularity and Bitcoin Ethos
 
-;; ⚡ BOLT: PERFORMANCE OPTIMIZATION REPORT ⚡
-;;
-;; M-2024-07-15: Gas Savings via Pre-flight Check Consolidation
-;;
-;; Before: The `open-position` function made two separate cross-contract calls:
-;;   1. `(contract-call? .conxian-protocol is-paused)`
-;;   2. `(contract-call? .block-utils get-current-tenure-id)`
-;;
-;; After: The function now makes a single call to `get-protocol-status` on the `conxian-protocol` contract,
-;; which returns a tuple containing both the pause status and the tenure ID.
-;;
-;; Impact: This refactoring reduces the number of cross-contract calls in the `open-position` function from two to one.
-;; By batching the data retrieval, we achieve a measurable gas saving on every `open-position` transaction,
-;; improving the overall efficiency of the protocol.
-
 ;; Traits
 (use-trait position-manager-trait .core-traits.position-manager-trait)
 (use-trait collateral-manager-trait .core-traits.collateral-manager-trait)
@@ -97,7 +82,6 @@
     (metadata (optional (string-utf8 1024)))
   )
   (begin
-    ;; ⚡ BOLT: Optimized pre-flight checks by consolidating two contract calls into one.
     (let ((protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
           (is-paused (get paused protocol-status)))
       (try! (guard-entry is-paused)))
@@ -178,7 +162,7 @@
 ;; @returns (response bool)
 (define-public (liquidate-position (position-id uint))
   (begin
-    ;; BOLT: Removed call to non-existent `check-finality` function.
+    ;; Removed call to non-existent `check-finality` function.
     (contract-call? .risk-manager liquidate position-id)
   )
 )

@@ -15,7 +15,7 @@
 (define-data-var token-symbol (string-ascii 10) "CXVG")
 (define-constant ERR_NOT_DELEGATING (err u5005))
 
-(define-data-var token-uri (optional (string-utf8 256)) (some u"https://conxian.com/cxvg.json"))
+(define-data-var token-uri (optional (string-utf8 256)) (some "https://conxian.com/cxvg.json"))
 (define-data-var contract-owner principal tx-sender)
 (define-data-var regulatory-adapter-contract principal .regulatory-adapter)
 

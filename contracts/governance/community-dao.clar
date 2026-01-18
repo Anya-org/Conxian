@@ -46,9 +46,7 @@
 
 ;; Authorization
 (define-private (check-compliance (user principal))
-  (let (
-      (compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user))
-    )
+  (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
     (if (is-ok compliance-status)
       true
       false
@@ -73,6 +71,7 @@
 (define-public (create-proposal
     (title (string-ascii 64))
     (description (string-ascii 256))
+    (token-trait <sip-010-trait>)
   )
   (let (
       (proposal-id (+ (var-get proposal-count) u1))
@@ -82,10 +81,11 @@
     )
     ;; Compliance Check
     (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+    (asserts! (is-eq (contract-of token-trait) token) ERR_UNAUTHORIZED)
 
     ;; Token Balance Check (Prevent spam)
     ;; Dynamic contract call to the configured token
-    (let ((balance (unwrap-panic (contract-call? token get-balance tx-sender))))
+    (let ((balance (unwrap-panic (contract-call? token-trait get-balance tx-sender))))
       (asserts! (> balance u0) ERR_UNAUTHORIZED)
     )
 
@@ -113,57 +113,60 @@
 (define-public (vote
     (proposal-id uint)
     (support bool)
+    (token-trait <sip-010-trait>)
   )
   (let (
       (proposal (unwrap! (map-get? proposals proposal-id) ERR_PROPOSAL_NOT_FOUND))
       (voter tx-sender)
       (token (var-get governance-token))
-      (balance (unwrap-panic (contract-call? token get-balance voter)))
     )
-    ;; Compliance Check
-    (asserts! (check-compliance voter) ERR_NON_COMPLIANT)
+    (asserts! (is-eq (contract-of token-trait) token) ERR_UNAUTHORIZED)
+    (let ((balance (unwrap-panic (contract-call? token-trait get-balance voter))))
+      ;; Compliance Check
+      (asserts! (check-compliance voter) ERR_NON_COMPLIANT)
 
-    ;; Validation
-    (asserts! (>= block-height (get start-block proposal)) ERR_PROPOSAL_ACTIVE)
-    (asserts! (<= block-height (get end-block proposal)) ERR_PROPOSAL_EXPIRED)
-    (asserts!
-      (is-none (map-get? votes {
+      ;; Validation
+      (asserts! (>= block-height (get start-block proposal)) ERR_PROPOSAL_ACTIVE)
+      (asserts! (<= block-height (get end-block proposal)) ERR_PROPOSAL_EXPIRED)
+      (asserts!
+        (is-none (map-get? votes {
+          proposal-id: proposal-id,
+          voter: voter,
+        }))
+        ERR_UNAUTHORIZED
+      )
+      (asserts! (> balance u0) ERR_UNAUTHORIZED)
+
+      ;; Record Vote
+      (map-set votes {
         proposal-id: proposal-id,
         voter: voter,
-      }))
-      ERR_UNAUTHORIZED
-    )
-    (asserts! (> balance u0) ERR_UNAUTHORIZED)
+      }
+        true
+      )
 
-    ;; Record Vote
-    (map-set votes {
-      proposal-id: proposal-id,
-      voter: voter,
-    }
-      true
-    )
+      (map-set proposals proposal-id
+        (merge proposal {
+          for-votes: (if support
+            (+ (get for-votes proposal) balance)
+            (get for-votes proposal)
+          ),
+          against-votes: (if (not support)
+            (+ (get against-votes proposal) balance)
+            (get against-votes proposal)
+          ),
+        })
+      )
 
-    (map-set proposals proposal-id
-      (merge proposal {
-        for-votes: (if support
-          (+ (get for-votes proposal) balance)
-          (get for-votes proposal)
-        ),
-        against-votes: (if (not support)
-          (+ (get against-votes proposal) balance)
-          (get against-votes proposal)
-        ),
+      (print {
+        event: "vote",
+        id: proposal-id,
+        voter: voter,
+        support: support,
+        weight: balance,
       })
+      (ok true)
     )
-
-    (print {
-      event: "vote",
-      id: proposal-id,
-      voter: voter,
-      support: support,
-      weight: balance,
-    })
-    (ok true)
   )
 )
 

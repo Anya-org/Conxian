@@ -5,6 +5,7 @@
 
 (use-trait service-trait .conxian-service-trait.conxian-service-trait)
 (use-trait proposal-trait .governance-traits.proposal-trait)
+(use-trait proposal-executor-trait .governance-traits.proposal-executor-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u6000))
