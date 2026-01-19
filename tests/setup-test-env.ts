@@ -1,8 +1,7 @@
 import { initSimnet } from '@stacks/clarinet-sdk';
+import { beforeAll } from 'vitest';
 
-async function setup() {
+beforeAll(async () => {
     const simnet = await initSimnet();
     globalThis.simnet = simnet;
-}
-
-setup();
+});

@@ -273,3 +273,12 @@ Standardized error codes from `trait-errors.clar`:
 
 - **Testing**: Expand test coverage for new components.
 - **Deployment**: Verify all contracts on testnet.
+
+## 12. Recovery Registry (BOLT ⚡ Initiative)
+
+This section logs all files isolated during the Level 0 Root Stabilization phase. The goal is to create a clear record of stabilization actions and prevent knowledge decay.
+
+| File Path | Reason for Isolation | Required Fix |
+|---|---|---|
+| `contracts/core/founder-vesting.clar` | Fatal Syntax Error | The contract logic is not enclosed in a `(define-contract ...)` block, causing a global Clarity parser failure. |
+| `tests/setup-test-env.ts` | Asynchronous Race Condition | The `initSimnet()` function is not awaited by the test runner, causing the `simnet` global to be undefined when tests execute. |
