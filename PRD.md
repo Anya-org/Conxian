@@ -110,6 +110,11 @@ Standardized error codes from `trait-errors.clar`:
 - [x] **DAO Treasury** - `dao-treasury` with vault trait
 - [x] **Emergency Governance** - `emergency-governance` (circuit breaker)
 - [x] **Founder Vesting** - `founder-vesting` (linear unlock)
+  - **Implementation**: A standalone contract that manages linear vesting schedules for multiple beneficiaries. The contract owner can add new schedules, and beneficiaries can claim their vested tokens at any time.
+  - **State Transitions**:
+    - `add-vesting-schedule`: Adds a new vesting schedule to the `vesting-schedules` map.
+    - `claim-vested-tokens`: Calculates the vested and claimable amounts based on the current block height, transfers the tokens to the beneficiary, and updates the `claimed-amount` for that schedule.
+  - **Complexity**: The contract's operations are all O(1), as they only involve direct map lookups and arithmetic operations. Gas costs are minimal and constant, regardless of the number of vesting schedules.
 - [x] **Gamification** - `gamification-manager` (XP system)
 - [x] **Legal Registry** - `legal-representative-registry` (KYC mapping)
 - [x] **ICO System** - `ico-offering` (token sale logic)
@@ -280,5 +285,4 @@ This section logs all files isolated during the Level 0 Root Stabilization phase
 
 | File Path | Reason for Isolation | Required Fix |
 |---|---|---|
-| `contracts/core/founder-vesting.clar` | Fatal Syntax Error | The contract logic is not enclosed in a `(define-contract ...)` block, causing a global Clarity parser failure. |
 | `tests/setup-test-env.ts` | Asynchronous Race Condition | The `initSimnet()` function is not awaited by the test runner, causing the `simnet` global to be undefined when tests execute. |
