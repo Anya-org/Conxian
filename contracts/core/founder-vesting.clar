@@ -1,10 +1,9 @@
 ;; contracts/core/founder-vesting.clar
 ;; BOLT: Refactored for Clarity 4, Nakamoto compatibility, and secure state management.
 
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
+
 (define-contract founder-vesting
-
-    (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
-
     ;; --- Constants and Errors ---
     (define-constant CONTRACT_OWNER deployer)
     (define-constant ERR_UNAUTHORIZED (err u401))
