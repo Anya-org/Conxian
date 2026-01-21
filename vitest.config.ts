@@ -7,7 +7,7 @@ export default defineConfig({
     testTimeout: 300000,
     hookTimeout: 90000,
     fileParallelism: false,
-    exclude: ["contracts/drafts"],
+    exclude: ["contracts/drafts", "**/node_modules/**"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
