@@ -13,6 +13,7 @@
 (define-constant ERR_MODULE_NOT_FOUND (err u1003))
 
 (define-constant ROLE_EMERGENCY u3)
+(define-constant ROLE_PROTOCOL_ADMIN u2)
 
 ;; Data Vars
 (define-data-var paused bool false)
@@ -52,6 +53,20 @@
       sender: tx-sender,
     })
     (ok true)
+  )
+)
+
+;; BOLT: Optimizes module registration by allowing an administrator to register multiple modules in a single transaction.
+;; This reduces gas costs by performing the authorization check only once.
+(define-public (batch-register-modules (modules-list (list 20 { name: (string-ascii 32), contract: principal })))
+  (begin
+    (asserts! (contract-call? .admin-facade has-role tx-sender ROLE_PROTOCOL_ADMIN) ERR_UNAUTHORIZED)
+    (fold (lambda (module-data accumulator)
+      (begin
+        (map-set modules { name: (get name module-data) } { contract: (get contract module-data), active: true })
+        (ok true)
+      )
+    ) modules-list (ok true))
   )
 )
 
@@ -97,6 +112,21 @@
       (map-set modules { name: name } (merge module { active: active }))
       (ok true)
     )
+  )
+)
+
+;; BOLT: Optimizes module activation by allowing an administrator to update multiple modules in a single transaction.
+(define-public (batch-set-module-active (updates (list 20 { name: (string-ascii 32), active: bool })))
+  (begin
+    (asserts! (contract-call? .admin-facade has-role tx-sender ROLE_PROTOCOL_ADMIN) ERR_UNAUTHORIZED)
+    (fold (lambda (update accumulator)
+      (let ((module (unwrap! (map-get? modules { name: (get name update) }) ERR_MODULE_NOT_FOUND)))
+        (begin
+          (map-set modules { name: (get name update) } (merge module { active: (get active update) }))
+          (ok true)
+        )
+      )
+    ) updates (ok true))
   )
 )
 

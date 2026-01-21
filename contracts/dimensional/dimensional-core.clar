@@ -75,7 +75,7 @@
     version: uint,
     metadata: (optional (string-utf8 1024)),
     tenure-id: uint, ;; Updated for Nakamoto tenure tracking (uint)
-  }
+  },
 )
 
 (define-map position-ids
