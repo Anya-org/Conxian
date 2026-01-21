@@ -41,14 +41,8 @@
 ;; @returns (response bool uint)
 (define-public (set-paused (new-paused bool))
   (begin
-    ;; Use centralized admin facade for ultra-low gas authorization
-    (asserts!
-      (or
-        (contract-call? .admin-facade is-global-admin)
-(contract-call? .admin-facade has-role tx-sender
-          ROLE_EMERGENCY_PAUSE
-        )
-      )
+    ;; BOLT: Replaced two contract calls with a single, consolidated authorization check.
+    (asserts! (contract-call? .admin-facade is-authorized-to-pause tx-sender)
       ERR_UNAUTHORIZED
     )
     (var-set paused new-paused)
