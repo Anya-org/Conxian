@@ -107,6 +107,15 @@
   (is-eq tx-sender (var-get global-admin))
 )
 
+;; BOLT: Consolidated authorization check for pausing the protocol.
+;; @desc Checks if the sender is authorized to pause the protocol.
+;; @param sender principal
+;; @returns bool
+(define-read-only (is-authorized-to-pause (sender principal))
+  (or (is-eq sender (var-get global-admin))
+      (default-to false (map-get? role-cache { user: sender, role: ROLE_EMERGENCY_PAUSE })))
+)
+
 ;; Core Functions
 
 ;; @desc Pause a contract (emergency only)
