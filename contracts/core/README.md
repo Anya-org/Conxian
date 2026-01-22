@@ -8,102 +8,93 @@ permalink: /modules/core/
 
 ## Overview
 
-The Core Module is the foundational layer and central nervous system of the Conxian Protocol. It is responsible for managing global state, system-wide security, and routing all core user interactions for dimensional trading, position management, and risk assessment.
+The Core Module is the foundational layer and central nervous system of the Conxian Protocol. It manages global state, system-wide security, and routes all core user and administrative interactions. The architecture is designed for security, clarity, and gas efficiency by separating responsibilities into distinct, single-purpose contracts.
 
-The module is designed around a secure, modular **facade pattern**. The `dimensional-engine.clar` contract serves as the primary, user-facing entry point, while the `conxian-protocol.clar` contract acts as the central administrative hub. This architecture separates user actions from protocol administration and enforces system-wide rules.
+## Architecture: A Three-Contract System
 
-## Architecture: Facade and Coordinator
+The module operates on a three-contract model that separates administrative authorization, protocol state, and user-facing operations.
 
-The Core Module's architecture separates user interaction from protocol administration.
+1.  **`admin-facade.clar` (Authorization Hub)**: This contract is the **single source of truth for all authorization and access control**. It manages roles (e.g., `ROLE_GLOBAL_ADMIN`, `ROLE_EMERGENCY_PAUSE`) and provides a centralized point for other contracts to verify permissions. This pattern significantly reduces redundant authorization logic across the protocol and optimizes gas costs by consolidating checks.
 
-1.  **`dimensional-engine.clar` (User Facade)**: This contract is the single entry point for all standard user operations. It contains minimal business logic, instead validating inputs and delegating work to specialized manager contracts. Crucially, it performs pre-flight checks by querying other contracts for pause status (`conxian-protocol`) and regulatory compliance (`regulatory-adapter`).
+2.  **`conxian-protocol.clar` (Protocol State Coordinator)**: This contract manages the global state of the protocol. Its primary responsibilities include managing the system-wide emergency pause switch, maintaining a registry of all authorized module contracts, and handling contract ownership. It **delegates all authorization checks** to the `admin-facade.clar` contract.
 
-2.  **`conxian-protocol.clar` (Protocol Coordinator)**: This is the administrative heart of the protocol. It manages a system-wide emergency pause switch, maintains a registry of all authorized module contracts, and handles ownership and administrative permissions.
-
-***Architectural Note**: The current implementation of `dimensional-engine.clar` uses hardcoded contract dependencies for its manager contracts (e.g., `.position-manager`, `.collateral-manager`). This is a deviation from the originally intended dynamic module registry pattern, where dependencies would be looked up from `conxian-protocol.clar` at runtime. While the module registry exists in `conxian-protocol.clar`, `dimensional-engine.clar` does not currently utilize it.*
+3.  **`dimensional-engine.clar` (User Facade)**: This is the primary, user-facing entry point for all trading and position management. It validates user inputs and delegates the core logic to specialized manager contracts (e.g., `position-manager.clar`). Before executing any state-changing operations, it performs critical pre-flight checks by querying `conxian-protocol.clar` for the system's pause status.
 
 ### Control Flow Diagram
 
+This diagram illustrates the separation of concerns between the three core contracts. Administrative actions are authorized by `admin-facade.clar` and executed in `conxian-protocol.clar`, while user actions are routed through `dimensional-engine.clar`.
+
 ```mermaid
 graph TD
+    subgraph "Admin Actions"
+        A[Administrator] --> B{admin-facade.clar};
+        B -- Authorizes Role --> B;
+        C[conxian-protocol.clar] -- 1. Checks Role --> B;
+        A -- 2. `set-paused(true)` --> C;
+    end
+
     subgraph "User Actions"
-        A[User] --> B{dimensional-engine.clar};
+        D[User] --> E{dimensional-engine.clar};
+        E -- 1. Pre-flight: Check Pause Status --> C;
+        E -- 2. Delegate `open-position` --> F[position-manager.clar];
     end
 
-    subgraph "Protocol State & Security"
-        G[Admin] --> H{conxian-protocol.clar};
-        H -- set-paused --> H;
-        H -- register-module --> H;
+    subgraph "Dependencies"
+        F
     end
-
-    subgraph "Hardcoded Dependencies"
-        C[position-manager.clar]
-        D[collateral-manager.clar]
-        F[risk-manager.clar]
-        I[regulatory-adapter.clar]
-    end
-
-    B -- 1. Pre-flight: Check Compliance --> I;
-    B -- 1. Pre-flight: Check Pause Status --> H;
-
-    B -- 2. Delegate `open-position` --> C;
-    B -- 2. Delegate `deposit-funds` --> D;
-    B -- 2. Delegate `liquidate-position` --> F;
 ```
 
-## Core Contracts
+## Core Contracts & Public Functions
 
-### Facade & Coordinator
+### `admin-facade.clar` (Authorization Hub)
 
--   **`dimensional-engine.clar`**: The user-facing **facade** for the Core Module. It is the single, secure entry point for all position management, collateral, and risk-related calls. It performs critical pre-flight checks before delegating calls to the appropriate manager contracts.
--   **`conxian-protocol.clar`**: The central **protocol coordinator**. It is responsible for managing system-wide configurations, the module contract registry, and the global emergency pause feature. All administrative actions are routed through this contract.
+This contract centralizes all role-based access control (RBAC) to provide a single, gas-efficient source of truth for permissions.
 
-### Manager Contracts (Single-Responsibility)
+#### Authorization
+-   `is-global-admin()`: (Read-Only) Checks if the caller is the global administrator.
+-   `is-authorized-to-pause(sender principal)`: (Read-Only) Checks if a given principal has permission to pause the protocol. This is a `;; BOLT:` optimization that consolidates multiple checks into a single function.
+-   `has-role(role uint)`: (Read-Only) A generic function to check if the caller has a specific role.
 
--   **`position-manager.clar`**: Manages the entire lifecycle of user trading positions.
--   **`collateral-manager.clar`**: Handles all operations related to user collateral.
--   **`risk-manager.clar`**: Assesses the health of all open positions and manages the liquidation process.
--   **`funding-rate-calculator.clar`**: Calculates the funding rate for perpetual futures.
+#### Role Management
+-   `set-role(user principal, role uint, enabled bool)`: (Global Admin Only) Grants or revokes a specific role for a user.
+-   `batch-update-roles(updates (list 100 {user: principal, role: uint, active: bool}))`: (Global Admin Only) Updates multiple user roles in a single, gas-efficient transaction. This is a `;; BOLT:` optimization.
 
-### Key Dependencies
-
--   **`regulatory-adapter.clar`**: A compliance contract that verifies a user's status.
-
-## Public Functions
-
-### `dimensional-engine.clar` (User-Facing)
+#### Emergency Functions
+-   `set-emergency-pause(paused bool)`: (Emergency Role or Global Admin) Sets the emergency pause status.
 
 #### Configuration
--   `set-protocol-coordinator(new-coordinator principal)`: (Authorized Only) Sets the address of the main protocol coordinator contract.
+-   `set-global-admin(new-admin principal)`: (Global Admin Only) Transfers the global admin role to a new principal.
+-   `set-rbac-contract(new-contract principal)`: (Global Admin Only) Sets the address of the RBAC contract.
 
-#### Position Management
--   `open-position(token principal, amount uint, leverage uint, long bool, slippage-limit (optional uint), metadata (optional (string-utf8 1024)))`: Opens a new trading position.
--   `close-position(position-id uint, token principal, slippage-limit (optional uint))`: Closes an existing position.
+### `conxian-protocol.clar` (Protocol State Coordinator)
 
-#### Collateral Management
--   `deposit-funds(amount uint, token <.sip-standards.sip-010-ft-trait>)`: Deposits funds into the collateral manager.
--   `withdraw-funds(amount uint, token <.sip-standards.sip-010-ft-trait>)`: Withdraws funds from the collateral manager.
-
-#### Risk Management
--   `check-position-health(position-id uint)`: (Read-Only) Checks the health factor of a specific position.
--   `liquidate-position(position-id uint)`: Initiates the liquidation of an unhealthy position.
-
-### `conxian-protocol.clar` (Admin-Facing)
+This contract manages the protocol's global state and contract registry, delegating all authorization to `admin-facade.clar`.
 
 #### Global State
--   `set-paused(new-paused bool)`: (Admin Only) Pauses or unpauses all state-changing protocol functions.
+-   `set-paused(new-paused bool)`: (Admin Only) Pauses or unpauses all state-changing protocol functions. Delegates authorization to `admin-facade.clar`.
 -   `is-paused()`: (Read-Only) Returns the current pause status of the protocol.
--   `get-protocol-status()`: (Read-Only) Returns the pause status and the current Nakamoto tenure ID.
+-   `get-protocol-status()`: (Read-Only) Returns the pause status and the current Nakamoto tenure ID in a single, efficient call. This is a `;; BOLT:` optimization.
 
 #### Module Registry
 -   `register-module(name (string-ascii 32), contract principal)`: (Admin Only) Adds a new module contract to the protocol registry.
+-   `batch-register-modules(modules-list (list 20 {name: (string-ascii 32), contract: principal}))`: (Admin Only) Registers multiple modules in a single transaction. A `;; BOLT:` optimization.
 -   `set-module-active(name (string-ascii 32), active bool)`: (Admin Only) Activates or deactivates a registered module.
+-   `batch-set-module-active(updates (list 20 {name: (string-ascii 32), active: bool}))`: (Admin Only) Updates the status of multiple modules in a single transaction. A `;; BOLT:` optimization.
 -   `get-module(name (string-ascii 32))`: (Read-Only) Retrieves the address and status of a registered module.
 
 #### Ownership
 -   `set-contract-owner(new-owner principal)`: (Admin Only) Transfers ownership of the protocol to a new address.
 -   `get-contract-owner()`: (Read-Only) Returns the current owner of the protocol.
 
+### `dimensional-engine.clar` (User-Facing Facade)
+
+This contract is the secure entry point for all user-facing trading operations. Its documentation is included for architectural context.
+
+-   `open-position(...)`: Opens a new trading position.
+-   `close-position(...)`: Closes an existing position.
+-   `deposit-funds(...)`: Deposits funds into the collateral manager.
+-   `withdraw-funds(...)`: Withdraws funds from the collateral manager.
+
 ## Status
 
-**Under Review**: The contracts in this module are currently undergoing a comprehensive review to ensure correctness, security, and full alignment with the modular trait architecture. While the core functionality is implemented, the contracts are not yet considered production-ready.
+**Aligned**: The contracts in this module have been aligned with the architecture described in the `PRD.md`. The separation of concerns between authorization (`admin-facade`), state (`conxian-protocol`), and user interaction (`dimensional-engine`) is now clearly documented.
