@@ -114,7 +114,13 @@ Standardized error codes from `trait-errors.clar`:
   - **State Transitions**:
     - `add-vesting-schedule`: Adds a new vesting schedule to the `vesting-schedules` map.
     - `claim-vested-tokens`: Calculates the vested and claimable amounts based on the current block height, transfers the tokens to the beneficiary, and updates the `claimed-amount` for that schedule.
-  - **Complexity**: The contract's operations are all O(1), as they only involve direct map lookups and arithmetic operations. Gas costs are minimal and constant, regardless of the number of vesting schedules.
+  - **Complexity**: The contract's operations are all O(1), as they only involve direct map lookups and arithmetic operations. Gas costs are minimal and constant, regardless of the number of vesting schedules. The gas cost for a `claim-vested-tokens` call can be modeled with the following formula:
+  $$ G_{claim} = C_{base} + C_{map\_read} + C_{arithmetic} + C_{transfer} $$
+  Where:
+  -   $C_{base}$ is the base cost of a contract call.
+  -   $C_{map\_read}$ is the cost of reading from the `vesting-schedules` map.
+  -   $C_{arithmetic}$ is the cost of the vesting calculation.
+  -   $C_{transfer}$ is the cost of the `stx-transfer?` call.
 - [x] **Gamification** - `gamification-manager` (XP system)
 - [x] **Legal Registry** - `legal-representative-registry` (KYC mapping)
 - [x] **ICO System** - `ico-offering` (token sale logic)
@@ -284,5 +290,21 @@ Standardized error codes from `trait-errors.clar`:
 This section logs all files isolated during the Level 0 Root Stabilization phase. The goal is to create a clear record of stabilization actions and prevent knowledge decay.
 
 | File Path | Reason for Isolation | Required Fix |
-|---|---|---|
+| :--- | :--- | :--- |
 | `tests/setup-test-env.ts` | Asynchronous Race Condition | The `initSimnet()` function is not awaited by the test runner, causing the `simnet` global to be undefined when tests execute. |
+| `contracts/drafts/federated-oracle-adapter.clar` | Non-functional stub | Awaiting full implementation. |
+| `contracts/drafts/interest-rate-model.clar` | Pending Security Review | The contract is complete but requires a comprehensive security audit before reintegration. |
+| `contracts/drafts/lending-manager.clar` | Architectural Redesign | Awaiting a redesign to align with the latest PRD specifications for multi-asset collateral. |
+| `contracts/drafts/regulatory-adapter.clar` | SIP-018 Compliance | Being updated to support the latest SIP-018 standards for digital signatures. |
+
+## 13. Benchmarks (Vitest 4.0)
+
+This section provides a summary of the latest performance metrics from the Vitest 4.0 test suite. The goal is to track the gas costs and execution times of critical functions to prevent performance regressions.
+
+*NOTE: This section is a placeholder and will be populated with data from the automated testing pipeline.*
+
+| Contract | Function | Gas Cost (Mean) | Execution Time (ms) |
+| :--- | :--- | :--- | :--- |
+| `admin-facade.clar` | `batch-update-roles` | (TBD) | (TBD) |
+| `conxian-protocol.clar` | `batch-register-modules` | (TBD) | (TBD) |
+| `dimensional-engine.clar` | `open-position` | (TBD) | (TBD) |
