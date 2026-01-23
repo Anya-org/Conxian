@@ -61,10 +61,11 @@ const InvestorDashboard: React.FC = () => {
           {/* Risk Matrix Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
              {RISK_VECTORS.map((vector) => (
-                <div 
+                <button 
                   key={vector.id}
+                  type="button"
                   onClick={() => setActiveVector(vector.id)}
-                  className={`p-8 bg-surface-200/40 border rounded-[2.5rem] transition-all cursor-pointer group relative overflow-hidden ${
+                  className={`w-full text-left p-8 bg-surface-200/40 border rounded-[2.5rem] transition-all cursor-pointer group relative overflow-hidden ${
                     activeVector === vector.id ? 'border-bitcoin/50 bg-bitcoin/5' : 'border-border hover:border-muted'
                   }`}
                 >
@@ -83,10 +84,13 @@ const InvestorDashboard: React.FC = () => {
                          <span className="text-xs font-bold text-muted">/ 100</span>
                       </div>
                       <div className="w-full h-1 bg-background rounded-full overflow-hidden">
-                         <div className={`h-full transition-all duration-1000 ${vector.id === 'liq' ? 'bg-warning' : 'bg-bitcoin'}`} style={{ width: `${vector.value}%` }} />
+                         <div 
+                           className={`h-full transition-all duration-1000 ${vector.id === 'liq' ? 'bg-warning' : 'bg-bitcoin'}`} 
+                           style={{ width: `${vector.value}%` }} 
+                         />
                       </div>
                    </div>
-                </div>
+                </button>
              ))}
           </div>
 
