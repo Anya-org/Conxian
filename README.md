@@ -1,189 +1,125 @@
-# Conxius Wallet
+# Conxian Finance Protocol
 
-<<<<<<< HEAD
 ## Overview
 
-🏦 Conxian Protocol:
+🏦 **Conxian Finance**: A Multi-Dimensional, Stacks-Native Automated Monetary Platform
 
-A Multi-Dimensional, Stacks-Native Automated Monetary Platform.
-
-📜 I. The SAB Manifesto
+📜 **SAXAAP Manifesto**
 > "Code is Law, Logic is Sovereign."
 
-Conxian is not a financial service provider; it is an autonomous digital organism. It operates as a Sovereign Autonomous Bank (SAB) where human discretion is replaced by mathematical certainty.
- * Autonomous: Decisions are executed by code, not committees.
- * Neutral: The protocol is a public utility, indifferent to borders or identities.
- * Sovereign: Conxian lives on the "Pure Chain," anchored by the immutable security of Bitcoin.
+Conxian is not a financial service provider; it is an autonomous digital organism. It operates as a **Sovereign Autonomous Business (SAB)** where human discretion is replaced by mathematical certainty.
 
-📖 II. Whitepaper Summary (v2.0)
+- **Autonomous**: Decisions are executed by code, not committees
+- **Neutral**: The protocol is a public utility, indifferent to borders or identities  
+- **Sovereign**: Conxian lives on the "Pure Chain," anchored by Bitcoin's immutable security
 
-Conxian provides a Platform-as-a-Service (PaaS) model for decentralized, multi-dimensional finance.
-⚡ Core Services (Current Implementation)
- * Sovereign Bonds: Automated fixed-yield debt instruments.
- * Wormhole NTT: Native Token Transfers for cross-chain sovereignty without "wrapping."
+## Architecture
 
-**Planned Features (Not Yet Implemented):**
- * Money Markets: Algorithmic lending with real-time risk adjustment.
- * Flash Loans: Atomic, uncollateralized liquidity for arbitrage and rebalancing.
-🗳️ Granulated Automated DAO Seats
-Governance is segmented into five specialized automated seats that respond to on-chain metrics:
- * CXD (Debt): Automates stability and collateral ratios.
- * CXVG (Governance): Manages systemic logic and upgrades.
- * CXTR (Treasury): Rebalances reserves against BTC/STX volatility.
- * CXS (Staking): Manages yield distribution and reputation logic.
- * CXLP (Liquidity): Optimizes AMM depth and fee structures.
+### 🏗️ **Facade Pattern & Trait System**
+- **Centralized Traits**: All interfaces defined in `/contracts/traits/`
+- **Modular Contracts**: Single-responsibility contracts in dedicated modules
+- **Bitcoin Finality**: All operations anchored to Nakamoto consensus
+- **Censorship Resistance**: Critical actions performable by any user
 
-🏢 III. Enterprise Integration Guide
+### 📊 **Multi-Dimensional DeFi System**
 
-Conxian is designed for "Compliance at the Edge." ### 🔗 Connecting to the PaaS
-Institutions can leverage Conxian's liquidity and debt structures while maintaining their own regulatory requirements through:
- * Custom NTT Transceivers: Plug in KYC-filtered transceivers for cross-chain movement.
- * Metric Oracles: Provide institutional-grade data feeds to trigger automated DAO seat actions.
+**Core DeFi Primitives:**
+- **DEX**: Concentrated liquidity, multi-hop routing, batch auctions
+- **Lending**: Automated money markets with real-time risk adjustment
+- **Vaults**: sBTC integration, yield aggregation, custody solutions
+- **Tokens**: CXD (governance), CXS (staking), CXTR (treasury), CXLP (liquidity)
 
-⚖️ IV. License & Regulatory Decoupling
+**SAXAAP Business Model:**
+- **Revenue Generation**: Subscription fees (1 STX), transaction fees, service charges
+- **Revenue Distribution**: Autonomous 60/20/20 split (Staking/Dev/Insurance)
+- **Multi-Council Governance**: 5 specialized automated seats
+- **Office Workers**: Autonomous liquidations and treasury operations
 
-This project is licensed under the GNU General Public License v3 (GPLv3).
-Why GPLv3?
- * Hands-Off Sovereignty: It establishes the protocol as a "public good." No central "manager" owns the commercial rights, which decouples the Architect from the financial actions of the users.
- * Permissionless Growth: It allows anyone to fork or build on Conxian, provided their contributions remain open-source.
+### 🗳️ **5-Tier Governance System**
 
-🛠️ V. Developer Setup
+- **CXD (Debt)**: Automates stability and collateral ratios
+- **CXVG (Governance)**: Manages systemic logic and upgrades  
+- **CXTR (Treasury)**: Rebalances reserves against BTC/STX volatility
+- **CXS (Staking)**: Manages yield distribution and reputation logic
+- **CXLP (Liquidity)**: Optimizes AMM depth and fee structures
 
-Conxian is built with Clarity 4 and tested using the Clarinet SDK.
+## Technical Stack
 
-**For a comprehensive overview of the protocol's vision, architecture, smart contracts, and operational procedures, please visit our complete documentation hub:**
+### ⚡ **Stacks-Native Components**
+- **Clarity 4**: Smart contract language with Bitcoin anchoring
+- **Nakamoto Compatibility**: 6 Bitcoin confirmations for high-value operations
+- **Multi-Oracle System**: Chainlink, Pyth, Redstone, DIA, TWAP adapters
+- **Cross-Chain**: Wormhole integration for sovereign token transfers
 
--   **[View Complete Documentation](documentation/README.md)**
+### 🔧 **Development Tools**
+- **Clarinet SDK**: Contract development and testing
+- **StacksOrbit**: Deployment automation
+- **Vitest**: Comprehensive test suite
 
-This central hub contains all key documents, including:
+## Repository Structure
 
--   **Strategic Overview & Whitepaper**
--   **Technical Architecture Guides**
--   **Smart Contract Module Breakdowns**
--   **Development Roadmap**
--   **Security Audit Reports**
--   **Developer & Contribution Guides**
-=======
-### The Sovereign Bitcoin Enclave
+```
+/contracts/
+├── traits/           # All trait definitions (centralized)
+├── core/             # Dimensional engine, risk management
+├── dex/              # Decentralized exchange logic
+├── governance/       # 5-tier DAO system
+├── tokens/           # Multi-token system
+├── oracle/           # Price feed adapters
+├── security/         # Circuit breakers, monitoring
+├── lending/          # Money markets
+├── vaults/           # Custody and yield
+└── utils/            # Shared utilities
+```
 
-Designed by **Conxian Labs** under the **Conxian Brand**.
-
-[![License](https://img.shields.io/badge/License-BUSL--1.1-orange.svg)](./LICENSE)
-[![Build Status](https://img.shields.io/badge/Build-Reproducible-success.svg)](https://github.com/conxian/conxius-wallet)
-[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Web-blue.svg)](https://github.com/conxian/conxius-wallet)
-
-Conxius is a mobile-first, non-custodial Bitcoin wallet built for the sovereign individual and the institutional operator.
-It leverages a **Native Hardened Enclave** model to ensure your private keys never leave your device's secure hardware.
->>>>>>> 2b7ceb80d13077a5ed3f3a4228acdc870843f446
-
----
-
-<<<<<<< HEAD
--   **Maturity Level**: 🔵 **Technical Alpha (Testnet)**
--   **Architectural Pattern**: Facade-Based & Trait-Driven
--   **Next Steps**: Comprehensive testing, third-party security audits, and preparation for mainnet.
-
-***Disclaimer**: This project is in a Technical Alpha stage. The features and architecture described in the documentation represent the target design of the protocol, and not all functionality is fully implemented. Please refer to the module-specific `README` files for the most accurate information on the current state of the code.*
-
-## Development Setup
+## Development
 
 ### Prerequisites
-
-1.  Clarinet 2.0+
-2.  Node.js 18+
-3.  Git
-=======
-## 🛡️ Core Principles
-
-- **True Sovereignty**: No accounts, no email, no KYC. Your keys, your Bitcoin.
-- **Native Enclave**: Private keys are generated and stored within the Android Keystore / Secure Enclave.
-- **Zero Telemetry**: We do not track you. No analytics, no logging, no middle-man servers.
-- **Multi-Layer Native**: Deep integration with:
-**Bitcoin L1, Lightning (Breez/Greenlight), Stacks (SIP-005), Rootstock, Liquid, and Nostr.
-
-## 🚀 Key Features
-
-### 🏦 Institutional-Grade Security
-
-- **Native Enclave Core**: Encrypted state persisted on-device with memory-only seed handling.
-- **Ops Personas**: Pre-configured governance structures (BRICS, Business, Nomad, Unbanked) for entity management.
-- **Risk Enclave**: Real-time institutional risk auditing and protocol-native moat quantification.
-
-### ⚡ Lightning & Multi-Layer
-
-- **Embedded Lightning**: Built-in Greenlight (Breez SDK) node for instant, low-fee payments.
-- **Bitcoin L2 Support**: Native derivation for Stacks, Liquid, and Rootstock.
-- **Coin Control Forge**: Real-time UTXO indexer with advanced coin selection and freezing capabilities.
-
-### 🆔 Decentralized Identity
-
-- **D.iD Integration**: Decentralized Identity (did:pkh:btc) derived natively from your enclave.
-- **Nostr Transport**: Encrypted multi-sig coordination and decentralized profile metadata via Nostr relays.
-
-## 📂 Repository Structure
-
-- `components/`: React UI components following Bitcoin Design Standards.
-- `services/`: Core logic for Enclave interactions, signing, and protocol integrations.
-- `android/`: Native Capacitor bridge and Secure Enclave implementation.
-- `docs/`: Comprehensive technical and operational documentation.
-
-## 🛠️ Development
-
-### Prerequisites
-
-- Node.js (v18+)
-- Android Studio + Android SDK (for device installs)
-- Java 17+
->>>>>>> 2b7ceb80d13077a5ed3f3a4228acdc870843f446
+- Clarinet 2.0+
+- Node.js 18+
+- Git
 
 ### Getting Started
 
 1. **Install Dependencies**
-
    ```bash
    npm install
    ```
 
-2. **Run in Web (Mock Enclave)**
-
-<<<<<<< HEAD
-```bash
-npm test
-```
-=======
+2. **Run Tests**
    ```bash
-   npm run dev
+   npm test
    ```
 
-3. **Build & Sync Android**
-
+3. **Contract Check**
    ```bash
-   npm run build
+   clarinet check
    ```
 
-## 🔐 Security & Privacy
+4. **Local Development**
+   ```bash
+   clarinet console
+   ```
 
-### Reproducible Builds
+## License
 
-Conxius is committed to reproducible builds. This allows anyone to verify that the binary provided in our releases was generated from the exact source code in this repository.
+Conxian Finance Protocol is distributed under the **GNU General Public License v3 (GPLv3)**.
 
-### Vulnerability Disclosure
-
-If you find a security issue, please contact us at `security@conxian.com`.
-
-## 📜 Documentation & Guides
-
-All documentation is centralized in our **[Documentation Hub](./docs/)**.
-
-- **[User Guide](./docs/user/user-guide.md)**: Onboarding and daily usage.
-- **[Architecture](./docs/architecture.md)**: Deep dive into the Enclave and Plugin system.
-- **[Institutional Onboarding](./docs/enterprise/onboarding.md)**: Setting up Ops Personas.
-
-## ⚖️ License
-
-Conxius Wallet is distributed under the Business Source License 1.1 (BUSL-1.1). See [LICENSE](./LICENSE) for details.
+**Why GPLv3?**
+- **Hands-Off Sovereignty**: Establishes the protocol as a "public good"
+- **Permissionless Growth**: Anyone can fork or build on Conxian
+- **No Commercial Capture**: Prevents centralization of the protocol
 
 ---
 
-© 2024-2026 Conxian Labs. All rights reserved.
->>>>>>> 2b7ceb80d13077a5ed3f3a4228acdc870843f446
+## Status
+
+- **Maturity Level**: 🔵 **Technical Alpha (Testnet)**
+- **Architecture**: Facade-Based & Trait-Driven
+- **Next Steps**: Comprehensive testing, security audits, mainnet preparation
+
+**Disclaimer**: This project is in a Technical Alpha stage. Features represent the target design, not all functionality is fully implemented.
+
+---
+
+© 2024-2026 Conxian Finance. All rights reserved.
