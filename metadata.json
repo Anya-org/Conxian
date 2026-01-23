@@ -1,0 +1,17 @@
+{
+  "name": "Conxius Wallet",
+  "short_name": "Conxius",
+  "version": "0.3.0",
+  "description": "Hardened Bitcoin Multi-Layer Sovereign Enclave with Native NTT Bridging.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "mobileFeatures": [
+    "vibration",
+    "notifications",
+    "biometrics"
+  ],
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#f97316"
+}

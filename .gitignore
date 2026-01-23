@@ -1,11 +1,36 @@
-# ===========================================================================
-# CONXIAN PROTOCOL - GITIGNORE
-# ===========================================================================
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# ---------------------------------------------------------------------------
-# 1. ENVIRONMENT & SECRETS
-# ---------------------------------------------------------------------------
-# Environment files
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Android
+android/app/build
+android/.gradle
+android/local.properties
+android/captures
+.gradle
+
+# Environment & Secrets
 .env
 .env.*
 !.env.example
@@ -29,323 +54,23 @@ secrets*
 # Configuration
 config.local.json
 
-# ---------------------------------------------------------------------------
-# 2. DEVELOPMENT TOOLS & CACHE
-# ---------------------------------------------------------------------------
-# Node.js (comprehensive from official template)
-node_modules/
-jspm_packages/
-web_modules/
-
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-
-# Diagnostic reports (https://nodejs.org/api/report.html)
-report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
-
 # Runtime data
 pids
 *.pid
 *.seed
 *.pid.lock
 
-# Coverage directory used by tools like istanbul
+# Coverage
 coverage/
 *.lcov
-
-# nyc test coverage
 .nyc_output/
 
-# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
-.grunt
-
-# Bower dependency directory (https://bower.io/)
-bower_components/
-
-# node-waf configuration
-.lock-wscript
-
-# Compiled binary addons (https://nodejs.org/api/addons.html)
-build/Release
-
-# TypeScript cache
-*.tsbuildinfo
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Optional stylelint cache
-.stylelintcache
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# parcel-bundler cache (https://parceljs.org/)
-.parcel-cache
-
-# Next.js build output
-.next
-out
-
-# Nuxt.js build / generate output
-.nuxt
-
-# Sveltekit cache directory
-.svelte-kit/
-
-# yarn v3
-.pnp.*
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Rust
+# ---------------------------------------------------------------------------
+# Clarinet & Stacks
+# ---------------------------------------------------------------------------
+.clarinet
 target/
-Cargo.lock
-
-# Cache directories
-.cache/
-.tmp/
-.temp/
-temp/
-tmp/
-.history/
-.githooks/
-
-# ---------------------------------------------------------------------------
-# 3. BUILD & DEPLOYMENT ARTIFACTS
-# ---------------------------------------------------------------------------
-dist/
-build/
-.deployments/
-
-# Deployment artifacts
-*.deployed.json
-*.deployed.yaml
-deployment-registry-*.json
-wallet-*.json
-deployer-*.json
-private-keys-*.txt
-
-# ---------------------------------------------------------------------------
-# 4. TESTING & COVERAGE
-# ---------------------------------------------------------------------------
-test-results/
-junit.xml
-coverage.xml
-coverage/
-.nyc_output/
-
-# ---------------------------------------------------------------------------
-# 5. LOGS
-# ---------------------------------------------------------------------------
-logs/
-clarinet.log
-*.log
-
-# ---------------------------------------------------------------------------
-# 6. IDE & EDITOR FILES
-# ---------------------------------------------------------------------------
-# Visual Studio Code
-.vscode/
-.vscode/settings.json
-.vscode/launch.json
-.vscode/extensions.json
-.vscode-test/
-*.code-workspace
-
-# JetBrains IDEs (IntelliJ, WebStorm, etc.)
-.idea/
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/dictionaries
-.idea/shelf
-.idea/contentModel.xml
-.idea/dataSources.ids
-.idea/dataSources.local.xml
-.idea/sqlDataSources.xml
-.idea/dynamic.xml
-.idea/uiDesigner.xml
-.idea/gradle.xml
-.idea/libraries
-*.iws
-*.iml
-*.ipr
-
-# Vim
-*~
-.#*
-*.swp
-*.swo
-.vimrc
-.viminfo
-
-# Emacs
-*~
-\#*\#
-/.emacs.desktop
-/.emacs.desktop.lock
-*.elc
-auto-save-list
-tramp
-.\#*
-
-# Sublime Text
-*.sublime-project
-*.sublime-workspace
-
-# Kate
-*.kateconfig
-
-# Notepad++
-*.npp
-
-# TextMate
-*.tmproj
-*.tmproject.settings
-
-# Geany
-*.geany
-
-# Eclipse
-.project
-.classpath
-.cproject
-.settings/
-
-# NetBeans
-nbproject/
-nbproject/private/
-build/
-nbbuild/
-dist/
-nbdist/
-.nb-gradle/
-
-# Brackets
-.brackets.json
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# ---------------------------------------------------------------------------
-# 7. OS SPECIFIC FILES
-# ---------------------------------------------------------------------------
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# ---------------------------------------------------------------------------
-# 8. STACKS BLOCKCHAIN SPECIFIC
-# ---------------------------------------------------------------------------
-# Chain data
-.stacks-chain/
-.stacks-db/
-.chainstate/
-
-# Clarinet specific
-**/settings/Mainnet.toml
-**/settings/Testnet.toml
-.clarinet/
-artifacts/
-clarinet-windows-x64.msi
-clarinet_check_output.txt
-clarinet_check_errors.txt
-contracts-index.txt
-
-# Stacks deployment directories
-stacks/simnet/
-stacks/deployments/simnet/
-stacks/deployments/testnet/
-stacks/deployments/mainnet/
-stacks/.cache/
-
-# Bitcoin/Stacks wallet files
-*.wallet
-*.seed
-stx-wallet*
-btc-wallet*
-
-# ---------------------------------------------------------------------------
-# 9. BACKUP & TEMPORARY FILES
-# ---------------------------------------------------------------------------
-*.backup
-*.bak
-*.tmp
-*.temp
-*~
-
-# ---------------------------------------------------------------------------
-# 10. PROJECT SPECIFIC EXCLUSIONS
-# ---------------------------------------------------------------------------
-# Conxian specific
-monitoring/logs/
-analytics/cache/
-
-# StacksOrbit standalone repository (separate GitHub repo)
-stacksorbit/
-
-# Kiro IDE specific files
-.kiro/*
-.kiro/specs/
-
-# Prompt files (sensitive AI instructions)
-.github/chatmodes/*
-.github/copilot-instructions.md
-
-# Trae rules documentation
-.trae/rules/*
-
-# Contract backups
-contracts/dex/*backup.clar
-
-backups/env/.env.*
-
-*.devnet-plan.yaml.backup
-  
-compilation-errors-clean.txt
-stacks/security/audit-prep/*.txt
-deployments/*.simnet-plan.yaml
-stacks/deployments/*.simnet-plan.yaml
-*#
-clarinet-installer.msi
+settings/Devnet.toml
+!settings/Simnet.toml
+!settings/Testnet.toml
+!settings/Mainnet.toml
