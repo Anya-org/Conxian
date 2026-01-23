@@ -26,9 +26,6 @@
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "esModuleInterop": true
-  },
-  "include": ["src/**/*", "components/**/*", "services/**/*", "tests/**/*.ts", "scripts/**/*.ts", "*.ts"],
-  "exclude": ["node_modules"]
+    "forceConsistentCasingInFileNames": true
+  }
 }
