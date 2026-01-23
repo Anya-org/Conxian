@@ -89,6 +89,7 @@ const Settings: React.FC = () => {
                  {['BTC', 'SATS', 'BITS'].map(u => (
                    <button 
                     key={u}
+                    type="button"
                     onClick={() => setUnit(u)}
                     className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${unit === u ? 'bg-orange-600 text-white shadow-lg' : 'text-zinc-600 hover:text-zinc-400'}`}
                    >
@@ -120,7 +121,7 @@ const Settings: React.FC = () => {
               <p className="font-bold text-zinc-200">Purge Sovereign State</p>
               <p className="text-xs text-zinc-500 mt-1">Wipes all keys, BIP-39 entropy, and cached ledger data. Action is terminal.</p>
             </div>
-            <button onClick={appContext.resetEnclave} className="px-8 py-3 bg-red-600/10 border border-red-500/20 text-red-500 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all">
+            <button type="button" onClick={appContext.resetEnclave} className="px-8 py-3 bg-red-600/10 border border-red-500/20 text-red-500 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all">
               Execute Purge
             </button>
           </div>
@@ -145,6 +146,7 @@ const Settings: React.FC = () => {
                 ].map(opt => (
                   <button
                     key={opt.id}
+                    type="button"
                     onClick={() => appContext.setMode(opt.id as any)}
                     className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                       mode === opt.id ? 'bg-green-600 text-white shadow-lg' : 'text-zinc-600 hover:text-zinc-400'

@@ -125,4 +125,15 @@ export class IdentityService {
           throw new Error('Lightning Authentication failed');
       }
   }
+
+  /**
+   * Links an external wallet to the identity.
+   * In a real implementation, this might involve signing a message with the external wallet
+   * and storing the link in a decentralized registry or locally.
+   */
+  async linkExternalWallet(walletType: string, address: string): Promise<void> {
+      console.log(`Linking ${walletType} wallet: ${address}`);
+      // Simulate API call/registry update
+      return new Promise(resolve => setTimeout(resolve, 1000));
+  }
 }

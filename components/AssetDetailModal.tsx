@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Asset, Transaction } from '../types';
-import { X, ArrowUpRight, ArrowDownLeft, Clock, Bot, Loader2, ExternalLink, History, ShieldCheck, Sparkles } from 'lucide-react';
+import { X, ArrowUpRight, ArrowDownLeft, Clock, Bot, Loader2, ExternalLink, History, ShieldCheck, Sparkles, AlertTriangle } from 'lucide-react';
 import { LAYER_COLORS, MOCK_TRANSACTIONS } from '../constants';
 import { getAssetInsight } from '../services/gemini';
 
@@ -18,7 +18,7 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ asset, onClose }) =
     const fetchInsight = async () => {
       setIsLoadingInsight(true);
       const res = await getAssetInsight(asset);
-      setInsight(res);
+      setInsight(res ?? null);
       setIsLoadingInsight(false);
     };
     fetchInsight();
@@ -30,100 +30,118 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ asset, onClose }) =
     .sort((a, b) => b.timestamp - a.timestamp);
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-xl animate-in fade-in duration-300">
       <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300" 
+        className="absolute inset-0 transition-opacity duration-300" 
         onClick={onClose}
       />
       
-      <div className="relative w-full max-w-2xl bg-zinc-950 border border-zinc-800 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
+      <div className="relative w-full max-w-2xl bg-surface-100 border border-border rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300">
+        <div className="absolute top-0 right-0 -mt-24 -mr-24 w-64 h-64 bg-bitcoin/5 rounded-full blur-3xl pointer-events-none" />
+        
         {/* Header */}
-        <div className="p-8 border-b border-zinc-900 flex justify-between items-start">
-          <div className="flex items-center gap-5">
-            <div className={`w-16 h-16 rounded-[1.25rem] flex items-center justify-center font-bold text-3xl text-white shadow-lg ${LAYER_COLORS[asset.layer]}`}>
+        <div className="p-8 md:p-10 border-b border-border flex justify-between items-start relative z-10">
+          <div className="flex items-center gap-6">
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-bold text-3xl text-white shadow-xl ${LAYER_COLORS[asset.layer] || 'bg-surface-300'}`}>
               {asset.symbol[0]}
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-bold tracking-tight text-zinc-100">{asset.name}</h2>
-                <span title="D.i.D Verified Asset" className="flex items-center justify-center">
-                  <ShieldCheck size={18} className="text-blue-500" />
-                </span>
+            <div className="space-y-1">
+              <div className="flex items-center gap-3">
+                <h2 className="text-2xl font-bold tracking-tight text-white">{asset.name}</h2>
+                <div title="D.i.D Verified Asset" className="flex items-center justify-center p-1 bg-bitcoin/10 rounded-full">
+                  <ShieldCheck size={16} className="text-bitcoin" />
+                </div>
               </div>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-[10px] font-black uppercase text-zinc-500 tracking-[0.2em]">{asset.layer}</span>
-                <span className="w-1 h-1 rounded-full bg-zinc-800" />
-                <span className="text-xs text-zinc-500 font-medium">{asset.type}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase text-muted tracking-[0.2em]">{asset.layer}</span>
+                <div className="w-1 h-1 rounded-full bg-border" />
+                <span className="text-[10px] text-muted font-bold uppercase tracking-wider">{asset.type}</span>
               </div>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 hover:bg-zinc-900 rounded-full text-zinc-500 transition-colors"
-            aria-label="Close"
-            title="Close"
+            aria-label="Close modal"
+            className="p-2.5 bg-surface-200 hover:bg-surface-300 border border-border rounded-full text-muted hover:text-white transition-all active:scale-95"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-8 space-y-10 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-8 md:p-10 space-y-10 custom-scrollbar relative z-10">
           {asset.layer === 'Liquid' && (
-            <div className="bg-amber-600/10 border border-amber-600/20 rounded-3xl p-6 text-[10px] text-amber-500 font-black uppercase tracking-widest">
-              Liquid balances are read from public explorer APIs and do not include confidential asset support.
-            </div>
-          )}
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 gap-5">
-            <div className="bg-zinc-900/40 p-6 rounded-3xl border border-zinc-800/50 hover:border-zinc-700/50 transition-colors">
-              <p className="text-zinc-500 text-xs mb-1 font-bold uppercase tracking-wider">Available Balance</p>
-              <p className="text-2xl font-mono font-bold tracking-tight text-zinc-100">
-                {asset.balance.toLocaleString()} <span className="text-zinc-500 text-sm font-normal uppercase">{asset.symbol}</span>
+            <div className="bg-bitcoin/5 border border-bitcoin/10 rounded-2xl p-5 flex items-start gap-3">
+              <AlertTriangle size={16} className="text-bitcoin shrink-0 mt-0.5" />
+              <p className="text-[10px] text-muted leading-relaxed font-bold uppercase tracking-wider">
+                Liquid balances are read from public explorer APIs and do not include confidential asset support.
               </p>
             </div>
-            <div className="bg-zinc-900/40 p-6 rounded-3xl border border-zinc-800/50 hover:border-zinc-700/50 transition-colors">
-              <p className="text-zinc-500 text-xs mb-1 font-bold uppercase tracking-wider">Estimated Value</p>
-              <p className="text-2xl font-mono font-bold text-orange-500 tracking-tight">
+          )}
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 gap-6">
+            <div className="bg-surface-200/50 p-6 rounded-3xl border border-border shadow-inner group hover:border-bitcoin/30 transition-colors">
+              <p className="text-muted text-[10px] mb-2 font-bold uppercase tracking-widest">Available Balance</p>
+              <p className="text-2xl font-bold tracking-tight text-white font-mono">
+                {asset.balance.toLocaleString()} <span className="text-muted text-sm font-normal uppercase ml-1">{asset.symbol}</span>
+              </p>
+            </div>
+            <div className="bg-surface-200/50 p-6 rounded-3xl border border-border shadow-inner group hover:border-bitcoin/30 transition-colors">
+              <p className="text-muted text-[10px] mb-2 font-bold uppercase tracking-widest">Market Valuation</p>
+              <p className="text-2xl font-bold text-bitcoin tracking-tight font-mono">
                 ${asset.valueUsd.toLocaleString()}
               </p>
             </div>
           </div>
 
           {/* AI Insights Section */}
-          <div className="bg-orange-500/5 border border-orange-500/10 rounded-3xl p-7 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-              <Bot size={80} />
+          <div className="bg-surface-200 border border-border rounded-[2rem] p-8 relative overflow-hidden group shadow-xl">
+            <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity pointer-events-none">
+              <Bot size={120} />
             </div>
-            <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-orange-500/20 p-2 rounded-lg">
-                  <Sparkles className="text-orange-500" size={18} />
+            <div className="relative z-10 space-y-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="bg-bitcoin/10 p-2 rounded-xl text-bitcoin">
+                    <Sparkles size={18} />
+                  </div>
+                  <h3 className="font-bold text-[10px] uppercase tracking-[0.2em] text-bitcoin">Protocol Insight Engine</h3>
                 </div>
-                <h3 className="font-bold text-xs uppercase tracking-widest text-orange-500">Protocol Intelligence Analysis</h3>
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-surface-300 rounded-lg border border-border">
+                  <div className="w-1 h-1 rounded-full bg-success animate-pulse" />
+                  <span className="text-[8px] font-bold text-muted uppercase tracking-tighter">AI Analysis Live</span>
+                </div>
               </div>
-              <div className="text-sm text-zinc-300 leading-relaxed min-h-[100px] bg-zinc-950/30 p-4 rounded-2xl border border-orange-500/10">
+              <div className="text-xs text-zinc-300 leading-relaxed min-h-[100px] bg-surface-100/50 p-5 rounded-2xl border border-border italic shadow-inner">
                 {isLoadingInsight ? (
-                  <div className="flex items-center gap-3 text-zinc-500 italic py-4">
-                    <Loader2 className="animate-spin" size={16} />
-                    <span>Analyzing protocol utility...</span>
+                  <div className="flex flex-col items-center justify-center py-8 gap-4 text-muted">
+                    <Loader2 className="animate-spin text-bitcoin" size={24} />
+                    <span className="text-[10px] font-bold uppercase tracking-widest animate-pulse">Scanning On-Chain Metrics...</span>
                   </div>
                 ) : (
-                  <p className="whitespace-pre-wrap text-xs leading-relaxed">{insight}</p>
+                  <p className="whitespace-pre-wrap leading-relaxed opacity-90">{insight}</p>
                 )}
               </div>
             </div>
           </div>
 
           {/* Transaction History Section */}
-          <div className="space-y-5">
-            <div className="flex items-center justify-between px-1">
-              <h3 className="font-bold text-sm uppercase tracking-widest text-zinc-400 flex items-center gap-2">
-                <History size={16} />
-                Layer Activity
-              </h3>
-              <button type="button" className="text-[10px] font-bold uppercase tracking-wider text-zinc-600 hover:text-orange-500 transition-colors flex items-center gap-1.5" aria-label="Open Explorer" title="Open Explorer">
-                Explorer <ExternalLink size={10} />
+          <div className="space-y-6">
+            <div className="flex items-center justify-between px-2">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 bg-surface-200 rounded-lg text-muted">
+                  <History size={16} />
+                </div>
+                <h3 className="font-bold text-[10px] uppercase tracking-[0.2em] text-white">Layer Activity Ledger</h3>
+              </div>
+              <button 
+                type="button" 
+                className="text-[10px] font-bold uppercase tracking-widest text-muted hover:text-bitcoin transition-all flex items-center gap-2 group" 
+                aria-label="Open Explorer" 
+                title="Open Explorer"
+              >
+                Explorer <ExternalLink size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </button>
             </div>
             
@@ -132,33 +150,35 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ asset, onClose }) =
                 assetTransactions.map(tx => (
                   <div 
                     key={tx.id} 
-                    className="bg-zinc-900/20 hover:bg-zinc-900/50 border border-zinc-800/40 p-5 rounded-[1.25rem] flex items-center justify-between group transition-all duration-300 hover:translate-x-1"
+                    className="bg-surface-200/30 hover:bg-surface-200/60 border border-border p-5 rounded-2xl flex items-center justify-between group transition-all duration-300 hover:scale-[1.01] shadow-sm hover:shadow-md"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                        tx.type === 'receive' ? 'bg-green-500/10 text-green-500' : 
+                    <div className="flex items-center gap-5">
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-inner ${
+                        tx.type === 'receive' ? 'bg-success/10 text-success' : 
                         tx.type === 'send' ? 'bg-red-500/10 text-red-500' : 
-                        'bg-blue-500/10 text-blue-500'
+                        'bg-bitcoin/10 text-bitcoin'
                       }`}>
-                        {tx.type === 'receive' ? <ArrowDownLeft size={18} /> : 
-                         tx.type === 'send' ? <ArrowUpRight size={18} /> : 
-                         <Bot size={18} />}
+                        {tx.type === 'receive' ? <ArrowDownLeft size={20} /> : 
+                         tx.type === 'send' ? <ArrowUpRight size={20} /> : 
+                         <Bot size={20} />}
                       </div>
-                      <div>
-                        <div className="text-sm font-bold capitalize text-zinc-200">{tx.type}</div>
-                        <div className="text-[10px] text-zinc-500 font-mono mt-0.5">
-                          {new Date(tx.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} • {tx.counterparty}
+                      <div className="space-y-1">
+                        <div className="text-sm font-bold text-white uppercase tracking-tight">{tx.type}</div>
+                        <div className="text-[10px] text-muted font-bold uppercase tracking-widest flex items-center gap-2">
+                          <span>{new Date(tx.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                          <div className="w-1 h-1 rounded-full bg-border" />
+                          <span className="opacity-70">{tx.counterparty}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className={`text-sm font-mono font-bold ${
-                        tx.type === 'receive' ? 'text-green-500' : 'text-zinc-100'
+                    <div className="text-right space-y-1.5">
+                      <div className={`text-sm font-bold font-mono ${
+                        tx.type === 'receive' ? 'text-success' : 'text-white'
                       }`}>
                         {tx.type === 'receive' ? '+' : '-'}{tx.amount.toLocaleString()} {tx.asset}
                       </div>
-                      <div className={`text-[9px] font-black uppercase tracking-tighter mt-1 px-1.5 py-0.5 rounded border inline-block ${
-                        tx.status === 'completed' ? 'border-zinc-800 text-zinc-600' : 'border-orange-500/20 text-orange-500'
+                      <div className={`text-[8px] font-bold uppercase tracking-[0.15em] px-2 py-0.5 rounded-full border ${
+                        tx.status === 'completed' ? 'border-border text-muted bg-surface-200/50' : 'border-bitcoin/30 text-bitcoin bg-bitcoin/5'
                       }`}>
                         {tx.status}
                       </div>
@@ -166,13 +186,13 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ asset, onClose }) =
                   </div>
                 ))
               ) : (
-                <div className="py-16 text-center border-2 border-dashed border-zinc-900 rounded-[2rem] flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-700">
-                    <Clock size={24} />
+                <div className="py-20 text-center border-2 border-dashed border-border rounded-[2.5rem] flex flex-col items-center gap-4 bg-surface-200/10">
+                  <div className="w-16 h-16 rounded-2xl bg-surface-200 flex items-center justify-center text-muted shadow-inner">
+                    <Clock size={32} />
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-zinc-400 font-bold text-sm">No activity found</p>
-                    <p className="text-zinc-600 text-xs max-w-[200px] mx-auto">No recorded transactions for {asset.symbol} on the {asset.layer} layer.</p>
+                  <div className="space-y-1.5 px-10">
+                    <p className="text-white font-bold text-sm uppercase tracking-widest">No Activity Detected</p>
+                    <p className="text-muted text-[10px] font-medium leading-relaxed uppercase tracking-wider">Zero recorded transactions for {asset.symbol} on the {asset.layer} layer.</p>
                   </div>
                 </div>
               )}
@@ -181,12 +201,12 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ asset, onClose }) =
         </div>
 
         {/* Footer Actions */}
-        <div className="p-8 bg-zinc-950/80 backdrop-blur-md border-t border-zinc-900 flex gap-4">
-          <button className="flex-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 font-bold py-4 rounded-2xl transition-all border border-zinc-800 active:scale-[0.98]">
-            Receive
+        <div className="p-8 md:p-10 bg-surface-100 border-t border-border flex gap-5 relative z-10">
+          <button type="button" className="flex-1 bg-surface-200 hover:bg-surface-300 text-white font-bold py-4 rounded-2xl transition-all border border-border active:scale-95 shadow-lg flex items-center justify-center gap-2 uppercase text-[10px] tracking-[0.2em]">
+            Deposit
           </button>
-          <button className="flex-1 bg-orange-600 hover:bg-orange-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-orange-600/20 active:scale-[0.98]">
-            Send {asset.symbol}
+          <button type="button" className="flex-1 bg-bitcoin hover:bg-bitcoin/90 text-black font-bold py-4 rounded-2xl transition-all shadow-xl shadow-bitcoin/20 active:scale-95 flex items-center justify-center gap-2 uppercase text-[10px] tracking-[0.2em]">
+            Transmit {asset.symbol}
           </button>
         </div>
       </div>

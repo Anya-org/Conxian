@@ -105,22 +105,23 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
 
   return (
     <div 
-      className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 font-sans select-none touch-none"
+      className="min-h-screen bg-background flex items-center justify-center p-4 font-sans select-none touch-none"
       onMouseMove={handleMouseMove}
       onTouchMove={handleTouchMove}
     >
-      <div className="max-w-md w-full bg-zinc-900 border border-zinc-800 rounded-3xl md:rounded-[3rem] p-6 md:p-10 space-y-6 md:space-y-8 shadow-2xl animate-in fade-in zoom-in duration-500">
+      <div className="max-w-md w-full bg-surface-100 border border-border rounded-[2.5rem] p-8 md:p-12 space-y-8 md:space-y-10 shadow-2xl animate-in fade-in zoom-in duration-500 relative overflow-hidden">
+        <div className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-bitcoin/5 rounded-full blur-3xl pointer-events-none" />
         
-        
-
         {step === 'type' && (
-          <div className="space-y-8 animate-in fade-in">
+          <div className="space-y-10 animate-in fade-in relative z-10">
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-orange-600 rounded-2xl flex items-center justify-center mx-auto text-white shadow-lg">
-                <Shield size={32} />
+              <div className="w-20 h-20 bg-surface-200 border border-bitcoin/20 rounded-3xl flex items-center justify-center mx-auto text-bitcoin shadow-xl shadow-bitcoin/5">
+                <Shield size={40} />
               </div>
-              <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-zinc-100 uppercase italic">Configure Vault</h2>
-              <p className="text-zinc-500 text-sm">Define your multi-layer signature policy.</p>
+              <div className="space-y-1">
+                <h2 className="text-3xl font-bold tracking-tight text-white uppercase italic">Configure Vault</h2>
+                <p className="text-muted text-[10px] font-bold uppercase tracking-widest">Define your multi-layer signature policy</p>
+              </div>
             </div>
 
             <div className="space-y-4">
@@ -132,21 +133,21 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                 <button
                   key={type.id}
                   onClick={() => setWalletType(type.id as any)}
-                  className={`w-full p-6 rounded-[2rem] border text-left transition-all group ${
+                  className={`w-full p-6 rounded-3xl border text-left transition-all group ${
                     walletType === type.id 
-                      ? 'bg-orange-600/10 border-orange-500/50 text-white shadow-lg' 
-                      : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                      ? 'bg-bitcoin/10 border-bitcoin/50 text-white shadow-lg' 
+                      : 'bg-surface-200/50 border-border text-muted hover:border-bitcoin/30'
                   }`}
                 >
-                  <div className="flex items-center gap-4">
-                    <div className={`p-2 rounded-xl transition-colors ${
-                      walletType === type.id ? 'bg-orange-500 text-white' : 'bg-zinc-900 text-zinc-600'
+                  <div className="flex items-center gap-5">
+                    <div className={`p-3 rounded-2xl transition-colors ${
+                      walletType === type.id ? 'bg-bitcoin text-black' : 'bg-surface-100 text-muted group-hover:text-bitcoin'
                     }`}>
-                      <type.icon size={20} />
+                      <type.icon size={22} />
                     </div>
-                    <div>
-                       <p className="font-bold text-sm">{type.label}</p>
-                       <p className="text-[10px] opacity-70 leading-relaxed">{type.desc}</p>
+                    <div className="space-y-1">
+                       <p className={`font-bold text-sm tracking-tight ${walletType === type.id ? 'text-white' : 'text-white/70'}`}>{type.label}</p>
+                       <p className="text-[10px] font-medium opacity-60 leading-relaxed">{type.desc}</p>
                     </div>
                   </div>
                 </button>
@@ -155,7 +156,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
 
             <button 
               onClick={() => setStep('entropy')}
-              className="w-full bg-zinc-100 hover:bg-white text-zinc-950 font-black py-5 rounded-3xl text-xs uppercase tracking-widest transition-all active:scale-95"
+              className="w-full bg-white hover:bg-white/90 text-black font-bold py-5 rounded-2xl text-[10px] uppercase tracking-[0.2em] transition-all active:scale-95 shadow-xl"
             >
               Continue to Entropy Scan
             </button>
@@ -163,82 +164,86 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
         )}
 
         {step === 'entropy' && (
-          <div className="text-center space-y-10 py-10 animate-in fade-in">
-             <div className="space-y-4">
-                <div className="w-20 h-20 bg-zinc-950 border border-zinc-800 rounded-full flex items-center justify-center mx-auto relative overflow-hidden">
+          <div className="text-center space-y-12 py-10 animate-in fade-in relative z-10">
+             <div className="space-y-6">
+                <div className="w-24 h-24 bg-surface-200 border border-border rounded-full flex items-center justify-center mx-auto relative overflow-hidden shadow-inner">
                    <div 
                      ref={entropyCircleRef}
-                     className="absolute bottom-0 left-0 right-0 bg-orange-600 transition-all duration-300" 
+                     className="absolute bottom-0 left-0 right-0 bg-bitcoin/20 transition-all duration-300" 
                    />
-                   <RotateCcw className={`text-zinc-200 relative z-10 ${entropyProgress < 100 ? 'animate-spin' : ''}`} size={32} />
+                   <RotateCcw className={`text-bitcoin relative z-10 ${entropyProgress < 100 ? 'animate-spin' : ''}`} size={40} />
                 </div>
-                <h3 className="text-xl md:text-2xl font-black italic uppercase tracking-tighter">Gathering Entropy</h3>
-                <p className="text-xs text-zinc-500 italic max-w-[240px] mx-auto">
-                   Hardware-level noise captured via cursor trajectory.
-                </p>
+                <div className="space-y-2">
+                   <h3 className="text-2xl font-bold italic uppercase tracking-tight text-white">Gathering Entropy</h3>
+                   <p className="text-[10px] text-muted font-bold uppercase tracking-widest max-w-[240px] mx-auto">
+                      Hardware-level noise captured via cursor trajectory
+                   </p>
+                </div>
              </div>
 
-             <div className="space-y-2">
-                <div className="w-full h-1.5 bg-zinc-950 rounded-full overflow-hidden border border-zinc-800">
+             <div className="space-y-4">
+                <div className="w-full h-2.5 bg-surface-200 rounded-full overflow-hidden border border-border p-0.5">
                    <div 
                      ref={entropyBarRef}
-                     className="h-full bg-orange-500 transition-all" 
+                     className="h-full bg-bitcoin rounded-full transition-all shadow-[0_0_15px_rgba(247,147,26,0.3)]" 
                    />
                 </div>
-                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">{Math.floor(entropyProgress)}% Captured</p>
+                <p className="text-[10px] font-bold text-bitcoin uppercase tracking-widest">{Math.floor(entropyProgress)}% Captured</p>
              </div>
              {isGenerating && (
-                <div className="flex items-center justify-center gap-2 text-orange-500 text-[10px] font-black uppercase">
-                   <Loader2 size={12} className="animate-spin" /> Finalizing BIP-39 Map...
+                <div className="flex items-center justify-center gap-3 text-bitcoin text-[10px] font-bold uppercase tracking-[0.15em]">
+                   <Loader2 size={16} className="animate-spin" /> Finalizing BIP-39 Map...
                 </div>
              )}
           </div>
         )}
 
         {step === 'security' && (
-          <div className="space-y-8 animate-in fade-in">
-             <div className="text-center space-y-2">
-                <div className="w-16 h-16 bg-zinc-950 border border-zinc-800 rounded-2xl flex items-center justify-center mx-auto text-orange-500 shadow-xl mb-4">
-                   <Lock size={32} />
+          <div className="space-y-10 animate-in fade-in relative z-10">
+             <div className="text-center space-y-4">
+                <div className="w-20 h-20 bg-surface-200 border border-border rounded-3xl flex items-center justify-center mx-auto text-bitcoin shadow-xl mb-2">
+                   <Lock size={40} />
                 </div>
-                <h3 className="text-xl md:text-2xl font-black italic uppercase tracking-tighter">Secure Enclave</h3>
-                <p className="text-xs text-zinc-500 italic">Set a PIN to encrypt your local session.</p>
+                <div className="space-y-1">
+                   <h3 className="text-2xl font-bold italic uppercase tracking-tight text-white">Secure Enclave</h3>
+                   <p className="text-[10px] text-muted font-bold uppercase tracking-widest">Set a PIN to encrypt your local session</p>
+                </div>
              </div>
 
-             <div className="space-y-4">
-                <div className="space-y-2">
-                   <label className="text-[10px] font-black uppercase text-zinc-600 ml-1">Enclave PIN (4-8 digits)</label>
+             <div className="space-y-6">
+                <div className="space-y-2.5">
+                   <label className="text-[10px] font-bold uppercase text-muted tracking-widest ml-1">Enclave PIN (4-8 digits)</label>
                    <input 
                       type="password"
                       value={pin}
                       onChange={(e) => setPin(e.target.value)}
-                      placeholder="PIN"
+                      placeholder="••••"
                       aria-label="Enclave PIN"
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl py-4 px-6 text-center text-2xl font-mono text-white tracking-widest focus:outline-none focus:border-orange-500/50"
+                      className="w-full bg-surface-200 border border-border rounded-2xl py-5 px-6 text-center text-3xl font-mono text-white tracking-[1em] focus:outline-none focus:border-bitcoin/50 focus:ring-1 focus:ring-bitcoin/20 transition-all placeholder:text-muted/30"
                       maxLength={8}
                    />
                 </div>
-                <div className="space-y-2">
-                   <label className="text-[10px] font-black uppercase text-zinc-600 ml-1">Confirm PIN</label>
+                <div className="space-y-2.5">
+                   <label className="text-[10px] font-bold uppercase text-muted tracking-widest ml-1">Confirm PIN</label>
                    <input 
                       type="password"
                       value={confirmPin}
                       onChange={(e) => setConfirmPin(e.target.value)}
-                      placeholder="Confirm"
+                      placeholder="••••"
                       aria-label="Confirm Enclave PIN"
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl py-4 px-6 text-center text-2xl font-mono text-white tracking-widest focus:outline-none focus:border-orange-500/50"
+                      className="w-full bg-surface-200 border border-border rounded-2xl py-5 px-6 text-center text-3xl font-mono text-white tracking-[1em] focus:outline-none focus:border-bitcoin/50 focus:ring-1 focus:ring-bitcoin/20 transition-all placeholder:text-muted/30"
                       maxLength={8}
                    />
                 </div>
-                <div className="space-y-2">
-                   <label className="text-[10px] font-black uppercase text-zinc-600 ml-1">BIP-39 Passphrase (Optional)</label>
+                <div className="space-y-2.5">
+                   <label className="text-[10px] font-bold uppercase text-muted tracking-widest ml-1">BIP-39 Passphrase (Optional)</label>
                    <input 
                       type="password"
                       value={passphrase}
                       onChange={(e) => setPassphrase(e.target.value)}
-                      placeholder="Optional passphrase"
+                      placeholder="Enter optional passphrase"
                       aria-label="BIP-39 Passphrase"
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl py-4 px-6 text-center text-sm font-mono text-white tracking-widest focus:outline-none focus:border-orange-500/50"
+                      className="w-full bg-surface-200 border border-border rounded-2xl py-5 px-6 text-center text-sm font-mono text-white tracking-widest focus:outline-none focus:border-bitcoin/50 focus:ring-1 focus:ring-bitcoin/20 transition-all placeholder:text-muted/30"
                    />
                 </div>
              </div>
@@ -246,61 +251,68 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
              <button 
                 onClick={() => setStep('backup')}
                 disabled={!pin || pin.length < 4 || pin !== confirmPin}
-                className="w-full bg-zinc-100 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-black py-5 rounded-3xl text-xs uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-3"
+                className="w-full bg-white hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed text-black font-bold py-5 rounded-2xl text-[10px] uppercase tracking-[0.2em] transition-all active:scale-95 flex items-center justify-center gap-3 shadow-xl"
              >
-                <CheckCircle2 size={16} /> Confirm Encryption
+                <CheckCircle2 size={18} /> Confirm Encryption
              </button>
           </div>
         )}
 
         {step === 'backup' && (
-          <div className="space-y-8 animate-in slide-in-from-bottom-4">
+          <div className="space-y-10 animate-in slide-in-from-bottom-4 relative z-10">
              <div className="text-center space-y-2">
-                <h3 className="text-xl md:text-2xl font-black italic uppercase tracking-tighter">Master Seed Backup</h3>
-                <p className="text-xs text-zinc-500 italic">Production-grade recovery phrase.</p>
+                <h3 className="text-2xl font-bold italic uppercase tracking-tight text-white">Master Seed Backup</h3>
+                <p className="text-[10px] text-muted font-bold uppercase tracking-widest">Production-grade recovery phrase</p>
              </div>
 
              <div className="relative group">
-                <div className={`grid grid-cols-3 gap-2 p-6 bg-zinc-950 border border-zinc-800 rounded-[2rem] transition-all duration-500 ${!showMnemonic ? 'blur-md' : 'blur-0'}`}>
+                <div className={`grid grid-cols-3 gap-3 p-8 bg-surface-200 border border-border rounded-[2.5rem] transition-all duration-700 ${!showMnemonic ? 'blur-xl' : 'blur-0'}`}>
                    {mnemonic.map((word, i) => (
-                      <div key={i} className="flex items-center gap-2">
-                         <span className="text-[9px] text-zinc-700 font-mono">{i+1}.</span>
-                         <span className="text-xs font-bold text-zinc-300">{word}</span>
+                      <div key={i} className="flex items-center gap-2.5">
+                         <span className="text-[10px] text-muted font-mono font-bold">{String(i+1).padStart(2, '0')}.</span>
+                         <span className="text-sm font-bold text-white tracking-tight">{word}</span>
                       </div>
                    ))}
                 </div>
                 {!showMnemonic && (
                   <button 
                     onClick={() => setShowMnemonic(true)}
-                    className="absolute inset-0 flex flex-col items-center justify-center bg-transparent rounded-[2rem]"
+                    className="absolute inset-0 flex flex-col items-center justify-center bg-transparent rounded-[2.5rem] group-hover:scale-105 transition-transform"
                   >
-                     <Eye size={32} className="text-orange-500" />
-                     <span className="text-[10px] font-black uppercase text-orange-500 mt-2">Reveal Phrase</span>
+                     <div className="w-16 h-16 bg-bitcoin/10 rounded-full flex items-center justify-center mb-3">
+                        <Eye size={32} className="text-bitcoin" />
+                     </div>
+                     <span className="text-[10px] font-bold uppercase text-bitcoin tracking-[0.2em]">Reveal Phrase</span>
                   </button>
                 )}
              </div>
 
-             <div className="bg-orange-500/10 border border-orange-500/20 p-5 rounded-2xl flex gap-4">
-                <AlertTriangle className="text-orange-500 shrink-0" size={20} />
-                <p className="text-[10px] text-orange-200 italic font-medium">
-                   This phrase is encrypted locally. It is NEVER transmitted to Conxius Labs.
-                </p>
+             <div className="bg-bitcoin/5 border border-bitcoin/10 p-6 rounded-3xl flex gap-5">
+                <AlertTriangle className="text-bitcoin shrink-0" size={24} />
+                <div className="space-y-1">
+                   <p className="text-[10px] font-bold text-bitcoin uppercase tracking-wider">Security Protocol</p>
+                   <p className="text-[10px] text-muted leading-relaxed font-medium italic">
+                      This phrase is encrypted locally. It is <span className="text-white font-bold">NEVER</span> transmitted to Conxius Labs or any third party.
+                   </p>
+                </div>
              </div>
 
              <button 
                onClick={handleFinalize}
                disabled={isFinalizing}
-               className="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-5 rounded-3xl text-xs uppercase tracking-widest shadow-xl flex items-center justify-center gap-3 disabled:opacity-50"
+               className="w-full bg-bitcoin hover:bg-bitcoin/90 text-black font-bold py-5 rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-bitcoin/10 flex items-center justify-center gap-3 disabled:opacity-50 transition-all active:scale-95"
              >
-                {isFinalizing ? <Loader2 size={16} className="animate-spin" /> : <Lock size={16} />}
+                {isFinalizing ? <Loader2 size={18} className="animate-spin" /> : <Lock size={18} />}
                 {isFinalizing ? 'Deriving Roots...' : 'Initialize Enclave'}
              </button>
           </div>
         )}
 
-        <p className="text-center text-[9px] text-zinc-700 uppercase tracking-widest font-black">
-          Conxius SVN 0.3 • SOVEREIGN
-        </p>
+        <div className="text-center pt-2 relative z-10">
+          <p className="text-[9px] text-muted/50 uppercase tracking-[0.3em] font-bold">
+            Conxius SVN 0.3 • SOVEREIGN
+          </p>
+        </div>
       </div>
     </div>
   );

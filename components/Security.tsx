@@ -35,11 +35,11 @@ const Security: React.FC = () => {
                 </div>
              </div>
              <div className="grid grid-cols-2 gap-4">
-                <button className="p-6 bg-zinc-950 border border-zinc-900 rounded-2xl text-left hover:border-zinc-700 transition-all group">
+                <button type="button" className="p-6 bg-zinc-950 border border-zinc-900 rounded-2xl text-left hover:border-zinc-700 transition-all group">
                    <p className="text-[10px] font-black uppercase text-zinc-600 mb-2 group-hover:text-zinc-400">Master Seed</p>
                    <p className="font-mono text-xs text-zinc-400">View Recovery Phrase</p>
                 </button>
-                <button className="p-6 bg-zinc-950 border border-zinc-900 rounded-2xl text-left hover:border-zinc-700 transition-all group">
+                <button type="button" className="p-6 bg-zinc-950 border border-zinc-900 rounded-2xl text-left hover:border-zinc-700 transition-all group">
                    <p className="text-[10px] font-black uppercase text-zinc-600 mb-2 group-hover:text-zinc-400">Entropy Source</p>
                    <p className="font-mono text-xs text-zinc-400">Hardware RNG Status</p>
                 </button>
@@ -89,7 +89,7 @@ const Security: React.FC = () => {
              <p className="text-xs text-zinc-500 leading-relaxed">
                 Lost access to your keys? We partner with <strong>Unchained Capital</strong> and <strong>Casa</strong> for professional inheritance and recovery planning.
              </p>
-             <button className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2">
+             <button type="button" className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2">
                 Referral Programs <ArrowUpRight size={14} />
              </button>
           </div>

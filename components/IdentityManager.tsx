@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { UserCheck, ShieldCheck, Fingerprint, ExternalLink, Bot, Loader2, Plus, Copy, AlertCircle, CheckCircle2, Link2, Trash2, X, Wallet, Key, PenTool, Camera, RefreshCw, ShieldAlert, FileCheck, ShoppingBag, Zap, Lock, Medal, Share2, QrCode, Radio } from 'lucide-react';
+import { UserCheck, ShieldCheck, Fingerprint, Plus, Copy, CheckCircle2, Link2, X, Wallet, Zap, Lock, Radio, RefreshCw, Loader2 } from 'lucide-react';
 import { getDIDInsight } from '../services/gemini';
 import { DIDProfile } from '../types';
 import { generateNostrKeypair } from '../services/nostr';
@@ -100,14 +100,39 @@ const IdentityManager: React.FC = () => {
       }
   };
 
+  const handleLinkWallet = async () => {
+    const walletType = prompt("Enter wallet type (e.g. Electrum, Sparrow, BlueWallet):");
+    const address = prompt("Enter wallet address:");
+    
+    if (!walletType || !address) return;
+
+    try {
+        const idService = new IdentityService();
+        await idService.linkExternalWallet(walletType, address);
+        
+        const newItem: LinkedItem = {
+            label: `${walletType} Wallet`,
+            value: address,
+            status: 'linked',
+            type: 'external_wallet',
+            walletType: walletType as any
+        };
+        
+        setLinks(prev => [...prev, newItem]);
+        alert("External Wallet Linked Successfully!");
+    } catch (e) {
+        alert("Linking Failed: " + (e as Error).message);
+    }
+  };
+
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-10 animate-in fade-in duration-500 pb-24">
+    <div className="p-8 max-w-7xl mx-auto space-y-12 animate-in fade-in duration-500 pb-24">
       <header className="flex justify-between items-end">
         <div>
           <h2 className="text-3xl font-black italic uppercase tracking-tighter text-zinc-100">Identity Enclave</h2>
           <p className="text-zinc-500 text-sm italic">Verification through Proof-of-Work and Decentralized Identity.</p>
         </div>
-        <button onClick={() => setIsModalOpen(true)} className="bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 transition-all shadow-xl shadow-orange-600/20 active:scale-95">
+        <button type="button" onClick={() => setIsModalOpen(true)} className="bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 transition-all shadow-xl shadow-orange-600/20 active:scale-95">
           <Plus size={18} /> Link Account
         </button>
       </header>
@@ -130,7 +155,12 @@ const IdentityManager: React.FC = () => {
                       <p className="text-[9px] font-black text-zinc-600 uppercase">Primary DID</p>
                       <p className="text-[10px] font-mono text-zinc-400 truncate w-32">{profile.did}</p>
                    </div>
-                   <button onClick={() => navigator.clipboard.writeText(profile.did)} className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-700">
+                   <button 
+                      type="button"
+                      aria-label="Copy DID to clipboard"
+                      onClick={() => navigator.clipboard.writeText(profile.did)} 
+                      className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-700"
+                   >
                       <Copy size={14} />
                    </button>
                 </div>
@@ -155,6 +185,7 @@ const IdentityManager: React.FC = () => {
                     </div>
                  ) : (
                     <button 
+                       type="button"
                        onClick={handleGenerateNostr}
                        disabled={isGeneratingNostr}
                        className="bg-purple-600 hover:bg-purple-500 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-purple-600/30 flex items-center gap-2"
@@ -212,7 +243,7 @@ const IdentityManager: React.FC = () => {
                    </p>
                </div>
                
-               <button onClick={handleLnLogin} className="bg-yellow-500/10 border border-yellow-500/20 rounded-[2.5rem] p-8 space-y-4 text-left hover:bg-yellow-500/20 transition-all group">
+               <button type="button" onClick={handleLnLogin} className="bg-yellow-500/10 border border-yellow-500/20 rounded-[2.5rem] p-8 space-y-4 text-left hover:bg-yellow-500/20 transition-all group">
                    <h3 className="text-xs font-black uppercase tracking-widest text-yellow-500 flex items-center gap-2">
                        <Zap size={14} /> Test Lightning Login
                    </h3>

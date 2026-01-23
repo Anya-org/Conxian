@@ -42,12 +42,13 @@
     "vite-plugin-wasm": "^3.5.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.0.1",
+    "@capacitor/cli": "^2.5.0",
     "@tailwindcss/postcss": "^4.1.18",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@types/node": "^25.0.10",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19.2.8",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.2",
@@ -58,7 +59,7 @@
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
-    "vite-plugin-node-polyfills": "^0.25.0",
+    "vite-plugin-node-polyfills": "^0.2.0",
     "vitest": "^4.0.17"
   }
 }

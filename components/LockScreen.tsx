@@ -34,24 +34,25 @@ const LockScreen: React.FC<LockScreenProps> = ({ onUnlock, isError, requireBiome
   };
 
   return (
-    <div className="fixed inset-0 bg-zinc-950 flex items-center justify-center z-[1000] p-6">
-      <div className="w-full max-w-sm flex flex-col items-center gap-8 animate-in zoom-in duration-300">
-        <div className="flex flex-col items-center gap-4 mb-4">
-           <div className="w-20 h-20 bg-zinc-900 rounded-[2rem] flex items-center justify-center shadow-2xl border border-zinc-800 relative">
-              <Lock size={32} className="text-orange-500" />
+    <div className="fixed inset-0 bg-background flex items-center justify-center z-[1000] p-6">
+      <div className="w-full max-w-sm flex flex-col items-center gap-10 animate-in zoom-in duration-500">
+        <div className="flex flex-col items-center gap-6">
+           <div className="w-24 h-24 bg-surface-100 rounded-[2.5rem] flex items-center justify-center shadow-2xl border border-border relative group transition-transform duration-500 hover:scale-105">
+              <div className="absolute inset-0 bg-bitcoin/5 rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Lock size={36} className="text-bitcoin relative z-10" />
               {isError && (
-                 <div className="absolute -top-2 -right-2 bg-red-500 text-white p-1.5 rounded-full animate-bounce">
-                    <AlertCircle size={14} />
+                 <div className="absolute -top-1 -right-1 bg-error text-white p-2 rounded-full animate-bounce shadow-lg ring-4 ring-background">
+                    <AlertCircle size={16} />
                  </div>
               )}
            </div>
-           <div className="text-center">
-              <h1 className="text-2xl font-black text-zinc-100 tracking-tighter uppercase italic">Conxius Enclave</h1>
-              <p className="text-xs text-zinc-500 font-medium mt-1">Sovereign Environment Locked</p>
+           <div className="text-center space-y-2">
+              <h1 className="text-3xl font-bold text-white tracking-tighter uppercase italic">Conxius Enclave</h1>
+              <p className="text-[10px] font-bold text-muted uppercase tracking-[0.2em]">Sovereign Environment Locked</p>
            </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="w-full space-y-8">
+        <form onSubmit={handleSubmit} className="w-full space-y-10">
            {requireBiometric && !biometricApproved && (
              <button
                type="button"
@@ -62,28 +63,27 @@ const LockScreen: React.FC<LockScreenProps> = ({ onUnlock, isError, requireBiome
                  setIsBiometricChecking(false);
                }}
                disabled={isBiometricChecking}
-               className="w-full bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-black py-4 rounded-3xl text-xs uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50"
-               aria-label="Unlock with Biometrics"
-               title="Unlock with Biometrics"
+               className="w-full bg-surface-200 hover:bg-surface-300 border border-border text-white font-bold py-4 rounded-2xl text-[10px] uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50 shadow-lg"
              >
-               {isBiometricChecking ? <Loader2 size={16} className="animate-spin" /> : <Fingerprint size={16} />}
-               {isBiometricChecking ? 'Verifying...' : 'Verify Biometrics'}
+               {isBiometricChecking ? <Loader2 size={16} className="animate-spin text-bitcoin" /> : <Fingerprint size={16} className="text-bitcoin" />}
+               {isBiometricChecking ? 'Verifying Identity...' : 'Unlock with Biometrics'}
              </button>
            )}
-           <div className="flex justify-center gap-4">
+
+           <div className="flex justify-center gap-6">
               {[...Array(4)].map((_, i) => (
                  <div 
                    key={i} 
-                   className={`w-4 h-4 rounded-full transition-all duration-300 ${
+                   className={`w-3.5 h-3.5 rounded-full transition-all duration-500 ${
                       i < pin.length 
-                        ? isError ? 'bg-red-500 scale-110' : 'bg-orange-500 scale-110' 
-                        : 'bg-zinc-800'
+                        ? isError ? 'bg-error scale-125 shadow-[0_0_15px_rgba(239,68,68,0.5)]' : 'bg-bitcoin scale-125 shadow-[0_0_15px_rgba(247,147,26,0.5)]' 
+                        : 'bg-surface-300'
                    }`} 
                  />
               ))}
            </div>
 
-           <div className="grid grid-cols-3 gap-4 px-4">
+           <div className="grid grid-cols-3 gap-5 px-2">
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, 'del'].map((item, i) => (
                  item === '' ? <div key={i} /> :
                  item === 'del' ? (
@@ -91,10 +91,10 @@ const LockScreen: React.FC<LockScreenProps> = ({ onUnlock, isError, requireBiome
                       type="button" 
                       key={i}
                       onClick={() => setPin(prev => prev.slice(0, -1))}
-                      className="h-16 rounded-2xl flex items-center justify-center text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/50 transition-all font-bold text-xs uppercase"
+                      className="h-16 rounded-2xl flex items-center justify-center text-muted hover:text-white hover:bg-surface-200 transition-all font-bold text-[10px] uppercase tracking-widest"
                       disabled={!biometricApproved}
                     >
-                       Delete
+                       Clear
                     </button>
                  ) : (
                     <button 
@@ -102,7 +102,7 @@ const LockScreen: React.FC<LockScreenProps> = ({ onUnlock, isError, requireBiome
                       key={i}
                       onClick={() => handleNumClick(item.toString())}
                       disabled={!biometricApproved}
-                      className="h-16 bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-900 hover:border-zinc-700 rounded-2xl text-xl font-bold text-zinc-200 transition-all active:scale-95 disabled:opacity-40 disabled:hover:bg-zinc-900/50 disabled:active:scale-100"
+                      className="h-16 bg-surface-100 hover:bg-surface-200 border border-border rounded-2xl text-2xl font-bold text-white transition-all active:scale-90 disabled:opacity-30 shadow-sm"
                     >
                        {item}
                     </button>
@@ -110,25 +110,26 @@ const LockScreen: React.FC<LockScreenProps> = ({ onUnlock, isError, requireBiome
               ))}
            </div>
 
-           <button 
-             type="submit" 
-             disabled={!biometricApproved || pin.length < 4 || isValidating}
-             className="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black py-5 rounded-3xl text-xs uppercase tracking-widest shadow-2xl flex items-center justify-center gap-3 active:scale-95 transition-all"
-           >
-              {isValidating ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
-              {isValidating ? 'Decrypting State...' : 'Unlock Vault'}
-           </button>
-           {onResetWallet && (
-             <button
-               type="button"
-               onClick={onResetWallet}
-               className="w-full text-zinc-500 hover:text-zinc-300 text-[10px] font-black uppercase tracking-widest py-2"
-               aria-label="Create New Wallet"
-               title="Create New Wallet"
+           <div className="space-y-4">
+             <button 
+               type="submit" 
+               disabled={!biometricApproved || pin.length < 4 || isValidating}
+               className="w-full bg-bitcoin hover:bg-bitcoin-dark disabled:opacity-30 disabled:grayscale text-black font-bold py-5 rounded-2xl text-[10px] uppercase tracking-widest shadow-xl shadow-bitcoin/20 flex items-center justify-center gap-3 active:scale-95 transition-all"
              >
-               Create New Wallet
+                {isValidating ? <Loader2 size={18} className="animate-spin" /> : <ShieldCheck size={18} />}
+                <span>{isValidating ? 'Decrypting State...' : 'Unlock Vault'}</span>
              </button>
-           )}
+             
+             {onResetWallet && (
+               <button
+                 type="button"
+                 onClick={onResetWallet}
+                 className="w-full text-muted hover:text-white text-[9px] font-bold uppercase tracking-[0.2em] py-2 transition-colors"
+               >
+                 Purge & Reset Wallet
+               </button>
+             )}
+           </div>
         </form>
       </div>
     </div>

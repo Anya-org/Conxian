@@ -39,17 +39,17 @@ const InvestorDashboard: React.FC = () => {
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <div className="flex items-center gap-3 mb-2">
-             <Briefcase className="text-orange-500" />
-             <h2 className="text-3xl font-black tracking-tighter text-zinc-100 uppercase italic">Research & Risk Enclave</h2>
+             <Briefcase className="text-bitcoin" />
+             <h2 className="text-3xl font-black tracking-tighter text-white uppercase italic">Research & Risk Enclave</h2>
           </div>
-          <p className="text-zinc-500 text-sm">Quantifying protocol-native moats and risk-adjusted valuation.</p>
+          <p className="text-muted text-sm">Quantifying protocol-native moats and risk-adjusted valuation.</p>
         </div>
         <div className="flex items-center gap-4">
-           <div className="bg-zinc-900 border border-zinc-800 px-6 py-4 rounded-[2rem] text-right group hover:border-orange-500/30 transition-all shadow-2xl">
-              <p className="text-[10px] font-black uppercase text-zinc-500 tracking-widest mb-1">Pre-Market Evaluation</p>
+           <div className="bg-surface-200 border border-border px-6 py-4 rounded-[2rem] text-right group hover:border-bitcoin/30 transition-all shadow-2xl">
+              <p className="text-[10px] font-black uppercase text-muted tracking-widest mb-1">Pre-Market Evaluation</p>
               <div className="flex items-center gap-2">
-                 <span className="text-2xl font-mono font-bold text-orange-500">{valuationRange}</span>
-                 <TrendingUp size={16} className="text-green-500" />
+                 <span className="text-2xl font-mono font-bold text-bitcoin">{valuationRange}</span>
+                 <TrendingUp size={16} className="text-success" />
               </div>
            </div>
         </div>
@@ -64,8 +64,8 @@ const InvestorDashboard: React.FC = () => {
                 <div 
                   key={vector.id}
                   onClick={() => setActiveVector(vector.id)}
-                  className={`p-8 bg-zinc-900/40 border rounded-[2.5rem] transition-all cursor-pointer group relative overflow-hidden ${
-                    activeVector === vector.id ? 'border-orange-500/50 bg-orange-500/5' : 'border-zinc-800 hover:border-zinc-700'
+                  className={`p-8 bg-surface-200/40 border rounded-[2.5rem] transition-all cursor-pointer group relative overflow-hidden ${
+                    activeVector === vector.id ? 'border-bitcoin/50 bg-bitcoin/5' : 'border-border hover:border-muted'
                   }`}
                 >
                    <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform">
@@ -73,17 +73,17 @@ const InvestorDashboard: React.FC = () => {
                    </div>
                    <div className="relative z-10 space-y-4">
                       <div className="flex justify-between items-start">
-                         <h4 className="text-[10px] font-black uppercase text-zinc-500 tracking-widest">{vector.label}</h4>
-                         <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-zinc-950 border border-zinc-900 ${vector.color}`}>
+                         <h4 className="text-[10px] font-black uppercase text-muted tracking-widest">{vector.label}</h4>
+                         <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-background border border-border ${vector.color}`}>
                             {vector.status}
                          </span>
                       </div>
                       <div className="flex items-baseline gap-2">
-                         <span className="text-4xl font-mono font-bold text-zinc-100">{vector.value}</span>
-                         <span className="text-xs font-bold text-zinc-600">/ 100</span>
+                         <span className="text-4xl font-mono font-bold text-white">{vector.value}</span>
+                         <span className="text-xs font-bold text-muted">/ 100</span>
                       </div>
-                      <div className="w-full h-1 bg-zinc-950 rounded-full overflow-hidden">
-                         <div className={`h-full transition-all duration-1000 ${vector.id === 'liq' ? 'bg-yellow-500' : 'bg-orange-500'}`} style={{ width: `${vector.value}%` }} />
+                      <div className="w-full h-1 bg-background rounded-full overflow-hidden">
+                         <div className={`h-full transition-all duration-1000 ${vector.id === 'liq' ? 'bg-warning' : 'bg-bitcoin'}`} style={{ width: `${vector.value}%` }} />
                       </div>
                    </div>
                 </div>
@@ -91,15 +91,15 @@ const InvestorDashboard: React.FC = () => {
           </div>
 
           {/* CRO Research Terminal */}
-          <div className="bg-zinc-900/40 border border-zinc-800 rounded-[3rem] p-1 shadow-2xl overflow-hidden">
-             <div className="bg-zinc-950 rounded-[2.8rem] flex flex-col min-h-[600px]">
-                <div className="p-8 border-b border-zinc-900 bg-zinc-900/20 flex items-center justify-between">
+          <div className="bg-surface-200 border border-border rounded-[3rem] p-1 shadow-2xl overflow-hidden">
+             <div className="bg-background rounded-[2.8rem] flex flex-col min-h-[600px]">
+                <div className="p-8 border-b border-border bg-surface-200/20 flex items-center justify-between">
                    <div className="flex items-center gap-3">
-                      <FileText size={20} className="text-orange-500" />
-                      <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 font-mono italic">CRO_STRATEGIC_AUDIT_2024</h3>
+                      <FileText size={20} className="text-bitcoin" />
+                      <h3 className="text-xs font-black uppercase tracking-widest text-muted font-mono italic">CRO_STRATEGIC_AUDIT_2024</h3>
                    </div>
                    <div className="flex items-center gap-4">
-                      <button onClick={runInstitutionalAudit} className="text-[10px] font-black uppercase text-orange-500 hover:text-orange-400 transition-all flex items-center gap-2">
+                      <button type="button" onClick={runInstitutionalAudit} className="text-[10px] font-black uppercase text-orange-500 hover:text-orange-400 transition-all flex items-center gap-2">
                          <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
                          Refine Analysis
                       </button>
@@ -160,7 +160,7 @@ const InvestorDashboard: React.FC = () => {
                  <p className="text-xs font-medium leading-relaxed italic opacity-90 mb-8">
                     "Conxius captures the 'Bitcoin Multi-Layer' renaissance. By integrating NTT natively, it creates an exit-liquidity moat that CEXs cannot match without sacrificing their custodial margins."
                  </p>
-                 <button className="w-full bg-white text-orange-600 font-black py-4 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-zinc-100 transition-all shadow-xl">
+                 <button type="button" className="w-full bg-white text-orange-600 font-black py-4 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-zinc-100 transition-all shadow-xl">
                     Download Full PDF Report
                  </button>
               </div>

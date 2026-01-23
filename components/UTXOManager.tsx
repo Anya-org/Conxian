@@ -57,7 +57,13 @@ const UTXOManager: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-4">
-            <button onClick={loadUtxos} disabled={isLoading} className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-500 hover:text-orange-500">
+            <button 
+                type="button"
+                aria-label="Refresh UTXOs"
+                onClick={loadUtxos} 
+                disabled={isLoading} 
+                className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-500 hover:text-orange-500"
+            >
                 <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
             </button>
             <div className="bg-zinc-900/50 border border-zinc-800 px-6 py-4 rounded-2xl text-right min-w-[200px]">
@@ -125,7 +131,9 @@ const UTXOManager: React.FC = () => {
                             <p className="text-[9px] font-black uppercase text-zinc-600">{utxo.status}</p>
                         </div>
                         <button 
+                            type="button"
                             onClick={() => toggleFreeze(utxo.txid)}
+                            aria-label={utxo.isFrozen ? "Unlock UTXO" : "Freeze UTXO"}
                             className={`p-3 rounded-xl border transition-all ${
                                 utxo.isFrozen ? 'bg-blue-500 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-500'
                             }`}

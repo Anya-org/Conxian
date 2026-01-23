@@ -32,7 +32,7 @@ import SystemDiagnostics from './components/SystemDiagnostics';
 import Web3Browser from './components/Web3Browser';
 import LockScreen from './components/LockScreen';
 import ToastContainer, { ToastMessage, ToastType } from './components/Toast';
-import { Shield, Loader2, Zap, FlaskConical, ShieldCheck, Lock, Terminal, Cpu, CheckCircle2, RotateCcw, Database } from 'lucide-react';
+import { Shield, Loader2, FlaskConical, Lock as LockIcon, Cpu, CheckCircle2 } from 'lucide-react';
 import './styles/progress.css';
 import { AppState, WalletConfig, Asset, Bounty, AppMode, Network, LnBackendConfig } from './types';
 import { AppContext } from './context';
@@ -123,7 +123,7 @@ const App: React.FC = () => {
       .finally(() => setEnclaveChecked(true));
   }, []);
 
-  const sanitizeStateForPersistence = (s: any) => {
+  const sanitizeStateForPersistence = (s: AppState & { language: Language }) => {
     const next: any = { ...s };
     if (next.walletConfig) {
       next.walletConfig = { ...next.walletConfig };
@@ -136,7 +136,7 @@ const App: React.FC = () => {
     return next;
   };
 
-  const persistState = async (newState: any, pin: string) => {
+  const persistState = async (newState: AppState & { language: Language }, pin: string) => {
     try {
       const encrypted = await encryptState(sanitizeStateForPersistence(newState), pin);
       await setEnclaveBlob(STORAGE_KEY, encrypted, { requireBiometric: !!newState.security?.biometricUnlock });
@@ -164,7 +164,7 @@ const App: React.FC = () => {
   }, [activeTab]);
 
   const BOOT_SEQUENCE = [
-    { text: "BIP-322 Verification...", icon: Lock },
+    { text: "BIP-322 Verification...", icon: LockIcon },
     { text: "Tor V3 Tunnel Stable...", icon:  Shield },
     { text: "BIP-84 Roots Loaded...", icon: Cpu },
     { text: "Sovereignty Confirmed.", icon: CheckCircle2 }
@@ -269,7 +269,14 @@ const App: React.FC = () => {
     assets: mode === 'simulation' ? MOCK_ASSETS : []
   }));
   const setLnBackend = (cfg: LnBackendConfig) => setState(prev => ({ ...prev, lnBackend: cfg }));
-  const setSecurity = (s: Partial<AppState['security']>) => setState(prev => ({ ...prev, security: { ...prev.security, ...s } }));
+  const setSecurity = (s: Partial<AppState['security']>) => setState(prev => ({ 
+    ...prev, 
+    security: { 
+      autoLockMinutes: 5, // Default if prev.security is undefined
+      ...prev.security, 
+      ...s 
+    } as AppState['security']
+  }));
   const lockWallet = () => {
      currentPinRef.current = null;
      clearEnclaveBiometricSession();
@@ -374,25 +381,34 @@ const App: React.FC = () => {
   if (isBooting) {
     const CurrentIcon = BOOT_SEQUENCE[bootStep].icon;
     return (
-      <div className="fixed inset-0 bg-zinc-950 flex flex-col items-center justify-center z-[1000] p-6 text-center font-mono">
-        <div className="w-24 h-24 bg-zinc-900 rounded-[2.5rem] flex items-center justify-center mb-10 border border-zinc-800 shadow-2xl relative overflow-hidden">
-          <FlaskConical size={48} className="text-orange-500 fill-current relative z-10" />
+      <div className="fixed inset-0 bg-background flex flex-col items-center justify-center z-[1000] p-6 text-center">
+        <div className="w-24 h-24 bg-surface-100 rounded-[2.5rem] flex items-center justify-center mb-10 border border-border shadow-2xl relative overflow-hidden group">
+          <div className="absolute inset-0 bg-bitcoin/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          <FlaskConical size={48} className="text-bitcoin fill-bitcoin/10 relative z-10" />
         </div>
-        <div className="space-y-6 max-w-md w-full">
-           <CurrentIcon size={24} className="animate-pulse text-orange-500 mx-auto" />
-           <h1 className="text-3xl font-black tracking-tighter text-zinc-100 uppercase italic">
-              Conxius<span className="text-orange-500">Labs</span>
-           </h1>
-           <div className="h-1 w-full bg-zinc-900 rounded-full overflow-hidden">
-              {(() => {
-                const pct = Math.round(((bootStep + 1) / BOOT_SEQUENCE.length) * 100);
-                const quant = Math.min(100, Math.max(0, Math.round(pct / 5) * 5));
-                return <div className={`h-full bg-orange-500 transition-all duration-500 progress-${quant}`} />;
-              })()}
+        <div className="space-y-8 max-w-md w-full">
+           <div className="space-y-3">
+             <h1 className="text-4xl font-bold tracking-tighter text-white uppercase italic">
+                Conxius<span className="text-bitcoin">Labs</span>
+             </h1>
+             <p className="text-[10px] font-bold text-muted uppercase tracking-[0.3em]">Sovereign Financial Enclave</p>
            </div>
-           <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest animate-pulse">
-              {BOOT_SEQUENCE[bootStep].text}
-           </p>
+
+           <div className="space-y-4">
+             <div className="h-1 w-full bg-surface-200 rounded-full overflow-hidden p-[1px]">
+                {(() => {
+                  const pct = Math.round(((bootStep + 1) / BOOT_SEQUENCE.length) * 100);
+                  const quant = Math.min(100, Math.max(0, Math.round(pct / 5) * 5));
+                  return <div className={`h-full bg-bitcoin rounded-full transition-all duration-700 shadow-[0_0_15px_rgba(247,147,26,0.5)] progress-${quant}`} />;
+                })()}
+             </div>
+             <div className="flex items-center justify-center gap-3 text-bitcoin/80">
+                <CurrentIcon size={16} className="animate-pulse" />
+                <p className="text-[10px] font-bold uppercase tracking-widest animate-pulse">
+                  {BOOT_SEQUENCE[bootStep].text}
+                </p>
+             </div>
+           </div>
         </div>
       </div>
     );
@@ -412,11 +428,16 @@ const App: React.FC = () => {
 
   if (!enclaveChecked) {
     return (
-      <div className="fixed inset-0 bg-zinc-950 text-zinc-100 flex items-center justify-center p-8">
-        <div className="w-full max-w-sm space-y-4">
-          <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Checking Vault</p>
-          <div className="h-1 w-full bg-zinc-900 rounded-full overflow-hidden">
-            <div className="h-full bg-orange-500 w-2/3 animate-pulse" />
+      <div className="fixed inset-0 bg-background text-white flex items-center justify-center p-8">
+        <div className="w-full max-w-sm space-y-6 text-center">
+          <div className="flex justify-center">
+            <Loader2 size={32} className="text-bitcoin animate-spin" />
+          </div>
+          <div className="space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">Accessing Secure Vault</p>
+            <div className="h-1 w-full bg-surface-200 rounded-full overflow-hidden">
+              <div className="h-full bg-bitcoin w-2/3 animate-pulse shadow-[0_0_10px_rgba(247,147,26,0.3)]" />
+            </div>
           </div>
         </div>
       </div>
@@ -468,9 +489,14 @@ const App: React.FC = () => {
                   <p className="text-[9px] font-black text-[var(--muted)] uppercase tracking-widest">Sovereignty</p>
                   <p className="text-xs font-mono font-bold text-[var(--accent-2)]">{state.sovereigntyScore}/100</p>
                </div>
-               <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[var(--success)] to-[var(--accent-2)] cursor-pointer hover:scale-105 transition-transform" onClick={lockWallet} title="Lock Enclave">
-                  <Lock size={14} className="text-white mx-auto mt-2" />
-               </div>
+               <button 
+                  onClick={lockWallet} 
+                  title="Lock Enclave"
+                  aria-label="Lock Enclave"
+                  className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[var(--success)] to-[var(--accent-2)] cursor-pointer hover:scale-105 transition-transform flex items-center justify-center"
+               >
+                  <LockIcon size={14} className="text-white" />
+               </button>
             </div>
           </div>
           {state.network !== 'mainnet' && (

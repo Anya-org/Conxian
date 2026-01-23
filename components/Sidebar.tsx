@@ -37,45 +37,45 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <div className="w-64 h-screen border-r border-[var(--border)] bg-[var(--surface-1)]/95 backdrop-blur-xl flex flex-col p-6 sticky top-0">
-      <div className="flex items-center gap-3 mb-10">
-        <div className="w-10 h-10 rounded-xl overflow-hidden ring-1 ring-[var(--border)] shadow-lg shadow-black/30">
+    <div className="w-64 h-screen border-r border-border bg-background flex flex-col p-6 sticky top-0 overflow-hidden">
+      <div className="flex items-center gap-4 mb-10 group">
+        <div className="w-11 h-11 rounded-xl overflow-hidden ring-1 ring-border shadow-xl transition-transform group-hover:scale-105 duration-500">
           <img src="/conxius-logo.svg" alt="Conxius" className="w-full h-full object-cover" />
         </div>
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-[var(--text)]">Conxius <span className="text-[var(--accent)]">Wallet</span></h1>
-          <div className="flex items-center gap-1.5">
-            <p className="text-[10px] text-[var(--muted)] font-black uppercase tracking-[0.2em]">Native Enclave</p>
-            <span className="bg-[rgba(247,147,26,0.12)] text-[var(--accent)] text-[8px] px-1.5 py-0.5 rounded border border-[rgba(247,147,26,0.35)] font-black uppercase shadow-sm">SVN 0.3</span>
+        <div className="space-y-0.5">
+          <h1 className="text-xl font-bold tracking-tight text-white leading-none">Conxius</h1>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-bitcoin font-bold uppercase tracking-wider">Wallet</span>
+            <span className="bg-bitcoin/10 text-bitcoin text-[8px] px-1.5 py-0.5 rounded border border-bitcoin/20 font-bold uppercase">v0.3</span>
           </div>
         </div>
       </div>
 
-      <nav className="flex-1 space-y-1.5 overflow-y-auto custom-scrollbar pr-2">
+      <nav className="flex-1 space-y-1 overflow-y-auto custom-scrollbar -mr-2 pr-2">
         {menuItems.map((item) => (
           <button
             key={item.id}
             onClick={() => setActiveTab(item.id)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+            className={`w-full flex items-center gap-3.5 px-4 py-2.5 rounded-xl transition-all duration-300 group ${
               activeTab === item.id 
-                ? 'bg-[rgba(247,147,26,0.12)] text-[var(--accent)] border border-[rgba(247,147,26,0.35)] shadow-sm' 
-                : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface-2)]'
+                ? 'bg-bitcoin/10 text-bitcoin border border-bitcoin/20 shadow-lg shadow-bitcoin/5' 
+                : 'text-muted hover:text-white hover:bg-surface-200'
             }`}
           >
-            <item.icon size={18} className={activeTab === item.id ? 'text-[var(--accent)]' : 'text-[var(--muted)]'} />
-            <span className="font-semibold text-sm">{item.label}</span>
+            <item.icon size={18} className={`transition-colors ${activeTab === item.id ? 'text-bitcoin' : 'text-muted group-hover:text-bitcoin/70'}`} />
+            <span className="font-bold text-xs uppercase tracking-wider">{item.label}</span>
           </button>
         ))}
       </nav>
 
-      <div className="mt-auto pt-6 border-t border-[var(--border)] space-y-4">
-        <div className="bg-gradient-to-tr from-[rgba(247,147,26,0.18)] to-[rgba(17,24,39,0.9)] border border-[rgba(247,147,26,0.3)] rounded-2xl p-4 flex items-center gap-3">
-           <div className="p-2 bg-[var(--accent)] rounded-lg text-white">
+      <div className="mt-6 pt-6 border-t border-border">
+        <div className="bg-surface-200 border border-border rounded-2xl p-4 flex items-center gap-3 shadow-inner group transition-colors hover:border-bitcoin/30">
+           <div className="p-2.5 bg-bitcoin rounded-xl text-black shadow-lg shadow-bitcoin/20">
               <Medal size={16} />
            </div>
            <div>
-              <p className="text-[8px] font-black uppercase text-[var(--accent-2)] tracking-widest">Sovereign Build</p>
-              <p className="text-[10px] font-bold text-[var(--text)] italic">Hardware-Backed</p>
+              <p className="text-[9px] font-bold uppercase text-muted tracking-widest group-hover:text-bitcoin transition-colors">Sovereign Build</p>
+              <p className="text-[10px] font-bold text-white italic">Hardware-Backed</p>
            </div>
         </div>
       </div>
