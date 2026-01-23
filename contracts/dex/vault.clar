@@ -17,7 +17,7 @@
 
 ;; Vault parameters
 (define-constant MIN_DEPOSIT u1000000) ;; 1 STX equivalent
-(define-constant MAX_VAULTS_PER_USER u10
+(define-constant MAX_VAULTS_PER_USER u10)
 (define-constant VAULT_CREATION_FEE u100000) ;; 0.1 STX equivalent
 (define-constant MAX_WITHDRAWAL_PERCENT u10000) ;; 100% max withdrawal
 (define-constant COOLDOWN_PERIOD u100) ;; 100 blocks cooldown
@@ -71,14 +71,14 @@
 })
 
 ;; Events
-(define-event (vault-created (vault-id (buff 32)) (owner principal) (vault-type (string-ascii 32))))
-(define-event (vault-deposited (vault-id (buff 32)) (token principal) (amount uint)))
-(define-event (vault-withdrawn (vault-id (buff 32)) (token principal) (amount uint)))
-(define-event (vault-activated (vault-id (buff 32))))
-(define-event (vault-deactivated (vault-id (buff 32))))
-(define-event (permission-granted (vault-id (buff 32)) (user principal) (level (string-ascii 16))))
-(define-event (permission-revoked (vault-id (buff 32)) (user principal)))
-(define-event (cooldown-started (vault-id (buff 32)) (duration uint)))
+;; (define-event (vault-created (vault-id (buff 32)) (owner principal) (vault-type (string-ascii 32))))
+;; (define-event (vault-deposited (vault-id (buff 32)) (token principal) (amount uint)))
+;; (define-event (vault-withdrawn (vault-id (buff 32)) (token principal) (amount uint)))
+;; (define-event (vault-activated (vault-id (buff 32))))
+;; (define-event (vault-deactivated (vault-id (buff 32))))
+;; (define-event (permission-granted (vault-id (buff 32)) (user principal) (level (string-ascii 16))))
+;; (define-event (permission-revoked (vault-id (buff 32)) (user principal)))
+;; (define-event (cooldown-started (vault-id (buff 32)) (duration uint)))
 
 ;; Read-only functions
 
@@ -100,10 +100,10 @@
 )
 
 (define-read-only (get-vault-balance (vault-id (buff 32)) (token principal))
-  (match (get-vault vault_id)
+  (match (get-vault vault-id)
     vault 
       (let ((balances (get vault balances)))
-        (ok (get-token-balance balances token))
+        (ok (default-to u0 (map-get? balances { token: token })))
       )
     none (ok u0)
   )
@@ -185,7 +185,7 @@
     )
     
     ;; Generate vault ID
-    (let ((vault-id (hash160 (concat (principal-to-buff? tx-sender) (string-ascii vault_type))))
+    (let ((vault-id (hash160 (concat (principal-to-buff? tx-sender) (string-ascii vault_type)))))
       
       ;; Create vault
       (map-set vaults { vault-id: vault-id } {
@@ -259,7 +259,7 @@
       (var-set total-vaults (+ (var-get total-vaults) u1))
       
       ;; Emit event
-      (emit-event (vault-created vault_id tx-sender vault_type))
+      (print { event: "vault-created", vault-id: vault-id, owner: tx-sender, vault-type: vault_type })
       
       (ok {
         vault-id: vault-id,
@@ -268,6 +268,7 @@
         created-at: block-height
       })
     )
+  )
   )
 )
 
@@ -333,7 +334,7 @@
                   (var-set total-deposits (+ (var-get total-deposits) u1))
                   
                   ;; Emit event
-                  (emit-event (vault-deposited vault_id token amount))
+                  (print { event: "vault-deposited", vault-id: vault_id, token: token, amount: amount })
                   
                   (ok {
                     vault-id: vault_id,
@@ -421,7 +422,7 @@
                     (var-set total-withdrawals (+ (var-get total-withdrawals) u1))
                     
                     ;; Emit event
-                    (emit-event (vault-withdrawn vault_id token amount))
+                    (print { event: "vault-withdrawn", vault-id: vault_id, token: token, amount: amount })
                     
                     (ok {
                       vault-id: vault_id,
@@ -477,7 +478,7 @@
         )
         
         ;; Emit event
-        (emit-event (permission-granted vault_id user level))
+        (print { event: "permission-granted", vault-id: vault_id, user: user, level: level })
         
         (ok true)
       )
@@ -516,7 +517,7 @@
         )
         
         ;; Emit event
-        (emit-event (permission-revoked vault_id user))
+        (print { event: "permission-revoked", vault-id: vault_id, user: user })
         
         (ok true)
       )
@@ -552,7 +553,7 @@
         })
         
         ;; Emit event
-        (emit-event (cooldown-started vault_id duration))
+        (print { event: "cooldown-started", vault-id: vault_id, duration: duration })
         
         (ok {
           vault-id: vault_id,
@@ -608,7 +609,7 @@
         )
         
         ;; Emit event
-        (emit-event (vault-activated vault_id))
+        (print { event: "vault-activated", vault-id: vault_id })
         
         (ok true)
       )
@@ -660,7 +661,7 @@
         )
         
         ;; Emit event
-        (emit-event (vault-deactivated vault_id))
+        (print { event: "vault-deactivated", vault-id: vault_id })
         
         (ok true)
       )
@@ -818,7 +819,7 @@
                 total-vaults: total-vaults,
                 total-deposits: (+ (get stats total-deposits) deposit),
                 total-withdrawals: (+ (get stats total-withdrawals) withdraw),
-                average-balance: (get stats average-balance)
+                average-balance: (get stats average-balance),
                 last-activity: block-height
               })
             )
@@ -876,4 +877,5 @@
       })
     none (ok { user: user, total-vaults: u0, active-vaults: u0, last-activity: u0, vault-ids: (list 0 (buff 32)) })
   )
+)
 )

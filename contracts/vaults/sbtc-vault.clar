@@ -2,9 +2,9 @@
 ;; Conxian Enterprise Standard: sBTC Vault (Tier 0 Compliance)
 ;; Secure Custody with "Clean-Hands" Enforcement and Travel Rule Hooks
 
-(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
-(use-trait vault-trait .vault-traits.vault-trait)
+(impl-trait .vault-traits.vault-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u8000))
@@ -40,7 +40,7 @@
 ;; Enforces: Sender must be compliant.
 (define-public (deposit
         (amount uint)
-        (token .sip-standards.sip-010-ft-trait)
+        (token <sip-010-ft-trait>)
     )
     (let ((sender tx-sender))
         ;; 1. Validate Token
@@ -71,10 +71,10 @@
 
 ;; @desc Withdraw sBTC from the vault
 ;; Enforces: Recipient must be compliant. High value transfers require Travel Rule check (mocked via travel-rule-service or event).
-(define-public (withdraw
+(define-public (withdraw-to-user
         (amount uint)
         (recipient principal)
-        (token .sip-standards.sip-010-ft-trait)
+        (token <sip-010-ft-trait>)
     )
     (let (
             (sender tx-sender)
@@ -128,6 +128,15 @@
     (begin
         (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
         (var-set contract-owner new-owner)
+        (ok true)
+    )
+)
+
+;; Vault Trait Implementation - allocate-to-strategy
+(define-public (allocate-to-strategy (amount uint) (strategy principal))
+    (begin
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+        ;; Placeholder for strategy allocation logic
         (ok true)
     )
 )

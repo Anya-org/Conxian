@@ -79,13 +79,13 @@
 )
 
 ;; Events
-(define-event (template-created (template-id uint) (name (string-ascii 64))
-  (pool-type (string-ascii 32))
-))
-(define-event (template-deployed (template-id uint) (instance-id uint) (pool-address principal)))
-(define-event (template-updated (template-id uint) (field (string-ascii 32))))
-(define-event (instance-created (instance-id uint) (template-id uint) (creator principal)))
-(define-event (pool-configured (pool principal) (instance-id uint)));; Read-only functions
+;; (template-created (template-id uint) (name (string-ascii 64)) (pool-type (string-ascii 32)))
+;; (template-deployed (template-id uint) (instance-id uint) (pool-address principal)))
+;; (template-updated (template-id uint) (field (string-ascii 32))))
+;; (instance-created (instance-id uint) (template-id uint) (creator principal)))
+;; (pool-configured (pool principal) (instance-id uint)))
+
+;; Read-only functions
 
 (define-read-only (get-template (template-id uint))
   (map-get? pool-templates { template-id: template-id })
@@ -108,7 +108,7 @@
 (define-read-only (get-template-code (template-id uint))
   (match (get-template template-id)
     template (ok (get template contract-code))
-    none (ok (buff 0))
+    none (ok 0x)
   )
 )
 
@@ -205,7 +205,7 @@
       (var-set total-pools-created (+ (var-get total-pools-created) u1))
 
       ;; Emit event
-      (emit-event (template-created template-id name pool-type))
+      (print { event: "template-created", template-id: template-id, name: name, pool-type: pool-type })
 
       (ok template-id)
     )
@@ -281,9 +281,9 @@
             (var-set total-pools-created (+ (var-get total-pools-created) u1))
 
             ;; Emit events
-            (emit-event (template-deployed template-id instance-id pool-address))
-            (emit-event (instance-created instance-id template-id tx-sender))
-            (emit-event (pool-configured pool-address instance_id))
+            (print { event: "template-deployed", template-id: template-id, instance-id: instance-id, pool-address: pool-address })
+            (print { event: "instance-created", instance-id: instance-id, template-id: template-id, creator: tx-sender })
+            (print { event: "pool-configured", pool-address: pool-address, instance_id: instance_id })
 
             (ok {
               instance-id: instance-id,
@@ -332,7 +332,7 @@
             })
 
             ;; Emit event
-            (emit-event (pool-configured pool (get config instance_id)))
+            (print { event: "pool-configured", pool: pool, instance_id: instance_id })
 
             (ok true)
           )
@@ -429,8 +429,8 @@
     template_id: u0,
     instance_id: u0,
     parameters: (list 0 {
-      key: (string-ascii 32),
-      value: (string-ascii 64),
+      key: "template-key",
+      value: "template-value",
     }),
     last-updated: u0,
   }

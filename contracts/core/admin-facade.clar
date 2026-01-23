@@ -67,7 +67,7 @@
 
 (define-private (execute-admin-operation-wrapper (operation {
   type: uint,
-  params: (list 10 principal),
+  params: (list 5 principal),
 }))
   (let ((op-type (get type operation)))
     (if (is-eq op-type u1)
@@ -76,7 +76,7 @@
         (execute-protocol-operation (get params operation))
         (if (is-eq op-type u3)
           (execute-treasury-operation (get params operation))
-          ERR_INVALID_OPERATION
+          (err ERR_INVALID_OPERATION)
         )
       )
     )
@@ -87,12 +87,12 @@
     (result (response bool uint))
     (operation {
       type: uint,
-      params: (list 10 principal),
+      params: (list 5 principal),
     })
   )
   (match result
     success (execute-admin-operation-wrapper operation)
-    error (err error)
+    error result
   )
 )
 
@@ -226,7 +226,7 @@
 ;; Batch Admin Operations (1000x more efficient)
 (define-public (batch-admin-operations (operations (list 200 {
   type: uint,
-  params: (list 10 principal),
+  params: (list 5 principal),
 })))
   (begin
     (asserts! (is-global-admin) ERR_NOT_AUTHORIZED)
@@ -303,7 +303,7 @@
 
 (define-private (validate-admin-operation (operation {
   type: uint,
-  params: (list 10 principal),
+  params: (list 5 principal),
 }))
   (begin
     (let ((op-type (get type operation)))
@@ -323,7 +323,7 @@
 
 (define-private (execute-admin-operation (operation {
   type: uint,
-  params: (list 10 principal),
+  params: (list 5 principal),
 }))
   (let ((op-type (get type operation)))
     (if (is-eq op-type u1)
@@ -340,11 +340,11 @@
 )
 
 ;; Emergency Operations
-(define-private (validate-emergency-operation (params (list 10 principal)))
+(define-private (validate-emergency-operation (params (list 5 principal)))
   (ok true)
 )
 
-(define-private (execute-emergency-operation (params (list 10 principal)))
+(define-private (execute-emergency-operation (params (list 5 principal)))
   (begin
     (var-set emergency-pause true)
     (print {
@@ -356,11 +356,11 @@
 )
 
 ;; Protocol Operations
-(define-private (validate-protocol-operation (params (list 10 principal)))
+(define-private (validate-protocol-operation (params (list 5 principal)))
   (ok true)
 )
 
-(define-private (execute-protocol-operation (params (list 10 principal)))
+(define-private (execute-protocol-operation (params (list 5 principal)))
   (begin
     ;; Delegate to specific protocol contracts
     (print {
@@ -372,11 +372,11 @@
 )
 
 ;; Treasury Operations
-(define-private (validate-treasury-operation (params (list 10 principal)))
+(define-private (validate-treasury-operation (params (list 5 principal)))
   (ok true)
 )
 
-(define-private (execute-treasury-operation (params (list 10 principal)))
+(define-private (execute-treasury-operation (params (list 5 principal)))
   (begin
     ;; Delegate to treasury contracts
     (print {

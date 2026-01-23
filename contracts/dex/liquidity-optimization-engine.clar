@@ -46,7 +46,8 @@
 )
 
 ;; Events
-(define-event (liquidity-optimized (pool principal) (old-liquidity uint) (new-liquidity uint)))
+;; (liquidity-optimized (pool principal) (old-liquidity uint) (new-liquidity uint))
+
 ;; Private functions
 
 (define-read-only (get-pool-utilization (pool principal))

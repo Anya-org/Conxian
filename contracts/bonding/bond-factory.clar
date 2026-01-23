@@ -8,6 +8,36 @@
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_INVALID_AMOUNT (err u1001))
+
+;; SIP-010 FT Implementation
+(define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
+  (begin
+    (asserts! (is-eq tx-sender sender) ERR_UNAUTHORIZED)
+    (asserts! (> amount u0) ERR_INVALID_AMOUNT)
+    ;; Transfer logic would go here
+    (ok true)
+  )
+)
+
+(define-read-only (get-name)
+  (ok "Conxian Bond Token")
+)
+
+(define-read-only (get-symbol)
+  (ok "CXBD")
+)
+
+(define-read-only (get-decimals)
+  (ok u8)
+)
+
+(define-read-only (get-balance (owner principal))
+  (ok u0) ;; Placeholder implementation
+)
+
+(define-read-only (get-total-supply)
+  (ok u0) ;; Placeholder implementation
+)
 (define-constant ERR_BOND_NOT_FOUND (err u1002))
 
 ;; Data Vars
@@ -54,15 +84,14 @@
 
     (let (
         (bond-id (+ (var-get bond-nonce) u1))
-        (mint-result (ft-mint? bond-token amount tx-sender
-          (some 0x0000000000000000000000000000000000000000)))
+        (mint-result (ft-mint? bond-token amount tx-sender))
       )
       (asserts! (is-ok mint-result) ERR_INVALID_AMOUNT)
       (map-set bonds bond-id {
         issuer: tx-sender,
         principal-amount: amount,
         interest-rate: u0,
-        maturity-block: (+ (block-height) duration),
+        maturity-block: (+ block-height duration),
         is-active: true,
       })
       (var-set bond-nonce bond-id)

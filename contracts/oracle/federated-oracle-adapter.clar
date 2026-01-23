@@ -63,7 +63,7 @@
     })
     
     ;; Recalculate aggregated price
-    (recalculate-aggregated-price asset)
+    (unwrap! (recalculate-aggregated-price asset) (err u1001))
     (ok true)
   )
 )

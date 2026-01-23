@@ -102,7 +102,7 @@
         
         ;; Mint via Coordinator (Minting CXVG Governance Token)
         (try! (contract-call? .token-system-coordinator mint-cxvg
-            amount recipient
+            .cxvg-token amount recipient
         ))
         
         (print { event: "emission-minted", target: tx-sender, recipient: recipient, amount: amount })
