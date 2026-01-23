@@ -32,9 +32,6 @@ clarity-version = 2
 path = "contracts/budget-manager.clar"
 address = "ST3I4J5K6L7M8N9O0P1Q2R3S4T5U6V7W8X9Y0Z1A2B3C4"
 
-[contracts.self-launch-coordinator]
-path = "contracts/self-launch-coordinator.clar"
-address = "ST4J5K6L7M8N9O0P1Q2R3S4T5U6V7W8X9Y0Z1A2B3C4D5"
 
 [contracts.sip-standards]
 path = "contracts/traits/sip-standards.clar"
@@ -89,9 +86,6 @@ address = "STM2N3O4P5Q6R7S8T9U0V1W2X3Y4Z5A6B7C8D9E0F1"
 path = "contracts/dimensional/tokenized-bond-adapter.clar"
 address = "STW3L4M5N6O7P8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D2E3F4"
 
-[contracts.security-monitoring]
-path = "contracts/traits/security-monitoring.clar"
-address = "STX4M5N6O7P8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D2E3F4G5"
 
 [contracts.block-utils]
 path = "contracts/utils/block-utils.clar"
@@ -255,9 +249,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/dex/liquidity-provider.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.sbtc-oracle-adapter]
-path = "contracts/sbtc/sbtc-oracle-adapter.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.real-time-monitoring-dashboard]
 path = "contracts/dex/real-time-monitoring-dashboard.clar"
@@ -284,9 +275,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/migration/migration-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.sbtc-flash-loan-vault]
-path = "contracts/sbtc/sbtc-flash-loan-vault.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.predictive-scaling-system]
 path = "contracts/dex/predictive-scaling-system.clar"
@@ -304,9 +292,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/dex/timelock-controller.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.sbtc-integration]
-path = "contracts/sbtc/sbtc-integration.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.price-impact-calculator]
 path = "contracts/dex/price-impact-calculator.clar"
@@ -378,9 +363,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/utils/utils.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.sip-018-signed-messages]
-path = "contracts/utils/sip-018-signed-messages.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.encoding]
 path = "contracts/utils/encoding.clar"
@@ -629,13 +611,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/interoperability/wormhole-handlers.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.sbtc-lending-integration]
-path = "contracts/sbtc/sbtc-lending-integration.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.sbtc-flash-loan-extension]
-path = "contracts/sbtc/sbtc-flash-loan-extension.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.dimensional-traits]
 path = "contracts/traits/dimensional-traits.clar"
@@ -681,9 +657,6 @@ address = "STS8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2V3W4X5Y6Z7A8B9"
 path = "contracts/traits/cross-chain-traits.clar"
 address = "STU0J1K2L3M4N5O6P7Q8R9S0T1U2V3W4X5Y6Z7A8B9C0D1"
 
-[contracts.sip-018-signed-messages-trait]
-path = "contracts/traits/sip-018-signed-messages-trait.clar"
-address = "STV1K2L3M4N5O6P7Q8R9S0T1U2V3W4X5Y6Z7A8B9C0D1E2"
 
 [contracts.queue-traits]
 path = "contracts/traits/queue-traits.clar"
