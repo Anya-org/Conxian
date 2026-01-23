@@ -231,11 +231,11 @@ path = "contracts/dex/enterprise-loan-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.advanced-order-manager]
-path = "contracts/enterprise/advanced-order-manager.clar"
+path = "contracts/dex/enterprise-loan-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.compliance-hooks]
-path = "contracts/enterprise/compliance-hooks.clar"
+path = "contracts/compliance/compliance-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.on-chain-router-helper]
@@ -917,9 +917,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/mocks/mock-oracle.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.dia-oracle-mock]
-path = "contracts/mocks/dia-oracle-mock.clar"
-address = "STW1X2Y3Z4A5B6C8"
 
 [contracts.dimensional-core]
 path = "contracts/dimensional/dimensional-core.clar"
