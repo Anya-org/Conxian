@@ -334,9 +334,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/dex/nakamoto-compatibility.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.stable-swap-pool]
-path = "contracts/dex/stable-swap-pool.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.distributed-cache-manager]
 path = "contracts/dex/distributed-cache-manager.clar"
