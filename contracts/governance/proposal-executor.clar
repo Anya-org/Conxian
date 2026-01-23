@@ -67,7 +67,7 @@
   )
   (let (
       (proposal
-        (unwrap! (contract-call? .proposal-registry get-proposal proposal-id)
+        (unwrap! (contract-call? (var-get proposal-registry-contract) get-proposal proposal-id)
           ERR_PROPOSAL_NOT_FOUND
         )
       )

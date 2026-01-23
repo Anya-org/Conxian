@@ -19,20 +19,20 @@
   (begin
     (asserts! (is-eq tx-sender sender) ERR_UNAUTHORIZED)
     (asserts! (>= (ft-get-balance cxd-token sender) amount) ERR_INSUFFICIENT_BALANCE)
-    (ft-transfer? cxd-token amount sender recipient)
+    (try! (ft-transfer? cxd-token amount sender recipient))
     (ok true)
   )
 )
 
-(define-read-only (get-name ())
+(define-read-only (get-name)
   (ok "Conxian Governance Token")
 )
 
-(define-read-only (get-symbol ())
+(define-read-only (get-symbol)
   (ok "CXD")
 )
 
-(define-read-only (get-decimals ())
+(define-read-only (get-decimals)
   (ok u8)
 )
 
@@ -40,15 +40,19 @@
   (ok (ft-get-balance cxd-token owner))
 )
 
-(define-read-only (get-total-supply ())
+(define-read-only (get-total-supply)
   (ok (var-get total-supply))
+)
+
+(define-read-only (get-token-uri)
+  (ok (some "https://conxian.io/metadata/cxd"))
 )
 
 ;; Mint function for initial distribution
 (define-public (mint (amount uint) (recipient principal))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
-    (ft-mint? cxd-token amount recipient)
+    (try! (ft-mint? cxd-token amount recipient))
     (var-set total-supply (+ (var-get total-supply) amount))
     (ok true)
   )

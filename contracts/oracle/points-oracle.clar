@@ -24,6 +24,12 @@
 (define-data-var points-decay-enabled bool true)
 (define-data-var last-decay-block uint u0)
 
+;; Event definitions
+(define-map points-earned { event-id: uint } { user: principal, amount: uint, source: (string-ascii 16) })
+(define-map points-burned { event-id: uint } { user: principal, amount: uint, reason: (string-ascii 16) })
+(define-map points-transferred { event-id: uint } { from: principal, to: principal, amount: uint })
+(define-map reward-claimed { event-id: uint } { user: principal, reward-id: uint, cost: uint })
+
 ;; Storage maps
 (define-map user-points { user: principal } { 
   balance: uint,
@@ -173,7 +179,7 @@
         (var-set total-points-issued (+ (var-get total-points-issued) amount))
         
         ;; Emit event
-        (emit-event (points-earned user amount source))
+        (map-set points-earned { event-id: block-height } { user: user, amount: amount, source: source })
         
         (ok {
           new-balance: (+ current-balance amount),
@@ -215,7 +221,7 @@
         (var-set total-points-burned (+ (var-get total-points-burned) amount))
         
         ;; Emit event
-        (emit-event (points-burned tx-sender amount reason))
+        (map-set points-burned { event-id: block-height } { user: tx-sender, amount: amount, reason: reason })
         
         (ok {
           new-balance: (- current-balance amount),
@@ -278,7 +284,7 @@
         )
         
         ;; Emit event
-        (emit-event (points-transferred tx-sender to amount))
+        (map-set points-transferred { event-id: block-height } { from: tx-sender, to: to, amount: amount })
         
         (ok {
           sender-balance: (- sender-balance amount),
@@ -341,7 +347,7 @@
                   })
                   
                   ;; Emit event
-                  (emit-event (reward-claimed tx-sender reward-id (get reward points-cost)))
+                  (map-set reward-claimed { event-id: block-height } { user: tx-sender, reward-id: reward-id, cost: (get reward points-cost) })
                   
                   (ok {
                     reward-name: (get reward name),

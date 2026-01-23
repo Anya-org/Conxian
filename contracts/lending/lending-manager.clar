@@ -70,7 +70,7 @@
     (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
     
     (match (map-get? loans { borrower: borrower, loan-id: loan-id })
-      some-loan 
+      some-loan
         (begin
           (map-set loans { borrower: borrower, loan-id: loan-id } {
             borrowed-amount: (- (get borrowed-amount some-loan) repay-amount),
@@ -82,7 +82,8 @@
           })
           (ok true)
         )
-      none (err ERR_LOAN_NOT_FOUND)
+      none
+        (err ERR_LOAN_NOT_FOUND)
     )
   )
 )

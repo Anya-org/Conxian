@@ -416,13 +416,6 @@
 (define-private (get-optional (option))
   (default-to u0 option))
 
-(define-private (find-stale-allocations (pool-id uint) (max-age uint))
-  (begin
-    ;; Simplified implementation - would need proper iteration
-    (list 0 uint)
-  )
-)
-
 ;; Admin functions
 
 (define-public (emergency-cleanup-all-pools)

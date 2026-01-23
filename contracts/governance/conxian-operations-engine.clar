@@ -77,7 +77,7 @@
     (executor <proposal-executor-trait>)
   )
   (let (
-      (proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id)
+      (proposal (unwrap! (contract-call? (var-get proposal-registry-contract) get-proposal proposal-id)
         ERR_NO_SIGNAL
       ))
       (council-id (get council-id proposal))

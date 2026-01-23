@@ -692,7 +692,7 @@
     (list
       0
       {
-        route-id: (buff 32),
+        route-id: 0x0000000000000000000000000000000000000000000000000000000000000000,
         pools: (list 0 principal),
         estimated-output: u0,
         slippage: u0,
@@ -739,7 +739,7 @@
     (let (
         (token-pair (create-token-pair token-in token-out))
         (top-routes (if (> (len routes) u5)
-          (slice routes u0 u5)
+          (take routes u5)
           routes
         ))
       )
