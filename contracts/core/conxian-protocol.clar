@@ -17,7 +17,7 @@
 
 ;; Data Vars
 (define-data-var paused bool false)
-(define-data-var contract-owner principal tx-sender) ;; Replaces protocol-admin
+(define-data-var contract-owner principal deployer) ;; Replaces protocol-admin
 (define-data-var access-control principal .conxian-access)
 (define-data-var admin-facade-contract principal .admin-facade)
 

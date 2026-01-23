@@ -17,7 +17,7 @@
 (define-constant ERR_NON_COMPLIANT (err u5001))
 
 ;; Data Vars
-(define-data-var protocol-coordinator principal tx-sender)
+(define-data-var protocol-coordinator principal deployer)
 (define-data-var regulatory-adapter-contract principal .regulatory-adapter)
 (define-data-var block-utils-contract principal .block-utils)
 (define-data-var conxian-protocol-contract principal .conxian-protocol)
