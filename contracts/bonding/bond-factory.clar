@@ -55,8 +55,7 @@
     (let (
         (bond-id (+ (var-get bond-nonce) u1))
         (mint-result (ft-mint? bond-token amount tx-sender
-          (some 0x0000000000000000000000000000000000000000)
-        ))
+          (some 0x0000000000000000000000000000000000000000)))
       )
       (asserts! (is-ok mint-result) ERR_INVALID_AMOUNT)
       (map-set bonds bond-id {

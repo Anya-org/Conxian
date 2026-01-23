@@ -41,7 +41,7 @@
 
 (define-map allocation-index { principal } { 
   pool-id: uint,
-  slot-id: uint,
+  slot-id: uint,,
   allocation-count: uint
 })
 

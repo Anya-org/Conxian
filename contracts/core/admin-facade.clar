@@ -19,7 +19,7 @@
 
 ;; State
 (define-data-var rbac-contract principal .rbac)
-(define-data-var global-admin principal deployer)
+(define-data-var global-admin principal tx-sender)
 (define-data-var emergency-pause bool false)
 (define-data-var max-batch-size uint u100)
 
