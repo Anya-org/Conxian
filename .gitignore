@@ -1,53 +1,18 @@
-# ===========================================================================
-# CONXIAN PROTOCOL - GITIGNORE
-# ===========================================================================
-
-# ---------------------------------------------------------------------------
-# 1. ENVIRONMENT & SECRETS
-# ---------------------------------------------------------------------------
-# Environment files
-.env
-.env.*
-!.env.example
-!.env.example.*
-backups/env/**
-
-# Security & Private Keys (CRITICAL)
-*.pem
-*.key
-*.p12
-*.private
-*.pfx
-*.crt
-*.cert
-private-key*
-deployer-key*
-wallet-seed*
-mnemonic*
-secrets*
-
-# Configuration
-config.local.json
-
-# ---------------------------------------------------------------------------
-# 2. DEVELOPMENT TOOLS & CACHE
-# ---------------------------------------------------------------------------
-# Node.js
-node_modules/
+# Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 lerna-debug.log*
 
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-pip-log.txt
-pip-delete-this-directory.txt
+node_modules
+dist
+dist-ssr
+*.local
 
+<<<<<<< HEAD
 # Rust
 target/
 Cargo.lock
@@ -107,85 +72,22 @@ clarinet-current.txt
 # ---------------------------------------------------------------------------
 # 7. OS SPECIFIC FILES
 # ---------------------------------------------------------------------------
+=======
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+>>>>>>> 2b7ceb80d13077a5ed3f3a4228acdc870843f446
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# ---------------------------------------------------------------------------
-# 8. STACKS BLOCKCHAIN SPECIFIC
-# ---------------------------------------------------------------------------
-# Chain data
-.stacks-chain/
-.stacks-db/
-.chainstate/
-
-# Clarinet specific
-**/settings/Mainnet.toml
-**/settings/Testnet.toml
-.clarinet/
-artifacts/
-clarinet-windows-x64.msi
-clarinet_check_output.txt
-clarinet_check_errors.txt
-contracts-index.txt
-
-# Stacks deployment directories
-stacks/simnet/
-stacks/deployments/simnet/
-stacks/deployments/testnet/
-stacks/deployments/mainnet/
-stacks/.cache/
-
-# Bitcoin/Stacks wallet files
-*.wallet
-*.seed
-stx-wallet*
-btc-wallet*
-
-# ---------------------------------------------------------------------------
-# 9. BACKUP & TEMPORARY FILES
-# ---------------------------------------------------------------------------
-*.backup
-*.bak
-*.tmp
-*.temp
-*~
-
-# ---------------------------------------------------------------------------
-# 10. PROJECT SPECIFIC EXCLUSIONS
-# ---------------------------------------------------------------------------
-# Conxian specific
-monitoring/logs/
-analytics/cache/
-
-# StacksOrbit standalone repository (separate GitHub repo)
-stacksorbit/
-
-# Kiro IDE specific files
-.kiro/*
-.kiro/specs/
-
-# Prompt files (sensitive AI instructions)
-.github/chatmodes/*
-.github/copilot-instructions.md
-
-# Trae rules documentation
-.trae/rules/*
-
-# Contract backups
-contracts/dex/*backup.clar
-
-backups/env/.env.*
-
-*.devnet-plan.yaml.backup
-  
-compilation-errors-clean.txt
-stacks/security/audit-prep/*.txt
-deployments/*.simnet-plan.yaml
-stacks/deployments/*.simnet-plan.yaml
-*#
-clarinet-installer.msi
+# Android
+android/app/build
+android/.gradle
+android/local.properties
+android/captures
+.gradle
