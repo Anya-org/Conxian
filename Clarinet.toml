@@ -150,7 +150,7 @@ path = "contracts/tokens/cxlp-token.clar"
 address = "STV2K3L4M5N6O7P8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D2E3"
 
 [contracts.regulatory-adapter]
-path = "contracts/enterprise/regulatory-adapter.clar"
+path = "contracts/compliance/regulatory-adapter.clar"
 clarity-version = 2
 
 [contracts.cxs-token]
@@ -201,9 +201,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/oracle/oracle-adapter-stub.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.sanctions-oracle]
-path = "contracts/compliance/sanctions-oracle.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.travel-rule-service]
 path = "contracts/compliance/travel-rule-service.clar"
@@ -212,7 +209,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.compliance-manager]
 path = "contracts/compliance/compliance-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["sanctions-oracle", "block-utils"]
+depends_on = ["block-utils"]
 
 [contracts.compliance-trait]
 path = "contracts/compliance/compliance-trait.clar"
@@ -282,9 +279,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/dex/weighted-swap-pool.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.sbtc-bond-integration]
-path = "contracts/sbtc/sbtc-bond-integration.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.migration-manager]
 path = "contracts/migration/migration-manager.clar"
@@ -464,9 +458,6 @@ address = "STR0A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9"
 path = "contracts/lending/liquidation-manager.clar"
 address = "STN2O3P4Q5R6S7T8U9V0W1X2Y3Z4A5B6C9Q8R9S0T1U2WP"
 
-[contracts.roles]
-path = "contracts/access/roles.clar"
-address = "STU2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T1U2V3"
 
 [contracts.position-factory-root]
 path = "contracts/mev/position-factory-root.clar"
@@ -562,13 +553,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/rewards/early-lp-rewards.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.rewards-distributor]
-path = "contracts/rewards/rewards-distributor.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.role-manager]
-path = "contracts/security/role-manager.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.enhanced-circuit-breaker]
 path = "contracts/security/enhanced-circuit-breaker.clar"
@@ -586,9 +571,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/security/rate-limiter.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.role-nft]
-path = "contracts/security/role-nft.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.bond-token]
 path = "contracts/bonding/bond-token.clar"
@@ -634,9 +616,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/staking/staking-yield-nft.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.rewards]
-path = "contracts/staking/rewards.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.wormhole-inbox]
 path = "contracts/interoperability/wormhole-inbox.clar"
@@ -796,40 +775,13 @@ address = "STR6S7T8U9V0W1X2Y3Z4A5B6C3"
 path = "contracts/math/exponentiation.clar"
 address = "STS7T8U9V0W1X2Y3Z4A5B6C4"
 
-[contracts.mock-strategy-a]
-path = "contracts/mocks/mock-strategy-a.clar"
-address = "STT8U9V0W1X2Y3Z4A5B6C5"
-
-[contracts.pyth-store-mock]
-path = "contracts/mocks/pyth-store-mock.clar"
-address = "STU9V0W1X2Y3Z4A5B6C6"
-
-[contracts.mock-lending-pool]
-path = "contracts/mocks/mock-lending-pool.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-
-[contracts.mock-usda-token]
-path = "contracts/mocks/mock-usda-token.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-
-[contracts.mock-pool]
-path = "contracts/mocks/mock-pool.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-
-[contracts.mock-metrics]
-path = "contracts/mocks/mock-metrics.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-
-[contracts.mock-strategy-b]
-path = "contracts/mocks/mock-strategy-b.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.bridge-nft]
 path = "contracts/cross-chain/bridge-nft.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.enterprise-compliance-manager]
-path = "contracts/enterprise/compliance-manager.clar"
+path = "contracts/compliance/compliance-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.position-factory]
@@ -850,9 +802,6 @@ path = "contracts/bonding/bond-factory.clar"
 address = "ST1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2"
 depends_on = ["pausable-trait"]
 
-[contracts.mock-token]
-path = "contracts/mocks/mock-token.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.reputation-engine]
 path = "contracts/governance/reputation-engine.clar"
@@ -877,14 +826,7 @@ path = "contracts/security/circuit-breaker.clar"
 address = "STH3W4X5Y6Z7A8B9C0D1E2F3G4H5I6J7K8L9M0N1O2P3Q4"
 depends_on = ["rbac"]
 
-[contracts.mock-dao]
-path = "contracts/mocks/mock-dao.clar"
-address = "STI4X5Y6Z7A8B9C0D1E2F3G4H5I6J7K8L9M0N1O2P3Q4R5"
 
-[contracts.institutional-account-manager]
-path = "contracts/enterprise/institutional-account-manager.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = ["block-utils"]
 
 [contracts.kyc-registry]
 path = "contracts/identity/kyc-registry.clar"
@@ -909,13 +851,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/core/economic-policy-engine.clar"
 clarity-version = 2
 
-[contracts.oracle-mock]
-path = "contracts/mocks/oracle-mock.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-
-[contracts.mock-oracle]
-path = "contracts/mocks/mock-oracle.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 
 [contracts.dimensional-core]
@@ -940,13 +875,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/vaults/yield-aggregator.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.redstone-oracle-mock]
-path = "contracts/mocks/redstone-oracle-mock.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-
-[contracts.pyth-oracle-v2-mock]
-path = "contracts/mocks/pyth-oracle-v2-mock.clar"
-address = "STV0W1X2Y3Z4A5B6C7"
 
 [contracts.revenue-distributor]
 path = "contracts/treasury/revenue-distributor.clar"
@@ -964,7 +892,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = ["pausable-trait"]
 
 [contracts.risk-management]
-path = "contracts/traits/risk-management.clar"
+path = "contracts/traits/risk-manager-trait.clar"
 address = "STY6B7C8D9E0F1G2H3I4J5K6L7M8N9O0P1Q2R3S4T5U6"
 
 [contracts.risk-manager]
@@ -1006,10 +934,18 @@ path = "contracts/governance/timelock.clar"
 address = "STC2J3K4L5M6N7O8P9Q0R1S2T3U4V5W6X7Y8Z9A0B1C2"
 depends_on = ["conxian-access"]
 
-[contracts.enterprise-facade]
-path = "contracts/enterprise/enterprise-facade.clar"
-address = "STJ9Y0Z1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0"
-depends_on = ["conxian-access", "institutional-account-manager"]
+
+[contracts.lending-manager]
+path = "contracts/lending/lending-manager.clar"
+address = "STL4M5N6O7P8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D2E3F4"
+
+[contracts.interest-rate-model]
+path = "contracts/lending/interest-rate-model.clar"
+address = "STM5N6O7P8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D2E3F4G5"
+
+[contracts.federated-oracle-adapter]
+path = "contracts/oracle/federated-oracle-adapter.clar"
+address = "STN6O7P8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D2E3F4G5H6"
 
 [contracts.community-dao]
 path = "contracts/governance/community-dao.clar"
@@ -1022,9 +958,9 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = ["block-utils"]
 
 [contracts.revenue-router]
-path = "contracts/treasury/revenue-router.clar"
+path = "contracts/treasury/revenue-distributor.clar"
 address = "STK0Z1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1"
-depends_on = ["revenue-distributor"]
+depends_on = ["allocation-policy"]
 
 [contracts.cxvg-token]
 path = "contracts/tokens/cxvg-token.clar"
@@ -1093,9 +1029,6 @@ path = "contracts/governance/governance-handover.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = ["conxian-access", "admin-facade"]
 
-[contracts.pyth-oracle-v2]
-path = "contracts/mocks/pyth-oracle-v2-mock.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.proposal-engine]
 path = "contracts/governance/proposal-engine.clar"
