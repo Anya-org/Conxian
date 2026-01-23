@@ -23,14 +23,7 @@
 (define-data-var emergency-pause bool false)
 (define-data-var max-batch-size uint u100)
 
-;; Role Cache for Ultra-Low Gas Lookups
-(define-map role-cache
-  {
-    user: principal,
-    role: uint,
-  }
-  bool
-)
+(define-map role-cache { user: principal, role: uint } bool)
 
 ;; Helper Functions for Batch Operations
 (define-private (execute-role-grant
@@ -76,12 +69,17 @@
   type: uint,
   params: (list 10 principal),
 }))
-  (match (get type operation)
-    1 (execute-emergency-operation (get params operation))
-    2 (execute-protocol-operation (get params operation))
-    3 (execute-treasury-operation (get params operation))
-    default
-    ERR_INVALID_OPERATION
+  (let ((op-type (get type operation)))
+    (if (is-eq op-type u1)
+      (execute-emergency-operation (get params operation))
+      (if (is-eq op-type u2)
+        (execute-protocol-operation (get params operation))
+        (if (is-eq op-type u3)
+          (execute-treasury-operation (get params operation))
+          ERR_INVALID_OPERATION
+        )
+      )
+    )
   )
 )
 
@@ -100,11 +98,16 @@
 
 ;; Authorization
 (define-private (has-role (role uint))
-  (contract-call? .rbac has-role tx-sender role)
+  ;; BOLT: Optimized role check to use the local cache instead of a cross-contract call.
+  (default-to false (map-get? role-cache { user: tx-sender, role: role }))
 )
 
 (define-read-only (is-global-admin)
   (is-eq tx-sender (var-get global-admin))
+)
+
+(define-public (is-authorized (role uint))
+  (ok (has-role role))
 )
 
 ;; BOLT: Consolidated authorization check for pausing the protocol.
@@ -155,8 +158,14 @@
   (begin
     (asserts! (has-role ROLE_GLOBAL_ADMIN) ERR_NOT_AUTHORIZED)
     (if enabled
-      (try! (contract-call? .rbac grant-role user role))
-      (try! (contract-call? .rbac revoke-role user role))
+      (begin
+        (try! (contract-call? .rbac grant-role user role))
+        (map-set role-cache { user: user, role: role } true)
+      )
+      (begin
+        (try! (contract-call? .rbac revoke-role user role))
+        (map-delete role-cache { user: user, role: role })
+      )
     )
     (ok true)
   )
@@ -180,9 +189,18 @@
     (result (response bool uint))
   )
   (match result
-    ok-val (if (get active update)
-      (contract-call? .rbac grant-role (get user update) (get role update))
-      (contract-call? .rbac revoke-role (get user update) (get role update))
+    ok-val
+    (if (get active update)
+      (begin
+        (try! (contract-call? .rbac grant-role (get user update) (get role update)))
+        (map-set role-cache { user: (get user update), role: (get role update) } true)
+        (ok true)
+      )
+      (begin
+        (try! (contract-call? .rbac revoke-role (get user update) (get role update)))
+        (map-delete role-cache { user: (get user update), role: (get role update) })
+        (ok true)
+      )
     )
     err-val (err err-val)
   )
@@ -288,11 +306,17 @@
   params: (list 10 principal),
 }))
   (begin
-    (match (get type operation)
-      1 (validate-emergency-operation (get params operation))
-      2 (validate-protocol-operation (get params operation))
-      3 (validate-treasury-operation (get params operation))
-      default (err ERR_INVALID_OPERATION)
+    (let ((op-type (get type operation)))
+      (if (is-eq op-type u1)
+        (validate-emergency-operation (get params operation))
+        (if (is-eq op-type u2)
+          (validate-protocol-operation (get params operation))
+          (if (is-eq op-type u3)
+            (validate-treasury-operation (get params operation))
+            (err ERR_INVALID_OPERATION)
+          )
+        )
+      )
     )
   )
 )
@@ -301,11 +325,17 @@
   type: uint,
   params: (list 10 principal),
 }))
-  (match (get type operation)
-    1 (execute-emergency-operation (get params operation))
-    2 (execute-protocol-operation (get params operation))
-    3 (execute-treasury-operation (get params operation))
-    default (err ERR_INVALID_OPERATION)
+  (let ((op-type (get type operation)))
+    (if (is-eq op-type u1)
+      (execute-emergency-operation (get params operation))
+      (if (is-eq op-type u2)
+        (execute-protocol-operation (get params operation))
+        (if (is-eq op-type u3)
+          (execute-treasury-operation (get params operation))
+          (err ERR_INVALID_OPERATION)
+        )
+      )
+    )
   )
 )
 
