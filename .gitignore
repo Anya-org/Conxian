@@ -29,3 +29,48 @@ android/.gradle
 android/local.properties
 android/captures
 .gradle
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+!.env.example.*
+backups/env/**
+
+# Security & Private Keys (CRITICAL)
+*.pem
+*.key
+*.p12
+*.private
+*.pfx
+*.crt
+*.cert
+private-key*
+deployer-key*
+wallet-seed*
+mnemonic*
+secrets*
+
+# Configuration
+config.local.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+coverage/
+*.lcov
+.nyc_output/
+
+# ---------------------------------------------------------------------------
+# Clarinet & Stacks
+# ---------------------------------------------------------------------------
+.clarinet
+target/
+settings/Devnet.toml
+!settings/Simnet.toml
+!settings/Testnet.toml
+!settings/Mainnet.toml

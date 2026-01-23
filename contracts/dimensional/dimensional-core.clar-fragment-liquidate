@@ -1,0 +1,42 @@
+(define-public (liquidate-position (owner principal) (position-id uint) (oracle-trait <oracle-trait>))
+  (begin
+    (try! (check-bitcoin-finality))
+    (let (
+      (position (unwrap! (get-position owner position-id) ERR_INVALID_POSITION))
+      (current-price (try! (get-oracle-price (var-get dimensional-token) oracle-trait)))
+      (pnl (calculate-pnl position current-price))
+      (collateral-value (get collateral position))
+      (maintenance-margin (/ (* collateral-value (get maintenance-margin position)) PROTOCOL_FEE_DENOMINATOR))
+      (adjusted-collateral (if (>= pnl 0)
+        (+ collateral-value (to-uint pnl))
+        (if (> (to-uint (* -1 pnl)) collateral-value)
+          u0
+          (- collateral-value (to-uint (* -1 pnl)))
+        )
+      ))
+    )
+      (asserts! (is-eq (get status position) "ACTIVE") ERR_POSITION_NOT_ACTIVE)
+      (asserts! (< adjusted-collateral maintenance-margin) ERR_INSUFFICIENT_COLLATERAL)
+
+      (map-set positions { owner: owner, id: position-id }
+        (merge position {
+          status: "LIQUIDATED",
+          last-updated: block-height,
+        })
+      )
+
+      (var-set total-value-locked (- (var-get total-value-locked) collateral-value))
+      (var-set total-positions-closed (+ (var-get total-positions-closed) u1))
+
+      (print {
+        event: "liquidate-position",
+        position-id: position-id,
+        owner: owner,
+        liquidator: tx-sender,
+        tenure-id: (unwrap-panic (contract-call? .block-utils get-current-tenure-id))
+      })
+
+      (ok true)
+    )
+  )
+)

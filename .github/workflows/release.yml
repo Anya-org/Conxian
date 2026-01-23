@@ -1,0 +1,260 @@
+name: Conxian Release Pipeline
+
+on:
+  push:
+    tags:
+      - "v*"
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: "Type of release"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      pre_release:
+        description: "Mark as pre-release"
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: "20"
+  CLARINET_VERSION: "3.11.0"
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  security-gate:
+    name: Security Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      security-status: ${{ steps.security.outputs.status }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Security Scanning
+        id: security
+        run: |
+          echo "🔒 Running security scanning..."
+          # Basic grep for potential secrets (non-blocking)
+          if git grep -i -n "PRIVATE KEY" || true; then
+            echo "Review potential secret findings above (if any)."
+          fi
+          echo "status=passed" >> $GITHUB_OUTPUT
+
+  pre-release-testing:
+    name: Pre-Release Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [security-gate]
+    if: needs.security-gate.outputs.security-status == 'passed'
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - name: Install Clarinet
+        run: |
+          echo "Using project-pinned Clarinet via npx"
+
+      - name: Install Dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Contract Compilation
+        run: npx clarinet check
+
+      - name: Full Test Suite
+        run: npm test
+
+  version-management:
+    name: Version Management
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [pre-release-testing]
+    permissions:
+      contents: write
+    outputs:
+      new-version: ${{ steps.version.outputs.new-version }}
+      changelog: ${{ steps.changelog.outputs.content }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine Version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            CURRENT_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+            CURRENT_VERSION=${CURRENT_VERSION#v}
+            IFS='.' read -ra PARTS <<< "$CURRENT_VERSION"
+            MAJOR=${PARTS[0]:-0}; MINOR=${PARTS[1]:-0}; PATCH=${PARTS[2]:-0}
+            case "${{ github.event.inputs.release_type }}" in
+              major) NEW_VERSION="$((MAJOR + 1)).0.0";;
+              minor) NEW_VERSION="$MAJOR.$((MINOR + 1)).0";;
+              patch) NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))";;
+            esac
+            echo "new-version=v$NEW_VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "new-version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+          if [[ -n "$PREVIOUS_TAG" ]]; then
+            git log ${PREVIOUS_TAG}..HEAD --pretty=format:"- %s (%h)" > changelog.md
+          else
+            echo "- Initial release" > changelog.md
+          fi
+          echo "" >> changelog.md
+          echo "## Metrics" >> changelog.md
+          echo "- Contracts: 16" >> changelog.md
+          echo "- Tokenomics: 10M CXVG / 5M CXLP" >> changelog.md
+          echo "content<<EOF" >> $GITHUB_OUTPUT
+          cat changelog.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+  build-artifacts:
+    name: Build Release Artifacts
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [version-management]
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - name: Install Clarinet
+        run: |
+          echo "Using project-pinned Clarinet via npx"
+
+      - name: Install Dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build Production Package
+        run: |
+          mkdir -p release-artifacts
+          tar -czf release-artifacts/conxian-contracts-${{ needs.version-management.outputs.new-version }}.tar.gz \
+            contracts/ Clarinet.toml deployments/
+          tar -czf release-artifacts/conxian-scripts-${{ needs.version-management.outputs.new-version }}.tar.gz \
+            scripts/deploy-*.sh scripts/post_deploy_verify.ts scripts/sdk_deploy_contracts.ts || true
+          (cd release-artifacts && sha256sum *.tar.gz > checksums.txt)
+
+      - name: Upload Release Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts-${{ needs.version-management.outputs.new-version }}
+          path: release-artifacts/
+          retention-days: 30
+
+  github-release:
+    name: GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs:
+      [security-gate, pre-release-testing, version-management, build-artifacts]
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts-${{ needs.version-management.outputs.new-version }}
+          path: release-artifacts/
+
+      - name: Prepare Release Body
+        run: |
+          cat > body.md <<'EOF'
+          # Conxian Release
+
+          ## What's New
+          EOF
+          echo "${{ needs.version-management.outputs.changelog }}" >> body.md
+          cat >> body.md <<'EOF'
+
+          ## Artifacts
+          - Contracts package
+          - Scripts package
+          - Checksums
+
+          ## Security
+          - Contracts compiled & tests passed
+          - Basic security gate completed
+          EOF
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.version-management.outputs.new-version }}
+          name: Conxian ${{ needs.version-management.outputs.new-version }}
+          body_path: body.md
+          draft: false
+          prerelease: ${{ github.event.inputs.pre_release || false }}
+          files: |
+            release-artifacts/*.tar.gz
+            release-artifacts/checksums.txt
+
+  summary:
+    name: Pipeline Summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs:
+      [
+        security-gate,
+        pre-release-testing,
+        version-management,
+        build-artifacts,
+        github-release,
+      ]
+    if: always()
+    permissions:
+      contents: read
+    steps:
+      - name: Summarize
+        run: |
+          echo "## 🚀 Release Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Stage | Result |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Gate | ${{ needs.security-gate.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Testing | ${{ needs.pre-release-testing.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Versioning | ${{ needs.version-management.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Artifacts | ${{ needs.build-artifacts.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Release | ${{ needs.github-release.result }} |" >> $GITHUB_STEP_SUMMARY

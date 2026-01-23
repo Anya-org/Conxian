@@ -1,16 +1,21 @@
-# Conxius Wallet
+# Conxius Wallet & Conxian Protocol
 
-Mobile-first sovereign wallet with a hardened local enclave model.
+Mobile-first sovereign wallet with a hardened local enclave model, integrated with the Conxian Protocol.
 
 ## What This Repo Contains
 
-- React + Vite UI bundled with Tailwind CSS (offline-safe; no CDN dependency)
-- Android app via Capacitor
-- **Native Enclave Core**
-  - Encrypted wallet state persisted on-device (Android Keystore)
-  - Memory-only seed handling for zero-leak operations
-  - Native key derivation for Bitcoin, Stacks, Liquid, Rootstock, and Nostr
-  - Embedded Greenlight (Breez SDK) node with direct enclave access
+- **Conxius Wallet (Frontend/Mobile)**
+  - React + Vite UI bundled with Tailwind CSS (offline-safe; no CDN dependency)
+  - Android app via Capacitor
+  - **Native Enclave Core**
+    - Encrypted wallet state persisted on-device (Android Keystore)
+    - Memory-only seed handling for zero-leak operations
+    - Native key derivation for Bitcoin, Stacks, Liquid, Rootstock, and Nostr
+    - Embedded Greenlight (Breez SDK) node with direct enclave access
+
+- **Conxian Protocol (Backend/Smart Contracts)**
+  - Core smart contracts for DeFi yield optimization on Stacks.
+  - Deployment scripts and comprehensive test suites.
 
 ## Wallet Lifecycle
 
@@ -25,6 +30,7 @@ Mobile-first sovereign wallet with a hardened local enclave model.
 - Node.js (v18+)
 - Android Studio + Android SDK (for device installs)
 - Java 17+
+- [Clarinet](https://github.com/hirosystems/clarinet) (for smart contract development)
 
 **Install**
 
@@ -58,12 +64,11 @@ Mobile-first sovereign wallet with a hardened local enclave model.
 - **BreezPlugin**: Lightning Network node running in a foreground service, connected natively to the Enclave.
 - **IdentityService**: Manages D.iD and Nostr identity using 0-gas enclave derivation.
 
-## Roadmap
+## Protocol Documentation
 
-- See [ROADMAP.md](ROADMAP.md)
+All documentation for the Conxian Protocol is centralized in our **[Documentation Hub](./docs/)**.
+For developers, the best place to start is the **[Getting Started Guide](./docs/developer/getting-started.md)**.
 
-## Project Docs
+## License
 
-- [WHITEPAPER.md](WHITEPAPER.md)
-- [PRD.md](PRD.md) - **Source of Truth**
-- [CHANGELOG.md](CHANGELOG.md)
+Conxius Wallet & Conxian Protocol are distributed under the Business Source License 1.1 (BUSL-1.1). See [LICENSE](./LICENSE) for details.

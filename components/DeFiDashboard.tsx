@@ -131,12 +131,14 @@ const DeFiDashboard: React.FC = () => {
            <div>
               <div className="flex gap-4 mb-6 border-b border-zinc-800 pb-2">
                  <button 
+                    type="button"
                     onClick={() => setActiveTab('positions')}
                     className={`pb-2 text-sm font-bold uppercase tracking-widest transition-all ${activeTab === 'positions' ? 'text-purple-500 border-b-2 border-purple-500' : 'text-zinc-500 hover:text-zinc-300'}`}
                  >
                     Active Positions
                  </button>
                  <button 
+                    type="button"
                     onClick={() => setActiveTab('opportunities')}
                     className={`pb-2 text-sm font-bold uppercase tracking-widest transition-all ${activeTab === 'opportunities' ? 'text-purple-500 border-b-2 border-purple-500' : 'text-zinc-500 hover:text-zinc-300'}`}
                  >
@@ -270,7 +272,7 @@ const DeFiDashboard: React.FC = () => {
            <div className="bg-zinc-900/40 border border-zinc-800 rounded-[2.5rem] p-8 text-center space-y-4">
               <h4 className="font-bold text-sm text-zinc-200">Need Liquidity?</h4>
               <p className="text-xs text-zinc-500">Move assets between layers instantly via NTT.</p>
-              <button className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+              <button type="button" className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
                  Open Bridge <ExternalLink size={12} />
               </button>
            </div>

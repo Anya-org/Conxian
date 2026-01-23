@@ -1,0 +1,6 @@
+*.clar text eol=lf
+*.toml text eol=lf
+*.ts text eol=lf
+*.md text eol=lf
+*.js text eol=lf
+*.sh text eol=lf
