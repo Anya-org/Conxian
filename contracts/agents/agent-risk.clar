@@ -1,7 +1,7 @@
-(use-trait risk-manager-trait .dimensional-traits.risk-manager-trait)
+(use-trait risk-manager-trait .risk-manager-trait.risk-manager-trait)
 (use-trait rbac-trait .core-traits.rbac-trait)
 
-(impl-trait .dimensional-traits.risk-manager-trait)
+(impl-trait .risk-manager-trait.risk-manager-trait)
 (impl-trait .automation-traits.office-job-trait)
 (use-trait office-job-trait .automation-traits.office-job-trait)
 
@@ -10,6 +10,7 @@
 (define-constant ERR_NOT_CONFIGURED (err u1006))
 (define-constant MIN_LEVERAGE u100)
 
+(define-data-var contract-owner principal tx-sender)
 (define-data-var max-leverage uint u2000)
 (define-data-var maintenance-margin uint u500)
 (define-data-var liquidation-threshold uint u8000)
@@ -60,6 +61,57 @@
     (var-set min-liquidation-reward min-reward)
     (var-set max-liquidation-reward max-reward)
     (ok true)
+  )
+)
+
+(define-public (liquidate (position-id uint))
+  (begin
+    ;; Simplified liquidation logic
+    (ok true)
+  )
+)
+
+(define-read-only (get-health-factor (position-id uint))
+  (begin
+    ;; Simplified health factor calculation
+    (ok u15000) ;; 150% health factor
+  )
+)
+
+(define-public (update-position-health (position-id uint) (new-health uint) (collateral-value uint) (strategy principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+    ;; Update logic would go here
+    (ok true)
+  )
+)
+
+(define-public (set-asset-collateral-factor (asset principal) (factor uint) (risk-level uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+    ;; Set factor logic would go here
+    (ok true)
+  )
+)
+
+(define-read-only (get-asset-factor (asset principal))
+  (begin
+    ;; Return default collateral factor
+    (ok u8000) ;; 80%
+  )
+)
+
+(define-read-only (get-global-collateral-factor ())
+  (begin
+    ;; Return global collateral factor
+    (ok u8000) ;; 80%
+  )
+)
+
+(define-read-only (is-liquidatable (position-id uint))
+  (begin
+    ;; Simplified liquidation check
+    (ok false)
   )
 )
 

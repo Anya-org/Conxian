@@ -191,12 +191,9 @@
                 (volatility (- (get confidence price-data) u5000))
               )
               ;; Derive volatility from confidence
-              (match (update-market-parameters asset (get utilization current-params)
+              (try! (update-market-parameters asset (get utilization current-params)
                 volatility
-              )
-                update-success update-success
-                update-error (err update-error)
-              )
+              ))
             )
           )
         )

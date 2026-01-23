@@ -134,10 +134,10 @@
     (let ((permissions (get-vault-permissions vault_id)))
       (if (is-some permissions)
           (begin
-            (let ((perm (unwrap-optional permissions)))
+            (let ((perm (unwrap! permissions)))
               (let ((user-permission (get-user-permission (get perm permissions) user)))
                 (if (is-some user-permission)
-                    (has-permission-level (get-optional user-permission) required-level)
+                    (has-permission-level (unwrap! user-permission) required-level)
                     false
                 )
               )
@@ -268,7 +268,6 @@
         created-at: block-height
       })
     )
-  )
   )
 )
 

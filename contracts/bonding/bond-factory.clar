@@ -38,6 +38,10 @@
 (define-read-only (get-total-supply)
   (ok u0) ;; Placeholder implementation
 )
+
+(define-read-only (get-token-uri)
+  (ok (some "https://conxian.io/metadata/bond"))
+)
 (define-constant ERR_BOND_NOT_FOUND (err u1002))
 
 ;; Data Vars

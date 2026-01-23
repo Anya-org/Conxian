@@ -70,15 +70,15 @@
     (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
     
     (match (map-get? loans { borrower: borrower, loan-id: loan-id })
-      loan
+      some-loan 
         (begin
           (map-set loans { borrower: borrower, loan-id: loan-id } {
-            borrowed-amount: (- (get borrowed-amount loan) repay-amount),
-            collateral-amount: (get collateral-amount loan),
-            interest-rate: (get interest-rate loan),
-            start-block: (get start-block loan),
+            borrowed-amount: (- (get borrowed-amount some-loan) repay-amount),
+            collateral-amount: (get collateral-amount some-loan),
+            interest-rate: (get interest-rate some-loan),
+            start-block: (get start-block some-loan),
             last-interest-block: block-height,
-            active: (and (> (get borrowed-amount loan) repay-amount) (get active loan))
+            active: (and (> (get borrowed-amount some-loan) repay-amount) (get active some-loan))
           })
           (ok true)
         )

@@ -155,15 +155,15 @@
     
     ;; Get current user points
     (let ((current-points (get-user-points user)))
-      (let ((current-balance (if (is-some current-points) (get-optional (get-points-balance user)) u0))
-            (current-earned (if (is-some current-points) (get-optional (get-points-earned user)) u0))
+      (let ((current-balance (if (is-some current-points) (unwrap! (get-points-balance user)) u0))
+            (current-earned (if (is-some current-points) (unwrap! (get-points-earned user)) u0))
             (current-tier (calculate-user-tier user)))
         
         ;; Update user points
         (map-set user-points { user: user } {
           balance: (+ current-balance amount),
           earned: (+ current-earned amount),
-          burned: (if (is-some current-points) (get-optional (get-points-burned user)) u0),
+          burned: (if (is-some current-points) (unwrap! (get-points-burned user)) u0),
           last-activity: block-height,
           points-tier: current-tier,
           expiry-block: (+ block-height POINTS_EXPIRY_BLOCKS)
@@ -195,8 +195,8 @@
     (let ((current-points (get-user-points tx-sender)))
       (asserts! (is-some current-points) ERR_POINTS_NOT_AVAILABLE)
       
-      (let ((current-balance (get-optional (get-points-balance tx-sender)))
-            (current-burned (get-optional (get-points-burned tx-sender))))
+      (let ((current-balance (unwrap! (get-points-balance tx-sender)))
+            (current-burned (unwrap! (get-points-burned tx-sender))))
         
         ;; Check sufficient balance
         (asserts! (>= current-balance amount) ERR_POINTS_NOT_AVAILABLE)
@@ -204,7 +204,7 @@
         ;; Update user points
         (map-set user-points { user: tx-sender } {
           balance: (- current-balance amount),
-          earned: (get-optional (get-points-earned tx-sender)),
+          earned: (unwrap! (get-points-earned tx-sender)),
           burned: (+ current-burned amount),
           last-activity: block-height,
           points-tier: (calculate-user-tier tx-sender),
@@ -237,7 +237,7 @@
     (let ((sender-points (get-user-points tx-sender)))
       (asserts! (is-some sender-points) ERR_POINTS_NOT_AVAILABLE)
       
-      (let ((sender-balance (get-optional (get-points-balance tx-sender)))
+      (let ((sender-balance (unwrap! (get-points-balance tx-sender)))
             (receiver-points (get-user-points to)))
         
         ;; Check sufficient balance
@@ -246,19 +246,19 @@
         ;; Update sender points
         (map-set user-points { user: tx-sender } {
           balance: (- sender-balance amount),
-          earned: (get-optional (get-points-earned tx-sender)),
-          burned: (get-optional (get-points-burned tx-sender)),
+          earned: (unwrap! (get-points-earned tx-sender)),
+          burned: (unwrap! (get-points-burned tx-sender)),
           last-activity: block-height,
           points-tier: (calculate-user-tier tx-sender),
           expiry-block: (get sender-points expiry-block)
         })
         
         ;; Update receiver points
-        (let ((receiver-balance (if (is-some receiver-points) (get-optional (get-points-balance to)) u0))
+        (let ((receiver-balance (if (is-some receiver-points) (unwrap! (get-points-balance to)) u0))
           (map-set user-points { user: to } {
             balance: (+ receiver-balance amount),
-            earned: (if (is-some receiver-points) (get-optional (get-points-earned to)) u0),
-            burned: (if (is-some receiver-points) (get-optional (get-points-burned to)) u0),
+            earned: (if (is-some receiver-points) (unwrap! (get-points-earned to)) u0),
+            burned: (if (is-some receiver-points) (unwrap! (get-points-burned to)) u0),
             last-activity: block-height,
             points-tier: (calculate-user-tier to),
             expiry-block: (+ block-height POINTS_EXPIRY_BLOCKS)
@@ -309,7 +309,7 @@
           (let ((user-claim (get-user-reward-claim tx-sender reward-id)))
             (if (is-some user-claim)
                 (asserts!
-                  (< (get claim-count (get-optional user-claim))
+                  (< (get claim-count (unwrap! user-claim))
                     (get reward max-claims)
                   )
                   ERR_POINTS_NOT_AVAILABLE
@@ -322,7 +322,7 @@
               success
                 (begin
                   ;; Update user reward claim
-                  (let ((current-claims (if (is-some user-claim) (get claim-count (get-optional user-claim)) u0)))
+                  (let ((current-claims (if (is-some user-claim) (get claim-count (unwrap! user-claim)) u0)))
                     (map-set user-rewards { user: tx-sender, reward-id: reward-id } {
                       claimed-at: block-height,
                       claim-count: (+ current-claims u1)
@@ -409,9 +409,6 @@
 
 (define-private (is-some (option))
   (not (is-none option)))
-
-(define-private (get-optional (option))
-  (default-to { balance: u0, earned: u0, burned: u0, last-activity: u0, points-tier: u0, expiry-block: u0 } option))
 
 (define-private (is-authorized-issuer (issuer principal))
   (begin
