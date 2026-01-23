@@ -3,7 +3,7 @@
 ;; Implements O(1) Scalable Reward Distribution with "Clean-Hands" Enforcement.
 ;; Pausable Staking (Deposits paused on emergency, Withdrawals always open).
 
-(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
@@ -102,7 +102,7 @@
 
 (define-public (stake
     (amount uint)
-    (token <sip-010-trait>)
+    (token <sip-010-ft-trait>)
   )
   (begin
     ;; Fail if paused
@@ -131,7 +131,7 @@
 
 (define-public (withdraw
     (amount uint)
-    (token .sip-standards.sip-010-ft-trait)
+    (token <sip-010-ft-trait>)
   )
   (begin
     ;; Withdrawals are allowed even if paused (User Protection Ethos)
@@ -158,7 +158,7 @@
   )
 )
 
-(define-public (get-reward (token .sip-standards.sip-010-ft-trait))
+(define-public (get-reward (token <sip-010-ft-trait>))
   (let ((reward (earned tx-sender)))
     (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
     (asserts! (is-eq (contract-of token) (var-get rewards-token))

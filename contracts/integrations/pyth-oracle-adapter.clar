@@ -31,7 +31,7 @@
 (define-public (get-price (asset principal))
   (let (
       (tenure-id (contract-call? .block-utils get-current-tenure-id))
-      (price-data (unwrap! (contract-call? .pyth-oracle-v2 get-price asset)
+      (price-data (unwrap! (contract-call? .pyth-oracle get-price asset)
         (err u7002)
       ))
     )

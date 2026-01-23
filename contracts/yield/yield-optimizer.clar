@@ -2,7 +2,7 @@
 ;; Analyzes strategies and rebalances funds for optimal APY
 ;; Enhanced with Strategy Selection and Risk Scoring
 
-(use-trait vault-trait .vault-trait.vault-trait)
+(use-trait vault-trait .vault-traits.vault-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_STRATEGY_NOT_FOUND (err u6001))

@@ -3,5 +3,6 @@
   (
     (deposit (uint principal) (response uint uint))
     (withdraw (uint principal) (response uint uint))
+    (allocate-to-strategy (amount uint) (strategy principal) (response bool uint))
   )
 )

@@ -47,9 +47,9 @@
 })
 
 ;; Events
-(define-event (liquidity-added (provider principal) (pool principal) (amount uint)))
-(define-event (liquidity-removed (provider principal) (pool principal) (amount uint)))
-(define-event (rewards-claimed (provider principal) (pool principal) (amount uint)))
+;; (liquidity-added (provider principal) (pool principal) (amount uint))
+;; (liquidity-removed (provider principal) (pool principal) (amount uint))
+;; (rewards-claimed (provider principal) (pool principal) (amount uint))
 
 ;; Private helper functions
 

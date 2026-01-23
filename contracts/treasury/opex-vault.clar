@@ -32,7 +32,7 @@
       ERR_UNAUTHORIZED
     )
     (asserts!
-      (contract-call? (var-get conxian-access-contract) has-role tx-sender
+      (contract-call? (var-get conxian-access-contract) .conxian-access has-role tx-sender
         ROLE_OPERATOR
       )
       ;; ROLE_OPERATOR ERR_UNAUTHORIZED

@@ -39,7 +39,7 @@
   (+ (var-get base-price) (/ (* (var-get slope) current-supply) u1000000))
 )
 
-(define-read-only (get-buy-quote (amount-cxd uint))
+(define-public (get-buy-quote (amount-cxd uint))
   (let (
       (supply (unwrap-panic (contract-call? .cxd-token get-total-supply)))
       (price-start (get-price supply))
@@ -52,7 +52,7 @@
   )
 )
 
-(define-read-only (get-sell-quote (amount-cxd uint))
+(define-public (get-sell-quote (amount-cxd uint))
   (let (
       (supply (unwrap-panic (contract-call? .cxd-token get-total-supply)))
       (price-start (get-price supply))

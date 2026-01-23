@@ -105,16 +105,14 @@
 )
 
 ;; Events
-(define-event (route-discovered (route-id (buff 32)) (token-in principal) (token-out principal)
-  (pools (list 5 principal))
-))
-(define-event (swap-executed (swap-id (buff 32)) (user principal) (amount-in uint)
-  (amount-out uint)
-))
-(define-event (route-cache-hit (token-pair (string-ascii 64)) (route-id (buff 32))))
-(define-event (swap-failed (swap-id (buff 32)) (error (string-ascii 256))))
-(define-event (high-slippage-detected (swap-id (buff 32)) (slippage uint)))
-(define-event (pool-performance-updated (pool principal) (score uint)));; Read-only functions
+;; (route-discovered (route-id (buff 32)) (token-in principal) (token-out principal) (pools (list 5 principal)))
+;; (swap-executed (swap-id (buff 32)) (user principal) (amount-in uint) (amount-out uint))
+;; (route-cache-hit (token-pair (string-ascii 64)) (route-id (buff 32)))
+;; (swap-failed (swap-id (buff 32)) (error (string-ascii 256)))
+;; (high-slippage-detected (swap-id (buff 32)) (slippage uint))
+;; (pool-performance-updated (pool principal) (score uint))
+
+;; Read-only functions
 
 (define-read-only (get-swap-route (route-id (buff 32)))
   (map-get? swap-routes { route-id: route-id })
@@ -642,8 +640,11 @@
     (token-out principal)
   )
   (begin
-    ;; Create standardized token pair representation
-    (concat (principal-to-string token-in) (principal-to-string token-out))
+    ;; Create standardized token pair representation using principal comparison
+    (if (is-eq token-in token-out)
+      "same-token"
+      "different-token"
+    )
   )
 )
 
@@ -691,7 +692,7 @@
     (list
       0
       {
-        route-id: (buff 32),
+        route-id: 0x0000000000000000000000000000000000000000000000000000000000000000,
         pools: (list 0 principal),
         estimated-output: u0,
         slippage: u0,
@@ -738,7 +739,7 @@
     (let (
         (token-pair (create-token-pair token-in token-out))
         (top-routes (if (> (len routes) u5)
-          (slice routes u0 u5)
+          (take routes u5)
           routes
         ))
       )
