@@ -1,30 +1,30 @@
-# Conxian Protocol: Documentation Hub
+# Conxius Wallet Documentation
 
-Welcome to the central documentation hub for the Conxian Protocol. All project documentation, from the high-level vision to detailed developer guides, is organized and accessible from this location.
+Welcome to the official documentation for **Conxius Wallet**, a mobile-first, sovereign Bitcoin enclave designed by **Conxian Labs**.
 
-## 📄 Core Project Documents
+## �️ Architecture & Security
 
-These documents provide the strategic overview, technical details, and development trajectory for the protocol.
+- **[Enclave Model](./enclave-architecture.md)**: Deep dive into the native Android Keystore integration and memory-only seed handling.
+- **[Signing Service](./signing-service.md)**: Documentation for `services/signer.ts` and the cryptographic primitives used.
+- **[Privacy Policy](./privacy.md)**: Our commitment to zero-telemetry and local-first data.
 
-- **[Whitepaper](./whitepaper.md)** - A detailed technical explanation of the protocol's design and objectives.
-- **[Roadmap](./ROADMAP.md)** - The development roadmap and future milestones.
-- **[Changelog](./CHANGELOG.md)** - A complete record of all versions and updates.
-- **[Business Classification Analysis](./BUSINESS_CLASSIFICATION_ANALYSIS.md)** - An analysis of the protocol's classification as a Sovereign Autonomous Business (SAB).
-- **[License](../LICENSE)** - The Business Source License 1.1 (BUSL-1.1) governing the codebase.
+## � Developer Guides
 
-## 👥 Audience-Specific Guides
+- **[Getting Started](./getting-started.md)**: How to set up the development environment for React, Capacitor, and Android.
+- **[Native Plugins](./native-plugins.md)**: Interacting with the `SecureEnclave` and `Breez` (Lightning) plugins.
+- **[Identity & Nostr](./identity-nostr.md)**: Using D.iD and Nostr for sovereign coordination.
 
-This documentation is tailored to the needs of different audiences interacting with the protocol.
+## 🏦 Institutional & Enterprise
 
-- **[User Documentation](./user/)** - For end-users of the Conxian Protocol. Includes getting started guides and tutorials.
-- **[Developer Documentation](./developer/)** - For developers building on top of or contributing to the protocol.
-  - **[Getting Started Guide](./developer/getting-started.md)** - **Start here!** Set up your environment, run tests, and deploy.
-- **[Enterprise Documentation](./enterprise/)** - For institutional clients and partners. Includes integration and compliance guides.
-- **[Operations Documentation](./operations/)** - For system operators and maintainers. Includes monitoring and incident response procedures.
+- **[Ops Personas](./ops-personas.md)**: Configuring governance structures for institutional entity management.
+- **[Risk Auditing](./risk-auditing.md)**: Understanding the real-time risk profile and institutional audit features.
 
-## 🤝 Contribution & Standards
+## 🤝 Contribution
 
-Information for contributors and a reference for project standards.
+- **[Contributing](../CONTRIBUTING.md)**: How to help build the future of sovereign Bitcoin tooling.
+- **[Security Policy](../SECURITY.md)**: Reporting vulnerabilities and our bounty program.
 
-- **[Contributing Guidelines](./CONTRIBUTING.md)** - The process for contributing code, documentation, or raising issues.
-- **[Naming Standards](./NAMING_STANDARDS.md)** - The naming conventions used throughout the Clarity codebase.
+---
+
+### Archive
+- **[Legacy Protocol Reference](./archive/conxian-protocol-defi/)**: Archived documentation for the Conxian DeFi Protocol (not part of the Conxius Wallet product).

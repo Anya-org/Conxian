@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, Cell } from 'recharts';
-import { TrendingUp, PieChart, Landmark, Users, Vote, ExternalLink, Loader2, Sparkles, ShieldCheck, DollarSign, BarChart4, Briefcase, Zap, Activity, Sword, Medal, Award, FileText, Target, Scale, History, TrendingDown, ShieldAlert, Binary, AlertTriangle, Fingerprint, Eye } from 'lucide-react';
+import { TrendingUp, PieChart, Landmark, Users, Vote, ExternalLink, Loader2, Sparkles, ShieldCheck, DollarSign, BarChart4, Briefcase, Zap, Activity, Sword, Medal, Award, FileText, Target, Scale, History, TrendingDown, ShieldAlert, Binary, AlertTriangle, Fingerprint, Eye, RefreshCw } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { getRiskProfileAudit } from '../services/gemini';
 import { MOCK_ASSETS } from '../constants';
@@ -85,7 +85,7 @@ const InvestorDashboard: React.FC = () => {
                       </div>
                       <div className="w-full h-1 bg-background rounded-full overflow-hidden">
                          <div 
-                           className={`h-full transition-all duration-1000 ${vector.id === 'liq' ? 'bg-warning' : 'bg-bitcoin'}`} 
+                           className={`h-full transition-all duration-1000 ${vector.id === 'liq' ? 'bg-orange-500' : 'bg-bitcoin'}`} 
                            style={{ width: `${vector.value}%` }} 
                          />
                       </div>
@@ -103,7 +103,12 @@ const InvestorDashboard: React.FC = () => {
                       <h3 className="text-xs font-black uppercase tracking-widest text-muted font-mono italic">CRO_STRATEGIC_AUDIT_2024</h3>
                    </div>
                    <div className="flex items-center gap-4">
-                      <button type="button" onClick={runInstitutionalAudit} className="text-[10px] font-black uppercase text-orange-500 hover:text-orange-400 transition-all flex items-center gap-2">
+                      <button 
+                        type="button" 
+                        onClick={runInstitutionalAudit} 
+                        className="text-[10px] font-black uppercase text-orange-500 hover:text-orange-400 transition-all flex items-center gap-2"
+                        disabled={isLoading}
+                      >
                          <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
                          Refine Analysis
                       </button>
@@ -197,8 +202,6 @@ const InvestorDashboard: React.FC = () => {
   );
 };
 
-const RefreshCw = ({ size, className }: { size: number, className?: string }) => (
-  <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
-);
+
 
 export default InvestorDashboard;
