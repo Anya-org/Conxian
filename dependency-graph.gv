@@ -1,6 +1,0 @@
-// Contract Dependencies
-digraph {
-	"trait-registry"
-	"cxd-token"
-	"cxd-token" -> "sip-010-trait"
-}
