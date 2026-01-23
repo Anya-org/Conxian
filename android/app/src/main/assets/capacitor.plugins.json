@@ -1,6 +1,0 @@
-[
-	{
-		"pkg": "@capacitor/browser",
-		"classpath": "com.capacitorjs.plugins.browser.BrowserPlugin"
-	}
-]
