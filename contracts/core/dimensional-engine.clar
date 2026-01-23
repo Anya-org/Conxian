@@ -126,7 +126,11 @@
   )
   (begin
     (let (
-        (is-paused (unwrap-panic (contract-call? .conxian-protocol is-paused)))
+        ;; BOLT: Refactored to use `get-protocol-status` for improved error handling.
+        ;; BOLT: Refactored to use `get-protocol-status` for improved error handling.
+        ;; BOLT: Refactored to use `get-protocol-status` for improved error handling.
+        (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
+        (is-paused (get paused protocol-status))
         (position-manager (try! (get-module-contract "position-manager")))
       )
       (try! (guard-entry is-paused))
@@ -147,7 +151,9 @@
   )
   (begin
     (let (
-        (is-paused (unwrap-panic (contract-call? .conxian-protocol is-paused)))
+        ;; BOLT: Consolidated pause check to reduce cross-contract calls.
+        (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
+        (is-paused (get paused protocol-status))
         (collateral-manager (try! (get-module-contract "collateral-manager")))
       )
       (try! (guard-entry is-paused))
@@ -166,7 +172,9 @@
   )
   (begin
     (let (
-        (is-paused (unwrap-panic (contract-call? .conxian-protocol is-paused)))
+        ;; BOLT: Consolidated pause check to reduce cross-contract calls.
+        (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
+        (is-paused (get paused protocol-status))
         (collateral-manager (try! (get-module-contract "collateral-manager")))
       )
       (try! (guard-entry is-paused))
