@@ -119,7 +119,11 @@ const GovernancePortal: React.FC = () => {
                  </div>
               </div>
            </div>
-           <button onClick={() => setOpsMode('setup')} className="bg-zinc-100 hover:bg-white text-black px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl active:scale-95 flex items-center gap-2">
+           <button 
+               type="button"
+               onClick={() => setOpsMode('setup')} 
+               className="bg-zinc-100 hover:bg-white text-black px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl active:scale-95 flex items-center gap-2"
+           >
                <Briefcase size={16} /> Ops Setup
            </button>
         </div>
@@ -134,7 +138,14 @@ const GovernancePortal: React.FC = () => {
                         <h3 className="text-3xl font-black tracking-tighter text-zinc-100">Initialize Ops Governance</h3>
                         <p className="text-sm text-zinc-500">Select a structural template for your Sovereign Entity.</p>
                     </div>
-                    <button onClick={() => setOpsMode('view')} className="p-4 hover:bg-zinc-900 rounded-full text-zinc-500"><Undo2 /></button>
+                    <button 
+                        type="button"
+                        onClick={() => setOpsMode('view')} 
+                        className="p-4 hover:bg-zinc-900 rounded-full text-zinc-500"
+                        aria-label="Close setup"
+                    >
+                        <Undo2 />
+                    </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -144,10 +155,12 @@ const GovernancePortal: React.FC = () => {
                         return (
                             <button 
                                 key={key}
+                                type="button"
                                 onClick={() => setSelectedPersona(key)}
                                 className={`p-8 rounded-[2rem] border text-left transition-all space-y-4 group relative overflow-hidden ${
                                     isSelected ? 'bg-zinc-900 border-orange-500 ring-2 ring-orange-500/20' : 'bg-zinc-900/40 border-zinc-800 hover:bg-zinc-900 hover:border-zinc-700'
                                 }`}
+                                aria-pressed={isSelected}
                             >
                                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white mb-4 ${
                                     key === 'brics' ? 'bg-red-500' : 
@@ -179,6 +192,7 @@ const GovernancePortal: React.FC = () => {
                 {selectedPersona && (
                     <div className="flex justify-end pt-4 border-t border-zinc-900">
                         <button 
+                            type="button"
                             className="bg-orange-600 hover:bg-orange-500 text-white px-12 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-orange-600/20 transition-all flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4"
                             onClick={async () => {
                                 const svc = new GovernanceService();
@@ -218,8 +232,10 @@ const GovernancePortal: React.FC = () => {
                              <p className="text-sm font-mono font-bold text-zinc-200 mt-1 truncate w-48">{delegatedTo}</p>
                           </div>
                           <button 
+                            type="button"
                             onClick={revokeDelegation}
                             className="p-2 hover:bg-orange-500/20 rounded-lg text-orange-500 transition-colors"
+                            aria-label="Revoke delegation"
                           >
                              <Undo2 size={18} />
                           </button>
@@ -230,6 +246,7 @@ const GovernancePortal: React.FC = () => {
                     <div className="space-y-4">
                        <p className="text-xs text-zinc-400 leading-relaxed italic">Delegate your NFT voting weight to a trusted technical expert or a community multi-sig.</p>
                        <button 
+                        type="button"
                         onClick={() => setShowDelegationModal(true)}
                         className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl text-[10px] font-black uppercase tracking-widest border border-zinc-700 transition-all flex items-center justify-center gap-2"
                        >
@@ -263,12 +280,14 @@ const GovernancePortal: React.FC = () => {
                  {MOCK_PROPOSALS.map((p) => (
                     <button 
                      key={p.id}
+                     type="button"
                      onClick={() => setSelectedProposal(p)}
                      className={`w-full p-6 rounded-[2rem] border text-left transition-all group ${
                        selectedProposal?.id === p.id 
                        ? 'bg-zinc-900 border-orange-500/50 shadow-2xl scale-[1.02]' 
                        : 'bg-zinc-950 border-zinc-900 hover:border-zinc-800'
                      }`}
+                     aria-pressed={selectedProposal?.id === p.id}
                     >
                        <div className="flex justify-between items-start mb-4">
                           <span className="text-[10px] font-mono font-black text-zinc-500 bg-zinc-900 px-2 py-1 rounded">{p.id}</span>
@@ -341,6 +360,7 @@ const GovernancePortal: React.FC = () => {
 
                  <div className="flex gap-4">
                     <button 
+                       type="button"
                        onClick={handleVote}
                        disabled={isVoting || !!delegatedTo}
                        className="flex-1 bg-zinc-100 hover:bg-white text-zinc-950 font-black py-5 rounded-2xl text-xs uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:grayscale active:scale-95"
@@ -349,6 +369,7 @@ const GovernancePortal: React.FC = () => {
                        Affirm Measure
                     </button>
                     <button 
+                       type="button"
                        onClick={handleVote}
                        disabled={isVoting || !!delegatedTo}
                        className="flex-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 font-black py-5 rounded-2xl text-xs uppercase tracking-widest transition-all border border-zinc-800 flex items-center justify-center gap-3 disabled:opacity-50 active:scale-95"

@@ -1,69 +1,102 @@
 # Conxius Wallet
 
-Mobile-first sovereign wallet with a hardened local enclave model.
+### The Sovereign Bitcoin Enclave
 
-## What This Repo Contains
+Designed by **Conxian Labs** under the **Conxian Brand**.
 
-- React + Vite UI bundled with Tailwind CSS (offline-safe; no CDN dependency)
-- Android app via Capacitor
-- **Native Enclave Core**
-  - Encrypted wallet state persisted on-device (Android Keystore)
-  - Memory-only seed handling for zero-leak operations
-  - Native key derivation for Bitcoin, Stacks, Liquid, Rootstock, and Nostr
-  - Embedded Greenlight (Breez SDK) node with direct enclave access
+[![License](https://img.shields.io/badge/License-BUSL--1.1-orange.svg)](./LICENSE)
+[![Build Status](https://img.shields.io/badge/Build-Reproducible-success.svg)](https://github.com/conxian/conxius-wallet)
+[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Web-blue.svg)](https://github.com/conxian/conxius-wallet)
 
-## Wallet Lifecycle
+Conxius is a mobile-first, non-custodial Bitcoin wallet built for the sovereign individual and the institutional operator.
+It leverages a **Native Hardened Enclave** model to ensure your private keys never leave your device's secure hardware.
 
-- If an encrypted wallet exists on-device, the app resumes it by showing the lock screen.
-- If no wallet exists, the app starts onboarding to create/import a new wallet.
-- From the lock screen, you can wipe the vault and create a new wallet (destructive).
+---
 
-## Development
+## 🛡️ Core Principles
 
-**Prerequisites**
+- **True Sovereignty**: No accounts, no email, no KYC. Your keys, your Bitcoin.
+- **Native Enclave**: Private keys are generated and stored within the Android Keystore / Secure Enclave.
+- **Zero Telemetry**: We do not track you. No analytics, no logging, no middle-man servers.
+- **Multi-Layer Native**: Deep integration with:
+**Bitcoin L1, Lightning (Breez/Greenlight), Stacks (SIP-005), Rootstock, Liquid, and Nostr.
+
+## 🚀 Key Features
+
+### 🏦 Institutional-Grade Security
+
+- **Native Enclave Core**: Encrypted state persisted on-device with memory-only seed handling.
+- **Ops Personas**: Pre-configured governance structures (BRICS, Business, Nomad, Unbanked) for entity management.
+- **Risk Enclave**: Real-time institutional risk auditing and protocol-native moat quantification.
+
+### ⚡ Lightning & Multi-Layer
+
+- **Embedded Lightning**: Built-in Greenlight (Breez SDK) node for instant, low-fee payments.
+- **Bitcoin L2 Support**: Native derivation for Stacks, Liquid, and Rootstock.
+- **Coin Control Forge**: Real-time UTXO indexer with advanced coin selection and freezing capabilities.
+
+### 🆔 Decentralized Identity
+
+- **D.iD Integration**: Decentralized Identity (did:pkh:btc) derived natively from your enclave.
+- **Nostr Transport**: Encrypted multi-sig coordination and decentralized profile metadata via Nostr relays.
+
+## 📂 Repository Structure
+
+- `components/`: React UI components following Bitcoin Design Standards.
+- `services/`: Core logic for Enclave interactions, signing, and protocol integrations.
+- `android/`: Native Capacitor bridge and Secure Enclave implementation.
+- `docs/`: Comprehensive technical and operational documentation.
+
+## 🛠️ Development
+
+### Prerequisites
 
 - Node.js (v18+)
 - Android Studio + Android SDK (for device installs)
 - Java 17+
 
-**Install**
+### Getting Started
 
-- `npm install`
+1. **Install Dependencies**
 
-**Run web (Mock Enclave)**
+   ```bash
+   npm install
+   ```
 
-- `npm run dev`
+2. **Run in Web (Mock Enclave)**
 
-**Build web**
+   ```bash
+   npm run dev
+   ```
 
-- `npm run build`
+3. **Build & Sync Android**
 
-## Android (Production Environment)
+   ```bash
+   npm run build
+   ```
 
-**Build + install debug**
+## 🔐 Security & Privacy
 
-- `cd android && ./gradlew :app:installDebug`
+### Reproducible Builds
 
-**Sync web assets into Android**
+Conxius is committed to reproducible builds. This allows anyone to verify that the binary provided in our releases was generated from the exact source code in this repository.
 
-- `npx cap sync android`
+### Vulnerability Disclosure
 
-**Run Unit Tests**
+If you find a security issue, please contact us at `security@conxian.com`.
 
-- `cd android && ./gradlew :app:testDebugUnitTest`
+## 📜 Documentation & Guides
 
-## Key Architecture
+All documentation is centralized in our **[Documentation Hub](./docs/)**.
 
-- **SecureEnclavePlugin**: Native Java bridge handling all sensitive key operations.
-- **BreezPlugin**: Lightning Network node running in a foreground service, connected natively to the Enclave.
-- **IdentityService**: Manages D.iD and Nostr identity using 0-gas enclave derivation.
+- **[User Guide](./docs/user/user-guide.md)**: Onboarding and daily usage.
+- **[Architecture](./docs/architecture.md)**: Deep dive into the Enclave and Plugin system.
+- **[Institutional Onboarding](./docs/enterprise/onboarding.md)**: Setting up Ops Personas.
 
-## Roadmap
+## ⚖️ License
 
-- See [ROADMAP.md](ROADMAP.md)
+Conxius Wallet is distributed under the Business Source License 1.1 (BUSL-1.1). See [LICENSE](./LICENSE) for details.
 
-## Project Docs
+---
 
-- [WHITEPAPER.md](WHITEPAPER.md)
-- [PRD.md](PRD.md) - **Source of Truth**
-- [CHANGELOG.md](CHANGELOG.md)
+© 2024-2026 Conxian Labs. All rights reserved.
