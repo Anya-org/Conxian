@@ -32,7 +32,6 @@ clarity-version = 2
 path = "contracts/budget-manager.clar"
 address = "ST3I4J5K6L7M8N9O0P1Q2R3S4T5U6V7W8X9Y0Z1A2B3C4"
 
-
 [contracts.sip-standards]
 path = "contracts/traits/sip-standards.clar"
 address = "STL1M2N3O4P5Q6R7S8T9U0V1W2X3Y4Z5A6B7C8D9E"
@@ -57,9 +56,6 @@ address = "STA0P1Q2R3S4T5U6V7W8X9Y0Z1A2B3C4D5E6F7G8H9I0J1"
 path = "contracts/traits/governance-traits.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.tiered-pools]
-path = "contracts/pools/tiered-pools.clar"
-address = "STB1Q2R3S4T5U6V7W8X9Y0Z1A2B3C4D5E6F7G8H9I0J1K2"
 
 [contracts.multi-hop-router-v3]
 path = "contracts/dex/multi-hop-router-v3.clar"
@@ -82,9 +78,6 @@ depends_on = ["roles"]
 path = "contracts/traits/core-traits.clar"
 address = "STM2N3O4P5Q6R7S8T9U0V1W2X3Y4Z5A6B7C8D9E0F1"
 
-[contracts.tokenized-bond-adapter]
-path = "contracts/dimensional/tokenized-bond-adapter.clar"
-address = "STW3L4M5N6O7P8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D2E3F4"
 
 
 [contracts.block-utils]
@@ -106,10 +99,6 @@ address = "STL1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2"
 [contracts.governance]
 path = "contracts/dimensional/governance.clar"
 address = "STM2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2V3"
-
-[contracts.tokenized-bond]
-path = "contracts/dimensional/tokenized-bond.clar"
-address = "STN3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2V3W4"
 
 [contracts.position-nft]
 path = "contracts/dimensional/position-nft.clar"
@@ -164,7 +153,7 @@ path = "contracts/tokens/cxd-token.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.yield-optimizer]
-path = "contracts/rewards/yield-optimizer.clar"
+path = "contracts/yield/yield-optimizer.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.math-utilities]
@@ -262,19 +251,9 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/dex/pool-type-registry.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.transaction-batch-processor]
-path = "contracts/dex/transaction-batch-processor.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-
-[contracts.weighted-swap-pool]
-path = "contracts/dex/weighted-swap-pool.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-
-
 [contracts.migration-manager]
 path = "contracts/migration/migration-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-
 
 [contracts.predictive-scaling-system]
 path = "contracts/dex/predictive-scaling-system.clar"
@@ -288,9 +267,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/migration/legacy-adapter.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.timelock-controller]
-path = "contracts/dex/timelock-controller.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 
 [contracts.price-impact-calculator]
@@ -356,9 +332,6 @@ clarity-version = 2
 path = "contracts/marketplace/nft-marketplace.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.utils]
-path = "contracts/utils/utils.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 
 [contracts.encoding]
@@ -369,9 +342,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/utils/comparison-helpers.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.validation]
-path = "contracts/utils/validation.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.error-utils]
 path = "contracts/utils/error-utils.clar"
@@ -401,9 +371,6 @@ address = "STD9S0T1U2V3W4X5Y6Z7A8B9C0D1E2F3G4H5I6J7K8L9M0"
 path = "contracts/insurance/insurance-protection-nft.clar"
 address = "STX3M4N5O6P7Q8R9S0T1U2V3W4X5Y6Z7A8B9C0D1E2F3G4"
 
-[contracts.tier-manager]
-path = "contracts/core/tier-manager.clar"
-address = "STE0T1U2V3W4X5Y6Z7A8B9C0D1E2F3G4H5I6J7K8L9M0N1"
 
 [contracts.conxian-exit-queue]
 path = "contracts/core/conxian-exit-queue.clar"
@@ -472,9 +439,6 @@ address = "STH5P6Q7R8S9T1U2V3W4X5Y6Z7A8B9C0D1E2F3G4H5I6"
 path = "contracts/errors/protocol-errors.clar"
 address = "STJ8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D1E2F3G4H5I6J7"
 
-[contracts.standard-errors]
-path = "contracts/errors/standard-errors.clar"
-address = "STK9L0M1N2O3P4Q5R6S7T8U9V0W1X2Y3Z4A5B6C7"
 
 [contracts.order-book]
 path = "contracts/orders/order-book.clar"
@@ -484,9 +448,6 @@ address = "STL0M1N2O3P4Q5R6S7T8U9V0W1X2Y3Z4A5B6C7"
 path = "contracts/automation/automation-manager.clar"
 address = "STM1N2O3P4Q5R6S7T8U9V0W1X2Y3Z4A5B6C8"
 
-[contracts.stacks-native-launch-script]
-path = "contracts/automation/stacks-native-launch-script.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.keeper-coordinator]
 path = "contracts/automation/keeper-coordinator.clar"
@@ -591,9 +552,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/staking/dual-stacking-orchestrator.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.staking-yield-nft]
-path = "contracts/staking/staking-yield-nft.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 
 [contracts.wormhole-inbox]
@@ -647,7 +605,7 @@ path = "contracts/traits/defi-primitives.clar"
 address = "STR7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2V3W4X5Y6Z7A8"
 
 [contracts.trait-errors]
-path = "contracts/traits/trait-errors.clar"
+path = "contracts/errors/protocol-errors.clar"
 address = "STS8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2V3W4X5Y6Z7A8B9"
 
 [contracts.cross-chain-traits]
@@ -721,9 +679,6 @@ address = "STD1L2M3N4O5P6Q7R8S9T1U2V3W4X5Y6Z8A9B0C1D2E3"
 path = "contracts/governance/signed-data-base.clar"
 address = "STF4M5N6O7P8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D1E2F3"
 
-[contracts.vault-registrar]
-path = "contracts/vaults/vault-registrar.clar"
-address = "STG5N6O7P8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D1E2F3G4"
 
 [contracts.fee-manager]
 path = "contracts/vaults/fee-manager.clar"
@@ -733,9 +688,6 @@ address = "STO3P4Q5R6S7T8U9V0W1X2Y3Z4A5B6C0"
 path = "contracts/vaults/custody.clar"
 address = "STP4Q5R6S7T8U9V0W1X2Y3Z4A5B6C1"
 
-[contracts.test-access]
-path = "contracts/test/test-access.clar"
-address = "STQ5R6S7T8U9V0W1X2Y3Z4A5B6C2"
 
 [contracts.dimensional-engine-interface]
 path = "contracts/interfaces/dimensional-engine-interface.clar"
@@ -833,9 +785,6 @@ path = "contracts/governance/community-governance-token.clar"
 address = "ST6D7E8F9G0H1I2J3K4L5M6N7O8P9Q0R1S2T3U4V5W6"
 depends_on = ["pausable-trait"]
 
-[contracts.yield-distribution-engine]
-path = "contracts/yield/yield-distribution-engine.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.auto-compounder]
 path = "contracts/yield/auto-compounder.clar"
