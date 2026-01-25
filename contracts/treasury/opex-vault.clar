@@ -39,7 +39,7 @@
     )
     ;; Check limits
     (if (> (- block-height (var-get last-spend-block))
-        (contract-call? (var-get nakamoto-constants-contract) get-blocks-per-day)
+        (contract-call? .nakamoto-constants get-blocks-per-day)
       )
       (begin
         (var-set daily-spend amount)

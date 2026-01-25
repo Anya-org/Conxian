@@ -82,8 +82,7 @@
           })
           (ok true)
         )
-      none
-        (err ERR_LOAN_NOT_FOUND)
+      (err ERR_LOAN_NOT_FOUND)
     )
   )
 )

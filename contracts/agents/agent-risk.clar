@@ -1,7 +1,7 @@
-(use-trait risk-manager-trait .risk-manager-trait.risk-manager-trait)
+(use-trait risk-manager-trait .risk-management.risk-manager-trait)
 (use-trait rbac-trait .core-traits.rbac-trait)
 
-(impl-trait .risk-manager-trait.risk-manager-trait)
+(impl-trait .risk-management.risk-manager-trait)
 (impl-trait .automation-traits.office-job-trait)
 (use-trait office-job-trait .automation-traits.office-job-trait)
 

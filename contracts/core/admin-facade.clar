@@ -82,11 +82,11 @@
 )
 
 (define-private (process-admin-operation
-    (result (response bool uint))
     (operation {
       type: uint,
       params: (list 5 principal),
     })
+    (result (response bool uint))
   )
   (match result
     success (execute-admin-operation-wrapper operation)
