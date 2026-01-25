@@ -90,3 +90,10 @@
     )
   )
 )
+
+(define-public (get-position (position-id uint))
+  (match (map-get? positions position-id)
+    pos (ok pos)
+    (err u3000)
+  )
+)

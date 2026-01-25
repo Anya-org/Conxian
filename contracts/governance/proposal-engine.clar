@@ -56,7 +56,7 @@
       start-block end-block
     )
       proposal-id (ok proposal-id)
-      err-val (err (to-uint err-val))
+      err-val (err err-val)
     )
   )
 )

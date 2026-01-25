@@ -52,7 +52,7 @@
 )
 
 ;; Vault Trait Implementation - allocate-to-strategy
-(define-public (allocate-to-strategy (strategy principal) (amount uint) (token <sip-010-trait>))
+(define-public (allocate-to-strategy (strategy principal) (amount uint))
     (begin
         (asserts! (is-owner) ERR_UNAUTHORIZED)
         ;; Placeholder for strategy allocation logic

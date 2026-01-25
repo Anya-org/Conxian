@@ -101,7 +101,7 @@
   )
 )
 
-(define-read-only (get-global-collateral-factor ())
+(define-read-only (get-global-collateral-factor)
   (begin
     ;; Return global collateral factor
     (ok u8000) ;; 80%

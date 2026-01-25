@@ -76,6 +76,6 @@
                 (ok best-principal)
             )
         )
-        err-val (err (to-uint err-val))
+        err-val (err err-val)
     )
 )

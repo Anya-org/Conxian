@@ -4,7 +4,7 @@
 ;; Native Stacks Architecture - Fully Deterministic
 
 (impl-trait .defi-traits.oracle-trait)
-(impl-trait .core-traits.interest-rate-trait)
+(impl-trait .core-traits.funding-rate-trait)
 
 ;; Constants - Gas Free (compile-time)
 (define-constant BASE_RATE u1000) ;; 0.1% base rate (scaled 10000)
@@ -137,6 +137,10 @@
   (ok (var-get current-interest-rate))
 )
 
+(define-read-only (get-funding-rate (period uint))
+  (ok (var-get current-interest-rate))
+)
+
 (define-read-only (get-current-collateral-factor)
   (ok (var-get collateral-factor))
 )
@@ -150,6 +154,14 @@
     price-data (ok (get price price-data))
     (err u1001)
   )
+)
+
+(define-read-only (fetch-price (asset principal))
+  (get-price asset)
+)
+
+(define-read-only (get-name ())
+  (ok "Economic-Policy-Engine")
 )
 
 ;; Subscription Management

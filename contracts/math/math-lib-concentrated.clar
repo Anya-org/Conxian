@@ -71,7 +71,7 @@
       bit: uint,
     })
   )
-  (if (not (is-eq (and (get bit state) (get tick entry)) u0))
+  (if (not (is-eq (get bit state) u0))
     (merge state { result: (/ (* (get result state) (get current entry)) u1000000000000), bit: (* (get bit state) u2) })
     (merge state { bit: (* (get bit state) u2) })
   )

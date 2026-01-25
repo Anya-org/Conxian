@@ -133,7 +133,7 @@
 )
 
 ;; Vault Trait Implementation - allocate-to-strategy
-(define-public (allocate-to-strategy (amount uint) (strategy principal))
+(define-public (allocate-to-strategy (strategy principal) (amount uint))
     (begin
         (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
         ;; Placeholder for strategy allocation logic

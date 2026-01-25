@@ -478,17 +478,6 @@
     }))
     (key (string-ascii 32))
   )
-  (begin
-    ;; Check if key exists in configuration
-    (fold configuration false
-      (lambda
-        ((found bool) (config {
-          key: (string-ascii 32),
-          value: (string-ascii 64),
-        }))
-        (or found (is-eq (get config key) key))
-      ))
-  )
 )
 
 (define-private (has-configuration-key

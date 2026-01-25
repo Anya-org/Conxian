@@ -2,7 +2,6 @@
 ;; @version 1.0.0
 ;; @description Manages advanced order types for enterprise clients (TWAP, VWAP, Iceberg)
 
-(impl-trait 'contracts.traits.enterprise-traits.advanced-order-trait)
 
 (define-constant ERR-NOT-AUTHORIZED (err u1000))
 (define-constant ERR-NOT-IMPLEMENTED (err u9999))

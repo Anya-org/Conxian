@@ -149,6 +149,14 @@
   )
 )
 
+(define-read-only (has-permission-level (perm-level (string-ascii 16)) (required-level (string-ascii 16)))
+  (is-eq perm-level required-level)
+)
+
+(define-read-only (get-user-permission (perms (list 5 { user: principal, level: (string-ascii 16) })) (user principal))
+  none
+)
+
 (define-read-only (get-vault-statistics (vault-type (string-ascii 32)))
   (map-get? vault-statistics { vault-type: vault_type }))
 

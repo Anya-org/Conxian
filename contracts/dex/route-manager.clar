@@ -36,9 +36,9 @@
 (define-public (swap-route
         (amount-in uint)
         (amount-out-min uint)
-        (token-in .sip-standards.sip-010-ft-trait)
-        (token-out .sip-standards.sip-010-ft-trait)
-        (route (list 5 principal)) ;; List of pool contracts
+        (token-in <sip-010-trait>)
+        (token-out <sip-010-trait>)
+        (route (list 5 principal))
     )
     (let ((sender tx-sender))
         ;; 1. Global Pause Check (via Protocol Facade - assumed available)

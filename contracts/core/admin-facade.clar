@@ -74,7 +74,7 @@
         (execute-protocol-operation (get params operation))
         (if (is-eq op-type u3)
           (execute-treasury-operation (get params operation))
-          (err ERR_INVALID_OPERATION)
+          ERR_INVALID_OPERATION
         )
       )
     )
@@ -90,7 +90,7 @@
   )
   (match result
     success (execute-admin-operation-wrapper operation)
-    error (err (to-uint error))
+    error (err error)
   )
 )
 

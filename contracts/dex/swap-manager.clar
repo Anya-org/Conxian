@@ -260,7 +260,7 @@
         (asserts! (<= (get route slippage) max-slippage) ERR_SLIPPAGE_EXCEEDED)
 
         ;; Generate swap ID
-        (let ((swap-id (hash160 (concat (principal-to-buff? tx-sender) (int-to-buff block-height)))))
+        (let ((swap-id (derive-swap-id route-id)))
           ;; Execute swap (simplified - would use actual pool contracts)
           (let ((swap_result (execute-multi-hop-swap route amount-in)))
             (match swap_result
@@ -740,15 +740,7 @@
 (define-private (update-pool-performance (pools (list 5 principal)) (slippage uint) (success bool))
   (ok true)
 )
-        route-id: 0x0000000000000000000000000000000000000000000000000000000000000000,
-        pools: (list 0 principal),
-        estimated-output: u0,
-        slippage: u0,
-        confidence: u0,
-      }
-    )
-  )
-)
+
 
 (define-private (sort-routes-by-output (routes (list
   10
@@ -998,4 +990,8 @@
     })
     none (err ERR_POOL_NOT_FOUND)
   )
+)
+
+(define-private (derive-swap-id (route-id (buff 32)))
+  (hash160 (concat route-id (sha256 (unwrap-panic (to-consensus-buff? (+ (var-get total-swaps) u1))))))
 )
