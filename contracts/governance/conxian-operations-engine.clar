@@ -57,7 +57,7 @@
 ;; Compliance Helper
 (define-private (check-compliance (user principal))
   (let (
-      (compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user))
+      (compliance-status (contract-call? (var-get regulatory-adapter-contract) check-clean-hands-compliance user))
     )
     (if (is-ok compliance-status)
       true
@@ -77,7 +77,7 @@
     (executor <proposal-executor-trait>)
   )
   (let (
-      (proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id)
+      (proposal (unwrap! (contract-call? (var-get proposal-registry-contract) get-proposal proposal-id)
         ERR_NO_SIGNAL
       ))
       (council-id (get council-id proposal))
@@ -94,9 +94,7 @@
 
     ;; 3. Execute via Proposal Executor
     ;; The Executor will validate the vote counts and quorum
-    (try! (as-contract (contract-call? executor execute proposal-id proposal-contract
-      u5000
-    )))
+    (try! (as-contract (contract-call? executor execute proposal-id proposal-contract)))
 
     ;; 4. Update Heartbeat
     (var-set last-governance-action block-height)

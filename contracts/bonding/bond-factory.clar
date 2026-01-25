@@ -40,7 +40,7 @@
 )
 
 (define-read-only (get-token-uri)
-  (ok (some "https://conxian.io/metadata/bond"))
+  (ok (some u"https://conxian.io/metadata/bond"))
 )
 (define-constant ERR_BOND_NOT_FOUND (err u1002))
 

@@ -179,25 +179,15 @@
     ;; Check if price is stale
     (match (map-get? asset-prices asset)
       price-data
-      (begin
-        (match (if (is-price-stale (get timestamp price-data))
-          (err u1002) ;; Price stale
-          (ok true)
-        )
-          stale-error (err stale-error)
-          success (begin
-            (let (
-                (current-params (unwrap! (map-get? market-parameters asset) (err u1003)))
-                (volatility (- (get confidence price-data) u5000))
-              )
-              ;; Derive volatility from confidence
-              (match (update-market-parameters asset (get utilization current-params)
-                volatility
-              )
-                update-success update-success
-                update-error (err update-error)
-              )
-            )
+      (if (is-price-stale (get timestamp price-data))
+        (err u1002) ;; Price stale
+        (let (
+            (current-params (unwrap! (map-get? market-parameters asset) (err u1003)))
+            (volatility (- (get confidence price-data) u5000))
+          )
+          ;; Derive volatility from confidence
+          (update-market-parameters asset (get utilization current-params)
+            volatility
           )
         )
       )

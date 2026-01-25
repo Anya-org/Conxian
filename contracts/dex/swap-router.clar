@@ -7,9 +7,8 @@
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_SLIPPAGE (err u3000))
 
-;; @desc Executes a swap for an exact input amount against a single concentrated liquidity pool.
-;; @param pool-id: The ID of the concentrated liquidity pool to use for the swap.
-;; @param token-in: The SIP-010 contract of the token being provided.
+(define-data-var conxian-protocol-contract principal .conxian-protocol)
+(define-data-var concentrated-liquidity-pool-contract principal .concentrated-liquidity-pool)
 
 ;; @desc Executes a swap for an exact input amount against a single concentrated liquidity pool.
 ;; @param pool-id: The ID of the concentrated liquidity pool to use for the swap.
@@ -30,7 +29,7 @@
         ;; This single call fetches both the pause status and tenure ID,
         ;; reducing cross-contract calls from two to one. This saves ~15%
         ;; on read operations for this function.
-        (let ((protocol-status (try! (contract-call? .conxian-protocol get-protocol-status))))
+        (let ((protocol-status (try! (contract-call? (var-get conxian-protocol-contract) get-protocol-status))))
             (asserts! (not (get paused protocol-status)) (err u1001))
 
             ;; 2. Pull tokens from user

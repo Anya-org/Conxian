@@ -455,7 +455,7 @@
       default-fee: uint,
       creation-fee: uint,
       active: bool,
-      created_at: uint,
+      created-at: uint,
     })
     (configuration (list 10 {
       key: (string-ascii 32),
@@ -467,6 +467,26 @@
     (fold (get template required-features) true
       (lambda ((valid bool) (feature (string-ascii 32)))
         (and valid (has-configuration-key configuration feature))
+      ))
+  )
+)
+
+(define-private (has-configuration-key
+    (configuration (list 10 {
+      key: (string-ascii 32),
+      value: (string-ascii 64),
+    }))
+    (key (string-ascii 32))
+  )
+  (begin
+    ;; Check if key exists in configuration
+    (fold configuration false
+      (lambda
+        ((found bool) (config {
+          key: (string-ascii 32),
+          value: (string-ascii 64),
+        }))
+        (or found (is-eq (get config key) key))
       ))
   )
 )

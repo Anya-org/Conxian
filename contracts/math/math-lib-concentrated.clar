@@ -29,66 +29,34 @@
 
 ;; @desc Helper to calculate power of sqrt ratio
 ;; Iterative multiplication (O(log n))
-(define-private (pow-sqrt-ratio
-    (abs-tick int)
-    (is-positive bool)
-  )
-  (let (
+(define-private (pow-sqrt-ratio (abs-tick int) (is-positive bool))
+  (let
+    (
       (ratio (fold pow-helper
         (list
-          {
-            tick: abs-tick,
-            current: u1000000000000,
-          } ;; 1.0 * 1e12
-          {
-            tick: abs-tick,
-            current: u1000000000000,
-          }
-          {
-            tick: abs-tick,
-            current: u1000000000000,
-          }
-          {
-            tick: abs-tick,
-            current: u1000000000000,
-          }
-          {
-            tick: abs-tick,
-            current: u1000000000000,
-          }
-          {
-            tick: abs-tick,
-            current: u1000000000000,
-          }
-          {
-            tick: abs-tick,
-            current: u1000000000000,
-          }
-          {
-            tick: abs-tick,
-            current: u1000000000000,
-          } ;; 8 iterations for 8 bits effectively (simplified)
-        ) {
-        result: u1000000000000,
-        bit: u1,
-      }))
-      ;; Initial result 1.0
+          { tick: abs-tick, current: u1000049998750 }
+          { tick: abs-tick, current: u1000100000000 }
+          { tick: abs-tick, current: u1000200010000 }
+          { tick: abs-tick, current: u1000400060004 }
+          { tick: abs-tick, current: u1000800240021 }
+          { tick: abs-tick, current: u1001600960128 }
+          { tick: abs-tick, current: u1003203840923 }
+          { tick: abs-tick, current: u1006415368983 }
+          { tick: abs-tick, current: u1012869163026 }
+          { tick: abs-tick, current: u1025850599931 }
+          { tick: abs-tick, current: u1052350239995 }
+          { tick: abs-tick, current: u1107445360166 }
+          { tick: abs-tick, current: u1226445360166 }
+          { tick: abs-tick, current: u1504188360166 }
+          { tick: abs-tick, current: u2262562560166 }
+          { tick: abs-tick, current: u5119098240166 }
+        )
+        { result: u1000000000000, bit: u1 }
+      ))
     )
-    ;; This fold is a placeholder for the actual binary decomposition logic
-    ;; Implementing full binary decomposition in functional Clarity is verbose.
-    ;; For this version, we will return a mock linear approximation for small ticks
-    ;; and a safe default for large ones to ensure contract compiles and runs for testing.
-
-    ;; REAL IMPLEMENTATION NOTE:
-    ;; In a full production env, we would unroll the loop:
-    ;; if (tick & 1 != 0) ratio = ratio * 1.0000499999...
-    ;; if (tick & 2 != 0) ratio = ratio * 1.0001000000...
-    ;; ...
-
-    ;; Simplified return for "Production Grade" structure (logic to be filled with precise constants)
     (if is-positive
-      u1000000000000
-      u1000000000000
+      (get result ratio)
+      (/ u1000000000000 (get result ratio))
     )
   )
 )
@@ -103,8 +71,10 @@
       bit: uint,
     })
   )
-  state
-  ;; Pass through
+  (if (not (is-eq (and (get bit state) (get tick entry)) u0))
+    (merge state { result: (/ (* (get result state) (get current entry)) u1000000000000), bit: (* (get bit state) u2) })
+    (merge state { bit: (* (get bit state) u2) })
+  )
 )
 
 ;; @desc Calculates amount0 for a liquidity chunk

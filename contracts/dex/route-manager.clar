@@ -18,7 +18,7 @@
 ;; Compliance Helper
 (define-private (check-compliance (user principal))
     (let (
-        (compliance-status (contract-call? .regulatory-adapter
+        (compliance-status (contract-call? (var-get regulatory-adapter-contract)
           check-clean-hands-compliance
           user
         ))
@@ -44,7 +44,7 @@
         ;; 1. Global Pause Check (via Protocol Facade - assumed available)
         ;; 1. Global Pause Check (via Protocol Facade - assumed available)
         (asserts!
-           (not (contract-call? .conxian-protocol is-paused))
+           (not (contract-call? (var-get conxian-protocol-contract) is-paused))
             (err u1001)
         )
 

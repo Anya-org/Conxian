@@ -43,7 +43,7 @@
 (define-public (set-paused (new-paused bool))
   (begin
     ;; BOLT: Replaced two contract calls with a single, consolidated authorization check.
-    (asserts! (contract-call? .admin-facade is-authorized-to-pause tx-sender)
+    (asserts! (contract-call? (var-get admin-facade-contract) is-authorized-to-pause tx-sender)
       ERR_UNAUTHORIZED
     )
     (var-set paused new-paused)

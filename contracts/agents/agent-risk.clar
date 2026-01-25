@@ -157,7 +157,10 @@
 )
 
 (define-private (check-role (role (string-ascii 32)))
-  (ok true) ;; Mock implementation
+  (if (is-eq role "ROLE_ADMIN")
+    (ok true)
+    (err u1001)
+  )
 )
 
 (define-public (assess-position-risk (position-id uint))

@@ -689,151 +689,83 @@
 (define-private (get-optional (option))
   (default-to u0 option))
 
-(define-private (is-token-supported (tokens (list 10 principal)) (token principal))
+(define-private (get-user-permission (permissions (list 5 { user: principal, level: (string-ascii 16) })) (user principal))
   (begin
-    ;; Check if token is in supported list
-    (fold tokens false
-      (lambda ((found bool) (supported-token principal))
-        (or found (is-eq supported-token token))
+    (match (find-if (lambda ((p { user: principal, level: (string-ascii 16) })) (is-eq (get p user) user)) permissions)
+      found (some (get found level))
+      none none
+    )
+  )
+)
+
+(define-private (has-permission-level (level (string-ascii 16)) (required-level (string-ascii 16)))
+  (if (is-eq level "owner")
+    true
+    (is-eq level required-level)
+  )
+)
+
+(define-private (is-token-supported (tokens (list 10 principal)) (token principal))
+  (is-some (find-if (lambda ((t principal)) (is-eq t token)) tokens))
+)
+
+(define-private (update-token-balance (balances (list 10 { token: principal, amount: uint })) (token principal) (amount int))
+  (let ((current-balance (get-token-balance balances token)))
+    (let ((new-balance (+ current-balance amount)))
+      (asserts! (>= new-balance u0) ERR_INSUFFICIENT_BALANCE)
+      (let ((other-balances (filter (lambda ((b { token: principal, amount: uint })) (not (is-eq (get b token) token))) balances)))
+        (append other-balances { token: token, amount: new-balance })
       )
     )
   )
 )
 
 (define-private (get-token-balance (balances (list 10 { token: principal, amount: uint })) (token principal))
-  (begin
-    ;; Get balance for specific token
-    (fold balances u0
-      (lambda ((result uint) (balance { token: principal, amount: uint }))
-        (if (is-eq (get balance token) token)
-            (get balance amount)
-            result
-        )
-      )
-    )
-  )
-)
-
-(define-private (update-token-balance (balances (list 10 { token: principal, amount: uint })) (token principal) (amount uint))
-  (begin
-    ;; Update balance for specific token
-    (fold balances (list 0 { token: principal, amount: uint })
-      (lambda ((result (list 10 { token: principal, amount: uint })) (balance { token: principal, amount: uint }))
-        (if (is-eq (get balance token) token)
-            (append result { token: token, amount: (+ (get balance amount) amount) })
-            (append result balance)
-        )
-      )
-    )
-  )
-)
-
-(define-private (get-user-permission (permissions (list 5 { user: principal, level: (string-ascii 16) })) (user principal))
-  (begin
-    ;; Get permission level for specific user
-    (fold permissions none
-      (lambda ((result (optional (string-ascii 16))) (permission { user: principal, level: (string-ascii 16) }))
-        (if (is-eq (get permission user) user)
-            (some (get permission level))
-            result
-        )
-      )
-    )
-  )
-)
-
-(define-private (has-permission-level (current-level (string-ascii 16)) (required-level (string-ascii 16)))
-  (begin
-    ;; Check if current permission level meets or exceeds required level
-    (match current-level
-      "owner" true
-      "admin" (or (is-eq required-level "admin") (is-eq required-level "deposit") (is-eq required-level "withdraw") (is-eq required-level "view"))
-      "deposit" (or (is-eq required-level "deposit") (is-eq required-level "view"))
-      "withdraw" (or (is-eq required-level "withdraw") (is-eq required-level "view"))
-      "view" (is-eq required-level "view")
-      false
-    )
-  )
-)
-
-(define-private (remove-from-list (list (list 5 principal)) (item principal))
-  (begin
-    ;; Remove item from list
-    (fold list (list 0 principal)
-      (lambda ((result (list 5 principal)) (current-item principal))
-        (if (is-eq current-item item)
-            result
-            (append result current-item)
-        )
-      )
-    )
-  )
-)
-
-(define-private (remove-user-permission (permissions (list 5 { user: principal, level: (string-ascii 16) })) (user principal))
-  (begin
-    ;; Remove user permission from list
-    (fold permissions (list 0 { user: principal, level: (string-ascii 16) })
-      (lambda ((result (list 5 { user: principal, level: (string-ascii 16) })) (permission { user: principal, level: (string-ascii 16) }))
-        (if (is-eq (get permission user) user)
-            result
-            (append result permission)
-        )
-      )
-    )
+  (match (find-if (lambda ((b { token: principal, amount: uint })) (is-eq (get b token) token)) balances)
+    found (get found amount)
+    none u0
   )
 )
 
 (define-private (update-user-activity (user principal))
-  (begin
-    ;; Update user's last activity timestamp
-    (let ((user_info (get-user-vaults user)))
-      (if (is-some user_info)
-          (begin
-            (let ((user-vaults (unwrap-optional user_info)))
-              (map-set user-vaults { user: user } {
-                vault-ids: (get user-vaults vault-ids),
-                total-vaults: (get user-vaults total-vaults),
-                active-vaults: (get user-vaults active-vaults),
-                last-activity: block-height
-              })
-            )
-          )
-          true
+  (let ((user-info (get-user-vaults user)))
+    (if (is-some user-info)
+      (let ((user-vaults (unwrap-panic user-info)))
+        (map-set user-vaults { user: user } {
+          vault-ids: (get user-vaults vault-ids),
+          total-vaults: (get user-vaults total-vaults),
+          active-vaults: (get user-vaults active-vaults),
+          last-activity: block-height
+        })
       )
+      true
     )
   )
 )
 
-(define-private (update-vault-statistics (vault_type (string-ascii 32)) (deposit uint) (withdraw uint))
-  (begin
-    ;; Update vault type statistics
-    (let ((type_stats (get-vault-statistics vault_type)))
-      (if (is-some type_stats)
-          (begin
-            (let ((stats (unwrap-optional type_stats))
-                  (total-vaults (get stats total-vaults)))
-              
-              (map-set vault-statistics { vault-type: vault_type } {
-                total-vaults: total-vaults,
-                total-deposits: (+ (get stats total-deposits) deposit),
-                total-withdrawals: (+ (get stats total-withdrawals) withdraw),
-                average-balance: (get stats average-balance),
-                last-activity: block-height
-              })
-            )
-          )
-          ;; Create new statistics record
-          (map-set vault-statistics { vault-type: vault_type } {
-            total-vaults: u1,
-            total-deposits: deposit,
-            total-withdrawals: withdraw,
-            average-balance: u0,
-            last-activity: block-height
-          })
+(define-private (update-vault-statistics (vault-type (string-ascii 32)) (deposit-amount uint) (withdrawal-amount uint))
+  (let ((type-stats (get-vault-statistics vault-type)))
+    (if (is-some type-stats)
+      (let ((stats (unwrap-panic type-stats)))
+        (map-set vault-statistics { vault-type: vault-type } {
+          total-vaults: (get stats total-vaults),
+          total-deposits: (+ (get stats total-deposits) deposit-amount),
+          total-withdrawals: (+ (get stats total-withdrawals) withdrawal-amount),
+          average-balance: (get stats average-balance),
+          last-activity: block-height
+        })
       )
+      true
     )
   )
+)
+
+(define-private (remove-from-list (items (list 10 principal)) (item principal))
+  (filter (lambda ((i principal)) (not (is-eq i item))) items)
+)
+
+(define-private (remove-user-permission (permissions (list 5 { user: principal, level: (string-ascii 16) })) (user principal))
+  (filter (lambda ((p { user: principal, level: (string-ascii 16) })) (not (is-eq (get p user) user))) permissions)
 )
 
 ;; Utility functions

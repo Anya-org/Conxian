@@ -90,7 +90,7 @@
   )
   (match result
     success (execute-admin-operation-wrapper operation)
-    error (err error)
+    error (err (to-uint error))
   )
 )
 

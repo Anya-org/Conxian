@@ -334,7 +334,7 @@
 (define-private (find-stale-allocations (pool-id uint) (max-age uint))
   (begin
     ;; Simplified implementation - would need proper iteration
-    (list u0 u1 u2) ;; Return some sample stale allocation IDs
+    (list ) ;; Return some sample stale allocation IDs
   )
 )
 

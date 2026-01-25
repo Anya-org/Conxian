@@ -22,6 +22,7 @@
 (define-data-var total-liquidity-supplied uint u0)
 (define-data-var total-rewards-distributed uint u0)
 (define-data-var liquidity-provider-active bool true)
+(define-data-var dex-facade-contract principal .dex-facade)
 
 ;; Storage maps
 (define-map liquidity-positions { pool: principal, provider: principal } {
@@ -72,14 +73,14 @@
     ;; Validate inputs
     (asserts! (> amount u0) ERR_ZERO_AMOUNT)
     (asserts! (>= amount MIN_LIQUIDITY) ERR_INSUFFICIENT_BALANCE)
-    (asserts! (contract-call? .dex-facade pool-exists pool) ERR_INVALID_POOL)
+    (asserts! (contract-call? (var-get dex-facade-contract) pool-exists pool) ERR_INVALID_POOL)
     
     ;; Check if provider already has position
     (let ((existing-position (get-liquidity-position pool tx-sender))
           (current-shares (if (is-some existing-position) 
                                (unwrap! (map-get? liquidity-positions { pool: pool, provider: tx-sender }) { liquidity-amount: u0, pool-shares: u0, last-deposit: u0, rewards-earned: u0, rewards-claimed: u0, fee-tier: u0 })
                                u0))
-          (pool-total-liquidity (contract-call? .dex-facade get-pool-liquidity pool)))
+          (pool-total-liquidity (contract-call? (var-get dex-facade-contract) get-pool-liquidity pool)))
       
       ;; Calculate shares (simplified - would use proper LP token calculation)
       (let ((new-shares (/ (* amount current-shares) pool-total-liquidity)))

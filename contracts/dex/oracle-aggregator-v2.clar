@@ -95,7 +95,7 @@
                 (ok true)
                 ERR_PRICE_DEVIATION
             )
-            _ (ok true) ;; If TWAP fails, we fail open or closed? Let's fail open for now with log
+            error (err (to-uint error))
         )
     )
 )
