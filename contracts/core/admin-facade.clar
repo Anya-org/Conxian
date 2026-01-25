@@ -32,8 +32,7 @@
   )
   (match (contract-call? .rbac grant-role user role)
     success (ok success)
-    error
-    ERR_BATCH_LIMIT_EXCEEDED
+    error (err error)
   )
 )
 
@@ -43,8 +42,7 @@
   )
   (match (contract-call? .rbac revoke-role user role)
     success (ok success)
-    error
-    ERR_BATCH_LIMIT_EXCEEDED
+    error (err error)
   )
 )
 
@@ -92,7 +90,7 @@
   )
   (match result
     success (execute-admin-operation-wrapper operation)
-    error result
+    error (err error)
   )
 )
 
