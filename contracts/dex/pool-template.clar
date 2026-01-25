@@ -455,7 +455,7 @@
       default-fee: uint,
       creation-fee: uint,
       active: bool,
-      created_at: uint,
+      created-at: uint,
     })
     (configuration (list 10 {
       key: (string-ascii 32),
@@ -468,6 +468,15 @@
       (lambda ((valid bool) (feature (string-ascii 32)))
         (and valid (has-configuration-key configuration feature))
       ))
+  )
+)
+
+(define-private (has-configuration-key
+    (configuration (list 10 {
+      key: (string-ascii 32),
+      value: (string-ascii 64),
+    }))
+    (key (string-ascii 32))
   )
 )
 

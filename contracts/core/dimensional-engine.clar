@@ -30,22 +30,15 @@
   (is-eq tx-sender (var-get protocol-coordinator))
 )
 
-;; @desc Checks if a user is compliant by calling the regulatory adapter.
-;; @param user: The principal of the user to check.
-;; @returns bool
-(define-private (check-compliance (user principal))
-  (is-ok (contract-call? .regulatory-adapter check-clean-hands-compliance user))
-)
-
 ;; --- Internal Guards ---
 
 ;; @desc Centralized entry guard for standard pre-flight checks.
-;; @param is-paused: A boolean indicating if the protocol is paused.
+;; @param protocol-status: A tuple containing the protocol's pause and compliance status.
 ;; @returns (response bool)
-(define-private (guard-entry (is-paused bool))
+(define-private (guard-entry (protocol-status { paused: bool, compliant: bool, tenure-id: (optional (buff 32)) }))
   (begin
-    (asserts! (not is-paused) ERR_CONTRACT_PAUSED)
-    (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+    (asserts! (not (get paused protocol-status)) ERR_CONTRACT_PAUSED)
+    (asserts! (get compliant protocol-status) ERR_NON_COMPLIANT)
     (ok true)
   )
 )
@@ -74,7 +67,7 @@
 ;; @param metadata: Optional metadata for the position.
 ;; @returns (response uint) The ID of the new position.
 (define-private (get-module-contract (name (string-ascii 32)))
-  (let ((module-data (try! (contract-call? .conxian-protocol get-module name))))
+  (let ((module-data (try! (contract-call? (var-get conxian-protocol-contract) get-module name))))
     (match module-data
       data (begin
         (asserts! (get active data) (err u5002))
@@ -95,11 +88,11 @@
   )
   (begin
     (let (
+        ;; BOLT: Consolidated pause and compliance pre-flight checks into a single contract call.
         (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
-        (is-paused (get paused protocol-status))
         (position-manager (try! (get-module-contract "position-manager")))
       )
-      (try! (guard-entry is-paused))
+      (try! (guard-entry protocol-status))
       (let ((result (contract-call? position-manager open-position tx-sender token amount
           leverage long
         )))
@@ -126,14 +119,11 @@
   )
   (begin
     (let (
-        ;; BOLT: Refactored to use `get-protocol-status` for improved error handling.
-        ;; BOLT: Refactored to use `get-protocol-status` for improved error handling.
-        ;; BOLT: Refactored to use `get-protocol-status` for improved error handling.
+        ;; BOLT: Consolidated pause and compliance pre-flight checks into a single contract call.
         (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
-        (is-paused (get paused protocol-status))
         (position-manager (try! (get-module-contract "position-manager")))
       )
-      (try! (guard-entry is-paused))
+      (try! (guard-entry protocol-status))
       (contract-call? position-manager close-position tx-sender position-id)
     )
   )
@@ -151,12 +141,11 @@
   )
   (begin
     (let (
-        ;; BOLT: Consolidated pause check to reduce cross-contract calls.
+        ;; BOLT: Consolidated pause and compliance pre-flight checks into a single contract call.
         (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
-        (is-paused (get paused protocol-status))
         (collateral-manager (try! (get-module-contract "collateral-manager")))
       )
-      (try! (guard-entry is-paused))
+      (try! (guard-entry protocol-status))
       (contract-call? collateral-manager deposit-funds amount token)
     )
   )
@@ -172,12 +161,11 @@
   )
   (begin
     (let (
-        ;; BOLT: Consolidated pause check to reduce cross-contract calls.
+        ;; BOLT: Consolidated pause and compliance pre-flight checks into a single contract call.
         (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
-        (is-paused (get paused protocol-status))
         (collateral-manager (try! (get-module-contract "collateral-manager")))
       )
-      (try! (guard-entry is-paused))
+      (try! (guard-entry protocol-status))
       (contract-call? collateral-manager withdraw-funds amount token)
     )
   )

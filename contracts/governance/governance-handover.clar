@@ -46,11 +46,11 @@
 ;; Returns true if ALL critical systems are owned by the Timelock.
 (define-public (verify-full-handover)
   (let (
-      (protocol-owner (unwrap-panic (contract-call? .conxian-protocol get-admin)))
-      (risk-owner (unwrap-panic (contract-call? .agent-risk get-contract-owner)))
-      (treasury-owner (unwrap-panic (contract-call? .agent-treasury get-contract-owner)))
-      (reg-owner (unwrap-panic (contract-call? .regulatory-adapter get-contract-owner)))
-      (access-owner (unwrap-panic (contract-call? .conxian-access get-contract-owner)))
+      (protocol-owner (unwrap-panic (contract-call? (var-get conxian-protocol-contract) get-admin)))
+      (risk-owner (unwrap-panic (contract-call? (var-get agent-risk-contract) get-contract-owner)))
+      (treasury-owner (unwrap-panic (contract-call? (var-get agent-treasury-contract) get-contract-owner)))
+      (reg-owner (unwrap-panic (contract-call? (var-get regulatory-adapter-contract) get-contract-owner)))
+      (access-owner (unwrap-panic (contract-call? (var-get conxian-access-contract) get-contract-owner)))
     )
     (asserts! (contract-call? .admin-facade is-global-admin) ERR_NOT_AUTHORIZED) ;; Added this line based on the instruction's context.
 

@@ -32,8 +32,7 @@
   )
   (match (contract-call? .rbac grant-role user role)
     success (ok success)
-    error
-    ERR_BATCH_LIMIT_EXCEEDED
+    error (err error)
   )
 )
 
@@ -43,8 +42,7 @@
   )
   (match (contract-call? .rbac revoke-role user role)
     success (ok success)
-    error
-    ERR_BATCH_LIMIT_EXCEEDED
+    error (err error)
   )
 )
 
@@ -76,7 +74,7 @@
         (execute-protocol-operation (get params operation))
         (if (is-eq op-type u3)
           (execute-treasury-operation (get params operation))
-          (err ERR_INVALID_OPERATION)
+          ERR_INVALID_OPERATION
         )
       )
     )
@@ -84,15 +82,15 @@
 )
 
 (define-private (process-admin-operation
-    (result (response bool uint))
     (operation {
       type: uint,
       params: (list 5 principal),
     })
+    (result (response bool uint))
   )
   (match result
     success (execute-admin-operation-wrapper operation)
-    error result
+    error (err error)
   )
 )
 

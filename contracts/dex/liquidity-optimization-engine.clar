@@ -22,6 +22,7 @@
 ;; Data variables
 (define-data-var optimization-engine-active bool true)
 (define-data-var optimization-frequency uint u100) ;; Every 100 blocks
+(define-data-var dex-facade-contract principal .dex-facade)
 
 ;; Storage maps
 (define-map pool-optimization-data
@@ -139,7 +140,7 @@
     )
     (begin
         ;; Verify pool exists
-        (asserts! (contract-call? .dex-facade pool-exists pool) ERR_INVALID_POOL)
+        (asserts! (contract-call? (var-get dex-facade-contract) pool-exists pool) ERR_INVALID_POOL)
 
         ;; Validate fee tier
         (asserts! (and (>= new-fee-tier u0) (<= new-fee-tier u10000))

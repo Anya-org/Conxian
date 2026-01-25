@@ -11,11 +11,12 @@ Conxian is not a financial service provider; it is an autonomous digital organis
 
 - **Autonomous**: Decisions are executed by code, not committees
 - **Neutral**: The protocol is a public utility, indifferent to borders or identities  
-- **Sovereign**: Conxian lives on the "Pure Chain," anchored by Bitcoin's immutable security
+- **Sovereign**: Conxian lives on "Stacks Blockchain" anchored by Bitcoin's immutable security
 
 ## Architecture
 
 ### 🏗️ **Facade Pattern & Trait System**
+
 - **Centralized Traits**: All interfaces defined in `/contracts/traits/`
 - **Modular Contracts**: Single-responsibility contracts in dedicated modules
 - **Bitcoin Finality**: All operations anchored to Nakamoto consensus
@@ -24,12 +25,14 @@ Conxian is not a financial service provider; it is an autonomous digital organis
 ### 📊 **Multi-Dimensional DeFi System**
 
 **Core DeFi Primitives:**
+
 - **DEX**: Concentrated liquidity, multi-hop routing, batch auctions
 - **Lending**: Automated money markets with real-time risk adjustment
 - **Vaults**: sBTC integration, yield aggregation, custody solutions
 - **Tokens**: CXD (governance), CXS (staking), CXTR (treasury), CXLP (liquidity)
 
 **SAXAAP Business Model:**
+
 - **Revenue Generation**: Subscription fees (1 STX), transaction fees, service charges
 - **Revenue Distribution**: Autonomous 60/20/20 split (Staking/Dev/Insurance)
 - **Multi-Council Governance**: 5 specialized automated seats
@@ -46,12 +49,14 @@ Conxian is not a financial service provider; it is an autonomous digital organis
 ## Technical Stack
 
 ### ⚡ **Stacks-Native Components**
+
 - **Clarity 4**: Smart contract language with Bitcoin anchoring
 - **Nakamoto Compatibility**: 6 Bitcoin confirmations for high-value operations
 - **Multi-Oracle System**: Chainlink, Pyth, Redstone, DIA, TWAP adapters
 - **Cross-Chain**: Wormhole integration for sovereign token transfers
 
 ### 🔧 **Development Tools**
+
 - **Clarinet SDK**: Contract development and testing
 - **StacksOrbit**: Deployment automation
 - **Vitest**: Comprehensive test suite
@@ -75,28 +80,33 @@ Conxian is not a financial service provider; it is an autonomous digital organis
 ## Development
 
 ### Prerequisites
-- Clarinet 2.0+
+
+- Clarinet 3.12+
 - Node.js 18+
 - Git
 
 ### Getting Started
 
 1. **Install Dependencies**
+
    ```bash
    npm install
    ```
 
 2. **Run Tests**
+
    ```bash
-   npm test
+   npm run coverage
    ```
 
 3. **Contract Check**
+
    ```bash
    clarinet check
    ```
 
 4. **Local Development**
+
    ```bash
    clarinet console
    ```
@@ -106,6 +116,7 @@ Conxian is not a financial service provider; it is an autonomous digital organis
 Conxian Finance Protocol is distributed under the **GNU General Public License v3 (GPLv3)**.
 
 **Why GPLv3?**
+
 - **Hands-Off Sovereignty**: Establishes the protocol as a "public good"
 - **Permissionless Growth**: Anyone can fork or build on Conxian
 - **No Commercial Capture**: Prevents centralization of the protocol

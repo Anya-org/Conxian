@@ -43,7 +43,7 @@
 (define-public (set-paused (new-paused bool))
   (begin
     ;; BOLT: Replaced two contract calls with a single, consolidated authorization check.
-    (asserts! (contract-call? .admin-facade is-authorized-to-pause tx-sender)
+    (asserts! (contract-call? (var-get admin-facade-contract) is-authorized-to-pause tx-sender)
       ERR_UNAUTHORIZED
     )
     (var-set paused new-paused)
@@ -167,11 +167,13 @@
   (map-get? modules { name: name })
 )
 
-;; @desc Gets the global pause status and the current Nakamoto tenure ID in a single call.
-;; @returns (response { paused: bool, tenure-id: (optional (buff 32)) } uint)
+;; BOLT: Optimized to consolidate pause, tenure, and compliance checks into a single call.
+;; @desc Gets the global pause status, Nakamoto tenure ID, and user compliance status.
+;; @returns (response { paused: bool, tenure-id: (optional (buff 32)), compliant: bool } uint)
 (define-read-only (get-protocol-status)
   (ok {
     paused: (var-get paused),
     tenure-id: (contract-call? .block-utils get-current-tenure-id),
+    compliant: (is-ok (contract-call? .regulatory-adapter check-clean-hands-compliance tx-sender))
   })
 )

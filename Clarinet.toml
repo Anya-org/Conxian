@@ -211,12 +211,10 @@ path = "contracts/dex/enterprise-loan-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.advanced-order-manager]
-path = "contracts/dex/enterprise-loan-manager.clar"
+path = "contracts/enterprise/advanced-order-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.compliance-hooks]
-path = "contracts/compliance/compliance-manager.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+
 
 [contracts.on-chain-router-helper]
 path = "contracts/dex/on-chain-router-helper.clar"

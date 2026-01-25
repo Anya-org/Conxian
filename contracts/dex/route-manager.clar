@@ -18,7 +18,7 @@
 ;; Compliance Helper
 (define-private (check-compliance (user principal))
     (let (
-        (compliance-status (contract-call? .regulatory-adapter
+        (compliance-status (contract-call? (var-get regulatory-adapter-contract)
           check-clean-hands-compliance
           user
         ))
@@ -36,15 +36,15 @@
 (define-public (swap-route
         (amount-in uint)
         (amount-out-min uint)
-        (token-in .sip-standards.sip-010-ft-trait)
-        (token-out .sip-standards.sip-010-ft-trait)
-        (route (list 5 principal)) ;; List of pool contracts
+        (token-in <sip-010-trait>)
+        (token-out <sip-010-trait>)
+        (route (list 5 principal))
     )
     (let ((sender tx-sender))
         ;; 1. Global Pause Check (via Protocol Facade - assumed available)
         ;; 1. Global Pause Check (via Protocol Facade - assumed available)
         (asserts!
-           (not (contract-call? .conxian-protocol is-paused))
+           (not (contract-call? (var-get conxian-protocol-contract) is-paused))
             (err u1001)
         )
 

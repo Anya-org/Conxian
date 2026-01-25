@@ -270,6 +270,7 @@ Standardized error codes from `trait-errors.clar`:
 
 ### Resolved Issues
 
+- **Test Environment**: Fixed a race condition in `tests/setup-test-env.ts` by replacing the `beforeAll` hook with a `globalSetup` file (`tests/global-setup.ts`) to ensure `initSimnet()` completes before tests run.
 - **Compilation Fixes**: Resolved circular dependencies and missing entries in `Clarinet.toml`.
 - **Trait Alignment**: Corrected `office-job-trait` implementation in `agent-treasury` and `agent-risk`.
 - **Syntax Errors**: Fixed `fold` argument order in `admin-facade` and contract calls in `proposal-executor`.
@@ -286,7 +287,6 @@ This section logs all files isolated during the Level 0 Root Stabilization phase
 
 | File Path | Reason for Isolation | Required Fix |
 | :--- | :--- | :--- |
-| `tests/setup-test-env.ts` | Asynchronous Race Condition | The `initSimnet()` function is not awaited by the test runner, causing the `simnet` global to be undefined when tests execute. |
 | `contracts/drafts/federated-oracle-adapter.clar` | Non-functional stub | Awaiting full implementation. |
 | `contracts/drafts/interest-rate-model.clar` | Pending Security Review | The contract is complete but requires a comprehensive security audit before reintegration. |
 | `contracts/drafts/lending-manager.clar` | Architectural Redesign | Awaiting a redesign to align with the latest PRD specifications for multi-asset collateral. |

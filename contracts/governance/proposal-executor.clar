@@ -28,11 +28,11 @@
   (if (> council-id u0)
     ;; Council-scoped proposal: currently use global CXVG supply
     (unwrap-panic
-      (contract-call? .cxvg-token get-total-supply)
+      (contract-call? (var-get cxvg-token-contract) get-total-supply)
     )
     ;; Global proposal: also use global CXVG supply
     (unwrap-panic
-      (contract-call? .cxvg-token get-total-supply)
+      (contract-call? (var-get cxvg-token-contract) get-total-supply)
     )
   )
 )

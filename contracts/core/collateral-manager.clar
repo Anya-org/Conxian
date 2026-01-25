@@ -41,7 +41,7 @@
       (tenure-id (contract-call? .block-utils get-current-tenure-id))
     )
     (asserts!
-      (not (contract-call? .conxian-protocol is-paused))
+      (not (contract-call? (var-get conxian-protocol-contract) is-paused))
       (err u1001)
     )
 

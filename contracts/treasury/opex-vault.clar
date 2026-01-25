@@ -32,14 +32,14 @@
       ERR_UNAUTHORIZED
     )
     (asserts!
-      (contract-call? (var-get conxian-access-contract) .conxian-access has-role tx-sender
+      (contract-call? .conxian-access has-role tx-sender
         ROLE_OPERATOR
       )
       ;; ROLE_OPERATOR ERR_UNAUTHORIZED
     )
     ;; Check limits
     (if (> (- block-height (var-get last-spend-block))
-        (contract-call? (var-get nakamoto-constants-contract) get-blocks-per-day)
+        (contract-call? .nakamoto-constants get-blocks-per-day)
       )
       (begin
         (var-set daily-spend amount)

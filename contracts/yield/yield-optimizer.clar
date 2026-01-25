@@ -59,7 +59,7 @@
 
 (define-private (best-strategy-reducer (candidate principal) (current-best (response principal uint)))
     (match current-best
-        best-principal 
+        best-principal
         (let
             (
                 (strat-cand (map-get? strategies candidate))
@@ -71,11 +71,11 @@
                         (ok candidate)
                         (ok best-principal)
                     )
-                    (if (and (get active c) (<= (get risk-score c) (var-get max-risk-tolerance))) (ok candidate) (ok best-principal)) ;; If current best is invalid/dummy, take candidate
+                    (if (and (get active c) (<= (get risk-score c) (var-get max-risk-tolerance))) (ok candidate) (ok best-principal))
                 )
-                (ok best-principal) ;; Candidate not found
+                (ok best-principal)
             )
         )
-        err-val current-best
+        err-val (err err-val)
     )
 )

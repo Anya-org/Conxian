@@ -1,7 +1,7 @@
-(use-trait risk-manager-trait .risk-manager-trait.risk-manager-trait)
+(use-trait risk-manager-trait .risk-management.risk-manager-trait)
 (use-trait rbac-trait .core-traits.rbac-trait)
 
-(impl-trait .risk-manager-trait.risk-manager-trait)
+(impl-trait .risk-management.risk-manager-trait)
 (impl-trait .automation-traits.office-job-trait)
 (use-trait office-job-trait .automation-traits.office-job-trait)
 
@@ -101,7 +101,7 @@
   )
 )
 
-(define-read-only (get-global-collateral-factor ())
+(define-read-only (get-global-collateral-factor)
   (begin
     ;; Return global collateral factor
     (ok u8000) ;; 80%
@@ -157,7 +157,10 @@
 )
 
 (define-private (check-role (role (string-ascii 32)))
-  (ok true) ;; Mock implementation
+  (if (is-eq role "ROLE_ADMIN")
+    (ok true)
+    (err u1001)
+  )
 )
 
 (define-public (assess-position-risk (position-id uint))

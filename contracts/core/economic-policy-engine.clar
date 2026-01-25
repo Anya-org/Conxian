@@ -4,7 +4,7 @@
 ;; Native Stacks Architecture - Fully Deterministic
 
 (impl-trait .defi-traits.oracle-trait)
-(impl-trait .core-traits.interest-rate-trait)
+(impl-trait .core-traits.funding-rate-trait)
 
 ;; Constants - Gas Free (compile-time)
 (define-constant BASE_RATE u1000) ;; 0.1% base rate (scaled 10000)
@@ -137,6 +137,10 @@
   (ok (var-get current-interest-rate))
 )
 
+(define-read-only (get-funding-rate (period uint))
+  (ok (var-get current-interest-rate))
+)
+
 (define-read-only (get-current-collateral-factor)
   (ok (var-get collateral-factor))
 )
@@ -150,6 +154,14 @@
     price-data (ok (get price price-data))
     (err u1001)
   )
+)
+
+(define-read-only (fetch-price (asset principal))
+  (get-price asset)
+)
+
+(define-read-only (get-name ())
+  (ok "Economic-Policy-Engine")
 )
 
 ;; Subscription Management
@@ -179,25 +191,15 @@
     ;; Check if price is stale
     (match (map-get? asset-prices asset)
       price-data
-      (begin
-        (match (if (is-price-stale (get timestamp price-data))
-          (err u1002) ;; Price stale
-          (ok true)
-        )
-          stale-error (err stale-error)
-          success (begin
-            (let (
-                (current-params (unwrap! (map-get? market-parameters asset) (err u1003)))
-                (volatility (- (get confidence price-data) u5000))
-              )
-              ;; Derive volatility from confidence
-              (match (update-market-parameters asset (get utilization current-params)
-                volatility
-              )
-                update-success update-success
-                update-error (err update-error)
-              )
-            )
+      (if (is-price-stale (get timestamp price-data))
+        (err u1002) ;; Price stale
+        (let (
+            (current-params (unwrap! (map-get? market-parameters asset) (err u1003)))
+            (volatility (- (get confidence price-data) u5000))
+          )
+          ;; Derive volatility from confidence
+          (update-market-parameters asset (get utilization current-params)
+            volatility
           )
         )
       )

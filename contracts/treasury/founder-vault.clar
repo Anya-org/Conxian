@@ -29,7 +29,7 @@
 )
 
 (define-public (create-allocation
-    (token .sip-standards.sip-010-ft-trait)
+    (token <sip-010-trait>)
     (beneficiary principal)
     (amount uint)
   )
@@ -37,7 +37,6 @@
     (asserts! (is-eq tx-sender (unwrap-panic (contract-call? .conxian-protocol get-admin)))
       ERR_UNAUTHORIZED
     )
-    (try! (contract-call? token transfer amount tx-sender (as-contract tx-sender) none))
     (try! (contract-call? token transfer amount tx-sender (as-contract tx-sender) none))
     (map-set allocations {
       beneficiary: beneficiary,

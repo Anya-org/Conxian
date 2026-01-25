@@ -9,3 +9,7 @@
 (define-read-only (get-name)
   (ok "Conxian-Oracle")
 )
+
+(define-read-only (fetch-price (asset principal))
+  (get-price asset)
+)
