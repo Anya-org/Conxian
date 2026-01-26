@@ -3,7 +3,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     environment: "node",
-    globalSetup: "./tests/global-setup.ts",
+    setupFiles: ["./tests/setup-test-env.ts"],
     testTimeout: 300000,
     hookTimeout: 90000,
     fileParallelism: false,
