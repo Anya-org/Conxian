@@ -67,7 +67,7 @@ def topological_sort_util(v, visited, stack, graph, recursion_stack):
             print(f"Circular dependency detected: {v} -> {i}")
             # This is a critical error, but for now we will just print it and continue
             # This allows us to at least get a partial sort
-            pass
+            break
 
     stack.insert(0, v)
     recursion_stack[v] = False
