@@ -275,9 +275,11 @@ Standardized error codes from `trait-errors.clar`:
 - **Trait Alignment**: Corrected `office-job-trait` implementation in `agent-treasury` and `agent-risk`.
 - **Syntax Errors**: Fixed `fold` argument order in `admin-facade` and contract calls in `proposal-executor`.
 - **Version Compatibility**: Updated Clarity versions for `dex-factory-v2` and `math-lib-concentrated`.
+- **Partial Test Environment Fix**: Removed a conflicting legacy test setup file (`tests/vitest.setup.ts`) and corrected syntax errors related to authorization checks in core contracts (`admin-facade.clar`, `conxian-protocol.clar`). **Note:** The test suite remains non-functional, crashing with a parser error (`Tried to close list which isn't open`) during initialization. This prevented full verification of the fixes. Further investigation into the `Clarinet.toml` configuration and contract loading order is required.
 
 ### Pending Action Items
 
+- **Testing**: Resolve the test suite initialization failure to enable verification of contract changes.
 - **Testing**: Expand test coverage for new components.
 - **Deployment**: Verify all contracts on testnet.
 

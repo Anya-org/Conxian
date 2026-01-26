@@ -243,13 +243,7 @@
 ;; Emergency Pause (Ultra-low gas)
 (define-public (set-emergency-pause (paused bool))
   (begin
-    (asserts!
-      (or
-        (is-global-admin)
-        (has-role tx-sender ROLE_EMERGENCY_PAUSE)
-      )
-      ERR_NOT_AUTHORIZED
-    )
+    (asserts! (unwrap! (contract-call? .admin-facade is-authorized-to-pause tx-sender) ERR_NOT_AUTHORIZED) ERR_NOT_AUTHORIZED)
     (var-set emergency-pause paused)
     (print {
       event: "emergency-pause",
