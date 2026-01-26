@@ -5,7 +5,7 @@ network: simnet
 genesis:
   wallets:
     - name: deployer
-      address: ST1R1JMJPGDQ6QKY9NTE60Y5168R7ZDB4V4DXGZV7
+      address: ST3H73JRXH68866XXQC6HMD8TVZ8R87ZTHJX7JTCA
       balance: "0"
       sbtc-balance: "1000000000"
   contracts:
@@ -28,8 +28,8 @@ plan:
     - id: 0
       transactions:
         - emulated-contract-publish:
-            contract-name: sip-standards
-            emulated-sender: ST1R1JMJPGDQ6QKY9NTE60Y5168R7ZDB4V4DXGZV7
-            path: contracts/traits/sip-standards.clar
+            contract-name: ownable
+            emulated-sender: ST3H73JRXH68866XXQC6HMD8TVZ8R87ZTHJX7JTCA
+            path: contracts/base/ownable.clar
             clarity-version: 1
       epoch: "2.05"
