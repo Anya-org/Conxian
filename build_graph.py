@@ -95,6 +95,14 @@ def main():
     print("Building dependency graph...")
     graph, data = build_dependency_graph(clarinet_toml_path)
 
+    # Print the full dependency graph for debugging
+    print("\n--- Full Dependency Graph ---")
+    for contract, deps in graph.items():
+        if deps:
+            print(f"{contract} -> {', '.join(deps)}")
+    print("---------------------------\n")
+
+
     print("Topologically sorting contracts...")
     sorted_contracts = topological_sort(graph)
 

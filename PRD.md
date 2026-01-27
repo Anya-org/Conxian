@@ -277,10 +277,10 @@ Standardized error codes from `trait-errors.clar`:
 - **Version Compatibility**: Updated Clarity versions for `dex-factory-v2` and `math-lib-concentrated`.
 - **Partial Test Environment Fix**: Removed a conflicting legacy test setup file (`tests/vitest.setup.ts`) and corrected syntax errors related to authorization checks in core contracts (`admin-facade.clar`, `conxian-protocol.clar`). **Note:** The test suite remains non-functional, crashing with a parser error (`Tried to close list which isn't open`) during initialization. This prevented full verification of the fixes. Further investigation into the `Clarinet.toml` configuration and contract loading order is required.
 - **Test Environment Stability**: Confirmed the Vitest runner is functional by creating a `tests/sanity.test.ts`. The root cause of the test suite failure is a `CircularReference` error in the `Clarinet.toml` dependency graph, which tooling was unable to resolve.
+- **`Clarinet.toml` `CircularReference` Fix**: Manually remediated the `Clarinet.toml` file to break a circular dependency loop between `dimensional-engine`, `position-manager`, and `risk-manager`. This resolved the test suite's initialization crash.
 
 ### Pending Action Items
 
-- **Testing**: **CRITICAL BLOCKER:** Resolve the `CircularReference` error in `Clarinet.toml`. The recommended approach is to start with a minimal `Clarinet.toml` and incrementally add contracts back until the failure is reproduced, thereby isolating the problematic dependency.
 - **Testing**: Expand test coverage for new components.
 - **Deployment**: Verify all contracts on testnet.
 
@@ -290,7 +290,6 @@ This section logs all files isolated during the Level 0 Root Stabilization phase
 
 | File Path | Reason for Isolation | Required Fix |
 | :--- | :--- | :--- |
-| `Clarinet.toml` & dependents | **CRITICAL**: Test suite crashes on initialization with a `CircularReference` error. | The dependency graph in `Clarinet.toml` is too complex for the test runner to resolve. The `build_graph.py` script is ineffective. A manual, incremental approach is required to rebuild a stable `Clarinet.toml`. |
 | `contracts/drafts/federated-oracle-adapter.clar` | Non-functional stub | Awaiting full implementation. |
 | `contracts/drafts/interest-rate-model.clar` | Pending Security Review | The contract is complete but requires a comprehensive security audit before reintegration. |
 | `contracts/drafts/lending-manager.clar` | Architectural Redesign | Awaiting a redesign to align with the latest PRD specifications for multi-asset collateral. |
