@@ -38,7 +38,7 @@
           token: token-principal,
         })
       ))
-      (tenure-id (contract-call? .block-utils get-current-tenure-id))
+      (tenure-id (contract-call? (var-get block-utils-contract) get-current-tenure-id))
     )
     (asserts!
       (not (contract-call? (var-get conxian-protocol-contract) is-paused))

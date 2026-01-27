@@ -17,9 +17,7 @@
 
 ;; Data Vars
 (define-data-var paused bool false)
-(define-data-var contract-owner principal deployer) ;; Replaces protocol-admin
-(define-data-var access-control principal .conxian-access)
-(define-data-var admin-facade-contract principal .admin-facade)
+(define-data-var contract-owner principal deployer)
 
 ;; Maps
 (define-map modules
@@ -37,13 +35,9 @@
 
 ;; Administrative Functions
 
-;; @desc Pauses the protocol globally
-;; @param new-paused bool
-;; @returns (response bool uint)
-(define-public (set-paused (new-paused bool))
+(define-public (set-paused (admin-facade <rbac-trait>) (new-paused bool))
   (begin
-    ;; BOLT: Replaced two contract calls with a single, consolidated authorization check.
-    (asserts! (unwrap! (contract-call? (var-get admin-facade-contract) is-authorized-to-pause tx-sender) ERR_UNAUTHORIZED)
+    (asserts! (unwrap! (contract-call? admin-facade is-authorized-to-pause tx-sender) ERR_UNAUTHORIZED)
       ERR_UNAUTHORIZED
     )
     (var-set paused new-paused)
@@ -56,31 +50,25 @@
   )
 )
 
-;; BOLT: Optimizes module registration by allowing an administrator to register multiple modules in a single transaction.
-;; This reduces gas costs by performing the authorization check only once.
-(define-public (batch-register-modules (modules-list (list 20 { name: (string-ascii 32), contract: principal })))
+(define-public (batch-register-modules (admin-facade <rbac-trait>) (modules-list (list 20 { name: (string-ascii 32), contract: principal })))
   (begin
-    (asserts! (unwrap! (contract-call? .admin-facade is-authorized ROLE_PROTOCOL_ADMIN) ERR_UNAUTHORIZED) ERR_UNAUTHORIZED)
+    (asserts! (unwrap! (contract-call? admin-facade is-authorized ROLE_PROTOCOL_ADMIN) ERR_UNAUTHORIZED) ERR_UNAUTHORIZED)
     (fold (lambda (module-data accumulator)
       (begin
         (map-set modules { name: (get name module-data) } { contract: (get contract module-data), active: true })
         (ok true)
       )
-    ) modules-list (ok true))
+    ) modules-list (ok true)) (ok true))
   )
 )
 
-;; @desc registers a new module
-;; @param name (string-ascii 32)
-;; @param contract principal
-;; @returns (response bool uint)
-(define-public (register-module
+(define-public (register-module (admin-facade <rbac-trait>)
     (name (string-ascii 32))
     (contract principal)
   )
   (begin
     (asserts!
-      (unwrap! (contract-call? .admin-facade is-authorized
+      (unwrap! (contract-call? admin-facade is-authorized
         ROLE_PROTOCOL_ADMIN
       ) ERR_UNAUTHORIZED)
       ERR_UNAUTHORIZED
@@ -93,18 +81,14 @@
   )
 )
 
-;; @desc update module status
-;; @param name (string-ascii 32)
-;; @param active bool
-;; @returns (response bool uint)
-(define-public (set-module-active
+(define-public (set-module-active (admin-facade <rbac-trait>)
     (name (string-ascii 32))
     (active bool)
   )
   (let ((module (unwrap! (map-get? modules { name: name }) ERR_MODULE_NOT_FOUND)))
     (begin
       (asserts!
-        (unwrap! (contract-call? .admin-facade is-authorized
+        (unwrap! (contract-call? admin-facade is-authorized
           ROLE_PROTOCOL_ADMIN
         ) ERR_UNAUTHORIZED)
         ERR_UNAUTHORIZED
@@ -115,10 +99,9 @@
   )
 )
 
-;; BOLT: Optimizes module activation by allowing an administrator to update multiple modules in a single transaction.
-(define-public (batch-set-module-active (updates (list 20 { name: (string-ascii 32), active: bool })))
+(define-public (batch-set-module-active (admin-facade <rbac-trait>) (updates (list 20 { name: (string-ascii 32), active: bool })))
   (begin
-    (asserts! (unwrap! (contract-call? .admin-facade is-authorized ROLE_PROTOCOL_ADMIN) ERR_UNAUTHORIZED) ERR_UNAUTHORIZED)
+    (asserts! (unwrap! (contract-call? admin-facade is-authorized ROLE_PROTOCOL_ADMIN) ERR_UNAUTHORIZED) ERR_UNAUTHORIZED)
     (fold (lambda (update accumulator)
       (let ((module (unwrap! (map-get? modules { name: (get name update) }) ERR_MODULE_NOT_FOUND)))
         (begin
@@ -130,10 +113,9 @@
   )
 )
 
-;; Admin Handover
-(define-public (set-contract-owner (new-owner principal))
+(define-public (set-contract-owner (admin-facade <rbac-trait>) (new-owner principal))
   (begin
-    (asserts! (contract-call? .admin-facade is-global-admin)
+    (asserts! (contract-call? admin-facade is-global-admin)
       ERR_UNAUTHORIZED
     )
     (var-set contract-owner new-owner)
@@ -167,13 +149,10 @@
   (map-get? modules { name: name })
 )
 
-;; BOLT: Optimized to consolidate pause, tenure, and compliance checks into a single call.
-;; @desc Gets the global pause status, Nakamoto tenure ID, and user compliance status.
-;; @returns (response { paused: bool, tenure-id: (optional (buff 32)), compliant: bool } uint)
-(define-read-only (get-protocol-status)
+(define-read-only (get-protocol-status (block-utils principal) (regulatory-adapter <compliance-trait>))
   (ok {
     paused: (var-get paused),
-    tenure-id: (contract-call? .block-utils get-current-tenure-id),
-    compliant: (is-ok (contract-call? .regulatory-adapter check-clean-hands-compliance tx-sender))
+    tenure-id: (contract-call? block-utils get-current-tenure-id),
+    compliant: (is-ok (contract-call? regulatory-adapter check-clean-hands-compliance tx-sender))
   })
 )

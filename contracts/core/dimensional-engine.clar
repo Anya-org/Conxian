@@ -89,7 +89,7 @@
   (begin
     (let (
         ;; BOLT: Consolidated pause and compliance pre-flight checks into a single contract call.
-        (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
+        (protocol-status (try! (contract-call? (var-get conxian-protocol-contract) get-protocol-status)))
         (position-manager (try! (get-module-contract "position-manager")))
       )
       (try! (guard-entry protocol-status))

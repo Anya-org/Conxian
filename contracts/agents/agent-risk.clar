@@ -224,7 +224,7 @@
       ;; We don't have a private liquidate function, so we call the public one? 
       ;; Or we assume do-work IS the liquidation trigger.
       ;; Let's assume we call liquidate-position.
-      (try! (liquidate-position position-id tx-sender))
+      (unwrap! (liquidate-position position-id tx-sender) ERR_UNAUTHORIZED)
       
       ;; Payout
       ;; We assume the job pays 5 uSTX for now (placeholder)

@@ -133,7 +133,7 @@
   (begin
     ;; Validate inputs
     (asserts! (> amount u0) ERR_ZERO_AMOUNT)
-    (asserts! (contract-call? .dex-facade pool-exists pool) ERR_INVALID_POOL)
+    (asserts! (contract-call? (var-get dex-facade-contract) pool-exists pool) ERR_INVALID_POOL)
     
     ;; Check if provider has position
     (let ((position (get-liquidity-position pool tx-sender)))
@@ -178,7 +178,7 @@
 (define-public (claim-rewards (pool principal))
   (begin
     ;; Validate pool exists
-    (asserts! (contract-call? .dex-facade pool-exists pool) ERR_INVALID_POOL)
+    (asserts! (contract-call? (var-get dex-facade-contract) pool-exists pool) ERR_INVALID_POOL)
     
     ;; Check if provider has position
     (let ((position (get-liquidity-position pool tx-sender)))
@@ -273,7 +273,7 @@
 (define-public (set-liquidity-provider-active (active bool))
   (begin
     ;; Only admin can change this
-    (asserts! (is-eq tx-sender (unwrap-panic (contract-call? .conxian-protocol get-admin))) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (unwrap-panic (contract-call? (var-get dex-facade-contract) get-admin))) ERR_UNAUTHORIZED)
     (var-set liquidity-provider-active active)
     (ok true)
   )

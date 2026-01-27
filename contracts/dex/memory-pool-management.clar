@@ -21,6 +21,7 @@
 (define-data-var total-pools-allocated uint u0)
 (define-data-var total-memory-allocated uint u0)
 (define-data-var cleanup-frequency uint u100) ;; Every 100 blocks
+(define-data-var conxian-protocol principal .conxian-protocol)
 
 ;; Storage maps
 (define-map memory-pools { pool-id: uint } { 
@@ -350,13 +351,14 @@
               (cleaned-count u0))
           
           ;; Clean up each stale allocation
-          (fold stale-allocations u0
-            (lambda ((count uint) (slot-id uint))
+          (fold (lambda (slot-id count)
               (match (deallocate-memory pool-id slot-id)
                 success (+ count u1)
                 error count
               )
             )
+            (find-stale-allocations pool-id u1000)
+            u0
           )
           
           ;; Update pool cleanup time
@@ -421,7 +423,7 @@
 (define-public (emergency-cleanup-all-pools)
   (begin
     ;; Only admin can emergency cleanup
-    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (unwrap-panic (contract-call? (var-get conxian-protocol) get-admin))) ERR_UNAUTHORIZED)
     
     ;; Clean all pools
     (fold (range u1 (+ (var-get total-pools-allocated) u1)) u0
@@ -440,7 +442,7 @@
 (define-public (set-cleanup-frequency (frequency uint))
   (begin
     ;; Only admin can set cleanup frequency
-    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (unwrap-panic (contract-call? (var-get conxian-protocol) get-admin))) ERR_UNAUTHORIZED)
     (asserts! (> frequency u0) ERR_INVALID_ALLOCATION)
     
     (var-set cleanup-frequency frequency)

@@ -1,4 +1,4 @@
-;; Oracle Aggregator v2 - Weighted sources with TWAP and manipulation detection (minimal implementation)
+;; Oracle Aggregator - Weighted sources with TWAP and manipulation detection (minimal implementation)
 
 (use-trait oracle-trait .oracle-pricing.oracle-trait)
 (use-trait err-trait .trait-errors.standard-errors)

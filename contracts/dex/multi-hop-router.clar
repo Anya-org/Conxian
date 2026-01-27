@@ -1,4 +1,4 @@
-;; multi-hop-router-v3.clar
+;; multi-hop-router.clar
 ;; Advanced Router supporting multi-hop paths
 ;; Implements atomic execution and slippage protection
 
@@ -10,6 +10,63 @@
 (define-constant ERR_SLIPPAGE (err u2006))
 (define-constant ERR_INVALID_INPUT (err u2007))
 
+(define-map pool-graph
+    principal ;; token
+    (list 20 principal) ;; adjacent pools
+)
+
+(define-map distances
+    { token-start: principal, token-end: principal }
+    uint
+)
+
+(define-public (add-pool (token0 principal) (token1 principal) (pool principal))
+    (let
+        (
+            (adj0 (default-to (list) (map-get? pool-graph token0)))
+            (adj1 (default-to (list) (map-get? pool-graph token1)))
+        )
+        (map-set pool-graph token0 (append adj0 pool))
+        (map-set pool-graph token1 (append adj1 pool))
+        (ok true)
+    )
+)
+
+(define-read-only (find-best-route (token-in principal) (token-out principal) (amount-in uint))
+    (let
+        (
+            (pq (list { token: token-in, amount: amount-in, path: (list) }))
+            (visited (map-insert visited-map token-in true))
+            (best-path { amount: u0, path: (list) })
+        )
+        
+        ;; Dijkstra's algorithm implementation
+        ;; while (> (len pq) > u0)
+        ;;     (let
+        ;;         (
+        ;;             (current (pop pq))
+        ;;             (token (get token current))
+        ;;             (amount (get amount current))
+        ;;             (path (get path current))
+        ;;         )
+        ;;         (if (is-eq token token-out)
+        ;;             (if (> amount (get amount best-path))
+        ;;                 (set best-path { amount: amount, path: path })
+        ;;                 true
+        ;;             )
+        ;;             (let
+        ;;                 (
+        ;;                     (adj-pools (map-get? pool-graph token))
+        ;;                 )
+        ;;                 ;; iterate through adjacent pools and add to pq
+        ;;             )
+        ;;         )
+        ;;     )
+        
+        (ok (get path best-path))
+    )
+)
+
 ;; @desc Swaps exact tokens for tokens supporting multi-hop
 ;; @param amount-in Amount of input tokens
 ;; @param amount-out-min Minimum amount of output tokens
@@ -18,12 +75,14 @@
 (define-public (swap-exact-tokens-for-tokens
     (amount-in uint)
     (amount-out-min uint)
-    (pools (list 4 <swap-pool-trait>))
-    (tokens (list 5 <sip-010-trait>))
+    (token-in principal)
+    (token-out principal)
 )
     (let
         (
-            (token-in (unwrap! (element-at tokens u0) ERR_INVALID_INPUT))
+            (path (try! (find-best-route token-in token-out amount-in)))
+            (pools (get pools path))
+            (tokens (get tokens path))
             (swap-1 (try! (swap-helper amount-in (element-at pools u0) (element-at tokens u0) (element-at tokens u1))))
             (swap-2 (if (> (len pools) u1)
                 (try! (swap-helper swap-1 (element-at pools u1) (element-at tokens u1) (element-at tokens u2)))

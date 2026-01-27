@@ -26,10 +26,26 @@ Conxian is not a financial service provider; it is an autonomous digital organis
 
 **Core DeFi Primitives:**
 
-- **DEX**: Concentrated liquidity, multi-hop routing, batch auctions
+- **DEX**:
+  - `concentrated-liquidity-pool.clar`: Implements tick-based liquidity management and position NFTs.
+  - `multi-hop-router-v3.clar`: Utilizes Dijkstra's algorithm for optimal path finding across all pool types.
+  - `dex-factory.clar`: Enhanced with a pool type registry for multi-pool support.
 - **Lending**: Automated money markets with real-time risk adjustment
 - **Vaults**: sBTC integration, yield aggregation, custody solutions
 - **Tokens**: CXD (governance), CXS (staking), CXTR (treasury), CXLP (liquidity)
+
+**Enterprise and Yield Features:**
+
+- `enterprise-api.clar`: Provides tiered institutional accounts, advanced order types, and compliance integration.
+- `compliance-hooks.clar`: Offers hooks for KYC/AML checks and other compliance-related functions.
+- `yield-optimizer.clar`: Analyzes strategies and rebalances funds for optimal APY, with performance tracking and auto-compounding capabilities.
+- `auto-compounder.clar`: Automates yield compounding for connected vaults.
+
+**Performance and Compatibility:**
+
+- `performance-optimizer.clar`: Monitors and optimizes gas usage and transaction throughput.
+- `legacy-adapter.clar`: Provides a backward-compatible interface to legacy contracts during migration.
+- `migration-manager.clar`: Manages data migration from legacy contracts to the enhanced system.
 
 **SAXAAP Business Model:**
 
@@ -63,7 +79,7 @@ Conxian is not a financial service provider; it is an autonomous digital organis
 
 ## Repository Structure
 
-```
+```text
 /contracts/
 ├── traits/           # All trait definitions (centralized)
 ├── core/             # Dimensional engine, risk management

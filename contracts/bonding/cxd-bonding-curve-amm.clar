@@ -54,7 +54,7 @@
 
 (define-public (get-sell-quote (amount-cxd uint))
   (let (
-      (supply (unwrap-panic (contract-call? .cxd-token get-total-supply)))
+      (supply (unwrap-panic (contract-call? (var-get cxd-token-contract) get-total-supply)))
       (price-start (get-price supply))
       (price-end (get-price (- supply amount-cxd)))
       (average-price (/ (+ price-start price-end) u2))

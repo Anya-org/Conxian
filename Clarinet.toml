@@ -56,8 +56,8 @@ address = "STA0P1Q2R3S4T5U6V7W8X9Y0Z1A2B3C4D5E6F7G8H9I0J1"
 path = "contracts/traits/governance-traits.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.multi-hop-router-v3]
-path = "contracts/dex/multi-hop-router-v3.clar"
+[contracts.multi-hop-router]
+path = "contracts/dex/multi-hop-router.clar"
 address = "STC2R3S4T5U6V7W8X9Y0Z1A2B3C4D5E6F7G8H9I0J1K2L3"
 
 [contracts.launch-limits]
@@ -175,7 +175,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.points-oracle]
 path = "contracts/oracle/points-oracle.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-protocol",]
 
 [contracts.oracle-adapter-stub]
 path = "contracts/oracle/oracle-adapter-stub.clar"
@@ -229,7 +228,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.liquidity-provider]
 path = "contracts/dex/liquidity-provider.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-protocol",]
 
 [contracts.real-time-monitoring-dashboard]
 path = "contracts/dex/real-time-monitoring-dashboard.clar"
@@ -279,22 +277,18 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.swap-manager]
 path = "contracts/dex/swap-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-protocol",]
 
 [contracts.vault]
 path = "contracts/dex/vault.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-protocol",]
 
 [contracts.liquidity-optimization-engine]
 path = "contracts/dex/liquidity-optimization-engine.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-protocol",]
 
 [contracts.pool-template]
 path = "contracts/dex/pool-template.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-protocol",]
 
 [contracts.factory-trait]
 path = "contracts/dex/factory-trait.clar"
@@ -315,12 +309,8 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.memory-pool-management]
 path = "contracts/dex/memory-pool-management.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-protocol",]
 
-[contracts.dex-factory-v2]
-path = "contracts/dex/dex-factory-v2.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-clarity-version = 2
+
 
 [contracts.nft-marketplace]
 path = "contracts/marketplace/nft-marketplace.clar"
@@ -546,6 +536,10 @@ address = "STX5A6B7C8D9E0F1G2H3I4J5K6L7M8N9O0P1Q2R3S4T5"
 path = "contracts/traits/oracle-pricing.clar"
 address = "STV1W2X3Y4Z5A6B7C8D9E0F1G2H3I4J5K6L7M8N9O0"
 
+[contracts.conxian-protocol]
+path = "contracts/core/conxian-protocol.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+
 [contracts.conxian-service-trait]
 path = "contracts/traits/conxian-service-trait.clar"
 address = "STU2X3Y4Z5A6B7C8D9E0F1G2H3I4J5K6L7M8N9O0P1Q2"
@@ -727,8 +721,8 @@ path = "contracts/governance/voting.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = [ "block-utils", "rbac",]
 
-[contracts.dimensional-oracle]
-path = "contracts/oracle/dimensional-oracle.clar"
+[contracts.oracle-aggregator]
+path = "contracts/oracle/oracle-aggregator.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.economic-policy-engine]
@@ -777,10 +771,6 @@ path = "contracts/core/risk-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 depends_on = [ "conxian-access", "dimensional-engine",]
 
-[contracts.conxian-protocol]
-path = "contracts/core/conxian-protocol.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "block-utils", "regulatory-adapter", "admin-facade",]
 
 [contracts.opex-vault]
 path = "contracts/treasury/opex-vault.clar"
