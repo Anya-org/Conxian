@@ -17,6 +17,7 @@
 (define-data-var min-liquidation-reward uint u100)
 (define-data-var max-liquidation-reward uint u1000)
 (define-data-var insurance-fund principal tx-sender)
+(define-data-var last-checked-id uint u0)
 
 (define-public (set-risk-parameters
     (new-max-leverage uint)
@@ -109,9 +110,10 @@
 )
 
 (define-read-only (is-liquidatable (position-id uint))
-  (begin
-    ;; Simplified liquidation check
-    (ok false)
+  (let (
+    (risk-data (unwrap! (assess-position-risk position-id) (err u404)))
+  )
+    (ok (< (get health-factor risk-data) u10000))
   )
 )
 
@@ -210,27 +212,39 @@
 
 ;; --- Office Worker Implementation ---
 
+;; @desc Autonomous check to see if any position needs liquidation.
+;; Keepers call this to see if they should trigger do-work.
 (define-public (check-work-needed)
-  (begin
-    ;; In a real implementation, this would iterate over a registry of open positions.
-    ;; For now, we return false as we don't have an iterable list of positions in this contract state.
-    ;; This is a placeholder to satisfy the trait.
-    (ok false)
+  (let (
+    (next-id (+ (var-get last-checked-id) u1))
+  )
+    (match (contract-call? .dimensional-core get-position tx-sender next-id)
+      pos (ok (unwrap-panic (is-liquidatable next-id)))
+      none (begin
+        (var-set last-checked-id u0) ;; Reset loop
+        (ok false)
+      )
+    )
   )
 )
 
+;; @desc Executes the liquidation and rewards the worker.
+;; @param job-data: The position-id encoded as a buffer (using to-consensus-buff).
 (define-public (do-work (job-data (buff 2048)))
-  (let ((position-id u0)) ;; Simplified - would parse from job-data in production
-    ;; Check work needed logic would go here to validate
+  (let (
+    (position-id (unwrap! (from-consensus-buff? uint (unwrap! (as-max-len? job-data u16) ERR_INVALID_PARAMETERS)) ERR_INVALID_PARAMETERS))
+  )
     (begin
-      ;; Call the internal liquidation
-      ;; We don't have a private liquidate function, so we call the public one? 
-      ;; Or we assume do-work IS the liquidation trigger.
-      ;; Let's assume we call liquidate-position.
-      (try! (liquidate-position position-id tx-sender))
+      ;; 1. Validate work is still needed
+      (asserts! (unwrap-panic (is-liquidatable position-id)) ERR_INVALID_PARAMETERS)
+
+      ;; 2. Execute Liquidation in the Core
+      (try! (contract-call? .dimensional-core liquidate-position tx-sender position-id .oracle-aggregator-v2))
       
-      ;; Payout
-      ;; We assume the job pays 5 uSTX for now (placeholder)
+      ;; 3. Update last checked ID to move the scanner forward
+      (var-set last-checked-id position-id)
+
+      ;; 4. Payout to Worker (5 uSTX reward)
       (contract-call? .office-manager payout tx-sender u5)
     )
   )

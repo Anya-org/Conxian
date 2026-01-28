@@ -125,8 +125,36 @@ Standardized error codes from `trait-errors.clar`:
 - [x] **ICO System** - `ico-offering` (token sale logic)
 - [x] **Signature Verification** - `governance-signature-verifier` (SIP-018)
 - [x] **Upgrade Control** - `upgrade-controller` (governance-gated)
+- [x] **Enterprise Orders** - `advanced-order-manager` (TWAP/VWAP implementation)
+- [x] **Dimensional Risk Tokens** - `position-nft` (SIP-009 DRT system)
 
-### 4.3. Security Features
+### 4.3. Financial Logic & Strategies
+
+#### 4.3.1. Dynamic Interest Rate Model
+The protocol implements an industry-leading **Kinked Curve Interest Rate Model** in `economic-policy-engine.clar`. The rate ($R$) is calculated based on the utilization ($U$):
+
+$$
+R =
+\begin{cases}
+R_0 + \frac{U}{U_{kink}} \cdot Slope_1 & \text{if } U \le U_{kink} \\
+R_0 + Slope_1 + \frac{U - U_{kink}}{1 - U_{kink}} \cdot Slope_2 & \text{if } U > U_{kink}
+\end{cases}
+$$
+
+**Parameters**:
+- $R_0 = 1\%$ (Base Rate)
+- $U_{kink} = 80\%$ (Optimal Utilization)
+- $Slope_1 = 4\%$ (Low utilization incentive)
+- $Slope_2 = 60\%$ (High utilization deterrent)
+
+#### 4.3.2. Dimensional Risk Parameters
+Maintenance Margin ($MM$) is dynamic and multi-dimensional, scaling with position risk:
+
+$$ MM = MM_{base} + \text{Leverage}^2 $$
+
+This ensures that high-leverage positions are progressively more expensive to maintain and easier to liquidate, protecting system solvency.
+
+### 4.4. Security Features
 
 - [x] Circuit breaker functionality
 - [x] MEV protection
@@ -282,12 +310,11 @@ Standardized error codes from `trait-errors.clar`:
 
 | File Path | Failure Point | Status |
 | :--- | :--- | :--- |
-| `contracts/dex/*` | Extensive use of unsupported `lambda` keyword. | 🔴 CRITICAL BLOCKER |
-| `contracts/core/collateral-manager.clar` | Load-order issues and unresolved contract references. | 🟡 PARTIAL FIX |
-| `contracts/oracle/points-oracle.clar` | Mismatched return types vs traits. | 🟡 RECOVERY PENDING |
-| `contracts/security/mev-protector.clar` | Syntactic instability. | 🟡 RECOVERY PENDING |
-| `contracts/dex/pool-template.clar` | Syntax errors and `lambda` usage. | 🔴 CRITICAL BLOCKER |
-| `Entire Repo` | Lack of `burn-block-height` usage (Nakamoto incompatibility). | 🟡 FOUNDATION DEBT |
+| `contracts/drafts/federated-oracle-adapter.clar` | Non-functional stub | Awaiting full implementation. |
+| `contracts/drafts/interest-rate-model.clar` | Replaced | Integrated into `economic-policy-engine.clar` as Kinked Curve Model. |
+| `contracts/drafts/lending-manager.clar` | Architectural Redesign | Awaiting a redesign to align with the latest PRD specifications for multi-asset collateral. |
+| `contracts/drafts/regulatory-adapter.clar` | SIP-018 Compliance | Being updated to support the latest SIP-018 standards for digital signatures. |
+| `contracts/rewards/default-strategy-engine.clar` | Tier 0 Stub | Implementation pending based on Yield Strategy requirements. |
 
 ## 13. Benchmarks (Vitest 4.0)
 
