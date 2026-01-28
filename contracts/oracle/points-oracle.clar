@@ -434,8 +434,8 @@
 (define-read-only (get-price (feed-id (string-ascii 32)))
   (begin
     ;; Return points as "price" for oracle compatibility
-    (match (get-user-points (principal-from-string feed-id)))
-      points (ok (get points balance))
+    (match (get-user-points (principal-from-string feed-id))
+      points (ok (get balance points))
       none (ok u0)
     )
   )

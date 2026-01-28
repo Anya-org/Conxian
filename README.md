@@ -26,13 +26,10 @@ Conxian is not a financial service provider; it is an autonomous digital organis
 
 **Core DeFi Primitives:**
 
-- **DEX**:
-  - `concentrated-liquidity-pool.clar`: Implements tick-based liquidity management and position NFTs.
-  - `multi-hop-router-v3.clar`: Utilizes Dijkstra's algorithm for optimal path finding across all pool types.
-  - `dex-factory.clar`: Enhanced with a pool type registry for multi-pool support.
-- **Lending**: Automated money markets with real-time risk adjustment
+- **DEX**: Concentrated liquidity, multi-hop routing, batch auctions
+- **Lending**: Automated money markets with Kinked-Curve Interest Rate Models
 - **Vaults**: sBTC integration, yield aggregation, custody solutions
-- **Tokens**: CXD (governance), CXS (staking), CXTR (treasury), CXLP (liquidity)
+- **Tokens**: CXD (governance), CXS (staking), CXTR (treasury), CXLP (liquidity), DRT (position NFT)
 
 **Enterprise and Yield Features:**
 
@@ -50,7 +47,7 @@ Conxian is not a financial service provider; it is an autonomous digital organis
 **SAXAAP Business Model:**
 
 - **Revenue Generation**: Subscription fees (1 STX), transaction fees, service charges
-- **Revenue Distribution**: Autonomous 60/20/20 split (Staking/Dev/Insurance)
+- **Revenue Distribution**: Autonomous 60/20/20 split (Staking/Dev/Insurance) via `revenue-distributor`
 - **Multi-Council Governance**: 5 specialized automated seats
 - **Office Workers**: Autonomous liquidations and treasury operations
 
@@ -141,9 +138,9 @@ Conxian Finance Protocol is distributed under the **GNU General Public License v
 
 ## Status
 
-- **Maturity Level**: 🔵 **Technical Alpha (Testnet)**
-- **Architecture**: Facade-Based & Trait-Driven
-- **Next Steps**: Comprehensive testing, security audits, mainnet preparation
+- **Maturity Level**: 🟡 **Root Foundation Stable** (Recovered 2026-01-16)
+- **Architecture**: Facade-Based & Trait-Driven (Top-down recovery in progress)
+- **Next Steps**: Extension of the stable root to collateral and position managers; Nakamoto compatibility audit.
 
 **Disclaimer**: This project is in a Technical Alpha stage. Features represent the target design, not all functionality is fully implemented.
 

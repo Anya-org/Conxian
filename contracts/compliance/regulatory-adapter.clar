@@ -28,13 +28,13 @@
 (define-map blacklist principal bool)
 
 ;; Read-only: Check Clean-Hands Compliance
-(define-public (check-clean-hands-compliance (user principal))
+(define-read-only (check-clean-hands-compliance (user principal))
   (let (
     (status (map-get? compliance-status { user: user }))
     (is-blacklisted (default-to false (map-get? blacklist user)))
   )
     (if is-blacklisted
-      (err ERR_BLACKLISTED)
+      ERR_BLACKLISTED
       (match status
         record (if (get clean-hands record)
           (ok true)

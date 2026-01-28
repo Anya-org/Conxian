@@ -5,11 +5,15 @@ import type { Simnet } from '@stacks/clarinet-sdk';
 let simnet: Simnet;
 
 beforeAll(async () => {
-  simnet = await initSimnet();
+  if (!simnet) {
+    console.log('Initializing Simnet for test environment...');
+    simnet = await initSimnet();
+    console.log('Simnet initialized.');
+  }
 });
 
 afterAll(async () => {
-  // No cleanup needed
+  // Cleanup if necessary
 });
 
 export { simnet };
