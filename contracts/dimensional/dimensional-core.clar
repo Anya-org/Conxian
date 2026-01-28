@@ -259,6 +259,9 @@
         (as-contract tx-sender) none
       ))
 
+      ;; Mint Dimensional Risk Token (NFT)
+      (try! (contract-call? .position-nft mint tx-sender position-id))
+
       (map-set positions {
         owner: tx-sender,
         id: position-id,
@@ -276,14 +279,14 @@
         status: "ACTIVE",
         funding-interval: funding-interval,
         max-leverage: leverage,
-        maintenance-margin: DEFAULT_MAINTENANCE_MARGIN,
-        time-decay: none,
-        volatility: none,
+        maintenance-margin: (+ DEFAULT_MAINTENANCE_MARGIN (* leverage leverage)), ;; Dynamic MM based on Leverage^2
+        time-decay: (some u0),
+        volatility: (some u0), ;; Will be updated by Risk Agent
         is-hedged: false,
         tags: tags,
         version: (var-get positions-version),
         metadata: metadata,
-        tenure-id: (contract-call? .block-utils get-current-tenure-id),
+        tenure-id: (unwrap-panic (contract-call? .block-utils get-current-tenure-id)),
       })
 
       ;; Fix size calculation for short
@@ -378,6 +381,9 @@
       )
       (var-set total-positions-closed (+ (var-get total-positions-closed) u1))
 
+      ;; Burn Dimensional Risk Token (NFT)
+      (try! (contract-call? .position-nft burn position-id))
+
       (print {
         event: "close-position",
         position-id: position-id,
@@ -433,6 +439,9 @@
         (- (var-get total-value-locked) collateral-value)
       )
       (var-set total-positions-closed (+ (var-get total-positions-closed) u1))
+
+      ;; Burn Dimensional Risk Token (NFT)
+      (try! (contract-call? .position-nft burn position-id))
 
       (print {
         event: "liquidate-position",
@@ -500,7 +509,7 @@
   tags: (list 10 (string-utf8 32)),
   version: uint,
   metadata: (optional (string-utf8 1024)),
-  tenure-id: (buff 32),
+  tenure-id: uint,
 }))
   (let (
       (size (get size position))
@@ -536,7 +545,7 @@
       tags: (list 10 (string-utf8 32)),
       version: uint,
       metadata: (optional (string-utf8 1024)),
-      tenure-id: (buff 32),
+      tenure-id: uint,
     })
     (current-price uint)
   )
