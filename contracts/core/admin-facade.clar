@@ -3,7 +3,7 @@
 ;; Implements single source of truth for all admin operations
 
 ;; Traits
-(use-trait rbac-trait .core-traits.rbac-trait)
+(use-trait rbac-trait .core-traits.conxian-access-trait)
 (use-trait pausable-trait .pausable-trait.pausable-trait)
 
 ;; Constants
@@ -18,7 +18,7 @@
 (define-constant ROLE_TREASURY_ADMIN u3)
 
 ;; State
-(define-data-var rbac-contract principal .rbac)
+(define-data-var rbac-contract principal .conxian-access)
 (define-data-var global-admin principal tx-sender)
 (define-data-var emergency-pause bool false)
 (define-data-var max-batch-size uint u100)
@@ -30,7 +30,7 @@
     (user principal)
     (role uint)
   )
-  (match (contract-call? .rbac grant-role user role)
+  (match (contract-call? .conxian-access grant-role user role)
     success (ok success)
     error (err error)
   )
@@ -40,7 +40,7 @@
     (user principal)
     (role uint)
   )
-  (match (contract-call? .rbac revoke-role user role)
+  (match (contract-call? .conxian-access revoke-role user role)
     success (ok success)
     error (err error)
   )
@@ -157,11 +157,11 @@
     (asserts! (has-role ROLE_GLOBAL_ADMIN) ERR_NOT_AUTHORIZED)
     (if enabled
       (begin
-        (try! (contract-call? .rbac grant-role user role))
+        (try! (contract-call? .conxian-access grant-role user role))
         (map-set role-cache { user: user, role: role } true)
       )
       (begin
-        (try! (contract-call? .rbac revoke-role user role))
+        (try! (contract-call? .conxian-access revoke-role user role))
         (map-delete role-cache { user: user, role: role })
       )
     )
@@ -190,12 +190,12 @@
     ok-val
     (if (get active update)
       (begin
-        (try! (contract-call? .rbac grant-role (get user update) (get role update)))
+        (try! (contract-call? .conxian-access grant-role (get user update) (get role update)))
         (map-set role-cache { user: (get user update), role: (get role update) } true)
         (ok true)
       )
       (begin
-        (try! (contract-call? .rbac revoke-role (get user update) (get role update)))
+        (try! (contract-call? .conxian-access revoke-role (get user update) (get role update)))
         (map-delete role-cache { user: (get user update), role: (get role update) })
         (ok true)
       )

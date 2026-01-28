@@ -1,1 +1,0 @@
-import { initSimnet } from '@stacks/clarinet-sdk'; async function main() { try { const simnet = await initSimnet({ clarinetConfig: 'Clarinet.root.toml' }); console.log('Simnet Root initialized'); } catch (e) { console.error(e); } } main();

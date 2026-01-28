@@ -24,6 +24,16 @@
   )
 )
 
+;; Burn function
+(define-public (burn (amount uint) (owner principal))
+  (begin
+    (asserts! (is-eq tx-sender owner) ERR_UNAUTHORIZED)
+    (try! (ft-burn? cxd-token amount owner))
+    (var-set total-supply (- (var-get total-supply) amount))
+    (ok true)
+  )
+)
+
 (define-read-only (get-name)
   (ok "Conxian Governance Token")
 )

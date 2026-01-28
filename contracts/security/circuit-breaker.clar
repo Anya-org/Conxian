@@ -1,7 +1,7 @@
 ;; circuit-breaker.clar
 ;; Implements automated pause triggers for volatility and emergency stops
 
-(use-trait roles-trait .core-traits.rbac-trait)
+(use-trait roles-trait .core-traits.conxian-access-trait)
 
 (define-constant ROLE_ADMIN u1)
 (define-constant ROLE_KEEPER u2)
@@ -12,7 +12,7 @@
 
 ;; Data Vars
 (define-data-var contract-owner principal tx-sender)
-(define-data-var rbac-contract principal .rbac)
+(define-data-var rbac-contract principal .conxian-access)
 
 ;; Map of paused contracts
 (define-map paused-contracts
@@ -33,7 +33,7 @@
 (define-private (is-authorized (role uint))
   (if (is-eq tx-sender (var-get contract-owner))
     true
-    (contract-call? .rbac has-role tx-sender role)
+    (contract-call? .conxian-access has-role tx-sender role)
   )
 )
 

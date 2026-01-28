@@ -1,7 +1,7 @@
 [project]
 name = "Conxian-Root"
 clarinet_version = "3.12.0"
-epoch = "2.5"
+epoch = "3.0"
 
 [simnet]
 mnemonic = "cute bird surprise boring old news cake design aisle helmet choose tree"
@@ -217,6 +217,7 @@ depends_on = ["sip-standards", "revenue-distributor"]
 
 [contracts.mev-protector]
 path = "contracts/security/mev-protector.clar"
+depends_on = ["encoding"]
 
 [contracts.swap-router]
 path = "contracts/dex/swap-router.clar"
