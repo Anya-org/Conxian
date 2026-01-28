@@ -41,14 +41,13 @@ The trait system is modular, specific, and designed to prevent circular dependen
 
 ## 6. PRD.md "Recovery Registry"
 
-**Conclusion:** The `PRD.md` accurately identifies several contracts as being drafts or stubs.
+**Conclusion:** The `PRD.md` has been updated to reflect that many core modules are now consolidated and functional.
 
-The following contracts are listed in the "Recovery Registry" and are confirmed to be non-functional or incomplete:
+The following contracts, previously listed as drafts, have been consolidated into the "Full Truth" codebase:
 
-* `contracts/drafts/federated-oracle-adapter.clar`
-* `contracts/drafts/interest-rate-model.clar`
-* `contracts/drafts/lending-manager.clar`
-* `contracts/drafts/regulatory-adapter.clar`
+* `contracts/oracle/federated-oracle-adapter.clar`
+* `contracts/lending/lending-manager.clar`
+* `contracts/compliance/regulatory-adapter.clar`
 
 This transparency is commendable and provides a clear roadmap for future development.
 

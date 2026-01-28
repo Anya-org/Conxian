@@ -57,7 +57,17 @@ Conxian implements a **Dual-Council Governance Model**:
 - **Voting**: Periodic (Annual General Meeting - AGM), high quorum required, long duration.
 - **AGM Interval**: Codified at ~1 year (52,560 burn blocks).
 
-## 5. Security & Risk Management
+## 5. Token System Use Cases
+
+The protocol utilizes a 5-token system aligned with specialized councils:
+
+- **CXD (Governance/Revenue)**: The primary dividend token. Receives 60% of protocol revenue. Used for staking and protocol-wide governance.
+- **CXVG (Voting/Strategic)**: Used by the Strategic Council (Board) for AGM voting. Implements "Clean-Hands" compliance.
+- **CXS (Staking/Yield)**: Specialized for Staking & Yield Curve parameter voting. Implemented via `yield-governance.clar`.
+- **CXTR (Treasury/Capital)**: Specialized for Treasury & Capital Allocation voting. Implemented via `treasury-governance.clar`.
+- **CXLP (Liquidity/Gauges)**: Specialized for Liquidity & AMM Weighting. Implemented via `gauge-manager.clar`.
+
+## 6. Security & Risk Management
 
 - **Dimensional Risk**: Maintenance Margin scales quadratically with leverage: $MM = MM_{base} + Leverage^2$.
 - **MEV Protection**: Commit-Reveal scheme enforced for all DEX operations to prevent frontrunning.
@@ -70,9 +80,9 @@ Conxian implements a **Dual-Council Governance Model**:
 - **Foundation Consolidation**: Reduced trait redundancy and implemented modular math libraries.
 - **Core stabilization**: Repaired logic and naming in `admin-facade`, `conxian-protocol`, and `risk-manager`.
 - **Fiscal Policy**: Completed `revenue-distributor` and `allocation-policy` with 60/20/20 enforcement.
-- **Hybrid Governance**: Refined `voting` and `proposal-engine` to support Staff vs Board councils.
+- **Hybrid Governance**: Refined `proposal-engine` (Staff) and `community-voting-engine` (Board) to support Dual-Council governance.
 - **Nakamoto Transition**: Verified `burn-block-height` usage across all temporal logic.
-- **Service Module Repair**: Consolidated DEX, Lending, and Token modules. Removed all `v2`/`v3` versioning suffixes.
+- **Service Module Repair**: Consolidated DEX, Lending, and Token modules.
 
 ### Resolved Issues
 

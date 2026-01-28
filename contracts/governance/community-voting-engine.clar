@@ -15,8 +15,8 @@
 (define-constant ERR_NON_COMPLIANT (err u2001))
 
 ;; Data Vars
-(define-data-var voting-delay uint u144) ;; ~1 day (144 blocks @ 10m, but 5s -> 17280)
-(define-data-var voting-period uint u51840) ;; ~3 days
+(define-data-var voting-delay uint u144) ;; ~1 day (144 blocks @ 10m)
+(define-data-var voting-period uint u52560) ;; ~1 year (AGM Interval)
 
 ;; Data Maps
 (define-map proposals
