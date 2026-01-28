@@ -141,7 +141,7 @@
 )
 
 (define-read-only (get-funding-rate (period uint))
-  (ok (var-get current-interest-rate))
+  (ok (* (var-get current-interest-rate) period))
 )
 
 (define-read-only (get-current-collateral-factor)

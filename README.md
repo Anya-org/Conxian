@@ -31,6 +31,19 @@ Conxian is not a financial service provider; it is an autonomous digital organis
 - **Vaults**: sBTC integration, yield aggregation, custody solutions
 - **Tokens**: CXD (governance), CXS (staking), CXTR (treasury), CXLP (liquidity), DRT (position NFT)
 
+**Enterprise and Yield Features:**
+
+- `enterprise-api.clar`: Provides tiered institutional accounts, advanced order types, and compliance integration.
+- `compliance-hooks.clar`: Offers hooks for KYC/AML checks and other compliance-related functions.
+- `yield-optimizer.clar`: Analyzes strategies and rebalances funds for optimal APY, with performance tracking and auto-compounding capabilities.
+- `auto-compounder.clar`: Automates yield compounding for connected vaults.
+
+**Performance and Compatibility:**
+
+- `performance-optimizer.clar`: Monitors and optimizes gas usage and transaction throughput.
+- `legacy-adapter.clar`: Provides a backward-compatible interface to legacy contracts during migration.
+- `migration-manager.clar`: Manages data migration from legacy contracts to the enhanced system.
+
 **SAXAAP Business Model:**
 
 - **Revenue Generation**: Subscription fees (1 STX), transaction fees, service charges
@@ -63,7 +76,7 @@ Conxian is not a financial service provider; it is an autonomous digital organis
 
 ## Repository Structure
 
-```
+```text
 /contracts/
 ├── traits/           # All trait definitions (centralized)
 ├── core/             # Dimensional engine, risk management

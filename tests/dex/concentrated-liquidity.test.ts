@@ -42,7 +42,7 @@ describe("Concentrated Liquidity System", () => {
     });
   });
 
-  describe("DEX Factory V2", () => {
+  describe("DEX Factory", () => {
     it("should register a new pool", () => {
         const poolType = 3; // Concentrated
         const tokenA = `${deployer}.token-a`;
@@ -50,7 +50,7 @@ describe("Concentrated Liquidity System", () => {
         const poolContract = `${deployer}.concentrated-pool-1`;
 
         const result = simnet.callPublicFn(
-            "dex-factory-v2",
+            "dex-factory",
             "register-pool",
             [Cl.principal(tokenA), Cl.principal(tokenB), Cl.uint(poolType), Cl.principal(poolContract)],
             deployer

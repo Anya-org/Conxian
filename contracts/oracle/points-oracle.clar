@@ -439,7 +439,7 @@
       none (ok u0)
     )
   )
-)
+
 
 (define-read-only (get-confidence (feed-id (string-ascii 32)))
   ;; Return tier as confidence

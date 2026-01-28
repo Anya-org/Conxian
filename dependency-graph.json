@@ -94,7 +94,7 @@
   "dimensional-oracle": [
     "defi-traits"
   ],
-  "oracle-aggregator-v2": [
+  "oracle-aggregator": [
     "defi-traits",
     "switchboard-oracle-adapter",
     "redstone-oracle-adapter",

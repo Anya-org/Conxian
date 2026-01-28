@@ -200,10 +200,7 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/dex/memory-pool-management.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.dex-factory-v2]
-path = "contracts/dex/dex-factory-v2.clar"
-address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-clarity-version = 2
+
 
 [contracts.nft-marketplace]
 path = "contracts/marketplace/nft-marketplace.clar"
@@ -429,6 +426,10 @@ address = "STX5A6B7C8D9E0F1G2H3I4J5K6L7M8N9O0P1Q2R3S4T5"
 path = "contracts/traits/oracle-pricing.clar"
 address = "STV1W2X3Y4Z5A6B7C8D9E0F1G2H3I4J5K6L7M8N9O0"
 
+[contracts.conxian-protocol]
+path = "contracts/core/conxian-protocol.clar"
+address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
+
 [contracts.conxian-service-trait]
 path = "contracts/traits/conxian-service-trait.clar"
 address = "STU2X3Y4Z5A6B7C8D9E0F1G2H3I4J5K6L7M8N9O0P1Q2"
@@ -597,8 +598,8 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/governance/voting.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.dimensional-oracle]
-path = "contracts/oracle/dimensional-oracle.clar"
+[contracts.oracle-aggregator]
+path = "contracts/oracle/oracle-aggregator.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 [contracts.block-utils]

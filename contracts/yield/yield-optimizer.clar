@@ -20,6 +20,14 @@
     }
 )
 
+(define-map strategy-performance
+    { strategy: principal, block: uint }
+    {
+        apy: uint,
+        tvl: uint
+    }
+)
+
 (define-data-var max-risk-tolerance uint u50)
 
 ;; @desc Registers or updates a strategy
@@ -30,6 +38,17 @@
             active: true,
             risk-score: risk-score,
             estimated-apy: apy
+        })
+        (ok true)
+    )
+)
+
+(define-public (record-performance (strategy principal) (apy uint) (tvl uint))
+    (begin
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+        (map-set strategy-performance { strategy: strategy, block: block-height } {
+            apy: apy,
+            tvl: tvl
         })
         (ok true)
     )
@@ -48,6 +67,25 @@
         (try! (contract-call? vault-from withdraw amount tx-sender))
         (try! (contract-call? vault-to deposit amount tx-sender))
         (ok true)
+    )
+)
+
+(define-public (compound-rewards (strategies-list (list 10 principal)))
+    (begin
+        (map compound-strategy strategies-list)
+        (ok true)
+    )
+)
+
+(define-private (compound-strategy (strategy principal))
+    (let
+        (
+            (strat-data (unwrap! (map-get? strategies strategy) ERR_STRATEGY_NOT_FOUND))
+        )
+        (if (get active strat-data)
+            (as-contract (contract-call? .auto-compounder compound strategy))
+            (ok false)
+        )
     )
 )
 

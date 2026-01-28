@@ -24,32 +24,44 @@
 
 ;; Configuration
 (define-data-var deviation-threshold uint u500) ;; 5% deviation allowed (basis points)
+(define-data-var circuit-breaker (optional principal) none)
+(define-data-var block-utils principal .block-utils)
+
+(define-private (check-circuit-breaker)
+    (match (var-get circuit-breaker)
+        cb (contract-call? cb is-circuit-open)
+        (ok false)
+    )
+)
 
 ;; @desc Routes price request based on Intent (DEX vs Lending)
 (define-public (get-price-by-intent
         (asset principal)
         (intent (string-ascii 20))
     )
-    (let
-        (
-            (price-result (if (is-eq intent "DEX")
-                ;; Use Pyth for Efficiency
-                (contract-call? .pyth-oracle-adapter get-price asset)
-                (if (is-eq intent "LENDING")
-                    ;; Use RedStone for Consistency
-                    (contract-call? .redstone-oracle-adapter get-price asset)
-                    ;; Fallback to Pyth
+    (begin
+        (if (try! (check-circuit-breaker)) (err ERR_CIRCUIT_OPEN) (ok true))
+        (let
+            (
+                (price-result (if (is-eq intent "DEX")
+                    ;; Use Pyth for Efficiency
                     (contract-call? .pyth-oracle-adapter get-price asset)
-                )
-            ))
-        )
-        ;; Perform manipulation check before returning
-        (match price-result
-            price (begin
-                (try! (check-manipulation asset price))
-                (ok price)
+                    (if (is-eq intent "LENDING")
+                        ;; Use RedStone for Consistency
+                        (contract-call? .redstone-oracle-adapter get-price asset)
+                        ;; Fallback to Pyth
+                        (contract-call? .pyth-oracle-adapter get-price asset)
+                    )
+                ))
             )
-            error (err error)
+            ;; Perform manipulation check before returning
+            (match price-result
+                price (begin
+                    (try! (check-manipulation asset price))
+                    (ok price)
+                )
+                error (err error)
+            )
         )
     )
 )
@@ -60,7 +72,7 @@
         (ok {
             alert: alert-status,
             ready-to-trade: (< (get level alert-status) u2),
-            tenure: (contract-call? .block-utils get-current-tenure-id),
+            tenure:(tenure: (contract-call? (var-get block-utils) get-current-tenure-id),
         })
     )
 )
@@ -77,26 +89,40 @@
 
 ;; Internal Security Functions
 
+(define-map asset-volatility
+    principal
+    {
+        mean: uint,
+        std-dev: uint
+    }
+)
+
+(define-private (update-volatility (asset principal) (price uint))
+    (let
+        (
+            (vol (default-to { mean: u0, std-dev: u0 } (map-get? asset-volatility asset)))
+            (mean (get mean vol))
+            (std-dev (get std-dev vol))
+            ;; Simplified volatility update
+            (new-mean (/ (+ mean price) u2))
+            (new-std-dev (/ (+ std-dev (abs (- price new-mean))) u2))
+        )
+        (map-set asset-volatility asset { mean: new-mean, std-dev: new-std-dev })
+        (ok true)
+    )
+)
+
 (define-private (check-manipulation (asset principal) (current-price uint))
     (let
         (
-            (last-block (default-to u0 (map-get? last-updated asset)))
-            (history-price (if (> last-block u0)
-                (get-twap asset last-block block-height)
-                (ok current-price) ;; First observation, trust it
-            ))
+            (vol (default-to { mean: current-price, std-dev: u0 } (map-get? asset-volatility asset)))
+            (mean (get mean vol))
+            (std-dev (get std-dev vol))
+            (deviation-threshold (* std-dev u3)) ;; 3 standard deviations
         )
-        ;; Update history for next time
-        (map-set price-cumulative-history { asset: asset, block: block-height } current-price) ;; Simplified storage
-        (map-set last-updated asset block-height)
-        
-        (match history-price
-            safe-price (if (is-deviation-safe current-price safe-price)
-                (ok true)
-                ERR_PRICE_DEVIATION
-            )
-            error (err (to-uint error))
-        )
+        (try! (update-volatility asset current-price))
+        (asserts! (< (abs (- current-price mean)) deviation-threshold) ERR_PRICE_DEVIATION)
+        (ok true)
     )
 )
 

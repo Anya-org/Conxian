@@ -25,6 +25,14 @@
   uint
 )
 
+(define-map auction-bids
+    { block: uint, user: principal }
+    {
+        payload: (buff 128),
+        bid: uint
+    }
+)
+
 (define-constant COMMIT_WINDOW u10) ;; Blocks within which reveal must happen
 
 ;; @desc Commits a hash of the intended transaction
@@ -64,8 +72,38 @@
 
     ;; Clear commit to prevent replay
     (map-delete commits tx-sender)
-    (ok true)
+    (ok payload)
   )
+)
+
+(define-public (submit-bid (payload (buff 128)) (bid uint))
+    (begin
+        (asserts! (is-revealed tx-sender) ERR_COMMIT_NOT_FOUND)
+        (map-set auction-bids { block: block-height, user: tx-sender } {
+            payload: payload,
+            bid: bid
+        })
+        (ok true)
+    )
+)
+
+(define-public (process-auction (block uint))
+    (let
+        (
+            ;; In a real implementation, this would iterate through all bids for the block
+            ;; and select the winners based on the auction rules.
+            ;; For simplicity, we'll just process the first bid we find.
+            (bids (map-get? auction-bids { block: block, user: tx-sender }))
+        )
+        (match bids
+            bid (begin
+                ;; Execute the transaction payload
+                ;; (as-contract (contract-call? ... (get payload bid)))
+                (ok true)
+            )
+            (err ERR_COMMIT_NOT_FOUND)
+        )
+    )
 )
 
 ;; @desc Checks if the user has revealed a valid commitment in the current block

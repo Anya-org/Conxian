@@ -1,13 +1,13 @@
-;; Oracle Aggregator v2 - Weighted sources with TWAP and manipulation detection (minimal implementation)
+;; Oracle Aggregator - Weighted sources with TWAP and manipulation detection (minimal implementation)
 
 (use-trait oracle-trait .oracle-pricing.oracle-trait)
 (use-trait err-trait .trait-errors.standard-errors)
 (use-trait math-trait .math-utilities.math-trait)
 
-(define-constant ERR_UNAUTHORIZED (err-trait err-unauthorized))
-(define-constant ERR_ASSET_NOT_FOUND (err-trait err-asset-not-found))
-(define-constant ERR_CIRCUIT_OPEN (err-trait err-circuit-open))
-(define-constant ERR_INVALID_PRICE (err-trait err-invalid-price))
+(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_ASSET_NOT_FOUND (err u1001))
+(define-constant ERR_CIRCUIT_OPEN (err u1002))
+(define-constant ERR_INVALID_PRICE (err u1003))
 (define-constant BPS u10000)
 (define-constant MIN_PRICE u100)  ;; $0.0000000000000001 (1e-16)
 (define-constant MAX_PRICE (* u1000000000000000000 u1000000))  ;; $1M with 18 decimals

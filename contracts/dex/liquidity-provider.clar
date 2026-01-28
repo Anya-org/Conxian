@@ -73,7 +73,7 @@
     ;; Validate inputs
     (asserts! (> amount u0) ERR_ZERO_AMOUNT)
     (asserts! (>= amount MIN_LIQUIDITY) ERR_INSUFFICIENT_BALANCE)
-    (asserts! (contract-call? (var-get dex-facade-contract) pool-exists pool) ERR_INVALID_POOL)
+    (asserts! (contract-call? .dex-facade pool-exists pool) ERR_INVALID_POOL)
     
     ;; Check if provider already has position
     (let ((existing-position (get-liquidity-position pool tx-sender))
@@ -103,17 +103,17 @@
         
         ;; Update provider stats
         (map-set provider-stats { provider: tx-sender } {
-          total-liquidity: (+ (if (is-some (get-provider-stats tx-sender)) 
-                                  (get total-liquidity (unwrap! (get-provider-stats tx-sender) { total-liquidity: u0, total-rewards: u0, pool-count: u0, first-provision: u0 }))
+          total-liquidity: (+ (if (is-some (map-get? provider-stats { provider: tx-sender }))
+                                  (get total-liquidity (unwrap! (map-get? provider-stats { provider: tx-sender }) { total-liquidity: u0, total-rewards: u0, pool-count: u0, first-provision: u0 }))
                                   u0) amount),
-          total-rewards: (if (is-some (get-provider-stats tx-sender)) 
-                           (get total-rewards (unwrap! (get-provider-stats tx-sender) { total-liquidity: u0, total-rewards: u0, pool-count: u0, first-provision: u0 }))
+          total-rewards: (if (is-some (map-get? provider-stats { provider: tx-sender }))
+                           (get total-rewards (unwrap! (map-get? provider-stats { provider: tx-sender }) { total-liquidity: u0, total-rewards: u0, pool-count: u0, first-provision: u0 }))
                            u0),
-          pool-count: (+ (if (is-some (get-provider-stats tx-sender)) 
-                           (get pool-count (unwrap! (get-provider-stats tx-sender) { total-liquidity: u0, total-rewards: u0, pool-count: u0, first-provision: u0 }))
+          pool-count: (+ (if (is-some (map-get? provider-stats { provider: tx-sender }))
+                           (get pool-count (unwrap! (map-get? provider-stats { provider: tx-sender }) { total-liquidity: u0, total-rewards: u0, pool-count: u0, first-provision: u0 }))
                            u0) u1),
-          first-provision: (if (is-some (get-provider-stats tx-sender)) 
-                             (get first-provision (unwrap! (get-provider-stats tx-sender) { total-liquidity: u0, total-rewards: u0, pool-count: u0, first-provision: u0 }))
+          first-provision: (if (is-some (map-get? provider-stats { provider: tx-sender }))
+                             (get first-provision (unwrap! (map-get? provider-stats { provider: tx-sender }) { total-liquidity: u0, total-rewards: u0, pool-count: u0, first-provision: u0 }))
                              block-height)
         })
         
@@ -133,7 +133,7 @@
   (begin
     ;; Validate inputs
     (asserts! (> amount u0) ERR_ZERO_AMOUNT)
-    (asserts! (contract-call? .dex-facade pool-exists pool) ERR_INVALID_POOL)
+    (asserts! (contract-call? (var-get dex-facade-contract) pool-exists pool) ERR_INVALID_POOL)
     
     ;; Check if provider has position
     (let ((position (get-liquidity-position pool tx-sender)))
@@ -178,7 +178,7 @@
 (define-public (claim-rewards (pool principal))
   (begin
     ;; Validate pool exists
-    (asserts! (contract-call? .dex-facade pool-exists pool) ERR_INVALID_POOL)
+    (asserts! (contract-call? (var-get dex-facade-contract) pool-exists pool) ERR_INVALID_POOL)
     
     ;; Check if provider has position
     (let ((position (get-liquidity-position pool tx-sender)))
@@ -273,7 +273,7 @@
 (define-public (set-liquidity-provider-active (active bool))
   (begin
     ;; Only admin can change this
-    (asserts! (is-eq tx-sender (unwrap-panic (contract-call? .conxian-protocol get-admin))) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (unwrap-panic (contract-call? (var-get dex-facade-contract) get-admin))) ERR_UNAUTHORIZED)
     (var-set liquidity-provider-active active)
     (ok true)
   )

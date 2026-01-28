@@ -23,6 +23,7 @@
 (define-data-var optimization-engine-active bool true)
 (define-data-var optimization-frequency uint u100) ;; Every 100 blocks
 (define-data-var dex-facade-contract principal .dex-facade)
+(define-data-var conxian-protocol principal .conxian-protocol)
 
 ;; Storage maps
 (define-map pool-optimization-data
@@ -140,7 +141,7 @@
     )
     (begin
         ;; Verify pool exists
-        (asserts! (contract-call? (var-get dex-facade-contract) pool-exists pool) ERR_INVALID_POOL)
+        (asserts! (contract-call? .dex-facade pool-exists pool) ERR_INVALID_POOL)
 
         ;; Validate fee tier
         (asserts! (and (>= new-fee-tier u0) (<= new-fee-tier u10000))
@@ -195,7 +196,7 @@
         ;; Only admin can change this
         (asserts!
             (is-eq tx-sender
-                (unwrap-panic (contract-call? .conxian-protocol get-admin))
+                (unwrap-panic (contract-call? (var-get conxian-protocol) get-admin))
             )
             ERR_UNAUTHORIZED
         )

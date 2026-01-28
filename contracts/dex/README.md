@@ -1,10 +1,10 @@
 ---
 layout: default
-title: DEX Module
+title: Module Dex
 permalink: /modules/dex/
 ---
 
-# DEX Module
+# Module: DEX
 
 ## Overview
 
@@ -28,23 +28,23 @@ graph TD
 
 ### Execution Facade
 
--   **`multi-hop-router-v3.clar`**: The **facade** for trade execution. It provides an interface for performing swaps across multiple liquidity pools in a single atomic transaction.
+- **`multi-hop-router-v3.clar`**: The **facade** for trade execution. It provides an interface for performing swaps across multiple liquidity pools in a single atomic transaction.
 
 ### Pool Implementation
 
--   **`concentrated-liquidity-pool.clar`**: The primary AMM for volatile asset pairs, allowing for greater capital efficiency by enabling liquidity providers to concentrate their capital within specific price ranges.
--   **`stable-swap-pool.clar`**: An AMM optimized for stablecoin swaps, using a different curve to minimize slippage.
--   **`weighted-swap-pool.clar`**: An AMM that allows for pools with more than two assets and custom weightings.
+- **`concentrated-liquidity-pool.clar`**: The primary AMM for volatile asset pairs. It allows liquidity providers to concentrate their capital within specific price ranges, providing greater capital efficiency. Key features include tick-based liquidity management and position NFTs.
+- **`stable-swap-pool.clar`**: An AMM optimized for stablecoin swaps, using a different curve to minimize slippage.
+- **`weighted-swap-pool.clar`**: An AMM that allows for pools with more than two assets and custom weightings.
 
 ### Factories and Registries
 
--   **`dex-factory-v2.clar`**: A factory contract for creating new liquidity pools.
--   **`pool-registry.clar`**: A registry of all active liquidity pools.
+- **`dex-factory.clar`**: A factory contract for creating new liquidity pools. It features a pool type registry that allows for the creation of different types of pools, including concentrated liquidity, stable swap, and weighted pools.
+- **`pool-registry.clar`**: A registry of all active liquidity pools.
 
-## Public Functions (`multi-hop-router-v3.clar`)
+## Public Functions (`multi-hop-router.clar`)
 
--   `swap-exact-tokens-for-tokens(amount-in uint, amount-out-min uint, pools (list 4 <swap-pool-trait>), tokens (list 5 <sip-010-trait>))`: Executes a multi-hop swap for an exact input amount.
+- `swap-exact-tokens-for-tokens(amount-in uint, amount-out-min uint, token-in principal, token-out principal)`: Executes a multi-hop swap for an exact input amount. It uses Dijkstra's algorithm to find the optimal path across all available pools.
 
 ## Status
 
-**Under Review**: The contracts in this module are currently undergoing a comprehensive review. While the core swapping functionality in `multi-hop-router-v3.clar` is stable, the surrounding factory and registry contracts are being refined to ensure full alignment with the protocol's modular architecture. These contracts are not yet considered production-ready.
+**Under Review**: The contracts in this module are currently undergoing a comprehensive review. While the core swapping functionality in `multi-hop-router.clar` is stable, the surrounding factory and registry contracts are being refined to ensure full alignment with the protocol's modular architecture. These contracts are not yet considered production-ready.
