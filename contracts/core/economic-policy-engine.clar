@@ -7,9 +7,10 @@
 (impl-trait .core-traits.funding-rate-trait)
 
 ;; Constants - Gas Free (compile-time)
-(define-constant BASE_RATE u1000) ;; 0.1% base rate (scaled 10000)
-(define-constant UTILIZATION_THRESHOLD u8000) ;; 80% threshold
-(define-constant RATE_MULTIPLIER u15000) ;; 1.5x multiplier
+(define-constant BASE_RATE u100) ;; 1% base rate (scaled 10000)
+(define-constant UTILIZATION_KINK u8000) ;; 80% threshold
+(define-constant SLOPE_1 u400) ;; 4% slope 1
+(define-constant SLOPE_2 u6000) ;; 60% slope 2
 (define-constant MIN_COLLATERAL_FACTOR u5000) ;; 50% min
 (define-constant MAX_COLLATERAL_FACTOR u9500) ;; 95% max
 (define-constant PRICE_STALE_BLOCKS u100) ;; 5 minutes @ 3s blocks
@@ -23,7 +24,7 @@
 (define-data-var current-interest-rate uint BASE_RATE)
 (define-data-var collateral-factor uint MIN_COLLATERAL_FACTOR)
 (define-data-var last-price-update uint block-height)
-(define-data-var treasury-address principal tx-sender)
+(define-data-var revenue-distributor principal .revenue-distributor)
 
 ;; Subscription State
 (define-map subscribers principal bool)
@@ -55,10 +56,12 @@
 )
 
 (define-private (calculate-interest-rate (utilization uint))
-  ;; Deterministic formula - no external calls
-  (if (>= utilization UTILIZATION_THRESHOLD)
-    (* BASE_RATE RATE_MULTIPLIER)
-    BASE_RATE
+  ;; Kinked Curve Interest Rate Model (Aave V3 style)
+  (if (<= utilization UTILIZATION_KINK)
+    ;; Pre-kink: R = R0 + (U / U_kink) * Slope1
+    (+ BASE_RATE (/ (* utilization SLOPE_1) UTILIZATION_KINK))
+    ;; Post-kink: R = R0 + Slope1 + ((U - U_kink) / (1 - U_kink)) * Slope2
+    (+ (+ BASE_RATE SLOPE_1) (/ (* (- utilization UTILIZATION_KINK) SLOPE_2) (- u10000 UTILIZATION_KINK)))
   )
 )
 
@@ -167,8 +170,11 @@
 ;; Subscription Management
 (define-public (subscribe)
   (begin
-    ;; Payment to treasury
-    (try! (stx-transfer? SUBSCRIPTION_COST tx-sender (var-get treasury-address)))
+    ;; Payment to Revenue Distributor
+    (try! (stx-transfer? SUBSCRIPTION_COST tx-sender (var-get revenue-distributor)))
+
+    ;; Trigger Distribution (60/20/20 split)
+    (try! (contract-call? .revenue-distributor distribute-stx SUBSCRIPTION_COST))
     
     ;; Grant subscription
     (map-set subscribers tx-sender true)

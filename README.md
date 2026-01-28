@@ -27,14 +27,14 @@ Conxian is not a financial service provider; it is an autonomous digital organis
 **Core DeFi Primitives:**
 
 - **DEX**: Concentrated liquidity, multi-hop routing, batch auctions
-- **Lending**: Automated money markets with real-time risk adjustment
+- **Lending**: Automated money markets with Kinked-Curve Interest Rate Models
 - **Vaults**: sBTC integration, yield aggregation, custody solutions
-- **Tokens**: CXD (governance), CXS (staking), CXTR (treasury), CXLP (liquidity)
+- **Tokens**: CXD (governance), CXS (staking), CXTR (treasury), CXLP (liquidity), DRT (position NFT)
 
 **SAXAAP Business Model:**
 
 - **Revenue Generation**: Subscription fees (1 STX), transaction fees, service charges
-- **Revenue Distribution**: Autonomous 60/20/20 split (Staking/Dev/Insurance)
+- **Revenue Distribution**: Autonomous 60/20/20 split (Staking/Dev/Insurance) via `revenue-distributor`
 - **Multi-Council Governance**: 5 specialized automated seats
 - **Office Workers**: Autonomous liquidations and treasury operations
 

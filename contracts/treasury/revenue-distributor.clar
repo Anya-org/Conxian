@@ -35,6 +35,29 @@
     )
 )
 
+(define-public (distribute-stx (amount uint))
+    (let (
+        (policy (unwrap-panic (contract-call? .allocation-policy get-allocation-percentages)))
+        (staking-amt (/ (* amount (get staking policy)) u10000))
+        (dev-amt (/ (* amount (get dev policy)) u10000))
+        (ins-amt (/ (* amount (get insurance policy)) u10000))
+    )
+        ;; Execute actual transfers
+        (try! (as-contract (stx-transfer? staking-amt tx-sender (var-get staking-vault))))
+        (try! (as-contract (stx-transfer? dev-amt tx-sender (var-get dev-treasury))))
+        (try! (as-contract (stx-transfer? ins-amt tx-sender (var-get insurance-vault))))
+
+        (print {
+            event: "stx-revenue-distributed",
+            amount: amount,
+            staking: staking-amt,
+            dev: dev-amt,
+            insurance: ins-amt
+        })
+        (ok true)
+    )
+)
+
 ;; Admin Functions
 (define-public (set-staking-vault (vault principal))
     (ok (var-set staking-vault vault))

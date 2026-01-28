@@ -175,7 +175,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.points-oracle]
 path = "contracts/oracle/points-oracle.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-protocol",]
 
 [contracts.oracle-adapter-stub]
 path = "contracts/oracle/oracle-adapter-stub.clar"
@@ -188,7 +187,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.compliance-manager]
 path = "contracts/compliance/compliance-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "block-utils",]
 
 [contracts.compliance-trait]
 path = "contracts/compliance/compliance-trait.clar"
@@ -229,7 +227,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.liquidity-provider]
 path = "contracts/dex/liquidity-provider.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-protocol",]
 
 [contracts.real-time-monitoring-dashboard]
 path = "contracts/dex/real-time-monitoring-dashboard.clar"
@@ -270,7 +267,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.dex-factory]
 path = "contracts/dex/dex-factory.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "concentrated-liquidity-pool",]
 
 [contracts.protocol-invariant-monitor]
 path = "contracts/dex/protocol-invariant-monitor.clar"
@@ -279,22 +275,18 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.swap-manager]
 path = "contracts/dex/swap-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-protocol",]
 
 [contracts.vault]
 path = "contracts/dex/vault.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-protocol",]
 
 [contracts.liquidity-optimization-engine]
 path = "contracts/dex/liquidity-optimization-engine.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-protocol",]
 
 [contracts.pool-template]
 path = "contracts/dex/pool-template.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-protocol",]
 
 [contracts.factory-trait]
 path = "contracts/dex/factory-trait.clar"
@@ -315,7 +307,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.memory-pool-management]
 path = "contracts/dex/memory-pool-management.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-protocol",]
 
 [contracts.dex-factory-v2]
 path = "contracts/dex/dex-factory-v2.clar"
@@ -609,7 +600,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.upgrade-controller]
 path = "contracts/governance/upgrade-controller.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "governance",]
 
 [contracts.lending-protocol-governance]
 path = "contracts/governance/lending-protocol-governance.clar"
@@ -670,7 +660,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.enterprise-compliance-manager]
 path = "contracts/compliance/compliance-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "block-utils",]
 
 [contracts.position-factory]
 path = "contracts/position-factory.clar"
@@ -683,12 +672,10 @@ address = "STX5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T1U2V3W4X5Y6"
 [contracts.token-emission-controller]
 path = "contracts/yield/token-emission-controller.clar"
 address = "STA0H1I2J3K4L5M6N7O8P9Q0R1S2T3U4V5W6X7Y8Z9A0"
-depends_on = [ "token-system-coordinator",]
 
 [contracts.bond-factory]
 path = "contracts/bonding/bond-factory.clar"
 address = "ST1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2"
-depends_on = [ "regulatory-adapter",]
 
 [contracts.reputation-engine]
 path = "contracts/governance/reputation-engine.clar"
@@ -705,27 +692,22 @@ address = "STG2V3W4X5Y6Z7A8B9C0D1E2F3G4H5I6J7K8L9M0N1O2P3"
 [contracts.position-manager]
 path = "contracts/core/position-manager.clar"
 address = "STY5Z6A7B8C9D0E1F2G3H4I5J6K7L8M9N0P1Q2R3S4T5U6"
-depends_on = [ "dimensional-engine",]
 
 [contracts.circuit-breaker]
 path = "contracts/security/circuit-breaker.clar"
 address = "STH3W4X5Y6Z7A8B9C0D1E2F3G4H5I6J7K8L9M0N1O2P3Q4"
-depends_on = [ "rbac",]
 
 [contracts.kyc-registry]
 path = "contracts/identity/kyc-registry.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "block-utils",]
 
 [contracts.analytics-aggregator]
 path = "contracts/monitoring/analytics-aggregator.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "block-utils",]
 
 [contracts.voting]
 path = "contracts/governance/voting.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "block-utils", "rbac",]
 
 [contracts.dimensional-oracle]
 path = "contracts/oracle/dimensional-oracle.clar"
@@ -738,12 +720,10 @@ clarity-version = 2
 [contracts.dimensional-core]
 path = "contracts/dimensional/dimensional-core.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "block-utils", "pausable",]
 
 [contracts.community-governance-token]
 path = "contracts/governance/community-governance-token.clar"
 address = "ST6D7E8F9G0H1I2J3K4L5M6N7O8P9Q0R1S2T3U4V5W6"
-depends_on = [ "regulatory-adapter",]
 
 [contracts.auto-compounder]
 path = "contracts/yield/auto-compounder.clar"
@@ -756,17 +736,14 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.revenue-distributor]
 path = "contracts/treasury/revenue-distributor.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "allocation-policy",]
 
 [contracts.sbtc-vault]
 path = "contracts/vaults/sbtc-vault.clar"
 address = "STF5G6H7I8J9K0L1M2N3O4P5Q6R7S8T9U0V1W2X3Y4"
-depends_on = [ "regulatory-adapter",]
 
 [contracts.token-system-coordinator]
 path = "contracts/tokens/token-system-coordinator.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "regulatory-adapter",]
 
 [contracts.risk-management]
 path = "contracts/traits/risk-manager-trait.clar"
@@ -775,27 +752,22 @@ address = "STY6B7C8D9E0F1G2H3I4J5K6L7M8N9O0P1Q2R3S4T5U6"
 [contracts.risk-manager]
 path = "contracts/core/risk-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-access", "dimensional-engine",]
 
 [contracts.conxian-protocol]
 path = "contracts/core/conxian-protocol.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "block-utils", "regulatory-adapter", "admin-facade",]
 
 [contracts.opex-vault]
 path = "contracts/treasury/opex-vault.clar"
 address = "STG6V7W8X9Y0Z1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7"
-depends_on = [ "conxian-access", "nakamoto-constants", "regulatory-adapter",]
 
 [contracts.conxian-vaults]
 path = "contracts/treasury/conxian-vaults.clar"
 address = "STH7W8X9Y0Z1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8"
-depends_on = [ "conxian-access",]
 
 [contracts.dlc-manager]
 path = "contracts/sbtc/dlc-manager.clar"
 address = "STI8X9Y0Z1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9"
-depends_on = [ "conxian-access",]
 
 [contracts.proposal-registry]
 path = "contracts/governance/proposal-registry.clar"
@@ -804,12 +776,10 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.enhanced-governance-nft]
 path = "contracts/governance/enhanced-governance-nft.clar"
 address = "STD1L2M3N4O5P6Q7R8S9T1U2V3W4X5Y6Z8A9B0C1D2E3"
-depends_on = [ "conxian-access",]
 
 [contracts.timelock]
 path = "contracts/governance/timelock.clar"
 address = "STC2J3K4L5M6N7O8P9Q0R1S2T3U4V5W6X7Y8Z9A0B1C2"
-depends_on = [ "conxian-access",]
 
 [contracts.lending-manager]
 path = "contracts/lending/lending-manager.clar"
@@ -826,27 +796,22 @@ address = "STN6O7P8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D2E3F4G5H6"
 [contracts.community-dao]
 path = "contracts/governance/community-dao.clar"
 address = "ST7E8F9G0H1I2J3K4L5M6N7O8P9Q0R1S2T3U4V5W6X7"
-depends_on = [ "governance-token", "regulatory-adapter",]
 
 [contracts.redstone-oracle-adapter]
 path = "contracts/integrations/redstone-oracle-adapter.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "block-utils",]
 
 [contracts.revenue-router]
 path = "contracts/treasury/revenue-distributor.clar"
 address = "STK0Z1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1"
-depends_on = [ "allocation-policy",]
 
 [contracts.cxvg-token]
 path = "contracts/tokens/cxvg-token.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "regulatory-adapter",]
 
 [contracts.route-manager]
 path = "contracts/dex/route-manager.clar"
 address = "ST4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2V3W4X5"
-depends_on = [ "block-utils",]
 
 [contracts.concentrated-liquidity-pool]
 path = "contracts/dex/concentrated-liquidity-pool.clar"
@@ -855,7 +820,6 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.collateral-manager]
 path = "contracts/core/collateral-manager.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "block-utils", "conxian-protocol",]
 
 [contracts.switchboard-oracle-adapter]
 path = "contracts/integrations/switchboard-oracle-adapter.clar"
@@ -868,18 +832,15 @@ address = "STI6Q7R8S9T1U2V3W4X5Y6Z7A8B9C0D1E2F3G4H5I6J7"
 [contracts.founder-vault]
 path = "contracts/treasury/founder-vault.clar"
 address = "STI7P8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D1E2F3G4H5I6"
-depends_on = [ "nakamoto-constants", "conxian-protocol",]
 
 [contracts.agent-treasury]
 path = "contracts/agents/agent-treasury.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "office-manager",]
 
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 clarity-version = 2
-depends_on = [ "position-manager", "office-manager",]
 
 [contracts.proposal-executor]
 path = "contracts/governance/proposal-executor.clar"
@@ -888,17 +849,14 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.dimensional-engine]
 path = "contracts/core/dimensional-engine.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "collateral-manager", "conxian-protocol",]
 
 [contracts.governance-handover]
 path = "contracts/governance/governance-handover.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "conxian-access", "admin-facade",]
 
 [contracts.proposal-engine]
 path = "contracts/governance/proposal-engine.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "reputation-engine",]
 
 [contracts.conxian-operations-engine]
 path = "contracts/governance/conxian-operations-engine.clar"
@@ -907,7 +865,6 @@ address = "STI8J9K0L1M2N3O4P5Q6R7S8T9U0V1W2X3Y4Z5A6B7"
 [contracts.cxd-staking]
 path = "contracts/yield/cxd-staking.clar"
 address = "ST3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2V3W4"
-depends_on = [ "regulatory-adapter",]
 
 [contracts.operational-treasury]
 path = "contracts/core/operational-treasury.clar"
@@ -916,17 +873,14 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 [contracts.conxian-paas-factory]
 path = "contracts/core/conxian-paas-factory.clar"
 address = "STJ9K0L1M2N3O4P5Q6R7S8T9U0V1W2X3Y4Z5A6B7C8"
-depends_on = [ "regulatory-adapter",]
 
 [contracts.cxd-bonding-curve-amm]
 path = "contracts/bonding/cxd-bonding-curve-amm.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "cxd-token", "regulatory-adapter", "token-system-coordinator",]
 
 [contracts.admin-facade]
 path = "contracts/core/admin-facade.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
-depends_on = [ "rbac",]
 
 [contracts.swap-router]
 path = "contracts/dex/swap-router.clar"
