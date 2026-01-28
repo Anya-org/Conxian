@@ -13,7 +13,7 @@
 
 ;; Contracts
 (define-data-var conxian-protocol-contract principal .conxian-protocol)
-(define-data-var rbac-contract principal .rbac)
+(define-data-var rbac-contract principal .conxian-access)
 (define-data-var block-utils-contract principal .block-utils)
 
 ;; Map: User -> Token -> Amount
@@ -124,7 +124,7 @@
         (is-eq tx-sender
           (unwrap-panic (contract-call? .conxian-protocol get-admin))
         )
-        (contract-call? .rbac has-role tx-sender ROLE_PROTOCOL)
+        (contract-call? .conxian-access has-role tx-sender ROLE_PROTOCOL)
       )
       ERR_UNAUTHORIZED
     )

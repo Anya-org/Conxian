@@ -3,7 +3,7 @@
 ;; Enables 1000x TPS improvement through batching
 
 ;; Traits
-(use-trait rbac-trait .core-traits.rbac-trait)
+(use-trait rbac-trait .core-traits.conxian-access-trait)
 (use-trait admin-facade-trait .core-traits.admin-facade-trait)
 
 ;; Constants

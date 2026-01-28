@@ -2,7 +2,7 @@
 ;; "The Payroll" - Coordinates the Office Workers and their incentives.
 ;; Verifies registered workers and handles payment for completed jobs.
 
-(impl-trait .core-traits.rbac-trait)
+(impl-trait .core-traits.conxian-access-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))

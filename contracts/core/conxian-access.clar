@@ -2,7 +2,7 @@
 ;; Unified Role-Based Access Control (RBAC) Backend
 ;; Centralizes all permissioning for the Conxian Protocol
 
-(impl-trait .core-traits.rbac-trait)
+(impl-trait .core-traits.conxian-access-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))

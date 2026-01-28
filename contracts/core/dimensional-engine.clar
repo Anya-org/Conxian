@@ -15,6 +15,8 @@
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_CONTRACT_PAUSED (err u5000))
 (define-constant ERR_NON_COMPLIANT (err u5001))
+(define-constant ERR_MODULE_NOT_ACTIVE (err u5002))
+(define-constant ERR_MODULE_NOT_FOUND (err u5003))
 
 ;; Data Vars
 (define-data-var protocol-coordinator principal deployer)
@@ -24,18 +26,13 @@
 
 ;; --- Authorization ---
 
-;; @desc Checks if the transaction sender is the authorized protocol coordinator.
-;; @returns bool
 (define-private (is-authorized)
   (is-eq tx-sender (var-get protocol-coordinator))
 )
 
 ;; --- Internal Guards ---
 
-;; @desc Centralized entry guard for standard pre-flight checks.
-;; @param protocol-status: A tuple containing the protocol's pause and compliance status.
-;; @returns (response bool)
-(define-private (guard-entry (protocol-status { paused: bool, compliant: bool, tenure-id: (optional (buff 32)) }))
+(define-private (guard-entry (protocol-status { paused: bool, compliant: bool, tenure-id: (optional uint) }))
   (begin
     (asserts! (not (get paused protocol-status)) ERR_CONTRACT_PAUSED)
     (asserts! (get compliant protocol-status) ERR_NON_COMPLIANT)
@@ -45,9 +42,6 @@
 
 ;; --- Configuration ---
 
-;; @desc Sets the protocol coordinator address, which controls administrative functions.
-;; @param new-coordinator: The principal of the new protocol coordinator contract.
-;; @returns (response bool)
 (define-public (set-protocol-coordinator (new-coordinator principal))
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
@@ -58,19 +52,11 @@
 
 ;; --- Facade Functions: Position Management ---
 
-;; @desc Opens a new trading position by delegating to the position manager.
-;; @param token: The principal of the token being traded.
-;; @param amount: The amount of the token to use for the position.
-;; @param leverage: The leverage to apply to the position.
-;; @param long: A boolean indicating if the position is long (true) or short (false).
-;; @param slippage-limit: An optional slippage limit for the trade.
-;; @param metadata: Optional metadata for the position.
-;; @returns (response uint) The ID of the new position.
 (define-private (get-module-contract (name (string-ascii 32)))
   (let ((module-data (contract-call? .conxian-protocol get-module name)))
     (match module-data
       data (begin
-        (asserts! (get active data) (err u5002))
+        (asserts! (get active data) ERR_MODULE_NOT_ACTIVE)
         (ok (get contract data))
       )
       (err u5003)
@@ -79,6 +65,7 @@
 )
 
 (define-public (open-position
+    (position-manager <position-manager-trait>)
     (token principal)
     (amount uint)
     (leverage uint)
@@ -88,14 +75,12 @@
   )
   (begin
     (let (
-        ;; BOLT: Consolidated pause and compliance pre-flight checks into a single contract call.
-        (protocol-status (try! (contract-call? (var-get conxian-protocol-contract) get-protocol-status)))
-        (position-manager (try! (get-module-contract "position-manager")))
+        (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
+        (registered-manager (try! (get-module-contract "position-manager")))
       )
+      (asserts! (is-eq (contract-of position-manager) registered-manager) ERR_UNAUTHORIZED)
       (try! (guard-entry protocol-status))
-      (let ((result (contract-call? position-manager open-position tx-sender token amount
-          leverage long
-        )))
+      (let ((result (contract-call? position-manager open-position tx-sender token amount leverage long)))
         (print {
           event: "facade-open-position",
           sender: tx-sender,
@@ -107,22 +92,18 @@
   )
 )
 
-;; @desc Closes an existing trading position by delegating to the position manager.
-;; @param position-id: The ID of the position to close.
-;; @param token: The principal of the token being traded.
-;; @param slippage-limit: An optional slippage limit for the trade.
-;; @returns (response bool)
 (define-public (close-position
+    (position-manager <position-manager-trait>)
     (position-id uint)
     (token principal)
     (slippage-limit (optional uint))
   )
   (begin
     (let (
-        ;; BOLT: Consolidated pause and compliance pre-flight checks into a single contract call.
         (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
-        (position-manager (try! (get-module-contract "position-manager")))
+        (registered-manager (try! (get-module-contract "position-manager")))
       )
+      (asserts! (is-eq (contract-of position-manager) registered-manager) ERR_UNAUTHORIZED)
       (try! (guard-entry protocol-status))
       (contract-call? position-manager close-position tx-sender position-id)
     )
@@ -131,64 +112,61 @@
 
 ;; --- Facade Functions: Collateral Management ---
 
-;; @desc Deposits funds into the collateral manager.
-;; @param amount: The amount of tokens to deposit.
-;; @param token: The SIP-010 token contract to deposit.
-;; @returns (response bool)
 (define-public (deposit-funds
+    (collateral-manager <collateral-manager-trait>)
     (amount uint)
-    (token .sip-standards.sip-010-ft-trait)
+    (token-trait <sip-010-trait>)
   )
   (begin
     (let (
-        ;; BOLT: Consolidated pause and compliance pre-flight checks into a single contract call.
         (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
-        (collateral-manager (try! (get-module-contract "collateral-manager")))
+        (registered-manager (try! (get-module-contract "collateral-manager")))
       )
+      (asserts! (is-eq (contract-of collateral-manager) registered-manager) ERR_UNAUTHORIZED)
       (try! (guard-entry protocol-status))
-      (contract-call? collateral-manager deposit-funds amount token)
+      (contract-call? collateral-manager deposit-funds amount token-trait)
     )
   )
 )
 
-;; @desc Withdraws funds from the collateral manager.
-;; @param amount: The amount of tokens to withdraw.
-;; @param token: The SIP-010 token contract to withdraw.
-;; @returns (response bool)
 (define-public (withdraw-funds
+    (collateral-manager <collateral-manager-trait>)
     (amount uint)
-    (token .sip-standards.sip-010-ft-trait)
+    (token-trait <sip-010-trait>)
   )
   (begin
     (let (
-        ;; BOLT: Consolidated pause and compliance pre-flight checks into a single contract call.
         (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
-        (collateral-manager (try! (get-module-contract "collateral-manager")))
+        (registered-manager (try! (get-module-contract "collateral-manager")))
       )
+      (asserts! (is-eq (contract-of collateral-manager) registered-manager) ERR_UNAUTHORIZED)
       (try! (guard-entry protocol-status))
-      (contract-call? collateral-manager withdraw-funds amount token)
+      (contract-call? collateral-manager withdraw-funds amount token-trait)
     )
   )
 )
 
 ;; --- Facade Functions: Risk Management ---
 
-;; @desc Checks the health factor of a position by delegating to the risk manager.
-;; @param position-id: The ID of the position to check.
-;; @returns (response uint) The health factor of the position.
-(define-public (check-position-health (position-id uint))
-  (let ((risk-manager (try! (get-module-contract "risk-manager"))))
-    (contract-call? risk-manager get-health-factor position-id)
+(define-public (check-position-health
+    (risk-manager <risk-manager-trait>)
+    (position-id uint)
+  )
+  (begin
+    (let ((registered-manager (try! (get-module-contract "risk-manager"))))
+      (asserts! (is-eq (contract-of risk-manager) registered-manager) ERR_UNAUTHORIZED)
+      (contract-call? risk-manager get-health-factor position-id)
+    )
   )
 )
 
-;; @desc Liquidates an unhealthy position by delegating to the risk manager.
-;; @param position-id: The ID of the position to liquidate.
-;; @returns (response bool)
-(define-public (liquidate-position (position-id uint))
+(define-public (liquidate-position
+    (risk-manager <risk-manager-trait>)
+    (position-id uint)
+  )
   (begin
-    ;; BOLT: Removed call to non-existent `check-finality` function.
-    (let ((risk-manager (try! (get-module-contract "risk-manager"))))
+    (let ((registered-manager (try! (get-module-contract "risk-manager"))))
+      (asserts! (is-eq (contract-of risk-manager) registered-manager) ERR_UNAUTHORIZED)
       (contract-call? risk-manager liquidate position-id)
     )
   )

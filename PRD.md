@@ -81,6 +81,7 @@ The protocol utilizes a 5-token system aligned with specialized councils:
 - **Core stabilization**: Repaired logic and naming in `admin-facade`, `conxian-protocol`, and `risk-manager`.
 - **Fiscal Policy**: Completed `revenue-distributor` and `allocation-policy` with 60/20/20 enforcement.
 - **Hybrid Governance**: Refined `proposal-engine` (Staff) and `community-voting-engine` (Board) to support Dual-Council governance.
+- **Clarity 4 Upgrade**: All core contracts migrated to Clarity 4 (Epoch 3.0), utilizing `block-timestamp`, `burn-block-height`, and `to-ascii` for enhanced precision and security.
 - **Nakamoto Transition**: Verified `burn-block-height` usage across all temporal logic.
 - **Service Module Repair**: Consolidated DEX, Lending, and Token modules.
 

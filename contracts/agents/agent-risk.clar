@@ -1,5 +1,5 @@
 (use-trait risk-manager-trait .risk-management.risk-manager-trait)
-(use-trait rbac-trait .core-traits.rbac-trait)
+(use-trait rbac-trait .core-traits.conxian-access-trait)
 
 (impl-trait .risk-management.risk-manager-trait)
 (impl-trait .automation-traits.office-job-trait)

@@ -12,7 +12,7 @@
 (define-constant SLOPE_2 u6000) ;; 60% slope 2
 (define-constant MIN_COLLATERAL_FACTOR u5000) ;; 50% min
 (define-constant MAX_COLLATERAL_FACTOR u9500) ;; 95% max
-(define-constant PRICE_STALE_BLOCKS u100)
+(define-constant PRICE_STALE_SECONDS u300) ;; 5 minutes in seconds
 
 (define-constant SUBSCRIPTION_COST u1000000) ;; 1 STX
 (define-constant ERR_NO_SUBSCRIPTION (err u1006))
@@ -23,7 +23,7 @@
 (define-data-var utilization-rate uint u0)
 (define-data-var current-interest-rate uint BASE_RATE)
 (define-data-var collateral-factor uint MIN_COLLATERAL_FACTOR)
-(define-data-var last-price-update uint u0)
+(define-data-var last-price-update-time uint u0)
 (define-data-var revenue-distributor principal .revenue-distributor)
 
 ;; Subscription State
@@ -34,7 +34,7 @@
   principal
   {
     price: uint,
-    timestamp: uint,
+    timestamp: uint, ;; Block timestamp
     confidence: uint,
   }
 )
@@ -45,11 +45,14 @@
     utilization: uint,
     interest-rate: uint,
     collateral-factor: uint,
-    last-update: uint,
+    last-update-burn: uint, ;; burn-block-height
   }
 )
 
-;; Internal Logic
+;; Gas-Free Internal Logic (Private Functions)
+(define-private (calculate-utilization-rate)
+  (var-get utilization-rate)
+)
 
 (define-private (calculate-interest-rate (utilization uint))
   (if (<= utilization UTILIZATION_KINK)
@@ -100,7 +103,6 @@
         )
         true
       )
-
       (ok true)
     )
   )
@@ -113,13 +115,12 @@
     (confidence uint)
   )
   (begin
-    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) ERR_UNAUTHORIZED)
     (map-set asset-prices asset {
       price: price,
-      timestamp: burn-block-height,
+      timestamp: block-timestamp,
       confidence: confidence,
     })
-    (var-set last-price-update burn-block-height)
+    (var-set last-price-update-time block-timestamp)
     (ok true)
   )
 )
@@ -182,15 +183,36 @@
   (default-to false (map-get? subscribers user))
 )
 
+;; Automated Monetary Fund Operations
+(define-public (auto-adjust-parameters (asset principal))
+  (begin
+    (asserts! (is-subscribed tx-sender) ERR_NO_SUBSCRIPTION)
+    (match (map-get? asset-prices asset)
+      price-data
+      (if (is-price-stale (get timestamp price-data))
+        (err u1002)
+        (let (
+            (current-params (unwrap! (map-get? market-parameters asset) (err u1003)))
+            (volatility (if (> (get confidence price-data) u5000) (- (get confidence price-data) u5000) u0))
+          )
+          (update-market-parameters asset (get utilization current-params) volatility)
+        )
+      )
+      (err u1004)
+    )
+  )
+)
+
 ;; System Health Monitoring
 
 ;; @desc Get the overall health and status of the economic engine.
 (define-read-only (get-system-health)
   (ok {
-    last-update: (var-get last-price-update),
-    blocks-since-update: (- burn-block-height (var-get last-price-update)),
+    last-update-time: (var-get last-price-update-time),
+    seconds-since-update: (- block-timestamp (var-get last-price-update-time)),
     current-rate: (var-get current-interest-rate),
     utilization: (var-get utilization-rate),
     collateral-factor: (var-get collateral-factor),
+    burn-height: burn-block-height
   })
 )
