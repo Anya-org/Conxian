@@ -129,7 +129,7 @@
       event: "contract-pause-requested",
       target: target,
     })
-    (ok true)
+    (ok u0)
   )
 )
 
