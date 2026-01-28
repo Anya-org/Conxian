@@ -40,32 +40,34 @@
       ))
       (tenure-id (contract-call? .block-utils get-current-tenure-id))
     )
-    (asserts!
-      (not (contract-call? (var-get conxian-protocol-contract) is-paused))
-      (err u1001)
+    (begin
+      (asserts!
+        (not (contract-call? .conxian-protocol is-paused))
+        (err u1001)
+      )
+
+      ;; Transfer tokens to this contract
+      (try! (contract-call? token-trait transfer amount tx-sender (as-contract tx-sender)
+        none
+      ))
+
+      (map-set user-collateral {
+        user: tx-sender,
+        token: token-principal,
+      }
+        (+ current-balance amount)
+      )
+
+      (print {
+        event: "deposit",
+        user: tx-sender,
+        token: token-principal,
+        amount: amount,
+        tenure-id: tenure-id,
+      })
+
+      (ok true)
     )
-
-    ;; Transfer tokens to this contract
-    (try! (contract-call? token-trait transfer amount tx-sender (as-contract tx-sender)
-      none
-    ))
-
-    (map-set user-collateral {
-      user: tx-sender,
-      token: token-principal,
-    }
-      (+ current-balance amount)
-    )
-
-    (print {
-      event: "deposit",
-      user: tx-sender,
-      token: token-principal,
-      amount: amount,
-      tenure-id: tenure-id,
-    })
-
-    (ok true)
   )
 )
 
@@ -83,28 +85,30 @@
         })
       ))
     )
-    (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1001))
-    (asserts! (>= current-balance amount) ERR_INSUFFICIENT_BALANCE)
+    (begin
+      (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1001))
+      (asserts! (>= current-balance amount) ERR_INSUFFICIENT_BALANCE)
 
-    ;; Transfer tokens back
-    (try! (as-contract (contract-call? token-trait transfer amount tx-sender tx-sender none)))
+      ;; Transfer tokens back
+      (try! (as-contract (contract-call? token-trait transfer amount tx-sender tx-sender none)))
 
-    (map-set user-collateral {
-      user: tx-sender,
-      token: token-principal,
-    }
-      (- current-balance amount)
+      (map-set user-collateral {
+        user: tx-sender,
+        token: token-principal,
+      }
+        (- current-balance amount)
+      )
+
+      (print {
+        event: "withdraw",
+        user: tx-sender,
+        token: token-principal,
+        amount: amount,
+        tenure-id: (contract-call? .block-utils get-current-tenure-id),
+      })
+
+      (ok true)
     )
-
-    (print {
-      event: "withdraw",
-      user: tx-sender,
-      token: token-principal,
-      amount: amount,
-      tenure-id: (contract-call? .block-utils get-current-tenure-id),
-    })
-
-    (ok true)
   )
 )
 
@@ -118,9 +122,9 @@
     (asserts!
       (or
         (is-eq tx-sender
-          (unwrap-panic (contract-call? (var-get conxian-protocol-contract) get-admin))
+          (unwrap-panic (contract-call? .conxian-protocol get-admin))
         )
-        (contract-call? (var-get rbac-contract) has-role tx-sender ROLE_PROTOCOL)
+        (contract-call? .rbac has-role tx-sender ROLE_PROTOCOL)
       )
       ERR_UNAUTHORIZED
     )

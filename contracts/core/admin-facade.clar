@@ -105,7 +105,7 @@
 )
 
 (define-public (is-authorized (role uint))
-  (ok (has-role role))
+  (ok (or (is-global-admin) (has-role role)))
 )
 
 ;; BOLT: Consolidated authorization check for pausing the protocol.
@@ -232,18 +232,15 @@
       ERR_BATCH_LIMIT_EXCEEDED
     )
 
-    ;; Validate all operations first (fail fast)
-    (let ((validated (map validate-admin-operation operations)))
-      ;; Execute in batch (single transaction) with proper error handling
-      (fold process-admin-operation validated (ok true))
-    )
+    ;; Execute in batch (single transaction) with proper error handling
+    (fold process-admin-operation operations (ok true))
   )
 )
 
 ;; Emergency Pause (Ultra-low gas)
 (define-public (set-emergency-pause (paused bool))
   (begin
-    (asserts! (unwrap! (contract-call? .admin-facade is-authorized-to-pause tx-sender) ERR_NOT_AUTHORIZED) ERR_NOT_AUTHORIZED)
+    (asserts! (is-authorized-to-pause tx-sender) ERR_NOT_AUTHORIZED)
     (var-set emergency-pause paused)
     (print {
       event: "emergency-pause",

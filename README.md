@@ -125,9 +125,9 @@ Conxian Finance Protocol is distributed under the **GNU General Public License v
 
 ## Status
 
-- **Maturity Level**: 🔵 **Technical Alpha (Testnet)**
-- **Architecture**: Facade-Based & Trait-Driven
-- **Next Steps**: Comprehensive testing, security audits, mainnet preparation
+- **Maturity Level**: 🟡 **Root Foundation Stable** (Recovered 2026-01-16)
+- **Architecture**: Facade-Based & Trait-Driven (Top-down recovery in progress)
+- **Next Steps**: Extension of the stable root to collateral and position managers; Nakamoto compatibility audit.
 
 **Disclaimer**: This project is in a Technical Alpha stage. Features represent the target design, not all functionality is fully implemented.
 

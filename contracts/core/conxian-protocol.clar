@@ -17,7 +17,7 @@
 
 ;; Data Vars
 (define-data-var paused bool false)
-(define-data-var contract-owner principal deployer) ;; Replaces protocol-admin
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) ;; Standard Simnet Deployer
 (define-data-var access-control principal .conxian-access)
 (define-data-var admin-facade-contract principal .admin-facade)
 
@@ -43,7 +43,7 @@
 (define-public (set-paused (new-paused bool))
   (begin
     ;; BOLT: Replaced two contract calls with a single, consolidated authorization check.
-    (asserts! (unwrap! (contract-call? (var-get admin-facade-contract) is-authorized-to-pause tx-sender) ERR_UNAUTHORIZED)
+    (asserts! (contract-call? .admin-facade is-authorized-to-pause tx-sender)
       ERR_UNAUTHORIZED
     )
     (var-set paused new-paused)
@@ -56,17 +56,19 @@
   )
 )
 
+(define-private (batch-register-helper (module-data { name: (string-ascii 32), contract: principal }) (accumulator (response bool uint)))
+  (begin
+    (map-set modules { name: (get name module-data) } { contract: (get contract module-data), active: true })
+    (ok true)
+  )
+)
+
 ;; BOLT: Optimizes module registration by allowing an administrator to register multiple modules in a single transaction.
 ;; This reduces gas costs by performing the authorization check only once.
 (define-public (batch-register-modules (modules-list (list 20 { name: (string-ascii 32), contract: principal })))
   (begin
     (asserts! (unwrap! (contract-call? .admin-facade is-authorized ROLE_PROTOCOL_ADMIN) ERR_UNAUTHORIZED) ERR_UNAUTHORIZED)
-    (fold (lambda (module-data accumulator)
-      (begin
-        (map-set modules { name: (get name module-data) } { contract: (get contract module-data), active: true })
-        (ok true)
-      )
-    ) modules-list (ok true))
+    (fold batch-register-helper modules-list (ok true))
   )
 )
 
@@ -115,18 +117,20 @@
   )
 )
 
+(define-private (batch-active-helper (update { name: (string-ascii 32), active: bool }) (accumulator (response bool uint)))
+  (let ((module (unwrap! (map-get? modules { name: (get name update) }) (err u1003))))
+    (begin
+      (map-set modules { name: (get name update) } (merge module { active: (get active update) }))
+      (ok true)
+    )
+  )
+)
+
 ;; BOLT: Optimizes module activation by allowing an administrator to update multiple modules in a single transaction.
 (define-public (batch-set-module-active (updates (list 20 { name: (string-ascii 32), active: bool })))
   (begin
     (asserts! (unwrap! (contract-call? .admin-facade is-authorized ROLE_PROTOCOL_ADMIN) ERR_UNAUTHORIZED) ERR_UNAUTHORIZED)
-    (fold (lambda (update accumulator)
-      (let ((module (unwrap! (map-get? modules { name: (get name update) }) ERR_MODULE_NOT_FOUND)))
-        (begin
-          (map-set modules { name: (get name update) } (merge module { active: (get active update) }))
-          (ok true)
-        )
-      )
-    ) updates (ok true))
+    (fold batch-active-helper updates (ok true))
   )
 )
 
@@ -169,11 +173,13 @@
 
 ;; BOLT: Optimized to consolidate pause, tenure, and compliance checks into a single call.
 ;; @desc Gets the global pause status, Nakamoto tenure ID, and user compliance status.
-;; @returns (response { paused: bool, tenure-id: (optional (buff 32)), compliant: bool } uint)
+;; @returns (response { paused: bool, tenure-id: uint, compliant: bool } uint)
 (define-read-only (get-protocol-status)
   (ok {
     paused: (var-get paused),
     tenure-id: (contract-call? .block-utils get-current-tenure-id),
-    compliant: (is-ok (contract-call? .regulatory-adapter check-clean-hands-compliance tx-sender))
+    compliant: (match (contract-call? .regulatory-adapter check-clean-hands-compliance tx-sender)
+                res res
+                err-val false)
   })
 )

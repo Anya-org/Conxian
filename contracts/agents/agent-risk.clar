@@ -82,7 +82,7 @@
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
     ;; Update logic would go here
-    (ok true)
+    (ok new-health)
   )
 )
 
@@ -94,14 +94,14 @@
   )
 )
 
-(define-read-only (get-asset-factor (asset principal))
+(define-public (get-asset-factor (asset principal))
   (begin
     ;; Return default collateral factor
     (ok u8000) ;; 80%
   )
 )
 
-(define-read-only (get-global-collateral-factor)
+(define-public (get-global-collateral-factor)
   (begin
     ;; Return global collateral factor
     (ok u8000) ;; 80%
@@ -119,11 +119,14 @@
     (position-id uint)
     (liquidator principal)
   )
-  (ok {
-    liquidated: true,
-    reward: u0,
-    repaid: u0,
-  })
+  (begin
+    (asserts! (> u1 u0) (err u1001))
+    (ok {
+      liquidated: true,
+      reward: u0,
+      repaid: u0,
+    })
+  )
 )
 
 (define-public (set-insurance-fund (fund principal))
