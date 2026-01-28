@@ -23,7 +23,7 @@
   .agent-treasury
   .compliance.regulatory-adapter
   .conxian-access
-)))
+))
 
 ;; @desc Verifies that a specific contract has been transferred to the Timelock
 (define-private (verify-contract-owner (target principal))

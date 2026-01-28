@@ -84,7 +84,14 @@
 ;; Read-only functions
 
 (define-read-only (get-user-points (user principal))
-  (ok (default-to u0 (map-get? user-points { user: user })))
+  (ok (default-to {
+    balance: u0,
+    earned: u0,
+    burned: u0,
+    last-activity: u0,
+    points-tier: u0,
+    expiry-block: u0
+  } (map-get? user-points { user: user })))
 )
 
 (define-read-only (get-points-balance (user principal))
@@ -162,10 +169,10 @@
     (asserts! true ERR_INSUFFICIENT_PERMISSIONS) ;; Mock implementation
     
     ;; Get current user points
-    (let ((current-points (get-user-points user)))
-      (let ((current-balance (if (is-some current-points) (unwrap! (get-points-balance user)) u0))
-            (current-earned (if (is-some current-points) (unwrap! (get-points-earned user)) u0))
-            (current-tier (calculate-user-tier user)))
+    (let ((current-points (unwrap-panic (get-user-points user))))
+      (let ((current-balance (get balance current-points))
+            (current-earned (get earned current-points))
+            (current-tier (unwrap-panic (calculate-user-tier user))))
         
         ;; Update user points
         (map-set user-points { user: user } {
@@ -200,11 +207,9 @@
     (asserts! (<= amount MAX_POINTS_PER_TRANSACTION) ERR_INVALID_POINTS)
     
     ;; Get current user points
-    (let ((current-points (get-user-points tx-sender)))
-      (asserts! (is-some current-points) ERR_POINTS_NOT_AVAILABLE)
-      
-      (let ((current-balance (unwrap! (get-points-balance tx-sender) (err ERR_POINTS_NOT_AVAILABLE)))
-            (current-burned (unwrap! (get-points-burned tx-sender) (err ERR_POINTS_NOT_AVAILABLE))))
+    (let ((current-points (unwrap-panic (get-user-points tx-sender))))
+      (let ((current-balance (get balance current-points))
+            (current-burned (get burned current-points)))
         
         ;; Check sufficient balance
         (asserts! (>= current-balance amount) ERR_POINTS_NOT_AVAILABLE)
@@ -212,11 +217,11 @@
         ;; Update user points
         (map-set user-points { user: tx-sender } {
           balance: (- current-balance amount),
-          earned: (unwrap! (get-points-earned tx-sender) (err ERR_POINTS_NOT_AVAILABLE)),
+          earned: (get earned current-points),
           burned: (+ current-burned amount),
           last-activity: block-height,
-          points-tier: (unwrap! (calculate-user-tier tx-sender) (err ERR_POINTS_NOT_AVAILABLE)),
-          expiry-block: (get (unwrap! current-points (err ERR_POINTS_NOT_AVAILABLE)) expiry-block)
+          points-tier: (unwrap-panic (calculate-user-tier tx-sender)),
+          expiry-block: (get current-points expiry-block)
         })
         
         ;; Update totals
@@ -242,11 +247,9 @@
     (asserts! (not (is-eq tx-sender to)) ERR_INVALID_RECIPIENT)
     
     ;; Get current user points
-    (let ((sender-points (get-user-points tx-sender)))
-      (asserts! (is-some sender-points) ERR_POINTS_NOT_AVAILABLE)
-      
-      (let ((sender-balance (unwrap! (get-points-balance tx-sender) (err ERR_POINTS_NOT_AVAILABLE)))
-            (receiver-points (get-user-points to)))
+    (let ((sender-points (unwrap-panic (get-user-points tx-sender))))
+      (let ((sender-balance (get balance sender-points))
+            (receiver-points (unwrap-panic (get-user-points to))))
         
         ;; Check sufficient balance
         (asserts! (>= sender-balance amount) ERR_POINTS_NOT_AVAILABLE)
@@ -254,21 +257,21 @@
         ;; Update sender points
         (map-set user-points { user: tx-sender } {
           balance: (- sender-balance amount),
-          earned: (unwrap! (get-points-earned tx-sender) (err ERR_POINTS_NOT_AVAILABLE)),
-          burned: (unwrap! (get-points-burned tx-sender) (err ERR_POINTS_NOT_AVAILABLE)),
+          earned: (get earned sender-points),
+          burned: (get burned sender-points),
           last-activity: block-height,
-          points-tier: (unwrap! (calculate-user-tier tx-sender) (err ERR_POINTS_NOT_AVAILABLE)),
+          points-tier: (unwrap-panic (calculate-user-tier tx-sender)),
           expiry-block: (get sender-points expiry-block)
         })
         
         ;; Update receiver points
-        (let ((receiver-balance (if (is-some receiver-points) (unwrap! (get-points-balance to) (err ERR_POINTS_NOT_AVAILABLE)) u0)))
+        (let ((receiver-balance (get balance receiver-points)))
           (map-set user-points { user: to } {
             balance: (+ receiver-balance amount),
-            earned: (if (is-some receiver-points) (unwrap! (get-points-earned to) (err ERR_POINTS_NOT_AVAILABLE)) u0),
-            burned: (if (is-some receiver-points) (unwrap! (get-points-burned to) (err ERR_POINTS_NOT_AVAILABLE)) u0),
+            earned: (get earned receiver-points),
+            burned: (get burned receiver-points),
             last-activity: block-height,
-            points-tier: (unwrap! (calculate-user-tier to) (err ERR_POINTS_NOT_AVAILABLE)),
+            points-tier: (unwrap-panic (calculate-user-tier to)),
             expiry-block: (+ block-height POINTS_EXPIRY_BLOCKS)
           })
         )
@@ -436,10 +439,10 @@
     ;; Return points as "price" for oracle compatibility
     (match (get-user-points (principal-from-string feed-id))
       points (ok (get balance points))
-      none (ok u0)
+      err-val (ok u0)
     )
   )
-
+)
 
 (define-read-only (get-confidence (feed-id (string-ascii 32)))
   ;; Return tier as confidence

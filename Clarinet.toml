@@ -88,6 +88,26 @@ depends_on = ["core-traits", "math-utilities", "defi-traits"]
 path = "contracts/tokens/cxd-token.clar"
 depends_on = ["sip-standards"]
 
+[contracts.cxvg-token]
+path = "contracts/tokens/cxvg-token.clar"
+depends_on = ["sip-standards", "regulatory-adapter"]
+
+[contracts.cxs-token]
+path = "contracts/tokens/cxs-token.clar"
+depends_on = ["sip-standards"]
+
+[contracts.cxtr-token]
+path = "contracts/tokens/cxtr-token.clar"
+depends_on = ["sip-standards"]
+
+[contracts.cxlp-token]
+path = "contracts/tokens/cxlp-token.clar"
+depends_on = ["sip-standards"]
+
+[contracts.cxlp-position-nft]
+path = "contracts/tokens/cxlp-position-nft.clar"
+depends_on = ["sip-standards"]
+
 [contracts.points-oracle]
 path = "contracts/oracle/points-oracle.clar"
 depends_on = ["defi-traits"]
@@ -143,13 +163,45 @@ depends_on = ["automation-traits"]
 path = "contracts/governance/proposal-registry.clar"
 depends_on = ["governance-traits"]
 
+[contracts.enhanced-governance-nft]
+path = "contracts/governance/enhanced-governance-nft.clar"
+depends_on = ["sip-standards", "conxian-access"]
+
+[contracts.reputation-engine]
+path = "contracts/governance/reputation-engine.clar"
+depends_on = ["governance-traits"]
+
+[contracts.proposal-executor]
+path = "contracts/governance/proposal-executor.clar"
+depends_on = ["governance-traits", "sip-standards", "proposal-registry", "enhanced-governance-nft", "cxvg-token"]
+
+[contracts.proposal-engine]
+path = "contracts/governance/proposal-engine.clar"
+depends_on = ["governance-traits", "sip-standards", "proposal-registry", "enhanced-governance-nft", "reputation-engine", "proposal-executor"]
+
+[contracts.community-voting-engine]
+path = "contracts/governance/community-voting-engine.clar"
+depends_on = ["governance-traits", "sip-standards", "cxvg-token", "reputation-engine", "regulatory-adapter"]
+
 [contracts.voting]
 path = "contracts/governance/voting.clar"
-depends_on = ["governance-traits", "sip-standards", "admin-facade"]
+depends_on = ["governance-traits", "sip-standards", "admin-facade", "block-utils", "conxian-access"]
 
 [contracts.dao-treasury]
 path = "contracts/governance/dao-treasury.clar"
 depends_on = ["vault-trait", "sip-standards"]
+
+[contracts.gauge-manager]
+path = "contracts/governance/gauge-manager.clar"
+depends_on = ["sip-standards", "cxlp-token"]
+
+[contracts.yield-governance]
+path = "contracts/governance/yield-governance.clar"
+depends_on = ["governance-traits", "cxs-token", "economic-policy-engine"]
+
+[contracts.treasury-governance]
+path = "contracts/governance/treasury-governance.clar"
+depends_on = ["governance-traits", "cxtr-token", "operational-treasury"]
 
 [contracts.lending-manager]
 path = "contracts/lending/lending-manager.clar"

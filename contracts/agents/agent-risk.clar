@@ -79,7 +79,7 @@
   )
 )
 
-(define-public (update-position-health (position-id uint) (new-health uint) (collateral-value uint) (strategy principal))principal))
+(define-public (update-position-health (position-id uint) (new-health uint) (collateral-value uint) (strategy principal))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
     ;; Update logic would go here

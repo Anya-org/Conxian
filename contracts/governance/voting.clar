@@ -11,6 +11,9 @@
 (define-constant ERR_START_BLOCK_IN_PAST (err u2000))
 (define-constant ROLE_GOVERNANCE u1)
 
+;; Data Vars
+(define-data-var proposal-count uint u0)
+
 ;; Data Maps
 (define-map proposals
     uint 
@@ -31,20 +34,14 @@
 ;; @desc Creates a proposal
 ;; @param start-block uint
 ;; @param end-block uint
-
-;; Core Logic
-
-;; @desc Creates a proposal
-;; @param start-block uint
-;; @param end-block uint
 ;; @returns (response uint uint)
 (define-public (create-proposal (start-block uint) (end-block uint))
     (let (
-        (proposal-id u1) ;; Simple counter for demo
+        (proposal-id (+ (var-get proposal-count) u1))
         (tenure-id (contract-call? .block-utils get-current-tenure-id))
     )
         ;; Check Authentication (RBAC Governance Role)
-        (asserts! (contract-call? .rbac has-role tx-sender ROLE_GOVERNANCE)
+        (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_GOVERNANCE))
             ERR_UNAUTHORIZED
         )
         
@@ -61,6 +58,7 @@
         
         ;; Default to Council 1 (CXD) for now
         (map-set proposal-councils proposal-id u1)
+        (var-set proposal-count proposal-id)
         
         (print {
             event: "create-proposal",

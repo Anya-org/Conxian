@@ -67,16 +67,13 @@
 ;; @param metadata: Optional metadata for the position.
 ;; @returns (response uint) The ID of the new position.
 (define-private (get-module-contract (name (string-ascii 32)))
-  (let ((module-data (try! (contract-call? .conxian-protocol get-module name))))
+  (let ((module-data (contract-call? .conxian-protocol get-module name)))
     (match module-data
       data (begin
         (asserts! (get active data) (err u5002))
         (ok (get contract data))
       )
       (err u5003)
-    )
-  )
-)
     )
   )
 )
