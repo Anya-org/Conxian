@@ -1,50 +1,81 @@
----
-layout: default
-title: Module Dex
-permalink: /modules/dex/
----
-
-# Module: DEX
+# DEX Module
 
 ## Overview
 
-The DEX Module provides a highly efficient and capital-aware decentralized exchange. It is architected to be flexible and extensible, supporting multiple pool types and optimized trading routes. The module separates the concerns of trade execution, pool creation, and liquidity management into distinct, specialized contracts.
+The DEX Module provides a highly efficient and capital-aware decentralized exchange for the Conxian Protocol. It is architected for flexibility, supporting multiple pool types and optimized trading routes through a modular execution layer.
 
-## Architecture: Multi-Hop Router
+## Architecture: Multi-Layer Execution
 
-The current implementation of the DEX module uses an advanced execution facade, `multi-hop-router-v3.clar`, which provides a single entry point for complex swap operations. This contract can interact with multiple liquidity pools to execute trades across a predefined path.
+The DEX module separates concerns into three distinct layers:
+1. **User Facade (`swap-router.clar`)**: The primary entry point for users. Handles single and multi-hop swaps across registered pools.
+2. **Coordination Layer (`swap-manager.clar`)**: Manages route discovery, performance tracking, and caching for optimal trade execution.
+3. **Storage Layer (`vault.clar`)**: Provides secure asset storage and management for protocol-owned and user-managed liquidity.
 
 ### Control Flow Diagram
 
 ```mermaid
 graph TD
-    A[User] -- swap-exact-tokens-for-tokens --> B{multi-hop-router-v3.clar};
-    B -- 1. swap --> C[Pool 1];
-    B -- 2. swap --> D[Pool 2];
-    B -- 3. swap --> E[Pool 3];
+    User --> Router[swap-router.clar]
+    Router -- 1. Find Route --> Manager[swap-manager.clar]
+    Router -- 2. Execute Swap --> Pools[Liquidity Pools]
+    Pools -- Settlement --> Vault[vault.clar]
 ```
 
 ## Core Contracts
 
-### Execution Facade
+### `swap-router.clar` (User Facade)
+Handles user-facing swap operations. It is Nakamoto-aligned and tenure-aware.
+- `exact-input-single(...)`: Performs a swap across a single pool.
+- `exact-input-multi(...)`: Coordinates swaps across multiple hops.
 
-- **`multi-hop-router-v3.clar`**: The **facade** for trade execution. It provides an interface for performing swaps across multiple liquidity pools in a single atomic transaction.
+### `swap-manager.clar` (Coordination)
+Optimizes trade execution by identifying the most efficient routes and caching results.
+- `find-best-route(...)`: Determines the optimal path for a swap.
+- `execute-swap(...)`: Executes a coordinated swap along a discovered route.
+- `batch-execute-swaps(...)`: Allows for multiple swaps in a single transaction.
 
-### Pool Implementation
+### `vault.clar` (Asset Management)
+The protocol's secure storage system for assets.
+- `create-vault(...)`: Initializes a new secure storage instance.
+- `deposit-to-vault(...)`: Safely stores assets in a vault.
+- `withdraw-from-vault(...)`: Retrieves assets from a vault.
 
-- **`concentrated-liquidity-pool.clar`**: The primary AMM for volatile asset pairs. It allows liquidity providers to concentrate their capital within specific price ranges, providing greater capital efficiency. Key features include tick-based liquidity management and position NFTs.
-- **`stable-swap-pool.clar`**: An AMM optimized for stablecoin swaps, using a different curve to minimize slippage.
-- **`weighted-swap-pool.clar`**: An AMM that allows for pools with more than two assets and custom weightings.
+## Integration Examples
 
-### Factories and Registries
+### Executing a Simple Swap
+Users should interact with the `swap-router` for all trading operations.
 
-- **`dex-factory.clar`**: A factory contract for creating new liquidity pools. It features a pool type registry that allows for the creation of different types of pools, including concentrated liquidity, stable swap, and weighted pools.
-- **`pool-registry.clar`**: A registry of all active liquidity pools.
+```clarity
+(contract-call? .swap-router exact-input-single
+  .pool-stx-cxd
+  .stx-token
+  .cxd-token
+  u1000000 ;; amount-in
+  u950000  ;; min-amount-out (5% slippage)
+)
+```
 
-## Public Functions (`multi-hop-router.clar`)
+### Finding an Optimal Route
+Integrators can query the `swap-manager` to find the most efficient path for a trade.
 
-- `swap-exact-tokens-for-tokens(amount-in uint, amount-out-min uint, token-in principal, token-out principal)`: Executes a multi-hop swap for an exact input amount. It uses Dijkstra's algorithm to find the optimal path across all available pools.
+```clarity
+(contract-call? .swap-manager find-best-route
+  .stx-token
+  .cxd-token
+  u1000000
+)
+```
+
+## Testing
+
+### Automated Tests
+DEX functionality is verified through a suite of integration tests.
+
+Run DEX tests:
+```bash
+npm test -- tests/dex-defi.test.ts
+```
 
 ## Status
 
-**Under Review**: The contracts in this module are currently undergoing a comprehensive review. While the core swapping functionality in `multi-hop-router.clar` is stable, the surrounding factory and registry contracts are being refined to ensure full alignment with the protocol's modular architecture. These contracts are not yet considered production-ready.
+**Aligned**: The core contracts (`swap-router`, `swap-manager`, `vault`) have been remediated to remove non-Clarity patterns (like lambdas) and aligned with Nakamoto-era standards.

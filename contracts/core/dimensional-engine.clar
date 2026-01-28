@@ -59,7 +59,7 @@
         (asserts! (get active data) ERR_MODULE_NOT_ACTIVE)
         (ok (get contract data))
       )
-      ERR_MODULE_NOT_FOUND
+      (err u5003)
     )
   )
 )

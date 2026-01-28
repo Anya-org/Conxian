@@ -1,13 +1,12 @@
 ;; economic-policy-engine.clar
 ;; Automated Monetary Fund with Gas-Free Internal Logic
 ;; Brain: Operations Engine | Input: On-chain data | Output: System parameters
-;; Native Stacks Architecture - Fully Deterministic
 
 (impl-trait .defi-traits.oracle-trait)
 (impl-trait .core-traits.funding-rate-trait)
 
-;; Constants - Gas Free (compile-time)
-(define-constant BASE_RATE u100) ;; 1% base rate (scaled 10000)
+;; Constants
+(define-constant BASE_RATE u100) ;; 1% base rate
 (define-constant UTILIZATION_KINK u8000) ;; 80% threshold
 (define-constant SLOPE_1 u400) ;; 4% slope 1
 (define-constant SLOPE_2 u6000) ;; 60% slope 2
@@ -17,8 +16,9 @@
 
 (define-constant SUBSCRIPTION_COST u1000000) ;; 1 STX
 (define-constant ERR_NO_SUBSCRIPTION (err u1006))
+(define-constant ERR_UNAUTHORIZED (err u1007))
 
-;; Data Vars - Single Source of Truth
+;; Data Vars
 (define-data-var price-feed principal tx-sender)
 (define-data-var utilization-rate uint u0)
 (define-data-var current-interest-rate uint BASE_RATE)
@@ -29,7 +29,7 @@
 ;; Subscription State
 (define-map subscribers principal bool)
 
-;; Efficient Storage - Map for O(1) lookups
+;; Storage
 (define-map asset-prices
   principal
   {
@@ -71,16 +71,19 @@
 )
 
 (define-private (is-price-stale (timestamp uint))
-  (< (- block-timestamp timestamp) PRICE_STALE_SECONDS)
+  (< (- burn-block-height timestamp) PRICE_STALE_BLOCKS)
 )
 
-;; Public Functions - Minimized Gas Costs
+;; Public Functions
+
+;; @desc Update market parameters for a specific asset.
 (define-public (update-market-parameters
     (asset principal)
     (new-utilization uint)
     (price-volatility uint)
   )
   (begin
+    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) ERR_UNAUTHORIZED)
     (let (
         (new-rate (calculate-interest-rate new-utilization))
         (new-factor (calculate-collateral-factor price-volatility))
@@ -89,7 +92,7 @@
         utilization: new-utilization,
         interest-rate: new-rate,
         collateral-factor: new-factor,
-        last-update-burn: burn-block-height,
+        last-update: burn-block-height,
       })
 
       (if (is-eq asset (var-get price-feed))
@@ -105,7 +108,7 @@
   )
 )
 
-;; Oracle Integration - Gas Optimized
+;; @desc Update the price feed for an asset.
 (define-public (update-price-feed
     (asset principal)
     (price uint)
@@ -123,22 +126,28 @@
 )
 
 ;; Read Functions
+
+;; @desc Get the current protocol interest rate.
 (define-read-only (get-current-interest-rate)
   (ok (var-get current-interest-rate))
 )
 
+;; @desc Get the funding rate for a specific period.
 (define-read-only (get-funding-rate (period uint))
   (ok (* (var-get current-interest-rate) period))
 )
 
+;; @desc Get the current global collateral factor.
 (define-read-only (get-current-collateral-factor)
   (ok (var-get collateral-factor))
 )
 
+;; @desc Get market parameters for a specific asset.
 (define-read-only (get-market-parameters (asset principal))
   (map-get? market-parameters asset)
 )
 
+;; @desc Get the last recorded price for an asset.
 (define-read-only (get-price (asset principal))
   (match (map-get? asset-prices asset)
     price-data (ok (get price price-data))
@@ -146,15 +155,19 @@
   )
 )
 
+;; @desc Facade for get-price to match oracle-trait.
 (define-read-only (fetch-price (asset principal))
   (get-price asset)
 )
 
+;; @desc Returns the name of the contract.
 (define-read-only (get-name ())
   (ok "Economic-Policy-Engine")
 )
 
 ;; Subscription Management
+
+;; @desc Activate a subscription for access to advanced monetary functions.
 (define-public (subscribe)
   (begin
     (try! (stx-transfer? SUBSCRIPTION_COST tx-sender (var-get revenue-distributor)))
@@ -165,6 +178,7 @@
   )
 )
 
+;; @desc Check if a user is a subscriber.
 (define-read-only (is-subscribed (user principal))
   (default-to false (map-get? subscribers user))
 )
@@ -190,6 +204,8 @@
 )
 
 ;; System Health Monitoring
+
+;; @desc Get the overall health and status of the economic engine.
 (define-read-only (get-system-health)
   (ok {
     last-update-time: (var-get last-price-update-time),
