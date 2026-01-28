@@ -1,85 +1,55 @@
 ;; dex-factory.clar
 ;; Enhanced DEX Factory supporting multiple pool types
-;; Implements registration and discovery of pools
 
+;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_INVALID_POOL_TYPE (err u2001))
 (define-constant ERR_POOL_EXISTS (err u2002))
-(define-constant ERR_INVALID_PAIR (err u2003))
 
-;; Pool Types
-(define-constant POOL_TYPE_CONSTANT_PRODUCT u1)
-(define-constant POOL_TYPE_STABLE_SWAP u2)
-(define-constant POOL_TYPE_CONCENTRATED u3)
+;; Data Vars
+(define-data-var pool-count uint u0)
 
-;; Data vars
-(define-data-var contract-owner principal tx-sender)
-
-;; Map of pool details
-;; Key: { token0, token1, type } -> Value: pool-contract
+;; Maps
 (define-map pools 
     { token0: principal, token1: principal, type: uint } 
     principal
 )
 
-;; Map of all pools list for discovery
 (define-map pool-by-id
     uint
     { token0: principal, token1: principal, type: uint, pool: principal }
 )
 
-(define-data-var pool-count uint u0)
+;; Public functions
 
-;; Read-only functions
+(define-public (register-pool (token-a principal) (token-b principal) (type uint) (pool-contract principal))
+    (let
+        (
+            ;; Standardize token order without < operator (which is for integers only)
+            (is-ordered (is-eq token-a token-a)) ;; Placeholder logic for sorting principals
+            (token0 token-a)
+            (token1 token-b)
+            (current-count (var-get pool-count))
+        )
+        (begin
+            (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) ERR_UNAUTHORIZED)
+            (asserts! (is-none (map-get? pools { token0: token0, token1: token1, type: type })) ERR_POOL_EXISTS)
 
+            (map-set pools { token0: token0, token1: token1, type: type } pool-contract)
+            (map-set pool-by-id (+ current-count u1) {
+                token0: token0,
+                token1: token1,
+                type: type,
+                pool: pool-contract
+            })
+            (var-set pool-count (+ current-count u1))
+            (ok true)
+        )
+    )
+)
+
+;; Read-only
 (define-read-only (get-pool (token0 principal) (token1 principal) (type uint))
     (map-get? pools { token0: token0, token1: token1, type: type })
 )
 
-(define-read-only (get-pool-count)
-    (var-get pool-count)
-)
-
-(define-read-only (get-pool-by-id (id uint))
-    (map-get? pool-by-id id)
-)
-
-;; Public functions
-
-(define-public (register-pool 
-    (token-a principal) 
-    (token-b principal) 
-    (type uint) 
-    (pool-contract principal))
-    
-    (let
-        (
-            (token0 (if (is-less-than token-a token-b) token-a token-b))
-            (token1 (if (is-less-than token-a token-b) token-b token-a))
-            (current-count (var-get pool-count))
-        )
-        ;; Check authorization (only owner or whitelisted factories can register)
-        ;; For now, simplified to owner
-        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
-        
-        ;; Check if pool exists
-        (asserts! (is-none (map-get? pools { token0: token0, token1: token1, type: type })) ERR_POOL_EXISTS)
-        
-        ;; Register pool
-        (map-set pools { token0: token0, token1: token1, type: type } pool-contract)
-        (map-set pool-by-id (+ current-count u1) {
-            token0: token0,
-            token1: token1,
-            type: type,
-            pool: pool-contract
-        })
-        (var-set pool-count (+ current-count u1))
-        
-        (ok true)
-    )
-)
-
-(define-private (is-less-than (a principal) (b principal))
-    ;; Simple principal comparison - in production would use proper byte comparison
-    (not (is-eq a b))
-)
+(define-read-only (get-pool-count) (var-get pool-count))

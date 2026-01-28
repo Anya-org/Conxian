@@ -7,87 +7,48 @@
 📜 **SAXAAP Manifesto**
 > "Code is Law, Logic is Sovereign."
 
-Conxian is not a financial service provider; it is an autonomous digital organism. It operates as a **Sovereign Autonomous Business (SAB)** where human discretion is replaced by mathematical certainty.
+Conxian is a **Sovereign Autonomous Business (SAB)** where human discretion is replaced by mathematical certainty. It operates like a digital corporation where smart contracts are the Managers/Staff reporting to the DAO (Board).
 
-- **Autonomous**: Decisions are executed by code, not committees
+- **Autonomous**: Decisions are executed by code agents, not committees
 - **Neutral**: The protocol is a public utility, indifferent to borders or identities  
-- **Sovereign**: Conxian lives on "Stacks Blockchain" anchored by Bitcoin's immutable security
+- **Sovereign**: Anchored by Bitcoin's immutable security via Nakamoto consensus
 
-## Architecture
+## Refined Corporate Architecture
 
-### 🏗️ **Facade Pattern & Trait System**
+### 🗳️ **Dual-Council Governance (Staff vs Board)**
 
-- **Centralized Traits**: All interfaces defined in `/contracts/traits/`
-- **Modular Contracts**: Single-responsibility contracts in dedicated modules
-- **Bitcoin Finality**: All operations anchored to Nakamoto consensus
-- **Censorship Resistance**: Critical actions performable by any user
+- **Operational Council (Staff)**: 24/7 voting by autonomous agents (`agent-risk`, `agent-treasury`) for parameter tuning and daily operations.
+- **Strategic Council (Board/AGM)**: Periodic Human General Meetings (Annual/Quarterly) for structural upgrades and major fiscal changes.
 
-### 📊 **Multi-Dimensional DeFi System**
+### 💰 **Autonomous Fiscal Policy (60/20/20)**
 
-**Core DeFi Primitives:**
-
-- **DEX**: Concentrated liquidity, multi-hop routing, batch auctions
-- **Lending**: Automated money markets with Kinked-Curve Interest Rate Models
-- **Vaults**: sBTC integration, yield aggregation, custody solutions
-- **Tokens**: CXD (governance), CXS (staking), CXTR (treasury), CXLP (liquidity), DRT (position NFT)
-
-**Enterprise and Yield Features:**
-
-- `enterprise-api.clar`: Provides tiered institutional accounts, advanced order types, and compliance integration.
-- `compliance-hooks.clar`: Offers hooks for KYC/AML checks and other compliance-related functions.
-- `yield-optimizer.clar`: Analyzes strategies and rebalances funds for optimal APY, with performance tracking and auto-compounding capabilities.
-- `auto-compounder.clar`: Automates yield compounding for connected vaults.
-
-**Performance and Compatibility:**
-
-- `performance-optimizer.clar`: Monitors and optimizes gas usage and transaction throughput.
-- `legacy-adapter.clar`: Provides a backward-compatible interface to legacy contracts during migration.
-- `migration-manager.clar`: Manages data migration from legacy contracts to the enhanced system.
-
-**SAXAAP Business Model:**
-
-- **Revenue Generation**: Subscription fees (1 STX), transaction fees, service charges
-- **Revenue Distribution**: Autonomous 60/20/20 split (Staking/Dev/Insurance) via `revenue-distributor`
-- **Multi-Council Governance**: 5 specialized automated seats
-- **Office Workers**: Autonomous liquidations and treasury operations
-
-### 🗳️ **5-Tier Governance System**
-
-- **CXD (Debt)**: Automates stability and collateral ratios
-- **CXVG (Governance)**: Manages systemic logic and upgrades  
-- **CXTR (Treasury)**: Rebalances reserves against BTC/STX volatility
-- **CXS (Staking)**: Manages yield distribution and reputation logic
-- **CXLP (Liquidity)**: Optimizes AMM depth and fee structures
+Total revenue is automatically distributed:
+- **60% Staking**: Rewards to `cxd-staking` participants.
+- **20% Operational Treasury**: Protocol development and autonomous staff expenses.
+- **20% Insurance Fund**: Systematic risk reserve.
 
 ## Technical Stack
 
-### ⚡ **Stacks-Native Components**
-
-- **Clarity 4**: Smart contract language with Bitcoin anchoring
-- **Nakamoto Compatibility**: 6 Bitcoin confirmations for high-value operations
-- **Multi-Oracle System**: Chainlink, Pyth, Redstone, DIA, TWAP adapters
-- **Cross-Chain**: Wormhole integration for sovereign token transfers
-
-### 🔧 **Development Tools**
-
-- **Clarinet SDK**: Contract development and testing
-- **StacksOrbit**: Deployment automation
-- **Vitest**: Comprehensive test suite
+- **Clarity 2**: Nakamoto-aligned with `burn-block-height` and Bitcoin finality.
+- **Tenure Awareness**: Logic is aware of Stacks block tenures for deterministic execution.
+- **Facade Pattern**: All core logic accessed via dimensional facades and consolidated traits.
+- **Hybrid Oracle**: Aggregated Pyth, Redstone, and Switchboard feeds with deviation guards.
 
 ## Repository Structure
 
 ```text
 /contracts/
-├── traits/           # All trait definitions (centralized)
-├── core/             # Dimensional engine, risk management
-├── dex/              # Decentralized exchange logic
-├── governance/       # 5-tier DAO system
-├── tokens/           # Multi-token system
-├── oracle/           # Price feed adapters
-├── security/         # Circuit breakers, monitoring
-├── lending/          # Money markets
-├── vaults/           # Custody and yield
-└── utils/            # Shared utilities
+├── traits/           # Consolidated modular trait standards
+├── core/             # Ops engine, risk/collateral/position managers
+├── dex/              # Concentrated liquidity, swap router, vault
+├── governance/       # Dual-council DAO (Board)
+├── agents/           # Autonomous Office Workers (Staff)
+├── tokens/           # CXD, CXVG, CXS, CXTR, CXLP
+├── oracle/           # Price feed adapters and aggregators
+├── security/         # Circuit breakers and MEV protection
+├── lending/          # Automated money markets
+├── vaults/           # sBTC integration and yield aggregation
+└── utils/            # Tenure and encoding utilities
 ```
 
 ## Development
@@ -96,53 +57,25 @@ Conxian is not a financial service provider; it is an autonomous digital organis
 
 - Clarinet 3.12+
 - Node.js 18+
-- Git
 
 ### Getting Started
 
 1. **Install Dependencies**
-
    ```bash
    npm install
    ```
-
 2. **Run Tests**
-
    ```bash
-   npm run coverage
+   npm test
    ```
-
-3. **Contract Check**
-
-   ```bash
-   clarinet check
-   ```
-
-4. **Local Development**
-
-   ```bash
-   clarinet console
-   ```
-
-## License
-
-Conxian Finance Protocol is distributed under the **GNU General Public License v3 (GPLv3)**.
-
-**Why GPLv3?**
-
-- **Hands-Off Sovereignty**: Establishes the protocol as a "public good"
-- **Permissionless Growth**: Anyone can fork or build on Conxian
-- **No Commercial Capture**: Prevents centralization of the protocol
 
 ---
 
 ## Status
 
-- **Maturity Level**: 🟡 **Root Foundation Stable** (Recovered 2026-01-16)
-- **Architecture**: Facade-Based & Trait-Driven (Top-down recovery in progress)
-- **Next Steps**: Extension of the stable root to collateral and position managers; Nakamoto compatibility audit.
-
-**Disclaimer**: This project is in a Technical Alpha stage. Features represent the target design, not all functionality is fully implemented.
+- **Maturity Level**: 🟢 **Service Modules Repaired** (Refined 2026-01-16)
+- **Architecture**: Full Truth Alignment achieved across Core, DEX, Governance, and Economics.
+- **Nakamoto Ready**: Transitioned all temporal logic to `burn-block-height`.
 
 ---
 

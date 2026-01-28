@@ -1,72 +1,51 @@
 ;; revenue-distributor.clar
-;; Distributes collected protocol revenue based on Allocation Policy
-;; Implements the Whitepaper 60/20/20 Split
+;; Distributes protocol revenue (60/20/20 split)
 
-(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
+;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))
 
-;; Data Vars for Distribution Destinations
+;; State
 (define-data-var staking-vault principal .cxd-staking)
-(define-data-var dev-treasury principal .operational-treasury)
-(define-data-var insurance-vault principal .operational-treasury) ;; Placeholder
+(define-data-var operational-treasury principal .operational-treasury)
+(define-data-var insurance-fund principal .operational-treasury)
 
-(define-public (distribute (token <sip-010-trait>) (amount uint))
-    (let (
-        (policy (unwrap-panic (contract-call? .allocation-policy get-allocation-percentages)))
-        (staking-amt (/ (* amount (get staking policy)) u10000))
-        (dev-amt (/ (* amount (get dev policy)) u10000))
-        (ins-amt (/ (* amount (get insurance policy)) u10000))
+;; Public Functions
+
+(define-public (distribute-token (token <sip-010-ft-trait>) (amount uint))
+  (let (
+    (policy (unwrap-panic (contract-call? .allocation-policy get-allocation-percentages)))
+    (staking-amt (/ (* amount (get staking policy)) u10000))
+    (dev-amt (/ (* amount (get dev policy)) u10000))
+    (ins-amt (/ (* amount (get insurance policy)) u10000))
+  )
+    (begin
+      (try! (as-contract (contract-call? token transfer staking-amt tx-sender (var-get staking-vault) none)))
+      (try! (as-contract (contract-call? token transfer dev-amt tx-sender (var-get operational-treasury) none)))
+      (try! (as-contract (contract-call? token transfer ins-amt tx-sender (var-get insurance-fund) none)))
+      (ok true)
     )
-        ;; Execute actual transfers
-        (try! (as-contract (contract-call? token transfer staking-amt tx-sender (var-get staking-vault) none)))
-        (try! (as-contract (contract-call? token transfer dev-amt tx-sender (var-get dev-treasury) none)))
-        (try! (as-contract (contract-call? token transfer ins-amt tx-sender (var-get insurance-vault) none)))
-        
-        (print { 
-            event: "revenue-distributed", 
-            amount: amount, 
-            token: (contract-of token),
-            staking: staking-amt,
-            dev: dev-amt,
-            insurance: ins-amt
-        })
-        (ok true)
-    )
+  )
 )
 
 (define-public (distribute-stx (amount uint))
-    (let (
-        (policy (unwrap-panic (contract-call? .allocation-policy get-allocation-percentages)))
-        (staking-amt (/ (* amount (get staking policy)) u10000))
-        (dev-amt (/ (* amount (get dev policy)) u10000))
-        (ins-amt (/ (* amount (get insurance policy)) u10000))
+  (let (
+    (policy (unwrap-panic (contract-call? .allocation-policy get-allocation-percentages)))
+    (staking-amt (/ (* amount (get staking policy)) u10000))
+    (dev-amt (/ (* amount (get dev policy)) u10000))
+    (ins-amt (/ (* amount (get insurance policy)) u10000))
+  )
+    (begin
+      (try! (as-contract (stx-transfer? staking-amt tx-sender (var-get staking-vault))))
+      (try! (as-contract (stx-transfer? dev-amt tx-sender (var-get operational-treasury))))
+      (try! (as-contract (stx-transfer? ins-amt tx-sender (var-get insurance-fund))))
+      (ok true)
     )
-        ;; Execute actual transfers
-        (try! (as-contract (stx-transfer? staking-amt tx-sender (var-get staking-vault))))
-        (try! (as-contract (stx-transfer? dev-amt tx-sender (var-get dev-treasury))))
-        (try! (as-contract (stx-transfer? ins-amt tx-sender (var-get insurance-vault))))
-
-        (print {
-            event: "stx-revenue-distributed",
-            amount: amount,
-            staking: staking-amt,
-            dev: dev-amt,
-            insurance: ins-amt
-        })
-        (ok true)
-    )
+  )
 )
 
-;; Admin Functions
-(define-public (set-staking-vault (vault principal))
-    (ok (var-set staking-vault vault))
-)
-
-(define-public (set-dev-treasury (treasury principal))
-    (ok (var-set dev-treasury treasury))
-)
-
-(define-public (set-insurance-vault (vault principal))
-    (ok (var-set insurance-vault vault))
+;; Read-only
+(define-read-only (get-operational-treasury)
+  (var-get operational-treasury)
 )
