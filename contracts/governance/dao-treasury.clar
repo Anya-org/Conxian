@@ -26,8 +26,6 @@
 )
 
 ;; Vault Trait Implementation
-(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
-
 (define-public (deposit (amount uint) (token <sip-010-ft-trait>))
     (contract-call? token transfer amount tx-sender (as-contract tx-sender) none)
 )
@@ -39,12 +37,12 @@
     )
 )
 
-(define-public (get-balance (token <sip-010-ft-trait>))
+(define-read-only (get-balance (token <sip-010-ft-trait>))
     (contract-call? token get-balance (as-contract tx-sender))
 )
 
 ;; Additional Treasury Functions
-(define-public (withdraw-to (amount uint) (token <sip-010-trait>) (recipient principal))
+(define-public (withdraw-to (amount uint) (token <sip-010-ft-trait>) (recipient principal))
     (begin
         (asserts! (is-owner) ERR_UNAUTHORIZED)
         (as-contract (contract-call? token transfer amount tx-sender recipient none))
@@ -56,6 +54,14 @@
     (begin
         (asserts! (is-owner) ERR_UNAUTHORIZED)
         ;; Placeholder for strategy allocation logic
+        (ok true)
+    )
+)
+
+(define-public (complete-withdrawal)
+    (begin
+        (asserts! (is-owner) ERR_UNAUTHORIZED)
+        ;; Placeholder for withdrawal completion logic
         (ok true)
     )
 )

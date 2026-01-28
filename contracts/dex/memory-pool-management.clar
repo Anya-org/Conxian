@@ -356,6 +356,11 @@
                 success (+ count u1)
                 error count
               )
+            )(fold (lambda (slot-id count)
+              (match (deallocate-memory pool-id slot-id)
+                success (+ count u1)
+                error count
+              )
             )
             (find-stale-allocations pool-id u1000)
             u0

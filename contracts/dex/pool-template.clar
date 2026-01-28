@@ -20,6 +20,7 @@
 (define-data-var template-active bool true)
 (define-data-var total-pools-created uint u0)
 (define-data-var template-version uint TEMPLATE_VERSION)
+(define-data-var conxian-protocol principal .conxian-protocol)
 
 ;; Storage maps
 (define-map pool-templates
@@ -479,14 +480,6 @@
     (key (string-ascii 32))
   )
 )
-
-(define-private (has-configuration-key
-    (configuration (list 10 {
-      key: (string-ascii 32),
-      value: (string-ascii 64),
-    }))
-    (key (string-ascii 32))
-  )
   (begin
     ;; Check if key exists in configuration
     (fold configuration false

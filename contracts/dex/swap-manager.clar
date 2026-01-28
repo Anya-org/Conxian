@@ -779,7 +779,7 @@
     (let (
         (token-pair (create-token-pair token-in token-out))
         (top-routes (if (> (len routes) u5)
-          (take routes u5)
+          (unwrap-panic (list-slice routes u0 u5))
           routes
         ))
       )

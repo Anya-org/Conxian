@@ -90,7 +90,7 @@
     (asserts! (> weighted-voter-power u0) ERR_UNAUTHORIZED)
 
     ;; Update activity score
-    (asserts! (contract-call? (var-get access-control) is-module-active "governance")
+    (asserts! (contract-call? .conxian-access is-module-active "governance")
       ERR_UNAUTHORIZED
     )
     (try! (contract-call? (var-get reputation-engine-contract) update-activity-score

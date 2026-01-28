@@ -32,9 +32,7 @@
       ERR_UNAUTHORIZED
     )
     (asserts!
-      (contract-call? .conxian-access has-role tx-sender
-        ROLE_OPERATOR
-      )
+      (contract-call? .conxian-access has-role tx-sender ROLE_OPERATOR)
       ;; ROLE_OPERATOR ERR_UNAUTHORIZED
     )
     ;; Check limits

@@ -58,7 +58,7 @@
         (map-set modules { name: (get name module-data) } { contract: (get contract module-data), active: true })
         (ok true)
       )
-    ) modules-list (ok true)) (ok true))
+    ) modules-list (ok true))
   )
 )
 

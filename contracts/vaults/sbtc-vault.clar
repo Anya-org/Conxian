@@ -140,3 +140,11 @@
         (ok true)
     )
 )
+
+(define-public (complete-withdrawal)
+    (begin
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+        ;; Placeholder for withdrawal completion logic
+        (ok true)
+    )
+)

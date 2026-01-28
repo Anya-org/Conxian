@@ -32,7 +32,7 @@
     )
 )
 
-(define-read-only (find-best-route (token-in principal) (token-out principal) (amount-in uint))
+(define-public (find-best-route (token-in principal) (token-out principal) (amount-in uint))
     (let
         (
             (pq (list { token: token-in, amount: amount-in, path: (list) }))
@@ -83,17 +83,17 @@
             (path (try! (find-best-route token-in token-out amount-in)))
             (pools (get pools path))
             (tokens (get tokens path))
-            (swap-1 (try! (swap-helper amount-in (element-at pools u0) (element-at tokens u0) (element-at tokens u1))))
+            (swap-1 (try! (swap-helper amount-in (unwrap-panic (element-at pools u0)) (unwrap-panic (element-at tokens u0)) (unwrap-panic (element-at tokens u1)))))
             (swap-2 (if (> (len pools) u1)
-                (try! (swap-helper swap-1 (element-at pools u1) (element-at tokens u1) (element-at tokens u2)))
+                (try! (swap-helper swap-1 (unwrap-panic (element-at pools u1)) (unwrap-panic (element-at tokens u1)) (unwrap-panic (element-at tokens u2))))
                 swap-1
             ))
             (swap-3 (if (> (len pools) u2)
-                (try! (swap-helper swap-2 (element-at pools u2) (element-at tokens u2) (element-at tokens u3)))
+                (try! (swap-helper swap-2 (unwrap-panic (element-at pools u2)) (unwrap-panic (element-at tokens u2)) (unwrap-panic (element-at tokens u3))))
                 swap-2
             ))
             (swap-4 (if (> (len pools) u3)
-                (try! (swap-helper swap-3 (element-at pools u3) (element-at tokens u3) (element-at tokens u4)))
+                (try! (swap-helper swap-3 (unwrap-panic (element-at pools u3)) (unwrap-panic (element-at tokens u3)) (unwrap-panic (element-at tokens u4))))
                 swap-3
             ))
         )
@@ -105,7 +105,7 @@
 ;; Helper to execute a single swap
 ;; Handles the trait call
 (define-private (execute-swap (p <swap-pool-trait>) (amount-in uint) (ti <sip-010-trait>) (to <sip-010-trait>))
-    (contract-call? p swap amount-in (contract-of ti) (contract-of to))
+    (contract-call? pool swap amount-in (contract-of ti) (contract-of to))
 )
 
 (define-private (swap-helper
@@ -118,6 +118,6 @@
         (ti (unwrap! token-in ERR_INVALID_INPUT))
         (to (unwrap! token-out ERR_INVALID_INPUT))
     )
-        (execute-swap (unwrap! pool (ok amount-in)) amount-in ti to)
+        (contract-call? (unwrap! pool ERR_INVALID_INPUT) swap amount-in (contract-of ti) (contract-of to))
     )
 )

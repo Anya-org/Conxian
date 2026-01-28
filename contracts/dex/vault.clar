@@ -185,7 +185,7 @@
     (let ((user_info (get-user-vaults tx-sender)))
       (if (is-some user_info)
           (asserts!
-            (< (get total-vaults (get-optional user_info)) MAX_VAULTS_PER_USER)
+            (< (get total-vaults (unwrap-panic user_info)) MAX_VAULTS_PER_USER)
             ERR_VAULT_ALREADY_EXISTS
           )
           true
@@ -216,7 +216,7 @@
       })
       
       ;; Update user vaults
-      (let ((user_info (get-user-vaults tx-sender)))
+      (let ((user_info (map-get? user-vaults { user: tx-sender })))
         (if (is-some user_info)
             (begin
               (let ((user-vaults (unwrap-optional user_info)))

@@ -25,6 +25,7 @@
 ;; Configuration
 (define-data-var deviation-threshold uint u500) ;; 5% deviation allowed (basis points)
 (define-data-var circuit-breaker (optional principal) none)
+(define-data-var block-utils principal .block-utils)
 
 (define-private (check-circuit-breaker)
     (match (var-get circuit-breaker)
@@ -71,7 +72,7 @@
         (ok {
             alert: alert-status,
             ready-to-trade: (< (get level alert-status) u2),
-            tenure: (contract-call? .block-utils get-current-tenure-id),
+            tenure:(tenure: (contract-call? (var-get block-utils) get-current-tenure-id),
         })
     )
 )
