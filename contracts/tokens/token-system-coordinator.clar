@@ -9,9 +9,9 @@
 (use-trait ft-mintable-trait .sip-standards.ft-mintable-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_INVALID_TOKEN (err u1001))
-(define-constant ERR_NON_COMPLIANT (err u1002))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_INVALID_TOKEN u1001)
+(define-constant ERR_NON_COMPLIANT u1002)
 
 ;; Data Vars
 (define-data-var coordinator-admin principal tx-sender) ;; Ops Engine or Timelock
@@ -51,8 +51,8 @@
     (recipient principal)
   )
   (begin
-    (asserts! (is-authorized-minter) ERR_UNAUTHORIZED)
-    (asserts! (check-compliance recipient) ERR_NON_COMPLIANT)
+    (asserts! (is-authorized-minter) (err ERR_UNAUTHORIZED))
+    (asserts! (check-compliance recipient) (err ERR_NON_COMPLIANT))
     (try! (contract-call? token mint amount recipient))
     (ok true)
   )
@@ -64,7 +64,7 @@
     (owner principal)
   )
   (begin
-    (asserts! (is-eq tx-sender owner) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender owner) (err ERR_UNAUTHORIZED))
     (try! (contract-call? token burn amount owner))
     (ok true)
   )
@@ -74,7 +74,7 @@
 
 (define-public (set-coordinator-admin (new-admin principal))
   (begin
-    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
     (var-set coordinator-admin new-admin)
     (ok true)
   )
@@ -82,7 +82,7 @@
 
 (define-public (set-minter-status (minter principal) (status bool))
   (begin
-    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
     (map-set authorized-minters minter status)
     (ok true)
   )
@@ -90,7 +90,7 @@
 
 (define-public (set-cxd-token (token principal))
   (begin
-    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
     (var-set cxd-token-contract token)
     (ok true)
   )
@@ -98,7 +98,7 @@
 
 (define-public (set-cxvg-token (token principal))
   (begin
-    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
     (var-set cxvg-token-contract token)
     (ok true)
   )
@@ -114,7 +114,7 @@
     (recipient principal)
   )
   (begin
-    (asserts! (is-eq (contract-of token) (var-get cxd-token-contract)) ERR_INVALID_TOKEN)
+    (asserts! (is-eq (contract-of token) (var-get cxd-token-contract)) (err ERR_INVALID_TOKEN))
     (mint-token token amount recipient)
   )
 )
@@ -127,7 +127,7 @@
     (recipient principal)
   )
   (begin
-    (asserts! (is-eq (contract-of token) (var-get cxvg-token-contract)) ERR_INVALID_TOKEN)
+    (asserts! (is-eq (contract-of token) (var-get cxvg-token-contract)) (err ERR_INVALID_TOKEN))
     (mint-token token amount recipient)
   )
 )
@@ -140,7 +140,7 @@
     (owner principal)
   )
   (begin
-    (asserts! (is-eq (contract-of token) (var-get cxd-token-contract)) ERR_INVALID_TOKEN)
+    (asserts! (is-eq (contract-of token) (var-get cxd-token-contract)) (err ERR_INVALID_TOKEN))
     (burn-token token amount owner)
   )
 )
@@ -151,7 +151,7 @@
     (owner principal)
   )
   (begin
-    (asserts! (is-eq (contract-of token) (var-get cxvg-token-contract)) ERR_INVALID_TOKEN)
+    (asserts! (is-eq (contract-of token) (var-get cxvg-token-contract)) (err ERR_INVALID_TOKEN))
     (burn-token token amount owner)
   )
 )

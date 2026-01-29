@@ -1,8 +1,10 @@
 ;; File: contracts/traits/vault-trait.clar
+(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+
 (define-trait vault-trait
   (
-    (deposit (uint principal) (response uint uint))
-    (withdraw (uint principal) (response uint uint))
-    (allocate-to-strategy (amount uint) (strategy principal) (response bool uint))
+    (deposit (uint <sip-010-trait>) (response bool uint))
+    (withdraw (uint <sip-010-trait>) (response bool uint))
+    (allocate-to-strategy (principal uint) (response bool uint))
   )
 )

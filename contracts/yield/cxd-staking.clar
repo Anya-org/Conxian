@@ -7,11 +7,11 @@
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u8000))
-(define-constant ERR_NON_COMPLIANT (err u8001))
-(define-constant ERR_ZERO_STAKE (err u8002))
-(define-constant ERR_NOT_FOUND (err u8003))
-(define-constant ERR_PAUSED (err u8004))
+(define-constant ERR_UNAUTHORIZED u8000)
+(define-constant ERR_NON_COMPLIANT u8001)
+(define-constant ERR_ZERO_STAKE u8002)
+(define-constant ERR_NOT_FOUND u8003)
+(define-constant ERR_PAUSED u8004)
 
 ;; State
 (define-data-var staking-token principal .cxd-token)
@@ -19,7 +19,7 @@
 (define-data-var regulatory-adapter-contract principal .regulatory-adapter)
 (define-data-var total-staked uint u0)
 (define-data-var reward-rate uint u0) ;; Rewards per block
-(define-data-var last-update-block uint block-height)
+(define-data-var last-update-block uint u0)
 (define-data-var reward-per-token-stored uint u0)
 (define-data-var staking-paused bool false)
 
@@ -106,12 +106,12 @@
   )
   (begin
     ;; Fail if paused
-    (asserts! (not (var-get staking-paused)) ERR_PAUSED)
-    (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+    (asserts! (not (var-get staking-paused)) (err ERR_PAUSED))
+    (asserts! (check-compliance tx-sender) (err ERR_NON_COMPLIANT))
     (asserts! (is-eq (contract-of token) (var-get staking-token))
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
     )
-    (asserts! (> amount u0) ERR_ZERO_STAKE)
+    (asserts! (> amount u0) (err ERR_ZERO_STAKE))
 
     (update-reward tx-sender)
 
@@ -135,12 +135,12 @@
   )
   (begin
     ;; Withdrawals are allowed even if paused (User Protection Ethos)
-    (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+    (asserts! (check-compliance tx-sender) (err ERR_NON_COMPLIANT))
     (asserts! (is-eq (contract-of token) (var-get staking-token))
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
     )
-    (asserts! (> amount u0) ERR_ZERO_STAKE)
-    (asserts! (>= (get-balance tx-sender) amount) ERR_ZERO_STAKE)
+    (asserts! (> amount u0) (err ERR_ZERO_STAKE))
+    (asserts! (>= (get-balance tx-sender) amount) (err ERR_ZERO_STAKE))
 
     (update-reward tx-sender)
 
@@ -160,9 +160,9 @@
 
 (define-public (get-reward (token <sip-010-ft-trait>))
   (let ((reward (earned tx-sender)))
-    (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+    (asserts! (check-compliance tx-sender) (err ERR_NON_COMPLIANT))
     (asserts! (is-eq (contract-of token) (var-get rewards-token))
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
     )
 
     (update-reward tx-sender)
@@ -183,8 +183,8 @@
 )
 
 (define-public (exit
-    (staking-token-trait .sip-standards.sip-010-ft-trait)
-    (rewards-token-trait .sip-standards.sip-010-ft-trait)
+    (staking-token-trait <sip-010-ft-trait>)
+    (rewards-token-trait <sip-010-ft-trait>)
   )
   (begin
     (try! (withdraw (get-balance tx-sender) staking-token-trait))
@@ -199,7 +199,7 @@
     ;; Controlled by Agent Treasury or Ops Engine
     (asserts!
       (or (is-eq tx-sender .agent-treasury) (is-eq tx-sender .conxian-operations-engine))
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
     )
     (update-reward tx-sender)
     (var-set reward-rate rate)
@@ -212,7 +212,7 @@
     ;; Controlled by Ops Engine or Risk Agent (Emergency)
     (asserts!
       (or (is-eq tx-sender .conxian-operations-engine) (is-eq tx-sender .agent-risk))
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
     )
     (var-set staking-paused paused)
     (print {

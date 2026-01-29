@@ -5,9 +5,9 @@
 (impl-trait .queue-traits.queue-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_QUEUE_EMPTY (err u1001))
-(define-constant ERR_QUEUE_FULL (err u1002))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_QUEUE_EMPTY u1001)
+(define-constant ERR_QUEUE_FULL u1002)
 
 ;; Data Vars
 (define-data-var contract-owner principal tx-sender)
@@ -54,7 +54,7 @@
       (current-tail (var-get tail))
     )
     (begin
-      (asserts! (is-owner) ERR_UNAUTHORIZED)
+      (asserts! (is-owner) (err ERR_UNAUTHORIZED))
       
       (if (is-eq current-head current-tail)
         (ok none) ;; Queue is empty

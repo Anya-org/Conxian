@@ -5,8 +5,8 @@
 (impl-trait .governance-traits.proposal-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_INVALID_PARAM (err u1001))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_INVALID_PARAM u1001)
 
 ;; Data Vars
 (define-data-var governance-contract principal tx-sender)
@@ -28,7 +28,7 @@
 
 (define-public (set-governance-contract (new-gov principal))
     (begin
-        (asserts! (is-authorized) ERR_UNAUTHORIZED)
+        (asserts! (is-authorized) (err ERR_UNAUTHORIZED))
         (var-set governance-contract new-gov)
         (ok true)
     )
@@ -70,7 +70,7 @@
 
 (define-public (update-risk-parameters (asset principal) (risk-score uint))
     (begin
-        (asserts! (is-authorized) ERR_UNAUTHORIZED)
+        (asserts! (is-authorized) (err ERR_UNAUTHORIZED))
         ;; Update risk logic here
         (print { event: "risk-param-update", asset: asset, score: risk-score })
         (ok true)

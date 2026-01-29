@@ -2,16 +2,14 @@
 ;; Conxian Protocol: Swap manager for coordinating trades across multiple pools
 
 ;; Dependencies
-(use-trait defi-traits .defi-traits.defi-traits)
-(use-trait core-traits .core-traits.core-traits)
 
 ;; Constants
-(define-constant ERR_INVALID_SWAP (err u35001))
-(define-constant ERR_POOL_NOT_FOUND (err u35002))
-(define-constant ERR_INSUFFICIENT_BALANCE (err u35003))
-(define-constant ERR_SLIPPAGE_EXCEEDED (err u35004))
-(define-constant ERR_SWAP_FAILED (err u35005))
-(define-constant ERR_UNAUTHORIZED (err u35006))
+(define-constant ERR_INVALID_SWAP u35001)
+(define-constant ERR_POOL_NOT_FOUND u35002)
+(define-constant ERR_INSUFFICIENT_BALANCE u35003)
+(define-constant ERR_SLIPPAGE_EXCEEDED u35004)
+(define-constant ERR_SWAP_FAILED u35005)
+(define-constant ERR_UNAUTHORIZED u35006)
 
 ;; Swap manager parameters
 (define-constant MAX_SLIPPAGE u500) ;; 5% max slippage
@@ -26,6 +24,7 @@
 (define-data-var total-swaps uint u0)
 (define-data-var total-volume uint u0)
 (define-data-var last-route-cleanup uint u0)
+(define-data-var circuit-breaker (optional principal) none)
 
 ;; Storage maps
 (define-map swap-routes
@@ -105,7 +104,16 @@
 ;; Authorization Helpers
 
 (define-private (is-admin)
-  (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin))
+  (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin))
+)
+
+(define-private (check-circuit-breaker)
+  (match (var-get circuit-breaker)
+    cb (if (contract-call? .circuit-breaker is-contract-paused (as-contract tx-sender))
+         (err ERR_SWAP_FAILED)
+         (ok true))
+    (ok true)
+  )
 )
 
 ;; Read-only functions
@@ -119,7 +127,7 @@
 (define-read-only (get-route-pools (route-id (buff 32)))
   (match (map-get? swap-routes { route-id: route-id })
     route (ok (get pools route))
-    none (err ERR_POOL_NOT_FOUND)
+    (err ERR_POOL_NOT_FOUND)
   )
 )
 
@@ -127,7 +135,7 @@
 (define-read-only (get-route-estimated-output (route-id (buff 32)))
   (match (map-get? swap-routes { route-id: route-id })
     route (ok (get estimated-output route))
-    none (err ERR_POOL_NOT_FOUND)
+    (err ERR_POOL_NOT_FOUND)
   )
 )
 
@@ -135,7 +143,7 @@
 (define-read-only (get-route-slippage (route-id (buff 32)))
   (match (map-get? swap-routes { route-id: route-id })
     route (ok (get slippage route))
-    none (err ERR_POOL_NOT_FOUND)
+    (err ERR_POOL_NOT_FOUND)
   )
 )
 
@@ -143,7 +151,7 @@
 (define-read-only (is-route-active (route-id (buff 32)))
   (match (map-get? swap-routes { route-id: route-id })
     route (ok (get active route))
-    none (ok false)
+    (ok false)
   )
 )
 
@@ -192,11 +200,11 @@
   )
   (begin
     ;; Validate inputs
-    (asserts! (not (is-eq token-in token-out)) ERR_INVALID_SWAP)
-    (asserts! (> amount-in u0) ERR_INVALID_SWAP)
-    (asserts! (>= amount-in MIN_TRADE_AMOUNT) ERR_INVALID_SWAP)
-    (asserts! (<= amount-in MAX_TRADE_AMOUNT) ERR_INVALID_SWAP)
-    (asserts! (var-get swap-manager-active) ERR_SWAP_FAILED)
+    (asserts! (not (is-eq token-in token-out)) (err ERR_INVALID_SWAP))
+    (asserts! (> amount-in u0) (err ERR_INVALID_SWAP))
+    (asserts! (>= amount-in MIN_TRADE_AMOUNT) (err ERR_INVALID_SWAP))
+    (asserts! (<= amount-in MAX_TRADE_AMOUNT) (err ERR_INVALID_SWAP))
+    (asserts! (var-get swap-manager-active) (err ERR_SWAP_FAILED))
 
     ;; Check cache first (simplified logic)
     (find-new-routes token-in token-out amount-in)
@@ -211,28 +219,29 @@
     (max-slippage uint)
   )
   (begin
+    (try! (check-circuit-breaker))
     ;; Validate inputs
-    (asserts! (> amount-in u0) ERR_INVALID_SWAP)
-    (asserts! (> min-amount-out u0) ERR_INVALID_SWAP)
-    (asserts! (<= max-slippage u10000) ERR_INVALID_SWAP)
-    (asserts! (var-get swap-manager-active) ERR_SWAP_FAILED)
+    (asserts! (> amount-in u0) (err ERR_INVALID_SWAP))
+    (asserts! (> min-amount-out u0) (err ERR_INVALID_SWAP))
+    (asserts! (<= max-slippage u10000) (err ERR_INVALID_SWAP))
+    (asserts! (var-get swap-manager-active) (err ERR_SWAP_FAILED))
 
     ;; Check if route exists and is active
     (let ((route_info (get-swap-route route-id)))
-      (asserts! (is-some route_info) ERR_POOL_NOT_FOUND)
+      (asserts! (is-some route_info) (err ERR_POOL_NOT_FOUND))
 
       (let ((route (unwrap-panic route_info)))
-        (asserts! (get route active) ERR_POOL_NOT_FOUND)
+        (asserts! (get active route) (err ERR_POOL_NOT_FOUND))
 
         ;; Check slippage
-        (asserts! (<= (get route slippage) max-slippage) ERR_SLIPPAGE_EXCEEDED)
+        (asserts! (<= (get slippage route) max-slippage) (err ERR_SLIPPAGE_EXCEEDED))
 
         ;; Generate swap ID
         (let ((swap-id (derive-swap-id route-id)))
           ;; Execute swap (Stub logic)
           (let ((amount-out (/ (* amount-in u9900) u10000)))
             (begin
-              (asserts! (>= amount-out min-amount-out) ERR_SLIPPAGE_EXCEEDED)
+              (asserts! (>= amount-out min-amount-out) (err ERR_SLIPPAGE_EXCEEDED))
 
               ;; Update successful swap record
               (map-set swap-executions { swap-id: swap-id } {
@@ -276,7 +285,7 @@
     max-slippage: uint,
   })))
   (begin
-    (asserts! (<= (len swaps) u10) ERR_INVALID_SWAP)
+    (asserts! (<= (len swaps) u10) (err ERR_INVALID_SWAP))
     (ok (fold batch-swap-helper swaps u0))
   )
 )
@@ -288,17 +297,25 @@
     max-slippage: uint,
   }) (result uint))
   (match (execute-swap (get route-id swap) (get amount-in swap) (get min-amount-out swap) (get max-slippage swap))
-    success (+ result u1)
-    error result
+    okv (+ result u1)
+    errv result
   )
 )
 
 ;; @desc Update the route cache for a token pair
 (define-public (update-route-cache (token-in principal) (token-out principal))
   (begin
-    (asserts! (not (is-eq token-in token-out)) ERR_INVALID_SWAP)
-    (asserts! (var-get swap-manager-active) ERR_SWAP_FAILED)
+    (asserts! (not (is-eq token-in token-out)) (err ERR_INVALID_SWAP))
+    (asserts! (var-get swap-manager-active) (err ERR_SWAP_FAILED))
     ;; Logic to find and store routes
+    (ok true)
+  )
+)
+
+(define-public (set-circuit-breaker (new-cb principal))
+  (begin
+    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
+    (var-set circuit-breaker (some new-cb))
     (ok true)
   )
 )
@@ -306,7 +323,7 @@
 ;; @desc Invalidate a route
 (define-public (invalidate-route (route-id (buff 32)))
   (begin
-    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
     (match (map-get? swap-routes { route-id: route-id })
       route (begin
               (map-set swap-routes { route-id: route-id } (merge route { active: false }))
@@ -320,7 +337,7 @@
 ;; @desc Admin function to set manager status
 (define-public (set-swap-manager-active (active bool))
   (begin
-    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
     (var-set swap-manager-active active)
     (ok true)
   )
@@ -337,7 +354,7 @@
   (begin
     ;; In practice, would use graph traversal. Returning direct route stub.
     (ok {
-      route-id: (sha256 "direct-route"),
+      route-id: (sha256 0x00),
       pools: (list ),
       estimated-output: amount-in,
       slippage: u100,
@@ -348,5 +365,5 @@
 )
 
 (define-private (derive-swap-id (route-id (buff 32)))
-  (hash160 (concat route-id (sha256 (unwrap-panic (to-consensus-buff? (+ (var-get total-swaps) u1))))))
+  (hash160 (concat route-id (sha256 0x00)))
 )

@@ -7,9 +7,9 @@
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u10000))
-(define-constant ERR_DEPLOYMENT_FAILED (err u10001))
-(define-constant ERR_NAME_TAKEN (err u10002))
+(define-constant ERR_UNAUTHORIZED u10000)
+(define-constant ERR_DEPLOYMENT_FAILED u10001)
+(define-constant ERR_NAME_TAKEN u10002)
 
 ;; Data Vars
 (define-data-var deployment-fee uint u1000000000) ;; 1000 STX (example)
@@ -49,12 +49,12 @@
   )
   (let ((deployer tx-sender))
     ;; 1. Validation
-    (asserts! (is-none (map-get? deployed-sabs name)) ERR_NAME_TAKEN)
+    (asserts! (is-none (map-get? deployed-sabs name)) (err ERR_NAME_TAKEN))
 
     ;; 2. Compliance Check (Deployer must be Clean-Hands)
     (asserts!
       (is-ok (contract-call? .regulatory-adapter check-clean-hands-compliance deployer))
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
     )
 
     ;; 3. Pay Protocol Fee
@@ -89,11 +89,11 @@
     (name (string-ascii 64))
     (new-status (string-ascii 20))
   )
-  (let ((sab (unwrap! (map-get? deployed-sabs name) ERR_DEPLOYMENT_FAILED)))
+  (let ((sab (unwrap! (map-get? deployed-sabs name) (err ERR_DEPLOYMENT_FAILED))))
     ;; Only Ops Engine or Risk Agent can suspend
     (asserts!
       (or (is-eq tx-sender (var-get conxian-operations-engine-contract)) (is-eq tx-sender (var-get agent-risk-contract)))
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
     )
 
     (map-set deployed-sabs name (merge sab { status: new-status }))

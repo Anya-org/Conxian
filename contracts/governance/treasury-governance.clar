@@ -5,7 +5,7 @@
 (impl-trait .governance-traits.proposal-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_UNAUTHORIZED u1000)
 
 ;; Data Vars
 (define-data-var active-budget uint u0)
@@ -15,7 +15,7 @@
 (define-public (execute (proposer principal))
   (begin
     ;; Called by proposal-executor after a successful CXTR vote
-    (asserts! (is-eq tx-sender .proposal-executor) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender .proposal-executor) (err ERR_UNAUTHORIZED))
 
     ;; Logic to trigger a withdrawal from operational-treasury
     ;; (contract-call? .operational-treasury withdraw-stx u1000000 proposer)

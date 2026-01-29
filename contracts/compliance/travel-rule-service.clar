@@ -4,8 +4,8 @@
 ;; Tier 0: Automated Compliance Logging
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u9000))
-(define-constant ERR_INVALID_DATA (err u9001))
+(define-constant ERR_UNAUTHORIZED u9000)
+(define-constant ERR_INVALID_DATA u9001)
 
 ;; Data Vars
 (define-data-var compliance-admin principal tx-sender)

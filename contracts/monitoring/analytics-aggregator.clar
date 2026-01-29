@@ -6,7 +6,7 @@
 (use-trait ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u4000))
+(define-constant ERR_UNAUTHORIZED u4000)
 
 ;; Data Vars
 (define-data-var total-volume uint u0)

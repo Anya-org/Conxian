@@ -15,8 +15,8 @@
 (define-constant PRICE_STALE_SECONDS u300) ;; 5 minutes in seconds
 
 (define-constant SUBSCRIPTION_COST u1000000) ;; 1 STX
-(define-constant ERR_NO_SUBSCRIPTION (err u1006))
-(define-constant ERR_UNAUTHORIZED (err u1007))
+(define-constant ERR_NO_SUBSCRIPTION u1006)
+(define-constant ERR_UNAUTHORIZED u1007)
 
 ;; Data Vars
 (define-data-var price-feed principal tx-sender)
@@ -71,7 +71,7 @@
 )
 
 (define-private (is-price-stale (timestamp uint))
-  (< (- burn-block-height timestamp) PRICE_STALE_BLOCKS)
+  (>= (- (default-to u0 (get-block-info? time block-height)) timestamp) PRICE_STALE_SECONDS)
 )
 
 ;; Public Functions
@@ -83,7 +83,7 @@
     (price-volatility uint)
   )
   (begin
-    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
     (let (
         (new-rate (calculate-interest-rate new-utilization))
         (new-factor (calculate-collateral-factor price-volatility))
@@ -92,7 +92,7 @@
         utilization: new-utilization,
         interest-rate: new-rate,
         collateral-factor: new-factor,
-        last-update: burn-block-height,
+        last-update-burn: burn-block-height,
       })
 
       (if (is-eq asset (var-get price-feed))
@@ -117,10 +117,10 @@
   (begin
     (map-set asset-prices asset {
       price: price,
-      timestamp: block-timestamp,
+      timestamp: (default-to u0 (get-block-info? time block-height)),
       confidence: confidence,
     })
-    (var-set last-price-update-time block-timestamp)
+    (var-set last-price-update-time (default-to u0 (get-block-info? time block-height)))
     (ok true)
   )
 )
@@ -161,7 +161,7 @@
 )
 
 ;; @desc Returns the name of the contract.
-(define-read-only (get-name ())
+(define-read-only (get-name)
   (ok "Economic-Policy-Engine")
 )
 
@@ -186,7 +186,7 @@
 ;; Automated Monetary Fund Operations
 (define-public (auto-adjust-parameters (asset principal))
   (begin
-    (asserts! (is-subscribed tx-sender) ERR_NO_SUBSCRIPTION)
+    (asserts! (is-subscribed tx-sender) (err ERR_NO_SUBSCRIPTION))
     (match (map-get? asset-prices asset)
       price-data
       (if (is-price-stale (get timestamp price-data))
@@ -209,7 +209,7 @@
 (define-read-only (get-system-health)
   (ok {
     last-update-time: (var-get last-price-update-time),
-    seconds-since-update: (- block-timestamp (var-get last-price-update-time)),
+    seconds-since-update: (- (default-to u0 (get-block-info? time block-height)) (var-get last-price-update-time)),
     current-rate: (var-get current-interest-rate),
     utilization: (var-get utilization-rate),
     collateral-factor: (var-get collateral-factor),

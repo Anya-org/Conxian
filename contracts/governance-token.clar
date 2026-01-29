@@ -6,9 +6,9 @@
 (impl-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u100))
-(define-constant ERR_INSUFFICIENT_FUNDS (err u101))
-(define-constant ERR_INVALID_AMOUNT (err u102))
+(define-constant ERR_UNAUTHORIZED u100)
+(define-constant ERR_INSUFFICIENT_FUNDS u101)
+(define-constant ERR_INVALID_AMOUNT u102)
 
 ;; Data Variables
 (define-data-var token-name (string-ascii 32) "ConxianGovernance")
@@ -81,12 +81,12 @@
     (memo (optional (buff 34)))
   )
   (begin
-    (asserts! (is-eq tx-sender sender) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender sender) (err ERR_UNAUTHORIZED))
     (let (
-        (sender-balance (unwrap! (get-balance sender) ERR_UNAUTHORIZED))
-        (recipient-balance (unwrap! (get-balance recipient) ERR_UNAUTHORIZED))
+        (sender-balance (unwrap! (get-balance sender) (err ERR_UNAUTHORIZED)))
+        (recipient-balance (unwrap! (get-balance recipient) (err ERR_UNAUTHORIZED)))
       )
-      (asserts! (>= sender-balance amount) ERR_INSUFFICIENT_FUNDS)
+      (asserts! (>= sender-balance amount) (err ERR_INSUFFICIENT_FUNDS))
       (map-set token-balances { account: sender } { amount: (- sender-balance amount) })
       (map-set token-balances { account: recipient } { amount: (+ recipient-balance amount) })
 
@@ -108,7 +108,7 @@
 ;; Governance Token Trait Functions
 (define-read-only (get-voting-power (account principal))
   (let (
-      (balance (unwrap! (get-balance account) ERR_UNAUTHORIZED))
+      (balance (unwrap! (get-balance account) (err ERR_UNAUTHORIZED)))
       (delegated-to-me (default-to u0
         (get amount (map-get? delegated-amounts { account: account }))
       ))
@@ -125,7 +125,7 @@
 )
 
 (define-public (has-voting-power (account principal))
-  (let ((power (unwrap! (get-voting-power account) ERR_UNAUTHORIZED)))
+  (let ((power (unwrap! (get-voting-power account) (err ERR_UNAUTHORIZED))))
     (ok (> power u0))
   )
 )
@@ -139,7 +139,7 @@
     (amount uint)
   )
   (let (
-      (current-balance (unwrap! (get-balance tx-sender) ERR_UNAUTHORIZED))
+      (current-balance (unwrap! (get-balance tx-sender) (err ERR_UNAUTHORIZED)))
       (current-delegation (default-to { amount: u0 }
         (map-get? delegations {
           delegator: tx-sender,
@@ -147,7 +147,7 @@
         })
       ))
     )
-    (asserts! (>= current-balance amount) ERR_INSUFFICIENT_FUNDS)
+    (asserts! (>= current-balance amount) (err ERR_INSUFFICIENT_FUNDS))
 
     ;; Update delegation record
     (map-set delegations {
@@ -189,11 +189,11 @@
           delegator: tx-sender,
           delegate: delegate,
         })
-        ERR_UNAUTHORIZED
+        (err ERR_UNAUTHORIZED)
       ))
       (delegated-amount (get amount current-delegation))
     )
-    (asserts! (>= delegated-amount amount) ERR_INSUFFICIENT_FUNDS)
+    (asserts! (>= delegated-amount amount) (err ERR_INSUFFICIENT_FUNDS))
 
     (if (> amount delegated-amount)
       ;; Undelegate all
@@ -244,7 +244,7 @@
 ;; Private helper functions
 (define-private (update-voting-power (account principal))
   (let (
-      (balance (unwrap! (get-balance account) ERR_UNAUTHORIZED))
+      (balance (unwrap! (get-balance account) (err ERR_UNAUTHORIZED)))
       (delegated-to-me (default-to u0
         (get amount (map-get? delegated-amounts { account: account }))
       ))
@@ -269,7 +269,7 @@
 ;; Administrative Functions
 (define-public (set-minter (new-minter principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (var-set minter-contract new-minter)
     (ok true)
   )
@@ -281,9 +281,9 @@
     (recipient principal)
   )
   (begin
-    (asserts! (is-eq tx-sender (var-get minter-contract)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get minter-contract)) (err ERR_UNAUTHORIZED))
     (var-set token-supply (+ (var-get token-supply) amount))
-    (map-set token-balances { account: recipient } { amount: (+ (unwrap! (get-balance recipient) ERR_UNAUTHORIZED) amount) })
+    (map-set token-balances { account: recipient } { amount: (+ (unwrap! (get-balance recipient) (err ERR_UNAUTHORIZED)) amount) })
     (unwrap-panic (update-voting-power recipient))
     (print {
       event: "mint",
@@ -299,9 +299,9 @@
     (owner principal)
   )
   (begin
-    (asserts! (is-eq tx-sender (var-get minter-contract)) ERR_UNAUTHORIZED)
-    (let ((owner-balance (unwrap! (get-balance owner) ERR_UNAUTHORIZED)))
-      (asserts! (>= owner-balance amount) ERR_INSUFFICIENT_FUNDS)
+    (asserts! (is-eq tx-sender (var-get minter-contract)) (err ERR_UNAUTHORIZED))
+    (let ((owner-balance (unwrap! (get-balance owner) (err ERR_UNAUTHORIZED))))
+      (asserts! (>= owner-balance amount) (err ERR_INSUFFICIENT_FUNDS))
       (var-set token-supply (- (var-get token-supply) amount))
       (map-set token-balances { account: owner } { amount: (- owner-balance amount) })
       (unwrap-panic (update-voting-power owner))

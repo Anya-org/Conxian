@@ -6,13 +6,13 @@
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_EPOCH_NOT_ENDED (err u1001))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_EPOCH_NOT_ENDED u1001)
 
 ;; Data Vars
 (define-data-var epoch-length uint u518400) ;; ~30 days (5s blocks)
 (define-data-var current-epoch uint u0)
-(define-data-var last-epoch-update uint block-height)
+(define-data-var last-epoch-update uint u0)
 (define-data-var emission-rate uint u100000000) ;; Initial: 100 tokens per block (example)
 (define-data-var decay-rate-bps uint u1000) ;; 10% decay per epoch
 
@@ -41,7 +41,7 @@
         (current-block block-height)
         (time-since-update (- current-block (var-get last-epoch-update)))
     )
-        (asserts! (>= time-since-update (var-get epoch-length)) ERR_EPOCH_NOT_ENDED)
+        (asserts! (>= time-since-update (var-get epoch-length)) (err ERR_EPOCH_NOT_ENDED))
         
         ;; Apply Decay
         (let (
@@ -95,7 +95,7 @@
     (let (
         (weight (default-to u0 (map-get? emission-targets tx-sender)))
     )
-        (asserts! (> weight u0) ERR_UNAUTHORIZED)
+        (asserts! (> weight u0) (err ERR_UNAUTHORIZED))
         
         ;; Rate Limit Check (Omitted for brevity, assumed caller calculates correctly based on time)
         ;; In production, validate `amount <= emission_rate * delta_blocks * weight / total_weight`
@@ -113,7 +113,7 @@
 ;; Admin
 (define-public (add-emission-target (target principal) (weight uint))
     (begin
-        (asserts! (is-admin) ERR_UNAUTHORIZED)
+        (asserts! (is-admin) (err ERR_UNAUTHORIZED))
         (map-set emission-targets target weight)
         (var-set total-weight (+ (var-get total-weight) weight))
         (ok true)

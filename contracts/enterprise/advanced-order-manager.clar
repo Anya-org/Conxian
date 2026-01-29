@@ -5,10 +5,10 @@
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
-(define-constant ERR_NOT_AUTHORIZED (err u1000))
-(define-constant ERR_INVALID_PARAMS (err u1001))
-(define-constant ERR_ORDER_NOT_FOUND (err u1002))
-(define-constant ERR_ORDER_EXPIRED (err u1003))
+(define-constant ERR_NOT_AUTHORIZED u1000)
+(define-constant ERR_INVALID_PARAMS u1001)
+(define-constant ERR_ORDER_NOT_FOUND u1002)
+(define-constant ERR_ORDER_EXPIRED u1003)
 
 (define-data-var contract-owner principal tx-sender)
 (define-data-var next-order-id uint u0)
@@ -41,7 +41,7 @@
     (let (
         (order-id (var-get next-order-id))
     )
-        (asserts! (and (> intervals u0) (> amount u0)) ERR_INVALID_PARAMS)
+        (asserts! (and (> intervals u0) (> amount u0)) (err ERR_INVALID_PARAMS))
 
         ;; Escrow tokens
         (try! (contract-call? token-in transfer amount tx-sender (as-contract tx-sender) none))
@@ -68,12 +68,12 @@
 ;; @desc Execute next leg of TWAP (to be called by Keepers/Office Workers)
 (define-public (execute-twap-leg (order-id uint) (token-in <sip-010-trait>) (swap-router principal))
     (let (
-        (order (unwrap! (map-get? twap-orders order-id) ERR_ORDER_NOT_FOUND))
+        (order (unwrap! (map-get? twap-orders order-id) (err ERR_ORDER_NOT_FOUND)))
         (amount-per-leg (/ (get remaining-amount order) (get intervals-left order)))
     )
-        (asserts! (is-eq (get status order) "active") ERR_ORDER_EXPIRED)
-        (asserts! (>= block-height (+ (get last-execution-block order) (get blocks-between order))) ERR_INVALID_PARAMS)
-        (asserts! (is-eq (get token-in order) (contract-of token-in)) ERR_INVALID_PARAMS)
+        (asserts! (is-eq (get status order) "active") (err ERR_ORDER_EXPIRED))
+        (asserts! (>= block-height (+ (get last-execution-block order) (get blocks-between order))) (err ERR_INVALID_PARAMS))
+        (asserts! (is-eq (get token-in order) (contract-of token-in)) (err ERR_INVALID_PARAMS))
 
         ;; Execution logic (calling the DEX router)
         ;; For now, we simulate the swap
@@ -93,11 +93,11 @@
 ;; @desc Cancel an order and refund remaining
 (define-public (cancel-twap-order (order-id uint) (token-in <sip-010-trait>))
     (let (
-        (order (unwrap! (map-get? twap-orders order-id) ERR_ORDER_NOT_FOUND))
+        (order (unwrap! (map-get? twap-orders order-id) (err ERR_ORDER_NOT_FOUND)))
     )
-        (asserts! (is-eq (get owner order) tx-sender) ERR_NOT_AUTHORIZED)
-        (asserts! (is-eq (get status order) "active") ERR_ORDER_EXPIRED)
-        (asserts! (is-eq (get token-in order) (contract-of token-in)) ERR_INVALID_PARAMS)
+        (asserts! (is-eq (get owner order) tx-sender) (err ERR_NOT_AUTHORIZED))
+        (asserts! (is-eq (get status order) "active") (err ERR_ORDER_EXPIRED))
+        (asserts! (is-eq (get token-in order) (contract-of token-in)) (err ERR_INVALID_PARAMS))
 
         (try! (as-contract (contract-call? token-in transfer (get remaining-amount order) (as-contract tx-sender) (get owner order) none)))
 

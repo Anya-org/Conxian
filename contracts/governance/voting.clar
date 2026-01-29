@@ -5,10 +5,10 @@
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_ALREADY_VOTED (err u1001))
-(define-constant ERR_VOTING_CLOSED (err u1002))
-(define-constant ERR_START_BLOCK_IN_PAST (err u2000))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_ALREADY_VOTED u1001)
+(define-constant ERR_VOTING_CLOSED u1002)
+(define-constant ERR_START_BLOCK_IN_PAST u2000)
 (define-constant ROLE_GOVERNANCE u1)
 
 ;; Data Vars
@@ -42,11 +42,11 @@
     )
         ;; Check Authentication (RBAC Governance Role)
         (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_GOVERNANCE))
-            ERR_UNAUTHORIZED
+            (err ERR_UNAUTHORIZED)
         )
         
         ;; Ensure start block is in the future
-        (asserts! (> start-block block-height) ERR_START_BLOCK_IN_PAST)
+        (asserts! (> start-block block-height) (err ERR_START_BLOCK_IN_PAST))
         
         (map-set proposals proposal-id {
             start-block: start-block,
@@ -83,11 +83,11 @@
         ;; Update Vote Counts (Simplified, assuming 1 vote per call for now, real logic would pull token balance)
     )
         ;; But without a known
-        (asserts! (and (>= block-height (get start-block proposal)) (<= block-height (get end-block proposal))) ERR_VOTING_CLOSED)
-        (asserts! (is-none (map-get? votes { proposal-id: proposal-id, voter: tx-sender })) ERR_ALREADY_VOTED)
+        (asserts! (and (>= block-height (get start-block proposal)) (<= block-height (get end-block proposal))) (err ERR_VOTING_CLOSED))
+        (asserts! (is-none (map-get? votes { proposal-id: proposal-id, voter: tx-sender })) (err ERR_ALREADY_VOTED))
         
         ;; User must have a seat (voting power > 0)
-        (asserts! (> voter-power u0) ERR_UNAUTHORIZED)
+        (asserts! (> voter-power u0) (err ERR_UNAUTHORIZED))
         
         (map-set votes { proposal-id: proposal-id, voter: tx-sender } true)
         

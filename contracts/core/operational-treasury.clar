@@ -6,7 +6,7 @@
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_UNAUTHORIZED u1000)
 
 ;; Data Vars
 (define-data-var contract-owner principal tx-sender)
@@ -33,7 +33,7 @@
     (recipient principal)
   )
   (begin
-    (asserts! (is-authorized) ERR_UNAUTHORIZED)
+    (asserts! (is-authorized) (err ERR_UNAUTHORIZED))
     (as-contract (stx-transfer? amount tx-sender recipient))
   )
 )
@@ -45,7 +45,7 @@
     (recipient principal)
   )
   (begin
-    (asserts! (is-authorized) ERR_UNAUTHORIZED)
+    (asserts! (is-authorized) (err ERR_UNAUTHORIZED))
     (as-contract (contract-call? token transfer amount tx-sender recipient none))
   )
 )
@@ -53,7 +53,7 @@
 ;; Admin
 (define-public (set-contract-owner (new-owner principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (var-set contract-owner new-owner)
     (ok true)
   )

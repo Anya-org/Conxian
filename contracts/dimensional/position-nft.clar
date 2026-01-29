@@ -4,12 +4,12 @@
 
 (impl-trait .sip-standards.sip-009-nft-trait)
 
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_NOT_OWNER (err u1001))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_NOT_OWNER u1001)
 
 (define-data-var last-token-id uint u0)
 (define-data-var contract-owner principal tx-sender)
-(define-data-var authorized-minter principal .dimensional-core)
+(define-data-var authorized-minter principal tx-sender)
 
 (define-non-fungible-token dimensional-risk-token uint)
 
@@ -29,7 +29,7 @@
 
 (define-public (transfer (token-id uint) (sender principal) (recipient principal))
     (begin
-        (asserts! (is-eq tx-sender sender) ERR_NOT_OWNER)
+        (asserts! (is-eq tx-sender sender) (err ERR_NOT_OWNER))
         (nft-transfer? dimensional-risk-token token-id sender recipient)
     )
 )
@@ -38,7 +38,7 @@
 
 (define-public (mint (recipient principal) (token-id uint))
     (begin
-        (asserts! (is-eq tx-sender (var-get authorized-minter)) ERR_UNAUTHORIZED)
+        (asserts! (is-eq tx-sender (var-get authorized-minter)) (err ERR_UNAUTHORIZED))
         (try! (nft-mint? dimensional-risk-token token-id recipient))
         (if (> token-id (var-get last-token-id))
             (var-set last-token-id token-id)
@@ -50,8 +50,8 @@
 
 (define-public (burn (token-id uint))
     (begin
-        (asserts! (is-eq tx-sender (var-get authorized-minter)) ERR_UNAUTHORIZED)
-        (nft-burn? dimensional-risk-token token-id (unwrap! (nft-get-owner? dimensional-risk-token token-id) ERR_NOT_OWNER))
+        (asserts! (is-eq tx-sender (var-get authorized-minter)) (err ERR_UNAUTHORIZED))
+        (nft-burn? dimensional-risk-token token-id (unwrap! (nft-get-owner? dimensional-risk-token token-id) (err ERR_NOT_OWNER)))
     )
 )
 
@@ -59,7 +59,7 @@
 
 (define-public (set-minter (new-minter principal))
     (begin
-        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+        (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
         (var-set authorized-minter new-minter)
         (ok true)
     )

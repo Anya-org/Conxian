@@ -2,15 +2,14 @@
 ;; Conxian Protocol: Memory pool management for optimized data handling
 
 ;; Dependencies
-(use-trait core-traits .core-traits.core-traits)
 
 ;; Constants
-(define-constant ERR_INSUFFICIENT_MEMORY (err u17001))
-(define-constant ERR_INVALID_POOL_SIZE (err u17002))
-(define-constant ERR_POOL_FULL (err u17003))
-(define-constant ERR_POOL_EMPTY (err u17004))
-(define-constant ERR_INVALID_ALLOCATION (err u17005))
-(define-constant ERR_UNAUTHORIZED (err u17006))
+(define-constant ERR_INSUFFICIENT_MEMORY u17001)
+(define-constant ERR_INVALID_POOL_SIZE u17002)
+(define-constant ERR_POOL_FULL u17003)
+(define-constant ERR_POOL_EMPTY u17004)
+(define-constant ERR_INVALID_ALLOCATION u17005)
+(define-constant ERR_UNAUTHORIZED u17006)
 
 ;; Memory pool parameters
 (define-constant MIN_POOL_SIZE u1000)
@@ -58,7 +57,7 @@
             (ok u0)
         )
     )
-    none (err ERR_INVALID_ALLOCATION)
+    (err ERR_INVALID_ALLOCATION)
   )
 )
 
@@ -67,8 +66,8 @@
 ;; @desc Create a new memory pool
 (define-public (create-memory-pool (pool-size uint) (pool-type (string-ascii 16)))
   (begin
-    (asserts! (>= pool-size MIN_POOL_SIZE) ERR_INVALID_POOL_SIZE)
-    (asserts! (<= pool-size MAX_POOL_SIZE) ERR_INVALID_POOL_SIZE)
+    (asserts! (>= pool-size MIN_POOL_SIZE) (err ERR_INVALID_POOL_SIZE))
+    (asserts! (<= pool-size MAX_POOL_SIZE) (err ERR_INVALID_POOL_SIZE))
     
     (let ((pool-id (+ (var-get total-pools-allocated) u1)))
       (map-set memory-pools { pool-id: pool-id } {
@@ -91,11 +90,11 @@
 ;; @desc Allocate a slot in a memory pool
 (define-public (allocate-memory (pool-id uint) (allocation-size uint) (initial-data (buff 256)))
   (begin
-    (asserts! (> allocation-size u0) ERR_INVALID_ALLOCATION)
-    (asserts! (<= allocation-size MAX_ALLOCATION_SIZE) ERR_INVALID_ALLOCATION)
+    (asserts! (> allocation-size u0) (err ERR_INVALID_ALLOCATION))
+    (asserts! (<= allocation-size MAX_ALLOCATION_SIZE) (err ERR_INVALID_ALLOCATION))
     
-    (let ((pool (unwrap! (map-get? memory-pools { pool-id: pool-id }) ERR_INVALID_ALLOCATION)))
-      (asserts! (> (get free-slots pool) u0) ERR_POOL_FULL)
+    (let ((pool (unwrap! (map-get? memory-pools { pool-id: pool-id }) (err ERR_INVALID_ALLOCATION))))
+      (asserts! (> (get free-slots pool) u0) (err ERR_POOL_FULL))
       
       (let ((slot-id (+ (get allocated-slots pool) u1)))
         (map-set memory-allocations { pool-id: pool-id, slot-id: slot-id } {
@@ -124,8 +123,8 @@
 ;; @desc Deallocate a slot from a memory pool
 (define-public (deallocate-memory (pool-id uint) (slot-id uint))
   (begin
-    (let ((alloc (unwrap! (map-get? memory-allocations { pool-id: pool-id, slot-id: slot-id }) ERR_INVALID_ALLOCATION)))
-      (asserts! (is-eq (get allocated-to alloc) tx-sender) ERR_UNAUTHORIZED)
+    (let ((alloc (unwrap! (map-get? memory-allocations { pool-id: pool-id, slot-id: slot-id }) (err ERR_INVALID_ALLOCATION))))
+      (asserts! (is-eq (get allocated-to alloc) tx-sender) (err ERR_UNAUTHORIZED))
       
       (map-delete memory-allocations { pool-id: pool-id, slot-id: slot-id })
       
@@ -150,7 +149,7 @@
 ;; @desc Emergency cleanup of all memory pools
 (define-public (emergency-cleanup-all-pools)
   (begin
-    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
     ;; Placeholder for full cleanup logic
     (ok true)
   )

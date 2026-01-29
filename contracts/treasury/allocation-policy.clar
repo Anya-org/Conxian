@@ -2,8 +2,8 @@
 ;; Defines protocol revenue allocation percentages
 ;; Basis points: 10000 = 100%
 
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_INVALID_SHARE (err u1001))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_INVALID_SHARE u1001)
 
 (define-data-var staking-share uint u6000) ;; 60%
 (define-data-var dev-fund-share uint u2000) ;; 20%
@@ -25,8 +25,8 @@
     (insurance uint)
   )
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (asserts! (is-eq (+ staking (+ dev insurance)) u10000) ERR_INVALID_SHARE)
+    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq (+ staking (+ dev insurance)) u10000) (err ERR_INVALID_SHARE))
     (var-set staking-share staking)
     (var-set dev-fund-share dev)
     (var-set insurance-share insurance)

@@ -9,7 +9,6 @@
 ;; Standard traits
 (use-trait oracle-trait .defi-traits.oracle-trait)
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
-(use-trait pausable-trait .pausable-trait.pausable-trait)
 (use-trait rbac-trait .core-traits.conxian-access-trait)
 (use-trait circuit-breaker-trait .security-monitoring.circuit-breaker-trait)
 
@@ -22,21 +21,21 @@
 (define-constant MAX_FEE_RATE u1000)
 
 ;; ===== Error Codes =====
-(define-constant ERR_UNAUTHORIZED (err u2001))
-(define-constant ERR_INVALID_POSITION (err u2002))
-(define-constant ERR_INSUFFICIENT_COLLATERAL (err u2003))
-(define-constant ERR_SLIPPAGE (err u2004))
-(define-constant ERR_POSITION_EXISTS (err u2005))
-(define-constant ERR_INVALID_LEVERAGE (err u2006))
-(define-constant ERR_INVALID_POSITION_TYPE (err u2007))
-(define-constant ERR_POSITION_NOT_ACTIVE (err u2008))
-(define-constant ERR_INVALID_FUNDING_INTERVAL (err u2009))
-(define-constant ERR_ORACLE_ERROR (err u2010))
-(define-constant ERR_INVALID_AMOUNT (err u2011))
-(define-constant ERR_POSITION_LIQUIDATED (err u2012))
-(define-constant ERR_INSUFFICIENT_LIQUIDITY (err u2013))
-(define-constant ERR_UNWRAP_FAILED (err u2018))
-(define-constant ERR_BITCOIN_NOT_FINALIZED (err u10001))
+(define-constant ERR_UNAUTHORIZED u2001)
+(define-constant ERR_INVALID_POSITION u2002)
+(define-constant ERR_INSUFFICIENT_COLLATERAL u2003)
+(define-constant ERR_SLIPPAGE u2004)
+(define-constant ERR_POSITION_EXISTS u2005)
+(define-constant ERR_INVALID_LEVERAGE u2006)
+(define-constant ERR_INVALID_POSITION_TYPE u2007)
+(define-constant ERR_POSITION_NOT_ACTIVE u2008)
+(define-constant ERR_INVALID_FUNDING_INTERVAL u2009)
+(define-constant ERR_ORACLE_ERROR u2010)
+(define-constant ERR_INVALID_AMOUNT u2011)
+(define-constant ERR_POSITION_LIQUIDATED u2012)
+(define-constant ERR_INSUFFICIENT_LIQUIDITY u2013)
+(define-constant ERR_UNWRAP_FAILED u2018)
+(define-constant ERR_BITCOIN_NOT_FINALIZED u10001)
 
 ;; ===== Data Variables =====
 (define-data-var owner principal tx-sender)
@@ -143,7 +142,7 @@
     (oracle-ref <oracle-trait>)
   )
   (let (
-      (position (unwrap! (get-position user position-id) ERR_INVALID_POSITION))
+      (position (unwrap! (get-position user position-id) (err ERR_INVALID_POSITION)))
       (current-price (try! (get-oracle-price (var-get dimensional-token) oracle-ref)))
       (collateral-value (get collateral position))
       (pnl (calculate-pnl position current-price))
@@ -171,7 +170,7 @@
 ;; ===== Public Functions - Admin =====
 (define-public (set-owner (new-owner principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get owner)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get owner)) (err ERR_UNAUTHORIZED))
     (var-set owner new-owner)
     (ok true)
   )
@@ -179,7 +178,7 @@
 
 (define-public (set-oracle-contract (oracle principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get owner)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get owner)) (err ERR_UNAUTHORIZED))
     (var-set oracle-contract-principal oracle)
     (ok true)
   )
@@ -187,7 +186,7 @@
 
 (define-public (set-protocol-fee-rate (fee-rate uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get owner)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get owner)) (err ERR_UNAUTHORIZED))
     (asserts! (<= fee-rate MAX_FEE_RATE) (err u2016))
     (var-set protocol-fee-rate fee-rate)
     (ok true)
@@ -196,7 +195,7 @@
 
 (define-public (set-dimensional-token (token principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get owner)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get owner)) (err ERR_UNAUTHORIZED))
     (var-set dimensional-token token)
     (ok true)
   )
@@ -214,8 +213,8 @@
 (define-public (get-dimensional-state)
   (ok {
     total-positions: (var-get next-position-id),
-    active-positions: (unwrap! (count-active-positions) ERR_UNWRAP_FAILED),
-    total-value-locked: (unwrap! (calculate-tvl) ERR_UNWRAP_FAILED),
+    active-positions: (unwrap! (count-active-positions) (err ERR_UNWRAP_FAILED)),
+    total-value-locked: (unwrap! (calculate-tvl) (err ERR_UNWRAP_FAILED)),
     system-health: "operational",
   })
 )
@@ -242,9 +241,9 @@
         (is-long (or (is-eq position-type "LONG") (is-eq position-type "PERPETUAL")))
         (size (* collateral-amount leverage))
       )
-      (asserts! (>= collateral-amount MIN_COLLATERAL) ERR_INVALID_AMOUNT)
+      (asserts! (>= collateral-amount MIN_COLLATERAL) (err ERR_INVALID_AMOUNT))
       (asserts! (and (>= leverage u1) (<= leverage MAX_LEVERAGE))
-        ERR_INVALID_LEVERAGE
+        (err ERR_INVALID_LEVERAGE)
       )
       (asserts!
         (or
@@ -252,7 +251,7 @@
           (is-eq position-type "SHORT")
           (is-eq position-type "PERPETUAL")
         )
-        ERR_INVALID_POSITION_TYPE
+        (err ERR_INVALID_POSITION_TYPE)
       )
 
       (try! (contract-call? token-trait transfer collateral-amount tx-sender
@@ -286,7 +285,7 @@
         tags: tags,
         version: (var-get positions-version),
         metadata: metadata,
-        tenure-id: (unwrap-panic (contract-call? .block-utils get-current-tenure-id)),
+        tenure-id: (contract-call? .block-utils get-current-tenure-id),
       })
 
       ;; Fix size calculation for short
@@ -301,7 +300,7 @@
                 owner: tx-sender,
                 id: position-id,
               })
-              ERR_INVALID_POSITION
+              (err ERR_INVALID_POSITION)
             ) { size: (* (to-int size) -1) }
           ))
         true
@@ -322,7 +321,7 @@
         position-type: position-type,
         token: token,
         price: price,
-        tenure-id: (unwrap-panic (contract-call? .block-utils get-current-tenure-id)),
+        tenure-id: (contract-call? .block-utils get-current-tenure-id),
       })
       (ok position-id)
     )
@@ -338,7 +337,7 @@
   (begin
     (try! (check-bitcoin-finality))
     (let (
-        (position (unwrap! (get-position tx-sender position-id) ERR_INVALID_POSITION))
+        (position (unwrap! (get-position tx-sender position-id) (err ERR_INVALID_POSITION)))
         (current-price (try! (get-oracle-price (var-get dimensional-token) oracle)))
         (pnl (calculate-pnl position current-price))
         (fees (calculate-fees position))
@@ -354,7 +353,7 @@
           )
         ))
       )
-      (asserts! (is-eq (get status position) "ACTIVE") ERR_POSITION_NOT_ACTIVE)
+      (asserts! (is-eq (get status position) "ACTIVE") (err ERR_POSITION_NOT_ACTIVE))
 
       (map-set positions {
         owner: tx-sender,
@@ -367,7 +366,7 @@
       )
 
       (asserts! (is-eq (contract-of token-trait) (var-get dimensional-token))
-        ERR_UNAUTHORIZED
+        (err ERR_UNAUTHORIZED)
       )
       (if (> total-amount u0)
         (try! (as-contract (contract-call? token-trait transfer total-amount tx-sender tx-sender
@@ -390,7 +389,7 @@
         owner: tx-sender,
         pnl: pnl,
         fees: fees,
-        tenure-id: (unwrap-panic (contract-call? .block-utils get-current-tenure-id)),
+        tenure-id: (contract-call? .block-utils get-current-tenure-id),
       })
       (ok true)
     )
@@ -405,7 +404,7 @@
   (begin
     (try! (check-bitcoin-finality))
     (let (
-        (position (unwrap! (get-position user position-id) ERR_INVALID_POSITION))
+        (position (unwrap! (get-position user position-id) (err ERR_INVALID_POSITION)))
         (current-price (try! (get-oracle-price (var-get dimensional-token) oracle-ref)))
         (pnl (calculate-pnl position current-price))
         (collateral-value (get collateral position))
@@ -420,9 +419,9 @@
           )
         ))
       )
-      (asserts! (is-eq (get status position) "ACTIVE") ERR_POSITION_NOT_ACTIVE)
+      (asserts! (is-eq (get status position) "ACTIVE") (err ERR_POSITION_NOT_ACTIVE))
       (asserts! (< adjusted-collateral maintenance-margin)
-        ERR_INSUFFICIENT_COLLATERAL
+        (err ERR_INSUFFICIENT_COLLATERAL)
       )
 
       (map-set positions {
@@ -448,7 +447,7 @@
         position-id: position-id,
         owner: user,
         liquidator: tx-sender,
-        tenure-id: (unwrap-panic (contract-call? .block-utils get-current-tenure-id)),
+        tenure-id: (contract-call? .block-utils get-current-tenure-id),
       })
 
       (ok true)
@@ -456,21 +455,6 @@
   )
 )
 
-;; ===== Public Functions - Pausable =====
-(define-public (check-not-paused (pausable <pausable-trait>))
-  (begin
-    (asserts! (is-eq (contract-of pausable) (var-get pausable-contract))
-      (err u3001)
-    )
-    (match (contract-call? pausable is-paused)
-      is-paused? (if is-paused?
-        (err u3001)
-        (ok true)
-      )
-      error (err u3002)
-    )
-  )
-)
 
 ;; --- Nakamoto Consensus Integration ---
 (define-private (check-bitcoin-finality)
@@ -483,7 +467,7 @@
     (oracle principal)
   )
   (begin
-    (asserts! (is-eq tx-sender (var-get owner)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get owner)) (err ERR_UNAUTHORIZED))
     (var-set owner new-owner)
     (var-set oracle-contract-principal oracle)
     (var-set protocol-fee-rate u30) ;; 0.3%

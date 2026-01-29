@@ -1,5 +1,5 @@
 ;; --- Error Definitions ---
-(define-constant ERR_NOT_IMPLEMENTED (err u9999))
+(define-constant ERR_NOT_IMPLEMENTED u9999)
 
 ;; --- Protocol Configuration ---
 (define-constant BRIDGE_FEE u1000)

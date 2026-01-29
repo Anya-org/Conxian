@@ -4,9 +4,9 @@
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_LOCKED (err u1001))
-(define-constant ERR_NO_ALLOCATION (err u1002))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_LOCKED u1001)
+(define-constant ERR_NO_ALLOCATION u1002)
 
 ;; Vesting Schedule (using block height)
 (define-constant VESTING_START block-height)
@@ -35,7 +35,7 @@
   )
   (begin
     (asserts! (is-eq tx-sender (unwrap-panic (contract-call? .conxian-protocol get-admin)))
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
     )
     (try! (contract-call? token transfer amount tx-sender (as-contract tx-sender) none))
     (map-set allocations {
@@ -57,12 +57,12 @@
           beneficiary: sender,
           token: (contract-of token),
         })
-        ERR_NO_ALLOCATION
+        (err ERR_NO_ALLOCATION)
       ))
       (vested-amount (calculate-vested (get total allocation)))
       (claimable (- vested-amount (get claimed allocation)))
     )
-    (asserts! (> claimable u0) ERR_LOCKED)
+    (asserts! (> claimable u0) (err ERR_LOCKED))
     (try! (as-contract (contract-call? token transfer claimable tx-sender sender none)))
     (map-set allocations {
       beneficiary: sender,

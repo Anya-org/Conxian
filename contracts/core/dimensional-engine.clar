@@ -12,14 +12,14 @@
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_CONTRACT_PAUSED (err u5000))
-(define-constant ERR_NON_COMPLIANT (err u5001))
-(define-constant ERR_MODULE_NOT_ACTIVE (err u5002))
-(define-constant ERR_MODULE_NOT_FOUND (err u5003))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_CONTRACT_PAUSED u5000)
+(define-constant ERR_NON_COMPLIANT u5001)
+(define-constant ERR_MODULE_NOT_ACTIVE u5002)
+(define-constant ERR_MODULE_NOT_FOUND u5003)
 
 ;; Data Vars
-(define-data-var protocol-coordinator principal deployer)
+(define-data-var protocol-coordinator principal tx-sender)
 (define-data-var regulatory-adapter-contract principal .regulatory-adapter)
 (define-data-var block-utils-contract principal .block-utils)
 (define-data-var conxian-protocol-contract principal .conxian-protocol)
@@ -34,8 +34,8 @@
 
 (define-private (guard-entry (protocol-status { paused: bool, compliant: bool, tenure-id: (optional uint) }))
   (begin
-    (asserts! (not (get paused protocol-status)) ERR_CONTRACT_PAUSED)
-    (asserts! (get compliant protocol-status) ERR_NON_COMPLIANT)
+    (asserts! (not (get paused protocol-status)) (err ERR_CONTRACT_PAUSED))
+    (asserts! (get compliant protocol-status) (err ERR_NON_COMPLIANT))
     (ok true)
   )
 )
@@ -44,7 +44,7 @@
 
 (define-public (set-protocol-coordinator (new-coordinator principal))
   (begin
-    (asserts! (is-authorized) ERR_UNAUTHORIZED)
+    (asserts! (is-authorized) (err ERR_UNAUTHORIZED))
     (var-set protocol-coordinator new-coordinator)
     (ok true)
   )
@@ -56,7 +56,7 @@
   (let ((module-data (contract-call? .conxian-protocol get-module name)))
     (match module-data
       data (begin
-        (asserts! (get active data) ERR_MODULE_NOT_ACTIVE)
+        (asserts! (get active data) (err ERR_MODULE_NOT_ACTIVE))
         (ok (get contract data))
       )
       (err u5003)
@@ -75,10 +75,10 @@
   )
   (begin
     (let (
-        (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
-        (registered-manager (try! (get-module-contract "position-manager")))
+        (protocol-status (unwrap-panic (contract-call? .conxian-protocol get-protocol-status)))
+        (registered-manager (unwrap-panic (get-module-contract "position-manager")))
       )
-      (asserts! (is-eq (contract-of position-manager) registered-manager) ERR_UNAUTHORIZED)
+      (asserts! (is-eq (contract-of position-manager) registered-manager) (err ERR_UNAUTHORIZED))
       (try! (guard-entry protocol-status))
       (let ((result (contract-call? position-manager open-position tx-sender token amount leverage long)))
         (print {
@@ -100,10 +100,10 @@
   )
   (begin
     (let (
-        (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
-        (registered-manager (try! (get-module-contract "position-manager")))
+        (protocol-status (unwrap-panic (contract-call? .conxian-protocol get-protocol-status)))
+        (registered-manager (unwrap-panic (get-module-contract "position-manager")))
       )
-      (asserts! (is-eq (contract-of position-manager) registered-manager) ERR_UNAUTHORIZED)
+      (asserts! (is-eq (contract-of position-manager) registered-manager) (err ERR_UNAUTHORIZED))
       (try! (guard-entry protocol-status))
       (contract-call? position-manager close-position tx-sender position-id)
     )
@@ -119,10 +119,10 @@
   )
   (begin
     (let (
-        (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
-        (registered-manager (try! (get-module-contract "collateral-manager")))
+        (protocol-status (unwrap-panic (contract-call? .conxian-protocol get-protocol-status)))
+        (registered-manager (unwrap-panic (get-module-contract "collateral-manager")))
       )
-      (asserts! (is-eq (contract-of collateral-manager) registered-manager) ERR_UNAUTHORIZED)
+      (asserts! (is-eq (contract-of collateral-manager) registered-manager) (err ERR_UNAUTHORIZED))
       (try! (guard-entry protocol-status))
       (contract-call? collateral-manager deposit-funds amount token-trait)
     )
@@ -136,10 +136,10 @@
   )
   (begin
     (let (
-        (protocol-status (try! (contract-call? .conxian-protocol get-protocol-status)))
-        (registered-manager (try! (get-module-contract "collateral-manager")))
+        (protocol-status (unwrap-panic (contract-call? .conxian-protocol get-protocol-status)))
+        (registered-manager (unwrap-panic (get-module-contract "collateral-manager")))
       )
-      (asserts! (is-eq (contract-of collateral-manager) registered-manager) ERR_UNAUTHORIZED)
+      (asserts! (is-eq (contract-of collateral-manager) registered-manager) (err ERR_UNAUTHORIZED))
       (try! (guard-entry protocol-status))
       (contract-call? collateral-manager withdraw-funds amount token-trait)
     )
@@ -154,7 +154,7 @@
   )
   (begin
     (let ((registered-manager (try! (get-module-contract "risk-manager"))))
-      (asserts! (is-eq (contract-of risk-manager) registered-manager) ERR_UNAUTHORIZED)
+      (asserts! (is-eq (contract-of risk-manager) registered-manager) (err ERR_UNAUTHORIZED))
       (contract-call? risk-manager get-health-factor position-id)
     )
   )
@@ -166,7 +166,7 @@
   )
   (begin
     (let ((registered-manager (try! (get-module-contract "risk-manager"))))
-      (asserts! (is-eq (contract-of risk-manager) registered-manager) ERR_UNAUTHORIZED)
+      (asserts! (is-eq (contract-of risk-manager) registered-manager) (err ERR_UNAUTHORIZED))
       (contract-call? risk-manager liquidate position-id)
     )
   )

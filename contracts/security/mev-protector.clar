@@ -1,10 +1,10 @@
 ;; mev-protector.clar
 ;; Implements Commit-Reveal scheme to prevent sandwich attacks
 
-(define-constant ERR_INVALID_COMMIT (err u2000))
-(define-constant ERR_COMMIT_EXPIRED (err u2001))
-(define-constant ERR_COMMIT_NOT_FOUND (err u2002))
-(define-constant ERR_BLOCK_HEIGHT_MISMATCH (err u2003))
+(define-constant ERR_INVALID_COMMIT u2000)
+(define-constant ERR_COMMIT_EXPIRED u2001)
+(define-constant ERR_COMMIT_NOT_FOUND u2002)
+(define-constant ERR_BLOCK_HEIGHT_MISMATCH u2003)
 
 ;; Commitment storage
 (define-map commits principal { hash: (buff 32), height: uint })
@@ -27,11 +27,11 @@
 ;; @desc Reveals the payload and validates against commitment
 (define-public (reveal (salt (buff 32)) (payload (buff 128)))
   (let (
-      (user-commit (unwrap! (map-get? commits tx-sender) ERR_COMMIT_NOT_FOUND))
+      (user-commit (unwrap! (map-get? commits tx-sender) (err ERR_COMMIT_NOT_FOUND)))
       (computed-hash (contract-call? .encoding hash-data (concat salt payload)))
     )
-    (asserts! (<= burn-block-height (+ (get height user-commit) COMMIT_WINDOW)) ERR_COMMIT_EXPIRED)
-    (asserts! (is-eq (get hash user-commit) computed-hash) ERR_INVALID_COMMIT)
+    (asserts! (<= burn-block-height (+ (get height user-commit) COMMIT_WINDOW)) (err ERR_COMMIT_EXPIRED))
+    (asserts! (is-eq (get hash user-commit) computed-hash) (err ERR_INVALID_COMMIT))
 
     (map-set revealed-in-block tx-sender burn-block-height)
     (map-delete commits tx-sender)
@@ -41,7 +41,7 @@
 
 (define-public (submit-bid (payload (buff 128)) (bid uint))
     (begin
-        (asserts! (is-revealed tx-sender) ERR_COMMIT_NOT_FOUND)
+        (asserts! (is-revealed tx-sender) (err ERR_COMMIT_NOT_FOUND))
         (map-set auction-bids { block: burn-block-height, user: tx-sender } { payload: payload, bid: bid })
         (ok true)
     )
@@ -51,7 +51,7 @@
     (let ((bids (map-get? auction-bids { block: block, user: tx-sender })))
         (match bids
             bid (ok true)
-            ERR_COMMIT_NOT_FOUND
+            (err ERR_COMMIT_NOT_FOUND)
         )
     )
 )

@@ -4,12 +4,11 @@
 (impl-trait .core-traits.protocol-manager-trait)
 
 ;; Traits
-(use-trait admin-facade-trait .core-traits.admin-facade-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_PAUSED (err u1001))
-(define-constant ERR_MODULE_NOT_FOUND (err u1003))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_PAUSED u1001)
+(define-constant ERR_MODULE_NOT_FOUND u1003)
 
 ;; Roles
 (define-constant ROLE_ADMIN u1)
@@ -30,14 +29,14 @@
 ;; Authorization
 
 (define-read-only (get-protocol-admin)
-  (var-get contract-owner)
+  (ok (var-get contract-owner))
 )
 
 ;; Administrative Functions
 
 (define-public (set-paused (new-paused bool))
   (begin
-    (asserts! (contract-call? .admin-facade is-authorized-to-pause tx-sender) ERR_UNAUTHORIZED)
+    (asserts! (contract-call? .admin-facade is-authorized-to-pause tx-sender) (err ERR_UNAUTHORIZED))
     (var-set paused new-paused)
     (print { event: "protocol-pause-status", paused: new-paused })
     (ok true)
@@ -46,7 +45,7 @@
 
 (define-public (register-module (name (string-ascii 32)) (contract principal))
   (begin
-    (asserts! (unwrap! (contract-call? .admin-facade is-authorized ROLE_ADMIN) ERR_UNAUTHORIZED) ERR_UNAUTHORIZED)
+    (asserts! (unwrap! (contract-call? .admin-facade is-authorized ROLE_ADMIN) (err ERR_UNAUTHORIZED)) (err ERR_UNAUTHORIZED))
     (map-set modules { name: name } {
       contract: contract,
       active: true,
@@ -57,7 +56,7 @@
 
 (define-public (set-contract-owner (new-owner principal))
   (begin
-    (asserts! (contract-call? .admin-facade is-global-admin) ERR_UNAUTHORIZED)
+    (asserts! (contract-call? .admin-facade is-global-admin) (err ERR_UNAUTHORIZED))
     (var-set contract-owner new-owner)
     (ok true)
   )

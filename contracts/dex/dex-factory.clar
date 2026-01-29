@@ -2,8 +2,8 @@
 ;; Enhanced DEX Factory supporting multiple pool types
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_POOL_EXISTS (err u2002))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_POOL_EXISTS u2002)
 
 ;; Data Vars
 (define-data-var pool-count uint u0)
@@ -31,8 +31,8 @@
             (current-count (var-get pool-count))
         )
         (begin
-            (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) ERR_UNAUTHORIZED)
-            (asserts! (is-none (map-get? pools { token0: token0, token1: token1, type: type })) ERR_POOL_EXISTS)
+            (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
+            (asserts! (is-none (map-get? pools { token0: token0, token1: token1, type: type })) (err ERR_POOL_EXISTS))
 
             (map-set pools { token0: token0, token1: token1, type: type } pool-contract)
             (map-set pool-by-id (+ current-count u1) {

@@ -5,14 +5,14 @@
 ;; Enforces "Clean-Hands" Compliance.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
-(use-trait reputation-trait .reputation-engine-trait.reputation-engine-trait)
+(use-trait reputation-trait .governance-traits.reputation-engine-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_ALREADY_VOTED (err u1001))
-(define-constant ERR_VOTING_CLOSED (err u1002))
-(define-constant ERR_START_BLOCK_IN_PAST (err u2000))
-(define-constant ERR_NON_COMPLIANT (err u2001))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_ALREADY_VOTED u1001)
+(define-constant ERR_VOTING_CLOSED u1002)
+(define-constant ERR_START_BLOCK_IN_PAST u2000)
+(define-constant ERR_NON_COMPLIANT u2001)
 
 ;; Data Vars
 (define-data-var voting-delay uint u144) ;; ~1 day (144 blocks @ 10m)
@@ -40,7 +40,7 @@
 
 ;; Compliance Check
 (define-private (check-compliance (user principal))
-  (let ((compliance-status (contract-call? .compliance.regulatory-adapter check-clean-hands-compliance user)))
+  (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
     (if (is-ok compliance-status)
       true
       false
@@ -60,10 +60,10 @@
       (current-block block-height)
     )
     ;; Compliance Check
-    (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+    (asserts! (check-compliance tx-sender) (err ERR_NON_COMPLIANT))
 
     ;; Ensure start block is in the future
-    (asserts! (> start-block current-block) ERR_START_BLOCK_IN_PAST)
+    (asserts! (> start-block current-block) (err ERR_START_BLOCK_IN_PAST))
 
     (map-set proposals proposal-id {
       start-block: start-block,
@@ -101,19 +101,19 @@
       )))
     )
     ;; Compliance Check
-    (asserts! (check-compliance voter) ERR_NON_COMPLIANT)
+    (asserts! (check-compliance voter) (err ERR_NON_COMPLIANT))
 
     ;; Validation
     (asserts!
       (and (>= block-height (get start-block proposal)) (<= block-height (get end-block proposal)))
-      ERR_VOTING_CLOSED
+      (err ERR_VOTING_CLOSED)
     )
     (asserts!
       (is-none (map-get? votes {
         proposal-id: proposal-id,
         voter: voter,
       }))
-      ERR_ALREADY_VOTED
+      (err ERR_ALREADY_VOTED)
     )
 
     (map-set votes {
@@ -138,15 +138,15 @@
     )
 
     ;; Update Reputation Activity
-    (try! (contract-call? .reputation-engine update-activity-score voter))
-
-    (print {
+    (let ((rep-update (contract-call? .reputation-engine update-activity-score voter)))
+      (print {
       event: "vote",
       id: proposal-id,
       voter: voter,
       support: support,
-      weight: weighted-balance,
-    })
+        weight: weighted-balance,
+      })
+    )
     (ok true)
   )
 )

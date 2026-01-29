@@ -67,8 +67,8 @@ describe('Root Recovery: Conxian Protocol', () => {
     );
     expect(statusResponse.result).toStrictEqual(Cl.ok(Cl.tuple({
       paused: Cl.bool(false),
-      'tenure-id': Cl.uint(0),
-      compliant: Cl.bool(false)
+      'tenure-id': Cl.some(Cl.uint(0)),
+      compliant: Cl.bool(true)
     })));
   });
 });

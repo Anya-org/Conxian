@@ -5,7 +5,7 @@
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u7200))
+(define-constant ERR_UNAUTHORIZED u7200)
 (define-constant BRIDGE_FEE u1000000) ;; 1 STX
 
 ;; Data Vars

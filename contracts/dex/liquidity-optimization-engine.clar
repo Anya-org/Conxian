@@ -7,11 +7,11 @@
 (use-trait oracle-trait .defi-traits.oracle-trait)
 
 ;; Constants
-(define-constant ERR_INSUFFICIENT_LIQUIDITY (err 12001))
-(define-constant ERR_INVALID_POOL (err 12002))
-(define-constant ERR_OPTIMIZATION_FAILED (err 12003))
-(define-constant ERR_INSUFFICIENT_DATA (err 12004))
-(define-constant ERR_INVALID_PARAMETERS (err 12005))
+(define-constant ERR_INSUFFICIENT_LIQUIDITY 12001)
+(define-constant ERR_INVALID_POOL 12002)
+(define-constant ERR_OPTIMIZATION_FAILED 12003)
+(define-constant ERR_INSUFFICIENT_DATA 12004)
+(define-constant ERR_INVALID_PARAMETERS 12005)
 
 ;; Optimization parameters
 (define-constant MIN_LIQUIDITY_THRESHOLD u100000000) ;; 100 STX equivalent
@@ -83,7 +83,7 @@
 
 (define-public (optimize-liquidity (pool principal))
     (begin
-        (asserts! (var-get optimization-engine-active) ERR_OPTIMIZATION_FAILED)
+        (asserts! (var-get optimization-engine-active) (err ERR_OPTIMIZATION_FAILED))
 
         (let (
                 (current-utilization (get-pool-utilization pool))
@@ -141,11 +141,11 @@
     )
     (begin
         ;; Verify pool exists
-        (asserts! (contract-call? .dex-facade pool-exists pool) ERR_INVALID_POOL)
+        (asserts! (contract-call? .dex-facade pool-exists pool) (err ERR_INVALID_POOL))
 
         ;; Validate fee tier
         (asserts! (and (>= new-fee-tier u0) (<= new-fee-tier u10000))
-            ERR_INVALID_PARAMETERS
+            (err ERR_INVALID_PARAMETERS)
         )
 
         ;; Get current fee tier
@@ -198,7 +198,7 @@
             (is-eq tx-sender
                 (unwrap-panic (contract-call? (var-get conxian-protocol) get-admin))
             )
-            ERR_UNAUTHORIZED
+            (err ERR_UNAUTHORIZED)
         )
         (var-set optimization-engine-active active)
         (ok true)

@@ -1,5 +1,5 @@
 ;; Error Constants
-(define-constant ERR_NOT_IMPLEMENTED (err u9999))
+(define-constant ERR_NOT_IMPLEMENTED u9999)
 (define-data-var message-nonce uint u0)
 
 ;; --- Read-Only Functions ---

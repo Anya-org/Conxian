@@ -5,7 +5,7 @@
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
-(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_UNAUTHORIZED u1000)
 
 (define-data-var allowance-limit uint u1000000) ;; Daily spending limit
 (define-data-var last-spend-block uint u0)
@@ -24,16 +24,16 @@
     (recipient principal)
   )
   (begin
-      ;; ROLE_OPERATOR ERR_UN
+      ;; ROLE_OPERATOR (err ERR_UN)
     (asserts!
       (is-ok
         (contract-call? .regulatory-adapter check-clean-hands-compliance tx-sender)
       )
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
     )
     (asserts!
       (contract-call? .conxian-access has-role tx-sender ROLE_OPERATOR)
-      ;; ROLE_OPERATOR ERR_UNAUTHORIZED
+      ;; ROLE_OPERATOR (err ERR_UNAUTHORIZED)
     )
     ;; Check limits
     (if (> (- block-height (var-get last-spend-block))

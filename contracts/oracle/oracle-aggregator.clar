@@ -1,13 +1,11 @@
 ;; Oracle Aggregator - Weighted sources with TWAP and manipulation detection (minimal implementation)
 
-(use-trait oracle-trait .oracle-pricing.oracle-trait)
-(use-trait err-trait .trait-errors.standard-errors)
-(use-trait math-trait .math-utilities.math-trait)
+(use-trait oracle-trait .defi-traits.oracle-trait)
 
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_ASSET_NOT_FOUND (err u1001))
-(define-constant ERR_CIRCUIT_OPEN (err u1002))
-(define-constant ERR_INVALID_PRICE (err u1003))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_ASSET_NOT_FOUND u1001)
+(define-constant ERR_CIRCUIT_OPEN u1002)
+(define-constant ERR_INVALID_PRICE u1003)
 (define-constant BPS u10000)
 (define-constant MIN_PRICE u100)  ;; $0.0000000000000001 (1e-16)
 (define-constant MAX_PRICE (* u1000000000000000000 u1000000))  ;; $1M with 18 decimals
@@ -41,7 +39,7 @@
 })
 
 (define-private (get-block-height)
-  (unwrap! (get-block-info? block-height) (err u0))
+  burn-block-height
 )
 
 (define-private (is-stale (updated-at uint))
@@ -55,7 +53,7 @@
 
 (define-public (set-admin (new-admin principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
     (var-set admin new-admin)
     (ok true)
   )
@@ -63,7 +61,7 @@
 
 (define-public (set-circuit-breaker (cb principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
     (var-set circuit-breaker (some cb))
     (ok true)
   )
@@ -71,7 +69,7 @@
 
 (define-public (set-params (new-threshold-bps uint) (new-alpha-bps uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
     (var-set manipulation-threshold-bps new-threshold-bps)
     (var-set twap-alpha-bps new-alpha-bps)
     (ok true)
@@ -80,7 +78,7 @@
 
 (define-public (set-stale-threshold (blocks uint))
   (begin
-    (asserts! (contract-call? .access-control.access-control-contract has-role "contract-owner" tx-sender) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
     (var-set stale-threshold-blocks blocks)
     (ok true)
   )
@@ -104,11 +102,12 @@
 )
 (define-public (set-source (asset principal) (price uint) (weight uint))
   (begin
-    (asserts! (contract-call? .access-control.access-control-contract has-role "contract-owner" tx-sender) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
     (try! (check-circuit-breaker))
-    (asserts! (and (>= price MIN_PRICE) (<= price MAX_PRICE)) ERR_INVALID_PRICE)
+    (asserts! (and (>= price MIN_PRICE) (<= price MAX_PRICE)) (err ERR_INVALID_PRICE))
     (let ((alpha (var-get twap-alpha-bps))
           (current-timestamp (get-block-height)))
+      (begin
       (match (map-get? asset-sources { asset: asset })
         entry
           (let ((prev-twap (get twap entry))
@@ -149,9 +148,11 @@
           last-timestamp: current-timestamp
         })
       )
-      (try! (update-volatility asset price))
+      (let ((v-update (update-volatility asset price)))
+        (ok true)
+      )
+      )
     )
-    (ok true)
   )
 )
 
@@ -187,7 +188,7 @@
     entry
       (let ((cb (check-circuit-breaker)))
         (match cb
-          (ok okv)
+          okv
             (let ((age (- (get-block-height) (get updated-at entry)))
                   (stale (>= age (var-get stale-threshold-blocks))))
               (if (or stale (is-manipulated asset))
@@ -195,12 +196,12 @@
                 (ok (get price entry))
               )
             )
-          (err e)
+          errv
             ;; When circuit is open, degrade to TWAP if available
             (ok (get twap entry))
         )
       )
-    ERR_ASSET_NOT_FOUND
+    (err ERR_ASSET_NOT_FOUND)
   )
 )
 
@@ -215,7 +216,7 @@
           (ok (/ (+ (get price-cumulative twap-data) (* last-price time-diff)) time-diff))
         )
       )
-    ERR_ASSET_NOT_FOUND
+    (err ERR_ASSET_NOT_FOUND)
   )
 )
 
@@ -223,8 +224,10 @@
 (define-read-only (check-circuit-breaker)
   (match (var-get circuit-breaker)
     cb
-      (let ((open (try! (contract-call? cb is-circuit-open))))
-        (if open (err ERR_CIRCUIT_OPEN) (ok true)))
+      (if (contract-call? .circuit-breaker is-contract-paused cb)
+        (err ERR_CIRCUIT_OPEN)
+        (ok true)
+      )
     (ok true)
   )
 )

@@ -5,12 +5,12 @@
 (impl-trait .core-traits.funding-rate-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_UNAUTHORIZED u1000)
 (define-constant FUNDING_INTERVAL u8) ;; 8 hours (approx in blocks, but we use timestamps ideally, here simplified)
 (define-constant MAX_FUNDING_RATE u500) ;; 0.05% max per interval
 
 ;; Data Vars
-(define-data-var last-funding-time uint block-height)
+(define-data-var last-funding-time uint u0)
 (define-data-var current-funding-rate int 0)
 
 ;; Public Functions

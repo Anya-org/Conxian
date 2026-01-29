@@ -7,10 +7,10 @@
 (impl-trait .vault-traits.vault-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u8000))
-(define-constant ERR_NON_COMPLIANT (err u8001))
-(define-constant ERR_INSUFFICIENT_BALANCE (err u8002))
-(define-constant ERR_TRAVEL_RULE_REQUIRED (err u8003))
+(define-constant ERR_UNAUTHORIZED u8000)
+(define-constant ERR_NON_COMPLIANT u8001)
+(define-constant ERR_INSUFFICIENT_BALANCE u8002)
+(define-constant ERR_TRAVEL_RULE_REQUIRED u8003)
 
 ;; Thresholds
 (define-constant TRAVEL_RULE_THRESHOLD u100000000) ;; Example: 1 sBTC (satoshis) or $1k equiv. Adjust as needed.
@@ -45,11 +45,11 @@
     (let ((sender tx-sender))
         ;; 1. Validate Token
         (asserts! (is-eq (contract-of token) (var-get sbtc-token))
-            ERR_UNAUTHORIZED
+            (err ERR_UNAUTHORIZED)
         )
 
         ;; 2. Compliance Check (Clean Hands)
-        (asserts! (check-compliance sender) ERR_NON_COMPLIANT)
+        (asserts! (check-compliance sender) (err ERR_NON_COMPLIANT))
 
         ;; 3. Transfer Asset
         (try! (contract-call? token transfer amount sender (as-contract tx-sender) none))
@@ -82,15 +82,15 @@
         )
         ;; 1. Validate Token & Balance
         (asserts! (is-eq (contract-of token) (var-get sbtc-token))
-            ERR_UNAUTHORIZED
+            (err ERR_UNAUTHORIZED)
         )
-        (asserts! (>= current-balance amount) ERR_INSUFFICIENT_BALANCE)
+        (asserts! (>= current-balance amount) (err ERR_INSUFFICIENT_BALANCE))
 
         ;; 2. Compliance Check (Sender)
-        (asserts! (check-compliance sender) ERR_NON_COMPLIANT)
+        (asserts! (check-compliance sender) (err ERR_NON_COMPLIANT))
 
         ;; 3. Compliance Check (Recipient) - Prevent withdrawal to sanctioned/non-compliant addresses
-        (asserts! (check-compliance recipient) ERR_NON_COMPLIANT)
+        (asserts! (check-compliance recipient) (err ERR_NON_COMPLIANT))
 
         ;; 4. Travel Rule Check (if amount > threshold)
         ;; In a real Tier 0 system, this would require an attestation or separate flow.
@@ -118,7 +118,7 @@
 
 (define-public (set-sbtc-token (new-token principal))
     (begin
-        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+        (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
         (var-set sbtc-token new-token)
         (ok true)
     )
@@ -126,7 +126,7 @@
 
 (define-public (set-owner (new-owner principal))
     (begin
-        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+        (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
         (var-set contract-owner new-owner)
         (ok true)
     )
@@ -135,7 +135,7 @@
 ;; Vault Trait Implementation - allocate-to-strategy
 (define-public (allocate-to-strategy (strategy principal) (amount uint))
     (begin
-        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+        (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
         ;; Placeholder for strategy allocation logic
         (ok true)
     )
@@ -143,7 +143,7 @@
 
 (define-public (complete-withdrawal)
     (begin
-        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+        (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
         ;; Placeholder for withdrawal completion logic
         (ok true)
     )

@@ -1,14 +1,24 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { Simnet, initSimnet } from '@stacks/clarinet-sdk';
+
+import { describe, expect, it, beforeAll } from 'vitest';
+import { initSimnet } from '@stacks/clarinet-sdk';
+import { Cl } from '@stacks/transactions';
 
 describe('Simple Test', () => {
-  let simnet: Simnet;
+  let simnet: any;
+  let deployer: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     simnet = await initSimnet();
+    deployer = simnet.deployer;
   });
 
-  it('should have access to the simnet object', () => {
-    expect(simnet).toBeDefined();
+  it('should load conxian-access', () => {
+    const owner = simnet.callReadOnlyFn(
+      'conxian-access',
+      'get-contract-owner',
+      [],
+      deployer
+    );
+    expect(owner.result).toBeDefined();
   });
 });

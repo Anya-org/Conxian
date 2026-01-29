@@ -70,7 +70,7 @@ depends_on = ["core-traits", "conxian-access"]
 
 [contracts.conxian-protocol]
 path = "contracts/core/conxian-protocol.clar"
-depends_on = ["core-traits", "admin-facade"]
+depends_on = ["core-traits", "admin-facade", "block-utils"]
 
 [contracts.ops-engine]
 path = "contracts/core/ops-engine.clar"
@@ -110,6 +110,7 @@ depends_on = ["sip-standards"]
 
 [contracts.points-oracle]
 path = "contracts/oracle/points-oracle.clar"
+clarity-version = 2
 depends_on = ["defi-traits"]
 
 [contracts.swap-manager]
@@ -123,6 +124,10 @@ depends_on = ["sip-standards", "defi-traits", "vault-trait"]
 [contracts.dimensional-engine]
 path = "contracts/core/dimensional-engine.clar"
 depends_on = ["core-traits", "math-utilities", "conxian-protocol"]
+
+[contracts.dimensional-core]
+path = "contracts/dimensional/dimensional-core.clar"
+depends_on = ["defi-traits", "sip-standards", "core-traits", "security-monitoring", "block-utils", "position-nft"]
 
 [contracts.position-nft]
 path = "contracts/dimensional/position-nft.clar"
@@ -149,11 +154,11 @@ path = "contracts/treasury/allocation-policy.clar"
 
 [contracts.office-manager]
 path = "contracts/automation/office-manager.clar"
-depends_on = ["automation-traits"]
-
-[contracts.agent-risk]
-path = "contracts/agents/agent-risk.clar"
 depends_on = ["automation-traits", "core-traits"]
+
+# [contracts.agent-risk]
+# path = "contracts/agents/agent-risk.clar"
+# depends_on = ["automation-traits", "core-traits", "dimensional-core", "office-manager", "oracle-aggregator"]
 
 [contracts.agent-treasury]
 path = "contracts/agents/agent-treasury.clar"
@@ -235,9 +240,13 @@ depends_on = ["defi-traits", "math-utilities"]
 path = "contracts/oracle/federated-oracle-adapter.clar"
 depends_on = ["defi-traits"]
 
+[contracts.circuit-breaker]
+path = "contracts/security/circuit-breaker.clar"
+depends_on = ["core-traits", "security-monitoring", "conxian-access"]
+
 [contracts.oracle-aggregator]
 path = "contracts/oracle/oracle-aggregator.clar"
-depends_on = ["defi-traits", "redstone-oracle-adapter", "pyth-oracle-adapter"]
+depends_on = ["defi-traits", "math-utilities", "circuit-breaker"]
 
 [contracts.position-manager]
 path = "contracts/core/position-manager.clar"
@@ -245,7 +254,7 @@ depends_on = ["core-traits", "conxian-protocol"]
 
 [contracts.collateral-manager]
 path = "contracts/core/collateral-manager.clar"
-depends_on = ["core-traits", "conxian-protocol", "sip-standards", "conxian-access"]
+depends_on = ["core-traits", "conxian-protocol", "sip-standards", "conxian-access", "block-utils"]
 
 [contracts.risk-manager]
 path = "contracts/core/risk-manager.clar"

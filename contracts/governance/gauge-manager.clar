@@ -5,9 +5,9 @@
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_INVALID_POOL (err u1001))
-(define-constant ERR_VOTING_PERIOD_ACTIVE (err u1002))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_INVALID_POOL u1001)
+(define-constant ERR_VOTING_PERIOD_ACTIVE u1002)
 
 ;; Data Vars
 (define-data-var current-epoch uint u0)
@@ -35,7 +35,7 @@
       (balance (unwrap-panic (contract-call? .cxlp-token get-balance voter)))
     )
     (begin
-      (asserts! (>= balance amount) ERR_UNAUTHORIZED)
+      (asserts! (>= balance amount) (err ERR_UNAUTHORIZED))
       ;; Record user vote
       (map-set user-votes { epoch: epoch, user: voter } { pool: pool, amount: amount })
 
@@ -45,7 +45,9 @@
       )
 
       ;; Update total epoch votes
-      (var-set total-epoch-votes (+ (var-get total-epoch-votes) amount))
+      (let ((current-total (default-to u0 (map-get? total-epoch-votes epoch))))
+        (map-set total-epoch-votes epoch (+ current-total amount))
+      )
 
       (print { event: "gauge-vote", epoch: epoch, pool: pool, amount: amount, voter: voter })
       (ok true)

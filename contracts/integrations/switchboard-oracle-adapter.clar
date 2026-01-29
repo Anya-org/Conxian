@@ -5,9 +5,9 @@
 ;; Constants
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u6200))
-(define-constant ERR_NO_PRICE (err u6201))
-(define-constant ERR_CONFIDENCE_TOO_LOW (err u6202))
+(define-constant ERR_UNAUTHORIZED u6200)
+(define-constant ERR_NO_PRICE u6201)
+(define-constant ERR_CONFIDENCE_TOO_LOW u6202)
 
 (define-data-var block-utils-contract principal .block-utils)
 (define-data-var admin principal tx-sender)

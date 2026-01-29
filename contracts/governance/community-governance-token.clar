@@ -7,9 +7,9 @@
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_NOT_TOKEN_OWNER (err u1001))
-(define-constant ERR_NON_COMPLIANT (err u1002))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_NOT_TOKEN_OWNER u1001)
+(define-constant ERR_NON_COMPLIANT u1002)
 
 ;; Data Vars
 (define-data-var token-name (string-ascii 32) "Community Governance Token")
@@ -109,9 +109,9 @@
       (delegator tx-sender)
       (balance (ft-get-balance cgt delegator))
     )
-    (asserts! (check-compliance delegator) ERR_NON_COMPLIANT)
-    (asserts! (check-compliance delegatee) ERR_NON_COMPLIANT)
-    (asserts! (not (is-eq delegator delegatee)) ERR_UNAUTHORIZED)
+    (asserts! (check-compliance delegator) (err ERR_NON_COMPLIANT))
+    (asserts! (check-compliance delegatee) (err ERR_NON_COMPLIANT))
+    (asserts! (not (is-eq delegator delegatee)) (err ERR_UNAUTHORIZED))
     ;; Cannot delegate to self (undelegate instead)
 
     ;; Remove old delegation
@@ -152,7 +152,7 @@
         })
         (ok true)
       )
-      (err u1003) ;; ERR_NOT_DELEGATING
+      (err u1003) ;; (err ERR_NOT_DELEGATING)
     )
   )
 )
@@ -183,11 +183,11 @@
     (memo (optional (buff 34)))
   )
   (begin
-    (asserts! (is-eq tx-sender sender) ERR_NOT_TOKEN_OWNER)
+    (asserts! (is-eq tx-sender sender) (err ERR_NOT_TOKEN_OWNER))
 
     ;; Enforce Clean Hands Compliance for Sender AND Recipient
-    (asserts! (check-compliance sender) ERR_NON_COMPLIANT)
-    (asserts! (check-compliance recipient) ERR_NON_COMPLIANT)
+    (asserts! (check-compliance sender) (err ERR_NON_COMPLIANT))
+    (asserts! (check-compliance recipient) (err ERR_NON_COMPLIANT))
 
     (try! (ft-transfer? cgt amount sender recipient))
 
@@ -233,7 +233,7 @@
     (recipient principal)
   )
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (try! (ft-mint? cgt amount recipient))
 
     ;; Update delegation power if recipient is delegating
@@ -248,7 +248,7 @@
 ;; Admin
 (define-public (set-contract-owner (new-owner principal))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (var-set contract-owner new-owner)
     (ok true)
   )
@@ -256,7 +256,7 @@
 
 (define-public (set-token-uri (new-uri (optional (string-utf8 256))))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (var-set token-uri new-uri)
     (ok true)
   )

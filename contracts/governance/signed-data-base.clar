@@ -2,7 +2,7 @@
 ;; Storage for Oracle and Off-Chain Data Signatures
 ;; Acts as a Data Availability layer for governance
 
-(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_UNAUTHORIZED u1000)
 
 ;; Data Storage
 (define-map signed-data
