@@ -46,7 +46,7 @@
 (define-public (record-performance (strategy principal) (apy uint) (tvl uint))
     (begin
         (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
-        (map-set strategy-performance { strategy: strategy, block: block-height } {
+        (map-set strategy-performance { strategy: strategy, block: stacks-block-time } {
             apy: apy,
             tvl: tvl
         })

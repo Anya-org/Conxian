@@ -27,7 +27,7 @@
         ;; Anyone can store, but we track the signer
         (map-set signed-data hash {
             signer: tx-sender,
-            timestamp: block-height,
+            timestamp: stacks-block-time,
             data-uri: uri
         })
         (print { event: "data-stored", hash: hash, signer: tx-sender })

@@ -67,7 +67,7 @@
       governance: governance-contract,
       token: token-contract,
       staking: staking-contract,
-      created-at: block-height,
+      created-at: stacks-block-time,
       status: "active",
     })
 

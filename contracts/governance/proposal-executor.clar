@@ -82,7 +82,7 @@
       (asserts! (is-authorized-executor (get proposer proposal)) (err ERR_UNAUTHORIZED))
 
       ;; Time/state checks
-      (asserts! (>= block-height (get end-block proposal)) (err ERR_PROPOSAL_NOT_ACTIVE))
+      (asserts! (>= stacks-block-time (get end-block proposal)) (err ERR_PROPOSAL_NOT_ACTIVE))
       (asserts! (not (get executed proposal)) (err ERR_VOTING_CLOSED))
       (asserts! (not (get canceled proposal)) (err ERR_VOTING_CLOSED))
 

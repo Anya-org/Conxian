@@ -113,7 +113,7 @@
       council-id: council-id,
       voting-power: voting-power,
       member-type: member-type,
-      created-at: block-height,
+      created-at: stacks-block-time,
     })
 
     (map-set member-seats {

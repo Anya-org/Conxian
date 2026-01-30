@@ -22,8 +22,8 @@
 (define-map proposals
   uint
   {
-    start-block: uint,
-    end-block: uint,
+    start-time: uint,
+    end-time: uint,
     yes-votes: uint,
     no-votes: uint,
     executed: bool,
@@ -52,22 +52,22 @@
 
 ;; @desc Creates a proposal
 (define-public (create-proposal
-    (start-block uint)
-    (end-block uint)
+    (start-time uint)
+    (end-time uint)
   )
   (let (
       (proposal-id u1) ;; Use Proposal Registry in full implementation
-      (current-block block-height)
+      (current-time stacks-block-time)
     )
     ;; Compliance Check
     (asserts! (check-compliance tx-sender) (err ERR_NON_COMPLIANT))
 
-    ;; Ensure start block is in the future
-    (asserts! (> start-block current-block) (err ERR_START_BLOCK_IN_PAST))
+    ;; Ensure start time is in the future
+    (asserts! (> start-time current-time) (err ERR_START_BLOCK_IN_PAST))
 
     (map-set proposals proposal-id {
-      start-block: start-block,
-      end-block: end-block,
+      start-time: start-time,
+      end-time: end-time,
       yes-votes: u0,
       no-votes: u0,
       executed: false,
@@ -76,8 +76,8 @@
     (print {
       event: "create-proposal",
       proposal-id: proposal-id,
-      start-block: start-block,
-      end-block: end-block,
+      start-time: start-time,
+      end-time: end-time,
       proposer: tx-sender,
     })
 
@@ -105,7 +105,7 @@
 
     ;; Validation
     (asserts!
-      (and (>= block-height (get start-block proposal)) (<= block-height (get end-block proposal)))
+      (and (>= stacks-block-time (get start-time proposal)) (<= stacks-block-time (get end-time proposal)))
       (err ERR_VOTING_CLOSED)
     )
     (asserts!

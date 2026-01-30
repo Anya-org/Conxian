@@ -245,7 +245,7 @@
       event: "emergency-pause",
       paused: paused,
       sender: tx-sender,
-      block-height: block-height,
+      stacks-block-time: stacks-block-time,
     })
     (ok true)
   )

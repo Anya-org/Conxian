@@ -18,7 +18,7 @@
 (define-data-var rewards-token principal .cxd-token) ;; Rewards in CXD (can be changed to other token)
 (define-data-var regulatory-adapter-contract principal .regulatory-adapter)
 (define-data-var total-staked uint u0)
-(define-data-var reward-rate uint u0) ;; Rewards per second (Clarity 4 block-height)
+(define-data-var reward-rate uint u0) ;; Rewards per second (Clarity 4 stacks-block-time)
 (define-data-var last-update-time uint u0)
 (define-data-var reward-per-token-stored uint u0)
 (define-data-var staking-paused bool false)
@@ -63,7 +63,7 @@
       (var-get reward-per-token-stored)
       (+ (var-get reward-per-token-stored)
         (/
-          (* (- block-height (var-get last-update-time)) (var-get reward-rate)
+          (* (- stacks-block-time (var-get last-update-time)) (var-get reward-rate)
             u1000000 ;; Precision Factor
           )
           total
@@ -88,7 +88,7 @@
 (define-private (update-reward (account principal))
   (let ((new-per-token (get-reward-per-token)))
     (var-set reward-per-token-stored new-per-token)
-    (var-set last-update-time block-height)
+    (var-set last-update-time stacks-block-time)
     (if (not (is-eq account tx-sender))
       true ;; No-op if just updating global
       (begin

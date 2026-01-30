@@ -253,7 +253,7 @@
                 amount-out: amount-out,
                 actual-slippage: u100,
                 gas-used: u50000,
-                timestamp: block-height,
+                timestamp: stacks-block-time,
                 success: true,
                 error: none,
               })

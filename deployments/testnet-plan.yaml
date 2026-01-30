@@ -13,7 +13,7 @@ plan:
             cost: 10000
             path: "contracts/tokens/cxd-token.clar"
             anchor-block-only: true
-            clarity-version: 3
+            clarity-version: 4
             epoch: "3.0"
         - contract-publish:
             contract-name: governance-token
@@ -21,5 +21,5 @@ plan:
             cost: 10000
             path: "contracts/governance-token.clar"
             anchor-block-only: true
-            clarity-version: 3
+            clarity-version: 4
             epoch: "3.0"

@@ -70,11 +70,11 @@
 
 ;; --- Private Helper Functions ---
 (define-private (calculate-vested-amount (schedule {total-amount: uint, start-time: uint, end-time: uint, claimed-amount: uint}))
-  (if (< block-height (get start-time schedule))
+  (if (< stacks-block-time (get start-time schedule))
     u0
-    (if (>= block-height (get end-time schedule))
+    (if (>= stacks-block-time (get end-time schedule))
       (get total-amount schedule)
-      (/ (* (get total-amount schedule) (- block-height (get start-time schedule))) (- (get end-time schedule) (get start-time schedule)))
+      (/ (* (get total-amount schedule) (- stacks-block-time (get start-time schedule))) (- (get end-time schedule) (get start-time schedule)))
     )
   )
 )

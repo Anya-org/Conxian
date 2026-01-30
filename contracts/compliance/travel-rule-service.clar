@@ -12,7 +12,7 @@
 
 ;; Events
 (define-private (emit-event (event (string-ascii 32)) (data (optional (buff 256))))
-    (print { event: event, data: data, block: block-height })
+    (print { event: event, data: data, block: stacks-block-time })
 )
 
 ;; @desc Log IVMS101 Data Hash for Travel Rule Compliance
@@ -38,7 +38,7 @@
             beneficiary: beneficiary-vasp,
             amount: amount,
             token: token,
-            timestamp: block-height
+            timestamp: stacks-block-time
         })
         (ok true)
     )

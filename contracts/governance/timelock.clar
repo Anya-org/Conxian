@@ -39,7 +39,7 @@
     (begin
         ;; Only Admin/Governance can queue
         (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_ADMIN)) (err ERR_UNAUTHORIZED))
-        (let ((eta (+ block-height (var-get delay))))
+        (let ((eta (+ stacks-block-time (var-get delay))))
             (map-set queued-proposals proposal-principal eta)
             (print {
                 event: "queue",
@@ -55,8 +55,8 @@
     (let (
         (queued-eta (unwrap! (map-get? queued-proposals proposal-principal) (err ERR_NOT_QUEUED)))
     )
-        (asserts! (>= block-height queued-eta) (err ERR_TOO_EARLY))
-        (asserts! (<= block-height (+ queued-eta GRACE_PERIOD)) (err ERR_EXPIRED))
+        (asserts! (>= stacks-block-time queued-eta) (err ERR_TOO_EARLY))
+        (asserts! (<= stacks-block-time (+ queued-eta GRACE_PERIOD)) (err ERR_EXPIRED))
 
         (map-delete queued-proposals proposal-principal)
         

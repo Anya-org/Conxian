@@ -108,8 +108,8 @@
         owner: tx-sender,
         vault-type: vault-type,
         tokens: tokens,
-        created-at: block-height,
-        last-updated: block-height,
+        created-at: stacks-block-time,
+        last-updated: stacks-block-time,
         active: true,
         metadata: metadata,
         cooldown-end: u0
@@ -158,8 +158,8 @@
     (asserts! (is-eq tx-sender (get owner vault-info)) (err ERR_UNAUTHORIZED_ACCESS))
     (asserts! (>= current-balance amount) (err ERR_INSUFFICIENT_BALANCE))
 
-    ;; Native Clarity 4 asset restriction (placeholder for 2026 standard)
-    ;; (restrict-assets? token amount)
+    ;; Native Clarity 4 asset restriction (2026 standard)
+    (asserts! (restrict-assets? token amount) (err ERR_UNAUTHORIZED_ACCESS))
 
     (try! (as-contract (contract-call? token-trait transfer amount (as-contract tx-sender) (get owner vault-info) none)))
     

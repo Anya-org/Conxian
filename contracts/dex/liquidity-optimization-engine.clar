@@ -100,7 +100,7 @@
                 )
                 ;; Update optimization data
                 (map-set pool-optimization-data { pool: pool } {
-                    last-optimization: block-height,
+                    last-optimization: stacks-block-time,
                     target-liquidity: optimal-liquidity,
                     current-utilization: current-utilization,
                     optimization-score: optimization-score,
@@ -152,7 +152,7 @@
         (let ((old-fee-tier (get-pool-fee-tier pool)))
             ;; Update fee tier
             (map-set pool-optimization-data { pool: pool } {
-                last-optimization: block-height,
+                last-optimization: stacks-block-time,
                 target-liquidity: (get-pool-target-liquidity pool),
                 current-utilization: (get-pool-utilization pool),
                 optimization-score: (get-optimization-score pool),
@@ -161,7 +161,7 @@
 
             ;; Record optimization history
             (map-set optimization-history { pool: pool } {
-                timestamp: block-height,
+                timestamp: stacks-block-time,
                 action: "fee-tier-update",
                 old-value: old-fee-tier,
                 new-value: new-fee-tier,

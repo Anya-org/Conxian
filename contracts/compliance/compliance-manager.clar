@@ -53,7 +53,7 @@
 
 ;; @desc Full user check (Aggregated)
 (define-public (check-user-compliance (user principal))
-  (let ((current-height block-height))
+  (let ((current-height stacks-block-time))
     (begin
       (asserts! (var-get compliance-enabled) (ok true))
       ;; 1. Check Sanctions (Mock integration)

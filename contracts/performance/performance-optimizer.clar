@@ -34,9 +34,9 @@
 (define-public (increment-transaction-count)
     (let
         (
-            (count (default-to u0 (map-get? transaction-throughput block-height)))
+            (count (default-to u0 (map-get? transaction-throughput stacks-block-time)))
         )
-        (map-set transaction-throughput block-height (+ count u1))
+        (map-set transaction-throughput stacks-block-time (+ count u1))
         (ok true)
     )
 )
