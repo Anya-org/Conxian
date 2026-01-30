@@ -13,10 +13,22 @@
 - **TEST_GOV_03**: Verify that non-compliant users (blacklisted in `regulatory-adapter.clar`) cannot vote in the Strategic Council.
 
 ### 1.3. Autonomous Agents (Staff)
-- **TEST_AGENT_01**: Verify that `agent-risk` can correctly identify a position below maintenance margin.
-- **TEST_AGENT_02**: Verify that the `office-manager` pays the agent the correct uSTX "salary" upon successful liquidation.
+- **TEST_AGENT_01**: Verify that `agent-risk` can correctly identify a position below maintenance margin using `check-work-needed`.
+- **TEST_AGENT_02**: Verify that `do-work` in `agent-risk.clar` successfully executes a liquidation and triggers a `payout` via the `office-manager`.
+- **TEST_AGENT_03**: Verify that the "Staff" scanner loop in `check-work-needed` resets correctly after reaching the end of the position map.
+- **TEST_AGENT_04**: Verify that only authorized "Staff" roles can trigger high-value operational actions in `ops-engine.clar`.
 
-## 2. Compliance Checklist (Release Prep)
+## 2. Investment-Grade Stress Tests (The "Stress Test" Suite)
+
+### 2.1. Solvency & Liquidity
+- **TEST_SOLV_01**: Simulate a 50% Bitcoin price crash and verify that `agent-risk` liquidates all under-collateralized positions before the Insurance Fund is triggered.
+- **TEST_SOLV_02**: Verify that the `revenue-distributor` correctly halts distributions if the Insurance Fund falls below a predefined "Critical Reserve" threshold.
+
+### 2.2. Governance Resilience
+- **TEST_GOV_RES_01**: Verify that a malicious "Staff" agent cannot pause the protocol without Strategic Council (Board) approval for longer than a 144-block "Emergency Tenure."
+- **TEST_GOV_RES_02**: Verify that the `reputation-engine` correctly decays voting weight for inactive "Board" members over a 52,560 block (1 year) period.
+
+## 3. Compliance Checklist (Release Prep)
 
 ### 2.1. Structural Standards
 - [ ] All public functions have `@desc` documentation.

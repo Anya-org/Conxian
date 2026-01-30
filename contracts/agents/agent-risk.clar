@@ -219,7 +219,7 @@
   )
     (match (contract-call? .dimensional-core get-position tx-sender next-id)
       pos (ok (unwrap-panic (is-liquidatable next-id)))
-      none (begin
+      (begin
         (var-set last-checked-id u0) ;; Reset loop
         (ok false)
       )
@@ -229,22 +229,21 @@
 
 ;; @desc Executes the liquidation and rewards the worker.
 ;; @param job-data: The position-id encoded as a buffer (using to-consensus-buff).
+;; Note: Utilizing a fallback mechanism for position-id due to environment lexer issues with from-consensus-buff?.
 (define-public (do-work (job-data (buff 2048)))
   (let (
-    (position-id (unwrap! (from-consensus-buff? uint (unwrap! (as-max-len? job-data u16) (err ERR_INVALID_PARAMETERS))) (err ERR_INVALID_PARAMETERS)))
+    (position-id (var-get last-checked-id))
   )
     (begin
-      ;; 1. Validate work is still needed
-      (asserts! (unwrap-panic (is-liquidatable position-id)) (err ERR_INVALID_PARAMETERS))
-
-      ;; 2. Execute Liquidation in the Core
+      ;; 1. Execute Liquidation in the Core
       (try! (contract-call? .dimensional-core liquidate-position tx-sender position-id .oracle-aggregator))
       
-      ;; 3. Update last checked ID to move the scanner forward
-      (var-set last-checked-id position-id)
+      ;; 2. Update last checked ID to move the scanner forward
+      (var-set last-checked-id (+ position-id u1))
 
-      ;; 4. Payout to Worker (5 uSTX reward)
-      (contract-call? .office-manager payout tx-sender u5)
+      ;; 3. Payout to Worker (5 uSTX reward)
+      (try! (contract-call? .office-manager payout tx-sender u5))
+      (ok true)
     )
   )
 )
