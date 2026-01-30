@@ -67,7 +67,7 @@
         max-liquidity: max-liquidity,
         default-fee: default-fee,
         active: true,
-        created-at: burn-block-height,
+        created-at: block-height,
       })
       (var-set total-templates template-id)
       (print { event: "template-created", template-id: template-id, name: name })

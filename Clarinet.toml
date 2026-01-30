@@ -197,10 +197,6 @@ path = "contracts/automation/office-manager.clar"
 clarity-version = 2
 depends_on = ["automation-traits", "core-traits"]
 
-[contracts.agent-risk]
-path = "contracts/agents/agent-risk.clar"
-clarity-version = 2
-depends_on = ["automation-traits", "core-traits", "dimensional-core", "office-manager", "oracle-aggregator"]
 
 [contracts.agent-treasury]
 path = "contracts/agents/agent-treasury.clar"
@@ -356,3 +352,13 @@ depends_on = ["encoding"]
 path = "contracts/dex/swap-router.clar"
 clarity-version = 2
 depends_on = ["sip-standards", "conxian-protocol"]
+
+[contracts.founder-vesting]
+path = "contracts/core/founder-vesting.clar"
+clarity-version = 2
+depends_on = ["sip-standards"]
+
+[contracts.agent-risk]
+path = "contracts/agents/agent-risk.clar"
+clarity-version = 2
+depends_on = ["automation-traits", "core-traits", "dimensional-core", "office-manager", "oracle-aggregator"]

@@ -253,7 +253,7 @@
                 amount-out: amount-out,
                 actual-slippage: u100,
                 gas-used: u50000,
-                timestamp: burn-block-height,
+                timestamp: block-height,
                 success: true,
                 error: none,
               })

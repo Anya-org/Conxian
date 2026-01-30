@@ -3,8 +3,8 @@
 ## Phase 1: MVP (Foundation Recovery) - COMPLETED
 - **Root Sovereignty**: Implementation of `conxian-protocol` registry and `conxian-access` RBAC.
 - **Trait Standardization**: Consolidation of core DeFi and Governance traits in `contracts/traits/`.
-- **Nakamoto Alignment**: Migration of all temporal logic to `burn-block-height`.
-- **Clarity 4 Migration**: Full codebase upgrade to Clarity 4 (Epoch 3.0) for Nakamoto readiness.
+- **Nakamoto Alignment**: Migration of all temporal logic to `stacks-block-time` for second-level precision.
+- **Clarity 4 Migration**: Full codebase refactor to Clarity 4 (Epoch 3.0) using `contract-hash?`, `restrict-assets?`, and `secp256r1-verify`.
 - **Fiscal Policy**: Implementation of the 60/20/20 `revenue-distributor` and `allocation-policy`.
 
 ## Phase 2: Alpha (Autonomous Operations) - CURRENT

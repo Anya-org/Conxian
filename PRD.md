@@ -107,8 +107,8 @@ The system operates like a digital corporation where smart contracts serve as Ma
 
 ### 8.1. Nakamoto & Tenure Alignment
 
-- Use `burn-block-height` for all temporal logic (Vesting, Voting, Staling).
-- Minimum 6 Bitcoin confirmations for high-value operations.
+- Use `stacks-block-time` for all temporal logic (Vesting, Voting, Staling) to ensure second-level precision.
+- Minimum 6 Bitcoin confirmations for high-value operations via `block-utils`.
 - All core logic is tenure-aware via `block-utils`, ensuring deterministic behavior across Stacks blocks.
 
 ### 8.2. Sovereign Autonomous Fiscal Policy
@@ -158,8 +158,8 @@ The protocol utilizes a 5-token system aligned with specialized councils:
 - **Core Stabilization**: Repaired logic and naming in `admin-facade`, `conxian-protocol`, and `risk-manager`.
 - **Fiscal Policy**: Completed `revenue-distributor` and `allocation-policy` with 60/20/20 enforcement.
 - **Hybrid Governance**: Refined `proposal-engine` (Staff) and `community-voting-engine` (Board) to support Dual-Council governance.
-- **Clarity 4 Upgrade**: All core contracts migrated to Clarity 4 (Epoch 3.0), utilizing `burn-block-height` and `get-block-info?` for enhanced precision and tenure-aware security.
-- **Nakamoto Transition**: Verified `burn-block-height` usage across all temporal logic.
+- **Clarity 4 Protocol Enforcement**: All core contracts migrated to Clarity 4 (Epoch 3.0), utilizing `stacks-block-time` for high-precision temporal logic and `contract-hash?` for secure module registry.
+- **Nakamoto Transition**: Switched from legacy `block-height` to `stacks-block-time` for all yield, voting, and timelock accrual, ensuring deterministic behavior in fast-block environments.
 - **Service Module Repair**: Consolidated DEX, Lending, and Token modules.
 - **Autonomous Agents**: Implemented `agent-risk` with `check-work-needed` and `do-work` for automated liquidations.
 

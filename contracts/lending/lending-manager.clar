@@ -40,7 +40,7 @@
   (let (
     (asset (contract-of asset-trait))
     (current-dep (default-to u0 (map-get? deposits { asset: asset, user: tx-sender })))
-    (reserve (default-to { total-deposits: u0, total-borrows: u0, last-updated: burn-block-height } (map-get? reserve-data asset)))
+    (reserve (default-to { total-deposits: u0, total-borrows: u0, last-updated: block-height } (map-get? reserve-data asset)))
   )
     (begin
       (try! (check-circuit-breaker))
@@ -52,7 +52,7 @@
       (map-set deposits { asset: asset, user: tx-sender } (+ current-dep amount))
       (map-set reserve-data asset (merge reserve {
         total-deposits: (+ (get total-deposits reserve) amount),
-        last-updated: burn-block-height
+        last-updated: block-height
       }))
 
       (print { event: "deposit", user: tx-sender, asset: asset, amount: amount })
@@ -82,7 +82,7 @@
       (map-set borrows { asset: asset, user: tx-sender } (+ current-bor amount))
       (map-set reserve-data asset (merge reserve {
         total-borrows: (+ (get total-borrows reserve) amount),
-        last-updated: burn-block-height
+        last-updated: block-height
       }))
 
       (print { event: "borrow", user: tx-sender, asset: asset, amount: amount })
@@ -109,7 +109,7 @@
         (map-set borrows { asset: asset, user: tx-sender } (- current-bor repaid-amount))
         (map-set reserve-data asset (merge reserve {
           total-borrows: (- (get total-borrows reserve) repaid-amount),
-          last-updated: burn-block-height
+          last-updated: block-height
         }))
 
         (print { event: "repay", user: tx-sender, asset: asset, amount: repaid-amount })

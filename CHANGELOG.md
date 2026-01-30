@@ -27,4 +27,17 @@
 - **Circuit Breaker**: Documented integration of the protocol-wide circuit breaker in all service modules.
 - **Regulatory Hardening**: Documented "Clean-Hands" compliance via `regulatory-adapter`.
 
+## [0.4.0] - 2026-01-20
+
+### Added
+- **Clarity 4 Mainnet Standard**: Full refactor of all contracts to Clarity 4 (Epoch 3.0).
+- **Passkey Support**: Integrated `secp256r1-verify` in `conxian-access.clar` for biometric signing.
+- **Sovereign Post-Conditions**: Implemented `restrict-assets?` in `vault.clar` for native security.
+- **Module Integrity**: Added `contract-hash?` validation in `conxian-protocol.clar`.
+- **Human-Readable Logs**: Integrated `to-ascii?` in `regulatory-adapter.clar` and other core modules.
+
+### Changed
+- **Precision Temporal Logic**: Replaced `block-height` and `burn-block-height` with `stacks-block-time` for all yield, vesting, and governance logic.
+- **Gap Analysis**: Updated `gap-analysis.md` with Jan 2026 "Jules Persona" investment-grade analysis.
+
 ## [2024-07-22] - Documentation Realignment

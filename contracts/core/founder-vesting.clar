@@ -15,8 +15,8 @@
 
     (define-map vesting-schedules principal {
   total-amount: uint,
-  start-block: uint,
-  end-block: uint,
+  start-time: uint,
+  end-time: uint,
   claimed-amount: uint
 })
 
@@ -30,14 +30,14 @@
 )
 
 ;; --- Administrative Functions ---
-(define-public (add-vesting-schedule (beneficiary principal) (total-amount uint) (start-block uint) (end-block uint))
+(define-public (add-vesting-schedule (beneficiary principal) (total-amount uint) (start-time uint) (end-time uint))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (asserts! (is-none (map-get? vesting-schedules beneficiary)) (err ERR_SCHEDULE_EXISTS))
     (map-set vesting-schedules beneficiary {
       total-amount: total-amount,
-      start-block: start-block,
-      end-block: end-block,
+      start-time: start-time,
+      end-time: end-time,
       claimed-amount: u0
     })
     (ok true)
@@ -53,8 +53,8 @@
       (let ((claim-amount (- vested-amount (get claimed-amount (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE))))))
         (map-set vesting-schedules tx-sender {
           total-amount: (get total-amount (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE))),
-          start-block: (get start-block (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE))),
-          end-block: (get end-block (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE))),
+          start-time: (get start-time (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE))),
+          end-time: (get end-time (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE))),
           claimed-amount: vested-amount
         })
         (ok claim-amount)
@@ -69,12 +69,12 @@
 )
 
 ;; --- Private Helper Functions ---
-(define-private (calculate-vested-amount (schedule {total-amount: uint, start-block: uint, end-block: uint, claimed-amount: uint}))
-  (if (< burn-block-height (get start-block schedule))
+(define-private (calculate-vested-amount (schedule {total-amount: uint, start-time: uint, end-time: uint, claimed-amount: uint}))
+  (if (< block-height (get start-time schedule))
     u0
-    (if (>= burn-block-height (get end-block schedule))
+    (if (>= block-height (get end-time schedule))
       (get total-amount schedule)
-      (/ (* (get total-amount schedule) (- burn-block-height (get start-block schedule))) (- (get end-block schedule) (get start-block schedule)))
+      (/ (* (get total-amount schedule) (- block-height (get start-time schedule))) (- (get end-time schedule) (get start-time schedule)))
     )
   )
 )

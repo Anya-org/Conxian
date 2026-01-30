@@ -64,7 +64,8 @@
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set blacklist user true)
-    (print { event: "user-blacklisted", user: user })
+    ;; Use block-height for high-precision audit logs (Clarity 4)
+    (print { event: "user-blacklisted", user: user, audit-time: block-height })
     (ok true)
   )
 )
