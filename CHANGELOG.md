@@ -11,11 +11,17 @@
 ## [Unreleased]
 
 ### Added
-- Implementation-grade roadmap with standards adherence and acceptance criteria.
-- Whitepaper and PRD documents (see README for links).
+- **Investment-Grade Analysis**: Integrated SWOT, PESTLE, and Six-Pillar View into `PRD.md`.
+- **Project Roadmap**: Created `docs/ROADMAP.md` detailing 4-phase execution (MVP to Scale).
+- **SAB Whitepaper**: Created `docs/WHITEPAPER.md` with high-level narrative and VC pitch.
+- **Verification Suite**: Created `docs/REQUIREMENTS_TESTING.md` for unit tests and compliance checklists.
+- **CAPEX/OPEX Modeling**: Added financial estimates for autonomous "Staff" operations in `PRD.md`.
 
 ### Changed
+- **PRD Synchronization**: Updated `PRD.md` to reflect full truth implementation state and identified "Kill-Switch" risks.
 - Documentation alignment: repository docs now reflect actual wallet lifecycle and security boundary.
 
 ### Security
 - Documented security requirements and quality gates for future changes.
+
+## [2024-07-22] - Documentation Realignment
