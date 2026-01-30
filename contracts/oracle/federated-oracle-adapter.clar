@@ -3,9 +3,9 @@
 ;; Aggregates price data from multiple oracle sources
 
 ;; Constants
-(define-constant ERR_NOT_IMPLEMENTED (err u9999))
-(define-constant ERR_UNAUTHORIZED (err u6000))
-(define-constant ERR_STALE_PRICE (err u6001))
+(define-constant ERR_NOT_IMPLEMENTED u9999)
+(define-constant ERR_UNAUTHORIZED u6000)
+(define-constant ERR_STALE_PRICE u6001)
 (define-constant MAX_PRICE_AGE u100) ;; 100 blocks
 
 ;; Data Vars
@@ -54,7 +54,7 @@
 ;; Public: Submit Price
 (define-public (submit-price (asset (string-ascii 32)) (price uint) (source principal))
   (begin
-    (asserts! (is-eq tx-sender source) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender source) (err ERR_UNAUTHORIZED))
     
     ;; Update individual price
     (map-set individual-prices { asset: asset, source: source } {
@@ -78,7 +78,7 @@
 ;; Public: Add Oracle Source
 (define-public (add-oracle-source (source principal) (weight uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set oracle-sources { source: source } {
       active: true,
       last-update: block-height,
@@ -91,7 +91,7 @@
 ;; Public: Remove Oracle Source
 (define-public (remove-oracle-source (source principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set oracle-sources { source: source } {
       active: false,
       last-update: block-height,

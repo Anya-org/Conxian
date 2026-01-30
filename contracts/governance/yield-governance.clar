@@ -5,7 +5,7 @@
 (impl-trait .governance-traits.proposal-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_UNAUTHORIZED u1000)
 
 ;; Data Vars
 (define-data-var proposal-engine principal .proposal-engine)
@@ -17,7 +17,7 @@
     ;; This function would be called by the proposal-executor
     ;; It updates the economic-policy-engine with pre-agreed values
     ;; For this implementation, we assume the proposal-executor has validated the vote.
-    (asserts! (is-eq tx-sender .proposal-executor) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender .proposal-executor) (err ERR_UNAUTHORIZED))
 
     ;; Example: Update global interest rate parameters
     ;; In a full implementation, the parameters would be passed in the proposal data.

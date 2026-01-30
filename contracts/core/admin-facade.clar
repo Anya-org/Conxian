@@ -4,12 +4,11 @@
 
 ;; Traits
 (use-trait rbac-trait .core-traits.conxian-access-trait)
-(use-trait pausable-trait .pausable-trait.pausable-trait)
 
 ;; Constants
-(define-constant ERR_NOT_AUTHORIZED (err u1000))
-(define-constant ERR_INVALID_OPERATION (err u1001))
-(define-constant ERR_BATCH_LIMIT_EXCEEDED (err u1002))
+(define-constant ERR_NOT_AUTHORIZED u1000)
+(define-constant ERR_INVALID_OPERATION u1001)
+(define-constant ERR_BATCH_LIMIT_EXCEEDED u1002)
 
 ;; Role Definitions
 (define-constant ROLE_GLOBAL_ADMIN u0)
@@ -74,7 +73,7 @@
         (execute-protocol-operation (get params operation))
         (if (is-eq op-type u3)
           (execute-treasury-operation (get params operation))
-          ERR_INVALID_OPERATION
+          (err ERR_INVALID_OPERATION)
         )
       )
     )
@@ -122,7 +121,7 @@
 ;; @desc Pause a contract (emergency only)
 (define-public (pause-contract (target principal))
   (begin
-    (asserts! (has-role ROLE_EMERGENCY_PAUSE) ERR_NOT_AUTHORIZED)
+    (asserts! (has-role ROLE_EMERGENCY_PAUSE) (err ERR_NOT_AUTHORIZED))
     ;; Note: In a real implementation, this would delegate to a pausable contract
     ;; For now, we just log the pause request
     (print {
@@ -136,7 +135,7 @@
 ;; @desc Unpause a contract
 (define-public (unpause-contract (target principal))
   (begin
-    (asserts! (has-role ROLE_GLOBAL_ADMIN) ERR_NOT_AUTHORIZED)
+    (asserts! (has-role ROLE_GLOBAL_ADMIN) (err ERR_NOT_AUTHORIZED))
     ;; Note: In a real implementation, this would delegate to a pausable contract
     ;; For now, we just log the unpause request
     (print {
@@ -154,7 +153,7 @@
     (enabled bool)
   )
   (begin
-    (asserts! (has-role ROLE_GLOBAL_ADMIN) ERR_NOT_AUTHORIZED)
+    (asserts! (has-role ROLE_GLOBAL_ADMIN) (err ERR_NOT_AUTHORIZED))
     (if enabled
       (begin
         (try! (contract-call? .conxian-access grant-role user role))
@@ -172,7 +171,7 @@
 ;; @desc Set the RBAC contract address
 (define-public (set-rbac-contract (new-contract principal))
   (begin
-    (asserts! (has-role ROLE_GLOBAL_ADMIN) ERR_NOT_AUTHORIZED)
+    (asserts! (has-role ROLE_GLOBAL_ADMIN) (err ERR_NOT_AUTHORIZED))
     (var-set rbac-contract new-contract)
     (ok true)
   )
@@ -211,9 +210,9 @@
   active: bool,
 })))
   (begin
-    (asserts! (is-global-admin) ERR_NOT_AUTHORIZED)
+    (asserts! (is-global-admin) (err ERR_NOT_AUTHORIZED))
     (asserts! (<= (len updates) (var-get max-batch-size))
-      ERR_BATCH_LIMIT_EXCEEDED
+      (err ERR_BATCH_LIMIT_EXCEEDED)
     )
 
     ;; Correctly process each role update using fold
@@ -227,9 +226,9 @@
   params: (list 5 principal),
 })))
   (begin
-    (asserts! (is-global-admin) ERR_NOT_AUTHORIZED)
+    (asserts! (is-global-admin) (err ERR_NOT_AUTHORIZED))
     (asserts! (<= (len operations) (var-get max-batch-size))
-      ERR_BATCH_LIMIT_EXCEEDED
+      (err ERR_BATCH_LIMIT_EXCEEDED)
     )
 
     ;; Execute in batch (single transaction) with proper error handling
@@ -240,7 +239,7 @@
 ;; Emergency Pause (Ultra-low gas)
 (define-public (set-emergency-pause (paused bool))
   (begin
-    (asserts! (is-authorized-to-pause tx-sender) ERR_NOT_AUTHORIZED)
+    (asserts! (is-authorized-to-pause tx-sender) (err ERR_NOT_AUTHORIZED))
     (var-set emergency-pause paused)
     (print {
       event: "emergency-pause",
@@ -255,7 +254,7 @@
 ;; Global Admin Management
 (define-public (set-global-admin (new-admin principal))
   (begin
-    (asserts! (is-global-admin) ERR_NOT_AUTHORIZED)
+    (asserts! (is-global-admin) (err ERR_NOT_AUTHORIZED))
     (var-set global-admin new-admin)
     (print {
       event: "global-admin-changed",
@@ -273,7 +272,7 @@
   active: bool,
 }))
   (begin
-    (asserts! (is-valid-principal (get user update)) ERR_INVALID_OPERATION)
+    (asserts! (is-valid-principal (get user update)) (err ERR_INVALID_OPERATION))
     (if (get active update)
       (map-set role-cache {
         user: (get user update),

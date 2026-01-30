@@ -5,7 +5,7 @@
 (impl-trait .automation-traits.office-job-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_UNAUTHORIZED u1000)
 
 ;; State
 (define-data-var rebalance-threshold uint u1000000) ;; 1M uSTX

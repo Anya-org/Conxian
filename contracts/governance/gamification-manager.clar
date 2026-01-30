@@ -2,7 +2,7 @@
 ;; User Engagement & XP System for Governance
 ;; Tracks user activity and awards XP
 
-(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_UNAUTHORIZED u1000)
 
 ;; Data Storage
 (define-map user-xp
@@ -28,7 +28,7 @@
         (current-xp (get-user-xp user))
         (new-xp (+ current-xp amount))
     )
-        (asserts! (is-admin) ERR_UNAUTHORIZED)
+        (asserts! (is-admin) (err ERR_UNAUTHORIZED))
         (map-set user-xp user new-xp)
         (print { event: "xp-awarded", user: user, amount: amount, total: new-xp })
         (ok new-xp)
@@ -37,7 +37,7 @@
 
 (define-public (set-admin (new-admin principal))
     (begin
-        (asserts! (is-admin) ERR_UNAUTHORIZED)
+        (asserts! (is-admin) (err ERR_UNAUTHORIZED))
         (var-set admin new-admin)
         (ok true)
     )

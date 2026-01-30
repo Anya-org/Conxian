@@ -5,10 +5,10 @@
 
 ;; --- Constants and Errors ---
 (define-constant CONTRACT_OWNER tx-sender)
-(define-constant ERR_UNAUTHORIZED (err u401))
-(define-constant ERR_NO_VESTING_SCHEDULE (err u404))
-(define-constant ERR_NOTHING_TO_CLAIM (err u405))
-(define-constant ERR_SCHEDULE_EXISTS (err u409))
+(define-constant ERR_UNAUTHORIZED u401)
+(define-constant ERR_NO_VESTING_SCHEDULE u404)
+(define-constant ERR_NOTHING_TO_CLAIM u405)
+(define-constant ERR_SCHEDULE_EXISTS u409)
 
 ;; --- Data Storage ---
 (define-data-var contract-owner principal tx-sender)
@@ -23,7 +23,7 @@
 ;; --- Contract Initialization ---
 (define-public (initialize (owner principal))
   (begin
-    (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender CONTRACT_OWNER) (err ERR_UNAUTHORIZED))
     (var-set contract-owner owner)
     (ok true)
   )
@@ -32,8 +32,8 @@
 ;; --- Administrative Functions ---
 (define-public (add-vesting-schedule (beneficiary principal) (total-amount uint) (start-block uint) (end-block uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
-    (asserts! (is-none (map-get? vesting-schedules beneficiary)) ERR_SCHEDULE_EXISTS)
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-none (map-get? vesting-schedules beneficiary)) (err ERR_SCHEDULE_EXISTS))
     (map-set vesting-schedules beneficiary {
       total-amount: total-amount,
       start-block: start-block,
@@ -47,14 +47,14 @@
 ;; --- Public Functions ---
 (define-public (claim-vested-tokens)
   (let ((schedule (map-get? vesting-schedules tx-sender)))
-    (asserts! (is-some schedule) ERR_NO_VESTING_SCHEDULE)
-    (let ((vested-amount (calculate-vested-amount (unwrap! schedule ERR_NO_VESTING_SCHEDULE))))
-      (asserts! (> vested-amount (get claimed-amount (unwrap! schedule ERR_NO_VESTING_SCHEDULE))) ERR_NOTHING_TO_CLAIM)
-      (let ((claim-amount (- vested-amount (get claimed-amount (unwrap! schedule ERR_NO_VESTING_SCHEDULE)))))
+    (asserts! (is-some schedule) (err ERR_NO_VESTING_SCHEDULE))
+    (let ((vested-amount (calculate-vested-amount (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE)))))
+      (asserts! (> vested-amount (get claimed-amount (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE)))) (err ERR_NOTHING_TO_CLAIM))
+      (let ((claim-amount (- vested-amount (get claimed-amount (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE))))))
         (map-set vesting-schedules tx-sender {
-          total-amount: (get total-amount (unwrap! schedule ERR_NO_VESTING_SCHEDULE)),
-          start-block: (get start-block (unwrap! schedule ERR_NO_VESTING_SCHEDULE)),
-          end-block: (get end-block (unwrap! schedule ERR_NO_VESTING_SCHEDULE)),
+          total-amount: (get total-amount (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE))),
+          start-block: (get start-block (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE))),
+          end-block: (get end-block (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE))),
           claimed-amount: vested-amount
         })
         (ok claim-amount)

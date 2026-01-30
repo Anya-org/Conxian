@@ -6,8 +6,8 @@
 (use-trait nft-trait .sip-standards.sip-009-nft-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u8000))
-(define-constant ERR_NOT_FOUND (err u8001))
+(define-constant ERR_UNAUTHORIZED u8000)
+(define-constant ERR_NOT_FOUND u8001)
 
 ;; Maps
 (define-map user-kyc

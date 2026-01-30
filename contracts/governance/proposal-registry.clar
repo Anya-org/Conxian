@@ -1,9 +1,9 @@
 ;; proposal-registry.clar
 ;; Registry for Conxian Governance Proposals
 
-(define-constant ERR_UNAUTHORIZED (err u4000))
-(define-constant ERR_NOT_FOUND (err u404))
-(define-constant ERR_ALREADY_VOTED (err u4001))
+(define-constant ERR_UNAUTHORIZED u4000)
+(define-constant ERR_NOT_FOUND u404)
+(define-constant ERR_ALREADY_VOTED u4001)
 
 (define-map proposals
   uint
@@ -77,7 +77,7 @@
 )
 
 (define-public (set-executed (proposal-id uint))
-  (let ((proposal (unwrap! (map-get? proposals proposal-id) ERR_NOT_FOUND)))
+  (let ((proposal (unwrap! (map-get? proposals proposal-id) (err ERR_NOT_FOUND))))
     (begin
       ;; In a real scenario, this would check if the caller is the proposal-executor
       (map-set proposals proposal-id (merge proposal { executed: true }))
@@ -91,10 +91,10 @@
     (support bool)
     (weight uint)
   )
-  (let ((proposal (unwrap! (map-get? proposals proposal-id) ERR_NOT_FOUND)))
+  (let ((proposal (unwrap! (map-get? proposals proposal-id) (err ERR_NOT_FOUND))))
     (begin
       ;; In production, check if caller is proposal-engine
-      (asserts! (not (has-voted proposal-id tx-sender)) ERR_ALREADY_VOTED)
+      (asserts! (not (has-voted proposal-id tx-sender)) (err ERR_ALREADY_VOTED))
 
       ;; Record receipt
       (map-set vote-receipts {

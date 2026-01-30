@@ -4,8 +4,8 @@
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_INVALID_PARAMS (err u1001))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_INVALID_PARAMS u1001)
 
 (define-map positions
   uint

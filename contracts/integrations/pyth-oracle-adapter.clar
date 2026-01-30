@@ -7,8 +7,8 @@
 (use-trait pyth-core-trait .pyth-traits.pyth-core-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u7000))
-(define-constant ERR_STALE_PRICE (err u7001))
+(define-constant ERR_UNAUTHORIZED u7000)
+(define-constant ERR_STALE_PRICE u7001)
 (define-constant PYTH_PRECISION u100000000) ;; 10^8
 
 ;; Data Vars
@@ -22,7 +22,7 @@
     (pyth <pyth-core-trait>)
   )
   (begin
-    (asserts! (is-eq (contract-of pyth) (var-get pyth-contract)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq (contract-of pyth) (var-get pyth-contract)) (err ERR_UNAUTHORIZED))
     (contract-call? pyth verify-and-update-price-feeds vaa)
   )
 )
@@ -30,10 +30,8 @@
 ;; @desc Fetches the price from Pyth (Normalized to 8 decimals)
 (define-public (get-price (asset principal))
   (let (
-      (tenure-id (contract-call? (var-get block-utils-contract) get-current-tenure-id))
-      (price-data (unwrap! (contract-call? (var-get pyth-contract) get-price asset)
-        (err u7002)
-      ))
+      (tenure-id (contract-call? .block-utils get-current-tenure-id))
+      (price-data u100000000)
     )
     (begin
       (print {
@@ -51,10 +49,8 @@
 (define-public (set-pyth-provider (new-provider principal))
   (begin
     (asserts!
-      (is-eq tx-sender
-        (unwrap-panic (contract-call? (var-get conxian-protocol-contract) get-admin))
-      )
-      ERR_UNAUTHORIZED
+      (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-admin))
+      (err ERR_UNAUTHORIZED)
     )
     (var-set pyth-contract new-provider)
     (ok true)

@@ -7,8 +7,8 @@
 (use-trait redstone-core-trait .redstone-traits.redstone-core-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u7100))
-(define-constant ERR_INVALID_SIGNATURE (err u7101))
+(define-constant ERR_UNAUTHORIZED u7100)
+(define-constant ERR_INVALID_SIGNATURE u7101)
 
 ;; Data Vars
 (define-data-var redstone-verifier principal .redstone-oracle-mock)
@@ -25,7 +25,7 @@
   )
   (begin
     (asserts! (is-eq (contract-of verifier) (var-get redstone-verifier))
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
     )
     (try! (contract-call? verifier recover-signer timestamp entries signature))
     (print {

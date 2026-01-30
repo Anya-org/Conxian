@@ -4,7 +4,7 @@
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_UNAUTHORIZED u1000)
 
 ;; State
 (define-data-var staking-vault principal .cxd-staking)

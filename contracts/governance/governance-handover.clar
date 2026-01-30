@@ -4,8 +4,8 @@
 ;; Ensures "Hands-Off" ethos by cryptographically proving no admin keys remain in individual hands.
 
 ;; Constants
-(define-constant ERR_NOT_AUTHORIZED (err u10000))
-(define-constant ERR_HANDOVER_INCOMPLETE (err u10001))
+(define-constant ERR_NOT_AUTHORIZED u10000)
+(define-constant ERR_HANDOVER_INCOMPLETE u10001)
 (define-constant TARGET_OWNER .timelock)
 
 ;; Contract Principals
@@ -52,7 +52,7 @@
       (reg-owner (unwrap-panic (contract-call? (var-get regulatory-adapter-contract) get-contract-owner)))
       (access-owner (unwrap-panic (contract-call? (var-get conxian-access-contract) get-contract-owner)))
     )
-    (asserts! (contract-call? .admin-facade is-global-admin) ERR_NOT_AUTHORIZED) ;; Added this line based on the instruction's context.
+    (asserts! (contract-call? .admin-facade is-global-admin) (err ERR_NOT_AUTHORIZED)) ;; Added this line based on the instruction's context.
 
     ;; Check Conxian Protocol
     (asserts! (is-eq protocol-owner TARGET_OWNER)

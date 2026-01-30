@@ -7,10 +7,10 @@
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_SLIPPAGE (err u1001))
-(define-constant ERR_NON_COMPLIANT (err u1002))
-(define-constant ERR_INSUFFICIENT_FUNDS (err u1003))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_SLIPPAGE u1001)
+(define-constant ERR_NON_COMPLIANT u1002)
+(define-constant ERR_INSUFFICIENT_FUNDS u1003)
 
 ;; Data Vars
 (define-data-var slope uint u1000) ;; Price increase per token (in micro-STX per micro-CXD)
@@ -76,8 +76,8 @@
       (quote (unwrap-panic (get-buy-quote amount-cxd)))
     )
     ;; Compliance Check
-    (asserts! (check-compliance buyer) ERR_NON_COMPLIANT)
-    (asserts! (<= quote max-spend-stx) ERR_SLIPPAGE)
+    (asserts! (check-compliance buyer) (err ERR_NON_COMPLIANT))
+    (asserts! (<= quote max-spend-stx) (err ERR_SLIPPAGE))
 
     ;; Transfer STX to Contract (Reserve)
     ;; Note: We keep fees separate or in reserve? 
@@ -115,8 +115,8 @@
       (quote (unwrap-panic (get-sell-quote amount-cxd)))
     )
     ;; Compliance Check
-    (asserts! (check-compliance seller) ERR_NON_COMPLIANT)
-    (asserts! (>= quote min-receive-stx) ERR_SLIPPAGE)
+    (asserts! (check-compliance seller) (err ERR_NON_COMPLIANT))
+    (asserts! (>= quote min-receive-stx) (err ERR_SLIPPAGE))
 
     ;; Burn CXD
     (try! (contract-call? .token-system-coordinator burn-cxd

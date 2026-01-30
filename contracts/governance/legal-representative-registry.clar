@@ -2,7 +2,7 @@
 ;; Registry of Clean-Hands/KYC'd Entities
 ;; Maps on-chain principals to off-chain legal identities (hash)
 
-(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_UNAUTHORIZED u1000)
 
 ;; Data Storage
 (define-map legal-registry
@@ -31,7 +31,7 @@
 ;; Admin Functions
 (define-public (register-representative (entity principal) (name-hash (buff 32)) (jurisdiction (string-ascii 64)))
     (begin
-        (asserts! (is-eq tx-sender (var-get registrar)) ERR_UNAUTHORIZED)
+        (asserts! (is-eq tx-sender (var-get registrar)) (err ERR_UNAUTHORIZED))
         (map-set legal-registry entity {
             name-hash: name-hash,
             jurisdiction: jurisdiction,
@@ -46,7 +46,7 @@
     (let (
         (profile (unwrap-panic (map-get? legal-registry entity)))
     )
-        (asserts! (is-eq tx-sender (var-get registrar)) ERR_UNAUTHORIZED)
+        (asserts! (is-eq tx-sender (var-get registrar)) (err ERR_UNAUTHORIZED))
         (map-set legal-registry entity (merge profile { active: active }))
         (ok true)
     )

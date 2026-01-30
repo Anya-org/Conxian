@@ -5,8 +5,8 @@
 (impl-trait .core-traits.risk-manager-trait)
 
 ;; Constants - Gas Free (compile-time)
-(define-constant ERR_NOT_AUTHORIZED (err u1000))
-(define-constant ERR_HEALTHY_POSITION (err u6000))
+(define-constant ERR_NOT_AUTHORIZED u1000)
+(define-constant ERR_HEALTHY_POSITION u6000)
 (define-constant HEALTH_FACTOR_BASE u10000) ;; 1.0 scaled
 (define-constant LIQUIDATION_THRESHOLD u8000) ;; 0.8 threshold
 (define-constant COLLATERAL_FACTOR u7500) ;; 0.75 base factor
@@ -16,7 +16,7 @@
 
 (define-public (set-dimensional-engine (new-engine principal))
   (begin
-    (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender u1)) ERR_NOT_AUTHORIZED)
+    (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender u1)) (err ERR_NOT_AUTHORIZED))
     (var-set dimensional-engine new-engine)
     (ok true)
   )
@@ -100,7 +100,7 @@
     (asset principal)
   )
   (begin
-    (asserts! (is-eq tx-sender (var-get dimensional-engine)) ERR_NOT_AUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get dimensional-engine)) (err ERR_NOT_AUTHORIZED))
     
     ;; Single write operation
     (let ((health-factor (calculate-health-factor collateral-value debt-value)))
@@ -117,13 +117,13 @@
 
 (define-public (liquidate (position-id uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get dimensional-engine)) ERR_NOT_AUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get dimensional-engine)) (err ERR_NOT_AUTHORIZED))
     
     (let ((hf (match (map-get? position-health position-id)
                 health-data (get health-factor health-data)
                 u20000 ;; Default safe value
               )))
-      (asserts! (not (is-position-healthy hf)) ERR_HEALTHY_POSITION)
+      (asserts! (not (is-position-healthy hf)) (err ERR_HEALTHY_POSITION))
       
       ;; Execute liquidation logic here
       ;; Remove position after liquidation
@@ -140,7 +140,7 @@
     (debt-values (list 20 uint))
   )
   (begin
-    (asserts! (is-eq tx-sender (var-get dimensional-engine)) ERR_NOT_AUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get dimensional-engine)) (err ERR_NOT_AUTHORIZED))
     
     ;; Process all positions in single transaction
     (map-set position-health (unwrap-panic (element-at positions u0)) {
@@ -160,7 +160,7 @@
     (volatility-adjustment uint)
   )
   (begin
-    (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender u1)) ERR_NOT_AUTHORIZED)
+    (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender u1)) (err ERR_NOT_AUTHORIZED))
     
     (map-set asset-collateral-factors asset {
       factor: factor,

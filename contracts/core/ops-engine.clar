@@ -5,16 +5,16 @@
 (use-trait proposal-trait .governance-traits.proposal-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u6000))
+(define-constant ERR_UNAUTHORIZED u6000)
 
 ;; State
-(define-data-var last-action-block uint burn-block-height)
+(define-data-var last-action-block uint u0)
 
 ;; Public Functions
 
 (define-public (process-signal (proposal-id uint) (proposal-contract <proposal-trait>))
   (begin
-    (asserts! (contract-call? .admin-facade is-authorized u4) ERR_UNAUTHORIZED) ;; ROLE_OPERATOR
+    (asserts! (unwrap-panic (contract-call? .admin-facade is-authorized u4)) (err ERR_UNAUTHORIZED)) ;; ROLE_OPERATOR
     (var-set last-action-block burn-block-height)
     (contract-call? proposal-contract execute tx-sender)
   )

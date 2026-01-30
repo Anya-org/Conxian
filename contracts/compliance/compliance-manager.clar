@@ -6,8 +6,8 @@
 (use-trait compliance-trait .compliance-trait.compliance-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u6000))
-(define-constant ERR_NON_COMPLIANT (err u6001))
+(define-constant ERR_UNAUTHORIZED u6000)
+(define-constant ERR_NON_COMPLIANT u6001)
 
 ;; Data Vars
 (define-data-var contract-owner principal tx-sender)
@@ -32,7 +32,7 @@
 ;; Administrative Functions
 (define-public (set-owner (new-owner principal))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (var-set contract-owner new-owner)
     (ok true)
   )
@@ -40,7 +40,7 @@
 
 (define-public (set-compliance-enabled (enabled bool))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (var-set compliance-enabled enabled)
     (print {
       event: "compliance-status-changed",

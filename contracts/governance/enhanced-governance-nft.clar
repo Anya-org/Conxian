@@ -5,10 +5,10 @@
 (impl-trait .sip-standards.sip-009-nft-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_NOT_FOUND (err u1001))
-(define-constant ERR_SEAT_TAKEN (err u1002))
-(define-constant ERR_SOULBOUND (err u6003))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_NOT_FOUND u1001)
+(define-constant ERR_SEAT_TAKEN u1002)
+(define-constant ERR_SOULBOUND u6003)
 
 ;; Council IDs
 (define-constant COUNCIL_CXD u1) ;; Core Protocol & Architecture
@@ -71,10 +71,10 @@
     (recipient principal)
   )
   (begin
-    (asserts! (is-eq tx-sender sender) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender sender) (err ERR_UNAUTHORIZED))
     ;; Governance seats are soulbound by default in this version
     ;; Only admin can revoke/transfer via separate admin functions
-    ERR_SOULBOUND
+    (err ERR_SOULBOUND)
   )
 )
 
@@ -93,9 +93,9 @@
     ;; Check Admin Role via Conxian Access
     (asserts!
       (unwrap! (contract-call? .conxian-access has-role tx-sender u1)
-        ERR_UNAUTHORIZED
+        (err ERR_UNAUTHORIZED)
       )
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
     )
 
     ;; Ensure user doesn't already have a seat on this council
@@ -104,7 +104,7 @@
         user: recipient,
         council-id: council-id,
       }))
-      ERR_SEAT_TAKEN
+      (err ERR_SEAT_TAKEN)
     )
 
     (try! (nft-mint? seat new-id recipient))
@@ -130,17 +130,17 @@
 
 (define-public (burn-seat (seat-id uint))
   (let (
-      (owner (unwrap! (nft-get-owner? seat seat-id) ERR_NOT_FOUND))
-      (metadata (unwrap! (map-get? seat-data seat-id) ERR_NOT_FOUND))
+      (owner (unwrap! (nft-get-owner? seat seat-id) (err ERR_NOT_FOUND)))
+      (metadata (unwrap! (map-get? seat-data seat-id) (err ERR_NOT_FOUND)))
       (council-id (get council-id metadata))
       (power (get voting-power metadata))
       (current-council-power (default-to u0 (map-get? council-power council-id)))
     )
     (asserts!
       (unwrap! (contract-call? .conxian-access has-role tx-sender u1)
-        ERR_UNAUTHORIZED
+        (err ERR_UNAUTHORIZED)
       )
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
     )
     (try! (nft-burn? seat seat-id owner))
     (map-delete seat-data seat-id)

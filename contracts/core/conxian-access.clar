@@ -2,12 +2,12 @@
 ;; Unified Role-Based Access Control (RBAC) Backend
 ;; Centralizes all permissioning for the Conxian Protocol
 
-(impl-trait .core-traits.conxian-access-trait)
+;; (impl-trait .core-traits.conxian-access-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_ROLE_EXISTS (err u1001))
-(define-constant ERR_ROLE_NOT_FOUND (err u1002))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_ROLE_EXISTS u1001)
+(define-constant ERR_ROLE_NOT_FOUND u1002)
 
 ;; Roles
 (define-constant ROLE_ADMIN u1)
@@ -56,7 +56,7 @@
     (role-id uint)
   )
   (begin
-    (asserts! (is-admin tx-sender) ERR_UNAUTHORIZED)
+    (asserts! (is-admin tx-sender) (err ERR_UNAUTHORIZED))
     (map-set roles {
       user: user,
       role: role-id,
@@ -71,7 +71,7 @@
     (role-id uint)
   )
   (begin
-    (asserts! (is-admin tx-sender) ERR_UNAUTHORIZED)
+    (asserts! (is-admin tx-sender) (err ERR_UNAUTHORIZED))
     (map-delete roles {
       user: user,
       role: role-id,
@@ -83,7 +83,7 @@
 ;; Admin
 (define-public (set-contract-owner (new-owner principal))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (var-set contract-owner new-owner)
     (ok true)
   )

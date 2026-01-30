@@ -6,8 +6,8 @@
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_INSUFFICIENT_BALANCE (err u1001))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_INSUFFICIENT_BALANCE u1001)
 
 ;; Roles from conxian-access
 (define-constant ROLE_ADMIN u1)
@@ -47,10 +47,10 @@
                 (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_ADMIN))
                 (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_EMERGENCY))
             )
-            ERR_UNAUTHORIZED
+            (err ERR_UNAUTHORIZED)
         )
         (let ((current-balance (default-to u0 (map-get? balances (contract-of token)))))
-            (asserts! (>= current-balance amount) ERR_INSUFFICIENT_BALANCE)
+            (asserts! (>= current-balance amount) (err ERR_INSUFFICIENT_BALANCE))
             (map-set balances (contract-of token) (- current-balance amount))
             (as-contract (contract-call? token transfer amount tx-sender recipient none))
         )

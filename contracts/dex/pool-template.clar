@@ -2,15 +2,14 @@
 ;; Conxian Protocol: Template system for standardized pool creation
 
 ;; Dependencies
-(use-trait core-traits .core-traits.core-traits)
 
 ;; Constants
-(define-constant ERR_INVALID_TEMPLATE (err u23001))
-(define-constant ERR_TEMPLATE_NOT_FOUND (err u23002))
-(define-constant ERR_INVALID_POOL_TYPE (err u23003))
-(define-constant ERR_INSUFFICIENT_LIQUIDITY (err u23004))
-(define-constant ERR_POOL_ALREADY_EXISTS (err u23005))
-(define-constant ERR_UNAUTHORIZED (err u23006))
+(define-constant ERR_INVALID_TEMPLATE u23001)
+(define-constant ERR_TEMPLATE_NOT_FOUND u23002)
+(define-constant ERR_INVALID_POOL_TYPE u23003)
+(define-constant ERR_INSUFFICIENT_LIQUIDITY u23004)
+(define-constant ERR_POOL_ALREADY_EXISTS u23005)
+(define-constant ERR_UNAUTHORIZED u23006)
 
 ;; Template parameters
 (define-constant MIN_LIQUIDITY u1000000)
@@ -56,8 +55,8 @@
     (default-fee uint)
   )
   (begin
-    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) ERR_UNAUTHORIZED)
-    (asserts! (> (len name) u0) ERR_INVALID_TEMPLATE)
+    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
+    (asserts! (> (len name) u0) (err ERR_INVALID_TEMPLATE))
 
     (let ((template-id (+ (var-get total-templates) u1)))
       (map-set pool-templates { template-id: template-id } {
@@ -80,7 +79,7 @@
 ;; @desc Deactivate a pool template
 (define-public (deactivate-template (template-id uint))
   (begin
-    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
     (match (map-get? pool-templates { template-id: template-id })
       template (begin
                 (map-set pool-templates { template-id: template-id } (merge template { active: false }))

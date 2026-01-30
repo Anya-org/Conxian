@@ -5,10 +5,10 @@
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_PAUSED (err u1001))
-(define-constant ERR_SLIPPAGE (err u3000))
-(define-constant ERR_INVALID_PATH (err u2005))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_PAUSED u1001)
+(define-constant ERR_SLIPPAGE u3000)
+(define-constant ERR_INVALID_PATH u2005)
 
 ;; Public Functions
 
@@ -27,12 +27,12 @@
     (min-amount-out uint)
   )
   (begin
-    (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) ERR_PAUSED)
+    (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
 
     ;; Execute swap on pool (Stub logic for architecture validation)
     (let ((amount-out amount-in)) ;; Simplified for now
       (begin
-        (asserts! (>= amount-out min-amount-out) ERR_SLIPPAGE)
+        (asserts! (>= amount-out min-amount-out) (err ERR_SLIPPAGE))
         (print {
           event: "router-swap",
           user: tx-sender,
@@ -59,7 +59,7 @@
     (min-amount-out uint)
   )
   (begin
-    (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) ERR_PAUSED)
+    (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
     ;; Multi-hop logic would iterate through the path
     ;; Returning amount-in as a stub for architectural validation
     (ok amount-in)

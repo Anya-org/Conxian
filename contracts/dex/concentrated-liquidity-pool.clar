@@ -5,9 +5,9 @@
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_INSUFFICIENT_LIQUIDITY (err u1002))
-(define-constant ERR_INVALID_TICK (err u2000))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_INSUFFICIENT_LIQUIDITY u1002)
+(define-constant ERR_INVALID_TICK u2000)
 
 ;; Storage
 (define-map pools
@@ -38,7 +38,7 @@
 (define-public (create-pool (token0 principal) (token1 principal) (fee uint) (sqrt-price uint))
   (let ((pool-id (+ (var-get pool-nonce) u1)))
     (begin
-      (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) ERR_UNAUTHORIZED)
+      (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
       (map-set pools pool-id {
           token0: token0,
           token1: token1,
@@ -54,7 +54,7 @@
 )
 
 (define-public (mint (pool-id uint) (tick-lower int) (tick-upper int) (amount uint))
-  (let ((pool (unwrap! (map-get? pools pool-id) ERR_INSUFFICIENT_LIQUIDITY))
+  (let ((pool (unwrap! (map-get? pools pool-id) (err ERR_INSUFFICIENT_LIQUIDITY)))
         (position-key { pool-id: pool-id, owner: tx-sender, tick-lower: tick-lower, tick-upper: tick-upper }))
     (begin
       (asserts! (> amount u0) (err u1003))
@@ -70,7 +70,7 @@
 )
 
 (define-public (swap (pool-id uint) (zero-for-one bool) (amount-in uint))
-  (let ((pool (unwrap! (map-get? pools pool-id) ERR_INSUFFICIENT_LIQUIDITY)))
+  (let ((pool (unwrap! (map-get? pools pool-id) (err ERR_INSUFFICIENT_LIQUIDITY))))
     (begin
       ;; Simplified constant product swap logic for stub
       (ok amount-in)

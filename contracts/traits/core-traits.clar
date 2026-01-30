@@ -1,6 +1,8 @@
 ;; core-traits.clar
 ;; Definition of core module traits
 
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
+
 (define-trait ownable-trait (
   (get-owner
     ()
@@ -12,7 +14,7 @@
   )
 ))
 
-(define-trait rbac-trait (
+(define-trait conxian-access-trait (
   (has-role
     (principal uint)
     (response bool uint)
@@ -46,12 +48,12 @@
 ))
 
 (define-trait collateral-manager-trait (
-  (deposit
-    (principal principal uint)
+  (deposit-funds
+    (uint <sip-010-ft-trait>)
     (response bool uint)
   )
-  (withdraw
-    (principal principal uint)
+  (withdraw-funds
+    (uint <sip-010-ft-trait>)
     (response bool uint)
   )
 ))
@@ -72,4 +74,9 @@
     (uint)
     (response uint uint)
   )
+))
+
+(define-trait protocol-manager-trait (
+  (is-paused () (response bool uint))
+  (get-protocol-admin () (response principal uint))
 ))

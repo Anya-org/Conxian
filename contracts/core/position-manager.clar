@@ -5,8 +5,8 @@
 (impl-trait .core-traits.position-manager-trait)
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
-(define-constant ERR_NOT_AUTHORIZED (err u1000))
-(define-constant ERR_POSITION_NOT_FOUND (err u3000))
+(define-constant ERR_NOT_AUTHORIZED u1000)
+(define-constant ERR_POSITION_NOT_FOUND u3000)
 
 ;; State - Engine Address
 (define-data-var contract-owner principal tx-sender)
@@ -39,7 +39,7 @@
 
 (define-public (set-dimensional-engine (engine principal))
   (begin
-    (asserts! (is-owner) ERR_NOT_AUTHORIZED)
+    (asserts! (is-owner) (err ERR_NOT_AUTHORIZED))
     (var-set dimensional-engine engine)
     (ok true)
   )
@@ -47,7 +47,7 @@
 
 (define-public (set-contract-owner (new-owner principal))
   (begin
-    (asserts! (is-owner) ERR_NOT_AUTHORIZED)
+    (asserts! (is-owner) (err ERR_NOT_AUTHORIZED))
     (var-set contract-owner new-owner)
     (ok true)
   )
@@ -61,7 +61,7 @@
     (long bool)
   )
   (let ((pos-id (var-get next-position-id)))
-    (asserts! (is-engine) ERR_NOT_AUTHORIZED)
+    (asserts! (is-engine) (err ERR_NOT_AUTHORIZED))
 
     (map-set positions pos-id {
       owner: user,
@@ -83,15 +83,15 @@
     (position-id uint)
   )
   (begin
-    (let ((pos (unwrap! (map-get? positions position-id) ERR_POSITION_NOT_FOUND)))
-      (asserts! (is-eq (get owner pos) user) ERR_NOT_AUTHORIZED)
+    (let ((pos (unwrap! (map-get? positions position-id) (err ERR_POSITION_NOT_FOUND))))
+      (asserts! (is-eq (get owner pos) user) (err ERR_NOT_AUTHORIZED))
       (map-set positions position-id (merge pos { open: false }))
       (ok true)
     )
   )
 )
 
-(define-public (get-position (position-id uint))
+(define-read-only (get-position (position-id uint))
   (match (map-get? positions position-id)
     pos (ok pos)
     (err u3000)

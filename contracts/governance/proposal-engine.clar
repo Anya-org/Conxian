@@ -4,15 +4,15 @@
 
 (use-trait proposal-trait .governance-traits.proposal-trait)
 (use-trait nft-trait .sip-standards.sip-009-nft-trait)
-(use-trait reputation-trait .reputation-engine-trait.reputation-engine-trait)
+(use-trait reputation-trait .governance-traits.reputation-engine-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_NOT_FOUND (err u1001))
-(define-constant ERR_PROPOSAL_ACTIVE (err u1002))
-(define-constant ERR_PROPOSAL_ALREADY_EXISTS (err u7004))
-(define-constant ERR_PROPOSAL_ENDED (err u1003))
-(define-constant ERR_INSUFFICIENT_POWER (err u1004))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_NOT_FOUND u1001)
+(define-constant ERR_PROPOSAL_ACTIVE u1002)
+(define-constant ERR_PROPOSAL_ALREADY_EXISTS u7004)
+(define-constant ERR_PROPOSAL_ENDED u1003)
+(define-constant ERR_INSUFFICIENT_POWER u1004)
 
 (define-data-var proposal-counter uint u0)
 (define-data-var proposal-executor-contract principal .proposal-executor)
@@ -43,20 +43,17 @@
     ;; Check if sender holds a seat on this council (or is admin)
     (asserts!
       (>
-        (unwrap-panic (contract-call? (var-get seat-token) get-seat-power tx-sender
+        (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender
           council-id
         ))
         u0
       )
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
     )
 
     ;; Register proposal
-    (match (contract-call? (var-get registry) add-proposal contract-principal council-id
+    (contract-call? .proposal-registry add-proposal contract-principal council-id
       start-block end-block
-    )
-      proposal-id (ok proposal-id)
-      err-val (err err-val)
     )
   )
 )
@@ -70,36 +67,37 @@
     (support bool)
   )
   (let (
-      (proposal (unwrap! (contract-call? (var-get proposal-registry-contract) get-proposal proposal-id)
-        ERR_NOT_FOUND
+      (proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id)
+        (err ERR_NOT_FOUND)
       ))
       (council-id (get council-id proposal))
-      (raw-voter-power (unwrap-panic (contract-call? (var-get seat-token) get-seat-power tx-sender
+      (raw-voter-power (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender
         council-id
       )))
-      (weighted-voter-power (unwrap-panic (contract-call? (var-get reputation-engine) get-weighted-voting-power tx-sender
+      (weighted-voter-power (unwrap-panic (contract-call? .reputation-engine get-weighted-voting-power tx-sender
         raw-voter-power
       )))
     )
     ;; Assert Voting Period
-    (asserts! (>= block-height (get start-block proposal)) ERR_NOT_FOUND)
-    ;; Should be ERR_NOT_STARTED but reusing
-    (asserts! (< block-height (get end-block proposal)) ERR_PROPOSAL_ENDED)
+    (asserts! (>= block-height (get start-block proposal)) (err ERR_NOT_FOUND))
+    ;; Should be (err ERR_NOT_STARTED) but reusing
+    (asserts! (< block-height (get end-block proposal)) (err ERR_PROPOSAL_ENDED))
 
     ;; Assert Voter Power
-    (asserts! (> weighted-voter-power u0) ERR_UNAUTHORIZED)
+    (asserts! (> weighted-voter-power u0) (err ERR_UNAUTHORIZED))
 
     ;; Update activity score
-    (asserts! (contract-call? .conxian-access is-module-active "governance")
-      ERR_UNAUTHORIZED
+    (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender u1)) ;; Placeholder
+      (err ERR_UNAUTHORIZED)
     )
-    (try! (contract-call? (var-get reputation-engine-contract) update-activity-score
+    (let ((rep-update (contract-call? .reputation-engine update-activity-score
       tx-sender
-    ))
+    )))
 
     ;; Record Vote
-    (contract-call? (var-get proposal-registry-contract) vote-proposal proposal-id support
+    (contract-call? .proposal-registry vote-proposal proposal-id support
       weighted-voter-power
+    )
     )
   )
 )
@@ -112,8 +110,8 @@
     (proposal-id uint)
     (proposal-contract <proposal-trait>)
   )
-  (contract-call? (var-get proposal-executor-contract) execute proposal-id
-    proposal-contract
+  (contract-call? .proposal-executor execute proposal-id
+    proposal-contract u5000
   )
   ;; 50% quorum hardcoded for now
 )

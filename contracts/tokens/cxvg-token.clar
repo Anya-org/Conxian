@@ -7,13 +7,13 @@
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_NON_COMPLIANT (err u1001))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_NON_COMPLIANT u1001)
 
 ;; Data Vars
 (define-data-var token-name (string-ascii 32) "Conxian Voting Token")
 (define-data-var token-symbol (string-ascii 10) "CXVG")
-(define-constant ERR_NOT_DELEGATING (err u5005))
+(define-constant ERR_NOT_DELEGATING u5005)
 
 (define-data-var token-uri (optional (string-utf8 256)) (some u"https://conxian.com/cxvg.json"))
 (define-data-var contract-owner principal tx-sender)
@@ -105,9 +105,9 @@
       (delegator tx-sender)
       (balance (ft-get-balance cxvg delegator))
     )
-    (asserts! (check-compliance delegator) ERR_NON_COMPLIANT)
-    (asserts! (check-compliance delegatee) ERR_NON_COMPLIANT)
-    (asserts! (not (is-eq delegator delegatee)) ERR_UNAUTHORIZED)
+    (asserts! (check-compliance delegator) (err ERR_NON_COMPLIANT))
+    (asserts! (check-compliance delegatee) (err ERR_NON_COMPLIANT))
+    (asserts! (not (is-eq delegator delegatee)) (err ERR_UNAUTHORIZED))
     ;; Cannot delegate to self (undelegate instead)
 
     ;; Remove old delegation
@@ -148,7 +148,7 @@
         })
         (ok true)
       )
-      (err ERR_NOT_DELEGATING) ;; ERR_NOT_DELEGATING
+      (err ERR_NOT_DELEGATING) ;; (err ERR_NOT_DELEGATING)
     )
   )
 )
@@ -179,11 +179,11 @@
     (memo (optional (buff 34)))
   )
   (begin
-    (asserts! (is-eq tx-sender sender) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender sender) (err ERR_UNAUTHORIZED))
 
     ;; Enforce Clean Hands
-    (asserts! (check-compliance sender) ERR_NON_COMPLIANT)
-    (asserts! (check-compliance recipient) ERR_NON_COMPLIANT)
+    (asserts! (check-compliance sender) (err ERR_NON_COMPLIANT))
+    (asserts! (check-compliance recipient) (err ERR_NON_COMPLIANT))
 
     (try! (ft-transfer? cxvg amount sender recipient))
 
@@ -236,7 +236,7 @@
         (is-eq tx-sender .token-system-coordinator)
         (is-eq tx-sender .token-emission-controller)
       )
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
     )
 
     (try! (ft-mint? cxvg amount recipient))
@@ -255,7 +255,7 @@
     (sender principal)
   )
   (begin
-    (asserts! (is-eq tx-sender sender) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender sender) (err ERR_UNAUTHORIZED))
 
     (try! (ft-burn? cxvg amount sender))
 
@@ -271,7 +271,7 @@
 ;; Admin
 (define-public (set-contract-owner (new-owner principal))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (var-set contract-owner new-owner)
     (ok true)
   )
@@ -279,7 +279,7 @@
 
 (define-public (set-token-uri (new-uri (optional (string-utf8 256))))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (var-set token-uri new-uri)
     (ok true)
   )

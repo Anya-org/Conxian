@@ -1,13 +1,13 @@
-(use-trait risk-manager-trait .risk-management.risk-manager-trait)
+(use-trait risk-manager-trait .core-traits.risk-manager-trait)
 (use-trait rbac-trait .core-traits.conxian-access-trait)
 
-(impl-trait .risk-management.risk-manager-trait)
+(impl-trait .core-traits.risk-manager-trait)
 (impl-trait .automation-traits.office-job-trait)
 (use-trait office-job-trait .automation-traits.office-job-trait)
 
-(define-constant ERR_UNAUTHORIZED (err u1001))
-(define-constant ERR_INVALID_PARAMETERS (err u1005))
-(define-constant ERR_NOT_CONFIGURED (err u1006))
+(define-constant ERR_UNAUTHORIZED u1001)
+(define-constant ERR_INVALID_PARAMETERS u1005)
+(define-constant ERR_NOT_CONFIGURED u1006)
 (define-constant MIN_LEVERAGE u100)
 
 (define-data-var contract-owner principal tx-sender)
@@ -28,15 +28,15 @@
     (try! (check-role "ROLE_ADMIN"))
     (asserts!
       (and (>= new-max-leverage MIN_LEVERAGE) (<= new-max-leverage u5000))
-      ERR_INVALID_PARAMETERS
+      (err ERR_INVALID_PARAMETERS)
     )
     (asserts!
       (and (> new-maintenance-margin u0) (< new-maintenance-margin u10000))
-      ERR_INVALID_PARAMETERS
+      (err ERR_INVALID_PARAMETERS)
     )
     (asserts!
       (and (> new-liquidation-threshold new-maintenance-margin) (<= new-liquidation-threshold u10000))
-      ERR_INVALID_PARAMETERS
+      (err ERR_INVALID_PARAMETERS)
     )
     (var-set max-leverage new-max-leverage)
     (var-set maintenance-margin new-maintenance-margin)
@@ -57,7 +57,7 @@
         (<= min-reward max-reward)
         (<= max-reward u5000)
       )
-      ERR_INVALID_PARAMETERS
+      (err ERR_INVALID_PARAMETERS)
     )
     (var-set min-liquidation-reward min-reward)
     (var-set max-liquidation-reward max-reward)
@@ -81,7 +81,7 @@
 
 (define-public (update-position-health (position-id uint) (new-health uint) (collateral-value uint) (strategy principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     ;; Update logic would go here
     (ok new-health)
   )
@@ -89,20 +89,20 @@
 
 (define-public (set-asset-collateral-factor (asset principal) (factor uint) (risk-level uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     ;; Set factor logic would go here
     (ok true)
   )
 )
 
-(define-public (get-asset-factor (asset principal))
+(define-read-only (get-asset-factor (asset principal))
   (begin
     ;; Return default collateral factor
     (ok u8000) ;; 80%
   )
 )
 
-(define-public (get-global-collateral-factor)
+(define-read-only (get-global-collateral-factor)
   (begin
     ;; Return global collateral factor
     (ok u8000) ;; 80%
@@ -110,10 +110,9 @@
 )
 
 (define-read-only (is-liquidatable (position-id uint))
-  (let (
-    (risk-data (unwrap! (assess-position-risk position-id) (err u404)))
-  )
-    (ok (< (get health-factor risk-data) u10000))
+  (match (assess-position-risk position-id)
+    risk-data (ok (< (get health-factor risk-data) u10000))
+    error (err u404)
   )
 )
 
@@ -168,10 +167,10 @@
   )
 )
 
-(define-public (assess-position-risk (position-id uint))
+(define-read-only (assess-position-risk (position-id uint))
   (let (
       (position (unwrap! (contract-call? .position-manager get-position position-id)
-        ERR_INVALID_PARAMETERS
+        (err ERR_INVALID_PARAMETERS)
       ))
       (collateral (get collateral position))
       (size (get size position))
@@ -187,7 +186,7 @@
           leverage: (get leverage position),
           is-long: (get is-long position),
         })
-        ERR_INVALID_PARAMETERS
+        (err ERR_INVALID_PARAMETERS)
       ))
     )
     (ok {
@@ -232,14 +231,14 @@
 ;; @param job-data: The position-id encoded as a buffer (using to-consensus-buff).
 (define-public (do-work (job-data (buff 2048)))
   (let (
-    (position-id (unwrap! (from-consensus-buff? uint (unwrap! (as-max-len? job-data u16) ERR_INVALID_PARAMETERS)) ERR_INVALID_PARAMETERS))
+    (position-id (unwrap! (from-consensus-buff? uint (unwrap! (as-max-len? job-data u16) (err ERR_INVALID_PARAMETERS))) (err ERR_INVALID_PARAMETERS)))
   )
     (begin
       ;; 1. Validate work is still needed
-      (asserts! (unwrap-panic (is-liquidatable position-id)) ERR_INVALID_PARAMETERS)
+      (asserts! (unwrap-panic (is-liquidatable position-id)) (err ERR_INVALID_PARAMETERS))
 
       ;; 2. Execute Liquidation in the Core
-      (try! (contract-call? .dimensional-core liquidate-position tx-sender position-id .oracle-aggregator-v2))
+      (try! (contract-call? .dimensional-core liquidate-position tx-sender position-id .oracle-aggregator))
       
       ;; 3. Update last checked ID to move the scanner forward
       (var-set last-checked-id position-id)

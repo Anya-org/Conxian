@@ -4,9 +4,9 @@
 
 (use-trait vault-trait .vault-traits.vault-trait)
 
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_STRATEGY_NOT_FOUND (err u6001))
-(define-constant ERR_RISK_TOO_HIGH (err u6002))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_STRATEGY_NOT_FOUND u6001)
+(define-constant ERR_RISK_TOO_HIGH u6002)
 
 (define-data-var contract-owner principal tx-sender)
 
@@ -33,7 +33,7 @@
 ;; @desc Registers or updates a strategy
 (define-public (update-strategy (vault principal) (risk-score uint) (apy uint))
     (begin
-        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+        (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
         (map-set strategies vault {
             active: true,
             risk-score: risk-score,
@@ -45,7 +45,7 @@
 
 (define-public (record-performance (strategy principal) (apy uint) (tvl uint))
     (begin
-        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
+        (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
         (map-set strategy-performance { strategy: strategy, block: block-height } {
             apy: apy,
             tvl: tvl
@@ -58,10 +58,10 @@
 (define-public (rebalance (vault-from <vault-trait>) (vault-to <vault-trait>) (amount uint))
     (let
         (
-            (strategy-to (unwrap! (map-get? strategies (contract-of vault-to)) ERR_STRATEGY_NOT_FOUND))
+            (strategy-to (unwrap! (map-get? strategies (contract-of vault-to)) (err ERR_STRATEGY_NOT_FOUND)))
         )
         ;; Check risk tolerance
-        (asserts! (<= (get risk-score strategy-to) (var-get max-risk-tolerance)) ERR_RISK_TOO_HIGH)
+        (asserts! (<= (get risk-score strategy-to) (var-get max-risk-tolerance)) (err ERR_RISK_TOO_HIGH))
         
         ;; Logic to withdraw from A and deposit to B
         (try! (contract-call? vault-from withdraw amount tx-sender))
@@ -80,7 +80,7 @@
 (define-private (compound-strategy (strategy principal))
     (let
         (
-            (strat-data (unwrap! (map-get? strategies strategy) ERR_STRATEGY_NOT_FOUND))
+            (strat-data (unwrap! (map-get? strategies strategy) (err ERR_STRATEGY_NOT_FOUND)))
         )
         (if (get active strat-data)
             (as-contract (contract-call? .auto-compounder compound strategy))

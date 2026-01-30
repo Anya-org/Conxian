@@ -7,12 +7,12 @@
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_PROPOSAL_NOT_FOUND (err u1001))
-(define-constant ERR_PROPOSAL_ACTIVE (err u1002))
-(define-constant ERR_PROPOSAL_EXPIRED (err u1003))
-(define-constant ERR_QUORUM_NOT_REACHED (err u1004))
-(define-constant ERR_NON_COMPLIANT (err u1005))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_PROPOSAL_NOT_FOUND u1001)
+(define-constant ERR_PROPOSAL_ACTIVE u1002)
+(define-constant ERR_PROPOSAL_EXPIRED u1003)
+(define-constant ERR_QUORUM_NOT_REACHED u1004)
+(define-constant ERR_NON_COMPLIANT u1005)
 
 ;; Data Vars
 (define-data-var dao-name (string-ascii 64) "Community DAO")
@@ -60,7 +60,7 @@
     ;; Only allowing this if no proposals exist yet to prevent takeover, 
     ;; OR restrict to specific deployer role. 
     ;; For simplicity/template: allow if proposal-count is 0 (initialization phase)
-    (asserts! (is-eq (var-get proposal-count) u0) ERR_UNAUTHORIZED)
+    (asserts! (is-eq (var-get proposal-count) u0) (err ERR_UNAUTHORIZED))
     (var-set governance-token new-token)
     (ok true)
   )
@@ -80,13 +80,13 @@
       (token (var-get governance-token))
     )
     ;; Compliance Check
-    (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
-    (asserts! (is-eq (contract-of token-trait) token) ERR_UNAUTHORIZED)
+    (asserts! (check-compliance tx-sender) (err ERR_NON_COMPLIANT))
+    (asserts! (is-eq (contract-of token-trait) token) (err ERR_UNAUTHORIZED))
 
     ;; Token Balance Check (Prevent spam)
     ;; Dynamic contract call to the configured token
     (let ((balance (unwrap-panic (contract-call? token-trait get-balance tx-sender))))
-      (asserts! (> balance u0) ERR_UNAUTHORIZED)
+      (asserts! (> balance u0) (err ERR_UNAUTHORIZED))
     )
 
     (map-set proposals proposal-id {
@@ -116,26 +116,26 @@
     (token-trait <sip-010-trait>)
   )
   (let (
-      (proposal (unwrap! (map-get? proposals proposal-id) ERR_PROPOSAL_NOT_FOUND))
+      (proposal (unwrap! (map-get? proposals proposal-id) (err ERR_PROPOSAL_NOT_FOUND)))
       (voter tx-sender)
       (token (var-get governance-token))
     )
-    (asserts! (is-eq (contract-of token-trait) token) ERR_UNAUTHORIZED)
+    (asserts! (is-eq (contract-of token-trait) token) (err ERR_UNAUTHORIZED))
     (let ((balance (unwrap-panic (contract-call? token-trait get-balance voter))))
       ;; Compliance Check
-      (asserts! (check-compliance voter) ERR_NON_COMPLIANT)
+      (asserts! (check-compliance voter) (err ERR_NON_COMPLIANT))
 
       ;; Validation
-      (asserts! (>= block-height (get start-block proposal)) ERR_PROPOSAL_ACTIVE)
-      (asserts! (<= block-height (get end-block proposal)) ERR_PROPOSAL_EXPIRED)
+      (asserts! (>= block-height (get start-block proposal)) (err ERR_PROPOSAL_ACTIVE))
+      (asserts! (<= block-height (get end-block proposal)) (err ERR_PROPOSAL_EXPIRED))
       (asserts!
         (is-none (map-get? votes {
           proposal-id: proposal-id,
           voter: voter,
         }))
-        ERR_UNAUTHORIZED
+        (err ERR_UNAUTHORIZED)
       )
-      (asserts! (> balance u0) ERR_UNAUTHORIZED)
+      (asserts! (> balance u0) (err ERR_UNAUTHORIZED))
 
       ;; Record Vote
       (map-set votes {
@@ -172,15 +172,15 @@
 
 ;; Execution (Simplified for Tier 0)
 (define-public (execute (proposal-id uint))
-  (let ((proposal (unwrap! (map-get? proposals proposal-id) ERR_PROPOSAL_NOT_FOUND)))
-    (asserts! (> block-height (get end-block proposal)) ERR_PROPOSAL_ACTIVE)
-    (asserts! (not (get executed proposal)) ERR_PROPOSAL_EXPIRED)
+  (let ((proposal (unwrap! (map-get? proposals proposal-id) (err ERR_PROPOSAL_NOT_FOUND))))
+    (asserts! (> block-height (get end-block proposal)) (err ERR_PROPOSAL_ACTIVE))
+    (asserts! (not (get executed proposal)) (err ERR_PROPOSAL_EXPIRED))
     (asserts! (> (get for-votes proposal) (get against-votes proposal))
-      ERR_QUORUM_NOT_REACHED
+      (err ERR_QUORUM_NOT_REACHED)
     )
 
     ;; Only compliant users can trigger execution
-    (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+    (asserts! (check-compliance tx-sender) (err ERR_NON_COMPLIANT))
 
     (map-set proposals proposal-id (merge proposal { executed: true }))
     (print {

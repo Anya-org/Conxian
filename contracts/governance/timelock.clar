@@ -7,11 +7,11 @@
 (define-constant MIN_DELAY u100) ;; 100 blocks minimum
 (define-constant MAX_DELAY u10000) ;; 10000 blocks maximum
 (define-constant GRACE_PERIOD u1000) ;; 1000 blocks grace period
-(define-constant ERR_NOT_QUEUED (err u1000))
-(define-constant ERR_INVALID_DELAY (err u1001))
-(define-constant ERR_TOO_EARLY (err u1002))
-(define-constant ERR_EXPIRED (err u1003))
-(define-constant ERR_UNAUTHORIZED (err u1004))
+(define-constant ERR_NOT_QUEUED u1000)
+(define-constant ERR_INVALID_DELAY u1001)
+(define-constant ERR_TOO_EARLY u1002)
+(define-constant ERR_EXPIRED u1003)
+(define-constant ERR_UNAUTHORIZED u1004)
 
 ;; Roles from conxian-access
 (define-constant ROLE_ADMIN u1)
@@ -28,8 +28,8 @@
 ;; Governance
 (define-public (set-delay (new-delay uint))
     (begin
-        (asserts! (>= new-delay MIN_DELAY) ERR_INVALID_DELAY)
-        (asserts! (<= new-delay MAX_DELAY) ERR_INVALID_DELAY)
+        (asserts! (>= new-delay MIN_DELAY) (err ERR_INVALID_DELAY))
+        (asserts! (<= new-delay MAX_DELAY) (err ERR_INVALID_DELAY))
         (var-set delay new-delay)
         (ok true)
     )
@@ -38,7 +38,7 @@
 (define-public (queue-proposal (proposal-principal principal) (target principal))
     (begin
         ;; Only Admin/Governance can queue
-        (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_ADMIN)) ERR_UNAUTHORIZED)
+        (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_ADMIN)) (err ERR_UNAUTHORIZED))
         (let ((eta (+ block-height (var-get delay))))
             (map-set queued-proposals proposal-principal eta)
             (print {
@@ -53,15 +53,15 @@
 
 (define-public (execute (proposal-principal principal) (proposal-id uint))
     (let (
-        (queued-eta (unwrap! (map-get? queued-proposals proposal-principal) ERR_NOT_QUEUED))
+        (queued-eta (unwrap! (map-get? queued-proposals proposal-principal) (err ERR_NOT_QUEUED)))
     )
-        (asserts! (>= block-height queued-eta) ERR_TOO_EARLY)
-        (asserts! (<= block-height (+ queued-eta GRACE_PERIOD)) ERR_EXPIRED)
+        (asserts! (>= block-height queued-eta) (err ERR_TOO_EARLY))
+        (asserts! (<= block-height (+ queued-eta GRACE_PERIOD)) (err ERR_EXPIRED))
 
         (map-delete queued-proposals proposal-principal)
         
         (begin
-            (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+            (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
             
             ;; Execute proposal - simplified approach
             (ok true)

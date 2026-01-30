@@ -7,10 +7,10 @@
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_INVALID_POOL (err u2001))
-(define-constant ERR_SLIPPAGE (err u2002))
-(define-constant ERR_NON_COMPLIANT (err u2003))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_INVALID_POOL u2001)
+(define-constant ERR_SLIPPAGE u2002)
+(define-constant ERR_NON_COMPLIANT u2003)
 
 ;; Data Maps
 ;; positions: position-id -> { pool: principal, owner: principal, liquidity: uint, tick-lower: int, tick-upper: int }
@@ -63,7 +63,7 @@
     (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1001))
 
     ;; 2. Compliance Check
-    (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+    (asserts! (check-compliance tx-sender) (err ERR_NON_COMPLIANT))
 
     ;; 3. Interaction: Call Pool Mint
     ;; Note: The pool contract must implement (mint (uint int int uint) (response bool uint))
@@ -102,11 +102,11 @@
 ;; @returns (response bool uint)
 (define-public (close-position (position-id uint))
   (let ((position (unwrap! (map-get? positions position-id) (err u404))))
-    (asserts! (is-eq (get owner position) tx-sender) ERR_UNAUTHORIZED)
+    (asserts! (is-eq (get owner position) tx-sender) (err ERR_UNAUTHORIZED))
     (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1001))
 
     ;; Compliance Check
-    (asserts! (check-compliance tx-sender) ERR_NON_COMPLIANT)
+    (asserts! (check-compliance tx-sender) (err ERR_NON_COMPLIANT))
 
     (map-delete positions position-id)
 

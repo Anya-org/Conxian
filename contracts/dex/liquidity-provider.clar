@@ -6,13 +6,13 @@
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
-(define-constant ERR_INSUFFICIENT_BALANCE (err u13001))
-(define-constant ERR_INVALID_POOL (err u13002))
-(define-constant ERR_ZERO_AMOUNT (err u13003))
-(define-constant ERR_ALREADY_PROVIDER (err u13004))
-(define-constant ERR_NOT_PROVIDER (err u13005))
-(define-constant ERR_INVALID_PARAMETERS (err u13006))
-(define-constant ERR_UNAUTHORIZED (err u13007))
+(define-constant ERR_INSUFFICIENT_BALANCE u13001)
+(define-constant ERR_INVALID_POOL u13002)
+(define-constant ERR_ZERO_AMOUNT u13003)
+(define-constant ERR_ALREADY_PROVIDER u13004)
+(define-constant ERR_NOT_PROVIDER u13005)
+(define-constant ERR_INVALID_PARAMETERS u13006)
+(define-constant ERR_UNAUTHORIZED u13007)
 
 ;; Minimum liquidity thresholds
 (define-constant MIN_LIQUIDITY u1000000) ;; 1 STX equivalent
@@ -62,8 +62,8 @@
 ;; @desc Add liquidity to a specific pool
 (define-public (add-liquidity (pool principal) (amount uint))
   (begin
-    (asserts! (> amount u0) ERR_ZERO_AMOUNT)
-    (asserts! (>= amount MIN_LIQUIDITY) ERR_INSUFFICIENT_BALANCE)
+    (asserts! (> amount u0) (err ERR_ZERO_AMOUNT))
+    (asserts! (>= amount MIN_LIQUIDITY) (err ERR_INSUFFICIENT_BALANCE))
     
     (let ((existing-position (default-to
                                { liquidity-amount: u0, pool-shares: u0, last-deposit: u0, rewards-earned: u0, rewards-claimed: u0, fee-tier: u0 }
@@ -98,8 +98,8 @@
 
 ;; @desc Remove liquidity from a specific pool
 (define-public (remove-liquidity (pool principal) (amount uint))
-  (let ((position (unwrap! (map-get? liquidity-positions { pool: pool, provider: tx-sender }) ERR_NOT_PROVIDER)))
-    (asserts! (<= amount (get liquidity-amount position)) ERR_INSUFFICIENT_BALANCE)
+  (let ((position (unwrap! (map-get? liquidity-positions { pool: pool, provider: tx-sender }) (err ERR_NOT_PROVIDER))))
+    (asserts! (<= amount (get liquidity-amount position)) (err ERR_INSUFFICIENT_BALANCE))
     
     (map-set liquidity-positions { pool: pool, provider: tx-sender } {
       liquidity-amount: (- (get liquidity-amount position) amount),
@@ -128,10 +128,10 @@
 ;; @desc Claim earned rewards from a specific pool
 (define-public (claim-rewards (pool principal))
   (let (
-    (position (unwrap! (map-get? liquidity-positions { pool: pool, provider: tx-sender }) ERR_NOT_PROVIDER))
+    (position (unwrap! (map-get? liquidity-positions { pool: pool, provider: tx-sender }) (err ERR_NOT_PROVIDER)))
     (unclaimed (- (get rewards-earned position) (get rewards-claimed position)))
   )
-    (asserts! (> unclaimed u0) ERR_ZERO_AMOUNT)
+    (asserts! (> unclaimed u0) (err ERR_ZERO_AMOUNT))
     
     (map-set liquidity-positions { pool: pool, provider: tx-sender } {
       liquidity-amount: (get liquidity-amount position),
@@ -160,7 +160,7 @@
 ;; @desc Batch claim rewards from multiple pools
 (define-public (batch-claim-rewards (pools (list 20 principal)))
   (begin
-    (asserts! (<= (len pools) u20) ERR_INVALID_PARAMETERS)
+    (asserts! (<= (len pools) u20) (err ERR_INVALID_PARAMETERS))
     (ok (fold batch-claim-helper pools u0))
   )
 )
@@ -177,7 +177,7 @@
 ;; @desc Set the active status of the liquidity provider system
 (define-public (set-liquidity-provider-active (active bool))
   (begin
-    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
     (var-set liquidity-provider-active active)
     (ok true)
   )

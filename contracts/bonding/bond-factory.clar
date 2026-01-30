@@ -6,14 +6,14 @@
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_INVALID_AMOUNT (err u1001))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_INVALID_AMOUNT u1001)
 
 ;; SIP-010 FT Implementation
 (define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
   (begin
-    (asserts! (is-eq tx-sender sender) ERR_UNAUTHORIZED)
-    (asserts! (> amount u0) ERR_INVALID_AMOUNT)
+    (asserts! (is-eq tx-sender sender) (err ERR_UNAUTHORIZED))
+    (asserts! (> amount u0) (err ERR_INVALID_AMOUNT))
     ;; Transfer logic would go here
     (ok true)
   )
@@ -42,7 +42,7 @@
 (define-read-only (get-token-uri)
   (ok (some u"https://conxian.io/metadata/bond"))
 )
-(define-constant ERR_BOND_NOT_FOUND (err u1002))
+(define-constant ERR_BOND_NOT_FOUND u1002)
 
 ;; Data Vars
 (define-data-var contract-owner principal tx-sender)
@@ -83,14 +83,14 @@
         check-clean-hands-compliance
         user
       ))
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
     )
 
     (let (
         (bond-id (+ (var-get bond-nonce) u1))
         (mint-result (ft-mint? bond-token amount tx-sender))
       )
-      (asserts! (is-ok mint-result) ERR_INVALID_AMOUNT)
+      (asserts! (is-ok mint-result) (err ERR_INVALID_AMOUNT))
       (map-set bonds bond-id {
         issuer: tx-sender,
         principal-amount: amount,

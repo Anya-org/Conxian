@@ -3,12 +3,11 @@
 ;; Replaces old prototype with RBAC and Trait-driven logic
 
 ;; Traits
-(use-trait compliance-trait .compliance-trait.compliance-trait)
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_INSUFFICIENT_BALANCE (err u2000))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_INSUFFICIENT_BALANCE u2000)
 (define-constant ROLE_PROTOCOL u2)
 
 ;; Contracts
@@ -38,11 +37,11 @@
           token: token-principal,
         })
       ))
-      (tenure-id (contract-call? (var-get block-utils-contract) get-current-tenure-id))
+      (tenure-id (contract-call? .block-utils get-current-tenure-id))
     )
     (begin
       (asserts!
-        (not (contract-call? (var-get conxian-protocol-contract) is-paused))
+        (not (unwrap-panic (contract-call? .conxian-protocol is-paused)))
         (err u1001)
       )
 
@@ -86,8 +85,8 @@
       ))
     )
     (begin
-      (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1001))
-      (asserts! (>= current-balance amount) ERR_INSUFFICIENT_BALANCE)
+      (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err u1001))
+      (asserts! (>= current-balance amount) (err ERR_INSUFFICIENT_BALANCE))
 
       ;; Transfer tokens back
       (try! (as-contract (contract-call? token-trait transfer amount tx-sender tx-sender none)))
@@ -124,9 +123,9 @@
         (is-eq tx-sender
           (unwrap-panic (contract-call? .conxian-protocol get-admin))
         )
-        (contract-call? .conxian-access has-role tx-sender ROLE_PROTOCOL)
+        (is-eq (ok true) (contract-call? .conxian-access has-role tx-sender ROLE_PROTOCOL))
       )
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
     )
     (let ((current-balance (default-to u0
         (map-get? user-collateral {
@@ -134,7 +133,7 @@
           token: token,
         })
       )))
-      (asserts! (>= current-balance amount) ERR_INSUFFICIENT_BALANCE)
+      (asserts! (>= current-balance amount) (err ERR_INSUFFICIENT_BALANCE))
       (map-set user-collateral {
         user: user,
         token: token,

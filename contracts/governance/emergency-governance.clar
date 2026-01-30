@@ -5,7 +5,7 @@
 (use-trait pausable-trait .pausable-trait.pausable-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_UNAUTHORIZED u1000)
 (define-constant ACTION_PAUSE_PROTOCOL u1)
 (define-constant ACTION_UNPAUSE_PROTOCOL u2)
 
@@ -19,7 +19,7 @@
 
 (define-public (set-emergency-admin (new-admin principal))
     (begin
-        (asserts! (is-emergency-admin) ERR_UNAUTHORIZED)
+        (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
         (var-set emergency-admin new-admin)
         (ok true)
     )
@@ -28,14 +28,14 @@
 ;; Emergency Actions
 (define-public (activate-emergency-pause (contract <pausable-trait>))
     (begin
-        (asserts! (is-emergency-admin) ERR_UNAUTHORIZED)
+        (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
         (contract-call? contract set-paused true)
     )
 )
 
 (define-public (deactivate-emergency-pause (contract <pausable-trait>))
     (begin
-        (asserts! (is-emergency-admin) ERR_UNAUTHORIZED)
+        (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
         (contract-call? contract set-paused false)
     )
 )
@@ -49,7 +49,7 @@
 
 (define-public (trigger-circuit-breaker)
     (begin
-        (asserts! (is-emergency-admin) ERR_UNAUTHORIZED)
+        (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
         (var-set global-circuit-breaker true)
         (print { event: "circuit-breaker-triggered", sender: tx-sender })
         (ok true)
@@ -58,7 +58,7 @@
 
 (define-public (reset-circuit-breaker)
     (begin
-        (asserts! (is-emergency-admin) ERR_UNAUTHORIZED)
+        (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
         (var-set global-circuit-breaker false)
         (print { event: "circuit-breaker-reset", sender: tx-sender })
         (ok true)

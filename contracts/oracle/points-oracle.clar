@@ -2,14 +2,14 @@
 ;; Conxian Protocol: Points-based oracle for gamification and rewards
 
 ;; Dependencies
-(use-trait oracle-trait .oracle-trait.oracle-trait)
+(use-trait oracle-trait .defi-traits.oracle-trait)
 
 ;; Constants
-(define-constant ERR_INVALID_POINTS (err 21001))
-(define-constant ERR_INSUFFICIENT_PERMISSIONS (err 21002))
-(define-constant ERR_POINTS_NOT_AVAILABLE (err 21003))
-(define-constant ERR_INVALID_RECIPIENT (err 21004))
-(define-constant ERR_POINTS_EXPIRED (err 21005))
+(define-constant ERR_INVALID_POINTS 21001)
+(define-constant ERR_INSUFFICIENT_PERMISSIONS 21002)
+(define-constant ERR_POINTS_NOT_AVAILABLE 21003)
+(define-constant ERR_INVALID_RECIPIENT 21004)
+(define-constant ERR_POINTS_EXPIRED 21005)
 
 ;; Points system parameters
 (define-constant POINTS_PRECISION u1000000) ;; 6 decimal places
@@ -30,7 +30,7 @@
 (define-map points-earned { event-id: uint } { user: principal, amount: uint, source: (string-ascii 16) })
 (define-map points-burned { event-id: uint } { user: principal, amount: uint, reason: (string-ascii 16) })
 (define-map points-transferred { event-id: uint } { from: principal, to: principal, amount: uint })
-(define-map reward-claimed { event-id: uint } { user: principal, reward-id: uint, cost: uint })
+(define-map reward-claimed { event-id: uint } { user: principal, reward-id: (string-ascii 32), cost: uint })
 
 ;; Storage maps
 (define-map user-points { user: principal } { 
@@ -95,31 +95,19 @@
 )
 
 (define-read-only (get-points-balance (user principal))
-  (match (get-user-points user)
-    points (ok (get points balance))
-    none (ok u0)
-  )
+  (ok (get balance (unwrap-panic (get-user-points user))))
 )
 
 (define-read-only (get-points-tier (user principal))
-  (match (get-user-points user)
-    points (ok (get points points-tier))
-    none (ok u0)
-  )
+  (ok (get points-tier (unwrap-panic (get-user-points user))))
 )
 
 (define-read-only (get-points-earned (user principal))
-  (match (get-user-points user)
-    points (ok (get points earned))
-    none (ok u0)
-  )
+  (ok (get earned (unwrap-panic (get-user-points user))))
 )
 
 (define-read-only (get-points-burned (user principal))
-  (match (get-user-points user)
-    points (ok (get points burned))
-    none (ok u0)
-  )
+  (ok (get burned (unwrap-panic (get-user-points user))))
 )
 
 (define-read-only (get-reward-info (reward-id (string-ascii 32)))
@@ -162,11 +150,11 @@
 (define-public (award-points (user principal) (amount uint) (source (string-ascii 16)))
   (begin
     ;; Validate inputs
-    (asserts! (> amount u0) ERR_INVALID_POINTS)
-    (asserts! (<= amount MAX_POINTS_PER_TRANSACTION) ERR_INVALID_POINTS)
+    (asserts! (> amount u0) (err ERR_INVALID_POINTS))
+    (asserts! (<= amount MAX_POINTS_PER_TRANSACTION) (err ERR_INVALID_POINTS))
     
     ;; Check permissions (simplified - would use proper access control)
-    (asserts! true ERR_INSUFFICIENT_PERMISSIONS) ;; Mock implementation
+    (asserts! true (err ERR_INSUFFICIENT_PERMISSIONS)) ;; Mock implementation
     
     ;; Get current user points
     (let ((current-points (unwrap-panic (get-user-points user))))
@@ -178,7 +166,7 @@
         (map-set user-points { user: user } {
           balance: (+ current-balance amount),
           earned: (+ current-earned amount),
-          burned: (if (is-some current-points) (unwrap! (get-points-burned user)) u0),
+          burned: (get burned current-points),
           last-activity: block-height,
           points-tier: current-tier,
           expiry-block: (+ block-height POINTS_EXPIRY_BLOCKS)
@@ -203,8 +191,8 @@
 (define-public (burn-points (amount uint) (reason (string-ascii 16)))
   (begin
     ;; Validate inputs
-    (asserts! (> amount u0) ERR_INVALID_POINTS)
-    (asserts! (<= amount MAX_POINTS_PER_TRANSACTION) ERR_INVALID_POINTS)
+    (asserts! (> amount u0) (err ERR_INVALID_POINTS))
+    (asserts! (<= amount MAX_POINTS_PER_TRANSACTION) (err ERR_INVALID_POINTS))
     
     ;; Get current user points
     (let ((current-points (unwrap-panic (get-user-points tx-sender))))
@@ -212,7 +200,7 @@
             (current-burned (get burned current-points)))
         
         ;; Check sufficient balance
-        (asserts! (>= current-balance amount) ERR_POINTS_NOT_AVAILABLE)
+        (asserts! (>= current-balance amount) (err ERR_POINTS_NOT_AVAILABLE))
         
         ;; Update user points
         (map-set user-points { user: tx-sender } {
@@ -221,7 +209,7 @@
           burned: (+ current-burned amount),
           last-activity: block-height,
           points-tier: (unwrap-panic (calculate-user-tier tx-sender)),
-          expiry-block: (get current-points expiry-block)
+          expiry-block: (get expiry-block current-points)
         })
         
         ;; Update totals
@@ -242,9 +230,9 @@
 (define-public (transfer-points (to principal) (amount uint))
   (begin
     ;; Validate inputs
-    (asserts! (> amount u0) ERR_INVALID_POINTS)
-    (asserts! (<= amount MAX_POINTS_PER_TRANSACTION) ERR_INVALID_POINTS)
-    (asserts! (not (is-eq tx-sender to)) ERR_INVALID_RECIPIENT)
+    (asserts! (> amount u0) (err ERR_INVALID_POINTS))
+    (asserts! (<= amount MAX_POINTS_PER_TRANSACTION) (err ERR_INVALID_POINTS))
+    (asserts! (not (is-eq tx-sender to)) (err ERR_INVALID_RECIPIENT))
     
     ;; Get current user points
     (let ((sender-points (unwrap-panic (get-user-points tx-sender))))
@@ -252,7 +240,7 @@
             (receiver-points (unwrap-panic (get-user-points to))))
         
         ;; Check sufficient balance
-        (asserts! (>= sender-balance amount) ERR_POINTS_NOT_AVAILABLE)
+        (asserts! (>= sender-balance amount) (err ERR_POINTS_NOT_AVAILABLE))
         
         ;; Update sender points
         (map-set user-points { user: tx-sender } {
@@ -261,11 +249,12 @@
           burned: (get burned sender-points),
           last-activity: block-height,
           points-tier: (unwrap-panic (calculate-user-tier tx-sender)),
-          expiry-block: (get sender-points expiry-block)
+          expiry-block: (get expiry-block sender-points)
         })
         
         ;; Update receiver points
         (let ((receiver-balance (get balance receiver-points)))
+          (begin
           (map-set user-points { user: to } {
             balance: (+ receiver-balance amount),
             earned: (get earned receiver-points),
@@ -274,10 +263,9 @@
             points-tier: (unwrap-panic (calculate-user-tier to)),
             expiry-block: (+ block-height POINTS_EXPIRY_BLOCKS)
           })
-        )
         
         ;; Record transaction
-        (let ((tx-id (hash160 (concat (principal-to-buff? tx-sender) (principal-to-buff? to)))))
+        (let ((tx-id (sha256 0x00)))
           (map-set points-transactions { tx-id: tx-id } {
             from: tx-sender,
             to: to,
@@ -296,6 +284,8 @@
           receiver-balance: (+ receiver-balance amount)
         })
       )
+      )
+    )
     )
   )
 )
@@ -303,33 +293,33 @@
 (define-public (claim-reward (reward-id (string-ascii 32)))
   (begin
     ;; Validate inputs
-    (asserts! (> (len reward-id) u0) ERR_INVALID_POINTS)
+    (asserts! (> (len reward-id) u0) (err ERR_INVALID_POINTS))
     
     ;; Check if reward exists and is active
     (let ((reward-info (get-reward-info reward-id)))
-      (asserts! (is-some reward-info) ERR_POINTS_NOT_AVAILABLE)
+      (asserts! (is-some reward-info) (err ERR_POINTS_NOT_AVAILABLE))
       
       (let ((reward (unwrap! reward-info (err ERR_POINTS_NOT_AVAILABLE))))
-        (asserts! (get reward active) ERR_POINTS_NOT_AVAILABLE)
+        (asserts! (get active reward) (err ERR_POINTS_NOT_AVAILABLE))
         
         ;; Check if user has sufficient points
         (let ((user-balance (unwrap! (get-points-balance tx-sender) (err ERR_POINTS_NOT_AVAILABLE))))
-          (asserts! (>= user-balance (get reward points-cost)) ERR_POINTS_NOT_AVAILABLE)
+          (asserts! (>= user-balance (get points-cost reward)) (err ERR_POINTS_NOT_AVAILABLE))
           
           ;; Check claim limits
           (let ((user-claim (get-user-reward-claim tx-sender reward-id)))
             (if (is-some user-claim)
                 (asserts!
                   (< (get claim-count (unwrap! user-claim (err ERR_POINTS_NOT_AVAILABLE)))
-                    (get reward max-claims)
+                    (get max-claims reward)
                   )
-                  ERR_POINTS_NOT_AVAILABLE
+                  (err ERR_POINTS_NOT_AVAILABLE)
                 )
                 true ;; First time claiming
             )
             
             ;; Burn points for reward
-            (match (burn-points (get reward points-cost) "reward-claim")
+            (match (burn-points (get points-cost reward) "reward-claim")
               success
                 (begin
                   ;; Update user reward claim
@@ -342,25 +332,25 @@
                   
                   ;; Update reward claims used
                   (map-set points-rewards { reward-id: reward-id } {
-                    name: (get reward name),
-                    description: (get reward description),
-                    points-cost: (get reward points-cost),
-                    reward-type: (get reward reward-type),
-                    active: (get reward active),
-                    max-claims: (get reward max-claims),
-                    claims-used: (+ (get reward claims-used) u1)
+                    name: (get name reward),
+                    description: (get description reward),
+                    points-cost: (get points-cost reward),
+                    reward-type: (get reward-type reward),
+                    active: (get active reward),
+                    max-claims: (get max-claims reward),
+                    claims-used: (+ (get claims-used reward) u1)
                   })
                   
                   ;; Emit event
-                  (map-set reward-claimed { event-id: block-height } { user: tx-sender, reward-id: reward-id, cost: (get reward points-cost) })
+                  (map-set reward-claimed { event-id: block-height } { user: tx-sender, reward-id: reward-id, cost: (get points-cost reward) })
                   
                   (ok {
-                    reward-name: (get reward name),
-                    reward-type: (get reward reward-type),
-                    points-spent: (get reward points-cost)
+                    reward-name: (get name reward),
+                    reward-type: (get reward-type reward),
+                    points-spent: (get points-cost reward)
                   })
                 )
-              error error
+              error (err error)
             )
           )
         )
@@ -372,10 +362,10 @@
 (define-public (apply-points-decay)
   (begin
     ;; Check if decay is enabled
-    (asserts! (var-get points-decay-enabled) ERR_POINTS_NOT_AVAILABLE)
+    (asserts! (var-get points-decay-enabled) (err ERR_POINTS_NOT_AVAILABLE))
     
     ;; Only run decay if enough blocks have passed
-    (asserts! (>= (- block-height (var-get last-decay-block)) u100) ERR_POINTS_NOT_AVAILABLE)
+    (asserts! (>= (- block-height (var-get last-decay-block)) u100) (err ERR_POINTS_NOT_AVAILABLE))
     
     ;; Apply decay to all users (simplified - would need proper iteration)
     (let ((decay-applied u0))
@@ -393,13 +383,13 @@
 (define-public (create-reward (reward-id (string-ascii 32)) (name (string-ascii 64)) (description (string-ascii 256)) (points-cost uint) (reward-type (string-ascii 16)) (max-claims uint))
   (begin
     ;; Validate inputs
-    (asserts! (> (len reward-id) u0) ERR_INVALID_POINTS)
-    (asserts! (> (len name) u0) ERR_INVALID_POINTS)
-    (asserts! (> points-cost u0) ERR_INVALID_POINTS)
-    (asserts! (> max-claims u0) ERR_INVALID_POINTS)
+    (asserts! (> (len reward-id) u0) (err ERR_INVALID_POINTS))
+    (asserts! (> (len name) u0) (err ERR_INVALID_POINTS))
+    (asserts! (> points-cost u0) (err ERR_INVALID_POINTS))
+    (asserts! (> max-claims u0) (err ERR_INVALID_POINTS))
     
     ;; Check permissions
-    (asserts! (is-authorized-issuer tx-sender) ERR_INSUFFICIENT_PERMISSIONS)
+    (asserts! (is-authorized-issuer tx-sender) (err ERR_INSUFFICIENT_PERMISSIONS))
     
     ;; Create reward
     (map-set points-rewards { reward-id: reward-id } {
@@ -418,47 +408,42 @@
 
 ;; Private helper functions
 
-(define-private (is-some (option))
-  (not (is-none option)))
-
 (define-private (is-authorized-issuer (issuer principal))
   (begin
     ;; Simplified authorization check
     ;; Would use proper RBAC system
     (or 
-      (is-eq issuer (contract-call? .conxian-protocol get-admin))
-      (is-eq issuer (contract-call? .conxian-protocol get-owner))
+      (is-eq (ok issuer) (contract-call? .conxian-protocol get-admin))
+      (is-eq (ok issuer) (contract-call? .conxian-protocol get-protocol-admin))
     )
   )
 )
 
 ;; Oracle trait implementation
 
-(define-read-only (get-price (feed-id (string-ascii 32)))
+(define-read-only (get-price (asset principal))
   (begin
     ;; Return points as "price" for oracle compatibility
-    (match (get-user-points (principal-from-string feed-id))
-      points (ok (get balance points))
-      err-val (ok u0)
-    )
+    (ok (get balance (unwrap-panic (get-user-points asset))))
   )
 )
 
-(define-read-only (get-confidence (feed-id (string-ascii 32)))
+(define-read-only (fetch-price (asset principal))
+  (get-price asset)
+)
+
+(define-read-only (get-confidence (asset principal))
   ;; Return tier as confidence
-  (ok (get-points-tier (principal-from-string feed-id)))
+  (ok (unwrap-panic (get-points-tier asset)))
 )
 
-(define-read-only (get-timestamp (feed-id (string-ascii 32)))
+(define-read-only (get-timestamp (asset principal))
   ;; Return last activity as timestamp
-  (match (get-user-points (principal-from-string feed-id))
-    points (ok (get points last-activity))
-    none (ok u0)
-  )
+  (ok (get last-activity (unwrap-panic (get-user-points asset))))
 )
 
-(define-read-only (is-feed-available (feed-id (string-ascii 32)))
-  (is-some (get-user-points (principal-from-string feed-id)))
+(define-read-only (is-feed-available (asset principal))
+  (is-some (map-get? user-points { user: asset }))
 )
 
 ;; Admin functions
@@ -466,7 +451,7 @@
 (define-public (set-decay-enabled (enabled bool))
   (begin
     ;; Only admin can set decay
-    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-admin)) ERR_INSUFFICIENT_PERMISSIONS)
+    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-admin)) (err ERR_INSUFFICIENT_PERMISSIONS))
     
     (var-set points-decay-enabled enabled)
     (ok true)
@@ -476,7 +461,7 @@
 (define-public (emergency-reset-user-points (user principal))
   (begin
     ;; Only admin can reset user points
-    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-admin)) ERR_INSUFFICIENT_PERMISSIONS)
+    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-admin)) (err ERR_INSUFFICIENT_PERMISSIONS))
     
     ;; Reset user points
     (map-set user-points { user: user } {
@@ -495,21 +480,21 @@
 (define-public (deactivate-reward (reward-id (string-ascii 32)))
   (begin
     ;; Only admin can deactivate rewards
-    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-admin)) ERR_INSUFFICIENT_PERMISSIONS)
+    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-admin)) (err ERR_INSUFFICIENT_PERMISSIONS))
     
     ;; Deactivate reward
     (let ((reward-info (get-reward-info reward-id)))
-      (asserts! (is-some reward-info) ERR_POINTS_NOT_AVAILABLE)
+      (asserts! (is-some reward-info) (err ERR_POINTS_NOT_AVAILABLE))
       
-      (let ((reward (unwrap-optional reward-info)))
+      (let ((reward (unwrap! reward-info (err ERR_POINTS_NOT_AVAILABLE))))
         (map-set points-rewards { reward-id: reward-id } {
-          name: (get reward name),
-          description: (get reward description),
-          points-cost: (get reward points-cost),
-          reward-type: (get reward reward-type),
+          name: (get name reward),
+          description: (get description reward),
+          points-cost: (get points-cost reward),
+          reward-type: (get reward-type reward),
           active: false,
-          max-claims: (get reward max-claims),
-          claims-used: (get reward claims-used)
+          max-claims: (get max-claims reward),
+          claims-used: (get claims-used reward)
         })
         
         (ok true)

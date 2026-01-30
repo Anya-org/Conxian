@@ -5,10 +5,10 @@
 (impl-trait .core-traits.conxian-access-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_UNKNOWN_WORKER (err u1001))
-(define-constant ERR_INSUFFICIENT_FUNDS (err u1002))
-(define-constant ERR_INVALID_JOB (err u1003))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_UNKNOWN_WORKER u1001)
+(define-constant ERR_INSUFFICIENT_FUNDS u1002)
+(define-constant ERR_INVALID_JOB u1003)
 
 ;; State
 (define-data-var contract-owner principal tx-sender)
@@ -32,7 +32,7 @@
 
 (define-public (set-agent-status (agent principal) (active bool))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (map-set authorized-agents agent active)
     (ok true)
   )
@@ -46,7 +46,7 @@
 
 (define-public (register-worker (worker principal))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (map-set workers worker true)
     (print {
       event: "worker-registered",
@@ -58,7 +58,7 @@
 
 (define-public (remove-worker (worker principal))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (map-delete workers worker)
     (ok true)
   )
@@ -85,8 +85,8 @@
 
 (define-public (withdraw-payroll (amount uint))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (asserts! (<= amount (var-get payroll-balance)) ERR_INSUFFICIENT_FUNDS)
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (asserts! (<= amount (var-get payroll-balance)) (err ERR_INSUFFICIENT_FUNDS))
     (try! (as-contract (stx-transfer? amount tx-sender (var-get contract-owner))))
     (var-set payroll-balance (- (var-get payroll-balance) amount))
     (ok true)
@@ -101,13 +101,13 @@
 (define-public (payout (worker principal) (amount uint))
   (begin
     ;; 1. Caller must be an Authorized Agent (e.g., agent-risk)
-    (asserts! (is-authorized-agent tx-sender) ERR_UNAUTHORIZED)
+    (asserts! (is-authorized-agent tx-sender) (err ERR_UNAUTHORIZED))
     
     ;; 2. Worker must be registered
-    (asserts! (is-worker-active worker) ERR_UNKNOWN_WORKER)
+    (asserts! (is-worker-active worker) (err ERR_UNKNOWN_WORKER))
     
     ;; 3. Check funds
-    (asserts! (<= amount (var-get payroll-balance)) ERR_INSUFFICIENT_FUNDS)
+    (asserts! (<= amount (var-get payroll-balance)) (err ERR_INSUFFICIENT_FUNDS))
     
     ;; 4. Transfer funds to Worker
     (try! (as-contract (stx-transfer? amount tx-sender worker)))

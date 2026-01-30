@@ -7,10 +7,10 @@
 (use-trait admin-facade-trait .core-traits.admin-facade-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_BATCH_TOO_LARGE (err u1001))
-(define-constant ERR_INVALID_BATCH (err u1002))
-(define-constant ERR_OPERATION_FAILED (err u1003))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_BATCH_TOO_LARGE u1001)
+(define-constant ERR_INVALID_BATCH u1002)
+(define-constant ERR_OPERATION_FAILED u1003)
 
 ;; Batch Configuration
 (define-constant MAX_BATCH_SIZE u1000)
@@ -57,9 +57,9 @@
     (batch-id (optional uint))
   )
   (begin
-    (asserts! (var-get batch-enabled) ERR_UNAUTHORIZED)
-    (asserts! (<= (len operations) MAX_BATCH_SIZE) ERR_BATCH_TOO_LARGE)
-    (asserts! (validate-batch-operations operations) ERR_INVALID_BATCH)
+    (asserts! (var-get batch-enabled) (err ERR_UNAUTHORIZED))
+    (asserts! (<= (len operations) MAX_BATCH_SIZE) (err ERR_BATCH_TOO_LARGE))
+    (asserts! (validate-batch-operations operations) (err ERR_INVALID_BATCH))
 
     (let ((actual-batch-id (default-to (var-get current-batch-id) batch-id)))
       ;; Increment batch counter
@@ -93,7 +93,7 @@
 })))
   (begin
     ;; Direct admin check without circular dependency
-    (asserts! (is-eq tx-sender (var-get global-admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get global-admin)) (err ERR_UNAUTHORIZED))
 
     (let ((role-operations (map convert-role-to-batch-operation updates)))
       (process-batch role-operations none)
@@ -111,7 +111,7 @@
 })))
   (begin
     ;; Simplified authorization check
-    (asserts! (is-eq tx-sender (var-get global-admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get global-admin)) (err ERR_UNAUTHORIZED))
 
     (let ((transfer-operations (map convert-transfer-to-batch-operation transfers)))
       (process-batch transfer-operations none)
@@ -123,7 +123,7 @@
 (define-public (batch-compliance-checks (users (list 500 principal)))
   (begin
     ;; Simplified authorization check
-    (asserts! (is-eq tx-sender (var-get global-admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get global-admin)) (err ERR_UNAUTHORIZED))
 
     (let ((compliance-operations (map convert-compliance-to-batch-operation users)))
       (process-batch compliance-operations none)
@@ -148,7 +148,7 @@
 ;; Admin Functions
 (define-public (set-batch-enabled (enabled bool))
   (begin
-    (asserts! (is-eq tx-sender (var-get global-admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get global-admin)) (err ERR_UNAUTHORIZED))
     (var-set batch-enabled enabled)
     (ok true)
   )
@@ -156,15 +156,15 @@
 
 (define-public (set-max-batch-size (new-size uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get global-admin)) ERR_UNAUTHORIZED)
-    (asserts! (<= new-size u10000) ERR_BATCH_TOO_LARGE)
+    (asserts! (is-eq tx-sender (var-get global-admin)) (err ERR_UNAUTHORIZED))
+    (asserts! (<= new-size u10000) (err ERR_BATCH_TOO_LARGE))
     (ok true)
   )
 )
 
 (define-public (set-global-admin (new-admin principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get global-admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get global-admin)) (err ERR_UNAUTHORIZED))
     (var-set global-admin new-admin)
     (ok true)
   )
@@ -194,9 +194,9 @@
   )
   (match result
     success (begin
-      (asserts! (is-valid-principal (get target operation)) ERR_INVALID_BATCH)
+      (asserts! (is-valid-principal (get target operation)) (err ERR_INVALID_BATCH))
       (asserts! (<= (get gas-limit operation) MAX_GAS_PER_BATCH)
-        ERR_BATCH_TOO_LARGE
+        (err ERR_BATCH_TOO_LARGE)
       )
       (ok true)
     )

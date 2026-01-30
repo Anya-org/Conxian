@@ -1,8 +1,8 @@
 ;; compliance-hooks.clar
 ;; Conxian Compliance Hooks: KYC/AML checks and audit trails
 
-(define-constant ERR_UNAUTHORIZED (err u4000))
-(define-constant ERR_KYC_FAILED (err u4001))
+(define-constant ERR_UNAUTHORIZED u4000)
+(define-constant ERR_KYC_FAILED u4001)
 
 (define-map kyc-providers
     principal
@@ -19,7 +19,7 @@
 
 (define-public (verify-kyc (user principal))
     (begin
-        (asserts! (map-get? kyc-providers tx-sender) ERR_UNAUTHORIZED)
+        (asserts! (map-get? kyc-providers tx-sender) (err ERR_UNAUTHORIZED))
         ;; In a real implementation, this would involve a more complex verification process
         (ok true)
     )

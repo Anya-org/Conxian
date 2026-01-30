@@ -6,9 +6,9 @@
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_NON_COMPLIANT (err u2003))
-(define-constant ERR_INVALID_ROUTE (err u2004))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_NON_COMPLIANT u2003)
+(define-constant ERR_INVALID_ROUTE u2004)
 
 ;; Contracts
 (define-data-var regulatory-adapter-contract principal .regulatory-adapter)
@@ -49,7 +49,7 @@
         )
 
         ;; 2. Compliance Check (Clean Hands)
-        (asserts! (check-compliance sender) ERR_NON_COMPLIANT)
+        (asserts! (check-compliance sender) (err ERR_NON_COMPLIANT))
 
         ;; 3. Execute Swap (Stubbed logic for routing)
         ;; In a full implementation, this would iterate through 'route' 

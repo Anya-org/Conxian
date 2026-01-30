@@ -7,9 +7,10 @@
 (use-trait oracle-trait .defi-traits.oracle-trait)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED (err u7300))
-(define-constant ERR_STALE_PRICE (err u7301))
-(define-constant ERR_PRICE_DEVIATION (err u7302))
+(define-constant ERR_UNAUTHORIZED u7300)
+(define-constant ERR_STALE_PRICE u7301)
+(define-constant ERR_PRICE_DEVIATION u7302)
+(define-constant ERR_CIRCUIT_OPEN u7303)
 
 ;; Data vars for TWAP
 (define-map price-cumulative-history
@@ -29,7 +30,7 @@
 
 (define-private (check-circuit-breaker)
     (match (var-get circuit-breaker)
-        cb (contract-call? cb is-circuit-open)
+        cb (contract-call? .circuit-breaker is-circuit-breaker-active)
         (ok false)
     )
 )
@@ -72,7 +73,7 @@
         (ok {
             alert: alert-status,
             ready-to-trade: (< (get level alert-status) u2),
-            tenure:(tenure: (contract-call? (var-get block-utils) get-current-tenure-id),
+            tenure: (contract-call? (var-get block-utils) get-current-tenure-id),
         })
     )
 )
@@ -121,7 +122,7 @@
             (deviation-threshold (* std-dev u3)) ;; 3 standard deviations
         )
         (try! (update-volatility asset current-price))
-        (asserts! (< (abs (- current-price mean)) deviation-threshold) ERR_PRICE_DEVIATION)
+        (asserts! (< (abs (- current-price mean)) deviation-threshold) (err ERR_PRICE_DEVIATION))
         (ok true)
     )
 )

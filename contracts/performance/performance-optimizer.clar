@@ -1,7 +1,7 @@
 ;; performance-optimizer.clar
 ;; Monitors and optimizes gas usage and transaction throughput
 
-(define-constant ERR_UNAUTHORIZED (err u5000))
+(define-constant ERR_UNAUTHORIZED u5000)
 
 (define-map function-gas-costs
     (string-ascii 40) ;; function name
