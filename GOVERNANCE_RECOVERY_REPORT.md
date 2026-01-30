@@ -19,9 +19,9 @@ This report summarizes the remedial actions taken to align the Conxian Protocol 
 ## 3. Clarity 4 Performance Upgrade (Self-Initiated)
 
 ### Economic Policy Engine
-- **Improvement**: Migrated from block-height to `block-timestamp` for oracle stale checks.
-- **Precision**: Increased staleness detection precision from ~10 minute intervals to 1 second resolution.
-- **Compliance**: Fully aligned with Stacks 3.3 SIP-033 standards.
+- **Improvement**: Migrated from block-height to `get-block-info?` (time) for tenure-aware stale checks.
+- **Precision**: Increased staleness detection precision using Bitcoin-anchored timestamps.
+- **Compliance**: Fully aligned with Stacks 3.3 SIP-033 standards and Nakamoto consensus.
 
 ## 4. Status Review of Strategic Issues
 
@@ -37,4 +37,4 @@ This report summarizes the remedial actions taken to align the Conxian Protocol 
 
 - [x] **Trait Sanitization**: Repaired foundational trait files to resolve lexer errors.
 - [x] **Epoch 3.0 Activation**: `Clarinet.toml` synchronized for Clarity 4.
-- [x] **Temporal Alignment**: All core temporal logic migrated to `burn-block-height` and `block-timestamp`.
+- [x] **Temporal Alignment**: All core temporal logic migrated to `burn-block-height` and `get-block-info?`.
