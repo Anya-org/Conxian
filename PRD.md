@@ -37,41 +37,54 @@ The system operates like a digital corporation where smart contracts serve as Ma
 ## 3. SWOT & PESTLE Analysis
 
 ### 3.1. SWOT
-- **Strengths**: Bitcoin security, Clarity 4/Nakamoto alignment, 60/20/20 Fiscal Policy, Reputation meritocracy.
-- **Weaknesses**: High 5-token complexity, central admin risk in `allocation-policy`, early-stage agent autonomy.
-- **Opportunities**: Sovereign wealth fund integration, automated "Office Manager" for cross-chain liquidity.
-- **Threats**: Regulatory scrutiny of autonomous agents, smart contract exploit risks, competitor L2 expansion.
+- **Strengths**:
+    - **Bitcoin Finality**: Inheritance of BTC security via Nakamoto/PoX.
+    - **Determinism**: Clarity 4 decidability prevents "Re-entrancy" and other EVM-common bugs.
+    - **Autonomous Fiscal Policy**: Hard-coded 60/20/20 revenue split ensures long-term solvency.
+    - **Operational Efficiency**: 24/7 "Staff" agents reduce human overhead and reaction time.
+- **Weaknesses**:
+    - **Cognitive Load**: 5-token model (CXD/CXVG/CXS/CXTR/CXLP) requires steep user education.
+    - **Dependency**: Reliance on Stacks core upgrade timelines (Nakamoto).
+    - **Early Autonomy**: "Staff" agents currently handle limited scopes (Liquidations/Treasury).
+- **Opportunities**:
+    - **XAAS Adoption**: Providing sovereign infrastructure for institutional DeFi sub-DAOs.
+    - **MiCA Compliance**: First-mover advantage in compliant Bitcoin DeFi for the EU market.
+    - **Sovereign Wealth**: Attracting state-level capital seeking "Bitcoin-Native" yield.
+- **Threats**:
+    - **L2 Fragmentation**: Rapid TVL migration to EVM-based Bitcoin L2s (Merlin, BOB).
+    - **Regulatory "Kill-Switch"**: Bans on autonomous agent legal personality or strict liability without safe harbors.
 
 ### 3.2. PESTLE
-- **Political**: Balancing decentralization with nation-state regulatory demands.
-- **Economic**: Sustainability of the 60/20/20 split during low-volume market cycles.
-- **Social**: Adoption of "Digital Corporation" models over traditional DAO committees.
-- **Technological**: Stacks Nakamoto upgrade stability and Clarity 4 adoption.
-- **Legal**: MiCA, GDPR compliance, and legal personality of DAOs.
-- **Environmental**: High efficiency via Proof-of-Transfer (PoX) vs traditional PoW.
+- **Political**: Tension between DAO sovereignty and nation-state regulatory frameworks.
+- **Economic**: Bitcoin's role as "Digital Gold" vs the protocol's need for high-velocity DeFi activity.
+- **Social**: Shifting trust from human intermediaries to verifiable autonomous agents.
+- **Technological**: Complexity of cross-chain "Staff" orchestration via Wormhole/Zink.
+- **Legal**: Navigation of MiCA stablecoin bans (Algorithmic) and Travel Rule data-sharing requirements.
+- **Environmental**: High efficiency of PoX (reusing existing PoW) aligns with ESG mandates.
 
 ## 4. Financial Modeling (CAPEX/OPEX)
 
 ### 4.1. CAPEX (Initial Build)
-- **R&D**: High initial cost for 40+ modular contracts and 5-token governance system.
-- **Audits**: Multiple security audits required for core primitives (DEX, Lending, Agents).
-- **Licenses**: Legal structuring for SAB entities in compliant jurisdictions.
+- **R&D (High)**: Development of 40+ modular Clarity 4 contracts. Estimated 25,000+ developer hours.
+- **Security Audits**: Critical for "Full Truth" recovery. Estimated budget: $150,000 - $300,000 for core primitives.
+- **Legal Architecture**: Establishing the SAB's legal personality in MiCA-friendly jurisdictions (e.g., Switzerland/Luxembourg).
 
 ### 4.2. OPEX (Maintenance)
-- **Agent Salaries**: Incentive models for "Staff" agents performing 24/7 maintenance (Payroll model).
-- **Infrastructure**: Cost of maintaining RPC nodes and indexing services.
-- **Governance**: Rewards for active participants in both Staff and Board councils.
+- **Staff Payroll (Autonomous)**: 20% of protocol revenue is automatically routed to `operational-treasury` to pay "Keepers" and "Agents" via `office-manager`.
+- **Governance Dividends**: 60% of revenue distributed to CXD stakers, ensuring a high yield-to-governance ratio.
+- **Infrastructure**: Costs for RPC nodes, indexing, and front-end hosting (decentralized via IPFS).
 
 ## 5. Gaps & Hurdles (Kill-Switch Risks)
 
-- **Regulatory Wall**: If "Autonomous Agents" are legally banned or restricted, the protocol's core USP is threatened.
-- **Complexity Trap**: The 5-token model (CXD/CXVG/CXS/CXTR/CXLP) may fragment governance attention and liquidity.
-- **Admin Centralization**: The `allocation-policy` currently allows a single admin to alter revenue shares; needs migration to Board-only voting.
+- **The "Agent Liability" Wall**: If regulators hold all protocol developers strictly liable for autonomous agent actions, the "Staff" model becomes a liability risk.
+- **MiCA Algorithmic Ban**: If Conxian implements algorithmic stablecoins, they will be effectively barred from the EU market. Protocol must prioritize asset-backed (1:1) models.
+- **Tenure Inconsistency**: High latency in Bitcoin block times (even with Stacks fast blocks) may affect high-frequency risk management.
 
 ## 6. Opportunity Mapping (Blue Ocean)
 
-- **Autonomous Office Manager**: A coordinator agent that optimizes "Staff" agent performance across multiple protocols.
-- **Sovereign Lending**: Bitcoin-backed lending models with 24/7 autonomous risk mitigation.
+- **SAB-as-a-Service**: Offering the Conxian "Corporate Engine" (Governance + Staff + Treasury) as a template for other decentralized businesses.
+- **Institutional "Clean-Hands" Lending**: Utilizing the `regulatory-adapter` to offer KYC/AML-compliant lending pools for traditional finance (TradFi) entry.
+- **Autonomous Cross-Chain Yield**: Deploying "Agents" to other L2s (Liquid, Merlin) to aggregate yield back to Stacks/Bitcoin.
 
 ## 7. Core Architecture
 

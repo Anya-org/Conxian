@@ -26,15 +26,24 @@ Unlike protocols with discretionary spending, Conxian's revenue is codified:
 ### 3. Everything-as-a-Service (XAAS)
 Conxian is not just a DEX or a Lending platform; it is a suite of sovereign primitives. Third-party developers and SMEs can "rent" or "subscribe" to Conxian's infrastructure to launch their own branded financial services.
 
-## The VC Pitch
+## The VC Pitch: Institutional-Grade Bitcoin DeFi
 
 **Conxian is the "AWS of Sovereign Finance."** We provide the underlying logic, security, and compliance rails for the next generation of digital corporations. By removing human error from the operational loop, we offer a level of transparency and efficiency that traditional financial institutions cannot match.
 
-**Key Metrics:**
-- **Architecture**: 40+ modular contracts, Clarity 4, Nakamoto-ready.
-- **Governance**: Dual-Council model with Reputation weighting.
-- **Revenue**: Codified 60/20/20 split.
-- **Compliance**: "Clean-Hands" regulatory adapters.
+### Market Opportunity: The Bitcoin L2 Surge
+As Bitcoin evolves from "Digital Gold" to a productive asset, the demand for secure, programmable L2 solutions is exploding. Conxian positions itself at the intersection of **Bitcoin Security** and **Autonomous Operations**, capturing value from the multi-billion dollar BTC TVL migration.
 
-**Investment Opportunity:**
-Staking CXD tokens provides direct exposure to the cash flows of an autonomous digital corporation. Participating in the Strategic Council via CXVG allows for shaping the future of decentralized institutional finance.
+### Defensibility: The SAB Moat
+While competitors compete on transaction speed or gas fees, Conxian competes on **Operational Resilience**. Our "Staff" agent model ensures that the protocol remains solvent and profitable 24/7, regardless of market volatility or human fatigue.
+
+**Key Metrics & Milestones:**
+- **Architecture**: 40+ modular contracts, Clarity 4 (Decidable/Deterministic), Nakamoto-aligned.
+- **Fiscal Policy**: Immutable 60/20/20 revenue split codified in the `revenue-distributor`.
+- **Governance**: Dual-Council meritocracy (Staff vs. Board) with Reputation weighting.
+- **Compliance**: MiCA-ready `regulatory-adapter` for "Clean-Hands" institutional onboarding.
+
+### Investment Opportunity: Cash Flow Sovereignty
+Investing in Conxian is not just a bet on a token; it is an equity stake in an autonomous digital corporation.
+- **Yield**: Staking CXD tokens provides direct, automated exposure to 60% of all protocol revenue (DEX fees, lending spreads, subscriptions).
+- **Governance**: Holding CXVG grants a seat on the Strategic Council (Board), allowing for high-level steering of the protocol's fiscal and operational parameters.
+- **Scalability**: The XAAS model allows Conxian to scale horizontally across multiple Bitcoin L2s (Stacks, Liquid, Merlin) without increasing human headcount.

@@ -1,14 +1,12 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 import { Cl, cvToValue } from '@stacks/transactions';
-import { initSimnet } from '../../setup-test-env';
+import { simnet } from '../setup-test-env';
 import { Simnet } from '@stacks/clarinet-sdk';
 
 describe('Autonomous Executive Agents', () => {
-  let simnet: Simnet;
   let deployer: string;
 
   beforeEach(async () => {
-    simnet = await initSimnet();
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
   });

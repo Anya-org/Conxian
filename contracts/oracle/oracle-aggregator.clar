@@ -1,6 +1,7 @@
 ;; Oracle Aggregator - Weighted sources with TWAP and manipulation detection (minimal implementation)
 
 (use-trait oracle-trait .defi-traits.oracle-trait)
+(impl-trait .defi-traits.oracle-trait)
 
 (define-constant ERR_UNAUTHORIZED u1000)
 (define-constant ERR_ASSET_NOT_FOUND u1001)
@@ -203,6 +204,10 @@
       )
     (err ERR_ASSET_NOT_FOUND)
   )
+)
+
+(define-read-only (fetch-price (asset principal))
+  (get-price asset)
 )
 
 ;; Get TWAP explicitly
