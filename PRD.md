@@ -2,12 +2,9 @@
 
 ## 1. Executive Summary
 
-Conxian is a **Sovereign Autonomous Business (SAB)** operating on the Stacks blockchain with Bitcoin finality via
-Nakamoto consensus.
-The protocol implements a full **Everything-as-a-Service (XAAS)** model, providing autonomous DeFi primitives
-(DEX, Lending, Vaults), multi-council governance, and monetized services.
-The system operates like a digital corporation where smart contracts serve as Managers/Agents (Staff)
-reporting to the DAO (Board).
+Conxian is a **Sovereign Autonomous Business (SAB)** operating on the Stacks blockchain with Bitcoin finality via Nakamoto consensus.
+The protocol implements a full **Everything-as-a-Service (XAAS)** model, providing autonomous DeFi primitives (DEX, Lending, Vaults), multi-council governance, and monetized services.
+The system operates like a digital corporation where smart contracts serve as Managers/Agents (Staff) reporting to the DAO (Board).
 
 ## 2. Core Architecture
 
@@ -32,7 +29,7 @@ reporting to the DAO (Board).
 
 - Use `burn-block-height` for all temporal logic (Vesting, Voting, Staling).
 - Minimum 6 Bitcoin confirmations for high-value operations.
-- All core logic is tenure-aware, ensuring deterministic behavior across Stacks blocks.
+- All core logic is tenure-aware via `block-utils`, ensuring deterministic behavior across Stacks blocks.
 
 ### 3.2. Sovereign Autonomous Fiscal Policy
 
@@ -49,13 +46,13 @@ Conxian implements a **Dual-Council Governance Model**:
 ### 4.1. Operational Council (Staff)
 - **Participants**: Autonomous Agents and Core Developers (Managers).
 - **Scope**: Parameter tuning (Interest rates, Risk factors), emergency pauses, and daily treasury allocations.
-- **Voting**: Continuous (24/7), lower threshold, fast execution.
+- **Voting**: Continuous (24/7), lower threshold, fast execution. Implemented via `proposal-engine.clar`.
 
 ### 4.2. Strategic Council (Board/AGM)
 - **Participants**: Human Token Holders (Governance token holders).
 - **Scope**: Structural upgrades, major fiscal policy changes, and appointment of new modules.
 - **Voting**: Periodic (Annual General Meeting - AGM), high quorum required, long duration.
-- **AGM Interval**: Codified at ~1 year (52,560 burn blocks).
+- **AGM Interval**: Codified at ~1 year (52,560 burn blocks) in `community-voting-engine.clar`.
 
 ## 5. Token System Use Cases
 
@@ -69,21 +66,22 @@ The protocol utilizes a 5-token system aligned with specialized councils:
 
 ## 6. Security & Risk Management
 
-- **Dimensional Risk**: Maintenance Margin scales quadratically with leverage: $MM = MM_{base} + Leverage^2$.
-- **MEV Protection**: Commit-Reveal scheme enforced for all DEX operations to prevent frontrunning.
-- **Hybrid Oracle**: Aggregates Pyth, Redstone, and Switchboard with deviation guards.
+- **Dimensional Risk**: Maintenance Margin scales quadratically with leverage: $MM = MM_{base} + Leverage^2$. Implemented in `dimensional-core.clar`.
+- **MEV Protection**: Commit-Reveal scheme enforced for all DEX operations to prevent frontrunning. Implemented in `mev-protector.clar`.
+- **Hybrid Oracle**: Aggregates Pyth, Redstone, and Switchboard with deviation guards. Implemented in `oracle-aggregator.clar`.
 
 ## 11. Implementation Status (Full Truth Recovery)
 
 ### Recently Implemented (PHASE 4)
 
 - **Foundation Consolidation**: Reduced trait redundancy and implemented modular math libraries.
-- **Core stabilization**: Repaired logic and naming in `admin-facade`, `conxian-protocol`, and `risk-manager`.
+- **Core Stabilization**: Repaired logic and naming in `admin-facade`, `conxian-protocol`, and `risk-manager`.
 - **Fiscal Policy**: Completed `revenue-distributor` and `allocation-policy` with 60/20/20 enforcement.
 - **Hybrid Governance**: Refined `proposal-engine` (Staff) and `community-voting-engine` (Board) to support Dual-Council governance.
-- **Clarity 4 Upgrade**: All core contracts migrated to Clarity 4 (Epoch 3.0), utilizing `block-timestamp`, `burn-block-height`, and `to-ascii` for enhanced precision and security.
+- **Clarity 4 Upgrade**: All core contracts migrated to Clarity 4 (Epoch 3.0), utilizing `burn-block-height` and `get-block-info?` for enhanced precision and tenure-aware security.
 - **Nakamoto Transition**: Verified `burn-block-height` usage across all temporal logic.
 - **Service Module Repair**: Consolidated DEX, Lending, and Token modules.
+- **Autonomous Agents**: Implemented `agent-risk` with `check-work-needed` and `do-work` for automated liquidations.
 
 ### Resolved Issues
 
@@ -99,3 +97,4 @@ The protocol utilizes a 5-token system aligned with specialized councils:
 | `contracts/dex/vault.clar` | Repaired (Clarity 2) | COMPLETED |
 | `contracts/lending/lending-manager.clar` | Consolidated | COMPLETED |
 | `contracts/governance/dao-treasury.clar` | Aligned with Vault Trait | COMPLETED |
+| `contracts/agents/agent-risk.clar` | "Office Worker" Implemented | COMPLETED |

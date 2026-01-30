@@ -9,16 +9,16 @@
 
 Conxian is a **Sovereign Autonomous Business (SAB)** where human discretion is replaced by mathematical certainty. It operates like a digital corporation where smart contracts are the Managers/Staff reporting to the DAO (Board).
 
-- **Autonomous**: Decisions are executed by code agents, not committees
-- **Neutral**: The protocol is a public utility, indifferent to borders or identities  
-- **Sovereign**: Anchored by Bitcoin's immutable security via Nakamoto consensus
+- **Autonomous**: Decisions are executed by code agents, not committees.
+- **Neutral**: The protocol is a public utility, indifferent to borders or identities.
+- **Sovereign**: Anchored by Bitcoin's immutable security via Nakamoto consensus.
 
 ## Refined Corporate Architecture
 
 ### 🗳️ **Dual-Council Governance (Staff vs Board)**
 
-- **Operational Council (Staff)**: 24/7 voting by autonomous agents (`agent-risk`, `agent-treasury`) for parameter tuning and daily operations.
-- **Strategic Council (Board/AGM)**: Periodic Human General Meetings (Annual/Quarterly) for structural upgrades and major fiscal changes.
+- **Operational Council (Staff)**: 24/7 voting by autonomous agents (`agent-risk`, `agent-treasury`) for parameter tuning and daily operations. Implemented via `proposal-engine.clar`.
+- **Strategic Council (Board/AGM)**: Periodic Human General Meetings (Annual/Quarterly) for structural upgrades and major fiscal changes. Implemented via `community-voting-engine.clar`.
 
 ### 💰 **Autonomous Fiscal Policy (60/20/20)**
 
@@ -29,8 +29,8 @@ Total revenue is automatically distributed:
 
 ## Technical Stack
 
-- **Clarity 2**: Nakamoto-aligned with `burn-block-height` and Bitcoin finality.
-- **Tenure Awareness**: Logic is aware of Stacks block tenures for deterministic execution.
+- **Clarity 4**: Nakamoto-aligned (Epoch 3.0) with `burn-block-height` and Bitcoin finality.
+- **Tenure Awareness**: Logic is aware of Stacks block tenures via `block-utils` for deterministic execution.
 - **Facade Pattern**: All core logic accessed via dimensional facades and consolidated traits.
 - **Hybrid Oracle**: Aggregated Pyth, Redstone, and Switchboard feeds with deviation guards.
 
@@ -40,8 +40,8 @@ Total revenue is automatically distributed:
 /contracts/
 ├── traits/           # Consolidated modular trait standards
 ├── core/             # Ops engine, risk/collateral/position managers
-├── dex/              # Concentrated liquidity, swap router, vault
-├── governance/       # Dual-council DAO (Board)
+├── dex/              # Swap router, vaults, and liquidity management
+├── governance/       # Dual-council DAO (Board/Staff)
 ├── agents/           # Autonomous Office Workers (Staff)
 ├── tokens/           # CXD, CXVG, CXS, CXTR, CXLP
 ├── oracle/           # Price feed adapters and aggregators
@@ -73,9 +73,9 @@ Total revenue is automatically distributed:
 
 ## Status
 
-- **Maturity Level**: 🟢 **Service Modules Repaired** (Refined 2026-01-16)
+- **Maturity Level**: 🟢 **Service Modules Repaired** (Refined 2025-01-24)
 - **Architecture**: Full Truth Alignment achieved across Core, DEX, Governance, and Economics.
-- **Nakamoto Ready**: Transitioned all temporal logic to `burn-block-height`.
+- **Nakamoto Ready**: Transitioned all temporal logic to `burn-block-height` and Epoch 3.0.
 
 ---
 
