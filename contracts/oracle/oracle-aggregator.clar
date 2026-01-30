@@ -40,7 +40,7 @@
 })
 
 (define-private (get-block-height)
-  burn-block-height
+  block-height
 )
 
 (define-private (is-stale (updated-at uint))

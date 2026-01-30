@@ -8,7 +8,7 @@
 (define-constant ERR_UNAUTHORIZED u1000)
 (define-constant ERR_ALREADY_VOTED u1001)
 (define-constant ERR_VOTING_CLOSED u1002)
-(define-constant ERR_START_BLOCK_IN_PAST u2000)
+(define-constant ERR_START_TIME_IN_PAST u2000)
 (define-constant ROLE_GOVERNANCE u1)
 
 ;; Data Vars
@@ -18,8 +18,8 @@
 (define-map proposals
     uint 
     {
-        start-block: uint,
-        end-block: uint,
+        start-time: uint,
+        end-time: uint,
         yes-votes: uint,
         no-votes: uint,
         executed: bool
@@ -35,7 +35,7 @@
 ;; @param start-block uint
 ;; @param end-block uint
 ;; @returns (response uint uint)
-(define-public (create-proposal (start-block uint) (end-block uint))
+(define-public (create-proposal (start-time uint) (end-time uint))
     (let (
         (proposal-id (+ (var-get proposal-count) u1))
         (tenure-id (contract-call? .block-utils get-current-tenure-id))
@@ -45,12 +45,12 @@
             (err ERR_UNAUTHORIZED)
         )
         
-        ;; Ensure start block is in the future
-        (asserts! (> start-block block-height) (err ERR_START_BLOCK_IN_PAST))
+        ;; Ensure start time is in the future
+        (asserts! (> start-time block-height) (err ERR_START_TIME_IN_PAST))
         
         (map-set proposals proposal-id {
-            start-block: start-block,
-            end-block: end-block,
+            start-time: start-time,
+            end-time: end-time,
             yes-votes: u0,
             no-votes: u0,
             executed: false
@@ -63,7 +63,7 @@
         (print {
             event: "create-proposal",
             proposal-id: proposal-id,
-            start-block: start-block,
+            start-time: start-time,
             tenure-id: tenure-id
         })
         
@@ -82,8 +82,8 @@
         
         ;; Update Vote Counts (Simplified, assuming 1 vote per call for now, real logic would pull token balance)
     )
-        ;; But without a known
-        (asserts! (and (>= block-height (get start-block proposal)) (<= block-height (get end-block proposal))) (err ERR_VOTING_CLOSED))
+        ;; Check if voting period is active using block-height
+        (asserts! (and (>= block-height (get start-time proposal)) (<= block-height (get end-time proposal))) (err ERR_VOTING_CLOSED))
         (asserts! (is-none (map-get? votes { proposal-id: proposal-id, voter: tx-sender })) (err ERR_ALREADY_VOTED))
         
         ;; User must have a seat (voting power > 0)

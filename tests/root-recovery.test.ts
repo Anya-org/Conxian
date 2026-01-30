@@ -1,14 +1,12 @@
 
 import { describe, expect, it, beforeAll } from 'vitest';
-import { initSimnet } from '@stacks/clarinet-sdk';
+import { simnet } from './setup-test-env';
 import { Cl } from '@stacks/transactions';
 
 describe('Root Recovery: Conxian Protocol', () => {
-  let simnet: any;
   let deployer: string;
 
   beforeAll(async () => {
-    simnet = await initSimnet();
     deployer = simnet.deployer;
   });
 

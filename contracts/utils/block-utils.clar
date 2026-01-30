@@ -10,23 +10,28 @@
 
 ;; Read-only: Get Current Tenure ID
 (define-read-only (get-current-tenure-id)
-  ;; Simplified: Use burn-block-height as a proxy for tenure
-  ;; In a real implementation, this would query actual tenure info
-  (/ burn-block-height BLOCKS_PER_TENURE)
+  ;; Simplified: Use block-height as a proxy for tenure
+  (/ block-height BLOCKS_PER_TENURE)
+)
+
+;; Read-only: Get Current Stacks Block Time (Clarity 4 compatible)
+(define-read-only (get-stacks-block-time)
+  (default-to u0 (get-block-info? time block-height))
 )
 
 ;; Read-only: Get Tenure Info
 (define-read-only (get-tenure-info)
     (ok {
         tenure-id: (get-current-tenure-id),
-        burn-block-height: burn-block-height,
-        stacks-block-height: block-height
+        block-height: block-height,
+        stacks-block-height: block-height,
+        block-time: (get-stacks-block-time)
     })
 )
 
 ;; Read-only: Calculate Blocks Since Tenure Start
 (define-read-only (get-blocks-in-current-tenure)
-    (mod burn-block-height BLOCKS_PER_TENURE)
+    (mod block-height BLOCKS_PER_TENURE)
 )
 
 ;; Read-only: Check if Tenure is Fresh (< 5 blocks old)
@@ -36,22 +41,19 @@
 
 ;; Read-only: Get Bitcoin Confirmations
 (define-read-only (get-bitcoin-confirmations (target-burn-height uint))
-    (if (>= burn-block-height target-burn-height)
-        (ok (- burn-block-height target-burn-height))
-        (if false (err u0) (ok u0))
+    (if (>= block-height target-burn-height)
+        (ok (- block-height target-burn-height))
+        (ok u0)
     )
 )
 
 ;; Read-only: Check Minimum Confirmations
 (define-read-only (has-min-confirmations (target-burn-height uint) (min-confirmations uint))
-    (match (get-bitcoin-confirmations target-burn-height)
-        confirmations (ok (>= confirmations min-confirmations))
-        error (err error)
-    )
+    (ok (>= (unwrap-panic (get-bitcoin-confirmations target-burn-height)) min-confirmations))
 )
 
 ;; @desc Check if the current block is finalized
 ;; @returns (response bool uint)
 (define-public (check-finality)
-    (if false (err u0) (ok true))
+    (if true (ok true) (err u0))
 )

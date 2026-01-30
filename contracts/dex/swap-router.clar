@@ -1,6 +1,6 @@
 ;; swap-router.clar
 ;; DEX Interaction Layer: Handles Single and Multi-hop swaps
-;; Nakamoto-aligned with burn-block-height
+;; Nakamoto-aligned with block-height
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
@@ -38,7 +38,7 @@
           user: tx-sender,
           amount-in: amount-in,
           amount-out: amount-out,
-          burn-height: burn-block-height
+          burn-height: block-height
         })
         (ok amount-out)
       )

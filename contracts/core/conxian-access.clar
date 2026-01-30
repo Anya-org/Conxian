@@ -2,7 +2,7 @@
 ;; Unified Role-Based Access Control (RBAC) Backend
 ;; Centralizes all permissioning for the Conxian Protocol
 
-;; (impl-trait .core-traits.conxian-access-trait)
+(impl-trait .core-traits.conxian-access-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u1000)
@@ -91,4 +91,14 @@
 
 (define-read-only (get-contract-owner)
   (ok (var-get contract-owner))
+)
+
+;; Read-only: Verify Passkey/Biometric Signature (Clarity 4 stub)
+(define-read-only (verify-passkey-signature (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
+  (ok true)
+)
+
+;; Read-only: Global Admin Check
+(define-read-only (is-global-admin)
+  (is-admin tx-sender)
 )

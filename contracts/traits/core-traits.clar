@@ -27,6 +27,10 @@
     (principal uint)
     (response bool uint)
   )
+  (verify-passkey-signature
+    ((buff 32) (buff 64) (buff 33))
+    (response bool uint)
+  )
 ))
 
 (define-trait regulatory-adapter-trait (

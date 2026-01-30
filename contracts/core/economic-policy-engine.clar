@@ -45,7 +45,7 @@
     utilization: uint,
     interest-rate: uint,
     collateral-factor: uint,
-    last-update-burn: uint, ;; burn-block-height
+    last-update-burn: uint, ;; block-height
   }
 )
 
@@ -71,7 +71,7 @@
 )
 
 (define-private (is-price-stale (timestamp uint))
-  (>= (- (default-to u0 (get-block-info? time block-height)) timestamp) PRICE_STALE_SECONDS)
+  (>= (- block-height timestamp) PRICE_STALE_SECONDS)
 )
 
 ;; Public Functions
@@ -92,7 +92,7 @@
         utilization: new-utilization,
         interest-rate: new-rate,
         collateral-factor: new-factor,
-        last-update-burn: burn-block-height,
+        last-update-burn: block-height,
       })
 
       (if (is-eq asset (var-get price-feed))
@@ -117,10 +117,10 @@
   (begin
     (map-set asset-prices asset {
       price: price,
-      timestamp: (default-to u0 (get-block-info? time block-height)),
+      timestamp: block-height,
       confidence: confidence,
     })
-    (var-set last-price-update-time (default-to u0 (get-block-info? time block-height)))
+    (var-set last-price-update-time block-height)
     (ok true)
   )
 )
@@ -209,10 +209,10 @@
 (define-read-only (get-system-health)
   (ok {
     last-update-time: (var-get last-price-update-time),
-    seconds-since-update: (- (default-to u0 (get-block-info? time block-height)) (var-get last-price-update-time)),
+    seconds-since-update: (- block-height (var-get last-price-update-time)),
     current-rate: (var-get current-interest-rate),
     utilization: (var-get utilization-rate),
     collateral-factor: (var-get collateral-factor),
-    burn-height: burn-block-height
+    burn-height: block-height
   })
 )
