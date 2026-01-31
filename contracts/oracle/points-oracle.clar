@@ -254,7 +254,6 @@
         
         ;; Update receiver points
         (let ((receiver-balance (get balance receiver-points)))
-          (begin
           (map-set user-points { user: to } {
             balance: (+ receiver-balance amount),
             earned: (get earned receiver-points),
@@ -263,6 +262,7 @@
             points-tier: (unwrap-panic (calculate-user-tier to)),
             expiry-time: (+ stacks-block-time POINTS_EXPIRY_SECONDS)
           })
+        )
         
         ;; Record transaction
         (let ((tx-id (sha256 0x00)))
@@ -284,8 +284,6 @@
           receiver-balance: (+ receiver-balance amount)
         })
       )
-      )
-    )
     )
   )
 )

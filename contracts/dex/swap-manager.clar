@@ -193,7 +193,7 @@
 ;; Public functions
 
 ;; @desc Find the best route for a token pair and amount
-(define-public (find-best-route
+(define-read-only (find-best-route
     (token-in principal)
     (token-out principal)
     (amount-in uint)
@@ -303,7 +303,7 @@
 )
 
 ;; @desc Update the route cache for a token pair
-(define-public (update-route-cache (token-in principal) (token-out principal))
+(define-read-only (update-route-cache (token-in principal) (token-out principal))
   (begin
     (asserts! (not (is-eq token-in token-out)) (err ERR_INVALID_SWAP))
     (asserts! (var-get swap-manager-active) (err ERR_SWAP_FAILED))

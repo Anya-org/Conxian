@@ -17,7 +17,7 @@
 (define-constant ROLE_KEEPER u5)
 
 ;; State
-(define-data-var contract-owner principal tx-sender)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-map roles
   {
     user: principal,
