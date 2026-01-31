@@ -95,7 +95,7 @@
         issuer: tx-sender,
         principal-amount: amount,
         interest-rate: u0,
-        maturity-block: (+ stacks-block-time duration),
+        maturity-block: (+ burn-block-height duration),
         is-active: true,
       })
       (var-set bond-nonce bond-id)

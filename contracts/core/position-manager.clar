@@ -91,6 +91,16 @@
   )
 )
 
+(define-public (force-close-position (position-id uint))
+  (begin
+    (asserts! (is-engine) (err ERR_NOT_AUTHORIZED))
+    (let ((pos (unwrap! (map-get? positions position-id) (err ERR_POSITION_NOT_FOUND))))
+      (map-set positions position-id (merge pos { open: false }))
+      (ok true)
+    )
+  )
+)
+
 (define-read-only (get-position (position-id uint))
   (match (map-get? positions position-id)
     pos (ok pos)

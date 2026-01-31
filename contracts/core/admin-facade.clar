@@ -245,7 +245,7 @@
       event: "emergency-pause",
       paused: paused,
       sender: tx-sender,
-      stacks-block-time: stacks-block-time,
+      burn-block-height: burn-block-height,
     })
     (ok true)
   )
@@ -260,6 +260,22 @@
       event: "global-admin-changed",
       old-admin: tx-sender,
       new-admin: new-admin,
+      timestamp: burn-block-height
+    })
+    (ok true)
+  )
+)
+
+;; Sovereign Handoff: Transfer global admin to timelock
+(define-public (transfer-global-admin-to-timelock)
+  (begin
+    (asserts! (is-global-admin) (err ERR_NOT_AUTHORIZED))
+    (var-set global-admin .timelock)
+    (print {
+      event: "sovereign-handoff",
+      module: "admin-facade",
+      new-admin: .timelock,
+      timestamp: burn-block-height
     })
     (ok true)
   )

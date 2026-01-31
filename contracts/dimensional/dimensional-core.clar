@@ -132,7 +132,7 @@
   (ok {
     is-open: false,
     reason: "",
-    last-updated: stacks-block-time,
+    last-updated: burn-block-height,
   })
 )
 
@@ -236,7 +236,7 @@
     (try! (check-bitcoin-finality))
     (let (
         (position-id (var-get next-position-id))
-        (current-block stacks-block-time)
+        (current-block burn-block-height)
         (price (try! (get-oracle-price token oracle-ref)))
         (is-long (or (is-eq position-type "LONG") (is-eq position-type "PERPETUAL")))
         (size (* collateral-amount leverage))
@@ -361,7 +361,7 @@
       }
         (merge position {
           status: "CLOSED",
-          last-updated: stacks-block-time,
+          last-updated: burn-block-height,
         })
       )
 
@@ -430,7 +430,7 @@
       }
         (merge position {
           status: "LIQUIDATED",
-          last-updated: stacks-block-time,
+          last-updated: burn-block-height,
         })
       )
 
@@ -501,7 +501,7 @@
         (to-uint size)
         (to-uint (* size -1))
       ))
-      (position-duration (- stacks-block-time (get entry-time position)))
+      (position-duration (- burn-block-height (get entry-time position)))
       (fee (/ (* size-abs position-duration (var-get protocol-fee-rate))
         PROTOCOL_FEE_DENOMINATOR
       ))

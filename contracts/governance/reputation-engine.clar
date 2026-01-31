@@ -20,7 +20,7 @@
 
 (define-private (calculate-decayed-score (last-voted-block uint) (current-score uint))
   (let (
-    (blocks-since-last-vote (- stacks-block-time last-voted-block))
+    (blocks-since-last-vote (- burn-block-height last-voted-block))
     (decay-periods (/ blocks-since-last-vote ONE_DAY))
   )
     (if (> decay-periods u0)
@@ -55,7 +55,7 @@
 (define-public (update-activity-score (user principal))
   (begin
     (map-set activity-scores user {
-      last-voted-block: stacks-block-time,
+      last-voted-block: burn-block-height,
       score: INITIAL_ACTIVITY_SCORE
     })
     (ok true)

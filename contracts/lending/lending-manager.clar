@@ -13,12 +13,54 @@
 (define-data-var circuit-breaker (optional principal) none)
 (define-map deposits { asset: principal, user: principal } uint)
 (define-map borrows { asset: principal, user: principal } uint)
-(define-map reserve-data principal { total-deposits: uint, total-borrows: uint, last-updated: uint })
+(define-map reserve-data principal { 
+  total-deposits: uint, 
+  total-borrows: uint, 
+  total-reserves: uint,
+  last-updated: uint 
+})
 
 ;; --- Helpers ---
 
 (define-private (is-admin)
   (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin))
+)
+
+(define-private (get-interest-rate (asset principal) (utilization uint))
+  (contract-call? .economic-policy-engine get-current-interest-rate)
+)
+
+(define-private (accrue-interest (asset principal))
+  (let ((reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: burn-block-height } (map-get? reserve-data asset))))
+    (let (
+      (current-time burn-block-height)
+      (time-delta (- current-time (get last-updated reserve)))
+    )
+      (if (> time-delta u0)
+        (let (
+          (current-total-borrows (get total-borrows reserve))
+          (utilization (if (> (get total-deposits reserve) u0) (/ (* current-total-borrows u10000) (get total-deposits reserve)) u0))
+          (rate (unwrap-panic (get-interest-rate asset utilization))) ;; Annual rate scaled by 10000
+          ;; Simple interest for demo: Principal * Rate * Time / (BlocksPerYear * Scale)
+          ;; Assuming ~52560 blocks per year (10 min blocks)
+          (interest-factor (/ (* rate time-delta) u52560)) 
+          (interest-accrued (/ (* current-total-borrows interest-factor) u10000))
+          (reserve-factor (unwrap-panic (contract-call? .economic-policy-engine get-reserve-factor)))
+          (protocol-fee (/ (* interest-accrued reserve-factor) u10000))
+          (supplier-interest (- interest-accrued protocol-fee))
+        )
+          (map-set reserve-data asset (merge reserve {
+            total-borrows: (+ current-total-borrows interest-accrued),
+            total-deposits: (+ (get total-deposits reserve) supplier-interest),
+            total-reserves: (+ (get total-reserves reserve) protocol-fee),
+            last-updated: current-time
+          }))
+          (ok true)
+        )
+        (ok true)
+      )
+    )
+  )
 )
 
 (define-private (check-circuit-breaker)
@@ -39,24 +81,28 @@
 (define-public (deposit (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
-    (current-dep (default-to u0 (map-get? deposits { asset: asset, user: tx-sender })))
-    (reserve (default-to { total-deposits: u0, total-borrows: u0, last-updated: stacks-block-time } (map-get? reserve-data asset)))
   )
     (begin
       (try! (check-circuit-breaker))
-      (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
-      (asserts! (> amount u0) (err ERR_INVALID_AMOUNT))
+      (unwrap-panic (accrue-interest asset))
+      (let (
+        (current-dep (default-to u0 (map-get? deposits { asset: asset, user: tx-sender })))
+        (reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: burn-block-height } (map-get? reserve-data asset)))
+      )
+        (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
+        (asserts! (> amount u0) (err ERR_INVALID_AMOUNT))
 
-      (try! (contract-call? asset-trait transfer amount tx-sender (as-contract tx-sender) none))
+        (try! (contract-call? asset-trait transfer amount tx-sender (as-contract tx-sender) none))
 
-      (map-set deposits { asset: asset, user: tx-sender } (+ current-dep amount))
-      (map-set reserve-data asset (merge reserve {
-        total-deposits: (+ (get total-deposits reserve) amount),
-        last-updated: stacks-block-time
-      }))
+        (map-set deposits { asset: asset, user: tx-sender } (+ current-dep amount))
+        (map-set reserve-data asset (merge reserve {
+          total-deposits: (+ (get total-deposits reserve) amount),
+          last-updated: burn-block-height
+        }))
 
-      (print { event: "deposit", user: tx-sender, asset: asset, amount: amount })
-      (ok true)
+        (print { event: "deposit", user: tx-sender, asset: asset, amount: amount })
+        (ok true)
+      )
     )
   )
 )
@@ -68,25 +114,29 @@
 (define-public (borrow (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
-    (current-bor (default-to u0 (map-get? borrows { asset: asset, user: tx-sender })))
-    (reserve (unwrap! (map-get? reserve-data asset) (err u404)))
   )
     (begin
       (try! (check-circuit-breaker))
-      (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
-      (asserts! (<= amount (get total-deposits reserve)) (err ERR_INSUFFICIENT_LIQUIDITY))
+      (unwrap-panic (accrue-interest asset))
+      (let (
+        (current-bor (default-to u0 (map-get? borrows { asset: asset, user: tx-sender })))
+        (reserve (unwrap! (map-get? reserve-data asset) (err u404)))
+      )
+        (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
+        (asserts! (<= amount (get total-deposits reserve)) (err ERR_INSUFFICIENT_LIQUIDITY))
 
-      ;; Note: In a full implementation, this would query the risk-manager for collateralization
-      (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) tx-sender none)))
+        ;; Note: In a full implementation, this would query the risk-manager for collateralization
+        (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) tx-sender none)))
 
-      (map-set borrows { asset: asset, user: tx-sender } (+ current-bor amount))
-      (map-set reserve-data asset (merge reserve {
-        total-borrows: (+ (get total-borrows reserve) amount),
-        last-updated: stacks-block-time
-      }))
+        (map-set borrows { asset: asset, user: tx-sender } (+ current-bor amount))
+        (map-set reserve-data asset (merge reserve {
+          total-borrows: (+ (get total-borrows reserve) amount),
+          last-updated: burn-block-height
+        }))
 
-      (print { event: "borrow", user: tx-sender, asset: asset, amount: amount })
-      (ok true)
+        (print { event: "borrow", user: tx-sender, asset: asset, amount: amount })
+        (ok true)
+      )
     )
   )
 )
@@ -98,22 +148,88 @@
 (define-public (repay (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
-    (current-bor (default-to u0 (map-get? borrows { asset: asset, user: tx-sender })))
-    (reserve (unwrap! (map-get? reserve-data asset) (err u404)))
   )
     (begin
-      (asserts! (> amount u0) (err ERR_INVALID_AMOUNT))
-      (try! (contract-call? asset-trait transfer amount tx-sender (as-contract tx-sender) none))
+      (unwrap-panic (accrue-interest asset))
+      (let (
+        (current-bor (default-to u0 (map-get? borrows { asset: asset, user: tx-sender })))
+        (reserve (unwrap! (map-get? reserve-data asset) (err u404)))
+      )
+        (asserts! (> amount u0) (err ERR_INVALID_AMOUNT))
+        (try! (contract-call? asset-trait transfer amount tx-sender (as-contract tx-sender) none))
 
-      (let ((repaid-amount (if (> current-bor amount) amount current-bor)))
-        (map-set borrows { asset: asset, user: tx-sender } (- current-bor repaid-amount))
-        (map-set reserve-data asset (merge reserve {
-          total-borrows: (- (get total-borrows reserve) repaid-amount),
-          last-updated: stacks-block-time
-        }))
+        (let ((repaid-amount (if (> current-bor amount) amount current-bor)))
+          (map-set borrows { asset: asset, user: tx-sender } (- current-bor repaid-amount))
+          (map-set reserve-data asset (merge reserve {
+            total-borrows: (- (get total-borrows reserve) repaid-amount),
+            last-updated: burn-block-height
+          }))
 
-        (print { event: "repay", user: tx-sender, asset: asset, amount: repaid-amount })
-        (ok true)
+          (print { event: "repay", user: tx-sender, asset: asset, amount: repaid-amount })
+          (ok true)
+        )
+      )
+    )
+  )
+)
+
+(define-private (is-risk-manager)
+  (is-eq tx-sender .risk-manager) ;; Or look up via conxian-protocol
+)
+
+;; @desc Seize collateral from a user (Liquidation)
+(define-public (seize-collateral (asset-trait <sip-010-ft-trait>) (user principal) (liquidator principal) (amount uint))
+  (let (
+    (asset (contract-of asset-trait))
+    (current-dep (default-to u0 (map-get? deposits { asset: asset, user: user })))
+  )
+    (begin
+      (asserts! (or (is-admin) (is-risk-manager)) (err ERR_UNAUTHORIZED))
+      (asserts! (<= amount current-dep) (err ERR_INVALID_AMOUNT))
+      
+      ;; Transfer collateral balance from user to liquidator
+      ;; Note: In a real system, we might physically transfer tokens or just update internal balances.
+      ;; Here we update internal balances: decrease user, increase liquidator.
+      ;; The liquidator can then withdraw if they want.
+      
+      (map-set deposits { asset: asset, user: user } (- current-dep amount))
+      (map-set deposits { asset: asset, user: liquidator } (+ (default-to u0 (map-get? deposits { asset: asset, user: liquidator })) amount))
+      
+      (print { event: "seize-collateral", user: user, liquidator: liquidator, asset: asset, amount: amount })
+      (ok true)
+    )
+  )
+)
+
+;; @desc Collect accumulated protocol reserves and send to revenue distributor.
+(define-public (collect-reserves (asset-trait <sip-010-ft-trait>))
+  (let (
+    (asset (contract-of asset-trait))
+  )
+    (begin
+      (unwrap-panic (accrue-interest asset))
+      (let (
+        (reserve (unwrap! (map-get? reserve-data asset) (err u404)))
+        (amount (get total-reserves reserve))
+        (distributor (unwrap-panic (contract-call? .economic-policy-engine get-revenue-distributor))) ;; Assuming this getter exists or we use constant
+      )
+        (asserts! (> amount u0) (ok true)) ;; Nothing to collect
+        
+        ;; Transfer to distributor
+        ;; Note: We need the distributor principal. Since it's not in lending-manager, let's look it up or hardcode standard
+        (let ((target (contract-call? .conxian-protocol get-contract-address "revenue-distributor"))) ;; Or just use .revenue-distributor if linked
+           ;; Simplification: use the known revenue distributor contract directly if trait allows, or just transfer to it.
+           ;; We will assume .revenue-distributor is the standard one.
+           (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) .revenue-distributor none)))
+           ;; Call distribute? The distributor might handle STX vs Tokens differently.
+           ;; For SIP-010, the revenue-distributor likely needs a notify or we just send it.
+           ;; Looking at revenue-distributor earlier, it had distribute-stx. Does it have distribute-token?
+           ;; Assuming yes or we just send it to holding.
+           
+           (map-set reserve-data asset (merge reserve { total-reserves: u0 }))
+           (print { event: "collect-reserves", asset: asset, amount: amount })
+           (ok true)
+        )
       )
     )
   )

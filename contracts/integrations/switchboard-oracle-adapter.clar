@@ -42,7 +42,7 @@
         (map-set switchboard-feeds asset {
             price: price,
             confidence: confidence,
-            timestamp: stacks-block-time
+            timestamp: burn-block-height
         })
         (print { event: "switchboard-price-update", asset: asset, price: price, confidence: confidence })
         (ok true)

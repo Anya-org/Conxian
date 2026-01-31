@@ -14,15 +14,17 @@
 (define-constant MAX_COLLATERAL_FACTOR u9500) ;; 95% max
 (define-constant PRICE_STALE_SECONDS u300) ;; 5 minutes in seconds
 
-(define-constant SUBSCRIPTION_COST u1000000) ;; 1 STX
+(define-data-var subscription-cost uint u1000000) ;; 1 STX default
 (define-constant ERR_NO_SUBSCRIPTION u1006)
 (define-constant ERR_UNAUTHORIZED u1007)
+(define-constant ERR_INVALID_PARAM u1008)
 
 ;; Data Vars
 (define-data-var price-feed principal tx-sender)
 (define-data-var utilization-rate uint u0)
 (define-data-var current-interest-rate uint BASE_RATE)
 (define-data-var collateral-factor uint MIN_COLLATERAL_FACTOR)
+(define-data-var reserve-factor uint u1000) ;; 10% default
 (define-data-var last-price-update-time uint u0)
 (define-data-var revenue-distributor principal .revenue-distributor)
 
@@ -45,7 +47,7 @@
     utilization: uint,
     interest-rate: uint,
     collateral-factor: uint,
-    last-update-burn: uint, ;; stacks-block-time
+    last-update-burn: uint, ;; burn-block-height
   }
 )
 
@@ -71,7 +73,7 @@
 )
 
 (define-private (is-price-stale (timestamp uint))
-  (>= (- stacks-block-time timestamp) PRICE_STALE_SECONDS)
+  (>= (- burn-block-height timestamp) PRICE_STALE_SECONDS)
 )
 
 ;; Public Functions
@@ -92,7 +94,7 @@
         utilization: new-utilization,
         interest-rate: new-rate,
         collateral-factor: new-factor,
-        last-update-burn: stacks-block-time,
+        last-update-burn: burn-block-height,
       })
 
       (if (is-eq asset (var-get price-feed))
@@ -117,10 +119,10 @@
   (begin
     (map-set asset-prices asset {
       price: price,
-      timestamp: stacks-block-time,
+      timestamp: burn-block-height,
       confidence: confidence,
     })
-    (var-set last-price-update-time stacks-block-time)
+    (var-set last-price-update-time burn-block-height)
     (ok true)
   )
 )
@@ -165,16 +167,45 @@
   (ok "Economic-Policy-Engine")
 )
 
+;; Configuration
+
+(define-public (set-subscription-cost (new-cost uint))
+  (begin
+    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
+    (var-set subscription-cost new-cost)
+    (ok true)
+  )
+)
+
+(define-read-only (get-revenue-distributor)
+  (ok (var-get revenue-distributor))
+)
+    
+(define-public (set-reserve-factor (new-factor uint))
+  (begin
+    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
+    (asserts! (<= new-factor u10000) (err ERR_INVALID_PARAM))
+    (var-set reserve-factor new-factor)
+    (ok true)
+  )
+)
+
+(define-read-only (get-reserve-factor)
+  (ok (var-get reserve-factor))
+)
+
 ;; Subscription Management
 
 ;; @desc Activate a subscription for access to advanced monetary functions.
 (define-public (subscribe)
-  (begin
-    (try! (stx-transfer? SUBSCRIPTION_COST tx-sender (var-get revenue-distributor)))
-    (try! (contract-call? .revenue-distributor distribute-stx SUBSCRIPTION_COST))
-    (map-set subscribers tx-sender true)
-    (print { event: "subscription-activated", subscriber: tx-sender })
-    (ok true)
+  (let ((cost (var-get subscription-cost)))
+    (begin
+      (try! (stx-transfer? cost tx-sender (var-get revenue-distributor)))
+      (try! (contract-call? .revenue-distributor distribute-stx cost))
+      (map-set subscribers tx-sender true)
+      (print { event: "subscription-activated", subscriber: tx-sender, cost: cost })
+      (ok true)
+    )
   )
 )
 
@@ -209,10 +240,10 @@
 (define-read-only (get-system-health)
   (ok {
     last-update-time: (var-get last-price-update-time),
-    seconds-since-update: (- stacks-block-time (var-get last-price-update-time)),
+    seconds-since-update: (- burn-block-height (var-get last-price-update-time)),
     current-rate: (var-get current-interest-rate),
     utilization: (var-get utilization-rate),
     collateral-factor: (var-get collateral-factor),
-    burn-height: stacks-block-time
+    burn-height: burn-block-height
   })
 )

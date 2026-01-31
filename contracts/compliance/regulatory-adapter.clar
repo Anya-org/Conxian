@@ -52,7 +52,7 @@
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set compliance-status { user: user } {
       clean-hands: true,
-      verified-at: stacks-block-time,
+      verified-at: burn-block-height,
       jurisdiction: jurisdiction
     })
     (ok true)
@@ -64,8 +64,8 @@
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set blacklist user true)
-    ;; Use stacks-block-time for high-precision audit logs (Clarity 4)
-    (print { event: "user-blacklisted", user: user, audit-time: stacks-block-time, status: (to-ascii? 0x424c41434b4c4953544544) }) ;; "BLACKLISTED"
+    ;; Use burn-block-height for high-precision audit logs (Clarity 4)
+    (print { event: "user-blacklisted", user: user, audit-time: burn-block-height, status: "BLACKLISTED" })
     (ok true)
   )
 )

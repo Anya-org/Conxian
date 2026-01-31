@@ -252,7 +252,7 @@
     )
     (map-set voting-power { account: account } {
       power: total-power,
-      last-update: stacks-block-time,
+      last-update: burn-block-height,
     })
     (ok true)
   )

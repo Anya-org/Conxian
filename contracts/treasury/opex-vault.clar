@@ -36,12 +36,12 @@
       ;; ROLE_OPERATOR (err ERR_UNAUTHORIZED)
     )
     ;; Check limits
-    (if (> (- stacks-block-time (var-get last-spend-block))
+    (if (> (- burn-block-height (var-get last-spend-block))
         (contract-call? .nakamoto-constants get-blocks-per-day)
       )
       (begin
         (var-set daily-spend amount)
-        (var-set last-spend-block stacks-block-time)
+        (var-set last-spend-block burn-block-height)
       )
       (begin
         (asserts! (<= (+ (var-get daily-spend) amount) (var-get allowance-limit))

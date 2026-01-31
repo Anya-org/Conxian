@@ -7,6 +7,7 @@ The DEX Module provides a highly efficient and capital-aware decentralized excha
 ## Architecture: Multi-Layer Execution
 
 The DEX module separates concerns into three distinct layers:
+
 1. **User Facade (`swap-router.clar`)**: The primary entry point for users. Handles single and multi-hop swaps across registered pools.
 2. **Coordination Layer (`swap-manager.clar`)**: Manages route discovery, performance tracking, and caching for optimal trade execution.
 3. **Storage Layer (`vault.clar`)**: Provides secure asset storage and management for protocol-owned and user-managed liquidity.
@@ -24,18 +25,33 @@ graph TD
 ## Core Contracts
 
 ### `swap-router.clar` (User Facade)
+
 Handles user-facing swap operations. It is Nakamoto-aligned and tenure-aware.
+
 - `exact-input-single(...)`: Performs a swap across a single pool.
 - `exact-input-multi(...)`: Coordinates swaps across multiple hops.
 
 ### `swap-manager.clar` (Coordination)
+
 Optimizes trade execution by identifying the most efficient routes and caching results.
+
 - `find-best-route(...)`: Determines the optimal path for a swap.
 - `execute-swap(...)`: Executes a coordinated swap along a discovered route.
 - `batch-execute-swaps(...)`: Allows for multiple swaps in a single transaction.
 
+### `concentrated-liquidity-pool.clar` (Core Engine)
+
+The singleton contract managing all concentrated liquidity pools and fee collection.
+
+- `create-pool(...)`: Deploys a new pool for a token pair.
+- `swap(...)`: Executes trades against a specific pool ID.
+- `mint(...)`: Adds liquidity to a specific tick range.
+- `collect-protocol-fees(...)`: Sweeps accumulated fees to the Revenue Distributor.
+
 ### `vault.clar` (Asset Management)
+
 The protocol's secure storage system for assets.
+
 - `create-vault(...)`: Initializes a new secure storage instance.
 - `deposit-to-vault(...)`: Safely stores assets in a vault.
 - `withdraw-from-vault(...)`: Retrieves assets from a vault.
@@ -43,6 +59,7 @@ The protocol's secure storage system for assets.
 ## Integration Examples
 
 ### Executing a Simple Swap
+
 Users should interact with the `swap-router` for all trading operations.
 
 ```clarity
@@ -56,6 +73,7 @@ Users should interact with the `swap-router` for all trading operations.
 ```
 
 ### Finding an Optimal Route
+
 Integrators can query the `swap-manager` to find the most efficient path for a trade.
 
 ```clarity
@@ -69,9 +87,11 @@ Integrators can query the `swap-manager` to find the most efficient path for a t
 ## Testing
 
 ### Automated Tests
+
 DEX functionality is verified through a suite of integration tests.
 
 Run DEX tests:
+
 ```bash
 npm test -- tests/dex-defi.test.ts
 ```

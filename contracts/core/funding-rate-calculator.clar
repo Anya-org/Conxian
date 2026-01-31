@@ -23,7 +23,7 @@
     ;; Simplified gas-free calculation
     (let ((diff (- (to-int mark-price) (to-int index-price))))
       (var-set current-funding-rate diff)
-      (var-set last-funding-time stacks-block-time)
+      (var-set last-funding-time burn-block-height)
       (ok diff)
     )
   )

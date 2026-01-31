@@ -73,14 +73,14 @@
       (map-set liquidity-positions { pool: pool, provider: tx-sender } {
         liquidity-amount: (+ (get liquidity-amount existing-position) amount),
         pool-shares: (+ (get pool-shares existing-position) amount), ;; Simplified share calculation
-        last-deposit: stacks-block-time,
+        last-deposit: burn-block-height,
         rewards-earned: (get rewards-earned existing-position),
         rewards-claimed: (get rewards-claimed existing-position),
         fee-tier: u1000
       })
 
       ;; Update provider stats
-      (let ((stats (default-to { total-liquidity: u0, total-rewards: u0, pool-count: u0, first-provision: stacks-block-time } (map-get? provider-stats { provider: tx-sender }))))
+      (let ((stats (default-to { total-liquidity: u0, total-rewards: u0, pool-count: u0, first-provision: burn-block-height } (map-get? provider-stats { provider: tx-sender }))))
         (map-set provider-stats { provider: tx-sender } {
           total-liquidity: (+ (get total-liquidity stats) amount),
           total-rewards: (get total-rewards stats),

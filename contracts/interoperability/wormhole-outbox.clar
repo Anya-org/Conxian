@@ -1,6 +1,6 @@
 ;; wormhole-outbox.clar
 ;; Sends cross-chain messages via Wormhole
-;; Nakamoto-aligned with stacks-block-time
+;; Nakamoto-aligned with burn-block-height
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
@@ -35,7 +35,7 @@
           recipient: recipient,
           payload: payload,
           sender: tx-sender,
-          sent-at: stacks-block-time,
+          sent-at: burn-block-height,
       })
       (var-set sequence seq)
       (ok seq)

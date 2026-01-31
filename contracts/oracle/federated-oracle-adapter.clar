@@ -43,7 +43,7 @@
 (define-read-only (get-price (asset (string-ascii 32)))
   (match (map-get? price-data { asset: asset })
     data 
-      (if (> (- stacks-block-time (get last-update data)) MAX_PRICE_AGE)
+      (if (> (- burn-block-height (get last-update data)) MAX_PRICE_AGE)
         (err ERR_STALE_PRICE)
         (ok (get aggregated-price data))
       )
@@ -59,7 +59,7 @@
     ;; Update individual price
     (map-set individual-prices { asset: asset, source: source } {
       price: price,
-      timestamp: stacks-block-time
+      timestamp: burn-block-height
     })
     
     ;; Recalculate aggregated price
@@ -81,7 +81,7 @@
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set oracle-sources { source: source } {
       active: true,
-      last-update: stacks-block-time,
+      last-update: burn-block-height,
       weight: weight
     })
     (ok true)
@@ -94,7 +94,7 @@
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set oracle-sources { source: source } {
       active: false,
-      last-update: stacks-block-time,
+      last-update: burn-block-height,
       weight: u0
     })
     (ok true)
