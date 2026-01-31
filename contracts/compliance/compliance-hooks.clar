@@ -1,27 +1,110 @@
 ;; compliance-hooks.clar
 ;; Conxian Compliance Hooks: KYC/AML checks and audit trails
+;;
+;; REPAIRED: Added proper authorization for KYC provider management
 
 (define-constant ERR_UNAUTHORIZED u4000)
 (define-constant ERR_KYC_FAILED u4001)
+(define-constant ERR_ALREADY_PROVIDER u4002)
+(define-constant ERR_NOT_PROVIDER u4003)
+
+;; Data vars
+(define-data-var contract-owner principal tx-sender)
+(define-data-var compliance-manager principal .compliance-manager)
 
 (define-map kyc-providers
     principal
-    bool
+    {
+        active: bool,
+        name: (string-ascii 64),
+        registered-at: uint
+    }
 )
 
-(define-public (add-kyc-provider (provider principal))
+(define-private (is-owner)
+    (is-eq tx-sender (var-get contract-owner))
+)
+
+(define-private (is-compliance-manager)
+    (is-eq tx-sender (var-get compliance-manager))
+)
+
+(define-public (set-contract-owner (new-owner principal))
     (begin
-        ;; Add authorization logic here
-        (map-set kyc-providers provider true)
+        (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+        (var-set contract-owner new-owner)
         (ok true)
     )
 )
 
-(define-public (verify-kyc (user principal))
+(define-public (set-compliance-manager (new-manager principal))
     (begin
-        (asserts! (map-get? kyc-providers tx-sender) (err ERR_UNAUTHORIZED))
-        ;; In a real implementation, this would involve a more complex verification process
+        (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+        (var-set compliance-manager new-manager)
         (ok true)
+    )
+)
+
+(define-public (add-kyc-provider (provider principal) (name (string-ascii 64)))
+    (begin
+        (asserts! (or (is-owner) (is-compliance-manager)) (err ERR_UNAUTHORIZED))
+        (asserts! (is-none (map-get? kyc-providers provider)) (err ERR_ALREADY_PROVIDER))
+        (map-set kyc-providers provider {
+            active: true,
+            name: name,
+            registered-at: stacks-block-time
+        })
+        (print {
+            event: "kyc-provider-added",
+            provider: provider,
+            name: name,
+            timestamp: stacks-block-time
+        })
+        (ok true)
+    )
+)
+
+(define-public (remove-kyc-provider (provider principal))
+    (begin
+        (asserts! (or (is-owner) (is-compliance-manager)) (err ERR_UNAUTHORIZED))
+        (asserts! (is-some (map-get? kyc-providers provider)) (err ERR_NOT_PROVIDER))
+        (map-delete kyc-providers provider)
+        (print {
+            event: "kyc-provider-removed",
+            provider: provider,
+            timestamp: stacks-block-time
+        })
+        (ok true)
+    )
+)
+
+(define-public (verify-kyc (user principal) (kyc-level uint))
+    (let ((provider-data (map-get? kyc-providers tx-sender)))
+        (begin
+            (asserts! (is-some provider-data) (err ERR_UNAUTHORIZED))
+            (asserts! (get active (unwrap-panic provider-data)) (err ERR_UNAUTHORIZED))
+            ;; Call compliance-manager to update status
+            (try! (contract-call? .compliance-manager check-user-compliance user false kyc-level false))
+            (print {
+                event: "kyc-verified",
+                user: user,
+                provider: tx-sender,
+                kyc-level: kyc-level,
+                timestamp: stacks-block-time
+            })
+            (ok true)
+        )
+    )
+)
+
+(define-read-only (get-kyc-provider (provider principal))
+    (map-get? kyc-providers provider)
+)
+
+(define-read-only (is-active-provider (provider principal))
+    (match (map-get? kyc-providers provider)
+        data (get active data)
+        false
     )
 )
 

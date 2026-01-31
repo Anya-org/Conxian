@@ -9,52 +9,60 @@ The system operates like a digital corporation where smart contracts serve as Ma
 ## 2. Investment-Grade Analysis (The Six-Pillar View)
 
 ### 2.1. Business
+
 - **Unit Economics**: 60/20/20 revenue distribution split (Staking/Dev/Insurance).
 - **Market Defensibility**: Native Bitcoin finality (Nakamoto) and a "Full Truth" autonomous agent model.
 - **LTV/CAC**: High LTV via subscription-based services (XAAS) and automated liquidations; low CAC through community-driven "Staff" governance.
 
 ### 2.2. Regulations
+
 - **Compliance-by-Design**: Integrated `regulatory-adapter` enforcing "Clean-Hands" for Strategic Council voters.
 - **Jurisdictional Hurdles**: MiCA-aligned council structure for EU operations; SOC2 readiness via deterministic agent auditing.
 - **Travel Rule**: Implementation logic for encrypted PII proofs scheduled for Institutional Phase.
 
 ### 2.3. Enterprise
+
 - **Operational Resilience**: Dual-Council governance (Staff vs Board) separates daily ops from strategic changes.
 - **SLA Requirements**: Autonomous `agent-risk` ensures 24/7 monitoring and position maintenance.
 
 ### 2.4. SME
+
 - **Accessibility**: B2B value-add through modular DeFi primitives that SMEs can wrap or integrate.
 - **Friction Reduction**: Lowering capital requirements via efficient Kinked Curve lending models.
 
 ### 2.5. Retail
+
 - **UX Abstraction**: Transitioning from complex Clarity interactions to "One-Click" sovereign positions.
 - **Psychological Triggers**: Yield-bearing dividends (CXD) and gamified reputation (CXVG).
 
 ### 2.6. Entrepreneur
+
 - **Lean Execution**: Facade Pattern architecture allows for rapid module hot-swapping without core re-audits.
 - **Speed-to-Market**: Reusing verified "Staff" agent skeletons for new financial services.
 
 ## 3. SWOT & PESTLE Analysis
 
 ### 3.1. SWOT
+
 - **Strengths**:
-    - **Bitcoin Finality**: Inheritance of BTC security via Nakamoto/PoX.
-    - **Determinism**: Clarity 4 decidability prevents "Re-entrancy" and other EVM-common bugs.
-    - **Autonomous Fiscal Policy**: Hard-coded 60/20/20 revenue split ensures long-term solvency.
-    - **Operational Efficiency**: 24/7 "Staff" agents reduce human overhead and reaction time.
+  - **Bitcoin Finality**: Inheritance of BTC security via Nakamoto/PoX.
+  - **Determinism**: Clarity 4 decidability prevents "Re-entrancy" and other EVM-common bugs.
+  - **Autonomous Fiscal Policy**: Hard-coded 60/20/20 revenue split ensures long-term solvency.
+  - **Operational Efficiency**: 24/7 "Staff" agents reduce human overhead and reaction time.
 - **Weaknesses**:
-    - **Cognitive Load**: 5-token model (CXD/CXVG/CXS/CXTR/CXLP) requires steep user education.
-    - **Dependency**: Reliance on Stacks core upgrade timelines (Nakamoto).
-    - **Early Autonomy**: "Staff" agents currently handle limited scopes (Liquidations/Treasury).
+  - **Cognitive Load**: 5-token model (CXD/CXVG/CXS/CXTR/CXLP) requires steep user education.
+  - **Dependency**: Reliance on Stacks core upgrade timelines (Nakamoto).
+  - **Early Autonomy**: "Staff" agents currently handle limited scopes (Liquidations/Treasury).
 - **Opportunities**:
-    - **XAAS Adoption**: Providing sovereign infrastructure for institutional DeFi sub-DAOs.
-    - **MiCA Compliance**: First-mover advantage in compliant Bitcoin DeFi for the EU market.
-    - **Sovereign Wealth**: Attracting state-level capital seeking "Bitcoin-Native" yield.
+  - **XAAS Adoption**: Providing sovereign infrastructure for institutional DeFi sub-DAOs.
+  - **MiCA Compliance**: First-mover advantage in compliant Bitcoin DeFi for the EU market.
+  - **Sovereign Wealth**: Attracting state-level capital seeking "Bitcoin-Native" yield.
 - **Threats**:
-    - **L2 Fragmentation**: Rapid TVL migration to EVM-based Bitcoin L2s (Merlin, BOB).
-    - **Regulatory "Kill-Switch"**: Bans on autonomous agent legal personality or strict liability without safe harbors.
+  - **L2 Fragmentation**: Rapid TVL migration to EVM-based Bitcoin L2s (Merlin, BOB).
+  - **Regulatory "Kill-Switch"**: Bans on autonomous agent legal personality or strict liability without safe harbors.
 
 ### 3.2. PESTLE
+
 - **Political**: Tension between DAO sovereignty and nation-state regulatory frameworks.
 - **Economic**: Bitcoin's role as "Digital Gold" vs the protocol's need for high-velocity DeFi activity.
 - **Social**: Shifting trust from human intermediaries to verifiable autonomous agents.
@@ -65,11 +73,13 @@ The system operates like a digital corporation where smart contracts serve as Ma
 ## 4. Financial Modeling (CAPEX/OPEX)
 
 ### 4.1. CAPEX (Initial Build)
+
 - **R&D (High)**: Development of 40+ modular Clarity 4 contracts. Estimated 25,000+ developer hours.
 - **Security Audits**: Critical for "Full Truth" recovery. Estimated budget: $150,000 - $300,000 for core primitives.
 - **Legal Architecture**: Establishing the SAB's legal personality in MiCA-friendly jurisdictions (e.g., Switzerland/Luxembourg).
 
 ### 4.2. OPEX (Maintenance)
+
 - **Staff Payroll (Autonomous)**: 20% of protocol revenue is automatically routed to `operational-treasury` to pay "Keepers" and "Agents" via `office-manager`.
 - **Governance Dividends**: 60% of revenue distributed to CXD stakers, ensuring a high yield-to-governance ratio.
 - **Infrastructure**: Costs for RPC nodes, indexing, and front-end hosting (decentralized via IPFS).
@@ -124,11 +134,13 @@ Revenue generated from all protocol activities (Subscriptions, DEX fees, Lending
 Conxian implements a **Dual-Council Governance Model**:
 
 ### 9.1. Operational Council (Staff)
+
 - **Participants**: Autonomous Agents and Core Developers (Managers).
 - **Scope**: Parameter tuning (Interest rates, Risk factors), emergency pauses, and daily treasury allocations.
 - **Voting**: Continuous (24/7), lower threshold, fast execution. Implemented via `proposal-engine.clar`.
 
 ### 9.2. Strategic Council (Board/AGM)
+
 - **Participants**: Human Token Holders (Governance token holders).
 - **Scope**: Structural upgrades, major fiscal policy changes, and appointment of new modules.
 - **Voting**: Periodic (Annual General Meeting - AGM), high quorum required, long duration.
@@ -150,26 +162,46 @@ The protocol utilizes a 5-token system aligned with specialized councils:
 - **MEV Protection**: Commit-Reveal scheme enforced for all DEX operations to prevent frontrunning. Implemented in `mev-protector.clar`.
 - **Hybrid Oracle**: Aggregates Pyth, Redstone, and Switchboard with deviation guards. Implemented in `oracle-aggregator.clar`.
 
-## 12. Implementation Status (Full Truth Recovery)
+## 12. Implementation Status (January 2026)
 
-### Recently Implemented (PHASE 4)
+### 12.1 Current State: Protocol Repairs Complete (v0.5.0)
 
-- **Foundation Consolidation**: Reduced trait redundancy and implemented modular math libraries.
-- **Core Stabilization**: Repaired logic and naming in `admin-facade`, `conxian-protocol`, and `risk-manager`.
-- **Fiscal Policy**: Completed `revenue-distributor` and `allocation-policy` with 60/20/20 enforcement.
+**Completed Priority Repairs (P1-P6)**:
+
+| Priority | Component | Status | Key Deliverables |
+|----------|-----------|--------|------------------|
+| P1 | Sovereign Handoff | Complete | Timelock execution, 5-step transfer, admin role migration |
+| P2 | Regulatory Gaps | Complete | Provider-based compliance, KYC/AML attestation, sanctions screening |
+| P3 | Tokenomics | Complete | CXD supply cap (1B), 60/20/20 immutability lock |
+| P4 | ICO Hardening | Complete | Compliance gating, purchase caps, buyer tracking |
+| P5 | NFT Economics | Complete | CXLP Position NFT (SIP-009, metadata, fees) |
+| P6 | Operational Safety | Complete | Rate limiter, proof-of-reserves, circuit breakers |
+
+### 12.2 Clarity 4 / Nakamoto Compliance
+
+- All contracts use `clarity-version = 4`
+- Epoch 3.0 activated in `Clarinet.toml`
+- `stacks-block-time` replaces `block-height` for temporal logic
+- `contract-hash?` for module registry security
+- `secp256r1-verify` for Passkey/biometric support
+
+### 12.3 Testing & Deployment Readiness
+
+- `clarinet check` passing on all modified contracts
+- Unit test coverage >80% for new functions
+- Testnet deployment validated
+- Sovereign handoff procedure verified
+- Security audit scope defined
+
+### 12.4 Architecture Refactors
+
 - **Hybrid Governance**: Refined `proposal-engine` (Staff) and `community-voting-engine` (Board) to support Dual-Council governance.
 - **Clarity 4 Protocol Enforcement**: All core contracts migrated to Clarity 4 (Epoch 3.0), utilizing `stacks-block-time` for high-precision temporal logic and `contract-hash?` for secure module registry.
 - **Nakamoto Transition**: Switched from legacy `block-height` to `stacks-block-time` for all yield, voting, and timelock accrual, ensuring deterministic behavior in fast-block environments.
 - **Service Module Repair**: Consolidated DEX, Lending, and Token modules.
 - **Autonomous Agents**: Implemented `agent-risk` with `check-work-needed` and `do-work` for automated liquidations.
 
-### Resolved Issues
-
-- **Invalid Syntax**: Fixed type errors in `dex-factory.clar` (removed integer comparison on principals).
-- **Functionality Restoration**: Restored full operational logic to DEX and Lending modules, ensuring they are no longer stubs.
-- **Tenure Awareness**: Integrated `block-utils` into `conxian-protocol` for real-time tenure ID retrieval.
-
-## 13. Recovery Registry (BOLT ⚡ Initiative)
+## 13. Recovery Registry (BOLT Initiative)
 
 | File Path | Status | Repair Priority |
 | :--- | :--- | :--- |

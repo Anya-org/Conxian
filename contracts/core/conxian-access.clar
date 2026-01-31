@@ -85,6 +85,27 @@
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (var-set contract-owner new-owner)
+    (print {
+      event: "owner-changed",
+      old-owner: tx-sender,
+      new-owner: new-owner,
+      timestamp: stacks-block-time
+    })
+    (ok true)
+  )
+)
+
+;; Sovereign Handoff: Transfer ownership to timelock
+(define-public (transfer-ownership-to-timelock)
+  (begin
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (var-set contract-owner .timelock)
+    (print {
+      event: "sovereign-handoff",
+      module: "conxian-access",
+      new-owner: .timelock,
+      timestamp: stacks-block-time
+    })
     (ok true)
   )
 )
