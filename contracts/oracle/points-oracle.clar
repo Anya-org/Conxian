@@ -14,7 +14,7 @@
 ;; Points system parameters
 (define-constant POINTS_PRECISION u1000000) ;; 6 decimal places
 (define-constant MAX_POINTS_PER_TRANSACTION u100000000) ;; 100 points max
-(define-constant POINTS_EXPIRY_BLOCKS u10080) ;; 1 day expiry
+(define-constant POINTS_EXPIRY_SECONDS u86400) ;; 1 day expiry
 (define-constant MIN_POINTS_THRESHOLD u1000) ;; Minimum points for rewards
 (define-constant POINTS_DECAY_RATE u100) ;; 0.01% decay per block
 
@@ -39,7 +39,7 @@
   burned: uint,
   last-activity: uint,
   points-tier: uint,
-  expiry-block: uint
+  expiry-time: uint
 })
 
 (define-map points-transactions { tx-id: (buff 32) } { 
@@ -90,7 +90,7 @@
     burned: u0,
     last-activity: u0,
     points-tier: u0,
-    expiry-block: u0
+    expiry-time: u0
   } (map-get? user-points { user: user })))
 )
 
@@ -167,16 +167,16 @@
           balance: (+ current-balance amount),
           earned: (+ current-earned amount),
           burned: (get burned current-points),
-          last-activity: block-height,
+          last-activity: stacks-block-time,
           points-tier: current-tier,
-          expiry-block: (+ block-height POINTS_EXPIRY_BLOCKS)
+          expiry-time: (+ stacks-block-time POINTS_EXPIRY_SECONDS)
         })
         
         ;; Update totals
         (var-set total-points-issued (+ (var-get total-points-issued) amount))
         
         ;; Emit event
-        (map-set points-earned { event-id: block-height } { user: user, amount: amount, source: source })
+        (map-set points-earned { event-id: stacks-block-time } { user: user, amount: amount, source: source })
         
         (ok {
           new-balance: (+ current-balance amount),
@@ -207,16 +207,16 @@
           balance: (- current-balance amount),
           earned: (get earned current-points),
           burned: (+ current-burned amount),
-          last-activity: block-height,
+          last-activity: stacks-block-time,
           points-tier: (unwrap-panic (calculate-user-tier tx-sender)),
-          expiry-block: (get expiry-block current-points)
+          expiry-time: (get expiry-time current-points)
         })
         
         ;; Update totals
         (var-set total-points-burned (+ (var-get total-points-burned) amount))
         
         ;; Emit event
-        (map-set points-burned { event-id: block-height } { user: tx-sender, amount: amount, reason: reason })
+        (map-set points-burned { event-id: stacks-block-time } { user: tx-sender, amount: amount, reason: reason })
         
         (ok {
           new-balance: (- current-balance amount),
@@ -247,9 +247,9 @@
           balance: (- sender-balance amount),
           earned: (get earned sender-points),
           burned: (get burned sender-points),
-          last-activity: block-height,
+          last-activity: stacks-block-time,
           points-tier: (unwrap-panic (calculate-user-tier tx-sender)),
-          expiry-block: (get expiry-block sender-points)
+          expiry-time: (get expiry-time sender-points)
         })
         
         ;; Update receiver points
@@ -259,9 +259,9 @@
             balance: (+ receiver-balance amount),
             earned: (get earned receiver-points),
             burned: (get burned receiver-points),
-            last-activity: block-height,
+            last-activity: stacks-block-time,
             points-tier: (unwrap-panic (calculate-user-tier to)),
-            expiry-block: (+ block-height POINTS_EXPIRY_BLOCKS)
+            expiry-time: (+ stacks-block-time POINTS_EXPIRY_SECONDS)
           })
         
         ;; Record transaction
@@ -270,14 +270,14 @@
             from: tx-sender,
             to: to,
             amount: amount,
-            timestamp: block-height,
+            timestamp: stacks-block-time,
             transaction-type: "transfer",
             metadata: none
           })
         )
         
         ;; Emit event
-        (map-set points-transferred { event-id: block-height } { from: tx-sender, to: to, amount: amount })
+        (map-set points-transferred { event-id: stacks-block-time } { from: tx-sender, to: to, amount: amount })
         
         (ok {
           sender-balance: (- sender-balance amount),
@@ -325,7 +325,7 @@
                   ;; Update user reward claim
                   (let ((current-claims (if (is-some user-claim) (get claim-count (unwrap! user-claim (err ERR_POINTS_NOT_AVAILABLE))) u0)))
                     (map-set user-rewards { user: tx-sender, reward-id: reward-id } {
-                      claimed-at: block-height,
+                      claimed-at: stacks-block-time,
                       claim-count: (+ current-claims u1)
                     })
                   )
@@ -342,7 +342,7 @@
                   })
                   
                   ;; Emit event
-                  (map-set reward-claimed { event-id: block-height } { user: tx-sender, reward-id: reward-id, cost: (get points-cost reward) })
+                  (map-set reward-claimed { event-id: stacks-block-time } { user: tx-sender, reward-id: reward-id, cost: (get points-cost reward) })
                   
                   (ok {
                     reward-name: (get name reward),
@@ -365,7 +365,7 @@
     (asserts! (var-get points-decay-enabled) (err ERR_POINTS_NOT_AVAILABLE))
     
     ;; Only run decay if enough blocks have passed
-    (asserts! (>= (- block-height (var-get last-decay-block)) u100) (err ERR_POINTS_NOT_AVAILABLE))
+    (asserts! (>= (- stacks-block-time (var-get last-decay-block)) u100) (err ERR_POINTS_NOT_AVAILABLE))
     
     ;; Apply decay to all users (simplified - would need proper iteration)
     (let ((decay-applied u0))
@@ -373,7 +373,7 @@
       ;; Simplified implementation
       
       ;; Update last decay block
-      (var-set last-decay-block block-height)
+      (var-set last-decay-block stacks-block-time)
       
       (ok decay-applied)
     )
@@ -468,9 +468,9 @@
       balance: u0,
       earned: u0,
       burned: u0,
-      last-activity: block-height,
+      last-activity: stacks-block-time,
       points-tier: u0,
-      expiry-block: u0
+      expiry-time: u0
     })
     
     (ok true)

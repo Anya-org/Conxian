@@ -31,7 +31,7 @@
       owner: sender,
       pool: pool,
       amount: amount,
-      created: block-height,
+      created: stacks-block-time,
     })
     (var-set position-nonce id)
     (ok id)

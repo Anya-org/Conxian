@@ -14,9 +14,9 @@
   (/ block-height BLOCKS_PER_TENURE)
 )
 
-;; Read-only: Get Current Stacks Block Time (Clarity 4 compatible)
+;; Read-only: Get Current Stacks Block Time (Clarity 4 native)
 (define-read-only (get-stacks-block-time)
-  (default-to u0 (get-block-info? time block-height))
+  stacks-block-time
 )
 
 ;; Read-only: Get Tenure Info
@@ -39,10 +39,10 @@
   (< (get-blocks-in-current-tenure) u5)
 )
 
-;; Read-only: Get Bitcoin Confirmations
+;; Read-only: Get Bitcoin Confirmations (Native Nakamoto)
 (define-read-only (get-bitcoin-confirmations (target-burn-height uint))
-    (if (>= block-height target-burn-height)
-        (ok (- block-height target-burn-height))
+    (if (>= burn-block-height target-burn-height)
+        (ok (- burn-block-height target-burn-height))
         (ok u0)
     )
 )

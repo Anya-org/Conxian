@@ -74,7 +74,7 @@
         pool-size: pool-size,
         allocated-slots: u0,
         free-slots: pool-size,
-        last-cleanup: block-height,
+        last-cleanup: stacks-block-time,
         pool-type: pool-type
       })
       
@@ -100,8 +100,8 @@
         (map-set memory-allocations { pool-id: pool-id, slot-id: slot-id } {
           allocated-to: tx-sender,
           allocation-size: allocation-size,
-          allocation-time: block-height,
-          last-access: block-height,
+          allocation-time: stacks-block-time,
+          last-access: stacks-block-time,
           data: initial-data
         })
         

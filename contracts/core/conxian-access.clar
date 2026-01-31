@@ -93,9 +93,9 @@
   (ok (var-get contract-owner))
 )
 
-;; Read-only: Verify Passkey/Biometric Signature (Clarity 4 stub)
+;; Read-only: Verify Passkey/Biometric Signature (Clarity 4 Native)
 (define-read-only (verify-passkey-signature (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
-  (ok true)
+  (ok (secp256r1-verify message signature public-key))
 )
 
 ;; Read-only: Global Admin Check

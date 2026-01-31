@@ -9,7 +9,7 @@
 (define-constant ERR_NO_ALLOCATION u1002)
 
 ;; Vesting Schedule (using block height)
-(define-constant VESTING_START block-height)
+(define-constant VESTING_START stacks-block-time)
 (define-data-var conxian-protocol-contract principal .conxian-protocol)
 (define-data-var nakamoto-constants-contract principal .nakamoto-constants)
 
@@ -77,8 +77,8 @@
 
 (define-read-only (calculate-vested (total uint))
   (let ((vesting-duration (unwrap-panic (get-vesting-duration))))
-    (if (>= block-height (+ VESTING_START vesting-duration))
+    (if (>= stacks-block-time (+ VESTING_START vesting-duration))
       total
-      (/ (* total (- block-height VESTING_START)) vesting-duration)
+      (/ (* total (- stacks-block-time VESTING_START)) vesting-duration)
     ))
 )

@@ -71,8 +71,8 @@
     (match (map-get? position-health position-id)
       health-data
       (begin
-        ;; Return cached value if fresh (within 10 blocks)
-        (if (< (- block-height (get last-update health-data)) u10)
+        ;; Return cached value if fresh (within 600 seconds / 10 mins)
+        (if (< (- stacks-block-time (get last-update health-data)) u600)
           (ok (get health-factor health-data))
           ;; Calculate new if not cached
           (let ((new-hf (calculate-health-factor (get collateral-value health-data)
@@ -82,7 +82,7 @@
               health-factor: new-hf,
               collateral-value: (get collateral-value health-data),
               debt-value: (get debt-value health-data),
-              last-update: block-height,
+              last-update: stacks-block-time,
             })
             (ok new-hf)
           )
@@ -108,7 +108,7 @@
         health-factor: health-factor,
         collateral-value: collateral-value,
         debt-value: debt-value,
-        last-update: block-height,
+        last-update: stacks-block-time,
       })
       (ok health-factor)
     )
@@ -147,7 +147,7 @@
       health-factor: u10000,
       collateral-value: (default-to u0 (element-at collateral-values u0)),
       debt-value: (default-to u0 (element-at debt-values u0)),
-      last-update: block-height,
+      last-update: stacks-block-time,
     })
     (ok true)
   )
@@ -165,7 +165,7 @@
     (map-set asset-collateral-factors asset {
       factor: factor,
       volatility-adjustment: volatility-adjustment,
-      last-adjustment: block-height,
+      last-adjustment: stacks-block-time,
     })
     
     (ok true)

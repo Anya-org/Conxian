@@ -35,9 +35,11 @@ As of January 20, 2026, the Conxian Protocol (SAXDaaP) has successfully complete
 | **Validation** | **Immutable** | `contract-hash?` used to verify module contract code on-chain. |
 
 ## 4. Brutally Honest Investment Risks (Residual)
-1. **Infrastructure Lag**: While the protocol logic is ready for 2026, external RPC providers and indexers may still experience latency in processing Clarity 4 high-velocity events.
-2. **Oracle Dependency**: The protocol remains dependent on the latency of external oracle adapters (Pyth/Redstone) for its `stacks-block-time` price points.
-3. **Regulatory Evolution**: While compliant with 2024-2025 MiCA/DAC8, the "Jan 2026" landscape may introduce new requirements for AI-agent legal personality.
+1. **Infrastructure Lag**: While the protocol logic is ready for 2026, external RPC providers and indexers may still experience latency in processing Clarity 4 high-velocity events. This could lead to "Shadow States" where the contract is ahead of the UI.
+2. **Oracle Dependency**: The protocol remains dependent on the latency of external oracle adapters (Pyth/Redstone) for its `stacks-block-time` price points. A failure in oracle second-precision updates could trigger cascading liquidations.
+3. **Regulatory Evolution**: While compliant with 2024-2025 MiCA/DAC8, the "Jan 2026" landscape may introduce new requirements for AI-agent legal personality, potentially forcing a transition from "Staff" agents to "Legal Representative" proxies.
+4. **Governance Apathy**: The move to second-precision may increase the velocity of operational proposals, potentially overwhelming human "Board" members and leading to "Staff" agent capture (Autonomous Agency Risk).
+5. **Fixed Fiscal Policy Rigidness**: The hard-coded 60/20/20 split, while a strength for certainty, lacks the flexibility to pivot during extreme "Black Swan" events where the Insurance Fund might require 100% of revenue to maintain solvency.
 
 ## 5. Conclusion
 The SAXDaaP platform is now technically superior to legacy Bitcoin DeFi. The refactor to Clarity 4 is **COMPLETE** and verified against the Jan 2026 Sovereign standard.

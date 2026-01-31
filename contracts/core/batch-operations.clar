@@ -76,7 +76,7 @@
           batch-id: actual-batch-id,
           operations-count: (len operations),
           result: result,
-          timestamp: block-height,
+          timestamp: stacks-block-time,
         })
 
         result
@@ -219,7 +219,7 @@
       success-count: (extract-success-count results),
       failure-count: (extract-failure-count results),
       gas-used: (- end-gas start-gas),
-      timestamp: block-height,
+      timestamp: stacks-block-time,
     })
 
     results
@@ -392,7 +392,7 @@
 )
 
 (define-private (get-current-gas-used)
-  block-height
+  stacks-block-time
   ;; Simplified - in real implementation would track gas usage
 )
 

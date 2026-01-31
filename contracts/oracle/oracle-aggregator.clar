@@ -39,12 +39,12 @@
   count: uint
 })
 
-(define-private (get-block-height)
-  block-height
+(define-private (get-stacks-block-time)
+  stacks-block-time
 )
 
 (define-private (is-stale (updated-at uint))
-  (let ((current-height (get-block-height)))
+  (let ((current-height (get-stacks-block-time)))
     (>= (- current-height updated-at) (var-get stale-threshold-blocks)))
 )
 
@@ -107,7 +107,7 @@
     (try! (check-circuit-breaker))
     (asserts! (and (>= price MIN_PRICE) (<= price MAX_PRICE)) (err ERR_INVALID_PRICE))
     (let ((alpha (var-get twap-alpha-bps))
-          (current-timestamp (get-block-height)))
+          (current-timestamp (get-stacks-block-time)))
       (begin
       (match (map-get? asset-sources { asset: asset })
         entry
@@ -190,7 +190,7 @@
       (let ((cb (check-circuit-breaker)))
         (match cb
           okv
-            (let ((age (- (get-block-height) (get updated-at entry)))
+            (let ((age (- (get-stacks-block-time) (get updated-at entry)))
                   (stale (>= age (var-get stale-threshold-blocks))))
               (if (or stale (is-manipulated asset))
                 (ok (get twap entry))
@@ -214,7 +214,7 @@
 (define-read-only (get-twap (asset principal))
   (match (map-get? asset-twap-data { asset: asset })
     twap-data
-      (let ((time-diff (- (get-block-height) (get last-timestamp twap-data)))
+      (let ((time-diff (- (get-stacks-block-time) (get last-timestamp twap-data)))
             (last-price (get price (unwrap-panic (map-get? asset-sources { asset: asset })))))
         (if (is-eq time-diff u0)
           (ok last-price)
