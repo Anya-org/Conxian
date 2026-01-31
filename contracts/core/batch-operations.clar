@@ -239,12 +239,11 @@
   (match accumulator
     success (begin
       (match (try-execute-operation operation)
-        success-count (ok (+ success-count success-count))
-        failure-count (ok success-count)
+        success-count (ok (+ success success-count))
+        failure-count (ok success)
       )
     )
-    error
-    error
+    error (err error)
   )
 )
 
