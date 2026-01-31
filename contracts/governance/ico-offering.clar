@@ -42,7 +42,7 @@
         buyer: buyer,
         amount: amount,
         cost: cost,
-        timestamp: stacks-block-time
+        timestamp: burn-block-height
     })
 )
 
@@ -102,7 +102,7 @@
         (print {
             event: "ico-sale-state-changed",
             active: active,
-            timestamp: stacks-block-time
+            timestamp: burn-block-height
         })
         (ok true)
     )

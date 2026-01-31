@@ -53,7 +53,7 @@
         event: "reserves-updated",
         asset: asset,
         amount: amount,
-        timestamp: stacks-block-time
+        timestamp: burn-block-height
     })
 )
 
@@ -63,7 +63,7 @@
         asset: asset,
         attestor: attestor,
         amount: amount,
-        timestamp: stacks-block-time
+        timestamp: burn-block-height
     })
 )
 
@@ -84,7 +84,7 @@
         (print {
             event: "attestor-added",
             attestor: attestor,
-            timestamp: stacks-block-time
+            timestamp: burn-block-height
         })
         (ok true)
     )
@@ -98,7 +98,7 @@
         (print {
             event: "attestor-removed",
             attestor: attestor,
-            timestamp: stacks-block-time
+            timestamp: burn-block-height
         })
         (ok true)
     )
@@ -111,7 +111,7 @@
     (signature (buff 64))
   )
     (let (
-        (current-time stacks-block-time)
+        (current-time burn-block-height)
         (attestor tx-sender)
       )
         ;; Verify attestor is authorized
@@ -162,14 +162,14 @@
             (map-set asset-reserves asset-principal (merge existing-data {
                 on-chain-balance: balance,
                 total-supply: total-supply,
-                last-update: stacks-block-time
+                last-update: burn-block-height
             }))
             ;; First sync for this asset
             (map-set asset-reserves asset-principal {
                 total-supply: total-supply,
                 on-chain-balance: balance,
                 off-chain-backing: u0,
-                last-update: stacks-block-time,
+                last-update: burn-block-height,
                 attestation-count: u0
             })
         )
@@ -186,7 +186,7 @@
         (and
             (>= (get off-chain-backing data) (get total-supply data))
             (>= (get attestation-count data) MIN_ATTESTATIONS)
-            (< (- stacks-block-time (get last-update data)) PROOF_VALIDITY_PERIOD)
+            (< (- burn-block-height (get last-update data)) PROOF_VALIDITY_PERIOD)
         )
         false
     )
@@ -244,7 +244,7 @@
             reserve-ratio: (get-reserve-ratio asset),
             attestation-count: (get attestation-count data),
             last-update: (get last-update data),
-            is-stale: (> (- stacks-block-time (get last-update data)) PROOF_VALIDITY_PERIOD)
+            is-stale: (> (- burn-block-height (get last-update data)) PROOF_VALIDITY_PERIOD)
         }
         {
             fully-backed: false,

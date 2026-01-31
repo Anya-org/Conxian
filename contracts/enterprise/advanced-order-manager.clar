@@ -72,7 +72,7 @@
         (amount-per-leg (/ (get remaining-amount order) (get intervals-left order)))
     )
         (asserts! (is-eq (get status order) "active") (err ERR_ORDER_EXPIRED))
-        (asserts! (>= stacks-block-time (+ (get last-execution-block order) (get blocks-between order))) (err ERR_INVALID_PARAMS))
+        (asserts! (>= burn-block-height (+ (get last-execution-block order) (get blocks-between order))) (err ERR_INVALID_PARAMS))
         (asserts! (is-eq (get token-in order) (contract-of token-in)) (err ERR_INVALID_PARAMS))
 
         ;; Execution logic (calling the DEX router)
@@ -82,7 +82,7 @@
         (map-set twap-orders order-id (merge order {
             remaining-amount: (- (get remaining-amount order) amount-per-leg),
             intervals-left: (- (get intervals-left order) u1),
-            last-execution-block: stacks-block-time,
+            last-execution-block: burn-block-height,
             status: (if (is-eq (get intervals-left order) u1) "completed" "active")
         }))
 

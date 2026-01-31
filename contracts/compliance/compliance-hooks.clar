@@ -52,13 +52,13 @@
         (map-set kyc-providers provider {
             active: true,
             name: name,
-            registered-at: stacks-block-time
+            registered-at: burn-block-height
         })
         (print {
             event: "kyc-provider-added",
             provider: provider,
             name: name,
-            timestamp: stacks-block-time
+            timestamp: burn-block-height
         })
         (ok true)
     )
@@ -72,7 +72,7 @@
         (print {
             event: "kyc-provider-removed",
             provider: provider,
-            timestamp: stacks-block-time
+            timestamp: burn-block-height
         })
         (ok true)
     )
@@ -90,7 +90,7 @@
                 user: user,
                 provider: tx-sender,
                 kyc-level: kyc-level,
-                timestamp: stacks-block-time
+                timestamp: burn-block-height
             })
             (ok true)
         )

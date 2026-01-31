@@ -15,8 +15,8 @@
 )
 
 ;; Read-only: Get Current Stacks Block Time (Clarity 4 native)
-(define-read-only (get-stacks-block-time)
-  stacks-block-time
+(define-read-only (get-burn-block-height)
+  burn-block-height
 )
 
 ;; Read-only: Get Tenure Info
@@ -25,7 +25,7 @@
         tenure-id: (get-current-tenure-id),
         block-height: block-height,
         stacks-block-height: block-height,
-        block-time: (get-stacks-block-time)
+        block-time: (get-burn-block-height)
     })
 )
 

@@ -167,16 +167,16 @@
           balance: (+ current-balance amount),
           earned: (+ current-earned amount),
           burned: (get burned current-points),
-          last-activity: stacks-block-time,
+          last-activity: burn-block-height,
           points-tier: current-tier,
-          expiry-time: (+ stacks-block-time POINTS_EXPIRY_SECONDS)
+          expiry-time: (+ burn-block-height POINTS_EXPIRY_SECONDS)
         })
         
         ;; Update totals
         (var-set total-points-issued (+ (var-get total-points-issued) amount))
         
         ;; Emit event
-        (map-set points-earned { event-id: stacks-block-time } { user: user, amount: amount, source: source })
+        (map-set points-earned { event-id: burn-block-height } { user: user, amount: amount, source: source })
         
         (ok {
           new-balance: (+ current-balance amount),
@@ -207,7 +207,7 @@
           balance: (- current-balance amount),
           earned: (get earned current-points),
           burned: (+ current-burned amount),
-          last-activity: stacks-block-time,
+          last-activity: burn-block-height,
           points-tier: (unwrap-panic (calculate-user-tier tx-sender)),
           expiry-time: (get expiry-time current-points)
         })
@@ -216,7 +216,7 @@
         (var-set total-points-burned (+ (var-get total-points-burned) amount))
         
         ;; Emit event
-        (map-set points-burned { event-id: stacks-block-time } { user: tx-sender, amount: amount, reason: reason })
+        (map-set points-burned { event-id: burn-block-height } { user: tx-sender, amount: amount, reason: reason })
         
         (ok {
           new-balance: (- current-balance amount),
@@ -239,50 +239,51 @@
       (let ((sender-balance (get balance sender-points))
             (receiver-points (unwrap-panic (get-user-points to))))
         
-        ;; Check sufficient balance
-        (asserts! (>= sender-balance amount) (err ERR_POINTS_NOT_AVAILABLE))
-        
-        ;; Update sender points
-        (map-set user-points { user: tx-sender } {
-          balance: (- sender-balance amount),
-          earned: (get earned sender-points),
-          burned: (get burned sender-points),
-          last-activity: stacks-block-time,
-          points-tier: (unwrap-panic (calculate-user-tier tx-sender)),
-          expiry-time: (get expiry-time sender-points)
-        })
-        
-        ;; Update receiver points
         (let ((receiver-balance (get balance receiver-points)))
+          
+          ;; Check sufficient balance
+          (asserts! (>= sender-balance amount) (err ERR_POINTS_NOT_AVAILABLE))
+          
+          ;; Update sender points
+          (map-set user-points { user: tx-sender } {
+            balance: (- sender-balance amount),
+            earned: (get earned sender-points),
+            burned: (get burned sender-points),
+            last-activity: burn-block-height,
+            points-tier: (unwrap-panic (calculate-user-tier tx-sender)),
+            expiry-time: (get expiry-time sender-points)
+          })
+          
+          ;; Update receiver points
           (map-set user-points { user: to } {
             balance: (+ receiver-balance amount),
             earned: (get earned receiver-points),
             burned: (get burned receiver-points),
-            last-activity: stacks-block-time,
+            last-activity: burn-block-height,
             points-tier: (unwrap-panic (calculate-user-tier to)),
-            expiry-time: (+ stacks-block-time POINTS_EXPIRY_SECONDS)
+            expiry-time: (+ burn-block-height POINTS_EXPIRY_SECONDS)
+          })
+          
+          ;; Record transaction
+          (let ((tx-id (sha256 0x00)))
+            (map-set points-transactions { tx-id: tx-id } {
+              from: tx-sender,
+              to: to,
+              amount: amount,
+              timestamp: burn-block-height,
+              transaction-type: "transfer",
+              metadata: none
+            })
+          )
+          
+          ;; Emit event
+          (map-set points-transferred { event-id: burn-block-height } { from: tx-sender, to: to, amount: amount })
+          
+          (ok {
+            sender-balance: (- sender-balance amount),
+            receiver-balance: (+ receiver-balance amount)
           })
         )
-        
-        ;; Record transaction
-        (let ((tx-id (sha256 0x00)))
-          (map-set points-transactions { tx-id: tx-id } {
-            from: tx-sender,
-            to: to,
-            amount: amount,
-            timestamp: stacks-block-time,
-            transaction-type: "transfer",
-            metadata: none
-          })
-        )
-        
-        ;; Emit event
-        (map-set points-transferred { event-id: stacks-block-time } { from: tx-sender, to: to, amount: amount })
-        
-        (ok {
-          sender-balance: (- sender-balance amount),
-          receiver-balance: (+ receiver-balance amount)
-        })
       )
     )
   )
@@ -323,7 +324,7 @@
                   ;; Update user reward claim
                   (let ((current-claims (if (is-some user-claim) (get claim-count (unwrap! user-claim (err ERR_POINTS_NOT_AVAILABLE))) u0)))
                     (map-set user-rewards { user: tx-sender, reward-id: reward-id } {
-                      claimed-at: stacks-block-time,
+                      claimed-at: burn-block-height,
                       claim-count: (+ current-claims u1)
                     })
                   )
@@ -340,7 +341,7 @@
                   })
                   
                   ;; Emit event
-                  (map-set reward-claimed { event-id: stacks-block-time } { user: tx-sender, reward-id: reward-id, cost: (get points-cost reward) })
+                  (map-set reward-claimed { event-id: burn-block-height } { user: tx-sender, reward-id: reward-id, cost: (get points-cost reward) })
                   
                   (ok {
                     reward-name: (get name reward),
@@ -363,7 +364,7 @@
     (asserts! (var-get points-decay-enabled) (err ERR_POINTS_NOT_AVAILABLE))
     
     ;; Only run decay if enough blocks have passed
-    (asserts! (>= (- stacks-block-time (var-get last-decay-block)) u100) (err ERR_POINTS_NOT_AVAILABLE))
+    (asserts! (>= (- burn-block-height (var-get last-decay-block)) u100) (err ERR_POINTS_NOT_AVAILABLE))
     
     ;; Apply decay to all users (simplified - would need proper iteration)
     (let ((decay-applied u0))
@@ -371,7 +372,7 @@
       ;; Simplified implementation
       
       ;; Update last decay block
-      (var-set last-decay-block stacks-block-time)
+      (var-set last-decay-block burn-block-height)
       
       (ok decay-applied)
     )
@@ -466,7 +467,7 @@
       balance: u0,
       earned: u0,
       burned: u0,
-      last-activity: stacks-block-time,
+      last-activity: burn-block-height,
       points-tier: u0,
       expiry-time: u0
     })

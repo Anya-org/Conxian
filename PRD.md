@@ -10,6 +10,10 @@ The system operates like a digital corporation where smart contracts serve as Ma
 
 ### 2.1. Business
 
+- **Revenue Engines**:
+  - **Lending**: 10% Reserve Factor on interest spreads.
+  - **DEX**: ~1/6th Protocol Fee on swap volume.
+  - **Services**: Subscription fees for advanced tools.
 - **Unit Economics**: 60/20/20 revenue distribution split (Staking/Dev/Insurance).
 - **Market Defensibility**: Native Bitcoin finality (Nakamoto) and a "Full Truth" autonomous agent model.
 - **LTV/CAC**: High LTV via subscription-based services (XAAS) and automated liquidations; low CAC through community-driven "Staff" governance.

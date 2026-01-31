@@ -22,14 +22,26 @@ graph TD
 ## Core Contracts
 
 ### `lending-manager.clar`
+
 The central hub for all lending operations.
+
 - `deposit(...)`: Supply assets to the protocol.
 - `borrow(...)`: Withdraw assets against collateral.
 - `repay(...)`: Return borrowed assets.
+- `seize-collateral(...)`: Transfer collateral from defaulter to liquidator (Risk Manager only).
+- `collect-reserves(...)`: Sweep accumulated Protocol Revenue (Reserve Factor) to the Distributor.
+
+## Revenue Model
+
+The protocol charges a **Reserve Factor** (default 10%) on all accrued interest.
+
+- `Supplier Interest` = `Total Interest` * (1 - Reserve Factor)
+- `Protocol Revenue` = `Total Interest` * Reserve Factor
 
 ## Integration Examples
 
 ### Supplying Assets
+
 Users can supply any supported SIP-010 token to the lending pool.
 
 ```clarity
@@ -40,6 +52,7 @@ Users can supply any supported SIP-010 token to the lending pool.
 ```
 
 ### Borrowing Assets
+
 Borrowing requires sufficient collateral in the protocol.
 
 ```clarity
@@ -52,9 +65,11 @@ Borrowing requires sufficient collateral in the protocol.
 ## Testing
 
 ### Automated Tests
+
 Lending logic is verified through a suite of market simulation tests.
 
 Run lending tests:
+
 ```bash
 npm test -- tests/lending/
 ```

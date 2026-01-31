@@ -8,6 +8,7 @@
 (define-constant ERR_UNAUTHORIZED u1000)
 (define-constant ERR_INSUFFICIENT_LIQUIDITY u1002)
 (define-constant ERR_INVALID_TICK u2000)
+(define-constant PROTOCOL_FEE_SHARE u1666) ;; ~1/6th of the swap fee
 
 ;; Storage
 (define-map pools
@@ -31,6 +32,8 @@
     }
 )
 
+(define-map total-revenue principal uint)
+
 (define-data-var pool-nonce uint u0)
 
 ;; Public Functions
@@ -38,7 +41,7 @@
 (define-public (create-pool (token0 principal) (token1 principal) (fee uint) (sqrt-price uint))
   (let ((pool-id (+ (var-get pool-nonce) u1)))
     (begin
-      (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
+      (asserts! (is-eq tx-sender (unwrap-panic (contract-call? .conxian-protocol get-protocol-admin))) (err ERR_UNAUTHORIZED))
       (map-set pools pool-id {
           token0: token0,
           token1: token1,
@@ -69,11 +72,55 @@
   )
 )
 
-(define-public (swap (pool-id uint) (zero-for-one bool) (amount-in uint))
+(define-public (swap (pool-id uint) (zero-for-one bool) (amount-in uint) (token0-trait <sip-010-ft-trait>) (token1-trait <sip-010-ft-trait>))
   (let ((pool (unwrap! (map-get? pools pool-id) (err ERR_INSUFFICIENT_LIQUIDITY))))
     (begin
-      ;; Simplified constant product swap logic for stub
-      (ok amount-in)
+      (asserts! (is-eq (contract-of token0-trait) (get token0 pool)) (err ERR_UNAUTHORIZED))
+      (asserts! (is-eq (contract-of token1-trait) (get token1 pool)) (err ERR_UNAUTHORIZED))
+      
+      ;; 1. Calculate Fees
+      (let (
+        (total-fee (/ (* amount-in (get fee pool)) u1000000)) ;; Assuming fee is in ppm
+        (protocol-fee (/ (* total-fee PROTOCOL_FEE_SHARE) u10000))
+        (lp-fee (- total-fee protocol-fee))
+        (amount-out (- amount-in total-fee)) ;; Simplified 1:1 swap for stub + fee deduction
+        (token-in (if zero-for-one (get token0 pool) (get token1 pool)))
+        (token-out (if zero-for-one (get token1 pool) (get token0 pool)))
+        (token-out-trait (if zero-for-one token1-trait token0-trait))
+      )
+        ;; 2. Accrue Protocol Revenue
+        (let ((current-revenue (default-to u0 (map-get? total-revenue token-in))))
+          (map-set total-revenue token-in (+ current-revenue protocol-fee))
+        )
+
+        ;; 3. Update Pool (Add LP fee to liquidity effectively)
+        (map-set pools pool-id (merge pool { liquidity: (+ (get liquidity pool) lp-fee) }))
+
+        ;; 4. Execute Swap (Stub: just transfer in and out)
+        ;; Note: Real CPAMM logic would change sqrt-price and tick.
+        ;; This stub assumes infinite liquidity at 1:1 price for simplicity of demonstrating fee logic.
+        ;; In a real implementation, 'amount-out' would be calculated via price curve.
+        
+        ;; Transfer output tokens to user
+        (as-contract (try! (contract-call? token-out-trait transfer amount-out tx-sender tx-sender none)))
+        
+        (ok amount-out)
+      )
+    )
+  )
+)
+
+(define-public (collect-protocol-fees (token-trait <sip-010-ft-trait>))
+  (let (
+    (token (contract-of token-trait))
+    (amount (default-to u0 (map-get? total-revenue token)))
+  )
+    (begin
+      (asserts! (> amount u0) (ok true))
+      (try! (as-contract (contract-call? token-trait transfer amount (as-contract tx-sender) .revenue-distributor none)))
+      (map-set total-revenue token u0)
+      (print { event: "collect-dex-fees", token: token, amount: amount })
+      (ok true)
     )
   )
 )

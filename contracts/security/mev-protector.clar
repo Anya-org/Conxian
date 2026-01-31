@@ -19,7 +19,7 @@
 ;; @desc Commits a hash of the intended transaction
 (define-public (commit (hash (buff 32)))
   (begin
-    (map-set commits tx-sender { hash: hash, height: stacks-block-time })
+    (map-set commits tx-sender { hash: hash, height: burn-block-height })
     (ok true)
   )
 )
@@ -30,10 +30,10 @@
       (user-commit (unwrap! (map-get? commits tx-sender) (err ERR_COMMIT_NOT_FOUND)))
       (computed-hash (contract-call? .encoding hash-data (concat salt payload)))
     )
-    (asserts! (<= stacks-block-time (+ (get height user-commit) COMMIT_WINDOW)) (err ERR_COMMIT_EXPIRED))
+    (asserts! (<= burn-block-height (+ (get height user-commit) COMMIT_WINDOW)) (err ERR_COMMIT_EXPIRED))
     (asserts! (is-eq (get hash user-commit) computed-hash) (err ERR_INVALID_COMMIT))
 
-    (map-set revealed-in-block tx-sender stacks-block-time)
+    (map-set revealed-in-block tx-sender burn-block-height)
     (map-delete commits tx-sender)
     (ok payload)
   )
@@ -42,7 +42,7 @@
 (define-public (submit-bid (payload (buff 128)) (bid uint))
     (begin
         (asserts! (is-revealed tx-sender) (err ERR_COMMIT_NOT_FOUND))
-        (map-set auction-bids { block: stacks-block-time, user: tx-sender } { payload: payload, bid: bid })
+        (map-set auction-bids { block: burn-block-height, user: tx-sender } { payload: payload, bid: bid })
         (ok true)
     )
 )
@@ -58,5 +58,5 @@
 
 ;; @desc Checks if the user has revealed a valid commitment in the current block
 (define-read-only (is-revealed (user principal))
-  (is-eq (map-get? revealed-in-block user) (some stacks-block-time))
+  (is-eq (map-get? revealed-in-block user) (some burn-block-height))
 )

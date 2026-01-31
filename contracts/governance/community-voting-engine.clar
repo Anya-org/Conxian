@@ -57,7 +57,7 @@
   )
   (let (
       (proposal-id u1) ;; Use Proposal Registry in full implementation
-      (current-time stacks-block-time)
+      (current-time burn-block-height)
     )
     ;; Compliance Check
     (asserts! (check-compliance tx-sender) (err ERR_NON_COMPLIANT))
@@ -105,7 +105,7 @@
 
     ;; Validation
     (asserts!
-      (and (>= stacks-block-time (get start-time proposal)) (<= stacks-block-time (get end-time proposal)))
+      (and (>= burn-block-height (get start-time proposal)) (<= burn-block-height (get end-time proposal)))
       (err ERR_VOTING_CLOSED)
     )
     (asserts!

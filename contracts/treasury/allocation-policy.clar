@@ -9,9 +9,9 @@
 (define-constant ERR_POLICY_LOCKED u1002)
 
 ;; Default allocation: 60/20/20 split
-(define-constant DEFAULT_STAKING_SHARE uint u6000) ;; 60%
-(define-constant DEFAULT_DEV_SHARE uint u2000)     ;; 20%
-(define-constant DEFAULT_INSURANCE_SHARE uint u2000) ;; 20%
+(define-constant DEFAULT_STAKING_SHARE u6000) ;; 60%
+(define-constant DEFAULT_DEV_SHARE u2000)     ;; 20%
+(define-constant DEFAULT_INSURANCE_SHARE u2000) ;; 20%
 
 ;; Current allocations
 (define-data-var staking-share uint u6000) ;; 60%
@@ -31,7 +31,7 @@
     staking: staking,
     dev: dev,
     insurance: insurance,
-    timestamp: stacks-block-time
+    timestamp: burn-block-height
   })
 )
 
@@ -80,7 +80,7 @@
     (var-set staking-share staking)
     (var-set dev-fund-share dev)
     (var-set insurance-share insurance)
-    (var-set last-change-block stacks-block-time)
+    (var-set last-change-block burn-block-height)
     
     ;; Emit event
     (emit-allocation-changed staking dev insurance)
@@ -96,7 +96,7 @@
     (asserts! (is-timelock) (err ERR_UNAUTHORIZED))
     (asserts! (not (var-get policy-locked)) (err ERR_POLICY_LOCKED))
     (var-set policy-locked true)
-    (emit-policy-locked stacks-block-time)
+    (emit-policy-locked burn-block-height)
     (ok true)
   )
 )
@@ -109,7 +109,7 @@
     (var-set staking-share DEFAULT_STAKING_SHARE)
     (var-set dev-fund-share DEFAULT_DEV_SHARE)
     (var-set insurance-share DEFAULT_INSURANCE_SHARE)
-    (var-set last-change-block stacks-block-time)
+    (var-set last-change-block burn-block-height)
     (emit-allocation-changed DEFAULT_STAKING_SHARE DEFAULT_DEV_SHARE DEFAULT_INSURANCE_SHARE)
     (ok true)
   )

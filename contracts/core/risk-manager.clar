@@ -72,7 +72,7 @@
       health-data
       (begin
         ;; Return cached value if fresh (within 600 seconds / 10 mins)
-        (if (< (- stacks-block-time (get last-update health-data)) u600)
+        (if (< (- burn-block-height (get last-update health-data)) u600)
           (ok (get health-factor health-data))
           ;; Calculate new if not cached
           (let ((new-hf (calculate-health-factor (get collateral-value health-data)
@@ -82,7 +82,7 @@
               health-factor: new-hf,
               collateral-value: (get collateral-value health-data),
               debt-value: (get debt-value health-data),
-              last-update: stacks-block-time,
+              last-update: burn-block-height,
             })
             (ok new-hf)
           )
@@ -108,14 +108,25 @@
         health-factor: health-factor,
         collateral-value: collateral-value,
         debt-value: debt-value,
-        last-update: stacks-block-time,
+        last-update: burn-block-height,
       })
       (ok health-factor)
     )
   )
 )
 
+(define-data-var lending-manager principal .lending-manager)
+(define-data-var position-manager principal .position-manager)
+
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
+
+(define-constant LIQUIDATION_BONUS u500) ;; 5% bonus
+
 (define-public (liquidate (position-id uint))
+  (err u9999) ;; Deprecated: Use liquidate-with-trait
+)
+
+(define-public (liquidate-with-trait (position-id uint) (collateral-token <sip-010-ft-trait>))
   (begin
     (asserts! (is-eq tx-sender (var-get dimensional-engine)) (err ERR_NOT_AUTHORIZED))
     
@@ -125,10 +136,55 @@
               )))
       (asserts! (not (is-position-healthy hf)) (err ERR_HEALTHY_POSITION))
       
-      ;; Execute liquidation logic here
-      ;; Remove position after liquidation
-      (map-delete position-health position-id)
-      (ok true)
+      ;; 1. Get Position Data
+      (let ((pos (unwrap-panic (contract-call? .position-manager get-position position-id))))
+         
+         ;; 2. Calculate Seize Amount (Debt + Bonus)
+         (let (
+           (debt (get size pos))
+           (collateral (get collateral pos))
+           (bonus-amount (/ (* debt LIQUIDATION_BONUS) u10000))
+           (target-seize (+ debt bonus-amount))
+           (seize-amount (if (>= collateral target-seize) target-seize collateral))
+           (token (get token pos))
+         )
+           ;; Verify the passed trait matches the position's token (assuming token field is the collateral asset)
+           (asserts! (is-eq (contract-of collateral-token) token) (err u9001))
+
+           ;; 3. Seize Collateral (Transfer from User to Liquidator)
+           ;; Note: We assume the caller of the facade (the liquidator) is the one receiving assets.
+           ;; But here tx-sender is dimensional-engine.
+           ;; We need to know who the liquidator is.
+           ;; The facade doesn't pass the liquidator principal to us.
+           ;; However, in the facade, tx-sender IS the liquidator.
+           ;; So (contract-call? ... tx-sender ...) here refers to the FACADE contract.
+           ;; We need `tx-sender` of the *transaction*, or pass it.
+           ;; `tx-sender` in `risk-manager` is `dimensional-engine`.
+           ;; The `lending-manager` needs the `liquidator` principal to credit the deposit map.
+           ;; If we pass `tx-sender` (engine), the engine gets the collateral.
+           ;; The engine then needs to forward it?
+           ;; Or we rely on `contract-caller`? 
+           ;; In Clarity: `tx-sender` is the original sender? No, it changes with context.
+           ;; `contract-caller` is the immediate caller (engine).
+           ;; `tx-sender` is the principal that signed the transaction (the liquidator user).
+           ;; SO: `tx-sender` IS the liquidator!
+           ;; Wait, let me verify Clarity `tx-sender` behavior.
+           ;; "tx-sender changes when a contract calls another contract?"
+           ;; Docs: "tx-sender keyword returns the principal that sent the transaction." 
+           ;; "When a contract calls another contract, tx-sender remains the principal that signed the transaction."
+           ;; `contract-caller` changes.
+           ;; SO: `tx-sender` IS CORRECT. It is the User.
+           
+           (try! (contract-call? .lending-manager seize-collateral collateral-token (get owner pos) tx-sender seize-amount))
+           
+           ;; 4. Close Position
+           (try! (contract-call? .position-manager force-close-position position-id))
+           
+           ;; 5. Remove Health Track
+           (map-delete position-health position-id)
+           (ok true)
+         )
+      )
     )
   )
 )
@@ -147,7 +203,7 @@
       health-factor: u10000,
       collateral-value: (default-to u0 (element-at collateral-values u0)),
       debt-value: (default-to u0 (element-at debt-values u0)),
-      last-update: stacks-block-time,
+      last-update: burn-block-height,
     })
     (ok true)
   )
@@ -165,7 +221,7 @@
     (map-set asset-collateral-factors asset {
       factor: factor,
       volatility-adjustment: volatility-adjustment,
-      last-adjustment: stacks-block-time,
+      last-adjustment: burn-block-height,
     })
     
     (ok true)

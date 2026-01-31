@@ -79,9 +79,9 @@
       )))
     )
     ;; Assert Voting Period
-    (asserts! (>= stacks-block-time (get start-block proposal)) (err ERR_NOT_FOUND))
+    (asserts! (>= burn-block-height (get start-block proposal)) (err ERR_NOT_FOUND))
     ;; Should be (err ERR_NOT_STARTED) but reusing
-    (asserts! (< stacks-block-time (get end-block proposal)) (err ERR_PROPOSAL_ENDED))
+    (asserts! (< burn-block-height (get end-block proposal)) (err ERR_PROPOSAL_ENDED))
 
     ;; Assert Voter Power
     (asserts! (> weighted-voter-power u0) (err ERR_UNAUTHORIZED))

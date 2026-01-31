@@ -11,7 +11,7 @@
 (define-constant ERR_TIMELOCK_ACTIVE u1002)
 (define-constant ERR_NO_PENDING_OWNER u1003)
 
-(define-constant TIMELOCK_DELAY u86400) ;; 24 hours in seconds (Clarity 4 stacks-block-time)
+(define-constant TIMELOCK_DELAY u86400) ;; 24 hours in seconds (Clarity 4 burn-block-height)
 
 ;; Data Vars
 (define-data-var owner principal tx-sender)
@@ -31,7 +31,7 @@
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
         (var-set pending-owner (some new-owner))
-        (var-set transfer-delay-end (+ stacks-block-time TIMELOCK_DELAY))
+        (var-set transfer-delay-end (+ burn-block-height TIMELOCK_DELAY))
         (print { event: "ownership-transfer-requested", new-owner: new-owner, delay-end: (var-get transfer-delay-end) })
         (ok true)
     )
@@ -43,7 +43,7 @@
         (new-owner (unwrap! (var-get pending-owner) (err ERR_NO_PENDING_OWNER)))
     )
         (asserts! (is-eq tx-sender new-owner) (err ERR_UNAUTHORIZED))
-        (asserts! (>= stacks-block-time (var-get transfer-delay-end)) (err ERR_TIMELOCK_ACTIVE))
+        (asserts! (>= burn-block-height (var-get transfer-delay-end)) (err ERR_TIMELOCK_ACTIVE))
         (var-set owner new-owner)
         (var-set pending-owner none)
         (var-set transfer-delay-end u0)

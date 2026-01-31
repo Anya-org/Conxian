@@ -75,7 +75,7 @@
   )
   (let (
       (proposal-id (+ (var-get proposal-count) u1))
-      (start (+ stacks-block-time (var-get voting-delay)))
+      (start (+ burn-block-height (var-get voting-delay)))
       (end (+ start (var-get voting-period)))
       (token (var-get governance-token))
     )
@@ -126,8 +126,8 @@
       (asserts! (check-compliance voter) (err ERR_NON_COMPLIANT))
 
       ;; Validation
-      (asserts! (>= stacks-block-time (get start-block proposal)) (err ERR_PROPOSAL_ACTIVE))
-      (asserts! (<= stacks-block-time (get end-block proposal)) (err ERR_PROPOSAL_EXPIRED))
+      (asserts! (>= burn-block-height (get start-block proposal)) (err ERR_PROPOSAL_ACTIVE))
+      (asserts! (<= burn-block-height (get end-block proposal)) (err ERR_PROPOSAL_EXPIRED))
       (asserts!
         (is-none (map-get? votes {
           proposal-id: proposal-id,
@@ -173,7 +173,7 @@
 ;; Execution (Simplified for Tier 0)
 (define-public (execute (proposal-id uint))
   (let ((proposal (unwrap! (map-get? proposals proposal-id) (err ERR_PROPOSAL_NOT_FOUND))))
-    (asserts! (> stacks-block-time (get end-block proposal)) (err ERR_PROPOSAL_ACTIVE))
+    (asserts! (> burn-block-height (get end-block proposal)) (err ERR_PROPOSAL_ACTIVE))
     (asserts! (not (get executed proposal)) (err ERR_PROPOSAL_EXPIRED))
     (asserts! (> (get for-votes proposal) (get against-votes proposal))
       (err ERR_QUORUM_NOT_REACHED)

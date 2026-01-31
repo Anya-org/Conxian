@@ -45,7 +45,7 @@
         proposal: proposal,
         eta: eta,
         target: target,
-        timestamp: stacks-block-time
+        timestamp: burn-block-height
     })
 )
 
@@ -54,7 +54,7 @@
         event: "proposal-executed",
         proposal: proposal,
         target: target,
-        timestamp: stacks-block-time
+        timestamp: burn-block-height
     })
 )
 
@@ -62,7 +62,7 @@
     (print {
         event: "proposal-cancelled",
         proposal: proposal,
-        timestamp: stacks-block-time
+        timestamp: burn-block-height
     })
 )
 
@@ -94,7 +94,7 @@
         ;; Check not already queued
         (asserts! (is-none (map-get? queued-proposals proposal-principal)) (err ERR_ALREADY_EXECUTED))
         
-        (let ((eta (+ stacks-block-time (var-get delay))))
+        (let ((eta (+ burn-block-height (var-get delay))))
             (map-set queued-proposals proposal-principal {
                 eta: eta,
                 executed: false,
@@ -116,8 +116,8 @@
     )
         ;; Checks
         (asserts! (not executed) (err ERR_ALREADY_EXECUTED))
-        (asserts! (>= stacks-block-time eta) (err ERR_TOO_EARLY))
-        (asserts! (<= stacks-block-time (+ eta GRACE_PERIOD)) (err ERR_EXPIRED))
+        (asserts! (>= burn-block-height eta) (err ERR_TOO_EARLY))
+        (asserts! (<= burn-block-height (+ eta GRACE_PERIOD)) (err ERR_EXPIRED))
         (asserts! (is-eq (contract-of proposal-contract) proposal-principal) (err ERR_UNAUTHORIZED))
         
         ;; Mark as executed BEFORE calling to prevent reentrancy
@@ -152,7 +152,7 @@
             event: "admin-transferred",
             old-admin: tx-sender,
             new-admin: new-admin,
-            timestamp: stacks-block-time
+            timestamp: burn-block-height
         })
         (ok true)
     )
@@ -176,8 +176,8 @@
         proposal-data 
         (and 
             (not (get executed proposal-data))
-            (>= stacks-block-time (get eta proposal-data))
-            (<= stacks-block-time (+ (get eta proposal-data) GRACE_PERIOD))
+            (>= burn-block-height (get eta proposal-data))
+            (<= burn-block-height (+ (get eta proposal-data) GRACE_PERIOD))
         )
         false
     )
@@ -189,7 +189,7 @@
         admin: (var-get admin),
         has-valid-delay: (and (>= (var-get delay) MIN_DELAY) (<= (var-get delay) MAX_DELAY)),
         governance-contract: (var-get governance-contract),
-        timestamp: stacks-block-time
+        timestamp: burn-block-height
     }
 )
 

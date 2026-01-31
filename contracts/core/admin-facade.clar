@@ -245,7 +245,7 @@
       event: "emergency-pause",
       paused: paused,
       sender: tx-sender,
-      stacks-block-time: stacks-block-time,
+      burn-block-height: burn-block-height,
     })
     (ok true)
   )
@@ -260,7 +260,7 @@
       event: "global-admin-changed",
       old-admin: tx-sender,
       new-admin: new-admin,
-      timestamp: stacks-block-time
+      timestamp: burn-block-height
     })
     (ok true)
   )
@@ -275,7 +275,7 @@
       event: "sovereign-handoff",
       module: "admin-facade",
       new-admin: .timelock,
-      timestamp: stacks-block-time
+      timestamp: burn-block-height
     })
     (ok true)
   )

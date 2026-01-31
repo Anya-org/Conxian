@@ -32,7 +32,7 @@
   {
     token-in: principal,
     token-out: principal,
-    pools: (list 5 principal),
+    pools: (list 5 uint), ;; Changed from principal to uint for Singleton IDs
     estimated-output: uint,
     slippage: uint,
     gas-estimate: uint,
@@ -91,7 +91,7 @@
   {
     routes: (list 5 {
         route-id: (buff 32),
-        pools: (list 5 principal),
+        pools: (list 5 uint), ;; Changed from principal to uint
         estimated-output: uint,
         slippage: uint,
         confidence: uint,
@@ -253,7 +253,7 @@
                 amount-out: amount-out,
                 actual-slippage: u100,
                 gas-used: u50000,
-                timestamp: stacks-block-time,
+                timestamp: burn-block-height,
                 success: true,
                 error: none,
               })
@@ -355,7 +355,7 @@
     ;; In practice, would use graph traversal. Returning direct route stub.
     (ok {
       route-id: (sha256 0x00),
-      pools: (list ),
+      pools: (list u1), ;; Stub: Pool ID 1
       estimated-output: amount-in,
       slippage: u100,
       confidence: u9500,

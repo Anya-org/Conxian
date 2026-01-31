@@ -22,7 +22,7 @@
     recipient: recipient,
     amount: amount,
     new-total: (var-get total-supply),
-    timestamp: stacks-block-time
+    timestamp: burn-block-height
   })
 )
 
@@ -32,7 +32,7 @@
     owner: owner,
     amount: amount,
     new-total: (var-get total-supply),
-    timestamp: stacks-block-time
+    timestamp: burn-block-height
   })
 )
 

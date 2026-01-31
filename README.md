@@ -22,6 +22,11 @@ Conxian is a **Sovereign Autonomous Business (SAB)** where human discretion is r
 
 ### 💰 **Autonomous Fiscal Policy (60/20/20)**
 
+The protocol employs active **Revenue Collection** levers to fund its ecosystem:
+- **Lending**: 10% Reserve Factor on all borrow interest.
+- **DEX**: ~16% Protocol Fee on all swaps.
+- **Subscription**: Governance-tuned access fees.
+
 Total revenue is automatically distributed:
 - **60% Staking**: Rewards to `cxd-staking` participants.
 - **20% Operational Treasury**: Protocol development and autonomous staff expenses.
@@ -29,7 +34,7 @@ Total revenue is automatically distributed:
 
 ## Technical Stack
 
-- **Clarity 4**: Nakamoto-aligned (Epoch 3.0) with `burn-block-height` and Bitcoin finality.
+- **Clarity 4**: Nakamoto-aligned (Epoch 3.0) utilizing `stacks-block-time` for high-precision logic and `burn-block-height` for Bitcoin anchoring.
 - **Tenure Awareness**: Logic is aware of Stacks block tenures via `block-utils` for deterministic execution.
 - **Facade Pattern**: All core logic accessed via dimensional facades and consolidated traits.
 - **Hybrid Oracle**: Aggregated Pyth, Redstone, and Switchboard feeds with deviation guards.

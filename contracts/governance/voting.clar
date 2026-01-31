@@ -46,7 +46,7 @@
         )
         
         ;; Ensure start time is in the future
-        (asserts! (> start-time stacks-block-time) (err ERR_START_TIME_IN_PAST))
+        (asserts! (> start-time burn-block-height) (err ERR_START_TIME_IN_PAST))
         
         (map-set proposals proposal-id {
             start-time: start-time,
@@ -82,8 +82,8 @@
         
         ;; Update Vote Counts (Simplified, assuming 1 vote per call for now, real logic would pull token balance)
     )
-        ;; Check if voting period is active using stacks-block-time
-        (asserts! (and (>= stacks-block-time (get start-time proposal)) (<= stacks-block-time (get end-time proposal))) (err ERR_VOTING_CLOSED))
+        ;; Check if voting period is active using burn-block-height
+        (asserts! (and (>= burn-block-height (get start-time proposal)) (<= burn-block-height (get end-time proposal))) (err ERR_VOTING_CLOSED))
         (asserts! (is-none (map-get? votes { proposal-id: proposal-id, voter: tx-sender })) (err ERR_ALREADY_VOTED))
         
         ;; User must have a seat (voting power > 0)

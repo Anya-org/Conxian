@@ -9,7 +9,7 @@
 ;; State
 (define-data-var staking-vault principal .cxd-staking)
 (define-data-var operational-treasury principal .operational-treasury)
-(define-data-var insurance-fund principal .operational-treasury)
+(define-data-var insurance-fund principal .conxian-insurance-fund)
 
 ;; Public Functions
 

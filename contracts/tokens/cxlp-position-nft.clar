@@ -49,7 +49,7 @@
         position-id: position-id,
         owner: owner,
         pool: pool,
-        timestamp: stacks-block-time
+        timestamp: burn-block-height
     })
 )
 
@@ -58,7 +58,7 @@
         event: "position-updated",
         position-id: position-id,
         liquidity: liquidity,
-        timestamp: stacks-block-time
+        timestamp: burn-block-height
     })
 )
 
@@ -121,8 +121,8 @@
             fee-growth-inside1-last: u0,
             tokens-owed0: u0,
             tokens-owed1: u0,
-            created-at: stacks-block-time,
-            last-updated: stacks-block-time
+            created-at: burn-block-height,
+            last-updated: burn-block-height
         })
         
         (var-set last-position-id new-id)

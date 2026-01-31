@@ -12,8 +12,9 @@
 
 ;; --- Data Storage ---
 (define-data-var contract-owner principal tx-sender)
+(define-data-var vesting-start uint u0)
 
-    (define-map vesting-schedules principal {
+(define-map vesting-schedules principal {
   total-amount: uint,
   start-time: uint,
   end-time: uint,
@@ -25,6 +26,7 @@
   (begin
     (asserts! (is-eq tx-sender CONTRACT_OWNER) (err ERR_UNAUTHORIZED))
     (var-set contract-owner owner)
+    (var-set vesting-start burn-block-height)
     (ok true)
   )
 )
@@ -70,11 +72,11 @@
 
 ;; --- Private Helper Functions ---
 (define-private (calculate-vested-amount (schedule {total-amount: uint, start-time: uint, end-time: uint, claimed-amount: uint}))
-  (if (< stacks-block-time (get start-time schedule))
+  (if (< burn-block-height (var-get vesting-start))
     u0
-    (if (>= stacks-block-time (get end-time schedule))
+    (if (>= burn-block-height (+ (var-get vesting-start) (- (get end-time schedule) (get start-time schedule))))
       (get total-amount schedule)
-      (/ (* (get total-amount schedule) (- stacks-block-time (get start-time schedule))) (- (get end-time schedule) (get start-time schedule)))
+      (/ (* (get total-amount schedule) (- burn-block-height (var-get vesting-start))) (- (get end-time schedule) (get start-time schedule)))
     )
   )
 )

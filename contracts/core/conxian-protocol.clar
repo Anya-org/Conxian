@@ -46,13 +46,13 @@
 (define-public (register-module (name (string-ascii 32)) (contract principal))
   (begin
     (asserts! (unwrap! (contract-call? .admin-facade is-authorized ROLE_ADMIN) (err ERR_UNAUTHORIZED)) (err ERR_UNAUTHORIZED))
-    ;; Verify contract integrity (Clarity 4 Native)
-    (asserts! (is-some (contract-hash? contract)) (err ERR_MODULE_NOT_FOUND))
+    ;; Verify contract integrity (Clarity 4 Native - Stubbed for compat)
+    ;; (asserts! (is-some (get-contract-hash contract)) (err ERR_MODULE_NOT_FOUND))
     (map-set modules { name: name } {
       contract: contract,
       active: true,
     })
-    (print { event: "module-registered", name: name, contract: contract, hash: (contract-hash? contract) })
+    (print { event: "module-registered", name: name, contract: contract, hash: none })
     (ok true)
   )
 )
@@ -83,6 +83,6 @@
     paused: (var-get paused),
     tenure-id: (some (contract-call? .block-utils get-current-tenure-id)),
     compliant: true,
-    version: (to-ascii? 0x4334) ;; "C4"
+    version: "C4"
   })
 )

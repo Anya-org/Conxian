@@ -39,7 +39,7 @@
     user: user,
     compliant: compliant,
     provider: provider,
-    timestamp: stacks-block-time
+    timestamp: burn-block-height
   })
 )
 
@@ -48,7 +48,7 @@
     event: "sanctions-detected",
     user: user,
     reason: reason,
-    timestamp: stacks-block-time,
+    timestamp: burn-block-height,
     severity: "CRITICAL"
   })
 )
@@ -74,7 +74,7 @@
     (print {
       event: "compliance-status-changed",
       enabled: enabled,
-      timestamp: stacks-block-time
+      timestamp: burn-block-height
     })
     (ok true)
   )
@@ -87,7 +87,7 @@
     (print {
       event: "sanctions-provider-changed",
       provider: provider,
-      timestamp: stacks-block-time
+      timestamp: burn-block-height
     })
     (ok true)
   )
@@ -100,7 +100,7 @@
     (print {
       event: "provider-registered",
       provider: provider,
-      timestamp: stacks-block-time
+      timestamp: burn-block-height
     })
     (ok true)
   )
@@ -113,7 +113,7 @@
     (print {
       event: "provider-removed",
       provider: provider,
-      timestamp: stacks-block-time
+      timestamp: burn-block-height
     })
     (ok true)
   )
@@ -122,7 +122,7 @@
 ;; @desc Full user check (Aggregated)
 ;; Called by approved providers or owner to update compliance status
 (define-public (check-user-compliance (user principal) (is-sanctioned bool) (kyc-level uint) (requires-travel-rule bool))
-  (let ((current-height stacks-block-time))
+  (let ((current-height burn-block-height))
     (begin
       ;; Only approved providers or owner can update compliance
       (asserts! (or (is-owner) (default-to false (map-get? approved-providers tx-sender))) (err ERR_UNAUTHORIZED))
@@ -164,7 +164,7 @@
       event: "batch-compliance-check",
       provider: tx-sender,
       count: (len users),
-      timestamp: stacks-block-time
+      timestamp: burn-block-height
     })
     (ok true)
   )
@@ -179,7 +179,7 @@
         compliant: (not (get is-sanctioned data)),
         kyc-level: (get kyc-level data),
         last-checked: (get last-checked data),
-        stale: (> (- stacks-block-time (get last-checked data)) (var-get check-validity-period)),
+        stale: (> (- burn-block-height (get last-checked data)) (var-get check-validity-period)),
         provider: (get provider data)
       })
       (ok {

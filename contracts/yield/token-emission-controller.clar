@@ -38,7 +38,7 @@
 ;; Can be called by anyone (Keeper/Automation).
 (define-public (update-epoch)
     (let (
-        (current-block stacks-block-time)
+        (current-block burn-block-height)
         (time-since-update (- current-block (var-get last-epoch-update)))
     )
         (asserts! (>= time-since-update (var-get epoch-length)) (err ERR_EPOCH_NOT_ENDED))
@@ -65,7 +65,7 @@
 (define-public (drip-rewards (target principal))
     (let (
         (weight (default-to u0 (map-get? emission-targets target)))
-        (current-block stacks-block-time)
+        (current-block burn-block-height)
         ;; Note: Real implementation needs per-target "last-drip" tracking to avoid double dipping
         ;; Simplified here: We assume this is called per block or we calculate delta.
         ;; Better approach: "distribute-all" or tracking `last-drip-block` per target.

@@ -158,7 +158,7 @@
     (print {
       event: "handover-finalized",
       status: "TIER-0-ACHIEVED",
-      timestamp: stacks-block-time
+      timestamp: burn-block-height
     })
     (ok true)
   )
@@ -169,7 +169,7 @@
   {
     complete: (var-get handover-complete),
     timelock-admin: (unwrap-panic (contract-call? .timelock get-admin)),
-    timestamp: stacks-block-time
+    timestamp: burn-block-height
   }
 )
 
@@ -182,6 +182,6 @@
     admin-facade-admin: (unwrap-panic (contract-call? .admin-facade is-global-admin)),
     timelock-admin: (unwrap-panic (contract-call? .timelock get-admin)),
     operational-treasury-owner: (unwrap-panic (contract-call? (var-get operational-treasury-contract) get-contract-owner)),
-    timestamp: stacks-block-time
+    timestamp: burn-block-height
   }
 )

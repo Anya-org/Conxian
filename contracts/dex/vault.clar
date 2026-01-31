@@ -59,6 +59,11 @@
   )
 )
 
+(define-private (restrict-assets? (token principal) (amount uint))
+  ;; Placeholder for asset restriction logic (e.g. compliance, whitelisting)
+  true
+)
+
 ;; Read-only functions
 
 ;; @desc Get details of a vault
@@ -108,8 +113,8 @@
         owner: tx-sender,
         vault-type: vault-type,
         tokens: tokens,
-        created-at: stacks-block-time,
-        last-updated: stacks-block-time,
+        created-at: burn-block-height,
+        last-updated: burn-block-height,
         active: true,
         metadata: metadata,
         cooldown-end: u0
