@@ -48,7 +48,7 @@
           fee: fee,
           sqrt-price: sqrt-price,
           liquidity: u0,
-          tick: i0
+          tick: 0
       })
       (var-set pool-nonce pool-id)
       (ok pool-id)
@@ -86,7 +86,6 @@
         (amount-out (- amount-in total-fee)) ;; Simplified 1:1 swap for stub + fee deduction
         (token-in (if zero-for-one (get token0 pool) (get token1 pool)))
         (token-out (if zero-for-one (get token1 pool) (get token0 pool)))
-        (token-out-trait (if zero-for-one token1-trait token0-trait))
       )
         ;; 2. Accrue Protocol Revenue
         (let ((current-revenue (default-to u0 (map-get? total-revenue token-in))))
@@ -102,7 +101,12 @@
         ;; In a real implementation, 'amount-out' would be calculated via price curve.
         
         ;; Transfer output tokens to user
-        (as-contract (try! (contract-call? token-out-trait transfer amount-out tx-sender tx-sender none)))
+        (as-contract
+          (if zero-for-one
+            (try! (contract-call? token1-trait transfer amount-out tx-sender tx-sender none))
+            (try! (contract-call? token0-trait transfer amount-out tx-sender tx-sender none))
+          )
+        )
         
         (ok amount-out)
       )

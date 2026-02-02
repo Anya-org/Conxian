@@ -52,8 +52,8 @@ This contract centralizes all role-based access control (RBAC) to provide a sing
 
 #### Authorization
 -   `is-global-admin()`: (Read-Only) Checks if the caller is the global administrator.
+-   `is-authorized(role uint)`: (Public) Checks if the caller is the global admin or has the specified role.
 -   `is-authorized-to-pause(sender principal)`: (Read-Only) Checks if a given principal has permission to pause the protocol. This is a `;; BOLT:` optimization that consolidates multiple checks into a single function.
--   `has-role(role uint)`: (Read-Only) A generic function to check if the caller has a specific role.
 
 #### Role Management
 -   `set-role(user principal, role uint, enabled bool)`: (Global Admin Only) Grants or revokes a specific role for a user.
@@ -61,10 +61,14 @@ This contract centralizes all role-based access control (RBAC) to provide a sing
 
 #### Emergency Functions
 -   `set-emergency-pause(paused bool)`: (Emergency Role or Global Admin) Sets the emergency pause status.
+-   `pause-contract(target principal)`: (Emergency Role Only) Requests to pause a specific target contract.
+-   `unpause-contract(target principal)`: (Global Admin Only) Requests to unpause a specific target contract.
 
 #### Configuration
 -   `set-global-admin(new-admin principal)`: (Global Admin Only) Transfers the global admin role to a new principal.
+-   `transfer-global-admin-to-timelock()`: (Global Admin Only) Transfers the global admin role to the protocol timelock.
 -   `set-rbac-contract(new-contract principal)`: (Global Admin Only) Sets the address of the RBAC contract.
+-   `batch-admin-operations(operations (list 200 {type: uint, params: (list 5 principal)}))`: (Global Admin Only) Executes multiple administrative operations in a single transaction.
 
 ### `conxian-protocol.clar` (Protocol State Coordinator)
 
@@ -85,6 +89,8 @@ This contract manages the protocol's global state and contract registry, delegat
 #### Ownership
 -   `set-contract-owner(new-owner principal)`: (Admin Only) Transfers ownership of the protocol to a new address.
 -   `get-contract-owner()`: (Read-Only) Returns the current owner of the protocol.
+-   `get-admin()`: (Read-Only) Returns the current owner of the protocol.
+-   `get-protocol-admin()`: (Read-Only) Returns the current owner of the protocol.
 
 ### `dimensional-engine.clar` (User-Facing Facade)
 
@@ -94,6 +100,46 @@ This contract is the secure entry point for all user-facing trading operations. 
 -   `close-position(...)`: Closes an existing position.
 -   `deposit-funds(...)`: Deposits funds into the collateral manager.
 -   `withdraw-funds(...)`: Withdraws funds from the collateral manager.
+
+## Integration Examples
+
+### Checking Protocol Pause Status
+
+To check if the protocol is currently paused, call the `is-paused` function on `conxian-protocol.clar`:
+
+```clarity
+(contract-call? .conxian-protocol is-paused)
+```
+
+### Checking User Authorization
+
+To check if a user has a specific role, use the `is-authorized` function on `admin-facade.clar`:
+
+```clarity
+(contract-call? .admin-facade is-authorized u1) ;; Checks for ROLE_EMERGENCY_PAUSE
+```
+
+### Registering a New Module
+
+Modules must be registered by an administrator:
+
+```clarity
+(contract-call? .conxian-protocol register-module "lending" .lending-pool)
+```
+
+## Testing
+
+The core module tests are located in `tests/core/`. You can run them using the following command:
+
+```bash
+npm test -- tests/core/
+```
+
+Key test scenarios include:
+-   **Authorization Checks**: Verifying that only authorized principals can perform administrative actions.
+-   **Pause Logic**: Ensuring that state-changing functions are blocked when the protocol is paused.
+-   **Module Registry**: Validating the registration and activation of protocol modules.
+-   **Batch Operations**: Testing the gas efficiency and correctness of batch role updates.
 
 ## Status
 

@@ -20,4 +20,22 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 - **Documentation**: All public functions must be documented with header comments.
 - **Security**: Always verify traits and handle error cases explicitly.
 
+## Commit Message Format
+
+We follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
+
+Format: `<type>(<scope>): <description>`
+
+Types:
+- `feat`: A new feature
+- `fix`: A bug fix
+- `docs`: Documentation only changes
+- `style`: Changes that do not affect the meaning of the code
+- `refactor`: A code change that neither fixes a bug nor adds a feature
+- `perf`: A code change that improves performance
+- `test`: Adding missing tests or correcting existing tests
+- `chore`: Changes to the build process or auxiliary tools and libraries
+
+Example: `feat(core): add batch operation for role updates`
+
 Thank you for your contributions!
