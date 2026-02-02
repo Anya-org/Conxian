@@ -3,7 +3,7 @@ import { Cl } from '@stacks/transactions';
 import { initSimnet } from "@stacks/clarinet-sdk";
 import { resolve } from "path";
 
-const ORACLE_AGGREGATOR_V2_CONTRACT_NAME = 'oracle-aggregator-v2';
+const ORACLE_AGGREGATOR_V2_CONTRACT_NAME = 'oracle-aggregator';
 const MOCK_CIRCUIT_BREAKER_CONTRACT_NAME = 'mock-circuit-breaker';
 
 describe('P0 Circuit Breaker Logic Flaw Mitigation Tests', () => {

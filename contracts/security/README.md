@@ -23,7 +23,7 @@ Unlike other modules that are built around a central facade, the Security Module
 
 ### Oracle Security
 
-- **`oracle-aggregator-v2.clar`**: An enhanced oracle contract that provides time-weighted average pricing (TWAP) and statistical manipulation detection. It also integrates with the `circuit-breaker.clar` contract to automatically pause the system in the event of a suspected oracle attack.
+- **`oracle-aggregator.clar`**: An enhanced oracle contract that provides time-weighted average pricing (TWAP) and statistical manipulation detection. It also integrates with the `circuit-breaker.clar` contract to automatically pause the system in the event of a suspected oracle attack.
 
 ### Emergency Controls
 

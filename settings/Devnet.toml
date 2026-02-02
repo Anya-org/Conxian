@@ -68,8 +68,8 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/governance/enhanced-governance-nft.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.conxian-operations-engine]
-path = "contracts/governance/conxian-operations-engine.clar"
+[contracts.ops-engine]
+path = "contracts/core/ops-engine.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 # ---------- Oracle Contracts ----------
@@ -77,8 +77,8 @@ address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 path = "contracts/oracle/oracle.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
-[contracts.oracle-aggregator-v2]
-path = "contracts/oracle/oracle-aggregator-v2.clar"
+[contracts.oracle-aggregator]
+path = "contracts/oracle/oracle-aggregator.clar"
 address = "STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ"
 
 # ---------- Utility Contracts ----------

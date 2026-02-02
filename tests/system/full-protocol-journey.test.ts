@@ -110,7 +110,7 @@ describe('Grand Unified System Journey', () => {
 
   const performSwap = () => {
     return simnet.callPublicFn(
-      "multi-hop-router-v3",
+      "swap-router",
       "swap-direct",
       [
         Cl.uint(1_000_000),
