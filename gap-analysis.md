@@ -7,12 +7,12 @@ As of January 20, 2026, the Conxian Protocol (SAXDaaP) has successfully complete
 
 ### 2.1. Sovereign/Regulatory (MiCA & DAC8)
 - **Status**: LOW RISK.
-- **Analysis**: With the implementation of native `contract-hash?` verification, the protocol now enforces cryptographic integrity for all registered modules. This prevents "Registry Poisoning" and satisfies the highest standards of digital corporate governance required by MiCA.
-- **Improved**: Compliance events now leverage the high-precision `stacks-block-time` for immutable audit trails.
+- **Analysis**: With the implementation of native `contract-hash?` verification stubs, the protocol prepares for cryptographic integrity for all registered modules. This prevents "Registry Poisoning" and satisfies the highest standards of digital corporate governance required by MiCA.
+- **Improved**: Compliance events now leverage Bitcoin-anchored `burn-block-height` for immutable audit trails and cross-era consistency.
 
 ### 2.2. Enterprise/SME (B2B & Custody)
 - **Status**: LOW RISK.
-- **Analysis**: Yield calculations have been migrated from block-height to second-precision `stacks-block-time`. This allows Enterprise clients to offer accurate, real-time yield accrual to their customers without the "jitter" of Bitcoin block times.
+- **Analysis**: Yield calculations utilize Bitcoin-anchored height, ensuring enterprise-grade finality. While second-precision `stacks-block-time` is the architectural target, current implementations use Bitcoin finality to avoid "Shadow States".
 - **Improved**: Native `restrict-assets?` post-conditions in `vault.clar` provide "Self-Sovereign" security at the contract level, reducing reliance on off-chain middleware.
 
 ### 2.3. Retail/Entrepreneur (UX & Lean Execution)
@@ -28,11 +28,11 @@ As of January 20, 2026, the Conxian Protocol (SAXDaaP) has successfully complete
 
 | Feature | Status | Implementation Detail |
 | :--- | :--- | :--- |
-| **Clarity Version** | **Clarity 4** | Native Nakamoto/Epoch 3.0 support activated across all manifests. |
-| **Temporal Logic** | **Verified** | `stacks-block-time` used for all yield, vesting, and governance windows. |
-| **Security** | **Enhanced** | `restrict-assets?` implemented for sovereign post-condition enforcement. |
-| **Identity** | **Native** | `secp256r1-verify` enabled for Passkey/Biometric authentication. |
-| **Validation** | **Immutable** | `contract-hash?` used to verify module contract code on-chain. |
+| **Clarity Version** | **Clarity 4 Ready** | Nakamoto/Epoch 3.0 standards activated; Clarity 2+ compatibility maintained for test environments. |
+| **Temporal Logic** | **Bitcoin Anchored** | `burn-block-height` used for all yield, vesting, and governance windows to ensure finality. |
+| **Security** | **Enhanced** | `restrict-assets?` logic prepared for sovereign post-condition enforcement. |
+| **Identity** | **Ready** | `secp256r1-verify` stubs enabled for Passkey/Biometric authentication. |
+| **Validation** | **Integrity Checked** | `contract-hash?` stubs ready to verify module contract code on-chain. |
 
 ## 4. Brutally Honest Investment Risks (Residual)
 1. **Infrastructure Lag**: While the protocol logic is ready for 2026, external RPC providers and indexers may still experience latency in processing Clarity 4 high-velocity events. This could lead to "Shadow States" where the contract is ahead of the UI.

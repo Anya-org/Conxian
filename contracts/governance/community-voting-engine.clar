@@ -144,7 +144,8 @@
       id: proposal-id,
       voter: voter,
       support: support,
-        weight: weighted-balance,
+      weight: weighted-balance,
+      timestamp: burn-block-height
       })
     )
     (ok true)

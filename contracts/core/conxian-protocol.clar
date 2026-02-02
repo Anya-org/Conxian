@@ -56,13 +56,14 @@
   (begin
     (asserts! (unwrap! (contract-call? .admin-facade is-authorized ROLE_ADMIN) (err ERR_UNAUTHORIZED)) (err ERR_UNAUTHORIZED))
     ;; Verify contract integrity (Clarity 4 Native - Stubbed for compat)
-    ;; (asserts! (is-some (get-contract-hash contract)) (err ERR_MODULE_NOT_FOUND))
-    (map-set modules { name: name } {
-      contract: contract,
-      active: true,
-    })
-    (print { event: "module-registered", name: name, contract: contract, hash: none })
-    (ok true)
+    ;; (let ((c-hash (unwrap! (contract-hash? contract) (err ERR_MODULE_NOT_FOUND))))
+      (map-set modules { name: name } {
+        contract: contract,
+        active: true,
+      })
+      (print { event: "module-registered", name: name, contract: contract, hash: none })
+      (ok true)
+    ;; )
   )
 )
 
