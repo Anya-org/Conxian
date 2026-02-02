@@ -2,10 +2,11 @@
 
 ## 1. Unit Test Cases (Core Primitives)
 
-### 1.1. Fiscal Policy (Revenue Distributor)
-- **TEST_REV_01**: Verify that a 10,000 uSTX deposit is split exactly 6000/2000/2000 across Staking, Dev, and Insurance vaults.
-- **TEST_REV_02**: Verify that only the Admin (currently) or the Strategic Council (target) can modify allocation percentages in `allocation-policy.clar`.
+### 1.1. Fiscal Policy (Adaptive Yield Engine)
+- **TEST_REV_01**: Verify that the AYE initially targets a 60/20/20 split across Staking, Dev, and Insurance vaults.
+- **TEST_REV_02**: Verify that `agent-treasury` utilizing PID control smoothly rebalances yields (max 1% shift per block) during risk state transitions.
 - **TEST_REV_03**: Verify that total shares must always sum to 10,000 (100%).
+- **TEST_REV_04**: Verify that "Accrued Claims" are correctly recorded in `cxd-treasury.clar` when staker dividends are diverted to the Insurance Fund.
 
 ### 1.2. Governance (Dual-Council)
 - **TEST_GOV_01**: Verify that `submit-proposal` in `proposal-engine.clar` requires the sender to hold an `enhanced-governance-nft` seat.
@@ -13,8 +14,8 @@
 - **TEST_GOV_03**: Verify that non-compliant users (blacklisted in `regulatory-adapter.clar`) cannot vote in the Strategic Council.
 
 ### 1.3. Autonomous Agents (Staff)
-- **TEST_AGENT_01**: Verify that `agent-risk` can correctly identify a position below maintenance margin using `check-work-needed`.
-- **TEST_AGENT_02**: Verify that `do-work` in `agent-risk.clar` successfully executes a liquidation and triggers a `payout` via the `office-manager`.
+- **TEST_AGENT_01**: (Agent-Risk 2.0) Verify that `assess-system-risk` correctly calculates composite scores from liquidity depth and hashrate volatility.
+- **TEST_AGENT_02**: (Agent-Treasury) Verify that the PID controller integral windup protection prevents bps overflow during long-term rebalancing.
 - **TEST_AGENT_03**: Verify that the "Staff" scanner loop in `check-work-needed` resets correctly after reaching the end of the position map.
 - **TEST_AGENT_04**: Verify that only authorized "Staff" roles can trigger high-value operational actions in `ops-engine.clar`.
 
@@ -41,9 +42,9 @@
 - [ ] Circuit breaker integrated into all high-value transfer functions.
 
 ### 2.3. Nakamoto/Clarity 4 Standards
-- [ ] `burn-block-height` used for all temporal logic (Vesting, Voting).
-- [ ] `get-block-info?` used for tenure-aware timestamps.
-- [ ] `Clarinet.toml` epoch set to `"3.0"`.
+- [ ] `stacks-block-time` used for all temporal logic (Vesting, Voting).
+- [ ] `contract-hash?` used for module verification in `conxian-protocol.clar`.
+- [ ] `Clarinet.toml` epoch set to `"3.0"` and `clarity-version` set to `2` (stable).
 
 ## 3. Definition of Done (DoD)
 - [x] Code passes `clarinet check`.

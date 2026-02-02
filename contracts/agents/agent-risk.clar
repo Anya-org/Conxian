@@ -19,6 +19,59 @@
 (define-data-var insurance-fund principal tx-sender)
 (define-data-var last-checked-id uint u0)
 
+;; Agent-Risk 2.0: Predictive Perception State
+(define-data-var liquidity-depth uint u10000) ;; 10000 = 100% (Target depth)
+(define-data-var hash-rate-volatility uint u0) ;; 0 = stable, 10000 = extreme
+(define-data-var mempool-congestion uint u0) ;; 0 = empty, 10000 = full
+
+;; Governance bounds for states
+(define-constant RISK_THRESHOLD_PREEMPTIVE u2000)
+(define-constant RISK_THRESHOLD_DEFENSIVE u5000)
+
+(define-public (set-predictive-params
+    (new-liquidity-depth uint)
+    (new-hash-rate-volatility uint)
+    (new-mempool-congestion uint)
+  )
+  (begin
+    (try! (check-role "ROLE_ADMIN"))
+    (asserts! (<= new-liquidity-depth u10000) (err ERR_INVALID_PARAMETERS))
+    (asserts! (<= new-hash-rate-volatility u10000) (err ERR_INVALID_PARAMETERS))
+    (asserts! (<= new-mempool-congestion u10000) (err ERR_INVALID_PARAMETERS))
+    (var-set liquidity-depth new-liquidity-depth)
+    (var-set hash-rate-volatility new-hash-rate-volatility)
+    (var-set mempool-congestion new-mempool-congestion)
+    (ok true)
+  )
+)
+
+(define-read-only (assess-system-risk)
+  (let (
+    ;; Liquidity risk increases as depth decreases
+    (l-risk (if (> u10000 (var-get liquidity-depth)) (- u10000 (var-get liquidity-depth)) u0))
+    (h-risk (var-get hash-rate-volatility))
+    (m-risk (var-get mempool-congestion))
+    ;; Simple weighted average for composite score
+    (composite-score (/ (+ (+ l-risk h-risk) m-risk) u3))
+  )
+    composite-score
+  )
+)
+
+(define-read-only (get-current-risk-state)
+  (let (
+    (score (assess-system-risk))
+  )
+    (if (>= score RISK_THRESHOLD_DEFENSIVE)
+      "DEFENSIVE"
+      (if (>= score RISK_THRESHOLD_PREEMPTIVE)
+        "PREEMPTIVE"
+        "EQUILIBRIUM"
+      )
+    )
+  )
+)
+
 (define-public (set-risk-parameters
     (new-max-leverage uint)
     (new-maintenance-margin uint)
@@ -161,9 +214,9 @@
 )
 
 (define-private (check-role (role (string-ascii 32)))
-  (if (is-eq role "ROLE_ADMIN")
+  (if (or (is-eq tx-sender (var-get contract-owner)) (is-eq contract-caller .conxian-access))
     (ok true)
-    (err u1001)
+    (err ERR_UNAUTHORIZED)
   )
 )
 

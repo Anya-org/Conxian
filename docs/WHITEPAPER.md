@@ -23,11 +23,11 @@ Conxian operates as a fully automated entity with two distinct layers of intelli
 ### 1. Bitcoin Finality
 By anchoring all state transitions to Bitcoin via Stacks Nakamoto consensus, Conxian inherits the security and immutability of the world's most robust settlement layer.
 
-### 2. Autonomous Fiscal Policy (60/20/20)
-Unlike protocols with discretionary spending, Conxian's revenue is codified:
-- **60% Dividends**: Directly to CXD stakers.
-- **20% R&D**: For autonomous staff incentives and protocol evolution.
-- **20% Insurance**: A permanent risk reserve for black-swan events.
+### 2. Intelligence-Led Adaptive Fiscal Policy (AYE)
+Unlike protocols with discretionary spending or rigid payout structures, Conxian's revenue is managed by the **Adaptive Yield Engine (AYE)**. This system utilizes PID control and Fuzzy Logic to dynamically rebalance flows based on predictive risk:
+- **Equilibrium**: Target 60/20/20 (Dividends/R&D/Insurance).
+- **Defensive**: Rebalancing up to 80% to the Insurance Fund during high-risk signatures to ensure systemic solvency.
+- **Priority Claims**: Any yield diverted from stakers is tracked and backfilled once equilibrium returns.
 
 ### 3. Everything-as-a-Service (XAAS)
 Conxian is not just a DEX or a Lending platform; it is a suite of sovereign primitives. Third-party developers and SMEs can "rent" or "subscribe" to Conxian's infrastructure to launch their own branded financial services.
@@ -44,7 +44,7 @@ While competitors compete on transaction speed or gas fees, Conxian competes on 
 
 **Key Metrics & Milestones:**
 - **Architecture**: 40+ modular contracts, Clarity 4 (Decidable/Deterministic), Nakamoto-aligned.
-- **Fiscal Policy**: Immutable 60/20/20 revenue split codified in the `revenue-distributor`.
+- **Fiscal Policy**: Intelligence-Led AYE with predictive rebalancing and claim accrual.
 - **Governance**: Dual-Council meritocracy (Staff vs. Board) with Reputation weighting.
 - **Compliance**: MiCA-ready `regulatory-adapter` for "Clean-Hands" institutional onboarding.
 

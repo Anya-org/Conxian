@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.6.0] - 2026-02-02 - CXIP-011: Intelligence-Led Adaptive Yield Engine
+
+### Added
+
+- **Adaptive Yield Engine (AYE)**: Implemented `cxd-treasury.clar` as a dynamic replacement for static allocation policies.
+- **Agent-Risk 2.0**: Enhanced `agent-risk.clar` with Predictive Perception (liquidity depth, hash rate volatility, mempool congestion).
+- **Control Theory**: Integrated PID Controller and Fuzzy Logic in `agent-treasury.clar` for smooth fiscal transitions.
+- **Priority Claims**: Automated "Accrued Claims" tracking in `cxd-treasury.clar` for diverted staker revenue during defensive states.
+- **Intelligence Loop**: Composite risk scoring and automated state transitions (Equilibrium, Pre-emptive, Defensive).
+
+### Changed
+
+- **Revenue Distribution**: Refactored `revenue-distributor.clar` to utilize the AYE intelligence loop and record priority claims.
+- **Clarity 4 Migration**: Upgraded all core protocol and agent contracts to Clarity 4 (Epoch 3.0) for Nakamoto-era performance.
+
+### Deprecated
+
+- **Static Policy**: Deprecated `allocation-policy.clar` in favor of the Intelligence-Led AYE.
+
 ## [2024-07-22] - Documentation Realignment
 
 ### Changed
