@@ -23,17 +23,18 @@ The module is centered around the transition from manual allocation to autonomou
 
 This contract implements the logic for dynamic fiscal policy.
 
--   `rebalance(staking uint, dev uint, insurance uint)`: Updates the revenue shares. Called by `agent-treasury` via PID control.
--   `record-diverted-claim(token principal, amount uint)`: Automatically records "Priority Claims" for stakers when yield is diverted to the Insurance Fund.
--   `get-allocation-percentages()`: Returns the current active revenue split.
--   `set-bounds(min-staking uint, max-insurance uint)`: (Admin Only) Sets the safety rails for the autonomous agents.
+-   `rebalance(staking uint, dev uint, insurance uint)`: Updates the revenue shares. Called by `agent-treasury` or Admin.
+-   `record-diverted-claim(token principal, amount uint)`: Automatically records "Priority Claims" for stakers when yield is diverted.
+-   `get-allocation-percentages()`: (Read-Only) Returns the current active revenue split (Basis points: 10000 = 100%).
+-   `set-bounds(min-staking uint, max-insurance uint)`: (Admin Only) Sets the safety rails for autonomous agents.
+-   `backfill-claims(token principal, amount uint)`: (Admin Only) Deducts from recorded claims once they are backfilled.
 
 ### `revenue-distributor.clar`
 
 Responsible for the automated distribution of protocol income.
 
 -   `distribute-stx(amount uint)`: Splits STX revenue according to the AYE policy and records claims if necessary.
--   `distribute-token(token <sip-010>, amount uint)`: Splits token revenue and records claims.
+-   `distribute-token(token <sip-010-ft-trait>, amount uint)`: Splits token revenue and records claims.
 
 ## Integration Examples
 

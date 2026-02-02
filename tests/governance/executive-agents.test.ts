@@ -13,14 +13,14 @@ describe('Autonomous Executive Agents', () => {
 
   describe('CRO (Chief Risk Officer)', () => {
     it('CEO can trigger an emergency pause via the CRO', async () => {
-      // (contract-call? .conxian-operations-engine trigger-emergency-pause)
+      // (contract-call? .ops-engine trigger-emergency-pause)
       const call = Cl.contractCall(
-        'conxian-operations-engine',
+        'ops-engine',
         'trigger-emergency-pause',
         [],
       );
       const result = await simnet.callPublicFn(
-        'conxian-operations-engine',
+        'ops-engine',
         'trigger-emergency-pause',
         [],
         deployer

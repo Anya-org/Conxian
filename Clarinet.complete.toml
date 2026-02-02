@@ -47,8 +47,8 @@ path = "contracts/traits/reputation-engine-trait.clar"
 [contracts.governance-traits]
 path = "contracts/traits/governance-traits.clar"
 
-[contracts.multi-hop-router-v3]
-path = "contracts/dex/multi-hop-router-v3.clar"
+[contracts.swap-router]
+path = "contracts/dex/swap-router.clar"
 
 [contracts.launch-limits]
 path = "contracts/config/launch-limits.clar"
@@ -247,8 +247,8 @@ path = "contracts/dex/cxvg-utility.clar"
 path = "contracts/dex/memory-pool-management.clar"
 depends_on = [ "conxian-protocol",]
 
-[contracts.dex-factory-v2]
-path = "contracts/dex/dex-factory-v2.clar"
+[contracts.dex-factory]
+path = "contracts/dex/dex-factory.clar"
 clarity-version = 2
 
 [contracts.nft-marketplace]
@@ -693,8 +693,8 @@ depends_on = [ "conxian-access", "admin-facade",]
 path = "contracts/governance/proposal-engine.clar"
 depends_on = [ "reputation-engine",]
 
-[contracts.conxian-operations-engine]
-path = "contracts/governance/conxian-operations-engine.clar"
+[contracts.ops-engine]
+path = "contracts/core/ops-engine.clar"
 
 [contracts.cxd-staking]
 path = "contracts/yield/cxd-staking.clar"

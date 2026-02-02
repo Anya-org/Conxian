@@ -257,10 +257,10 @@ plan:
             anchor-block-only: true
             clarity-version: 4
         - contract-publish:
-            contract-name: conxian-operations-engine
+            contract-name: ops-engine
             expected-sender: ST32CN8SBRJ0A5CQA0589VM1QFV6XFNCVD98Q9799
             cost: 256920
-            path: "contracts\\governance\\conxian-operations-engine.clar"
+            path: "contracts\\core\\ops-engine.clar"
             anchor-block-only: true
             clarity-version: 4
         - contract-publish:
@@ -368,7 +368,7 @@ plan:
             contract-name: dex-factory
             expected-sender: ST32CN8SBRJ0A5CQA0589VM1QFV6XFNCVD98Q9799
             cost: 45260
-            path: "contracts\\dex\\dex-factory-v2.clar"
+            path: "contracts\\dex\\dex-factory.clar"
             anchor-block-only: true
             clarity-version: 4
         - contract-publish:
@@ -438,7 +438,7 @@ plan:
             contract-name: oracle-aggregator
             expected-sender: ST32CN8SBRJ0A5CQA0589VM1QFV6XFNCVD98Q9799
             cost: 48880
-            path: "contracts\\dex\\oracle-aggregator-v2.clar"
+            path: "contracts\\dex\\oracle-aggregator.clar"
             anchor-block-only: true
             clarity-version: 4
         - contract-publish:
@@ -690,10 +690,10 @@ plan:
             anchor-block-only: true
             clarity-version: 4
         - contract-publish:
-            contract-name: multi-hop-router-v3
+            contract-name: swap-router
             expected-sender: ST32CN8SBRJ0A5CQA0589VM1QFV6XFNCVD98Q9799
             cost: 53870
-            path: "contracts\\dex\\multi-hop-router-v3.clar"
+            path: "contracts\\dex\\swap-router.clar"
             anchor-block-only: true
             clarity-version: 4
         - contract-publish:

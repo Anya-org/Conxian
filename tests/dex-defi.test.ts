@@ -167,8 +167,8 @@ describe("DEX and DeFi Tests", () => {
   });
 
   describe("Multi-Hop Routing", () => {
-    it("should have multi-hop-router-v3 deployed", () => {
-      const contract = simnet.getContractSource("multi-hop-router-v3");
+    it("should have swap-router deployed", () => {
+      const contract = simnet.getContractSource("swap-router");
       expect(contract).toBeDefined();
     });
   });

@@ -23,7 +23,7 @@
     "proposal-executor"
   ],
   "tiered-pools": [],
-  "multi-hop-router-v3": [],
+  "swap-router": [],
   "launch-limits": [],
   "agent-risk": [
     "sbtc-vault",
@@ -74,7 +74,7 @@
   ],
   "cxd-staking": [
     "regulatory-adapter",
-    "conxian-operations-engine",
+    "ops-engine",
     "cxd-token",
     "agent-treasury",
     "sip-standards",
@@ -184,7 +184,6 @@
   "dex-factory": [],
   "cxvg-utility": [],
   "memory-pool-management": [],
-  "dex-factory-v2": [],
   "nft-marketplace": [],
   "rbac": [],
   "block-utils": [],
@@ -219,7 +218,7 @@
   ],
   "conxian-paas-factory": [
     "regulatory-adapter",
-    "conxian-operations-engine",
+    "ops-engine",
     "sip-standards",
     "operational-treasury",
     "agent-risk"
@@ -248,7 +247,7 @@
   "operational-treasury": [
     "sip-standards",
     "agent-treasury",
-    "conxian-operations-engine"
+    "ops-engine"
   ],
   "conxian-token-factory": [],
   "protocol-coordinator": [
@@ -442,7 +441,7 @@
     "defi-traits",
     "dex-factory",
     "cxd-token",
-    "conxian-operations-engine"
+    "ops-engine"
   ],
   "proposal-executor": [
     "proposal-registry",
@@ -454,7 +453,7 @@
   "founder-vesting": [],
   "dao-treasury": [],
   "proposal-engine-trait": [],
-  "conxian-operations-engine": [
+  "ops-engine": [
     "proposal-registry",
     "regulatory-adapter",
     "conxian-service-trait",

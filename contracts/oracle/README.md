@@ -31,7 +31,7 @@ graph TD
 
 ## Security Features
 
-The `oracle-aggregator-v2.clar` contract includes the following security features:
+The `oracle-aggregator.clar` contract includes the following security features:
 
 -   **Manipulation Detection**: The contract compares the latest price update with the current TWAP. If the deviation exceeds a configurable threshold, the `is-manipulated` function will return `true`. In this "degraded mode," the `get-price` function will return the TWAP instead of the latest price, providing a more stable, manipulation-resistant price.
 -   **Stale Price Threshold**: If a price has not been updated for a certain number of blocks, it is considered stale. In this case, `get-price` will also return the TWAP.
@@ -39,7 +39,7 @@ The `oracle-aggregator-v2.clar` contract includes the following security feature
 
 ## Public Functions
 
-### `oracle-aggregator-v2.clar`
+### `oracle-aggregator.clar`
 
 #### Admin Functions
 -   `set-admin(new-admin principal)`: Sets a new admin for the contract.
