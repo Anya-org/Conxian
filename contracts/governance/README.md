@@ -71,4 +71,4 @@ graph TD
 
 ## Status
 
-**Under Review**: The contracts in this module are currently undergoing a comprehensive review. While the core governance functionality is implemented, the contracts are not yet considered production-ready and are being hardened to ensure full security and alignment with the protocol's architecture.
+**Aligned**: The Governance module implements the Dual-Council (Staff vs Board) architecture. It is fully integrated with the `reputation-engine` and aligned with Clarity 4 security standards.

@@ -1,3 +1,9 @@
+---
+layout: default
+title: DEX Module
+permalink: /modules/dex/
+---
+
 # DEX Module
 
 ## Overview

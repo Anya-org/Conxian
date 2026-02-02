@@ -1,24 +1,33 @@
+---
+layout: default
+title: Oracle Module
+permalink: /modules/oracle/
+---
+
 # Oracle Module
 
 ## Overview
 
-The Oracle Module provides a simple, on-chain price feed system for the Conxian Protocol. It is designed to be a reliable source of price data for other modules, such as the DEX and lending protocols.
+The Oracle Module provides a robust, multi-source price feed system for the Conxian Protocol. It is designed to be a reliable source of price data for other modules, such as the DEX and lending protocols, utilizing aggregated data from Pyth, Redstone, and Switchboard.
 
 ## Architecture
 
-The module consists of a single contract, `oracle-aggregator-v2.clar`, which is responsible for storing, managing, and retrieving asset prices. The contract is designed to be updated by a trusted admin, and it includes basic security features to mitigate price manipulation.
+The module is centered around the `oracle-aggregator.clar` contract, which aggregates data from multiple provider adapters. The contract is tenure-aware and includes advanced security features to mitigate price manipulation and ensure Bitcoin-native finality.
 
 ### Control Flow Diagram
 
 ```mermaid
 graph TD
-    A[Admin] -- set-source --> B{oracle-aggregator-v2.clar};
+    A[Admin/Keepers] -- set-source --> B{oracle-aggregator.clar};
+    B -- Fetch --> P[Pyth Adapter];
+    B -- Fetch --> R[Redstone Adapter];
+    B -- Fetch --> S[Switchboard Adapter];
     C[Protocol Contract] -- get-price --> B;
 ```
 
 ## Core Contracts
 
--   **`oracle-aggregator-v2.clar`**: The primary oracle contract. It stores the latest price for each asset, along with a Time-Weighted Average Price (TWAP) calculated using an Exponential Moving Average (EMA).
+-   **`oracle-aggregator.clar`**: The primary oracle contract. It stores the latest aggregated price for each asset, along with a Time-Weighted Average Price (TWAP).
 
 ## Security Features
 
@@ -47,4 +56,4 @@ The `oracle-aggregator-v2.clar` contract includes the following security feature
 
 ## Status
 
-**Under Review**: The `oracle-aggregator-v2.clar` contract is currently undergoing a comprehensive review. While it provides basic oracle functionality, it is not yet considered production-ready.
+**Aligned**: The Oracle module has been upgraded to a hybrid aggregation model, supporting multiple provider adapters and a consolidated `oracle-aggregator`.

@@ -1,3 +1,9 @@
+---
+layout: default
+title: Security Module
+permalink: /modules/security/
+---
+
 # Security Module
 
 ## Overview
@@ -34,4 +40,4 @@ Unlike other modules that are built around a central facade, the Security Module
 
 ## Status
 
-**Under Review**: The contracts in this module are highly security-critical and are undergoing an intensive review and audit process. While the core logic is implemented, these contracts are not yet considered production-ready and should not be used in a mainnet environment.
+**Aligned**: The Security module provides multi-layered protection including the `circuit-breaker`, `mev-protector`, and `proof-of-reserves`. All contracts are Clarity 4 compliant and aligned with the "Full Truth" architecture.

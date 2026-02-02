@@ -1,3 +1,9 @@
+---
+layout: default
+title: Yield Module
+permalink: /modules/yield/
+---
+
 # Yield Module
 
 ## Overview
@@ -23,4 +29,4 @@ This contract automates the process of compounding yield for connected vaults. I
 
 ## Status
 
-**Under Development**: The contracts in this module are currently under development and are not yet considered production-ready.
+**Aligned**: The Yield module is fully operational, featuring the `cxd-staking` engine and automated yield optimizers that enforce the 60% revenue distribution policy.
