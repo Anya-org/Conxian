@@ -16,7 +16,7 @@
 (define-data-var contract-owner principal tx-sender)
 (define-data-var compliance-enabled bool true)
 (define-data-var sanctions-provider principal tx-sender) ;; Configurable sanctions oracle
-(define-data-var check-validity-period uint u86400) ;; 24 hours in seconds
+(define-data-var check-validity-period uint u144) ;; 24 hours in blocks (~144 blocks)
 
 ;; Maps
 (define-map compliance-status
@@ -119,32 +119,37 @@
   )
 )
 
+;; Internal helper for compliance updates
+(define-private (internal-check-user (user principal) (is-sanctioned bool) (kyc-level uint) (requires-travel-rule bool))
+  (begin
+    ;; Update compliance status
+    (map-set compliance-status { user: user } {
+      is-sanctioned: is-sanctioned,
+      kyc-level: kyc-level,
+      last-checked: burn-block-height,
+      requires-travel-rule: requires-travel-rule,
+      provider: tx-sender
+    })
+
+    ;; Emit events
+    (if is-sanctioned
+      (emit-sanctions-found user "SANCTIONS_LIST_MATCH")
+      (emit-compliance-checked user true tx-sender)
+    )
+    true
+  )
+)
+
 ;; @desc Full user check (Aggregated)
 ;; Called by approved providers or owner to update compliance status
 (define-public (check-user-compliance (user principal) (is-sanctioned bool) (kyc-level uint) (requires-travel-rule bool))
-  (let ((current-height burn-block-height))
-    (begin
-      ;; Only approved providers or owner can update compliance
-      (asserts! (or (is-owner) (default-to false (map-get? approved-providers tx-sender))) (err ERR_UNAUTHORIZED))
-      (asserts! (var-get compliance-enabled) (ok true))
-      
-      ;; Update compliance status
-      (map-set compliance-status { user: user } {
-        is-sanctioned: is-sanctioned,
-        kyc-level: kyc-level,
-        last-checked: current-height,
-        requires-travel-rule: requires-travel-rule,
-        provider: tx-sender
-      })
-      
-      ;; Emit events
-      (if is-sanctioned
-        (emit-sanctions-found user "SANCTIONS_LIST_MATCH")
-        (emit-compliance-checked user true tx-sender)
-      )
-      
-      (ok (not is-sanctioned))
-    )
+  (begin
+    ;; Only approved providers or owner can update compliance
+    (asserts! (or (is-owner) (default-to false (map-get? approved-providers tx-sender))) (err ERR_UNAUTHORIZED))
+    (asserts! (var-get compliance-enabled) (ok true))
+
+    (internal-check-user user is-sanctioned kyc-level requires-travel-rule)
+    (ok (not is-sanctioned))
   )
 )
 
@@ -158,14 +163,16 @@
   (begin
     (asserts! (or (is-owner) (default-to false (map-get? approved-providers tx-sender))) (err ERR_UNAUTHORIZED))
     (asserts! (var-get compliance-enabled) (ok true))
-    ;; In a real implementation, iterate through lists and update each
-    ;; For now, just emit event
+
     (print {
       event: "batch-compliance-check",
       provider: tx-sender,
       count: (len users),
       timestamp: burn-block-height
     })
+
+    ;; Use map with internal private function
+    (print (map internal-check-user users sanctioned-list kyc-levels travel-rules))
     (ok true)
   )
 )

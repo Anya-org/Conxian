@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.1] - 2026-02-02 - Final Alignment & Precision Refactor
+
+### Fixed
+- **Compliance Manager**: Fixed 24h validity check logic to use block-height consistency (144 blocks).
+- **Temporal Logic**: Synchronized all contracts to use `burn-block-height` for Bitcoin-anchored precision and finality.
+- **Vesting**: Added events to `founder-vesting` for better auditability.
+
+### Added
+- **Batch Processing**: Implemented `batch-check-compliance` in `compliance-manager.clar`.
+- **Clarity 4 Preparation**: Updated `Clarinet.toml` and core contracts to prepare for Clarity 4 native features (contract-hash, secp256r1-verify).
+
+### Changed
+- **PRD Alignment**: Fully synchronized `PRD.md` with implementation state, clarifying the use of Bitcoin-anchored temporal logic.
+
 ## [0.6.0] - 2026-02-02 - CXIP-011: Intelligence-Led Adaptive Yield Engine
 
 ### Added

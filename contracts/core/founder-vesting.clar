@@ -59,6 +59,7 @@
           end-time: (get end-time (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE))),
           claimed-amount: vested-amount
         })
+        (print { event: "vesting-claimed", beneficiary: tx-sender, amount: claim-amount, timestamp: burn-block-height })
         (ok claim-amount)
       )
     )
