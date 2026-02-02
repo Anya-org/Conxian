@@ -1,0 +1,26 @@
+title: Conxian Finance Protocol Documentation
+description: Sovereign Autonomous Business on Stacks/Bitcoin
+theme: jekyll-theme-cayman
+show_downloads: true
+google_analytics:
+remote_theme: pages-themes/cayman@v0.2.0
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"
+
+navigation:
+  - title: Home
+    url: /
+  - title: PRD
+    url: /PRD
+  - title: Research
+    url: /docs/RESEARCH
+  - title: Benchmarks
+    url: /docs/BENCHMARKS
+  - title: Roadmap
+    url: /docs/ROADMAP
+  - title: Whitepaper
+    url: /docs/WHITEPAPER

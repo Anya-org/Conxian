@@ -1,3 +1,9 @@
+---
+layout: default
+title: Agents Module
+permalink: /modules/agents/
+---
+
 # Agents Module
 
 ## Overview
@@ -29,3 +35,6 @@ This module contains two distinct agent contracts:
 
 -   `check-work-needed()`: Implements the `office-job-trait` to check if the treasury balance has exceeded the rebalancing threshold.
 -   `do-work(job-data (buff 2048))`: Implements the `office-job-trait` to perform the treasury rebalancing.
+
+## Status
+**Aligned**: The Agents module (Staff) is fully integrated with the `office-manager` and Nakamoto-era automation standards.

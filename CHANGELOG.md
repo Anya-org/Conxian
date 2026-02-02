@@ -18,7 +18,7 @@
 - **SAB Whitepaper**: Enhanced `docs/WHITEPAPER.md` with Sovereign Autonomous Business (SAB) narrative and VC pitch.
 - **Verification Suite**: Updated `docs/REQUIREMENTS_TESTING.md` with specific unit tests for autonomous agents and fiscal policy.
 - **CAPEX/OPEX Modeling**: Integrated detailed financial estimates and "Staff" payroll models in `PRD.md`.
-- **Research Findings**: Documented 2024 Bitcoin L2 landscape and MiCA regulatory findings in `docs/research_findings_2024.md`.
+- **Research Findings**: Documented 2024 Bitcoin L2 landscape and MiCA regulatory findings in `docs/RESEARCH.md` (updated to 2026).
 
 ### Changed
 

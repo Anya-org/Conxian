@@ -1,4 +1,10 @@
-# Conxian Protocol Roadmap (v0.3.0)
+---
+layout: default
+title: Protocol Roadmap
+permalink: /docs/ROADMAP/
+---
+
+# Conxian Protocol Roadmap (v0.5.0)
 
 ## Phase 1: MVP (Foundation Recovery) - COMPLETED
 - **Root Sovereignty**: Implementation of `conxian-protocol` registry and `conxian-access` RBAC.

@@ -1,3 +1,9 @@
+---
+layout: default
+title: Product Requirements Document (PRD)
+permalink: /PRD/
+---
+
 # Conxian Finance Protocol - Product Requirements Document
 
 ## 1. Executive Summary
@@ -214,3 +220,10 @@ The protocol utilizes a 5-token system aligned with specialized councils:
 | `contracts/lending/lending-manager.clar` | Consolidated | COMPLETED |
 | `contracts/governance/dao-treasury.clar` | Aligned with Vault Trait | COMPLETED |
 | `contracts/agents/agent-risk.clar` | "Office Worker" Implemented | COMPLETED |
+
+## 14. Performance & Benchmarks
+
+Detailed execution metrics and scalability data can be found in the [Protocol Benchmarks](docs/BENCHMARKS.md) document.
+Current performance confirms < 20ms execution for core financial primitives.
+
+Strategic analysis of the competitive landscape and regulatory environment is available in the [Research & Strategic Analysis](docs/RESEARCH.md) document.

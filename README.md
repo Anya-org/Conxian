@@ -1,3 +1,9 @@
+---
+layout: default
+title: Conxian Finance Protocol
+permalink: /
+---
+
 # Conxian Finance Protocol
 
 ## Overview
@@ -86,6 +92,8 @@ Total revenue is automatically distributed:
 ## Status
 
 - **Maturity Level**: 🟢 **Protocol Repairs Complete** (January 2026)
+- **Performance**: ⚡ **[Verified Benchmarks](docs/BENCHMARKS.md)** (Avg. < 20ms execution)
+- **Strategy**: 📖 **[Research & Strategic Analysis](docs/RESEARCH.md)** (2026 Update)
 - **Completed Repairs**:
   - ✅ P1: Sovereign Handoff (timelock execution, admin transfers)
   - ✅ P2: Regulatory Gaps (compliance provider system, KYC/AML)

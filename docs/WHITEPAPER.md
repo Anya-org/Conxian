@@ -1,3 +1,9 @@
+---
+layout: default
+title: Whitepaper
+permalink: /docs/WHITEPAPER/
+---
+
 # Conxian Finance: The Sovereign Autonomous Business (SAB)
 
 ## Narrative: Code as Law, Logic as Sovereign
