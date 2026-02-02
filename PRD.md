@@ -20,8 +20,8 @@ The system operates like a digital corporation where smart contracts serve as Ma
   - **Lending**: 10% Reserve Factor on interest spreads.
   - **DEX**: ~1/6th Protocol Fee on swap volume.
   - **Services**: Subscription fees for advanced tools.
-- **Unit Economics**: 60/20/20 revenue distribution split (Staking/Dev/Insurance).
-- **Market Defensibility**: Native Bitcoin finality (Nakamoto) and a "Full Truth" autonomous agent model.
+- **Unit Economics**: Intelligence-Led Adaptive Yield Engine (AYE) dynamically rebalances revenue. Target: 60/20/20 (Staking/Dev/Insurance).
+- **Market Defensibility**: Native Bitcoin finality (Nakamoto), "Full Truth" autonomous agent model, and the world's first "Self-Correcting" DeFi fiscal policy.
 - **LTV/CAC**: High LTV via subscription-based services (XAAS) and automated liquidations; low CAC through community-driven "Staff" governance.
 
 ### 2.2. Regulations
@@ -57,8 +57,8 @@ The system operates like a digital corporation where smart contracts serve as Ma
 - **Strengths**:
   - **Bitcoin Finality**: Inheritance of BTC security via Nakamoto/PoX.
   - **Determinism**: Clarity 4 decidability prevents "Re-entrancy" and other EVM-common bugs.
-  - **Autonomous Fiscal Policy**: Hard-coded 60/20/20 revenue split ensures long-term solvency.
-  - **Operational Efficiency**: 24/7 "Staff" agents reduce human overhead and reaction time.
+- **Autonomous Fiscal Policy**: Intelligence-Led AYE with PID/Fuzzy transitions ensures predictive solvency.
+- **Operational Efficiency**: 24/7 "Staff" agents with predictive risk perception (Agent-Risk 2.0).
 - **Weaknesses**:
   - **Cognitive Load**: 5-token model (CXD/CXVG/CXS/CXTR/CXLP) requires steep user education.
   - **Dependency**: Reliance on Stacks core upgrade timelines (Nakamoto).
@@ -91,7 +91,7 @@ The system operates like a digital corporation where smart contracts serve as Ma
 ### 4.2. OPEX (Maintenance)
 
 - **Staff Payroll (Autonomous)**: 20% of protocol revenue is automatically routed to `operational-treasury` to pay "Keepers" and "Agents" via `office-manager`.
-- **Governance Dividends**: 60% of revenue distributed to CXD stakers, ensuring a high yield-to-governance ratio.
+- **Governance Dividends**: Target 60% of revenue distributed to CXD stakers via AYE, with priority claims backfilled during defensive recovery.
 - **Infrastructure**: Costs for RPC nodes, indexing, and front-end hosting (decentralized via IPFS).
 
 ## 5. Gaps & Hurdles (Kill-Switch Risks)
@@ -113,7 +113,8 @@ The system operates like a digital corporation where smart contracts serve as Ma
 - **DAO (Board of Directors)**: Holds ultimate sovereignty over the protocol. Approves strategic changes.
 - **Office Workers (Staff)**: Autonomous agents (`agent-risk`, `agent-treasury`) that execute daily operations.
 - **Operational Treasury (Company Accounts)**: Managed by the Executive (Ops Engine) with Board oversight.
-- **Revenue Distributor (CFO)**: Automatically enforces the 60/20/20 fiscal policy.
+- **Revenue Distributor (CFO)**: Automatically enforces AYE fiscal policy with predictive claim accrual.
+- **Adaptive Yield Engine (AYE)**: The "Monetary Fund" module implementing PID control and Fuzzy Logic state transitions.
 
 ### 7.2. Facade Pattern Architecture
 
@@ -131,13 +132,14 @@ The system operates like a digital corporation where smart contracts serve as Ma
 - Minimum 6 Bitcoin confirmations for high-value operations via `block-utils`.
 - All core logic is tenure-aware via `block-utils`, ensuring deterministic behavior across Stacks blocks.
 
-### 8.2. Sovereign Autonomous Fiscal Policy
+### 8.2. Sovereign Autonomous Fiscal Policy (Intelligence-Led)
 
-Revenue generated from all protocol activities (Subscriptions, DEX fees, Lending spreads) is automatically distributed:
+Revenue generated from all protocol activities is dynamically distributed via the **Adaptive Yield Engine (AYE)**:
 
-- **60% Staking (Dividends)**: Routed to `cxd-staking` to reward governance participants.
-- **20% Operational Treasury (R&D/Ops)**: Routed to `operational-treasury` for autonomous staff expenses and protocol development.
-- **20% Insurance Fund (Risk Reserve)**: Routed to a dedicated reserve to maintain system solvency during black swan events.
+- **Target State (Equilibrium)**: 60% Staking / 20% Treasury / 20% Insurance.
+- **Predictive State (Pre-emptive)**: 40-55% Staking / 20% Treasury / 25-40% Insurance.
+- **Crisis State (Defensive)**: 0-10% Staking / 20% Treasury / 70-80% Insurance.
+- **Priority Claims**: Any yield diverted from stakers during Defensive/Pre-emptive states is recorded as an "Accrued Claim" for future backfilling.
 
 ## 9. Governance Model (Staff vs Board)
 
@@ -172,20 +174,17 @@ The protocol utilizes a 5-token system aligned with specialized councils:
 - **MEV Protection**: Commit-Reveal scheme enforced for all DEX operations to prevent frontrunning. Implemented in `mev-protector.clar`.
 - **Hybrid Oracle**: Aggregates Pyth, Redstone, and Switchboard with deviation guards. Implemented in `oracle-aggregator.clar`.
 
-## 12. Implementation Status (January 2026)
+## 12. Implementation Status (February 2026)
 
-### 12.1 Current State: Protocol Repairs Complete (v0.5.0)
+### 12.1 Current State: CXIP-011 Deployed (v0.6.0)
 
-**Completed Priority Repairs (P1-P6)**:
+**Completed Core Modules**:
 
 | Priority | Component | Status | Key Deliverables |
 |----------|-----------|--------|------------------|
-| P1 | Sovereign Handoff | Complete | Timelock execution, 5-step transfer, admin role migration |
-| P2 | Regulatory Gaps | Complete | Provider-based compliance, KYC/AML attestation, sanctions screening |
-| P3 | Tokenomics | Complete | CXD supply cap (1B), 60/20/20 immutability lock |
-| P4 | ICO Hardening | Complete | Compliance gating, purchase caps, buyer tracking |
-| P5 | NFT Economics | Complete | CXLP Position NFT (SIP-009, metadata, fees) |
-| P6 | Operational Safety | Complete | Rate limiter, proof-of-reserves, circuit breakers |
+| P1-P6 | Protocol Repairs | Complete | Sovereign Handoff, MiCA Compliance, Token Caps, Circuit Breakers |
+| P7 | CXIP-011: AYE | Complete | Intelligence-Led Yield Engine, PID Controller, Fuzzy Logic Fiscal Policy |
+| P8 | Agent-Risk 2.0 | Complete | Predictive Perception (Liquidity, Hashrate, Mempool) |
 
 ### 12.2 Clarity 4 / Nakamoto Compliance
 
@@ -209,7 +208,7 @@ The protocol utilizes a 5-token system aligned with specialized councils:
 - **Clarity 4 Protocol Enforcement**: All core contracts migrated to Clarity 4 (Epoch 3.0), utilizing `stacks-block-time` for high-precision temporal logic and `contract-hash?` for secure module registry.
 - **Nakamoto Transition**: Switched from legacy `block-height` to `stacks-block-time` for all yield, voting, and timelock accrual, ensuring deterministic behavior in fast-block environments.
 - **Service Module Repair**: Consolidated DEX, Lending, and Token modules.
-- **Autonomous Agents**: Implemented `agent-risk` with `check-work-needed` and `do-work` for automated liquidations.
+- **Autonomous Agents**: Upgraded to Agent-Risk 2.0 with Predictive Perception and Agent-Treasury with PID Control.
 
 ## 13. Recovery Registry (BOLT Initiative)
 

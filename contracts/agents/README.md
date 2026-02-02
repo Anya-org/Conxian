@@ -14,13 +14,16 @@ The Agents Module contains autonomous contracts that are designed to perform spe
 
 This module contains two distinct agent contracts:
 
--   **`agent-risk.clar`**: Acts as an autonomous risk manager. It is responsible for setting risk parameters, managing liquidations, and assessing the health of open positions.
--   **`agent-treasury.clar`**: Acts as an autonomous treasury manager, or "CFO". It is responsible for rebalancing the protocol's funds when certain thresholds are met.
+-   **`agent-risk.clar`**: Agent-Risk 2.0. Acts as an autonomous risk manager with **Predictive Perception**. It monitors liquidity depth, hashrate volatility, and mempool congestion to determine the protocol's risk state.
+-   **`agent-treasury.clar`**: Acts as an autonomous treasury manager implementing **PID Control Theory**. It dynamically rebalances revenue flows between stakers and the insurance fund based on the intelligence provided by `agent-risk`.
 
 ## Public Functions
 
 ### `agent-risk.clar`
 
+-   `set-predictive-params(liquidity uint, hashrate uint, mempool uint)`: (Admin Only) Updates the predictive perception inputs.
+-   `assess-system-risk()`: (Read-Only) Calculates a composite risk score (0-10000).
+-   `get-current-risk-state()`: (Read-Only) Returns the current state: "EQUILIBRIUM", "PREEMPTIVE", or "DEFENSIVE".
 -   `set-risk-parameters(new-max-leverage uint, new-maintenance-margin uint, new-liquidation-threshold uint)`: (Admin Only) Sets the core risk parameters for the protocol.
 -   `set-liquidation-rewards(min-reward uint, max-reward uint)`: (Admin Only) Sets the minimum and maximum rewards for liquidators.
 -   `liquidate-position(position-id uint, liquidator principal)`: Liquidates an unhealthy position.
