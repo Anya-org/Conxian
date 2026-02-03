@@ -184,6 +184,10 @@
 )
 
 ;; Minimal aggregator: return latest price when not manipulated; otherwise return TWAP (degraded mode)
+
+(define-read-only (get-volatility (asset principal))
+  (ok (default-to { mean: u0, variance: u0, count: u0 } (map-get? asset-volatility-data { asset: asset })))
+)
 (define-read-only (get-price (asset principal))
   (match (map-get? asset-sources { asset: asset })
     entry

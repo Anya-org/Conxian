@@ -7,6 +7,7 @@
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u1000)
 
+(define-data-var last-slow-check uint u0)
 ;; State
 (define-data-var rebalance-threshold uint u1000000) ;; 1M uSTX
 
@@ -20,6 +21,23 @@
 (define-constant KD 100) ;; 0.01
 
 ;; Authorization
+
+(define-public (apply-fiscal-dam)
+  (let ((gcr (unwrap-panic (contract-call? .agent-risk get-gcr))))
+    (begin
+      (if (< gcr u110)
+        (try! (contract-call? .cxd-treasury rebalance u0 u0 u10000))
+        (if (< gcr u150)
+          (try! (contract-call? .cxd-treasury rebalance u6000 u2000 u2000))
+          (try! (contract-call? .cxd-treasury rebalance u8000 u1000 u1000))
+        )
+      )
+      (var-set last-slow-check burn-block-height)
+      (ok true)
+    )
+  )
+)
+
 (define-public (check-work-needed)
   (let (
       (risk-score (contract-call? .agent-risk assess-system-risk))

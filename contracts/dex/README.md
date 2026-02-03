@@ -36,6 +36,7 @@ Handles user-facing swap operations. It is Nakamoto-aligned and tenure-aware.
 
 - `exact-input-single(pool-id uint, token-in <sip-010-ft-trait>, token-out <sip-010-ft-trait>, amount-in uint, min-amount-out uint)`: Performs a swap across a single pool.
 - `exact-input-multi(pool-ids (list 5 uint), tokens (list 6 principal), amount-in uint, min-amount-out uint)`: Coordinates swaps across multiple hops.
+- `update-volatility-fees()`: (Public) Fast Path trigger to adjust pool fees based on instant volatility (Anti-LVR).
 
 ### `swap-manager.clar` (Coordination)
 
@@ -53,6 +54,7 @@ The singleton contract managing all concentrated liquidity pools and fee collect
 - `swap(pool-id uint, zero-for-one bool, amount-in uint, token0-trait <sip-010-ft-trait>, token1-trait <sip-010-ft-trait>)`: Executes trades against a specific pool ID.
 - `mint(pool-id uint, tick-lower int, tick-upper int, amount uint)`: Adds liquidity to a specific tick range.
 - `collect-protocol-fees(token-trait <sip-010-ft-trait>)`: Sweeps accumulated fees to the Revenue Distributor.
+- `set-pool-fee(pool-id uint, new-fee uint)`: (Public) Authorized update of the pool fee parameter.
 
 ### `vault.clar` (Asset Management)
 

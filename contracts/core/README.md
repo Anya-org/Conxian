@@ -18,7 +18,10 @@ The module operates on a three-contract model that separates administrative auth
 
 2.  **`conxian-protocol.clar` (Protocol State Coordinator)**: This contract manages the global state of the protocol. Its primary responsibilities include managing the system-wide emergency pause switch, maintaining a registry of all authorized module contracts, and handling contract ownership. It **delegates all authorization checks** to the `admin-facade.clar` contract.
 
-3.  **`dimensional-engine.clar` (User Facade)**: This is the primary, user-facing entry point for all trading and position management. It validates user inputs and delegates the core logic to specialized manager contracts. Before executing any state-changing operations, it performs critical pre-flight checks by querying `conxian-protocol.clar`.
+3.  **`dimensional-engine.clar` (User Facade)**: ... (User entry point) ...
+
+4.  **`ops-engine.clar` (The Heartbeat)**: Coordinates the protocol heartbeat by triggering Fast Path and Slow Path logic updates (CXIP-012). It incentivizes external keepers to maintain protocol health.
+
 
 ### Control Flow Diagram
 
@@ -65,6 +68,11 @@ graph TD
 -   `transfer-global-admin-to-timelock()`: (Global Admin Only) Transfers the global admin role to the protocol timelock.
 -   `set-rbac-contract(new-contract principal)`: (Global Admin Only) Sets the address of the RBAC contract.
 -   `batch-admin-operations(operations (list 200 {type: uint, params: (list 5 principal)}))`: (Global Admin Only) Executes multiple administrative operations in a single transaction.
+
+### `ops-engine.clar` (The Heartbeat)
+
+-   `trigger-epoch-update()`: (Public) Incentivized function to trigger Anti-LVR updates (Fast Path) and Fiscal Dam/PID updates (Slow Path).
+-   `process-signal(proposal-id uint, proposal-contract <proposal-trait>)`: (Operator Only) Executes governance signals.
 
 ### `conxian-protocol.clar` (Protocol State Coordinator)
 

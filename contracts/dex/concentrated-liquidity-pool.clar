@@ -137,3 +137,19 @@
 (define-read-only (get-position (pool-id uint) (owner principal) (tick-lower int) (tick-upper int))
   (map-get? positions { pool-id: pool-id, owner: owner, tick-lower: tick-lower, tick-upper: tick-upper })
 )
+
+
+(define-data-var fee-setter principal tx-sender)
+(define-public (set-pool-fee (pool-id uint) (new-fee uint))
+  (let ((pool (unwrap! (map-get? pools pool-id) (err ERR_INSUFFICIENT_LIQUIDITY))))
+    (begin
+      (asserts! (or
+        (is-eq tx-sender (unwrap-panic (contract-call? .conxian-protocol get-protocol-admin)))
+        (is-eq contract-caller (var-get fee-setter))
+      ) (err ERR_UNAUTHORIZED))
+      (map-set pools pool-id (merge pool { fee: new-fee }))
+      (print { event: "pool-fee-updated", pool-id: pool-id, new-fee: new-fee })
+      (ok true)
+    )
+  )
+)
