@@ -18,15 +18,15 @@ describe("Governance Tests", () => {
   });
 
   describe("Operations Engine", () => {
-    it("should have conxian-operations-engine deployed", () => {
-      const contract = simnet.getContractSource("conxian-operations-engine");
+    it("should have ops-engine deployed", () => {
+      const contract = simnet.getContractSource("ops-engine");
       expect(contract).toBeDefined();
     });
 
     it("should allow operational adjustments", () => {
       const params = Cl.bufferFromHex("00"); // Dummy params
       const result = simnet.callPublicFn(
-        "conxian-operations-engine",
+        "ops-engine",
         "execute-operational-adjustment",
         [params],
         deployer
@@ -37,7 +37,7 @@ describe("Governance Tests", () => {
 
     it("should check failsafe status", () => {
       const result = simnet.callReadOnlyFn(
-        "conxian-operations-engine",
+        "ops-engine",
         "is-failsafe-active",
         [],
         deployer

@@ -7,8 +7,8 @@ let simnet: Simnet;
 beforeAll(async () => {
   if (!simnet) {
     console.log('Initializing Simnet for test environment...');
-    // Force Clarity 2 / Epoch 3.0
-    simnet = await initSimnet();
+    // Force Clarity 4 / Epoch 3.0
+    simnet = await initSimnet('Clarinet.toml');
     console.log('Simnet initialized.');
   }
 });

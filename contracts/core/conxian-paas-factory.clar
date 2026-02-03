@@ -15,7 +15,7 @@
 (define-data-var deployment-fee uint u1000000000) ;; 1000 STX (example)
 (define-data-var fee-collector principal .operational-treasury)
 (define-data-var regulatory-adapter-contract principal .regulatory-adapter)
-(define-data-var conxian-operations-engine-contract principal .conxian-operations-engine)
+(define-data-var ops-engine-contract principal .ops-engine)
 (define-data-var agent-risk-contract principal .agent-risk)
 
 ;; Registry of deployed businesses
@@ -92,7 +92,7 @@
   (let ((sab (unwrap! (map-get? deployed-sabs name) (err ERR_DEPLOYMENT_FAILED))))
     ;; Only Ops Engine or Risk Agent can suspend
     (asserts!
-      (or (is-eq tx-sender (var-get conxian-operations-engine-contract)) (is-eq tx-sender (var-get agent-risk-contract)))
+      (or (is-eq tx-sender (var-get ops-engine-contract)) (is-eq tx-sender (var-get agent-risk-contract)))
       (err ERR_UNAUTHORIZED)
     )
 

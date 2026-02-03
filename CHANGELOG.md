@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.6.1] - 2026-02-02 - Final Alignment & Precision Refactor
+
+### Fixed
+- **Compliance Manager**: Fixed 24h validity check logic to use block-height consistency (144 blocks).
+- **Temporal Logic**: Synchronized all contracts to use `burn-block-height` for Bitcoin-anchored precision and finality.
+- **Vesting**: Added events to `founder-vesting` for better auditability.
+
+### Added
+- **Batch Processing**: Implemented `batch-check-compliance` in `compliance-manager.clar`.
+- **Clarity 4 Preparation**: Updated `Clarinet.toml` and core contracts to prepare for Clarity 4 native features (contract-hash, secp256r1-verify).
+
+### Changed
+- **PRD Alignment**: Fully synchronized `PRD.md` with implementation state, clarifying the use of Bitcoin-anchored temporal logic.
+
+## [0.6.0] - 2026-02-02 - CXIP-011: Intelligence-Led Adaptive Yield Engine
+
+### Added
+
+- **Adaptive Yield Engine (AYE)**: Implemented `cxd-treasury.clar` as a dynamic replacement for static allocation policies.
+- **Agent-Risk 2.0**: Enhanced `agent-risk.clar` with Predictive Perception (liquidity depth, hash rate volatility, mempool congestion).
+- **Control Theory**: Integrated PID Controller and Fuzzy Logic in `agent-treasury.clar` for smooth fiscal transitions.
+- **Priority Claims**: Automated "Accrued Claims" tracking in `cxd-treasury.clar` for diverted staker revenue during defensive states.
+- **Intelligence Loop**: Composite risk scoring and automated state transitions (Equilibrium, Pre-emptive, Defensive).
+
+### Changed
+
+- **Revenue Distribution**: Refactored `revenue-distributor.clar` to utilize the AYE intelligence loop and record priority claims.
+- **Clarity 4 Migration**: Upgraded all core protocol and agent contracts to Clarity 4 (Epoch 3.0) for Nakamoto-era performance.
+
+### Deprecated
+
+- **Static Policy**: Deprecated `allocation-policy.clar` in favor of the Intelligence-Led AYE.
+
 ## [2024-07-22] - Documentation Realignment
 
 ### Changed
@@ -18,7 +51,7 @@
 - **SAB Whitepaper**: Enhanced `docs/WHITEPAPER.md` with Sovereign Autonomous Business (SAB) narrative and VC pitch.
 - **Verification Suite**: Updated `docs/REQUIREMENTS_TESTING.md` with specific unit tests for autonomous agents and fiscal policy.
 - **CAPEX/OPEX Modeling**: Integrated detailed financial estimates and "Staff" payroll models in `PRD.md`.
-- **Research Findings**: Documented 2024 Bitcoin L2 landscape and MiCA regulatory findings in `docs/research_findings_2024.md`.
+- **Research Findings**: Documented 2024 Bitcoin L2 landscape and MiCA regulatory findings in `docs/RESEARCH.md` (updated to 2026).
 
 ### Changed
 

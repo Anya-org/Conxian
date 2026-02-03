@@ -1,3 +1,9 @@
+---
+layout: default
+title: Lending Module
+permalink: /modules/lending/
+---
+
 # Lending Module
 
 ## Overview

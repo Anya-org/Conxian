@@ -23,7 +23,7 @@ describe("Conxian Operations Engine", () => {
     // Operations Engine Principal
     const opsEngine = Cl.contractPrincipal(
       deployer,
-      "conxian-operations-engine"
+      "ops-engine"
     );
 
     // Mint Seat u5 (Ops) to the contract
@@ -40,7 +40,7 @@ describe("Conxian Operations Engine", () => {
     const params = Cl.bufferFromHex("00"); // Dummy params
 
     const exec = simnet.callPublicFn(
-      "conxian-operations-engine",
+      "ops-engine",
       "execute-operational-adjustment",
       [params],
       deployer // Default controller is deployer
@@ -51,7 +51,7 @@ describe("Conxian Operations Engine", () => {
   it("prevents unauthorized users from executing adjustments", () => {
     const params = Cl.bufferFromHex("00");
     const exec = simnet.callPublicFn(
-      "conxian-operations-engine",
+      "ops-engine",
       "execute-operational-adjustment",
       [params],
       wallet1
@@ -93,7 +93,7 @@ describe("Conxian Operations Engine", () => {
 
     // 4. Controller triggers the vote
     const vote = simnet.callPublicFn(
-      "conxian-operations-engine",
+      "ops-engine",
       "cast-council-vote",
       [Cl.uint(1), Cl.bool(true)],
       deployer
@@ -142,7 +142,7 @@ describe("Conxian Operations Engine", () => {
 
     // 3. Try to vote (No seat minted for engine)
     const vote = simnet.callPublicFn(
-      "conxian-operations-engine",
+      "ops-engine",
       "cast-council-vote",
       [Cl.uint(1), Cl.bool(true)],
       deployer
@@ -152,7 +152,7 @@ describe("Conxian Operations Engine", () => {
 
   it("allows updating the controller", () => {
     const update = simnet.callPublicFn(
-      "conxian-operations-engine",
+      "ops-engine",
       "set-operator-controller",
       [Cl.standardPrincipal(wallet1)],
       deployer

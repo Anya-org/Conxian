@@ -1,4 +1,4 @@
-;; oracle-aggregator-v2.clar
+;; oracle-aggregator.clar
 ;; Conxian Oracle Standard: Hybrid Aggregator V2
 ;; Orchestrates Pyth (DEX), RedStone (Lending), and Switchboard (Sentinels)
 ;; Enhanced with TWAP and Manipulation Detection

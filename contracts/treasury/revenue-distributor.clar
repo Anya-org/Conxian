@@ -15,8 +15,9 @@
 
 (define-public (distribute-token (token <sip-010-ft-trait>) (amount uint))
   (let (
-    (policy (unwrap-panic (contract-call? .allocation-policy get-allocation-percentages)))
-    (staking-amt (/ (* amount (get staking policy)) u10000))
+    (policy (unwrap-panic (contract-call? .cxd-treasury get-allocation-percentages)))
+    (staking-share (get staking policy))
+    (staking-amt (/ (* amount staking-share) u10000))
     (dev-amt (/ (* amount (get dev policy)) u10000))
     (ins-amt (/ (* amount (get insurance policy)) u10000))
   )
@@ -24,6 +25,17 @@
       (try! (as-contract (contract-call? token transfer staking-amt tx-sender (var-get staking-vault) none)))
       (try! (as-contract (contract-call? token transfer dev-amt tx-sender (var-get operational-treasury) none)))
       (try! (as-contract (contract-call? token transfer ins-amt tx-sender (var-get insurance-fund) none)))
+
+      ;; Record diverted claim if staking-share is below target (60%)
+      (if (< staking-share u6000)
+        (let (
+          (target-amt (/ (* amount u6000) u10000))
+          (diverted (- target-amt staking-amt))
+        )
+          (try! (contract-call? .cxd-treasury record-diverted-claim (contract-of token) diverted))
+        )
+        true
+      )
       (ok true)
     )
   )
@@ -31,8 +43,9 @@
 
 (define-public (distribute-stx (amount uint))
   (let (
-    (policy (unwrap-panic (contract-call? .allocation-policy get-allocation-percentages)))
-    (staking-amt (/ (* amount (get staking policy)) u10000))
+    (policy (unwrap-panic (contract-call? .cxd-treasury get-allocation-percentages)))
+    (staking-share (get staking policy))
+    (staking-amt (/ (* amount staking-share) u10000))
     (dev-amt (/ (* amount (get dev policy)) u10000))
     (ins-amt (/ (* amount (get insurance policy)) u10000))
   )
@@ -40,6 +53,18 @@
       (try! (as-contract (stx-transfer? staking-amt tx-sender (var-get staking-vault))))
       (try! (as-contract (stx-transfer? dev-amt tx-sender (var-get operational-treasury))))
       (try! (as-contract (stx-transfer? ins-amt tx-sender (var-get insurance-fund))))
+
+      ;; Record diverted claim if staking-share is below target (60%)
+      ;; Using .cxd-token as a proxy for STX claims tracker principal
+      (if (< staking-share u6000)
+        (let (
+          (target-amt (/ (* amount u6000) u10000))
+          (diverted (- target-amt staking-amt))
+        )
+          (try! (contract-call? .cxd-treasury record-diverted-claim .cxd-token diverted))
+        )
+        true
+      )
       (ok true)
     )
   )

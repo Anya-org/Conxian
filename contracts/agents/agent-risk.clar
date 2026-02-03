@@ -19,6 +19,106 @@
 (define-data-var insurance-fund principal tx-sender)
 (define-data-var last-checked-id uint u0)
 
+;; Agent-Risk 2.0: Predictive Perception State
+(define-data-var liquidity-depth uint u10000) ;; 10000 = 100% (Target depth)
+(define-data-var hash-rate-volatility uint u0) ;; 0 = stable, 10000 = extreme
+(define-data-var mempool-congestion uint u0) ;; 0 = empty, 10000 = full
+
+;; Governance bounds for states
+(define-constant RISK_THRESHOLD_PREEMPTIVE u2000)
+(define-constant RISK_THRESHOLD_DEFENSIVE u5000)
+
+;; PID Stability Controller State
+(define-data-var last-price-error int 0)
+(define-data-var price-integral int 0)
+(define-data-var stability-fee uint u500) ;; 5% default (bps)
+
+(define-constant KP_STABILITY u50)
+(define-constant KI_STABILITY u1)
+(define-constant KD_STABILITY u10)
+(define-constant PRICE_TARGET u100000000) ;; .00
+
+(define-public (set-predictive-params
+    (new-liquidity-depth uint)
+    (new-hash-rate-volatility uint)
+    (new-mempool-congestion uint)
+  )
+  (begin
+    (try! (check-role "ROLE_ADMIN"))
+    (asserts! (<= new-liquidity-depth u10000) (err ERR_INVALID_PARAMETERS))
+    (asserts! (<= new-hash-rate-volatility u10000) (err ERR_INVALID_PARAMETERS))
+    (asserts! (<= new-mempool-congestion u10000) (err ERR_INVALID_PARAMETERS))
+    (var-set liquidity-depth new-liquidity-depth)
+    (var-set hash-rate-volatility new-hash-rate-volatility)
+    (var-set mempool-congestion new-mempool-congestion)
+    (ok true)
+  )
+)
+
+(define-read-only (assess-system-risk)
+  (let (
+    ;; Liquidity risk increases as depth decreases
+    (l-risk (if (> u10000 (var-get liquidity-depth)) (- u10000 (var-get liquidity-depth)) u0))
+    (h-risk (var-get hash-rate-volatility))
+    (m-risk (var-get mempool-congestion))
+    ;; Simple weighted average for composite score
+    (composite-score (/ (+ (+ l-risk h-risk) m-risk) u3))
+  )
+    composite-score
+  )
+)
+
+(define-read-only (get-current-risk-state)
+  (let (
+    (score (assess-system-risk))
+  )
+    (if (>= score RISK_THRESHOLD_DEFENSIVE)
+      "DEFENSIVE"
+      (if (>= score RISK_THRESHOLD_PREEMPTIVE)
+        "PREEMPTIVE"
+        "EQUILIBRIUM"
+      )
+    )
+  )
+)
+
+(define-read-only (get-gcr)
+  (let ((score (assess-system-risk)))
+    (if (> score u5000)
+      (ok u105) ;; Crisis
+      (if (> score u2000)
+        (ok u130) ;; Stability
+        (ok u160) ;; Abundance
+      )
+    )
+  )
+)
+
+(define-public (update-pid-rates)
+  (let (
+    (price (unwrap-panic (contract-call? .oracle-aggregator get-price .cxd-token)))
+    (error (- (to-int PRICE_TARGET) (to-int price)))
+    (new-integral (+ (var-get price-integral) error))
+    (derivative (- error (var-get last-price-error)))
+    (term-p (* (to-int KP_STABILITY) error))
+    (term-i (* (to-int KI_STABILITY) new-integral))
+    (term-d (* (to-int KD_STABILITY) derivative))
+    (numerator (+ (+ term-p term-i) term-d))
+    (adjustment (/ numerator (to-int u10000)))
+    (current-fee (to-int (var-get stability-fee)))
+    (new-fee-int (+ current-fee adjustment))
+    (final-fee (if (> new-fee-int (to-int u2000)) u2000 (if (< new-fee-int (to-int u0)) u0 (to-uint new-fee-int))))
+  )
+    (begin
+      (var-set price-integral new-integral)
+      (var-set last-price-error error)
+      (var-set stability-fee final-fee)
+      (print { event: "stability-fee-updated", new-fee: final-fee, error: error })
+      (ok true)
+    )
+  )
+)
+
 (define-public (set-risk-parameters
     (new-max-leverage uint)
     (new-maintenance-margin uint)
@@ -161,9 +261,9 @@
 )
 
 (define-private (check-role (role (string-ascii 32)))
-  (if (is-eq role "ROLE_ADMIN")
+  (if (or (is-eq tx-sender (var-get contract-owner)) (is-eq contract-caller .conxian-access))
     (ok true)
-    (err u1001)
+    (err ERR_UNAUTHORIZED)
   )
 )
 

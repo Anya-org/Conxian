@@ -101,7 +101,7 @@
 (define-public (payout (worker principal) (amount uint))
   (begin
     ;; 1. Caller must be an Authorized Agent (e.g., agent-risk)
-    (asserts! (is-authorized-agent tx-sender) (err ERR_UNAUTHORIZED))
+    (asserts! (is-authorized-agent contract-caller) (err ERR_UNAUTHORIZED))
     
     ;; 2. Worker must be registered
     (asserts! (is-worker-active worker) (err ERR_UNKNOWN_WORKER))

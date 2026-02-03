@@ -8,67 +8,69 @@ permalink: /modules/governance/
 
 ## Overview
 
-The Governance Module provides the framework for decentralized decision-making and protocol upgrades. It is designed to be secure, transparent, and flexible, enabling the community to propose, vote on, and execute changes. The module also features the **Conxian Operations Engine**, an automated on-chain agent that can participate in governance.
+The Governance Module provides the framework for decentralized decision-making and protocol upgrades. It implements a **Dual-Council Governance Model** (Staff vs Board), separating daily operational management from long-term strategic decisions.
 
-## Architecture: Logic-Rich Facade and Specialized Managers
+## Architecture: Dual-Council System
 
-The Governance Module is architected around a **logic-rich facade**. The `proposal-engine.clar` contract serves as the primary controller, acting as the secure, unified entry point for all governance actions.
+The module is architected around two specialized voting engines:
 
-Unlike a pure facade, the `proposal-engine.clar` contains significant business logic. It is responsible for enforcing the core rules of the governance process, such as validating proposal timings, checking voting eligibility, and managing the overall state of a proposal. While it orchestrates the process, it delegates specialized tasks to the manager contracts below.
+1.  **Operational Council (Staff)**: Managed via `proposal-engine.clar`. This is a high-velocity, 24/7 engine used by autonomous agents and core managers for parameter tuning and emergency responses.
+2.  **Strategic Council (Board/AGM)**: Managed via `community-voting-engine.clar`. This engine is used for high-quorum, long-duration votes by CXVG token holders, typically during Annual General Meetings (AGM).
 
 ### Control Flow Diagram
 
 ```mermaid
 graph TD
-    subgraph "Voting Power Calculation"
-        A[enhanced-governance-nft.clar] -- 1. Raw Seat Power --> B{proposal-engine.clar};
-        C[reputation-engine.clar] -- 2. Adjusts for Activity --> B;
+    subgraph "Operational Council (Staff)"
+        A[Agents/Managers] -- submit-proposal --> B{proposal-engine.clar};
+        B -- Record --> C[proposal-registry.clar];
+        A -- vote --> B;
+        B -- execute --> D[proposal-executor.clar];
     end
 
-    subgraph "Governance Workflow"
-        D[User/DAO] -- 3. submit-proposal() --> B;
-        B -- 4. Stores Proposal --> E[proposal-registry.clar];
-        F[Voter] -- 5. vote() --> B;
-        B -- 6. Records Weighted Vote --> E;
-        G[Proposer/Admin] -- 7. execute-proposal() --> H[proposal-executor.clar];
-        H -- 8. Executes Payload --> I[Target Contract];
-        H -- 9. Marks as Executed --> E;
+    subgraph "Strategic Council (Board)"
+        E[CXVG Holders] -- create-proposal --> F{community-voting-engine.clar};
+        E -- vote --> F;
+        F -- "Manual Execution (WIP)" --> G[Protocol Upgrades];
     end
 ```
 
 ## Core Contracts
 
-### Logic-Rich Facade
+### Operational Engine (Staff)
 
--   **`proposal-engine.clar`**: The primary **controller** for the governance module. It provides a unified interface for creating proposals, casting votes, and queuing execution. It enforces the core business logic of the governance process and delegates specialized tasks like data storage and vote counting to the manager contracts.
+-   **`proposal-engine.clar`**: The primary controller for daily operations. It routes proposals to the registry and coordinates execution via the executor. It uses `burn-block-height` for temporal logic.
+-   **`proposal-executor.clar`**: Validates quorums and executes the payload of passed operational proposals.
+-   **`proposal-registry.clar`**: The unified data store for all operational proposals and vote receipts.
 
-### Manager Contracts
+### Strategic Engine (Board)
 
--   **`proposal-registry.clar`**: A specialized contract responsible for both storing proposal data and recording all votes cast against them.
--   **`proposal-executor.clar`**: A dedicated contract for executing general governance proposals after they have passed. It validates quorum requirements before executing a proposal's payload.
--   **`upgrade-controller.clar`**: A specialized, high-security contract for managing the execution of sensitive protocol upgrades. This contract is independent of the main proposal engine and incorporates additional safety features like timelocks.
+-   **`community-voting-engine.clar`**: Manages strategic proposals using the CXVG token. It enforces "Clean-Hands" compliance via the `regulatory-adapter` and features long voting periods (~1 year AGM interval).
 
-### Supporting Contracts
+### Supporting Infrastructure
 
--   **`enhanced-governance-nft.clar`**: Implements the NFT-based council and role system. It is the source of a voter's "raw" voting power, based on which council seats they hold.
--   **`reputation-engine.clar`**: A supporting contract that adjusts a voter's raw power based on their activity and historical participation. The `proposal-engine.clar` queries this contract to get a "weighted" voting power, which is used to calculate the final vote.
-
-### Automated Governance Agent
-
--   **`conxian-operations-engine.clar`**: An automated agent that can hold a formal seat in the DAO. It is designed to consume on-chain metrics and participate in governance by calling the `proposal-engine.clar`, although its logic is currently under development.
+-   **`reputation-engine.clar`**: Adjusts a voter's raw power based on activity and historical participation.
+-   **`enhanced-governance-nft.clar`**: Manages council seat power for the Operational Council.
+-   **`cxvg-token.clar`**: The strategic governance token used by the Board.
+-   **`timelock.clar`**: Enforces execution delays for high-sensitivity governance actions.
 
 ## Public Functions
 
-### `proposal-engine.clar` (User-Facing)
+### `proposal-engine.clar` (Operational)
 
--   `submit-proposal(proposal-contract <.governance-traits.proposal-trait>, council-id uint, start-block uint, end-block uint)`: Submits a new proposal for voting.
--   `vote(proposal-id uint, support bool)`: Casts a vote on an active proposal. The weight of the vote is determined by the combination of the voter's NFT-based seat power and their reputation score.
--   `execute-proposal(proposal-id uint, proposal-contract <.governance-traits.proposal-trait>)`: Triggers the execution of a passed proposal by calling the `proposal-executor`.
+-   `submit-proposal(proposal-contract <proposal-trait>, council-id uint, start-block uint, end-block uint)`: Submits a new operational proposal.
+-   `vote(proposal-id uint, support bool)`: Casts a vote weighted by seat power and reputation.
+-   `execute-proposal(proposal-id uint, proposal-contract <proposal-trait>)`: Triggers execution via the `proposal-executor`.
 
-### `proposal-executor.clar` (System-Facing)
+### `community-voting-engine.clar` (Strategic)
 
--   `execute(proposal-id uint, proposal-contract <.governance-traits.proposal-trait>, quorum-percentage uint)`: Called by the `proposal-engine` to execute a passed proposal. It verifies that the voting period is over, the proposal passed, and the quorum was met before executing the proposal's logic.
+-   `create-proposal(start-time uint, end-time uint)`: Creates a new strategic community proposal.
+-   `vote(proposal-id uint, support bool)`: Casts a vote using CXVG tokens, weighted by reputation.
+
+### `proposal-executor.clar`
+
+-   `execute(proposal-id uint, proposal-contract <proposal-trait>, quorum-percentage uint)`: Validates and executes a passed operational proposal.
 
 ## Status
 
-**Under Review**: The contracts in this module are currently undergoing a comprehensive review. While the core governance functionality is implemented, the contracts are not yet considered production-ready and are being hardened to ensure full security and alignment with the protocol's architecture.
+**Aligned**: The Governance module fully implements the Dual-Council architecture. Operational tasks are handled by "Staff" agents via the `proposal-engine`, while strategic shifts are reserved for "Board" members via the `community-voting-engine`.

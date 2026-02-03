@@ -24,7 +24,7 @@
 
 ;; Authorization
 ;; Only Ops Engine or Admin can add targets
-(define-data-var admin principal .conxian-operations-engine)
+(define-data-var admin principal .ops-engine)
 (define-data-var token-system-coordinator-contract principal .token-system-coordinator)
 
 (define-private (is-admin)
