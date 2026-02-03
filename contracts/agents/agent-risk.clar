@@ -180,9 +180,47 @@
 )
 
 (define-public (liquidate (position-id uint))
-  (begin
-    ;; Simplified liquidation logic
-    (ok true)
+  (let (
+    (liquidator tx-sender)
+  )
+    (begin
+      ;; 1. Check if position is liquidatable
+      (asserts! (unwrap-panic (is-liquidatable position-id)) (err u1002))
+      
+      ;; 2. Get position details
+      (let ((position-risk (unwrap! (assess-position-risk position-id) (err ERR_INVALID_PARAMETERS))))
+        
+        ;; 3. Calculate liquidation reward (5% of collateral, clamped to min/max)
+        (let (
+          (collateral (get collateral (unwrap! (contract-call? .position-manager get-position position-id) (err u404))))
+          (reward-bps (var-get liquidation-threshold))
+          (raw-reward (/ (* collateral reward-bps) u10000))
+          (reward (if (< raw-reward (var-get min-liquidation-reward)) 
+                   (var-get min-liquidation-reward)
+                   (if (> raw-reward (var-get max-liquidation-reward))
+                     (var-get max-liquidation-reward)
+                     raw-reward)))
+        )
+          ;; 4. Call dimensional-core to execute liquidation
+          (try! (contract-call? .dimensional-core liquidate-position 
+            (get owner (unwrap! (contract-call? .position-manager get-position position-id) (err u404)))
+            position-id 
+            .oracle-aggregator))
+          
+          ;; 5. Transfer reward to liquidator (from insurance fund or protocol reserves)
+          ;; Note: In production, this would transfer actual assets. For now, we log the event.
+          (print { 
+            event: "liquidation-executed", 
+            position-id: position-id, 
+            liquidator: liquidator,
+            reward: reward,
+            timestamp: burn-block-height
+          })
+          
+          (ok reward)
+        )
+      )
+    )
   )
 )
 
@@ -234,13 +272,51 @@
     (position-id uint)
     (liquidator principal)
   )
-  (begin
-    (asserts! (> u1 u0) (err u1001))
-    (ok {
-      liquidated: true,
-      reward: u0,
-      repaid: u0,
-    })
+  (let (
+    (caller tx-sender)
+  )
+    (begin
+      ;; 1. Verify caller is authorized (this contract or admin)
+      (asserts! (or (is-eq caller (var-get contract-owner)) (is-eq caller (as-contract tx-sender))) (err ERR_UNAUTHORIZED))
+      
+      ;; 2. Check if position is liquidatable
+      (asserts! (unwrap-panic (is-liquidatable position-id)) (err u1003))
+      
+      ;; 3. Execute liquidation through dimensional-core
+      (let (
+        (position (unwrap! (contract-call? .position-manager get-position position-id) (err u404)))
+        (owner (get owner position))
+        (collateral (get collateral position))
+        ;; Calculate 5% liquidation penalty
+        (penalty (/ (* collateral u500) u10000))
+        (reward (- collateral penalty))
+      )
+        ;; Call dimensional-core to liquidate
+        (try! (contract-call? .dimensional-core liquidate-position owner position-id .oracle-aggregator))
+        
+        ;; Seize collateral from lending-manager if applicable
+        (try! (contract-call? .lending-manager seize-collateral .cxd-token owner liquidator collateral))
+        
+        ;; Transfer reward to liquidator
+        ;; In production, transfer actual tokens. For now, log the event.
+        (print {
+          event: "liquidate-position",
+          position-id: position-id,
+          owner: owner,
+          liquidator: liquidator,
+          collateral-seized: collateral,
+          liquidation-penalty: penalty,
+          liquidator-reward: reward,
+          timestamp: burn-block-height
+        })
+        
+        (ok {
+          liquidated: true,
+          reward: reward,
+          repaid: collateral,
+        })
+      )
+    )
   )
 )
 

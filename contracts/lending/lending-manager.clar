@@ -8,6 +8,9 @@
 (define-constant ERR_PAUSED u1001)
 (define-constant ERR_INSUFFICIENT_LIQUIDITY u1002)
 (define-constant ERR_INVALID_AMOUNT u1003)
+(define-constant ERR_INSUFFICIENT_COLLATERAL u1004)
+
+(define-constant COLLATERAL_FACTOR u7500) ;; 75% - borrow up to 75% of collateral value
 
 ;; Storage
 (define-data-var circuit-breaker (optional principal) none)
@@ -122,7 +125,9 @@
         (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
         (asserts! (<= amount (get total-deposits reserve)) (err ERR_INSUFFICIENT_LIQUIDITY))
 
-        ;; Note: In a full implementation, this would query the risk-manager for collateralization
+        ;; CRITICAL: Check collateralization before allowing borrow
+        (asserts! (is-sufficiently-collateralized tx-sender amount) (err ERR_INSUFFICIENT_COLLATERAL))
+
         (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) tx-sender none)))
 
         (map-set borrows { asset: asset, user: tx-sender } (+ current-bor amount))
@@ -172,6 +177,41 @@
 
 (define-private (is-risk-manager)
   (is-eq tx-sender .risk-manager) ;; Or look up via conxian-protocol
+)
+
+;; @desc Calculate total collateral value for a user across all assets
+;; @param user principal - The user to check
+;; @returns uint - Total collateral value in USD equivalent (simplified)
+(define-read-only (get-user-collateral-value (user principal))
+  ;; Simplified: Sum of all deposits. In production, query oracle for USD values.
+  (let ((deposit-balance (default-to u0 (map-get? deposits { asset: .cxd-token, user: user }))))
+    deposit-balance
+  )
+)
+
+;; @desc Get total borrowed amount for a user across all assets
+;; @param user principal - The user to check
+;; @returns uint - Total borrowed value in USD equivalent
+(define-read-only (get-user-borrow-value (user principal))
+  (let ((borrow-balance (default-to u0 (map-get? borrows { asset: .cxd-token, user: user }))))
+    borrow-balance
+  )
+)
+
+;; @desc Check if user has sufficient collateral for a new borrow
+;; @param user principal - The borrower
+;; @param borrow-amount uint - The new amount to borrow
+;; @returns bool - True if sufficiently collateralized
+(define-read-only (is-sufficiently-collateralized (user principal) (borrow-amount uint))
+  (let (
+    (collateral-value (get-user-collateral-value user))
+    (current-borrowed (get-user-borrow-value user))
+    (total-borrow-after (+ current-borrowed borrow-amount))
+    ;; Maximum borrowable = collateral * COLLATERAL_FACTOR / 10000
+    (max-borrowable (/ (* collateral-value COLLATERAL_FACTOR) u10000))
+  )
+    (<= total-borrow-after max-borrowable)
+  )
 )
 
 ;; @desc Seize collateral from a user (Liquidation)
