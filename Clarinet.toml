@@ -191,7 +191,7 @@ depends_on = ["defi-traits", "sip-standards", "conxian-protocol"]
 [contracts.revenue-distributor]
 path = "contracts/treasury/revenue-distributor.clar"
 clarity-version = 3
-depends_on = ["core-traits", "math-utilities", "allocation-policy"]
+depends_on = ["core-traits", "math-utilities", "cxd-treasury"]
 
 [contracts.allocation-policy]
 path = "contracts/treasury/allocation-policy.clar"
@@ -206,7 +206,7 @@ depends_on = ["automation-traits", "core-traits"]
 [contracts.agent-treasury]
 path = "contracts/agents/agent-treasury.clar"
 clarity-version = 3
-depends_on = ["automation-traits"]
+depends_on = ["automation-traits", "agent-risk", "cxd-treasury", "office-manager"]
 
 [contracts.proposal-registry]
 path = "contracts/governance/proposal-registry.clar"
@@ -372,3 +372,7 @@ depends_on = ["sip-standards"]
 path = "contracts/agents/agent-risk.clar"
 clarity-version = 3
 depends_on = ["automation-traits", "core-traits", "dimensional-core", "office-manager", "oracle-aggregator"]
+
+[contracts.cxd-treasury]
+path = "contracts/treasury/cxd-treasury.clar"
+clarity-version = 3

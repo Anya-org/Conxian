@@ -1,9 +1,12 @@
+;; agent-risk.clar
+;; Agent-Risk 2.0: Predictive Perception & PID Stability Controller
+;; Implements the AYE (Automated Yield Engine) PID logic for CXD peg stability.
+
+(use-trait office-job-trait .automation-traits.office-job-trait)
 (use-trait risk-manager-trait .core-traits.risk-manager-trait)
-(use-trait rbac-trait .core-traits.conxian-access-trait)
 
 (impl-trait .core-traits.risk-manager-trait)
 (impl-trait .automation-traits.office-job-trait)
-(use-trait office-job-trait .automation-traits.office-job-trait)
 
 (define-constant ERR_UNAUTHORIZED u1001)
 (define-constant ERR_INVALID_PARAMETERS u1005)
@@ -33,10 +36,14 @@
 (define-data-var price-integral int 0)
 (define-data-var stability-fee uint u500) ;; 5% default (bps)
 
-(define-constant KP_STABILITY u50)
+;; PID Constants (Refined for 8-decimal price error)
+;; KP=5: 1% error (10^6) -> 5*10^6 / 10^4 = 500 bps (5%) adjustment
+(define-constant KP_STABILITY u5)
 (define-constant KI_STABILITY u1)
 (define-constant KD_STABILITY u10)
-(define-constant PRICE_TARGET u100000000) ;; .00
+(define-constant PRICE_TARGET u100000000) ;; $1.00 (8 decimals)
+(define-constant INTEGRAL_LIMIT (to-int u10000000)) ;; 10% cumulative limit
+(define-constant DEADBAND (to-int u50000)) ;; 5 bps deadband
 
 (define-public (set-predictive-params
     (new-liquidity-depth uint)
@@ -97,8 +104,14 @@
 (define-public (update-pid-rates)
   (let (
     (price (unwrap-panic (contract-call? .oracle-aggregator get-price .cxd-token)))
-    (error (- (to-int PRICE_TARGET) (to-int price)))
-    (new-integral (+ (var-get price-integral) error))
+    (raw-error (- (to-int PRICE_TARGET) (to-int price)))
+    ;; Apply Deadband
+    (error (if (and (> raw-error (- 0 DEADBAND)) (< raw-error DEADBAND)) (to-int u0) raw-error))
+
+    (raw-integral (+ (var-get price-integral) error))
+    ;; Integral Clamping (Windup Protection)
+    (new-integral (if (> raw-integral INTEGRAL_LIMIT) INTEGRAL_LIMIT (if (< raw-integral (- 0 INTEGRAL_LIMIT)) (- 0 INTEGRAL_LIMIT) raw-integral)))
+
     (derivative (- error (var-get last-price-error)))
     (term-p (* (to-int KP_STABILITY) error))
     (term-i (* (to-int KI_STABILITY) new-integral))
@@ -107,13 +120,14 @@
     (adjustment (/ numerator (to-int u10000)))
     (current-fee (to-int (var-get stability-fee)))
     (new-fee-int (+ current-fee adjustment))
+    ;; Final Fee Clamping: 0% to 20%
     (final-fee (if (> new-fee-int (to-int u2000)) u2000 (if (< new-fee-int (to-int u0)) u0 (to-uint new-fee-int))))
   )
     (begin
       (var-set price-integral new-integral)
       (var-set last-price-error error)
       (var-set stability-fee final-fee)
-      (print { event: "stability-fee-updated", new-fee: final-fee, error: error })
+      (print { event: "stability-fee-updated", new-fee: final-fee, error: error, integral: new-integral })
       (ok true)
     )
   )
@@ -312,7 +326,6 @@
 ;; --- Office Worker Implementation ---
 
 ;; @desc Autonomous check to see if any position needs liquidation.
-;; Keepers call this to see if they should trigger do-work.
 (define-public (check-work-needed)
   (let (
     (next-id (+ (var-get last-checked-id) u1))
@@ -328,20 +341,13 @@
 )
 
 ;; @desc Executes the liquidation and rewards the worker.
-;; @param job-data: The position-id encoded as a buffer (using to-consensus-buff).
-;; Note: Utilizing a fallback mechanism for position-id due to environment lexer issues with from-consensus-buff?.
 (define-public (do-work (job-data (buff 2048)))
   (let (
     (position-id (var-get last-checked-id))
   )
     (begin
-      ;; 1. Execute Liquidation in the Core
       (try! (contract-call? .dimensional-core liquidate-position tx-sender position-id .oracle-aggregator))
-      
-      ;; 2. Update last checked ID to move the scanner forward
       (var-set last-checked-id (+ position-id u1))
-
-      ;; 3. Payout to Worker (5 uSTX reward)
       (try! (contract-call? .office-manager payout tx-sender u5))
       (ok true)
     )
