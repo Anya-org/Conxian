@@ -98,7 +98,7 @@
         ;; 4. Execute Swap - Transfer output tokens from contract to user
         ;; Note: Real CPAMM logic would change sqrt-price and tick via x*y=k invariant.
         ;; For production, integrate with concentrated-math library for proper price curve.
-        (let ((recipient tx-sender))
+        (let ((recipient contract-caller))
           (as-contract
             (if zero-for-one
               (try! (contract-call? token1-trait transfer amount-out (as-contract tx-sender) recipient none))

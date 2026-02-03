@@ -54,16 +54,14 @@
                         )))
         (begin
           (asserts! (>= amount-out min-amount-out) (err ERR_SLIPPAGE))
-          ;; The pool should have sent the tokens to the router or the user?
-          ;; Standard: Pool sends to recipient. `swap` in `concentrated-liquidity-pool` currently just calcs.
-          ;; We need to update `concentrated-liquidity-pool` to send tokens out?
-          ;; Current `concentrated-liquidity-pool` swap is:
-          ;; (ok amount-out)
-          ;; It logic: `(map-set pools ...)` updates liquidity.
-          ;; It logic: doesn't transfer output tokens!
-          ;; *Critical Gap*: The pool logic I added earlier calculates fees and updates liquidity but doesn't transfer output tokens to the user.
-          ;; *Action*: I must fix `concentrated-liquidity-pool` to transfer `amount-out` to `tx-sender`.
-          ;; Assuming that fix, the router is done.
+          
+          ;; Forward tokens from Router to User
+          ;; Pool sent tokens to Router (contract-caller)
+          (let ((user tx-sender))
+            (as-contract
+              (try! (contract-call? token-out transfer amount-out tx-sender user none))
+            )
+          )
           
           (print {
             event: "router-swap",

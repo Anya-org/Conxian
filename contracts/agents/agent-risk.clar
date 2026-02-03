@@ -217,7 +217,7 @@
             timestamp: burn-block-height
           })
           
-          (ok reward)
+          (ok true)
         )
       )
     )

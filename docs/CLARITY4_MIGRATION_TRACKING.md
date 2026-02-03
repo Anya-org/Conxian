@@ -1,6 +1,7 @@
 # Clarity 4 Migration Tracking - Mainnet Alignment
 
 ## Status
+
 **Current:** Clarity 3 (mainnet-compatible)  
 **Target:** Clarity 4 (upon mainnet activation)  
 **Last Updated:** February 2026
@@ -12,12 +13,15 @@
 Clarity 4 is NOT yet active on mainnet. The migration will be tied to:
 
 ### 1. Epoch 3.1 Activation
+
 - **Current Mainnet Epoch:** 3.0 (Nakamoto)
 - **Target Epoch:** 3.1 (Clarity 4 support)
 - **Status:** Not yet scheduled
 
 ### 2. SIP-033 Implementation
+
 Clarity 4 features we will leverage:
+
 - `contract-hash?` - Module registry security
 - `stacks-block-time` - High-precision temporal logic  
 - `secp256r1-verify` - Passkey/biometric support
@@ -28,6 +32,7 @@ Clarity 4 features we will leverage:
 ## Pre-Migration Checklist
 
 ### Phase 1: Preparation (Current)
+
 - [x] All contracts compile with Clarity 3
 - [x] Critical bug fixes implemented (DEX swap, lending collateral, liquidation, governance IDs)
 - [x] Functional fixes verified Clarity 3 compatible
@@ -35,11 +40,13 @@ Clarity 4 features we will leverage:
 - [ ] Security audit scope defined
 
 ### Phase 2: Mainnet Deployment (Clarity 3)
+
 - [ ] Deploy current protocol to mainnet
 - [ ] Establish TVL and user base
 - [ ] Monitor for critical issues
 
 ### Phase 3: Clarity 4 Migration (Upon Activation)
+
 - [ ] Monitor Stacks mainnet for Epoch 3.1 activation
 - [ ] Update `Clarinet.toml` clarity-version from 3 → 4
 - [ ] Update `epoch` from "3.0" → "3.1"

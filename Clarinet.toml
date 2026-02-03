@@ -93,10 +93,6 @@ path = "contracts/core/conxian-protocol.clar"
 clarity-version = 3
 depends_on = ["core-traits", "admin-facade", "block-utils"]
 
-[contracts.ops-engine]
-path = "contracts/core/ops-engine.clar"
-clarity-version = 3
-depends_on = ["governance-traits", "admin-facade"]
 
 [contracts.regulatory-adapter]
 path = "contracts/compliance/regulatory-adapter.clar"
@@ -203,10 +199,6 @@ clarity-version = 3
 depends_on = ["automation-traits", "core-traits"]
 
 
-[contracts.agent-treasury]
-path = "contracts/agents/agent-treasury.clar"
-clarity-version = 3
-depends_on = ["automation-traits", "agent-risk", "cxd-treasury", "office-manager"]
 
 [contracts.proposal-registry]
 path = "contracts/governance/proposal-registry.clar"
@@ -376,3 +368,13 @@ depends_on = ["automation-traits", "core-traits", "dimensional-core", "office-ma
 [contracts.cxd-treasury]
 path = "contracts/treasury/cxd-treasury.clar"
 clarity-version = 3
+
+[contracts.agent-treasury]
+path = "contracts/agents/agent-treasury.clar"
+clarity-version = 3
+depends_on = ["automation-traits", "agent-risk", "cxd-treasury", "office-manager"]
+
+[contracts.ops-engine]
+path = "contracts/core/ops-engine.clar"
+clarity-version = 3
+depends_on = ["governance-traits", "admin-facade"]
