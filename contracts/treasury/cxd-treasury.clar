@@ -28,7 +28,7 @@
 
 ;; State Bounds (Set by Strategic Council/Admin)
 (define-data-var min-staking-allowed uint u0)
-(define-data-var max-insurance-allowed uint u8000)
+(define-data-var max-insurance-allowed uint u10000)
 
 ;; --- Read Functions ---
 

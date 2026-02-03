@@ -10,6 +10,16 @@
 (define-constant ERR_INSUFFICIENT_BALANCE u1001)
 (define-constant ERR_MAX_SUPPLY_REACHED u1002)
 
+
+(define-map authorized-minters principal bool)
+(define-public (add-minter (minter principal))
+  (begin
+    (asserts! (or (is-eq tx-sender (var-get contract-owner)) (default-to false (map-get? authorized-minters contract-caller))) (err ERR_UNAUTHORIZED))
+    (map-set authorized-minters minter true)
+    (ok true)
+  )
+)
+
 ;; Data Vars
 (define-data-var total-supply uint u0) ;; Start at 0, track actual minted
 (define-data-var contract-owner principal tx-sender)
@@ -95,7 +105,7 @@
 ;; Mint function for initial distribution
 (define-public (mint (amount uint) (recipient principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (asserts! (or (is-eq tx-sender (var-get contract-owner)) (default-to false (map-get? authorized-minters contract-caller))) (err ERR_UNAUTHORIZED))
     ;; Check max supply
     (asserts! (<= (+ (var-get total-supply) amount) (var-get max-supply)) (err ERR_MAX_SUPPLY_REACHED))
     (try! (ft-mint? cxd-token amount recipient))
@@ -108,7 +118,7 @@
 ;; Admin functions
 (define-public (set-contract-owner (new-owner principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (asserts! (or (is-eq tx-sender (var-get contract-owner)) (default-to false (map-get? authorized-minters contract-caller))) (err ERR_UNAUTHORIZED))
     (var-set contract-owner new-owner)
     (ok true)
   )

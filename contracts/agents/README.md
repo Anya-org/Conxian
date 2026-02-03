@@ -20,6 +20,11 @@ This module contains two distinct agent contracts:
 ## Public Functions
 
 ### `agent-risk.clar`
+### `agent-risk.clar`
+
+-   `get-gcr()`: (Read-Only) Returns the Global Collateral Ratio (GCR) indicator.
+-   `update-pid-rates()`: (Public) Recalculates the Stability Fee using the PID controller.
+
 
 -   `set-predictive-params(new-liquidity-depth uint, new-hash-rate-volatility uint, new-mempool-congestion uint)`: (Admin Only) Updates the predictive perception inputs.
 -   `assess-system-risk()`: (Read-Only) Calculates a composite risk score (0-10000).
@@ -34,6 +39,10 @@ This module contains two distinct agent contracts:
 -   `do-work(job-data (buff 2048))`: Implements `office-job-trait`. Executes liquidation.
 
 ### `agent-treasury.clar`
+### `agent-treasury.clar`
+
+-   `apply-fiscal-dam()`: (Public) Triggers autonomous revenue rebalancing based on the GCR.
+
 
 -   `check-work-needed()`: Implements `office-job-trait`. Checks if rebalancing is required based on risk score or balance.
 -   `do-work(job-data (buff 2048))`: Implements `office-job-trait`. Executes PID-controlled rebalancing of revenue flows via `cxd-treasury`.

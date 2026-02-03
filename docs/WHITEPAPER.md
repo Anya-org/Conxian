@@ -26,6 +26,8 @@ By anchoring all state transitions to Bitcoin via Stacks Nakamoto consensus, Con
 ### 2. Intelligence-Led Adaptive Fiscal Policy (AYE)
 Unlike protocols with discretionary spending or rigid payout structures, Conxian's revenue is managed by the **Adaptive Yield Engine (AYE)**. This system utilizes PID control and Fuzzy Logic to dynamically rebalance flows based on predictive risk:
 - **Equilibrium**: Target 60/20/20 (Dividends/R&D/Insurance).
+- **Crisis (GCR < 110%)**: The **Fiscal Dam** closes, routing 100% of revenue to the Vault for recapitalization.
+- **Abundance (GCR > 150%)**: The **Fiscal Dam** overflows, routing 80% of revenue to stakers to accelerate growth.
 - **Defensive**: Rebalancing up to 80% to the Insurance Fund during high-risk signatures to ensure systemic solvency.
 - **Priority Claims**: Any yield diverted from stakers is tracked and backfilled once equilibrium returns.
 
