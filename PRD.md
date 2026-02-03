@@ -174,52 +174,32 @@ The protocol utilizes a 5-token system aligned with specialized councils:
 - **MEV Protection**: Commit-Reveal scheme enforced for all DEX operations to prevent frontrunning. Implemented in `mev-protector.clar`.
 - **Hybrid Oracle**: Aggregates Pyth, Redstone, and Switchboard with deviation guards. Implemented in `oracle-aggregator.clar`.
 
-## 12. Implementation Status (February 2026)
+## 12. Recovery Registry (BOLT Initiative)
 
-### 12.1 Current State: CXIP-011 Deployed (v0.6.0)
+| Component / File Path | Issue | Status | Repair Priority |
+| :--- | :--- | :--- | :--- |
+| `tests/setup-test-env.ts` | `initSimnet()` race condition and non-deterministic initialization | COMPLETED | - |
+| `Clarinet.toml` | Clarity 4 vs Epoch 2.1 mismatch / Deployment errors | COMPLETED | - |
+| `tests/` | Major Test-Contract Mismatch (Tests calling non-existent functions) | PENDING | HIGH |
+| `Clarinet.toml` | Missing `mock-circuit-breaker` and other test dependencies | PENDING | MEDIUM |
+| `tests/security.skip/` | Hardcoded `ST*` addresses and `TypeError` in circuit-breaker tests | PENDING | MEDIUM |
+| `ui/src/tests/` | API Service test failures due to missing contract mocks | PENDING | LOW |
+| `contracts/dex/swap-manager.clar` | Repaired (Clarity 2) | COMPLETED | - |
+| `contracts/dex/vault.clar` | Repaired (Clarity 2) | COMPLETED | - |
+| `contracts/lending/lending-manager.clar` | Consolidated | COMPLETED | - |
+| `contracts/governance/dao-treasury.clar` | Aligned with Vault Trait | COMPLETED | - |
+| `contracts/agents/agent-risk.clar` | "Office Worker" Implemented | COMPLETED | - |
 
-**Completed Core Modules**:
+**Next Logical Task**: Synchronize DEX and Lending tests with current contract implementations (Phase 2: Module Fix).
 
-| Priority | Component | Status | Key Deliverables |
-|----------|-----------|--------|------------------|
-| P1-P6 | Protocol Repairs | Complete | Sovereign Handoff, MiCA Compliance, Token Caps, Circuit Breakers |
-| P7 | CXIP-011: AYE | Complete | Intelligence-Led Yield Engine, PID Controller, Fuzzy Logic Fiscal Policy |
-| P8 | Agent-Risk 2.0 | Complete | Predictive Perception (Liquidity, Hashrate, Mempool) |
+## 13. Performance & Benchmarks (February 2026)
 
-### 12.2 Clarity 4 / Nakamoto Compliance
+### 13.1 Fresh Full Info
+- **Current Stability**: ~30% (Foundation stable, Core logic passing, DEX/System tests failing due to out-of-sync logic).
+- **Blockers**: Major discrepancy between test suite expectations and actual contract interfaces.
+- **Gas Metrics**: Core transactions (Swap/Stake) verified within Nakamoto limits (< 20ms execution).
 
-- Core contracts prepared for `clarity-version = 4` (Currently optimized for Clarity 2+ Nakamoto compatibility in test environments).
-- Epoch 3.0 activated in `Clarinet.toml`.
-- `burn-block-height` (Bitcoin-anchored height) serves as the primary temporal anchor for all yield, voting, and timelock accrual.
-- `contract-hash?` and `secp256r1-verify` logic implemented as validated stubs, ready for full mainnet activation.
-
-### 12.3 Testing & Deployment Readiness
-
-- `clarinet check` passing on all modified contracts
-- Unit test coverage >80% for new functions
-- Testnet deployment validated
-- Sovereign handoff procedure verified
-- Security audit scope defined
-
-### 12.4 Architecture Refactors
-
-- **Hybrid Governance**: Refined `proposal-engine` (Staff) and `community-voting-engine` (Board) to support Dual-Council governance.
-- **Clarity 4 Protocol Enforcement**: All core contracts aligned with Clarity 4 (Epoch 3.0) standards, utilizing Bitcoin-anchored `burn-block-height` for high-precision temporal logic and preparing for secure module registry.
-- **Nakamoto Transition**: Switched from legacy `block-height` to `burn-block-height` for all yield, voting, and timelock accrual, ensuring deterministic behavior and Bitcoin finality.
-- **Service Module Repair**: Consolidated DEX, Lending, and Token modules.
-- **Autonomous Agents**: Upgraded to Agent-Risk 2.0 with Predictive Perception and Agent-Treasury with PID Control.
-
-## 13. Recovery Registry (BOLT Initiative)
-
-| File Path | Status | Repair Priority |
-| :--- | :--- | :--- |
-| `contracts/dex/swap-manager.clar` | Repaired (Clarity 2) | COMPLETED |
-| `contracts/dex/vault.clar` | Repaired (Clarity 2) | COMPLETED |
-| `contracts/lending/lending-manager.clar` | Consolidated | COMPLETED |
-| `contracts/governance/dao-treasury.clar` | Aligned with Vault Trait | COMPLETED |
-| `contracts/agents/agent-risk.clar` | "Office Worker" Implemented | COMPLETED |
-
-## 14. Performance & Benchmarks
+### 13.2 Verified Benchmarks
 
 Detailed execution metrics and scalability data can be found in the [Protocol Benchmarks](docs/BENCHMARKS.md) document.
 Current performance confirms < 20ms execution for core financial primitives.
