@@ -25,11 +25,9 @@
 (define-private (is-admin)
   (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin))
 )
-
 (define-private (get-interest-rate (asset principal) (utilization uint))
   (contract-call? .economic-policy-engine get-current-interest-rate)
 )
-
 (define-private (accrue-interest (asset principal))
   (let ((reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: burn-block-height } (map-get? reserve-data asset))))
     (let (
@@ -62,7 +60,6 @@
     )
   )
 )
-
 (define-private (check-circuit-breaker)
   (match (var-get circuit-breaker)
     cb (if (contract-call? .circuit-breaker is-contract-paused (as-contract tx-sender))
@@ -216,16 +213,9 @@
         (asserts! (> amount u0) (ok true)) ;; Nothing to collect
         
         ;; Transfer to distributor
-        ;; Note: We need the distributor principal. Since it's not in lending-manager, let's look it up or hardcode standard
-        (let ((target (contract-call? .conxian-protocol get-contract-address "revenue-distributor"))) ;; Or just use .revenue-distributor if linked
-           ;; Simplification: use the known revenue distributor contract directly if trait allows, or just transfer to it.
-           ;; We will assume .revenue-distributor is the standard one.
+        ;; Note: We use the known revenue distributor contract directly.
+        (begin
            (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) .revenue-distributor none)))
-           ;; Call distribute? The distributor might handle STX vs Tokens differently.
-           ;; For SIP-010, the revenue-distributor likely needs a notify or we just send it.
-           ;; Looking at revenue-distributor earlier, it had distribute-stx. Does it have distribute-token?
-           ;; Assuming yes or we just send it to holding.
-           
            (map-set reserve-data asset (merge reserve { total-reserves: u0 }))
            (print { event: "collect-reserves", asset: asset, amount: amount })
            (ok true)
