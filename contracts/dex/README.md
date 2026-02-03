@@ -24,22 +24,22 @@ graph TD
 
 ## Core Contracts
 
-### `swap-router.clar` (User Facade)
+### Active Contracts
+
+#### `swap-router.clar` (User Facade)
 
 Handles user-facing swap operations. It is Nakamoto-aligned and tenure-aware.
 
 - `exact-input-single(...)`: Performs a swap across a single pool.
 - `exact-input-multi(...)`: Coordinates swaps across multiple hops.
 
-### `swap-manager.clar` (Coordination)
+#### `swap-manager.clar` (Coordination)
 
 Optimizes trade execution by identifying the most efficient routes and caching results.
 
-- `find-best-route(...)`: Determines the optimal path for a swap.
-- `execute-swap(...)`: Executes a coordinated swap along a discovered route.
-- `batch-execute-swaps(...)`: Allows for multiple swaps in a single transaction.
+- `update-volatility-fees()`: Updates fees based on market volatility (keeper function).
 
-### `concentrated-liquidity-pool.clar` (Core Engine)
+#### `concentrated-liquidity-pool.clar` (Core Engine)
 
 The singleton contract managing all concentrated liquidity pools and fee collection.
 
@@ -48,13 +48,35 @@ The singleton contract managing all concentrated liquidity pools and fee collect
 - `mint(...)`: Adds liquidity to a specific tick range.
 - `collect-protocol-fees(...)`: Sweeps accumulated fees to the Revenue Distributor.
 
-### `vault.clar` (Asset Management)
+#### `vault.clar` (Asset Management)
 
 The protocol's secure storage system for assets.
 
 - `create-vault(...)`: Initializes a new secure storage instance.
 - `deposit-to-vault(...)`: Safely stores assets in a vault.
 - `withdraw-from-vault(...)`: Retrieves assets from a vault.
+
+### 🚧 Stub Contracts (Future Implementation)
+
+The following contracts are placeholders for future DEX features:
+
+| Contract | Status | Planned Functionality |
+|----------|--------|----------------------|
+| `batch-auction.clar` | 🚧 Stub | Batch execution for MEV protection |
+| `real-time-monitoring-dashboard.clar` | 🚧 Stub | DEX analytics and monitoring |
+| `price-impact-calculator.clar` | 🚧 Stub | Slippage estimation tools |
+| `pool-type-registry.clar` | 🚧 Stub | Multi-pool type management |
+| `pool-implementation-registry.clar` | 🚧 Stub | Pool template registry |
+| `nakamoto-compatibility.clar` | 🚧 Stub | Nakamoto-specific optimizations |
+| `on-chain-router-helper.clar` | 🚧 Stub | Router optimization utilities |
+| `distributed-cache-manager.clar` | 🚧 Stub | Oracle price caching layer |
+| `cxlp-migration-queue.clar` | 🚧 Stub | LP token migration system |
+| `dex-registrar.clar` | 🚧 Stub | DEX registry management |
+| `cxvg-utility.clar` | 🚧 Stub | CXVG token DEX utilities |
+| `enterprise-loan-manager.clar` | 🚧 Stub | B2B lending integration |
+| `rebalancing-rules.clar` | 🚧 Stub | Auto-rebalancing for vaults |
+| `predictive-scaling-system.clar` | 🚧 Stub | Dynamic gas/liquidity scaling |
+| `protocol-invariant-monitor.clar` | 🚧 Stub | Safety check automation |
 
 ## Integration Examples
 

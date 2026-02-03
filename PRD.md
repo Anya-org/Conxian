@@ -50,7 +50,7 @@ The system operates like a digital corporation where smart contracts serve as Ma
 
 - **Strengths**:
   - **Bitcoin Finality**: Inheritance of BTC security via Nakamoto/PoX.
-  - **Determinism**: Clarity 4 decidability prevents "Re-entrancy" and other EVM-common bugs.
+  - **Determinism**: Clarity 3 decidability prevents "Re-entrancy" and other EVM-common bugs. Clarity 4 migration prepared for when mainnet activates Epoch 3.1.
   - **Autonomous Fiscal Policy**: Hard-coded 60/20/20 revenue split ensures long-term solvency.
   - **Operational Efficiency**: 24/7 "Staff" agents reduce human overhead and reaction time.
 - **Weaknesses**:
@@ -78,7 +78,7 @@ The system operates like a digital corporation where smart contracts serve as Ma
 
 ### 4.1. CAPEX (Initial Build)
 
-- **R&D (High)**: Development of 40+ modular Clarity 4 contracts. Estimated 25,000+ developer hours.
+- **R&D (High)**: Development of 53 modular Clarity 3 contracts (migrating to Clarity 4 upon mainnet Epoch 3.1 activation). Estimated 25,000+ developer hours.
 - **Security Audits**: Critical for "Full Truth" recovery. Estimated budget: $150,000 - $300,000 for core primitives.
 - **Legal Architecture**: Establishing the SAB's legal personality in MiCA-friendly jurisdictions (e.g., Switzerland/Luxembourg).
 
@@ -181,13 +181,13 @@ The protocol utilizes a 5-token system aligned with specialized councils:
 | P5 | NFT Economics | Complete | CXLP Position NFT (SIP-009, metadata, fees) |
 | P6 | Operational Safety | Complete | Rate limiter, proof-of-reserves, circuit breakers |
 
-### 12.2 Clarity 4 / Nakamoto Compliance
+### 12.2 Clarity 3 / Nakamoto Compliance
 
-- All contracts use `clarity-version = 4`
+- All contracts use `clarity-version = 3` for mainnet compatibility
 - Epoch 3.0 activated in `Clarinet.toml`
-- `stacks-block-time` replaces `block-height` for temporal logic
-- `contract-hash?` for module registry security
-- `secp256r1-verify` for Passkey/biometric support
+- `burn-block-height` used for Bitcoin-anchored temporal logic
+- Clarity 4 migration tracked in `docs/CLARITY4_MIGRATION_TRACKING.md`
+- `stacks-block-time` and `contract-hash?` prepared for future activation
 
 ### 12.3 Testing & Deployment Readiness
 
@@ -200,7 +200,7 @@ The protocol utilizes a 5-token system aligned with specialized councils:
 ### 12.4 Architecture Refactors
 
 - **Hybrid Governance**: Refined `proposal-engine` (Staff) and `community-voting-engine` (Board) to support Dual-Council governance.
-- **Clarity 4 Protocol Enforcement**: All core contracts migrated to Clarity 4 (Epoch 3.0), utilizing `stacks-block-time` for high-precision temporal logic and `contract-hash?` for secure module registry.
+- **Clarity 4 Protocol Preparation**: Core contracts prepared for Clarity 4 (Epoch 3.1), utilizing `stacks-block-time` for high-precision temporal logic and `contract-hash?` for secure module registry. Currently Clarity 3 for mainnet compatibility.
 - **Nakamoto Transition**: Switched from legacy `block-height` to `stacks-block-time` for all yield, voting, and timelock accrual, ensuring deterministic behavior in fast-block environments.
 - **Service Module Repair**: Consolidated DEX, Lending, and Token modules.
 - **Autonomous Agents**: Implemented `agent-risk` with `check-work-needed` and `do-work` for automated liquidations.

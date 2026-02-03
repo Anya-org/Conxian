@@ -10,7 +10,7 @@ permalink: /docs/ROADMAP/
 - **Root Sovereignty**: Implementation of `conxian-protocol` registry and `conxian-access` RBAC.
 - **Trait Standardization**: Consolidation of core DeFi and Governance traits in `contracts/traits/`.
 - **Nakamoto Alignment**: Migration of all temporal logic to `burn-block-height` (Bitcoin-anchored height) for cross-era consistency and Bitcoin finality.
-- **Clarity 4 Migration**: Full codebase refactor to Clarity 4 (Epoch 3.0) standards, with native security features implemented as validated stubs for testnet stability.
+- **Clarity 4 Preparation**: Core contracts prepared for Clarity 4 (Epoch 3.1) with `stacks-block-time` and `contract-hash?` features. Currently Clarity 3 (Epoch 3.0) for mainnet compatibility.
 - **Fiscal Policy**: Implementation of the 60/20/20 `revenue-distributor` and `cxd-treasury`.
 
 ## Phase 2: Alpha (Autonomous Operations) - COMPLETED (January 2026)

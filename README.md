@@ -34,7 +34,7 @@ Total revenue is automatically distributed:
 
 ## Technical Stack
 
-- **Clarity 4**: Nakamoto-aligned (Epoch 3.0) utilizing `stacks-block-time` for high-precision logic and `burn-block-height` for Bitcoin anchoring.
+- **Clarity 3**: Nakamoto-aligned (Epoch 3.0) utilizing `burn-block-height` for Bitcoin anchoring. Clarity 4 migration tracked for when mainnet activates Epoch 3.1.
 - **Tenure Awareness**: Logic is aware of Stacks block tenures via `block-utils` for deterministic execution.
 - **Facade Pattern**: All core logic accessed via dimensional facades and consolidated traits.
 - **Hybrid Oracle**: Aggregated Pyth, Redstone, and Switchboard feeds with deviation guards.
@@ -87,7 +87,7 @@ Total revenue is automatically distributed:
   - ✅ P5: NFT Economics (CXLP Position NFT implementation)
   - ✅ P6: Operational Safety (rate limiter, proof-of-reserves)
 - **Architecture**: Full Truth Alignment achieved across Core, DEX, Governance, Economics, and Security.
-- **Nakamoto Ready**: All contracts use `stacks-block-time` and Epoch 3.0 standards.
+- **Nakamoto Ready**: All contracts use `burn-block-height` and Epoch 3.0 standards.
 - **Next Phase**: Security audit preparation and testnet deployment.
 
 ---
