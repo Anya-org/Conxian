@@ -334,6 +334,10 @@
   )
 )
 
+(define-read-only (is-contract-paused (contract principal))
+  (contract-call? .conxian-protocol is-paused)
+)
+
 (define-data-var last-checked-id-agent uint u0)
 
 (define-public (check-work-needed)

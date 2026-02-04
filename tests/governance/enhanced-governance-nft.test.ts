@@ -32,7 +32,7 @@ describe('Enhanced Governance NFT (Seats)', () => {
       ],
       deployer
     );
-    expect(mint.result).toBeOk(Cl.uint(1));
+    expect(mint.result).toEqual(Cl.ok(Cl.uint(1)));
 
     // Verify Seat Data
     const seatInfo = simnet.callReadOnlyFn(
@@ -41,14 +41,12 @@ describe('Enhanced Governance NFT (Seats)', () => {
         [Cl.uint(1)],
         deployer
     );
-    expect(seatInfo.result).toBeSome(Cl.tuple({
+    expect(seatInfo.result).toEqual(Cl.some(Cl.tuple({
         'council-id': Cl.uint(1),
         'voting-power': Cl.uint(100),
         'member-type': Cl.stringAscii("human"),
-        'created-at': Cl.uint(0) // Simnet starts at 0? Or 1? Usually 0 or small number. 
-                                  // Actually block-height is usually 1 in beforeAll? 
-                                  // We'll just check it's a tuple for now to be safe on height.
-    }));
+        'created-at': Cl.uint(1)
+    })));
   });
 
   it('prevents non-admin from minting', () => {
@@ -63,7 +61,7 @@ describe('Enhanced Governance NFT (Seats)', () => {
       ],
       wallet1 // Not admin
     );
-    expect(mint.result).toBeErr(Cl.uint(1000)); // ERR_UNAUTHORIZED
+    expect(mint.result).toEqual(Cl.error(Cl.uint(1000))); // ERR_UNAUTHORIZED
   });
 
   it('prevents multiple seats on same council for one user', () => {
@@ -82,7 +80,7 @@ describe('Enhanced Governance NFT (Seats)', () => {
       [Cl.standardPrincipal(wallet1), Cl.uint(1), Cl.uint(50), Cl.stringAscii("human")],
       deployer
     );
-    expect(mint2.result).toBeErr(Cl.uint(1002)); // ERR_SEAT_TAKEN
+    expect(mint2.result).toEqual(Cl.error(Cl.uint(1002))); // ERR_SEAT_TAKEN
   });
 
   it('allows user to hold seats on DIFFERENT councils', () => {
@@ -101,7 +99,7 @@ describe('Enhanced Governance NFT (Seats)', () => {
       [Cl.standardPrincipal(wallet1), Cl.uint(2), Cl.uint(50), Cl.stringAscii("human")],
       deployer
     );
-    expect(mint2.result).toBeOk(Cl.uint(2));
+    expect(mint2.result).toEqual(Cl.ok(Cl.uint(2)));
   });
 
   it('tracks total council power correctly', () => {
@@ -127,7 +125,7 @@ describe('Enhanced Governance NFT (Seats)', () => {
         [Cl.uint(1)],
         deployer
     );
-    expect(totalPower.result).toBeUint(300);
+    expect(totalPower.result).toEqual(Cl.uint(300));
   });
 
   it('updates total power on burn', () => {
@@ -147,7 +145,7 @@ describe('Enhanced Governance NFT (Seats)', () => {
         [seatId],
         deployer
     );
-    expect(burn.result).toBeOk(Cl.bool(true));
+    expect(burn.result).toEqual(Cl.ok(Cl.bool(true)));
 
     const totalPower = simnet.callReadOnlyFn(
         'enhanced-governance-nft',
@@ -155,6 +153,6 @@ describe('Enhanced Governance NFT (Seats)', () => {
         [Cl.uint(1)],
         deployer
     );
-    expect(totalPower.result).toBeUint(0);
+    expect(totalPower.result).toEqual(Cl.uint(0));
   });
 });

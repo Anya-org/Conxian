@@ -56,7 +56,7 @@ describe("Conxian Operations Engine", () => {
       [params],
       wallet1
     );
-    expect(exec.result).toBeErr(Cl.uint(6000)); // ERR_UNAUTHORIZED
+    expect(exec.result).toEqual(Cl.error(Cl.uint(6000))); // ERR_UNAUTHORIZED
   });
 
   it("allows the contract to cast a council vote if it holds a seat", () => {
@@ -98,7 +98,7 @@ describe("Conxian Operations Engine", () => {
       [Cl.uint(1), Cl.bool(true)],
       deployer
     );
-    expect(vote.result).toBeOk(Cl.bool(true));
+    expect(vote.result).toEqual(Cl.ok(Cl.bool(true)));
 
     // Verify vote counted
     const proposal = simnet.callReadOnlyFn(
@@ -109,7 +109,7 @@ describe("Conxian Operations Engine", () => {
     );
     const props = (proposal.result as any).value.data;
     // Deployer hasn't voted, only Engine. Engine power = 100.
-    expect(props["for-votes"]).toBeUint(100);
+    expect(props["for-votes"]).toEqual(Cl.uint(100));
   });
 
   it("fails to vote if contract has no seat", () => {
@@ -147,7 +147,7 @@ describe("Conxian Operations Engine", () => {
       [Cl.uint(1), Cl.bool(true)],
       deployer
     );
-    expect(vote.result).toBeErr(Cl.uint(6000));
+    expect(vote.result).toEqual(Cl.error(Cl.uint(6000)));
   });
 
   it("allows updating the controller", () => {
@@ -157,6 +157,6 @@ describe("Conxian Operations Engine", () => {
       [Cl.standardPrincipal(wallet1)],
       deployer
     );
-    expect(update.result).toBeOk(Cl.bool(true));
+    expect(update.result).toEqual(Cl.ok(Cl.bool(true)));
   });
 });

@@ -20,6 +20,15 @@
   )
 )
 
+(define-public (trigger-emergency-pause)
+  (begin
+    (asserts! (unwrap-panic (contract-call? .admin-facade is-authorized u4)) (err ERR_UNAUTHORIZED))
+    (try! (contract-call? .conxian-protocol pause))
+    (print { event: "emergency-pause-triggered", caller: tx-sender, block: burn-block-height })
+    (ok true)
+  )
+)
+
 (define-read-only (get-last-action)
   (var-get last-action-block)
 )
@@ -27,16 +36,22 @@
 (define-public (trigger-epoch-update)
   (begin
     ;; 1. FAST PATH (DEX Protection) - Every ~10 Blocks
-    (try! (contract-call? .swap-router update-volatility-fees))
+    ;; TODO: Implement update-volatility-fees in swap-router
+    ;; (try! (contract-call? .swap-router update-volatility-fees))
 
     ;; 2. SLOW PATH (Fiscal Strategy) - Every Bitcoin Block
-    (try! (contract-call? .agent-treasury run-fiscal-strategy))
+    ;; TODO: Implement run-fiscal-strategy in agent-treasury
+    ;; (try! (contract-call? .agent-treasury run-fiscal-strategy))
 
     ;; 3. PID STABILIZER (Risk Management)
-    (try! (contract-call? .agent-risk update-pid-rates))
+    ;; TODO: Implement update-pid-rates in agent-risk
+    ;; (try! (contract-call? .agent-risk update-pid-rates))
 
     ;; 4. KEEPER REWARD - 5 CXD (Keeper incentive)
     ;; Note: cxd-token must have ops-engine as authorized minter
-    (contract-call? .cxd-token mint u500000000 tx-sender)
+    (try! (contract-call? .cxd-token mint u500000000 tx-sender))
+    
+    (print { event: "epoch-updated", keeper: tx-sender, block: burn-block-height })
+    (ok true)
   )
 )

@@ -13,19 +13,13 @@ describe('Autonomous Executive Agents', () => {
 
   describe('CRO (Chief Risk Officer)', () => {
     it('CEO can trigger an emergency pause via the CRO', async () => {
-      // (contract-call? .ops-engine trigger-emergency-pause)
-      const call = Cl.contractCall(
-        'ops-engine',
-        'trigger-emergency-pause',
-        [],
-      );
       const result = await simnet.callPublicFn(
         'ops-engine',
         'trigger-emergency-pause',
         [],
         deployer
       );
-      expect(result.result).toBeOk(Cl.bool(true));
+      expect(result.result).toEqual(Cl.ok(Cl.bool(true)));
 
       // Verify that the main protocol contract is now paused
       const isPaused = await simnet.callReadOnlyFn(
@@ -34,7 +28,7 @@ describe('Autonomous Executive Agents', () => {
         [Cl.contractPrincipal(deployer, 'conxian-protocol')],
         deployer
       );
-      expect(isPaused.result).toBeOk(Cl.bool(true));
+      expect(isPaused.result).toEqual(Cl.ok(Cl.bool(true)));
     });
   });
 
@@ -49,16 +43,6 @@ describe('Autonomous Executive Agents', () => {
         deployer
       );
 
-      const call = Cl.contractCall(
-        'agent-treasury',
-        'distribute',
-        [
-          Cl.contractPrincipal(deployer, 'mock-token'),
-          Cl.uint(amount),
-          Cl.principal(deployer),
-        ],
-      );
-
       const result = await simnet.callPublicFn(
         'agent-treasury',
         'distribute',
@@ -70,7 +54,7 @@ describe('Autonomous Executive Agents', () => {
         deployer
       );
 
-      expect(result.result).toBeOk(Cl.bool(true));
+      expect(result.result).toEqual(Cl.ok(Cl.bool(true)));
 
       // Verify the distribution
       // Note: In a real test, we would have mock vaults to check balances.

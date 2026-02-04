@@ -43,6 +43,11 @@
   )
 )
 
+;; Convenience function for emergency pause
+(define-public (pause)
+  (set-paused true)
+)
+
 (define-public (register-module (name (string-ascii 32)) (contract principal))
   (begin
     (asserts! (unwrap! (contract-call? .admin-facade is-authorized ROLE_ADMIN) (err ERR_UNAUTHORIZED)) (err ERR_UNAUTHORIZED))
