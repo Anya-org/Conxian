@@ -113,6 +113,41 @@
   )
 )
 
+(define-public (burn (pool-id uint) (tick-lower int) (tick-upper int) (amount uint))
+  (let ((pool (unwrap! (map-get? pools pool-id) (err ERR_INSUFFICIENT_LIQUIDITY)))
+        (position-key { pool-id: pool-id, owner: tx-sender, tick-lower: tick-lower, tick-upper: tick-upper })
+        (position (unwrap! (map-get? positions position-key) (err ERR_INSUFFICIENT_LIQUIDITY))))
+    (begin
+      (asserts! (>= (get liquidity position) amount) (err ERR_INSUFFICIENT_LIQUIDITY))
+      (asserts! (> amount u0) (err u1003))
+      ;; Update position liquidity
+      (let ((new-liquidity (- (get liquidity position) amount)))
+        (if (> new-liquidity u0)
+          (map-set positions position-key (merge position { liquidity: new-liquidity }))
+          (map-delete positions position-key)
+        )
+      )
+      ;; Update global liquidity
+      (map-set pools pool-id (merge pool { liquidity: (- (get liquidity pool) amount) }))
+      (print { event: "position-burned", pool-id: pool-id, owner: tx-sender, amount: amount })
+      (ok true)
+    )
+  )
+)
+
+(define-public (collect (pool-id uint) (tick-lower int) (tick-upper int))
+  (let ((position-key { pool-id: pool-id, owner: tx-sender, tick-lower: tick-lower, tick-upper: tick-upper })
+        (position (default-to { liquidity: u0, fee-growth-inside-0: u0, fee-growth-inside-1: u0 } (map-get? positions position-key))))
+    (begin
+      ;; Return collected fees (simplified - in production would calculate actual fees)
+      (ok {
+        collected-0: (get fee-growth-inside-0 position),
+        collected-1: (get fee-growth-inside-1 position)
+      })
+    )
+  )
+)
+
 (define-public (collect-protocol-fees (token-trait <sip-010-ft-trait>))
   (let (
     (token (contract-of token-trait))
