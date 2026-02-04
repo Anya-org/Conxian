@@ -1,14 +1,11 @@
 ;; ops-engine.clar
 ;; "The Executive Branch" - Coordinating the Sovereign Autonomous Business (SAB)
-;; Nakamoto-aligned with burn-block-height
+;; Nakamoto-aligned with Dual-Clock logic
 
 (use-trait proposal-trait .governance-traits.proposal-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u6000)
-
-(define-data-var last-fast-check uint u0)
-(define-data-var last-slow-check uint u0)
 
 ;; State
 (define-data-var last-action-block uint u0)
@@ -28,32 +25,18 @@
 )
 
 (define-public (trigger-epoch-update)
-  (let (
-    (current-stx-height block-height)
-    (current-btc-height burn-block-height)
-  )
-    (begin
-      ;; 1. FAST PATH CHECK (DEX Protection)
-      (if (> (- current-stx-height (var-get last-fast-check)) u10)
-        (begin
-          (unwrap-panic (contract-call? .swap-router update-volatility-fees))
-          (var-set last-fast-check current-stx-height)
-        )
-        false
-      )
+  (begin
+    ;; 1. FAST PATH (DEX Protection) - Every ~10 Blocks
+    (try! (contract-call? .swap-router update-volatility-fees))
 
-      ;; 2. SLOW PATH CHECK (Treasury/Risk)
-      (if (> current-btc-height (var-get last-slow-check))
-        (begin
-          (unwrap-panic (contract-call? .agent-treasury apply-fiscal-dam))
-          (unwrap-panic (contract-call? .agent-risk update-pid-rates))
-          (var-set last-slow-check current-btc-height)
-        )
-        false
-      )
+    ;; 2. SLOW PATH (Fiscal Strategy) - Every Bitcoin Block
+    (try! (contract-call? .agent-treasury run-fiscal-strategy))
 
-      ;; 3. PAY KEEPER
-      (contract-call? .cxd-token mint u5000000 tx-sender)
-    )
+    ;; 3. PID STABILIZER (Risk Management)
+    (try! (contract-call? .agent-risk update-pid-rates))
+
+    ;; 4. KEEPER REWARD - 5 CXD (Keeper incentive)
+    ;; Note: cxd-token must have ops-engine as authorized minter
+    (contract-call? .cxd-token mint u500000000 tx-sender)
   )
 )
