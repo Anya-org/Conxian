@@ -1,6 +1,6 @@
 ;; ops-engine.clar
 ;; "The Executive Branch" - Coordinating the Sovereign Autonomous Business (SAB)
-;; Nakamoto-aligned with burn-block-height
+;; Nakamoto-aligned with Dual-Clock Logic (block-height and burn-block-height)
 
 (use-trait proposal-trait .governance-traits.proposal-trait)
 
@@ -27,13 +27,16 @@
   (var-get last-action-block)
 )
 
+;; @desc Trigger the Dual-Clock epoch update.
+;; Fast Gear: Reflexes (DEX Fees) via block-height.
+;; Slow Gear: Strategy (Fiscal Dam) via burn-block-height.
 (define-public (trigger-epoch-update)
   (let (
     (current-stx-height block-height)
     (current-btc-height burn-block-height)
   )
     (begin
-      ;; 1. FAST PATH CHECK (DEX Protection)
+      ;; 1. FAST GEAR (Reflexes) - Every ~10 Blocks (~1 min)
       (if (> (- current-stx-height (var-get last-fast-check)) u10)
         (begin
           (unwrap-panic (contract-call? .swap-router update-volatility-fees))
@@ -42,7 +45,7 @@
         false
       )
 
-      ;; 2. SLOW PATH CHECK (Treasury/Risk)
+      ;; 2. SLOW GEAR (Strategy) - Every Bitcoin Block (~10 min)
       (if (> current-btc-height (var-get last-slow-check))
         (begin
           (unwrap-panic (contract-call? .agent-treasury apply-fiscal-dam))
@@ -52,7 +55,7 @@
         false
       )
 
-      ;; 3. PAY KEEPER
+      ;; 3. PAY KEEPER (5 CXD)
       (contract-call? .cxd-token mint u5000000 tx-sender)
     )
   )

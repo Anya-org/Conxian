@@ -9,6 +9,7 @@
 (define-constant ERR_PAUSED u1001)
 (define-constant ERR_SLIPPAGE u3000)
 (define-constant ERR_INVALID_PATH u2005)
+(define-data-var current-fee uint u3000)
 
 ;; Public Functions
 
@@ -29,21 +30,8 @@
   (begin
     (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
 
-    ;; Transfer input tokens to pool
-    ;; Note: The pool's swap function usually expects tokens to be transferred *before* or *during* the swap depending on architecture.
-    ;; In Uniswap V3, the callback handles it. Here, we transfer to the pool contract first if the pool doesn't pull.
-    ;; concentrated-liquidity-pool.swap currently just returns amount-out (stub -> fixed).
-    ;; Real logic: router transfers to pool, calls swap.
-    ;; We need to know which pool contract? It's .concentrated-liquidity-pool.
-    
     (try! (contract-call? token-in transfer amount-in tx-sender .concentrated-liquidity-pool none))
     
-    ;; Execute swap
-    ;; Need to know zero-for-one direction. 
-    ;; We can infer from pool state or pass it. 
-    ;; For this router, we'll assume the caller knows or we check:
-    ;; The router should ideally check if token-in is token0 or token1.
-    ;; Since we can't easily read pool state without a read-only call inside public (Clarity 2 allowed it, Clarity 3/4 allows it).
     (let (
       (pool-state (unwrap! (contract-call? .concentrated-liquidity-pool get-pool pool-id) (err ERR_INVALID_PATH)))
       (zero-for-one (is-eq (contract-of token-in) (get token0 pool-state)))
@@ -55,8 +43,6 @@
         (begin
           (asserts! (>= amount-out min-amount-out) (err ERR_SLIPPAGE))
           
-          ;; Forward tokens from Router to User
-          ;; Pool sent tokens to Router (contract-caller)
           (let ((user tx-sender))
             (as-contract
               (try! (contract-call? token-out transfer amount-out tx-sender user none))
@@ -78,7 +64,7 @@
   )
 )
 
-;; Multi-hop stub - kept simple as full iteration requires complex trait passing in Clarity
+;; Multi-hop stub
 (define-public (exact-input-multi
     (pool-ids (list 5 uint))
     (tokens (list 6 principal))
@@ -87,16 +73,33 @@
   )
   (begin
     (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
-    ;; Multi-hop implementation requires recursive calls or fold with dynamic traits, which is hard.
-    ;; For now, we leave this as a known limitation/stub, prioritizing single-hop revenue.
     (ok amount-in)
   )
 )
 
-(define-public (update-volatility-fees)
+(define-read-only (get-fee)
+  (var-get current-fee)
+)
+
+(define-public (set-fee (new-fee uint))
   (begin
-    ;; Fast Path: Adjust DEX fees based on short-term volatility
-    ;; Placeholder for actual logic
+    (asserts! (is-eq contract-caller .ops-engine) (err ERR_UNAUTHORIZED))
+    (var-set current-fee new-fee)
     (ok true)
+  )
+)
+
+(define-public (update-volatility-fees)
+  (let (
+    (volatility-index (contract-call? .oracle-aggregator get-volatility-index))
+    (base-fee u3000)
+    (max-fee u10000)
+    (new-fee (if (> volatility-index u50) max-fee base-fee))
+  )
+    (begin
+      (try! (contract-call? .concentrated-liquidity-pool set-pool-fee u1 new-fee))
+      (var-set current-fee new-fee)
+      (ok new-fee)
+    )
   )
 )
