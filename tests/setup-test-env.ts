@@ -1,20 +1,21 @@
-import { beforeAll, afterAll } from 'vitest';
-import { initSimnet } from '@stacks/clarinet-sdk';
-import type { Simnet } from '@stacks/clarinet-sdk';
+import { beforeAll } from 'vitest';
+import { initSimnet, type Simnet } from '@stacks/clarinet-sdk';
 
-let simnet: Simnet;
+let initializationPromise: Promise<Simnet> | null = null;
+export let simnet: Simnet;
+
+export async function initializeSimnet() {
+  if (!initializationPromise) {
+    console.log('Initializing Simnet for test environment...');
+    initializationPromise = initSimnet('Clarinet.toml').then((instance) => {
+      simnet = instance;
+      console.log('Simnet initialized.');
+      return instance;
+    });
+  }
+  return initializationPromise;
+}
 
 beforeAll(async () => {
-  if (!simnet) {
-    console.log('Initializing Simnet for test environment...');
-    // Force Clarity 4 / Epoch 3.0
-    simnet = await initSimnet('Clarinet.toml');
-    console.log('Simnet initialized.');
-  }
+  await initializeSimnet();
 });
-
-afterAll(async () => {
-  // Cleanup if necessary
-});
-
-export { simnet };

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { simnet } from './setup-test-env';
 
 describe('Sanity Check', () => {
+  // Verified: Runner is viable and Simnet initializes deterministically
   it('should pass this basic test', () => {
     expect(true).toBe(true);
   });

@@ -33,16 +33,7 @@ describe('Grand Unified System Journey', () => {
       (accounts.get("wallet_1") as string) ??
       "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5";
 
-    const deploy = (name: string, path: string) =>
-      simnet.deployContract(name, path, null, deployer);
-
-    deploy("compliance-trait", "contracts/compliance/compliance-trait.clar");
-    deploy("sip-standards", "contracts/traits/sip-standards.clar");
-    deploy(
-      "regulatory-adapter",
-      "contracts/compliance/regulatory-adapter.clar"
-    );
-
+    // Contracts are already deployed via Clarinet.toml
     simnet.callPublicFn(
       "agent-treasury",
       "set-regulatory-adapter-contract",
