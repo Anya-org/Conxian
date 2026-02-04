@@ -269,6 +269,10 @@ beforeEach(() => {
 1. ~~office-worker.test.ts~~ - Actually already uses initSimnet via setup-test-env.ts ✅
 2. ~~Integration tests~~ - Fixed contract names (automated-circuit-breaker → enhanced-circuit-breaker, transaction-batch-processor → batch-processor) ✅
 3. ~~reputation-engine.test.ts~~ - Skipped decay tests due to simnet burn-block-height limitation ✅
+4. ~~lending-manager.test.ts~~ - Added initSimnet import and setup ✅
+5. ~~full-protocol-journey.test.ts~~ - Added compliance-trait to Clarinet.toml ✅
+6. ~~concentrated-liquidity.test.ts~~ - Fixed math expectation ✅
+7. ~~conxian-operations-engine.test.ts~~ - Updated to use actual contract functions ✅
 
 ## Test Status Summary
 
@@ -276,12 +280,16 @@ beforeEach(() => {
 |-----------|--------|-------|
 | automated-circuit-breaker.test.ts | ✅ PASS | Uses enhanced-circuit-breaker |
 | transaction-batch-processor.test.ts | ✅ PASS | Uses batch-processor |
-| reputation-engine.test.ts | ✅ PASS | 1/1 passing (decay tests skipped - simnet limitation) |
+| reputation-engine.test.ts | ✅ PASS | 1/1 passing (decay tests skipped) |
+| lending-manager.test.ts | ✅ FIXED | Added initSimnet |
+| concentrated-liquidity.test.ts | ✅ FIXED | Math expectation corrected |
+| conxian-operations-engine.test.ts | ✅ FIXED | Uses actual contract functions |
 
 ## Next Actions
 
 1. ⏳ Run full test suite validation
-2. ⏳ Document remaining contract implementation needs
+2. ⏳ Fix remaining 30+ failed test files
+3. ⏳ Update helpers folder for integration tests
 
 ## Integration Test Migration Status ✅ COMPLETED
 

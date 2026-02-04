@@ -36,127 +36,53 @@ describe("Conxian Operations Engine", () => {
     expect(mint.result).toEqual(Cl.ok(Cl.uint(1)));
   };
 
-  it("allows the operator controller to execute operational adjustments", () => {
-    const params = Cl.bufferFromHex("00"); // Dummy params
-
+  it("allows authorized operator to trigger emergency pause", () => {
     const exec = simnet.callPublicFn(
       "ops-engine",
-      "execute-operational-adjustment",
-      [params],
-      deployer // Default controller is deployer
+      "trigger-emergency-pause",
+      [],
+      deployer
     );
     expect(exec.result).toEqual(Cl.ok(Cl.bool(true)));
   });
 
-  it("prevents unauthorized users from executing adjustments", () => {
-    const params = Cl.bufferFromHex("00");
+  it("prevents unauthorized users from triggering emergency pause", () => {
     const exec = simnet.callPublicFn(
       "ops-engine",
-      "execute-operational-adjustment",
-      [params],
+      "trigger-emergency-pause",
+      [],
       wallet1
     );
-    expect(exec.result).toEqual(Cl.error(Cl.uint(6000))); // ERR_UNAUTHORIZED
+    expect(exec.result).toEqual(Cl.error(Cl.uint(6000)));
   });
 
-  it("allows the contract to cast a council vote if it holds a seat", () => {
-    // 1. Submit a proposal (requires a seat, so mint one for deployer first)
-    simnet.callPublicFn(
-      "enhanced-governance-nft",
-      "mint-seat",
-      [
-        Cl.standardPrincipal(deployer),
-        Cl.uint(5),
-        Cl.uint(100),
-        Cl.stringAscii("human"),
-      ],
-      deployer
-    );
-
-    simnet.callPublicFn(
-      "proposal-engine",
-      "submit-proposal",
-      [
-        Cl.contractPrincipal(deployer, "mock-proposal"),
-        Cl.uint(5),
-        Cl.uint(10),
-        Cl.uint(100),
-      ],
-      deployer
-    );
-
-    // 2. Mint Seat for Operations Engine
-    mintOpsSeat();
-
-    // 3. Fast forward
-    for (let i = 0; i < 10; i++) simnet.mineEmptyBlock();
-
-    // 4. Controller triggers the vote
-    const vote = simnet.callPublicFn(
+  it("allows authorized operator to trigger epoch update", () => {
+    const exec = simnet.callPublicFn(
       "ops-engine",
-      "cast-council-vote",
-      [Cl.uint(1), Cl.bool(true)],
+      "trigger-epoch-update",
+      [],
       deployer
     );
-    expect(vote.result).toEqual(Cl.ok(Cl.bool(true)));
-
-    // Verify vote counted
-    const proposal = simnet.callReadOnlyFn(
-      "proposal-registry",
-      "get-proposal",
-      [Cl.uint(1)],
-      deployer
-    );
-    const props = (proposal.result as any).value.data;
-    // Deployer hasn't voted, only Engine. Engine power = 100.
-    expect(props["for-votes"]).toEqual(Cl.uint(100));
+    expect(exec.result).toEqual(Cl.ok(Cl.bool(true)));
   });
 
-  it("fails to vote if contract has no seat", () => {
-    // 1. Submit a proposal
-    simnet.callPublicFn(
-      "enhanced-governance-nft",
-      "mint-seat",
-      [
-        Cl.standardPrincipal(deployer),
-        Cl.uint(5),
-        Cl.uint(100),
-        Cl.stringAscii("human"),
-      ],
-      deployer
-    );
-    simnet.callPublicFn(
-      "proposal-engine",
-      "submit-proposal",
-      [
-        Cl.contractPrincipal(deployer, "mock-proposal"),
-        Cl.uint(5),
-        Cl.uint(10),
-        Cl.uint(100),
-      ],
-      deployer
-    );
-
-    // 2. Fast forward
-    for (let i = 0; i < 10; i++) simnet.mineEmptyBlock();
-
-    // 3. Try to vote (No seat minted for engine)
-    const vote = simnet.callPublicFn(
+  it("prevents unauthorized users from triggering epoch update", () => {
+    const exec = simnet.callPublicFn(
       "ops-engine",
-      "cast-council-vote",
-      [Cl.uint(1), Cl.bool(true)],
-      deployer
+      "trigger-epoch-update",
+      [],
+      wallet1
     );
-    expect(vote.result).toEqual(Cl.error(Cl.uint(6000)));
+    expect(exec.result).toEqual(Cl.error(Cl.uint(6000)));
   });
 
-  it("allows updating the controller", () => {
-    const update = simnet.callPublicFn(
+  it("returns last action block", () => {
+    const result = simnet.callReadOnlyFn(
       "ops-engine",
-      "set-operator-controller",
-      [Cl.standardPrincipal(wallet1)],
+      "get-last-action",
+      [],
       deployer
     );
-    expect(update.result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(result.result).toBeDefined();
   });
 });

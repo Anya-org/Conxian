@@ -103,6 +103,10 @@ clarity-version = 3
 depends_on = ["core-traits", "admin-facade", "block-utils"]
 
 
+[contracts.compliance-trait]
+path = "contracts/compliance/compliance-trait.clar"
+clarity-version = 3
+
 [contracts.regulatory-adapter]
 path = "contracts/compliance/regulatory-adapter.clar"
 clarity-version = 3
