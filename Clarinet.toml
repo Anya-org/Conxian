@@ -377,4 +377,3 @@ depends_on = ["automation-traits", "agent-risk", "cxd-treasury", "office-manager
 [contracts.ops-engine]
 path = "contracts/core/ops-engine.clar"
 clarity-version = 3
-depends_on = ["governance-traits", "admin-facade"]

@@ -37,11 +37,10 @@
 (define-data-var stability-fee uint u500) ;; 5% default (bps)
 
 ;; PID Constants (Refined for 8-decimal price error)
-;; KP=5: 1% error (10^6) -> 5*10^6 / 10^4 = 500 bps (5%) adjustment
 (define-constant KP_STABILITY u5)
 (define-constant KI_STABILITY u1)
 (define-constant KD_STABILITY u10)
-(define-constant PRICE_TARGET u100000000) ;; $1.00 (8 decimals)
+(define-constant PRICE_TARGET u100000000) ;; .00 (8 decimals)
 (define-constant INTEGRAL_LIMIT (to-int u10000000)) ;; 10% cumulative limit
 (define-constant DEADBAND (to-int u50000)) ;; 5 bps deadband
 
@@ -64,11 +63,9 @@
 
 (define-read-only (assess-system-risk)
   (let (
-    ;; Liquidity risk increases as depth decreases
     (l-risk (if (> u10000 (var-get liquidity-depth)) (- u10000 (var-get liquidity-depth)) u0))
     (h-risk (var-get hash-rate-volatility))
     (m-risk (var-get mempool-congestion))
-    ;; Simple weighted average for composite score
     (composite-score (/ (+ (+ l-risk h-risk) m-risk) u3))
   )
     composite-score
@@ -102,33 +99,31 @@
 )
 
 (define-public (update-pid-rates)
-  (let (
-    (price (unwrap-panic (contract-call? .oracle-aggregator get-price .cxd-token)))
-    (raw-error (- (to-int PRICE_TARGET) (to-int price)))
-    ;; Apply Deadband
-    (error (if (and (> raw-error (- 0 DEADBAND)) (< raw-error DEADBAND)) (to-int u0) raw-error))
-
-    (raw-integral (+ (var-get price-integral) error))
-    ;; Integral Clamping (Windup Protection)
-    (new-integral (if (> raw-integral INTEGRAL_LIMIT) INTEGRAL_LIMIT (if (< raw-integral (- 0 INTEGRAL_LIMIT)) (- 0 INTEGRAL_LIMIT) raw-integral)))
-
-    (derivative (- error (var-get last-price-error)))
-    (term-p (* (to-int KP_STABILITY) error))
-    (term-i (* (to-int KI_STABILITY) new-integral))
-    (term-d (* (to-int KD_STABILITY) derivative))
-    (numerator (+ (+ term-p term-i) term-d))
-    (adjustment (/ numerator (to-int u10000)))
-    (current-fee (to-int (var-get stability-fee)))
-    (new-fee-int (+ current-fee adjustment))
-    ;; Final Fee Clamping: 0% to 20%
-    (final-fee (if (> new-fee-int (to-int u2000)) u2000 (if (< new-fee-int (to-int u0)) u0 (to-uint new-fee-int))))
-  )
-    (begin
-      (var-set price-integral new-integral)
-      (var-set last-price-error error)
-      (var-set stability-fee final-fee)
-      (print { event: "stability-fee-updated", new-fee: final-fee, error: error, integral: new-integral })
-      (ok true)
+  (begin
+    (asserts! (or (is-eq contract-caller .ops-engine) (is-eq tx-sender (var-get contract-owner))) (err ERR_UNAUTHORIZED))
+    (let (
+      (price (unwrap-panic (contract-call? .oracle-aggregator get-price .cxd-token)))
+      (raw-error (- (to-int PRICE_TARGET) (to-int price)))
+      (error (if (and (> raw-error (- 0 DEADBAND)) (< raw-error DEADBAND)) (to-int u0) raw-error))
+      (raw-integral (+ (var-get price-integral) error))
+      (new-integral (if (> raw-integral INTEGRAL_LIMIT) INTEGRAL_LIMIT (if (< raw-integral (- 0 INTEGRAL_LIMIT)) (- 0 INTEGRAL_LIMIT) raw-integral)))
+      (derivative (- error (var-get last-price-error)))
+      (term-p (* (to-int KP_STABILITY) error))
+      (term-i (* (to-int KI_STABILITY) new-integral))
+      (term-d (* (to-int KD_STABILITY) derivative))
+      (numerator (+ (+ term-p term-i) term-d))
+      (adjustment (/ numerator (to-int u10000)))
+      (current-fee (to-int (var-get stability-fee)))
+      (new-fee-int (+ current-fee adjustment))
+      (final-fee (if (> new-fee-int (to-int u2000)) u2000 (if (< new-fee-int (to-int u0)) u0 (to-uint new-fee-int))))
+    )
+      (begin
+        (var-set price-integral new-integral)
+        (var-set last-price-error error)
+        (var-set stability-fee final-fee)
+        (print { event: "stability-fee-updated", new-fee: final-fee, error: error, integral: new-integral })
+        (ok true)
+      )
     )
   )
 )
@@ -159,38 +154,13 @@
   )
 )
 
-(define-public (set-liquidation-rewards
-    (min-reward uint)
-    (max-reward uint)
-  )
-  (begin
-    (try! (check-role "ROLE_ADMIN"))
-    (asserts!
-      (and
-        (> min-reward u0)
-        (<= min-reward max-reward)
-        (<= max-reward u5000)
-      )
-      (err ERR_INVALID_PARAMETERS)
-    )
-    (var-set min-liquidation-reward min-reward)
-    (var-set max-liquidation-reward max-reward)
-    (ok true)
-  )
-)
-
 (define-public (liquidate (position-id uint))
   (let (
     (liquidator tx-sender)
   )
     (begin
-      ;; 1. Check if position is liquidatable
       (asserts! (unwrap-panic (is-liquidatable position-id)) (err u1002))
-      
-      ;; 2. Get position details
       (let ((position-risk (unwrap! (assess-position-risk position-id) (err ERR_INVALID_PARAMETERS))))
-        
-        ;; 3. Calculate liquidation reward (5% of collateral, clamped to min/max)
         (let (
           (collateral (get collateral (unwrap! (contract-call? .position-manager get-position position-id) (err u404))))
           (reward-bps (var-get liquidation-threshold))
@@ -201,14 +171,10 @@
                      (var-get max-liquidation-reward)
                      raw-reward)))
         )
-          ;; 4. Call dimensional-core to execute liquidation
           (try! (contract-call? .dimensional-core liquidate-position 
             (get owner (unwrap! (contract-call? .position-manager get-position position-id) (err u404)))
             position-id 
             .oracle-aggregator))
-          
-          ;; 5. Transfer reward to liquidator (from insurance fund or protocol reserves)
-          ;; Note: In production, this would transfer actual assets. For now, we log the event.
           (print { 
             event: "liquidation-executed", 
             position-id: position-id, 
@@ -216,7 +182,6 @@
             reward: reward,
             timestamp: burn-block-height
           })
-          
           (ok true)
         )
       )
@@ -225,16 +190,12 @@
 )
 
 (define-read-only (get-health-factor (position-id uint))
-  (begin
-    ;; Simplified health factor calculation
-    (ok u15000) ;; 150% health factor
-  )
+  (ok u15000)
 )
 
 (define-public (update-position-health (position-id uint) (new-health uint) (collateral-value uint) (strategy principal))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
-    ;; Update logic would go here
     (ok new-health)
   )
 )
@@ -242,23 +203,16 @@
 (define-public (set-asset-collateral-factor (asset principal) (factor uint) (risk-level uint))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
-    ;; Set factor logic would go here
     (ok true)
   )
 )
 
 (define-read-only (get-asset-factor (asset principal))
-  (begin
-    ;; Return default collateral factor
-    (ok u8000) ;; 80%
-  )
+  (ok u8000)
 )
 
 (define-read-only (get-global-collateral-factor)
-  (begin
-    ;; Return global collateral factor
-    (ok u8000) ;; 80%
-  )
+  (ok u8000)
 )
 
 (define-read-only (is-liquidatable (position-id uint))
@@ -276,29 +230,17 @@
     (caller tx-sender)
   )
     (begin
-      ;; 1. Verify caller is authorized (this contract or admin)
       (asserts! (or (is-eq caller (var-get contract-owner)) (is-eq caller (as-contract tx-sender))) (err ERR_UNAUTHORIZED))
-      
-      ;; 2. Check if position is liquidatable
       (asserts! (unwrap-panic (is-liquidatable position-id)) (err u1003))
-      
-      ;; 3. Execute liquidation through dimensional-core
       (let (
         (position (unwrap! (contract-call? .position-manager get-position position-id) (err u404)))
         (owner (get owner position))
         (collateral (get collateral position))
-        ;; Calculate 5% liquidation penalty
         (penalty (/ (* collateral u500) u10000))
         (reward (- collateral penalty))
       )
-        ;; Call dimensional-core to liquidate
         (try! (contract-call? .dimensional-core liquidate-position owner position-id .oracle-aggregator))
-        
-        ;; Seize collateral from lending-manager if applicable
         (try! (contract-call? .lending-manager seize-collateral .cxd-token owner liquidator collateral))
-        
-        ;; Transfer reward to liquidator
-        ;; In production, transfer actual tokens. For now, log the event.
         (print {
           event: "liquidate-position",
           position-id: position-id,
@@ -309,7 +251,6 @@
           liquidator-reward: reward,
           timestamp: burn-block-height
         })
-        
         (ok {
           liquidated: true,
           reward: reward,
@@ -393,37 +334,29 @@
   )
 )
 
-(define-data-var cxvg-seat-nft-id uint u0)
+(define-data-var last-checked-id-agent uint u0)
 
-(define-public (vote-on-solvency)
-  (ok true)
-)
-
-;; --- Office Worker Implementation ---
-
-;; @desc Autonomous check to see if any position needs liquidation.
 (define-public (check-work-needed)
   (let (
-    (next-id (+ (var-get last-checked-id) u1))
+    (next-id (+ (var-get last-checked-id-agent) u1))
   )
     (match (contract-call? .dimensional-core get-position tx-sender next-id)
       pos (ok (unwrap-panic (is-liquidatable next-id)))
       (begin
-        (var-set last-checked-id u0) ;; Reset loop
+        (var-set last-checked-id-agent u0)
         (ok false)
       )
     )
   )
 )
 
-;; @desc Executes the liquidation and rewards the worker.
 (define-public (do-work (job-data (buff 2048)))
   (let (
-    (position-id (var-get last-checked-id))
+    (position-id (var-get last-checked-id-agent))
   )
     (begin
       (try! (contract-call? .dimensional-core liquidate-position tx-sender position-id .oracle-aggregator))
-      (var-set last-checked-id (+ position-id u1))
+      (var-set last-checked-id-agent (+ position-id u1))
       (try! (contract-call? .office-manager payout tx-sender u5))
       (ok true)
     )

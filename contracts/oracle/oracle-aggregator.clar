@@ -94,7 +94,7 @@
       (let ((old-mean (get mean data))
             (new-mean (/ (+ (* old-mean (get count data)) price) new-count))
             (old-variance (get variance data))
-            (new-variance (/ (+ (* old-variance (get count data)) (* (- price old-mean) (- price new-mean))) new-count)))
+            (new-variance (/ (+ (* old-variance (get count data)) (to-uint (* (- (to-int price) (to-int old-mean)) (- (to-int price) (to-int new-mean))))) new-count)))
         (map-set asset-volatility-data { asset: asset } { mean: new-mean, variance: new-variance, count: new-count })
       )
     )
@@ -188,6 +188,13 @@
 (define-read-only (get-volatility (asset principal))
   (ok (default-to { mean: u0, variance: u0, count: u0 } (map-get? asset-volatility-data { asset: asset })))
 )
+(define-read-only (get-volatility-index)
+  (match (map-get? asset-volatility-data { asset: .cxd-token })
+    data (ok (get variance data))
+    (ok u0)
+  )
+)
+
 (define-read-only (get-price (asset principal))
   (match (map-get? asset-sources { asset: asset })
     entry

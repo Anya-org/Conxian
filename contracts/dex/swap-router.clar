@@ -10,15 +10,24 @@
 (define-constant ERR_SLIPPAGE u3000)
 (define-constant ERR_INVALID_PATH u2005)
 
+(define-constant BASE-FEE u30) ;; 0.3%
+(define-constant MAX-FEE u100) ;; 1.0%
+
+;; State
+(define-data-var last-check-height uint u0)
+(define-data-var current-fee uint u30)
+
 ;; Public Functions
 
+(define-public (set-fee (new-fee uint))
+  (begin
+    (asserts! (unwrap-panic (contract-call? .admin-facade is-authorized u1)) (err ERR_UNAUTHORIZED)) ;; ROLE_ADMIN
+    (var-set current-fee new-fee)
+    (ok true)
+  )
+)
+
 ;; @desc Executes a single-hop swap between two tokens using a specific pool.
-;; @param pool-id uint - The ID of the liquidity pool.
-;; @param token-in <sip-010-ft-trait> - The trait of the input token.
-;; @param token-out <sip-010-ft-trait> - The trait of the output token.
-;; @param amount-in uint - The amount of input tokens to swap.
-;; @param min-amount-out uint - The minimum amount of output tokens expected (slippage protection).
-;; @returns (response uint uint) - The actual amount of output tokens received.
 (define-public (exact-input-single
     (pool-id uint)
     (token-in <sip-010-ft-trait>)
@@ -29,21 +38,8 @@
   (begin
     (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
 
-    ;; Transfer input tokens to pool
-    ;; Note: The pool's swap function usually expects tokens to be transferred *before* or *during* the swap depending on architecture.
-    ;; In Uniswap V3, the callback handles it. Here, we transfer to the pool contract first if the pool doesn't pull.
-    ;; concentrated-liquidity-pool.swap currently just returns amount-out (stub -> fixed).
-    ;; Real logic: router transfers to pool, calls swap.
-    ;; We need to know which pool contract? It's .concentrated-liquidity-pool.
-    
     (try! (contract-call? token-in transfer amount-in tx-sender .concentrated-liquidity-pool none))
     
-    ;; Execute swap
-    ;; Need to know zero-for-one direction. 
-    ;; We can infer from pool state or pass it. 
-    ;; For this router, we'll assume the caller knows or we check:
-    ;; The router should ideally check if token-in is token0 or token1.
-    ;; Since we can't easily read pool state without a read-only call inside public (Clarity 2 allowed it, Clarity 3/4 allows it).
     (let (
       (pool-state (unwrap! (contract-call? .concentrated-liquidity-pool get-pool pool-id) (err ERR_INVALID_PATH)))
       (zero-for-one (is-eq (contract-of token-in) (get token0 pool-state)))
@@ -55,8 +51,6 @@
         (begin
           (asserts! (>= amount-out min-amount-out) (err ERR_SLIPPAGE))
           
-          ;; Forward tokens from Router to User
-          ;; Pool sent tokens to Router (contract-caller)
           (let ((user tx-sender))
             (as-contract
               (try! (contract-call? token-out transfer amount-out tx-sender user none))
@@ -78,7 +72,7 @@
   )
 )
 
-;; Multi-hop stub - kept simple as full iteration requires complex trait passing in Clarity
+;; Multi-hop stub
 (define-public (exact-input-multi
     (pool-ids (list 5 uint))
     (tokens (list 6 principal))
@@ -87,16 +81,37 @@
   )
   (begin
     (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
-    ;; Multi-hop implementation requires recursive calls or fold with dynamic traits, which is hard.
-    ;; For now, we leave this as a known limitation/stub, prioritizing single-hop revenue.
     (ok amount-in)
   )
 )
 
 (define-public (update-volatility-fees)
   (begin
-    ;; Fast Path: Adjust DEX fees based on short-term volatility
-    ;; Placeholder for actual logic
-    (ok true)
+    (asserts! (or (is-eq contract-caller .ops-engine) (unwrap-panic (contract-call? .admin-facade is-authorized u1))) (err ERR_UNAUTHORIZED))
+    (let
+        (
+            (current-height block-height)
+            (height-diff (- current-height (var-get last-check-height)))
+        )
+        (if (<= height-diff u10)
+          (ok (var-get current-fee))
+          (let
+              (
+                  (volatility-index (unwrap-panic (contract-call? .oracle-aggregator get-volatility-index)))
+                  (new-fee (if (> volatility-index u50) MAX-FEE BASE-FEE))
+              )
+              (begin
+                (var-set current-fee new-fee)
+                (var-set last-check-height current-height)
+                (print { event: "dex-fee-updated", new-fee: new-fee, volatility: volatility-index })
+                (ok new-fee)
+              )
+          )
+        )
+    )
   )
+)
+
+(define-read-only (get-fee)
+  (ok (var-get current-fee))
 )
