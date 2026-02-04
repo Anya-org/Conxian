@@ -12,7 +12,7 @@
 
 ;; Get sqrt price ratio at tick (returns value with 12 decimal places)
 ;; tick 0 -> 1.0 -> 1000000000000
-;; tick 1 -> sqrt(1.0001) ~ 1.00004999875 -> 1000049998750
+;; tick 1 -> sqrt(1.0001) > 1.00004999875 -> 1000049998750
 (define-read-only (get-sqrt-ratio-at-tick (tick int))
   (let
     (
