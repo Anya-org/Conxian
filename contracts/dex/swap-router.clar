@@ -38,23 +38,21 @@
   (begin
     (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
 
-    (try! (contract-call? token-in transfer amount-in tx-sender .concentrated-liquidity-pool none))
+    (try! (contract-call? token-in transfer amount-in tx-sender (as-contract tx-sender) none))
     
     (let (
       (pool-state (unwrap! (contract-call? .concentrated-liquidity-pool get-pool pool-id) (err ERR_INVALID_PATH)))
       (zero-for-one (is-eq (contract-of token-in) (get token0 pool-state)))
     )
-      (let ((amount-out (if zero-for-one
+      (let ((amount-out (as-contract (if zero-for-one
                           (try! (contract-call? .concentrated-liquidity-pool swap pool-id zero-for-one amount-in token-in token-out))
                           (try! (contract-call? .concentrated-liquidity-pool swap pool-id zero-for-one amount-in token-out token-in))
-                        )))
+                        ))))
         (begin
           (asserts! (>= amount-out min-amount-out) (err ERR_SLIPPAGE))
           
           (let ((user tx-sender))
-            (as-contract
-              (try! (contract-call? token-out transfer amount-out tx-sender user none))
-            )
+            (try! (as-contract (contract-call? token-out transfer amount-out (as-contract tx-sender) user none)))
           )
           
           (print {
