@@ -7,7 +7,7 @@
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u1000)
 
-(define-data-var last-slow-check uint u0)
+(define-data-var last-fiscal-height uint u0)
 ;; State
 (define-data-var rebalance-threshold uint u1000000) ;; 1M uSTX
 
@@ -20,25 +20,33 @@
 (define-constant KI 10)  ;; 0.001
 (define-constant KD 100) ;; 0.01
 
-;; Authorization
-
-(define-public (apply-fiscal-dam)
-  (let ((gcr (unwrap-panic (contract-call? .agent-risk get-gcr))))
-    (begin
-      (if (< gcr u110)
-        ;; EMERGENCY: 100% to Insurance Fund
-        (try! (contract-call? .cxd-treasury rebalance u0 u0 u10000))
-        (if (< gcr u150)
-          ;; STABILITY: 60% Stakers, 20% Ops, 20% Insurance
-          (try! (contract-call? .cxd-treasury rebalance u6000 u2000 u2000))
-          ;; ABUNDANCE: 80% Stakers, 10% Ops, 10% Insurance
-          (try! (contract-call? .cxd-treasury rebalance u8000 u1000 u1000))
+;; @desc Rebalance revenue flows based on Global Collateral Ratio (GCR).
+(define-public (run-fiscal-strategy)
+  (let ((btc-height burn-block-height))
+    (if (<= btc-height (var-get last-fiscal-height))
+      (ok false)
+      (let ((gcr (unwrap-panic (contract-call? .agent-risk get-gcr))))
+        (begin
+          (if (< gcr u110)
+            ;; EMERGENCY: 100% to Insurance Fund
+            (try! (contract-call? .cxd-treasury rebalance u0 u0 u10000))
+            (if (< gcr u150)
+              ;; STABILITY: 60% Stakers, 20% Ops, 20% Insurance
+              (try! (contract-call? .cxd-treasury rebalance u6000 u2000 u2000))
+              ;; ABUNDANCE: 80% Stakers, 10% Ops, 10% Insurance
+              (try! (contract-call? .cxd-treasury rebalance u8000 u1000 u1000))
+            )
+          )
+          (var-set last-fiscal-height btc-height)
+          (ok true)
         )
       )
-      (var-set last-slow-check burn-block-height)
-      (ok true)
     )
   )
+)
+
+(define-public (apply-fiscal-dam)
+  (run-fiscal-strategy)
 )
 
 (define-public (check-work-needed)

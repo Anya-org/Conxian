@@ -6,6 +6,15 @@ epoch = "3.0"
 [simnet]
 mnemonic = "cute bird surprise boring old news cake design aisle helmet choose tree"
 
+[contracts.mock-token]
+path = "contracts/test-helpers/mock-token.clar"
+clarity-version = 3
+
+[contracts.mock-proposal]
+path = "contracts/test-helpers/mock-proposal.clar"
+clarity-version = 3
+depends_on = ["governance-traits"]
+
 [contracts.sip-standards]
 path = "contracts/traits/sip-standards.clar"
 clarity-version = 3
@@ -66,7 +75,7 @@ clarity-version = 3
 path = "contracts/math/math-utilities.clar"
 clarity-version = 3
 
-[contracts.concentrated-math]
+[contracts.math-lib-concentrated]
 path = "contracts/math/concentrated-math.clar"
 clarity-version = 3
 
@@ -93,6 +102,10 @@ path = "contracts/core/conxian-protocol.clar"
 clarity-version = 3
 depends_on = ["core-traits", "admin-facade", "block-utils"]
 
+
+[contracts.compliance-trait]
+path = "contracts/compliance/compliance-trait.clar"
+clarity-version = 3
 
 [contracts.regulatory-adapter]
 path = "contracts/compliance/regulatory-adapter.clar"
@@ -377,4 +390,4 @@ depends_on = ["automation-traits", "agent-risk", "cxd-treasury", "office-manager
 [contracts.ops-engine]
 path = "contracts/core/ops-engine.clar"
 clarity-version = 3
-depends_on = ["governance-traits", "admin-facade"]
+depends_on = ["governance-traits", "admin-facade", "swap-router", "agent-treasury", "agent-risk", "cxd-token"]

@@ -189,8 +189,8 @@
 (define-read-only (get-volatility-index)
   (let ((data (default-to { mean: u0, variance: u0, count: u0 } (map-get? asset-volatility-data { asset: (var-get primary-asset) }))))
     (if (is-eq (get mean data) u0)
-      u0
-      (/ (* (get variance data) u100) (get mean data))
+      (ok u0)
+      (ok (/ (* (get variance data) u100) (get mean data)))
     )
   )
 )
@@ -198,6 +198,7 @@
 (define-read-only (get-volatility (asset principal))
   (ok (default-to { mean: u0, variance: u0, count: u0 } (map-get? asset-volatility-data { asset: asset })))
 )
+
 (define-read-only (get-price (asset principal))
   (match (map-get? asset-sources { asset: asset })
     entry

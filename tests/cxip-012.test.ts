@@ -2,62 +2,61 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { Cl } from '@stacks/transactions';
 import { simnet } from './setup-test-env';
 
-describe('CXIP-012: The Cybernetic Protocol Upgrade', () => {
+describe('CXIP-012: Cybernetic Protocol Upgrade Simulation', () => {
   let deployer: string;
+  let keeper: string;
 
   beforeAll(() => {
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
+    keeper = accounts.get('wallet_1')!;
   });
 
-  it('Scenario: Black Monday - 30% Market Crash triggers Anti-LVR and Fiscal Dam', () => {
-    // 1. Setup: Create pool, Mint initial tokens and set initial price
+  it('Scenario: Market Crash triggers Anti-LVR and Fiscal Dam', () => {
+    // 1. SETUP: Authorize ops-engine, create pool, and initialize oracle
     simnet.callPublicFn('cxd-token', 'add-minter', [Cl.contractPrincipal(deployer, 'ops-engine')], deployer);
 
     // Create Pool 1
     simnet.callPublicFn('concentrated-liquidity-pool', 'create-pool', [
         Cl.contractPrincipal(deployer, 'cxd-token'),
         Cl.contractPrincipal(deployer, 'cxvg-token'),
-        Cl.uint(3000), // 0.3%
+        Cl.uint(30), // 0.3%
         Cl.uint(100000000)
     ], deployer);
 
-    // Set initial price $1.00 for CXD
-    simnet.callPublicFn('oracle-aggregator', 'set-source', [
-        Cl.contractPrincipal(deployer, 'cxd-token'),
-        Cl.uint(100000000), // $1.00
-        Cl.uint(100)
-    ], deployer);
+    simnet.callPublicFn('oracle-aggregator', 'set-source', [Cl.contractPrincipal(deployer, 'cxd-token'), Cl.uint(100000000), Cl.uint(100)], deployer);
 
-    // Verify initial fee is 0.3% (3000 ppm)
-    let fee = simnet.callReadOnlyFn('swap-router', 'get-fee', [], deployer);
-    expect(fee.result).toEqual(Cl.uint(3000));
+    // Check initial fee (0.3% = 30 bps)
+    const initialFee = simnet.callReadOnlyFn('swap-router', 'get-fee', [], deployer);
+    expect(initialFee.result).toEqual(Cl.ok(Cl.uint(30)));
 
-    // 2. TRIGGER CRASH: Price drops and volatility increases
-    simnet.callPublicFn('oracle-aggregator', 'set-source', [
-        Cl.contractPrincipal(deployer, 'cxd-token'),
-        Cl.uint(70000000), // $0.70
-        Cl.uint(100)
-    ], deployer);
+    // 2. TRIGGER CRASH: Increase volatility and set crisis risk params
+    simnet.callPublicFn('oracle-aggregator', 'set-source', [Cl.contractPrincipal(deployer, 'cxd-token'), Cl.uint(70000000), Cl.uint(100)], deployer);
 
-    simnet.callPublicFn('oracle-aggregator', 'set-source', [
-        Cl.contractPrincipal(deployer, 'cxd-token'),
-        Cl.uint(130000000), // $1.30 (high variance)
-        Cl.uint(100)
-    ], deployer);
+    // Set predictive params to trigger "Crisis" (score > 5000 -> GCR < 110)
+    simnet.callPublicFn('agent-risk', 'set-predictive-params', [Cl.uint(0), Cl.uint(10000), Cl.uint(10000)], deployer);
 
-    // 3. Run Automation (The "Keeper" Trigger)
+    const riskScore = simnet.callReadOnlyFn('agent-risk', 'assess-system-risk', [], deployer);
+    console.log('Risk Score:', riskScore.result);
+
+    // 3. RUN AUTOMATION: Keeper triggers epoch update
     simnet.mineEmptyBlocks(11);
 
-    const response = simnet.callPublicFn('ops-engine', 'trigger-epoch-update', [], deployer);
+    const response = simnet.callPublicFn('ops-engine', 'trigger-epoch-update', [], keeper);
+    console.log('Epoch Update Response:', response.result);
     expect(response.result).toBeDefined();
 
-    // 4. Verify Anti-LVR (Fast Path)
-    fee = simnet.callReadOnlyFn('swap-router', 'get-fee', [], deployer);
-    expect(fee.result).toEqual(Cl.uint(10000));
+    // 4. VERIFY REFLEXES
+    // Assert Fee spiked to 1.0% (100 bps) due to Anti-LVR
+    const spikedFee = simnet.callReadOnlyFn('swap-router', 'get-fee', [], deployer);
+    expect(spikedFee.result).toEqual(Cl.ok(Cl.uint(100)));
 
-    // 5. Verify Fiscal Dam (Slow Path)
-    const shares = simnet.callReadOnlyFn('cxd-treasury', 'get-allocation-percentages', [], deployer);
-    console.log('Final Shares:', Cl.prettyPrint(shares.result));
+    // Assert Fiscal Dam rerouted revenue to Vault (0% staking, 0% dev, 100% insurance)
+    const policy = simnet.callReadOnlyFn('cxd-treasury', 'get-allocation-percentages', [], deployer);
+    expect(policy.result).toEqual(Cl.ok(Cl.tuple({ staking: Cl.uint(0), dev: Cl.uint(0), insurance: Cl.uint(10000) })));
+
+    // 5. VERIFY KEEPER REWARD
+    const balance = simnet.callReadOnlyFn('cxd-token', 'get-balance', [Cl.standardPrincipal(keeper)], deployer);
+    expect(balance.result).toEqual(Cl.ok(Cl.uint(500000000))); // 5 CXD
   });
 });

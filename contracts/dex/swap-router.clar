@@ -9,17 +9,17 @@
 (define-constant ERR_PAUSED u1001)
 (define-constant ERR_SLIPPAGE u3000)
 (define-constant ERR_INVALID_PATH u2005)
-(define-data-var current-fee uint u3000)
+
+(define-constant BASE-FEE u30) ;; 0.3%
+(define-constant MAX-FEE u100) ;; 1.0%
+
+;; State
+(define-data-var last-check-height uint u0)
+(define-data-var current-fee uint u30)
 
 ;; Public Functions
 
 ;; @desc Executes a single-hop swap between two tokens using a specific pool.
-;; @param pool-id uint - The ID of the liquidity pool.
-;; @param token-in <sip-010-ft-trait> - The trait of the input token.
-;; @param token-out <sip-010-ft-trait> - The trait of the output token.
-;; @param amount-in uint - The amount of input tokens to swap.
-;; @param min-amount-out uint - The minimum amount of output tokens expected (slippage protection).
-;; @returns (response uint uint) - The actual amount of output tokens received.
 (define-public (exact-input-single
     (pool-id uint)
     (token-in <sip-010-ft-trait>)
@@ -78,28 +78,41 @@
 )
 
 (define-read-only (get-fee)
-  (var-get current-fee)
+  (ok (var-get current-fee))
 )
 
 (define-public (set-fee (new-fee uint))
   (begin
-    (asserts! (is-eq contract-caller .ops-engine) (err ERR_UNAUTHORIZED))
+    (asserts! (or (is-eq contract-caller .ops-engine) (unwrap-panic (contract-call? .admin-facade is-authorized u1))) (err ERR_UNAUTHORIZED))
     (var-set current-fee new-fee)
     (ok true)
   )
 )
 
 (define-public (update-volatility-fees)
-  (let (
-    (volatility-index (contract-call? .oracle-aggregator get-volatility-index))
-    (base-fee u3000)
-    (max-fee u10000)
-    (new-fee (if (> volatility-index u50) max-fee base-fee))
-  )
-    (begin
-      (try! (contract-call? .concentrated-liquidity-pool set-pool-fee u1 new-fee))
-      (var-set current-fee new-fee)
-      (ok new-fee)
+  (begin
+    (asserts! (or (is-eq contract-caller .ops-engine) (unwrap-panic (contract-call? .admin-facade is-authorized u1))) (err ERR_UNAUTHORIZED))
+    (let
+        (
+            (current-height block-height)
+            (height-diff (- current-height (var-get last-check-height)))
+        )
+        (if (<= height-diff u10)
+          (ok (var-get current-fee))
+          (let
+              (
+                  (volatility-index (unwrap-panic (contract-call? .oracle-aggregator get-volatility-index)))
+                  (new-fee (if (> volatility-index u50) MAX-FEE BASE-FEE))
+              )
+              (begin
+                (try! (contract-call? .concentrated-liquidity-pool set-pool-fee u1 new-fee))
+                (var-set current-fee new-fee)
+                (var-set last-check-height current-height)
+                (print { event: "dex-fee-updated", new-fee: new-fee, volatility: volatility-index })
+                (ok new-fee)
+              )
+          )
+        )
     )
   )
 )

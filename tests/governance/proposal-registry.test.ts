@@ -31,7 +31,7 @@ describe('Proposal Registry', () => {
       deployer
     );
 
-    expect(add.result).toBeOk(Cl.uint(1));
+    expect(add.result).toEqual(Cl.ok(Cl.uint(1)));
 
     const proposal = simnet.callReadOnlyFn(
       "proposal-registry",
@@ -40,18 +40,20 @@ describe('Proposal Registry', () => {
       deployer
     );
 
-    expect(proposal.result).toBeSome(
-      Cl.tuple({
-        proposer: Cl.standardPrincipal(deployer),
-        "proposal-contract": Cl.contractPrincipal(deployer, "mock-proposal"),
-        "council-id": Cl.uint(1),
-        "start-block": Cl.uint(10),
-        "end-block": Cl.uint(100),
-        "for-votes": Cl.uint(0),
-        "against-votes": Cl.uint(0),
-        executed: Cl.bool(false),
-        canceled: Cl.bool(false),
-      })
+    expect(proposal.result).toEqual(
+      Cl.some(
+        Cl.tuple({
+          proposer: Cl.standardPrincipal(deployer),
+          "proposal-contract": Cl.contractPrincipal(deployer, "mock-proposal"),
+          "council-id": Cl.uint(1),
+          "start-block": Cl.uint(10),
+          "end-block": Cl.uint(100),
+          "for-votes": Cl.uint(0),
+          "against-votes": Cl.uint(0),
+          executed: Cl.bool(false),
+          canceled: Cl.bool(false),
+        })
+      )
     );
   });
 
@@ -80,7 +82,7 @@ describe('Proposal Registry', () => {
       ],
       wallet1
     );
-    expect(vote1.result).toBeOk(Cl.bool(true));
+    expect(vote1.result).toEqual(Cl.ok(Cl.bool(true)));
 
     // Check stats
     const proposalAfterVote = simnet.callReadOnlyFn(
@@ -90,8 +92,8 @@ describe('Proposal Registry', () => {
       deployer
     );
     const props = (proposalAfterVote.result as any).value.data;
-    expect(props["for-votes"]).toBeUint(50);
-    expect(props["against-votes"]).toBeUint(0);
+    expect(props["for-votes"]).toEqual(Cl.uint(50));
+    expect(props["against-votes"]).toEqual(Cl.uint(0));
 
     // Verify Receipt
     const hasVoted = simnet.callReadOnlyFn(
@@ -100,7 +102,7 @@ describe('Proposal Registry', () => {
       [Cl.uint(1), Cl.standardPrincipal(wallet1)],
       deployer
     );
-    expect(hasVoted.result).toBeBool(true);
+    expect(hasVoted.result).toEqual(Cl.bool(true));
 
     // Attempt Double Vote
     const vote2 = simnet.callPublicFn(
@@ -109,7 +111,7 @@ describe('Proposal Registry', () => {
       [Cl.uint(1), Cl.bool(false), Cl.uint(50)],
       wallet1
     );
-    expect(vote2.result).toBeErr(Cl.uint(4001)); // ERR_ALREADY_VOTED
+    expect(vote2.result).toEqual(Cl.error(Cl.uint(4001))); // ERR_ALREADY_VOTED
   });
 
   it("allows setting executed status", () => {
@@ -132,7 +134,7 @@ describe('Proposal Registry', () => {
       [Cl.uint(1)],
       deployer
     );
-    expect(exec.result).toBeOk(Cl.bool(true));
+    expect(exec.result).toEqual(Cl.ok(Cl.bool(true)));
 
     const proposal = simnet.callReadOnlyFn(
       "proposal-registry",
@@ -141,6 +143,6 @@ describe('Proposal Registry', () => {
       deployer
     );
     const props = (proposal.result as any).value.data;
-    expect(props.executed).toBeBool(true);
+    expect(props.executed).toEqual(Cl.bool(true));
   });
 });

@@ -23,6 +23,15 @@
   )
 )
 
+(define-public (trigger-emergency-pause)
+  (begin
+    (asserts! (unwrap-panic (contract-call? .admin-facade is-authorized u4)) (err ERR_UNAUTHORIZED))
+    (try! (contract-call? .conxian-protocol pause))
+    (print { event: "emergency-pause-triggered", caller: tx-sender, block: burn-block-height })
+    (ok true)
+  )
+)
+
 (define-read-only (get-last-action)
   (var-get last-action-block)
 )
@@ -48,7 +57,7 @@
       ;; 2. SLOW GEAR (Strategy) - Every Bitcoin Block (~10 min)
       (if (> current-btc-height (var-get last-slow-check))
         (begin
-          (unwrap-panic (contract-call? .agent-treasury apply-fiscal-dam))
+          (unwrap-panic (contract-call? .agent-treasury run-fiscal-strategy))
           (unwrap-panic (contract-call? .agent-risk update-pid-rates))
           (var-set last-slow-check current-btc-height)
         )
@@ -56,7 +65,10 @@
       )
 
       ;; 3. PAY KEEPER (5 CXD)
-      (contract-call? .cxd-token mint u5000000 tx-sender)
+      (try! (contract-call? .cxd-token mint u500000000 tx-sender))
+
+      (print { event: "epoch-updated", keeper: tx-sender, block: burn-block-height })
+      (ok true)
     )
   )
 )
