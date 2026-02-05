@@ -85,6 +85,18 @@
   )
 )
 
+(define-read-only (get-fee)
+  (ok (var-get current-fee))
+)
+
+(define-public (set-fee (new-fee uint))
+  (begin
+    (asserts! (or (is-eq contract-caller .ops-engine) (unwrap-panic (contract-call? .admin-facade is-authorized u1))) (err ERR_UNAUTHORIZED))
+    (var-set current-fee new-fee)
+    (ok true)
+  )
+)
+
 (define-public (update-volatility-fees)
   (begin
     (asserts! (or (is-eq contract-caller .ops-engine) (unwrap-panic (contract-call? .admin-facade is-authorized u1))) (err ERR_UNAUTHORIZED))
@@ -101,6 +113,7 @@
                   (new-fee (if (> volatility-index u50) MAX-FEE BASE-FEE))
               )
               (begin
+                (try! (contract-call? .concentrated-liquidity-pool set-pool-fee u1 new-fee))
                 (var-set current-fee new-fee)
                 (var-set last-check-height current-height)
                 (print { event: "dex-fee-updated", new-fee: new-fee, volatility: volatility-index })
@@ -110,8 +123,4 @@
         )
     )
   )
-)
-
-(define-read-only (get-fee)
-  (ok (var-get current-fee))
 )

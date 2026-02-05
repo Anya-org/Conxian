@@ -167,8 +167,14 @@ The protocol utilizes a 5-token system aligned with specialized councils:
 - **Hybrid Oracle**: Aggregates Pyth, Redstone, and Switchboard with deviation guards. Implemented in `oracle-aggregator.clar`.
 
 ## 12. Implementation Status (January 2026)
+### 12.0 CXIP-012: The Cybernetic Upgrade (v0.6.1)
 
-### 12.1 Current State: Protocol Repairs Complete (v0.5.0)
+- **Dual-Clock Standard**: Integrated Fast Gear (Reflexes) and Slow Gear (Strategy) logic.
+- **Anti-LVR Switch**: Dynamic DEX fees based on real-time volatility.
+- **Fiscal Dam**: Adaptive revenue routing based on Global Collateral Ratio (GCR).
+- **Chainhook Readiness**: Prepared for event-driven automation.
+
+### 12.1 Current State: Cybernetic Protocol Upgrade (v0.6.1)
 
 **Completed Priority Repairs (P1-P6)**:
 

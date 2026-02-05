@@ -13,8 +13,17 @@ describe('CXIP-012: Cybernetic Protocol Upgrade Simulation', () => {
   });
 
   it('Scenario: Market Crash triggers Anti-LVR and Fiscal Dam', () => {
-    // 1. SETUP: Authorize ops-engine and initialize oracle
+    // 1. SETUP: Authorize ops-engine, create pool, and initialize oracle
     simnet.callPublicFn('cxd-token', 'add-minter', [Cl.contractPrincipal(deployer, 'ops-engine')], deployer);
+
+    // Create Pool 1
+    simnet.callPublicFn('concentrated-liquidity-pool', 'create-pool', [
+        Cl.contractPrincipal(deployer, 'cxd-token'),
+        Cl.contractPrincipal(deployer, 'cxvg-token'),
+        Cl.uint(30), // 0.3%
+        Cl.uint(100000000)
+    ], deployer);
+
     simnet.callPublicFn('oracle-aggregator', 'set-source', [Cl.contractPrincipal(deployer, 'cxd-token'), Cl.uint(100000000), Cl.uint(100)], deployer);
 
     // Check initial fee (0.3% = 30 bps)

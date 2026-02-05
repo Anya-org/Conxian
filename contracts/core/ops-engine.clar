@@ -1,6 +1,6 @@
 ;; ops-engine.clar
 ;; "The Executive Branch" - Coordinating the Sovereign Autonomous Business (SAB)
-;; Nakamoto-aligned with Dual-Clock logic
+;; Nakamoto-aligned with Dual-Clock Logic (block-height and burn-block-height)
 
 (use-trait proposal-trait .governance-traits.proposal-trait)
 
@@ -33,25 +33,39 @@
   (var-get last-action-block)
 )
 
+;; @desc Trigger the Dual-Clock epoch update.
+;; Fast Gear: Reflexes (DEX Fees) via block-height.
+;; Slow Gear: Strategy (Fiscal Dam) via burn-block-height.
 (define-public (trigger-epoch-update)
-  (begin
-    ;; 1. FAST PATH (DEX Protection) - Every ~10 Blocks
-    ;; TODO: Implement update-volatility-fees in swap-router
-    ;; (try! (contract-call? .swap-router update-volatility-fees))
+  (let (
+    (current-stx-height block-height)
+    (current-btc-height burn-block-height)
+  )
+    (begin
+      ;; 1. FAST GEAR (Reflexes) - Every ~10 Blocks (~1 min)
+      (if (> (- current-stx-height (var-get last-fast-check)) u10)
+        (begin
+          (unwrap-panic (contract-call? .swap-router update-volatility-fees))
+          (var-set last-fast-check current-stx-height)
+        )
+        false
+      )
 
-    ;; 2. SLOW PATH (Fiscal Strategy) - Every Bitcoin Block
-    ;; TODO: Implement run-fiscal-strategy in agent-treasury
-    ;; (try! (contract-call? .agent-treasury run-fiscal-strategy))
+      ;; 2. SLOW GEAR (Strategy) - Every Bitcoin Block (~10 min)
+      (if (> current-btc-height (var-get last-slow-check))
+        (begin
+          (unwrap-panic (contract-call? .agent-treasury run-fiscal-strategy))
+          (unwrap-panic (contract-call? .agent-risk update-pid-rates))
+          (var-set last-slow-check current-btc-height)
+        )
+        false
+      )
 
-    ;; 3. PID STABILIZER (Risk Management)
-    ;; TODO: Implement update-pid-rates in agent-risk
-    ;; (try! (contract-call? .agent-risk update-pid-rates))
+      ;; 3. PAY KEEPER (5 CXD)
+      (try! (contract-call? .cxd-token mint u500000000 tx-sender))
 
-    ;; 4. KEEPER REWARD - 5 CXD (Keeper incentive)
-    ;; Note: cxd-token must have ops-engine as authorized minter
-    (try! (contract-call? .cxd-token mint u500000000 tx-sender))
-    
-    (print { event: "epoch-updated", keeper: tx-sender, block: burn-block-height })
-    (ok true)
+      (print { event: "epoch-updated", keeper: tx-sender, block: burn-block-height })
+      (ok true)
+    )
   )
 )

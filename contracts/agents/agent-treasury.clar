@@ -20,31 +20,32 @@
 (define-constant KI 10)
 (define-constant KD 100)
 
+;; @desc Rebalance revenue flows based on Global Collateral Ratio (GCR).
 (define-public (run-fiscal-strategy)
-    (let
-        (
-            (btc-height burn-block-height)
-        )
-        ;; Only run once per Bitcoin block
-        (if (<= btc-height (var-get last-fiscal-height))
-          (ok false)
-          (let
-              (
-                  (gcr (unwrap-panic (contract-call? .agent-risk get-gcr)))
-              )
-              (begin
-                (if (< gcr u110)
-                    ;; EMERGENCY: 100% to Vault (Insurance)
-                    (try! (contract-call? .cxd-treasury rebalance u0 u0 u10000))
-                    ;; NORMAL: 60% Stakers, 20% Ops, 20% Vault
-                    (try! (contract-call? .cxd-treasury rebalance u6000 u2000 u2000))
-                )
-                (var-set last-fiscal-height btc-height)
-                (ok true)
-              )
+  (let ((btc-height burn-block-height))
+    (if (<= btc-height (var-get last-fiscal-height))
+      (ok false)
+      (let ((gcr (unwrap-panic (contract-call? .agent-risk get-gcr))))
+        (begin
+          (if (< gcr u110)
+            ;; EMERGENCY: 100% to Insurance Fund
+            (try! (contract-call? .cxd-treasury rebalance u0 u0 u10000))
+            (if (< gcr u150)
+              ;; STABILITY: 60% Stakers, 20% Ops, 20% Insurance
+              (try! (contract-call? .cxd-treasury rebalance u6000 u2000 u2000))
+              ;; ABUNDANCE: 80% Stakers, 10% Ops, 10% Insurance
+              (try! (contract-call? .cxd-treasury rebalance u8000 u1000 u1000))
+            )
           )
+          (var-set last-fiscal-height btc-height)
+          (ok true)
         )
+      )
     )
+)
+
+(define-public (apply-fiscal-dam)
+  (run-fiscal-strategy)
 )
 
 (define-public (apply-fiscal-dam)
@@ -65,8 +66,8 @@
 (define-private (get-fuzzy-setpoint (risk-state (string-ascii 20)))
   (if (is-eq risk-state "DEFENSIVE")
     500
-    (if (is-eq risk-state "PREEMPTIVE")
-      4750
+    (if (is-eq risk-state "CRISIS")
+      0
       6000
     )
   )
@@ -95,9 +96,12 @@
     (current-staking (to-int (get staking current-shares)))
     (target-setpoint (get-fuzzy-setpoint risk-state))
     (adjustment (calculate-pid-adjustment target-setpoint current-staking))
+
     (clamped-adj (if (> adjustment 100) 100 (if (< adjustment -100) -100 adjustment)))
     (new-staking-int (+ current-staking clamped-adj))
+
     (final-staking (if (> new-staking-int 6000) u6000 (if (< new-staking-int 0) u0 (to-uint new-staking-int))))
+    
     (new-dev u2000)
     (new-insurance (- u8000 final-staking))
   )
@@ -109,6 +113,7 @@
         new-staking: final-staking,
         adjustment: clamped-adj
       })
+
       (match (contract-call? .office-manager payout tx-sender u5)
         success (ok true)
         error (begin

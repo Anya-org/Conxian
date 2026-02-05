@@ -16,6 +16,7 @@
 (define-data-var manipulation-threshold-bps uint u500) ;; 5% default
 (define-data-var twap-alpha-bps uint u1000) ;; 10% EMA weight for new observations
 (define-data-var circuit-breaker (optional principal) none)
+(define-data-var primary-asset principal .cxd-token)
 ;; Degrade to TWAP when price age exceeds threshold (in blocks)
 (define-data-var stale-threshold-blocks uint u4320000)
 
@@ -185,14 +186,17 @@
 
 ;; Minimal aggregator: return latest price when not manipulated; otherwise return TWAP (degraded mode)
 
+(define-read-only (get-volatility-index)
+  (let ((data (default-to { mean: u0, variance: u0, count: u0 } (map-get? asset-volatility-data { asset: (var-get primary-asset) }))))
+    (if (is-eq (get mean data) u0)
+      (ok u0)
+      (ok (/ (* (get variance data) u100) (get mean data)))
+    )
+  )
+)
+
 (define-read-only (get-volatility (asset principal))
   (ok (default-to { mean: u0, variance: u0, count: u0 } (map-get? asset-volatility-data { asset: asset })))
-)
-(define-read-only (get-volatility-index)
-  (match (map-get? asset-volatility-data { asset: .cxd-token })
-    data (ok (get variance data))
-    (ok u0)
-  )
 )
 
 (define-read-only (get-price (asset principal))

@@ -56,6 +56,19 @@
   )
 )
 
+(define-public (set-pool-fee (pool-id uint) (new-fee uint))
+  (begin
+    (asserts! (or
+        (is-eq tx-sender (unwrap-panic (contract-call? .conxian-protocol get-protocol-admin)))
+        (is-eq contract-caller .swap-router)
+    ) (err ERR_UNAUTHORIZED))
+    (let ((pool (unwrap! (map-get? pools pool-id) (err ERR_INSUFFICIENT_LIQUIDITY))))
+      (map-set pools pool-id (merge pool { fee: new-fee }))
+      (ok true)
+    )
+  )
+)
+
 (define-public (mint (pool-id uint) (tick-lower int) (tick-upper int) (amount uint))
   (let ((pool (unwrap! (map-get? pools pool-id) (err ERR_INSUFFICIENT_LIQUIDITY)))
         (position-key { pool-id: pool-id, owner: tx-sender, tick-lower: tick-lower, tick-upper: tick-upper }))

@@ -36,7 +36,7 @@ describe('Concentrated Liquidity Pool', () => {
     // First create a pool
     const cxdToken = `${deployer}.cxd-token`;
     const cxsToken = `${deployer}.cxs-token`;
-    
+
     let result = simnet.callPublicFn(
       'concentrated-liquidity-pool',
       'create-pool',
@@ -49,7 +49,7 @@ describe('Concentrated Liquidity Pool', () => {
       deployer
     );
     expect(result.result).toEqual(Cl.ok(Cl.uint(1)));
-    
+
     // Then mint a position
     result = simnet.callPublicFn(
       'concentrated-liquidity-pool',

@@ -17,6 +17,8 @@
 (define-data-var contract-owner principal tx-sender)
 (define-data-var max-supply uint u100000000000000000) ;; 1 billion with 8 decimals (1B * 10^8)
 
+(define-map minters { minter: principal } { authorized: bool })
+
 ;; Events
 (define-private (emit-mint (recipient principal) (amount uint))
   (print {
@@ -94,6 +96,20 @@
   (ok (- (var-get max-supply) (var-get total-supply)))
 )
 
+;; Helper for minters
+(define-read-only (is-minter (minter principal))
+  (default-to false (get authorized (map-get? minters { minter: minter })))
+)
+
+;; Admin functions
+(define-public (add-minter (minter principal))
+  (begin
+    (asserts! (or (is-eq tx-sender (var-get contract-owner)) (is-minter contract-caller)) (err ERR_UNAUTHORIZED))
+    (map-set minters { minter: minter } { authorized: true })
+    (ok true)
+  )
+)
+
 ;; Mint function for initial distribution
 (define-read-only (is-minter (minter principal))
   (default-to false (get authorized (map-get? minters { minter: minter })))
@@ -119,7 +135,6 @@
   )
 )
 
-;; Admin functions
 (define-public (set-contract-owner (new-owner principal))
   (begin
     (asserts! (or (is-eq tx-sender (var-get contract-owner)) (is-minter contract-caller)) (err ERR_UNAUTHORIZED))
