@@ -15,10 +15,10 @@
 (define-data-var last-error int 0)
 (define-data-var integral int 0)
 
-;; PID Constants (scaled by 10000 for precision)
-(define-constant KP 500) ;; 0.05
-(define-constant KI 10)  ;; 0.001
-(define-constant KD 100) ;; 0.01
+;; PID Constants
+(define-constant KP 500)
+(define-constant KI 10)
+(define-constant KD 100)
 
 ;; @desc Rebalance revenue flows based on Global Collateral Ratio (GCR).
 (define-public (run-fiscal-strategy)
@@ -42,7 +42,10 @@
         )
       )
     )
-  )
+)
+
+(define-public (apply-fiscal-dam)
+  (run-fiscal-strategy)
 )
 
 (define-public (apply-fiscal-dam)
@@ -104,7 +107,6 @@
   )
     (begin
       (try! (contract-call? .cxd-treasury rebalance final-staking new-dev new-insurance))
-
       (print {
         event: "agent-treasury-rebalance-executed",
         risk-state: risk-state,

@@ -19,6 +19,14 @@
 
 ;; Public Functions
 
+(define-public (set-fee (new-fee uint))
+  (begin
+    (asserts! (unwrap-panic (contract-call? .admin-facade is-authorized u1)) (err ERR_UNAUTHORIZED)) ;; ROLE_ADMIN
+    (var-set current-fee new-fee)
+    (ok true)
+  )
+)
+
 ;; @desc Executes a single-hop swap between two tokens using a specific pool.
 (define-public (exact-input-single
     (pool-id uint)

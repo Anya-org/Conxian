@@ -7,9 +7,6 @@
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u6000)
 
-(define-data-var last-fast-check uint u0)
-(define-data-var last-slow-check uint u0)
-
 ;; State
 (define-data-var last-action-block uint u0)
 
