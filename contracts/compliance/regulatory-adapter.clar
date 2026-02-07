@@ -1,6 +1,7 @@
 ;; regulatory-adapter.clar
 ;; Conxian Finance: Regulatory Adapter (Clean-Hands Compliance)
 ;; Implements regulatory-adapter-trait from core-traits
+;; Clarity 4 Standard: Using stacks-block-time and to-ascii? for human-readable audit trails.
 
 ;; Traits
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
@@ -52,7 +53,7 @@
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set compliance-status { user: user } {
       clean-hands: true,
-      verified-at: burn-block-height,
+      verified-at: stacks-block-time,
       jurisdiction: jurisdiction
     })
     (ok true)
@@ -64,8 +65,14 @@
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set blacklist user true)
-    ;; Use burn-block-height for high-precision audit logs (Clarity 4)
-    (print { event: "user-blacklisted", user: user, audit-time: burn-block-height, status: "BLACKLISTED" })
+    ;; Use stacks-block-time for second-precision audit logs (Clarity 4)
+    ;; to-ascii? converts a buffer to a string-ascii
+    (print {
+      event: "user-blacklisted",
+      user: user,
+      audit-time: stacks-block-time,
+      status: (unwrap-panic (to-ascii? 0x424c41434b4c4953544544)) ;; "BLACKLISTED"
+    })
     (ok true)
   )
 )
@@ -75,7 +82,7 @@
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-delete blacklist user)
-    (print { event: "user-removed-from-blacklist", user: user })
+    (print { event: "user-removed-from-blacklist", user: user, timestamp: stacks-block-time })
     (ok true)
   )
 )
