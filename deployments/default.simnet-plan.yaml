@@ -127,6 +127,9 @@ plan:
             emulated-sender: ST3SNVJMW9480ZG1Y50439BSYEG1HA7NQPNVYN9F0
             path: contracts/core/conxian-protocol.clar
             clarity-version: 1
+      epoch: "2.05"
+    - id: 1
+      transactions:
         - emulated-contract-publish:
             contract-name: collateral-manager
             emulated-sender: ST3SNVJMW9480ZG1Y50439BSYEG1HA7NQPNVYN9F0
@@ -275,6 +278,9 @@ plan:
             emulated-sender: ST3SNVJMW9480ZG1Y50439BSYEG1HA7NQPNVYN9F0
             path: contracts/core/founder-vesting.clar
             clarity-version: 1
+      epoch: "2.05"
+    - id: 2
+      transactions:
         - emulated-contract-publish:
             contract-name: funding-rate-calculator
             emulated-sender: ST3SNVJMW9480ZG1Y50439BSYEG1HA7NQPNVYN9F0
@@ -393,6 +399,9 @@ plan:
             emulated-sender: ST3SNVJMW9480ZG1Y50439BSYEG1HA7NQPNVYN9F0
             path: contracts/integrations/switchboard-oracle-adapter.clar
             clarity-version: 1
+      epoch: "2.05"
+    - id: 3
+      transactions:
         - emulated-contract-publish:
             contract-name: treasury-governance
             emulated-sender: ST3SNVJMW9480ZG1Y50439BSYEG1HA7NQPNVYN9F0

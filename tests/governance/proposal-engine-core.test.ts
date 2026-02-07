@@ -46,7 +46,7 @@ describe('Proposal Engine - Core Functionality', () => {
       ],
       wallet1
     );
-    expect(failProp.result).toBeErr(Cl.uint(1000)); // ERR_UNAUTHORIZED (no seat) or panic unwrapping 0
+    expect(failProp.result).toEqual(Cl.error(Cl.uint(1000))); // ERR_UNAUTHORIZED (no seat) or panic unwrapping 0
 
     // Mint Seat
     mintSeat();
@@ -63,7 +63,7 @@ describe('Proposal Engine - Core Functionality', () => {
       ],
       wallet1
     );
-    expect(successProp.result).toBeOk(Cl.uint(1));
+    expect(successProp.result).toEqual(Cl.ok(Cl.uint(1)));
   });
 
   it("allows a seat holder to vote on a proposal", () => {
@@ -91,7 +91,7 @@ describe('Proposal Engine - Core Functionality', () => {
       [Cl.uint(1), Cl.bool(true)],
       wallet1
     );
-    expect(vote.result).toBeOk(Cl.bool(true));
+    expect(vote.result).toEqual(Cl.ok(Cl.bool(true)));
 
     // Check registry for votes
     const proposal = simnet.callReadOnlyFn(
@@ -101,7 +101,7 @@ describe('Proposal Engine - Core Functionality', () => {
       deployer
     );
     const props = (proposal.result as any).value.data;
-    expect(props["for-votes"]).toBeUint(100); // Equal to seat power
+    expect(props["for-votes"]).toEqual(Cl.uint(100)); // Equal to seat power
   });
 
   it("prevents voting before start block", () => {
@@ -129,6 +129,6 @@ describe('Proposal Engine - Core Functionality', () => {
     );
     // Expect ERR_NOT_FOUND (u1001) or whatever check fails first
     // In code: (asserts! (>= block-height (get start-block proposal)) ERR_NOT_FOUND)
-    expect(vote.result).toBeErr(Cl.uint(1001));
+    expect(vote.result).toEqual(Cl.error(Cl.uint(1001)));
   });
 });

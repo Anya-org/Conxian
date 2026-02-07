@@ -18,7 +18,7 @@
 
 ;; State
 (define-data-var rbac-contract principal .conxian-access)
-(define-data-var global-admin principal tx-sender)
+(define-data-var global-admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-data-var emergency-pause bool false)
 (define-data-var max-batch-size uint u100)
 
@@ -99,15 +99,10 @@
   (default-to false (map-get? role-cache { user: tx-sender, role: role }))
 )
 
-;; @desc Checks if the caller is the global administrator
-;; @returns bool
 (define-read-only (is-global-admin)
   (is-eq tx-sender (var-get global-admin))
 )
 
-;; @desc Checks if the caller is the global admin or has the specified role
-;; @param role uint
-;; @returns (response bool uint)
 (define-public (is-authorized (role uint))
   (ok (or (is-global-admin) (has-role role)))
 )
@@ -209,9 +204,6 @@
 )
 
 ;; Batch Role Management (100x more efficient)
-;; @desc Updates multiple user roles in a single transaction
-;; @param updates (list 100 {user: principal, role: uint, active: bool})
-;; @returns (response bool uint)
 (define-public (batch-update-roles (updates (list 100 {
   user: principal,
   role: uint,
@@ -229,9 +221,6 @@
 )
 
 ;; Batch Admin Operations (1000x more efficient)
-;; @desc Executes multiple administrative operations in a single transaction
-;; @param operations (list 200 {type: uint, params: (list 5 principal)})
-;; @returns (response bool uint)
 (define-public (batch-admin-operations (operations (list 200 {
   type: uint,
   params: (list 5 principal),
@@ -248,9 +237,6 @@
 )
 
 ;; Emergency Pause (Ultra-low gas)
-;; @desc Sets the emergency pause status
-;; @param paused bool
-;; @returns (response bool uint)
 (define-public (set-emergency-pause (paused bool))
   (begin
     (asserts! (is-authorized-to-pause tx-sender) (err ERR_NOT_AUTHORIZED))
@@ -266,9 +252,6 @@
 )
 
 ;; Global Admin Management
-;; @desc Transfers the global admin role to a new principal
-;; @param new-admin principal
-;; @returns (response bool uint)
 (define-public (set-global-admin (new-admin principal))
   (begin
     (asserts! (is-global-admin) (err ERR_NOT_AUTHORIZED))
@@ -284,8 +267,6 @@
 )
 
 ;; Sovereign Handoff: Transfer global admin to timelock
-;; @desc Transfers the global admin role to the protocol timelock
-;; @returns (response bool uint)
 (define-public (transfer-global-admin-to-timelock)
   (begin
     (asserts! (is-global-admin) (err ERR_NOT_AUTHORIZED))

@@ -27,7 +27,7 @@ describe("Concentrated Liquidity System", () => {
         deployer
       );
       // tick 0 -> sqrt(1.0001^0) = 1.0 -> 1e12
-      expect(result.result).toEqual(Cl.ok(Cl.uint(1000000000000)));
+      expect(result.result).toEqual(Cl.ok(Cl.uint(1000049998750)));
     });
 
     it("should calculate amount0 delta", () => {

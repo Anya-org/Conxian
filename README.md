@@ -1,9 +1,3 @@
----
-layout: default
-title: Conxian Finance Protocol
-permalink: /
----
-
 # Conxian Finance Protocol
 
 ## Overview
@@ -40,7 +34,7 @@ Total revenue is automatically distributed:
 
 ## Technical Stack
 
-- **Clarity 4**: Nakamoto-aligned (Epoch 3.0) utilizing Bitcoin-anchored `burn-block-height` for high-precision temporal logic and cross-era consistency.
+- **Clarity 3**: Nakamoto-aligned (Epoch 3.0) utilizing `burn-block-height` for Bitcoin anchoring. Clarity 4 migration tracked for when mainnet activates Epoch 3.1.
 - **Tenure Awareness**: Logic is aware of Stacks block tenures via `block-utils` for deterministic execution.
 - **Facade Pattern**: All core logic accessed via dimensional facades and consolidated traits.
 - **Hybrid Oracle**: Aggregated Pyth, Redstone, and Switchboard feeds with deviation guards.
@@ -80,13 +74,6 @@ Total revenue is automatically distributed:
    npm test
    ```
 
-## Community and Contribution
-
-- [Contributing Guide](CONTRIBUTING.md)
-- [Code of Conduct](CODE_OF_CONDUCT.md)
-- [Security Policy](SECURITY.md)
-- [License](LICENSE)
-
 ---
 
 ## Status
@@ -101,9 +88,8 @@ Total revenue is automatically distributed:
   - ✅ P4: ICO Hardening (compliance gating, purchase caps)
   - ✅ P5: NFT Economics (CXLP Position NFT implementation)
   - ✅ P6: Operational Safety (rate limiter, proof-of-reserves)
-  - ✅ P7: Cybernetic Upgrade (CXIP-012: Dynamic Fiscal & Operational Logic)
 - **Architecture**: Full Truth Alignment achieved across Core, DEX, Governance, Economics, and Security.
-- **Nakamoto Ready**: All contracts use Bitcoin-anchored temporal logic and Epoch 3.0 standards.
+- **Nakamoto Ready**: All contracts use `burn-block-height` and Epoch 3.0 standards.
 - **Next Phase**: Security audit preparation and testnet deployment.
 
 ---

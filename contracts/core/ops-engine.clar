@@ -7,9 +7,6 @@
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u6000)
 
-(define-data-var last-fast-check uint u0)
-(define-data-var last-slow-check uint u0)
-
 ;; State
 (define-data-var last-action-time uint u0)
 
@@ -23,10 +20,22 @@
   )
 )
 
+(define-public (trigger-emergency-pause)
+  (begin
+    (asserts! (unwrap-panic (contract-call? .admin-facade is-authorized u4)) (err ERR_UNAUTHORIZED))
+    (try! (contract-call? .conxian-protocol pause))
+    (print { event: "emergency-pause-triggered", caller: tx-sender, block: burn-block-height })
+    (ok true)
+  )
+)
+
 (define-read-only (get-last-action)
   (var-get last-action-time)
 )
 
+;; @desc Trigger the Dual-Clock epoch update.
+;; Fast Gear: Reflexes (DEX Fees) via block-height.
+;; Slow Gear: Strategy (Fiscal Dam) via burn-block-height.
 (define-public (trigger-epoch-update)
   (let (
     (current-time stacks-block-time)
@@ -45,15 +54,18 @@
       ;; 2. SLOW PATH CHECK (Treasury/Risk) - Updated every ~10 minutes (600s)
       (if (> (- current-time (var-get last-slow-check)) u600)
         (begin
-          (unwrap-panic (contract-call? .agent-treasury apply-fiscal-dam))
+          (unwrap-panic (contract-call? .agent-treasury run-fiscal-strategy))
           (unwrap-panic (contract-call? .agent-risk update-pid-rates))
           (var-set last-slow-check current-time)
         )
         false
       )
 
-      ;; 3. PAY KEEPER
-      (contract-call? .cxd-token mint u5000000 tx-sender)
+      ;; 3. PAY KEEPER (5 CXD)
+      (try! (contract-call? .cxd-token mint u500000000 tx-sender))
+
+      (print { event: "epoch-updated", keeper: tx-sender, block: burn-block-height })
+      (ok true)
     )
   )
 )

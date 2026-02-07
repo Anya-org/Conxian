@@ -176,10 +176,10 @@ This document details the complete Priority-Ordered Repair (P1-P6) of the Conxia
 
 ### Clarity 4 / Nakamoto Compliance
 
-- ✅ All contracts use Bitcoin-anchored `burn-block-height` (Epoch 3.0) for precision and finality.
-- ✅ Events include timestamps for auditability.
-- ✅ No dynamic values in `define-data-var` at contract level (except `tx-sender` for owner).
-- ✅ Proper error constants (u1000+ range).
+- ✅ All contracts use `stacks-block-time` or `stacks-block-height` (Epoch 3.0)
+- ✅ Events include timestamps for auditability
+- ✅ No dynamic values in `define-data-var` at contract level (except tx-sender for owner)
+- ✅ Proper error constants (u1000+ range)
 
 ### Conxian Ethos Compliance
 

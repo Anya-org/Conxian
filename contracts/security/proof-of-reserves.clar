@@ -20,7 +20,7 @@
 
 ;; Data Vars
 (define-data-var contract-owner principal tx-sender)
-(define-data-var oracle-aggregator principal .oracle-aggregator)
+(define-data-var oracle-aggregator principal .oracle-aggregator-v2)
 
 ;; Authorized attestors (oracles/auditors)
 (define-map authorized-attestors principal bool)

@@ -115,3 +115,69 @@
   )
   ;; 50% quorum hardcoded for now
 )
+
+;; Admin functions
+(define-public (set-voting-period (new-period uint))
+  (begin
+    (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
+    (print { event: "set-voting-period", period: new-period })
+    (ok true)
+  )
+)
+
+(define-public (set-quorum-percentage (new-quorum uint))
+  (begin
+    (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
+    (print { event: "set-quorum-percentage", quorum: new-quorum })
+    (ok true)
+  )
+)
+
+(define-public (set-proposal-executor (new-executor principal))
+  (begin
+    (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
+    (var-set proposal-executor-contract new-executor)
+    (print { event: "set-proposal-executor", executor: new-executor })
+    (ok true)
+  )
+)
+
+(define-public (transfer-ownership (new-owner principal))
+  (begin
+    (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
+    (print { event: "transfer-ownership", owner: new-owner })
+    (ok true)
+  )
+)
+
+(define-public (set-protocol-coordinator (new-coordinator principal))
+  (begin
+    (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
+    (print { event: "set-protocol-coordinator", coordinator: new-coordinator })
+    (ok true)
+  )
+)
+
+(define-public (set-proposal-registry (new-registry principal))
+  (begin
+    (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
+    (var-set proposal-registry-contract new-registry)
+    (ok true)
+  )
+)
+
+;; Legacy function for compatibility
+(define-public (propose
+    (title (string-ascii 50))
+    (signatures (list 10 principal))
+    (action-ids (list 10 uint))
+    (action-types (list 10 (string-ascii 20)))
+    (action-params (list 10 (buff 256)))
+    (start-block uint)
+    (end-block uint)
+  )
+  (begin
+    (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
+    (ok true)
+  )
+)

@@ -203,7 +203,7 @@
 
 (define-public (set-rewards-duration (duration uint))
   (begin
-    (asserts! (or (is-eq tx-sender .agent-treasury) (is-eq tx-sender .ops-engine)) (err ERR_UNAUTHORIZED))
+    (asserts! (or (is-eq tx-sender .agent-treasury) (is-eq tx-sender .conxian-operations-engine)) (err ERR_UNAUTHORIZED))
     (var-set rewards-duration duration)
     (ok true)
   )
@@ -223,7 +223,7 @@
     (timestamp stacks-block-time)
   )
     (begin
-      (asserts! (or (is-eq tx-sender .agent-treasury) (is-eq tx-sender .ops-engine) (is-eq tx-sender .revenue-distributor)) (err ERR_UNAUTHORIZED))
+      (asserts! (or (is-eq tx-sender .agent-treasury) (is-eq tx-sender .conxian-operations-engine) (is-eq tx-sender .revenue-distributor)) (err ERR_UNAUTHORIZED))
       (asserts! (is-eq (contract-of token) (var-get rewards-token)) (err ERR_UNAUTHORIZED))
       
       (update-reward tx-sender)
@@ -251,7 +251,7 @@
   (begin
     ;; Controlled by Agent Treasury or Ops Engine
     (asserts!
-      (or (is-eq tx-sender .agent-treasury) (is-eq tx-sender .ops-engine))
+      (or (is-eq tx-sender .agent-treasury) (is-eq tx-sender .conxian-operations-engine))
       (err ERR_UNAUTHORIZED)
     )
     (update-reward tx-sender)
@@ -264,7 +264,7 @@
   (begin
     ;; Controlled by Ops Engine or Risk Agent (Emergency)
     (asserts!
-      (or (is-eq tx-sender .ops-engine) (is-eq tx-sender .agent-risk))
+      (or (is-eq tx-sender .conxian-operations-engine) (is-eq tx-sender .agent-risk))
       (err ERR_UNAUTHORIZED)
     )
     (var-set staking-paused paused)
