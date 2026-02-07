@@ -1,7 +1,14 @@
-import { describe, expect, it } from 'vitest';
-import { Cl, cvToValue } from '@stacks/transactions';
+import { describe, expect, it, beforeAll } from 'vitest';
+import { initSimnet, type Simnet } from '@stacks/clarinet-sdk';
+import { Cl } from '@stacks/transactions';
+
+let simnet: Simnet;
 
 describe('math-lib-concentrated', () => {
+  beforeAll(async () => {
+    simnet = await initSimnet('Clarinet.toml');
+  });
+
   it('should calculate the sqrt ratio correctly', () => {
     const { result } = simnet.callReadOnlyFn(
       'math-lib-concentrated',
@@ -9,6 +16,6 @@ describe('math-lib-concentrated', () => {
       [Cl.int(1)],
       simnet.deployer,
     );
-    expect(result).toBeOk(Cl.uint(1000049998750));
+    expect(result).toEqual(Cl.uint(1000049998750));
   });
 });

@@ -6,6 +6,15 @@ epoch = "3.0"
 [simnet]
 mnemonic = "cute bird surprise boring old news cake design aisle helmet choose tree"
 
+[contracts.mock-token]
+path = "contracts/test-helpers/mock-token.clar"
+clarity-version = 2
+
+[contracts.mock-proposal]
+path = "contracts/test-helpers/mock-proposal.clar"
+clarity-version = 2
+depends_on = ["governance-traits"]
+
 [contracts.sip-standards]
 path = "contracts/traits/sip-standards.clar"
 clarity-version = 2
@@ -66,7 +75,7 @@ clarity-version = 2
 path = "contracts/math/math-utilities.clar"
 clarity-version = 2
 
-[contracts.concentrated-math]
+[contracts.math-lib-concentrated]
 path = "contracts/math/concentrated-math.clar"
 clarity-version = 2
 
@@ -86,18 +95,17 @@ depends_on = ["core-traits"]
 [contracts.admin-facade]
 path = "contracts/core/admin-facade.clar"
 clarity-version = 2
-depends_on = ["core-traits", "conxian-access"]
+depends_on = ["core-traits", "conxian-access", "timelock"]
 
 [contracts.conxian-protocol]
 path = "contracts/core/conxian-protocol.clar"
 clarity-version = 2
 depends_on = ["core-traits", "admin-facade", "block-utils"]
 
-[contracts.ops-engine]
-path = "contracts/core/ops-engine.clar"
-clarity-version = 2
-depends_on = ["governance-traits", "admin-facade", "swap-router", "agent-treasury", "agent-risk", "cxd-token"]
 
+[contracts.compliance-trait]
+path = "contracts/compliance/compliance-trait.clar"
+clarity-version = 2
 
 [contracts.regulatory-adapter]
 path = "contracts/compliance/regulatory-adapter.clar"
@@ -172,7 +180,7 @@ depends_on = ["sip-standards"]
 [contracts.concentrated-liquidity-pool]
 path = "contracts/dex/concentrated-liquidity-pool.clar"
 clarity-version = 2
-depends_on = ["sip-standards", "conxian-protocol"]
+depends_on = ["sip-standards", "conxian-protocol", "revenue-distributor"]
 
 [contracts.liquidity-provider]
 path = "contracts/dex/liquidity-provider.clar"
@@ -192,10 +200,10 @@ depends_on = ["defi-traits", "sip-standards", "conxian-protocol"]
 [contracts.revenue-distributor]
 path = "contracts/treasury/revenue-distributor.clar"
 clarity-version = 2
-depends_on = ["core-traits", "math-utilities", "cxd-treasury"]
+depends_on = ["core-traits", "math-utilities", "cxd-treasury", "conxian-insurance-fund", "cxd-staking", "cxd-token", "operational-treasury"]
 
-[contracts.cxd-treasury]
-path = "contracts/treasury/cxd-treasury.clar"
+[contracts.allocation-policy]
+path = "contracts/treasury/allocation-policy.clar"
 clarity-version = 2
 
 [contracts.office-manager]
@@ -203,10 +211,7 @@ path = "contracts/automation/office-manager.clar"
 clarity-version = 2
 depends_on = ["automation-traits", "core-traits"]
 
-[contracts.agent-treasury]
-path = "contracts/agents/agent-treasury.clar"
-clarity-version = 2
-depends_on = ["automation-traits", "agent-risk", "cxd-treasury", "office-manager"]
+
 
 [contracts.proposal-registry]
 path = "contracts/governance/proposal-registry.clar"
@@ -266,7 +271,7 @@ depends_on = ["governance-traits", "cxtr-token", "operational-treasury"]
 [contracts.lending-manager]
 path = "contracts/lending/lending-manager.clar"
 clarity-version = 2
-depends_on = ["core-traits", "math-utilities", "conxian-protocol"]
+depends_on = ["core-traits", "math-utilities", "conxian-protocol", "circuit-breaker", "cxd-token", "economic-policy-engine", "revenue-distributor", "risk-manager"]
 
 [contracts.conxian-insurance-fund]
 path = "contracts/security/conxian-insurance-fund.clar"
@@ -316,7 +321,7 @@ depends_on = ["core-traits", "security-monitoring", "conxian-access"]
 [contracts.oracle-aggregator]
 path = "contracts/oracle/oracle-aggregator.clar"
 clarity-version = 2
-depends_on = ["defi-traits", "math-utilities", "circuit-breaker"]
+depends_on = ["defi-traits", "math-utilities", "circuit-breaker", "cxd-token"]
 
 [contracts.position-manager]
 path = "contracts/core/position-manager.clar"
@@ -361,7 +366,7 @@ depends_on = ["encoding"]
 [contracts.swap-router]
 path = "contracts/dex/swap-router.clar"
 clarity-version = 2
-depends_on = ["sip-standards", "conxian-protocol", "oracle-aggregator", "circuit-breaker", "concentrated-liquidity-pool", "cxvg-token"]
+depends_on = ["sip-standards", "conxian-protocol", "concentrated-liquidity-pool", "admin-facade", "oracle-aggregator"]
 
 [contracts.founder-vesting]
 path = "contracts/core/founder-vesting.clar"
@@ -371,8 +376,103 @@ depends_on = ["sip-standards"]
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
 clarity-version = 2
-depends_on = ["automation-traits", "core-traits", "dimensional-core", "office-manager", "oracle-aggregator", "cxd-token"]
+depends_on = ["automation-traits", "core-traits", "dimensional-core", "office-manager", "oracle-aggregator", "cxd-token", "lending-manager", "position-manager", "conxian-access", "conxian-protocol", "sip-standards"]
 
-[contracts.compliance-trait]
+[contracts.cxd-treasury]
+path = "contracts/treasury/cxd-treasury.clar"
+clarity-version = 2
+
+[contracts.agent-treasury]
+path = "contracts/agents/agent-treasury.clar"
+clarity-version = 2
+depends_on = ["automation-traits", "agent-risk", "cxd-treasury", "office-manager"]
+
+[contracts.ops-engine]
+path = "contracts/core/ops-engine.clar"
+clarity-version = 2
+depends_on = ["governance-traits", "admin-facade", "swap-router", "agent-treasury", "agent-risk", "cxd-token"]
+
+
+[contracts.kyc-registry]
+path = "contracts/compliance/kyc-registry.clar"
+clarity-version = 2
+
+[contracts.compliance-manager]
+path = "contracts/compliance/compliance-manager.clar"
+clarity-version = 2
+
+[contracts.compliance-hooks]
+path = "contracts/compliance/compliance-hooks.clar"
+clarity-version = 2
+
+[contracts.enterprise-facade]
+path = "contracts/enterprise/enterprise-facade.clar"
+clarity-version = 2
+
+[contracts.mock-usda-token]
+path = "contracts/test-helpers/mock-usda-token.clar"
+clarity-version = 2
+
+[contracts.governance-token]
+path = "contracts/governance-token.clar"
+clarity-version = 2
+
+[contracts.token-system-coordinator]
+path = "contracts/tokens/token-system-coordinator.clar"
+clarity-version = 2
+
+[contracts.optimization-helpers]
+path = "contracts/helpers/optimization-helpers.clar"
+clarity-version = 2
+
+[contracts.protocol-errors]
+path = "contracts/protocol-errors.clar"
+clarity-version = 2
+
+[contracts.position-factory]
+path = "contracts/position-factory.clar"
+clarity-version = 2
+
+[contracts.budget-manager]
+path = "contracts/budget-manager.clar"
+clarity-version = 2
+
+[contracts.btc-adapter]
+path = "contracts/interfaces/btc-adapter.clar"
+clarity-version = 2
+
+[contracts.decentralized-trait-registry]
+path = "contracts/decentralized-trait-registry.clar"
+clarity-version = 2
+
+[contracts.utils]
+path = "contracts/utils.clar"
+clarity-version = 2
+
+[contracts.validation]
+path = "contracts/validation.clar"
+clarity-version = 2
+
+[contracts.precision-calculator]
+path = "contracts/precision-calculator.clar"
+clarity-version = 2
+
+[contracts.standard-errors]
+path = "contracts/standard-errors.clar"
+clarity-version = 2
+
+[contracts.trait-errors]
+path = "contracts/trait-errors.clar"
+clarity-version = 2
+
+[contracts.lib]
+path = "contracts/lib.clar"
+clarity-version = 2
+
+[contracts.test-access]
+path = "contracts/test-access.clar"
+clarity-version = 2
+
+[contracts.compliance-traits]
 path = "contracts/compliance/compliance-trait.clar"
 clarity-version = 2

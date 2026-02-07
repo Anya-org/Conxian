@@ -163,11 +163,12 @@
 (define-public (liquidate-position
     (risk-manager <risk-manager-trait>)
     (position-id uint)
+    (collateral-token <sip-010-trait>)
   )
   (begin
     (let ((registered-manager (try! (get-module-contract "risk-manager"))))
       (asserts! (is-eq (contract-of risk-manager) registered-manager) (err ERR_UNAUTHORIZED))
-      (contract-call? risk-manager liquidate position-id)
+      (contract-call? risk-manager liquidate position-id collateral-token)
     )
   )
 )

@@ -17,6 +17,7 @@
 ;; Data Vars
 (define-data-var voting-delay uint u144) ;; ~1 day (144 blocks @ 10m)
 (define-data-var voting-period uint u52560) ;; ~1 year (AGM Interval)
+(define-data-var proposal-counter uint u0) ;; Incrementing proposal ID counter
 
 ;; Data Maps
 (define-map proposals
@@ -56,7 +57,7 @@
     (end-time uint)
   )
   (let (
-      (proposal-id u1) ;; Use Proposal Registry in full implementation
+      (new-id (+ (var-get proposal-counter) u1))
       (current-time burn-block-height)
     )
     ;; Compliance Check
@@ -65,7 +66,10 @@
     ;; Ensure start time is in the future
     (asserts! (> start-time current-time) (err ERR_START_BLOCK_IN_PAST))
 
-    (map-set proposals proposal-id {
+    ;; Increment proposal counter
+    (var-set proposal-counter new-id)
+
+    (map-set proposals new-id {
       start-time: start-time,
       end-time: end-time,
       yes-votes: u0,
@@ -75,13 +79,13 @@
 
     (print {
       event: "create-proposal",
-      proposal-id: proposal-id,
+      proposal-id: new-id,
       start-time: start-time,
       end-time: end-time,
       proposer: tx-sender,
     })
 
-    (ok proposal-id)
+    (ok new-id)
   )
 )
 

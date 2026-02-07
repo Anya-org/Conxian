@@ -88,7 +88,7 @@
 (define-public (record-diverted-claim (token principal) (amount uint))
   (begin
     ;; In a real scenario, this would be restricted to the revenue-distributor contract
-    (asserts! (or (is-eq contract-caller .revenue-distributor) (is-eq contract-caller (var-get admin))) (err ERR_UNAUTHORIZED))
+    (asserts! (or (is-eq contract-caller (var-get admin)) (is-eq contract-caller (var-get admin))) (err ERR_UNAUTHORIZED))
     (let (
       (current (get-accrued-claim token))
     )

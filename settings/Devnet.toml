@@ -6,6 +6,7 @@ name = "devnet"
 
 [accounts]
 deployer = { address = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM" }
+wallet_1 = { address = "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5" }
 
 # ---------- Traits ----------
 [traits.sip-010-ft-trait]

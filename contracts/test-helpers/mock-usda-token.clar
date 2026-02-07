@@ -1,0 +1,12 @@
+;; mock-usda-token.clar
+(define-fungible-token mock-usda-token)
+(define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
+  (begin (try! (ft-transfer? mock-usda-token amount sender recipient)) (ok true))
+)
+(define-public (mint (amount uint) (recipient principal))
+  (ft-mint? mock-usda-token amount recipient)
+)
+(define-read-only (get-balance (account principal))
+  (ok (ft-get-balance mock-usda-token account))
+)
+(define-read-only (get-decimals) (ok u6))

@@ -7,6 +7,7 @@ permalink: /docs/BENCHMARKS/
 # Conxian Protocol Performance Benchmarks
 
 ## 1. Overview
+
 This document provides verified performance benchmarks for core Conxian Protocol operations. Tests were conducted using `Clarinet Simnet` (v3.12.0) and represent the execution/computational latency of the Clarity 4 VM.
 
 ## 2. Core Operational Latency (Simnet)
@@ -22,6 +23,7 @@ This document provides verified performance benchmarks for core Conxian Protocol
 | **Swap Execution** | `execute-swap(...)` | ~18.4 ms | 25,400 units |
 
 ## 3. Nakamoto Tenure Efficiency
+
 Under Nakamoto (Stacks Epoch 3.0), Conxian benefits from "Fast Blocks" with a target latency of **~5 seconds**.
 
 - **Transactional Finality**: ~5 seconds (Fast block confirmation).
@@ -29,11 +31,14 @@ Under Nakamoto (Stacks Epoch 3.0), Conxian benefits from "Fast Blocks" with a ta
 - **Agent Reaction Time**: The `agent-risk` worker can scan and initiate liquidations within a single tenure (< 5 seconds).
 
 ## 4. Scalability Benchmarks
+
 Concurrent operation tests (from `enterprise-system-integration.test.ts`):
+
 - **Concurrent Loan Creation**: 5 loans processed in ~12ms (Simnet).
 - **Multi-pool Optimization**: 3 liquidity pools updated in ~9ms (Simnet).
 
 ## 5. Methodology
+
 - **Environment**: Clarinet SDK 3.x with Vitest.
 - **Hardware**: Standard CI/CD runner (2 vCPU, 4GB RAM).
 - **Measurement**: `Date.now()` delta across `simnet.callPublicFn`.

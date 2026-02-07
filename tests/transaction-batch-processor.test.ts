@@ -8,6 +8,9 @@ import { Cl } from '@stacks/transactions';
 import { createMockSimnet } from './helpers/test-setup';
 import { HEAVY_DISABLED } from './helpers/env';
 
+// NOTE: Using batch-processor contract which exists in automation/
+// The original transaction-batch-processor contract does not exist
+
 const d = HEAVY_DISABLED ? describe.skip : describe;
 
 const mockSimnet = createMockSimnet();
@@ -23,7 +26,7 @@ d('Transaction Batch Processor', () => {
     const deployer = accounts.get('deployer')!;
     
     // Check initial state
-    const stats = mockSimnet.callReadOnlyFn('transaction-batch-processor', 'get-processing-stats', [], deployer);
+    const stats = mockSimnet.callReadOnlyFn('batch-processor', 'get-processing-stats', [], deployer);
     
     expect(stats.result).toBeDefined();
     console.log('✅ Transaction Batch Processor: Initialization test passed');
@@ -35,7 +38,7 @@ d('Transaction Batch Processor', () => {
     const wallet2 = accounts.get('wallet_2')!;
     
     // Add transfer transaction to batch
-    const addResult = mockSimnet.callPublicFn('transaction-batch-processor', 'add-to-batch', [
+    const addResult = mockSimnet.callPublicFn('batch-processor', 'add-to-batch', [
       Cl.uint(1), // TX_TYPE_TRANSFER
       Cl.principal(wallet1),
       Cl.principal(wallet2),
@@ -46,7 +49,7 @@ d('Transaction Batch Processor', () => {
     expect(addResult.result).toBeDefined();
     
     // Check batch size increased (mocked response)
-    const stats = mockSimnet.callReadOnlyFn('transaction-batch-processor', 'get-processing-stats', [], deployer);
+    const stats = mockSimnet.callReadOnlyFn('batch-processor', 'get-processing-stats', [], deployer);
     expect(stats.result).toBeDefined();
     console.log('✅ Transaction Batch Processor: Add to batch test passed');
   });
@@ -55,7 +58,7 @@ d('Transaction Batch Processor', () => {
     const deployer = accounts.get('deployer')!;
     
     // Test batch processing logic
-    const processResult = mockSimnet.callPublicFn('transaction-batch-processor', 'process-current-batch', [], deployer);
+    const processResult = mockSimnet.callPublicFn('batch-processor', 'process-current-batch', [], deployer);
     expect(processResult.result).toBeDefined();
     console.log('✅ Transaction Batch Processor: Batch processing test passed');
   });
@@ -64,7 +67,7 @@ d('Transaction Batch Processor', () => {
     const deployer = accounts.get('deployer')!;
     
     // Test emergency flush
-    const flushResult = mockSimnet.callPublicFn('transaction-batch-processor', 'emergency-flush-batch', [], deployer);
+    const flushResult = mockSimnet.callPublicFn('batch-processor', 'emergency-flush-batch', [], deployer);
     expect(flushResult.result).toBeDefined();
     console.log('✅ Transaction Batch Processor: Emergency flush test passed');
   });
@@ -73,7 +76,7 @@ d('Transaction Batch Processor', () => {
     const deployer = accounts.get('deployer')!;
     
     // Test metrics collection
-    const stats = mockSimnet.callReadOnlyFn('transaction-batch-processor', 'get-processing-stats', [], deployer);
+    const stats = mockSimnet.callReadOnlyFn('batch-processor', 'get-processing-stats', [], deployer);
     expect(stats.result).toBeDefined();
     console.log('✅ Transaction Batch Processor: Metrics tracking test passed');
   });

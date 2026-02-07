@@ -68,7 +68,7 @@
     (response uint uint)
   )
   (liquidate
-    (uint)
+    (uint <sip-010-ft-trait>)
     (response bool uint)
   )
 ))

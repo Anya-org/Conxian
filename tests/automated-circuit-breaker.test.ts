@@ -3,6 +3,9 @@ import { Cl } from '@stacks/transactions';
 import { Simnet } from "@stacks/clarinet-sdk";
 import { HEAVY_DISABLED } from './helpers/env';
 
+// NOTE: Using enhanced-circuit-breaker contract which exists in the codebase
+// The original automated-circuit-breaker contract does not exist
+
 const d = HEAVY_DISABLED ? describe.skip : describe;
 
 /**
@@ -96,25 +99,25 @@ d('Automated Circuit Breaker', () => {
   it('should initialize circuit breaker system correctly', () => {
     const deployer = accounts.get('deployer')!;
     
-    // Check initial global statistics
-    const stats = mockSimnet.callReadOnlyFn('automated-circuit-breaker', 'get-global-stats', [], deployer);
+    // Check initial global statistics using enhanced-circuit-breaker
+    const stats = mockSimnet.callReadOnlyFn('enhanced-circuit-breaker', 'get-global-stats', [], deployer);
     
     expect(stats.result).toBeDefined();
-    console.log('✅ Automated Circuit Breaker: Initialization test passed');
+    console.log('✅ Enhanced Circuit Breaker: Initialization test passed');
   });
 
   it('should register and configure services successfully', () => {
     const deployer = accounts.get('deployer')!;
     
     // Register a service
-    const registerResult = mockSimnet.callPublicFn('automated-circuit-breaker', 'register-service', [
+    const registerResult = mockSimnet.callPublicFn('enhanced-circuit-breaker', 'register-service', [
       Cl.stringAscii('token-transfer-service')
     ], deployer);
     
     expect(registerResult.result).toBeDefined();
     
     // Configure service thresholds
-    const configResult = mockSimnet.callPublicFn('automated-circuit-breaker', 'configure-service', [
+    const configResult = mockSimnet.callPublicFn('enhanced-circuit-breaker', 'configure-service', [
       Cl.stringAscii('token-transfer-service'),
       Cl.uint(15), // failure threshold
       Cl.uint(3),  // success threshold
@@ -122,82 +125,82 @@ d('Automated Circuit Breaker', () => {
     ], deployer);
     
     expect(configResult.result).toBeDefined();
-    console.log('✅ Automated Circuit Breaker: Service registration test passed');
+    console.log('✅ Enhanced Circuit Breaker: Service registration test passed');
   });
 
   it('should handle success and failure recording correctly', () => {
     const deployer = accounts.get('deployer')!;
     
     // Record a successful request
-    const successResult = mockSimnet.callPublicFn('automated-circuit-breaker', 'record-success', [
+    const successResult = mockSimnet.callPublicFn('enhanced-circuit-breaker', 'record-success', [
       Cl.stringAscii('token-transfer-service')
     ], deployer);
     
     expect(successResult.result).toBeDefined();
     
     // Record a failed request
-    const failureResult = mockSimnet.callPublicFn('automated-circuit-breaker', 'record-failure', [
+    const failureResult = mockSimnet.callPublicFn('enhanced-circuit-breaker', 'record-failure', [
       Cl.stringAscii('token-transfer-service')
     ], deployer);
     
     expect(failureResult.result).toBeDefined();
-    console.log('✅ Automated Circuit Breaker: Success/failure recording test passed');
+    console.log('✅ Enhanced Circuit Breaker: Success/failure recording test passed');
   });
 
   it('should validate circuit state transitions', () => {
     const deployer = accounts.get('deployer')!;
     
     // Check circuit state
-    const stateResult = mockSimnet.callPublicFn('automated-circuit-breaker', 'check-circuit-state', [
+    const stateResult = mockSimnet.callPublicFn('enhanced-circuit-breaker', 'check-circuit-state', [
       Cl.stringAscii('token-transfer-service')
     ], deployer);
     
     expect(stateResult.result).toBeDefined();
     
     // Get circuit status
-    const statusResult = mockSimnet.callReadOnlyFn('automated-circuit-breaker', 'get-circuit-status', [
+    const statusResult = mockSimnet.callReadOnlyFn('enhanced-circuit-breaker', 'get-circuit-status', [
       Cl.stringAscii('token-transfer-service')
     ], deployer);
     
     expect(statusResult.result).toBeDefined();
-    console.log('✅ Automated Circuit Breaker: Circuit state transition test passed');
+    console.log('✅ Enhanced Circuit Breaker: Circuit state transition test passed');
   });
 
   it('should handle emergency circuit controls', () => {
     const deployer = accounts.get('deployer')!;
     
     // Force open circuit
-    const openResult = mockSimnet.callPublicFn('automated-circuit-breaker', 'force-open-circuit', [
+    const openResult = mockSimnet.callPublicFn('enhanced-circuit-breaker', 'force-open-circuit', [
       Cl.stringAscii('token-transfer-service')
     ], deployer);
     
     expect(openResult.result).toBeDefined();
     
     // Force close circuit
-    const closeResult = mockSimnet.callPublicFn('automated-circuit-breaker', 'force-close-circuit', [
+    const closeResult = mockSimnet.callPublicFn('enhanced-circuit-breaker', 'force-close-circuit', [
       Cl.stringAscii('token-transfer-service')
     ], deployer);
     
     expect(closeResult.result).toBeDefined();
-    console.log('✅ Automated Circuit Breaker: Emergency controls test passed');
+    console.log('✅ Enhanced Circuit Breaker: Emergency controls test passed');
   });
 
   it('should calculate error rates and health status correctly', () => {
     const deployer = accounts.get('deployer')!;
     
     // Calculate error rate
-    const errorRateResult = mockSimnet.callReadOnlyFn('automated-circuit-breaker', 'calculate-error-rate', [
+    const errorRateResult = mockSimnet.callReadOnlyFn('enhanced-circuit-breaker', 'calculate-error-rate', [
       Cl.stringAscii('token-transfer-service')
     ], deployer);
     
     expect(errorRateResult.result).toBeDefined();
     
     // Check circuit health
-    const healthResult = mockSimnet.callReadOnlyFn('automated-circuit-breaker', 'is-circuit-healthy', [
+    const healthResult = mockSimnet.callReadOnlyFn('enhanced-circuit-breaker', 'is-circuit-healthy', [
       Cl.stringAscii('token-transfer-service')
     ], deployer);
     
     expect(healthResult.result).toBeDefined();
-    console.log('✅ Automated Circuit Breaker: Error rate and health status test passed');
+    console.log('✅ Enhanced Circuit Breaker: Error rate and health status test passed');
   });
 });

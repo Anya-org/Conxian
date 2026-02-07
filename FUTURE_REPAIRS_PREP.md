@@ -20,12 +20,14 @@ This document tracks preparation items for upcoming repair phases following the 
 ## Pre-Testnet Deployment Preparation
 
 ### Contract Validation
+
 - [ ] Run `clarinet check` on all 12 modified contracts
 - [ ] Verify no unresolved contract references in modified files
 - [ ] Verify no unresolved variable references (e.g., `stacks-block-time` in cxd-token.clar)
 - [ ] Check trait conformance for all implemented traits
 
 ### Test Suite Preparation
+
 - [ ] Update unit tests for timelock execution flow
 - [ ] Create compliance provider registration tests
 - [ ] Add ICO purchase cap validation tests
@@ -34,6 +36,7 @@ This document tracks preparation items for upcoming repair phases following the 
 - [ ] Validate proof-of-reserves attestation flow
 
 ### Integration Tests
+
 - [ ] Sovereign handoff end-to-end (all 5 steps)
 - [ ] Compliance check integration with ICO
 - [ ] Tokenomics: Mint up to max supply boundary
@@ -41,6 +44,7 @@ This document tracks preparation items for upcoming repair phases following the 
 - [ ] Proof-of-reserves with multiple attestors
 
 ### Documentation Preparation
+
 - [ ] API documentation for new public functions
 - [ ] Sovereign handoff runbook for testnet
 - [ ] Compliance provider integration guide
@@ -54,31 +58,37 @@ This document tracks preparation items for upcoming repair phases following the 
 Based on gap analysis and remaining items:
 
 ### P7: Cross-Chain Integration
+
 - **Wormhole Outbox**: Hardcoded address resolution
 - **Bridge NFTs**: Cross-chain asset verification
 - **Oracle Aggregators**: DIA, Chainlink adapter completeness
 
 ### P8: DEX Completion
+
 - **Concentrated Liquidity Pool**: Integration with CXLP Position NFT
 - **Multi-Hop Router V3**: Path optimization and slippage
 - **Batch Auction**: MEV-resistant trading
 
 ### P9: Lending Protocol
+
 - **Interest Rate Model**: Utilization curve tuning
 - **Liquidation Manager**: Incentive structure
 - **Collateral Manager**: LTV ratios and oracle integration
 
 ### P10: Governance Enhancement
+
 - **Proposal Engine**: Full trait-based proposal types
 - **Voting**: Quadratic voting integration
 - **Reputation Engine**: Clean-hands reputation weighting
 
 ### P11: Agent Systems
+
 - **Agent Risk**: Automated risk parameter adjustment
 - **Agent Treasury**: Autonomous rebalancing
 - **Office Manager**: Task queue optimization
 
 ### P12: Developer Experience
+
 - **Clarinet Configuration**: Contract reference cleanup
 - **Testing Framework**: Comprehensive coverage
 - **Deployment Scripts**: StacksOrbit integration
@@ -88,6 +98,7 @@ Based on gap analysis and remaining items:
 ## Dependencies to Resolve
 
 ### Unresolved Contract References (Pre-existing)
+
 The following are in contracts NOT modified during P1-P6 and require separate repair:
 
 - `ST*...dimensional-core` in agent-risk.clar:217
@@ -105,43 +116,49 @@ The following are in contracts NOT modified during P1-P6 and require separate re
 ## Testnet Deployment Sequence
 
 ### Phase 1: Core Infrastructure
+
 1. Deploy traits first
 2. Deploy core contracts (conxian-access, admin-facade, conxian-protocol)
 3. Deploy timelock
 4. Verify handoff readiness
 
 ### Phase 2: Compliance & Tokens
+
 5. Deploy compliance contracts
-6. Deploy token contracts (with max supply verification)
-7. Deploy allocation-policy
-8. Test token minting up to cap
+2. Deploy token contracts (with max supply verification)
+3. Deploy allocation-policy
+4. Test token minting up to cap
 
 ### Phase 3: DeFi & NFT
+
 9. Deploy CXLP Position NFT
-10. Deploy ICO offering
-11. Test ICO with compliance gating
-12. Verify purchase caps
+2. Deploy ICO offering
+3. Test ICO with compliance gating
+4. Verify purchase caps
 
 ### Phase 4: Security
+
 13. Deploy rate-limiter
-14. Deploy proof-of-reserves
-15. Configure operation limits
-16. Add attestors
+2. Deploy proof-of-reserves
+3. Configure operation limits
+4. Add attestors
 
 ### Phase 5: Sovereign Handoff
+
 17. Execute handoff step 1 (conxian-access)
-18. Execute handoff step 2 (admin-facade)
-19. Execute handoff step 3 (timelock)
-20. Execute handoff step 4 (operational-treasury)
-21. Execute handoff step 5 (regulatory-adapter)
-22. Finalize handoff
-23. Verify all ownership transferred
+2. Execute handoff step 2 (admin-facade)
+3. Execute handoff step 3 (timelock)
+4. Execute handoff step 4 (operational-treasury)
+5. Execute handoff step 5 (regulatory-adapter)
+6. Finalize handoff
+7. Verify all ownership transferred
 
 ---
 
 ## Security Audit Scope
 
 ### High Priority for Audit
+
 - [ ] Timelock proposal execution logic
 - [ ] Rate limiter bypass vectors
 - [ ] Proof-of-reserves attestation manipulation
@@ -150,12 +167,14 @@ The following are in contracts NOT modified during P1-P6 and require separate re
 - [ ] CXD supply cap enforcement
 
 ### Medium Priority
+
 - [ ] CXLP NFT transfer safety
 - [ ] Allocation policy lock mechanism
 - [ ] Sovereign handoff step ordering
 - [ ] Event log completeness
 
 ### Low Priority
+
 - [ ] Read-only function accuracy
 - [ ] Event naming consistency
 - [ ] Error code uniqueness
@@ -165,16 +184,19 @@ The following are in contracts NOT modified during P1-P6 and require separate re
 ## Resources Required
 
 ### Development
+
 - Clarinet 3.12+ with Epoch 3.0 support
 - Node.js 18+ for testing
 - StacksOrbit for deployment automation
 
 ### Testnet
+
 - STX for contract deployment (~50 contracts)
 - Test wallets for compliance provider simulation
 - Mock oracle feeds for PoR testing
 
 ### Documentation
+
 - API spec templates
 - Runbook templates
 - Audit preparation templates
