@@ -1,6 +1,6 @@
 ;; ops-engine.clar
 ;; "The Executive Branch" - Coordinating the Sovereign Autonomous Business (SAB)
-;; Nakamoto-aligned with Dual-Clock Logic (block-height and burn-block-height)
+;; Clarity 4 Standard - Nakamoto-aligned with stacks-block-time
 
 (use-trait proposal-trait .governance-traits.proposal-trait)
 
@@ -8,14 +8,14 @@
 (define-constant ERR_UNAUTHORIZED u6000)
 
 ;; State
-(define-data-var last-action-block uint u0)
+(define-data-var last-action-time uint u0)
 
 ;; Public Functions
 
 (define-public (process-signal (proposal-id uint) (proposal-contract <proposal-trait>))
   (begin
     (asserts! (unwrap-panic (contract-call? .admin-facade is-authorized u4)) (err ERR_UNAUTHORIZED)) ;; ROLE_OPERATOR
-    (var-set last-action-block burn-block-height)
+    (var-set last-action-time stacks-block-time)
     (contract-call? proposal-contract execute tx-sender)
   )
 )
@@ -30,7 +30,7 @@
 )
 
 (define-read-only (get-last-action)
-  (var-get last-action-block)
+  (var-get last-action-time)
 )
 
 ;; @desc Trigger the Dual-Clock epoch update.
@@ -38,25 +38,25 @@
 ;; Slow Gear: Strategy (Fiscal Dam) via burn-block-height.
 (define-public (trigger-epoch-update)
   (let (
-    (current-stx-height block-height)
-    (current-btc-height burn-block-height)
+    (current-time stacks-block-time)
+    (current-stx-height stacks-block-height)
   )
     (begin
-      ;; 1. FAST GEAR (Reflexes) - Every ~10 Blocks (~1 min)
-      (if (> (- current-stx-height (var-get last-fast-check)) u10)
+      ;; 1. FAST PATH CHECK (DEX Protection) - Updated every ~1 minute (60s)
+      (if (> (- current-time (var-get last-fast-check)) u60)
         (begin
           (unwrap-panic (contract-call? .swap-router update-volatility-fees))
-          (var-set last-fast-check current-stx-height)
+          (var-set last-fast-check current-time)
         )
         false
       )
 
-      ;; 2. SLOW GEAR (Strategy) - Every Bitcoin Block (~10 min)
-      (if (> current-btc-height (var-get last-slow-check))
+      ;; 2. SLOW PATH CHECK (Treasury/Risk) - Updated every ~10 minutes (600s)
+      (if (> (- current-time (var-get last-slow-check)) u600)
         (begin
           (unwrap-panic (contract-call? .agent-treasury run-fiscal-strategy))
           (unwrap-panic (contract-call? .agent-risk update-pid-rates))
-          (var-set last-slow-check current-btc-height)
+          (var-set last-slow-check current-time)
         )
         false
       )

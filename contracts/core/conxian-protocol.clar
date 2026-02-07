@@ -1,5 +1,6 @@
 ;; conxian-protocol.clar
 ;; Core Facade for Conxian Protocol
+;; Forced Clarity 4 Standard (Jan 2026 Edition)
 
 (impl-trait .core-traits.protocol-manager-trait)
 
@@ -23,6 +24,7 @@
   {
     contract: principal,
     active: bool,
+    hash: (optional (buff 32))
   }
 )
 
@@ -38,7 +40,7 @@
   (begin
     (asserts! (contract-call? .admin-facade is-authorized-to-pause tx-sender) (err ERR_UNAUTHORIZED))
     (var-set paused new-paused)
-    (print { event: "protocol-pause-status", paused: new-paused })
+    (print { event: "protocol-pause-status", paused: new-paused, timestamp: stacks-block-time })
     (ok true)
   )
 )
@@ -51,14 +53,103 @@
 (define-public (register-module (name (string-ascii 32)) (contract principal))
   (begin
     (asserts! (unwrap! (contract-call? .admin-facade is-authorized ROLE_ADMIN) (err ERR_UNAUTHORIZED)) (err ERR_UNAUTHORIZED))
-    ;; Verify contract integrity (Clarity 4 Native - Stubbed for compat)
-    ;; (asserts! (is-some (get-contract-hash contract)) (err ERR_MODULE_NOT_FOUND))
-    (map-set modules { name: name } {
-      contract: contract,
+    ;; Verify contract integrity (Clarity 4 Native)
+    ;; In mainnet C4, contract-hash? returns (optional (buff 32))
+    (let ((c-hash (contract-hash? contract)))
+      (map-set modules { name: name } {
+        contract: contract,
+        active: true,
+        hash: c-hash
+      })
+      (print { event: "module-registered", name: name, contract: contract, hash: c-hash, timestamp: stacks-block-time })
+      (ok true)
+    )
+  )
+)
+
+;; @desc Registers multiple modules in a batch
+;; @param entries (list 50 {name: (string-ascii 32), contract: principal})
+;; @returns (response bool uint)
+(define-public (batch-register-modules (entries (list 50 {name: (string-ascii 32), contract: principal})))
+  (begin
+    (asserts! (contract-call? .admin-facade is-global-admin) (err ERR_UNAUTHORIZED))
+    (ok (fold register-module-iter entries true))
+  )
+)
+
+(define-private (register-module-iter (entry {name: (string-ascii 32), contract: principal}) (previous bool))
+  (begin
+    (map-set modules { name: (get name entry) } {
+      contract: (get contract entry),
       active: true,
     })
-    (print { event: "module-registered", name: name, contract: contract, hash: none })
-    (ok true)
+    true
+  )
+)
+
+;; @desc Sets multiple modules active status in a batch
+;; @param entries (list 50 {name: (string-ascii 32), active: bool})
+;; @returns (response bool uint)
+(define-public (batch-set-module-active (entries (list 50 {name: (string-ascii 32), active: bool})))
+  (begin
+    (asserts! (contract-call? .admin-facade is-global-admin) (err ERR_UNAUTHORIZED))
+    (ok (fold set-module-active-iter entries true))
+  )
+)
+
+(define-private (set-module-active-iter (entry {name: (string-ascii 32), active: bool}) (previous bool))
+  (match (map-get? modules { name: (get name entry) })
+    current (begin
+      (map-set modules { name: (get name entry) } {
+        contract: (get contract current),
+        active: (get active entry),
+      })
+      true
+    )
+    false
+  )
+)
+
+;; @desc Registers multiple modules in a batch
+;; @param entries (list 50 {name: (string-ascii 32), contract: principal})
+;; @returns (response bool uint)
+(define-public (batch-register-modules (entries (list 50 {name: (string-ascii 32), contract: principal})))
+  (begin
+    (asserts! (contract-call? .admin-facade is-global-admin) (err ERR_UNAUTHORIZED))
+    (ok (fold register-module-iter entries true))
+  )
+)
+
+(define-private (register-module-iter (entry {name: (string-ascii 32), contract: principal}) (previous bool))
+  (begin
+    (map-set modules { name: (get name entry) } {
+      contract: (get contract entry),
+      active: true,
+    })
+    true
+  )
+)
+
+;; @desc Sets multiple modules active status in a batch
+;; @param entries (list 50 {name: (string-ascii 32), active: bool})
+;; @returns (response bool uint)
+(define-public (batch-set-module-active (entries (list 50 {name: (string-ascii 32), active: bool})))
+  (begin
+    (asserts! (contract-call? .admin-facade is-global-admin) (err ERR_UNAUTHORIZED))
+    (ok (fold set-module-active-iter entries true))
+  )
+)
+
+(define-private (set-module-active-iter (entry {name: (string-ascii 32), active: bool}) (previous bool))
+  (match (map-get? modules { name: (get name entry) })
+    current (begin
+      (map-set modules { name: (get name entry) } {
+        contract: (get contract current),
+        active: (get active entry),
+      })
+      true
+    )
+    false
   )
 )
 
@@ -79,15 +170,21 @@
 (define-read-only (is-paused)
   (ok (var-get paused)))
 
+;; @desc Retrieves module information by name
+;; @param name (string-ascii 32)
+;; @returns (optional {contract: principal, active: bool, hash: (optional (buff 32))})
 (define-read-only (get-module (name (string-ascii 32)))
   (map-get? modules { name: name })
 )
 
+;; @desc Returns a comprehensive status of the protocol
+;; @returns (response {paused: bool, tenure-id: (optional uint), compliant: bool, version: (string-ascii 2), timestamp: uint} uint)
 (define-read-only (get-protocol-status)
   (ok {
     paused: (var-get paused),
     tenure-id: (some (contract-call? .block-utils get-current-tenure-id)),
     compliant: true,
-    version: "C4"
+    version: "C4",
+    timestamp: stacks-block-time
   })
 )

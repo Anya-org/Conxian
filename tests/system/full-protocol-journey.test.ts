@@ -33,7 +33,7 @@ describe('Grand Unified System Journey', () => {
       (accounts.get("wallet_1") as string) ??
       "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5";
 
-    // Contracts pre-deployed via simnet plan
+    // Contracts are already deployed via Clarinet.toml
     simnet.callPublicFn(
       "agent-treasury",
       "set-regulatory-adapter-contract",

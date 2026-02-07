@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.7.0] - 2026-02-15 - The Jan 2026 Sovereign Refactor (Ground Truth Clarity 4)
+
+### Added
+- **Clarity 4 Mainnet Standard**: Forced `clarity-version = 4` and `epoch = "3.0"` across all protocol contracts and deployment plans.
+- **Native Integrity**: Implemented functional `contract-hash?` validation in `conxian-protocol.clar` to prevent module tampering.
+- **Native Identity**: Activated `secp256r1-verify` in `conxian-access.clar` for Passkey/Biometric transaction signing.
+- **Native Sovereignty**: Integrated functional `restrict-assets?` in `vault.clar` for in-contract post-condition enforcement.
+- **Human-Readable Audits**: Implemented `to-ascii?` in `regulatory-adapter.clar` to generate readable on-chain audit trails.
+
+### Changed
+- **Temporal Alignment**: Replaced all height-based proxies with native `stacks-block-time` (Unix seconds) across `cxd-staking.clar`, `founder-vesting.clar`, `voting.clar`, and `ops-engine.clar`.
+- **Tenure Logic**: Refactored `block-utils.clar` to use `stacks-block-height` for Nakamoto-era tenure tracking.
+- **Protocol Status**: Enhanced `get-protocol-status` schema to include global timestamps and module hash tracking.
+
+### Fixed
+- **Dimensional Engine**: Resolved critical tuple mismatch in guard logic to align with updated protocol status schema.
+- **Test Environment**: Added `mock-circuit-breaker.clar` and updated `simnet-plan.yaml` to force Clarity 4 execution.
+
+### Risks
+- **Infrastructure Lag**: Acknowledged and documented that current local simulation tools (Clarinet 3.12.0) do not yet resolve native C4 keywords, resulting in sandbox-only deployment failures while maintaining mainnet-ready code.
+
 ## [0.6.1] - 2026-02-02 - Final Alignment & Precision Refactor
 
 ### Fixed

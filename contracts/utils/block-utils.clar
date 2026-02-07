@@ -1,6 +1,7 @@
 ;; block-utils.clar
 ;; Nakamoto Block & Tenure Utilities
 ;; Provides tenure-aware functions for Nakamoto consensus
+;; Force Clarity 4 Standard (Jan 2026 Edition)
 
 ;; Constants
 (define-constant BLOCKS_PER_TENURE u10) ;; Approximate, varies in reality
@@ -10,11 +11,17 @@
 
 ;; Read-only: Get Current Tenure ID
 (define-read-only (get-current-tenure-id)
-  ;; Simplified: Use block-height as a proxy for tenure
-  (/ block-height BLOCKS_PER_TENURE)
+  ;; Use stacks-block-height for tenure calculation in Nakamoto
+  (/ stacks-block-height BLOCKS_PER_TENURE)
 )
 
 ;; Read-only: Get Current Stacks Block Time (Clarity 4 native)
+;; @desc Returns the Unix timestamp of the current Stacks block
+(define-read-only (get-stacks-block-time)
+  stacks-block-time
+)
+
+;; Read-only: Get Bitcoin Burn Block Height
 (define-read-only (get-burn-block-height)
   burn-block-height
 )
@@ -24,14 +31,14 @@
     (ok {
         tenure-id: (get-current-tenure-id),
         block-height: block-height,
-        stacks-block-height: block-height,
-        block-time: (get-burn-block-height)
+        stacks-block-height: stacks-block-height,
+        block-time: stacks-block-time
     })
 )
 
 ;; Read-only: Calculate Blocks Since Tenure Start
 (define-read-only (get-blocks-in-current-tenure)
-    (mod block-height BLOCKS_PER_TENURE)
+    (mod stacks-block-height BLOCKS_PER_TENURE)
 )
 
 ;; Read-only: Check if Tenure is Fresh (< 5 blocks old)

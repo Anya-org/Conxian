@@ -1,5 +1,6 @@
 ;; contracts/core/founder-vesting.clar
 ;; BOLT: Refactored for Clarity 4, Nakamoto compatibility, and secure state management.
+;; Migrated to stacks-block-time for second-precision vesting.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
@@ -26,7 +27,7 @@
   (begin
     (asserts! (is-eq tx-sender CONTRACT_OWNER) (err ERR_UNAUTHORIZED))
     (var-set contract-owner owner)
-    (var-set vesting-start burn-block-height)
+    (var-set vesting-start stacks-block-time)
     (ok true)
   )
 )
@@ -59,7 +60,7 @@
           end-time: (get end-time (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE))),
           claimed-amount: vested-amount
         })
-        (print { event: "vesting-claimed", beneficiary: tx-sender, amount: claim-amount, timestamp: burn-block-height })
+        (print { event: "vesting-claimed", beneficiary: tx-sender, amount: claim-amount, timestamp: stacks-block-time })
         (ok claim-amount)
       )
     )
@@ -73,11 +74,11 @@
 
 ;; --- Private Helper Functions ---
 (define-private (calculate-vested-amount (schedule {total-amount: uint, start-time: uint, end-time: uint, claimed-amount: uint}))
-  (if (< burn-block-height (var-get vesting-start))
+  (if (< stacks-block-time (var-get vesting-start))
     u0
-    (if (>= burn-block-height (+ (var-get vesting-start) (- (get end-time schedule) (get start-time schedule))))
+    (if (>= stacks-block-time (+ (var-get vesting-start) (- (get end-time schedule) (get start-time schedule))))
       (get total-amount schedule)
-      (/ (* (get total-amount schedule) (- burn-block-height (var-get vesting-start))) (- (get end-time schedule) (get start-time schedule)))
+      (/ (* (get total-amount schedule) (- stacks-block-time (var-get vesting-start))) (- (get end-time schedule) (get start-time schedule)))
     )
   )
 )

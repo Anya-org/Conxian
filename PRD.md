@@ -93,6 +93,7 @@ The system operates like a digital corporation where smart contracts serve as Ma
 - **The "Agent Liability" Wall**: If regulators hold all protocol developers strictly liable for autonomous agent actions, the "Staff" model becomes a liability risk.
 - **MiCA Algorithmic Ban**: If Conxian implements algorithmic stablecoins, they will be effectively barred from the EU market. Protocol must prioritize asset-backed (1:1) models.
 - **Tenure Inconsistency**: High latency in Bitcoin block times (even with Stacks fast blocks) may affect high-frequency risk management.
+- **Infrastructure Lag**: Jan 2026 Clarity 4 keywords (stacks-block-time) may face latency or unresolved status in certain development/simnet environments, necessitating sandbox-specific height-based mocks during integration testing.
 
 ## 6. Opportunity Mapping (Blue Ocean)
 
@@ -121,9 +122,12 @@ The system operates like a digital corporation where smart contracts serve as Ma
 
 ### 8.1. Nakamoto & Tenure Alignment
 
-- Use `stacks-block-time` for all temporal logic (Vesting, Voting, Staling) to ensure second-level precision.
-- Minimum 6 Bitcoin confirmations for high-value operations via `block-utils`.
-- All core logic is tenure-aware via `block-utils`, ensuring deterministic behavior across Stacks blocks.
+- **Clarity 4 Mainnet Standard**: All contracts forced to `clarity-version = 4` and `epoch = "3.0"`.
+- Use `stacks-block-time` (Unix-anchored time) for all temporal logic (Vesting, Voting, Staking) to ensure cross-era consistency and second-precision.
+- **Integrity**: Native `contract-hash?` validation enforced in module registry.
+- **Identity**: Native `secp256r1-verify` enabled for biometric transaction signing.
+- **Sovereignty**: Native `restrict-assets?` implemented in `vault.clar` for in-contract post-condition enforcement.
+- **Auditability**: Native `to-ascii?` conversion for human-readable on-chain messages.
 
 ### 8.2. Sovereign Autonomous Fiscal Policy
 
