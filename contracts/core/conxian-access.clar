@@ -1,6 +1,7 @@
 ;; conxian-access.clar
 ;; Unified Role-Based Access Control (RBAC) Backend
 ;; Centralizes all permissioning for the Conxian Protocol
+;; Forced Clarity 4 Standard (Jan 2026 Edition)
 
 (impl-trait .core-traits.conxian-access-trait)
 
@@ -89,7 +90,7 @@
       event: "owner-changed",
       old-owner: tx-sender,
       new-owner: new-owner,
-      timestamp: burn-block-height
+      timestamp: stacks-block-time
     })
     (ok true)
   )
@@ -104,7 +105,7 @@
       event: "sovereign-handoff",
       module: "conxian-access",
       new-owner: .timelock,
-      timestamp: burn-block-height
+      timestamp: stacks-block-time
     })
     (ok true)
   )
@@ -115,8 +116,9 @@
 )
 
 ;; Read-only: Verify Passkey/Biometric Signature (Clarity 4 Native)
+;; @desc Uses native secp256r1-verify to validate biometric/Passkey signatures
 (define-read-only (verify-passkey-signature (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
-  (ok true) ;; Stubbed for environment compatibility
+  (ok (secp256r1-verify message signature public-key))
 )
 
 ;; Read-only: Global Admin Check

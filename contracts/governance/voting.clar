@@ -1,6 +1,7 @@
 ;; voting.clar
 ;; Conxian Standard: Tenure-Aware Governance
 ;; Updates legacy voting to use Block Utils and RBAC
+;; Migrated to stacks-block-time for second-precision voting.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
@@ -32,8 +33,8 @@
 ;; Core Logic
 
 ;; @desc Creates a proposal
-;; @param start-block uint
-;; @param end-block uint
+;; @param start-time uint (Unix timestamp)
+;; @param end-time uint (Unix timestamp)
 ;; @returns (response uint uint)
 (define-public (create-proposal (start-time uint) (end-time uint))
     (let (
@@ -46,7 +47,7 @@
         )
         
         ;; Ensure start time is in the future
-        (asserts! (> start-time burn-block-height) (err ERR_START_TIME_IN_PAST))
+        (asserts! (> start-time stacks-block-time) (err ERR_START_TIME_IN_PAST))
         
         (map-set proposals proposal-id {
             start-time: start-time,
@@ -64,7 +65,8 @@
             event: "create-proposal",
             proposal-id: proposal-id,
             start-time: start-time,
-            tenure-id: tenure-id
+            tenure-id: tenure-id,
+            timestamp: stacks-block-time
         })
         
         (ok proposal-id)
@@ -79,11 +81,9 @@
     (let (
         (proposal (unwrap! (map-get? proposals proposal-id) (err u404)))
         (voter-power u1)
-        
-        ;; Update Vote Counts (Simplified, assuming 1 vote per call for now, real logic would pull token balance)
     )
-        ;; Check if voting period is active using burn-block-height
-        (asserts! (and (>= burn-block-height (get start-time proposal)) (<= burn-block-height (get end-time proposal))) (err ERR_VOTING_CLOSED))
+        ;; Check if voting period is active using stacks-block-time
+        (asserts! (and (>= stacks-block-time (get start-time proposal)) (<= stacks-block-time (get end-time proposal))) (err ERR_VOTING_CLOSED))
         (asserts! (is-none (map-get? votes { proposal-id: proposal-id, voter: tx-sender })) (err ERR_ALREADY_VOTED))
         
         ;; User must have a seat (voting power > 0)
@@ -97,7 +97,7 @@
             no-votes: (if (not support) (+ (get no-votes proposal) voter-power) (get no-votes proposal))
         }))
         
-        (print { event: "vote-cast", proposal-id: proposal-id, voter: tx-sender, power: voter-power, support: support })
+        (print { event: "vote-cast", proposal-id: proposal-id, voter: tx-sender, power: voter-power, support: support, timestamp: stacks-block-time })
         
         (ok true)
     )

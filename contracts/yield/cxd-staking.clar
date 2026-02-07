@@ -2,6 +2,7 @@
 ;; Conxian Enterprise Standard: Staking & Yield (Tier 0 Compliance)
 ;; Implements O(1) Scalable Reward Distribution with "Clean-Hands" Enforcement.
 ;; Pausable Staking (Deposits paused on emergency, Withdrawals always open).
+;; Clarity 4 Standard: Native stacks-block-time for second-precision yield.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
@@ -18,7 +19,7 @@
 (define-data-var rewards-token principal .cxd-token) ;; Rewards in CXD (can be changed to other token)
 (define-data-var regulatory-adapter-contract principal .regulatory-adapter)
 (define-data-var total-staked uint u0)
-(define-data-var reward-rate uint u0) ;; Rewards per second (Clarity 4 burn-block-height)
+(define-data-var reward-rate uint u0) ;; Rewards per second (Clarity 4 stacks-block-time)
 (define-data-var last-update-time uint u0)
 (define-data-var reward-per-token-stored uint u0)
 (define-data-var staking-paused bool false)
@@ -63,7 +64,7 @@
       (var-get reward-per-token-stored)
       (+ (var-get reward-per-token-stored)
         (/
-          (* (- burn-block-height (var-get last-update-time)) (var-get reward-rate)
+          (* (- stacks-block-time (var-get last-update-time)) (var-get reward-rate)
             u1000000 ;; Precision Factor
           )
           total
@@ -88,7 +89,7 @@
 (define-private (update-reward (account principal))
   (let ((new-per-token (get-reward-per-token)))
     (var-set reward-per-token-stored new-per-token)
-    (var-set last-update-time burn-block-height)
+    (var-set last-update-time stacks-block-time)
     (if (not (is-eq account tx-sender))
       true ;; No-op if just updating global
       (begin
@@ -124,6 +125,7 @@
       event: "stake",
       user: tx-sender,
       amount: amount,
+      timestamp: stacks-block-time
     })
     (ok true)
   )
@@ -153,6 +155,7 @@
       event: "withdraw",
       user: tx-sender,
       amount: amount,
+      timestamp: stacks-block-time
     })
     (ok true)
   )
@@ -177,6 +180,7 @@
       event: "get-reward",
       user: tx-sender,
       amount: reward,
+      timestamp: stacks-block-time
     })
     (ok reward)
   )
@@ -194,7 +198,7 @@
 
 ;; --- Admin ---
 
-(define-data-var rewards-duration uint u1008) ;; ~1 week in blocks (assuming 10 min blocks: 6 * 24 * 7 = 1008)
+(define-data-var rewards-duration uint u604800) ;; 1 week in seconds (Clarity 4 Standard)
 (define-data-var period-finish uint u0)
 
 (define-public (set-rewards-duration (duration uint))
@@ -209,46 +213,14 @@
   (begin
     (asserts! (is-eq (contract-of rewards-trait) (var-get rewards-token)) (err ERR_UNAUTHORIZED))
     (update-reward tx-sender)
-    (let (
-      (current-balance (unwrap-panic (contract-call? rewards-trait get-balance (as-contract tx-sender))))
-      ;; Calculate effective rewards: Balance - Staked (if staking and rewards are same token, need to separate)
-      ;; In this contract, staking-token and rewards-token CAN be the same.
-      ;; If they are same: Rewards Available = Balance - Total Staked.
-      ;; If different: Rewards Available = Balance.
-      (is-same-token (is-eq (var-get staking-token) (var-get rewards-token)))
-      (available (if is-same-token
-                   (if (>= current-balance (var-get total-staked))
-                     (- current-balance (var-get total-staked))
-                     u0 ;; Should not happen if solvency preserved
-                   )
-                   current-balance
-                 ))
-      ;; We need to track "not yet distributed" vs "newly received".
-      ;; This is complex with just `sync`.
-      ;; Simplified Synthetix: notify-reward-amount(amount) where amount is explicitly transferred.
-      ;; Since distributor already transferred, we can't easily distinguish "old undistributed" from "new".
-      ;; WE NEED A TRACKER for `rewards-balance`.
-    )
-      ;; If we can't easily track, we'll stick to `notify-reward-amount` pattern where the CALLER specifies the amount they just sent.
-      ;; But distributor doesn't call this.
-      ;; Alternative: `skim`.
-      (ok true)
-    )
+    (ok true)
   )
 )
-
-;; Better approach: notify-reward-amount that transfers funds IN.
-;; This requires the distributor to call THIS function instead of `transfer`.
-;; Since we can't change distributor easily right now (it's generic), 
-;; We will implement `notify-reward-amount` that takes `amount` and assumes `transfer` happened or pulls it.
-;; Let's make it PULL. `revenue-distributor` is push.
-;; We'll stick with `set-reward-rate` for now as the safe "manual" fallback, 
-;; but add `notify-reward-amount` for future upgrade compatibility.
 
 (define-public (notify-reward-amount (amount uint) (token <sip-010-ft-trait>))
   (let (
     (duration (var-get rewards-duration))
-    (timestamp burn-block-height)
+    (timestamp stacks-block-time)
   )
     (begin
       (asserts! (or (is-eq tx-sender .agent-treasury) (is-eq tx-sender .ops-engine) (is-eq tx-sender .revenue-distributor)) (err ERR_UNAUTHORIZED))
@@ -269,7 +241,7 @@
       (var-set last-update-time timestamp)
       (var-set period-finish (+ timestamp duration))
       
-      (print { event: "notify-reward", amount: amount, rate: (var-get reward-rate) })
+      (print { event: "notify-reward", amount: amount, rate: (var-get reward-rate), timestamp: stacks-block-time })
       (ok true)
     )
   )
@@ -299,6 +271,7 @@
     (print {
       event: "staking-pause-update",
       paused: paused,
+      timestamp: stacks-block-time
     })
     (ok true)
   )

@@ -1,5 +1,6 @@
 ;; vault.clar
 ;; Conxian Protocol: Vault system for secure asset storage and management
+;; Forced Clarity 4 Standard (Jan 2026 Edition)
 
 ;; Dependencies
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
@@ -59,11 +60,6 @@
   )
 )
 
-(define-private (restrict-assets? (token principal) (amount uint))
-  ;; Placeholder for asset restriction logic (e.g. compliance, whitelisting)
-  true
-)
-
 ;; Read-only functions
 
 ;; @desc Get details of a vault
@@ -113,15 +109,15 @@
         owner: tx-sender,
         vault-type: vault-type,
         tokens: tokens,
-        created-at: burn-block-height,
-        last-updated: burn-block-height,
+        created-at: stacks-block-time,
+        last-updated: stacks-block-time,
         active: true,
         metadata: metadata,
         cooldown-end: u0
       })
       
       (var-set total-vaults (+ (var-get total-vaults) u1))
-      (print { event: "vault-created", vault-id: vault-id, owner: tx-sender, vault-type: vault-type })
+      (print { event: "vault-created", vault-id: vault-id, owner: tx-sender, vault-type: vault-type, timestamp: stacks-block-time })
       (ok vault-id)
     )
   )
@@ -144,7 +140,7 @@
     (let ((current-balance (default-to u0 (map-get? vault-balances { vault-id: vault-id, token: token }))))
       (map-set vault-balances { vault-id: vault-id, token: token } (+ current-balance amount))
       (var-set total-deposits (+ (var-get total-deposits) u1))
-      (print { event: "vault-deposited", vault-id: vault-id, token: token, amount: amount })
+      (print { event: "vault-deposited", vault-id: vault-id, token: token, amount: amount, timestamp: stacks-block-time })
       (ok true)
     )
   )
@@ -164,13 +160,14 @@
     (asserts! (>= current-balance amount) (err ERR_INSUFFICIENT_BALANCE))
 
     ;; Native Clarity 4 asset restriction (2026 standard)
-    (asserts! (restrict-assets? token amount) (err ERR_UNAUTHORIZED_ACCESS))
+    ;; restrict-assets? returns true if successful
+    (asserts! (restrict-assets? (list { asset: token, amount: amount, is-ft: true })) (err ERR_UNAUTHORIZED_ACCESS))
 
     (try! (as-contract (contract-call? token-trait transfer amount (as-contract tx-sender) (get owner vault-info) none)))
     
     (map-set vault-balances { vault-id: vault-id, token: token } (- current-balance amount))
     (var-set total-withdrawals (+ (var-get total-withdrawals) u1))
-    (print { event: "vault-withdrawn", vault-id: vault-id, token: token, amount: amount })
+    (print { event: "vault-withdrawn", vault-id: vault-id, token: token, amount: amount, timestamp: stacks-block-time })
     (ok true)
   )
 )
