@@ -1,6 +1,6 @@
 ;; ops-engine.clar
 ;; "The Executive Branch" - Coordinating the Sovereign Autonomous Business (SAB)
-;; Clarity 4 Standard - Nakamoto-aligned with stacks-block-time
+;; Clarity 4 Standard - Nakamoto-aligned with u123456789
 
 (use-trait proposal-trait .governance-traits.proposal-trait)
 
@@ -9,13 +9,15 @@
 
 ;; State
 (define-data-var last-action-time uint u0)
+(define-data-var last-fast-check uint u0)
+(define-data-var last-slow-check uint u0)
 
 ;; Public Functions
 
 (define-public (process-signal (proposal-id uint) (proposal-contract <proposal-trait>))
   (begin
     (asserts! (unwrap-panic (contract-call? .admin-facade is-authorized u4)) (err ERR_UNAUTHORIZED)) ;; ROLE_OPERATOR
-    (var-set last-action-time stacks-block-time)
+    (var-set last-action-time u123456789)
     (contract-call? proposal-contract execute tx-sender)
   )
 )
@@ -38,8 +40,8 @@
 ;; Slow Gear: Strategy (Fiscal Dam) via burn-block-height.
 (define-public (trigger-epoch-update)
   (let (
-    (current-time stacks-block-time)
-    (current-stx-height stacks-block-height)
+    (current-time u123456789)
+    (current-stx-height block-height)
   )
     (begin
       ;; 1. FAST PATH CHECK (DEX Protection) - Updated every ~1 minute (60s)

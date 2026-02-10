@@ -20,6 +20,7 @@
     (asserts! (is-eq tx-sender sender) (err ERR_UNAUTHORIZED))
     (asserts! (>= (ft-get-balance cxtr-token sender) amount) (err ERR_INSUFFICIENT_BALANCE))
     (try! (ft-transfer? cxtr-token amount sender recipient))
+    (match memo to-print (print to-print) 0x)
     (ok true)
   )
 )

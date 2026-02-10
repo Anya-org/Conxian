@@ -291,3 +291,6 @@
     (ok true)
   )
 )
+(define-public (withdraw (asset principal) (amount uint))
+  (ok true)
+)

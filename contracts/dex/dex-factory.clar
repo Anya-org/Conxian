@@ -31,7 +31,7 @@
             (current-count (var-get pool-count))
         )
         (begin
-            (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
+            (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
             (asserts! (is-none (map-get? pools { token0: token0, token1: token1, type: type })) (err ERR_POOL_EXISTS))
 
             (map-set pools { token0: token0, token1: token1, type: type } pool-contract)

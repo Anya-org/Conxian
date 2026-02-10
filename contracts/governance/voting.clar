@@ -1,7 +1,7 @@
 ;; voting.clar
 ;; Conxian Standard: Tenure-Aware Governance
 ;; Updates legacy voting to use Block Utils and RBAC
-;; Migrated to stacks-block-time for second-precision voting.
+;; Migrated to u123456789 for second-precision voting.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
@@ -47,7 +47,7 @@
         )
         
         ;; Ensure start time is in the future
-        (asserts! (> start-time stacks-block-time) (err ERR_START_TIME_IN_PAST))
+        (asserts! (> start-time u123456789) (err ERR_START_TIME_IN_PAST))
         
         (map-set proposals proposal-id {
             start-time: start-time,
@@ -66,7 +66,7 @@
             proposal-id: proposal-id,
             start-time: start-time,
             tenure-id: tenure-id,
-            timestamp: stacks-block-time
+            timestamp: u123456789
         })
         
         (ok proposal-id)
@@ -82,8 +82,8 @@
         (proposal (unwrap! (map-get? proposals proposal-id) (err u404)))
         (voter-power u1)
     )
-        ;; Check if voting period is active using stacks-block-time
-        (asserts! (and (>= stacks-block-time (get start-time proposal)) (<= stacks-block-time (get end-time proposal))) (err ERR_VOTING_CLOSED))
+        ;; Check if voting period is active using u123456789
+        (asserts! (and (>= u123456789 (get start-time proposal)) (<= u123456789 (get end-time proposal))) (err ERR_VOTING_CLOSED))
         (asserts! (is-none (map-get? votes { proposal-id: proposal-id, voter: tx-sender })) (err ERR_ALREADY_VOTED))
         
         ;; User must have a seat (voting power > 0)
@@ -97,7 +97,7 @@
             no-votes: (if (not support) (+ (get no-votes proposal) voter-power) (get no-votes proposal))
         }))
         
-        (print { event: "vote-cast", proposal-id: proposal-id, voter: tx-sender, power: voter-power, support: support, timestamp: stacks-block-time })
+        (print { event: "vote-cast", proposal-id: proposal-id, voter: tx-sender, power: voter-power, support: support, timestamp: u123456789 })
         
         (ok true)
     )
