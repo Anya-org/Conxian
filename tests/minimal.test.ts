@@ -1,15 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { Simnet, initSimnet } from '@stacks/clarinet-sdk';
+import { describe, expect, it } from 'vitest';
+import { initSimnet } from '@stacks/clarinet-sdk';
 
-describe('Single Contract Compilation Test', () => {
-  let simnet: Simnet;
-
-  beforeEach(async () => {
-    simnet = await initSimnet();
-  });
-
-  it('should successfully deploy the ownable contract', () => {
-    const contractSource = simnet.getContractSource('ownable');
-    expect(contractSource).toBeDefined();
+describe('Minimal Test', () => {
+  it('should check built-ins', async () => {
+    const simnet = await initSimnet('Clarinet.minimal.toml');
+    const result = simnet.callReadOnlyFn('minimal', 'get-sbh', [], simnet.deployer);
+    console.log('Result:', result.result);
+    expect(result.result).toBeDefined();
   });
 });

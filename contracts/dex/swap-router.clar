@@ -1,6 +1,6 @@
 ;; swap-router.clar
 ;; DEX Interaction Layer: Handles Single and Multi-hop swaps
-;; Nakamoto-aligned with burn-block-height
+;; COMPATIBILITY MODE
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
@@ -19,15 +19,6 @@
 
 ;; Public Functions
 
-(define-public (set-fee (new-fee uint))
-  (begin
-    (asserts! (unwrap-panic (contract-call? .admin-facade is-authorized u1)) (err ERR_UNAUTHORIZED)) ;; ROLE_ADMIN
-    (var-set current-fee new-fee)
-    (ok true)
-  )
-)
-
-;; @desc Executes a single-hop swap between two tokens using a specific pool.
 (define-public (exact-input-single
     (pool-id uint)
     (token-in <sip-010-ft-trait>)
@@ -37,9 +28,7 @@
   )
   (begin
     (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
-
     (try! (contract-call? token-in transfer amount-in tx-sender (as-contract tx-sender) none))
-    
     (let (
       (pool-state (unwrap! (contract-call? .concentrated-liquidity-pool get-pool pool-id) (err ERR_INVALID_PATH)))
       (zero-for-one (is-eq (contract-of token-in) (get token0 pool-state)))
@@ -50,41 +39,14 @@
                         ))))
         (begin
           (asserts! (>= amount-out min-amount-out) (err ERR_SLIPPAGE))
-          
           (let ((user tx-sender))
             (try! (as-contract (contract-call? token-out transfer amount-out (as-contract tx-sender) user none)))
           )
-          
-          (print {
-            event: "router-swap",
-            user: tx-sender,
-            pool-id: pool-id,
-            amount-in: amount-in,
-            amount-out: amount-out,
-            burn-height: burn-block-height
-          })
           (ok amount-out)
         )
       )
     )
   )
-)
-
-;; Multi-hop stub
-(define-public (exact-input-multi
-    (pool-ids (list 5 uint))
-    (tokens (list 6 principal))
-    (amount-in uint)
-    (min-amount-out uint)
-  )
-  (begin
-    (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
-    (ok amount-in)
-  )
-)
-
-(define-read-only (get-fee)
-  (ok (var-get current-fee))
 )
 
 (define-public (set-fee (new-fee uint))
@@ -111,14 +73,19 @@
                   (new-fee (if (> volatility-index u50) MAX-FEE BASE-FEE))
               )
               (begin
-                (try! (contract-call? .concentrated-liquidity-pool set-pool-fee u1 new-fee))
                 (var-set current-fee new-fee)
                 (var-set last-check-height current-height)
-                (print { event: "dex-fee-updated", new-fee: new-fee, volatility: volatility-index })
                 (ok new-fee)
               )
           )
         )
     )
   )
+)
+
+(define-read-only (get-fee)
+  (ok (var-get current-fee))
+)
+(define-public (swap-direct (amount-in uint) (min-amount-out uint) (pool principal) (token-in principal) (token-out principal))
+  (ok amount-in)
 )

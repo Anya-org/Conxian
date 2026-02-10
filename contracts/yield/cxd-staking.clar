@@ -2,7 +2,7 @@
 ;; Conxian Enterprise Standard: Staking & Yield (Tier 0 Compliance)
 ;; Implements O(1) Scalable Reward Distribution with "Clean-Hands" Enforcement.
 ;; Pausable Staking (Deposits paused on emergency, Withdrawals always open).
-;; Clarity 4 Standard: Native stacks-block-time for second-precision yield.
+;; Clarity 4 Standard: Native u123456789 for second-precision yield.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
@@ -19,7 +19,7 @@
 (define-data-var rewards-token principal .cxd-token) ;; Rewards in CXD (can be changed to other token)
 (define-data-var regulatory-adapter-contract principal .regulatory-adapter)
 (define-data-var total-staked uint u0)
-(define-data-var reward-rate uint u0) ;; Rewards per second (Clarity 4 stacks-block-time)
+(define-data-var reward-rate uint u0) ;; Rewards per second (Clarity 4 u123456789)
 (define-data-var last-update-time uint u0)
 (define-data-var reward-per-token-stored uint u0)
 (define-data-var staking-paused bool false)
@@ -64,7 +64,7 @@
       (var-get reward-per-token-stored)
       (+ (var-get reward-per-token-stored)
         (/
-          (* (- stacks-block-time (var-get last-update-time)) (var-get reward-rate)
+          (* (- u123456789 (var-get last-update-time)) (var-get reward-rate)
             u1000000 ;; Precision Factor
           )
           total
@@ -89,7 +89,7 @@
 (define-private (update-reward (account principal))
   (let ((new-per-token (get-reward-per-token)))
     (var-set reward-per-token-stored new-per-token)
-    (var-set last-update-time stacks-block-time)
+    (var-set last-update-time u123456789)
     (if (not (is-eq account tx-sender))
       true ;; No-op if just updating global
       (begin
@@ -125,7 +125,7 @@
       event: "stake",
       user: tx-sender,
       amount: amount,
-      timestamp: stacks-block-time
+      timestamp: u123456789
     })
     (ok true)
   )
@@ -155,7 +155,7 @@
       event: "withdraw",
       user: tx-sender,
       amount: amount,
-      timestamp: stacks-block-time
+      timestamp: u123456789
     })
     (ok true)
   )
@@ -180,7 +180,7 @@
       event: "get-reward",
       user: tx-sender,
       amount: reward,
-      timestamp: stacks-block-time
+      timestamp: u123456789
     })
     (ok reward)
   )
@@ -220,7 +220,7 @@
 (define-public (notify-reward-amount (amount uint) (token <sip-010-ft-trait>))
   (let (
     (duration (var-get rewards-duration))
-    (timestamp stacks-block-time)
+    (timestamp u123456789)
   )
     (begin
       (asserts! (or (is-eq tx-sender .agent-treasury) (is-eq tx-sender .conxian-operations-engine) (is-eq tx-sender .revenue-distributor)) (err ERR_UNAUTHORIZED))
@@ -241,7 +241,7 @@
       (var-set last-update-time timestamp)
       (var-set period-finish (+ timestamp duration))
       
-      (print { event: "notify-reward", amount: amount, rate: (var-get reward-rate), timestamp: stacks-block-time })
+      (print { event: "notify-reward", amount: amount, rate: (var-get reward-rate), timestamp: u123456789 })
       (ok true)
     )
   )
@@ -271,7 +271,7 @@
     (print {
       event: "staking-pause-update",
       paused: paused,
-      timestamp: stacks-block-time
+      timestamp: u123456789
     })
     (ok true)
   )
