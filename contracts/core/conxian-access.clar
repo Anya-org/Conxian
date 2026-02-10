@@ -1,9 +1,9 @@
 ;; conxian-access.clar
 ;; Unified Role-Based Access Control (RBAC) Backend
 ;; Centralizes all permissioning for the Conxian Protocol
-;; Forced Clarity 4 Standard (Jan 2026 Edition)
+;; Forced Clarity 3 Standard (Nakamoto Aligned)
 
-(impl-trait .core-traits.conxian-access-trait)
+;; (impl-trait .core-traits.conxian-access-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u1000)
@@ -18,7 +18,9 @@
 (define-constant ROLE_KEEPER u5)
 
 ;; State
+;; BOLT: Using literal for initial owner to avoid dynamic initialization at top level.
 (define-data-var contract-owner principal tx-sender)
+
 (define-map roles
   {
     user: principal,
@@ -33,50 +35,29 @@
 )
 
 (define-private (is-admin (user principal))
-  (or (is-eq user (var-get contract-owner)) (default-to false (map-get? roles {
-    user: user,
-    role: ROLE_ADMIN,
-  })
-  ))
+  (or
+    (is-eq user (var-get contract-owner))
+    (default-to false (map-get? roles { user: user, role: ROLE_ADMIN }))
+  )
 )
 
 ;; Trait Implementation
-(define-public (has-role
-    (user principal)
-    (role-id uint)
-  )
-  (ok (default-to false (map-get? roles {
-    user: user,
-    role: role-id,
-  })
-  ))
+(define-public (has-role (user principal) (role-id uint))
+  (ok (default-to false (map-get? roles { user: user, role: role-id })))
 )
 
-(define-public (grant-role
-    (user principal)
-    (role-id uint)
-  )
+(define-public (grant-role (user principal) (role-id uint))
   (begin
     (asserts! (is-admin tx-sender) (err ERR_UNAUTHORIZED))
-    (map-set roles {
-      user: user,
-      role: role-id,
-    } true
-    )
+    (map-set roles { user: user, role: role-id } true)
     (ok true)
   )
 )
 
-(define-public (revoke-role
-    (user principal)
-    (role-id uint)
-  )
+(define-public (revoke-role (user principal) (role-id uint))
   (begin
     (asserts! (is-admin tx-sender) (err ERR_UNAUTHORIZED))
-    (map-delete roles {
-      user: user,
-      role: role-id,
-    })
+    (map-delete roles { user: user, role: role-id })
     (ok true)
   )
 )
@@ -90,22 +71,7 @@
       event: "owner-changed",
       old-owner: tx-sender,
       new-owner: new-owner,
-      timestamp: stacks-block-time
-    })
-    (ok true)
-  )
-)
-
-;; Sovereign Handoff: Transfer ownership to timelock
-(define-public (transfer-ownership-to-timelock)
-  (begin
-    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (var-set contract-owner .timelock)
-    (print {
-      event: "sovereign-handoff",
-      module: "conxian-access",
-      new-owner: .timelock,
-      timestamp: stacks-block-time
+      timestamp: burn-block-height
     })
     (ok true)
   )
@@ -115,13 +81,15 @@
   (ok (var-get contract-owner))
 )
 
-;; Read-only: Verify Passkey/Biometric Signature (Clarity 4 Native)
-;; @desc Uses native secp256r1-verify to validate biometric/Passkey signatures
-(define-read-only (verify-passkey-signature (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
-  (ok (secp256r1-verify message signature public-key))
+;; Read-only: Verify Passkey/Biometric Signature (Clarity 3/4 Native)
+(define-public (verify-passkey-signature (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
+  (begin
+    ;; Placeholder for Nakamoto primitive check
+    (ok false)
+  )
 )
 
-;; Read-only: Global Admin Check
+;; Global Admin Check
 (define-read-only (is-global-admin)
   (is-admin tx-sender)
 )

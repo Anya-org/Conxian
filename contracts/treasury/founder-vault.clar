@@ -9,7 +9,7 @@
 (define-constant ERR_NO_ALLOCATION u1002)
 
 ;; Vesting Schedule (using block height)
-(define-constant VESTING_START burn-block-height)
+(define-constant VESTING_START u0)
 (define-data-var conxian-protocol-contract principal .conxian-protocol)
 (define-data-var nakamoto-constants-contract principal .nakamoto-constants)
 

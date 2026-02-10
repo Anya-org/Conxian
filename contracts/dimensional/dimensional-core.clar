@@ -369,9 +369,7 @@
         (err ERR_UNAUTHORIZED)
       )
       (if (> total-amount u0)
-        (try! (as-contract (contract-call? token-trait transfer total-amount tx-sender tx-sender
-          none
-        )))
+        (try! (as-contract (contract-call? token-trait transfer total-amount (as-contract tx-sender) tx-sender none)))
         true
       )
 

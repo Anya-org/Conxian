@@ -89,7 +89,7 @@
       (asserts! (>= current-balance amount) (err ERR_INSUFFICIENT_BALANCE))
 
       ;; Transfer tokens back
-      (try! (as-contract (contract-call? token-trait transfer amount tx-sender tx-sender none)))
+      (try! (as-contract (contract-call? token-trait transfer amount tx-sender none)))
 
       (map-set user-collateral {
         user: tx-sender,

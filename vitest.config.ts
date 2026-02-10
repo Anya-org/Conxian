@@ -7,12 +7,12 @@ export default defineConfig({
     testTimeout: 300000,
     hookTimeout: 90000,
     fileParallelism: false,
-    include: ["tests/core/conxian-protocol-batch.test.ts", "tests/sanity.test.ts", "tests/simple.test.ts"],
+    include: ["tests/**/*.test.ts", "tests/**/*.spec.ts"],
     exclude: ["contracts/drafts", "**/node_modules/**"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
-      include: ["contracts/**/*.clar"],
+      include: ["tests/**/*.test.ts", "tests/**/*.spec.ts"],
     },
   },
   poolOptions: {

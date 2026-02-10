@@ -91,7 +91,8 @@
 
 ;; Trait Implementation
 
-(define-public (is-circuit-breaker-active)
+(define-read-only (check-breaker) (ok (is-contract-paused (as-contract tx-sender))))
+(define-read-only (is-circuit-breaker-active)
   (ok (is-contract-paused (as-contract tx-sender)))
 )
 

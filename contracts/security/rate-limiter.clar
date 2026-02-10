@@ -41,7 +41,7 @@
         event: "rate-limit-exceeded",
         user: user,
         operation: operation,
-        timestamp: stacks-block-height
+        timestamp: block-height
     })
 )
 
@@ -55,7 +55,7 @@
     (let (
         (config (default-to { max-operations: DEFAULT_MAX_OPERATIONS, enabled: true } 
                          (map-get? operation-config operation)))
-        (current-block stacks-block-height)
+        (current-block block-height)
         (window-start (var-get window-size))
         (rate-data (map-get? rate-limits { user: user, operation: operation }))
       )

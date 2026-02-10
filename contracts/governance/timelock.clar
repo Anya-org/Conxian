@@ -27,6 +27,7 @@
 (define-data-var delay uint u1000)
 (define-data-var admin principal tx-sender)
 (define-data-var governance-contract principal tx-sender)
+(define-data-var access-contract principal .conxian-access)
 
 ;; Queued proposals: principal -> {eta, executed}
 (define-map queued-proposals
@@ -83,6 +84,14 @@
     (begin
         (asserts! (is-admin) (err ERR_UNAUTHORIZED))
         (var-set governance-contract new-governance)
+        (ok true)
+    )
+)
+
+(define-public (set-access-contract (new-access principal))
+    (begin
+        (asserts! (is-admin) (err ERR_UNAUTHORIZED))
+        (var-set access-contract new-access)
         (ok true)
     )
 )
@@ -192,4 +201,3 @@
         timestamp: burn-block-height
     }
 )
-

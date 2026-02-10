@@ -11,7 +11,7 @@
 (define-constant ERR_TIMELOCK_ACTIVE u1002)
 (define-constant ERR_NO_PENDING_OWNER u1003)
 
-(define-constant TIMELOCK_DELAY u86400) ;; 24 hours in seconds (Clarity 4 burn-block-height)
+(define-constant TIMELOCK_DELAY u86400) ;; 24 hours in seconds (Clarity 4 u0)
 
 ;; Data Vars
 (define-data-var owner principal tx-sender)
