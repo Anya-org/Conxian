@@ -16,15 +16,23 @@ describe('CXIP-012: Cybernetic Protocol Upgrade Simulation', () => {
     // 1. SETUP: Authorize ops-engine, create pool, and initialize oracle
     simnet.callPublicFn('cxd-token', 'add-minter', [Cl.contractPrincipal(deployer, 'ops-engine')], deployer);
 
+    // Set ops-engine in swap-router to allow fee updates
+    simnet.callPublicFn('swap-router', 'set-ops-engine', [Cl.contractPrincipal(deployer, 'ops-engine')], deployer);
+
     // Create Pool 1
     simnet.callPublicFn('concentrated-liquidity-pool', 'create-pool', [
         Cl.contractPrincipal(deployer, 'cxd-token'),
         Cl.contractPrincipal(deployer, 'cxvg-token'),
         Cl.uint(30), // 0.3%
-        Cl.uint(100000000)
+        Cl.uint(100000000),
+        Cl.int(0)
     ], deployer);
 
-    simnet.callPublicFn('oracle-aggregator', 'set-source', [Cl.contractPrincipal(deployer, 'cxd-token'), Cl.uint(100000000), Cl.uint(100)], deployer);
+    simnet.callPublicFn('oracle-aggregator', 'set-source', [
+        Cl.contractPrincipal(deployer, 'cxd-token'),
+        Cl.uint(100000000),
+        Cl.uint(100)
+    ], deployer);
 
     // Check initial fee (0.3% = 30 bps)
     const initialFee = simnet.callReadOnlyFn('swap-router', 'get-fee', [], deployer);
@@ -40,11 +48,11 @@ describe('CXIP-012: Cybernetic Protocol Upgrade Simulation', () => {
     console.log('Risk Score:', riskScore.result);
 
     // 3. RUN AUTOMATION: Keeper triggers epoch update
-    simnet.mineEmptyBlocks(11);
+    simnet.mineEmptyBlocks(13); // Ensure enough blocks for fast check (12)
 
     const response = simnet.callPublicFn('ops-engine', 'trigger-epoch-update', [], keeper);
     console.log('Epoch Update Response:', response.result);
-    expect(response.result).toBeDefined();
+    expect(response.result).toEqual(Cl.ok(Cl.bool(true)));
 
     // 4. VERIFY REFLEXES
     // Assert Fee spiked to 1.0% (100 bps) due to Anti-LVR

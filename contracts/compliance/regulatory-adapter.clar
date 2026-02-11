@@ -1,7 +1,6 @@
 ;; regulatory-adapter.clar
 ;; Conxian Finance: Regulatory Adapter (Clean-Hands Compliance)
-;; Implements regulatory-adapter-trait from core-traits
-;; Clarity 4 Standard: Using u123456789 and to-ascii for human-readable audit trails.
+;; Enhanced Institutional Hardening - MiCA Readiness
 
 ;; Traits
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
@@ -22,7 +21,8 @@
   {
     clean-hands: bool,
     verified-at: uint,
-    jurisdiction: (string-ascii 64)
+    jurisdiction: (string-ascii 64),
+    tier: uint
   }
 )
 
@@ -48,14 +48,16 @@
 )
 
 ;; Admin: Add to Whitelist
-(define-public (add-to-whitelist (user principal) (jurisdiction (string-ascii 64)))
+(define-public (add-to-whitelist (user principal) (jurisdiction (string-ascii 64)) (tier uint))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set compliance-status { user: user } {
       clean-hands: true,
-      verified-at: u123456789,
-      jurisdiction: jurisdiction
+      verified-at: burn-block-height,
+      jurisdiction: jurisdiction,
+      tier: tier
     })
+    (print { event: "compliance-verified", user: user, jurisdiction: jurisdiction, tier: tier })
     (ok true)
   )
 )
@@ -65,13 +67,12 @@
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set blacklist user true)
-    ;; Use u123456789 for second-precision audit logs (Clarity 4)
-    ;; to-ascii converts a buffer to a string-ascii
+    ;; Human-readable audit trails (Clarity 4 Vision)
     (print {
       event: "user-blacklisted",
       user: user,
-      audit-time: u123456789,
-      status: (unwrap-panic (some "MOCK")) ;; "BLACKLISTED"
+      audit-time: burn-block-height,
+      status: "LOCKED"
     })
     (ok true)
   )
@@ -82,14 +83,26 @@
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-delete blacklist user)
-    (print { event: "user-removed-from-blacklist", user: user, timestamp: u123456789 })
+    (print { event: "user-removed-from-blacklist", user: user, timestamp: burn-block-height })
     (ok true)
   )
 )
 
-;; Read-only: Get Compliance Status
-(define-read-only (get-compliance-status (user principal))
-  (ok (map-get? compliance-status { user: user }))
+;; @desc Generates a compliance report for regulatory bodies (MiCA Readiness)
+(define-read-only (generate-compliance-report (user principal))
+  (let (
+    (status (default-to { clean-hands: false, verified-at: u0, jurisdiction: "UNKNOWN", tier: u0 }
+            (map-get? compliance-status { user: user })))
+    (blacklisted (default-to false (map-get? blacklist user)))
+  )
+    (ok {
+      user: user,
+      status: (if blacklisted "BLACKLISTED" (if (get clean-hands status) "VERIFIED" "UNVERIFIED")),
+      jurisdiction: (get jurisdiction status),
+      tier: (get tier status),
+      last-audit: (get verified-at status)
+    })
+  )
 )
 
 ;; Admin: Update Authority
