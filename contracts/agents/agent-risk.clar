@@ -96,7 +96,7 @@
       (prev-error (var-get last-price-error))
       ;; Integral windup protection: clamp integral to prevent excessive accumulation
       (raw-integral (+ (var-get price-integral) error))
-      (integral (if (> raw-integral 50000) 50000 (if (< raw-integral -50000) -50000 raw-integral)))
+      (integral (if (> raw-integral 10000000) 10000000 (if (< raw-integral -10000000) -10000000 raw-integral)))
       (derivative (- error prev-error))
       ;; PID Formula: Output = (Kp*E + Ki*I + Kd*D)
       (pid-output (+ (+ (* (to-int KP_STABILITY) error) (* (to-int KI_STABILITY) integral)) (* (to-int KD_STABILITY) derivative)))
@@ -174,4 +174,39 @@
 
 (define-public (get-health-factor (position-id uint))
   (contract-call? .risk-manager get-health-factor position-id)
+)
+
+;; --- Enhanced Risk Controls ---
+
+(define-public (set-risk-parameters (new-max-leverage uint) (new-maintenance-margin uint) (new-liquidation-threshold uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (var-set max-leverage new-max-leverage)
+    (var-set maintenance-margin new-maintenance-margin)
+    (var-set liquidation-threshold new-liquidation-threshold)
+    (ok true)
+  )
+)
+
+(define-public (set-liquidation-rewards (min-reward uint) (max-reward uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (var-set min-liquidation-reward min-reward)
+    (var-set max-liquidation-reward max-reward)
+    (ok true)
+  )
+)
+
+(define-read-only (calculate-liquidation-price (position {entry-price: uint, leverage: uint, is-long: bool}))
+  (let (
+    (entry-price (get entry-price position))
+    (leverage (get leverage position))
+    (is-long (get is-long position))
+    (mm (var-get maintenance-margin))
+  )
+    (if is-long
+      (ok (/ (* entry-price (- u10000 (/ u10000 leverage))) u10000))
+      (ok (/ (* entry-price (+ u10000 (/ u10000 leverage))) u10000))
+    )
+  )
 )

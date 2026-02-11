@@ -51,7 +51,7 @@ graph TD
 
 -   **`reputation-engine.clar`**: Adjusts a voter's raw power based on activity and historical participation.
 -   **`enhanced-governance-nft.clar`**: Manages council seat power for the Operational Council.
--   **`cxvg-token.clar`**: The strategic governance token used by the Board.
+-   **`contracts/tokens/cxvg-token.clar`**: The strategic governance token used by the Board.
 -   **`timelock.clar`**: Enforces execution delays for high-sensitivity governance actions.
 
 ## Public Functions

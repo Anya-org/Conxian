@@ -27,17 +27,14 @@ The protocol employs active **Revenue Collection** levers to fund its ecosystem:
 - **DEX**: ~16% Protocol Fee on all swaps.
 - **Subscription**: Governance-tuned access fees.
 
-Total revenue is dynamically distributed via the **Fiscal Dam** system:
-- **Staking**: Rewards to `cxd-staking` participants (60% target, scales up to 80%).
-- **Operational Treasury**: Protocol development and autonomous staff expenses (20% target).
-- **Insurance Fund**: Systematic risk reserve (20% target, scales up to 100% in crisis).
-- **60% Staking**: Rewards to `cxd-staking` participants.
-- **20% Operational Treasury**: Protocol development and autonomous staff expenses.
-- **20% Insurance Fund**: Systematic risk reserve.
+Total revenue is dynamically distributed via the **Fiscal Dam** system (V3 Cybernetic Logic):
+- **Staking (Dividends)**: Rewards to `cxd-staking` participants (60% Equilibrium target, scales up to 80% in Abundance).
+- **Operational Treasury**: Protocol development and autonomous staff expenses (20% Equilibrium target, scales down to 0% in Crisis).
+- **Insurance Fund**: Systematic risk reserve (20% Equilibrium target, scales up to 100% in Crisis).
 
 ## Technical Stack
 
-- **Clarity 3**: Nakamoto-aligned (Epoch 3.0) utilizing `burn-block-height` for Bitcoin anchoring. Clarity 4 migration tracked for when mainnet activates Epoch 3.1.
+- **Clarity 2/3**: Nakamoto-aligned (Epoch 3.0) utilizing `burn-block-height` for Bitcoin anchoring. Currently back-ported to Clarity 2 for Simnet compatibility while remaining logically ready for Clarity 4 (Epoch 3.1).
 - **Tenure Awareness**: Logic is aware of Stacks block tenures via `block-utils` for deterministic execution.
 - **Facade Pattern**: All core logic accessed via dimensional facades and consolidated traits.
 - **Hybrid Oracle**: Aggregated Pyth, Redstone, and Switchboard feeds with deviation guards.
@@ -47,16 +44,24 @@ Total revenue is dynamically distributed via the **Fiscal Dam** system:
 ```text
 /contracts/
 ├── traits/           # Consolidated modular trait standards
-├── core/             # Ops engine, risk/collateral/position managers
-├── dex/              # Swap router, vaults, and liquidity management
+├── core/             # Ops engine, protocol coordinator, and facades
+├── dimensional/      # Dimensional trading core and position NFTs
+├── dex/              # Swap router, manager, and liquidity pools
 ├── governance/       # Dual-council DAO (Board/Staff)
 ├── agents/           # Autonomous Office Workers (Staff)
 ├── tokens/           # CXD, CXVG, CXS, CXTR, CXLP
 ├── oracle/           # Price feed adapters and aggregators
-├── security/         # Circuit breakers and MEV protection
+├── security/         # Circuit breakers, MEV protection, and PoR
 ├── lending/          # Automated money markets
-├── vaults/           # sBTC integration and yield aggregation
-└── utils/            # Tenure and encoding utilities
+├── treasury/         # Revenue distribution (Fiscal Dam) and vaults
+├── yield/            # Staking and emission controllers
+├── compliance/       # Regulatory adapter and KYC/AML services
+├── automation/       # Keeper coordination and block manager
+├── identity/         # KYC registry and identity badges
+├── bonding/          # Bonding curves and bond factories
+├── monitoring/       # Analytics and stability monitors
+├── cross-chain/      # Bridge hooks and NFTs
+└── math/             # Concentrated liquidity and math utilities
 ```
 
 ## Development
@@ -81,13 +86,13 @@ Total revenue is dynamically distributed via the **Fiscal Dam** system:
 
 ## Status
 
-- **Maturity Level**: 🟡 **Foundational Stable** (Recovery in Progress - Feb 2026)
+- **Maturity Level**: 🟡 **Foundational Stable** (Documentation Alignment Finalized - Feb 2026)
 - **Performance**: ⚡ **[Verified Benchmarks](docs/BENCHMARKS.md)** (Avg. < 20ms execution)
 - **Strategy**: 📖 **[Research & Strategic Analysis](docs/RESEARCH.md)** (2026 Update)
 - **Completed Repairs**:
   - ✅ P1: Sovereign Handoff (timelock execution, admin transfers)
   - ✅ P2: Regulatory Gaps (compliance provider system, KYC/AML)
-  - ✅ P3: Tokenomics Clarity (supply caps, 60/20/20 immutability)
+  - ✅ P3: Tokenomics Clarity (supply caps, 60/20/20 immutability in `cxd-treasury`)
   - ✅ P4: ICO Hardening (compliance gating, purchase caps)
   - ✅ P5: NFT Economics (CXLP Position NFT implementation)
   - ✅ P6: Operational Safety (rate limiter, proof-of-reserves)
