@@ -1,19 +1,16 @@
-
 import { describe, it, expect, beforeAll } from 'vitest';
 import { Cl } from '@stacks/transactions';
 import { simnet } from './setup-test-env';
 
-describe('Intelligence-Led Adaptive Yield Engine (AYE)', () => {
+describe('Intelligence-Led Adaptive Yield Engine (AYE) - CXIP-013', () => {
   let deployer: string;
-  let worker: string;
 
   beforeAll(() => {
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
-    worker = accounts.get('deployer')!;
   });
 
-  it('Initial state should be Equilibrium (60/20/20)', () => {
+  it('Initial state should be CXIP-013 Equilibrium', () => {
     const response = simnet.callReadOnlyFn(
       'cxd-treasury',
       'get-allocation-percentages',
@@ -21,50 +18,52 @@ describe('Intelligence-Led Adaptive Yield Engine (AYE)', () => {
       deployer
     );
     expect(response.result).toEqual(Cl.ok(Cl.tuple({
-      staking: Cl.uint(6000),
-      dev: Cl.uint(2000),
-      insurance: Cl.uint(2000)
+      treasury: Cl.uint(4500),
+      bounty: Cl.uint(3000),
+      lp: Cl.uint(1500),
+      grant: Cl.uint(500),
+      buyback: Cl.uint(500),
+      insurance: Cl.uint(0),
+      staking: Cl.uint(1500),
+      dev: Cl.uint(4500)
     })));
   });
 
-  it('Agent-Risk should assess low risk initially', () => {
-    const riskScore = simnet.callReadOnlyFn(
+  it('Agent-Risk should provide performance metrics', () => {
+    const metrics = simnet.callReadOnlyFn(
       'agent-risk',
-      'assess-system-risk',
+      'get-performance-metrics',
       [],
       deployer
     );
-    expect(riskScore.result).toEqual(Cl.uint(0));
-
-    const riskState = simnet.callReadOnlyFn(
-      'agent-risk',
-      'get-current-risk-state',
-      [],
-      deployer
-    );
-    expect(riskState.result).toEqual(Cl.stringAscii('EQUILIBRIUM'));
+    // Default values I set in agent-risk.clar
+    expect(metrics.result).toEqual(Cl.tuple({
+      tvl: Cl.uint(1000000000),
+      'last-month-tvl': Cl.uint(900000000),
+      'bounty-completion-rate': Cl.uint(9600),
+      'tvl-growth-bps': Cl.uint(1111) // (1B-0.9B)/0.9B * 10000 = 1111.11...
+    }));
   });
 
-  it('Simulating high risk should transition state to DEFENSIVE', () => {
-    // Set low liquidity depth and high volatility
-    const response = simnet.callPublicFn(
-      'agent-risk',
-      'set-predictive-params',
-      [Cl.uint(1000), Cl.uint(9000), Cl.uint(8000)],
-      deployer
-    );
-    expect(response.result).toEqual(Cl.ok(Cl.bool(true)));
-
-    const riskState = simnet.callReadOnlyFn(
-      'agent-risk',
-      'get-current-risk-state',
+  it('Performance adjustment should be active if bounty rate > 95%', () => {
+    // Bounty rate 9600 > 9500
+    const adj = simnet.callReadOnlyFn(
+      'agent-treasury',
+      'calculate-performance-adjustment',
       [],
       deployer
     );
-    expect(riskState.result).toEqual(Cl.stringAscii('DEFENSIVE'));
+    expect(adj.result).toEqual(Cl.uint(500));
   });
 
-  it('Agent-Treasury should rebalance during defensive state', () => {
+  it('Agent-Treasury should rebalance with performance adjustment in stability', () => {
+    // Set mock GCR to 140 (Stability)
+    simnet.callPublicFn(
+      "agent-risk",
+      "set-mock-gcr",
+      [Cl.uint(140)],
+      deployer
+    );
     // Authorize agent-treasury in cxd-treasury
     const auth = simnet.callPublicFn(
       'cxd-treasury',
@@ -74,16 +73,14 @@ describe('Intelligence-Led Adaptive Yield Engine (AYE)', () => {
     );
     expect(auth.result).toEqual(Cl.ok(Cl.bool(true)));
 
-    // Initial staking is 6000. Target for DEFENSIVE is 500.
-    // PID/Clamped adjustment should move it down by 100 bps (1%) per block.
+    // Trigger rebalance
     const rebalanceResponse = simnet.callPublicFn(
       'agent-treasury',
-      'do-work',
-      [Cl.bufferFromHex('00')],
-      worker
+      'run-fiscal-strategy',
+      [],
+      deployer
     );
-    // Note: This might return err u1002 (insufficient funds for payout) but the rebalance should have happened!
-    // We already saw the print from cxd-treasury in previous runs.
+    expect(rebalanceResponse.result).toEqual(Cl.ok(Cl.bool(true)));
 
     const newPolicy = simnet.callReadOnlyFn(
       'cxd-treasury',
@@ -91,34 +88,57 @@ describe('Intelligence-Led Adaptive Yield Engine (AYE)', () => {
       [],
       deployer
     );
-    // 6000 - 100 = 5900
+
+    // Stability Baseline: T:4500, B:3000, LP:1500, G:500, BB:500
+    // Perf Adj (+500 to B, -500 from T): T:4000, B:3500, LP:1500, G:500, BB:500
     expect(newPolicy.result).toEqual(Cl.ok(Cl.tuple({
-      staking: Cl.uint(5900),
-      dev: Cl.uint(2000),
-      insurance: Cl.uint(2100)
+      treasury: Cl.uint(4000),
+      bounty: Cl.uint(3500),
+      lp: Cl.uint(1500),
+      grant: Cl.uint(500),
+      buyback: Cl.uint(500),
+      insurance: Cl.uint(0),
+      staking: Cl.uint(1500),
+      dev: Cl.uint(4000)
     })));
   });
 
-  it('Revenue distribution should record claims when staking share is below target', () => {
-    // We bypass the actual distribution if STX transfer is failing,
-    // but we can test the record-diverted-claim directly if needed,
-    // or just assume it works if rebalance worked.
-
-    // Let's call record-diverted-claim directly from admin to verify tracking
-    const claimResponse = simnet.callPublicFn(
-      'cxd-treasury',
-      'record-diverted-claim',
-      [Cl.contractPrincipal(deployer, 'cxd-token'), Cl.uint(500)],
+  it('Agent-Risk Crisis should trigger 100% insurance', () => {
+    // Set high risk score
+    const response = simnet.callPublicFn(
+      'agent-risk',
+      'set-predictive-params',
+      [Cl.uint(1000), Cl.uint(9000), Cl.uint(8000)],
       deployer
     );
-    expect(claimResponse.result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(response.result).toEqual(Cl.ok(Cl.bool(true)));
 
-    const claim = simnet.callReadOnlyFn(
-      'cxd-treasury',
-      'get-accrued-claim',
-      [Cl.contractPrincipal(deployer, 'cxd-token')],
+    // Mine a block to allow re-run of strategy
+    simnet.mineEmptyBurnBlock();
+
+    const rebalanceResponse = simnet.callPublicFn(
+      'agent-treasury',
+      'run-fiscal-strategy',
+      [],
       deployer
     );
-    expect(claim.result).toEqual(Cl.uint(500));
+    expect(rebalanceResponse.result).toEqual(Cl.ok(Cl.bool(true)));
+
+    const crisisPolicy = simnet.callReadOnlyFn(
+      'cxd-treasury',
+      'get-allocation-percentages',
+      [],
+      deployer
+    );
+    expect(crisisPolicy.result).toEqual(Cl.ok(Cl.tuple({
+      treasury: Cl.uint(0),
+      bounty: Cl.uint(0),
+      lp: Cl.uint(0),
+      grant: Cl.uint(0),
+      buyback: Cl.uint(0),
+      insurance: Cl.uint(10000),
+      staking: Cl.uint(0),
+      dev: Cl.uint(0)
+    })));
   });
 });
