@@ -28,6 +28,8 @@
 
 (define-map blacklist principal bool)
 
+(define-map passported-jurisdictions (string-ascii 64) bool)
+
 ;; Read-only: Check Clean-Hands Compliance
 (define-read-only (check-clean-hands-compliance (user principal))
   (let (
@@ -122,4 +124,17 @@
     (var-set contract-owner new-owner)
     (ok true)
   )
+)
+
+;; Passporting Logic (MiCA Compliance)
+(define-public (set-passport-status (jurisdiction (string-ascii 64)) (active bool))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (map-set passported-jurisdictions jurisdiction active)
+    (ok true)
+  )
+)
+
+(define-read-only (is-jurisdiction-passported (jurisdiction (string-ascii 64)))
+  (default-to false (map-get? passported-jurisdictions jurisdiction))
 )

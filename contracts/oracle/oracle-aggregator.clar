@@ -86,6 +86,14 @@
   )
 )
 
+(define-public (reset-volatility (asset principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
+    (map-set asset-volatility-data { asset: asset } { mean: u0, variance: u0, count: u0 })
+    (ok true)
+  )
+)
+
 ;; Update price and twap (EMA)
 (define-private (update-volatility (asset principal) (price uint))
   (let ((data (default-to { mean: u0, variance: u0, count: u0 } (map-get? asset-volatility-data { asset: asset })))

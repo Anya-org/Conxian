@@ -6,6 +6,7 @@
 
 ;; State
 (define-data-var last-fiscal-height uint u0)
+(define-data-var current-fiscal-state uint u1) ;; 0=CRISIS, 1=STABILITY, 2=ABUNDANCE
 (define-data-var contract-owner principal tx-sender)
 
 ;; @desc Run the fiscal strategy based on system risk (The Fiscal Dam).
@@ -17,18 +18,28 @@
       (ok false)
       (let (
         (gcr (unwrap-panic (contract-call? .agent-risk get-gcr)))
+        (prev-state (var-get current-fiscal-state))
+        ;; Hysteresis logic to prevent flapping
+        (next-state (if (is-eq prev-state u0)
+                      (if (> gcr u115) u1 u0) ;; From CRISIS, need 115 to go STABILITY
+                      (if (is-eq prev-state u2)
+                        (if (< gcr u145) u1 u2) ;; From ABUNDANCE, need < 145 to go STABILITY
+                        (if (< gcr u110) u0 (if (> gcr u150) u2 u1)) ;; From STABILITY
+                      )
+                    ))
       )
         (begin
-          (if (< gcr u110)
-            ;; CRISIS (GCR < 110%): 100% Insurance to recapitalize protocol
+          (if (is-eq next-state u0)
+            ;; CRISIS: 100% Insurance to recapitalize protocol
             (try! (contract-call? .cxd-treasury rebalance u0 u0 u10000))
-            (if (< gcr u150)
-              ;; STABILITY/EQUILIBRIUM (110-150% GCR): 60/20/20 split
+            (if (is-eq next-state u1)
+              ;; STABILITY/EQUILIBRIUM: 60/20/20 split
               (try! (contract-call? .cxd-treasury rebalance u6000 u2000 u2000))
-              ;; ABUNDANCE (GCR > 150%): 80% Staking, 10% Dev, 10% Insurance
+              ;; ABUNDANCE: 80% Staking, 10% Dev, 10% Insurance
               (try! (contract-call? .cxd-treasury rebalance u8000 u1000 u1000))
             )
           )
+          (var-set current-fiscal-state next-state)
           (var-set last-fiscal-height btc-height)
           (print { event: "fiscal-strategy-executed", gcr: gcr, height: btc-height })
           (ok true)
