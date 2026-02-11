@@ -23,7 +23,7 @@ The module is centered around the transition from manual allocation to autonomou
 
 This contract implements the logic for dynamic fiscal policy.
 
--   `rebalance(staking uint, dev uint, insurance uint)`: Updates the revenue shares. Called by `agent-treasury` or Admin.
+-   `rebalance(treasury uint, bounty uint, lp uint, grant uint, buyback uint, insurance uint)`: Updates the revenue shares. Called by `agent-treasury` or Admin.
 -   `record-diverted-claim(token principal, amount uint)`: Automatically records "Priority Claims" for stakers when yield is diverted.
 -   `get-allocation-percentages()`: (Read-Only) Returns the current active revenue split (Basis points: 10000 = 100%).
 -   `set-bounds(min-staking uint, max-insurance uint)`: (Admin Only) Sets the safety rails for autonomous agents.

@@ -53,9 +53,9 @@ The protocol utilizes a Facade Pattern to separate user interaction from core lo
 - **Temporal Logic**: Uses `burn-block-height` for Bitcoin-anchored timing. Logical readiness for `stacks-block-time` (Clarity 4) is maintained.
 - **Identity**: Native `secp256r1-verify` readiness for biometric signing.
 
-### 6.2. Cybernetic Autonomous Fiscal Policy (Fiscal Dam V3)
+### 6.2. Cybernetic Autonomous Fiscal Policy (Fiscal Dam V4)
 Revenue is dynamically distributed based on system health (Global Collateral Ratio - GCR) and Risk Scores:
-- **Equilibrium (Stable)**: 60% Staking, 20% Treasury, 20% Insurance.
+- **Equilibrium (Stable)**: 45% Treasury, 30% Bounty, 15% LP, 5% Grant, 5% Buy-back (CXIP-013).
 - **Crisis (GCR < 110%)**: Up to 100% Insurance for recapitalization.
 - **Abundance (GCR > 150%)**: Up to 80% Staking rewards.
 
@@ -85,6 +85,11 @@ Revenue is dynamically distributed based on system health (Global Collateral Rat
 - **Proof-of-Reserves**: Implemented in `contracts/security/proof-of-reserves.clar`.
 
 ## 10. Implementation Status (February 2026)
+
+### 10.3. CXIP-013: Bounty-Driven Revenue Model
+- **Reworked Distribution**: Transitioned to a 5-way split (Treasury, Bounty, LP, Grants, Buy-back).
+- **Performance Adjustment**: Integrated dynamic shift (+5%) to Bounty Pool based on TVL growth and Bounty completion rates.
+- **Fiscal Dam V4**: Enhanced safety logic to accommodate new allocation categories.
 
 ### 10.1. CXIP-012: The Cybernetic Upgrade
 - **Dual-Clock Standard**: Integrated Fast Gear (Reflexes) and Slow Gear (Strategy) logic via `ops-engine.clar`.

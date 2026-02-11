@@ -30,7 +30,7 @@ This module contains two distinct agent contracts:
 ### `agent-treasury.clar`
 
 -   **`run-fiscal-strategy()`**: (Public) Triggers autonomous revenue rebalancing (Fiscal Dam).
--   **`calculate-cybernetic-policy()`**: (Read-Only) Returns the target 60/20/20 or adjusted split based on current GCR.
+-   **`calculate-cybernetic-policy()`**: (Read-Only) Returns the target CXIP-013 Performance-Adjusted or Fiscal Dam adjusted split based on current GCR.
 
 ## Status
 **Aligned**: The Agents module (Staff) is fully integrated with the `ops-engine` and Nakamoto-era automation standards.

@@ -20,6 +20,12 @@
 (define-data-var max-liquidation-reward uint u1000)
 (define-data-var insurance-fund principal tx-sender)
 
+;; Performance Metrics (CXIP-013)
+(define-data-var total-value-locked uint u1000000000)
+(define-data-var last-month-tvl uint u900000000)
+(define-data-var bounty-completion-rate uint u9600)
+(define-data-var mock-gcr uint u0)
+
 ;; Predictive Perception State
 (define-data-var liquidity-depth uint u10000)
 (define-data-var hash-rate-volatility uint u0)
@@ -75,7 +81,7 @@
                   (contract-call? .lending-manager get-reserve-data .cxd-token)))
     (total-deposits (get total-deposits cxd-reserve))
     (total-borrows (get total-borrows cxd-reserve))
-    (metric-gcr (if (is-eq total-borrows u0) u10000 (/ (* total-deposits u100) total-borrows)))
+    (metric-gcr (if (> (var-get mock-gcr) u0) (var-get mock-gcr) (if (is-eq total-borrows u0) u10000 (/ (* total-deposits u100) total-borrows))))
   )
     (if (>= score u5000)
       (ok u105) ;; Force Crisis state for high risk scores (e.g. market crash)
@@ -208,5 +214,34 @@
       (ok (/ (* entry-price (- u10000 (/ u10000 leverage))) u10000))
       (ok (/ (* entry-price (+ u10000 (/ u10000 leverage))) u10000))
     )
+  )
+)
+
+;; --- Performance Metrics (CXIP-013) ---
+
+(define-public (set-performance-metrics (new-tvl uint) (new-last-tvl uint) (new-bounty-rate uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (var-set total-value-locked new-tvl)
+    (var-set last-month-tvl new-last-tvl)
+    (var-set bounty-completion-rate new-bounty-rate)
+    (ok true)
+  )
+)
+
+(define-read-only (get-performance-metrics)
+  {
+    tvl: (var-get total-value-locked),
+    last-month-tvl: (var-get last-month-tvl),
+    bounty-completion-rate: (var-get bounty-completion-rate),
+    tvl-growth-bps: (if (is-eq (var-get last-month-tvl) u0) u0 (if (>= (var-get total-value-locked) (var-get last-month-tvl)) (/ (* (- (var-get total-value-locked) (var-get last-month-tvl)) u10000) (var-get last-month-tvl)) u0))
+  }
+)
+
+(define-public (set-mock-gcr (new-gcr uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (var-set mock-gcr new-gcr)
+    (ok true)
   )
 )
