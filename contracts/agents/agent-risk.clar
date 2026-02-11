@@ -152,6 +152,26 @@
   (ok true)
 )
 
+
+;; --- Cybernetic Intelligence ---
+
+;; @desc Consolidated system intelligence for the Fiscal Dam.
+;; Returns health (risk score), financial (GCR), and operational (PID) metrics.
+(define-read-only (get-cybernetic-intel)
+  (let (
+    (risk-score (assess-system-risk))
+    (gcr (unwrap-panic (get-gcr)))
+    (pid-fee (var-get stability-fee))
+  )
+    {
+      health-score: risk-score,
+      financial-gcr: gcr,
+      operational-fee: pid-fee,
+      timestamp: burn-block-height
+    }
+  )
+)
+
 (define-public (get-health-factor (position-id uint))
   (contract-call? .risk-manager get-health-factor position-id)
 )

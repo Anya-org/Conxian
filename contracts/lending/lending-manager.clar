@@ -10,7 +10,7 @@
 (define-constant ERR_INVALID_AMOUNT u1003)
 (define-constant ERR_INSUFFICIENT_COLLATERAL u1004)
 
-(define-constant COLLATERAL_FACTOR u7500) ;; 75% - borrow up to 75% of collateral value
+(define-constant COLLATERAL_FACTOR u9000) ;; 75% - borrow up to 75% of collateral value
 
 ;; Storage
 (define-data-var circuit-breaker (optional principal) none)
@@ -128,7 +128,7 @@
         ;; CRITICAL: Check collateralization before allowing borrow
         (asserts! (is-sufficiently-collateralized tx-sender amount) (err ERR_INSUFFICIENT_COLLATERAL))
 
-        (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) tx-sender none)))
+        (let ((user tx-sender)) (try! (as-contract (contract-call? asset-trait transfer amount tx-sender user none))))
 
         (map-set borrows { asset: asset, user: tx-sender } (+ current-bor amount))
         (map-set reserve-data asset (merge reserve {

@@ -19,7 +19,7 @@ permalink: /docs/ROADMAP/
 - **Agent Staffing**: Deployment of Agent-Risk 2.0 (`agent-risk`) and Agent-Treasury (`agent-treasury`) for autonomous protocol management.
 - **Circuit Breaker**: Integration of protocol-wide safety pauses in DEX and Lending modules.
 - **Adaptive Yield Engine (AYE)**: Activation of Intelligence-Led fiscal policy with PID control and Fuzzy Logic state transitions (Equilibrium, Pre-emptive, Defensive).
-- **Cybernetic Logic (CXIP-012)**: Implementation of Anti-LVR dynamic fees and the Fiscal Dam for autonomous recapitalization.
+- **Cybernetic Logic (CXIP-012)**: Implementation of Anti-LVR dynamic fees and the **Cybernetic Fiscal Dam (V3)** for fully automated, variable revenue distribution based on real-time metrics.
 - **Dual-Council Governance**: Activation of `proposal-engine` (Staff) and `community-voting-engine` (Board).
 - **Reputation Integration**: Merit-based voting weight adjustment via `reputation-engine`.
 
