@@ -21,7 +21,7 @@ describe('CXIP-012: Cybernetic Protocol Upgrade Simulation', () => {
         Cl.contractPrincipal(deployer, 'cxd-token'),
         Cl.contractPrincipal(deployer, 'cxvg-token'),
         Cl.uint(30), // 0.3%
-        Cl.uint(100000000)
+        Cl.uint(100000000), Cl.int(0)
     ], deployer);
 
     simnet.callPublicFn('oracle-aggregator', 'set-source', [Cl.contractPrincipal(deployer, 'cxd-token'), Cl.uint(100000000), Cl.uint(100)], deployer);

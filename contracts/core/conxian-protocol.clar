@@ -1,6 +1,6 @@
 ;; conxian-protocol.clar
 ;; Core Facade for Conxian Protocol
-;; Forced Clarity 4 Standard (Jan 2026 Edition) - COMPATIBILITY MODE
+;; Clarity 2 Standard - COMPATIBILITY MODE
 
 (impl-trait .core-traits.protocol-manager-trait)
 
@@ -36,7 +36,7 @@
   (begin
     (asserts! (contract-call? .admin-facade is-authorized-to-pause tx-sender) (err ERR_UNAUTHORIZED))
     (var-set paused new-paused)
-    (print { event: "protocol-pause-status", paused: new-paused, timestamp: u123456789 })
+    (print { event: "protocol-pause-status", paused: new-paused, timestamp: burn-block-height })
     (ok true)
   )
 )
@@ -54,7 +54,7 @@
         active: true,
         hash: c-hash
       })
-      (print { event: "module-registered", name: name, contract: contract, hash: c-hash, timestamp: u123456789 })
+      (print { event: "module-registered", name: name, contract: contract, hash: c-hash, timestamp: burn-block-height })
       (ok true)
     )
   )
@@ -125,6 +125,6 @@
     tenure-id: (some (contract-call? .block-utils get-current-tenure-id)),
     compliant: true,
     version: "C4",
-    timestamp: u123456789
+    timestamp: burn-block-height
   })
 )

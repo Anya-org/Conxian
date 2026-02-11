@@ -39,7 +39,7 @@ describe('Autonomous Executive Agents', () => {
       await simnet.callPublicFn(
         'mock-token',
         'mint',
-        [Cl.uint(amount), Cl.principal(deployer)],
+        [Cl.uint(amount), Cl.contractPrincipal(deployer, 'revenue-distributor')],
         deployer
       );
 
@@ -49,7 +49,7 @@ describe('Autonomous Executive Agents', () => {
         [
           Cl.contractPrincipal(deployer, 'mock-token'),
           Cl.uint(amount),
-          Cl.principal(deployer),
+          Cl.contractPrincipal(deployer, 'revenue-distributor'),
         ],
         deployer
       );
@@ -59,8 +59,8 @@ describe('Autonomous Executive Agents', () => {
       // Verify the distribution
       // Note: In a real test, we would have mock vaults to check balances.
       // Here, we'll just check the print events if available, or assume success on OK.
-      expect(result.events).toHaveLength(1);
-      const printEvent = result.events[0];
+      expect(result.events).toHaveLength(4);
+      const printEvent = result.events[3];
       if (printEvent.type === 'print_event') {
         const decodedEvent = cvToValue(printEvent.data.value);
         expect(decodedEvent.value.staking-amount.value).toBe(600000n);

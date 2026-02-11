@@ -34,6 +34,8 @@
 (define-constant KP_STABILITY u5)
 (define-constant KI_STABILITY u1)
 (define-constant KD_STABILITY u10)
+(define-constant INTEGRAL_LIMIT (to-int u10000000))
+(define-constant PID_SCALE (to-int u10000))
 
 (define-data-var last-checked-id-agent uint u0)
 
@@ -72,7 +74,42 @@
 (define-public (update-pid-rates)
   (begin
     (asserts! (or (is-eq contract-caller .ops-engine) (is-eq tx-sender (var-get contract-owner))) (err ERR_UNAUTHORIZED))
-    (ok true)
+    (let (
+      (current-price (unwrap-panic (contract-call? .oracle-aggregator get-price .cxd-token)))
+      (error (- (to-int PRICE_TARGET) (to-int current-price)))
+      (last-error (var-get last-price-error))
+      (current-integral (var-get price-integral))
+
+      (derivative (- error last-error))
+      (pid-output (+ (* (to-int KP_STABILITY) error)
+                     (+ (* (to-int KI_STABILITY) current-integral)
+                        (* (to-int KD_STABILITY) derivative))))
+
+      (adjustment (/ pid-output PID_SCALE))
+      (new-fee-int (+ (to-int (var-get stability-fee)) adjustment))
+      (new-fee (if (< new-fee-int 0) u0 (to-uint new-fee-int)))
+
+      (raw-integral (+ current-integral error))
+      (clamped-integral (if (> raw-integral INTEGRAL_LIMIT)
+                            INTEGRAL_LIMIT
+                            (if (< raw-integral (- 0 INTEGRAL_LIMIT))
+                                (- 0 INTEGRAL_LIMIT)
+                                raw-integral)))
+    )
+      (begin
+        (var-set last-price-error error)
+        (var-set price-integral clamped-integral)
+        (var-set stability-fee new-fee)
+        (print {
+          event: "pid-update",
+          price: current-price,
+          error: error,
+          new-fee: new-fee,
+          integral: clamped-integral
+        })
+        (ok true)
+      )
+    )
   )
 )
 
@@ -102,4 +139,8 @@
 
 (define-read-only (get-health-factor (position-id uint))
   (ok u15000)
+)
+
+(define-read-only (is-contract-paused (target principal))
+  (contract-call? .conxian-protocol is-paused)
 )

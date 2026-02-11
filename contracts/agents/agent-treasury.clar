@@ -2,6 +2,8 @@
 ;; Autonomous Fiscal Agent for Conxian Protocol
 ;; COMPATIBILITY MODE
 
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
+
 (define-constant ERR_UNAUTHORIZED u1000)
 
 ;; State
@@ -35,9 +37,35 @@
 (define-public (apply-fiscal-dam)
   (run-fiscal-strategy)
 )
+
 (define-public (set-regulatory-adapter-contract (new-adapter principal))
-  (ok true)
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (ok true)
+  )
 )
-(define-public (distribute (token principal) (amount uint) (recipient principal))
-  (ok true)
+
+;; @desc Distribute protocol revenue. (Enhanced for Production Vision)
+(define-public (distribute (token-trait <sip-010-ft-trait>) (amount uint) (recipient principal))
+  (let (
+    (policy (unwrap-panic (contract-call? .cxd-treasury get-allocation-percentages)))
+    (staking-share (get staking policy))
+    (staking-amt (/ (* amount staking-share) u10000))
+    (dev-amt (/ (* amount (get dev policy)) u10000))
+    (ins-amt (/ (* amount (get insurance policy)) u10000))
+  )
+    (begin
+      (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+      (try! (contract-call? .revenue-distributor distribute-token token-trait amount))
+      (print {
+        event: "revenue-distributed",
+        token: (contract-of token-trait),
+        total-amount: amount,
+        staking-amount: staking-amt,
+        dev-fund-amount: dev-amt,
+        insurance-fund-amount: ins-amt
+      })
+      (ok true)
+    )
+  )
 )

@@ -1,7 +1,7 @@
 ;; regulatory-adapter.clar
 ;; Conxian Finance: Regulatory Adapter (Clean-Hands Compliance)
 ;; Implements regulatory-adapter-trait from core-traits
-;; Clarity 4 Standard: Using u123456789 and to-ascii for human-readable audit trails.
+;; Clarity 2 Standard: Using burn-block-height for Bitcoin-anchored audit trails.
 
 ;; Traits
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
@@ -17,6 +17,8 @@
 (define-data-var authority-pubkey (buff 33) 0x00)
 
 ;; Maps
+;; Tier 0 Packing: We could pack clean-hands and verified-at,
+;; but keeping it explicit for audit trail clarity in this version.
 (define-map compliance-status
   { user: principal }
   {
@@ -53,7 +55,7 @@
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set compliance-status { user: user } {
       clean-hands: true,
-      verified-at: u123456789,
+      verified-at: burn-block-height,
       jurisdiction: jurisdiction
     })
     (ok true)
@@ -65,13 +67,12 @@
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set blacklist user true)
-    ;; Use u123456789 for second-precision audit logs (Clarity 4)
-    ;; to-ascii converts a buffer to a string-ascii
+    ;; Use burn-block-height for Bitcoin-anchored audit logs
     (print {
       event: "user-blacklisted",
       user: user,
-      audit-time: u123456789,
-      status: (unwrap-panic (some "MOCK")) ;; "BLACKLISTED"
+      audit-time: burn-block-height,
+      status: "BLACKLISTED"
     })
     (ok true)
   )
@@ -82,7 +83,7 @@
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-delete blacklist user)
-    (print { event: "user-removed-from-blacklist", user: user, timestamp: u123456789 })
+    (print { event: "user-removed-from-blacklist", user: user, timestamp: burn-block-height })
     (ok true)
   )
 )
@@ -98,6 +99,20 @@
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (var-set regulatory-authority new-authority)
     (var-set authority-pubkey new-pubkey)
+    (ok true)
+  )
+)
+
+;; New MiCA-aligned function: Verify IVMS101 Proof (Mock for Institutional Phase)
+(define-public (verify-ivms101-proof (user principal) (proof-hash (buff 32)))
+  (begin
+    (asserts! (is-eq tx-sender (var-get regulatory-authority)) (err ERR_UNAUTHORIZED))
+    (map-set compliance-status { user: user } {
+      clean-hands: true,
+      verified-at: burn-block-height,
+      jurisdiction: "IVMS101-VERIFIED"
+    })
+    (print { event: "ivms101-verified", user: user, proof: proof-hash })
     (ok true)
   )
 )

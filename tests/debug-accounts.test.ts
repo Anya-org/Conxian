@@ -6,6 +6,6 @@ describe('Debug Accounts', () => {
   it('should print accounts', async () => {
     const simnet = await initSimnet(resolve(__dirname, '../Clarinet.toml'));
     const accounts = simnet.getAccounts();
-    console.log('Accounts:', Array.from(accounts.keys()));
+    console.log('Deployer address:', accounts.get('deployer'));
   });
 });

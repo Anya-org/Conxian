@@ -385,7 +385,7 @@ clarity-version = 2
 [contracts.agent-treasury]
 path = "contracts/agents/agent-treasury.clar"
 clarity-version = 2
-depends_on = ["automation-traits", "agent-risk", "cxd-treasury", "office-manager"]
+depends_on = ["automation-traits", "agent-risk", "cxd-treasury", "office-manager", "sip-standards", "revenue-distributor"]
 
 [contracts.ops-engine]
 path = "contracts/core/ops-engine.clar"

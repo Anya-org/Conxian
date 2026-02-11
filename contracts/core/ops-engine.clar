@@ -1,6 +1,6 @@
 ;; ops-engine.clar
 ;; "The Executive Branch" - Coordinating the Sovereign Autonomous Business (SAB)
-;; Clarity 4 Standard - Nakamoto-aligned with u123456789
+;; Clarity 2 Standard - Nakamoto-aligned
 
 (use-trait proposal-trait .governance-traits.proposal-trait)
 
@@ -17,7 +17,7 @@
 (define-public (process-signal (proposal-id uint) (proposal-contract <proposal-trait>))
   (begin
     (asserts! (unwrap-panic (contract-call? .admin-facade is-authorized u4)) (err ERR_UNAUTHORIZED)) ;; ROLE_OPERATOR
-    (var-set last-action-time u123456789)
+    (var-set last-action-time block-height)
     (contract-call? proposal-contract execute tx-sender)
   )
 )
@@ -36,29 +36,29 @@
 )
 
 ;; @desc Trigger the Dual-Clock epoch update.
-;; Fast Gear: Reflexes (DEX Fees) via block-height.
-;; Slow Gear: Strategy (Fiscal Dam) via burn-block-height.
+;; Fast Gear: Reflexes (DEX Fees) via Stacks block-height.
+;; Slow Gear: Strategy (Fiscal Dam) via Bitcoin burn-block-height.
 (define-public (trigger-epoch-update)
   (let (
-    (current-time u123456789)
     (current-stx-height block-height)
+    (current-btc-height burn-block-height)
   )
     (begin
-      ;; 1. FAST PATH CHECK (DEX Protection) - Updated every ~1 minute (60s)
-      (if (> (- current-time (var-get last-fast-check)) u60)
+      ;; 1. FAST PATH CHECK (DEX Protection) - Updated every Stacks block
+      (if (> current-stx-height (var-get last-fast-check))
         (begin
           (unwrap-panic (contract-call? .swap-router update-volatility-fees))
-          (var-set last-fast-check current-time)
+          (var-set last-fast-check current-stx-height)
         )
         false
       )
 
-      ;; 2. SLOW PATH CHECK (Treasury/Risk) - Updated every ~10 minutes (600s)
-      (if (> (- current-time (var-get last-slow-check)) u600)
+      ;; 2. SLOW PATH CHECK (Treasury/Risk) - Updated every Bitcoin block
+      (if (> current-btc-height (var-get last-slow-check))
         (begin
           (unwrap-panic (contract-call? .agent-treasury run-fiscal-strategy))
           (unwrap-panic (contract-call? .agent-risk update-pid-rates))
-          (var-set last-slow-check current-time)
+          (var-set last-slow-check current-btc-height)
         )
         false
       )
@@ -66,7 +66,12 @@
       ;; 3. PAY KEEPER (5 CXD)
       (try! (contract-call? .cxd-token mint u500000000 tx-sender))
 
-      (print { event: "epoch-updated", keeper: tx-sender, block: burn-block-height })
+      (print {
+        event: "epoch-updated",
+        keeper: tx-sender,
+        stx-height: current-stx-height,
+        btc-height: current-btc-height
+      })
       (ok true)
     )
   )

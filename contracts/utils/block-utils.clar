@@ -10,7 +10,9 @@
 )
 
 (define-read-only (get-stacks-block-time)
-  u123456789
+  ;; Simulation proxy for stacks-block-time in Clarity 2
+  ;; Approximately seconds since a reference block
+  (+ u123456789 (* block-height u60))
 )
 
 (define-read-only (get-burn-block-height)
@@ -21,7 +23,7 @@
     (ok {
         tenure-id: (get-current-tenure-id),
         block-height: block-height,
-        block-time: u123456789
+        block-time: (get-stacks-block-time)
     })
 )
 
