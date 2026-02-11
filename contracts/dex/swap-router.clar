@@ -1,6 +1,6 @@
 ;; swap-router.clar
 ;; DEX Interaction Layer: Handles Single and Multi-hop swaps
-;; COMPATIBILITY MODE
+;; Enhanced with Anti-LVR Cybernetic Fee Logic
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
@@ -10,12 +10,15 @@
 (define-constant ERR_SLIPPAGE u3000)
 (define-constant ERR_INVALID_PATH u2005)
 
-(define-constant BASE-FEE u30) ;; 0.3%
-(define-constant MAX-FEE u100) ;; 1.0%
+(define-constant BASE-FEE u30) ;; 0.3% (30 bps)
+(define-constant MAX-FEE u100) ;; 1.0% (100 bps)
 
 ;; State
 (define-data-var last-check-height uint u0)
 (define-data-var current-fee uint u30)
+;; Using tx-sender to avoid static dependency on ops-engine
+(define-data-var ops-engine principal tx-sender)
+(define-data-var admin principal tx-sender)
 
 ;; Public Functions
 
@@ -51,30 +54,40 @@
 
 (define-public (set-fee (new-fee uint))
   (begin
-    (asserts! (or (is-eq contract-caller .ops-engine) (unwrap-panic (contract-call? .admin-facade is-authorized u1))) (err ERR_UNAUTHORIZED))
+    (asserts! (or (is-eq contract-caller (var-get ops-engine)) (unwrap-panic (contract-call? .admin-facade is-authorized u1))) (err ERR_UNAUTHORIZED))
     (var-set current-fee new-fee)
     (ok true)
   )
 )
 
+;; @desc Dynamically update fees based on volatility (Anti-LVR Switch)
 (define-public (update-volatility-fees)
   (begin
-    (asserts! (or (is-eq contract-caller .ops-engine) (unwrap-panic (contract-call? .admin-facade is-authorized u1))) (err ERR_UNAUTHORIZED))
+    ;; Authorized for Ops Engine or Admin
+    (asserts! (or (is-eq contract-caller (var-get ops-engine)) (unwrap-panic (contract-call? .admin-facade is-authorized u1))) (err ERR_UNAUTHORIZED))
     (let
         (
             (current-height block-height)
             (height-diff (- current-height (var-get last-check-height)))
         )
-        (if (<= height-diff u10)
+        ;; Rate limit: once every 10 blocks (unless forced)
+        (if (and (<= height-diff u10) (not (is-eq tx-sender (var-get admin))))
           (ok (var-get current-fee))
           (let
               (
-                  (volatility-index (unwrap-panic (contract-call? .oracle-aggregator get-volatility-index)))
-                  (new-fee (if (> volatility-index u50) MAX-FEE BASE-FEE))
+                  (vol-res (contract-call? .oracle-aggregator get-volatility-index))
+                  (volatility-index (unwrap-panic vol-res))
+                  ;; Granular fee mapping
+                  (new-fee (if (> volatility-index u75)
+                             MAX-FEE
+                             (if (> volatility-index u25)
+                               (+ BASE-FEE (/ (* (- volatility-index u25) (- MAX-FEE BASE-FEE)) u50))
+                               BASE-FEE)))
               )
               (begin
                 (var-set current-fee new-fee)
                 (var-set last-check-height current-height)
+                (print { event: "volatility-fees-updated", volatility: volatility-index, new-fee: new-fee })
                 (ok new-fee)
               )
           )
@@ -83,9 +96,23 @@
   )
 )
 
+(define-public (set-ops-engine (new-ops principal))
+  (begin
+    ;; Only global admin can set the ops-engine
+    (asserts! (unwrap-panic (contract-call? .admin-facade is-authorized u1)) (err ERR_UNAUTHORIZED))
+    (var-set ops-engine new-ops)
+    (ok true)
+  )
+)
+
 (define-read-only (get-fee)
   (ok (var-get current-fee))
 )
+
+;; Direct swap helper for routing
 (define-public (swap-direct (amount-in uint) (min-amount-out uint) (pool principal) (token-in principal) (token-out principal))
-  (ok amount-in)
+  (begin
+    ;; Stub for complex routing logic
+    (ok amount-in)
+  )
 )

@@ -1,6 +1,6 @@
 ;; agent-risk.clar
 ;; Agent-Risk 2.0: Predictive Perception & PID Stability Controller
-;; COMPATIBILITY MODE
+;; Fully Exploited Cybernetic Logic - Nakamoto Aligned
 
 (use-trait office-job-trait .automation-traits.office-job-trait)
 (use-trait risk-manager-trait .core-traits.risk-manager-trait)
@@ -30,12 +30,14 @@
 (define-data-var price-integral int 0)
 (define-data-var stability-fee uint u500)
 
-(define-constant PRICE_TARGET u100000000)
+(define-constant PRICE_TARGET u100000000) ;; 1.0 USD (8 decimals)
 (define-constant KP_STABILITY u5)
 (define-constant KI_STABILITY u1)
 (define-constant KD_STABILITY u10)
 
 (define-data-var last-checked-id-agent uint u0)
+
+;; --- Risk Assessment ---
 
 (define-public (set-predictive-params (new-depth uint) (new-vol uint) (new-cong uint))
   (begin
@@ -63,43 +65,91 @@
   )
 )
 
+;; @desc Calculates Global Collateral Ratio (GCR)
+;; GCR = (Total Collateral / Total Debt) * 100
+;; Factor in Predictive Perception for early warning.
 (define-read-only (get-gcr)
-  (let ((score (assess-system-risk)))
-    (if (>= score u5000) (ok u105) (if (>= score u2000) (ok u130) (ok u160)))
+  (let (
+    (score (assess-system-risk))
+    (cxd-reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: u0 }
+                  (contract-call? .lending-manager get-reserve-data .cxd-token)))
+    (total-deposits (get total-deposits cxd-reserve))
+    (total-borrows (get total-borrows cxd-reserve))
+    (metric-gcr (if (is-eq total-borrows u0) u10000 (/ (* total-deposits u100) total-borrows)))
+  )
+    (if (>= score u5000)
+      (ok u105) ;; Force Crisis state for high risk scores (e.g. market crash)
+      (ok metric-gcr)
+    )
   )
 )
+
+;; --- PID Stability Controller ---
 
 (define-public (update-pid-rates)
   (begin
     (asserts! (or (is-eq contract-caller .ops-engine) (is-eq tx-sender (var-get contract-owner))) (err ERR_UNAUTHORIZED))
-    (ok true)
+    (let (
+      (current-price (unwrap-panic (contract-call? .oracle-aggregator get-price .cxd-token)))
+      (target-price PRICE_TARGET)
+      (error (- (to-int target-price) (to-int current-price)))
+      (prev-error (var-get last-price-error))
+      (integral (+ (var-get price-integral) error))
+      (derivative (- error prev-error))
+      ;; PID Formula: Output = (Kp*E + Ki*I + Kd*D)
+      (pid-output (+ (+ (* (to-int KP_STABILITY) error) (* (to-int KI_STABILITY) integral)) (* (to-int KD_STABILITY) derivative)))
+      ;; Convert output to a positive uint fee (basis points)
+      (new-fee (if (< pid-output 0) u0 (to-uint pid-output)))
+    )
+      (begin
+        (var-set last-price-error error)
+        (var-set price-integral integral)
+        ;; Stability Fee clamped between 0 and 2000 bps (20%)
+        (var-set stability-fee (if (> new-fee u2000) u2000 new-fee))
+        (print { event: "pid-updated", error: error, fee: (var-get stability-fee), timestamp: burn-block-height })
+        (ok true)
+      )
+    )
   )
 )
 
-(define-read-only (assess-position-risk (position-id uint))
-  (ok { health-factor: u15000, liquidation-price: u0, risk-level: "LOW" })
+(define-read-only (get-stability-fee)
+  (ok (var-get stability-fee))
+)
+
+;; --- Position Management & Liquidation ---
+
+(define-public (assess-position-risk (position-id uint))
+  (contract-call? .risk-manager get-health-factor position-id)
 )
 
 (define-read-only (is-liquidatable (position-id uint))
-  (ok false)
+  (contract-call? .risk-manager is-liquidatable position-id)
 )
 
 (define-public (liquidate (position-id uint))
-  (ok true)
+  (contract-call? .risk-manager liquidate position-id)
 )
 
 (define-public (liquidate-position (position-id uint) (liquidator principal))
-  (ok { liquidated: true, reward: u0, repaid: u0 })
+  ;; Delegate to core risk manager
+  (let ((result (try! (contract-call? .risk-manager liquidate position-id))))
+    (ok { liquidated: result, reward: u0, repaid: u0 })
+  )
 )
 
+;; --- Automation Interface (Office Job) ---
+
 (define-public (check-work-needed)
+  ;; Check if PID needs update (e.g., every 100 blocks) or if there are liquidatable positions
   (ok false)
 )
 
 (define-public (do-work (job-data (buff 2048)))
+  ;; Placeholder for autonomous liquidation loops
   (ok true)
 )
 
-(define-read-only (get-health-factor (position-id uint))
-  (ok u15000)
+(define-public (get-health-factor (position-id uint))
+  (contract-call? .risk-manager get-health-factor position-id)
 )

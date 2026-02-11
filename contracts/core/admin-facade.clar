@@ -18,7 +18,7 @@
 
 ;; State
 (define-data-var rbac-contract principal .conxian-access)
-(define-data-var global-admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var global-admin principal tx-sender)
 (define-data-var emergency-pause bool false)
 (define-data-var max-batch-size uint u100)
 
