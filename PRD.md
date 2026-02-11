@@ -129,9 +129,13 @@ The system operates like a digital corporation where smart contracts serve as Ma
 - **Sovereignty**: Native `restrict-assets?` implemented in `vault.clar` for in-contract post-condition enforcement.
 - **Auditability**: Native `to-ascii?` conversion for human-readable on-chain messages.
 
-### 8.2. Sovereign Autonomous Fiscal Policy
+### 8.2. Cybernetic Autonomous Fiscal Policy
 
-Revenue generated from all protocol activities (Subscriptions, DEX fees, Lending spreads) is automatically distributed:
+Revenue generated from all protocol activities is automatically distributed via the **Fiscal Dam** (Cybernetic Allocation):
+
+- **Staking (Dividends)**: Dynamically adjusted (0% to 80%) based on system health.
+- **Operational Treasury (R&D/Ops)**: Dynamically adjusted (0% to 20%).
+- **Insurance Fund (Risk Reserve)**: Dynamically adjusted (10% to 100%) to maintain solvency during volatility.
 
 - **60% Staking (Dividends)**: Routed to `cxd-staking` to reward governance participants.
 - **20% Operational Treasury (R&D/Ops)**: Routed to `operational-treasury` for autonomous staff expenses and protocol development.
@@ -175,7 +179,7 @@ The protocol utilizes a 5-token system aligned with specialized councils:
 
 - **Dual-Clock Standard**: Integrated Fast Gear (Reflexes) and Slow Gear (Strategy) logic.
 - **Anti-LVR Switch**: Dynamic DEX fees based on real-time volatility.
-- **Fiscal Dam**: Adaptive revenue routing based on Global Collateral Ratio (GCR).
+- **Fiscal Dam**: Fully adjusted, cybernetic revenue routing (V3) using linear interpolation based on GCR and Risk Score.
 - **Chainhook Readiness**: Prepared for event-driven automation.
 
 ### 13.1 Post-Repair Status (February 2026)

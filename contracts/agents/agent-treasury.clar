@@ -9,6 +9,54 @@
 (define-data-var current-fiscal-state uint u1) ;; 0=CRISIS, 1=STABILITY, 2=ABUNDANCE
 (define-data-var contract-owner principal tx-sender)
 
+;; --- Cybernetic Revenue Allocation ---
+
+;; @desc Calculate the dynamic revenue split based on cybernetic intel.
+;; Linear interpolation for smooth transitions between states.
+(define-read-only (calculate-cybernetic-policy)
+  (let (
+    (intel (contract-call? .agent-risk get-cybernetic-intel))
+    (gcr (get financial-gcr intel))
+    (risk-score (get health-score intel))
+  )
+    (if (or (< gcr u110) (>= risk-score u5000))
+      ;; CRISIS: 100% Insurance
+      { staking: u0, dev: u0, insurance: u10000 }
+      (if (>= gcr u150)
+        ;; ABUNDANCE: 80% Staking, 10% Dev, 10% Insurance
+        { staking: u8000, dev: u1000, insurance: u1000 }
+        (if (>= gcr u130)
+          ;; STABILITY TO ABUNDANCE (130-150)
+          (let (
+            (delta (- gcr u130))
+            (staking-inc (/ (* delta u2000) u20))
+            (dev-dec (/ (* delta u1000) u20))
+          )
+            {
+              staking: (+ u6000 staking-inc),
+              dev: (- u2000 dev-dec),
+              insurance: (- u2000 dev-dec)
+            }
+          )
+          ;; CRISIS TO STABILITY (110-130)
+          (let (
+            (delta (- gcr u110))
+            (staking-inc (/ (* delta u6000) u20))
+            (dev-inc (/ (* delta u2000) u20))
+            (ins-dec (/ (* delta u8000) u20))
+          )
+            {
+              staking: staking-inc,
+              dev: dev-inc,
+              insurance: (- u10000 ins-dec)
+            }
+          )
+        )
+      )
+    )
+  )
+)
+
 ;; @desc Run the fiscal strategy based on system risk (The Fiscal Dam).
 ;; Adaptive revenue routing based on Global Collateral Ratio (GCR).
 (define-public (run-fiscal-strategy)
@@ -17,31 +65,23 @@
     (if (<= btc-height (var-get last-fiscal-height))
       (ok false)
       (let (
-        (gcr (unwrap-panic (contract-call? .agent-risk get-gcr)))
-        (prev-state (var-get current-fiscal-state))
-        ;; Hysteresis logic to prevent flapping
-        (next-state (if (is-eq prev-state u0)
-                      (if (> gcr u115) u1 u0) ;; From CRISIS, need 115 to go STABILITY
-                      (if (is-eq prev-state u2)
-                        (if (< gcr u145) u1 u2) ;; From ABUNDANCE, need < 145 to go STABILITY
-                        (if (< gcr u110) u0 (if (> gcr u150) u2 u1)) ;; From STABILITY
-                      )
-                    ))
+        (policy (calculate-cybernetic-policy))
+        (staking (get staking policy))
+        (dev (get dev policy))
+        (insurance (get insurance policy))
       )
         (begin
-          (if (is-eq next-state u0)
-            ;; CRISIS: 100% Insurance to recapitalize protocol
-            (try! (contract-call? .cxd-treasury rebalance u0 u0 u10000))
-            (if (is-eq next-state u1)
-              ;; STABILITY/EQUILIBRIUM: 60/20/20 split
-              (try! (contract-call? .cxd-treasury rebalance u6000 u2000 u2000))
-              ;; ABUNDANCE: 80% Staking, 10% Dev, 10% Insurance
-              (try! (contract-call? .cxd-treasury rebalance u8000 u1000 u1000))
-            )
-          )
-          (var-set current-fiscal-state next-state)
+          (try! (contract-call? .cxd-treasury rebalance staking dev insurance))
           (var-set last-fiscal-height btc-height)
-          (print { event: "fiscal-strategy-executed", gcr: gcr, height: btc-height })
+          ;; Update current-fiscal-state for legacy monitoring compatibility
+          (var-set current-fiscal-state (if (is-eq staking u0) u0 (if (>= staking u8000) u2 u1)))
+          (print {
+            event: "fiscal-strategy-executed",
+            staking: staking,
+            dev: dev,
+            insurance: insurance,
+            height: btc-height
+          })
           (ok true)
         )
       )
@@ -74,7 +114,7 @@
 (define-read-only (get-fiscal-status)
   (ok {
     last-run: (var-get last-fiscal-height),
-    strategy: "FISCAL-DAM-V2",
+    strategy: "FISCAL-DAM-CYBERNETIC-V3",
     compliant: true
   })
 )

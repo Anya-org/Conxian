@@ -44,3 +44,4 @@
 - **Compatibility**: All contracts successfully aligned to Clarity 2/Epoch 3.0 for Simnet stability.
 - **Core Modules**: `dimensional-core`, `ops-engine`, and `agent-risk` are now fully integrated.
 - **Verification**: Core path (Supply/Borrow/Swap/Distribute) verified via `full-protocol-journey.test.ts`.
+- **Revenue Flow**: Fully automated, cybernetic revenue allocation (Fiscal Dam V3) implemented, replacing discrete 60/20/20 splits with dynamic, GCR-adjusted linear interpolation.

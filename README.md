@@ -20,14 +20,17 @@ Conxian is a **Sovereign Autonomous Business (SAB)** where human discretion is r
 - **Operational Council (Staff)**: 24/7 voting by autonomous agents (`agent-risk`, `agent-treasury`) for parameter tuning and daily operations. Implemented via `proposal-engine.clar`.
 - **Strategic Council (Board/AGM)**: Periodic Human General Meetings (Annual/Quarterly) for structural upgrades and major fiscal changes. Implemented via `community-voting-engine.clar`.
 
-### 💰 **Autonomous Fiscal Policy (60/20/20)**
+### 💰 **Autonomous Fiscal Policy (Cybernetic)**
 
 The protocol employs active **Revenue Collection** levers to fund its ecosystem:
 - **Lending**: 10% Reserve Factor on all borrow interest.
 - **DEX**: ~16% Protocol Fee on all swaps.
 - **Subscription**: Governance-tuned access fees.
 
-Total revenue is automatically distributed:
+Total revenue is dynamically distributed via the **Fiscal Dam** system:
+- **Staking**: Rewards to `cxd-staking` participants (60% target, scales up to 80%).
+- **Operational Treasury**: Protocol development and autonomous staff expenses (20% target).
+- **Insurance Fund**: Systematic risk reserve (20% target, scales up to 100% in crisis).
 - **60% Staking**: Rewards to `cxd-staking` participants.
 - **20% Operational Treasury**: Protocol development and autonomous staff expenses.
 - **20% Insurance Fund**: Systematic risk reserve.
