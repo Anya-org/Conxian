@@ -8,44 +8,29 @@ permalink: /modules/agents/
 
 ## Overview
 
-The Agents Module contains autonomous contracts that are designed to perform specific, automated tasks within the Conxian Protocol. These "agent" contracts implement the `office-job-trait`, allowing them to be managed and triggered by an automation engine.
+The Agents Module contains autonomous contracts designed to perform automated tasks within the Conxian Protocol. These "agent" contracts implement the `office-job-trait`, allowing them to be managed and triggered by an automation engine (`ops-engine`).
 
 ## Architecture
 
 This module contains two distinct agent contracts:
 
--   **`agent-risk.clar`**: Agent-Risk 2.0. Acts as an autonomous risk manager with **Predictive Perception**. It monitors liquidity depth, hashrate volatility, and mempool congestion to determine the protocol's risk state.
--   **`agent-treasury.clar`**: Acts as an autonomous treasury manager implementing **PID Control Theory**. It dynamically rebalances revenue flows between stakers and the insurance fund based on the intelligence provided by `agent-risk`.
+-   **`agent-risk.clar`**: Agent-Risk 2.0. Acts as an autonomous risk manager with **Predictive Perception**. It monitors liquidity depth, hashrate volatility, and mempool congestion.
+-   **`agent-treasury.clar`**: Acts as an autonomous treasury manager implementing the **Fiscal Dam V3**. It dynamically rebalances revenue flows based on intelligence from `agent-risk`.
 
 ## Public Functions
 
 ### `agent-risk.clar`
-### `agent-risk.clar`
 
--   `get-gcr()`: (Read-Only) Returns the Global Collateral Ratio (GCR) indicator.
--   `update-pid-rates()`: (Public) Recalculates the Stability Fee using the PID controller.
-
-
--   `set-predictive-params(new-liquidity-depth uint, new-hash-rate-volatility uint, new-mempool-congestion uint)`: (Admin Only) Updates the predictive perception inputs.
--   `assess-system-risk()`: (Read-Only) Calculates a composite risk score (0-10000).
--   `get-current-risk-state()`: (Read-Only) Returns the current state: "EQUILIBRIUM", "PREEMPTIVE", or "DEFENSIVE".
--   `set-risk-parameters(new-max-leverage uint, new-maintenance-margin uint, new-liquidation-threshold uint)`: (Admin Only) Sets core risk parameters.
--   `set-liquidation-rewards(min-reward uint, max-reward uint)`: (Admin Only) Sets rewards for liquidators.
--   `liquidate(position-id uint)`: Simplified liquidation trigger.
--   `liquidate-position(position-id uint, liquidator principal)`: Full liquidation execution.
--   `assess-position-risk(position-id uint)`: (Read-Only) Returns health factor and risk level for a position.
--   `calculate-liquidation-price(position {entry-price: uint, leverage: uint, is-long: bool})`: (Read-Only) Predicts liquidation price.
--   `check-work-needed()`: Implements `office-job-trait`. Checks for liquidatable positions.
--   `do-work(job-data (buff 2048))`: Implements `office-job-trait`. Executes liquidation.
+-   **`get-cybernetic-intel()`**: (Read-Only) Returns a consolidated state of protocol health, GCR, and PID fees.
+-   **`update-pid-rates()`**: (Public) Recalculates the Stability Fee using the PID controller.
+-   **`get-current-risk-state()`**: (Read-Only) Returns "EQUILIBRIUM", "DEFENSIVE", or "CRISIS".
+-   **`set-risk-parameters(max-leverage, maintenance-margin, threshold)`**: (Admin) Updates core risk parameters.
+-   **`calculate-liquidation-price(position)`**: (Read-Only) Predicts liquidation price for a hypothetical position.
 
 ### `agent-treasury.clar`
-### `agent-treasury.clar`
 
--   `apply-fiscal-dam()`: (Public) Triggers autonomous revenue rebalancing based on the GCR.
-
-
--   `check-work-needed()`: Implements `office-job-trait`. Checks if rebalancing is required based on risk score or balance.
--   `do-work(job-data (buff 2048))`: Implements `office-job-trait`. Executes PID-controlled rebalancing of revenue flows via `cxd-treasury`.
+-   **`run-fiscal-strategy()`**: (Public) Triggers autonomous revenue rebalancing (Fiscal Dam).
+-   **`calculate-cybernetic-policy()`**: (Read-Only) Returns the target 60/20/20 or adjusted split based on current GCR.
 
 ## Status
-**Aligned**: The Agents module (Staff) is fully integrated with the `office-manager` and Nakamoto-era automation standards. It provides the "Staff" intelligence for the protocol's autonomous fiscal policy.
+**Aligned**: The Agents module (Staff) is fully integrated with the `ops-engine` and Nakamoto-era automation standards.

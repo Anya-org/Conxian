@@ -74,7 +74,7 @@ This document details the complete Priority-Ordered Repair (P1-P6) of the Conxia
 
 **Contracts Modified**:
 
-- `contracts/treasury/allocation-policy.clar` (160 lines)
+- `contracts/treasury/cxd-treasury.clar` (160 lines)
   - ADDED: Default allocation constants (60/20/20) for reference
   - ADDED: `timelock` principal for governance control
   - ADDED: `policy-locked` boolean for immutability
@@ -208,7 +208,7 @@ This document details the complete Priority-Ordered Repair (P1-P6) of the Conxia
 | P1 | `contracts/governance/governance-handover.clar` | 188 | ✅ Complete |
 | P2 | `contracts/compliance/compliance-manager.clar` | 203 | ✅ Complete |
 | P2 | `contracts/compliance/compliance-hooks.clar` | 136 | ✅ Complete |
-| P3 | `contracts/treasury/allocation-policy.clar` | 160 | ✅ Complete |
+| P3 | `contracts/treasury/cxd-treasury.clar` | 160 | ✅ Complete |
 | P3 | `contracts/tokens/cxd-token.clar` | 117 | ✅ Complete |
 | P4 | `contracts/governance/ico-offering.clar` | 169 | ✅ Complete |
 | P5 | `contracts/tokens/cxlp-position-nft.clar` | 137 | ✅ Complete (was stub) |

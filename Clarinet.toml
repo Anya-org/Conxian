@@ -411,3 +411,13 @@ clarity-version = 2
 [contracts.interest-rate-model]
 path = "contracts/lending/interest-rate-model.clar"
 clarity-version = 2
+
+[contracts.kyc-registry]
+path = "contracts/identity/kyc-registry.clar"
+clarity-version = 2
+depends_on = ["block-utils"]
+
+[contracts.compliance-hooks]
+path = "contracts/compliance/compliance-hooks.clar"
+clarity-version = 2
+depends_on = ["compliance-manager"]

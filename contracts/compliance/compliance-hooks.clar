@@ -118,3 +118,23 @@
         (ok true)
     )
 )
+
+;; --- Test Alignment Hooks ---
+
+(define-constant ERR_POLICY_VIOLATION u7000)
+
+(define-read-only (check-kyc (user principal))
+  (let ((status (contract-call? .kyc-registry get-identity-status user)))
+    (if (>= (get tier status) u1)
+      (ok true)
+      (err ERR_POLICY_VIOLATION)
+    )
+  )
+)
+
+(define-read-only (check-aml (user principal))
+  (if (contract-call? .kyc-registry is-sanctioned user)
+    (err ERR_POLICY_VIOLATION)
+    (ok true)
+  )
+)
