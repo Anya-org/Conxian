@@ -48,6 +48,7 @@
 (define-public (register-module (name (string-ascii 32)) (contract principal))
   (begin
     (asserts! (unwrap! (contract-call? .admin-facade is-authorized ROLE_ADMIN) (err ERR_UNAUTHORIZED)) (err ERR_UNAUTHORIZED))
+    ;; Clarity 4 Vision: (let ((c-hash (contract-hash? contract))) ...)
     (let ((c-hash (some 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20)))
       (map-set modules { name: name } {
         contract: contract,
@@ -69,6 +70,7 @@
 
 (define-private (register-module-iter (entry {name: (string-ascii 32), contract: principal}) (previous bool))
   (begin
+    ;; Clarity 4 Vision: hash: (contract-hash? (get contract entry))
     (map-set modules { name: (get name entry) } {
       contract: (get contract entry),
       active: true,

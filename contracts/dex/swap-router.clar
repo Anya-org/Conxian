@@ -78,11 +78,16 @@
                   (vol-res (contract-call? .oracle-aggregator get-volatility-index))
                   (volatility-index (unwrap-panic vol-res))
                   ;; Granular fee mapping
-                  (new-fee (if (> volatility-index u75)
+                  (calculated-fee (if (> volatility-index u75)
                              MAX-FEE
                              (if (> volatility-index u25)
                                (+ BASE-FEE (/ (* (- volatility-index u25) (- MAX-FEE BASE-FEE)) u50))
                                BASE-FEE)))
+                  ;; Volatility Decay: Fee can only drop by 5 bps per check to protect LPs
+                  (current-f (var-get current-fee))
+                  (new-fee (if (< calculated-fee current-f)
+                             (if (> (- current-f calculated-fee) u5) (- current-f u5) calculated-fee)
+                             calculated-fee))
               )
               (begin
                 (var-set current-fee new-fee)

@@ -25,8 +25,9 @@ permalink: /docs/ROADMAP/
 
 ## Phase 3: Institutional (Compliance & Scale) - CURRENT
 
-- **Regulatory Hardening**: Expansion of `regulatory-adapter` to include MiCA-compliant reporting and Travel Rule encrypted proofs.
-- **Enterprise Vaults**: Advanced sBTC integration and institutional yield aggregation.
+- **Regulatory Hardening**: Expansion of `regulatory-adapter` to include MiCA-compliant reporting, passporting, and VASP registration. [IN PROGRESS]
+- **Enterprise Vaults**: Advanced sBTC integration and institutional yield aggregation. [PLANNED]
+- **Clarity 4 Production Vision**: Implementation of next-gen Stacks primitives (stacks-block-time, contract-hash?). [IN PROGRESS]
 - **Multi-Council Expansion**: Activation of specialized token governance (CXS, CXTR, CXLP).
 - **Security Audits**: Comprehensive cross-contract audit of the "Full Truth" codebase.
 

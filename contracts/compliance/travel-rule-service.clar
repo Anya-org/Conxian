@@ -10,6 +10,22 @@
 ;; Data Vars
 (define-data-var compliance-admin principal tx-sender)
 
+;; Maps
+(define-map registered-vasps (string-ascii 20) bool)
+
+;; VASP Management
+(define-public (register-vasp (vasp-id (string-ascii 20)))
+    (begin
+        (asserts! (is-eq tx-sender (var-get compliance-admin)) (err ERR_UNAUTHORIZED))
+        (map-set registered-vasps vasp-id true)
+        (ok true)
+    )
+)
+
+(define-read-only (is-vasp-registered (vasp-id (string-ascii 20)))
+    (default-to false (map-get? registered-vasps vasp-id))
+)
+
 ;; Events
 (define-private (emit-event (event (string-ascii 32)) (data (optional (buff 256))))
     (print { event: event, data: data, block: burn-block-height })

@@ -42,6 +42,7 @@
   (let (
     (current-stx-height block-height)
     (current-btc-height burn-block-height)
+    ;; Clarity 4 Vision: (current-time stacks-block-time)
   )
     (begin
       ;; 1. FAST PATH CHECK (DEX Protection)
