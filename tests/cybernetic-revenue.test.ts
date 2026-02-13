@@ -10,45 +10,64 @@ describe('Cybernetic Revenue Allocation', () => {
     deployer = accounts.get('deployer')!;
   });
 
-  it('verifies dynamic allocation across all ranges', () => {
+  it('verifies dynamic allocation across all ranges (CXIP-013)', () => {
+    // Initialize state
     simnet.callPublicFn('agent-risk', 'set-predictive-params', [Cl.uint(10000), Cl.uint(0), Cl.uint(0)], deployer);
     simnet.callPublicFn('cxd-token', 'mint', [Cl.uint(1000000), Cl.standardPrincipal(deployer)], deployer);
 
-    // 1. CRISIS
+    // Performance adjustment is active by default in agent-risk (bounty rate 96%)
+    // adj-treasury = 4500 - 500 = 4000
+    // adj-bounty = 3000 + 500 = 3500
+
+    // 1. CRISIS (GCR < 110 or high risk)
     simnet.callPublicFn('agent-risk', 'set-predictive-params', [Cl.uint(0), Cl.uint(10000), Cl.uint(10000)], deployer);
     let policy = simnet.callReadOnlyFn('agent-treasury', 'calculate-cybernetic-policy', [], deployer);
-    expect(policy.result).toEqual(Cl.tuple({ staking: Cl.uint(0), dev: Cl.uint(0), insurance: Cl.uint(10000) }));
+    expect(policy.result).toEqual(Cl.tuple({
+      treasury: Cl.uint(0),
+      bounty: Cl.uint(0),
+      lp: Cl.uint(0),
+      grant: Cl.uint(0),
+      buyback: Cl.uint(0),
+      insurance: Cl.uint(10000)
+    }));
 
-    // 2. ABUNDANCE
+    // 2. ABUNDANCE (GCR >= 150)
     simnet.callPublicFn('agent-risk', 'set-predictive-params', [Cl.uint(10000), Cl.uint(0), Cl.uint(0)], deployer);
+    // GCR will be 10000 (Abundance) because borrows are 0
     policy = simnet.callReadOnlyFn('agent-treasury', 'calculate-cybernetic-policy', [], deployer);
-    expect(policy.result).toEqual(Cl.tuple({ staking: Cl.uint(8000), dev: Cl.uint(1000), insurance: Cl.uint(1000) }));
+    expect(policy.result).toEqual(Cl.tuple({
+      treasury: Cl.uint(1000),
+      bounty: Cl.uint(0),
+      lp: Cl.uint(8000),
+      grant: Cl.uint(0),
+      buyback: Cl.uint(0),
+      insurance: Cl.uint(1000)
+    }));
 
-    // 3. INTERMEDIATE 1 (GCR 125)
-    // Need D/B = 1.25. D=1000, B=800.
-    simnet.callPublicFn('lending-manager', 'deposit', [Cl.contractPrincipal(deployer, 'cxd-token'), Cl.uint(1000)], deployer);
-    const borRes = simnet.callPublicFn('lending-manager', 'borrow', [Cl.contractPrincipal(deployer, 'cxd-token'), Cl.uint(800)], deployer);
-    console.log('Borrow 800 Result:', borRes.result);
+    // 3. STABILITY (130 <= GCR < 150)
+    // Force GCR = 140
+    simnet.callPublicFn('agent-risk', 'set-mock-gcr', [Cl.uint(140)], deployer);
+    policy = simnet.callReadOnlyFn('agent-treasury', 'calculate-cybernetic-policy', [], deployer);
+    expect(policy.result).toEqual(Cl.tuple({
+      treasury: Cl.uint(4000), // 4500 - 500
+      bounty: Cl.uint(3500),   // 3000 + 500
+      lp: Cl.uint(1500),
+      grant: Cl.uint(500),
+      buyback: Cl.uint(500),
+      insurance: Cl.uint(0)
+    }));
 
-    let gcr = simnet.callReadOnlyFn('agent-risk', 'get-gcr', [], deployer);
-    console.log('GCR:', gcr.result);
-
-    if (gcr.result.type === 'ok' && gcr.result.value.value === 125n) {
-      policy = simnet.callReadOnlyFn('agent-treasury', 'calculate-cybernetic-policy', [], deployer);
-      expect(policy.result).toEqual(Cl.tuple({ staking: Cl.uint(4500), dev: Cl.uint(1500), insurance: Cl.uint(4000) }));
-    }
-
-    // 4. INTERMEDIATE 2 (GCR 140)
-    // Add deposits to reach GCR 140.
-    // D/B = 1.4 -> D = 1.4 * 800 = 1120.
-    // Current D = 1000. Add 120.
-    simnet.callPublicFn('lending-manager', 'deposit', [Cl.contractPrincipal(deployer, 'cxd-token'), Cl.uint(120)], deployer);
-    gcr = simnet.callReadOnlyFn('agent-risk', 'get-gcr', [], deployer);
-    console.log('GCR:', gcr.result);
-
-    if (gcr.result.type === 'ok' && gcr.result.value.value === 140n) {
-      policy = simnet.callReadOnlyFn('agent-treasury', 'calculate-cybernetic-policy', [], deployer);
-      expect(policy.result).toEqual(Cl.tuple({ staking: Cl.uint(7000), dev: Cl.uint(1500), insurance: Cl.uint(1500) }));
-    }
+    // 4. INTERPOLATION (110 <= GCR < 130)
+    // GCR 120 -> delta 10. multiplier 10/20 = 0.5
+    simnet.callPublicFn('agent-risk', 'set-mock-gcr', [Cl.uint(120)], deployer);
+    policy = simnet.callReadOnlyFn('agent-treasury', 'calculate-cybernetic-policy', [], deployer);
+    expect(policy.result).toEqual(Cl.tuple({
+      treasury: Cl.uint(2000), // 4000 * 0.5
+      bounty: Cl.uint(1750),   // 3500 * 0.5
+      lp: Cl.uint(750),        // 1500 * 0.5
+      grant: Cl.uint(250),     // 500 * 0.5
+      buyback: Cl.uint(250),   // 500 * 0.5
+      insurance: Cl.uint(5000) // Remainder
+    }));
   });
 });

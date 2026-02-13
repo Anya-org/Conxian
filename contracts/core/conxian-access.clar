@@ -1,7 +1,7 @@
 ;; conxian-access.clar
 ;; Unified Role-Based Access Control (RBAC) Backend
 ;; Centralizes all permissioning for the Conxian Protocol
-;; Forced Clarity 4 Standard (Jan 2026 Edition)
+;; Forced Compatibility Mode (Clarity 2/3)
 
 (impl-trait .core-traits.conxian-access-trait)
 

@@ -1,47 +1,22 @@
-# Conxian Labs - Agent Context (Jules)
+# Conxian Protocol: Agent Directives (Feb 2026)
 
-## Service Domains: Dual-Viewpoint Mapping
+## 1. System Build Ethos
+- **Sovereign Autonomy**: All core logic must be autonomous. Avoid manual admin interventions.
+- **Nakamoto Alignment**: Use `burn-block-height` for slow-path strategy and `block-height` for fast-path reflexes.
+- **Defensive Engineering**: NO `unwrap-panic` in public functions or critical logic. Use `try!`, `match`, or `unwrap!` with explicit errors.
+- **CXIP-013 Compliance**: All revenue must flow through the 6-way Fiscal Dam V4.
 
-### Viewpoint A: Internal Ops (The Engine Room)
+## 2. Technical Standards
+- **Clarity Version**: Maintain Compatibility Mode (Clarity 2/3) for stable simulation. Pre-wire for Clarity 4 features as commented "Vision" code.
+- **SIP Standards**: Strict adherence to SIP-010 (FT) and SIP-009 (NFT). Transfer functions MUST handle optional memos.
+- **Temporal Logic**: Prefer `burn-block-height` for any logic involving value accrual or locking to align with Bitcoin tenure.
 
-| Domain | Contracts | Description |
-| :--- | :--- | :--- |
-| **DAO Services** | `proposal-registry`, `proposal-executor`, `proposal-engine`, `community-voting-engine`, `voting`, `dao-treasury`, `upgrade-controller`, `timelock` | Core governance logic, voting mechanisms, and timelock execution. |
-| **Platform Services** | `conxian-protocol`, `ops-engine`, `economic-policy-engine`, `allocation-policy`, `office-manager`, `circuit-breaker`, `token-system-coordinator` | Protocol coordination, economic policies, and emergency fail-safes. |
-| **Admin Ops** | `conxian-access`, `admin-facade`, `operational-treasury`, `reputation-engine`, `legal-representative-registry` | RBAC, administrative facades, and reputation tracking. |
-| **Cross-Chain Ops** | `wormhole-outbox`, `oracle-aggregator`, `*-oracle-adapter`, `twap-oracle` | Bridge hooks and hybrid oracle aggregation. |
+## 3. Operational Directives
+- **Dual-Clock Heartbeat**: The `trigger-epoch-update` in `ops-engine.clar` is the protocol's heartbeat. Ensure it is efficient and incentivized.
+- **Predictive Risk**: `agent-risk.clar` must use the PID controller to proactively manage GCR and stability fees.
+- **Traceability**: Every state change MUST emit a structured event with a timestamp.
 
-### Viewpoint B: External Ops (The User Experience)
-
-| Domain | Contracts | Description |
-| :--- | :--- | :--- |
-| **Retail** | `cxd-token`, `cxvg-token`, `cxs-token`, `cxtr-token`, `cxlp-token`, `enhanced-governance-nft`, `position-nft`, `ico-offering` | User-facing tokens, NFTs, and onboarding tools. |
-| **DeFi** | `swap-manager`, `vault`, `dimensional-engine`, `dimensional-core`, `liquidity-provider`, `revenue-distributor`, `lending-manager`, `position-manager`, `collateral-manager`, `risk-manager`, `cxd-staking`, `swap-router`, `yield-optimizer` | Core DeFi primitives: Swaps, Lending, Yield, and Dimensional Trading. |
-| **Business** | `founder-vesting`, `regulatory-adapter`, `agent-treasury`, `agent-risk`, `travel-rule-service`, `compliance-manager` | B2B settlements, regulatory compliance, and autonomous risk management. |
-
----
-
-## Technical Directives (BOLT Initiative)
-
-1.  **Clarity 4 Native**: Leverage `SIP-033` features (e.g., `contract-hash?`, `stacks-block-time`, `secp256r1-verify`).
-2.  **Initialization**: DO NOT use dynamic values (`tx-sender`, `burn-block-height`) in top-level `define-data-var` or `define-constant`. Use literal placeholders and initialize via public functions or use `tx-sender` only during deployment if strictly necessary and allowed by the environment.
-3.  **Zero Gas Ops**: Maximize `read-only` functions. Identify public functions that can be converted.
-4.  **Safety**: All `contract-call?` must be wrapped in `unwrap!` or `try!`. No swallowed errors.
-5.  **Data Packing**: Merge multiple state variables into single `uint` or `buff` where applicable to save gas on storage.
-
----
-
-## Agent Status Update (February 2026)
-
-- **Compatibility**: All contracts successfully aligned to Clarity 2/Epoch 3.0 for Simnet stability.
-- **Core Modules**: , , and  are now fully integrated.
-- **Verification**: Core path (Supply/Borrow/Swap/Distribute) verified via .
-
----
-
-## Agent Status Update (February 2026)
-
-- **Compatibility**: All contracts successfully aligned to Clarity 2/Epoch 3.0 for Simnet stability.
-- **Core Modules**: `dimensional-core`, `ops-engine`, and `agent-risk` are now fully integrated.
-- **Verification**: Core path (Supply/Borrow/Swap/Distribute) verified via `full-protocol-journey.test.ts`.
-- **Revenue Flow**: Fully automated, cybernetic revenue allocation (Fiscal Dam V3) implemented, replacing discrete 60/20/20 splits with dynamic, GCR-adjusted linear interpolation.
+## 4. Troubleshooting
+- If tests fail in Simnet, check block height thresholds for fast/slow paths.
+- Ensure `.ops-engine` is an authorized minter in `cxd-token.clar` for keeper rewards.
+- Verify `.agent-treasury` is authorized for rebalancing in `cxd-treasury.clar`.

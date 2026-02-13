@@ -6,6 +6,7 @@
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u6000)
+(define-constant ERR_EXECUTION_FAILED u6001)
 
 ;; State (using heights for Dual-Clock precision in Simnet)
 (define-data-var last-action-height uint u0)
@@ -16,7 +17,7 @@
 
 (define-public (process-signal (proposal-id uint) (proposal-contract <proposal-trait>))
   (begin
-    (asserts! (unwrap-panic (contract-call? .admin-facade is-authorized u4)) (err ERR_UNAUTHORIZED)) ;; ROLE_OPERATOR
+    (asserts! (is-eq (contract-call? .admin-facade is-authorized u4) (ok true)) (err ERR_UNAUTHORIZED)) ;; ROLE_OPERATOR
     (var-set last-action-height block-height)
     (contract-call? proposal-contract execute tx-sender)
   )
@@ -24,7 +25,7 @@
 
 (define-public (trigger-emergency-pause)
   (begin
-    (asserts! (unwrap-panic (contract-call? .admin-facade is-authorized u4)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq (contract-call? .admin-facade is-authorized u4) (ok true)) (err ERR_UNAUTHORIZED))
     (try! (contract-call? .conxian-protocol pause))
     (print { event: "emergency-pause-triggered", caller: tx-sender, block: burn-block-height })
     (ok true)
@@ -42,13 +43,12 @@
   (let (
     (current-stx-height block-height)
     (current-btc-height burn-block-height)
-    ;; Clarity 4 Vision: (current-time stacks-block-time)
   )
     (begin
       ;; 1. FAST PATH CHECK (DEX Protection)
       (if (>= (- current-stx-height (var-get last-fast-check)) u12)
         (begin
-          (unwrap-panic (contract-call? .swap-router update-volatility-fees))
+          (try! (contract-call? .swap-router update-volatility-fees))
           (var-set last-fast-check current-stx-height)
         )
         false
@@ -57,8 +57,8 @@
       ;; 2. SLOW PATH CHECK (Treasury/Risk)
       (if (>= (- current-btc-height (var-get last-slow-check)) u1)
         (begin
-          (unwrap-panic (contract-call? .agent-treasury run-fiscal-strategy))
-          (unwrap-panic (contract-call? .agent-risk update-pid-rates))
+          (try! (contract-call? .agent-treasury run-fiscal-strategy))
+          (try! (contract-call? .agent-risk update-pid-rates))
           (var-set last-slow-check current-btc-height)
         )
         false

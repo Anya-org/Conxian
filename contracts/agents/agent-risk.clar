@@ -11,6 +11,7 @@
 
 (define-constant ERR_UNAUTHORIZED u1001)
 (define-constant ERR_INVALID_PARAMETERS u1005)
+(define-constant ERR_ORACLE_FAILURE u1006)
 
 (define-data-var contract-owner principal tx-sender)
 (define-data-var max-leverage uint u2000)
@@ -74,7 +75,7 @@
 ;; @desc Calculates Global Collateral Ratio (GCR)
 ;; GCR = (Total Collateral / Total Debt) * 100
 ;; Factor in Predictive Perception for early warning.
-(define-read-only (get-gcr)
+(define-read-only (get-gcr-internal)
   (let (
     (score (assess-system-risk))
     (cxd-reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: u0 }
@@ -84,8 +85,8 @@
     (metric-gcr (if (> (var-get mock-gcr) u0) (var-get mock-gcr) (if (is-eq total-borrows u0) u10000 (/ (* total-deposits u100) total-borrows))))
   )
     (if (>= score u5000)
-      (ok u105) ;; Force Crisis state for high risk scores (e.g. market crash)
-      (ok metric-gcr)
+      u105 ;; Force Crisis state for high risk scores (e.g. market crash)
+      metric-gcr
     )
   )
 )
@@ -96,7 +97,7 @@
   (begin
     (asserts! (or (is-eq contract-caller .ops-engine) (is-eq tx-sender (var-get contract-owner))) (err ERR_UNAUTHORIZED))
     (let (
-      (current-price (unwrap-panic (contract-call? .oracle-aggregator get-price .cxd-token)))
+      (current-price (try! (contract-call? .oracle-aggregator get-price .cxd-token)))
       (target-price PRICE_TARGET)
       (error (- (to-int target-price) (to-int current-price)))
       (prev-error (var-get last-price-error))
@@ -166,7 +167,7 @@
 (define-read-only (get-cybernetic-intel)
   (let (
     (risk-score (assess-system-risk))
-    (gcr (unwrap-panic (get-gcr)))
+    (gcr (get-gcr-internal))
     (pid-fee (var-get stability-fee))
   )
     {
@@ -244,4 +245,8 @@
     (var-set mock-gcr new-gcr)
     (ok true)
   )
+)
+
+(define-read-only (get-gcr)
+  (ok (get-gcr-internal))
 )
