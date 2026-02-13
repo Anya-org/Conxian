@@ -147,7 +147,7 @@
       (match (map-get? asset-twap-data { asset: asset })
         twap-data
           (let ((time-diff (- current-timestamp (get last-timestamp twap-data)))
-                (last-price (get price (unwrap-panic (map-get? asset-sources { asset: asset })))))
+                (last-price (default-to u0 (get price (map-get? asset-sources { asset: asset })))))
             (map-set asset-twap-data { asset: asset } {
               price-cumulative: (+ (get price-cumulative twap-data) (* last-price time-diff)),
               last-timestamp: current-timestamp
@@ -238,7 +238,7 @@
   (match (map-get? asset-twap-data { asset: asset })
     twap-data
       (let ((time-diff (- (get-burn-block-height) (get last-timestamp twap-data)))
-            (last-price (get price (unwrap-panic (map-get? asset-sources { asset: asset })))))
+            (last-price (default-to u0 (get price (map-get? asset-sources { asset: asset })))))
         (if (is-eq time-diff u0)
           (ok last-price)
           (ok (/ (+ (get price-cumulative twap-data) (* last-price time-diff)) time-diff))
