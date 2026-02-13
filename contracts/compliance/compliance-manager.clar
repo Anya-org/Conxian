@@ -10,8 +10,8 @@
 (define-data-var contract-owner principal tx-sender)
 (define-data-var sanctions-provider principal tx-sender)
 
-;; 24-hour validity period (144 blocks)
-(define-constant VALIDITY_PERIOD u144)
+;; 24-hour validity period (86400 seconds)
+(define-constant VALIDITY_PERIOD u86400)
 
 (define-map compliance-records
     principal
@@ -70,13 +70,13 @@
             sanctions-checked: sanctions-checked,
             kyc-level: kyc-level,
             travel-rule-checked: travel-rule-checked,
-            last-updated: burn-block-height
+            last-updated: stacks-block-time
         })
         (print {
             event: "compliance-checked",
             user: user,
             kyc-level: kyc-level,
-            timestamp: burn-block-height
+            timestamp: stacks-block-time
         })
         (ok true)
     )
@@ -90,7 +90,7 @@
 (define-read-only (is-compliant (user principal))
     (let ((record (map-get? compliance-records user)))
         (match record
-            data (if (> (- burn-block-height (get last-updated data)) VALIDITY_PERIOD)
+            data (if (> (- stacks-block-time (get last-updated data)) VALIDITY_PERIOD)
                     false
                     (get sanctions-checked data))
             false

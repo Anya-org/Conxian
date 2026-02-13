@@ -8,8 +8,8 @@
 (define-constant ERR_UNAUTHORIZED u6000)
 (define-constant ERR_EXECUTION_FAILED u6001)
 
-;; State (using heights for Dual-Clock precision in Simnet)
-(define-data-var last-action-height uint u0)
+;; State (using stacks-block-time for Dual-Clock precision)
+(define-data-var last-action-time uint u0)
 (define-data-var last-fast-check uint u0)
 (define-data-var last-slow-check uint u0)
 
@@ -18,7 +18,7 @@
 (define-public (process-signal (proposal-id uint) (proposal-contract <proposal-trait>))
   (begin
     (asserts! (is-eq (contract-call? .admin-facade is-authorized u4) (ok true)) (err ERR_UNAUTHORIZED)) ;; ROLE_OPERATOR
-    (var-set last-action-height block-height)
+    (var-set last-action-time stacks-block-time)
     (contract-call? proposal-contract execute tx-sender)
   )
 )
@@ -27,39 +27,38 @@
   (begin
     (asserts! (is-eq (contract-call? .admin-facade is-authorized u4) (ok true)) (err ERR_UNAUTHORIZED))
     (try! (contract-call? .conxian-protocol pause))
-    (print { event: "emergency-pause-triggered", caller: tx-sender, block: burn-block-height })
+    (print { event: "emergency-pause-triggered", caller: tx-sender, timestamp: stacks-block-time })
     (ok true)
   )
 )
 
 (define-read-only (get-last-action)
-  (ok (var-get last-action-height))
+  (ok (var-get last-action-time))
 )
 
 ;; @desc Trigger the Dual-Clock epoch update.
-;; Fast Gear: Reflexes (DEX Fees) via Stacks block-height (target ~1 min / 12 blocks).
-;; Slow Gear: Strategy (Fiscal Dam) via Bitcoin burn-block-height (target ~10 min / 1 block).
+;; Fast Gear: Reflexes (DEX Fees) via stacks-block-time (target ~1 min / 60s).
+;; Slow Gear: Strategy (Fiscal Dam) via stacks-block-time (target ~10 min / 600s).
 (define-public (trigger-epoch-update)
   (let (
-    (current-stx-height block-height)
-    (current-btc-height burn-block-height)
+    (current-time stacks-block-time)
   )
     (begin
       ;; 1. FAST PATH CHECK (DEX Protection)
-      (if (>= (- current-stx-height (var-get last-fast-check)) u12)
+      (if (>= (- current-time (var-get last-fast-check)) u60)
         (begin
           (try! (contract-call? .swap-router update-volatility-fees))
-          (var-set last-fast-check current-stx-height)
+          (var-set last-fast-check current-time)
         )
         false
       )
 
       ;; 2. SLOW PATH CHECK (Treasury/Risk)
-      (if (>= (- current-btc-height (var-get last-slow-check)) u1)
+      (if (>= (- current-time (var-get last-slow-check)) u600)
         (begin
           (try! (contract-call? .agent-treasury run-fiscal-strategy))
           (try! (contract-call? .agent-risk update-pid-rates))
-          (var-set last-slow-check current-btc-height)
+          (var-set last-slow-check current-time)
         )
         false
       )
@@ -70,8 +69,7 @@
       (print {
         event: "epoch-updated",
         keeper: tx-sender,
-        stx-height: current-stx-height,
-        btc-height: current-btc-height
+        timestamp: current-time
       })
       (ok true)
     )

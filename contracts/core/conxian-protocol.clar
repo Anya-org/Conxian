@@ -36,7 +36,7 @@
   (begin
     (asserts! (contract-call? .admin-facade is-authorized-to-pause tx-sender) (err ERR_UNAUTHORIZED))
     (var-set paused new-paused)
-    (print { event: "protocol-pause-status", paused: new-paused, timestamp: u123456789 })
+    (print { event: "protocol-pause-status", paused: new-paused, timestamp: stacks-block-time })
     (ok true)
   )
 )
@@ -48,14 +48,14 @@
 (define-public (register-module (name (string-ascii 32)) (contract principal))
   (begin
     (asserts! (unwrap! (contract-call? .admin-facade is-authorized ROLE_ADMIN) (err ERR_UNAUTHORIZED)) (err ERR_UNAUTHORIZED))
-    ;; Clarity 4 Vision: (let ((c-hash (contract-hash? contract))) ...)
-    (let ((c-hash (some 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20)))
+    ;; Native Clarity 4 contract-hash? validation
+    (let ((c-hash (contract-hash? contract)))
       (map-set modules { name: name } {
         contract: contract,
         active: true,
         hash: c-hash
       })
-      (print { event: "module-registered", name: name, contract: contract, hash: c-hash, timestamp: u123456789 })
+      (print { event: "module-registered", name: name, contract: contract, hash: c-hash, timestamp: stacks-block-time })
       (ok true)
     )
   )
@@ -70,11 +70,11 @@
 
 (define-private (register-module-iter (entry {name: (string-ascii 32), contract: principal}) (previous bool))
   (begin
-    ;; Clarity 4 Vision: hash: (contract-hash? (get contract entry))
+    ;; Native Clarity 4 contract-hash? validation
     (map-set modules { name: (get name entry) } {
       contract: (get contract entry),
       active: true,
-      hash: (some 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20)
+      hash: (contract-hash? (get contract entry))
     })
     true
   )
@@ -127,6 +127,6 @@
     tenure-id: (some (contract-call? .block-utils get-current-tenure-id)),
     compliant: true,
     version: "C4",
-    timestamp: u123456789
+    timestamp: stacks-block-time
   })
 )

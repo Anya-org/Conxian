@@ -10,7 +10,7 @@
 - **Human-Readable Audits**: Implemented `to-ascii?` in `regulatory-adapter.clar` to generate readable on-chain audit trails.
 
 ### Changed
-- **Temporal Alignment**: Replaced all height-based proxies with native `stacks-block-time` (Unix seconds) across `cxd-staking.clar`, `founder-vesting.clar`, `voting.clar`, and `ops-engine.clar`.
+- **Temporal Alignment**: Replaced all height-based proxies with native `stacks-block-time` (Unix seconds) across `cxd-staking.clar`, `founder-vesting.clar`, `voting.clar`, `ops-engine.clar`, and `compliance-manager.clar`.
 - **Tenure Logic**: Refactored `block-utils.clar` to use `stacks-block-height` for Nakamoto-era tenure tracking.
 - **Protocol Status**: Enhanced `get-protocol-status` schema to include global timestamps and module hash tracking.
 
