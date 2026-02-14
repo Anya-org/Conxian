@@ -55,7 +55,7 @@
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set compliance-status { user: user } {
       clean-hands: true,
-      verified-at: burn-block-height,
+      verified-at: stacks-block-time,
       jurisdiction: jurisdiction,
       tier: tier
     })
@@ -69,12 +69,12 @@
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set blacklist user true)
-    ;; Human-readable audit trails (Clarity 4 Vision)
+    ;; Human-readable audit trails (Clarity 4 Native)
     (print {
       event: "user-blacklisted",
       user: user,
-      audit-time: burn-block-height,
-      status: "LOCKED"
+      audit-time: stacks-block-time,
+      status: (to-ascii? 0x4c4f434b4544)
     })
     (ok true)
   )
@@ -85,7 +85,7 @@
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-delete blacklist user)
-    (print { event: "user-removed-from-blacklist", user: user, timestamp: burn-block-height })
+    (print { event: "user-removed-from-blacklist", user: user, timestamp: stacks-block-time })
     (ok true)
   )
 )

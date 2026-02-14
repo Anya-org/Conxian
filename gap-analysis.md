@@ -35,9 +35,11 @@ As of February 2026, the Conxian Protocol (SAXDaaP) has completed its first stag
 | **Validation** | **Module Registry** | Principal-based verification with C4 hash hooks. |
 | **Revenue Model** | **CXIP-013 Verified** | 6-way dynamic split (Treasury, Bounty, LP, etc.) active. |
 
-## 4. Residual Risks
-1. **Toolchain Alignment**: Full activation of Clarity 4 features depends on simulation environment updates.
-2. **Oracle Dependency**: PID controller efficiency depends on the frequency of `trigger-epoch-update` calls by keepers.
+## 4. Residual Risks (Brutally Honest Investment View)
+1. **Toolchain Alignment**: While the protocol is now fully refactored to the Clarity 4 Mainnet Standard, local simulation (Clarinet SDK 3.13.x) remains in a "dead zone" where native C4 keywords may not yet resolve correctly, requiring testnet validation for final verification.
+2. **Oracle Dependency**: The protocol's heartbeat (Dual-Clock) relies on the frequency of `trigger-epoch-update` calls. Any stagnation in keeper activity could lead to stale fiscal parameters.
+3. **Complexity Debt**: The interconnectedness of 53+ contracts and a 5-token model (CXD, CXVG, CXS, CXTR, CXLP) creates a significant attack surface. A failure in the PID controller logic could lead to systematic "Peg Ringing."
+4. **Sovereignty Conflicts**: Jurisdictional "Code as Law" mandates may conflict with the protocol's autonomous nature, particularly regarding the `regulatory-authority` intervention capabilities in the adapter.
 
 ## 5. Conclusion
 The Conxian Protocol is technically superior and production-ready. The Fiscal Dam V4 and Dual-Clock standards are implemented as the protocol's "Heartbeat", providing unprecedented autonomous stability for a Bitcoin-native platform.

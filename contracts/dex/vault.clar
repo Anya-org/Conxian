@@ -109,15 +109,15 @@
         owner: tx-sender,
         vault-type: vault-type,
         tokens: tokens,
-        created-at: u123456789,
-        last-updated: u123456789,
+        created-at: stacks-block-time,
+        last-updated: stacks-block-time,
         active: true,
         metadata: metadata,
         cooldown-end: u0
       })
       
       (var-set total-vaults (+ (var-get total-vaults) u1))
-      (print { event: "vault-created", vault-id: vault-id, owner: tx-sender, vault-type: vault-type, timestamp: u123456789 })
+      (print { event: "vault-created", vault-id: vault-id, owner: tx-sender, vault-type: vault-type, timestamp: stacks-block-time })
       (ok vault-id)
     )
   )
@@ -140,7 +140,7 @@
     (let ((current-balance (default-to u0 (map-get? vault-balances { vault-id: vault-id, token: token }))))
       (map-set vault-balances { vault-id: vault-id, token: token } (+ current-balance amount))
       (var-set total-deposits (+ (var-get total-deposits) u1))
-      (print { event: "vault-deposited", vault-id: vault-id, token: token, amount: amount, timestamp: u123456789 })
+      (print { event: "vault-deposited", vault-id: vault-id, token: token, amount: amount, timestamp: stacks-block-time })
       (ok true)
     )
   )
@@ -161,13 +161,13 @@
 
     ;; Native Clarity 4 asset restriction (2026 standard)
     ;; restrict-assets? returns true if successful
-    (asserts! true (err ERR_UNAUTHORIZED_ACCESS))
+    (asserts! (restrict-assets?) (err ERR_UNAUTHORIZED_ACCESS))
 
     (try! (as-contract (contract-call? token-trait transfer amount (as-contract tx-sender) (get owner vault-info) none)))
     
     (map-set vault-balances { vault-id: vault-id, token: token } (- current-balance amount))
     (var-set total-withdrawals (+ (var-get total-withdrawals) u1))
-    (print { event: "vault-withdrawn", vault-id: vault-id, token: token, amount: amount, timestamp: u123456789 })
+    (print { event: "vault-withdrawn", vault-id: vault-id, token: token, amount: amount, timestamp: stacks-block-time })
     (ok true)
   )
 )

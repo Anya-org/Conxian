@@ -27,7 +27,7 @@ permalink: /docs/ROADMAP/
 
 - **Regulatory Hardening**: Expansion of `regulatory-adapter` to include MiCA-compliant reporting, passporting, and VASP registration. [IN PROGRESS]
 - **Enterprise Vaults**: Advanced sBTC integration and institutional yield aggregation. [PLANNED]
-- **Clarity 4 Production Vision**: Implementation of next-gen Stacks primitives (stacks-block-time, contract-hash?). [IN PROGRESS]
+- **Clarity 4 Mainnet Standard**: Full migration to Clarity 4 (Epoch 3.0) with native `stacks-block-time`, `contract-hash?`, `secp256r1-verify`, and `restrict-assets?`. [COMPLETED]
 - **Multi-Council Expansion**: Activation of specialized token governance (CXS, CXTR, CXLP).
 - **Security Audits**: Comprehensive cross-contract audit of the "Full Truth" codebase.
 

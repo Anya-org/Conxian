@@ -49,9 +49,9 @@ The protocol utilizes a Facade Pattern to separate user interaction from core lo
 ## 6. Technical Specifications
 
 ### 6.1. Nakamoto & Tenure Alignment
-- **Compatibility Standard**: Contracts use `clarity-version = 2` and `epoch = "3.0"` for broad toolchain support (Simnet).
-- **Temporal Logic**: Uses `burn-block-height` for Bitcoin-anchored timing. Logical readiness for `stacks-block-time` (Clarity 4) is maintained.
-- **Identity**: Native `secp256r1-verify` readiness for biometric signing.
+- **Compatibility Standard**: Contracts use `clarity-version = 4` and `epoch = "3.0"` (Nakamoto Mainnet Standard).
+- **Temporal Logic**: Uses native `stacks-block-time` (Unix seconds) for all yield accrual, vesting, and governance logic. Tenure tracking utilizes `stacks-block-height`.
+- **Identity**: Fully implemented native `secp256r1-verify` for biometric/Passkey transaction signing.
 
 ### 6.2. Cybernetic Autonomous Fiscal Policy (Fiscal Dam V4)
 Revenue is dynamically distributed based on system health (Global Collateral Ratio - GCR) and Risk Scores:
@@ -84,7 +84,11 @@ Revenue is dynamically distributed based on system health (Global Collateral Rat
 - **Rate Limiting**: Implemented in `contracts/security/rate-limiter.clar`.
 - **Proof-of-Reserves**: Implemented in `contracts/security/proof-of-reserves.clar`.
 
-## 10. Implementation Status (February 2026)
+## 10. Implementation Status (February 2026 - Clarity 4 Migration Complete)
+
+### 10.0. Clarity 4 Mainnet Refactor
+- **Native Primitives**: Fully integrated `contract-hash?`, `secp256r1-verify`, `restrict-assets?`, and `to-ascii?`.
+- **Temporal Alignment**: All time-sensitive logic migrated from block-heights to second-precision `stacks-block-time`.
 
 ### 10.3. CXIP-013: Bounty-Driven Revenue Model
 - **Reworked Distribution**: Transitioned to a 5-way split (Treasury, Bounty, LP, Grants, Buy-back).

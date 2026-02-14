@@ -6,11 +6,11 @@
 (define-data-var last-tenure-id uint u0)
 
 (define-read-only (get-current-tenure-id)
-  (/ block-height BLOCKS_PER_TENURE)
+  (/ stacks-block-height BLOCKS_PER_TENURE)
 )
 
 (define-read-only (get-stacks-block-time)
-  u123456789
+  stacks-block-time
 )
 
 (define-read-only (get-burn-block-height)
@@ -20,13 +20,13 @@
 (define-read-only (get-tenure-info)
     (ok {
         tenure-id: (get-current-tenure-id),
-        block-height: block-height,
-        block-time: u123456789
+        block-height: stacks-block-height,
+        block-time: stacks-block-time
     })
 )
 
 (define-read-only (get-blocks-in-current-tenure)
-    (mod block-height BLOCKS_PER_TENURE)
+    (mod stacks-block-height BLOCKS_PER_TENURE)
 )
 
 (define-read-only (is-tenure-fresh)
