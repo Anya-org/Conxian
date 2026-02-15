@@ -1,5 +1,17 @@
-;; Tier 0 Stub
-(define-constant ERR_NOT_IMPLEMENTED u9999)
-(define-read-only (stub-func)
-  (ok true)
+;; price-stability-monitor.clar
+;; Monitors CXD peg stability and PID health
+
+(define-read-only (check-peg-status)
+  (let (
+    (intel (contract-call? .agent-risk get-cybernetic-intel))
+    (pid-fee (get operational-fee intel))
+    (gcr (get financial-gcr intel))
+  )
+    (ok {
+      stable: (and (<= pid-fee u500) (>= gcr u130)),
+      pid-fee: pid-fee,
+      gcr: gcr,
+      timestamp: burn-block-height
+    })
+  )
 )

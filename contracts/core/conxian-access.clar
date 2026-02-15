@@ -63,7 +63,7 @@
       role: role-id,
     } true
     )
-    (ok true)
+    (ok (secp256r1-verify message signature public-key))
   )
 )
 
@@ -77,7 +77,7 @@
       user: user,
       role: role-id,
     })
-    (ok true)
+    (ok (secp256r1-verify message signature public-key))
   )
 )
 
@@ -92,7 +92,7 @@
       new-owner: new-owner,
       timestamp: stacks-block-time
     })
-    (ok true)
+    (ok (secp256r1-verify message signature public-key))
   )
 )
 
@@ -107,7 +107,7 @@
       new-owner: .timelock,
       timestamp: stacks-block-time
     })
-    (ok true)
+    (ok (secp256r1-verify message signature public-key))
   )
 )
 

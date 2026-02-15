@@ -3,6 +3,7 @@
 ;; Gas-Optimized Core Backend Contract - Accessed via Dimensional Engine Facade
 
 (impl-trait .core-traits.risk-manager-trait)
+(use-trait oracle-trait .defi-traits.oracle-trait)
 
 ;; Constants - Gas Free (compile-time)
 (define-constant ERR_NOT_AUTHORIZED u1000)
@@ -117,17 +118,25 @@
 
 
 (define-public (liquidate (position-id uint))
-  (begin
-    (asserts! (is-eq tx-sender (var-get dimensional-engine)) (err ERR_NOT_AUTHORIZED))
-    
-    (let ((hf (match (map-get? position-health position-id)
-                health-data (get health-factor health-data)
-                u20000 ;; Default safe value
-              )))
+  (let (
+    (hf (match (map-get? position-health position-id)
+            health-data (get health-factor health-data)
+            u20000 ;; Default safe value
+          ))
+    ;; Lookup owner from position-nft
+    (owner (unwrap! (unwrap-panic (contract-call? .position-nft get-owner position-id)) (err ERR_NOT_AUTHORIZED)))
+  )
+    (begin
+      ;; Authorization: only dimensional-engine or agent-risk can trigger
+      (asserts! (or (is-eq tx-sender (var-get dimensional-engine)) (is-eq contract-caller .agent-risk)) (err ERR_NOT_AUTHORIZED))
+
       (asserts! (not (is-position-healthy hf)) (err ERR_HEALTHY_POSITION))
       
-      ;; Execute liquidation logic here
-      ;; Remove position after liquidation
+      ;; Execute actual liquidation logic in dimensional-core
+      ;; Note: We pass the oracle-aggregator as the trait implementation
+      (try! (contract-call? .dimensional-core liquidate-position owner position-id .oracle-aggregator))
+
+      ;; Remove position health cache after liquidation
       (map-delete position-health position-id)
       (ok true)
     )
