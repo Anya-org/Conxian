@@ -2,7 +2,7 @@
 ;; Conxian Enterprise Standard: Staking & Yield (Tier 0 Compliance)
 ;; Implements O(1) Scalable Reward Distribution with "Clean-Hands" Enforcement.
 ;; Pausable Staking (Deposits paused on emergency, Withdrawals always open).
-;; Clarity 4 Standard: Native stacks-block-time for second-precision yield.
+;; Clarity 4 Standard: Native (contract-call? .block-utils get-stacks-block-time) for second-precision yield.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
@@ -16,13 +16,18 @@
 
 ;; State
 (define-data-var staking-token principal .cxd-token)
-(define-data-var rewards-token principal .cxd-token) ;; Rewards in CXD (can be changed to other token)
+(define-data-var rewards-token principal .cxd-token) ;; Rewards in CXD
 (define-data-var regulatory-adapter-contract principal .regulatory-adapter)
 (define-data-var total-staked uint u0)
-(define-data-var reward-rate uint u0) ;; Rewards per second (Clarity 4 stacks-block-time)
+(define-data-var reward-rate uint u0)
 (define-data-var last-update-time uint u0)
 (define-data-var reward-per-token-stored uint u0)
 (define-data-var staking-paused bool false)
+
+;; Authorized Callers (Breaking Circular Dependencies)
+(define-data-var ops-engine-principal principal tx-sender)
+(define-data-var agent-risk-principal principal tx-sender)
+(define-data-var agent-treasury-principal principal tx-sender)
 
 ;; Maps
 (define-map user-balance
@@ -48,210 +53,86 @@
   )
 )
 
-;; --- Math & View ---
+;; --- Reward Calculation Logic ---
 
-(define-read-only (get-total-staked)
-  (var-get total-staked)
-)
-
-(define-read-only (get-balance (account principal))
-  (default-to u0 (map-get? user-balance account))
-)
-
-(define-read-only (get-reward-per-token)
-  (let ((total (var-get total-staked)))
-    (if (is-eq total u0)
-      (var-get reward-per-token-stored)
-      (+ (var-get reward-per-token-stored)
-        (/
-          (* (- stacks-block-time (var-get last-update-time)) (var-get reward-rate)
-            u1000000 ;; Precision Factor
-          )
-          total
-        ))
-    )
+(define-read-only (reward-per-token)
+  (if (is-eq (var-get total-staked) u0)
+    (var-get reward-per-token-stored)
+    (+ (var-get reward-per-token-stored)
+       (/ (* (var-get reward-rate)
+             (- (contract-call? .block-utils get-stacks-block-time) (var-get last-update-time))
+             u1000000)
+          (var-get total-staked)))
   )
 )
 
 (define-read-only (earned (account principal))
-  (let (
-      (balance (get-balance account))
-      (per-token (get-reward-per-token))
-      (paid (default-to u0 (map-get? user-reward-per-token-paid account)))
-      (rewards (default-to u0 (map-get? user-rewards account)))
-    )
-    (/ (+ (* balance (- per-token paid)) (* rewards u1000000)) u1000000)
-  )
+  (+ (/ (* (unwrap-panic (get-user-balance account))
+           (- (reward-per-token) (default-to u0 (map-get? user-reward-per-token-paid account))))
+        u1000000)
+     (default-to u0 (map-get? user-rewards account)))
 )
-
-;; --- Core Actions ---
 
 (define-private (update-reward (account principal))
-  (let ((new-per-token (get-reward-per-token)))
-    (var-set reward-per-token-stored new-per-token)
-    (var-set last-update-time stacks-block-time)
-    (if (not (is-eq account tx-sender))
-      true ;; No-op if just updating global
-      (begin
-        (map-set user-rewards account (earned account))
-        (map-set user-reward-per-token-paid account new-per-token)
-        true
-      )
-    )
+  (begin
+    (var-set reward-per-token-stored (reward-per-token))
+    (var-set last-update-time (contract-call? .block-utils get-stacks-block-time))
+    (map-set user-rewards account (earned account))
+    (map-set user-reward-per-token-paid account (var-get reward-per-token-stored))
   )
 )
 
-(define-public (stake
-    (amount uint)
-    (token <sip-010-ft-trait>)
-  )
+;; --- Public Functions ---
+
+(define-public (stake (amount uint))
   (begin
-    ;; Fail if paused
     (asserts! (not (var-get staking-paused)) (err ERR_PAUSED))
-    (asserts! (check-compliance tx-sender) (err ERR_NON_COMPLIANT))
-    (asserts! (is-eq (contract-of token) (var-get staking-token))
-      (err ERR_UNAUTHORIZED)
-    )
     (asserts! (> amount u0) (err ERR_ZERO_STAKE))
-
+    (asserts! (check-compliance tx-sender) (err ERR_NON_COMPLIANT))
     (update-reward tx-sender)
-
-    (try! (contract-call? token transfer amount tx-sender (as-contract tx-sender) none))
-
+    (try! (contract-call? .cxd-token transfer amount tx-sender (as-contract tx-sender) none))
     (var-set total-staked (+ (var-get total-staked) amount))
-    (map-set user-balance tx-sender (+ (get-balance tx-sender) amount))
-
-    (print {
-      event: "stake",
-      user: tx-sender,
-      amount: amount,
-      timestamp: stacks-block-time
-    })
+    (map-set user-balance tx-sender (+ (unwrap-panic (get-user-balance tx-sender)) amount))
     (ok true)
   )
 )
 
-(define-public (withdraw
-    (amount uint)
-    (token <sip-010-ft-trait>)
-  )
+(define-public (withdraw (amount uint))
   (begin
-    ;; Withdrawals are allowed even if paused (User Protection Ethos)
-    (asserts! (check-compliance tx-sender) (err ERR_NON_COMPLIANT))
-    (asserts! (is-eq (contract-of token) (var-get staking-token))
-      (err ERR_UNAUTHORIZED)
-    )
     (asserts! (> amount u0) (err ERR_ZERO_STAKE))
-    (asserts! (>= (get-balance tx-sender) amount) (err ERR_ZERO_STAKE))
-
-    (update-reward tx-sender)
-
-    (var-set total-staked (- (var-get total-staked) amount))
-    (map-set user-balance tx-sender (- (get-balance tx-sender) amount))
-
-    (as-contract (try! (contract-call? token transfer amount tx-sender tx-sender none)))
-
-    (print {
-      event: "withdraw",
-      user: tx-sender,
-      amount: amount,
-      timestamp: stacks-block-time
-    })
-    (ok true)
-  )
-)
-
-(define-public (get-reward (token <sip-010-ft-trait>))
-  (let ((reward (earned tx-sender)))
-    (asserts! (check-compliance tx-sender) (err ERR_NON_COMPLIANT))
-    (asserts! (is-eq (contract-of token) (var-get rewards-token))
-      (err ERR_UNAUTHORIZED)
-    )
-
-    (update-reward tx-sender)
-    (map-set user-rewards tx-sender u0)
-
-    (if (> reward u0)
-      (as-contract (try! (contract-call? token transfer reward tx-sender tx-sender none)))
-      true
-    )
-
-    (print {
-      event: "get-reward",
-      user: tx-sender,
-      amount: reward,
-      timestamp: stacks-block-time
-    })
-    (ok reward)
-  )
-)
-
-(define-public (exit
-    (staking-token-trait <sip-010-ft-trait>)
-    (rewards-token-trait <sip-010-ft-trait>)
-  )
-  (begin
-    (try! (withdraw (get-balance tx-sender) staking-token-trait))
-    (get-reward rewards-token-trait)
-  )
-)
-
-;; --- Admin ---
-
-(define-data-var rewards-duration uint u604800) ;; 1 week in seconds (Clarity 4 Standard)
-(define-data-var period-finish uint u0)
-
-(define-public (set-rewards-duration (duration uint))
-  (begin
-    (asserts! (or (is-eq tx-sender .agent-treasury) (is-eq tx-sender .conxian-operations-engine)) (err ERR_UNAUTHORIZED))
-    (var-set rewards-duration duration)
-    (ok true)
-  )
-)
-
-(define-public (sync-rewards (rewards-trait <sip-010-ft-trait>))
-  (begin
-    (asserts! (is-eq (contract-of rewards-trait) (var-get rewards-token)) (err ERR_UNAUTHORIZED))
-    (update-reward tx-sender)
-    (ok true)
-  )
-)
-
-(define-public (notify-reward-amount (amount uint) (token <sip-010-ft-trait>))
-  (let (
-    (duration (var-get rewards-duration))
-    (timestamp stacks-block-time)
-  )
-    (begin
-      (asserts! (or (is-eq tx-sender .agent-treasury) (is-eq tx-sender .conxian-operations-engine) (is-eq tx-sender .revenue-distributor)) (err ERR_UNAUTHORIZED))
-      (asserts! (is-eq (contract-of token) (var-get rewards-token)) (err ERR_UNAUTHORIZED))
-      
+    (let ((balance (unwrap-panic (get-user-balance tx-sender))))
+      (asserts! (>= balance amount) (err ERR_UNAUTHORIZED))
       (update-reward tx-sender)
-      
-      (if (>= timestamp (var-get period-finish))
-        (var-set reward-rate (/ amount duration))
-        (let (
-          (remaining (- (var-get period-finish) timestamp))
-          (leftover (* remaining (var-get reward-rate)))
-        )
-          (var-set reward-rate (/ (+ amount leftover) duration))
-        )
-      )
-      
-      (var-set last-update-time timestamp)
-      (var-set period-finish (+ timestamp duration))
-      
-      (print { event: "notify-reward", amount: amount, rate: (var-get reward-rate), timestamp: stacks-block-time })
+      (try! (as-contract (contract-call? .cxd-token transfer amount tx-sender tx-sender none)))
+      (var-set total-staked (- (var-get total-staked) amount))
+      (map-set user-balance tx-sender (- balance amount))
       (ok true)
     )
   )
 )
 
+(define-public (get-reward)
+  (begin
+    (update-reward tx-sender)
+    (let ((reward (default-to u0 (map-get? user-rewards tx-sender))))
+      (if (> reward u0)
+        (begin
+          (map-set user-rewards tx-sender u0)
+          (try! (as-contract (contract-call? .cxd-token transfer reward tx-sender tx-sender none)))
+          (ok reward)
+        )
+        (ok u0)
+      )
+    )
+  )
+)
+
+;; --- Admin/Agent Functions ---
+
 (define-public (set-reward-rate (rate uint))
   (begin
-    ;; Controlled by Agent Treasury or Ops Engine
     (asserts!
-      (or (is-eq tx-sender .agent-treasury) (is-eq tx-sender .conxian-operations-engine))
+      (or (is-eq tx-sender (var-get agent-treasury-principal)) (is-eq tx-sender (var-get ops-engine-principal)))
       (err ERR_UNAUTHORIZED)
     )
     (update-reward tx-sender)
@@ -262,17 +143,40 @@
 
 (define-public (set-paused (paused bool))
   (begin
-    ;; Controlled by Ops Engine or Risk Agent (Emergency)
     (asserts!
-      (or (is-eq tx-sender .conxian-operations-engine) (is-eq tx-sender .agent-risk))
+      (or (is-eq tx-sender (var-get ops-engine-principal)) (is-eq tx-sender (var-get agent-risk-principal)))
       (err ERR_UNAUTHORIZED)
     )
     (var-set staking-paused paused)
     (print {
       event: "staking-pause-update",
       paused: paused,
-      timestamp: stacks-block-time
+      timestamp: (contract-call? .block-utils get-stacks-block-time)
     })
     (ok true)
   )
+)
+
+(define-public (set-authorized-principals (ops principal) (risk principal) (treasury principal))
+  (begin
+    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-owner)) (err ERR_UNAUTHORIZED))
+    (var-set ops-engine-principal ops)
+    (var-set agent-risk-principal risk)
+    (var-set agent-treasury-principal treasury)
+    (ok true)
+  )
+)
+
+;; --- Read-Only Functions ---
+
+(define-read-only (get-user-balance (user principal))
+  (ok (default-to u0 (map-get? user-balance user)))
+)
+
+(define-read-only (get-staking-stats)
+  {
+    total-staked: (var-get total-staked),
+    reward-rate: (var-get reward-rate),
+    staking-paused: (var-get staking-paused)
+  }
 )

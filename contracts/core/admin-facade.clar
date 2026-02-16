@@ -17,7 +17,7 @@
 (define-constant ROLE_TREASURY_ADMIN u3)
 
 ;; State
-(define-data-var rbac-contract principal (var-get access-contract))
+(define-data-var rbac-contract principal .conxian-access)
 (define-data-var global-admin principal tx-sender)
 (define-data-var emergency-pause bool false)
 (define-data-var max-batch-size uint u100)

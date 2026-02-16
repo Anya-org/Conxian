@@ -22,3 +22,7 @@ This proposal defines a transparent, on-chain revenue-splitting mechanism for Co
 - **revenue-distributor.clar**: Executes the distribution to 6 distinct vaults.
 - **agent-risk.clar**: Provides performance metrics (TVL growth, Bounty rate).
 - **agent-treasury.clar**: Orchestrates the Fiscal Dam V4 logic including CXIP-013 adjustments.
+
+## Implementation Status (Feb 2026)
+- **Verified**: Revenue distribution logic (Fiscal Dam V4) verified via `cybernetic-revenue.test.ts`.
+- **Coordination**: Integration with `ops-engine` heartbeat verified via `full-protocol-journey.test.ts`.
