@@ -20,6 +20,7 @@
 
 ;; State
 (define-data-var contract-owner principal tx-sender)
+(define-data-var timelock-principal principal tx-sender)
 (define-map roles
   {
     user: principal,
@@ -113,11 +114,11 @@
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (asserts! (secp256r1-verify message signature public-key) (err ERR_INVALID_SIGNATURE))
-    (var-set contract-owner .timelock)
+    (var-set contract-owner (var-get timelock-principal))
     (print {
       event: "sovereign-handoff",
       module: "conxian-access",
-      new-owner: .timelock,
+      new-owner: (var-get timelock-principal),
       timestamp: stacks-block-time
     })
     (ok true)
@@ -137,4 +138,12 @@
 ;; Read-only: Global Admin Check
 (define-read-only (is-global-admin)
   (is-admin tx-sender)
+)
+
+(define-public (set-timelock-principal (new-timelock principal))
+  (begin
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (var-set timelock-principal new-timelock)
+    (ok true)
+  )
 )

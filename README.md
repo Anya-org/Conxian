@@ -26,19 +26,18 @@ Conxian is a **Sovereign Autonomous Business (SAB)** where human discretion is r
 
 ### 💰 **Autonomous Fiscal Policy (Cybernetic)**
 
-The protocol employs active **Revenue Collection** levers to fund its ecosystem:
+The protocol employs active **Revenue Collection** levers to fund its ecosystem (The Fiscal Dam V4):
 - **Lending**: 10% Reserve Factor on all borrow interest.
 - **DEX**: ~16% Protocol Fee on all swaps.
 - **Subscription**: Governance-tuned access fees.
 
-Total revenue is dynamically distributed via the **Fiscal Dam** system (V3 Cybernetic Logic):
-- **Staking (Dividends)**: Rewards to `cxd-staking` participants (60% Equilibrium target, scales up to 80% in Abundance).
-- **Operational Treasury**: Protocol development and autonomous staff expenses (20% Equilibrium target, scales down to 0% in Crisis).
-- **Insurance Fund**: Systematic risk reserve (20% Equilibrium target, scales up to 100% in Crisis).
+Total revenue is dynamically distributed via the **Fiscal Dam** system (CXIP-013 Performance-Adjusted):
+- **Baseline Allocation**: 45% Treasury, 30% Bounty, 15% LP Incentives, 5% Grants, 5% Buy-back.
+- **Dynamic Adjustments**: Revenue split shifts based on Global Collateral Ratio (GCR) and system risk scores (Crisis, Stability, Abundance).
 
 ## Technical Stack
 
-- **Clarity 2/3**: Nakamoto-aligned (Epoch 3.0) utilizing `burn-block-height` for Bitcoin anchoring. Currently back-ported to Clarity 2 for Simnet compatibility while remaining logically ready for Clarity 4 (Epoch 3.1).
+- **Clarity 4**: Nakamoto-native (Epoch 3.0) utilizing `stacks-block-time` for precision and `burn-block-height` for Bitcoin tenure.
 - **Tenure Awareness**: Logic is aware of Stacks block tenures via `block-utils` for deterministic execution.
 - **Facade Pattern**: All core logic accessed via dimensional facades and consolidated traits.
 - **Hybrid Oracle**: Aggregated Pyth, Redstone, and Switchboard feeds with deviation guards.
@@ -92,19 +91,22 @@ For contribution guidelines, please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Status
 
-- **Maturity Level**: 🟡 **Foundational Stable** (Documentation Alignment Finalized - Feb 2026)
+- **Maturity Level**: 🟢 **Foundational Stable** (Root-to-Leaf Overhaul - Feb 2026)
 - **Performance**: ⚡ **[Verified Benchmarks](docs/BENCHMARKS.md)** (Avg. < 20ms execution)
 - **Strategy**: 📖 **[Research & Strategic Analysis](docs/RESEARCH.md)** (2026 Update)
 - **Completed Repairs**:
+  - ✅ **Root-to-Leaf Consolidation**: Liquidation logic centralized in `risk-manager`.
+  - ✅ **TVL Normalization**: Repaired cross-token decimal aggregation in `finance-metrics`.
+  - ✅ **Monitoring Activation**: Live telemetry dashboard enabled.
   - ✅ P1: Sovereign Handoff (timelock execution, admin transfers)
   - ✅ P2: Regulatory Gaps (compliance provider system, KYC/AML)
-  - ✅ P3: Tokenomics Clarity (supply caps, 60/20/20 immutability in `cxd-treasury`)
+  - ✅ P3: Tokenomics Clarity (1B CXD supply cap, Fiscal Dam V4)
   - ✅ P4: ICO Hardening (compliance gating, purchase caps)
   - ✅ P5: NFT Economics (CXLP Position NFT implementation)
   - ✅ P6: Operational Safety (rate limiter, proof-of-reserves)
 - **Architecture**: Full Truth Alignment achieved across Core, DEX, Governance, Economics, and Security.
 - **Nakamoto Ready**: All contracts use `burn-block-height` and Epoch 3.0 standards.
-- **Next Phase**: Security audit preparation and testnet deployment.
+- **Testing Status**: Circular dependency issues identified in Simnet environment. Core logic syntactically verified.
 
 ---
 

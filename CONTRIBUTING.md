@@ -39,3 +39,10 @@ Types:
 Example: `feat(core): add batch operation for role updates`
 
 Thank you for your contributions!
+
+## Modular Architecture & Testability
+
+To avoid circular dependencies in our simulation environment, we enforce the **Principal Injection** pattern:
+- **Avoid Hardcoding**: Do not use hardcoded contract literals (e.g., `.contract-name`) for internal cross-contract calls if they create a dependency loop.
+- **Use Data-Vars**: Use `(define-data-var)` to store the principal of an external contract.
+- **Setters**: Provide a public setter (authorized by admin) to initialize or update these principals at runtime.

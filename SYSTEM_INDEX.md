@@ -2,87 +2,50 @@
 
 This document provides a comprehensive index of the Conxian Protocol, outlining its modules, contracts, and interworkings.
 
-## 1. Core Architecture
+## 1. Core Architecture (Root-to-Leaf Model)
 
-The protocol is designed as a modular system with a central registry and a facade-based entry point.
+The protocol is designed as a modular system with a central registry and specialized decision-making hubs.
 
 ### Monitoring & Analytics
-- **`monitoring-dashboard.clar`**: Real-time health monitoring, reporting system status (HEALTHY, DEFENSIVE, CRISIS).
-- **`finance-metrics.clar`**: Unified financial reporting, calculating protocol-wide TVL and CXD supply.
+- **`monitoring-dashboard.clar`**: Real-time health monitoring, reporting system status (HEALTHY, DEFENSIVE, CRISIS) integrated with live financial telemetry.
+- **`finance-metrics.clar`**: Unified financial reporting, calculating protocol-wide TVL with cross-token decimal normalization (STX/CXD).
 - **`price-stability-monitor.clar`**: Tracks CXD peg stability and PID controller health.
-- **`analytics-aggregator.clar`**: Consolidates protocol events (swaps, fees) for off-chain analytics.
 
-### Central Registry
-- **`conxian-protocol.clar`**: The source of truth for all active modules. It maintains a map of module names to contract principals and their Clarity 4 contract hashes.
+### Central Registry & Auth
+- **`conxian-protocol.clar`**: The source of truth for all active modules. Maintains a map of module names to contract principals.
+- **`admin-facade.clar`**: Centralized RBAC facade; delegates to `conxian-access.clar`.
 
-### Facade Layer
-- **`dimensional-engine.clar`**: The primary entry point for users. It routes calls to specific modules (`position-manager`, `collateral-manager`, `risk-manager`) after verifying their registration in the central protocol registry.
+## 2. Decision Logic Hubs (Mid-Layer)
 
-## 2. Primary Modules
+### Risk & Decision Logic
+- **`risk-manager.clar`**: **Centralized Risk Decision Hub**. Tracks position health factors and governs liquidation eligibility based on system-wide risk scores.
+- **`agent-risk.clar`**: Cybernetic Perception Agent. Calculates PID stability fees and system risk scores.
+
+### Fiscal & Treasury Strategy
+- **`agent-treasury.clar`**: Orchestrates the "Fiscal Dam V4". Calculates performance-adjusted revenue shares.
+- **`cxd-treasury.clar`**: Stores the dynamic revenue split policy (CXIP-013).
+
+## 3. Executive Engines (Leaf Layer)
 
 ### Trading & Positions
-- **`dimensional-core.clar`**: Implements the core logic for opening, closing, and liquidating leveraged positions. It handles PnL calculations and manages the `positions` state.
-- **`position-manager.clar`**: Manages the lifecycle of positions, coordinating with the collateral and risk managers.
-- **`position-nft.clar`**: Implements the Dimensional Risk Token (DRT) as a SIP-009 NFT, representing a user's active position.
+- **`dimensional-core.clar`**: Executes the core logic for opening, closing, and liquidating leveraged positions. **Authorized by Risk Manager**.
+- **`position-manager.clar`**: Lifecycle coordinator for positions.
+- **`position-nft.clar`**: SIP-009 NFT representing an active position.
 
-### Collateral & Risk
-- **`collateral-manager.clar`**: Manages the custody of user collateral and ensures sufficient backing for positions.
-- **`risk-manager.clar`**: Tracks position health factors and provides an interface for liquidations.
-- **`lending-manager.clar`**: Manages a decentralized lending market, allowing users to deposit and borrow assets with accrued interest.
+### DEX & Liquidity
+- **`swap-router.clar`**: User-facing entry point for DEX operations.
+- **`concentrated-liquidity-pool.clar`**: Executive engine for concentrated liquidity swaps and management.
 
-### Economic Policy & Yield
-- **`economic-policy-engine.clar`**: Defines global economic parameters such as reserve factors and protocol fees.
-- **`cxd-staking.clar`**: Manages the staking of CXD tokens for protocol rewards.
+## 4. The Heartbeat (Heart)
+- **`ops-engine.clar`**: Coordinates the protocol "Dual-Clock" heartbeat.
+  - **Fast Path (~1 min)**: Reflexive updates (DEX Fees).
+  - **Slow Path (~10 min)**: Strategic updates (Fiscal strategy, PID).
 
-## 3. Cybernetic Agents & Automation
-
-Conxian utilizes autonomous agents to maintain protocol stability and execute fiscal policy.
-
-### The Heartbeat
-- **`ops-engine.clar`**: Implements a "Dual-Clock" heartbeat.
-  - **Fast Path (~1 min)**: Triggers volatility fee updates in the DEX.
-  - **Slow Path (~10 min)**: Triggers fiscal strategy and PID rate updates.
-  - **Incentive**: Keepers receive 5 CXD for triggering the update.
-
-### The Perception Agent
-- **`agent-risk.clar`**: Uses a PID (Proportional-Integral-Derivative) controller to manage protocol stability.
-  - **PID Stability**: Dynamically adjusts the stability fee based on CXD price deviation from its $1 target.
-  - **Risk Assessment**: Calculates a system-wide risk score based on liquidity depth, hashrate volatility, and mempool congestion.
-
-### The Fiscal Agent
-- **`agent-treasury.clar`**: Orchestrates the "Fiscal Dam V4".
-  - **Dynamic Policy**: Calculates revenue allocation shares based on the Global Collateral Ratio (GCR) and health scores.
-  - **Rebalancing**: Automatically updates the allocation policy in `cxd-treasury`.
-
-## 4. Treasury & Revenue Distribution (CXIP-013)
-
-### Allocation Policy
-- **`cxd-treasury.clar`**: Stores the 6-way revenue split policy and tracks accrued claims for stakers.
-- **`revenue-distributor.clar`**: Executes the physical distribution of tokens/STX to various vaults:
-  - **Core Treasury (45%)**
-  - **Bounty Pool (30%)**
-  - **LP / Validator (15%)**
-  - **Community / Grant (5%)**
-  - **Buy-Back & Burn (5%)**
-  - **Insurance Fund (Variable)**
-
-### Vaults
-- **`operational-treasury.clar`**: Holds funds for protocol development and operations.
-- **`conxian-insurance-fund.clar`**: Acts as a safety buffer during "CRISIS" states.
-- **`founder-vault.clar`**, **`opex-vault.clar`**: Specialized treasury vaults.
-
-## 5. Tokens & Standards
-
-- **`cxd-token.clar`**: Governance token (SIP-010).
-- **`cxvg-token.clar`**: SIP-010 token (details TBD).
-- **`cxlp-position-nft.clar`**: SIP-009 NFT for LP positions.
-
-## 6. Compliance & Security
-
+## 5. Security & Compliance
 - **`compliance-manager.clar`**: Central registry for KYC/AML compliance.
-- **`compliance-hooks.clar`**: Read-only hooks used to gate transactions based on compliance status.
-- **`admin-facade.clar`**: Role-based access control (RBAC) implementation.
-- **`mev-protector.clar`**: Protects against miner-extractable value and front-running.
+- **`compliance-hooks.clar`**: Read-only hooks for gating transactions.
+- **`mev-protector.clar`**: Commitment-based front-running protection.
+- **`circuit-breaker.clar`**: System-wide emergency stop mechanism.
 
 ---
-*Generated by Conxian Protocol Architect (Feb 2026)*
+*Generated by Conxian Protocol Architect (Feb 16, 2026)*
