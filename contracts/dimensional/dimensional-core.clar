@@ -39,6 +39,7 @@
 
 ;; ===== Data Variables =====
 (define-data-var owner principal tx-sender)
+(define-data-var risk-manager-principal principal tx-sender)
 (define-data-var oracle-contract-principal principal tx-sender)
 (define-data-var next-position-id uint u0)
 (define-data-var protocol-fee-rate uint u30)
@@ -402,6 +403,7 @@
     (oracle-ref <oracle-trait>)
   )
   (begin
+    (asserts! (or (is-eq contract-caller (var-get risk-manager-principal)) (is-eq contract-caller (var-get owner))) (err ERR_UNAUTHORIZED))
     (try! (check-bitcoin-finality))
     (let (
         (position (unwrap! (get-position user position-id) (err ERR_INVALID_POSITION)))
@@ -462,6 +464,13 @@
 )
 
 ;; ===== Initialization =====
+(define-public (set-risk-manager (new-manager principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get owner)) (err ERR_UNAUTHORIZED))
+    (var-set risk-manager-principal new-manager)
+    (ok true)
+  )
+)
 (define-public (initialize
     (new-owner principal)
     (oracle principal)

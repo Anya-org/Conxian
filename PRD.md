@@ -33,7 +33,7 @@ Conxian Finance is a multi-dimensional, Stacks-native automated monetary platfor
 ## 4. Financial Modeling
 
 ### 4.1. CAPEX (Initial Build)
-- Development of 53 modular Clarity contracts (targeting Clarity 4, currently aligned to Clarity 2/3.0 for compatibility).
+- Development of 53 modular Clarity contracts (Clarity 4 / Nakamoto Standard).
 
 ### 4.2. OPEX (Maintenance)
 - **Staff Payroll**: 20% (Equilibrium) of protocol revenue routed to `operational-treasury`.
@@ -78,29 +78,30 @@ Revenue is dynamically distributed based on system health (Global Collateral Rat
 - **CXLP**: Liquidity Position NFTs (SIP-009).
 
 ## 9. Security & Risk Management
-- **Dimensional Risk**: Implemented in `contracts/dimensional/dimensional-core.clar`.
+- **Centralized Risk Logic**: `risk-manager.clar` manages health factors and liquidation decisions.
+- **Dimensional Execution**: `dimensional-core.clar` executes authorized leverage and liquidation actions.
 - **MEV Protection**: Implemented in `contracts/security/mev-protector.clar`.
 - **Hybrid Oracle**: Implemented in `contracts/oracle/oracle-aggregator.clar`.
 - **Rate Limiting**: Implemented in `contracts/security/rate-limiter.clar`.
 - **Proof-of-Reserves**: Implemented in `contracts/security/proof-of-reserves.clar`.
 
-## 10. Implementation Status (February 2026 - Clarity 4 Migration Complete)
+## 10. Implementation Status (February 2026 - Root-to-Leaf Overhaul)
 
 ### 10.0. Clarity 4 Mainnet Refactor
 - **Native Primitives**: Fully integrated `contract-hash?`, `secp256r1-verify`, `restrict-assets?`, and `to-ascii?`.
 - **Temporal Alignment**: All time-sensitive logic migrated from block-heights to second-precision `stacks-block-time`.
 
 ### 10.3. CXIP-013: Bounty-Driven Revenue Model
-- **Reworked Distribution**: Transitioned to a 5-way split (Treasury, Bounty, LP, Grants, Buy-back).
+- **Unified Distribution**: Transitioned to a 6-way split (Treasury, Bounty, LP, Grants, Buy-back, Insurance).
 - **Performance Adjustment**: Integrated dynamic shift (+5%) to Bounty Pool based on TVL growth and Bounty completion rates.
-- **Fiscal Dam V4**: Enhanced safety logic to accommodate new allocation categories.
+- **Fiscal Dam V4**: Enhanced safety logic with interpolated Crisis-to-Stability transitions.
 
 ### 10.1. CXIP-012: The Cybernetic Upgrade
 - **Dual-Clock Standard**: Integrated Fast Gear (Reflexes) and Slow Gear (Strategy) logic via `ops-engine.clar`.
 - **Anti-LVR Switch**: Dynamic DEX fees based on real-time volatility.
 - **Fiscal Dam V3**: Fully adjusted, cybernetic revenue routing implemented in `agent-treasury.clar`.
 
-### 10.2. Post-Repair Status
-- **Dimensional Trading**: Fully operational, verified via system journey tests.
-- **Compliance**: Provider-based system implemented in `compliance-manager.clar`.
-- **Tokenomics**: 1B CXD supply cap enforced. `cxd-treasury` maintains fiscal dam states.
+### 10.2. Root-to-Leaf Consolidation
+- **Decision Centralization**: Consolidated fragmented liquidation logic into `risk-manager.clar`.
+- **Data Normalization**: Repaired `finance-metrics.clar` to ensure TVL calculations account for multi-decimal asset standards (STX vs CXD).
+- **Monitoring**: Activated `monitoring-dashboard.clar` with live financial telemetry.

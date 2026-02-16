@@ -12,8 +12,8 @@
     (lending-cxd (match lending-res res (get total-deposits res) u0))
 
     ;; Treasury Balances (STX)
-    (treasury-stx (stx-get-balance .operational-treasury))
-    (insurance-stx (stx-get-balance .conxian-insurance-fund))
+    (treasury-stx (* (stx-get-balance .operational-treasury) u100))
+    (insurance-stx (* (stx-get-balance .conxian-insurance-fund) u100))
 
     ;; Treasury Balances (CXD)
     (treasury-cxd (match (contract-call? .cxd-token get-balance .operational-treasury) ok-val ok-val err-val u0))

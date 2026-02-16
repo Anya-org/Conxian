@@ -5,18 +5,19 @@
 - **Nakamoto Alignment**: Use `burn-block-height` for slow-path strategy and `block-height` for fast-path reflexes.
 - **Defensive Engineering**: NO `unwrap-panic` in public functions or critical logic. Use `try!`, `match`, or `unwrap!` with explicit errors.
 - **CXIP-013 Compliance**: All revenue must flow through the 6-way Fiscal Dam V4.
+- **Root-to-Leaf Integrity**: Centralize decision logic in Risk/Treasury agents; keep Core engines as pure executive layers.
 
 ## 2. Technical Standards
-- **Clarity Version**: Maintain Compatibility Mode (Clarity 2/3) for stable simulation. Pre-wire for Clarity 4 features as commented "Vision" code.
+- **Clarity Version**: Clarity 4 (Epoch 3.0) for Mainnet. Use `stacks-block-time` and `burn-block-height`.
 - **SIP Standards**: Strict adherence to SIP-010 (FT) and SIP-009 (NFT). Transfer functions MUST handle optional memos.
-- **Temporal Logic**: Prefer `burn-block-height` for any logic involving value accrual or locking to align with Bitcoin tenure.
+- **Principal Injection**: Avoid hardcoding contract literals. Use `data-vars` for external contract principals to support modularity and resolve circular dependencies in tests.
 
 ## 3. Operational Directives
 - **Dual-Clock Heartbeat**: The `trigger-epoch-update` in `ops-engine.clar` is the protocol's heartbeat. Ensure it is efficient and incentivized.
-- **Predictive Risk**: `agent-risk.clar` must use the PID controller to proactively manage GCR and stability fees.
-- **Traceability**: Every state change MUST emit a structured event with a timestamp.
+- **Predictive Risk**: `risk-manager.clar` consolidates liquidation decisions, factoring in `agent-risk` cybernetic scores.
+- **Financial Accuracy**: Always normalize asset decimals (e.g., STX u6 to CXD u8) when calculating TVL or protocol-wide metrics.
 
 ## 4. Troubleshooting
-- If tests fail in Simnet, check block height thresholds for fast/slow paths.
+- **Circular Dependencies**: If tests fail with `CircularReference`, verify that all contracts use the "Principal Injection" pattern via public setters.
 - Ensure `.ops-engine` is an authorized minter in `cxd-token.clar` for keeper rewards.
-- Verify `.agent-treasury` is authorized for rebalancing in `cxd-treasury.clar`.
+- Verify `.risk-manager` is authorized to call `liquidate-position` in `dimensional-core.clar`.
