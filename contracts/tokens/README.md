@@ -22,7 +22,7 @@ The Token Module manages the lifecycle and economics of the Conxian ecosystem's 
 
 ### SIP-010 Tokens (Fungible)
 
--   **`cxd-token.clar`**: The dividend token. Implements supply caps and emission controls.
+-   **`cxd-token.clar`**: The dividend token. Implements supply caps and emission controls. **Authorized Minters**: Must include `.ops-engine` to enable automated keeper rewards via `trigger-epoch-update`.
 -   **`cxvg-token.clar`**: The strategic governance token. Integrated with the `regulatory-adapter`.
 -   **`cxs-token.clar`**: Staking governance token.
 -   **`cxtr-token.clar`**: Treasury governance token.

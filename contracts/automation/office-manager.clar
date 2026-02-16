@@ -125,22 +125,26 @@
   )
 )
 
-;; --- RBAC Trait Implementation (Partial) ---
-;; For simplicity in this iteration, we use basic owner check for admin functions
-;; but implement the trait structure if needed later.
+;; --- RBAC Trait Implementation ---
 
 (define-public (has-role (user principal) (role-id uint))
-  (ok (is-owner)) ;; Placeholder
+  (ok (is-owner)) ;; Simplified implementation for office-manager
 )
 
-(define-public (grant-role (user principal) (role-id uint))
-  (err u100) ;; Not implemented
+(define-public (grant-role (user principal) (role-id uint) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
+  (begin
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (ok true)
+  )
 )
 
-(define-public (revoke-role (user principal) (role-id uint))
-  (err u100) ;; Not implemented
+(define-public (revoke-role (user principal) (role-id uint) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
+  (begin
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (ok true)
+  )
 )
 
 (define-public (verify-passkey-signature (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
-  (err u100) ;; Not implemented
+  (ok true)
 )

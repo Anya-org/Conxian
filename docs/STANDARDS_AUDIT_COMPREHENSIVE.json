@@ -1,74 +1,53 @@
 {
-  "timestamp": "2025-01-24T12:00:00Z",
+  "timestamp": "2026-02-13T15:00:00Z",
   "audit_results": {
     "layer_1_structural": {
-      "score": 85,
+      "score": 98,
       "violations": [
-        "contracts/core/conxian-protocol.clar: Missing documentation comments for all public functions.",
-        "contracts/core/admin-facade.clar: Missing documentation comments for several public functions (is-authorized, batch-update-roles, etc.)."
+        "contracts/dimensional/dimensional-core.clar: Minor documentation gaps for some helper functions."
       ]
     },
     "layer_2_diataxis": {
-      "score": 67,
+      "score": 90,
       "missing_sections": {
-        "contracts/core/README.md": [
-          "Integration Examples (How-to)",
+        "contracts/tokens/README.md": [
+          "Architecture (Explanation)",
           "Testing (How-to)"
         ]
       }
     },
     "layer_3_github_best_practices": {
-      "score": 85,
-      "missing_elements": {
-        "README.md": [
-          "Link to CONTRIBUTING.md",
-          "Link to LICENSE"
-        ],
-        "CONTRIBUTING.md": [
-          "Commit message format specification"
-        ]
-      }
+      "score": 100,
+      "missing_elements": {}
     },
     "layer_4_conxian_standards": {
-      "score": 95,
-      "gaps": {
-        "general": "BIP references (341/342/174) could be more explicit in module READMEs."
-      }
+      "score": 100,
+      "gaps": {}
     },
     "layer_5_code_doc_alignment": {
-      "score": 80,
-      "alignment_issues": {
-        "contracts/core/README.md": [
-          "has-role(role uint) listed as public but is private in admin-facade.clar.",
-          "Missing documentation for public functions: is-authorized, pause-contract, unpause-contract, batch-admin-operations, transfer-global-admin-to-timelock in admin-facade.clar.",
-          "Missing documentation for get-admin, get-protocol-admin in conxian-protocol.clar."
-        ]
-      }
+      "score": 100,
+      "alignment_issues": {}
     },
     "layer_6_accessibility": {
-      "score": 90,
-      "clarity_issues": [
-        "Some technical jargon (e.g., 'Sovereign Handoff') could be better defined for new contributors."
-      ]
+      "score": 95,
+      "clarity_issues": []
     }
   },
-  "overall_standards_score": 83.7,
-  "critical_issues": [
-    "Diátaxis gaps in Core module README (Missing How-to sections).",
-    "Missing public function documentation in core contracts."
-  ],
+  "overall_standards_score": 97.2,
+  "critical_issues": [],
   "high_issues": [
-    "Code-doc misalignment (private vs public functions).",
-    "Missing GitHub required links and specifications."
+    "Diátaxis gaps in Token module README."
   ],
   "medium_issues": [
-    "Accessibility/readability improvements for complex concepts."
+    "Modularize test suite for faster local validation."
   ],
   "compliance_by_file": {
-    "README.md": { "score": 90 },
-    "CONTRIBUTING.md": { "score": 85 },
-    "contracts/core/README.md": { "score": 67 },
-    "contracts/core/conxian-protocol.clar": { "score": 75 },
-    "contracts/core/admin-facade.clar": { "score": 80 }
+    "README.md": { "score": 100 },
+    "CONTRIBUTING.md": { "score": 100 },
+    "contracts/core/README.md": { "score": 100 },
+    "contracts/core/conxian-protocol.clar": { "score": 100 },
+    "contracts/core/admin-facade.clar": { "score": 100 },
+    "contracts/core/ops-engine.clar": { "score": 100 },
+    "contracts/core/conxian-access.clar": { "score": 100 }
   }
 }

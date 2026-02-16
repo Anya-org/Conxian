@@ -20,11 +20,11 @@
     (response bool uint)
   )
   (grant-role
-    (principal uint)
+    (principal uint (buff 32) (buff 64) (buff 33))
     (response bool uint)
   )
   (revoke-role
-    (principal uint)
+    (principal uint (buff 32) (buff 64) (buff 33))
     (response bool uint)
   )
   (verify-passkey-signature
