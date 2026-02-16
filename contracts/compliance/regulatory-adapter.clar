@@ -55,7 +55,7 @@
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set compliance-status { user: user } {
       clean-hands: true,
-      verified-at: stacks-block-time,
+      verified-at: (contract-call? .block-utils get-stacks-block-time),
       jurisdiction: jurisdiction,
       tier: tier
     })
@@ -73,8 +73,8 @@
     (print {
       event: "user-blacklisted",
       user: user,
-      audit-time: stacks-block-time,
-      status: (to-ascii? 0x4c4f434b4544)
+      audit-time: (contract-call? .block-utils get-stacks-block-time),
+      status: (contract-call? .block-utils to-ascii-safe 0x4c4f434b4544)
     })
     (ok true)
   )
@@ -85,7 +85,7 @@
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-delete blacklist user)
-    (print { event: "user-removed-from-blacklist", user: user, timestamp: stacks-block-time })
+    (print { event: "user-removed-from-blacklist", user: user, timestamp: (contract-call? .block-utils get-stacks-block-time) })
     (ok true)
   )
 )

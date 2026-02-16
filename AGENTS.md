@@ -21,3 +21,8 @@
 - **Circular Dependencies**: If tests fail with `CircularReference`, verify that all contracts use the "Principal Injection" pattern via public setters.
 - Ensure `.ops-engine` is an authorized minter in `cxd-token.clar` for keeper rewards.
 - Verify `.risk-manager` is authorized to call `liquidate-position` in `dimensional-core.clar`.
+
+## 5. Testing Protocols
+- **Root-to-Leaf**: Always verify system integration starting from the `ops-engine` heartbeat.
+- **Leaf-to-Root**: Ensure individual manager contracts are unit-tested before integration.
+- **Dual-Mode**: Use `block-utils.clar` for any time-based or C4-native operations in tests.

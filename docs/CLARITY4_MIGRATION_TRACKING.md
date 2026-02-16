@@ -135,3 +135,9 @@ These critical fixes work with both Clarity 3 and 4:
 - [Stacks Nakamoto Rollout](https://docs.stacks.co/nakamoto-upgrade/nakamoto-rollout-plan)
 - [SIP-033: Clarity 4](https://github.com/stacksgov/sips/blob/main/sips/sip-033/sip-033-clarity-4.md)
 - [Stacks Roadmap](https://stacksroadmap.com/)
+
+## Feb 2026: Dual-Mode Implementation
+The protocol has successfully transitioned to a "Dual-Mode" architecture.
+- **Production**: Contracts remain C4-native, using `stacks-block-time` and `secp256r1-verify`.
+- **Simulation**: Logic is wrapped via `block-utils.clar` to allow stable testing in Clarinet SDK 3.12.0.
+- **Dependency Resolution**: Circular dependencies resolved via principal injection.

@@ -125,3 +125,16 @@
 - **Gap Analysis**: Updated `gap-analysis.md` with Jan 2026 "Jules Persona" investment-grade analysis.
 
 ## [2024-07-22] - Documentation Realignment
+
+## [0.7.0] - 2026-02-13
+### Added
+- Dual-Mode testing architecture via `block-utils.clar`.
+- Principal Injection pattern for breaking contract circularity.
+- Comprehensive Root-to-Leaf and Leaf-to-Root verification suite (21 files).
+- Multi-council seat minting and power tracking in `enhanced-governance-nft`.
+
+### Fixed
+- Resolved simulation failures for Clarity 4 native keywords.
+- Fixed 15+ "Unresolved Contract" errors in Simnet.
+- Standardized account naming across all test suites.
+- Corrected `dimensional-engine` pre-flight check logic.

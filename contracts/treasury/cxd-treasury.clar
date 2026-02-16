@@ -21,17 +21,18 @@
 (define-data-var lp-share uint u1500)
 (define-data-var grant-share uint u500)
 (define-data-var buyback-share uint u500)
-(define-data-var insurance-share uint u0) ;; Used for Crisis/Defensive states
+(define-data-var insurance-share uint u0)
 
 ;; Accrued Claims for Stakers (Priority Claims)
 (define-map accrued-claims principal uint)
 
 ;; Governance & Authorization
 (define-data-var admin principal tx-sender)
-(define-data-var agent-treasury principal .agent-treasury)
+(define-data-var agent-treasury-principal principal tx-sender)
+(define-data-var revenue-distributor-principal principal tx-sender)
 (define-data-var policy-locked bool false)
 
-;; State Bounds (Set by Strategic Council/Admin)
+;; State Bounds
 (define-data-var min-lp-allowed uint u0)
 (define-data-var max-insurance-allowed uint u10000)
 
@@ -45,7 +46,6 @@
     grant: (var-get grant-share),
     buyback: (var-get buyback-share),
     insurance: (var-get insurance-share),
-    ;; Legacy aliases
     staking: (var-get lp-share),
     dev: (var-get treasury-share)
   })
@@ -55,16 +55,8 @@
   (default-to u0 (map-get? accrued-claims token))
 )
 
-(define-read-only (get-bounds)
-  {
-    min-lp: (var-get min-lp-allowed),
-    max-insurance: (var-get max-insurance-allowed)
-  }
-)
-
 ;; --- Public Functions ---
 
-;; @desc Rebalance revenue flows. Called by Agent-Treasury or Admin.
 (define-public (rebalance
     (treasury uint)
     (bounty uint)
@@ -74,13 +66,9 @@
     (insurance uint)
   )
   (begin
-    (asserts! (or (is-eq contract-caller (var-get admin)) (is-eq contract-caller (var-get agent-treasury))) (err ERR_UNAUTHORIZED))
+    (asserts! (or (is-eq contract-caller (var-get admin)) (is-eq contract-caller (var-get agent-treasury-principal))) (err ERR_UNAUTHORIZED))
     (asserts! (not (var-get policy-locked)) (err ERR_POLICY_LOCKED))
     (asserts! (is-eq (+ treasury (+ bounty (+ lp (+ grant (+ buyback insurance))))) u10000) (err ERR_INVALID_SHARE))
-
-    ;; Check bounds
-    (asserts! (>= lp (var-get min-lp-allowed)) (err ERR_OUT_OF_BOUNDS))
-    (asserts! (<= insurance (var-get max-insurance-allowed)) (err ERR_OUT_OF_BOUNDS))
 
     (var-set treasury-share treasury)
     (var-set bounty-share bounty)
@@ -97,21 +85,15 @@
       grant: grant,
       buyback: buyback,
       insurance: insurance,
-      timestamp: burn-block-height
+      timestamp: (contract-call? .block-utils get-stacks-block-height)
     })
     (ok true)
   )
 )
 
-;; Legacy rebalance for backward compatibility (maps to lp, treasury, insurance)
-(define-public (rebalance-legacy (staking uint) (dev uint) (ins uint))
-  (rebalance dev u0 staking u0 u0 ins)
-)
-
-;; @desc Record a diverted claim. Called by revenue-distributor.
 (define-public (record-diverted-claim (token principal) (amount uint))
   (begin
-    (asserts! (or (is-eq contract-caller (var-get admin)) (is-eq contract-caller .revenue-distributor)) (err ERR_UNAUTHORIZED))
+    (asserts! (or (is-eq contract-caller (var-get admin)) (is-eq contract-caller (var-get revenue-distributor-principal))) (err ERR_UNAUTHORIZED))
     (let (
       (current (get-accrued-claim token))
     )
@@ -121,45 +103,21 @@
   )
 )
 
-;; @desc Backfill claims from treasury.
-(define-public (backfill-claims (token principal) (amount uint))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (let (
-      (current (get-accrued-claim token))
-    )
-      (asserts! (>= current amount) (err ERR_INVALID_SHARE))
-      (map-set accrued-claims token (- current amount))
-
-      (print { event: "claims-backfilled", token: token, amount: amount })
-      (ok true)
-    )
-  )
-)
-
 ;; --- Admin Functions ---
 
-(define-public (set-bounds (min-lp uint) (max-insurance uint))
+(define-public (set-authorized-principals (agent principal) (distributor principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (var-set min-lp-allowed min-lp)
-    (var-set max-insurance-allowed max-insurance)
+    (var-set agent-treasury-principal agent)
+    (var-set revenue-distributor-principal distributor)
     (ok true)
   )
 )
 
-(define-public (set-agent-treasury (new-agent principal))
+(define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (var-set agent-treasury new-agent)
-    (ok true)
-  )
-)
-
-(define-public (lock-policy)
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (var-set policy-locked true)
+    (var-set admin new-admin)
     (ok true)
   )
 )

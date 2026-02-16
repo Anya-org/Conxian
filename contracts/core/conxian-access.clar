@@ -1,7 +1,7 @@
 ;; conxian-access.clar
 ;; Unified Role-Based Access Control (RBAC) Backend
 ;; Centralizes all permissioning for the Conxian Protocol
-;; Forced Compatibility Mode (Clarity 2/3)
+;; Dual-Mode: Compatibility and Clarity 4
 
 (impl-trait .core-traits.conxian-access-trait)
 
@@ -63,8 +63,8 @@
   )
   (begin
     (asserts! (is-admin tx-sender) (err ERR_UNAUTHORIZED))
-    ;; Verify signature for sensitive role changes
-    (asserts! (secp256r1-verify message signature public-key) (err ERR_INVALID_SIGNATURE))
+    ;; Verify signature for sensitive role changes (Safe Wrapper)
+    (asserts! (contract-call? .block-utils secp256r1-verify-safe message signature public-key) (err ERR_INVALID_SIGNATURE))
     (map-set roles {
       user: user,
       role: role-id,
@@ -83,8 +83,8 @@
   )
   (begin
     (asserts! (is-admin tx-sender) (err ERR_UNAUTHORIZED))
-    ;; Verify signature for sensitive role changes
-    (asserts! (secp256r1-verify message signature public-key) (err ERR_INVALID_SIGNATURE))
+    ;; Verify signature for sensitive role changes (Safe Wrapper)
+    (asserts! (contract-call? .block-utils secp256r1-verify-safe message signature public-key) (err ERR_INVALID_SIGNATURE))
     (map-delete roles {
       user: user,
       role: role-id,
@@ -97,13 +97,13 @@
 (define-public (set-contract-owner (new-owner principal) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (asserts! (secp256r1-verify message signature public-key) (err ERR_INVALID_SIGNATURE))
+    (asserts! (contract-call? .block-utils secp256r1-verify-safe message signature public-key) (err ERR_INVALID_SIGNATURE))
     (var-set contract-owner new-owner)
     (print {
       event: "owner-changed",
       old-owner: tx-sender,
       new-owner: new-owner,
-      timestamp: stacks-block-time
+      timestamp: (contract-call? .block-utils get-stacks-block-time)
     })
     (ok true)
   )
@@ -113,13 +113,13 @@
 (define-public (transfer-ownership-to-timelock (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (asserts! (secp256r1-verify message signature public-key) (err ERR_INVALID_SIGNATURE))
+    (asserts! (contract-call? .block-utils secp256r1-verify-safe message signature public-key) (err ERR_INVALID_SIGNATURE))
     (var-set contract-owner (var-get timelock-principal))
     (print {
       event: "sovereign-handoff",
       module: "conxian-access",
       new-owner: (var-get timelock-principal),
-      timestamp: stacks-block-time
+      timestamp: (contract-call? .block-utils get-stacks-block-time)
     })
     (ok true)
   )
@@ -129,10 +129,9 @@
   (ok (var-get contract-owner))
 )
 
-;; Read-only: Verify Passkey/Biometric Signature (Clarity 4 Native)
-;; @desc Uses native secp256r1-verify to validate biometric/Passkey signatures
+;; Read-only: Verify Passkey/Biometric Signature (Safe Wrapper)
 (define-read-only (verify-passkey-signature (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
-  (ok (secp256r1-verify message signature public-key))
+  (ok (contract-call? .block-utils secp256r1-verify-safe message signature public-key))
 )
 
 ;; Read-only: Global Admin Check
