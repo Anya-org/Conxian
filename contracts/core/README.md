@@ -74,20 +74,26 @@ graph TD
 
 ### `ops-engine.clar` (The Heartbeat)
 
-- `trigger-epoch-update()`: (Public) Incentivized function to trigger Anti-LVR updates (Fast Path) and Fiscal Dam/PID updates (Slow Path).
+- `trigger-epoch-update()`: (Public) Incentivized function to trigger Anti-LVR updates (Fast Path) and Fiscal Dam/PID updates (Slow Path). **Note**: Requires the `ops-engine` contract to be an authorized minter in `cxd-token` to pay keeper rewards.
 - `process-signal(proposal-id uint, proposal-contract <proposal-trait>)`: (Operator Only) Executes governance signals.
+- `trigger-emergency-pause()`: (Operator Only) Triggers a protocol-wide emergency pause.
+- `get-last-action()`: (Read-Only) Returns the timestamp of the last administrative action.
+- `get-engine-status()`: (Read-Only) Returns the current operational status of the heartbeat engine.
 
 ### `conxian-protocol.clar` (Protocol State Coordinator)
 
 #### Global State
 
 - `set-paused(new-paused bool)`: (Admin Only) Pauses or unpauses all state-changing protocol functions.
+- `pause()`: (Public) Convenience function to pause the protocol.
 - `is-paused()`: (Read-Only) Returns the current pause status of the protocol.
 - `get-protocol-status()`: (Read-Only) Returns a comprehensive status of the protocol, including Nakamoto tenure ID.
 
 #### Module Registry
 
 - `register-module(name (string-ascii 32), contract principal)`: (Admin Only) Adds a new module contract to the protocol registry.
+- `batch-register-modules(entries (list 50 {name: (string-ascii 32), contract: principal}))`: (Admin Only) Registers multiple modules in a single transaction.
+- `batch-set-module-active(entries (list 50 {name: (string-ascii 32), active: bool}))`: (Admin Only) Updates activation status for multiple modules.
 - `get-module(name (string-ascii 32))`: (Read-Only) Retrieves the address and status of a registered module.
 
 #### Ownership
@@ -104,6 +110,43 @@ graph TD
 - `withdraw-funds(collateral-manager <collateral-manager-trait>, amount uint, token-trait <sip-010-trait>)`: Withdraws funds from the collateral manager.
 - `check-position-health(risk-manager <risk-manager-trait>, position-id uint)`: Queries position health via the risk manager.
 - `liquidate-position(risk-manager <risk-manager-trait>, position-id uint)`: Triggers liquidation of an unhealthy position.
+
+## Integration Examples
+
+### Checking Authorization
+```clarity
+;; Check if tx-sender has ROLE_OPERATOR (u4)
+(contract-call? .admin-facade is-authorized u4)
+```
+
+### Triggering Heartbeat (Keeper)
+```clarity
+;; Trigger epoch update and receive 5 CXD reward
+(contract-call? .ops-engine trigger-epoch-update)
+```
+
+### Querying Protocol Status
+```clarity
+;; Get comprehensive protocol status
+(contract-call? .conxian-protocol get-protocol-status)
+```
+
+## Testing
+
+To run the core module tests, use the following command:
+
+```bash
+npx vitest run tests/core-contracts.test.ts
+```
+
+Ensure your environment is configured for Clarity 4 (Epoch 3.0) execution as per the Nakamoto upgrade standards.
+
+## BIP Compliance
+
+The Core Module ensures alignment with the following Bitcoin Improvement Proposals (BIPs):
+- **BIP 341 (Taproot)**: Integration hooks for Taproot-based transaction validation.
+- **BIP 342 (Taproot Scripts)**: Support for advanced script execution in anchored transactions.
+- **BIP 174 (PSBT)**: Standards for Partially Signed Bitcoin Transactions in cross-chain operations.
 
 ## Status
 

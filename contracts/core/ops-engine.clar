@@ -15,6 +15,10 @@
 
 ;; Public Functions
 
+;; @desc Processes a governance signal by executing a proposal contract.
+;; @param proposal-id uint - The ID of the proposal.
+;; @param proposal-contract <proposal-trait> - The proposal contract to execute.
+;; @returns (response bool uint)
 (define-public (process-signal (proposal-id uint) (proposal-contract <proposal-trait>))
   (begin
     (asserts! (is-eq (contract-call? .admin-facade is-authorized u4) (ok true)) (err ERR_UNAUTHORIZED)) ;; ROLE_OPERATOR
@@ -23,6 +27,8 @@
   )
 )
 
+;; @desc Triggers a protocol-wide emergency pause.
+;; @returns (response bool uint)
 (define-public (trigger-emergency-pause)
   (begin
     (asserts! (is-eq (contract-call? .admin-facade is-authorized u4) (ok true)) (err ERR_UNAUTHORIZED))
@@ -32,6 +38,8 @@
   )
 )
 
+;; @desc Returns the timestamp of the last executive action.
+;; @returns (response uint uint)
 (define-read-only (get-last-action)
   (ok (var-get last-action-time))
 )
@@ -78,6 +86,8 @@
 
 ;; Compliance
 
+;; @desc Returns the current operational status of the heartbeat engine.
+;; @returns (response {fast-gear: uint, slow-gear: uint, active: bool} uint)
 (define-read-only (get-engine-status)
   (ok {
     fast-gear: (var-get last-fast-check),

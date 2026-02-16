@@ -32,6 +32,10 @@
 )
 
 ;; Administrative Functions
+
+;; @desc Pauses or unpauses all state-changing protocol functions.
+;; @param new-paused bool - The new pause status.
+;; @returns (response bool uint)
 (define-public (set-paused (new-paused bool))
   (begin
     (asserts! (contract-call? .admin-facade is-authorized-to-pause tx-sender) (err ERR_UNAUTHORIZED))
@@ -41,10 +45,16 @@
   )
 )
 
+;; @desc Convenience function to pause the protocol.
+;; @returns (response bool uint)
 (define-public (pause)
   (set-paused true)
 )
 
+;; @desc Registers a new module contract in the protocol registry.
+;; @param name (string-ascii 32) - The unique name of the module.
+;; @param contract principal - The address of the module contract.
+;; @returns (response bool uint)
 (define-public (register-module (name (string-ascii 32)) (contract principal))
   (begin
     (asserts! (unwrap! (contract-call? .admin-facade is-authorized ROLE_ADMIN) (err ERR_UNAUTHORIZED)) (err ERR_UNAUTHORIZED))
@@ -61,6 +71,9 @@
   )
 )
 
+;; @desc Registers multiple module contracts in a single batch transaction.
+;; @param entries (list 50 {name: (string-ascii 32), contract: principal}) - List of module entries.
+;; @returns (response bool uint)
 (define-public (batch-register-modules (entries (list 50 {name: (string-ascii 32), contract: principal})))
   (begin
     (asserts! (contract-call? .admin-facade is-global-admin) (err ERR_UNAUTHORIZED))
@@ -80,6 +93,9 @@
   )
 )
 
+;; @desc Updates the activation status for multiple modules in a single batch.
+;; @param entries (list 50 {name: (string-ascii 32), active: bool}) - List of module activation updates.
+;; @returns (response bool uint)
 (define-public (batch-set-module-active (entries (list 50 {name: (string-ascii 32), active: bool})))
   (begin
     (asserts! (contract-call? .admin-facade is-global-admin) (err ERR_UNAUTHORIZED))
@@ -101,6 +117,9 @@
   )
 )
 
+;; @desc Transfers ownership of the protocol coordinator to a new address.
+;; @param new-owner principal - The address of the new owner.
+;; @returns (response bool uint)
 (define-public (set-contract-owner (new-owner principal))
   (begin
     (asserts! (contract-call? .admin-facade is-global-admin) (err ERR_UNAUTHORIZED))
@@ -110,17 +129,27 @@
 )
 
 ;; Read Only
+
+;; @desc Returns the current owner of the protocol.
+;; @returns (response principal uint)
 (define-read-only (get-admin)
   (ok (var-get contract-owner))
 )
 
+;; @desc Returns the current pause status of the protocol.
+;; @returns (response bool uint)
 (define-read-only (is-paused)
   (ok (var-get paused)))
 
+;; @desc Retrieves the address and status of a registered module.
+;; @param name (string-ascii 32) - The name of the module.
+;; @returns (optional {contract: principal, active: bool, hash: (optional (buff 32))})
 (define-read-only (get-module (name (string-ascii 32)))
   (map-get? modules { name: name })
 )
 
+;; @desc Returns a comprehensive status report of the protocol.
+;; @returns (response {paused: bool, tenure-id: (optional uint), compliant: bool, version: (string-ascii 2), timestamp: uint} uint)
 (define-read-only (get-protocol-status)
   (ok {
     paused: (var-get paused),

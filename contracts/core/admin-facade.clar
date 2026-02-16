@@ -28,8 +28,11 @@
 (define-private (execute-role-grant
     (user principal)
     (role uint)
+    (message (buff 32))
+    (signature (buff 64))
+    (public-key (buff 33))
   )
-  (match (contract-call? .conxian-access grant-role user role)
+  (match (contract-call? .conxian-access grant-role user role message signature public-key)
     success (ok success)
     error (err error)
   )
@@ -38,8 +41,11 @@
 (define-private (execute-role-revoke
     (user principal)
     (role uint)
+    (message (buff 32))
+    (signature (buff 64))
+    (public-key (buff 33))
   )
-  (match (contract-call? .conxian-access revoke-role user role)
+  (match (contract-call? .conxian-access revoke-role user role message signature public-key)
     success (ok success)
     error (err error)
   )
@@ -51,12 +57,15 @@
       user: principal,
       role: uint,
       active: bool,
+      message: (buff 32),
+      signature: (buff 64),
+      public-key: (buff 33)
     })
   )
   (match result
     success (if (get active update)
-      (execute-role-grant (get user update) (get role update))
-      (execute-role-revoke (get user update) (get role update))
+      (execute-role-grant (get user update) (get role update) (get message update) (get signature update) (get public-key update))
+      (execute-role-revoke (get user update) (get role update) (get message update) (get signature update) (get public-key update))
     )
     error (err error)
   )
@@ -103,6 +112,9 @@
   (is-eq tx-sender (var-get global-admin))
 )
 
+;; @desc Checks if the caller is authorized for a specific role or is the global admin.
+;; @param role uint - The role ID to check.
+;; @returns (response bool uint) - Returns ok(true) if authorized, ok(false) otherwise.
 (define-public (is-authorized (role uint))
   (ok (or (is-global-admin) (has-role role)))
 )
@@ -151,16 +163,19 @@
     (user principal)
     (role uint)
     (enabled bool)
+    (message (buff 32))
+    (signature (buff 64))
+    (public-key (buff 33))
   )
   (begin
     (asserts! (has-role ROLE_GLOBAL_ADMIN) (err ERR_NOT_AUTHORIZED))
     (if enabled
       (begin
-        (try! (contract-call? .conxian-access grant-role user role))
+        (try! (contract-call? .conxian-access grant-role user role message signature public-key))
         (map-set role-cache { user: user, role: role } true)
       )
       (begin
-        (try! (contract-call? .conxian-access revoke-role user role))
+        (try! (contract-call? .conxian-access revoke-role user role message signature public-key))
         (map-delete role-cache { user: user, role: role })
       )
     )
@@ -182,6 +197,9 @@
       user: principal,
       role: uint,
       active: bool,
+      message: (buff 32),
+      signature: (buff 64),
+      public-key: (buff 33)
     })
     (result (response bool uint))
   )
@@ -189,12 +207,12 @@
     ok-val
     (if (get active update)
       (begin
-        (try! (contract-call? .conxian-access grant-role (get user update) (get role update)))
+        (try! (contract-call? .conxian-access grant-role (get user update) (get role update) (get message update) (get signature update) (get public-key update)))
         (map-set role-cache { user: (get user update), role: (get role update) } true)
         (ok true)
       )
       (begin
-        (try! (contract-call? .conxian-access revoke-role (get user update) (get role update)))
+        (try! (contract-call? .conxian-access revoke-role (get user update) (get role update) (get message update) (get signature update) (get public-key update)))
         (map-delete role-cache { user: (get user update), role: (get role update) })
         (ok true)
       )
@@ -203,11 +221,16 @@
   )
 )
 
-;; Batch Role Management (100x more efficient)
+;; @desc Updates multiple user roles in a single batch transaction.
+;; @param updates (list 100 {user: principal, role: uint, active: bool, message: (buff 32), signature: (buff 64), public-key: (buff 33)}) - List of role updates.
+;; @returns (response bool uint)
 (define-public (batch-update-roles (updates (list 100 {
   user: principal,
   role: uint,
   active: bool,
+  message: (buff 32),
+  signature: (buff 64),
+  public-key: (buff 33)
 })))
   (begin
     (asserts! (is-global-admin) (err ERR_NOT_AUTHORIZED))
@@ -220,7 +243,9 @@
   )
 )
 
-;; Batch Admin Operations (1000x more efficient)
+;; @desc Executes multiple administrative operations in a single batch transaction.
+;; @param operations (list 200 {type: uint, params: (list 5 principal)}) - List of admin operations.
+;; @returns (response bool uint)
 (define-public (batch-admin-operations (operations (list 200 {
   type: uint,
   params: (list 5 principal),
@@ -251,7 +276,9 @@
   )
 )
 
-;; Global Admin Management
+;; @desc Transfers the global administrator role to a new principal.
+;; @param new-admin principal - The address of the new administrator.
+;; @returns (response bool uint)
 (define-public (set-global-admin (new-admin principal))
   (begin
     (asserts! (is-global-admin) (err ERR_NOT_AUTHORIZED))
@@ -266,7 +293,8 @@
   )
 )
 
-;; Sovereign Handoff: Transfer global admin to timelock
+;; @desc Transfers the global administrator role to the protocol timelock.
+;; @returns (response bool uint)
 (define-public (transfer-global-admin-to-timelock)
   (begin
     (asserts! (is-global-admin) (err ERR_NOT_AUTHORIZED))
@@ -286,6 +314,9 @@
   user: principal,
   role: uint,
   active: bool,
+  message: (buff 32),
+  signature: (buff 64),
+  public-key: (buff 33)
 }))
   (begin
     (asserts! (is-valid-principal (get user update)) (err ERR_INVALID_OPERATION))

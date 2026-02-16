@@ -1,5 +1,9 @@
 # Conxian Finance Protocol
 
+[![Status](https://img.shields.io/badge/Status-Foundational_Stable-yellow.svg)](https://conxian.io)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Nakamoto](https://img.shields.io/badge/Nakamoto-Ready-green.svg)](docs/CLARITY4_MIGRATION_TRACKING.md)
+
 ## Overview
 
 🏦 **Conxian Finance**: A Multi-Dimensional, Stacks-Native Automated Monetary Platform
@@ -72,6 +76,8 @@ Total revenue is dynamically distributed via the **Fiscal Dam** system (V3 Cyber
 - Node.js 18+
 
 ### Getting Started
+
+For contribution guidelines, please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 1. **Install Dependencies**
    ```bash

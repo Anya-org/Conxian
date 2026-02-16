@@ -9,6 +9,7 @@
 (define-constant ERR_UNAUTHORIZED u1000)
 (define-constant ERR_ROLE_EXISTS u1001)
 (define-constant ERR_ROLE_NOT_FOUND u1002)
+(define-constant ERR_INVALID_SIGNATURE u1003)
 
 ;; Roles
 (define-constant ROLE_ADMIN u1)
@@ -55,36 +56,47 @@
 (define-public (grant-role
     (user principal)
     (role-id uint)
+    (message (buff 32))
+    (signature (buff 64))
+    (public-key (buff 33))
   )
   (begin
     (asserts! (is-admin tx-sender) (err ERR_UNAUTHORIZED))
+    ;; Verify signature for sensitive role changes
+    (asserts! (secp256r1-verify message signature public-key) (err ERR_INVALID_SIGNATURE))
     (map-set roles {
       user: user,
       role: role-id,
     } true
     )
-    (ok (secp256r1-verify message signature public-key))
+    (ok true)
   )
 )
 
 (define-public (revoke-role
     (user principal)
     (role-id uint)
+    (message (buff 32))
+    (signature (buff 64))
+    (public-key (buff 33))
   )
   (begin
     (asserts! (is-admin tx-sender) (err ERR_UNAUTHORIZED))
+    ;; Verify signature for sensitive role changes
+    (asserts! (secp256r1-verify message signature public-key) (err ERR_INVALID_SIGNATURE))
     (map-delete roles {
       user: user,
       role: role-id,
     })
-    (ok (secp256r1-verify message signature public-key))
+    (ok true)
   )
 )
 
 ;; Admin
-(define-public (set-contract-owner (new-owner principal))
+(define-public (set-contract-owner (new-owner principal) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (asserts! (secp256r1-verify message signature public-key) (err ERR_INVALID_SIGNATURE))
     (var-set contract-owner new-owner)
     (print {
       event: "owner-changed",
@@ -92,14 +104,15 @@
       new-owner: new-owner,
       timestamp: stacks-block-time
     })
-    (ok (secp256r1-verify message signature public-key))
+    (ok true)
   )
 )
 
 ;; Sovereign Handoff: Transfer ownership to timelock
-(define-public (transfer-ownership-to-timelock)
+(define-public (transfer-ownership-to-timelock (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (asserts! (secp256r1-verify message signature public-key) (err ERR_INVALID_SIGNATURE))
     (var-set contract-owner .timelock)
     (print {
       event: "sovereign-handoff",
@@ -107,7 +120,7 @@
       new-owner: .timelock,
       timestamp: stacks-block-time
     })
-    (ok (secp256r1-verify message signature public-key))
+    (ok true)
   )
 )
 

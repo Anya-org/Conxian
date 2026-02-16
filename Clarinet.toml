@@ -115,7 +115,7 @@ depends_on = ["core-traits"]
 [contracts.economic-policy-engine]
 path = "contracts/core/economic-policy-engine.clar"
 clarity-version = 4
-depends_on = ["core-traits", "math-utilities", "defi-traits"]
+depends_on = ["core-traits", "math-utilities", "defi-traits", "conxian-protocol", "revenue-distributor"]
 
 [contracts.cxd-token]
 path = "contracts/tokens/cxd-token.clar"
@@ -180,7 +180,7 @@ depends_on = ["sip-standards"]
 [contracts.concentrated-liquidity-pool]
 path = "contracts/dex/concentrated-liquidity-pool.clar"
 clarity-version = 4
-depends_on = ["sip-standards", "conxian-protocol", "concentrated-liquidity-pool", "admin-facade", ]
+depends_on = ["sip-standards", "conxian-protocol", "admin-facade", ]
 
 [contracts.liquidity-provider]
 path = "contracts/dex/liquidity-provider.clar"
@@ -200,7 +200,7 @@ depends_on = ["sip-standards", "conxian-protocol", "concentrated-liquidity-pool"
 [contracts.revenue-distributor]
 path = "contracts/treasury/revenue-distributor.clar"
 clarity-version = 4
-depends_on = ["core-traits", "math-utilities", "cxd-treasury"]
+depends_on = ["core-traits", "math-utilities", "cxd-treasury", "cxd-token", "cxd-staking", "operational-treasury", "conxian-insurance-fund"]
 
 [contracts.allocation-policy]
 path = "contracts/treasury/allocation-policy.clar"
@@ -212,6 +212,11 @@ clarity-version = 4
 depends_on = ["automation-traits", "core-traits"]
 
 
+
+[contracts.timelock]
+path = "contracts/governance/timelock.clar"
+clarity-version = 4
+depends_on = ["governance-traits"]
 
 [contracts.proposal-registry]
 path = "contracts/governance/proposal-registry.clar"
@@ -271,7 +276,7 @@ depends_on = ["governance-traits", "cxtr-token", "operational-treasury"]
 [contracts.lending-manager]
 path = "contracts/lending/lending-manager.clar"
 clarity-version = 4
-depends_on = ["sip-standards", "conxian-protocol", "concentrated-liquidity-pool", "admin-facade", ]
+depends_on = ["sip-standards", "conxian-protocol", "concentrated-liquidity-pool", "admin-facade", "economic-policy-engine", "cxd-token", "revenue-distributor", "risk-manager"]
 
 [contracts.conxian-insurance-fund]
 path = "contracts/security/conxian-insurance-fund.clar"
@@ -376,7 +381,7 @@ depends_on = ["sip-standards"]
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
 clarity-version = 4
-depends_on = ["automation-traits", "core-traits", "dimensional-core", "office-manager", "oracle-aggregator", "position-manager", "lending-manager", "conxian-access"]
+depends_on = ["automation-traits", "core-traits", "dimensional-core", "office-manager", "oracle-aggregator", "position-manager", "lending-manager", "conxian-access", "risk-manager"]
 
 [contracts.cxd-treasury]
 path = "contracts/treasury/cxd-treasury.clar"
