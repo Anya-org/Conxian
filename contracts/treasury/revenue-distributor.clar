@@ -20,7 +20,7 @@
 
 (define-public (distribute-token (token <sip-010-ft-trait>) (amount uint))
   (let (
-    (policy (unwrap-panic (contract-call? .cxd-treasury get-allocation-percentages)))
+    (policy (unwrap! (contract-call? .cxd-treasury get-allocation-percentages) (err ERR_UNAUTHORIZED)))
     (treasury-amt (/ (* amount (get treasury policy)) u10000))
     (bounty-amt   (/ (* amount (get bounty policy))   u10000))
     (lp-amt       (/ (* amount (get lp policy))       u10000))
@@ -53,7 +53,7 @@
 
 (define-public (distribute-stx (amount uint))
   (let (
-    (policy (unwrap-panic (contract-call? .cxd-treasury get-allocation-percentages)))
+    (policy (unwrap! (contract-call? .cxd-treasury get-allocation-percentages) (err ERR_UNAUTHORIZED)))
     (treasury-amt (/ (* amount (get treasury policy)) u10000))
     (bounty-amt   (/ (* amount (get bounty policy))   u10000))
     (lp-amt       (/ (* amount (get lp policy))       u10000))
