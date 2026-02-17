@@ -85,7 +85,7 @@
   (begin
     (asserts! (or (is-eq contract-caller (var-get ops-engine-principal)) (is-eq tx-sender (var-get contract-owner))) (err ERR_UNAUTHORIZED))
     (let (
-      (current-price (unwrap-panic (contract-call? .oracle-aggregator get-price .cxd-token)))
+      (current-price (unwrap! (contract-call? .oracle-aggregator get-price .cxd-token) (err ERR_INVALID_PARAMS)))
       (error (- (to-int PRICE_TARGET) (to-int current-price)))
       (new-integral (let ((i (+ (var-get price-integral) error)))
                       (if (> i MAX_INTEGRAL) MAX_INTEGRAL (if (< i (- 0 MAX_INTEGRAL)) (- 0 MAX_INTEGRAL) i))))

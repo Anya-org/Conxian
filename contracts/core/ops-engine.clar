@@ -7,6 +7,7 @@
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u6000)
 (define-constant ERR_EXECUTION_FAILED u6001)
+(define-constant ERR_NO_WORK_NEEDED u101)
 
 ;; State (using (contract-call? .block-utils get-stacks-block-time) for Dual-Clock precision)
 (define-data-var last-action-time uint u0)
@@ -50,10 +51,15 @@
 (define-public (trigger-epoch-update)
   (let (
     (current-time (contract-call? .block-utils get-stacks-block-time))
+    (work-done-fast (>= (- current-time (var-get last-fast-check)) u60))
+    (work-done-slow (>= (- current-time (var-get last-slow-check)) u600))
   )
     (begin
+      ;; Ensure at least one gear needs updating
+      (asserts! (or work-done-fast work-done-slow) (err ERR_NO_WORK_NEEDED))
+
       ;; 1. FAST PATH CHECK (DEX Protection)
-      (if (>= (- current-time (var-get last-fast-check)) u60)
+      (if work-done-fast
         (begin
           (try! (contract-call? .swap-router update-volatility-fees))
           (var-set last-fast-check current-time)
@@ -62,7 +68,7 @@
       )
 
       ;; 2. SLOW PATH CHECK (Treasury/Risk)
-      (if (>= (- current-time (var-get last-slow-check)) u600)
+      (if work-done-slow
         (begin
           (try! (contract-call? .agent-treasury run-fiscal-strategy))
           (try! (contract-call? .agent-risk update-pid-rates))

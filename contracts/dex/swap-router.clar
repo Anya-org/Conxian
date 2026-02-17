@@ -30,7 +30,7 @@
     (min-amount-out uint)
   )
   (begin
-    (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
+    (asserts! (not (is-eq (contract-call? .conxian-protocol is-paused) (ok true))) (err ERR_PAUSED))
     (try! (contract-call? token-in transfer amount-in tx-sender (as-contract tx-sender) none))
     (let (
       (pool-state (unwrap! (contract-call? .concentrated-liquidity-pool get-pool pool-id) (err ERR_INVALID_PATH)))
@@ -54,7 +54,7 @@
 
 (define-public (set-fee (new-fee uint))
   (begin
-    (asserts! (or (is-eq contract-caller (var-get ops-engine)) (unwrap-panic (contract-call? .admin-facade is-authorized u1))) (err ERR_UNAUTHORIZED))
+    (asserts! (or (is-eq contract-caller (var-get ops-engine)) (is-eq (contract-call? .admin-facade is-authorized u1) (ok true))) (err ERR_UNAUTHORIZED))
     (var-set current-fee new-fee)
     (ok true)
   )
@@ -64,7 +64,7 @@
 (define-public (update-volatility-fees)
   (begin
     ;; Authorized for Ops Engine or Admin
-    (asserts! (or (is-eq contract-caller (var-get ops-engine)) (unwrap-panic (contract-call? .admin-facade is-authorized u1))) (err ERR_UNAUTHORIZED))
+    (asserts! (or (is-eq contract-caller (var-get ops-engine)) (is-eq (contract-call? .admin-facade is-authorized u1) (ok true))) (err ERR_UNAUTHORIZED))
     (let
         (
             (current-height block-height)
@@ -76,7 +76,7 @@
           (let
               (
                   (vol-res (contract-call? .oracle-aggregator get-volatility-index))
-                  (volatility-index (unwrap-panic vol-res))
+                  (volatility-index (unwrap! vol-res (err ERR_UNAUTHORIZED)))
                   ;; Granular fee mapping
                   (calculated-fee (if (> volatility-index u75)
                              MAX-FEE
@@ -104,7 +104,7 @@
 (define-public (set-ops-engine (new-ops principal))
   (begin
     ;; Only global admin can set the ops-engine
-    (asserts! (unwrap-panic (contract-call? .admin-facade is-authorized u1)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq (contract-call? .admin-facade is-authorized u1) (ok true)) (err ERR_UNAUTHORIZED))
     (var-set ops-engine new-ops)
     (ok true)
   )
