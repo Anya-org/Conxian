@@ -9,7 +9,7 @@
 (define-constant ERR_OPERATION_FAILED u1003)
 
 ;; Batch Configuration
-(define-constant MAX_BATCH_SIZE u1000)
+(define-constant MAX_BATCH_SIZE u10)
 (define-constant MAX_GAS_PER_BATCH u1000000)
 
 ;; Data Vars
@@ -43,7 +43,7 @@
         type: uint,
         target: principal,
         function: (string-ascii 32),
-        params: (list 10 principal),
+        params: (list 5 principal),
         gas-limit: uint,
       }
     ))
@@ -96,24 +96,24 @@
 )
 
 ;; Private Helper Functions
-(define-private (validate-batch-operations (operations (list 1000
+(define-private (validate-batch-operations (operations (list 10
   {
   type: uint,
   target: principal,
   function: (string-ascii 32),
-  params: (list 10 principal),
+  params: (list 5 principal),
   gas-limit: uint,
 })))
   (is-eq (len operations) (len operations)) ;; Basic validation
 )
 
 (define-private (execute-batch-with-gas-tracking
-    (operations (list 1000
+    (operations (list 10
       {
         type: uint,
         target: principal,
         function: (string-ascii 32),
-        params: (list 10 principal),
+        params: (list 5 principal),
         gas-limit: uint,
       }
     ))
@@ -139,7 +139,7 @@
       type: uint,
       target: principal,
       function: (string-ascii 32),
-      params: (list 10 principal),
+      params: (list 5 principal),
       gas-limit: uint,
     })
     (accumulator (response uint uint))

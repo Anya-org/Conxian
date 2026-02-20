@@ -609,3 +609,19 @@ clarity-version = 4
 
 
 depends_on = ["block-utils", "sip-standards"]
+
+
+[contracts.bond-token]
+path = "contracts/bonding/bond-token.clar"
+clarity-version = 4
+depends_on = ["sip-standards"]
+
+[contracts.batch-auction]
+path = "contracts/dex/batch-auction.clar"
+clarity-version = 4
+depends_on = ["sip-standards"]
+
+[contracts.oracle]
+path = "contracts/dex/oracle.clar"
+clarity-version = 4
+depends_on = ["defi-traits"]

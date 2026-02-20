@@ -33,6 +33,7 @@ describe("dimensional-engine-optimization", () => {
   });
 
   it("ensures open-position fails when the protocol is paused", () => {
+    // deployer is global-admin in admin-facade by default
     simnet.callPublicFn(
       "conxian-protocol",
       "set-paused",
@@ -44,6 +45,7 @@ describe("dimensional-engine-optimization", () => {
       "dimensional-engine",
       "open-position",
       [
+        Cl.principal(deployer + ".position-manager"),
         Cl.principal(deployer + ".cxd-token"),
         Cl.uint(100),
         Cl.uint(2),
@@ -53,9 +55,7 @@ describe("dimensional-engine-optimization", () => {
       ],
       deployer
     );
-    // Based on conxian-protocol implementation, ERR_PAUSED is u1001
-    // But dimensional-engine might have its own error codes.
-    // Let's check the result.
-    expect(result).toBeDefined();
+    // ERR_CONTRACT_PAUSED = u5000 in dimensional-engine
+    expect(result).toEqual(Cl.error(Cl.uint(5000)));
   });
 });

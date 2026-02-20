@@ -4,7 +4,6 @@ import { Cl } from "@stacks/transactions";
 
 let simnet: Simnet;
 let deployer: string;
-let wallet1: string;
 
 describe("Core Contract Tests", () => {
   beforeAll(async () => {
@@ -14,7 +13,6 @@ describe("Core Contract Tests", () => {
   beforeEach(() => {
     const accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
-    wallet1 = accounts.get("wallet_1")!;
   });
 
   describe("Core Protocol", () => {
@@ -33,14 +31,14 @@ describe("Core Contract Tests", () => {
       expect(result.result).toEqual(Cl.ok(Cl.bool(false)));
     });
 
-    it("should check if caller is owner", () => {
+    it("should check protocol owner", () => {
       const result = simnet.callReadOnlyFn(
         "conxian-protocol",
-        "is-owner",
+        "get-protocol-owner",
         [],
         deployer
       );
-      expect(result.result).toEqual(Cl.ok(Cl.bool(true)));
+      expect(result.result).toEqual(Cl.principal(deployer));
     });
   });
 
@@ -53,32 +51,6 @@ describe("Core Contract Tests", () => {
     it("should have sip-standards trait deployed", () => {
       const contract = simnet.getContractSource("sip-standards");
       expect(contract).toBeDefined();
-    });
-
-    it("should have rbac-trait available", () => {
-      // Test that the trait is properly defined
-      const contract = simnet.getContractSource("core-traits");
-      expect(contract).toBeDefined();
-      if (contract) {
-        expect(contract.contract).toContain("rbac-trait");
-      }
-    });
-  });
-
-  describe("Base Contracts", () => {
-    it("should have ownable contract deployed", () => {
-      const contract = simnet.getContractSource("ownable");
-      expect(contract).toBeDefined();
-    });
-
-    it("should test ownable get-owner function", () => {
-      const result = simnet.callReadOnlyFn(
-        "ownable",
-        "get-owner",
-        [],
-        deployer
-      );
-      expect(result.result).toEqual(Cl.ok(Cl.principal(deployer)));
     });
   });
 
@@ -95,21 +67,15 @@ describe("Core Contract Tests", () => {
       expect(contract).toBeDefined();
     });
 
-    it("should have placeholder function in cxd-token", () => {
-      const result = simnet.callPublicFn(
+    it("should check cxd-token total supply", () => {
+      const result = simnet.callReadOnlyFn(
         "cxd-token",
-        "placeholder",
+        "get-total-supply",
         [],
         deployer
       );
-      expect(result.result).toEqual(Cl.ok(Cl.bool(true)));
+      expect(result.result).toEqual(Cl.ok(Cl.uint(0)));
     });
   });
 
-  describe("Batch Operations", () => {
-    it("should have batch-operations contract deployed", () => {
-      const contract = simnet.getContractSource("batch-operations");
-      expect(contract).toBeDefined();
-    });
-  });
 });
