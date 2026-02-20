@@ -27,7 +27,7 @@
       token-in: token-in,
       token-out: token-out,
       amount: amount,
-      tenure-id: (contract-call? .block-utils get-current-tenure-id),
+      tenure-id: (/ stacks-block-height u10),
     })
     (ok true)
   )

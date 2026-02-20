@@ -3,7 +3,7 @@
 ## [0.7.0] - 2026-02-15 - The Jan 2026 Sovereign Refactor (Ground Truth Clarity 4)
 
 ### Added
-- **Clarity 4 Mainnet Standard**: Forced `clarity-version = 4` and `epoch = "3.0"` across all protocol contracts and deployment plans.
+- **Clarity 4 Mainnet Standard**: Forced `clarity-version = 4` and `epoch = "3.0"` across all protocol contracts and deployment plans. Eliminated legacy `.block-utils` library dependency in favor of native keywords.
 - **Native Integrity**: Implemented functional `contract-hash?` validation in `conxian-protocol.clar` to prevent module tampering.
 - **Native Identity**: Activated `secp256r1-verify` in `conxian-access.clar` for Passkey/Biometric transaction signing.
 - **Native Sovereignty**: Integrated functional `restrict-assets?` in `vault.clar` for in-contract post-condition enforcement.

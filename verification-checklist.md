@@ -11,6 +11,7 @@
 - [x] **Sovereignty**: `restrict-assets?` implemented in critical asset-moving functions (e.g., `vault.clar`).
 - [x] **Identity**: `secp256r1-verify` implemented in `conxian-access.clar` for Passkey support.
 - [x] **Transparency**: `to-ascii?` used in event logs for human-readable audit trails.
+- [x] **Native Optimization**: Legacy `.block-utils` library dependency removed from all core and DeFi modules.
 
 ## 3. Module-Specific Refactors
 - [x] **Root**: `conxian-protocol.clar`, `conxian-access.clar`, `admin-facade.clar`.

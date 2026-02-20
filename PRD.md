@@ -49,7 +49,7 @@ The protocol utilizes a Facade Pattern to separate user interaction from core lo
 ## 6. Technical Specifications
 
 ### 6.1. Nakamoto & Tenure Alignment
-- **Compatibility Standard**: Contracts use `clarity-version = 4` and `epoch = "3.0"` (Nakamoto Mainnet Standard).
+- **Native Standard**: Contracts use `clarity-version = 4` and `epoch = "3.0"` (Nakamoto Mainnet Standard).
 - **Temporal Logic**: Uses native `stacks-block-time` (Unix seconds) for all yield accrual, vesting, and governance logic. Tenure tracking utilizes `stacks-block-height`.
 - **Identity**: Fully implemented native `secp256r1-verify` for biometric/Passkey transaction signing.
 
@@ -114,8 +114,26 @@ Revenue is dynamically distributed based on system health (Global Collateral Rat
 
 ### 12.1. Pending Remedial Tasks
 - [ ] **Task B**: Implement `contracts/drafts/federated-oracle-adapter.clar`.
-- [ ] **Task C**: Update `contracts/drafts/regulatory-adapter.clar` for SIP-018 Compliance.
 - [ ] **Task D**: Redesign `contracts/drafts/lending-manager.clar` for multi-asset collateral.
 
 ### 12.2. Completed Remedial Actions
 - [x] **Task A**: Fix `tests/setup-test-env.ts` (Asynchronous Race Condition). Resolved via singleton pattern and Vitest setupFiles integration (Feb 2026).
+- [x] **Task C**: Update `contracts/compliance/regulatory-adapter.clar` for SIP-018 Compliance. Implemented structured data hashing and signature verification for institutional "Clean-Hands" attestations (Feb 2026).
+
+## 13. Tiered System Testing & Regulatory Benchmarks
+
+The Conxian Protocol adheres to a 4-tier Sovereign Autonomous Everything-as-a-Service (SAXaaP) testing framework to ensure mission-critical stability from Alpha to Million-User scale.
+
+### 13.1. Testing Tiers
+
+| Tier | Scale | Focus | Key Metrics | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **Tier 1: Alpha** | 100 Tx | Core Logic & Determinism | 100% Logic success, Event parity | ACTIVE |
+| **Tier 2: Beta** | 1,000 Tx | Stress & Concurrency | Revert rate < 0.1%, Block consistency | ACTIVE |
+| **Tier 3: Load** | 100,000 Tx | Scalability & Limits | Gas/Map scaling, Data-var stability | DESIGN |
+| **Tier 4: Protocol** | 1,000,000 Tx | Sovereign Stability | Long-term TVL health, Anti-LVR accuracy | PLANNED |
+
+### 13.2. Regulatory Benchmarks (MiCA & Clean-Hands)
+- **SIP-018 Attestations**: All institutional "Clean-Hands" verifications must use SIP-018 signed structured data from authorized regulators.
+- **Passkey Identity**: Retail users utilize `secp256r1-verify` for biometric-secured compliant transactions.
+- **Audit Trails**: All compliance events emit native Clarity 4 `to-ascii` trails for transparent regulatory reporting.

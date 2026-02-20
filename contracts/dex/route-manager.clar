@@ -13,7 +13,6 @@
 ;; Contracts
 (define-data-var regulatory-adapter-contract principal .regulatory-adapter)
 (define-data-var conxian-protocol-contract principal .conxian-protocol)
-(define-data-var block-utils-contract principal .block-utils)
 
 ;; Compliance Helper
 (define-private (check-compliance (user principal))
@@ -62,7 +61,7 @@
             amount-in: amount-in,
             amount-out-min: amount-out-min,
             route: route,
-            tenure-id: (contract-call? .block-utils get-current-tenure-id),
+            tenure-id: (/ stacks-block-height u10),
         })
 
         (ok true)

@@ -4,7 +4,7 @@ title: Protocol Roadmap
 permalink: /docs/ROADMAP/
 ---
 
-# Conxian Protocol Roadmap (v0.6.0)
+# Conxian Protocol Roadmap (v0.7.0)
 
 ## Phase 1: MVP (Foundation Recovery) - COMPLETED
 

@@ -32,9 +32,9 @@
   (contract-call? .economic-policy-engine get-current-interest-rate)
 )
 (define-private (accrue-interest (asset principal))
-  (let ((reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: (contract-call? .block-utils get-burn-block-height) } (map-get? reserve-data asset))))
+  (let ((reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: burn-block-height } (map-get? reserve-data asset))))
     (let (
-      (current-time (contract-call? .block-utils get-burn-block-height))
+      (current-time burn-block-height)
       (time-delta (- current-time (get last-updated reserve)))
     )
       (if (> time-delta u0)
@@ -87,7 +87,7 @@
       (unwrap-panic (accrue-interest asset))
       (let (
         (current-dep (default-to u0 (map-get? deposits { asset: asset, user: tx-sender })))
-        (reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: (contract-call? .block-utils get-burn-block-height) } (map-get? reserve-data asset)))
+        (reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: burn-block-height } (map-get? reserve-data asset)))
       )
         (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
         (asserts! (> amount u0) (err ERR_INVALID_AMOUNT))
@@ -97,7 +97,7 @@
         (map-set deposits { asset: asset, user: tx-sender } (+ current-dep amount))
         (map-set reserve-data asset (merge reserve {
           total-deposits: (+ (get total-deposits reserve) amount),
-          last-updated: (contract-call? .block-utils get-burn-block-height)
+          last-updated: burn-block-height
         }))
 
         (print { event: "deposit", user: tx-sender, asset: asset, amount: amount })
@@ -133,7 +133,7 @@
         (map-set borrows { asset: asset, user: tx-sender } (+ current-bor amount))
         (map-set reserve-data asset (merge reserve {
           total-borrows: (+ (get total-borrows reserve) amount),
-          last-updated: (contract-call? .block-utils get-burn-block-height)
+          last-updated: burn-block-height
         }))
 
         (print { event: "borrow", user: tx-sender, asset: asset, amount: amount })
@@ -164,7 +164,7 @@
           (map-set borrows { asset: asset, user: tx-sender } (- current-bor repaid-amount))
           (map-set reserve-data asset (merge reserve {
             total-borrows: (- (get total-borrows reserve) repaid-amount),
-            last-updated: (contract-call? .block-utils get-burn-block-height)
+            last-updated: burn-block-height
           }))
 
           (print { event: "repay", user: tx-sender, asset: asset, amount: repaid-amount })
