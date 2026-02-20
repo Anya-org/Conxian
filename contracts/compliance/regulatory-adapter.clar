@@ -91,7 +91,7 @@
     ;; Update Status
     (map-set compliance-status { user: user } {
       clean-hands: true,
-      verified-at: stacks-block-time,
+      verified-at: (contract-call? .block-utils get-stacks-block-time),
       jurisdiction: jurisdiction,
       tier: tier
     })
