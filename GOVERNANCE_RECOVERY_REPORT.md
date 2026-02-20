@@ -39,7 +39,7 @@ During the February sprint integration testing, a critical hurdle was identified
 | #109 | Resolve MEV protector dependency | COMPLETED | Fixed `mev-protector.clar` dependency on `encoding` and corrected syntax errors. |
 | #71 | Mainnet Checklist | MOSTLY DONE | P1-P6 repairs complete. Core logic aligned with Clarity 4/Nakamoto. |
 | **NEW** | **Root-to-Leaf Consolidation** | **COMPLETED** | **Liquidation logic and TVL metrics unified across the protocol stack.** |
-| **NEW** | **Test Env Refactor** | **IN PROGRESS** | **Transitioning to Principal Injection to resolve circular dependencies.** |
+| **NEW** | **Test Env Refactor** | **COMPLETED** | **Resolved asynchronous race conditions in Simnet initialization via singleton/Proxy pattern.** |
 
 ## 5. Remaining Critical Gaps
 
