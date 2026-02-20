@@ -109,3 +109,13 @@ Revenue is dynamically distributed based on system health (Global Collateral Rat
 ## 11. Sprint February 2026: The Integrity Refactor
 - **Objective**: Full address of testing implementation against C4 codebase.
 - **Outcome**: 21 passing test suites, Dual-Mode compatibility, and resolved circular dependencies.
+
+## 12. Recovery Registry (Remedial Actions)
+
+### 12.1. Pending Remedial Tasks
+- [ ] **Task B**: Implement `contracts/drafts/federated-oracle-adapter.clar`.
+- [ ] **Task C**: Update `contracts/drafts/regulatory-adapter.clar` for SIP-018 Compliance.
+- [ ] **Task D**: Redesign `contracts/drafts/lending-manager.clar` for multi-asset collateral.
+
+### 12.2. Completed Remedial Actions
+- [x] **Task A**: Fix `tests/setup-test-env.ts` (Asynchronous Race Condition). Resolved via singleton pattern and Vitest setupFiles integration (Feb 2026).

@@ -98,6 +98,7 @@ For contribution guidelines, please see [CONTRIBUTING.md](CONTRIBUTING.md).
   - ✅ **Root-to-Leaf Consolidation**: Liquidation logic centralized in `risk-manager`.
   - ✅ **TVL Normalization**: Repaired cross-token decimal aggregation in `finance-metrics`.
   - ✅ **Monitoring Activation**: Live telemetry dashboard enabled.
+  - ✅ **Testing Infrastructure**: Resolved asynchronous race conditions in Simnet initialization.
   - ✅ P1: Sovereign Handoff (timelock execution, admin transfers)
   - ✅ P2: Regulatory Gaps (compliance provider system, KYC/AML)
   - ✅ P3: Tokenomics Clarity (1B CXD supply cap, Fiscal Dam V4)
