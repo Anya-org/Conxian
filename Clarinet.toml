@@ -117,7 +117,7 @@ path = "contracts/core/conxian-access.clar"
 clarity-version = 4
 
 
-depends_on = ["block-utils", "core-traits"]
+depends_on = ["core-traits"]
 
 [contracts.admin-facade]
 path = "contracts/core/admin-facade.clar"
@@ -132,7 +132,7 @@ clarity-version = 4
 
 
 
-depends_on = ["admin-facade", "block-utils", "core-traits"]
+depends_on = ["admin-facade", "core-traits"]
 
 [contracts.compliance-trait]
 path = "contracts/compliance/compliance-trait.clar"
@@ -143,7 +143,7 @@ path = "contracts/compliance/regulatory-adapter.clar"
 clarity-version = 4
 
 
-depends_on = ["block-utils", "core-traits"]
+depends_on = ["core-traits"]
 
 [contracts.economic-policy-engine]
 path = "contracts/core/economic-policy-engine.clar"
@@ -213,21 +213,21 @@ path = "contracts/dex/vault.clar"
 clarity-version = 4
 
 
-depends_on = ["block-utils", "circuit-breaker", "conxian-protocol", "defi-traits", "sip-standards", "vault-trait"]
+depends_on = ["circuit-breaker", "conxian-protocol", "defi-traits", "sip-standards", "vault-trait"]
 
 [contracts.dimensional-engine]
 path = "contracts/core/dimensional-engine.clar"
 clarity-version = 4
 
 
-depends_on = ["admin-facade", "block-utils", "concentrated-liquidity-pool", "conxian-protocol", "core-traits", "regulatory-adapter", "sip-standards"]
+depends_on = ["admin-facade", "concentrated-liquidity-pool", "conxian-protocol", "core-traits", "regulatory-adapter", "sip-standards"]
 
 [contracts.dimensional-core]
 path = "contracts/dimensional/dimensional-core.clar"
 clarity-version = 4
 
 
-depends_on = ["block-utils", "core-traits", "defi-traits", "oracle-aggregator", "position-nft", "security-monitoring", "sip-standards"]
+depends_on = ["core-traits", "defi-traits", "oracle-aggregator", "position-nft", "security-monitoring", "sip-standards"]
 
 [contracts.position-nft]
 path = "contracts/dimensional/position-nft.clar"
@@ -336,7 +336,7 @@ path = "contracts/governance/voting.clar"
 clarity-version = 4
 
 
-depends_on = ["admin-facade", "block-utils", "conxian-access", "governance-traits", "sip-standards"]
+depends_on = ["admin-facade", "conxian-access", "governance-traits", "sip-standards"]
 
 [contracts.dao-treasury]
 path = "contracts/governance/dao-treasury.clar"
@@ -371,7 +371,7 @@ path = "contracts/lending/lending-manager.clar"
 clarity-version = 4
 
 
-depends_on = ["admin-facade", "block-utils", "circuit-breaker", "concentrated-liquidity-pool", "conxian-protocol", "cxd-token", "economic-policy-engine", "revenue-distributor", "risk-manager", "sip-standards"]
+depends_on = ["admin-facade", "circuit-breaker", "concentrated-liquidity-pool", "conxian-protocol", "cxd-token", "economic-policy-engine", "revenue-distributor", "risk-manager", "sip-standards"]
 
 [contracts.conxian-insurance-fund]
 path = "contracts/security/conxian-insurance-fund.clar"
@@ -385,14 +385,14 @@ path = "contracts/integrations/redstone-oracle-adapter.clar"
 clarity-version = 4
 
 
-depends_on = ["block-utils", "defi-traits", "redstone-traits"]
+depends_on = ["defi-traits", "redstone-traits"]
 
 [contracts.pyth-oracle-adapter]
 path = "contracts/integrations/pyth-oracle-adapter.clar"
 clarity-version = 4
 
 
-depends_on = ["block-utils", "conxian-protocol", "defi-traits", "pyth-traits"]
+depends_on = ["conxian-protocol", "defi-traits", "pyth-traits"]
 
 [contracts.chainlink-adapter]
 path = "contracts/integrations/chainlink-adapter.clar"
@@ -413,7 +413,7 @@ path = "contracts/integrations/switchboard-oracle-adapter.clar"
 clarity-version = 4
 
 
-depends_on = ["block-utils", "defi-traits"]
+depends_on = ["defi-traits"]
 
 [contracts.twap-oracle]
 path = "contracts/integrations/twap-oracle.clar"
@@ -455,7 +455,7 @@ path = "contracts/core/collateral-manager.clar"
 clarity-version = 4
 
 
-depends_on = ["block-utils", "conxian-access", "conxian-protocol", "core-traits", "sip-standards"]
+depends_on = ["conxian-access", "conxian-protocol", "core-traits", "sip-standards"]
 
 [contracts.risk-manager]
 path = "contracts/core/risk-manager.clar"
@@ -483,7 +483,7 @@ path = "contracts/yield/cxd-staking.clar"
 clarity-version = 4
 
 
-depends_on = ["block-utils", "core-traits", "cxd-token", "regulatory-adapter", "revenue-distributor", "sip-standards"]
+depends_on = ["core-traits", "cxd-token", "regulatory-adapter", "revenue-distributor", "sip-standards"]
 
 [contracts.wormhole-outbox]
 path = "contracts/interoperability/wormhole-outbox.clar"
@@ -511,14 +511,14 @@ path = "contracts/core/founder-vesting.clar"
 clarity-version = 4
 
 
-depends_on = ["block-utils", "sip-standards"]
+depends_on = ["sip-standards"]
 
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
 clarity-version = 4
 
 
-depends_on = ["automation-traits", "block-utils", "conxian-access", "core-traits", "cxd-token", "defi-traits", "dimensional-core", "lending-manager", "office-manager", "ops-engine", "oracle-aggregator", "position-manager", "risk-manager"]
+depends_on = ["automation-traits", "conxian-access", "core-traits", "cxd-token", "defi-traits", "dimensional-core", "lending-manager", "office-manager", "ops-engine", "oracle-aggregator", "position-manager", "risk-manager"]
 
 [contracts.cxd-treasury]
 path = "contracts/treasury/cxd-treasury.clar"
@@ -539,7 +539,7 @@ path = "contracts/core/ops-engine.clar"
 clarity-version = 4
 
 
-depends_on = ["admin-facade", "agent-risk", "agent-treasury", "block-utils", "conxian-protocol", "cxd-token", "governance-traits", "swap-router"]
+depends_on = ["admin-facade", "agent-risk", "agent-treasury", "conxian-protocol", "cxd-token", "governance-traits", "swap-router"]
 
 [contracts.mock-usda-token]
 path = "contracts/test-helpers/mock-token.clar"
@@ -554,7 +554,7 @@ path = "contracts/compliance/compliance-manager.clar"
 clarity-version = 4
 
 
-depends_on = ["block-utils"]
+
 
 [contracts.dex-factory]
 path = "contracts/dex/dex-factory.clar"
@@ -572,7 +572,7 @@ path = "contracts/identity/kyc-registry.clar"
 clarity-version = 4
 
 
-depends_on = ["block-utils"]
+
 
 [contracts.compliance-hooks]
 path = "contracts/compliance/compliance-hooks.clar"
@@ -608,7 +608,7 @@ clarity-version = 4
 
 
 
-depends_on = ["block-utils", "sip-standards"]
+depends_on = ["sip-standards"]
 
 
 [contracts.bond-token]
@@ -625,3 +625,7 @@ depends_on = ["sip-standards"]
 path = "contracts/dex/oracle.clar"
 clarity-version = 4
 depends_on = ["defi-traits"]
+
+[contracts.test-c4]
+path = "contracts/test-helpers/test-c4.clar"
+clarity-version = 4

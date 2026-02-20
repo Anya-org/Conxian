@@ -85,7 +85,7 @@
       grant: grant,
       buyback: buyback,
       insurance: insurance,
-      timestamp: (contract-call? .block-utils get-stacks-block-height)
+      timestamp: stacks-block-height
     })
     (ok true)
   )

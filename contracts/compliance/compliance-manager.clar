@@ -70,13 +70,13 @@
             sanctions-checked: sanctions-checked,
             kyc-level: kyc-level,
             travel-rule-checked: travel-rule-checked,
-            last-updated: (contract-call? .block-utils get-stacks-block-time)
+            last-updated: stacks-block-time
         })
         (print {
             event: "compliance-checked",
             user: user,
             kyc-level: kyc-level,
-            timestamp: (contract-call? .block-utils get-stacks-block-time)
+            timestamp: stacks-block-time
         })
         (ok true)
     )
@@ -90,7 +90,7 @@
 (define-read-only (is-compliant (user principal))
     (let ((record (map-get? compliance-records user)))
         (match record
-            data (if (> (- (contract-call? .block-utils get-stacks-block-time) (get last-updated data)) VALIDITY_PERIOD)
+            data (if (> (- stacks-block-time (get last-updated data)) VALIDITY_PERIOD)
                     false
                     (get sanctions-checked data))
             false

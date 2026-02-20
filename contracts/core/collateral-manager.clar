@@ -13,7 +13,6 @@
 ;; Contracts
 (define-data-var conxian-protocol-contract principal .conxian-protocol)
 (define-data-var rbac-contract principal .conxian-access)
-(define-data-var block-utils-contract principal .block-utils)
 
 ;; Map: User -> Token -> Amount
 (define-map user-collateral
@@ -37,7 +36,7 @@
           token: token-principal,
         })
       ))
-      (tenure-id (contract-call? .block-utils get-current-tenure-id))
+      (tenure-id (/ stacks-block-height u10))
     )
     (begin
       (asserts!
@@ -103,7 +102,7 @@
         user: tx-sender,
         token: token-principal,
         amount: amount,
-        tenure-id: (contract-call? .block-utils get-current-tenure-id),
+        tenure-id: (/ stacks-block-height u10),
       })
 
       (ok true)

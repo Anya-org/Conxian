@@ -49,7 +49,7 @@ The protocol utilizes a Facade Pattern to separate user interaction from core lo
 ## 6. Technical Specifications
 
 ### 6.1. Nakamoto & Tenure Alignment
-- **Compatibility Standard**: Contracts use `clarity-version = 4` and `epoch = "3.0"` (Nakamoto Mainnet Standard).
+- **Native Standard**: Contracts use `clarity-version = 4` and `epoch = "3.0"` (Nakamoto Mainnet Standard).
 - **Temporal Logic**: Uses native `stacks-block-time` (Unix seconds) for all yield accrual, vesting, and governance logic. Tenure tracking utilizes `stacks-block-height`.
 - **Identity**: Fully implemented native `secp256r1-verify` for biometric/Passkey transaction signing.
 

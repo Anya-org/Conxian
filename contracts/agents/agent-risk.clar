@@ -117,7 +117,7 @@
     health-score: (assess-system-risk),
     financial-gcr: (get-gcr-internal),
     operational-fee: (var-get stability-fee),
-    timestamp: (contract-call? .block-utils get-stacks-block-height)
+    timestamp: stacks-block-height
   }
 )
 

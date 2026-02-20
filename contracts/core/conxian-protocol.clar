@@ -31,8 +31,8 @@
   (ok {
     compliant: true,
     paused: (var-get paused),
-    tenure-id: (some (contract-call? .block-utils get-current-tenure-id)),
-    timestamp: (contract-call? .block-utils get-stacks-block-time),
+    tenure-id: (some (/ stacks-block-height u10)),
+    timestamp: stacks-block-time,
     version: "06"
   })
 )
@@ -54,7 +54,7 @@
   (begin
     (asserts! (contract-call? .admin-facade is-authorized-to-pause tx-sender) (err ERR_UNAUTHORIZED))
     (var-set paused new-paused)
-    (print { event: "protocol-pause-status", paused: new-paused, timestamp: (contract-call? .block-utils get-stacks-block-time) })
+    (print { event: "protocol-pause-status", paused: new-paused, timestamp: stacks-block-time })
     (ok true)
   )
 )
@@ -88,8 +88,7 @@
 (define-public (register-module (name (string-ascii 32)) (contract principal))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
-    ;; Safe Wrapper for (contract-call? .block-utils contract-hash-safe)
-    (let ((c-hash (unwrap-panic (contract-call? .block-utils contract-hash-safe contract))))
+    (let ((c-hash (unwrap-panic (contract-hash? contract))))
       (map-set modules { name: name } {
         contract: contract,
         active: true,

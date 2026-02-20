@@ -62,11 +62,17 @@
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set compliance-status { user: user } {
       clean-hands: true,
-      verified-at: (contract-call? .block-utils get-stacks-block-time),
+      verified-at: stacks-block-time,
       jurisdiction: jurisdiction,
       tier: tier
     })
-    (print { event: "compliance-verified", user: user, jurisdiction: jurisdiction, tier: tier })
+    (print {
+        event: "compliance-verified",
+        user: user,
+        jurisdiction: jurisdiction,
+        tier: tier,
+        audit: (to-ascii? DOMAIN_NAME)
+    })
     (ok true)
   )
 )
@@ -94,7 +100,8 @@
       event: "compliance-verified-sip018",
       user: user,
       jurisdiction: jurisdiction,
-      tier: tier
+      tier: tier,
+      audit: (to-ascii? DOMAIN_NAME)
     })
     (ok true)
   )
@@ -106,8 +113,10 @@
 )
 
 (define-read-only (get-structured-data-hash (user principal) (jurisdiction (string-ascii 64)) (tier uint))
-  ;; Simplified hash for simulation compatibility
-  (sha256 (concat TYPE_HASH (sha256 0x01020304)))
+  ;; Improved structured hash using available Clarity 4 primitives
+  (sha256 (concat TYPE_HASH
+    (sha256 (concat (sha256 (unwrap-panic (to-ascii? (sha256 (concat DOMAIN_NAME DOMAIN_VERSION))))) (sha256 jurisdiction)))
+  ))
 )
 
 (define-read-only (get-sip018-hash (user principal) (jurisdiction (string-ascii 64)) (tier uint))
@@ -119,6 +128,7 @@
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set blacklist user true)
+    (print { event: "user-blacklisted", user: user, timestamp: stacks-block-time, audit: (to-ascii? DOMAIN_NAME) })
     (ok true)
   )
 )
@@ -128,6 +138,7 @@
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (var-set regulatory-authority new-authority)
     (var-set authority-pubkey new-pubkey)
+    (print { event: "authority-updated", new-authority: new-authority, audit: (to-ascii? DOMAIN_NAME) })
     (ok true)
   )
 )

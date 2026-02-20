@@ -57,7 +57,7 @@
   )
   (let (
       (position-id (+ (var-get position-nonce) u1))
-      (tenure-id (contract-call? .block-utils get-current-tenure-id))
+      (tenure-id (/ stacks-block-height u10))
     )
     ;; 1. Check Global Pause via Facade
     (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1001))
@@ -114,7 +114,7 @@
       event: "close-position",
       position-id: position-id,
       owner: tx-sender,
-      tenure-id: (contract-call? .block-utils get-current-tenure-id),
+      tenure-id: (/ stacks-block-height u10),
     })
     (ok true)
   )

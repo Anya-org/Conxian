@@ -31,7 +31,7 @@
     (print {
       event: "redstone-data-verified",
       timestamp: timestamp,
-      tenure-id: (contract-call? .block-utils get-current-tenure-id),
+      tenure-id: (/ stacks-block-height u10),
     })
     (ok true)
   )

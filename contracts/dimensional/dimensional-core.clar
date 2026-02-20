@@ -286,7 +286,7 @@
         tags: tags,
         version: (var-get positions-version),
         metadata: metadata,
-        tenure-id: (contract-call? .block-utils get-current-tenure-id),
+        tenure-id: (/ stacks-block-height u10),
       })
 
       ;; Fix size calculation for short
@@ -322,7 +322,7 @@
         position-type: position-type,
         token: token,
         price: price,
-        tenure-id: (contract-call? .block-utils get-current-tenure-id),
+        tenure-id: (/ stacks-block-height u10),
       })
       (ok position-id)
     )
@@ -390,7 +390,7 @@
         owner: tx-sender,
         pnl: pnl,
         fees: fees,
-        tenure-id: (contract-call? .block-utils get-current-tenure-id),
+        tenure-id: (/ stacks-block-height u10),
       })
       (ok true)
     )
@@ -449,7 +449,7 @@
         position-id: position-id,
         owner: user,
         liquidator: tx-sender,
-        tenure-id: (contract-call? .block-utils get-current-tenure-id),
+        tenure-id: (/ stacks-block-height u10),
       })
 
       (ok true)
@@ -460,7 +460,7 @@
 
 ;; --- Nakamoto Consensus Integration ---
 (define-private (check-bitcoin-finality)
-  (contract-call? .block-utils check-finality)
+  (ok (asserts! (> burn-block-height u6) (err ERR_BITCOIN_NOT_FINALIZED)))
 )
 
 ;; ===== Initialization =====

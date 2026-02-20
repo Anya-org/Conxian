@@ -13,7 +13,6 @@
 
 ;; Data Vars
 (define-data-var pyth-contract principal .pyth-oracle-v2-mock)
-(define-data-var block-utils-contract principal .block-utils)
 (define-data-var conxian-protocol-contract principal .conxian-protocol)
 
 ;; @desc Updates the price feed with a VAA (Pull Model)
@@ -30,7 +29,7 @@
 ;; @desc Fetches the price from Pyth (Normalized to 8 decimals)
 (define-public (get-price (asset principal))
   (let (
-      (tenure-id (contract-call? .block-utils get-current-tenure-id))
+      (tenure-id (/ stacks-block-height u10))
       (price-data u100000000)
     )
     (begin
