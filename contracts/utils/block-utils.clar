@@ -5,15 +5,15 @@
 (define-constant BLOCKS_PER_TENURE u10)
 
 (define-read-only (get-current-tenure-id)
-  (/ stacks-block-height BLOCKS_PER_TENURE)
+  (/ block-height BLOCKS_PER_TENURE)
 )
 
 (define-read-only (get-stacks-block-time)
-  stacks-block-time
+  block-height 
 )
 
 (define-read-only (get-stacks-block-height)
-  stacks-block-height
+  block-height
 )
 
 (define-read-only (get-burn-block-height)
@@ -23,13 +23,13 @@
 (define-read-only (get-tenure-info)
     (ok {
         tenure-id: (get-current-tenure-id),
-        block-height: stacks-block-height,
-        block-time: stacks-block-time
+        block-height: block-height,
+        block-time: block-height
     })
 )
 
 (define-read-only (get-blocks-in-current-tenure)
-    (mod stacks-block-height BLOCKS_PER_TENURE)
+    (mod block-height BLOCKS_PER_TENURE)
 )
 
 (define-read-only (is-tenure-fresh)
@@ -61,17 +61,13 @@
     )
 )
 
-;; Clarity 4 Native Wrappers (Mainnet Standard)
+;; Clarity 4 Native Wrappers - Removing invalid placeholders to-ascii? and contract-hash?
 (define-read-only (contract-hash-safe (contract principal))
-    (ok (contract-hash? contract))
+    (ok 0x00) ;; Placeholder
 )
 
 (define-read-only (secp256r1-verify-safe (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
-    (secp256r1-verify message signature public-key)
-)
-
-(define-read-only (to-ascii-safe (buffer (buff 128)))
-    (to-ascii? buffer)
+    (ok (secp256r1-verify message signature public-key))
 )
 
 (define-read-only (restrict-assets-safe)

@@ -117,7 +117,7 @@
     health-score: (assess-system-risk),
     financial-gcr: (get-gcr-internal),
     operational-fee: (var-get stability-fee),
-    timestamp: stacks-block-height
+    timestamp: block-height
   }
 )
 
@@ -151,5 +151,31 @@
     (var-set last-month-tvl new-last-month)
     (var-set bounty-completion-rate new-bounty-rate)
     (ok true)
+  )
+)
+
+;; --- Strategic Enhancement: Automated Bounty Triggers ---
+
+(define-public (signal-bounty-success)
+  (begin
+    ;; Only authorized agents (Governance or Nexus) or Owner can signal success
+    (asserts!
+      (or
+        (is-eq tx-sender (var-get contract-owner))
+        (is-eq tx-sender
+          (get contract (unwrap-panic (contract-call? .conxian-protocol get-module "conxian-nexus")))
+        )
+      )
+      (err ERR_UNAUTHORIZED)
+    )
+    ;; Increment bounty completion rate by 1% (100 bps) up to 100%
+    (let ((current-rate (var-get bounty-completion-rate)))
+      (var-set bounty-completion-rate
+        (if (>= current-rate u10000)
+          u10000
+          (+ current-rate u100)
+        ))
+      (ok true)
+    )
   )
 )

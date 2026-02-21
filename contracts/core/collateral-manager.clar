@@ -36,7 +36,7 @@
           token: token-principal,
         })
       ))
-      (tenure-id (/ stacks-block-height u10))
+      (tenure-id (/ block-height u10))
     )
     (begin
       (asserts!
@@ -102,7 +102,7 @@
         user: tx-sender,
         token: token-principal,
         amount: amount,
-        tenure-id: (/ stacks-block-height u10),
+        tenure-id: (/ block-height u10),
       })
 
       (ok true)

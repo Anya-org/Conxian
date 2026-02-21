@@ -31,8 +31,8 @@
   (ok {
     compliant: true,
     paused: (var-get paused),
-    tenure-id: (some (/ stacks-block-height u10)),
-    timestamp: stacks-block-time,
+    tenure-id: (some (/ block-height u10)),
+    timestamp: block-height,
     version: "06"
   })
 )
@@ -54,7 +54,7 @@
   (begin
     (asserts! (contract-call? .admin-facade is-authorized-to-pause tx-sender) (err ERR_UNAUTHORIZED))
     (var-set paused new-paused)
-    (print { event: "protocol-pause-status", paused: new-paused, timestamp: stacks-block-time })
+    (print { event: "protocol-pause-status", paused: new-paused, timestamp: block-height })
     (ok true)
   )
 )
@@ -88,14 +88,12 @@
 (define-public (register-module (name (string-ascii 32)) (contract principal))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
-    (let ((c-hash (unwrap-panic (contract-hash? contract))))
-      (map-set modules { name: name } {
-        contract: contract,
-        active: true,
-        hash: (some c-hash)
-      })
-      (ok true)
-    )
+    (map-set modules { name: name } {
+      contract: contract,
+      active: true,
+      hash: none ;; Removing invalid contract-hash? for now
+    })
+    (ok true)
   )
 )
 

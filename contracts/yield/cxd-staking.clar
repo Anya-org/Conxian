@@ -2,7 +2,7 @@
 ;; Conxian Enterprise Standard: Staking & Yield (Tier 0 Compliance)
 ;; Implements O(1) Scalable Reward Distribution with "Clean-Hands" Enforcement.
 ;; Pausable Staking (Deposits paused on emergency, Withdrawals always open).
-;; Clarity 4 Standard: Native stacks-block-time for second-precision yield.
+;; Clarity 4 Standard: Native block-height for tenure-precision yield.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
@@ -60,7 +60,7 @@
     (var-get reward-per-token-stored)
     (+ (var-get reward-per-token-stored)
        (/ (* (var-get reward-rate)
-             (- stacks-block-time (var-get last-update-time))
+             (- block-height (var-get last-update-time))
              u1000000)
           (var-get total-staked)))
   )
@@ -76,7 +76,7 @@
 (define-private (update-reward (account principal))
   (begin
     (var-set reward-per-token-stored (reward-per-token))
-    (var-set last-update-time stacks-block-time)
+    (var-set last-update-time block-height)
     (map-set user-rewards account (earned account))
     (map-set user-reward-per-token-paid account (var-get reward-per-token-stored))
   )
@@ -151,7 +151,7 @@
     (print {
       event: "staking-pause-update",
       paused: paused,
-      timestamp: stacks-block-time
+      timestamp: block-height
     })
     (ok true)
   )

@@ -61,7 +61,7 @@
             amount-in: amount-in,
             amount-out-min: amount-out-min,
             route: route,
-            tenure-id: (/ stacks-block-height u10),
+            tenure-id: (/ block-height u10),
         })
 
         (ok true)

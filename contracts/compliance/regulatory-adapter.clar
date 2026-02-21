@@ -1,7 +1,6 @@
-;; regulatory-adapter.clar
 ;; Conxian Finance: Regulatory Adapter (Clean-Hands Compliance)
 ;; Enhanced Institutional Hardening - MiCA Readiness
-;; SIP-018 Compliant Attestations
+;; SIP-018 Compliant Attestations (Nakamoto-Ready)
 
 ;; Traits
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
@@ -20,7 +19,10 @@
 ;; Data Vars
 (define-data-var contract-owner principal tx-sender)
 (define-data-var regulatory-authority principal tx-sender)
-(define-data-var authority-pubkey (buff 33) 0x000000000000000000000000000000000000000000000000000000000000000000)
+(define-data-var threshold uint u1)
+
+;; Maps
+(define-map authorized-signers (buff 33) uint)
 
 ;; Maps
 (define-map compliance-status
@@ -62,7 +64,7 @@
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set compliance-status { user: user } {
       clean-hands: true,
-      verified-at: stacks-block-time,
+      verified-at: block-height,
       jurisdiction: jurisdiction,
       tier: tier
     })
@@ -71,37 +73,52 @@
         user: user,
         jurisdiction: jurisdiction,
         tier: tier,
-        audit: (to-ascii? DOMAIN_NAME)
+        audit: DOMAIN_NAME
     })
     (ok true)
   )
 )
 
-;; SIP-018: Verify Compliance Signature
-(define-public (verify-and-update-compliance (user principal) (jurisdiction (string-ascii 64)) (tier uint) (signature (buff 65)))
+;; Multisig Verification Helpers
+(define-private (verify-sig-and-get-weight (pubkey (buff 33)) (acc { message-hash: (buff 32), signatures: (list 10 (buff 65)), index: uint, total-weight: uint }))
+  (let (
+    (signature (unwrap-panic (element-at (get signatures acc) (get index acc))))
+    (weight (default-to u0 (map-get? authorized-signers pubkey)))
+    (is-valid (secp256k1-verify (get message-hash acc) signature pubkey))
+  )
+    {
+      message-hash: (get message-hash acc),
+      signatures: (get signatures acc),
+      index: (+ (get index acc) u1),
+      total-weight: (if is-valid (+ (get total-weight acc) weight) (get total-weight acc))
+    }
+  )
+)
+
+;; SIP-018: Verify Compliance Signature (Multisig version)
+(define-public (verify-and-update-compliance (user principal) (jurisdiction (string-ascii 64)) (tier uint) (signatures (list 10 (buff 65))) (pubkeys (list 10 (buff 33))))
   (let (
     (message-hash (get-sip018-hash user jurisdiction tier))
-    (pubkey (var-get authority-pubkey))
+    (verification-result (fold verify-sig-and-get-weight pubkeys { message-hash: message-hash, signatures: signatures, index: u0, total-weight: u0 }))
   )
-    ;; Assert that authority pubkey is set
-    (asserts! (not (is-eq pubkey 0x000000000000000000000000000000000000000000000000000000000000000000)) (err ERR_UNAUTHORIZED))
-    ;; Verify Signature
-    (asserts! (secp256k1-verify message-hash signature pubkey) (err ERR_INVALID_SIGNATURE))
+    ;; Check if total weight meets threshold
+    (asserts! (>= (get total-weight verification-result) (var-get threshold)) (err ERR_INVALID_SIGNATURE))
 
     ;; Update Status
     (map-set compliance-status { user: user } {
       clean-hands: true,
-      verified-at: (contract-call? .block-utils get-stacks-block-time),
+      verified-at: block-height,
       jurisdiction: jurisdiction,
       tier: tier
     })
 
     (print {
-      event: "compliance-verified-sip018",
+      event: "compliance-verified-multisig",
       user: user,
       jurisdiction: jurisdiction,
-      tier: tier,
-      audit: (to-ascii? DOMAIN_NAME)
+      total-weight: (get total-weight verification-result),
+      threshold: (var-get threshold),
+      audit: DOMAIN_NAME
     })
     (ok true)
   )
@@ -115,7 +132,7 @@
 (define-read-only (get-structured-data-hash (user principal) (jurisdiction (string-ascii 64)) (tier uint))
   ;; Improved structured hash using available Clarity 4 primitives
   (sha256 (concat TYPE_HASH
-    (sha256 (concat (sha256 (unwrap-panic (to-ascii? (sha256 (concat DOMAIN_NAME DOMAIN_VERSION))))) (sha256 jurisdiction)))
+    (sha256 (concat (sha256 (unwrap-panic (to-consensus-buff? (sha256 (concat DOMAIN_NAME DOMAIN_VERSION))))) (sha256 jurisdiction)))
   ))
 )
 
@@ -128,17 +145,34 @@
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set blacklist user true)
-    (print { event: "user-blacklisted", user: user, timestamp: stacks-block-time, audit: (to-ascii? DOMAIN_NAME) })
+    (print { event: "user-blacklisted", user: user, timestamp: block-height, audit: DOMAIN_NAME })
     (ok true)
   )
 )
 
-(define-public (update-authority (new-authority principal) (new-pubkey (buff 33)))
+(define-public (update-authority (new-authority principal))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (var-set regulatory-authority new-authority)
-    (var-set authority-pubkey new-pubkey)
-    (print { event: "authority-updated", new-authority: new-authority, audit: (to-ascii? DOMAIN_NAME) })
+    (print { event: "authority-updated", new-authority: new-authority, audit: DOMAIN_NAME })
+    (ok true)
+  )
+)
+
+(define-public (set-signer (pubkey (buff 33)) (weight uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (map-set authorized-signers pubkey weight)
+    (print { event: "signer-updated", pubkey: pubkey, weight: weight })
+    (ok true)
+  )
+)
+
+(define-public (set-threshold (new-threshold uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (var-set threshold new-threshold)
+    (print { event: "threshold-updated", threshold: new-threshold })
     (ok true)
   )
 )

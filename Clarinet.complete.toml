@@ -24,7 +24,7 @@ path = "contracts/dex/batch-auction.clar"
 
 [contracts.math-lib-concentrated]
 path = "contracts/math/math-lib-concentrated.clar"
-clarity-version = 4
+clarity-version = 3
 
 [contracts.budget-manager]
 path = "contracts/budget-manager.clar"
@@ -64,7 +64,7 @@ path = "contracts/traits/core-traits.clar"
 
 [contracts.block-utils]
 path = "contracts/utils/block-utils.clar"
-clarity-version = 4
+clarity-version = 3
 
 [contracts.defi-traits]
 path = "contracts/traits/defi-traits.clar"
@@ -104,7 +104,7 @@ path = "contracts/tokens/cxlp-token.clar"
 
 [contracts.regulatory-adapter]
 path = "contracts/compliance/regulatory-adapter.clar"
-clarity-version = 4
+clarity-version = 3
 
 [contracts.cxs-token]
 path = "contracts/tokens/cxs-token.clar"
@@ -249,7 +249,7 @@ depends_on = [ "conxian-protocol",]
 
 [contracts.dex-factory]
 path = "contracts/dex/dex-factory.clar"
-clarity-version = 4
+clarity-version = 3
 
 [contracts.nft-marketplace]
 path = "contracts/marketplace/nft-marketplace.clar"
@@ -561,7 +561,7 @@ path = "contracts/oracle/dimensional-oracle.clar"
 
 [contracts.economic-policy-engine]
 path = "contracts/core/economic-policy-engine.clar"
-clarity-version = 4
+clarity-version = 3
 
 [contracts.dimensional-core]
 path = "contracts/dimensional/dimensional-core.clar"
@@ -675,7 +675,7 @@ depends_on = [ "office-manager",]
 
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
-clarity-version = 4
+clarity-version = 3
 depends_on = [ "position-manager", "office-manager",]
 
 [contracts.proposal-executor]

@@ -10,8 +10,10 @@
 (define-data-var contract-owner principal tx-sender)
 (define-data-var sanctions-provider principal tx-sender)
 
-;; 24-hour validity period (86400 seconds)
-(define-constant VALIDITY_PERIOD u86400)
+;; 24-hour validity period (~144 blocks at 10m intervals, or more in Nakamoto)
+;; For Nakamoto, we might want a larger number of blocks if we expect fast blocks, 
+;; but keeping it conservative at 144 for L1 sync.
+(define-constant VALIDITY_PERIOD u144)
 
 (define-map compliance-records
     principal
@@ -70,13 +72,13 @@
             sanctions-checked: sanctions-checked,
             kyc-level: kyc-level,
             travel-rule-checked: travel-rule-checked,
-            last-updated: stacks-block-time
+            last-updated: block-height
         })
         (print {
             event: "compliance-checked",
             user: user,
             kyc-level: kyc-level,
-            timestamp: stacks-block-time
+            timestamp: block-height
         })
         (ok true)
     )
@@ -90,7 +92,7 @@
 (define-read-only (is-compliant (user principal))
     (let ((record (map-get? compliance-records user)))
         (match record
-            data (if (> (- stacks-block-time (get last-updated data)) VALIDITY_PERIOD)
+            data (if (> (- block-height (get last-updated data)) VALIDITY_PERIOD)
                     false
                     (get sanctions-checked data))
             false

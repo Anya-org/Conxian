@@ -103,7 +103,7 @@
       event: "owner-changed",
       old-owner: tx-sender,
       new-owner: new-owner,
-      timestamp: stacks-block-time
+      timestamp: block-height
     })
     (ok true)
   )
@@ -119,7 +119,7 @@
       event: "sovereign-handoff",
       module: "conxian-access",
       new-owner: (var-get timelock-principal),
-      timestamp: stacks-block-time
+      timestamp: block-height
     })
     (ok true)
   )

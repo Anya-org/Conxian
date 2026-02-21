@@ -49,6 +49,7 @@
 (define-data-var total-positions-closed uint u0)
 (define-data-var positions-version uint u1)
 (define-data-var pausable-contract principal tx-sender)
+(define-data-var conclave-sbt-address principal .conclave-sbt)
 
 ;; ===== Data Maps =====
 (define-map positions
@@ -202,6 +203,14 @@
   )
 )
 
+(define-public (set-conclave-sbt-address (sbt principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get owner)) (err ERR_UNAUTHORIZED))
+    (var-set conclave-sbt-address sbt)
+    (ok true)
+  )
+)
+
 ;; ===== Public Functions - Oracle =====
 (define-private (get-oracle-price
     (token principal)
@@ -286,7 +295,7 @@
         tags: tags,
         version: (var-get positions-version),
         metadata: metadata,
-        tenure-id: (/ stacks-block-height u10),
+        tenure-id: (/ block-height u10),
       })
 
       ;; Fix size calculation for short
@@ -322,7 +331,7 @@
         position-type: position-type,
         token: token,
         price: price,
-        tenure-id: (/ stacks-block-height u10),
+        tenure-id: (/ block-height u10),
       })
       (ok position-id)
     )
@@ -341,7 +350,7 @@
         (position (unwrap! (get-position tx-sender position-id) (err ERR_INVALID_POSITION)))
         (current-price (try! (get-oracle-price (var-get dimensional-token) oracle)))
         (pnl (calculate-pnl position current-price))
-        (fees (calculate-fees position))
+        (fees (calculate-fees tx-sender position))
         (collateral (get collateral position))
         (total-amount (if (>= pnl 0)
           (if (>= (+ collateral (to-uint pnl)) fees)
@@ -390,7 +399,7 @@
         owner: tx-sender,
         pnl: pnl,
         fees: fees,
-        tenure-id: (/ stacks-block-height u10),
+        tenure-id: (/ block-height u10),
       })
       (ok true)
     )
@@ -449,7 +458,7 @@
         position-id: position-id,
         owner: user,
         liquidator: tx-sender,
-        tenure-id: (/ stacks-block-height u10),
+        tenure-id: (/ block-height u10),
       })
 
       (ok true)
@@ -484,7 +493,7 @@
   )
 )
 
-(define-private (calculate-fees (position {
+(define-private (calculate-fees (user principal) (position {
   collateral: uint,
   size: int,
   entry-time: uint,
@@ -511,7 +520,9 @@
         (to-uint (* size -1))
       ))
       (position-duration (- burn-block-height (get entry-time position)))
-      (fee (/ (* size-abs position-duration (var-get protocol-fee-rate))
+      ;; SAF Floor Fee: 0.1% (u10) if user has Conclave SBT, else standard rate
+      (fee-rate (if (contract-call? .conclave-sbt has-sbt user) u10 (var-get protocol-fee-rate)))
+      (fee (/ (* size-abs position-duration fee-rate)
         PROTOCOL_FEE_DENOMINATOR
       ))
     )

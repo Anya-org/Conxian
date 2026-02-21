@@ -1,6 +1,10 @@
 (define-read-only (test-c4)
     (ok {
-        time: stacks-block-time,
-        height: stacks-block-height
+        time: block-height,
+        height: block-height,
+        ;; Test primitives
+        consensus-buff: (to-consensus-buff? u100),
+        ;; Note: secp256r1-verify usually returns bool, let's just see if it parses
+        r1: (is-eq (secp256r1-verify 0x00 0x00 0x00) true)
     })
 )

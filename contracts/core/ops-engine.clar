@@ -9,7 +9,7 @@
 (define-constant ERR_EXECUTION_FAILED u6001)
 (define-constant ERR_NO_WORK_NEEDED u101)
 
-;; State (using stacks-block-time for Dual-Clock precision)
+;; State (using block-height for Tenure-Clock precision)
 (define-data-var last-action-time uint u0)
 (define-data-var last-fast-check uint u0)
 (define-data-var last-slow-check uint u0)
@@ -23,7 +23,7 @@
 (define-public (process-signal (proposal-id uint) (proposal-contract <proposal-trait>))
   (begin
     (asserts! (is-eq (contract-call? .admin-facade is-authorized u4) (ok true)) (err ERR_UNAUTHORIZED)) ;; ROLE_OPERATOR
-    (var-set last-action-time stacks-block-time)
+    (var-set last-action-time block-height)
     (contract-call? proposal-contract execute tx-sender)
   )
 )
@@ -34,7 +34,7 @@
   (begin
     (asserts! (is-eq (contract-call? .admin-facade is-authorized u4) (ok true)) (err ERR_UNAUTHORIZED))
     (try! (contract-call? .conxian-protocol pause))
-    (print { event: "emergency-pause-triggered", caller: tx-sender, timestamp: stacks-block-time })
+    (print { event: "emergency-pause-triggered", caller: tx-sender, timestamp: block-height })
     (ok true)
   )
 )
@@ -46,11 +46,11 @@
 )
 
 ;; @desc Trigger the Dual-Clock epoch update.
-;; Fast Gear: Reflexes (DEX Fees) via stacks-block-time (target ~1 min / 60s).
-;; Slow Gear: Strategy (Fiscal Dam) via stacks-block-time (target ~10 min / 600s).
+;; Fast Gear: Reflexes (DEX Fees) via block-height (target ~1 block).
+;; Slow Gear: Strategy (Fiscal Dam) via block-height (target ~10 blocks).
 (define-public (trigger-epoch-update)
   (let (
-    (current-time stacks-block-time)
+    (current-time block-height)
     (work-done-fast (>= (- current-time (var-get last-fast-check)) u60))
     (work-done-slow (>= (- current-time (var-get last-slow-check)) u600))
   )

@@ -1,7 +1,6 @@
-;; agent-treasury.clar
-;; Autonomous Fiscal Agent for Conxian Protocol
-;; Upgraded for CXIP-013 (Performance-Adjusted Revenue Model)
 ;; Fully Exploited Fiscal Dam Logic - Nakamoto Aligned
+
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 (define-constant ERR_UNAUTHORIZED u1000)
 
@@ -143,4 +142,25 @@
     strategy: "FISCAL-DAM-CXIP-013",
     compliant: true
   })
+)
+
+;; --- Strategic Enhancement: IaaS Monetization ---
+
+(define-public (deposit-service-fee (token <sip-010-ft-trait>) (amount uint))
+  (begin
+    ;; Transfer tokens from sender to distributor via this agent
+    (try! (contract-call? token transfer amount tx-sender (as-contract tx-sender) none))
+    (try! (as-contract (contract-call? .revenue-distributor distribute-token token amount)))
+    (print { event: "service-fee-deposited", amount: amount, token: (contract-of token) })
+    (ok true)
+  )
+)
+
+(define-public (deposit-service-fee-stx (amount uint))
+  (begin
+    (try! (stx-transfer? amount tx-sender (as-contract tx-sender)))
+    (try! (as-contract (contract-call? .revenue-distributor distribute-stx amount)))
+    (print { event: "service-fee-stx-deposited", amount: amount })
+    (ok true)
+  )
 )
