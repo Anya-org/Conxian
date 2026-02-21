@@ -84,3 +84,8 @@
   (is-paused () (response bool uint))
   (get-protocol-admin () (response principal uint))
 ))
+
+(define-trait admin-facade-trait (
+  (is-authorized-to-pause (principal) (response bool uint))
+  (is-authorized (uint) (response bool uint))
+))

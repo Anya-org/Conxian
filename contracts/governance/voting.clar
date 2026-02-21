@@ -4,6 +4,7 @@
 ;; Migrated to block-height for tenure-precision voting.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
+(use-trait access-trait .core-traits.conxian-access-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u1000)
@@ -38,12 +39,13 @@
 ;; @param start-time uint (Unix timestamp)
 ;; @param end-time uint (Unix timestamp)
 ;; @returns (response uint uint)
-(define-public (create-proposal (start-time uint) (end-time uint))
+(define-public (create-proposal (start-time uint) (end-time uint) (access-contract-trait <access-trait>))
     (let (
         (proposal-id (+ (var-get proposal-count) u1))
         (tenure-id (/ block-height u10))
     )
-        (asserts! (unwrap-panic (contract-call? access-contract "has-role" tx-sender ROLE_GOVERNANCE))
+        (asserts! (is-eq (contract-of access-contract-trait) (var-get access-contract)) (err ERR_UNAUTHORIZED))
+        (asserts! (unwrap-panic (contract-call? access-contract-trait has-role tx-sender ROLE_GOVERNANCE))
             (err ERR_UNAUTHORIZED)
         )
         

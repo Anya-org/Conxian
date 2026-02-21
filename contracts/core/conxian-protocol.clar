@@ -3,6 +3,7 @@
 ;; Dual-Mode: Compatibility and Clarity 4
 
 (impl-trait .core-traits.protocol-manager-trait)
+(use-trait admin-facade-trait .core-traits.admin-facade-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u1000)
@@ -51,9 +52,10 @@
 ;; @desc Pauses or unpauses all state-changing protocol functions.
 ;; @param new-paused bool - The new pause status.
 ;; @returns (response bool uint)
-(define-public (set-paused (new-paused bool))
+(define-public (set-paused (new-paused bool) (admin-facade <admin-facade-trait>))
   (begin
-    (asserts! (contract-call? admin-contract "is-authorized-to-pause" tx-sender)
+    (asserts! (is-eq (contract-of admin-facade) (var-get admin-contract)) (err ERR_UNAUTHORIZED))
+    (asserts! (unwrap-panic (contract-call? admin-facade is-authorized-to-pause tx-sender))
       (err ERR_UNAUTHORIZED)
     )
     (var-set paused new-paused)
