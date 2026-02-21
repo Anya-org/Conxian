@@ -15,6 +15,7 @@
 ;; State
 (define-data-var paused bool false)
 (define-data-var contract-owner principal tx-sender)
+(define-data-var admin-contract principal .admin-facade)
 
 ;; Maps
 (define-map modules
@@ -52,7 +53,9 @@
 ;; @returns (response bool uint)
 (define-public (set-paused (new-paused bool))
   (begin
-    (asserts! (contract-call? .admin-facade is-authorized-to-pause tx-sender) (err ERR_UNAUTHORIZED))
+    (asserts! (contract-call? admin-contract is-authorized-to-pause tx-sender)
+      (err ERR_UNAUTHORIZED)
+    )
     (var-set paused new-paused)
     (print { event: "protocol-pause-status", paused: new-paused, timestamp: block-height })
     (ok true)
@@ -63,7 +66,9 @@
 ;; @returns (response bool uint)
 (define-public (pause)
   (begin
-    (asserts! (contract-call? .admin-facade is-authorized-to-pause tx-sender) (err ERR_UNAUTHORIZED))
+    (asserts! (contract-call? admin-contract is-authorized-to-pause tx-sender)
+      (err ERR_UNAUTHORIZED)
+    )
     (var-set paused true)
     (ok true)
   )
@@ -73,7 +78,9 @@
 ;; @returns (response bool uint)
 (define-public (unpause)
   (begin
-    (asserts! (contract-call? .admin-facade is-authorized-to-pause tx-sender) (err ERR_UNAUTHORIZED))
+    (asserts! (contract-call? admin-contract is-authorized-to-pause tx-sender)
+      (err ERR_UNAUTHORIZED)
+    )
     (var-set paused false)
     (ok true)
   )
@@ -113,6 +120,16 @@
   )
 )
 
+
 (define-read-only (get-protocol-owner)
   (var-get contract-owner)
+)
+
+;; @desc Update the admin contract principal (Principal Injection)
+(define-public (set-admin-contract (new-admin principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (var-set admin-contract new-admin)
+    (ok true)
+  )
 )

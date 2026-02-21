@@ -132,7 +132,7 @@
 (define-read-only (get-structured-data-hash (user principal) (jurisdiction (string-ascii 64)) (tier uint))
   ;; Improved structured hash using available Clarity 4 primitives
   (sha256 (concat TYPE_HASH
-    (sha256 (concat (sha256 (unwrap-panic (to-consensus-buff? (sha256 (concat DOMAIN_NAME DOMAIN_VERSION))))) (sha256 jurisdiction)))
+    (sha256 (concat (sha256 (unwrap-panic (to-consensus-buff (sha256 (concat DOMAIN_NAME DOMAIN_VERSION))))) (sha256 jurisdiction)))
   ))
 )
 

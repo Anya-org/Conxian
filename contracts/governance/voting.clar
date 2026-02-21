@@ -14,6 +14,8 @@
 
 ;; Data Vars
 (define-data-var proposal-count uint u0)
+(define-data-var access-contract principal .conxian-access)
+(define-data-var contract-owner principal tx-sender)
 
 ;; Data Maps
 (define-map proposals
@@ -42,7 +44,7 @@
         (tenure-id (/ block-height u10))
     )
         ;; Check Authentication (RBAC Governance Role)
-        (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_GOVERNANCE))
+        (asserts! (unwrap-panic (contract-call? access-contract has-role tx-sender ROLE_GOVERNANCE))
             (err ERR_UNAUTHORIZED)
         )
         
@@ -99,6 +101,27 @@
         
         (print { event: "vote-cast", proposal-id: proposal-id, voter: tx-sender, power: voter-power, support: support, timestamp: block-height })
         
+        (ok true)
+    )
+)
+
+;; @desc Update the access contract principal (Principal Injection)
+(define-public (set-access-contract (new-access principal))
+    (begin
+        (asserts! (is-eq tx-sender (var-get contract-owner))
+            (err ERR_UNAUTHORIZED)
+        )
+        (var-set access-contract new-access)
+        (ok true)
+    )
+)
+
+(define-public (set-contract-owner (new-owner principal))
+    (begin
+        (asserts! (is-eq tx-sender (var-get contract-owner))
+            (err ERR_UNAUTHORIZED)
+        )
+        (var-set contract-owner new-owner)
         (ok true)
     )
 )

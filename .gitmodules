@@ -1,3 +1,3 @@
 [submodule "conxian-ui"]
-	path = ui
+	path = conxian-ui
 	url = https://github.com/Conxian/Conxian_UI.git

@@ -5,8 +5,8 @@
 ;; @desc Wraps a value in the standard consensus buffering format
 ;; @param value (buff 128) - The raw value to encode
 ;; @returns (buff 128) - The encoded buffer
-(define-read-only (to-consensus-buff?-wrapper (value (buff 128)))
-  (to-consensus-buff? value)
+(define-read-only (to-consensus-buff-wrapper (value (buff 128)))
+  (to-consensus-buff value)
 )
 
 ;; @desc Deterministic SHA256 hash of any buffer
@@ -20,6 +20,6 @@
 ;; @param value uint
 ;; @returns (buff 16)
 (define-read-only (uint-to-buff (value uint))
-  (unwrap-panic (to-consensus-buff? value))
+  (unwrap-panic (to-consensus-buff value))
   ;; Placeholder
 )
