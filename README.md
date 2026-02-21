@@ -27,18 +27,21 @@ Conxian is a **Sovereign Autonomous Business (SAB)** where human discretion is r
 ### 💰 **Autonomous Fiscal Policy (Cybernetic)**
 
 The protocol employs active **Revenue Collection** levers to fund its ecosystem (The Fiscal Dam V4):
+
 - **Lending**: 10% Reserve Factor on all borrow interest.
 - **DEX**: ~16% Protocol Fee on all swaps.
 - **Subscription**: Governance-tuned access fees.
 
 Total revenue is dynamically distributed via the **Fiscal Dam** system (CXIP-013 Performance-Adjusted):
+
 - **Baseline Allocation**: 45% Treasury, 30% Bounty, 15% LP Incentives, 5% Grants, 5% Buy-back.
 - **Dynamic Adjustments**: Revenue split shifts based on Global Collateral Ratio (GCR) and system risk scores (Crisis, Stability, Abundance).
 
 ## Technical Stack
 
-- **Clarity 4**: Nakamoto-native (Epoch 3.0) utilizing `stacks-block-time` for precision and `burn-block-height` for Bitcoin tenure.
+- **Clarity 4**: Nakamoto-native (Epoch 3.1) utilizing `block-height` for tenure-sensitive finality.
 - **Tenure Awareness**: Logic is aware of Stacks block tenures via `block-utils` for deterministic execution.
+- **Principal Injection**: Mandatory architectural standard for all cross-contract calls to ensure dynamic resolution and prevent circular blocks.
 - **Facade Pattern**: All core logic accessed via dimensional facades and consolidated traits.
 - **Hybrid Oracle**: Aggregated Pyth, Redstone, and Switchboard feeds with deviation guards.
 
@@ -79,10 +82,13 @@ Total revenue is dynamically distributed via the **Fiscal Dam** system (CXIP-013
 For contribution guidelines, please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 1. **Install Dependencies**
+
    ```bash
    npm install
    ```
+
 2. **Run Tests**
+
    ```bash
    npm test
    ```
@@ -99,21 +105,24 @@ For contribution guidelines, please see [CONTRIBUTING.md](CONTRIBUTING.md).
   - ✅ **TVL Normalization**: Repaired cross-token decimal aggregation in `finance-metrics`.
   - ✅ **Monitoring Activation**: Live telemetry dashboard enabled.
   - ✅ **Testing Infrastructure**: Resolved asynchronous race conditions in Simnet initialization.
+  - ✅ **Phase 11: Submodule Alignment**: Renamed `ui` to `conxian-ui` and synchronized with organizational remote.
+  - ✅ **Phase 11: Principal Injection**: Core protocol and governance decoupled via dynamic injection pattern.
   - ✅ P1: Sovereign Handoff (timelock execution, admin transfers)
   - ✅ P2: Regulatory Gaps (compliance provider system, KYC/AML)
   - ✅ P3: Tokenomics Clarity (1B CXD supply cap, Fiscal Dam V4)
   - ✅ P4: ICO Hardening (compliance gating, purchase caps)
   - ✅ P5: NFT Economics (CXLP Position NFT implementation)
   - ✅ P6: Operational Safety (rate limiter, proof-of-reserves)
-- **Architecture**: Full Truth Alignment achieved across Core, DEX, Governance, Economics, and Security.
-- **Nakamoto Ready**: All contracts use `burn-block-height` and Epoch 3.0 standards.
-- **Testing Status**: Circular dependency issues identified in Simnet environment. Core logic syntactically verified.
+- **Architecture**: Full Truth Alignment achieved across Core, DEX, Governance, Economics, Security, and Submodules.
+- **Nakamoto Ready**: All contracts use `burn-block-height` and Epoch 3.1 standards.
+- **Testing Status**: Principal Injection implemented to resolve circular dependency issues. Core logic syntactically verified.
 
 ---
 
 © 2024-2026 Conxian Finance. All rights reserved.
 
 ## Sprint Status (Feb 2026)
+
 - **Status**: SYSTEM INTEGRITY VERIFIED.
 - **Testing**: Root-to-Leaf and Leaf-to-Root validation completed across 21 test suites.
 - **Standards**: 100% compliance with Conxian Dual-Mode testing standard.
