@@ -53,7 +53,7 @@
 ;; @returns (response bool uint)
 (define-public (set-paused (new-paused bool))
   (begin
-    (asserts! (contract-call? admin-contract is-authorized-to-pause tx-sender)
+    (asserts! (contract-call? admin-contract "is-authorized-to-pause" tx-sender)
       (err ERR_UNAUTHORIZED)
     )
     (var-set paused new-paused)
@@ -66,7 +66,7 @@
 ;; @returns (response bool uint)
 (define-public (pause)
   (begin
-    (asserts! (contract-call? admin-contract is-authorized-to-pause tx-sender)
+    (asserts! (contract-call? admin-contract "is-authorized-to-pause" tx-sender)
       (err ERR_UNAUTHORIZED)
     )
     (var-set paused true)
@@ -78,7 +78,7 @@
 ;; @returns (response bool uint)
 (define-public (unpause)
   (begin
-    (asserts! (contract-call? admin-contract is-authorized-to-pause tx-sender)
+    (asserts! (contract-call? admin-contract "is-authorized-to-pause" tx-sender)
       (err ERR_UNAUTHORIZED)
     )
     (var-set paused false)

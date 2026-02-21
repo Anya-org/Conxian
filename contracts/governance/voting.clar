@@ -43,8 +43,7 @@
         (proposal-id (+ (var-get proposal-count) u1))
         (tenure-id (/ block-height u10))
     )
-        ;; Check Authentication (RBAC Governance Role)
-        (asserts! (unwrap-panic (contract-call? access-contract has-role tx-sender ROLE_GOVERNANCE))
+        (asserts! (unwrap-panic (contract-call? access-contract "has-role" tx-sender ROLE_GOVERNANCE))
             (err ERR_UNAUTHORIZED)
         )
         
