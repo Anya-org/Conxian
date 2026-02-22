@@ -16,11 +16,11 @@
 
 ;; Data Vars
 (define-data-var dao-name (string-ascii 64) "Community DAO")
-(define-data-var governance-token principal .community-governance-token) ;; Default, updateable
+(define-data-var governance-token principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) ;; Default, updateable
 (define-data-var proposal-count uint u0)
 (define-data-var voting-delay uint u144) ;; ~1 day
 (define-data-var voting-period uint u51840) ;; ~3 days
-(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
+(define-data-var regulatory-adapter-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 (define-map proposals
   uint

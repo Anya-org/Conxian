@@ -13,10 +13,10 @@
 
 ;; Data Vars
 (define-data-var deployment-fee uint u1000000000) ;; 1000 STX (example)
-(define-data-var fee-collector principal .operational-treasury)
-(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
-(define-data-var ops-engine-contract principal .ops-engine)
-(define-data-var agent-risk-contract principal .agent-risk)
+(define-data-var fee-collector principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var regulatory-adapter-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var ops-engine-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var agent-risk-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Registry of deployed businesses
 (define-map deployed-sabs

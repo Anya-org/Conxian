@@ -15,10 +15,10 @@
 (define-constant ERR_PROPOSAL_FAILED u3007)
 (define-constant ERR_INVALID_PROPOSAL_CONTRACT u3008)
 
-(define-data-var ops-engine principal tx-sender)
-(define-data-var proposal-registry-contract principal .proposal-registry)
-(define-data-var governance-nft-contract principal .enhanced-governance-nft)
-(define-data-var cxvg-token-contract principal .cxvg-token)
+(define-data-var ops-engine principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var proposal-registry-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var governance-nft-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var cxvg-token-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 (define-private (is-ops-engine)
   (is-eq tx-sender (var-get ops-engine))

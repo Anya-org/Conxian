@@ -9,7 +9,7 @@
 (define-constant ERR_PRICE_NOT_FOUND u1001)
 
 ;; Data Vars
-(define-data-var contract-owner principal tx-sender)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Price Map
 (define-map prices principal uint)

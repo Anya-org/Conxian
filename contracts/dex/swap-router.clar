@@ -17,8 +17,8 @@
 (define-data-var last-check-height uint u0)
 (define-data-var current-fee uint u30)
 ;; Using tx-sender to avoid static dependency on ops-engine
-(define-data-var ops-engine principal tx-sender)
-(define-data-var admin principal tx-sender)
+(define-data-var ops-engine principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Public Functions
 

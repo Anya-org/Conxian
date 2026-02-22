@@ -15,8 +15,8 @@
 (define-data-var token-name (string-ascii 32) "Community Governance Token")
 (define-data-var token-symbol (string-ascii 10) "CGT")
 (define-data-var token-uri (optional (string-utf8 256)) none)
-(define-data-var contract-owner principal tx-sender)
-(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var regulatory-adapter-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Token
 (define-fungible-token cgt)

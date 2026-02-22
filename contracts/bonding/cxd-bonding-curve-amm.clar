@@ -16,10 +16,10 @@
 (define-data-var slope uint u1000) ;; Price increase per token (in micro-STX per micro-CXD)
 (define-data-var base-price uint u1000000) ;; Starting price (1 STX)
 (define-data-var fee-basis-points uint u50) ;; 0.5% fee
-(define-data-var fee-collector principal .operational-treasury)
-(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
-(define-data-var cxd-token-contract principal .cxd-token)
-(define-data-var token-system-coordinator-contract principal .token-system-coordinator)
+(define-data-var fee-collector principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var regulatory-adapter-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var cxd-token-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var token-system-coordinator-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Compliance
 (define-private (check-compliance (user principal))

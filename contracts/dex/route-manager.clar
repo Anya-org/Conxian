@@ -11,8 +11,8 @@
 (define-constant ERR_INVALID_ROUTE u2004)
 
 ;; Contracts
-(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
-(define-data-var conxian-protocol-contract principal .conxian-protocol)
+(define-data-var regulatory-adapter-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var conxian-protocol-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Compliance Helper
 (define-private (check-compliance (user principal))
@@ -61,7 +61,7 @@
             amount-in: amount-in,
             amount-out-min: amount-out-min,
             route: route,
-            tenure-id: (/ stacks-block-height u10),
+            tenure-id: (/ block-height u10),
         })
 
         (ok true)

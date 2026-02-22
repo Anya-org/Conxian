@@ -14,7 +14,7 @@
 (define-constant DEFAULT_MAX_OPERATIONS uint u10) ;; 10 operations per window
 
 ;; Data Vars
-(define-data-var contract-owner principal tx-sender)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-data-var window-size uint u600) ;; Configurable window size
 
 ;; Rate tracking: user -> operation-type -> {count, last-operation}

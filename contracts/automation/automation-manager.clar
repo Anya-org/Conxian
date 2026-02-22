@@ -2,7 +2,7 @@
 ;; Automation orchestration
 
 (define-data-var automation-active bool true)
-(define-data-var admin principal tx-sender)
+(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 (define-public (trigger-automation (job-id uint))
   (begin

@@ -17,8 +17,8 @@
 (define-data-var token-supply uint u0)
 (define-data-var token-uri (optional (string-utf8 256)) none)
 
-(define-data-var contract-owner principal tx-sender)
-(define-data-var minter-contract principal tx-sender)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var minter-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-data-var total-delegated uint u0)
 
 ;; Data Maps

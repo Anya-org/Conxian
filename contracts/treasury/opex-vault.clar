@@ -11,9 +11,9 @@
 (define-data-var last-spend-block uint u0)
 (define-data-var daily-spend uint u0)
 
-(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
-(define-data-var conxian-access-contract principal .conxian-access)
-(define-data-var nakamoto-constants-contract principal .nakamoto-constants)
+(define-data-var regulatory-adapter-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var conxian-access-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var nakamoto-constants-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 (define-constant ROLE_OPERATOR u4)
 

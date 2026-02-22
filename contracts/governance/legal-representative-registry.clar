@@ -14,7 +14,7 @@
     }
 )
 
-(define-data-var registrar principal tx-sender)
+(define-data-var registrar principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Read Only
 (define-read-only (is-registered (entity principal))

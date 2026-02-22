@@ -9,7 +9,7 @@
 (define-constant ERR_INVALID_PARAM u1001)
 
 ;; Data Vars
-(define-data-var governance-contract principal tx-sender)
+(define-data-var governance-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Map for pending changes
 (define-map pending-updates

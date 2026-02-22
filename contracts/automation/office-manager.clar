@@ -11,7 +11,7 @@
 (define-constant ERR_INVALID_JOB u1003)
 
 ;; State
-(define-data-var contract-owner principal tx-sender)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Worker Registry
 ;; Maps worker principal to their active status

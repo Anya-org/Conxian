@@ -16,9 +16,9 @@
 (define-constant TRAVEL_RULE_THRESHOLD u100000000) ;; Example: 1 sBTC (satoshis) or $1k equiv. Adjust as needed.
 
 ;; State
-(define-data-var sbtc-token principal .sbtc-token) ;; Placeholder for actual sBTC contract
+(define-data-var sbtc-token principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) ;; Placeholder for actual sBTC contract
 (define-data-var total-deposits uint u0)
-(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
+(define-data-var regulatory-adapter-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Maps
 (define-map user-balances
@@ -114,7 +114,7 @@
 )
 
 ;; @desc Admin: Set sBTC Token Principal
-(define-data-var contract-owner principal tx-sender)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 (define-public (set-sbtc-token (new-token principal))
     (begin

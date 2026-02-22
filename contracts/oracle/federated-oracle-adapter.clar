@@ -9,7 +9,7 @@
 (define-constant MAX_PRICE_AGE u100) ;; 100 blocks
 
 ;; Data Vars
-(define-data-var contract-owner principal tx-sender)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-data-var required-sources uint u3) ;; Require 3 sources
 
 ;; Maps

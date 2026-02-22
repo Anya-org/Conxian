@@ -45,9 +45,9 @@
 (define-constant ERR_BOND_NOT_FOUND u1002)
 
 ;; Data Vars
-(define-data-var contract-owner principal tx-sender)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-data-var bond-nonce uint u0)
-(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
+(define-data-var regulatory-adapter-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Bond Token
 (define-fungible-token bond-token)

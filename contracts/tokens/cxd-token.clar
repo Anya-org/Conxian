@@ -11,7 +11,7 @@
 
 ;; Data Vars
 (define-data-var total-supply uint u0)
-(define-data-var contract-owner principal tx-sender)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-data-var max-supply uint u100000000000000000) ;; 1 billion with 8 decimals
 
 (define-map minters { minter: principal } { authorized: bool })

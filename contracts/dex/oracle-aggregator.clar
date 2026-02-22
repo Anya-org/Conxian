@@ -72,7 +72,7 @@
         (ok {
             alert: alert-status,
             ready-to-trade: (< (get level alert-status) u2),
-            tenure: (/ stacks-block-height u10),
+            tenure: (/ block-height u10),
         })
     )
 )

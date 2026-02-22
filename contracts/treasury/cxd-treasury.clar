@@ -27,9 +27,9 @@
 (define-map accrued-claims principal uint)
 
 ;; Governance & Authorization
-(define-data-var admin principal tx-sender)
-(define-data-var agent-treasury-principal principal tx-sender)
-(define-data-var revenue-distributor-principal principal tx-sender)
+(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var agent-treasury-principal principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var revenue-distributor-principal principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-data-var policy-locked bool false)
 
 ;; State Bounds
@@ -85,7 +85,7 @@
       grant: grant,
       buyback: buyback,
       insurance: insurance,
-      timestamp: stacks-block-height
+      timestamp: block-height
     })
     (ok true)
   )

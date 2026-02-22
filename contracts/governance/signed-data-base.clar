@@ -14,7 +14,7 @@
     }
 )
 
-(define-data-var oracle-feed principal tx-sender)
+(define-data-var oracle-feed principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Read
 (define-read-only (get-data-info (hash (buff 32)))

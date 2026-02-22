@@ -2,7 +2,7 @@
 ;; Conxian Enterprise Standard: Staking & Yield (Tier 0 Compliance)
 ;; Implements O(1) Scalable Reward Distribution with "Clean-Hands" Enforcement.
 ;; Pausable Staking (Deposits paused on emergency, Withdrawals always open).
-;; Clarity 4 Standard: Native stacks-block-time for second-precision yield.
+;; Clarity 4 Standard: Native burn-block-height for second-precision yield.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
@@ -15,9 +15,9 @@
 (define-constant ERR_PAUSED u8004)
 
 ;; State
-(define-data-var staking-token principal .cxd-token)
-(define-data-var rewards-token principal .cxd-token) ;; Rewards in CXD
-(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
+(define-data-var staking-token principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var rewards-token principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) ;; Rewards in CXD
+(define-data-var regulatory-adapter-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-data-var total-staked uint u0)
 (define-data-var reward-rate uint u0)
 (define-data-var last-update-time uint u0)
@@ -25,9 +25,9 @@
 (define-data-var staking-paused bool false)
 
 ;; Authorized Callers (Breaking Circular Dependencies)
-(define-data-var ops-engine-principal principal tx-sender)
-(define-data-var agent-risk-principal principal tx-sender)
-(define-data-var agent-treasury-principal principal tx-sender)
+(define-data-var ops-engine-principal principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var agent-risk-principal principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var agent-treasury-principal principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Maps
 (define-map user-balance
@@ -60,7 +60,7 @@
     (var-get reward-per-token-stored)
     (+ (var-get reward-per-token-stored)
        (/ (* (var-get reward-rate)
-             (- stacks-block-time (var-get last-update-time))
+             (- burn-block-height (var-get last-update-time))
              u1000000)
           (var-get total-staked)))
   )
@@ -76,7 +76,7 @@
 (define-private (update-reward (account principal))
   (begin
     (var-set reward-per-token-stored (reward-per-token))
-    (var-set last-update-time stacks-block-time)
+    (var-set last-update-time burn-block-height)
     (map-set user-rewards account (earned account))
     (map-set user-reward-per-token-paid account (var-get reward-per-token-stored))
   )
@@ -151,7 +151,7 @@
     (print {
       event: "staking-pause-update",
       paused: paused,
-      timestamp: stacks-block-time
+      timestamp: burn-block-height
     })
     (ok true)
   )

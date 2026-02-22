@@ -12,8 +12,8 @@
 (define-constant ERR_ALREADY_PAUSED u1002)
 
 ;; Data Vars
-(define-data-var contract-owner principal tx-sender)
-(define-data-var rbac-contract principal .conxian-access)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var rbac-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Map of paused contracts
 (define-map paused-contracts
