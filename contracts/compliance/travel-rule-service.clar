@@ -8,7 +8,7 @@
 (define-constant ERR_INVALID_DATA u9001)
 
 ;; Data Vars
-(define-data-var compliance-admin principal tx-sender)
+(define-data-var compliance-admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Maps
 (define-map registered-vasps (string-ascii 20) bool)

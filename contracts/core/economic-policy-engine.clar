@@ -20,13 +20,13 @@
 (define-constant ERR_INVALID_PARAM u1008)
 
 ;; Data Vars
-(define-data-var price-feed principal tx-sender)
+(define-data-var price-feed principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-data-var utilization-rate uint u0)
 (define-data-var current-interest-rate uint BASE_RATE)
 (define-data-var collateral-factor uint MIN_COLLATERAL_FACTOR)
 (define-data-var reserve-factor uint u1000) ;; 10% default
 (define-data-var last-price-update-time uint u0)
-(define-data-var revenue-distributor principal .revenue-distributor)
+(define-data-var revenue-distributor principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Subscription State
 (define-map subscribers principal bool)

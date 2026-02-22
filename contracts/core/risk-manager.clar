@@ -13,10 +13,10 @@
 (define-constant LIQUIDATION_THRESHOLD u8000) ;; 0.8 threshold
 
 ;; Data Vars
-(define-data-var ops-engine-contract principal tx-sender)
-(define-data-var dimensional-engine principal .dimensional-core)
+(define-data-var ops-engine-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var dimensional-engine principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-data-var system-risk-score uint u0)
-(define-data-var risk-agent principal tx-sender)
+(define-data-var risk-agent principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Efficient Storage - O(1) cache
 (define-map position-health

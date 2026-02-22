@@ -24,8 +24,8 @@
 
 ;; Authorization
 ;; Only Ops Engine or Admin can add targets
-(define-data-var admin principal .ops-engine)
-(define-data-var token-system-coordinator-contract principal .token-system-coordinator)
+(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var token-system-coordinator-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 (define-private (is-admin)
     (is-eq tx-sender (var-get admin))

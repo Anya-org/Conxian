@@ -50,7 +50,7 @@
 )
 
 ;; Access Control
-(define-data-var access-control principal .conxian-access)
+(define-data-var access-control principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; SIP-009 Interface
 (define-read-only (get-last-token-id)

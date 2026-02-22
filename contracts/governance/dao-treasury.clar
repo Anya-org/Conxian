@@ -14,7 +14,7 @@
 (define-constant TIMELOCK_DELAY u86400) ;; 24 hours in seconds (Clarity 4 burn-block-height)
 
 ;; Data Vars
-(define-data-var owner principal tx-sender)
+(define-data-var owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-data-var pending-owner (optional principal) none)
 (define-data-var transfer-delay-end uint u0)
 

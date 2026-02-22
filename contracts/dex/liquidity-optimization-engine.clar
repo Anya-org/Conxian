@@ -22,8 +22,8 @@
 ;; Data variables
 (define-data-var optimization-engine-active bool true)
 (define-data-var optimization-frequency uint u100) ;; Every 100 blocks
-(define-data-var dex-facade-contract principal .dex-facade)
-(define-data-var conxian-protocol principal .conxian-protocol)
+(define-data-var dex-facade-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var conxian-protocol principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Storage maps
 (define-map pool-optimization-data

@@ -19,11 +19,11 @@
 ;; Data Vars
 (define-data-var token-price uint u100) ;; STX per Token (microSTX/microToken ratio)
 (define-data-var sale-active bool false)
-(define-data-var treasury-address principal tx-sender)
-(define-data-var sale-owner principal tx-sender)
+(define-data-var treasury-address principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var sale-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Compliance
-(define-data-var regulatory-adapter principal .regulatory-adapter)
+(define-data-var regulatory-adapter principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-data-var compliance-required bool true)
 
 ;; Sale Caps

@@ -9,7 +9,7 @@
 (define-constant ERR_UNAUTHORIZED u1000)
 
 ;; Data Vars
-(define-data-var contract-owner principal tx-sender)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Authorization
 (define-private (is-authorized)

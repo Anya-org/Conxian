@@ -9,8 +9,8 @@
 (define-constant ERR_NOT_PROVIDER u4003)
 
 ;; Data vars
-(define-data-var contract-owner principal tx-sender)
-(define-data-var compliance-manager principal .compliance-manager)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var compliance-manager principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 (define-map kyc-providers
     principal

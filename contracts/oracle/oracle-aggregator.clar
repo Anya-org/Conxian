@@ -12,11 +12,11 @@
 (define-constant MAX_PRICE (* u1000000000000000000 u1000000))  ;; $1M with 18 decimals
 
 ;; Admin
-(define-data-var admin principal tx-sender)
+(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-data-var manipulation-threshold-bps uint u500) ;; 5% default
 (define-data-var twap-alpha-bps uint u1000) ;; 10% EMA weight for new observations
 (define-data-var circuit-breaker (optional principal) none)
-(define-data-var primary-asset principal .cxd-token)
+(define-data-var primary-asset principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 ;; Degrade to TWAP when price age exceeds threshold (in blocks)
 (define-data-var stale-threshold-blocks uint u4320000)
 

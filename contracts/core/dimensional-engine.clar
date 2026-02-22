@@ -19,9 +19,9 @@
 (define-constant ERR_MODULE_NOT_FOUND u5003)
 
 ;; Data Vars
-(define-data-var protocol-coordinator principal tx-sender)
-(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
-(define-data-var conxian-protocol-contract principal .conxian-protocol)
+(define-data-var protocol-coordinator principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var regulatory-adapter-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var conxian-protocol-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; --- Authorization ---
 

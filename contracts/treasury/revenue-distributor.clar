@@ -5,16 +5,16 @@
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u1000)
-(define-data-var admin principal tx-sender)
+(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-constant TARGET_LP_SHARE u1500) ;; CXIP-013 Target
 
 ;; State
-(define-data-var lp-vault principal .cxd-staking)
-(define-data-var treasury-vault principal .operational-treasury)
-(define-data-var bounty-vault principal .operational-treasury) ;; Defaults to op-treasury if not set
-(define-data-var grant-vault principal .operational-treasury) ;; Defaults to op-treasury if not set
-(define-data-var buyback-vault principal .operational-treasury) ;; Defaults to op-treasury if not set
-(define-data-var insurance-vault principal .conxian-insurance-fund)
+(define-data-var lp-vault principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var treasury-vault principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var bounty-vault principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) ;; Defaults to op-treasury if not set
+(define-data-var grant-vault principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) ;; Defaults to op-treasury if not set
+(define-data-var buyback-vault principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) ;; Defaults to op-treasury if not set
+(define-data-var insurance-vault principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Public Functions
 

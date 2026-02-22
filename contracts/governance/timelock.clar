@@ -25,8 +25,8 @@
 
 ;; State
 (define-data-var delay uint u1000)
-(define-data-var admin principal tx-sender)
-(define-data-var governance-contract principal tx-sender)
+(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var governance-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Queued proposals: principal -> {eta, executed}
 (define-map queued-proposals

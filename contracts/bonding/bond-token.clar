@@ -10,7 +10,7 @@
 
 ;; Data Vars
 (define-data-var total-supply uint u0)
-(define-data-var contract-owner principal tx-sender)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-data-var token-name (string-ascii 32) "Conxian Bond Token")
 (define-data-var token-symbol (string-ascii 10) "CXBD")
 (define-data-var token-uri (optional (string-utf8 256)) (some u"https://conxian.io/metadata/bond"))

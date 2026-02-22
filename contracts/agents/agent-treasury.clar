@@ -8,7 +8,7 @@
 ;; State
 (define-data-var last-fiscal-height uint u0)
 (define-data-var current-fiscal-state uint u1) ;; 0=CRISIS, 1=STABILITY, 2=ABUNDANCE
-(define-data-var contract-owner principal tx-sender)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; CXIP-013 Equilibrium Baseline (bps)
 (define-constant BASELINE_TREASURY u4500)

@@ -11,7 +11,7 @@
 (define-constant ERR_INVALID_SIGNATURE u7101)
 
 ;; Data Vars
-(define-data-var redstone-verifier principal .redstone-oracle-mock)
+(define-data-var redstone-verifier principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; @desc Verifies a RedStone data package and records the price
 (define-public (verify-data-package
@@ -31,7 +31,7 @@
     (print {
       event: "redstone-data-verified",
       timestamp: timestamp,
-      tenure-id: (/ stacks-block-height u10),
+      tenure-id: (/ block-height u10),
     })
     (ok true)
   )

@@ -11,7 +11,7 @@
 (define-constant ERR_INVALID_BID u1003)
 
 ;; Data Vars
-(define-data-var auction-owner principal tx-sender)
+(define-data-var auction-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-data-var auction-nonce uint u0)
 
 ;; Auction Storage

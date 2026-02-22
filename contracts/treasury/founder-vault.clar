@@ -10,8 +10,8 @@
 
 ;; Vesting Schedule (using block height)
 (define-constant VESTING_START burn-block-height)
-(define-data-var conxian-protocol-contract principal .conxian-protocol)
-(define-data-var nakamoto-constants-contract principal .nakamoto-constants)
+(define-data-var conxian-protocol-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var nakamoto-constants-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 (define-read-only (get-vesting-duration)
   (contract-call? .nakamoto-constants get-blocks-per-year)

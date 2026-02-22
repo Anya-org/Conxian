@@ -15,13 +15,13 @@
 (define-constant TARGET_OWNER .timelock)
 
 ;; Contract Principals
-(define-data-var conxian-protocol-contract principal .conxian-protocol)
-(define-data-var agent-risk-contract principal .agent-risk)
-(define-data-var agent-treasury-contract principal .agent-treasury)
-(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
-(define-data-var conxian-access-contract principal .conxian-access)
-(define-data-var admin-facade-contract principal .admin-facade)
-(define-data-var operational-treasury-contract principal .operational-treasury)
+(define-data-var conxian-protocol-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var agent-risk-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var agent-treasury-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var regulatory-adapter-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var conxian-access-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var admin-facade-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var operational-treasury-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-data-var handover-complete bool false)
 
 ;; Critical System Contracts to Audit

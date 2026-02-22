@@ -19,8 +19,8 @@
 (define-constant MIN_ATTESTATIONS uint u3)
 
 ;; Data Vars
-(define-data-var contract-owner principal tx-sender)
-(define-data-var oracle-aggregator principal .oracle-aggregator-v2)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var oracle-aggregator principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Authorized attestors (oracles/auditors)
 (define-map authorized-attestors principal bool)

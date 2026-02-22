@@ -9,8 +9,8 @@
 (define-constant ERR_POSITION_NOT_FOUND u3000)
 
 ;; State - Engine Address
-(define-data-var contract-owner principal tx-sender)
-(define-data-var dimensional-engine principal tx-sender)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var dimensional-engine principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 (define-map positions
   uint

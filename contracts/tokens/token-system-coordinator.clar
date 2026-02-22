@@ -14,12 +14,12 @@
 (define-constant ERR_NON_COMPLIANT u1002)
 
 ;; Data Vars
-(define-data-var coordinator-admin principal tx-sender) ;; Ops Engine or Timelock
-(define-data-var regulatory-adapter-contract principal .regulatory-adapter)
+(define-data-var coordinator-admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) ;; Ops Engine or Timelock
+(define-data-var regulatory-adapter-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; System token contracts
-(define-data-var cxd-token-contract principal .cxd-token)
-(define-data-var cxvg-token-contract principal .cxvg-token)
+(define-data-var cxd-token-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var cxvg-token-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Authorized Minters (e.g. Emission Controller, AMM, Staking)
 (define-map authorized-minters principal bool)

@@ -8,7 +8,7 @@
 (define-constant ERR_STRATEGY_NOT_FOUND u6001)
 (define-constant ERR_RISK_TOO_HIGH u6002)
 
-(define-data-var contract-owner principal tx-sender)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Strategy storage
 (define-map strategies

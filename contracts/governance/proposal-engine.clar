@@ -15,17 +15,17 @@
 (define-constant ERR_INSUFFICIENT_POWER u1004)
 
 (define-data-var proposal-counter uint u0)
-(define-data-var proposal-executor-contract principal .proposal-executor)
-(define-data-var proposal-registry-contract principal .proposal-registry)
-(define-data-var reputation-engine-contract principal .reputation-engine)
+(define-data-var proposal-executor-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var proposal-registry-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var reputation-engine-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Access Control
-(define-data-var access-control principal .conxian-access)
+(define-data-var access-control principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Routes
-(define-data-var registry principal .proposal-registry)
-(define-data-var seat-token principal .enhanced-governance-nft)
-(define-data-var reputation-engine principal .reputation-engine)
+(define-data-var registry principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var seat-token principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var reputation-engine principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; @desc Submits a new proposal to a specific council for voting.
 ;; @param proposal-contract: The contract principal of the proposal to be voted on. Must implement the proposal-trait.

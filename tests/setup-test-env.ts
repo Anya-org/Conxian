@@ -15,7 +15,7 @@ export async function initializeSimnet(): Promise<Simnet> {
   console.log('Initializing Simnet for test environment...');
   initializationPromise = initSimnet('Clarinet.toml').then((instance) => {
     internalSimnet = instance;
-    console.log('Simnet initialized.');
+    console.log('Simnet initialized.'); console.log('Accounts:', instance.getAccounts());
     return instance;
   }).catch((error) => {
     initializationPromise = null; // Reset on failure to allow retry
