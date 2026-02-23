@@ -1,4 +1,7 @@
 ;; gauge-manager.clar
+;; Conxian Protocol Standard Contract
+
+;; gauge-manager.clar
 ;; CXLP Use Case: Liquidity Gauge System
 ;; Allows CXLP holders to vote on incentive distribution weights for DEX pools.
 
@@ -28,6 +31,9 @@
 
 ;; Core Logic
 
+
+;; @desc Vote gauge
+;; @returns (response bool uint)
 (define-public (vote-gauge (pool principal) (amount uint))
   (let (
       (epoch (var-get current-epoch))
@@ -55,6 +61,9 @@
   )
 )
 
+
+;; @desc Advance epoch
+;; @returns (response bool uint)
 (define-public (advance-epoch)
   (begin
     ;; Simplified: anyone can advance for now, or use automated agent

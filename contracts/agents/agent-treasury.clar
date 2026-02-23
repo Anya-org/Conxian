@@ -127,12 +127,24 @@
 
 ;; Admin Functions
 
+(define-public (initialize (new-owner principal))
+  (begin
+    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
+    (var-set contract-owner new-owner)
+    (ok true)
+  )
+)
+
 (define-public (set-contract-owner (new-owner principal))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (var-set contract-owner new-owner)
     (ok true)
   )
+)
+
+(define-read-only (get-contract-owner)
+  (var-get contract-owner)
 )
 
 ;; Compliance & Audit

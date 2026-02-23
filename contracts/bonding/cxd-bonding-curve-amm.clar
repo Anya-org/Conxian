@@ -23,12 +23,7 @@
 
 ;; Compliance
 (define-private (check-compliance (user principal))
-  (let ((compliance-status (contract-call? (var-get regulatory-adapter-contract) check-clean-hands-compliance user)))
-    (if (is-ok compliance-status)
-      true
-      false
-    )
-  )
+  (contract-call? .regulatory-adapter check-clean-hands-compliance user)
 )
 
 ;; Price Calculation
@@ -41,7 +36,7 @@
 
 (define-public (get-buy-quote (amount-cxd uint))
   (let (
-      (supply (unwrap-panic (contract-call? (var-get cxd-token-contract) get-total-supply)))
+      (supply (unwrap-panic (contract-call? .cxd-token get-total-supply)))
       (price-start (get-price supply))
       (price-end (get-price (+ supply amount-cxd)))
       (average-price (/ (+ price-start price-end) u2))
@@ -54,7 +49,7 @@
 
 (define-public (get-sell-quote (amount-cxd uint))
   (let (
-      (supply (unwrap-panic (contract-call? (var-get cxd-token-contract) get-total-supply)))
+      (supply (unwrap-panic (contract-call? .cxd-token get-total-supply)))
       (price-start (get-price supply))
       (price-end (get-price (- supply amount-cxd)))
       (average-price (/ (+ price-start price-end) u2))
@@ -93,7 +88,7 @@
     ;; Mint CXD via Coordinator
     ;; Coordinator must have authorized this contract as a minter
     (try! (contract-call? .token-system-coordinator mint-cxd
-      amount-cxd buyer
+      .cxd-token amount-cxd buyer
     ))
 
     (print {
@@ -120,7 +115,7 @@
 
     ;; Burn CXD
     (try! (contract-call? .token-system-coordinator burn-cxd
-      amount-cxd seller
+      .cxd-token amount-cxd seller
     ))
 
     ;; Transfer STX from Reserve

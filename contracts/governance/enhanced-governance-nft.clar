@@ -1,4 +1,7 @@
 ;; enhanced-governance-nft.clar
+;; Conxian Protocol Standard Contract
+
+;; enhanced-governance-nft.clar
 ;; Conxian Governance: Council Seats
 ;; Implements SIP-009 for Governance Seats
 
@@ -65,6 +68,9 @@
   (ok (nft-get-owner? seat token-id))
 )
 
+
+;; @desc Transfer
+;; @returns (response bool uint)
 (define-public (transfer
     (token-id uint)
     (sender principal)
@@ -80,6 +86,9 @@
 
 ;; Core Logic
 
+
+;; @desc Mint seat
+;; @returns (response bool uint)
 (define-public (mint-seat
     (recipient principal)
     (council-id uint)
@@ -128,6 +137,9 @@
   )
 )
 
+
+;; @desc Burn seat
+;; @returns (response bool uint)
 (define-public (burn-seat (seat-id uint))
   (let (
       (owner (unwrap! (nft-get-owner? seat seat-id) (err ERR_NOT_FOUND)))

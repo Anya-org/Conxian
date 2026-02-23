@@ -1,4 +1,7 @@
 ;; legal-representative-registry.clar
+;; Conxian Protocol Standard Contract
+
+;; legal-representative-registry.clar
 ;; Registry of Clean-Hands/KYC'd Entities
 ;; Maps on-chain principals to off-chain legal identities (hash)
 
@@ -29,6 +32,9 @@
 )
 
 ;; Admin Functions
+
+;; @desc Register representative
+;; @returns (response bool uint)
 (define-public (register-representative (entity principal) (name-hash (buff 32)) (jurisdiction (string-ascii 64)))
     (begin
         (asserts! (is-eq tx-sender (var-get registrar)) (err ERR_UNAUTHORIZED))
@@ -42,6 +48,9 @@
     )
 )
 
+
+;; @desc Update status
+;; @returns (response bool uint)
 (define-public (update-status (entity principal) (active bool))
     (let (
         (profile (unwrap-panic (map-get? legal-registry entity)))

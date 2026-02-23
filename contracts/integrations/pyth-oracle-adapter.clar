@@ -48,7 +48,7 @@
 (define-public (set-pyth-provider (new-provider principal))
   (begin
     (asserts!
-      (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-admin))
+      (is-eq tx-sender (contract-call? .conxian-protocol get-admin))
       (err ERR_UNAUTHORIZED)
     )
     (var-set pyth-contract new-provider)

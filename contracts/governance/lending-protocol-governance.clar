@@ -1,4 +1,7 @@
 ;; lending-protocol-governance.clar
+;; Conxian Protocol Standard Contract
+
+;; lending-protocol-governance.clar
 ;; Specialized Governance for Money Markets
 ;; Manages Interest Rate Models and Collateral Factors via Proposal
 
@@ -26,6 +29,9 @@
     (is-eq tx-sender (var-get governance-contract))
 )
 
+
+;; @desc Set governance contract
+;; @returns (response bool uint)
 (define-public (set-governance-contract (new-gov principal))
     (begin
         (asserts! (is-authorized) (err ERR_UNAUTHORIZED))
@@ -35,6 +41,9 @@
 )
 
 ;; Proposal Trait Implementation
+
+;; @desc Execute
+;; @returns (response bool uint)
 (define-public (execute (proposer principal))
     (begin
         ;; Start execution logic
@@ -44,6 +53,9 @@
 )
 
 ;; Specialized Functions
+
+;; @desc Propose interest rate change
+;; @returns (response bool uint)
 (define-public (propose-interest-rate-change (asset principal) (new-base-rate uint))
     (begin
         ;; Logic to create a proposal for IR change
@@ -56,6 +68,9 @@
     )
 )
 
+
+;; @desc Propose collateral factor change
+;; @returns (response bool uint)
 (define-public (propose-collateral-factor-change (asset principal) (new-factor uint))
     (begin
         ;; Logic to create a proposal for CF change
@@ -68,6 +83,9 @@
     )
 )
 
+
+;; @desc Update risk parameters
+;; @returns (response bool uint)
 (define-public (update-risk-parameters (asset principal) (risk-score uint))
     (begin
         (asserts! (is-authorized) (err ERR_UNAUTHORIZED))

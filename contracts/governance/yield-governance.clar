@@ -1,4 +1,7 @@
 ;; yield-governance.clar
+;; Conxian Protocol Standard Contract
+
+;; yield-governance.clar
 ;; CXS Use Case: Staking & Yield Curve Governance
 ;; Specialized controller for updating Economic Policy Engine parameters.
 
@@ -12,6 +15,9 @@
 
 ;; Core Logic
 
+
+;; @desc Execute
+;; @returns (response bool uint)
 (define-public (execute (proposer principal))
   (begin
     ;; This function would be called by the proposal-executor

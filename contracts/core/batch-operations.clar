@@ -1,4 +1,7 @@
 ;; batch-operations.clar
+;; Conxian Protocol Standard Contract
+
+;; batch-operations.clar
 ;; Standardized batch operation processing for Conxian Protocol
 ;; Forced Clarity 4 Standard (Jan 2026 Edition)
 
@@ -38,7 +41,7 @@
 ;; Main Batch Processor (Ultra-High Performance)
 (define-public (process-batch
     (operations (list
-      1000
+      50
       {
         type: uint,
         target: principal,
@@ -79,6 +82,9 @@
 )
 
 ;; Admin Functions
+
+;; @desc Set batch enabled
+;; @returns (response bool uint)
 (define-public (set-batch-enabled (enabled bool))
   (begin
     (asserts! (is-eq tx-sender (var-get global-admin)) (err ERR_UNAUTHORIZED))
@@ -87,6 +93,9 @@
   )
 )
 
+
+;; @desc Set global admin
+;; @returns (response bool uint)
 (define-public (set-global-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get global-admin)) (err ERR_UNAUTHORIZED))
@@ -96,7 +105,7 @@
 )
 
 ;; Private Helper Functions
-(define-private (validate-batch-operations (operations (list 10
+(define-private (validate-batch-operations (operations (list 50
   {
   type: uint,
   target: principal,
@@ -108,7 +117,7 @@
 )
 
 (define-private (execute-batch-with-gas-tracking
-    (operations (list 10
+    (operations (list 50
       {
         type: uint,
         target: principal,

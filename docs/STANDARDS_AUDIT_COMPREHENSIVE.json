@@ -1,53 +1,1088 @@
 {
-  "timestamp": "2026-02-13T15:00:00Z",
+  "timestamp": "2026-02-23T12:00:22.340909",
   "audit_results": {
     "layer_1_structural": {
-      "score": 98,
-      "violations": [
-        "contracts/dimensional/dimensional-core.clar: Minor documentation gaps for some helper functions."
-      ]
+      "score": 84.48275862068965
     },
     "layer_2_diataxis": {
-      "score": 90,
-      "missing_sections": {
-        "contracts/tokens/README.md": [
-          "Architecture (Explanation)",
-          "Testing (How-to)"
-        ]
-      }
+      "score": 100.0
     },
     "layer_3_github_best_practices": {
-      "score": 100,
-      "missing_elements": {}
+      "score": 100.0
     },
     "layer_4_conxian_standards": {
-      "score": 100,
-      "gaps": {}
+      "score": 50
     },
     "layer_5_code_doc_alignment": {
-      "score": 100,
-      "alignment_issues": {}
+      "score": 100.0
     },
     "layer_6_accessibility": {
-      "score": 95,
-      "clarity_issues": []
+      "score": 95.90361445783132
     }
   },
-  "overall_standards_score": 97.2,
+  "overall_standards_score": 88.39772884642015,
   "critical_issues": [],
-  "high_issues": [
-    "Diátaxis gaps in Token module README."
-  ],
+  "high_issues": [],
   "medium_issues": [
-    "Modularize test suite for faster local validation."
+    "Missing Conxian standard reference: BIP-341",
+    "Missing Conxian standard reference: BIP-342",
+    "Missing Conxian standard reference: BIP-174",
+    "Missing Conxian standard reference: Hexagonal",
+    "Missing Conxian standard reference: 60/20/20"
   ],
   "compliance_by_file": {
-    "README.md": { "score": 100 },
-    "CONTRIBUTING.md": { "score": 100 },
-    "contracts/core/README.md": { "score": 100 },
-    "contracts/core/conxian-protocol.clar": { "score": 100 },
-    "contracts/core/admin-facade.clar": { "score": 100 },
-    "contracts/core/ops-engine.clar": { "score": 100 },
-    "contracts/core/conxian-access.clar": { "score": 100 }
+    "./contracts/governance-token.clar": {
+      "layer_1": 30,
+      "issues": [
+        "Public function transfer is missing documentation",
+        "Public function has-voting-power is missing documentation",
+        "Public function delegate-voting-power is missing documentation",
+        "Public function undelegate-voting-power is missing documentation",
+        "Public function set-minter is missing documentation",
+        "Public function mint is missing documentation",
+        "Public function burn is missing documentation"
+      ]
+    },
+    "./contracts/position-factory.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function create-position is missing documentation"
+      ]
+    },
+    "./contracts/constants/nakamoto-constants.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/integrations/redstone-oracle-adapter.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function verify-data-package is missing documentation",
+        "Public function get-price is missing documentation"
+      ]
+    },
+    "./contracts/integrations/dia-oracle-adapter.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function update-price is missing documentation"
+      ]
+    },
+    "./contracts/integrations/switchboard-oracle-adapter.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function get-price is missing documentation",
+        "Public function update-price is missing documentation"
+      ]
+    },
+    "./contracts/integrations/pyth-oracle-adapter.clar": {
+      "layer_1": 70,
+      "issues": [
+        "Public function update-price-feed is missing documentation",
+        "Public function get-price is missing documentation",
+        "Public function set-pyth-provider is missing documentation"
+      ]
+    },
+    "./contracts/integrations/twap-oracle.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function record-price is missing documentation"
+      ]
+    },
+    "./contracts/integrations/chainlink-adapter.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function update-price is missing documentation"
+      ]
+    },
+    "./contracts/dex/predictive-scaling-system.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/dex/protocol-invariant-monitor.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/dex/oracle-aggregator.clar": {
+      "layer_1": 70,
+      "issues": [
+        "Public function get-price-by-intent is missing documentation",
+        "Public function get-price is missing documentation",
+        "Public function get-weights is missing documentation"
+      ]
+    },
+    "./contracts/dex/dex-factory.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/dex/route-manager.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function swap-route is missing documentation"
+      ]
+    },
+    "./contracts/dex/memory-pool-management.clar": {
+      "layer_1": 60,
+      "issues": [
+        "Public function create-memory-pool is missing documentation",
+        "Public function allocate-memory is missing documentation",
+        "Public function deallocate-memory is missing documentation",
+        "Public function emergency-cleanup-all-pools is missing documentation"
+      ]
+    },
+    "./contracts/dex/oracle.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/dex/swap-router.clar": {
+      "layer_1": 50,
+      "issues": [
+        "Public function exact-input-single is missing documentation",
+        "Public function set-fee is missing documentation",
+        "Public function update-volatility-fees is missing documentation",
+        "Public function set-ops-engine is missing documentation",
+        "Public function swap-direct is missing documentation"
+      ]
+    },
+    "./contracts/dex/liquidity-provider.clar": {
+      "layer_1": 50,
+      "issues": [
+        "Public function add-liquidity is missing documentation",
+        "Public function remove-liquidity is missing documentation",
+        "Public function claim-rewards is missing documentation",
+        "Public function batch-claim-rewards is missing documentation",
+        "Public function set-liquidity-provider-active is missing documentation"
+      ]
+    },
+    "./contracts/dex/concentrated-liquidity-pool.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/dex/liquidity-optimization-engine.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/dex/batch-auction.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/dex/liquidity-manager.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/dex/swap-manager.clar": {
+      "layer_1": 50,
+      "issues": [
+        "Public function execute-swap is missing documentation",
+        "Public function batch-execute-swaps is missing documentation",
+        "Public function set-circuit-breaker is missing documentation",
+        "Public function invalidate-route is missing documentation",
+        "Public function set-swap-manager-active is missing documentation"
+      ]
+    },
+    "./contracts/dex/pool-template.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function create-template is missing documentation",
+        "Public function deactivate-template is missing documentation"
+      ]
+    },
+    "./contracts/dex/vault.clar": {
+      "layer_1": 50,
+      "issues": [
+        "Public function create-vault is missing documentation",
+        "Public function deposit-to-vault is missing documentation",
+        "Public function withdraw-from-vault is missing documentation",
+        "Public function set-circuit-breaker is missing documentation",
+        "Public function set-vault-system-active is missing documentation"
+      ]
+    },
+    "./contracts/dex/rebalancing-rules.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/dex/dex-facade.clar": {
+      "layer_1": 70,
+      "issues": [
+        "Public function add-authorized-pool is missing documentation",
+        "Public function remove-authorized-pool is missing documentation",
+        "Public function initialize is missing documentation"
+      ]
+    },
+    "./contracts/marketplace/nft-marketplace.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/insurance/insurance-protection-nft.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/bonding/bond-factory.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function transfer is missing documentation",
+        "Public function create-bond is missing documentation"
+      ]
+    },
+    "./contracts/bonding/cxd-bonding-curve-amm.clar": {
+      "layer_1": 60,
+      "issues": [
+        "Public function get-buy-quote is missing documentation",
+        "Public function get-sell-quote is missing documentation",
+        "Public function buy is missing documentation",
+        "Public function sell is missing documentation"
+      ]
+    },
+    "./contracts/bonding/bond-token.clar": {
+      "layer_1": 60,
+      "issues": [
+        "Public function transfer is missing documentation",
+        "Public function mint is missing documentation",
+        "Public function burn is missing documentation",
+        "Public function set-contract-owner is missing documentation"
+      ]
+    },
+    "./contracts/utils/encoding.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/utils/block-utils.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function check-finality is missing documentation"
+      ]
+    },
+    "./contracts/mev/position-factory-root.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/mev/mev-protection-nft.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/enterprise/advanced-order-manager.clar": {
+      "layer_1": 70,
+      "issues": [
+        "Public function place-twap-order is missing documentation",
+        "Public function execute-twap-leg is missing documentation",
+        "Public function cancel-twap-order is missing documentation"
+      ]
+    },
+    "./contracts/enterprise/enterprise-api.clar": {
+      "layer_1": 70,
+      "issues": [
+        "Public function register-account is missing documentation",
+        "Public function update-kyc-status is missing documentation",
+        "Public function submit-advanced-order is missing documentation"
+      ]
+    },
+    "./contracts/enterprise/enterprise-facade.clar": {
+      "layer_1": 70,
+      "issues": [
+        "Public function set-enterprise-active is missing documentation",
+        "Public function register-account is missing documentation",
+        "Public function submit-twap-order is missing documentation"
+      ]
+    },
+    "./contracts/helpers/optimization-helpers.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/monitoring/analytics-aggregator.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function track-swap is missing documentation",
+        "Public function track-fee is missing documentation"
+      ]
+    },
+    "./contracts/monitoring/finance-metrics.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/monitoring/price-stability-monitor.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/monitoring/monitoring-dashboard.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/staking/dual-stacking-orchestrator.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function placeholder is missing documentation"
+      ]
+    },
+    "./contracts/staking/native-stacking-operator.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function placeholder is missing documentation"
+      ]
+    },
+    "./contracts/vaults/sbtc-vault.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function deposit is missing documentation",
+        "Public function withdraw is missing documentation"
+      ]
+    },
+    "./contracts/vaults/custody.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function placeholder is missing documentation"
+      ]
+    },
+    "./contracts/vaults/yield-aggregator.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function add-strategy is missing documentation",
+        "Public function deposit is missing documentation"
+      ]
+    },
+    "./contracts/vaults/fee-manager.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function placeholder is missing documentation"
+      ]
+    },
+    "./contracts/dimensional/position-nft.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/dimensional/dimensional-core.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/security/rate-limiter.clar": {
+      "layer_1": 70,
+      "issues": [
+        "Public function check-rate-limit is missing documentation",
+        "Public function set-custom-limit is missing documentation",
+        "Public function transfer-ownership is missing documentation"
+      ]
+    },
+    "./contracts/security/mev-protector.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function commit-order is missing documentation"
+      ]
+    },
+    "./contracts/security/conxian-insurance-fund.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function deposit is missing documentation",
+        "Public function cover-loss is missing documentation"
+      ]
+    },
+    "./contracts/security/proof-of-reserves.clar": {
+      "layer_1": 40,
+      "issues": [
+        "Public function add-attestor is missing documentation",
+        "Public function remove-attestor is missing documentation",
+        "Public function submit-attestation is missing documentation",
+        "Public function sync-on-chain-balance is missing documentation",
+        "Public function set-oracle-aggregator is missing documentation",
+        "Public function set-contract-owner is missing documentation"
+      ]
+    },
+    "./contracts/security/circuit-breaker.clar": {
+      "layer_1": 30,
+      "issues": [
+        "Public function set-contract-paused is missing documentation",
+        "Public function set-function-paused is missing documentation",
+        "Public function is-circuit-breaker-active is missing documentation",
+        "Public function trigger-circuit-breaker is missing documentation",
+        "Public function reset-circuit-breaker is missing documentation",
+        "Public function get-circuit-breaker-status is missing documentation",
+        "Public function trigger-circuit-breaker-for is missing documentation"
+      ]
+    },
+    "./contracts/security/enhanced-circuit-breaker.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function placeholder is missing documentation"
+      ]
+    },
+    "./contracts/interfaces/dimensional-engine-interface.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/interfaces/btc-adapter.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/upgrade-controller.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/voting.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/legal-representative-registry.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/proposal-engine-trait.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/proposal-registry.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/proposal-engine.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/enhanced-governance-nft.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/gauge-manager.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/community-governance-token.clar": {
+      "layer_1": 40,
+      "issues": [
+        "Public function delegate is missing documentation",
+        "Public function revoke-delegation is missing documentation",
+        "Public function transfer is missing documentation",
+        "Public function mint is missing documentation",
+        "Public function set-contract-owner is missing documentation",
+        "Public function set-token-uri is missing documentation"
+      ]
+    },
+    "./contracts/governance/treasury-governance.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/yield-governance.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/community-dao.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/proposal-executor.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/governance-signature-verifier.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/governance-handover.clar": {
+      "layer_1": 70,
+      "issues": [
+        "Public function verify-full-handover is missing documentation",
+        "Public function execute-handover-step is missing documentation",
+        "Public function finalize-handover is missing documentation"
+      ]
+    },
+    "./contracts/governance/ico-offering.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/lending-protocol-governance.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/reputation-engine.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/gamification-manager.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/signed-data-base.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/emergency-governance.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/dao-treasury.clar": {
+      "layer_1": 10,
+      "issues": [
+        "Public function request-ownership-transfer is missing documentation",
+        "Public function claim-ownership is missing documentation",
+        "Public function set-owner is missing documentation",
+        "Public function deposit is missing documentation",
+        "Public function withdraw is missing documentation",
+        "Public function get-balance is missing documentation",
+        "Public function withdraw-to is missing documentation",
+        "Public function allocate-to-strategy is missing documentation",
+        "Public function complete-withdrawal is missing documentation"
+      ]
+    },
+    "./contracts/governance/timelock.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/governance/community-voting-engine.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function create-proposal is missing documentation",
+        "Public function vote is missing documentation"
+      ]
+    },
+    "./contracts/tokens/cxvg-token.clar": {
+      "layer_1": 30,
+      "issues": [
+        "Public function delegate is missing documentation",
+        "Public function revoke-delegation is missing documentation",
+        "Public function transfer is missing documentation",
+        "Public function mint is missing documentation",
+        "Public function burn is missing documentation",
+        "Public function set-contract-owner is missing documentation",
+        "Public function set-token-uri is missing documentation"
+      ]
+    },
+    "./contracts/tokens/cxd-token.clar": {
+      "layer_1": 50,
+      "issues": [
+        "Public function transfer is missing documentation",
+        "Public function burn is missing documentation",
+        "Public function add-minter is missing documentation",
+        "Public function mint is missing documentation",
+        "Public function set-contract-owner is missing documentation"
+      ]
+    },
+    "./contracts/tokens/cxlp-position-nft.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function transfer is missing documentation",
+        "Public function mint-position is missing documentation"
+      ]
+    },
+    "./contracts/tokens/cxtr-token.clar": {
+      "layer_1": 70,
+      "issues": [
+        "Public function transfer is missing documentation",
+        "Public function mint is missing documentation",
+        "Public function burn is missing documentation"
+      ]
+    },
+    "./contracts/tokens/cxlp-token.clar": {
+      "layer_1": 70,
+      "issues": [
+        "Public function transfer is missing documentation",
+        "Public function mint is missing documentation",
+        "Public function burn is missing documentation"
+      ]
+    },
+    "./contracts/tokens/cxd-price-initializer.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function placeholder is missing documentation"
+      ]
+    },
+    "./contracts/tokens/token-system-coordinator.clar": {
+      "layer_1": 20,
+      "issues": [
+        "Public function set-coordinator-admin is missing documentation",
+        "Public function set-minter-status is missing documentation",
+        "Public function set-cxd-token is missing documentation",
+        "Public function set-cxvg-token is missing documentation",
+        "Public function mint-cxd is missing documentation",
+        "Public function mint-cxvg is missing documentation",
+        "Public function burn-cxd is missing documentation",
+        "Public function burn-cxvg is missing documentation"
+      ]
+    },
+    "./contracts/tokens/cxs-token.clar": {
+      "layer_1": 70,
+      "issues": [
+        "Public function transfer is missing documentation",
+        "Public function mint is missing documentation",
+        "Public function burn is missing documentation"
+      ]
+    },
+    "./contracts/pools/pool-registry.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/pools/pool-factory.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/rewards/default-strategy-engine.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/rewards/early-lp-rewards.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/automation/automation-manager.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function trigger-automation is missing documentation",
+        "Public function set-automation-active is missing documentation"
+      ]
+    },
+    "./contracts/automation/batch-processor.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function batch-call is missing documentation"
+      ]
+    },
+    "./contracts/automation/office-manager.clar": {
+      "layer_1": 0,
+      "issues": [
+        "Public function set-agent-status is missing documentation",
+        "Public function register-worker is missing documentation",
+        "Public function remove-worker is missing documentation",
+        "Public function fund-payroll is missing documentation",
+        "Public function withdraw-payroll is missing documentation",
+        "Public function payout is missing documentation",
+        "Public function has-role is missing documentation",
+        "Public function grant-role is missing documentation",
+        "Public function revoke-role is missing documentation",
+        "Public function verify-passkey-signature is missing documentation"
+      ]
+    },
+    "./contracts/test-helpers/test-c4.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/test-helpers/mock-proposal.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function execute is missing documentation",
+        "Public function reset is missing documentation"
+      ]
+    },
+    "./contracts/test-helpers/mock-token.clar": {
+      "layer_1": 70,
+      "issues": [
+        "Public function transfer is missing documentation",
+        "Public function mint is missing documentation",
+        "Public function burn is missing documentation"
+      ]
+    },
+    "./contracts/identity/identity-badge.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/identity/kyc-registry.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function set-identity-status is missing documentation"
+      ]
+    },
+    "./contracts/orders/order-book.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/treasury/cxd-treasury.clar": {
+      "layer_1": 50,
+      "issues": [
+        "Public function rebalance is missing documentation",
+        "Public function record-diverted-claim is missing documentation",
+        "Public function initialize is missing documentation",
+        "Public function set-authorized-principals is missing documentation",
+        "Public function set-admin is missing documentation"
+      ]
+    },
+    "./contracts/treasury/founder-vault.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function create-allocation is missing documentation",
+        "Public function claim is missing documentation"
+      ]
+    },
+    "./contracts/treasury/allocation-policy.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/treasury/revenue-distributor.clar": {
+      "layer_1": 70,
+      "issues": [
+        "Public function distribute-token is missing documentation",
+        "Public function distribute-stx is missing documentation",
+        "Public function set-destinations is missing documentation"
+      ]
+    },
+    "./contracts/treasury/opex-vault.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function withdraw-opex is missing documentation"
+      ]
+    },
+    "./contracts/treasury/conxian-vaults.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function deposit is missing documentation",
+        "Public function withdraw is missing documentation"
+      ]
+    },
+    "./contracts/agents/agent-treasury.clar": {
+      "layer_1": 60,
+      "issues": [
+        "Public function run-fiscal-strategy is missing documentation",
+        "Public function apply-fiscal-dam is missing documentation",
+        "Public function initialize is missing documentation",
+        "Public function set-contract-owner is missing documentation"
+      ]
+    },
+    "./contracts/agents/agent-risk.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/oracle/oracle-aggregator.clar": {
+      "layer_1": 40,
+      "issues": [
+        "Public function set-admin is missing documentation",
+        "Public function set-circuit-breaker is missing documentation",
+        "Public function set-params is missing documentation",
+        "Public function set-stale-threshold is missing documentation",
+        "Public function reset-volatility is missing documentation",
+        "Public function set-source is missing documentation"
+      ]
+    },
+    "./contracts/oracle/external-oracle-adapter.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/oracle/oracle-adapter-stub.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/oracle/federated-oracle-adapter.clar": {
+      "layer_1": 70,
+      "issues": [
+        "Public function submit-price is missing documentation",
+        "Public function add-oracle-source is missing documentation",
+        "Public function remove-oracle-source is missing documentation"
+      ]
+    },
+    "./contracts/oracle/dimensional-oracle.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function get-price is missing documentation",
+        "Public function fetch-price is missing documentation"
+      ]
+    },
+    "./contracts/oracle/points-oracle.clar": {
+      "layer_1": 10,
+      "issues": [
+        "Public function award-points is missing documentation",
+        "Public function burn-points is missing documentation",
+        "Public function transfer-points is missing documentation",
+        "Public function claim-reward is missing documentation",
+        "Public function apply-points-decay is missing documentation",
+        "Public function create-reward is missing documentation",
+        "Public function set-decay-enabled is missing documentation",
+        "Public function emergency-reset-user-points is missing documentation",
+        "Public function deactivate-reward is missing documentation"
+      ]
+    },
+    "./contracts/sbtc/dlc-manager.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function create-dlc is missing documentation"
+      ]
+    },
+    "./contracts/migration/legacy-adapter.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function legacy-function is missing documentation"
+      ]
+    },
+    "./contracts/migration/migration-manager.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function start-migration is missing documentation",
+        "Public function complete-migration is missing documentation"
+      ]
+    },
+    "./contracts/core/dimensional-engine.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/core/conxian-access.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/core/position-manager.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/core/ops-engine.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function trigger-epoch-update is missing documentation"
+      ]
+    },
+    "./contracts/core/operational-treasury.clar": {
+      "layer_1": 60,
+      "issues": [
+        "Public function deposit-stx is missing documentation",
+        "Public function withdraw-stx is missing documentation",
+        "Public function withdraw-token is missing documentation",
+        "Public function set-contract-owner is missing documentation"
+      ]
+    },
+    "./contracts/core/conxian-protocol.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/core/conxian-paas-factory.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function register-new-sab is missing documentation",
+        "Public function update-sab-status is missing documentation"
+      ]
+    },
+    "./contracts/core/collateral-manager.clar": {
+      "layer_1": 70,
+      "issues": [
+        "Public function deposit-funds is missing documentation",
+        "Public function withdraw-funds is missing documentation",
+        "Public function seize-collateral is missing documentation"
+      ]
+    },
+    "./contracts/core/admin-facade.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/core/economic-policy-engine.clar": {
+      "layer_1": 40,
+      "issues": [
+        "Public function update-market-parameters is missing documentation",
+        "Public function update-price-feed is missing documentation",
+        "Public function set-subscription-cost is missing documentation",
+        "Public function set-reserve-factor is missing documentation",
+        "Public function subscribe is missing documentation",
+        "Public function auto-adjust-parameters is missing documentation"
+      ]
+    },
+    "./contracts/core/risk-manager.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/core/conxian-exit-queue.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/core/batch-operations.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function process-batch is missing documentation"
+      ]
+    },
+    "./contracts/core/founder-vesting.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/core/funding-rate-calculator.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/interoperability/wormhole-handlers.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/interoperability/wormhole-outbox.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function send-message is missing documentation"
+      ]
+    },
+    "./contracts/interoperability/wormhole-inbox.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/lib/clarity-bitcoin.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/compliance/travel-rule-service.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function register-vasp is missing documentation",
+        "Public function log-travel-rule-data is missing documentation"
+      ]
+    },
+    "./contracts/compliance/regulatory-adapter.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function transfer-ownership is missing documentation"
+      ]
+    },
+    "./contracts/compliance/compliance-manager.clar": {
+      "layer_1": 30,
+      "issues": [
+        "Public function register-provider is missing documentation",
+        "Public function remove-provider is missing documentation",
+        "Public function set-sanctions-provider is missing documentation",
+        "Public function check-user-compliance is missing documentation",
+        "Public function batch-check-compliance is missing documentation",
+        "Public function check-kyc-compliance is missing documentation",
+        "Public function set-owner is missing documentation"
+      ]
+    },
+    "./contracts/compliance/compliance-hooks.clar": {
+      "layer_1": 40,
+      "issues": [
+        "Public function set-contract-owner is missing documentation",
+        "Public function set-compliance-manager is missing documentation",
+        "Public function add-kyc-provider is missing documentation",
+        "Public function remove-kyc-provider is missing documentation",
+        "Public function verify-kyc is missing documentation",
+        "Public function log-audit-event is missing documentation"
+      ]
+    },
+    "./contracts/compliance/compliance-trait.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/lending/lending-manager.clar": {
+      "layer_1": 60,
+      "issues": [
+        "Public function seize-collateral is missing documentation",
+        "Public function collect-reserves is missing documentation",
+        "Public function set-circuit-breaker is missing documentation",
+        "Public function withdraw is missing documentation"
+      ]
+    },
+    "./contracts/lending/interest-rate-model.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/yield/cxd-staking.clar": {
+      "layer_1": 40,
+      "issues": [
+        "Public function stake is missing documentation",
+        "Public function withdraw is missing documentation",
+        "Public function get-reward is missing documentation",
+        "Public function set-reward-rate is missing documentation",
+        "Public function set-paused is missing documentation",
+        "Public function set-authorized-principals is missing documentation"
+      ]
+    },
+    "./contracts/yield/token-emission-controller.clar": {
+      "layer_1": 60,
+      "issues": [
+        "Public function update-epoch is missing documentation",
+        "Public function drip-rewards is missing documentation",
+        "Public function request-mint is missing documentation",
+        "Public function add-emission-target is missing documentation"
+      ]
+    },
+    "./contracts/yield/auto-compounder.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function compound is missing documentation"
+      ]
+    },
+    "./contracts/yield/enhanced-yield-strategy.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function placeholder is missing documentation"
+      ]
+    },
+    "./contracts/yield/cross-protocol-integrator.clar": {
+      "layer_1": 90,
+      "issues": [
+        "Public function placeholder is missing documentation"
+      ]
+    },
+    "./contracts/yield/yield-optimizer.clar": {
+      "layer_1": 60,
+      "issues": [
+        "Public function update-strategy is missing documentation",
+        "Public function record-performance is missing documentation",
+        "Public function rebalance is missing documentation",
+        "Public function compound-rewards is missing documentation"
+      ]
+    },
+    "./contracts/traits/pyth-traits.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/traits/redstone-traits.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/traits/enterprise-traits.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/traits/pausable-trait.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/traits/automation-traits.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/traits/queue-traits.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/traits/cross-chain-traits.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/traits/conxian-service-trait.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/traits/bond-traits.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/traits/defi-traits.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/traits/security-monitoring.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/traits/core-traits.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/traits/governance-traits.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/traits/sip-standards.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/traits/vault-trait.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/traits/controller-traits.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/traits/dimensional-traits.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/performance/performance-optimizer.clar": {
+      "layer_1": 80,
+      "issues": [
+        "Public function record-gas-cost is missing documentation",
+        "Public function increment-transaction-count is missing documentation"
+      ]
+    },
+    "./contracts/math/math-utilities.clar": {
+      "layer_1": 100,
+      "issues": []
+    },
+    "./contracts/math/concentrated-math.clar": {
+      "layer_1": 100,
+      "issues": []
+    }
   }
 }

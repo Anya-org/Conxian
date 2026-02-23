@@ -30,7 +30,7 @@
     (min-amount-out uint)
   )
   (begin
-    (asserts! (not (is-eq (contract-call? .conxian-protocol is-paused) (ok true))) (err ERR_PAUSED))
+    (asserts! (not (contract-call? .conxian-protocol is-paused)) (err ERR_PAUSED))
     (try! (contract-call? token-in transfer amount-in tx-sender (as-contract tx-sender) none))
     (let (
       (pool-state (unwrap! (contract-call? .concentrated-liquidity-pool get-pool pool-id) (err ERR_INVALID_PATH)))

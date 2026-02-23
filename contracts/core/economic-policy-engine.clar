@@ -85,7 +85,7 @@
     (price-volatility uint)
   )
   (begin
-    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
     (let (
         (new-rate (calculate-interest-rate new-utilization))
         (new-factor (calculate-collateral-factor price-volatility))
@@ -171,7 +171,7 @@
 
 (define-public (set-subscription-cost (new-cost uint))
   (begin
-    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
     (var-set subscription-cost new-cost)
     (ok true)
   )
@@ -183,7 +183,7 @@
     
 (define-public (set-reserve-factor (new-factor uint))
   (begin
-    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
     (asserts! (<= new-factor u10000) (err ERR_INVALID_PARAM))
     (var-set reserve-factor new-factor)
     (ok true)

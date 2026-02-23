@@ -1,4 +1,7 @@
 ;; oracle.clar
+;; Conxian Protocol Standard Contract
+
+;; oracle.clar
 ;; Manual Price Oracle for Conxian Protocol
 ;; Allows admin to set prices for assets
 
@@ -21,6 +24,9 @@
 
 ;; Public Functions
 
+
+;; @desc Set price
+;; @returns (response bool uint)
 (define-public (set-price (asset principal) (price uint))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -30,6 +36,9 @@
   )
 )
 
+
+;; @desc Set contract owner
+;; @returns (response bool uint)
 (define-public (set-contract-owner (new-owner principal))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))

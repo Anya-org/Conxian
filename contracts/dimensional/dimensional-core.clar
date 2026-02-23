@@ -64,6 +64,10 @@
   (map-get? positions { owner: user, id: position-id })
 )
 
+(define-read-only (calculate-tvl)
+  (ok (var-get total-value-locked))
+)
+
 ;; @desc Calculates the health factor of a position.
 ;; @param user principal - Position owner.
 ;; @param position-id uint - Position ID.
@@ -133,6 +137,10 @@
 )
 
 ;; @desc Closes an active position.
+;; @param position-id uint - The ID of the position to close.
+;; @param token-trait <sip-010-ft-trait> - The collateral token trait.
+;; @param oracle <oracle-trait> - The price oracle trait.
+;; @returns (response bool uint)
 (define-public (close-position (position-id uint) (token-trait <sip-010-ft-trait>) (oracle <oracle-trait>))
   (let (
       (pos (unwrap! (get-position tx-sender position-id) (err ERR_INVALID_POSITION)))
@@ -147,6 +155,27 @@
       (asserts! (is-eq (get status pos) "ACTIVE") (err ERR_POSITION_NOT_ACTIVE))
       (map-set positions { owner: tx-sender, id: position-id } (merge pos { status: "CLOSED", last-updated: burn-block-height }))
       (if (> final-amt u0) (try! (as-contract (contract-call? token-trait transfer final-amt tx-sender tx-sender none))) true)
+      (try! (contract-call? .position-nft burn position-id))
+      (var-set total-value-locked (- (var-get total-value-locked) collateral))
+      (ok true)
+    )
+  )
+)
+
+;; @desc Liquidates a position.
+;; @param user principal - The owner of the position.
+;; @param position-id uint - The ID of the position to liquidate.
+;; @param oracle-ref <oracle-trait> - The price oracle trait.
+;; @returns (response bool uint)
+(define-public (liquidate-position (user principal) (position-id uint) (oracle-ref <oracle-trait>))
+  (begin
+    (asserts! (is-eq contract-caller (var-get risk-manager-principal)) (err ERR_UNAUTHORIZED))
+    (let (
+        (pos (unwrap! (get-position user position-id) (err ERR_INVALID_POSITION)))
+        (collateral (get collateral pos))
+      )
+      (asserts! (is-eq (get status pos) "ACTIVE") (err ERR_POSITION_NOT_ACTIVE))
+      (map-set positions { owner: user, id: position-id } (merge pos { status: "LIQUIDATED", last-updated: burn-block-height }))
       (try! (contract-call? .position-nft burn position-id))
       (var-set total-value-locked (- (var-get total-value-locked) collateral))
       (ok true)
@@ -180,6 +209,10 @@
 )
 
 ;; ===== Admin =====
+
+;; @desc Updates the authorized risk manager principal.
+;; @param mgr principal - The new risk manager principal.
+;; @returns (response bool uint)
 (define-public (set-risk-manager (mgr principal))
   (begin
     (asserts! (is-eq tx-sender (var-get owner)) (err ERR_UNAUTHORIZED))

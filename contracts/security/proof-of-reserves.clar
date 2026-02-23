@@ -16,7 +16,7 @@
 (define-constant PROOF_VALIDITY_PERIOD u604800)
 
 ;; Minimum required attestations
-(define-constant MIN_ATTESTATIONS uint u3)
+(define-constant MIN_ATTESTATIONS u3)
 
 ;; Data Vars
 (define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)

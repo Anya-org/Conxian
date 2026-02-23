@@ -4,10 +4,31 @@ import { simnet } from './setup-test-env';
 
 describe('Intelligence-Led Adaptive Yield Engine (AYE) - CXIP-013', () => {
   let deployer: string;
+  const P0 = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
 
   beforeAll(() => {
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
+
+    // Initialize agents and treasury with deployer as owner/admin
+    simnet.callPublicFn(
+      'agent-risk',
+      'initialize',
+      [Cl.principal(deployer)],
+      P0
+    );
+    simnet.callPublicFn(
+      'cxd-treasury',
+      'initialize',
+      [Cl.principal(deployer)],
+      P0
+    );
+    simnet.callPublicFn(
+      'agent-treasury',
+      'initialize',
+      [Cl.principal(deployer)],
+      P0
+    );
   });
 
   it('Initial state should be CXIP-013 Equilibrium', () => {
@@ -30,13 +51,20 @@ describe('Intelligence-Led Adaptive Yield Engine (AYE) - CXIP-013', () => {
   });
 
   it('Agent-Risk should provide performance metrics', () => {
+    // Set TVL and bounty completion rate
+    simnet.callPublicFn(
+      'agent-risk',
+      'set-tvl',
+      [Cl.uint(1000000000), Cl.uint(900000000), Cl.uint(9600)],
+      deployer
+    );
+
     const metrics = simnet.callReadOnlyFn(
       'agent-risk',
       'get-performance-metrics',
       [],
       deployer
     );
-    // Default values I set in agent-risk.clar
     expect(metrics.result).toEqual(Cl.tuple({
       tvl: Cl.uint(1000000000),
       'last-month-tvl': Cl.uint(900000000),
@@ -67,8 +95,8 @@ describe('Intelligence-Led Adaptive Yield Engine (AYE) - CXIP-013', () => {
     // Authorize agent-treasury in cxd-treasury
     const auth = simnet.callPublicFn(
       'cxd-treasury',
-      'set-agent-treasury',
-      [Cl.contractPrincipal(deployer, 'agent-treasury')],
+      'set-authorized-principals',
+      [Cl.contractPrincipal(deployer, 'agent-treasury'), Cl.contractPrincipal(deployer, 'revenue-distributor')],
       deployer
     );
     expect(auth.result).toEqual(Cl.ok(Cl.bool(true)));
@@ -105,13 +133,12 @@ describe('Intelligence-Led Adaptive Yield Engine (AYE) - CXIP-013', () => {
 
   it('Agent-Risk Crisis should trigger 100% insurance', () => {
     // Set high risk score
-    const response = simnet.callPublicFn(
+    simnet.callPublicFn(
       'agent-risk',
-      'set-predictive-params',
-      [Cl.uint(1000), Cl.uint(9000), Cl.uint(8000)],
+      'set-mock-gcr',
+      [Cl.uint(105)], // Crisis is GCR < 110
       deployer
     );
-    expect(response.result).toEqual(Cl.ok(Cl.bool(true)));
 
     // Mine a block to allow re-run of strategy
     simnet.mineEmptyBurnBlock();

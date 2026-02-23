@@ -1,3 +1,6 @@
+;; founder-vesting.clar
+;; Conxian Protocol Standard Contract
+
 ;; contracts/core/founder-vesting.clar
 ;; BOLT: Refactored for Clarity 4, Nakamoto compatibility, and secure state management.
 ;; Migrated to burn-block-height for second-precision vesting.
@@ -23,6 +26,9 @@
 })
 
 ;; --- Contract Initialization ---
+
+;; @desc Initialize
+;; @returns (response bool uint)
 (define-public (initialize (owner principal))
   (begin
     (asserts! (is-eq tx-sender CONTRACT_OWNER) (err ERR_UNAUTHORIZED))
@@ -33,6 +39,9 @@
 )
 
 ;; --- Administrative Functions ---
+
+;; @desc Add vesting schedule
+;; @returns (response bool uint)
 (define-public (add-vesting-schedule (beneficiary principal) (total-amount uint) (start-time uint) (end-time uint))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
@@ -48,6 +57,9 @@
 )
 
 ;; --- Public Functions ---
+
+;; @desc Claim vested tokens
+;; @returns (response bool uint)
 (define-public (claim-vested-tokens)
   (let ((schedule (map-get? vesting-schedules tx-sender)))
     (asserts! (is-some schedule) (err ERR_NO_VESTING_SCHEDULE))

@@ -1,4 +1,7 @@
 ;; conxian-access.clar
+;; Conxian Protocol Standard Contract
+
+;; conxian-access.clar
 ;; Unified Role-Based Access Control (RBAC) Backend
 ;; Centralizes all permissioning for the Conxian Protocol
 ;; Dual-Mode: Compatibility and Clarity 4
@@ -43,6 +46,9 @@
 )
 
 ;; Trait Implementation
+
+;; @desc Has role
+;; @returns (response bool uint)
 (define-public (has-role
     (user principal)
     (role-id uint)
@@ -54,6 +60,9 @@
   ))
 )
 
+
+;; @desc Grant role
+;; @returns (response bool uint)
 (define-public (grant-role
     (user principal)
     (role-id uint)
@@ -74,6 +83,9 @@
   )
 )
 
+
+;; @desc Revoke role
+;; @returns (response bool uint)
 (define-public (revoke-role
     (user principal)
     (role-id uint)
@@ -94,6 +106,9 @@
 )
 
 ;; Admin
+
+;; @desc Initialize
+;; @returns (response bool uint)
 (define-public (initialize (owner principal))
   (begin
     (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
@@ -102,6 +117,9 @@
   )
 )
 
+
+;; @desc Set contract owner
+;; @returns (response bool uint)
 (define-public (set-contract-owner (new-owner principal) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -111,6 +129,9 @@
 )
 
 ;; Sovereign Handoff: Transfer ownership to timelock
+
+;; @desc Transfer ownership to timelock
+;; @returns (response bool uint)
 (define-public (transfer-ownership-to-timelock (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -120,7 +141,7 @@
 )
 
 (define-read-only (get-contract-owner)
-  (ok (var-get contract-owner))
+  (var-get contract-owner)
 )
 
 ;; Read-only: Verify Passkey/Biometric Signature (Safe Wrapper)
@@ -133,6 +154,9 @@
   (is-admin tx-sender)
 )
 
+
+;; @desc Set timelock principal
+;; @returns (response bool uint)
 (define-public (set-timelock-principal (new-timelock principal))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))

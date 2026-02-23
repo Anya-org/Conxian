@@ -1,4 +1,7 @@
 ;; community-dao.clar
+;; Conxian Protocol Standard Contract
+
+;; community-dao.clar
 ;; Conxian PaaS Standard: Community DAO Governance
 ;; Compliant DAO structure for sub-DAOs spawned via PaaS Factory.
 ;; Tier 0: "Hands-Off" Governance with Clean-Hands Enforcement.
@@ -46,15 +49,13 @@
 
 ;; Authorization
 (define-private (check-compliance (user principal))
-  (let ((compliance-status (contract-call? .regulatory-adapter check-clean-hands-compliance user)))
-    (if (is-ok compliance-status)
-      true
-      false
-    )
-  )
+  (contract-call? .regulatory-adapter check-clean-hands-compliance user)
 )
 
 ;; Admin (DAO Bootstrap)
+
+;; @desc Set governance token
+;; @returns (response bool uint)
 (define-public (set-governance-token (new-token principal))
   (begin
     ;; Only allowing this if no proposals exist yet to prevent takeover, 
@@ -68,6 +69,9 @@
 
 ;; Core Logic
 
+
+;; @desc Create proposal
+;; @returns (response bool uint)
 (define-public (create-proposal
     (title (string-ascii 64))
     (description (string-ascii 256))
@@ -110,6 +114,9 @@
   )
 )
 
+
+;; @desc Vote
+;; @returns (response bool uint)
 (define-public (vote
     (proposal-id uint)
     (support bool)
@@ -171,6 +178,9 @@
 )
 
 ;; Execution (Simplified for Tier 0)
+
+;; @desc Execute
+;; @returns (response bool uint)
 (define-public (execute (proposal-id uint))
   (let ((proposal (unwrap! (map-get? proposals proposal-id) (err ERR_PROPOSAL_NOT_FOUND))))
     (asserts! (> burn-block-height (get end-block proposal)) (err ERR_PROPOSAL_ACTIVE))

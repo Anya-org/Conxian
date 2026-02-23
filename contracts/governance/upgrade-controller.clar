@@ -1,4 +1,7 @@
 ;; upgrade-controller.clar
+;; Conxian Protocol Standard Contract
+
+;; upgrade-controller.clar
 ;; Controls Protocol Upgrades
 ;; Standard Upgrade Logic Pattern
 
@@ -10,6 +13,9 @@
     (is-eq tx-sender (var-get governance))
 )
 
+
+;; @desc Set governance
+;; @returns (response bool uint)
 (define-public (set-governance (new-gov principal))
     (begin
         (asserts! (is-governance) (err ERR_UNAUTHORIZED))
@@ -19,6 +25,9 @@
 )
 
 ;; Upgrade Signal
+
+;; @desc Signal upgrade
+;; @returns (response bool uint)
 (define-public (signal-upgrade (contract principal) (new-impl-hash (buff 32)))
     (begin
         (asserts! (is-governance) (err ERR_UNAUTHORIZED))

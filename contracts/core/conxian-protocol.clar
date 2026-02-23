@@ -1,4 +1,7 @@
 ;; conxian-protocol.clar
+;; Conxian Protocol Standard Contract
+
+;; conxian-protocol.clar
 ;; Core Facade for Conxian Protocol - COMPATIBILITY MODE
 
 (define-constant ERR_UNAUTHORIZED u1000)
@@ -13,6 +16,9 @@
   (ok { compliant: true, paused: (var-get paused), tenure-id: (some (/ block-height u10)), timestamp: burn-block-height, version: "06" })
 )
 
+
+;; @desc Set paused
+;; @returns (response bool uint)
 (define-public (set-paused (new-paused bool))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
@@ -21,6 +27,23 @@
   )
 )
 
+
+;; @desc Pause
+;; @returns (response bool uint)
+(define-public (pause)
+  (set-paused true)
+)
+
+
+;; @desc Unpause
+;; @returns (response bool uint)
+(define-public (unpause)
+  (set-paused false)
+)
+
+
+;; @desc Register module
+;; @returns (response bool uint)
 (define-public (register-module (name (string-ascii 32)) (contract principal))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
@@ -30,6 +53,7 @@
 )
 
 (define-read-only (get-module (name (string-ascii 32))) (map-get? modules { name: name }))
-(define-read-only (is-paused) (ok (var-get paused)))
+(define-read-only (is-paused) (var-get paused))
 (define-read-only (get-protocol-owner) (var-get contract-owner))
-(define-read-only (get-protocol-admin) (ok (var-get contract-owner)))
+(define-read-only (get-protocol-admin) (var-get contract-owner))
+(define-read-only (get-admin) (var-get contract-owner))

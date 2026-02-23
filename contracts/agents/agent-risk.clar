@@ -1,4 +1,7 @@
 ;; agent-risk.clar
+;; Conxian Protocol Standard Contract
+
+;; agent-risk.clar
 ;; "AYE" Predictive Risk Agent
 ;; Manages Stability Fees (PID) and Global Collateral Ratio (GCR)
 ;; Nakamoto-Aligned (Clarity 4 / Epoch 3.0)
@@ -36,6 +39,9 @@
 
 ;; --- Risk Assessment ---
 
+
+;; @desc Set predictive params
+;; @returns (response bool uint)
 (define-public (set-predictive-params (new-depth uint) (new-vol uint) (new-cong uint))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
@@ -44,6 +50,10 @@
     (var-set mempool-congestion new-cong)
     (ok true)
   )
+)
+
+(define-read-only (get-contract-owner)
+  (var-get contract-owner)
 )
 
 (define-read-only (assess-system-risk)
@@ -58,6 +68,8 @@
 
 (define-read-only (get-performance-metrics)
   {
+    tvl: (var-get total-value-locked),
+    last-month-tvl: (var-get last-month-tvl),
     tvl-growth-bps: (if (> (var-get last-month-tvl) u0)
                         (/ (* (- (var-get total-value-locked) (var-get last-month-tvl)) u10000) (var-get last-month-tvl))
                         u0),
@@ -77,6 +89,9 @@
   )
 )
 
+
+;; @desc Update pid rates
+;; @returns (response bool uint)
 (define-public (update-pid-rates)
   (begin
     (asserts! (or (is-eq contract-caller (var-get ops-engine-principal)) (is-eq tx-sender (var-get contract-owner))) (err ERR_UNAUTHORIZED))
@@ -104,7 +119,13 @@
 )
 
 ;; --- Automation Interface ---
+
+;; @desc Check work needed
+;; @returns (response bool uint)
 (define-public (check-work-needed) (ok false))
+
+;; @desc Do work
+;; @returns (response bool uint)
 (define-public (do-work (job-data (buff 2048))) (ok true))
 
 ;; --- Cybernetic Intelligence ---
@@ -117,11 +138,28 @@
   }
 )
 
+
+;; @desc Get health factor
+;; @returns (response bool uint)
 (define-public (get-health-factor (position-id uint))
   (ok u10000)
 )
 
 ;; --- Admin Functions ---
+
+;; @desc Initialize
+;; @returns (response bool uint)
+(define-public (initialize (owner principal))
+  (begin
+    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
+    (var-set contract-owner owner)
+    (ok true)
+  )
+)
+
+
+;; @desc Set ops engine
+;; @returns (response bool uint)
 (define-public (set-ops-engine (new-ops principal))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
@@ -132,6 +170,9 @@
 
 (define-read-only (get-gcr) (ok (get-gcr-internal)))
 
+
+;; @desc Set mock gcr
+;; @returns (response bool uint)
 (define-public (set-mock-gcr (new-gcr uint))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
@@ -140,6 +181,9 @@
   )
 )
 
+
+;; @desc Set tvl
+;; @returns (response bool uint)
 (define-public (set-tvl (new-tvl uint) (new-last-month uint) (new-bounty-rate uint))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))

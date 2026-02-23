@@ -36,7 +36,7 @@
 
 (define-public (submit-advanced-order (order-type (string-ascii 10)) (params (buff 128)))
     (begin
-        (try! (contract-call? .compliance-hooks verify-kyc tx-sender))
+        (try! (contract-call? .compliance-hooks verify-kyc tx-sender u1))
         (asserts! (get kyc-status (unwrap! (map-get? institutional-accounts tx-sender) (err ERR_ACCOUNT_NOT_FOUND))) (err ERR_UNAUTHORIZED))
         ;; Logic to handle different order types (TWAP, VWAP, etc.)
         (ok true)

@@ -1,4 +1,7 @@
 ;; rebalancing-rules.clar
+;; Conxian Protocol Standard Contract
+
+;; rebalancing-rules.clar
 ;; Rules for auto-rebalancing vaults
 
 (define-read-only (should-rebalance (current-ratio uint) (target-ratio uint) (threshold uint))
@@ -7,6 +10,9 @@
   )
 )
 
+
+;; @desc Placeholder
+;; @returns (response bool uint)
 (define-public (placeholder)
   (ok true)
 )

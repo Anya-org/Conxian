@@ -1,4 +1,7 @@
 ;; gamification-manager.clar
+;; Conxian Protocol Standard Contract
+
+;; gamification-manager.clar
 ;; User Engagement & XP System for Governance
 ;; Tracks user activity and awards XP
 
@@ -23,6 +26,9 @@
 )
 
 ;; Admin Functions
+
+;; @desc Award xp
+;; @returns (response bool uint)
 (define-public (award-xp (user principal) (amount uint))
     (let (
         (current-xp (get-user-xp user))
@@ -35,6 +41,9 @@
     )
 )
 
+
+;; @desc Set admin
+;; @returns (response bool uint)
 (define-public (set-admin (new-admin principal))
     (begin
         (asserts! (is-admin) (err ERR_UNAUTHORIZED))

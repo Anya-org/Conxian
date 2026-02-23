@@ -34,7 +34,7 @@
     (amount uint)
   )
   (begin
-    (asserts! (is-eq tx-sender (unwrap-panic (contract-call? .conxian-protocol get-admin)))
+    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-admin))
       (err ERR_UNAUTHORIZED)
     )
     (try! (contract-call? token transfer amount tx-sender (as-contract tx-sender) none))
@@ -76,7 +76,7 @@
 )
 
 (define-read-only (calculate-vested (total uint))
-  (let ((vesting-duration (unwrap-panic (get-vesting-duration))))
+  (let ((vesting-duration (get-vesting-duration)))
     (if (>= burn-block-height (+ VESTING_START vesting-duration))
       total
       (/ (* total (- burn-block-height VESTING_START)) vesting-duration)

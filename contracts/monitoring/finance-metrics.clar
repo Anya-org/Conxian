@@ -17,7 +17,7 @@
 (define-read-only (get-protocol-metrics)
   (let (
     (tvl (unwrap-panic (get-tvl)))
-    (supply (unwrap-panic (contract-call? .cxd-token get-total-supply)))
+    (supply (contract-call? .cxd-token get-total-supply))
   )
     (ok {
       tvl: tvl,
