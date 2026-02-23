@@ -32,7 +32,7 @@
 ;; @param council-id: The ID of the council that will vote on this proposal.
 ;; @param start-block: The block height at which voting begins.
 ;; @param end-block: The block height at which voting ends.
-;; @returns (response uint) The ID of the newly created proposal.
+;; @returns (response uint uint) The ID of the newly created proposal.
 (define-public (submit-proposal
     (proposal-contract <proposal-trait>)
     (council-id uint)
@@ -61,7 +61,7 @@
 ;; @desc Casts a vote on an active proposal.
 ;; @param proposal-id: The ID of the proposal to vote on.
 ;; @param support: A boolean indicating the voter's choice (true for 'yes', false for 'no').
-;; @returns (response bool)
+;; @returns (response bool uint)
 (define-public (vote
     (proposal-id uint)
     (support bool)
@@ -87,7 +87,7 @@
     (asserts! (> weighted-voter-power u0) (err ERR_UNAUTHORIZED))
 
     ;; Update activity score
-    (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender u1)) ;; Placeholder
+    (asserts! (unwrap! (contract-call? .conxian-access has-role tx-sender u1) (err ERR_UNAUTHORIZED))
       (err ERR_UNAUTHORIZED)
     )
     (let ((rep-update (contract-call? .reputation-engine update-activity-score
@@ -105,7 +105,7 @@
 ;; @desc Executes a passed proposal by delegating to the proposal executor.
 ;; @param proposal-id: The ID of the proposal to execute.
 ;; @param proposal-contract: The contract principal of the proposal.
-;; @returns (response bool)
+;; @returns (response bool uint)
 (define-public (execute-proposal
     (proposal-id uint)
     (proposal-contract <proposal-trait>)
@@ -117,6 +117,10 @@
 )
 
 ;; Admin functions
+
+;; @desc Updates the default voting period for operational proposals.
+;; @param new-period uint - The new duration in blocks.
+;; @returns (response bool uint)
 (define-public (set-voting-period (new-period uint))
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
@@ -125,6 +129,9 @@
   )
 )
 
+;; @desc Sets the required quorum percentage for proposal execution.
+;; @param new-quorum uint - The new quorum percentage (in bps, e.g., 5000 for 50%).
+;; @returns (response bool uint)
 (define-public (set-quorum-percentage (new-quorum uint))
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
@@ -133,6 +140,9 @@
   )
 )
 
+;; @desc Updates the contract principal authorized to execute proposals.
+;; @param new-executor principal - The new executor contract principal.
+;; @returns (response bool uint)
 (define-public (set-proposal-executor (new-executor principal))
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
@@ -142,6 +152,9 @@
   )
 )
 
+;; @desc Transports administrative ownership of the engine.
+;; @param new-owner principal - The new owner principal.
+;; @returns (response bool uint)
 (define-public (transfer-ownership (new-owner principal))
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
@@ -150,6 +163,9 @@
   )
 )
 
+;; @desc Sets the main protocol coordinator contract.
+;; @param new-coordinator principal - The new coordinator principal.
+;; @returns (response bool uint)
 (define-public (set-protocol-coordinator (new-coordinator principal))
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
@@ -158,6 +174,9 @@
   )
 )
 
+;; @desc Updates the data store used for recording proposals.
+;; @param new-registry principal - The new registry contract principal.
+;; @returns (response bool uint)
 (define-public (set-proposal-registry (new-registry principal))
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
@@ -166,7 +185,15 @@
   )
 )
 
-;; Legacy function for compatibility
+;; @desc Legacy function for backward compatibility with previous governance versions.
+;; @param title (string-ascii 50) - The proposal title.
+;; @param signatures (list 10 principal) - Required signatures.
+;; @param action-ids (list 10 uint) - Action identifiers.
+;; @param action-types (list 10 (string-ascii 20)) - Types of actions.
+;; @param action-params (list 10 (buff 256)) - Parameters for actions.
+;; @param start-block uint - Start block height.
+;; @param end-block uint - End block height.
+;; @returns (response bool uint)
 (define-public (propose
     (title (string-ascii 50))
     (signatures (list 10 principal))

@@ -1,4 +1,7 @@
 ;; emergency-governance.clar
+;; Conxian Protocol Standard Contract
+
+;; emergency-governance.clar
 ;; "Break Glass" Emergency Protocol
 ;; Allows specific roles to pause the protocol in crisis
 
@@ -17,6 +20,9 @@
     (is-eq tx-sender (var-get emergency-admin))
 )
 
+
+;; @desc Set emergency admin
+;; @returns (response bool uint)
 (define-public (set-emergency-admin (new-admin principal))
     (begin
         (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
@@ -26,6 +32,9 @@
 )
 
 ;; Emergency Actions
+
+;; @desc Activate emergency pause
+;; @returns (response bool uint)
 (define-public (activate-emergency-pause (contract <pausable-trait>))
     (begin
         (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
@@ -33,6 +42,9 @@
     )
 )
 
+
+;; @desc Deactivate emergency pause
+;; @returns (response bool uint)
 (define-public (deactivate-emergency-pause (contract <pausable-trait>))
     (begin
         (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
@@ -47,6 +59,9 @@
     (ok (var-get global-circuit-breaker))
 )
 
+
+;; @desc Trigger circuit breaker
+;; @returns (response bool uint)
 (define-public (trigger-circuit-breaker)
     (begin
         (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
@@ -56,6 +71,9 @@
     )
 )
 
+
+;; @desc Reset circuit breaker
+;; @returns (response bool uint)
 (define-public (reset-circuit-breaker)
     (begin
         (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))

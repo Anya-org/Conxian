@@ -3,7 +3,7 @@
 
 (define-read-only (get-protocol-health)
   (let (
-    (protocol-status (unwrap-panic (contract-call? .conxian-protocol get-protocol-status)))
+    (protocol-status (contract-call? .conxian-protocol get-protocol-status))
     (risk-intel (contract-call? .agent-risk get-cybernetic-intel))
   )
     (ok {

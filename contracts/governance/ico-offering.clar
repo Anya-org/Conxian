@@ -1,4 +1,7 @@
 ;; ico-offering.clar
+;; Conxian Protocol Standard Contract
+
+;; ico-offering.clar
 ;; Initial Coin Offering Contract
 ;; Fixed price crowdsale logic with compliance gating and caps
 ;;
@@ -54,15 +57,15 @@
 ;; Compliance check
 (define-private (check-compliance (user principal))
     (if (var-get compliance-required)
-        (match (contract-call? .regulatory-adapter check-clean-hands-compliance user)
-            success (if success true false)
-            error false
-        )
+        (contract-call? .regulatory-adapter check-clean-hands-compliance user)
         true
     )
 )
 
 ;; Public Interface
+
+;; @desc Buy tokens
+;; @returns (response bool uint)
 (define-public (buy-tokens (amount uint) (token <sip-010-trait>))
     (let (
         (buyer tx-sender)
@@ -95,6 +98,9 @@
 )
 
 ;; Admin Functions
+
+;; @desc Set sale active
+;; @returns (response bool uint)
 (define-public (set-sale-active (active bool))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -108,6 +114,9 @@
     )
 )
 
+
+;; @desc Set token price
+;; @returns (response bool uint)
 (define-public (set-token-price (new-price uint))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -117,6 +126,9 @@
     )
 )
 
+
+;; @desc Set treasury address
+;; @returns (response bool uint)
 (define-public (set-treasury-address (new-address principal))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -125,6 +137,9 @@
     )
 )
 
+
+;; @desc Set sale caps
+;; @returns (response bool uint)
 (define-public (set-sale-caps (new-sale-cap uint) (new-individual-cap uint))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -134,6 +149,9 @@
     )
 )
 
+
+;; @desc Set compliance required
+;; @returns (response bool uint)
 (define-public (set-compliance-required (required bool))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -142,6 +160,9 @@
     )
 )
 
+
+;; @desc Transfer ownership
+;; @returns (response bool uint)
 (define-public (transfer-ownership (new-owner principal))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))

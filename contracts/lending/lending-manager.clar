@@ -26,7 +26,7 @@
 ;; --- Helpers ---
 
 (define-private (is-admin)
-  (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin))
+  (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin))
 )
 (define-private (get-interest-rate (asset principal) (utilization uint))
   (contract-call? .economic-policy-engine get-current-interest-rate)
@@ -89,7 +89,7 @@
         (current-dep (default-to u0 (map-get? deposits { asset: asset, user: tx-sender })))
         (reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: burn-block-height } (map-get? reserve-data asset)))
       )
-        (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
+        (asserts! (not (contract-call? .conxian-protocol is-paused)) (err ERR_PAUSED))
         (asserts! (> amount u0) (err ERR_INVALID_AMOUNT))
 
         (try! (contract-call? asset-trait transfer amount tx-sender (as-contract tx-sender) none))
@@ -122,7 +122,7 @@
         (current-bor (default-to u0 (map-get? borrows { asset: asset, user: tx-sender })))
         (reserve (unwrap! (map-get? reserve-data asset) (err u404)))
       )
-        (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err ERR_PAUSED))
+        (asserts! (not (contract-call? .conxian-protocol is-paused)) (err ERR_PAUSED))
         (asserts! (<= amount (get total-deposits reserve)) (err ERR_INSUFFICIENT_LIQUIDITY))
 
         ;; CRITICAL: Check collateralization before allowing borrow

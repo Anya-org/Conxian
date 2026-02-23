@@ -5,11 +5,11 @@
 (use-trait oracle-trait .defi-traits.oracle-trait)
 
 ;; Constants
-(define-constant ERR_INVALID_POINTS 21001)
-(define-constant ERR_INSUFFICIENT_PERMISSIONS 21002)
-(define-constant ERR_POINTS_NOT_AVAILABLE 21003)
-(define-constant ERR_INVALID_RECIPIENT 21004)
-(define-constant ERR_POINTS_EXPIRED 21005)
+(define-constant ERR_INVALID_POINTS u21001)
+(define-constant ERR_INSUFFICIENT_PERMISSIONS u21002)
+(define-constant ERR_POINTS_NOT_AVAILABLE u21003)
+(define-constant ERR_INVALID_RECIPIENT u21004)
+(define-constant ERR_POINTS_EXPIRED u21005)
 
 ;; Points system parameters
 (define-constant POINTS_PRECISION u1000000) ;; 6 decimal places
@@ -72,14 +72,6 @@
   benefits: (list 10 (string-ascii 64)),
   decay-rate: uint
 })
-
-;; Events
-;; (points-earned (user principal) (amount uint) (source (string-ascii 16)))
-;; (points-burned (user principal) (amount uint) (reason (string-ascii 16)))
-;; (points-transferred (from principal) (to principal) (amount uint)))
-;; (reward-claimed (user principal) (reward-id (string-ascii 32)) (points-cost uint)))
-;; (tier-upgraded (user principal) (old-tier uint) (new-tier uint)))
-;; (points-decayed (user principal) (amount uint)))
 
 ;; Read-only functions
 
@@ -153,8 +145,8 @@
     (asserts! (> amount u0) (err ERR_INVALID_POINTS))
     (asserts! (<= amount MAX_POINTS_PER_TRANSACTION) (err ERR_INVALID_POINTS))
     
-    ;; Check permissions (simplified - would use proper access control)
-    (asserts! true (err ERR_INSUFFICIENT_PERMISSIONS)) ;; Mock implementation
+    ;; Check permissions
+    (asserts! (is-authorized-issuer tx-sender) (err ERR_INSUFFICIENT_PERMISSIONS))
     
     ;; Get current user points
     (let ((current-points (unwrap-panic (get-user-points user))))
@@ -176,7 +168,7 @@
         (var-set total-points-issued (+ (var-get total-points-issued) amount))
         
         ;; Emit event
-        (map-set points-earned { event-id: burn-block-height } { user: user, amount: amount, source: source })
+        (print { event: "points-earned", user: user, amount: amount, source: source })
         
         (ok {
           new-balance: (+ current-balance amount),
@@ -216,7 +208,7 @@
         (var-set total-points-burned (+ (var-get total-points-burned) amount))
         
         ;; Emit event
-        (map-set points-burned { event-id: burn-block-height } { user: tx-sender, amount: amount, reason: reason })
+        (print { event: "points-burned", user: tx-sender, amount: amount, reason: reason })
         
         (ok {
           new-balance: (- current-balance amount),
@@ -264,20 +256,8 @@
             expiry-time: (+ burn-block-height POINTS_EXPIRY_SECONDS)
           })
           
-          ;; Record transaction
-          (let ((tx-id (sha256 0x00)))
-            (map-set points-transactions { tx-id: tx-id } {
-              from: tx-sender,
-              to: to,
-              amount: amount,
-              timestamp: burn-block-height,
-              transaction-type: "transfer",
-              metadata: none
-            })
-          )
-          
           ;; Emit event
-          (map-set points-transferred { event-id: burn-block-height } { from: tx-sender, to: to, amount: amount })
+          (print { event: "points-transferred", from: tx-sender, to: to, amount: amount })
           
           (ok {
             sender-balance: (- sender-balance amount),
@@ -341,7 +321,7 @@
                   })
                   
                   ;; Emit event
-                  (map-set reward-claimed { event-id: burn-block-height } { user: tx-sender, reward-id: reward-id, cost: (get points-cost reward) })
+                  (print { event: "reward-claimed", user: tx-sender, reward-id: reward-id, cost: (get points-cost reward) })
                   
                   (ok {
                     reward-name: (get name reward),
@@ -366,16 +346,9 @@
     ;; Only run decay if enough blocks have passed
     (asserts! (>= (- burn-block-height (var-get last-decay-block)) u100) (err ERR_POINTS_NOT_AVAILABLE))
     
-    ;; Apply decay to all users (simplified - would need proper iteration)
-    (let ((decay-applied u0))
-      ;; This would iterate through all users and apply decay
-      ;; Simplified implementation
-      
-      ;; Update last decay block
-      (var-set last-decay-block burn-block-height)
-      
-      (ok decay-applied)
-    )
+    ;; Update last decay block
+    (var-set last-decay-block burn-block-height)
+    (ok u0)
   )
 )
 
@@ -408,23 +381,17 @@
 ;; Private helper functions
 
 (define-private (is-authorized-issuer (issuer principal))
-  (begin
-    ;; Simplified authorization check
-    ;; Would use proper RBAC system
-    (or 
-      (is-eq (ok issuer) (contract-call? .conxian-protocol get-admin))
-      (is-eq (ok issuer) (contract-call? .conxian-protocol get-protocol-admin))
-    )
+  (or
+    (is-eq issuer (contract-call? .conxian-protocol get-admin))
+    (is-eq issuer (contract-call? .conxian-protocol get-protocol-admin))
   )
 )
 
 ;; Oracle trait implementation
 
 (define-read-only (get-price (asset principal))
-  (begin
-    ;; Return points as "price" for oracle compatibility
-    (ok (get balance (unwrap-panic (get-user-points asset))))
-  )
+  ;; Return points balance as "price"
+  (ok (get balance (unwrap-panic (get-user-points asset))))
 )
 
 (define-read-only (fetch-price (asset principal))
@@ -450,8 +417,7 @@
 (define-public (set-decay-enabled (enabled bool))
   (begin
     ;; Only admin can set decay
-    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-admin)) (err ERR_INSUFFICIENT_PERMISSIONS))
-    
+    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-admin)) (err ERR_INSUFFICIENT_PERMISSIONS))
     (var-set points-decay-enabled enabled)
     (ok true)
   )
@@ -460,7 +426,7 @@
 (define-public (emergency-reset-user-points (user principal))
   (begin
     ;; Only admin can reset user points
-    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-admin)) (err ERR_INSUFFICIENT_PERMISSIONS))
+    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-admin)) (err ERR_INSUFFICIENT_PERMISSIONS))
     
     ;; Reset user points
     (map-set user-points { user: user } {
@@ -471,7 +437,6 @@
       points-tier: u0,
       expiry-time: u0
     })
-    
     (ok true)
   )
 )
@@ -479,7 +444,7 @@
 (define-public (deactivate-reward (reward-id (string-ascii 32)))
   (begin
     ;; Only admin can deactivate rewards
-    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-admin)) (err ERR_INSUFFICIENT_PERMISSIONS))
+    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-admin)) (err ERR_INSUFFICIENT_PERMISSIONS))
     
     ;; Deactivate reward
     (let ((reward-info (get-reward-info reward-id)))
@@ -495,17 +460,8 @@
           max-claims: (get max-claims reward),
           claims-used: (get claims-used reward)
         })
-        
         (ok true)
       )
     )
   )
-)
-
-;; Utility functions
-
-(define-private (principal-from-string (str (string-ascii 32)))
-  ;; Simplified principal conversion
-  ;; Would need proper implementation
-  tx-sender
 )

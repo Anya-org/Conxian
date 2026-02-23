@@ -1,139 +1,99 @@
 ;; rate-limiter.clar
-;; Conxian Security: Rate limiting for sensitive operations
-;; Prevents spam and protects against certain attack vectors
-;;
-;; REPAIRED: Full implementation of rate limiting with window-based tracking
+;; Conxian Security: Rate Limiting System
+;; Prevents spam and protects against rapid-fire exploits
 
 ;; Constants
-(define-constant ERR_RATE_LIMIT_EXCEEDED u7000)
-(define-constant ERR_UNAUTHORIZED u7001)
-(define-constant ERR_INVALID_WINDOW u7002)
+(define-constant ERR_UNAUTHORIZED u7000)
+(define-constant ERR_RATE_LIMIT_EXCEEDED u7001)
+(define-constant ERR_INVALID_PARAMS u7002)
 
-;; Default rate limits (operations per window)
-(define-constant DEFAULT_WINDOW_SIZE uint u600) ;; 10 minutes in blocks (assuming 1 block/sec)
-(define-constant DEFAULT_MAX_OPERATIONS uint u10) ;; 10 operations per window
+(define-constant DEFAULT_WINDOW_SIZE u600) ;; 10 minutes in blocks (assuming 1 block/sec)
+(define-constant DEFAULT_MAX_OPERATIONS u10) ;; 10 operations per window
 
-;; Data Vars
+;; Data variables
 (define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var window-size uint u600) ;; Configurable window size
 
-;; Rate tracking: user -> operation-type -> {count, last-operation}
-(define-map rate-limits
-    { user: principal, operation: (string-ascii 32) }
+;; Maps
+(define-map user-rate-limits
+    principal
     {
-        count: uint,
-        window-start: uint
+        window-start: uint,
+        operation-count: uint,
+        custom-window-size: (optional uint),
+        custom-max-operations: (optional uint)
     }
 )
 
-;; Custom limits per operation type
-(define-map operation-config
-    (string-ascii 32)
-    {
-        max-operations: uint,
-        enabled: bool
-    }
-)
-
-;; Events
-(define-private (emit-rate-limit-hit (user principal) (operation (string-ascii 32)))
-    (print {
-        event: "rate-limit-exceeded",
-        user: user,
-        operation: operation,
-        timestamp: block-height
-    })
-)
-
-;; Authorization
+;; Private functions
 (define-private (is-owner)
     (is-eq tx-sender (var-get contract-owner))
 )
 
-;; @desc Check if operation is allowed for user
-(define-public (check-operation (user principal) (operation (string-ascii 32)))
-    (let (
-        (config (default-to { max-operations: DEFAULT_MAX_OPERATIONS, enabled: true } 
-                         (map-get? operation-config operation)))
-        (current-block block-height)
-        (window-start (var-get window-size))
-        (rate-data (map-get? rate-limits { user: user, operation: operation }))
-      )
-        ;; Check if operation type is enabled
-        (asserts! (get enabled config) (ok true))
-        
-        (match rate-data
-            existing-data
-            ;; Check if we're in a new window
-            (if (> current-block (+ (get window-start existing-data) window-start))
-                ;; New window, reset count
+;; Public functions
+(define-public (check-rate-limit (user principal))
+    (let
+        (
+            (current-block burn-block-height)
+            (user-data (default-to
+                {
+                    window-start: current-block,
+                    operation-count: u0,
+                    custom-window-size: none,
+                    custom-max-operations: none
+                }
+                (map-get? user-rate-limits user)
+            ))
+            (window-size (default-to DEFAULT_WINDOW_SIZE (get custom-window-size user-data)))
+            (max-ops (default-to DEFAULT_MAX_OPERATIONS (get custom-max-operations user-data)))
+        )
+        (if (>= (- current-block (get window-start user-data)) window-size)
+            ;; New window
+            (begin
+                (map-set user-rate-limits user (merge user-data {
+                    window-start: current-block,
+                    operation-count: u1
+                }))
+                (ok true)
+            )
+            ;; Same window
+            (if (< (get operation-count user-data) max-ops)
                 (begin
-                    (map-set rate-limits { user: user, operation: operation } {
-                        count: u1,
-                        window-start: current-block
-                    })
+                    (map-set user-rate-limits user (merge user-data {
+                        operation-count: (+ (get operation-count user-data) u1)
+                    }))
                     (ok true)
                 )
-                ;; Same window, check count
-                (if (< (get count existing-data) (get max-operations config))
-                    (begin
-                        (map-set rate-limits { user: user, operation: operation } {
-                            count: (+ (get count existing-data) u1),
-                            window-start: (get window-start existing-data)
-                        })
-                        (ok true)
-                    )
-                    (begin
-                        (emit-rate-limit-hit user operation)
-                        (err ERR_RATE_LIMIT_EXCEEDED)
-                    )
-                )
-            )
-            ;; First operation for this user/operation
-            (begin
-                (map-set rate-limits { user: user, operation: operation } {
-                    count: u1,
-                    window-start: current-block
-                })
-                (ok true)
+                (err ERR_RATE_LIMIT_EXCEEDED)
             )
         )
     )
 )
 
-;; Admin Functions
-(define-public (set-window-size (new-size uint))
+(define-public (set-custom-limit (user principal) (window-size (optional uint)) (max-ops (optional uint)))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-        (var-set window-size new-size)
-        (ok true)
+        (let
+            (
+                (user-data (default-to
+                    {
+                        window-start: burn-block-height,
+                        operation-count: u0,
+                        custom-window-size: none,
+                        custom-max-operations: none
+                    }
+                    (map-get? user-rate-limits user)
+                ))
+            )
+            (map-set user-rate-limits user (merge user-data {
+                custom-window-size: window-size,
+                custom-max-operations: max-ops
+            }))
+            (ok true)
+        )
     )
 )
 
-(define-public (set-operation-config 
-    (operation (string-ascii 32)) 
-    (max-ops uint) 
-    (enabled bool)
-  )
-    (begin
-        (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-        (map-set operation-config operation {
-            max-operations: max-ops,
-            enabled: enabled
-        })
-        (ok true)
-    )
-)
-
-(define-public (reset-user-limit (user principal) (operation (string-ascii 32)))
-    (begin
-        (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-        (map-delete rate-limits { user: user, operation: operation })
-        (ok true)
-    )
-)
-
-(define-public (set-contract-owner (new-owner principal))
+(define-public (transfer-ownership (new-owner principal))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
         (var-set contract-owner new-owner)
@@ -141,15 +101,7 @@
     )
 )
 
-;; Read-only
-(define-read-only (get-user-rate-info (user principal) (operation (string-ascii 32)))
-    (map-get? rate-limits { user: user, operation: operation })
-)
-
-(define-read-only (get-operation-config (operation (string-ascii 32)))
-    (map-get? operation-config operation)
-)
-
-(define-read-only (get-window-size)
-    (ok (var-get window-size))
+;; Read-only functions
+(define-read-only (get-user-data (user principal))
+    (map-get? user-rate-limits user)
 )

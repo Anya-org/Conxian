@@ -16,17 +16,7 @@
 
 ;; Compliance Helper
 (define-private (check-compliance (user principal))
-    (let (
-        (compliance-status (contract-call? .regulatory-adapter
-          check-clean-hands-compliance
-          user
-        ))
-      )
-        (if (is-ok compliance-status)
-            true
-            false
-        )
-    )
+  (contract-call? .regulatory-adapter check-clean-hands-compliance user)
 )
 
 ;; @desc Execute a swap along a specified route
@@ -40,10 +30,9 @@
         (route (list 5 principal))
     )
     (let ((sender tx-sender))
-        ;; 1. Global Pause Check (via Protocol Facade - assumed available)
-        ;; 1. Global Pause Check (via Protocol Facade - assumed available)
+        ;; 1. Global Pause Check
         (asserts!
-           (not (contract-call? (var-get conxian-protocol-contract) is-paused))
+           (not (contract-call? .conxian-protocol is-paused))
             (err u1001)
         )
 

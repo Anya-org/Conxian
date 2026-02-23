@@ -177,7 +177,7 @@
 ;; @desc Set the active status of the liquidity provider system
 (define-public (set-liquidity-provider-active (active bool))
   (begin
-    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
     (var-set liquidity-provider-active active)
     (ok true)
   )

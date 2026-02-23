@@ -2,7 +2,7 @@
 ;; Central Treasury for Conxian DAO
 ;; Implements standard vault traits for compatibility
 
-(impl-trait .vault-trait.vault-trait)
+(impl-trait .vault-traits.vault-trait)
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
@@ -70,7 +70,7 @@
 )
 
 (define-public (get-balance (token <sip-010-trait>))
-    (ok (unwrap-panic (contract-call? token get-balance (as-contract tx-sender))))
+    (ok (contract-call? token get-balance (as-contract tx-sender)))
 )
 
 ;; Additional Treasury Functions

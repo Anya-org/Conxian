@@ -1,4 +1,7 @@
 ;; position-manager.clar
+;; Conxian Protocol Standard Contract
+
+;; position-manager.clar
 ;; Manages the lifecycle of trading positions
 ;; Core Backend Contract - Accessed via Dimensional Engine Facade
 
@@ -37,6 +40,9 @@
   (is-eq tx-sender (var-get dimensional-engine))
 )
 
+
+;; @desc Set dimensional engine
+;; @returns (response bool uint)
 (define-public (set-dimensional-engine (engine principal))
   (begin
     (asserts! (is-owner) (err ERR_NOT_AUTHORIZED))
@@ -45,6 +51,9 @@
   )
 )
 
+
+;; @desc Set contract owner
+;; @returns (response bool uint)
 (define-public (set-contract-owner (new-owner principal))
   (begin
     (asserts! (is-owner) (err ERR_NOT_AUTHORIZED))
@@ -53,6 +62,9 @@
   )
 )
 
+
+;; @desc Open position
+;; @returns (response bool uint)
 (define-public (open-position
     (user principal)
     (token principal)
@@ -78,6 +90,9 @@
   )
 )
 
+
+;; @desc Close position
+;; @returns (response bool uint)
 (define-public (close-position
     (user principal)
     (position-id uint)
@@ -91,6 +106,9 @@
   )
 )
 
+
+;; @desc Force close position
+;; @returns (response bool uint)
 (define-public (force-close-position (position-id uint))
   (begin
     (asserts! (is-engine) (err ERR_NOT_AUTHORIZED))

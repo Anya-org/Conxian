@@ -55,7 +55,7 @@
     (default-fee uint)
   )
   (begin
-    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
     (asserts! (> (len name) u0) (err ERR_INVALID_TEMPLATE))
 
     (let ((template-id (+ (var-get total-templates) u1)))
@@ -79,7 +79,7 @@
 ;; @desc Deactivate a pool template
 (define-public (deactivate-template (template-id uint))
   (begin
-    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
     (match (map-get? pool-templates { template-id: template-id })
       template (begin
                 (map-set pool-templates { template-id: template-id } (merge template { active: false }))

@@ -1,4 +1,7 @@
 ;; concentrated-liquidity-pool.clar
+;; Conxian Protocol Standard Contract
+
+;; concentrated-liquidity-pool.clar
 ;; Concentrated Liquidity Logic for Conxian Protocol
 ;; COMPATIBILITY MODE
 
@@ -39,6 +42,9 @@
 
 ;; Public Functions
 
+
+;; @desc Create pool
+;; @returns (response bool uint)
 (define-public (create-pool (token0 principal) (token1 principal) (fee uint) (sqrt-price uint) (tick int))
   (let ((pool-id (+ (var-get pool-nonce) u1)))
     (begin
@@ -56,6 +62,9 @@
   )
 )
 
+
+;; @desc Set pool fee
+;; @returns (response bool uint)
 (define-public (set-pool-fee (pool-id uint) (new-fee uint))
   (begin
     (let ((pool (unwrap! (map-get? pools pool-id) (err ERR_INSUFFICIENT_LIQUIDITY))))
@@ -65,6 +74,9 @@
   )
 )
 
+
+;; @desc Mint
+;; @returns (response bool uint)
 (define-public (mint (pool-id uint) (tick-lower int) (tick-upper int) (amount uint))
   (let ((pool (unwrap! (map-get? pools pool-id) (err ERR_INSUFFICIENT_LIQUIDITY)))
         (position-key { pool-id: pool-id, owner: tx-sender, tick-lower: tick-lower, tick-upper: tick-upper }))
@@ -79,6 +91,9 @@
   )
 )
 
+
+;; @desc Swap
+;; @returns (response bool uint)
 (define-public (swap (pool-id uint) (zero-for-one bool) (amount-in uint) (token0-trait <sip-010-ft-trait>) (token1-trait <sip-010-ft-trait>))
   (let ((pool (unwrap! (map-get? pools pool-id) (err ERR_INSUFFICIENT_LIQUIDITY))))
     (begin
@@ -107,6 +122,9 @@
   )
 )
 
+
+;; @desc Burn
+;; @returns (response bool uint)
 (define-public (burn (pool-id uint) (tick-lower int) (tick-upper int) (amount uint))
   (let ((pool (unwrap! (map-get? pools pool-id) (err ERR_INSUFFICIENT_LIQUIDITY)))
         (position-key { pool-id: pool-id, owner: tx-sender, tick-lower: tick-lower, tick-upper: tick-upper })
@@ -125,6 +143,9 @@
   )
 )
 
+
+;; @desc Collect
+;; @returns (response bool uint)
 (define-public (collect (pool-id uint) (tick-lower int) (tick-upper int))
   (let ((position-key { pool-id: pool-id, owner: tx-sender, tick-lower: tick-lower, tick-upper: tick-upper })
         (position (default-to { liquidity: u0, fee-growth-inside-0: u0, fee-growth-inside-1: u0 } (map-get? positions position-key))))
@@ -135,6 +156,9 @@
   )
 )
 
+
+;; @desc Collect protocol fees
+;; @returns (response bool uint)
 (define-public (collect-protocol-fees (token-trait <sip-010-ft-trait>))
   (let (
     (token (contract-of token-trait))
@@ -149,10 +173,16 @@
   )
 )
 
+
+;; @desc Initialize
+;; @returns (response bool uint)
 (define-public (initialize (token0 principal) (token1 principal) (sqrt-price uint) (tick int) (fee uint))
   (create-pool token0 token1 fee sqrt-price tick)
 )
 
+
+;; @desc Add liquidity
+;; @returns (response bool uint)
 (define-public (add-liquidity (amount0 uint) (amount1 uint) (token0 principal) (token1 principal))
   (ok true)
 )

@@ -3,6 +3,7 @@
 ;; Enhanced with Strategy Selection and Risk Scoring
 
 (use-trait vault-trait .vault-traits.vault-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 (define-constant ERR_UNAUTHORIZED u1000)
 (define-constant ERR_STRATEGY_NOT_FOUND u6001)
@@ -55,7 +56,7 @@
 )
 
 ;; @desc Rebalances funds from one vault to another
-(define-public (rebalance (vault-from <vault-trait>) (vault-to <vault-trait>) (amount uint))
+(define-public (rebalance (vault-from <vault-trait>) (vault-to <vault-trait>) (amount uint) (token <sip-010-ft-trait>))
     (let
         (
             (strategy-to (unwrap! (map-get? strategies (contract-of vault-to)) (err ERR_STRATEGY_NOT_FOUND)))
@@ -64,8 +65,8 @@
         (asserts! (<= (get risk-score strategy-to) (var-get max-risk-tolerance)) (err ERR_RISK_TOO_HIGH))
         
         ;; Logic to withdraw from A and deposit to B
-        (try! (contract-call? vault-from withdraw amount tx-sender))
-        (try! (contract-call? vault-to deposit amount tx-sender))
+        (try! (contract-call? vault-from withdraw amount token))
+        (try! (contract-call? vault-to deposit amount token))
         (ok true)
     )
 )

@@ -1,14 +1,12 @@
 ;; auto-compounder.clar
 ;; Automates yield compounding for connected vaults
 
-(use-trait vault-trait .vault-trait.vault-trait)
-
-(define-public (compound (vault <vault-trait>))
+(define-public (compound (vault principal))
   (begin
     ;; Logic to harvest and reinvest
     (print {
       event: "compound",
-      vault: (contract-of vault),
+      vault: vault,
     })
     (ok true)
   )

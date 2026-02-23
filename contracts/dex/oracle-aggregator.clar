@@ -68,7 +68,7 @@
 
 ;; @desc Aggregated System Health Check
 (define-read-only (get-system-intelligence)
-    (let ((alert-status (unwrap-panic (contract-call? .switchboard-oracle-adapter get-alert-status))))
+    (let ((alert-status (contract-call? .switchboard-oracle-adapter get-alert-status)))
         (ok {
             alert: alert-status,
             ready-to-trade: (< (get level alert-status) u2),

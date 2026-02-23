@@ -1,4 +1,7 @@
 ;; batch-auction.clar
+;; Conxian Protocol Standard Contract
+
+;; batch-auction.clar
 ;; Batch Auction for MEV Protection
 ;; Allows users to submit bids and executes them in a batch
 
@@ -35,6 +38,9 @@
 
 ;; Public Functions
 
+
+;; @desc Create auction
+;; @returns (response bool uint)
 (define-public (create-auction
     (token-sell <sip-010-ft-trait>)
     (token-buy <sip-010-ft-trait>)
@@ -58,6 +64,9 @@
   )
 )
 
+
+;; @desc Place bid
+;; @returns (response bool uint)
 (define-public (place-bid (auction-id uint) (token-buy <sip-010-ft-trait>) (amount uint))
   (let ((auction (unwrap! (map-get? auctions auction-id) (err ERR_INVALID_BID))))
     (asserts! (not (get is-finalized auction)) (err ERR_AUCTION_EXPIRED))
@@ -74,6 +83,9 @@
   )
 )
 
+
+;; @desc Finalize auction
+;; @returns (response bool uint)
 (define-public (finalize-auction (auction-id uint))
   (let ((auction (unwrap! (map-get? auctions auction-id) (err ERR_INVALID_BID))))
     (asserts! (not (get is-finalized auction)) (err ERR_AUCTION_EXPIRED))

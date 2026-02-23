@@ -105,6 +105,14 @@
 
 ;; --- Admin Functions ---
 
+(define-public (initialize (new-admin principal))
+  (begin
+    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
+    (var-set admin new-admin)
+    (ok true)
+  )
+)
+
 (define-public (set-authorized-principals (agent principal) (distributor principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))

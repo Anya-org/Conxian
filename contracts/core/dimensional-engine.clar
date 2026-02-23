@@ -1,4 +1,7 @@
 ;; dimensional-engine.clar
+;; Conxian Protocol Standard Contract
+
+;; dimensional-engine.clar
 ;; Facade contract for the Core Module
 ;; Central entry point for position management, collateral, and risk.
 ;; Adheres to Decentralized Modularity and Bitcoin Ethos
@@ -41,6 +44,9 @@
 
 ;; --- Configuration ---
 
+
+;; @desc Set protocol coordinator
+;; @returns (response bool uint)
 (define-public (set-protocol-coordinator (new-coordinator principal))
   (begin
     (asserts! (is-authorized) (err ERR_UNAUTHORIZED))
@@ -63,6 +69,9 @@
   )
 )
 
+
+;; @desc Open position
+;; @returns (response bool uint)
 (define-public (open-position
     (position-manager <position-manager-trait>)
     (token principal)
@@ -91,6 +100,9 @@
   )
 )
 
+
+;; @desc Close position
+;; @returns (response bool uint)
 (define-public (close-position
     (position-manager <position-manager-trait>)
     (position-id uint)
@@ -111,6 +123,9 @@
 
 ;; --- Facade Functions: Collateral Management ---
 
+
+;; @desc Deposit funds
+;; @returns (response bool uint)
 (define-public (deposit-funds
     (collateral-manager <collateral-manager-trait>)
     (amount uint)
@@ -128,6 +143,9 @@
   )
 )
 
+
+;; @desc Withdraw funds
+;; @returns (response bool uint)
 (define-public (withdraw-funds
     (collateral-manager <collateral-manager-trait>)
     (amount uint)
@@ -147,6 +165,9 @@
 
 ;; --- Facade Functions: Risk Management ---
 
+
+;; @desc Check position health
+;; @returns (response bool uint)
 (define-public (check-position-health
     (risk-manager <risk-manager-trait>)
     (position-id uint)
@@ -159,6 +180,9 @@
   )
 )
 
+
+;; @desc Liquidate position
+;; @returns (response bool uint)
 (define-public (liquidate-position
     (risk-manager <risk-manager-trait>)
     (position-id uint)

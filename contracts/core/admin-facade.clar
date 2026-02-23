@@ -1,4 +1,7 @@
 ;; admin-facade.clar
+;; Conxian Protocol Standard Contract
+
+;; admin-facade.clar
 ;; Centralized Admin Facade for Gas Optimization
 
 ;; Traits
@@ -17,6 +20,9 @@
   (is-eq tx-sender (var-get global-admin))
 )
 
+
+;; @desc Is authorized
+;; @returns (response bool uint)
 (define-public (is-authorized (role uint))
   (ok (or (is-global-admin) (default-to false (map-get? role-cache { user: tx-sender, role: role }))))
 )
@@ -26,6 +32,9 @@
       (default-to false (map-get? role-cache { user: sender, role: u1 })))
 )
 
+
+;; @desc Set role
+;; @returns (response bool uint)
 (define-public (set-role (user principal) (role uint) (enabled bool))
   (begin
     (asserts! (is-global-admin) (err ERR_NOT_AUTHORIZED))
@@ -37,6 +46,20 @@
   )
 )
 
+
+;; @desc Transfer global admin to timelock
+;; @returns (response bool uint)
+(define-public (transfer-global-admin-to-timelock)
+  (begin
+    (asserts! (is-global-admin) (err ERR_NOT_AUTHORIZED))
+    (var-set global-admin .timelock)
+    (ok true)
+  )
+)
+
+
+;; @desc Initialize
+;; @returns (response bool uint)
 (define-public (initialize (admin principal))
   (begin
     (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_NOT_AUTHORIZED))

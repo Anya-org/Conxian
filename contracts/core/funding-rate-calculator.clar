@@ -1,4 +1,7 @@
 ;; funding-rate-calculator.clar
+;; Conxian Protocol Standard Contract
+
+;; funding-rate-calculator.clar
 ;; Gas-Optimized Funding Rate Calculator
 ;; Core Logic for Perpetual Futures Funding
 
@@ -14,6 +17,9 @@
 (define-data-var current-funding-rate int 0)
 
 ;; Public Functions
+
+;; @desc Update funding rate
+;; @returns (response bool uint)
 (define-public (update-funding-rate
     (mark-price uint)
     (index-price uint)

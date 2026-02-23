@@ -149,7 +149,7 @@
 ;; @desc Emergency cleanup of all memory pools
 (define-public (emergency-cleanup-all-pools)
   (begin
-    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
     ;; Placeholder for full cleanup logic
     (ok true)
   )

@@ -1,4 +1,7 @@
 ;; treasury-governance.clar
+;; Conxian Protocol Standard Contract
+
+;; treasury-governance.clar
 ;; CXTR Use Case: Treasury & Capital Allocation Governance
 ;; Specialized controller for Operational Treasury disbursements.
 
@@ -12,6 +15,9 @@
 
 ;; Core Logic
 
+
+;; @desc Execute
+;; @returns (response bool uint)
 (define-public (execute (proposer principal))
   (begin
     ;; Called by proposal-executor after a successful CXTR vote

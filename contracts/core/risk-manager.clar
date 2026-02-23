@@ -1,4 +1,7 @@
 ;; risk-manager.clar
+;; Conxian Protocol Standard Contract
+
+;; risk-manager.clar
 ;; Assesses position health and manages liquidations
 ;; Gas-Optimized Core Backend Contract - Centralized Risk Logic
 
@@ -29,7 +32,7 @@
 
 ;; Authorization
 (define-private (is-authorized-admin)
-  (unwrap-panic (contract-call? .conxian-access has-role tx-sender u1))
+  (is-eq (contract-call? .conxian-access has-role tx-sender u1) (ok true))
 )
 
 ;; Gas-Free Internal Logic
@@ -42,6 +45,9 @@
 
 ;; Optimized Public Functions
 
+
+;; @desc Update system risk
+;; @returns (response bool uint)
 (define-public (update-system-risk (new-score uint))
   (begin
     (asserts! (or (is-eq contract-caller (var-get risk-agent)) (is-authorized-admin)) (err ERR_NOT_AUTHORIZED))
@@ -50,9 +56,12 @@
   )
 )
 
+
+;; @desc Get health factor
+;; @returns (response bool uint)
 (define-public (get-health-factor (position-id uint))
   (let (
-    (owner (unwrap! (unwrap-panic (contract-call? .position-nft get-owner position-id)) (err ERR_INVALID_POSITION)))
+    (owner (unwrap! (unwrap! (contract-call? .position-nft get-owner position-id) (err ERR_INVALID_POSITION)) (err ERR_INVALID_POSITION)))
     (position (unwrap! (contract-call? .dimensional-core get-position owner position-id) (err ERR_INVALID_POSITION)))
     (collateral-value (get collateral position))
     (maintenance-margin (get maintenance-margin position))
@@ -68,9 +77,12 @@
   )
 )
 
+
+;; @desc Liquidate
+;; @returns (response bool uint)
 (define-public (liquidate (position-id uint))
   (let (
-    (owner (unwrap! (unwrap-panic (contract-call? .position-nft get-owner position-id)) (err ERR_INVALID_POSITION)))
+    (owner (unwrap! (unwrap! (contract-call? .position-nft get-owner position-id) (err ERR_INVALID_POSITION)) (err ERR_INVALID_POSITION)))
     (hf (unwrap! (get-health-factor position-id) (err ERR_INVALID_POSITION)))
     (current-risk (var-get system-risk-score))
     (adjusted-threshold (if (>= current-risk u5000) u11000 u10000))
@@ -111,6 +123,9 @@
   )
 )
 
+
+;; @desc Set dimensional engine
+;; @returns (response bool uint)
 (define-public (set-dimensional-engine (new-engine principal))
   (begin
     (asserts! (is-authorized-admin) (err ERR_NOT_AUTHORIZED))
@@ -119,6 +134,9 @@
   )
 )
 
+
+;; @desc Set risk agent
+;; @returns (response bool uint)
 (define-public (set-risk-agent (new-agent principal))
   (begin
     (asserts! (is-authorized-admin) (err ERR_NOT_AUTHORIZED))
@@ -127,6 +145,9 @@
   )
 )
 
+
+;; @desc Set ops engine
+;; @returns (response bool uint)
 (define-public (set-ops-engine (new-ops principal))
   (begin
     (asserts! (is-authorized-admin) (err ERR_NOT_AUTHORIZED))

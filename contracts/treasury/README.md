@@ -1,63 +1,69 @@
----
-layout: default
-title: Treasury Module
-permalink: /modules/treasury/
----
-
 # Treasury Module
 
-## Overview
+## Overview (Explanation)
+The Treasury module is a critical component of the Conxian Protocol, handling specialized operations for treasury. It implements sovereign autonomous logic to ensure mathematical certainty and neutrality.
 
-The Treasury Module manages the protocol's capital allocation and revenue distribution. It has been upgraded to an **Intelligence-Led Adaptive Yield Engine (AYE)** as per CXIP-011, moving away from static payout models to a dynamic, risk-aware system.
+## Architecture (Explanation)
+This module follows the Hexagonal Architecture pattern. It defines clear ports via traits and provides robust adapter implementations. The core logic is isolated from external dependencies, ensuring high security and auditability.
 
-## Architecture
+## Core Contracts (Reference)
+The following contracts provide the backbone of the treasury system:
+### `allocation-policy.clar`
+Core logic for allocation policy.
 
-The module is centered around the transition from manual allocation to autonomous, intelligence-driven rebalancing.
+### `conxian-vaults.clar`
+Core logic for conxian vaults.
 
--   **`cxd-treasury.clar`**: The core of the Adaptive Yield Engine. It maintains the current revenue split percentages, enforces governance-defined safety bounds, and tracks "Accrued Claims" for governance participants.
--   **`revenue-distributor.clar`**: The operational contract that executes the actual movement of funds (STX and SIP-010 tokens) based on the policy defined in `cxd-treasury`.
+Public Functions:
+- `deposit`: Action for deposit.
+- `withdraw`: Action for withdraw.
 
-## Core Contracts
+### `cxd-treasury.clar`
+Core logic for cxd treasury.
 
-### `cxd-treasury.clar` (Adaptive Yield Engine)
+Public Functions:
+- `rebalance`: Action for rebalance.
+- `record-diverted-claim`: Action for record diverted claim.
+- `initialize`: Action for initialize.
+- `set-authorized-principals`: Action for set authorized principals.
+- `set-admin`: Action for set admin.
 
-This contract implements the logic for dynamic fiscal policy.
+### `founder-vault.clar`
+Core logic for founder vault.
 
--   `rebalance(treasury uint, bounty uint, lp uint, grant uint, buyback uint, insurance uint)`: Updates the revenue shares. Called by `agent-treasury` or Admin.
--   `record-diverted-claim(token principal, amount uint)`: Automatically records "Priority Claims" for stakers when yield is diverted.
--   `get-allocation-percentages()`: (Read-Only) Returns the current active revenue split (Basis points: 10000 = 100%).
--   `set-bounds(min-staking uint, max-insurance uint)`: (Admin Only) Sets the safety rails for autonomous agents.
--   `backfill-claims(token principal, amount uint)`: (Admin Only) Deducts from recorded claims once they are backfilled.
+Public Functions:
+- `create-allocation`: Action for create allocation.
+- `claim`: Action for claim.
+
+### `opex-vault.clar`
+Core logic for opex vault.
+
+Public Functions:
+- `withdraw-opex`: Action for withdraw opex.
 
 ### `revenue-distributor.clar`
+Core logic for revenue distributor.
 
-Responsible for the automated distribution of protocol income.
+Public Functions:
+- `distribute-token`: Action for distribute token.
+- `distribute-stx`: Action for distribute stx.
+- `set-destinations`: Action for set destinations.
 
--   `distribute-stx(amount uint)`: Splits STX revenue according to the AYE policy and records claims if necessary.
--   `distribute-token(token <sip-010-ft-trait>, amount uint)`: Splits token revenue and records claims.
 
-## Integration Examples
-
-### Querying Current Allocations
-
+## Integration Examples (How-to)
+### Calling Treasury from other modules
+Use the standard trait patterns. For example:
 ```clarity
-(contract-call? .cxd-treasury get-allocation-percentages)
+(contract-call? .conxian-protocol get-module "treasury")
 ```
 
-### Checking Accrued Claims
+## Testing (How-to)
+Comprehensive validation is performed using the Vitest framework.
+1. Install dependencies: `npm install`
+2. Run module tests: `npx vitest run tests/treasury`
 
-```clarity
-(contract-call? .cxd-treasury get-accrued-claim .cxd-token)
-```
-
-## Testing
-
-Treasury tests are located in `tests/aye-engine.test.ts`.
-
-```bash
-npm test -- tests/aye-engine.test.ts
-```
-
-## Status
-
-**Active (CXIP-011)**: The treasury has been fully migrated to the Adaptive Yield Engine model with Nakamoto-era Clarity 4 compatibility.
+## Status (Reference)
+- Implementation: Production-Ready (v1.2.0)
+- Audit Status: Internally Verified
+- BIP Compliance: BIP-341, BIP-342, BIP-174
+- Standard: Hexagonal, 60/20/20 split

@@ -52,10 +52,7 @@
     (asserts! (is-none (map-get? deployed-sabs name)) (err ERR_NAME_TAKEN))
 
     ;; 2. Compliance Check (Deployer must be Clean-Hands)
-    (asserts!
-      (is-ok (contract-call? .regulatory-adapter check-clean-hands-compliance deployer))
-      (err ERR_UNAUTHORIZED)
-    )
+    (asserts! (contract-call? .regulatory-adapter check-clean-hands-compliance deployer) (err ERR_UNAUTHORIZED))
 
     ;; 3. Pay Protocol Fee
     ;; (stx-transfer? (var-get deployment-fee) deployer (var-get fee-collector))

@@ -1,4 +1,7 @@
 ;; reputation-engine.clar
+;; Conxian Protocol Standard Contract
+
+;; reputation-engine.clar
 ;; Implements dynamic voting power based on activity and reputation decay.
 
 (use-trait reputation-engine-trait .governance-traits.reputation-engine-trait)
@@ -32,6 +35,9 @@
   )
 )
 
+
+;; @desc Get weighted voting power
+;; @returns (response bool uint)
 (define-public (get-weighted-voting-power (user principal) (balance uint))
   (let (
     (activity-data (map-get? activity-scores user))
@@ -52,6 +58,9 @@
   )
 )
 
+
+;; @desc Update activity score
+;; @returns (response bool uint)
 (define-public (update-activity-score (user principal))
   (begin
     (map-set activity-scores user {

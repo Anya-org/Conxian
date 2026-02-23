@@ -1,4 +1,7 @@
 ;; liquidity-optimization-engine.clar
+;; Conxian Protocol Standard Contract
+
+;; liquidity-optimization-engine.clar
 ;; Conxian Standard: Liquidity Optimization Engine
 ;; Dynamically optimizes liquidity distribution across pools
 
@@ -7,11 +10,12 @@
 (use-trait oracle-trait .defi-traits.oracle-trait)
 
 ;; Constants
-(define-constant ERR_INSUFFICIENT_LIQUIDITY 12001)
-(define-constant ERR_INVALID_POOL 12002)
-(define-constant ERR_OPTIMIZATION_FAILED 12003)
-(define-constant ERR_INSUFFICIENT_DATA 12004)
-(define-constant ERR_INVALID_PARAMETERS 12005)
+(define-constant ERR_INSUFFICIENT_LIQUIDITY u12001)
+(define-constant ERR_INVALID_POOL u12002)
+(define-constant ERR_OPTIMIZATION_FAILED u12003)
+(define-constant ERR_INSUFFICIENT_DATA u12004)
+(define-constant ERR_INVALID_PARAMETERS u12005)
+(define-constant ERR_UNAUTHORIZED u1000)
 
 ;; Optimization parameters
 (define-constant MIN_LIQUIDITY_THRESHOLD u100000000) ;; 100 STX equivalent
@@ -23,7 +27,7 @@
 (define-data-var optimization-engine-active bool true)
 (define-data-var optimization-frequency uint u100) ;; Every 100 blocks
 (define-data-var dex-facade-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var conxian-protocol principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var conxian-protocol-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Storage maps
 (define-map pool-optimization-data
@@ -47,9 +51,6 @@
     }
 )
 
-;; Events
-;; (liquidity-optimized (pool principal) (old-liquidity uint) (new-liquidity uint))
-
 ;; Private functions
 
 (define-read-only (get-pool-utilization (pool principal))
@@ -72,15 +73,15 @@
 
 (define-read-only (get-pool-fee-tier (pool principal))
     (default-to u3000
-        (get fee-tier
-            (unwrap! (map-get? pool-optimization-data { pool: pool })
-                (err u12002)
-            ))
+        (get fee-tier (map-get? pool-optimization-data { pool: pool }))
     )
 )
 
 ;; Public functions
 
+
+;; @desc Optimize liquidity
+;; @returns (response bool uint)
 (define-public (optimize-liquidity (pool principal))
     (begin
         (asserts! (var-get optimization-engine-active) (err ERR_OPTIMIZATION_FAILED))
@@ -93,10 +94,13 @@
             ;; Calculate optimal liquidity allocation
             (let (
                     (optimal-liquidity (if (> current-utilization TARGET_UTILIZATION)
-                        (* target-liquidity u1100) ;; Increase by 10%
-                        (* target-liquidity u900) ;; Decrease by 10%
+                        (/ (* target-liquidity u110) u100) ;; Increase by 10%
+                        (/ (* target-liquidity u90) u100) ;; Decrease by 10%
                     ))
-                    (liquidity-delta (- optimal-liquidity target-liquidity))
+                    (liquidity-delta (if (> optimal-liquidity target-liquidity)
+                        (- optimal-liquidity target-liquidity)
+                        (- target-liquidity optimal-liquidity)
+                    ))
                 )
                 ;; Update optimization data
                 (map-set pool-optimization-data { pool: pool } {
@@ -114,7 +118,7 @@
                     old-liquidity: target-liquidity,
                     new-liquidity: optimal-liquidity,
                     delta: liquidity-delta,
-                    recommended-action: (if (> liquidity-delta u0)
+                    recommended-action: (if (> optimal-liquidity target-liquidity)
                         "add-liquidity"
                         "remove-liquidity"
                     ),
@@ -125,7 +129,7 @@
                     old-liquidity: target-liquidity,
                     new-liquidity: optimal-liquidity,
                     delta: liquidity-delta,
-                    recommended-action: (if (> liquidity-delta u0)
+                    recommended-action: (if (> optimal-liquidity target-liquidity)
                         "add-liquidity"
                         "remove-liquidity"
                     ),
@@ -135,6 +139,9 @@
     )
 )
 
+
+;; @desc Update pool fee tier
+;; @returns (response bool uint)
 (define-public (update-pool-fee-tier
         (pool principal)
         (new-fee-tier uint)
@@ -191,12 +198,15 @@
     )
 )
 
+
+;; @desc Set optimization engine active
+;; @returns (response bool uint)
 (define-public (set-optimization-engine-active (active bool))
     (begin
         ;; Only admin can change this
         (asserts!
             (is-eq tx-sender
-                (unwrap-panic (contract-call? (var-get conxian-protocol) get-admin))
+                (contract-call? .conxian-protocol get-protocol-admin)
             )
             (err ERR_UNAUTHORIZED)
         )

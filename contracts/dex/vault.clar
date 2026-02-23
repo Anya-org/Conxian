@@ -26,10 +26,10 @@
 (define-data-var total-vaults uint u0)
 (define-data-var total-deposits uint u0)
 (define-data-var total-withdrawals uint u0)
-(define-data-var circuit-breaker (optional principal) none)
+(define-data-var circuit-breaker-var (optional principal) none)
 
 ;; Storage maps
-(define-map vaults { vault-id: (buff 32) } { 
+(define-map vaults { vault-id: (buff 20) } {
   owner: principal,
   vault-type: (string-ascii 32),
   tokens: (list 10 principal),
@@ -40,10 +40,10 @@
   cooldown-end: uint
 })
 
-(define-map vault-balances { vault-id: (buff 32), token: principal } uint)
+(define-map vault-balances { vault-id: (buff 20), token: principal } uint)
 
 (define-map user-vaults { user: principal } { 
-  vault-ids: (list 10 (buff 32)),
+  vault-ids: (list 10 (buff 20)),
   total-vaults: uint,
   active-vaults: uint,
   last-activity: uint
@@ -52,7 +52,7 @@
 ;; Helpers
 
 (define-private (check-circuit-breaker)
-  (match (var-get circuit-breaker)
+  (match (var-get circuit-breaker-var)
     cb (if (contract-call? .circuit-breaker is-contract-paused (as-contract tx-sender))
          (err ERR_VAULT_NOT_ACTIVE)
          (ok true))
@@ -63,11 +63,11 @@
 ;; Read-only functions
 
 ;; @desc Get details of a vault
-(define-read-only (get-vault (vault-id (buff 32)))
+(define-read-only (get-vault (vault-id (buff 20)))
   (map-get? vaults { vault-id: vault-id }))
 
 ;; @desc Get the owner of a vault
-(define-read-only (get-vault-owner (vault-id (buff 32)))
+(define-read-only (get-vault-owner (vault-id (buff 20)))
   (match (map-get? vaults { vault-id: vault-id })
     vault (ok (get owner vault))
     (err ERR_VAULT_NOT_FOUND)
@@ -75,12 +75,12 @@
 )
 
 ;; @desc Get the balance of a specific token in a vault
-(define-read-only (get-vault-balance (vault-id (buff 32)) (token principal))
+(define-read-only (get-vault-balance (vault-id (buff 20)) (token principal))
   (ok (default-to u0 (map-get? vault-balances { vault-id: vault-id, token: token })))
 )
 
 ;; @desc Check if a vault is active
-(define-read-only (is-vault-active (vault-id (buff 32)))
+(define-read-only (is-vault-active (vault-id (buff 20)))
   (match (map-get? vaults { vault-id: vault-id })
     vault (ok (get active vault))
     (ok false)
@@ -102,7 +102,7 @@
   (begin
     (asserts! (var-get vault-system-active) (err ERR_VAULT_NOT_ACTIVE))
     
-    (let ((vault-id (hash160 (sha256 0x00))))
+    (let ((vault-id (hash160 0x00)))
       (asserts! (is-none (map-get? vaults { vault-id: vault-id })) (err ERR_VAULT_ALREADY_EXISTS))
       
       (map-set vaults { vault-id: vault-id } {
@@ -124,7 +124,7 @@
 )
 
 ;; @desc Deposit tokens to a vault
-(define-public (deposit-to-vault (vault-id (buff 32)) (token-trait <sip-010-ft-trait>) (amount uint))
+(define-public (deposit-to-vault (vault-id (buff 20)) (token-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (token (contract-of token-trait))
     (vault-info (unwrap! (get-vault vault-id) (err ERR_VAULT_NOT_FOUND)))
@@ -147,7 +147,7 @@
 )
 
 ;; @desc Withdraw tokens from a vault
-(define-public (withdraw-from-vault (vault-id (buff 32)) (token-trait <sip-010-ft-trait>) (amount uint))
+(define-public (withdraw-from-vault (vault-id (buff 20)) (token-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (token (contract-of token-trait))
     (vault-info (unwrap! (get-vault vault-id) (err ERR_VAULT_NOT_FOUND)))
@@ -160,8 +160,7 @@
     (asserts! (>= current-balance amount) (err ERR_INSUFFICIENT_BALANCE))
 
     ;; Native Clarity 4 asset restriction (2026 standard)
-    ;; (true) returns true if successful
-    (asserts!  (true) (err ERR_UNAUTHORIZED_ACCESS))
+    (asserts! true (err ERR_UNAUTHORIZED_ACCESS))
 
     (try! (as-contract (contract-call? token-trait transfer amount (as-contract tx-sender) (get owner vault-info) none)))
     
@@ -174,8 +173,8 @@
 
 (define-public (set-circuit-breaker (new-cb principal))
   (begin
-    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED_ACCESS))
-    (var-set circuit-breaker (some new-cb))
+    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED_ACCESS))
+    (var-set circuit-breaker-var (some new-cb))
     (ok true)
   )
 )
@@ -183,7 +182,7 @@
 ;; @desc Admin function to set system status
 (define-public (set-vault-system-active (active bool))
   (begin
-    (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED_ACCESS))
+    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED_ACCESS))
     (var-set vault-system-active active)
     (ok true)
   )

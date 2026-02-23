@@ -40,7 +40,7 @@
     )
     (begin
       (asserts!
-        (not (unwrap-panic (contract-call? .conxian-protocol is-paused)))
+        (not (contract-call? .conxian-protocol is-paused))
         (err u1001)
       )
 
@@ -84,7 +84,7 @@
       ))
     )
     (begin
-      (asserts! (not (unwrap-panic (contract-call? .conxian-protocol is-paused))) (err u1001))
+      (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1001))
       (asserts! (>= current-balance amount) (err ERR_INSUFFICIENT_BALANCE))
 
       ;; Transfer tokens back
@@ -120,7 +120,7 @@
     (asserts!
       (or
         (is-eq tx-sender
-          (unwrap-panic (contract-call? .conxian-protocol get-admin))
+          (contract-call? .conxian-protocol get-admin)
         )
         (is-eq (ok true) (contract-call? .conxian-access has-role tx-sender ROLE_PROTOCOL))
       )

@@ -42,7 +42,7 @@
         (tenure-id (/ block-height u10))
     )
         ;; Check Authentication (RBAC Governance Role)
-        (asserts! (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_GOVERNANCE))
+        (asserts! (is-eq (contract-call? .conxian-access has-role tx-sender ROLE_GOVERNANCE) (ok true))
             (err ERR_UNAUTHORIZED)
         )
         

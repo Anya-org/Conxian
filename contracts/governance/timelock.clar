@@ -1,4 +1,7 @@
 ;; timelock.clar
+;; Conxian Protocol Standard Contract
+
+;; timelock.clar
 ;; Time-delayed execution controller for critical protocol changes
 ;; Aligned with Nakamoto 5s block times
 ;; Decentralized: Uses Unified RBAC via .conxian-access
@@ -79,6 +82,9 @@
 )
 
 ;; Governance Configuration
+
+;; @desc Set governance contract
+;; @returns (response bool uint)
 (define-public (set-governance-contract (new-governance principal))
     (begin
         (asserts! (is-admin) (err ERR_UNAUTHORIZED))
@@ -88,6 +94,9 @@
 )
 
 ;; Proposal Management
+
+;; @desc Queue proposal
+;; @returns (response bool uint)
 (define-public (queue-proposal (proposal-principal principal) (target principal))
     (begin
         (asserts! (is-governance) (err ERR_UNAUTHORIZED))
@@ -107,6 +116,9 @@
 )
 
 ;; Execute Proposal - Can be called by anyone once timelock expires (permissionless execution)
+
+;; @desc Execute proposal
+;; @returns (response bool uint)
 (define-public (execute-proposal (proposal-principal principal) (proposal-contract <proposal-trait>))
     (let (
         (proposal (unwrap! (map-get? queued-proposals proposal-principal) (err ERR_NOT_QUEUED)))
@@ -132,6 +144,9 @@
 )
 
 ;; Cancel Proposal - Only governance can cancel
+
+;; @desc Cancel proposal
+;; @returns (response bool uint)
 (define-public (cancel-proposal (proposal-principal principal))
     (begin
         (asserts! (is-governance) (err ERR_UNAUTHORIZED))
@@ -144,6 +159,9 @@
 )
 
 ;; Sovereign Handoff: Transfer admin to another principal (e.g., DAO or new timelock)
+
+;; @desc Transfer admin
+;; @returns (response bool uint)
 (define-public (transfer-admin (new-admin principal))
     (begin
         (asserts! (is-admin) (err ERR_UNAUTHORIZED))
@@ -164,7 +182,7 @@
 )
 
 (define-read-only (get-admin)
-    (ok (var-get admin))
+    (var-get admin)
 )
 
 (define-read-only (get-proposal-status (proposal principal))

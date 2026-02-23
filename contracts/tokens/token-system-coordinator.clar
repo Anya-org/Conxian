@@ -35,13 +35,9 @@
 )
 
 (define-private (check-compliance (user principal))
-  (let (
-      (result (contract-call? .regulatory-adapter
-                check-clean-hands-compliance
-                user
-             ))
-    )
-    (is-ok result)
+  (contract-call? .regulatory-adapter
+    check-clean-hands-compliance
+    user
   )
 )
 

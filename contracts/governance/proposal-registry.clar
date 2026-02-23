@@ -1,4 +1,7 @@
 ;; proposal-registry.clar
+;; Conxian Protocol Standard Contract
+
+;; proposal-registry.clar
 ;; Registry for Conxian Governance Proposals
 
 (define-constant ERR_UNAUTHORIZED u4000)
@@ -50,6 +53,9 @@
   )
 )
 
+
+;; @desc Add proposal
+;; @returns (response bool uint)
 (define-public (add-proposal
     (proposal-contract principal)
     (council-id uint)
@@ -76,6 +82,9 @@
   )
 )
 
+
+;; @desc Set executed
+;; @returns (response bool uint)
 (define-public (set-executed (proposal-id uint))
   (let ((proposal (unwrap! (map-get? proposals proposal-id) (err ERR_NOT_FOUND))))
     (begin
@@ -86,6 +95,9 @@
   )
 )
 
+
+;; @desc Vote proposal
+;; @returns (response bool uint)
 (define-public (vote-proposal
     (proposal-id uint)
     (support bool)

@@ -1,4 +1,7 @@
 ;; position-nft.clar
+;; Conxian Protocol Standard Contract
+
+;; position-nft.clar
 ;; Dimensional Risk Token (DRT) - Represents a multi-dimensional position in Conxian
 ;; Implements SIP-009
 
@@ -27,6 +30,9 @@
     (ok (nft-get-owner? dimensional-risk-token token-id))
 )
 
+
+;; @desc Transfer
+;; @returns (response bool uint)
 (define-public (transfer (token-id uint) (sender principal) (recipient principal))
     (begin
         (asserts! (is-eq tx-sender sender) (err ERR_NOT_OWNER))
@@ -36,6 +42,9 @@
 
 ;; --- Internal Functions ---
 
+
+;; @desc Mint
+;; @returns (response bool uint)
 (define-public (mint (recipient principal) (token-id uint))
     (begin
         (asserts! (is-eq tx-sender (var-get authorized-minter)) (err ERR_UNAUTHORIZED))
@@ -48,6 +57,9 @@
     )
 )
 
+
+;; @desc Burn
+;; @returns (response bool uint)
 (define-public (burn (token-id uint))
     (begin
         (asserts! (is-eq tx-sender (var-get authorized-minter)) (err ERR_UNAUTHORIZED))
@@ -57,6 +69,9 @@
 
 ;; --- Admin Functions ---
 
+
+;; @desc Set minter
+;; @returns (response bool uint)
 (define-public (set-minter (new-minter principal))
     (begin
         (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))

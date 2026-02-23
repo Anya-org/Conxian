@@ -15,10 +15,6 @@
   block-height
 )
 
-(define-read-only (get-burn-block-height)
-  burn-block-height
-)
-
 (define-read-only (get-tenure-info)
     (ok {
         tenure-id: (get-current-tenure-id),

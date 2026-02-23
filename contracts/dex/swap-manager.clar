@@ -104,7 +104,7 @@
 ;; Authorization Helpers
 
 (define-private (is-admin)
-  (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin))
+  (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin))
 )
 
 (define-private (check-circuit-breaker)

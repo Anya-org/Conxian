@@ -1,4 +1,7 @@
 ;; signed-data-base.clar
+;; Conxian Protocol Standard Contract
+
+;; signed-data-base.clar
 ;; Storage for Oracle and Off-Chain Data Signatures
 ;; Acts as a Data Availability layer for governance
 
@@ -22,6 +25,9 @@
 )
 
 ;; Write
+
+;; @desc Store data
+;; @returns (response bool uint)
 (define-public (store-data (hash (buff 32)) (uri (string-ascii 256)))
     (begin
         ;; Anyone can store, but we track the signer

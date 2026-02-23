@@ -1,4 +1,7 @@
 ;; dex-factory.clar
+;; Conxian Protocol Standard Contract
+
+;; dex-factory.clar
 ;; Enhanced DEX Factory supporting multiple pool types
 
 ;; Constants
@@ -21,6 +24,9 @@
 
 ;; Public functions
 
+
+;; @desc Register pool
+;; @returns (response bool uint)
 (define-public (register-pool (token-a principal) (token-b principal) (type uint) (pool-contract principal))
     (let
         (
@@ -31,7 +37,7 @@
             (current-count (var-get pool-count))
         )
         (begin
-            (asserts! (is-eq (ok tx-sender) (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
+            (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
             (asserts! (is-none (map-get? pools { token0: token0, token1: token1, type: type })) (err ERR_POOL_EXISTS))
 
             (map-set pools { token0: token0, token1: token1, type: type } pool-contract)
