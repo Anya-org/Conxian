@@ -12,7 +12,7 @@
 (define-constant SLOPE_2 u6000) ;; 60% slope 2
 (define-constant MIN_COLLATERAL_FACTOR u5000) ;; 50% min
 (define-constant MAX_COLLATERAL_FACTOR u9500) ;; 95% max
-(define-constant PRICE_STALE_SECONDS u300) ;; 5 minutes in seconds
+(define-constant PRICE_STALE_BLOCKS u300) ;; Target: 300 blocks (~50 hours at 10m/block)
 
 (define-data-var subscription-cost uint u1000000) ;; 1 STX default
 (define-constant ERR_NO_SUBSCRIPTION u1006)
@@ -36,7 +36,7 @@
   principal
   {
     price: uint,
-    timestamp: uint, ;; Block timestamp
+    timestamp: uint, ;; burn-block-height
     confidence: uint,
   }
 )
@@ -73,12 +73,16 @@
 )
 
 (define-private (is-price-stale (timestamp uint))
-  (>= (- burn-block-height timestamp) PRICE_STALE_SECONDS)
+  (>= (- burn-block-height timestamp) PRICE_STALE_BLOCKS)
 )
 
 ;; Public Functions
 
 ;; @desc Update market parameters for a specific asset.
+;; @param asset principal - The principal of the asset to update.
+;; @param new-utilization uint - The current utilization rate in basis points (0-10000).
+;; @param price-volatility uint - The asset's price volatility in basis points.
+;; @returns (response bool uint)
 (define-public (update-market-parameters
     (asset principal)
     (new-utilization uint)
@@ -111,6 +115,10 @@
 )
 
 ;; @desc Update the price feed for an asset.
+;; @param asset principal - The principal of the asset.
+;; @param price uint - The new price value.
+;; @param confidence uint - The confidence interval or volatility indicator.
+;; @returns (response bool uint)
 (define-public (update-price-feed
     (asset principal)
     (price uint)
@@ -130,26 +138,34 @@
 ;; Read Functions
 
 ;; @desc Get the current protocol interest rate.
+;; @returns (response uint uint)
 (define-read-only (get-current-interest-rate)
   (ok (var-get current-interest-rate))
 )
 
 ;; @desc Get the funding rate for a specific period.
+;; @param period uint - The time period for funding calculation (in blocks).
+;; @returns (response uint uint)
 (define-read-only (get-funding-rate (period uint))
   (ok (* (var-get current-interest-rate) period))
 )
 
 ;; @desc Get the current global collateral factor.
+;; @returns (response uint uint)
 (define-read-only (get-current-collateral-factor)
   (ok (var-get collateral-factor))
 )
 
 ;; @desc Get market parameters for a specific asset.
+;; @param asset principal - The principal of the asset.
+;; @returns (optional {utilization: uint, interest-rate: uint, collateral-factor: uint, last-update-burn: uint})
 (define-read-only (get-market-parameters (asset principal))
   (map-get? market-parameters asset)
 )
 
 ;; @desc Get the last recorded price for an asset.
+;; @param asset principal - The principal of the asset.
+;; @returns (response uint uint)
 (define-read-only (get-price (asset principal))
   (match (map-get? asset-prices asset)
     price-data (ok (get price price-data))
@@ -158,17 +174,23 @@
 )
 
 ;; @desc Facade for get-price to match oracle-trait.
+;; @param asset principal - The principal of the asset.
+;; @returns (response uint uint)
 (define-read-only (fetch-price (asset principal))
   (get-price asset)
 )
 
 ;; @desc Returns the name of the contract.
+;; @returns (response (string-ascii 32) uint)
 (define-read-only (get-name)
   (ok "Economic-Policy-Engine")
 )
 
 ;; Configuration
 
+;; @desc Set the cost of protocol subscriptions.
+;; @param new-cost uint - The new subscription cost in micro-STX.
+;; @returns (response bool uint)
 (define-public (set-subscription-cost (new-cost uint))
   (begin
     (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
@@ -177,10 +199,15 @@
   )
 )
 
+;; @desc Get the revenue distributor principal.
+;; @returns (response principal uint)
 (define-read-only (get-revenue-distributor)
   (ok (var-get revenue-distributor))
 )
     
+;; @desc Set the reserve factor for the protocol.
+;; @param new-factor uint - The new reserve factor in basis points (0-10000).
+;; @returns (response bool uint)
 (define-public (set-reserve-factor (new-factor uint))
   (begin
     (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) (err ERR_UNAUTHORIZED))
@@ -190,6 +217,8 @@
   )
 )
 
+;; @desc Get the current reserve factor.
+;; @returns (response uint uint)
 (define-read-only (get-reserve-factor)
   (ok (var-get reserve-factor))
 )
@@ -197,6 +226,7 @@
 ;; Subscription Management
 
 ;; @desc Activate a subscription for access to advanced monetary functions.
+;; @returns (response bool uint)
 (define-public (subscribe)
   (let ((cost (var-get subscription-cost)))
     (begin
@@ -210,11 +240,17 @@
 )
 
 ;; @desc Check if a user is a subscriber.
+;; @param user principal - The principal of the user.
+;; @returns bool
 (define-read-only (is-subscribed (user principal))
   (default-to false (map-get? subscribers user))
 )
 
 ;; Automated Monetary Fund Operations
+
+;; @desc Automatically adjust market parameters based on recent price data.
+;; @param asset principal - The principal of the asset.
+;; @returns (response bool uint)
 (define-public (auto-adjust-parameters (asset principal))
   (begin
     (asserts! (is-subscribed tx-sender) (err ERR_NO_SUBSCRIPTION))
@@ -237,6 +273,7 @@
 ;; System Health Monitoring
 
 ;; @desc Get the overall health and status of the economic engine.
+;; @returns (response {last-update-time: uint, seconds-since-update: uint, current-rate: uint, utilization: uint, collateral-factor: uint, burn-height: uint} uint)
 (define-read-only (get-system-health)
   (ok {
     last-update-time: (var-get last-price-update-time),
