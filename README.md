@@ -1,7 +1,7 @@
 # Conxian Finance Protocol
 
 [![Status](https://img.shields.io/badge/Status-Verified_Production_Ready-green.svg)](https://conxian.io)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Nakamoto](https://img.shields.io/badge/Nakamoto-Ready-green.svg)](docs/CLARITY4_MIGRATION_TRACKING.md)
 
 ## Overview

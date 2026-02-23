@@ -28,8 +28,8 @@ The primary facade for multi-dimensional position management, collateral, and ri
 |----------|-----------|-------------|
 | `open-position` | `(open-position (manager <position-manager-trait>) (token principal) (amount uint) (leverage uint) (long bool) (slippage-limit (optional uint)) (metadata (optional (string-utf8 1024))))` | Opens a leveraged position via the specified manager. |
 | `close-position` | `(close-position (manager <position-manager-trait>) (position-id uint))` | Closes an existing position and settles collateral. |
-| `liquidate-position` | `(liquidate-position (manager <position-manager-trait>) (position-id uint))` | Forces closure of an undercollateralized position. |
-| `check-position-health` | `(check-position-health (risk <risk-manager-trait>) (position-id uint))` | returns the health factor for a specific position. |
+| `liquidate-position` | `(liquidate-position (risk-manager <risk-manager-trait>) (position-id uint))` | Forces closure of an undercollateralized position. |
+| `check-position-health` | `(check-position-health (risk-manager <risk-manager-trait>) (position-id uint))` | Returns the health factor for a specific position. |
 
 ### `economic-policy-engine.clar`
 Automated monetary policy and parameter adjustment system.
@@ -40,6 +40,9 @@ Automated monetary policy and parameter adjustment system.
 | `update-price-feed` | `(update-price-feed (asset principal) (price uint) (confidence uint))` | Records a new price for an asset. |
 | `subscribe` | `(subscribe)` | Activates a user subscription for access to advanced monetary functions. |
 | `auto-adjust-parameters` | `(auto-adjust-parameters (asset principal))` | Automatically triggers a parameter update based on latest price data. |
+| `get-system-health` | `(get-system-health)` | Returns the overall health score of the economic system. |
+| `get-price` | `(get-price (asset principal))` | Returns the latest cached price for an asset. |
+| `is-subscribed` | `(is-subscribed (user principal))` | Returns whether a user has an active subscription. |
 
 ## Error Codes
 
