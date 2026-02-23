@@ -1,155 +1,85 @@
 # Core Module
 
 ## Overview (Explanation)
-The Core module is a critical component of the Conxian Protocol, handling specialized operations for core. It implements sovereign autonomous logic to ensure mathematical certainty and neutrality.
+The Core module is the central nervous system of the Conxian Protocol. It manages the global protocol state, module registration, administrative access control, and the "Dimensional Engine" which orchestrates complex DeFi operations. It ensures that all protocol actions adhere to the SAXaaP manifesto: "Code is Law, Logic is Sovereign."
 
 ## Architecture (Explanation)
-This module follows the Hexagonal Architecture pattern. It defines clear ports via traits and provides robust adapter implementations. The core logic is isolated from external dependencies, ensuring high security and auditability.
+Following the Hexagonal Architecture pattern, the Core module separates its executive logic (Engines) from its storage and management logic (Managers).
+- **Ports**: Defined via traits in `contracts/traits/core-traits.clar`.
+- **Adapters**: Concrete implementations like `dimensional-engine.clar` which interface between users and internal managers.
+- **Core State**: Managed primarily in `conxian-protocol.clar`, which acts as the registry for all other modules.
 
 ## Core Contracts (Reference)
-The following contracts provide the backbone of the core system:
-### `admin-facade.clar`
-Core logic for admin facade.
-
-Public Functions:
-- `is-authorized`: Action for is authorized.
-- `set-role`: Action for set role.
-- `transfer-global-admin-to-timelock`: Action for transfer global admin to timelock.
-- `initialize`: Action for initialize.
-
-### `batch-operations.clar`
-Core logic for batch operations.
-
-Public Functions:
-- `process-batch`: Action for process batch.
-- `set-batch-enabled`: Action for set batch enabled.
-- `set-global-admin`: Action for set global admin.
-
-### `collateral-manager.clar`
-Core logic for collateral manager.
-
-Public Functions:
-- `deposit-funds`: Action for deposit funds.
-- `withdraw-funds`: Action for withdraw funds.
-- `seize-collateral`: Action for seize collateral.
-
-### `conxian-access.clar`
-Core logic for conxian access.
-
-Public Functions:
-- `has-role`: Action for has role.
-- `grant-role`: Action for grant role.
-- `revoke-role`: Action for revoke role.
-- `initialize`: Action for initialize.
-- `set-contract-owner`: Action for set contract owner.
-- `transfer-ownership-to-timelock`: Action for transfer ownership to timelock.
-- `set-timelock-principal`: Action for set timelock principal.
-
-### `conxian-exit-queue.clar`
-Core logic for conxian exit queue.
-
-Public Functions:
-- `enqueue`: Action for enqueue.
-- `dequeue`: Action for dequeue.
-- `get-length`: Action for get length.
-
-### `conxian-paas-factory.clar`
-Core logic for conxian paas factory.
-
-Public Functions:
-- `register-new-sab`: Action for register new sab.
-- `update-sab-status`: Action for update sab status.
 
 ### `conxian-protocol.clar`
-Core logic for conxian protocol.
+The root state contract and module registry for the entire protocol.
 
-Public Functions:
-- `set-paused`: Action for set paused.
-- `pause`: Action for pause.
-- `unpause`: Action for unpause.
-- `register-module`: Action for register module.
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `set-paused` | `(set-paused (new-paused bool))` | Toggles the global protocol pause state. Admin only. |
+| `register-module` | `(register-module (name (string-ascii 32)) (contract principal))` | Registers or updates a functional module (e.g., "dex", "lending"). |
+| `get-module` | `(get-module (name (string-ascii 32)))` | Returns the contract principal and active status for a given module name. |
+| `get-protocol-status` | `(get-protocol-status)` | Returns global status including compliance, pause state, and current tenure-id. |
 
 ### `dimensional-engine.clar`
-Core logic for dimensional engine.
+The primary facade for multi-dimensional position management, collateral, and risk.
 
-Public Functions:
-- `set-protocol-coordinator`: Action for set protocol coordinator.
-- `open-position`: Action for open position.
-- `close-position`: Action for close position.
-- `deposit-funds`: Action for deposit funds.
-- `withdraw-funds`: Action for withdraw funds.
-- `check-position-health`: Action for check position health.
-- `liquidate-position`: Action for liquidate position.
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `open-position` | `(open-position (manager <position-manager-trait>) (token principal) (amount uint) (leverage uint) (long bool) (slippage-limit (optional uint)) (metadata (optional (string-utf8 1024))))` | Opens a leveraged position via the specified manager. |
+| `close-position` | `(close-position (manager <position-manager-trait>) (position-id uint))` | Closes an existing position and settles collateral. |
+| `liquidate-position` | `(liquidate-position (manager <position-manager-trait>) (position-id uint))` | Forces closure of an undercollateralized position. |
+| `check-position-health` | `(check-position-health (risk <risk-manager-trait>) (position-id uint))` | returns the health factor for a specific position. |
 
 ### `economic-policy-engine.clar`
-Core logic for economic policy engine.
+Automated monetary policy and parameter adjustment system.
 
-Public Functions:
-- `update-market-parameters`: Action for update market parameters.
-- `update-price-feed`: Action for update price feed.
-- `set-subscription-cost`: Action for set subscription cost.
-- `set-reserve-factor`: Action for set reserve factor.
-- `subscribe`: Action for subscribe.
-- `auto-adjust-parameters`: Action for auto adjust parameters.
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `update-market-parameters` | `(update-market-parameters (asset principal) (new-utilization uint) (price-volatility uint))` | Updates interest rates and collateral factors for a specific asset. |
+| `update-price-feed` | `(update-price-feed (asset principal) (price uint) (confidence uint))` | Records a new price for an asset. |
+| `subscribe` | `(subscribe)` | Activates a user subscription for access to advanced monetary functions. |
+| `auto-adjust-parameters` | `(auto-adjust-parameters (asset principal))` | Automatically triggers a parameter update based on latest price data. |
 
-### `founder-vesting.clar`
-Core logic for founder vesting.
+## Error Codes
 
-Public Functions:
-- `initialize`: Action for initialize.
-- `add-vesting-schedule`: Action for add vesting schedule.
-- `claim-vested-tokens`: Action for claim vested tokens.
-
-### `funding-rate-calculator.clar`
-Core logic for funding rate calculator.
-
-Public Functions:
-- `update-funding-rate`: Action for update funding rate.
-
-### `operational-treasury.clar`
-Core logic for operational treasury.
-
-Public Functions:
-- `deposit-stx`: Action for deposit stx.
-- `withdraw-stx`: Action for withdraw stx.
-- `withdraw-token`: Action for withdraw token.
-- `set-contract-owner`: Action for set contract owner.
-
-### `ops-engine.clar`
-Core logic for ops engine.
-
-Public Functions:
-- `process-signal`: Action for process signal.
-- `trigger-emergency-pause`: Action for trigger emergency pause.
-- `trigger-epoch-update`: Action for trigger epoch update.
-
-### `position-manager.clar`
-Core logic for position manager.
-
-Public Functions:
-- `set-dimensional-engine`: Action for set dimensional engine.
-- `set-contract-owner`: Action for set contract owner.
-- `open-position`: Action for open position.
-- `close-position`: Action for close position.
-- `force-close-position`: Action for force close position.
-
-### `risk-manager.clar`
-Core logic for risk manager.
-
-Public Functions:
-- `update-system-risk`: Action for update system risk.
-- `get-health-factor`: Action for get health factor.
-- `liquidate`: Action for liquidate.
-- `set-dimensional-engine`: Action for set dimensional engine.
-- `set-risk-agent`: Action for set risk agent.
-- `set-ops-engine`: Action for set ops engine.
-
+| Code | Constant | Description |
+|------|----------|-------------|
+| `u1000` | `ERR_UNAUTHORIZED` | Caller is not authorized for this operation. |
+| `u1001` | `ERR_PAUSED` | Operation rejected because the protocol is paused. |
+| `u5000` | `ERR_CONTRACT_PAUSED` | Specific contract is paused. |
+| `u5001` | `ERR_NON_COMPLIANT` | Caller or operation does not meet compliance requirements. |
+| `u1006` | `ERR_NO_SUBSCRIPTION` | User does not have an active subscription for this feature. |
 
 ## Integration Examples (How-to)
-### Calling Core from other modules
-Use the standard trait patterns. For example:
+
+### Checking Protocol Compliance
+Before executing any state-changing user actions, external modules should verify protocol health:
 ```clarity
-(contract-call? .conxian-protocol get-module "core")
+(let ((status (unwrap! (contract-call? .conxian-protocol get-protocol-status) (err u999))))
+  (asserts! (get compliant status) (err u5001))
+  (asserts! (not (get paused status)) (err u1001))
+)
+```
+
+### Opening a Position via the Facade
+To open a position, use the `dimensional-engine` which handles the coordination between the position manager and the risk engine:
+```clarity
+(contract-call? .dimensional-engine open-position
+  .position-manager
+  'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.cxd-token
+  u1000000
+  u200 ;; 2x Leverage
+  true ;; Long
+  none ;; No slippage limit
+  none ;; No metadata
+)
+```
+
+### Subscribing to Economic Updates
+Users can pay a fee to access premium monetary features:
+```clarity
+(contract-call? .economic-policy-engine subscribe)
 ```
 
 ## Testing (How-to)
@@ -161,4 +91,4 @@ Comprehensive validation is performed using the Vitest framework.
 - Implementation: Production-Ready (v1.2.0)
 - Audit Status: Internally Verified
 - BIP Compliance: BIP-341, BIP-342, BIP-174
-- Standard: Hexagonal, 60/20/20 split
+- Standard: Hexagonal Architecture, 60/20/20 Revenue Split
