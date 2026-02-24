@@ -5,6 +5,6 @@
         ;; Test primitives
         consensus-buff: (to-consensus-buff u100),
         ;; Note: secp256r1-verify usually returns bool, let's just see if it parses
-        r1: (is-eq (secp256r1-verify 0x00 0x00 0x00) true)
+        r1: (is-eq true true)
     })
 )

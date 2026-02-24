@@ -6,7 +6,7 @@
 ;; @param value (buff 128) - The raw value to encode
 ;; @returns (buff 128) - The encoded buffer
 (define-read-only (to-consensus-buff-wrapper (value (buff 128)))
-  (ok (to-consensus-buff? value))
+  (ok (to-consensus-buff value))
 )
 
 ;; @desc Deterministic SHA256 hash of any buffer
