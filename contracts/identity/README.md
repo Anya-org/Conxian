@@ -1,28 +1,38 @@
 # Identity Module
 
 ## Overview (Explanation)
-The Identity module is a critical component of the Conxian Protocol, handling specialized operations for identity. It implements sovereign autonomous logic to ensure mathematical certainty and neutrality.
+The Identity module manages user verification and reputation within the Conxian ecosystem. It provides the protocol with the necessary context to enforce compliance and distribute rewards based on user history and verification status.
 
 ## Architecture (Explanation)
-This module follows the Hexagonal Architecture pattern. It defines clear ports via traits and provides robust adapter implementations. The core logic is isolated from external dependencies, ensuring high security and auditability.
+The module utilizes a decentralized identity model:
+- **KYC Registry**: `kyc-registry.clar` stores verification levels and status for all protocol participants.
+- **Badges**: `identity-badge.clar` implements SIP-009 NFTs to represent specific achievements or verification tiers.
+- **Privacy**: Only necessary verification flags are stored on-chain; sensitive data remains off-chain.
 
 ## Core Contracts (Reference)
-The following contracts provide the backbone of the identity system:
-### `identity-badge.clar`
-Core logic for identity badge.
 
 ### `kyc-registry.clar`
-Core logic for kyc registry.
+The primary registry for user verification data.
 
-Public Functions:
-- `set-identity-status`: Action for set identity status.
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `set-identity-status` | `(set-identity-status (user principal) (status bool) (level uint))` | Updates the verification level for a user. Authorized only. |
+| `get-identity-status` | `(get-identity-status (user principal))` | Returns the current status and tier for a specific user. |
 
+### `identity-badge.clar`
+Reputation and achievement tokens.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `mint` | `(mint (recipient principal) (badge-id uint))` | Awards a specific badge to a user. Authorized only. |
 
 ## Integration Examples (How-to)
-### Calling Identity from other modules
-Use the standard trait patterns. For example:
+
+### Checking User Verification
 ```clarity
-(contract-call? .conxian-protocol get-module "identity")
+(let ((status (unwrap-panic (contract-call? .kyc-registry get-identity-status tx-sender))))
+  (asserts! (get status status) (err u5001))
+)
 ```
 
 ## Testing (How-to)
@@ -33,5 +43,5 @@ Comprehensive validation is performed using the Vitest framework.
 ## Status (Reference)
 - Implementation: Production-Ready (v1.2.0)
 - Audit Status: Internally Verified
-- BIP Compliance: BIP-341, BIP-342, BIP-174
-- Standard: Hexagonal, 60/20/20 split
+- Identity Standard: Verified Principals
+- Standard: Hexagonal Architecture

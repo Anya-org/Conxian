@@ -1,65 +1,39 @@
 # Oracle Module
 
 ## Overview (Explanation)
-The Oracle module is a critical component of the Conxian Protocol, handling specialized operations for oracle. It implements sovereign autonomous logic to ensure mathematical certainty and neutrality.
+The Oracle module provides reliable, manipulation-resistant price feeds for the Conxian Protocol. It aggregates data from multiple sources, including external adapters and on-chain monitors, to provide accurate asset valuations for lending, swaps, and risk assessment.
 
 ## Architecture (Explanation)
-This module follows the Hexagonal Architecture pattern. It defines clear ports via traits and provides robust adapter implementations. The core logic is isolated from external dependencies, ensuring high security and auditability.
+The module utilizes an aggregator-adapter pattern:
+- **Aggregator**: `oracle-aggregator.clar` collects and filters prices from various sources using deviation guards and stale thresholds.
+- **Adapters**: Concrete implementations like `federated-oracle-adapter.clar` and `external-oracle-adapter.clar` interface with off-chain providers.
+- **Specialized Oracles**: `points-oracle.clar` manages protocol-specific metrics like reputation or loyalty points.
 
 ## Core Contracts (Reference)
-The following contracts provide the backbone of the oracle system:
-### `dimensional-oracle.clar`
-Core logic for dimensional oracle.
-
-Public Functions:
-- `get-price`: Action for get price.
-- `fetch-price`: Action for fetch price.
-
-### `external-oracle-adapter.clar`
-Core logic for external oracle adapter.
-
-### `federated-oracle-adapter.clar`
-Core logic for federated oracle adapter.
-
-Public Functions:
-- `submit-price`: Action for submit price.
-- `add-oracle-source`: Action for add oracle source.
-- `remove-oracle-source`: Action for remove oracle source.
-
-### `oracle-adapter-stub.clar`
-Core logic for oracle adapter stub.
 
 ### `oracle-aggregator.clar`
-Core logic for oracle aggregator.
+The primary interface for price data consumption.
 
-Public Functions:
-- `set-admin`: Action for set admin.
-- `set-circuit-breaker`: Action for set circuit breaker.
-- `set-params`: Action for set params.
-- `set-stale-threshold`: Action for set stale threshold.
-- `reset-volatility`: Action for reset volatility.
-- `set-source`: Action for set source.
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `get-price` | `(get-price (asset principal))` | Returns the aggregated price for a specific asset. |
+| `get-volatility-index` | `(get-volatility-index)` | Returns a composite volatility score for system-wide fee adjustment. |
+| `set-source` | `(set-source (asset principal) (source principal) (weight uint))` | Registers a new price source. Admin only. |
 
-### `points-oracle.clar`
-Core logic for points oracle.
+### `federated-oracle-adapter.clar`
+Enables a council of trusted sources to submit prices.
 
-Public Functions:
-- `award-points`: Action for award points.
-- `burn-points`: Action for burn points.
-- `transfer-points`: Action for transfer points.
-- `claim-reward`: Action for claim reward.
-- `apply-points-decay`: Action for apply points decay.
-- `create-reward`: Action for create reward.
-- `set-decay-enabled`: Action for set decay enabled.
-- `emergency-reset-user-points`: Action for emergency reset user points.
-- `deactivate-reward`: Action for deactivate reward.
-
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `submit-price` | `(submit-price (asset principal) (price uint))` | Submits a new price observation. Authorized sources only. |
 
 ## Integration Examples (How-to)
-### Calling Oracle from other modules
-Use the standard trait patterns. For example:
+
+### Fetching a Verified Price
 ```clarity
-(contract-call? .conxian-protocol get-module "oracle")
+(let ((price (unwrap! (contract-call? .oracle-aggregator get-price .cxd-token) (err u404))))
+  (print price)
+)
 ```
 
 ## Testing (How-to)
@@ -70,5 +44,5 @@ Comprehensive validation is performed using the Vitest framework.
 ## Status (Reference)
 - Implementation: Production-Ready (v1.2.0)
 - Audit Status: Internally Verified
-- BIP Compliance: BIP-341, BIP-342, BIP-174
-- Standard: Hexagonal, 60/20/20 split
+- Sources: Aggregated (Pyth, Federated)
+- Standard: Hexagonal, Deviation-Guarded

@@ -6,8 +6,8 @@ The Tokens module defines the various assets and accounting units used within th
 ## Architecture (Explanation)
 All tokens in this module follow the SIP-010 standard for Fungible Tokens.
 - **CXD**: The core utility and governance token.
-- **CXVG**: A non-transferable token representing voting power, earned through staking or delegation.
-- **Accounting**: Tokens like `cxtr-token.clar` and `cxlp-token.clar` are used for internal protocol accounting.
+- **CXVG**: A non-transferable token representing voting power (SIP-010 compliant interface).
+- **CXLP**: Position NFTs (SIP-009) representing concentrated liquidity positions.
 
 ## Core Contracts (Reference)
 
@@ -18,14 +18,15 @@ The primary SIP-010 token for the Conxian ecosystem.
 |----------|-----------|-------------|
 | `transfer` | `(transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))` | Standard SIP-010 transfer. |
 | `mint` | `(mint (amount uint) (recipient principal))` | Creates new CXD tokens. Authorized minters only. |
-| `get-voting-power` | `(get-voting-power (user principal))` | Returns the governance voting weight for a user. |
+| `get-max-supply` | `(get-max-supply)` | Returns the hard cap of 1,000,000,000 CXD. |
 
 ### `cxvg-token.clar`
 Governance Voting Power token (non-transferable).
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `get-balance` | `(get-balance (who principal))` | Returns the voting power balance of a specific user. |
+| `delegate` | `(delegate (delegatee principal))` | Delegating voting power to another principal. |
+| `get-voting-power` | `(get-voting-power (user principal))` | Returns the total voting weight (including delegations). |
 | `mint` | `(mint (amount uint) (recipient principal))` | Issues voting power. Authorized by governance only. |
 
 ## Integration Examples (How-to)
@@ -39,9 +40,9 @@ Standard SIP-010 balance check:
 ```
 
 ### Delegating Voting Power
-Users can delegate their governance influence:
+Users can delegate their governance influence via the CXVG contract:
 ```clarity
-(contract-call? .cxd-token delegate .governance-agent)
+(contract-call? .cxvg-token delegate .governance-agent)
 ```
 
 ## Testing (How-to)
@@ -52,5 +53,5 @@ Comprehensive validation is performed using the Vitest framework.
 ## Status (Reference)
 - Implementation: Production-Ready (v1.2.0)
 - Audit Status: Internally Verified
-- SIP Compliance: SIP-010
+- SIP Compliance: SIP-010, SIP-009
 - Standard: Hexagonal, Nakamoto Ready

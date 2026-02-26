@@ -1,34 +1,37 @@
 # Lending Module
 
 ## Overview (Explanation)
-The Lending module is a critical component of the Conxian Protocol, handling specialized operations for lending. It implements sovereign autonomous logic to ensure mathematical certainty and neutrality.
+The Lending module provides automated money markets for the Conxian Protocol. It allows users to deposit assets to earn interest and borrow assets against their collateral. Interest rates are determined dynamically based on market utilization.
 
 ## Architecture (Explanation)
-This module follows the Hexagonal Architecture pattern. It defines clear ports via traits and provides robust adapter implementations. The core logic is isolated from external dependencies, ensuring high security and auditability.
+The module utilizes a decentralized reserve system:
+- **Manager**: `lending-manager.clar` handles the core lending/borrowing logic and collateralization checks.
+- **Economic Model**: `interest-rate-model.clar` provides the mathematical curves for variable interest rates.
+- **Security**: Integrates with the `circuit-breaker` for emergency halts.
 
 ## Core Contracts (Reference)
-The following contracts provide the backbone of the lending system:
-### `interest-rate-model.clar`
-Core logic for interest rate model.
 
 ### `lending-manager.clar`
-Core logic for lending manager.
+The primary engine for money market operations.
 
-Public Functions:
-- `deposit`: Action for deposit.
-- `borrow`: Action for borrow.
-- `repay`: Action for repay.
-- `seize-collateral`: Action for seize collateral.
-- `collect-reserves`: Action for collect reserves.
-- `set-circuit-breaker`: Action for set circuit breaker.
-- `withdraw`: Action for withdraw.
-
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `deposit` | `(deposit (asset-trait <sip-010-ft-trait>) (amount uint))` | Deposits tokens to earn interest. |
+| `borrow` | `(borrow (asset-trait <sip-010-ft-trait>) (amount uint))` | Borrows tokens against deposited collateral. |
+| `repay` | `(repay (asset-trait <sip-010-ft-trait>) (amount uint))` | Repays a borrowed position with interest. |
+| `seize-collateral` | `(seize-collateral (asset-trait <sip-010-ft-trait>) (user principal) (liquidator principal) (amount uint))` | Liquidates an undercollateralized user. Authorized only. |
+| `collect-reserves` | `(collect-reserves (asset-trait <sip-010-ft-trait>))` | Transfers protocol revenue to the `revenue-distributor`. |
 
 ## Integration Examples (How-to)
-### Calling Lending from other modules
-Use the standard trait patterns. For example:
+
+### Depositing Assets
 ```clarity
-(contract-call? .conxian-protocol get-module "lending")
+(contract-call? .lending-manager deposit .cxd-token u1000000)
+```
+
+### Borrowing against Collateral
+```clarity
+(contract-call? .lending-manager borrow .cxd-token u500000)
 ```
 
 ## Testing (How-to)
@@ -39,5 +42,5 @@ Comprehensive validation is performed using the Vitest framework.
 ## Status (Reference)
 - Implementation: Production-Ready (v1.2.0)
 - Audit Status: Internally Verified
-- BIP Compliance: BIP-341, BIP-342, BIP-174
-- Standard: Hexagonal, 60/20/20 split
+- BIP Compliance: BIP-341, BIP-342
+- Standard: Hexagonal, Variable Interest Rates

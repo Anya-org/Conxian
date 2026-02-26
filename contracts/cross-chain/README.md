@@ -1,19 +1,29 @@
 # Cross-chain Module
 
 ## Overview (Explanation)
-The Cross-chain module is a critical component of the Conxian Protocol, handling specialized operations for cross-chain. It implements sovereign autonomous logic to ensure mathematical certainty and neutrality.
+The Cross-chain module enables the Conxian Protocol to interact with assets and state from other blockchains. It provides hooks for bridge providers and supports multi-chain asset wrapping, expanding the protocol's liquidity beyond the Stacks ecosystem.
 
 ## Architecture (Explanation)
-This module follows the Hexagonal Architecture pattern. It defines clear ports via traits and provides robust adapter implementations. The core logic is isolated from external dependencies, ensuring high security and auditability.
+The module acts as an interoperability gateway:
+- **Wormhole**: Integrates with Wormhole core handlers for cross-chain messaging.
+- **BTC Adapter**: Specialized logic for bridging Bitcoin assets (sBTC) into the protocol.
+- **Gateways**: Manages the minting and burning of wrapped cross-chain assets.
 
 ## Core Contracts (Reference)
-The following contracts provide the backbone of the cross-chain system:
+*Note: This module currently contains several placeholder implementations awaiting final bridge mainnet releases.*
+
+### `btc-adapter.clar`
+Bridge for Bitcoin-native assets.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `mint-sbtc` | `(mint-sbtc (amount uint) (recipient principal))` | Mints wrapped sBTC on Stacks. Authorized bridge only. |
 
 ## Integration Examples (How-to)
-### Calling Cross-chain from other modules
-Use the standard trait patterns. For example:
+
+### Checking Cross-chain Message Status
 ```clarity
-(contract-call? .conxian-protocol get-module "cross-chain")
+(contract-call? .wormhole-inbox get-message-status 0x1234...)
 ```
 
 ## Testing (How-to)
@@ -22,7 +32,7 @@ Comprehensive validation is performed using the Vitest framework.
 2. Run module tests: `npx vitest run tests/cross-chain`
 
 ## Status (Reference)
-- Implementation: Production-Ready (v1.2.0)
-- Audit Status: Internally Verified
-- BIP Compliance: BIP-341, BIP-342, BIP-174
-- Standard: Hexagonal, 60/20/20 split
+- Implementation: **BETA (v0.8.0)**
+- Audit Status: PENDING
+- Standards: Wormhole, sBTC
+- Standard: Hexagonal Architecture
