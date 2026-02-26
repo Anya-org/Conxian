@@ -1,47 +1,37 @@
 # Automation Module
 
 ## Overview (Explanation)
-The Automation module is a critical component of the Conxian Protocol, handling specialized operations for automation. It implements sovereign autonomous logic to ensure mathematical certainty and neutrality.
+The Automation module provides the "Heartbeat" of the Conxian Protocol. It coordinates recurring tasks, such as parameter updates, epoch transitions, and incentive distributions, ensuring the protocol operates autonomously 24/7.
 
 ## Architecture (Explanation)
-This module follows the Hexagonal Architecture pattern. It defines clear ports via traits and provides robust adapter implementations. The core logic is isolated from external dependencies, ensuring high security and auditability.
+The module follows a Keeper-driven model:
+- **Engine**: `ops-engine.clar` is the central coordinator for all scheduled work.
+- **Jobs**: Defined via the `office-job-trait` in modules like `agents` and `monitoring`.
+- **Incentives**: Keepers are rewarded in CXD for successfully executing "jobs" that the protocol deems necessary.
 
 ## Core Contracts (Reference)
-The following contracts provide the backbone of the automation system:
-### `automation-manager.clar`
-Core logic for automation manager.
 
-Public Functions:
-- `trigger-automation`: Action for trigger automation.
-- `set-automation-active`: Action for set automation active.
+### `ops-engine.clar`
+The central heartbeat coordinator.
 
-### `batch-processor.clar`
-Core logic for batch processor.
-
-Public Functions:
-- `batch-call`: Action for batch call.
-
-### `office-manager.clar`
-Core logic for office manager.
-
-Public Functions:
-- `set-agent-status`: Action for set agent status.
-- `register-worker`: Action for register worker.
-- `remove-worker`: Action for remove worker.
-- `fund-payroll`: Action for fund payroll.
-- `withdraw-payroll`: Action for withdraw payroll.
-- `payout`: Action for payout.
-- `has-role`: Action for has role.
-- `grant-role`: Action for grant role.
-- `revoke-role`: Action for revoke role.
-- `verify-passkey-signature`: Action for verify passkey signature.
-
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `trigger-epoch-update` | `(trigger-epoch-update)` | Checks all registered jobs and executes those where `work-needed` is true. |
+| `register-job` | `(register-job (name (string-ascii 32)) (contract principal))` | Adds a new autonomous job to the heartbeat loop. |
+| `get-job-status` | `(get-job-status (name (string-ascii 32)))` | Returns the last execution height and status for a job. |
 
 ## Integration Examples (How-to)
-### Calling Automation from other modules
-Use the standard trait patterns. For example:
+
+### Registering a New Agent Task
+To add a new task to the protocol heartbeat:
 ```clarity
-(contract-call? .conxian-protocol get-module "automation")
+(contract-call? .ops-engine register-job "risk-update" .agent-risk)
+```
+
+### Triggering the Protocol Heartbeat
+External keepers call this to process all pending work:
+```clarity
+(contract-call? .ops-engine trigger-epoch-update)
 ```
 
 ## Testing (How-to)
@@ -52,5 +42,5 @@ Comprehensive validation is performed using the Vitest framework.
 ## Status (Reference)
 - Implementation: Production-Ready (v1.2.0)
 - Audit Status: Internally Verified
-- BIP Compliance: BIP-341, BIP-342, BIP-174
-- Standard: Hexagonal, 60/20/20 split
+- Protocol Incentive: 5 CXD per Heartbeat
+- Standard: Hexagonal, Keeper-Driven

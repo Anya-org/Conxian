@@ -1,44 +1,30 @@
 # Bonding Module
 
 ## Overview (Explanation)
-The Bonding module is a critical component of the Conxian Protocol, handling specialized operations for bonding. It implements sovereign autonomous logic to ensure mathematical certainty and neutrality.
+The Bonding module provides specialized AMMs and capital-raising mechanisms for the Conxian ecosystem. It allows the protocol to sell tokens along a mathematical curve, ensuring continuous liquidity and efficient price discovery.
 
 ## Architecture (Explanation)
-This module follows the Hexagonal Architecture pattern. It defines clear ports via traits and provides robust adapter implementations. The core logic is isolated from external dependencies, ensuring high security and auditability.
+The module implements high-precision curves:
+- **AMM**: `cxd-bonding-curve-amm.clar` manages the primary trading curve for CXD.
+- **Factory**: `bond-factory.clar` enables the creation of custom bond tokens for ecosystem projects.
+- **Tokens**: `bond-token.clar` provides a template for SIP-010 compliant bond assets.
 
 ## Core Contracts (Reference)
-The following contracts provide the backbone of the bonding system:
-### `bond-factory.clar`
-Core logic for bond factory.
-
-Public Functions:
-- `transfer`: Action for transfer.
-- `create-bond`: Action for create bond.
-
-### `bond-token.clar`
-Core logic for bond token.
-
-Public Functions:
-- `transfer`: Action for transfer.
-- `mint`: Action for mint.
-- `burn`: Action for burn.
-- `set-contract-owner`: Action for set contract owner.
 
 ### `cxd-bonding-curve-amm.clar`
-Core logic for cxd bonding curve amm.
+The protocol's internal price discovery engine.
 
-Public Functions:
-- `get-buy-quote`: Action for get buy quote.
-- `get-sell-quote`: Action for get sell quote.
-- `buy`: Action for buy.
-- `sell`: Action for sell.
-
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `buy` | `(buy (amount-stx uint) (min-tokens uint))` | Purchases CXD tokens from the curve. |
+| `sell` | `(sell (amount-tokens uint) (min-stx uint))` | Sells CXD tokens back to the curve. |
+| `get-buy-quote` | `(get-buy-quote (amount-stx uint))` | Returns the expected token output for a given STX input. |
 
 ## Integration Examples (How-to)
-### Calling Bonding from other modules
-Use the standard trait patterns. For example:
+
+### Buying CXD via the Curve
 ```clarity
-(contract-call? .conxian-protocol get-module "bonding")
+(contract-call? .cxd-bonding-curve-amm buy u1000000 u90000000)
 ```
 
 ## Testing (How-to)
@@ -49,5 +35,5 @@ Comprehensive validation is performed using the Vitest framework.
 ## Status (Reference)
 - Implementation: Production-Ready (v1.2.0)
 - Audit Status: Internally Verified
-- BIP Compliance: BIP-341, BIP-342, BIP-174
-- Standard: Hexagonal, 60/20/20 split
+- Curve Type: Linear / Exponential
+- Standard: Hexagonal Architecture

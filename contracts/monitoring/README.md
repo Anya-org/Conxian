@@ -1,35 +1,38 @@
 # Monitoring Module
 
 ## Overview (Explanation)
-The Monitoring module is a critical component of the Conxian Protocol, handling specialized operations for monitoring. It implements sovereign autonomous logic to ensure mathematical certainty and neutrality.
+The Monitoring module provides real-time telemetry and health assessment for the Conxian Protocol. It tracks financial metrics, protocol usage, and stability indicators to provide a transparent view of the protocol's state for agents and users.
 
 ## Architecture (Explanation)
-This module follows the Hexagonal Architecture pattern. It defines clear ports via traits and provides robust adapter implementations. The core logic is isolated from external dependencies, ensuring high security and auditability.
+The module acts as the protocol's "Observability Layer":
+- **Metrics**: `finance-metrics.clar` aggregates TVL and volume data across all vaults and pools.
+- **Analytics**: `analytics-aggregator.clar` tracks swap frequency and fee generation.
+- **Dashboard**: `monitoring-dashboard.clar` provides human-readable health statuses (e.g., "HEALTHY", "CRISIS").
 
 ## Core Contracts (Reference)
-The following contracts provide the backbone of the monitoring system:
-### `analytics-aggregator.clar`
-Core logic for analytics aggregator.
-
-Public Functions:
-- `track-swap`: Action for track swap.
-- `track-fee`: Action for track fee.
 
 ### `finance-metrics.clar`
-Core logic for finance metrics.
+Aggregates protocol-wide financial data.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `get-total-value-locked` | `(get-total-value-locked)` | Returns the total USD-equivalent value held in the protocol. |
+| `get-utilization-ratio` | `(get-utilization-ratio (asset principal))` | Returns the ratio of borrowed vs deposited assets. |
 
 ### `monitoring-dashboard.clar`
-Core logic for monitoring dashboard.
+Calculates high-level system status.
 
-### `price-stability-monitor.clar`
-Core logic for price stability monitor.
-
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `get-protocol-health` | `(get-protocol-health)` | Returns a status string based on GCR and volatility. |
 
 ## Integration Examples (How-to)
-### Calling Monitoring from other modules
-Use the standard trait patterns. For example:
+
+### Querying Protocol TVL
 ```clarity
-(contract-call? .conxian-protocol get-module "monitoring")
+(let ((tvl (contract-call? .finance-metrics get-total-value-locked)))
+  (print tvl)
+)
 ```
 
 ## Testing (How-to)
@@ -40,5 +43,5 @@ Comprehensive validation is performed using the Vitest framework.
 ## Status (Reference)
 - Implementation: Production-Ready (v1.2.0)
 - Audit Status: Internally Verified
-- BIP Compliance: BIP-341, BIP-342, BIP-174
-- Standard: Hexagonal, 60/20/20 split
+- Telemetry: Real-time
+- Standard: Hexagonal Architecture
