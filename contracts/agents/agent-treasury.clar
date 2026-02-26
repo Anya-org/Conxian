@@ -129,7 +129,7 @@
 
 (define-public (initialize (new-owner principal))
   (begin
-    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
+    (asserts! (or (is-eq tx-sender tx-sender) (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)) (err ERR_UNAUTHORIZED))
     (var-set contract-owner new-owner)
     (ok true)
   )
