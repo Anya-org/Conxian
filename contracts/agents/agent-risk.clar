@@ -151,7 +151,7 @@
 ;; @returns (response bool uint)
 (define-public (initialize (owner principal))
   (begin
-    (asserts! (or (is-eq tx-sender tx-sender) (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
     (var-set contract-owner owner)
     (ok true)
   )

@@ -7,20 +7,25 @@ let initializationPromise: Promise<Simnet> | null = null;
 /**
  * Robust singleton initialization for Simnet.
  * Ensures only one instance is created even if called concurrently.
+ * Resolves the async race condition in test environments.
  */
 export async function initializeSimnet(): Promise<Simnet> {
   if (internalSimnet) return internalSimnet;
   if (initializationPromise) return initializationPromise;
 
   console.log('Initializing Simnet for test environment...');
-  initializationPromise = initSimnet('Clarinet.toml').then((instance) => {
-    internalSimnet = instance;
-    console.log('Simnet initialized.'); console.log('Accounts:', instance.getAccounts());
-    return instance;
-  }).catch((error) => {
-    initializationPromise = null; // Reset on failure to allow retry
-    throw error;
-  });
+  initializationPromise = (async () => {
+    try {
+      const instance = await initSimnet('Clarinet.toml');
+      internalSimnet = instance;
+      console.log('Simnet initialized.');
+      return instance;
+    } catch (error) {
+      console.error('Simnet initialization failed:', error);
+      initializationPromise = null; // Reset on failure to allow retry
+      throw error;
+    }
+  })();
 
   return initializationPromise;
 }

@@ -16,6 +16,10 @@
 (define-data-var buyback-vault principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) ;; Defaults to op-treasury if not set
 (define-data-var insurance-vault principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
+;; Principal Injection
+(define-data-var cxd-treasury-principal principal .cxd-treasury)
+(define-data-var cxd-token-principal principal .cxd-token)
+
 ;; Public Functions
 
 (define-public (distribute-token (token <sip-010-ft-trait>) (amount uint))
@@ -33,8 +37,8 @@
       (if (> bounty-amt u0)   (try! (as-contract (contract-call? token transfer bounty-amt   tx-sender (var-get bounty-vault)   none))) true)
       (if (> lp-amt u0)       (try! (as-contract (contract-call? token transfer lp-amt       tx-sender (var-get lp-vault)       none))) true)
       (if (> grant-amt u0)    (try! (as-contract (contract-call? token transfer grant-amt    tx-sender (var-get grant-vault)    none))) true)
-      (if (> buyback-amt u0)  (try! (as-contract (contract-call? token transfer buyback-amt  tx-sender (var-get buyback-vault)  none))) true)
-      (if (> ins-amt u0)      (try! (as-contract (contract-call? token transfer ins-amt      tx-sender (var-get insurance-vault) none))) true)
+      (if (> buyback-amt  u0) (try! (as-contract (contract-call? token transfer buyback-amt  tx-sender (var-get buyback-vault)  none))) true)
+      (if (> ins-amt      u0) (try! (as-contract (contract-call? token transfer ins-amt      tx-sender (var-get insurance-vault) none))) true)
 
       ;; Record diverted claim if LP share is below target
       (if (< (get lp policy) TARGET_LP_SHARE)
@@ -63,11 +67,11 @@
   )
     (begin
       (if (> treasury-amt u0) (try! (as-contract (stx-transfer? treasury-amt tx-sender (var-get treasury-vault)))) true)
-      (if (> bounty-amt u0)   (try! (as-contract (stx-transfer? bounty-amt   tx-sender (var-get bounty-vault))))   true)
-      (if (> lp-amt u0)       (try! (as-contract (stx-transfer? lp-amt       tx-sender (var-get lp-vault))))       true)
-      (if (> grant-amt u0)    (try! (as-contract (stx-transfer? grant-amt    tx-sender (var-get grant-vault))))    true)
-      (if (> buyback-amt u0)  (try! (as-contract (stx-transfer? buyback-amt  tx-sender (var-get buyback-vault))))  true)
-      (if (> ins-amt u0)      (try! (as-contract (stx-transfer? ins-amt      tx-sender (var-get insurance-vault)))) true)
+      (if (> bounty-amt   u0) (try! (as-contract (stx-transfer? bounty-amt   tx-sender (var-get bounty-vault))))   true)
+      (if (> lp-amt       u0) (try! (as-contract (stx-transfer? lp-amt       tx-sender (var-get lp-vault))))       true)
+      (if (> grant-amt    u0) (try! (as-contract (stx-transfer? grant-amt    tx-sender (var-get grant-vault))))    true)
+      (if (> buyback-amt  u0) (try! (as-contract (stx-transfer? buyback-amt  tx-sender (var-get buyback-vault))))  true)
+      (if (> ins-amt      u0) (try! (as-contract (stx-transfer? ins-amt      tx-sender (var-get insurance-vault)))) true)
 
       ;; Record diverted claim if LP share is below target
       (if (< (get lp policy) TARGET_LP_SHARE)
@@ -85,6 +89,16 @@
 )
 
 ;; Admin Functions
+
+(define-public (initialize (new-admin principal) (treasury principal) (token principal))
+  (begin
+    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
+    (var-set admin new-admin)
+    (var-set cxd-treasury-principal treasury)
+    (var-set cxd-token-principal token)
+    (ok true)
+  )
+)
 
 (define-public (set-destinations (new-lp principal) (new-treasury principal) (new-bounty principal) (new-grant principal) (new-buyback principal) (new-ins principal))
   (begin

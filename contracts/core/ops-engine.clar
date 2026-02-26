@@ -14,6 +14,14 @@
 (define-data-var last-fast-check uint u0)
 (define-data-var last-slow-check uint u0)
 
+;; Principal Injection
+(define-data-var admin-facade-principal principal .admin-facade)
+(define-data-var conxian-protocol-principal principal .conxian-protocol)
+(define-data-var swap-router-principal principal .swap-router)
+(define-data-var agent-treasury-principal principal .agent-treasury)
+(define-data-var agent-risk-principal principal .agent-risk)
+(define-data-var cxd-token-principal principal .cxd-token)
+
 ;; Public Functions
 
 ;; @desc Processes a governance signal by executing a proposal contract.
@@ -100,4 +108,19 @@
     slow-gear: (var-get last-slow-check),
     active: true
   })
+)
+
+;; Admin
+
+(define-public (initialize (facade principal) (protocol principal) (router principal) (treasury principal) (risk principal) (token principal))
+  (begin
+    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
+    (var-set admin-facade-principal facade)
+    (var-set conxian-protocol-principal protocol)
+    (var-set swap-router-principal router)
+    (var-set agent-treasury-principal treasury)
+    (var-set agent-risk-principal risk)
+    (var-set cxd-token-principal token)
+    (ok true)
+  )
 )
