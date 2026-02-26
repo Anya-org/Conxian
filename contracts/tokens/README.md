@@ -1,91 +1,47 @@
 # Tokens Module
 
 ## Overview (Explanation)
-The Tokens module is a critical component of the Conxian Protocol, handling specialized operations for tokens. It implements sovereign autonomous logic to ensure mathematical certainty and neutrality.
+The Tokens module defines the various assets and accounting units used within the Conxian Protocol. This includes the primary governance token (CXD), the voting power token (CXVG), and specialized tokens for liquidity and treasury.
 
 ## Architecture (Explanation)
-This module follows the Hexagonal Architecture pattern. It defines clear ports via traits and provides robust adapter implementations. The core logic is isolated from external dependencies, ensuring high security and auditability.
+All tokens in this module follow the SIP-010 standard for Fungible Tokens.
+- **CXD**: The core utility and governance token.
+- **CXVG**: A non-transferable token representing voting power, earned through staking or delegation.
+- **Accounting**: Tokens like `cxtr-token.clar` and `cxlp-token.clar` are used for internal protocol accounting.
 
 ## Core Contracts (Reference)
-The following contracts provide the backbone of the tokens system:
-### `cxd-price-initializer.clar`
-Core logic for cxd price initializer.
-
-Public Functions:
-- `placeholder`: Action for placeholder.
 
 ### `cxd-token.clar`
-Core logic for cxd token.
+The primary SIP-010 token for the Conxian ecosystem.
 
-Public Functions:
-- `transfer`: Action for transfer.
-- `burn`: Action for burn.
-- `add-minter`: Action for add minter.
-- `mint`: Action for mint.
-- `set-contract-owner`: Action for set contract owner.
-
-### `cxlp-position-nft.clar`
-Core logic for cxlp position nft.
-
-Public Functions:
-- `transfer`: Action for transfer.
-- `mint-position`: Action for mint position.
-
-### `cxlp-token.clar`
-Core logic for cxlp token.
-
-Public Functions:
-- `transfer`: Action for transfer.
-- `mint`: Action for mint.
-- `burn`: Action for burn.
-
-### `cxs-token.clar`
-Core logic for cxs token.
-
-Public Functions:
-- `transfer`: Action for transfer.
-- `mint`: Action for mint.
-- `burn`: Action for burn.
-
-### `cxtr-token.clar`
-Core logic for cxtr token.
-
-Public Functions:
-- `transfer`: Action for transfer.
-- `mint`: Action for mint.
-- `burn`: Action for burn.
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `transfer` | `(transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))` | Standard SIP-010 transfer. |
+| `mint` | `(mint (amount uint) (recipient principal))` | Creates new CXD tokens. Authorized minters only. |
+| `get-voting-power` | `(get-voting-power (user principal))` | Returns the governance voting weight for a user. |
 
 ### `cxvg-token.clar`
-Core logic for cxvg token.
+Governance Voting Power token (non-transferable).
 
-Public Functions:
-- `delegate`: Action for delegate.
-- `revoke-delegation`: Action for revoke delegation.
-- `transfer`: Action for transfer.
-- `mint`: Action for mint.
-- `burn`: Action for burn.
-- `set-contract-owner`: Action for set contract owner.
-- `set-token-uri`: Action for set token uri.
-
-### `token-system-coordinator.clar`
-Core logic for token system coordinator.
-
-Public Functions:
-- `set-coordinator-admin`: Action for set coordinator admin.
-- `set-minter-status`: Action for set minter status.
-- `set-cxd-token`: Action for set cxd token.
-- `set-cxvg-token`: Action for set cxvg token.
-- `mint-cxd`: Action for mint cxd.
-- `mint-cxvg`: Action for mint cxvg.
-- `burn-cxd`: Action for burn cxd.
-- `burn-cxvg`: Action for burn cxvg.
-
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `get-balance` | `(get-balance (who principal))` | Returns the voting power balance of a specific user. |
+| `mint` | `(mint (amount uint) (recipient principal))` | Issues voting power. Authorized by governance only. |
 
 ## Integration Examples (How-to)
-### Calling Tokens from other modules
-Use the standard trait patterns. For example:
+
+### Checking Token Balance
+Standard SIP-010 balance check:
 ```clarity
-(contract-call? .conxian-protocol get-module "tokens")
+(let ((balance (unwrap-panic (contract-call? .cxd-token get-balance tx-sender))))
+  (print balance)
+)
+```
+
+### Delegating Voting Power
+Users can delegate their governance influence:
+```clarity
+(contract-call? .cxd-token delegate .governance-agent)
 ```
 
 ## Testing (How-to)
@@ -96,5 +52,5 @@ Comprehensive validation is performed using the Vitest framework.
 ## Status (Reference)
 - Implementation: Production-Ready (v1.2.0)
 - Audit Status: Internally Verified
-- BIP Compliance: BIP-341, BIP-342, BIP-174
-- Standard: Hexagonal, 60/20/20 split
+- SIP Compliance: SIP-010
+- Standard: Hexagonal, Nakamoto Ready
