@@ -91,9 +91,12 @@ For contribution guidelines, please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Status
 
-- **Maturity Level**: 🟢 **Foundational Stable** (Root-to-Leaf Overhaul - Feb 2026)
+- **Maturity Level**: 🟡 **Foundational Remediation** (Circular Dependency Recovery - Feb 2026)
 - **Performance**: ⚡ **[Verified Benchmarks](docs/BENCHMARKS.md)** (Avg. < 20ms execution)
 - **Strategy**: 📖 **[Research & Strategic Analysis](docs/RESEARCH.md)** (2026 Update)
+- **Revenue Distribution**:
+  - **Sovereign Baseline**: 60/20/20 (Dividends/R&D/Insurance).
+  - **Active Performance (CXIP-013)**: 45/30/15/5/5 Dynamic Baseline.
 - **Completed Repairs**:
   - ✅ **Root-to-Leaf Consolidation**: Liquidation logic centralized in `risk-manager`.
   - ✅ **TVL Normalization**: Repaired cross-token decimal aggregation in `finance-metrics`.
@@ -107,7 +110,7 @@ For contribution guidelines, please see [CONTRIBUTING.md](CONTRIBUTING.md).
   - ✅ P6: Operational Safety (rate limiter, proof-of-reserves)
 - **Architecture**: Full Truth Alignment achieved across Core, DEX, Governance, Economics, and Security.
 - **Nakamoto Ready**: All contracts use `burn-block-height` and Epoch 3.0 standards.
-- **Testing Status**: Circular dependency issues identified in Simnet environment. Core logic syntactically verified.
+- **Testing Status**: Circular dependency issues identified in Simnet environment. Core logic syntactically verified. Remediation in progress.
 
 ---
 

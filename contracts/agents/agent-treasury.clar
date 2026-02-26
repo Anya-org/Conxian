@@ -10,6 +10,10 @@
 (define-data-var current-fiscal-state uint u1) ;; 0=CRISIS, 1=STABILITY, 2=ABUNDANCE
 (define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
+;; Principal Injection
+(define-data-var agent-risk-principal principal .agent-risk)
+(define-data-var cxd-treasury-principal principal .cxd-treasury)
+
 ;; CXIP-013 Equilibrium Baseline (bps)
 (define-constant BASELINE_TREASURY u4500)
 (define-constant BASELINE_BOUNTY   u3000)
@@ -127,10 +131,12 @@
 
 ;; Admin Functions
 
-(define-public (initialize (new-owner principal))
+(define-public (initialize (new-owner principal) (risk principal) (treasury principal))
   (begin
-    (asserts! (or (is-eq tx-sender tx-sender) (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
     (var-set contract-owner new-owner)
+    (var-set agent-risk-principal risk)
+    (var-set cxd-treasury-principal treasury)
     (ok true)
   )
 )
