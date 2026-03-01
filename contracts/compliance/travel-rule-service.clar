@@ -1,51 +1,43 @@
 ;; travel-rule-service.clar
 ;; Conxian Enterprise Standard: Travel Rule Service (IVMS101 Compliant Audit Trail)
-;; Implements FATF Recommendation 16 for on-chain audit of off-chain data exchange.
-;; Tier 0: Automated Compliance Logging
+;; Manages VASP registration and transaction logging.
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u9000)
 (define-constant ERR_INVALID_DATA u9001)
 
 ;; Data Vars
-(define-data-var compliance-admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var admin principal tx-sender)
 
 ;; Maps
 (define-map registered-vasps (string-ascii 20) bool)
+;; Map: TxRef -> Ivms101Hash
+(define-map travel-rule-logs (buff 32) (buff 32))
 
-;; VASP Management
+;; Authorization
+(define-private (is-admin) (is-eq tx-sender (var-get admin)))
+
+;; Public Functions
+
 (define-public (register-vasp (vasp-id (string-ascii 20)))
     (begin
-        (asserts! (is-eq tx-sender (var-get compliance-admin)) (err ERR_UNAUTHORIZED))
+        (asserts! (is-admin) (err ERR_UNAUTHORIZED))
         (map-set registered-vasps vasp-id true)
         (ok true)
     )
 )
 
-(define-read-only (is-vasp-registered (vasp-id (string-ascii 20)))
-    (default-to false (map-get? registered-vasps vasp-id))
-)
-
-;; Events
-(define-private (emit-event (event (string-ascii 32)) (data (optional (buff 256))))
-    (print { event: event, data: data, block: burn-block-height })
-)
-
-;; @desc Log IVMS101 Data Hash for Travel Rule Compliance
-;; This function creates an immutable record that Travel Rule data was exchanged for a transaction.
-;; The actual PII (IVMS101 payload) is exchanged off-chain between VASPs or Wallets.
-;; The hash anchors that data to the blockchain for auditability.
 (define-public (log-travel-rule-data 
-        (transaction-ref (buff 32)) ;; Unique ID for the transfer (e.g. hash of inputs)
-        (ivms101-hash (buff 32))    ;; SHA256 of the IVMS101 JSON payload
-        (originator-vasp (string-ascii 20)) ;; LEI or VASP ID
-        (beneficiary-vasp (string-ascii 20)) ;; LEI or VASP ID
+        (transaction-ref (buff 32))
+        (ivms101-hash (buff 32))
+        (originator-vasp (string-ascii 20))
+        (beneficiary-vasp (string-ascii 20))
         (amount uint)
         (token principal)
     )
     (begin
-        ;; In a full system, we might verify the caller is a registered VASP or the Vault.
-;; For now, we allow any compliant entity to log (Open Audit).
+        (asserts! (or (is-vasp-registered originator-vasp) (is-admin)) (err ERR_UNAUTHORIZED))
+        (map-set travel-rule-logs transaction-ref ivms101-hash)
         (print {
             event: "travel-rule-log",
             tx-ref: transaction-ref,
@@ -60,11 +52,16 @@
     )
 )
 
-;; @desc Validate if a transfer requires Travel Rule data
-;; Returns true if amount > threshold (e.g. 1000 USD/EUR equiv)
+;; Read-only Functions
+
+(define-read-only (is-vasp-registered (vasp-id (string-ascii 20)))
+    (default-to false (map-get? registered-vasps vasp-id))
+)
+
+(define-read-only (get-log (tx-ref (buff 32)))
+    (map-get? travel-rule-logs tx-ref)
+)
+
 (define-read-only (requires-travel-rule (amount uint))
-    ;; Mock threshold logic. Ideally calls an Oracle for Fiat value.
-    ;; Assuming 1 unit = 1 satoshi for sBTC. 100,000,000 sats = 1 BTC.
-    ;; Threshold: ~$1000. If BTC = $100k, then 0.01 BTC = 1,000,000 sats.
     (> amount u1000000)
 )

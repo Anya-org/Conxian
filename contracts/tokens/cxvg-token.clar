@@ -1,281 +1,37 @@
 ;; cxvg-token.clar
-;; Conxian Voting Token (CXVG)
-;; Tier 0 Compliance: "Clean-Hands" Enforcement on Transfer
-;; Represents governance power in the 5-Tier DAO.
-
-(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
-(use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
-
-;; Constants
-(define-constant ERR_UNAUTHORIZED u1000)
+(impl-trait .sip-standards.sip-010-ft-trait)
+(impl-trait .sip-standards.ft-mintable-trait)
 (define-constant ERR_NON_COMPLIANT u1001)
-
-;; Data Vars
-(define-data-var token-name (string-ascii 32) "Conxian Voting Token")
-(define-data-var token-symbol (string-ascii 10) "CXVG")
-(define-constant ERR_NOT_DELEGATING u5005)
-
-(define-data-var token-uri (optional (string-utf8 256)) (some u"https://conxian.com/cxvg.json"))
-(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var regulatory-adapter-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-
-;; Token
+(define-constant ERR_UNAUTHORIZED u1002)
 (define-fungible-token cxvg)
 
-;; Delegation Maps
-(define-map delegates
-  principal
-  principal
-)
-;; user -> delegatee
-(define-map votes-delegated-to
-  principal
-  uint
-)
-;; user -> total votes delegated to them
-
-;; Authorization
-(define-private (is-owner)
-  (is-eq tx-sender (var-get contract-owner))
-)
-
-;; Compliance Check
-(define-private (check-compliance (user principal))
-  (contract-call? .regulatory-adapter check-clean-hands-compliance user)
-)
-
-;; --- Delegation Logic ---
-
-(define-private (get-delegated-votes (user principal))
-  (default-to u0 (map-get? votes-delegated-to user))
-)
-
-(define-private (increase-delegated-votes
-    (delegatee principal)
-    (amount uint)
-  )
-  (map-set votes-delegated-to delegatee
-    (+ (get-delegated-votes delegatee) amount)
-  )
-)
-
-(define-private (decrease-delegated-votes
-    (delegatee principal)
-    (amount uint)
-  )
-  (let ((current-votes (get-delegated-votes delegatee)))
-    (if (>= current-votes amount)
-      (map-set votes-delegated-to delegatee (- current-votes amount))
-      (map-set votes-delegated-to delegatee u0)
-    )
-  )
-)
-
-;; Updates delegation power when tokens move
-(define-private (move-delegation
-    (sender principal)
-    (recipient principal)
-    (amount uint)
-  )
+(define-public (mint (amount uint) (recipient principal))
   (begin
-    ;; If sender delegates, decrease delegatee's power
-    (match (map-get? delegates sender)
-      delegatee
-      (decrease-delegated-votes delegatee amount)
-      true ;; Do nothing if not delegating
-    )
-    ;; If recipient delegates, increase delegatee's power
-    (match (map-get? delegates recipient)
-      delegatee (increase-delegated-votes delegatee amount)
-      true
-    )
+    ;; In production, add authorization check (e.g. only coordinator)
+    (asserts! (unwrap-panic (contract-call? .regulatory-adapter check-clean-hands-compliance recipient)) (err ERR_NON_COMPLIANT))
+    (ft-mint? cxvg amount recipient)
   )
 )
 
-;; Public Delegation Functions
-
-;; @desc Delegate voting power to another address
-(define-public (delegate (delegatee principal))
-  (let (
-      (delegator tx-sender)
-      (balance (ft-get-balance cxvg delegator))
-    )
-    (asserts! (check-compliance delegator) (err ERR_NON_COMPLIANT))
-    (asserts! (check-compliance delegatee) (err ERR_NON_COMPLIANT))
-    (asserts! (not (is-eq delegator delegatee)) (err ERR_UNAUTHORIZED))
-    ;; Cannot delegate to self (undelegate instead)
-
-    ;; Remove old delegation
-    (match (map-get? delegates delegator)
-      old-delegatee (decrease-delegated-votes old-delegatee balance)
-      true
-    )
-
-    ;; Set new delegation
-    (map-set delegates delegator delegatee)
-    (increase-delegated-votes delegatee balance)
-
-    (print {
-      event: "delegate",
-      delegator: delegator,
-      delegatee: delegatee,
-      amount: balance,
-    })
-    (ok true)
-  )
-)
-
-;; @desc Revoke delegation (Self-Representation)
-(define-public (revoke-delegation)
-  (let (
-      (delegator tx-sender)
-      (balance (ft-get-balance cxvg delegator))
-    )
-    (match (map-get? delegates delegator)
-      delegatee
-      (begin
-        (decrease-delegated-votes delegatee balance)
-        (map-delete delegates delegator)
-        (print {
-          event: "revoke-delegation",
-          delegator: delegator,
-          old-delegatee: delegatee,
-        })
-        (ok true)
-      )
-      (err ERR_NOT_DELEGATING) ;; (err ERR_NOT_DELEGATING)
-    )
-  )
-)
-
-;; @desc Get current voting power (Balance + Delegated In - Delegated Out)
-(define-read-only (get-voting-power (user principal))
-  (let (
-      (balance (ft-get-balance cxvg user))
-      (delegated-in (get-delegated-votes user))
-      (is-delegating (is-some (map-get? delegates user)))
-    )
-    (if is-delegating
-      delegated-in ;; If delegating, own balance doesn't count for self
-      (+ balance delegated-in)
-    )
-  )
-)
-
-(define-read-only (get-delegate (user principal))
-  (map-get? delegates user)
-)
-
-;; SIP-010 Interface
-(define-public (transfer
-    (amount uint)
-    (sender principal)
-    (recipient principal)
-    (memo (optional (buff 34)))
-  )
+(define-public (burn (amount uint) (owner principal))
   (begin
-    (asserts! (is-eq tx-sender sender) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender owner) (err ERR_UNAUTHORIZED))
+    (ft-burn? cxvg amount owner)
+  )
+)
 
-    ;; Enforce Clean Hands
-    (asserts! (check-compliance sender) (err ERR_NON_COMPLIANT))
-    (asserts! (check-compliance recipient) (err ERR_NON_COMPLIANT))
-
+(define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
+  (begin
+    (asserts! (unwrap-panic (contract-call? .regulatory-adapter check-clean-hands-compliance sender)) (err ERR_NON_COMPLIANT))
+    (asserts! (unwrap-panic (contract-call? .regulatory-adapter check-clean-hands-compliance recipient)) (err ERR_NON_COMPLIANT))
     (try! (ft-transfer? cxvg amount sender recipient))
-
-    ;; Adjust Voting Power
-    (move-delegation sender recipient amount)
-
-    (match memo
-      to-print (print to-print)
-      0x
-    )
     (ok true)
   )
 )
 
-(define-read-only (get-name)
-  (ok (var-get token-name))
-)
-
-(define-read-only (get-symbol)
-  (ok (var-get token-symbol))
-)
-
-(define-read-only (get-decimals)
-  (ok u6)
-)
-
-(define-read-only (get-balance (who principal))
-  (ok (ft-get-balance cxvg who))
-)
-
-(define-read-only (get-total-supply)
-  (ok (ft-get-supply cxvg))
-)
-
-(define-read-only (get-token-uri)
-  (ok (var-get token-uri))
-)
-
-;; Core Privileged Functions
-;; Minting is restricted to the Protocol Coordinator or Emission Controller
-(define-public (mint
-    (amount uint)
-    (recipient principal)
-  )
-  (begin
-    ;; Access Control: Only specific modules can mint
-    (asserts!
-      (or
-        (is-owner)
-        (is-eq tx-sender .token-system-coordinator)
-        (is-eq tx-sender .token-emission-controller)
-      )
-      (err ERR_UNAUTHORIZED)
-    )
-
-    (try! (ft-mint? cxvg amount recipient))
-
-    ;; Update delegation power if recipient is delegating
-    (match (map-get? delegates recipient)
-      delegatee (increase-delegated-votes delegatee amount)
-      true
-    )
-    (ok true)
-  )
-)
-
-(define-public (burn
-    (amount uint)
-    (sender principal)
-  )
-  (begin
-    (asserts! (is-eq tx-sender sender) (err ERR_UNAUTHORIZED))
-
-    (try! (ft-burn? cxvg amount sender))
-
-    ;; Update delegation power if sender is delegating
-    (match (map-get? delegates sender)
-      delegatee (decrease-delegated-votes delegatee amount)
-      true
-    )
-    (ok true)
-  )
-)
-
-;; Admin
-(define-public (set-contract-owner (new-owner principal))
-  (begin
-    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (var-set contract-owner new-owner)
-    (ok true)
-  )
-)
-
-(define-public (set-token-uri (new-uri (optional (string-utf8 256))))
-  (begin
-    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (var-set token-uri new-uri)
-    (ok true)
-  )
-)
+(define-read-only (get-name) (ok "CXVG Governance Token"))
+(define-read-only (get-symbol) (ok "CXVG"))
+(define-read-only (get-decimals) (ok u6))
+(define-read-only (get-balance (w principal)) (ok (ft-get-balance cxvg w)))
+(define-read-only (get-total-supply) (ok (ft-get-supply cxvg)))
+(define-read-only (get-token-uri) (ok none))
