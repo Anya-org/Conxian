@@ -39,7 +39,8 @@ Total revenue is dynamically distributed via the **Fiscal Dam** system (CXIP-013
 
 - **Clarity 4**: Nakamoto-native (Epoch 3.0) utilizing `stacks-block-time` for precision and `burn-block-height` for Bitcoin tenure.
 - **Tenure Awareness**: Logic is aware of Stacks block tenures via `block-utils` for deterministic execution.
-- **Facade Pattern**: All core logic accessed via dimensional facades and consolidated traits.
+- **Hexagonal Architecture**: Separation of concerns between core logic (Engines), state management (Managers), and external interfaces (Facades).
+- **BIP Compliance**: Standards-aligned with BIP-341 (Taproot), BIP-342 (Tapscript), and BIP-174 (PSBT).
 - **Hybrid Oracle**: Aggregated Pyth, Redstone, and Switchboard feeds with deviation guards.
 
 ## Repository Structure

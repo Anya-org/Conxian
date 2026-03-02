@@ -25,6 +25,14 @@ Fixed-point arithmetic.
 |----------|-----------|-------------|
 | `mul-div` | `(mul-div (a uint) (b uint) (c uint))` | Performs `(a * b) / c` with internal 128-bit precision. |
 
+## Integration Examples (How-to)
+
+### Scaling Values
+To scale a value by a precision factor:
+```clarity
+(contract-call? .math-utilities mul-div u100 u100000000 u100) ;; Identity scale
+```
+
 ## Testing (How-to)
 Comprehensive validation is performed using the Vitest framework.
 1. Install dependencies: `npm install`
