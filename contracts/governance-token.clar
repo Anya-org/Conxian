@@ -50,30 +50,50 @@
 )
 
 ;; SIP-010 Functions
+
+;; @desc Get token name
+;; @returns (response (string-ascii 32) uint)
 (define-read-only (get-name)
   (ok (var-get token-name))
 )
 
+;; @desc Get token symbol
+;; @returns (response (string-ascii 10) uint)
 (define-read-only (get-symbol)
   (ok (var-get token-symbol))
 )
 
+;; @desc Get token decimals
+;; @returns (response uint uint)
 (define-read-only (get-decimals)
   (ok (var-get token-decimals))
 )
 
+;; @desc Get balance of an account
+;; @param account (principal)
+;; @returns (response uint uint)
 (define-read-only (get-balance (account principal))
   (ok (default-to u0 (get amount (map-get? token-balances { account: account }))))
 )
 
+;; @desc Get total token supply
+;; @returns (response uint uint)
 (define-read-only (get-total-supply)
   (ok (var-get token-supply))
 )
 
+;; @desc Get token URI
+;; @returns (response (optional (string-utf8 256)) uint)
 (define-read-only (get-token-uri)
   (ok (var-get token-uri))
 )
 
+;; @desc Transfer tokens to a recipient
+;; @param amount (uint)
+;; @param sender (principal)
+;; @param recipient (principal)
+;; @param memo (optional (buff 34))
+;; @returns (response bool uint)
 (define-public (transfer
     (amount uint)
     (sender principal)
@@ -106,6 +126,10 @@
 )
 
 ;; Governance Token Trait Functions
+
+;; @desc Get voting power of an account
+;; @param account (principal)
+;; @returns (response uint uint)
 (define-read-only (get-voting-power (account principal))
   (let (
       (balance (unwrap! (get-balance account) (err ERR_UNAUTHORIZED)))
@@ -117,6 +141,10 @@
   )
 )
 
+;; @desc Get voting power of an account at a specific block height
+;; @param account (principal)
+;; @param height (uint)
+;; @returns (response uint uint)
 (define-read-only (get-voting-power-at
     (account principal)
     (height uint)
@@ -124,16 +152,25 @@
   (get-voting-power account)
 )
 
+;; @desc Check if an account has any voting power
+;; @param account (principal)
+;; @returns (response bool uint)
 (define-public (has-voting-power (account principal))
   (let ((power (unwrap! (get-voting-power account) (err ERR_UNAUTHORIZED))))
     (ok (> power u0))
   )
 )
 
+;; @desc Get total voting power in circulation
+;; @returns (response uint uint)
 (define-read-only (get-total-voting-power)
   (ok (var-get token-supply))
 )
 
+;; @desc Delegate voting power to another account
+;; @param delegate (principal)
+;; @param amount (uint)
+;; @returns (response bool uint)
 (define-public (delegate-voting-power
     (delegate principal)
     (amount uint)
@@ -179,6 +216,10 @@
   )
 )
 
+;; @desc Undelegate voting power from another account
+;; @param delegate (principal)
+;; @param amount (uint)
+;; @returns (response bool uint)
 (define-public (undelegate-voting-power
     (delegate principal)
     (amount uint)
@@ -267,6 +308,10 @@
 )
 
 ;; Administrative Functions
+
+;; @desc Set minter principal
+;; @param new-minter (principal)
+;; @returns (response bool uint)
 (define-public (set-minter (new-minter principal))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
@@ -276,6 +321,11 @@
 )
 
 ;; Mint and Burn (for minter contract only)
+
+;; @desc Mint tokens to a recipient
+;; @param amount (uint)
+;; @param recipient (principal)
+;; @returns (response bool uint)
 (define-public (mint
     (amount uint)
     (recipient principal)
@@ -294,6 +344,10 @@
   )
 )
 
+;; @desc Burn tokens from an owner
+;; @param amount (uint)
+;; @param owner (principal)
+;; @returns (response bool uint)
 (define-public (burn
     (amount uint)
     (owner principal)

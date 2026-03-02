@@ -29,6 +29,9 @@ This module serves as the "Interface Layer" of the protocol's Hexagonal Architec
 |-------|-------------|
 | `office-job-trait` | Interface for autonomous agent tasks (Staff). |
 
+## Core Contracts (Reference)
+The protocol core traits are housed in `contracts/traits/`, which act as the global interface registry for all executive and managerial contracts.
+
 ## Integration Examples (How-to)
 
 ### Implementing a Custom Oracle

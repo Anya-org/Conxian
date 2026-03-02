@@ -42,6 +42,9 @@ Error codes are categorized by functional domain:
 | `u3002` | `ERR_ALREADY_VOTED` | User has already cast a vote for this proposal. |
 | `u3005` | `ERR_VOTING_ENDED` | Attempted to vote after the deadline. |
 
+## Core Contracts (Reference)
+Individual contracts define their own domain-specific constants but must fall within the specified ranges to prevent collisions during aggregation.
+
 ## Integration Examples (How-to)
 
 ### Standard Error Handling in Clarity
@@ -54,6 +57,9 @@ Always use `unwrap!` or `asserts!` with standardized error codes:
   )
 )
 ```
+
+## Testing (How-to)
+Error code consistency is verified across the entire suite of integration tests. Functional tests for each module ensure that the correct error code is returned for specific failure conditions (e.g., `tests/core/conxian-protocol.test.ts` for `ERR_UNAUTHORIZED`).
 
 ## Status (Reference)
 - Implementation: Finalized (v1.2.0)

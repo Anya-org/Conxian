@@ -40,7 +40,10 @@
 ;; --- Risk Assessment ---
 
 
-;; @desc Set predictive params
+;; @desc Set predictive risk parameters
+;; @param new-depth (uint)
+;; @param new-vol (uint)
+;; @param new-cong (uint)
 ;; @returns (response bool uint)
 (define-public (set-predictive-params (new-depth uint) (new-vol uint) (new-cong uint))
   (begin
@@ -52,10 +55,14 @@
   )
 )
 
+;; @desc Get contract owner principal
+;; @returns principal
 (define-read-only (get-contract-owner)
   (var-get contract-owner)
 )
 
+;; @desc Assess current system-wide risk score
+;; @returns uint
 (define-read-only (assess-system-risk)
   (let (
     (l-risk (if (> u10000 (var-get liquidity-depth)) (- u10000 (var-get liquidity-depth)) u0))
@@ -66,6 +73,8 @@
   )
 )
 
+;; @desc Get performance metrics for fiscal analysis
+;; @returns {tvl: uint, last-month-tvl: uint, tvl-growth-bps: uint, bounty-completion-rate: uint}
 (define-read-only (get-performance-metrics)
   {
     tvl: (var-get total-value-locked),
@@ -77,6 +86,8 @@
   }
 )
 
+;; @desc Internal calculation for Global Collateral Ratio
+;; @returns uint
 (define-read-only (get-gcr-internal)
   (let (
     (score (assess-system-risk))
@@ -90,7 +101,7 @@
 )
 
 
-;; @desc Update pid rates
+;; @desc Update stability fee using PID controller
 ;; @returns (response bool uint)
 (define-public (update-pid-rates)
   (begin
@@ -120,15 +131,18 @@
 
 ;; --- Automation Interface ---
 
-;; @desc Check work needed
+;; @desc Check if maintenance work is needed
 ;; @returns (response bool uint)
 (define-public (check-work-needed) (ok false))
 
-;; @desc Do work
+;; @desc Execute protocol maintenance work
+;; @param job-data (buff 2048)
 ;; @returns (response bool uint)
 (define-public (do-work (job-data (buff 2048))) (ok true))
 
 ;; --- Cybernetic Intelligence ---
+;; @desc Get high-level cybernetic intelligence data
+;; @returns {health-score: uint, financial-gcr: uint, operational-fee: uint, timestamp: uint}
 (define-read-only (get-cybernetic-intel)
   {
     health-score: (assess-system-risk),
@@ -139,15 +153,17 @@
 )
 
 
-;; @desc Get health factor
-;; @returns (response bool uint)
+;; @desc Get health factor for a specific position
+;; @param position-id (uint)
+;; @returns (response uint uint)
 (define-public (get-health-factor (position-id uint))
   (ok u10000)
 )
 
 ;; --- Admin Functions ---
 
-;; @desc Initialize
+;; @desc Initialize agent contract
+;; @param owner (principal)
 ;; @returns (response bool uint)
 (define-public (initialize (owner principal))
   (begin
@@ -158,7 +174,8 @@
 )
 
 
-;; @desc Set ops engine
+;; @desc Set ops engine principal
+;; @param new-ops (principal)
 ;; @returns (response bool uint)
 (define-public (set-ops-engine (new-ops principal))
   (begin
@@ -168,10 +185,13 @@
   )
 )
 
+;; @desc Get Global Collateral Ratio
+;; @returns (response uint uint)
 (define-read-only (get-gcr) (ok (get-gcr-internal)))
 
 
-;; @desc Set mock gcr
+;; @desc Set mock Global Collateral Ratio for testing
+;; @param new-gcr (uint)
 ;; @returns (response bool uint)
 (define-public (set-mock-gcr (new-gcr uint))
   (begin
@@ -182,7 +202,10 @@
 )
 
 
-;; @desc Set tvl
+;; @desc Set TVL and performance metrics
+;; @param new-tvl (uint)
+;; @param new-last-month (uint)
+;; @param new-bounty-rate (uint)
 ;; @returns (response bool uint)
 (define-public (set-tvl (new-tvl uint) (new-last-month uint) (new-bounty-rate uint))
   (begin
