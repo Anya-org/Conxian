@@ -23,7 +23,6 @@
 
 ## 📜 Proposals (CXIPs)
 * [CXIP-013: Revenue Distribution](Conxian/CXIP-013.md)
-* [CXIP-015: Bitcoin Stablecoins](Conxian/CXIP-015.md)
 
 ## 🏗️ Infrastructure
 * [Cloud Roadmap](03_infrastructure/cloud-roadmap.md)
