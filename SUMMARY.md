@@ -18,6 +18,8 @@
 * [Market Timing](02_strategy/market-timing.md)
 * [Funding Tiers](02_strategy/funding-tiers.md)
 * [7 Powers Report](02_strategy/7_POWERS_ENHANCEMENT_REPORT.md)
+* [ATS Standard (2026)](02_strategy/ATS_TEMPLATE.md)
+* [AgentOps Specification](02_strategy/AGENT_OPS_SPEC.md)
 
 ## 🏗️ Infrastructure
 * [Cloud Roadmap](03_infrastructure/cloud-roadmap.md)
