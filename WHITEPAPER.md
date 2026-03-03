@@ -31,7 +31,7 @@ Aligned with the **[Strategic Alignment (ALIGNMENT.md)](./ALIGNMENT.md)**.
 - **Phase 1-3 (Completed)**: Foundation, L1/L2 core, and sBTC integration.
 - **Phase 4 (Completed)**: Interoperability via Wormhole NTT and sovereign bridging.
 - **Phase 5 (Active)**: Global Liquidity Mesh, Risk Oracle, and Gateway Institutional Beta.
-- **Phase 6 (Next)**: Sovereign AI-Driven Asset Allocation and Universal Bitcoin Identity.
+- **Phase 6 (Next)**: Sovereign AI (Conxient)-Driven Asset Allocation and Universal Bitcoin Identity.
 
 ---
 © 2026 Conxian Labs. Sovereign Autonomous Business.

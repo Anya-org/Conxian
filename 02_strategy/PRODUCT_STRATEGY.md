@@ -4,57 +4,44 @@ layout: page
 permalink: /docs/product-strategy
 ---
 
-# Conxius Product Strategy: The Sovereign Super-App
+# Conxian Product Strategy: Vertical Sovereignty
 
-**Vision:** To be the single, secure gateway for the entire Bitcoin ecosystem, bridging the gap between hardware-grade security and mobile-first utility.
+**Vision:** To build the definitive institutional and retail interface for Bitcoin-native finance, powered by autonomous intelligence (Conxient).
 
-## 1. The Conclave Gap (Value Proposition)
+## 1. Value Proposition: The Bitcoin-Native Moat
 
-Market analysis reveals a critical void:
-- **Hardware Wallets:** High security, zero mobility, high friction.
-- **Hot Wallets:** High utility, high risk, vulnerable to OS exploits.
-- **The Conclave Solution:** Mobile TEE (StrongBox) isolation provides hardware-grade security with the seamless UX of a modern smartphone.
+Conxian focuses on **Vertical Sovereignty**:
+- **Hardware-Enforced Logic**: All signing and intent verification occurs in the TEE/StrongBox.
+- **Protocol-First Interoperability**: Direct L1-to-L2 integrations (sBTC, L-BTC) rather than high-risk cross-chain bridges.
+- **Agentic Automation**: Transitioning users from active traders to strategic architects via the Conxient AI Engine.
 
-## 2. Competitive Dominance: "Sovereign Rails"
+## 2. Competitive Advantage: 7 Powers Alignment
 
-Conxius wins on two fronts:
-1.  **Price & Speed:** Our SAF (Sovereignty-Adjusted Fee) model and Persistent Crypto Worker ensure we are the fastest and cheapest entry point to Bitcoin L2s.
-2.  **Infrastructure Sovereignty:** Unlike competitors who rely on public APIs, Conxius is deploying the **"Real Rails"** (dedicated proxies and transceivers) to guarantee user execution.
+| Power | Conxian Implementation |
+| :--- | :--- |
+| **Network Economies** | SAB framework as the default settlement layer for AI agents (KYA). |
+| **Switching Costs** | Deep ERP integration (SAP/Oracle) for automated corporate treasury. |
+| **Counter-Positioning** | Mandating TEE security, making retail hot-wallets look "obsolete." |
+| **Process Power** | Opaque and complex multi-chain routing via Wormhole NTT. |
 
-## 3. The Sovereign Retention Cycle (The Flywheel)
+## 3. The Conxient Flywheel (Phase 6)
 
-### Phase A: Acquisition (The "Sovereign Rails" Hook)
-We pull users from fragmented wallets into a unified Bitcoin interface that "just works" for every layer (L1, Lightning, Stacks, RGB).
+1. **Reputation**: Users build Universal Bitcoin Identity (UBI) through cross-layer activity.
+2. **Intelligence**: Conxient analyzes UBI and provides sovereign allocation insights.
+3. **Execution**: One-click rebalancing across the Global Liquidity Mesh.
+4. **Retention**: Hardware-attested reputation creates high exit barriers.
 
-### Phase B: Activation (Sovereignty Quests)
-Users are gamified into securing their accounts.
-*   **Quest 1: The Vault:** Enable StrongBox/TEE.
-*   **Quest 2: The Sentry:** Complete Play Integrity attestation.
-*   **Quest 3: The Ghost:** Enable Tor and Silent Payments.
-*   **Reward:** Higher **Sovereignty Score** unlocks lower fees and B2B "Citadel" features.
+## 4. Operational Roadmap (2026 Focus)
 
-### Phase C: Retention (Institutional Lock-in)
-For B2B users, the wallet becomes part of their corporate governance. The "switching cost" is the security of their entire treasury.
-
-### Phase D: Monetization (B2B Expansion)
-Retail success feeds the **Conclave SDK** and **Conxian Gateway** institutional adoption.
-
-## 4. Multi-Layer Roadmap (Phase 4 Alignment)
-
-| Milestone | Feature | Status |
+| Milestone | Deliverable | Focus |
 | :--- | :--- | :--- |
-| **M1-M11** | Core L1/L2, Bridge, Privacy v1, BitVM | COMPLETED |
-| **M12: Real Rails** | Infrastructure (Changelly/Bisq Proxies) | **ACTIVE** |
-| **M13: Musig2** | Taproot Aggregated Multi-Sig | Q3 2026 |
-| **M14: RGB Pro** | Full WASM Client-Side Validation | Q3 2026 |
-| **M15: Privacy Hub** | WabiSabi Coordinator Integration | Q4 2026 |
-
-## 5. Success Metrics
-*   **Infrastructure Uptime:** Reliability of the "Real Rails".
-*   **Total Sovereignty Score (TSS):** Aggregate security health of the user base.
-*   **B2B Conversion Rate:** Adoption of the Conclave SDK by 3rd-party devs.
+| **M12: Real Rails** | Changelly/Bisq Proxy Deployment | Deployment |
+| **M13: Musig2** | Taproot Musig2 Institutional Quorums | Security |
+| **M14: RGB Pro** | Full RGB-WASM Client-Side Validation | Native Assets |
+| **M15: Conxient Ops**| AI-Driven AgentOps 1.0 | Agentic Finance |
+| **M16: SSI Trust** | Universal Bitcoin Identity (UBI) | Sovereignty |
+| **M17: Privacy Hub** | WabiSabi Coordinator Integration | Privacy |
 
 ---
 
----
 [Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)

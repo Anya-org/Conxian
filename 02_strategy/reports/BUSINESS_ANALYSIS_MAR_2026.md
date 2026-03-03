@@ -27,7 +27,7 @@ By executing the M12 "Real Rails" milestone, Conxian will deploy its own dedicat
 *   **Sovereignty Impact:** Removes the ability for third-party RPC providers to censor transactions, perfectly aligning with the "Code is Law" philosophy. 
 
 ## 4. Identified Gaps & Recommendations (Q2/Q3 2026)
-While the foundation is secure, the following vectors require immediate engineering bandwidth to finalize Phase 5 and move to Phase 6 (Sovereign AI):
+While the foundation is secure, the following vectors require immediate engineering bandwidth to finalize Phase 5 and move to Phase 6 (Conxient) (Sovereign AI):
 
 1.  **Deploy M12 Proxies:** The strategy is documented, but the actual GCP Cloud Run proxies and local Bisq daemons need to be physically deployed and connected to the `conxian-gateway`.
 2.  **Complete M13 Musig2:** The `lib-conxian-core` currently holds the cryptographic stub for Taproot Musig2. Full BIP-327 aggregation (Nonce Gen -> Sign -> Aggregate) needs to be wired up for multi-device institutional quorums.

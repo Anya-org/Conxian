@@ -15,7 +15,7 @@ Competitors cannot easily copy this process because it requires:
 2.  **SAB Governance:** Multi-chain pods governed by a single, unified SAB logic.
 3.  **Wormhole Deep Integration:** Native support for NTT's "Transceiver" model, which allows Conxian to define custom verification rules for cross-chain messages.
 
-## 4. Implementation Map (2026 Phase 6)
+## 4. Implementation Map (2026 Phase 6 (Conxient))
 - **Layer 1:** Stacks (Hub) - Sovereign logic and SAB management.
 - **Layer 2:** Solana - High-frequency trading and retail distribution.
 - **Layer 3:** Bitcoin L1 - Final settlement and long-term treasury lock-up.

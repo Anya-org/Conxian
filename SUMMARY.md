@@ -18,6 +18,12 @@
 * [Market Timing](02_strategy/market-timing.md)
 * [Funding Tiers](02_strategy/funding-tiers.md)
 * [7 Powers Report](02_strategy/7_POWERS_ENHANCEMENT_REPORT.md)
+* [ATS Standard 2026](02_strategy/ATS_TEMPLATE.md)
+* [AgentOps Specification](02_strategy/AGENT_OPS_SPEC.md)
+
+## 📜 Proposals (CXIPs)
+* [CXIP-013: Revenue Distribution](Conxian/CXIP-013.md)
+* [CXIP-015: Bitcoin Stablecoins](Conxian/CXIP-015.md)
 
 ## 🏗️ Infrastructure
 * [Cloud Roadmap](03_infrastructure/cloud-roadmap.md)
@@ -42,6 +48,12 @@
 * [Sprint Status - Feb 2026](06_meetings/SPRINT_STATUS_FEB_2026.md)
 * [Meeting with Sizwe](06_meetings/2026-02-26-sizwe.md)
 * [Meeting with Khosa](06_meetings/2026-02-27-khosa.md)
+
+## 📈 Strategy Review
+* [CSO Review - Feb 2026](ALIGNMENT.md#6-chief-strategy-officer-cso--lead-architect-review-feb-2026)
+* [Standardized Product Briefs](internal/strategy/briefs/)
+* [Market Sizing](internal/strategy/MARKET_SIZING.md)
+* [Red Team Assessment](internal/strategy/RED_TEAM_ASSESSMENT.md)
 
 ## 🛡️ Privacy
 * [Sovereign Privacy Report](docs/product-review/SOVEREIGN_PRIVACY_REPORT.md)

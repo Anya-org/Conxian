@@ -6,7 +6,7 @@ This report provides a deep-dive evaluation of the Conxian Labs business archite
 ---
 
 ## 2. Gap Analysis (Current vs. 2026 Objective)
-*   **Network Economies:** Existing SAB documentation focused on internal operations; lacked positioning for AI financial agents and machine-to-machine (M2M) settlement.
+*   **Network Economies:** Existing SAB documentation focused on internal operations; lacked positioning for AI financial agents (Conxient) and machine-to-machine (M2M) settlement.
 *   **Switching Costs:** "The Engine" was isolated from legacy ERP systems, limiting its ability to create organizational lock-in within the "Office of the CFO."
 *   **Counter-Positioning:** Hardware security was marketed as a "feature" rather than a "governance mandate" that structurally excludes browser-based competitors.
 *   **Process Power:** NTT bridging was treated as a standard feature rather than an opaque, complex multichain routing advantage.
@@ -17,7 +17,7 @@ This report provides a deep-dive evaluation of the Conxian Labs business archite
 ## 3. Strategic Enhancements (The 7 Powers)
 
 ### 3.1 Network Economies: Agentic Finance & KYA Protocol
-**Action:** Positioned the SAB framework as the default settlement layer for AI-driven capital.
+**Action:** Positioned the SAB framework as the default settlement layer for Conxient AI-driven capital (Conxient).
 *   **New Protocol:** Developed the **Know Your Agent (KYA)** framework ([03_infrastructure/KYA_PROTOCOL.md](../03_infrastructure/KYA_PROTOCOL.md)) to standardize hardware-attested agent identities.
 *   **Deliverable:** Updated the Conxian Whitepaper ([Conxian/docs/WHITEPAPER.md](../Conxian/docs/WHITEPAPER.md)) to reflect the shift from human-led DAO governance to hardware-gated agentic settlement.
 

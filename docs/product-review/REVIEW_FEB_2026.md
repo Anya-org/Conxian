@@ -17,7 +17,7 @@ Conxian Labs has successfully established a high-integrity, Bitcoin-anchored eco
 *   **State**: **PRODUCTION-READY**. 162+ passing tests.
 *   **Strengths**: TEE/StrongBox hardware security, native Tor integration, and multi-protocol support (BTC, L2s, Sidechains).
 *   **Legal Risk**: Primarily around classification as a Financial Intermediary (CASP/FSP). Mitigated by strictly non-custodial TEE architecture and outsourcing fiat/swap rails to regulated partners (Transak, VALR).
-*   **Opportunities**: Integration of Sovereign AI-Driven Asset Allocation (Phase 6).
+*   **Opportunities**: Integration of Sovereign AI-Driven Asset Allocation (Phase 6 (Conxient)).
 
 ### 2.3 lib-conxian-core (The Stem)
 *   **Role**: Shared Rust/TS Logic & Conxian Gateway.
@@ -78,7 +78,7 @@ The flow from **Vision (Root)** to **Settlement (Leaf)** is technically sound:
 
 ---
 
-## 6. Recommendations for Phase 6
+## 6. Recommendations for Phase 6 (Conxient)
 *   **Prioritize Musig2/RGB-WASM**: Complete these critical technical milestones to unlock institutional treasury and client-side validation.
 *   **Harden Simulation**: Work on custom simulation hooks or scripts to bypass Clarinet C4 limitations.
 *   **Rationalize Token Model**: Simplify the retail user experience to reduce friction for Global South adoption.
