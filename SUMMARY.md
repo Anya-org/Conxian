@@ -53,6 +53,10 @@
 * [Standardized Product Briefs](internal/strategy/briefs/)
 * [Market Sizing](internal/strategy/MARKET_SIZING.md)
 * [Red Team Assessment](internal/strategy/RED_TEAM_ASSESSMENT.md)
+* [Business Unit Review 2026](internal/strategy/business_unit_review_2026.md)
+* [Leaf-to-Root Feedback 2026](internal/strategy/leaf_to_root_feedback_2026.md)
+* [Root-Leaf Alignment Report](internal/strategy/root_leaf_alignment_report.md)
+* [System & Asset Review 2026](internal/strategy/system_asset_review_2026.md)
 
 ## 🛡️ Privacy
 * [Sovereign Privacy Report](docs/product-review/SOVEREIGN_PRIVACY_REPORT.md)
