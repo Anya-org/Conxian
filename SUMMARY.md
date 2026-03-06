@@ -32,6 +32,10 @@
 * [Multichain Routing NTT](03_infrastructure/MULTICHAIN_ROUTING_NTT.md)
 * [ERP Integration](03_infrastructure/ERP_INTEGRATION_MODELS.md)
 
+## ⚙️ Operations
+* [Dev-to-Live Workflow](conxius-platform/WORKFLOW.md)
+* [System Deployment Guide](conxius-platform/DEPLOYMENT.md)
+
 ## ⚖️ Legal & Compliance
 * [MICA & IRS Compliance](04_legal/MICA_IRS_COMPLIANCE_ENCLAVE.md)
 * [Partners & Compliance](04_legal/PARTNERS_AND_COMPLIANCE.md)
