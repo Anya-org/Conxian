@@ -1,158 +1,86 @@
 ;; collateral-manager.clar
-;; Conxian Standard: Collateral Management
-;; Replaces old prototype with RBAC and Trait-driven logic
+;; Standardized Collateral Management for Conxian Protocol
+;; Nakamoto-Aligned (Epoch 3.0 / Clarity 4)
 
-;; Traits
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u1000)
-(define-constant ERR_INSUFFICIENT_BALANCE u2000)
-(define-constant ROLE_PROTOCOL u2)
+(define-constant ERR_PAUSED u1001)
+(define-constant ERR_INSUFFICIENT_BALANCE u1002)
 
-;; Contracts
-(define-data-var conxian-protocol-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var rbac-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+;; Roles
+(define-constant ROLE_PROTOCOL u1)
 
-;; Map: User -> Token -> Amount
-(define-map user-collateral
-  {
-    user: principal,
-    token: principal,
-  }
-  uint
-)
+;; State
+(define-map balances { user: principal, token: principal } uint)
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
-;; @desc Deposits collateral (Signature aligned with tests)
-(define-public (deposit-funds
-    (amount uint)
-    (token-trait <sip-010-trait>)
-  )
+;; --- Core Logic ---
+
+;; @desc Deposit funds
+(define-public (deposit-funds (amount uint) (token-trait <sip-010-trait>))
   (let (
-      (token-principal (contract-of token-trait))
-      (current-balance (default-to u0
-        (map-get? user-collateral {
-          user: tx-sender,
-          token: token-principal,
-        })
-      ))
-      (tenure-id (/ block-height u10))
-    )
+    (user tx-sender)
+    (token-principal (contract-of token-trait))
+    (current-balance (default-to u0 (map-get? balances { user: user, token: token-principal })))
+  )
     (begin
-      (asserts!
-        (not (contract-call? .conxian-protocol is-paused))
-        (err u1001)
-      )
-
-      ;; Transfer tokens to this contract
-      (try! (contract-call? token-trait transfer amount tx-sender (as-contract tx-sender)
-        none
-      ))
-
-      (map-set user-collateral {
-        user: tx-sender,
-        token: token-principal,
-      }
-        (+ current-balance amount)
-      )
-
-      (print {
-        event: "deposit",
-        user: tx-sender,
-        token: token-principal,
-        amount: amount,
-        tenure-id: tenure-id,
-      })
-
+      (asserts! (not (contract-call? .conxian-protocol is-paused)) (err ERR_PAUSED))
+      (try! (contract-call? token-trait transfer amount user (as-contract tx-sender) none))
+      (map-set balances { user: user, token: token-principal } (+ current-balance amount))
+      (print { event: "collateral-deposited", user: user, token: token-principal, amount: amount })
       (ok true)
     )
   )
 )
 
-;; @desc Withdraws collateral
-(define-public (withdraw-funds
-    (amount uint)
-    (token-trait <sip-010-trait>)
-  )
+;; @desc Withdraw funds
+(define-public (withdraw-funds (amount uint) (token-trait <sip-010-trait>))
   (let (
-      (token-principal (contract-of token-trait))
-      (current-balance (default-to u0
-        (map-get? user-collateral {
-          user: tx-sender,
-          token: token-principal,
-        })
-      ))
-    )
+    (user tx-sender)
+    (token-principal (contract-of token-trait))
+    (current-balance (default-to u0 (map-get? balances { user: user, token: token-principal })))
+  )
     (begin
-      (asserts! (not (contract-call? .conxian-protocol is-paused)) (err u1001))
+      (asserts! (not (contract-call? .conxian-protocol is-paused)) (err ERR_PAUSED))
       (asserts! (>= current-balance amount) (err ERR_INSUFFICIENT_BALANCE))
-
-      ;; Transfer tokens back
-      (try! (as-contract (contract-call? token-trait transfer amount tx-sender tx-sender none)))
-
-      (map-set user-collateral {
-        user: tx-sender,
-        token: token-principal,
-      }
-        (- current-balance amount)
-      )
-
-      (print {
-        event: "withdraw",
-        user: tx-sender,
-        token: token-principal,
-        amount: amount,
-        tenure-id: (/ block-height u10),
-      })
-
+      (try! (as-contract (contract-call? token-trait transfer amount tx-sender user none)))
+      (map-set balances { user: user, token: token-principal } (- current-balance amount))
+      (print { event: "collateral-withdrawn", user: user, token: token-principal, amount: amount })
       (ok true)
     )
   )
 )
 
-;; @desc Admin/Risk Manager seizure of collateral (Liquidation)
-(define-public (seize-collateral
-    (user principal)
-    (token principal)
-    (amount uint)
+;; @desc Seize collateral (Liquidation)
+(define-public (seize-collateral (user principal) (token principal) (amount uint))
+  (let (
+    (current-balance (default-to u0 (map-get? balances { user: user, token: token })))
+    ;; Fixed match to use concrete types for simnet stability
+    (is-admin (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_PROTOCOL)))
   )
+    (begin
+      (asserts! (or (is-eq tx-sender (var-get contract-owner)) is-admin) (err ERR_UNAUTHORIZED))
+      (asserts! (>= current-balance amount) (err ERR_INSUFFICIENT_BALANCE))
+      (map-set balances { user: user, token: token } (- current-balance amount))
+      ;; Note: In production, funds would be transferred or credited to insurance
+      (print { event: "collateral-seized", user: user, token: token, amount: amount })
+      (ok true)
+    )
+  )
+)
+
+;; Read-only
+(define-read-only (get-user-balance (user principal) (token principal))
+  (default-to u0 (map-get? balances { user: user, token: token }))
+)
+
+;; Admin
+(define-public (initialize (owner principal))
   (begin
-    (asserts!
-      (or
-        (is-eq tx-sender
-          (contract-call? .conxian-protocol get-admin)
-        )
-        (is-eq (ok true) (contract-call? .conxian-access has-role tx-sender ROLE_PROTOCOL))
-      )
-      (err ERR_UNAUTHORIZED)
-    )
-    (let ((current-balance (default-to u0
-        (map-get? user-collateral {
-          user: user,
-          token: token,
-        })
-      )))
-      (asserts! (>= current-balance amount) (err ERR_INSUFFICIENT_BALANCE))
-      (map-set user-collateral {
-        user: user,
-        token: token,
-      }
-        (- current-balance amount)
-      )
-    )
+    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
+    (var-set contract-owner owner)
     (ok true)
   )
-)
-
-;; Read Only
-(define-read-only (get-collateral-balance
-    (user principal)
-    (token principal)
-  )
-  (ok (default-to u0
-    (map-get? user-collateral {
-      user: user,
-      token: token,
-    })
-  ))
 )
