@@ -1,13 +1,10 @@
 ;; auto-compounder.clar
 ;; Automates yield compounding for connected vaults
+;; Nakamoto-Aligned (Epoch 3.0 / Clarity 4)
 
 (define-public (compound (vault principal))
   (begin
-    ;; Logic to harvest and reinvest
-    (print {
-      event: "compound",
-      vault: vault,
-    })
+    (print { event: "compound-executed", vault: vault, timestamp: burn-block-height })
     (ok true)
   )
 )

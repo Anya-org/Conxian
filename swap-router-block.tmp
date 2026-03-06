@@ -1,0 +1,3 @@
+[contracts.swap-router]
+path = "contracts/dex/swap-router.clar"
+depends_on = [ "admin-facade", "concentrated-liquidity-pool", "conxian-protocol", "mev-protector", "oracle-aggregator", "sip-standards",]
