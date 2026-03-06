@@ -53,8 +53,8 @@
 * [Meeting with Khosa](06_meetings/2026-02-27-khosa.md)
 
 ## 📈 Strategy Review
-* [CSO Review - Feb 2026](ALIGNMENT.md#6-chief-strategy-officer-cso--lead-architect-review-feb-2026)
-* [Standardized Product Briefs](internal/strategy/briefs/)
+* [CSO Review - Feb 2026](ALIGNMENT.md)
+* [Standardized Product Briefs](internal/strategy/briefs/README.md)
 * [Market Sizing](internal/strategy/MARKET_SIZING.md)
 * [Red Team Assessment](internal/strategy/RED_TEAM_ASSESSMENT.md)
 * [Business Unit Review 2026](internal/strategy/business_unit_review_2026.md)
