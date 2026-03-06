@@ -25,3 +25,11 @@
     (response bool uint)
   )
 ))
+
+(define-trait dex-router-trait (
+  (update-volatility-fees
+    ()
+    (response uint uint)
+  )
+)
+)

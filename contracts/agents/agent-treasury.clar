@@ -11,7 +11,7 @@
 ;; @desc Run the fiscal strategy
 (define-public (run-fiscal-strategy)
   (let (
-    (intel (contract-call? .agent-risk get-cybernetic-intel))
+    (intel (unwrap-panic (contract-call? .agent-risk get-cybernetic-intel)))
     (gcr (get financial-gcr intel))
   )
     (begin

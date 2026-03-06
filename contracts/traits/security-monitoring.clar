@@ -1,11 +1,11 @@
 ;; security-monitoring.clar
-;; Centralized trait for security monitoring and circuit breaker functionality
+;; Traits for Security Systems (Circuit Breakers, etc.)
 
-(define-trait circuit-breaker-trait
-  (
-    (is-circuit-breaker-active () (response bool uint))
-    (trigger-circuit-breaker () (response bool uint))
-    (reset-circuit-breaker () (response bool uint))
-    (get-circuit-breaker-status () (response { active: bool, last-triggered: uint, trigger-count: uint } uint))
-  )
-)
+(define-trait circuit-breaker-trait (
+  (is-contract-paused (principal) (response bool uint))
+  (toggle-contract-pause (principal) (response bool uint))
+))
+
+(define-trait monitor-trait (
+  (report-anomaly (principal (buff 256)) (response bool uint))
+))

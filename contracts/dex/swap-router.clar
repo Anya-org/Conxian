@@ -9,16 +9,12 @@
 
 (define-public (update-volatility-fees)
   (let (
-    (vol-res (contract-call? .oracle-aggregator get-volatility-index))
+    (vol (unwrap! (contract-call? .oracle-aggregator get-volatility-index) (err u501)))
+    (new-fee (if (> vol u75) MAX-FEE BASE-FEE))
   )
     (begin
-      (match vol-res
-        vol (let ((new-fee (if (> vol u75) MAX-FEE BASE-FEE)))
-              (begin
-                (var-set current-fee new-fee)
-                (ok new-fee)))
-        err-val (ok BASE-FEE) ;; Default on error to preserve execution
-      )
+      (var-set current-fee new-fee)
+      (ok new-fee)
     )
   )
 )
