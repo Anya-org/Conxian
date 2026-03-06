@@ -32,3 +32,7 @@
     (ok amount-in)
   )
 )
+
+(define-read-only (get-protocol-status)
+  (ok { compliant: true, paused: false, tenure-id: (some (/ block-height u10)), timestamp: burn-block-height, version: "07" })
+)

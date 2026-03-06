@@ -4,19 +4,19 @@ network: simnet
 genesis:
   wallets:
   - name: deployer
-    address: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+    address: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
     balance: '0'
     sbtc-balance: '1000000000'
   - name: wallet_1
-    address: ST2BGVZJ5CK78FRHBCMZ1BK27F5ZAXV093A2GDMB0
+    address: ST1BK09EJ3272K82VQDGGHRCWCSBDSXT0H5D3SVZ9
     balance: '0'
     sbtc-balance: '1000000000'
   - name: wallet_2
-    address: ST3R75S8YHD014QF3RA99ZKBH40FH2TGSVCDKS5Q7
+    address: ST3G0SKJA7KN537NZKX1GCEQE05Q99QB5YEBB863K
     balance: '0'
     sbtc-balance: '1000000000'
   - name: wallet_3
-    address: ST23SHHKQQ7065M77YWXT3031WPWFA5316TQYBNFN
+    address: ST1ECTRH7MDVG58KMZQ1J36RV4MFBNFDQF25CR2DS
     balance: '0'
     sbtc-balance: '1000000000'
   contracts:
@@ -40,127 +40,127 @@ plan:
     transactions:
     - transaction-type: emulated-contract-publish
       contract-name: automation-traits
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/traits/automation-traits.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: conxian-service-trait
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/traits/conxian-service-trait.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: oracle-aggregator
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/oracle/oracle-aggregator.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: agent-risk
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/agents/agent-risk.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: cxd-treasury
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/treasury/cxd-treasury.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: agent-treasury
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/agents/agent-treasury.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: security-monitoring
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/traits/security-monitoring.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: circuit-breaker
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/security/circuit-breaker.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: sip-standards
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/traits/sip-standards.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: core-traits
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/traits/core-traits.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: conxian-access
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/core/conxian-access.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: conxian-insurance-fund
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/security/conxian-insurance-fund.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: conxian-protocol
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/core/conxian-protocol.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: cxd-token
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/tokens/cxd-token.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: defi-traits
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/traits/defi-traits.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: position-nft
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/dimensional/position-nft.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: dimensional-core
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/dimensional/dimensional-core.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: economic-policy-engine
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/core/economic-policy-engine.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: finance-metrics
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/monitoring/finance-metrics.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: lending-manager
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/lending/lending-manager.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: mev-protector
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/security/mev-protector.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: operational-treasury
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/core/operational-treasury.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: swap-router
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/dex/swap-router.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: ops-engine
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/core/ops-engine.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: revenue-distributor
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/treasury/revenue-distributor.clar
       clarity-version: 1
     epoch: '2.05'
@@ -168,7 +168,7 @@ plan:
     transactions:
     - transaction-type: emulated-contract-publish
       contract-name: risk-manager
-      emulated-sender: ST2JRPA7MYM5MP44PWPXYC1CTZP6T014B8STHR1M7
+      emulated-sender: ST1WADVS7S598X8XNY9QWZ1M1DHT78WJH69XRKJ70
       path: contracts/core/risk-manager.clar
       clarity-version: 1
     epoch: '2.05'
