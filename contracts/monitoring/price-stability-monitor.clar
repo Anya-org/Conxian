@@ -3,7 +3,7 @@
 
 (define-read-only (check-peg-status)
   (let (
-    (intel (contract-call? .agent-risk get-cybernetic-intel))
+    (intel (unwrap-panic (contract-call? .agent-risk get-cybernetic-intel)))
     (pid-fee (get operational-fee intel))
     (gcr (get financial-gcr intel))
   )

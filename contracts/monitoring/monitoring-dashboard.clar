@@ -13,10 +13,10 @@
 ;; @desc Aggregate protocol health metrics
 (define-read-only (get-protocol-health)
   (let (
-    (status (contract-call? .conxian-protocol get-protocol-status))
-    (risk (contract-call? .agent-risk get-cybernetic-intel))
-    (metrics (contract-call? .finance-metrics get-protocol-metrics))
-    (gcr (contract-call? .agent-risk get-gcr))
+    (status (unwrap-panic (contract-call? .conxian-protocol get-protocol-status)))
+    (risk (unwrap-panic (contract-call? .agent-risk get-cybernetic-intel)))
+    (metrics (unwrap-panic (contract-call? .finance-metrics get-protocol-metrics)))
+    (gcr (unwrap-panic (contract-call? .agent-risk get-gcr)))
   )
     (ok {
         status: status,

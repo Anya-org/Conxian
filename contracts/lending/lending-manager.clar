@@ -65,7 +65,7 @@
 )
 (define-private (check-circuit-breaker)
   (match (var-get circuit-breaker)
-    cb (if (contract-call? .circuit-breaker is-contract-paused (as-contract tx-sender))
+    cb (if (unwrap-panic (contract-call? .circuit-breaker is-contract-paused (as-contract tx-sender)))
          (err ERR_PAUSED)
          (ok true))
     (ok true)
@@ -75,9 +75,6 @@
 ;; --- Core Logic ---
 
 ;; @desc Deposit assets into the lending protocol.
-;; @param asset-trait <sip-010-ft-trait> - The trait of the asset to deposit.
-;; @param amount uint - The amount of tokens to deposit.
-;; @returns (response bool uint)
 (define-public (deposit (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
@@ -108,9 +105,6 @@
 )
 
 ;; @desc Borrow assets from the protocol.
-;; @param asset-trait <sip-010-ft-trait> - The trait of the asset to borrow.
-;; @param amount uint - The amount of tokens to borrow.
-;; @returns (response bool uint)
 (define-public (borrow (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
@@ -144,9 +138,6 @@
 )
 
 ;; @desc Repay borrowed assets.
-;; @param asset-trait <sip-010-ft-trait> - The trait of the asset to repay.
-;; @param amount uint - The amount of tokens to repay.
-;; @returns (response bool uint)
 (define-public (repay (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
@@ -180,18 +171,14 @@
 )
 
 ;; @desc Calculate total collateral value for a user across all assets
-;; @param user principal - The user to check
-;; @returns uint - Total collateral value in USD equivalent (simplified)
 (define-read-only (get-user-collateral-value (user principal))
-  ;; Simplified: Sum of all deposits. In production, query oracle for USD values.
+  ;; Simplified: Sum of all deposits.
   (let ((deposit-balance (default-to u0 (map-get? deposits { asset: .cxd-token, user: user }))))
     deposit-balance
   )
 )
 
 ;; @desc Get total borrowed amount for a user across all assets
-;; @param user principal - The user to check
-;; @returns uint - Total borrowed value in USD equivalent
 (define-read-only (get-user-borrow-value (user principal))
   (let ((borrow-balance (default-to u0 (map-get? borrows { asset: .cxd-token, user: user }))))
     borrow-balance
@@ -199,9 +186,6 @@
 )
 
 ;; @desc Check if user has sufficient collateral for a new borrow
-;; @param user principal - The borrower
-;; @param borrow-amount uint - The new amount to borrow
-;; @returns bool - True if sufficiently collateralized
 (define-read-only (is-sufficiently-collateralized (user principal) (borrow-amount uint))
   (let (
     (collateral-value (get-user-collateral-value user))
@@ -224,11 +208,6 @@
       (asserts! (or (is-admin) (is-risk-manager)) (err ERR_UNAUTHORIZED))
       (asserts! (<= amount current-dep) (err ERR_INVALID_AMOUNT))
       
-      ;; Transfer collateral balance from user to liquidator
-      ;; Note: In a real system, we might physically transfer tokens or just update internal balances.
-      ;; Here we update internal balances: decrease user, increase liquidator.
-      ;; The liquidator can then withdraw if they want.
-      
       (map-set deposits { asset: asset, user: user } (- current-dep amount))
       (map-set deposits { asset: asset, user: liquidator } (+ (default-to u0 (map-get? deposits { asset: asset, user: liquidator })) amount))
       
@@ -248,12 +227,9 @@
       (let (
         (reserve (unwrap! (map-get? reserve-data asset) (err u404)))
         (amount (get total-reserves reserve))
-        (distributor (unwrap-panic (contract-call? .economic-policy-engine get-revenue-distributor))) ;; Assuming this getter exists or we use constant
       )
-        (asserts! (> amount u0) (ok true)) ;; Nothing to collect
+        (asserts! (> amount u0) (ok true))
         
-        ;; Transfer to distributor
-        ;; Note: We use the known revenue distributor contract directly.
         (begin
            (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) .revenue-distributor none)))
            (map-set reserve-data asset (merge reserve { total-reserves: u0 }))
@@ -272,16 +248,6 @@
   (map-get? reserve-data asset)
 )
 
-;; @desc Get the deposit balance for a user.
-(define-read-only (get-user-deposit (asset principal) (user principal))
-  (default-to u0 (map-get? deposits { asset: asset, user: user }))
-)
-
-;; @desc Get the borrow balance for a user.
-(define-read-only (get-user-borrow (asset principal) (user principal))
-  (default-to u0 (map-get? borrows { asset: asset, user: user }))
-)
-
 ;; Admin
 
 (define-public (set-circuit-breaker (new-cb principal))
@@ -290,7 +256,4 @@
     (var-set circuit-breaker (some new-cb))
     (ok true)
   )
-)
-(define-public (withdraw (asset principal) (amount uint))
-  (ok true)
 )
