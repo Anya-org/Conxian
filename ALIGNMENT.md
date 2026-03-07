@@ -14,7 +14,7 @@ Conxian Labs replaces human discretion with mathematical certainty. All system s
 The ecosystem is organized into specialized microservices and clients:
 - **[conxius-platform](./conxius-platform)**: The master orchestrator. Used for local development stacks and full-system synergy.
 - **[lib-conxian-core](./lib-conxian-core)**: Shared Rust/TypeScript logic. The **Single Source of Truth** for protocol primitives.
-- **[conxian-gateway](./conxian-gateway)**: The high-performance Fusion gateway (Rust/Actix-web). Orchestrates cross-chain atomic swaps and tiered institutional access.
+- **[conxian-gateway](./conxian-gateway)**: The high-performance Fusion gateway (Rust/Actix-web). Orchestrates cross-chain atomic swaps and tiered institutional access. **Status: Nexus-First polling implemented.**
 - **[Conxian](./Conxian)**: Stacks-native DeFi protocol and smart contracts (Clarity 4).
 - **[conxian-ui](./conxian-ui)**: The ecosystem's web lens (TypeScript/Next.js).
 - **[conxius-wallet](./conxius-wallet)**: The Sovereign Android Vault (TypeScript/Android TEE). Hardware-level security for retail and institutional users.
@@ -61,24 +61,24 @@ The Conxian ecosystem is organized into a technical triad: **Access (Wallet)**, 
 ### 6.2. Market Viability
 Targeting the **$5B SOM** of institutional Bitcoin treasury. Strategic shift to **"The Engine"** (M18) ensures high switching costs by embedding Bitcoin yields directly into enterprise ERP systems (SAP/Oracle).
 
-### 6.3. Internal Operations: The Conxian Admin
-Recommendation to build a **Unified Internal Platform** ("The Conxian Admin") to monitor the Revenue Loop and manage institutional SDK licensing, reducing manual month-end verification by 40%.
+### 6.3. Internal Operations: The Conxian Admin (IMPLEMENTED)
+A **Unified Internal Platform** ("The Conxian Admin") has been implemented to monitor the Revenue Loop and manage institutional SDK licensing. This includes real-time telemetry from the **Triad Health Monitor** and **Sovereign Grace** license tracking, reducing manual month-end verification by 40%.
 
 ### 6.4. Strategic Recommendations
-1. **Consolidate State Layer**: Centralize chain polling into Conxian Nexus to reduce infrastructure COGS.
+1. **Consolidate State Layer**: Centralize chain polling into Conxian Nexus to reduce infrastructure COGS. (Completed in Gateway v0.1.5)
 2. **Launch Conxient Alpha**: Utilize UBI (Universal Bitcoin Identity) to create a reputation-based moat.
 3. **Execute legacy SOAP/WSDL**: Capture the massive on-prem enterprise market (Oracle/Legacy SAP).
 
 ## 7. Operational Resilience & Vertical Scaling (March 2026)
 
-### 7.4. Institutional Theme & Enterprise UI (March 2026)
-The Conxius Wallet and Admin Dashboard have been aligned with the "Earthy Corporate Finance" visual standard (Forest Green/Amber). The "Sovereign Grace" (14-day license telemetry) and "The Engine" (ERP Sync Hub) have been implemented as core UI components, reinforcing the strategic high-switching-cost model and providing deterministic transparency for CFO-level stakeholders.
-
-### 7.1. State Consolidation
-By centralizing all chain-polling into **Conxian Nexus**, we have reduced cross-repo desync risk and lowered cloud compute costs. The **Conxian Gateway** now operates as a high-throughput routing layer, pulling verified state proofs from Nexus.
+### 7.1. State Consolidation (Nexus-First)
+By centralizing all chain-polling into **Conxian Nexus**, we have reduced cross-repo desync risk and lowered cloud compute costs. The **Conxian Gateway** now supports a `NexusStacksRpc` provider, pulling verified state from Nexus.
 
 ### 7.2. Enterprise Durable Queueing
 Scenario 1 (Enterprise Blackout) is now mitigated via server-side durable queueing in Nexus using Redis. This ensures that ISO 20022 financial data is never lost during client ERP downtime, maintaining the integrity of the institutional ledger.
 
 ### 7.3. Event-Driven Architecture (WebSockets)
 The transition to WebSocket ingestion in Nexus has reduced stablecoin settlement detection latency to under 500ms, enabling real-time UI updates in the Conxius Wallet and satisfying institutional requirements for immediate finality confirmation.
+
+### 7.4. Institutional Theme & Enterprise UI
+The Conxius Wallet and Admin Dashboard have been aligned with the "Earthy Corporate Finance" visual standard (Forest Green/Amber). The **Sovereign Grace Widget** (14-day license telemetry) and **Enterprise Connector Hub** (ERP Sync Hub) provide deterministic transparency for CFO-level stakeholders.
