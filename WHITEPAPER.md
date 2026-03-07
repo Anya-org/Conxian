@@ -28,5 +28,5 @@ As a final line of defense, the wallet deploys smart contract-enforced spend lim
 - **Phase 4 Unbundling**: Structural isolation of B2B, B2C, and Infrastructure suites.
 
 ---
-© 2026 Conxian Labs. Sovereign Autonomous Business.
+© 2026 Conxian. Sovereign Autonomous Business.
 [Return to Root README](./README.md) | [Strategic Alignment](./ALIGNMENT.md)

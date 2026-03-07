@@ -1,4 +1,4 @@
-# Conxian Labs: Architectural Superiority & Ethos Alignment (March 2026)
+# Conxian: Architectural Superiority & Ethos Alignment (March 2026)
 
 ## 1. Architectural Superiority: "Vertical Sovereignty"
 

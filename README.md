@@ -1,6 +1,6 @@
-# Conxian Labs: Internal Business Repository
+# Conxian: Internal Business Repository
 
-This private repository is the **Central Nervous System** (CNS) for Conxian Labs. It provides technical mapping and strategic alignment for building a **Sovereign Autonomous Business**.
+This private repository is the **Central Nervous System** (CNS) for Conxian. It provides technical mapping and strategic alignment for building a **Sovereign Autonomous Business**.
 
 ## 🚀 The Mission
 We engineer systems that mathematically prevent the black-box, fractional-reserve failures of centralized platforms through **Zero Secret Egress**, non-custodial sovereignty, and hardware-enclosed execution.
@@ -29,4 +29,4 @@ Use the root **Makefile** to manage isolated suites:
 - \`make unbundle\`: Verify architectural compartmentalization.
 
 ## 🛡️ Access & Confidentiality
-All documents are confidential and proprietary. © 2026 Conxian Labs. Sovereign Autonomous Business.
+All documents are confidential and proprietary. © 2026 Conxian. Sovereign Autonomous Business.

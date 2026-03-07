@@ -13,4 +13,4 @@ Welcome to the central documentation hub for the Conxian ecosystem. This site is
 - [Legal & Compliance](../04_legal/MICA_IRS_COMPLIANCE_ENCLAVE.md)
 
 ---
-© 2026 Conxian Labs.
+© 2026 Conxian.

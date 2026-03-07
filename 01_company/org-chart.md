@@ -1,4 +1,4 @@
-# Conxian Labs Organization Chart
+# Conxian Organization Chart
 
 ## Executive Team
 - **Founder**: Ecosystem Architect & Strategy Lead.

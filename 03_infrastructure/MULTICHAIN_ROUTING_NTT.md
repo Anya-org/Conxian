@@ -12,5 +12,5 @@ Conxian utilizes Wormhole's **Native Token Transfers (NTT)** and the **Conclave 
 By embedding routing logic directly into the hardware-enclosed signer, Conxian eliminates the need for centralized bridging intermediaries. This reduces the attack surface and ensures that all value movement remains under the absolute control of the sovereign user.
 
 ---
-© 2026 Conxian Labs. Sovereign Autonomous Business.
+© 2026 Conxian. Sovereign Autonomous Business.
 [Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)

@@ -1,10 +1,10 @@
-# Conxian Labs: Root Management & Architectural Unbundling
+# Conxian: Root Management & Architectural Unbundling
 # Orchestrates development across isolated product suites.
 
 .PHONY: help init unbundle build-b2b build-b2c build-infra test-all update-all
 
 help:
-	@echo "Conxian Labs: Unified Orchestrator"
+	@echo "Conxian: Unified Orchestrator"
 	@echo "Suite Management:"
 	@echo "  make build-b2b   - Build B2B SDK (lib-conclave-sdk) and Nexus"
 	@echo "  make build-b2c   - Build B2C Wallet (conxius-wallet)"

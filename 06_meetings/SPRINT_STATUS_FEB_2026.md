@@ -1,4 +1,4 @@
-# Conxian Labs: Sprint Status (February 2026)
+# Conxian: Sprint Status (February 2026)
 
 ## 1. Ecosystem Overview
 - **Status**: SYSTEM INTEGRITY VERIFIED.
@@ -23,7 +23,7 @@
 - **Token Complexity**: 5-token model rationalization in progress for retail UX.
 
 ---
-© 2026 Conxian Labs.
+© 2026 Conxian.
 
 ---
 [Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)

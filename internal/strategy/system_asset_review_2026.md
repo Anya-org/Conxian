@@ -1,4 +1,4 @@
-# Conxian Labs: System & Asset Review (March 2026)
+# Conxian: System & Asset Review (March 2026)
 
 ## 1. Design & UX Standards Audit
 

@@ -1,6 +1,6 @@
 # Infrastructure & Cloud Roadmap
 
-Conxian Labs follows a "Cloud-First, Sovereignty-Anchored" approach.
+Conxian follows a "Cloud-First, Sovereignty-Anchored" approach.
 
 ## Phase 1: Rapid Iteration (Current - Year 3.5)
 - **Primary Provider**: Google Cloud Platform (GCP) for Core/Gateway.

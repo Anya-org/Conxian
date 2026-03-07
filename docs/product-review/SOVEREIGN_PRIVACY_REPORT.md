@@ -1,4 +1,4 @@
-# Conxian Labs: Sovereign Privacy & Risk Mitigation Report
+# Conxian: Sovereign Privacy & Risk Mitigation Report
 
 ## 1. Introduction
 This report outlines the strategy for mitigating legal and regulatory risks while maintaining the "Sovereign Bitcoin" ethos. We focus on the distinction between "software interface" and "financial intermediary."
@@ -14,7 +14,7 @@ To maintain legal clarity and avoid being classified as a Financial Intermediary
 - **Conxius Role**: Acts strictly as the **Sovereign Interface** (UI). We enable the user to interact with these partners but never possess or control user funds or data during these flows.
 
 ### 2.2 Data & Fund Sovereignty
-- **No Handling of Data**: We do not store, mix, or manage user funds or personal data on Conxian Labs servers.
+- **No Handling of Data**: We do not store, mix, or manage user funds or personal data on Conxian servers.
 - **Zero-Data Architecture**: Technical telemetry (Grafana/Prometheus) tracks system health and performance metrics, but never individual user identities or transaction details.
 - **Fund Isolation**: User funds are stored in hardware-secured enclaves (The Conclave) on the user's device. We never have the ability to move user funds.
 

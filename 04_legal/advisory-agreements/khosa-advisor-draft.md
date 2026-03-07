@@ -9,5 +9,5 @@
 - Compliance memo oversight.
 
 **Milestones**:
-- Finalization of the Conxian Labs Compliance Memo.
+- Finalization of the Conxian Compliance Memo.
 - Completion of initial investor readiness audit.

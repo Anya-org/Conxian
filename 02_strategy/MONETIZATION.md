@@ -4,7 +4,7 @@ layout: page
 permalink: /monetization
 ---
 
-# Conxian Labs: Sovereign Infrastructure Monetization (2026)
+# Conxian: Sovereign Infrastructure Monetization (2026)
 
 **Philosophy:** Conxian monetizes the provision of high-integrity, non-custodial infrastructure. Our revenue model is designed to be disruptively low-cost for users while maintaining sustainable B2B and technical service streams.
 

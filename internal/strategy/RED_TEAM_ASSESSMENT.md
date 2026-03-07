@@ -40,4 +40,4 @@ The following tickets have been generated for tracking the implementation of the
 Prioritize the consolidation of the State Layer into Conxian Nexus to reduce cross-repo desync surface area. Transition from LocalStorage to IndexedDB for high-volume enterprise reconciliation buffering.
 
 ---
-© 2026 Conxian Labs. Red Team Specialist.
+© 2026 Conxian. Red Team Specialist.

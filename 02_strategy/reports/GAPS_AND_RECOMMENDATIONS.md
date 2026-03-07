@@ -50,5 +50,5 @@ This document identifies technical and operational gaps in the Conxius ecosystem
 
 ---
 
-*Maintained by: Conxian Labs Architecture Team*
+*Maintained by: Conxian Architecture Team*
 *Last Review: 2026-02-18*

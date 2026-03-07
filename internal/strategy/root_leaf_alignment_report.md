@@ -1,4 +1,4 @@
-# Conxian Labs: Root-to-Leaf & Leaf-to-Root Alignment Report (March 2026)
+# Conxian: Root-to-Leaf & Leaf-to-Root Alignment Report (March 2026)
 
 ## 1. Root-to-Leaf Alignment (Vision -> Implementation)
 

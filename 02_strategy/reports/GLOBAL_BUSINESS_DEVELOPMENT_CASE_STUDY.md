@@ -1,11 +1,11 @@
-# Conxian Labs: Global Business Development Case Study (2026)
+# Conxian: Global Business Development Case Study (2026)
 
 **Target:** Industry Benchmarking, Market Sizing, Cost Analysis, and Profitability Strategy
 **Alignment:** Bitcoin-Native, Zero-To-One Bootstrap, Global Scaling
 
 ## Executive Summary
 
-Conxian Labs operates across three distinct product verticals, generating a flywheel of self-sustaining value:
+Conxian operates across three distinct product verticals, generating a flywheel of self-sustaining value:
 
 1. **Consumer Interface:** `conxius-wallet` (B2C Retail Access)
 2. **Infrastructure & Services:** `conxius-platform` / `conxian-gateway` / `lib-conclave-sdk` (B2B SaaS / Enterprise)
@@ -84,7 +84,7 @@ This case study breaks down the Total Addressable Market (TAM), competitive benc
 
 ## Conclusion & The OpEx Moat
 
-By vertically integrating the **Consumer Interface**, the **B2B Infrastructure**, and the underlying **DeFi Protocol**, Conxian Labs creates an inescapable economic flywheel:
+By vertically integrating the **Consumer Interface**, the **B2B Infrastructure**, and the underlying **DeFi Protocol**, Conxian creates an inescapable economic flywheel:
 
 1. **B2B Clients (Platform)** pay high-margin recurring revenue to utilize our SDKs, subsidizing all server/RPC costs.
 2. **Consumers (Wallet)** utilize those B2B integrations and pay micro-transaction routing fees (SAF), driving organic liquidity.

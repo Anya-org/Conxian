@@ -1,7 +1,7 @@
-# Conxian Labs: Business Model & Technical Deep Dive (v1.0)
+# Conxian: Business Model & Technical Deep Dive (v1.0)
 
 ## 1. Executive Summary
-Conxian Labs is a **Non-Custodial Software Infrastructure Provider** building the unified interface for the Bitcoin economy. By replacing human discretion with "Code is Law" (SAB Logic), Conxian anchors all system states to the Bitcoin burn-block height. The business model transitions from high-utility retail tools (B2C) to high-margin institutional infrastructure (B2B).
+Conxian is a **Non-Custodial Software Infrastructure Provider** building the unified interface for the Bitcoin economy. By replacing human discretion with "Code is Law" (SAB Logic), Conxian anchors all system states to the Bitcoin burn-block height. The business model transitions from high-utility retail tools (B2C) to high-margin institutional infrastructure (B2B).
 
 ---
 

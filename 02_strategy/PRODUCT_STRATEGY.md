@@ -23,5 +23,5 @@ Conxian bridges human intent with machine speed without compromising security.
 By implementing the **Agent Payments Protocol (AP2)**, Conxian standardizes how AI agents prove their authorization to spend. This creates a powerful network effect where developers build on Conxian because it provides the most secure, "Plug-and-Play" financial stack for agents.
 
 ---
-© 2026 Conxian Labs. Sovereign Autonomous Business.
+© 2026 Conxian. Sovereign Autonomous Business.
 [Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)

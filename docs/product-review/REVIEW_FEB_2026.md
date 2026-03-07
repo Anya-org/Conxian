@@ -1,7 +1,7 @@
-# Conxian Labs: Root-to-Leaf Product Review (February 2026)
+# Conxian: Root-to-Leaf Product Review (February 2026)
 
 ## 1. Executive Summary
-Conxian Labs has successfully established a high-integrity, Bitcoin-anchored ecosystem. The "Central Nervous System" (Business Repo) provides clear strategic direction, while the technical submodules have matured into a cohesive "Nakamoto Native" stack. The transition from "Nakamoto Ready" to "Nakamoto Native" is the defining achievement of this period.
+Conxian has successfully established a high-integrity, Bitcoin-anchored ecosystem. The "Central Nervous System" (Business Repo) provides clear strategic direction, while the technical submodules have matured into a cohesive "Nakamoto Native" stack. The transition from "Nakamoto Ready" to "Nakamoto Native" is the defining achievement of this period.
 
 ---
 
@@ -55,7 +55,7 @@ Conxian Labs has successfully established a high-integrity, Bitcoin-anchored eco
 
 ## 3. Legal Risk & Sovereign Privacy Review
 The ecosystem operates on a "Strictly Non-Custodial" mandate, with a deep focus on risk mitigation and codified protection:
-*   **Partner-Delegated Compliance**: Regulated handling (KYC, Banking) is delegated to partners. Conxian Labs never handles user or fund data.
+*   **Partner-Delegated Compliance**: Regulated handling (KYC, Banking) is delegated to partners. Conxian never handles user or fund data.
 *   **Zero-Data Architecture**: Technical telemetry avoids individual identity or transaction details, focusing on system performance and health.
 *   **Privacy Rights & PETs**: Implementations of CoinJoin and Tor mask metadata and protect the inherent right to privacy for individuals and organizations. (See [SOVEREIGN_PRIVACY_REPORT.md](./SOVEREIGN_PRIVACY_REPORT.md) for a deep dive).
 *   **Regulatory Alignment**: Proactive engagement with standards like FINOS and jurisdictions like the FSCA ensures that our "software-only" interface is correctly classified and protected by actual law.

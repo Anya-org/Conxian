@@ -47,5 +47,5 @@ This document categorizes structural risks and outlines "No-Egress" mitigation s
 *   **Mitigation**: **Rust Core Mandate.** All mission-critical signing and state logic must reside in Conclave Core (Rust). TypeScript is strictly for UI/UX rendering. Mandatory release SBOM generation.
 
 ---
-© 2026 Conxian Labs. Sovereign Autonomous Business.
+© 2026 Conxian. Sovereign Autonomous Business.
 [Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)

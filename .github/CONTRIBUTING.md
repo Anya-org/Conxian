@@ -1,6 +1,6 @@
-# Contributing to Conxian Labs
+# Contributing to Conxian
 
-Thank you for your interest in Conxian Labs. This repository is for internal strategic and business documentation.
+Thank you for your interest in Conxian. This repository is for internal strategic and business documentation.
 
 ## How to Contribute
 1. Ensure you have the necessary access permissions.

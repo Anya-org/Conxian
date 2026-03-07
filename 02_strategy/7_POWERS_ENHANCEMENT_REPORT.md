@@ -1,7 +1,7 @@
 # Strategic Evaluation: 7 Powers Ground Truth (March 2026)
 
 ## 1. Executive Summary
-Conxian Labs has completed the implementation of its 2026 strategic moats. By leveraging **hardware-secured autonomous agents** and **deterministic ERP synchronization**, Conxian establishes a multi-dimensional moat that is structurally superior to both retail-centric incumbents and legacy TradFi platforms.
+Conxian has completed the implementation of its 2026 strategic moats. By leveraging **hardware-secured autonomous agents** and **deterministic ERP synchronization**, Conxian establishes a multi-dimensional moat that is structurally superior to both retail-centric incumbents and legacy TradFi platforms.
 
 ---
 
@@ -28,5 +28,5 @@ Conxian Labs has completed the implementation of its 2026 strategic moats. By le
 - **Outcome**: Brands Conxian as the "Clean-Hands" protocol for MiCA/IRS compliance.
 
 ---
-© 2026 Conxian Labs. Sovereign Autonomous Business.
+© 2026 Conxian. Sovereign Autonomous Business.
 [Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)

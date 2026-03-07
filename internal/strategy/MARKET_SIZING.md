@@ -1,17 +1,35 @@
-# Market Sizing & Financial Viability: Bitcoin DeFi (2026)
+# Conxian: Unified Market Sizing & Financial Viability (2026)
 
-## 1. TAM / SAM / SOM Breakdown
-- **TAM (Total Addressable Market)**: The entire $1.4T Bitcoin Market Cap (assuming conversion to productive capital).
-- **SAM (Serviceable Available Market)**: $150B - The portion of Bitcoin holders using L2s and Sidechains (Stacks, Liquid, RSK, BOB).
-- **SOM (Serviceable Obtainable Market)**: $5B - Institutional Bitcoin treasury management and sovereign retail users targeted by Conxian.
+## 1. Aggregate Opportunity
+The Conxian umbrella addresses the full spectrum of the Bitcoin Renaissance, from retail access to institutional settlement.
 
-## 2. COGS & Infrastructure Optimization
-- **Current COGS**: Primarily cloud compute (GCP/Render) and bridge relayer fees.
-- **Optimization Strategy**:
-  - **Shared Nexus**: Centralizing indexers in Conxian Nexus reduces duplicate API calls.
-  - **The Conclave SDK**: Offloading signing logic to client devices (Android TEE) eliminates server-side HSM costs.
-  - **MVCR Automation**: Enclave-attested compliance reduces manual audit overhead by 80%.
+| Business Unit | Market Segment | TAM (2026 Est.) | SAM | SOM Target |
+| :--- | :--- | :--- | :--- | :--- |
+| **Conxius** | Mobile Wallets | $3.6 Trillion* | $150 Billion | $5 Billion |
+| **Conxian CSF** | Bitcoin DeFi | $1.4 Trillion** | $150 Billion | $2.5 Billion |
+| **Conxian Fusion** | ERP Integration | $20 Billion | $5 Billion | $1 Billion |
+| **Conxian Nexus** | Risk Oracles | $5 Billion | $1 Billion | $250 Million |
 
-## 3. Pricing Model
-- **B2C**: SAF (Sovereignty-Adjusted Fee) - 0.1% to 0.25%.
-- **B2B**: Tiered SaaS licensing ($2,500 - $15,000/mo) for the Conclave SDK and Gateway.
+*\*Total Transaction Value; \*\*Total Bitcoin Market Cap*
+
+## 2. Integrated OpEx/CapEx Strategy
+Conxian follows a **Ruthless COGS Minimization Strategy**, utilizing client-side compute (StrongBox) and cloud free-tiers to maintain a low burn rate during scaling.
+
+### 2.1 Consolidated CapEx (One-Time)
+- **R&D / Genesis Pools**: $1.2 Million.
+- **Security & Lab Infrastructure**: $200,000.
+
+### 2.2 Consolidated OpEx (Annual)
+- **Engineering (Unified Elite Team)**: $3.2 Million.
+- **Audit & Compliance**: $400,000.
+- **Institutional Sales & Marketing**: $600,000.
+- **Cloud/Node Infrastructure**: $500,000.
+
+## 3. Revenue Diversification
+The ecosystem captures value at every layer of the Bitcoin stack:
+- **B2C**: Convenience fees (0.1%-0.25%) and Pro subscriptions ($9.99/mo).
+- **B2B**: Tiered licensing ($2.5k-$15k/mo) and implementation fees ($50k-$250k).
+- **Protocol**: Liquidity performance fees (10%).
+
+---
+© 2026 Conxian. Sovereign Autonomous Business.

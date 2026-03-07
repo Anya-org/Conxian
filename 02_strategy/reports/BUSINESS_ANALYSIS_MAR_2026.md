@@ -3,7 +3,7 @@
 **Phase:** Phase 5 (Level 3: Sovereign Scaling)  
 
 ## 1. Executive Summary
-Conxian Labs is successfully executing its **Infrastructure Pivot**, transitioning from a consumer wallet interface into an institutional-grade, **Bitcoin-native Infrastructure Layer**. By commoditizing mobile Secure Enclaves (TEE/StrongBox) and orchestrating them via a high-performance Rust gateway, the business is poised to capture high-margin B2B revenue (fintechs, neobanks, L2s) while reducing operational reliance on third-party SaaS providers.
+Conxian is successfully executing its **Infrastructure Pivot**, transitioning from a consumer wallet interface into an institutional-grade, **Bitcoin-native Infrastructure Layer**. By commoditizing mobile Secure Enclaves (TEE/StrongBox) and orchestrating them via a high-performance Rust gateway, the business is poised to capture high-margin B2B revenue (fintechs, neobanks, L2s) while reducing operational reliance on third-party SaaS providers.
 
 ## 2. Ecosystem Health & Submodule Alignment
 The "leaf-to-root" synchronization of all submodules confirms that the ecosystem is technically aligned with the master `ROADMAP.md` and `ALIGNMENT.md`:
@@ -34,4 +34,4 @@ While the foundation is secure, the following vectors require immediate engineer
 3.  **Address M14 RGB-WASM:** Client-side asset validation for RGB smart contracts remains a technical gap that must be addressed to support native L1 assets securely.
 
 ## 5. Conclusion
-Conxian Labs is operating with strict adherence to its core ethos. The architecture is mathematically verifiable, non-custodial, and highly resilient. By focusing the next two quarters on finalizing the Conclave SDK packaging and deploying sovereign proxies, the business will achieve total infrastructural independence and significant B2B cash flow.
+Conxian is operating with strict adherence to its core ethos. The architecture is mathematically verifiable, non-custodial, and highly resilient. By focusing the next two quarters on finalizing the Conclave SDK packaging and deploying sovereign proxies, the business will achieve total infrastructural independence and significant B2B cash flow.

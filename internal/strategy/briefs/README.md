@@ -1,4 +1,4 @@
-# Conxian Labs: Standardized Product Briefs
+# Conxian: Standardized Product Briefs
 
 This directory contains standardized technical and strategic briefs for all core submodules of the Conxian ecosystem.
 

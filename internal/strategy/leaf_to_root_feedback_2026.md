@@ -1,4 +1,4 @@
-# Conxian Labs: Leaf-to-Root Feedback Analysis (March 2026)
+# Conxian: Leaf-to-Root Feedback Analysis (March 2026)
 
 This report identifies technical and operational insights from the "leaf" submodules that have driven or should drive strategic shifts at the "root" (Business Strategy).
 

@@ -1,7 +1,7 @@
 # Zero-to-One Financial Plan: Bootstrap & COGS Minimization
 
 ## 1. Context: The Zero-Budget Reality
-Conxian Labs is currently operating at **Phase 5 (Level 3: Sovereign Scaling)** with a starting runway of **$0**. To survive and reach profitability without initial venture capital, the business must employ a **Ruthless COGS (Cost of Goods Sold) Minimization Strategy** alongside immediate, low-friction revenue generation from both B2C and B2B markets.
+Conxian is currently operating at **Phase 5 (Level 3: Sovereign Scaling)** with a starting runway of **$0**. To survive and reach profitability without initial venture capital, the business must employ a **Ruthless COGS (Cost of Goods Sold) Minimization Strategy** alongside immediate, low-friction revenue generation from both B2C and B2B markets.
 
 ## 2. COGS Minimization Strategy (The $0 OpEx Model)
 Every piece of infrastructure has been architected to push costs away from centralized servers and onto decentralized or free-tier resources.
@@ -39,4 +39,4 @@ The retail wallet (`conxius-wallet`) is the top-of-funnel acquisition channel.
 3.  **Scaling OpEx:** Once free tiers are exceeded, use incoming SAF revenue, Pro subscriptions, and B2B licensing to fund the transition to dedicated AWS/GCP nodes (executing M12).
 
 ## 5. Conclusion
-By leveraging Rust's efficiency, serverless free tiers, and pushing cryptographic compute to the user's mobile hardware, Conxian Labs can maintain a functional, high-security ecosystem at **effectively zero cost**. The dual-pronged approach of viral B2C utility fees and high-margin B2B licensing guarantees a path to profitability without external venture reliance.
+By leveraging Rust's efficiency, serverless free tiers, and pushing cryptographic compute to the user's mobile hardware, Conxian can maintain a functional, high-security ecosystem at **effectively zero cost**. The dual-pronged approach of viral B2C utility fees and high-margin B2B licensing guarantees a path to profitability without external venture reliance.

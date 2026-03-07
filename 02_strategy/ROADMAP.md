@@ -34,5 +34,5 @@ The definitive high-integrity interface for the autonomous Bitcoin economy.
 | **M18: Privacy Hub** | Q4 2026 | ⏳ | WabiSabi Coordinator Integration | **Privacy** |
 
 ---
-© 2026 Conxian Labs. Sovereign Autonomous Business.
+© 2026 Conxian. Sovereign Autonomous Business.
 [Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)

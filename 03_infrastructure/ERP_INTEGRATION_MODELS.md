@@ -12,5 +12,5 @@
 By embedding Bitcoin-native settlement logic into the enterprise's primary record system, Conxian eliminates manual month-end variance analysis and provides a foundation for autonomous corporate treasury.
 
 ---
-© 2026 Conxian Labs. Sovereign Autonomous Business.
+© 2026 Conxian. Sovereign Autonomous Business.
 [Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)

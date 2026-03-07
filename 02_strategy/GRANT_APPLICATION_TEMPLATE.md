@@ -9,7 +9,7 @@ permalink: /docs/grant-template
 ## 1. Project Overview
 
 **Project Name:** Conxius Wallet
-**Entity:** Conxian Labs
+**Entity:** Conxian
 **One-Liner:** A "Bitcoin-First" mobile gateway providing TEE-secured, multi-layer sovereignty for the full Bitcoin ecosystem.
 
 **The Problem:** Users are fragmented across custodial bridges and disparate apps for Stacks (sBTC), Bitcoin L1, and EVM-compatible Bitcoin L2s. There is no unified mobile interface that offers hardware-grade security for cross-chain movement.
@@ -55,7 +55,7 @@ permalink: /docs/grant-template
 
 ## 5. Team & Track Record
 
-The Conxian Labs team consists of experts in Android TEE security, Bitcoin scripting, and cross-chain architecture. We have successfully completed Milestones M1-M3 and are currently executing the Level 2 Operational Roadmap.
+The Conxian team consists of experts in Android TEE security, Bitcoin scripting, and cross-chain architecture. We have successfully completed Milestones M1-M3 and are currently executing the Level 2 Operational Roadmap.
 
 ---
 [Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)

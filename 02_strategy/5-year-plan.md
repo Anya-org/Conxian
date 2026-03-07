@@ -1,7 +1,7 @@
-# Conxian Labs: 5-Year Strategic Plan (2026 Update)
+# Conxian: 5-Year Strategic Plan (2026 Update)
 
 ## Executive Summary
-Conxian Labs is building the sovereign financial infrastructure for the Bitcoin Renaissance. Our 5-year plan transitions from high-utility retail tools to institutional-grade orchestration and settlement.
+Conxian is building the sovereign financial infrastructure for the Bitcoin Renaissance. Our 5-year plan transitions from high-utility retail tools to institutional-grade orchestration and settlement.
 
 ## Timeline Overview
 - **Year 1-2 (2025-2026)**: Foundation & Product-Market Fit.
@@ -39,7 +39,7 @@ Providing SLA-grade APIs and SDKs for fintechs and neobanks to access the Bitcoi
 - System health and performance metrics (Glass Node telemetry).
 
 ---
-© 2026 Conxian Labs.
+© 2026 Conxian.
 
 ---
 [Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)
