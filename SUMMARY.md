@@ -33,7 +33,7 @@
 * [ERP Integration](03_infrastructure/ERP_INTEGRATION_MODELS.md)
 
 ## ⚙️ Operations
-* [Dev-to-Live Workflow](conxius-platform/WORKFLOW.md)
+* [Dev-to-Live Workflow](conxius-platform/DEPLOYMENT.md)
 * [System Deployment Guide](conxius-platform/DEPLOYMENT.md)
 
 ## ⚖️ Legal & Compliance
@@ -61,6 +61,9 @@
 * [Leaf-to-Root Feedback 2026](internal/strategy/leaf_to_root_feedback_2026.md)
 * [Root-Leaf Alignment Report](internal/strategy/root_leaf_alignment_report.md)
 * [System & Asset Review 2026](internal/strategy/system_asset_review_2026.md)
+
+## 🔬 Research
+* [Superiority Evaluation 2026](docs/research/SUPERIORITY_REPORT_2026.md)
 
 ## 🛡️ Privacy
 * [Sovereign Privacy Report](docs/product-review/SOVEREIGN_PRIVACY_REPORT.md)
