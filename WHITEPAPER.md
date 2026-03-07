@@ -1,37 +1,31 @@
 # Conxian: The Bitcoin Sovereign Finance Layer
-**Whitepaper v1.2.0 (2026 Revision - Phase 5 Alignment)**
+**Whitepaper v1.5.0 (2026 Revision - Agentic Interface Ground Truth)**
 
 ## Abstract
-Conxian is a comprehensive DeFi orchestration platform designed to make Bitcoin a productive asset. By integrating Stacks L2 (Nakamoto) smart contracts with a high-performance middleware layer (Conxian Gateway & Nexus), Conxian provides institutional-grade access to sovereign Bitcoin services.
+Conxian is a high-integrity DeFi orchestration platform designed to make Bitcoin a productive asset. By integrating Stacks L2 (Nakamoto) smart contracts with a hardware-anchored middleware triad, Conxian provides the technical truth required for a Sovereign Autonomous Business.
 
 ## 1. Vision & Ethos
-### 1.1 Full Bitcoin Network Orientation
-All system states are anchored to Bitcoin burn-block-height. Bitcoin is the ultimate settlement layer and source of truth.
+### 1.1 Non-Custodial Truth
+All system states are anchored to the Bitcoin burn-block height. We mathematically prevent centralized, fractional-reserve failures by enforcing hardware-enclosed execution and trustless cryptographic proof.
 
-### 1.2 Earthy Corporate Finance
-Design language conveying trust, stability, and professional financial orchestration.
+## 2. Technical Architecture: Agentic Interface
+The Conxius-wallet is elevated into an **Autonomous Agentic Interface**.
+- **Kotlin MCP Server**: Embedded Model Context Protocol server providing localized, sovereign AI context for LLM tool-calling.
+- **Hardware-Enclosed Signing**: All agent-initiated transactions require signing within the **Android StrongBox** (Zero Secret Egress).
+- **A402 ASCs**: Atomic Service Channels utilizing TEE-assisted adaptor signatures to ensure payment atomicity for digital services.
 
-## 2. Technical Architecture
-### 2.1 Conxian Gateway (The Orchestrator)
-High-performance Fusion gateway (Rust/Actix-web) orchestrating cross-chain atomic swaps (Stacks, Liquid, Rootstock) and providing tiered institutional access.
-### 2.2 Conxian Nexus (The Glass Node)
-Functions as a **Decentralized Risk Oracle** and API bridge. Provides verifiable state proofs and cryptographically signed risk scoring.
-### 2.3 Conxius Wallet (The Vault)
-Mobile secure enclave integration for local intent signing, providing hardware-level security (TEE/StrongBox).
+## 3. Protocol Guardrails
+Conxian enforces absolute cryptographic boundaries between human intent and machine speed.
 
-## 3. Core Features
-### 3.1 Global Liquidity Mesh
-Active orchestration of HTLC-based atomic swaps ensuring seamless sovereign asset mobility.
-### 3.2 Governed Automation
-Switching cost strategy via deterministic synchronization between on-chain yields and legacy enterprise ERP systems (SAP, Oracle, NetSuite).
+### 3.1 AP2 Verifiable Mandates
+Autonomous execution is governed by the **Agent Payments Protocol (AP2)**. Mandates are tamper-proof digital contracts (VCs) that the hardware enclave verifies against unsigned payloads before generating a signature. This mitigates prompt injection at the silicon level.
 
-## 4. Roadmap Alignment
-Aligned with the **[Strategic Alignment (ALIGNMENT.md)](./ALIGNMENT.md)**.
+### 3.2 On-Chain Spend Limits (Clarity)
+As a final line of defense, the wallet deploys smart contract-enforced spend limits on the Stacks blockchain. Daily and per-transaction caps are baked into the **Clarity settlement layer**, ensuring protocol-level rejection of unauthorized drainage.
 
-- **Phase 1-3 (Completed)**: Foundation, L1/L2 core, and sBTC integration.
-- **Phase 4 (Completed)**: Interoperability via Wormhole NTT and sovereign bridging.
-- **Phase 5 (Active)**: Global Liquidity Mesh, Risk Oracle, and Gateway Institutional Beta.
-- **Phase 6 (Next)**: Sovereign AI (Conxient)-Driven Asset Allocation and Universal Bitcoin Identity.
+## 4. Operational Standards
+- **Zero Secret Egress**: Private keys never leave the secure hardware enclave.
+- **Phase 4 Unbundling**: Structural isolation of B2B, B2C, and Infrastructure suites.
 
 ---
 © 2026 Conxian Labs. Sovereign Autonomous Business.

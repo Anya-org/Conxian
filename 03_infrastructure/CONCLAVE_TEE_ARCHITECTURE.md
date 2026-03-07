@@ -1,35 +1,23 @@
-# Conclave Android SDK: TEE & StrongBox Architecture
+# Conclave Android SDK: Agentic TEE & StrongBox Architecture (2026)
 
 ## 1. Objective
+To enforce "Zero Secret Egress" for autonomous AI agents by strictly isolating private key access within flagship Android hardware (StrongBox/TEE).
 
-To strictly align our Android Native implementation (`conxius-wallet`) with Google's hardware security requirements, ensuring that the "Conclave SDK" can be packaged and licensed to B2B institutional clients as mathematically provable, hardware-backed security.
+## 2. Agentic Hardware Isolation
+The Conxius-wallet elevates security by separating the AI agent logic from the cryptographic signing layer.
+- **Agent Environment**: AI agents (governed by the local Kotlin MCP Server) operate within the standard Android application environment. They generate transaction intents and construct unsigned payloads.
+- **Hardware-Enclosed Signing**: Unsigned payloads are sent to the **StrongBoxManager**. The StrongBox enclave (or TEE fallback) acts as the final arbiter.
+- **Zero Secret Egress**: Private keys never leave the hardware enclave. Signing occurs entirely within the physically isolated CPU/memory of the StrongBox, preventing extraction even during application-layer logic drift or prompt injection.
 
-## 2. Hardware-Backed Security Model
+## 3. Protocol Guardrails: AP2 & StrongBox
+Before a transaction is signed, the StrongBox verifies the payload against the **AP2 Verifiable Mandate**.
+- **Mandate Check**: The enclave ensures the transaction amount, recipient, and asset type align with the cryptographically signed human mandate stored in the secure element.
+- **Prompt Injection Mitigation**: Because the signing decision is made within the hardware enclave based on immutable mandates, a compromised LLM cannot autonomously "hallucinate" a transaction that drains the wallet.
 
-The Conclave SDK uses a tiered key generation and storage approach via `StrongBoxManager.kt`:
+## 4. MCP Server Integration
+The wallet embeds a native **Kotlin Model Context Protocol (MCP)** server.
+- **Localized Context**: Provides the AI agent with a type-safe interface to query wallet state and trigger authorized tools.
+- **Security Barrier**: The MCP server serves as the controlled entry point, ensuring the AI only interacts with predefined, sovereign capabilities.
 
-### 2.1 StrongBox Enclave (Primary Requirement)
-
-- **Implementation:** `builder.setIsStrongBoxBacked(true)`
-- **Standard:** On flagship devices (e.g., Pixel series), cryptographic keys are generated and stored in a physically separate secure element (StrongBox) that has its own CPU, memory, and secure storage.
-- **B2B Guarantee:** Keys cannot be extracted by the host OS, even if the device is fully rooted or compromised by a kernel-level exploit.
-
-### 2.2 TEE Fallback (Secondary Tier)
-
-- **Implementation:** Automatic fallback catching `StrongBoxUnavailableException`.
-- **Standard:** Uses the ARM TrustZone Trusted Execution Environment (TEE).
-- **B2B Guarantee:** Keys remain securely isolated from the rich OS (Android), though they share the main SoC.
-
-## 3. Strict Compliance & Provability
-
-To license this SDK to B2B clients, we must prove compliance:
-
-1. **No Exportability:** `KeyGenParameterSpec` does NOT use `setUserAuthenticationRequired(false)` without explicit biometric bounds for transaction signing. (To be hardened: We must enforce `setUserAuthenticationRequired(true)` for all high-value signers).
-2. **Key Attestation:** Conclave must implement Android Keystore Key Attestation. This provides an X.509 certificate chain rooted to Google's hardware, proving to the server (`conxian-gateway`) that the key genuinely resides in a hardware enclave.
-3. **Memory Zeroing:** All intermediate representations of payloads and seeds in `conxius-wallet` are immediately zeroed out (`Arrays.fill()`) after the `doFinal` operation.
-
-## 4. Next Steps for B2B Packaging
-
-1. Refactor `StrongBoxManager` into an isolated `conclave-sdk-android` module.
-2. Enforce `setUserAuthenticationRequired(true)` tied to `BiometricPrompt`.
-3. Implement Key Attestation validation on `conxian-gateway` to reject any signatures not proven to originate from a hardware-backed keystore.
+---
+[Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)

@@ -1,0 +1,29 @@
+name: Infrastructure Suite CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'conxian-gateway/**'
+      - 'conxius-platform/**'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'conxian-gateway/**'
+      - 'conxius-platform/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-of: '20'
+    - name: Build Infrastructure Suite
+      run: make build-infra
+    - name: Test Gateway
+      run: cd conxian-gateway && cargo test

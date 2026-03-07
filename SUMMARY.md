@@ -20,6 +20,7 @@
 * [7 Powers Report](02_strategy/7_POWERS_ENHANCEMENT_REPORT.md)
 * [ATS Standard 2026](02_strategy/ATS_TEMPLATE.md)
 * [AgentOps Specification](02_strategy/AGENT_OPS_SPEC.md)
+* [iOS Parity Plan](02_strategy/reports/IOS_PARITY_PLAN.md)
 
 ## 📜 Proposals (CXIPs)
 * [CXIP-013: Revenue Distribution](Conxian/CXIP-013.md)
@@ -33,8 +34,8 @@
 * [ERP Integration](03_infrastructure/ERP_INTEGRATION_MODELS.md)
 
 ## ⚙️ Operations
-* [Dev-to-Live Workflow](conxius-platform/DEPLOYMENT.md)
-* [System Deployment Guide](conxius-platform/DEPLOYMENT.md)
+* [Dev-to-Live Workflow](conxius-platform/WORKFLOW.md)
+* [System Deployment Guide](conxius-platform/WORKFLOW.md)
 
 ## ⚖️ Legal & Compliance
 * [MICA & IRS Compliance](04_legal/MICA_IRS_COMPLIANCE_ENCLAVE.md)
@@ -53,7 +54,7 @@
 * [Meeting with Khosa](06_meetings/2026-02-27-khosa.md)
 
 ## 📈 Strategy Review
-* [CSO Review - Feb 2026](ALIGNMENT.md)
+* [CSO Review - March 2026](ALIGNMENT.md)
 * [Standardized Product Briefs](internal/strategy/briefs/README.md)
 * [Market Sizing](internal/strategy/MARKET_SIZING.md)
 * [Red Team Assessment](internal/strategy/RED_TEAM_ASSESSMENT.md)

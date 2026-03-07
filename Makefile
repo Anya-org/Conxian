@@ -1,57 +1,63 @@
-# Conxian Labs: Root Makefile
-# Orchestrates development across the ecosystem.
+# Conxian Labs: Root Management & Architectural Unbundling
+# Orchestrates development across isolated product suites.
 
-.PHONY: init auth start stop update-all logs bench deploy help
+.PHONY: help init unbundle build-b2b build-b2c build-infra test-all update-all
 
 help:
-	@echo "Conxian Business Repository - Root Management Commands:"
+	@echo "Conxian Labs: Unified Orchestrator"
+	@echo "Suite Management:"
+	@echo "  make build-b2b   - Build B2B SDK (lib-conclave-sdk) and Nexus"
+	@echo "  make build-b2c   - Build B2C Wallet (conxius-wallet)"
+	@echo "  make build-infra - Build Gateway and Platform Infrastructure"
+	@echo "Operations:"
 	@echo "  make init        - Initialize and update all submodules"
-	@echo "  make auth        - Provision local .env with secrets (via conxius-platform)"
-	@echo "  make start       - Build and start the entire stack (via conxius-platform)"
-	@echo "  make stop        - Stop and remove the stack"
-	@echo "  make update-all  - Pull the latest main branches for all submodules"
-	@echo "  make logs        - Tail logs for all services"
-	@echo "  make bench       - Run automated performance benchmarks"
-	@echo "  make deploy      - Run deployment workflows"
+	@echo "  make unbundle    - Verify architectural compartmentalization"
+	@echo "  make test-all    - Run tests across all isolated suites"
+	@echo "  make update-all  - Sync all modules to latest main"
 
 init:
-	@echo "Initializing all submodules..."
+	@echo "Initializing unbundled submodules..."
 	git submodule update --init --recursive
 
-auth:
-	@echo "Delegating auth to conxius-platform..."
-	$(MAKE) -C conxius-platform auth
+unbundle:
+	@echo "Verifying no cross-contamination between B2B and B2C..."
+	@# B2B must not depend on B2C UI components
+	@if grep -r "conxius-wallet" lib-conclave-sdk conxian-nexus 2>/dev/null; then \
+		echo "FAIL: B2B contamination detected"; \
+		false; \
+	fi
+	@echo "Compartmentalization verified: OK"
 
+build-b2b:
+	@echo "Building B2B Suite (Conclave SDK & Nexus)..."
+	cd lib-conclave-sdk && cargo build
+	cd conxian-nexus && cargo build
+
+build-b2c:
+	@echo "Building B2C Suite (Conxius Wallet)..."
+	cd conxius-wallet && npm run build
+
+build-infra:
+	@echo "Building Infrastructure Suite (Gateway & Admin)..."
+	cd conxian-gateway && cargo build
+	cd conxius-platform/services/admin-dashboard && npm run build
+
+test-all:
+	@echo "Executing Full System Test Suite..."
+	cd conxian-gateway && cargo test
+	cd conxian-nexus && cargo test
+	cd conxius-wallet && npm test
+
+update-all:
+	@echo "Updating all suites to main..."
+	git submodule foreach 'git fetch origin && git checkout main && git pull'
+
+# Legacy compatibility
 start:
-	@echo "Delegating start to conxius-platform..."
 	$(MAKE) -C conxius-platform start
 
 stop:
-	@echo "Delegating stop to conxius-platform..."
 	$(MAKE) -C conxius-platform stop
 
-update-all:
-	@echo "Updating all submodules to main..."
-	git submodule foreach 'git fetch origin && git checkout main && git pull'
-
-logs:
-	@echo "Delegating logs to conxius-platform..."
-	$(MAKE) -C conxius-platform logs
-
-bench:
-	@echo "Delegating benchmarks to conxius-platform..."
-	$(MAKE) -C conxius-platform bench
-
 docs-build:
-	@echo "Building documentation..."
-	@# For GitHub Pages, the "build" is just ensuring the structure is correct.
 	@ls SUMMARY.md .gitbook.yaml > /dev/null
-
-docs-serve:
-	@echo "To view documentation locally, use a markdown viewer or a local web server."
-	@echo "Running simple python server on port 8000..."
-	python3 -m http.server 8000
-
-deploy:
-	@echo "Delegating deployment to conxius-platform..."
-	$(MAKE) -C conxius-platform deploy

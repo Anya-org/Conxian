@@ -1,0 +1,25 @@
+name: B2C Suite CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'conxius-wallet/**'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'conxius-wallet/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-of: '20'
+    - name: Build B2C Suite
+      run: make build-b2c
+    - name: Test B2C Suite
+      run: cd conxius-wallet && npm test
