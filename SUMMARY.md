@@ -35,7 +35,6 @@
 
 ## ⚙️ Operations
 * [Dev-to-Live Workflow](conxius-platform/DEPLOYMENT.md)
-* [System Deployment Guide](conxius-platform/DEPLOYMENT.md)
 
 ## ⚖️ Legal & Compliance
 * [MICA & IRS Compliance](04_legal/MICA_IRS_COMPLIANCE_ENCLAVE.md)
@@ -54,7 +53,6 @@
 * [Meeting with Khosa](06_meetings/2026-02-27-khosa.md)
 
 ## 📈 Strategy Review
-* [CSO Review - March 2026](ALIGNMENT.md)
 * [Standardized Product Briefs](internal/strategy/briefs/README.md)
 * [Market Sizing](internal/strategy/MARKET_SIZING.md)
 * [Red Team Assessment](internal/strategy/RED_TEAM_ASSESSMENT.md)

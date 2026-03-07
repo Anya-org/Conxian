@@ -11,29 +11,31 @@ The ecosystem is organized into standalone businesses under the **Conxian** umbr
 
 ### 2.1 Conxius (Access Business)
 - **Brand**: Sovereign Android Vault.
-- **TAM**: $250B (Mobile Self-Custody).
+- **TAM**: 50B (Mobile Self-Custody).
 - **Core Technology**: Android TEE/StrongBox signing; Kotlin MCP server.
 
 ### 2.2 Conxian Sovereign Finance (CSF) (Finance Business)
 - **Brand**: Bitcoin-Native Settlement Protocol.
-- **TAM**: $1.4T (Total Bitcoin Capital).
+- **TAM**: .4T (Total Bitcoin Capital).
 - **Core Technology**: Clarity 4 Smart Contracts; CXIP-013 Revenue Distribution.
 
 ### 2.3 Conxian Fusion (Connectivity Business)
 - **Brand**: Institutional Gateway & ERP Bridge.
-- **TAM**: $20B (Blockchain-in-ERP).
+- **TAM**: 0B (Blockchain-in-ERP).
 - **Core Technology**: Rust Actix-web Gateway; "The Engine" Deterministic Sync.
 
 ### 2.4 Conxian Nexus (State Business)
 - **Brand**: Trustless State & Risk Oracle.
-- **TAM**: $5B (Blockchain Risk Management).
+- **TAM**: B (Blockchain Risk Management).
 - **Core Technology**: Merkle State Proofs; Glass Node Telemetry.
 
 ## 3. Verified Technical Implementation (Ground Truth)
-- **Nexus-First State Model**: Successfully consolidated blockchain polling into Nexus (v0.1.6) to reduce infrastructure COGS.
+- **Nexus-First State Model**: Successfully consolidated blockchain polling into Nexus (v0.1.7) to reduce infrastructure COGS and establish a single source of truth.
 - **BIP-322 Ownership**: Verified hardware-enclosed BIP-322 signing in the Conxius Wallet for secure, attested logins.
 - **Taproot Musig2**: Implemented BIP-327 hardened quorums in CSF for institutional treasury management.
-- **Institutional Fusion Hub**: Deployed a specialized Admin suite for real-time "Revenue Loop" telemetry.
+- **Institutional Fusion Hub**: Deployed a specialized Admin suite with specialized components (SovereignGraceWidget, EnterpriseConnectorHub, CircuitBreakerModule, TriadHealthMonitor) for real-time "Revenue Loop" telemetry.
+- **MVCR Generation**: Implemented hardware-attested Mathematically Verifiable Compliance Reports for MiCA and IRS 1099-DA standards.
+- **ERP Resilience**: Implemented persistent Event Queueing with exponential backoff for deterministic ERP synchronization.
 
 ## 4. Operational Standards
 - **Zero Secret Egress**: Private keys never enter application memory or leave the hardware enclave.
