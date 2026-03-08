@@ -50,3 +50,14 @@
         (response bool uint)
     )
 ))
+
+(define-trait ft-mintable-trait (
+    (mint
+        (uint principal)
+        (response bool uint)
+    )
+    (burn
+        (uint principal)
+        (response bool uint)
+    )
+))
