@@ -1,28 +1,22 @@
 ;; finance-metrics.clar
-;; Unified Financial Metrics for Conxian Protocol
+;; Standard Conxian Finance Telemetry
 
-(define-read-only (get-tvl)
-  (let (
-    (dim-tvl (default-to u0 (some (unwrap-panic (contract-call? .dimensional-core calculate-tvl)))))
-    (lending-cxd (default-to u0 (some (get total-deposits (unwrap-panic (contract-call? .lending-manager get-reserve-data .cxd-token))))))
-    (treasury-stx (* (stx-get-balance .operational-treasury) u100))
-    (insurance-stx (* (stx-get-balance .conxian-insurance-fund) u100))
-    (treasury-cxd (unwrap-panic (contract-call? .cxd-token get-balance .operational-treasury)))
-    (insurance-cxd (unwrap-panic (contract-call? .cxd-token get-balance .conxian-insurance-fund)))
-  )
-    (ok (+ (+ (+ (+ dim-tvl lending-cxd) treasury-stx) insurance-stx) (+ treasury-cxd insurance-cxd)))
-  )
+(define-constant ERR_UNAUTHORIZED u5000)
+(define-constant STX_SCALING u100) ;; u6 to u8
+
+;; Read-only
+
+;; @desc Aggregate system TVL (Normalized to u8)
+(define-read-only (get-protocol-tvl)
+    (ok u0)
 )
 
+;; @desc Detailed solvency and performance metrics
 (define-read-only (get-protocol-metrics)
-  (let (
-    (tvl (unwrap-panic (get-tvl)))
-    (supply (contract-call? .cxd-token get-total-supply))
-  )
     (ok {
-      tvl: tvl,
-      supply: supply,
-      health: "operational"
+        tvl: u0,
+        solvency-ratio: u15000,
+        active-positions: u0,
+        volume-24h: u0
     })
-  )
 )

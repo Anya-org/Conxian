@@ -5,6 +5,7 @@ Conxian is built on the **Sovereign Autonomous X-as-a-Protocol** framework.
 - **Hexagonal Architecture**: Separation of concerns between core logic (Engines), state management (Managers), and external interfaces (Facades).
 - **Principal Injection**: Dynamic dependency management to resolve circularity and enable upgradability.
 - **Nakamoto-First**: Temporal logic anchored to Bitcoin block heights and Stacks block times.
+- **BIP Compliance**: Built with support for BIP-341 (Taproot), BIP-342 (Tapscript), and BIP-174 (PSBT) for cross-chain settlement and advanced scripting.
 
 ## 2. System Layers
 

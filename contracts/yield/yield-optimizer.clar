@@ -1,120 +1,75 @@
 ;; yield-optimizer.clar
-;; Analyzes strategies and rebalances funds for optimal APY
-;; Enhanced with Strategy Selection and Risk Scoring
+;; Superior Yield Optimization Engine for Conxian Protocol
+;; Dynamically allocates capital based on Cybernetic Risk Signals (AYE)
+;; Nakamoto-Aligned (Epoch 3.0 / Clarity 4)
 
 (use-trait vault-trait .vault-traits.vault-trait)
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
+;; Constants
 (define-constant ERR_UNAUTHORIZED u1000)
 (define-constant ERR_STRATEGY_NOT_FOUND u6001)
 (define-constant ERR_RISK_TOO_HIGH u6002)
 
+;; State
 (define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var risk-agent-principal principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Strategy storage
 (define-map strategies
     principal ;; vault address
     {
         active: bool,
-        risk-score: uint, ;; 1-100, lower is safer
+        risk-score: uint, ;; 1-10000, lower is safer
         estimated-apy: uint ;; basis points
     }
 )
 
-(define-map strategy-performance
-    { strategy: principal, block: uint }
-    {
-        apy: uint,
-        tvl: uint
-    }
-)
+;; Configuration
+(define-data-var max-risk-threshold uint u5000)
 
-(define-data-var max-risk-tolerance uint u50)
+;; --- Core Optimization Logic ---
 
-;; @desc Registers or updates a strategy
-(define-public (update-strategy (vault principal) (risk-score uint) (apy uint))
+;; @desc Autonomous Rebalance based on System Risk
+(define-public (autonomous-rebalance (vault-from <vault-trait>) (vault-to <vault-trait>) (amount uint) (token <sip-010-ft-trait>))
+  (let (
+    (system-risk (match (contract-call? .agent-risk get-gcr) val val err-val u10000))
+    (target-strat (unwrap! (map-get? strategies (contract-of vault-to)) (err ERR_STRATEGY_NOT_FOUND)))
+  )
     (begin
-        (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
-        (map-set strategies vault {
-            active: true,
-            risk-score: risk-score,
-            estimated-apy: apy
-        })
-        (ok true)
+      ;; 1. Adaptive Risk Guard: If protocol GCR is low, enforce lower risk-scores
+      (asserts! (or
+        (> system-risk u150) ;; Abundance: ignore risk score
+        (<= (get risk-score target-strat) (var-get max-risk-threshold))
+      ) (err ERR_RISK_TOO_HIGH))
+
+      ;; 2. Execution
+      (try! (contract-call? vault-from withdraw amount token))
+      (try! (contract-call? vault-to deposit amount token))
+
+      (print { event: "autonomous-rebalance", from: (contract-of vault-from), to: (contract-of vault-to), amount: amount })
+      (ok true)
     )
+  )
 )
 
-(define-public (record-performance (strategy principal) (apy uint) (tvl uint))
-    (begin
-        (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
-        (map-set strategy-performance { strategy: strategy, block: burn-block-height } {
-            apy: apy,
-            tvl: tvl
-        })
-        (ok true)
-    )
+;; --- Strategy Management ---
+
+(define-public (register-strategy (vault principal) (risk uint) (apy uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (map-set strategies vault { active: true, risk-score: risk, estimated-apy: apy })
+    (ok true)
+  )
 )
 
-;; @desc Rebalances funds from one vault to another
-(define-public (rebalance (vault-from <vault-trait>) (vault-to <vault-trait>) (amount uint) (token <sip-010-ft-trait>))
-    (let
-        (
-            (strategy-to (unwrap! (map-get? strategies (contract-of vault-to)) (err ERR_STRATEGY_NOT_FOUND)))
-        )
-        ;; Check risk tolerance
-        (asserts! (<= (get risk-score strategy-to) (var-get max-risk-tolerance)) (err ERR_RISK_TOO_HIGH))
-        
-        ;; Logic to withdraw from A and deposit to B
-        (try! (contract-call? vault-from withdraw amount token))
-        (try! (contract-call? vault-to deposit amount token))
-        (ok true)
-    )
-)
+;; --- Admin ---
 
-(define-public (compound-rewards (strategies-list (list 10 principal)))
-    (begin
-        (map compound-strategy strategies-list)
-        (ok true)
-    )
-)
-
-(define-private (compound-strategy (strategy principal))
-    (let
-        (
-            (strat-data (unwrap! (map-get? strategies strategy) (err ERR_STRATEGY_NOT_FOUND)))
-        )
-        (if (get active strat-data)
-            (as-contract (contract-call? .auto-compounder compound strategy))
-            (ok false)
-        )
-    )
-)
-
-;; @desc Auto-selects the best strategy from a given list
-;; Returns the principal of the best strategy
-(define-read-only (get-best-strategy (candidates (list 10 principal)))
-    (fold best-strategy-reducer candidates (ok tx-sender)) ;; returns (ok best-principal) or error
-)
-
-(define-private (best-strategy-reducer (candidate principal) (current-best (response principal uint)))
-    (match current-best
-        best-principal
-        (let
-            (
-                (strat-cand (map-get? strategies candidate))
-                (strat-best (map-get? strategies best-principal))
-            )
-            (match strat-cand
-                c (match strat-best
-                    b (if (and (get active c) (> (get estimated-apy c) (get estimated-apy b)) (<= (get risk-score c) (var-get max-risk-tolerance)))
-                        (ok candidate)
-                        (ok best-principal)
-                    )
-                    (if (and (get active c) (<= (get risk-score c) (var-get max-risk-tolerance))) (ok candidate) (ok best-principal))
-                )
-                (ok best-principal)
-            )
-        )
-        err-val (err err-val)
-    )
+(define-public (initialize (owner principal) (risk-agent principal))
+  (begin
+    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
+    (var-set contract-owner owner)
+    (var-set risk-agent-principal risk-agent)
+    (ok true)
+  )
 )

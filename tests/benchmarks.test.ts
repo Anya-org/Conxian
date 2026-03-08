@@ -32,3 +32,11 @@ describe('Protocol Benchmarks', () => {
     expect(res.result).toBeDefined();
   });
 });
+
+describe('Observability Benchmarks', () => {
+  it('captures gas for get-protocol-status', async () => {
+    const simnet = await initSimnet();
+    const res = simnet.callReadOnlyFn('conxian-protocol', 'get-protocol-status', [], 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM');
+    expect(res.result).toBeDefined();
+  });
+});

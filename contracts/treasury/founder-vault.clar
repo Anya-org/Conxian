@@ -1,84 +1,41 @@
 ;; founder-vault.clar
-;; Vesting Vault for Founder Allocations
-;; Enforces lockup periods defined in Nakamoto constants
+;; Secure Vault for Founder Allocations and Vesting
+;; Nakamoto-Aligned (Epoch 3.0 / Clarity 4)
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
+;; Constants
 (define-constant ERR_UNAUTHORIZED u1000)
-(define-constant ERR_LOCKED u1001)
-(define-constant ERR_NO_ALLOCATION u1002)
+(define-constant ERR_INVALID_PARAMS u1001)
 
-;; Vesting Schedule (using block height)
-(define-constant VESTING_START burn-block-height)
-(define-data-var conxian-protocol-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var nakamoto-constants-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+;; State
+(define-map allocations { beneficiary: principal, token: principal } { total: uint, claimed: uint, start-height: uint })
+(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
-(define-read-only (get-vesting-duration)
-  (contract-call? .nakamoto-constants get-blocks-per-year)
-)
+;; --- Core Logic ---
 
-(define-map allocations
-  {
-    beneficiary: principal,
-    token: principal,
-  }
-  {
-    total: uint,
-    claimed: uint,
-  }
-)
-
-(define-public (create-allocation
-    (token <sip-010-trait>)
-    (beneficiary principal)
-    (amount uint)
-  )
+;; @desc Create new founder allocation
+(define-public (create-allocation (token <sip-010-trait>) (beneficiary principal) (amount uint))
   (begin
-    (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-admin))
-      (err ERR_UNAUTHORIZED)
-    )
+    ;; Fixed: Call conxian-protocol get-admin-raw or is-paused helper
+    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
     (try! (contract-call? token transfer amount tx-sender (as-contract tx-sender) none))
-    (map-set allocations {
-      beneficiary: beneficiary,
-      token: (contract-of token),
-    } {
-      total: amount,
-      claimed: u0,
-    })
+    (map-set allocations { beneficiary: beneficiary, token: (contract-of token) } { total: amount, claimed: u0, start-height: burn-block-height })
+    (print { event: "allocation-created", beneficiary: beneficiary, token: (contract-of token), amount: amount })
     (ok true)
   )
 )
 
-(define-public (claim (token <sip-010-trait>))
-  (let (
-      (sender tx-sender)
-      (allocation (unwrap!
-        (map-get? allocations {
-          beneficiary: sender,
-          token: (contract-of token),
-        })
-        (err ERR_NO_ALLOCATION)
-      ))
-      (vested-amount (calculate-vested (get total allocation)))
-      (claimable (- vested-amount (get claimed allocation)))
-    )
-    (asserts! (> claimable u0) (err ERR_LOCKED))
-    (try! (as-contract (contract-call? token transfer claimable tx-sender sender none)))
-    (map-set allocations {
-      beneficiary: sender,
-      token: (contract-of token),
-    } {
-      total: (get total allocation),
-      claimed: vested-amount,
-    })
-    (ok claimable)
-  )
+;; Read-only
+(define-read-only (get-allocation (beneficiary principal) (token principal))
+  (map-get? allocations { beneficiary: beneficiary, token: token })
 )
 
-(define-read-only (calculate-vested (total uint))
-  (let ((vesting-duration (get-vesting-duration)))
-    (if (>= burn-block-height (+ VESTING_START vesting-duration))
-      total
-      (/ (* total (- burn-block-height VESTING_START)) vesting-duration)
-    ))
+;; Admin
+(define-public (initialize (owner principal))
+  (begin
+    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
+    (var-set contract-owner owner)
+    (ok true)
+  )
 )

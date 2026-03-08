@@ -1,659 +1,101 @@
 [project]
 name = "Conxian"
-authors = []
-description = "Conxian Protocol - Comprehensive System"
-telemetry = false
-cache_dir = "./.cache"
-requirements = []
+clarinet_version = "3.12.0"
+epoch = "3.0"
+
+[accounts]
+deployer = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
 
 [simnet]
 mnemonic = "cute bird surprise boring old news cake design aisle helmet choose tree"
-epoch = "3.0"
 
 [contracts.sip-standards]
 path = "contracts/traits/sip-standards.clar"
 
 [contracts.core-traits]
 path = "contracts/traits/core-traits.clar"
-depends_on = [ "sip-standards",]
-
-[contracts.conxian-access]
-path = "contracts/core/conxian-access.clar"
-depends_on = [ "core-traits",]
-
-[contracts.governance-traits]
-path = "contracts/traits/governance-traits.clar"
-
-[contracts.timelock]
-path = "contracts/governance/timelock.clar"
-depends_on = [ "conxian-access", "governance-traits",]
-
-[contracts.admin-facade]
-path = "contracts/core/admin-facade.clar"
-depends_on = [ "core-traits", "timelock",]
-
-[contracts.advanced-order-manager]
-path = "contracts/enterprise/advanced-order-manager.clar"
-depends_on = [ "sip-standards",]
-
-[contracts.automation-traits]
-path = "contracts/traits/automation-traits.clar"
-
-[contracts.cxd-token]
-path = "contracts/tokens/cxd-token.clar"
-depends_on = [ "sip-standards",]
 
 [contracts.security-monitoring]
 path = "contracts/traits/security-monitoring.clar"
 
-[contracts.circuit-breaker]
-path = "contracts/security/circuit-breaker.clar"
-depends_on = [ "conxian-access", "core-traits", "security-monitoring",]
-
-[contracts.defi-traits]
-path = "contracts/traits/defi-traits.clar"
-
-[contracts.oracle-aggregator]
-path = "contracts/oracle/oracle-aggregator.clar"
-depends_on = [ "circuit-breaker", "defi-traits",]
-
-[contracts.agent-risk]
-path = "contracts/agents/agent-risk.clar"
-depends_on = [ "automation-traits", "cxd-token", "oracle-aggregator",]
-
-[contracts.cxd-treasury]
-path = "contracts/treasury/cxd-treasury.clar"
-
-[contracts.agent-treasury]
-path = "contracts/agents/agent-treasury.clar"
-depends_on = [ "agent-risk", "cxd-treasury",]
-
-[contracts.allocation-policy]
-path = "contracts/treasury/allocation-policy.clar"
-
-[contracts.analytics-aggregator]
-path = "contracts/monitoring/analytics-aggregator.clar"
-depends_on = [ "sip-standards",]
-
-
-[contracts.vault-traits]
-path = "contracts/traits/vault-trait.clar"
-depends_on = [ "sip-standards",]
-
-[contracts.auto-compounder]
-path = "contracts/yield/auto-compounder.clar"
-depends_on = [ "vault-traits",]
-
-[contracts.automation-manager]
-path = "contracts/automation/automation-manager.clar"
-
-[contracts.batch-auction]
-path = "contracts/dex/batch-auction.clar"
-depends_on = [ "sip-standards",]
-
-[contracts.batch-operations]
-path = "contracts/core/batch-operations.clar"
-
-[contracts.batch-processor]
-path = "contracts/automation/batch-processor.clar"
-
-
-[contracts.block-utils]
-path = "contracts/utils/block-utils.clar"
-
-[contracts.regulatory-adapter]
-path = "contracts/compliance/regulatory-adapter.clar"
-depends_on = [ "core-traits", "kyc-registry" ]
-
-[contracts.bond-factory]
-path = "contracts/bonding/bond-factory.clar"
-depends_on = [ "core-traits", "regulatory-adapter", "sip-standards",]
-
-[contracts.bond-token]
-path = "contracts/bonding/bond-token.clar"
-depends_on = [ "sip-standards",]
-
-[contracts.bond-traits]
-path = "contracts/traits/bond-traits.clar"
-
-
-[contracts.btc-adapter]
-path = "contracts/interfaces/btc-adapter.clar"
-
-
-[contracts.chainlink-adapter]
-path = "contracts/integrations/chainlink-adapter.clar"
-
-[contracts.clarity-bitcoin]
-path = "contracts/lib/clarity-bitcoin.clar"
-
-[contracts.conxian-protocol]
-path = "contracts/core/conxian-protocol.clar"
-
-[contracts.collateral-manager]
-path = "contracts/core/collateral-manager.clar"
-depends_on = [ "conxian-access", "conxian-protocol", "sip-standards",]
-
-[contracts.community-dao]
-path = "contracts/governance/community-dao.clar"
-depends_on = [ "core-traits", "regulatory-adapter", "sip-standards",]
-
-[contracts.community-governance-token]
-path = "contracts/governance/community-governance-token.clar"
-depends_on = [ "core-traits", "regulatory-adapter", "sip-standards",]
-
-[contracts.token-system-coordinator]
-path = "contracts/tokens/token-system-coordinator.clar"
-depends_on = [ "core-traits", "regulatory-adapter", "sip-standards",]
-
-[contracts.token-emission-controller]
-path = "contracts/yield/token-emission-controller.clar"
-depends_on = [ "sip-standards", "token-system-coordinator" ]
-
-[contracts.cxvg-token]
-path = "contracts/tokens/cxvg-token.clar"
-depends_on = [ "core-traits", "regulatory-adapter", "sip-standards", "token-system-coordinator",]
-
-[contracts.reputation-engine]
-path = "contracts/governance/reputation-engine.clar"
-depends_on = [ "governance-traits",]
-
-[contracts.community-voting-engine]
-path = "contracts/governance/community-voting-engine.clar"
-depends_on = [ "cxvg-token", "governance-traits", "regulatory-adapter", "reputation-engine", "sip-standards",]
-
-
-[contracts.compliance-manager]
-path = "contracts/compliance/compliance-manager.clar"
-
-[contracts.kyc-registry]
-path = "contracts/identity/kyc-registry.clar"
-
-[contracts.compliance-hooks]
-path = "contracts/compliance/compliance-hooks.clar"
-depends_on = [ "compliance-manager", "kyc-registry",]
-
-[contracts.compliance-trait]
-path = "contracts/compliance/compliance-trait.clar"
-
-[contracts.revenue-distributor]
-path = "contracts/treasury/revenue-distributor.clar"
-depends_on = [ "cxd-token", "cxd-treasury", "sip-standards",]
-
-[contracts.concentrated-liquidity-pool]
-path = "contracts/dex/concentrated-liquidity-pool.clar"
-depends_on = [ "revenue-distributor", "sip-standards",]
-
-[contracts.concentrated-math]
-path = "contracts/math/concentrated-math.clar"
-
-[contracts.controller-traits]
-path = "contracts/traits/controller-traits.clar"
-
-[contracts.queue-traits]
-path = "contracts/traits/queue-traits.clar"
-
-[contracts.conxian-exit-queue]
-path = "contracts/core/conxian-exit-queue.clar"
-depends_on = [ "queue-traits",]
-
-[contracts.conxian-insurance-fund]
-path = "contracts/security/conxian-insurance-fund.clar"
-depends_on = [ "conxian-access", "sip-standards",]
-
-[contracts.conxian-paas-factory]
-path = "contracts/core/conxian-paas-factory.clar"
-depends_on = [ "core-traits", "regulatory-adapter", "sip-standards",]
+[contracts.automation-traits]
+path = "contracts/traits/automation-traits.clar"
 
 [contracts.conxian-service-trait]
 path = "contracts/traits/conxian-service-trait.clar"
 
-[contracts.conxian-vaults]
-path = "contracts/treasury/conxian-vaults.clar"
-depends_on = [ "conxian-access", "sip-standards", "vault-traits",]
+[contracts.defi-traits]
+path = "contracts/traits/defi-traits.clar"
 
-[contracts.cross-chain-traits]
-path = "contracts/traits/cross-chain-traits.clar"
+[contracts.conxian-access]
+path = "contracts/core/conxian-access.clar"
 
-[contracts.cross-protocol-integrator]
-path = "contracts/yield/cross-protocol-integrator.clar"
+[contracts.conxian-protocol]
+path = "contracts/core/conxian-protocol.clar"
+depends_on = ["conxian-access"]
 
-[contracts.custody]
-path = "contracts/vaults/custody.clar"
+[contracts.oracle-aggregator]
+path = "contracts/oracle/oracle-aggregator.clar"
 
-[contracts.cxd-bonding-curve-amm]
-path = "contracts/bonding/cxd-bonding-curve-amm.clar"
-depends_on = [ "core-traits", "cxd-token", "regulatory-adapter", "sip-standards", "token-system-coordinator",]
+[contracts.cxd-token]
+path = "contracts/tokens/cxd-token.clar"
+depends_on = ["conxian-protocol", "conxian-access"]
 
-[contracts.cxd-price-initializer]
-path = "contracts/tokens/cxd-price-initializer.clar"
-
-[contracts.cxd-staking]
-path = "contracts/yield/cxd-staking.clar"
-depends_on = [ "conxian-protocol", "core-traits", "cxd-token", "regulatory-adapter", "sip-standards",]
-
-
-[contracts.cxlp-position-nft]
-path = "contracts/tokens/cxlp-position-nft.clar"
-depends_on = [ "sip-standards",]
-
-[contracts.cxlp-token]
-path = "contracts/tokens/cxlp-token.clar"
-depends_on = [ "sip-standards",]
-
-[contracts.cxs-token]
-path = "contracts/tokens/cxs-token.clar"
-depends_on = [ "sip-standards",]
-
-[contracts.cxtr-token]
-path = "contracts/tokens/cxtr-token.clar"
-depends_on = [ "sip-standards",]
-
-
-[contracts.dao-treasury]
-path = "contracts/governance/dao-treasury.clar"
-depends_on = [ "sip-standards", "vault-traits",]
-
-
-[contracts.default-strategy-engine]
-path = "contracts/rewards/default-strategy-engine.clar"
-
-[contracts.dex-factory]
-path = "contracts/dex/dex-factory.clar"
-depends_on = [ "conxian-protocol",]
-
-[contracts.dex-facade]
-path = "contracts/dex/dex-facade.clar"
-depends_on = [ "conxian-protocol", "dex-factory", "sip-standards",]
-
-
-[contracts.dia-oracle-adapter]
-path = "contracts/integrations/dia-oracle-adapter.clar"
-
-
-
-
-
-
-
-[contracts.position-nft]
-path = "contracts/dimensional/position-nft.clar"
-depends_on = [ "sip-standards",]
-
-[contracts.dimensional-core]
-path = "contracts/dimensional/dimensional-core.clar"
-depends_on = [ "defi-traits", "position-nft", "security-monitoring", "sip-standards",]
-
-[contracts.dimensional-engine]
-path = "contracts/core/dimensional-engine.clar"
-depends_on = [ "conxian-protocol", "core-traits", "sip-standards",]
-
-[contracts.dimensional-engine-interface]
-path = "contracts/interfaces/dimensional-engine-interface.clar"
-
-[contracts.dimensional-oracle]
-path = "contracts/oracle/dimensional-oracle.clar"
-depends_on = [ "defi-traits",]
-
-[contracts.dimensional-traits]
-path = "contracts/traits/dimensional-traits.clar"
-
-
-[contracts.dlc-manager]
-path = "contracts/sbtc/dlc-manager.clar"
-depends_on = [ "conxian-access",]
-
-[contracts.dual-stacking-orchestrator]
-path = "contracts/staking/dual-stacking-orchestrator.clar"
-
-[contracts.early-lp-rewards]
-path = "contracts/rewards/early-lp-rewards.clar"
-
-[contracts.economic-policy-engine]
-path = "contracts/core/economic-policy-engine.clar"
-depends_on = [ "conxian-protocol", "core-traits", "defi-traits", "revenue-distributor",]
-
-[contracts.pausable-trait]
-path = "contracts/traits/pausable-trait.clar"
-
-[contracts.emergency-governance]
-path = "contracts/governance/emergency-governance.clar"
-depends_on = [ "pausable-trait",]
-
-[contracts.encoding]
-path = "contracts/utils/encoding.clar"
-
-[contracts.enhanced-circuit-breaker]
-path = "contracts/security/enhanced-circuit-breaker.clar"
-
-[contracts.enhanced-governance-nft]
-path = "contracts/governance/enhanced-governance-nft.clar"
-depends_on = [ "conxian-access", "sip-standards",]
-
-[contracts.enhanced-yield-strategy]
-path = "contracts/yield/enhanced-yield-strategy.clar"
-
-[contracts.enterprise-api]
-path = "contracts/enterprise/enterprise-api.clar"
-depends_on = [ "compliance-hooks",]
-
-[contracts.enterprise-facade]
-path = "contracts/enterprise/enterprise-facade.clar"
-
-
-[contracts.enterprise-traits]
-path = "contracts/traits/enterprise-traits.clar"
-
-[contracts.external-oracle-adapter]
-path = "contracts/oracle/external-oracle-adapter.clar"
-
-
-[contracts.federated-oracle-adapter]
-path = "contracts/oracle/federated-oracle-adapter.clar"
-
-[contracts.fee-manager]
-path = "contracts/vaults/fee-manager.clar"
-
-[contracts.risk-manager]
-path = "contracts/core/risk-manager.clar"
-depends_on = [ "conxian-access", "core-traits", "defi-traits", "dimensional-core", "oracle-aggregator", "position-nft",]
-
-[contracts.lending-manager]
-path = "contracts/lending/lending-manager.clar"
-depends_on = [ "circuit-breaker", "conxian-protocol", "cxd-token", "economic-policy-engine", "revenue-distributor", "risk-manager", "sip-standards",]
-
-[contracts.ops-engine]
-path = "contracts/core/ops-engine.clar"
-depends_on = [ "agent-risk", "agent-treasury", "swap-router", "admin-facade", "conxian-protocol", "cxd-token", "governance-traits",]
-
-[contracts.operational-treasury]
-path = "contracts/core/operational-treasury.clar"
-depends_on = [ "agent-treasury", "ops-engine", "sip-standards",]
-
-[contracts.finance-metrics]
-path = "contracts/monitoring/finance-metrics.clar"
-depends_on = [ "conxian-insurance-fund", "cxd-token", "dimensional-core", "lending-manager", "operational-treasury",]
-
-[contracts.nakamoto-constants]
-path = "contracts/constants/nakamoto-constants.clar"
-
-[contracts.founder-vault]
-path = "contracts/treasury/founder-vault.clar"
-depends_on = [ "conxian-protocol", "nakamoto-constants", "sip-standards",]
-
-[contracts.founder-vesting]
-path = "contracts/core/founder-vesting.clar"
-depends_on = [ "sip-standards",]
-
-[contracts.funding-rate-calculator]
-path = "contracts/core/funding-rate-calculator.clar"
-depends_on = [ "core-traits",]
-
-[contracts.gamification-manager]
-path = "contracts/governance/gamification-manager.clar"
-
-[contracts.gauge-manager]
-path = "contracts/governance/gauge-manager.clar"
-depends_on = [ "cxlp-token", "sip-standards",]
-
-
-[contracts.governance-handover]
-path = "contracts/governance/governance-handover.clar"
-depends_on = [ "admin-facade", "agent-risk", "agent-treasury", "conxian-access", "conxian-protocol", "governance-traits", "operational-treasury", "regulatory-adapter", "timelock",]
-
-[contracts.governance-signature-verifier]
-path = "contracts/governance/governance-signature-verifier.clar"
-
-[contracts.governance-token]
-path = "contracts/governance-token.clar"
-depends_on = [ "sip-standards",]
-
-
-[contracts.ico-offering]
-path = "contracts/governance/ico-offering.clar"
-depends_on = [ "regulatory-adapter", "sip-standards",]
-
-[contracts.identity-badge]
-path = "contracts/identity/identity-badge.clar"
-
-[contracts.insurance-protection-nft]
-path = "contracts/insurance/insurance-protection-nft.clar"
-
-[contracts.interest-rate-model]
-path = "contracts/lending/interest-rate-model.clar"
-
-
-[contracts.migration-manager]
-path = "contracts/migration/migration-manager.clar"
-
-[contracts.legacy-adapter]
-path = "contracts/migration/legacy-adapter.clar"
-depends_on = [ "migration-manager",]
-
-[contracts.legal-representative-registry]
-path = "contracts/governance/legal-representative-registry.clar"
-
-[contracts.lending-protocol-governance]
-path = "contracts/governance/lending-protocol-governance.clar"
-depends_on = [ "governance-traits",]
-
-[contracts.liquidity-manager]
-path = "contracts/dex/liquidity-manager.clar"
-depends_on = [ "concentrated-liquidity-pool", "conxian-protocol", "regulatory-adapter", "sip-standards", "vault-traits",]
-
-[contracts.liquidity-optimization-engine]
-path = "contracts/dex/liquidity-optimization-engine.clar"
-depends_on = [ "dex-facade", "conxian-protocol", "defi-traits",]
-
-[contracts.liquidity-provider]
-path = "contracts/dex/liquidity-provider.clar"
-depends_on = [ "conxian-protocol", "sip-standards",]
-
-[contracts.math-utilities]
-path = "contracts/math/math-utilities.clar"
-
-[contracts.memory-pool-management]
-path = "contracts/dex/memory-pool-management.clar"
-depends_on = [ "conxian-protocol",]
-
-[contracts.mev-protection-nft]
-path = "contracts/mev/mev-protection-nft.clar"
+[contracts.cxd-treasury]
+path = "contracts/treasury/cxd-treasury.clar"
+depends_on = ["conxian-access"]
 
 [contracts.mev-protector]
 path = "contracts/security/mev-protector.clar"
 
-
-[contracts.mock-proposal]
-path = "contracts/test-helpers/mock-proposal.clar"
-depends_on = [ "governance-traits",]
-
-[contracts.mock-token]
-path = "contracts/test-helpers/mock-token.clar"
-
-[contracts.monitoring-dashboard]
-path = "contracts/monitoring/monitoring-dashboard.clar"
-depends_on = [ "agent-risk", "conxian-protocol",]
-
-
-
-[contracts.native-stacking-operator]
-path = "contracts/staking/native-stacking-operator.clar"
-
-[contracts.nft-marketplace]
-path = "contracts/marketplace/nft-marketplace.clar"
-
-[contracts.office-manager]
-path = "contracts/automation/office-manager.clar"
-depends_on = [ "core-traits",]
-
-
-[contracts.opex-vault]
-path = "contracts/treasury/opex-vault.clar"
-depends_on = [ "conxian-access", "core-traits", "nakamoto-constants", "regulatory-adapter", "sip-standards",]
-
-[contracts.optimization-helpers]
-path = "contracts/helpers/optimization-helpers.clar"
-
-[contracts.oracle]
-path = "contracts/dex/oracle.clar"
-depends_on = [ "defi-traits",]
-
-[contracts.oracle-adapter-stub]
-path = "contracts/oracle/oracle-adapter-stub.clar"
-
-[contracts.order-book]
-path = "contracts/orders/order-book.clar"
-
-[contracts.performance-optimizer]
-path = "contracts/performance/performance-optimizer.clar"
-
-[contracts.points-oracle]
-path = "contracts/oracle/points-oracle.clar"
-depends_on = [ "conxian-protocol", "defi-traits",]
-
-[contracts.pool-factory]
-path = "contracts/pools/pool-factory.clar"
-
-
-[contracts.pool-registry]
-path = "contracts/pools/pool-registry.clar"
-
-[contracts.pool-template]
-path = "contracts/dex/pool-template.clar"
-depends_on = [ "conxian-protocol",]
-
-
-[contracts.position-factory]
-path = "contracts/position-factory.clar"
-depends_on = [ "sip-standards",]
-
-[contracts.position-factory-root]
-path = "contracts/mev/position-factory-root.clar"
-
-[contracts.position-manager]
-path = "contracts/core/position-manager.clar"
-depends_on = [ "core-traits", "sip-standards",]
-
-[contracts.predictive-scaling-system]
-path = "contracts/dex/predictive-scaling-system.clar"
-
-
-[contracts.price-stability-monitor]
-path = "contracts/monitoring/price-stability-monitor.clar"
-depends_on = [ "agent-risk",]
-
-[contracts.proof-of-reserves]
-path = "contracts/security/proof-of-reserves.clar"
-depends_on = [ "sip-standards",]
-
-[contracts.proposal-registry]
-path = "contracts/governance/proposal-registry.clar"
-
-[contracts.proposal-executor]
-path = "contracts/governance/proposal-executor.clar"
-depends_on = [ "cxvg-token", "governance-traits", "proposal-registry", "sip-standards",]
-
-[contracts.proposal-engine]
-path = "contracts/governance/proposal-engine.clar"
-depends_on = [ "conxian-access", "enhanced-governance-nft", "governance-traits", "proposal-executor", "proposal-registry", "reputation-engine", "sip-standards",]
-
-[contracts.proposal-engine-trait]
-path = "contracts/governance/proposal-engine-trait.clar"
-
-
-[contracts.protocol-invariant-monitor]
-path = "contracts/dex/protocol-invariant-monitor.clar"
-
-[contracts.pyth-traits]
-path = "contracts/traits/pyth-traits.clar"
-
-[contracts.pyth-oracle-adapter]
-path = "contracts/integrations/pyth-oracle-adapter.clar"
-depends_on = [ "conxian-protocol", "defi-traits", "pyth-traits",]
-
-[contracts.rate-limiter]
-path = "contracts/security/rate-limiter.clar"
-
-
-[contracts.rebalancing-rules]
-path = "contracts/dex/rebalancing-rules.clar"
-
-[contracts.redstone-traits]
-path = "contracts/traits/redstone-traits.clar"
-
-[contracts.redstone-oracle-adapter]
-path = "contracts/integrations/redstone-oracle-adapter.clar"
-depends_on = [ "defi-traits", "redstone-traits",]
-
-[contracts.route-manager]
-path = "contracts/dex/route-manager.clar"
-depends_on = [ "conxian-protocol", "core-traits", "regulatory-adapter", "sip-standards",]
-
-[contracts.sbtc-vault]
-path = "contracts/vaults/sbtc-vault.clar"
-depends_on = [ "core-traits", "regulatory-adapter", "sip-standards", "vault-traits",]
-
-[contracts.signed-data-base]
-path = "contracts/governance/signed-data-base.clar"
-
-[contracts.swap-manager]
-path = "contracts/dex/swap-manager.clar"
-depends_on = [ "circuit-breaker", "conxian-protocol",]
-
 [contracts.swap-router]
 path = "contracts/dex/swap-router.clar"
-depends_on = [ "admin-facade", "concentrated-liquidity-pool", "conxian-protocol", "oracle-aggregator", "sip-standards",]
+depends_on = ["oracle-aggregator", "mev-protector", "conxian-protocol"]
 
-[contracts.switchboard-oracle-adapter]
-path = "contracts/integrations/switchboard-oracle-adapter.clar"
+[contracts.agent-risk]
+path = "contracts/agents/agent-risk.clar"
+clarity-version = 4
+depends_on = ["oracle-aggregator", "cxd-token"]
 
-[contracts.test-c4]
-path = "contracts/test-helpers/test-c4.clar"
+[contracts.agent-treasury]
+path = "contracts/agents/agent-treasury.clar"
+depends_on = ["agent-risk", "cxd-treasury"]
 
-[contracts.travel-rule-service]
-path = "contracts/compliance/travel-rule-service.clar"
+[contracts.revenue-distributor]
+path = "contracts/treasury/revenue-distributor.clar"
+depends_on = ["cxd-treasury"]
 
-[contracts.treasury-governance]
-path = "contracts/governance/treasury-governance.clar"
-depends_on = [ "cxtr-token", "governance-traits", "operational-treasury", "proposal-executor",]
+[contracts.economic-policy-engine]
+path = "contracts/core/economic-policy-engine.clar"
+depends_on = ["conxian-protocol", "revenue-distributor"]
 
-[contracts.twap-oracle]
-path = "contracts/integrations/twap-oracle.clar"
+[contracts.risk-manager]
+path = "contracts/core/risk-manager.clar"
 
-[contracts.upgrade-controller]
-path = "contracts/governance/upgrade-controller.clar"
+[contracts.position-nft]
+path = "contracts/dimensional/position-nft.clar"
 
-[contracts.vault]
-path = "contracts/dex/vault.clar"
-depends_on = [ "circuit-breaker", "conxian-protocol", "sip-standards",]
+[contracts.lending-manager]
+path = "contracts/lending/lending-manager.clar"
+depends_on = ["conxian-protocol", "economic-policy-engine", "risk-manager"]
 
-[contracts.voting]
-path = "contracts/governance/voting.clar"
-depends_on = [ "conxian-access", "sip-standards",]
+[contracts.dimensional-core]
+path = "contracts/dimensional/dimensional-core.clar"
+depends_on = ["position-nft"]
 
-[contracts.wormhole-handlers]
-path = "contracts/interoperability/wormhole-handlers.clar"
+[contracts.operational-treasury]
+path = "contracts/core/operational-treasury.clar"
 
-[contracts.wormhole-inbox]
-path = "contracts/interoperability/wormhole-inbox.clar"
+[contracts.conxian-insurance-fund]
+path = "contracts/security/conxian-insurance-fund.clar"
 
-[contracts.wormhole-outbox]
-path = "contracts/interoperability/wormhole-outbox.clar"
-depends_on = [ "revenue-distributor", "sip-standards",]
+[contracts.finance-metrics]
+path = "contracts/monitoring/finance-metrics.clar"
+depends_on = ["cxd-token", "lending-manager", "dimensional-core", "operational-treasury", "conxian-insurance-fund"]
 
-[contracts.yield-aggregator]
-path = "contracts/vaults/yield-aggregator.clar"
-depends_on = [ "vault-traits",]
+[contracts.ops-engine]
+path = "contracts/core/ops-engine.clar"
+depends_on = ["swap-router", "agent-treasury"]
 
-[contracts.yield-governance]
-path = "contracts/governance/yield-governance.clar"
-depends_on = [ "cxs-token", "governance-traits", "proposal-executor",]
-
-[contracts.yield-optimizer]
-path = "contracts/yield/yield-optimizer.clar"
-depends_on = [ "auto-compounder", "vault-traits",]
-
-[accounts]
-deployer = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
-wallet_1 = "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5"
-wallet_2 = "ST2CY5V39NHDPWSXMW9MDT5W3R0X5Y6K68159ST7"
+[contracts.circuit-breaker]
+path = "contracts/security/circuit-breaker.clar"

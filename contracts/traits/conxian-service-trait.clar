@@ -27,3 +27,11 @@
     (response bool uint)
   )
 ))
+
+(define-trait strategy-trait (
+  (run-fiscal-strategy
+    ()
+    (response bool uint)
+  )
+)
+)
