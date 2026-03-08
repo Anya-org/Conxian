@@ -118,3 +118,6 @@ path = "contracts/governance/proposal-registry.clar"
 
 [contracts.concentrated-math]
 path = "contracts/math/concentrated-math.clar"
+
+[contracts.governance-traits]
+path = "contracts/traits/governance-traits.clar"
