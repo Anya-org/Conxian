@@ -92,30 +92,42 @@
 )
 
 
-;; @desc Swap
-;; @returns (response bool uint)
+;; @desc Swap - Router pulls input tokens, pool executes swap and sends output
 (define-public (swap (pool-id uint) (zero-for-one bool) (amount-in uint) (token0-trait <sip-010-ft-trait>) (token1-trait <sip-010-ft-trait>))
   (let ((pool (unwrap! (map-get? pools pool-id) (err ERR_INSUFFICIENT_LIQUIDITY))))
     (begin
+      (asserts! (> amount-in u0) (err u1003))
       (let (
         (total-fee (/ (* amount-in (get fee pool)) u1000000))
         (protocol-fee (/ (* total-fee PROTOCOL_FEE_SHARE) u10000))
         (lp-fee (- total-fee protocol-fee))
         (amount-out (- amount-in total-fee))
         (token-in (if zero-for-one (get token0 pool) (get token1 pool)))
+        (recipient contract-caller) ;; Router is calling, user is tx-sender of router
       )
+        ;; Track protocol revenue
         (let ((current-revenue (default-to u0 (map-get? total-revenue token-in))))
           (map-set total-revenue token-in (+ current-revenue protocol-fee))
         )
+        ;; Update pool liquidity
         (map-set pools pool-id (merge pool { liquidity: (+ (get liquidity pool) lp-fee) }))
-        (let ((recipient tx-sender))
-          (as-contract
-            (if zero-for-one
-              (try! (contract-call? token1-trait transfer amount-out (as-contract tx-sender) recipient none))
-              (try! (contract-call? token0-trait transfer amount-out (as-contract tx-sender) recipient none))
-            )
-          )
+        
+        ;; Send output tokens to recipient (via router, which is contract-caller)
+        (if zero-for-one
+          (try! (as-contract (contract-call? token1-trait transfer amount-out tx-sender recipient none)))
+          (try! (as-contract (contract-call? token0-trait transfer amount-out tx-sender recipient none)))
         )
+        
+        ;; Emit swap event
+        (print {
+          event: "pool-swap",
+          pool-id: pool-id,
+          zero-for-one: zero-for-one,
+          amount-in: amount-in,
+          amount-out: amount-out,
+          recipient: recipient
+        })
+        
         (ok amount-out)
       )
     )

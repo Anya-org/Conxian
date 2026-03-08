@@ -82,18 +82,64 @@
 )
 
 ;; Vault Trait Implementation - allocate-to-strategy
+(define-map strategy-allocations principal uint)
+(define-data-var total-allocated uint u0)
+
 (define-public (allocate-to-strategy (strategy principal) (amount uint))
-    (begin
-        (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-        ;; Placeholder for strategy allocation logic
-        (ok true)
+    (let (
+        (current-allocation (default-to u0 (map-get? strategy-allocations strategy)))
+        (new-allocation (+ current-allocation amount))
+    )
+        (begin
+            (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+            (map-set strategy-allocations strategy new-allocation)
+            (var-set total-allocated (+ (var-get total-allocated) amount))
+            (print {
+                event: "strategy-allocated",
+                strategy: strategy,
+                amount: amount,
+                new-total: new-allocation,
+                total-allocated: (var-get total-allocated)
+            })
+            (ok true)
+        )
+    )
+)
+
+;; @desc Get allocation for a specific strategy
+(define-read-only (get-strategy-allocation (strategy principal))
+    (ok (default-to u0 (map-get? strategy-allocations strategy)))
+)
+
+;; @desc Get total allocated across all strategies
+(define-read-only (get-total-allocated)
+    (ok (var-get total-allocated))
+)
+
+;; @desc Deallocate from a strategy
+(define-public (deallocate-from-strategy (strategy principal) (amount uint))
+    (let (
+        (current-allocation (default-to u0 (map-get? strategy-allocations strategy)))
+    )
+        (begin
+            (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+            (asserts! (>= current-allocation amount) (err ERR_INSUFFICIENT_BALANCE))
+            (map-set strategy-allocations strategy (- current-allocation amount))
+            (var-set total-allocated (- (var-get total-allocated) amount))
+            (print {
+                event: "strategy-deallocated",
+                strategy: strategy,
+                amount: amount,
+                remaining: (- current-allocation amount)
+            })
+            (ok true)
+        )
     )
 )
 
 (define-public (complete-withdrawal)
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-        ;; Placeholder for withdrawal completion logic
         (ok true)
     )
 )

@@ -50,7 +50,7 @@ path = "contracts/security/mev-protector.clar"
 
 [contracts.swap-router]
 path = "contracts/dex/swap-router.clar"
-depends_on = ["oracle-aggregator", "mev-protector", "conxian-protocol"]
+depends_on = ["oracle-aggregator", "mev-protector", "conxian-protocol", "concentrated-liquidity-pool"]
 
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
@@ -99,3 +99,10 @@ depends_on = ["swap-router", "agent-treasury"]
 
 [contracts.circuit-breaker]
 path = "contracts/security/circuit-breaker.clar"
+
+[contracts.vault-traits]
+path = "contracts/traits/vault-trait.clar"
+
+[contracts.concentrated-liquidity-pool]
+path = "contracts/dex/concentrated-liquidity-pool.clar"
+depends_on = ["sip-standards"]

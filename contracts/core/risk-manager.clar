@@ -70,6 +70,18 @@
   )
 )
 
+;; @desc Read-only health factor lookup (no cache update)
+(define-read-only (get-health-factor-read-only (position-id uint))
+  (let (
+    (cached (map-get? position-health position-id))
+  )
+    (match cached
+      data (ok (get health-factor data))
+      (err ERR_INVALID_POSITION)
+    )
+  )
+)
+
 ;; @desc Execute liquidation trigger
 ;; @returns (response bool uint)
 (define-public (liquidate (position-id uint))
