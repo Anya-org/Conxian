@@ -82,12 +82,12 @@ export default function Home() {
               <p className="text-sm text-gray-500 uppercase tracking-wider mt-1">Free Sigs/Mo</p>
             </div>
             <div>
-              <p className="text-3xl font-bold">$1.00+</p>
-              <p className="text-sm text-gray-500 uppercase tracking-wider mt-1">PPP Scaled</p>
+              <p className="text-3xl font-bold">~300ms</p>
+              <p className="text-sm text-gray-500 uppercase tracking-wider mt-1">Avg Latency</p>
             </div>
             <div>
-              <p className="text-3xl font-bold">~300ms</p>
-              <p className="text-sm text-gray-500 uppercase tracking-wider mt-1">Latency</p>
+              <p className="text-3xl font-bold">100%</p>
+              <p className="text-sm text-gray-500 uppercase tracking-wider mt-1">Self Custodial</p>
             </div>
           </div>
         </div>
