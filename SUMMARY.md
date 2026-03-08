@@ -10,59 +10,31 @@
 * [Org Chart](01_company/org-chart.md)
 
 ## 📈 Strategy
-* [5-Year Plan](02_strategy/5-year-plan.md)
 * [Roadmap](02_strategy/ROADMAP.md)
+* [Autonomous Launch Roadmap](02_strategy/CSF_AUTONOMOUS_ROADMAP.md)
+* [Business Strategy](02_strategy/BUSINESS_STRATEGY.md)
 * [Product Strategy](02_strategy/PRODUCT_STRATEGY.md)
 * [Monetization](02_strategy/MONETIZATION.md)
 * [Sovereign Bridge Strategy](02_strategy/SOVEREIGN_BRIDGE_STRATEGY.md)
-* [Market Timing](02_strategy/market-timing.md)
-* [Funding Tiers](02_strategy/funding-tiers.md)
 * [7 Powers Report](02_strategy/7_POWERS_ENHANCEMENT_REPORT.md)
 * [ATS Standard 2026](02_strategy/ATS_TEMPLATE.md)
-* [AgentOps Specification](02_strategy/AGENT_OPS_SPEC.md)
-* [iOS Parity Plan](02_strategy/reports/IOS_PARITY_PLAN.md)
 
-## 📜 Proposals (CXIPs)
-* [CXIP-013: Revenue Distribution](Conxian/CXIP-013.md)
-
-## 🏗️ Infrastructure
-* [Cloud Roadmap](03_infrastructure/cloud-roadmap.md)
-* [GCP Infrastructure](03_infrastructure/GCP_INFRASTRUCTURE.md)
-* [Cost Estimates](03_infrastructure/cost-estimates.md)
-* [KYA Protocol](03_infrastructure/KYA_PROTOCOL.md)
-* [Multichain Routing NTT](03_infrastructure/MULTICHAIN_ROUTING_NTT.md)
-* [ERP Integration](03_infrastructure/ERP_INTEGRATION_MODELS.md)
-
-## ⚙️ Operations
-* [Dev-to-Live Workflow](conxius-platform/DEPLOYMENT.md)
+## 🛠️ OpenSpec (Ground Truth)
+* [OpenSpec Baseline](openspec/changes/remediate-enterprise-sovereignty/specs.md)
+* [Autonomous Launch Specs](openspec/changes/csf-autonomous-launch/specs.md)
 
 ## ⚖️ Legal & Compliance
-* [MICA & IRS Compliance](04_legal/MICA_IRS_COMPLIANCE_ENCLAVE.md)
-* [Partners & Compliance](04_legal/PARTNERS_AND_COMPLIANCE.md)
-* [Governed Automation Standards](04_legal/GOVERNED_AUTOMATION_STANDARDS.md)
 * [Risk Registry](04_legal/RISK_REGISTRY.md)
-* [Incorporation](04_legal/incorporation.md)
+* [Partners & Compliance](04_legal/PARTNERS_AND_COMPLIANCE.md)
+* [MiCA/IRS Compliance Enclave](04_legal/MICA_IRS_COMPLIANCE_ENCLAVE.md)
 
-## 🤝 Investors
-* [Pitch Feedback](05_investors/pitch-feedback.md)
-* [Target List](05_investors/target-list.md)
+## 📦 Architecture
+* [Conxian Protocol](Conxian/docs/ARCHITECTURE.md)
+* [Nexus State Node](conxian-nexus/docs/PRD.md)
+* [Fusion Gateway](conxian-gateway/PRD.md)
 
-## 📅 Meetings & Status
-* [Sprint Status - Feb 2026](06_meetings/SPRINT_STATUS_FEB_2026.md)
-* [Meeting with Sizwe](06_meetings/2026-02-26-sizwe.md)
-* [Meeting with Khosa](06_meetings/2026-02-27-khosa.md)
-
-## 📈 Strategy Review
-* [Standardized Product Briefs](internal/strategy/briefs/README.md)
-* [Market Sizing](internal/strategy/MARKET_SIZING.md)
-* [Red Team Assessment](internal/strategy/RED_TEAM_ASSESSMENT.md)
-* [Business Unit Review 2026](internal/strategy/business_unit_review_2026.md)
-* [Leaf-to-Root Feedback 2026](internal/strategy/leaf_to_root_feedback_2026.md)
-* [Root-Leaf Alignment Report](internal/strategy/root_leaf_alignment_report.md)
-* [System & Asset Review 2026](internal/strategy/system_asset_review_2026.md)
-
-## 🔬 Research
-* [Superiority Evaluation 2026](docs/research/SUPERIORITY_REPORT_2026.md)
-
-## 🛡️ Privacy
-* [Sovereign Privacy Report](docs/product-review/SOVEREIGN_PRIVACY_REPORT.md)
+## 💼 Business Development Units
+* [Access BD (Retail/SME)](conxius-wallet/docs/business/BD_UNIT_ACCESS.md)
+* [Finance BD (LPs/Yield)](Conxian/docs/BD_UNIT_FINANCE.md)
+* [Connectivity BD (ERP/Treasury)](conxian-gateway/docs/BD_UNIT_CONNECTIVITY.md)
+* [State BD (Data/Risk)](conxian-nexus/docs/BD_UNIT_STATE.md)

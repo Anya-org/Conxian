@@ -14,15 +14,15 @@ Conxian is a **Bitcoin-native Infrastructure Ecosystem**. We have unbundled our 
 *   **Strategy**: Commodore high-end security via device-native TEE. Use the "Sovereign Virus" viral growth model (Shared Conclaves) to onboard retail and SME users.
 
 ### 2.2 Conxian Sovereign Finance (CSF) (The Yield Engine)
-*   **TAM**: $150B
-*   **Strategy**: Provide a high-integrity settlement layer for Bitcoin yields. Institutional trust is built through the "Fiscal Dam" architectural remediation and CXIP-013 revenue transparency.
+*   **TAM**: $1.4T (Total Bitcoin Capital)
+*   **Strategy**: Transition to a community-owned, autonomous protocol ("Gift Status"). Revenue is secured via a hardcoded 0.1% Founder's Cut, with growth accelerated by 5-5-5 referral engines.
 
 ### 2.3 Conxian Fusion (The Institutional Bridge)
-*   **TAM**: $50B
-*   **Strategy**: Target the Office of the CFO by providing "The Engine" - a deterministic sync between Bitcoin yields and enterprise ERP systems (SAP/Oracle). This creates insurmountably high switching costs.
+*   **TAM**: $100B
+*   **Strategy**: Target the Office of the CFO by providing "The Engine" - a deterministic sync between Bitcoin yields and enterprise ERP systems (SAP/Oracle). Deployed via ALEX/Portal institutional SDKs.
 
 ### 2.4 Conxian Nexus (Cryptographic State)
-*   **TAM**: $20B
+*   **TAM**: $10B
 *   **Strategy**: Establish the ecosystem's "Glass Node." Provide verifiable state proofs and real-time risk telemetry to institutional ERM (Enterprise Risk Management) dashboards.
 
 ---
