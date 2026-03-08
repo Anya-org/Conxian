@@ -1,6 +1,6 @@
 # Conxian Protocol: Ruthless Risk Registry & Due Diligence (2026 Revision)
 
-This document categorizes structural risks and outlines "No-Egress" mitigation strategies based on verified technical implementation.
+This document categorizes structural risks and outlines "No-Egress" mitigation strategies based on verified technical implementation and the transition to autonomous launch.
 
 ---
 
@@ -9,6 +9,10 @@ This document categorizes structural risks and outlines "No-Egress" mitigation s
 ### 1.1 The "Gatekeeper" Vulnerability
 *   **Risk**: Centralized secret management for the ecosystem.
 *   **Mitigation**: Migration to **n-of-m Musig2 Institutional Quorums** for all administrative operations. Sentinel secret filtering mandated in all CI/CD flows.
+
+### 1.2 Governance Attack during Handover
+*   **Risk**: Malicious actors capturing the ExecutorDAO during the 24-month progressive decentralization phase.
+*   **Mitigation**: **Trust Buffer Implementation.** 90% of IDO proceeds are locked in a one-week safety buffer. DAO voting power is weighted by "A-Power" (ALEX Lab participation history) and reputation scores.
 
 ---
 
@@ -45,6 +49,18 @@ This document categorizes structural risks and outlines "No-Egress" mitigation s
 ### 5.1 TypeScript/NPM Supply Chain Risk
 *   **Risk**: Vulnerabilities in the orchestration layer.
 *   **Mitigation**: **Rust Core Mandate.** All mission-critical signing and state logic must reside in Conclave Core (Rust). TypeScript is strictly for UI/UX rendering. Mandatory release SBOM generation.
+
+---
+
+## 6. Autonomous Launch Specifics
+
+### 6.1 "Founder's Cut" Sustainability Risk
+*   **Risk**: The 0.1% hardcoded fee is insufficient for long-term maintenance or exceeds community tolerance.
+*   **Mitigation**: The fee is hardcoded in `revenue-automation.clar` for predictability. It serves as a permanent protocol endowment for the "Gift Status," ensuring the system remains autonomous without needing additional capital injections.
+
+### 6.2 Key Relinquishment (Admin 0x0)
+*   **Risk**: Irreversible loss of protocol update capability if the admin key is burned prematurely.
+*   **Mitigation**: **Progressive Key Relinquishment.** Handover to ExecutorDAO (M20) precedes the final burn (M21). System stability must be verified via Magnus adversarial testing before final key relinquishment.
 
 ---
 © 2026 Conxian. Sovereign Autonomous Business.

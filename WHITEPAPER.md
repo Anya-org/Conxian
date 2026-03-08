@@ -1,31 +1,31 @@
 # Conxian: The Bitcoin Sovereign Finance Layer
-**Whitepaper v1.5.0 (2026 Revision - Agentic Interface Ground Truth)**
+**Whitepaper v1.6.0 (2026 Revision - Autonomous Launch Ground Truth)**
 
 ## Abstract
 Conxian is a high-integrity DeFi orchestration platform designed to make Bitcoin a productive asset. By integrating Stacks L2 (Nakamoto) smart contracts with a hardware-anchored middleware triad, Conxian provides the technical truth required for a Sovereign Autonomous Business.
 
-## 1. Vision & Ethos
-### 1.1 Non-Custodial Truth
-All system states are anchored to the Bitcoin burn-block height. We mathematically prevent centralized, fractional-reserve failures by enforcing hardware-enclosed execution and trustless cryptographic proof.
+## 1. Vision & Ethos: Non-Custodial Truth
+All system states are anchored to the Bitcoin burn-block height. We mathematically prevent centralized, fractional-reserve failures by enforcing hardware-enclosed execution, trustless cryptographic proof, and hardcoded fee distributions.
 
 ## 2. Technical Architecture: Agentic Interface
 The Conxius-wallet is elevated into an **Autonomous Agentic Interface**.
-- **Kotlin MCP Server**: Embedded Model Context Protocol server providing localized, sovereign AI context for LLM tool-calling.
-- **Hardware-Enclosed Signing**: All agent-initiated transactions require signing within the **Android StrongBox** (Zero Secret Egress).
-- **A402 ASCs**: Atomic Service Channels utilizing TEE-assisted adaptor signatures to ensure payment atomicity for digital services.
+- **Kotlin MCP Server**: Embedded Model Context Protocol server providing localized, sovereign AI context.
+- **Hardware-Enclosed Signing**: All transactions require signing within the **Android StrongBox** (Zero Secret Egress).
+- **A402 ASCs**: Atomic Service Channels for automated agentic payments.
 
-## 3. Protocol Guardrails
-Conxian enforces absolute cryptographic boundaries between human intent and machine speed.
+## 3. CSF: Sovereign Finance & Autonomous Growth
+Conxian Sovereign Finance (CSF) serves as the settlement and liquidity layer.
+- **Founder's Cut**: Hardcoded 0.1% protocol fee for long-term system sustainability.
+- **5-5-5 Referral Engine**: Autonomous growth loop (5% Referrer, 5% Referee, 5% Protocol Health).
+- **ALEX Lab Fair Launch**: Price discovery via Liquidity Bootstrapping Pools (LBP) and community-led IDO.
 
-### 3.1 AP2 Verifiable Mandates
-Autonomous execution is governed by the **Agent Payments Protocol (AP2)**. Mandates are tamper-proof digital contracts (VCs) that the hardware enclave verifies against unsigned payloads before generating a signature. This mitigates prompt injection at the silicon level.
+## 4. Protocol Guardrails
+- **AP2 Verifiable Mandates**: Tamper-proof digital contracts governing AI spending.
+- **Nexus-First State**: Trustless state synchronization through the Glass Node architecture.
+- **ISO 20022 Sync**: "The Engine" ensures deterministic ERP synchronization for institutional users.
 
-### 3.2 On-Chain Spend Limits (Clarity)
-As a final line of defense, the wallet deploys smart contract-enforced spend limits on the Stacks blockchain. Daily and per-transaction caps are baked into the **Clarity settlement layer**, ensuring protocol-level rejection of unauthorized drainage.
-
-## 4. Operational Standards
-- **Zero Secret Egress**: Private keys never leave the secure hardware enclave.
-- **Phase 4 Unbundling**: Structural isolation of B2B, B2C, and Infrastructure suites.
+## 5. Transition to Gift Status
+The protocol is designed for **Exit to Community (E2C)**. Admin control will be progressively relinquished to the **ExecutorDAO**, with final "Key Relinquishment" setting the admin address to 0x0.
 
 ---
 © 2026 Conxian. Sovereign Autonomous Business.
