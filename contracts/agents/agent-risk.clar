@@ -72,9 +72,37 @@
   (ok (var-get mock-gcr))
 )
 
-;; @desc Calculates health factor for a position (Stub)
+;; @desc Calculates real health factor for a position by querying risk-manager (read-only)
 (define-read-only (get-health-factor (position-id uint))
-  (ok u200) ;; 2.0x Healthy default
+  (contract-call? .risk-manager get-health-factor-read-only position-id)
+)
+
+;; @desc Check if a position is liquidatable
+(define-read-only (is-liquidatable (position-id uint))
+  (contract-call? .risk-manager is-liquidatable position-id)
+)
+
+;; @desc Trigger liquidation for an unhealthy position
+(define-public (trigger-liquidation (position-id uint))
+  (let (
+    (liquidatable (unwrap! (is-liquidatable position-id) (err u2002)))
+  )
+    (begin
+      (asserts! (not (var-get is-paused)) (err u1001))
+      (asserts! liquidatable (err u2003)) ;; Position not liquidatable
+      
+      ;; Call risk-manager to execute liquidation
+      (try! (contract-call? .risk-manager liquidate position-id))
+      
+      (print {
+        event: "liquidation-triggered",
+        position-id: position-id,
+        triggered-by: tx-sender,
+        timestamp: burn-block-height
+      })
+      (ok true)
+    )
+  )
 )
 
 ;; --- conxian-service-trait ---
