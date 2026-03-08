@@ -1,24 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Shield, Zap, Lock, Code, CheckCircle2, ChevronRight, Activity } from "lucide-react";
-import { motion } from "framer-motion";
 
 export default function Home() {
   const [signingState, setSigningState] = useState<"idle" | "signing" | "success">("idle");
   const [latency, setLatency] = useState(0);
+  
+  const timer1 = useRef<NodeJS.Timeout | null>(null);
+  const timer2 = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timer1.current) clearTimeout(timer1.current);
+      if (timer2.current) clearTimeout(timer2.current);
+    };
+  }, []);
 
   const simulateSigning = () => {
+    if (signingState !== "idle") return;
+    
     setSigningState("signing");
     const start = performance.now();
     
     // Simulate ~300ms StrongBox hardware signing latency
-    setTimeout(() => {
+    timer1.current = setTimeout(() => {
       const end = performance.now();
       setLatency(Math.round(end - start));
       setSigningState("success");
       
-      setTimeout(() => setSigningState("idle"), 3000);
+      timer2.current = setTimeout(() => setSigningState("idle"), 3000);
     }, 312);
   };
 
@@ -117,10 +128,10 @@ export default function Home() {
 
               <button 
                 onClick={simulateSigning}
-                disabled={signingState === "signing"}
+                disabled={signingState !== "idle"}
                 className={`w-full py-4 rounded-md font-bold flex items-center justify-center gap-2 transition-all ${
                   signingState === "signing" ? "bg-orange-500/50 cursor-not-allowed" :
-                  signingState === "success" ? "bg-green-500 text-black" :
+                  signingState === "success" ? "bg-green-500 text-black cursor-not-allowed" :
                   "bg-white text-black hover:bg-orange-500 hover:text-white"
                 }`}
               >
