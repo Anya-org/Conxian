@@ -44,25 +44,15 @@
 ;; @desc Check health of a specific module
 (define-private (check-module-health (module-id (string-ascii 32)))
   (if (is-eq module-id "dimensional-core")
-    (match (contract-call? .dimensional-core calculate-tvl)
-      success true
-      err-val false)
+    (is-ok (contract-call? .dimensional-core calculate-tvl))
   (if (is-eq module-id "risk-manager")
-    (match (contract-call? .risk-manager is-liquidatable u0)
-      success true
-      err-val false)
+    (is-ok (contract-call? .risk-manager is-liquidatable u0))
   (if (is-eq module-id "oracle-aggregator")
-    (match (contract-call? .oracle-aggregator get-price .cxd-token)
-      success true
-      err-val false)
+    (is-ok (contract-call? .oracle-aggregator get-price .cxd-token))
   (if (is-eq module-id "agent-risk")
-    (match (contract-call? .agent-risk assess-system-risk)
-      success true
-      err-val false)
+    (> (contract-call? .agent-risk assess-system-risk) u0)
   (if (is-eq module-id "swap-router")
-    (match (contract-call? .swap-router get-protocol-status)
-      success true
-      err-val false)
+    (is-ok (contract-call? .swap-router get-protocol-status))
   ;; Default: unknown module
   false
   ))))))

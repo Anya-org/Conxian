@@ -164,6 +164,9 @@ path = "contracts/monitoring/monitoring-dashboard.clar"
 [contracts.proposal-engine]
 path = "contracts/governance/proposal-engine.clar"
 
+[contracts.proposal-executor]
+path = "contracts/governance/proposal-executor.clar"
+
 [contracts.dao-treasury]
 path = "contracts/governance/dao-treasury.clar"
 
@@ -196,3 +199,12 @@ path = "contracts/test-helpers/mock-token.clar"
 
 [contracts.mock-proposal]
 path = "contracts/test-helpers/mock-proposal.clar"
+
+[contracts.compliance-manager]
+path = "contracts/compliance/compliance-manager.clar"
+
+[contracts.regulatory-adapter]
+path = "contracts/compliance/regulatory-adapter.clar"
+
+[contracts.enhanced-governance-nft]
+path = "contracts/governance/enhanced-governance-nft.clar"
