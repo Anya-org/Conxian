@@ -104,6 +104,38 @@
   )
 )
 
+;; @desc Withdraw deposited assets from the protocol.
+(define-public (withdraw (asset-trait <sip-010-ft-trait>) (amount uint))
+  (let (
+    (asset (contract-of asset-trait))
+  )
+    (begin
+      (try! (check-circuit-breaker))
+      (unwrap-panic (accrue-interest asset))
+      (let (
+        (current-dep (default-to u0 (map-get? deposits { asset: asset, user: tx-sender })))
+        (reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: burn-block-height } (map-get? reserve-data asset)))
+      )
+        (asserts! (not (contract-call? .conxian-protocol is-paused)) (err ERR_PAUSED))
+        (asserts! (> amount u0) (err ERR_INVALID_AMOUNT))
+        (asserts! (<= amount current-dep) (err ERR_INSUFFICIENT_LIQUIDITY))
+
+        ;; Transfer tokens from contract to user
+        (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) tx-sender none)))
+
+        (map-set deposits { asset: asset, user: tx-sender } (- current-dep amount))
+        (map-set reserve-data asset (merge reserve {
+          total-deposits: (- (get total-deposits reserve) amount),
+          last-updated: burn-block-height
+        }))
+
+        (print { event: "withdraw", user: tx-sender, asset: asset, amount: amount })
+        (ok true)
+      )
+    )
+  )
+)
+
 ;; @desc Borrow assets from the protocol.
 (define-public (borrow (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (

@@ -106,3 +106,15 @@ path = "contracts/traits/vault-trait.clar"
 [contracts.concentrated-liquidity-pool]
 path = "contracts/dex/concentrated-liquidity-pool.clar"
 depends_on = ["sip-standards"]
+
+[contracts.interest-rate-model]
+path = "contracts/lending/interest-rate-model.clar"
+
+[contracts.reputation-engine]
+path = "contracts/governance/reputation-engine.clar"
+
+[contracts.proposal-registry]
+path = "contracts/governance/proposal-registry.clar"
+
+[contracts.concentrated-math]
+path = "contracts/math/concentrated-math.clar"
