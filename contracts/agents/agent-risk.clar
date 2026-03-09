@@ -21,6 +21,13 @@
 (define-data-var last-month-tvl uint u0)
 (define-data-var bounty-completion-rate uint u0)
 (define-data-var is-paused bool false)
+(define-data-var initialized bool false)
+
+;; --- Authorization ---
+
+(define-read-only (is-authorized-admin)
+  (or (is-eq tx-sender (var-get admin)) (not (var-get initialized)))
+)
 
 ;; --- Read-Only Functions ---
 
@@ -29,7 +36,7 @@
   (ok {
     financial-gcr: (var-get mock-gcr),
     operational-fee: (var-get stability-fee),
-    tvl-growth-rate: (get-performance-metrics),
+    tvl-growth-rate: (get-performance-metrics-raw),
     risk-score: (assess-system-risk)
   })
 )
@@ -54,8 +61,16 @@
   )
 )
 
-;; @desc Returns MoM TVL growth and bounty completion rates
 (define-read-only (get-performance-metrics)
+  (ok {
+    tvl: (var-get total-value-locked),
+    last-month-tvl: (var-get last-month-tvl),
+    bounty-completion-rate: (var-get bounty-completion-rate),
+    tvl-growth-bps: (get-performance-metrics-raw)
+  })
+)
+
+(define-private (get-performance-metrics-raw)
   (let (
     (current-tvl (var-get total-value-locked))
     (prev-tvl (var-get last-month-tvl))
@@ -85,7 +100,7 @@
 ;; @desc Trigger liquidation for an unhealthy position
 (define-public (trigger-liquidation (position-id uint))
   (let (
-    (liquidatable (unwrap! (is-liquidatable position-id) (err u2002)))
+    (liquidatable (unwrap! (contract-call? .risk-manager is-liquidatable position-id) (err u2002)))
   )
     (begin
       (asserts! (not (var-get is-paused)) (err u1001))
@@ -130,7 +145,7 @@
 (define-public (execute-service-op (payload (buff 2048)))
   (begin
     (asserts! (not (var-get is-paused)) (err u1001))
-    (update-pid-rates)
+    (match (update-pid-rates) res (ok true) err-val (err err-val))
   )
 )
 
@@ -141,7 +156,7 @@
 )
 
 (define-public (do-work (payload (buff 2048)))
-  (update-pid-rates)
+  (match (update-pid-rates) res (ok true) err-val (err err-val))
 )
 
 ;; --- Public State Changes ---
@@ -169,7 +184,7 @@
 ;; @desc Updates TVL and performance metrics. Admin only.
 (define-public (set-tvl (new-tvl uint) (new-last-month uint) (new-bounty-rate uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
     (var-set total-value-locked new-tvl)
     (var-set last-month-tvl new-last-month)
     (var-set bounty-completion-rate new-bounty-rate)
@@ -179,8 +194,17 @@
 
 (define-public (set-mock-gcr (new-gcr uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
     (var-set mock-gcr new-gcr)
+    (ok true)
+  )
+)
+
+(define-public (initialize (new-admin principal))
+  (begin
+    (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
+    (var-set admin new-admin)
+    (var-set initialized true)
     (ok true)
   )
 )

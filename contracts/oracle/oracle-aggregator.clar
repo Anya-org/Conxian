@@ -1,27 +1,39 @@
 ;; oracle-aggregator.clar - Multi-Source Price Aggregation
-;; Conxian Protocol - Nakamoto-Aligned (Epoch 3.0 / Clarity 4)
-;; Aggregates prices from multiple oracle sources for resilience
+;; Conxian Protocol - Apex Upgrade (v1.1.0)
+;; Aggregates prices for 2026 Stacks Ecosystem assets (sBTC, stSTX, USDA, etc.)
 
-;; Constants
-(define-constant ERR_UNAUTHORIZED u1000)
-(define-constant ERR_NO_VALID_PRICE u1001)
-(define-constant ERR_STALE_PRICE u1002)
-(define-constant ERR_INVALID_SOURCE u1003)
-(define-constant MAX_PRICE_AGE u144) ;; ~24 hours in blocks
+;; --- Constants ---
+(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_NO_VALID_PRICE (err u1001))
+(define-constant ERR_STALE_PRICE (err u1002))
+(define-constant ERR_INVALID_SOURCE (err u1003))
+(define-constant MAX_PRICE_AGE u144)
 (define-constant MIN_SOURCES_REQUIRED u2)
 
-;; Data Vars
+;; --- Data Vars ---
 (define-data-var admin principal tx-sender)
 (define-data-var volatility-index uint u35)
 
+;; --- Maps ---
 ;; Price Sources (principal -> enabled)
 (define-map authorized-sources principal bool)
 
-;; Asset Prices: principal -> {price: uint, timestamp: uint, sources: uint}
-(define-map asset-prices principal {price: uint, timestamp: uint, source-count: uint})
+;; Asset Registry: principal -> { tier: uint, is-yield-bearing: bool }
+(define-map asset-registry principal { tier: uint, is-yield-bearing: bool })
 
-;; Individual source prices: {asset, source} -> {price: uint, timestamp: uint}
-(define-map source-prices {asset: principal, source: principal} {price: uint, timestamp: uint})
+;; Asset Prices: principal -> { price: uint, timestamp: uint, source-count: uint }
+(define-map asset-prices principal { price: uint, timestamp: uint, source-count: uint })
+
+;; Individual source prices: { asset, source } -> { price: uint, timestamp: uint }
+(define-map source-prices { asset: principal, source: principal } { price: uint, timestamp: uint })
+
+;; --- Authorization ---
+
+(define-read-only (is-authorized-admin)
+  (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin))
+)
+
+;; --- Public Oracle Functions ---
 
 ;; @desc Submit price from an authorized oracle source
 (define-public (submit-price (asset principal) (price uint))
@@ -30,11 +42,11 @@
     (is-authorized (default-to false (map-get? authorized-sources source)))
   )
     (begin
-      (asserts! is-authorized (err ERR_UNAUTHORIZED))
+      (asserts! is-authorized ERR_UNAUTHORIZED)
       (asserts! (> price u0) (err u1004))
       
       ;; Store source price
-      (map-set source-prices {asset: asset, source: source} {price: price, timestamp: burn-block-height})
+      (map-set source-prices { asset: asset, source: source } { price: price, timestamp: burn-block-height })
       
       ;; Aggregate prices
       (unwrap! (aggregate-prices asset) (err u1005))
@@ -51,15 +63,56 @@
   )
 )
 
-;; @desc Aggregate prices from all sources for an asset
+;; --- Asset Management ---
+
+;; @desc Register a 2026 Ecosystem Asset (stSTX, stSTXbtc, sBTC, USDA)
+(define-public (register-asset (asset principal) (tier uint) (is-yield-bearing bool))
+  (begin
+    (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
+    (map-set asset-registry asset { tier: tier, is-yield-bearing: is-yield-bearing })
+    (print { event: "asset-registered", asset: asset, tier: tier, yield-bearing: is-yield-bearing })
+    (ok true)
+  )
+)
+
+;; --- Read-only Functions ---
+
+;; @desc Get aggregated price for an asset
+(define-read-only (get-price (asset principal))
+  (let (
+    (data (map-get? asset-prices asset))
+  )
+    (match data
+      price-data (begin
+        (asserts! (< (- burn-block-height (get timestamp price-data)) MAX_PRICE_AGE) ERR_STALE_PRICE)
+        (ok (get price price-data))
+      )
+      (ok u100000000)
+    )
+  )
+)
+
+(define-read-only (get-asset-info (asset principal))
+  (ok (map-get? asset-registry asset))
+)
+
+;; @desc Fetch price (alias for get-price for trait compatibility)
+(define-read-only (fetch-price (asset principal))
+  (get-price asset)
+)
+
+(define-read-only (get-volatility-index)
+  (ok (var-get volatility-index))
+)
+
+;; --- Private Functions ---
+
 (define-private (aggregate-prices (asset principal))
   (let (
-    ;; For now, use a simple median of available sources
-    ;; In production, this would iterate through all authorized sources
     (price-data (map-get? asset-prices asset))
   )
     (begin
-      ;; Update with new submission (simplified aggregation)
+      ;; Update with new submission (simplified aggregation for sim)
       (match price-data
         prev-data (map-set asset-prices asset {
           price: (get price prev-data),
@@ -77,105 +130,36 @@
   )
 )
 
-;; @desc Get aggregated price for an asset
-(define-read-only (get-price (asset principal))
-  (let (
-    (data (map-get? asset-prices asset))
-  )
-    (match data
-      price-data (begin
-        (asserts! (< (- burn-block-height (get timestamp price-data)) MAX_PRICE_AGE) (err ERR_STALE_PRICE))
-        (ok (get price price-data))
-      )
-      (ok u100000000) ;; Default price if no data
-    )
+;; --- Admin Overrides ---
+
+(define-public (set-source-authorized (source principal) (authorized bool))
+  (begin
+    (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
+    (map-set authorized-sources source authorized)
+    (ok true)
   )
 )
 
-;; @desc Get price from a specific source
-(define-read-only (get-source-price (asset principal) (source principal))
-  (let (
-    (data (map-get? source-prices {asset: asset, source: source}))
-  )
-    (match data
-      price-data (ok (get price price-data))
-      (err ERR_NO_VALID_PRICE)
-    )
-  )
-)
-
-;; @desc Fetch price (alias for get-price for trait compatibility)
-(define-read-only (fetch-price (asset principal))
-  (get-price asset)
-)
-
-;; @desc Get volatility index
-(define-read-only (get-volatility-index)
-  (ok (var-get volatility-index))
-)
-
-;; @desc Update volatility index (admin only)
 (define-public (set-volatility-index (new-vol uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
     (var-set volatility-index new-vol)
     (ok true)
   )
 )
 
-;; @desc Add/remove authorized price sources
-(define-public (set-source-authorized (source principal) (authorized bool))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (map-set authorized-sources source authorized)
-    (print {
-      event: "source-authorization-changed",
-      source: source,
-      authorized: authorized
-    })
-    (ok true)
-  )
-)
-
-;; @desc Set aggregated price directly (admin override for testing/emergency)
 (define-public (set-price (asset principal) (price uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (asserts! (> price u0) (err u1004))
+    (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
     (map-set asset-prices asset {
       price: price,
       timestamp: burn-block-height,
       source-count: u1
     })
-    (print {
-      event: "price-set",
-      asset: asset,
-      price: price,
-      timestamp: burn-block-height
-    })
-    (ok true)
-  )
-)
-
-;; @desc Check if source is authorized
-(define-read-only (is-source-authorized (source principal))
-  (ok (default-to false (map-get? authorized-sources source)))
-)
-
-;; @desc Get price data with metadata
-(define-read-only (get-price-data (asset principal))
-  (ok (map-get? asset-prices asset))
-)
-
-;; @desc Set admin
-(define-public (set-admin (new-admin principal))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (var-set admin new-admin)
     (ok true)
   )
 )
 
 (define-read-only (get-protocol-status)
-  (ok { compliant: true, paused: false, tenure-id: (some (/ block-height u10)), timestamp: burn-block-height, version: "08" })
+  (ok { compliant: true, version: "v1.1.0-Apex", timestamp: burn-block-height })
 )
