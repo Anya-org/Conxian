@@ -3,14 +3,14 @@
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
-(define-constant ERR_UNAUTHORIZED u1000)
-(define-constant ERR_PAUSED u1001)
-(define-constant ERR_INSUFFICIENT_LIQUIDITY u1002)
-(define-constant ERR_INSUFFICIENT_COLLATERAL u1003)
-(define-constant ERR_INVALID_AMOUNT u1004)
+(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_PAUSED (err u1001))
+(define-constant ERR_INSUFFICIENT_LIQUIDITY (err u1002))
+(define-constant ERR_INSUFFICIENT_COLLATERAL (err u1003))
+(define-constant ERR_INVALID_AMOUNT (err u1004))
 
-(define-constant COLLATERAL_FACTOR u7500) ;; 75%
-(define-constant RESERVE_FACTOR u1000) ;; 10%
+(define-constant COLLATERAL_FACTOR u7500)
+(define-constant RESERVE_FACTOR u1000)
 
 (define-map reserve-data
   principal
@@ -34,7 +34,7 @@
     (reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: burn-block-height } (map-get? reserve-data asset)))
   )
     (begin
-      (asserts! (> amount u0) (err ERR_INVALID_AMOUNT))
+      (asserts! (> amount u0) ERR_INVALID_AMOUNT)
       (try! (contract-call? asset-trait transfer amount tx-sender (as-contract tx-sender) none))
 
       (map-set deposits { asset: asset, user: tx-sender } (+ (default-to u0 (map-get? deposits { asset: asset, user: tx-sender })) amount))
@@ -51,13 +51,9 @@
     (reserve (unwrap! (map-get? reserve-data asset) (err u404)))
   )
     (begin
-      (asserts! (<= amount (get total-deposits reserve)) (err ERR_INSUFFICIENT_LIQUIDITY))
-      ;; Note: Real implementation would calculate interest and check collateral
+      (asserts! (<= amount (get total-deposits reserve)) ERR_INSUFFICIENT_LIQUIDITY)
       (map-set borrows { asset: asset, user: tx-sender } (+ (default-to u0 (map-get? borrows { asset: asset, user: tx-sender })) amount))
       (map-set reserve-data asset (merge reserve { total-borrows: (+ (get total-borrows reserve) amount) }))
-
-      ;; BME Activity: Borrowing generates theoretical "utility" revenue
-      ;; In a real BME, we might track interest paid as the fee.
 
       (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) tx-sender none)))
       (ok true)
@@ -75,10 +71,9 @@
     (begin
       (try! (contract-call? asset-trait transfer amount tx-sender (as-contract tx-sender) none))
       
-      ;; BME Activity Tracking: Register interest paid as protocol fee
       (match (contract-call? .bme-engine register-fee-activity (as-contract tx-sender) interest-portion)
         res true
-        err-val (print { event: "bme-report-failed", error: err-val })
+        err-val (begin (print { event: "bme-report-failed", error: err-val }) false)
       )
       
       (map-set reserve-data asset (merge reserve {

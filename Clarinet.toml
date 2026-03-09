@@ -32,6 +32,7 @@ path = "contracts/traits/conxian-intent-trait.clar"
 
 [contracts.conxian-csf-trait]
 path = "contracts/traits/conxian-csf-trait.clar"
+depends_on = ["sip-standards"]
 
 [contracts.conxian-access]
 path = "contracts/core/conxian-access.clar"
@@ -45,10 +46,11 @@ path = "contracts/utils/block-utils.clar"
 
 [contracts.oracle-aggregator]
 path = "contracts/oracle/oracle-aggregator.clar"
+depends_on = ["conxian-protocol"]
 
 [contracts.cxd-token]
 path = "contracts/tokens/cxd-token.clar"
-depends_on = ["conxian-protocol", "conxian-access"]
+depends_on = ["conxian-protocol", "conxian-access", "sip-standards"]
 
 [contracts.bme-engine]
 path = "contracts/core/bme-engine.clar"
@@ -67,7 +69,7 @@ depends_on = ["bme-engine", "cxd-token"]
 
 [contracts.concentrated-liquidity-pool]
 path = "contracts/dex/concentrated-liquidity-pool.clar"
-depends_on = ["sip-standards", "bme-engine", "revenue-distributor"]
+depends_on = ["sip-standards", "bme-engine", "conxian-csf-trait"]
 
 [contracts.risk-manager]
 path = "contracts/core/risk-manager.clar"
@@ -75,15 +77,19 @@ path = "contracts/core/risk-manager.clar"
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
 clarity-version = 4
-depends_on = ["oracle-aggregator", "cxd-token", "risk-manager"]
+depends_on = ["oracle-aggregator", "cxd-token", "risk-manager", "conxian-protocol", "automation-traits", "conxian-service-trait"]
 
-[contracts.agent-treasury]
-path = "contracts/agents/agent-treasury.clar"
-depends_on = ["agent-risk", "cxd-treasury", "bme-engine", "concentrated-liquidity-pool"]
+[contracts.enhanced-circuit-breaker]
+path = "contracts/security/enhanced-circuit-breaker.clar"
+depends_on = ["security-monitoring"]
 
 [contracts.swap-router]
 path = "contracts/dex/swap-router.clar"
-depends_on = ["oracle-aggregator", "mev-protector", "conxian-protocol", "concentrated-liquidity-pool", "conxian-csf-trait"]
+depends_on = ["oracle-aggregator", "mev-protector", "conxian-protocol", "concentrated-liquidity-pool", "conxian-csf-trait", "enhanced-circuit-breaker", "bme-engine", "sip-standards"]
+
+[contracts.agent-treasury]
+path = "contracts/agents/agent-treasury.clar"
+depends_on = ["agent-risk", "cxd-treasury", "bme-engine", "sip-standards", "conxian-protocol", "concentrated-liquidity-pool"]
 
 [contracts.intent-solver-gateway]
 path = "contracts/gateway/intent-solver-gateway.clar"
@@ -91,7 +97,7 @@ depends_on = ["conxian-intent-trait", "bme-engine", "block-utils"]
 
 [contracts.ops-engine]
 path = "contracts/core/ops-engine.clar"
-depends_on = ["swap-router", "agent-treasury"]
+depends_on = ["swap-router", "agent-treasury", "sip-standards"]
 
 [contracts.economic-policy-engine]
 path = "contracts/core/economic-policy-engine.clar"
@@ -102,7 +108,7 @@ path = "contracts/dimensional/position-nft.clar"
 
 [contracts.lending-manager]
 path = "contracts/lending/lending-manager.clar"
-depends_on = ["conxian-protocol", "economic-policy-engine", "risk-manager", "bme-engine"]
+depends_on = ["conxian-protocol", "economic-policy-engine", "risk-manager", "bme-engine", "sip-standards"]
 
 [contracts.dimensional-core]
 path = "contracts/dimensional/dimensional-core.clar"
@@ -120,6 +126,7 @@ depends_on = ["cxd-token", "lending-manager", "dimensional-core", "operational-t
 
 [contracts.circuit-breaker]
 path = "contracts/security/circuit-breaker.clar"
+depends_on = ["security-monitoring"]
 
 [contracts.vault-traits]
 path = "contracts/traits/vault-trait.clar"
@@ -177,6 +184,7 @@ path = "contracts/dex/liquidity-manager.clar"
 
 [contracts.monitoring-dashboard]
 path = "contracts/monitoring/monitoring-dashboard.clar"
+depends_on = ["conxian-protocol", "agent-risk", "finance-metrics", "dimensional-core", "risk-manager", "oracle-aggregator", "swap-router"]
 
 [contracts.proposal-engine]
 path = "contracts/governance/proposal-engine.clar"
@@ -210,6 +218,7 @@ path = "contracts/security/proof-of-reserves.clar"
 
 [contracts.mock-token]
 path = "contracts/test-helpers/mock-token.clar"
+depends_on = ["sip-standards"]
 
 [contracts.mock-proposal]
 path = "contracts/test-helpers/mock-proposal.clar"
@@ -222,3 +231,11 @@ path = "contracts/compliance/regulatory-adapter.clar"
 
 [contracts.enhanced-governance-nft]
 path = "contracts/governance/enhanced-governance-nft.clar"
+
+[contracts.dex-factory]
+path = "contracts/dex/dex-factory.clar"
+depends_on = ["conxian-protocol"]
+
+[contracts.mock-csf-protocol]
+path = "contracts/test-helpers/mock-csf-protocol.clar"
+depends_on = ["conxian-csf-trait", "sip-standards"]
