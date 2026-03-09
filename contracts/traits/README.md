@@ -1,15 +1,32 @@
 # Traits Module
 
 ## Overview (Explanation)
-The Traits module defines the protocol's interface standards, ensuring modularity and interoperability across all Conxian modules. By using standardized traits, the protocol can swap implementations of core engines (e.g., oracles, governance engines) without breaking dependent logic.
+The Traits module defines the protocol's interface standards, ensuring modularity and interoperability across all Conxian modules. By using standardized traits, the protocol can swap implementations of core engines without breaking dependent logic. In 2026, the **Conxian CSF** and **Intent Layer** established new standards for inter-protocol liquidity and cross-chain execution.
 
 ## Architecture (Explanation)
 This module serves as the "Interface Layer" of the protocol's Hexagonal Architecture.
+- **CSF Traits**: Defined in `conxian-csf-trait.clar`. Establishes the universal standard for liquidity and yield routing.
+- **Intent Traits**: Defined in `conxian-intent-trait.clar`. Provides the standard for Bitcoin-anchored intents and solver execution.
 - **Core Traits**: Defined in `core-traits.clar` (RBAC, Pausable).
 - **DeFi Traits**: Defined in `defi-traits.clar` (Oracles, Swap, LPT).
 - **Standards**: SIP compliance is enforced via `sip-standards.clar` (SIP-009, SIP-010).
 
 ## Core Traits (Reference)
+
+### `conxian-csf-trait.clar` (CSF v1.1.0)
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `execute-csf-swap` | `(<sip-010-trait> <sip-010-trait> uint principal)` | Executes a standardized swap for the Universal Router. |
+| `request-flash-liquidity` | `(<sip-010-trait> uint (buff 32))` | Requests low-latency flash liquidity. |
+| `settle-arbitrage` | `(<sip-010-trait> <sip-010-trait> uint (list 10 principal))` | Atomic settlement of cross-protocol arbitrage. |
+| `claim-conxian-yield` | `(<sip-010-trait> uint principal)` | Forwards rewards to external vault owners without breaking custody. |
+| `get-csf-health` | `()` | Returns real-time health telemetry for risk monitoring. |
+
+### `conxian-intent-trait.clar`
+| Trait | Description |
+|-------|-------------|
+| `conxian-intent-solver-trait` | Standard for intent verification and execution. |
+| `conxian-liquidity-v1-trait` | Standard for providing liquidity and settling swaps via intents. |
 
 ### `core-traits.clar`
 | Trait | Description |
@@ -24,39 +41,28 @@ This module serves as the "Interface Layer" of the protocol's Hexagonal Architec
 | `ft-trait` | SIP-010 Fungible Token standard. |
 | `nft-trait` | SIP-009 Non-Fungible Token standard. |
 
-### `automation-traits.clar`
-| Trait | Description |
-|-------|-------------|
-| `office-job-trait` | Interface for autonomous agent tasks (Staff). |
-
-## Core Contracts (Reference)
-The protocol core traits are housed in `contracts/traits/`, which act as the global interface registry for all executive and managerial contracts.
-
 ## Integration Examples (How-to)
 
-### Implementing a Custom Oracle
-To create a new price feed that the protocol can use:
+### Implementing CSF Liquidity (External Protocol)
+To allow Conxian's router to trade through your protocol:
 ```clarity
-(impl-trait .defi-traits.oracle-trait)
+(impl-trait .conxian-csf-trait.trait-csf-liquidity-v1)
 
-(define-read-only (get-price (asset principal))
-  (ok u100000000) ;; Static price for demo
+(define-public (execute-csf-swap (token-in <sip-010>) (token-out <sip-010>) (amount uint) (recipient principal))
+  ;; Your internal swap logic here
+  (ok { amount-out: amount, fee-collected: u30 })
 )
 ```
 
-### Using SIP-010 in a Contract
+### Executing an Intent (Solver)
 ```clarity
-(use-trait ft-trait .sip-standards.sip-010-ft-trait)
-
-(define-public (do-transfer (token <ft-trait>) (amount uint))
-  (contract-call? token transfer amount tx-sender .receiver none)
-)
+(contract-call? .intent-solver-gateway execute-intent intent-id payload solver)
 ```
 
 ## Testing (How-to)
-Trait compliance is verified by successful contract deployment and module integration tests.
+Trait compliance is verified via `tests/csf-full-system.test.ts` and `tests/cxip-012.test.ts`.
 
 ## Status (Reference)
-- Implementation: Finalized (v1.2.0)
-- Audit Status: Internally Verified
-- Alignment: 100% Repository-wide Trait Consistency
+- Implementation: Active (Apex v1.1.0)
+- Audit Status: Internally Verified (March 2026)
+- Alignment: 100% Ecosystem Standard Compatibility

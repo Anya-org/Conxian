@@ -4,45 +4,44 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.3.x   | :white_check_mark: |
-| < 0.3.0 | :x:                |
+| 1.1.x (Apex) | :white_check_mark: |
+| 0.7.x   | :white_check_mark: |
+| < 0.7.0 | :x:                |
 
 ## Reporting a Vulnerability
 
-We take the security of the Conxian Protocol very seriously. If you find a security vulnerability, please do not report it publicly. Instead, please report it via one of the following methods:
+We take the security of the Conxian Protocol very seriously. If you find a security vulnerability, please report it via:
 
 - **Email**: security@conxian.io
 - **GitHub**: Use the "Report a vulnerability" button on the Security tab.
 
-We will acknowledge your report within 48 hours and provide a timeline for resolution.
+We acknowledge reports within 48 hours.
 
-## Security Standards
+## Security Standards (Apex Upgrade v1.1.0)
 
-- **Code is Law**: All logic must be verifiable and sovereign.
-- **Circuit Breakers**: Critical modules include circuit breakers for emergency pausing.
-- **Rate Limiting**: Sensitive operations protected via `rate-limiter.clar` (window-based limiting per operation type).
-- **Proof of Reserves**: Treasury assets verified via multi-attestor `proof-of-reserves.clar` system.
-- **Sovereign Handoff**: Admin roles transferable to timelock/DAO via staged 5-step process.
-- **Compliance**: KYC/AML verification via provider-based `compliance-manager.clar`.
-- **Audits**: Core contracts undergo regular security audits.
+- **Code is Law**: All logic is verifiable and sovereign.
+- **Enhanced Circuit Breakers**: Protocol features a multi-tier system including global pauses and per-protocol **Isolation Mode** (`enhanced-circuit-breaker.clar`).
+- **Contagion Guard**: Trustlessly isolate from external CSF-compliant protocol insolvency.
+- **Rate Limiting**: Sensitive operations protected via window-based limiting.
+- **Proof of Reserves**: Treasury verified via multi-attestor system.
+- **Sovereign Handoff**: Admin roles transferable to DAO via staged process.
+- **Compliance**: SIP-018 and jurisdictional compliance via `regulatory-adapter.clar`.
 
-## Security Features (January 2026)
+## Security Features (March 2026)
 
 ### Operational Safety
-- **Rate Limiter**: Window-based rate limiting (default 600 blocks/10 min) with operation-specific configuration
-- **Proof of Reserves**: Multi-attestor verification requiring 3+ attestations, 7-day validity period
-- **Circuit Breakers**: Automated pause triggers for emergency situations
+- **Enhanced Circuit Breaker**: Automated and manual pause triggers with fine-grained isolation for external liquidity sources.
+- **Proof of Reserves**: Multi-attestor verification requiring 3+ attestations.
+- **Rate Limiting**: 600-block window limiting per operation type.
 
 ### Access Control
-- **Timelock Governance**: All critical changes require time-delayed execution
-- **Role-Based Access**: Granular roles (owner, timelock, governance, operator) via `conxian-access.clar`
-- **Sovereign Handoff**: Explicit 5-step procedure to transfer control from deployer to DAO
+- **Timelock Governance**: Delayed execution for critical parameter changes.
+- **CSF Registry**: Restricted discovery and management of third-party routing targets.
 
 ### Compliance
-- **Provider Registry**: Authorized KYC/AML providers with structured registration
-- **Sanctions Screening**: Integration points for sanctions list checking
-- **Clean Hands**: On-chain compliance verification for sensitive operations
+- **Regulatory Adapter**: SIP-018 attestation aggregation.
+- **KYC Registry**: On-chain verification of user/provider status.
 
 ---
 
-*Last updated: January 31, 2026*
+*Last updated: March 15, 2026*

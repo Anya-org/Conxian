@@ -1,73 +1,49 @@
 # DEX Module
 
 ## Overview (Explanation)
-The DEX module provides high-efficiency trading and liquidity provision for the Conxian ecosystem. It supports concentrated liquidity (similar to Uniswap V3), predictive routing, and multi-asset swaps.
+The DEX module provides high-efficiency trading and liquidity provision for the Conxian ecosystem. In 2026, it evolved into a **Universal Routing Layer** powered by the Apex Router and the Common Settlement Framework (CSF).
 
 ## Architecture (Explanation)
-The DEX follows a layered approach:
-- **Facade**: `dex-facade.clar` provides a unified entry point for pool management.
-- **Routing**: `swap-router.clar` handles path-finding and multi-hop swaps.
-- **Engine**: `concentrated-liquidity-pool.clar` manages the core math, ticks, and liquidity of individual pairs.
+The DEX follows a dynamic routing architecture:
+- **Universal Router**: `swap-router.clar` handles dynamic dispatch to any CSF-compliant liquidity source.
+- **Protocol Registry**: `dex-factory.clar` maintains the list of permitted external protocol integrations.
+- **Native Engine**: `concentrated-liquidity-pool.clar` provides high-efficiency native Stacks liquidity.
 
 ## Core Contracts (Reference)
 
 ### `swap-router.clar`
-The primary interface for user trades.
+The Apex Universal Router.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `exact-input-single` | `(exact-input-single (amount-in uint) (min-amount-out uint) (pool principal) (token-in principal) (token-out principal))` | Executes a swap through a specific pool. |
-| `swap-direct` | `(swap-direct (amount-in uint) (min-amount-out uint) (pool principal) (token-in principal) (token-out principal))` | Executes a direct swap between two tokens in a pool. |
-| `update-volatility-fees` | `(update-volatility-fees)` | Dynamically updates swap fees based on market volatility. |
+| `csf-swap` | `(liquidity-source <csf-trait> token-in token-out amount-in min-out)` | Executes a swap through any registered CSF source. |
+| `claim-external-yield` | `(liquidity-source <csf-trait> reward-token amount)` | Bridges rewards from third-party protocols to the user. |
 
-### `concentrated-liquidity-pool.clar`
-The engine for concentrated liquidity pairs.
-
-| Function | Signature | Description |
-|----------|-----------|-------------|
-| `swap` | `(swap (pool-id uint) (zero-for-one bool) (amount-in uint) (token0-trait <sip-010-ft-trait>) (token1-trait <sip-010-ft-trait>))` | Performs a swap within a specific pool using tick-based liquidity. |
-| `mint` | `(mint (pool-id uint) (tick-lower int) (tick-upper int) (amount uint))` | Adds liquidity within a specific price range. |
-| `collect-protocol-fees` | `(collect-protocol-fees (token-trait <sip-010-ft-trait>))` | Transfers accumulated protocol fees to the treasury. |
-
-### `dex-facade.clar`
-Administrative and registry facade for the DEX.
+### `dex-factory.clar`
+CSF Discovery and Registry.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `add-authorized-pool` | `(add-authorized-pool (pool principal))` | Registers a new liquidity pool as authorized for the protocol. |
-| `pool-exists` | `(pool-exists (pool principal))` | Returns whether a specific principal is a registered DEX pool. |
+| `register-csf-protocol` | `(protocol principal name)` | Registers a CSF-compliant external contract for discovery. |
+| `get-csf-protocol` | `(protocol principal)` | Returns metadata for a registered external protocol. |
 
 ## Integration Examples (How-to)
 
-### Executing a Swap
-To trade tokens via the router:
+### Routing through an External Protocol (e.g. Bitflow)
 ```clarity
-(contract-call? .swap-router exact-input-single
-  u1000000 ;; 1 STX
-  u990000  ;; 0.99 CXD (1% slippage)
-  .stx-cxd-pool
+(contract-call? .swap-router csf-swap
+  .bitflow-csf-adapter
   .stx-token
-  .cxd-token
-)
-```
-
-### Adding Concentrated Liquidity
-LP providers can specify their price range:
-```clarity
-(contract-call? .concentrated-liquidity-pool mint
-  u1     ;; Pool ID
-  i-1000 ;; Lower Tick
-  i1000  ;; Upper Tick
-  u5000000
+  .usda-token
+  u1000000
+  u990000
 )
 ```
 
 ## Testing (How-to)
-Comprehensive validation is performed using the Vitest framework.
-1. Install dependencies: `npm install`
-2. Run module tests: `npx vitest run tests/dex`
+Comprehensive validation is performed via `tests/csf-full-system.test.ts`.
 
 ## Status (Reference)
-- Implementation: Production-Ready (v1.2.0)
-- Audit Status: Internally Verified
-- Standard: Hexagonal, Concentrated Liquidity
+- Implementation: Apex v1.1.0 Ready
+- Audit Status: Internally Verified (March 2026)
+- Standard: CSF Dynamic Dispatch, 100% Fee Buy-back

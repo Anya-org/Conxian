@@ -1,28 +1,29 @@
-# CXIP-013: Bounty-Driven Revenue-Distribution Model
+# CXIP-013: Sovereign BME Revenue Model (Apex Upgrade)
 
 ## Overview
-This proposal defines a transparent, on-chain revenue-splitting mechanism for Conxian, favoring the Bounty Pool to incentivize contributors.
+This proposal defines the transition from the legacy Fiscal Dam to the **Apex Burn-Mint Equilibrium (BME)** model. In this model, 100% of collected protocol fees are autonomously converted into CXD tokens for burning or vault recycling, while new CXD is emitted meritocratically based on activity markers.
 
-## Allocation Blueprint (Equilibrium)
-| Destination | Baseline % (bps) | Purpose |
+## Allocation Blueprint (BME Activity Markers)
+| Marker | Emission Weight | Purpose |
 |-------------|------------------|---------|
-| **Core Treasury** | **45%** (4500 bps) | Protocol development & 5% safety buffer. |
-| **Bounty Pool** | **30%** (3000 bps) | Labor fund for staff, auditors, and devs. |
-| **LP / Validator** | **15%** (1500 bps) | Auto-compounded staking rewards. |
-| **Community / Grant** | **5%** (500 bps) | DAO ecosystem grants. |
-| **Buy-Back & Burn** | **5%** (500 bps) | CXD token price support. |
+| **DEX Liquidity** | **45%** | Incentivizing deep books and volume. |
+| **Bounty Completion** | **30%** | Funding protocol maintenance and R&D. |
+| **Governance Staking** | **15%** | Rewarding long-term alignment. |
+| **Strategic Grants** | **10%** | Ecosystem expansion. |
 
-## Dynamic Performance Adjustment
-- **Trigger**: TVL growth > 12% MoM OR Bounty completion rate > 95%.
-- **Action**: Shift +5% (500 bps) from **Core Treasury** to **Bounty Pool**.
-- **Reversion**: Automatic reversion to baseline if trigger fails.
+## Buy-Back and Burn Protocol
+- **Lending Fees**: 100% swap-to-CXD and burn.
+- **Swap Fees**: 100% swap-to-CXD and burn.
+- **Registration Fees**: 100% vault recycling.
+
+## Dynamic Performance Trigger
+- **Performance State**: If TVL growth > 12% MoM, emission rate increases by 5% to the Bounty Pool to support accelerated development.
 
 ## Implementation
-- **cxd-treasury.clar**: Stores the 6-way split and supports rebalancing.
-- **revenue-distributor.clar**: Executes the distribution to 6 distinct vaults.
-- **agent-risk.clar**: Provides performance metrics (TVL growth, Bounty rate).
-- **agent-treasury.clar**: Orchestrates the Fiscal Dam V4 logic including CXIP-013 adjustments.
+- **bme-engine.clar**: Orchestrates meritocratic minting and epoch updates.
+- **revenue-distributor.clar**: Routes 100% of revenue to the BME Engine.
+- **swap-router.clar**: Executes the automated buy-backs via the Universal Router.
 
-## Implementation Status (Feb 2026)
-- **Verified**: Revenue distribution logic (Fiscal Dam V4) verified via `cybernetic-revenue.test.ts`.
-- **Coordination**: Integration with `ops-engine` heartbeat verified via `full-protocol-journey.test.ts`.
+## Implementation Status (March 2026)
+- **Verified**: Apex BME logic verified via `tests/csf-full-system.test.ts`.
+- **Interoperability**: Native yield routing for stSTX and sBTC fully implemented.
