@@ -62,6 +62,7 @@
   )
 )
 
+;; @desc Sets a new administrator for the ops engine. Admin only.
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -70,6 +71,7 @@
   )
 )
 
+;; @desc Returns the protocol status monitored by the ops engine.
 (define-read-only (get-protocol-status)
   (ok { compliant: true, paused: false, tenure-id: (some (/ block-height u10)), timestamp: burn-block-height, version: "07" })
 )

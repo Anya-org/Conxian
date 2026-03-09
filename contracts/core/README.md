@@ -17,9 +17,9 @@ The root state contract and module registry for the entire protocol.
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `set-paused` | `(set-paused (new-paused bool))` | Toggles the global protocol pause state. Admin only. |
-| `register-module` | `(register-module (name (string-ascii 32)) (contract principal))` | Registers or updates a functional module (e.g., "dex", "lending"). |
-| `get-module` | `(get-module (name (string-ascii 32)))` | Returns the contract principal and active status for a given module name. |
 | `get-protocol-status` | `(get-protocol-status)` | Returns global status including compliance, pause state, and current tenure-id. |
+| `get-protocol-admin` | `(get-protocol-admin)` | Returns the principal that is currently the owner/administrator of the protocol registry. |
+| `is-paused` | `(is-paused)` | Returns whether the protocol is currently in a paused state. |
 
 ### `dimensional-engine.clar`
 The primary facade for multi-dimensional position management, collateral, and risk.
@@ -27,32 +27,20 @@ The primary facade for multi-dimensional position management, collateral, and ri
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `open-position` | `(open-position (manager <position-manager-trait>) (token principal) (amount uint) (leverage uint) (long bool) (slippage-limit (optional uint)) (metadata (optional (string-utf8 1024))))` | Opens a leveraged position via the specified manager. |
-| `close-position` | `(close-position (manager <position-manager-trait>) (position-id uint))` | Closes an existing position and settles collateral. |
-| `liquidate-position` | `(liquidate-position (risk-manager <risk-manager-trait>) (position-id uint))` | Forces closure of an undercollateralized position. |
-| `check-position-health` | `(check-position-health (risk-manager <risk-manager-trait>) (position-id uint))` | Returns the health factor for a specific position. |
+| `close-position` | `(close-position (manager <position-manager-trait>) (position-id uint) (token principal) (slippage-limit (optional uint)))` | Closes an existing position and settles collateral via the specified manager. |
+| `liquidate-position` | `(liquidate-position (risk-manager <risk-manager-trait>) (position-id uint))` | Forces closure of an undercollateralized position via the risk manager. |
+| `check-position-health` | `(check-position-health (risk-manager <risk-manager-trait>) (position-id uint))` | Returns the health factor for a specific position via the risk manager. |
+| `deposit-funds` | `(deposit-funds (collateral-manager <collateral-manager-trait>) (amount uint) (token-trait <sip-010-trait>))` | Deposits funds into a specific collateral manager. |
+| `withdraw-funds` | `(withdraw-funds (collateral-manager <collateral-manager-trait>) (amount uint) (token-trait <sip-010-trait>))` | Withdraws funds from a specific collateral manager. |
 
 ### `economic-policy-engine.clar`
 Automated monetary policy and parameter adjustment system.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `update-market-parameters` | `(update-market-parameters (asset principal) (new-utilization uint) (price-volatility uint))` | Updates interest rates and collateral factors for a specific asset. |
-| `update-price-feed` | `(update-price-feed (asset principal) (price uint) (confidence uint))` | Records a new price for an asset. |
-| `subscribe` | `(subscribe)` | Activates a user subscription for access to advanced monetary functions. |
-| `auto-adjust-parameters` | `(auto-adjust-parameters (asset principal))` | Automatically triggers a parameter update based on latest price data. |
-| `get-system-health` | `(get-system-health)` | Returns the overall health score of the economic system. |
-| `get-price` | `(get-price (asset principal))` | Returns the latest cached price for an asset. |
-| `is-subscribed` | `(is-subscribed (user principal))` | Returns whether a user has an active subscription. |
-
-## Error Codes
-
-| Code | Constant | Description |
-|------|----------|-------------|
-| `u1000` | `ERR_UNAUTHORIZED` | Caller is not authorized for this operation. |
-| `u1001` | `ERR_PAUSED` | Operation rejected because the protocol is paused. |
-| `u5000` | `ERR_CONTRACT_PAUSED` | Specific contract is paused. |
-| `u5001` | `ERR_NON_COMPLIANT` | Caller or operation does not meet compliance requirements. |
-| `u1006` | `ERR_NO_SUBSCRIPTION` | User does not have an active subscription for this feature. |
+| `get-current-interest-rate` | `(get-current-interest-rate)` | Returns the current system-wide interest rate (e.g., u500 for 5%). |
+| `get-reserve-factor` | `(get-reserve-factor)` | Returns the system-wide reserve factor (e.g., u1000 for 10%). |
+| `get-revenue-distributor` | `(get-revenue-distributor)` | Returns the principal of the active revenue distributor. |
 
 ## Integration Examples (How-to)
 
