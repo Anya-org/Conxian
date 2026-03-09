@@ -30,12 +30,18 @@ path = "contracts/traits/defi-traits.clar"
 [contracts.conxian-intent-trait]
 path = "contracts/traits/conxian-intent-trait.clar"
 
+[contracts.conxian-csf-trait]
+path = "contracts/traits/conxian-csf-trait.clar"
+
 [contracts.conxian-access]
 path = "contracts/core/conxian-access.clar"
 
 [contracts.conxian-protocol]
 path = "contracts/core/conxian-protocol.clar"
 depends_on = ["conxian-access"]
+
+[contracts.block-utils]
+path = "contracts/utils/block-utils.clar"
 
 [contracts.oracle-aggregator]
 path = "contracts/oracle/oracle-aggregator.clar"
@@ -63,10 +69,13 @@ depends_on = ["bme-engine", "cxd-token"]
 path = "contracts/dex/concentrated-liquidity-pool.clar"
 depends_on = ["sip-standards", "bme-engine", "revenue-distributor"]
 
+[contracts.risk-manager]
+path = "contracts/core/risk-manager.clar"
+
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
 clarity-version = 4
-depends_on = ["oracle-aggregator", "cxd-token"]
+depends_on = ["oracle-aggregator", "cxd-token", "risk-manager"]
 
 [contracts.agent-treasury]
 path = "contracts/agents/agent-treasury.clar"
@@ -74,11 +83,11 @@ depends_on = ["agent-risk", "cxd-treasury", "bme-engine", "concentrated-liquidit
 
 [contracts.swap-router]
 path = "contracts/dex/swap-router.clar"
-depends_on = ["oracle-aggregator", "mev-protector", "conxian-protocol", "concentrated-liquidity-pool"]
+depends_on = ["oracle-aggregator", "mev-protector", "conxian-protocol", "concentrated-liquidity-pool", "conxian-csf-trait"]
 
 [contracts.intent-solver-gateway]
 path = "contracts/gateway/intent-solver-gateway.clar"
-depends_on = ["conxian-intent-trait", "bme-engine"]
+depends_on = ["conxian-intent-trait", "bme-engine", "block-utils"]
 
 [contracts.ops-engine]
 path = "contracts/core/ops-engine.clar"
@@ -87,9 +96,6 @@ depends_on = ["swap-router", "agent-treasury"]
 [contracts.economic-policy-engine]
 path = "contracts/core/economic-policy-engine.clar"
 depends_on = ["conxian-protocol", "revenue-distributor"]
-
-[contracts.risk-manager]
-path = "contracts/core/risk-manager.clar"
 
 [contracts.position-nft]
 path = "contracts/dimensional/position-nft.clar"
@@ -189,9 +195,6 @@ path = "contracts/traits/access-control-trait.clar"
 
 [contracts.math-utilities]
 path = "contracts/math/math-utilities.clar"
-
-[contracts.block-utils]
-path = "contracts/utils/block-utils.clar"
 
 [constants.nakamoto-constants]
 path = "contracts/constants/nakamoto-constants.clar"
