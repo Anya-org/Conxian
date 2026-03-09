@@ -1,6 +1,7 @@
 ;; cxd-token.clar
 ;; Standard SIP-010 Fungible Token for Conxian Dollar
 ;; Nakamoto-Aligned (Epoch 3.0 / Clarity 4)
+;; Upgraded for BME (Burn-Mint Equilibrium)
 
 (impl-trait .sip-standards.sip-010-ft-trait)
 
@@ -9,10 +10,14 @@
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_ALREADY_MINTER (err u1001))
 (define-constant ERR_NOT_MINTER (err u1002))
+(define-constant ERR_MAX_SUPPLY_REACHED (err u1003))
 
-;; Admin and authorized minters
+(define-constant MAX_SUPPLY u100000000000000000) ;; 1 Billion CXD (8 decimals)
+
+;; Admin and authorized minters/burners
 (define-data-var admin principal tx-sender)
 (define-map authorized-minters principal bool)
+(define-map authorized-burners principal bool)
 
 ;; @desc Check if caller is admin or authorized minter
 (define-private (is-authorized-minter)
@@ -22,11 +27,28 @@
   )
 )
 
+;; @desc Check if caller is authorized burner
+(define-private (is-authorized-burner)
+  (or
+    (is-eq tx-sender (var-get admin))
+    (default-to false (map-get? authorized-burners tx-sender))
+  )
+)
+
 ;; @desc Mint new tokens - requires admin or authorized minter
 (define-public (mint (amount uint) (recipient principal))
   (begin
     (asserts! (is-authorized-minter) ERR_UNAUTHORIZED)
+    (asserts! (<= (+ (ft-get-supply cxd) amount) MAX_SUPPLY) ERR_MAX_SUPPLY_REACHED)
     (ft-mint? cxd amount recipient)
+  )
+)
+
+;; @desc Burn tokens - requires authorized burner
+(define-public (burn (amount uint) (owner principal))
+  (begin
+    (asserts! (is-authorized-burner) ERR_UNAUTHORIZED)
+    (ft-burn? cxd amount owner)
   )
 )
 
@@ -39,6 +61,20 @@
     (print {
       event: "minter-added",
       minter: minter,
+      admin: tx-sender
+    })
+    (ok true)
+  )
+)
+
+;; @desc Add authorized burner (admin only)
+(define-public (add-burner (burner principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (map-set authorized-burners burner true)
+    (print {
+      event: "burner-added",
+      burner: burner,
       admin: tx-sender
     })
     (ok true)
