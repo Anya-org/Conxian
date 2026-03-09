@@ -140,16 +140,17 @@
   )
 )
 
+;; @desc Returns the principal that is currently the owner of the access control contract.
 (define-read-only (get-contract-owner)
   (var-get contract-owner)
 )
 
-;; Read-only: Verify Passkey/Biometric Signature (Safe Wrapper)
+;; @desc Verifies a passkey/biometric signature. Placeholder for production implementation.
 (define-read-only (verify-passkey-signature (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (ok true)
 )
 
-;; Read-only: Global Admin Check
+;; @desc Returns whether the current transaction sender is a global protocol administrator.
 (define-read-only (is-global-admin)
   (is-admin tx-sender)
 )
