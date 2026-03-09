@@ -12,7 +12,25 @@
 
 ;; @desc Full system heartbeat
 (define-public (trigger-epoch-update (cxd-token <sip-010-trait>))
-  (ok true)
+  (let (
+    (current-time burn-block-height)
+    (pools (list ))
+  )
+    (begin
+      ;; 1. Fast path: Update DEX volatility fees
+      (match (contract-call? .swap-router update-volatility-fees)
+        res (var-set last-fast-check current-time)
+        err-val false
+      )
+
+      ;; 2. Slow path: Run fiscal strategy (BME Engine & Fee Collection)
+      (match (contract-call? .agent-treasury run-fiscal-strategy pools cxd-token)
+        res (var-set last-slow-check current-time)
+        err-val false
+      )
+      (ok true)
+    )
+  )
 )
 
 ;; @desc Sets a new administrator for the ops engine. Admin only.

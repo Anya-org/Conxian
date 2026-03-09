@@ -13,13 +13,12 @@ describe('CXIP-012: Cybernetic Protocol Upgrade Simulation', () => {
   });
 
   it('Scenario: Volatility affects DEX fees', () => {
-    // 1. High Volatility
-    simnet.callPublicFn('oracle-aggregator', 'set-source', [Cl.principal(deployer + '.cxd-token'), Cl.uint(100000000), Cl.uint(100000000)], deployer);
-
-    // We need to set ops-engine in swap-router for authorization
-    simnet.callPublicFn('swap-router', 'set-ops-engine', [Cl.principal(deployer)], deployer);
+    // 1. Setup Oracle
+    simnet.callPublicFn('conxian-protocol', 'set-owner', [Cl.principal(deployer)], deployer);
+    simnet.callPublicFn('oracle-aggregator', 'set-source-authorized', [Cl.principal(deployer), Cl.bool(true)], deployer);
+    simnet.callPublicFn('oracle-aggregator', 'set-volatility-index', [Cl.uint(80)], deployer);
 
     const result = simnet.callPublicFn('swap-router', 'update-volatility-fees', [], deployer);
-    expect(result.result).toBeDefined();
+    expect(result.result).toEqual(Cl.ok(Cl.uint(100))); // MAX-FEE
   });
 });

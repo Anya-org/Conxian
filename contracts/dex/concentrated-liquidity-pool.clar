@@ -80,6 +80,25 @@
   )
 )
 
+;; --- Pool Management ---
+
+(define-public (create-pool (token0 principal) (token1 principal) (fee uint) (sqrt-price uint) (tick int))
+  (let ((pool-id (+ (var-get pool-nonce) u1)))
+    (begin
+      (map-set pools pool-id {
+          token0: token0,
+          token1: token1,
+          fee: fee,
+          sqrt-price: sqrt-price,
+          liquidity: u0,
+          tick: tick
+      })
+      (var-set pool-nonce pool-id)
+      (ok pool-id)
+    )
+  )
+)
+
 ;; --- Initialization & Admin ---
 
 (define-public (set-authorized-collector (new-collector principal))
