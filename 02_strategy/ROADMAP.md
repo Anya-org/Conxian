@@ -25,6 +25,7 @@ The definitive high-integrity interface for the autonomous Bitcoin economy.
 | :--- | :--- | :--- | :--- | :--- |
 | **M1-M12** | 2024-2025 | ✅ | Foundation/Unbundling | **Historical** |
 | **M13: Agentic interface** | Q2 2026 | ✅ | **AP2, A402, and Kotlin MCP Server** | **Autonomous Finance** |
+| **M13.5: Native Liquidity** | Q2 2026 | ✅ | **sBTC v1.0, USDCx, Pyth, Wormhole** | **Liquidity** |
 | **M14: Guardrail Stress-Test**| Q3 2026 | ✅ | Clarity On-Chain Limit Validation & FSOC | **Security** |
 | **M15: Biometric Intents** | Q3 2026 | ✅ | Human-in-the-Loop MCP & MVCR Compliance | **Sovereignty** |
 | **M16: CSF Standardization** | Q3 2026 | ✅ | **Public Clarity Traits & Registry** | **Composability** |

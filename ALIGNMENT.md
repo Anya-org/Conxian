@@ -33,6 +33,14 @@ The ecosystem is organized into four standalone businesses, each targeting a spe
 - **CSF Standard Operational**: Implemented public Clarity traits for liquidity and reward integration.
 - **Nexus CSF Registry**: Added /v1/csf-registry to automate discovery of compliant third-party protocols.
 - **Autonomous Launch Ready**: CSF backend extension complete with hardcoded 0.1% Founder's Cut and 5-5-5 referral engines.
+- **Nexus-First State Model**: Successfully consolidated blockchain polling into Nexus (v0.1.7) to establish a single source of truth.
+- **ALEX & Portal Integration**: Deployed institutional liquidity and cross-chain BTC swap SDKs in Fusion Gateway.
+- **BIP-322 Ownership**: Verified hardware-enclosed BIP-322 signing in the Conxius Wallet for secure, attested logins.
+- **MVCR Generation**: Implemented hardware-attested Mathematically Verifiable Compliance Reports for MiCA and IRS 1099-DA standards.
+- **ERP Resilience**: Implemented persistent Event Queueing with exponential backoff for deterministic ERP synchronization via "The Engine".
+- **Multi-Asset DeFi Upgrades**: Integrated native sBTC v1.0 and Circle's USDCx (SIP-10) as core protocol assets.
+- **Real-Time Oracle & Interop**: Deployed Pyth Network low-latency price feeds and Wormhole VAA redemption handlers.
+- **Sovereign sBTC Signing**: Enabled hardware-attested sBTC peg-out signing in Conxius Wallet via Conclave TEE.
 - **Circuit Breaker Overrides**: Implemented manual compliance overrides for administrative flexibility.
 
 ## 4. Operational Standards

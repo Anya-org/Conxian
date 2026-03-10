@@ -1,7 +1,7 @@
 # Standalone Business Unit Brief: Conxian Sovereign Finance (CSF)
 
 ## 1. Executive Overview
-**Conxian Sovereign Finance (CSF)** is the settlement vertical of the Conxian ecosystem. It is a standalone DeFi protocol providing deep liquidity, automated yield, and high-integrity financial primitives anchored to the Bitcoin burn-block height.
+**Conxian Sovereign Finance (CSF)** is the settlement vertical of the Conxian ecosystem. It is a standalone DeFi protocol providing deep liquidity, automated yield, and high-integrity financial primitives anchored to the Bitcoin burn-block height, enhanced with **native sBTC v1.0** and **Circle USDCx** support.
 
 ## 2. Market Analysis (2026 Forecast)
 ### 2.1 Total Addressable Market (TAM)
