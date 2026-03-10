@@ -12,6 +12,7 @@ This document tracks the ground-truth implementation status of every major featu
 | **Zero-Leak Memory** | ✅ PRODUCTION | Strict .fill(0) and try...finally enforcement. |
 | **Device Integrity Plugin** | ✅ PRODUCTION | Multi-layer heuristics for root/emulator detection. **Verified on Samsung A10.** |
 | **Maestro UI Testing** | ✅ PRODUCTION | Automated on-device UI flows for Android verification. |
+| **Genesis Allocation** | ✅ PRODUCTION | Tripartite treasury: Founder Equity, Labs Ops, and CSF Bounty Vault. Nakamoto-aligned Clarity 4. |
 
 ## II. BITCOIN L1 (BTC)
 
@@ -78,15 +79,21 @@ This document tracks the ground-truth implementation status of every major featu
 
 ### 🟢 ALL CORE PROTOCOLS ENHANCED
 
-1. **Done**: Sprint 2026-02-18 Root-to-Leaf Audit & Repair completed. Refined native signing for 14+ layers, hardened Web5 enclave bridge, and synchronized Dashboard receive flows.
-2. **Done**: Sprint 2026-02-18 Milestone M6 (Multi-Sig) & M7 (Privacy v2) implemented. Hardened Silent Payments and added CoinJoin & Tor simulation.
-3. **Done**: Sprint 2026-02-18 System-wide Review & Refinement. Enhanced sBTC Nakamoto monitoring, production-grade Ark boarding logic, and TEE-backed Governance persistence. Standardized Gateway domain alignment across the ecosystem.
-4. **Done**: Sprint 2026-02-18 Milestone M10 (ZK Verifier) & M11 (BitVM) Verification. Verified functional cryptographic STARK verifier in Labs Explorer.
-5. **Done**: Sprint 2026-02-18 Maestro On-Device Testing. Setup and verified automated UI testing flows for Android hardware.
+1. **Done**: Sprint 2026-03-05 Genesis Tokenomics Integration.
+   - Implemented tripartite genesis system: Founder Equity, Labs Ops Treasury, and CSF Bounty Vault.
+   - Wired unvested capital to cxd-staking for Block 0 productivity.
+   - Wired Labs Treasury to bond-factory for native financing (Client #001).
+   - Codified 3-of-5 Multi-Sig and automated Baseline OpEx streaming (~5k/mo).
+   - Verified 144-block (~24h) audit timelock for bounties.
+2. **Done**: Sprint 2026-02-18 Root-to-Leaf Audit & Repair completed. Refined native signing for 14+ layers, hardened Web5 enclave bridge, and synchronized Dashboard receive flows.
+3. **Done**: Sprint 2026-02-18 Milestone M6 (Multi-Sig) & M7 (Privacy v2) implemented. Hardened Silent Payments and added CoinJoin & Tor simulation.
+4. **Done**: Sprint 2026-02-18 System-wide Review & Refinement. Enhanced sBTC Nakamoto monitoring, production-grade Ark boarding logic, and TEE-backed Governance persistence. Standardized Gateway domain alignment across the ecosystem.
+5. **Done**: Sprint 2026-02-18 Milestone M10 (ZK Verifier) & M11 (BitVM) Verification. Verified functional cryptographic STARK verifier in Labs Explorer.
+6. **Done**: Sprint 2026-02-18 Maestro On-Device Testing. Setup and verified automated UI testing flows for Android hardware.
 
 ---
 
-*Last Updated: 2026-02-18*
+*Last Updated: 2026-03-05*
 
 ### 🔵 REPOSITORY MAINTENANCE (2026-02-18)
 
