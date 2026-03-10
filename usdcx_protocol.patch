@@ -1,0 +1,25 @@
+<<<<<<< SEARCH
+        // Native CSF Integration (2026 Ground Truth)
+        const isCsf = key.includes('stacking-dao') || key.includes('zest') || key.includes('arkadiko');
+=======
+        // Native CSF & USDCx Integration (2026 Ground Truth)
+        const isCsf = key.includes('stacking-dao') || key.includes('zest') || key.includes('arkadiko');
+        const isUsdcx = key.includes('usdcx-token');
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            name: isCsf ? `CSF: ${name}` : name,
+            symbol: name.substring(0, 4).toUpperCase(),
+            balance: parseInt(token.balance) / 1000000, // Assuming 6 decimals standard
+            valueUsd: 0,
+            layer: 'Stacks',
+            type: isCsf ? 'CSF-Standard' : 'SIP-10',
+            address
+=======
+            name: isUsdcx ? 'Circle USDCx' : (isCsf ? `CSF: ${name}` : name),
+            symbol: isUsdcx ? 'USDCx' : name.substring(0, 4).toUpperCase(),
+            balance: parseInt(token.balance) / 1000000, // Assuming 6 decimals standard
+            valueUsd: 0,
+            layer: 'Stacks',
+            type: isUsdcx ? 'SIP-10' : (isCsf ? 'CSF-Standard' : 'SIP-10'),
+            address
+>>>>>>> REPLACE
