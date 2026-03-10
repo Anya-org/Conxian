@@ -34,7 +34,13 @@
 * [Fusion Gateway](conxian-gateway/PRD.md)
 
 ## 💼 Business Development Units
-* [Access BD (Retail/SME)](conxius-wallet/docs/business/BD_UNIT_ACCESS.md)
-* [Finance BD (LPs/Yield)](Conxian/docs/BD_UNIT_FINANCE.md)
-* [Connectivity BD (ERP/Treasury)](conxian-gateway/docs/BD_UNIT_CONNECTIVITY.md)
-* [State BD (Data/Risk)](conxian-nexus/docs/BD_UNIT_STATE.md)
+* [Access BD (Retail/SME)](BD_UNIT_ACCESS.md)
+* [Finance BD (LPs/Yield)](BD_UNIT_FINANCE.md)
+* [Connectivity BD (ERP/Treasury)](BD_UNIT_CONNECTIVITY.md)
+* [State BD (Data/Risk)](BD_UNIT_STATE.md)
+
+## 📊 Reports & Audits
+* [Ecosystem Health 2026](docs/CONSOLIDATED_ECOSYSTEM_HEALTH_2026.md)
+* [Revenue Structure Audit](docs/REVENUE_STRUCTURE_AUDIT_2026.md)
+* [Strategic Alignment (March 2026)](docs/STRATEGIC_ALIGNMENT_MAR_2026.md)
+* [CSF Standard Proposal](docs/CSF_STANDARD_PROPOSAL.md)
