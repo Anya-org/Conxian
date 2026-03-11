@@ -61,7 +61,7 @@ This is essential for the "User Safety & Trust" phase to ensure the app is runni
 
 1. **POC for RGB:** Integrate the WASM loader in `worker-manager.ts` and verify a sample NIA (Non-Inflatable Asset) consignment.
 2. **Musig2 Prototype:** Create a test suite in `tests/musig2.test.ts` verifying the aggregation of 3 partial signatures into a valid Taproot witness.
-3. **Integrity Hook:** Update the Conxian Gateway to include a `/v1/verify-integrity` endpoint.
+3. **Integrity Hook:** Update the Conxian Gateway to include a `/api/v1/compliance/verify-integrity` endpoint.
 
 
 ---
