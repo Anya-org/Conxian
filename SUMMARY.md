@@ -2,6 +2,7 @@
 
 * [Introduction](README.md)
 * [Strategic Alignment](ALIGNMENT.md)
+* [Onsite Server Specs](03_infrastructure/ONSITE_SERVER_SPEC_SHEET.md)
 * [Whitepaper](WHITEPAPER.md)
 
 ## 🏢 Company
@@ -44,3 +45,4 @@
 * [Revenue Structure Audit](docs/REVENUE_STRUCTURE_AUDIT_2026.md)
 * [Strategic Alignment (March 2026)](docs/STRATEGIC_ALIGNMENT_MAR_2026.md)
 * [CSF Standard Proposal](docs/CSF_STANDARD_PROPOSAL.md)
+* [CXIP-016: Multi-Ecosystem Enhancement](openspec/changes/csf-autonomous-launch/specs.md)
