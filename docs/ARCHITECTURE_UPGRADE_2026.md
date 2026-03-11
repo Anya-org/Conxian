@@ -12,53 +12,36 @@ We are enforcing a strict hardware-anchored root of trust across all deployment 
 
 ### 1.2 Desktop Client (Conxius Desktop)
 *   **Hardware**: TPM 2.0 (Trusted Platform Module).
-*   **Integration**: Wired via `tss-esapi` library.
-*   **Security Features**:
-    *   **Secure Boot Attestation**: Verify the integrity of the wallet binary before execution.
-    *   **Key Sealing**: Master seed is sealed to PCRs (Platform Configuration Registers), preventing decryption if the system state is altered.
-    *   **Hardware-backed Entropy**: Use TPM's TRNG for seed generation.
 
 ### 1.3 Enterprise Infrastructure (Gateway & Nexus)
 *   **Hardware**: Dedicated HSM (Hardware Security Module) - FIPS 140-2 Level 3.
-*   **Integration**: PKCS#11 interface via the `cryptoki` crate.
-*   **Access Control**: Mandatory FIDO2/WebAuthn authentication for HSM signing requests.
-*   **Server Integrity**: TPM 2.0 attestation for all enterprise node applications to prevent "Evil Maid" attacks and unauthorized software modification.
 
-## 2. Enterprise ERP Bond Underwriting (Fusion Gateway)
+## 2. Enterprise ERP (F-ERP) Upgrade Suite
 
-The Conxian bond issuance system is evolving into a dynamic, trust-minimized credit primitive.
+The Conxian bond issuance and treasury systems are evolving into dynamic, trust-minimized institutional primitives.
 
-### 2.1 ERP Connectivity
-*   **Connectors**: SOAP/WSDL for SAP (Legacy/Institutional), REST/OAuth for Oracle NetSuite and Microsoft Dynamics.
-*   **Data Fetching**: Periodic polling of Revenue, OpEx, and CapEx metrics.
+### 2.1 Dynamic Collateral Engine (DCE)
+*   **Non-Liquidating Stabilization**: Uses the Dynamic Collateral Ratio (DCR) formula:
+    $DCR = \frac{OnChain\_Liq + Attested\_ERP\_Revenue + Pending\_Rev}{Active\_Bonds \times Risk\_Multiplier}$
+*   **Revenue Interception**: Automatically redirects enterprise revenue to top up positions when DCR falls below **110%**.
+*   **Advanced Correction**: When DCR falls below **105%**, the engine natively triggers parameter adjustments (e.g., duration extensions) to avoid forced liquidations of the core treasury.
 
-### 2.2 Oracle & Data Integrity
-*   **TLSNotary**: Use TLSNotary to generate cryptographic proofs of data authenticity directly from the enterprise ERP's TLS session.
-*   **Zero-Knowledge Proofs (ZKP)**: Generate ZK-proofs (via RISC0) of financial health metrics (e.g., DCR calculation) to allow for underwriting without exposing sensitive raw data on-chain.
+### 2.2 Intelligent Bond Structuring (IBS)
+*   **Programmatic Underwriting**: Automatically determines bond principal caps (3x net cash flow) using TLSNotary-attested ERP data.
 
-### 2.3 On-Chain Underwriting (Clarity 4)
-*   **Dynamic Collateral Ratio (DCR)**:
-    $DCR = \frac{OnChain\_Liq + Attested\_ERP\_Revenue}{Active\_Bonds \times Risk\_Multiplier}$
-*   **144-Block Timelock**: All ERP-verified revenue intended for bond servicing is routed through a mandatory 144-block timelocked vault (`yield-router.clar`).
-*   **Auto-Correction**: The yield router automatically intercepts funds to re-collateralize the bond if the DCR drops below the 1.1 threshold.
+### 2.3 Productive Streaming (The Golden Rule)
+*   **The Engine**: Enforces the mathematical constraint that operational outflow ($) can never exceed accumulated liquid yield ($).
+*   **Constraint**:  \leq Y_h$. Any attempt to dilute locked principal ($) for OpEx results in a transaction revert.
+
+### 2.4 SWIFT Bypass & Zero-Trust Connectivity
+*   **ISO-20022 Native**: The `enterprise-api.clar` handles USD-native settlements via USDCx.
+*   **Zero-Trust Reconciliation**: Nexus State Node provides hardware-attested settlement receipts.
 
 ## 3. Multi-Chain Full Stack Support (>70% TAM)
 
-To maximize business impact, the ecosystem provides deep integration for the industry's most dominant networks.
-
-### 3.1 Network Matrix
 *   **Bitcoin Ecosystem**: Native BTC, sBTC (NTT), Stacks (Nakamoto/Clarity).
-*   **Ethereum (EVM)**: Full stack support including EIP-1559, EIP-712 structured signing, and Native Token Transfer (NTT) framework integration.
-*   **Solana (Non-EVM)**: Integration of the Ed25519 curve in `lib-conclave-sdk`. Native Solana transaction building and NTT support.
-
-### 3.2 Library Integrations
-*   **NTT Framework**: Wormhole Native Token Transfer (NTT) for sBTC and USDCx.
-*   **Oracle**: TLSNotary + RISC0 for verifiable off-chain data.
-*   **Signing**: Musig2 (Bitcoin), ECDSA (ETH), Ed25519 (Solana).
-
-## 4. Institutional DeFi Readiness
-*   **Custody Compatibility**: Full support for Fireblocks/Copper via standard signing interfaces (SIP-018, EIP-712).
-*   **Regulatory Compliance**: Integrated `regulatory-adapter.clar` for institutional whitelisting and auditability.
+*   **Ethereum (EVM)**: Full NTT and EIP-712 support.
+*   **Solana**: Native Solana transaction building and NTT support.
 
 ---
 © 2026 Conxian. Sovereign Autonomous Business.
