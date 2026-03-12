@@ -47,3 +47,4 @@
 * [CSF Standard Proposal](docs/CSF_STANDARD_PROPOSAL.md)
 * [CXIP-016: Multi-Ecosystem Enhancement](openspec/changes/csf-autonomous-launch/specs.md)
 * [Architecture Upgrade 2026](docs/ARCHITECTURE_UPGRADE_2026.md)
+* [Unified Financial Metrics Engine](docs/UNIFIED_FINANCIAL_METRICS_ENGINE_2026.md)
