@@ -2,7 +2,7 @@
 
 **Market**: Bitcoin-Native DeFi & Institutional Liquidity.
 **Brand**: Conxian CSF.
-**Positioning**: The high-integrity settlement layer for the productive Bitcoin economy.
+**Positioning**: The high-integrity, open-source settlement layer for the productive Bitcoin economy.
 
 ## 1. Revenue Streams
 - **Protocol Fees**: Hardcoded 0.1% "Founder's Cut" on all transactional events (Swaps, Lending).
@@ -11,6 +11,7 @@
 
 ## 2. Competitive Advantage: "Gift Status"
 - **Autonomous Sovereignty**: Transition to ExecutorDAO ensures the protocol is a public utility, attracting institutional volume wary of centralized "backdoors."
+- **CSF Standard Traits**: Third-party protocols plug into Conxian natively via `conxian-csf-trait.clar`.
 - **Nakamoto-Ready**: Native integration with Stacks sBTC and ALEX/Portal SDKs.
 
 ## 3. Targeted Segments
