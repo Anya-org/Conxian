@@ -48,3 +48,7 @@
 * [CXIP-016: Multi-Ecosystem Enhancement](openspec/changes/csf-autonomous-launch/specs.md)
 * [Architecture Upgrade 2026](docs/ARCHITECTURE_UPGRADE_2026.md)
 * [Unified Financial Metrics Engine](docs/UNIFIED_FINANCIAL_METRICS_ENGINE_2026.md)
+
+## 🏁 Audit Results (March 2026)
+* [Gap & Vulnerability Report](GAP_VULNERABILITY_REPORT.md)
+* [Master System Audit & Readiness Report](FINAL_AUDIT_REPORT.md)
