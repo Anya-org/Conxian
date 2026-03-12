@@ -5,8 +5,8 @@
 **Positioning**: The deterministic ISO 20022 bridge between legacy financial systems and sovereign Bitcoin rails.
 
 ## 1. Revenue Streams
-- **Tiered Licensing**: ,500 - 5,000/mo based on transaction volume and ERP connector requirements (SAP, Oracle, NetSuite).
-- **Implementation Fees**: 0,000 - 50,000 for customized institutional deployments and "Citadel" onsite setup.
+- **Tiered Licensing**: $2,500 - $15,000/mo based on transaction volume and ERP connector requirements (SAP, Oracle, NetSuite).
+- **Implementation Fees**: $10,000 - $50,000 for customized institutional deployments and "Citadel" onsite setup.
 - **API Overages**: Volume-based fees for high-frequency institutional routing.
 
 ## 2. Core Product: "The Engine"
