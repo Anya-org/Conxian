@@ -24,7 +24,7 @@ The ecosystem is organized into four standalone businesses:
 ## 📂 Business Unit Strategy (Exco-Level)
 - **[Access BD (Conxius)](./BD_UNIT_ACCESS.md)**: Mobile retail and SME treasury growth.
 - **[Finance BD (CSF)](./BD_UNIT_FINANCE.md)**: Institutional liquidity and settlement.
-- **[Connectivity BD (Fusion)](./BD_UNIT_CONNECTIVITY.md)**: ERP synchronization and SWIFT bypass.
+- **[Connectivity BD (Fusion)](./BD_UNIT_CONNECTIVITY.md)**: ERP synchronization.
 - **[State BD (Nexus)](./BD_UNIT_STATE.md)**: Verifiable state proofs and risk telemetry.
 
 ## 📜 Key Reports
