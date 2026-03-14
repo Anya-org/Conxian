@@ -18,16 +18,16 @@ We are enforcing a strict hardware-anchored root of trust across all deployment 
 
 ## 2. Enterprise ERP (F-ERP) Upgrade Suite
 
-The Conxian bond issuance and treasury systems are evolving into dynamic, trust-minimized institutional primitives.
+The Conxian POL issuance and treasury systems are evolving into dynamic, trust-minimized institutional primitives.
 
 ### 2.1 Dynamic Collateral Engine (DCE)
 *   **Non-Liquidating Stabilization**: Uses the Dynamic Collateral Ratio (DCR) formula:
-    $DCR = \frac{OnChain\_Liq + Attested\_ERP\_Revenue + Pending\_Rev}{Active\_Bonds \times Risk\_Multiplier}$
+    $DCR = \frac{OnChain\_Liq + Attested\_ERP\_Revenue + Pending\_Rev}{Active\_POLs \times Risk\_Multiplier}$
 *   **Revenue Interception**: Automatically redirects enterprise revenue to top up positions when DCR falls below **110%**.
 *   **Advanced Correction**: When DCR falls below **105%**, the engine natively triggers parameter adjustments (e.g., duration extensions) to avoid forced liquidations of the core treasury.
 
-### 2.2 Intelligent Bond Structuring (IBS)
-*   **Programmatic Underwriting**: Automatically determines bond principal caps (3x net cash flow) using TLSNotary-attested ERP data.
+### 2.2 Intelligent POL Structuring (IBS)
+*   **Programmatic Underwriting**: Automatically determines POL principal caps (3x net cash flow) using TLSNotary-attested ERP data.
 
 ### 2.3 Productive Streaming (The Golden Rule)
 *   **The Engine**: Enforces the mathematical constraint that operational outflow ($) can never exceed accumulated liquid yield ($).
@@ -46,10 +46,10 @@ The Conxian bond issuance and treasury systems are evolving into dynamic, trust-
 ---
 © 2026 Conxian. Sovereign Autonomous Business.
 
-# F-ERP Bond System Upgrade (2026)
+# F-ERP POL System Upgrade (2026)
 
 ## Overview
-The F-ERP Bond Upgrade implements a Bitcoin-native credit model for SMEs and enterprises, anchored by the Dynamic Collateral Engine (DCE).
+The F-ERP POL Upgrade implements a Bitcoin-native credit model for SMEs and enterprises, anchored by the Dynamic Collateral Engine (DCE).
 
 ## Components
 - **Intelligent Structuring**: Programmatic assessment of attested ERP data to determine principal limits and risk-adjusted coupons.
