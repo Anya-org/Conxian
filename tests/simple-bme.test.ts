@@ -13,7 +13,8 @@ describe('Simple BME', () => {
   });
 
   it('compiles and registers activity', () => {
-    const pool1 = 'ST1SJ3DTE5DN7X54Y7D5KS8M7JJ8V3EN6N9X392E';
+    const accounts = simnet.getAccounts();
+    const pool1 = accounts.get('wallet_1')!;
 
     let res = simnet.callPublicFn('bme-engine', 'add-activity-reporter', [Cl.principal(deployer)], deployer);
     expect(res.result).toEqual(Cl.ok(Cl.bool(true)));

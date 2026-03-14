@@ -22,8 +22,8 @@
 (define-constant ROLE_KEEPER u5)
 
 ;; State
-(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var timelock-principal principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var contract-owner principal tx-sender)
+(define-data-var timelock-principal principal tx-sender)
 (define-map roles
   {
     user: principal,
@@ -111,7 +111,7 @@
 ;; @returns (response bool uint)
 (define-public (initialize (owner principal))
   (begin
-    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (var-set contract-owner owner)
     (ok true)
   )

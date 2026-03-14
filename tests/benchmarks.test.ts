@@ -9,7 +9,7 @@ describe('Protocol Benchmarks', () => {
   beforeEach(async () => {
     simnet = await initSimnet();
     const accounts = simnet.getAccounts();
-    deployer = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
+    deployer = accounts.get('deployer')!;
   });
 
   it('captures gas for run-fiscal-strategy', () => {

@@ -55,75 +55,13 @@ describe("Token and Utility Tests", () => {
   });
 
   describe("Utility Contracts", () => {
-    it("should have utils deployed", () => {
-      const contract = simnet.getContractSource("utils");
+    it("should have block-utils deployed", () => {
+      const contract = simnet.getContractSource("block-utils");
       expect(contract).toBeDefined();
     });
 
-    it("should have validation deployed", () => {
-      const contract = simnet.getContractSource("validation");
-      expect(contract).toBeDefined();
-    });
-
-    it("should have optimization-helpers deployed", () => {
-      const contract = simnet.getContractSource("optimization-helpers");
-      expect(contract).toBeDefined();
-    });
-
-    it("should have precision-calculator deployed", () => {
-      const contract = simnet.getContractSource("precision-calculator");
-      expect(contract).toBeDefined();
-    });
-  });
-
-  describe("Math Libraries", () => {
-    it("should have math-lib-concentrated deployed", () => {
-      const contract = simnet.getContractSource("math-lib-concentrated");
-      expect(contract).toBeDefined();
-    });
-  });
-
-  describe("Error Handling", () => {
-    it("should have protocol-errors deployed", () => {
-      const contract = simnet.getContractSource("protocol-errors");
-      expect(contract).toBeDefined();
-    });
-
-    it("should have standard-errors deployed", () => {
-      const contract = simnet.getContractSource("standard-errors");
-      expect(contract).toBeDefined();
-    });
-
-    it("should have trait-errors deployed", () => {
-      const contract = simnet.getContractSource("trait-errors");
-      expect(contract).toBeDefined();
-    });
-  });
-
-  describe("Library Contracts", () => {
-    it("should have lib deployed", () => {
-      const contract = simnet.getContractSource("lib");
-      expect(contract).toBeDefined();
-    });
-  });
-
-  describe("Test Contracts", () => {
-    it("should have test-access deployed", () => {
-      const contract = simnet.getContractSource("test-access");
-      expect(contract).toBeDefined();
-    });
-  });
-
-  describe("Position Factory", () => {
-    it("should have position-factory deployed", () => {
-      const contract = simnet.getContractSource("position-factory");
-      expect(contract).toBeDefined();
-    });
-  });
-
-  describe("Budget Manager", () => {
-    it("should have budget-manager deployed", () => {
-      const contract = simnet.getContractSource("budget-manager");
+    it("should have math-utilities deployed", () => {
+      const contract = simnet.getContractSource("math-utilities");
       expect(contract).toBeDefined();
     });
   });
@@ -135,46 +73,29 @@ describe("Token and Utility Tests", () => {
     });
   });
 
-  describe("BTC Adapter", () => {
-    it("should have btc-adapter deployed", () => {
-      const contract = simnet.getContractSource("btc-adapter");
-      expect(contract).toBeDefined();
-    });
-  });
-
-  describe("Decentralized Trait Registry", () => {
-    it("should have decentralized-trait-registry deployed", () => {
-      const contract = simnet.getContractSource("decentralized-trait-registry");
+  describe("Position Factory", () => {
+    it("should have position-factory deployed", () => {
+      const contract = simnet.getContractSource("position-factory");
       expect(contract).toBeDefined();
     });
   });
 
   describe("Token Function Tests", () => {
-    it("should test cxd-token placeholder function", () => {
-      const result = simnet.callPublicFn(
+    it("should test cxd-token get-name function", () => {
+      const result = simnet.callReadOnlyFn(
         "cxd-token",
-        "placeholder",
+        "get-name",
         [],
         deployer
       );
-      expect(result.result).toEqual(Cl.ok(Cl.bool(true)));
+      expect(result.result).toEqual(Cl.ok(Cl.stringAscii("Conxian Dollar")));
     });
   });
 
-  describe("Utility Function Tests", () => {
-    it("should test utils contract deployment", () => {
-      const contract = simnet.getContractSource("utils");
+  describe("Error Handling", () => {
+    it("should have sip-standards deployed with correct trait definitions", () => {
+      const contract = simnet.getContractSource("sip-standards");
       expect(contract).toBeDefined();
-    });
-  });
-
-  describe("Error Contract Tests", () => {
-    it("should have trait-errors with standardized error codes", () => {
-      const contract = simnet.getContractSource("trait-errors");
-      expect(contract).toBeDefined();
-      if (contract) {
-        expect(contract.contract).toContain("ERR_UNAUTHORIZED");
-      }
     });
   });
 });

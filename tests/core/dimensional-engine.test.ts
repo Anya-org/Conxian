@@ -10,26 +10,6 @@ describe("dimensional-engine-optimization", () => {
     simnet = await initializeSimnet();
     const accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
-
-    // Register modules
-    simnet.callPublicFn(
-      "conxian-protocol",
-      "register-module",
-      [Cl.stringAscii("position-manager"), Cl.principal(deployer + ".position-manager")],
-      deployer
-    );
-    simnet.callPublicFn(
-      "conxian-protocol",
-      "register-module",
-      [Cl.stringAscii("collateral-manager"), Cl.principal(deployer + ".collateral-manager")],
-      deployer
-    );
-    simnet.callPublicFn(
-      "conxian-protocol",
-      "register-module",
-      [Cl.stringAscii("risk-manager"), Cl.principal(deployer + ".risk-manager")],
-      deployer
-    );
   });
 
   it("ensures open-position fails when the protocol is paused", () => {
@@ -45,7 +25,7 @@ describe("dimensional-engine-optimization", () => {
       "dimensional-engine",
       "open-position",
       [
-        Cl.principal(deployer + ".position-manager"),
+        Cl.principal(deployer + ".position-nft"),
         Cl.principal(deployer + ".cxd-token"),
         Cl.uint(100),
         Cl.uint(2),

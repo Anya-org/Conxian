@@ -7,8 +7,8 @@
 (define-constant ERR_STALE_ATTESTATION u3001)
 (define-constant ERR_INVALID_PROVIDER u3002)
 
-(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var sanctions-provider principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var contract-owner principal tx-sender)
+(define-data-var sanctions-provider principal tx-sender)
 
 ;; 24-hour validity period (86400 seconds)
 (define-constant VALIDITY_PERIOD u86400)

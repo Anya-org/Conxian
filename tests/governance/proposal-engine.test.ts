@@ -7,7 +7,7 @@ describe('Proposal Engine Security Audit', () => {
   let deployer: string;
 
   beforeAll(async () => {
-    simnet = await initSimnet('Clarinet.toml');
+    simnet = await initSimnet();
     deployer = simnet.getAccounts().get('deployer')!;
   });
 

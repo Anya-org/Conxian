@@ -7,7 +7,7 @@ let deployer: string;
 
 describe('Proposal Engine - Admin Functions', () => {
   beforeAll(async () => {
-    simnet = await initSimnet("Clarinet.toml");
+    simnet = await initSimnet();
   });
 
   beforeEach(async () => {

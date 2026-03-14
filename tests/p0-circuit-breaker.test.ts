@@ -1,8 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Cl } from '@stacks/transactions';
 import { initSimnet } from "@stacks/clarinet-sdk";
-import { resolve } from "path";
-
 const ORACLE_AGGREGATOR_V2_CONTRACT_NAME = 'oracle-aggregator';
 const MOCK_CIRCUIT_BREAKER_CONTRACT_NAME = 'mock-circuit-breaker';
 
@@ -14,8 +12,7 @@ describe('P0 Circuit Breaker Logic Flaw Mitigation Tests', () => {
   let mockCircuitBreakerContract: any;
 
   beforeEach(async () => {
-    const manifestPath = resolve(__dirname, '../../Clarinet.toml');
-    simnet = await initSimnet(manifestPath);
+    simnet = await initSimnet();
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
     wallet1 = accounts.get('wallet_1')!;
@@ -31,7 +28,7 @@ describe('P0 Circuit Breaker Logic Flaw Mitigation Tests', () => {
         [Cl.principal(mockCircuitBreakerContract)],
         wallet1
     );
-    expect(result.result).toEqual(Cl.error(Cl.uint(1001))); // ERR_UNAUTHORIZED
+    expect(result.result).toEqual(Cl.error(Cl.uint(1001))); // ERR_CB_UNAUTHORIZED
 
     // Admin successfully sets the circuit breaker
     result = simnet.callPublicFn(

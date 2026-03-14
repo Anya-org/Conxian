@@ -15,22 +15,6 @@ describe("Conxian Operations Engine", () => {
     deployer = accounts.get("deployer")!;
     wallet1 = accounts.get("wallet_1")!;
 
-    // Grant ROLE_OPERATOR (u4) to deployer
-    simnet.callPublicFn(
-      "conxian-access",
-      "grant-role",
-      [
-        Cl.principal(deployer),
-        Cl.uint(4),
-        Cl.buffer(Buffer.alloc(32)),
-        Cl.buffer(Buffer.alloc(64)),
-        Cl.buffer(Buffer.alloc(33))
-      ],
-      deployer
-    );
-
-    // Initialize swap-router with deployer as ops-engine for simple test
-    simnet.callPublicFn("swap-router", "set-ops-engine", [Cl.principal(deployer + ".ops-engine")], deployer);
   });
 
   it("allows authorized operator to trigger emergency pause", () => {
