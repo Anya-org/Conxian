@@ -25,7 +25,7 @@ Conclave SDK is a **headless cryptographic state machine** that commoditizes the
 ## Transparent, Ethos-Aligned Pricing
 
 * **Conclave Free Tier:** Up to 50,000 signatures per month completely free to build and test. 
-* **Conclave Starter (PPP Scaled):** Once past the free tier, pricing scales from **$1.00/mo upwards**, adjusted dynamically for Purchasing Power Parity (PPP) in emerging markets. No fiat credit walls—pay in stables.
+* **Conclave Starter (ExchangeRate Scaled):** Once past the free tier, pricing scales from **$1.00/mo upwards**, adjusted dynamically for Purchasing Power Parity (ExchangeRate) in emerging markets. No fiat credit walls—pay in stables.
 * **Institutional Tier ($2.5k - $15k/mo):** Dedicated sovereign routing, priority Musig2 integration, and full SLA support.
 
 **Stop renting security. Start owning your citadel.**

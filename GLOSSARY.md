@@ -6,8 +6,8 @@ This document establishes the canonical terminology for the Conxian ecosystem, a
 
 | Conxian Internal Term | Standardized Industry Term | Reference Standard | Definition |
 | :--- | :--- | :--- | :--- |
-| **ZKC (Zero-Knowledge Compliance)** | **Attestation / Proof of Compliance** | MiCA / FATF | A hardware-attested cryptographic proof that a transaction or user meets specific regulatory criteria without revealing raw data. |
-| **PPP (Protocol Price/Purchasing)** | **Exchange Rate / Oracle Price** | ISO 20022 (CAMT) | The deterministic valuation of an asset relative to a benchmark (e.g., USD, BTC). |
+| **Attestation (Zero-Knowledge Compliance)** | **Attestation / Proof of Compliance** | MiCA / FATF | A hardware-attested cryptographic proof that a transaction or user meets specific regulatory criteria without revealing raw data. |
+| **ExchangeRate (Protocol Price/Purchasing)** | **Exchange Rate / Oracle Price** | ISO 20022 (CAMT) | The deterministic valuation of an asset relative to a benchmark (e.g., USD, BTC). |
 | **DCR (Dynamic Collateral Ratio)** | **LTV (Loan-to-Value) / Capital Adequacy Ratio** | Basel III | The ratio of on-chain and ERP-verified assets to active liabilities, adjusted for risk multipliers. |
 | **Sovereign Root** | **HD Master Seed / Root Entropy** | BIP-32 / BIP-44 | The hardware-anchored cryptographic origin for hierarchical deterministic key derivation. |
 | **The Vault (Enclave)** | **TEE (Trusted Execution Environment)** | NIST / GlobalPlatform | A hardware-isolated secure area of a processor that guarantees code and data integrity. |
@@ -16,8 +16,8 @@ This document establishes the canonical terminology for the Conxian ecosystem, a
 
 | Internal Variable/Function | Standardized Term | Context |
 | :--- | :--- | :--- |
-| `deposit-funds` | `deposit-assets` | Asset inflow into a vault or collateral manager. |
-| `withdraw-funds` | `withdraw-assets` | Asset outflow from a vault or collateral manager. |
+| `deposit-assets` | `deposit-assets` | Asset inflow into a vault or collateral manager. |
+| `withdraw-assets` | `withdraw-assets` | Asset outflow from a vault or collateral manager. |
 | `clean-hands-compliance` | `sanctions-verification` | Compliance check against AML/OFAC lists. |
 | `agent-risk` (AYE) | `risk-engine` | The autonomous logic determining stability fees and liquidation thresholds. |
 | `fiscal-dam` | `treasury-controller` | Logic managing the flow of protocol revenue to various pools. |

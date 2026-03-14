@@ -40,14 +40,14 @@ We are adopting a **Product-Led Growth (PLG)** pricing model. The goal is maximu
 * **Pricing:** **$2.5k to $15k+/month**.
 * **Deliverables:** Dedicated sovereign proxies (M12), custom SLAs, multi-sig quorum orchestration (Musig2), and white-glove enterprise support.
 
-### D. The B2C Retail Engine (Conxius Wallet): Tiered & PPP Pricing
+### D. The B2C Retail Engine (Conxius Wallet): Tiered & ExchangeRate Pricing
 
-To maximize global adoption while respecting local economic realities, we are implementing a **Purchasing Power Parity (PPP)** pricing model. At standard FX rates (~16 to 19 ZAR per 1 USD), a $9.99/mo subscription equates to almost R190, which heavily prices out emerging market users. By adjusting for PPP, we can capture massive volume across all demographics.
+To maximize global adoption while respecting local economic realities, we are implementing a **Purchasing Power Parity (ExchangeRate)** pricing model. At standard FX rates (~16 to 19 ZAR per 1 USD), a $9.99/mo subscription equates to almost R190, which heavily prices out emerging market users. By adjusting for ExchangeRate, we can capture massive volume across all demographics.
 
 * **Tier 1: Conclave Starter ($1.00/mo)**:
     * **Target:** Emerging markets (e.g., South Africa, LATAM) and entry-level retail users (~R18 ZAR/mo).
     * **Features:** Standard Tor routing, basic 2-of-3 multi-sig, standard swap fees. Lowers the barrier to entry to convert free users into paid, loyal customers.
-* **Tier 2: Conclave Pro ($9.99/mo Standard | ~$4.99/mo PPP-Adjusted)**:
+* **Tier 2: Conclave Pro ($9.99/mo Standard | ~$4.99/mo ExchangeRate-Adjusted)**:
     * **Target:** Power users, institutional managers, and developed markets.
     * **Features:** Unlimited multi-sig quorums, dedicated sovereign Tor circuits, zero base-fee swaps.
 * **Sovereignty-Adjusted Fee (SAF):** 0.1% minimum spread on cross-chain swaps. The higher a user's sovereignty score, the lower their fees.
@@ -56,8 +56,8 @@ To maximize global adoption while respecting local economic realities, we are im
 
 To maintain our "No Dark State" and "Credible Neutrality" ethos, pricing logic cannot be hidden in a centralized Web2 database. The architecture is explicitly decoupled:
 
-1. **The Risk Oracle (`conxian-nexus`)**: Ingests real-world universal FX rates (e.g., USD, ZAR, NGN, EUR, INR, BRL) and live global PPP indices via decentralized data feeds. It provides intelligent, real-time localized pricing states to the blockchain for every region.
-2. **The Smart Contract (Stacks / Bitcoin L2)**: The absolute single source of truth. Users mint a time-bound "Subscription Trait" (NFT or token balance) using stablecoins or sBTC. The contract calculates the exact cost dynamically using the Oracle's localized PPP pricing.
+1. **The Risk Oracle (`conxian-nexus`)**: Ingests real-world universal FX rates (e.g., USD, ZAR, NGN, EUR, INR, BRL) and live global ExchangeRate indices via decentralized data feeds. It provides intelligent, real-time localized pricing states to the blockchain for every region.
+2. **The Smart Contract (Stacks / Bitcoin L2)**: The absolute single source of truth. Users mint a time-bound "Subscription Trait" (NFT or token balance) using stablecoins or sBTC. The contract calculates the exact cost dynamically using the Oracle's localized ExchangeRate pricing.
 3. **The Router (`conxian-gateway`)**: The Rust backend purely enforces access. It reads the user's on-chain subscription state to allow or deny high-bandwidth requests, Tor orchestration, and premium API routing.
 4. **The Client (`conxius-wallet` / UI)**: Strictly handles localized UX/UI display (rendering dynamic prices in the user's native fiat currency) and constructs the payment transaction for the user's hardware enclave to sign.
 

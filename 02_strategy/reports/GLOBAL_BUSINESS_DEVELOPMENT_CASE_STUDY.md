@@ -21,7 +21,7 @@ This case study breaks down the Total Addressable Market (TAM), competitive benc
 
 * **TAM (Web3 Wallets):** $6.5B - $8B by 2026. Over 100M+ active users globally.
 * **SAM (Bitcoin/L2 Retail):** $1.2B. Users looking for Bitcoin-native, self-custodial yield and swaps.
-* **SOM:** $50M - $100M. Targeting 1-2 million sovereign users in emerging markets (PPP adoption) and western power users.
+* **SOM:** $50M - $100M. Targeting 1-2 million sovereign users in emerging markets (ExchangeRate adoption) and western power users.
 
 ### Competitive Benchmarking
 
@@ -31,7 +31,7 @@ This case study breaks down the Total Addressable Market (TAM), competitive benc
 ### Pricing & Margin Strategy
 
 * **Tier 1: Free User:** $0 upfront. Monetized via the 0.1% SAF spread on routing trades.
-* **Tier 2: Conclave Starter (PPP Scaled):** $1.00/mo upwards dynamically adjusted for emerging markets. Unlocks basic multi-device sync and priority routing.
+* **Tier 2: Conclave Starter (ExchangeRate Scaled):** $1.00/mo upwards dynamically adjusted for emerging markets. Unlocks basic multi-device sync and priority routing.
 * **Tier 3: Conclave Pro ($9.99/mo):** Western/Developed markets. Unlocks unlimited Musig2 quorums, dedicated Tor circuits, and zero base-fee routing.
 * **COGS/Margin:** Because compute is pushed to the user's mobile device, COGS is ~$0. Software subscriptions are 99% gross margin.
 
@@ -71,7 +71,7 @@ This case study breaks down the Total Addressable Market (TAM), competitive benc
 ### Competitive Benchmarking
 
 * **Competitor (Aave / Zest):** Centralized governance controls risk parameters. Yield is often fragmented across wrapped assets.
-* **Conxian Advantage (Universal FX & Real-Yield):** Utilizing our `conxian-nexus` Oracle Stub, we track dynamic PPP and Universal FX off-chain and push it on-chain. This allows the DeFi protocol to offer localized lending rates (e.g., ZAR or NGN stable borrowing) backed by Bitcoin finality.
+* **Conxian Advantage (Universal FX & Real-Yield):** Utilizing our `conxian-nexus` Oracle Stub, we track dynamic ExchangeRate and Universal FX off-chain and push it on-chain. This allows the DeFi protocol to offer localized lending rates (e.g., ZAR or NGN stable borrowing) backed by Bitcoin finality.
 
 ### Pricing & Margin Strategy
 

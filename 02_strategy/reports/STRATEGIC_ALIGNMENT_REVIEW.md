@@ -13,7 +13,7 @@ The strategic pivot from a purely B2C retail wallet to an **Institutional B2B In
 
 * **Infrastructure (M12 Real Rails):** The plan to build sovereign proxies (Bisq, Changelly) perfectly aligns with the SDK strategy. When L2s buy the SDK, they are actually buying access to these highly secure, censorship-resistant rails via the `conxian-gateway`.
 * **Security (M13 Musig2):** The 5-year plan mandates institutional-grade utility. The Conclave SDK, equipped with StrongBox and Taproot Musig2 quorums, mathematically satisfies this requirement.
-* **Pricing:** The universal fiat PPP pricing handled via the Risk Oracle perfectly executes the "Credible Neutrality" and "No Dark State" ethos mandated in the master rules.
+* **Pricing:** The universal fiat ExchangeRate pricing handled via the Risk Oracle perfectly executes the "Credible Neutrality" and "No Dark State" ethos mandated in the master rules.
 
 ---
 
@@ -33,7 +33,7 @@ The strategy relies on selling the Conclave SDK to emerging Bitcoin L2s. However
 The `SDK_BUSINESS_GROWTH_STRATEGY` dictates that all subscription pricing logic lives on-chain via the Risk Oracle.
 
 * **Risk:** Minting a "Subscription Trait" on Stacks or a Bitcoin L2 incurs gas fees. If the subscription is $1/mo (Conclave Starter), but gas fees are $1.50, the economics fail for emerging markets.
-* **Solution:** We must batch subscription proofs via state channels or utilize a high-throughput, low-fee L2 (like Stacks sBTC subnets) specifically for the subscription contracts to ensure the gas cost never eclipses the PPP-adjusted subscription fee.
+* **Solution:** We must batch subscription proofs via state channels or utilize a high-throughput, low-fee L2 (like Stacks sBTC subnets) specifically for the subscription contracts to ensure the gas cost never eclipses the ExchangeRate-adjusted subscription fee.
 
 ### Gap 3: SDK Extraction Engineering
 

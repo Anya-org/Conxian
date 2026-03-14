@@ -21,12 +21,12 @@
 
 ## 2. `conxian-nexus` (The Gateway Billing Engine)
 
-**Business Goal:** Track SDK usage, enforce SaaS paywalls (Stripe/Crypto), and execute dynamic PPP arbitrage.
+**Business Goal:** Track SDK usage, enforce SaaS paywalls (Stripe/Crypto), and execute dynamic ExchangeRate arbitrage.
 **Current State:** Nexus acts as an MEV/liquidator bot and syncs Stacks state. It does not currently handle user authentication or SaaS billing logic.
 **Monetization Gaps:**
 
 * **No Developer Console API:** We need backend routes to generate SDK API keys and track their usage.
-* **No Stripe / Web3 Payment Integration:** We cannot physically charge the $1.00 PPP or $9.99 Pro fees.
+* **No Stripe / Web3 Payment Integration:** We cannot physically charge the $1.00 ExchangeRate or $9.99 Pro fees.
 
 **Actionable Tickets:**
 
@@ -55,7 +55,7 @@
 ## 4. `Conxian` (DeFi Smart Contracts)
 
 **Business Goal:** Extract protocol origination fees and liquidation penalties directly into the DAO Treasury.
-**Current State:** `swap-router.clar` has a static `BASE-FEE u30` (0.3%). `fee-manager.clar` exists but is disconnected from the dynamic PPP oracle data.
+**Current State:** `swap-router.clar` has a static `BASE-FEE u30` (0.3%). `fee-manager.clar` exists but is disconnected from the dynamic ExchangeRate oracle data.
 **Monetization Gaps:**
 
 * **Static Fees:** We are not utilizing the cybernetic/dynamic fee logic. If we want to undercut MetaMask, the Stacks contracts need to be able to accept dynamic fee parameters based on the user's tier.
@@ -63,5 +63,5 @@
 
 **Actionable Tickets:**
 
-1. **[DEFI-01] Connect Oracle Stub to Fee Manager:** Allow the `conxian-nexus` PPP Oracle to dynamically adjust base swap fees down to 0.1% for high-volume or Pro users.
+1. **[DEFI-01] Connect Oracle Stub to Fee Manager:** Allow the `conxian-nexus` ExchangeRate Oracle to dynamically adjust base swap fees down to 0.1% for high-volume or Pro users.
 2. **[DEFI-02] Implement `sweep-fees` Functionality:** Ensure the `swap-router` and `lending-manager` have public functions that allow Nexus to batch transfer accrued Protocol Origination Fees into the operational treasury.
