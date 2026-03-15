@@ -16,7 +16,11 @@ describe('Protocol Benchmarks', () => {
     // Mine a few blocks to ensure burn-block-height progresses
     simnet.mineEmptyBlocks(10);
 
-    const res = simnet.callPublicFn('agent-treasury', 'run-fiscal-strategy', [], deployer);
+    const accounts = simnet.getAccounts();
+    const wallet1 = accounts.get('wallet_1')!;
+    const res = simnet.callPublicFn('agent-treasury', 'run-fiscal-strategy',
+      [Cl.list([Cl.principal(wallet1)]), Cl.contractPrincipal(deployer, 'cxd-token')],
+      deployer);
     console.log('BENCHMARK: run-fiscal-strategy');
     console.log(JSON.stringify(res.events, null, 2));
     // In Clarinet SDK, gas is often in res.result if it returns a response or check events

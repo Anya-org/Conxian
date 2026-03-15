@@ -110,6 +110,10 @@ path = "contracts/dimensional/position-nft.clar"
 path = "contracts/lending/lending-manager.clar"
 depends_on = ["conxian-protocol", "economic-policy-engine", "risk-manager", "bme-engine", "sip-standards"]
 
+[contracts.dimensional-engine]
+path = "contracts/core/dimensional-engine.clar"
+depends_on = ["conxian-protocol", "conxian-access", "core-traits", "sip-standards"]
+
 [contracts.dimensional-core]
 path = "contracts/dimensional/dimensional-core.clar"
 depends_on = ["position-nft"]

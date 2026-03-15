@@ -3,6 +3,7 @@ id: 1
 name: Full System Deployment (March 2026)
 network: testnet
 stacks-node: "https://stacks-node-api.testnet.stacks.co"
+deployer: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
 plan:
   batches:
     - id: 0

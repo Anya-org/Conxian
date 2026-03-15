@@ -21,3 +21,26 @@
   (is-paused () (response bool uint))
   (get-protocol-admin () (response principal uint))
 ))
+
+(define-trait position-manager-trait (
+  (open-position (principal principal uint uint bool) (response uint uint))
+  (close-position (principal uint) (response bool uint))
+  (liquidate-position (principal uint) (response bool uint))
+))
+
+(define-trait collateral-manager-trait (
+  (deposit-funds (uint <sip-010-ft-trait>) (response bool uint))
+  (withdraw-funds (uint <sip-010-ft-trait>) (response bool uint))
+  (add-collateral (principal principal uint) (response bool uint))
+  (remove-collateral (principal principal uint) (response bool uint))
+))
+
+(define-trait risk-manager-trait (
+  (get-health-factor (uint) (response uint uint))
+  (liquidate (uint) (response bool uint))
+))
+
+(define-trait funding-rate-trait (
+  (update-funding-rate (principal) (response bool uint))
+  (apply-funding (principal uint) (response bool uint))
+))
