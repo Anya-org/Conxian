@@ -1,5 +1,5 @@
 ;; position-factory.clar
-;; Factory for creating and managing user positions (e.g., Liquidity, Lending)
+;; Factory for creating and managing user positions (e.g. Liquidity Lending)
 ;; Tier 0 Architecture
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
@@ -10,10 +10,10 @@
 (define-map positions
   uint
   {
-    owner: principal,
-    pool: principal,
-    amount: uint,
-    created: uint,
+    owner: principal
+    pool: principal
+    amount: uint
+    created: uint
   }
 )
 
@@ -28,10 +28,10 @@
       (sender tx-sender)
     )
     (map-set positions id {
-      owner: sender,
-      pool: pool,
-      amount: amount,
-      created: burn-block-height,
+      owner: sender
+      pool: pool
+      amount: amount
+      created: burn-block-height
     })
     (var-set position-nonce id)
     (ok id)

@@ -18,8 +18,8 @@
     (
       (abs-tick (if (< tick 0) (* tick (- 1)) tick))
     )
-    ;; For tick 0, return DECIMALS_12 (1.0)
-    ;; For tick 1, return approximately 1.00005 * DECIMALS_12
+    ;; For tick 0 return DECIMALS_12 (1.0)
+    ;; For tick 1 return approximately 1.00005 * DECIMALS_12
     (if (is-eq tick 0)
       u1000000000000 ;; 1.0 with 12 decimals
       (if (is-eq tick 1)

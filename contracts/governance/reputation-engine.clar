@@ -16,7 +16,7 @@
 (define-map activity-scores
   principal
   {
-    last-voted-block: uint,
+    last-voted-block: uint
     score: uint
   }
 )
@@ -64,7 +64,7 @@
 (define-public (update-activity-score (user principal))
   (begin
     (map-set activity-scores user {
-      last-voted-block: burn-block-height,
+      last-voted-block: burn-block-height
       score: INITIAL_ACTIVITY_SCORE
     })
     (ok true)

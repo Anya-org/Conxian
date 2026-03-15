@@ -14,7 +14,7 @@
 ;; State
 (define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-map settled-intents (buff 32) bool)
-(define-map registered-dapps principal { metadata-uri: (string-ascii 256), registered-at: uint })
+(define-map registered-dapps principal { metadata-uri: (string-ascii 256) registered-at: uint })
 
 ;; --- Implementation ---
 
@@ -22,7 +22,7 @@
 (define-public (verify-intent-proof (state-proof (buff 2048)) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     ;; Call the unified access control or native crypto primitives
-    ;; In simulation, we assume hardware verification passes
+    ;; In simulation we assume hardware verification passes
     (ok true)
   )
 )
@@ -35,9 +35,9 @@
     (map-set settled-intents intent-id true)
 
     (print {
-      event: "intent-executed",
-      intent-id: intent-id,
-      solver: solver,
+      event: "intent-executed"
+      intent-id: intent-id
+      solver: solver
       timestamp: burn-block-height
     })
 
@@ -54,7 +54,7 @@
 (define-public (register-dapp (dapp-principal principal) (metadata-uri (string-ascii 256)))
   (begin
     (map-set registered-dapps dapp-principal {
-      metadata-uri: metadata-uri,
+      metadata-uri: metadata-uri
       registered-at: burn-block-height
     })
     (ok true)

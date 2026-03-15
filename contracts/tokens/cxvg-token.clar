@@ -8,7 +8,7 @@
 ;; @desc Mints new CXVG governance tokens to a recipient.
 (define-public (mint (amount uint) (recipient principal))
   (begin
-    ;; In production, add authorization check (e.g. only coordinator)
+    ;; In production add authorization check (e.g. only coordinator)
     (asserts! (unwrap-panic (contract-call? .regulatory-adapter check-clean-hands-compliance recipient)) (err ERR_NON_COMPLIANT))
     (ft-mint? cxvg amount recipient)
   )

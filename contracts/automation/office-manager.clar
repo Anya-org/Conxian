@@ -18,7 +18,7 @@
 (define-map workers principal bool)
 
 ;; Payroll Balance
-;; Total funds available for paying workers (in uSTX for now, can be generic)
+;; Total funds available for paying workers (in uSTX for now can be generic)
 (define-data-var payroll-balance uint u0)
 
 ;; Authorization
@@ -49,7 +49,7 @@
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (map-set workers worker true)
     (print {
-      event: "worker-registered",
+      event: "worker-registered"
       worker: worker
     })
     (ok true)
@@ -75,8 +75,8 @@
     (try! (stx-transfer? amount tx-sender (as-contract tx-sender)))
     (var-set payroll-balance (+ (var-get payroll-balance) amount))
     (print {
-      event: "payroll-funded",
-      amount: amount,
+      event: "payroll-funded"
+      amount: amount
       new-balance: (var-get payroll-balance)
     })
     (ok true)
@@ -100,7 +100,7 @@
 ;; @param amount: The fee to pay the worker
 (define-public (payout (worker principal) (amount uint))
   (begin
-    ;; 1. Caller must be an Authorized Agent (e.g., agent-risk)
+    ;; 1. Caller must be an Authorized Agent (e.g. agent-risk)
     (asserts! (is-authorized-agent contract-caller) (err ERR_UNAUTHORIZED))
     
     ;; 2. Worker must be registered
@@ -116,9 +116,9 @@
     (var-set payroll-balance (- (var-get payroll-balance) amount))
     
     (print {
-      event: "worker-paid",
-      job-contract: tx-sender,
-      worker: worker,
+      event: "worker-paid"
+      job-contract: tx-sender
+      worker: worker
       amount: amount
     })
     (ok true)

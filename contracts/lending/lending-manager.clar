@@ -15,15 +15,15 @@
 (define-map reserve-data
   principal
   {
-    total-deposits: uint,
-    total-borrows: uint,
-    total-reserves: uint,
+    total-deposits: uint
+    total-borrows: uint
+    total-reserves: uint
     last-updated: uint
   }
 )
 
-(define-map deposits { asset: principal, user: principal } uint)
-(define-map borrows { asset: principal, user: principal } uint)
+(define-map deposits { asset: principal user: principal } uint)
+(define-map borrows { asset: principal user: principal } uint)
 
 (define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 
@@ -31,13 +31,13 @@
 (define-public (deposit (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
-    (reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: burn-block-height } (map-get? reserve-data asset)))
+    (reserve (default-to { total-deposits: u0 total-borrows: u0 total-reserves: u0 last-updated: burn-block-height } (map-get? reserve-data asset)))
   )
     (begin
       (asserts! (> amount u0) ERR_INVALID_AMOUNT)
       (try! (contract-call? asset-trait transfer amount tx-sender (as-contract tx-sender) none))
 
-      (map-set deposits { asset: asset, user: tx-sender } (+ (default-to u0 (map-get? deposits { asset: asset, user: tx-sender })) amount))
+      (map-set deposits { asset: asset user: tx-sender } (+ (default-to u0 (map-get? deposits { asset: asset user: tx-sender })) amount))
       (map-set reserve-data asset (merge reserve { total-deposits: (+ (get total-deposits reserve) amount) }))
       (ok true)
     )
@@ -52,7 +52,7 @@
   )
     (begin
       (asserts! (<= amount (get total-deposits reserve)) ERR_INSUFFICIENT_LIQUIDITY)
-      (map-set borrows { asset: asset, user: tx-sender } (+ (default-to u0 (map-get? borrows { asset: asset, user: tx-sender })) amount))
+      (map-set borrows { asset: asset user: tx-sender } (+ (default-to u0 (map-get? borrows { asset: asset user: tx-sender })) amount))
       (map-set reserve-data asset (merge reserve { total-borrows: (+ (get total-borrows reserve) amount) }))
 
       (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) tx-sender none)))
@@ -73,11 +73,11 @@
       
       (match (contract-call? .bme-engine register-fee-activity (as-contract tx-sender) interest-portion)
         res true
-        err-val (begin (print { event: "bme-report-failed", error: err-val }) false)
+        err-val (begin (print { event: "bme-report-failed" error: err-val }) false)
       )
       
       (map-set reserve-data asset (merge reserve {
-        total-borrows: (- (get total-borrows reserve) (- amount interest-portion)),
+        total-borrows: (- (get total-borrows reserve) (- amount interest-portion))
         total-reserves: (+ (get total-reserves reserve) interest-portion)
       }))
       (ok true)
@@ -105,19 +105,19 @@
 )
 
 (define-read-only (get-user-supply-balance (user principal) (asset principal))
-  (map-get? deposits { asset: asset, user: user })
+  (map-get? deposits { asset: asset user: user })
 )
 
 ;; @desc Withdraw previously deposited assets.
 (define-public (withdraw (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
-    (user-deposit (default-to u0 (map-get? deposits { asset: asset, user: tx-sender })))
-    (reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: burn-block-height } (map-get? reserve-data asset)))
+    (user-deposit (default-to u0 (map-get? deposits { asset: asset user: tx-sender })))
+    (reserve (default-to { total-deposits: u0 total-borrows: u0 total-reserves: u0 last-updated: burn-block-height } (map-get? reserve-data asset)))
   )
     (begin
       (asserts! (>= user-deposit amount) ERR_INSUFFICIENT_LIQUIDITY)
-      (map-set deposits { asset: asset, user: tx-sender } (- user-deposit amount))
+      (map-set deposits { asset: asset user: tx-sender } (- user-deposit amount))
       (map-set reserve-data asset (merge reserve { total-deposits: (if (>= (get total-deposits reserve) amount) (- (get total-deposits reserve) amount) u0) }))
       (ok true)
     )

@@ -18,7 +18,7 @@
 (define-map exit-queue
   uint
   {
-    user: principal,
+    user: principal
     amount: uint
   }
 )
@@ -37,9 +37,9 @@
 (define-public (enqueue (user principal) (amount uint))
   (let ((current-tail (var-get tail)))
     (begin
-      ;; Access control: Only allow approved contracts (placeholder for now, effectively public or restricted)
-      ;; In production, this should check a whitelist from conxian-protocol
-      (map-set exit-queue current-tail { user: user, amount: amount })
+      ;; Access control: Only allow approved contracts (placeholder for now effectively public or restricted)
+      ;; In production this should check a whitelist from conxian-protocol
+      (map-set exit-queue current-tail { user: user amount: amount })
       (var-set tail (+ current-tail u1))
       (ok true)
     )
@@ -47,7 +47,7 @@
 )
 
 ;; @desc Dequeues the next request
-;; @returns (response (optional {user, amount}) uint)
+;; @returns (response (optional {user amount}) uint)
 (define-public (dequeue)
   (let (
       (current-head (var-get head))

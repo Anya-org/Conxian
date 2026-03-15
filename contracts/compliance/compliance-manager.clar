@@ -16,9 +16,9 @@
 (define-map compliance-records
     principal
     {
-        sanctions-checked: bool,
-        kyc-level: uint,
-        travel-rule-checked: bool,
+        sanctions-checked: bool
+        kyc-level: uint
+        travel-rule-checked: bool
         last-updated: uint
     }
 )
@@ -67,15 +67,15 @@
     (begin
         (asserts! (or (is-owner) (is-approved-provider tx-sender)) (err ERR_UNAUTHORIZED))
         (map-set compliance-records user {
-            sanctions-checked: sanctions-checked,
-            kyc-level: kyc-level,
-            travel-rule-checked: travel-rule-checked,
+            sanctions-checked: sanctions-checked
+            kyc-level: kyc-level
+            travel-rule-checked: travel-rule-checked
             last-updated: burn-block-height
         })
         (print {
-            event: "compliance-checked",
-            user: user,
-            kyc-level: kyc-level,
+            event: "compliance-checked"
+            user: user
+            kyc-level: kyc-level
             timestamp: burn-block-height
         })
         (ok true)

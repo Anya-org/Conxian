@@ -25,10 +25,10 @@
 (define-map batch-results
   { batch-id: uint }
   {
-    success-count: uint,
-    failure-count: uint,
-    gas-used: uint,
-    timestamp: uint,
+    success-count: uint
+    failure-count: uint
+    gas-used: uint
+    timestamp: uint
   }
 )
 
@@ -43,11 +43,11 @@
     (operations (list
       50
       {
-        type: uint,
-        target: principal,
-        function: (string-ascii 32),
-        params: (list 5 principal),
-        gas-limit: uint,
+        type: uint
+        target: principal
+        function: (string-ascii 32)
+        params: (list 5 principal)
+        gas-limit: uint
       }
     ))
     (batch-id (optional uint))
@@ -68,11 +68,11 @@
 
         ;; Emit batch completion event
         (print {
-          event: "batch-completed",
-          batch-id: actual-batch-id,
-          operations-count: (len operations),
-          result: result,
-          timestamp: burn-block-height,
+          event: "batch-completed"
+          batch-id: actual-batch-id
+          operations-count: (len operations)
+          result: result
+          timestamp: burn-block-height
         })
 
         (ok result)
@@ -107,11 +107,11 @@
 ;; Private Helper Functions
 (define-private (validate-batch-operations (operations (list 50
   {
-  type: uint,
-  target: principal,
-  function: (string-ascii 32),
-  params: (list 5 principal),
-  gas-limit: uint,
+  type: uint
+  target: principal
+  function: (string-ascii 32)
+  params: (list 5 principal)
+  gas-limit: uint
 })))
   (is-eq (len operations) (len operations)) ;; Basic validation
 )
@@ -119,11 +119,11 @@
 (define-private (execute-batch-with-gas-tracking
     (operations (list 50
       {
-        type: uint,
-        target: principal,
-        function: (string-ascii 32),
-        params: (list 5 principal),
-        gas-limit: uint,
+        type: uint
+        target: principal
+        function: (string-ascii 32)
+        params: (list 5 principal)
+        gas-limit: uint
       }
     ))
     (batch-id uint)
@@ -133,10 +133,10 @@
     )
     ;; Store batch results
     (map-set batch-results { batch-id: batch-id } {
-      success-count: (match results val val err u0),
-      failure-count: (match results val u0 err u1),
-      gas-used: u0,
-      timestamp: burn-block-height,
+      success-count: (match results val val err u0)
+      failure-count: (match results val u0 err u1)
+      gas-used: u0
+      timestamp: burn-block-height
     })
 
     results
@@ -145,11 +145,11 @@
 
 (define-private (execute-single-operation
     (operation {
-      type: uint,
-      target: principal,
-      function: (string-ascii 32),
-      params: (list 5 principal),
-      gas-limit: uint,
+      type: uint
+      target: principal
+      function: (string-ascii 32)
+      params: (list 5 principal)
+      gas-limit: uint
     })
     (accumulator (response uint uint))
   )
@@ -162,9 +162,9 @@
 ;; Utility Functions
 (define-read-only (get-batch-statistics)
   (ok {
-    total-batches: (var-get total-batches-processed),
-    current-batch-id: (var-get current-batch-id),
-    batch-enabled: (var-get batch-enabled),
-    max-batch-size: MAX_BATCH_SIZE,
+    total-batches: (var-get total-batches-processed)
+    current-batch-id: (var-get current-batch-id)
+    batch-enabled: (var-get batch-enabled)
+    max-batch-size: MAX_BATCH_SIZE
   })
 )

@@ -4,7 +4,7 @@
 
 (define-public (compound (vault principal))
   (begin
-    (print { event: "compound-executed", vault: vault, timestamp: burn-block-height })
+    (print { event: "compound-executed" vault: vault timestamp: burn-block-height })
     (ok true)
   )
 )

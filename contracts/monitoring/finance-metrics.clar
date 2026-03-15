@@ -14,9 +14,9 @@
 ;; @desc Detailed solvency and performance metrics
 (define-read-only (get-protocol-metrics)
     (ok {
-        tvl: u0,
-        solvency-ratio: u15000,
-        active-positions: u0,
+        tvl: u0
+        solvency-ratio: u15000
+        active-positions: u0
         volume-24h: u0
     })
 )

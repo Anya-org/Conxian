@@ -13,7 +13,7 @@
 ;; State
 (define-data-var global-admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 
-(define-map role-cache { user: principal, role: uint } bool)
+(define-map role-cache { user: principal role: uint } bool)
 
 ;; Authorization
 (define-read-only (is-global-admin)
@@ -24,12 +24,12 @@
 ;; @desc Is authorized
 ;; @returns (response bool uint)
 (define-public (is-authorized (role uint))
-  (ok (or (is-global-admin) (default-to false (map-get? role-cache { user: tx-sender, role: role }))))
+  (ok (or (is-global-admin) (default-to false (map-get? role-cache { user: tx-sender role: role }))))
 )
 
 (define-read-only (is-authorized-to-pause (sender principal))
   (or (is-eq sender (var-get global-admin))
-      (default-to false (map-get? role-cache { user: sender, role: u1 })))
+      (default-to false (map-get? role-cache { user: sender role: u1 })))
 )
 
 
@@ -39,8 +39,8 @@
   (begin
     (asserts! (is-global-admin) (err ERR_NOT_AUTHORIZED))
     (if enabled
-      (map-set role-cache { user: user, role: role } true)
-      (map-delete role-cache { user: user, role: role })
+      (map-set role-cache { user: user role: role } true)
+      (map-delete role-cache { user: user role: role })
     )
     (ok true)
   )

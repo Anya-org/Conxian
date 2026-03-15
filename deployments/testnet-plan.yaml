@@ -9,7 +9,7 @@ plan:
       transactions:
         - contract-publish:
             contract-name: cxd-token
-            expected-sender: STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ
+            expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
             cost: 10000
             path: "contracts/tokens/cxd-token.clar"
             anchor-block-only: true
@@ -17,7 +17,7 @@ plan:
             epoch: "3.0"
         - contract-publish:
             contract-name: governance-token
-            expected-sender: STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ
+            expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
             cost: 10000
             path: "contracts/governance-token.clar"
             anchor-block-only: true

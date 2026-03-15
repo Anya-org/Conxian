@@ -4,7 +4,7 @@
 ;;; Adheres to Clarity 4 / Nakamoto Standard (SIP-033/034).
 ;;; 
 ;;; Version: 1.2.0
-;;; Enforced Standards: CXIP-012 (Dual-Clock), CXIP-013 (Fiscal Dam)
+;;; Enforced Standards: CXIP-012 (Dual-Clock) CXIP-013 (Fiscal Dam)
 
 ;; Traits
 (use-trait oracle-trait .defi-traits.oracle-trait)
@@ -38,18 +38,18 @@
 
 ;; ===== Data Maps =====
 (define-map positions
-  { owner: principal, id: uint }
+  { owner: principal id: uint }
   {
-    collateral: uint,
-    size: int,
-    entry-price: uint,
-    entry-time: uint,        ;; Unix timestamp (burn-block-height)
-    last-funding: uint,     ;; Unix timestamp (burn-block-height)
-    last-updated: uint,     ;; Unix timestamp (burn-block-height)
-    position-type: (string-ascii 20),
-    status: (string-ascii 20),
-    max-leverage: uint,
-    maintenance-margin: uint,
+    collateral: uint
+    size: int
+    entry-price: uint
+    entry-time: uint        ;; Unix timestamp (burn-block-height)
+    last-funding: uint     ;; Unix timestamp (burn-block-height)
+    last-updated: uint     ;; Unix timestamp (burn-block-height)
+    position-type: (string-ascii 20)
+    status: (string-ascii 20)
+    max-leverage: uint
+    maintenance-margin: uint
     tenure-id: uint         ;; Nakamoto Tenure ID (block-height based)
   }
 )
@@ -61,7 +61,7 @@
 ;; @param position-id uint - The unique identifier of the position.
 ;; @returns (optional tuple)
 (define-read-only (get-position (user principal) (position-id uint))
-  (map-get? positions { owner: user, id: position-id })
+  (map-get? positions { owner: user id: position-id })
 )
 
 (define-read-only (calculate-tvl)
@@ -115,17 +115,17 @@
       (try! (contract-call? token-trait transfer collateral-amount tx-sender (as-contract tx-sender) none))
       (try! (contract-call? .position-nft mint tx-sender pos-id))
 
-      (map-set positions { owner: tx-sender, id: pos-id } {
-        collateral: collateral-amount,
-        size: (if (is-eq position-type "LONG") size (* size -1)),
-        entry-price: price,
-        entry-time: burn-block-height,
-        last-funding: burn-block-height,
-        last-updated: burn-block-height,
-        position-type: position-type,
-        status: "ACTIVE",
-        max-leverage: leverage,
-        maintenance-margin: (+ DEFAULT_MAINTENANCE_MARGIN (* leverage leverage)),
+      (map-set positions { owner: tx-sender id: pos-id } {
+        collateral: collateral-amount
+        size: (if (is-eq position-type "LONG") size (* size -1))
+        entry-price: price
+        entry-time: burn-block-height
+        last-funding: burn-block-height
+        last-updated: burn-block-height
+        position-type: position-type
+        status: "ACTIVE"
+        max-leverage: leverage
+        maintenance-margin: (+ DEFAULT_MAINTENANCE_MARGIN (* leverage leverage))
         tenure-id: (/ block-height u10)
       })
 
@@ -153,7 +153,7 @@
     )
     (begin
       (asserts! (is-eq (get status pos) "ACTIVE") (err ERR_POSITION_NOT_ACTIVE))
-      (map-set positions { owner: tx-sender, id: position-id } (merge pos { status: "CLOSED", last-updated: burn-block-height }))
+      (map-set positions { owner: tx-sender id: position-id } (merge pos { status: "CLOSED" last-updated: burn-block-height }))
       (if (> final-amt u0) (try! (as-contract (contract-call? token-trait transfer final-amt tx-sender tx-sender none))) true)
       (try! (contract-call? .position-nft burn position-id))
       (var-set total-value-locked (- (var-get total-value-locked) collateral))
@@ -175,7 +175,7 @@
         (collateral (get collateral pos))
       )
       (asserts! (is-eq (get status pos) "ACTIVE") (err ERR_POSITION_NOT_ACTIVE))
-      (map-set positions { owner: user, id: position-id } (merge pos { status: "LIQUIDATED", last-updated: burn-block-height }))
+      (map-set positions { owner: user id: position-id } (merge pos { status: "LIQUIDATED" last-updated: burn-block-height }))
       (try! (contract-call? .position-nft burn position-id))
       (var-set total-value-locked (- (var-get total-value-locked) collateral))
       (ok true)
@@ -185,7 +185,7 @@
 
 ;; ===== Private Helpers =====
 
-(define-private (calculate-pnl (pos { collateral: uint, size: int, entry-price: uint, entry-time: uint, last-funding: uint, last-updated: uint, position-type: (string-ascii 20), status: (string-ascii 20), max-leverage: uint, maintenance-margin: uint, tenure-id: uint }) (curr-price uint))
+(define-private (calculate-pnl (pos { collateral: uint size: int entry-price: uint entry-time: uint last-funding: uint last-updated: uint position-type: (string-ascii 20) status: (string-ascii 20) max-leverage: uint maintenance-margin: uint tenure-id: uint }) (curr-price uint))
   (let (
       (size (get size pos))
       (entry (get entry-price pos))
@@ -198,7 +198,7 @@
   )
 )
 
-(define-private (calculate-fees (pos { collateral: uint, size: int, entry-price: uint, entry-time: uint, last-funding: uint, last-updated: uint, position-type: (string-ascii 20), status: (string-ascii 20), max-leverage: uint, maintenance-margin: uint, tenure-id: uint }))
+(define-private (calculate-fees (pos { collateral: uint size: int entry-price: uint entry-time: uint last-funding: uint last-updated: uint position-type: (string-ascii 20) status: (string-ascii 20) max-leverage: uint maintenance-margin: uint tenure-id: uint }))
   (let (
       (size (get size pos))
       (abs-size (if (>= size 0) (to-uint size) (to-uint (* size -1))))

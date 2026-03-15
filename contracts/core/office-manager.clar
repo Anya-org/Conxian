@@ -1,5 +1,5 @@
 ;; office-manager.clar
-;; Manages worker registration, payroll funding, and agent authorization.
+;; Manages worker registration payroll funding and agent authorization.
 
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_INSUFFICIENT_FUNDS (err u1001))

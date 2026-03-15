@@ -1,6 +1,6 @@
 ;; operational-treasury.clar
 ;; Conxian Enterprise Standard: Operational Treasury
-;; Collects fees from PaaS Factory, AMM, and other modules.
+;; Collects fees from PaaS Factory AMM and other modules.
 ;; Tier 0: "Hands-Off" Management via Agent Treasury / Timelock.
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)

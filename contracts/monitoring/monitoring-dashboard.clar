@@ -17,10 +17,10 @@
     (gcr (unwrap-panic (contract-call? .agent-risk get-gcr)))
   )
     (ok {
-        status: status,
-        risk: risk,
-        metrics: metrics,
-        gcr: gcr,
+        status: status
+        risk: risk
+        metrics: metrics
+        gcr: gcr
         uptime: burn-block-height
     })
   )
@@ -28,17 +28,17 @@
 
 (define-read-only (get-module-status (module-id (string-ascii 32)))
   (ok {
-    module: module-id,
-    healthy: true,
+    module: module-id
+    healthy: true
     last-update: burn-block-height
   })
 )
 
 (define-read-only (get-system-health-summary)
   (ok {
-    total-modules: u5,
-    healthy-modules: u5,
-    overall-healthy: true,
+    total-modules: u5
+    healthy-modules: u5
+    overall-healthy: true
     timestamp: burn-block-height
   })
 )

@@ -30,18 +30,18 @@
 (define-map seat-data
   uint ;; token-id
   {
-    council-id: uint,
-    voting-power: uint,
-    member-type: (string-ascii 20), ;; "human", "autonomous-agent"
-    created-at: uint,
+    council-id: uint
+    voting-power: uint
+    member-type: (string-ascii 20) ;; "human" "autonomous-agent"
+    created-at: uint
   }
 )
 
 ;; Mapping: Principal -> Council -> Seat ID (Enforce 1 seat per council)
 (define-map member-seats
   {
-    user: principal,
-    council-id: uint,
+    user: principal
+    council-id: uint
   }
   uint
 )
@@ -110,8 +110,8 @@
     ;; Ensure user doesn't already have a seat on this council
     (asserts!
       (is-none (map-get? member-seats {
-        user: recipient,
-        council-id: council-id,
+        user: recipient
+        council-id: council-id
       }))
       (err ERR_SEAT_TAKEN)
     )
@@ -119,15 +119,15 @@
     (try! (nft-mint? seat new-id recipient))
 
     (map-set seat-data new-id {
-      council-id: council-id,
-      voting-power: voting-power,
-      member-type: member-type,
-      created-at: burn-block-height,
+      council-id: council-id
+      voting-power: voting-power
+      member-type: member-type
+      created-at: burn-block-height
     })
 
     (map-set member-seats {
-      user: recipient,
-      council-id: council-id,
+      user: recipient
+      council-id: council-id
     }
       new-id
     )
@@ -157,8 +157,8 @@
     (try! (nft-burn? seat seat-id owner))
     (map-delete seat-data seat-id)
     (map-delete member-seats {
-      user: owner,
-      council-id: council-id,
+      user: owner
+      council-id: council-id
     })
 
     ;; Update Total Power (Protect against underflow though shouldn't happen)
@@ -177,8 +177,8 @@
     (council-id uint)
   )
   (let ((power (match (map-get? member-seats {
-      user: user,
-      council-id: council-id,
+      user: user
+      council-id: council-id
     })
       seat-id (get voting-power (unwrap-panic (map-get? seat-data seat-id)))
       u0

@@ -30,15 +30,15 @@
 (define-map voting-power
   { account: principal }
   {
-    power: uint,
-    last-update: uint,
+    power: uint
+    last-update: uint
   }
 )
 
 (define-map delegations
   {
-    delegator: principal,
-    delegate: principal,
+    delegator: principal
+    delegate: principal
   }
   { amount: uint }
 )
@@ -115,10 +115,10 @@
       (unwrap-panic (update-voting-power recipient))
 
       (print {
-        event: "transfer",
-        sender: sender,
-        recipient: recipient,
-        amount: amount,
+        event: "transfer"
+        sender: sender
+        recipient: recipient
+        amount: amount
       })
       (ok true)
     )
@@ -179,8 +179,8 @@
       (current-balance (unwrap! (get-balance tx-sender) (err ERR_UNAUTHORIZED)))
       (current-delegation (default-to { amount: u0 }
         (map-get? delegations {
-          delegator: tx-sender,
-          delegate: delegate,
+          delegator: tx-sender
+          delegate: delegate
         })
       ))
     )
@@ -188,8 +188,8 @@
 
     ;; Update delegation record
     (map-set delegations {
-      delegator: tx-sender,
-      delegate: delegate,
+      delegator: tx-sender
+      delegate: delegate
     } { amount: amount }
     )
 
@@ -227,8 +227,8 @@
   (let (
       (current-delegation (unwrap!
         (map-get? delegations {
-          delegator: tx-sender,
-          delegate: delegate,
+          delegator: tx-sender
+          delegate: delegate
         })
         (err ERR_UNAUTHORIZED)
       ))
@@ -240,8 +240,8 @@
       ;; Undelegate all
       (begin
         (map-delete delegations {
-          delegator: tx-sender,
-          delegate: delegate,
+          delegator: tx-sender
+          delegate: delegate
         })
         (map-set delegated-amounts { account: delegate } { amount: (-
           (default-to u0
@@ -255,8 +255,8 @@
       ;; Partial undelegation
       (begin
         (map-set delegations {
-          delegator: tx-sender,
-          delegate: delegate,
+          delegator: tx-sender
+          delegate: delegate
         } { amount: (- delegated-amount amount) }
         )
         (map-set delegated-amounts { account: delegate } { amount: (-
@@ -292,8 +292,8 @@
       (total-power (+ balance delegated-to-me))
     )
     (map-set voting-power { account: account } {
-      power: total-power,
-      last-update: burn-block-height,
+      power: total-power
+      last-update: burn-block-height
     })
     (ok true)
   )
@@ -336,9 +336,9 @@
     (map-set token-balances { account: recipient } { amount: (+ (unwrap! (get-balance recipient) (err ERR_UNAUTHORIZED)) amount) })
     (unwrap-panic (update-voting-power recipient))
     (print {
-      event: "mint",
-      recipient: recipient,
-      amount: amount,
+      event: "mint"
+      recipient: recipient
+      amount: amount
     })
     (ok true)
   )
@@ -360,9 +360,9 @@
       (map-set token-balances { account: owner } { amount: (- owner-balance amount) })
       (unwrap-panic (update-voting-power owner))
       (print {
-        event: "burn",
-        owner: owner,
-        amount: amount,
+        event: "burn"
+        owner: owner
+        amount: amount
       })
       (ok true)
     )

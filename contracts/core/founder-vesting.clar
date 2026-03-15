@@ -2,7 +2,7 @@
 ;; Conxian Protocol Standard Contract
 
 ;; contracts/core/founder-vesting.clar
-;; BOLT: Refactored for Clarity 4, Nakamoto compatibility, and secure state management.
+;; BOLT: Refactored for Clarity 4 Nakamoto compatibility and secure state management.
 ;; Migrated to burn-block-height for second-precision vesting.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
@@ -19,9 +19,9 @@
 (define-data-var vesting-start uint u0)
 
 (define-map vesting-schedules principal {
-  total-amount: uint,
-  start-time: uint,
-  end-time: uint,
+  total-amount: uint
+  start-time: uint
+  end-time: uint
   claimed-amount: uint
 })
 
@@ -47,9 +47,9 @@
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (asserts! (is-none (map-get? vesting-schedules beneficiary)) (err ERR_SCHEDULE_EXISTS))
     (map-set vesting-schedules beneficiary {
-      total-amount: total-amount,
-      start-time: start-time,
-      end-time: end-time,
+      total-amount: total-amount
+      start-time: start-time
+      end-time: end-time
       claimed-amount: u0
     })
     (ok true)
@@ -67,12 +67,12 @@
       (asserts! (> vested-amount (get claimed-amount (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE)))) (err ERR_NOTHING_TO_CLAIM))
       (let ((claim-amount (- vested-amount (get claimed-amount (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE))))))
         (map-set vesting-schedules tx-sender {
-          total-amount: (get total-amount (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE))),
-          start-time: (get start-time (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE))),
-          end-time: (get end-time (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE))),
+          total-amount: (get total-amount (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE)))
+          start-time: (get start-time (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE)))
+          end-time: (get end-time (unwrap! schedule (err ERR_NO_VESTING_SCHEDULE)))
           claimed-amount: vested-amount
         })
-        (print { event: "vesting-claimed", beneficiary: tx-sender, amount: claim-amount, timestamp: burn-block-height })
+        (print { event: "vesting-claimed" beneficiary: tx-sender amount: claim-amount timestamp: burn-block-height })
         (ok claim-amount)
       )
     )
@@ -85,7 +85,7 @@
 )
 
 ;; --- Private Helper Functions ---
-(define-private (calculate-vested-amount (schedule {total-amount: uint, start-time: uint, end-time: uint, claimed-amount: uint}))
+(define-private (calculate-vested-amount (schedule {total-amount: uint start-time: uint end-time: uint claimed-amount: uint}))
   (if (< burn-block-height (var-get vesting-start))
     u0
     (if (>= burn-block-height (+ (var-get vesting-start) (- (get end-time schedule) (get start-time schedule))))

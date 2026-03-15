@@ -26,18 +26,18 @@
 (define-map positions
     uint
     {
-        owner: principal,
-        pool: principal,
-        token0: principal,
-        token1: principal,
-        tick-lower: int,
-        tick-upper: int,
-        liquidity: uint,
-        fee-growth-inside0-last: uint,
-        fee-growth-inside1-last: uint,
-        tokens-owed0: uint,
-        tokens-owed1: uint,
-        created-at: uint,
+        owner: principal
+        pool: principal
+        token0: principal
+        token1: principal
+        tick-lower: int
+        tick-upper: int
+        liquidity: uint
+        fee-growth-inside0-last: uint
+        fee-growth-inside1-last: uint
+        tokens-owed0: uint
+        tokens-owed1: uint
+        created-at: uint
         last-updated: uint
     }
 )
@@ -45,19 +45,19 @@
 ;; Events
 (define-private (emit-position-created (position-id uint) (owner principal) (pool principal))
     (print {
-        event: "position-created",
-        position-id: position-id,
-        owner: owner,
-        pool: pool,
+        event: "position-created"
+        position-id: position-id
+        owner: owner
+        pool: pool
         timestamp: burn-block-height
     })
 )
 
 (define-private (emit-position-updated (position-id uint) (liquidity uint))
     (print {
-        event: "position-updated",
-        position-id: position-id,
-        liquidity: liquidity,
+        event: "position-updated"
+        position-id: position-id
+        liquidity: liquidity
         timestamp: burn-block-height
     })
 )
@@ -110,18 +110,18 @@
         (try! (nft-mint? cxlp-position new-id owner))
         
         (map-set positions new-id {
-            owner: owner,
-            pool: pool,
-            token0: token0,
-            token1: token1,
-            tick-lower: tick-lower,
-            tick-upper: tick-upper,
-            liquidity: liquidity,
-            fee-growth-inside0-last: u0,
-            fee-growth-inside1-last: u0,
-            tokens-owed0: u0,
-            tokens-owed1: u0,
-            created-at: burn-block-height,
+            owner: owner
+            pool: pool
+            token0: token0
+            token1: token1
+            tick-lower: tick-lower
+            tick-upper: tick-upper
+            liquidity: liquidity
+            fee-growth-inside0-last: u0
+            fee-growth-inside1-last: u0
+            tokens-owed0: u0
+            tokens-owed1: u0
+            created-at: burn-block-height
             last-updated: burn-block-height
         })
         

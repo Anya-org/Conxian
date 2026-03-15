@@ -22,12 +22,12 @@
   (begin
     ;; This function would be called by the proposal-executor
     ;; It updates the economic-policy-engine with pre-agreed values
-    ;; For this implementation, we assume the proposal-executor has validated the vote.
+    ;; For this implementation we assume the proposal-executor has validated the vote.
     (asserts! (is-eq tx-sender .proposal-executor) (err ERR_UNAUTHORIZED))
 
     ;; Example: Update global interest rate parameters
-    ;; In a full implementation, the parameters would be passed in the proposal data.
-    (print { event: "yield-parameters-updated", proposer: proposer })
+    ;; In a full implementation the parameters would be passed in the proposal data.
+    (print { event: "yield-parameters-updated" proposer: proposer })
     (ok true)
   )
 )

@@ -19,8 +19,8 @@
 (define-map strategies
     principal ;; vault address
     {
-        active: bool,
-        risk-score: uint, ;; 1-10000, lower is safer
+        active: bool
+        risk-score: uint ;; 1-10000 lower is safer
         estimated-apy: uint ;; basis points
     }
 )
@@ -37,7 +37,7 @@
     (target-strat (unwrap! (map-get? strategies (contract-of vault-to)) (err ERR_STRATEGY_NOT_FOUND)))
   )
     (begin
-      ;; 1. Adaptive Risk Guard: If protocol GCR is low, enforce lower risk-scores
+      ;; 1. Adaptive Risk Guard: If protocol GCR is low enforce lower risk-scores
       (asserts! (or
         (> system-risk u150) ;; Abundance: ignore risk score
         (<= (get risk-score target-strat) (var-get max-risk-threshold))
@@ -47,7 +47,7 @@
       (try! (contract-call? vault-from withdraw amount token))
       (try! (contract-call? vault-to deposit amount token))
 
-      (print { event: "autonomous-rebalance", from: (contract-of vault-from), to: (contract-of vault-to), amount: amount })
+      (print { event: "autonomous-rebalance" from: (contract-of vault-from) to: (contract-of vault-to) amount: amount })
       (ok true)
     )
   )
@@ -58,7 +58,7 @@
 (define-public (register-strategy (vault principal) (risk uint) (apy uint))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
-    (map-set strategies vault { active: true, risk-score: risk, estimated-apy: apy })
+    (map-set strategies vault { active: true risk-score: risk estimated-apy: apy })
     (ok true)
   )
 )

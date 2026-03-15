@@ -1,6 +1,6 @@
 ;; risk-manager.clar
 ;; Unified Risk Management Hub for Conxian Protocol
-;; Consolidates liquidation logic, position health scores, and system risk signals.
+;; Consolidates liquidation logic position health scores and system risk signals.
 ;; Nakamoto-Aligned (Epoch 3.0 / Clarity 4)
 
 ;; Constants
@@ -19,8 +19,8 @@
 (define-map position-health
   uint
   {
-    health-factor: uint,
-    last-update: uint,
+    health-factor: uint
+    last-update: uint
   }
 )
 
@@ -62,7 +62,7 @@
   )
     (begin
       (map-set position-health position-id {
-        health-factor: hf,
+        health-factor: hf
         last-update: burn-block-height
       })
       (ok hf)
@@ -89,7 +89,7 @@
     (owner (unwrap! (unwrap! (contract-call? .position-nft get-owner position-id) (err ERR_INVALID_POSITION)) (err ERR_INVALID_POSITION)))
     (hf (unwrap! (get-health-factor position-id) (err ERR_INVALID_POSITION)))
     (current-risk (var-get system-risk-score))
-    ;; Predictive Threshold: If system risk is high (> 5000), trigger earlier (110% vs 100%)
+    ;; Predictive Threshold: If system risk is high (> 5000) trigger earlier (110% vs 100%)
     (adjusted-threshold (if (>= current-risk u5000) u11000 u10000))
   )
     (begin
@@ -107,10 +107,10 @@
       (map-delete position-health position-id)
 
       (print {
-        event: "risk-triggered-liquidation",
-        position-id: position-id,
-        health-factor: hf,
-        system-risk: current-risk,
+        event: "risk-triggered-liquidation"
+        position-id: position-id
+        health-factor: hf
+        system-risk: current-risk
         threshold: adjusted-threshold
       })
       (ok true)

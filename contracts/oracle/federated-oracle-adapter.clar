@@ -16,8 +16,8 @@
 (define-map oracle-sources
   { source: principal }
   {
-    active: bool,
-    last-update: uint,
+    active: bool
+    last-update: uint
     weight: uint
   }
 )
@@ -25,16 +25,16 @@
 (define-map price-data
   { asset: (string-ascii 32) }
   {
-    aggregated-price: uint,
-    last-update: uint,
+    aggregated-price: uint
+    last-update: uint
     source-count: uint
   }
 )
 
 (define-map individual-prices
-  { asset: (string-ascii 32), source: principal }
+  { asset: (string-ascii 32) source: principal }
   {
-    price: uint,
+    price: uint
     timestamp: uint
   }
 )
@@ -57,8 +57,8 @@
     (asserts! (is-eq tx-sender source) (err ERR_UNAUTHORIZED))
     
     ;; Update individual price
-    (map-set individual-prices { asset: asset, source: source } {
-      price: price,
+    (map-set individual-prices { asset: asset source: source } {
+      price: price
       timestamp: burn-block-height
     })
     
@@ -71,7 +71,7 @@
 ;; Private: Recalculate Aggregated Price
 (define-private (recalculate-aggregated-price (asset (string-ascii 32)))
   ;; This is a simplified implementation
-  ;; In production, would iterate through all active sources
+  ;; In production would iterate through all active sources
   (ok true)
 )
 
@@ -80,8 +80,8 @@
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set oracle-sources { source: source } {
-      active: true,
-      last-update: burn-block-height,
+      active: true
+      last-update: burn-block-height
       weight: weight
     })
     (ok true)
@@ -93,8 +93,8 @@
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set oracle-sources { source: source } {
-      active: false,
-      last-update: burn-block-height,
+      active: false
+      last-update: burn-block-height
       weight: u0
     })
     (ok true)

@@ -1,6 +1,6 @@
 ;; switchboard-oracle-adapter.clar
 ;; Conxian Oracle Standard: System Sentinel (Intelligence Layer)
-;; Handles Governance Alerts, Circuit Breakers, and System Health
+;; Handles Governance Alerts Circuit Breakers and System Health
 
 ;; Constants
 
@@ -18,8 +18,8 @@
 (define-map switchboard-feeds
     principal ;; Asset
     {
-        price: uint,
-        confidence: uint,
+        price: uint
+        confidence: uint
         timestamp: uint
     }
 )
@@ -39,11 +39,11 @@
     (begin
         (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
         (map-set switchboard-feeds asset {
-            price: price,
-            confidence: confidence,
+            price: price
+            confidence: confidence
             timestamp: burn-block-height
         })
-        (print { event: "switchboard-price-update", asset: asset, price: price, confidence: confidence })
+        (print { event: "switchboard-price-update" asset: asset price: price confidence: confidence })
         (ok true)
     )
 )

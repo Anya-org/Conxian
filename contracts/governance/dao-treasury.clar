@@ -32,7 +32,7 @@
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
         (var-set pending-owner (some new-owner))
         (var-set transfer-delay-end (+ burn-block-height TIMELOCK_DELAY))
-        (print { event: "ownership-transfer-requested", new-owner: new-owner, delay-end: (var-get transfer-delay-end) })
+        (print { event: "ownership-transfer-requested" new-owner: new-owner delay-end: (var-get transfer-delay-end) })
         (ok true)
     )
 )
@@ -47,7 +47,7 @@
         (var-set owner new-owner)
         (var-set pending-owner none)
         (var-set transfer-delay-end u0)
-        (print { event: "ownership-transfer-completed", new-owner: new-owner })
+        (print { event: "ownership-transfer-completed" new-owner: new-owner })
         (ok true)
     )
 )
@@ -95,10 +95,10 @@
             (map-set strategy-allocations strategy new-allocation)
             (var-set total-allocated (+ (var-get total-allocated) amount))
             (print {
-                event: "strategy-allocated",
-                strategy: strategy,
-                amount: amount,
-                new-total: new-allocation,
+                event: "strategy-allocated"
+                strategy: strategy
+                amount: amount
+                new-total: new-allocation
                 total-allocated: (var-get total-allocated)
             })
             (ok true)
@@ -127,9 +127,9 @@
             (map-set strategy-allocations strategy (- current-allocation amount))
             (var-set total-allocated (- (var-get total-allocated) amount))
             (print {
-                event: "strategy-deallocated",
-                strategy: strategy,
-                amount: amount,
+                event: "strategy-deallocated"
+                strategy: strategy
+                amount: amount
                 remaining: (- current-allocation amount)
             })
             (ok true)

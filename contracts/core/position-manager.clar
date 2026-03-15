@@ -18,14 +18,14 @@
 (define-map positions
   uint
   {
-    owner: principal,
-    token: principal,
-    size: uint,
-    collateral: uint,
-    leverage: uint,
-    entry-price: uint,
-    is-long: bool,
-    open: bool,
+    owner: principal
+    token: principal
+    size: uint
+    collateral: uint
+    leverage: uint
+    entry-price: uint
+    is-long: bool
+    open: bool
   }
 )
 
@@ -76,14 +76,14 @@
     (asserts! (is-engine) (err ERR_NOT_AUTHORIZED))
 
     (map-set positions pos-id {
-      owner: user,
-      token: token,
-      size: (* amount leverage),
-      collateral: amount,
-      leverage: leverage,
-      entry-price: u0, ;; To be fetched from oracle via engine
-      is-long: long,
-      open: true,
+      owner: user
+      token: token
+      size: (* amount leverage)
+      collateral: amount
+      leverage: leverage
+      entry-price: u0 ;; To be fetched from oracle via engine
+      is-long: long
+      open: true
     })
     (var-set next-position-id (+ pos-id u1))
     (ok pos-id)

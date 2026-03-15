@@ -3,7 +3,7 @@
 
 ;; dimensional-engine.clar
 ;; Facade contract for the Core Module
-;; Central entry point for position management, collateral, and risk.
+;; Central entry point for position management collateral and risk.
 ;; Adheres to Decentralized Modularity and Bitcoin Ethos
 
 ;; Traits
@@ -34,7 +34,7 @@
 
 ;; --- Internal Guards ---
 
-(define-private (guard-entry (protocol-status { paused: bool, compliant: bool, tenure-id: (optional uint), version: (string-ascii 2), timestamp: uint }))
+(define-private (guard-entry (protocol-status { paused: bool compliant: bool tenure-id: (optional uint) version: (string-ascii 2) timestamp: uint }))
   (begin
     (asserts! (not (get paused protocol-status)) (err ERR_CONTRACT_PAUSED))
     (asserts! (get compliant protocol-status) (err ERR_NON_COMPLIANT))
@@ -90,9 +90,9 @@
       (try! (guard-entry protocol-status))
       (let ((result (contract-call? position-manager open-position tx-sender token amount leverage long)))
         (print {
-          event: "facade-open-position",
-          sender: tx-sender,
-          tenure-id: (get tenure-id protocol-status),
+          event: "facade-open-position"
+          sender: tx-sender
+          tenure-id: (get tenure-id protocol-status)
         })
         result
       )

@@ -15,8 +15,8 @@
 (define-data-var compliance-validator principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-data-var authority-pubkey (optional (buff 33)) none)
 
-;; Map: User -> { validated: bool, expires-at: uint }
-(define-map compliance-attestations principal { validated: bool, expires-at: uint })
+;; Map: User -> { validated: bool expires-at: uint }
+(define-map compliance-attestations principal { validated: bool expires-at: uint })
 
 ;; Authorization
 (define-private (is-owner) (is-eq tx-sender (var-get contract-owner)))
@@ -49,7 +49,7 @@
     (begin
         (asserts! (or (is-validator) (is-owner)) ERR_UNAUTHORIZED)
         (map-set compliance-attestations user {
-            validated: true,
+            validated: true
             expires-at: expires-at
         })
         (ok true)
@@ -102,7 +102,7 @@
   (let ((pubkey-opt (var-get authority-pubkey)))
     (begin
       (asserts! (is-some pubkey-opt) ERR_UNAUTHORIZED)
-      ;; In simnet, signature verification always fails (C4 mainnet-only feature)
+      ;; In simnet signature verification always fails (C4 mainnet-only feature)
       ERR_INVALID_SIGNATURE
     )
   )

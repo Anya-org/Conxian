@@ -9,7 +9,7 @@
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u1000)
-(define-constant FUNDING_INTERVAL u8) ;; 8 hours (approx in blocks, but we use timestamps ideally, here simplified)
+(define-constant FUNDING_INTERVAL u8) ;; 8 hours (approx in blocks but we use timestamps ideally here simplified)
 (define-constant MAX_FUNDING_RATE u500) ;; 0.05% max per interval
 
 ;; Data Vars
@@ -25,7 +25,7 @@
     (index-price uint)
   )
   (begin
-    ;; Funding Rate = Clamp(Ma - Ia, -0.05%, 0.05%)
+    ;; Funding Rate = Clamp(Ma - Ia -0.05% 0.05%)
     ;; Simplified gas-free calculation
     (let ((diff (- (to-int mark-price) (to-int index-price))))
       (var-set current-funding-rate diff)
