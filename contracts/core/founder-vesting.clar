@@ -15,7 +15,7 @@
 (define-constant ERR_SCHEDULE_EXISTS u409)
 
 ;; --- Data Storage ---
-(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var contract-owner principal tx-sender)
 (define-data-var vesting-start uint u0)
 
 (define-map vesting-schedules principal {

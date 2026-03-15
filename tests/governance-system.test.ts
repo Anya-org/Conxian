@@ -8,7 +8,7 @@ let wallet1: string;
 
 describe("Governance Tests", () => {
   beforeAll(async () => {
-    simnet = await initSimnet("Clarinet.toml");
+    simnet = await initSimnet();
   });
 
   beforeEach(() => {

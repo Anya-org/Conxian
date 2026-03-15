@@ -1,8 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Cl } from '@stacks/transactions';
 import { initSimnet } from "@stacks/clarinet-sdk";
-import { resolve } from "path";
-
 const COMPLIANCE_HOOKS_CONTRACT_NAME = 'compliance-hooks';
 const KYC_REGISTRY_CONTRACT_NAME = 'kyc-registry';
 
@@ -14,8 +12,7 @@ describe('P0 Policy Enforcement Bypass Mitigation Tests', () => {
   let kycRegistryContract: any;
 
   beforeEach(async () => {
-    const manifestPath = resolve(__dirname, '../../Clarinet.toml');
-    simnet = await initSimnet(manifestPath);
+    simnet = await initSimnet();
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
     wallet1 = accounts.get('wallet_1')!;

@@ -7,9 +7,11 @@ describe('lending-manager', () => {
   let deployer: string;
 
   beforeAll(async () => {
-    simnet = await initSimnet('Clarinet.toml');
+    simnet = await initSimnet();
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
+    // Mint mock tokens to deployer for testing
+    simnet.callPublicFn('mock-token', 'mint', [Cl.uint(1000000), Cl.principal(deployer)], deployer);
   });
 
   it('should deposit assets successfully', async () => {
@@ -23,6 +25,8 @@ describe('lending-manager', () => {
   });
 
   it('should withdraw assets successfully', async () => {
+    // Deposit first
+    simnet.callPublicFn('lending-manager', 'deposit', [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(100)], deployer);
     const { result } = await simnet.callPublicFn(
       'lending-manager',
       'withdraw',
@@ -33,6 +37,8 @@ describe('lending-manager', () => {
   });
 
   it('should borrow assets successfully', async () => {
+    // Deposit first to establish liquidity
+    simnet.callPublicFn('lending-manager', 'deposit', [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(500)], deployer);
     const { result } = await simnet.callPublicFn(
       'lending-manager',
       'borrow',
@@ -43,6 +49,11 @@ describe('lending-manager', () => {
   });
 
   it('should repay assets successfully', async () => {
+    // Setup: deposit + borrow
+    simnet.callPublicFn('lending-manager', 'deposit', [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(500)], deployer);
+    simnet.callPublicFn('lending-manager', 'borrow', [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(100)], deployer);
+    // Mint repayment tokens
+    simnet.callPublicFn('mock-token', 'mint', [Cl.uint(100), Cl.principal(deployer)], deployer);
     const { result } = await simnet.callPublicFn(
       'lending-manager',
       'repay',

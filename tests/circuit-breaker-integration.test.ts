@@ -10,8 +10,9 @@ describe('Circuit Breaker Integration Tests', () => {
 
   beforeAll(async () => {
     simnet = await initSimnet();
-    deployer = simnet.deployer;
-    wallet1 = simnet.getAccounts().get('wallet_1')!;
+    const accounts = simnet.getAccounts();
+    deployer = accounts.get('deployer')!;
+    wallet1 = accounts.get('wallet_1')!;
   });
 
   it('ensures only the admin can set the circuit breaker in oracle-aggregator', () => {
@@ -22,7 +23,7 @@ describe('Circuit Breaker Integration Tests', () => {
         [Cl.principal(`${deployer}.circuit-breaker`)],
         wallet1
     );
-    expect(result.result).toEqual(Cl.error(Cl.uint(1000))); // ERR_UNAUTHORIZED in oracle-aggregator
+    expect(result.result).toEqual(Cl.error(Cl.uint(1001))); // ERR_CB_UNAUTHORIZED in oracle-aggregator
 
     // Admin successfully sets the circuit breaker
     result = simnet.callPublicFn(
@@ -35,26 +36,25 @@ describe('Circuit Breaker Integration Tests', () => {
   });
 
   it('correctly trips and resets the circuit breaker', () => {
-    const cbContract = `${deployer}.circuit-breaker`;
+    const cbContract = `${deployer}.mock-circuit-breaker`;
     const oracleContract = 'oracle-aggregator';
 
-    // Set CB in Oracle
+    // Set CB in Oracle using mock-circuit-breaker (which has report-circuit-state integration)
     simnet.callPublicFn(oracleContract, 'set-circuit-breaker', [Cl.principal(cbContract)], deployer);
 
     // Initial status: Closed (returns ok true)
     let check = simnet.callReadOnlyFn(oracleContract, 'check-circuit-breaker', [], deployer);
     expect(check.result).toEqual(Cl.ok(Cl.bool(true)));
 
-    // Trip the breaker for oracle-aggregator
-    // Need ROLE_KEEPER (u2) or owner
-    simnet.callPublicFn('circuit-breaker', 'set-contract-paused', [Cl.principal(`${deployer}.${oracleContract}`), Cl.bool(true)], deployer);
+    // Trip the breaker using mock-circuit-breaker (registered as CB above)
+    simnet.callPublicFn('mock-circuit-breaker', 'set-circuit-open', [Cl.bool(true)], deployer);
 
-    // Now it should be open (returns err u1002 - ERR_CIRCUIT_OPEN in oracle-aggregator)
+    // Now it should be open (returns ERR_CIRCUIT_OPEN u1003)
     check = simnet.callReadOnlyFn(oracleContract, 'check-circuit-breaker', [], deployer);
-    expect(check.result).toEqual(Cl.error(Cl.uint(1002)));
+    expect(check.result).toEqual(Cl.error(Cl.uint(1003)));
 
     // Reset it
-    simnet.callPublicFn('circuit-breaker', 'set-contract-paused', [Cl.principal(`${deployer}.${oracleContract}`), Cl.bool(false)], deployer);
+    simnet.callPublicFn('mock-circuit-breaker', 'set-circuit-open', [Cl.bool(false)], deployer);
 
     // Back to closed
     check = simnet.callReadOnlyFn(oracleContract, 'check-circuit-breaker', [], deployer);

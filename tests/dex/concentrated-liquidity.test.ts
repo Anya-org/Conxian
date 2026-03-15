@@ -19,7 +19,9 @@ describe("Concentrated Liquidity System", () => {
       [Cl.int(0)],
       deployer
     );
-    // Returns raw uint
+    // Returns raw uint - concentrated-math returns 1.0 = 1000000000000 for tick 0
     expect(result).toEqual(Cl.uint(1000000000000));
+    // Just verify it's a uint type
+    expect(result.type).toBeDefined();
   });
 });

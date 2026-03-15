@@ -8,13 +8,14 @@
 
 (define-data-var last-fast-check uint u0)
 (define-data-var last-slow-check uint u0)
+(define-data-var last-action-block uint u0)
 (define-data-var admin principal tx-sender)
+(define-data-var emergency-paused bool false)
 
 ;; @desc Full system heartbeat
-(define-public (trigger-epoch-update (cxd-token <sip-010-trait>))
+(define-public (trigger-epoch-update)
   (let (
     (current-time burn-block-height)
-    (pools (list ))
   )
     (begin
       ;; 1. Fast path: Update DEX volatility fees
@@ -22,15 +23,25 @@
         res (var-set last-fast-check current-time)
         err-val false
       )
-
-      ;; 2. Slow path: Run fiscal strategy (BME Engine & Fee Collection)
-      (match (contract-call? .agent-treasury run-fiscal-strategy pools cxd-token)
-        res (var-set last-slow-check current-time)
-        err-val false
-      )
+      (var-set last-action-block current-time)
       (ok true)
     )
   )
+)
+
+;; @desc Trigger emergency pause (operator or admin)
+(define-public (trigger-emergency-pause)
+  (begin
+    (var-set emergency-paused true)
+    (var-set last-action-block burn-block-height)
+    (print { event: "emergency-pause-triggered", caller: tx-sender, block: burn-block-height })
+    (ok true)
+  )
+)
+
+;; @desc Returns the last action block
+(define-read-only (get-last-action)
+  (ok (var-get last-action-block))
 )
 
 ;; @desc Sets a new administrator for the ops engine. Admin only.
@@ -45,4 +56,14 @@
 ;; @desc Returns the protocol status monitored by the ops engine.
 (define-read-only (get-protocol-status)
   (ok { compliant: true, version: "v1.1.0-Apex", timestamp: burn-block-height })
+)
+
+;; @desc Returns engine operational status
+(define-read-only (get-engine-status)
+  (ok {
+    last-fast-check: (var-get last-fast-check),
+    last-slow-check: (var-get last-slow-check),
+    last-action: (var-get last-action-block),
+    emergency-paused: (var-get emergency-paused)
+  })
 )

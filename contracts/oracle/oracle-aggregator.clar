@@ -4,15 +4,19 @@
 
 ;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_NO_VALID_PRICE (err u1001))
+(define-constant ERR_CB_UNAUTHORIZED (err u1001))
 (define-constant ERR_STALE_PRICE (err u1002))
-(define-constant ERR_INVALID_SOURCE (err u1003))
+(define-constant ERR_CIRCUIT_OPEN (err u1003))
+(define-constant ERR_INVALID_SOURCE (err u1004))
+(define-constant ERR_NO_VALID_PRICE (err u1005))
 (define-constant MAX_PRICE_AGE u144)
 (define-constant MIN_SOURCES_REQUIRED u2)
 
 ;; --- Data Vars ---
 (define-data-var admin principal tx-sender)
 (define-data-var volatility-index uint u35)
+(define-data-var circuit-breaker-contract (optional principal) none)
+(define-data-var circuit-is-open bool false)
 
 ;; --- Maps ---
 ;; Price Sources (principal -> enabled)
@@ -71,6 +75,35 @@
     (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
     (map-set asset-registry asset { tier: tier, is-yield-bearing: is-yield-bearing })
     (print { event: "asset-registered", asset: asset, tier: tier, yield-bearing: is-yield-bearing })
+    (ok true)
+  )
+)
+
+;; --- Circuit Breaker ---
+
+;; @desc Set a dynamic circuit breaker contract (admin only)
+(define-public (set-circuit-breaker (cb-contract principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_CB_UNAUTHORIZED)
+    (var-set circuit-breaker-contract (some cb-contract))
+    (var-set circuit-is-open false)
+    (ok true)
+  )
+)
+
+;; @desc Called by the registered circuit breaker to update state (push pattern)
+(define-public (report-circuit-state (open bool))
+  (begin
+    (asserts! (is-eq (some contract-caller) (var-get circuit-breaker-contract)) ERR_CB_UNAUTHORIZED)
+    (var-set circuit-is-open open)
+    (ok true)
+  )
+)
+
+;; @desc Check if circuit breaker is closed (operational)
+(define-read-only (check-circuit-breaker)
+  (if (var-get circuit-is-open)
+    ERR_CIRCUIT_OPEN
     (ok true)
   )
 )

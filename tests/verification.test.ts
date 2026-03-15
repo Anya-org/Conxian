@@ -14,7 +14,8 @@ describe('BME & Intent Layer Verification', () => {
   });
 
   it('verifies bme-engine has Activity Marker and Recycling logic', () => {
-    const pool = 'ST1SJ3DTE5DN7X54Y7D5KS8M7JJ8V3EN6N9X392E';
+    const accounts = simnet.getAccounts();
+    const pool = accounts.get('wallet_1')!;
 
     // Register Activity Marker
     simnet.callPublicFn('bme-engine', 'add-activity-reporter', [Cl.principal(deployer)], deployer);

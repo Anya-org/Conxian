@@ -25,7 +25,7 @@
 (define-map deposits { asset: principal, user: principal } uint)
 (define-map borrows { asset: principal, user: principal } uint)
 
-(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var admin principal tx-sender)
 
 ;; @desc Deposit assets for lending or collateral.
 (define-public (deposit (asset-trait <sip-010-ft-trait>) (amount uint))
@@ -48,14 +48,15 @@
 (define-public (borrow (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
+    (caller tx-sender)
     (reserve (unwrap! (map-get? reserve-data asset) (err u404)))
   )
     (begin
       (asserts! (<= amount (get total-deposits reserve)) ERR_INSUFFICIENT_LIQUIDITY)
-      (map-set borrows { asset: asset, user: tx-sender } (+ (default-to u0 (map-get? borrows { asset: asset, user: tx-sender })) amount))
+      (map-set borrows { asset: asset, user: caller } (+ (default-to u0 (map-get? borrows { asset: asset, user: caller })) amount))
       (map-set reserve-data asset (merge reserve { total-borrows: (+ (get total-borrows reserve) amount) }))
 
-      (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) tx-sender none)))
+      (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) caller none)))
       (ok true)
     )
   )
@@ -65,8 +66,10 @@
 (define-public (repay (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
-    (reserve (unwrap! (map-get? reserve-data asset) (err u404)))
+    (reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: burn-block-height } (map-get? reserve-data asset)))
     (interest-portion (/ (* amount RESERVE_FACTOR) u10000))
+    (principal-portion (if (>= amount interest-portion) (- amount interest-portion) u0))
+    (current-borrows (get total-borrows reserve))
   )
     (begin
       (try! (contract-call? asset-trait transfer amount tx-sender (as-contract tx-sender) none))
@@ -77,7 +80,7 @@
       )
       
       (map-set reserve-data asset (merge reserve {
-        total-borrows: (- (get total-borrows reserve) (- amount interest-portion)),
+        total-borrows: (if (>= current-borrows principal-portion) (- current-borrows principal-portion) u0),
         total-reserves: (+ (get total-reserves reserve) interest-portion)
       }))
       (ok true)
@@ -102,4 +105,24 @@
 
 (define-read-only (get-reserve-data (asset principal))
   (map-get? reserve-data asset)
+)
+
+(define-read-only (get-user-supply-balance (user principal) (asset principal))
+  (map-get? deposits { asset: asset, user: user })
+)
+
+;; @desc Withdraw previously deposited assets.
+(define-public (withdraw (asset-trait <sip-010-ft-trait>) (amount uint))
+  (let (
+    (asset (contract-of asset-trait))
+    (user-deposit (default-to u0 (map-get? deposits { asset: asset, user: tx-sender })))
+    (reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: burn-block-height } (map-get? reserve-data asset)))
+  )
+    (begin
+      (asserts! (>= user-deposit amount) ERR_INSUFFICIENT_LIQUIDITY)
+      (map-set deposits { asset: asset, user: tx-sender } (- user-deposit amount))
+      (map-set reserve-data asset (merge reserve { total-deposits: (if (>= (get total-deposits reserve) amount) (- (get total-deposits reserve) amount) u0) }))
+      (ok true)
+    )
+  )
 )

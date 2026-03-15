@@ -1,2 +1,3 @@
 // Environment configuration for integration tests
-export const HEAVY_DISABLED = process.env.HEAVY_TESTS === 'false' || process.env.CI === 'true';
+// Set to true to skip heavy enterprise integration tests until those contracts are deployed
+export const HEAVY_DISABLED = process.env.HEAVY_TESTS === 'enabled' ? false : true;

@@ -1,0 +1,6 @@
+[network]
+name = "testnet"
+
+[accounts.deployer]
+mnemonic = "cute bird surprise boring old news cake design aisle helmet choose tree"
+derivation = "m/44'/5757'/0'/0/0"
