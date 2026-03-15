@@ -7,7 +7,7 @@
 (define-constant ERR_INVALID_PARAMS u1001)
 
 ;; State
-(define-data-var admin principal tx-sender)
+(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-data-var auction-counter uint u0)
 
 ;; Map: AuctionID -> Details

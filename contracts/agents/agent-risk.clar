@@ -12,7 +12,7 @@
 (define-constant KD_STABILITY u200)
 
 ;; Data Vars
-(define-data-var admin principal tx-sender)
+(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-data-var mock-gcr uint u150)
 (define-data-var price-integral int 0)
 (define-data-var last-error int 0)

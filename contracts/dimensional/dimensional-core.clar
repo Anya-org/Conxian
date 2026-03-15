@@ -29,9 +29,9 @@
 (define-constant ERR_BITCOIN_NOT_FINALIZED u10001)
 
 ;; ===== Data Variables =====
-(define-data-var owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var risk-manager-principal principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var dimensional-token principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var owner principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
+(define-data-var risk-manager-principal principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
+(define-data-var dimensional-token principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-data-var next-position-id uint u0)
 (define-data-var protocol-fee-rate uint u30)
 (define-data-var total-value-locked uint u0)

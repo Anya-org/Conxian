@@ -22,9 +22,9 @@
 (define-constant ERR_MODULE_NOT_FOUND u5003)
 
 ;; Data Vars
-(define-data-var protocol-coordinator principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var regulatory-adapter-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var conxian-protocol-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var protocol-coordinator principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
+(define-data-var regulatory-adapter-contract principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
+(define-data-var conxian-protocol-contract principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 
 ;; --- Authorization ---
 

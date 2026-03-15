@@ -6,7 +6,7 @@
 
 (define-constant ERR_UNAUTHORIZED (err u7000))
 
-(define-data-var admin principal tx-sender)
+(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-map paused-contracts principal bool)
 
 (define-read-only (is-contract-paused (target principal))

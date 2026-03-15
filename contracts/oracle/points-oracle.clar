@@ -24,7 +24,7 @@
 (define-data-var points-decay-enabled bool true)
 (define-data-var last-decay-block uint u0)
 
-(define-data-var conxian-protocol-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var conxian-protocol-contract principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 
 ;; Event definitions
 (define-map points-earned { event-id: uint } { user: principal, amount: uint, source: (string-ascii 16) })

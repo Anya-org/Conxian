@@ -5,7 +5,7 @@
 (define-constant ERR_UNAUTHORIZED u5000)
 
 ;; State
-(define-data-var admin principal tx-sender)
+(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 
 ;; Public Functions
 

@@ -10,7 +10,7 @@
 (define-constant ERR_QUEUE_FULL u1002)
 
 ;; Data Vars
-(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var contract-owner principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-data-var head uint u0)
 (define-data-var tail uint u0)
 

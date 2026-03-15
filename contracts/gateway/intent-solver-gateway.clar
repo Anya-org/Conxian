@@ -12,7 +12,7 @@
 (define-constant ERR_EXPIRED (err u1003))
 
 ;; State
-(define-data-var admin principal tx-sender)
+(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-map settled-intents (buff 32) bool)
 (define-map registered-dapps principal { metadata-uri: (string-ascii 256), registered-at: uint })
 

@@ -9,7 +9,7 @@
 (define-constant BRIDGE_FEE u1000000) ;; 1 STX
 
 ;; Data Vars
-(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-data-var sequence uint u0)
 
 ;; Storage

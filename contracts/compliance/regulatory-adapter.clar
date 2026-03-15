@@ -11,8 +11,8 @@
 (define-constant ERR_NO_AUTHORITY (err u6004))
 
 ;; State
-(define-data-var contract-owner principal tx-sender)
-(define-data-var compliance-validator principal tx-sender)
+(define-data-var contract-owner principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
+(define-data-var compliance-validator principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-data-var authority-pubkey (optional (buff 33)) none)
 
 ;; Map: User -> { validated: bool, expires-at: uint }

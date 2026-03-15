@@ -15,7 +15,7 @@
 (define-constant MAX_SUPPLY u100000000000000000) ;; 1 Billion CXD (8 decimals)
 
 ;; Admin and authorized minters/burners
-(define-data-var admin principal tx-sender)
+(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-map authorized-minters principal bool)
 (define-map authorized-burners principal bool)
 

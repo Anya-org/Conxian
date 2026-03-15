@@ -4,7 +4,7 @@
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_INSUFFICIENT_FUNDS (err u1001))
 
-(define-data-var admin principal tx-sender)
+(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-data-var payroll-balance uint u0)
 
 (define-map workers principal bool)

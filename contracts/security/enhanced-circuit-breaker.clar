@@ -10,7 +10,7 @@
 (define-constant ERR_NOT_FOUND (err u8002))
 
 ;; --- Data Variables ---
-(define-data-var admin principal tx-sender)
+(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-data-var global-pause bool false)
 
 ;; --- Maps ---

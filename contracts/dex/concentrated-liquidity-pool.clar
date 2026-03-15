@@ -23,7 +23,7 @@
   }
 )
 (define-data-var pool-nonce uint u0)
-(define-data-var authorized-collector principal tx-sender)
+(define-data-var authorized-collector principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 
 ;; --- CSF Trait Implementation ---
 

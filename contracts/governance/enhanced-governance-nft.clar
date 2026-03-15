@@ -53,7 +53,7 @@
 )
 
 ;; Access Control
-(define-data-var access-control principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var access-control principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 
 ;; SIP-009 Interface
 (define-read-only (get-last-token-id)

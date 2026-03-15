@@ -11,7 +11,7 @@
 (define-constant ERR_UNAUTHORIZED u1000)
 
 ;; Data Vars
-(define-data-var proposal-engine principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var proposal-engine principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 
 ;; Core Logic
 

@@ -7,7 +7,7 @@
 
 (define-constant ERR_UNAUTHORIZED u1000)
 
-(define-data-var governance principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var governance principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 
 (define-private (is-governance)
     (is-eq tx-sender (var-get governance))

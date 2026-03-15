@@ -25,7 +25,7 @@
 (define-map deposits { asset: principal, user: principal } uint)
 (define-map borrows { asset: principal, user: principal } uint)
 
-(define-data-var admin principal tx-sender)
+(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 
 ;; @desc Deposit assets for lending or collateral.
 (define-public (deposit (asset-trait <sip-010-ft-trait>) (amount uint))

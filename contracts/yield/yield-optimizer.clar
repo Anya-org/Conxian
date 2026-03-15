@@ -12,8 +12,8 @@
 (define-constant ERR_RISK_TOO_HIGH u6002)
 
 ;; State
-(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var risk-agent-principal principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var contract-owner principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
+(define-data-var risk-agent-principal principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 
 ;; Strategy storage
 (define-map strategies
@@ -67,7 +67,7 @@
 
 (define-public (initialize (owner principal) (risk-agent principal))
   (begin
-    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P) (err ERR_UNAUTHORIZED))
     (var-set contract-owner owner)
     (var-set risk-agent-principal risk-agent)
     (ok true)

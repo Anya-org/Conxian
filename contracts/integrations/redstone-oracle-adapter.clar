@@ -11,7 +11,7 @@
 (define-constant ERR_INVALID_SIGNATURE u7101)
 
 ;; Data Vars
-(define-data-var redstone-verifier principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var redstone-verifier principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 
 ;; @desc Verifies a RedStone data package and records the price
 (define-public (verify-data-package

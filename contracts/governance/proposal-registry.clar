@@ -35,7 +35,7 @@
 (define-data-var proposal-count uint u0)
 
 ;; Access Control
-(define-data-var access-control principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var access-control principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 
 (define-read-only (get-proposal (proposal-id uint))
   (map-get? proposals proposal-id)

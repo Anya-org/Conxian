@@ -3,7 +3,7 @@
 ;; Uses push pattern: calls oracle-aggregator.report-circuit-state when state changes.
 
 (define-data-var circuit-open bool false)
-(define-data-var admin principal tx-sender)
+(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 
 (define-public (set-circuit-open (open bool))
   (begin

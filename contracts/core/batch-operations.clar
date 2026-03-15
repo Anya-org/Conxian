@@ -19,7 +19,7 @@
 (define-data-var batch-enabled bool true)
 (define-data-var current-batch-id uint u0)
 (define-data-var total-batches-processed uint u0)
-(define-data-var global-admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var global-admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 
 ;; Batch Tracking
 (define-map batch-results

@@ -3,7 +3,7 @@
 (use-trait ft-mintable-trait .sip-standards.ft-mintable-trait)
 
 (define-constant ERR_UNAUTHORIZED u1000)
-(define-data-var admin principal tx-sender)
+(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-map emission-targets principal uint)
 
 ;; Principal Injection Pattern

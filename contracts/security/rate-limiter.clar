@@ -11,7 +11,7 @@
 (define-constant DEFAULT_MAX_OPERATIONS u10) ;; 10 operations per window
 
 ;; Data variables
-(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var contract-owner principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 
 ;; Maps
 (define-map user-rate-limits

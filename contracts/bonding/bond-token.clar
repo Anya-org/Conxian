@@ -9,7 +9,7 @@
 (define-constant ERR_INSUFFICIENT_BALANCE u1001)
 
 ;; State
-(define-data-var contract-owner principal tx-sender)
+(define-data-var contract-owner principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-fungible-token bond-token)
 
 ;; SIP-010 FT Implementation

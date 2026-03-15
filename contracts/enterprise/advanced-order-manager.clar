@@ -10,7 +10,7 @@
 (define-constant ERR_ORDER_NOT_FOUND u1002)
 (define-constant ERR_ORDER_EXPIRED u1003)
 
-(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var contract-owner principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-data-var next-order-id uint u0)
 
 ;; TWAP Order Registry

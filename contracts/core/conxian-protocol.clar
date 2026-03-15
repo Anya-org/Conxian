@@ -5,8 +5,8 @@
 (define-constant ERR_PAUSED (err u1001))
 
 (define-data-var paused bool false)
-(define-data-var contract-owner principal tx-sender)
-(define-data-var initialized bool true)
+(define-data-var contract-owner principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
+(define-data-var initialized bool false)
 
 (define-map modules (string-ascii 50) { contract: principal, active: bool })
 

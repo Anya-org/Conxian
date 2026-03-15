@@ -8,14 +8,14 @@
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; --- Constants and Errors ---
-(define-constant CONTRACT_OWNER tx-sender)
+(define-constant CONTRACT_OWNER 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-constant ERR_UNAUTHORIZED u401)
 (define-constant ERR_NO_VESTING_SCHEDULE u404)
 (define-constant ERR_NOTHING_TO_CLAIM u405)
 (define-constant ERR_SCHEDULE_EXISTS u409)
 
 ;; --- Data Storage ---
-(define-data-var contract-owner principal tx-sender)
+(define-data-var contract-owner principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-data-var vesting-start uint u0)
 
 (define-map vesting-schedules principal {
