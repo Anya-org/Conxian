@@ -3,7 +3,7 @@
 * [Introduction](README.md)
 * [Strategic Alignment](ALIGNMENT.md)
 * [Onsite Server Specs](03_infrastructure/ONSITE_SERVER_SPEC_SHEET.md)
-* [Whitepaper](WHITEPAPER.md)
+* [Whitepaper](Conxian/docs/WHITEPAPER.md)
 
 ## 🏢 Company
 
