@@ -80,9 +80,20 @@
   )
 )
 
+;; @desc Convenience function to initialize mainnet assets
+(define-public (initialize-ecosystem-assets)
+  (begin
+    (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
+    ;; Example registrations for common ecosystem assets
+    ;; Tier 1: BTC, sBTC, stSTX
+    ;; Tier 2: ALEX, USDA
+    (try! (register-asset .cxd-token u1 false))
+    (ok true)
+  )
+)
+
 ;; --- Circuit Breaker ---
 
-;; @desc Set a dynamic circuit breaker contract (admin only)
 (define-public (set-circuit-breaker (cb-contract principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_CB_UNAUTHORIZED)
@@ -92,7 +103,6 @@
   )
 )
 
-;; @desc Called by the registered circuit breaker to update state (push pattern)
 (define-public (report-circuit-state (open bool))
   (begin
     (asserts! (is-eq (some contract-caller) (var-get circuit-breaker-contract)) ERR_CB_UNAUTHORIZED)
@@ -101,7 +111,6 @@
   )
 )
 
-;; @desc Check if circuit breaker is closed (operational)
 (define-read-only (check-circuit-breaker)
   (if (var-get circuit-is-open)
     ERR_CIRCUIT_OPEN
@@ -130,7 +139,6 @@
   (ok (map-get? asset-registry asset))
 )
 
-;; @desc Fetch price (alias for get-price for trait compatibility)
 (define-read-only (fetch-price (asset principal))
   (get-price asset)
 )
@@ -146,7 +154,6 @@
     (price-data (map-get? asset-prices asset))
   )
     (begin
-      ;; Update with new submission (simplified aggregation for sim)
       (match price-data
         prev-data (map-set asset-prices asset {
           price: (get price prev-data),
@@ -166,7 +173,6 @@
 
 ;; --- Admin Overrides ---
 
-;; @desc Authorize or deauthorize a price source
 (define-public (set-source-authorized (source principal) (authorized bool))
   (begin
     (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
@@ -175,7 +181,6 @@
   )
 )
 
-;; @desc Update the protocol volatility index
 (define-public (set-volatility-index (new-vol uint))
   (begin
     (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
@@ -184,7 +189,6 @@
   )
 )
 
-;; @desc Manually set an asset price (Emergency/Admin only)
 (define-public (set-price (asset principal) (price uint))
   (begin
     (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
