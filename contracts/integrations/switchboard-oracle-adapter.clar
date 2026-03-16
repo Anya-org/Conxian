@@ -25,6 +25,8 @@
 )
 
 ;; Read-only: Get Price
+
+;; @desc Get the last reported price from Switchboard
 (define-public (get-price (asset principal))
     (let (
         (feed (unwrap! (map-get? switchboard-feeds asset) (err ERR_NO_PRICE)))
@@ -35,6 +37,8 @@
 )
 
 ;; Admin: Update Price with Confidence
+
+;; @desc Update the Switchboard price feed for an asset
 (define-public (update-price (asset principal) (price uint) (confidence uint))
     (begin
         (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))

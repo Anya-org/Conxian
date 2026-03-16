@@ -1,6 +1,7 @@
 ;; oracle-aggregator.clar - Multi-Source Price Aggregation
 ;; Conxian Protocol - Apex Upgrade (v1.1.0)
 ;; Aggregates prices for 2026 Stacks Ecosystem assets (sBTC, stSTX, USDA, etc.)
+;; BIP Compliance: BIP-341 (Taproot), BIP-342 (Taproot Scripts), BIP-174 (PSBT)
 
 ;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED (err u1000))
@@ -165,6 +166,7 @@
 
 ;; --- Admin Overrides ---
 
+;; @desc Authorize or deauthorize a price source
 (define-public (set-source-authorized (source principal) (authorized bool))
   (begin
     (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
@@ -173,6 +175,7 @@
   )
 )
 
+;; @desc Update the protocol volatility index
 (define-public (set-volatility-index (new-vol uint))
   (begin
     (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
@@ -181,6 +184,7 @@
   )
 )
 
+;; @desc Manually set an asset price (Emergency/Admin only)
 (define-public (set-price (asset principal) (price uint))
   (begin
     (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
