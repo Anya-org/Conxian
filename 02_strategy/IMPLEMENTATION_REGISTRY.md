@@ -82,7 +82,7 @@ This document tracks the ground-truth implementation status of every major featu
 1. **Done**: Sprint 2026-03-05 Genesis Tokenomics Integration.
    - Implemented tripartite genesis system: Founder Equity, Labs Ops Treasury, and CSF Bounty Vault.
    - Wired unvested capital to cxd-staking for Block 0 productivity.
-   - Wired Labs Treasury to bond-factory for native financing (Client #001).
+   - Wired Labs Treasury to conxian-csf-pol for native financing (Client #001).
    - Codified 3-of-5 Multi-Sig and automated Baseline OpEx streaming (~5k/mo).
    - Verified 144-block (~24h) audit timelock for bounties.
 2. **Done**: Sprint 2026-02-18 Root-to-Leaf Audit & Repair completed. Refined native signing for 14+ layers, hardened Web5 enclave bridge, and synchronized Dashboard receive flows.

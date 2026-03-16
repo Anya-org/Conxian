@@ -36,4 +36,4 @@ The definitive high-integrity interface for the autonomous Bitcoin economy.
 
 ---
 © 2026 Conxian. Leading Business Exco Team.
-[Return to ALIGNMENT.md](../ALIGNMENT.md)
+[Return to ALIGNMENT.md](ALIGNMENT.md)

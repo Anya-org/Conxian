@@ -4,8 +4,8 @@ Welcome to the central documentation hub for the Conxian ecosystem. This site is
 
 ## 🗺️ Quick Start
 - **[Strategic Alignment](../ALIGNMENT.md)**
-- **[System Whitepaper](../WHITEPAPER.md)**
-- **[Full Roadmap](../02_strategy/ROADMAP.md)**
+- **[System Whitepaper](Conxian/docs/WHITEPAPER.md)**
+- **[Full Roadmap](ROADMAP.md)**
 
 ## 📂 Explore by Category
 - [Company Strategy](../01_company/vision-mission.md)

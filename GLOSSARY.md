@@ -38,7 +38,7 @@ This document establishes the canonical terminology for the Conxian ecosystem, a
 | :--- | :--- | :--- |
 | **USDCx** | **Synthetic Dollar / Asset-Referenced Token** | MiCA ART |
 | **sBTC** | **Wrapped Bitcoin / Trustless Peg** | SIP-010 |
-| **Enterprise Bond** | **Revenue-Backed Obligation** | IFRS 9 |
+| **Enterprise Swap** | **Revenue-Backed Obligation** | IFRS 9 |
 | **Liquidity Pool** | **Automated Market Maker (AMM) Inventory** | DeFi Standard |
 
 ## 5. Status & Error Codes
