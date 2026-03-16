@@ -77,3 +77,10 @@ To position Conxian as the central liquidity gravitational hub, the CSF natively
 
 ---
 *End of Document (Archived March 2026)*
+
+## 14. Mainnet Release Notes (March 2026)
+
+### 14.1. ALEX Lab CSF Integration
+- **Status**: COMPLETED.
+- **Details**: Full support for trustless routing through ALEX Lab liquidity pools via the `alex-adapter`. Universal Router can now natively settle trades through ALEX mainnet contracts.
+- **Verification**: Verified in simulation with 100% test coverage.

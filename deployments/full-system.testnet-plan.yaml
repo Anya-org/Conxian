@@ -136,3 +136,19 @@ plan:
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
+        - contract-publish:
+            contract-name: conxian-csf-trait
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 20000
+            path: "contracts/traits/conxian-csf-trait.clar"
+            anchor-block-only: true
+            clarity-version: 4
+            epoch: "3.0"
+        - contract-publish:
+            contract-name: alex-adapter
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 20000
+            path: "contracts/integrations/alex-adapter.clar"
+            anchor-block-only: true
+            clarity-version: 4
+            epoch: "3.0"

@@ -293,5 +293,9 @@ depends_on = ["governance-traits", "conxian-access"]
 path = "contracts/governance/governance-handover.clar"
 depends_on = ["timelock"]
 
+[contracts.alex-adapter]
+path = "contracts/integrations/alex-adapter.clar"
+depends_on = ["conxian-csf-trait", "sip-standards", "conxian-protocol"]
+
 [contracts.signed-data-base]
 path = "contracts/governance/signed-data-base.clar"
