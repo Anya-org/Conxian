@@ -51,7 +51,7 @@
   )
 )
 
-;; Public: Submit Price
+;; @desc Submit a price observation for an asset
 (define-public (submit-price (asset (string-ascii 32)) (price uint) (source principal))
   (begin
     (asserts! (is-eq tx-sender source) (err ERR_UNAUTHORIZED))
@@ -75,7 +75,7 @@
   (ok true)
 )
 
-;; Public: Add Oracle Source
+;; @desc Add a new authorized oracle source
 (define-public (add-oracle-source (source principal) (weight uint))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
@@ -88,7 +88,7 @@
   )
 )
 
-;; Public: Remove Oracle Source
+;; @desc Remove an authorized oracle source
 (define-public (remove-oracle-source (source principal))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))

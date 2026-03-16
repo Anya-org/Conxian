@@ -1,1 +1,60 @@
-;; twap-oracle.clar;; Time-Weighted Average Price Oracle;; Implements oracle-trait for DEX-derived TWAP calculations(impl-trait .oracle-trait.oracle-trait);; Constants(define-constant ERR_UNAUTHORIZED u6400)(define-constant ERR_NO_PRICE u6401)(define-constant ERR_WINDOW_TOO_SHORT u6402);; Data Vars(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)(define-data-var twap-window uint u10) ;; 10 blocks;; Price Observations(define-map price-observations    { asset: principal, block: uint }    uint ;; Price at that block);; Oracle Trait Implementation(define-read-only (get-price (asset principal))  (begin    (let ((current-block burn-block-height)          (window (var-get twap-window)))      (asserts! (>= current-block window) (err ERR_WINDOW_TOO_SHORT))            ;; Get price at start of window      (match (map-get? price-observations { asset: asset, block: (- current-block window) })        start-price          (match (map-get? price-observations { asset: asset, block: current-block })            end-price              (ok (/ (+ start-price end-price) u2)) ;; Simple average            none (err ERR_NO_PRICE)          )        none (err ERR_NO_PRICE)      )    )  ))(define-read-only (fetch-price (asset principal))  (get-price asset))(define-read-only (get-name ())  (ok "TWAP Oracle"));; Admin: Record Price Observation(define-public (record-price (asset principal) (price uint))    (begin        (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))        (map-set price-observations { asset: asset, block: burn-block-height } price)        (print { event: "twap-price-recorded", asset: asset, price: price, block: burn-block-height })        (ok true)    ))
+;; twap-oracle.clar
+;; Time-Weighted Average Price Oracle
+;; Implements oracle-trait for DEX-derived TWAP calculations
+(impl-trait .oracle-trait.oracle-trait)
+
+;; Constants
+(define-constant ERR_UNAUTHORIZED u6400)
+(define-constant ERR_NO_PRICE u6401)
+(define-constant ERR_WINDOW_TOO_SHORT u6402)
+
+;; Data Vars
+(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var twap-window uint u10) ;; 10 blocks
+
+;; Price Observations
+(define-map price-observations
+    { asset: principal, block: uint }
+    uint ;; Price at that block
+)
+
+;; Oracle Trait Implementation
+(define-read-only (get-price (asset principal))
+  (begin
+    (let ((current-block burn-block-height)
+          (window (var-get twap-window)))
+      (asserts! (>= current-block window) (err ERR_WINDOW_TOO_SHORT))
+
+      ;; Get price at start of window
+      (match (map-get? price-observations { asset: asset, block: (- current-block window) })
+        start-price
+          (match (map-get? price-observations { asset: asset, block: current-block })
+            end-price
+              (ok (/ (+ start-price end-price) u2)) ;; Simple average
+            none (err ERR_NO_PRICE)
+          )
+        none (err ERR_NO_PRICE)
+      )
+    )
+  )
+)
+
+(define-read-only (fetch-price (asset principal))
+  (get-price asset)
+)
+
+(define-read-only (get-name ())
+  (ok "TWAP Oracle")
+)
+
+;; Admin: Record Price Observation
+
+;; @desc Record a price observation for TWAP calculation
+(define-public (record-price (asset principal) (price uint))
+    (begin
+        (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
+        (map-set price-observations { asset: asset, block: burn-block-height } price)
+        (print { event: "twap-price-recorded", asset: asset, price: price, block: burn-block-height })
+        (ok true)
+    )
+)

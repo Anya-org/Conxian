@@ -139,6 +139,7 @@
 
 ;; Public functions
 
+;; @desc Award points to a user for a specific action
 (define-public (award-points (user principal) (amount uint) (source (string-ascii 16)))
   (begin
     ;; Validate inputs
@@ -180,6 +181,7 @@
   )
 )
 
+;; @desc Burn points from the user's balance
 (define-public (burn-points (amount uint) (reason (string-ascii 16)))
   (begin
     ;; Validate inputs
@@ -219,6 +221,7 @@
   )
 )
 
+;; @desc Transfer points to another user
 (define-public (transfer-points (to principal) (amount uint))
   (begin
     ;; Validate inputs
@@ -269,6 +272,7 @@
   )
 )
 
+;; @desc Spend points to claim a specific reward
 (define-public (claim-reward (reward-id (string-ascii 32)))
   (begin
     ;; Validate inputs
@@ -338,6 +342,7 @@
   )
 )
 
+;; @desc Apply points decay logic globally (Heartbeat-compatible)
 (define-public (apply-points-decay)
   (begin
     ;; Check if decay is enabled
@@ -352,6 +357,7 @@
   )
 )
 
+;; @desc Create a new reward that users can claim
 (define-public (create-reward (reward-id (string-ascii 32)) (name (string-ascii 64)) (description (string-ascii 256)) (points-cost uint) (reward-type (string-ascii 16)) (max-claims uint))
   (begin
     ;; Validate inputs
@@ -414,6 +420,7 @@
 
 ;; Admin functions
 
+;; @desc Enable or disable points decay
 (define-public (set-decay-enabled (enabled bool))
   (begin
     ;; Only admin can set decay
@@ -423,6 +430,7 @@
   )
 )
 
+;; @desc Emergency reset of a user's points balance
 (define-public (emergency-reset-user-points (user principal))
   (begin
     ;; Only admin can reset user points
@@ -441,6 +449,7 @@
   )
 )
 
+;; @desc Deactivate a reward to prevent further claims
 (define-public (deactivate-reward (reward-id (string-ascii 32)))
   (begin
     ;; Only admin can deactivate rewards

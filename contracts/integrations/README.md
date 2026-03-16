@@ -8,45 +8,55 @@ This module follows the Hexagonal Architecture pattern. It defines clear ports v
 
 ## Core Contracts (Reference)
 The following contracts provide the backbone of the integrations system:
-### `chainlink-adapter.clar`
-Core logic for chainlink adapter.
 
-Public Functions:
-- `update-price`: Action for update price.
+### `chainlink-adapter.clar`
+Adapts Chainlink price feeds to the Conxian Oracle Trait.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `update-price` | `(update-price (asset principal) (price uint) (round-id uint))` | Update the price feed for a specific asset. |
+| `get-price` | `(get-price (asset principal))` | Get the cached price for an asset. |
 
 ### `dia-oracle-adapter.clar`
-Core logic for dia oracle adapter.
+Adapts DIA decentralized price feeds.
 
-Public Functions:
-- `update-price`: Action for update price.
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `update-price` | `(update-price (asset principal) (price uint) (signature (buff 65)))` | Update the DIA price feed with signature. |
+| `get-price` | `(get-price (asset principal))` | Get the cached price for an asset. |
 
 ### `pyth-oracle-adapter.clar`
-Core logic for pyth oracle adapter.
+Efficient pull-model adapter for Pyth Network.
 
-Public Functions:
-- `update-price-feed`: Action for update price feed.
-- `get-price`: Action for get price.
-- `set-pyth-provider`: Action for set pyth provider.
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `update-price-feed` | `(update-price-feed (vaa (buff 2048)) (pyth <pyth-core-trait>))` | Updates the price feed with a VAA. |
+| `get-price` | `(get-price (asset principal))` | Fetches the normalized price from Pyth. |
+| `set-pyth-provider` | `(set-pyth-provider (new-provider principal))` | Admin function to switch the Pyth provider. |
 
 ### `redstone-oracle-adapter.clar`
-Core logic for redstone oracle adapter.
+Redstone oracle data adapter.
 
-Public Functions:
-- `verify-data-package`: Action for verify data package.
-- `get-price`: Action for get price.
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `verify-data-package` | `(verify-data-package (package (buff 1024)))` | Verify Redstone data package. |
+| `get-price` | `(get-price (asset principal))` | Get price from Redstone. |
 
 ### `switchboard-oracle-adapter.clar`
-Core logic for switchboard oracle adapter.
+Switchboard V2 adapter for Conxian.
 
-Public Functions:
-- `get-price`: Action for get price.
-- `update-price`: Action for update price.
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `get-price` | `(get-price (asset principal))` | Get last reported price from Switchboard. |
+| `update-price` | `(update-price (asset principal) (price uint) (confidence uint))` | Update the Switchboard price feed. |
 
 ### `twap-oracle.clar`
-Core logic for twap oracle.
+Calculates Time-Weighted Average Prices from historical observations.
 
-Public Functions:
-- `record-price`: Action for record price.
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `record-price` | `(record-price (asset principal) (price uint))` | Record a price observation. |
+| `get-price` | `(get-price (asset principal))` | Calculate TWAP from recorded observations. |
 
 
 ## Integration Examples (How-to)
