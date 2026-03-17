@@ -31,7 +31,7 @@
 
 * [Compliance & Enhancement Alignment Report](archive/COMPLIANCE_ALIGNED_REPORT.md)
 * [Master System Audit & Readiness Report](archive/FINAL_AUDIT_REPORT.md)
-* [BOS Simulation Report 2026](docs/BOS_SIMULATION_REPORT_2026.md)
+* [BOS Simulation Report 2026 (Final)](docs/BOS_SIMULATION_REPORT_2026_FINAL.md)
 
 ## 📂 Archive (Historical)
 
