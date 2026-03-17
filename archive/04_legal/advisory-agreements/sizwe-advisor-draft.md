@@ -4,7 +4,7 @@
 **Role**: Infrastructure Advisor / CTO (KCZ)
 **Scope of Work**:
 - Infrastructure design and cloud roadmap oversight.
-- Security architecture review (Sentinel, Fusion Auth).
+- Security architecture review (cxn-arch-guardian, Fusion Auth).
 - Technical mentorship and strategic infrastructure planning.
 
 **Milestones**:

@@ -8,7 +8,7 @@ This document categorizes structural risks and outlines "No-Egress" mitigation s
 
 ### 1.1 The "Gatekeeper" Vulnerability
 *   **Risk**: Centralized secret management for the ecosystem.
-*   **Mitigation**: Migration to **n-of-m Musig2 Institutional Quorums** for all administrative operations. Sentinel secret filtering mandated in all CI/CD flows.
+*   **Mitigation**: Migration to **n-of-m Musig2 Institutional Quorums** for all administrative operations. cxn-arch-guardian secret filtering mandated in all CI/CD flows.
 
 ### 1.2 Governance Attack during Handover
 *   **Risk**: Malicious actors capturing the ExecutorDAO during the 24-month progressive decentralization phase.

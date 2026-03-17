@@ -14,7 +14,7 @@ Conxian is a **Non-Custodial Software Infrastructure Provider** building the uni
 - **stacksorbit**: Professional TUI/GUI for Stacks smart contract deployment and monitoring.
 
 ### 2.2 Security & Telemetry
-- **Sentinel**: Automated secret filtering to prevent sensitive leakages.
+- **cxn-arch-guardian**: Automated secret filtering to prevent sensitive leakages.
 - **Fusion Auth**: Unified JWT/Enclave-based authentication without custodial risk.
 - **Glass Node Architecture**: Full system transparency via Prometheus (9090) and Grafana (3001).
 

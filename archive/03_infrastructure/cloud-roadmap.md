@@ -6,7 +6,7 @@ Conxian follows a "Cloud-First, Sovereignty-Anchored" approach.
 - **Primary Provider**: Google Cloud Platform (GCP) for Core/Gateway.
 - **Secondary Provider**: Render for UI/Static sites.
 - **Monitoring**: "Glass Node Architecture" using Prometheus and Grafana.
-- **Security**: "Sentinel" automated secret filtering.
+- **Security**: "cxn-arch-guardian" automated secret filtering.
 
 ## Phase 2: Progressive Sovereignty (Year 3.5 - Year 5)
 - **Transition**: Begin moving critical Bitcoin/Stacks RPC nodes to self-hosted or dedicated bare metal.

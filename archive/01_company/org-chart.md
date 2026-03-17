@@ -5,7 +5,7 @@
 
 ## Strategic Partners & Advisors
 - **Sizwe (KCZ)**: Infrastructure Advisor / CTO.
-  - Responsibility: Cloud roadmap, security (Sentinel), and platform orchestration.
+  - Responsibility: Cloud roadmap, security (cxn-arch-guardian), and platform orchestration.
 - **Ms. Khosa**: Legal Advisor / Board Member.
   - Responsibility: Compliance, incorporation, and advisory agreements.
 
