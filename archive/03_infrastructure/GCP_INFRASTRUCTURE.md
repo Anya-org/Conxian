@@ -17,4 +17,4 @@ GCP configurations are managed within the `gateway/` submodule to ensure audit-r
 - **Observability**: Prometheus-compatible metrics are exposed via the Gateway and Nexus on ports 8080/3000 respectively.
 
 ---
-[Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)

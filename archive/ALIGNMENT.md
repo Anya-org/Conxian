@@ -64,4 +64,4 @@ The ecosystem is organized into four standalone businesses, each targeting a spe
 
 ---
 © 2026 Conxian. Sovereign Autonomous Business.
-[Return to Root README](./README.md)
+[Return to Root README](../README.md)

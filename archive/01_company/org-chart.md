@@ -15,4 +15,4 @@
 - **Infrastructure**: conxius-platform & conxian-nexus.
 
 ---
-[Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)

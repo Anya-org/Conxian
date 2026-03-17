@@ -71,4 +71,4 @@ This document outlines the definitive user experience for Native Token Transfers
 *   **App Closed:** If the user closes the app, the tracking process will continue in the background. When the app is re-opened, the status tracker will reflect the latest state.
 
 ---
-[Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)

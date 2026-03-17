@@ -7,4 +7,4 @@
 5. **Transparency**: All telemetry and system logic are verifiable (Glass Node Architecture).
 
 ---
-[Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)

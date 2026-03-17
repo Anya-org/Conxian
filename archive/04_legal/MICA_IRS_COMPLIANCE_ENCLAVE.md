@@ -16,4 +16,4 @@ Unlike self-reported logs, Conxian's auditing primitives are rooted in the Secur
 
 ---
 © 2026 Conxian. Sovereign Autonomous Business.
-[Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)

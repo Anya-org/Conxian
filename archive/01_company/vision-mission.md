@@ -10,4 +10,4 @@ Conxian builds the high-integrity infrastructure required for community-owned, a
 **Code is Law. Sovereignty is Absolute.**
 
 ---
-[Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)

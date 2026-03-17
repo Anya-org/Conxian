@@ -110,4 +110,4 @@ This document tracks the ground-truth implementation status of every major featu
 4. **Priority 4**: Integration with Universal Bitcoin Identity (UBI) for credit scoring.
 
 ---
-[Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)

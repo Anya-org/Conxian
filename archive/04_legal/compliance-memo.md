@@ -15,4 +15,4 @@ Since Conxian never takes custody of user assets, it does not fall under traditi
 Conxian extends its non-custodial position to include **Mathematically Verifiable Compliance Reports (MVCR).** By utilizing hardware-attested audit trails, the platform allows institutional users to remain compliant with MiCA (EU) and IRS Form 1099-DA (USA) without delegating custody to a centralized third party. This creates a "Regulatory Trust Moat" that differentiates Conxian from retail-centric incumbents.
 
 ---
-[Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)

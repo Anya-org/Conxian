@@ -25,4 +25,4 @@ These standards align with the **2026 MiCA "Secure Custody"** requirements and p
 
 ---
 © 2026 Conxian. Sovereign Autonomous Business.
-[Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)

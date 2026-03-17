@@ -24,4 +24,4 @@ As the ecosystem moves toward Series A ($20M+), the baseline stream will be adju
 
 ---
 © 2026 Conxian. Sovereign Autonomous Business.
-[Return to Root README](../README.md)
+[Return to Root README](../../README.md)

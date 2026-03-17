@@ -47,4 +47,4 @@ permalink: /partners
 4.  **Founder's Cut Transparency**: Hardcoded 0.1% fees must be disclosed in all transaction previews.
 
 ---
-[Return to Root README](../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)
