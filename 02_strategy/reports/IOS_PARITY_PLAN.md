@@ -19,4 +19,4 @@ The Conxian ecosystem's current reliance on Android TEE/StrongBox creates a "Har
 - **Strategic Moat:** Positions Conxian as the **first non-custodial wallet** to offer unified, hardware-grade security for the full Bitcoin stack across all major mobile platforms.
 
 ---
-[Return to Strategy](./PRODUCT_STRATEGY.md) | [View Roadmap](ROADMAP.md)
+[Return to Strategy](../../BD_UNIT_ACCESS.md) | [View Roadmap](../../ROADMAP.md)
