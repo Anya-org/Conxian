@@ -16,7 +16,7 @@ Conxian Labs is successfully executing its **Infrastructure Pivot**, transitioni
 The "leaf-to-root" synchronization of all submodules confirms that the ecosystem is technically aligned with the master `ROADMAP.md` and `ALIGNMENT.md`:
 
 * **`conxius-wallet` (The Vault):** Hardware-grade security is verified. Recent CI hardening strictly enforces `FLAG_SECURE` and disables Android backups, ensuring the TEE/StrongBox Enclaves cannot be compromised. This forms the mathematical foundation required to sell the **Conclave SDK**.
-* **`conxian-gateway` (The Router):** Fully deprecates legacy systems (Anya-core/OPSource). It now acts as the central compliance pipe, exposing granular Prometheus metrics (success/failure rates) essential for real-time observability.
+* **`conxian-gateway` (The Router):** Fully deprecates legacy systems (Deprecated-Deprecated-Deprecated-Conxian Gateway/OPSource). It now acts as the central compliance pipe, exposing granular Prometheus metrics (success/failure rates) essential for real-time observability.
 * **`conxian-nexus` (Risk Oracle):** Successfully integrated with the Gateway's telemetry. The Nexus now acts as an automated, decentralized circuit breaker, shifting the system into "Safety Mode" if verification failure rates exceed 10%.
 * **`lib-conxian-core` (The Engine):** The "Single Source of Truth." Initial Taproot Musig2 (BIP-327) primitives have been merged, unblocking the M13 requirement for institutional treasury quorums.
 * **`conxian-ui` & `stacksorbit` (The Interfaces):** UX standards have been enhanced to meet the "Earthy Corporate Finance" theme. UI now explicitly enforces **Nakamoto-Native Finality** by fetching and displaying the Bitcoin `burn-block-height`.
