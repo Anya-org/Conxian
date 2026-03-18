@@ -5,14 +5,14 @@
 
 ## 🤖 Business Operations System (BOS)
 
-* [Strategy Nexus (CEO)](cxn-strategy-nexus/REALTIME_M&A_VELOCITY.md)
+* [Strategy Nexus](cxn-strategy-nexus/REALTIME_M&A_VELOCITY.md)
     * [Sovereign MOI Alignment](cxn-strategy-nexus/docs/SOVEREIGN_MOI_ALIGNMENT.md)
     * [ZK-Data Room Schema](cxn-strategy-nexus/docs/ZK_DATA_ROOM_SCHEMA.md)
     * [Sovereign Pitch Deck Narrative](cxn-strategy-nexus/docs/SOVEREIGN_PITCH_DECK_NARRATIVE.md)
-* [Treasury Oracle (CFO)](cxn-treasury-oracle/SOVEREIGN_RUNWAY.md)
-* [Arch Guardian (CTO)](cxn-arch-guardian/ANTI_FRAGILITY_LOOP.md)
+* [Treasury Oracle](cxn-treasury-oracle/SOVEREIGN_RUNWAY.md)
+* [Arch Guardian](cxn-arch-guardian/ANTI_FRAGILITY_LOOP.md)
 * [Grid Oracle (Agnostic)](cxn-grid-oracle/README.md)
-* [Ops Engine (COO)](cxn-ops-engine/DEPLOYMENT_EFFICIENCY.md)
+* [Ops Engine](cxn-ops-engine/DEPLOYMENT_EFFICIENCY.md)
     * [Linear Integration Wiring](cxn-ops-engine/LINEAR_WIRING.md)
 
 ## 🏛️ Ground Truth (OpenSpec)

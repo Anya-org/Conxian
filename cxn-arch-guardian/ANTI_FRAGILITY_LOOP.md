@@ -11,3 +11,7 @@ Continuous enforcement of the Sovereign Naming Matrix and automated collision au
 ## 3. Audit Log
 - **Source**: Linear (`cxn-arch-guardian` tag)
 - **Status**: ACTIVE
+
+## 4. Regulatory & Machine Economy (v1.7.0)
+- **SARS CARF v1.5**: Generating hardware-attested BRS v1.5 XML reports locally to meet the May 2027 filing deadline.
+- **ONLTrust Integration**: Hardcoded 1% royalty routing in `revenue-automation.clar` ensures absolute sovereignty for machine economy OPEX.

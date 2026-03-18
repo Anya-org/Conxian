@@ -6,11 +6,11 @@
 ## 2. The Narrative Pillars
 - **Zero Dilution**: Reaching R2B+ valuation using POL and Yield, not VC equity.
 - **Hardware Sovereignty**: TEE/StrongBox floor means the keys never leave the enclave.
-- **Machine Governance**: The CEO manages the `cxn-strategy-nexus`, not just humans. The business logic is encoded in Clarity.
+- **Machine Governance**: The Strategy Nexus manages the `cxn-strategy-nexus`, not just humans. The business logic is encoded in Clarity.
 - **Universal Integration**: Bridging legacy ERP (SAP/Oracle) to Bitcoin-native state.
 
 ## 3. The Visual "Point to the Code" Strategy
-- During client loops, the CEO displays the Render Dashboard.
+- During client loops, the Strategy Nexus displays the Render Dashboard.
 - "You don't have to trust my word; verify the state in the Supabase ledger and the Nexus Glass Node."
 
 ## 4. Valuation Vector

@@ -24,7 +24,7 @@
 
 ### 3.2 Operating Expenditure (OpEx)
 - **B2B Engineering & Support**: $1.2 Million / year.
-- **Sales & Institutional Partnerships**: $400,000 / year (Direct engagement with ERP vendors and CFO offices).
+- **Sales & Institutional Partnerships**: $400,000 / year (Direct engagement with ERP vendors and Treasury Oracle offices).
 - **Infrastructure (High-Availability)**: $200,000 / year (Redundant server-side hosting for B2B uptime).
 
 ### 3.3 Revenue Model

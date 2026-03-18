@@ -10,7 +10,7 @@ This report identifies technical and operational insights from the "leaf" submod
 ## 2. Enterprise Integration Pivot ("The Engine")
 - **Insight**: High-net-worth and institutional clients expressed friction with pure-crypto workflows and required direct integration with existing accounting standards.
 - **Strategic Shift**: Prioritizing **"The Engine" (M18)**. Focus has shifted from general DeFi features to deterministic ERP synchronization (SAP/Oracle) and ISO 20022/GAAP compliance.
-- **Impact**: Created a high-switching-cost moat within the "Office of the CFO," moving Conxian from a "crypto tool" to a "financial infrastructure" category.
+- **Impact**: Created a high-switching-cost moat within the "Office of the Treasury Oracle," moving Conxian from a "crypto tool" to a "financial infrastructure" category.
 
 ## 3. Real-Time Operational Resilience
 - **Insight**: Network latency and enterprise downtime (Blackouts) identified as critical risks for institutional adoption.

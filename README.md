@@ -1,28 +1,30 @@
-# Conxian-Labs: Internal Business Operations System (BOS)
+# Conxian-Labs: Sovereign Business Operations System (BOS v1.7.0)
 
-This repository is the programmatic **State Machine** for Conxian-Labs operations. It replaces passive documentation with active, real-time tracking of the ecosystem's structural and financial health.
+This repository is the programmatic **State Machine** for Conxian-Labs operations. We have evolved from a system that runs on infrastructure to a system that **is** infrastructure—living directly on Bitcoin.
 
-## 🚀 The Mission: Terminal Exit Vector
+## 🚀 The Strategic Vision: Bitcoin-Native Evolution
+Conxian-Labs is engineering a $1B+ Bitcoin-native ecosystem. Our Business Operations System (BOS) transforms operational excellence into verifiable, immutable proof on the world's most resilient network. This ensures absolute sovereignty and maximizes valuation for our Terminal Exit Vector.
 
-We are engineering a $1B+ Bitcoin-native ecosystem. The BOS ensures that internal operations mirror the technical excellence of our protocols, providing continuous, verifiable proof of value for stakeholders and M&A partners.
+## 🤖 Agentic EXCO Suite
+The BOS is powered by an active suite of autonomous agents:
 
-## 🤖 Programmatic EXCO (The cxn- Suite)
+- **[Strategy Nexus](./cxn-strategy-nexus)**: M&A velocity, structural integrity, and hardware-attested ZK-Data Room proofs.
+- **[Treasury Oracle](./cxn-treasury-oracle)**: Multi-sig Bitcoin treasury, automated BTC yield, and 1% royalty routing to ONLTrust.
+- **[Arch Guardian](./cxn-arch-guardian)**: ATS enforcement, immutable IP registry, and CARF/BRS v1.5 regulatory enforcement.
+- **[Ops Engine](./cxn-ops-engine)**: Bitcoin-native bounties, decentralized contributor onboarding, and protocol-owned layer (POL) management.
 
-The repository is structured around the active Agentic EXCO suite:
+## 🏛️ Protocol Owned Layers (POL)
+- **Settlement**: Anchored to Bitcoin L1 via OpenTimestamps and Stacks Nakamoto.
+- **State Layer**: [Supabase](https://supabase.com) (Real-time Financials, IP Audit, Exit Velocity).
+- **Execution Engine**: [Linear](https://linear.app) (Programmatic Action Task Specifications).
+- **Monetization**: Hardcoded **0.1% protocol fee** and 1% Software Licensing Royalty.
 
-- **[Strategy Nexus (CEO)](./cxn-strategy-nexus)**: M&A velocity, structural integrity, and exit metrics.
-- **[Treasury Oracle (CFO)](./cxn-treasury-oracle)**: Sovereign runway, native yield execution, and burn rates.
-- **[Arch Guardian (CTO)](./cxn-arch-guardian)**: ATS enforcement, collision audits, and IP sovereignty.
-- **[Ops Engine (COO)](./cxn-ops-engine)**: Deployment efficiency and Linear integration.
+## 🗺️ Implementation Roadmap (v1.7.0)
+1. **Foundation (Q3-Q4 2025)**: Anchor key metrics and IP assets to Bitcoin. Establish multi-sig treasury.
+2. **Integration (Q1-Q2 2026)**: Deploy autonomous BTC yield and on-chain governance logs.
+3. **Sovereignty (Q3-Q4 2026+)**: Complete migration of critical state to Bitcoin; May 2027 SARS compliance deadline.
 
-## 🏛️ Governance & State Layer
-
-- **State Layer**: [Supabase](https://supabase.com) (Financials, IP Audit, Velocity).
-- **Execution Engine**: [Linear](https://linear.app) (Action Task Specifications).
-- **Audit Protocol**: [system_ip_audit.md](./system_ip_audit.md).
-
-## 📂 Archive
-Legacy documentation and artifacts are maintained in the [archive](./archive) for historical context but are deprecated for active operations.
+> "We didn't build Conxian-Labs to be another company running on rented infrastructure. We built it to be sovereign. This roadmap delivers that sovereignty—not in theory, but through every agent in our EXCO suite, on the most resilient network humanity has ever created."
 
 ---
-🛡️ **Sovereign Autonomous Business (SAB)**. © 2026 Conxian-Labs. Leading Business Exco Team.
+🛡️ **Sovereign Autonomous Business (SAB)**. © 2026 Conxian-Labs. Powered by Bitcoin.

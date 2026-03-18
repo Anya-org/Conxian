@@ -41,3 +41,20 @@ This document defines the standalone positioning and Total Addressable Markets (
 
 ---
 © 2026 Conxian. Sovereign Autonomous Business.
+
+---
+
+## 6. Strategic Capital & Partner Filtering (cxn-arch-guardian)
+**Identity**: Strategic Capital Oracle.
+**Ethos**: BTC-native. No TradFi/Dilution. Yield-only. Sovereign-first.
+
+### Partner Filtering Logic
+- **Equity Threshold**: 15% - 25% equity opt-in for partners providing the ~R150,000 "full setup" (Compliance/Rainmaking/CIPC).
+- **Stewardship**: Must respect Level 1 B-BBEE stewardship and the "Yield-only" philosophy.
+- **Security**: Reject any partner proposing custodial solutions or centralized key management.
+- **Valuation Baseline**: R880,000 IP valuation floor (5,840 labor hours @ R150/hr + tools).
+
+### Revenue Routing (Clarity 4.0)
+- **Royalty**: 1% "Software Licensing Royalty" stream routed to the IP Vault.
+- **PIT**: "Platform Delivery Fees" facilitating Personal Income Tax (PIT) for technical delivery.
+- **Machine Economy**: 1% royalty stream autonomously funds persistent storage (Filecoin FVM) and data query layers (Polybase).

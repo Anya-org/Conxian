@@ -17,7 +17,7 @@ Conxian's "Vertical Sovereignty" model provides a definitive technical advantage
 ### 1.3. Institutional Moat: "The Engine" & MVCR
 - **Competitors**: Fireblocks/BitGo provide custody (counterparty risk). Retail wallets lack compliance reporting.
 - **Conxian Superiority**: **Mathematically Verifiable Compliance Reports (MVCR)** generated directly from hardware enclaves. "The Engine" provides deterministic ERP synchronization (SAP/Oracle), turning the wallet into a piece of core financial infrastructure.
-- **Switching Cost Power**: Integration into enterprise CFO workflows creates massive organizational lock-in (Hamilton Helmer's 7 Powers).
+- **Switching Cost Power**: Integration into enterprise Treasury Oracle workflows creates massive organizational lock-in (Hamilton Helmer's 7 Powers).
 
 ## 2. Ethos Alignment: "Sovereign by Design"
 

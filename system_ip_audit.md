@@ -1,3 +1,4 @@
+# Conxian-Labs System IP Audit & Lexicon Enforcement Protocol (v1.7.0)
 # Conxian-Labs System IP Audit & Lexicon Enforcement Protocol
 
 ## 1. Objective
@@ -29,4 +30,4 @@ To maintain 100% IP sovereignty and eliminate legacy nomenclature that creates M
 ## 5. Initialization
 - Date: March 2026
 - Status: ACTIVE
-- Authority: CEO (cxn-strategy-nexus)
+- Authority: Strategy Nexus (cxn-strategy-nexus)
