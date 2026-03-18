@@ -74,4 +74,4 @@ This document provides a comprehensive review of the current crypto wallet marke
 Conxius wins by being **Sovereign by Design** and **Efficient by Default**. We offer the security of hardware, the UX of mainstream wallets, and the privacy of Bitcoin power-user tools—all in a single, gas-efficient package.
 
 ---
-[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../legacy_docs/ALIGNMENT.md)

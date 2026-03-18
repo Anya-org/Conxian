@@ -30,4 +30,4 @@ Technical decisions are aligned with these funding milestones.
 - **Milestones**: $1B+ TVL.
 
 ---
-[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../legacy_docs/ALIGNMENT.md)

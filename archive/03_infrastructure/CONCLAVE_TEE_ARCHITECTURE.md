@@ -20,4 +20,4 @@ The wallet embeds a native **Kotlin Model Context Protocol (MCP)** server.
 - **Security Barrier**: The MCP server serves as the controlled entry point, ensuring the AI only interacts with predefined, sovereign capabilities.
 
 ---
-[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../legacy_docs/ALIGNMENT.md)

@@ -17,4 +17,4 @@ Conxian follows a "Cloud-First, Sovereignty-Anchored" approach.
 - **storage**: Cloud SQL (Postgres) + Bitcoin Core/Stacks node storage.
 
 ---
-[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../legacy_docs/ALIGNMENT.md)

@@ -17,4 +17,4 @@ The Conxian stack is designed for **Zero Secret Egress** and **Nexus-First** sta
 
 ---
 © 2026 Conxian. Sovereign Autonomous Business.
-[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../legacy_docs/ALIGNMENT.md)

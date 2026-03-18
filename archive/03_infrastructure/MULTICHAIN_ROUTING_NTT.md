@@ -13,4 +13,4 @@ By embedding routing logic directly into the hardware-enclosed signer, Conxian e
 
 ---
 © 2026 Conxian. Sovereign Autonomous Business.
-[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../legacy_docs/ALIGNMENT.md)

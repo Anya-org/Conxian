@@ -90,4 +90,4 @@ This document defines the authoritative hardware, networking, and security requi
 
 ---
 © 2026 Conxian. Sovereign Autonomous Business.
-[Return to Strategic Alignment](../ALIGNMENT.md)
+[Return to Strategic Alignment](../legacy_docs/ALIGNMENT.md)

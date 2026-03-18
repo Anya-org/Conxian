@@ -37,4 +37,4 @@ Providing SLA-grade APIs and "The Engine" (ERP Sync) for fintechs and enterprise
 
 ---
 © 2026 Conxian. Sovereign Autonomous Business.
-[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../legacy_docs/ALIGNMENT.md)

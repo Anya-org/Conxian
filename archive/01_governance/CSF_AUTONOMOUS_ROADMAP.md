@@ -20,4 +20,4 @@ The final act of the core development team is the strategic relinquishment of ad
 
 ---
 © 2026 Conxian. Sovereign Autonomous Business.
-[Return to ALIGNMENT.md](../ALIGNMENT.md)
+[Return to ALIGNMENT.md](../legacy_docs/ALIGNMENT.md)

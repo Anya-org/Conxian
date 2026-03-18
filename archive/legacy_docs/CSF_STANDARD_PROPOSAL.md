@@ -30,4 +30,4 @@ The **Conxian Nexus** maintains a registry of CSF-compliant contracts, enabling 
 
 ---
 © 2026 Conxian. Sovereign Autonomous Business.
-[Return to ALIGNMENT.md](../archive/ALIGNMENT.md)
+[Return to ALIGNMENT.md](./ALIGNMENT.md)

@@ -136,4 +136,4 @@ To ensure the best UX for the "Digital Citadelist," the Conxius NTT Bridge imple
 * **Ethos Alignment:** Eliminates the "Gas Token Requirement" bottleneck, making Bitcoin layers feel like a single, unified network.
 
 ---
-[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../legacy_docs/ALIGNMENT.md)

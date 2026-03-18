@@ -24,4 +24,4 @@ The Conxian Gateway acts as the KYA Registrar. When Agent A (an AI liquidity bot
 By standardizing KYA, Conxian becomes the default routing and settlement layer for "Agentic Finance." As more autonomous capital enters the market, the network effect of a unified, hardware-secured trust layer creates an insurmountable moat against unverified, retail-grade systems.
 
 ---
-[Return to Root README](../../README.md) | [Strategic Alignment](../ALIGNMENT.md)
+[Return to Root README](../../README.md) | [Strategic Alignment](../legacy_docs/ALIGNMENT.md)
