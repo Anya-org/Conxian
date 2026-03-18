@@ -5,6 +5,10 @@ This repository is the programmatic **State Machine** for Conxian-Labs operation
 ## 🚀 The Strategic Vision: Bitcoin-Native Evolution
 Conxian-Labs is engineering a $1B+ Bitcoin-native ecosystem. Our Business Operations System (BOS) transforms operational excellence into verifiable, immutable proof on the world's most resilient network. This ensures absolute sovereignty and maximizes valuation for our Terminal Exit Vector.
 
+## 🏛️ Ground Truth (OpenSpec)
+
+The definitive technical specifications for the Conxian-Labs ecosystem are maintained in the `openspec/` directory. See the [Enterprise Sovereignty Baseline](./openspec/changes/remediate-enterprise-sovereignty/specs.md) for the latest architectural standards.
+
 ## 🤖 Agentic EXCO Suite
 The BOS is powered by an active suite of autonomous agents:
 

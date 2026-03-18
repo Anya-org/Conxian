@@ -31,7 +31,7 @@ The nomenclature purge is 95% complete. A theme alignment gap was identified and
 ## 4. Alignment & Enhancements
 1. **Wallet Theme**: Standardized `conxius-wallet/index.css` to Forest Green/Gold palette.
 2. **State Layer**: Supabase tables (`exit_velocity`, `runway_metrics`) are now populated with high-fidelity operational data.
-3. **Naming Purge**: Legacy "Conxian Arch Guardian" identifiers have been remapped to the `cxn-` suite.
+3. **Naming Purge**: Legacy "cxn-arch-guardian" identifiers have been remapped to the `cxn-` suite.
 
 ## 5. Conclusion
 The Conxian BOS is **MISSION READY**. All systems are aligned for the May 2026 Genesis Launch. Structural integrity is verified at 0.99.
