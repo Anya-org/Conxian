@@ -11,6 +11,7 @@
     * [Sovereign Pitch Deck Narrative](cxn-strategy-nexus/docs/SOVEREIGN_PITCH_DECK_NARRATIVE.md)
 * [Treasury Oracle (CFO)](cxn-treasury-oracle/SOVEREIGN_RUNWAY.md)
 * [Arch Guardian (CTO)](cxn-arch-guardian/ANTI_FRAGILITY_LOOP.md)
+* [Grid Oracle (Agnostic)](cxn-grid-oracle/README.md)
 * [Ops Engine (COO)](cxn-ops-engine/DEPLOYMENT_EFFICIENCY.md)
     * [Linear Integration Wiring](cxn-ops-engine/LINEAR_WIRING.md)
 
