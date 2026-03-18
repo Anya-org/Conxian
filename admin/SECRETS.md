@@ -48,3 +48,15 @@ These repositories run the core backend logic, rust engine, and API gateway.
 ## Secret Provisioning Script
 
 To validate that your local environment is correctly configured, you can run the validation script located at `admin/validate-env.ps1`.
+
+---
+
+## 3. Current Local Development Keys (March 2026 Snapshot)
+
+The following keys were safely extracted from the local `.env` before being removed from tracking. Please ensure they are properly mapped into GitHub Secrets for the next deployment pipeline.
+
+- `DEPLOYER_PRIVKEY`: `753b7cc01a1a2e86221266a154af739463fce51219d97e4f856cd7200c3bd2a6`
+- `SYSTEM_ADDRESS`: `ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
+- `NETWORK`: `testnet`
+- `CORE_API_URL`: `https://api.testnet.hiro.so`
+
