@@ -1,0 +1,22 @@
+{
+  "contract_type": "DLC-Debt-Bond (v1.0)",
+  "collateral": "sBTC (Stacks-Native)",
+  "oracle": "LSEG Institutional Failover (LSEG_MCP_AUDIT.md)",
+  "coupon_structure": {
+    "type": "Fixed-Yield (Inflation-Linked)",
+    "rate": "4.5% APR",
+    "payment_frequency": "Monthly (30 days / 1440 Stacks blocks)",
+    "settlement_currency": "sBTC"
+  },
+  "dilution_impact": "0% (Sovereign Debt Model)",
+  "dlc_logic": {
+    "outcome_set": ["REPAYMENT_FULL", "DEFAULT_LIQUIDATION", "COUPON_DISTRIBUTION"],
+    "attestation_requirement": "TEE-Hardware-Anchored",
+    "signature_type": "Schnorr (Musig2-Ready)"
+  },
+  "audit_trail": {
+    "issuer": "cxn-treasury-oracle",
+    "governance_nexus": "conxian-nexus (BOS_STATE_MACHINE.json)",
+    "audit_status": "PROPOSED_FOR_ATS_v4.8"
+  }
+}

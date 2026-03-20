@@ -1,17 +1,18 @@
 {
   "$schema": "https://morganstanley.github.io/CALM/schema.json",
-  "system": "Conxian Sovereign BOS (ATS v4.7)",
-  "version": "4.7.0",
-  "description": "Recursive Service Loop State Machine with Sovereign Sharding",
+  "system": "Conxian Sovereign BOS (ATS v4.8)",
+  "version": "4.8.0",
+  "description": "Recursive Service Loop State Machine with Bitcoin DLC Bond Logic",
   "states": {
     "CLIENT_MODE": {
       "description": "BOS consumes Gateway intelligence to optimize Finance yield rebalancing",
       "actions": [
         "HIRE_INTERNAL_AGENTS",
         "REBALANCE_TREASURY",
-        "CROSS_REFERENCE_LSEG_MCP"
+        "CROSS_REFERENCE_LSEG_MCP",
+        "ISSUE_BITCOIN_DLC_BOND"
       ],
-      "transitions": ["SUPPLIER_MODE", "SHARDED_EXECUTION"]
+      "transitions": ["SUPPLIER_MODE", "SHARDED_EXECUTION", "DEBT_ISSUANCE"]
     },
     "SUPPLIER_MODE": {
       "description": "BOS provides Nexus governance-as-a-service to external EVM/Solana stacks",
@@ -30,11 +31,20 @@
         "OFFSHORE_YIELD_ROUTING"
       ],
       "transitions": ["CLIENT_MODE", "SUPPLIER_MODE"]
+    },
+    "DEBT_ISSUANCE": {
+      "description": "Bitcoin-native debt issuance via DLCs to raise capital without dilution",
+      "actions": [
+        "INIT_DLC_CONTRACT",
+        "OFFER_BOND_COUPON",
+        "SETTLE_COUPON_IN_SBTC"
+      ],
+      "transitions": ["CLIENT_MODE"]
     }
   },
   "compliance_guardrails": {
     "jurisdiction": "Sovereign-First (Decentralized)",
-    "rule_set": "CARF/BRS v1.7 / SARB-Exempt-v4.7",
+    "rule_set": "CARF/BRS v1.7 / SARB-Exempt-v4.8",
     "sharding_policy": "ZERO_LOCAL_STATE_PII"
   }
 }

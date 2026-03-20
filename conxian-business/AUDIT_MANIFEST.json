@@ -1,0 +1,60 @@
+{
+  "org": "Conxian",
+  "timestamp": "2026-03-20T10:49:10.764125Z",
+  "version": "v2.0-Audit",
+  "files": [
+    {
+      "path": "conxian-business/SARB_COMPLIANCE_REPORT.json",
+      "sha256": "1ea90a5a687d7b5ecf96d6409c86dc0b1031520c259b7ce4080191169691d885"
+    },
+    {
+      "path": "conxian-business/transparency_custodian.py",
+      "sha256": "b3d970b1b7ae15e47c1bb1580383a05e56f28d986c99de2ecfaeddd39ce317e4"
+    },
+    {
+      "path": "conxian-business/BOS_STATE_MACHINE.json",
+      "sha256": "c3f4940fa6efa42be2f1f8d7d7761329fb623c28f692c80fdd56545b465358ef"
+    },
+    {
+      "path": "conxian-business/SERVICE_LOOP.md",
+      "sha256": "b3010b38ca022c32feed9c1c8eb0972eb15d2bbeb9b0ad1087469b50d48bd591"
+    },
+    {
+      "path": "cxn-arch-guardian/ANTI_FRAGILITY_LOOP.md",
+      "sha256": "89742f5a78b007e17fbd6a646c3c878f0832386de00f88ab727dd7467e3de331"
+    },
+    {
+      "path": "cxn-ops-engine/DEPLOYMENT_EFFICIENCY.md",
+      "sha256": "8e1cfea54bbef9a325f5897147f2103550004fce0e076c7750412c40719de8c5"
+    },
+    {
+      "path": "cxn-ops-engine/LINEAR_WIRING.md",
+      "sha256": "6c265d0cb685e433792d0a26c240aeee33e12edcb05177bffcdb2f2a5da3abc1"
+    },
+    {
+      "path": "cxn-strategy-nexus/REALTIME_M&A_VELOCITY.md",
+      "sha256": "c6d559a048cf6ffe524f569755f61ed192dc1a39f92ed7c5f3d855782340dc29"
+    },
+    {
+      "path": "cxn-strategy-nexus/docs/SOVEREIGN_PITCH_DECK_NARRATIVE.md",
+      "sha256": "59b2130eec5d5a29ea33c3972ca65f16be3d4e484d22d3db02a5c763a621a650"
+    },
+    {
+      "path": "cxn-strategy-nexus/docs/ZK_DATA_ROOM_SCHEMA.md",
+      "sha256": "8d0948bc73f4a2cde332a85301e2c14585c5b5b35b892ba1752b2110d295ea05"
+    },
+    {
+      "path": "cxn-strategy-nexus/docs/SOVEREIGN_MOI_ALIGNMENT.md",
+      "sha256": "a2a1b64c0663341e5b918ee9cc0ca0b230e8b0bfa1acdec1440ab10cba599009"
+    },
+    {
+      "path": "cxn-treasury-oracle/LSEG_MCP_AUDIT.md",
+      "sha256": "23c71899ce4fc98c85cdc25efa08e57464bb93575716d17f885c008c860e3e79"
+    },
+    {
+      "path": "cxn-treasury-oracle/SOVEREIGN_RUNWAY.md",
+      "sha256": "a89a9965b990a961912a2ef7d9b447f976f069304532c5b8c196c8f24aaec220"
+    }
+  ],
+  "stacks_anchor_payload": "9c5ab590e67bdc43300940e536cde9886512bd303fd14222699694b422531d5e"
+}

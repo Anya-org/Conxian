@@ -1,0 +1,52 @@
+name: Conxian BOS CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-gateway:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+    - name: Run Gateway Tests
+      run: |
+        cd lib-conxian-core/gateway
+        cargo test
+
+  transparency-audit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    - name: Run Transparency Custodian
+      run: |
+        python3 conxian-business/transparency_custodian.py
+    - name: Verify Manifest
+      run: |
+        [ -f conxian-business/AUDIT_MANIFEST.json ]
+
+  deploy-testnet-simulation:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    - name: Install dependencies
+      run: |
+        pip install -r stacksorbit/requirements.txt
+    - name: Run Testnet Deployment Simulation
+      run: |
+        # Simulated run of stacksorbit deployment
+        python3 stacksorbit/conxian_testnet_deploy.py --help
