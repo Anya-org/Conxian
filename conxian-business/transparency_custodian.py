@@ -1,7 +1,7 @@
 import hashlib
 import os
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 
 def calculate_hash(file_path):
     sha256_hash = hashlib.sha256()
@@ -13,7 +13,7 @@ def calculate_hash(file_path):
 def generate_manifest():
     manifest = {
         "org": "Conxian",
-        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "version": "v2.0-Audit",
         "files": []
     }

@@ -1,0 +1,6 @@
+Implemented Strategos Alignment Gaps:
+1. EXEC-0402: x402 Payment Forge in conxian-gateway (internal/api/src/payment.rs) with ISO 20022 pacs.008 XML egress.
+2. SANDBOX-001: TEE Self-Verification in conxian-gateway (internal/api/src/handlers.rs).
+3. IDENTITY-001: KYA Reputation and ERC-8004 (LEI) mapping in conxius-wallet (services/identity.ts).
+4. Updated audit/strategos-alignment.md to reflect closure of these gaps.
+5. Added chrono and uuid dependencies to conxian-gateway/internal/api/Cargo.toml.
