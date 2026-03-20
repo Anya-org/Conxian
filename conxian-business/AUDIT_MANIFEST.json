@@ -1,6 +1,6 @@
 {
   "org": "Conxian",
-  "timestamp": "2026-03-20T13:35:07.207476Z",
+  "timestamp": "2026-03-20T14:52:26.235530Z",
   "version": "v2.0-Audit",
   "files": [
     {
@@ -21,7 +21,7 @@
     },
     {
       "path": "conxian-business/AUDIT_MANIFEST.json",
-      "sha256": "5938a98ee08b43c7b7d167fe58c808fc83bf7f587e1a17302c3fb1f4a493f236"
+      "sha256": "bd54801d0c2600db728dccb4e54ce0b7c07d6aa331a607abf544bfb444669e3b"
     },
     {
       "path": "cxn-arch-guardian/ANTI_FRAGILITY_LOOP.md",
@@ -56,6 +56,10 @@
       "sha256": "a2a1b64c0663341e5b918ee9cc0ca0b230e8b0bfa1acdec1440ab10cba599009"
     },
     {
+      "path": "cxn-treasury-oracle/TREASURY_MCP_CONFIG.json",
+      "sha256": "e7a07c5020a8348d52ca3c0751ef39057b2c6ca88396b4990bbcf40fafe89375"
+    },
+    {
       "path": "cxn-treasury-oracle/LSEG_MCP_AUDIT.md",
       "sha256": "23c71899ce4fc98c85cdc25efa08e57464bb93575716d17f885c008c860e3e79"
     },
@@ -66,7 +70,19 @@
     {
       "path": "cxn-treasury-oracle/BITCOIN_BOND_DLC.json",
       "sha256": "14c95765d542a37849b8f1b1488b6ecabedc815dda77de63dc802a57c1750ee1"
+    },
+    {
+      "path": "cxn-treasury-oracle/BOS_INTEGRATION_MAP.md",
+      "sha256": "2d4be1f65c9dab22faa7d9c0c32eafe4e4c1774963fe8c624195a127b6b561bc"
+    },
+    {
+      "path": "cxn-treasury-oracle/OPENCLAW_TEE_SPEC.md",
+      "sha256": "ab341e9929f53658d84f1a18694761858464590035b2e629e971cff3bbcd4848"
+    },
+    {
+      "path": "cxn-treasury-oracle/WEB5_IDENTITY_AUDIT.md",
+      "sha256": "5b12b390ffad99aa06a0634919c37c484a268fe63ad8435847fd147873ad398c"
     }
   ],
-  "stacks_anchor_payload": "2e84453b5e5d83956497fbca7be9971c4f547535936e610c46afcb4ce39bf971"
+  "stacks_anchor_payload": "29c69d6dcecea14f18231e933a05902cff9d7d41d819b2b3def2f944ad418d14"
 }
