@@ -13,7 +13,7 @@ The definitive technical specifications for the Conxian-Labs ecosystem are maint
 The BOS is powered by an active suite of autonomous agents:
 
 - **[Strategy Nexus](./cxn-strategy-nexus)**: M&A velocity, structural integrity, and hardware-attested ZK-Data Room proofs.
-- **[Treasury Oracle](./cxn-treasury-oracle)**: Multi-sig Bitcoin treasury, automated BTC yield, and 1% royalty routing to ONLTrust.
+- **[Treasury Oracle](./cxn-treasury-oracle)**: Multi-sig Bitcoin treasury, automated BTC yield, and 1% (100 bps) Sovereign Tax routing to ONLTrust via revenue-automation.clar.
 - **[Arch Guardian](./cxn-arch-guardian)**: ATS enforcement, immutable IP registry, and CARF/BRS v1.5 regulatory enforcement.
 - **[Ops Engine](./cxn-ops-engine)**: Bitcoin-native bounties, decentralized contributor onboarding, and protocol-owned layer (POL) management.
 
@@ -21,7 +21,7 @@ The BOS is powered by an active suite of autonomous agents:
 - **Settlement**: Anchored to Bitcoin L1 via OpenTimestamps and Stacks Nakamoto.
 - **State Layer**: [Supabase](https://supabase.com) (Real-time Financials, IP Audit, Exit Velocity).
 - **Execution Engine**: [Linear](https://linear.app) (Programmatic Action Task Specifications).
-- **Monetization**: Hardcoded **0.1% protocol fee** and 1% Software Licensing Royalty.
+- **Monetization**: Hardcoded **0.1% protocol fee (CSF swaps) and 1% (100 bps) Sovereign Tax (A2P and cross-chain)** and 1% Software Licensing Royalty.
 
 ## 🗺️ Implementation Roadmap (v1.7.0)
 1. **Foundation (Q3-Q4 2025)**: Anchor key metrics and IP assets to Bitcoin. Establish multi-sig treasury.
