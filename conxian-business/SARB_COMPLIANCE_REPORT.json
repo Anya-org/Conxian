@@ -1,0 +1,17 @@
+{
+  "report_id": "CXN-SARB-2026-001",
+  "identity": "cxn-strategy-nexus",
+  "timestamp": "2026-03-20T12:00:00Z",
+  "compliance_model": "Sovereign Sharding (ATS v4.7)",
+  "regulation": "SARB 2026 Budget Speech / Exchange Control",
+  "mitigation_strategy": {
+    "capital_flow_hosting": "Tableland (On-Chain / Non-Custodial)",
+    "local_egress": "Zero local PII storage in Supabase",
+    "yield_classification": "Institutional Sovereign Utility (FASB-aligned)",
+    "tax_sweep_logic": "Automatic 100bps extraction via Clarity v4"
+  },
+  "verification": {
+    "attestation_type": "TEE-Hardware-Anchored",
+    "audit_trail": "LSEG MCP Verified"
+  }
+}

@@ -1,22 +1,40 @@
 {
   "$schema": "https://morganstanley.github.io/CALM/schema.json",
-  "system": "Conxian Sovereign BOS",
-  "version": "4.2.0",
-  "description": "Recursive Service Loop State Machine",
+  "system": "Conxian Sovereign BOS (ATS v4.7)",
+  "version": "4.7.0",
+  "description": "Recursive Service Loop State Machine with Sovereign Sharding",
   "states": {
     "CLIENT_MODE": {
       "description": "BOS consumes Gateway intelligence to optimize Finance yield rebalancing",
-      "actions": ["HIRE_INTERNAL_AGENTS", "REBALANCE_TREASURY"],
-      "transitions": ["SUPPLIER_MODE"]
+      "actions": [
+        "HIRE_INTERNAL_AGENTS",
+        "REBALANCE_TREASURY",
+        "CROSS_REFERENCE_LSEG_MCP"
+      ],
+      "transitions": ["SUPPLIER_MODE", "SHARDED_EXECUTION"]
     },
     "SUPPLIER_MODE": {
       "description": "BOS provides Nexus governance-as-a-service to external EVM/Solana stacks",
-      "actions": ["PROVIDE_SETTLEMENT", "ENFORCE_GOVERNANCE"],
-      "transitions": ["CLIENT_MODE"]
+      "actions": [
+        "PROVIDE_SETTLEMENT",
+        "ENFORCE_GOVERNANCE",
+        "EXTRACT_100BPS_TAX"
+      ],
+      "transitions": ["CLIENT_MODE", "SHARDED_EXECUTION"]
+    },
+    "SHARDED_EXECUTION": {
+      "description": "Regulatory-shielded execution mode for SARB compliance via decentralized state",
+      "actions": [
+        "COMMIT_STATE_TO_TABLELAND",
+        "VALIDATE_SARB_EXEMPTION",
+        "OFFSHORE_YIELD_ROUTING"
+      ],
+      "transitions": ["CLIENT_MODE", "SUPPLIER_MODE"]
     }
   },
   "compliance_guardrails": {
-    "jurisdiction": "Sovereign-First",
-    "rule_set": "CARF/BRS v1.5"
+    "jurisdiction": "Sovereign-First (Decentralized)",
+    "rule_set": "CARF/BRS v1.7 / SARB-Exempt-v4.7",
+    "sharding_policy": "ZERO_LOCAL_STATE_PII"
   }
 }
