@@ -70,6 +70,7 @@ The CSF is a standardized interface that allows third-party protocols to nativel
   - ✅ **Universal Router**: Dynamic dispatch for the entire Stacks ecosystem.
   - ✅ **Contagion Guard**: Multi-tier isolation circuit breaking.
   - ✅ **2026 Asset Support**: stSTX, stSTXbtc, sBTC, and USDA native tracking.
+  - ✅ **Federated Oracle**: Multi-source weighted price aggregation (CSF-aligned).
 
 ---
 
