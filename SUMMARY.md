@@ -2,6 +2,7 @@
 
 * [Introduction](README.md)
 * [System IP Audit](system_ip_audit.md)
+* [Strategos Mandate (Constraints & Ethos)](docs/STRATEGOS_MANDATE.md)
 
 ## 🤖 Business Operations System (BOS)
 
@@ -20,6 +21,7 @@
 
 * [OpenSpec Baseline](openspec/changes/remediate-enterprise-sovereignty/specs.md)
 * [Autonomous Launch Specs](openspec/changes/csf-autonomous-launch/specs.md)
+* [Strategos Alignment Audit](audit/strategos-alignment.md)
 
 ## 📦 Architecture
 
@@ -36,7 +38,3 @@
 * [Sovereign Simulation (9-Cycle)](archive/legacy_docs/BOS_SIMULATION_REPORT_2026_FINAL.md)
 * [CSF Protocol Standard](archive/legacy_docs/CSF_STANDARD_PROPOSAL.md)
 * [Architecture Upgrade 2026](archive/legacy_docs/ARCHITECTURE_UPGRADE_2026.md)
-* [Vision & Mission (Historical)](archive/legacy_docs/vision-mission.md)
-* [Roadmap (Historical)](archive/legacy_docs/ROADMAP.md)
-* [Strategic Alignment (Historical)](archive/legacy_docs/ALIGNMENT.md)
-* [Risk Registry (Historical)](archive/legacy_docs/RISK_REGISTRY.md)

@@ -1,14 +1,23 @@
 {
-  "report_id": "CXN-SARB-2026-001",
+  "report_id": "CXN-GLOBAL-2026-001",
   "identity": "cxn-strategy-nexus",
   "timestamp": "2026-03-20T12:00:00Z",
-  "compliance_model": "Sovereign Sharding (ATS v4.7)",
-  "regulation": "SARB 2026 Budget Speech / Exchange Control",
-  "mitigation_strategy": {
+  "compliance_model": "Global Sovereign Sharding (ATS v4.8.0)",
+  "regulations": [
+    "SARB 2026 Budget Speech / Exchange Control",
+    "BIS Global Reserve Framework (Basel III/IV)",
+    "ISO 20022 Financial Messaging Standard"
+  ],
+  "mitigation_strategies": {
     "capital_flow_hosting": "Tableland (On-Chain / Non-Custodial)",
     "local_egress": "Zero local PII storage in Supabase",
     "yield_classification": "Institutional Sovereign Utility (FASB-aligned)",
-    "tax_sweep_logic": "Automatic 100bps extraction via Clarity v4"
+    "tax_sweep_logic": "Automatic 100bps extraction via Clarity v4",
+    "global_standard": "ISO 20022 pacs.008 XML for Banking Egress"
+  },
+  "identifiers": {
+    "LEI": "PENDING (ERC-8004 Mapping)",
+    "DID": "did:ion:conxian-central-treasury"
   },
   "verification": {
     "attestation_type": "TEE-Hardware-Anchored",

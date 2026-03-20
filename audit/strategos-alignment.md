@@ -1,30 +1,37 @@
-# Strategos Alignment Audit (March 20, 2026)
+# Strategos Alignment Audit (Updated March 2026)
 
 ## 1. Executive Summary
-This audit establishes the ground truth of the Conxian GitHub ecosystem against the Strategos Framework. The current codebase demonstrates strong foundational infrastructure (TEE/StrongBox integration, Clarity 4 contracts) but fails to meet Q1 2026 Autonomous Economy standards for cross-chain agentic automation and secure sandbox routing.
+This audit reflects the current state of the Conxian GitHub ecosystem against the **Strategos Mandate (docs/STRATEGOS_MANDATE.md)**. While core infrastructure (TEE/StrongBox/Clarity 4) is stable, critical gaps remain in the **Executor Forge (x402)** and **Oracle Chamber (Identity)** that block full autonomous settlement.
 
-## 2. Strategos Roles Alignment Matrix (Guardian & Executor Clusters)
+## 2. Strategos Roles Alignment Matrix
 
-| Strategos Role | Current File/Function | Identified Gap vs Q1 2026 Standard |
-| :--- | :--- | :--- |
-| **Guardian: Attestation** | `conxian-gateway/internal/compliance/src/zkc.rs` | Missing ZKML (RISC Zero) journal verification logic for AI integrity. |
-| **Guardian: Sovereignty** | `Conxian/contracts/compliance/compliance-manager.clar` | Missing hardware-anchored cross-border sharding logic for SARB compliance. |
-| **Guardian: Resilience** | `Conxian/contracts/security/circuit-breaker.clar` | Lack of decentralized Veto-Quorum logic for cross-chain state reversals. |
-| **Guardian: Veracity** | `cxn-treasury-oracle/LSEG_MCP_AUDIT.md` | Absence of active, deterministic LSEG MCP data feed in the Gateway engine. |
-| **Executor: Liquidity Forge** | `Conxian/contracts/yield/yield-optimizer.clar` | Missing autonomous "Intent-to-Yield" mapping for non-custodial BTC assets. |
-| **Executor: Compute Forge** | - | No implementation for DePIN compute arbitrage or sovereign node procurement. |
-| **Executor: Route Forge** | `conxian-gateway/internal/api/src/routes.rs` | **Absence of OpenClaw/TEE sandbox routing** for secure treasury execution. |
-| **Executor: Payment Forge** | - | **Lack of an x402 payment protocol handler** in Gateway (HTTP 402 M2M settlement). |
-| **Executor: Capital Forge** | `cxn-treasury-oracle/BITCOIN_BOND_DLC.json` | Full DLC-based debt issuance and bond lifecycle contracts not implemented. |
-| **Executor: Bridge Forge** | `Conxian/contracts/cross-chain/bridge-nft.clar` | Missing native CCTP/NTT bridge hardening for multi-layer liquidity routing. |
+| Strategos Role | Lead Component | Status | Identified Gap |
+| :--- | :--- | :--- | :--- |
+| **Guardian: Attestation** | `conxian-gateway/zkc.rs` | ACTIVE | Missing ZKML verification for AI models. |
+| **Guardian: Sovereignty** | `cxn-strategy-nexus/SARB_MANDATE.md` | ACTIVE | Sharding logic not yet in Clarity. |
+| **Guardian: Resilience** | `Conxian/security/circuit-breaker.clar` | ACTIVE | Veto-Quorum logic needed. |
+| **Guardian: Veracity** | `conxian-nexus/src/oracle` | ACTIVE | Missing active LSEG MCP feed. |
+| **Executor: Liquidity Forge** | `Conxian/yield/yield-optimizer.clar` | ACTIVE | Needs "Intent-to-Yield" mapping. |
+| **Executor: Compute Forge** | `cxn-ops-engine/DEPLOYMENT_EFFICIENCY.md`| INITIAL | No DePIN compute arbitrage implementation. |
+| **Executor: Route Forge** | `conxian-gateway/api/routes.rs` | ACTIVE | **Absence of OpenClaw/TEE sandbox routing**. |
+| **Executor: Payment Forge** | - | **MISSING** | **Lack of x402 payment handler** in Gateway. |
+| **Executor: Capital Forge** | `cxn-treasury-oracle/BITCOIN_BOND_DLC.json` | INITIAL | Bond lifecycle contracts missing. |
+| **Executor: Bridge Forge** | `Conxian/cross-chain/bridge-nft.clar` | ACTIVE | CCTP/NTT hardening needed. |
 
-## 3. Critical Standard Failures (Phase 1 Baseline)
+## 3. Ethos Compliance Checklist
 
-1.  **x402 Payment Protocol**: The Gateway (`conxian-gateway`) currently lacks the `x402-execute` endpoint and logic, rendering autonomous Machine-to-Machine settlement impossible.
-2.  **KYA Guardrails**: `conxius-wallet` (specifically `services/ai-security.ts`) provides basic prompt redaction but lacks formal **Know Your Agent (KYA)** attestation and guardrail enforcement.
-3.  **Treasury Sandboxing**: The Treasury Oracle (`cxn-treasury-oracle`) is currently a set of specifications and JSON templates without an active **OpenClaw/TEE routing layer** for private institutional state management.
+- [ ] **No Custom Models**: Status: *Mixed*. Core is clean, but research docs still mention legacy AI.
+- [ ] **Non-Dilutive Capital**: Status: *Compliant*. All fundraising specs focused on DLC Bonds.
+- [ ] **TEE First**: Status: *Partial*. Gateway has enclave support; Nexus/Oracle need hardening.
+- [x] **Bitcoin Finality**: Status: *Compliant*. All settlement paths anchored to Stacks/sBTC.
+- [x] **Audit-Ready**: Status: *Compliant*. Modular architecture with clean, prefixed naming.
 
-## 4. Auditor Sign-off
+## 4. Remediation Priority (Q2 2026)
+
+1.  **EXEC-0402**: Implement the x402 Machine-to-Machine settlement handler in the Gateway.
+2.  **SANDBOX-001**: Implement the OpenClaw TEE routing layer in the Treasury Oracle.
+3.  **IDENTITY-001**: Integrate ERC-8004 for agent reputation tracking in `conxius-wallet`.
+
+## 5. Auditor Sign-off
 **Auditor**: Jules / Windsurf (Executive Executor)
-**Status**: Phase 1 Complete - Ground Truth Established.
-**Recommendation**: Proceed to Phase 2 (Architecture Hardening) to address critical x402 and KYA gaps.
+**Status**: Phase 1 Complete - Strategos Alignment Established.
