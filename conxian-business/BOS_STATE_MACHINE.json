@@ -1,0 +1,22 @@
+{
+  "$schema": "https://morganstanley.github.io/CALM/schema.json",
+  "system": "Conxian Sovereign BOS",
+  "version": "4.2.0",
+  "description": "Recursive Service Loop State Machine",
+  "states": {
+    "CLIENT_MODE": {
+      "description": "BOS consumes Gateway intelligence to optimize Finance yield rebalancing",
+      "actions": ["HIRE_INTERNAL_AGENTS", "REBALANCE_TREASURY"],
+      "transitions": ["SUPPLIER_MODE"]
+    },
+    "SUPPLIER_MODE": {
+      "description": "BOS provides Nexus governance-as-a-service to external EVM/Solana stacks",
+      "actions": ["PROVIDE_SETTLEMENT", "ENFORCE_GOVERNANCE"],
+      "transitions": ["CLIENT_MODE"]
+    }
+  },
+  "compliance_guardrails": {
+    "jurisdiction": "Sovereign-First",
+    "rule_set": "CARF/BRS v1.5"
+  }
+}
