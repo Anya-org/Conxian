@@ -13,7 +13,7 @@ The definitive technical specifications for the Conxian-Labs ecosystem are maint
 The BOS is powered by an active suite of autonomous agents:
 
 - **[Strategy Nexus](./cxn-strategy-nexus)**: M&A velocity, structural integrity, and hardware-attested ZK-Data Room proofs.
-- **[Treasury Oracle](./cxn-treasury-oracle)**: Multi-sig Bitcoin treasury, automated BTC yield, and 1% (100 bps) Sovereign Tax routing to ONLTrust via revenue-automation.clar.
+- **[Treasury Oracle](./cxn-treasury-oracle)**: Multi-sig Bitcoin treasury, automated BTC yield, and 1% (100 bps) Sovereign Tax routing to Conxian-Labs via revenue-automation.clar.
 - **[Arch Guardian](./cxn-arch-guardian)**: ATS enforcement, immutable IP registry, and CARF/BRS v1.5 regulatory enforcement.
 - **[Ops Engine](./cxn-ops-engine)**: Bitcoin-native bounties, decentralized contributor onboarding, and protocol-owned layer (POL) management.
 
