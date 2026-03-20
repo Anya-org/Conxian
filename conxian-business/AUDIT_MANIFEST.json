@@ -1,11 +1,11 @@
 {
   "org": "Conxian",
-  "timestamp": "2026-03-20T14:52:26.235530Z",
+  "timestamp": "2026-03-20T18:17:46.663940Z",
   "version": "v2.0-Audit",
   "files": [
     {
       "path": "conxian-business/SARB_COMPLIANCE_REPORT.json",
-      "sha256": "1ea90a5a687d7b5ecf96d6409c86dc0b1031520c259b7ce4080191169691d885"
+      "sha256": "b19a83c2d63585f41ee3432256cac35e37423772fe40601e9a0eacae4051a7d8"
     },
     {
       "path": "conxian-business/transparency_custodian.py",
@@ -21,7 +21,7 @@
     },
     {
       "path": "conxian-business/AUDIT_MANIFEST.json",
-      "sha256": "bd54801d0c2600db728dccb4e54ce0b7c07d6aa331a607abf544bfb444669e3b"
+      "sha256": "41d47a2091733ecf1b3a9c2706920d77310075295cc5ec67af90be2b75d68a67"
     },
     {
       "path": "cxn-arch-guardian/ANTI_FRAGILITY_LOOP.md",
@@ -41,7 +41,7 @@
     },
     {
       "path": "cxn-strategy-nexus/docs/SARB_MARCH_2026_MANDATE.md",
-      "sha256": "05427f5f29d056c1b44c667e5417235391a21ee85beaa0d9185940896c7d1f90"
+      "sha256": "cbdfe4a3e9efc75f2ba6ca536bc1d675dd6cfb4a7e6751d7602d83a0a05375d5"
     },
     {
       "path": "cxn-strategy-nexus/docs/SOVEREIGN_PITCH_DECK_NARRATIVE.md",
@@ -65,7 +65,7 @@
     },
     {
       "path": "cxn-treasury-oracle/SOVEREIGN_RUNWAY.md",
-      "sha256": "a89a9965b990a961912a2ef7d9b447f976f069304532c5b8c196c8f24aaec220"
+      "sha256": "9987145fea5383c3dcc2fc04fd53e8c2110b76be4a92e12adbdff5796c888b70"
     },
     {
       "path": "cxn-treasury-oracle/BITCOIN_BOND_DLC.json",
@@ -77,12 +77,12 @@
     },
     {
       "path": "cxn-treasury-oracle/OPENCLAW_TEE_SPEC.md",
-      "sha256": "ab341e9929f53658d84f1a18694761858464590035b2e629e971cff3bbcd4848"
+      "sha256": "94096ccc2d7bb5e4c6ba1c7f95ca729a971dfabbb9f50a23cf4b668aac107bd8"
     },
     {
       "path": "cxn-treasury-oracle/WEB5_IDENTITY_AUDIT.md",
-      "sha256": "5b12b390ffad99aa06a0634919c37c484a268fe63ad8435847fd147873ad398c"
+      "sha256": "ef6a101a4e929747f25466c333e7b6384adb9079883a14b5f28d011dbda6cd90"
     }
   ],
-  "stacks_anchor_payload": "29c69d6dcecea14f18231e933a05902cff9d7d41d819b2b3def2f944ad418d14"
+  "stacks_anchor_payload": "ac080f3232b62f1964534effc4dc19b7712d7bf3badf051b68dc17f3041c729a"
 }

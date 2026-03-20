@@ -34,7 +34,7 @@
 
 ## 📂 Archive (Legacy Docs)
 
-* [Legacy Docs Index](archive/legacy_docs/)
+* [Legacy Docs Index](archive/legacy_docs/README.md)
 * [Sovereign Simulation (9-Cycle)](archive/legacy_docs/BOS_SIMULATION_REPORT_2026_FINAL.md)
 * [CSF Protocol Standard](archive/legacy_docs/CSF_STANDARD_PROPOSAL.md)
 * [Architecture Upgrade 2026](archive/legacy_docs/ARCHITECTURE_UPGRADE_2026.md)
