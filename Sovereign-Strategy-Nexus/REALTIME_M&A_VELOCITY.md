@@ -27,4 +27,4 @@ To maintain continuous M&A readiness and track the velocity of structural enhanc
   - **Gitcoin GG25**: Q2 Bitcoin Infrastructure Track.
   - **Stacks Continuous Track**: Monitor for post-March 2026 openings.
 
-> "Operational excellence is transformed into verifiable, tax-neutral IP valuation, protecting our R200M+ exit floor." — cxn-arch-guardian
+> "Operational excellence is transformed into verifiable, tax-neutral IP valuation, protecting our R200M+ exit floor." — Nakamoto-Guardian

@@ -15,7 +15,7 @@
     "signature_type": "Schnorr (Musig2-Ready)"
   },
   "audit_trail": {
-    "issuer": "cxn-treasury-oracle",
+    "issuer": "Fiscal-Vault-Oracle",
     "governance_nexus": "conxian-nexus (BOS_STATE_MACHINE.json)",
     "audit_status": "PROPOSED_FOR_ATS_v4.8"
   }

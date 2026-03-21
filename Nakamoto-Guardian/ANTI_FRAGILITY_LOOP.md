@@ -12,7 +12,7 @@ Continuous enforcement of the Sovereign Naming Matrix and automated collision au
 
 ## 3. Audit Log
 
-- **Source**: Linear (`cxn-arch-guardian` tag)
+- **Source**: Linear (`Nakamoto-Guardian` tag)
 - **Status**: ACTIVE
 
 ## 4. Regulatory & Machine Economy (v1.7.0)

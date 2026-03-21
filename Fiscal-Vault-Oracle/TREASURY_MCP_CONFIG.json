@@ -1,6 +1,6 @@
 {
   "mcp_version": "1.0.0",
-  "client_id": "cxn-treasury-oracle-openclaw",
+  "client_id": "Fiscal-Vault-Oracle-openclaw",
   "bridges": {
     "supabase_state_bridge": {
       "url": "mcp://supabase.conxian.internal",
@@ -12,7 +12,7 @@
       ],
       "constraints": {
         "max_write_frequency": "Every 144 Stacks blocks",
-        "pii_redaction": "REQUIRED (cxn-strategy-nexus policy)"
+        "pii_redaction": "REQUIRED (Sovereign-Strategy-Nexus policy)"
       }
     },
     "context7_docs_bridge": {

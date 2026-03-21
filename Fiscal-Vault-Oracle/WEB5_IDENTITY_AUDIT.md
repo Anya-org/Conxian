@@ -3,9 +3,9 @@
 ## 1. Decentralized Identifier (DID) Architecture
 
 - **DID Method**: `did:ion` (Sidetree on Bitcoin L1).
-- **DID Identity**: The unique public key generated within the `cxn-treasury-oracle` TEE (Secure Enclave).
+- **DID Identity**: The unique public key generated within the `Fiscal-Vault-Oracle` TEE (Secure Enclave).
 - **Authentication**: All MCP requests sent by the OpenClaw engine must include a cryptographically signed `Authorization: DID-Enclave <signature>` header.
-- **Authority**: The DID is authorized via a Stacks-native `IntentMandate` signed by the `cxn-strategy-nexus` (CEO).
+- **Authority**: The DID is authorized via a Stacks-native `IntentMandate` signed by the `Sovereign-Strategy-Nexus` (CEO).
 
 ## 2. Decentralized Web Node (DWN) Audit Layer
 
@@ -14,7 +14,7 @@
   - **Decision Logs**: A complete trace of the OpenClaw agent's reasoning process for each treasury rebalance.
   - **Logic Histories**: A record of all internal state transitions within the `BOS_STATE_MACHINE.json`.
   - **Transaction Intents**: Pre-signed Bitcoin/Stacks transaction payloads before they are submitted to the `conxian-nexus`.
-- **Encryption**: All data written to the DWN is encrypted using the `cxn-arch-guardian`'s public key, ensuring only authorized auditors can view the full history.
+- **Encryption**: All data written to the DWN is encrypted using the `Nakamoto-Guardian`'s public key, ensuring only authorized auditors can view the full history.
 
 ## 3. M&A Due Diligence & Cryptographic Transparency
 

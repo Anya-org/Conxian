@@ -6,16 +6,16 @@
 
 ## 🤖 Business Operations System (BOS)
 
-* [Strategy Nexus](cxn-strategy-nexus/REALTIME_M&A_VELOCITY.md)
-  * [Sovereign MOI Alignment](cxn-strategy-nexus/docs/SOVEREIGN_MOI_ALIGNMENT.md)
-  * [ZK-Data Room Schema](cxn-strategy-nexus/docs/ZK_DATA_ROOM_SCHEMA.md)
-  * [Sovereign Pitch Deck Narrative](cxn-strategy-nexus/docs/SOVEREIGN_PITCH_DECK_NARRATIVE.md)
+* [Strategy Nexus](Sovereign-Strategy-Nexus/REALTIME_M&A_VELOCITY.md)
+  * [Sovereign MOI Alignment](Sovereign-Strategy-Nexus/docs/SOVEREIGN_MOI_ALIGNMENT.md)
+  * [ZK-Data Room Schema](Sovereign-Strategy-Nexus/docs/ZK_DATA_ROOM_SCHEMA.md)
+  * [Sovereign Pitch Deck Narrative](Sovereign-Strategy-Nexus/docs/SOVEREIGN_PITCH_DECK_NARRATIVE.md)
   * [LSEG MCP Audit](Fiscal-Vault-Oracle/LSEG_MCP_AUDIT.md)
 * [Treasury Oracle](Fiscal-Vault-Oracle/SOVEREIGN_RUNWAY.md)
 * [Arch Guardian](Nakamoto-Guardian/ANTI_FRAGILITY_LOOP.md)
 * [Grid Oracle (Agnostic)](cxn-grid-oracle/README.md)
-* [Ops Engine](cxn-ops-engine/DEPLOYMENT_EFFICIENCY.md)
-  * [Linear Integration Wiring](cxn-ops-engine/LINEAR_WIRING.md)
+* [Ops Engine](Sovereign-Ops-Orchestrator/DEPLOYMENT_EFFICIENCY.md)
+  * [Linear Integration Wiring](Sovereign-Ops-Orchestrator/LINEAR_WIRING.md)
 
 ## 🏛️ Ground Truth (OpenSpec)
 

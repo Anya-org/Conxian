@@ -11,7 +11,7 @@ Conxian operates as a unified suite of four specialized business units, each sol
 
 ### 1. Conxius (The Consumer Interface)
 *   **Subrepo**: `conxius-wallet`
-*   **Strategos Role**: `cxn-strategy-nexus` (CEO)
+*   **Strategos Role**: `Sovereign-Strategy-Nexus` (CEO)
 *   **Viewpoint**: "Sovereignty in your pocket." To provide a retail/mobile experience that matches TradFi convenience without ever touching the user's private keys.
 *   **Solutions**:
     *   **Satoshi AI Privacy Scout**: A proactive on-device assistant that suggests UTXO consolidation and privacy improvements to optimize fees and sovereignty scores.
@@ -20,7 +20,7 @@ Conxian operates as a unified suite of four specialized business units, each sol
 
 ### 2. Conxian CSF (The Financial Protocol)
 *   **Subrepo**: `Conxian/contracts`, `lib-conxian-core`
-*   **Strategos Role**: `cxn-treasury-oracle` (Fiscal-Intelligence-Unit)
+*   **Strategos Role**: `Fiscal-Vault-Oracle` (Fiscal-Intelligence-Unit)
 *   **Viewpoint**: "Non-dilutive institutional liquidity." To replace equity-heavy VC models with a self-sustaining yield and debt engine anchored to Bitcoin finality.
 *   **Solutions**:
     *   **BME Engine (Burn-Mint Equilibrium)**: A 144-block epoch-based tokenomics engine ensuring stable, deterministic emissions and protocol-wide sustainability.
@@ -29,7 +29,7 @@ Conxian operates as a unified suite of four specialized business units, each sol
 
 ### 3. Conxian Fusion (The B2B Gateway)
 *   **Subrepo**: `conxian-gateway`, `lib-conclave-sdk`
-*   **Strategos Role**: `cxn-arch-guardian` (CTO)
+*   **Strategos Role**: `Nakamoto-Guardian` (CTO)
 *   **Viewpoint**: "Stateless institutional rails." To allow banks and SMEs to interact with Bitcoin DeFi without the regulatory burden of custodial liability.
 *   **Solutions**:
     *   **Zero-Knowledge Compliance (ZKC)**: A stateless API module that verifies device-attested signatures (ECDSA/Schnorr) without storing PII or private keys.
@@ -38,7 +38,7 @@ Conxian operates as a unified suite of four specialized business units, each sol
 
 ### 4. Conxian Nexus (The State Layer)
 *   **Subrepo**: `conxian-nexus`
-*   **Strategos Role**: `cxn-ops-engine` (COO)
+*   **Strategos Role**: `Sovereign-Ops-Orchestrator` (COO)
 *   **Viewpoint**: "Glass Node transparency." To provide a verifiable, high-availability state root for all cross-chain and protocol actions.
 *   **Solutions**:
     *   **MMR State Root**: Merkle Mountain Range (MMR) implementation for lightweight, verifiable transaction history and reorg detection.

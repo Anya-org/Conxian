@@ -2,7 +2,7 @@
 
 ## 1. Objective
 
-Map the OpenClaw autonomous engine within the `cxn-treasury-oracle` to the state transitions of the Business Operations System (BOS).
+Map the OpenClaw autonomous engine within the `Fiscal-Vault-Oracle` to the state transitions of the Business Operations System (BOS).
 
 ## 2. State-Action Mapping (BOS_STATE_MACHINE.json)
 
@@ -17,13 +17,13 @@ Map the OpenClaw autonomous engine within the `cxn-treasury-oracle` to the state
 
 - **Internal Triggers**: OpenClaw continuously monitors the `runway_metrics` table via the Supabase MCP bridge.
 - **External Triggers**: `conxian-nexus` sends a `NEW_BITCOIN_BLOCK` event through the MCP Unix Domain Socket.
-- **Authority Triggers**: `cxn-strategy-nexus` issues a signed `IntentMandate` to override rebalancing logic for M&A events.
+- **Authority Triggers**: `Sovereign-Strategy-Nexus` issues a signed `IntentMandate` to override rebalancing logic for M&A events.
 
 ## 4. Guardrails & 144-Block Time-Lock
 
 - **Pre-Execution Check**: OpenClaw must verify the `LSEG_MCP_AUDIT.md` constraint: (Nexus pricing within 50bps of LSEG institutional data).
 - **Time-Lock**: Every state change to the `DEBT_ISSUANCE` state requires a 144-block Bitcoin finality confirmation before it is marked as `COMMITTED` in the `BOS_STATE_MACHINE.json`.
-- **Failure Protocol**: If the 50bps threshold is breached, OpenClaw reverts to `SHARDED_EXECUTION` mode and alerts the `cxn-arch-guardian`.
+- **Failure Protocol**: If the 50bps threshold is breached, OpenClaw reverts to `SHARDED_EXECUTION` mode and alerts the `Nakamoto-Guardian`.
 
 ## 5. Audit Trace
 

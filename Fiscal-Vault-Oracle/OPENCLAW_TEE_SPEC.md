@@ -2,7 +2,7 @@
 
 ## 1. Objective
 
-Architect a secure, hardware-isolated execution environment for the OpenClaw autonomous engine within the `cxn-treasury-oracle`.
+Architect a secure, hardware-isolated execution environment for the OpenClaw autonomous engine within the `Fiscal-Vault-Oracle`.
 
 ## 2. Trusted Execution Environment (TEE) Deployment
 

@@ -5,7 +5,7 @@ In accordance with the South African Companies Act (Section 76) and the fiduciar
 
 ## 2. The 144-Block Rule
 - **Directive**: No critical state change or financial commitment can be finalized without a mandatory 144-block time-lock (approx. 24 hours on Bitcoin-native layers).
-- **Enforcement**: Programmatically enforced by the `cxn-treasury-oracle` and verified via the `conxian-nexus` Glass Node.
+- **Enforcement**: Programmatically enforced by the `Fiscal-Vault-Oracle` and verified via the `conxian-nexus` Glass Node.
 - **Legal Weight**: This rule serves as a binding corporate governance standard, mitigating "key-man" dependency and ensuring diligence.
 
 ## 3. Director Fiduciary Duty (AI Literacy)

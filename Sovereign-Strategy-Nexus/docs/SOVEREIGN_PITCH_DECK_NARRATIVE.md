@@ -6,7 +6,7 @@
 ## 2. The Narrative Pillars
 - **Zero Dilution**: Reaching R2B+ valuation using POL and Yield, not VC equity.
 - **Hardware Sovereignty**: TEE/StrongBox floor means the keys never leave the enclave.
-- **Machine Governance**: The Strategy Nexus manages the `cxn-strategy-nexus`, not just humans. The business logic is encoded in Clarity.
+- **Machine Governance**: The Strategy Nexus manages the `Sovereign-Strategy-Nexus`, not just humans. The business logic is encoded in Clarity.
 - **Universal Integration**: Bridging legacy ERP (SAP/Oracle) to Bitcoin-native state.
 
 ## 3. The Visual "Point to the Code" Strategy
