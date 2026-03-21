@@ -24,6 +24,7 @@ These secrets must be set up in the GitHub Settings for the `conxian-business` r
 For local development, different repositories require specific `.env` variables. **Never commit `.env` files.**
 
 ### 1. Smart Contracts & Deployment (`Conxian` & `stacksorbit`)
+
 These repositories interact with the Stacks blockchain.
 
 - `NETWORK`: (e.g., `testnet` or `mainnet`)
@@ -35,6 +36,7 @@ These repositories interact with the Stacks blockchain.
 - `CORE_API_URL` / `STACKS_API_BASE`: Node RPC URL (e.g., `https://api.testnet.hiro.so`)
 
 ### 2. Backend & Gateway (`conxius-platform` & `conxian-nexus`)
+
 These repositories run the core backend logic, rust engine, and API gateway.
 
 - `DATABASE_URL` / `CORE_DB_URI`: PostgreSQL connection string
@@ -59,4 +61,3 @@ The following keys were safely extracted from the local `.env` before being remo
 - `SYSTEM_ADDRESS`: `ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
 - `NETWORK`: `testnet`
 - `CORE_API_URL`: `https://api.testnet.hiro.so`
-
