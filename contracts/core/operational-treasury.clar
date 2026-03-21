@@ -15,7 +15,7 @@
 (define-private (is-authorized)
   (or
     (is-eq tx-sender (var-get contract-owner))
-    (is-eq tx-sender .agent-treasury) ;; The Autonomous CFO
+    (is-eq tx-sender .fiscal-orchestrator) ;; The Autonomous Sovereign-Financial-Office
     (is-eq tx-sender .ops-engine) ;; The Executive
   )
 )

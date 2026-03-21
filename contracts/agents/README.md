@@ -46,7 +46,7 @@ Core engines can query the risk agent before allowing high-leverage operations:
 ### Executing Fiscal Policy
 The `ops-engine` heartbeat triggers the fiscal dam:
 ```clarity
-(contract-call? .agent-treasury apply-fiscal-dam)
+(contract-call? .fiscal-orchestrator apply-fiscal-dam)
 ```
 
 ## Testing (How-to)

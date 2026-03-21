@@ -11,6 +11,7 @@
 (define-data-var last-action-block uint u0)
 (define-data-var admin principal tx-sender)
 (define-data-var emergency-paused bool false)
+(define-data-var cloud-rebalance-signal uint u0)
 
 ;; @desc Full system heartbeat
 (define-public (trigger-epoch-update)
@@ -35,6 +36,18 @@
     (var-set emergency-paused true)
     (var-set last-action-block burn-block-height)
     (print { event: "emergency-pause-triggered", caller: tx-sender, block: burn-block-height })
+    (ok true)
+  )
+)
+
+;; @desc Trigger Cloud Infrastructure Rebalance
+;; Signals the bos-orchestrator to adjust GCP resources (WIF-enabled)
+(define-public (trigger-cloud-rebalance (new-capacity uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (var-set cloud-rebalance-signal new-capacity)
+    (var-set last-action-block burn-block-height)
+    (print { event: "cloud-rebalance-triggered", capacity: new-capacity, block: burn-block-height })
     (ok true)
   )
 )

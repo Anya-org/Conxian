@@ -5,7 +5,7 @@
 ;; Manages the lifecycle of trading positions
 ;; Core Backend Contract - Accessed via Dimensional Engine Facade
 
-(impl-trait .core-traits.position-manager-trait)
+(impl-trait .core-traits.position-orchestrator-trait)
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 (define-constant ERR_NOT_AUTHORIZED u1000)
@@ -107,12 +107,25 @@
 )
 
 
-;; @desc Force close position
+;; @desc Force close position (internal use)
 ;; @returns (response bool uint)
 (define-public (force-close-position (position-id uint))
   (begin
     (asserts! (is-engine) (err ERR_NOT_AUTHORIZED))
     (let ((pos (unwrap! (map-get? positions position-id) (err ERR_POSITION_NOT_FOUND))))
+      (map-set positions position-id (merge pos { open: false }))
+      (ok true)
+    )
+  )
+)
+
+;; @desc Liquidate position (trait alignment)
+;; @returns (response bool uint)
+(define-public (liquidate-position (user principal) (position-id uint))
+  (begin
+    (asserts! (is-engine) (err ERR_NOT_AUTHORIZED))
+    (let ((pos (unwrap! (map-get? positions position-id) (err ERR_POSITION_NOT_FOUND))))
+      (asserts! (is-eq (get owner pos) user) (err ERR_NOT_AUTHORIZED))
       (map-set positions position-id (merge pos { open: false }))
       (ok true)
     )

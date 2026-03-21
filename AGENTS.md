@@ -20,7 +20,7 @@
 ## 4. Troubleshooting
 - **Circular Dependencies**: If tests fail with `CircularReference`, verify that all contracts use the "Principal Injection" pattern via public setters.
 - Ensure `.ops-engine` is an authorized minter in `cxd-token.clar` for keeper rewards.
-- Verify `.risk-manager` is authorized to call `liquidate-position` in `dimensional-core.clar`.
+- Verify `.risk-unit` is authorized to call `liquidate-position` in `dimensional-core.clar`.
 
 ## 5. Testing Protocols
 - **Root-to-Leaf**: Always verify system integration starting from the `ops-engine` heartbeat.

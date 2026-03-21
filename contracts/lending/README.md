@@ -26,12 +26,12 @@ The primary engine for money market operations.
 
 ### Depositing Assets
 ```clarity
-(contract-call? .lending-manager deposit .cxd-token u1000000)
+(contract-call? .lending-orchestrator deposit .cxd-token u1000000)
 ```
 
 ### Borrowing against Collateral
 ```clarity
-(contract-call? .lending-manager borrow .cxd-token u500000)
+(contract-call? .lending-orchestrator borrow .cxd-token u500000)
 ```
 
 ## Testing (How-to)
