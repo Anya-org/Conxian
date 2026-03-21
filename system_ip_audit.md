@@ -13,14 +13,14 @@ To maintain 100% IP sovereignty and eliminate legacy nomenclature that creates M
 ## 3. Conxian Remapping Matrix
 | Legacy Name | New BOS Unit | Logic Alignment |
 | :--- | :--- | :--- |
-| **cxn-arch-guardian** | **cxn-arch-guardian** | Hard-sec, TEE enforcement, and IP sovereignty audits. |
-| **cxn-strategy-nexus / Intel** | **cxn-strategy-nexus** | M&A velocity, market cap engineering, and ZK-Data Room prep. |
-| **cxn-treasury-oracle / Oracle** | **cxn-treasury-oracle** | Real-time runway, yield tracking, and bond financing. |
-| **cxn-ops-engine** | **cxn-ops-engine** | Linear cycle times and programmatic execution efficiency. |
+| **Nakamoto-Guardian** | **Nakamoto-Guardian** | Hard-sec, TEE enforcement, and IP sovereignty audits. |
+| **Sovereign-Strategy-Nexus / Intel** | **Sovereign-Strategy-Nexus** | M&A velocity, market cap engineering, and ZK-Data Room prep. |
+| **Fiscal-Vault-Oracle / Oracle** | **Fiscal-Vault-Oracle** | Real-time runway, yield tracking, and bond financing. |
+| **Sovereign-Ops-Orchestrator** | **Sovereign-Ops-Orchestrator** | Linear cycle times and programmatic execution efficiency. |
 
 ## 4. Enforcement Logic
 1. **Full Name Primacy**: Use "Conxian" for the protocol and "Conxius" for the access layer.
-2. **Agent Standardization**: All internal executive modules must use the `cxn-` prefix (e.g., `cxn-strategy-nexus`).
+2. **Agent Standardization**: All internal executive modules must use the `cxn-` prefix (e.g., `Sovereign-Strategy-Nexus`).
 3. **Legacy Purge**:
    - Search for "Conxian" and replace with "cxn-" or "Conxian".
    - Search for "Conxian" and replace according to the **Remapping Matrix**.
@@ -30,4 +30,4 @@ To maintain 100% IP sovereignty and eliminate legacy nomenclature that creates M
 ## 5. Initialization
 - Date: March 2026
 - Status: ACTIVE
-- Authority: Strategy Nexus (cxn-strategy-nexus)
+- Authority: Strategy Nexus (Sovereign-Strategy-Nexus)

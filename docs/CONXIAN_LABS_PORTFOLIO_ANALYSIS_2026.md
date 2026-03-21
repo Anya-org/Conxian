@@ -20,7 +20,7 @@ Conxian operates as a unified suite of four specialized business units, each sol
 
 ### 2. Conxian CSF (The Financial Protocol)
 *   **Subrepo**: `Conxian/contracts`, `lib-conxian-core`
-*   **Strategos Role**: `cxn-treasury-oracle` (CFO)
+*   **Strategos Role**: `cxn-treasury-oracle` (Fiscal-Intelligence-Unit)
 *   **Viewpoint**: "Non-dilutive institutional liquidity." To replace equity-heavy VC models with a self-sustaining yield and debt engine anchored to Bitcoin finality.
 *   **Solutions**:
     *   **BME Engine (Burn-Mint Equilibrium)**: A 144-block epoch-based tokenomics engine ensuring stable, deterministic emissions and protocol-wide sustainability.

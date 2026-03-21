@@ -2,11 +2,11 @@
 
 ## 1. Design & UX Standards Audit
 
-### 1.1 "Earthy Corporate Finance" Theme
+### 1.1 "Sovereign Nakamoto v4.0" Theme
 - **Primary Color (#2E403B)**: Verified in \`conxian-ui\` (CSS variables and SVG assets).
 - **Accent Color (#D4A017)**: Verified in \`conxian-ui\` (CSS variables and SVG assets).
 - **Wallet UI Regression**: \`conxius-wallet\` currently uses a legacy "Bitcoin Orange" palette (\`#f7931a\`) and dark theme.
-- **Action**: Align \`conxius-wallet/index.css\` with the Tier0 light theme and Forest Green/Gold palette defined in the root strategy.
+- **Action**: Align \`conxius-wallet/index.css\` with the Sovereign Dark Theme and Deep Slate (#0F172A) and Cyber Cyan (#22D3EE)palette defined in the root strategy.
 
 ### 1.2 "Glass Node" Telemetry
 - **Prometheus (9090)**: Configured in \`conxius-platform/prometheus.yml\`.
@@ -34,4 +34,4 @@
 - **Brand Assets**: Core SVG marks (Mark-A, Mark-B) are stored in \`conxian-ui/public\` and reflect the finalized branding.
 
 ## 4. Final Verification
-The Conxian ecosystem assets are **90% ALIGNED**. The primary remaining task is the visual synchronization of the \`conxius-wallet\` theme to match the unified "Earthy Corporate Finance" identity used by the rest of the ecosystem.
+The Conxian ecosystem assets are **90% ALIGNED**. The primary remaining task is the visual synchronization of the \`conxius-wallet\` theme to match the unified "Sovereign Nakamoto v4.0" identity used by the rest of the ecosystem.

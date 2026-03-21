@@ -1,6 +1,6 @@
 # Nomenclature Alignment Audit (Corporate vs. Product)
 
-**Directive:** cxn-arch-guardian
+**Directive:** Nakamoto-Guardian
 **Status:** EXECUTED
 
 This audit confirms the strict separation between the Corporate Entity (**Conxian Labs**) and the Product Ecosystem (**Conxian, Nexus, Conxius, Gateway**).

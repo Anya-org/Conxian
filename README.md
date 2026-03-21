@@ -12,10 +12,10 @@ The definitive technical specifications for the Conxian ecosystem are maintained
 ## 🤖 Agentic EXCO Suite
 The BOS is powered by an active suite of autonomous agents:
 
-- **[Strategy Nexus](./cxn-strategy-nexus)**: M&A velocity, structural integrity, and hardware-attested ZK-Data Room proofs.
-- **[Treasury Oracle](./cxn-treasury-oracle)**: Multi-sig Bitcoin treasury, automated BTC yield, and 1% (100 bps) Sovereign Tax routing to Conxian via revenue-automation.clar.
-- **[Arch Guardian](./cxn-arch-guardian)**: ATS enforcement, immutable IP registry, and CARF/BRS v1.5 regulatory enforcement.
-- **[Ops Engine](./cxn-ops-engine)**: Bitcoin-native bounties, decentralized contributor onboarding, and protocol-owned layer (POL) management.
+- **[Sovereign Strategy Nexus](./Sovereign-Strategy-Nexus)**: M&A velocity, structural integrity, and hardware-attested ZK-Data Room proofs.
+- **[Fiscal Vault Oracle](./Fiscal-Vault-Oracle)**: Multi-sig Bitcoin treasury, automated BTC yield, and 1% (100 bps) Sovereign Tax routing to Conxian via revenue-automation.clar.
+- **[Nakamoto Guardian](./Nakamoto-Guardian)**: ATS enforcement, immutable IP registry, and CARF/BRS v1.5 regulatory enforcement.
+- **[Sovereign Ops Orchestrator](./Sovereign-Ops-Orchestrator)**: Bitcoin-native bounties, decentralized contributor onboarding, and protocol-owned layer (POL) management.
 
 ## 🏛️ Protocol Owned Layers (POL)
 - **Settlement**: Anchored to Bitcoin L1 via OpenTimestamps and Stacks Nakamoto.

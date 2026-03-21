@@ -10,7 +10,7 @@ To execute a tax-neutral transfer of Intellectual Property (IP) from the foundat
 ## 2. Asset Description: The "Digital Citadel" IP
 The "Asset" comprises:
 - **Protocol Owned Layers (POL)**: Clarity 4.0 smart contracts and Nakamoto settlement logic.
-- **Agentic EXCO Suite**: `cxn-strategy-nexus`, `cxn-treasury-oracle`, `cxn-arch-guardian`, and `cxn-ops-engine`.
+- **Agentic EXCO Suite**: `Sovereign-Strategy-Nexus`, `Fiscal-Vault-Oracle`, `Nakamoto-Guardian`, and `Sovereign-Ops-Orchestrator`.
 - **Access Layer**: Conxius Wallet (Android Native) with StrongBox/TEE.
 
 ## 3. Valuation & Consideration
@@ -28,4 +28,4 @@ To maintain Level 1 B-BBEE status (100% black ownership), the following constrai
 - **Revenue Integrity**: Hardcoded 0.1% Founder's Cut and 1% Software Licensing Royalty (routed to ONLTrust IP Vault).
 
 ---
-🛡️ **Strategic Capital Oracle**. Verified by cxn-arch-guardian.
+🛡️ **Strategic Capital Oracle**. Verified by Nakamoto-Guardian.

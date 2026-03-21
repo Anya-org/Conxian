@@ -24,63 +24,63 @@
       "sha256": "cd06f48ad849a44d05485d424cff6d3c794007ef24e65ecc77687681b6b1648f"
     },
     {
-      "path": "cxn-arch-guardian/ANTI_FRAGILITY_LOOP.md",
+      "path": "Nakamoto-Guardian/ANTI_FRAGILITY_LOOP.md",
       "sha256": "89742f5a78b007e17fbd6a646c3c878f0832386de00f88ab727dd7467e3de331"
     },
     {
-      "path": "cxn-ops-engine/DEPLOYMENT_EFFICIENCY.md",
+      "path": "Sovereign-Ops-Orchestrator/DEPLOYMENT_EFFICIENCY.md",
       "sha256": "8e1cfea54bbef9a325f5897147f2103550004fce0e076c7750412c40719de8c5"
     },
     {
-      "path": "cxn-ops-engine/LINEAR_WIRING.md",
+      "path": "Sovereign-Ops-Orchestrator/LINEAR_WIRING.md",
       "sha256": "6c265d0cb685e433792d0a26c240aeee33e12edcb05177bffcdb2f2a5da3abc1"
     },
     {
-      "path": "cxn-strategy-nexus/REALTIME_M&A_VELOCITY.md",
+      "path": "Sovereign-Strategy-Nexus/REALTIME_M&A_VELOCITY.md",
       "sha256": "c6d559a048cf6ffe524f569755f61ed192dc1a39f92ed7c5f3d855782340dc29"
     },
     {
-      "path": "cxn-strategy-nexus/docs/SARB_MARCH_2026_MANDATE.md",
+      "path": "Sovereign-Strategy-Nexus/docs/SARB_MARCH_2026_MANDATE.md",
       "sha256": "cbdfe4a3e9efc75f2ba6ca536bc1d675dd6cfb4a7e6751d7602d83a0a05375d5"
     },
     {
-      "path": "cxn-strategy-nexus/docs/SOVEREIGN_PITCH_DECK_NARRATIVE.md",
+      "path": "Sovereign-Strategy-Nexus/docs/SOVEREIGN_PITCH_DECK_NARRATIVE.md",
       "sha256": "59b2130eec5d5a29ea33c3972ca65f16be3d4e484d22d3db02a5c763a621a650"
     },
     {
-      "path": "cxn-strategy-nexus/docs/ZK_DATA_ROOM_SCHEMA.md",
+      "path": "Sovereign-Strategy-Nexus/docs/ZK_DATA_ROOM_SCHEMA.md",
       "sha256": "8d0948bc73f4a2cde332a85301e2c14585c5b5b35b892ba1752b2110d295ea05"
     },
     {
-      "path": "cxn-strategy-nexus/docs/SOVEREIGN_MOI_ALIGNMENT.md",
+      "path": "Sovereign-Strategy-Nexus/docs/SOVEREIGN_MOI_ALIGNMENT.md",
       "sha256": "a2a1b64c0663341e5b918ee9cc0ca0b230e8b0bfa1acdec1440ab10cba599009"
     },
     {
-      "path": "cxn-treasury-oracle/TREASURY_MCP_CONFIG.json",
+      "path": "Fiscal-Vault-Oracle/TREASURY_MCP_CONFIG.json",
       "sha256": "e7a07c5020a8348d52ca3c0751ef39057b2c6ca88396b4990bbcf40fafe89375"
     },
     {
-      "path": "cxn-treasury-oracle/LSEG_MCP_AUDIT.md",
+      "path": "Fiscal-Vault-Oracle/LSEG_MCP_AUDIT.md",
       "sha256": "23c71899ce4fc98c85cdc25efa08e57464bb93575716d17f885c008c860e3e79"
     },
     {
-      "path": "cxn-treasury-oracle/SOVEREIGN_RUNWAY.md",
+      "path": "Fiscal-Vault-Oracle/SOVEREIGN_RUNWAY.md",
       "sha256": "9987145fea5383c3dcc2fc04fd53e8c2110b76be4a92e12adbdff5796c888b70"
     },
     {
-      "path": "cxn-treasury-oracle/BITCOIN_BOND_DLC.json",
+      "path": "Fiscal-Vault-Oracle/BITCOIN_BOND_DLC.json",
       "sha256": "14c95765d542a37849b8f1b1488b6ecabedc815dda77de63dc802a57c1750ee1"
     },
     {
-      "path": "cxn-treasury-oracle/BOS_INTEGRATION_MAP.md",
+      "path": "Fiscal-Vault-Oracle/BOS_INTEGRATION_MAP.md",
       "sha256": "2d4be1f65c9dab22faa7d9c0c32eafe4e4c1774963fe8c624195a127b6b561bc"
     },
     {
-      "path": "cxn-treasury-oracle/OPENCLAW_TEE_SPEC.md",
+      "path": "Fiscal-Vault-Oracle/OPENCLAW_TEE_SPEC.md",
       "sha256": "94096ccc2d7bb5e4c6ba1c7f95ca729a971dfabbb9f50a23cf4b668aac107bd8"
     },
     {
-      "path": "cxn-treasury-oracle/WEB5_IDENTITY_AUDIT.md",
+      "path": "Fiscal-Vault-Oracle/WEB5_IDENTITY_AUDIT.md",
       "sha256": "ef6a101a4e929747f25466c333e7b6384adb9079883a14b5f28d011dbda6cd90"
     }
   ],
