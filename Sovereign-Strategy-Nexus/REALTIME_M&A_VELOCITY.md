@@ -1,9 +1,11 @@
 # Strategy Nexus: Real-Time M&A Velocity Tracking (v1.7.0)
 
 ## 1. Objective
+
 To maintain continuous M&A readiness and track the velocity of structural enhancements against the R200M - R2B+ terminal exit vector.
 
 ## 2. Velocity Metrics
+
 - **Structural Integrity**: Measurement of ATS alignment across all business units (Target: 98%).
 - **IP Sovereignty Score**: Automated audit results from `system_ip_audit.md`.
 - **Exit Velocity**: Time to generate hardware-attested ZK-Data Room proofs.
@@ -22,7 +24,7 @@ To maintain continuous M&A readiness and track the velocity of structural enhanc
 - **Section 42 Swap**: Draft Asset-for-Share agreement at R880,000 cost-basis.
 - **Regulatory Deadline**: SARS CARF/BRS v1.5 compliance reports required by **May 2027**.
 - **Grant Monitoring**:
-    - **Gitcoin GG25**: Q2 Bitcoin Infrastructure Track.
-    - **Stacks Continuous Track**: Monitor for post-March 2026 openings.
+  - **Gitcoin GG25**: Q2 Bitcoin Infrastructure Track.
+  - **Stacks Continuous Track**: Monitor for post-March 2026 openings.
 
 > "Operational excellence is transformed into verifiable, tax-neutral IP valuation, protecting our R200M+ exit floor." — cxn-arch-guardian
