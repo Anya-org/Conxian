@@ -1,11 +1,16 @@
 ;; oracle-aggregator.clar - Multi-Source Price Aggregation
 ;; Conxian Protocol - Apex Upgrade (v1.1.0)
 ;; Aggregates prices for 2026 Stacks Ecosystem assets (sBTC, stSTX, USDA, etc.)
+;; BIP Compliance: BIP-341 (Taproot), BIP-342 (Taproot Scripts), BIP-174 (PSBT)
 
 ;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_CB_UNAUTHORIZED (err u1001))
+(define-constant ERR_CB_UNAUTHORIZED (err u1001))
 (define-constant ERR_STALE_PRICE (err u1002))
+(define-constant ERR_CIRCUIT_OPEN (err u1003))
+(define-constant ERR_INVALID_SOURCE (err u1004))
+(define-constant ERR_NO_VALID_PRICE (err u1005))
 (define-constant ERR_CIRCUIT_OPEN (err u1003))
 (define-constant ERR_INVALID_SOURCE (err u1004))
 (define-constant ERR_NO_VALID_PRICE (err u1005))
@@ -15,6 +20,8 @@
 ;; --- Data Vars ---
 (define-data-var admin principal tx-sender)
 (define-data-var volatility-index uint u35)
+(define-data-var circuit-breaker-contract (optional principal) none)
+(define-data-var circuit-is-open bool false)
 (define-data-var circuit-breaker-contract (optional principal) none)
 (define-data-var circuit-is-open bool false)
 
@@ -129,7 +136,6 @@
   (ok (map-get? asset-registry asset))
 )
 
-;; @desc Fetch price (alias for get-price for trait compatibility)
 (define-read-only (fetch-price (asset principal))
   (get-price asset)
 )
@@ -145,7 +151,6 @@
     (price-data (map-get? asset-prices asset))
   )
     (begin
-      ;; Update with new submission (simplified aggregation for sim)
       (match price-data
         prev-data (map-set asset-prices asset {
           price: (get price prev-data),

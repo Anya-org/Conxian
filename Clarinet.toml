@@ -119,6 +119,13 @@ depends_on = ["sip-standards"]
 [contracts.dimensional-engine]
 path = "contracts/core/dimensional-engine.clar"
 depends_on = ["conxian-protocol", "conxian-access", "core-traits", "sip-standards"]
+[contracts.lending-manager]
+path = "contracts/lending/lending-manager.clar"
+depends_on = ["conxian-protocol", "economic-policy-engine", "risk-manager", "bme-engine", "sip-standards"]
+
+[contracts.dimensional-engine]
+path = "contracts/core/dimensional-engine.clar"
+depends_on = ["conxian-protocol", "conxian-access", "core-traits", "sip-standards"]
 
 [contracts.dimensional-core]
 path = "contracts/dimensional/dimensional-core.clar"
@@ -286,12 +293,11 @@ depends_on = ["sip-standards"]
 path = "contracts/math/concentrated-math.clar"
 clarity-version = 4
 
-[contracts.office-orchestrator]
-path = "contracts/core/office-orchestrator.clar"
+[contracts.office-manager]
+path = "contracts/core/office-manager.clar"
 
-[contracts.symmetry-governor]
-path = "contracts/governance/symmetry-governor.clar"
-depends_on = ["governance-traits"]
+[contracts.upgrade-controller]
+path = "contracts/governance/upgrade-controller.clar"
 
 [contracts.voting]
 path = "contracts/governance/voting.clar"
@@ -312,38 +318,13 @@ depends_on = ["governance-traits", "conxian-access"]
 path = "contracts/governance/governance-handover.clar"
 depends_on = ["timelock"]
 
+[contracts.alex-adapter]
+path = "contracts/integrations/alex-adapter.clar"
+depends_on = ["conxian-csf-trait", "sip-standards", "conxian-protocol"]
+
+[contracts.federated-oracle-adapter]
+path = "contracts/oracle/federated-oracle-adapter.clar"
+depends_on = ["defi-traits"]
+
 [contracts.signed-data-base]
 path = "contracts/governance/signed-data-base.clar"
-
-[contracts.pyth-traits]
-path = "contracts/traits/pyth-traits.clar"
-
-[contracts.redstone-traits]
-path = "contracts/traits/redstone-traits.clar"
-
-[contracts.pyth-oracle-v4]
-path = "contracts/oracle/pyth-oracle-v4.clar"
-depends_on = ["pyth-traits"]
-
-[contracts.pyth-oracle-adapter]
-path = "contracts/oracle/pyth-oracle-adapter.clar"
-depends_on = ["pyth-oracle-v4", "oracle-aggregator"]
-
-[contracts.swap-aggregator]
-path = "contracts/dex/swap-aggregator.clar"
-depends_on = ["conxian-csf-trait", "sip-standards"]
-
-[contracts.bns-stub]
-path = "contracts/governance/bns-stub.clar"
-
-[contracts.reputation-engine]
-path = "contracts/governance/reputation-engine.clar"
-depends_on = ["bns-stub"]
-
-[contracts.fiscal-intelligence]
-path = "contracts/agents/fiscal-intelligence.clar"
-depends_on = ["sip-standards", "yield-optimizer"]
-
-[contracts.payment-forge]
-path = "contracts/agents/payment-forge.clar"
-depends_on = ["conxian-csf-trait", "sip-standards", "fiscal-intelligence"]

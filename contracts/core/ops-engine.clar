@@ -9,11 +9,13 @@
 (define-data-var last-fast-check uint u0)
 (define-data-var last-slow-check uint u0)
 (define-data-var last-action-block uint u0)
+(define-data-var last-action-block uint u0)
 (define-data-var admin principal tx-sender)
 (define-data-var emergency-paused bool false)
 (define-data-var cloud-rebalance-signal uint u0)
 
 ;; @desc Full system heartbeat
+(define-public (trigger-epoch-update)
 (define-public (trigger-epoch-update)
   (let (
     (current-time burn-block-height)
@@ -24,6 +26,7 @@
         res (var-set last-fast-check current-time)
         err-val false
       )
+      (var-set last-action-block current-time)
       (var-set last-action-block current-time)
       (ok true)
     )
@@ -69,6 +72,16 @@
 ;; @desc Returns the protocol status monitored by the ops engine.
 (define-read-only (get-protocol-status)
   (ok { compliant: true, version: "v1.1.0-Apex", timestamp: burn-block-height })
+)
+
+;; @desc Returns engine operational status
+(define-read-only (get-engine-status)
+  (ok {
+    last-fast-check: (var-get last-fast-check),
+    last-slow-check: (var-get last-slow-check),
+    last-action: (var-get last-action-block),
+    emergency-paused: (var-get emergency-paused)
+  })
 )
 
 ;; @desc Returns engine operational status

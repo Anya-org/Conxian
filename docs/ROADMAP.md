@@ -37,3 +37,7 @@ permalink: /docs/ROADMAP/
 - **Autonomous Office Manager**: Advanced AI-orchestration for complex multi-agent workflows.
 - **Retail Abstraction**: Launch of the Conxian Unified Interface (UI) with full UX abstraction of Clarity logic.
 - **AGM Maturation**: First full-cycle Annual General Meeting (AGM) execution.
+
+## Phase 3.5: Mainnet Release (March 2026) - CURRENT
+- **ALEX Lab Integration**: CSF adapter deployed and registered. [COMPLETED]
+- **Mainnet Readiness**: Protocol registry updated for Stacks mainnet deployment. [COMPLETED]

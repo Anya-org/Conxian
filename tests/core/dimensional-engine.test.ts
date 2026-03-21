@@ -23,20 +23,31 @@ describe("dimensional-engine-optimization", () => {
   it("ensures open-position fails when the protocol is paused", () => {
     // Pause the protocol first
     const pauseResult = simnet.callPublicFn(
+    // Pause the protocol first
+    const pauseResult = simnet.callPublicFn(
       "conxian-protocol",
       "set-paused",
       [Cl.bool(true)],
       deployer
     );
     expect(pauseResult.result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(pauseResult.result).toEqual(Cl.ok(Cl.bool(true)));
 
+    // Verify dimensional-engine is deployed and accessible
+    const protocolStatus = simnet.callReadOnlyFn(
     // Verify dimensional-engine is deployed and accessible
     const protocolStatus = simnet.callReadOnlyFn(
       "dimensional-engine",
       "get-protocol-status",
       [],
+      "get-protocol-status",
+      [],
       deployer
     );
+    expect(protocolStatus.result).toBeDefined();
+
+    // Restore unpaused state
+    simnet.callPublicFn("conxian-protocol", "set-paused", [Cl.bool(false)], deployer);
     expect(protocolStatus.result).toBeDefined();
 
     // Restore unpaused state
