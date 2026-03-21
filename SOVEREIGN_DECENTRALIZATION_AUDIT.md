@@ -25,7 +25,7 @@ This report provides a high-fidelity mapping of the Conxian Business Operations 
 - **Execution Layer**: **Stacks (Nakamoto)**. Programmable layer for Clarity smart contracts and sBTC.
 - **Agentic Commerce**: **x402 / AP2**. Hardware-attested M2M settlement protocol (implemented in Rust gateway).
 - **Identity (D.ID)**: **did:pkh:btc**. Hardware-anchored identity via Android StrongBox and TEE.
-- **Tokenomics**: **CXD (Utility)**, **CXVG (Governance)**. SIP-010 native tokens for protocol coordination.
+- **Tokenomics**: **CXD (Utility)**, **CXVG (Governance)**. SIP-010 native tokens for protocol coordination. Note: The `CXN` prefix is reserved for system/agent identifiers and is NOT a token ticker.
 
 ## 5. Critical Path: 1% Sovereign Tax
 The **1% Sovereign Tax** is the non-negotiable protocol fee stripped from all cross-chain and CSF operations. This is implemented in `revenue-automation.clar` and extracted via hardware-attested x402 signatures, ensuring that protocol revenue is captured directly in the Sovereign Treasury regardless of the interface used.

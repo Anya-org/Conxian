@@ -25,8 +25,9 @@ To maintain 100% IP sovereignty and eliminate legacy nomenclature that creates M
 ## 4. Enforcement Logic
 
 1. **Full Name Primacy**: Use "Conxian" for the protocol and "Conxius" for the access layer.
-2. **Agent Standardization**: All internal executive modules must use the `cxn-` prefix (e.g., `Sovereign-Strategy-Nexus`).
-3. **Legacy Purge**:
+2. **Agent Standardization**: All internal executive modules must use the `cxn-` prefix (e.g., `cxn-strategy-nexus`). The "Sovereign" brand remains the public-facing identity for business units (e.g., Sovereign Strategy Nexus).
+3. **Token Ticker Integrity**: The prefix `CXN` is strictly reserved for internal system and agent identification. It MUST NOT be used as a token ticker symbol. All fungible tokens use specific 3-4 letter codes (CXD, CXVG, CXTR, CXS, CXLP).
+4. **Legacy Purge**:
    - Search for "Conxian" and replace with "cxn-" or "Conxian".
    - Search for "Conxian" and replace according to the **Remapping Matrix**.
    - Strip any loose "Conxian" identifiers from BOS folders (`cxn-*`).

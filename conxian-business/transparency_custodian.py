@@ -19,7 +19,7 @@ def generate_manifest():
     }
 
     # Audit strategic and executive directories
-    targets = ["conxian-business", "cxn-arch-guardian", "cxn-ops-engine", "cxn-strategy-nexus", "cxn-treasury-oracle"]
+    targets = ["conxian-business", "Nakamoto-Guardian", "Sovereign-Ops-Orchestrator", "Sovereign-Strategy-Nexus", "Fiscal-Vault-Oracle"]
 
     for target in targets:
         if os.path.isdir(target):
