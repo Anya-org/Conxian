@@ -66,6 +66,7 @@ To position Conxian as the central liquidity gravitational hub, the CSF natively
 | **REC-002** | Doc-Code Baseline Mismatch | **CLOSED** | Sync complete: Apex BME Engine integrated. |
 | **REC-003** | Simulation Gap | **CLOSED** | Clarity 4 keywords successfully shimmed for @stacks/clarinet-sdk v3.14.0. |
 | **REC-004** | Foundation Race Condition | **CLOSED** | Resolved via singleton/Proxy pattern in `setup-test-env.ts`. |
+| **REC-005** | Federated Oracle Implementation | **CLOSED** | Weighted aggregation engine and stale price enforcement implemented in `federated-oracle-adapter.clar`. |
 
 ## 13. Benchmarks (Verified)
 
@@ -84,3 +85,8 @@ To position Conxian as the central liquidity gravitational hub, the CSF natively
 - **Status**: COMPLETED.
 - **Details**: Full support for trustless routing through ALEX Lab liquidity pools via the `alex-adapter`. Universal Router can now natively settle trades through ALEX mainnet contracts.
 - **Verification**: Verified in simulation with 100% test coverage.
+
+### 14.2. Federated Oracle Implementation
+- **Status**: COMPLETED.
+- **Details**: Remedial implementation of the `federated-oracle-adapter` with weighted price aggregation and stale price protection.
+- **Verification**: 100% coverage via `tests/oracle-adapter.test.ts` in simulation.

@@ -297,5 +297,9 @@ depends_on = ["timelock"]
 path = "contracts/integrations/alex-adapter.clar"
 depends_on = ["conxian-csf-trait", "sip-standards", "conxian-protocol"]
 
+[contracts.federated-oracle-adapter]
+path = "contracts/oracle/federated-oracle-adapter.clar"
+depends_on = ["defi-traits"]
+
 [contracts.signed-data-base]
 path = "contracts/governance/signed-data-base.clar"
