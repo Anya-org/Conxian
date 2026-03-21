@@ -138,8 +138,6 @@ path = "contracts/traits/vault-trait.clar"
 [contracts.interest-rate-model]
 path = "contracts/lending/interest-rate-model.clar"
 
-[contracts.reputation-engine]
-path = "contracts/governance/reputation-engine.clar"
 
 [contracts.proposal-registry]
 path = "contracts/governance/proposal-registry.clar"
@@ -295,3 +293,28 @@ depends_on = ["timelock"]
 
 [contracts.signed-data-base]
 path = "contracts/governance/signed-data-base.clar"
+
+[contracts.pyth-traits]
+path = "contracts/traits/pyth-traits.clar"
+
+[contracts.redstone-traits]
+path = "contracts/traits/redstone-traits.clar"
+
+[contracts.pyth-oracle-v4]
+path = "contracts/oracle/pyth-oracle-v4.clar"
+depends_on = ["pyth-traits"]
+
+[contracts.pyth-oracle-adapter]
+path = "contracts/oracle/pyth-oracle-adapter.clar"
+depends_on = ["pyth-oracle-v4", "oracle-aggregator"]
+
+[contracts.swap-aggregator]
+path = "contracts/dex/swap-aggregator.clar"
+depends_on = ["conxian-csf-trait", "sip-standards"]
+
+[contracts.bns-stub]
+path = "contracts/governance/bns-stub.clar"
+
+[contracts.reputation-engine]
+path = "contracts/governance/reputation-engine.clar"
+depends_on = ["bns-stub"]
