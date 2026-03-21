@@ -1,4 +1,4 @@
-# Render Service Payload: Conxian-Labs Institutional UI
+# Render Service Payload: Conxian Institutional UI
 
 To output the visual proof of architecture for the institutional UI, the following payload structure is required for the Render-hosted services.
 

@@ -1,7 +1,7 @@
 # Sovereign MOI: Corporate Governance Alignment (SA Companies Act & King IV)
 
 ## 1. Executive Mandate
-In accordance with the South African Companies Act (Section 76) and the fiduciary duties of directors, Conxian-Labs aligns its governance with the **Business Operations System (BOS)**.
+In accordance with the South African Companies Act (Section 76) and the fiduciary duties of directors, Conxian aligns its governance with the **Business Operations System (BOS)**.
 
 ## 2. The 144-Block Rule
 - **Directive**: No critical state change or financial commitment can be finalized without a mandatory 144-block time-lock (approx. 24 hours on Bitcoin-native layers).

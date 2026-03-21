@@ -1,6 +1,6 @@
 {
   "org": "Conxian",
-  "timestamp": "2026-03-20T20:52:04.757360Z",
+  "timestamp": "2026-03-21T05:37:04.532342Z",
   "version": "v2.0-Audit",
   "files": [
     {
@@ -9,7 +9,7 @@
     },
     {
       "path": "conxian-business/transparency_custodian.py",
-      "sha256": "f5234dce49920af24bffd7c94fe3d9d31fa08fa1ef5534b1ee762a281a434e25"
+      "sha256": "fe143e71486778e1aedd1beb7ef9f4531097650ddba3e375ad6fbdfb16dc8136"
     },
     {
       "path": "conxian-business/BOS_STATE_MACHINE.json",
@@ -21,7 +21,7 @@
     },
     {
       "path": "conxian-business/AUDIT_MANIFEST.json",
-      "sha256": "a230432a1ab85a1a4eb80cbb2231d551dce4bbadb1c8ac5ee2c5686b55aa1b36"
+      "sha256": "cd06f48ad849a44d05485d424cff6d3c794007ef24e65ecc77687681b6b1648f"
     },
     {
       "path": "cxn-arch-guardian/ANTI_FRAGILITY_LOOP.md",
@@ -84,5 +84,5 @@
       "sha256": "ef6a101a4e929747f25466c333e7b6384adb9079883a14b5f28d011dbda6cd90"
     }
   ],
-  "stacks_anchor_payload": "ec9d5b495b505f2a0e0065d8236bf652d4fa381d1452ea501960599fbcab120b"
+  "stacks_anchor_payload": "fa14c68b2b37937a27ef6509c6b5a927c69a6a2e7e204e28ec54503e3c64cc47"
 }

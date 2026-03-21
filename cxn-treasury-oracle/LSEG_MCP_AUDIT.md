@@ -1,7 +1,7 @@
 # LSEG MCP Treasury Audit (Institutional Standard - ATS v4.7)
 
 ## 1. Objective
-Provide an institutional-grade audit trail for Conxian-Labs yield rebalancing by cross-referencing all protocol state changes against LSEG Real-Time Content (MCP).
+Provide an institutional-grade audit trail for Conxian yield rebalancing by cross-referencing all protocol state changes against LSEG Real-Time Content (MCP).
 
 ## 2. Institutional Logic
 - **Primary Feed**: Conxian-Nexus (Sovereign Stacks/BTC Node)
