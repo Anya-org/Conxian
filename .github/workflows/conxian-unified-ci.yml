@@ -1,0 +1,76 @@
+name: Conxian Unified CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  monolith-ci:
+    name: Full Protocol Suite (Monolith)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2
+      with:
+        workspaces: |
+          conxian-gateway
+          conxian-nexus
+          lib-conclave-sdk
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: conxius-wallet/package-lock.json
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Gateway Suite
+      if: contains(github.event.pull_request.labels.*.name, 'infra') || github.event_name == 'push'
+      run: |
+        cd conxian-gateway
+        cargo check -p api
+        cargo test
+
+    - name: B2B Suite (Nexus & SDK)
+      if: contains(github.event.pull_request.labels.*.name, 'b2b') || github.event_name == 'push'
+      run: |
+        cd conxian-nexus
+        cargo test
+
+    - name: B2C Wallet Suite
+      if: contains(github.event.pull_request.labels.*.name, 'b2c') || github.event_name == 'push'
+      run: |
+        cd conxius-wallet
+        npm ci
+        npm test
+
+    - name: Transparency Audit & Docs
+      run: |
+        python3 conxian-business/transparency_custodian.py
+        make docs-build
+        grep -oP '(?<=\]\().*?\.md(?=\))' SUMMARY.md | while read -r link; do
+          if [ ! -f "$link" ]; then
+            echo "ERROR: Broken link in SUMMARY.md -> $link"
+          fi
+        done
+
+    - name: Testnet Simulation
+      run: |
+        pip install -r stacksorbit/requirements.txt
+        python3 stacksorbit/conxian_testnet_deploy.py --help
