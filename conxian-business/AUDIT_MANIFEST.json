@@ -1,6 +1,6 @@
 {
   "org": "Conxian",
-  "timestamp": "2026-03-21T17:01:34.241762Z",
+  "timestamp": "2026-03-22T05:44:05.425520Z",
   "version": "v2.0-Audit",
   "files": [
     {
@@ -21,7 +21,7 @@
     },
     {
       "path": "conxian-business/AUDIT_MANIFEST.json",
-      "sha256": "bcf114cbf74baf98a3ca66bce4d27e4039097b0eaf2002d3dadaf4b9896283f0"
+      "sha256": "12ce750702e6d5380490e690f0670a8d120aed18ad3c0e801b22b1cd65d03230"
     },
     {
       "path": "Nakamoto-Guardian/ANTI_FRAGILITY_LOOP.md",
@@ -84,5 +84,5 @@
       "sha256": "6d0d07e5a39acb61fb51fb0bf177ee639f087f46f21bbb162e9b2a8ca70fcf71"
     }
   ],
-  "stacks_anchor_payload": "62023858cb809a94074dc5c5c00ab5cacbf7726a2f11ae83362be483a42933a3"
+  "stacks_anchor_payload": "67b34af0f7f1ed20bdb4c6586b3f2c43309f35c4d0321b701a815f56d3966d7b"
 }
