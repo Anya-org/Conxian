@@ -1,6 +1,6 @@
 {
   "org": "Conxian",
-  "timestamp": "2026-03-22T23:13:52.978469Z",
+  "timestamp": "2026-03-23T12:45:21.307797Z",
   "version": "v2.0-Audit",
   "files": [
     {
@@ -21,7 +21,7 @@
     },
     {
       "path": "conxian-business/AUDIT_MANIFEST.json",
-      "sha256": "8075f4e5eb5c627ef7041168713d65ea6f696290bb5fe45f6ada1c5222ce7cbb"
+      "sha256": "a0e5b0179e4ed1fd30d6d6cc631c9d180d962174195770c3b869f94f53474b54"
     },
     {
       "path": "Nakamoto-Guardian/ANTI_FRAGILITY_LOOP.md",
@@ -45,7 +45,7 @@
     },
     {
       "path": "Sovereign-Strategy-Nexus/docs/SOVEREIGN_PITCH_DECK_NARRATIVE.md",
-      "sha256": "f8cde18b5f7ba64648f18314a44284f961d80c885d743fc8a7e0ae3e44f5bf4e"
+      "sha256": "a579856a6ad060175cb558549c232b4a3997f7b83f1f9485fc3f5ebd080dd4e0"
     },
     {
       "path": "Sovereign-Strategy-Nexus/docs/ZK_DATA_ROOM_SCHEMA.md",
@@ -84,5 +84,5 @@
       "sha256": "6d0d07e5a39acb61fb51fb0bf177ee639f087f46f21bbb162e9b2a8ca70fcf71"
     }
   ],
-  "stacks_anchor_payload": "088033979b1a82fb6039e4d5689a00839e495a0baf7943898f773cd2c46002b5"
+  "stacks_anchor_payload": "ec5435c03ca16793b047e4d4c46e1033884aefb4bb789fcdc9cd56303669f75a"
 }
