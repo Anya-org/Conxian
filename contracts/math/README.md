@@ -15,15 +15,27 @@ Math for tick-based liquidity.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `get-sqrt-ratio-at-tick` | `(get-sqrt-ratio-at-tick (tick int))` | Returns the square root of the price ratio for a specific tick. |
-| `get-tick-at-sqrt-ratio` | `(get-tick-at-sqrt-ratio (sqrt-ratio-x96 uint))` | Returns the tick index for a given square root ratio. |
+| `get-sqrt-ratio-at-tick` | `(tick int)` | Returns the square root of the price ratio for a specific tick. |
+| `get-tick-at-sqrt-ratio` | `(sqrt-price-x96 uint)` | Returns the tick index for a given square root ratio. |
+| `get-amount0-delta` | `(sqrt-price-a-x96 uint) (sqrt-price-b-x96 uint) (liquidity uint)` | Calculate amount0 delta for a given liquidity and price range. |
+| `get-amount1-delta` | `(sqrt-price-a-x96 uint) (sqrt-price-b-x96 uint) (liquidity uint)` | Calculate amount1 delta for a given liquidity and price range. |
+| `is-valid-tick` | `(tick int)` | Check if tick is valid. |
+| `get-min-tick` | `()` | Get MIN_TICK. |
+| `get-max-tick` | `()` | Get MAX_TICK. |
 
 ### `math-utilities.clar`
 Fixed-point arithmetic.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `mul-div` | `(mul-div (a uint) (b uint) (c uint))` | Performs `(a * b) / c` with internal 128-bit precision. |
+| `stub-func` | `()` | A stub function for math utility testing. |
+
+### `exponentiation.clar`
+Power calculations.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `calc-pow` | `(base uint) (exponent uint)` | Calculate the power of a base to an exponent. |
 
 ## Integration Examples (How-to)
 

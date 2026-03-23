@@ -19,6 +19,7 @@
 
 ;; --- CSF Dynamic Dispatch ---
 
+;; @desc Swap tokens through any CSF-compliant liquidity source
 (define-public (csf-swap
     (liquidity-source <csf-liquidity-trait>)
     (token-in <sip-010-ft-trait>)
@@ -63,6 +64,7 @@
   )
 )
 
+;; @desc Claim external protocol yield through a CSF source
 (define-public (claim-external-yield
     (liquidity-source <csf-liquidity-trait>)
     (reward-token <sip-010-ft-trait>)
@@ -73,6 +75,7 @@
   )
 )
 
+;; @desc Update the protocol fees based on current market volatility
 (define-public (update-volatility-fees)
   (let (
     (vol (unwrap! (contract-call? .oracle-aggregator get-volatility-index) ERR_INTERNAL))
@@ -85,6 +88,7 @@
   )
 )
 
+;; @desc Execute a swap on a single pool with exact input amount
 (define-public (exact-input-single
     (pool-id uint)
     (token-in <sip-010-ft-trait>)
@@ -98,6 +102,7 @@
   )
 )
 
+;; @desc Get the current operational status of the swap router
 (define-read-only (get-protocol-status)
   (ok { compliant: true, version: "v1.1.0-Apex", tenure-id: (some (/ block-height u10)) })
 )

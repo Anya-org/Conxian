@@ -33,7 +33,48 @@ The Apex Heartbeat engine.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `trigger-epoch-update` | `(trigger-epoch-update (cxd-token <sip-010-trait>))` | Synchronizes protocol fees and BME epoch updates. |
+| `trigger-epoch-update` | `(cxd-token <sip-010-trait>)` | Synchronizes protocol fees and BME epoch updates. |
+
+### `bme-engine.clar`
+Sovereign Burn-Mint Equilibrium.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `add-activity-reporter` | `(reporter principal)` | Add an authorized principal that can report activity to the BME engine. |
+| `register-fee-activity` | `(pool principal) (fee-amount uint)` | Register fee activity for a specific pool. |
+| `execute-epoch-minting` | `(pools-to-reward (list 50 principal))` | Trigger the minting and distribution of rewards. |
+| `burn-protocol-fees` | `(amount uint)` | Burn a specific amount of protocol fees in CXD. |
+| `swap-and-burn` | `(token <sip-010-ft-trait>) (amount uint)` | Swap a specific token for CXD and burn it. |
+| `get-bme-stats` | `()` | Get global statistics for the BME engine. |
+| `get-protocol-status` | `()` | Get the current operational status of the BME engine. |
+
+### `conxian-paas-factory.clar`
+Platform-as-a-Service Infrastructure.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `register-new-sab` | `(name (string-ascii 64)) (treasury principal) (gov principal) (tok (optional principal)) (stk (optional principal))` | Register a new Sovereign Autonomous Business (SAB). |
+
+### `economic-policy-engine.clar`
+Fiscal and Monetary Policy.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `get-current-interest-rate` | `()` | Get the current protocol interest rate. |
+| `get-reserve-factor` | `()` | Get the protocol reserve factor. |
+| `get-revenue-distributor` | `()` | Get the principal of the revenue distributor. |
+
+### `office-manager.clar`
+Operational Resource Management.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `is-worker-active` | `(worker principal)` | Check if a worker is currently active. |
+| `register-worker` | `(worker principal)` | Register a new worker in the office system. |
+| `fund-payroll` | `(amount uint)` | Add funds to the protocol's payroll pool. |
+| `set-agent-status` | `(agent principal) (active bool)` | Set the authorization status for a protocol agent. |
+| `get-payroll-balance` | `()` | Get the current balance of the payroll pool. |
+| `is-agent-authorized` | `(agent principal)` | Check if an agent is authorized. |
 
 ## Integration Examples (How-to)
 
