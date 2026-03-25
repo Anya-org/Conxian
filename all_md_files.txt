@@ -197,7 +197,7 @@
 ./conxius-wallet/.github/ISSUE_TEMPLATE/bug_report.md
 ./conxius-wallet/.github/ISSUE_TEMPLATE/feature_request.md
 ./conxius-wallet/.github/PULL_REQUEST_TEMPLATE.md
-./conxius-wallet/.jules/sentinel.md
+./conxius-wallet/.jules/cortex.md
 ./conxius-wallet/AGENTS.md
 ./conxius-wallet/CHANGELOG.md
 ./conxius-wallet/CODE_OF_CONDUCT.md
@@ -357,7 +357,7 @@
 ./stacksorbit/.Jules/palette.md
 ./stacksorbit/.jules/bolt.md
 ./stacksorbit/.jules/palette.md
-./stacksorbit/.jules/sentinel.md
+./stacksorbit/.jules/cortex.md
 ./stacksorbit/AGENTS.md
 ./stacksorbit/CHANGELOG.md
 ./stacksorbit/CONTRIBUTING.md
