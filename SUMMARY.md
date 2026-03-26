@@ -40,3 +40,9 @@
 * [Sovereign Simulation (9-Cycle)](archive/legacy_docs/BOS_SIMULATION_REPORT_2026_FINAL.md)
 * [CSF Protocol Standard](archive/legacy_docs/CSF_STANDARD_PROPOSAL.md)
 * [Architecture Upgrade 2026](archive/legacy_docs/ARCHITECTURE_UPGRADE_2026.md)
+
+## 🏭 Industrial Engine (v12.0)
+
+* [Conxian Job Card Schema (CJCS)](docs/CJCS_v2.0_SPEC.md)
+* [ERP MCP Handshake Spec](docs/ERP_MCP_HANDSHAKE_SPEC.md)
+* [Virality Flywheel Simulation](docs/VIRALITY_FLYWHEEL_SIMULATION.md)
