@@ -11,66 +11,92 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  monolith-ci:
-    name: Full Protocol Suite (Monolith)
+  gateway-suite:
+    name: Gateway Suite
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'infra') || github.event_name == 'push'
     steps:
     - uses: actions/checkout@v4
-
     - name: Setup Rust
       uses: dtolnay/rust-toolchain@stable
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2
+      with:
+        workspaces: conxian-gateway
+    - name: Check & Test
+      run: |
+        cd conxian-gateway
+        cargo check -p api
+        cargo test
 
+  b2b-suite:
+    name: B2B Suite (Nexus & SDK)
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'b2b') || github.event_name == 'push'
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
     - name: Rust Cache
       uses: Swatinem/rust-cache@v2
       with:
         workspaces: |
-          conxian-gateway
           conxian-nexus
           lib-conclave-sdk
+    - name: Check & Test
+      run: |
+        cd conxian-nexus
+        cargo test
 
+  b2c-wallet-suite:
+    name: B2C Wallet Suite
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'b2c') || github.event_name == 'push'
+    steps:
+    - uses: actions/checkout@v4
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
         cache: 'npm'
         cache-dependency-path: conxius-wallet/package-lock.json
-
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-
-    - name: Gateway Suite
-      if: contains(github.event.pull_request.labels.*.name, 'infra') || github.event_name == 'push'
-      run: |
-        cd conxian-gateway
-        cargo check -p api
-        cargo test
-
-    - name: B2B Suite (Nexus & SDK)
-      if: contains(github.event.pull_request.labels.*.name, 'b2b') || github.event_name == 'push'
-      run: |
-        cd conxian-nexus
-        cargo test
-
-    - name: B2C Wallet Suite
-      if: contains(github.event.pull_request.labels.*.name, 'b2c') || github.event_name == 'push'
+    - name: Install & Test
       run: |
         cd conxius-wallet
         npm ci
         npm test
 
-    - name: Transparency Audit & Docs
+  audit-and-docs:
+    name: Transparency Audit & Docs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+    - name: Run Audit
       run: |
         python3 conxian-business/transparency_custodian.py
-        make docs-build
+    - name: Validate Summary
+      run: |
         grep -oP '(?<=\]\().*?\.md(?=\))' SUMMARY.md | while read -r link; do
           if [ ! -f "$link" ]; then
             echo "ERROR: Broken link in SUMMARY.md -> $link"
+            false
           fi
         done
 
-    - name: Testnet Simulation
+  testnet-simulation:
+    name: Testnet Simulation
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+    - name: Install & Simulate
       run: |
         pip install -r stacksorbit/requirements.txt
         python3 stacksorbit/conxian_testnet_deploy.py --help

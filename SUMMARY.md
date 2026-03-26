@@ -22,6 +22,8 @@
 * [OpenSpec Baseline](openspec/changes/remediate-enterprise-sovereignty/specs.md)
 * [Autonomous Launch Specs](openspec/changes/csf-autonomous-launch/specs.md)
 * [Strategos Alignment Audit](audit/strategos-alignment.md)
+* [Strategic Moat Map](docs/STRATEGIC_MOAT_MAP.md)
+* [Missing Chips Brief](docs/MISSING_CHIPS_BRIEF.md)
 
 ## 📦 Architecture
 
