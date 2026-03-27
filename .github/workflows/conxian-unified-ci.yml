@@ -69,6 +69,7 @@ jobs:
   audit-and-docs:
     name: Transparency Audit & Docs
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'audit')
     steps:
     - uses: actions/checkout@v4
     - name: Setup Python
@@ -90,6 +91,7 @@ jobs:
   testnet-simulation:
     name: Testnet Simulation
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'simulation')
     steps:
     - uses: actions/checkout@v4
     - name: Setup Python
