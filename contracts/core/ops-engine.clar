@@ -16,7 +16,6 @@
 
 ;; @desc Full system heartbeat
 (define-public (trigger-epoch-update)
-(define-public (trigger-epoch-update)
   (let (
     (current-time burn-block-height)
   )

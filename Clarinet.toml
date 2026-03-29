@@ -289,8 +289,7 @@ clarity-version = 4
 [contracts.office-manager]
 path = "contracts/core/office-manager.clar"
 
-[contracts.upgrade-controller]
-path = "contracts/governance/upgrade-controller.clar"
+
 
 [contracts.voting]
 path = "contracts/governance/voting.clar"
@@ -324,5 +323,3 @@ path = "contracts/governance/signed-data-base.clar"
 
 [contracts.self-launch-coordinator]
 path = 'contracts/core/self-launch-coordinator.clar'
-clarity_version = 2
-epoch = 2.4
