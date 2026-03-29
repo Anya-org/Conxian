@@ -1,11 +1,15 @@
 {
   "org": "Conxian",
-  "timestamp": "2026-03-26T08:53:55.446702Z",
+  "timestamp": "2026-03-29T01:23:59.318768Z",
   "version": "v2.0-Audit",
   "files": [
     {
       "path": "docs/BUSINESS_COMPLIANCE_ALIGNMENT_2026.md",
       "sha256": "3a6ef90e4bf79b1afd7727cbd0ca9b2af2182ad410df320c732b24b28efd207b"
+    },
+    {
+      "path": "docs/VIRALITY_FLYWHEEL_SIMULATION.md",
+      "sha256": "702c1d1aeaf2bdf16ea5e5edce0699424eefc233b71a43fd677e7361130b0119"
     },
     {
       "path": "docs/TEE_SECURITY_AUDIT.md",
@@ -36,6 +40,14 @@
       "sha256": "511e59f2cd0498eab72e9d2341116582be9b815b32114833cdb19381cc623fe9"
     },
     {
+      "path": "docs/CJCS_v2.0_SPEC.md",
+      "sha256": "03b9e34bd703fd82dcbd922dfa39185332851de1789f8d1e9dd55fdb23cf6de9"
+    },
+    {
+      "path": "docs/AGENTS.md",
+      "sha256": "667cfc9c877b29e1956698b24599480104093a0497661e7600970888f9c8e9e6"
+    },
+    {
       "path": "docs/MISSING_CHIPS_BRIEF.md",
       "sha256": "32a829c895f1be63083eb59d796f2b3c69559697556620f4dcd41d85a11365d1"
     },
@@ -46,6 +58,14 @@
     {
       "path": "docs/README.md",
       "sha256": "491122a66b255acd9d4ec3c4532c0149fffb61bd1f3b092f499c4480770a6a7d"
+    },
+    {
+      "path": "docs/ERP_MCP_HANDSHAKE_SPEC.md",
+      "sha256": "a3ad6d87356cf0d4428ef899266724f7aae962e5390d8fab440019becd5d6d90"
+    },
+    {
+      "path": "docs/bounties/ATS_v14_INJECTION.md",
+      "sha256": "6b1f51fa2163d0785618b0c3c0111606fb89adf17de9139c2778737dd152a97e"
     },
     {
       "path": "docs/research/BITCOIN_NATIVE_UPGRADE.md",
@@ -394,14 +414,6 @@
     {
       "path": "Conxian/contracts/utils/encoding.clar",
       "sha256": "d6a1ae29e454b08d48157437e21d21244c20868fcbdfa10d6ae96f4024df48ec"
-    },
-    {
-      "path": "Conxian/contracts/finance/dlc-bond-trait.clar",
-      "sha256": "ea93857a5ec60c29753ce10466e19be7fec993a06de2756aecb0137f87207c5a"
-    },
-    {
-      "path": "Conxian/contracts/finance/dlc-bond.clar",
-      "sha256": "d2f98c611d041313e42f611c8e73fdb9b5504d8a0334049322c379075985b917"
     },
     {
       "path": "Conxian/contracts/migration/legacy-adapter.clar",
@@ -1281,7 +1293,7 @@
     },
     {
       "path": "Conxian/ui/ARCHITECTURE.md",
-      "sha256": "3e984b24fbd0a5978ab4857cc404408d2e8f864737a589f9126b0cbb4229633f"
+      "sha256": "0e82d174e78368ed095304ef4fc1e8b5c69daf8e919a35390092f41b28763ebc"
     },
     {
       "path": "Conxian/ui/.idx/integrations.json",
@@ -1389,7 +1401,7 @@
     },
     {
       "path": "conxian-business/AUDIT_MANIFEST.json",
-      "sha256": "5158b4cd98e7a26e462230f6855c355ad2fd1ce85185799ed32863a8638b3efd"
+      "sha256": "678c21cae427b2cb393e1ff4583a4cb7d3e47afea1e49593bd7ee54374d4cf93"
     },
     {
       "path": "Nakamoto-Guardian/ANTI_FRAGILITY_LOOP.md",
@@ -1452,5 +1464,5 @@
       "sha256": "6d0d07e5a39acb61fb51fb0bf177ee639f087f46f21bbb162e9b2a8ca70fcf71"
     }
   ],
-  "stacks_anchor_payload": "b050c235fa4ef32e2a21cab5d35bf3f9f792c4408cc2570e1f257fa384076174"
+  "stacks_anchor_payload": "690bf1970ca7d9ad9794f733ff5e1def3876b48c6d7310a3ae98c88cece28ad3"
 }
