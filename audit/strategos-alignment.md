@@ -9,7 +9,7 @@ This audit reflects the current state of the Conxian GitHub ecosystem against th
 | :--- | :--- | :--- | :--- |
 | **Guardian: Attestation** | `conxian-gateway/zkc.rs` | ACTIVE | **ZKML verification placeholder implemented.** |
 | **Guardian: Sovereignty** | `Sovereign-Strategy-Nexus/SARB_MANDATE.md` | ACTIVE | Sharding logic implemented in shards.rs. |
-| **Guardian: Resilience** | `Conxian/security/circuit-breaker.clar` | ACTIVE | Veto-Quorum logic needed. |
+| **Guardian: Resilience** | `Conxian/security/circuit-breaker.clar` | ACTIVE | **VERIFIED**: Veto-Quorum v2 (RES-001). |
 | **Guardian: Veracity** | `conxian-nexus/src/oracle` | ACTIVE | Missing active LSEG MCP feed. |
 | **Executor: Liquidity Forge** | `Conxian/yield/yield-optimizer.clar` | ACTIVE | Needs "Intent-to-Yield" mapping. |
 | **Executor: Compute Forge** | `Sovereign-Ops-Orchestrator/DEPLOYMENT_EFFICIENCY.md`| INITIAL | No DePIN compute arbitrage implementation. |
@@ -32,6 +32,7 @@ This audit reflects the current state of the Conxian GitHub ecosystem against th
 1.  **EXEC-0402**: **VERIFIED**. x402 Machine-to-Machine settlement handler and ISO 20022 pacs.008 XML egress fully implemented and tested in Gateway (`internal/api/src/payment.rs`).
 2.  **SANDBOX-001**: **VERIFIED**. TEE Self-Verification foundation implemented in Gateway (`internal/api/src/handlers.rs`).
 3.  **IDENTITY-001**: **VERIFIED**. ERC-8004 equivalent KYA reputation tracking and LEI placeholders integrated into Conxius Wallet (`services/identity.ts`).
+4.  **RES-001**: **VERIFIED**. Veto-Quorum v2 logic with Guardian Registry and block-height expiration implemented in `Conxian/contracts/security/circuit-breaker.clar`.
 
 ## 5. Next Steps (Q3 2026)
 - Integrate ZKML verification in `conxian-gateway/zkc.rs`.
