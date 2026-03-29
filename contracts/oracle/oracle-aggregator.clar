@@ -5,8 +5,7 @@
 
 ;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_CB_UNAUTHORIZED (err u1001))
-(define-constant ERR_CB_UNAUTHORIZED (err u1001))
+(define-constant ERR_OA_UNAUTHORIZED (err u1001))
 (define-constant ERR_STALE_PRICE (err u1002))
 (define-constant ERR_CIRCUIT_OPEN (err u1003))
 (define-constant ERR_INVALID_SOURCE (err u1004))
@@ -91,7 +90,7 @@
 ;; @desc Set a dynamic circuit breaker contract (admin only)
 (define-public (set-circuit-breaker (cb-contract principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_CB_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_OA_UNAUTHORIZED)
     (var-set circuit-breaker-contract (some cb-contract))
     (var-set circuit-is-open false)
     (ok true)

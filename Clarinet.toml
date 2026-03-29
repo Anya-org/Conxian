@@ -46,7 +46,7 @@ path = "contracts/utils/block-utils.clar"
 
 [contracts.oracle-aggregator]
 path = "contracts/oracle/oracle-aggregator.clar"
-depends_on = ["conxian-protocol"]
+depends_on = ["conxian-protocol", "defi-traits"]
 
 [contracts.cxd-token]
 path = "contracts/tokens/cxd-token.clar"
@@ -73,12 +73,16 @@ depends_on = ["sip-standards", "bme-engine", "conxian-csf-trait"]
 
 [contracts.risk-unit]
 path = "contracts/core/risk-unit.clar"
-depends_on = ["core-traits"]
+depends_on = ["core-traits", "oracle-aggregator"]
 
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
 clarity-version = 4
 depends_on = ["oracle-aggregator", "cxd-token", "risk-unit", "conxian-protocol", "automation-traits", "conxian-service-trait"]
+
+
+
+
 
 [contracts.order-orchestrator]
 path = "contracts/enterprise/order-orchestrator.clar"
@@ -147,6 +151,7 @@ path = "contracts/lending/interest-rate-model.clar"
 
 [contracts.proposal-registry]
 path = "contracts/governance/proposal-registry.clar"
+depends_on = ["governance-traits", "conxian-access"]
 
 [contracts.concentrated-math]
 path = "contracts/math/concentrated-math.clar"
@@ -197,11 +202,17 @@ path = "contracts/migration/migration-orchestrator.clar"
 path = "contracts/monitoring/monitoring-dashboard.clar"
 depends_on = ["conxian-protocol", "agent-risk", "finance-metrics", "dimensional-core", "risk-unit", "oracle-aggregator", "swap-router"]
 
-[contracts.proposal-engine]
-path = "contracts/governance/proposal-engine.clar"
+[contracts.reputation-engine]
+path = "contracts/governance/reputation-engine.clar"
+depends_on = ["conxian-access"]
 
 [contracts.proposal-executor]
 path = "contracts/governance/proposal-executor.clar"
+depends_on = ["proposal-registry", "cxvg-token"]
+
+[contracts.proposal-engine]
+path = "contracts/governance/proposal-engine.clar"
+depends_on = ["proposal-registry", "reputation-engine", "proposal-executor", "enhanced-governance-nft", "conxian-access"]
 
 [contracts.dao-treasury]
 path = "contracts/governance/dao-treasury.clar"
@@ -323,3 +334,7 @@ path = "contracts/governance/signed-data-base.clar"
 
 [contracts.self-launch-coordinator]
 path = 'contracts/core/self-launch-coordinator.clar'
+
+[contracts.test-c4]
+path = "contracts/test-c4.clar"
+clarity-version = 4
