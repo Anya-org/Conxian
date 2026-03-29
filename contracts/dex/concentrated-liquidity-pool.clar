@@ -36,7 +36,7 @@
 (define-public (execute-csf-swap (token-in <sip-010-ft-trait>) (token-out <sip-010-ft-trait>) (amount-in uint) (recipient principal))
   (let (
     (pool-id u1)
-    (amount-out (try! (swap-internal pool-id true amount-in token-in token-out)))
+    (amount-out (try! (swap-internal pool-id true amount-in token-in token-out recipient)))
   )
     (ok { amount-out: amount-out, fee-collected: (/ (* amount-in u30) u10000) })
   )
@@ -65,23 +65,34 @@
 ;; --- Core Swap Logic ---
 
 ;; @desc Execute a swap in a concentrated liquidity pool
-(define-public (swap (pool-id uint) (zero-for-one bool) (amount-in uint) (token0-trait <sip-010-ft-trait>) (token1-trait <sip-010-ft-trait>))
-  (swap-internal pool-id zero-for-one amount-in token0-trait token1-trait)
+(define-public (swap (pool-id uint) (zero-for-one bool) (amount-in uint) (token0-trait <sip-010-ft-trait>) (token1-trait <sip-010-ft-trait>) (recipient principal))
+  (swap-internal pool-id zero-for-one amount-in token0-trait token1-trait recipient)
 )
 
-(define-private (swap-internal (pool-id uint) (zero-for-one bool) (amount-in uint) (token0-trait <sip-010-ft-trait>) (token1-trait <sip-010-ft-trait>))
-  (let ((pool (unwrap! (map-get? pools pool-id) ERR_INSUFFICIENT_LIQUIDITY)))
+(define-private (swap-internal (pool-id uint) (zero-for-one bool) (amount-in uint) (token0-trait <sip-010-ft-trait>) (token1-trait <sip-010-ft-trait>) (recipient principal))
+  (let (
+    (pool (unwrap! (map-get? pools pool-id) ERR_INSUFFICIENT_LIQUIDITY))
+    (token-out-trait (if zero-for-one token1-trait token0-trait))
+  )
     (begin
       (let (
         (total-fee (/ (* amount-in (get fee pool)) u1000000))
         (protocol-fee (/ (* total-fee PROTOCOL_FEE_SHARE) u10000))
         (amount-out (- amount-in total-fee))
       )
-        (match (contract-call? .bme-engine register-fee-activity (as-contract tx-sender) protocol-fee)
-          res true
-          err-val false
+        (begin
+          ;; Transfer input tokens from caller to the pool
+          (try! (contract-call? token-in transfer amount-in tx-sender (as-contract tx-sender) none))
+
+          ;; Transfer output tokens from the pool to the recipient (User)
+          (try! (as-contract (contract-call? token-out-trait transfer amount-out (as-contract tx-sender) recipient none)))
+
+          (match (contract-call? .bme-engine register-fee-activity (as-contract tx-sender) protocol-fee)
+            res true
+            err-val false
+          )
+          (ok amount-out)
         )
-        (ok amount-out)
       )
     )
   )
