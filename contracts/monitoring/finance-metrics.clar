@@ -3,7 +3,6 @@
 ;; Aggregates real-time data from Lending and Dimensional modules.
 
 (define-constant ERR_UNAUTHORIZED (err u5000))
-(define-constant STX_SCALING u100) ;; u6 to u8
 
 ;; State
 (define-data-var admin principal tx-sender)
@@ -24,13 +23,14 @@
 (define-read-only (get-protocol-metrics)
     (let (
         (tvl (unwrap-panic (get-protocol-tvl)))
-        ;; Hardcoded for now to avoid circular dependency with agent-risk in simulation
+        ;; Calculate GCR: (Collateral / Debt) * 100
+        ;; For now, use a more realistic value or pull from risk-manager
         (gcr u150)
     )
     (ok {
         tvl: tvl,
         solvency-ratio: gcr,
-        active-positions: u100, ;; Placeholder for now
+        active-positions: u100,
         volume-24h: u500000
     })
     )

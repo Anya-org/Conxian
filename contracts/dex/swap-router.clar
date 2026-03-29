@@ -30,13 +30,18 @@
   (let (
     (paused-state (unwrap! (contract-call? .enhanced-circuit-breaker is-contract-paused .swap-router) ERR_INTERNAL))
     (is-isolated-res (unwrap! (contract-call? .enhanced-circuit-breaker is-isolated (contract-of liquidity-source)) ERR_INTERNAL))
+    (user tx-sender)
   )
     (begin
       (asserts! (not paused-state) ERR_PROTOCOL_PAUSED)
       (asserts! (not is-isolated-res) ERR_SOURCE_ISOLATED)
 
+      ;; 1. Transfer tokens from User to Router
+      (try! (contract-call? token-in transfer amount-in user (as-contract tx-sender) none))
+
       (let (
-        (swap-res (try! (contract-call? liquidity-source execute-csf-swap token-in token-out amount-in tx-sender)))
+        ;; 2. Execute swap as Router
+        (swap-res (try! (as-contract (contract-call? liquidity-source execute-csf-swap token-in token-out amount-in (as-contract tx-sender)))))
         (amount-out (get amount-out swap-res))
         (fee-collected (get fee-collected swap-res))
       )
@@ -48,6 +53,9 @@
             err-val false
           )
 
+          ;; 3. Transfer tokens back to User
+          (try! (as-contract (contract-call? token-out transfer amount-out (as-contract tx-sender) user none)))
+
           (print {
             event: "csf-swap-executed",
             source: (contract-of liquidity-source),
@@ -55,7 +63,7 @@
             token-out: (contract-of token-out),
             amount-out: amount-out,
             fee: fee-collected,
-            sender: tx-sender
+            sender: user
           })
           (ok amount-out)
         )
@@ -97,11 +105,25 @@
     (min-amount-out uint)
   )
   (let (
-    (amount-out (try! (contract-call? .concentrated-liquidity-pool swap pool-id true amount-in token-in token-out tx-sender)))
+    (user tx-sender)
   )
     (begin
-      (asserts! (>= amount-out min-amount-out) ERR_SLIPPAGE)
-      (ok amount-out)
+      ;; 1. Transfer tokens from User to Router
+      (try! (contract-call? token-in transfer amount-in user (as-contract tx-sender) none))
+
+      (let (
+        ;; 2. Execute swap as Router
+        (amount-out (try! (as-contract (contract-call? .concentrated-liquidity-pool swap pool-id true amount-in token-in token-out (as-contract tx-sender)))))
+      )
+        (begin
+          (asserts! (>= amount-out min-amount-out) ERR_SLIPPAGE)
+
+          ;; 3. Transfer tokens back to User
+          (try! (as-contract (contract-call? token-out transfer amount-out (as-contract tx-sender) user none)))
+
+          (ok amount-out)
+        )
+      )
     )
   )
 )

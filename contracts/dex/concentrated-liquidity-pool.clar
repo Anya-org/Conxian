@@ -73,6 +73,7 @@
   (let (
     (pool (unwrap! (map-get? pools pool-id) ERR_INSUFFICIENT_LIQUIDITY))
     (token-out-trait (if zero-for-one token1-trait token0-trait))
+    (token-in-trait (if zero-for-one token0-trait token1-trait))
   )
     (begin
       (let (
@@ -82,11 +83,12 @@
       )
         (begin
           ;; Transfer input tokens from caller to the pool
-          (try! (contract-call? token-in transfer amount-in tx-sender (as-contract tx-sender) none))
+          (try! (contract-call? token-in-trait transfer amount-in tx-sender (as-contract tx-sender) none))
 
-          ;; Transfer output tokens from the pool to the recipient (User)
+          ;; Transfer output tokens from the pool to the recipient
           (try! (as-contract (contract-call? token-out-trait transfer amount-out (as-contract tx-sender) recipient none)))
 
+          ;; Register activity for BME
           (match (contract-call? .bme-engine register-fee-activity (as-contract tx-sender) protocol-fee)
             res true
             err-val false
