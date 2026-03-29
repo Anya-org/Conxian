@@ -1,7 +1,7 @@
 [project]
 name = "Conxian"
 clarinet_version = "3.12.0"
-epoch = "3.0"
+epoch = 3.0
 
 [accounts]
 deployer = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
@@ -77,7 +77,6 @@ depends_on = ["core-traits", "oracle-aggregator"]
 
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
-clarity_version = 3
 depends_on = ["oracle-aggregator", "cxd-token", "risk-unit", "conxian-protocol", "automation-traits", "conxian-service-trait"]
 
 [contracts.order-orchestrator]
@@ -198,9 +197,12 @@ path = "contracts/migration/migration-orchestrator.clar"
 path = "contracts/monitoring/monitoring-dashboard.clar"
 depends_on = ["conxian-protocol", "agent-risk", "finance-metrics", "dimensional-core", "risk-unit", "oracle-aggregator", "swap-router"]
 
+[contracts.bns-stub]
+path = "contracts/governance/bns-stub.clar"
+
 [contracts.reputation-engine]
 path = "contracts/governance/reputation-engine.clar"
-depends_on = ["conxian-access"]
+depends_on = ["conxian-access", "bns-stub"]
 
 [contracts.proposal-executor]
 path = "contracts/governance/proposal-executor.clar"
@@ -291,7 +293,6 @@ depends_on = ["sip-standards"]
 
 [contracts.math-lib-concentrated]
 path = "contracts/math/concentrated-math.clar"
-clarity_version = 3
 
 [contracts.office-manager]
 path = "contracts/core/office-manager.clar"
@@ -331,4 +332,3 @@ path = 'contracts/core/self-launch-coordinator.clar'
 
 [contracts.test-c4]
 path = "contracts/test-c4.clar"
-clarity_version = 2

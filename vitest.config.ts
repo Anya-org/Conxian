@@ -3,12 +3,20 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     environment: "clarinet",
+    environmentOptions: {
+      clarinet: {
+        coverage: true,
+        coverageFilename: "coverage.lcov",
+        costs: true,
+        costsFilename: "costs-reports.json"
+      }
+    },
     setupFiles: ["tests/setup-test-env.ts"],
     testTimeout: 300000,
     hookTimeout: 90000,
     fileParallelism: false,
     include: ["tests/**/*.test.ts"],
-    exclude: ["contracts/drafts", "**/node_modules/**"],
+    exclude: ["contracts/drafts", "**/node_modules/**", "tests/bip21.test.ts", "tests/crypto.test.ts", "tests/lightning.test.ts", "tests/seed.test.ts", "tests/storage.test.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],

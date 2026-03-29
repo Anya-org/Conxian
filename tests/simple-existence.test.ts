@@ -14,7 +14,7 @@ describe('Existence Check', () => {
       'ops-engine',
       'swap-router',
       'agent-risk',
-      'agent-treasury',
+      'fiscal-orchestrator',
       'oracle-aggregator'
     ];
 

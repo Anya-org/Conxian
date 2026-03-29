@@ -27,7 +27,7 @@ describe("Autonomous Executive Agents", () => {
   describe("Treasury Agent", () => {
     it("can calculate cybernetic policy", () => {
       const { result } = simnet.callReadOnlyFn(
-        "agent-treasury",
+        "fiscal-orchestrator",
         "calculate-cybernetic-policy",
         [],
         deployer

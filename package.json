@@ -52,7 +52,7 @@
     "tsx": "^4.7.1",
     "typescript": "^5.4.5",
     "vitest": "^4.0.16",
-    "vitest-environment-clarinet": "3.0.1"
+    "vitest-environment-clarinet": "^3.0.2"
   },
   "pnpm": {
     "overrides": {

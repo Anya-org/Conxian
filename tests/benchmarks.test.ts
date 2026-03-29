@@ -18,7 +18,7 @@ describe('Protocol Benchmarks', () => {
 
     const accounts = simnet.getAccounts();
     const wallet1 = accounts.get('wallet_1')!;
-    const res = simnet.callPublicFn('agent-treasury', 'run-fiscal-strategy',
+    const res = simnet.callPublicFn('fiscal-orchestrator', 'run-fiscal-strategy',
       [Cl.list([Cl.principal(wallet1)]), Cl.contractPrincipal(deployer, 'cxd-token')],
       deployer);
     console.log('BENCHMARK: run-fiscal-strategy');

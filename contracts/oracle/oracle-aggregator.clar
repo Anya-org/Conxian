@@ -10,17 +10,13 @@
 (define-constant ERR_CIRCUIT_OPEN (err u1003))
 (define-constant ERR_INVALID_SOURCE (err u1004))
 (define-constant ERR_NO_VALID_PRICE (err u1005))
-(define-constant ERR_CIRCUIT_OPEN (err u1003))
-(define-constant ERR_INVALID_SOURCE (err u1004))
-(define-constant ERR_NO_VALID_PRICE (err u1005))
+(define-constant ERR_CB_UNAUTHORIZED (err u1006))
 (define-constant MAX_PRICE_AGE u144)
 (define-constant MIN_SOURCES_REQUIRED u2)
 
 ;; --- Data Vars ---
 (define-data-var admin principal tx-sender)
 (define-data-var volatility-index uint u35)
-(define-data-var circuit-breaker-contract (optional principal) none)
-(define-data-var circuit-is-open bool false)
 (define-data-var circuit-breaker-contract (optional principal) none)
 (define-data-var circuit-is-open bool false)
 
