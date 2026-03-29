@@ -126,3 +126,8 @@
     )
   )
 )
+
+;; @desc Calculate total value locked in the lending manager
+(define-read-only (get-protocol-tvl)
+  (ok u0) ;; Implement aggregation logic over reserve-data map in future iteration
+)

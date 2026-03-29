@@ -96,9 +96,13 @@
     (amount-in uint)
     (min-amount-out uint)
   )
-  (begin
-    (try! (contract-call? token-in transfer amount-in tx-sender .concentrated-liquidity-pool none))
-    (contract-call? .concentrated-liquidity-pool swap pool-id true amount-in token-in token-out)
+  (let (
+    (amount-out (try! (contract-call? .concentrated-liquidity-pool swap pool-id true amount-in token-in token-out tx-sender)))
+  )
+    (begin
+      (asserts! (>= amount-out min-amount-out) ERR_SLIPPAGE)
+      (ok amount-out)
+    )
   )
 )
 
