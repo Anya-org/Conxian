@@ -77,12 +77,8 @@ depends_on = ["core-traits", "oracle-aggregator"]
 
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
-clarity-version = 4
+clarity_version = 3
 depends_on = ["oracle-aggregator", "cxd-token", "risk-unit", "conxian-protocol", "automation-traits", "conxian-service-trait"]
-
-
-
-
 
 [contracts.order-orchestrator]
 path = "contracts/enterprise/order-orchestrator.clar"
@@ -126,7 +122,7 @@ depends_on = ["conxian-protocol", "conxian-access", "core-traits", "sip-standard
 
 [contracts.dimensional-core]
 path = "contracts/dimensional/dimensional-core.clar"
-depends_on = ["position-nft"]
+depends_on = ["position-nft", "core-traits", "conxian-protocol", "oracle-aggregator"]
 
 [contracts.operational-treasury]
 path = "contracts/core/operational-treasury.clar"
@@ -295,12 +291,10 @@ depends_on = ["sip-standards"]
 
 [contracts.math-lib-concentrated]
 path = "contracts/math/concentrated-math.clar"
-clarity-version = 4
+clarity_version = 3
 
 [contracts.office-manager]
 path = "contracts/core/office-manager.clar"
-
-
 
 [contracts.voting]
 path = "contracts/governance/voting.clar"
@@ -337,4 +331,4 @@ path = 'contracts/core/self-launch-coordinator.clar'
 
 [contracts.test-c4]
 path = "contracts/test-c4.clar"
-clarity-version = 4
+clarity_version = 2
