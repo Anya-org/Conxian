@@ -73,8 +73,8 @@ importers:
         specifier: ^8.13.6
         version: 8.13.6
       '@stacks/clarinet-sdk':
-        specifier: ^3.12.0
-        version: 3.13.1
+        specifier: ^3.14.0
+        version: 3.15.1
       '@stacks/common':
         specifier: ^7.3.1
         version: 7.3.1
@@ -114,6 +114,9 @@ importers:
       vitest:
         specifier: ^4.0.16
         version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@24.10.9)(tsx@4.21.0)
+      vitest-environment-clarinet:
+        specifier: 3.0.1
+        version: 3.0.1(@stacks/clarinet-sdk@3.15.1)(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@24.10.9)(tsx@4.21.0))
 
 packages:
 
@@ -375,66 +378,79 @@ packages:
     resolution: {integrity: sha512-E8jKK87uOvLrrLN28jnAAAChNq5LeCd2mGgZF+fGF5D507WlG/Noct3lP/QzQ6MrqJ5BCKNwI9ipADB6jyiq2A==}
     cpu: [arm]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-arm-musleabihf@4.56.0':
     resolution: {integrity: sha512-jQosa5FMYF5Z6prEpTCCmzCXz6eKr/tCBssSmQGEeozA9tkRUty/5Vx06ibaOP9RCrW1Pvb8yp3gvZhHwTDsJw==}
     cpu: [arm]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-arm64-gnu@4.56.0':
     resolution: {integrity: sha512-uQVoKkrC1KGEV6udrdVahASIsaF8h7iLG0U0W+Xn14ucFwi6uS539PsAr24IEF9/FoDtzMeeJXJIBo5RkbNWvQ==}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-arm64-musl@4.56.0':
     resolution: {integrity: sha512-vLZ1yJKLxhQLFKTs42RwTwa6zkGln+bnXc8ueFGMYmBTLfNu58sl5/eXyxRa2RarTkJbXl8TKPgfS6V5ijNqEA==}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-loong64-gnu@4.56.0':
     resolution: {integrity: sha512-FWfHOCub564kSE3xJQLLIC/hbKqHSVxy8vY75/YHHzWvbJL7aYJkdgwD/xGfUlL5UV2SB7otapLrcCj2xnF1dg==}
     cpu: [loong64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-loong64-musl@4.56.0':
     resolution: {integrity: sha512-z1EkujxIh7nbrKL1lmIpqFTc/sr0u8Uk0zK/qIEFldbt6EDKWFk/pxFq3gYj4Bjn3aa9eEhYRlL3H8ZbPT1xvA==}
     cpu: [loong64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-ppc64-gnu@4.56.0':
     resolution: {integrity: sha512-iNFTluqgdoQC7AIE8Q34R3AuPrJGJirj5wMUErxj22deOcY7XwZRaqYmB6ZKFHoVGqRcRd0mqO+845jAibKCkw==}
     cpu: [ppc64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-ppc64-musl@4.56.0':
     resolution: {integrity: sha512-MtMeFVlD2LIKjp2sE2xM2slq3Zxf9zwVuw0jemsxvh1QOpHSsSzfNOTH9uYW9i1MXFxUSMmLpeVeUzoNOKBaWg==}
     cpu: [ppc64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-riscv64-gnu@4.56.0':
     resolution: {integrity: sha512-in+v6wiHdzzVhYKXIk5U74dEZHdKN9KH0Q4ANHOTvyXPG41bajYRsy7a8TPKbYPl34hU7PP7hMVHRvv/5aCSew==}
     cpu: [riscv64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-riscv64-musl@4.56.0':
     resolution: {integrity: sha512-yni2raKHB8m9NQpI9fPVwN754mn6dHQSbDTwxdr9SE0ks38DTjLMMBjrwvB5+mXrX+C0npX0CVeCUcvvvD8CNQ==}
     cpu: [riscv64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-s390x-gnu@4.56.0':
     resolution: {integrity: sha512-zhLLJx9nQPu7wezbxt2ut+CI4YlXi68ndEve16tPc/iwoylWS9B3FxpLS2PkmfYgDQtosah07Mj9E0khc3Y+vQ==}
     cpu: [s390x]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-x64-gnu@4.56.0':
     resolution: {integrity: sha512-MVC6UDp16ZSH7x4rtuJPAEoE1RwS8N4oK9DLHy3FTEdFoUTCFVzMfJl/BVJ330C+hx8FfprA5Wqx4FhZXkj2Kw==}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-x64-musl@4.56.0':
     resolution: {integrity: sha512-ZhGH1eA4Qv0lxaV00azCIS1ChedK0V32952Md3FtnxSqZTBTd6tgil4nZT5cU8B+SIw3PFYkvyR4FKo2oyZIHA==}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-openbsd-x64@4.56.0':
     resolution: {integrity: sha512-O16XcmyDeFI9879pEcmtWvD/2nyxR9mF7Gs44lf1vGGx8Vg2DRNx11aVXBEqOQhWb92WN4z7fW/q4+2NYzCbBA==}
@@ -487,11 +503,11 @@ packages:
   '@stacks/blockchain-api-client@8.13.6':
     resolution: {integrity: sha512-ja7jYybcPorDCNtc3UPyJLdmpjrz24R09wxQ9+T7jlKjYKjrooKYJlyH+YYujbck/G6Q2Ga7n8pc6kiy/EwNKA==}
 
-  '@stacks/clarinet-sdk-wasm@3.13.1':
-    resolution: {integrity: sha512-bNGdmhAsGhMmqbJ6DnBdZBKGQAMAyQXAEkoTjHLFjxj013XxiUMXEl1nVxdQmjqDuZFXn9bkkHTF56YF1aCQ/g==}
+  '@stacks/clarinet-sdk-wasm@3.15.1':
+    resolution: {integrity: sha512-VnmhHG8cvB6ku/OGw1LCWwHElrGCL6stq6CVQxbTdb595ZAKIvBhJY7iKW5bvqWmHHMS7jxCNXM2fO/8M997Jg==}
 
-  '@stacks/clarinet-sdk@3.13.1':
-    resolution: {integrity: sha512-n3ehFVHcJ4P7vpDHbZRiqUHrzoNfY+P5ZRgpXiISJrQvinNGbX+SAtH3E+aw2L6fXqRyZQB0v/w9XVV8yjtXsg==}
+  '@stacks/clarinet-sdk@3.15.1':
+    resolution: {integrity: sha512-tFDzkqIIWyIl3WG21GJq1PtiIhQDyOXeOTK8089AXQYlO6jqwIvYlHuKn5qjokFBUaYcPOjGUhcCoJtkUCs6rA==}
     engines: {node: '>=18.0.0'}
 
   '@stacks/common@7.3.1':
@@ -1369,6 +1385,13 @@ packages:
       yaml:
         optional: true
 
+  vitest-environment-clarinet@3.0.1:
+    resolution: {integrity: sha512-0d9aRWdi9c9rIxfRYVoiKJN7VVPvIOhbSV75juq/Lyw8IqfQs94sLW7mjVlbQLjUL/tXz0e5vhU0Hjt/lS3QjA==}
+    deprecated: Please ugprade to vitest-environment-clarinet >= v3 and use @stacks/clarinet-sdk
+    peerDependencies:
+      '@stacks/clarinet-sdk': '>=3.8.1'
+      vitest: ^4.0.0
+
   vitest@4.0.18:
     resolution: {integrity: sha512-hOQuK7h0FGKgBAas7v0mSAsnvrIgAvWmRFjmzpJ7SwFHH3g1k2u37JtYwOwmEKhK6ZO3v9ggDBBm0La1LCK4uQ==}
     engines: {node: ^20.0.0 || ^22.0.0 || >=24.0.0}
@@ -1732,11 +1755,11 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@stacks/clarinet-sdk-wasm@3.13.1': {}
+  '@stacks/clarinet-sdk-wasm@3.15.1': {}
 
-  '@stacks/clarinet-sdk@3.13.1':
+  '@stacks/clarinet-sdk@3.15.1':
     dependencies:
-      '@stacks/clarinet-sdk-wasm': 3.13.1
+      '@stacks/clarinet-sdk-wasm': 3.15.1
       '@stacks/transactions': 7.3.1
       kolorist: 1.8.0
       prompts: 2.4.2
@@ -2711,6 +2734,11 @@ snapshots:
       '@types/node': 24.10.9
       fsevents: 2.3.3
       tsx: 4.21.0
+
+  vitest-environment-clarinet@3.0.1(@stacks/clarinet-sdk@3.15.1)(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@24.10.9)(tsx@4.21.0)):
+    dependencies:
+      '@stacks/clarinet-sdk': 3.15.1
+      vitest: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@24.10.9)(tsx@4.21.0)
 
   vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@24.10.9)(tsx@4.21.0):
     dependencies:
