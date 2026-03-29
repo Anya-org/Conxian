@@ -54,6 +54,7 @@ const DEPLOYMENT_SEQUENCE = [
   { name: "ops-engine", path: "contracts/core/ops-engine.clar" },
   // Phase 12: Gateway
   { name: "intent-solver-gateway", path: "contracts/gateway/intent-solver-gateway.clar" },
+  { name: "revenue-automation", path: "contracts/revenue-automation.clar" },
 ];
 
 async function getAccountNonce(address: string): Promise<number> {

@@ -7,6 +7,7 @@
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
     "test": "vitest run",
+    "deploy": "clarinet deploy revenue-automation --network testnet",
     "clarinet:check": "clarinet check",
     "check": "clarinet check",
     "clarinet:console": "clarinet console",

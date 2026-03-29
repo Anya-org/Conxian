@@ -332,3 +332,8 @@ path = 'contracts/core/self-launch-coordinator.clar'
 
 [contracts.test-c4]
 path = "contracts/test-c4.clar"
+
+[contracts.revenue-automation]
+path = "contracts/revenue-automation.clar"
+depends_on = ["sip-standards"]
+
