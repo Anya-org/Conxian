@@ -69,10 +69,10 @@
 
 (define-read-only (get-performance-metrics)
   (let (
-    (tvl (unwrap-panic (contract-call? .finance-metrics get-protocol-tvl)))
+    (metrics (unwrap-panic (contract-call? .finance-metrics get-protocol-metrics)))
   )
     (ok {
-      tvl: tvl,
+      tvl: (get tvl metrics),
       last-month-tvl: u1000000, ;; Mock for now
       bounty-completion-rate: u85,
       tvl-growth-bps: u100
@@ -80,9 +80,13 @@
   )
 )
 
-;; @desc Returns raw GCR for legacy integration
+;; @desc Returns raw GCR from finance-metrics
 (define-read-only (get-gcr)
-  (ok u150) ;; Simulated constant for base risk logic
+  (let (
+    (metrics (unwrap-panic (contract-call? .finance-metrics get-protocol-metrics)))
+  )
+    (ok (get solvency-ratio metrics))
+  )
 )
 
 ;; @desc Calculates real health factor for a position by querying risk-manager (read-only)
