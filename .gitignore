@@ -1,0 +1,52 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Build artifacts
+dist/
+build/
+target/
+*.so
+*.dylib
+*.dll
+*.exe
+*.wasm
+
+# Test and coverage
+test-results/
+playwright-report/
+coverage/
+.nyc_output/
+*.log
+
+# Environment and secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+secrets.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.class
+.venv/
+venv/
+ENV/
+env/
+
+# Rust
+target/
+debug/
+release/
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Submodules and workspace-specific ignores (already handled by their own .gitignores)

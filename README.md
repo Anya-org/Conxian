@@ -4,7 +4,7 @@ This repository is the programmatic **State Machine** for Conxian operations. We
 
 ## 🚀 The Strategic Vision: Bitcoin-Native Evolution
 
-Conxian is engineering a $1B+ Bitcoin-native ecosystem. Our Business Operations System (BOS) transforms operational excellence into verifiable, immutable proof on the world's most resilient network. This ensures absolute sovereignty and maximizes valuation for our Terminal Exit Vector.
+Conxian is engineering a B+ Bitcoin-native ecosystem. Our Business Operations System (BOS) transforms operational excellence into verifiable, immutable proof on the world's most resilient network. This ensures absolute sovereignty and maximizes valuation for our Terminal Exit Vector.
 
 ## 🏛️ Ground Truth (OpenSpec)
 
@@ -25,6 +25,14 @@ The BOS is powered by an active suite of autonomous agents:
 - **State Layer**: [Supabase](https://supabase.com) (Real-time Financials, IP Audit, Exit Velocity).
 - **Execution Engine**: [Linear](https://linear.app) (Programmatic Action Task Specifications).
 - **Monetization**: Hardcoded **0.1% protocol fee (CSF swaps) and 1% (100 bps) Sovereign Tax (A2P and cross-chain)** and 1% Software Licensing Royalty.
+
+## 🛡️ Governance and Security
+
+We adhere to strict sovereignty and security standards.
+
+- [**CONTRIBUTING.md**](./CONTRIBUTING.md): Guidelines for contributing to the BOS.
+- [**SECURITY.md**](./SECURITY.md): How to report vulnerabilities and our security posture.
+- [**LICENSE**](./LICENSE) (if present): Software licensing terms.
 
 ## 🗺️ Implementation Roadmap (v1.7.0)
 
