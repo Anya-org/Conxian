@@ -37,6 +37,8 @@
 )
 
 ;; Admin Functions
+
+;; @desc Sets a new administrative principal for the metrics contract
 (define-public (set-admin (new-admin principal))
     (begin
         (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
