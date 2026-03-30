@@ -22,6 +22,7 @@
 
 ;; --- Authorization ---
 
+;; @desc Returns true if the principal is the contract administrator
 (define-read-only (is-admin (user principal))
   (is-eq user (var-get admin))
 )
