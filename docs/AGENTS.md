@@ -23,4 +23,10 @@
 - **Specs**: docs/
 
 ---
-🛡️ **SOVEREIGN. INDUSTRIAL. BTC-NATIVE.**
+**SOVEREIGN. INDUSTRIAL. BTC-NATIVE.**
+
+## 6. KNOWLEDGE RETENTION & HYGIENE (March 2026 Mandate)
+- **Zero Secret Egress (ZSE)**: No sensitive operational, strategy, or financial material may be tracked in the active Git index.
+- **Migration Mandate**: Before any path containing sensitive material (e.g., `internal/strategy/`, `archive/`) is added to `.gitignore`, all contained knowledge must be migrated to the **Linear Virtual Office** (e.g., parent issue CON-306).
+- **Verification**: Run `python3 scripts/verify_knowledge_retention.py` to ensure all ignored sensitive paths are accounted for in the `audit/migration_manifest.json`.
+- **Hygiene**: The root directory must remain clean of build artifacts (`*.log`, `*.txt`, `*.patch`).

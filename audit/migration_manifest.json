@@ -1,0 +1,69 @@
+{
+  "CON-306": {
+    "description": "Master Strategy Migration",
+    "paths": ["internal/strategy/**", "archive/**"]
+  },
+  "CON-307": {
+    "paths": ["internal/strategy/HOLISTIC_REVIEW.md"]
+  },
+  "CON-308": {
+    "paths": ["internal/strategy/RED_TEAM_ASSESSMENT.md"]
+  },
+  "CON-309": {
+    "paths": ["internal/strategy/INTERNAL_OPERATIONS.md"]
+  },
+  "CON-310": {
+    "paths": ["internal/strategy/MARKET_SIZING.md"]
+  },
+  "CON-311": {
+    "paths": ["internal/strategy/SUPERIORITY_RESEARCH_2026.md"]
+  },
+  "CON-312": {
+    "paths": ["internal/strategy/SYNERGIES.md"]
+  },
+  "CON-313": {
+    "paths": ["internal/strategy/briefs/*"]
+  },
+  "CON-314": {
+    "paths": ["internal/strategy/leaf_to_root_feedback_2026.md"]
+  },
+  "CON-315": {
+    "paths": ["internal/strategy/root_leaf_alignment_report.md"]
+  },
+  "CON-316": {
+    "paths": ["internal/strategy/system_asset_review_2026.md"]
+  },
+  "CON-317": {
+    "paths": ["internal/strategy/business_unit_review_2026.md"]
+  },
+  "CON-318": {
+    "paths": ["archive/GAP_VULNERABILITY_REPORT.md"]
+  },
+  "CON-319": {
+    "paths": ["archive/GLOSSARY.md"]
+  },
+  "CON-320": {
+    "paths": ["archive/03_infrastructure/README.md"]
+  },
+  "CON-321": {
+    "paths": ["archive/05_investors/*", "archive/02_strategy/*"]
+  },
+  "CON-322": {
+    "paths": [
+      "archive/03_infrastructure/*",
+      "archive/01_governance/*",
+      "archive/06_meetings/*",
+      "archive/07_assets/*"
+    ]
+  },
+  "CON-323": {
+    "paths": [
+      "archive/legacy_docs/*",
+      "archive/BD_UNIT_*",
+      "archive/PRD.md",
+      "archive/*.py",
+      "archive/*.sh",
+      "archive/*.ps1"
+    ]
+  }
+}

@@ -14,6 +14,8 @@ Welcome to the Conxian ecosystem. We are building a Bitcoin-native Business Oper
 2.  Maintain Zero Secret Egress (ZSE) compliance.
 3.  All Clarity smart contracts must pass the Vitest/Simnet test suite.
 4.  Documentation must be updated to match implementation.
+5.  Review the [**CODEOWNERS**](./CODEOWNERS) file to identify the appropriate reviewers for your changes.
+6.  Ensure any changes are reflected in the [**CHANGELOG.md**](./CHANGELOG.md).
 
 ## Coding Standards
 
@@ -23,7 +25,7 @@ Welcome to the Conxian ecosystem. We are building a Bitcoin-native Business Oper
 
 ## Governance
 
-Conxian operates as a Sovereign Autonomous Business. Contributions are validated by the EXCO agent suite.
+Conxian operates as a Sovereign Autonomous Business. Contributions are validated by the EXCO agent suite and must adhere to the [**LICENSE**](./LICENSE) terms.
 
 ---
 🛡️ **Sovereign Autonomous Business (SAB)**. © 2026 Conxian-Labs.

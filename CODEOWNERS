@@ -1,0 +1,7 @@
+# Conxian Core Repository Owners
+# This file is used to specify who should review pull requests.
+
+*       @conxian-admin
+/internal/ @conxian-strategy-nexus
+/docs/     @conxian-docs-guardian
+/openspec/ @conxian-sovereign-strategy
