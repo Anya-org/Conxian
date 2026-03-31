@@ -40,6 +40,13 @@ This repository is licensed under the GNU GPL v3.0 (see `LICENSE`).
 - [**CHANGELOG.md**](./CHANGELOG.md): History of BOS changes.
 - [**CODEOWNERS**](./CODEOWNERS): Repository ownership and review guidance.
 
+## 📂 Repository Hygiene
+
+To maintain a clean and sovereign workspace, we adhere to strict hygiene standards:
+- **`scripts/`**: Contains active utility scripts (e.g., `check_links.py`).
+- **`archive/remediation_scripts/`**: Historical artifacts from previous system audits and remediations.
+- **`openspec/`**: Definitive technical specifications.
+
 ## 🗺️ Implementation Roadmap (v1.7.0)
 
 1. **Foundation (Q3-Q4 2025)**: Anchor key metrics and IP assets to Bitcoin. Establish multi-sig treasury.

@@ -53,11 +53,13 @@ To validate that your local environment is correctly configured, you can run the
 
 ---
 
-## 3. Current Local Development Keys (March 2026 Snapshot)
+## 3. Local Development Keys & Security (ZSE Compliance)
 
-The following keys were safely extracted from the local `.env` before being removed from tracking. Please ensure they are properly mapped into GitHub Secrets for the next deployment pipeline.
+**WARNING: NEVER COMMIT PRIVATE KEYS OR SENSITIVE CREDENTIALS TO THIS REPOSITORY.**
 
-- `DEPLOYER_PRIVKEY`: `753b7cc01a1a2e86221266a154af739463fce51219d97e4f856cd7200c3bd2a6`
-- `SYSTEM_ADDRESS`: `ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
-- `NETWORK`: `testnet`
-- `CORE_API_URL`: `https://api.testnet.hiro.so`
+In accordance with the **Zero Secret Egress (ZSE)** mandate, all sensitive keys (such as `DEPLOYER_PRIVKEY` or `SYSTEM_PRIVKEY`) must be managed via:
+1.  **Secure Environment Variables**: Use local `.env` files (which are ignored by git).
+2.  **Hardware Security Modules (HSM)**: For production, use Android StrongBox/Secure Enclave as specified in our architecture.
+3.  **Encrypted Password Managers**: For shared development secrets, use an organization-approved vault.
+
+If you need to provision a new environment, refer to the `admin/validate-env.ps1` script and ensure your local `.env` matches the requirements listed in Section 2.
