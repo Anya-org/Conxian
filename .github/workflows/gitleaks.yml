@@ -49,7 +49,8 @@ jobs:
 
           config_args=()
           if git cat-file -e "${base_sha}:gitleaks.toml" 2>/dev/null; then
-            config_path="${tmp_dir}/gitleaks.toml"
+            mkdir -p "$tmp_dir"
+            config_path="$(mktemp "${tmp_dir}/gitleaks-config-XXXXXX.toml")"
             git show "${base_sha}:gitleaks.toml" > "$config_path"
             config_args+=(--config="$config_path")
           fi
