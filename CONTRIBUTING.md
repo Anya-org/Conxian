@@ -40,6 +40,19 @@ Example: `feat(core): add batch operation for role updates`
 
 Thank you for your contributions!
 
+## Dependencies
+
+This repo standardizes on **npm** and commits `package-lock.json` to keep installs reproducible.
+
+- When you change dependencies, include the updated `package-lock.json` in the same PR.
+- Do not commit other lockfiles (`pnpm-lock.yaml`, `yarn.lock`, `bun.lockb`).
+
+## Secrets and local environment
+
+- Never commit any `.env*` files (for example: `.env`, `.env.local`, `ui/.env.local`), private keys, or API tokens.
+- Use `.env.example` as the template for required environment variables.
+- Pull requests and pushes to `main` are scanned with `gitleaks` in GitHub Actions.
+
 ## Modular Architecture & Testability
 
 To avoid circular dependencies in our simulation environment, we enforce the **Principal Injection** pattern:

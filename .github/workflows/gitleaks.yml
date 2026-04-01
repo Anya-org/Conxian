@@ -1,0 +1,60 @@
+name: gitleaks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install gitleaks
+        run: |
+          set -euo pipefail
+
+          version="8.30.1"
+          archive="gitleaks_${version}_linux_x64.tar.gz"
+          url="https://github.com/gitleaks/gitleaks/releases/download/v${version}/${archive}"
+
+          curl -sSL "$url" -o "/tmp/${archive}"
+          tar -xzf "/tmp/${archive}" -C /tmp
+          sudo mv /tmp/gitleaks /usr/local/bin/gitleaks
+          gitleaks version
+
+      - name: Run gitleaks (commit range)
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+          PUSH_AFTER_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          range=""
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            range="${PR_BASE_SHA}..${PR_HEAD_SHA}"
+          else
+            if [ "$PUSH_BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
+              range="$PUSH_AFTER_SHA"
+            else
+              range="${PUSH_BEFORE_SHA}..${PUSH_AFTER_SHA}"
+            fi
+          fi
+
+          echo "Scanning git range: ${range}"
+          gitleaks detect \
+            --redact \
+            --config="gitleaks.toml" \
+            --log-opts="${range}"

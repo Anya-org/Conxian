@@ -1,0 +1,7 @@
+title = "Conxian gitleaks config"
+
+[allowlist]
+description = "Repo-local templates and docs that may include example values"
+paths = [
+  '''^\.env\.example$''',
+]
