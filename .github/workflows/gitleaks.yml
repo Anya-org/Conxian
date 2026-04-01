@@ -3,8 +3,7 @@ name: gitleaks
 on:
   pull_request:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -15,7 +14,7 @@ jobs:
     name: gitleaks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
 
@@ -24,47 +23,52 @@ jobs:
           set -euo pipefail
 
           version="8.30.1"
-          archive="gitleaks_${version}_linux_x64.tar.gz"
-          url="https://github.com/gitleaks/gitleaks/releases/download/v${version}/${archive}"
+          asset="gitleaks_${version}_linux_x64.tar.gz"
+          checksums="gitleaks_${version}_checksums.txt"
 
-          curl -sSL "$url" -o "/tmp/${archive}"
-          tar -xzf "/tmp/${archive}" -C /tmp
-          sudo mv /tmp/gitleaks /usr/local/bin/gitleaks
-          gitleaks version
+          curl -sSL -o "$asset" \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${version}/${asset}"
+          curl -sSL -o "$checksums" \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${version}/${checksums}"
 
-      - name: Run gitleaks (commit range)
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          PUSH_BEFORE_SHA: ${{ github.event.before }}
-          PUSH_AFTER_SHA: ${{ github.sha }}
+          grep " ${asset}$" "$checksums" | sha256sum -c -
+
+          install_dir="$RUNNER_TEMP/gitleaks"
+          mkdir -p "$install_dir"
+          tar -xzf "$asset" -C "$install_dir" gitleaks
+          echo "$install_dir" >> "$GITHUB_PATH"
+
+      - name: Scan (pull_request)
+        if: github.event_name == 'pull_request'
         run: |
           set -euo pipefail
+          gitleaks detect \
+            --no-banner \
+            --redact \
+            --log-opts="${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
 
-          range=""
-          if [ "$EVENT_NAME" = "pull_request" ]; then
-            range="${PR_BASE_SHA}..${PR_HEAD_SHA}"
-          fi
-
-          if [ "$EVENT_NAME" = "push" ]; then
-            if [ "$PUSH_BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
-              range="$PUSH_AFTER_SHA"
-            else
-              range="${PUSH_BEFORE_SHA}..${PUSH_AFTER_SHA}"
-            fi
-          fi
-
-          if [ -n "$range" ]; then
-            echo "Scanning git range: ${range}"
+      - name: Scan (push)
+        if: github.event_name == 'push'
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
             gitleaks detect \
+              --no-banner \
               --redact \
-              --config="gitleaks.toml" \
-              --log-opts="${range}"
-          else
-            echo "No git range available for event ${EVENT_NAME}; scanning working tree"
-            gitleaks detect \
-              --no-git \
-              --redact \
-              --config="gitleaks.toml"
+              --no-git
+            exit 0
           fi
+
+          gitleaks detect \
+            --no-banner \
+            --redact \
+            --log-opts="${{ github.event.before }}..${{ github.sha }}"
+
+      - name: Scan (workflow_dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          gitleaks detect \
+            --no-banner \
+            --redact \
+            --no-git
