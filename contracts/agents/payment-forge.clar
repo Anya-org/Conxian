@@ -52,10 +52,14 @@
       ;; 2. Execute Transfer to SFC Vault
       (match (contract-call? token transfer amount tx-sender .fiscal-vault-oracle none)
         transfer-ok (begin
+          (asserts! transfer-ok ERR_SETTLEMENT_FAILED)
           (print { event: "x402-settlement-executed", amount: amount, token: (contract-of token), actor: tx-sender })
           (ok true)
         )
-        transfer-err ERR_SETTLEMENT_FAILED
+        transfer-err (begin
+          (print { event: "x402-settlement-failed", amount: amount, token: (contract-of token), actor: tx-sender, reason: transfer-err })
+          ERR_SETTLEMENT_FAILED
+        )
       )
     )
   )
