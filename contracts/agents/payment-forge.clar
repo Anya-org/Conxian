@@ -10,6 +10,10 @@
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_INVALID_X402_SIG (err u5001))
 (define-constant ERR_SETTLEMENT_FAILED (err u5002))
+(define-constant ERR_INVALID_X402_PAYLOAD (err u5003))
+(define-constant ERR_X402_REPLAY (err u5004))
+(define-constant ERR_X402_SIGNER_NOT_REGISTERED (err u5005))
+(define-constant ERR_INVALID_X402_PUBKEY (err u5006))
 
 (define-data-var admin principal tx-sender)
 
@@ -17,23 +21,42 @@
 ;; Transaction Hash -> ISO 20022 Verification Hash
 (define-map settlement-registry (buff 32) (buff 32))
 
+;; --- x402 Signature Registry ---
+(define-map x402-signer-pubkeys principal (buff 33))
+(define-map x402-consumed-msg-hashes (buff 32) bool)
+
 ;; --- Public Functions ---
 
 ;; @desc Trigger x402 M2M Settlement
 ;; Inspired by HTTP 402: Payment Required. AI Agent triggers instant settlement.
 (define-public (trigger-x402-settlement (amount uint) (token <sip-010-trait>) (signature (buff 65)))
   (let (
-    (msg-hash (sha256 (unwrap-panic (to-consensus-buff? { amount: amount, requester: tx-sender, epoch: burn-block-height }))))
+    (payload {
+      amount: amount,
+      token: (contract-of token),
+      vault: .fiscal-vault-oracle,
+      requester: tx-sender,
+      epoch: burn-block-height,
+      forge: (as-contract tx-sender)
+    })
+    (msg-hash (sha256 (unwrap! (to-consensus-buff? payload) ERR_INVALID_X402_PAYLOAD)))
+    (pubkey (unwrap! (map-get? x402-signer-pubkeys tx-sender) ERR_X402_SIGNER_NOT_REGISTERED))
   )
     (begin
-      ;; 1. Signature Verification (Placeholder: In production, verify against Sovereign DID)
+      ;; 1. Signature Verification (Temporary: registry-backed, admin-managed pubkeys)
       (asserts! (is-eq (len signature) u65) ERR_INVALID_X402_SIG)
+      (asserts! (is-none (map-get? x402-consumed-msg-hashes msg-hash)) ERR_X402_REPLAY)
+      (asserts! (secp256k1-verify msg-hash signature pubkey) ERR_INVALID_X402_SIG)
+      (map-set x402-consumed-msg-hashes msg-hash true)
       
       ;; 2. Execute Transfer to SFC Vault
-      (try! (contract-call? token transfer amount tx-sender .fiscal-vault-oracle none))
-      
-      (print { event: "x402-settlement-executed", amount: amount, token: (contract-of token), actor: tx-sender })
-      (ok true)
+      (match (contract-call? token transfer amount tx-sender .fiscal-vault-oracle none)
+        transfer-ok (begin
+          (print { event: "x402-settlement-executed", amount: amount, token: (contract-of token), actor: tx-sender })
+          (ok true)
+        )
+        transfer-err ERR_SETTLEMENT_FAILED
+      )
     )
   )
 )
@@ -71,6 +94,15 @@
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
     (var-set admin new-admin)
+    (ok true)
+  )
+)
+
+(define-public (set-x402-signer-pubkey (signer principal) (pubkey (buff 33)))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq (len pubkey) u33) ERR_INVALID_X402_PUBKEY)
+    (map-set x402-signer-pubkeys signer pubkey)
     (ok true)
   )
 )
