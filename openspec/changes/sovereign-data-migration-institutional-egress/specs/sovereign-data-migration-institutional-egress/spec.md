@@ -12,6 +12,16 @@ This specification uses requirement keywords (**MUST**, **MUST NOT**, **SHOULD**
 - **External subledger**: any external accounting system ingesting Conxian datasets (ERP subledger, auditor subledger, reporting pipeline).
 - **Proof/visual-proof flow**: any workflow that presents derived analytics as evidence (dashboards, reports, attestations).
 
+### Export field naming conventions
+
+To reduce ambiguity across institutional egress consumers, exported datasets **MUST** define a representation-agnostic canonical field schema and a deterministic mapping to any renderer-specific formats.
+
+- Canonical dataset fields **MUST** use `snake_case`.
+- JSON exports, CSV headers, the column names of any SQL views or tables used as egress-facing datasets, and any other direct machine-readable serializations of the dataset (excluding message-oriented integration formats) **MUST** expose the canonical fields using their canonical `snake_case` field names. Any deprecated alias fields **MAY** deviate from `snake_case` but **MUST** be explicitly documented as non-canonical and follow the published deprecation window.
+- Message formats (ISO 20022 and any other message format) **MAY** use format-native field names; renderers **MUST** publish a deterministic mapping from canonical fields to the renderer-specific field names in a version-controlled location alongside the dataset schema.
+- If canonical field names change, the dataset producer **MUST** either publish a backward-compatible alias strategy with an explicit deprecation window or publish a replacement dataset with a new `dataset_id` and deprecate the prior dataset. Any alias strategy **MUST** treat canonical field names as authoritative when both canonical and alias fields are present.
+- `burn_block_height` is the canonical field name for burn block anchoring; if any implementation previously exposed `burn-block-height`, it **MUST** emit both `burn_block_height` and the deprecated alias `burn-block-height` for the duration of the explicitly documented deprecation window.
+
 ## 1. Purpose
 
 Define Phase 5 "clean break" constraints for Supabase and Neon, and define institutional accounting egress as standardized read-only subledger export. This spec synthesizes and sharpens existing SAB migration and treasury/oracle work without creating a duplicate execution lane.
@@ -62,7 +72,7 @@ Out of scope:
    - serving egress datasets,
    - serving verification materials,
    - rendering standardized message formats (e.g., ISO 20022) over verifiable datasets.
-5. **Burn-block anchoring**: Egress datasets **MUST** identify finality using Bitcoin-anchored height (`burn-block-height`) wherever final settlement interpretation is required.
+5. **Burn-block anchoring**: Egress datasets **MUST** identify finality using Bitcoin-anchored height (`burn_block_height`) wherever final settlement interpretation is required (see Export field naming conventions for legacy `burn-block-height` aliasing and deprecation).
 6. **No secret egress**: Egress datasets **MUST NOT** contain:
    - seed phrases, signing keys, enclave-only secrets, or any reversible key material,
    - private identity disclosures.
