@@ -2,6 +2,33 @@
 
 This repository is the programmatic **State Machine** for Conxian operations. We have evolved from a system that runs on infrastructure to a system that **is** infrastructure—living directly on Bitcoin.
 
+## Purpose
+
+Define and version Conxian's Business Operations System (BOS) as an auditable, programmatic state machine (OpenSpec, governance, and operational artifacts).
+
+## Status
+
+Active. This is the public source of truth for BOS-level specifications and how the broader Conxian stack fits together.
+
+## Audience
+
+- Contributors implementing Conxian's protocol, infrastructure, and tools.
+- Partners and auditors who need a canonical, versioned view of OpenSpec.
+
+## Relationship to the Conxian stack
+
+This repository pins and coordinates the flagship Conxian repositories, including:
+
+- [`Conxian/`](./Conxian): Conxian Finance Protocol (Clarity smart contracts)
+- [`conxian-gateway/`](./conxian-gateway): Conxian Gateway (Rust)
+- [`conxian-nexus/`](./conxian-nexus): Conxian Nexus (Rust)
+- [`lib-conxian-core/`](./lib-conxian-core): Shared core libraries centered around the Gateway
+- [`conxian-ui/`](./conxian-ui): Conxian UI (web)
+- [`conxius-wallet/`](./conxius-wallet): Conxius Wallet (mobile)
+- [`conxius-platform/`](./conxius-platform): Stack orchestration and local development
+- [`stacksorbit/`](./stacksorbit): Deployment and operations tooling
+- [`conxian-labs-site/`](./conxian-labs-site): Conxian Labs public site
+
 ## 🚀 The Strategic Vision: Bitcoin-Native Evolution
 
 Conxian is engineering a B+ Bitcoin-native ecosystem. Our Business Operations System (BOS) transforms operational excellence into verifiable, immutable proof on the world's most resilient network. This ensures absolute sovereignty and maximizes valuation for our Terminal Exit Vector.
