@@ -59,6 +59,7 @@ jobs:
           head_sha="${{ github.event.pull_request.head.sha }}"
 
           config_args=()
+          # Use the base branch's gitleaks config so PRs can't weaken rules for their own scan.
           if git cat-file -e "${base_sha}:gitleaks.toml" 2>/dev/null; then
             mkdir -p "$tmp_dir"
             config_path="$(mktemp "${tmp_dir}/gitleaks-config-XXXXXX.toml")"
