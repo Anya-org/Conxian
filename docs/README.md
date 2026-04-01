@@ -4,7 +4,7 @@ Welcome to the central documentation hub for the Conxian ecosystem. This site is
 
 ## 🗺️ Quick Start
 - **[System Whitepaper](../Conxian/docs/WHITEPAPER.md)**
-- **[Sovereign Decentralization Audit](../SOVEREIGN_DECENTRALIZATION_AUDIT.md)**
+- **[Introduction](../README.md)**
 
 ## 📂 Strategic Knowledge Base
 Detailed strategic alignment, roadmap, and company strategy documents have been migrated to the [Linear Virtual Office](https://linear.app/conxian-labs) (Parent Issue: CON-306) to ensure Zero Secret Egress (ZSE) compliance.

@@ -18,7 +18,7 @@ env:
 jobs:
   Deploy-Preview:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'infra')
     steps:
       - uses: actions/checkout@v6
       - name: Install Vercel CLI

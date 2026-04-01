@@ -25,6 +25,8 @@ coverage/
 # Environment and secrets
 .env
 .env.local
+.env.development
+.env.production
 .env.development.local
 .env.test.local
 .env.production.local
@@ -55,5 +57,11 @@ release/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Developer scratch files and patches
+*.patch
+code_review_input.txt
+debug_regex.js
+test_match.js
 
 # Submodules and workspace-specific ignores (already handled by their own .gitignores)

@@ -1,8 +1,7 @@
 # Table of contents
 
 * [Introduction](README.md)
-* [System IP Audit](system_ip_audit.md)
-* [Strategos Mandate (Constraints & Ethos)](docs/STRATEGOS_MANDATE.md)
+* [Archive Migration (Linear Virtual Office; ZSE)](ARCHIVE_MIGRATION.md)
 
 ## 🤖 Business Operations System (BOS)
 
@@ -22,7 +21,6 @@
 * [OpenSpec Baseline](openspec/changes/remediate-enterprise-sovereignty/specs.md)
 * [Autonomous Launch Specs](openspec/changes/csf-autonomous-launch/specs.md)
 * [Strategos Alignment Audit](audit/strategos-alignment.md)
-* [Strategic Moat Map](docs/STRATEGIC_MOAT_MAP.md)
 * [Missing Chips Brief](docs/MISSING_CHIPS_BRIEF.md)
 
 ## 📦 Architecture
@@ -34,12 +32,7 @@
 * [TEE Security Audit](docs/TEE_SECURITY_AUDIT.md)
 * [Audit Dashboard Spec](docs/DASHBOARD_SPEC.md)
 
-## 📂 Archive (Legacy Docs)
-
-* [Archive migration (Linear Virtual Office; ZSE)](ARCHIVE_MIGRATION.md)
-
 ## 🏭 Industrial Engine (v12.0)
 
 * [Conxian Job Card Schema (CJCS)](docs/CJCS_v2.0_SPEC.md)
 * [ERP MCP Handshake Spec](docs/ERP_MCP_HANDSHAKE_SPEC.md)
-* [Virality Flywheel Simulation](docs/VIRALITY_FLYWHEEL_SIMULATION.md)
