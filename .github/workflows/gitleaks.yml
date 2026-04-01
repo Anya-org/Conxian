@@ -62,7 +62,7 @@ jobs:
           # Use the base branch's gitleaks config so PRs can't weaken rules for their own scan.
           if git cat-file -e "${base_sha}:gitleaks.toml" 2>/dev/null; then
             mkdir -p "$tmp_dir"
-            config_path="$(mktemp "${tmp_dir}/gitleaks-config-XXXXXX.toml")"
+            config_path="$(mktemp "${tmp_dir}/gitleaks-config-XXXXXX")"
             git show "${base_sha}:gitleaks.toml" > "$config_path"
             config_args+=(--config="$config_path")
           fi
