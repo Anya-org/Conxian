@@ -50,12 +50,12 @@ Used for tracking settlements that occur on external networks (e.g., PAPSS) but 
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `native_tx_hash` | TEXT | Reference to the Stacks on-chain transaction hash (not enforced as a DB FK). |
+| `native_tx_hash` | TEXT | Reference to the Stacks on-chain transaction hash (not enforced as a DB foreign key). |
 | `external_tx_reference` | TEXT | The reference ID from the external settlement network. |
 | `settlement_network_origin` | TEXT | Origin network (e.g., 'PAPSS', 'BRICS'). |
 | `fiat_value_pegged` | NUMERIC(20, 2) | Pegged fiat value of the settlement. |
 | `currency_code` | CHAR(3) | ISO-4217 currency code (default `USD`). |
-| `created_at` | TIMESTAMPTZ | Insertion timestamp. |
+| `created_at` | TIMESTAMPTZ | Insertion timestamp (default `now()`). |
 | `metadata` | JSONB | Provider payload / reconciliation attributes (default `{}`). |
 
 ## Integration Examples (How-to)

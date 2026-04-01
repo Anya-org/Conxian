@@ -10,8 +10,30 @@ CREATE TABLE IF NOT EXISTS cnx_bos.cxn_external_settlement_logs (
     settlement_network_origin TEXT NOT NULL,
     fiat_value_pegged NUMERIC(20, 2) NOT NULL,
     currency_code CHAR(3) NOT NULL DEFAULT 'USD',
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     metadata JSONB NOT NULL DEFAULT '{}'::jsonb
 );
+
+ALTER TABLE cnx_bos.cxn_external_settlement_logs
+  ALTER COLUMN currency_code SET DEFAULT 'USD',
+  ALTER COLUMN created_at SET DEFAULT now(),
+  ALTER COLUMN metadata SET DEFAULT '{}'::jsonb,
+  ALTER COLUMN currency_code SET NOT NULL,
+  ALTER COLUMN created_at SET NOT NULL,
+  ALTER COLUMN metadata SET NOT NULL;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'cxn_ext_settlement_origin_ref_uniq'
+      AND conrelid = 'cnx_bos.cxn_external_settlement_logs'::regclass
+  ) THEN
+    ALTER TABLE cnx_bos.cxn_external_settlement_logs
+      ADD CONSTRAINT cxn_ext_settlement_origin_ref_uniq
+      UNIQUE (settlement_network_origin, external_tx_reference);
+  END IF;
+END $$;
 
 CREATE INDEX IF NOT EXISTS idx_ext_settlement_native_hash ON cnx_bos.cxn_external_settlement_logs(native_tx_hash);
