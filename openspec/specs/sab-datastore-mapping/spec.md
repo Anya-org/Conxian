@@ -14,6 +14,8 @@ This specification uses requirement keywords (**MUST**, **MUST NOT**, **SHOULD**
 - **DID**: Decentralized identifier.
 - **DID-ZK disclosures**: DID-associated zero-knowledge attestations; private inputs remain enclave-only.
 - **Conxius Wallet**: End-user wallet product that may cache non-canonical state for offline UX continuity.
+- **Wallet cache directory**: The on-device directory containing the wallet cache SQLite database file(s) and any associated files created/managed alongside them.
+- **SQLite sidecar files**: Any SQLite-generated files associated with a given database file, including (but not limited to) WAL/SHM files, rollback journals, statement journals, and other temporary artifacts (e.g., `-wal`, `-shm`, `-journal`, `-mj*`, `-stmtjrnl`).
 
 ## 1. Purpose
 
@@ -43,16 +45,34 @@ All non-enclave datastores (including PostgreSQL, Supabase, Tableland, Redis, an
 | **Immutable Governance & Audit** | **Stacks L1 (event log + audit registry contract)** | **Tableland** (optional mirror) | Default is on-chain auditability. Tableland is an optional public mirror when decentralized SQL materially improves discoverability without becoming a dependency for correctness. |
 | **Hardware-Anchored Identity** | **Stacks L1 (public key registry + enclave key identifiers + attestation commitments)** | N/A | Mandated for Zero Secret Egress (ZSE). Private keys remain enclave-only; only public keys, key IDs, and attestations are anchored on-chain. |
 | **High-Frequency Caching** | N/A | **Redis** | Volatile cache for millisecond-latency session management, real-time mempool tracking, and telemetry buffering. |
-| **Offline Wallet Cache** | N/A | **Local SQLite** | Offline lookups and UX continuity. **MUST** be treated as a local cache; canonical state remains on-chain. Wallet caches **MUST NOT** store seed phrases, signing keys, or enclave-only secrets in any form, even encrypted. If user-sensitive non-secret data is cached, it **MUST** be protected at rest (OS/hardware-backed storage encryption is acceptable; otherwise use application-level encryption). Any application-level encryption keys used to protect cached data **MUST** be generated and retained by the enclave/secure element (or an OS keychain/keystore backed by it) such that key material is non-exportable. **Key material (raw or wrapped), key-encryption keys, and wrapped data-encryption keys MUST NOT be stored in the SQLite database (including WAL/journal files) or in any files under the wallet cache directory.** Cached data **SHOULD** be treated as removable/invalidatable. |
+| **Offline Wallet Cache** | N/A | **Local SQLite** | Offline lookups and UX continuity. See [Offline Wallet Cache (SQLite) encryption key material handling](#offline-wallet-cache-sqlite-encryption-key-material-handling). |
 
-#### 3.1.1. Data Flow & Verification
+<a id="offline-wallet-cache-sqlite-encryption-key-material-handling"></a>
+
+#### 3.1.1. Offline Wallet Cache (SQLite) Semantics & Encryption Key Material Handling
+
+This subsection defines conformance requirements for any SQLite-backed offline wallet cache.
+
+In this subsection, “key” refers to cryptographic key material (e.g., KEKs/DEKs), not cache lookup keys.
+
+1. **Local-cache semantics**: SQLite **MUST** be treated as a local cache; canonical state remains on-chain.
+2. **No secret storage**: Wallet caches **MUST NOT** store seed phrases, signing keys, or enclave-only secrets in any form, even encrypted.
+3. **At-rest protection for cached user-sensitive data**: If user-sensitive non-secret data is cached, it **MUST** be protected at rest (OS/hardware-backed storage encryption is acceptable; otherwise use application-level encryption).
+4. **Application-level encryption keys**: If application-level encryption is used to protect cached data, the encryption keys **MUST** be generated and retained by the enclave/secure element (or an OS keychain/keystore backed by it) such that key material is non-exportable.
+5. **Prohibited key material locations**: Any secret cryptographic key material (including key-encryption keys (KEKs) and data-encryption keys (DEKs), in raw or wrapped form) **MUST NOT** be stored anywhere under the wallet cache directory, including:
+   - the SQLite database file, or
+   - any SQLite sidecar files (as defined in the terminology list above).
+6. **Permitted key references**: Non-secret key identifiers/aliases (e.g., OS keychain/keystore key IDs) that reference an OS keychain/keystore entry and contain neither raw keys nor wrapped key blobs **MAY** be stored in SQLite as part of the cache metadata.
+7. **Removability**: Cached data **SHOULD** be treated as removable/invalidatable.
+
+#### 3.1.2. Data Flow & Verification
 
 1. **Stacks L1 emits canonical state transitions** via contract state + events.
 2. **Indexers derive replicas** (Postgres/Supabase/Tableland) by consuming L1 events and projecting them into query-optimized schemas.
 3. **Verification** is performed by anchoring periodic dataset checkpoints on-chain (a deterministic root hash over a defined canonicalization and hashing scheme) and requiring indexers/clients to match those checkpoints.
 4. **Mismatch handling**: any replica that fails checkpoint validation is treated as stale/corrupted and **MUST** be rebuilt from the on-chain event stream.
 
-##### 3.1.1.1. MVP checkpoint specification (deterministic)
+##### 3.1.2.1. MVP checkpoint specification (deterministic)
 
 To avoid incompatible hashing implementations, checkpoints **MUST** use a deterministic event-canonicalization and hashing scheme.
 
@@ -94,7 +114,7 @@ Each record **MUST** be encoded as a single UTF-8 line with `|` separators and a
 - Checkpoints **MUST** be anchored on Stacks L1 in a dedicated registry contract (e.g., an audit/checkpoint registry) that records at least: `dataset_id`, `start`, `end`, `root_sha256`, and `scheme_id`.
 - Clients/indexers **MUST** discover the latest checkpoint for a dataset by reading from that registry contract on-chain (not by trusting an off-chain API).
 
-#### 3.1.2. Constraints for Non-authoritative Query Layers
+#### 3.1.3. Constraints for Non-authoritative Query Layers
 
 Any non-authoritative central derived or query layer that is used as a shared read model (including PostgreSQL read models, Supabase or equivalent analytics layers, and optional mirrors such as Tableland) **MUST** satisfy the following constraints.
 
