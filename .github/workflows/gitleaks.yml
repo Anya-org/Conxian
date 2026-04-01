@@ -38,6 +38,17 @@ jobs:
           tar -xzf "$asset" -C "$install_dir" gitleaks
           echo "$install_dir" >> "$GITHUB_PATH"
 
+      - name: Validate gitleaks.toml (pull_request head)
+        if: github.event_name == 'pull_request' && hashFiles('gitleaks.toml') != ''
+        run: |
+          set -euo pipefail
+          gitleaks detect \
+            --no-banner \
+            --redact \
+            --exit-code=0 \
+            --no-git \
+            --config="gitleaks.toml"
+
       - name: Scan (pull_request)
         if: github.event_name == 'pull_request'
         run: |
