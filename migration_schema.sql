@@ -29,6 +29,7 @@ DECLARE
   table_oid oid;
   origin_attnum SMALLINT;
   ref_attnum SMALLINT;
+  existing_index_name TEXT;
 BEGIN
   table_oid := 'cnx_bos.cxn_external_settlement_logs'::regclass;
 
@@ -36,47 +37,118 @@ BEGIN
   INTO origin_attnum
   FROM pg_attribute
   WHERE attrelid = table_oid
-    AND attname = 'settlement_network_origin';
+    AND attname = 'settlement_network_origin'
+    AND NOT attisdropped;
 
   SELECT attnum
   INTO ref_attnum
   FROM pg_attribute
   WHERE attrelid = table_oid
-    AND attname = 'external_tx_reference';
+    AND attname = 'external_tx_reference'
+    AND NOT attisdropped;
+
+  IF origin_attnum IS NULL OR ref_attnum IS NULL THEN
+    RAISE EXCEPTION
+      'Expected columns settlement_network_origin and external_tx_reference to exist on cnx_bos.cxn_external_settlement_logs before enforcing uniqueness';
+  END IF;
 
   IF NOT EXISTS (
     SELECT 1
-    FROM pg_index i
-    WHERE i.indrelid = table_oid
-      AND i.indisunique
-      AND (
-        i.indkey = format('%s %s', origin_attnum, ref_attnum)::int2vector
-        OR i.indkey = format('%s %s', ref_attnum, origin_attnum)::int2vector
-      )
+    FROM pg_constraint
+    WHERE conrelid = table_oid
+      AND conname = 'cxn_ext_settlement_origin_ref_uniq'
+      AND contype = 'u'
   ) THEN
     IF EXISTS (
-      SELECT 1
-      FROM (
-        SELECT settlement_network_origin, external_tx_reference
-        FROM cnx_bos.cxn_external_settlement_logs
-        GROUP BY 1, 2
-        HAVING COUNT(*) > 1
-      ) d
-    ) THEN
-      RAISE EXCEPTION
-        'Cannot enforce uniqueness on (settlement_network_origin, external_tx_reference): duplicate rows exist';
-    END IF;
-
-    EXECUTE 'CREATE UNIQUE INDEX IF NOT EXISTS idx_ext_settlement_origin_ref_uniq ON cnx_bos.cxn_external_settlement_logs (settlement_network_origin, external_tx_reference)';
-
-    IF NOT EXISTS (
       SELECT 1
       FROM pg_constraint
       WHERE conrelid = table_oid
         AND conname = 'cxn_ext_settlement_origin_ref_uniq'
+        AND contype <> 'u'
     ) THEN
-      EXECUTE 'ALTER TABLE cnx_bos.cxn_external_settlement_logs ADD CONSTRAINT cxn_ext_settlement_origin_ref_uniq UNIQUE USING INDEX idx_ext_settlement_origin_ref_uniq';
+      RAISE EXCEPTION
+        'Constraint "cxn_ext_settlement_origin_ref_uniq" exists but is not UNIQUE on %',
+        table_oid::regclass;
     END IF;
+
+    IF EXISTS (
+      SELECT 1
+      FROM pg_constraint c
+      WHERE c.conrelid = table_oid
+        AND c.contype = 'u'
+        AND (
+          c.conkey = ARRAY[origin_attnum, ref_attnum]
+          OR c.conkey = ARRAY[ref_attnum, origin_attnum]
+        )
+        AND c.conname <> 'cxn_ext_settlement_origin_ref_uniq'
+    ) THEN
+      RAISE EXCEPTION
+        'Found existing UNIQUE constraint on (settlement_network_origin, external_tx_reference) with unexpected name; expected cxn_ext_settlement_origin_ref_uniq';
+    END IF;
+
+    SELECT c.relname
+    INTO existing_index_name
+    FROM pg_index i
+    JOIN pg_class c ON c.oid = i.indexrelid
+    LEFT JOIN pg_constraint cst ON cst.conindid = i.indexrelid
+    WHERE i.indrelid = table_oid
+      AND i.indisunique
+      AND i.indisvalid
+      AND i.indpred IS NULL
+      AND NOT i.indisprimary
+      AND cst.oid IS NULL
+      AND (
+        i.indkey = format('%s %s', origin_attnum, ref_attnum)::int2vector
+        OR i.indkey = format('%s %s', ref_attnum, origin_attnum)::int2vector
+      )
+    LIMIT 1;
+
+    IF existing_index_name IS NULL THEN
+      LOCK TABLE cnx_bos.cxn_external_settlement_logs IN EXCLUSIVE MODE;
+
+      IF EXISTS (
+        SELECT 1
+        FROM (
+          SELECT settlement_network_origin, external_tx_reference
+          FROM cnx_bos.cxn_external_settlement_logs
+          GROUP BY 1, 2
+          HAVING COUNT(*) > 1
+        ) d
+      ) THEN
+        RAISE EXCEPTION
+          'Cannot enforce uniqueness on (settlement_network_origin, external_tx_reference): duplicate rows exist';
+      END IF;
+
+      IF EXISTS (
+        SELECT 1
+        FROM pg_class c
+        JOIN pg_namespace ns ON ns.oid = c.relnamespace
+        JOIN pg_index i ON i.indexrelid = c.oid
+        WHERE i.indrelid = table_oid
+          AND ns.nspname = 'cnx_bos'
+          AND c.relname = 'idx_ext_settlement_origin_ref_uniq'
+          AND NOT (
+            i.indisunique
+            AND i.indisvalid
+            AND i.indpred IS NULL
+            AND (
+              i.indkey = format('%s %s', origin_attnum, ref_attnum)::int2vector
+              OR i.indkey = format('%s %s', ref_attnum, origin_attnum)::int2vector
+            )
+          )
+      ) THEN
+        RAISE EXCEPTION
+          'Existing index idx_ext_settlement_origin_ref_uniq does not match expected UNIQUE (settlement_network_origin, external_tx_reference) definition';
+      END IF;
+
+      EXECUTE 'CREATE UNIQUE INDEX IF NOT EXISTS idx_ext_settlement_origin_ref_uniq ON cnx_bos.cxn_external_settlement_logs (settlement_network_origin, external_tx_reference)';
+      existing_index_name := 'idx_ext_settlement_origin_ref_uniq';
+    END IF;
+
+    EXECUTE format(
+      'ALTER TABLE cnx_bos.cxn_external_settlement_logs ADD CONSTRAINT cxn_ext_settlement_origin_ref_uniq UNIQUE USING INDEX %I',
+      existing_index_name
+    );
   END IF;
 END $$;
 
