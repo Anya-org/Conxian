@@ -8,6 +8,14 @@ Welcome to the Conxian ecosystem. We are building a Bitcoin-native Business Oper
 2.  Explore the [Nomenclature Alignment](./audit/nomenclature-alignment.md) for branding and naming standards.
 3.  Check the [Sovereign-Ops-Orchestrator](./Sovereign-Ops-Orchestrator) for open bounties.
 
+## Bounty workflow
+
+- Only **bounty** issues in `Todo` are claimable, and claimable bounty issues must be unassigned.
+- Free-text "I'd like to work on this" comments and payment details in threads do not constitute a claim.
+- Preferred claim path is a `/claim` comment on the synced GitHub issue (when automation is enabled). Otherwise, maintainers accept claims by assigning the issue and moving it to `Claimed`.
+
+Reference: [`docs/bounties/BOUNTY_WORKFLOW.md`](./docs/bounties/BOUNTY_WORKFLOW.md).
+
 ## Pull Request Process
 
 1.  Ensure all code changes map to an existing Linear issue.
