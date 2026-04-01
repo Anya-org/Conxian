@@ -29,6 +29,9 @@
     (amount-out amount-after-fee)
   )
     (begin
+      (asserts! (is-eq (contract-of token-in) (contract-of token-out)) ERR_INVALID_PAIR)
+      (asserts! (<= amount-out amount-in) ERR_INSUFFICIENT_LIQUIDITY)
+
       ;; 1. Transfer token-in from sender to this aggregator
       (try! (contract-call? token-in transfer amount-in tx-sender (as-contract tx-sender) none))
       
