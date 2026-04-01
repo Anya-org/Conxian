@@ -11,14 +11,14 @@ The protocol is fully mapped and integrated into the Clarinet SDK ecosystem.
 ## 2. Decision Logic Hubs
 
 - **agent-risk.clar**: AYE Predictive Agent (PID stability fees and real-time risk telemetry).
-- **agent-treasury.clar**: Sovereign Fiscal Agent for BME orchestration.
-- **risk-manager.clar**: Centralized liquidation logic and global solvency monitor.
+- **fiscal-orchestrator.clar**: Sovereign Fiscal Agent for BME orchestration.
+- **risk-unit.clar**: Centralized liquidation logic and global solvency monitor.
 
 ## 3. Executive Engines
 
 - **dimensional-core.clar**: Leveraged position management (Nakamoto-Aligned).
 - **concentrated-liquidity-pool.clar**: Concentrated liquidity DEX engine (CSF-Compliant).
-- **lending-manager.clar**: Multi-asset money market and collateral management.
+- **lending-orchestrator.clar**: Multi-asset money market and collateral management.
 
 ## 4. Financial Infrastructure
 
