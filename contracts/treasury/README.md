@@ -50,6 +50,7 @@ Used for tracking settlements that occur on external networks (e.g., PAPSS) but 
 
 | Field | Type | Description |
 |-------|------|-------------|
+| `id` | BIGINT | Primary key (identity). |
 | `native_tx_hash` | TEXT | Reference to the Stacks on-chain transaction hash (not enforced as a DB foreign key). |
 | `external_tx_reference` | TEXT | The reference ID from the external settlement network. |
 | `settlement_network_origin` | TEXT | Origin network (e.g., 'PAPSS', 'BRICS'). |
@@ -57,6 +58,10 @@ Used for tracking settlements that occur on external networks (e.g., PAPSS) but 
 | `currency_code` | CHAR(3) | ISO-4217 currency code (default `USD`). |
 | `created_at` | TIMESTAMPTZ | Insertion timestamp (default `now()`). |
 | `metadata` | JSONB | Provider payload / reconciliation attributes (default `{}`). |
+
+Constraints/Indexes:
+- `UNIQUE (settlement_network_origin, external_tx_reference)`
+- `idx_ext_settlement_native_hash (native_tx_hash)`
 
 ## Integration Examples (How-to)
 
