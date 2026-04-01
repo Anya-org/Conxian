@@ -10,6 +10,17 @@
 (define-constant ERR_INSUFFICIENT_LIQUIDITY (err u4002))
 
 (define-data-var admin principal tx-sender)
+(define-data-var authorized-agent (optional principal) none)
+
+(define-read-only (is-authorized)
+  (or
+    (is-eq tx-sender (var-get admin))
+    (match (var-get authorized-agent)
+      agent (is-eq tx-sender agent)
+      false
+    )
+  )
+)
 
 ;; --- Sovereign Business Cells (SBC) ---
 (define-map business-cells 
@@ -48,6 +59,7 @@
     (cell (unwrap! (map-get? business-cells name) ERR_SBC_NOT_FOUND))
   )
     (begin
+      (asserts! (is-authorized) ERR_UNAUTHORIZED)
       (map-set business-cells name (merge cell { liquid-reserve: (+ (get liquid-reserve cell) amount) }))
       (ok true)
     )
@@ -60,6 +72,7 @@
     (cell (unwrap! (map-get? business-cells sbc-name) ERR_SBC_NOT_FOUND))
   )
     (begin
+      (asserts! (is-authorized) ERR_UNAUTHORIZED)
       (asserts! (>= (get liquid-reserve cell) amount) ERR_INSUFFICIENT_LIQUIDITY)
       ;; 1. Update Cell Liquidity
       (map-set business-cells sbc-name (merge cell { liquid-reserve: (- (get liquid-reserve cell) amount) }))
@@ -100,6 +113,7 @@
     (sweep-amount (/ (* (get liquid-reserve cell) u2000) u10000)) ;; 20%
   )
     (begin
+      (asserts! (is-authorized) ERR_UNAUTHORIZED)
       (asserts! (> sweep-amount u0) ERR_INSUFFICIENT_LIQUIDITY)
       ;; 1. Execute Deployment
       (try! (deploy-symmetry sbc-name strategy sweep-amount))
@@ -143,6 +157,22 @@
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
     (var-set admin new-admin)
+    (ok true)
+  )
+)
+
+(define-public (set-authorized-agent (new-agent principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (var-set authorized-agent (some new-agent))
+    (ok true)
+  )
+)
+
+(define-public (clear-authorized-agent)
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (var-set authorized-agent none)
     (ok true)
   )
 )
