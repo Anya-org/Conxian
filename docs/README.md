@@ -3,13 +3,11 @@
 Welcome to the central documentation hub for the Conxian ecosystem. This site is automatically generated from the [conxian-business](https://github.com/Conxian/conxian-business) repository.
 
 ## 🗺️ Quick Start
-- **[Strategic Alignment](../archive/legacy_docs/ALIGNMENT.md)**
 - **[System Whitepaper](../Conxian/docs/WHITEPAPER.md)**
-- **[Full Roadmap](../archive/legacy_docs/ROADMAP.md)**
+- **[Sovereign Decentralization Audit](../SOVEREIGN_DECENTRALIZATION_AUDIT.md)**
 
-## 📂 Explore by Category
-- [Company Strategy](../archive/legacy_docs/vision-mission.md)
-- [Technical Infrastructure](../archive/03_infrastructure/cloud-roadmap.md)
+## 📂 Strategic Knowledge Base
+Detailed strategic alignment, roadmap, and company strategy documents have been migrated to the [Linear Virtual Office](https://linear.app/conxian-labs) (Parent Issue: CON-306) to ensure Zero Secret Egress (ZSE) compliance.
 
 ---
 © 2026 Conxian.
