@@ -45,7 +45,9 @@ jobs:
           range=""
           if [ "$EVENT_NAME" = "pull_request" ]; then
             range="${PR_BASE_SHA}..${PR_HEAD_SHA}"
-          else
+          fi
+
+          if [ "$EVENT_NAME" = "push" ]; then
             if [ "$PUSH_BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
               range="$PUSH_AFTER_SHA"
             else
@@ -53,8 +55,16 @@ jobs:
             fi
           fi
 
-          echo "Scanning git range: ${range}"
-          gitleaks detect \
-            --redact \
-            --config="gitleaks.toml" \
-            --log-opts="${range}"
+          if [ -n "$range" ]; then
+            echo "Scanning git range: ${range}"
+            gitleaks detect \
+              --redact \
+              --config="gitleaks.toml" \
+              --log-opts="${range}"
+          else
+            echo "No git range available for event ${EVENT_NAME}; scanning working tree"
+            gitleaks detect \
+              --no-git \
+              --redact \
+              --config="gitleaks.toml"
+          fi
