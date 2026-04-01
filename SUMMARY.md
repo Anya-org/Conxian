@@ -2,6 +2,7 @@
 
 * [Introduction](README.md)
 * [Archive Migration (Linear Virtual Office; ZSE)](ARCHIVE_MIGRATION.md)
+* [Documentation Alignment Index](docs/DOCUMENTATION_ALIGNMENT_INDEX.md)
 
 ## 🤖 Business Operations System (BOS)
 
