@@ -45,15 +45,18 @@ Multi-asset storage for protocol-controlled liquidity with role-based access con
 
 ## External Data Schema (Institutional Reporting)
 
-### `cxn_external_settlement_logs` (Neon DB)
+### `cnx_bos.cxn_external_settlement_logs` (Neon DB)
 Used for tracking settlements that occur on external networks (e.g., PAPSS) but are referenced by on-chain transactions.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `native_tx_hash` | TEXT | Foreign key link to the Stacks on-chain transaction hash. |
+| `native_tx_hash` | TEXT | Reference to the Stacks on-chain transaction hash (not enforced as a DB FK). |
 | `external_tx_reference` | TEXT | The reference ID from the external settlement network. |
 | `settlement_network_origin` | TEXT | Origin network (e.g., 'PAPSS', 'BRICS'). |
-| `fiat_value_pegged` | NUMERIC | Pegged fiat value of the settlement. |
+| `fiat_value_pegged` | NUMERIC(20, 2) | Pegged fiat value of the settlement. |
+| `currency_code` | CHAR(3) | ISO-4217 currency code (default `USD`). |
+| `created_at` | TIMESTAMPTZ | Insertion timestamp. |
+| `metadata` | JSONB | Provider payload / reconciliation attributes (default `{}`). |
 
 ## Integration Examples (How-to)
 
