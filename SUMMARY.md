@@ -19,6 +19,7 @@
 ## 🏛️ Ground Truth (OpenSpec)
 
 * [OpenSpec Baseline](openspec/changes/remediate-enterprise-sovereignty/specs.md)
+* [Sovereign Data Migration & Institutional Egress](openspec/changes/sovereign-data-migration-institutional-egress/specs.md)
 * [Autonomous Launch Specs](openspec/changes/csf-autonomous-launch/specs.md)
 * [Strategos Alignment Audit](audit/strategos-alignment.md)
 * [Missing Chips Brief](docs/MISSING_CHIPS_BRIEF.md)
