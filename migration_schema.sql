@@ -68,6 +68,15 @@ BEGIN
     END IF;
 
     EXECUTE 'CREATE UNIQUE INDEX IF NOT EXISTS idx_ext_settlement_origin_ref_uniq ON cnx_bos.cxn_external_settlement_logs (settlement_network_origin, external_tx_reference)';
+
+    IF NOT EXISTS (
+      SELECT 1
+      FROM pg_constraint
+      WHERE conrelid = table_oid
+        AND conname = 'cxn_ext_settlement_origin_ref_uniq'
+    ) THEN
+      EXECUTE 'ALTER TABLE cnx_bos.cxn_external_settlement_logs ADD CONSTRAINT cxn_ext_settlement_origin_ref_uniq UNIQUE USING INDEX idx_ext_settlement_origin_ref_uniq';
+    END IF;
   END IF;
 END $$;
 
