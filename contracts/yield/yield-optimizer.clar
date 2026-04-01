@@ -62,12 +62,27 @@
 (define-public (execute-yield-intent (sovereign principal) (amount uint) (vault-to <vault-trait>) (token <sip-010-ft-trait>) (nonce uint) (signature (buff 65)))
   (let (
     (expected-nonce (default-to u0 (map-get? intent-nonces sovereign)))
-    (msg-hash (sha256 (unwrap-panic (to-consensus-buff? { amount: amount, vault: (contract-of vault-to), nonce: nonce }))))
-    ;; Basic validation mapping signature to intent
+    (vault-principal (contract-of vault-to))
+    (token-principal (contract-of token))
+    (msg-hash (sha256 (unwrap!
+      (to-consensus-buff? {
+        tag: "yield-intent",
+        contract: (as-contract tx-sender),
+        sovereign: sovereign,
+        token: token-principal,
+        amount: amount,
+        vault: vault-principal,
+        nonce: nonce
+      })
+      (err ERR_INVALID_INTENT)
+    )))
     (valid-sig (is-eq (len signature) u65))
+    (recovered-pubkey (unwrap! (secp256k1-recover? msg-hash signature) (err ERR_INVALID_INTENT)))
+    (recovered-principal (unwrap! (principal-of? recovered-pubkey) (err ERR_INVALID_INTENT)))
   )
     (asserts! valid-sig (err ERR_INVALID_INTENT))
     (asserts! (is-eq nonce expected-nonce) (err ERR_INVALID_INTENT))
+    (asserts! (is-eq recovered-principal sovereign) (err ERR_INVALID_INTENT))
     
     (map-set intent-nonces sovereign (+ nonce u1))
     
