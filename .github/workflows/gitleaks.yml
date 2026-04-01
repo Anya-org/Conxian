@@ -42,19 +42,38 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           set -euo pipefail
+          tmp_dir="${RUNNER_TEMP:-/tmp}"
+
+          base_sha="${{ github.event.pull_request.base.sha }}"
+          head_sha="${{ github.event.pull_request.head.sha }}"
+
+          config_args=()
+          if git cat-file -e "${base_sha}:gitleaks.toml" 2>/dev/null; then
+            config_path="${tmp_dir}/gitleaks.toml"
+            git show "${base_sha}:gitleaks.toml" > "$config_path"
+            config_args+=(--config="$config_path")
+          fi
+
           gitleaks detect \
             --no-banner \
             --redact \
-            --log-opts="${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
+            "${config_args[@]}" \
+            --log-opts="${base_sha}..${head_sha}"
 
       - name: Scan (push)
         if: github.event_name == 'push'
         run: |
           set -euo pipefail
+          config_args=()
+          if [ -f "gitleaks.toml" ]; then
+            config_args+=(--config="gitleaks.toml")
+          fi
+
           if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
             gitleaks detect \
               --no-banner \
               --redact \
+              "${config_args[@]}" \
               --no-git
             exit 0
           fi
@@ -62,13 +81,20 @@ jobs:
           gitleaks detect \
             --no-banner \
             --redact \
+            "${config_args[@]}" \
             --log-opts="${{ github.event.before }}..${{ github.sha }}"
 
       - name: Scan (workflow_dispatch)
         if: github.event_name == 'workflow_dispatch'
         run: |
           set -euo pipefail
+          config_args=()
+          if [ -f "gitleaks.toml" ]; then
+            config_args+=(--config="gitleaks.toml")
+          fi
+
           gitleaks detect \
             --no-banner \
             --redact \
+            "${config_args[@]}" \
             --no-git
