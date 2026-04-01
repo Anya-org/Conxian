@@ -15,8 +15,9 @@
 (define-read-only (is-authorized)
   (or
     (is-eq tx-sender (var-get admin))
+    (is-eq contract-caller (var-get admin))
     (match (var-get authorized-agent)
-      agent (is-eq tx-sender agent)
+      agent (or (is-eq tx-sender agent) (is-eq contract-caller agent))
       false
     )
   )
@@ -157,6 +158,7 @@
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
     (var-set admin new-admin)
+    (var-set authorized-agent none)
     (ok true)
   )
 )
