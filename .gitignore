@@ -37,11 +37,14 @@ deployment-registry-*.json
 wallet-*.json
 deployer-*.json
 private-keys-*.txt
+deployment/*.json
 
 # 4. TESTING & COVERAGE
 test-results/
 junit.xml
 coverage.xml
+coverage.lcov
+costs-reports.json
 coverage/
 .nyc_output/
 
