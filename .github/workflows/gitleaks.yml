@@ -1,0 +1,56 @@
+name: gitleaks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install gitleaks
+        run: |
+          set -euo pipefail
+
+          version="8.30.1"
+          curl -sSL -o gitleaks.tgz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${version}/gitleaks_${version}_linux_x64.tar.gz"
+          tar -xzf gitleaks.tgz gitleaks
+          sudo mv gitleaks /usr/local/bin/gitleaks
+
+      - name: Scan (pull_request)
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          gitleaks detect \
+            --no-banner \
+            --redact \
+            --log-opts="${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
+
+      - name: Scan (push)
+        if: github.event_name == 'push'
+        run: |
+          set -euo pipefail
+          gitleaks detect \
+            --no-banner \
+            --redact \
+            --log-opts="${{ github.event.before }}..${{ github.sha }}"
+
+      - name: Scan (workflow_dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          gitleaks detect \
+            --no-banner \
+            --redact \
+            --no-git

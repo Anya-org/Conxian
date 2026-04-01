@@ -31,10 +31,9 @@ vault.tmp
 
 # 3. NODE.JS & DEPENDENCIES
 node_modules/
-package-lock.json
-pnpm-lock.yaml
 yarn.lock
 bun.lockb
+pnpm-lock.yaml
 
 # 4. BUILD & DEPLOYMENT ARTIFACTS
 dist/
