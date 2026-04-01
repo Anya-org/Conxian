@@ -78,7 +78,7 @@
     )))
     (valid-sig (is-eq (len signature) u65))
     (recovered-pubkey (unwrap! (secp256k1-recover? msg-hash signature) (err ERR_INVALID_INTENT)))
-    (recovered-principal (unwrap! (principal-of? recovered-pubkey) (err ERR_INVALID_INTENT)))
+    (recovered-principal (unwrap! (principal-of? (hash160 recovered-pubkey)) (err ERR_INVALID_INTENT)))
   )
     (asserts! valid-sig (err ERR_INVALID_INTENT))
     (asserts! (is-eq nonce expected-nonce) (err ERR_INVALID_INTENT))
