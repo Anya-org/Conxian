@@ -4,6 +4,25 @@
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Nakamoto](https://img.shields.io/badge/Nakamoto-Aligned-green.svg)](docs/CLARITY4_MIGRATION_TRACKING.md)
 
+## Purpose
+
+Ship the Conxian Finance Protocol smart contracts (Clarity), including CSF interfaces, core execution engines, and governance primitives.
+
+## Status
+
+Active. For the current maturity level and recent upgrades, see [Status (March 2026)](#status-march-2026).
+
+## Audience
+
+- Clarity engineers integrating with CSF standards and Conxian primitives.
+- Security reviewers validating contract behavior, invariants, and integration surfaces.
+- Frontend and indexer developers building on top of Conxian protocol state.
+
+## Relationship to the Conxian stack
+
+- This is the on-chain execution layer.
+- It is typically consumed via Conxian Gateway (API + indexing) and surfaced through Conxian UI and Conxius Wallet.
+
 ## Overview
 
 🏦 **Conxian Finance**: A Multi-Dimensional, Stacks-Native Automated Monetary Platform.
