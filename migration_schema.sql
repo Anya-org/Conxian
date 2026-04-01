@@ -30,6 +30,19 @@ BEGIN
     WHERE conname = 'cxn_ext_settlement_origin_ref_uniq'
       AND conrelid = 'cnx_bos.cxn_external_settlement_logs'::regclass
   ) THEN
+    IF EXISTS (
+      SELECT 1
+      FROM (
+        SELECT settlement_network_origin, external_tx_reference
+        FROM cnx_bos.cxn_external_settlement_logs
+        GROUP BY 1, 2
+        HAVING COUNT(*) > 1
+      ) d
+    ) THEN
+      RAISE EXCEPTION
+        'Cannot add UNIQUE (settlement_network_origin, external_tx_reference): duplicate rows exist';
+    END IF;
+
     ALTER TABLE cnx_bos.cxn_external_settlement_logs
       ADD CONSTRAINT cxn_ext_settlement_origin_ref_uniq
       UNIQUE (settlement_network_origin, external_tx_reference);
