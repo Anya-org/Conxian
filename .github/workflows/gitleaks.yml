@@ -51,6 +51,14 @@ jobs:
         if: github.event_name == 'push'
         run: |
           set -euo pipefail
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            gitleaks detect \
+              --no-banner \
+              --redact \
+              --no-git
+            exit 0
+          fi
+
           gitleaks detect \
             --no-banner \
             --redact \
