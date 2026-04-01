@@ -1,0 +1,4 @@
+title = "Conxian gitleaks config"
+
+[extend]
+useDefault = true
