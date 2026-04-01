@@ -23,12 +23,34 @@ ALTER TABLE cnx_bos.cxn_external_settlement_logs
   ALTER COLUMN metadata SET NOT NULL;
 
 DO $$
+DECLARE
+  table_oid oid;
+  origin_attnum SMALLINT;
+  ref_attnum SMALLINT;
 BEGIN
+  table_oid := 'cnx_bos.cxn_external_settlement_logs'::regclass;
+
+  SELECT attnum
+  INTO origin_attnum
+  FROM pg_attribute
+  WHERE attrelid = table_oid
+    AND attname = 'settlement_network_origin';
+
+  SELECT attnum
+  INTO ref_attnum
+  FROM pg_attribute
+  WHERE attrelid = table_oid
+    AND attname = 'external_tx_reference';
+
   IF NOT EXISTS (
     SELECT 1
-    FROM pg_constraint
-    WHERE conname = 'cxn_ext_settlement_origin_ref_uniq'
-      AND conrelid = 'cnx_bos.cxn_external_settlement_logs'::regclass
+    FROM pg_index i
+    WHERE i.indrelid = table_oid
+      AND i.indisunique
+      AND (
+        i.indkey = format('%s %s', origin_attnum, ref_attnum)::int2vector
+        OR i.indkey = format('%s %s', ref_attnum, origin_attnum)::int2vector
+      )
   ) THEN
     IF EXISTS (
       SELECT 1
@@ -40,12 +62,10 @@ BEGIN
       ) d
     ) THEN
       RAISE EXCEPTION
-        'Cannot add UNIQUE (settlement_network_origin, external_tx_reference): duplicate rows exist';
+        'Cannot enforce uniqueness on (settlement_network_origin, external_tx_reference): duplicate rows exist';
     END IF;
 
-    ALTER TABLE cnx_bos.cxn_external_settlement_logs
-      ADD CONSTRAINT cxn_ext_settlement_origin_ref_uniq
-      UNIQUE (settlement_network_origin, external_tx_reference);
+    EXECUTE 'CREATE UNIQUE INDEX IF NOT EXISTS idx_ext_settlement_origin_ref_uniq ON cnx_bos.cxn_external_settlement_logs (settlement_network_origin, external_tx_reference)';
   END IF;
 END $$;
 
