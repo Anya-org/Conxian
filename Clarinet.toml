@@ -1,7 +1,7 @@
 [project]
 name = "Conxian"
 clarinet_version = "3.12.0"
-epoch = 3.0
+epoch = "3.0"
 
 [accounts]
 deployer = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
