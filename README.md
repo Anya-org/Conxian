@@ -32,6 +32,8 @@ The BOS is powered by an active suite of autonomous agents:
 
 We adhere to strict sovereignty and security standards.
 
+For general support and non-security bug reports, open a GitHub issue. For security vulnerabilities, follow the private reporting process in `SECURITY.md`.
+
 This repository is licensed under the GNU GPL v3.0 (see `LICENSE`).
 
 - [**CONTRIBUTING.md**](./CONTRIBUTING.md): Guidelines for contributing to the BOS.

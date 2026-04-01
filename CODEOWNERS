@@ -1,7 +1,23 @@
-# Conxian Core Repository Owners
-# This file is used to specify who should review pull requests.
+# Code owners for the Conxian monorepo.
+#
+# Notes:
+# - GitHub uses this file to auto-request reviews when a PR touches matching paths.
+# - Prefer listing real GitHub usernames (not internal role aliases).
 
-*       @conxian-admin
-/internal/ @conxian-strategy-nexus
-/docs/     @conxian-docs-guardian
-/openspec/ @conxian-sovereign-strategy
+* @botshelomokoka @admin-conxian-labs
+
+# Core protocol + specs
+/Conxian/ @botshelomokoka @admin-conxian-labs
+/openspec/ @botshelomokoka @admin-conxian-labs
+
+# Product suites
+/conxian-*/ @botshelomokoka @admin-conxian-labs
+/conxius-*/ @botshelomokoka @admin-conxian-labs
+/lib-*/ @botshelomokoka @admin-conxian-labs
+/showcase-dapp/ @botshelomokoka @admin-conxian-labs
+/stacksorbit/ @botshelomokoka @admin-conxian-labs
+
+# Governance + automation
+/.github/ @botshelomokoka @admin-conxian-labs
+/docs/ @botshelomokoka @admin-conxian-labs
+/scripts/ @botshelomokoka @admin-conxian-labs
