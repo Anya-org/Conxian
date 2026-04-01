@@ -36,7 +36,7 @@
 
 ## 📂 Archive (Legacy Docs)
 
-*Historical documents migrated to the [Linear Virtual Office](https://linear.app/conxian-labs) under ZSE compliance.*
+* [Archive migration (Linear Virtual Office; ZSE)](ARCHIVE_MIGRATION.md)
 
 ## 🏭 Industrial Engine (v12.0)
 
