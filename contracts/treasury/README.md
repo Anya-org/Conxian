@@ -8,6 +8,7 @@ This module uses a hub-and-spoke model for fund management:
 - **Registry**: `cxd-treasury.clar` maintains the global allocation policy and tracks accrued claims.
 - **Distribution**: `revenue-distributor.clar` executes token buy-backs and burns via the BME engine.
 - **Storage**: Specialized vaults like `conxian-vaults.clar` provide secure multi-asset storage with RBAC integration.
+- **Off-Chain Persistence**: External settlement events (PAPSS, BRICS) are recorded in the `cnx_bos.cxn_external_settlement_logs` table within the Neon database for institutional reporting and audit.
 
 ## Core Contracts (Reference)
 
@@ -41,6 +42,26 @@ Multi-asset storage for protocol-controlled liquidity with role-based access con
 | `withdraw` | `(token <sip-010-trait>) (amount uint)` | Withdraws tokens from the vault (requires RBAC role). |
 | `get-balance` | `(user principal) (token principal)` | Returns the vault balance for a specific user and token. |
 | `get-total-assets` | `(token principal)` | Returns the total balance of a specific asset held in the vaults. |
+
+## External Data Schema (Institutional Reporting)
+
+### `cnx_bos.cxn_external_settlement_logs` (Neon DB)
+Used for tracking settlements that occur on external networks (e.g., PAPSS) but are referenced by on-chain transactions.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | BIGINT | Primary key (identity). |
+| `native_tx_hash` | TEXT | Reference to the Stacks on-chain transaction hash (not enforced as a DB foreign key). |
+| `external_tx_reference` | TEXT | The reference ID from the external settlement network. |
+| `settlement_network_origin` | TEXT | Origin network (e.g., 'PAPSS', 'BRICS'). |
+| `fiat_value_pegged` | NUMERIC(20, 2) | Pegged fiat value of the settlement. |
+| `currency_code` | CHAR(3) | ISO-4217 currency code (default `USD`). |
+| `created_at` | TIMESTAMPTZ | Insertion timestamp (default `now()`). |
+| `metadata` | JSONB | Provider payload / reconciliation attributes (default `{}`). |
+
+Constraints/Indexes:
+- `UNIQUE (settlement_network_origin, external_tx_reference)`
+- `idx_ext_settlement_native_hash (native_tx_hash)`
 
 ## Integration Examples (How-to)
 
