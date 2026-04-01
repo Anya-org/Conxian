@@ -5,7 +5,7 @@ This is a maintainer-only checklist for enabling bounty payouts after ConxianCSF
 ## Definitions
 
 - **Payout-ready mode**: Maintainers have approved the program to begin sending bounty payments to contributors.
-- **ALEX launch funding source (sole allowed source)**: `SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.alex-vault`.
+- **ALEX launch funding source (sole allowed source)**: `SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.amm-vault-v2-01`.
 - **Payout wallet**: The internal maintainer-controlled wallet/multisig that sends bounty payments.
 
 This runbook assumes **Stacks mainnet**. If you see any principal starting with `ST` (testnet), stop and reconcile your deployment record before proceeding.
@@ -93,7 +93,7 @@ fi
 ### 2) Verify ALEX launch source of funds is active and is the sole bounty funding source
 
 1. Verify the ALEX funding source principal is exactly:
-   - `SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.alex-vault`
+   - `SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.amm-vault-v2-01`
 2. Verify the payout wallet received at least one inbound funding transfer from the ALEX vault principal.
 3. Verify the payout wallet received no inbound bounty funding transfers from any other principal since mainnet launch.
 
@@ -113,7 +113,7 @@ For this checklist, treat any inbound STX transfer or SIP-010 fungible-token tra
 set -euo pipefail
 
 API_BASE='https://api.mainnet.hiro.so'
-ALEX_VAULT='SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.alex-vault'
+ALEX_VAULT='SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.amm-vault-v2-01'
 
 : "${PAYOUT_ADDRESS:?Set PAYOUT_ADDRESS to the payout wallet STX address}"
 
