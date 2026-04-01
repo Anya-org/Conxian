@@ -1,4 +1,0 @@
-
-[contracts.vault]
-path = "contracts/dex/vault.clar"
-depends_on = [ "circuit-breaker", "conxian-protocol", "ops-engine", "sip-standards",]
