@@ -84,7 +84,7 @@ BEGIN
       )
       AND c.conname <> 'cxn_ext_settlement_origin_ref_uniq';
 
-    IF coalesce(array_length(matching_constraint_names, 1), 0) > 1 THEN
+    IF COALESCE(array_length(matching_constraint_names, 1), 0) > 1 THEN
       RAISE EXCEPTION
         'Multiple UNIQUE constraints found on (settlement_network_origin, external_tx_reference): %',
         matching_constraint_names;
@@ -106,6 +106,9 @@ BEGIN
       AND i.indisunique
       AND i.indisvalid
       AND i.indpred IS NULL
+      AND i.indexprs IS NULL
+      AND i.indnkeyatts = 2
+      AND i.indnatts = 2
       AND NOT i.indisprimary
       AND cst.oid IS NULL
       AND (
@@ -113,15 +116,14 @@ BEGIN
         OR i.indkey = format('%s %s', ref_attnum, origin_attnum)::int2vector
       );
 
-    IF coalesce(array_length(matching_index_names, 1), 0) > 1 THEN
-      RAISE EXCEPTION
-        'Multiple matching standalone unique indexes found: %',
-        matching_index_names;
+    IF COALESCE(array_length(matching_index_names, 1), 0) > 1 THEN
+      RAISE EXCEPTION 'Multiple matching standalone unique indexes found: %', matching_index_names;
     ELSIF array_length(matching_index_names, 1) = 1 THEN
       existing_index_name := matching_index_names[1];
     END IF;
 
     IF existing_index_name IS NULL THEN
+      PERFORM set_config('lock_timeout', '5s', true);
       LOCK TABLE cnx_bos.cxn_external_settlement_logs IN EXCLUSIVE MODE;
 
       IF EXISTS (
@@ -149,6 +151,9 @@ BEGIN
             i.indisunique
             AND i.indisvalid
             AND i.indpred IS NULL
+            AND i.indexprs IS NULL
+            AND i.indnkeyatts = 2
+            AND i.indnatts = 2
             AND (
               i.indkey = format('%s %s', origin_attnum, ref_attnum)::int2vector
               OR i.indkey = format('%s %s', ref_attnum, origin_attnum)::int2vector
