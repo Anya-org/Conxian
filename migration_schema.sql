@@ -147,7 +147,6 @@ BEGIN
       old_lock_timeout := current_setting('lock_timeout');
       PERFORM set_config('lock_timeout', '5s', true);
       LOCK TABLE cnx_bos.cxn_external_settlement_logs IN SHARE ROW EXCLUSIVE MODE;
-      PERFORM set_config('lock_timeout', old_lock_timeout, true);
 
       IF EXISTS (
         SELECT 1
@@ -197,6 +196,10 @@ BEGIN
       existing_index_schema,
       existing_index_name
     );
+
+    IF old_lock_timeout IS NOT NULL THEN
+      PERFORM set_config('lock_timeout', old_lock_timeout, true);
+    END IF;
   END IF;
 END $$;
 
