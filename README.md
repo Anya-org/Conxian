@@ -10,7 +10,9 @@ Ship the Conxian Finance Protocol smart contracts (Clarity), including CSF inter
 
 ## Status
 
-Active. For the current maturity level and recent upgrades, see [Status (March 2026)](#status-march-2026).
+Active development (alpha). Not production-ready; expect breaking changes.
+
+For a dated snapshot, see [Status (March 2026)](#status-march-2026). For ongoing changes, see [CHANGELOG.md](CHANGELOG.md).
 
 ## Audience
 
@@ -21,7 +23,10 @@ Active. For the current maturity level and recent upgrades, see [Status (March 2
 ## Relationship to the Conxian stack
 
 - This is the on-chain execution layer.
-- It is typically consumed via [Conxian Gateway](https://github.com/Conxian/conxian-gateway) (API + indexing) and surfaced through [Conxian UI](https://github.com/Conxian/Conxian_UI) (repo: `Conxian_UI`) and [Conxius Wallet](https://github.com/Conxian/conxius-wallet).
+- It is typically consumed via:
+  - [Conxian Gateway](https://github.com/Conxian/conxian-gateway) (API + indexing)
+  - [Conxian UI](https://github.com/Conxian/Conxian_UI) (`Conxian_UI`)
+  - [Conxius Wallet](https://github.com/Conxian/conxius-wallet)
 
 ## Overview
 
@@ -77,20 +82,14 @@ The CSF is a standardized interface that allows third-party protocols to nativel
 └── ...               # Lending, Monitoring, Security, Compliance
 ```
 
----
-
 ## Status (March 2026)
 
-- **Maturity Level**: 🟢 **Apex Production** (CSF Standard Established)
-- **Performance**: ⚡ **[Verified Benchmarks](docs/BENCHMARKS.md)** (Avg. < 40ms CSF routing)
-- **Revenue Mechanism**: 100% Buy-back and Burn (Apex BME).
-- **Key Upgrades**:
-  - ✅ **CSF v1.1.0**: Flash liquidity and yield routing standardized.
-  - ✅ **Universal Router**: Dynamic dispatch for the entire Stacks ecosystem.
-  - ✅ **Contagion Guard**: Multi-tier isolation circuit breaking.
-  - ✅ **2026 Asset Support**: stSTX, stSTXbtc, sBTC, and USDA native tracking.
-  - ✅ **Federated Oracle**: Multi-source weighted price aggregation (CSF-aligned).
-
----
+- **Maturity**: Active development (alpha); breaking changes expected.
+- **Nakamoto / Clarity 4 alignment**: [Clarity 4 migration tracking](docs/CLARITY4_MIGRATION_TRACKING.md)
+- **Benchmarks (simnet)**: [Protocol benchmarks](docs/BENCHMARKS.md)
+- **Recent reports and plans**:
+  - [Deployment sign-off (March 2026)](DEPLOYMENT_SIGN_OFF_MARCH_2026.md)
+  - [Enhancement plan (March 2026)](ENHANCEMENT_PLAN_MARCH_2026.md)
+  - [System alignment audit (March 2026)](docs/SYSTEM_ALIGNMENT_AUDIT_MARCH_2026.md)
 
 © 2024-2026 Conxian Finance. All rights reserved.
