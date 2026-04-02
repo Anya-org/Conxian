@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from "fs/promises";
 import { dirname, resolve } from "path";
+import { tmpdir } from "os";
 import { randomBytes } from "crypto";
 import { generateWallet, generateSecretKey } from "@stacks/wallet-sdk";
 import { getAddressFromPrivateKey } from "@stacks/transactions";
@@ -26,15 +27,15 @@ function printUsageAndExit(code: number): never {
       "BOS wallet key generation (safe by default)",
       "",
       "Usage:",
-      "  bun scripts/generate-bos-keys.ts [--count 5] [--out .tmp/bos-keys.json] [--overwrite] [--i-understand-this-leaks-secrets]",
+      "  bun scripts/generate-bos-keys.ts [--count 5] [--out <file>] [--overwrite] [--no-file] [--i-understand-this-leaks-secrets]",
       "",
       "Defaults:",
-      "  - Writes key material to a local gitignored file (.tmp/...) with restrictive permissions.",
+      "  - Writes key material to a local file outside the repo (OS temp dir) with restrictive permissions.",
       "  - Prints ONLY public addresses to stdout.",
       "",
       "Flags:",
       "  --count <n>                         Number of keys to generate (default: 5)",
-      "  --out <file>                        Where to write secrets JSON (default: .tmp/bos-keys.json)",
+      "  --out <file>                        Where to write secrets JSON (default: OS temp dir)",
       "  --overwrite                         Allow overwriting --out if it already exists",
       "  --no-file                           Do not write secret material to disk",
       "  --i-understand-this-leaks-secrets    Also print private keys/mnemonics to stdout",
@@ -45,9 +46,14 @@ function printUsageAndExit(code: number): never {
 }
 
 function parseArgs(argv: string[]): Args {
+  const defaultOutFile = resolve(
+    tmpdir(),
+    `conxian-bos-keys-${new Date().toISOString().replace(/[:.]/g, "-")}.json`,
+  );
+
   const args: Args = {
     count: 5,
-    outFile: resolve(process.cwd(), ".tmp", "bos-keys.json"),
+    outFile: defaultOutFile,
     overwrite: false,
     printSecrets: false,
     writeFile: true,
@@ -190,9 +196,13 @@ async function main() {
     }
 
     console.log(`\nWrote secret material to: ${args.outFile}`);
-    console.log("(This path should be gitignored; do not commit it.)\n");
+    console.log("(Do not commit or share this file.)\n");
   } else {
     console.log("\nSkipping writing secret material to disk (--no-file).\n");
+  }
+
+  if (args.printSecrets) {
+    console.log("WARNING: Printing secret material to stdout. This may be captured in logs.\n");
   }
 
   for (const key of keys) {
@@ -201,7 +211,6 @@ async function main() {
     console.log(`Address (Mainnet): ${key.mainnetAddress}`);
 
     if (args.printSecrets) {
-      console.log("WARNING: Printing secret material to stdout.");
       console.log(`Private Key: ${key.privateKey}`);
       console.log(`Mnemonic: ${key.mnemonic}`);
     }
