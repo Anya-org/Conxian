@@ -84,7 +84,7 @@ The CSF is a standardized interface that allows third-party protocols to nativel
 
 ## Status (March 2026)
 
-- **Maturity (as of March 2026)**: Active development (alpha); breaking changes expected.
+- **Maturity (as of March 2026)**: Snapshot of the then-current alpha-stage protocol; see [Status](#status) for the latest maturity and stability guidance.
 - **Snapshot highlights**:
   - CSF traits and interfaces: [`contracts/traits/`](contracts/traits/)
   - Router and DEX modules: [`contracts/dex/`](contracts/dex/)
@@ -92,8 +92,8 @@ The CSF is a standardized interface that allows third-party protocols to nativel
 - **Nakamoto / Clarity 4 alignment**: [Clarity 4 migration tracking](docs/CLARITY4_MIGRATION_TRACKING.md)
 - **Benchmarks (simnet)**: [Protocol benchmarks](docs/BENCHMARKS.md)
 - **Recent reports and plans**:
-  - [Deployment sign-off (March 2026)](DEPLOYMENT_SIGN_OFF_MARCH_2026.md)
-  - [Enhancement plan (March 2026)](ENHANCEMENT_PLAN_MARCH_2026.md)
+  - [Deployment sign-off (March 2026)](DEPLOYMENT_SIGN_OFF_MARCH_2026.md) (root-level report)
+  - [Enhancement plan (March 2026)](ENHANCEMENT_PLAN_MARCH_2026.md) (root-level report)
   - [System alignment audit (March 2026)](docs/SYSTEM_ALIGNMENT_AUDIT_MARCH_2026.md)
 
 © 2024-2026 Conxian Finance. All rights reserved.
