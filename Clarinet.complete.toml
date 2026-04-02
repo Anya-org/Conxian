@@ -510,6 +510,7 @@ path = "contracts/math/exponentiation.clar"
 [contracts.bridge-nft]
 path = "contracts/cross-chain/bridge-nft.clar"
 
+# Intentionally shares implementation with [contracts.compliance-manager].
 [contracts.enterprise-compliance-manager]
 path = "contracts/compliance/compliance-orchestrator.clar"
 depends_on = [ "block-utils",]
