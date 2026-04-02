@@ -72,8 +72,6 @@
 (define-private (swap-internal (pool-id uint) (zero-for-one bool) (amount-in uint) (token0-trait <sip-010-ft-trait>) (token1-trait <sip-010-ft-trait>) (recipient principal))
   (let (
     (pool (unwrap! (map-get? pools pool-id) ERR_INSUFFICIENT_LIQUIDITY))
-    (token-out-trait (if zero-for-one token1-trait token0-trait))
-    (token-in-trait (if zero-for-one token0-trait token1-trait))
   )
     (begin
       (let (
@@ -81,19 +79,31 @@
         (protocol-fee (/ (* total-fee PROTOCOL_FEE_SHARE) u10000))
         (amount-out (- amount-in total-fee))
       )
-        (begin
-          ;; Transfer input tokens from caller to the pool
-          (try! (contract-call? token-in-trait transfer amount-in tx-sender (as-contract tx-sender) none))
+        (if zero-for-one
+          (begin
+            ;; Transfer token0 in and token1 out
+            (try! (contract-call? token0-trait transfer amount-in tx-sender (as-contract tx-sender) none))
+            (try! (as-contract (contract-call? token1-trait transfer amount-out (as-contract tx-sender) recipient none)))
 
-          ;; Transfer output tokens from the pool to the recipient
-          (try! (as-contract (contract-call? token-out-trait transfer amount-out (as-contract tx-sender) recipient none)))
-
-          ;; Register activity for BME
-          (match (contract-call? .bme-engine register-fee-activity (as-contract tx-sender) protocol-fee)
-            res true
-            err-val false
+            ;; Register activity for BME
+            (match (contract-call? .bme-engine register-fee-activity (as-contract tx-sender) protocol-fee)
+              res true
+              err-val false
+            )
+            (ok amount-out)
           )
-          (ok amount-out)
+          (begin
+            ;; Transfer token1 in and token0 out
+            (try! (contract-call? token1-trait transfer amount-in tx-sender (as-contract tx-sender) none))
+            (try! (as-contract (contract-call? token0-trait transfer amount-out (as-contract tx-sender) recipient none)))
+
+            ;; Register activity for BME
+            (match (contract-call? .bme-engine register-fee-activity (as-contract tx-sender) protocol-fee)
+              res true
+              err-val false
+            )
+            (ok amount-out)
+          )
         )
       )
     )

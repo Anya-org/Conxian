@@ -81,7 +81,7 @@ depends_on = ["core-traits", "oracle-aggregator"]
 
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
-depends_on = ["oracle-aggregator", "cxd-token", "risk-unit", "conxian-protocol", "automation-traits", "conxian-service-trait"]
+depends_on = ["oracle-aggregator", "cxd-token", "risk-unit", "conxian-protocol", "finance-metrics", "automation-traits", "conxian-service-trait"]
 
 [contracts.order-orchestrator]
 path = "contracts/enterprise/order-orchestrator.clar"
@@ -335,3 +335,4 @@ path = 'contracts/core/self-launch-coordinator.clar'
 
 [contracts.test-c4]
 path = "contracts/test-c4.clar"
+

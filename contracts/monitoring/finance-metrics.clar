@@ -12,7 +12,7 @@
 ;; @desc Aggregate system TVL (Normalized to u8)
 (define-read-only (get-protocol-tvl)
     (let (
-        (lending-tvl (unwrap-panic (contract-call? .lending-manager get-protocol-tvl)))
+        (lending-tvl (unwrap-panic (contract-call? .lending-orchestrator get-protocol-tvl)))
         (dimensional-tvl (unwrap-panic (contract-call? .dimensional-core calculate-tvl)))
     )
     (ok (+ lending-tvl dimensional-tvl))
