@@ -31,7 +31,7 @@ DECLARE
   ref_attnum SMALLINT;
   existing_index_name TEXT;
   matching_constraint_names TEXT[];
-  existing_constraint_name TEXT;
+  matching_index_names TEXT[];
 BEGIN
   table_oid := 'cnx_bos.cxn_external_settlement_logs'::regclass;
 
@@ -86,22 +86,18 @@ BEGIN
 
     IF coalesce(array_length(matching_constraint_names, 1), 0) > 1 THEN
       RAISE EXCEPTION
-        'Multiple UNIQUE constraints exist on (settlement_network_origin, external_tx_reference): %',
+        'Multiple matching UNIQUE constraints found on (settlement_network_origin, external_tx_reference): %',
         matching_constraint_names;
-    END IF;
-
-    existing_constraint_name := matching_constraint_names[1];
-
-    IF existing_constraint_name IS NOT NULL THEN
+    ELSIF array_length(matching_constraint_names, 1) = 1 THEN
       EXECUTE format(
         'ALTER TABLE cnx_bos.cxn_external_settlement_logs RENAME CONSTRAINT %I TO cxn_ext_settlement_origin_ref_uniq',
-        existing_constraint_name
+        matching_constraint_names[1]
       );
       RETURN;
     END IF;
 
-    SELECT c.relname
-    INTO existing_index_name
+    SELECT array_agg(c.relname ORDER BY c.relname)
+    INTO matching_index_names
     FROM pg_index i
     JOIN pg_class c ON c.oid = i.indexrelid
     LEFT JOIN pg_constraint cst ON cst.conindid = i.indexrelid
@@ -114,8 +110,15 @@ BEGIN
       AND (
         i.indkey = format('%s %s', origin_attnum, ref_attnum)::int2vector
         OR i.indkey = format('%s %s', ref_attnum, origin_attnum)::int2vector
-      )
-    LIMIT 1;
+      );
+
+    IF coalesce(array_length(matching_index_names, 1), 0) > 1 THEN
+      RAISE EXCEPTION
+        'Multiple matching standalone unique indexes found: %',
+        matching_index_names;
+    ELSIF array_length(matching_index_names, 1) = 1 THEN
+      existing_index_name := matching_index_names[1];
+    END IF;
 
     IF existing_index_name IS NULL THEN
       LOCK TABLE cnx_bos.cxn_external_settlement_logs IN EXCLUSIVE MODE;
@@ -160,7 +163,8 @@ BEGIN
     END IF;
 
     EXECUTE format(
-      'ALTER TABLE cnx_bos.cxn_external_settlement_logs ADD CONSTRAINT cxn_ext_settlement_origin_ref_uniq UNIQUE USING INDEX %I',
+      'ALTER TABLE cnx_bos.cxn_external_settlement_logs ADD CONSTRAINT cxn_ext_settlement_origin_ref_uniq UNIQUE USING INDEX %I.%I',
+      'cnx_bos',
       existing_index_name
     );
   END IF;
