@@ -12,7 +12,8 @@
 (define-map paused-contracts principal bool)
 
 ;; --- Veto & Quorum Logic ---
-(define-map veto-signatures principal bool)
+(define-data-var veto-round uint u1)
+(define-map veto-signatures principal uint)
 (define-data-var veto-count uint u0)
 (define-data-var quorum-threshold uint u3)
 (define-data-var veto-active bool false)
@@ -43,9 +44,14 @@
 
 ;; @desc Triggers a veto. If quorum is reached, the system enters a vetoed state locking admin functions.
 (define-public (trigger-veto)
-  (let ((current-count (var-get veto-count)))
-    (asserts! (not (default-to false (map-get? veto-signatures tx-sender))) ERR_ALREADY_VETOED)
-    (map-set veto-signatures tx-sender true)
+  (let (
+    (round (var-get veto-round))
+    (current-count (var-get veto-count))
+    (last-signed (default-to u0 (map-get? veto-signatures tx-sender)))
+  )
+    (asserts! (not (var-get veto-active)) ERR_VETO_ACTIVE)
+    (asserts! (not (is-eq last-signed round)) ERR_ALREADY_VETOED)
+    (map-set veto-signatures tx-sender round)
     (var-set veto-count (+ current-count u1))
     (if (>= (+ current-count u1) (var-get quorum-threshold))
       (begin
@@ -63,6 +69,7 @@
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
     (var-set veto-count u0)
     (var-set veto-active false)
+    (var-set veto-round (+ (var-get veto-round) u1))
     (ok true)
   )
 )
