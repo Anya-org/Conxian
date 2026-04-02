@@ -146,5 +146,5 @@
 )
 
 (define-public (verify-passkey-signature (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
-  (ok true)
+  (ok false)
 )
