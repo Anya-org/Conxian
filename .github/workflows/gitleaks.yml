@@ -41,6 +41,9 @@ jobs:
         run: |
           set -euo pipefail
 
+          tmp_dir="${RUNNER_TEMP:-/tmp}"
+          mkdir -p "$tmp_dir"
+
           base_sha="${{ github.event.pull_request.base.sha }}"
           head_sha="${{ github.event.pull_request.head.sha }}"
 
@@ -54,11 +57,15 @@ jobs:
             exit 0
           fi
 
+          empty_dir="$(mktemp -d "${tmp_dir}/gitleaks-empty-XXXXXX")"
+          trap 'rm -rf "$empty_dir"' EXIT
+
           gitleaks detect \
             --no-banner \
             --redact \
             --exit-code=0 \
             --no-git \
+            --source="$empty_dir" \
             --config="gitleaks.toml"
 
       - name: Scan (pull_request)
