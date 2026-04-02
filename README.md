@@ -1,4 +1,4 @@
-# Conxian: Sovereign Business Operations System (BOS v1.7.0)
+# Conxian: Sovereign Business Operations System (BOS v1.8.2)
 
 This repository is the programmatic **State Machine** for Conxian operations. We have evolved from a system that runs on infrastructure to a system that **is** infrastructure—living directly on Bitcoin.
 
@@ -76,7 +76,7 @@ To maintain a clean and sovereign workspace, we adhere to strict hygiene standar
 - **`archive/remediation_scripts/`**: Historical artifacts from previous system audits and remediations.
 - **`openspec/`**: Definitive technical specifications.
 
-## 🗺️ Implementation Roadmap (v1.7.0)
+## 🗺️ Implementation Roadmap (v1.8.2)
 
 1. **Foundation (Q3-Q4 2025)**: Anchor key metrics and IP assets to Bitcoin. Establish multi-sig treasury.
 2. **Integration (Q1-Q2 2026)**: Deploy autonomous BTC yield and on-chain governance logs.
