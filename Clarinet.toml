@@ -207,6 +207,9 @@ path = "contracts/governance/bns-stub.clar"
 path = "contracts/governance/reputation-engine.clar"
 depends_on = ["conxian-access", "bns-stub"]
 
+[contracts.symmetry-governor]
+path = "contracts/governance/symmetry-governor.clar"
+
 [contracts.proposal-executor]
 path = "contracts/governance/proposal-executor.clar"
 depends_on = ["proposal-registry", "cxvg-token"]
