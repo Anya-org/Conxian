@@ -34,8 +34,8 @@
     (asserts! (> amount u0) ERR_ZERO_FUNDING)
     (asserts! (< (var-get current-phase) u6) ERR_PHASE_COMPLETE)
 
-    ;; Transfer STX to protocol treasury (admin for now)
-    (try! (stx-transfer? amount caller (var-get admin)))
+    ;; Escrow STX in this contract
+    (try! (stx-transfer? amount caller (as-contract tx-sender)))
 
     (let ((existing (default-to u0 (map-get? contributors caller))))
       (if (is-eq existing u0)
@@ -49,6 +49,23 @@
     (check-and-advance-phase)
 
     (print { event: "launch-contribution", contributor: caller, amount: amount, phase: (var-get current-phase) })
+    (ok true)
+  )
+)
+
+(define-public (withdraw-stx (amount uint) (recipient principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (as-contract (try! (stx-transfer? amount tx-sender recipient)))
+    (print { event: "launch-withdrawal", amount: amount, recipient: recipient })
+    (ok true)
+  )
+)
+
+(define-public (set-admin (new-admin principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (var-set admin new-admin)
     (ok true)
   )
 )
