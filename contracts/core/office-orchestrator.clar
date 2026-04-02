@@ -1,4 +1,4 @@
-;; office-manager.clar
+;; office-orchestrator.clar
 ;; Manages worker registration, payroll funding, and agent authorization.
 
 (define-constant ERR_UNAUTHORIZED (err u1000))
@@ -25,8 +25,29 @@
 (define-public (fund-payroll (amount uint))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (var-set payroll-balance (+ (var-get payroll-balance) amount))
-    (ok true)
+
+    (match (stx-transfer? amount tx-sender (as-contract tx-sender))
+      ok-val (begin
+        (var-set payroll-balance (+ (var-get payroll-balance) amount))
+        (ok true)
+      )
+      err-val ERR_INSUFFICIENT_FUNDS
+    )
+  )
+)
+
+(define-public (pay-worker (worker principal) (amount uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (>= (var-get payroll-balance) amount) ERR_INSUFFICIENT_FUNDS)
+
+    (match (as-contract (stx-transfer? amount tx-sender worker))
+      ok-val (begin
+        (var-set payroll-balance (- (var-get payroll-balance) amount))
+        (ok true)
+      )
+      err-val ERR_INSUFFICIENT_FUNDS
+    )
   )
 )
 
