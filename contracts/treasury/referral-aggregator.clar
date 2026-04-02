@@ -10,9 +10,24 @@
 (define-constant ERR_NOT_FOUND (err u404))
 
 ;; Roles & Config
-(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var admin principal tx-sender)
 (define-data-var worker-share-bps uint u9500) ;; 95%
 (define-data-var referrer-share-bps uint u500) ;; 5%
+
+(define-read-only (is-admin)
+    (or
+        (is-eq tx-sender (var-get admin))
+        (is-eq contract-caller (var-get admin))
+    )
+)
+
+(define-public (set-admin (new-admin principal))
+    (begin
+        (asserts! (is-admin) ERR_UNAUTHORIZED)
+        (var-set admin new-admin)
+        (ok true)
+    )
+)
 
 ;; Mapping of Referrals: Worker -> Referrer
 (define-map worker-referrals principal principal)
@@ -20,7 +35,7 @@
 ;; @desc Register a referrer for a specific worker
 (define-public (register-referral (worker principal) (referrer principal))
     (begin
-        (asserts! (or (is-eq tx-sender worker) (is-eq tx-sender (var-get admin))) ERR_UNAUTHORIZED)
+        (asserts! (or (is-eq tx-sender worker) (is-admin)) ERR_UNAUTHORIZED)
         (map-set worker-referrals worker referrer)
         (print { event: "referral-registered", worker: worker, referrer: referrer })
         (ok true)
@@ -78,7 +93,7 @@
 ;; @desc Admin function to update the split ratio
 (define-public (set-split-ratio (worker-bps uint) (referrer-bps uint))
     (begin
-        (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+        (asserts! (is-admin) ERR_UNAUTHORIZED)
         (asserts! (is-eq (+ worker-bps referrer-bps) u10000) ERR_INVALID_AMOUNT)
         (var-set worker-share-bps worker-bps)
         (var-set referrer-share-bps referrer-bps)
