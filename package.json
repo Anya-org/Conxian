@@ -7,6 +7,7 @@
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
     "test": "vitest run",
+    "deploy:testnet:revenue-automation": "node -e \"if(!process.env.I_UNDERSTAND_THIS_DEPLOYS_TO_TESTNET){ console.error('Set I_UNDERSTAND_THIS_DEPLOYS_TO_TESTNET=1 to deploy to testnet'); process.exit(1); }\" && clarinet deploy revenue-automation --network testnet",
     "clarinet:check": "clarinet check",
     "check": "clarinet check",
     "clarinet:console": "clarinet console",
