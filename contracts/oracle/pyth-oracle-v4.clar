@@ -3,6 +3,27 @@
 
 (impl-trait .pyth-traits.pyth-core-trait)
 
+(define-constant ERR_UNAUTHORIZED (err u1000))
+
+(define-data-var admin principal tx-sender)
+
+(define-read-only (is-authorized)
+  (let ((admin-principal (var-get admin)))
+    (or
+      (is-eq tx-sender admin-principal)
+      (is-eq contract-caller admin-principal)
+    )
+  )
+)
+
+(define-public (set-admin (new-admin principal))
+  (begin
+    (asserts! (is-authorized) ERR_UNAUTHORIZED)
+    (var-set admin new-admin)
+    (ok true)
+  )
+)
+
 (define-map price-feeds principal { price: uint, conf: uint, ema-price: uint, ema-conf: uint, expo: int, timestamp: uint })
 
 ;; --- Pyth Core Implementation ---
@@ -30,6 +51,7 @@
 ;; Admin function to seed prices for testing
 (define-public (set-mock-price (feed-id principal) (price uint))
   (begin
+    (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (map-set price-feeds feed-id { price: price, conf: u100, ema-price: price, ema-conf: u100, expo: -8, timestamp: burn-block-height })
     (ok true)
   )
