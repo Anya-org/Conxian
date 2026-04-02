@@ -15,8 +15,7 @@ This OpenSpec package is an architecture synthesis only. Execution remains track
 ## Institutional egress policy (read-only subledger export)
 - [ ] [CON-161](https://linear.app/conxian-labs/issue/CON-161/extend-treasury-oracle-schema-for-external-settlement-logs) — extend treasury oracle schema for external settlement logs
 - [ ] [CON-164](https://linear.app/conxian-labs/issue/CON-164/add-external-settlement-log-schema-in-treasury-oracle-repo) — add external settlement log schema in treasury oracle repo
-
-These tracks **MUST** enforce the canonical `snake_case` egress schema (including deprecated aliases and/or replacement datasets for field renames) and publish deterministic renderer mappings (for example ISO 20022) in version control alongside each dataset schema (see [spec: Export field naming conventions](./specs/sovereign-data-migration-institutional-egress/spec.md#export-field-naming-conventions)).
+- [ ] Treat [spec: Export field naming conventions](./specs/sovereign-data-migration-institutional-egress/spec.md#export-field-naming-conventions) as shared acceptance criteria for CON-161 and CON-164.
 
 ## Gateway readiness (non-egress)
 - [ ] [CON-160](https://linear.app/conxian-labs/issue/CON-160/add-global-settlement-ingress-to-gateway) — add global settlement ingress to gateway (not an external-subledger write-path)
