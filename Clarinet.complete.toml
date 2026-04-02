@@ -672,7 +672,7 @@ depends_on = [ "nakamoto-constants", "conxian-protocol",]
 
 [contracts.fiscal-orchestrator]
 path = "contracts/agents/fiscal-orchestrator.clar"
-depends_on = [ "office-manager",]
+depends_on = [ "office-manager", "sip-standards", "agent-risk", "concentrated-liquidity-pool", "bme-engine",]
 
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
