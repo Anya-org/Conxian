@@ -2,7 +2,7 @@
 
 This repository is the programmatic **State Machine** for Conxian operations. We have evolved from a system that runs on infrastructure to a system that **is** infrastructure—living directly on Bitcoin.
 
-Supporting — governance + orchestration hub for the Conxian ecosystem (OpenSpec, docs, and submodule wiring).
+Supporting — Governance + OpenSpec + submodule wiring for the Conxian ecosystem.
 
 See the [repo portfolio](docs/REPO_PORTFOLIO.md#ecosystem-repos) for the flagship/supporting repo map.
 
