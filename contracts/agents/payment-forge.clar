@@ -14,8 +14,10 @@
 (define-constant ERR_X402_REPLAY (err u5004))
 (define-constant ERR_X402_SIGNER_NOT_REGISTERED (err u5005))
 (define-constant ERR_INVALID_X402_PUBKEY (err u5006))
+(define-constant ERR_VAULT_NOT_SET (err u5007))
 
 (define-data-var admin principal tx-sender)
+(define-data-var fiscal-vault-oracle (optional principal) none)
 
 ;; --- Settlement Registry ---
 ;; Transaction Hash -> ISO 20022 Verification Hash
@@ -31,10 +33,11 @@
 ;; Inspired by HTTP 402: Payment Required. AI Agent triggers instant settlement.
 (define-public (trigger-x402-settlement (amount uint) (token <sip-010-trait>) (signature (buff 65)))
   (let (
+    (vault (unwrap! (var-get fiscal-vault-oracle) ERR_VAULT_NOT_SET))
     (payload {
       amount: amount,
       token: (contract-of token),
-      vault: .fiscal-vault-oracle,
+      vault: vault,
       requester: tx-sender,
       epoch: burn-block-height,
       forge: (as-contract tx-sender)
@@ -50,7 +53,7 @@
       (map-set x402-consumed-msg-hashes msg-hash true)
       
       ;; 2. Execute Transfer to SFC Vault
-      (match (contract-call? token transfer amount tx-sender .fiscal-vault-oracle none)
+      (match (contract-call? token transfer amount tx-sender vault none)
         transfer-ok (begin
           (asserts! transfer-ok ERR_SETTLEMENT_FAILED)
           (print { event: "x402-settlement-executed", amount: amount, token: (contract-of token), actor: tx-sender })
@@ -79,10 +82,12 @@
 ;; @desc Settle SBC Obligation
 ;; Programmatically clears debt for a Sovereign Business Cell via the Fiscal-Vault.
 (define-public (settle-sbc-obligation (sbc (string-ascii 32)) (amount uint) (token <sip-010-trait>))
-  (begin
-    ;; Logic to verify SBC state via .fiscal-intelligence and trigger vault release
-    (try! (contract-call? .fiscal-vault-oracle release-funds-to-sbc sbc amount token))
-    (ok true)
+  (let ((vault (unwrap! (var-get fiscal-vault-oracle) ERR_VAULT_NOT_SET)))
+    (begin
+      (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+      (try! (contract-call? vault release-funds-to-sbc sbc amount token))
+      (ok true)
+    )
   )
 )
 
@@ -92,12 +97,24 @@
   (map-get? settlement-registry tx-id)
 )
 
+(define-read-only (get-fiscal-vault-oracle)
+  (var-get fiscal-vault-oracle)
+)
+
 ;; --- Admin ---
 
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
     (var-set admin new-admin)
+    (ok true)
+  )
+)
+
+(define-public (set-fiscal-vault-oracle (vault principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (var-set fiscal-vault-oracle (some vault))
     (ok true)
   )
 )
