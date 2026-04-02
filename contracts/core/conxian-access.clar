@@ -13,6 +13,7 @@
 (define-constant ERR_ROLE_EXISTS u1001)
 (define-constant ERR_ROLE_NOT_FOUND u1002)
 (define-constant ERR_INVALID_SIGNATURE u1003)
+(define-constant ERR_PASSKEY_NOT_SUPPORTED u1004)
 
 ;; Roles
 (define-constant ROLE_ADMIN u1)
@@ -147,9 +148,9 @@
 
 ;; @desc Verifies a passkey/biometric signature.
 ;; @note Passkey/WebAuthn verification is not supported directly in Clarity today.
-;;       This returns false so callers cannot treat it as an authorization primitive.
+;;       This always fails so callers cannot treat it as an authorization primitive.
 (define-read-only (verify-passkey-signature (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
-  (ok false)
+  (err ERR_PASSKEY_NOT_SUPPORTED)
 )
 
 ;; @desc Returns whether the current transaction sender is a global protocol administrator.
