@@ -29,7 +29,9 @@ DECLARE
   table_oid oid;
   origin_attnum SMALLINT;
   ref_attnum SMALLINT;
+  old_lock_timeout TEXT;
   existing_index_name TEXT;
+  existing_index_schema TEXT;
   matching_constraint_names TEXT[];
   matching_index_names TEXT[];
 BEGIN
@@ -97,10 +99,11 @@ BEGIN
       RETURN;
     END IF;
 
-    SELECT array_agg(c.relname ORDER BY c.relname)
+    SELECT array_agg(format('%I.%I', ns.nspname, c.relname) ORDER BY ns.nspname, c.relname)
     INTO matching_index_names
     FROM pg_index i
     JOIN pg_class c ON c.oid = i.indexrelid
+    JOIN pg_namespace ns ON ns.oid = c.relnamespace
     LEFT JOIN pg_constraint cst ON cst.conindid = i.indexrelid
     WHERE i.indrelid = table_oid
       AND i.indisunique
@@ -119,12 +122,32 @@ BEGIN
     IF COALESCE(array_length(matching_index_names, 1), 0) > 1 THEN
       RAISE EXCEPTION 'Multiple matching standalone unique indexes found: %', matching_index_names;
     ELSIF array_length(matching_index_names, 1) = 1 THEN
-      existing_index_name := matching_index_names[1];
+      SELECT ns.nspname, c.relname
+      INTO existing_index_schema, existing_index_name
+      FROM pg_index i
+      JOIN pg_class c ON c.oid = i.indexrelid
+      JOIN pg_namespace ns ON ns.oid = c.relnamespace
+      LEFT JOIN pg_constraint cst ON cst.conindid = i.indexrelid
+      WHERE i.indrelid = table_oid
+        AND i.indisunique
+        AND i.indisvalid
+        AND i.indpred IS NULL
+        AND i.indexprs IS NULL
+        AND i.indnkeyatts = 2
+        AND i.indnatts = 2
+        AND NOT i.indisprimary
+        AND cst.oid IS NULL
+        AND (
+          i.indkey = format('%s %s', origin_attnum, ref_attnum)::int2vector
+          OR i.indkey = format('%s %s', ref_attnum, origin_attnum)::int2vector
+        );
     END IF;
 
     IF existing_index_name IS NULL THEN
+      old_lock_timeout := current_setting('lock_timeout');
       PERFORM set_config('lock_timeout', '5s', true);
-      LOCK TABLE cnx_bos.cxn_external_settlement_logs IN EXCLUSIVE MODE;
+      LOCK TABLE cnx_bos.cxn_external_settlement_logs IN SHARE ROW EXCLUSIVE MODE;
+      PERFORM set_config('lock_timeout', old_lock_timeout, true);
 
       IF EXISTS (
         SELECT 1
@@ -166,11 +189,12 @@ BEGIN
 
       EXECUTE 'CREATE UNIQUE INDEX IF NOT EXISTS idx_ext_settlement_origin_ref_uniq ON cnx_bos.cxn_external_settlement_logs (settlement_network_origin, external_tx_reference)';
       existing_index_name := 'idx_ext_settlement_origin_ref_uniq';
+      existing_index_schema := 'cnx_bos';
     END IF;
 
     EXECUTE format(
       'ALTER TABLE cnx_bos.cxn_external_settlement_logs ADD CONSTRAINT cxn_ext_settlement_origin_ref_uniq UNIQUE USING INDEX %I.%I',
-      'cnx_bos',
+      existing_index_schema,
       existing_index_name
     );
   END IF;
