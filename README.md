@@ -21,7 +21,7 @@ Active. For the current maturity level and recent upgrades, see [Status (March 2
 ## Relationship to the Conxian stack
 
 - This is the on-chain execution layer.
-- It is typically consumed via [Conxian Gateway](gateway/) (API + indexing) and surfaced through [Conxian UI](ui/) and [Conxius Wallet](https://github.com/Conxian/conxius-wallet).
+- It is typically consumed via [Conxian Gateway](https://github.com/Conxian/Conxian/tree/main/gateway) (API + indexing) and surfaced through [Conxian UI](https://github.com/Conxian/Conxian/tree/main/ui) and [Conxius Wallet](https://github.com/Conxian/conxius-wallet).
 
 ## Overview
 
