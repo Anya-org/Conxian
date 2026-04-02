@@ -22,14 +22,11 @@
     (current-height burn-block-height)
     (last-reset (var-get last-epoch-reset))
   )
-    (begin
-      (if (>= (- current-height last-reset) EPOCH_LENGTH)
-        (begin
-          (var-set epoch-emission-total u0)
-          (var-set last-epoch-reset current-height)
-          true
-        )
-        true
+    (if (>= current-height (+ last-reset EPOCH_LENGTH))
+      (begin
+        (var-set epoch-emission-total u0)
+        (var-set last-epoch-reset current-height)
+        (ok true)
       )
       (ok true)
     )
