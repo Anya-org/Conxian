@@ -156,6 +156,8 @@ Notes:
 
 Pinned repo descriptions should be short, conservative, and evidence-forward.
 
+Pinned repo descriptions don’t support Markdown-formatted links. Prefer referencing proof artifacts by name/path (for example, `SECURITY.md`, `CHANGELOG.md`, `openspec/`); put clickable Markdown links in surfaces that support them (READMEs and trust pages).
+
 1. `Sovereign operations system (BOS). Specs in openspec/. Status: Beta.`
 2. `Conxian Gateway + state proofs. Security policy in SECURITY.md. Status: Incubating.`
 3. `Reference implementation + OpenSpec artifacts. See CHANGELOG.md. Status: Stable.`
@@ -183,7 +185,7 @@ Homepage proof blocks should be claim + link (no long text).
 
 ## Consistency rules
 
-1. **No orphan claims**: every trust claim must link to proof.
+1. **No orphan claims**: every trust claim must reference a public proof artifact; link to it when the surface supports links.
 2. **No internal detail**: never copy internal-only strategy, legal, or incident content into public surfaces.
 3. **Prefer boundaries over hype**: “what this is / is not” beats marketing adjectives.
 4. **One vocabulary**: use the Status taxonomy above everywhere.
