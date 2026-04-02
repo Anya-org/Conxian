@@ -5,6 +5,7 @@
 * [Conxian: one-page market narrative](docs/CONXIAN_MARKET_NARRATIVE_ONE_PAGER.md)
 * [Documentation Alignment Index](docs/DOCUMENTATION_ALIGNMENT_INDEX.md)
 * [Partner Overview and Launch FAQ](docs/PARTNER_OVERVIEW_AND_LAUNCH_FAQ.md)
+* [Release notes and changelog format](docs/RELEASE_NOTES_AND_CHANGELOG.md)
 * [OpenSpec](openspec/README.md)
 
 ## 🤖 Business Operations System (BOS)
