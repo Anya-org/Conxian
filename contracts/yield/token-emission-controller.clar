@@ -3,6 +3,7 @@
 (use-trait ft-mintable-trait .sip-standards.ft-mintable-trait)
 
 (define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_EMISSION_CAP u1003)
 (define-data-var admin principal tx-sender)
 (define-map emission-targets principal uint)
 
@@ -13,19 +14,49 @@
 
 (define-constant MAX_EMISSION_PER_EPOCH u10000000000) ;; Hard safety cap
 (define-data-var epoch-emission-total uint u0)
+(define-constant EPOCH_LENGTH u144)
+(define-data-var last-epoch-reset uint burn-block-height)
+
+(define-private (sync-epoch-if-needed)
+  (let (
+    (current-height burn-block-height)
+    (last-reset (var-get last-epoch-reset))
+  )
+    (begin
+      (if (>= (- current-height last-reset) EPOCH_LENGTH)
+        (begin
+          (var-set epoch-emission-total u0)
+          (var-set last-epoch-reset current-height)
+          true
+        )
+        true
+      )
+      (ok true)
+    )
+  )
+)
 
 (define-public (request-mint (amount uint) (recipient principal))
   (let (
     (weight (default-to u0 (map-get? emission-targets tx-sender)))
   )
-    (asserts! (> weight u0) (err ERR_UNAUTHORIZED))
-    (asserts! (<= (+ (var-get epoch-emission-total) amount) MAX_EMISSION_PER_EPOCH) (err u1003))
+    (begin
+      (asserts! (> weight u0) (err ERR_UNAUTHORIZED))
+      (try! (sync-epoch-if-needed))
 
-    (var-set epoch-emission-total (+ (var-get epoch-emission-total) amount))
-    (print { event: "mint-requested", amount: amount, recipient: recipient })
-    ;; MINT LOGIC WOULD CALL CXVG TOKEN HERE
-    (ok true)
+      (let ((new-total (+ (var-get epoch-emission-total) amount)))
+        (asserts! (<= new-total MAX_EMISSION_PER_EPOCH) (err ERR_EMISSION_CAP))
+        (try! (contract-call? (var-get cxvg-token-contract) mint amount recipient))
+        (var-set epoch-emission-total new-total)
+        (print { event: "mint-requested", amount: amount, recipient: recipient })
+        (ok true)
+      )
+    )
   )
+)
+
+(define-public (sync-epoch)
+  (sync-epoch-if-needed)
 )
 
 (define-public (initialize (coordinator principal) (cxvg principal))
