@@ -14,7 +14,13 @@ jobs:
   gateway-suite:
     name: Gateway Suite
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.labels.*.name, 'infra') || github.event_name == 'push'
+    if: >-
+      github.event_name == 'push' ||
+      (
+        github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        contains(github.event.pull_request.labels.*.name, 'infra')
+      )
     steps:
     - uses: actions/checkout@v6
       with:
@@ -36,7 +42,13 @@ jobs:
   b2b-suite:
     name: B2B Suite (Nexus & SDK)
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.labels.*.name, 'b2b') || github.event_name == 'push'
+    if: >-
+      github.event_name == 'push' ||
+      (
+        github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        contains(github.event.pull_request.labels.*.name, 'b2b')
+      )
     steps:
     - uses: actions/checkout@v6
       with:
@@ -59,7 +71,13 @@ jobs:
   b2c-wallet-suite:
     name: B2C Wallet Suite
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.labels.*.name, 'b2c') || github.event_name == 'push'
+    if: >-
+      github.event_name == 'push' ||
+      (
+        github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        contains(github.event.pull_request.labels.*.name, 'b2c')
+      )
     steps:
     - uses: actions/checkout@v6
       with:
@@ -102,7 +120,10 @@ jobs:
   audit-and-docs:
     name: Transparency Audit & Docs
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.labels.*.name, 'audit')
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      contains(github.event.pull_request.labels.*.name, 'audit')
     steps:
     - uses: actions/checkout@v6
       with:
@@ -128,7 +149,10 @@ jobs:
   testnet-simulation:
     name: Testnet Simulation
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.labels.*.name, 'simulation')
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      contains(github.event.pull_request.labels.*.name, 'simulation')
     steps:
     - uses: actions/checkout@v6
       with:
