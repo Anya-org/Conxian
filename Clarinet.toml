@@ -63,6 +63,10 @@ depends_on = ["conxian-access"]
 [contracts.mev-protector]
 path = "contracts/security/mev-protector.clar"
 
+[contracts.revenue-automation]
+path = "contracts/treasury/revenue-automation.clar"
+depends_on = ["sip-standards", "revenue-distributor"]
+
 [contracts.revenue-distributor]
 path = "contracts/treasury/revenue-distributor.clar"
 depends_on = ["bme-engine", "cxd-token"]

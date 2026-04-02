@@ -17,6 +17,12 @@ We take the security of the Conxian Protocol very seriously. If you find a secur
 
 We acknowledge reports within 48 hours.
 
+## Secret handling
+
+- Do not commit any `.env*` files (for example: `.env`, `.env.local`, `ui/.env.local`), private keys, or API tokens.
+- Use `.env.example` as a template for local configuration.
+- This repository runs `gitleaks` in GitHub Actions on pull requests and pushes to `main` to catch new secret leaks.
+
 ## Security Standards (Apex Upgrade v1.1.0)
 
 - **Code is Law**: All logic is verifiable and sovereign.

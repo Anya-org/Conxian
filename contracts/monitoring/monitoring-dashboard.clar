@@ -9,6 +9,7 @@
 
 ;; Public Functions
 
+;; @desc Returns comprehensive protocol health metrics and risk indicators
 (define-read-only (get-protocol-health)
   (let (
     (status (unwrap-panic (contract-call? .conxian-protocol get-protocol-status)))
@@ -26,6 +27,7 @@
   )
 )
 
+;; @desc Returns the operational status of a specific protocol module
 (define-read-only (get-module-status (module-id (string-ascii 32)))
   (ok {
     module: module-id,
@@ -34,6 +36,7 @@
   })
 )
 
+;; @desc Returns a high-level summary of the entire system's health
 (define-read-only (get-system-health-summary)
   (ok {
     total-modules: u5,
@@ -44,6 +47,8 @@
 )
 
 ;; Admin Functions
+
+;; @desc Transfers administrative privileges to a new principal
 (define-public (transfer-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
