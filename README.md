@@ -85,6 +85,10 @@ The CSF is a standardized interface that allows third-party protocols to nativel
 ## Status (March 2026)
 
 - **Maturity (as of March 2026)**: Active development (alpha); breaking changes expected.
+- **Snapshot highlights**:
+  - CSF traits and interfaces: [`contracts/traits/`](contracts/traits/)
+  - Router and DEX modules: [`contracts/dex/`](contracts/dex/)
+  - Core safety and execution engines: [`contracts/core/`](contracts/core/)
 - **Nakamoto / Clarity 4 alignment**: [Clarity 4 migration tracking](docs/CLARITY4_MIGRATION_TRACKING.md)
 - **Benchmarks (simnet)**: [Protocol benchmarks](docs/BENCHMARKS.md)
 - **Recent reports and plans**:
