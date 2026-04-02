@@ -17,6 +17,7 @@ type Args = {
   outFile: string;
   overwrite: boolean;
   printSecrets: boolean;
+  writeFile: boolean;
 };
 
 function printUsageAndExit(code: number): never {
@@ -35,6 +36,7 @@ function printUsageAndExit(code: number): never {
       "  --count <n>                         Number of keys to generate (default: 5)",
       "  --out <file>                        Where to write secrets JSON (default: .tmp/bos-keys.json)",
       "  --overwrite                         Allow overwriting --out if it already exists",
+      "  --no-file                           Do not write secret material to disk",
       "  --i-understand-this-leaks-secrets    Also print private keys/mnemonics to stdout",
     ].join("\n"),
   );
@@ -48,6 +50,7 @@ function parseArgs(argv: string[]): Args {
     outFile: resolve(process.cwd(), ".tmp", "bos-keys.json"),
     overwrite: false,
     printSecrets: false,
+    writeFile: true,
   };
 
   for (let i = 0; i < argv.length; i++) {
@@ -80,6 +83,11 @@ function parseArgs(argv: string[]): Args {
 
     if (arg === "--overwrite") {
       args.overwrite = true;
+      continue;
+    }
+
+    if (arg === "--no-file") {
+      args.writeFile = false;
       continue;
     }
 
@@ -156,14 +164,36 @@ async function writeSecretsFile(outFile: string, keys: GeneratedKey[], overwrite
 async function main() {
   const args = parseArgs(process.argv.slice(2));
 
+  if (!args.writeFile && !args.printSecrets) {
+    console.error("Refusing to proceed: --no-file requires --i-understand-this-leaks-secrets (otherwise secrets have nowhere to go).");
+    process.exit(1);
+  }
+
   console.log("=== BOS Wallet Key Generation ===");
   console.log(`Generating ${args.count} key(s)...`);
 
   const keys = await generateKeys(args.count);
 
-  await writeSecretsFile(args.outFile, keys, args.overwrite);
-  console.log(`\nWrote secret material to: ${args.outFile}`);
-  console.log("(This path should be gitignored; do not commit it.)\n");
+  if (args.writeFile) {
+    try {
+      await writeSecretsFile(args.outFile, keys, args.overwrite);
+    } catch (err: unknown) {
+      if (err && typeof err === "object" && "code" in err && (err as { code?: string }).code === "EEXIST") {
+        console.error(
+          `Refusing to overwrite existing secrets file at ${args.outFile}. ` +
+            "Pass --overwrite to replace it, or delete the file manually.",
+        );
+        process.exit(1);
+      }
+
+      throw err;
+    }
+
+    console.log(`\nWrote secret material to: ${args.outFile}`);
+    console.log("(This path should be gitignored; do not commit it.)\n");
+  } else {
+    console.log("\nSkipping writing secret material to disk (--no-file).\n");
+  }
 
   for (const key of keys) {
     console.log(`--- ${key.label} ---`);
