@@ -86,13 +86,14 @@ BEGIN
 
     IF coalesce(array_length(matching_constraint_names, 1), 0) > 1 THEN
       RAISE EXCEPTION
-        'Multiple matching UNIQUE constraints found on (settlement_network_origin, external_tx_reference): %',
+        'Multiple UNIQUE constraints found on (settlement_network_origin, external_tx_reference): %',
         matching_constraint_names;
     ELSIF array_length(matching_constraint_names, 1) = 1 THEN
       EXECUTE format(
         'ALTER TABLE cnx_bos.cxn_external_settlement_logs RENAME CONSTRAINT %I TO cxn_ext_settlement_origin_ref_uniq',
         matching_constraint_names[1]
       );
+
       RETURN;
     END IF;
 
