@@ -93,8 +93,7 @@ depends_on = ["oracle-aggregator", "mev-protector", "conxian-protocol", "concent
 
 [contracts.fiscal-orchestrator]
 path = "contracts/agents/fiscal-orchestrator.clar"
-
-depends_on = ["sip-standards"]
+depends_on = ["sip-standards", "agent-risk", "concentrated-liquidity-pool", "bme-engine"]
 
 [contracts.enhanced-circuit-breaker]
 path = "contracts/security/enhanced-circuit-breaker.clar"
@@ -336,8 +335,3 @@ path = 'contracts/core/self-launch-coordinator.clar'
 
 [contracts.test-c4]
 path = "contracts/test-c4.clar"
-
-[contracts.revenue-automation]
-path = "contracts/revenue-automation.clar"
-depends_on = ["sip-standards"]
-
