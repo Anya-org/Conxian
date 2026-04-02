@@ -30,6 +30,8 @@ DECLARE
   origin_attnum SMALLINT;
   ref_attnum SMALLINT;
   existing_index_name TEXT;
+  matching_constraint_names TEXT[];
+  existing_constraint_name TEXT;
 BEGIN
   table_oid := 'cnx_bos.cxn_external_settlement_logs'::regclass;
 
@@ -71,19 +73,31 @@ BEGIN
         table_oid::regclass;
     END IF;
 
-    IF EXISTS (
-      SELECT 1
-      FROM pg_constraint c
-      WHERE c.conrelid = table_oid
-        AND c.contype = 'u'
-        AND (
-          c.conkey = ARRAY[origin_attnum, ref_attnum]
-          OR c.conkey = ARRAY[ref_attnum, origin_attnum]
-        )
-        AND c.conname <> 'cxn_ext_settlement_origin_ref_uniq'
-    ) THEN
+    SELECT array_agg(c.conname ORDER BY c.conname)
+    INTO matching_constraint_names
+    FROM pg_constraint c
+    WHERE c.conrelid = table_oid
+      AND c.contype = 'u'
+      AND (
+        c.conkey = ARRAY[origin_attnum, ref_attnum]
+        OR c.conkey = ARRAY[ref_attnum, origin_attnum]
+      )
+      AND c.conname <> 'cxn_ext_settlement_origin_ref_uniq';
+
+    IF coalesce(array_length(matching_constraint_names, 1), 0) > 1 THEN
       RAISE EXCEPTION
-        'Found existing UNIQUE constraint on (settlement_network_origin, external_tx_reference) with unexpected name; expected cxn_ext_settlement_origin_ref_uniq';
+        'Multiple UNIQUE constraints exist on (settlement_network_origin, external_tx_reference): %',
+        matching_constraint_names;
+    END IF;
+
+    existing_constraint_name := matching_constraint_names[1];
+
+    IF existing_constraint_name IS NOT NULL THEN
+      EXECUTE format(
+        'ALTER TABLE cnx_bos.cxn_external_settlement_logs RENAME CONSTRAINT %I TO cxn_ext_settlement_origin_ref_uniq',
+        existing_constraint_name
+      );
+      RETURN;
     END IF;
 
     SELECT c.relname
