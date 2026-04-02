@@ -147,7 +147,7 @@ path = "contracts/oracle/oracle-adapter-stub.clar"
 path = "contracts/compliance/travel-rule-service.clar"
 
 [contracts.compliance-manager]
-path = "contracts/compliance/compliance-manager.clar"
+path = "contracts/compliance/compliance-orchestrator.clar"
 depends_on = [ "block-utils",]
 
 [contracts.compliance-trait]
@@ -163,7 +163,7 @@ path = "contracts/helpers/optimization-helpers.clar"
 path = "contracts/dex/enterprise-loan-manager.clar"
 
 [contracts.order-orchestrator]
-path = "contracts/enterprise/advanced-order-manager.clar"
+path = "contracts/enterprise/order-orchestrator.clar"
 
 [contracts.on-chain-router-helper]
 path = "contracts/dex/on-chain-router-helper.clar"
@@ -191,7 +191,7 @@ path = "contracts/dex/dex-registrar.clar"
 path = "contracts/dex/pool-type-registry.clar"
 
 [contracts.migration-orchestrator]
-path = "contracts/migration/migration-manager.clar"
+path = "contracts/migration/migration-orchestrator.clar"
 
 [contracts.predictive-scaling-system]
 path = "contracts/dex/predictive-scaling-system.clar"
@@ -465,7 +465,7 @@ path = "contracts/monitoring/finance-metrics.clar"
 path = "contracts/governance/ico-offering.clar"
 
 [contracts.symmetry-governor]
-path = "contracts/governance/upgrade-controller.clar"
+path = "contracts/governance/symmetry-governor.clar"
 depends_on = [ "governance",]
 
 [contracts.lending-protocol-governance]
@@ -490,13 +490,13 @@ path = "contracts/governance/governance-signature-verifier.clar"
 path = "contracts/governance/legal-representative-registry.clar"
 
 [contracts.reputation-orchestrator]
-path = "contracts/governance/gamification-manager.clar"
+path = "contracts/governance/reputation-orchestrator.clar"
 
 [contracts.signed-data-base]
 path = "contracts/governance/signed-data-base.clar"
 
 [contracts.fee-orchestrator]
-path = "contracts/vaults/fee-manager.clar"
+path = "contracts/vaults/fee-orchestrator.clar"
 
 [contracts.custody]
 path = "contracts/vaults/custody.clar"
@@ -511,7 +511,7 @@ path = "contracts/math/exponentiation.clar"
 path = "contracts/cross-chain/bridge-nft.clar"
 
 [contracts.enterprise-compliance-manager]
-path = "contracts/compliance/compliance-manager.clar"
+path = "contracts/compliance/compliance-orchestrator.clar"
 depends_on = [ "block-utils",]
 
 [contracts.position-factory]
@@ -538,7 +538,7 @@ path = "contracts/core/conxian-access.clar"
 path = "contracts/core/funding-rate-calculator.clar"
 
 [contracts.position-orchestrator]
-path = "contracts/core/position-manager.clar"
+path = "contracts/core/position-orchestrator.clar"
 
 [contracts.circuit-breaker]
 path = "contracts/security/circuit-breaker.clar"
@@ -593,7 +593,7 @@ depends_on = [ "regulatory-adapter",]
 path = "contracts/traits/risk-unit-trait.clar"
 
 [contracts.risk-unit]
-path = "contracts/core/risk-manager.clar"
+path = "contracts/core/risk-unit.clar"
 depends_on = [ "conxian-access",]
 
 [contracts.conxian-protocol]
@@ -609,7 +609,7 @@ path = "contracts/treasury/conxian-vaults.clar"
 depends_on = [ "conxian-access",]
 
 [contracts.dlc-orchestrator]
-path = "contracts/sbtc/dlc-manager.clar"
+path = "contracts/sbtc/dlc-orchestrator.clar"
 depends_on = [ "conxian-access",]
 
 [contracts.proposal-registry]
@@ -624,7 +624,7 @@ path = "contracts/governance/timelock.clar"
 depends_on = [ "conxian-access",]
 
 [contracts.lending-orchestrator]
-path = "contracts/lending/lending-manager.clar"
+path = "contracts/lending/lending-orchestrator.clar"
 
 [contracts.interest-rate-model]
 path = "contracts/lending/interest-rate-model.clar"
@@ -656,7 +656,7 @@ depends_on = [ "block-utils",]
 path = "contracts/dex/concentrated-liquidity-pool.clar"
 
 [contracts.collateral-orchestrator]
-path = "contracts/core/collateral-manager.clar"
+path = "contracts/core/collateral-orchestrator.clar"
 depends_on = [ "block-utils", "conxian-protocol",]
 
 [contracts.switchboard-oracle-adapter]
@@ -670,7 +670,7 @@ path = "contracts/treasury/founder-vault.clar"
 depends_on = [ "nakamoto-constants", "conxian-protocol",]
 
 [contracts.fiscal-orchestrator]
-path = "contracts/agents/agent-treasury.clar"
+path = "contracts/agents/fiscal-orchestrator.clar"
 depends_on = [ "office-manager",]
 
 [contracts.agent-risk]
@@ -719,7 +719,7 @@ depends_on = [ "rbac",]
 path = "contracts/dex/swap-router.clar"
 
 [contracts.office-orchestrator]
-path = "contracts/automation/office-manager.clar"
+path = "contracts/core/office-orchestrator.clar"
 
 [contracts.pausable-trait]
 path = "contracts/traits/pausable-trait.clar"
