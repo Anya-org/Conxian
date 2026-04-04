@@ -6,5 +6,6 @@
         "cursor-global": true,
         "cursor-workspace": true
     },
-    "chat.mcp.gallery.enabled": true
+    "chat.mcp.gallery.enabled": true,
+    "java.format.settings.url": ".vscode/java-formatter.xml"
 }
