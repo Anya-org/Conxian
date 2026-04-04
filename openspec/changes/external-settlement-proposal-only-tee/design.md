@@ -54,9 +54,11 @@ This design makes the boundaries between parsing, attestation, and execution exp
   - `rail`,
   - `raw_payload_hash`,
   - `normalized_settlement_hash`,
+  - `trigger_id`,
+  - `settlement_identifiers`,
   - `asset_path`,
-  - `proposal_kind = EXTERNAL_SETTLEMENT_TRIGGER`,
-  - `timelock_delay_blocks = 144`.
+  - `timelock_delay_blocks = 144`,
+  - and `oracle_verification` (including `oracle_proof_digest` as defined in `spec.md` §2.1).
 
 The attested artifact MUST NOT contain raw payload bytes.
 
@@ -118,6 +120,8 @@ Each rail MUST define a canonical identifier set used to populate `settlement_id
 
 `envelope_identifiers` (including `tx_index`) MUST NOT affect `normalized_settlement_hash`.
 
+`settlement_identifiers` MUST be derived/normalized inside the TEE from `raw_payload_bytes`; any host-supplied hints MUST be treated as non-authoritative, MUST be checked inside the TEE (no successful attestation on mismatch), and MUST NOT be forwarded into the attested output (see [spec.md §2.1.1](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical) for normative semantics).
+
 Replay protection and deterministic idempotency are enforced via `trigger_id` derived from `{ rail, normalized_settlement_hash }`.
 
 Trigger granularity:
@@ -154,7 +158,7 @@ Informal summary:
 - String-valued settlement identifiers in `settlement_identifiers` are canonicalized using Unicode NFC (per Unicode 15.1.0) and compared byte-for-byte over UTF-8; case is preserved unless a field-specific canonicalization rule (e.g., uppercasing `settlement_currency`) explicitly requires a transform (see §2.1.1).
 - These identifier values are non-empty and, after NFC normalization, exclude Unicode control/format characters (`General_Category` Cc or Cf) and leading/trailing Unicode whitespace (`White_Space=Y`). See §2.1.1 for the precise normative rules.
 - If any value in `settlement_identifiers` fails canonicalization or validation under §2.1.1, that settlement transaction is invalid for external-settlement trigger purposes and does not produce a `normalized_settlement_hash` or `SovereignProposal`.
-- `envelope_identifiers.tx_index` is a non-negative integer.
+- `envelope_identifiers.tx_index` is a non-negative integer in the range `[0, 9007199254740991]` (inclusive, i.e. `2^53-1`).
 
 Proposal emission MUST be idempotent on `trigger_id`: duplicate triggers MUST NOT create additional proposals or timelocks.
 
