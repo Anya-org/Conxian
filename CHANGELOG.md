@@ -9,6 +9,9 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 
 ## [Unreleased]
 
+### Added
+- Documented the BOS business-end operating model (`docs/BOS_BUSINESS_BUILDOUT.md`), including ZSE public/internal split guidance and governance/README alignment.
+
 ## [1.8.2] - 2026-03-31
 ### Security
 - Remediated Zero Secret Egress (ZSE) violation by removing the `archive/` directory from the active Git index.

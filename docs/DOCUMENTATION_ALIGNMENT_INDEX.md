@@ -21,6 +21,7 @@ Notes:
 | `README.md` | Canonical | Public-safe | Repository entrypoint and overall orientation. |
 | `SUMMARY.md` | Canonical | Public-safe | GitBook table of contents (used for docs navigation; Pages publishing is allowlisted). |
 | `docs/README.md` | Supporting | Public-safe | “Docs hub” landing page. |
+| `docs/BOS_BUSINESS_BUILDOUT.md` | Canonical | Public-safe | Repo business purpose, business-unit placement, governance + ownership model, and public/internal split. |
 | `ARCHIVE_MIGRATION.md` | Canonical | Public-safe | ZSE placeholder + pointer to Linear Virtual Office for legacy material. |
 
 ## 2) BOS (Business Operations System)
@@ -118,6 +119,8 @@ These are the documents most likely to answer “what are we building?” and �
 | `docs/BUSINESS_COMPLIANCE_ALIGNMENT_2026.md` | Supporting | Internal-only | Strategy/compliance narrative for 2026 regulatory framing. |
 
 ## 6) Governance / repo operating model / runbooks
+
+See `docs/BOS_BUSINESS_BUILDOUT.md` for repo business purpose, business-unit placement, governance + ownership model, and public/internal split.
 
 | Document | Role | Visibility | What it’s for |
 | --- | --- | --- | --- |
