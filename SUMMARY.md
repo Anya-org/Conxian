@@ -14,6 +14,20 @@
 * [CSF mainnet readiness gate](docs/CSF_MAINNET_READINESS_GATE.md)
 * [OpenSpec](openspec/README.md)
 
+## 🤖 Business Operations System (BOS)
+
+* [Conxius Wallet BOS buildout](docs/CONXIUS_WALLET_BOS_BUILDOUT.md)
+* [Strategy Nexus](Sovereign-Strategy-Nexus/REALTIME_M&A_VELOCITY.md)
+  * [Sovereign MOI Alignment](Sovereign-Strategy-Nexus/docs/SOVEREIGN_MOI_ALIGNMENT.md)
+  * [ZK-Data Room Schema](Sovereign-Strategy-Nexus/docs/ZK_DATA_ROOM_SCHEMA.md)
+  * [Sovereign Pitch Deck Narrative](Sovereign-Strategy-Nexus/docs/SOVEREIGN_PITCH_DECK_NARRATIVE.md)
+  * [LSEG MCP Audit](Fiscal-Vault-Oracle/LSEG_MCP_AUDIT.md)
+* [Treasury Oracle](Fiscal-Vault-Oracle/SOVEREIGN_RUNWAY.md)
+* [Arch Guardian](Nakamoto-Guardian/ANTI_FRAGILITY_LOOP.md)
+* [Grid Oracle (Agnostic)](cxn-grid-oracle/README.md)
+* [Ops Engine](Sovereign-Ops-Orchestrator/DEPLOYMENT_EFFICIENCY.md)
+  * [Linear Integration Wiring](Sovereign-Ops-Orchestrator/LINEAR_WIRING.md)
+
 ## 🏛️ Ground Truth (OpenSpec)
 
 * [OpenSpec Baseline](openspec/changes/remediate-enterprise-sovereignty/specs.md)
