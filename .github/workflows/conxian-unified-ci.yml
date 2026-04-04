@@ -127,8 +127,7 @@ jobs:
       github.event_name == 'push' ||
       (
         github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository &&
-        contains(github.event.pull_request.labels.*.name, 'b2b')
+        github.event.pull_request.head.repo.full_name == github.repository
       )
     steps:
     - uses: actions/checkout@v6
@@ -138,6 +137,8 @@ jobs:
         persist-credentials: false
     - name: Setup Rust
       uses: dtolnay/rust-toolchain@stable
+      with:
+        components: clippy
     - name: Rust Cache
       uses: Swatinem/rust-cache@v2
       with:
@@ -147,9 +148,11 @@ jobs:
         cd lib-conxian-core
         cargo test --locked
         cargo clippy --locked --all-targets --all-features -- -D warnings
+    - uses: taiki-e/install-action@v2
+      with:
+        tool: cargo-audit@0.22.1
     - name: Dependency audit
       run: |
-        cargo install cargo-audit --version 0.22.1 --locked
         cd lib-conxian-core
         cargo audit
 
