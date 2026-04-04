@@ -2,6 +2,13 @@
 
 This page defines the Conxian public repo map for external evaluation and internal consistency.
 
+For the portfolio-level business-unit/operating-function mapping (and separation-of-concerns rules), see [Portfolio business-unit map and separation of concerns](./PORTFOLIO_BUSINESS_UNIT_MAP.md).
+
+- Repos governed via this BOS repo are pinned as submodule gitlinks (the specific submodule commit IDs recorded in this repo’s git tree, with paths/URLs configured in `.gitmodules`).
+- Every pinned submodule must be mapped in `docs/PORTFOLIO_BUSINESS_UNIT_MAP.md`.
+- Supporting repos that are not pinned as submodule gitlinks may be listed here for context, but they are not governed by this BOS repo’s hygiene invariants unless and until they are added as submodules and mapped in `docs/PORTFOLIO_BUSINESS_UNIT_MAP.md`.
+- This file is an explanatory trust-surface view; see the “Source-of-truth rule” section in `docs/PORTFOLIO_BUSINESS_UNIT_MAP.md` for the canonical invariants and validation rules.
+
 ## Standard role line (GitHub description + README top section)
 
 Use the same single **role line** in both the GitHub repo description (plain text; keep it concise—aim for ~160 chars) and the README “top section” (right below the opening paragraph). You may add a separate README-only line below it (for example, a link to this repo portfolio). The 1-line purposes should match the descriptions in the [Ecosystem repos](#ecosystem-repos) section.
