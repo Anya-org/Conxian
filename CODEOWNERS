@@ -16,6 +16,13 @@
 /lib-*/ @botshelomokoka @admin-conxian-labs
 /showcase-dapp/ @botshelomokoka @admin-conxian-labs
 /stacksorbit/ @botshelomokoka @admin-conxian-labs
+/cxn-grid-oracle/ @botshelomokoka @admin-conxian-labs
+
+# Agentic EXCO Suite
+/Fiscal-Vault-Oracle/ @botshelomokoka @admin-conxian-labs
+/Nakamoto-Guardian/ @botshelomokoka @admin-conxian-labs
+/Sovereign-Ops-Orchestrator/ @botshelomokoka @admin-conxian-labs
+/Sovereign-Strategy-Nexus/ @botshelomokoka @admin-conxian-labs
 
 # Governance + automation
 /.github/ @botshelomokoka @admin-conxian-labs

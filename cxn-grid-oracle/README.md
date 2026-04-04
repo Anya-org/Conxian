@@ -1,6 +1,8 @@
 # cxn-grid-oracle (Grid Intelligence & Orchestration)
 
-The cxn-grid-oracle module handles agnostic demand-response routing and energy orchestration.
+> Current workspace release: **v1.8.2** (see [`CHANGELOG.md`](../CHANGELOG.md))
+
+The cxn-grid-oracle module handles agnostic demand-response routing and energy orchestration for the Conxian ecosystem.
 
 ## Universal Oracle Schema
 
@@ -22,3 +24,15 @@ The cxn-grid-oracle module handles agnostic demand-response routing and energy o
   "timestamp": 123456789
 }
 ```
+
+## Governance
+
+This module is part of the Conxian Sovereign Autonomous Business (SAB).
+
+- [**LICENSE**](./LICENSE) (GPL-3.0-only)
+- [**NOTICE**](./NOTICE)
+- [**CONTRIBUTING.md**](../CONTRIBUTING.md)
+- [**SECURITY.md**](../SECURITY.md)
+
+---
+**Sovereign Autonomous Business (SAB)**. © Conxian-Labs. Licensed under GPL-3.0-only. Powered by Bitcoin.
