@@ -102,25 +102,35 @@ Execution must never accept or interpret raw TradFi payloads.
 
 #### 3.2.1 `settlement_identifiers` (required; canonical)
 
-To support replay protection and deterministic idempotency at the raw-message level, each rail MUST define a canonical identifier set used together with `raw_payload_hash` to compute `trigger_id`.
+To support replay protection and deterministic idempotency, each rail MUST define a canonical identifier set used together with `raw_payload_hash` to compute `trigger_id`.
+
+Trigger granularity:
+
+- A trigger is emitted **per settlement transaction** (not per envelope/message).
+- If a single inbound message contains multiple settlement transactions (e.g., ISO 20022 `pacs.008` with multiple `CdtTrfTxInf` entries), it produces **one trigger per transaction**.
 
 Minimum required identifier set (by rail):
 
 - **ISO20022 (pacs.008)**
   - `message_id` (e.g., `GrpHdr.MsgId`)
-  - `end_to_end_id` (e.g., `CdtTrfTxInf.PmtId.EndToEndId`)
-  - `settlement_amount` + `settlement_currency` (e.g., `CdtTrfTxInf.IntrBkSttlmAmt`)
-  - `settlement_date` (e.g., `CdtTrfTxInf.IntrBkSttlmDt`)
+  - `tx_index` (0-based index of the `CdtTrfTxInf` entry in rail-defined document order)
+  - `transaction_reference` (MUST use the first available in this order)
+    - `uetr` (e.g., `CdtTrfTxInf.PmtId.UETR`), else
+    - `end_to_end_id` (e.g., `CdtTrfTxInf.PmtId.EndToEndId`), else
+    - `tx_index` (base-10 string)
 - **PAPSS**
   - `message_id`
-  - `transaction_reference` (rail-provided unique reference)
-  - `settlement_amount` + `settlement_currency`
-  - `settlement_date`
+  - `tx_index` (0-based index in rail-defined order)
+  - `transaction_reference` (rail-provided unique reference; if not present, use `tx_index` as a base-10 string)
 - **BRICS**
   - `message_id`
-  - `settlement_reference` (rail-provided unique reference)
-  - `settlement_amount` + `settlement_currency`
-  - `settlement_date`
+  - `tx_index` (0-based index in rail-defined order)
+  - `transaction_reference` (rail-provided unique reference; if not present, use `tx_index` as a base-10 string)
+
+Canonical formatting requirements:
+
+- `message_id` and `transaction_reference` MUST be UTF-8 strings (Unicode NFC), MUST NOT contain `\n`, and MUST preserve case.
+- `tx_index` MUST be a non-negative integer.
 
 Proposal emission MUST be idempotent on `trigger_id`: duplicate triggers MUST NOT create additional proposals or timelocks.
 
@@ -155,10 +165,10 @@ Example (illustrative only):
 
 ## 5. Time-lock initiation
 
-On successful oracle verification (inside TEE), proposal emission initiates the standard time-lock using the attested delay and the native chain-height source:
+After oracle verification and attestation succeed inside the TEE, proposal emission initiates the standard time-lock using the attested delay and the native chain-height source:
 
 - `delay_blocks = 144`
-- `start_height` is sourced from the same canonical chain height source used by the native path
+- `start_height` is obtained at proposal emission time from the same canonical chain height source used by the native path
 - `release_height = start_height + delay_blocks`
 
 The TEE MUST attest `timelock_delay_blocks` but does not need to attest `start_height` or `release_height`.
@@ -189,7 +199,7 @@ Invariant:
    - A raw payload (XML/JSON) cannot be supplied to the executor.
 
 4. **Replay is idempotent**
-   - Replaying the same external message (same `trigger_id`) does not create additional proposals or timelocks.
+   - Replaying the same external trigger (same `trigger_id`) does not create additional proposals or timelocks.
 
 ### 7.2 Lifecycle tests
 

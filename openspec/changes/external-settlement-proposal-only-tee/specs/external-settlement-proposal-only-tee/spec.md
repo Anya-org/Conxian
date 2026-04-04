@@ -35,7 +35,7 @@ Proposal-only external settlement triggers define how ISO 20022 / PAPSS / BRICS 
    - Trigger source MUST NOT change the 5/5/90 productive streaming behavior.
 
 7. **Idempotency / replay protection**
-   - `trigger_id` MUST be computed deterministically using a canonical encoding (e.g., `sha256("external-settlement-trigger:v1" || JCS({ rail, raw_payload_hash, settlement_identifiers }))`). Idempotency is enforced at the raw-message level.
+   - `trigger_id` MUST be computed deterministically using a canonical encoding (e.g., `sha256("external-settlement-trigger:v1" || JCS({ rail, raw_payload_hash, settlement_identifiers }))`). Idempotency is enforced per `{ rail, raw_payload_hash, settlement_identifiers }` (one trigger per settlement transaction within a given `raw_payload_hash`).
    - Proposal emission MUST be idempotent on `trigger_id`: duplicate triggers MUST NOT create additional proposals or timelocks.
 
 ## 2. Required artifacts
@@ -65,19 +65,21 @@ Minimum required identifier set (by rail):
 
 - **ISO20022 (pacs.008)**
   - `message_id`
-  - `end_to_end_id`
-  - `settlement_amount` + `settlement_currency`
-  - `settlement_date`
+  - `tx_index`
+  - `transaction_reference` (prefer `uetr`, else `end_to_end_id`, else `tx_index` as a base-10 string)
 - **PAPSS**
   - `message_id`
-  - `transaction_reference`
-  - `settlement_amount` + `settlement_currency`
-  - `settlement_date`
+  - `tx_index`
+  - `transaction_reference` (if not present, use `tx_index` as a base-10 string)
 - **BRICS**
   - `message_id`
-  - `settlement_reference`
-  - `settlement_amount` + `settlement_currency`
-  - `settlement_date`
+  - `tx_index`
+  - `transaction_reference` (if not present, use `tx_index` as a base-10 string)
+
+Canonical formatting requirements:
+
+- `message_id` and `transaction_reference` MUST be UTF-8 strings (Unicode NFC), MUST NOT contain `\n`, and MUST preserve case.
+- `tx_index` MUST be a non-negative integer.
 
 ### 2.2 `SovereignProposal` (trigger-kind)
 
@@ -99,6 +101,6 @@ Prohibited fields:
 2. Valid payload but invalid oracle proof → proposal emission fails.
 3. Any attempt to include `raw_payload_bytes` or a full external-settlement payload structure in `AttestedExternalSettlementTrigger` → rejected.
 4. Any attempt to supply raw TradFi payload (bytes or parsed structure) to execution code → rejected.
-5. Replay the same external message (same `trigger_id`) → no new proposal/timelock created.
+5. Replay the same external trigger (same `trigger_id`) → no new proposal/timelock created.
 6. Any attempt to skip multi-sig approvals → rejected.
 7. Any attempt to change timelock away from 144 blocks (increase or decrease) → rejected.
