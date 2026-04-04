@@ -102,7 +102,7 @@ Execution must never accept or interpret raw TradFi payloads.
 
 #### 3.2.1 `settlement_identifiers` (required; canonical)
 
-To support replay protection and deterministic idempotency, each rail MUST define a canonical identifier set used together with `raw_payload_hash` to compute `trigger_id`.
+To support replay protection and deterministic idempotency at the raw-message level, each rail MUST define a canonical identifier set used together with `raw_payload_hash` to compute `trigger_id`.
 
 Trigger granularity:
 
