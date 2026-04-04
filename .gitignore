@@ -17,10 +17,14 @@ test-results/
 playwright-report/
 coverage/
 .nyc_output/
+tests/report.md
 /*.log
 /*.txt
 /*.patch
 /*.bak
+
+# Firebase local state
+.firebase/
 
 # Environment and secrets
 .env
