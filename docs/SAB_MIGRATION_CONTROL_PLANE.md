@@ -1,0 +1,55 @@
+# SAB migration control plane (CON-329)
+
+This is the coordinating "source of truth" artifact for the SAB infrastructure migration. It centralizes:
+
+- the dependency inventory (current-state and target-state mapping)
+- the domain-to-datastore decision log
+- readiness gates + cutover criteria
+- recommended migration waves
+
+Canonical tracker:
+
+- Linear: https://linear.app/conxian-labs/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory
+
+Related execution issues (parallelized):
+
+- https://linear.app/conxian-labs/issue/CON-334/map-target-datastore-decisions-by-sab-data-domain
+- https://linear.app/conxian-labs/issue/CON-335/define-pilot-readiness-gates-and-evidence-requirements
+- https://linear.app/conxian-labs/issue/CON-336/sequence-sab-migration-waves-by-value-reversibility-and-risk
+- https://linear.app/conxian-labs/issue/CON-337/inventory-current-supabase-and-neon-dependencies-by-service
+
+## Current status (snapshot)
+
+**As of:** 2026-04-04
+
+- **Inventory:** in progress (first-pass baseline captured; service-level detail in CON-337)
+- **Datastore decisions:** partially specified (baseline direction in OpenSpec; per-domain fit log in progress)
+- **Readiness gates:** first-pass defined (pilot + cutover)
+- **Migration waves:** first-pass defined (ordered by reversibility and risk)
+
+## Canonical artifacts
+
+- Dependency inventory: [SAB_MIGRATION_DEPENDENCY_INVENTORY.md](SAB_MIGRATION_DEPENDENCY_INVENTORY.md)
+- Domain-to-datastore decision log: [SAB_DATASTORE_DECISION_LOG.md](SAB_DATASTORE_DECISION_LOG.md)
+- Readiness gates & cutover criteria: [SAB_MIGRATION_READINESS_GATES.md](SAB_MIGRATION_READINESS_GATES.md)
+- Migration waves: [SAB_MIGRATION_WAVES.md](SAB_MIGRATION_WAVES.md)
+
+Baseline specs that constrain decisions:
+
+- SAB datastore mapping: [openspec/specs/sab-datastore-mapping/spec.md](../openspec/specs/sab-datastore-mapping/spec.md)
+- Sovereign data migration & institutional egress synthesis: [openspec/changes/sovereign-data-migration-institutional-egress/specs.md](../openspec/changes/sovereign-data-migration-institutional-egress/specs.md)
+
+## Working rules (program-level)
+
+1. **Canonical truth remains Stacks L1.** All off-chain stores are derived/query layers and must be rebuildable.
+2. **Correctness isolation:** Supabase and Neon must not be required for protocol correctness, final auditability, or institutional accounting truth.
+3. **Zero Secret Egress (ZSE):** no enclave-only secrets or signing keys in any non-enclave datastore.
+4. **Evidence over assertion:** readiness gates are only "met" when linked evidence exists (commit-pinned docs, checklists, or reproducible scripts).
+
+## Milestones (for dashboard updates)
+
+| Milestone | What it means | Evidence pointer |
+| :--- | :--- | :--- |
+| **M0: Architecture baseline** | Inventory exists, target-state candidates are mapped, and open questions are explicit. | [SAB_MIGRATION_DEPENDENCY_INVENTORY.md](SAB_MIGRATION_DEPENDENCY_INVENTORY.md), [SAB_DATASTORE_DECISION_LOG.md](SAB_DATASTORE_DECISION_LOG.md) |
+| **M1: Pilot-ready** | A sovereign baseline exists for at least one correctness-relevant dependency with a controlled cutover plan and rollback. | [SAB_MIGRATION_READINESS_GATES.md](SAB_MIGRATION_READINESS_GATES.md) (Pilot gate) |
+| **M2: Cutover-ready** | Phase 5 "clean break" criteria are evidenced; Supabase/Neon can be removed from correctness-critical paths. | [SAB_MIGRATION_READINESS_GATES.md](SAB_MIGRATION_READINESS_GATES.md) (Cutover gate) |

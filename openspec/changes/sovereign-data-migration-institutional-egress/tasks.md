@@ -4,6 +4,7 @@ This OpenSpec package is an architecture synthesis only. Execution remains track
 
 ## SAB migration program
 - [ ] [CON-329](https://linear.app/conxian-labs/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory) — control plane and dependency inventory
+  - Repo control-plane artifact: [SAB migration control plane](../../../docs/SAB_MIGRATION_CONTROL_PLANE.md)
 
 ## Supabase phase-out (analytics)
 - [ ] [CON-337](https://linear.app/conxian-labs/issue/CON-337/inventory-current-supabase-and-neon-dependencies-by-service) — inventory current Supabase and Neon dependencies by service

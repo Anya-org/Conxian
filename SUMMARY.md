@@ -30,6 +30,11 @@
 
 * [OpenSpec Baseline](openspec/changes/remediate-enterprise-sovereignty/specs.md)
 * [Sovereign Data Migration & Institutional Egress](openspec/changes/sovereign-data-migration-institutional-egress/specs.md)
+* [SAB migration control plane](docs/SAB_MIGRATION_CONTROL_PLANE.md)
+  * [Dependency inventory](docs/SAB_MIGRATION_DEPENDENCY_INVENTORY.md)
+  * [Datastore decision log](docs/SAB_DATASTORE_DECISION_LOG.md)
+  * [Readiness gates](docs/SAB_MIGRATION_READINESS_GATES.md)
+  * [Migration waves](docs/SAB_MIGRATION_WAVES.md)
 * [Trust & Proof Messaging (Public Surfaces)](docs/TRUST_AND_PROOF_MESSAGING.md)
 * [Autonomous Launch Specs](openspec/changes/csf-autonomous-launch/specs.md)
 * [Strategos Alignment Audit](audit/strategos-alignment.md)
