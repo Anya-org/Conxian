@@ -7,9 +7,11 @@ This is the coordinating "source of truth" artifact for the SAB infrastructure m
 - readiness gates + cutover criteria
 - recommended migration waves
 
-Canonical tracker:
+## Canonical tracker
 
-- Linear: https://linear.app/conxian-labs/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory
+- Linear: [CON-329][con-329]
+
+[con-329]: https://linear.app/conxian-labs/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory
 
 Related execution issues (parallelized):
 
@@ -18,14 +20,15 @@ Related execution issues (parallelized):
 - https://linear.app/conxian-labs/issue/CON-336/sequence-sab-migration-waves-by-value-reversibility-and-risk
 - https://linear.app/conxian-labs/issue/CON-337/inventory-current-supabase-and-neon-dependencies-by-service
 
-## Current status (snapshot)
+## Status and review cadence
 
-**As of:** 2026-04-04
+**Last reviewed:** 2026-04-04
 
-- **Inventory:** in progress (first-pass baseline captured; service-level detail in CON-337)
-- **Datastore decisions:** partially specified (baseline direction in OpenSpec; per-domain fit log in progress)
-- **Readiness gates:** first-pass defined (pilot + cutover)
-- **Migration waves:** first-pass defined (ordered by reversibility and risk)
+**Canonical tracker / live status:** [CON-329][con-329]
+
+**Review cadence:** at least monthly, and additionally within the same PR/commit whenever any program-level milestone changes (M0-M2) or readiness-gate evidence is updated.
+
+Update convention: on every review (cadence- or milestone-driven), bump `Last reviewed` in the same PR/commit that updates the underlying evidence (or a dedicated PR if no other content changes are needed).
 
 ## Canonical artifacts
 
