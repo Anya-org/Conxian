@@ -45,6 +45,7 @@
 (define-data-var next-coupon-height uint u0)
 
 (define-data-var defaulted bool false)
+(define-data-var defaulted-at (optional uint) none)
 
 ;; Global coupon index (scaled by INDEX_PRECISION)
 (define-data-var coupon-index uint u0)
@@ -80,9 +81,15 @@
   (begin
     (asserts! (var-get initialized) (err ERR_NOT_INITIALIZED))
     (assert-oracle)
-    (var-set defaulted true)
-    (print { event: "dlc-bond-defaulted", defaulted: true, oracle: tx-sender })
-    (ok true)
+    (if (var-get defaulted)
+      (ok false)
+      (begin
+        (var-set defaulted true)
+        (var-set defaulted-at (some burn-block-height))
+        (print { event: "dlc-bond-defaulted", defaulted: true, oracle: tx-sender, at: burn-block-height })
+        (ok true)
+      )
+    )
   )
 )
 
@@ -126,7 +133,8 @@
     coupon-interval-blocks: (var-get coupon-interval-blocks),
     coupon-ppm: (var-get coupon-ppm),
     next-coupon-height: (var-get next-coupon-height),
-    defaulted: (var-get defaulted)
+    defaulted: (var-get defaulted),
+    defaulted-at: (var-get defaulted-at)
   })
 )
 
@@ -143,7 +151,7 @@
 )
 
 ;; Initialization
-(define-public (initialize (token principal) (maturity uint) (oracle principal))
+(define-public (initialize (token <sip-010-ft-trait>) (maturity uint) (oracle principal))
   (begin
     (assert-issuer)
     (asserts! (not (var-get initialized)) (err ERR_ALREADY_INITIALIZED))
@@ -151,12 +159,12 @@
     (var-set initialized true)
     (var-set active true)
     (var-set dlc-oracle oracle)
-    (var-set sbtc-token token)
+    (var-set sbtc-token (contract-of token))
     (var-set maturity-height maturity)
     (var-set coupon-interval-blocks DEFAULT_COUPON_INTERVAL_BLOCKS)
     (var-set coupon-ppm DEFAULT_COUPON_PPM)
     (var-set next-coupon-height (+ burn-block-height DEFAULT_COUPON_INTERVAL_BLOCKS))
-    (print { event: "dlc-bond-initialized", issuer: (var-get issuer), sbtc: token, maturity: maturity, oracle: oracle })
+    (print { event: "dlc-bond-initialized", issuer: (var-get issuer), sbtc: (contract-of token), maturity: maturity, oracle: oracle })
     (ok true)
   )
 )

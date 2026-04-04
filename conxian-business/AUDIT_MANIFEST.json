@@ -1,6 +1,6 @@
 {
   "org": "Conxian",
-  "timestamp": "2026-04-04T10:07:16.913455Z",
+  "timestamp": "2026-04-04T10:30:06.999190Z",
   "version": "v2.0-Audit",
   "files": [
     {
@@ -1465,8 +1465,8 @@
     },
     {
       "path": "Fiscal-Vault-Oracle/dlc-bond.clar",
-      "sha256": "4117c8b45772dadb3584bcd44ff078713ddaae9d31a8db5bafac1fe50e7dc506"
+      "sha256": "ce1e27e1adbf8fd406685ea63b5f7420ca4c0a65a01f8d9d1ef1c2f02a08c215"
     }
   ],
-  "stacks_anchor_payload": "62e5780d156dcb0366ec6e232df52d0c987146158ed5e56bdbfc64f892a8b5d3"
+  "stacks_anchor_payload": "da513be52fe361896a2973502c63761eda45e909e4f312ac6d19e85df8b6b3a8"
 }
