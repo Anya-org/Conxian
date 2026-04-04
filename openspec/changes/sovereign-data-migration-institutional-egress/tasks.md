@@ -19,3 +19,5 @@ This OpenSpec package is an architecture synthesis only. Execution remains track
 
 ## Gateway readiness (non-egress)
 - [ ] [CON-160](https://linear.app/conxian-labs/issue/CON-160/add-global-settlement-ingress-to-gateway) — add global settlement ingress to gateway (not an external-subledger write-path)
+- [ ] [CON-162](https://linear.app/conxian-labs/issue/CON-162/enforce-proposal-only-external-settlement-triggers-in-tee) — enforce proposal-only external settlement triggers in TEE (no direct execution lane)
+  - Shared acceptance criteria: `openspec/changes/external-settlement-proposal-only-tee/`.
