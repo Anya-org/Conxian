@@ -87,6 +87,39 @@ jobs:
         cd conxian-nexus
         cargo test
 
+  lib-conxian-core-suite:
+    name: Core Library Suite (lib-conxian-core)
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'push' ||
+      (
+        github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        contains(github.event.pull_request.labels.*.name, 'b2b')
+      )
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        submodules: recursive
+        token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
+        persist-credentials: false
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2
+      with:
+        workspaces: lib-conxian-core
+    - name: Check & Test
+      run: |
+        cd lib-conxian-core
+        cargo test --locked
+        cargo clippy --all-targets --all-features -- -D warnings
+    - name: Dependency audit
+      run: |
+        cargo install cargo-audit --version 0.22.1 --locked
+        cd lib-conxian-core
+        cargo audit
+
   b2c-wallet-suite:
     name: B2C Wallet Suite
     runs-on: ubuntu-latest
