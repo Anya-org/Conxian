@@ -39,8 +39,7 @@ jobs:
       github.event_name == 'push' ||
       (
         github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository &&
-        contains(github.event.pull_request.labels.*.name, 'infra')
+        github.event.pull_request.head.repo.full_name == github.repository
       )
     steps:
     - uses: actions/checkout@v6
@@ -67,8 +66,7 @@ jobs:
       github.event_name == 'push' ||
       (
         github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository &&
-        contains(github.event.pull_request.labels.*.name, 'b2b')
+        github.event.pull_request.head.repo.full_name == github.repository
       )
     steps:
     - uses: actions/checkout@v6
@@ -96,8 +94,7 @@ jobs:
       github.event_name == 'push' ||
       (
         github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository &&
-        contains(github.event.pull_request.labels.*.name, 'b2c')
+        github.event.pull_request.head.repo.full_name == github.repository
       )
     steps:
     - uses: actions/checkout@v6

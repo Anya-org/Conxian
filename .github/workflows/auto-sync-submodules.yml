@@ -6,6 +6,10 @@ on:
     - cron: '0 0 * * *'
   workflow_dispatch: # Allow manual triggering
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -15,7 +19,7 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
-          token: ${{ secrets.PAT_TOKEN != '' && secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
 
       - name: Update Submodules to Latest Main
         run: |
@@ -24,19 +28,16 @@ jobs:
           
           # Initialize and update submodules recursively to track their defined branches (main)
           git submodule update --init --recursive --remote
-          
-      - name: Check for Changes
-        id: git-check
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "changes_exist=true" >> $GITHUB_ENV
-          else
-            echo "changes_exist=false" >> $GITHUB_ENV
-          fi
 
-      - name: Commit and Push Updates
-        if: ${{ env.changes_exist == 'true' }}
-        run: |
-          git add .
-          git commit -m "chore: auto-sync submodules to latest main branches"
-          git push
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
+          commit-message: "chore: auto-sync submodules"
+          title: "chore: auto-sync submodules"
+          body: |
+            Automated submodule update to the latest configured branches.
+
+            This workflow intentionally opens a PR rather than pushing directly to `main`.
+          branch: bot/auto-sync-submodules
+          delete-branch: true
