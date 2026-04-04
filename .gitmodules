@@ -10,10 +10,6 @@
 	path = conxian-nexus
 	url = https://github.com/Conxian/conxian-nexus
 	branch = main
-[submodule "lib-conxian-core"]
-	path = lib-conxian-core
-	url = https://github.com/Conxian/lib-conxian-core
-	branch = main
 [submodule "conxian-ui"]
 	path = conxian-ui
 	url = https://github.com/Conxian/Conxian_UI
