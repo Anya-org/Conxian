@@ -44,7 +44,9 @@ def generate_manifest():
 
     # Determine manifest path relative to script
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    manifest_path = os.path.join(script_dir, "AUDIT_MANIFEST.json")
+    generated_dir = os.path.join(script_dir, ".generated")
+    os.makedirs(generated_dir, exist_ok=True)
+    manifest_path = os.path.join(generated_dir, "AUDIT_MANIFEST.json")
 
     with open(manifest_path, "w") as f:
         json.dump(manifest, f, indent=2)

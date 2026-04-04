@@ -1,22 +1,27 @@
 {
-  "contract_type": "DLC-Debt-Bond (v1.0)",
-  "collateral": "sBTC (Stacks-Native)",
-  "oracle": "LSEG Institutional Failover (LSEG_MCP_AUDIT.md)",
+  "contract_type": "REDACTED",
+  "collateral": "REDACTED",
+  "oracle": "REDACTED",
   "coupon_structure": {
-    "type": "Fixed-Yield (Inflation-Linked)",
-    "rate": "4.5% APR",
-    "payment_frequency": "Monthly (30 days / 1440 Stacks blocks)",
-    "settlement_currency": "sBTC"
+    "type": "REDACTED",
+    "rate": "REDACTED",
+    "payment_frequency": "REDACTED",
+    "settlement_currency": "REDACTED"
   },
-  "dilution_impact": "0% (Sovereign Debt Model)",
+  "dilution_impact": "REDACTED",
   "dlc_logic": {
-    "outcome_set": ["REPAYMENT_FULL", "DEFAULT_LIQUIDATION", "COUPON_DISTRIBUTION"],
-    "attestation_requirement": "TEE-Hardware-Anchored",
-    "signature_type": "Schnorr (Musig2-Ready)"
+    "outcome_set": [],
+    "attestation_requirement": "REDACTED",
+    "signature_type": "REDACTED"
   },
   "audit_trail": {
-    "issuer": "Fiscal-Vault-Oracle",
-    "governance_nexus": "conxian-nexus (BOS_STATE_MACHINE.json)",
-    "audit_status": "PROPOSED_FOR_ATS_v4.8"
+    "issuer": "REDACTED",
+    "governance_nexus": "REDACTED",
+    "audit_status": "REDACTED"
+  },
+  "note": "Public-safe stub. Debt instrument details, coupon terms, and integration specifics are maintained in the Conxian Linear workspace.",
+  "linear": {
+    "workspace": "https://linear.app/conxian-labs",
+    "tracking_issue": "https://linear.app/conxian-labs/issue/CON-256"
   }
 }

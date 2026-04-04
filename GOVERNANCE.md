@@ -24,6 +24,7 @@ Conxian operates under a Zero Secret Egress (ZSE) mandate.
 
 ## Policies
 
+- Repository visibility: This repository is intended to be public. Internal-only strategy, legal interpretations, operational runbooks, infrastructure identifiers, and secret inventories must live in the Conxian Linear workspace (https://linear.app/conxian-labs). Tracking issue: https://linear.app/conxian-labs/issue/CON-256
 - Contributing guidelines: [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 - Security policy: [`SECURITY.md`](./SECURITY.md)
 - BOS business buildout and repo operating model: [`docs/BOS_BUSINESS_BUILDOUT.md`](./docs/BOS_BUSINESS_BUILDOUT.md)

@@ -1,35 +1,30 @@
+// This repository is public.
+//
+// This Terraform configuration is intentionally reduced to a public-safe template.
+// Concrete infrastructure definitions and any project-specific identifiers are
+// maintained outside git (see https://linear.app/conxian-labs/issue/CON-256).
+
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 5.0"
+    }
+  }
+}
+
+variable "project_id" {
+  description = "GCP project ID (kept outside this public repo)"
+  type        = string
+}
+
+variable "region" {
+  description = "GCP region"
+  type        = string
+  default     = "us-central1"
+}
+
 provider "google" {
-  project = "conxian-sovereign"
-  region  = "us-central1"
-}
-
-resource "google_compute_instance" "gateway_node" {
-  name         = "conxian-gateway-prod"
-  machine_type = "e2-standard-4"
-  zone         = "us-central1-a"
-
-  boot_disk {
-    initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-2204-lts"
-      size  = 100
-    }
-  }
-
-  network_interface {
-    network = "default"
-    access_config {
-      // Ephemeral IP
-    }
-  }
-
-  metadata = {
-    "conclave-ethos" = "TEE-ENABLED"
-    "bos-role"       = "GATEWAY"
-  }
-
-  tags = ["conxian-gateway", "sarb-compliant"]
-}
-
-output "gateway_ip" {
-  value = google_compute_instance.gateway_node.network_interface[0].access_config[0].nat_ip
+  project = var.project_id
+  region  = var.region
 }

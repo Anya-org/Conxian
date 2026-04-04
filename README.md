@@ -33,29 +33,26 @@ This repository pins and coordinates the flagship Conxian repositories, includin
 - [`stacksorbit/`](./stacksorbit): Deployment and operations tooling
 - [`conxian-labs-site/`](./conxian-labs-site): Conxian Labs public site
 
-## Ground truth (OpenSpec)
+## Repository visibility and public/private boundary
 
-The definitive technical specifications for the Conxian ecosystem are maintained in the `openspec/` directory. See the [Enterprise Sovereignty Baseline](./openspec/changes/remediate-enterprise-sovereignty/specs.md) for the latest architectural standards.
+This repository is intended to be public.
+
+To reduce public/private boundary risk, detailed strategy, legal interpretations, operational runbooks, infrastructure identifiers, and any secret inventory are maintained in the Conxian Linear workspace (not in git).
 
 This repository is public. Sensitive strategy, legal, operational, and administrative documents should live in the [Linear Virtual Office](https://linear.app/conxian-labs) in compliance with our Zero Secret Egress (ZSE) mandate.
 
+See:
+
+- https://linear.app/conxian-labs
+- https://linear.app/conxian-labs/issue/CON-256
+
 Detailed strategy and roadmap content must not be duplicated in this README; see `docs/BOS_BUSINESS_BUILDOUT.md` for the public vs internal documentation rules.
 
-## Agentic EXCO suite
+Some files are intentionally kept as stubs so existing links continue to resolve.
 
-The BOS is powered by an active suite of autonomous agents:
+## Ground truth (OpenSpec)
 
-- **[Sovereign Strategy Nexus](./Sovereign-Strategy-Nexus)**: Strategic alignment, structural integrity, and hardware-attested ZK-Data Room proofs.
-- **[Fiscal Vault Oracle](./Fiscal-Vault-Oracle)**: Multi-sig Bitcoin treasury and yield automation constraints.
-- **[Nakamoto Guardian](./Nakamoto-Guardian)**: ATS enforcement, immutable IP registry, and CARF/BRS v1.5 regulatory enforcement.
-- **[Sovereign Ops Orchestrator](./Sovereign-Ops-Orchestrator)**: Bitcoin-native bounties, decentralized contributor onboarding, and protocol-owned layer (POL) management.
-
-## Protocol-owned layers (POL)
-
-- **Settlement**: Anchored to Bitcoin L1 via OpenTimestamps and Stacks Nakamoto.
-- **State Layer**: [Supabase](https://supabase.com) (Real-time financials and IP audit metrics).
-- **Execution Engine**: [Linear](https://linear.app) (Programmatic Action Task Specifications).
-- **Monetization**: Protocol fees and licensing.
+The definitive technical specifications for the Conxian ecosystem are maintained in the `openspec/` directory. See the [Enterprise Sovereignty Baseline](./openspec/changes/remediate-enterprise-sovereignty/specs.md) for the latest architectural standards.
 
 ## Governance and security
 

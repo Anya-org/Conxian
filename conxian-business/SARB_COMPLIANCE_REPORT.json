@@ -1,26 +1,15 @@
 {
-  "report_id": "CXN-GLOBAL-2026-001",
-  "identity": "Sovereign-Strategy-Nexus",
-  "timestamp": "2026-03-20T12:00:00Z",
-  "compliance_model": "Global Sovereign Sharding (ATS v4.8.0)",
-  "regulations": [
-    "SARB 2026 Budget Speech / Exchange Control",
-    "BIS Global Reserve Framework (Basel III/IV)",
-    "ISO 20022 Financial Messaging Standard"
-  ],
-  "mitigation_strategies": {
-    "capital_flow_hosting": "Tableland (On-Chain / Non-Custodial)",
-    "local_egress": "Zero local PII storage in Supabase",
-    "yield_classification": "Institutional Sovereign Utility (FASB-aligned)",
-    "tax_sweep_logic": "Automatic 100bps extraction via Clarity v4",
-    "global_standard": "ISO 20022 pacs.008 XML for Banking Egress"
-  },
-  "identifiers": {
-    "LEI": "PENDING (ERC-8004 Mapping)",
-    "DID": "did:ion:conxian-central-treasury"
-  },
-  "verification": {
-    "attestation_type": "TEE-Hardware-Anchored",
-    "audit_trail": "LSEG MCP Verified"
+  "report_id": "CXN-REDACTED-000",
+  "identity": "redacted",
+  "timestamp": "1970-01-01T00:00:00Z",
+  "compliance_model": "redacted",
+  "regulations": [],
+  "mitigation_strategies": {},
+  "identifiers": {},
+  "verification": {},
+  "note": "Public-safe stub. Internal compliance reports and identifiers are maintained in the Conxian Linear workspace.",
+  "linear": {
+    "workspace": "https://linear.app/conxian-labs",
+    "tracking_issue": "https://linear.app/conxian-labs/issue/CON-256"
   }
 }

@@ -6,6 +6,10 @@ labels: enhancement, business
 assignees: ''
 ---
 
+> Note: This repository is public. Do not include confidential strategy, financial targets, operational runbooks, legal interpretations, or infrastructure identifiers.
+>
+> For internal proposals, use the Conxian Linear workspace instead: https://linear.app/conxian-labs
+
 ## Executive Summary
 
 *Provide a high-level summary of the proposed strategy or business model change.*

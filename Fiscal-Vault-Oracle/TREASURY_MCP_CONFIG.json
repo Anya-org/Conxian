@@ -1,45 +1,12 @@
 {
-  "mcp_version": "1.0.0",
-  "client_id": "Fiscal-Vault-Oracle-openclaw",
-  "bridges": {
-    "supabase_state_bridge": {
-      "url": "mcp://supabase.conxian.internal",
-      "permissions": [
-        "read_table:runway_metrics",
-        "read_table:audit_manifest",
-        "write_table:treasury_actions",
-        "write_table:dlc_state_updates"
-      ],
-      "constraints": {
-        "max_write_frequency": "Every 144 Stacks blocks",
-        "pii_redaction": "REQUIRED (Sovereign-Strategy-Nexus policy)"
-      }
-    },
-    "context7_docs_bridge": {
-      "url": "mcp://context7.conxian.internal",
-      "permissions": [
-        "read_docs:lseg_mcp_audit",
-        "read_docs:sarb_compliance_report",
-        "read_docs:bitcoin_bond_dlc"
-      ],
-      "purpose": "Deterministic retrieval of institutional yield curves and compliance mandates"
-    },
-    "lseg_institutional_bridge": {
-      "url": "mcp://lseg.institutional.conxian.internal",
-      "permissions": [
-        "call_tool:real_time_pricing",
-        "call_tool:historical_volatility",
-        "call_tool:fasb_audit_log"
-      ],
-      "verification": "Nexus pricing must match within 50bps of LSEG data"
-    }
-  },
-  "resource_mappings": {
-    "yield_curve": "context7://lseg_mcp_audit.md",
-    "treasury_state": "supabase://runway_metrics"
-  },
-  "audit_trail": {
-    "log_destination": "dwn://conxian-treasury-oracle.dwn",
-    "signing_requirement": "TEE-Hardware-Anchored (Schnorr)"
+  "mcp_version": "REDACTED",
+  "client_id": "REDACTED",
+  "bridges": {},
+  "resource_mappings": {},
+  "audit_trail": {},
+  "note": "Public-safe stub. Internal MCP endpoints, permissions, and vendor integrations are maintained in the Conxian Linear workspace.",
+  "linear": {
+    "workspace": "https://linear.app/conxian-labs",
+    "tracking_issue": "https://linear.app/conxian-labs/issue/CON-256"
   }
 }

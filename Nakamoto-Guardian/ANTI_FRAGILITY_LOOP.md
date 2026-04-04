@@ -1,21 +1,12 @@
-# Arch Guardian: Anti-Fragility & ATS Enforcement
+# Enforcement loop notes (migrated to Linear)
 
-## 1. Objective
+This repository is public.
 
-Continuous enforcement of the Sovereign Naming Matrix and automated collision audits across the codebase.
+Operational enforcement rules, compliance deadlines, and any automated audit outputs are maintained in the Conxian Linear workspace.
 
-## 2. Enforcement Modules
+See:
 
-- **Collision Detection**: Flagging generic identifiers (e.g., "Conxian").
-- **ATS Compliance**: Verifying that all merged code adheres to the Action Task Specification.
-- **Zero-Trust Bridges**: Blocking non-TEE/non-NTT bridge logic.
+- https://linear.app/conxian-labs
+- https://linear.app/conxian-labs/issue/CON-256
 
-## 3. Audit Log
-
-- **Source**: Linear (`Nakamoto-Guardian` tag)
-- **Status**: ACTIVE
-
-## 4. Regulatory & Machine Economy (v1.7.0)
-
-- **SARS CARF v1.5**: Generating hardware-attested BRS v1.5 XML reports locally to meet the May 2027 filing deadline.
-- **ONLTrust Integration**: Hardcoded 1% royalty routing in `revenue-automation.clar` ensures absolute sovereignty for machine economy OPEX.
+This file is intentionally kept as a stub so links continue to resolve.

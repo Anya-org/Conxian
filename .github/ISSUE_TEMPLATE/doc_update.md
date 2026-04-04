@@ -6,6 +6,8 @@ labels: documentation
 assignees: '
 ---
 
+> Note: This repository is public. Do not include confidential strategy, operational, legal, or infrastructure details. For internal-only material, use the Conxian Linear workspace: https://linear.app/conxian-labs
+
 ### Target Document
 *Which document or section requires updating? (e.g., `ALIGNMENT.md`, `02_strategy/ROADMAP.md`)*
 

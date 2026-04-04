@@ -2,24 +2,25 @@
 
 > Current workspace release: **v1.8.2** (see [`CHANGELOG.md`](../CHANGELOG.md))
 
-The **Sovereign Ops Orchestrator** is the operational engine of the Conxian Business Operations System (BOS). It optimizes deployment cycles and orchestrates the connection between the BOS state machine and execution platforms like Linear.
+The **Sovereign Ops Orchestrator** is the operational coordination layer of the Conxian Business Operations System (BOS).
+
+This repository is public. Detailed wiring, operational dashboards, and execution runbooks are maintained in Linear:
+
+- https://linear.app/conxian-labs
+- https://linear.app/conxian-labs/issue/CON-256
 
 ## Purpose
 
-- **Deployment Efficiency**: Measuring gas-efficiency and performance of operational state changes.
-- **Bottleneck Resolution**: Automated detection and resolution of "blocked" states in Linear.
-- **Protocol Owned Layer (POL)**: Management of Bitcoin-native bounties and decentralized contributor onboarding.
+- Coordinating BOS automation and operational processes.
+- Maintaining boundaries between public specs and internal operational material.
 
 ## Key Components
 
-- **[Deployment Efficiency Guide](./DEPLOYMENT_EFFICIENCY.md)**: Metrics for measuring operational performance.
-- **[Linear Wiring](./LINEAR_WIRING.md)**: Specifications for BOS-to-Linear automation.
+- **[Deployment efficiency](./DEPLOYMENT_EFFICIENCY.md)**
+- **[BOS automation wiring](./LINEAR_WIRING.md)**
 
 ## Governance
 
 This module is part of the Conxian Sovereign Autonomous Business (SAB).
 
 See [`GOVERNANCE.md`](../GOVERNANCE.md) for CONTRIBUTING, SECURITY, and LICENSE.
-
----
-🛡️ **Sovereign Autonomous Business (SAB)**. © 2026 Conxian-Labs. Powered by Bitcoin.
