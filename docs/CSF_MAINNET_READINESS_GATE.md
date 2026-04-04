@@ -56,6 +56,12 @@ Additional pinned repos (supporting surfaces):
 - Mainnet launch program (internal): https://linear.app/conxian-labs/issue/CON-10/mainnet-launch
 - Mainnet checklist (internal): https://linear.app/conxian-labs/issue/CON-7/mainnet-checklist
 - Admin principal centralization risk remediation (security): https://linear.app/conxian-labs/issue/CON-61/security-remediate-hardcoded-admin-principal-centralization-risk
+- ConxianCSF internal wallet + ALEX deployment readiness (signers + treasury wiring): https://linear.app/conxian-labs/issue/CON-136/conxiancsf-internal-wallet-and-alex-deployment-readiness
+- Fix mainnet deploy plan principals (mainnet uses `SP...`, not testnet `ST...`): https://linear.app/conxian-labs/issue/CON-371/fix-mainnet-release-plan-principals-stsp
+- Remove tracked runtime config / artifacts in Conxian (includes `.env`): https://linear.app/conxian-labs/issue/CON-183/secret-and-artifact-cleanup-conxian
+- Verify wallets, signers, and approval controls for launch: https://linear.app/conxian-labs/issue/CON-233/verify-wallets-signers-and-approval-controls-for-launch
+- Align security/incident contact inbox across repos: https://linear.app/conxian-labs/issue/CON-374/align-securityincident-contact-inbox-across-repos
+- Confirm bounty funding and payout activation for mainnet (ALEX path): https://linear.app/conxian-labs/issue/CON-230/confirm-bounty-funding-and-payout-activation-for-mainnet
 - Dependency drift risk (lib consolidation): https://linear.app/conxian-labs/issue/CON-67/infra-consolidate-lib-conxian-core-to-prevent-dependency-drift
 
 ### Supporting
@@ -70,9 +76,11 @@ Additional pinned repos (supporting surfaces):
 
 ### Missing dependency references (must be reconciled)
 
-The CON-129 description references issues that do not currently exist in Linear (as of 2026-04-04): `CON-130`, `CON-64`, `CON-65`, `CON-79`.
+The CON-129 description previously referenced issues that no longer exist in Linear (confirmed as of 2026-04-04) (`CON-130`, `CON-64`, `CON-65`, `CON-79`).
 
-Treat these as **documentation blockers** for this gate until the intended canonical issues (or equivalents) are linked.
+Track replacements and/or removals under: https://linear.app/conxian-labs/issue/CON-375/reconcile-deleted-issue-refs-in-con-129-con-130646579
+
+Treat CON-375 as a **documentation blocker** for this gate until the replacements/removals are fully reconciled.
 
 ## Bounty-ready subset (externalizable candidates only)
 
