@@ -11,9 +11,11 @@ Proposal-only external settlement triggers define how ISO 20022 / PAPSS / BRICS 
 2. **TEE verification is required before proposal emission**
    - A proposal MUST NOT be emitted unless a TEE/StrongBox/CloudTEE attestation verifies:
      - the payload digest (computed from `raw_payload_bytes` inside the TEE),
-     - `normalized_settlement_hash` (computed inside the TEE) using a rail-specific canonical serialization:
+     - `normalized_settlement_hash` (computed inside the TEE) for each settlement transaction using a rail-specific canonical serialization:
        - JSON: RFC 8785 JSON Canonicalization Scheme (JCS)
        - XML: W3C XML Canonicalization 1.1
+       - Additional requirement: rail-specific normalization MUST be envelope-agnostic: the same settlement transaction replayed in different envelopes/messages MUST yield the same `normalized_settlement_hash`, and envelope-level metadata (e.g., message identifiers, timestamps, routing fields) MUST NOT affect `normalized_settlement_hash`.
+       - The normalized settlement transaction hashed to produce `normalized_settlement_hash` MUST include at least the canonical `transaction_identifiers` defined in §2.1.1, and MUST NOT include any `envelope_identifiers`.
      - any digest/hash computed outside the TEE MUST be treated as untrusted; the TEE MUST recompute authoritative values from `raw_payload_bytes` and reject any mismatch with host-supplied claims
      - the oracle authenticity proof,
      - and the deterministic mapping to `asset_path`.
@@ -35,7 +37,12 @@ Proposal-only external settlement triggers define how ISO 20022 / PAPSS / BRICS 
    - Trigger source MUST NOT change the 5/5/90 productive streaming behavior.
 
 7. **Idempotency / replay protection**
-   - `trigger_id` MUST be computed deterministically using a canonical encoding (e.g., `sha256("external-settlement-trigger:v1" || JCS({ rail, raw_payload_hash, settlement_identifiers }))`). Idempotency is enforced per `{ rail, raw_payload_hash, settlement_identifiers }` (one trigger per settlement transaction within a given `raw_payload_hash`).
+   - `trigger_id` MUST be computed deterministically as follows:
+     - Canonicalization MUST use RFC 8785 JSON Canonicalization Scheme (JCS).
+     - The canonicalized value MUST be the JCS output for the JSON object `{"rail": rail, "normalized_settlement_hash": normalized_settlement_hash}` (exact key names as shown).
+     - The hash MUST be SHA-256 over `utf8("external-settlement-trigger:v1") || utf8(JCS({"rail": rail, "normalized_settlement_hash": normalized_settlement_hash}))`.
+     - `trigger_id` MUST be the lowercase hex encoding of the SHA-256 digest.
+   - Idempotency is enforced at the trigger granularity (one trigger per settlement transaction).
    - Proposal emission MUST be idempotent on `trigger_id`: duplicate triggers MUST NOT create additional proposals or timelocks.
 
 ## 2. Required artifacts
@@ -46,7 +53,7 @@ Minimum fields:
 
 - `rail`
 - `raw_payload_hash`
-- `settlement_identifiers`
+- `settlement_identifiers` (per-rail canonical set; see below)
 - `normalized_settlement_hash`
 - `trigger_id`
 - `asset_path`
@@ -61,6 +68,15 @@ Prohibited fields:
 
 #### 2.1.1 `settlement_identifiers` (per-rail canonical set)
 
+`settlement_identifiers` MUST be a JSON object with two namespaces:
+
+- `transaction_identifiers`: envelope-agnostic identifiers for the settlement transaction.
+- `envelope_identifiers`: envelope/message-local identifiers for audit/debug only.
+
+`transaction_identifiers` MUST be included in the normalized settlement transaction hashed to produce `normalized_settlement_hash`.
+
+`envelope_identifiers` MUST NOT affect `normalized_settlement_hash`.
+
 Minimum required identifier set (by rail):
 
 `tx_index` requirements (all rails):
@@ -71,22 +87,19 @@ Minimum required identifier set (by rail):
 Example: if a message contains three settlement-transaction entries `[A, B, C]` and `B` is later rejected or skipped, any triggers emitted for `A` and `C` still use `tx_index = 0` and `tx_index = 2`.
 
 - **ISO20022 (pacs.008)**
-  - `message_id`
-  - `tx_index` (0-based index of the `CdtTrfTxInf` element in the order it appears in the received XML document)
-  - `transaction_reference` (prefer `uetr`, else `end_to_end_id`, else `tx_index` as a base-10 string)
+  - `transaction_identifiers.transaction_reference` (prefer `uetr`, else `end_to_end_id`, else `instruction_id`)
+  - `envelope_identifiers.tx_index`
 - **PAPSS**
-  - `message_id`
-  - `tx_index` (0-based index of the transaction entry in the order it appears in the received message payload)
-  - `transaction_reference` (if not present, use `tx_index` as a base-10 string)
+  - `transaction_identifiers.transaction_reference`
+  - `envelope_identifiers.tx_index`
 - **BRICS**
-  - `message_id`
-  - `tx_index` (0-based index of the transaction entry in the order it appears in the received message payload)
-  - `transaction_reference` (if not present, use `tx_index` as a base-10 string)
+  - `transaction_identifiers.transaction_reference`
+  - `envelope_identifiers.tx_index`
 
 Canonical formatting requirements:
 
-- `message_id` and `transaction_reference` MUST be UTF-8 strings (Unicode NFC), MUST NOT contain `\n`, and MUST preserve case.
-- `tx_index` MUST be a non-negative integer.
+- `transaction_identifiers.transaction_reference` MUST be a UTF-8 string (Unicode NFC), MUST NOT contain `\n`, and MUST preserve case.
+- `envelope_identifiers.tx_index` MUST be a non-negative integer.
 
 ### 2.2 `SovereignProposal` (trigger-kind)
 
@@ -108,6 +121,6 @@ Prohibited fields:
 2. Valid payload but invalid oracle proof → proposal emission fails.
 3. Any attempt to include `raw_payload_bytes` or a full external-settlement payload structure in `AttestedExternalSettlementTrigger` → rejected.
 4. Any attempt to supply raw TradFi payload (bytes or parsed structure) to execution code → rejected.
-5. Replay the same external trigger (same `trigger_id`) → no new proposal/timelock created.
+5. Replay the same settlement transaction (same `trigger_id`) → no new proposal/timelock created.
 6. Any attempt to skip multi-sig approvals → rejected.
 7. Any attempt to change timelock away from 144 blocks (increase or decrease) → rejected.
