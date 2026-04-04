@@ -16,6 +16,7 @@ Provide a concise but comprehensive summary of the changes in this Pull Request.
 
 ### Checklist
 - [ ] I have performed a self-review of my own work.
+- [ ] If label-gated suites apply, I have applied (or requested a maintainer to apply) the correct PR label(s) so the relevant CI suites run (see [`.github/RELEASE_HYGIENE.md`](./.github/RELEASE_HYGIENE.md)).
 - [ ] I have verified that all automated checks (if any) pass successfully.
 - [ ] The language and tone adhere to the Earthy Corporate Finance standard.
 - [ ] Any references to temporal events on-chain are properly anchored (e.g., Bitcoin burn-block-height).

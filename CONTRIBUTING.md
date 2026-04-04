@@ -23,7 +23,8 @@ Reference: [`docs/bounties/BOUNTY_WORKFLOW.md`](./docs/bounties/BOUNTY_WORKFLOW.
 3.  All Clarity smart contracts must pass the Vitest/Simnet test suite.
 4.  Documentation must be updated to match implementation.
 5.  Review the [**CODEOWNERS**](./CODEOWNERS) file to identify the appropriate reviewers for your changes.
-6.  If your change affects user-facing behavior, public APIs, or the security posture, ensure it's documented in [**CHANGELOG.md**](./CHANGELOG.md) (see [docs/RELEASE_NOTES_AND_CHANGELOG.md](./docs/RELEASE_NOTES_AND_CHANGELOG.md) for format).
+6.  Review [`.github/RELEASE_HYGIENE.md`](./.github/RELEASE_HYGIENE.md) for required checks and label-gated CI suites.
+7.  If your change affects user-facing behavior, public APIs, or the security posture, ensure it's documented in [**CHANGELOG.md**](./CHANGELOG.md) (see [docs/RELEASE_NOTES_AND_CHANGELOG.md](./docs/RELEASE_NOTES_AND_CHANGELOG.md) for format).
 
 ## Security Issues
 
@@ -36,6 +37,8 @@ Follow the reporting guidance in [**SECURITY.md**](./SECURITY.md).
 This repository follows Semantic Versioning and documents notable user-facing or security-impacting changes in [**CHANGELOG.md**](./CHANGELOG.md).
 
 If your change affects a user-facing behavior or a security posture, include a changelog entry in the appropriate version section.
+
+For merge expectations and required checks, see [`.github/RELEASE_HYGIENE.md`](./.github/RELEASE_HYGIENE.md).
 
 ## Coding Standards
 
