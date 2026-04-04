@@ -63,17 +63,24 @@ Prohibited fields:
 
 Minimum required identifier set (by rail):
 
+`tx_index` requirements (all rails):
+
+- `tx_index` MUST be computed over the rail-defined settlement-transaction entries (e.g., ISO20022 `pacs.008` `CdtTrfTxInf` elements) in the exact sequence they appear in the received message payload, before any internal normalization or reordering. Implementations MUST NOT reorder transactions for indexing.
+- The index MUST be computed over all transaction entries present in the received message payload, including any that are later rejected or skipped.
+
+Example: if a message contains three settlement-transaction entries `[A, B, C]` and `B` is later rejected or skipped, any triggers emitted for `A` and `C` still use `tx_index = 0` and `tx_index = 2`.
+
 - **ISO20022 (pacs.008)**
   - `message_id`
-  - `tx_index`
+  - `tx_index` (0-based index of the `CdtTrfTxInf` element in the order it appears in the received XML document)
   - `transaction_reference` (prefer `uetr`, else `end_to_end_id`, else `tx_index` as a base-10 string)
 - **PAPSS**
   - `message_id`
-  - `tx_index`
+  - `tx_index` (0-based index of the transaction entry in the order it appears in the received message payload)
   - `transaction_reference` (if not present, use `tx_index` as a base-10 string)
 - **BRICS**
   - `message_id`
-  - `tx_index`
+  - `tx_index` (0-based index of the transaction entry in the order it appears in the received message payload)
   - `transaction_reference` (if not present, use `tx_index` as a base-10 string)
 
 Canonical formatting requirements:
