@@ -30,27 +30,31 @@ This design makes the boundaries between parsing, attestation, and execution exp
 **Untrusted responsibilities** (parsing / normalization):
 
 - Parse and validate schema (XML/JSON) to a canonical internal structure.
-- Compute a stable digest of the payload (e.g. `sha256(raw_payload_bytes)`).
+- Compute a stable digest of the payload for transport/audit (e.g. `sha256(raw_payload_bytes)`).
 - Extract only the fields required for mapping + audit.
 
-Clarification (to avoid “trust the parser”):
+**Boundary contract**:
 
-- The TEE MUST receive `raw_payload_bytes` (or a rail-defined canonical byte representation).
-- The TEE MUST recompute `raw_payload_hash = sha256(raw_payload_bytes)` internally and compare it to any untrusted-side claimed hash.
-- If the TEE produces or hashes `normalized_settlement`, it MUST use a deterministic canonical serialization (e.g., RFC 8785 JCS for JSON; a rail-defined XML canonicalization for ISO 20022).
-- The attested artifact MUST NOT include raw payload bytes (only hashes + extracted fields required for mapping and audit).
+- The TEE MUST receive `raw_payload_bytes` (or a rail-specific canonical byte representation).
+- The TEE MUST NOT treat any untrusted-side hash computation as authoritative.
 
 **Trusted responsibilities** (TEE / Conclave):
 
-- Recompute + re-validate the digest and any normalized payload hashing inside the TEE.
+- Recompute `raw_payload_hash = sha256(raw_payload_bytes)` inside the TEE and compare it to the claimed hash.
+- Compute `normalized_settlement_hash` inside the TEE from a canonical `normalized_settlement` derived from `raw_payload_bytes`.
+  - The canonical serialization MUST be rail-specific.
+  - JSON canonicalization: RFC 8785 JSON Canonicalization Scheme (JCS).
+  - XML canonicalization: W3C XML Canonicalization 1.1.
 - Verify the oracle authenticity for the external rail (signature/HMAC/cert-chain; rail-specific).
 - Produce an attested artifact that binds:
   - `rail`,
   - `raw_payload_hash`,
-  - `normalized_settlement` (or a hash thereof),
+  - `normalized_settlement_hash`,
   - `asset_path`,
   - `proposal_kind = EXTERNAL_SETTLEMENT_TRIGGER`,
   - `timelock_delay_blocks = 144`.
+
+The attested artifact MUST NOT contain raw payload bytes.
 
 **Output artifact**: `AttestedExternalSettlementTrigger` (signed + TEE-attested).
 
@@ -88,11 +92,41 @@ Execution must never accept or interpret raw TradFi payloads.
 
 - `rail`
 - `raw_payload_hash`
+- `normalized_settlement_hash` (hash of the normalized settlement under canonical serialization)
 - `trigger_id` (stable hash over `rail + raw_payload_hash + settlement_identifiers`)
+- `settlement_identifiers` (rail-specific canonical identifiers; see below)
 - `asset_path` (see mapping)
 - `timelock_delay_blocks = 144`
 - `tee_attestation` (StrongBox/TEE/CloudTEE report)
 - `oracle_verification` (rail-specific proof material; minimal)
+
+#### 3.2.1 `settlement_identifiers` (required; canonical)
+
+To support replay protection and deterministic idempotency at the raw-message level, each rail MUST define a canonical identifier set used together with `raw_payload_hash` to compute `trigger_id`.
+
+Minimum required identifier set (by rail):
+
+- **ISO20022 (pacs.008)**
+  - `message_id` (e.g., `GrpHdr.MsgId`)
+  - `end_to_end_id` (e.g., `CdtTrfTxInf.PmtId.EndToEndId`)
+  - `settlement_amount` + `settlement_currency` (e.g., `CdtTrfTxInf.IntrBkSttlmAmt`)
+  - `settlement_date` (e.g., `CdtTrfTxInf.IntrBkSttlmDt`)
+- **PAPSS**
+  - `message_id`
+  - `transaction_reference` (rail-provided unique reference)
+  - `settlement_amount` + `settlement_currency`
+  - `settlement_date`
+- **BRICS**
+  - `message_id`
+  - `settlement_reference` (rail-provided unique reference)
+  - `settlement_amount` + `settlement_currency`
+  - `settlement_date`
+
+Proposal emission MUST be idempotent on `trigger_id`: duplicate triggers MUST NOT create additional proposals or timelocks.
+
+Note: if two messages have different `raw_payload_hash` values, they will always yield different `trigger_id`s even if `settlement_identifiers` are identical.
+
+To ensure cross-implementation stability, `trigger_id` MUST be computed from a canonical encoding of `{ rail, raw_payload_hash, settlement_identifiers }` (e.g., `sha256("external-settlement-trigger:v1" || JCS({ rail, raw_payload_hash, settlement_identifiers }))`).
 
 ### 3.3 `SovereignProposal` (proposal lane)
 
@@ -121,12 +155,13 @@ Example (illustrative only):
 
 ## 5. Time-lock initiation
 
-On successful oracle verification (inside TEE), the system initiates the standard time-lock:
+On successful oracle verification (inside TEE), proposal emission initiates the standard time-lock using the attested delay and the native chain-height source:
 
 - `delay_blocks = 144`
-- `release_height = start_height + 144`
+- `start_height` is sourced from the same canonical chain height source used by the native path
+- `release_height = start_height + delay_blocks`
 
-The *start height* must be sourced from the same canonical chain height source used by the native path (e.g., Stacks burn-block height if that is the existing standard).
+The TEE MUST attest `timelock_delay_blocks` but does not need to attest `start_height` or `release_height`.
 
 ## 6. Yield routing invariants (5/5/90)
 
@@ -152,6 +187,9 @@ Invariant:
 3. **No raw payload enters execution**
    - Execution inputs reference `trigger_id` and `asset_path` only.
    - A raw payload (XML/JSON) cannot be supplied to the executor.
+
+4. **Replay is idempotent**
+   - Replaying the same external message (same `trigger_id`) does not create additional proposals or timelocks.
 
 ### 7.2 Lifecycle tests
 

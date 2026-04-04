@@ -22,3 +22,4 @@ This change formalizes the rule that ISO 20022 / PAPSS / BRICS settlement messag
 4. **TEE floor**: proposal emission requires a verifiable TEE/StrongBox/CloudTEE attestation.
 5. **Yield invariant**: yield routing outputs are unchanged (native vs external-triggered lock event are identical).
 6. **Boundary tests** exist for parsing/attestation/execution separation (see `design.md`).
+7. **Normative requirements** and negative tests are captured in `specs/external-settlement-proposal-only-tee/spec.md`.
