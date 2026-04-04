@@ -35,9 +35,11 @@ This design makes the boundaries between parsing, attestation, and execution exp
 
 **Boundary contract**:
 
-- `raw_payload_bytes` MUST be the exact byte sequence obtained from the rail message body after removal of rail-specific transport framing (e.g., headers/envelopes).
+- `raw_payload_bytes` MUST be the exact octet sequence of the rail application payload at the capture point on the rail ingress boundary, after **only** removing rail-specific transport framing that delimits and exposes the message-body bytes (e.g., envelope/header stripping, record/frame boundary removal, removal of HTTP `Transfer-Encoding: chunked` framing).
+- Construction of `raw_payload_bytes` MUST occur **before** any operation that interprets or transforms those bytes, including content decoding (e.g., base64), decompression (e.g., gzip or HTTP `Content-Encoding`), character-set decoding, parsing, or normalization.
+- All intermediaries and ingress components between the external rail and this ingress capture point for `raw_payload_bytes` MUST be configured such that they do not transform the application payload octets other than performing the allowed transport-framing removal described above.
 - The TEE MUST receive `raw_payload_bytes` exactly as defined above.
-- `raw_payload_bytes` MUST NOT undergo any transformation (including, but not limited to, re-encoding, whitespace normalization, parser round-tripping, BOM insertion/removal, or newline translation).
+- Other than the allowed transport-framing removal defined above, `raw_payload_bytes` MUST NOT undergo any transformation (including, but not limited to, re-encoding, whitespace normalization, parser round-tripping, BOM insertion/removal, or newline translation).
 - The TEE MUST NOT treat any untrusted-side hash computation as authoritative.
 
 **Trusted responsibilities** (TEE / Conclave):
