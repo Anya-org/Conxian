@@ -2,6 +2,10 @@
 
 This page defines the Conxian public repo map for external evaluation and internal consistency.
 
+For release governance (what can ship, what must stay private, and what requires additional controls), see:
+
+- [Repo Readiness Gates (Control Domains)](./REPO_READINESS_GATES_BY_CONTROL_DOMAIN.md)
+
 For the portfolio-level business-unit/operating-function mapping (and separation-of-concerns rules), see [Portfolio business-unit map and separation of concerns](./PORTFOLIO_BUSINESS_UNIT_MAP.md).
 
 - Repos governed via this BOS repo are pinned as submodule gitlinks (the specific submodule commit IDs recorded in this repo’s git tree, with paths/URLs configured in `.gitmodules`).

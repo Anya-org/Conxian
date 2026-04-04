@@ -7,6 +7,7 @@
 * [BOS business buildout (this repo)](docs/BOS_BUSINESS_BUILDOUT.md)
 * [Repo Portfolio (Flagship vs Supporting)](docs/REPO_PORTFOLIO.md)
 * [Portfolio business-unit map and separation of concerns](docs/PORTFOLIO_BUSINESS_UNIT_MAP.md)
+* [Repo Readiness Gates (Control Domains)](docs/REPO_READINESS_GATES_BY_CONTROL_DOMAIN.md)
 * [Partner Overview and Launch FAQ](docs/PARTNER_OVERVIEW_AND_LAUNCH_FAQ.md)
 * [Release notes and changelog format](docs/RELEASE_NOTES_AND_CHANGELOG.md)
 * [Release hygiene — conxian-nexus](docs/RELEASE_HYGIENE_CONXIAN_NEXUS.md)
