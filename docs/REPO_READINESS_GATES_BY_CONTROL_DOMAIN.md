@@ -121,7 +121,7 @@ Superproject note: `Conxian_UI` is checked out at path `conxian-ui/` (planned re
 | `lib-conclave-sdk` | Public | Conditional (crypto/supply-chain gates) | 1 | 0 | 0 | 0 | 0 | 2 | 2 |
 | `conxian-nexus` | Public | Conditional (service gates) | 1 | 2 | 1 | 1 | 0 | 3 | 2 |
 | `stacksorbit` | Public | Conditional (deployment tool gates) | 1 | 1 | 3 | 3 | 0 | 3 | 3 |
-| `.github` | Public | Ship (org defaults) | 1 | 0 | 0 | 0 | 0 | 2 | 1 |
+| `.github` | Public | Conditional (org-infra / high-blast-radius, elevated review) | 1 | 0 | 0 | 0 | 0 | 2 | 1 |
 | `conxian-business` | Public | Ship (docs/specs) | 1 | 1 | 0 | 0 | 0 | 2 | 1 |
 
 _Columns: L = Legal/public-safe, RC = Regulatory/compliance, FT = Funds/treasury impact, OC = On-chain execution risk, DC = Decentralization/custody posture, DR = Deployment readiness, OWN = Business-operating ownership._
@@ -136,8 +136,6 @@ Repos that can generally ship without additional org-level gates beyond the per-
 - have no control domain at level `3` (all are `0–2`)
 
 These repos still must meet the public-safe baseline and standard engineering hygiene (for example, no secrets in the repo and basic CI checks).
-
-> Note: For the `.github` repo, treat changes as high-blast-radius infrastructure and require elevated review even if it meets these numeric criteria.
 
 ### What must stay private (content-level, not necessarily repo-level)
 
