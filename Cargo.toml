@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "conxian-gateway",
+    "conxian-nexus",
+    "lib-conclave-sdk"
+]
+resolver = "2"
