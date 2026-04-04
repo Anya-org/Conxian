@@ -153,6 +153,6 @@ Service surfaces (for example, repos that expose a production-facing network ser
 
 ## Follow-ups (recommended)
 
-1. Confirm custody posture for `conxius-wallet` (target: non-custodial) and align `DC` level wording accordingly.
+1. `conxius-wallet` posture confirmed as non-custodial; keep `DC = 2` to reflect wallet-grade on-device key handling and signing boundaries.
 2. Add a lightweight “evidence” section per flagship repo (links to CI, release tags, runbooks in Linear) without embedding sensitive details.
 3. Reconcile public messaging in the `conxian-business` repo description with ZSE language (avoid stating it contains non-public docs if it is public).
