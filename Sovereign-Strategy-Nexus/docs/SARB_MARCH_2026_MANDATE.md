@@ -16,7 +16,7 @@ Codify the specific exchange control rules from the South Africa 2026 Budget Spe
 
 ## 4. Sovereign Shard Triggers
 - **TRIGGER_SHARD_ONSHORE**: If SARB KYC is detected, sender/receiver are both ZAF, and transaction > 50k ZAR.
-- **TRIGGER_SHARD_OFFSHORE**: For all non-ZAR residents and non-SADC settlement flows.
+- **TRIGGER_SHARD_OFFSHORE**: For all flows where the sender is not the jurisdiction country, or the counterparty's region differs from the jurisdiction region (default: non-ZAF, non-SADC settlement flows; SADC cross-border flows from ZAF remain `TRIGGER_SHARD_GLOBAL`).
 - **TRIGGER_SHARD_GLOBAL**: For transactions involving Global Reserve Banks or Tier-1 institutional rails (SWIFT/Target2).
 
 ## 5. Automation & Enforcement
@@ -27,3 +27,6 @@ Codify the specific exchange control rules from the South Africa 2026 Budget Spe
 ## 6. On-chain Implementation (Clarity)
 - **Jurisdictional Sharding + Allowance Monitoring**: `Sovereign-Strategy-Nexus/contracts/jurisdictional-sharding.clar`
   - Annual allowance bucketing is derived from on-chain block time (see `get-current-year`).
+  - Annual SDA/FIA totals are tracked for **cross-border egress** (sender is the jurisdiction country; receiver is not) via `get-allowance-status`.
+  - Tier-1 classification is derived from an on-chain allowlist via `set-tier1-counterparty` (not a caller-supplied boolean).
+  - By default, the contract is configured for ZAF/SADC and a 50k ZAR onshore trigger, but these parameters are owner-governed via `set-jurisdiction`, `set-country-region`, `set-onshore-trigger-zar`, and `set-sadc-fallback-enabled`.

@@ -4,6 +4,9 @@
 
 (define-constant ERR_UNAUTHORIZED (err u7100))
 (define-constant ERR_TX_REPLAY_MISMATCH (err u7101))
+(define-constant ERR_INVALID_REGION (err u7102))
+(define-constant ERR_UNSUPPORTED_YEAR (err u7103))
+(define-constant ERR_BLOCK_TIME_UNAVAILABLE (err u7104))
 
 (define-constant SHARD_ONSHORE u0)
 (define-constant SHARD_OFFSHORE u1)
@@ -31,6 +34,10 @@
 (define-constant YEAR_2040_START u2208988800)
 (define-constant YEAR_2041_START u2240611200)
 (define-constant YEAR_2042_START u2272147200)
+(define-constant YEAR_2043_START u2303683200)
+
+;; Supported settlement years: 2024–2042 inclusive.
+;; Calls that rely on block time will return ERR_UNSUPPORTED_YEAR once block-time >= YEAR_2043_START.
 
 ;; SARB mandate thresholds (ZAR/year)
 (define-constant SDA_LIMIT_ZAR u1500000)
@@ -42,6 +49,7 @@
 (define-data-var jurisdiction-country (string-ascii 3) "ZAF")
 (define-data-var jurisdiction-region uint REGION_SADC)
 (define-data-var onshore-trigger-zar uint ONSHORE_TRIGGER_ZAR)
+(define-data-var enable-sadc-fallback bool true)
 
 (define-data-var contract-owner principal tx-sender)
 (define-data-var compliance-czar principal tx-sender)
@@ -58,13 +66,22 @@
 ;; tx-id -> settlement fingerprint
 (define-map settlement-fingerprints
   (buff 32)
-  { sender: principal, receiver: principal, amount-zar: uint, tier1-rail: bool }
+  { sender: principal, receiver: principal, amount-zar: uint }
 )
 
 ;; (shard, user, year) -> total ZAR egress
 (define-map annual-zar-egress
   { shard: uint, user: principal, year: uint }
   { total: uint }
+)
+
+;; Tier-1 rails / counterparties are maintained on-chain and used to derive `tier1-rail`.
+(define-map tier1-counterparties principal bool)
+
+;; (user, year) -> total ZAR egress used for allowance checks (SDA/FIA)
+(define-map annual-zar-allowance-egress
+  { user: principal, year: uint }
+  uint
 )
 
 (define-private (is-owner)
@@ -97,12 +114,38 @@
 )
 
 (define-private (get-country-region (country (string-ascii 3)))
-  (match (map-get? country-regions { country: country })
-    entry
-      (get region entry)
-    (if (is-sadc-country country)
-      REGION_SADC
-      REGION_UNKNOWN
+  (if (is-eq country (var-get jurisdiction-country))
+    (var-get jurisdiction-region)
+    (match (map-get? country-regions { country: country })
+      entry
+        (get region entry)
+      (if (and (var-get enable-sadc-fallback) (is-sadc-country country))
+        REGION_SADC
+        REGION_UNKNOWN
+      )
+    )
+  )
+)
+
+(define-private (assert-supported-block-time (block-time uint))
+  (asserts! (and (>= block-time YEAR_2024_START) (< block-time YEAR_2043_START)) ERR_UNSUPPORTED_YEAR)
+)
+
+(define-private (is-tier1-rail (sender principal) (receiver principal))
+  (or
+    (default-to false (map-get? tier1-counterparties sender))
+    (default-to false (map-get? tier1-counterparties receiver))
+  )
+)
+
+(define-private (is-allowance-egress
+    (sender-country (string-ascii 3))
+    (receiver-country (string-ascii 3))
+  )
+  (let ((jurisdiction (var-get jurisdiction-country)))
+    (and
+      (is-eq sender-country jurisdiction)
+      (not (is-eq receiver-country jurisdiction))
     )
   )
 )
@@ -165,22 +208,20 @@
   )
 )
 
-(define-read-only (compute-shard
-    (sender principal)
-    (receiver principal)
+(define-private (compute-shard-by-country
+    (sender-country (string-ascii 3))
+    (receiver-country (string-ascii 3))
     (amount-zar uint)
     (tier1-rail bool)
   )
   (let (
-      (sender-country (get country (contract-call? .kyc-registry get-identity-status sender)))
-      (receiver-country (get country (contract-call? .kyc-registry get-identity-status receiver)))
       (jurisdiction (var-get jurisdiction-country))
-      (jurisdiction-region (var-get jurisdiction-region))
+      (jur-region (var-get jurisdiction-region))
       (receiver-region (get-country-region receiver-country))
     )
     (if tier1-rail
       SHARD_GLOBAL
-      (if (or (not (is-eq sender-country jurisdiction)) (not (is-eq receiver-region jurisdiction-region)))
+      (if (or (not (is-eq sender-country jurisdiction)) (not (is-eq receiver-region jur-region)))
         SHARD_OFFSHORE
         (if (and (is-eq sender-country jurisdiction) (is-eq receiver-country jurisdiction) (> amount-zar (var-get onshore-trigger-zar)))
           SHARD_ONSHORE
@@ -188,6 +229,20 @@
         )
       )
     )
+  )
+)
+
+(define-read-only (compute-shard
+    (sender principal)
+    (receiver principal)
+    (amount-zar uint)
+  )
+  (let (
+      (sender-country (get country (contract-call? .kyc-registry get-identity-status sender)))
+      (receiver-country (get country (contract-call? .kyc-registry get-identity-status receiver)))
+      (tier1-rail (is-tier1-rail sender receiver))
+    )
+    (compute-shard-by-country sender-country receiver-country amount-zar tier1-rail)
   )
 )
 
@@ -199,12 +254,18 @@
   (get total (default-to { total: u0 } (map-get? annual-zar-egress { shard: shard, user: user, year: year })))
 )
 
+(define-private (get-allowance-total
+    (user principal)
+    (year uint)
+  )
+  (default-to u0 (map-get? annual-zar-allowance-egress { user: user, year: year }))
+)
+
 (define-public (record-zar-settlement
     (tx-id (buff 32))
     (sender principal)
     (receiver principal)
     (amount-zar uint)
-    (tier1-rail bool)
   )
   (begin
     (asserts! (or (is-owner) (is-czar)) ERR_UNAUTHORIZED)
@@ -216,7 +277,6 @@
                 (is-eq sender (get sender existing))
                 (is-eq receiver (get receiver existing))
                 (is-eq amount-zar (get amount-zar existing))
-                (is-eq tier1-rail (get tier1-rail existing))
               )
               (ok { tx-id: tx-id, shard: existing-shard })
               ERR_TX_REPLAY_MISMATCH
@@ -224,32 +284,47 @@
           ERR_TX_REPLAY_MISMATCH
         )
       (let (
-          (block-time (unwrap-panic (get-block-info? time block-height)))
-          (year (year-from-unix-time block-time))
-          (shard (compute-shard sender receiver amount-zar tier1-rail))
+          (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+          (sender-country (get country (contract-call? .kyc-registry get-identity-status sender)))
+          (receiver-country (get country (contract-call? .kyc-registry get-identity-status receiver)))
+          (tier1-rail (is-tier1-rail sender receiver))
+          (shard (compute-shard-by-country sender-country receiver-country amount-zar tier1-rail))
         )
         (begin
-          (map-set settlement-shards tx-id shard)
-          (map-set settlement-fingerprints tx-id {
-            sender: sender,
-            receiver: receiver,
-            amount-zar: amount-zar,
-            tier1-rail: tier1-rail
-          })
-          (let ((prev-total (get-annual-total shard sender year)))
-            (map-set annual-zar-egress { shard: shard, user: sender, year: year } { total: (+ prev-total amount-zar) })
+          (assert-supported-block-time block-time)
+          (let ((year (year-from-unix-time block-time)))
+            (begin
+              (map-set settlement-shards tx-id shard)
+              (map-set settlement-fingerprints tx-id {
+                sender: sender,
+                receiver: receiver,
+                amount-zar: amount-zar
+              })
+              (let ((prev-total (get-annual-total shard sender year)))
+                (map-set annual-zar-egress { shard: shard, user: sender, year: year } { total: (+ prev-total amount-zar) })
+              )
+              (if (is-allowance-egress sender-country receiver-country)
+                (let ((prev-allowance-total (get-allowance-total sender year)))
+                  (map-set annual-zar-allowance-egress { user: sender, year: year } (+ prev-allowance-total amount-zar))
+                )
+                true
+              )
+              (print {
+                event: "zar-settlement-recorded",
+                tx-id: tx-id,
+                shard: shard,
+                sender: sender,
+                receiver: receiver,
+                amount-zar: amount-zar,
+                year: year,
+                tier1-rail: tier1-rail,
+                block-time: block-time,
+                block-height: block-height,
+                burn-block-height: burn-block-height
+              })
+              (ok { tx-id: tx-id, shard: shard })
+            )
           )
-          (print {
-            event: "zar-settlement-recorded",
-            tx-id: tx-id,
-            shard: shard,
-            sender: sender,
-            receiver: receiver,
-            amount-zar: amount-zar,
-            year: year,
-            timestamp: block-time
-          })
-          (ok { tx-id: tx-id, shard: shard })
         )
       )
     )
@@ -257,8 +332,25 @@
 )
 
 (define-read-only (get-current-year)
-  (let ((block-time (unwrap-panic (get-block-info? time block-height))))
-    (ok (year-from-unix-time block-time))
+  (let ((block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE)))
+    (begin
+      (assert-supported-block-time block-time)
+      (ok (year-from-unix-time block-time))
+    )
+  )
+)
+
+(define-read-only (get-network-time)
+  (let ((block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE)))
+    (begin
+      (assert-supported-block-time block-time)
+      (ok {
+        block-time: block-time,
+        block-height: block-height,
+        burn-block-height: burn-block-height,
+        year: (year-from-unix-time block-time)
+      })
+    )
   )
 )
 
@@ -270,8 +362,12 @@
   (ok (get-annual-total shard user year))
 )
 
-(define-read-only (get-allowance-status (shard uint) (user principal) (year uint))
-  (let ((total (get-annual-total shard user year)))
+(define-read-only (get-annual-zar-allowance-egress (user principal) (year uint))
+  (ok (get-allowance-total user year))
+)
+
+(define-read-only (get-allowance-status (user principal) (year uint))
+  (let ((total (get-allowance-total user year)))
     (ok {
       total: total,
       exceeds-sda: (>= total SDA_LIMIT_ZAR),
@@ -283,8 +379,24 @@
 (define-public (set-compliance-czar (new-czar principal))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (var-set compliance-czar new-czar)
-    (ok true)
+    (let (
+        (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+        (prev-czar (var-get compliance-czar))
+      )
+      (begin
+        (assert-supported-block-time block-time)
+        (var-set compliance-czar new-czar)
+        (print {
+          event: "compliance-czar-updated",
+          prev-czar: prev-czar,
+          new-czar: new-czar,
+          block-time: block-time,
+          block-height: block-height,
+          burn-block-height: burn-block-height
+        })
+        (ok true)
+      )
+    )
   )
 )
 
@@ -294,9 +406,29 @@
   )
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (var-set jurisdiction-country country)
-    (var-set jurisdiction-region region)
-    (ok true)
+    (asserts! (not (is-eq region REGION_UNKNOWN)) ERR_INVALID_REGION)
+    (let (
+        (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+        (prev-country (var-get jurisdiction-country))
+        (prev-region (var-get jurisdiction-region))
+      )
+      (begin
+        (assert-supported-block-time block-time)
+        (var-set jurisdiction-country country)
+        (var-set jurisdiction-region region)
+        (print {
+          event: "jurisdiction-updated",
+          prev-country: prev-country,
+          prev-region: prev-region,
+          new-country: country,
+          new-region: region,
+          block-time: block-time,
+          block-height: block-height,
+          burn-block-height: burn-block-height
+        })
+        (ok true)
+      )
+    )
   )
 )
 
@@ -306,32 +438,153 @@
   )
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (map-set country-regions { country: country } { region: region })
-    (ok true)
+    (let (
+        (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+        (prev (map-get? country-regions { country: country }))
+      )
+      (begin
+        (assert-supported-block-time block-time)
+        (map-set country-regions { country: country } { region: region })
+        (print {
+          event: "country-region-set",
+          country: country,
+          prev-region: (get region (default-to { region: REGION_UNKNOWN } prev)),
+          new-region: region,
+          block-time: block-time,
+          block-height: block-height,
+          burn-block-height: burn-block-height
+        })
+        (ok true)
+      )
+    )
   )
 )
 
 (define-public (delete-country-region (country (string-ascii 3)))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (map-delete country-regions { country: country })
-    (ok true)
+    (let (
+        (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+        (prev (map-get? country-regions { country: country }))
+      )
+      (begin
+        (assert-supported-block-time block-time)
+        (map-delete country-regions { country: country })
+        (print {
+          event: "country-region-deleted",
+          country: country,
+          prev-region: (get region (default-to { region: REGION_UNKNOWN } prev)),
+          block-time: block-time,
+          block-height: block-height,
+          burn-block-height: burn-block-height
+        })
+        (ok true)
+      )
+    )
   )
 )
 
 (define-public (set-onshore-trigger-zar (new-trigger-zar uint))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (var-set onshore-trigger-zar new-trigger-zar)
-    (ok true)
+    (let (
+        (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+        (prev-trigger-zar (var-get onshore-trigger-zar))
+      )
+      (begin
+        (assert-supported-block-time block-time)
+        (var-set onshore-trigger-zar new-trigger-zar)
+        (print {
+          event: "onshore-trigger-updated",
+          prev-onshore-trigger-zar: prev-trigger-zar,
+          new-onshore-trigger-zar: new-trigger-zar,
+          block-time: block-time,
+          block-height: block-height,
+          burn-block-height: burn-block-height
+        })
+        (ok true)
+      )
+    )
+  )
+)
+
+(define-public (set-tier1-counterparty (counterparty principal) (enabled bool))
+  (begin
+    (asserts! (or (is-owner) (is-czar)) ERR_UNAUTHORIZED)
+    (let (
+        (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+        (prev (default-to false (map-get? tier1-counterparties counterparty)))
+      )
+      (begin
+        (assert-supported-block-time block-time)
+        (if enabled
+          (map-set tier1-counterparties counterparty true)
+          (map-delete tier1-counterparties counterparty)
+        )
+        (print {
+          event: "tier1-counterparty-updated",
+          counterparty: counterparty,
+          prev-enabled: prev,
+          new-enabled: enabled,
+          block-time: block-time,
+          block-height: block-height,
+          burn-block-height: burn-block-height
+        })
+        (ok true)
+      )
+    )
+  )
+)
+
+(define-read-only (is-tier1-counterparty (counterparty principal))
+  (ok (default-to false (map-get? tier1-counterparties counterparty)))
+)
+
+(define-public (set-sadc-fallback-enabled (enabled bool))
+  (begin
+    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (let (
+        (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+        (prev-enabled (var-get enable-sadc-fallback))
+      )
+      (begin
+        (assert-supported-block-time block-time)
+        (var-set enable-sadc-fallback enabled)
+        (print {
+          event: "sadc-fallback-updated",
+          prev-enabled: prev-enabled,
+          new-enabled: enabled,
+          block-time: block-time,
+          block-height: block-height,
+          burn-block-height: burn-block-height
+        })
+        (ok true)
+      )
+    )
   )
 )
 
 (define-public (transfer-ownership (new-owner principal))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (var-set contract-owner new-owner)
-    (ok true)
+    (let (
+        (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+        (prev-owner (var-get contract-owner))
+      )
+      (begin
+        (assert-supported-block-time block-time)
+        (var-set contract-owner new-owner)
+        (print {
+          event: "ownership-transferred",
+          prev-owner: prev-owner,
+          new-owner: new-owner,
+          block-time: block-time,
+          block-height: block-height,
+          burn-block-height: burn-block-height
+        })
+        (ok true)
+      )
+    )
   )
 )
 
@@ -352,5 +605,10 @@
 )
 
 (define-read-only (get-region-for-country (country (string-ascii 3)))
-  (ok (get-country-region country))
+  (let ((jurisdiction (var-get jurisdiction-country)))
+    (ok (if (is-eq country jurisdiction)
+      (var-get jurisdiction-region)
+      (get-country-region country)
+    ))
+  )
 )
