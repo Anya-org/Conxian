@@ -27,6 +27,9 @@ For local development, refer to the `.env.example` files in each repository. **N
 - `DATABASE_URL`
 - `GATEWAY_JWT_SECRET`
 
+### 3. Governance & Operations (`conxian-business`)
+- `STX_PRIVATE_KEY` (required for `scripts/register-sbcs.ts`)
+
 ---
 
 ## Secret Provisioning Script
