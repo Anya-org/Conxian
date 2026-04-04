@@ -11,6 +11,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  change_detection:
+    name: Detect CI suite triggers
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      b2b: ${{ steps.filter_pr.outputs.b2b || steps.filter_push.outputs.b2b }}
+    steps:
+    - name: Detect B2B changes (PR)
+      if: github.event_name == 'pull_request'
+      id: filter_pr
+      uses: dorny/paths-filter@v3
+      with:
+        filters: |
+          b2b:
+            - 'conxian-nexus'
+            - 'conxian-nexus/**'
+            - 'lib-conclave-sdk'
+            - 'lib-conclave-sdk/**'
+            - '.gitmodules'
+
+    - name: Default B2B changes (push)
+      if: github.event_name == 'push'
+      id: filter_push
+      run: |
+        echo "b2b=true" >> $GITHUB_OUTPUT
+
   repo-hygiene:
     name: Repo Hygiene (ZSE & Submodules)
     runs-on: ubuntu-latest
@@ -62,11 +90,16 @@ jobs:
   b2b-suite:
     name: B2B Suite (Nexus & SDK)
     runs-on: ubuntu-latest
+    needs: [change_detection]
     if: >-
       github.event_name == 'push' ||
       (
         github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        (
+          needs.change_detection.outputs.b2b == 'true' ||
+          contains(github.event.pull_request.labels.*.name, 'b2b')
+        )
       )
     steps:
     - uses: actions/checkout@v6
