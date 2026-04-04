@@ -1,5 +1,4 @@
 {
-  "$schema": "https://morganstanley.github.io/CALM/schema.json",
   "system": "REDACTED (public repo stub)",
   "version": "REDACTED",
   "description": "This repository is public. The canonical BOS state-machine configuration is maintained in the Conxian Linear workspace.",
