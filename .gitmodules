@@ -33,3 +33,8 @@
 [submodule "lib-conclave-sdk"]
 	path = lib-conclave-sdk
 	url = https://github.com/Conxian/lib-conclave-sdk.git
+
+[submodule "lib-conxian-core"]
+	path = lib-conxian-core
+	url = https://github.com/Conxian/lib-conxian-core
+	branch = main
