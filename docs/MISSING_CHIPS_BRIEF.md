@@ -7,8 +7,8 @@ This brief identifies the critical functionalities missing from the current stac
 *   **Requirement**: A sub-module in 'conxian-nexus' that maps every x402 signature to a customer ID and updates a 3-Statement financial model in Supabase.
 
 ## 2. Bitcoin-Native DLC Bond Issuance (Debt Chip)
-*   **Missing**: Active DLC contract orchestration for non-dilutive capital.
-*   **Requirement**: Completion of 'dlc-orchestrator.clar' and integration with 'cxn-treasury-oracle' to allow institutional investors to lock BTC for yield-bearing sBTC bonds.
+*   **Delivered (v1)**: Lifecycle contract for sBTC-backed DLC bonds.
+*   **Implementation**: `Fiscal-Vault-Oracle/dlc-bond.clar` (init, subscription, coupon distribution, redemption).
 
 ## 3. Comprehensive D.ID Resolver (Identity Chip)
 *   **Missing**: Native resolution for Web3.bio, ENS, BNS, and World ID.

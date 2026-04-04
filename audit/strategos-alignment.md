@@ -15,7 +15,7 @@ This audit reflects the current state of the Conxian GitHub ecosystem against th
 | **Executor: Compute Forge** | `Sovereign-Ops-Orchestrator/DEPLOYMENT_EFFICIENCY.md`| INITIAL | No DePIN compute arbitrage implementation. |
 | **Executor: Route Forge** | `conxian-gateway/internal/api/src/handlers.rs` | ACTIVE | **VERIFIED**: TEE Self-Verification (SANDBOX-001). |
 | **Executor: Payment Forge** | `conxian-gateway/internal/api/src/payment.rs` | ACTIVE | **VERIFIED**: x402 M2M Payment & ISO 20022 (EXEC-0402). |
-| **Executor: Capital Forge** | `Fiscal-Vault-Oracle/BITCOIN_BOND_DLC.json` | INITIAL | Bond lifecycle contracts missing. |
+| **Executor: Capital Forge** | `Fiscal-Vault-Oracle/dlc-bond.clar` | ACTIVE | Lifecycle contract implemented; coupon + redemption anchored to Stacks/sBTC. |
 | **Executor: Bridge Forge** | `Conxian/cross-chain/bridge-nft.clar` | ACTIVE | CCTP/NTT hardening needed. |
 | **Oracle Chamber: Identity** | `conxius-wallet/services/identity.ts` | ACTIVE | **VERIFIED**: KYA Reputation & DID (IDENTITY-001). |
 
@@ -37,7 +37,7 @@ This audit reflects the current state of the Conxian GitHub ecosystem against th
 ## 5. Next Steps (Q3 2026)
 - Integrate ZKML verification in `conxian-gateway/zkc.rs`.
 - Implement Sharding logic in Clarity for SARB compliance.
-- Finalize Bitcoin DLC Bond lifecycle contracts in `Fiscal-Vault-Oracle`.
+- Extend Bitcoin DLC Bond lifecycle integration in `Fiscal-Vault-Oracle` (oracle attestation wiring + production deployment).
 
 ## 6. Auditor Sign-off
 **Auditor**: Jules / Windsurf (Executive Executor)

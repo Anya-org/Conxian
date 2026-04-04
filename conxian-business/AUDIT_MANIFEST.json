@@ -1,6 +1,6 @@
 {
   "org": "Conxian",
-  "timestamp": "2026-03-29T01:23:59.318768Z",
+  "timestamp": "2026-04-04T10:07:16.913455Z",
   "version": "v2.0-Audit",
   "files": [
     {
@@ -37,7 +37,7 @@
     },
     {
       "path": "docs/ATS_v11.0_MASTER_BASELINE.md",
-      "sha256": "511e59f2cd0498eab72e9d2341116582be9b815b32114833cdb19381cc623fe9"
+      "sha256": "340de0364ac39227726d70da9705bb5bdc44f52804d88fe139f5c64d2100b996"
     },
     {
       "path": "docs/CJCS_v2.0_SPEC.md",
@@ -49,7 +49,7 @@
     },
     {
       "path": "docs/MISSING_CHIPS_BRIEF.md",
-      "sha256": "32a829c895f1be63083eb59d796f2b3c69559697556620f4dcd41d85a11365d1"
+      "sha256": "b1a7d0bfdd3dd1d41cce202f74c92309f547b34ddcc1f7df2a1a4c94c7897a81"
     },
     {
       "path": "docs/CONXIAN_LABS_PORTFOLIO_ANALYSIS_2026.md",
@@ -1462,7 +1462,11 @@
     {
       "path": "Fiscal-Vault-Oracle/WEB5_IDENTITY_AUDIT.md",
       "sha256": "6d0d07e5a39acb61fb51fb0bf177ee639f087f46f21bbb162e9b2a8ca70fcf71"
+    },
+    {
+      "path": "Fiscal-Vault-Oracle/dlc-bond.clar",
+      "sha256": "4117c8b45772dadb3584bcd44ff078713ddaae9d31a8db5bafac1fe50e7dc506"
     }
   ],
-  "stacks_anchor_payload": "690bf1970ca7d9ad9794f733ff5e1def3876b48c6d7310a3ae98c88cece28ad3"
+  "stacks_anchor_payload": "62e5780d156dcb0366ec6e232df52d0c987146158ed5e56bdbfc64f892a8b5d3"
 }

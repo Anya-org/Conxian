@@ -11,7 +11,7 @@
 
 ## 2. PRODUCT SPECIFICATIONS (NEW)
 - **Nexus ERP Adapter**: SAP BAPI-to-x402 Wrapper for institutional M2M settlement. Includes OData v4 ingestion and MCP-driven state reconciliation.
-- **Sovereign Bond**: DLC-based, non-custodial debt instruments. Principal locked on L1; 4.5% yield paid in sBTC on L2. Verified in `Conxian/contracts/finance/dlc-bond.clar`.
+- **Sovereign Bond**: DLC-based, non-custodial debt instruments. Principal locked on L1; 4.5% yield paid in sBTC on L2. Verified in `Fiscal-Vault-Oracle/dlc-bond.clar`.
 - **D.ID ZK-Compliance**: SARB-aligned "Proof of Residency" using ZK-SNARKs. Privacy-preserving SDA/FIA limit monitoring via client-side accumulators.
 
 ## 3. ADAPTIVE ECONOMIC MODEL
