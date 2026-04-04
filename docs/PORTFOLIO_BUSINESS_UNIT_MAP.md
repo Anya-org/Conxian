@@ -6,17 +6,19 @@ This document is the portfolio-level map that assigns every repo/subrepo (submod
 
 Today, this page is the canonical human-readable portfolio map; machine-readable BOS artifacts in `./conxian-business/` should be treated as derived outputs. When this mapping changes, ensure any intentional BOS runtime/audit updates remain consistent with it. Until a machine-readable portfolio manifest exists, artifacts in `./conxian-business/` are non-authoritative derived outputs and may be regenerated/replaced.
 
-Contributors should not edit generated BOS state artifacts under `./conxian-business/` by hand (for example: `BOS_STATE_MACHINE.json`, `.generated/AUDIT_MANIFEST.json`); treat them as outputs that may be replaced at any time. Source code in that directory (for example: `transparency_custodian.py`) is maintained normally.
+Contributors should not edit generated BOS state artifacts under `./conxian-business/` by hand (for example: `BOS_STATE_MACHINE.json`, `AUDIT_MANIFEST.json`); treat them as outputs that may be replaced at any time. Source code in that directory (for example: `transparency_custodian.py`) is maintained normally.
 
-To regenerate BOS state artifacts (including `./conxian-business/.generated/AUDIT_MANIFEST.json` and `./conxian-business/BOS_STATE_MACHINE.json`), run:
+To regenerate BOS state artifacts (including `./conxian-business/AUDIT_MANIFEST.json` and `./conxian-business/BOS_STATE_MACHINE.json`), run from the repo root:
 
 ```bash
-python3 conxian-business/transparency_custodian.py
+python3 ./conxian-business/transparency_custodian.py
 ```
 
 Until portfolio hygiene automation exists to regenerate and diff BOS state artifacts under `./conxian-business/` in CI (see the P0 backlog), contributor policy is:
 
-- If your change affects portfolio wiring or BOS state inputs (for example: pinned submodule gitlinks, `.gitmodules`, the asset lists in this document, or the generator source under `./conxian-business/`), re-run the generator command above (do **not** edit any files under `./conxian-business/` by hand) and **commit** any updated derived artifacts that are tracked (for example: `./conxian-business/BOS_STATE_MACHINE.json`) in the same PR.
+- If your change affects portfolio wiring or BOS state inputs (for example: pinned submodule gitlinks (including adding/removing submodules), the mapping tables in this document (ecosystem submodule rows / BOS-native asset paths), or the generator source under `./conxian-business/`), re-run the generator command above (do **not** edit generated BOS state artifacts under `./conxian-business/` by hand) and **commit** all updated derived artifacts in the same PR.
+- Purely editorial changes to this document (for example: typo fixes, wording clarifications, or moving explanatory sections without changing mapping tables) do not require regeneration.
+- Changes to `.gitmodules` metadata alone (for example: changing URLs, removing `branch = ...`, or other formatting-only edits) do not require regeneration unless they also change the pinned gitlinks or the set of submodule paths.
 - Reviewers should treat changes that affect BOS state but do not update derived artifacts as incomplete and request that the regeneration step be run.
 
 If you are unsure whether a change affects BOS state inputs, err on the side of re-running the generator; it is intended to be cheap and idempotent.
@@ -56,9 +58,17 @@ Maintainer note: until the P0 portfolio manifest exists, changes to the asset li
 Source-of-truth rule:
 
 - The repo’s committed git tree (submodule gitlinks) is authoritative for which submodules are pinned (and to what commits).
-- `.gitmodules` is authoritative for expected submodule configuration metadata (`path`, `url`, and optional `branch`).
+- `.gitmodules` is authoritative for expected submodule configuration metadata (`path`, `url`).
+- Submodule bumps should be represented by explicit gitlink updates committed in a PR (see “How to bump a pinned submodule” below); do not rely on `git submodule update --remote` as a normal workflow.
+- The `auto-sync-submodules` workflow ([`.github/workflows/auto-sync-submodules.yml`](../.github/workflows/auto-sync-submodules.yml)) is the intentional exception: it sets a tracking branch for each submodule in CI (for example, `submodule.<name>.branch=main`) and uses `git submodule update --remote` internally to create reviewable PRs that update pinned gitlinks. It must not depend on remote `HEAD`.
 - This document is authoritative for business-unit/operating-function classification.
 - `docs/REPO_PORTFOLIO.md` is an explanatory trust-surface view; it may list additional supporting repos for context, but every pinned submodule in the ecosystem mapping table should appear there with a flagship/supporting classification.
+
+How to bump a pinned submodule (gitlink) in a PR (manual workflow):
+
+1. `git submodule update --init <path>`
+2. `cd <path> && git fetch origin --tags && git checkout <sha-or-tag-or-origin/main>`
+3. `cd - && git add <path> && git commit -m "chore: bump <path> pin"`
 
 Portfolio hygiene automation should validate:
 
@@ -67,11 +77,8 @@ Portfolio hygiene automation should validate:
 - Every row in the ecosystem submodule mapping table corresponds to a pinned gitlink and `.gitmodules` entry (no extra rows).
 - Every pinned gitlink with a row in the ecosystem submodule mapping table appears in `docs/REPO_PORTFOLIO.md` with a flagship/supporting classification.
 - Every BOS-native asset path enumerated in the BOS-native assets table exists in this repo (one-way check; new BOS-native assets must be added to the table during review).
-- If a submodule sets `branch` in `.gitmodules`, that branch exists upstream.
 
 Until portfolio hygiene automation is live, reviewers should treat these invariants as manual review criteria and reject PRs that violate them.
-
-Note: `.gitmodules` `branch` affects `git submodule update --remote` only; it does not change what commit is pinned.
 
 | Asset | Type | Primary BU / function | Primary concern(s) | Notes |
 | --- | --- | --- | --- | --- |

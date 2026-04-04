@@ -1,40 +1,30 @@
 [submodule "conxian-gateway"]
 	path = conxian-gateway
 	url = https://github.com/Conxian/conxian-gateway
-	branch = main
 [submodule "conxius-wallet"]
 	path = conxius-wallet
 	url = https://github.com/Conxian/conxius-wallet
-	branch = main
 [submodule "conxian-nexus"]
 	path = conxian-nexus
 	url = https://github.com/Conxian/conxian-nexus
-	branch = main
 [submodule "conxian-ui"]
 	path = conxian-ui
 	url = https://github.com/Conxian/Conxian_UI
-	branch = main
 [submodule "Conxian"]
 	path = Conxian
 	url = https://github.com/Conxian/Conxian
-	branch = main
 [submodule "conxius-platform"]
 	path = conxius-platform
 	url = https://github.com/Conxian/conxius-platform
-	branch = main
 [submodule "stacksorbit"]
 	path = stacksorbit
 	url = https://github.com/Conxian/stacksorbit
-	branch = main
 [submodule "conxian-labs-site"]
 	path = conxian-labs-site
 	url = https://github.com/Conxian/conxian-labs-site
-	branch = main
 [submodule "lib-conclave-sdk"]
 	path = lib-conclave-sdk
 	url = https://github.com/Conxian/lib-conclave-sdk
-	branch = master
 [submodule "lib-conxian-core"]
 	path = lib-conxian-core
 	url = https://github.com/Conxian/lib-conxian-core
-	branch = main

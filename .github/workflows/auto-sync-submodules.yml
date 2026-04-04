@@ -25,8 +25,16 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          
-          # Initialize and update submodules recursively to track their defined branches (main)
+
+          # `.gitmodules` intentionally does not set `submodule.<name>.branch`.
+          # Ensure `git submodule update --remote` tracks `main` rather than each remote's `HEAD`.
+          while read -r key _path; do
+            name=${key#submodule.}
+            name=${name%.path}
+            git config "submodule.${name}.branch" main
+          done < <(git config -f .gitmodules --get-regexp '^submodule\..*\.path$')
+
+          # Initialize and update submodules recursively to track their configured branches.
           git submodule update --init --recursive --remote
 
       - name: Create pull request
