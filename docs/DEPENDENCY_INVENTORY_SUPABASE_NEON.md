@@ -4,7 +4,7 @@ _Snapshot date:_ 2026-04-04
 
 This document inventories **current, evidenced** touchpoints to **Supabase** and **Neon** across the Conxian service surfaces pinned in this repository.
 
-Because this repo follows **Zero Secret Egress (ZSE)**, production connection strings, project refs, and keys are intentionally not present here. Wherever possible, each item is labeled with an **evidence level**.
+Because this repo follows **Zero Secret Egress (ZSE)**, production connection strings, project refs, keys, and internal hostnames are intentionally not present here. Wherever possible, each item is labeled with an **evidence level**.
 
 ## Evidence levels
 
@@ -16,7 +16,7 @@ Because this repo follows **Zero Secret Egress (ZSE)**, production connection st
 
 | Owning surface / service | Supabase capability | Business function | Role classification | Downstream consumers | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| `Fiscal-Vault-Oracle` (OpenClaw engine) | **DB + API bridge** via MCP (`mcp://supabase.conxian.internal`) with table-level permissions (`runway_metrics`, `audit_manifest`, `treasury_actions`, `dlc_state_updates`) | Treasury runway monitoring + governed treasury action logging (144-block cadence) | **Analytical + Governance + Transactional** (write path for off-chain action logs; not canonical truth) | OpenClaw runtime; `conxian-nexus` provides external triggers (`NEW_BITCOIN_BLOCK`); audit consumers via DWN | **Code**: `Fiscal-Vault-Oracle/TREASURY_MCP_CONFIG.json`, `Fiscal-Vault-Oracle/BOS_INTEGRATION_MAP.md` |
+| `Fiscal-Vault-Oracle` (OpenClaw engine) | **DB + API bridge** via MCP (`mcp://<redacted-supabase-mcp-endpoint>`) with table-level permissions (`runway_metrics`, `audit_manifest`, `treasury_actions`, `dlc_state_updates`) | Treasury runway monitoring + governed treasury action logging (144-block cadence) | **Analytical + Governance + Transactional** (write path for off-chain action logs; not canonical truth) | OpenClaw runtime; `conxian-nexus` provides external triggers (`NEW_BITCOIN_BLOCK`); audit consumers via DWN | **Code**: `Fiscal-Vault-Oracle/TREASURY_MCP_CONFIG.json`, `Fiscal-Vault-Oracle/BOS_INTEGRATION_MAP.md` |
 | `Fiscal-Vault-Oracle` (Treasury Oracle schema) | **DB schema + RLS** (`cxn_*` tables; RLS enabled; “read-only for authenticated clients”) | Treasury oracle read model (yield/runway/principal + timelock status) | **Analytical + Governance** (proof/visual-proof datasets) | “Conxius/Gateway” authenticated reads (per RLS note) | **Code**: `docs/CXN_TREASURY_ORACLE_SCHEMA.sql` |
 | `Sovereign-Ops-Orchestrator` (Ops Engine) | **DB** (implied) used as state layer for Linear webhook wiring (`ats_violations`, `deployment_efficiency`, `exit_velocity`) | Operational integrity + performance/valuation telemetry | **Governance + Analytical** | Render-hosted internal dashboard (“Stitch Dashboard”); internal operator workflows | **Spec/Doc**: `Sovereign-Ops-Orchestrator/LINEAR_WIRING.md` |
 | `Sovereign-Strategy-Nexus` (ZK Data Room) | **DB** (implied) as sources for proofs (`yield_events`, `ip_audit_logs`, `runway_metrics`, `deployment_efficiency`) | M&A readiness: verifiable proof surfaces without raw data disclosure | **Governance + Analytical** | External acquirers/auditors consuming proof artifacts; `conxian-nexus` as verifier in the flow | **Spec/Doc**: `Sovereign-Strategy-Nexus/docs/ZK_DATA_ROOM_SCHEMA.md` |
@@ -80,4 +80,4 @@ If/when we can safely pull a **redacted** list of environment variables (keys on
 
 ---
 
-🛡️ SAB. © 2026 Conxian-Labs.
+SAB. © 2026 Conxian-Labs.
