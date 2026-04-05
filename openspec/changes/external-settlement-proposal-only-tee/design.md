@@ -151,14 +151,7 @@ The per-rail `tx_index` parentheticals below are summaries; the spec is authorit
 
 Canonical formatting requirements:
 
-For normative formatting/equality rules (including any optional reconciliation identifier keys), see [specs/external-settlement-proposal-only-tee/spec.md §2.1.1](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical).
-
-Informal summary:
-
-- String-valued settlement identifiers in `settlement_identifiers` are canonicalized using Unicode NFC (per Unicode 15.1.0) and compared byte-for-byte over UTF-8; case is preserved unless a field-specific canonicalization rule (e.g., uppercasing `settlement_currency`) explicitly requires a transform (see §2.1.1).
-- These identifier values are non-empty and, after NFC normalization, exclude Unicode control/format characters (`General_Category` Cc or Cf) and leading/trailing Unicode whitespace (`White_Space=Y`). See §2.1.1 for the precise normative rules.
-- If any value in `settlement_identifiers` fails canonicalization or validation under §2.1.1, that settlement transaction is invalid for external-settlement trigger purposes and does not produce a `normalized_settlement_hash` or `SovereignProposal`.
-- `envelope_identifiers.tx_index` is a non-negative integer in the range `[0, 9007199254740991]` (inclusive, i.e. `2^53-1`).
+Canonicalization/validation and equality semantics for `settlement_identifiers` are normative in [specs/external-settlement-proposal-only-tee/spec.md §2.1.1](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical); this design document intentionally does not restate them to avoid drift.
 
 Proposal emission MUST be idempotent on `trigger_id`: duplicate triggers MUST NOT create additional proposals or timelocks.
 
