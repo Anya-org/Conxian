@@ -8,6 +8,12 @@ importers:
 
   .:
     devDependencies:
+      '@stacks/network':
+        specifier: 7.3.1
+        version: 7.3.1
+      '@stacks/transactions':
+        specifier: 7.3.1
+        version: 7.3.1
       '@types/react':
         specifier: ^19.2.14
         version: 19.2.14
@@ -136,7 +142,7 @@ importers:
         version: 5.2.8
       '@google/genai':
         specifier: ^1.40.0
-        version: 1.48.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+        version: 1.48.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@noble/curves':
         specifier: ^2.0.1
         version: 2.0.1
@@ -160,16 +166,16 @@ importers:
         version: 10.4.1
       '@web5/api':
         specifier: ^0.12.0
-        version: 0.12.0(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))
+        version: 0.12.0(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))
       '@wormhole-foundation/sdk':
         specifier: ^4.10.0
-        version: 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(got@11.8.6)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+        version: 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(got@11.8.6)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)
       '@wormhole-foundation/sdk-evm':
         specifier: ^4.10.0
-        version: 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+        version: 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@wormhole-foundation/sdk-solana':
         specifier: ^4.10.0
-        version: 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+        version: 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
       '@zxing/browser':
         specifier: ^0.1.5
         version: 0.1.5(@zxing/library@0.21.3)
@@ -293,7 +299,7 @@ importers:
         version: 9.1.7
       jsdom:
         specifier: ^27.4.0
-        version: 27.4.0(@noble/hashes@2.0.1)(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+        version: 27.4.0(@noble/hashes@2.0.1)(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       lint-staged:
         specifier: ^16.2.7
         version: 16.4.0
@@ -317,7 +323,7 @@ importers:
         version: 0.25.0(rollup@4.60.1)(vite@7.3.1(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))
       vitest:
         specifier: ^4.0.17
-        version: 4.1.2(@types/node@25.5.2)(@vitest/ui@4.1.2)(jsdom@27.4.0(@noble/hashes@2.0.1)(bufferutil@4.1.0)(utf-8-validate@6.0.6))(vite@7.3.1(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))
+        version: 4.1.2(@types/node@25.5.2)(@vitest/ui@4.1.2)(jsdom@27.4.0(@noble/hashes@2.0.1)(bufferutil@4.1.0)(utf-8-validate@5.0.10))(vite@7.3.1(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))
 
   stacksorbit:
     dependencies:
@@ -6912,11 +6918,11 @@ snapshots:
       '@noble/hashes': 1.8.0
       protobufjs: 6.11.4
 
-  '@coral-xyz/anchor@0.29.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)':
+  '@coral-xyz/anchor@0.29.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)':
     dependencies:
-      '@coral-xyz/borsh': 0.29.0(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))
+      '@coral-xyz/borsh': 0.29.0(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10))
       '@noble/hashes': 1.8.0
-      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
       bn.js: 5.2.3
       bs58: 4.0.1
       buffer-layout: 1.2.2
@@ -6934,9 +6940,9 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@coral-xyz/borsh@0.29.0(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))':
+  '@coral-xyz/borsh@0.29.0(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10))':
     dependencies:
-      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
       bn.js: 5.2.3
       buffer-layout: 1.2.2
 
@@ -6954,15 +6960,15 @@ snapshots:
       '@cosmjs/math': 0.33.1
       '@cosmjs/utils': 0.33.1
 
-  '@cosmjs/cosmwasm-stargate@0.32.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@cosmjs/cosmwasm-stargate@0.32.4(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/crypto': 0.32.4
       '@cosmjs/encoding': 0.32.4
       '@cosmjs/math': 0.32.4
       '@cosmjs/proto-signing': 0.32.4
-      '@cosmjs/stargate': 0.32.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@cosmjs/tendermint-rpc': 0.32.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@cosmjs/stargate': 0.32.4(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@cosmjs/tendermint-rpc': 0.32.4(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@cosmjs/utils': 0.32.4
       cosmjs-types: 0.9.0
       pako: 2.1.0
@@ -7039,27 +7045,27 @@ snapshots:
       '@cosmjs/utils': 0.33.1
       cosmjs-types: 0.9.0
 
-  '@cosmjs/socket@0.32.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@cosmjs/socket@0.32.4(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@cosmjs/stream': 0.32.4
-      isomorphic-ws: 4.0.1(ws@7.5.10(bufferutil@4.1.0)(utf-8-validate@6.0.6))
-      ws: 7.5.10(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      isomorphic-ws: 4.0.1(ws@7.5.10(bufferutil@4.1.0)(utf-8-validate@5.0.10))
+      ws: 7.5.10(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       xstream: 11.14.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  '@cosmjs/socket@0.33.1(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@cosmjs/socket@0.33.1(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@cosmjs/stream': 0.33.1
-      isomorphic-ws: 4.0.1(ws@7.5.10(bufferutil@4.1.0)(utf-8-validate@6.0.6))
-      ws: 7.5.10(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      isomorphic-ws: 4.0.1(ws@7.5.10(bufferutil@4.1.0)(utf-8-validate@5.0.10))
+      ws: 7.5.10(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       xstream: 11.14.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  '@cosmjs/stargate@0.32.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@cosmjs/stargate@0.32.4(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@confio/ics23': 0.6.8
       '@cosmjs/amino': 0.32.4
@@ -7067,7 +7073,7 @@ snapshots:
       '@cosmjs/math': 0.32.4
       '@cosmjs/proto-signing': 0.32.4
       '@cosmjs/stream': 0.32.4
-      '@cosmjs/tendermint-rpc': 0.32.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@cosmjs/tendermint-rpc': 0.32.4(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@cosmjs/utils': 0.32.4
       cosmjs-types: 0.9.0
       xstream: 11.14.0
@@ -7076,14 +7082,14 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@cosmjs/stargate@0.33.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@cosmjs/stargate@0.33.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@cosmjs/amino': 0.33.0
       '@cosmjs/encoding': 0.33.1
       '@cosmjs/math': 0.33.1
       '@cosmjs/proto-signing': 0.33.0
       '@cosmjs/stream': 0.33.1
-      '@cosmjs/tendermint-rpc': 0.33.1(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@cosmjs/tendermint-rpc': 0.33.1(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@cosmjs/utils': 0.33.1
       cosmjs-types: 0.9.0
     transitivePeerDependencies:
@@ -7099,13 +7105,13 @@ snapshots:
     dependencies:
       xstream: 11.14.0
 
-  '@cosmjs/tendermint-rpc@0.32.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@cosmjs/tendermint-rpc@0.32.4(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@cosmjs/crypto': 0.32.4
       '@cosmjs/encoding': 0.32.4
       '@cosmjs/json-rpc': 0.32.4
       '@cosmjs/math': 0.32.4
-      '@cosmjs/socket': 0.32.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@cosmjs/socket': 0.32.4(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@cosmjs/stream': 0.32.4
       '@cosmjs/utils': 0.32.4
       axios: 1.14.0
@@ -7116,13 +7122,13 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@cosmjs/tendermint-rpc@0.33.1(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@cosmjs/tendermint-rpc@0.33.1(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@cosmjs/crypto': 0.33.1
       '@cosmjs/encoding': 0.33.1
       '@cosmjs/json-rpc': 0.33.1
       '@cosmjs/math': 0.33.1
-      '@cosmjs/socket': 0.33.1(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@cosmjs/socket': 0.33.1(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@cosmjs/stream': 0.33.1
       '@cosmjs/utils': 0.33.1
       axios: 1.14.0
@@ -7381,12 +7387,12 @@ snapshots:
 
   '@fontsource/jetbrains-mono@5.2.8': {}
 
-  '@google/genai@1.48.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@google/genai@1.48.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       google-auth-library: 10.6.2
       p-retry: 4.6.2
       protobufjs: 7.5.4
-      ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -7582,11 +7588,11 @@ snapshots:
       '@protobuf-ts/runtime': 2.11.1
       '@protobuf-ts/runtime-rpc': 2.11.1
 
-  '@injectivelabs/sdk-ts@1.18.16(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)':
+  '@injectivelabs/sdk-ts@1.18.16(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)':
     dependencies:
       '@cosmjs/amino': 0.33.0
       '@cosmjs/proto-signing': 0.33.0
-      '@cosmjs/stargate': 0.33.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@cosmjs/stargate': 0.33.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@injectivelabs/abacus-proto-ts-v2': 1.17.5
       '@injectivelabs/core-proto-ts-v2': 1.18.0
       '@injectivelabs/exceptions': 1.18.16
@@ -7609,12 +7615,12 @@ snapshots:
       '@scure/bip39': 1.6.0
       axios: 1.14.0
       cosmjs-types: 0.9.0
-      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       eventemitter3: 5.0.4
       http-status-codes: 2.3.0
       rxjs: 7.8.2
       snakecase-keys: 5.5.0
-      viem: 2.47.10(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+      viem: 2.47.10(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -8277,10 +8283,10 @@ snapshots:
 
   '@sindresorhus/is@4.6.0': {}
 
-  '@solana/buffer-layout-utils@0.2.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)':
+  '@solana/buffer-layout-utils@0.2.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)':
     dependencies:
       '@solana/buffer-layout': 4.0.1
-      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
       bigint-buffer: 1.1.5
       bignumber.js: 9.3.1
     transitivePeerDependencies:
@@ -8310,11 +8316,11 @@ snapshots:
       commander: 14.0.3
       typescript: 5.9.3
 
-  '@solana/spl-token@0.3.9(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)':
+  '@solana/spl-token@0.3.9(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)':
     dependencies:
       '@solana/buffer-layout': 4.0.1
-      '@solana/buffer-layout-utils': 0.2.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@solana/buffer-layout-utils': 0.2.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
       buffer: 6.0.3
     transitivePeerDependencies:
       - bufferutil
@@ -8322,7 +8328,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)':
+  '@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)':
     dependencies:
       '@babel/runtime': 7.29.2
       '@noble/curves': 1.9.7
@@ -8335,7 +8341,7 @@ snapshots:
       bs58: 4.0.1
       buffer: 6.0.3
       fast-stable-stringify: 1.0.0
-      jayson: 4.3.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      jayson: 4.3.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       node-fetch: 2.7.0
       rpc-websockets: 9.3.7
       superstruct: 2.0.2
@@ -9252,7 +9258,7 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
 
-  '@web5/agent@0.8.1(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))':
+  '@web5/agent@0.8.1(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))':
     dependencies:
       '@noble/ciphers': 0.5.3
       '@scure/bip39': 1.2.2
@@ -9262,7 +9268,7 @@ snapshots:
       '@web5/dids': 1.2.0
       abstract-level: 1.0.4
       ed25519-keygen: 0.4.11
-      isomorphic-ws: 5.0.0(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))
+      isomorphic-ws: 5.0.0(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))
       level: 8.0.0
       ms: 2.1.3
       readable-web-to-node-stream: 3.0.2
@@ -9272,13 +9278,13 @@ snapshots:
       - supports-color
       - ws
 
-  '@web5/api@0.12.0(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))':
+  '@web5/api@0.12.0(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))':
     dependencies:
-      '@web5/agent': 0.8.1(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))
+      '@web5/agent': 0.8.1(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))
       '@web5/common': 1.1.0
       '@web5/crypto': 1.0.6
       '@web5/dids': 1.2.0
-      '@web5/user-agent': 0.7.1(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))
+      '@web5/user-agent': 0.7.1(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -9310,9 +9316,9 @@ snapshots:
       level: 8.0.1
       ms: 2.1.3
 
-  '@web5/user-agent@0.7.1(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))':
+  '@web5/user-agent@0.7.1(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))':
     dependencies:
-      '@web5/agent': 0.8.1(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))
+      '@web5/agent': 0.8.1(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))
       '@web5/common': 1.1.0
       '@web5/crypto': 1.0.6
       '@web5/dids': 1.2.0
@@ -9395,13 +9401,13 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@wormhole-foundation/sdk-cosmwasm-core@4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)':
+  '@wormhole-foundation/sdk-cosmwasm-core@4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)':
     dependencies:
-      '@cosmjs/cosmwasm-stargate': 0.32.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@cosmjs/stargate': 0.32.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@injectivelabs/sdk-ts': 1.18.16(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+      '@cosmjs/cosmwasm-stargate': 0.32.4(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@cosmjs/stargate': 0.32.4(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@injectivelabs/sdk-ts': 1.18.16(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)
       '@wormhole-foundation/sdk-connect': 4.15.0
-      '@wormhole-foundation/sdk-cosmwasm': 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+      '@wormhole-foundation/sdk-cosmwasm': 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -9410,14 +9416,14 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@wormhole-foundation/sdk-cosmwasm-ibc@4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)':
+  '@wormhole-foundation/sdk-cosmwasm-ibc@4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)':
     dependencies:
-      '@cosmjs/cosmwasm-stargate': 0.32.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@cosmjs/stargate': 0.32.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@injectivelabs/sdk-ts': 1.18.16(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+      '@cosmjs/cosmwasm-stargate': 0.32.4(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@cosmjs/stargate': 0.32.4(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@injectivelabs/sdk-ts': 1.18.16(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)
       '@wormhole-foundation/sdk-connect': 4.15.0
-      '@wormhole-foundation/sdk-cosmwasm': 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
-      '@wormhole-foundation/sdk-cosmwasm-core': 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+      '@wormhole-foundation/sdk-cosmwasm': 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)
+      '@wormhole-foundation/sdk-cosmwasm-core': 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)
       cosmjs-types: 0.9.0
     transitivePeerDependencies:
       - bufferutil
@@ -9427,12 +9433,12 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@wormhole-foundation/sdk-cosmwasm-tokenbridge@4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)':
+  '@wormhole-foundation/sdk-cosmwasm-tokenbridge@4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)':
     dependencies:
-      '@cosmjs/cosmwasm-stargate': 0.32.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@injectivelabs/sdk-ts': 1.18.16(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+      '@cosmjs/cosmwasm-stargate': 0.32.4(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@injectivelabs/sdk-ts': 1.18.16(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)
       '@wormhole-foundation/sdk-connect': 4.15.0
-      '@wormhole-foundation/sdk-cosmwasm': 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+      '@wormhole-foundation/sdk-cosmwasm': 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -9441,12 +9447,12 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@wormhole-foundation/sdk-cosmwasm@4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)':
+  '@wormhole-foundation/sdk-cosmwasm@4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)':
     dependencies:
-      '@cosmjs/cosmwasm-stargate': 0.32.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@cosmjs/cosmwasm-stargate': 0.32.4(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@cosmjs/proto-signing': 0.32.4
-      '@cosmjs/stargate': 0.32.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@injectivelabs/sdk-ts': 1.18.16(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+      '@cosmjs/stargate': 0.32.4(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@injectivelabs/sdk-ts': 1.18.16(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)
       '@wormhole-foundation/sdk-connect': 4.15.0
       cosmjs-types: 0.9.0
     transitivePeerDependencies:
@@ -9468,91 +9474,77 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@wormhole-foundation/sdk-base': 4.15.0
 
-  '@wormhole-foundation/sdk-evm-cctp@4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@wormhole-foundation/sdk-evm-cctp@4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@wormhole-foundation/sdk-connect': 4.15.0
-      '@wormhole-foundation/sdk-evm': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-evm-core': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@wormhole-foundation/sdk-evm': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-evm-core': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
       - utf-8-validate
 
-  '@wormhole-foundation/sdk-evm-core@4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@wormhole-foundation/sdk-evm-core@4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@wormhole-foundation/sdk-connect': 4.15.0
-      '@wormhole-foundation/sdk-evm': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@wormhole-foundation/sdk-evm': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
       - utf-8-validate
 
-  '@wormhole-foundation/sdk-evm-portico@4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@wormhole-foundation/sdk-evm-portico@4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@wormhole-foundation/sdk-connect': 4.15.0
-      '@wormhole-foundation/sdk-evm': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-evm-core': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-evm-tokenbridge': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@wormhole-foundation/sdk-evm': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-evm-core': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-evm-tokenbridge': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
       - utf-8-validate
 
-  '@wormhole-foundation/sdk-evm-tbtc@4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@wormhole-foundation/sdk-evm-tbtc@4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@wormhole-foundation/sdk-connect': 4.15.0
-      '@wormhole-foundation/sdk-evm': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-evm-core': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@wormhole-foundation/sdk-evm': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-evm-core': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
       - utf-8-validate
 
-  '@wormhole-foundation/sdk-evm-tokenbridge@4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@wormhole-foundation/sdk-evm-tokenbridge@4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@wormhole-foundation/sdk-connect': 4.15.0
-      '@wormhole-foundation/sdk-evm': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-evm-core': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@wormhole-foundation/sdk-evm': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-evm-core': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
       - utf-8-validate
 
-  '@wormhole-foundation/sdk-evm@4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@wormhole-foundation/sdk-evm@4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@wormhole-foundation/sdk-connect': 4.15.0
-      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
       - utf-8-validate
 
-  '@wormhole-foundation/sdk-solana-cctp@4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)':
+  '@wormhole-foundation/sdk-solana-cctp@4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)':
     dependencies:
-      '@coral-xyz/anchor': 0.29.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@solana/spl-token': 0.3.9(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@coral-xyz/anchor': 0.29.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@solana/spl-token': 0.3.9(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
       '@wormhole-foundation/sdk-connect': 4.15.0
-      '@wormhole-foundation/sdk-solana': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - encoding
-      - typescript
-      - utf-8-validate
-
-  '@wormhole-foundation/sdk-solana-core@4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)':
-    dependencies:
-      '@coral-xyz/anchor': 0.29.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@coral-xyz/borsh': 0.29.0(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))
-      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-connect': 4.15.0
-      '@wormhole-foundation/sdk-solana': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@wormhole-foundation/sdk-solana': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -9560,15 +9552,13 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@wormhole-foundation/sdk-solana-tbtc@4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)':
+  '@wormhole-foundation/sdk-solana-core@4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)':
     dependencies:
-      '@coral-xyz/anchor': 0.29.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@solana/spl-token': 0.3.9(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@coral-xyz/anchor': 0.29.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@coral-xyz/borsh': 0.29.0(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10))
+      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
       '@wormhole-foundation/sdk-connect': 4.15.0
-      '@wormhole-foundation/sdk-solana': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-solana-core': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-solana-tokenbridge': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@wormhole-foundation/sdk-solana': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -9576,14 +9566,15 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@wormhole-foundation/sdk-solana-tokenbridge@4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)':
+  '@wormhole-foundation/sdk-solana-tbtc@4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)':
     dependencies:
-      '@coral-xyz/anchor': 0.29.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@solana/spl-token': 0.3.9(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@coral-xyz/anchor': 0.29.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@solana/spl-token': 0.3.9(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
       '@wormhole-foundation/sdk-connect': 4.15.0
-      '@wormhole-foundation/sdk-solana': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-solana-core': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@wormhole-foundation/sdk-solana': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-solana-core': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-solana-tokenbridge': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -9591,12 +9582,27 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@wormhole-foundation/sdk-solana@4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)':
+  '@wormhole-foundation/sdk-solana-tokenbridge@4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)':
     dependencies:
-      '@coral-xyz/anchor': 0.29.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@coral-xyz/borsh': 0.29.0(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))
-      '@solana/spl-token': 0.3.9(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@coral-xyz/anchor': 0.29.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@solana/spl-token': 0.3.9(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-connect': 4.15.0
+      '@wormhole-foundation/sdk-solana': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-solana-core': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - encoding
+      - typescript
+      - utf-8-validate
+
+  '@wormhole-foundation/sdk-solana@4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@coral-xyz/anchor': 0.29.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@coral-xyz/borsh': 0.29.0(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10))
+      '@solana/spl-token': 0.3.9(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
       '@wormhole-foundation/sdk-connect': 4.15.0
       rpc-websockets: 7.11.2
     transitivePeerDependencies:
@@ -9667,16 +9673,16 @@ snapshots:
       - debug
       - typescript
 
-  '@wormhole-foundation/sdk-xrpl@4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@wormhole-foundation/sdk-xrpl@4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@wormhole-foundation/sdk-connect': 4.15.0
-      xrpl: 4.6.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      xrpl: 4.6.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
       - utf-8-validate
 
-  '@wormhole-foundation/sdk@4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(got@11.8.6)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)':
+  '@wormhole-foundation/sdk@4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(got@11.8.6)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)':
     dependencies:
       '@wormhole-foundation/sdk-algorand': 4.15.0
       '@wormhole-foundation/sdk-algorand-core': 4.15.0
@@ -9688,29 +9694,29 @@ snapshots:
       '@wormhole-foundation/sdk-base': 4.15.0
       '@wormhole-foundation/sdk-btc': 4.15.0
       '@wormhole-foundation/sdk-connect': 4.15.0
-      '@wormhole-foundation/sdk-cosmwasm': 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
-      '@wormhole-foundation/sdk-cosmwasm-core': 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
-      '@wormhole-foundation/sdk-cosmwasm-ibc': 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
-      '@wormhole-foundation/sdk-cosmwasm-tokenbridge': 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+      '@wormhole-foundation/sdk-cosmwasm': 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)
+      '@wormhole-foundation/sdk-cosmwasm-core': 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)
+      '@wormhole-foundation/sdk-cosmwasm-ibc': 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)
+      '@wormhole-foundation/sdk-cosmwasm-tokenbridge': 4.15.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6)
       '@wormhole-foundation/sdk-definitions': 4.15.0
-      '@wormhole-foundation/sdk-evm': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-evm-cctp': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-evm-core': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-evm-portico': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-evm-tbtc': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-evm-tokenbridge': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-solana': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-solana-cctp': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-solana-core': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-solana-tbtc': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@wormhole-foundation/sdk-solana-tokenbridge': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@wormhole-foundation/sdk-evm': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-evm-cctp': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-evm-core': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-evm-portico': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-evm-tbtc': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-evm-tokenbridge': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-solana': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-solana-cctp': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-solana-core': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-solana-tbtc': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      '@wormhole-foundation/sdk-solana-tokenbridge': 4.15.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)
       '@wormhole-foundation/sdk-stacks': 4.15.0
       '@wormhole-foundation/sdk-stacks-core': 4.15.0
       '@wormhole-foundation/sdk-sui': 4.15.0(typescript@5.9.3)
       '@wormhole-foundation/sdk-sui-cctp': 4.15.0(typescript@5.9.3)
       '@wormhole-foundation/sdk-sui-core': 4.15.0(typescript@5.9.3)
       '@wormhole-foundation/sdk-sui-tokenbridge': 4.15.0(typescript@5.9.3)
-      '@wormhole-foundation/sdk-xrpl': 4.15.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@wormhole-foundation/sdk-xrpl': 4.15.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - '@gql.tada/svelte-support'
       - '@gql.tada/vue-support'
@@ -9725,19 +9731,19 @@ snapshots:
 
   '@xmldom/xmldom@0.8.12': {}
 
-  '@xrplf/isomorphic@1.0.1(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@xrplf/isomorphic@1.0.1(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@noble/hashes': 1.8.0
       eventemitter3: 5.0.1
-      ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  '@xrplf/secret-numbers@2.0.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)':
+  '@xrplf/secret-numbers@2.0.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
-      '@xrplf/isomorphic': 1.0.1(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      ripple-keypairs: 2.0.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@xrplf/isomorphic': 1.0.1(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      ripple-keypairs: 2.0.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -10269,7 +10275,7 @@ snapshots:
 
   c32check@2.0.0:
     dependencies:
-      '@noble/hashes': 1.1.5
+      '@noble/hashes': 1.8.0
       base-x: 4.0.1
 
   cacheable-lookup@5.0.4: {}
@@ -11168,7 +11174,7 @@ snapshots:
 
   esutils@2.0.3: {}
 
-  ethers@6.16.0(bufferutil@4.1.0)(utf-8-validate@6.0.6):
+  ethers@6.16.0(bufferutil@4.1.0)(utf-8-validate@5.0.10):
     dependencies:
       '@adraffy/ens-normalize': 1.10.1
       '@noble/curves': 1.2.0
@@ -11176,7 +11182,7 @@ snapshots:
       '@types/node': 22.7.5
       aes-js: 4.0.0-beta.5
       tslib: 2.7.0
-      ws: 8.17.1(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      ws: 8.17.1(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -11812,17 +11818,17 @@ snapshots:
 
   isomorphic-timers-promises@1.0.1: {}
 
-  isomorphic-ws@4.0.1(ws@7.5.10(bufferutil@4.1.0)(utf-8-validate@6.0.6)):
+  isomorphic-ws@4.0.1(ws@7.5.10(bufferutil@4.1.0)(utf-8-validate@5.0.10)):
     dependencies:
-      ws: 7.5.10(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      ws: 7.5.10(bufferutil@4.1.0)(utf-8-validate@5.0.10)
 
-  isomorphic-ws@5.0.0(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)):
+  isomorphic-ws@5.0.0(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)):
     dependencies:
-      ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
 
-  isows@1.0.7(ws@8.18.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)):
+  isows@1.0.7(ws@8.18.3(bufferutil@4.1.0)(utf-8-validate@5.0.10)):
     dependencies:
-      ws: 8.18.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      ws: 8.18.3(bufferutil@4.1.0)(utf-8-validate@5.0.10)
 
   istanbul-lib-coverage@3.2.2: {}
 
@@ -11894,7 +11900,7 @@ snapshots:
       has-symbols: 1.1.0
       set-function-name: 2.0.2
 
-  jayson@4.3.0(bufferutil@4.1.0)(utf-8-validate@6.0.6):
+  jayson@4.3.0(bufferutil@4.1.0)(utf-8-validate@5.0.10):
     dependencies:
       '@types/connect': 3.4.38
       '@types/node': 12.20.55
@@ -11903,11 +11909,11 @@ snapshots:
       delay: 5.0.0
       es6-promisify: 5.0.0
       eyes: 0.1.8
-      isomorphic-ws: 4.0.1(ws@7.5.10(bufferutil@4.1.0)(utf-8-validate@6.0.6))
+      isomorphic-ws: 4.0.1(ws@7.5.10(bufferutil@4.1.0)(utf-8-validate@5.0.10))
       json-stringify-safe: 5.0.1
       stream-json: 1.9.1
       uuid: 8.3.2
-      ws: 7.5.10(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      ws: 7.5.10(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -11960,6 +11966,34 @@ snapshots:
       - supports-color
       - utf-8-validate
 
+  jsdom@27.4.0(@noble/hashes@2.0.1)(bufferutil@4.1.0)(utf-8-validate@5.0.10):
+    dependencies:
+      '@acemir/cssom': 0.9.31
+      '@asamuzakjp/dom-selector': 6.8.1
+      '@exodus/bytes': 1.15.0(@noble/hashes@2.0.1)
+      cssstyle: 5.3.7
+      data-urls: 6.0.1
+      decimal.js: 10.6.0
+      html-encoding-sniffer: 6.0.0(@noble/hashes@2.0.1)
+      http-proxy-agent: 7.0.2
+      https-proxy-agent: 7.0.6
+      is-potential-custom-element-name: 1.0.1
+      parse5: 8.0.0
+      saxes: 6.0.0
+      symbol-tree: 3.2.4
+      tough-cookie: 6.0.1
+      w3c-xmlserializer: 5.0.0
+      webidl-conversions: 8.0.1
+      whatwg-mimetype: 4.0.0
+      whatwg-url: 15.1.0
+      ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      xml-name-validator: 5.0.0
+    transitivePeerDependencies:
+      - '@noble/hashes'
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
   jsdom@27.4.0(@noble/hashes@2.0.1)(bufferutil@4.1.0)(utf-8-validate@6.0.6):
     dependencies:
       '@acemir/cssom': 0.9.31
@@ -11987,6 +12021,7 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
+    optional: true
 
   jsesc@3.1.0: {}
 
@@ -12019,7 +12054,7 @@ snapshots:
   jsontokens@4.0.1:
     dependencies:
       '@noble/hashes': 1.8.0
-      '@noble/secp256k1': 1.7.1
+      '@noble/secp256k1': 1.7.2
       base64-js: 1.5.1
 
   jsx-ast-utils@3.3.5:
@@ -13042,28 +13077,28 @@ snapshots:
       hash-base: 3.1.2
       inherits: 2.0.4
 
-  ripple-address-codec@5.0.0(bufferutil@4.1.0)(utf-8-validate@6.0.6):
+  ripple-address-codec@5.0.0(bufferutil@4.1.0)(utf-8-validate@5.0.10):
     dependencies:
       '@scure/base': 1.2.6
-      '@xrplf/isomorphic': 1.0.1(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@xrplf/isomorphic': 1.0.1(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  ripple-binary-codec@2.7.0(bufferutil@4.1.0)(utf-8-validate@6.0.6):
+  ripple-binary-codec@2.7.0(bufferutil@4.1.0)(utf-8-validate@5.0.10):
     dependencies:
-      '@xrplf/isomorphic': 1.0.1(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@xrplf/isomorphic': 1.0.1(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       bignumber.js: 9.3.1
-      ripple-address-codec: 5.0.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      ripple-address-codec: 5.0.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  ripple-keypairs@2.0.0(bufferutil@4.1.0)(utf-8-validate@6.0.6):
+  ripple-keypairs@2.0.0(bufferutil@4.1.0)(utf-8-validate@5.0.10):
     dependencies:
       '@noble/curves': 1.9.7
-      '@xrplf/isomorphic': 1.0.1(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      ripple-address-codec: 5.0.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@xrplf/isomorphic': 1.0.1(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      ripple-address-codec: 5.0.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -13813,16 +13848,16 @@ snapshots:
       d3-time: 3.1.0
       d3-timer: 3.0.1
 
-  viem@2.47.10(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6):
+  viem@2.47.10(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6):
     dependencies:
       '@noble/curves': 1.9.1
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
       abitype: 1.2.3(typescript@5.9.3)(zod@4.3.6)
-      isows: 1.0.7(ws@8.18.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))
+      isows: 1.0.7(ws@8.18.3(bufferutil@4.1.0)(utf-8-validate@5.0.10))
       ox: 0.14.7(typescript@5.9.3)(zod@4.3.6)
-      ws: 8.18.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      ws: 8.18.3(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     optionalDependencies:
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -13914,6 +13949,35 @@ snapshots:
       '@types/node': 24.6.2
       '@vitest/ui': 4.1.2(vitest@4.1.2)
       jsdom: 23.2.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+    transitivePeerDependencies:
+      - msw
+
+  vitest@4.1.2(@types/node@25.5.2)(@vitest/ui@4.1.2)(jsdom@27.4.0(@noble/hashes@2.0.1)(bufferutil@4.1.0)(utf-8-validate@5.0.10))(vite@7.3.1(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3)):
+    dependencies:
+      '@vitest/expect': 4.1.2
+      '@vitest/mocker': 4.1.2(vite@7.3.1(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))
+      '@vitest/pretty-format': 4.1.2
+      '@vitest/runner': 4.1.2
+      '@vitest/snapshot': 4.1.2
+      '@vitest/spy': 4.1.2
+      '@vitest/utils': 4.1.2
+      es-module-lexer: 2.0.0
+      expect-type: 1.3.0
+      magic-string: 0.30.21
+      obug: 2.1.1
+      pathe: 2.0.3
+      picomatch: 4.0.4
+      std-env: 4.0.0
+      tinybench: 2.9.0
+      tinyexec: 1.0.4
+      tinyglobby: 0.2.15
+      tinyrainbow: 3.1.0
+      vite: 7.3.1(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3)
+      why-is-node-running: 2.3.0
+    optionalDependencies:
+      '@types/node': 25.5.2
+      '@vitest/ui': 4.1.2(vitest@4.1.2)
+      jsdom: 27.4.0(@noble/hashes@2.0.1)(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - msw
 
@@ -14063,20 +14127,20 @@ snapshots:
 
   wrappy@1.0.2: {}
 
-  ws@7.5.10(bufferutil@4.1.0)(utf-8-validate@6.0.6):
+  ws@7.5.10(bufferutil@4.1.0)(utf-8-validate@5.0.10):
     optionalDependencies:
       bufferutil: 4.1.0
-      utf-8-validate: 6.0.6
+      utf-8-validate: 5.0.10
 
-  ws@8.17.1(bufferutil@4.1.0)(utf-8-validate@6.0.6):
+  ws@8.17.1(bufferutil@4.1.0)(utf-8-validate@5.0.10):
     optionalDependencies:
       bufferutil: 4.1.0
-      utf-8-validate: 6.0.6
+      utf-8-validate: 5.0.10
 
-  ws@8.18.3(bufferutil@4.1.0)(utf-8-validate@6.0.6):
+  ws@8.18.3(bufferutil@4.1.0)(utf-8-validate@5.0.10):
     optionalDependencies:
       bufferutil: 4.1.0
-      utf-8-validate: 6.0.6
+      utf-8-validate: 5.0.10
 
   ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10):
     optionalDependencies:
@@ -14101,18 +14165,18 @@ snapshots:
 
   xmlchars@2.2.0: {}
 
-  xrpl@4.6.0(bufferutil@4.1.0)(utf-8-validate@6.0.6):
+  xrpl@4.6.0(bufferutil@4.1.0)(utf-8-validate@5.0.10):
     dependencies:
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      '@xrplf/isomorphic': 1.0.1(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      '@xrplf/secret-numbers': 2.0.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      '@xrplf/isomorphic': 1.0.1(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@xrplf/secret-numbers': 2.0.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       bignumber.js: 9.3.1
       eventemitter3: 5.0.4
       fast-json-stable-stringify: 2.1.0
-      ripple-address-codec: 5.0.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      ripple-binary-codec: 2.7.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
-      ripple-keypairs: 2.0.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      ripple-address-codec: 5.0.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      ripple-binary-codec: 2.7.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      ripple-keypairs: 2.0.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate

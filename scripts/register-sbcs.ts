@@ -11,9 +11,9 @@ import {
   uintCV,
   stringAsciiCV,
 } from '@stacks/transactions';
-import { StacksTestnet } from '@stacks/network';
+import { networkFromName } from '@stacks/network';
 
-const network = new StacksTestnet();
+const network = networkFromName('testnet');
 const modulePath = fileURLToPath(import.meta.url);
 
 const sbcs = ["Conxian-Core", "Nexus-Labs", "Fiscal-Auth", "Sovereign-Ops"];
@@ -72,6 +72,8 @@ function requirePrivateKey(): string {
 }
 
 async function registerSBCs(privateKey: string) {
+  const failures: Array<{ sbc: string; error: string; reason: string }> = [];
+
   for (const sbc of sbcs) {
     const txOptions = {
       contractAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
@@ -86,8 +88,20 @@ async function registerSBCs(privateKey: string) {
     };
 
     const transaction = await makeContractCall(txOptions);
-    const broadcastResponse = await broadcastTransaction(transaction, network);
+    const broadcastResponse = await broadcastTransaction({ transaction, network });
+    if ('error' in broadcastResponse) {
+      console.error(`Failed to register SBC "${sbc}":`, broadcastResponse);
+      failures.push({ sbc, error: broadcastResponse.error, reason: broadcastResponse.reason });
+      continue;
+    }
     console.log(`Registering SBC: ${sbc} - TX ID: ${broadcastResponse.txid}`);
+  }
+
+  if (failures.length > 0) {
+    const summary = failures
+      .map((f) => `${f.sbc} (${f.error}: ${f.reason})`)
+      .join(', ');
+    throw new Error(`Failed to register SBCs: ${summary}`);
   }
 }
 

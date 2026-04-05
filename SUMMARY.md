@@ -49,6 +49,7 @@
 * [Sovereign Shard Spec](docs/SOVEREIGN_SHARD_SPEC.md)
 * [TEE Security Audit](docs/TEE_SECURITY_AUDIT.md)
 * [Audit Dashboard Spec](docs/DASHBOARD_SPEC.md)
+* [Protocol fee sweep runbook (ALEX conversion)](docs/PROTOCOL_FEE_SWEEP_RUNBOOK.md)
 
 ## 🏭 Industrial Engine (v12.0)
 

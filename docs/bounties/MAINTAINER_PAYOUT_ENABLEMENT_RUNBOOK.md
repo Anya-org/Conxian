@@ -8,6 +8,8 @@ This is a maintainer-only checklist for enabling bounty payouts after ConxianCSF
 - **ALEX launch funding source (sole allowed source)**: `SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.amm-vault-v2-01`.
 - **Payout wallet**: The internal maintainer-controlled wallet/multisig that sends bounty payments.
 
+Protocol-fee sweeps and fee-conversion activity (e.g., keeper-run ALEX swaps) must not fund the payout wallet directly. If the payout wallet receives inbound funds from any principal other than the ALEX launch vault, treat it as **NO-GO** unless explicitly reconciled and documented.
+
 This runbook assumes **Stacks mainnet**. If you see any principal starting with `ST` (testnet), stop and reconcile your deployment record before proceeding.
 
 ## Mainnet identifiers (March 2026 release)
