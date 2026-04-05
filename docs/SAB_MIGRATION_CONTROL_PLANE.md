@@ -18,6 +18,7 @@ Related execution issues (parallelized):
 - https://linear.app/conxian-labs/issue/CON-331/pilot-proof-carrying-analytics-for-treasury-and-oracle-workflows
 - https://linear.app/conxian-labs/issue/CON-332/define-sab-migration-timeline-cutover-waves-and-rollback-plan
 - https://linear.app/conxian-labs/issue/CON-333/define-governance-and-immutable-record-architecture-for-sab
+- https://linear.app/conxian-labs/issue/CON-334/map-target-datastore-decisions-by-sab-data-domain
 - https://linear.app/conxian-labs/issue/CON-335/define-pilot-readiness-gates-and-evidence-requirements
 - https://linear.app/conxian-labs/issue/CON-336/sequence-sab-migration-waves-by-value-reversibility-and-risk
 - https://linear.app/conxian-labs/issue/CON-337/inventory-current-supabase-and-neon-dependencies-by-service
