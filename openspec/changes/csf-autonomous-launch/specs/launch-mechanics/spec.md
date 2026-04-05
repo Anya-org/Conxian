@@ -7,11 +7,18 @@ The protocol MUST implement a hardcoded 0.1% Founder’s Cut **as a carve-out fr
 
 For the purposes of this requirement, **captured protocol fees** MUST mean the protocol-retained portion of each transaction’s fee after applying any third-party distributions (e.g. referral splits).
 
-The Founder’s Cut amount MUST equal `floor( captured_protocol_fees * 0.001 )`, computed in the transaction’s fee asset.
+All Founder’s Cut computations MUST be performed using integer math in the smallest unit of the transaction’s fee asset. For the purposes of this requirement, `/` MUST denote integer division and `%` MUST denote modulo.
 
-Founder’s Cut MUST be computed on captured protocol fees before any internal protocol allocations (reserve/ops/incentives).
+The protocol MUST compute Founder’s Cut in the following order:
 
-Any rounding remainder MUST remain in the protocol treasury/vault balance of the transaction’s fee asset.
+- `captured = captured_protocol_fees`
+- `founders_cut = captured / 1000`
+- `remainder = captured % 1000`
+- `post_cut_captured = captured - founders_cut`
+
+Internal protocol allocations (reserve/ops/incentives) MUST be computed from `post_cut_captured`.
+
+The rounding remainder for the Founder’s Cut computation MUST equal `remainder` and MUST remain in the protocol treasury/vault balance of the transaction’s fee asset (as part of `post_cut_captured`) and MUST NOT be included in the transfer to the designated founder vault.
 
 #### Scenario: Fee Redirection
 - **Given** a successful swap or lending event
