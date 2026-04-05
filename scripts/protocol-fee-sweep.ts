@@ -16,7 +16,6 @@ import {
   type ClarityValue,
   contractPrincipalCV,
   someCV,
-  noneCV,
   uintCV,
   makeContractCall,
   broadcastTransaction,
@@ -262,9 +261,6 @@ async function quoteDy(
 }
 
 function computeMinDy(quotedDy: bigint, slippageBps: bigint): bigint {
-  if (slippageBps > 10_000n) {
-    throw new Error(`slippage-bps must be <= 10000 (got: ${slippageBps})`);
-  }
   return (quotedDy * (10_000n - slippageBps)) / 10_000n;
 }
 
@@ -324,7 +320,25 @@ async function buildSweepPlan(params: {
       continue;
     }
 
+    if (quote.ok === 0n) {
+      skipped.push({
+        token: tokenPrincipal,
+        dx: dx.toString(),
+        reason: 'quoted dy is 0',
+      });
+      continue;
+    }
+
     const minDy = computeMinDy(quote.ok, params.slippageBps);
+
+    if (minDy <= 0n) {
+      skipped.push({
+        token: tokenPrincipal,
+        dx: dx.toString(),
+        reason: `minDy=${minDy.toString()} computed to a non-positive value; refusing to build swap`,
+      });
+      continue;
+    }
 
     plan.push({
       token: tokenPrincipal,
@@ -352,6 +366,12 @@ async function executeSweepPlan(params: {
     const dx = BigInt(item.dx);
     const minDy = BigInt(item.minDy);
 
+    if (minDy <= 0n) {
+      throw new Error(
+        `Refusing to execute swap with non-positive minDy for token ${item.token} (minDy=${item.minDy})`
+      );
+    }
+
     const txOptions = {
       contractAddress: params.swapHelper.address,
       contractName: params.swapHelper.contractName,
@@ -360,7 +380,7 @@ async function executeSweepPlan(params: {
         contractPrincipalCV(tokenX.address, tokenX.contractName),
         contractPrincipalCV(params.target.address, params.target.contractName),
         uintCV(dx),
-        minDy > 0n ? someCV(uintCV(minDy)) : noneCV(),
+        someCV(uintCV(minDy)),
       ],
       senderKey: params.privateKey,
       validateWithPostConditions: true,
@@ -492,6 +512,10 @@ async function main() {
   if (!feeVaultAddress) usageAndExit('Missing required --fee-vault');
   if (!targetPrincipal) usageAndExit('Missing required --target');
 
+  if (slippageBps >= 10_000n) {
+    usageAndExit(`Invalid --slippage-bps=${slippageBps.toString()}; expected 0..9999`);
+  }
+
   if (!swapHelperPrincipal) {
     if (networkName === 'mainnet') {
       swapHelperPrincipal = DEFAULT_SWAP_HELPER;
@@ -505,7 +529,6 @@ async function main() {
   }
 
   assertStacksNetworkPrefix(networkName, '--swap-helper', swapHelperPrincipal);
-
   if (feeVaultAddress.includes('.')) {
     usageAndExit('--fee-vault must be a standard principal (address only, no contract name)');
   }
