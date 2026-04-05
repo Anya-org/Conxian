@@ -1,5 +1,6 @@
 import os
 import re
+import subprocess
 import sys
 
 
@@ -32,29 +33,24 @@ def is_in_dir(rel_path: str, rel_dir: str) -> bool:
     return rel_path == rel_dir or rel_path.startswith(rel_dir + "/")
 
 
-def iter_repo_files(root: str, excluded_dirs: set[str]) -> list[str]:
-    files: list[str] = []
-    for dirpath, dirnames, filenames in os.walk(root):
-        rel_dir = os.path.relpath(dirpath, root)
-        if rel_dir == ".":
-            rel_dir = ""
+def git_ls_files(root: str) -> list[str]:
+    try:
+        out = subprocess.check_output(
+            ["git", "-C", root, "ls-files", "-z"],
+            stderr=subprocess.STDOUT,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+        raise RuntimeError(
+            f"Failed to enumerate tracked files via git in {root}: {exc}"
+        ) from exc
 
-        # Prune excluded dirs at the root.
-        if rel_dir == "":
-            dirnames[:] = [d for d in dirnames if d not in excluded_dirs]
-        # Always prune standard noise.
-        dirnames[:] = [d for d in dirnames if d not in {".git", "node_modules", ".next"}]
-
-        for name in filenames:
-            full_path = os.path.join(dirpath, name)
-            rel_path = os.path.relpath(full_path, root).replace(os.sep, "/")
-            files.append(rel_path)
-    return files
+    parts = [p for p in out.split(b"\x00") if p]
+    return [os.fsdecode(p) for p in parts]
 
 
 def read_text(root: str, rel_path: str) -> str:
     full_path = os.path.join(root, rel_path)
-    with open(full_path, "r", encoding="utf-8") as f:
+    with open(full_path, "r", encoding="utf-8", errors="replace") as f:
         return f.read()
 
 
@@ -63,7 +59,21 @@ def main() -> int:
     submodules = set(read_submodule_paths(root))
     excluded_dirs = {".idx"} | submodules
 
-    repo_files = iter_repo_files(root, excluded_dirs)
+    exempt_reference_files = {
+        "scripts/verify_bos_production_boundary.py",
+        "scripts/verify_pr_bos_classification.py",
+    }
+
+    excluded_paths = {p.rstrip("/") for p in excluded_dirs if p.rstrip("/")}
+    try:
+        repo_files = [
+            p
+            for p in git_ls_files(root)
+            if not any(is_in_dir(p, ex) for ex in excluded_paths)
+        ]
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
 
     errors: list[str] = []
 
@@ -76,30 +86,25 @@ def main() -> int:
             )
 
     # 2) Generated BOS audit outputs must never be committed.
-    generated_dir = os.path.join(root, "conxian-business", ".generated")
-    if os.path.isdir(generated_dir):
-        generated_files: list[str] = []
-        for dirpath, _, filenames in os.walk(generated_dir):
-            for name in filenames:
-                full_path = os.path.join(dirpath, name)
-                rel_path = os.path.relpath(full_path, root).replace(os.sep, "/")
-                generated_files.append(rel_path)
-        if generated_files:
-            errors.append(
-                "Committed generated artifacts detected under conxian-business/.generated/: "
-                + ", ".join(sorted(generated_files))
-            )
+    generated_files = [p for p in repo_files if is_in_dir(p, "conxian-business/.generated")]
+    if generated_files:
+        errors.append(
+            "Committed generated artifacts detected under conxian-business/.generated/: "
+            + ", ".join(sorted(generated_files))
+        )
 
     # 3) CI/runtime code must not depend on stub artifacts or local-only outputs.
     forbidden_substrings = [".stub.json", "conxian-business/.generated/"]
     code_exts = {".py", ".ts", ".js", ".mjs", ".cjs", ".sh", ".yml", ".yaml"}
     for rel_path in repo_files:
+        if not os.path.isfile(os.path.join(root, rel_path)):
+            continue
         _, ext = os.path.splitext(rel_path)
         if ext not in code_exts:
             continue
         if is_in_dir(rel_path, "docs") or is_in_dir(rel_path, "openspec"):
             continue
-        if rel_path.startswith("scripts/verify_"):
+        if rel_path in exempt_reference_files:
             continue
 
         text = read_text(root, rel_path)
@@ -114,6 +119,9 @@ def main() -> int:
     testnet_principal_literal = re.compile(r"['\"](?:ST|SN)[0-9A-Z]{20,}['\"]")
     for rel_path in repo_files:
         if not re.fullmatch(r"scripts/[^/]+\.ts", rel_path):
+            continue
+
+        if not os.path.isfile(os.path.join(root, rel_path)):
             continue
 
         text = read_text(root, rel_path)
