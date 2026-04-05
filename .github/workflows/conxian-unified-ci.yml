@@ -120,6 +120,9 @@ jobs:
         cd conxian-nexus
         cargo test
 
+        cd ../lib-conclave-sdk
+        cargo test
+
   lib-conxian-core-suite:
     name: Core Library Suite (lib-conxian-core)
     runs-on: ubuntu-latest

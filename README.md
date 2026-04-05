@@ -27,6 +27,7 @@ This repository pins and coordinates the flagship Conxian repositories, includin
 - [`conxian-gateway/`](./conxian-gateway): Conxian Gateway (Rust)
 - [`conxian-nexus/`](./conxian-nexus): Conxian Nexus (Rust)
 - [`lib-conxian-core/`](./lib-conxian-core): Shared core libraries centered around the Gateway
+- [`lib-conclave-sdk/`](./lib-conclave-sdk): Cross-platform enclave + hardware attestation SDK
 - [`conxian-ui/`](./conxian-ui): Conxian UI (web)
 - [`conxius-wallet/`](./conxius-wallet): Conxius Wallet (mobile)
 - [`conxius-platform/`](./conxius-platform): Stack orchestration and local development

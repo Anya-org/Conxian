@@ -12,6 +12,7 @@
 * [Release notes and changelog format](docs/RELEASE_NOTES_AND_CHANGELOG.md)
 * [Branch and promotion standard (dev/staged/main)](docs/BRANCH_AND_PROMOTION_STANDARD.md)
 * [Release hygiene — conxian-nexus](docs/RELEASE_HYGIENE_CONXIAN_NEXUS.md)
+* [Mainnet readiness checklist — lib-conclave-sdk](docs/MAINNET_READINESS_LIB_CONCLAVE_SDK.md)
 * [CSF mainnet readiness gate](docs/CSF_MAINNET_READINESS_GATE.md)
 * [OpenSpec](openspec/README.md)
 
