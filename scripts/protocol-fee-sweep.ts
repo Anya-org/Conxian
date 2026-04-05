@@ -6,9 +6,11 @@
 //
 // Usage (execute):
 //   STX_PRIVATE_KEY=... bun scripts/protocol-fee-sweep.ts --network mainnet --fee-vault SP... --target SP...token-wxbtc-v2 --execute
+//
+// Config: if a `.env` file exists in the current working directory, it is loaded.
 
 import { existsSync, readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   AnchorMode,
@@ -82,14 +84,8 @@ function parseUInt(argName: string, value: string): bigint {
 }
 
 function loadDotEnvIfPresent() {
-  const moduleDir = dirname(modulePath);
-  const searchDirs = [resolve(moduleDir, '..'), moduleDir, process.cwd()];
-
-  const envPath = searchDirs
-    .map((dir) => resolve(dir, '.env'))
-    .find((candidate) => existsSync(candidate));
-
-  if (!envPath) return;
+  const envPath = resolve(process.cwd(), '.env');
+  if (!existsSync(envPath)) return;
 
   const fileText = readFileSync(envPath, 'utf8');
   for (const rawLine of fileText.split(/\r?\n/u)) {
@@ -152,6 +148,9 @@ function usageAndExit(message?: string, exitCode: number = 1): never {
       '  --max-dx <uint>             Cap per-token swap size (default: unlimited)',
       '  --slippage-bps <uint>       Slippage guard in basis points (default: 200)',
       '  --execute                   Broadcast swaps (requires STX_PRIVATE_KEY)',
+      '',
+      'Notes:',
+      '  If present, `.env` is loaded from the current working directory (process.cwd()).',
       '',
       'Examples:',
       '  bun scripts/protocol-fee-sweep.ts --network mainnet --fee-vault SP... --target SP...token-wxbtc-v2',
