@@ -50,12 +50,14 @@ The evidence pack MUST include:
 
 - Repository name
 - Promotion PR link
-- Base (`main`) SHA (tip at promotion time)
-- Merge-base (`main`..`staged`) SHA
+- Pre-merge tip-of-`main` SHA (e.g. `git rev-parse origin/main`)
+- Merge-base of `main` and `staged` SHA (e.g. `git merge-base origin/main origin/staged`)
 - `staged` head commit SHA
 - Change owner (single accountable human)
 - Required approvers (CODEOWNERS) who signed off
 - Business unit(s) impacted
+
+Together, these SHAs identify the exact change window being promoted (from the merge-base to the `staged` head) and the pre-merge state of `main`.
 
 #### 2) Mainnet-only production scope
 
@@ -129,8 +131,8 @@ Copy/paste and fill out for any `staged` -> `main` promotion PR.
 
 - Repo: `<org>/<repo>`
 - Promotion PR: <link>
-- Base (`main`) SHA (tip at promotion time): `<sha>`
-- Merge-base (`main`..`staged`) SHA: `<sha>`
+- Pre-merge tip-of-`main` SHA (e.g. `git rev-parse origin/main`): `<sha>`
+- Merge-base of `main` and `staged` SHA (e.g. `git merge-base origin/main origin/staged`): `<sha>`
 - Head (`staged`) SHA: `<sha>`
 - Accountable owner: `<name>` (`<GitHub handle>`, optional: `<public Linear profile URL if available>`)
 - Approvers (CODEOWNERS): `<name/handle>`, `<name/handle>`
