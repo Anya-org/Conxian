@@ -56,6 +56,10 @@ Any `staged` -> `main` promotion MUST include a Mainnet Acceptance Evidence Pack
 - **AND** its source branch does not match `hotfix/*`
 - **THEN** the promotion MUST be rejected
 
+### Requirement: Mainnet acceptance evidence for `staged` -> `main`
+
+Any `staged` -> `main` promotion MUST include a Mainnet Acceptance Evidence Pack that satisfies all requirements defined in the canonical spec at [openspec/specs/mainnet-acceptance-evidence-pack/spec.md](../mainnet-acceptance-evidence-pack/spec.md).
+
 ### Requirement: Ownership and business-unit boundaries
 
 The workspace MUST keep business-unit boundaries explicit and enforceable.

@@ -16,7 +16,7 @@ To ensure the integrity of the Conxian Production Environment, all repositories 
 1. **Development & Unit Testing**: All work starts on feature branches and is merged into `dev` after passing standard CI checks and unit tests.
 2. **Testnet Validation**: Functional validation is performed on the `dev` branch against testnet (Stacks Testnet, Bitcoin Testnet/Signet).
 3. **Staging (Promotion Candidate)**: Once testnet validation is complete, code is promoted from `dev` to `staged`.
-4. **Mainnet Acceptance Evidence**: Promotion from `staged` to `main` requires a strict "Mainnet Acceptance Evidence Pack" that satisfies all controls defined in the canonical spec: `openspec/specs/mainnet-acceptance-evidence-pack/spec.md`.
+4. **Mainnet Acceptance Evidence**: Promotion from `staged` to `main` requires a strict "Mainnet Acceptance Evidence Pack" that satisfies all controls defined in the canonical spec: [`openspec/specs/mainnet-acceptance-evidence-pack/spec.md`](../openspec/specs/mainnet-acceptance-evidence-pack/spec.md).
 
    The pack typically demonstrates:
    - mainnet-only production scope

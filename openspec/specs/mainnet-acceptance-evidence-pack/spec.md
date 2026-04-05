@@ -50,7 +50,8 @@ The evidence pack MUST include:
 
 - Repository name
 - Promotion PR link
-- `main` base commit SHA (merge-base)
+- Base (`main`) SHA (tip at promotion time)
+- Merge-base (`main`..`staged`) SHA
 - `staged` head commit SHA
 - Change owner (single accountable human)
 - Required approvers (CODEOWNERS) who signed off
@@ -128,9 +129,10 @@ Copy/paste and fill out for any `staged` -> `main` promotion PR.
 
 - Repo: `<org>/<repo>`
 - Promotion PR: <link>
-- Base (`main`) SHA: `<sha>`
+- Base (`main`) SHA (tip at promotion time): `<sha>`
+- Merge-base (`main`..`staged`) SHA: `<sha>`
 - Head (`staged`) SHA: `<sha>`
-- Accountable owner: `<name>` (<GitHub handle>, <Linear profile URL>)
+- Accountable owner: `<name>` (`<GitHub handle>`, optional: `<public Linear profile URL if available>`)
 - Approvers (CODEOWNERS): `<name/handle>`, `<name/handle>`
 - Business unit(s): `<bu>`
 
