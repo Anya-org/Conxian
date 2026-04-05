@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+"""Verify BOS production boundaries by scanning tracked files for forbidden paths."""
+
 from __future__ import annotations
 
 import os
