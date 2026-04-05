@@ -14,6 +14,13 @@ Provide a concise but comprehensive summary of the changes in this Pull Request.
 - [ ] 🔒 Security / Compliance Enhancement
 - [ ] 🧹 Maintenance / Chore
 
+### BOS change classification
+*Select exactly one:*
+- [ ] docs-only
+- [ ] stub-isolation
+- [ ] dev-only implementation
+- [ ] production implementation
+
 ### Checklist
 - [ ] I have performed a self-review of my own work.
 - [ ] I targeted the correct base branch (`dev`, `staged`, or `main`) per `docs/BRANCH_AND_PROMOTION_STANDARD.md`.

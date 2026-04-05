@@ -59,6 +59,13 @@ jobs:
       run: |
         python3 scripts/verify_submodule_integrity.py
         git submodule status --recursive
+    - name: Verify BOS production boundary
+      run: |
+        python3 scripts/verify_bos_production_boundary.py
+    - name: Enforce BOS PR classification
+      if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
+      run: |
+        python3 scripts/verify_pr_bos_classification.py
 
   gateway-suite:
     name: Gateway Suite

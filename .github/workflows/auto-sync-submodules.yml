@@ -47,6 +47,12 @@ jobs:
           body: |
             Automated submodule update to the latest configured branches.
 
+            ### BOS change classification
+            - [ ] docs-only
+            - [ ] stub-isolation
+            - [ ] dev-only implementation
+            - [x] production implementation
+
             This workflow intentionally opens a PR rather than pushing directly to protected branches.
           base: dev
           branch: bot/auto-sync-submodules
