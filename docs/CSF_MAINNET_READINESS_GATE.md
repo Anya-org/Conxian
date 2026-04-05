@@ -7,6 +7,10 @@ Canonical trackers:
 - Linear: https://linear.app/conxian-labs/issue/CON-129/csf-mainnet-readiness-gate
 - GitHub (synced thread): https://github.com/Conxian/conxius-platform/issues/101
 
+Related operating order + cross-domain proof gates:
+
+- `docs/CSF_FIRST_OPERATING_SEQUENCE_AND_PROOF_GATES.md` (CON-426)
+
 ## Current gate status (snapshot)
 
 **As of:** 2026-04-04

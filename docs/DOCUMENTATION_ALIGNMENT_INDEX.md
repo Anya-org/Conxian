@@ -129,6 +129,7 @@ See `docs/BOS_BUSINESS_BUILDOUT.md` for repo business purpose, business-unit pla
 | `CONTRIBUTING.md` | Canonical | Public-safe | Contribution expectations and workflow. |
 | `SECURITY.md` | Canonical | Public-safe | Security policy and reporting. |
 | `.github/PULL_REQUEST_TEMPLATE.md` | Supporting | Public-safe | PR checklist and norms. |
+| `docs/CSF_FIRST_OPERATING_SEQUENCE_AND_PROOF_GATES.md` | Canonical | Public-safe | Locks the CSF → economy → gateway operating order and the minimum proof gates that keep launch, economy design, and go-to-market claims aligned. |
 | `docs/bounties/MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md` | Canonical | Internal-only | How maintainer payouts are enabled and validated. |
 | `admin/SECRETS.md` | Canonical | Internal-only | Secret registry + pointers to Linear docs (ZSE-compliant). |
 
