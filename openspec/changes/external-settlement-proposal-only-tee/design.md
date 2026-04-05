@@ -120,7 +120,7 @@ Each rail MUST define a canonical identifier set used to populate `settlement_id
 
 `envelope_identifiers` (including `tx_index`) MUST NOT affect `normalized_settlement_hash`.
 
-`settlement_identifiers` MUST be derived/normalized inside the TEE from `raw_payload_bytes`; any host-supplied hints MUST be treated as non-authoritative, MUST be checked inside the TEE (no successful attestation on mismatch), and MUST NOT be forwarded into the attested output (see [spec.md §2.1.1](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical) for normative semantics).
+`settlement_identifiers` MUST be derived/normalized inside the TEE from `raw_payload_bytes`; any host-supplied hints MUST be treated as non-authoritative, MUST be checked inside the TEE (no successful attestation on mismatch), and MUST NOT be forwarded into the attested output (see [spec.md §2.1.1 (`settlement_identifiers` canonical set)](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical) for normative semantics).
 
 Replay protection and deterministic idempotency are enforced via `trigger_id` derived from `{ rail, normalized_settlement_hash }`.
 
@@ -132,7 +132,7 @@ Trigger granularity:
 
 Minimum required identifier set (by rail):
 
-For normative `tx_index` requirements (ordering source, no-reorder constraint, and inclusion rules), see [spec.md (settlement identifier canonicalization)](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical).
+For normative `tx_index` requirements (ordering source, no-reorder constraint, and inclusion rules), see [spec.md §2.1.1 (`settlement_identifiers` canonical set)](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical).
 
 The per-rail `tx_index` parentheticals below are summaries; the spec is authoritative.
 
@@ -151,7 +151,7 @@ The per-rail `tx_index` parentheticals below are summaries; the spec is authorit
 
 Canonical formatting requirements:
 
-Canonicalization/validation and equality semantics for `settlement_identifiers` are normative in [spec.md (settlement identifier canonicalization)](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical); this design document intentionally does not restate them to avoid drift.
+See [spec.md §2.1.1 (`settlement_identifiers` canonical set)](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical) for the required `settlement_identifiers` structure (including `settlement_identifiers.envelope_identifiers`), canonicalization/validation rules, and equality semantics; this design document intentionally does not restate them to avoid drift.
 
 Proposal emission MUST be idempotent on `trigger_id`: duplicate triggers MUST NOT create additional proposals or timelocks.
 
