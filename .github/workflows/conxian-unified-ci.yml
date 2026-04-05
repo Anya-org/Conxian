@@ -2,9 +2,9 @@ name: Conxian Unified CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, staged, dev ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, staged, dev ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
