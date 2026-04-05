@@ -39,7 +39,7 @@ The workspace MUST enforce an ordered promotion path.
 - **THEN** it is promoted by merging `staged` into `main`
 - **AND** the merge is blocked unless required CI checks and required approvals are satisfied
 
-See **Requirement: Mainnet acceptance evidence for `staged` -> `main`** below.
+See [Requirement: Mainnet acceptance evidence for `staged` -> `main`](#mainnet-acceptance-evidence-staged-to-main) below.
 
 #### Scenario: Attempting to promote directly into main from a non-staged branch
 
@@ -53,6 +53,8 @@ See **Requirement: Mainnet acceptance evidence for `staged` -> `main`** below.
 - **AND** its source branch is not `dev`
 - **AND** its source branch does not match `hotfix/*`
 - **THEN** the promotion MUST be rejected
+
+<a id="mainnet-acceptance-evidence-staged-to-main"></a>
 
 ### Requirement: Mainnet acceptance evidence for `staged` -> `main`
 

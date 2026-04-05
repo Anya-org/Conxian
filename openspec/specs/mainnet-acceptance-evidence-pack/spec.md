@@ -59,6 +59,10 @@ The evidence pack MUST include:
 
 Together, these SHAs identify the exact change window being promoted (from the merge-base to the `staged` head) and the pre-merge state of `main`.
 
+Capture these SHAs **before merging** the promotion PR (while the PR is open): first run `git fetch origin main staged` to ensure the `origin/*` refs are current, then record each SHA explicitly (for example with `git rev-parse origin/main`, `git rev-parse origin/staged`, and `git merge-base origin/main origin/staged`) and paste them into the evidence pack template.
+
+If someone later re-runs these commands after the merge has landed, `origin/main` may no longer represent the pre-merge tip; reviewers should rely on the recorded pre-merge tip-of-`main` SHA to reconstruct the exact window.
+
 #### 2) Mainnet-only production scope
 
 The evidence pack MUST clearly state what is being promoted, including:
@@ -134,8 +138,9 @@ Copy/paste and fill out for any `staged` -> `main` promotion PR.
 - Pre-merge tip-of-`main` SHA (e.g. `git rev-parse origin/main`): `<sha>`
 - Merge-base of `main` and `staged` SHA (e.g. `git merge-base origin/main origin/staged`): `<sha>`
 - Head (`staged`) SHA: `<sha>`
-- Accountable owner: `<name>` (`<GitHub handle>`, optional: `<public Linear profile URL if available>`)
-- Approvers (CODEOWNERS): `<name/handle>`, `<name/handle>`
+- SHA capture timing: `before merge` (after `git fetch origin main staged`)
+- Accountable owner: `<name>` (GitHub: `@<handle>`; optional: `<public Linear profile URL if available>`)
+- Approvers (CODEOWNERS): `@<handle>`, `@<handle>` (optional: names)
 - Business unit(s): `<bu>`
 
 #### Mainnet-only production scope
