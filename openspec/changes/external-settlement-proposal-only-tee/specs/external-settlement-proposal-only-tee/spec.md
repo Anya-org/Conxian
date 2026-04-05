@@ -101,7 +101,9 @@ Prohibited fields:
 - `raw_payload_bytes`
 - Any full parsed external-settlement payload structure (XML/JSON) beyond the canonical `settlement_identifiers`.
 
-#### 2.1.1 `settlement_identifiers` (per-rail canonical set) <a id="settlement-identifiers-canonical"></a>
+<h4 id="settlement-identifiers-canonical">2.1.1 <code>settlement_identifiers</code> (per-rail canonical set)</h4>
+
+<a id="211-settlement_identifiers-per-rail-canonical-set"></a>
 
 `settlement_identifiers` MUST be a JSON object with two namespaces:
 
@@ -161,19 +163,29 @@ Example: if a message contains three settlement-transaction entries `[A, B, C]` 
 
 Canonical formatting requirements:
 
-- All string values in `settlement_identifiers.transaction_identifiers` MUST be canonicalized and validated as follows:
-  1. If an upstream source provides bytes, implementations MUST decode them as UTF-8 and MUST treat any decoding error as a canonicalization failure for the corresponding settlement transaction (i.e., MUST NOT substitute `U+FFFD`).
+- `settlement_identifiers.transaction_identifiers` MUST be present and MUST be a JSON object whose values are strings. If the `settlement_identifiers.transaction_identifiers` member is absent, is not an object, or contains any non-string value, this MUST be treated as a canonicalization failure for the corresponding settlement transaction.
+- Implementations MUST canonicalize and validate each string value in `settlement_identifiers.transaction_identifiers` as follows:
+  1. When constructing `settlement_identifiers` from upstream bytes, implementations MUST decode those bytes as UTF-8 and MUST treat any decoding error as a canonicalization failure for the corresponding settlement transaction (i.e., MUST NOT substitute `U+FFFD`).
   2. Implementations MUST reject any value that is not a sequence of Unicode scalar values (reject surrogate code points `U+D800..U+DFFF`).
   3. The value MUST be normalized to Unicode NFC; all subsequent validation, equality, and hashing operates on the NFC-normalized value.
-  4. Implementations MUST reject the value if the NFC-normalized value is empty, contains any Unicode control or format character (characters with `General_Category` Cc or Cf in the Unicode Character Database), contains the Unicode replacement character `U+FFFD`, or begins or ends with any Unicode whitespace character (characters with `White_Space=Y` in the Unicode Character Database).
+  4. Implementations MUST reject the value if any of the following holds:
+     - The NFC-normalized value is empty.
+     - The UTF-8 encoding of the NFC-normalized value exceeds 4096 bytes.
+     - The NFC-normalized value contains any Unicode control or format character (characters with `General_Category` Cc or Cf in the Unicode Character Database).
+     - The NFC-normalized value contains the Unicode replacement character `U+FFFD`.
+     - The NFC-normalized value begins or ends with any Unicode whitespace character (characters with `White_Space=Y` in the Unicode Character Database).
+
+- The normalization and validation rules in items 1–4 above apply to all values in `settlement_identifiers.transaction_identifiers` (including any optional reconciliation keys) and do not apply to fields outside `settlement_identifiers.transaction_identifiers`.
 - `transaction_identifiers.transaction_reference` MUST satisfy the canonical string rules above and MUST preserve case.
+- `settlement_identifiers.envelope_identifiers` MUST be present and MUST be a JSON object containing the required `envelope_identifiers.tx_index`.
 - `envelope_identifiers.tx_index` MUST be a JSON number that is an integer in the range `[0, 9007199254740991]` (inclusive, i.e. `2^53-1`).
+  - If `settlement_identifiers.envelope_identifiers` is absent or is not an object, or `envelope_identifiers.tx_index` is absent or invalid, the settlement transaction MUST be treated as invalid for external-settlement trigger purposes.
 
-Note: This section intentionally tightens earlier guidance. These canonicalization rules are normative for the current `external-settlement-trigger:v1` definition. Values that violate these canonical string rules MUST be treated as invalid.
+Note: This section intentionally tightens earlier guidance. These canonicalization and structural requirements are normative for the current `external-settlement-trigger:v1` definition.
 
-If any value in `settlement_identifiers.transaction_identifiers` (including any field-specific rules for optional reconciliation keys) fails canonicalization or validation, the corresponding settlement transaction MUST be treated as invalid for external-settlement trigger purposes and MUST NOT produce a `normalized_settlement_hash` or `SovereignProposal`.
+Any settlement transaction that fails any of the requirements above (including the type/structure requirements for `settlement_identifiers.transaction_identifiers` or canonicalization/validation of any of its values, including any optional reconciliation keys) MUST be treated as invalid for external-settlement trigger purposes and MUST NOT produce a `normalized_settlement_hash` or `SovereignProposal`.
 
-`envelope_identifiers.tx_index` MUST satisfy the field requirements above. If `envelope_identifiers.tx_index` is missing or fails these requirements, the corresponding settlement transaction MUST be treated as invalid for external-settlement trigger purposes and MUST NOT produce a `normalized_settlement_hash` or `SovereignProposal`. Any other `settlement_identifiers.envelope_identifiers` keys are optional metadata; malformed, unrecognized, or otherwise invalid values for those optional envelope identifiers MUST be ignored/omitted and MUST NOT cause the settlement transaction to be treated as invalid for external-settlement trigger purposes.
+Any other `settlement_identifiers.envelope_identifiers` keys are optional metadata; if the value for an optional envelope identifier fails any of its field-specific type or validation requirements, implementations MUST treat that value as if the corresponding field were absent and MUST NOT treat the settlement transaction as invalid solely because of that field.
 
 For `external-settlement-trigger:v1`, implementations MUST use Unicode 15.1.0 (Unicode Character Database + normalization data) for evaluating `General_Category`, `White_Space`, and NFC normalization.
 
@@ -185,7 +197,7 @@ Implementations MAY accept non-NFC-normalized input from upstream rails, but MUS
 
 Rails MAY include additional canonical identifiers (e.g., for reconciliation) in `settlement_identifiers.transaction_identifiers`. These optional identifier values are subject to the canonical string rules above. If a rail includes any of the following identifier keys, their values MUST be emitted in the canonical form specified:
 
-- `settlement_currency`: ISO 4217 code; the value MUST match `^[A-Za-z]{3}$`. The emitted canonical form MUST be the ASCII uppercase (`A`–`Z`) of those three letters.
+- `settlement_currency`: ISO 4217 code; the value MUST match `^[A-Za-z]{3}$`. The emitted canonical form MUST be the ASCII uppercase (`A`–`Z`) of those three letters and MUST match `^[A-Z]{3}$`.
 - `settlement_amount`: normalized non-negative decimal string (no sign, no exponent; canonical regex: `^(0|[1-9][0-9]*)(\.[0-9]*[1-9])?$`). The emitted value MUST match this regex. Fractional parts MUST NOT end in `0`, and integer values MUST NOT include a decimal point (e.g., `0`, `1`, `0.5`, `123.45` are valid; `01`, `1.0`, `0.50` are invalid).
 - `settlement_date`: ISO 8601 full-date `YYYY-MM-DD`. The emitted value MUST match `^[0-9]{4}-[0-9]{2}-[0-9]{2}$`, MUST represent a valid proleptic Gregorian calendar date with a year in the range `0001`–`9999`, and MUST NOT include any time-of-day or timezone offset component.
 
