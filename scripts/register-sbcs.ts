@@ -8,15 +8,121 @@ import {
   broadcastTransaction,
   AnchorMode,
   PostConditionMode,
-  uintCV,
   stringAsciiCV,
 } from '@stacks/transactions';
 import { networkFromName } from '@stacks/network';
 
-const network = networkFromName('testnet');
+type NetworkName = 'mainnet' | 'testnet';
+
+type PrincipalParts = {
+  address: string;
+  contractName: string;
+};
+
+const STACKS_NETWORK_PREFIXES: Record<NetworkName, readonly string[]> = {
+  mainnet: ['SP', 'SM'],
+  testnet: ['ST', 'SN'],
+};
+
 const modulePath = fileURLToPath(import.meta.url);
 
 const sbcs = ["Conxian-Core", "Nexus-Labs", "Fiscal-Auth", "Sovereign-Ops"];
+
+function parsePrincipal(principal: string): PrincipalParts {
+  const trimmed = principal.trim();
+  const dot = trimmed.indexOf('.');
+  if (dot === -1 || dot === 0 || dot === trimmed.length - 1) {
+    throw new Error(`Invalid principal: ${principal}`);
+  }
+
+  const address = trimmed.slice(0, dot);
+  const contractName = trimmed.slice(dot + 1);
+  return { address, contractName };
+}
+
+function usageAndExit(message?: string, exitCode: number = 1): never {
+  if (message) {
+    console.error(message);
+    console.error('');
+  }
+
+  console.error(
+    [
+      'Usage:',
+      '  STX_PRIVATE_KEY=... bun scripts/register-sbcs.ts --network mainnet|testnet --contract <contract-principal>',
+      '',
+      'Options:',
+      '  --network <name>      mainnet or testnet',
+      '  --contract <principal>  fiscal-intelligence contract principal (address.contract-name)',
+      '  --help               Show this message',
+      '',
+      'Examples:',
+      '  STX_PRIVATE_KEY=... bun scripts/register-sbcs.ts --network testnet --contract ST...fiscal-intelligence',
+      '  STX_PRIVATE_KEY=... bun scripts/register-sbcs.ts --network mainnet --contract SP...fiscal-intelligence',
+    ].join('\n')
+  );
+
+  process.exit(exitCode);
+}
+
+function assertStacksNetworkPrefix(networkName: NetworkName, flagName: string, principal: string) {
+  const normalized = principal.trim();
+  const prefixes: readonly string[] = STACKS_NETWORK_PREFIXES[networkName];
+  if (!prefixes.some((prefix) => normalized.startsWith(prefix))) {
+    usageAndExit(`On ${networkName}, ${flagName} must start with ${prefixes.join(' or ')}`);
+  }
+}
+
+function parseArgs(argv: string[]): { networkName: NetworkName; contract: PrincipalParts } {
+  let networkName: NetworkName | undefined;
+  let contract: string | undefined;
+
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (arg === '--help' || arg === '-h') {
+      usageAndExit(undefined, 0);
+    }
+
+    if (arg === '--network') {
+      const raw = argv[i + 1];
+      if (!raw) usageAndExit('Missing value for --network');
+      const trimmed = raw.trim();
+      if (trimmed !== 'mainnet' && trimmed !== 'testnet') usageAndExit(`Invalid --network: ${raw}`);
+      networkName = trimmed;
+      i += 1;
+      continue;
+    }
+
+    if (arg === '--contract') {
+      const raw = argv[i + 1];
+      if (!raw) usageAndExit('Missing value for --contract');
+      contract = raw.trim();
+      i += 1;
+      continue;
+    }
+
+    usageAndExit(`Unexpected argument: ${arg}`);
+  }
+
+  if (!networkName) usageAndExit('Missing required --network');
+  if (!contract) usageAndExit('Missing required --contract');
+
+  let contractParts: PrincipalParts;
+  try {
+    contractParts = parsePrincipal(contract);
+  } catch {
+    usageAndExit(`Invalid --contract principal: ${contract}`);
+  }
+
+  assertStacksNetworkPrefix(networkName, '--contract', contractParts.address);
+  if (contractParts.contractName !== 'fiscal-intelligence') {
+    usageAndExit(
+      `--contract must point to the fiscal-intelligence contract (got: ${contractParts.contractName})`
+    );
+  }
+
+  return { networkName, contract: contractParts };
+}
 
 function loadDotEnvIfPresent() {
   const moduleDir = dirname(modulePath);
@@ -71,16 +177,21 @@ function requirePrivateKey(): string {
   return privateKey;
 }
 
-async function registerSBCs(privateKey: string) {
+async function registerSBCs(params: {
+  privateKey: string;
+  networkName: NetworkName;
+  contract: PrincipalParts;
+}) {
+  const network = networkFromName(params.networkName);
   const failures: Array<{ sbc: string; error: string; reason: string }> = [];
 
   for (const sbc of sbcs) {
     const txOptions = {
-      contractAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-      contractName: 'fiscal-intelligence',
+      contractAddress: params.contract.address,
+      contractName: params.contract.contractName,
       functionName: 'codify-sbc',
       functionArgs: [stringAsciiCV(sbc)],
-      senderKey: privateKey,
+      senderKey: params.privateKey,
       validateWithPostConditions: true,
       network,
       anchorMode: AnchorMode.Any,
@@ -106,9 +217,10 @@ async function registerSBCs(privateKey: string) {
 }
 
 async function main() {
+  const { networkName, contract } = parseArgs(process.argv.slice(2));
   loadDotEnvIfPresent();
   const privateKey = requirePrivateKey();
-  await registerSBCs(privateKey);
+  await registerSBCs({ privateKey, networkName, contract });
 }
 
 const isMain = process.argv.slice(1).some((arg) => resolve(arg) === modulePath);
