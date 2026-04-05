@@ -12,6 +12,10 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 ### Added
 - Documented the BOS business-end operating model (`docs/BOS_BUSINESS_BUILDOUT.md`), including ZSE public/internal split guidance and governance/README alignment.
 
+### Changed
+- Clarified repository purpose/status and added an org-level repository catalog.
+- Added always-on metadata CI checks (ZSE manifest coverage + markdown link validation).
+
 ## [1.8.2] - 2026-03-31
 ### Security
 - Remediated Zero Secret Egress (ZSE) violation by removing the `archive/` directory from the active Git index.

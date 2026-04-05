@@ -1,5 +1,9 @@
 # Conxian: Sovereign Business Operations System (BOS v1.8.2)
 
+[![Repo Metadata CI](https://github.com/Conxian/conxian-business/actions/workflows/repo-metadata-ci.yml/badge.svg)](https://github.com/Conxian/conxian-business/actions/workflows/repo-metadata-ci.yml)
+[![Conxian Unified CI](https://github.com/Conxian/conxian-business/actions/workflows/conxian-unified-ci.yml/badge.svg)](https://github.com/Conxian/conxian-business/actions/workflows/conxian-unified-ci.yml)
+[![Deploy Documentation](https://github.com/Conxian/conxian-business/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/Conxian/conxian-business/actions/workflows/deploy-docs.yml)
+
 This repository is the programmatic **State Machine** for Conxian operations. We have evolved from a system that runs on infrastructure to a system that **is** infrastructure—living directly on Bitcoin.
 
 Supporting — Governance + OpenSpec + submodule wiring for the Conxian ecosystem.
@@ -13,6 +17,12 @@ Define and version Conxian's Business Operations System (BOS) as an auditable, p
 ## Status
 
 Active. This is the public source of truth for BOS-level specifications and how the broader Conxian stack fits together.
+
+Releases are tracked in `CHANGELOG.md` and published as SemVer tags (`vX.Y.Z`). See `RELEASING.md`.
+
+## Ownership
+
+Ownership and review requirements are defined in [`CODEOWNERS`](./CODEOWNERS).
 
 ## Audience
 
@@ -89,7 +99,12 @@ This repository is licensed under the GNU GPL v3.0 (see `LICENSE`).
 - [**Trust & Proof Messaging**](./docs/TRUST_AND_PROOF_MESSAGING.md): Public-facing trust surface guidance.
 - [**LICENSE**](./LICENSE): GNU GPL v3.0.
 - [**CHANGELOG.md**](./CHANGELOG.md): History of BOS changes.
+- [**RELEASING.md**](./RELEASING.md): Release process and changelog discipline.
 - [**CODEOWNERS**](./CODEOWNERS): Repository ownership and review guidance.
+
+## Repository catalog
+
+See [`docs/REPOSITORY_CATALOG.md`](./docs/REPOSITORY_CATALOG.md) for the org-level submodule catalog and pinning guidance.
 
 ## Repository hygiene
 
@@ -97,6 +112,5 @@ To maintain a clean and sovereign workspace, we adhere to strict hygiene standar
 - **`scripts/`**: Contains active utility scripts (e.g., `check_links.py`).
 - **`ARCHIVE_MIGRATION.md`**: ZSE-safe pointers to legacy material intentionally kept out of the Git index.
 - **`openspec/`**: Definitive technical specifications.
-
 ---
 **Sovereign Autonomous Business (SAB)**. © 2026 Conxian-Labs. Powered by Bitcoin.

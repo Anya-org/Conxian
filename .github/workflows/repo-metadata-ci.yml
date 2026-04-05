@@ -1,0 +1,43 @@
+name: Repo Metadata CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  metadata:
+    name: Metadata & Hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Setup Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: '3.11'
+
+      - name: Verify knowledge retention manifest coverage
+        run: python scripts/verify_knowledge_retention.py
+
+      - name: Validate markdown links
+        run: python scripts/check_links.py
+
+      - name: Assert README metadata sections exist
+        run: |
+          grep -q '^## Purpose$' README.md
+          grep -q '^## Status$' README.md
+          grep -q '^## Ownership$' README.md
+
+      - name: Assert changelog discipline
+        run: |
+          grep -q '^## \[Unreleased\]$' CHANGELOG.md
