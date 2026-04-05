@@ -3,11 +3,15 @@
 ## ADDED Requirements
 
 ### Requirement: Founder's Cut Fee Logic
-The protocol MUST implement a hardcoded 0.1% fee on all transactional events.
+The protocol MUST implement a hardcoded 0.1% Founder’s Cut **as a carve-out from captured protocol fees** (not an additive user fee).
+
+For the purposes of this requirement, **captured protocol fees** MUST mean the protocol-retained portion of each transaction’s fee after applying any third-party distributions (e.g. referral splits).
+
+The Founder’s Cut amount MUST equal `floor( captured_protocol_fees * 0.001 )`, computed in the transaction’s fee asset.
 #### Scenario: Fee Redirection
 - **Given** a successful swap or lending event
 - **When** processing the transaction
-- **Then** the protocol MUST deduct 0.1% and route it to the designated founder address.
+- **Then** the protocol MUST allocate a 0.1% Founder’s Cut from the protocol’s captured fee amount and route it to the designated founder vault.
 
 ### Requirement: ALEX AMM Integration
 The backend MUST utilize the ALEX Lab SDK for liquidity provisioning.

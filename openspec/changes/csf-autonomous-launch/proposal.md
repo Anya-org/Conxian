@@ -6,7 +6,7 @@ Transition the Conxian CSF backend into a community-owned, autonomous protocol v
 ## Goals
 1. **Autonomous Protocol**: Remove centralized admin control.
 2. **Fair Launch**: Execute IDO via ALEX Lab Launchpad.
-3. **Founder's Cut**: Implement a hardcoded 0.1% protocol fee for sustainability.
+3. **Founder's Cut**: Implement a hardcoded 0.1% Founder’s Cut as a carve-out from captured protocol fees.
 4. **Decentralized State**: Move to ExecutorDAO governance over 2 years.
 
 ## Proposed Changes

@@ -1,5 +1,7 @@
 # Tasks: CSF Autonomous Launch Execution
 
+Note: This task list describes the intended execution plan. For code-anchored gaps that still block enforceable fee capture and founder royalty routing in the pinned Conxian contracts, see `docs/FOUNDER_RIGHTS_ROYALTIES_AND_SABDAO_ECONOMICS.md`.
+
 ## 1. Governance & Specs
 - [x] 1.1 Finalize OpenSpec Change Proposal.
 - [x] 1.2 Validate specifications using `openspec validate`.

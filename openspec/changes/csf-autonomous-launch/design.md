@@ -6,9 +6,10 @@
 - **Phase 2 (24m)**: Full ExecutorDAO control with "Admin" address set to 0x0.
 
 ## 2. Revenue Architecture: The Founder's Cut
-- **Logic**: Every trade/mint/burn event triggers a 0.1% fee.
-- **Routing**: Fees are routed to a TEE-managed non-custodial address.
-- **Abstraction**: Users pay fees in sBTC; backend handles conversion to STX if needed.
+- **Rate**: 0.1% (10 bps).
+- **Semantics**: The Founder’s Cut is a **carve-out from captured protocol fees**, not an additive fee on users.
+- **Routing**: Founder’s Cut proceeds are routed to a **contract-level founder vault**, not a personal wallet.
+- **Asset**: Founder’s Cut is recorded **in-kind** (per fee asset), with optional conversion policy downstream.
 
 ## 3. Financial Connectivity: ALEX & Portal Integration
 - **Liquidity**: ALEX AMM SDK used for dynamic pool management.

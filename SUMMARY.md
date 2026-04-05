@@ -40,6 +40,7 @@
   * [Migration waves](docs/SAB_MIGRATION_WAVES.md)
 * [Trust & Proof Messaging (Public Surfaces)](docs/TRUST_AND_PROOF_MESSAGING.md)
 * [Autonomous Launch Specs](openspec/changes/csf-autonomous-launch/specs.md)
+* [Founder rights, royalties, and SAB/DAO economics (CON-424)](docs/FOUNDER_RIGHTS_ROYALTIES_AND_SABDAO_ECONOMICS.md)
 
 ## 📦 Architecture
 
