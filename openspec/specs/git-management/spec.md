@@ -54,7 +54,7 @@ See [Requirement: Mainnet acceptance evidence for `staged` -> `main`](#mainnet-a
 - **AND** its source branch does not match `hotfix/*`
 - **THEN** the promotion MUST be rejected
 
-<a id="mainnet-acceptance-evidence-staged-to-main"></a>
+<a id="mainnet-acceptance-evidence-staged-to-main" name="mainnet-acceptance-evidence-staged-to-main"> </a>
 
 ### Requirement: Mainnet acceptance evidence for `staged` -> `main`
 
