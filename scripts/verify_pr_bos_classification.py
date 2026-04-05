@@ -18,17 +18,18 @@ def main() -> int:
         print("GITHUB_EVENT_PATH not set; cannot validate PR classification")
         return 1
 
-    actor = (os.environ.get("GITHUB_ACTOR") or "").strip()
-    if actor == "dependabot[bot]":
-        print("Skipping BOS PR classification for dependabot")
-        return 0
-
     with open(event_path, "r", encoding="utf-8") as f:
         event = json.load(f)
 
     pr = event.get("pull_request")
     if not pr:
         print("No pull_request payload found; nothing to validate")
+        return 0
+
+    user = pr.get("user") or {}
+    pr_author = (user.get("login") or "").strip()
+    if pr_author == "dependabot[bot]":
+        print("Skipping BOS PR classification for dependabot")
         return 0
 
     body = pr.get("body") or ""
