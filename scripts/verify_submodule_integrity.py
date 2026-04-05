@@ -118,6 +118,7 @@ def _verify_submodule_pins(
     gitlinks: dict[str, str],
 ) -> list[str]:
     failures: list[str] = []
+    default_branches: dict[str, str] = {}
 
     for path, url in sorted(gitmodules.items()):
         sha = gitlinks.get(path)
@@ -129,11 +130,14 @@ def _verify_submodule_pins(
             failures.append(f"{path}: unsupported submodule url {url}")
             continue
 
-        repo_meta = _github_json(f"/repos/{repo}")
-        default_branch = repo_meta.get("default_branch")
+        default_branch = default_branches.get(repo)
         if not default_branch:
-            failures.append(f"{path}: unable to resolve default branch for {repo}")
-            continue
+            repo_meta = _github_json(f"/repos/{repo}")
+            default_branch = repo_meta.get("default_branch")
+            if not default_branch:
+                failures.append(f"{path}: unable to resolve default branch for {repo}")
+                continue
+            default_branches[repo] = default_branch
 
         branch_ref = urllib.parse.quote(default_branch, safe="")
         compare = _github_json(f"/repos/{repo}/compare/{sha}...{branch_ref}")

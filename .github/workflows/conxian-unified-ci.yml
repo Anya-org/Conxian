@@ -43,7 +43,7 @@ jobs:
     name: Repo Hygiene (ZSE & Submodules)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
         token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
@@ -77,7 +77,7 @@ jobs:
         github.event.pull_request.head.repo.full_name == github.repository
       )
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
         token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
@@ -109,7 +109,7 @@ jobs:
         )
       )
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
         token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
@@ -137,7 +137,7 @@ jobs:
         github.event.pull_request.head.repo.full_name == github.repository
       )
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
         token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
@@ -174,7 +174,7 @@ jobs:
         github.event.pull_request.head.repo.full_name == github.repository
       )
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
         token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
@@ -220,7 +220,7 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository &&
       contains(github.event.pull_request.labels.*.name, 'audit')
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
         token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
@@ -249,7 +249,7 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository &&
       contains(github.event.pull_request.labels.*.name, 'simulation')
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
         token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
