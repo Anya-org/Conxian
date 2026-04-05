@@ -63,11 +63,12 @@ user tx
   -> module fee is charged (swap/lending/etc)
   -> protocol fee balance accrues in a fee vault / treasury contract
   -> allocation policy applies:
-      - reserve / continuity first
-      - operating treasury
-      - contributor incentives
-      - Founder’s Cut carve-out -> founder vault
-      - optional buyback/burn sink (BME)
+      - Founder’s Cut carve-out -> founder vault (off-the-top from captured protocol fees)
+      - from the remaining captured protocol fees:
+        - reserve / continuity
+        - operating treasury
+        - contributor incentives
+        - optional buyback/burn sink (BME)
 ```
 
 ## Fastest route to real on-chain income (minimal viable operating path)
@@ -76,7 +77,7 @@ The fastest path is to make **one fee surface** (swaps) real end-to-end:
 
 1. **Make fee accrual enforceable**
    - Ensure swaps actually transfer the fee portion into a protocol-controlled vault (not just print events).
-   - Ensure the vault is a system wallet (contract principal), not a personal EOA.
+   - Ensure the vault is a system wallet implemented as a contract principal, not any standard principal (including personal or multisig wallets).
 2. **Use keeper-driven conversion rather than hardcoding swap paths**
    - Use the existing keeper runbook + script: `docs/PROTOCOL_FEE_SWEEP_RUNBOOK.md` and `scripts/protocol-fee-sweep.ts`.
 3. **Start with a single, conservative allocation policy**

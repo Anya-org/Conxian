@@ -6,7 +6,7 @@
 - **Phase 2 (24m)**: Full ExecutorDAO control with "Admin" address set to 0x0.
 
 ## 2. Revenue Architecture: The Founder's Cut
-- **Rate**: 0.1% (10 bps).
+- **Rate**: 0.1% (10 bps) of captured protocol fees (the protocol-retained portion after third-party splits; see `docs/FOUNDER_RIGHTS_ROYALTIES_AND_SABDAO_ECONOMICS.md`).
 - **Semantics**: The Founder’s Cut is a **carve-out from captured protocol fees**, not an additive fee on users.
 - **Routing**: Founder’s Cut proceeds are routed to a **contract-level founder vault**, not a personal wallet.
 - **Asset**: Founder’s Cut is recorded **in-kind** (per fee asset), with optional conversion policy downstream.
