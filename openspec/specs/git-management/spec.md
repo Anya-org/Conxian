@@ -39,6 +39,10 @@ The workspace MUST enforce an ordered promotion path.
 - **THEN** it is promoted by merging `staged` into `main`
 - **AND** the merge is blocked unless required CI checks and required approvals are satisfied
 
+### Requirement: Mainnet acceptance evidence for `staged` -> `main`
+
+Any `staged` -> `main` promotion MUST include a Mainnet Acceptance Evidence Pack that satisfies all requirements defined in the canonical spec at `openspec/specs/mainnet-acceptance-evidence-pack/spec.md`.
+
 #### Scenario: Attempting to promote directly into main from a non-staged branch
 
 - **WHEN** a pull request targets `main`

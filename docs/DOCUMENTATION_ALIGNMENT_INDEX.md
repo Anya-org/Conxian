@@ -53,6 +53,7 @@ OpenSpec is the best place to point issue descriptions when work is “spec-firs
 | Document | Role | Visibility | What it’s for |
 | --- | --- | --- | --- |
 | `openspec/specs/git-management/spec.md` | Canonical | Public-safe | Git hygiene, branching, and repo discipline expectations. |
+| `openspec/specs/mainnet-acceptance-evidence-pack/spec.md` | Canonical | Public-safe | Canonical evidence pack required for promoting `staged` into `main`. |
 | `openspec/specs/workspace-audit/spec.md` | Canonical | Public-safe | Workspace audit / cleanliness requirements. |
 | `openspec/specs/sab-datastore-mapping/spec.md` | Canonical | Public-safe | SAB datastore mapping requirements (persistence + mapping rules). |
 
