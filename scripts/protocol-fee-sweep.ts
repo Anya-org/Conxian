@@ -2,22 +2,19 @@
 // Plans (and optionally executes) protocol-fee sweeps by swapping SIP-010 balances via ALEX swap-helper.
 //
 // Usage (plan-only):
-//   bun scripts/protocol-fee-sweep.ts --network mainnet --fee-vault SP... --target SP...token-wxbtc-v2
+//   bun scripts/protocol-fee-sweep.ts --network mainnet --fee-vault SP... --target SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.token-wxbtc-v2
 //
 // Usage (execute):
-//   STX_PRIVATE_KEY=... bun scripts/protocol-fee-sweep.ts --network mainnet --fee-vault SP... --target SP...token-wxbtc-v2 --execute
-//
-// Config: if a `.env` file exists in the current working directory, it is loaded.
+//   STX_PRIVATE_KEY=... bun scripts/protocol-fee-sweep.ts --network mainnet --fee-vault SP... --target SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.token-wxbtc-v2 --execute
 
 import { existsSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   AnchorMode,
   ClarityType,
   type ClarityValue,
   contractPrincipalCV,
-  Pc,
   someCV,
   noneCV,
   uintCV,
@@ -49,7 +46,6 @@ type PrincipalParts = {
 
 type SweepPlanItem = {
   token: string;
-  assetName: string;
   dx: string;
   quotedDy: string;
   minDy: string;
@@ -64,6 +60,11 @@ type SkippedSweepItem = {
 const modulePath = fileURLToPath(import.meta.url);
 
 const DEFAULT_SWAP_HELPER = 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.swap-helper-v1-03';
+
+const STACKS_NETWORK_PREFIXES: Record<NetworkName, readonly string[]> = {
+  mainnet: ['SP', 'SM'],
+  testnet: ['ST', 'SN'],
+};
 
 function parsePrincipal(principal: string): PrincipalParts {
   const trimmed = principal.trim();
@@ -86,8 +87,14 @@ function parseUInt(argName: string, value: string): bigint {
 }
 
 function loadDotEnvIfPresent() {
-  const envPath = resolve(process.cwd(), '.env');
-  if (!existsSync(envPath)) return;
+  const moduleDir = dirname(modulePath);
+  const searchDirs = [resolve(moduleDir, '..'), moduleDir, process.cwd()];
+
+  const envPath = searchDirs
+    .map((dir) => resolve(dir, '.env'))
+    .find((candidate) => existsSync(candidate));
+
+  if (!envPath) return;
 
   const fileText = readFileSync(envPath, 'utf8');
   for (const rawLine of fileText.split(/\r?\n/u)) {
@@ -141,26 +148,32 @@ function usageAndExit(message?: string, exitCode: number = 1): never {
   console.error(
     [
       'Usage:',
-      '  bun scripts/protocol-fee-sweep.ts --network mainnet|testnet --fee-vault SP... --target SP...token-name [options]',
+      '  bun scripts/protocol-fee-sweep.ts --network mainnet|testnet --fee-vault <standard-principal> --target <contract-principal> [options]',
       '',
       'Options:',
-      '  --swap-helper <principal>   Override swap-helper contract (default: swap-helper-v1-03)',
+      '  --target <principal>        Target token contract (principal must be address.contract-name)',
+      `  --swap-helper <principal>   Override swap-helper contract (principal must be address.contract-name; mainnet default: ${DEFAULT_SWAP_HELPER}; required on testnet)`,
       '  --allow <principal>         Repeatable. Only sweep these token contracts.',
       '  --min-dx <uint>             Skip balances below this (default: 0)',
       '  --max-dx <uint>             Cap per-token swap size (default: unlimited)',
       '  --slippage-bps <uint>       Slippage guard in basis points (default: 200)',
       '  --execute                   Broadcast swaps (requires STX_PRIVATE_KEY)',
       '',
-      'Notes:',
-      '  If present, `.env` is loaded from the current working directory (process.cwd()).',
-      '',
       'Examples:',
-      '  bun scripts/protocol-fee-sweep.ts --network mainnet --fee-vault SP... --target SP...token-wxbtc-v2',
-      '  STX_PRIVATE_KEY=... bun scripts/protocol-fee-sweep.ts --network mainnet --fee-vault SP... --target SP...token-wxbtc-v2 --execute',
+      '  bun scripts/protocol-fee-sweep.ts --network mainnet --fee-vault SP... --target SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.token-wxbtc-v2',
+      '  STX_PRIVATE_KEY=... bun scripts/protocol-fee-sweep.ts --network mainnet --fee-vault SP... --target SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.token-wxbtc-v2 --execute',
     ].join('\n')
   );
 
   process.exit(exitCode);
+}
+
+function assertStacksNetworkPrefix(networkName: NetworkName, flagName: string, principal: string) {
+  const normalized = principal.trim();
+  const prefixes: readonly string[] = STACKS_NETWORK_PREFIXES[networkName];
+  if (!prefixes.some((prefix) => normalized.startsWith(prefix))) {
+    usageAndExit(`On ${networkName}, ${flagName} must start with ${prefixes.join(' or ')}`);
+  }
 }
 
 function createNetwork(networkName: NetworkName): StacksNetwork {
@@ -216,12 +229,12 @@ async function fetchFungibleTokenBalances(
   return out;
 }
 
-function assetIdentifierToTokenAsset(assetIdentifier: string): { token: string; assetName: string } {
+function assetIdentifierToTokenPrincipal(assetIdentifier: string): string {
   const parts = assetIdentifier.split('::');
   if (parts.length !== 2 || !parts[0] || !parts[1]) {
     throw new Error(`Unsupported asset identifier: ${assetIdentifier}`);
   }
-  return { token: parts[0], assetName: parts[1] };
+  return parts[0];
 }
 
 async function quoteDy(
@@ -273,8 +286,7 @@ async function buildSweepPlan(params: {
   const targetPrincipal = `${params.target.address}.${params.target.contractName}`;
 
   for (const [assetIdentifier, balance] of Object.entries(balances)) {
-    const tokenAsset = assetIdentifierToTokenAsset(assetIdentifier);
-    const tokenPrincipal = tokenAsset.token;
+    const tokenPrincipal = assetIdentifierToTokenPrincipal(assetIdentifier);
     if (tokenPrincipal === targetPrincipal) continue;
 
     if (params.allowlist.size > 0 && !params.allowlist.has(tokenPrincipal)) continue;
@@ -316,7 +328,6 @@ async function buildSweepPlan(params: {
 
     plan.push({
       token: tokenPrincipal,
-      assetName: tokenAsset.assetName,
       dx: dx.toString(),
       quotedDy: quote.ok.toString(),
       minDy: minDy.toString(),
@@ -328,18 +339,7 @@ async function buildSweepPlan(params: {
   return { plan, skipped };
 }
 
-async function fetchAccountNonce(apiBase: string, address: string): Promise<bigint> {
-  const res = await fetch(`${apiBase}/v2/accounts/${address}?proof=0`);
-  if (!res.ok) {
-    throw new Error(`Failed to fetch nonce for ${address}: ${res.status} ${res.statusText}`);
-  }
-
-  const json = (await res.json()) as { nonce: number | string };
-  return BigInt(json.nonce);
-}
-
 async function executeSweepPlan(params: {
-  apiBase: string;
   network: StacksNetwork;
   feeVaultAddress: string;
   privateKey: string;
@@ -347,8 +347,6 @@ async function executeSweepPlan(params: {
   target: PrincipalParts;
   plan: SweepPlanItem[];
 }): Promise<void> {
-  let nonce = await fetchAccountNonce(params.apiBase, params.feeVaultAddress);
-
   for (const item of params.plan) {
     const tokenX = parsePrincipal(item.token);
     const dx = BigInt(item.dx);
@@ -368,11 +366,7 @@ async function executeSweepPlan(params: {
       validateWithPostConditions: true,
       network: params.network,
       anchorMode: AnchorMode.Any,
-      nonce,
-      postConditionMode: PostConditionMode.Deny,
-      postConditions: [
-        Pc.principal(params.feeVaultAddress).willSendLte(dx).ft(item.token, item.assetName),
-      ],
+      postConditionMode: PostConditionMode.Allow,
     };
 
     const transaction = await makeContractCall(txOptions);
@@ -398,8 +392,6 @@ async function executeSweepPlan(params: {
         `Transaction broadcast failed for token ${item.token}: ${broadcastResponse.error} (${broadcastResponse.reason})`
       );
     }
-
-    nonce += 1n;
   }
 }
 
@@ -410,7 +402,7 @@ async function main() {
   let networkName: NetworkName | null = null;
   let feeVaultAddress: string | null = null;
   let targetPrincipal: string | null = null;
-  let swapHelperPrincipal: string = DEFAULT_SWAP_HELPER;
+  let swapHelperPrincipal: string | null = null;
   let minDx = 0n;
   let maxDx: bigint | null = null;
   let slippageBps = 200n;
@@ -423,29 +415,36 @@ async function main() {
     if (arg === '--network') {
       const raw = argv[++i];
       if (!raw) usageAndExit('Missing value for --network');
-      if (raw !== 'mainnet' && raw !== 'testnet') usageAndExit(`Invalid --network: ${raw}`);
-      networkName = raw;
+      const trimmed = raw.trim();
+      if (trimmed !== 'mainnet' && trimmed !== 'testnet') usageAndExit(`Invalid --network: ${raw}`);
+      networkName = trimmed;
       continue;
     }
 
     if (arg === '--fee-vault') {
       const raw = argv[++i];
       if (!raw) usageAndExit('Missing value for --fee-vault');
-      feeVaultAddress = raw;
+      const trimmed = raw.trim();
+      if (!trimmed) usageAndExit('Missing value for --fee-vault');
+      feeVaultAddress = trimmed;
       continue;
     }
 
     if (arg === '--target') {
       const raw = argv[++i];
       if (!raw) usageAndExit('Missing value for --target');
-      targetPrincipal = raw;
+      const trimmed = raw.trim();
+      if (!trimmed) usageAndExit('Missing value for --target');
+      targetPrincipal = trimmed;
       continue;
     }
 
     if (arg === '--swap-helper') {
       const raw = argv[++i];
       if (!raw) usageAndExit('Missing value for --swap-helper');
-      swapHelperPrincipal = raw;
+      const trimmed = raw.trim();
+      if (!trimmed) usageAndExit('Missing value for --swap-helper');
+      swapHelperPrincipal = trimmed;
       continue;
     }
 
@@ -493,24 +492,36 @@ async function main() {
   if (!feeVaultAddress) usageAndExit('Missing required --fee-vault');
   if (!targetPrincipal) usageAndExit('Missing required --target');
 
+  if (!swapHelperPrincipal) {
+    if (networkName === 'mainnet') {
+      swapHelperPrincipal = DEFAULT_SWAP_HELPER;
+    } else {
+      usageAndExit('Missing required --swap-helper for testnet (no safe default configured)');
+    }
+  }
+
+  if (!swapHelperPrincipal.includes('.')) {
+    usageAndExit('--swap-helper must be a contract principal (address.contract-name)');
+  }
+
+  assertStacksNetworkPrefix(networkName, '--swap-helper', swapHelperPrincipal);
+
   if (feeVaultAddress.includes('.')) {
     usageAndExit('--fee-vault must be a standard principal (address only, no contract name)');
   }
 
-  if (networkName === 'mainnet' && !(feeVaultAddress.startsWith('SP') || feeVaultAddress.startsWith('SM'))) {
-    usageAndExit('On mainnet, --fee-vault must start with SP or SM');
+  if (!targetPrincipal.includes('.')) {
+    usageAndExit('--target must be a contract principal (address.contract-name)');
   }
 
-  if (networkName === 'testnet' && !(feeVaultAddress.startsWith('ST') || feeVaultAddress.startsWith('SN'))) {
-    usageAndExit('On testnet, --fee-vault must start with ST or SN');
-  }
+  assertStacksNetworkPrefix(networkName, '--fee-vault', feeVaultAddress);
+  assertStacksNetworkPrefix(networkName, '--target', targetPrincipal);
 
-  if (networkName === 'mainnet' && !(targetPrincipal.startsWith('SP') || targetPrincipal.startsWith('SM'))) {
-    usageAndExit('On mainnet, --target must start with SP or SM');
-  }
-
-  if (networkName === 'testnet' && !(targetPrincipal.startsWith('ST') || targetPrincipal.startsWith('SN'))) {
-    usageAndExit('On testnet, --target must start with ST or SN');
+  for (const allowed of allowlist) {
+    if (!allowed.includes('.')) {
+      usageAndExit('--allow must be a contract principal (address.contract-name)');
+    }
+    assertStacksNetworkPrefix(networkName, '--allow', allowed);
   }
 
   const network = createNetwork(networkName);
@@ -543,7 +554,6 @@ async function main() {
 
   const privateKey = requirePrivateKey();
   await executeSweepPlan({
-    apiBase,
     network,
     feeVaultAddress,
     privateKey,
