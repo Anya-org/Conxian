@@ -161,7 +161,7 @@ Example: if a message contains three settlement-transaction entries `[A, B, C]` 
 
 Canonical formatting requirements:
 
-- All string values in `settlement_identifiers` MUST be canonicalized and validated as follows:
+- All string values in `settlement_identifiers.transaction_identifiers` MUST be canonicalized and validated as follows:
   1. If an upstream source provides bytes, implementations MUST decode them as UTF-8 and MUST treat any decoding error as a canonicalization failure for the corresponding settlement transaction (i.e., MUST NOT substitute `U+FFFD`).
   2. Implementations MUST reject any value that is not a sequence of Unicode scalar values (reject surrogate code points `U+D800..U+DFFF`).
   3. The value MUST be normalized to Unicode NFC; all subsequent validation, equality, and hashing operates on the NFC-normalized value.
@@ -171,7 +171,9 @@ Canonical formatting requirements:
 
 Note: This section intentionally tightens earlier guidance. These canonicalization rules are normative for the current `external-settlement-trigger:v1` definition. Values that violate these canonical string rules MUST be treated as invalid.
 
-If any value in `settlement_identifiers` (including any field-specific rules for optional reconciliation keys) fails canonicalization or validation, the corresponding settlement transaction MUST be treated as invalid for external-settlement trigger purposes and MUST NOT produce a `normalized_settlement_hash` or `SovereignProposal`.
+If any value in `settlement_identifiers.transaction_identifiers` (including any field-specific rules for optional reconciliation keys) fails canonicalization or validation, the corresponding settlement transaction MUST be treated as invalid for external-settlement trigger purposes and MUST NOT produce a `normalized_settlement_hash` or `SovereignProposal`.
+
+`envelope_identifiers.tx_index` MUST satisfy the field requirements above. If `envelope_identifiers.tx_index` is missing or fails these requirements, the corresponding settlement transaction MUST be treated as invalid for external-settlement trigger purposes and MUST NOT produce a `normalized_settlement_hash` or `SovereignProposal`. Any other `settlement_identifiers.envelope_identifiers` keys are optional metadata; malformed, unrecognized, or otherwise invalid values for those optional envelope identifiers MUST be ignored/omitted and MUST NOT cause the settlement transaction to be treated as invalid for external-settlement trigger purposes.
 
 For `external-settlement-trigger:v1`, implementations MUST use Unicode 15.1.0 (Unicode Character Database + normalization data) for evaluating `General_Category`, `White_Space`, and NFC normalization.
 
