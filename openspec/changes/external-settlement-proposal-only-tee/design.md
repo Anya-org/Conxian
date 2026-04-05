@@ -132,7 +132,7 @@ Trigger granularity:
 
 Minimum required identifier set (by rail):
 
-For normative `tx_index` requirements (ordering source, no-reorder constraint, and inclusion rules), see [specs/external-settlement-proposal-only-tee/spec.md §2.1.1](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical).
+For normative `tx_index` requirements (ordering source, no-reorder constraint, and inclusion rules), see [spec.md (settlement identifier canonicalization)](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical).
 
 The per-rail `tx_index` parentheticals below are summaries; the spec is authoritative.
 
@@ -151,7 +151,7 @@ The per-rail `tx_index` parentheticals below are summaries; the spec is authorit
 
 Canonical formatting requirements:
 
-Canonicalization/validation and equality semantics for `settlement_identifiers` are normative in [specs/external-settlement-proposal-only-tee/spec.md §2.1.1](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical); this design document intentionally does not restate them to avoid drift.
+Canonicalization/validation and equality semantics for `settlement_identifiers` are normative in [spec.md (settlement identifier canonicalization)](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical); this design document intentionally does not restate them to avoid drift.
 
 Proposal emission MUST be idempotent on `trigger_id`: duplicate triggers MUST NOT create additional proposals or timelocks.
 
