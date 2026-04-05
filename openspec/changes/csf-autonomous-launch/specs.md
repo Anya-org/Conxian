@@ -7,7 +7,7 @@
 - **SPEC-GOV-002**: **Key Relinquishment**. Final admin principal MUST be the burn address (0x0).
 
 ## 2. Revenue & Fees
-- **SPEC-REV-001**: **Founder's Cut**. A 0.1% hardcoded Founder’s Cut MUST be carved out from captured protocol fees and routed to a contract-level founder vault (never a standard principal).
+- **SPEC-REV-001**: **Founder's Cut**. A 0.1% hardcoded fee MUST be routed to the founder address.
 - **SPEC-REV-002**: **5-5-5 Growth**. Referrers and referees MUST receive 5% of fees as specified.
 
 ## 3. Financial Integration

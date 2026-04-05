@@ -6,27 +6,29 @@
 
 ## 1. System Inventory (Database & Infrastructure)
 
-### A. Neon Project: Conxian-backend (orange-paper-76209725)
-- **Status:** Active, PG 17.
-- **Key Tables:**
-  - `cnx_bos.cxn_external_settlement_logs`: Tracking institutional egress signals.
-  - `cnx_bos.m_and_a_readiness`: Strategic growth tracking.
-  - `cnx_bos.treasury_runway`: Fiscal health monitoring.
-  - `neon_auth.*`: Managed authentication (Better Auth compatible).
-  - `public.mmr_nodes`: Verifiable state commitment storage.
+This repository is public, and the ZSE policy in [`GOVERNANCE.md`](../GOVERNANCE.md#documentation-confidentiality-zse) prohibits publishing actionable infrastructure maps in Git.
 
-### B. Supabase Project: Conxian-platform (iczqutrbbfudfzfplymc)
-- **Status:** Active, PG 17.
-- **Key Tables:**
-  - `public.deployment_efficiency`: Monitoring release velocity and CI health.
-  - `public.runway_metrics`: Real-time fiscal telemetry.
-  - `public.yield_events`: Protocol revenue and yield tracking.
-  - `public.ip_audit_logs`: Intellectual Property and ZSE compliance auditing.
-  - `public.erp_sync_events`: OData v4 / ISO 20022 synchronization logs.
+**Canonical inventory (provider/project identifiers, service IDs, schema/table names):** maintained in Linear under CON-416 / CON-421.
 
-### C. Render Workspace: Conxian-Business (tea-d6u0edngi27c73dvhsg0)
+**Editors MUST NOT** include provider/project/workspace identifiers, database names, schema/table names, or other environment-specific IDs in this document; those details MUST remain in Linear (CON-416 / CON-421) to comply with the ZSE policy in `GOVERNANCE.md`.
+
+**Examples (for editors):** Safe: high-level provider names and scopes. Unsafe: provider project IDs, database names, or schema/table names.
+
+For this April 2026 readiness gate, CON-416 / CON-421 were reviewed on April 5, 2026 and confirmed to reflect the current production inventory.
+
+If any pre-publication drafts of this report contained infrastructure identifiers, remediation/rotation status is tracked under CON-416 / CON-421.
+
+### A. Managed Postgres (Neon)
+- **Status:** Active (PG 17).
+- **Scope (high level):** institutional egress telemetry, treasury/runway monitoring, managed auth, and verifiable state commitment storage.
+
+### B. Managed Postgres (Supabase)
+- **Status:** Active (PG 17).
+- **Scope (high level):** deployment/CI health metrics, runway metrics, yield events, IP/ZSE audit logging, and ERP sync event logging.
+
+### C. Hosting / Compute (Render)
 - **Status:** Operational.
-- **Services:** [Inventory Pending - Requires explicit service listing]
+- **Services:** maintained in Linear inventory (see CON-416 / CON-421).
 
 ## 2. Production Readiness Checklist
 

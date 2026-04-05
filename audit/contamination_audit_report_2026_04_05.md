@@ -30,7 +30,7 @@ This audit identified significant "stub", "mock", and "placeholder" contaminatio
 ## 3. Recommended Remediation
 1. **Dynamic Principal Injection:** Replace all hardcoded principals with `data-vars` initialized via authorized governance calls (CON-61).
 2. **Feature Gating:** Move all `stub-func` and mock logic to a `mock-integrations` directory or gate them behind a `testnet` feature flag in Rust/Clarity.
-3. **CI Guardrails:** Implement a CI check that fails if `main` branch contains prohibited strings (e.g., "MOCK_", "stub-func", "placeholder").
+3. **CI Guardrails (scoped):** Enforce a scoped contamination scan in CI for `main`/`staged` that rejects non-production patterns in production source trees, and use `docs/BRANCHING_AND_PROMOTION_POLICY.md` as the canonical source for the scan scope, exclusions, and patterns.
 4. **Production Implementation:** Prioritize implementation of the OData v4 ERP sync and ZKML verification modules (currently stubs).
 
 ---

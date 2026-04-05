@@ -8,21 +8,6 @@ The goals:
 - Ensure every merge has clear provenance (Linear issue + PR).
 - Make releases and changelogs easy to audit.
 
-## Branch and promotion standard
-
-This repository uses a three-branch model:
-
-- `dev` = testnet-only and non-production validation
-- `staged` = mainnet candidate validation
-- `main` = mainnet-only production code
-
-Promotion rules:
-
-- No direct promotion from `dev` to `main`.
-- Promotion to `main` happens only from `staged`.
-
-Reference: `docs/BRANCH_AND_PROMOTION_STANDARD.md` and `openspec/specs/git-management/spec.md`.
-
 ## Required checks guidance
 
 ### Always-on checks for PRs targeting `dev`, `staged`, or `main`
@@ -35,7 +20,6 @@ These workflows run on every pull request targeting `dev`, `staged`, or `main`. 
   - Repo hygiene:
     - ZSE knowledge retention via `scripts/verify_knowledge_retention.py`.
     - Submodule integrity via `scripts/verify_submodule_integrity.py`.
-- Branch promotion policy (see [`branch-promotion-policy.yml`](./workflows/branch-promotion-policy.yml))
 - Secret scan (see [`secret-scan.yml`](./workflows/secret-scan.yml))
 - Dependency review (see [`dependency-review.yml`](./workflows/dependency-review.yml))
 
@@ -60,7 +44,6 @@ Notes:
 ## PR and merge expectations
 
 - No direct commits to `main`. Use a PR.
-- Use the correct base branch (`dev`, `staged`, or `main`) based on the branch and promotion standard.
 - One PR = one focused change (keep it reviewable).
 - PRs should map to a Linear issue (include it in the PR description).
 - Follow `CODEOWNERS` for review routing.
