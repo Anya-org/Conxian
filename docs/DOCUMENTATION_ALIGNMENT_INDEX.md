@@ -31,7 +31,7 @@ These are the “operating-model” documents that explain how BOS components re
 | Document | Role | Visibility | What it’s for |
 | --- | --- | --- | --- |
 | `conxian-business/SERVICE_LOOP.md` | Canonical | Public-safe | BOS service loop (how client/supplier loops connect). |
-| `conxian-business/BOS_STATE_MACHINE.json` | Supporting | Internal-only | BOS state machine definition (automation substrate). |
+| `conxian-business/BOS_STATE_MACHINE.stub.json` | Supporting | Public-safe | Public-safe BOS state machine pointer stub; canonical internal definition is maintained outside this repo. |
 | `Sovereign-Ops-Orchestrator/LINEAR_WIRING.md` | Canonical | Internal-only | Intended Linear ↔ state-layer wiring and webhook triggers. |
 | `Sovereign-Ops-Orchestrator/DEPLOYMENT_EFFICIENCY.md` | Supporting | Internal-only | Bottleneck and deployment efficiency metrics. |
 | `Sovereign-Strategy-Nexus/REALTIME_M&A_VELOCITY.md` | Supporting | Internal-only | Strategy velocity tracking and exit-readiness framing. |
@@ -148,7 +148,7 @@ If an issue is in a planning or execution state, the description should link to 
 | --- | --- | --- |
 | https://linear.app/conxian-labs/issue/CON-343 | `openspec/changes/sovereign-data-migration-institutional-egress/specs.md`, `openspec/changes/sovereign-data-migration-institutional-egress/specs/sovereign-data-migration-institutional-egress/spec.md`, `ARCHIVE_MIGRATION.md` | This issue is spec-first and directly tied to ZSE + migration. |
 | https://linear.app/conxian-labs/issue/CON-158 | `docs/DOCUMENTATION_ALIGNMENT_INDEX.md`, `SUMMARY.md`, `openspec/changes/remediate-enterprise-sovereignty/specs.md` | This is the “alignment” umbrella; it should anchor to the index + baseline OpenSpec. |
-| https://linear.app/conxian-labs/issue/CON-152 | `conxian-business/SERVICE_LOOP.md`, `Sovereign-Ops-Orchestrator/LINEAR_WIRING.md`, `conxian-business/BOS_STATE_MACHINE.json` | BOS operating model work should reference the service loop + wiring + state machine. |
+| https://linear.app/conxian-labs/issue/CON-152 | `conxian-business/SERVICE_LOOP.md`, `Sovereign-Ops-Orchestrator/LINEAR_WIRING.md`, `conxian-business/BOS_STATE_MACHINE.stub.json` | BOS operating model work should reference the service loop + wiring + state machine. |
 | https://linear.app/conxian-labs/issue/CON-157 | `Conxian/PRD.md`, `conxian-gateway/PRD.md`, `conxian-nexus/docs/PRD.md` | “Business-unit model” extraction should start from PRDs (what exists and how it’s separated). |
 | https://linear.app/conxian-labs/issue/CON-160 | `conxian-gateway/PRD.md`, `lib-conxian-core/docs/PRD.md`, `openspec/changes/remediate-enterprise-sovereignty/specs/enterprise-sovereignty/spec.md` | Settlement ingress touches gateway/core-lib conventions + sovereignty requirements. |
 | https://linear.app/conxian-labs/issue/CON-131 | `docs/bounties/MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md`, `CONTRIBUTING.md` | Bounty workflow should reference the payout runbook + repo workflow norms. |
@@ -161,7 +161,7 @@ If an issue is in a planning or execution state, the description should link to 
 These are the highest-value sources to copy into Linear so day-to-day work stays stable even if the repo has to remove or relocate sensitive material.
 
 1. **BOS Operating Model (canonical)**
-   - Source: `conxian-business/SERVICE_LOOP.md`, `conxian-business/BOS_STATE_MACHINE.json`.
+   - Source: `conxian-business/SERVICE_LOOP.md`, `conxian-business/BOS_STATE_MACHINE.stub.json` (public-safe pointer; canonical BOS state machine definition is maintained in Linear).
 2. **Execution wiring: Linear ↔ BOS state layer (canonical)**
    - Source: `Sovereign-Ops-Orchestrator/LINEAR_WIRING.md`.
 3. **Zero Secret Egress (ZSE) + knowledge retention (canonical)**

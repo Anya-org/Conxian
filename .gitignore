@@ -48,6 +48,11 @@ secrets.json
 # Generated audit artifacts
 /conxian-business/.generated/
 
+# Internal-only BOS runtime artifacts (public repo keeps `*.stub.json` instead)
+/conxian-business/BOS_STATE_MACHINE.json
+/conxian-business/AUDIT_MANIFEST.json
+/conxian-business/SARB_COMPLIANCE_REPORT.json
+
 # Terraform
 .terraform/
 *.tfstate
