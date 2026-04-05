@@ -1,0 +1,39 @@
+name: Branch Promotion Policy
+
+on:
+  pull_request:
+    branches: [ main, staged, dev ]
+
+jobs:
+  enforce:
+    name: Enforce branch promotion rules
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Validate base/head branch relationship
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const base = context.payload.pull_request.base.ref;
+            const head = context.payload.pull_request.head.ref;
+
+            core.info(`Branch promotion check: ${head} -> ${base}`);
+
+            if (base === 'main' && head !== 'staged') {
+              core.setFailed(
+                `PRs into 'main' must come from 'staged' (got '${head}' -> '${base}').`
+              );
+              return;
+            }
+
+            if (base === 'staged') {
+              const allowed = head === 'dev' || head.startsWith('hotfix/');
+
+              if (!allowed) {
+                core.setFailed(
+                  `PRs into 'staged' must come from 'dev' (or 'hotfix/*') (got '${head}' -> '${base}').`
+                );
+              }
+            }
