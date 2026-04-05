@@ -68,7 +68,11 @@ def main() -> int:
 
     body = pr.get("body") or ""
 
-    section = extract_bos_classification_section(body) or body
+    section = extract_bos_classification_section(body)
+    if not section.strip():
+        print("BOS PR classification section not found.")
+        print("Add a heading like '### BOS change classification' and check exactly one box.")
+        return 1
 
     selected: list[str] = []
     checkbox_re = re.compile(r"^\s*[-*]\s*\[[xX]\]\s*(.+?)\s*$")
