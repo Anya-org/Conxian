@@ -5,8 +5,16 @@ Welcome to the Conxian ecosystem. We are building a Bitcoin-native Business Oper
 ## Getting Started
 
 1.  Review the [OpenSpec](./openspec/) directory for technical specifications.
-2.  Explore the [Nomenclature Alignment](./audit/nomenclature-alignment.md) for branding and naming standards.
-3.  Check the [Sovereign-Ops-Orchestrator](./Sovereign-Ops-Orchestrator) for open bounties.
+2.  Review the [**Branching and Promotion Policy**](./docs/BRANCHING_AND_PROMOTION_POLICY.md) for required branch workflows.
+3.  Explore the [Nomenclature Alignment](./audit/nomenclature-alignment.md) for branding and naming standards.
+4.  Check the [Sovereign-Ops-Orchestrator](./Sovereign-Ops-Orchestrator) for open bounties.
+
+## Branching and Promotion
+
+All contributors must adhere to the [**Branching and Promotion Policy**](./docs/BRANCHING_AND_PROMOTION_POLICY.md):
+- `main`: Mainnet-only production code. No stubs, mocks, or placeholders.
+- `staged`: Mainnet candidate validation and promotion to `main`.
+- `dev`: Default development and testnet-oriented logic.
 
 ## Bounty workflow
 

@@ -1,6 +1,6 @@
 # Fiscal Vault Oracle
 
-> Current workspace release: **v1.8.2** (see [`CHANGELOG.md`](../CHANGELOG.md))
+> Current workspace release: **v1.9.0** (see [`CHANGELOG.md`](../CHANGELOG.md))
 
 The **Fiscal Vault Oracle** is the treasury and policy coordination layer of the Conxian Business Operations System (BOS).
 

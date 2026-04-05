@@ -70,3 +70,16 @@ Copy these into a repository and adapt as needed:
 
 - [docs/templates/CHANGELOG_TEMPLATE.md](templates/CHANGELOG_TEMPLATE.md)
 - [docs/templates/RELEASE_NOTES_TEMPLATE.md](templates/RELEASE_NOTES_TEMPLATE.md)
+
+## Release v1.9.0 (April 2026)
+
+This release establishes the **System Readiness & Branching Control** baseline for the Conxian mainnet cutover.
+
+### Key Deliverables:
+1. **Branching & Promotion Policy**: Explicit `main`/`staged`/`dev` model enforced to prevent testnet/stub contamination in production paths.
+2. **Infrastructure Inventory**: Canonical mapping of Neon, Supabase, and Render components required for the SAB operating layer.
+3. **Contamination Audit**: Comprehensive identification of functional stubs (ZKML, DLC, Settlement) and mock residue across core repositories.
+
+### Repository Status:
+- **Conxian-Business**: Updated to version v1.9.0.
+- **Protocol/Gateway/Nexus**: Audit complete; remediation issues opened.

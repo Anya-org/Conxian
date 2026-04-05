@@ -99,3 +99,13 @@ Maintain these as Linear documents (canonical for privileged detail), referenced
 2. Keep `GOVERNANCE.md` as an explicit ownership + approval model tied to `CODEOWNERS` (not just a stub).
 3. Treat `docs/DOCUMENTATION_ALIGNMENT_INDEX.md` as the canonical “doc registry” and keep it updated whenever docs are added, moved, or reclassified.
 4. Migrate internal-only documents that materially increase operational exposure to Linear, leaving behind only ZSE-safe summaries and links.
+
+## 3. Branching and Promotion Policy (CON-381, CON-389)
+
+To ensure the integrity of the Conxian Production Environment, all repositories in the portfolio must adhere to the branching and promotion policy defined in [`docs/BRANCHING_AND_PROMOTION_POLICY.md`](./BRANCHING_AND_PROMOTION_POLICY.md).
+
+- **`main` branch**: Mainnet-only production code. No stubs, mocks, or placeholders.
+- **`staged` branch**: Mainnet candidate validation. The only promotion branch for `main`.
+- **`dev` branch**: Testnet-only and non-production validation.
+
+Direct merges from `dev` to `main` are strictly prohibited.

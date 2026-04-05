@@ -51,3 +51,13 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 - Public/private boundary violation by moving sensitive `internal/strategy/` content out of the active Git index.
 
 > Note: Removing files from the current tree does not purge them from git history. A follow-up history rewrite is required for a full removal.
+
+## [1.9.0] - 2026-04-05
+### Added
+- Defined canonical [Branching and Promotion Policy](docs/BRANCHING_AND_PROMOTION_POLICY.md) (CON-381, CON-389) across all repositories.
+- Created [Production-Path Contamination Audit Report](audit/contamination_audit_report_2026_04_05.md) (CON-394, CON-391) identifying stubs, mocks, and placeholders in core execution paths.
+- Created [Mainnet Readiness Gate & System Inventory](audit/mainnet_readiness_report_2026_04_05.md) (CON-133, CON-416) mapping Neon, Supabase, and Render infrastructure.
+
+### Changed
+- Updated [BOS Business Buildout](docs/BOS_BUSINESS_BUILDOUT.md) to include the new Branching and Promotion Policy and align with the "Mainnet Readiness Gate".
+- Updated [active session](audit/active_session.json) to reflect the transition from individual issue resolution to holistic system readiness.
