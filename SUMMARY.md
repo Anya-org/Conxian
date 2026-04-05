@@ -34,6 +34,7 @@
 * [Sovereign Data Migration & Institutional Egress](openspec/changes/sovereign-data-migration-institutional-egress/specs.md)
 * [SAB migration control plane](docs/SAB_MIGRATION_CONTROL_PLANE.md)
   * [Dependency inventory](docs/SAB_MIGRATION_DEPENDENCY_INVENTORY.md)
+  * [Supabase + Neon inventory (service-level)](docs/DEPENDENCY_INVENTORY_SUPABASE_NEON.md)
   * [Datastore decision log](docs/SAB_DATASTORE_DECISION_LOG.md)
   * [Readiness gates](docs/SAB_MIGRATION_READINESS_GATES.md)
   * [Migration waves](docs/SAB_MIGRATION_WAVES.md)

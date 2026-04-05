@@ -1,6 +1,14 @@
 # Supabase + Neon dependency inventory (current state) — CON-337
 
-_Snapshot date:_ 2026-04-04
+## Status and review cadence
+
+**Last reviewed:** 2026-04-05
+
+**Canonical tracker / live status:** https://linear.app/conxian-labs/issue/CON-337/inventory-current-supabase-and-neon-dependencies-by-service
+
+**Review cadence:** at least monthly, and additionally within the same PR/commit whenever evidence is added/removed.
+
+Update convention: on every review, bump `Last reviewed` in the same PR/commit that updates evidence (or a dedicated PR if no other content changes are needed).
 
 This document inventories **current, evidenced** touchpoints to **Supabase** and **Neon** across the Conxian service surfaces pinned in this repository.
 
