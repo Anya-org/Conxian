@@ -50,21 +50,30 @@ The evidence pack MUST include:
 
 - Repository name
 - Promotion PR link
-- Pre-merge tip-of-`main` SHA (e.g. `git rev-parse <canonical-remote>/main`)
-- Merge-base of `main` and `staged` SHA (e.g. `git merge-base <canonical-remote>/main <canonical-remote>/staged`)
-- Head (`staged`) SHA (e.g. `git rev-parse <canonical-remote>/staged`)
-- SHA capture timing (UTC timestamp; canonical remote used)
+- Pre-merge tip-of-`main` SHA
+- Merge-base of `main` and `staged` SHA
+- `staged` head commit SHA
+- SHA capture timestamp (ISO 8601 UTC; canonical remote used)
 - Change owner (single accountable human)
 - Required approvers (CODEOWNERS) who signed off
 - Business unit(s) impacted
 
-Together, these SHAs identify the exact change window being promoted (from the merge-base to the `staged` head) and the pre-merge state of `main`.
+Together, these SHAs and the capture timestamp identify the exact change window being promoted (from the merge-base to the `staged` head), the pre-merge state of `main`, and when that snapshot was taken.
 
-Capture these SHAs **immediately before merging** the promotion PR (after all required checks/approvals are green): first run `git fetch <canonical-remote> main staged` (where `<canonical-remote>` points at the canonical `<org>/<repo>` remote, not a fork; on forks this is typically `upstream`), then record each SHA explicitly (for example with `git rev-parse <canonical-remote>/main`, `git rev-parse <canonical-remote>/staged`, and `git merge-base <canonical-remote>/main <canonical-remote>/staged`) and paste them into the evidence pack template.
+Capture these SHAs **immediately before merging** the promotion PR (after all required checks/approvals are green).
 
-If the merge is delayed or `<canonical-remote>/main` advances after capture, re-capture and update the evidence pack before merging.
+You MUST run `git fetch --prune <canonical-remote> main staged` first so that the `<canonical-remote>/*` refs are current (`--prune` removes stale `<canonical-remote>/*` refs that no longer exist on the remote). `<canonical-remote>` MUST point at the canonical `<org>/<repo>` remote, not a fork (on forks this is typically `upstream`).
 
-If someone later re-runs these commands after the merge has landed, `<canonical-remote>/main` may no longer represent the pre-merge tip; reviewers should rely on the recorded pre-merge tip-of-`main` SHA to reconstruct the exact window.
+Record:
+
+- Pre-merge tip-of-`main`: `git rev-parse <canonical-remote>/main`
+- Merge-base: `git merge-base <canonical-remote>/main <canonical-remote>/staged`
+- `staged` head: `git rev-parse <canonical-remote>/staged`
+- SHA capture timestamp: `date -u +%Y-%m-%dT%H:%M:%SZ`
+
+If the merge is delayed or `<canonical-remote>/main` or `<canonical-remote>/staged` advances after capture, re-capture and update the evidence pack before merging.
+
+After the merge (or any other updates to `<canonical-remote>/main` or `<canonical-remote>/staged`), re-running `git fetch --prune <canonical-remote> main staged` and then the commands above will yield different values. Reviewers and auditors SHOULD rely on the SHAs recorded in the evidence pack as the source of truth for the pre-merge window.
 
 #### 2) Mainnet-only production scope
 
@@ -138,10 +147,10 @@ Copy/paste and fill out for any `staged` -> `main` promotion PR.
 
 - Repo: `<org>/<repo>`
 - Promotion PR: <link>
-- Pre-merge tip-of-`main` SHA (e.g. `git rev-parse <canonical-remote>/main`): `<sha>`
-- Merge-base of `main` and `staged` SHA (e.g. `git merge-base <canonical-remote>/main <canonical-remote>/staged`): `<sha>`
-- Head (`staged`) SHA (e.g. `git rev-parse <canonical-remote>/staged`): `<sha>`
-- SHA capture timing: `Captured at (UTC): <YYYY-MM-DDTHH:MM:SSZ>; Canonical remote: <canonical-remote>` (after `git fetch <canonical-remote> main staged`)
+- Pre-merge tip-of-`main` SHA: `<sha>`
+- Merge-base of `main` and `staged` SHA: `<sha>`
+- `staged` head commit SHA: `<sha>`
+- SHA capture timestamp: `Captured at (UTC): <YYYY-MM-DDTHH:MM:SSZ>; Canonical remote: <canonical-remote>` (after `git fetch --prune <canonical-remote> main staged`; before merge)
 - Accountable owner: `<name>` (GitHub: `@<handle>`; optional: `<public Linear profile URL if available>`)
 - Approvers (CODEOWNERS): `@<handle>`, `@<handle>` (optional: names)
 - Business unit(s): `<bu>`
