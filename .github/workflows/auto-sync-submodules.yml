@@ -39,7 +39,7 @@ jobs:
           git submodule update --init --recursive --remote
 
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
           commit-message: "chore: auto-sync submodules"
