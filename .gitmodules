@@ -16,6 +16,7 @@
 [submodule "conxius-platform"]
 	path = conxius-platform
 	url = https://github.com/Conxian/conxius-platform
+	update = none
 [submodule "stacksorbit"]
 	path = stacksorbit
 	url = https://github.com/Conxian/stacksorbit

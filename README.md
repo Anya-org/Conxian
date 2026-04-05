@@ -33,6 +33,28 @@ This repository pins and coordinates the flagship Conxian repositories, includin
 - [`stacksorbit/`](./stacksorbit): Deployment and operations tooling
 - [`conxian-labs-site/`](./conxian-labs-site): Conxian Labs public site
 
+## Cloning
+
+This repository uses Git submodules.
+
+```bash
+git clone --recurse-submodules https://github.com/Conxian/conxian-business
+cd conxian-business
+```
+
+`conxius-platform/` is configured with `update = none`, so it will be skipped by default during recursive submodule updates. To opt in:
+
+```bash
+git -c submodule.conxius-platform.update=checkout submodule update --init conxius-platform
+```
+
+If you need the `conxius-platform/` nested submodules, initialize them from within that repo (for example):
+
+```bash
+cd conxius-platform
+git submodule update --init services/conxian-ui
+```
+
 ## Repository visibility and public/private boundary
 
 This repository is intended to be public.
