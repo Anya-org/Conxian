@@ -38,23 +38,29 @@ const sbcs = ['Conxian-Core', 'Nexus-Labs', 'Fiscal-Auth', 'Sovereign-Ops'];
 
 function parsePrincipal(principal: string): PrincipalParts {
   const trimmed = principal.trim();
-  const dot = trimmed.indexOf('.');
-  if (dot === -1 || dot === 0 || dot === trimmed.length - 1) {
+  const parts = trimmed.split('.');
+  if (parts.length !== 2) {
     throw new Error(`Invalid principal: ${principal}`);
   }
 
-  const address = trimmed.slice(0, dot);
-  const contractName = trimmed.slice(dot + 1);
+  const address = parts[0]?.trim();
+  const contractName = parts[1]?.trim();
+  if (!address || !contractName) {
+    throw new Error(`Invalid principal: ${principal}`);
+  }
+
   return { address, contractName };
 }
 
 function usageAndExit(message?: string, exitCode: number = 1): never {
+  const write = exitCode === 0 ? console.log : console.error;
+
   if (message) {
-    console.error(message);
-    console.error('');
+    write(message);
+    write('');
   }
 
-  console.error(
+  write(
     [
       'Usage:',
       '  STX_PRIVATE_KEY=... bun scripts/register-sbcs.ts --network mainnet|testnet --contract <contract-principal>',
@@ -66,8 +72,8 @@ function usageAndExit(message?: string, exitCode: number = 1): never {
       '  --help                  Show this message',
       '',
       'Examples:',
-      '  STX_PRIVATE_KEY=... bun scripts/register-sbcs.ts --network testnet --contract STYOURTESTNETADDRESS.fiscal-intelligence',
-      '  STX_PRIVATE_KEY=... bun scripts/register-sbcs.ts --network mainnet --contract SPYOURMAINNETADDRESS.fiscal-intelligence',
+      '  STX_PRIVATE_KEY=... bun scripts/register-sbcs.ts --network testnet --contract <TESTNET_ADDRESS>.fiscal-intelligence',
+      '  STX_PRIVATE_KEY=... bun scripts/register-sbcs.ts --network mainnet --contract <MAINNET_ADDRESS>.fiscal-intelligence',
     ].join('\n')
   );
 
@@ -94,7 +100,13 @@ function parseArgs(argv: string[]): { networkName: NetworkName; contract: Princi
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
-    if (arg === '--') continue;
+    if (arg === '--') {
+      const rest = argv.slice(i + 1);
+      if (rest.length > 0) {
+        usageAndExit(`Unexpected positional arguments: ${rest.join(' ')}`);
+      }
+      break;
+    }
     if (arg === '--help' || arg === '-h') {
       usageAndExit(undefined, 0);
     }
