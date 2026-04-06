@@ -118,4 +118,4 @@ To ensure system automation remains system-controlled, all flagship and supporti
 - **Treasury Wallets**: Passive custody of protocol fees and reserves.
 - **Payout Wallets**: Controlled by SAB-approved multi-sigs for bounties and royalties.
 
-No launch-critical automation may depend on a personal or bootstrap wallet after the handoff to SAB-controlled custody (`docs/SAB_DAO_HANDOFF_PROTOCOL.md`).
+No launch-critical automation may depend on a personal or bootstrap wallet after the handoff to SAB-controlled custody (see [`SAB_DAO_HANDOFF_PROTOCOL.md`](./SAB_DAO_HANDOFF_PROTOCOL.md)).
