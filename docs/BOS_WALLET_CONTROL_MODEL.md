@@ -5,22 +5,22 @@ This document defines the canonical wallet-control model for BOS and related Con
 This repository is public. Under Zero Secret Egress (ZSE: no sensitive operational, strategy, or financial material in the active Git index), this doc:
 
 - **does** define wallet classes, authority boundaries, and on-chain control paths
-- **does not** include signer identities, key material, key-ceremony steps, or concrete wallet principals (those belong in the internal custody record; canonical pointer: `admin/SECRETS.md`)
+- **does not** include signer identities, key material, key-ceremony steps, or concrete wallet principals (those belong in the custody system of record outside Git; public-safe pointer stub: [`admin/SECRETS.md`](../admin/SECRETS.md))
 
 ## Canonical references
 
-- SAB program and migration context: `docs/SAB_MIGRATION_CONTROL_PLANE.md`
-- ConxianCSF launch gates + ALEX funding path: `docs/CSF_MAINNET_READINESS_GATE.md`
-- Internal custody record pointer (concrete principals + signer sets live outside Git): `admin/SECRETS.md`
+- SAB program and migration context: [docs/SAB_MIGRATION_CONTROL_PLANE.md](SAB_MIGRATION_CONTROL_PLANE.md)
+- ConxianCSF launch gates + ALEX funding path: [docs/CSF_MAINNET_READINESS_GATE.md](CSF_MAINNET_READINESS_GATE.md)
+- Custody system of record pointer (public-safe stub; system of record lives outside Git): [admin/SECRETS.md](../admin/SECRETS.md)
 
 ## Terms (used in this document)
 
-- **BOS**: Conxian's Business Operations System (the orchestration/policy/evidence layer for system operations; see `README.md`).
-- **SAB**: Conxian Sovereign Autonomous Business (the governing entity for this repo; see `GOVERNANCE.md`).
-- **ConxianCSF**: the Conxian Finance protocol system on Stacks (see `docs/CSF_MAINNET_READINESS_GATE.md`).
+- **BOS**: Conxian's Business Operations System (the orchestration/policy/evidence layer for system operations; see [README.md](../README.md)).
+- **SAB**: Conxian Sovereign Autonomous Business (the governing entity for this repo; see [GOVERNANCE.md](../GOVERNANCE.md)).
+- **ConxianCSF**: the Conxian Finance protocol system on Stacks (see [docs/CSF_MAINNET_READINESS_GATE.md](CSF_MAINNET_READINESS_GATE.md)).
 - **DAO**: the ConxianCSF-aligned governance authority for policy changes, executed via `DAO_TIMELOCK`.
-- **ALEX**: the ALEX protocol's Stacks smart contracts, used as an execution venue and launch funding path for ConxianCSF flows (see `docs/CSF_MAINNET_READINESS_GATE.md`).
-- **ZSE**: Zero Secret Egress, the public-repo operating constraint that keeps signer identities, key material, and concrete principals out of Git (see `docs/SAB_MIGRATION_CONTROL_PLANE.md`).
+- **ALEX**: the ALEX protocol's Stacks smart contracts, used as an execution venue and launch funding path for ConxianCSF flows (see [docs/CSF_MAINNET_READINESS_GATE.md](CSF_MAINNET_READINESS_GATE.md)).
+- **ZSE**: Zero Secret Egress, the public-repo operating constraint that keeps signer identities, key material, and concrete principals out of Git (see [docs/SAB_MIGRATION_CONTROL_PLANE.md](SAB_MIGRATION_CONTROL_PLANE.md)).
 
 ## Canonical model (stable)
 
@@ -28,19 +28,19 @@ This repository is public. Under Zero Secret Egress (ZSE: no sensitive operation
 
 1. **Wallet/enclave = signing authority (where a signature is required).** If a standard-principal transaction is broadcast, it must have been signed by the correct authority wallet/enclave. For contract principals, authority is enforced by on-chain access control.
 2. **BOS = orchestration + policy enforcement + evidence capture.** BOS may build unsigned transactions, check policy, and record evidence, but it must not "be the signing key".
-3. **ALEX = execution venue (on-chain).** Protocol deployment/funding/payout flows that depend on ALEX must treat ALEX contracts as the execution venue and on-chain source of truth (see `docs/CSF_MAINNET_READINESS_GATE.md`).
+3. **ALEX = execution venue (on-chain).** Protocol deployment/funding/payout flows that depend on ALEX must treat ALEX contracts as the execution venue and on-chain source of truth (see [docs/CSF_MAINNET_READINESS_GATE.md](CSF_MAINNET_READINESS_GATE.md)).
 4. **Custody lives in contract principals.** Treasury/vault balances should live in contract principals (vaults/treasuries), not in human wallets.
 5. **No single personal wallet after handoff.** After the automation cutover stage, no launch-critical automation may depend on a single personal/bootstrap wallet.
 
 ### Current bootstrap constraint
 
-Treat `BOOTSTRAP_OPERATOR_WALLET` as the **current bootstrap wallet** under operator control (see the internal custody record; pointer: `admin/SECRETS.md`).
+Treat `BOOTSTRAP_OPERATOR_WALLET` as the **current bootstrap wallet** under operator control (see the custody system of record outside Git; public-safe pointer stub: [admin/SECRETS.md](../admin/SECRETS.md)).
 
 Bootstrap use is allowed only for launch preparation and one-time initialization. It must not remain a durable deployer/admin/treasury/payout authority after handoff.
 
 ### Canonical wallet inventory (v1)
 
-Naming convention: identifiers below are **wallet classes**. Concrete principals and signer sets are tracked in the internal custody record (pointer: `admin/SECRETS.md`).
+Naming convention: identifiers below are **wallet classes**. Concrete principals and signer sets are tracked in the custody system of record outside Git; public-safe pointer stub: [admin/SECRETS.md](../admin/SECRETS.md).
 
 | Wallet / principal class | Type | Custody owner | Purpose | Recommended signer model | Spend / authority limits (policy) |
 | --- | --- | --- | --- | --- | --- |
@@ -76,7 +76,7 @@ Splitting emergency into **fast pause** (2-of-3) vs **slow recovery** (3-of-5) i
 
 ### Approval policy, spending limits, rollback authority (v1 defaults)
 
-These are policy-level defaults; concrete numbers (caps, tranche sizes, delay windows) belong in the internal custody/ops record (pointer: `admin/SECRETS.md`).
+These are policy-level defaults; concrete numbers (caps, tranche sizes, delay windows) belong in the custody system of record outside Git; public-safe pointer stub: [admin/SECRETS.md](../admin/SECRETS.md).
 
 - `SAB_DEPLOYER_MULTISIG`
   - Approval: only signs deploy/upgrade/admin-migration transactions that are linked to an approved change record (issue + commit/PR) and have a reviewed transaction plan.
@@ -108,7 +108,7 @@ This is the canonical boundary:
 
 - **DAO policy authority** defines and changes the policy surface through `DAO_TIMELOCK`.
   - fees/splits/limits, admin rotations, and high-risk configuration changes
-  - ability to replace/rotate SAB role holders via timelocked changes where supported
+  - ability to replace/rotate **on-chain admin/role principals** via timelocked changes where supported (signer-set changes for SAB multisigs remain an off-chain custody process)
 
 Operationally:
 
@@ -135,7 +135,7 @@ SAB operations
 
 - Create `SAB_DEPLOYER_MULTISIG`, `SAB_PAYOUT_MULTISIG`, `SAB_EMERGENCY_PAUSE_MULTISIG`, `SAB_EMERGENCY_RECOVERY_MULTISIG`.
 - Provision `SAB_BOS_EXECUTOR_KEY` in system custody (enclave/HSM-equivalent) with a strict operational allowlist.
-- Record signer set + quorum + recovery contacts in the internal custody record (pointer: `admin/SECRETS.md`).
+- Record signer set + quorum + recovery contacts in the custody system of record outside Git; public-safe pointer stub: [admin/SECRETS.md](../admin/SECRETS.md).
 
 #### Stage 2 — Move admin/owner surfaces out of bootstrap
 
@@ -222,4 +222,4 @@ Before broad launch or payout enablement:
    - the temporary bootstrap wallet (Stage 0 only), or
    - the intended SAB-controlled authority (Stages 3+)
 3. Verify deploy / keeper / payout / emergency keys are not unintentionally shared.
-4. Record last-rotation / replacement status for each production signing secret in the internal custody record (pointer: `admin/SECRETS.md`).
+4. Record last-rotation / replacement status for each production signing secret in the custody system of record outside Git; public-safe pointer stub: [admin/SECRETS.md](../admin/SECRETS.md).
