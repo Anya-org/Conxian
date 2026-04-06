@@ -21,7 +21,11 @@ This audit originally identified significant "stub", "mock", and "placeholder" c
 
 ### C. conxian-nexus (Intelligence Bridge)
 - **Functional Stubs:** REMEDIATED (FAIL-CLOSED). Stubs for ZKML, DLC, Identity, and ERP now return explicit errors and non-zero status codes (e.g., 503, 403, 501) rather than simulated data. This prevents "fail-open" scenarios during the mainnet cutover.
-- **Persistence Stubs:** REMEDIATED. Mock mutation hashes in `TablelandAdapter` and `KwilAdapter` have been purged.
+- **Persistence Stubs:** REMEDIATED. Mock mutation hashes in `TablelandAdapter` and `KwilAdapter` replaced with real HTTP calls to Tableland Validator REST API and Kwil broadcast endpoint respectively. Both fail closed on error.
+- **ERP Attestation:** REMEDIATED. Mock `enclave_sig_*` UUID replaced with real `Wallet::sign()` attestation via `lib-conxian-core`.
+- **ARR/MRR Metrics:** REMEDIATED. Redis-only counter augmented with durable Supabase REST upsert (non-fatal).
+- **Oracle Stub Flag:** REMEDIATED. `ORACLE_SERVICE_IS_STUBBED` flipped to `false`; `OracleStub` renamed to `OracleService` to reflect real implementation.
+- **Remaining (intentional, tracked):** `lib-conxian-core/src/lib.rs` retains one `[STUB]` for BitVM2 state root verification (CON-75). Kept in `REPO_EXCLUSIONS` until that integration is wired.
 
 ### D. conxian-business (BOS Governance)
 - **Intentional Stubs:** MAINTAINED. `BOS_STATE_MACHINE.stub.json` and `LINEAR_WIRING.md` remain stubs to satisfy Zero Secret Egress (ZSE) compliance.

@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.md](docs/RELEASE_NOTES_AND_CHANGELOG.md).
 
+## [Unreleased]
+
+### Changed
+- **Devcontainer (CON-383):** Added Rust stable and Python 3.10 to `.devcontainer/Dockerfile` so `cargo test` and CI scripts run locally.
+- **BOS production boundary (CON-383):** Removed residual `// Simulate execution success` placeholder comment from `conxian-nexus/src/api/rest.rs`. Replaced empty `test_health_check_stub` with a real assertion.
+- **ERP handler (CON-63):** Replaced mock enclave attestation UUID with a real wallet signature via `lib-conxian-core::Wallet::sign()`. Response now includes `attestation` (128-char hex) instead of a fabricated `enclave_sig_*` string.
+- **Kwil adapter (CON-330):** Replaced stub hash (`kwil_tx_stub_*`) with a real HTTP POST to `KWIL_PROVIDER_URL/api/v1/broadcast`. Fails closed (returns `Err`) when the provider is unreachable or config is absent.
+- **Tableland adapter (CON-69):** Replaced random hash stub with a real HTTP POST to the Tableland Validator REST API (`/api/v1/mutate`). Fails closed on HTTP error.
+- **ARR/MRR metrics (CON-68):** Added durable Supabase REST upsert to `log_revenue_intelligence` alongside the existing Redis counter. Non-fatal: skipped with a warning when `SUPABASE_URL`/`SUPABASE_ANON_KEY` are absent.
+- **ZKML handler (CON-70):** Replaced simulated-success stub with explicit `501 Not Implemented`. Integration path documented in `TODO(CON-70)` comment.
+- **DLC handler (CON-62):** Replaced placeholder response with explicit `501 Not Implemented`. Integration path documented in `TODO(CON-62)` comment.
+- **Identity handler (CON-66):** BNS names now resolved via real HTTP call to `api.bns.xyz`. ENS and WorldID return `503 Service Unavailable` until wired (`TODO(CON-66)`).
+- **Oracle service (CON-394):** Renamed `OracleStub` → `OracleService` in `ppp_tracker.rs` (the implementation was already real). Flipped `ORACLE_SERVICE_IS_STUBBED` to `false` in `config.rs`.
+- **Contamination guard (CON-383/CON-394):** Removed 7 file paths from `REPO_EXCLUSIONS["conxian-nexus"]` in `scripts/verify_contamination_guard.py`. `lib-conxian-core/src/lib.rs` retained (BitVM2 stub, CON-75).
+
+### Pending (noted for future sessions)
+- **Tableland (CON-69):** Full production wiring requires a Tableland table ID and a signed EVM transaction from the Nexus wallet. Current implementation sends unsigned SQL — needs wallet-signed mutation once Tableland EVM integration is confirmed.
+- **ZKML (CON-70):** Requires selection and integration of a Groth16/PlonK verifier crate (`bellman` or `arkworks`) and a deployed verifying-key registry on Stacks.
+- **DLC (CON-62):** Requires a DLC oracle contract address on Stacks mainnet and sBTC coupon settlement contract wiring.
+- **ENS/WorldID identity (CON-66):** ENS via `api.ensideas.com`; WorldID nullifier lookup pending integration approval.
+- **BitVM2 state root verification (CON-75):** `lib-conxian-core/src/lib.rs` retains one `[STUB]` for BitVM2 verification — tracked separately.
+
 ## [1.9.1] - 2026-04-06
 
 ### Security

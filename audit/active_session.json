@@ -1,19 +1,19 @@
 {
-  "session_id": "CXN-ARCH-GUARDIAN-2026-04-05",
+  "session_id": "CXN-ARCH-GUARDIAN-2026-04-06",
   "active_issue": {
-    "id": "CON-133",
-    "title": "Production deployment readiness audit for revenue-critical products",
+    "id": "CON-383",
+    "title": "Remove BOS state machine stub from production path — full buildout",
     "status": "In Progress",
     "priority": "Urgent",
-    "assignee": "Jules (Lead Architect)",
+    "assignee": "Ona (AI Agent)",
     "cohort": "Guardian"
   },
   "state_sync": {
-    "last_updated": "2026-04-05T09:15:00Z",
+    "last_updated": "2026-04-06T00:00:00Z",
     "target_table": "readiness_gate_state",
-    "locked": true,
-    "completion_status": "75%",
-    "test_pass_rate": "100%"
+    "locked": false,
+    "completion_status": "90%",
+    "test_pass_rate": "pending_ci"
   },
   "audit_trail": [
     {
@@ -35,6 +35,43 @@
       "timestamp": "2026-04-05T09:10:00Z",
       "action": "System Readiness Inventory Complete",
       "details": "Mapped Neon, Supabase, and Render infrastructure. Drafted audit/mainnet_readiness_report_2026_04_05.md."
+    },
+    {
+      "timestamp": "2026-04-06T00:00:00Z",
+      "action": "CON-383 Full BOS Buildout — Stub Remediation Complete",
+      "details": "Remediated all [STUB] markers in conxian-nexus/src/: ERP (real wallet signing), Kwil (real HTTP, fail-closed), Tableland (real HTTP, fail-closed), ARR/MRR (Supabase upsert, non-fatal), ZKML/DLC (501 Not Implemented), Identity/BNS (real HTTP), Oracle (ORACLE_SERVICE_IS_STUBBED flipped to false). Devcontainer updated with Rust stable + Python 3.10. Contamination guard REPO_EXCLUSIONS reduced to lib-conxian-core/src/lib.rs (BitVM2, CON-75). Pending items noted in CHANGELOG [Unreleased] for future sessions: Tableland EVM signing, ZKML verifier, DLC oracle, ENS/WorldID."
+    }
+  ],
+  "pending_future_work": [
+    {
+      "issue": "CON-75",
+      "title": "BitVM2 state root verification",
+      "file": "conxian-nexus/lib-conxian-core/src/lib.rs",
+      "note": "One [STUB] remains for BitVM2 verification. Requires verifier crate selection and Stacks integration."
+    },
+    {
+      "issue": "CON-70",
+      "title": "ZKML verifier integration",
+      "file": "conxian-nexus/src/api/zkml.rs",
+      "note": "Returns 501. Requires Groth16/PlonK verifier crate and deployed verifying-key registry."
+    },
+    {
+      "issue": "CON-62",
+      "title": "DLC bond orchestrator",
+      "file": "conxian-nexus/src/api/dlc.rs",
+      "note": "Returns 501. Requires DLC oracle contract address on Stacks mainnet."
+    },
+    {
+      "issue": "CON-66",
+      "title": "ENS and WorldID identity resolution",
+      "file": "conxian-nexus/src/api/identity.rs",
+      "note": "Returns 503 for ENS/WorldID. BNS is live. ENS via api.ensideas.com; WorldID pending approval."
+    },
+    {
+      "issue": "CON-69",
+      "title": "Tableland wallet-signed mutations",
+      "file": "conxian-nexus/src/storage/tableland.rs",
+      "note": "HTTP call is real but unsigned. Needs EVM wallet-signed mutation once Tableland integration confirmed."
     }
   ]
 }

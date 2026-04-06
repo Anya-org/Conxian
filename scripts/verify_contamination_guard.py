@@ -136,14 +136,15 @@ REPO_EXCLUSIONS = {
         f"AUDIT_MANIFEST.{STUB_SUFFIX}",
         f"SARB_COMPLIANCE_REPORT.{STUB_SUFFIX}",
     },
+    # All [STUB] markers in conxian-nexus/src/ have been remediated (CON-383):
+    # - zkml.rs, dlc.rs: fail-closed 501 Not Implemented
+    # - identity.rs: real BNS HTTP call; ENS/WorldID return 503
+    # - erp.rs: real wallet signing via lib-conxian-core
+    # - kwil.rs, tableland.rs: real HTTP calls, fail-closed on error
+    # - executor/mod.rs: real Supabase upsert, non-fatal
+    # lib-conxian-core/src/lib.rs retains one [STUB] for BitVM2 state root
+    # verification (CON-75) — kept until that integration is wired.
     "conxian-nexus": {
-        "src/api/dlc.rs",
-        "src/api/identity.rs",
-        "src/api/zkml.rs",
-        "src/api/erp.rs",
-        "src/executor/mod.rs",
-        "src/storage/kwil.rs",
-        "src/storage/tableland.rs",
         "lib-conxian-core/src/lib.rs",
     },
     "Conxian": {
