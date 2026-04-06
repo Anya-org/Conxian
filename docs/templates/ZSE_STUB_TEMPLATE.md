@@ -1,3 +1,10 @@
+<!--
+USAGE:
+- Replace [TITLE] and [PURPOSE/DOMAIN].
+- Link 1: Linear workspace root.
+- Link 2: the doc-specific Linear issue owning the canonical content (fallback: CON-256).
+-->
+
 # [TITLE] (migrated to Linear)
 
 This repository is public.
