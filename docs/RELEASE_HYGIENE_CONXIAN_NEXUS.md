@@ -5,7 +5,7 @@ This is the release discipline checklist for `conxian-nexus` (the Rust "Glass No
 ## Release artifacts (required)
 
 1. A version tag in the `conxian-nexus` repo (recommended: `vX.Y.Z`).
-2. A root `CHANGELOG.md` entry for the same `X.Y.Z` (Keep a Changelog + SemVer).
+2. A `CHANGELOG.md` entry in the `Conxian/conxian-nexus` repo root for the same `X.Y.Z` (Keep a Changelog + SemVer). See [`CHANGELOG.md`](https://github.com/Conxian/conxian-nexus/blob/main/CHANGELOG.md).
 3. GitHub Release notes (or equivalent) pointing to the tag/commit and linking CI results.
 
 ## Versioning and tagging
