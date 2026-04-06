@@ -2,6 +2,10 @@
 
 This document defines the staged handoff protocol from personal bootstrap control to the Sovereign Advisory Board (SAB) and finally to the Decentralized Autonomous Organization (DAO).
 
+For canonical wallet classes and the more granular staged migration protocol, see [`docs/BOS_WALLET_CONTROL_MODEL.md`](./BOS_WALLET_CONTROL_MODEL.md).
+
+Stage mapping note: relative to `docs/BOS_WALLET_CONTROL_MODEL.md`, Stage 1 here ≈ Stage 0 (bootstrap allowed), Stage 2 here ≈ Stage 1–3 (SAB custody establishment + admin surface migration + automation cutover), and Stage 3 here ≈ Stage 4+ (DAO alignment).
+
 ## Handoff stages
 
 ### Stage 1: Personal bootstrap (Initial Deployment)
@@ -9,14 +13,14 @@ This document defines the staged handoff protocol from personal bootstrap contro
 - **Custodian:** Developer / Operator personal address.
 - **Authority:** Full administrative control for deployment, initialization, and testnet validation.
 - **Risk:** High centralization / single-point-of-failure.
-- **Exit criterion:** Core protocol contracts deployed and verified on mainnet.
+- **Exit criterion:** Core protocol contracts deployed and verified on testnet; mainnet deployment plan finalized.
 
 ### Stage 2: SAB-controlled custody (Operational Launch)
-- **Status:** Target for Initial Mainnet Release.
+- **Status:** Required for Initial Mainnet Release.
 - **Custodian:** SAB-controlled multi-sigs and system-controlled agents.
 - **Authority:** Operational execution, parameter adjustments within defined bounds, and initial fee capture.
-- **Handoff action:** Transfer contract-owner roles to the appropriate SAB multi-sigs (e.g., `SAB-TREASURY-MS`, `BOUNTY-PAYOUT-MS`).
-- **Exit criterion:** Payouts enabled and protocol fees provably accruing to SAB-owned vaults.
+- **Handoff action:** Transfer contract-owner roles to the appropriate SAB multi-sigs and emergency authorities as defined in [`docs/BOS_WALLET_CONTROL_MODEL.md`](./BOS_WALLET_CONTROL_MODEL.md).
+- **Exit criterion:** Protocol fees provably accruing to SAB-owned vaults; payout enablement (if any) follows separate readiness gates.
 
 ### Stage 3: DAO-aligned governance (Long-term Decentralization)
 - **Status:** Post-launch maturity.
