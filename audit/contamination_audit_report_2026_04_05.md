@@ -11,7 +11,7 @@ This audit originally identified significant "stub", "mock", and "placeholder" c
 
 ### A. Conxian (Protocol Contracts)
 - **Hardcoded Devnet Principals:** REMEDIATED. All `ST1PQ...` instances replaced with `tx-sender` or dynamic governance variables (CON-61).
-- **Tier 0 Stubs:** GATED. Identified stubs in `order-book.clar`, `proposal-engine-trait.clar`, etc., are now monitored by the CI Contamination Guard.
+- **Tier 0 Stubs:** GATED. Identified stubs in `order-book.clar`, `proposal-engine-trait.clar`, etc., are monitored by the CI Contamination Guard where in-scope (see "Scan Scope / Exclusions").
 - **Mocks:** REMEDIATED. Non-production mocks in `agent-risk.clar` and `bns-stub.clar` are isolated from production paths.
 - **Placeholders:** REMEDIATED. Placeholder comments in `alex-adapter.clar` and `redstone-oracle-adapter.clar` have been updated to production integration status.
 
@@ -27,8 +27,11 @@ This audit originally identified significant "stub", "mock", and "placeholder" c
 - **Intentional Stubs:** MAINTAINED. `BOS_STATE_MACHINE.stub.json` and `LINEAR_WIRING.md` remain stubs to satisfy Zero Secret Egress (ZSE) compliance.
 
 ## 3. Enforcement
-1. **CI Guardrails:** The `scripts/verify_contamination_guard.py` script is now active and mandatory for all PRs targeting `main` and `staged`. It rejects hardcoded testnet principals and explicit stub markers in production source trees.
+1. **CI Guardrails:** The `scripts/verify_contamination_guard.py` script is now active and mandatory for all PRs targeting `main` and `staged`. It rejects hardcoded testnet principals and explicit stub markers in production source trees, subject to the current scan scope and allowlisted exclusions.
 2. **Fail-Closed Standard:** All new functional stubs must return a `NOT_IMPLEMENTED` or `SERVICE_UNAVAILABLE` error in the production code path.
+
+### Scan Scope / Exclusions
+The canonical scan scope, file-type filters, and allowlisted exclusions are defined in `scripts/verify_contamination_guard.py` (see `GLOBAL_EXCLUSIONS`, `REPO_EXCLUSIONS`, and `code_exts`). Any allowlisted paths are treated as intentional exceptions (e.g., ZSE stubs and explicitly gated integrations) and require manual review during audits/releases.
 
 ---
 **Verified by:** Jules (cxn-arch-guardian)
