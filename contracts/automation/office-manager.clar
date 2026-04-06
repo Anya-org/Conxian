@@ -31,6 +31,9 @@
 ;; Only whitelisted agents can trigger payouts
 (define-map authorized-agents principal bool)
 
+;; @desc Updates the authorization status of an agent. Owner only.
+;; @param agent: The principal of the agent to update.
+;; @param active: The active status to set.
 (define-public (set-agent-status (agent principal) (active bool))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -39,12 +42,16 @@
   )
 )
 
+;; @desc Checks if an agent is authorized to trigger payouts.
+;; @param agent: The principal of the agent to check.
 (define-read-only (is-authorized-agent (agent principal))
   (default-to false (map-get? authorized-agents agent))
 )
 
 ;; --- Worker Management ---
 
+;; @desc Registers a new worker in the payroll system. Owner only.
+;; @param worker: The principal of the worker to register.
 (define-public (register-worker (worker principal))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -57,6 +64,8 @@
   )
 )
 
+;; @desc Removes a worker from the payroll system. Owner only.
+;; @param worker: The principal of the worker to remove.
 (define-public (remove-worker (worker principal))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -65,12 +74,16 @@
   )
 )
 
+;; @desc Checks if a worker is currently active in the registry.
+;; @param worker: The principal of the worker to check.
 (define-read-only (is-worker-active (worker principal))
   (default-to false (map-get? workers worker))
 )
 
 ;; --- Payroll Management ---
 
+;; @desc Deposits STX into the payroll balance for future worker payments.
+;; @param amount: The amount of STX to deposit.
 (define-public (fund-payroll (amount uint))
   (begin
     (try! (stx-transfer? amount tx-sender (as-contract tx-sender)))
@@ -84,6 +97,8 @@
   )
 )
 
+;; @desc Withdraws STX from the payroll balance to the owner's account. Owner only.
+;; @param amount: The amount of STX to withdraw.
 (define-public (withdraw-payroll (amount uint))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -128,10 +143,19 @@
 
 ;; --- RBAC Trait Implementation ---
 
+;; @desc Checks if a user has a specific role.
+;; @param user: The principal to check.
+;; @param role-id: The ID of the role to verify.
 (define-public (has-role (user principal) (role-id uint))
   (ok (is-owner)) ;; Simplified implementation for office-manager
 )
 
+;; @desc Grants a role to a user. Owner only.
+;; @param user: The principal to grant the role to.
+;; @param role-id: The ID of the role to grant.
+;; @param message: Authorization message.
+;; @param signature: Authorization signature.
+;; @param public-key: Authorized public key.
 (define-public (grant-role (user principal) (role-id uint) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -139,6 +163,12 @@
   )
 )
 
+;; @desc Revokes a role from a user. Owner only.
+;; @param user: The principal to revoke the role from.
+;; @param role-id: The ID of the role to revoke.
+;; @param message: Authorization message.
+;; @param signature: Authorization signature.
+;; @param public-key: Authorized public key.
 (define-public (revoke-role (user principal) (role-id uint) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -147,6 +177,9 @@
 )
 
 ;; @desc Verifies a passkey/biometric signature.
+;; @param message: Authorization message.
+;; @param signature: Authorization signature.
+;; @param public-key: Authorized public key.
 ;; @note Passkey/WebAuthn verification is not supported directly in Clarity today.
 ;;       This returns (err ERR_PASSKEY_NOT_SUPPORTED) so callers cannot treat it as an authorization primitive.
 (define-public (verify-passkey-signature (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
