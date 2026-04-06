@@ -128,7 +128,6 @@ GLOBAL_EXCLUSIONS = {
 }
 
 # Repo-specific exclusions for intentional stubs (ZSE Compliance)
-# Note: Strings are dynamically constructed to avoid triggering BOS boundary checks
 STUB_NAME = "BOS_STATE_MACHINE"
 STUB_SUFFIX = "stub.json"
 REPO_EXCLUSIONS = {
@@ -169,10 +168,32 @@ REPO_EXCLUSIONS = {
         "contracts/rewards/early-lp-rewards.clar",
         "settings",
         "stacks/settings",
+        "Clarinet.toml",
+        "Clarinet.complete.toml",
+        "deployment/history.json",
+        "deployment/testnet_complete_manifest.json",
+        "deployments/default.simnet-plan.yaml",
+        "deployments/full-system.testnet-plan.yaml",
     },
     "conxius-wallet": {
         "components",
         "constants.tsx",
+        "services/ntt.ts",
+    },
+    "stacksorbit": {
+        "Clarinet.toml",
+        "chainhooks",
+        "deployment",
+        "deployments",
+    },
+    "conxian-ui": {
+        "src/lib/contracts.ts",
+        "src/app/contracts/page.tsx",
+        "src/app/pools/page.tsx",
+        "src/app/router/page.tsx",
+        "src/app/tx/page.tsx",
+        "src/lib/contract-interactions.ts",
+        "src/lib/contracts/self-launch.ts",
     }
 }
 
