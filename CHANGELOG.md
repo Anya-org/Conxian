@@ -11,6 +11,10 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 
 ### Added
 - Documented the BOS business-end operating model (`docs/BOS_BUSINESS_BUILDOUT.md`), including ZSE public/internal split guidance and governance/README alignment.
+- Standardized Zero Secret Egress (ZSE) stubs across the repository and created a canonical template at `docs/templates/ZSE_STUB_TEMPLATE.md`.
+
+### Security
+- Remediated `docs/bounties/MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md` by replacing sensitive operational details with a standardized ZSE stub.
 
 ## [1.8.2] - 2026-03-31
 ### Security

@@ -2,11 +2,11 @@
 
 This repository is public.
 
-Vendor/provider audit notes, internal MCP endpoints, and any operational verification thresholds are maintained in the Conxian Linear workspace.
+The canonical content for vendor audits and LSEG MCP integration is maintained in the Conxian Linear workspace to comply with our Zero Secret Egress (ZSE) mandate and to protect sensitive strategy, legal, or operational details.
 
 See:
 
 - https://linear.app/conxian-labs
 - https://linear.app/conxian-labs/issue/CON-256
 
-This file is intentionally kept as a stub so links continue to resolve.
+This file is intentionally kept as a stub so existing links continue to resolve.

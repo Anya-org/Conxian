@@ -2,11 +2,11 @@
 
 This repository is public.
 
-Detailed strategic planning, operational targets, and any partner- or jurisdiction-specific work is maintained in the Conxian Linear workspace to avoid publishing non-public strategy.
+The canonical content for strategic planning and M&A velocity is maintained in the Conxian Linear workspace to comply with our Zero Secret Egress (ZSE) mandate and to protect sensitive strategy, legal, or operational details.
 
 See:
 
 - https://linear.app/conxian-labs
 - https://linear.app/conxian-labs/issue/CON-256
 
-This file is intentionally kept as a stub so links from `SUMMARY.md` and other docs continue to resolve.
+This file is intentionally kept as a stub so existing links continue to resolve.

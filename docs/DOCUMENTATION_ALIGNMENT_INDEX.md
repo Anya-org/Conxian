@@ -31,16 +31,16 @@ These are the “operating-model” documents that explain how BOS components re
 | Document | Role | Visibility | What it’s for |
 | --- | --- | --- | --- |
 | `conxian-business/SERVICE_LOOP.md` | Canonical | Public-safe | BOS service loop (how client/supplier loops connect). |
-| `conxian-business/BOS_STATE_MACHINE.stub.json` | Supporting | Public-safe | Public-safe BOS state machine pointer stub; canonical internal definition is maintained outside this repo. |
-| `Sovereign-Ops-Orchestrator/LINEAR_WIRING.md` | Canonical | Internal-only | Intended Linear ↔ state-layer wiring and webhook triggers. |
-| `Sovereign-Ops-Orchestrator/DEPLOYMENT_EFFICIENCY.md` | Supporting | Internal-only | Bottleneck and deployment efficiency metrics. |
-| `Sovereign-Strategy-Nexus/REALTIME_M&A_VELOCITY.md` | Supporting | Internal-only | Strategy velocity tracking and exit-readiness framing. |
-| `Sovereign-Strategy-Nexus/docs/SOVEREIGN_MOI_ALIGNMENT.md` | Canonical | Internal-only | “MOI” alignment source for Strategy Nexus narratives. |
-| `Sovereign-Strategy-Nexus/docs/ZK_DATA_ROOM_SCHEMA.md` | Canonical | Internal-only | ZK data room schema (what proofs/data exist). |
-| `Sovereign-Strategy-Nexus/docs/SOVEREIGN_PITCH_DECK_NARRATIVE.md` | Supporting | Internal-only | Pitch narrative scaffolding. |
-| `Fiscal-Vault-Oracle/SOVEREIGN_RUNWAY.md` | Canonical | Internal-only | Treasury runway and yield execution constraints. |
-| `Fiscal-Vault-Oracle/LSEG_MCP_AUDIT.md` | Supporting | Internal-only | LSEG MCP audit context for treasury/oracle integrity. |
-| `Nakamoto-Guardian/ANTI_FRAGILITY_LOOP.md` | Canonical | Internal-only | ATS enforcement + collision audits framing. |
+| `conxian-business/BOS_STATE_MACHINE.stub.json` | Supporting | Public-safe | Public-safe BOS state machine pointer stub (standardized ZSE stub). |
+| `Sovereign-Ops-Orchestrator/LINEAR_WIRING.md` | Canonical | Internal-only | Intended Linear ↔ state-layer wiring and webhook triggers (standardized ZSE stub). |
+| `Sovereign-Ops-Orchestrator/DEPLOYMENT_EFFICIENCY.md` | Supporting | Internal-only | Bottleneck and deployment efficiency metrics (standardized ZSE stub). |
+| `Sovereign-Strategy-Nexus/REALTIME_M&A_VELOCITY.md` | Supporting | Internal-only | Strategy velocity tracking and exit-readiness framing (standardized ZSE stub). |
+| `Sovereign-Strategy-Nexus/docs/SOVEREIGN_MOI_ALIGNMENT.md` | Canonical | Internal-only | “MOI” alignment source for Strategy Nexus narratives (standardized ZSE stub). |
+| `Sovereign-Strategy-Nexus/docs/ZK_DATA_ROOM_SCHEMA.md` | Canonical | Internal-only | ZK data room schema (standardized ZSE stub). |
+| `Sovereign-Strategy-Nexus/docs/SOVEREIGN_PITCH_DECK_NARRATIVE.md` | Supporting | Internal-only | Pitch narrative scaffolding (standardized ZSE stub). |
+| `Fiscal-Vault-Oracle/SOVEREIGN_RUNWAY.md` | Canonical | Internal-only | Treasury runway and yield execution constraints (standardized ZSE stub). |
+| `Fiscal-Vault-Oracle/LSEG_MCP_AUDIT.md` | Supporting | Internal-only | LSEG MCP audit context for treasury/oracle integrity (standardized ZSE stub). |
+| `Nakamoto-Guardian/ANTI_FRAGILITY_LOOP.md` | Canonical | Internal-only | ATS enforcement + collision audits framing (standardized ZSE stub). |
 | `cxn-grid-oracle/README.md` | Supporting | Public-safe | Grid oracle overview (agnostic). |
 
 ## 3) OpenSpec (ground truth specs)
@@ -130,8 +130,8 @@ See `docs/BOS_BUSINESS_BUILDOUT.md` for repo business purpose, business-unit pla
 | `SECURITY.md` | Canonical | Public-safe | Security policy and reporting. |
 | `.github/PULL_REQUEST_TEMPLATE.md` | Supporting | Public-safe | PR checklist and norms. |
 | `docs/CSF_FIRST_OPERATING_SEQUENCE_AND_PROOF_GATES.md` | Canonical | Public-safe | Locks the CSF → economy → gateway operating order and the minimum proof gates that keep launch, economy design, and go-to-market claims aligned. |
-| `docs/bounties/MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md` | Canonical | Internal-only | How maintainer payouts are enabled and validated. |
-| `admin/SECRETS.md` | Canonical | Internal-only | Secret registry + pointers to Linear docs (ZSE-compliant). |
+| `docs/bounties/MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md` | Canonical | Internal-only | How maintainer payouts are enabled and validated (standardized ZSE stub). |
+| `admin/SECRETS.md` | Canonical | Internal-only | Secret registry + pointers to Linear docs (standardized ZSE stub). |
 
 ## 7) Known doc gaps / broken references (should not be re-created blindly)
 
