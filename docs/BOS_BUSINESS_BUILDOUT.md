@@ -109,3 +109,13 @@ To ensure the integrity of the Conxian Production Environment, all repositories 
 - **`dev` branch**: Testnet-only and non-production validation.
 
 Direct merges from `dev` to `main` are strictly prohibited.
+
+## 4. SAB-owned BOS Wallet Architecture (CON-423)
+
+To ensure system automation remains system-controlled, all flagship and supporting repositories must adhere to the wallet architecture defined in [`docs/SAB_WALLET_ARCHITECTURE_AND_CONTROL_MATRIX.md`](./SAB_WALLET_ARCHITECTURE_AND_CONTROL_MATRIX.md).
+
+- **Execution Wallets**: Used for routine automation and BOS service loops.
+- **Treasury Wallets**: Passive custody of protocol fees and reserves.
+- **Payout Wallets**: Controlled by SAB-approved multi-sigs for bounties and royalties.
+
+No launch-critical automation may depend on a personal or bootstrap wallet after the handoff to SAB-controlled custody (`docs/SAB_DAO_HANDOFF_PROTOCOL.md`).

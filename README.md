@@ -82,6 +82,14 @@ Detailed strategy and roadmap content must not be duplicated in this README; see
 
 Some files are intentionally kept as stubs so existing links continue to resolve.
 
+## BOS Architecture and Wallet Control
+
+The Conxian Business Operations System (BOS) follows a strict **SAB-owned wallet architecture** to ensure system-controlled automation and auditable financial flows.
+
+- **Wallet Architecture**: See [`docs/SAB_WALLET_ARCHITECTURE_AND_CONTROL_MATRIX.md`](./docs/SAB_WALLET_ARCHITECTURE_AND_CONTROL_MATRIX.md).
+- **Handoff Protocol**: The staged migration from personal bootstrap control to SAB and DAO governance is defined in [`docs/SAB_DAO_HANDOFF_PROTOCOL.md`](./docs/SAB_DAO_HANDOFF_PROTOCOL.md).
+- **Implementation Manifest**: Technical remediation of hardcoded principals and stubbed roles is tracked in [`docs/WALLET_REMAPPING_MANIFEST_CON_61_CON_423.md`](./docs/WALLET_REMAPPING_MANIFEST_CON_61_CON_423.md).
+
 ## Ground truth (OpenSpec)
 
 The definitive technical specifications for the Conxian ecosystem are maintained in the `openspec/` directory. See the [Enterprise Sovereignty Baseline](./openspec/changes/remediate-enterprise-sovereignty/specs.md) for the latest architectural standards.
