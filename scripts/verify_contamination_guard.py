@@ -11,6 +11,12 @@ import sys
 def repo_root() -> str:
     return os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
+def format_git_ls_files_error(root: str, details: str = "") -> str:
+    return (
+        f"Failed to run `git ls-files` in {root!r}. Ensure `git` is installed and available on PATH, and that this directory is a Git repo and submodules are initialized (e.g., `git submodule update --init --recursive`)."
+        + details
+    )
+
 def git_ls_files(root: str) -> list[str]:
     try:
         prefix = subprocess.check_output(
@@ -21,13 +27,13 @@ def git_ls_files(root: str) -> list[str]:
             ["git", "-C", root, "ls-files", "-z", "--", "."],
             stderr=subprocess.STDOUT,
         )
-    except (FileNotFoundError, subprocess.CalledProcessError) as exc:
+    except (FileNotFoundError, OSError) as exc:
+        raise SystemExit(format_git_ls_files_error(root, f"\n\nOS error:\n{exc}")) from exc
+    except subprocess.CalledProcessError as exc:
         output = getattr(exc, "output", b"")
         output_text = output.decode("utf-8", "replace") if output else ""
         details = f"\n\nGit output:\n{output_text}" if output_text else ""
-        raise SystemExit(
-            f"Failed to list tracked files in {root!r}. Ensure this directory is a Git repo and submodules are initialized (e.g., `git submodule update --init --recursive`).{details}"
-        ) from exc
+        raise SystemExit(format_git_ls_files_error(root, details)) from exc
     parts = [p for p in out.split(b"\x00") if p]
     prefix_text = prefix.decode("utf-8", "replace")
     prefix_text = prefix_text.strip()
@@ -41,11 +47,22 @@ def git_ls_files(root: str) -> list[str]:
     return paths
 
 def is_excluded(rel_path: str, excluded_set: set[str]) -> bool:
+    """Return True when `rel_path` should be skipped during scanning.
+
+    Exclusion semantics:
+    - Entries containing `/` match an exact relative path or a directory prefix.
+    - Bare entries match either a root-level file (exact match) or any directory
+      name anywhere in the path.
+    """
+    rel_path = rel_path.replace(os.sep, "/").replace("\\", "/")
+    while rel_path.startswith("./"):
+        rel_path = rel_path[2:]
     rel_path = rel_path.strip("/")
     parts = rel_path.split("/") if rel_path else []
-    filename = parts[-1] if parts else ""
     for excluded in excluded_set:
-        ex = excluded.strip("/")
+        ex = excluded.replace(os.sep, "/").replace("\\", "/").strip("/")
+        while ex.startswith("./"):
+            ex = ex[2:]
         if not ex:
             continue
 
@@ -53,7 +70,9 @@ def is_excluded(rel_path: str, excluded_set: set[str]) -> bool:
             if rel_path == ex or rel_path.startswith(ex + "/"):
                 return True
             continue
-        if ex == filename or ex in parts[:-1]:
+        if rel_path == ex:
+            return True
+        if ex in parts[:-1]:
             return True
     return False
 
@@ -66,7 +85,10 @@ def read_text(root: str, rel_path: str) -> str:
 
 # Patterns that indicate contamination in production code
 CONTAMINATION_PATTERNS = [
-    ("Hardcoded Testnet Principal", re.compile(r"\bST[0-9A-Z]{38,}\b", re.IGNORECASE)),
+    (
+        "Hardcoded Testnet Principal",
+        re.compile(r"(?<![0-9A-Z_])ST[0-9A-Z]{38,}(?![0-9A-Z_])", re.IGNORECASE),
+    ),
     ("Stub Function Marker", re.compile(r"\bstub-func\b")),
     ("Explicit [STUB] Marker", re.compile(r"\[STUB\]")),
     ("Mock Pattern", re.compile(r"\bMOCK_[A-Z0-9_]+\b")),
@@ -102,6 +124,7 @@ GLOBAL_EXCLUSIONS = {
     "CONTRIBUTING.md",
     "pnpm-lock.yaml",
     "package-lock.json",
+    "showcase-dapp/package-lock.json",
 }
 
 # Repo-specific exclusions for intentional stubs (ZSE Compliance)
