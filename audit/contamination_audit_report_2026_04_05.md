@@ -31,7 +31,7 @@ This audit originally identified significant "stub", "mock", and "placeholder" c
 2. **Fail-Closed Standard:** All new functional stubs must return a `NOT_IMPLEMENTED` or `SERVICE_UNAVAILABLE` error in the production code path.
 
 ### Scan Scope / Exclusions
-The canonical scan scope, file-type filters, and allowlisted exclusions are defined in `scripts/verify_contamination_guard.py` (see `GLOBAL_EXCLUSIONS`, `REPO_EXCLUSIONS`, and `code_exts`). Any allowlisted paths are treated as intentional exceptions (e.g., ZSE stubs and explicitly gated integrations) and require manual review during audits/releases.
+The canonical scan scope, file-type filters, and allowlisted exclusions are defined in [`scripts/verify_contamination_guard.py`](../scripts/verify_contamination_guard.py). Any allowlisted paths are treated as intentional exceptions (e.g., ZSE stubs and explicitly gated integrations) and require manual review during audits/releases.
 
 ---
 **Verified by:** Jules (cxn-arch-guardian)
