@@ -54,8 +54,27 @@ cargo run --bin conxian-nexus
 ### Conxian Gateway
 Handles institutional B2B traffic and compliance.
 
+Gateway defaults to the public Bitcoin mainnet RPC endpoint `https://bitcoin-rpc.publicnode.com` whenever `BITCOIN_RPC_URL` is unset. This default is only appropriate for non-production, non-funds-bearing local development and low-traffic open-tier environments (see [environment tier definitions](docs/BOS_BUSINESS_BUILDOUT.md)).
+
+> **Warning: public Bitcoin mainnet RPC default**
+>
+> - This default is only suitable for non-production, non-funds-bearing, low-traffic usage. For production, funds-bearing, or privacy-sensitive workloads, set `BITCOIN_RPC_URL` explicitly to a controlled node or vetted provider before running.
+> - Traffic to this default endpoint is handled by a third-party public RPC operator and may be logged (including IP addresses and request metadata).
+> - To avoid hitting mainnet in local testing, set `BITCOIN_RPC_URL` explicitly (for example to a testnet or regtest node). If you use the default endpoint, treat all traffic as live mainnet traffic: use disposable keys and small amounts you can afford to lose.
+>
+> See [conxian-gateway/README.md](conxian-gateway/README.md) for full configuration details.
+
 ```bash
 cd conxian-gateway
+
+# Recommended for local testing: set BITCOIN_RPC_URL explicitly (for example to a local regtest node) to avoid sending traffic to the public Bitcoin mainnet RPC default.
+# Adjust host/port to match your node.
+export BITCOIN_RPC_URL=http://127.0.0.1:18443
+
+# If your node requires RPC auth:
+# export BITCOIN_RPC_USER=your_rpc_user
+# export BITCOIN_RPC_PASS=your_rpc_pass
+
 cargo run --bin gateway
 ```
 

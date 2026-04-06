@@ -12,6 +12,12 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 ### Added
 - Documented the BOS business-end operating model (`docs/BOS_BUSINESS_BUILDOUT.md`), including ZSE public/internal split guidance and governance/README alignment.
 
+### Changed
+- gateway: **Behavior change** when `BITCOIN_RPC_URL` is unset: Gateway now defaults to the public Bitcoin mainnet RPC endpoint (`https://bitcoin-rpc.publicnode.com`). (CON-418, #354)
+
+### Security
+- gateway: **Operator action**: This default is intended only for non-production, non-funds-bearing development and low-traffic open-tier usage. Before upgrading, production, funds-bearing, or privacy-sensitive environments must set `BITCOIN_RPC_URL` explicitly (see [docs/BOS_BUSINESS_BUILDOUT.md](docs/BOS_BUSINESS_BUILDOUT.md) for environment tier definitions). Traffic to this default endpoint is handled by a third-party public RPC operator and may be logged (including IP addresses and request metadata). (CON-418, #354)
+
 ## [1.8.2] - 2026-03-31
 ### Security
 - Remediated Zero Secret Egress (ZSE) violation by removing the `archive/` directory from the active Git index.
