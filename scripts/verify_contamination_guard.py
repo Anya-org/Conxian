@@ -13,11 +13,15 @@ def repo_root() -> str:
 
 def git_ls_files(root: str) -> list[str]:
     try:
-        out = subprocess.check_output(
-            ["git", "-C", root, "ls-files", "-z"],
+        prefix = subprocess.check_output(
+            ["git", "-C", root, "rev-parse", "--show-prefix"],
             stderr=subprocess.STDOUT,
         )
-    except subprocess.CalledProcessError as exc:
+        out = subprocess.check_output(
+            ["git", "-C", root, "ls-files", "-z", "--", "."],
+            stderr=subprocess.STDOUT,
+        )
+    except (FileNotFoundError, subprocess.CalledProcessError) as exc:
         output = getattr(exc, "output", b"")
         output_text = output.decode("utf-8", "replace") if output else ""
         details = f"\n\nGit output:\n{output_text}" if output_text else ""
@@ -25,12 +29,21 @@ def git_ls_files(root: str) -> list[str]:
             f"Failed to list tracked files in {root!r}. Ensure this directory is a Git repo and submodules are initialized (e.g., `git submodule update --init --recursive`).{details}"
         ) from exc
     parts = [p for p in out.split(b"\x00") if p]
-    return [os.fsdecode(p) for p in parts]
+    prefix_text = prefix.decode("utf-8", "replace")
+    prefix_text = prefix_text.strip()
+    prefix_text = prefix_text.lstrip("/")
+    if prefix_text and not prefix_text.endswith("/"):
+        prefix_text += "/"
+
+    paths = [os.fsdecode(p) for p in parts]
+    if prefix_text:
+        paths = [p[len(prefix_text) :] if p.startswith(prefix_text) else p for p in paths]
+    return paths
 
 def is_excluded(rel_path: str, excluded_set: set[str]) -> bool:
     rel_path = rel_path.strip("/")
     parts = rel_path.split("/") if rel_path else []
-
+    filename = parts[-1] if parts else ""
     for excluded in excluded_set:
         ex = excluded.strip("/")
         if not ex:
@@ -40,10 +53,7 @@ def is_excluded(rel_path: str, excluded_set: set[str]) -> bool:
             if rel_path == ex or rel_path.startswith(ex + "/"):
                 return True
             continue
-
-        if ex in parts[:-1]:
-            return True
-        if parts and parts[-1] == ex:
+        if ex == filename or ex in parts[:-1]:
             return True
     return False
 
