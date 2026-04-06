@@ -54,7 +54,8 @@ The evidence pack MUST include:
 - Merge-base of `main` and `staged` SHA
 - `staged` head commit SHA
 - SHA capture timestamp (ISO 8601 UTC; canonical remote used)
-- Canonical remote URL (e.g. `git remote get-url <canonical-remote>`)
+- Canonical remote fetch URL(s) (credential-free; redact any embedded credentials) (e.g. `git remote get-url --all <canonical-remote>`)
+- Canonical remote push URL(s) (if different; credential-free; redact any embedded credentials) (e.g. `git remote get-url --push --all <canonical-remote>`)
 - Change owner (single accountable human)
 - Required approvers (CODEOWNERS) who signed off
 - Business unit(s) impacted
@@ -71,7 +72,8 @@ Record:
 - Merge-base: `git merge-base <canonical-remote>/main <canonical-remote>/staged`
 - `staged` head: `git rev-parse <canonical-remote>/staged`
 - SHA capture timestamp: `date -u +%Y-%m-%dT%H:%M:%SZ`
-- Canonical remote URL: `git remote get-url <canonical-remote>`
+- Canonical remote fetch URL(s): `git remote get-url --all <canonical-remote>`
+- Canonical remote push URL(s) (if different): `git remote get-url --push --all <canonical-remote>`
 
 If the merge is delayed or `<canonical-remote>/main` or `<canonical-remote>/staged` advances after capture, re-capture and update the evidence pack before merging.
 
@@ -153,7 +155,8 @@ Copy/paste and fill out for any `staged` -> `main` promotion PR.
 - Merge-base of `main` and `staged` SHA: `<sha>`
 - `staged` head commit SHA: `<sha>`
 - SHA capture timestamp: `Captured at (UTC): <YYYY-MM-DDTHH:MM:SSZ>; Canonical remote: <canonical-remote>` (after `git fetch --prune <canonical-remote> main staged`; before merge)
-- Canonical remote URL (e.g. `git remote get-url <canonical-remote>`): `<url>`
+- Canonical remote fetch URL(s) (credential-free; redact any embedded credentials) (e.g. `git remote get-url --all <canonical-remote>`): `<url>`
+- Canonical remote push URL(s) (if different) (e.g. `git remote get-url --push --all <canonical-remote>`): `<url>`
 - Accountable owner: `<name>` (GitHub: `@<handle>`; optional: `<public Linear profile URL if available>`)
 - Approvers (CODEOWNERS): `@<handle>`, `@<handle>` (optional: names)
 - Business unit(s): `<bu>`
