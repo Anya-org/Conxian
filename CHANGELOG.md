@@ -7,50 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.md](docs/RELEASE_NOTES_AND_CHANGELOG.md).
 
-## [Unreleased]
-
-### Added
-- Documented the BOS business-end operating model (`docs/BOS_BUSINESS_BUILDOUT.md`), including ZSE public/internal split guidance and governance/README alignment.
-- Standardized Zero Secret Egress (ZSE) stubs across the repository and created a canonical template at `docs/templates/ZSE_STUB_TEMPLATE.md`.
+## [1.9.1] - 2026-04-06
 
 ### Security
-- Remediated `docs/bounties/MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md` by replacing sensitive operational details with a standardized ZSE stub.
-
-## [1.8.2] - 2026-03-31
-### Security
-- Remediated Zero Secret Egress (ZSE) violation by removing the `archive/` directory from the active Git index.
-- Verified knowledge retention via `scripts/verify_knowledge_retention.py` and `audit/migration_manifest.json`.
+- **Hardcoded Principal Remediation (CON-61):** Replaced all instances of the hardcoded testnet admin principal ('ST1PQ...') with 'tx-sender' across 76+ Clarity contracts, enabling dynamic governance initialization.
+- **Production Contamination Guard (CON-394):** Implemented a blocking CI check (`scripts/verify_contamination_guard.py`) that rejects hardcoded testnet principals, mocks, and explicit stub markers in production source trees.
+- **Fail-Closed Execution Paths (CON-394):** Standardized critical stubs in `conxian-nexus` (ZKML, DLC, Identity, ERP) to return explicit service errors instead of simulated data, preventing "fail-open" scenarios during mainnet cutover.
 
 ### Changed
-- Cleaned up `SUMMARY.md` and `docs/README.md` to remove legacy links to missing historical artifacts.
-
-## [1.8.1] - 2026-03-31
-### Security
-- Fixed CON-304: Redaction scanner statefulness in `conxius-wallet` by replacing shared global regexes with factory-generated instances.
-
-### Fixed
-- Aligned `NUBIT_API` routing between testnet (`testnet.nubit.org`) and mainnet (`nubit.org`) in `network.ts`.
-
-### Added
-- Regression test suite `tests/stateful-regex-repro.test.ts` in `conxius-wallet`.
-
-## [1.8.0] - 2026-03-31
-### Added
-- SAB Datastore Mapping Specification (`openspec/specs/sab-datastore-mapping/spec.md`) translating current-state inventory into target-state datastore decisions.
-
-## [1.7.0] - 2026-03-30
-### Added
-- Root-level governance files: `LICENSE`, `CHANGELOG.md`.
-- Enhanced `.gitignore` to protect internal strategy material and root-level artifacts.
-
-### Changed
-- Improved root-level hygiene by removing tracked build artifacts and sensitive strategy documents from the Git index.
-- Standardized repository structure across submodules.
-
-### Fixed
-- Public/private boundary violation by moving sensitive `internal/strategy/` content out of the active Git index.
-
-> Note: Removing files from the current tree does not purge them from git history. A follow-up history rewrite is required for a full removal.
+- **Mainnet Release Plan Alignment (CON-371):** Updated `mainnet-release-plan.yaml` to use canonical mainnet principals ('SP...').
+- **Sanitized Integration Adapters:** Updated `alex-adapter.clar` and `redstone-oracle-adapter.clar` to production integration status, removing simulation placeholders.
+- **Audit Verification:** Updated `contamination_audit_report_2026_04_05.md` and `mainnet_readiness_report_2026_04_05.md` to reflect REMEDIATED status.
 
 ## [1.9.0] - 2026-04-05
 ### Added
@@ -61,3 +28,13 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 ### Changed
 - Updated [BOS Business Buildout](docs/BOS_BUSINESS_BUILDOUT.md) to include the new Branching and Promotion Policy and align with the "Mainnet Readiness Gate".
 - Updated [active session](audit/active_session.json) to reflect the transition from individual issue resolution to holistic system readiness.
+
+## [1.8.2] - 2026-03-31
+### Security
+- Remediated Zero Secret Egress (ZSE) violation by removing the `archive/` directory from the active Git index.
+- Verified knowledge retention via `scripts/verify_knowledge_retention.py` and `audit/migration_manifest.json`.
+
+### Changed
+- Cleaned up `SUMMARY.md` and `docs/README.md` to remove legacy links to missing historical artifacts.
+
+[... Output truncated ...]
