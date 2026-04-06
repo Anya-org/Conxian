@@ -31,14 +31,16 @@ Stage mapping note: relative to `docs/BOS_WALLET_CONTROL_MODEL.md`, Stage 1 here
 
 ## Step-by-step handoff procedure
 
+Note: contract ownership transfer interfaces vary by contract. Some use a two-step (pending -> claim) flow; others are single-step. The steps below are intentionally interface-agnostic and list common function names as examples.
+
 | Step | Action | Responsibility | Verification |
 | :--- | :--- | :--- | :--- |
 | **P-1** | Define the canonical mainnet principal for every required SAB wallet. | Operator | Publicly document in `docs/SAB_WALLET_ARCHITECTURE_AND_CONTROL_MATRIX.md`. |
 | **P-2** | Replace hardcoded principals in Clarinet plans and deployment scripts with the target SAB principals. | Dev | Pass CI verification for mainnet deployment plans. |
 | **H-1** | Deploy and initialize the `governance-handover` contract. | Operator | Verify contract on Stacks Explorer. |
-| **H-2** | Execute the `set-pending-owner` transaction on all core contracts, pointing to the SAB Multi-sig. | Bootstrap Wallet | Confirm transaction status on-chain. |
-| **H-3** | Call `claim-ownership` from the target SAB Multi-sig (requires quorum). | SAB Signers | Confirm final owner update. |
-| **V-1** | Verify that no bootstrap or personal address remains as a privileged role or recipient in the protocol. | Auditor | Successful `verify_handoff.sh` run. |
+| **H-2** | Initiate ownership transfer on each core contract, setting the intended SAB authority as the next owner/admin (e.g., `set-pending-owner`, `transfer-ownership`, `set-owner`). | Bootstrap Wallet | Confirm transaction status on-chain. |
+| **H-3** | Finalize ownership transfer from the receiving SAB authority where required (e.g., `claim-ownership`, `accept-ownership`). | SAB Signers | Confirm final owner/admin update. |
+| **V-1** | Verify that no bootstrap or personal address remains as a privileged role or recipient in the protocol. | Auditor | Successful `python3 scripts/verify_bos_production_boundary.py` + `python3 scripts/verify_contamination_guard.py` run, plus on-chain owner/admin and recipient confirmation for each core contract. |
 
 ## Rollback authority (Emergency Action)
 During the transition between Stage 2 and Stage 3, a **rollback authority** is maintained by the **Emergency Control** wallet class to revert changes if critical bugs are found. Once Stage 3 is fully achieved, this authority is strictly bounded by the DAO-controlled timelock (default 144 blocks).
