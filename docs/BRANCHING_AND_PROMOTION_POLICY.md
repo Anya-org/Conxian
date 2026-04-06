@@ -28,7 +28,7 @@ To ensure the integrity of the Conxian Production Environment, all repositories 
 
 ## 3. Enforcement (CI/CD Gates)
 
--- **Protected Branches**: `main` and `staged` must be protected with required reviews and passing status checks.
+- **Protected Branches**: `main` and `staged` must be protected with required reviews and passing status checks.
 - **Contamination Guard**: CI suites on `main` and `staged` must run a blocking scan for and reject non-production patterns, and the scan must be explicitly scoped to avoid false positives.
   - **Scope**: Run as a required status check on pull requests targeting `main` and `staged`. Scan only production source trees (repo-defined allowlist; e.g., `contracts/**`, `src/**`).
   - **Exclusions**: Explicitly exclude `docs/**`, `audit/**`, `**/*.md`, and test/mocks/fixtures paths.
@@ -70,6 +70,13 @@ To ensure the integrity of the Conxian Production Environment, all repositories 
     ```
 - **Submodule Integrity**: Parent repositories (like `conxian-business`) must ensure all submodules are pinned to their respective production-ready commits before merging to `main`.
 
+## 4. Remediation Standard (April 2026)
+
+Following the remediation of CON-394 and CON-61:
+- **No Hardcoded Principals:** Production Clarity contracts must use `tx-sender` or dynamic `data-vars` for administrative roles.
+- **Fail-Closed by Default:** Functional stubs (e.g., ZKML, DLC) must return explicit errors in the production path if the implementation is incomplete. Simulated data is only allowed on `dev` branches or behind explicit `mock-integrations` feature gates.
+- **Contamination Guard:** All PRs targeting `main` or `staged` are subject to the `verify_contamination_guard.py` check.
+
 ---
 **Verified by:** Jules (cxn-arch-guardian)
-**Date:** April 5, 2026
+**Date:** April 6, 2026
