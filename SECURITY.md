@@ -1,25 +1,43 @@
 # Security Policy
 
-## Supported Versions
+## Support Policy
 
-Only the latest release (or the current `main` branch if no releases exist) is supported with security updates.
+Security fixes are applied on a rolling basis to the default branch (`main`).
+
+When a tagged release line exists, only the latest release is supported with security updates.
+
+| Channel | Security fixes |
+| --- | --- |
+| `main` (default branch) | Yes |
+| Releases/tags older than the latest | No |
+| Other branches/commits | Not actively maintained for security |
 
 ## Reporting a Vulnerability
 
-If you find a security vulnerability, please do NOT open a public issue. Instead, report it privately to security@conxian-labs.com.
+Do not report security vulnerabilities via public GitHub issues.
+
+Report vulnerabilities privately using one of these channels:
+
+1. GitHub private vulnerability reporting (Security Advisories): use the repository Security tab and choose "Report a vulnerability".
+2. Email: security@conxian-labs.com
 
 When possible, include:
 
-- A clear description of the issue and impact
-- Steps to reproduce (or a minimal PoC)
-- The affected path/component (for example, `conxius-wallet`, `conxian-gateway`, `Conxian/contracts`)
+- A description of the vulnerability and potential impact
+- Steps to reproduce (or a minimal proof-of-concept)
+- The affected repository path/component (for example, `openspec/`, `scripts/`, or a specific submodule path)
 - Any relevant logs, error messages, or stack traces (redact secrets)
 
-We will acknowledge your report within 48 hours and provide a timeline for remediation. We ask for 90 days of responsible disclosure before any public announcement.
+If you cannot use either of the above, email admin@conxian-labs.com and clearly mark the message as a security report.
 
-## Coordinated Disclosure
+## Disclosure Policy
 
-If you prefer, you may also use GitHub's private vulnerability reporting (when enabled for this repository). We will coordinate the fix and disclosure timeline with you.
+We follow a coordinated disclosure model:
+
+1. We will acknowledge receipt of your report within 48-72 hours.
+2. We will investigate and provide a timeline for remediation.
+3. We ask that you do not disclose the vulnerability publicly until a fix has been released and coordinated.
+4. We will credit you in a security advisory unless you prefer to remain anonymous.
 
 ## Secrets and environment files
 
@@ -43,6 +61,3 @@ Conxian-Labs utilizes several core security principles:
 - **Zero Secret Egress (ZSE)**: Hardware-anchored private key derivation via Android StrongBox/Secure Enclave.
 - **Veto-Quorum v2**: Protocol-level circuit breakers for automated risk management.
 - **ATS Enforcement**: Automated compliance checks for all on-chain settlements.
-
----
-🛡️ **Sovereign Autonomous Business (SAB)**. © 2026 Conxian-Labs.

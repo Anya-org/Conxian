@@ -67,16 +67,9 @@ git submodule update --init services/conxian-ui
 
 ## Repository visibility and public/private boundary
 
-This repository is intended to be public.
+This repository is public. To reduce public/private boundary risk, detailed strategy, legal interpretations, operational runbooks, infrastructure identifiers, and any secret inventory are maintained in the Conxian Linear workspace (not in git), in compliance with our Zero Secret Egress (ZSE) mandate.
 
-To reduce public/private boundary risk, detailed strategy, legal interpretations, operational runbooks, infrastructure identifiers, and any secret inventory are maintained in the Conxian Linear workspace (not in git).
-
-This repository is public. Sensitive strategy, legal, operational, and administrative documents should live in the [Linear Virtual Office](https://linear.app/conxian-labs) in compliance with our Zero Secret Egress (ZSE) mandate.
-
-See:
-
-- https://linear.app/conxian-labs
-- https://linear.app/conxian-labs/issue/CON-256
+See https://linear.app/conxian-labs/issue/CON-256 for ZSE background and operating requirements.
 
 Detailed strategy and roadmap content must not be duplicated in this README; see `docs/BOS_BUSINESS_BUILDOUT.md` for the public vs internal documentation rules.
 
@@ -102,6 +95,8 @@ For general support and non-security bug reports, open a GitHub issue. For secur
 
 This repository is licensed under the GNU GPL v3.0 (see `LICENSE`).
 
+Exception note: some Conxian public repositories use MIT (for example, `.github` and `conxius-platform`). This repository remains GPL v3.0 because it is the BOS governance and OpenSpec source of truth.
+
 - [**CONTRIBUTING.md**](./CONTRIBUTING.md): Guidelines for contributing to the BOS.
 - [**SECURITY.md**](./SECURITY.md): How to report vulnerabilities and our security posture.
 - [**Trust & Proof Messaging**](./docs/TRUST_AND_PROOF_MESSAGING.md): Public-facing trust surface guidance.
@@ -117,8 +112,7 @@ See [`docs/REPOSITORY_CATALOG.md`](./docs/REPOSITORY_CATALOG.md) for the org-lev
 ## Repository hygiene
 
 To maintain a clean and sovereign workspace, we adhere to strict hygiene standards:
+
 - **`scripts/`**: Contains active utility scripts (e.g., `check_links.py`).
 - **`ARCHIVE_MIGRATION.md`**: ZSE-safe pointers to legacy material intentionally kept out of the Git index.
 - **`openspec/`**: Definitive technical specifications.
----
-**Sovereign Autonomous Business (SAB)**. © 2026 Conxian-Labs. Powered by Bitcoin.
