@@ -59,6 +59,9 @@ jobs:
       run: |
         python3 scripts/verify_submodule_integrity.py
         git submodule status --recursive
+    - name: Verify release hygiene (tags + changelog)
+      run: |
+        python3 scripts/verify_release_hygiene.py
 
   gateway-suite:
     name: Gateway Suite

@@ -69,6 +69,15 @@ Notes:
   - Appropriate label-gated suites ran (when relevant).
   - Changelog is updated when user-facing behavior or security posture changes.
 
+## Tagged releases (public repos)
+
+For user-facing repositories (starting with `conxius-wallet`), we expect releases to be cut as **SemVer tags** (`vX.Y.Z`) with:
+
+- a matching `CHANGELOG.md` entry, and
+- GitHub Release notes copied from the matching changelog section.
+
+`Conxian Unified CI` runs `scripts/verify_release_hygiene.py` to enforce that this repo’s root `CHANGELOG.md` contains an `## [Unreleased]` section, and to emit warnings when critical user-facing repos are missing tags.
+
 Merge preference:
 
 - Prefer squash-merge so `main` stays readable and the merge commit message captures the PR intent.
