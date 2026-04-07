@@ -211,6 +211,43 @@ This section intentionally repeats the asset list with additional positioning de
 | `lib-conclave-sdk/` | Enclave/crypto SDK | Attested flows, SDK primitives | Protocol decisions |
 | `lib-conxian-core/` | Shared conventions | Models, shared primitives | Business logic or product UX |
 
+#### Preserve vs enhance ownership boundaries (CON-433)
+
+The goal is to keep working boundaries stable (“preserve”) and only refactor (“enhance”) where responsibility is blurred or duplicated.
+
+Definitions used below:
+
+- **Preserve**: what must remain the repo’s primary responsibility and source of truth.
+- **Enhance**: what is safe to improve _within_ the repo, or to extract into a clearer boundary interface, when the same responsibility is duplicated elsewhere.
+
+A refactor is considered in-bounds only when it (1) reduces duplicated sources of truth, (2) makes the dependency direction clearer, and (3) does not move a stable, working responsibility into a different business unit.
+
+For this portfolio, dependencies should generally flow from **Protocol → Nexus → Gateway → UI/Wallet**, with **Platform** orchestrating those services without owning product logic.
+
+Notes on the requested repos:
+
+- `Conxian/` (Protocol)
+  - Preserve: on-chain state transition logic, contract interfaces/traits, registries, and protocol-level invariants.
+  - Enhance: clarify and version exported interfaces (traits/ABIs) so off-chain consumers (Nexus/Gateway/Wallet/UI) do not re-encode protocol rules in multiple places.
+- `conxian-gateway/` (Fusion / Gateway)
+  - Preserve: external integration surface (APIs/webhooks/partner adapters) and compliance/aggregation pipelines that consume Nexus/Protocol as upstream sources.
+  - Enhance: consolidate shared event/schema definitions behind an explicit boundary (often in `lib-conxian-core/`) so Wallet/UI/Platform are consumers, not re-implementers.
+- `conxian-nexus/` (Nexus)
+  - Preserve: authoritative off-chain state, state services, and telemetry/metrics that downstream services consume as read-only.
+  - Enhance: keep Nexus focused on being a source of truth and avoid embedding product-specific UX or integration logic; expose versioned APIs/schemas so Gateway/UI/Wallet treat it as an upstream dependency.
+- `lib-conxian-core/` (Shared core)
+  - Preserve: dependency-light primitives intended for cross-repo use (types/models, serialization, shared error conventions, stable schema definitions).
+  - Enhance: extract duplicated “boundary types” out of product repos _only_ when they are truly cross-unit and do not pull in product-specific dependencies.
+- `conxius-wallet/` (Conxius / Wallet)
+  - Preserve: key custody, signing, offline-first wallet UX, and client-side safety guarantees.
+  - Enhance: keep protocol/gateway integrations at the boundary API level; if a protocol rule must be mirrored client-side, prefer consuming a canonical interface/schema rather than copying business logic.
+- `conxian-ui/` (UI; upstream repo is `Conxian_UI`)
+  - Preserve: web UX for interacting with the ecosystem (dashboards/portals) by consuming Gateway/Nexus/Protocol boundary interfaces.
+  - Enhance: remove any drift where UI code becomes a secondary host for protocol or gateway business logic; keep UI as a consumer of versioned boundary surfaces.
+- `conxius-platform/` (Platform / DevEx)
+  - Preserve: local stack orchestration and developer workflows (compose files, service wiring, environment templates, “run the ecosystem end-to-end” tooling).
+  - Enhance: keep platform logic focused on orchestration and operability; when a service feature is needed, implement it in the owning product repo (Gateway/Nexus/Wallet/UI) and consume it from the platform.
+
 ### EXCO suite modules (directories tracked in this repo)
 
 | Asset | Unique value | In scope | Out of scope |
