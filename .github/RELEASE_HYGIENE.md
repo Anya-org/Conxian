@@ -19,6 +19,7 @@ These workflows run on every pull request targeting `dev`, `staged`, or `main`. 
 - Unified CI (see [`conxian-unified-ci.yml`](./workflows/conxian-unified-ci.yml))
   - Repo hygiene:
     - ZSE knowledge retention via `scripts/verify_knowledge_retention.py`.
+    - Tracked artifact scanning via `scripts/verify_tracked_artifacts.py`.
     - Submodule integrity via `scripts/verify_submodule_integrity.py`.
 - Secret scan (see [`secret-scan.yml`](./workflows/secret-scan.yml))
 - Dependency review (see [`dependency-review.yml`](./workflows/dependency-review.yml))
