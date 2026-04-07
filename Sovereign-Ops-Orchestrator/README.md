@@ -14,6 +14,10 @@ This repository is public. Detailed wiring, operational dashboards, and executio
 - Coordinating BOS automation and operational processes.
 - Maintaining boundaries between public specs and internal operational material.
 
+## Status
+
+active — Public-safe orchestration and wiring artifacts live here; detailed runbooks and dashboards are maintained in Linear.
+
 ## Key Components
 
 - **[Deployment efficiency](./DEPLOYMENT_EFFICIENCY.md)**

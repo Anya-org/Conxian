@@ -33,15 +33,15 @@ Ownership and review requirements are defined in [`CODEOWNERS`](./CODEOWNERS).
 
 This repository pins and coordinates the flagship Conxian repositories, including:
 
-- [`Conxian/`](./Conxian): Conxian Finance Protocol (Clarity smart contracts)
-- [`conxian-gateway/`](./conxian-gateway): Conxian Gateway (Rust)
-- [`conxian-nexus/`](./conxian-nexus): Conxian Nexus (Rust)
-- [`lib-conxian-core/`](./lib-conxian-core): Shared core libraries centered around the Gateway
-- [`conxian-ui/`](./conxian-ui): Conxian UI (web)
-- [`conxius-wallet/`](./conxius-wallet): Conxius Wallet (mobile)
-- [`conxius-platform/`](./conxius-platform): Stack orchestration and local development
-- [`stacksorbit/`](./stacksorbit): Deployment and operations tooling
-- [`conxian-labs-site/`](./conxian-labs-site): Conxian Labs public site
+- [`Conxian/`](./Conxian): Conxian Finance Protocol (Protocol; Clarity smart contracts)
+- [`conxian-gateway/`](./conxian-gateway): Conxian Gateway (Gateway; Rust)
+- [`conxian-nexus/`](./conxian-nexus): Conxian Nexus (State node; Rust)
+- [`lib-conxian-core/`](./lib-conxian-core): Shared core libraries centered around the Gateway (Shared core; Rust)
+- [`conxian-ui/`](./conxian-ui): Conxian UI (UI; web)
+- [`conxius-wallet/`](./conxius-wallet): Conxius Wallet (Wallet; mobile)
+- [`conxius-platform/`](./conxius-platform): Stack orchestration and local development (Platform)
+- [`stacksorbit/`](./stacksorbit): Deployment and operations tooling (Tooling)
+- [`conxian-labs-site/`](./conxian-labs-site): Conxian Labs public site (Website)
 
 ## Cloning
 

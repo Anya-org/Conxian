@@ -15,6 +15,10 @@ This repository is public. Detailed operational enforcement rules and internal c
 - **Anti-Fragility**: Continuous monitoring and collision audits across the Conxian ecosystem.
 - **Regulatory Compliance**: Compliance reporting and enforcement workflows (internal details live in Linear).
 
+## Status
+
+active — Public-safe enforcement and audit artifacts live here; detailed enforcement rules and compliance reporting is maintained in Linear.
+
 ## Key Components
 
 - **[Anti-Fragility Loop](./ANTI_FRAGILITY_LOOP.md)**: Logic for collision detection and generic identifier flagging.

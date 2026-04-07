@@ -15,6 +15,10 @@ This repository is public. Internal BOS state-machine configuration and complian
 - **Compliance Monitoring**: Compliance reporting and enforcement workflows (internal details live in Linear).
 - **Transparency Custody**: Managing the Python-based transparency custodian for verifiable operations.
 
+## Status
+
+active — This module documents BOS-level service-loop expectations and public-safe operational boundaries; detailed state-machine configuration and compliance reports live in Linear.
+
 ## Key Components
 
 - **[Service Loop Specification](./SERVICE_LOOP.md)**: Mermaid diagrams of the BOS Gateway and Nexus relationship.

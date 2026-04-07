@@ -14,6 +14,10 @@ This repository is public. Detailed strategy planning and internal operating mat
 - Strategic alignment and coordination for BOS-level work.
 - Maintaining boundaries between public specifications and internal-only material.
 
+## Status
+
+active — Public-facing strategy coordination artifacts live here; detailed internal planning and operating material is maintained in Linear.
+
 ## Key Components
 
 - **[Strategy tracking](./REALTIME_M&A_VELOCITY.md)**

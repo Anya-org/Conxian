@@ -1,3 +1,13 @@
+# Showcase dapp
+
+## Purpose
+
+A lightweight Next.js app used to demonstrate Conxian UI patterns and end-to-end integration in local/dev environments.
+
+## Status
+
+alpha — This app is intended for demos and experimentation rather than production deployment.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
