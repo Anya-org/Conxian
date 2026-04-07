@@ -21,6 +21,21 @@ We will acknowledge your report within 48 hours and provide a timeline for remed
 
 If you prefer, you may also use GitHub's private vulnerability reporting (when enabled for this repository). We will coordinate the fix and disclosure timeline with you.
 
+## Secrets and environment files
+
+- Do not commit any secret-bearing environment files (for example: `.env`, `.env.local`), private keys, or API tokens.
+- `.env.example` may be committed as a non-secret template, but it must never contain real secrets.
+- Ensure `.env`/`.env.*` patterns are listed in `.gitignore` so they are never committed by default (use an `!.env.example` exception if needed).
+- This repository runs a `gitleaks` secret scan in GitHub Actions on pull requests and pushes to `main` to catch new secret leaks.
+
+If a secret was committed to a public branch (even temporarily), treat it as compromised:
+
+- Rotate/revoke the secret at the source (wallet/private key, API provider, cloud console).
+- Update any dependent deployments/configuration to use the new secret.
+- Consider rewriting Git history to remove the secret material (rotation is still required regardless).
+
+If you discover that a secret was previously committed, also follow the reporting process in "Reporting a Vulnerability" so the team can assess impact and coordinate incident response.
+
 ## Security Controls
 
 Conxian-Labs utilizes several core security principles:
