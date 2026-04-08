@@ -6,7 +6,7 @@
 
 > **Note**: This document supersedes CJCS v2.0, but retains the filename `CJCS_v2.0_SPEC.md` for stable in-repo linking.
 
-> **Versioning & compatibility:** CJCS v2.0.1 is intended as a backward-compatible revision of CJCS v2.0 (clarifying the Industrial Intent standard and dependency web logic). New integrations should prefer the `.../v2.0.1` `@context`. Existing integrations pinned to `.../v2.0` can continue to interoperate, but should migrate when practical.
+> **Versioning & compatibility:** CJCS v2.0.1 is intended as an additive revision of CJCS v2.0 (no existing v2.0 terms are redefined; new terms may be added). New integrations should prefer the `https://conxian.com/contexts/job-card/v2.0.1` `@context`. Integrations pinned to `https://conxian.com/contexts/job-card/v2.0` should continue to process v2.0.1 Job Cards if they ignore unknown terms, but strict `@context` validators should migrate.
 
 ## 1. Overview
 The Conxian Job Card Schema (CJCS) is a machine-readable JSON-LD definition for ERP-to-Bitcoin labor coordination. It bridges the gap between institutional work orders (SAP/Oracle) and sovereign agent execution.
