@@ -29,7 +29,7 @@ The platform's **Guardian Class** wallets enforce a cryptographic floor (the "St
 Every independent lab must publish their logic to a public, Zero Secret Egress (ZSE) compliant repository (modeled after `conxian-business`). This ensures that the platform remains auditable while protecting sensitive operational secrets in the Linear Virtual Office.
 
 ## 3. The "Industrial Intent" Moat
-By establishing the **Conxian Job Card Schema (CJCS) v2.0** as the "HTTP" of industrial coordination, we create a **Dependency Web**. Virality is achieved when the output of one specialized lab (e.g., an "Inventory Lab") becomes the required, verifiable input for another lab (e.g., a "Trade Finance Lab").
+By establishing the **Conxian Job Card Schema (CJCS) v2.0.1** as the "HTTP" of industrial coordination, we create a **Dependency Web**. Virality is achieved when the output of one specialized lab (e.g., an "Inventory Lab") becomes the required, verifiable input for another lab (e.g., a "Trade Finance Lab"). See: [CJCS v2.0.1 spec](CJCS_v2.0_SPEC.md).
 
 ---
 🛡️ **SOVEREIGN. MODULAR. SCALABLE.**

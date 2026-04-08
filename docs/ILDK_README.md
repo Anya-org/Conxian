@@ -45,9 +45,9 @@ Scaling is achieved through **Policy-as-Code**:
 - **Sovereign Guardrails**: Guardian wallets enforce the "StrongBox" floor. A module can build any logic, but payouts require a verified 144-block Time-Lock or multi-sig state-proof.
 
 ## 6. Licensing
-This repository is currently licensed under the GNU GPL v3.0 (see [`LICENSE`](../LICENSE)).
+**Current status.** This repository is currently licensed under the GNU GPL v3.0 (see [`LICENSE`](../LICENSE)). Unless a file or directory explicitly states a different license, contents are available under GPL v3.0; any future component-specific licensing changes will be documented against specific tags and paths.
 
-The **dual-license** model described below is a proposed future policy for BOS kernel / ILDK components; it is not currently in effect in this repository.
+**Proposed future model (BOS kernel / ILDK components only).** The dual-license model described below is a proposed future policy for BOS kernel / ILDK components; it is not currently in effect in this repository.
 
 Proposed model:
 1. **BUSL (Business Source License)**: Protects the core platform during its early growth phase.
