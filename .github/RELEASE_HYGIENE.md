@@ -39,11 +39,11 @@ These workflows run on every pull request targeting `dev`, `staged`, or `main`. 
         - Patterns containing `/` are matched against the full normalized path; plain (non-glob) patterns can also match directory prefixes.
         - Patterns without `/`:
           - Plain strings (no glob wildcards: `*`, `?`, `[]`) match basenames, exact normalized paths, and directory prefixes.
-          - Glob patterns match basenames and also the full normalized path for compatibility, so keep patterns as specific as possible.
+          - Glob patterns match basenames only (they do not match full normalized paths; add `/` when you need full-path matching).
         - Examples:
           - `junit.xml` matches any tracked file with basename `junit.xml` anywhere in the repo.
           - `audit/reports` matches any tracked file under `audit/reports/` (directory-prefix match).
-          - `*.log` matches any tracked `.log` file by basename, and also any full path ending in `.log` (compatibility), so use with care.
+          - `*.log` matches any tracked `.log` file by basename, so use with care.
     - Submodule integrity via `scripts/verify_submodule_integrity.py`.
 - Branch promotion policy (see [`branch-promotion-policy.yml`](./workflows/branch-promotion-policy.yml))
 - Secret scan (see [`secret-scan.yml`](./workflows/secret-scan.yml))
