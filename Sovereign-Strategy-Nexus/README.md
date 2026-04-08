@@ -16,7 +16,7 @@ This repository is public. Detailed strategy planning and internal operating mat
 
 ## Status
 
-active — Public-facing strategy coordination artifacts live here; detailed internal planning and operating material is maintained in Linear.
+active — Public-facing strategy coordination artifacts live here; detailed internal planning and operating material is maintained in Linear. Internal details: <https://linear.app/conxian-labs/issue/CON-435/improve-portfolio-clarity-across-org-facing-repositories>.
 
 ## Key Components
 

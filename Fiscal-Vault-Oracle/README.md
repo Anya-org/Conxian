@@ -16,7 +16,7 @@ This repository is public. Detailed treasury operations, vendor integrations, an
 
 ## Status
 
-active — Public-safe treasury policy constraints and interfaces live here; detailed treasury operations and vendor terms are maintained in Linear.
+active — Public-safe treasury policy constraints and interfaces live here; detailed treasury operations and vendor terms are maintained in Linear. Internal details: <https://linear.app/conxian-labs/issue/CON-435/improve-portfolio-clarity-across-org-facing-repositories>.
 
 ## Key Components
 

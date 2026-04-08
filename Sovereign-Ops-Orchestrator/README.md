@@ -16,7 +16,7 @@ This repository is public. Detailed wiring, operational dashboards, and executio
 
 ## Status
 
-active — Public-safe orchestration and wiring artifacts live here; detailed runbooks and dashboards are maintained in Linear.
+active — Public-safe orchestration and wiring artifacts live here; detailed runbooks and dashboards are maintained in Linear. Internal details: <https://linear.app/conxian-labs/issue/CON-435/improve-portfolio-clarity-across-org-facing-repositories>.
 
 ## Key Components
 
