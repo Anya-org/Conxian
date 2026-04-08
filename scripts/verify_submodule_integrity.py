@@ -5,6 +5,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -90,6 +91,9 @@ def _parse_github_repo(url: str) -> str | None:
         repo = repo[:-4]
     return f"{owner}/{repo}"
 
+class GitHubApiError(RuntimeError):
+    pass
+
 
 def _github_json(path: str) -> dict:
     url = f"https://api.github.com{path}"
@@ -102,15 +106,60 @@ def _github_json(path: str) -> dict:
     if token:
         headers["Authorization"] = f"Bearer {token}"
 
+    def _truncate(value: str, limit: int = 200) -> str:
+        if len(value) <= limit:
+            return value
+        return value[:limit] + "…"
+
+    def _retry_delay(attempt: int, retry_after: str | None) -> float:
+        delay = min(2**attempt, 8)
+        if retry_after:
+            try:
+                delay = min(max(int(retry_after), 0), 8)
+            except ValueError:
+                pass
+        return delay
+
     request = urllib.request.Request(url, headers=headers)
-    try:
-        with urllib.request.urlopen(request, timeout=30) as response:
-            return json.loads(response.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        body = e.read().decode("utf-8", "replace")
-        raise RuntimeError(f"GitHub API request failed: {url} -> {e.code}: {body}") from e
-    except urllib.error.URLError as e:
-        raise RuntimeError(f"GitHub API request failed: {url} -> {e.reason}") from e
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(request, timeout=30) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8", "replace")
+            message = body
+            try:
+                parsed = json.loads(body)
+                if isinstance(parsed, dict) and parsed.get("message"):
+                    message = str(parsed.get("message"))
+            except json.JSONDecodeError:
+                pass
+
+            message = _truncate(message)
+
+            lower_message = message.lower()
+            is_rate_limited = e.code == 429 or (
+                e.code == 403
+                and ("rate limit" in lower_message or "abuse detection" in lower_message)
+            )
+
+            if (is_rate_limited or e.code in {500, 502, 503, 504}) and attempt < 2:
+                error_headers = getattr(e, "headers", None)
+                retry_after = error_headers.get("Retry-After") if error_headers else None
+                time.sleep(_retry_delay(attempt, retry_after))
+                continue
+
+            raise GitHubApiError(
+                f"GitHub API request failed: {url} -> {e.code}: {message}"
+            ) from e
+        except urllib.error.URLError as e:
+            reason = str(e.reason)
+
+            if attempt < 2:
+                time.sleep(_retry_delay(attempt, None))
+                continue
+
+            raise GitHubApiError(f"GitHub API request failed: {url} -> {reason}") from e
 
 
 def _verify_submodule_pins(
@@ -118,7 +167,7 @@ def _verify_submodule_pins(
     gitlinks: dict[str, str],
 ) -> list[str]:
     failures: list[str] = []
-    default_branches: dict[str, str] = {}
+    default_branch_cache: dict[str, str] = {}
 
     for path, url in sorted(gitmodules.items()):
         sha = gitlinks.get(path)
@@ -130,17 +179,26 @@ def _verify_submodule_pins(
             failures.append(f"{path}: unsupported submodule url {url}")
             continue
 
-        default_branch = default_branches.get(repo)
+        default_branch = default_branch_cache.get(repo)
         if not default_branch:
-            repo_meta = _github_json(f"/repos/{repo}")
+            try:
+                repo_meta = _github_json(f"/repos/{repo}")
+            except GitHubApiError as e:
+                failures.append(f"{path}: GitHub API error for {repo}: {e}")
+                continue
             default_branch = repo_meta.get("default_branch")
             if not default_branch:
                 failures.append(f"{path}: unable to resolve default branch for {repo}")
                 continue
-            default_branches[repo] = default_branch
+
+            default_branch_cache[repo] = default_branch
 
         branch_ref = urllib.parse.quote(default_branch, safe="")
-        compare = _github_json(f"/repos/{repo}/compare/{sha}...{branch_ref}")
+        try:
+            compare = _github_json(f"/repos/{repo}/compare/{sha}...{branch_ref}")
+        except GitHubApiError as e:
+            failures.append(f"{path}: GitHub API error for {repo}@{default_branch}: {e}")
+            continue
         status = compare.get("status")
         ahead_by = compare.get("ahead_by")
         behind_by = compare.get("behind_by")
@@ -173,7 +231,9 @@ def verify() -> None:
     missing_mappings = sorted(gitlink_paths - gitmodules_paths)
     extra_mappings = sorted(gitmodules_paths - gitlink_paths)
 
-    pin_failures = _verify_submodule_pins(gitmodules, gitlinks)
+    pin_failures: list[str] = []
+    if not missing_mappings and not extra_mappings:
+        pin_failures = _verify_submodule_pins(gitmodules, gitlinks)
 
     if not missing_mappings and not extra_mappings and not pin_failures:
         print("Success: .gitmodules mappings match gitlink entries and submodule pins are on upstream default branches.")
