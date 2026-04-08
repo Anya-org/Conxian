@@ -142,10 +142,10 @@ REPO_EXCLUSIONS = {
     # - erp.rs: real wallet signing via lib-conxian-core
     # - kwil.rs, tableland.rs: real HTTP calls, fail-closed on error
     # - executor/mod.rs: real Supabase upsert, non-fatal
-    # lib-conxian-core/src/lib.rs retains one [STUB] for BitVM2 state root
+    # conxian-nexus/lib-conxian-core/src/lib.rs retains one [STUB] for BitVM2 state root
     # verification (CON-75) — kept until that integration is wired.
     "conxian-nexus": {
-        "lib-conxian-core/src/lib.rs",
+        "conxian-nexus/lib-conxian-core/src/lib.rs",
     },
     "lib-conxian-core": {
         "src/lib.rs",
