@@ -14,6 +14,10 @@ Active development (alpha). Not production-ready; expect breaking changes.
 
 For a dated snapshot, see [Status (March 2026)](#status-march-2026). For ongoing changes, see [CHANGELOG.md](CHANGELOG.md).
 
+## Ownership
+
+Ownership and review requirements are defined in [`CODEOWNERS`](./CODEOWNERS).
+
 ## Audience
 
 - Clarity engineers integrating with CSF standards and Conxian primitives.
