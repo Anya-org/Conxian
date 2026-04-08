@@ -6,6 +6,7 @@
 * [Documentation Alignment Index](docs/DOCUMENTATION_ALIGNMENT_INDEX.md)
 * [BOS business buildout (this repo)](docs/BOS_BUSINESS_BUILDOUT.md)
 * [Repo Portfolio (Flagship vs Supporting)](docs/REPO_PORTFOLIO.md)
+* [Portfolio repository and subrepository inventory](docs/PORTFOLIO_REPOSITORY_INVENTORY.md)
 * [Governance files standardization (public repos)](docs/GOVERNANCE_FILES_STANDARDIZATION.md)
 * [Portfolio business-unit map and separation of concerns](docs/PORTFOLIO_BUSINESS_UNIT_MAP.md)
 * [Repo Readiness Gates (Control Domains)](docs/REPO_READINESS_GATES_BY_CONTROL_DOMAIN.md)
