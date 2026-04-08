@@ -1,6 +1,7 @@
 ;; alex-adapter.clar
 ;; Conxian CSF Adapter for ALEX Lab (Mainnet Standard)
 ;; Implements trait-csf-liquidity-v1 for trustless routing through ALEX pools.
+;; Remediated April 2026: Removed hardcoded principals
 
 (impl-trait .conxian-csf-trait.trait-csf-liquidity-v1)
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
@@ -11,8 +12,9 @@
 (define-constant ERR_ALEX_SWAP_FAILED (err u2001))
 
 ;; --- Data Vars ---
-(define-data-var alex-vault principal 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.alex-vault)
-(define-data-var alex-amm-pool principal 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.amm-pool-v2-01)
+;; Initialized to dummy values, must be set via set-alex-endpoints by admin
+(define-data-var alex-vault principal tx-sender)
+(define-data-var alex-amm-pool principal tx-sender)
 (define-data-var is-active bool true)
 
 ;; --- CSF Implementation ---
@@ -37,7 +39,7 @@
       (asserts! (var-get is-active) ERR_UNAUTHORIZED)
 
       ;; In production, this would call ALEX swap-helper or amm-pool directly
-      ;; Example: (contract-call? 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.swap-helper-v1-03 swap-helper ...)
+      ;; (contract-call? .alex-vault ...) or similar
 
       ;; For Conxian Universal Router compliance, we must return the results
       (ok { amount-out: amount, fee-collected: u30 }) ;; Standard 30bps fee

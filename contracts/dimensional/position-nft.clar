@@ -11,8 +11,8 @@
 (define-constant ERR_NOT_OWNER u1001)
 
 (define-data-var last-token-id uint u0)
-(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var authorized-minter principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var contract-owner principal tx-sender)
+(define-data-var authorized-minter principal tx-sender)
 
 (define-non-fungible-token dimensional-risk-token uint)
 

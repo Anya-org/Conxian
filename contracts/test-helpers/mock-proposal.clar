@@ -9,7 +9,7 @@
 (define-constant ERR_ALREADY_EXECUTED u1001)
 
 (define-data-var executed bool false)
-(define-data-var proposer principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var proposer principal tx-sender)
 
 ;; SIP-010 proposal trait implementation
 (define-read-only (get-proposer)

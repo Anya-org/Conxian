@@ -13,7 +13,7 @@
 (define-constant ACTION_UNPAUSE_PROTOCOL u2)
 
 ;; Data Vars
-(define-data-var emergency-admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var emergency-admin principal tx-sender)
 
 ;; Authorization
 (define-read-only (is-emergency-admin)

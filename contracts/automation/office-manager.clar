@@ -1,6 +1,7 @@
 ;; office-manager.clar
 ;; "The Payroll" - Coordinates the Office Workers and their incentives.
 ;; Verifies registered workers and handles payment for completed jobs.
+;; Remediated April 2026: Dynamic contract-owner fetching
 
 (impl-trait .core-traits.conxian-access-trait)
 
@@ -10,9 +11,6 @@
 (define-constant ERR_INSUFFICIENT_FUNDS u1002)
 (define-constant ERR_INVALID_JOB u1003)
 (define-constant ERR_PASSKEY_NOT_SUPPORTED u1004)
-
-;; State
-(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Worker Registry
 ;; Maps worker principal to their active status
@@ -24,7 +22,11 @@
 
 ;; Authorization
 (define-private (is-owner)
-  (is-eq tx-sender (var-get contract-owner))
+  (let (
+    (owner (default-to tx-sender (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")))
+  )
+    (is-eq tx-sender owner)
+  )
 )
 
 ;; Authorization check for Agents (The Staff)
@@ -100,12 +102,16 @@
 ;; @desc Withdraws STX from the payroll balance to the owner's account. Owner only.
 ;; @param amount: The amount of STX to withdraw.
 (define-public (withdraw-payroll (amount uint))
-  (begin
-    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (asserts! (<= amount (var-get payroll-balance)) (err ERR_INSUFFICIENT_FUNDS))
-    (try! (as-contract (stx-transfer? amount tx-sender (var-get contract-owner))))
-    (var-set payroll-balance (- (var-get payroll-balance) amount))
-    (ok true)
+  (let (
+    (owner (default-to tx-sender (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")))
+  )
+    (begin
+      (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+      (asserts! (<= amount (var-get payroll-balance)) (err ERR_INSUFFICIENT_FUNDS))
+      (try! (as-contract (stx-transfer? amount tx-sender owner)))
+      (var-set payroll-balance (- (var-get payroll-balance) amount))
+      (ok true)
+    )
   )
 )
 

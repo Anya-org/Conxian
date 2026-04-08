@@ -5,7 +5,7 @@
 
 ;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED (err u1000))
-(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var admin principal tx-sender)
 
 ;; State
 (define-data-var bme-vault principal .bme-engine)
@@ -36,7 +36,7 @@
 
 (define-public (initialize (new-admin principal))
   (begin
-    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender tx-sender) ERR_UNAUTHORIZED)
     (var-set admin new-admin)
     (ok true)
   )

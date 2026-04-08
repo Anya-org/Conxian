@@ -9,7 +9,7 @@
 (define-constant ERR_WINDOW_TOO_SHORT u6402)
 
 ;; Data Vars
-(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var admin principal tx-sender)
 (define-data-var twap-window uint u10) ;; 10 blocks
 
 ;; Price Observations
