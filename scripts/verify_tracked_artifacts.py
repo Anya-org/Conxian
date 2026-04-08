@@ -27,9 +27,16 @@ def _repo_root() -> Path:
         raise RuntimeError(
             "git is not installed or not on PATH; cannot determine repository root"
         ) from exc
-    except subprocess.CalledProcessError as exc:
+    except OSError as exc:
         raise RuntimeError(
-            f"Failed to determine repo root via git (exit {exc.returncode}): {exc.output}"
+            f"Failed to execute git to determine repository root: {exc}"
+        ) from exc
+    except subprocess.CalledProcessError as exc:
+        raw_output = exc.output or ""
+        output = raw_output.strip().replace("\n", " ")
+        details = f": {output}" if output else ""
+        raise RuntimeError(
+            f"Failed to determine repo root via git (exit {exc.returncode}){details}"
         ) from exc
     return Path(out.strip())
 
