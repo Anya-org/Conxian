@@ -13,6 +13,7 @@ If the repository publishes tagged releases, we backport security fixes only to 
 | All other releases/tags | No |
 | Other branches/commits | Not actively maintained for security |
 
+<a id="reporting-vulnerability"></a>
 ## Reporting a Vulnerability
 
 Do not report security vulnerabilities via public GitHub issues.
@@ -45,7 +46,7 @@ We follow a coordinated disclosure model:
 - Do not commit any secret-bearing environment files (for example: `.env`, `.env.local`), private keys, or API tokens.
 - `.env.example` may be committed as a non-secret template, but it must never contain real secrets.
 - Ensure `.env`/`.env.*` patterns are listed in `.gitignore` so they are never committed by default (use an `!.env.example` exception if needed).
-- This repository runs a `gitleaks` secret scan in GitHub Actions (see [`.github/workflows/secret-scan.yml`](./.github/workflows/secret-scan.yml)) on pull requests and pushes to `main`, `staged`, and `dev` to catch new secret leaks.
+- This repository runs a `gitleaks` secret scan in GitHub Actions on pull requests and selected branch pushes (see [`.github/workflows/secret-scan.yml`](./.github/workflows/secret-scan.yml)) to catch new secret leaks.
 
 If a secret was committed to a public branch (even temporarily), treat it as compromised:
 
@@ -53,7 +54,7 @@ If a secret was committed to a public branch (even temporarily), treat it as com
 - Update any dependent deployments/configuration to use the new secret.
 - Consider rewriting Git history to remove the secret material (rotation is still required regardless).
 
-If you discover that a secret was previously committed, also follow the reporting process in [Reporting a Vulnerability](#reporting-a-vulnerability) so the team can assess impact and coordinate incident response.
+If you discover that a secret was previously committed, also follow the reporting process in [Reporting a Vulnerability](#reporting-vulnerability) so the team can assess impact and coordinate incident response.
 
 ## Security Controls
 
