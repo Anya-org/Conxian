@@ -42,6 +42,38 @@ If a release has breaking changes, add:
   - PR number and/or commit hash
 - Avoid internal-only details and secrets (ZSE).
 
+Notes:
+
+- Front matter is allowed (for example, repos that publish the changelog via GitHub Pages), but the changelog content should still follow the section rules above.
+
+## Tagged releases (expectation)
+
+For user-facing repos, a version in `CHANGELOG.md` should correspond to an immutable git tag in the repo.
+
+- Tag format: `vX.Y.Z` (SemVer).
+- Prefer annotated tags: `git tag -a vX.Y.Z -m "vX.Y.Z"`.
+- The GitHub Release should be created from the tag and include the release notes.
+
+In this BOS repo, `Conxian Unified CI` runs `scripts/verify_release_hygiene.py` to:
+
+- enforce that the root `CHANGELOG.md` has an `## [Unreleased]` section, and
+- emit warnings when user-facing repos (starting with `conxius-wallet`) are missing tags.
+
+## Bootstrapping repos with versions but no tags
+
+Some repos may already carry version history in `CHANGELOG.md` but have not cut git tags yet. To bootstrap:
+
+1. Pick a version already documented in `CHANGELOG.md` (example: `1.6.0`).
+2. Identify the exact commit SHA that produced the shipped artifact.
+3. Create and push the tag in the upstream repo:
+
+```bash
+git tag -a v1.6.0 <commit-sha> -m "v1.6.0"
+git push origin v1.6.0
+```
+
+4. Create a GitHub Release from the tag and copy the matching changelog section into the release notes.
+
 ## Release notes (structure)
 
 Release notes are for humans. They should summarize impact and provide enough provenance for readers to verify the release.

@@ -15,6 +15,7 @@
 * [Branch and promotion standard (dev/staged/main)](docs/BRANCH_AND_PROMOTION_STANDARD.md)
 * [Mainnet acceptance evidence pack (staged -> main)](openspec/specs/mainnet-acceptance-evidence-pack/spec.md)
 * [Release hygiene — conxian-nexus](docs/RELEASE_HYGIENE_CONXIAN_NEXUS.md)
+* [Mainnet readiness checklist — lib-conclave-sdk](docs/MAINNET_READINESS_LIB_CONCLAVE_SDK.md)
 * [CSF mainnet readiness gate](docs/CSF_MAINNET_READINESS_GATE.md)
 * [CSF-first operating sequence and proof gates](docs/CSF_FIRST_OPERATING_SEQUENCE_AND_PROOF_GATES.md)
 * [OpenSpec](openspec/README.md)

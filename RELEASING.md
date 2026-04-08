@@ -7,7 +7,6 @@ This repo uses **Semantic Versioning** and **tagged releases**.
 
 For release note format requirements, see `docs/RELEASE_NOTES_AND_CHANGELOG.md`.
 For required checks and label-gated CI suites, see `.github/RELEASE_HYGIENE.md`.
-
 ## When to cut a release
 
 Cut a release when a change is user-facing (behavior, security posture, public docs that reframe the system), or when a set of changes should be pinned to an immutable reference for downstream repos.
@@ -18,6 +17,8 @@ Cut a release when a change is user-facing (behavior, security posture, public d
    - Ensure `## [Unreleased]` exists.
    - Move the changes being released from `## [Unreleased]` into a new `## [X.Y.Z] - YYYY-MM-DD` section.
    - Keep user-facing version strings in sync (for example, the BOS version in `README.md`).
+
+   Note: `Conxian Unified CI` enforces the `## [Unreleased]` section via `scripts/verify_release_hygiene.py`.
 2. Create an annotated tag locally:
 
 ```bash
@@ -41,3 +42,5 @@ gh release create vX.Y.Z --title "vX.Y.Z" --notes-file /tmp/release-notes.md
 - Tag releases independently.
 - Keep its own `CHANGELOG.md`.
 - Add CI and a status badge in its own README.
+
+When bumping a pinned submodule (gitlink) in this repo, prefer bumping to a tagged release commit in the upstream submodule repo.

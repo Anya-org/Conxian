@@ -25,7 +25,6 @@ In practice, “promotion” means opening a pull request from the source branch
 4. After mainnet-candidate validation completes and approvals are in place, open a promotion PR from `staged` into `main`.
 
 For emergency fixes, open a promotion PR from `hotfix/*` into `staged`, then promote `staged` into `main`.
-
 ## Enforcement
 
 ### Ownership and business-unit boundaries

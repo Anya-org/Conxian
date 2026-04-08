@@ -60,6 +60,7 @@ The wallet already contains a strong starting point for release prep. Use it as 
 Minimum release controls:
 
 - A single canonical versioning scheme (SemVer + monotonic Android `versionCode`).
+- A tagged git release (`vX.Y.Z`) corresponding to the shipped build and `CHANGELOG.md` entry.
 - Release notes and a changelog that clearly separate:
   - user-facing changes
   - security fixes

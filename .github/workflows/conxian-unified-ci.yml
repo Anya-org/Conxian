@@ -23,7 +23,7 @@ jobs:
     - name: Detect B2B changes (PR)
       if: github.event_name == 'pull_request'
       id: filter_pr
-      uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3
+      uses: dorny/paths-filter@v4
       with:
         filters: |
           b2b:
@@ -42,6 +42,8 @@ jobs:
   repo-hygiene:
     name: Repo Hygiene (ZSE & Submodules)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
     - uses: actions/checkout@v4
       with:
@@ -65,6 +67,11 @@ jobs:
       run: |
         python3 scripts/verify_submodule_integrity.py
         git submodule status --recursive
+    - name: Verify release hygiene (tags + changelog)
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: |
+        python3 scripts/verify_release_hygiene.py
     - name: Verify production contamination guard
       run: |
         python3 scripts/verify_contamination_guard.py
@@ -133,6 +140,9 @@ jobs:
         cd conxian-nexus
         cargo test
 
+        cd ../lib-conclave-sdk
+        cargo test
+
   lib-conxian-core-suite:
     name: Core Library Suite (lib-conxian-core)
     runs-on: ubuntu-latest
@@ -162,7 +172,7 @@ jobs:
         cargo test --locked
         cargo clippy --locked --all-targets --all-features -- -D warnings
     - name: Install cargo-audit
-      uses: taiki-e/install-action@1ed3272338f573e042a2e6bca3893aa19f43b47a # v2
+      uses: taiki-e/install-action@7a562dfa955aa2e4d5b0fd6ebd57ff9715c07b0b # v2
       with:
         tool: cargo-audit@0.22.1
     - name: Dependency audit
@@ -199,7 +209,7 @@ jobs:
 
     - name: Upload test artifacts
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: conxius-wallet-test-artifacts
         path: |
@@ -211,7 +221,7 @@ jobs:
 
     - name: Upload coverage
       if: github.event_name == 'push' && hashFiles('conxius-wallet/coverage/**') != ''
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: conxius-wallet-coverage
         path: conxius-wallet/coverage

@@ -10,7 +10,7 @@ Enable external businesses (ETH/SOL/EVM) to "rent" a Conxian route for AI-agenti
 4. **TEE Attestation**: All transactions must be signed by a hardware enclave (StrongBox/TEE) verified by the lib-conclave-sdk.
 
 ## 3. Technical Requirements
-- **SDK**: lib-conclave-sdk v1.7.0+
+- **SDK**: `lib-conclave-sdk` (pinned via the `conxian-business` submodule)
 - **Protocol**: x402 / AP2
 - **Settlement**: Stacks (sBTC) or Bitcoin L1 (via DLC)
 - **Fee**: 100 bps (Hardcoded in Clarity)

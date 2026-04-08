@@ -17,6 +17,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
+          ref: dev
           submodules: true
           fetch-depth: 0
           token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
@@ -38,7 +39,7 @@ jobs:
           git submodule update --init --recursive --remote
 
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
           commit-message: "chore: auto-sync submodules"
@@ -46,6 +47,7 @@ jobs:
           body: |
             Automated submodule update to the latest configured branches.
 
-            This workflow intentionally opens a PR rather than pushing directly to `main`.
+            This workflow intentionally opens a PR rather than pushing directly to protected branches.
+          base: dev
           branch: bot/auto-sync-submodules
           delete-branch: true

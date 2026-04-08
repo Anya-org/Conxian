@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+
+"""Verify the PR BOS change classification section is present and valid."""
+
+from __future__ import annotations
+
 import json
 import os
 import re
