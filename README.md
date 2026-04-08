@@ -67,7 +67,7 @@ git submodule update --init services/conxian-ui
 
 ## Repository visibility and public/private boundary
 
-This repository is currently private. To reduce public/private boundary risk, detailed strategy, legal interpretations, operational runbooks, infrastructure identifiers, and any secret inventory are maintained in the Conxian Linear workspace (not in git), in compliance with our Zero Secret Egress (ZSE) mandate.
+Treat this repository as public for boundary purposes. Detailed strategy, legal interpretations, operational runbooks, infrastructure identifiers, and any secret inventory are maintained in the Conxian Linear workspace (not in git), in compliance with our Zero Secret Egress (ZSE) mandate.
 
 See https://linear.app/conxian-labs/issue/CON-256 for ZSE background and operating requirements.
 
