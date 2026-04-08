@@ -120,6 +120,8 @@ Each rail MUST define a canonical identifier set used to populate `settlement_id
 
 `envelope_identifiers` (including `tx_index`) MUST NOT affect `normalized_settlement_hash`.
 
+Invalid or missing values in `settlement_identifiers.envelope_identifiers` MUST be ignored/omitted and MUST NOT invalidate the settlement transaction for external-settlement trigger purposes.
+
 `settlement_identifiers` MUST be derived/normalized inside the TEE from `raw_payload_bytes`; any host-supplied hints MUST be treated as non-authoritative, MUST be checked inside the TEE (no successful attestation on mismatch), and MUST NOT be forwarded into the attested output (see [spec.md §2.1.1 (`settlement_identifiers` canonical set)](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical) for normative semantics).
 
 Replay protection and deterministic idempotency are enforced via `trigger_id` derived from `{ rail, normalized_settlement_hash }`.
@@ -130,28 +132,35 @@ Trigger granularity:
 - If a single inbound message contains multiple settlement transactions (e.g., ISO 20022 `pacs.008` with multiple `CdtTrfTxInf` entries), it produces **one trigger per transaction**.
 - Replaying the same settlement transaction in a different envelope/message MUST produce the same `trigger_id`.
 
-Minimum required identifier set (by rail):
+Minimum required `transaction_identifiers` set (by rail):
 
-For normative `tx_index` requirements (ordering source, no-reorder constraint, and inclusion rules), see [spec.md §2.1.1 (`settlement_identifiers` canonical set)](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical).
+For normative `settlement_identifiers` requirements (including any `tx_index` ordering semantics and computation rules when included), see [spec.md §2.1.1 (`settlement_identifiers` canonical set)](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical).
 
-The per-rail `tx_index` parentheticals below are summaries; the spec is authoritative.
+The `tx_index` summary below is non-normative; the spec is authoritative.
 
 - **ISO20022 (pacs.008)**
   - `transaction_identifiers.transaction_reference` (MUST use the first available in this order)
     - `uetr` (e.g., `CdtTrfTxInf.PmtId.UETR`), else
     - `end_to_end_id` (e.g., `CdtTrfTxInf.PmtId.EndToEndId`), else
     - `instruction_id` (e.g., `CdtTrfTxInf.PmtId.InstrId`)
-  - `envelope_identifiers.tx_index` (0-based index of the `CdtTrfTxInf` entry in rail-defined document order)
 - **PAPSS**
   - `transaction_identifiers.transaction_reference` (rail-provided unique reference)
-  - `envelope_identifiers.tx_index` (0-based index in rail-defined order)
 - **BRICS**
   - `transaction_identifiers.transaction_reference` (rail-provided unique reference)
-  - `envelope_identifiers.tx_index` (0-based index in rail-defined order)
+
+Optional envelope identifiers (audit/debug only):
+
+- `envelope_identifiers.tx_index` (0-based index of the settlement-transaction entry in rail-defined order)
 
 Canonical formatting requirements:
 
-See [spec.md §2.1.1 (`settlement_identifiers` canonical set)](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical) for the required `settlement_identifiers` structure (including `settlement_identifiers.envelope_identifiers`), canonicalization/validation rules, and equality semantics; this design document intentionally does not restate them to avoid drift.
+For normative formatting/equality rules (including any optional reconciliation identifier keys), see [spec.md §2.1.1 (`settlement_identifiers` canonical set)](specs/external-settlement-proposal-only-tee/spec.md#settlement-identifiers-canonical).
+
+Informal summary:
+
+- String-valued settlement identifiers in `settlement_identifiers.transaction_identifiers` are canonicalized using Unicode NFC (per Unicode 15.1.0) and compared byte-for-byte over UTF-8; case is preserved unless a field-specific canonicalization rule (e.g., uppercasing `settlement_currency`) explicitly requires a transform (see §2.1.1).
+- These `transaction_identifiers` values are non-empty and, after NFC normalization, exclude Unicode control/format characters (`General_Category` Cc or Cf) and leading/trailing Unicode whitespace (`White_Space=Y`). See §2.1.1 for the precise normative rules.
+- If any value in `settlement_identifiers.transaction_identifiers` fails canonicalization or validation under §2.1.1, that settlement transaction is invalid for external-settlement trigger purposes and does not produce a `normalized_settlement_hash` or `SovereignProposal`.
 
 Proposal emission MUST be idempotent on `trigger_id`: duplicate triggers MUST NOT create additional proposals or timelocks.
 
