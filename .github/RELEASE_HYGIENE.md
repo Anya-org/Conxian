@@ -20,6 +20,11 @@ These workflows run on every pull request targeting `dev`, `staged`, or `main`. 
   - Repo hygiene:
     - ZSE knowledge retention via `scripts/verify_knowledge_retention.py`.
     - Tracked artifact scanning via `scripts/verify_tracked_artifacts.py`.
+      - False positives can be allowlisted via `.github/artifact-scan-allowlist.txt` (case-sensitive; paths are normalized to forward slashes with no leading `./`):
+        - Patterns containing `/` match the full normalized path (plain patterns also match directory prefixes).
+        - Patterns without `/`:
+          - Plain strings match basenames, exact paths, and directory prefixes.
+          - Glob patterns match basenames, and also the full path for compatibility, so keep patterns as specific as possible.
     - Submodule integrity via `scripts/verify_submodule_integrity.py`.
 - Secret scan (see [`secret-scan.yml`](./workflows/secret-scan.yml))
 - Dependency review (see [`dependency-review.yml`](./workflows/dependency-review.yml))

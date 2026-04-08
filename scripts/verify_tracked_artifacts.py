@@ -94,14 +94,34 @@ def _load_allowlist(repo_root: Path) -> list[str]:
 
 
 def _is_allowlisted(rel_path: str, allowlist: list[str]) -> bool:
-    rel_path = _normalize_path(rel_path)
-    for pattern in allowlist:
-        if fnmatch.fnmatch(rel_path, pattern):
-            return True
+    """Return True if `rel_path` is allowlisted.
 
-        if not any(ch in pattern for ch in "*?[]"):
-            if rel_path == pattern or rel_path.startswith(pattern + "/"):
+    Semantics:
+    - Patterns containing "/" are matched against the full normalized path.
+    - Patterns without "/" are matched against the basename (anywhere in the tree), which can be more permissive than root-anchored matching.
+      - For backward compatibility, glob patterns without "/" are also matched against the full path.
+    - Plain (non-glob) patterns also allow exact path and directory-prefix matches.
+
+    Matching is case-sensitive to avoid OS-dependent behavior.
+    """
+    rel_path = _normalize_path(rel_path)
+    base = rel_path.rsplit("/", 1)[-1]
+    for raw_pattern in allowlist:
+        pattern = _normalize_path(raw_pattern)
+        has_glob = any(ch in pattern for ch in "*?[]")
+        is_basename_pattern = "/" not in pattern
+
+        if is_basename_pattern:
+            if fnmatch.fnmatchcase(base, pattern):
                 return True
+            if has_glob and fnmatch.fnmatchcase(rel_path, pattern):
+                return True
+        else:
+            if fnmatch.fnmatchcase(rel_path, pattern):
+                return True
+
+        if not has_glob and (rel_path == pattern or rel_path.startswith(pattern + "/")):
+            return True
     return False
 
 
@@ -118,11 +138,11 @@ def _match_any(rel_path: str, patterns: tuple[str, ...]) -> bool:
             continue
 
         if "/" in normalized:
-            if fnmatch.fnmatch(rel_path, normalized):
+            if fnmatch.fnmatchcase(rel_path, normalized):
                 return True
             continue
 
-        if fnmatch.fnmatch(base, normalized):
+        if fnmatch.fnmatchcase(base, normalized):
             return True
     return False
 
