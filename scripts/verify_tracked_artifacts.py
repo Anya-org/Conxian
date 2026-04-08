@@ -15,11 +15,23 @@ class Rule:
 
 
 def _repo_root() -> Path:
-    out = subprocess.check_output(
-        ["git", "rev-parse", "--show-toplevel"],
-        stderr=subprocess.STDOUT,
-    )
-    return Path(out.decode("utf-8", "replace").strip())
+    try:
+        out = subprocess.check_output(
+            ["git", "rev-parse", "--show-toplevel"],
+            stderr=subprocess.STDOUT,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
+    except FileNotFoundError as exc:
+        raise RuntimeError(
+            "git is not installed or not on PATH; cannot determine repository root"
+        ) from exc
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(
+            f"Failed to determine repo root via git (exit {exc.returncode}): {exc.output}"
+        ) from exc
+    return Path(out.strip())
 
 
 def _read_submodule_paths(repo_root: Path) -> set[str]:
