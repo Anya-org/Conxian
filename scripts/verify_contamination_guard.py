@@ -180,9 +180,10 @@ REPO_EXCLUSIONS = {
         "deployments/full-system.testnet-plan.yaml",
     },
     "conxius-wallet": {
+        # UI mock data/constants (e.g. `MOCK_*`) are allowed for now, but production-facing
+        # service integrations (such as `services/`) should remain free of testnet principals.
         "components",
         "constants.tsx",
-        "services/ntt.ts",
     },
     "stacksorbit": {
         "Clarinet.toml",

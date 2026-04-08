@@ -5,12 +5,14 @@ This document defines the BOS-level business role, governance controls, and docu
 Canonical wallet docs live in the wallet repo itself (`Conxian/conxius-wallet`).
 
 
-- Product spec: [`conxius-wallet/docs/business/PRD.md`](https://github.com/Conxian/conxius-wallet/blob/f1d7d1ada9b90cbfb5b7d9f20d41a58da2715521/docs/business/PRD.md)
-- Operations roadmap: [`conxius-wallet/docs/operations/ROADMAP.md`](https://github.com/Conxian/conxius-wallet/blob/f1d7d1ada9b90cbfb5b7d9f20d41a58da2715521/docs/operations/ROADMAP.md)
-- Risk registry: [`conxius-wallet/docs/legal/RISK_REGISTRY.md`](https://github.com/Conxian/conxius-wallet/blob/f1d7d1ada9b90cbfb5b7d9f20d41a58da2715521/docs/legal/RISK_REGISTRY.md)
-- Protocol integration map: [`conxius-wallet/docs/protocols/IMPLEMENTATION_REGISTRY.md`](https://github.com/Conxian/conxius-wallet/blob/f1d7d1ada9b90cbfb5b7d9f20d41a58da2715521/docs/protocols/IMPLEMENTATION_REGISTRY.md)
+- Product spec: [`conxius-wallet/docs/business/PRD.md`](https://github.com/Conxian/conxius-wallet/blob/ef68ec49891d4a7085e499732b9fa0ce5816c1e2/docs/business/PRD.md)
+- Operations roadmap: [`conxius-wallet/docs/operations/ROADMAP.md`](https://github.com/Conxian/conxius-wallet/blob/ef68ec49891d4a7085e499732b9fa0ce5816c1e2/docs/operations/ROADMAP.md)
+- Risk registry: [`conxius-wallet/docs/legal/RISK_REGISTRY.md`](https://github.com/Conxian/conxius-wallet/blob/ef68ec49891d4a7085e499732b9fa0ce5816c1e2/docs/legal/RISK_REGISTRY.md)
+- Protocol integration map: [`conxius-wallet/docs/protocols/IMPLEMENTATION_REGISTRY.md`](https://github.com/Conxian/conxius-wallet/blob/ef68ec49891d4a7085e499732b9fa0ce5816c1e2/docs/protocols/IMPLEMENTATION_REGISTRY.md)
 
 Note: in this repo, those artifacts live under the `conxius-wallet/` submodule when it is checked out (for example, via `git submodule update --init conxius-wallet`). The GitHub links above pin to the wallet submodule SHA used by this repo.
+
+If `conxius-wallet` is repinned in this repo, update the SHA in the links above at the same time to avoid documentation drift.
 
 ## 1) Business-unit role (wallet operations + product delivery)
 
@@ -53,8 +55,8 @@ This is intentionally role-based (not person-based) so it can be applied regardl
 
 The wallet already contains a strong starting point for release prep. Use it as a checklist, but keep sensitive details out of git:
 
-- Release prep (public-safe only; no store account ops, no signing key custody procedures): [`conxius-wallet/docs/operations/ANDROID_RELEASE_PREP.md`](https://github.com/Conxian/conxius-wallet/blob/f1d7d1ada9b90cbfb5b7d9f20d41a58da2715521/docs/operations/ANDROID_RELEASE_PREP.md)
-- Device readiness (public-safe only; no production endpoint mapping): [`conxius-wallet/docs/operations/DEVICE_READINESS_REPORT.md`](https://github.com/Conxian/conxius-wallet/blob/f1d7d1ada9b90cbfb5b7d9f20d41a58da2715521/docs/operations/DEVICE_READINESS_REPORT.md)
+- Release prep (public-safe only; no store account ops, no signing key custody procedures): [`conxius-wallet/docs/operations/ANDROID_RELEASE_PREP.md`](https://github.com/Conxian/conxius-wallet/blob/ef68ec49891d4a7085e499732b9fa0ce5816c1e2/docs/operations/ANDROID_RELEASE_PREP.md)
+- Device readiness (public-safe only; no production endpoint mapping): [`conxius-wallet/docs/operations/DEVICE_READINESS_REPORT.md`](https://github.com/Conxian/conxius-wallet/blob/ef68ec49891d4a7085e499732b9fa0ce5816c1e2/docs/operations/DEVICE_READINESS_REPORT.md)
 - Internal-only: Play Store operations + signing key custody runbook (Linear Virtual Office)
 
 Minimum release controls:
