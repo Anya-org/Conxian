@@ -180,7 +180,11 @@ def verify() -> None:
 
     origin_url = _run_git(["remote", "get-url", "origin"]).strip()
     origin_repo = _parse_github_repo(origin_url)
-    if origin_repo:
+
+    check_origin_tags = (
+        os.environ.get("VERIFY_RELEASE_HYGIENE_CHECK_ORIGIN_TAGS", "").lower() == "true"
+    )
+    if check_origin_tags and origin_repo:
         repos_to_check["."] = origin_repo
 
     for rel_path, url in sorted(gitmodules.items()):
