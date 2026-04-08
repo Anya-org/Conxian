@@ -39,10 +39,19 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 - **Production Contamination Guard (CON-394):** Implemented a blocking CI check (`scripts/verify_contamination_guard.py`) that rejects hardcoded testnet principals, mocks, and explicit stub markers in production source trees.
 - **Fail-Closed Execution Paths (CON-394):** Standardized critical stubs in `conxian-nexus` (ZKML, DLC, Identity, ERP) to return explicit service errors instead of simulated data, preventing "fail-open" scenarios during mainnet cutover.
 
+### Added
+- Added Independent Lab Development Kit (ILDK) README (`docs/ILDK_README.md`) defining the "Morpho Blue" base-layer strategy for BOS.
+- Added Strategic Growth Model (`docs/STRATEGIC_GROWTH_MODEL_2026.md`) outlining comparison with legacy/DeFi models and governance-minimized scaling rules.
+
+Note: CJCS v2.0.1 / ILDK documentation updates landed on 2026-04-08.
+
 ### Changed
 - **Mainnet Release Plan Alignment (CON-371):** Updated `mainnet-release-plan.yaml` to use canonical mainnet principals ('SP...').
 - **Sanitized Integration Adapters:** Updated `alex-adapter.clar` and `redstone-oracle-adapter.clar` to production integration status, removing simulation placeholders.
 - **Audit Verification:** Updated `contamination_audit_report_2026_04_05.md` and `mainnet_readiness_report_2026_04_05.md` to reflect REMEDIATED status.
+- Enhanced Conxian Job Card Schema (CJCS) v2.0.1 (`docs/CJCS_v2.0_SPEC.md`) with "Industrial Intent" standard and dependency web logic.
+- Upgraded BOS Business Buildout (`docs/BOS_BUSINESS_BUILDOUT.md`) to include Real Yield Flywheel, Agentic App Store, and Policy-as-Code scaling.
+- Updated Documentation Hub entrypoint (`docs/README.md`) and alignment index (`docs/DOCUMENTATION_ALIGNMENT_INDEX.md`) to include new strategic artifacts.
 
 ## [1.9.0] - 2026-04-05
 ### Added
