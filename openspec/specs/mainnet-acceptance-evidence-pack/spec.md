@@ -14,7 +14,9 @@ The evidence pack is an auditable, reviewable artifact that proves:
 
 ## Requirements
 
-> **Note (Readiness tracker visibility):** If the linked mainnet readiness tracker is not directly accessible to PR reviewers, the evidence pack MUST record the pass status of that readiness work directly.
+### Requirement: Readiness work visibility
+
+If any linked mainnet readiness work (e.g., readiness tracker) is not directly accessible to PR reviewers, the evidence pack MUST record the mainnet pass status directly.
 
 ### Requirement: Evidence pack is mandatory for `staged` -> `main`
 
@@ -40,7 +42,7 @@ Any `staged` -> `main` promotion MUST satisfy all criteria below.
 - No temporary bypasses, relaxed checks, or debug-only execution paths remain enabled.
 - No testnet principals, endpoints, contract identifiers, wallets, or configuration remain in production configuration.
 - Release artifacts, docs, and readiness notes refer to mainnet deployment only.
-- Mainnet readiness work linked to the release is updated and shows pass status.
+- Mainnet readiness pass status is verifiable to PR reviewers (see [Requirement: Readiness work visibility](#requirement-readiness-work-visibility)).
 - Required checks pass for the promotion candidate.
 - Any security, signer, settlement, and governance controls required for production are verified against mainnet expectations.
 
@@ -59,7 +61,7 @@ The promotion MUST NOT be merged into `main` if any of the following are true:
 Before merging a promotion PR, the evidence pack MUST include explicit evidence that:
 
 - Branch source is `staged`.
-- Linked readiness work is updated and shows mainnet pass status.
+- Mainnet readiness pass status is verifiable to PR reviewers (see [Requirement: Readiness work visibility](#requirement-readiness-work-visibility)).
 - A repo audit confirms no stub or testnet contamination on production paths.
 - Reviewer sign-off confirms mainnet-only production integrity.
 
