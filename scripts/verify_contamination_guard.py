@@ -147,6 +147,9 @@ REPO_EXCLUSIONS = {
     "conxian-nexus": {
         "lib-conxian-core/src/lib.rs",
     },
+    "lib-conxian-core": {
+        "src/lib.rs",
+    },
     "Conxian": {
         "contracts/governance/proposal-engine-trait.clar",
         "contracts/helpers/optimization-helpers.clar",

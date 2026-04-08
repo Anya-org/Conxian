@@ -19,7 +19,6 @@ The protocol MUST compute Founder’s Cut in the following order:
 Internal protocol allocations (reserve/ops/incentives) MUST be computed from `post_cut_captured`.
 
 The rounding remainder for the Founder’s Cut computation MUST equal `remainder` and MUST remain in the protocol treasury/vault balance of the transaction’s fee asset (as part of `post_cut_captured`) and MUST NOT be included in the transfer to the designated founder vault.
-
 #### Scenario: Fee Redirection
 - **Given** a successful swap or lending event
 - **When** processing the transaction

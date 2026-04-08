@@ -1,6 +1,5 @@
 # Conxian: Sovereign Business Operations System (BOS v1.9.0)
 
-[![Repo Metadata CI](https://github.com/Conxian/conxian-business/actions/workflows/repo-metadata-ci.yml/badge.svg)](https://github.com/Conxian/conxian-business/actions/workflows/repo-metadata-ci.yml)
 [![Conxian Unified CI](https://github.com/Conxian/conxian-business/actions/workflows/conxian-unified-ci.yml/badge.svg)](https://github.com/Conxian/conxian-business/actions/workflows/conxian-unified-ci.yml)
 [![Deploy Documentation](https://github.com/Conxian/conxian-business/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/Conxian/conxian-business/actions/workflows/deploy-docs.yml)
 

@@ -79,7 +79,7 @@ function usageAndExit(message?: string, exitCode: number = 1): never {
 
   process.exit(exitCode);
 }
-function assertStacksNetworkPrefix(networkName: NetworkName, flagName: string, address: string) {
+function assertStacksNetworkPrefix(networkName: NetworkName, flagName: string, address: string): string {
   const normalized = address.trim().toUpperCase();
 
   if (!validateStacksAddress(normalized)) {
@@ -90,6 +90,8 @@ function assertStacksNetworkPrefix(networkName: NetworkName, flagName: string, a
   if (!prefixes.some((prefix) => normalized.startsWith(prefix))) {
     usageAndExit(`On ${networkName}, ${flagName} must start with ${prefixes.join(' or ')}`);
   }
+
+  return normalized;
 }
 
 function parseArgs(argv: string[]): { networkName: NetworkName; contract: PrincipalParts } {
@@ -140,7 +142,7 @@ function parseArgs(argv: string[]): { networkName: NetworkName; contract: Princi
     usageAndExit(`Invalid --contract principal: ${contract}`);
   }
 
-  assertStacksNetworkPrefix(networkName, '--contract', contractParts.address);
+  contractParts.address = assertStacksNetworkPrefix(networkName, '--contract', contractParts.address);
   if (contractParts.contractName !== 'fiscal-intelligence') {
     usageAndExit(
       `--contract must point to the fiscal-intelligence contract (got: ${contractParts.contractName})`

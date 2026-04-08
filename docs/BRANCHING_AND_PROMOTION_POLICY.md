@@ -27,8 +27,7 @@ To ensure the integrity of the Conxian Production Environment, all repositories 
 5. **Production Merge**: Only after the evidence pack is verified can `staged` be merged into `main`. **Direct merges from `dev` to `main` are strictly prohibited.**
 
 ## 3. Enforcement (CI/CD Gates)
-
-- **Protected Branches**: `main` and `staged` must be protected with required reviews and passing status checks.
+- **Protected Branches**: `main` and `staged` must be protected with required reviews and passing status checks (including the Contamination Guard).
 - **Contamination Guard**: CI suites on `main` and `staged` must run a blocking scan for and reject non-production patterns, and the scan must be explicitly scoped to avoid false positives.
   - **Scope**: Run as a required status check on pull requests targeting `main` and `staged`. Scan only production source trees (repo-defined allowlist; e.g., `contracts/**`, `src/**`).
   - **Exclusions**: Explicitly exclude `docs/**`, `audit/**`, `**/*.md`, and test/mocks/fixtures paths.
