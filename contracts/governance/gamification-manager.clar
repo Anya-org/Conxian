@@ -13,7 +13,7 @@
     uint
 )
 
-(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var admin principal tx-sender)
 
 ;; Read Only
 (define-read-only (get-user-xp (user principal))

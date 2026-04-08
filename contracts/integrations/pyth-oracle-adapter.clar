@@ -12,8 +12,8 @@
 (define-constant PYTH_PRECISION u100000000) ;; 10^8
 
 ;; Data Vars
-(define-data-var pyth-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var conxian-protocol-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var pyth-contract principal tx-sender)
+(define-data-var conxian-protocol-contract principal tx-sender)
 
 ;; @desc Updates the price feed with a VAA (Pull Model)
 (define-public (update-price-feed

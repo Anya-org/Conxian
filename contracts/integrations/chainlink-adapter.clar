@@ -9,7 +9,7 @@
 (define-constant ERR_NO_PRICE u6002)
 
 ;; Data Vars
-(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var admin principal tx-sender)
 (define-data-var max-staleness uint u100) ;; 100 blocks (~5 minutes)
 
 ;; Price Storage

@@ -18,9 +18,9 @@
 
 ;; Data Vars
 (define-data-var last-position-id uint u0)
-(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var pool-manager principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var fee-collector principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var contract-owner principal tx-sender)
+(define-data-var pool-manager principal tx-sender)
+(define-data-var fee-collector principal tx-sender)
 
 ;; Position Data
 (define-map positions

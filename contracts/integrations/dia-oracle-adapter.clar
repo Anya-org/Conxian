@@ -9,7 +9,7 @@
 (define-constant ERR_NO_PRICE u6102)
 
 ;; Data Vars
-(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var admin principal tx-sender)
 
 ;; Price Storage
 (define-map dia-prices

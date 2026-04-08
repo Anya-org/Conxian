@@ -26,6 +26,7 @@
   )
     (begin
       ;; 1. Collect protocol fees from core modules
+      ;; Use the injected trait correctly
       (match (contract-call? .concentrated-liquidity-pool collect-protocol-fees cxd-token-trait)
         res true
         err-val false

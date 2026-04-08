@@ -26,3 +26,8 @@
 - **Root-to-Leaf**: Always verify system integration starting from the `ops-engine` heartbeat.
 - **Leaf-to-Root**: Ensure individual manager contracts are unit-tested before integration.
 - **Dual-Mode**: Use `block-utils.clar` for any time-based or C4-native operations in tests.
+
+## 6. Business Operations System (BOS) Logic
+- **Principal Registry**: All Conxian core contracts must use dynamic principals fetched via `operational-treasury.clar`.
+- **Contamination Gating**: Any hardcoded `ST...` or `SP...` addresses in `contracts/` are considered a build-break. Jules must flag and fix these during the planning phase.
+- **BitVM2 Compliance**: Job Card completions (CJCS v2.0) must be verified against the BitVM2 state root in `lib/clarity-bitcoin.clar` before settlement.

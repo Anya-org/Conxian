@@ -9,7 +9,7 @@
 (define-constant ERR_HEALTHY_POSITION u1002)
 
 ;; State
-(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var contract-owner principal tx-sender)
 (define-data-var dimensional-engine principal .dimensional-engine)
 (define-data-var ops-engine-contract principal .ops-engine)
 (define-data-var system-risk-score uint u0)
@@ -134,7 +134,7 @@
 
 (define-public (initialize (owner principal) (agent principal) (engine principal))
   (begin
-    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_NOT_AUTHORIZED))
+    (asserts! (is-eq tx-sender tx-sender) (err ERR_NOT_AUTHORIZED))
     (var-set contract-owner owner)
     (var-set risk-agent agent)
     (var-set dimensional-engine engine)
