@@ -4,6 +4,7 @@ import os
 import re
 import subprocess
 import sys
+from typing import Union
 
 # Production Contamination Guard
 # This script scans production-track repositories for non-production patterns.
@@ -104,9 +105,26 @@ GATEABLE_LABELS = {
     "Placeholder simulation",
 }
 
-GATE_REQUIRED: dict[str, dict[str, re.Pattern[str]]] = {
+GateRule = Union[re.Pattern[str], dict[str, re.Pattern[str]]]
+
+GATE_REQUIRED: dict[str, dict[str, GateRule]] = {
     "conxian-gateway": {
         "internal/api/src/a2p.rs": re.compile(r'feature\s*=\s*"mock-integrations"'),
+    },
+}
+
+LABEL_ALLOWLIST: dict[str, dict[str, set[str]]] = {
+    "conxius-wallet": {
+        "Mock Pattern": {
+            "components/AssetDetailModal.tsx",
+            "components/CitadelManager.tsx",
+            "components/GovernancePortal.tsx",
+            "components/InvestorDashboard.tsx",
+            "components/Marketplace.tsx",
+            "components/RewardsHub.tsx",
+            "components/StackingManager.tsx",
+            "constants.tsx",
+        },
     },
 }
 
@@ -184,10 +202,10 @@ REPO_EXCLUSIONS = {
         "deployments/testnet-plan.yaml",
     },
     "conxius-wallet": {
-        # UI mock data/constants (e.g. `MOCK_*`) are allowed for now, but production-facing
-        # service integrations (such as `services/`) should remain free of testnet principals.
-        "components",
-        "constants.tsx",
+        # UI mock data/constants (e.g. `MOCK_*`) are allowed in a small set of files that are
+        # allowlisted in `LABEL_ALLOWLIST` above. We keep scanning the rest of the UI and
+        # all production-facing service integrations (such as `services/`).
+        "scripts/update_mocks.py",
     },
     "stacksorbit": {
         "Clarinet.toml",
@@ -211,8 +229,23 @@ def scan_repo(root: str, repo_name: str) -> list[str]:
     exclusions = GLOBAL_EXCLUSIONS | REPO_EXCLUSIONS.get(repo_name, set())
 
     gate_requirements = GATE_REQUIRED.get(repo_name, {})
+    allowlist = LABEL_ALLOWLIST.get(repo_name, {})
 
     files = git_ls_files(root)
+
+    if allowlist:
+        files_set = set(files)
+        known_labels = {lbl for (lbl, _) in CONTAMINATION_PATTERNS}
+        unknown_labels = set(allowlist) - known_labels
+        for lbl in sorted(unknown_labels):
+            errors.append(f"[{repo_name}] LABEL_ALLOWLIST references unknown label: {lbl!r}")
+
+        for lbl, paths in allowlist.items():
+            missing = sorted(p for p in paths if p not in files_set)
+            for p in missing:
+                errors.append(
+                    f"[{repo_name}] LABEL_ALLOWLIST references missing path for {lbl!r}: {p}"
+                )
 
     code_exts = {".rs", ".ts", ".tsx", ".clar", ".yaml", ".yml", ".json", ".toml"}
 
@@ -230,10 +263,21 @@ def scan_repo(root: str, repo_name: str) -> list[str]:
 
         lines = content.splitlines()
         for label, pattern in CONTAMINATION_PATTERNS:
+            label_allowlist = allowlist.get(label)
             for i, line in enumerate(lines, start=1):
                 if pattern.search(line):
-                    gate_regex = gate_requirements.get(rel_path)
-                    if gate_regex and label in GATEABLE_LABELS:
+                    if label_allowlist and rel_path in label_allowlist:
+                        break
+
+                    gate_rule = gate_requirements.get(rel_path)
+                    gate_regex = None
+                    if label in GATEABLE_LABELS:
+                        if isinstance(gate_rule, dict):
+                            gate_regex = gate_rule.get(label)
+                        else:
+                            gate_regex = gate_rule
+
+                    if gate_regex:
                         if gate_regex.search(content):
                             break
                         errors.append(
