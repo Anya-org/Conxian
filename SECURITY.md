@@ -2,14 +2,15 @@
 
 ## Support Policy
 
-Security fixes are applied on a rolling basis to the default branch (`main`).
+Security fixes are developed and merged to the default branch (`main`) on a rolling basis.
 
-When a tagged release line exists, only the latest release is supported with security updates.
+If the repository publishes tagged releases, we backport security fixes only to the latest tagged release.
 
 | Channel | Security fixes |
 | --- | --- |
 | `main` (default branch) | Yes |
-| Releases/tags older than the latest | No |
+| Latest tagged release (if any) | Yes |
+| All other releases/tags | No |
 | Other branches/commits | Not actively maintained for security |
 
 ## Reporting a Vulnerability
@@ -18,7 +19,7 @@ Do not report security vulnerabilities via public GitHub issues.
 
 Report vulnerabilities privately using one of these channels:
 
-1. GitHub private vulnerability reporting (Security Advisories): use the repository Security tab and choose "Report a vulnerability".
+1. GitHub private vulnerability reporting (Security Advisories): if enabled, use the repository Security tab and choose "Report a vulnerability".
 2. Email: security@conxian-labs.com
 
 When possible, include:
