@@ -4,13 +4,13 @@
 
 Security fixes are developed and merged to the default branch (`main`) on a rolling basis.
 
-If the repository publishes tagged releases, we backport security fixes only to the latest tagged release.
+If the repository publishes tagged releases, we backport security fixes only to the latest supported release line (for example, the latest `MAJOR.MINOR` series like `1.2.x`).
 
 | Channel | Security fixes |
 | --- | --- |
 | `main` (default branch) | Yes |
-| Latest tagged release (if any) | Yes |
-| All other releases/tags | No |
+| Latest supported release line (if any) | Yes (backported as needed) |
+| Releases/tags older than the latest supported release line | No (please upgrade to the latest supported release line) |
 | Other branches/commits | Not actively maintained for security |
 
 <a id="reporting-vulnerability"></a>
@@ -23,6 +23,8 @@ Report vulnerabilities privately using one of these channels:
 1. GitHub private vulnerability reporting (Security Advisories): if enabled, use the repository Security tab and choose "Report a vulnerability".
 2. Email: security@conxian-labs.com
 
+If you cannot use either of the above, email admin@conxian-labs.com and clearly mark the message as a security report.
+
 When possible, include:
 
 - A description of the vulnerability and potential impact
@@ -30,12 +32,9 @@ When possible, include:
 - The affected repository path/component (for example, `openspec/`, `scripts/`, or a specific submodule path)
 - Any relevant logs, error messages, or stack traces (redact secrets)
 
-If you cannot use either of the above, email admin@conxian-labs.com and clearly mark the message as a security report.
-
 ## Disclosure Policy
 
 We follow a coordinated disclosure model:
-
 1. We will acknowledge receipt of your report within 48-72 hours.
 2. We will investigate and provide a timeline for remediation.
 3. We ask that you do not disclose the vulnerability publicly until a fix has been released and coordinated.
