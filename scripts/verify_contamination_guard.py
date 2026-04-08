@@ -162,9 +162,7 @@ REPO_EXCLUSIONS = {
     # - executor/mod.rs: real Supabase upsert, non-fatal
     # conxian-nexus/lib-conxian-core/src/lib.rs retains one [STUB] for BitVM2 state root
     # verification (CON-75) — kept until that integration is wired.
-    "conxian-nexus": {
-        "conxian-nexus/lib-conxian-core/src/lib.rs",
-    },
+    "conxian-nexus": set(),
     "lib-conxian-core": {
         "src/lib.rs",
     },
