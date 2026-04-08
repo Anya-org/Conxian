@@ -34,17 +34,17 @@ Branch model column references the expected taxonomy in `./BRANCH_AND_PROMOTION_
 | Repository | BU / function | Owner (CODEOWNERS) | Production relevance | Branch model (observed) | Release criticality | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
 | `Conxian/conxian-business` | Governance (BOS + OpenSpec) | `@botshelomokoka @admin-conxian-labs` | Mainnet support | `default=main; dev=Y; staged=Y` | P0 | Umbrella repo; pins submodules and defines portfolio hygiene guardrails. |
-| `Conxian/Conxian` | CSF (Protocol) | Missing (no root `CODEOWNERS`) | Mainnet runtime | `default=main; dev=Y; staged=n` | P0 | Add `staged` to complete the promotion chain. |
-| `Conxian/conxian-nexus` | Nexus (State node) | Missing (no root `CODEOWNERS`) | Mainnet runtime | `default=main; dev=n; staged=n` | P0 | Missing `dev` and `staged`. |
-| `Conxian/conxian-gateway` | Fusion (Gateway) | Missing (no root `CODEOWNERS`) | Mainnet runtime | `default=main; dev=n; staged=n` | P0 | Missing `dev` and `staged`. |
-| `Conxian/conxius-wallet` | Conxius (Wallet) | Missing (no root `CODEOWNERS`) | Mainnet runtime | `default=main; dev=n; staged=n` | P0 | Missing `dev` and `staged`. |
-| `Conxian/lib-conxian-core` | Shared core | Missing (no root `CODEOWNERS`) | Mainnet support | `default=main; dev=n; staged=n` | P0 | Missing `dev` and `staged`. |
-| `Conxian/lib-conclave-sdk` | Shared SDK (TEE/crypto) | `@botshelomokoka` | Mainnet support | `default=master; dev=n; staged=n` | P0 | Default branch is `master` (portfolio standard expects `main`). Missing `dev` and `staged`. |
-| `Conxian/stacksorbit` | DevOps tooling (deployments) | Missing (no root `CODEOWNERS`) | Mainnet support | `default=main; dev=n; staged=n` | P0 | Missing `dev` and `staged`. |
-| `Conxian/Conxian_UI` | Operating function (UI) | Missing (no root `CODEOWNERS`) | Non-mainnet | `default=main; dev=n; staged=n` | P1 | Planned rename to `conxian-ui` (see `./REPO_PORTFOLIO.md`). |
-| `Conxian/conxius-platform` | Operating function (Platform/DevEx) | `@conxian/core-devs` | Non-mainnet | `default=main; dev=n; staged=n` | P1 | Local stack orchestration; should not become a home for product logic. |
-| `Conxian/conxian-labs-site` | Operating function (Public web) | `@botshelomokoka` | Non-mainnet | `default=main; dev=n; staged=n` | P2 | Public site; ZSE-sensitive material must remain in Linear. |
-| `Conxian/.github` | Governance (org defaults) | `@Conxian/Admins` | Mainnet support | `default=main; dev=n; staged=n` | P0 | Centralized templates/workflows; treat as production-relevant governance surface. |
+| `Conxian/Conxian` | CSF (Protocol) | Missing (no root `CODEOWNERS`) | Mainnet runtime | `default=main; dev=Y; staged=n` | P0 | Add `staged` to complete the promotion chain. Ownership PR: https://github.com/Conxian/Conxian/pull/373. |
+| `Conxian/conxian-nexus` | Nexus (State node) | Missing (no root `CODEOWNERS`) | Mainnet runtime | `default=main; dev=n; staged=n` | P0 | Missing `dev` and `staged`. Ownership PR: https://github.com/Conxian/conxian-nexus/pull/42. |
+| `Conxian/conxian-gateway` | Fusion (Gateway) | Missing (no root `CODEOWNERS`) | Mainnet runtime | `default=main; dev=n; staged=n` | P0 | Missing `dev` and `staged`. Ownership PR: https://github.com/Conxian/conxian-gateway/pull/43. |
+| `Conxian/conxius-wallet` | Conxius (Wallet) | Missing (no root `CODEOWNERS`) | Mainnet runtime | `default=main; dev=n; staged=n` | P0 | Missing `dev` and `staged`. Ownership PR: https://github.com/Conxian/conxius-wallet/pull/178. |
+| `Conxian/lib-conxian-core` | Shared core | Missing (no root `CODEOWNERS`) | Mainnet support | `default=main; dev=n; staged=n` | P0 | Missing `dev` and `staged`. Ownership PR: https://github.com/Conxian/lib-conxian-core/pull/42. |
+| `Conxian/lib-conclave-sdk` | Shared SDK (TEE/crypto) | `@botshelomokoka` | Mainnet support | `default=master; dev=n; staged=n` | P0 | Default branch is `master` (portfolio standard expects `main`). Missing `dev` and `staged`. Ownership PR: https://github.com/Conxian/lib-conclave-sdk/pull/24. |
+| `Conxian/stacksorbit` | DevOps tooling (deployments) | Missing (no root `CODEOWNERS`) | Mainnet support | `default=main; dev=n; staged=n` | P0 | Missing `dev` and `staged`. Ownership PR: https://github.com/Conxian/stacksorbit/pull/206. |
+| `Conxian/Conxian_UI` | Operating function (UI) | Missing (no root `CODEOWNERS`) | Non-mainnet | `default=main; dev=n; staged=n` | P1 | Planned rename to `conxian-ui` (see `./REPO_PORTFOLIO.md`). Ownership PR: https://github.com/Conxian/Conxian_UI/pull/88. |
+| `Conxian/conxius-platform` | Operating function (Platform/DevEx) | `@conxian/core-devs` | Non-mainnet | `default=main; dev=n; staged=n` | P1 | Local stack orchestration; should not become a home for product logic. Ownership PR: https://github.com/Conxian/conxius-platform/pull/452. |
+| `Conxian/conxian-labs-site` | Operating function (Public web) | `@botshelomokoka` | Non-mainnet | `default=main; dev=n; staged=n` | P2 | Public site; ZSE-sensitive material must remain in Linear. Ownership PR: https://github.com/Conxian/conxian-labs-site/pull/7. |
+| `Conxian/.github` | Governance (org defaults) | `@Conxian/Admins` | Mainnet support | `default=main; dev=n; staged=n` | P0 | Centralized templates/workflows; treat as production-relevant governance surface. Ownership PR: https://github.com/Conxian/.github/pull/11. |
 | `Conxian/.github-private` | Governance (private org ops) | Missing (no root `CODEOWNERS`) | Mainnet support | `default=main; dev=n; staged=n` | P0 | Private governance surface; add `CODEOWNERS` for explicit accountability. |
 
 ## Subrepository inventory (governed by `conxian-business`)

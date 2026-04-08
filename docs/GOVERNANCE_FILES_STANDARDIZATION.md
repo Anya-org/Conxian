@@ -32,10 +32,11 @@ Recommended sections (in order):
 1. One-paragraph description and a single role line (Flagship/Supporting).
 2. Purpose
 3. Status
-4. Audience
-5. Relationship to the Conxian stack (or subsystem map)
-6. Quick start (only if the repo is runnable)
-7. Governance and security (links to the files below)
+4. Ownership (link to `CODEOWNERS`)
+5. Audience
+6. Relationship to the Conxian stack (or subsystem map)
+7. Quick start (only if the repo is runnable)
+8. Governance and security (links to the files below)
 
 ### SECURITY.md
 
