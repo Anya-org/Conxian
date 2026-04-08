@@ -150,9 +150,9 @@ STUB_NAME = "BOS_STATE_MACHINE"
 STUB_SUFFIX = "stub.json"
 REPO_EXCLUSIONS = {
     "conxian-business": {
-        f"{STUB_NAME}.{STUB_SUFFIX}",
-        f"AUDIT_MANIFEST.{STUB_SUFFIX}",
-        f"SARB_COMPLIANCE_REPORT.{STUB_SUFFIX}",
+        f"conxian-business/{STUB_NAME}.{STUB_SUFFIX}",
+        f"conxian-business/AUDIT_MANIFEST.{STUB_SUFFIX}",
+        f"conxian-business/SARB_COMPLIANCE_REPORT.{STUB_SUFFIX}",
     },
     # All [STUB] markers in conxian-nexus/src/ have been remediated (CON-383):
     # - zkml.rs, dlc.rs: fail-closed 501 Not Implemented
@@ -163,6 +163,7 @@ REPO_EXCLUSIONS = {
     # conxian-nexus/lib-conxian-core/src/lib.rs retains one [STUB] for BitVM2 state root
     # verification (CON-75) — kept until that integration is wired.
     "conxian-nexus": set(),
+
     "lib-conxian-core": {
         "src/lib.rs",
     },

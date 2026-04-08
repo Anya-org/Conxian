@@ -65,11 +65,6 @@ def main() -> int:
     submodules = set(read_submodule_paths(root))
     excluded_dirs = {".idx"} | submodules
 
-    exempt_reference_files = {
-        "scripts/verify_bos_production_boundary.py",
-        "scripts/verify_pr_bos_classification.py",
-    }
-
     excluded_paths = {p.rstrip("/") for p in excluded_dirs if p.rstrip("/")}
     try:
         repo_files = [
@@ -112,7 +107,10 @@ def main() -> int:
             continue
         if is_in_dir(rel_path, "docs") or is_in_dir(rel_path, "openspec"):
             continue
-        if rel_path in exempt_reference_files:
+        # Verifier entrypoints may reference stub artifacts to enforce hygiene rules.
+        if os.path.dirname(rel_path) == "scripts" and os.path.basename(rel_path).startswith(
+            "verify_"
+        ):
             continue
 
         text = read_text(root, rel_path)
