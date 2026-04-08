@@ -23,7 +23,7 @@ The `conxian-business` repository is an umbrella repo that vendors key Conxian r
 - **Wallet**: `conxius-wallet`
 - **Gateway**: `conxian-gateway`
 - **Platform**: `conxius-platform`
-- **UI**: `Conxian_UI` (planned rename to `conxian-ui`)
+- **UI**: `conxian-ui/` (Git submodule; upstream `Conxian_UI`, planned rename to `conxian-ui`).
 - **Shared core**: `lib-conxian-core`, `lib-conclave-sdk`
 - **Protocol**: `Conxian`
 - **State node**: `conxian-nexus`
@@ -37,7 +37,7 @@ If we can only pin a few repos on the GitHub org profile, these are the clearest
 
 1. `conxius-wallet` (Wallet)
 2. `conxian-gateway` (Gateway)
-3. `Conxian_UI` (UI) or `conxius-platform` (Platform)
+3. `Conxian_UI` (UI; vendored as `conxian-ui/`) or `conxius-platform` (Platform)
 4. `Conxian` (Protocol)
 5. `lib-conxian-core` (Shared core)
 6. `conxian-labs-site` (Website)
@@ -49,7 +49,7 @@ If we can only pin a few repos on the GitHub org profile, these are the clearest
 | Gateway | [conxian-gateway](https://github.com/Conxian/conxian-gateway) | Integrators, institutions | Rust gateway services and API surface. |
 | Wallet | [conxius-wallet](https://github.com/Conxian/conxius-wallet) | End users | Non-custodial wallet product. |
 | Platform | [conxius-platform](https://github.com/Conxian/conxius-platform) | Operators, institutions | Platform services (admin dashboards, etc.). |
-| UI | [Conxian_UI](https://github.com/Conxian/Conxian_UI) | Operators, institutions | UI app(s) and specs. |
+| UI | [Conxian_UI](https://github.com/Conxian/Conxian_UI) (vendored as `conxian-ui/`) | Operators, institutions | UI app(s) and specs. |
 | Protocol | [Conxian](https://github.com/Conxian/Conxian) | Protocol engineers | Contracts + protocol logic. |
 | State node | [conxian-nexus](https://github.com/Conxian/conxian-nexus) | Operators | Nexus state node implementation. |
 | Shared core | [lib-conxian-core](https://github.com/Conxian/lib-conxian-core) | App / service developers | Shared core library. |
