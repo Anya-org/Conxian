@@ -28,6 +28,41 @@ For any repository in the Conxian portfolio:
 - **THEN** the pull request MUST include a Mainnet Acceptance Evidence Pack
 - **AND** the evidence MUST be sufficient to prove production safety for mainnet
 
+### Requirement: Strict acceptance criteria for `staged` -> `main`
+
+Any `staged` -> `main` promotion MUST satisfy all criteria below.
+
+- All production paths are explicitly mainnet-scoped.
+- No testnet-only logic remains in runtime, deployment, or release paths.
+- No stubs, mocks, placeholders, dummy handlers, or fake adapters remain in production paths.
+- No temporary bypasses, relaxed checks, or debug-only execution paths remain enabled.
+- No testnet principals, endpoints, contract identifiers, wallets, or configuration remain in production configuration.
+- Release artifacts, docs, and readiness notes refer to mainnet deployment only.
+- Mainnet readiness work linked to the release is updated and shows pass status (or the evidence pack explicitly records the pass status when the tracker is not public).
+- Required checks pass for the promotion candidate.
+- Any security, signer, settlement, and governance controls required for production are verified against mainnet expectations.
+
+### Requirement: Hard blockers
+
+The promotion MUST NOT be merged into `main` if any of the following are true:
+
+- A PR or issue references testnet deployment as the active release target.
+- Production code is replaced by scaffolding or partial stub behavior.
+- Runtime behavior depends on placeholder values or non-production configuration.
+- Mainnet acceptance evidence is missing, incomplete, or contradicted by repo contents.
+- Release documentation still mixes `dev`, `staged`, and `main` responsibilities.
+
+### Requirement: Evidence required before merge
+
+Before merging a promotion PR, the evidence pack MUST include explicit evidence that:
+
+- Branch source is `staged`.
+- Linked readiness work is updated and shows mainnet pass status (or the evidence pack explicitly records the pass status when the tracker is not public).
+- A repo audit confirms no stub or testnet contamination on production paths.
+- Reviewer sign-off confirms mainnet-only production integrity.
+
+If any blocker is found, the change stays out of `main` and is pushed back to `dev` or corrected in `staged` until the full mainnet acceptance standard is met.
+
 ### Requirement: Evidence pack format
 
 The evidence pack MUST be captured in one of these forms:
@@ -210,4 +245,10 @@ Copy/paste and fill out for any `staged` -> `main` promotion PR.
 
 - I (accountable owner) confirm this evidence pack is complete and accurate.
   - Name/date: `<name>, <YYYY-MM-DD>`
+
+#### Strict acceptance checklist (`staged` -> `main`)
+
+- [ ] All criteria in “Requirement: Strict acceptance criteria for `staged` -> `main`” are satisfied.
+- [ ] No items in “Requirement: Hard blockers” apply.
+- [ ] All items in “Requirement: Evidence required before merge” are included in this evidence pack.
 ```
