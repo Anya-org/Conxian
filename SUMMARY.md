@@ -25,6 +25,7 @@
 
 * [BOS wallet control model](docs/BOS_WALLET_CONTROL_MODEL.md)
 * [Conxius Wallet BOS buildout](docs/CONXIUS_WALLET_BOS_BUILDOUT.md)
+* [lib-conclave-sdk BOS buildout](docs/LIB_CONCLAVE_SDK_BOS_BUILDOUT.md)
 * [Strategy Nexus](Sovereign-Strategy-Nexus/REALTIME_M&A_VELOCITY.md)
   * [Sovereign MOI Alignment](Sovereign-Strategy-Nexus/docs/SOVEREIGN_MOI_ALIGNMENT.md)
   * [ZK-Data Room Schema](Sovereign-Strategy-Nexus/docs/ZK_DATA_ROOM_SCHEMA.md)
