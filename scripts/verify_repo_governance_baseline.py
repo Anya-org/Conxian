@@ -5,6 +5,7 @@ import os
 import re
 import subprocess
 import sys
+import traceback
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -77,12 +78,7 @@ def _read_text(path: Path) -> str:
 
 
 def _require_heading(text: str, heading: str) -> bool:
-    return bool(
-        re.search(
-            rf"(?im)^#{{1,3}}\s+{re.escape(heading)}\s*$",
-            text,
-        )
-    )
+    return bool(re.search(rf"(?im)^#{{1,3}}\s+{re.escape(heading)}\b", text))
 
 
 def _verify_readme(repo_root: Path, errors: list[str]) -> None:
@@ -122,9 +118,17 @@ def _verify_codeowners(codeowners: Path, *, repo_root: Path, errors: list[str]) 
         errors.append(f"{rel_path}: no ownership rules found")
         return
 
-    covers_all = any(line.split() and line.split()[0] == "*" for line in owner_lines)
+    covers_all = False
+    for line in owner_lines:
+        parts = line.split()
+        if not parts:
+            continue
+        if parts[0] in {"*", "/*"}:
+            covers_all = True
+            break
+
     if not covers_all:
-        errors.append(f"{rel_path}: must include a '*' rule to cover the entire repo")
+        errors.append(f"{rel_path}: must include a '*' or '/*' rule to cover the entire repo")
 
     has_github_owner = any(
         token.startswith("@") for line in owner_lines for token in line.split()[1:]
@@ -223,6 +227,9 @@ def verify() -> None:
 if __name__ == "__main__":
     try:
         verify()
-    except Exception as exc:
+    except RuntimeError as exc:
         print(str(exc), file=sys.stderr)
+        sys.exit(1)
+    except Exception:
+        traceback.print_exc()
         sys.exit(1)
