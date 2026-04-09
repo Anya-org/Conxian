@@ -78,7 +78,12 @@ def _read_text(path: Path) -> str:
 
 
 def _require_heading(text: str, heading: str) -> bool:
-    return bool(re.search(rf"(?im)^#{{1,3}}\s+{re.escape(heading)}\b", text))
+    return bool(
+        re.search(
+            rf"(?im)^\s{{0,3}}#{{1,3}}\s+{re.escape(heading)}\b",
+            text,
+        )
+    )
 
 
 def _verify_readme(repo_root: Path, errors: list[str]) -> None:
@@ -92,7 +97,7 @@ def _verify_readme(repo_root: Path, errors: list[str]) -> None:
 def _verify_security(repo_root: Path, errors: list[str]) -> None:
     text = _read_text(repo_root / "SECURITY.md")
     if not re.search(
-        r"(?im)^#{1,3}\s+reporting\s+a\s+vulnerabilit(y|ies)\b",
+        r"(?im)^\s{0,3}#{1,3}\s+reporting\s+a\s+vulnerabilit(y|ies)\b",
         text,
     ):
         errors.append("SECURITY.md: missing 'Reporting a Vulnerability' section")
