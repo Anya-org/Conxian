@@ -16,8 +16,8 @@ Provide a concise but comprehensive summary of the changes in this Pull Request.
 
 ### Checklist
 - [ ] I have performed a self-review of my own work.
-- [ ] I targeted the correct base branch (`dev`, `staged`, or `main`) per [`docs/BRANCHING_AND_PROMOTION_POLICY.md`](https://github.com/Conxian/conxian-business/blob/main/docs/BRANCHING_AND_PROMOTION_POLICY.md).
-- [ ] If label-gated suites apply, I have applied (or requested a maintainer to apply) the correct PR label(s) so the relevant CI suites run (see [`RELEASE_HYGIENE.md`](https://github.com/Conxian/conxian-business/blob/main/.github/RELEASE_HYGIENE.md)).
+- [ ] I targeted the correct base branch (`dev`, `staged`, or `main`) per [`docs/BRANCHING_AND_PROMOTION_POLICY.md`](../docs/BRANCHING_AND_PROMOTION_POLICY.md).
+- [ ] If label-gated suites apply, I have applied (or requested a maintainer to apply) the correct PR label(s) so the relevant CI suites run (see [`RELEASE_HYGIENE.md`](./RELEASE_HYGIENE.md)).
 - [ ] I have verified that all automated checks (if any) pass successfully.
 - [ ] The language and tone adhere to the Earthy Corporate Finance standard.
 - [ ] Any references to temporal events on-chain are properly anchored (e.g., Bitcoin burn-block-height).

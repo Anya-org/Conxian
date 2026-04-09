@@ -139,8 +139,8 @@ def _match_any(rel_path: str, patterns: tuple[str, ...]) -> bool:
         normalized = _normalize_path(pattern)
 
         if normalized.endswith("/**"):
-            dir_name = normalized[:-3]
-            if f"/{dir_name}/" in f"/{rel_path}/":
+            dir_name = normalized[:-3].rstrip("/")
+            if rel_path == dir_name or rel_path.startswith(dir_name + "/"):
                 return True
             continue
 

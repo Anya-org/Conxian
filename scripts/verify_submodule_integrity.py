@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+"""Verify that this repo's submodule pins stay aligned with upstream defaults.
+
+This check queries the GitHub REST API. It is intended to be CI-gating, and
+requires network access plus a token via GITHUB_TOKEN or GH_TOKEN.
+"""
+
 import configparser
 import json
 import os

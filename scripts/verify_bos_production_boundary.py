@@ -19,14 +19,16 @@ def read_submodule_paths(root: str) -> list[str]:
     if not os.path.exists(gitmodules_path):
         return []
 
+    path_re = re.compile(r"^path\s*=\s*(.+)$")
     paths: list[str] = []
     with open(gitmodules_path, "r", encoding="utf-8") as f:
         for raw_line in f:
             line = raw_line.strip()
-            if not line.startswith("path ="):
+            match = path_re.match(line)
+            if not match:
                 continue
-            _, value = line.split("=", 1)
-            candidate = value.strip()
+
+            candidate = match.group(1).strip()
             if candidate:
                 paths.append(candidate)
     return paths

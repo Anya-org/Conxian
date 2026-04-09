@@ -42,9 +42,13 @@ def _git_root() -> Path:
     return Path(_run_git(["rev-parse", "--show-toplevel"]).strip())
 
 
+def _escape_gha_message(message: str) -> str:
+    return message.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+
+
 def _notice(kind: str, message: str) -> None:
     if os.environ.get("GITHUB_ACTIONS") == "true":
-        print(f"::{kind}::{message}")
+        print(f"::{kind}::{_escape_gha_message(message)}")
     else:
         print(f"{kind.upper()}: {message}")
 
