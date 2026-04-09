@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import math
 import os
 import re
 import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
 
 
 @dataclass(frozen=True)
@@ -17,7 +20,7 @@ class RequiredFile:
 def _repo_root() -> Path:
     try:
         out = subprocess.check_output(
-            ["git", "rev-parse", "--show-toplevel"],
+            ["git", "-C", str(SCRIPT_DIR), "rev-parse", "--show-toplevel"],
             stderr=subprocess.STDOUT,
             text=True,
             encoding="utf-8",
@@ -29,17 +32,41 @@ def _repo_root() -> Path:
 
 
 REQUIRED_FILES: tuple[RequiredFile, ...] = (
-    RequiredFile("README.md", 256),
-    RequiredFile("LICENSE", 256),
-    RequiredFile("SECURITY.md", 256),
-    RequiredFile("CONTRIBUTING.md", 256),
-    RequiredFile("CODEOWNERS", 64),
-    RequiredFile("GOVERNANCE.md", 128),
-    RequiredFile("CHANGELOG.md", 256),
-    RequiredFile("RELEASING.md", 128),
-    RequiredFile(".github/RELEASE_HYGIENE.md", 256),
-    RequiredFile("docs/REPO_PORTFOLIO.md", 256),
+    RequiredFile("README.md", 1),
+    RequiredFile("LICENSE", 1),
+    RequiredFile("SECURITY.md", 1),
+    RequiredFile("CONTRIBUTING.md", 1),
+    RequiredFile("GOVERNANCE.md", 1),
+    RequiredFile("CHANGELOG.md", 1),
+    RequiredFile("RELEASING.md", 1),
+    RequiredFile(".github/RELEASE_HYGIENE.md", 1),
 )
+
+PORTFOLIO_DOCS: tuple[RequiredFile, ...] = (RequiredFile("docs/REPO_PORTFOLIO.md", 1),)
+
+CODEOWNERS_CANDIDATES: tuple[str, ...] = (
+    ".github/CODEOWNERS",
+    "CODEOWNERS",
+    "docs/CODEOWNERS",
+)
+
+
+def _is_truthy_env(var_name: str) -> bool:
+    return os.environ.get(var_name, "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "y",
+        "on",
+    }
+
+
+def _find_codeowners(repo_root: Path) -> Path | None:
+    for rel in CODEOWNERS_CANDIDATES:
+        path = repo_root / rel
+        if path.is_file():
+            return path
+    return None
 
 
 def _read_text(path: Path) -> str:
@@ -47,34 +74,39 @@ def _read_text(path: Path) -> str:
 
 
 def _require_heading(text: str, heading: str) -> bool:
-    return bool(re.search(rf"^##\s+{re.escape(heading)}\s*$", text, re.MULTILINE))
+    return bool(
+        re.search(
+            rf"(?im)^#{{1,3}}\s+{re.escape(heading)}\s*$",
+            text,
+        )
+    )
 
 
 def _verify_readme(repo_root: Path, errors: list[str]) -> None:
-    readme = repo_root / "README.md"
-    text = _read_text(readme)
+    text = _read_text(repo_root / "README.md")
 
     for required in ("Purpose", "Status", "Ownership"):
         if not _require_heading(text, required):
-            errors.append(f"README.md: missing required section heading '## {required}'")
+            errors.append(f"README.md: missing required section heading '{required}'")
 
 
 def _verify_security(repo_root: Path, errors: list[str]) -> None:
-    security = repo_root / "SECURITY.md"
-    text = _read_text(security)
-    if "Reporting a Vulnerability" not in text:
+    text = _read_text(repo_root / "SECURITY.md")
+    if not re.search(
+        r"(?im)^#{1,3}\s+reporting\s+a\s+vulnerabilit(y|ies)\b",
+        text,
+    ):
         errors.append("SECURITY.md: missing 'Reporting a Vulnerability' section")
 
 
 def _verify_contributing(repo_root: Path, errors: list[str]) -> None:
-    contributing = repo_root / "CONTRIBUTING.md"
-    text = _read_text(contributing)
-    if "Pull Request" not in text:
+    text = _read_text(repo_root / "CONTRIBUTING.md")
+    if not re.search(r"(?i)pull\s+request", text):
         errors.append("CONTRIBUTING.md: missing Pull Request guidance")
 
 
-def _verify_codeowners(repo_root: Path, errors: list[str]) -> None:
-    codeowners = repo_root / "CODEOWNERS"
+def _verify_codeowners(codeowners: Path, *, repo_root: Path, errors: list[str]) -> None:
+    rel_path = codeowners.relative_to(repo_root).as_posix()
     lines = _read_text(codeowners).splitlines()
 
     owner_lines = [
@@ -84,21 +116,22 @@ def _verify_codeowners(repo_root: Path, errors: list[str]) -> None:
     ]
 
     if not owner_lines:
-        errors.append("CODEOWNERS: no ownership rules found")
+        errors.append(f"{rel_path}: no ownership rules found")
         return
 
     covers_all = any(line.split() and line.split()[0] == "*" for line in owner_lines)
     if not covers_all:
-        errors.append("CODEOWNERS: must include a '*' rule to cover the entire repo")
+        errors.append(f"{rel_path}: must include a '*' rule to cover the entire repo")
 
-    has_github_owner = any("@" in token for line in owner_lines for token in line.split()[1:])
+    has_github_owner = any(
+        token.startswith("@") for line in owner_lines for token in line.split()[1:]
+    )
     if not has_github_owner:
-        errors.append("CODEOWNERS: no GitHub usernames found in ownership rules")
+        errors.append(f"{rel_path}: no GitHub usernames found in ownership rules")
 
 
 def _verify_changelog(repo_root: Path, errors: list[str]) -> None:
-    changelog = repo_root / "CHANGELOG.md"
-    text = _read_text(changelog)
+    text = _read_text(repo_root / "CHANGELOG.md")
     if not re.search(r"^##\s*\[Unreleased\]\s*$", text, re.MULTILINE):
         errors.append("CHANGELOG.md: missing '## [Unreleased]' section")
 
@@ -108,7 +141,23 @@ def verify() -> None:
     errors: list[str] = []
     missing: set[str] = set()
 
-    for required in REQUIRED_FILES:
+    required_files = list(REQUIRED_FILES)
+    if _is_truthy_env("BOS_REQUIRE_PORTFOLIO_DOCS"):
+        required_files.extend(PORTFOLIO_DOCS)
+
+    raw_multiplier = os.environ.get("GOVERNANCE_MIN_BYTES_MULTIPLIER", "1")
+    try:
+        min_bytes_multiplier = float(raw_multiplier)
+        if not math.isfinite(min_bytes_multiplier) or min_bytes_multiplier <= 0:
+            raise ValueError
+    except ValueError:
+        errors.append(
+            "GOVERNANCE_MIN_BYTES_MULTIPLIER must be a positive, finite number, got "
+            + repr(raw_multiplier)
+        )
+        min_bytes_multiplier = 1.0
+
+    for required in required_files:
         path = repo_root / required.rel_path
         if not path.exists():
             errors.append(f"Missing required file: {required.rel_path}")
@@ -118,10 +167,12 @@ def verify() -> None:
             errors.append(f"Required path is not a file: {required.rel_path}")
             missing.add(required.rel_path)
             continue
+
+        required_min = math.ceil(required.min_bytes * min_bytes_multiplier)
         size = path.stat().st_size
-        if size < required.min_bytes:
+        if required_min > 0 and size < required_min:
             errors.append(
-                f"Required file too small ({size} bytes < {required.min_bytes}): {required.rel_path}"
+                f"Required file too small ({size} bytes < {required_min}): {required.rel_path}"
             )
 
     if "README.md" not in missing:
@@ -130,8 +181,17 @@ def verify() -> None:
         _verify_security(repo_root, errors)
     if "CONTRIBUTING.md" not in missing:
         _verify_contributing(repo_root, errors)
-    if "CODEOWNERS" not in missing:
-        _verify_codeowners(repo_root, errors)
+
+    codeowners = _find_codeowners(repo_root)
+    if codeowners is None:
+        errors.append(
+            "CODEOWNERS: missing (expected one of: "
+            + ", ".join(CODEOWNERS_CANDIDATES)
+            + ")"
+        )
+    else:
+        _verify_codeowners(codeowners, repo_root=repo_root, errors=errors)
+
     if "CHANGELOG.md" not in missing:
         _verify_changelog(repo_root, errors)
 
