@@ -30,7 +30,7 @@ If the repo’s flagship/supporting placement changes in `docs/REPO_PORTFOLIO.md
 
 ## Public/private split recommendation (ZSE)
 
-This repository is public. The split below is a policy recommendation for what should be stored in Git vs stored in Linear.
+Treat this repository as public for boundary purposes. (This GitHub repository is private as of April 8, 2026.) The split below is a policy recommendation for what should be stored in Git vs stored in Linear.
 
 ### Public-safe (keep in Git)
 

@@ -2,7 +2,7 @@
 
 This repository is governed by the Conxian Sovereign Autonomous Business (SAB).
 
-This is a public repository. Governance rules must be documented without leaking privileged operational details.
+This repository is private (as of April 8, 2026), but is treated as public for boundary purposes under Zero Secret Egress (ZSE). Governance rules must be documented without leaking privileged operational details.
 
 Canonical business-purpose and public/private split guidance for this repo lives in `docs/BOS_BUSINESS_BUILDOUT.md`.
 
@@ -32,7 +32,7 @@ Conxian operates under a Zero Secret Egress (ZSE) mandate.
 
 ## Policies
 
-- Repository visibility: This repository is intended to be public. Internal-only strategy, legal interpretations, operational runbooks, infrastructure identifiers, and secret inventories must live in the Conxian Linear workspace (https://linear.app/conxian-labs). Tracking issue: https://linear.app/conxian-labs/issue/CON-256
+- Repository boundary: Treat this repo as public for ZSE boundary purposes. Internal-only strategy, legal interpretations, operational runbooks, infrastructure identifiers, and secret inventories must live in the Conxian Linear workspace (https://linear.app/conxian-labs). Tracking issue: https://linear.app/conxian-labs/issue/CON-256
 - Contributing guidelines: [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 - Security policy: [`SECURITY.md`](./SECURITY.md)
 - BOS business buildout and repo operating model: [`docs/BOS_BUSINESS_BUILDOUT.md`](./docs/BOS_BUSINESS_BUILDOUT.md)

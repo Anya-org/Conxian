@@ -9,7 +9,7 @@ USAGE:
 
 # [TITLE] (migrated to Linear)
 
-This repository is public.
+Treat this repository as public for boundary purposes.
 
 Do not add operational, security, financial, legal, or strategic details to this repository file beyond this pointer stub.
 
