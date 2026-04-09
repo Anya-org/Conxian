@@ -50,6 +50,8 @@ CODEOWNERS_CANDIDATES: tuple[str, ...] = (
     "docs/CODEOWNERS",
 )
 
+CODEOWNERS_MIN_BYTES = 64
+
 
 def _is_truthy_env(var_name: str) -> bool:
     return os.environ.get(var_name, "").strip().lower() in {
@@ -61,12 +63,13 @@ def _is_truthy_env(var_name: str) -> bool:
     }
 
 
-def _find_codeowners(repo_root: Path) -> Path | None:
-    for rel in CODEOWNERS_CANDIDATES:
-        path = repo_root / rel
+def _find_codeowners(repo_root: Path) -> list[Path]:
+    found: list[Path] = []
+    for rel_path in CODEOWNERS_CANDIDATES:
+        path = repo_root / rel_path
         if path.is_file():
-            return path
-    return None
+            found.append(path)
+    return found
 
 
 def _read_text(path: Path) -> str:
@@ -182,15 +185,27 @@ def verify() -> None:
     if "CONTRIBUTING.md" not in missing:
         _verify_contributing(repo_root, errors)
 
-    codeowners = _find_codeowners(repo_root)
-    if codeowners is None:
+    found_codeowners = _find_codeowners(repo_root)
+    if not found_codeowners:
         errors.append(
             "CODEOWNERS: missing (expected one of: "
             + ", ".join(CODEOWNERS_CANDIDATES)
             + ")"
         )
+    elif len(found_codeowners) > 1:
+        rels = ", ".join(str(path.relative_to(repo_root)) for path in found_codeowners)
+        errors.append(f"Multiple CODEOWNERS files found: {rels}; keep exactly one")
     else:
-        _verify_codeowners(codeowners, repo_root=repo_root, errors=errors)
+        codeowners = found_codeowners[0]
+        rel_path = codeowners.relative_to(repo_root).as_posix()
+        required_min = math.ceil(CODEOWNERS_MIN_BYTES * min_bytes_multiplier)
+        size = codeowners.stat().st_size
+        if required_min > 0 and size < required_min:
+            errors.append(
+                f"Required file too small ({size} bytes < {required_min}): {rel_path}"
+            )
+        else:
+            _verify_codeowners(codeowners, repo_root=repo_root, errors=errors)
 
     if "CHANGELOG.md" not in missing:
         _verify_changelog(repo_root, errors)
