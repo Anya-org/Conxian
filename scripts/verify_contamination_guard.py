@@ -77,6 +77,19 @@ def is_excluded(rel_path: str, excluded_set: set[str]) -> bool:
             return True
     return False
 
+
+def repo_relative_path_for_exclusions(repo_name: str, rel_path: str) -> str:
+    rel_path = rel_path.replace(os.sep, "/").replace("\\", "/")
+    while rel_path.startswith("./"):
+        rel_path = rel_path[2:]
+    rel_path = rel_path.strip("/")
+
+    repo_prefix = repo_name.strip("/")
+    if repo_prefix and rel_path.startswith(repo_prefix + "/"):
+        return rel_path[len(repo_prefix) + 1 :]
+
+    return rel_path
+
 def read_text(root: str, rel_path: str) -> str:
     full_path = os.path.join(root, rel_path)
     if not os.path.isfile(full_path):
@@ -152,9 +165,9 @@ STUB_NAME = "BOS_STATE_MACHINE"
 STUB_SUFFIX = "stub.json"
 REPO_EXCLUSIONS = {
     "conxian-business": {
-        f"conxian-business/{STUB_NAME}.{STUB_SUFFIX}",
-        f"conxian-business/AUDIT_MANIFEST.{STUB_SUFFIX}",
-        f"conxian-business/SARB_COMPLIANCE_REPORT.{STUB_SUFFIX}",
+        f"{STUB_NAME}.{STUB_SUFFIX}",
+        f"AUDIT_MANIFEST.{STUB_SUFFIX}",
+        f"SARB_COMPLIANCE_REPORT.{STUB_SUFFIX}",
     },
     # All [STUB] markers in conxian-nexus/src/ have been remediated (CON-383):
     # - zkml.rs, dlc.rs: fail-closed 501 Not Implemented
@@ -227,7 +240,7 @@ REPO_EXCLUSIONS = {
 
 def scan_repo(root: str, repo_name: str) -> list[str]:
     errors = []
-    exclusions = GLOBAL_EXCLUSIONS | REPO_EXCLUSIONS.get(repo_name, set())
+    repo_exclusions = REPO_EXCLUSIONS.get(repo_name, set())
 
     gate_requirements = GATE_REQUIRED.get(repo_name, {})
     allowlist = LABEL_ALLOWLIST.get(repo_name, {})
@@ -251,7 +264,11 @@ def scan_repo(root: str, repo_name: str) -> list[str]:
     code_exts = {".rs", ".ts", ".tsx", ".clar", ".yaml", ".yml", ".json", ".toml"}
 
     for rel_path in files:
-        if is_excluded(rel_path, exclusions):
+        if is_excluded(rel_path, GLOBAL_EXCLUSIONS):
+            continue
+
+        exclusion_path = repo_relative_path_for_exclusions(repo_name, rel_path)
+        if repo_exclusions and is_excluded(exclusion_path, repo_exclusions):
             continue
 
         _, ext = os.path.splitext(rel_path)
