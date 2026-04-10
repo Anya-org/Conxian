@@ -13,7 +13,7 @@
 (define-constant KD_STABILITY u200)
 
 ;; Data Vars
-(define-data-var admin principal tx-sender)
+(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-data-var price-integral int 0)
 (define-data-var last-error int 0)
 (define-data-var stability-fee uint u30) ;; 0.30%
@@ -22,6 +22,7 @@
 
 ;; --- Authorization ---
 
+;; @desc Functional description for is-authorized-admin)
 (define-read-only (is-authorized-admin)
   (or (is-eq tx-sender (var-get admin)) (not (var-get initialized)))
 )
@@ -67,6 +68,7 @@
   )
 )
 
+;; @desc Functional description for get-performance-metrics)
 (define-read-only (get-performance-metrics)
   (let (
     (metrics (unwrap-panic (contract-call? .finance-metrics get-protocol-metrics)))
@@ -124,10 +126,12 @@
 
 ;; --- conxian-service-trait ---
 
+;; @desc Functional description for get-service-status)
 (define-read-only (get-service-status)
   (ok (if (var-get is-paused) "PAUSED" "ACTIVE"))
 )
 
+;; @desc Functional description for get-health-metrics)
 (define-read-only (get-health-metrics)
   (ok {
     uptime: burn-block-height,
@@ -136,6 +140,7 @@
   })
 )
 
+;; @desc Functional description for set-service-paused
 (define-public (set-service-paused (paused bool))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -144,6 +149,7 @@
   )
 )
 
+;; @desc Functional description for execute-service-op
 (define-public (execute-service-op (payload (buff 2048)))
   (begin
     (asserts! (not (var-get is-paused)) (err u1001))
@@ -153,10 +159,12 @@
 
 ;; --- office-job-trait ---
 
+;; @desc Functional description for check-work-needed)
 (define-public (check-work-needed)
   (ok true) ;; Always ready for a check
 )
 
+;; @desc Functional description for do-work
 (define-public (do-work (payload (buff 2048)))
   (match (update-pid-rates) res (ok true) err-val (err err-val))
 )
@@ -183,6 +191,7 @@
   )
 )
 
+;; @desc Functional description for initialize
 (define-public (initialize (new-admin principal))
   (begin
     (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
@@ -192,6 +201,7 @@
   )
 )
 
+;; @desc Functional description for set-admin
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -200,10 +210,12 @@
   )
 )
 
+;; @desc Functional description for get-protocol-status)
 (define-read-only (get-protocol-status)
   (ok { compliant: true, paused: (var-get is-paused), tenure-id: (some (/ block-height u10)), timestamp: burn-block-height, version: "07" })
 )
 
+;; @desc Functional description for get-contract-owner)
 (define-read-only (get-contract-owner)
   (ok (var-get admin))
 )

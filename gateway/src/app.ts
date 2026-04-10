@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { handlePacs008, handlePacs009, handlePAPSSCallback, handleBRICSCallback } from './handlers/settlement.js';
 import { handleERPSync } from './handlers/erp.js';
+import { handleX402Payment } from './handlers/x402.js';
 import { verifyWebhookSignature } from './middleware/auth.js';
 
 dotenv.config();
@@ -29,5 +30,8 @@ app.post('/v1/settlement/brics/callback', verifyWebhookSignature, handleBRICSCal
 
 // ERP Ingress (OData v4)
 app.post('/v1/erp/sync', verifyWebhookSignature, handleERPSync);
+
+// x402 Payment Required Endpoint (Industrial Intent Alignment)
+app.post('/v1/industrial/payment', handleX402Payment);
 
 export default app;

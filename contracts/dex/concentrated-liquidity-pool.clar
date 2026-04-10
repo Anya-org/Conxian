@@ -10,6 +10,7 @@
 (define-constant ERR_INSUFFICIENT_LIQUIDITY (err u1002))
 (define-constant PROTOCOL_FEE_SHARE u1666)
 
+(define-data-var initialized bool false)
 ;; --- Storage ---
 (define-map pools
   uint
@@ -23,7 +24,19 @@
   }
 )
 (define-data-var pool-nonce uint u0)
-(define-data-var authorized-collector principal tx-sender)
+(define-data-var authorized-collector principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
+
+
+;; @desc Initialize the contract and set the authorized-collector (Directive 2)
+;; @desc Initialize CL pool
+(define-public (initialize (collector principal))
+  (begin
+    (asserts! (not (var-get initialized)) (err u1001))
+    (var-set authorized-collector collector)
+    (var-set initialized true)
+    (ok true)
+  )
+)
 
 ;; --- CSF Trait Implementation ---
 
@@ -70,32 +83,27 @@
 )
 
 (define-private (swap-internal (pool-id uint) (zero-for-one bool) (amount-in uint) (token0-trait <sip-010-ft-trait>) (token1-trait <sip-010-ft-trait>) (recipient principal))
+  (if zero-for-one
+    (swap-execute pool-id amount-in token0-trait token1-trait recipient)
+    (swap-execute pool-id amount-in token1-trait token0-trait recipient)
+  )
+)
+
+(define-private (swap-execute (pool-id uint) (amount-in uint) (token-in-trait <sip-010-ft-trait>) (token-out-trait <sip-010-ft-trait>) (recipient principal))
   (let (
     (pool (unwrap! (map-get? pools pool-id) ERR_INSUFFICIENT_LIQUIDITY))
-    (token-out-trait (if zero-for-one token1-trait token0-trait))
-    (token-in-trait (if zero-for-one token0-trait token1-trait))
+    (total-fee (/ (* amount-in (get fee pool)) u1000000))
+    (protocol-fee (/ (* total-fee PROTOCOL_FEE_SHARE) u10000))
+    (amount-out (- amount-in total-fee))
   )
     (begin
-      (let (
-        (total-fee (/ (* amount-in (get fee pool)) u1000000))
-        (protocol-fee (/ (* total-fee PROTOCOL_FEE_SHARE) u10000))
-        (amount-out (- amount-in total-fee))
+      (try! (contract-call? token-in-trait transfer amount-in tx-sender (as-contract tx-sender) none))
+      (try! (as-contract (contract-call? token-out-trait transfer amount-out (as-contract tx-sender) recipient none)))
+      (match (contract-call? .bme-engine register-fee-activity (as-contract tx-sender) protocol-fee)
+        res true
+        err-val false
       )
-        (begin
-          ;; Transfer input tokens from caller to the pool
-          (try! (contract-call? token-in-trait transfer amount-in tx-sender (as-contract tx-sender) none))
-
-          ;; Transfer output tokens from the pool to the recipient
-          (try! (as-contract (contract-call? token-out-trait transfer amount-out (as-contract tx-sender) recipient none)))
-
-          ;; Register activity for BME
-          (match (contract-call? .bme-engine register-fee-activity (as-contract tx-sender) protocol-fee)
-            res true
-            err-val false
-          )
-          (ok amount-out)
-        )
-      )
+      (ok amount-out)
     )
   )
 )

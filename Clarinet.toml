@@ -307,3 +307,7 @@ depends_on = ["defi-traits"]
 
 [contracts.signed-data-base]
 path = "contracts/governance/signed-data-base.clar"
+
+[contracts.ops-loan-manager]
+path = "contracts/enterprise/ops-loan-manager.clar"
+depends_on = ["sip-standards"]

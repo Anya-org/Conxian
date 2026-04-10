@@ -2,17 +2,20 @@
 ;; Autonomous Fiscal Agent for Conxian Protocol
 ;; Upgraded for Sovereign BME Orchestration
 
-(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
+(use-trait csf-trait .conxian-csf-trait.trait-csf-liquidity-v1)
 
 ;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED (err u1000))
 
 ;; --- Data Variables ---
-(define-data-var admin principal tx-sender)
+(define-data-var cl-pool principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
+(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
 (define-data-var initialized bool false)
 
 ;; --- Authorization ---
 
+;; @desc [Functional description for standards compliance]
 (define-read-only (is-authorized-admin)
   (or (is-eq tx-sender (var-get admin)) (not (var-get initialized)))
 )
@@ -20,14 +23,15 @@
 ;; --- Public Functions ---
 
 ;; @desc Run the fiscal strategy - Orchestrates BME epoch and buy-backs
-(define-public (run-fiscal-strategy (pools-to-reward (list 50 principal)) (cxd-token-trait <sip-010-trait>))
+;; @desc Run the autonomous fiscal strategy
+(define-public (run-fiscal-strategy (pool-trait <csf-trait>) (pools-to-reward (list 50 principal)) (cxd-token-trait <sip-010-ft-trait>))
   (let (
     (intel (unwrap! (contract-call? .agent-risk get-cybernetic-intel) (err u2001)))
   )
     (begin
       ;; 1. Collect protocol fees from core modules
       ;; Use the injected trait correctly
-      (match (contract-call? .concentrated-liquidity-pool collect-protocol-fees cxd-token-trait)
+      (match (contract-call? pool-trait collect-protocol-fees cxd-token-trait)
         res true
         err-val false
       )
@@ -96,6 +100,7 @@
   )
 )
 
+;; @desc [Functional description for standards compliance]
 (define-public (initialize (new-admin principal))
   (begin
     (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
@@ -105,6 +110,7 @@
   )
 )
 
+;; @desc [Functional description for standards compliance]
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -113,6 +119,7 @@
   )
 )
 
+;; @desc [Functional description for standards compliance]
 (define-read-only (get-protocol-status)
   (ok { compliant: true, version: "v1.1.0-Apex" })
 )
