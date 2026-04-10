@@ -7,6 +7,7 @@ requires network access plus a token via GITHUB_TOKEN or GH_TOKEN.
 """
 
 import configparser
+import dataclasses
 import json
 import os
 import subprocess
@@ -15,6 +16,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import date
 from pathlib import Path
 
 
@@ -97,6 +99,93 @@ def _parse_github_repo(url: str) -> str | None:
         repo = repo[:-4]
     return f"{owner}/{repo}"
 
+
+@dataclasses.dataclass(frozen=True)
+class SubmodulePinAllowlistEntry:
+    path: str
+    sha: str
+    expires_on: date
+    reason: str
+
+
+def _load_submodule_pin_allowlist(
+    repo_root: Path,
+) -> tuple[dict[str, dict[str, SubmodulePinAllowlistEntry]], list[str]]:
+    allowlist_path = repo_root / ".github" / "submodule-integrity-allowlist.json"
+    if not allowlist_path.exists():
+        return {}, []
+
+    failures: list[str] = []
+    try:
+        payload = json.loads(
+            allowlist_path.read_text(encoding="utf-8", errors="replace")
+        )
+    except json.JSONDecodeError as e:
+        return {}, [f"Invalid JSON in {allowlist_path}: {e}"]
+
+    raw_entries = payload.get("entries") if isinstance(payload, dict) else None
+    if not isinstance(raw_entries, list):
+        return {}, [
+            f"Invalid {allowlist_path}: expected top-level object with an 'entries' array."
+        ]
+
+    allowlist: dict[str, dict[str, SubmodulePinAllowlistEntry]] = {}
+    today = date.today()
+    for idx, raw_entry in enumerate(raw_entries):
+        if not isinstance(raw_entry, dict):
+            failures.append(
+                f"Invalid allowlist entry at entries[{idx}]: expected object."
+            )
+            continue
+
+        path = str(raw_entry.get("path") or "").strip()
+        sha = str(raw_entry.get("sha") or "").strip().lower()
+        expires_on = str(raw_entry.get("expiresOn") or "").strip()
+        reason = str(raw_entry.get("reason") or "").strip()
+
+        if not path:
+            failures.append(f"Invalid allowlist entry at entries[{idx}]: missing path")
+            continue
+
+        if len(sha) != 40 or any(ch not in "0123456789abcdef" for ch in sha):
+            failures.append(
+                f"Invalid allowlist entry at entries[{idx}]: sha must be a 40-character hex string"
+            )
+            continue
+
+        if not expires_on:
+            failures.append(
+                f"Invalid allowlist entry at entries[{idx}]: missing expiresOn (YYYY-MM-DD)"
+            )
+            continue
+
+        try:
+            expires_date = date.fromisoformat(expires_on)
+        except ValueError:
+            failures.append(
+                f"Invalid allowlist entry at entries[{idx}]: expiresOn must be ISO date YYYY-MM-DD"
+            )
+            continue
+
+        if expires_date < today:
+            failures.append(
+                f"Allowlist entry expired: {path}@{sha[:12]} expired on {expires_date.isoformat()}"
+            )
+            continue
+
+        if not reason:
+            failures.append(f"Invalid allowlist entry at entries[{idx}]: missing reason")
+            continue
+
+        allowlist.setdefault(path, {})[sha] = SubmodulePinAllowlistEntry(
+            path=path,
+            sha=sha,
+            expires_on=expires_date,
+            reason=reason,
+        )
+
+    return allowlist, failures
+
 class GitHubApiError(RuntimeError):
     pass
 
@@ -171,9 +260,12 @@ def _github_json(path: str) -> dict:
 def _verify_submodule_pins(
     gitmodules: dict[str, str],
     gitlinks: dict[str, str],
+    allowlist: dict[str, dict[str, SubmodulePinAllowlistEntry]],
 ) -> list[str]:
     failures: list[str] = []
     default_branch_cache: dict[str, str] = {}
+
+    allowlisted_hits: list[SubmodulePinAllowlistEntry] = []
 
     for path, url in sorted(gitmodules.items()):
         sha = gitlinks.get(path)
@@ -212,9 +304,24 @@ def _verify_submodule_pins(
         if status in {"identical", "ahead"}:
             continue
 
+        allowlisted_entry = allowlist.get(path, {}).get(sha.lower())
+        if allowlisted_entry is not None:
+            allowlisted_hits.append(allowlisted_entry)
+            continue
+
         failures.append(
             f"{path}: pinned {sha[:12]} is not on {repo}@{default_branch} (status={status}, ahead_by={ahead_by}, behind_by={behind_by})"
         )
+
+    if allowlisted_hits:
+        hits = ", ".join(
+            (
+                f"{e.path}@{e.sha[:12]} "
+                f"(expiresOn={e.expires_on.isoformat()}, reason={e.reason})"
+            )
+            for e in sorted(allowlisted_hits, key=lambda e: (e.path, e.sha))
+        )
+        print(f"Note: allowlisted submodule pins in effect: {hits}")
 
     return failures
 
@@ -223,8 +330,11 @@ def verify() -> None:
     repo_root = _git_root()
     gitlinks = _parse_gitlinks(repo_root)
     gitmodules, invalid_sections = _parse_gitmodules(repo_root / ".gitmodules")
+    allowlist, allowlist_failures = _load_submodule_pin_allowlist(repo_root)
     gitmodules_paths = set(gitmodules)
     gitlink_paths = set(gitlinks)
+
+    allowlist_paths = set(allowlist)
 
     if invalid_sections:
         lines = [
@@ -234,12 +344,29 @@ def verify() -> None:
         ]
         raise RuntimeError("\n".join(lines))
 
+    if allowlist_failures:
+        lines = [
+            "Submodule integrity check failed:",
+            "\nInvalid submodule integrity allowlist:",
+            *[f"  - {f}" for f in allowlist_failures],
+        ]
+        raise RuntimeError("\n".join(lines))
+
+    unknown_allowlist_paths = sorted(allowlist_paths - gitmodules_paths)
+    if unknown_allowlist_paths:
+        lines = [
+            "Submodule integrity check failed:",
+            "\nSubmodule integrity allowlist contains unknown paths:",
+            *[f"  - {p}" for p in unknown_allowlist_paths],
+        ]
+        raise RuntimeError("\n".join(lines))
+
     missing_mappings = sorted(gitlink_paths - gitmodules_paths)
     extra_mappings = sorted(gitmodules_paths - gitlink_paths)
 
     pin_failures: list[str] = []
     if not missing_mappings and not extra_mappings:
-        pin_failures = _verify_submodule_pins(gitmodules, gitlinks)
+        pin_failures = _verify_submodule_pins(gitmodules, gitlinks, allowlist)
 
     if not missing_mappings and not extra_mappings and not pin_failures:
         print("Success: .gitmodules mappings match gitlink entries and submodule pins are on upstream default branches.")
