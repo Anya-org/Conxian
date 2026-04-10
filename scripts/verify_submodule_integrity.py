@@ -177,7 +177,14 @@ def _load_submodule_pin_allowlist(
             failures.append(f"Invalid allowlist entry at entries[{idx}]: missing reason")
             continue
 
-        allowlist.setdefault(path, {})[sha] = SubmodulePinAllowlistEntry(
+        bucket = allowlist.setdefault(path, {})
+        if sha in bucket:
+            failures.append(
+                f"Duplicate allowlist entry for {path}@{sha[:12]} at entries[{idx}]"
+            )
+            continue
+
+        bucket[sha] = SubmodulePinAllowlistEntry(
             path=path,
             sha=sha,
             expires_on=expires_date,
@@ -275,6 +282,11 @@ def _verify_submodule_pins(
         repo = _parse_github_repo(url)
         if not repo:
             failures.append(f"{path}: unsupported submodule url {url}")
+            continue
+
+        allowlisted_entry = allowlist.get(path, {}).get(sha.lower())
+        if allowlisted_entry is not None:
+            allowlisted_hits.append(allowlisted_entry)
             continue
 
         default_branch = default_branch_cache.get(repo)
