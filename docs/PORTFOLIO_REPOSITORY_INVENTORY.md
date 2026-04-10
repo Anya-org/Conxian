@@ -1,63 +1,42 @@
-# Portfolio repository inventory
+# Portfolio repository inventory (CON-468)
 
-This document provides the canonical inventory of all repositories and subrepositories in the Conxian-Labs stack.
+This is the canonical map of all repositories in the Conxian-Labs ecosystem, classified by layer, role, and evaluation standard.
 
-## Taxonomy
+## Layer Taxonomy
 
-**Layers (per CON-468)**
+- **Decentralization-critical**: Core protocol, state-consensus, and trust-minimized execution.
+- **User and application surface**: Direct interaction layers for retail, business, and enterprise users.
+- **Shared runtime and developer infrastructure**: SDKs, core libraries, and internal orchestration tools.
+- **Governance and operating system**: BOS governance, OpenSpec, and internal EXCO coordination modules.
 
-- **Decentralization-critical**: core protocol and state-consensus components.
-- **User and application surface**: direct interaction layers for users and partners.
-- **Shared runtime and developer infrastructure**: SDKs, core libraries, and orchestration tools.
-- **Governance and operating system**: BOS governance, specs, and internal EXCO modules.
+## Evaluation Standards (Release Criticality)
 
-**Release criticality**
+- **P0**: Mainnet release blockers. Must adhere to strict production standards (no stubs, no testnet contamination).
+- **P1**: Important supporting surfaces. Should follow standards; drift is not immediately mainnet-blocking.
+- **P2**: Nice-to-have, experimental, or informational surfaces.
 
-- **P0**: mainnet release blockers (must not drift from portfolio standards).
-- **P1**: important supporting surfaces (should follow standards; drift is not immediately mainnet-blocking).
-- **P2**: nice-to-have or informational surfaces.
+## Canonical Repository Map
 
-## Repository inventory (GitHub org)
-
-| Repository | Layer | BU / function | Owner | Criticality |
-| --- | --- | --- | --- | --- |
-| `Conxian/conxian-business` | Governance | Governance (BOS + OpenSpec) | @botshelomokoka | P0 |
-| `Conxian/Conxian` | Decentralization | CSF (Protocol) | @botshelomokoka | P0 |
-| `Conxian/conxian-nexus` | Decentralization | Nexus (State node) | @botshelomokoka | P0 |
-| `Conxian/conxian-gateway` | Decentralization | Fusion (Gateway) | @botshelomokoka | P0 |
-| `Conxian/conxius-wallet` | User surface | Conxius (Wallet) | @botshelomokoka | P0 |
-| `Conxian/lib-conxian-core` | Shared runtime | Shared core | @botshelomokoka | P0 |
-| `Conxian/lib-conclave-sdk` | Shared runtime | Shared SDK (TEE/crypto) | @botshelomokoka | P0 |
-| `Conxian/stacksorbit` | Shared runtime | DevOps tooling | @botshelomokoka | P0 |
-| `Conxian/Conxian_UI` | User surface | Operating function (UI) | @botshelomokoka | P1 |
-| `Conxian/conxius-platform` | Shared runtime | Platform/DevEx | @conxian/core-devs | P1 |
-| `Conxian/conxian-labs-site` | User surface | Public web | @botshelomokoka | P2 |
-| `Conxian/.github` | Governance | Org defaults | @Conxian/Admins | P0 |
-
-## Subrepository inventory (governed by `conxian-business`)
-
-| Asset | Layer | Type | BU / function | Criticality |
-| --- | --- | --- | --- | --- |
-| `Conxian/` | Decentralization | Submodule | CSF (Protocol) | P0 |
-| `conxius-wallet/` | User surface | Submodule | Conxius (Wallet) | P0 |
-| `conxian-gateway/` | Decentralization | Submodule | Fusion (Gateway) | P0 |
-| `conxian-nexus/` | Decentralization | Submodule | Nexus (State node) | P0 |
-| `conxian-ui/` | User surface | Submodule | UI | P1 |
-| `conxian-labs-site/` | User surface | Submodule | Public web | P2 |
-| `conxius-platform/` | Shared runtime | Submodule | Platform/DevEx | P1 |
-| `stacksorbit/` | Shared runtime | Submodule | DevOps tooling | P0 |
-| `lib-conclave-sdk/` | Shared runtime | Submodule | Shared SDK | P0 |
-| `lib-conxian-core/` | Shared runtime | Submodule | Shared core | P0 |
-| `openspec/` | Governance | Directory | OpenSpec | P0 |
-| `docs/` | Governance | Directory | Public docs | P0 |
-| `scripts/` | Governance | Directory | Hygiene | P0 |
-| `.github/` | Governance | Directory | Repo ops | P0 |
-| `Fiscal-Vault-Oracle/` | Governance | Directory | Treasury (EXCO) | P0 |
-| `Nakamoto-Guardian/` | Governance | Directory | Compliance (EXCO) | P0 |
-| `Sovereign-Ops-Orchestrator/` | Governance | Directory | Ops (EXCO) | P0 |
-| `Sovereign-Strategy-Nexus/` | Governance | Directory | Strategy (EXCO) | P1 |
-| `cxn-grid-oracle/` | Shared runtime | Directory | Grid oracle | P1 |
-| `showcase-dapp/` | User surface | Directory | Showcase | P2 |
+| Repository | Layer | Role / Function | Owner | Standard |
+| :--- | :--- | :--- | :--- | :--- |
+| `conxian-business` | Governance | BOS & OpenSpec Governance | @botshelomokoka | P0 |
+| `Conxian` | Decentralization | CSF Core Protocol (Clarity) | @botshelomokoka | P0 |
+| `conxian-nexus` | Decentralization | Nexus State Node (Rust) | @botshelomokoka | P0 |
+| `conxian-gateway` | Decentralization | Fusion Gateway (Rust Engine) | @botshelomokoka | P0 |
+| `conxius-wallet` | User Surface | Sovereign Multi-chain Wallet | @botshelomokoka | P0 |
+| `lib-conxian-core` | Shared Runtime | Shared Cryptographic & State Logic | @botshelomokoka | P0 |
+| `lib-conclave-sdk` | Shared Runtime | TEE & Enclave SDK | @botshelomokoka | P0 |
+| `stacksorbit` | Shared Runtime | DevOps & Deployment Tooling | @botshelomokoka | P0 |
+| `conxian-ui` | User Surface | Operating Dashboard (Next.js) | @botshelomokoka | P1 |
+| `conxius-platform` | Shared Runtime | Developer Platform & Orchestration | @conxian/core-devs | P1 |
+| `conxian-labs-site` | User Surface | Public Communication Surface | @botshelomokoka | P2 |
+| `Fiscal-Vault-Oracle` | Governance | EXCO: Treasury & Market Data | @botshelomokoka | P0 |
+| `Nakamoto-Guardian` | Governance | EXCO: Compliance & Security | @botshelomokoka | P0 |
+| `Sovereign-Ops-Orchestrator` | Governance | EXCO: Operations & Service Loop | @botshelomokoka | P0 |
+| `Sovereign-Strategy-Nexus` | Governance | EXCO: Strategic Alignment | @botshelomokoka | P1 |
+| `cxn-grid-oracle` | Shared Runtime | Decentralized Data Oracle | @botshelomokoka | P1 |
+| `showcase-dapp` | User Surface | Demo & Integration Showcase | @botshelomokoka | P2 |
+| `.github` | Governance | Org-wide Standards & Workflows | @Conxian/Admins | P0 |
 
 ---
 © 2026 Conxian-Labs (Pty) Ltd | Omphile Ndaloenhle Legacy Trust
