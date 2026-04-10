@@ -57,3 +57,9 @@ The `referral_node` and `yield_distribution` fields enable the **Sovereign Swarm
 ---
 
 🛡️ **SOVEREIGN. INDUSTRIAL. BTC-NATIVE.**
+
+## 5. x402 Payment Handshake
+
+Industrial intents requiring payment MUST implement the x402 HTTP 402 protocol.
+The gateway will respond with `PAYMENT-REQUIRED` containing the base64-encoded mandate details.
+Execution is gated by valid on-chain payment proof verified via `ops-loan-manager.clar`.

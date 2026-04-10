@@ -12,8 +12,8 @@
 (define-constant MINT_PER_EPOCH u100000000000)
 
 ;; --- Data Vars ---
-(define-data-var admin principal tx-sender)
-(define-data-var last-mint-block uint burn-block-height)
+(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
+(define-data-var last-mint-block uint u0)
 (define-data-var total-epoch-fees uint u0)
 (define-data-var total-burned uint u0)
 
