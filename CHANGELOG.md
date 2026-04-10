@@ -12,6 +12,9 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 ### Added
 - Documented the BOS business-end operating model (`docs/BOS_BUSINESS_BUILDOUT.md`), including ZSE public/internal split guidance and governance/README alignment.
 
+### Fixed
+- **Showcase DApp Hygiene:** Removed tracked `dev_server.log` artifact and updated `.gitignore` to prevent future contamination.
+
 ### Changed
 - **Devcontainer (CON-383):** Added Rust stable and Python 3.10 to `.devcontainer/Dockerfile` so `cargo test` and CI scripts run locally.
 - **BOS production boundary (CON-383):** Removed residual `// Simulate execution success` placeholder comment from `conxian-nexus/src/api/rest.rs`. Replaced empty `test_health_check_stub` with a real assertion.
