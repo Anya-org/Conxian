@@ -33,17 +33,17 @@ def _repo_root() -> Path:
 
 
 REQUIRED_FILES: tuple[RequiredFile, ...] = (
-    RequiredFile("README.md", 1),
-    RequiredFile("LICENSE", 1),
-    RequiredFile("SECURITY.md", 1),
-    RequiredFile("CONTRIBUTING.md", 1),
-    RequiredFile("GOVERNANCE.md", 1),
-    RequiredFile("CHANGELOG.md", 1),
-    RequiredFile("RELEASING.md", 1),
-    RequiredFile(".github/RELEASE_HYGIENE.md", 1),
+    RequiredFile("README.md", 256),
+    RequiredFile("LICENSE", 256),
+    RequiredFile("SECURITY.md", 256),
+    RequiredFile("CONTRIBUTING.md", 256),
+    RequiredFile("GOVERNANCE.md", 128),
+    RequiredFile("CHANGELOG.md", 256),
+    RequiredFile("RELEASING.md", 128),
+    RequiredFile(".github/RELEASE_HYGIENE.md", 256),
 )
 
-PORTFOLIO_DOCS: tuple[RequiredFile, ...] = (RequiredFile("docs/REPO_PORTFOLIO.md", 1),)
+PORTFOLIO_DOCS: tuple[RequiredFile, ...] = (RequiredFile("docs/REPO_PORTFOLIO.md", 256),)
 
 CODEOWNERS_CANDIDATES: tuple[str, ...] = (
     ".github/CODEOWNERS",
@@ -52,7 +52,6 @@ CODEOWNERS_CANDIDATES: tuple[str, ...] = (
 )
 
 CODEOWNERS_MIN_BYTES = 64
-
 
 def _is_truthy_env(var_name: str) -> bool:
     return os.environ.get(var_name, "").strip().lower() in {
@@ -123,18 +122,9 @@ def _verify_codeowners(codeowners: Path, *, repo_root: Path, errors: list[str]) 
         errors.append(f"{rel_path}: no ownership rules found")
         return
 
-    covers_all = False
-    for line in owner_lines:
-        parts = line.split()
-        if not parts:
-            continue
-        if parts[0] in {"*", "/*"}:
-            covers_all = True
-            break
-
+    covers_all = any(line.split() and line.split()[0] == "*" for line in owner_lines)
     if not covers_all:
-        errors.append(f"{rel_path}: must include a '*' or '/*' rule to cover the entire repo")
-
+        errors.append(f"{rel_path}: must include a '*' rule to cover the entire repo")
     has_github_owner = any(
         token.startswith("@") for line in owner_lines for token in line.split()[1:]
     )

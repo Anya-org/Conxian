@@ -67,7 +67,9 @@ def _run(check: Check, *, cwd: Path) -> int:
     print(f"\n==> {check.label}", flush=True)
     env = os.environ.copy()
     if check.env:
-        env.update(check.env)
+        # Treat per-check env as defaults so callers can override via their shell.
+        for key, value in check.env.items():
+            env.setdefault(key, value)
 
     proc = subprocess.run(check.argv, check=False, cwd=str(cwd), env=env)
     return int(proc.returncode)
