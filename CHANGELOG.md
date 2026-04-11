@@ -9,6 +9,9 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 
 ## [Unreleased]
 
+### Security
+- **Hardcoded Principal Remediation (CON-61):** Remediated 5 core Clarity contracts in the `Conxian` submodule that were using hardcoded testnet principals (`ST1BK...`). Replaced them with `tx-sender` to enable dynamic governance and mainnet readiness.
+
 ### Added
 - Documented the BOS business-end operating model (`docs/BOS_BUSINESS_BUILDOUT.md`), including ZSE public/internal split guidance and governance/README alignment.
 

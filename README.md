@@ -1,4 +1,4 @@
-# Conxian: Sovereign Business Operations System (BOS v1.9.0)
+# Conxian: Sovereign Business Operations System (BOS v1.9.1)
 
 [![Conxian Unified CI](https://github.com/Conxian/conxian-business/actions/workflows/conxian-unified-ci.yml/badge.svg)](https://github.com/Conxian/conxian-business/actions/workflows/conxian-unified-ci.yml)
 [![Deploy Documentation](https://github.com/Conxian/conxian-business/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/Conxian/conxian-business/actions/workflows/deploy-docs.yml)
