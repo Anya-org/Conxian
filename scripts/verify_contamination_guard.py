@@ -73,7 +73,7 @@ def is_excluded(rel_path: str, excluded_set: set[str]) -> bool:
             continue
         if rel_path == ex:
             return True
-        if ex in parts[:-1]:
+        if ex in parts:
             return True
     return False
 
