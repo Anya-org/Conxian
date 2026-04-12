@@ -12,6 +12,15 @@ It classifies governance record domains, establishes datastore boundaries with o
 5. **Legal and institutional content is indexed, not replicated.** The full text of privileged legal/institutional documents lives in Linear Virtual Office (or another approved protected store). The governance ledger stores only public-safe metadata, content hashes, and access pointers.
 6. **Policy validation failures MUST fail closed.** No “best effort”, no inferred defaults, no degraded execution for writes.
 
+### Record canonicalization and hashing
+
+The `record_id` for any JSON-LD governance record MUST be computed deterministically to prevent “same semantics, different hash” failures across implementations.
+
+- **Canonicalization:** JSON-LD RDF Dataset Canonicalization using **URDNA2015**.
+- **Hash:** `sha256` over the canonicalized N-Quads bytes (UTF-8).
+- **Digest encoding:** `record_id` is the raw 32-byte digest; when represented as text it MUST be encoded as lowercase hex (64 chars). The on-chain anchor MUST store the same 32-byte digest (or, if stored as text, the same lowercase-hex encoding).
+- **Context resolution:** canonicalization MUST run with network fetch disabled; any JSON-LD contexts MUST be resolved from pinned, content-addressed artifacts.
+
 ## Target record planes
 
 SAB target architecture separates (a) enforceable governance state, (b) append-only governance records, and (c) operational application state.
