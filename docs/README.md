@@ -13,7 +13,7 @@ active — This documentation hub is published from the public-safe allowlist us
 
 ## Quick start
 - **[Independent Lab Development Kit (ILDK)](ILDK_README.md)**
-- **[System Whitepaper](../Conxian/docs/WHITEPAPER.md)**
+- **[System Whitepaper](https://github.com/Conxian/Conxian/blob/main/docs/WHITEPAPER.md)**
 - **[Introduction](../README.md)**
 - **[Repo portfolio (flagship vs supporting)](REPO_PORTFOLIO.md#ecosystem-repos)**
 
