@@ -19,15 +19,17 @@ Replay queries used to derive the snapshot above:
 
 ```bash
 # GitHub open bounty set
-gh issue list -R Conxian/conxius-platform -l Bounty --state open
+gh issue list -R Conxian/conxius-platform -l Bounty --state open --limit 1000
 
 # GitHub open bounty set (Bounty Open)
-gh issue list -R Conxian/conxius-platform -l 'Bounty Open' --state open
+gh issue list -R Conxian/conxius-platform -l 'Bounty Open' --state open --limit 1000
 
-# Linear bounty sets (Conxian-Labs team; all workflow states)
-ch-linear issue list -T CON -l Bounty
-ch-linear issue list -T CON -l 'Bounty Open'
+# Linear bounty sets (Conxian-Labs team; all workflow states via no --state filter)
+ch-linear issue list -T CON -l Bounty --limit 1000
+ch-linear issue list -T CON -l 'Bounty Open' --limit 1000
 ```
+
+If either list ever grows beyond the `--limit` value, increase it to keep the snapshot complete.
 
 These queries were run on 2026-04-12 to produce this point-in-time snapshot. Future runs of the same commands may return a different set of issues; any new or relabeled `Bounty` / `Bounty Open` items must be explicitly reclassified before being treated as externally claimable.
 
@@ -66,7 +68,9 @@ Derived GitHub classifications (snapshot 2026-04-12):
 #101 → Security-sensitive (CON-129)
 ```
 
-### Active Linear “public claimable” set (`Bounty Open`, as of 2026-04-12)
+### Snapshot: Linear issues labeled `Bounty Open` (as of 2026-04-12)
+
+These are expected to have `Bounty Open` removed for the pre-mainnet window per this classification.
 
 - https://linear.app/conxian-labs/issue/CON-178/release-hygiene-github
 - https://linear.app/conxian-labs/issue/CON-182/release-hygiene-conxian

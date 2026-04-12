@@ -27,6 +27,10 @@
 * [CSF-first operating sequence and proof gates](docs/CSF_FIRST_OPERATING_SEQUENCE_AND_PROOF_GATES.md)
 * [OpenSpec](openspec/README.md)
 
+## Bounties
+
+* [CON-231: Pre-mainnet bounty claimability classification (2026-04-12)](docs/bounties/CON-231_BOUNTY_CLASSIFICATION_2026-04-12.md)
+
 ## 🤖 Business Operations System (BOS)
 
 * [BOS wallet control model](docs/BOS_WALLET_CONTROL_MODEL.md)
