@@ -13,9 +13,11 @@ active — This documentation hub is published from the public-safe allowlist us
 
 ## Quick start
 - **[Independent Lab Development Kit (ILDK)](ILDK_README.md)**
-- **[System Whitepaper](https://github.com/Conxian/Conxian/blob/main/docs/WHITEPAPER.md)**
+- **[System Whitepaper](https://github.com/Conxian/Conxian/blob/40abfce6f0ff73cf9879f12cfadbabe3d8addc3c/docs/WHITEPAPER.md)**
 - **[Introduction](../README.md)**
 - **[Repo portfolio (flagship vs supporting)](REPO_PORTFOLIO.md#ecosystem-repos)**
+
+Note: Cross-repo docs links are pinned to the Conxian submodule SHA for reproducibility; update the SHA to match `git submodule status Conxian` when bumping the submodule.
 
 ## Strategic knowledge base
 - **[Strategic Growth Model (2026)](STRATEGIC_GROWTH_MODEL_2026.md)**
