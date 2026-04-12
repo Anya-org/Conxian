@@ -10,7 +10,7 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 ## [Unreleased]
 
 ### Security
-- **Hardcoded Principal Remediation (CON-61):** Remediated 5 core Clarity contracts in the `Conxian` submodule that were using hardcoded testnet principals (`ST1BK...`). Replaced them with `tx-sender` to enable dynamic governance and mainnet readiness.
+- **Hardcoded Principal Remediation (CON-61):** Remediated 5 core Clarity contracts in the `Conxian` submodule (`agent-risk.clar`, `agent-treasury.clar`, `bme-engine.clar`, `conxian-protocol.clar`, `concentrated-liquidity-pool.clar`) that were using hardcoded testnet principals (`ST1BK...`). Replaced them with `tx-sender` to enable dynamic governance and resolved the "Audit-to-Code" discrepancy in the `Conxian` submodule.
 
 ### Added
 - Documented the BOS business-end operating model (`docs/BOS_BUSINESS_BUILDOUT.md`), including ZSE public/internal split guidance and governance/README alignment.
@@ -18,9 +18,6 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 ### Fixed
 - **Contamination Guard Hardening (CON-394):** Improved path exclusion logic in `scripts/verify_contamination_guard.py` to correctly honor global exclusions (like `package-lock.json`) when they appear in subdirectories.
 - **Showcase DApp Hygiene:** Removed tracked `dev_server.log` artifact and updated `.gitignore` to prevent future contamination.
-
-### Security
-- **Hardcoded Principal Remediation (CON-61):** Remediated 5 core Clarity contracts in the `Conxian` submodule that were still using hardcoded testnet principals (`ST1BK...`). Replaced them with `tx-sender` to enable dynamic governance and mainnet readiness.
 
 ### Changed
 - **Devcontainer (CON-383):** Added Rust stable and Python 3.10 to `.devcontainer/Dockerfile` so `cargo test` and CI scripts run locally.
