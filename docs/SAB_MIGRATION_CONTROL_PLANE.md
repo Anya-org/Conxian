@@ -38,6 +38,7 @@ Update convention: on every review (cadence- or milestone-driven), bump `Last re
 - Dependency inventory: [SAB_MIGRATION_DEPENDENCY_INVENTORY.md](SAB_MIGRATION_DEPENDENCY_INVENTORY.md)
 - Supabase + Neon inventory (service-level): [DEPENDENCY_INVENTORY_SUPABASE_NEON.md](DEPENDENCY_INVENTORY_SUPABASE_NEON.md)
 - Domain-to-datastore decision log: [SAB_DATASTORE_DECISION_LOG.md](SAB_DATASTORE_DECISION_LOG.md)
+- Immutable governance and record architecture: [SAB_IMMUTABLE_GOVERNANCE_RECORD_ARCHITECTURE.md](SAB_IMMUTABLE_GOVERNANCE_RECORD_ARCHITECTURE.md)
 - Readiness gates & cutover criteria: [SAB_MIGRATION_READINESS_GATES.md](SAB_MIGRATION_READINESS_GATES.md)
 - Migration waves: [SAB_MIGRATION_WAVES.md](SAB_MIGRATION_WAVES.md)
 

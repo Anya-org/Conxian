@@ -38,6 +38,7 @@
   * [Dependency inventory](docs/SAB_MIGRATION_DEPENDENCY_INVENTORY.md)
   * [Supabase + Neon inventory (service-level)](docs/DEPENDENCY_INVENTORY_SUPABASE_NEON.md)
   * [Datastore decision log](docs/SAB_DATASTORE_DECISION_LOG.md)
+  * [Immutable governance and record architecture](docs/SAB_IMMUTABLE_GOVERNANCE_RECORD_ARCHITECTURE.md)
   * [Readiness gates](docs/SAB_MIGRATION_READINESS_GATES.md)
   * [Migration waves](docs/SAB_MIGRATION_WAVES.md)
 * [Trust & Proof Messaging (Public Surfaces)](docs/TRUST_AND_PROOF_MESSAGING.md)
