@@ -1,6 +1,6 @@
 # CON-137: Community funding model for system delivery
 
-This document is the policy artifact for https://linear.app/conxian-labs/issue/CON-137/community-funding-model-for-system-delivery.
+This document is the policy artifact for [CON-137](https://linear.app/conxian-labs/issue/CON-137/community-funding-model-for-system-delivery).
 
 It defines which work can be community-funded, which work must remain internal-only, and how to size bounties in a consistent, reviewable way.
 
@@ -14,7 +14,7 @@ Until ConxianCSF is verifiably deployed and ALEX launch-path funding is enabled,
 ## Funding constraints (normative)
 
 1. Do not advertise an issue as a paid bounty unless it is ConxianCSF-backed and ALEX-funded.
-   - Concretely: do not claim/label it as funded, do not publish payout amounts, and do not mark it as `Bounty Open` unless the ConxianCSF/ALEX gates are met.
+   - Concretely: do not claim/label it as funded, do not publish payout amounts, and do not apply the `Bounty Open` label (see [`BOUNTY_WORKFLOW.md`](./BOUNTY_WORKFLOW.md)) unless the ConxianCSF/ALEX gates are met.
    - Eligibility classification (community-contributable vs internal-only) is allowed and is not a payout promise.
 2. Maintainers MUST NOT request, confirm, or act on payout instructions (addresses, payment rails, etc.) in issue threads.
 3. Payout-enabling controls remain maintainer-only (see [`MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md`](./MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md)).
@@ -92,8 +92,8 @@ Apply multipliers for review cost and priority (round to nearest 5 BP).
 
 ### Step 3 — limits
 
-- Do not publish single issues larger than `L`.
-- Treat any sizing that lands above **40 BP** as an “XL” smell and split the work into multiple S/M/L issues before marking them community-funded; there is intentionally no XL row in the base-size table for a single bounty.
+- Do not publish base sizes above `L` (BaseBP > 20).
+- Treat any sizing that rounds to **40 BP** (or higher) as an “XL” smell and split the work into multiple S/M/L issues before marking them community-funded; there is intentionally no XL row in the base-size table for a single bounty.
 
 ## ConxianCSF mapping (post-ALEX)
 
