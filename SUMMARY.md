@@ -31,6 +31,7 @@
 ## Bounties
 
 * [CON-231: Pre-mainnet bounty claimability classification (2026-04-12)](docs/bounties/CON-231_BOUNTY_CLASSIFICATION_2026-04-12.md)
+* [CON-137: Community funding model for system delivery](docs/bounties/CON-137_COMMUNITY_FUNDING_MODEL.md)
 
 ## 🤖 Business Operations System (BOS)
 
