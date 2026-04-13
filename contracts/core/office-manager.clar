@@ -142,7 +142,7 @@
 
     (print {
       event: "worker-paid",
-      job-contract: contract-caller,
+      job-contract: (default-to tx-sender contract-caller),
       tx-sender: tx-sender,
       worker: worker,
       amount: amount
