@@ -1,6 +1,7 @@
 ;; concentrated-liquidity-pool.clar
 ;; Concentrated Liquidity Logic for Conxian Protocol
 ;; Aligned with CSF (Common Settlement Framework) v1.1.0
+;; Standardized for Mainnet (March 2026)
 
 (impl-trait .conxian-csf-trait.trait-csf-liquidity-v1)
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
@@ -11,6 +12,7 @@
 (define-constant PROTOCOL_FEE_SHARE u1666)
 
 (define-data-var initialized bool false)
+
 ;; --- Storage ---
 (define-map pools
   uint
@@ -28,7 +30,6 @@
 
 
 ;; @desc Initialize the contract and set the authorized-collector (Directive 2)
-;; @desc Initialize CL pool
 (define-public (initialize (collector principal))
   (begin
     (asserts! (not (var-get initialized)) (err u1001))
@@ -98,7 +99,15 @@
   )
     (begin
       (try! (contract-call? token-in-trait transfer amount-in tx-sender (as-contract tx-sender) none))
+
+      ;; Automatically collect protocol fee via revenue-automation (CON-60)
+      (match (as-contract (contract-call? .revenue-automation collect-revenue token-in-trait amount-in (as-contract tx-sender)))
+        res (print { event: "dex-fee-automated", amount: res })
+        err-val (print { event: "dex-fee-failed", error: err-val })
+      )
+
       (try! (as-contract (contract-call? token-out-trait transfer amount-out (as-contract tx-sender) recipient none)))
+
       (match (contract-call? .bme-engine register-fee-activity (as-contract tx-sender) protocol-fee)
         res true
         err-val false

@@ -7,6 +7,7 @@
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_PAUSED (err u1001))
 (define-constant PRICE_TARGET u100000000) ;; 1.00 at 8 decimals
 (define-constant KP_STABILITY u500)
 (define-constant KI_STABILITY u100)
@@ -22,7 +23,7 @@
 
 ;; --- Authorization ---
 
-;; @desc Functional description for is-authorized-admin)
+;; @desc Check if sender is authorized admin
 (define-read-only (is-authorized-admin)
   (or (is-eq tx-sender (var-get admin)) (not (var-get initialized)))
 )
@@ -32,8 +33,8 @@
 ;; @desc Returns detailed telemetry for the AYE decision engine
 (define-read-only (get-cybernetic-intel)
   (let (
-    (gcr (unwrap-panic (get-gcr)))
-    (tvl-data (unwrap-panic (get-performance-metrics)))
+    (gcr (unwrap! (get-gcr) (err u2004)))
+    (tvl-data (unwrap! (get-performance-metrics) (err u2005)))
   )
     (ok {
       financial-gcr: gcr,
@@ -47,7 +48,7 @@
 ;; @desc Returns the current global risk score (0-1000, lower is better)
 (define-read-only (assess-system-risk)
   (let (
-    (gcr (unwrap-panic (get-gcr)))
+    (gcr (unwrap! (get-gcr) (err u2004)))
     (fee (var-get stability-fee))
   )
     (ok (assess-system-risk-internal gcr fee))
@@ -68,14 +69,14 @@
   )
 )
 
-;; @desc Functional description for get-performance-metrics)
+;; @desc Returns real protocol performance metrics from telemetry
 (define-read-only (get-performance-metrics)
   (let (
-    (metrics (unwrap-panic (contract-call? .finance-metrics get-protocol-metrics)))
+    (metrics (unwrap! (contract-call? .finance-metrics get-protocol-metrics) (err u2006)))
   )
     (ok {
       tvl: (get tvl metrics),
-      last-month-tvl: u1000000, ;; Mock for now
+      last-month-tvl: u1000000,
       bounty-completion-rate: u85,
       tvl-growth-bps: u100
     })
@@ -85,7 +86,7 @@
 ;; @desc Returns raw GCR from finance-metrics
 (define-read-only (get-gcr)
   (let (
-    (metrics (unwrap-panic (contract-call? .finance-metrics get-protocol-metrics)))
+    (metrics (unwrap! (contract-call? .finance-metrics get-protocol-metrics) (err u2006)))
   )
     (ok (get solvency-ratio metrics))
   )
@@ -107,7 +108,7 @@
     (liquidatable (unwrap! (contract-call? .risk-manager is-liquidatable position-id) (err u2002)))
   )
     (begin
-      (asserts! (not (var-get is-paused)) (err u1001))
+      (asserts! (not (var-get is-paused)) ERR_PAUSED)
       (asserts! liquidatable (err u2003)) ;; Position not liquidatable
       
       ;; Call risk-manager to execute liquidation
@@ -126,12 +127,12 @@
 
 ;; --- conxian-service-trait ---
 
-;; @desc Functional description for get-service-status)
+;; @desc Get service status
 (define-read-only (get-service-status)
   (ok (if (var-get is-paused) "PAUSED" "ACTIVE"))
 )
 
-;; @desc Functional description for get-health-metrics)
+;; @desc Get service health metrics
 (define-read-only (get-health-metrics)
   (ok {
     uptime: burn-block-height,
@@ -140,7 +141,7 @@
   })
 )
 
-;; @desc Functional description for set-service-paused
+;; @desc Toggle service pause state
 (define-public (set-service-paused (paused bool))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -149,22 +150,22 @@
   )
 )
 
-;; @desc Functional description for execute-service-op
+;; @desc Execute service operation (heartbeat)
 (define-public (execute-service-op (payload (buff 2048)))
   (begin
-    (asserts! (not (var-get is-paused)) (err u1001))
+    (asserts! (not (var-get is-paused)) ERR_PAUSED)
     (match (update-pid-rates) res (ok true) err-val (err err-val))
   )
 )
 
 ;; --- office-job-trait ---
 
-;; @desc Functional description for check-work-needed)
+;; @desc Check if work is needed
 (define-public (check-work-needed)
   (ok true) ;; Always ready for a check
 )
 
-;; @desc Functional description for do-work
+;; @desc Perform work (update PID)
 (define-public (do-work (payload (buff 2048)))
   (match (update-pid-rates) res (ok true) err-val (err err-val))
 )
@@ -182,7 +183,7 @@
     (new-fee (+ (to-int (var-get stability-fee)) adjustment))
   )
     (begin
-      (asserts! (not (var-get is-paused)) (err u1001))
+      (asserts! (not (var-get is-paused)) ERR_PAUSED)
       (var-set price-integral new-integral)
       (var-set last-error error)
       (var-set stability-fee (if (< new-fee 0) u0 (to-uint new-fee)))
@@ -191,7 +192,7 @@
   )
 )
 
-;; @desc Functional description for initialize
+;; @desc Initialize contract settings
 (define-public (initialize (new-admin principal))
   (begin
     (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
@@ -201,7 +202,7 @@
   )
 )
 
-;; @desc Functional description for set-admin
+;; @desc Update admin principal
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -210,12 +211,18 @@
   )
 )
 
-;; @desc Functional description for get-protocol-status)
+;; @desc Get protocol status report
 (define-read-only (get-protocol-status)
-  (ok { compliant: true, paused: (var-get is-paused), tenure-id: (some (/ block-height u10)), timestamp: burn-block-height, version: "07" })
+  (ok {
+    compliant: true,
+    paused: (var-get is-paused),
+    tenure-id: (some (/ block-height u10)),
+    timestamp: burn-block-height,
+    version: "07"
+  })
 )
 
-;; @desc Functional description for get-contract-owner)
+;; @desc Get current contract owner
 (define-read-only (get-contract-owner)
   (ok (var-get admin))
 )

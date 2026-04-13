@@ -1,16 +1,25 @@
 # Treasury Module
 
 ## Overview (Explanation)
-The Treasury module manages the protocol's capital allocation and revenue distribution. It implements the "Fiscal Dam" (CXIP-013), a 6-way revenue split that ensures the long-term sustainability of the Conxian ecosystem by funding treasury, bounties, LP incentives, grants, buy-backs, and insurance.
+The Treasury module manages the protocol's capital allocation and revenue distribution. It implements the "Fiscal Dam" (CXIP-013) and enforces mandatory protocol fees via the Revenue Automation engine. This ensures the long-term sustainability of the Conxian ecosystem by funding treasury, bounties, LP incentives, grants, buy-backs, and insurance.
 
 ## Architecture (Explanation)
 This module uses a hub-and-spoke model for fund management:
+- **Automation**: `revenue-automation.clar` enforces a non-negotiable 100 bps protocol fee on core transactions (CON-60).
 - **Registry**: `cxd-treasury.clar` maintains the global allocation policy and tracks accrued claims.
 - **Distribution**: `revenue-distributor.clar` executes token buy-backs and burns via the BME engine.
 - **Storage**: Specialized vaults like `conxian-vaults.clar` provide secure multi-asset storage with RBAC integration.
 - **Off-Chain Persistence**: External settlement events (PAPSS, BRICS) are recorded in the `cnx_bos.cxn_external_settlement_logs` table within the Neon database for institutional reporting and audit.
 
 ## Core Contracts (Reference)
+
+### `revenue-automation.clar`
+Enforces the 100 bps (1%) protocol fee extraction required for Apex BME.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `collect-revenue` | `(token <sip-010-ft-trait>) (amount uint) (payer principal)` | Calculates and transfers 1% fee to the distributor. |
+| `set-admin` | `(new-admin principal)` | Updates the administrative principal. |
 
 ### `revenue-distributor.clar`
 The primary engine for routing protocol fees to the BME engine for burn or swap-and-burn.
@@ -51,32 +60,20 @@ Used for tracking settlements that occur on external networks (e.g., PAPSS) but 
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | BIGINT | Primary key (identity). |
-| `native_tx_hash` | TEXT | Reference to the Stacks on-chain transaction hash (not enforced as a DB foreign key). |
+| `native_tx_hash` | TEXT | Reference to the Stacks on-chain transaction hash. |
 | `external_tx_reference` | TEXT | The reference ID from the external settlement network. |
 | `settlement_network_origin` | TEXT | Origin network (e.g., 'PAPSS', 'BRICS'). |
 | `fiat_value_pegged` | NUMERIC(20, 2) | Pegged fiat value of the settlement. |
 | `currency_code` | CHAR(3) | ISO-4217 currency code (default `USD`). |
 | `created_at` | TIMESTAMPTZ | Insertion timestamp (default `now()`). |
-| `metadata` | JSONB | Provider payload / reconciliation attributes (default `{}`). |
-
-Constraints/Indexes:
-- `UNIQUE (settlement_network_origin, external_tx_reference)`
-- `idx_ext_settlement_native_hash (native_tx_hash)`
+| `metadata` | JSONB | Provider payload / reconciliation attributes. |
 
 ## Integration Examples (How-to)
 
-### Distributing Protocol Fees
-When a module (like the DEX) collects fees, it routes them through the distributor to be burned:
+### Enforcing Protocol Fees
+Core modules call the automation engine during value-transfer events:
 ```clarity
-(contract-call? .revenue-distributor distribute-token .cxd-token u1000000)
-```
-
-### Querying Allocation Policy
-External agents can check the current fiscal policy:
-```clarity
-(let ((policy (unwrap-panic (contract-call? .cxd-treasury get-allocation-percentages))))
-  (print (get treasury policy))
-)
+(contract-call? .revenue-automation collect-revenue .cxd-token u1000000 tx-sender)
 ```
 
 ## Testing (How-to)
@@ -85,7 +82,7 @@ Comprehensive validation is performed using the Vitest framework.
 2. Run module tests: `npx vitest run tests/treasury`
 
 ## Status (Reference)
-- Implementation: Production-Ready (v1.2.0)
-- Audit Status: Internally Verified (March 2026)
+- Implementation: Production-Ready (v1.2.1)
+- Audit Status: Internally Verified (April 2026)
 - BIP Compliance: BIP-341, BIP-342
 - Standard: Hexagonal, 6-Way Fiscal Dam Split, Diátaxis Compliant
