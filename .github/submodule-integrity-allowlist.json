@@ -2,15 +2,15 @@
   "entries": [
     {
       "path": "conxian-nexus",
-      "sha": "c3d846c8a250090ae752818e3ada3c86803cda16",
-      "expiresOn": "2026-04-15",
-      "reason": "Temporary BitVM2 verifier pin while Conxian/conxian-nexus#45 lands on main"
+      "sha": "06531dc72a34f19a81a71aa44226399808d02b4c",
+      "expiresOn": "2026-04-26",
+      "reason": "Temporary CON-67 pin while Conxian/conxian-nexus#49 lands on main"
     },
     {
       "path": "lib-conxian-core",
-      "sha": "2f7136904df698e1094dcdc698ff551e25a6e24a",
-      "expiresOn": "2026-04-15",
-      "reason": "Temporary BitVM2 verifier pin while Conxian/lib-conxian-core#43 lands on main"
+      "sha": "3b091d2700d840514427e4190c40d631b6d8132c",
+      "expiresOn": "2026-04-26",
+      "reason": "Temporary CON-67 pin while Conxian/lib-conxian-core#53 lands on main"
     }
   ]
 }
