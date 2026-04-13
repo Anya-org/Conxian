@@ -131,3 +131,8 @@ This report outlines the transition path for the Conxian ecosystem from its "Web
 #### [showcase-dapp](./showcase-dapp)
 - **Status**: Incubating.
 - **Advice**: Use this as the "Sovereignty Sandbox." Test new decentralized hosting (Akash/IPFS) and storage (Kwil) here before rolling out to P0 repos.
+
+### Phase 5: Business-as-a-Platform (BaaP) (Q1 2027)
+- **Action**: Formalize the "Business-in-a-Box" template for 3rd party labs.
+- **Action**: Implement Jurisdictional Sharding for tenant isolation on Akash/Kwil.
+- **Status**: Researching (CON-474).
