@@ -5,7 +5,7 @@ The Monitoring module provides real-time telemetry and health assessment for the
 
 ## Architecture (Explanation)
 The module acts as the protocol's "Observability Layer":
-- **Metrics**: `finance-metrics.clar` aggregates TVL and solvency data across all modules.
+- **Metrics**: `finance-metrics.clar` aggregates TVL and solvency data across all modules using the oracle aggregator.
 - **Analytics**: `analytics-aggregator.clar` tracks swap frequency and fee generation.
 - **Dashboard**: `monitoring-dashboard.clar` provides human-readable health statuses.
 
@@ -17,8 +17,10 @@ Aggregates protocol-wide financial data.
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `get-protocol-tvl` | `()` | Returns the total system TVL (normalized to u8) from Lending and Dimensional modules. |
-| `get-protocol-metrics` | `()` | Returns detailed solvency (GCR), active positions, and 24h volume metrics. |
+| `get-protocol-gcr` | `()` | Returns the Global Collateral Ratio (GCR) as a percentage. |
+| `get-protocol-metrics` | `()` | Returns detailed solvency (GCR), TVL, active positions, and 24h volume metrics. |
 | `set-admin` | `(new-admin principal)` | Sets a new administrative principal for the metrics contract. |
+| `set-tracked-assets` | `(new-assets (list 10 principal))` | Updates the list of assets tracked for TVL calculation. |
 
 ### `monitoring-dashboard.clar`
 Calculates high-level system status.
@@ -44,7 +46,7 @@ Comprehensive validation is performed using the Vitest framework.
 2. Run module tests: `npx vitest run tests/monitoring`
 
 ## Status (Reference)
-- Implementation: Production-Ready (v1.2.0)
-- Audit Status: Internally Verified (March 2026)
-- Telemetry: Real-time
+- Implementation: Production-Ready (v1.2.1)
+- Audit Status: Internally Verified (April 2026)
+- Telemetry: Real-time (Pull-based)
 - Standard: Hexagonal Architecture, Diátaxis Compliant

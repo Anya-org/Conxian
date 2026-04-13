@@ -73,7 +73,7 @@ depends_on = ["bme-engine", "cxd-token"]
 
 [contracts.concentrated-liquidity-pool]
 path = "contracts/dex/concentrated-liquidity-pool.clar"
-depends_on = ["sip-standards", "bme-engine", "conxian-csf-trait"]
+depends_on = ["sip-standards", "bme-engine", "conxian-csf-trait", "revenue-automation"]
 
 [contracts.risk-manager]
 path = "contracts/core/risk-manager.clar"
@@ -81,7 +81,7 @@ path = "contracts/core/risk-manager.clar"
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
 clarity-version = 4
-depends_on = ["oracle-aggregator", "cxd-token", "risk-manager", "conxian-protocol", "automation-traits", "conxian-service-trait"]
+depends_on = ["oracle-aggregator", "cxd-token", "risk-manager", "conxian-protocol", "automation-traits", "conxian-service-trait", "finance-metrics"]
 
 [contracts.enhanced-circuit-breaker]
 path = "contracts/security/enhanced-circuit-breaker.clar"
@@ -112,7 +112,7 @@ path = "contracts/dimensional/position-nft.clar"
 
 [contracts.lending-manager]
 path = "contracts/lending/lending-manager.clar"
-depends_on = ["conxian-protocol", "economic-policy-engine", "risk-manager", "bme-engine", "sip-standards"]
+depends_on = ["conxian-protocol", "economic-policy-engine", "risk-manager", "bme-engine", "sip-standards", "revenue-automation"]
 
 [contracts.dimensional-engine]
 path = "contracts/core/dimensional-engine.clar"
@@ -130,7 +130,7 @@ path = "contracts/security/conxian-insurance-fund.clar"
 
 [contracts.finance-metrics]
 path = "contracts/monitoring/finance-metrics.clar"
-depends_on = ["cxd-token", "lending-manager", "dimensional-core", "operational-treasury", "conxian-insurance-fund"]
+depends_on = ["cxd-token", "lending-manager", "dimensional-core", "operational-treasury", "conxian-insurance-fund", "oracle-aggregator"]
 
 [contracts.circuit-breaker]
 path = "contracts/security/circuit-breaker.clar"
@@ -311,3 +311,15 @@ path = "contracts/governance/signed-data-base.clar"
 [contracts.ops-loan-manager]
 path = "contracts/enterprise/ops-loan-manager.clar"
 depends_on = ["sip-standards"]
+
+[contracts.dlc-bond]
+path = "contracts/sbtc/dlc-bond.clar"
+depends_on = ["bond-traits", "sip-standards"]
+
+[contracts.dlc-orchestrator]
+path = "contracts/sbtc/dlc-orchestrator.clar"
+depends_on = ["bond-traits", "dlc-bond"]
+
+[contracts.dlc-manager]
+path = "contracts/sbtc/dlc-manager.clar"
+depends_on = ["conxian-access"]
