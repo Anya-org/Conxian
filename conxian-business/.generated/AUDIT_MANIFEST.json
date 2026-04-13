@@ -1,0 +1,1768 @@
+{
+  "org": "Conxian",
+  "timestamp": "2026-04-13T07:04:16.812022Z",
+  "version": "v2.0-Audit",
+  "files": [
+    {
+      "path": "docs/PORTFOLIO_DASHBOARD.md",
+      "sha256": "402c55a11b2f49e8788ff78c26a244fc19de505d0b0c70b196832ae3feabaf17"
+    },
+    {
+      "path": "docs/BUSINESS_COMPLIANCE_ALIGNMENT_2026.md",
+      "sha256": "d6c4d4ff5e4c9080cdf6a3fa60640d5584a1690c26cb84810002db81a2268b10"
+    },
+    {
+      "path": "docs/WALLET_REMAPPING_MANIFEST_CON_61_CON_423.md",
+      "sha256": "47da5c4e43732539c51e6a0d1a9f7c9ebe5cad05a98274666be862be56dfdd85"
+    },
+    {
+      "path": "docs/CONXIAN_MARKET_NARRATIVE_ONE_PAGER.md",
+      "sha256": "8b0c181e1ac8eaa0abeef74ff6d8f4e78392515eb10c18ef6e21cd974a6b4562"
+    },
+    {
+      "path": "docs/TRUST_AND_PROOF_MESSAGING.md",
+      "sha256": "9d2b3aafca256a8c5c47c90f6241ffbc8a428d7f8a3167f5dd51f4b2737f5fc0"
+    },
+    {
+      "path": "docs/DOCUMENTATION_CLASSIFICATION.md",
+      "sha256": "067435635bec6c2062a2073fb4180d9c68c42212f3af7edec139aa278547810f"
+    },
+    {
+      "path": "docs/CROSS_UNIT_CHANGE_CONTROL.md",
+      "sha256": "60d93aaaf5f982a96cf3ed550d684f28b5c8e47bed5d6916de120e2d94a58972"
+    },
+    {
+      "path": "docs/WALLET_SIGNER_CONTROL_VERIFICATION_REPORT.md",
+      "sha256": "e5c9287633cef754f7bdd54f7f882352f73bb65951952b6597406cb778163f38"
+    },
+    {
+      "path": "docs/PARTNER_OVERVIEW_AND_LAUNCH_FAQ.md",
+      "sha256": "289450a93dd5a33153a4b480a1276942fc63109697b7e983a3da85cd6d0630b4"
+    },
+    {
+      "path": "docs/CSF_MAINNET_READINESS_GATE.md",
+      "sha256": "734d9cbce671d7d24c781d7526dc6629af4c69228742e3dd1fbfa3b4d58f7017"
+    },
+    {
+      "path": "docs/DEPENDENCY_INVENTORY_SUPABASE_NEON.md",
+      "sha256": "08a9ab815af0a286cf4a95887951c24a1e99ae725d7e2a022dc07e28b36f0d93"
+    },
+    {
+      "path": "docs/CONXIAN_GATEWAY_BOS_BUILDOUT.md",
+      "sha256": "9ce5d19335e44d6d09cfbbfebd33a9bc4afab68b42421720b2b468b499673af0"
+    },
+    {
+      "path": "docs/REPO_READINESS_GATES_BY_CONTROL_DOMAIN.md",
+      "sha256": "5c1ab4b30c9b5eb188d2b040003c9c96b21ced6ddb96c94e6d9a5f78fd8d1b0f"
+    },
+    {
+      "path": "docs/SAB_MIGRATION_WAVES.md",
+      "sha256": "040977f0de20d1bb5e9b38a387a63e5068304dba37cfb818f2d8df7f43da6afb"
+    },
+    {
+      "path": "docs/PORTFOLIO_REPOSITORY_INVENTORY.md",
+      "sha256": "032c45a51dff52a4f1f81c196fa4ddea31c1e1230045ad9593d9ec272d701986"
+    },
+    {
+      "path": "docs/RELEASE_HYGIENE_CONXIAN_NEXUS.md",
+      "sha256": "34305051bd6f1b95bf2446ab690d82a22d23fffbe15c200993735e27444ac07a"
+    },
+    {
+      "path": "docs/SAB_MIGRATION_DEPENDENCY_INVENTORY.md",
+      "sha256": "bf791bed330c070f1498ed65413546995a7249ce7af60d55f663fd5af44f1987"
+    },
+    {
+      "path": "docs/TEE_SECURITY_AUDIT.md",
+      "sha256": "ecaa1ffad621c8e37936f859ab5f3e30a66d6293c9d9016f16300298e3428614"
+    },
+    {
+      "path": "docs/SOVEREIGN_SHARD_SPEC.md",
+      "sha256": "1c3a8a7b0e6b84397076ec583c41da5963df3e250480c79d2d67df3073b4edc0"
+    },
+    {
+      "path": "docs/SAB_DAO_HANDOFF_PROTOCOL.md",
+      "sha256": "afff66a88a1bfcbf54d6294c48c8468f1baf01af8fd1e1cd7508efe9baced4df"
+    },
+    {
+      "path": "docs/DASHBOARD_SPEC.md",
+      "sha256": "3845799cb9507a7b9c8446d66165b70f871a7d9a308a3f7d62039d7babeee8b9"
+    },
+    {
+      "path": "docs/MARCH_2026_BASELINE_STATS.md",
+      "sha256": "676eb7273172455dc618ad4971679e91f077385d17d2426ac7f6e8a9f94a84a2"
+    },
+    {
+      "path": "docs/BRANCHING_AND_PROMOTION_POLICY.md",
+      "sha256": "d942c0487bd106fa6b3eed0935190cfa75dbe8ad26fadd37f8f856accda52d2c"
+    },
+    {
+      "path": "docs/DOCUMENTATION_ALIGNMENT_INDEX.md",
+      "sha256": "8a52fd4a25e7ab07ea91c4de251e7f9af813a387925a940cbeff2033489750ca"
+    },
+    {
+      "path": "docs/STRATEGIC_GROWTH_MODEL_2026.md",
+      "sha256": "2fe95997004ad95927687c6da3d11cb3aa5e31fc287ff036b58d88e43c443331"
+    },
+    {
+      "path": "docs/REPO_PORTFOLIO.md",
+      "sha256": "13019e4ce6814afd2b6b67b6f0945d3e2de9852e5bec85984565b754c334f35d"
+    },
+    {
+      "path": "docs/BRANCH_AND_PROMOTION_STANDARD.md",
+      "sha256": "5d108297eebf7ca01d041f724140ef842f3b5a8bd3467d847f9d46fc63e11a2a"
+    },
+    {
+      "path": "docs/CONXIUS_PLATFORM_BOS_BUILDOUT.md",
+      "sha256": "3676f939c93857f07ba74f2069f9b0f1d077286d01a265a80bac18e0f18908d8"
+    },
+    {
+      "path": "docs/CONXIAN_LABS_SITE_BOS_BUILDOUT.md",
+      "sha256": "75f28a57db6fe463fba3fd72c2f69ad2457987d92fe3742a193fbea86b3bf204"
+    },
+    {
+      "path": "docs/PORTFOLIO_BUSINESS_UNIT_MAP.md",
+      "sha256": "432d48cb86a577f07f4726675f7f9a024220d9b892447cd26f3564dea8594fea"
+    },
+    {
+      "path": "docs/PUBLIC_VISIBILITY_AUDIT_REPORT.md",
+      "sha256": "33aa1aec73aa1e7bd9fa0173acb4cf198473aa037db42f0522c57240b4514841"
+    },
+    {
+      "path": "docs/GITHUB_GOVERNANCE_BOS_BUILDOUT.md",
+      "sha256": "1d1fadb78cab2a43781222d80039ff2bb58fc6353fed4bf501d298ce8da9e641"
+    },
+    {
+      "path": "docs/SAB_DATASTORE_DECISION_LOG.md",
+      "sha256": "fe5c569feedc9fb479a4c347108cfe301028e614b45423d1dc9055a4bd7297f2"
+    },
+    {
+      "path": "docs/CONXIAN_UI_BOS_BUILDOUT.md",
+      "sha256": "2c9fc30e6f82b0bd55c781450e684fc89e85b263ad7f373476434adf608391b8"
+    },
+    {
+      "path": "docs/MAINNET_READINESS_CONXIUS_WALLET.md",
+      "sha256": "7df98a293baec57f9fb121e9f9a38c886eb1d5d9524d3384a1b8db78c5a22bce"
+    },
+    {
+      "path": "docs/ATS_v11.0_MASTER_BASELINE.md",
+      "sha256": "f86445ed0b84088b9986ed746aa3f5a04fbab2d43c53fa4d9fc2a385fe10d3ba"
+    },
+    {
+      "path": "docs/LIB_CONXIAN_CORE_BOS_BUILDOUT.md",
+      "sha256": "c3b9a3a8bdf7847ec584d8e548ef7b0a74bd8e4ee311ff99cc16439984f5d83b"
+    },
+    {
+      "path": "docs/CSF_FIRST_OPERATING_SEQUENCE_AND_PROOF_GATES.md",
+      "sha256": "20dc6e1a67e9e516276970ee215266a02679a34cd390d9846c85f4b49f17f6f2"
+    },
+    {
+      "path": "docs/MAINNET_READINESS_CONXIAN_PROTOCOL.md",
+      "sha256": "aea5cb06973d7437071a5c88438f0778dbe00017d0cd215e798519e9e8da1e3a"
+    },
+    {
+      "path": "docs/CJCS_v2.0_SPEC.md",
+      "sha256": "65b5b842c71f37886428185ed9dc385cc2d6274e0bb387bd310ed69990532ed1"
+    },
+    {
+      "path": "docs/STACKSORBIT_BOS_BUILDOUT.md",
+      "sha256": "f5b041b9642f8bedee379001b725e290f33158f34ac6cc299f280df2a4221012"
+    },
+    {
+      "path": "docs/REPOSITORY_CATALOG.md",
+      "sha256": "80aed83bc989d6324a4143eb3a1d040141e2853829fb19cdb3f6e12e79e75b4b"
+    },
+    {
+      "path": "docs/AGENTS.md",
+      "sha256": "94267bd97b90f44e8ad63ba09a8b9ec74524ee95b3cd89149710839a60495271"
+    },
+    {
+      "path": "docs/BOS_BUSINESS_BUILDOUT.md",
+      "sha256": "d75a497f4a3e006ca46c850442f51618a85fb78b1b8eb4672d6d777348913ff6"
+    },
+    {
+      "path": "docs/MAINNET_READINESS_CONXIUS_PLATFORM.md",
+      "sha256": "b4ac5073ed472c3ce130b73aa0bac653a578e43b48671f101bbc02b55e2980a7"
+    },
+    {
+      "path": "docs/ILDK_README.md",
+      "sha256": "a5a6571a0305071a4f1b7512e25b55ad14c216d095519e97cb36fd7a7c2bc14d"
+    },
+    {
+      "path": "docs/MISSING_CHIPS_BRIEF.md",
+      "sha256": "552e57e44810d630dcbf60891094d301d8f40ef794f730a6359807c018356833"
+    },
+    {
+      "path": "docs/CONXIAN_NEXUS_BOS_BUILDOUT.md",
+      "sha256": "f2b807fa8f6efe49ffb53328ebf3f2856bac55aeb95e8e74520dfbd3a93df12b"
+    },
+    {
+      "path": "docs/RELEASE_NOTES_AND_CHANGELOG.md",
+      "sha256": "51fee6a2ef84699046280203472053f1c8281d23b61781a985ece215e39151bf"
+    },
+    {
+      "path": "docs/BOS_WALLET_CONTROL_MODEL.md",
+      "sha256": "ced13b9f5c605688cf7d5c1f2488896d50a70680a48a8aa7b806866c0b2f98dd"
+    },
+    {
+      "path": "docs/MAINNET_READINESS_LIB_CONCLAVE_SDK.md",
+      "sha256": "03fdb5ed932d8d73bb6242c9cddf5d86ad45ac8a2596372c32d755b404571bc2"
+    },
+    {
+      "path": "docs/SAB_MIGRATION_CONTROL_PLANE.md",
+      "sha256": "a06fe083f20bc788c2599438afdfa719e2d02c0dabf8b67ef07d355261771ac8"
+    },
+    {
+      "path": "docs/SAB_WALLET_ARCHITECTURE_AND_CONTROL_MATRIX.md",
+      "sha256": "c66f447b7ed19a3bca8f2cce0c0d6054bcb9a2f4a7cd3b6d78014680dba68a4f"
+    },
+    {
+      "path": "docs/MAINNET_READINESS_CONXIAN_GATEWAY.md",
+      "sha256": "add20acc6de49fe87d0e9601ba205fadb5ca5dc4701ea84dff994167b875e268"
+    },
+    {
+      "path": "docs/PRIVATE_REPO_REPO_CHECK_WORKFLOW.md",
+      "sha256": "1f41c412337e39236f32e3d0080e9e97109daad1659b19139b1f48fa340b89ea"
+    },
+    {
+      "path": "docs/CONXIAN_SOVEREIGN_SYSTEM_EVOLUTION_REPORT.md",
+      "sha256": "eb6563f5846c09ca51ce14b757fb15ee21a00b9d45ef09cb7aae2c99eac666a3"
+    },
+    {
+      "path": "docs/LIB_CONCLAVE_SDK_BOS_BUILDOUT.md",
+      "sha256": "774741186b260269d835ab47fec46fcba942a4d67bc048818cee35267648a5e6"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "a0fa8a8691114e924389a41ee23cdc3b07d700c4648463806e0724a36bfc4367"
+    },
+    {
+      "path": "docs/CONXIUS_WALLET_BOS_BUILDOUT.md",
+      "sha256": "9c28c74ca8ba2a7c908fa624efebbb320ac6c2aab14585ef935213525578c9a7"
+    },
+    {
+      "path": "docs/GOVERNANCE_FILES_STANDARDIZATION.md",
+      "sha256": "d6c6fef05a371e328041f83f2c34131a015c8a2f14c134a223ba0bf63b7ddd32"
+    },
+    {
+      "path": "docs/SAB_MIGRATION_READINESS_GATES.md",
+      "sha256": "330d69f5751af9648732faf53d4728d3b007dc48ce225c7a2838f0aa24a9a079"
+    },
+    {
+      "path": "docs/ERP_MCP_HANDSHAKE_SPEC.md",
+      "sha256": "a3ad6d87356cf0d4428ef899266724f7aae962e5390d8fab440019becd5d6d90"
+    },
+    {
+      "path": "docs/CONXIAN_PROTOCOL_BOS_BUILDOUT.md",
+      "sha256": "90aeb7956790c5d42cb6fb471c3b3b3a2208e59e463a24383e882635eafea088"
+    },
+    {
+      "path": "docs/templates/RELEASE_NOTES_TEMPLATE.md",
+      "sha256": "1db5171541d29d7d6a8ae151ab33daa4a56f33108163d1c86a9583396b7449a7"
+    },
+    {
+      "path": "docs/templates/CHANGELOG_TEMPLATE.md",
+      "sha256": "38c76af9aae3b1b8cb30183f79aa561c65234831cadae3ec21c6bf5bafa070ff"
+    },
+    {
+      "path": "docs/templates/ZSE_STUB_TEMPLATE.md",
+      "sha256": "daeee2801a9d0717b65e0a0c26a1dcb82c43de9e3f40f1a7872d73c04db7ca87"
+    },
+    {
+      "path": "docs/bounties/MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md",
+      "sha256": "9d2f5d8a1d80adde54e4926b43019dca70c71be93ffb732592342b9c509758b4"
+    },
+    {
+      "path": "docs/bounties/BOUNTY_WORKFLOW.md",
+      "sha256": "5db17bb960ccaae74caf9823a888137cd346890e800a9ae0f2bb9353bc884eec"
+    },
+    {
+      "path": "docs/bounties/CON-231_BOUNTY_CLASSIFICATION_2026-04-12.md",
+      "sha256": "7ba173558d9f4f59c6cc229b844c9022b677544d9abf855a1d159365e273e39f"
+    },
+    {
+      "path": "docs/bounties/CON-137_COMMUNITY_FUNDING_MODEL.md",
+      "sha256": "e41c1cc1163769717a861239977c8e15b5476a15de78b7d183ecd524660d4b2f"
+    },
+    {
+      "path": "docs/bounties/ATS_v14_INJECTION.md",
+      "sha256": "6b1f51fa2163d0785618b0c3c0111606fb89adf17de9139c2778737dd152a97e"
+    },
+    {
+      "path": "docs/protocols/ENTERPRISE_CUSTODY_BASELINE.md",
+      "sha256": "d09d5344f5133e9ccd18f695afc931c3efdb36fae8ea46e3af7930ec6c9e7cea"
+    },
+    {
+      "path": "docs/protocols/SIGNED_EVENT_ENVELOPE_V1.md",
+      "sha256": "1cb35b0db3fd5621628d16ac7a47cbef40533771cd8b11a0a413ee21861dac78"
+    },
+    {
+      "path": "docs/compliance/ZKML_ISO20022_FEASIBILITY_REPORT.md",
+      "sha256": "cf2435c4140fcfbec9245a3a2907a8e6cdfa682da6ae2e99343762ecfe337d9c"
+    },
+    {
+      "path": "docs/operations/SAB_MIGRATION_WAVES.md",
+      "sha256": "885e84db243c22486c41ff31f6277052d92bb325e0182db90e0442b4695aff1b"
+    },
+    {
+      "path": "docs/research/BITCOIN_NATIVE_UPGRADE.md",
+      "sha256": "93d3c2aabb50399b7db53c6223a6717fe490d7f035e873a32793a6ede14a351a"
+    },
+    {
+      "path": "docs/research/BOS_COMPETITIVE_ANALYSIS_AND_ENHANCEMENT.md",
+      "sha256": "15dcc7e3694f4c4bfdae0e2ef77e80aa810bbfcc01bc357b7aa02fc24d2ff7f9"
+    },
+    {
+      "path": "docs/architecture/DECENTRALIZED_DA_RPC_ARCHITECTURE.md",
+      "sha256": "993a8e4b245384315207646aa7dd520cafb61be399c59cd0a2b530074ce2464a"
+    },
+    {
+      "path": "docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md",
+      "sha256": "be411199b0c5fdb1a5af3a10c3c3d92a687cf99790383cb28d705ac70c44ee7a"
+    },
+    {
+      "path": "Conxian/package-lock.json",
+      "sha256": "9e619c32c571d5f0599364d6c83794df444a749472969ec464875c4e811bb8f2"
+    },
+    {
+      "path": "Conxian/CHANGELOG.md",
+      "sha256": "a87025bcd884d059dcd67a4389c3e80606442197024a63b1065afaea3825f6b2"
+    },
+    {
+      "path": "Conxian/SYSTEM_INDEX.md",
+      "sha256": "302545e082bd01e276620d58e0364979f75453eb47bc9f0453775926478e53d7"
+    },
+    {
+      "path": "Conxian/gap-analysis.md",
+      "sha256": "63808b25314023731682a523f24f64bed9e3ea8e6dd2c2bca9b68e514f7f7257"
+    },
+    {
+      "path": "Conxian/ENHANCEMENT_PLAN_MARCH_2026.md",
+      "sha256": "fc49f98caa298736bdbca6deea0debebdd07a69511be467614c3335e469c5aca"
+    },
+    {
+      "path": "Conxian/CXIP-013.md",
+      "sha256": "cad54dda6a4503f9b9fd4d7784432c6303905a15a75399323344734f74a0638d"
+    },
+    {
+      "path": "Conxian/CONTRIBUTING.md",
+      "sha256": "c4e151e6d047fca70fdf608646ccc0a7873c2f2f062dd4160051fbd878858aeb"
+    },
+    {
+      "path": "Conxian/REPAIR_REPORT_JANUARY_2026.md",
+      "sha256": "bbd5805ea4f062f32a6000aeedfd49a698bab28d310aaebf61cea579ddc456f1"
+    },
+    {
+      "path": "Conxian/metadata.json",
+      "sha256": "511ba8531d60ac524f39c6f9307e6f74960b1d2b6fa2503c8603c08795c21ac7"
+    },
+    {
+      "path": "Conxian/CODE_OF_CONDUCT.md",
+      "sha256": "487553a20bdbff0f30408f0d293910fbfff3db9f087c2ddb131769c6dd45dbbd"
+    },
+    {
+      "path": "Conxian/PRD.md",
+      "sha256": "e777992a746dd24e1fa3d3bc74886c4c4a27ba5b05f341d96d17b0cf83093b3c"
+    },
+    {
+      "path": "Conxian/comprehensive-analysis-report.md",
+      "sha256": "1829db115a1625ff2f44ee10dc73327c45b5f2761f2d513fc24dcdc2621cc2d1"
+    },
+    {
+      "path": "Conxian/WIREFRAME.md",
+      "sha256": "8aaee4a7161196275061c14b34b5cef15ce4ff28edecaed5037ea42641b35e71"
+    },
+    {
+      "path": "Conxian/dependency-graph.json",
+      "sha256": "7068566d04bb6bc7e0027735b7ed30268821449f3a8524fb7a66ff0d863a2282"
+    },
+    {
+      "path": "Conxian/AGENTS.md",
+      "sha256": "409749df7aa447b8fa0d6169526ad3fab9395e59c371c419e8538eed076dcd28"
+    },
+    {
+      "path": "Conxian/SECURITY.md",
+      "sha256": "24e63e849e636c32b5e50043733b1923caba503f6ceb3b13e8ea80d81912a9ab"
+    },
+    {
+      "path": "Conxian/DEPLOYMENT_SIGN_OFF_MARCH_2026.md",
+      "sha256": "6c15ba533c192586387f71e9efa73649cd4047a3a175ab0da5171abfcbd940de"
+    },
+    {
+      "path": "Conxian/FUTURE_REPAIRS_PREP.md",
+      "sha256": "7c50db428ad3a667edf2bf9637d7f7ac4449e309fe3e135054b79dc50dc9798f"
+    },
+    {
+      "path": "Conxian/tsconfig.json",
+      "sha256": "769d95fb37ac1de0f00e7455b0693f9ab5ee262fefa52e64bcd48680cf0b66ca"
+    },
+    {
+      "path": "Conxian/verification-checklist.md",
+      "sha256": "faa14c6c8cee80cbcecd6db5afbe74fad952e9286284ebd9d2ad8cf5a5f8ab57"
+    },
+    {
+      "path": "Conxian/package.json",
+      "sha256": "79325e39ffc6d2caf75f13d5110c9e53d7ec17d3dc32df7fe2d06e391f1acc9a"
+    },
+    {
+      "path": "Conxian/README.md",
+      "sha256": "5a360e019e4d609d9d5f28ba9beca867670a78394df62a474cabf85f7013c419"
+    },
+    {
+      "path": "Conxian/GOVERNANCE_RECOVERY_REPORT.md",
+      "sha256": "738e26d1c39a949e4fd4e8e33d2436fe194f1c5de111ad1f57ace915198014d5"
+    },
+    {
+      "path": "Conxian/contracts/position-factory.clar",
+      "sha256": "30a55d7e24667d0795c7ce47c781662e2d8d9437f05eda576cd4c3e6f466b0dd"
+    },
+    {
+      "path": "Conxian/contracts/governance-token.clar",
+      "sha256": "18a03ba8d483bc8ece1ae2e20aa576a93f62a423eae9ccf86dc987c173219e6e"
+    },
+    {
+      "path": "Conxian/contracts/test-c4.clar",
+      "sha256": "ed0576fd851d0ecd7d90457b8c994e182f406a61ed314df8af5f0d8d04f8c235"
+    },
+    {
+      "path": "Conxian/contracts/automation/batch-processor.clar",
+      "sha256": "d691e27e27d975246e059c95b4c9eb09adcc18b3b6d5cededff0251f7ba73d20"
+    },
+    {
+      "path": "Conxian/contracts/automation/automation-manager.clar",
+      "sha256": "7e99a3f88aee4b5d1d25c68a0431fc999dab9bd171c49f8c1e08978e6afc5370"
+    },
+    {
+      "path": "Conxian/contracts/automation/README.md",
+      "sha256": "161defb2c92212c7512a3b2e10eccf36df37da5b0be8830b7809d2bd825fc973"
+    },
+    {
+      "path": "Conxian/contracts/automation/office-manager.clar",
+      "sha256": "9ec68bba72aa68872a301e700697000628a87510240f92f5ad45be5f34987804"
+    },
+    {
+      "path": "Conxian/contracts/sbtc/dlc-manager.clar",
+      "sha256": "d7ee881e2c122b1e67cdd02f7ca432db1f4ca7cf553599b93da446298acee94b"
+    },
+    {
+      "path": "Conxian/contracts/sbtc/README.md",
+      "sha256": "709f416ca0a8df5162e63350770c740fc8ef68ebff99e2d3da339f99bbd80bab"
+    },
+    {
+      "path": "Conxian/contracts/orders/README.md",
+      "sha256": "7d071923825c653b60a4ecb628a91ce96c71c8712ba17259421135bd2916cb7b"
+    },
+    {
+      "path": "Conxian/contracts/orders/order-book.clar",
+      "sha256": "08ff40ff4cb67b20ee462fc122c9880bd589dd9a7a8fda2059a579385496e6fa"
+    },
+    {
+      "path": "Conxian/contracts/agents/agent-treasury.clar",
+      "sha256": "34c7040919cf055d94e114c3e4ee295baa019b282b5712482b85048dbd7151d9"
+    },
+    {
+      "path": "Conxian/contracts/agents/README.md",
+      "sha256": "82de4062b3fd3957b23a22a79229eedd754d73eea1f357ab4473ada7572c4a08"
+    },
+    {
+      "path": "Conxian/contracts/agents/agent-risk.clar",
+      "sha256": "131439599aeb1de8f015c54f0a2a79d194fb8c6e91a68e3a25f9921000f5a0e3"
+    },
+    {
+      "path": "Conxian/contracts/lending/lending-manager.clar",
+      "sha256": "5ece12aab485933726f8ae51391b0f027dadc94348fbd27dce144b55360ebefe"
+    },
+    {
+      "path": "Conxian/contracts/lending/interest-rate-model.clar",
+      "sha256": "bd422d2577965f81f51e896a244c6159f52f8132013311cc5d5460f074948210"
+    },
+    {
+      "path": "Conxian/contracts/lending/README.md",
+      "sha256": "27f57b4f721b2acc99b7e3ad221515f7444658def4ec03e86c12045bfa82eda5"
+    },
+    {
+      "path": "Conxian/contracts/vaults/fee-manager.clar",
+      "sha256": "975453c5af623afea5971e5f796d122dfac67bcd0c4bf4d9c45ef5e537a98af2"
+    },
+    {
+      "path": "Conxian/contracts/vaults/yield-aggregator.clar",
+      "sha256": "9b2cca7027cb5b37d03875cd8166441bb79819658d1541156aec3d020838b451"
+    },
+    {
+      "path": "Conxian/contracts/vaults/custody.clar",
+      "sha256": "0b4a1be959ca2747a8845cf9af174c58b9f8d13ef94c2eb68ade685560da45d6"
+    },
+    {
+      "path": "Conxian/contracts/vaults/sbtc-vault.clar",
+      "sha256": "03d947ab16f021b8793bb780124baadfc64ba5e5950360fcee4204c5c98b6a56"
+    },
+    {
+      "path": "Conxian/contracts/vaults/README.md",
+      "sha256": "72c3307e587f606e7392b4aaa7644a4f9240b3ec07beec53537cadf2576d7d03"
+    },
+    {
+      "path": "Conxian/contracts/audit-registry/README.md",
+      "sha256": "db3dfdfd488b1c7c04da2a0e0e4e8574c09f490b4ef00d2fdab92af5c4d2c315"
+    },
+    {
+      "path": "Conxian/contracts/helpers/optimization-helpers.clar",
+      "sha256": "08ff40ff4cb67b20ee462fc122c9880bd589dd9a7a8fda2059a579385496e6fa"
+    },
+    {
+      "path": "Conxian/contracts/helpers/README.md",
+      "sha256": "ac659c3e60676980e064ad17badefb087d4412a1c0db0933c694eb8b747b825e"
+    },
+    {
+      "path": "Conxian/contracts/mev/mev-protection-nft.clar",
+      "sha256": "08ff40ff4cb67b20ee462fc122c9880bd589dd9a7a8fda2059a579385496e6fa"
+    },
+    {
+      "path": "Conxian/contracts/mev/position-factory-root.clar",
+      "sha256": "08ff40ff4cb67b20ee462fc122c9880bd589dd9a7a8fda2059a579385496e6fa"
+    },
+    {
+      "path": "Conxian/contracts/mev/README.md",
+      "sha256": "f37e85f40d4208956417285a081415810579b8f26aae0b10a55e1e97cc6e083f"
+    },
+    {
+      "path": "Conxian/contracts/integrations/pyth-oracle-adapter.clar",
+      "sha256": "f9d700d0a4a18f9a56ba18bda670e32e999e0c07172ecd4994a46b7a3f0f527f"
+    },
+    {
+      "path": "Conxian/contracts/integrations/twap-oracle.clar",
+      "sha256": "e76b5f91bce446ed1a5c190b02fb06661b07bc7958c8d48d7460b4d72bfc7f72"
+    },
+    {
+      "path": "Conxian/contracts/integrations/chainlink-adapter.clar",
+      "sha256": "418424010a63b1527db95536e343ac2371e085167af436859b5a74b2f99e8272"
+    },
+    {
+      "path": "Conxian/contracts/integrations/switchboard-oracle-adapter.clar",
+      "sha256": "7e3d008534b03ef1e610ba30ad4bed43ef8241b7b9fb6af67c328bccf958ee4e"
+    },
+    {
+      "path": "Conxian/contracts/integrations/alex-adapter.clar",
+      "sha256": "822ce80960ed27d4c7b73991c06b19978b995fcaf2151b40f9cd5875fc4205cf"
+    },
+    {
+      "path": "Conxian/contracts/integrations/dia-oracle-adapter.clar",
+      "sha256": "03964849021e2f478ccb0bd8b5a2725a159f0dfc82f114d8f1b0fabe84b2d2cc"
+    },
+    {
+      "path": "Conxian/contracts/integrations/redstone-oracle-adapter.clar",
+      "sha256": "7fea5e8750b51a1deed1f07a41486a5bdfabf313c4dd9da669ce486b53240612"
+    },
+    {
+      "path": "Conxian/contracts/integrations/README.md",
+      "sha256": "1b82bac8f078976ab61a9c5977fdd4aa804eb1ec29a09a866ad3ed13fd7b20ca"
+    },
+    {
+      "path": "Conxian/contracts/config/README.md",
+      "sha256": "fc6e906363f47cd9a81ad2369a0facf65a261244ee6bb5ca3da00934d57cb38f"
+    },
+    {
+      "path": "Conxian/contracts/tokens/cxs-token.clar",
+      "sha256": "079015f103cc08ccc9ad0145b03af1d280a4424fff556e9330fcac44f9a08bcd"
+    },
+    {
+      "path": "Conxian/contracts/tokens/cxlp-token.clar",
+      "sha256": "aeaa8633cd8d4b1106fa51c202f166477996086aebddaf9f59bbd79514e9cb63"
+    },
+    {
+      "path": "Conxian/contracts/tokens/token-system-coordinator.clar",
+      "sha256": "5861f00bd809f98bcdf1481fa99c170d82eed4dcc89be56d51f7914670d49fc2"
+    },
+    {
+      "path": "Conxian/contracts/tokens/cxvg-token.clar",
+      "sha256": "c9a0a8c5984bc11dda7b75f34a8ebe9b639e868040005cfda610ae03f66e74b7"
+    },
+    {
+      "path": "Conxian/contracts/tokens/cxd-price-initializer.clar",
+      "sha256": "2310ab6f151854d01c041ce09280a8bbcf030f61476b2e2176c89b499b40ef5c"
+    },
+    {
+      "path": "Conxian/contracts/tokens/cxtr-token.clar",
+      "sha256": "10183b93316c071d9f7399983e47842735d675809a18c1c6b7ec60f77a65eeb0"
+    },
+    {
+      "path": "Conxian/contracts/tokens/README.md",
+      "sha256": "2f12716aadf98aac46db4ac7e8d8c9c1a0dce1bc03bb8ff4785eeb9373cd790f"
+    },
+    {
+      "path": "Conxian/contracts/tokens/cxd-token.clar",
+      "sha256": "4218f6038f20cf23d226ab7f34b4041f82d6f93daf5b8178b273c839974b6453"
+    },
+    {
+      "path": "Conxian/contracts/tokens/cxlp-position-nft.clar",
+      "sha256": "3b2719a7cef6b502cc1b67f9c4f691f2f1e399d7b2c763554f7098fcfaad5b0d"
+    },
+    {
+      "path": "Conxian/contracts/bonding/cxd-bonding-curve-amm.clar",
+      "sha256": "6c5c36d83eb3b644d058ce4ecaafd407d453a3ecdcc5389f34e45d1ace5e987d"
+    },
+    {
+      "path": "Conxian/contracts/bonding/bond-token.clar",
+      "sha256": "da7524c3e06aab44bcc5c7aa81a88a04c294b0fdca55dffd57af21ed4edafbe0"
+    },
+    {
+      "path": "Conxian/contracts/bonding/bond-factory.clar",
+      "sha256": "bf9e6d9d26004bbff73e7bf7cbadd3e197b9ad1d700673a24dad7ab377b82c09"
+    },
+    {
+      "path": "Conxian/contracts/bonding/README.md",
+      "sha256": "05b7a80d1181944dbfc9f24e1068ec6803dbdaa70d711af718f09330dde41e62"
+    },
+    {
+      "path": "Conxian/contracts/staking/dual-stacking-orchestrator.clar",
+      "sha256": "a779b208b9b030dba6e2ff45e1462b5d9cd8f10ff12ab6c154eec3734995e01d"
+    },
+    {
+      "path": "Conxian/contracts/staking/native-stacking-operator.clar",
+      "sha256": "e1bd160f738d897c3d4830e8630ca69919c322e9efd07830edeaad98cef1cca5"
+    },
+    {
+      "path": "Conxian/contracts/staking/README.md",
+      "sha256": "8383accdc1a2793eb3ef6cb467704360bf732e123da9de0694b6595116590e67"
+    },
+    {
+      "path": "Conxian/contracts/utils/rbac.clar",
+      "sha256": "9b6fc2b7c476058906f1050712c9167fbce359df8d680ebe9f509ff35029d61a"
+    },
+    {
+      "path": "Conxian/contracts/utils/block-utils.clar",
+      "sha256": "69d8ca651f9fe8f69727dbb2e31a956274dd739c5bb652d2c66adb5c833729b5"
+    },
+    {
+      "path": "Conxian/contracts/utils/nakamoto-compatibility.clar",
+      "sha256": "59da68f8bfb24c8c7f4ac7d7321221f2d1404c07ce76d46793e061ac01f4ed2a"
+    },
+    {
+      "path": "Conxian/contracts/utils/README.md",
+      "sha256": "8403f6991b60fc8b3e56deb0a69b0bee4be38b0554c9c77a3830d0f29db28bfa"
+    },
+    {
+      "path": "Conxian/contracts/utils/encoding.clar",
+      "sha256": "d6a1ae29e454b08d48157437e21d21244c20868fcbdfa10d6ae96f4024df48ec"
+    },
+    {
+      "path": "Conxian/contracts/migration/legacy-adapter.clar",
+      "sha256": "91cbb89491d84363a6791ae8946d90f955348c551f066369755715b8539eac30"
+    },
+    {
+      "path": "Conxian/contracts/migration/migration-manager.clar",
+      "sha256": "fd018135266237ee06d7b559bdd7fbac0b06fcacb219b5f12f2492c0ef4f1aeb"
+    },
+    {
+      "path": "Conxian/contracts/migration/README.md",
+      "sha256": "15b9102d7cb0906d653167c33ace72ffd9eae3464ffe4f761dd9daaece00b2f9"
+    },
+    {
+      "path": "Conxian/contracts/yield/yield-optimizer.clar",
+      "sha256": "8d692003d00c5173055cc4be3571419e7bc64f2c9d1394db1ba6ef639fe469cb"
+    },
+    {
+      "path": "Conxian/contracts/yield/cross-protocol-integrator.clar",
+      "sha256": "4e759b0fe00e613e469e4175bd86b6a89f7a0aa7f03342593d52c297af16d81b"
+    },
+    {
+      "path": "Conxian/contracts/yield/cxd-staking.clar",
+      "sha256": "2467609f442eb99d649d9b4f76da5a5b28a6b0fcfb6758a7d1af6defa9a6d9c2"
+    },
+    {
+      "path": "Conxian/contracts/yield/enhanced-yield-strategy.clar",
+      "sha256": "c3122ff22369c8ee79fc40cb93fa77f7b226c05662004004fdbd9c2bd4a3367b"
+    },
+    {
+      "path": "Conxian/contracts/yield/token-emission-controller.clar",
+      "sha256": "0781fd80a2133fcdc1a9459fafdc92a58d59c6159226edc42703d03fcbc2f539"
+    },
+    {
+      "path": "Conxian/contracts/yield/auto-compounder.clar",
+      "sha256": "d8fe264960c7c46bd7cb187eacc045859bae47d3b24c7f3068f141913dc4e4fc"
+    },
+    {
+      "path": "Conxian/contracts/yield/README.md",
+      "sha256": "7ac82cca9d31685f4bd222029e9384a16a7d391f1553e3f55e565d865e07894e"
+    },
+    {
+      "path": "Conxian/contracts/compliance/compliance-manager.clar",
+      "sha256": "df48b2abdda7ae9cc894ab8ca3f9ea340dd855925961743bfcf529abdd0283f8"
+    },
+    {
+      "path": "Conxian/contracts/compliance/regulatory-adapter.clar",
+      "sha256": "38f65e5b55b5edefd8ecf9042c374392c1a998b0096c658606afafe732181504"
+    },
+    {
+      "path": "Conxian/contracts/compliance/compliance-hooks.clar",
+      "sha256": "1d3d2314e0f064c6280e2123166b516736b997feaf21ff122cd368b69346dbd5"
+    },
+    {
+      "path": "Conxian/contracts/compliance/compliance-trait.clar",
+      "sha256": "13c11516ef8b3583059faf8d0c9451f511013c41ad98eba78012972d5d7ab471"
+    },
+    {
+      "path": "Conxian/contracts/compliance/README.md",
+      "sha256": "bc0de5854774a1190b413a2fa820057b2cba9373e432ba189166f4b319c1ecc9"
+    },
+    {
+      "path": "Conxian/contracts/compliance/travel-rule-service.clar",
+      "sha256": "e0d4a1eb5796f917a823d8038b2f57826230337764803929784570d993e35776"
+    },
+    {
+      "path": "Conxian/contracts/governance/upgrade-controller.clar",
+      "sha256": "661630d8d46d20e42720cc61c8293aff61cc95b7d1f793b36e35345c9f67cd94"
+    },
+    {
+      "path": "Conxian/contracts/governance/lending-protocol-governance.clar",
+      "sha256": "f8e0e4299e43a488e4959475f10b5abaef70127d1cc0e3a0a947e7e72c2118a7"
+    },
+    {
+      "path": "Conxian/contracts/governance/timelock.clar",
+      "sha256": "ea74446b629c8babba249945caa671d2a5fd959381652c67a6e9ee4d9c25ecce"
+    },
+    {
+      "path": "Conxian/contracts/governance/yield-governance.clar",
+      "sha256": "857898be152702f7cf704597377cde6634fb45fa763eb9d3a132e78dc2a89fba"
+    },
+    {
+      "path": "Conxian/contracts/governance/community-voting-engine.clar",
+      "sha256": "302643ddb3a857db86d1d11c32131e298fd30643a19eb899cf9c19a291d6017d"
+    },
+    {
+      "path": "Conxian/contracts/governance/proposal-engine.clar",
+      "sha256": "92598b134ea9e886509cb914442f22cbab23d2c956e9cae783f6dfa54b8f73d4"
+    },
+    {
+      "path": "Conxian/contracts/governance/treasury-governance.clar",
+      "sha256": "cb67685df4afcfe8670f1245146df0d441895e042ad5c5596d6f5f3abf7ed56b"
+    },
+    {
+      "path": "Conxian/contracts/governance/gauge-manager.clar",
+      "sha256": "41e114f7bcbb5882c77ce447768adeb54a90942e534bce73df77e4c3cca05fe9"
+    },
+    {
+      "path": "Conxian/contracts/governance/community-dao.clar",
+      "sha256": "29eaffb5b04dfa9f298144ac97c4dd3804467d82a8a27e571aa434c59311db1a"
+    },
+    {
+      "path": "Conxian/contracts/governance/dao-treasury.clar",
+      "sha256": "306b776c7e5258ee6c2acd14f9ec5acbb0d22a1c410c82e4a8be1d782461b6ee"
+    },
+    {
+      "path": "Conxian/contracts/governance/ico-offering.clar",
+      "sha256": "08d60cdcd11515e25fa0b2492c43619a87bdccda433bd460aee6d67bc9145cbd"
+    },
+    {
+      "path": "Conxian/contracts/governance/voting.clar",
+      "sha256": "2061067298cd6eb6675f4e416370370d768b4a5cbcdcb97cfc392e76f20502a1"
+    },
+    {
+      "path": "Conxian/contracts/governance/proposal-executor.clar",
+      "sha256": "dae2d0934a44eb6e45db627174345ef9cd1a334b4860f89423fce7b24f57b584"
+    },
+    {
+      "path": "Conxian/contracts/governance/governance-handover.clar",
+      "sha256": "281ca4139395f29c55c2f81c79450d77274a656e583e646787d4f8d3562faadb"
+    },
+    {
+      "path": "Conxian/contracts/governance/gamification-manager.clar",
+      "sha256": "17f4cf246eb884c0b483832cf3ecb1f6da9288afacb71c2c15283c088f60dbf8"
+    },
+    {
+      "path": "Conxian/contracts/governance/signed-data-base.clar",
+      "sha256": "e31e547887e04493b7260a9c6287c38680c3014526dbfe52e9083ef50d4b8266"
+    },
+    {
+      "path": "Conxian/contracts/governance/community-governance-token.clar",
+      "sha256": "44a498f5fa6f12a79a692eabe2944629f9050f4f5e8ace422300908906969bcb"
+    },
+    {
+      "path": "Conxian/contracts/governance/enhanced-governance-nft.clar",
+      "sha256": "3b2e754bc30153b2731ddffc6aace57b2ed7ab877974a27c13c4081ee982ddd4"
+    },
+    {
+      "path": "Conxian/contracts/governance/governance-signature-verifier.clar",
+      "sha256": "10999400f8c418b9ea897430edf8bf0965b8c2e346e92435357b3fba755afbc0"
+    },
+    {
+      "path": "Conxian/contracts/governance/proposal-engine-trait.clar",
+      "sha256": "46f908a157e8047a488c28bfe437ee6a25d56a8f2f46c4c60fcde0e8ff640051"
+    },
+    {
+      "path": "Conxian/contracts/governance/reputation-engine.clar",
+      "sha256": "186106a7fbb6117fbe832e39b88e428bd421a57e15e60bfa6698d46c6d179b6f"
+    },
+    {
+      "path": "Conxian/contracts/governance/emergency-governance.clar",
+      "sha256": "7cfb57e0f18a6da974186dee34082b18de7a4905c080032826142d1ba38d0b51"
+    },
+    {
+      "path": "Conxian/contracts/governance/README.md",
+      "sha256": "91a1f9f7a829c94bbb52d7e332889199abe0af55e5a29e5eada32a3c0633e5b0"
+    },
+    {
+      "path": "Conxian/contracts/governance/proposal-registry.clar",
+      "sha256": "ba194d9e9bb1aaf036f9cf9f4415028e62708d3acb37edf1dca4ed70f5e8f800"
+    },
+    {
+      "path": "Conxian/contracts/governance/legal-representative-registry.clar",
+      "sha256": "ca9fb6d7101ba52eca9e4d682cc04dfb3f9e1b794533eb24c5d9e22e8e199813"
+    },
+    {
+      "path": "Conxian/contracts/core/batch-operations.clar",
+      "sha256": "879354c34f5e2f41d4cb8a81ebfbc5fc5db2562756c71a2259df612888757aa7"
+    },
+    {
+      "path": "Conxian/contracts/core/founder-vesting.clar",
+      "sha256": "2c803772b40bc072781d47826044f9b2c6b0043e4c9e5871e6d52734ccb08c87"
+    },
+    {
+      "path": "Conxian/contracts/core/funding-rate-calculator.clar",
+      "sha256": "2534ec4a25fc8474bb655517e0361464faede94f5ba3a80431f6770d3505ffd1"
+    },
+    {
+      "path": "Conxian/contracts/core/conxian-access.clar",
+      "sha256": "f144fb2a43bf9302e39beb852c64282931430e9e574d98d59c587eead8dece8f"
+    },
+    {
+      "path": "Conxian/contracts/core/ops-engine.clar",
+      "sha256": "e75877b4d03a6cf480d89172de697fc6dd94fb3b46ae2345bd89a2e1f78b4c30"
+    },
+    {
+      "path": "Conxian/contracts/core/dimensional-engine.clar",
+      "sha256": "3e4d140d0a13bc8f95768d4731850f9924742519e5773191832550865ed55c2b"
+    },
+    {
+      "path": "Conxian/contracts/core/admin-facade.clar",
+      "sha256": "efd1b1fde6829468b0c10b601a7dfc97daf17010dcb24b5bb069ccdc98b9684f"
+    },
+    {
+      "path": "Conxian/contracts/core/economic-policy-engine.clar",
+      "sha256": "c193f6bab97e4d217392022c11770f04b150f5f2266a7bc8625e02000bea5200"
+    },
+    {
+      "path": "Conxian/contracts/core/conxian-exit-queue.clar",
+      "sha256": "0dc184f1f74c067a5b8dcbcb9cb17b1f011fb3d671155fdb81d23b705d99c784"
+    },
+    {
+      "path": "Conxian/contracts/core/risk-manager.clar",
+      "sha256": "571dd5b714fe94cad2c17306fd42492b321b5f8e8c026b70ff577ce408118f25"
+    },
+    {
+      "path": "Conxian/contracts/core/conxian-paas-factory.clar",
+      "sha256": "4026e50a1725bee6f65ad91745ef07d5ec24f7df6f6db235c4d83e55f0ac641a"
+    },
+    {
+      "path": "Conxian/contracts/core/collateral-manager.clar",
+      "sha256": "5e081fd529b46272d83107a4aaf760eadfe9c98c0493c54a104aa7879672769d"
+    },
+    {
+      "path": "Conxian/contracts/core/bme-engine.clar",
+      "sha256": "b4a29faffd6fe8b6e2bbe3cc15ddd6b08b842f87ced84d51a9c36e222c70cd9a"
+    },
+    {
+      "path": "Conxian/contracts/core/position-manager.clar",
+      "sha256": "558e5560c780677d99542932894a50ea6d047c4f58db87fb31bb9e0433f97503"
+    },
+    {
+      "path": "Conxian/contracts/core/conxian-protocol.clar",
+      "sha256": "77da3f7aba0f125bb1dca037436b44d93aac3feb51b841132d0ead8a0b8f8e70"
+    },
+    {
+      "path": "Conxian/contracts/core/operational-treasury.clar",
+      "sha256": "aefa1e831269f7008c8c360d74306ef6311558ff7ebc9d919152a3426416395b"
+    },
+    {
+      "path": "Conxian/contracts/core/README.md",
+      "sha256": "180cd8d01f2d7f22e446a91ddfabb8cc11d08732a8eb6d3f5caa9fecd8aff217"
+    },
+    {
+      "path": "Conxian/contracts/core/office-manager.clar",
+      "sha256": "a1df9d7ade25fe3fbf7eae2899a73208119b878263d65964473e2fbdd755011d"
+    },
+    {
+      "path": "Conxian/contracts/security/proof-of-reserves.clar",
+      "sha256": "f39f67ea1aef99a58bc514b0c5a85cce210637b50d53a17d598d2390ef9251ef"
+    },
+    {
+      "path": "Conxian/contracts/security/rate-limiter.clar",
+      "sha256": "490e7d06a7286abdd9a7fa39b148ef34ce30c2e933b329df7637db7b004f1c95"
+    },
+    {
+      "path": "Conxian/contracts/security/mev-protector.clar",
+      "sha256": "07e00929585a5a468b3e7e03d76d8ee42610c4abdaa232540cdd0745a03cf628"
+    },
+    {
+      "path": "Conxian/contracts/security/conxian-insurance-fund.clar",
+      "sha256": "946529e60e95559c601c3cb69f019383823d9a1f1f77b7e1a23a83ea4a4fb9ef"
+    },
+    {
+      "path": "Conxian/contracts/security/circuit-breaker.clar",
+      "sha256": "d74452cdcfabc63de9e5da84b73c8a3bc682d92595fbe3ee6ab0c1bdf5be2c95"
+    },
+    {
+      "path": "Conxian/contracts/security/README.md",
+      "sha256": "68dfc479e210aacce3862e32d4b7aa2102ee2289539d7fadc6552c5af57a66cd"
+    },
+    {
+      "path": "Conxian/contracts/security/enhanced-circuit-breaker.clar",
+      "sha256": "682dd70e4668283261e025beee2916fc426642e28d46bfbf5dcf9ed66b47ad29"
+    },
+    {
+      "path": "Conxian/contracts/oracle/federated-oracle-adapter.clar",
+      "sha256": "26792bde4b18ed61725b4d9c89c3bc41f283ab1adfe7068a68b988ff72a2d8bf"
+    },
+    {
+      "path": "Conxian/contracts/oracle/oracle-aggregator.clar",
+      "sha256": "153517c1efe47c7f8012b14af08be2dea08ad7b82786df6800a6b691fc895ceb"
+    },
+    {
+      "path": "Conxian/contracts/oracle/points-oracle.clar",
+      "sha256": "222b3592a30686aecb58d534774bd57e1434717202273bc7d178374c90a5bc9e"
+    },
+    {
+      "path": "Conxian/contracts/oracle/external-oracle-adapter.clar",
+      "sha256": "08ff40ff4cb67b20ee462fc122c9880bd589dd9a7a8fda2059a579385496e6fa"
+    },
+    {
+      "path": "Conxian/contracts/oracle/oracle-adapter-stub.clar",
+      "sha256": "08ff40ff4cb67b20ee462fc122c9880bd589dd9a7a8fda2059a579385496e6fa"
+    },
+    {
+      "path": "Conxian/contracts/oracle/dimensional-oracle.clar",
+      "sha256": "727a1e2295540f093716b6f80d145055c69c7023240be2b4a7da8a581359c8a3"
+    },
+    {
+      "path": "Conxian/contracts/oracle/README.md",
+      "sha256": "db00c796e410b7aac3d26ba2a0a11e57171c0d6e48f4007047b01cfef44acc4f"
+    },
+    {
+      "path": "Conxian/contracts/test-helpers/mock-token.clar",
+      "sha256": "94baa2bbd4ebf9c2bc503e8ae34c619f8d093cb85f29f3254b1e6bb39c258fe8"
+    },
+    {
+      "path": "Conxian/contracts/test-helpers/mock-circuit-breaker.clar",
+      "sha256": "c8b73d83f1053e2f5f4e20d363a4f59641b18fee72422423c4d5d950b1f4c716"
+    },
+    {
+      "path": "Conxian/contracts/test-helpers/test-c4.clar",
+      "sha256": "63bb1329b99aebdb4773a3155ddbf2cf0369038c058614900b934f1689fd96c1"
+    },
+    {
+      "path": "Conxian/contracts/test-helpers/mock-csf-protocol.clar",
+      "sha256": "7b0f37437df97f0b62e49297867a0239cedc53b9a9c8bded42c521cea3267ad2"
+    },
+    {
+      "path": "Conxian/contracts/test-helpers/mock-proposal.clar",
+      "sha256": "3cbdce2067d1279de710bf681c142c3a388fac5df5ac71ce0f0b42d04f1bc19f"
+    },
+    {
+      "path": "Conxian/contracts/test-helpers/README.md",
+      "sha256": "3e27d183c9a0873d3df1ac8316e798190fee8971111f84439f01e4cfee06a7ed"
+    },
+    {
+      "path": "Conxian/contracts/traits/redstone-traits.clar",
+      "sha256": "1cd255ac787d68ad8c70271ab90cd5e247514921852f5ae293df1bebed08c73a"
+    },
+    {
+      "path": "Conxian/contracts/traits/cross-chain-traits.clar",
+      "sha256": "42fb7ff599329ba465b37c37859b089057a8ff70032432472c7ed9e3c534cacb"
+    },
+    {
+      "path": "Conxian/contracts/traits/pausable-trait.clar",
+      "sha256": "5f680a1e9a60815554c8b2d8b86261515b74c08d8c0ae6348697eae47e70c64d"
+    },
+    {
+      "path": "Conxian/contracts/traits/bond-traits.clar",
+      "sha256": "3ae4717937522fa2103f86515710e2fed65c3a51798d895268156fec1de533a8"
+    },
+    {
+      "path": "Conxian/contracts/traits/conxian-service-trait.clar",
+      "sha256": "3dda26ba9924b5b6c18b10c3487beff2ed619f23f57e60c47a9828145fa2977c"
+    },
+    {
+      "path": "Conxian/contracts/traits/dimensional-traits.clar",
+      "sha256": "88ea057360fd4e6d3faec261d6a60d786f356d662564d101efa9858c9d0dbcbc"
+    },
+    {
+      "path": "Conxian/contracts/traits/core-traits.clar",
+      "sha256": "d40074c3b410d2c4afa004ec57b759ab0c9b3373e886b266d589b0b9d598c420"
+    },
+    {
+      "path": "Conxian/contracts/traits/security-monitoring.clar",
+      "sha256": "1a74656d4195cd17ac80a262cd328c69f5760b14e67a7686b813a09d26c27549"
+    },
+    {
+      "path": "Conxian/contracts/traits/controller-traits.clar",
+      "sha256": "0c455313989f41f413955a08d67aa7ee2c3d6ab8286386e0fa7a821a221bcc8a"
+    },
+    {
+      "path": "Conxian/contracts/traits/automation-traits.clar",
+      "sha256": "47d818898617e073569e22eb123d2a75243a52cd2af5aed5f5b6be7c0f761dec"
+    },
+    {
+      "path": "Conxian/contracts/traits/enterprise-traits.clar",
+      "sha256": "c5079ee3192705de08e081fd8e6caf9c0657690f2cedb0bfb5da8ed07ea8c524"
+    },
+    {
+      "path": "Conxian/contracts/traits/access-control-trait.clar",
+      "sha256": "44ce721e2bc965998a6bffe904fdfdb03d10a5ca0b49f5706ec0ec67c12799d9"
+    },
+    {
+      "path": "Conxian/contracts/traits/conxian-intent-trait.clar",
+      "sha256": "4e7bc1f1711e098f047ff9cb533faa6f00d874b9abbfe02b89a1067c37b52257"
+    },
+    {
+      "path": "Conxian/contracts/traits/governance-traits.clar",
+      "sha256": "7f982485394955b3af7d143c2def74bcca9df7853078c2b65a33d3b1759a3ec2"
+    },
+    {
+      "path": "Conxian/contracts/traits/pyth-traits.clar",
+      "sha256": "92455b1e665377141a87195aeed6d629e786468e004ed6e0fa60b1ad6ab3650b"
+    },
+    {
+      "path": "Conxian/contracts/traits/vault-trait.clar",
+      "sha256": "5ca716670c161671f3fb77edcafe20773d046e76f651b04e0259502a30ecd3d5"
+    },
+    {
+      "path": "Conxian/contracts/traits/README.md",
+      "sha256": "bfe8a30c3bdb0231a0e840b2713b39c46c29d08523f000becb404ca073d6994b"
+    },
+    {
+      "path": "Conxian/contracts/traits/conxian-csf-trait.clar",
+      "sha256": "15c591b430bc86128c34af0084cc617cd7767cec592e8c1a0ee0eb05e3510cf6"
+    },
+    {
+      "path": "Conxian/contracts/traits/sip-standards.clar",
+      "sha256": "c2c09e0677c0daea5a13a8dba65a4267c80e360e16e9046f8be4f84edfaa6094"
+    },
+    {
+      "path": "Conxian/contracts/traits/defi-traits.clar",
+      "sha256": "ff01758ab2911394d7e0c906b92f5910e18f6d41f4ab0a6e526914efbf3fd739"
+    },
+    {
+      "path": "Conxian/contracts/traits/queue-traits.clar",
+      "sha256": "c8500e2cc43611bd9a6f1f8bbe40c3bb3488bb33652ed8dffa60c2bcbaf1b321"
+    },
+    {
+      "path": "Conxian/contracts/insurance/insurance-protection-nft.clar",
+      "sha256": "08ff40ff4cb67b20ee462fc122c9880bd589dd9a7a8fda2059a579385496e6fa"
+    },
+    {
+      "path": "Conxian/contracts/insurance/README.md",
+      "sha256": "fca609e2731f4565312392696f63dba8d6f0490637c2d2b8605ed695115fe373"
+    },
+    {
+      "path": "Conxian/contracts/performance/performance-optimizer.clar",
+      "sha256": "e8cfd14ba028215faf1a37ba9097b45a1164d02f9fd2d312ae110e385a7adc9b"
+    },
+    {
+      "path": "Conxian/contracts/performance/README.md",
+      "sha256": "fe0c2a7b50f6bd3096e3ebe12b63864a7acd2ac09a65f6e1c544142b8a32664c"
+    },
+    {
+      "path": "Conxian/contracts/pools/pool-registry.clar",
+      "sha256": "08ff40ff4cb67b20ee462fc122c9880bd589dd9a7a8fda2059a579385496e6fa"
+    },
+    {
+      "path": "Conxian/contracts/pools/pool-factory.clar",
+      "sha256": "08ff40ff4cb67b20ee462fc122c9880bd589dd9a7a8fda2059a579385496e6fa"
+    },
+    {
+      "path": "Conxian/contracts/pools/README.md",
+      "sha256": "e8f9c40ffaf29b5668e64f0c7a58fad0b9c366fedf80e0c20699fc6081f87e30"
+    },
+    {
+      "path": "Conxian/contracts/errors/README.md",
+      "sha256": "4ed5e31b442f4d1fb459445384340af23f280dc1b22373e7f097503e8f3dd308"
+    },
+    {
+      "path": "Conxian/contracts/math/math-utilities.clar",
+      "sha256": "b6ff8968a4e86d034d68977711eec7421e85b6eb52f87f36e92fd2d8eab74d9d"
+    },
+    {
+      "path": "Conxian/contracts/math/exponentiation.clar",
+      "sha256": "891e247e30cece0c3aea96367b3ad80f17c7b1fb1f8962854e567a6a2d8ad505"
+    },
+    {
+      "path": "Conxian/contracts/math/concentrated-math.clar",
+      "sha256": "6a1a70150991ad0a9e51fb6861fbe39750775a15a5ee3a890070b9909bacac1f"
+    },
+    {
+      "path": "Conxian/contracts/math/README.md",
+      "sha256": "dea30c0f202429b2344b95bd17a64a8ce128cf41cd15cced4de4faac22b95683"
+    },
+    {
+      "path": "Conxian/contracts/interfaces/dimensional-engine-interface.clar",
+      "sha256": "08ff40ff4cb67b20ee462fc122c9880bd589dd9a7a8fda2059a579385496e6fa"
+    },
+    {
+      "path": "Conxian/contracts/interfaces/btc-adapter.clar",
+      "sha256": "08ff40ff4cb67b20ee462fc122c9880bd589dd9a7a8fda2059a579385496e6fa"
+    },
+    {
+      "path": "Conxian/contracts/interfaces/README.md",
+      "sha256": "45402afd7bc949bc0309766a27a532b6d6aa9e620269c859a03ef77c42f7f4db"
+    },
+    {
+      "path": "Conxian/contracts/marketplace/nft-marketplace.clar",
+      "sha256": "08ff40ff4cb67b20ee462fc122c9880bd589dd9a7a8fda2059a579385496e6fa"
+    },
+    {
+      "path": "Conxian/contracts/marketplace/README.md",
+      "sha256": "1e052499119477553514c501bb4c307f4539831b0060a51125b86be6bf163573"
+    },
+    {
+      "path": "Conxian/contracts/monitoring/price-stability-monitor.clar",
+      "sha256": "0289c2da14e7a6bd16d1b76caa4a879a50f43874cffe0524023a8e2ee10001c0"
+    },
+    {
+      "path": "Conxian/contracts/monitoring/analytics-aggregator.clar",
+      "sha256": "323da562931503735b8a95a0611b02f7be1a272d1b7fe334e7e0eab174641656"
+    },
+    {
+      "path": "Conxian/contracts/monitoring/finance-metrics.clar",
+      "sha256": "5c928a25c114967b5cacfa11ffdf0a42b25626a1d15a34c27321d9a5621f9fe0"
+    },
+    {
+      "path": "Conxian/contracts/monitoring/README.md",
+      "sha256": "6617bf4ff0d085734cd1441822001e393b5dcd6a26a9adb271cac5c0417d25f3"
+    },
+    {
+      "path": "Conxian/contracts/monitoring/monitoring-dashboard.clar",
+      "sha256": "447553d2dbf6a7762226e99db38eb688ba12c0fb0243164b8dc8ec9b5eeefbd4"
+    },
+    {
+      "path": "Conxian/contracts/base/pausable.clar",
+      "sha256": "06f48ac412b2d35a75e1dfef312d3577eba4a8dadfec2d8ced2da541e34c0d0b"
+    },
+    {
+      "path": "Conxian/contracts/identity/kyc-registry.clar",
+      "sha256": "7ad0215d4567f9c44863d51ce7bd86b9edbc939c190f2f8f36ba57bb8e5681aa"
+    },
+    {
+      "path": "Conxian/contracts/identity/identity-badge.clar",
+      "sha256": "08ff40ff4cb67b20ee462fc122c9880bd589dd9a7a8fda2059a579385496e6fa"
+    },
+    {
+      "path": "Conxian/contracts/identity/README.md",
+      "sha256": "d80841639bf18d44054a040aa4c1ea643f6531c5e1ecae50da0fadb8c9dec8b6"
+    },
+    {
+      "path": "Conxian/contracts/rewards/early-lp-rewards.clar",
+      "sha256": "08ff40ff4cb67b20ee462fc122c9880bd589dd9a7a8fda2059a579385496e6fa"
+    },
+    {
+      "path": "Conxian/contracts/rewards/default-strategy-engine.clar",
+      "sha256": "08ff40ff4cb67b20ee462fc122c9880bd589dd9a7a8fda2059a579385496e6fa"
+    },
+    {
+      "path": "Conxian/contracts/rewards/README.md",
+      "sha256": "de986b37ab9a86dccda055f9a2f854b459e6b97bb67c763cdee780ff3a1f9ae4"
+    },
+    {
+      "path": "Conxian/contracts/gateway/intent-solver-gateway.clar",
+      "sha256": "670ad6d2d6d0677f253cec70695286f20837050b3f8841f35c07f55406b9975a"
+    },
+    {
+      "path": "Conxian/contracts/interoperability/wormhole-inbox.clar",
+      "sha256": "5d3b76dffcdbb559306d56cc05c2c2d6927d607858ad52849e76f8c701b6e601"
+    },
+    {
+      "path": "Conxian/contracts/interoperability/wormhole-outbox.clar",
+      "sha256": "b06bbc264c4b95e772f15228cc49b1da076f327e0bfb2fc7deea4c95a860aee9"
+    },
+    {
+      "path": "Conxian/contracts/interoperability/wormhole-handlers.clar",
+      "sha256": "a2b0992ac35225f47080b283987947e4ede830b168318d4302ec4f90f786b826"
+    },
+    {
+      "path": "Conxian/contracts/interoperability/README.md",
+      "sha256": "93f294f0ba1d5a2238a840a218d46a6f5879ef328532801413b5f7d695dc6d6a"
+    },
+    {
+      "path": "Conxian/contracts/dex/batch-auction.clar",
+      "sha256": "6377854e8620b5f79018b65aa6ce7e959041d59c71700177eae5295b95103f3b"
+    },
+    {
+      "path": "Conxian/contracts/dex/memory-pool-management.clar",
+      "sha256": "ccc1e40af0330094046e97f8ed9f3fdd552349c6dfdc42e76e8b1641d1ad6218"
+    },
+    {
+      "path": "Conxian/contracts/dex/protocol-invariant-monitor.clar",
+      "sha256": "69f036363b79d91b41e45f058a3405c5ea79e0fa4340669b0004b2fee9f65e16"
+    },
+    {
+      "path": "Conxian/contracts/dex/concentrated-liquidity-pool.clar",
+      "sha256": "d7e736b05b4bdeff3a6ac21d0ce16c7833ad8ca7238302057c1aa4b668d99a3d"
+    },
+    {
+      "path": "Conxian/contracts/dex/dex-facade.clar",
+      "sha256": "771ddefe673558f0cc4760764887db31b528c1fea5ae6243dfa17a6aee524b53"
+    },
+    {
+      "path": "Conxian/contracts/dex/liquidity-provider.clar",
+      "sha256": "8b0c1e02c9bbb15b7428f3ecc1ebdef6004c6860f55f14014e362dc98f7d80fb"
+    },
+    {
+      "path": "Conxian/contracts/dex/swap-router.clar",
+      "sha256": "5a24d52da014a51843de07a4d5c0d2204a20393d3cb380ea4a9665e929130e77"
+    },
+    {
+      "path": "Conxian/contracts/dex/liquidity-optimization-engine.clar",
+      "sha256": "14c425562b27ce9a4edafc1717ffebff4feb413ea20751eb0dab3102c8a50bb8"
+    },
+    {
+      "path": "Conxian/contracts/dex/route-manager.clar",
+      "sha256": "20ed9503feab9893cf9e0056795aa3058bb2f0972e0f5813e2f24519f1b7f14f"
+    },
+    {
+      "path": "Conxian/contracts/dex/swap-manager.clar",
+      "sha256": "e97d502e4b45041e8d8d4bafd93014b290dd033f00158da90e2233227eebc08e"
+    },
+    {
+      "path": "Conxian/contracts/dex/predictive-scaling-system.clar",
+      "sha256": "5572c6392c512eb41ee6256ea6e63196c4c65bfe8b97b28f17e4455d2dc338dc"
+    },
+    {
+      "path": "Conxian/contracts/dex/vault.clar",
+      "sha256": "527159bac9977233a16db9c6f404bc4c52c2e490e0df6754924199d33f99def0"
+    },
+    {
+      "path": "Conxian/contracts/dex/pool-template.clar",
+      "sha256": "c279f7aa32cd95add3214b41b234cd665d6b77b1bb1567e6799695de4330bb09"
+    },
+    {
+      "path": "Conxian/contracts/dex/oracle.clar",
+      "sha256": "dbcf31f8d254ea3e4d38e2c61bc5be517a6f32d444aeba584a63e9c707b465ea"
+    },
+    {
+      "path": "Conxian/contracts/dex/rebalancing-rules.clar",
+      "sha256": "02fc35ca2601990d5ddb38c4986806f0557bff8f487e9555f68ab8c89775be4f"
+    },
+    {
+      "path": "Conxian/contracts/dex/dex-factory.clar",
+      "sha256": "f5a7d21bd0a9d76f22168c3c32b3679d4b740264d31cb1dc9df37d5cdacb9b74"
+    },
+    {
+      "path": "Conxian/contracts/dex/README.md",
+      "sha256": "650bd9e8e1306a66648e4e99aeb812f24073500cbdf9f3e52f1750d8ea8f4d2c"
+    },
+    {
+      "path": "Conxian/contracts/dex/liquidity-manager.clar",
+      "sha256": "3dc5f36683407ebf2e88d4d78b69ab8a790b12edddadf6e3265a812cc4a06fae"
+    },
+    {
+      "path": "Conxian/contracts/cross-chain/bridge-nft.clar",
+      "sha256": "1135179b8969978a8c061ae69eab073e38443c79704523cc48ac20be7fd0ed5b"
+    },
+    {
+      "path": "Conxian/contracts/cross-chain/README.md",
+      "sha256": "01afef54fdb4efd15ee829749ccb6838c53cbfc72792349669de77c97ab41966"
+    },
+    {
+      "path": "Conxian/contracts/lib/clarity-bitcoin.clar",
+      "sha256": "67c5e50e1ba29b3d22d6d6e7497326cb6e48e3f3e38189920fd9cc0edc8ad0e4"
+    },
+    {
+      "path": "Conxian/contracts/lib/README.md",
+      "sha256": "7432b6976f3ba544cd6a49b2c71cbf556521d1727bbe4a6e775e44930aea0bae"
+    },
+    {
+      "path": "Conxian/contracts/constants/nakamoto-constants.clar",
+      "sha256": "e00592574236787807640ed9576e9d5de01b58fe15ae045436bc1cc74283015c"
+    },
+    {
+      "path": "Conxian/contracts/constants/README.md",
+      "sha256": "4e3b859f62901ab47cf5bd2c165727adf5d54677f5487c841e4282efebb51579"
+    },
+    {
+      "path": "Conxian/contracts/access/README.md",
+      "sha256": "c538dd99cce019e6efda9d177bf2916b3575eb99392ff34a3ea69df5f6ea5fb8"
+    },
+    {
+      "path": "Conxian/contracts/dimensional/position-nft.clar",
+      "sha256": "a3263761d19cc38d93253199f6789a046ab5f9a61beb37f30a46ea17f7dff3d0"
+    },
+    {
+      "path": "Conxian/contracts/dimensional/dimensional-core.clar",
+      "sha256": "106fa92e7e6255e754ae2c509754150dd1070414c2c49afbdb9ab7a4f55fe408"
+    },
+    {
+      "path": "Conxian/contracts/dimensional/dim-oracle-automation.clar",
+      "sha256": "6fec136ded9896e37a4171af60b40ca816d9b5baa33857b3ae05fa1cfbb884b1"
+    },
+    {
+      "path": "Conxian/contracts/dimensional/governance.clar",
+      "sha256": "d0bf40d72e6acb2022d3d1d4242c0a60bd363ecebe51c06bd84dd5f29612a6b6"
+    },
+    {
+      "path": "Conxian/contracts/dimensional/README.md",
+      "sha256": "da4eab24b12c0eb3fb1e0ca8f3f14c651e7b74fc80810ffc35288f14fe9aecb0"
+    },
+    {
+      "path": "Conxian/contracts/treasury/founder-vault.clar",
+      "sha256": "7b7aaf6a4786600fcd1452e36b0380298523dcf58aa8e0ecaa2a341c94b43f5e"
+    },
+    {
+      "path": "Conxian/contracts/treasury/revenue-distributor.clar",
+      "sha256": "b0b73c6d3af28c63de2263048b7fa6249a286a4f82bca3fa4fe5d1c13c778281"
+    },
+    {
+      "path": "Conxian/contracts/treasury/revenue-automation.clar",
+      "sha256": "6b02d28d44c91ef98034c192d43d24f2597eac2689fffdcaf9059a235adc02a4"
+    },
+    {
+      "path": "Conxian/contracts/treasury/cxd-treasury.clar",
+      "sha256": "9be879893a2afc510112a68d46e79b044812c7074007872c36c9b19280ecfffa"
+    },
+    {
+      "path": "Conxian/contracts/treasury/opex-vault.clar",
+      "sha256": "275c4f82a59cf517e5a8d776a0dc839d4d50482a7b9966b5b6843932644ecb08"
+    },
+    {
+      "path": "Conxian/contracts/treasury/conxian-vaults.clar",
+      "sha256": "4a43ed7a308d8ce45d58f17a7b505fdc2677f374d139cbbe684cf1eb2b87a2e1"
+    },
+    {
+      "path": "Conxian/contracts/treasury/README.md",
+      "sha256": "f46aa46144d1ad2dc953599108052abcdee6aedfc224e8ef9f81e9c016e013a3"
+    },
+    {
+      "path": "Conxian/contracts/treasury/allocation-policy.clar",
+      "sha256": "459bb1daf01d32085b98fa766050efe99ac7448532ccccdf8a82b74c093dc063"
+    },
+    {
+      "path": "Conxian/contracts/enterprise/advanced-order-manager.clar",
+      "sha256": "b59f27c138a48b83f0506562016701ea6b11debe63a4c7e3ce330e90a8ee7df7"
+    },
+    {
+      "path": "Conxian/contracts/enterprise/enterprise-api.clar",
+      "sha256": "ba0bbf073495d61263f9e068390a6b16c7f06de1e81e06ccfe186598c63975d5"
+    },
+    {
+      "path": "Conxian/contracts/enterprise/enterprise-facade.clar",
+      "sha256": "ed27356e4646f85759d6999676ec80bc8ed33acfe22a49e90cb9282d45d4ee7d"
+    },
+    {
+      "path": "Conxian/contracts/enterprise/ops-loan-manager.clar",
+      "sha256": "004163182b2917465c8bf4366a8f19172f7f3ab456ec00663d05902947e1deff"
+    },
+    {
+      "path": "Conxian/contracts/enterprise/README.md",
+      "sha256": "0e127e518f8598f0178be8690a96a9d055df0e83097bd59c742603f15f177544"
+    },
+    {
+      "path": "Conxian/.windsurf/workflows/clarinet-repair.md",
+      "sha256": "4e4213d38fafca340e7c01bc81d52c798d1b04f2a684d13c24163d96aaacee22"
+    },
+    {
+      "path": "Conxian/docs/STANDARDS_VALIDATION_SESSION_7.md",
+      "sha256": "1ded0c9981ce562b0036e8ae2066766fa40517fae50ede7be2ee365d7154504e"
+    },
+    {
+      "path": "Conxian/docs/STANDARDS_VALIDATION_REPORT.md",
+      "sha256": "883c69d25d85d7d54576887db173ae9bbcb7de39075eff8689ccc85512998680"
+    },
+    {
+      "path": "Conxian/docs/DOCUMENTATION_STATE.md",
+      "sha256": "28d0184fd389e6beb2ae2fefdec7d6db305f2dac6c240aefc8c327b0320c4e2e"
+    },
+    {
+      "path": "Conxian/docs/STANDARDS_VALIDATION_SESSION_10.md",
+      "sha256": "d7ec6a2e3b3d79bc50f3b255be20abea31ae0c921dcabd05c8903c2cc01d4d66"
+    },
+    {
+      "path": "Conxian/docs/REVENUE_ANALYSIS.md",
+      "sha256": "82a5f1e0ee3e952ae77e1b3f526333204046d8ac4efc08623986761dff038427"
+    },
+    {
+      "path": "Conxian/docs/STANDARDS_AUDIT_COMPREHENSIVE.json",
+      "sha256": "6a96a6933050fb5e698bab6b76e8081f581cda13f0b829b8a420e25ef7301fad"
+    },
+    {
+      "path": "Conxian/docs/BENCHMARKS.md",
+      "sha256": "3a6ade7701626aec279e138debdc450aecfd1be9bc707b8390346abc813a76f1"
+    },
+    {
+      "path": "Conxian/docs/STANDARDS_VALIDATION_SESSION_9.md",
+      "sha256": "bf058f8df05df4c6cd30b318a41506975136c7942c32cbfab00f11d54b8ff44f"
+    },
+    {
+      "path": "Conxian/docs/STANDARDS_VALIDATION_SESSION_12.md",
+      "sha256": "ff7e41922e98f563154df837f089bbcb64087b6f38a96448314ed4d9c3356ec0"
+    },
+    {
+      "path": "Conxian/docs/WHITEPAPER.md",
+      "sha256": "86721915c693c962c5af38ffbf757b86746c0c96706d2eff74d67d45ff7c7a4f"
+    },
+    {
+      "path": "Conxian/docs/index.md",
+      "sha256": "21596d185cf4b59b1be0b99b440cdd962526ed2372506398469a68f57238fea5"
+    },
+    {
+      "path": "Conxian/docs/ROADMAP.md",
+      "sha256": "f2d18f19dcbc7b9b8176b9942378942b84f0b7b82207e9e88c661dbb57501a5f"
+    },
+    {
+      "path": "Conxian/docs/STANDARDS_VALIDATION_SESSION_8.md",
+      "sha256": "48d61a128ff4791e0a91699aab78ec3cae057d570a6d4944801bf88a338f2afc"
+    },
+    {
+      "path": "Conxian/docs/STANDARDS_VALIDATION_SESSION_2.md",
+      "sha256": "bf6d5b954f490a5f3b68f61819b1f7bf567fcb764ea5a4e0d946f64bb778f024"
+    },
+    {
+      "path": "Conxian/docs/STANDARDS_VALIDATION_SESSION_3.md",
+      "sha256": "7b78e453ea07f9deb4037e9a82d74a4c690941753aa8828fc4895eabe461147c"
+    },
+    {
+      "path": "Conxian/docs/STANDARDS_VALIDATION_SESSION_6.md",
+      "sha256": "f90a556b015d695a5c3374cbb34d75ddc06e3736e8e81bfc5a09a41d7c90f770"
+    },
+    {
+      "path": "Conxian/docs/STANDARDS_VALIDATION_SESSION_11.md",
+      "sha256": "f2cce7367e4d63023655fe04999a9a20c3aa5eb710998e5775975cf58c8af0e8"
+    },
+    {
+      "path": "Conxian/docs/TESTING.md",
+      "sha256": "41f164cc3ff530e8e7b5ba2455e24d37e6ae43793247941739982b8d83c38c77"
+    },
+    {
+      "path": "Conxian/docs/REQUIREMENTS_TESTING.md",
+      "sha256": "38a4993f45cf18468c31bdac9f6e33ee7174272c846c722a4c4b5adbd8c3765c"
+    },
+    {
+      "path": "Conxian/docs/SYSTEM_REVIEW_REPORT_JAN_2026.md",
+      "sha256": "b7be8b926731d45098853b27211e26a340703bc63dac7243d9fe042e6f7f8df7"
+    },
+    {
+      "path": "Conxian/docs/CJCS_v2.0_SPEC.md",
+      "sha256": "a3742dbfbd9258f9ae0dd7ff604be25acaa0ebc4ef38866d67b4258d5f86d606"
+    },
+    {
+      "path": "Conxian/docs/STANDARDS_VALIDATION_SESSION_1.md",
+      "sha256": "087b9dad35610dc35026498a2e418e239c7c30d55b0c6e494a6f07f3c6586f64"
+    },
+    {
+      "path": "Conxian/docs/STUB_CONTRACTS.md",
+      "sha256": "4aeb3ab22c1e2830ea1dec3a9622ff374f6d989fc404f6ead72c794c828316d7"
+    },
+    {
+      "path": "Conxian/docs/STANDARDS_VALIDATION_SESSION_5.md",
+      "sha256": "d146fa608134bda2eb3f948d3cf672e77189540fe88accf44672b20160011eca"
+    },
+    {
+      "path": "Conxian/docs/CIRCULAR_DEPENDENCY_MINDMAP.md",
+      "sha256": "952a0819ada49a99903a3bfea4fee3488bf49f4de2ac992d2e08e91023014f96"
+    },
+    {
+      "path": "Conxian/docs/RESEARCH.md",
+      "sha256": "6441ae6f97f66a42faf3810ca81e9760d752a7f3cf4016249d7ffaedc858bd7d"
+    },
+    {
+      "path": "Conxian/docs/CLARITY4_MIGRATION_TRACKING.md",
+      "sha256": "07973f994eca947f40bbce3b54a005662b8bf1463d9a26ec645995cc1b93c0f7"
+    },
+    {
+      "path": "Conxian/docs/SYSTEM_ALIGNMENT_AUDIT_MARCH_2026.md",
+      "sha256": "62788c2df87931931db75f3dfa75182cd73157ac3f2a2d0f59a752d6ec58ba43"
+    },
+    {
+      "path": "Conxian/docs/ARCHITECTURE.md",
+      "sha256": "c8263d4f7f9a6ff5b6664e26de97459b80896cd52c5e94bb287cfa0ae9dbde20"
+    },
+    {
+      "path": "Conxian/.stacksorbit/auto_detection_state.json",
+      "sha256": "35e5193f603b5c05d427c8a01a95eba55b04c5f9b8212b3fa8cd9667ed90695e"
+    },
+    {
+      "path": "Conxian/scripts/verify_contamination_guard.py",
+      "sha256": "4ad640c8320a2c24a7115944f22fe389fbd688f8d8695f324fa3d4e58f5f3682"
+    },
+    {
+      "path": "Conxian/scripts/global_principal_remediator.py",
+      "sha256": "59fc3f64ccf0164b4cc83f6d9eb6c21ae569973b6511d0ea482180c7e7ef6ee5"
+    },
+    {
+      "path": "Conxian/ui/GUIDE.md",
+      "sha256": "e987df12ef90564abfc3d44d301662b9eba43d81f2103014797b69409bc446b3"
+    },
+    {
+      "path": "Conxian/ui/package-lock.json",
+      "sha256": "945423d658b007130c76d123f1df99fdf1bdd9d6e1b7e16addac78b9d0981b80"
+    },
+    {
+      "path": "Conxian/ui/progress.md",
+      "sha256": "f667dc0d8b82422eb954808ed3556b64d91ce01a1eff51f42865fb0845c116e1"
+    },
+    {
+      "path": "Conxian/ui/CONTRIBUTING.md",
+      "sha256": "222229bcb9cc1b972b2255790c555b1724a3e06861e7132745cac69298e11d09"
+    },
+    {
+      "path": "Conxian/ui/AGENT_CONTEXT.md",
+      "sha256": "d2e3daf9234475090a7009662f17316b9c8b4899a01c1622a18edbb22bc6527d"
+    },
+    {
+      "path": "Conxian/ui/tsconfig.json",
+      "sha256": "de5556bcb44f244eeba93e0ed9da40c2b864d9d8d7654c0357787de9d4b8f26c"
+    },
+    {
+      "path": "Conxian/ui/package.json",
+      "sha256": "1edcfcdf777f1ab06ec0e7740fe5d91800b7d4bcff7b7166ca2c55d7530b8fd2"
+    },
+    {
+      "path": "Conxian/ui/README.md",
+      "sha256": "4507444b59cd82b97d436bbbf4746a79e9219027eab71e78aeff97c9a27d25e1"
+    },
+    {
+      "path": "Conxian/ui/ALIGNMENT_PLAN.md",
+      "sha256": "af3a85aca817cef2132349ba5e7a00f2c8e429853dca20a09dd8b78a27a4fac9"
+    },
+    {
+      "path": "Conxian/ui/ARCHITECTURE.md",
+      "sha256": "3e984b24fbd0a5978ab4857cc404408d2e8f864737a589f9126b0cbb4229633f"
+    },
+    {
+      "path": "Conxian/ui/.idx/integrations.json",
+      "sha256": "1be517af72e31b4f850013bfc7785ed9ce2ec75768ea932133dee0e3a1808c71"
+    },
+    {
+      "path": "Conxian/ui/.vscode/settings.json",
+      "sha256": "81d3359120048689987b36e1a89bc54c2f76e6ca8983dcdb1dbeb8c7dbd5f0a4"
+    },
+    {
+      "path": "Conxian/ui/.vscode/extensions.json",
+      "sha256": "40c3beb04cd52b7516f631426732b8f51800a40469fe428b013b9f3aea7f4185"
+    },
+    {
+      "path": "Conxian/ui/.Jules/palette.md",
+      "sha256": "080f36824a8a5a27c803666499ee2f9fd962c58031f4fc5ae069da7bd49f5255"
+    },
+    {
+      "path": "Conxian/ui/.gemini/skills/openspec-explore/SKILL.md",
+      "sha256": "4f534b22c2e04839f965186a9dd49129dcef318752260f5d67468d0a8d649826"
+    },
+    {
+      "path": "Conxian/ui/.gemini/skills/openspec-archive-change/SKILL.md",
+      "sha256": "dd8783f590c0488b2026bee9aae2adbc3cda1d7152ab04e9b9cf2ff3924fce50"
+    },
+    {
+      "path": "Conxian/ui/.gemini/skills/openspec-apply-change/SKILL.md",
+      "sha256": "c30999a1477d6a8377d7aaa02a82ad322206ffa0cca1ddf7d95618c4577ba10f"
+    },
+    {
+      "path": "Conxian/ui/.gemini/skills/openspec-propose/SKILL.md",
+      "sha256": "a41d8fda28db18ff9afd548fdc4076c89e492460ac3b8ee0fa4cb33b7034a3e0"
+    },
+    {
+      "path": "Conxian/ui/.jules/bolt.md",
+      "sha256": "c2d59f0136e4e7a2592964cb654e2e177ba081db93d52c39d0abe306ab318eb8"
+    },
+    {
+      "path": "Conxian/ui/openspec/changes/archive/2026-03-08-overhaul-spec-driven-design/proposal.md",
+      "sha256": "10429b8773536bfd372d29016cf56e51c985b8ac5c9e72d8af8a28160e993a11"
+    },
+    {
+      "path": "Conxian/ui/openspec/changes/archive/2026-03-08-overhaul-spec-driven-design/design.md",
+      "sha256": "fa34ba080f27ae7466a2b5412262b31c2f3057f0d177331226ff3d56758e7278"
+    },
+    {
+      "path": "Conxian/ui/openspec/changes/archive/2026-03-08-overhaul-spec-driven-design/tasks.md",
+      "sha256": "714a9d79232bebe175cb2a87038752078057cf596673b4c98b2f424b130234ca"
+    },
+    {
+      "path": "Conxian/ui/openspec/changes/archive/2026-03-08-overhaul-spec-driven-design/specs/asset-management/spec.md",
+      "sha256": "909c9ae4c9b0ed6decf03c012537a705c3d0c9ce20d0c5181b501e2e208abefe"
+    },
+    {
+      "path": "Conxian/ui/openspec/changes/archive/2026-03-08-overhaul-spec-driven-design/specs/system-modules/spec.md",
+      "sha256": "5098f475b3947af5a6799719679348acb9c61f6e12c996f5919167fb29b26ddb"
+    },
+    {
+      "path": "Conxian/ui/openspec/changes/archive/2026-03-08-overhaul-spec-driven-design/specs/technical-submodules/spec.md",
+      "sha256": "3d9ea301a9e0b559cce5b1269110038f2ecdd2baaecc16a563e039f29c49de99"
+    },
+    {
+      "path": "Conxian/ui/openspec/changes/archive/2026-03-08-overhaul-spec-driven-design/specs/business-flows/spec.md",
+      "sha256": "10b2e953f35ec480f2860f4be2890b47666fd1199907854acbd47e3d3724f55e"
+    },
+    {
+      "path": "Conxian/ui/openspec/specs/asset-management/spec.md",
+      "sha256": "50890a9d771fbab5e6eb10c8b4ceb43afce7f51b4a0d724d59d04f1b3cc806a2"
+    },
+    {
+      "path": "Conxian/ui/openspec/specs/system-modules/spec.md",
+      "sha256": "f29c514fbd8d1bdc14cd60a5722f7d6b9626cc17d6ef48b57beebb38d9a8f1bf"
+    },
+    {
+      "path": "Conxian/ui/openspec/specs/technical-submodules/spec.md",
+      "sha256": "54007dd5b39f763ac45d8b3444976936397275a56ffa83088ba3b4ec755f834b"
+    },
+    {
+      "path": "Conxian/ui/openspec/specs/business-flows/spec.md",
+      "sha256": "00fce949116195bc5cbda38a0cf9989710d2e0105a5d627d871c6e1acc85b590"
+    },
+    {
+      "path": "Conxian/audit/contamination_audit_report_2026_04_05.md",
+      "sha256": "1189b7b6a504ef2db91f6875cc3401220ed32cb0f2a8d05f28b3d250ae0f3347"
+    },
+    {
+      "path": "Conxian/gateway/package-lock.json",
+      "sha256": "3968e4d890c8b29f109c1f96672e3370359847a8104b3b556d01e91ea75f4a2e"
+    },
+    {
+      "path": "Conxian/gateway/tsconfig.json",
+      "sha256": "e3a343a81f405ca1387e4d44f0e3b990127a4df0e32ff966a516e6f1d3545e41"
+    },
+    {
+      "path": "Conxian/gateway/package.json",
+      "sha256": "02ed81cbac074b3495be4e019e010a63ec35b5e25191ebcc69cd0e70c112bd00"
+    },
+    {
+      "path": "Conxian/gateway/README.md",
+      "sha256": "41bb1ae8d1170d138a4b562e22391316dabc503f0f2253b612d4f7fda2d5942e"
+    },
+    {
+      "path": "Conxian/tests/TEST_INDEX.md",
+      "sha256": "97d4e884824cd88001f2f1c8d8fac1c836f7afa4f12dc618cf073322825ab59b"
+    },
+    {
+      "path": "conxian-business/transparency_custodian.py",
+      "sha256": "04829d904c630e68b6168be91bab5da40f681034fc7622666b8c8a8d7cb02868"
+    },
+    {
+      "path": "conxian-business/BOS_STATE_MACHINE.json",
+      "sha256": "826e4d955d0783b58b79fb299fc10a6f09a3ee01832a4c7155b49be7de760b36"
+    },
+    {
+      "path": "conxian-business/system_ip_audit.md",
+      "sha256": "ef55c4daabcc04a4e124bfb78e5d70388ecb4564104b9156fa777d75b949b0eb"
+    },
+    {
+      "path": "conxian-business/BOS_PLATFORM_SPEC.md",
+      "sha256": "aa821cf9ce9c5e477a0d313d7e76e98fa911685d2ded677293256f73d54bb33e"
+    },
+    {
+      "path": "conxian-business/BOS_CONFIG.md",
+      "sha256": "e81ac8e713d03914832d5409d31a0d70c74df5f0c036d530c854510e87f6b567"
+    },
+    {
+      "path": "conxian-business/AUDIT_MANIFEST.stub.json",
+      "sha256": "42fce293f1f50a1f22f311603ea0ba3d5d3d55e7aa33bc564f50dbf1c7ce8609"
+    },
+    {
+      "path": "conxian-business/SARB_COMPLIANCE_REPORT.stub.json",
+      "sha256": "d13a0d6348c9fcd9a1bdd43531ee04c2cb70f79796502bb94f0d08b096283acc"
+    },
+    {
+      "path": "conxian-business/SECTION_42_SWAP_AGREEMENT.md",
+      "sha256": "81754b17606c822f13223f21c74a2c2063ccac827f3537e72641ac9d868b0048"
+    },
+    {
+      "path": "conxian-business/SERVICE_LOOP.md",
+      "sha256": "1f5b0d549895d949d427eeff5f1cbf7d4079e52a3954163664c2e60c33e17137"
+    },
+    {
+      "path": "conxian-business/BOS_QUICKSTART_TEMPLATE.md",
+      "sha256": "b045692cbf0329be90238b9bc9f2591436656f91c5357cc7b8ba3fd7991af972"
+    },
+    {
+      "path": "conxian-business/BOS_BAAP_RESEARCH_SUMMARY.md",
+      "sha256": "52af3afcb4c58a2c67edb5a6720c5eac8c02e28d378244ca4d031bc15b3b6d90"
+    },
+    {
+      "path": "conxian-business/README.md",
+      "sha256": "55ae8b89f1ab62388ebd3d6449fd0d4d2be433daa22d6691f3d18a743ea62719"
+    },
+    {
+      "path": "conxian-business/.generated/AUDIT_MANIFEST.json",
+      "sha256": "cd149da093407191e7b7075ef375450f34d950446f93d0ff331f0254062221d2"
+    },
+    {
+      "path": "Nakamoto-Guardian/ANTI_FRAGILITY_LOOP.md",
+      "sha256": "3ae837682b8f73252e3847de5837a3015268e9a056f4326c6587d47bd332dfd0"
+    },
+    {
+      "path": "Nakamoto-Guardian/README.md",
+      "sha256": "1ddf1338b6f74002917a5389b25000e98faf85566a6934447fa342801b2bdeaf"
+    },
+    {
+      "path": "Sovereign-Ops-Orchestrator/DEPLOYMENT_EFFICIENCY.md",
+      "sha256": "cf1e23008cf1ffda2bbe31888741e7476d63f30c8e8f17a0548c9d218df398e0"
+    },
+    {
+      "path": "Sovereign-Ops-Orchestrator/LINEAR_WIRING.md",
+      "sha256": "9dc69bc95b55e31959a9785234227b057530472d01372be0beddd2c459943eba"
+    },
+    {
+      "path": "Sovereign-Ops-Orchestrator/README.md",
+      "sha256": "983881d303059669ef9396c81485c722ff453cdfd6848671d9d51059b5228cfc"
+    },
+    {
+      "path": "Sovereign-Strategy-Nexus/REALTIME_M&A_VELOCITY.md",
+      "sha256": "c826e44f6c5a5d5bad3ff7321b651080913081bcfc44fdc83cae997dbcb0f3d3"
+    },
+    {
+      "path": "Sovereign-Strategy-Nexus/README.md",
+      "sha256": "aa35311c03d5acec10ffeae920f8595069da1346ab4f67213fa4a15216f50b21"
+    },
+    {
+      "path": "Sovereign-Strategy-Nexus/contracts/jurisdictional-sharding.clar",
+      "sha256": "ef396a8d0e64c9967bbddd25c1c3fceb810d78be5e0fa1b31042c6135fae2ed0"
+    },
+    {
+      "path": "Sovereign-Strategy-Nexus/docs/SARB_MARCH_2026_MANDATE.md",
+      "sha256": "db3b5de5ecf0515885ba05dd11f216871ee85f4259a6ad502ca20887d65f54e8"
+    },
+    {
+      "path": "Sovereign-Strategy-Nexus/docs/SOVEREIGN_PITCH_DECK_NARRATIVE.md",
+      "sha256": "28c063f0065bc8be2ae66ab55474a245668eca42f6545e83c6fe5d94e1b52520"
+    },
+    {
+      "path": "Sovereign-Strategy-Nexus/docs/ZK_DATA_ROOM_SCHEMA.md",
+      "sha256": "e62ca8a455086b3f1e2331dbc9b97271e92914fd62aae447075cb7eec9df1042"
+    },
+    {
+      "path": "Sovereign-Strategy-Nexus/docs/SOVEREIGN_MOI_ALIGNMENT.md",
+      "sha256": "d75e56384b84ceb2a9cfa2c26270edc4ff3ade2484b3553c82717160a6a9f6c2"
+    },
+    {
+      "path": "Fiscal-Vault-Oracle/TREASURY_MCP_CONFIG.json",
+      "sha256": "a928d2be6ba7bfb6f779ce3aca7df6f25a98b4a6b983412722d9d0d061ec6c99"
+    },
+    {
+      "path": "Fiscal-Vault-Oracle/LSEG_MCP_AUDIT.md",
+      "sha256": "bd91671143cc777ab2e014db17ead92e87cad5b1ae3940e80019195f1995c56e"
+    },
+    {
+      "path": "Fiscal-Vault-Oracle/SOVEREIGN_RUNWAY.md",
+      "sha256": "5061b28f1fad2a574097d66abed9779c518caa90f4a9fc88e1a5ae4e8fd180c0"
+    },
+    {
+      "path": "Fiscal-Vault-Oracle/BITCOIN_BOND_DLC.json",
+      "sha256": "4a6630026ddde123daec6929bc29aa4f8a1bfac1df4f09c3697c10934251d53c"
+    },
+    {
+      "path": "Fiscal-Vault-Oracle/BOS_INTEGRATION_MAP.md",
+      "sha256": "e11853080d3a8b94aaf91f0e6eb5ed9f1b255a6ada4bb254af0c8eace50d9343"
+    },
+    {
+      "path": "Fiscal-Vault-Oracle/dlc-bond.clar",
+      "sha256": "8f929710c6d7105b203d84002b6910d91e4341524b2a5000e63188816e2feea0"
+    },
+    {
+      "path": "Fiscal-Vault-Oracle/OPENCLAW_TEE_SPEC.md",
+      "sha256": "d38456739a52cb3550027fdc0066e8869f4b31624deb556c41d569c0b86b839e"
+    },
+    {
+      "path": "Fiscal-Vault-Oracle/WEB5_IDENTITY_AUDIT.md",
+      "sha256": "9845fc40f157d98daf6aaf414053d0e768d6b1d3ef695f587de4199298cffca1"
+    },
+    {
+      "path": "Fiscal-Vault-Oracle/README.md",
+      "sha256": "06b1e581b8f30ad7fcb25f178127632c52df2a96d8690d9589b6b515c117ed87"
+    }
+  ],
+  "stacks_anchor_payload": "168cf07aee7e305c05e7949864f389592b8b6ab508fb0832736bf32082f92d96"
+}
