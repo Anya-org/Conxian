@@ -102,6 +102,9 @@
 )
 
 ;; @desc [Functional description for standards compliance]
+;; Errors:
+;; - ERR_UNAUTHORIZED (u1000): caller is not an authorized admin
+;; - ERR_ALREADY_INITIALIZED (u1001): contract has already been initialized
 (define-public (initialize (new-admin principal))
   (begin
     (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
