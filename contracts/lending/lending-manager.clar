@@ -30,7 +30,7 @@
 (define-map deposits { asset: principal, user: principal } uint)
 (define-map borrows { asset: principal, user: principal } uint)
 
-(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
+(define-data-var admin principal tx-sender)
 
 ;; --- Public Functions ---
 

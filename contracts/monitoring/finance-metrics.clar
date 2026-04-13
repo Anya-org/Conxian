@@ -7,7 +7,7 @@
 (define-constant ERR_INTERNAL (err u5001))
 
 ;; State
-(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
+(define-data-var admin principal tx-sender)
 
 ;; Core Asset List for TVL Tracking (Mainnet candidates)
 (define-data-var tracked-assets (list 10 principal) (list .cxd-token))
