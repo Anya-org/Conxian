@@ -17,7 +17,7 @@
 
 ;; @desc [Functional description for standards compliance]
 (define-read-only (is-authorized-admin)
-  (or (is-eq tx-sender (var-get admin)) (not (var-get initialized)))
+  (is-eq tx-sender (var-get admin))
 )
 
 ;; --- Public Functions ---
@@ -103,7 +103,7 @@
 ;; @desc [Functional description for standards compliance]
 (define-public (initialize (new-admin principal))
   (begin
-    (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
+    (asserts! (and (is-authorized-admin) (not (var-get initialized))) ERR_UNAUTHORIZED)
     (var-set admin new-admin)
     (var-set initialized true)
     (ok true)

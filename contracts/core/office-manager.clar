@@ -104,13 +104,13 @@
 (define-public (withdraw-payroll (amount uint))
   (match (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")
     owner
-    (begin
-      (asserts! (is-eq tx-sender owner) (err ERR_UNAUTHORIZED))
-      (asserts! (<= amount (var-get payroll-balance)) (err ERR_INSUFFICIENT_FUNDS))
-      (try! (as-contract (stx-transfer? amount tx-sender owner)))
-      (var-set payroll-balance (- (var-get payroll-balance) amount))
-      (ok true)
-    )
+      (begin
+        (asserts! (is-eq tx-sender owner) (err ERR_UNAUTHORIZED))
+        (asserts! (<= amount (var-get payroll-balance)) (err ERR_INSUFFICIENT_FUNDS))
+        (try! (as-contract (stx-transfer? amount tx-sender owner)))
+        (var-set payroll-balance (- (var-get payroll-balance) amount))
+        (ok true)
+      )
     (err ERR_OWNER_NOT_SET)
   )
 )

@@ -49,7 +49,7 @@ Coordinates worker incentives and payments.
 ### Registering as a Worker
 To start performing jobs for the protocol, a principal must first be registered by the owner:
 ```clarity
-(contract-call? .office-manager register-worker tx-sender)
+(contract-call? .office-manager register-worker worker-principal)
 ```
 
 ### Funding the Payroll

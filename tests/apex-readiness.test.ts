@@ -12,7 +12,7 @@ describe("Apex readiness and BOS Implementation", () => {
     deployer = accounts.get("deployer")!;
   });
 
-  it.skip("agent-treasury can run fiscal strategy", () => {
+  it("agent-treasury can run fiscal strategy", () => {
     // Initializing CL pool first
     const initRes = simnet.callPublicFn(
       "concentrated-liquidity-pool",
@@ -47,7 +47,7 @@ describe("Structured Finance (CON-452)", () => {
     deployer = accounts.get("deployer")!;
   });
 
-  it.skip("can create and fund an ops loan", () => {
+  it("can create and fund an ops loan", () => {
     const createRes = simnet.callPublicFn(
       "ops-loan-manager",
       "create-ops-loan",
