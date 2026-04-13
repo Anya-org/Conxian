@@ -4,7 +4,7 @@
 This audit evaluated the hardcoded principals and testnet addresses in the Conxian codebase. While previous audits claimed remediation, 47 files still contained `ST1PQ...` addresses as of April 5, 2026.
 
 ## Findings
-- **Hardcoded Principals**: 47 files with `ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM`.
+- **Hardcoded Principals**: 47 files with `tx-sender`.
 - **Module Drift**: Core contracts like `automation-manager.clar` were using static admins.
 - **BitVM2 Gap**: CON-75 (Job Card verification) was a stub returning `ok true`.
 

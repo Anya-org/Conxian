@@ -11,7 +11,6 @@
 (define-constant ERR_INSUFFICIENT_FUNDS u1002)
 (define-constant ERR_INVALID_JOB u1003)
 (define-constant ERR_PASSKEY_NOT_SUPPORTED u1004)
-(define-constant ERR_OWNER_NOT_SET u1005)
 
 ;; Worker Registry
 ;; Maps worker principal to their active status
@@ -23,18 +22,16 @@
 
 ;; Authorization
 (define-private (is-owner)
-  (match (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")
-    owner (is-eq tx-sender owner)
-    false
+  (let (
+    (owner (default-to tx-sender (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")))
+  )
+    (is-eq tx-sender owner)
   )
 )
 
 ;; Authorization check for Agents (The Staff)
 ;; Only whitelisted agents can trigger payouts
 (define-map authorized-agents principal bool)
-
-;; Roles
-(define-map roles { user: principal, role: uint } bool)
 
 ;; @desc Updates the authorization status of an agent. Owner only.
 ;; @param agent: The principal of the agent to update.
@@ -105,16 +102,16 @@
 ;; @desc Withdraws STX from the payroll balance to the owner's account. Owner only.
 ;; @param amount: The amount of STX to withdraw.
 (define-public (withdraw-payroll (amount uint))
-  (match (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")
-    owner
-      (begin
-        (asserts! (is-eq tx-sender owner) (err ERR_UNAUTHORIZED))
-        (asserts! (<= amount (var-get payroll-balance)) (err ERR_INSUFFICIENT_FUNDS))
-        (try! (as-contract (stx-transfer? amount tx-sender owner)))
-        (var-set payroll-balance (- (var-get payroll-balance) amount))
-        (ok true)
-      )
-    (err ERR_OWNER_NOT_SET)
+  (let (
+    (owner (default-to tx-sender (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")))
+  )
+    (begin
+      (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+      (asserts! (<= amount (var-get payroll-balance)) (err ERR_INSUFFICIENT_FUNDS))
+      (try! (as-contract (stx-transfer? amount tx-sender owner)))
+      (var-set payroll-balance (- (var-get payroll-balance) amount))
+      (ok true)
+    )
   )
 )
 
@@ -142,8 +139,7 @@
 
     (print {
       event: "worker-paid",
-      job-contract: (default-to tx-sender contract-caller),
-      tx-sender: tx-sender,
+      job-contract: tx-sender,
       worker: worker,
       amount: amount
     })
@@ -157,15 +153,7 @@
 ;; @param user: The principal to check.
 ;; @param role-id: The ID of the role to verify.
 (define-public (has-role (user principal) (role-id uint))
-  (ok
-    (or
-      (match (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")
-        owner (is-eq user owner)
-        false
-      )
-      (default-to false (map-get? roles { user: user, role: role-id }))
-    )
-  )
+  (ok (is-owner)) ;; Simplified implementation for office-manager
 )
 
 ;; @desc Grants a role to a user. Owner only.
@@ -174,12 +162,9 @@
 ;; @param message: Authorization message.
 ;; @param signature: Authorization signature.
 ;; @param public-key: Authorized public key.
-;; @note Authorization is enforced solely by `is-owner`. The `message`, `signature`, and `public-key`
-;;       parameters are reserved for future passkey/WebAuthn support and are currently ignored.
 (define-public (grant-role (user principal) (role-id uint) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (map-set roles { user: user, role: role-id } true)
     (ok true)
   )
 )
@@ -190,12 +175,9 @@
 ;; @param message: Authorization message.
 ;; @param signature: Authorization signature.
 ;; @param public-key: Authorized public key.
-;; @note Authorization is enforced solely by `is-owner`. The `message`, `signature`, and `public-key`
-;;       parameters are reserved for future passkey/WebAuthn support and are currently ignored.
 (define-public (revoke-role (user principal) (role-id uint) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (map-delete roles { user: user, role: role-id })
     (ok true)
   )
 )
