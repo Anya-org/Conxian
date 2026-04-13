@@ -139,7 +139,7 @@
 
     (print {
       event: "worker-paid",
-      job-contract: (default-to tx-sender contract-caller),
+      job-contract: contract-caller,
       tx-sender: tx-sender,
       worker: worker,
       amount: amount
@@ -150,11 +150,21 @@
 
 ;; --- RBAC Trait Implementation ---
 
+(define-map roles { user: principal, role-id: uint } bool)
+
 ;; @desc Checks if a user has a specific role.
 ;; @param user: The principal to check.
 ;; @param role-id: The ID of the role to verify.
 (define-public (has-role (user principal) (role-id uint))
-  (ok (is-owner)) ;; Simplified implementation for office-manager
+  (ok
+    (or
+      (match (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")
+        owner (is-eq user owner)
+        false
+      )
+      (default-to false (map-get? roles { user: user, role-id: role-id }))
+    )
+  )
 )
 
 ;; @desc Grants a role to a user. Owner only.
@@ -166,6 +176,7 @@
 (define-public (grant-role (user principal) (role-id uint) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (map-set roles { user: user, role-id: role-id } true)
     (ok true)
   )
 )
@@ -179,6 +190,7 @@
 (define-public (revoke-role (user principal) (role-id uint) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (map-delete roles { user: user, role-id: role-id })
     (ok true)
   )
 )
