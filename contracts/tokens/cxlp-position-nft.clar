@@ -24,113 +24,121 @@
 
 ;; Position Data
 (define-map positions
-    uint
-    {
-        owner: principal,
-        pool: principal,
-        token0: principal,
-        token1: principal,
-        tick-lower: int,
-        tick-upper: int,
-        liquidity: uint,
-        fee-growth-inside0-last: uint,
-        fee-growth-inside1-last: uint,
-        tokens-owed0: uint,
-        tokens-owed1: uint,
-        created-at: uint,
-        last-updated: uint
-    }
+  uint
+  {
+    owner: principal,
+    pool: principal,
+    token0: principal,
+    token1: principal,
+    tick-lower: int,
+    tick-upper: int,
+    liquidity: uint,
+    fee-growth-inside0-last: uint,
+    fee-growth-inside1-last: uint,
+    tokens-owed0: uint,
+    tokens-owed1: uint,
+    created-at: uint,
+    last-updated: uint
+  }
 )
 
 ;; Events
 (define-private (emit-position-created (position-id uint) (owner principal) (pool principal))
-    (print {
-        event: "position-created",
-        position-id: position-id,
-        owner: owner,
-        pool: pool,
-        timestamp: burn-block-height
-    })
+  (print {
+    event: "position-created",
+    position-id: position-id,
+    owner: owner,
+    pool: pool,
+    timestamp: burn-block-height
+  })
 )
 
 (define-private (emit-position-updated (position-id uint) (liquidity uint))
-    (print {
-        event: "position-updated",
-        position-id: position-id,
-        liquidity: liquidity,
-        timestamp: burn-block-height
-    })
+  (print {
+    event: "position-updated",
+    position-id: position-id,
+    liquidity: liquidity,
+    timestamp: burn-block-height
+  })
 )
 
 ;; Authorization
 (define-private (is-owner)
-    (is-eq tx-sender (var-get contract-owner))
+  (is-eq tx-sender (var-get contract-owner))
 )
 
 (define-private (is-pool-manager)
-    (is-eq tx-sender (var-get pool-manager))
+  (is-eq tx-sender (var-get pool-manager))
 )
 
 ;; SIP-009 Implementation
+
+;; @desc Returns the last token ID minted.
 (define-read-only (get-last-token-id)
-    (ok (var-get last-position-id))
+  (ok (var-get last-position-id))
 )
 
+;; @desc Returns the token URI for a given token ID.
 (define-read-only (get-token-uri (token-id uint))
-    (ok none)
+  (ok none)
 )
 
+;; @desc Returns the owner of a given token ID.
 (define-read-only (get-owner (token-id uint))
-    (ok (nft-get-owner? cxlp-position token-id))
+  (ok (nft-get-owner? cxlp-position token-id))
 )
 
+;; @desc Transfers a position NFT.
 (define-public (transfer (token-id uint) (sender principal) (recipient principal))
-    (begin
-        (asserts! (is-eq tx-sender sender) (err ERR_UNAUTHORIZED))
-        (try! (nft-transfer? cxlp-position token-id sender recipient))
-        (ok true)
-    )
+  (begin
+    (asserts! (is-eq tx-sender sender) (err ERR_UNAUTHORIZED))
+    (try! (nft-transfer? cxlp-position token-id sender recipient))
+    (ok true)
+  )
 )
 
 ;; Position Management
+
+;; @desc Mints a new liquidity position NFT. Authorized pool managers only.
 (define-public (mint-position
-    (owner principal)
-    (pool principal)
-    (token0 principal)
-    (token1 principal)
-    (tick-lower int)
-    (tick-upper int)
-    (liquidity uint)
+  (owner principal)
+  (pool principal)
+  (token0 principal)
+  (token1 principal)
+  (tick-lower int)
+  (tick-upper int)
+  (liquidity uint)
+)
+  (let ((new-id (+ (var-get last-position-id) u1)))
+    (asserts! (is-pool-manager) (err ERR_UNAUTHORIZED))
+    (asserts! (< tick-lower tick-upper) (err ERR_INVALID_TICK_RANGE))
+    (asserts! (> liquidity u0) (err ERR_INSUFFICIENT_LIQUIDITY))
+
+    (try! (nft-mint? cxlp-position new-id owner))
+
+    (map-set positions new-id {
+      owner: owner,
+      pool: pool,
+      token0: token0,
+      token1: token1,
+      tick-lower: tick-lower,
+      tick-upper: tick-upper,
+      liquidity: liquidity,
+      fee-growth-inside0-last: u0,
+      fee-growth-inside1-last: u0,
+      tokens-owed0: u0,
+      tokens-owed1: u0,
+      created-at: burn-block-height,
+      last-updated: burn-block-height
+    })
+
+    (var-set last-position-id new-id)
+    (emit-position-created new-id owner pool)
+    (ok new-id)
   )
-    (let ((new-id (+ (var-get last-position-id) u1)))
-        (asserts! (is-pool-manager) (err ERR_UNAUTHORIZED))
-        (asserts! (< tick-lower tick-upper) (err ERR_INVALID_TICK_RANGE))
-        (asserts! (> liquidity u0) (err ERR_INSUFFICIENT_LIQUIDITY))
-        
-        (try! (nft-mint? cxlp-position new-id owner))
-        
-        (map-set positions new-id {
-            owner: owner,
-            pool: pool,
-            token0: token0,
-            token1: token1,
-            tick-lower: tick-lower,
-            tick-upper: tick-upper,
-            liquidity: liquidity,
-            fee-growth-inside0-last: u0,
-            fee-growth-inside1-last: u0,
-            tokens-owed0: u0,
-            tokens-owed1: u0,
-            created-at: burn-block-height,
-            last-updated: burn-block-height
-        })
-        
-        (var-set last-position-id new-id)
-        (emit-position-created new-id owner pool)
-        (ok new-id)
-    )
 )
 
+;; @desc Returns the details of a specific position.
 (define-read-only (get-position (position-id uint))
-    (map-get? positions position-id)
+  (map-get? positions position-id)
 )
