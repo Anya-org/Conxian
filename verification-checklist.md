@@ -28,8 +28,8 @@
 - [x] `oracle-aggregator` handles multi-tier 2026 assets.
 
 ## 5. Environment & Simulation
-- [x] Vitest suite executed (skipped pending Simnet principal resolution fixes).
-- [x] `tests/csf-full-system.test.ts` baseline verified.
+- [ ] Vitest suite executed without skips (blocked pending Simnet principal resolution fixes).
+- [ ] `tests/csf-full-system.test.ts` passing.
 - [x] `tests/setup-test-env.ts` resolves simnet race conditions.
 
 ---
