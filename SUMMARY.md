@@ -23,6 +23,7 @@
 * [Mainnet readiness checklist — conxius-platform](docs/MAINNET_READINESS_CONXIUS_PLATFORM.md)
 * [Wallet & Signer Control Verification Report](docs/WALLET_SIGNER_CONTROL_VERIFICATION_REPORT.md)
 * [Enterprise control & custody baseline (CON-460)](docs/protocols/ENTERPRISE_CUSTODY_BASELINE.md)
+* [Signed event envelope v1 (CON-472)](docs/protocols/SIGNED_EVENT_ENVELOPE_V1.md)
 * [Public Visibility Audit Report](docs/PUBLIC_VISIBILITY_AUDIT_REPORT.md)
 * [CSF mainnet readiness gate](docs/CSF_MAINNET_READINESS_GATE.md)
 * [CSF-first operating sequence and proof gates](docs/CSF_FIRST_OPERATING_SEQUENCE_AND_PROOF_GATES.md)
