@@ -174,6 +174,8 @@
 ;; @param message: Authorization message.
 ;; @param signature: Authorization signature.
 ;; @param public-key: Authorized public key.
+;; @note Authorization is enforced solely by `is-owner`. The `message`, `signature`, and `public-key`
+;;       parameters are reserved for future passkey/WebAuthn support and are currently ignored.
 (define-public (grant-role (user principal) (role-id uint) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -188,6 +190,8 @@
 ;; @param message: Authorization message.
 ;; @param signature: Authorization signature.
 ;; @param public-key: Authorized public key.
+;; @note Authorization is enforced solely by `is-owner`. The `message`, `signature`, and `public-key`
+;;       parameters are reserved for future passkey/WebAuthn support and are currently ignored.
 (define-public (revoke-role (user principal) (role-id uint) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
