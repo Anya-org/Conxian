@@ -6,10 +6,10 @@ This dashboard provides a high-level maturity and readiness overview for the Con
 
 | Layer | Repo / Asset | Status | Readiness | Release Criticality |
 | --- | --- | --- | --- | --- |
-| **Governance** | `conxian-business` | Active | **READINESS VERIFIED** | P0 |
-| **Protocol** | `Conxian` | Active | Mainnet Pending | P0 |
+| **Governance** | `conxian-business` | Active | **BaaP EVOLVED** | P0 |
+| **Protocol** | `Conxian` | Active | **READY FOR MAINNET** | P0 |
 | **State Node** | `conxian-nexus` | Active | Mainnet Pending | P0 |
-| **Gateway** | `conxian-gateway` | Active | Mainnet Pending | P0 |
+| **Gateway** | `conxian-gateway` | Active | **READY FOR MAINNET** | P0 |
 | **Wallet** | `conxius-wallet` | Active | Mainnet Pending | P0 |
 | **Shared Core** | `lib-conxian-core` | Stable | Stable | P0 |
 | **Shared SDK** | `lib-conclave-sdk` | Beta | Mainnet Ready | P0 |
@@ -25,12 +25,13 @@ This dashboard provides a high-level maturity and readiness overview for the Con
 - [x] **Governance Standardization**: Completed (CON-432).
 - [x] **Security Hardening**: Completed (CON-253).
 - [x] **Mainnet Branch Model**: Implementation verified across portfolio.
+- [x] **BaaP Evolution**: Business-as-a-Platform standards and research integrated (CON-474).
 
 ## Audit Snapshot (April 2026)
 
 - **Infrastructure**: Neon/Supabase/Render inventory verified.
-- **Compliance**: ZSE stubs implemented for sensitive business logic.
-- **Contamination**: Production Contamination Guard (scripts/verify_contamination_guard.py) active and passing.
+- **Compliance**: ZSE stubs and ERP translation layers (CON-63) implemented.
+- **Contamination**: Production Contamination Guard (scripts/verify_contamination_guard.py) active and **PASSED org-wide**.
 
 ---
-*Last Updated: 2026-04-09*
+*Last Updated: 2026-04-13*
