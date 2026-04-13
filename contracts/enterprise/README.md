@@ -14,7 +14,7 @@ The module consists of the Enterprise API for account management, the Advanced O
 ## Integration Examples
 ### Creating an Ops Loan
 ```clarity
-(contract-call? .ops-loan-manager create-ops-loan "INV-2026-001" u100000000 u80 'SP1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
+(contract-call? .ops-loan-manager create-ops-loan "INV-2026-001" u100000000 u80 tx-sender)
 ```
 
 ## Testing

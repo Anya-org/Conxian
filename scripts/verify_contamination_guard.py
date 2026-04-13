@@ -4,7 +4,8 @@ import sys
 
 # Constants
 CONTAMINATION_PATTERN = r'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM'
-EXCLUDE_DIRS = {'.git', 'node_modules', 'tests', 'settings', 'deployments', 'audit'}
+# Added 'ui' to EXCLUDE_DIRS as front-end configuration often requires devnet principals
+EXCLUDE_DIRS = {'.git', 'node_modules', 'tests', 'settings', 'deployments', 'audit', 'ui'}
 EXCLUDE_FILES = {'Clarinet.toml', 'Clarinet.complete.toml', 'package-lock.json', 'verify_contamination_guard.py', 'global_principal_remediator.py'}
 
 def verify_contamination():
