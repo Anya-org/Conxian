@@ -72,7 +72,7 @@ Standard SIP-010 balance check:
 ### Minting via Coordinator
 Authorized agents can mint tokens through the coordinator:
 ```clarity
-(contract-call? .token-system-coordinator mint-cxd .cxd-token u100000000 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(contract-call? .token-system-coordinator mint-cxd .cxd-token u100000000 tx-sender)
 ```
 
 ## Testing (How-to)
