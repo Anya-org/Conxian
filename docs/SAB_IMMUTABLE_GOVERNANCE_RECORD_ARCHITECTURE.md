@@ -17,9 +17,16 @@ It classifies governance record domains, establishes datastore boundaries with o
 The `record_id` for any JSON-LD governance record MUST be computed deterministically to prevent “same semantics, different hash” failures across implementations.
 
 - **Canonicalization:** JSON-LD RDF Dataset Canonicalization using **URDNA2015**.
-- **Hash:** `sha256` over the canonicalized N-Quads bytes (UTF-8).
-- **Digest encoding:** `record_id` is the raw 32-byte digest; when represented as text it MUST be encoded as lowercase hex (64 chars). The on-chain anchor MUST store the same 32-byte digest (or, if stored as text, the same lowercase-hex encoding).
-- **Context resolution:** canonicalization MUST run with network fetch disabled; any JSON-LD contexts MUST be resolved from pinned, content-addressed artifacts.
+- **Hash domain:** The digest MUST be computed over the governance record with the single top-level `record_id` field removed from the JSON/JSON-LD input prior to JSON-LD processing; `record_id` MUST NOT be included in the RDF dataset used for canonicalization and hashing. Records MUST contain `record_id` at most once and only at the top level; any additional or nested occurrence of the JSON key `record_id` MUST cause canonicalization to fail.
+- **Hash input bytes:** Serialize the URDNA2015 canonicalized dataset to N-Quads using LF (U+000A) line endings (no CRLF). The serialization MUST end with a final LF. The hash input is the exact UTF-8 bytes of that serialization.
+- **Hash:** `sha256` over the hash input bytes above.
+- **`record_id` representation:** Inside any JSON/JSON-LD governance record, `record_id` MUST be the lowercase-hex encoding of the digest (64 chars, no prefix).
+- **On-chain anchor representation:** The on-chain anchor MUST store the same digest, either as 32 raw bytes or (if stored as text) the exact same lowercase-hex string.
+- **JSON-LD processing profile:** Canonicalization MUST be performed in JSON-LD 1.1 processing mode with a null/absent base IRI. Inline and remote `@context` values used during canonicalization MUST NOT define `@base`. If any `@base` is encountered, or if any relative IRI would require base resolution, canonicalization MUST fail.
+- **Context resolution / document loader policy:** canonicalization MUST run with network fetch disabled and MUST fail closed.
+  - Any attempt to perform a network fetch for a context/document MUST fail; resolution via pinned, content-addressed local artifacts is permitted.
+  - `@context` references MUST be absolute and MUST resolve only via pinned, content-addressed artifacts from an allowlisted local store; any unpinned context MUST fail.
+  - Relative IRIs in `@context` references MUST NOT be used; if present, canonicalization MUST fail.
 
 ## Target record planes
 
