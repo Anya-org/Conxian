@@ -22,17 +22,25 @@
 (define-data-var payroll-balance uint u0)
 
 ;; Authorization
-(define-private (is-owner)
+(define-private (is-owner-principal (user principal))
   (match (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")
-    owner (is-eq tx-sender owner)
+    owner (is-eq user owner)
     false
   )
+)
+
+(define-private (is-owner)
+  (is-owner-principal tx-sender)
 )
 
 ;; Authorization check for Agents (The Staff)
 ;; Only whitelisted agents can trigger payouts
 (define-map authorized-agents principal bool)
 
+;; Roles
+;; @note RBAC roles are independent of the `authorized-agents` map used for payroll payouts.
+;;       Granting a role does not, by itself, make a principal an authorized agent.
+(define-map roles { user: principal, role: uint } bool)
 ;; @desc Updates the authorization status of an agent. Owner only.
 ;; @param agent: The principal of the agent to update.
 ;; @param active: The active status to set.
@@ -150,19 +158,15 @@
 
 ;; --- RBAC Trait Implementation ---
 
-(define-map roles { user: principal, role-id: uint } bool)
-
 ;; @desc Checks if a user has a specific role.
 ;; @param user: The principal to check.
 ;; @param role-id: The ID of the role to verify.
+;; @note The protocol owner principal is treated as having all roles implicitly.
 (define-public (has-role (user principal) (role-id uint))
   (ok
     (or
-      (match (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")
-        owner (is-eq user owner)
-        false
-      )
-      (default-to false (map-get? roles { user: user, role-id: role-id }))
+      (default-to false (map-get? roles { user: user, role: role-id }))
+      (is-owner-principal user)
     )
   )
 )
@@ -173,10 +177,18 @@
 ;; @param message: Authorization message.
 ;; @param signature: Authorization signature.
 ;; @param public-key: Authorized public key.
+;; @note Authorization is enforced solely by `is-owner`. The `message`, `signature`, and `public-key`
+;;       parameters are reserved for future passkey/WebAuthn support and are currently ignored.
 (define-public (grant-role (user principal) (role-id uint) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (map-set roles { user: user, role-id: role-id } true)
+    (map-set roles { user: user, role: role-id } true)
+    (print {
+      event: "role-granted",
+      user: user,
+      role-id: role-id,
+      caller: tx-sender
+    })
     (ok true)
   )
 )
@@ -187,10 +199,18 @@
 ;; @param message: Authorization message.
 ;; @param signature: Authorization signature.
 ;; @param public-key: Authorized public key.
+;; @note Authorization is enforced solely by `is-owner`. The `message`, `signature`, and `public-key`
+;;       parameters are reserved for future passkey/WebAuthn support and are currently ignored.
 (define-public (revoke-role (user principal) (role-id uint) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (map-delete roles { user: user, role-id: role-id })
+    (map-delete roles { user: user, role: role-id })
+    (print {
+      event: "role-revoked",
+      user: user,
+      role-id: role-id,
+      caller: tx-sender
+    })
     (ok true)
   )
 )
