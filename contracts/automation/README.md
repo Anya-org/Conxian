@@ -46,9 +46,10 @@ Coordinates worker incentives and payments.
 
 ## Integration Examples (How-to)
 
-### Registering as a Worker
-To start performing jobs for the protocol, a principal must first be registered by the owner:
+### Registering a Worker (Owner only)
+To start performing jobs for the protocol, a worker principal must first be registered by the `office-manager-owner` principal (configured in `operational-treasury`):
 ```clarity
+;; Called by the office-manager-owner
 (contract-call? .office-manager register-worker worker-principal)
 ```
 
