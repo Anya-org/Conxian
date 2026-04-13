@@ -11,6 +11,7 @@
 (define-constant ERR_INSUFFICIENT_FUNDS u1002)
 (define-constant ERR_INVALID_JOB u1003)
 (define-constant ERR_PASSKEY_NOT_SUPPORTED u1004)
+(define-constant ERR_OWNER_NOT_SET u1005)
 
 ;; Worker Registry
 ;; Maps worker principal to their active status
@@ -22,10 +23,9 @@
 
 ;; Authorization
 (define-private (is-owner)
-  (let (
-    (owner (default-to tx-sender (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")))
-  )
-    (is-eq tx-sender owner)
+  (match (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")
+    owner (is-eq tx-sender owner)
+    false
   )
 )
 
@@ -102,16 +102,16 @@
 ;; @desc Withdraws STX from the payroll balance to the owner's account. Owner only.
 ;; @param amount: The amount of STX to withdraw.
 (define-public (withdraw-payroll (amount uint))
-  (let (
-    (owner (default-to tx-sender (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")))
-  )
-    (begin
-      (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-      (asserts! (<= amount (var-get payroll-balance)) (err ERR_INSUFFICIENT_FUNDS))
-      (try! (as-contract (stx-transfer? amount tx-sender owner)))
-      (var-set payroll-balance (- (var-get payroll-balance) amount))
-      (ok true)
-    )
+  (match (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")
+    owner
+      (begin
+        (asserts! (is-eq tx-sender owner) (err ERR_UNAUTHORIZED))
+        (asserts! (<= amount (var-get payroll-balance)) (err ERR_INSUFFICIENT_FUNDS))
+        (try! (as-contract (stx-transfer? amount tx-sender owner)))
+        (var-set payroll-balance (- (var-get payroll-balance) amount))
+        (ok true)
+      )
+    (err ERR_OWNER_NOT_SET)
   )
 )
 
@@ -139,7 +139,8 @@
 
     (print {
       event: "worker-paid",
-      job-contract: tx-sender,
+      job-contract: (default-to tx-sender contract-caller),
+      tx-sender: tx-sender,
       worker: worker,
       amount: amount
     })

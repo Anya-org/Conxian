@@ -19,7 +19,7 @@ The protocol treasury (`cxd-treasury.clar`) manages the allocation of collected 
 Founder royalties and operator entitlements are structured to ensure long-term alignment without compromising protocol autonomy:
 - **Founder's Cut**: A prioritized 10% carve-out from the **Treasury (SAB Operations)** share.
 - **Entitlement Type**: CXD-denominated and NFT-based rights for governance participation.
-- **Bootstrap Wallet**: `SPSZXAKV7DWTDZN2601WR31BM51BD3YTQWE97VRM` is designated as the initial beneficiary for the Founder's Cut, pending the activation of the SAB-owned production multisig.
+- **Bootstrap Wallet**: Designated via the principal registry key `founder-cut-beneficiary` (set in `operational-treasury.clar`), pending the activation of the SAB-owned production multisig.
 
 ## 4. Governance Boundaries
 - **SAB-Owned Wallets**: All protocol-controlled funds are held in smart-contract vaults (e.g., `conxian-vaults.clar`).

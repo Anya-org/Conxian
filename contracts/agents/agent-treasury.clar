@@ -7,6 +7,7 @@
 
 ;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_ALREADY_INITIALIZED (err u1001))
 
 ;; --- Data Variables ---
 (define-data-var cl-pool principal tx-sender)
@@ -17,7 +18,7 @@
 
 ;; @desc [Functional description for standards compliance]
 (define-read-only (is-authorized-admin)
-  (or (is-eq tx-sender (var-get admin)) (not (var-get initialized)))
+  (is-eq tx-sender (var-get admin))
 )
 
 ;; --- Public Functions ---
@@ -104,6 +105,7 @@
 (define-public (initialize (new-admin principal))
   (begin
     (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
+    (asserts! (not (var-get initialized)) ERR_ALREADY_INITIALIZED)
     (var-set admin new-admin)
     (var-set initialized true)
     (ok true)
