@@ -94,7 +94,7 @@ function assertStacksNetworkPrefix(networkName: NetworkName, flagName: string, a
     );
   }
 
-  return raw;
+  return normalized;
 }
 
 function parseArgs(argv: string[]): { networkName: NetworkName; contract: PrincipalParts } {
