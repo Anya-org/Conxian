@@ -12,12 +12,22 @@ This report evaluates the **Conxian Sovereign Business Operations System (BOS)**
 - **Weaknesses**: Centralized, vendor lock-in (OCI), high cost, "Black Box" automation.
 - **Gap vs. Conxian**: Oracle is a "Managed Service"; Conxian is "Sovereign." Conxian allows businesses to own their execution and state without central authority.
 
-### 2.2. Kiro Autonomous Agent / Agentic OS
+### 2.2. Glassnode (Blockchain Data & Intelligence)
+- **Strengths**: Comprehensive on-chain metrics, time-series data for asset health, and deep market insights. High effectiveness for analytical workloads.
+- **Weaknesses**: Centralized data ingestion and API delivery. Closed-source proprietary models.
+- **Gap vs. Conxian**: Conxian Nexus (Glass Node) provides **verifiable** on-chain telemetry where the user owns the node and the proof. Conxian moves from "Trusting a Data Provider" to "Verifying a Sovereign Node."
+
+### 2.3. Tableland (Decentralized SQL)
+- **Strengths**: Decentralized SQL database built on blockchain (EVM-compatible). Enables on-chain relational data with row-level access control.
+- **Weaknesses**: Latency tied to host chain finality; requires off-chain oracle-like setups for direct contract reads.
+- **Gap vs. Conxian**: Conxian uses Tableland as a **Persistence Mirror** for state roots and audit logs, ensuring that even if the primary Nexus storage (Postgres/Neon) fails, the state remains recoverable and verifiable via decentralized SQL.
+
+### 2.4. Kiro Autonomous Agent / Agentic OS
 - **Strengths**: Asynchronous development automation, codebase learning, isolated sandbox execution.
 - **Weaknesses**: Focused primarily on software development (DevOps) rather than complete business operations (Treasury, Legal, Compliance).
 - **Gap vs. Conxian**: Conxian integrates Treasury (Fiscal Vault) and Compliance (Nakamoto Guardian) into the agentic loop, creating a "Self-Running Business" rather than just a "Self-Writing Codebase."
 
-### 2.3. DAO Operating Systems (Aragon, Colony)
+### 2.5. DAO Operating Systems (Aragon, Colony)
 - **Strengths**: Multi-sig governance, permissionless participation.
 - **Weaknesses**: Often slow (on-chain voting), lack of deep integration with legacy industrial ERPs or AI-driven intelligence.
 - **Gap vs. Conxian**: Conxian uses the **ERP MCP Handshake** and **BitVM2** to bridge the gap between "Web2 Industrial Labor" and "Web3 Sovereign Settlement."
@@ -41,6 +51,10 @@ This report evaluates the **Conxian Sovereign Business Operations System (BOS)**
 ### 4.3. Standardized API/MCP Interfaces
 - **Requirement**: Easy-to-use interfaces for external developers and agents.
 - **Enhancement**: Transition from bespoke JSON-LD to a standardized **Model Context Protocol (MCP)** interface across all EXCO units.
+
+### 4.4. Verifiable Telemetry & Decentralized Persistence
+- **Requirement**: Ensure analytics and state are immutable and globally available without centralized hosting risk.
+- **Enhancement**: Move from hosted PostgreSQL metrics to a hybrid model using **Kwil** for transactional relational state and **Tableland** for long-term audit log persistence.
 
 ## 5. Implementation Summary
 - **Phase 1**: Update documentation to reflect BaaP vision (Active).
