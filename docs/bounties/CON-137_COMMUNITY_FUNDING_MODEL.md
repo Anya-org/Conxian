@@ -14,10 +14,16 @@ Until ConxianCSF is verifiably deployed and ALEX launch-path funding is enabled,
 ## Funding constraints (normative)
 
 1. Do not advertise an issue as a paid bounty unless it is ConxianCSF-backed and ALEX-funded.
-   - Concretely: do not claim/label it as funded, do not publish payout amounts, and do not apply the `Bounty Open` label (see [`BOUNTY_WORKFLOW.md`](./BOUNTY_WORKFLOW.md)) unless the ConxianCSF/ALEX gates are met.
+   - Concretely: do not represent it as funded, do not publish payout amounts, and do not apply the `Bounty Open` label (see [`BOUNTY_WORKFLOW.md`](./BOUNTY_WORKFLOW.md)) unless the ConxianCSF/ALEX gates are met.
    - Eligibility classification (community-contributable vs internal-only) is allowed and is not a payout promise.
 2. Maintainers MUST NOT request, confirm, or act on payout instructions (addresses, payment rails, etc.) in issue threads.
 3. Payout-enabling controls remain maintainer-only (see [`MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md`](./MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md)).
+
+ConxianCSF/ALEX funding gates are met only when all of the following are true:
+
+- ConxianCSF is deployed on Stacks mainnet and the deployed contract principal is recorded with public evidence (e.g., an explorer link) in the system of record for bounties.
+- ALEX launch-path bounty funding has been explicitly enabled in the governance/config source of truth for ConxianCSF.
+- Maintainer payout enablement has been completed per [`MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md`](./MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md).
 
 ## Eligibility: which work can be community-funded
 
@@ -92,8 +98,8 @@ Apply multipliers for review cost and priority (round to nearest 5 BP).
 
 ### Step 3 — limits
 
-- Do not publish base sizes above `L` (BaseBP > 20).
-- Treat any sizing that rounds to **40 BP** (or higher) as an “XL” smell and split the work into multiple S/M/L issues before marking them community-funded; there is intentionally no XL row in the base-size table for a single bounty.
+- Do not define or publish a BaseBP above `L` (20 BP).
+- TotalBP may exceed 20 due to multipliers, but any sizing that rounds to **40 BP** (or higher) is an “XL” smell and must be split into multiple S/M/L issues before marking them community-funded; there is intentionally no XL row in the base-size table for a single bounty.
 
 ## ConxianCSF mapping (post-ALEX)
 

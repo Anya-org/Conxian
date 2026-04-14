@@ -20,7 +20,11 @@ Being claimable under this workflow means maintainers will review contributions;
 These labels are used for visibility and filtering; they are separate from workflow states.
 
 - `Bounty`: the issue is managed under this workflow.
-- `Bounty Open`: the issue is eligible to be publicly advertised as an open, paid bounty. This requires both (a) the claimability rules below are met and (b) the ConxianCSF/ALEX funding gates in [`docs/bounties/CON-137_COMMUNITY_FUNDING_MODEL.md`](./CON-137_COMMUNITY_FUNDING_MODEL.md) are met.
+- `Bounty Open`: the issue may be publicly advertised as an open, paid bounty only if all of the following are true:
+  - It is labeled `Bounty`.
+  - It is in `Todo` and unassigned (i.e., claimable under this workflow).
+  - It is classified as claimable per [`docs/bounties/CON-231_BOUNTY_CLASSIFICATION_2026-04-12.md`](./CON-231_BOUNTY_CLASSIFICATION_2026-04-12.md).
+  - The ConxianCSF + ALEX funding gates are met per [`docs/bounties/CON-137_COMMUNITY_FUNDING_MODEL.md`](./CON-137_COMMUNITY_FUNDING_MODEL.md).
 
 ## Status model
 
