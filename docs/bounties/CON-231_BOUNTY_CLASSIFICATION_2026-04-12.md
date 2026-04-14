@@ -29,7 +29,7 @@ ch-linear issue list -T CON -l Bounty --limit 1000
 ch-linear issue list -T CON -l 'Bounty Open' --limit 1000
 ```
 
-If either list ever grows beyond the `--limit` value, increase it to keep the snapshot complete.
+If any query above ever returns as many rows as its `--limit` value, increase that `--limit` to keep the snapshot complete.
 
 These queries were run on 2026-04-12 to produce this point-in-time snapshot. Future runs of the same commands may return a different set of issues; any new or relabeled `Bounty` / `Bounty Open` items must be explicitly reclassified before being treated as externally claimable.
 
