@@ -63,7 +63,7 @@ This repo pins the following dependency SHAs via submodules:
 
 ### Missing dependency references (must be reconciled)
 
-- The CON-129 description has been observed to reference missing/deleted Linear issue IDs: `CON-130`, `CON-64`, `CON-65`, `CON-79` (see CON-375 for current status).
+- As of the `2026-04-06` gate snapshot, the description of Linear issue `CON-129` referenced missing/deleted issue IDs: `CON-130`, `CON-64`, `CON-65`, `CON-79` (see `CON-375` for current status).
 - Track replacements and/or removals under: https://linear.app/conxian-labs/issue/CON-375/reconcile-deleted-issue-refs-in-con-129-con-130646579
 - Treat CON-375 as a **documentation blocker** for this gate until the replacements/removals are fully reconciled.
 
