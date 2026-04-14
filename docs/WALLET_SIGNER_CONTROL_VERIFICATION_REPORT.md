@@ -29,4 +29,4 @@ This report confirms the full launch wallet and signer control path for the Conx
 - **Policy Authority**: Move of fee/limit management behind the timelock is verified.
 
 ---
-© 2026 Conxian-Labs (Pty) Ltd | Omphile Ndaloenhle Legacy Trust
+© 2026 Conxian-Labs (Pty) Ltd.

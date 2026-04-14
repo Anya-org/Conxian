@@ -10,4 +10,4 @@
 - **Orchestration**: Nexus coordinates DA commits via CJCS v2.0.
 
 ---
-© 2026 Conxian-Labs (Pty) Ltd | Omphile Ndaloenhle Legacy Trust
+© 2026 Conxian-Labs (Pty) Ltd.

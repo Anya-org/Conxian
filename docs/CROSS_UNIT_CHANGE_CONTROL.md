@@ -15,4 +15,4 @@ Changes to `README.md` role lines, `LICENSE` terms, or `SECURITY.md` policies th
 When a repository transitions status (e.g., from `Beta` to `Stable`), the `docs/PORTFOLIO_DASHBOARD.md` and `docs/PORTFOLIO_REPOSITORY_INVENTORY.md` in this repository **MUST** be updated to reflect the new maturity state.
 
 ---
-© 2026 Conxian-Labs (Pty) Ltd | Omphile Ndaloenhle Legacy Trust
+© 2026 Conxian-Labs (Pty) Ltd.

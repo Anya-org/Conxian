@@ -39,4 +39,4 @@ This is the canonical map of all repositories in the Conxian-Labs ecosystem, cla
 | `.github` | Governance | Org-wide Standards & Workflows | @Conxian/Admins | P0 |
 
 ---
-© 2026 Conxian-Labs (Pty) Ltd | Omphile Ndaloenhle Legacy Trust
+© 2026 Conxian-Labs (Pty) Ltd.

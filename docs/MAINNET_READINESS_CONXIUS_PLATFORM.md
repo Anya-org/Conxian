@@ -25,4 +25,4 @@ This checklist tracks the mainnet readiness for the `conxius-platform` repositor
 - [x] **Role Separation**: Platform operations isolated from internal administrative controls.
 
 ---
-© 2026 Conxian-Labs (Pty) Ltd | Omphile Ndaloenhle Legacy Trust
+© 2026 Conxian-Labs (Pty) Ltd.

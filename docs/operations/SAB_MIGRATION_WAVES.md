@@ -17,4 +17,4 @@
 - **Risk**: High (Protocol complexity).
 
 ---
-© 2026 Conxian-Labs (Pty) Ltd | Omphile Ndaloenhle Legacy Trust
+© 2026 Conxian-Labs (Pty) Ltd.

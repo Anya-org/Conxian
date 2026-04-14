@@ -211,4 +211,4 @@ For recovery workflows, the same event taxonomy applies. At minimum:
 Implementation note (public-safe): an append-only public audit manifest MAY be anchored to Stacks L1, while detailed logs are kept in an enterprise-controlled datastore, as long as both preserve the attempted/blocked/completed distinctions.
 
 ---
-© 2026 Conxian-Labs (Pty) Ltd | Omphile Ndaloenhle Legacy Trust
+© 2026 Conxian-Labs (Pty) Ltd.

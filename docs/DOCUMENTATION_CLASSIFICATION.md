@@ -18,4 +18,4 @@ To maintain Zero Secret Egress (ZSE) compliance, all Conxian documentation is cl
 If an internal-only document must be referenced from Git, provide a ZSE-compliant summary and a direct link to the canonical Linear document.
 
 ---
-© 2026 Conxian-Labs (Pty) Ltd | Omphile Ndaloenhle Legacy Trust
+© 2026 Conxian-Labs (Pty) Ltd.

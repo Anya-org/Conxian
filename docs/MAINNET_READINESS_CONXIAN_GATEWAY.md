@@ -25,4 +25,4 @@ This checklist tracks the mainnet readiness for the `conxian-gateway` repository
 - [x] **License**: Standardized GPL-3.0 added.
 
 ---
-© 2026 Conxian-Labs (Pty) Ltd | Omphile Ndaloenhle Legacy Trust
+© 2026 Conxian-Labs (Pty) Ltd.

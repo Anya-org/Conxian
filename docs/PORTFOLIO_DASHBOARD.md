@@ -10,10 +10,10 @@ This dashboard provides a high-level maturity and readiness overview for the Con
 | **Protocol** | `Conxian` | Active | **READY FOR MAINNET** | P0 |
 | **State Node** | `conxian-nexus` | Active | Mainnet Pending | P0 |
 | **Gateway** | `conxian-gateway` | Active | **READY FOR MAINNET** | P0 |
-| **Wallet** | `conxius-wallet` | Active | Mainnet Pending | P0 |
-| **Shared Core** | `lib-conxian-core` | Stable | Stable | P0 |
-| **Shared SDK** | `lib-conclave-sdk` | Beta | Mainnet Ready | P0 |
-| **Tooling** | `stacksorbit` | Active | Mainnet Ready | P0 |
+| **Wallet** | `conxius-wallet` | Active | **READY FOR MAINNET (v1.6.0)** | P0 |
+| **Shared Core** | `lib-conxian-core` | Stable | **READY FOR MAINNET** | P0 |
+| **Shared SDK** | `lib-conclave-sdk` | Beta | **READY FOR MAINNET** | P0 |
+| **Tooling** | `stacksorbit` | Active | **READY FOR MAINNET** | P0 |
 | **UI** | `conxian-ui` | Alpha | Incubating | P1 |
 | **Platform** | `conxius-platform` | Active | Incubating | P1 |
 | **Website** | `conxian-labs-site` | Stable | Stable | P2 |

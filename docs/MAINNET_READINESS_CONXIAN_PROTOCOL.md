@@ -27,4 +27,4 @@ This checklist tracks the mainnet readiness for the core `Conxian` protocol repo
 - [x] **ZSE Compliance**: Strategic knowledge migrated to Linear Virtual Office.
 
 ---
-© 2026 Conxian-Labs (Pty) Ltd | Omphile Ndaloenhle Legacy Trust
+© 2026 Conxian-Labs (Pty) Ltd.

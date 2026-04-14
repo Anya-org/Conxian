@@ -23,4 +23,4 @@ This report confirms the public/private visibility boundaries for the Conxian-La
 - [x] ZSE compliance verified repo-wide.
 
 ---
-© 2026 Conxian-Labs (Pty) Ltd | Omphile Ndaloenhle Legacy Trust
+© 2026 Conxian-Labs (Pty) Ltd.
