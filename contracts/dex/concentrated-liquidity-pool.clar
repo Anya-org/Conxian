@@ -26,7 +26,7 @@
   }
 )
 (define-data-var pool-nonce uint u0)
-(define-data-var authorized-collector principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
+(define-data-var authorized-collector principal tx-sender)
 
 
 ;; @desc Initialize the contract and set the authorized-collector (Directive 2)

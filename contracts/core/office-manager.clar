@@ -1,53 +1,226 @@
 ;; office-manager.clar
-;; Manages worker registration, payroll funding, and agent authorization.
+;; "The Payroll" - Coordinates the Office Workers and their incentives.
+;; Verifies registered workers and handles payment for completed jobs.
+;; Remediated April 2026: Dynamic contract-owner fetching
 
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_INSUFFICIENT_FUNDS (err u1001))
+(impl-trait .core-traits.conxian-access-trait)
 
-(define-data-var admin principal tx-sender)
+;; Constants
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_UNKNOWN_WORKER u1001)
+(define-constant ERR_INSUFFICIENT_FUNDS u1002)
+(define-constant ERR_INVALID_JOB u1003)
+(define-constant ERR_PASSKEY_NOT_SUPPORTED u1004)
+(define-constant ERR_OWNER_NOT_SET u1005)
+
+;; Worker Registry
+;; Maps worker principal to their active status
+(define-map workers principal bool)
+
+;; Payroll Balance
+;; Total funds available for paying workers (in uSTX for now, can be generic)
 (define-data-var payroll-balance uint u0)
 
-(define-map workers principal bool)
+;; Authorization
+(define-private (is-owner-principal (user principal))
+  (match (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")
+    owner (is-eq user owner)
+    false
+  )
+)
+
+(define-private (is-owner)
+  (is-owner-principal tx-sender)
+)
+
+;; Authorization check for Agents (The Staff)
+;; Only whitelisted agents can trigger payouts
 (define-map authorized-agents principal bool)
 
-;; @desc Check if a worker is currently active
-(define-read-only (is-worker-active (worker principal))
-  (default-to false (map-get? workers worker))
-)
-
-;; @desc Register a new worker in the office system
-(define-public (register-worker (worker principal))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (map-set workers worker true)
-    (ok true)
-  )
-)
-
-;; @desc Add funds to the protocol's payroll pool
-(define-public (fund-payroll (amount uint))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (var-set payroll-balance (+ (var-get payroll-balance) amount))
-    (ok true)
-  )
-)
-
-;; @desc Set the authorization status for a protocol agent
+;; Roles
+;; @note RBAC roles are independent of the `authorized-agents` map used for payroll payouts.
+;;       Granting a role does not, by itself, make a principal an authorized agent.
+(define-map roles { user: principal, role: uint } bool)
+;; @desc Updates the authorization status of an agent. Owner only.
+;; @param agent: The principal of the agent to update.
+;; @param active: The active status to set.
 (define-public (set-agent-status (agent principal) (active bool))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (map-set authorized-agents agent active)
     (ok true)
   )
 )
 
-;; @desc Get the current balance of the payroll pool
-(define-read-only (get-payroll-balance)
-  (ok (var-get payroll-balance))
+;; @desc Checks if an agent is authorized to trigger payouts.
+;; @param agent: The principal of the agent to check.
+(define-read-only (is-authorized-agent (agent principal))
+  (default-to false (map-get? authorized-agents agent))
 )
 
-;; @desc Check if an agent is authorized by the office manager
-(define-read-only (is-agent-authorized (agent principal))
-  (default-to false (map-get? authorized-agents agent))
+;; --- Worker Management ---
+
+;; @desc Registers a new worker in the payroll system. Owner only.
+;; @param worker: The principal of the worker to register.
+(define-public (register-worker (worker principal))
+  (begin
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (map-set workers worker true)
+    (print {
+      event: "worker-registered",
+      worker: worker
+    })
+    (ok true)
+  )
+)
+
+;; @desc Removes a worker from the payroll system. Owner only.
+;; @param worker: The principal of the worker to remove.
+(define-public (remove-worker (worker principal))
+  (begin
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (map-delete workers worker)
+    (ok true)
+  )
+)
+
+;; @desc Checks if a worker is currently active in the registry.
+;; @param worker: The principal of the worker to check.
+(define-read-only (is-worker-active (worker principal))
+  (default-to false (map-get? workers worker))
+)
+
+;; --- Payroll Management ---
+
+;; @desc Deposits STX into the payroll balance for future worker payments.
+;; @param amount: The amount of STX to deposit.
+(define-public (fund-payroll (amount uint))
+  (begin
+    (try! (stx-transfer? amount tx-sender (as-contract tx-sender)))
+    (var-set payroll-balance (+ (var-get payroll-balance) amount))
+    (print {
+      event: "payroll-funded",
+      amount: amount,
+      new-balance: (var-get payroll-balance)
+    })
+    (ok true)
+  )
+)
+
+;; @desc Withdraws STX from the payroll balance to the owner's account. Owner only.
+;; @param amount: The amount of STX to withdraw.
+(define-public (withdraw-payroll (amount uint))
+  (match (contract-call? .operational-treasury get-protocol-principal "office-manager-owner")
+    owner
+      (begin
+        (asserts! (is-eq tx-sender owner) (err ERR_UNAUTHORIZED))
+        (asserts! (<= amount (var-get payroll-balance)) (err ERR_INSUFFICIENT_FUNDS))
+        (try! (as-contract (stx-transfer? amount tx-sender owner)))
+        (var-set payroll-balance (- (var-get payroll-balance) amount))
+        (ok true)
+      )
+    (err ERR_OWNER_NOT_SET)
+  )
+)
+
+;; --- Payout Execution ---
+
+;; @desc Called by an Authorized Agent (Staff) to pay the Worker who did the job.
+;; @param worker: The address of the off-chain worker (tx-sender of the transaction usually)
+;; @param amount: The fee to pay the worker
+(define-public (payout (worker principal) (amount uint))
+  (begin
+    ;; 1. Caller must be an Authorized Agent (e.g., agent-risk)
+    (asserts! (is-authorized-agent contract-caller) (err ERR_UNAUTHORIZED))
+
+    ;; 2. Worker must be registered
+    (asserts! (is-worker-active worker) (err ERR_UNKNOWN_WORKER))
+
+    ;; 3. Check funds
+    (asserts! (<= amount (var-get payroll-balance)) (err ERR_INSUFFICIENT_FUNDS))
+
+    ;; 4. Transfer funds to Worker
+    (try! (as-contract (stx-transfer? amount tx-sender worker)))
+
+    ;; 5. Update Balance
+    (var-set payroll-balance (- (var-get payroll-balance) amount))
+
+    (print {
+      event: "worker-paid",
+      job-contract: contract-caller,
+      tx-sender: tx-sender,
+      worker: worker,
+      amount: amount
+    })
+    (ok true)
+  )
+)
+
+;; --- RBAC Trait Implementation ---
+
+;; @desc Checks if a user has a specific role.
+;; @param user: The principal to check.
+;; @param role-id: The ID of the role to verify.
+;; @note The protocol owner principal is treated as having all roles implicitly.
+(define-public (has-role (user principal) (role-id uint))
+  (ok
+    (or
+      (default-to false (map-get? roles { user: user, role: role-id }))
+      (is-owner-principal user)
+    )
+  )
+)
+
+;; @desc Grants a role to a user. Owner only.
+;; @param user: The principal to grant the role to.
+;; @param role-id: The ID of the role to grant.
+;; @param message: Authorization message.
+;; @param signature: Authorization signature.
+;; @param public-key: Authorized public key.
+;; @note Authorization is enforced solely by `is-owner`. The `message`, `signature`, and `public-key`
+;;       parameters are reserved for future passkey/WebAuthn support and are currently ignored.
+(define-public (grant-role (user principal) (role-id uint) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
+  (begin
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (map-set roles { user: user, role: role-id } true)
+    (print {
+      event: "role-granted",
+      user: user,
+      role-id: role-id,
+      caller: tx-sender
+    })
+    (ok true)
+  )
+)
+
+;; @desc Revokes a role from a user. Owner only.
+;; @param user: The principal to revoke the role from.
+;; @param role-id: The ID of the role to revoke.
+;; @param message: Authorization message.
+;; @param signature: Authorization signature.
+;; @param public-key: Authorized public key.
+;; @note Authorization is enforced solely by `is-owner`. The `message`, `signature`, and `public-key`
+;;       parameters are reserved for future passkey/WebAuthn support and are currently ignored.
+(define-public (revoke-role (user principal) (role-id uint) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
+  (begin
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (map-delete roles { user: user, role: role-id })
+    (print {
+      event: "role-revoked",
+      user: user,
+      role-id: role-id,
+      caller: tx-sender
+    })
+    (ok true)
+  )
+)
+
+;; @desc Verifies a passkey/biometric signature.
+;; @param message: Authorization message.
+;; @param signature: Authorization signature.
+;; @param public-key: Authorized public key.
+;; @note Passkey/WebAuthn verification is not supported directly in Clarity today.
+;;       This returns (err ERR_PASSKEY_NOT_SUPPORTED) so callers cannot treat it as an authorization primitive.
+(define-public (verify-passkey-signature (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
+  (err ERR_PASSKEY_NOT_SUPPORTED)
 )

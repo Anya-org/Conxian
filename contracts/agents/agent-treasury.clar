@@ -7,17 +7,18 @@
 
 ;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_ALREADY_INITIALIZED (err u1001))
 
 ;; --- Data Variables ---
-(define-data-var cl-pool principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
-(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
+(define-data-var cl-pool principal tx-sender)
+(define-data-var admin principal tx-sender)
 (define-data-var initialized bool false)
 
 ;; --- Authorization ---
 
 ;; @desc [Functional description for standards compliance]
 (define-read-only (is-authorized-admin)
-  (or (is-eq tx-sender (var-get admin)) (not (var-get initialized)))
+  (is-eq tx-sender (var-get admin))
 )
 
 ;; --- Public Functions ---
@@ -101,9 +102,13 @@
 )
 
 ;; @desc [Functional description for standards compliance]
+;; Errors:
+;; - ERR_UNAUTHORIZED (u1000): caller is not an authorized admin
+;; - ERR_ALREADY_INITIALIZED (u1001): contract has already been initialized
 (define-public (initialize (new-admin principal))
   (begin
     (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
+    (asserts! (not (var-get initialized)) ERR_ALREADY_INITIALIZED)
     (var-set admin new-admin)
     (var-set initialized true)
     (ok true)

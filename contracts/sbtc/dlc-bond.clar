@@ -14,7 +14,7 @@
 (define-constant ERR_INSUFFICIENT_FUNDS (err u1004))
 
 ;; --- State ---
-(define-data-var admin principal 'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P)
+(define-data-var admin principal tx-sender)
 
 (define-map bonds
   uint
