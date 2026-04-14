@@ -107,6 +107,11 @@
   )
 )
 
+;; @desc Get the current balance of the payroll pool
+(define-read-only (get-payroll-balance)
+  (ok (var-get payroll-balance))
+)
+
 ;; @desc Withdraws STX from the payroll balance to the owner's account. Owner only.
 ;; @param amount: The amount of STX to withdraw.
 (define-public (withdraw-payroll (amount uint))

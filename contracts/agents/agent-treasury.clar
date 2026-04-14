@@ -102,14 +102,18 @@
 )
 
 ;; @desc [Functional description for standards compliance]
+;; Params:
+;; - new-admin: initial admin principal for this contract
+;; - new-cl-pool: concentrated liquidity pool principal used for CL-related routing
 ;; Errors:
 ;; - ERR_UNAUTHORIZED (u1000): caller is not an authorized admin
 ;; - ERR_ALREADY_INITIALIZED (u1001): contract has already been initialized
-(define-public (initialize (new-admin principal))
+(define-public (initialize (new-admin principal) (new-cl-pool principal))
   (begin
     (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
     (asserts! (not (var-get initialized)) ERR_ALREADY_INITIALIZED)
     (var-set admin new-admin)
+    (var-set cl-pool new-cl-pool)
     (var-set initialized true)
     (ok true)
   )
