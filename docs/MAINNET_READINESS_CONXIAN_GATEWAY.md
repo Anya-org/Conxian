@@ -1,6 +1,6 @@
 # Mainnet Readiness Checklist — conxian-gateway (CON-143)
 
-## Status: READY FOR MAINNET
+## Status: READY FOR MAINNET (v0.1.1)
 
 This checklist tracks the mainnet readiness for the `conxian-gateway` repository.
 

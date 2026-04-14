@@ -29,7 +29,7 @@ Per the repo portfolio, `lib-conxian-core` is a **supporting** repo:
 ## 5) Prioritized Build/Repair List
 
 **P0 (Core Stability)**
-- Remediate production-path contamination (CON-402).
+- [x] Remediate production-path contamination (CON-402).
 - Standardize `CHANGELOG.md` with `## [Unreleased]` section.
 
 **P1 (Library Maturity)**

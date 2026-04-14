@@ -29,12 +29,12 @@ Per the repo portfolio, `conxian-nexus` is a **flagship** repo:
 ## 5) Prioritized Build/Repair List
 
 **P0 (Node Stability)**
-- Resolve BitVM2 state root verification stubs (CON-450).
+- [x] Resolve BitVM2 state root verification stubs (CON-450).
 - Standardize `CHANGELOG.md` structure.
 
 **P1 (Observability Maturity)**
 - Add standardized `README.md` (Purpose, Status, Ownership, Releases).
-- Finalize Prometheus metrics exporter for mainnet-ready telemetry.
+- [x] Finalize Prometheus metrics exporter for mainnet-ready telemetry.
 
 **P2 (Documentation Alignment)**
 - Move sensitive infrastructure mapping to Linear.

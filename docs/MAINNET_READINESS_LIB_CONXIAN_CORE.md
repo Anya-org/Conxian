@@ -1,6 +1,6 @@
 # Mainnet Readiness Checklist — lib-conxian-core (CON-145)
 
-## Status: READY FOR MAINNET
+## Status: READY FOR MAINNET (v0.1.1)
 
 This checklist tracks the mainnet readiness for the `lib-conxian-core` repository, which provides shared cryptographic and state logic across the Conxian portfolio.
 

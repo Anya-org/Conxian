@@ -1,6 +1,6 @@
 # Mainnet Readiness Checklist — Conxian Nexus (CON-396)
 
-## Status: READY FOR MAINNET (v0.4.0)
+## Status: READY FOR MAINNET (v0.5.1)
 
 This checklist tracks the mainnet readiness for the `conxian-nexus` repository (Glass Node).
 

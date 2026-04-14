@@ -30,7 +30,7 @@ Per the repo portfolio, `conxian-gateway` is a **flagship** repo:
 
 **P0 (Gateway Reliability)**
 - Standardize `CHANGELOG.md` with `## [Unreleased]` section.
-- Implement automated verification for x402 header parsing (CON-451).
+- [x] Implement automated verification for x402 header parsing (CON-451).
 
 **P1 (Compliance Maturity)**
 - Add standardized `README.md` (Purpose, Status, Ownership, Releases).

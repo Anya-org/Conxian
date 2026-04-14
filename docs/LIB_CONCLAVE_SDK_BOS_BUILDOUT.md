@@ -126,7 +126,7 @@ Suggested canonical home (public-safe): add an “Audit readiness” section to 
 
 **P0 (release integrity + safety gates)**
 
-- Close the mainnet-readiness checklist items and keep them discoverable: `docs/MAINNET_READINESS_LIB_CONCLAVE_SDK.md`.
+- [x] Close the mainnet-readiness checklist items and keep them discoverable: `docs/MAINNET_READINESS_LIB_CONCLAVE_SDK.md`.
 - Enforce release hygiene + supply-chain gates as CI requirements (SemVer tags, changelog discipline, vulnerability scanning).
 - Canonically define “public API” vs “internal module” boundaries in the SDK repo docs and keep the Rust/WASM surfaces aligned.
 

@@ -1,6 +1,6 @@
 # Mainnet Readiness Checklist — Conxian Protocol (CON-140)
 
-## Status: READY FOR MAINNET
+## Status: READY FOR MAINNET (v0.6.2)
 
 This checklist tracks the mainnet readiness for the core `Conxian` protocol repository.
 
