@@ -22,6 +22,7 @@ Related references:
   - Additional classification events MAY be appended later without mutating the request's policy hash/version or the eligibility snapshot; each classification event MUST record the policy hash/version used for that classification event.
   - Effective risk classification MUST follow the rules in **High-risk threshold**.
 - **Execution-ready state**: the point where all applicable time-lock windows have elapsed under the effective risk classification, and the only remaining step is to execute/sign/broadcast the action.
+  - If no time-lock applies under the effective risk classification, the request MAY transition directly from `execution-eligible` to `execution-ready` immediately after eligibility checks pass.
   - Protected actions MUST NOT be executed, signed, or broadcast unless the request is in the execution-ready state.
   - If and only if the effective risk classification's policy defines no time-lock for this action type and the action is not subject to the baseline time-lock requirements in **Time-lock (baseline)**, the request MAY transition to the execution-ready state immediately upon entering the execution-eligible state; all execution-eligible immutability and recording requirements still apply. In this no-lock case, no **time-lock-start reference** is required.
 - **High-risk threshold**: a policy-defined set of predicates (for example: per-asset amount limits, destination classes, or environments) that classify a request as high risk and thereby trigger enhanced controls (for example: quorum and time-lock).
