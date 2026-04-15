@@ -13,6 +13,8 @@ This checklist tracks the mainnet readiness for the `conxius-wallet` repository.
 - [x] **Stacks/sBTC**: Mainnet bridge logic verified.
 - [x] **Bitcoin L1**: `BdkManager` verified for mainnet transactions.
 - [x] **Boundary APIs**: Consumption of Gateway/Nexus APIs standardized.
+- [x] **Intent Translation**: CXN Guardian Intent Translator implemented for TEE approval.
+- [x] **Sovereign Handshake**: Hardware-verified intent verification UI created. of Gateway/Nexus APIs standardized.
 
 ### 3) Release Maturity
 - [x] **Versioning**: SemVer + Android versionCode (`v1.6.0`).
