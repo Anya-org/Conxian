@@ -17,7 +17,7 @@ This checklist tracks the mainnet readiness for the `conxian-nexus` repository (
 ### 3) Institutional Ingress
 - [x] **CON-166**: Global settlement ingress (ISO 20022/PAPSS/BRICS) wired.
 - [x] **Decentralized Sync**: Nostr state broadcast (Kind 26003) implemented.
-- [x] **Agentic MCP**: MCP server for treasury and MMR proofs deployed. (ISO 20022/PAPSS/BRICS) wired.
+- [x] **Agentic MCP**: MCP server for treasury and MMR proofs deployed.
 - [x] **TEE Verification**: Mandatory TEE attestation for external triggers enforced.
 - [x] **Time-Locks**: 144-block time-lock for institutional state proposals implemented.
 

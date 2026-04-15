@@ -10,10 +10,6 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 ## [Unreleased]
 
 ### Added
-- **Decentralized Edge Topology (Nexus):** Implemented fallback Nostr relay communication (Kind 26003) for state root and MMR root broadcast to ensure zero-dependency sync.
-- **Integrated MCP Server (Nexus):** Deployed a parallel Model Context Protocol (MCP) server exposing treasury state and verifiable MMR proofs to multi-modal agents.
-- **Sovereign Handshake Workflow (Wallet):** Integrated an AI-powered Intent Translator and SovereignHandshake TEE component for secure local intent verification and approval.
-- **Deterministic Deployment Verification (StacksOrbit):** Added an agent-readable JSON export mode to the GUI for verifying Nakamoto L2 smart contract deployment manifests.
 - (None currently)
 
 ## [1.9.2] - 2026-04-14
@@ -45,10 +41,6 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 - **Fail-Closed Execution Paths (CON-394):** Standardized critical stubs in `conxian-nexus` (ZKML, DLC, Identity, ERP) to return explicit service errors instead of simulated data, preventing "fail-open" scenarios during mainnet cutover.
 
 ### Added
-- **Decentralized Edge Topology (Nexus):** Implemented fallback Nostr relay communication (Kind 26003) for state root and MMR root broadcast to ensure zero-dependency sync.
-- **Integrated MCP Server (Nexus):** Deployed a parallel Model Context Protocol (MCP) server exposing treasury state and verifiable MMR proofs to multi-modal agents.
-- **Sovereign Handshake Workflow (Wallet):** Integrated an AI-powered Intent Translator and SovereignHandshake TEE component for secure local intent verification and approval.
-- **Deterministic Deployment Verification (StacksOrbit):** Added an agent-readable JSON export mode to the GUI for verifying Nakamoto L2 smart contract deployment manifests.
 - Added Independent Lab Development Kit (ILDK) README (`docs/ILDK_README.md`) defining the "Morpho Blue" base-layer strategy for BOS.
 - Added Strategic Growth Model (`docs/STRATEGIC_GROWTH_MODEL_2026.md`) outlining comparison with legacy/DeFi models and governance-minimized scaling rules.
 
