@@ -1,6 +1,6 @@
 # cxn-grid-oracle (Grid Intelligence & Orchestration)
 
-> Current workspace release: **v1.9.0** (see [`CHANGELOG.md`](../CHANGELOG.md))
+> Current workspace release: **v1.9.2** (see [`CHANGELOG.md`](../CHANGELOG.md))
 
 The cxn-grid-oracle module handles agnostic demand-response routing and energy orchestration for the Conxian ecosystem.
 

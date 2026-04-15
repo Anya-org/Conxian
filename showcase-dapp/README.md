@@ -1,46 +1,54 @@
 # Showcase dapp
 
+Supporting — Demo & Integration Showcase for Conxian UI patterns.
+
 ## Purpose
 
-A lightweight Next.js app used to demonstrate Conxian UI patterns and end-to-end integration in local/dev environments.
+A lightweight Next.js app used to demonstrate Conxian UI patterns and end-to-end integration in local/dev environments. It serves as a playground for verifying component behavior against real protocol and gateway state.
 
 ## Status
 
 alpha — This app is intended for demos and experimentation rather than production deployment.
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Ownership
+
+Ownership and review requirements are defined in [`CODEOWNERS`](../CODEOWNERS).
+
+## Audience
+
+- UI/UX developers building Conxian-compatible interfaces.
+- Protocol engineers verifying front-end integration.
+
+## Relationship to the Conxian stack
+
+This repository demonstrates integration between:
+- [`conxian-ui`](https://github.com/Conxian/Conxian_UI): Shared component library.
+- [`conxian-gateway`](https://github.com/Conxian/conxian-gateway): State aggregation and compliance.
+- [`lib-conxian-core`](https://github.com/Conxian/lib-conxian-core): Shared models and conventions.
 
 ## Getting Started
 
-First, run the development server:
+First, install dependencies:
+
+```bash
+cd showcase-dapp
+npm install
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Governance and security
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This module is part of the Conxian Sovereign Autonomous Business (SAB).
 
-## Learn More
+For general support and non-security bug reports, open a GitHub issue. For security vulnerabilities, follow the private reporting process in `SECURITY.md`.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [**CONTRIBUTING.md**](../CONTRIBUTING.md): Guidelines for contributing to the Conxian ecosystem.
+- [**SECURITY.md**](../SECURITY.md): How to report vulnerabilities and our security posture.
+- [**LICENSE**](../LICENSE): GNU GPL v3.0.
