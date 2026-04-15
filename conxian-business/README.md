@@ -25,7 +25,7 @@ active — This module documents BOS-level service-loop expectations and public-
 ## Key Components
 
 - **[Service Loop Specification](./SERVICE_LOOP.md)**: Mermaid diagrams of the BOS Gateway and Nexus relationship, including multi-tenant orchestration.
-- **[BOS State Machine](./BOS_STATE_MACHINE.json)**: Morgan Stanley CALM Standard state transitions (ZSE Stub).
+- **[BOS State Machine](./BOS_STATE_MACHINE.stub.json)**: Morgan Stanley CALM Standard state transitions (ZSE Stub).
 - **[IP & Compliance Audit](./system_ip_audit.md)**: Intellectual Property ownership audit (ZSE Stub).
 - **[Section 42 Swap Agreement](./SECTION_42_SWAP_AGREEMENT.md)**: Legal integrity for asset transfer (ZSE Stub).
 

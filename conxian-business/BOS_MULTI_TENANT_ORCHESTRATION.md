@@ -8,7 +8,7 @@ The BaaP model uses a **Supervisor-Worker** orchestration pattern for multi-tena
 ### Supervisor Agent (Strategy Nexus)
 - **Role**: Context switching and task dispatching.
 - **Isolation**: Injects the `TenantID` into every tool call.
-- **Decision Logic**: Routes business intents to specialized worker crews based on the `BOS_STATE_MACHINE.json`.
+- **Decision Logic**: Routes business intents to specialized worker crews based on the `BOS_STATE_MACHINE.stub.json`.
 
 ### Worker Crews (EXCO Units)
 - **Fiscal Vault Crew**: Manages liquidity, swaps, and payouts.

@@ -40,21 +40,35 @@ This report evaluates the **Conxian Sovereign Business Operations System (BOS)**
 
 ## 4. Enhancement Roadmap for BaaP (Business-as-a-Platform)
 
-### 4.1. Multi-Tenancy Orchestration
+### 4.1. Multi-Tenancy & Jurisdictional Sharding
 - **Requirement**: Support for multiple businesses running isolated BOS instances on shared decentralized infrastructure.
-- **Enhancement**: Implement "Jurisdictional Sharding" in the Strategy Nexus to isolate business contexts while sharing the security of the Stacks settlement layer.
+- **Enhancement**:
+    - **Isolation**: Implement "Jurisdictional Sharding" via Kwil Namespaces and Tableland Row-Level Access Control (RLAC).
+    - **Context Scoping**: Adopt `AsyncLocalStorage` (Node.js) or `ThreadLocal` (Java/Rust equivalent) patterns to ensure `TenantID` is automatically propagated across all agent tool calls and database mutations.
 
-### 4.2. Template-Based Deployment (The "Business-in-a-Box")
-- **Requirement**: Allow other businesses to "fork" the Conxian BOS with one click.
-- **Enhancement**: Create standard **Akash SDL** and **Docker Compose** templates for the full EXCO agent suite.
+### 4.2. Declarative Provisioning (The "Business-in-a-Box")
+- **Requirement**: Allow other businesses to "fork" and deploy the Conxian BOS with minimal friction.
+- **Enhancement**:
+    - **Cloud-Native**: Create standard **Akash SDL** (Cloud) and **Docker Compose** (Local) templates for the full EXCO agent suite.
+    - **BOS Operator**: Develop a "BOS Operator" (Kubernetes-style) that can autonomously provision a new tenant's vault, guardian, and nexus based on a single YAML manifest.
 
-### 4.3. Standardized API/MCP Interfaces
-- **Requirement**: Easy-to-use interfaces for external developers and agents.
-- **Enhancement**: Transition from bespoke JSON-LD to a standardized **Model Context Protocol (MCP)** interface across all EXCO units.
+### 4.3. Standardized Agent Interoperability (MCP v2.1)
+- **Requirement**: Seamless integration with external developers, specialized agents (e.g., CrewAI, AutoGen), and LLM platforms.
+- **Enhancement**:
+    - **MCP Adoption**: Standardize all EXCO units on the **Model Context Protocol (MCP)**. Each agent (Vault, Guardian, Nexus) must expose its tools, resources, and prompts via an MCP server.
+    - **Tool Aggregation**: Implement an MCP Proxy/Aggregator at the Gateway level to provide a single entry point for external LLMs to discover and execute Conxian business logic.
 
-### 4.4. Verifiable Telemetry & Decentralized Persistence
-- **Requirement**: Ensure analytics and state are immutable and globally available without centralized hosting risk.
-- **Enhancement**: Move from hosted PostgreSQL metrics to a hybrid model using **Kwil** for transactional relational state and **Tableland** for long-term audit log persistence.
+### 4.4. Sovereign Relational State (Kwil + Tableland Hybrid)
+- **Requirement**: High-performance relational state with immutable audit trails anchored to Bitcoin.
+- **Enhancement**:
+    - **Transactional Layer (Kwil)**: Use Kwil for active business state (e.g., pending swaps, active timelocks) due to its high throughput and SQL compatibility.
+    - **Audit Layer (Tableland)**: Use Tableland for long-term, immutable audit logs and state-root anchors. This provides a "Decentralized Mirror" that survives even if the primary Nexus hosting provider is compromised.
+
+### 4.5. Knowledge Retention & Zero Secret Egress (ZSE) Automation
+- **Requirement**: Maintain ZSE compliance while scaling to multiple teams.
+- **Enhancement**:
+    - **ZSE Scanner**: Integrate a CI-level ZSE scanner that rejects any PR containing material classified as "Internal Strategy" or "Sensitive Configuration" based on a dynamic regex library.
+    - **Automated Stubs**: Automate the generation of `*.stub.json` files from internal Linear issues during the build process to ensure public-facing clarity is never out of sync with internal progress.
 
 ## 5. Implementation Summary
 - **Phase 1**: Update documentation to reflect BaaP vision (Active).

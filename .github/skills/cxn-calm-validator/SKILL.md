@@ -7,7 +7,7 @@ description: Enforces the Morgan Stanley CALM standard for all BOS configuration
 # ETHOS: Programmatic operations require standardized state machines.
 
 ## LOGIC
-1. **TRIGGER:** When `BOS_STATE_MACHINE.json` or `BOS_CONFIG.md` is updated.
+1. **TRIGGER:** When `BOS_STATE_MACHINE.stub.json` or `BOS_CONFIG.md` is updated.
 2. **VALIDATE:** Ensure the JSON structure adheres to the Common Architecture Language Model (CALM).
 3. **CHECK:** - Mandatory fields: `state`, `transition`, `trigger`, `actor`.
    - Ensure all `actor` fields are compliant with the `cxn-` naming protocol.
