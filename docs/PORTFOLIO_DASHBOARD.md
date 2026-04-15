@@ -25,7 +25,7 @@ This dashboard provides a high-level maturity and readiness overview for the Con
 - [x] **Governance Standardization**: Completed (CON-432).
 - [x] **Security Hardening**: Completed (CON-253).
 - [x] **Mainnet Branch Model**: Implementation verified across portfolio.
-- [x] **BaaP Evolution**: Business-as-a-Platform standards and research integrated (CON-474).
+- [x] **BaaP Evolution**: Business-as-a-Platform v2.1 industrial standards integrated (CON-474).
 
 ## Audit Snapshot (April 2026)
 
@@ -34,4 +34,5 @@ This dashboard provides a high-level maturity and readiness overview for the Con
 - **Contamination**: Production Contamination Guard (scripts/verify_contamination_guard.py) active and **PASSED org-wide**.
 
 ---
-*Last Updated: 2026-04-14*
+*Last Updated: 2026-04-15*
+- [x] **Agentic Surface**: Read-First MCP layer and Sovereign Handshake implemented.
