@@ -61,9 +61,10 @@ Non-goals:
 
 ### 4.1 Hardware-backed key pair
 
-Each enterprise device/workload that needs BOS access MUST provision one or more key pairs where:
+Each enterprise device/workload that needs BOS access MUST provision one or more key pairs such that:
 
-- the private key is non-exportable (TPM/TEE/HSM)
+- device identity and approval/signature keys have private key material that is non-exportable and held in TPM/TEE/HSM-class hardware
+- session binding keys are hardware-backed and non-exportable for any session that can reach privileged/write BOS surfaces; for explicitly non-privileged, read-only surfaces, session binding keys MAY be software-backed if they are minted inside a hardened boundary and are never reused for higher-privilege BOS surfaces
 - the public key becomes a stable, non-reassignable identifier for this device/workload, used for replay protection and per-device risk controls; authorization policy and revocation are keyed on the canonical BOS principal that binds to one or more such device/workload keys
 
 Key purposes are separated:
@@ -117,7 +118,7 @@ The session broker SHOULD reject enterprise policy inputs (for example, IdP asse
 The session broker issues one of the following proof-of-possession-bound session forms:
 
 1. **mTLS client identity** (recommended for service-to-service and ERP connectors)
-   - broker mints a short-lived client certificate for a dedicated session binding key that is itself attested, or whose certificate carries an explicit binding to the device/workload identity key (for example, a custom extension that contains the device/workload identity key hash). The TLS key pair MUST NOT be the same as the device identity key or any approval/signature key, and device identity/approval keys MUST NEVER be used directly for TLS. Where the platform supports it, the TLS private key MUST be non-exportable and hardware-backed (TPM/TEE/HSM class). If a deployment uses a software TLS key, it MUST be minted inside a hardened boundary and MUST NOT be used for the highest-privilege BOS surfaces.
+   - broker mints a short-lived client certificate for a dedicated session binding key that is itself attested, or whose certificate carries an explicit binding to the device/workload identity key (for example, a custom extension that contains the device/workload identity key hash). The TLS key pair MUST NOT be the same as the device identity key or any approval/signature key, and device identity/approval keys MUST NEVER be used directly for TLS. Where the platform supports it, the TLS private key MUST be non-exportable and hardware-backed (TPM/TEE/HSM class). If a deployment uses a software TLS key, it MUST conform to the session binding key exception described in section 4.1 and MUST NOT be used for the highest-privilege BOS surfaces.
 
 2. **PoP token** (recommended for browser/mobile clients)
    - broker issues a short-lived token whose requests must include a per-request signature with the bound key
@@ -252,6 +253,8 @@ At minimum:
 - BOS privileged services MUST enforce revocation either by consulting the revocation registry on each request, or by honoring a strict maximum revocation-cache TTL that is shorter than the maximum session TTL
 
 If the revocation registry or attestation verifier is unavailable or returns an indeterminate result, the session broker and BOS privileged services MUST fail closed for privileged/write surfaces (rejecting session issuance and validation). Read-only surfaces MAY operate under a bounded cached view of revocation state when the registry is temporarily unavailable, subject to enterprise policy and with clear audit logging.
+
+When revocation or attestation checks are indeterminate, the session broker MUST NOT issue new sessions that can reach privileged/write BOS surfaces. Deployments MAY, under explicit enterprise policy and with immutable audit logging, allow the session broker to issue sessions constrained to explicitly read-only scopes using a bounded cached view of revocation state; otherwise, all session issuance MUST fail closed until revocation and attestation checks are healthy again.
 
 Implementations MUST treat network connection failures, DNS errors, timeouts, non-2xx HTTP responses, and parse/validation errors from the revocation registry or attestation verifier as indeterminate results. For privileged/write surfaces, only an explicit, positively authenticated “not revoked” response may be treated as sufficient to proceed.
 
