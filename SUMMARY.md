@@ -59,6 +59,7 @@
   * [LSEG MCP Audit](Fiscal-Vault-Oracle/LSEG_MCP_AUDIT.md)
 * [Treasury Oracle](Fiscal-Vault-Oracle/SOVEREIGN_RUNWAY.md)
 * [BOS treasury and yield integration architecture (CON-438)](docs/architecture/BOS_TREASURY_AND_YIELD_INTEGRATION_ARCHITECTURE.md)
+* [BOS sovereign enterprise identity architecture (CON-441)](docs/architecture/BOS_SOVEREIGN_ENTERPRISE_IDENTITY_ARCHITECTURE.md)
 * [Arch Guardian](Nakamoto-Guardian/ANTI_FRAGILITY_LOOP.md)
 * [Grid Oracle (Agnostic)](cxn-grid-oracle/README.md)
 * [Ops Engine](Sovereign-Ops-Orchestrator/DEPLOYMENT_EFFICIENCY.md)
