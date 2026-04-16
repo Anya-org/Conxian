@@ -144,9 +144,17 @@ Session issuance MUST be conditioned on a configured binding between these eleme
 
 The canonical BOS principal is anchored in the Device/Workload Identity Record (the device/workload identity key, or a stable identifier derived from it). Session binding keys (mTLS client keys and PoP keys) are proof-of-possession carriers that MUST be cryptographically bound to that principal. Allowlists, capability scopes, audit trails, and revocation entries MUST be keyed on the canonical principal, not on ephemeral session keys.
 
+Canonical BOS principals SHOULD be modeled explicitly as one of:
+
+- **Human operator principal**: bound to an enterprise user identifier plus one or more attested device/workload identity keys.
+- **ERP connector workload principal**: bound to an ERP system identifier plus an attested connector device/workload identity key.
+- **Headless automation principal**: bound to a non-human workload identifier plus an attested device/workload identity key.
+
+Principal identifiers MUST be globally unique within a BOS deployment and MUST NOT be reused for different subjects.
+
 Subject device/workload identity keys MUST NOT be reassigned to a different BOS principal over their lifetime. If a device or workload is reprovisioned or reassigned, it MUST generate new keys and establish a new binding.
 
-Long-lived refresh credentials are not permitted for privileged BOS surfaces. Session renewal MUST require fresh attestation within the maximum accepted identity-record age window, and interactive sessions MAY additionally require enterprise IdP re-authentication per policy. If a deployment supports any renewal artifact, it MUST be a hardware-backed proof-of-possession credential that is audience-limited to the session broker only and is never accepted directly by BOS privileged services. Any renewal artifact MUST have a maximum lifetime less than or equal to the maximum accepted Device/Workload Identity Record age.
+Multi-day or indefinite refresh credentials are not permitted for privileged BOS surfaces. Session renewal MUST require fresh attestation at least once per deployment policy interval (and never less frequently than the maximum accepted identity-record age window), and interactive sessions MAY additionally require enterprise IdP re-authentication per policy. If a deployment supports any renewal artifact, it MUST be a hardware-backed proof-of-possession credential that is audience-limited to the session broker only and is never accepted directly by BOS privileged services. Any renewal artifact MUST have a short TTL (for example, 1 hour or less) and MUST have a maximum lifetime less than or equal to the maximum accepted Device/Workload Identity Record age.
 
 ## 6) ERP and enterprise flows
 
@@ -226,7 +234,7 @@ At minimum:
 - the session broker MUST reject any identity record marked as revoked, even if the corresponding subject key is not revoked
 - BOS privileged services MUST enforce revocation either by consulting the revocation registry on each request, or by honoring a strict maximum revocation-cache TTL that is shorter than the maximum session TTL
 
-If the revocation registry or attestation verifier is unavailable or returns an indeterminate result, the session broker and BOS privileged services MUST fail closed for privileged surfaces (rejecting session issuance and validation).
+If the revocation registry or attestation verifier is unavailable or returns an indeterminate result, the session broker and BOS privileged services MUST fail closed for privileged/write surfaces (rejecting session issuance and validation). Read-only surfaces MAY operate under a bounded cached view of revocation state when the registry is temporarily unavailable, subject to enterprise policy and with clear audit logging.
 
 For sessions validated via online introspection (for example, opaque tokens), the session broker acts as the validation authority. For self-contained sessions validated directly by BOS services (for example, PoP tokens or mTLS client certs), those services MUST perform equivalent revocation checks against the revocation registry (or via a cache with TTL strictly shorter than the maximum session TTL) and MUST NOT treat locally-validated sessions as exempt from the global revocation model.
 
