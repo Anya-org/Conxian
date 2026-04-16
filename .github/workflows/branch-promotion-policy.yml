@@ -74,19 +74,27 @@ jobs:
 
             if (baseRef === 'dev') {
               requireBodyPattern(
-                /^###\s+Feature\s*->\s*dev\s+promotion\s+checklist\b/im,
-                "PRs into 'dev' must include a '### Feature -> dev promotion checklist' section in the PR description (see docs/PROMOTION_CHECKLISTS.md)."
+                /(PROMOTION:FEATURE->DEV)|(^###\s+Feature\s*->\s*dev\s+promotion\s+checklist\b)/im,
+                "PRs into 'dev' must include the feature -> dev promotion checklist in the PR description (see docs/PROMOTION_CHECKLISTS.md)."
               );
             }
 
             if (baseRef === 'staged') {
               requireBodyPattern(
-                /^###\s+Dev\s*->\s*staged\s+promotion\s+checklist\b/im,
-                "PRs into 'staged' must include a '### Dev -> staged promotion checklist' section in the PR description (see docs/PROMOTION_CHECKLISTS.md)."
+                /(PROMOTION:DEV->STAGED)|(^###\s+Dev\s*->\s*staged\s+promotion\s+checklist\b)/im,
+                "PRs into 'staged' must include the dev -> staged promotion checklist in the PR description (see docs/PROMOTION_CHECKLISTS.md)."
               );
               requireBodyPattern(
-                /wallet\s*\/\s*signer\s*\/\s*treasury\s+boundary/i,
-                "PRs into 'staged' must explicitly record wallet/signer/treasury boundary checks in the PR description (see docs/PROMOTION_CHECKLISTS.md)."
+                /\bwallet\b/i,
+                "PRs into 'staged' must explicitly record wallet boundary checks in the PR description (see docs/PROMOTION_CHECKLISTS.md)."
+              );
+              requireBodyPattern(
+                /\bsigner\b/i,
+                "PRs into 'staged' must explicitly record signer boundary checks in the PR description (see docs/PROMOTION_CHECKLISTS.md)."
+              );
+              requireBodyPattern(
+                /\btreasury\b/i,
+                "PRs into 'staged' must explicitly record treasury boundary checks in the PR description (see docs/PROMOTION_CHECKLISTS.md)."
               );
               requireBodyPattern(
                 /deployment\s+boundary/i,

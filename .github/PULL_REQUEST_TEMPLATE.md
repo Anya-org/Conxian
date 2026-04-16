@@ -26,6 +26,7 @@ Provide a concise but comprehensive summary of the changes in this Pull Request.
 Reference: `docs/PROMOTION_CHECKLISTS.md`
 Delete the sections that do not apply to your PR.
 
+<!-- PROMOTION:FEATURE->DEV -->
 ### Feature -> dev promotion checklist
 
 - [ ] I targeted `dev` (not `staged`/`main`) and the change is appropriate for testnet/non-production validation.
@@ -33,6 +34,7 @@ Delete the sections that do not apply to your PR.
 - [ ] The PR is scoped and does not mix unrelated changes (especially across `.github/`, `openspec/`, `docs/`, `scripts/`).
 - [ ] If this change touches wallets/signers/treasury/deployment surfaces, I described the change boundary and the expected runtime lane (`dev`/testnet).
 
+<!-- PROMOTION:DEV->STAGED -->
 ### Dev -> staged promotion checklist
 
 - [ ] Integrated testnet validation completed on `dev` and is linked here.
@@ -41,6 +43,7 @@ Delete the sections that do not apply to your PR.
 - [ ] Deployment boundary checks are explicitly recorded.
 - [ ] Any required submodule pins, lockfiles, and artifact provenance are updated for the promotion candidate.
 
+<!-- PROMOTION:STAGED->MAIN -->
 ### Mainnet acceptance evidence pack
 
 Required for `staged` -> `main` promotions. Provide the evidence pack under this heading, or link to a versioned in-repo file per `openspec/specs/mainnet-acceptance-evidence-pack/spec.md`.
