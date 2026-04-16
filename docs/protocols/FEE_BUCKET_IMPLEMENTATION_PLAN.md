@@ -70,6 +70,13 @@ Stage A buckets (policy-gated):
 | A2 | `referee_reward` | Contributor | 500 | Referee principal | Requires referral engine + payout readiness |
 | A3 | `protocol_health_lock` | Protocol-owned | 500 | `operational-treasury` principal key: `protocol-health-vault` | Requires policy toggle |
 
+Gate semantics (Stage A):
+
+- Stage A is a **partial carve-out** stage; it is not a full `10000`-BPS split.
+- When a policy gate for a Stage A bucket is off, that bucket is disabled (its effective BPS is `0`).
+- Stage A BPS values are never renormalized across the remaining buckets.
+- Any amount not carved out in Stage A becomes `captured_protocol_fees` and flows into Stage B.
+
 Stage B buckets (implementation-ready, with policy parameters):
 
 1. Compute `captured_protocol_fees = total_fee - sum(stage_A)`.
@@ -106,9 +113,17 @@ For any fee/yield flow, the implementation MUST:
 
 To avoid ambiguous “lost unit” behavior:
 
-- For a given split, compute each bucket amount using integer division.
+- For any split stage, compute each bucket amount using integer division.
 - Track `remainder = total - sum(bucket_amounts)`.
-- Route `remainder` to the most protocol-conservative bucket (typically `ecosystem_reserve` / protocol treasury custody), never to Labs or Founder.
+
+Remainder routing is stage-aware:
+
+- For carve-out stages (e.g., Stage A of `captured_protocol_fees.v1`), `remainder` is the input amount for the next stage (`captured_protocol_fees`) and is not routed to any bucket.
+- For terminal stages, route the `remainder` to a specific protocol-owned bucket:
+  - `productive_streaming.v1`: route remainder to `ecosystem_reserve`.
+  - Stage B (6-way split of `post_cut_captured`): route remainder to `treasury`.
+
+Remainders must never be routed to Labs or Founder.
 
 This matches the Founder’s Cut remainder rule in `openspec/changes/csf-autonomous-launch/specs/launch-mechanics/spec.md`.
 
@@ -196,6 +211,7 @@ Implementation steps:
    - takes `(token, amount, bucket_set_id, flow_recipient)` inputs,
    - validates that each full-split stage (e.g., `productive_streaming.v1`, or the Stage B split of `post_cut_captured`) has BPS that sum to `10000`,
    - treats partial carve-outs (e.g., Stage A of `captured_protocol_fees.v1`) as bounded by `<= 10000` rather than required to sum to `10000`,
+   - recomputes all bucket amounts on-chain from the canonical BPS configuration and fails closed if any caller-supplied breakdown disagrees,
    - resolves any role-based recipients through `operational-treasury`,
    - fails closed with explicit errors if a required principal key is missing.
 
@@ -214,8 +230,9 @@ Target locations:
 Implementation steps:
 
 1. Make bucket computation explicit in the proposal artifact:
-   - compute bucket amounts from `ProductiveStreaming` (5/5/90),
-   - include the resulting bucket list in the proposal payload used for execution.
+   - include the bucket set id and the flow beneficiary binding,
+   - optionally include computed bucket amounts for observability and audit,
+   - treat any precomputed bucket amounts as advisory only (on-chain routing must recompute and validate).
 
 2. Add a cross-trigger invariant test:
    - “native trigger” vs “external trigger” must compute identical bucket outputs given the same lock type and asset path.
