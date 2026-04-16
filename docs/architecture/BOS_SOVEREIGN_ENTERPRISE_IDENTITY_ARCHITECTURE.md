@@ -117,6 +117,7 @@ The session broker issues one of the following proof-of-possession-bound session
 
 2. **PoP token** (recommended for browser/mobile clients)
    - broker issues a short-lived token whose requests must include a per-request signature with the bound key
+   - the bound key MUST be hardware-backed and non-exportable per section 4.1 (for example, WebAuthn/FIDO or OS keystore-backed keys), not JS-managed or exportable keys
 
 Session properties (normative defaults):
 
@@ -172,6 +173,13 @@ This integrates with the existing ERP handshake model described in `docs/ERP_MCP
 
 ERP connectors that call BOS MCP (or any privileged BOS surface) MUST NOT hold long-lived BOS credentials (static API keys, shared secrets, or non-expiring tokens). All BOS calls from ERP MUST be mediated via short-lived, attested, proof-of-possession-bound sessions issued by the session broker.
 
+Horizontally-scaled ERP connector clusters MUST either:
+
+- share a BOS-facing key that is held only in an HSM/TEE boundary and never exported to application processes, or
+- provision a distinct device/workload identity key per instance so compromise and revocation can be localized
+
+Distributing a single private key into multiple application instances or configuration stores is not permitted.
+
 ### 6.3 Headless enterprise workload session (non-human)
 
 Use case: an enterprise-controlled automation (not a human) needs to call BOS.
@@ -201,6 +209,8 @@ At minimum:
 - the session broker MUST check revocation status on every session issuance and on every session validation
 - the session broker MUST reject any identity record marked as revoked, even if the corresponding subject key is not revoked
 - BOS privileged services MUST enforce revocation either by consulting the revocation registry on each request, or by honoring a strict maximum revocation-cache TTL that is shorter than the maximum session TTL
+
+If the revocation registry or attestation verifier is unavailable or returns an indeterminate result, the session broker and BOS privileged services MUST fail closed for privileged surfaces (rejecting session issuance and validation).
 
 ### 7.2 Recovery and rotation
 
