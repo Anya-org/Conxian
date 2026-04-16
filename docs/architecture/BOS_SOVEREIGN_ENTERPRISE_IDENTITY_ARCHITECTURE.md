@@ -125,7 +125,7 @@ The session broker issues one of the following proof-of-possession-bound session
 
 Session properties (normative defaults):
 
-- TTL: 5–15 minutes (policy-controlled)
+- TTL: MUST NOT exceed 15 minutes for sessions that can reach privileged BOS surfaces (implementations SHOULD target 5–15 minutes); longer TTLs MAY be used only for explicitly non-privileged, read-only surfaces under documented enterprise policy
 - Audience-bound: tokens/certs are issued for a specific BOS service surface
 - Scope-bound: explicit capability scopes (no implicit admin)
 - Replay-resistant: per-request nonce or signed request binding
@@ -245,6 +245,8 @@ At minimum:
 - BOS privileged services MUST enforce revocation either by consulting the revocation registry on each request, or by honoring a strict maximum revocation-cache TTL that is shorter than the maximum session TTL
 
 If the revocation registry or attestation verifier is unavailable or returns an indeterminate result, the session broker and BOS privileged services MUST fail closed for privileged/write surfaces (rejecting session issuance and validation). Read-only surfaces MAY operate under a bounded cached view of revocation state when the registry is temporarily unavailable, subject to enterprise policy and with clear audit logging.
+
+Implementations MUST treat network connection failures, DNS errors, timeouts, non-2xx HTTP responses, and parse/validation errors from the revocation registry or attestation verifier as indeterminate results. For privileged/write surfaces, only an explicit, positively authenticated “not revoked” response may be treated as sufficient to proceed.
 
 For sessions validated via online introspection (for example, opaque tokens), the session broker acts as the validation authority. For self-contained sessions validated directly by BOS services (for example, PoP tokens or mTLS client certs), those services MUST perform equivalent revocation checks against the revocation registry (or via a cache with TTL strictly shorter than the maximum session TTL) and MUST NOT treat locally-validated sessions as exempt from the global revocation model.
 
