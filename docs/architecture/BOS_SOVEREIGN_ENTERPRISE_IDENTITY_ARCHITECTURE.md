@@ -61,7 +61,7 @@ Non-goals:
 
 ### 4.1 Hardware-backed key pair
 
-Each enterprise device/workload that needs BOS access generates a key pair where:
+Each enterprise device/workload that needs BOS access MUST provision one or more key pairs where:
 
 - the private key is non-exportable (TPM/TEE/HSM)
 - the public key becomes the stable identifier for allowlists and replay protection
@@ -72,7 +72,7 @@ Key purposes are separated:
 - **session binding key**: binds online sessions to proof-of-possession
 - **approval/signature key**: used only for explicit approvals (for example, signing an intent mandate)
 
-The same physical secure element may hold multiple keys, but purposes must remain distinct at the policy layer.
+At minimum, device identity, session binding, and approval/signature keys MUST be distinct key pairs (even if stored in the same secure element), and MUST be treated as separate principals at the policy layer.
 
 ### 4.2 Attestation evidence
 
@@ -100,6 +100,8 @@ Enterprise SSO (OIDC/SAML) and provisioning (SCIM) are used to supply:
 
 These signals MUST be treated as time-bound inputs and must not become reusable BOS credentials.
 
+The session broker MUST only issue sessions when enterprise policy signals are explicitly bound to the attested subject key in an auditable way. Implementations MUST NOT combine enterprise claims from one context with attestation evidence from an unrelated key.
+
 ## 5) Session brokering model
 
 The session broker issues one of the following proof-of-possession-bound session forms:
@@ -123,6 +125,13 @@ Issuance MUST fail closed if any of the following cannot be verified:
 - enterprise policy inputs (when required)
 - allowlist membership for the subject key
 - requested capability scopes vs policy
+
+The session broker MUST derive a canonical BOS principal from:
+
+- the attested subject public key and its Device/Workload Identity Record
+- current enterprise policy signals (when required for the session type)
+
+Session issuance MUST be conditioned on a configured binding between these elements (for example, `user_id ↔ device_key` or `workload_id ↔ device_key`), and that binding MUST be recorded in an immutable audit trail.
 
 ## 6) ERP and enterprise flows
 
@@ -153,6 +162,8 @@ Use case: SAP/Oracle tool calling (`authorize_intent`) requires a session withou
 
 This integrates with the existing ERP handshake model described in `docs/ERP_MCP_HANDSHAKE_SPEC.md`, but replaces any implicit “shared secret to call MCP” assumption with attested session brokering.
 
+ERP connectors that call BOS MCP (or any privileged BOS surface) MUST NOT hold long-lived BOS credentials (static API keys, shared secrets, or non-expiring tokens). All BOS calls from ERP MUST be mediated via short-lived, attested, proof-of-possession-bound sessions issued by the session broker.
+
 ### 6.3 Headless enterprise workload session (non-human)
 
 Use case: an enterprise-controlled automation (not a human) needs to call BOS.
@@ -175,6 +186,11 @@ Revocation targets:
 - sessions issued under a compromised subject
 
 Revocation MUST be enforceable at the session broker and at BOS service boundaries (defense in depth).
+
+At minimum:
+
+- the session broker MUST check revocation status on every session issuance and on every session validation
+- BOS privileged services MUST enforce revocation either by consulting the revocation registry on each request, or by honoring a strict maximum revocation-cache TTL that is shorter than the maximum session TTL
 
 ### 7.2 Recovery and rotation
 
