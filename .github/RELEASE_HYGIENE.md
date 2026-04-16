@@ -25,16 +25,30 @@ Reference: `docs/BRANCH_AND_PROMOTION_STANDARD.md` and `openspec/specs/git-manag
 
 ## Required checks guidance
 
-### Always-on checks for PRs targeting `staged` or `main`
+### Always-on checks for PRs targeting `dev`, `staged`, or `main`
 
-These workflows run on every pull request targeting `dev`, `staged`, or `main`. Required checks are defined by branch protection rules, but merges to `staged` and `main` are expected to be green before merge:
+These workflows run on every pull request targeting `dev`, `staged`, or `main`. Branch protection rules determine which checks are *required* to merge into protected branches (typically `staged`/`main`), and promotion PRs are expected to have all checks green before merge.
 
 *Note:* check names shown in the PR UI may drift over time; rely on the PR UI’s required checks list when in doubt.
 
 - Unified CI (see [`conxian-unified-ci.yml`](./workflows/conxian-unified-ci.yml))
   - Repo hygiene:
     - ZSE knowledge retention via `scripts/verify_knowledge_retention.py`.
+    - Tracked artifact scanning via `scripts/verify_tracked_artifacts.py`.
+      - False positives can be allowlisted via `.github/artifact-scan-allowlist.txt` (case-sensitive; paths are normalized to forward slashes with no leading `./`):
+        - Plain (non-glob) patterns (no glob metacharacters such as `*`, `?`, or bracket expressions like `[a-z]`):
+          - If the pattern contains `/`, it is matched against the full normalized path.
+          - Plain patterns can also match a directory prefix at a path boundary (e.g., `audit/reports` matches `audit/reports/<...>` but not `audit/reports-old/<...>`).
+          - If the pattern does not contain `/`, it also matches basenames anywhere in the repo and exact normalized paths.
+        - Glob patterns (contain glob metacharacters such as `*`, `?`, or bracket expressions like `[a-z]`):
+          - If the pattern contains `/`, it is matched against the full normalized path.
+          - If the pattern does not contain `/`, it is matched against basenames only (it does not match full normalized paths; add `/` when you need full-path matching).
+        - Examples:
+          - `junit.xml` matches any tracked file with basename `junit.xml` anywhere in the repo.
+          - `audit/reports` matches any tracked file under `audit/reports/` (path-boundary directory-prefix match; does not match `audit/reports-old/`).
+          - `*.log` matches any tracked `.log` file by basename, so use with care.
     - Submodule integrity via `scripts/verify_submodule_integrity.py`.
+    - Governance baseline via `scripts/verify_repo_governance_baseline.py`.
 - Branch promotion policy (see [`branch-promotion-policy.yml`](./workflows/branch-promotion-policy.yml))
 - Secret scan (see [`secret-scan.yml`](./workflows/secret-scan.yml))
 - Dependency review (see [`dependency-review.yml`](./workflows/dependency-review.yml))

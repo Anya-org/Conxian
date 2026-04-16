@@ -8,6 +8,7 @@ import os
 import re
 import subprocess
 import sys
+from pathlib import PurePosixPath
 
 
 def repo_root() -> str:
@@ -19,14 +20,16 @@ def read_submodule_paths(root: str) -> list[str]:
     if not os.path.exists(gitmodules_path):
         return []
 
+    path_re = re.compile(r"^path\s*=\s*(.+)$")
     paths: list[str] = []
     with open(gitmodules_path, "r", encoding="utf-8") as f:
         for raw_line in f:
             line = raw_line.strip()
-            if not line.startswith("path ="):
+            match = path_re.match(line)
+            if not match:
                 continue
-            _, value = line.split("=", 1)
-            candidate = value.strip()
+
+            candidate = match.group(1).strip()
             if candidate:
                 paths.append(candidate)
     return paths
@@ -37,6 +40,18 @@ def is_in_dir(rel_path: str, rel_dir: str) -> bool:
     if not rel_dir:
         return False
     return rel_path == rel_dir or rel_path.startswith(rel_dir + "/")
+
+
+def normalize_rel_path(rel_path: str) -> str:
+    rel_path = rel_path.replace(os.sep, "/").replace("\\", "/")
+    while rel_path.startswith("./"):
+        rel_path = rel_path[2:]
+    return rel_path
+
+
+def is_top_level_verifier_entrypoint(rel_path: str) -> bool:
+    path = PurePosixPath(normalize_rel_path(rel_path))
+    return path.parent == PurePosixPath("scripts") and path.name.startswith("verify_")
 
 
 def git_ls_files(root: str) -> list[str]:
@@ -58,17 +73,11 @@ def read_text(root: str, rel_path: str) -> str:
     full_path = os.path.join(root, rel_path)
     with open(full_path, "r", encoding="utf-8", errors="replace") as f:
         return f.read()
-
-
 def main() -> int:
     root = repo_root()
+    this_script_rel = normalize_rel_path(os.path.relpath(os.path.abspath(__file__), root))
     submodules = set(read_submodule_paths(root))
     excluded_dirs = {".idx"} | submodules
-
-    exempt_reference_files = {
-        "scripts/verify_bos_production_boundary.py",
-        "scripts/verify_pr_bos_classification.py",
-    }
 
     excluded_paths = {p.rstrip("/") for p in excluded_dirs if p.rstrip("/")}
     try:
@@ -92,7 +101,9 @@ def main() -> int:
             )
 
     # 2) Generated BOS audit outputs must never be committed.
-    generated_files = [p for p in repo_files if is_in_dir(p, "conxian-business/.generated")]
+    generated_files = [
+        p for p in repo_files if is_in_dir(p, "conxian-business/.generated")
+    ]
     if generated_files:
         errors.append(
             "Committed generated artifacts detected under conxian-business/.generated/: "
@@ -110,18 +121,26 @@ def main() -> int:
             continue
         if is_in_dir(rel_path, "docs") or is_in_dir(rel_path, "openspec"):
             continue
-        if rel_path in exempt_reference_files:
-            continue
-
         text = read_text(root, rel_path)
         for needle in forbidden_substrings:
+            # Verifier entrypoints may reference stub artifacts to enforce hygiene rules,
+            # but should still be checked for all other forbidden references.
+            if needle == ".stub.json" and is_top_level_verifier_entrypoint(rel_path):
+                continue
+            if (
+                needle == "conxian-business/.generated/"
+                and rel_path == this_script_rel
+            ):
+                continue
             if needle in text:
                 errors.append(
                     f"Production/CI code must not reference {needle}: {rel_path}"
                 )
 
     # 4) Avoid hard-coded testnet defaults in operational scripts.
-    testnet_network_literal = re.compile(r"networkFromName\(\s*['\"]testnet['\"]\s*\)")
+    testnet_network_literal = re.compile(
+        r"(?:networkFromName\(\s*['\"]testnet['\"]\s*\)|new\s+StacksTestnet\s*\()"
+    )
     # Matches testnet principals like "ST..." or "ST....contract-name" (case-insensitive).
     testnet_principal_literal = re.compile(
         r"['\"](?:ST|SN)[0-9A-Z]{20,}(?:\.[a-zA-Z0-9-]{1,128})?['\"]",

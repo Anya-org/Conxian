@@ -1,8 +1,17 @@
 # cxn-grid-oracle (Grid Intelligence & Orchestration)
 
-> Current workspace release: **v1.8.2** (see [`CHANGELOG.md`](../CHANGELOG.md))
+> Current workspace release: **v1.9.2** (see [`CHANGELOG.md`](../CHANGELOG.md))
 
 The cxn-grid-oracle module handles agnostic demand-response routing and energy orchestration for the Conxian ecosystem.
+
+## Purpose
+
+- Define a public-safe input/output schema for grid intelligence signals used by Conxian orchestration.
+- Document expected fields and semantics so downstream components can integrate consistently.
+
+## Status
+
+alpha — This module currently provides schema documentation and governance scaffolding; production integrations should treat it as non-stable.
 
 ## Universal Oracle Schema
 

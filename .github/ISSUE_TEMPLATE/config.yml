@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Security Policy
-    url: /security/policy
-    about: Report security vulnerabilities privately.
+  - name: Conxian Support
+    url: https://github.com/Conxian/conxian-business/discussions
+    about: Please ask questions in the discussions tab.

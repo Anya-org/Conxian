@@ -75,7 +75,7 @@ export default function Home() {
             </span>
           </h1>
           <p className="text-xl text-gray-400 max-w-lg leading-relaxed">
-            A headless cryptographic state machine. Commoditize your users' mobile hardware for 
+            A headless cryptographic state machine. Commoditize your users&apos; mobile hardware for
             Nakamoto-native finality with zero vendor lock-in.
           </p>
           <div className="flex gap-4">
@@ -123,7 +123,7 @@ export default function Home() {
               <div className="bg-white/5 rounded-lg p-4 font-mono text-sm text-gray-300 break-all">
                 Payload: 0x9a8f7b...3c2d1e
                 <br />
-                Path: m/86'/0'/0'/0/0
+                Path: m/86&apos;/0&apos;/0&apos;/0/0
               </div>
 
               <button 

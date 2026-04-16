@@ -2,6 +2,9 @@
 node_modules/
 jspm_packages/
 
+# Root-only npm lockfile
+/package-lock.json
+
 # Firebase CLI
 .firebase/
 
@@ -86,3 +89,6 @@ debug_regex.js
 test_match.js
 
 # Submodules and workspace-specific ignores (already handled by their own .gitignores)
+
+.gemini/
+gha-creds-*.json

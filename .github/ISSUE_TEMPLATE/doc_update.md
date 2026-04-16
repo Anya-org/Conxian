@@ -3,7 +3,7 @@ name: Documentation Update
 about: Suggest an update to the business, strategic, or technical documentation.
 title: "[DOC]: "
 labels: documentation
-assignees: []
+assignees: '
 ---
 
 > Note: This repository is public. Do not include confidential strategy, operational, legal, or infrastructure details. For internal-only material, use the Conxian Linear workspace: https://linear.app/conxian-labs

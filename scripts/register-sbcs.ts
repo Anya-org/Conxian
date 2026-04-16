@@ -79,17 +79,22 @@ function usageAndExit(message?: string, exitCode: number = 1): never {
 
   process.exit(exitCode);
 }
-function assertStacksNetworkPrefix(networkName: NetworkName, flagName: string, address: string) {
-  const normalized = address.trim().toUpperCase();
-
-  if (!validateStacksAddress(normalized)) {
-    const hint = address === normalized ? '' : ` (from ${JSON.stringify(address)})`;
-    usageAndExit(`${flagName} has an invalid Stacks address: ${normalized}${hint}`);
+function assertStacksNetworkPrefix(networkName: NetworkName, flagName: string, address: string): string {
+  const raw = address.trim();
+  const normalized = raw.toUpperCase();
+  if (!validateStacksAddress(raw) && !validateStacksAddress(normalized)) {
+    const hint = address === raw ? '' : ` (from ${JSON.stringify(address)})`;
+    usageAndExit(`${flagName} has an invalid Stacks address: ${raw}${hint}`);
   }
+
   const prefixes: readonly string[] = STACKS_NETWORK_PREFIXES[networkName];
   if (!prefixes.some((prefix) => normalized.startsWith(prefix))) {
-    usageAndExit(`On ${networkName}, ${flagName} must start with ${prefixes.join(' or ')}`);
+    usageAndExit(
+      `On ${networkName}, ${flagName} must start with ${prefixes.join(' or ')} (got: ${raw})`
+    );
   }
+
+  return normalized;
 }
 
 function parseArgs(argv: string[]): { networkName: NetworkName; contract: PrincipalParts } {
@@ -140,7 +145,7 @@ function parseArgs(argv: string[]): { networkName: NetworkName; contract: Princi
     usageAndExit(`Invalid --contract principal: ${contract}`);
   }
 
-  assertStacksNetworkPrefix(networkName, '--contract', contractParts.address);
+  contractParts.address = assertStacksNetworkPrefix(networkName, '--contract', contractParts.address);
   if (contractParts.contractName !== 'fiscal-intelligence') {
     usageAndExit(
       `--contract must point to the fiscal-intelligence contract (got: ${contractParts.contractName})`

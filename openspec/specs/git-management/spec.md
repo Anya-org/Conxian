@@ -5,6 +5,7 @@
 Define the minimum git and submodule management capabilities needed to operate the Conxian workspace (status visibility, clean working trees, and safe synchronization).
 
 This spec also defines the canonical branch and promotion model used across the Conxian portfolio.
+
 ## Requirements
 
 ### Requirement: Canonical environment branches
@@ -28,6 +29,8 @@ The workspace MUST use the following branch roles consistently across all busine
 The workspace MUST enforce an ordered promotion path.
 
 - Promotion to `main` MUST happen only from `staged`.
+- Promotion to `staged` MUST happen only from `dev` (or `hotfix/*`).
+- Promotion to `staged` or `main` MUST originate from a branch in this repository (not a fork).
 - Direct promotion from `dev` to `main` MUST NOT be permitted.
 
 #### Scenario: Promoting a release to mainnet
@@ -36,11 +39,26 @@ The workspace MUST enforce an ordered promotion path.
 - **THEN** it is promoted by merging `staged` into `main`
 - **AND** the merge is blocked unless required CI checks and required approvals are satisfied
 
-#### Scenario: Attempting to promote directly from dev to main
+See [Requirement: Mainnet acceptance evidence for `staged` -> `main`](#mainnet-acceptance-evidence-staged-to-main) below.
+
+#### Scenario: Attempting to promote directly into main from a non-staged branch
 
 - **WHEN** a pull request targets `main`
-- **AND** its source branch is `dev`
+- **AND** its source branch is not `staged`
 - **THEN** the promotion MUST be rejected
+
+#### Scenario: Attempting to promote directly into staged from a non-dev, non-hotfix branch
+
+- **WHEN** a pull request targets `staged`
+- **AND** its source branch is not `dev`
+- **AND** its source branch does not match `hotfix/*`
+- **THEN** the promotion MUST be rejected
+
+<a id="mainnet-acceptance-evidence-staged-to-main" name="mainnet-acceptance-evidence-staged-to-main">&#8203;</a> <!-- Explicit anchor for cross-spec links; zero-width space helps preservation across renderers -->
+
+### Requirement: Mainnet acceptance evidence for `staged` -> `main`
+
+Any `staged` -> `main` promotion MUST include a Mainnet Acceptance Evidence Pack that satisfies all requirements defined in the canonical spec at [openspec/specs/mainnet-acceptance-evidence-pack/spec.md](../mainnet-acceptance-evidence-pack/spec.md).
 
 ### Requirement: Ownership and business-unit boundaries
 
@@ -99,4 +117,3 @@ The system MUST detect and report missing or inconsistent submodule definitions 
 - **WHEN** a workspace audit or sync is initiated
 - **THEN** the system validates that all submodules in the index have valid `.gitmodules` entries
 - **AND** it reports missing mappings as a blocking error
-

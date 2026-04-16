@@ -1,20 +1,18 @@
 # Supabase + Neon dependency inventory (current state) — CON-337
 
-## Status and review cadence
-
-**Last reviewed:** 2026-04-05
-
-**Canonical tracker / live status:** https://linear.app/conxian-labs/issue/CON-337/inventory-current-supabase-and-neon-dependencies-by-service
-
-**Review cadence:** at least monthly, and additionally within the same PR/commit whenever evidence is added/removed.
-
-Update convention: on every review, bump `Last reviewed` in the same PR/commit that updates evidence (or a dedicated PR if no other content changes are needed).
+_Snapshot date:_ 2026-04-04
 
 This document inventories **current, evidenced** touchpoints to **Supabase** and **Neon** across the Conxian service surfaces pinned in this repository.
 
 Because this repo follows **Zero Secret Egress (ZSE)**, production connection strings, project refs, keys, internal hostnames, and internal endpoints/URLs are intentionally not present here. Wherever possible, each item is labeled with an **evidence level**.
 
-**Redaction convention:** any internal endpoint/URL/hostname and any secret material (connection strings, project refs, keys) must be redacted so that no secret material remains. Use the placeholder `<redacted>` for all redacted portions. For URIs, keep only the scheme and replace everything after `://` with `<redacted>` (e.g., `mcp://<redacted>`). This applies to any referenced evidence artifacts pinned in this repo.
+**Redaction convention:** replace any internal endpoint/URL/hostname and any secret material (connection strings, project refs, keys) with a literal `<redacted>` placeholder rendered in Markdown as code, following the rules listed below. Do not partially mask values beyond what those rules explicitly allow.
+
+- **Whole value**: replace the entire value with `<redacted>` (covers bare hostnames, project refs, keys, connection strings when not presented as URIs).
+- **URIs with `://`**: keep the scheme and replace everything after `://` (credentials, host, port, path, query, fragment) with `<redacted>` (e.g., `https://<redacted>`, `mcp://<redacted>`, `postgresql://<redacted>`).
+- **Other schemes (no `://`)**: replace the entire value with `<redacted>`.
+
+This applies to any referenced evidence artifacts pinned in this repo.
 
 ## Evidence levels
 
@@ -26,7 +24,7 @@ Because this repo follows **Zero Secret Egress (ZSE)**, production connection st
 
 | Owning surface / service | Supabase capability | Business function | Role classification | Downstream consumers | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| `Fiscal-Vault-Oracle` (OpenClaw engine) | **DB + API bridge** via MCP with table-level permissions (`runway_metrics`, `audit_manifest`, `treasury_actions`, `dlc_state_updates`) | Treasury runway monitoring + governed treasury action logging (144-block cadence) | **Analytical + Governance + Transactional** (write path for off-chain action logs; not canonical truth) | OpenClaw runtime; `conxian-nexus` provides external triggers (`NEW_BITCOIN_BLOCK`); audit consumers via DWN | **Code**: `Fiscal-Vault-Oracle/TREASURY_MCP_CONFIG.json`, `Fiscal-Vault-Oracle/BOS_INTEGRATION_MAP.md` |
+| `Fiscal-Vault-Oracle` (OpenClaw engine) | **DB + API bridge** via MCP (`mcp://<redacted>`) with table-level permissions (`runway_metrics`, `audit_manifest`, `treasury_actions`, `dlc_state_updates`) | Treasury runway monitoring + governed treasury action logging (144-block cadence) | **Analytical + Governance + Transactional** (write path for off-chain action logs; not canonical truth) | OpenClaw runtime; `conxian-nexus` provides external triggers (`NEW_BITCOIN_BLOCK`); audit consumers via DWN | **Code**: `Fiscal-Vault-Oracle/TREASURY_MCP_CONFIG.json` *(redacted)*, `Fiscal-Vault-Oracle/BOS_INTEGRATION_MAP.md` *(redacted)* |
 | `Fiscal-Vault-Oracle` (Treasury Oracle schema) | **DB schema + RLS** (`cxn_*` tables; RLS enabled; “read-only for authenticated clients”) | Treasury oracle read model (yield/runway/principal + timelock status) | **Analytical + Governance** (proof/visual-proof datasets) | “Conxius/Gateway” authenticated reads (per RLS note) | **Code**: `docs/CXN_TREASURY_ORACLE_SCHEMA.sql` |
 | `Sovereign-Ops-Orchestrator` (Ops Engine) | **DB** (implied) used as state layer for Linear webhook wiring (`ats_violations`, `deployment_efficiency`, `exit_velocity`) | Operational integrity + performance/valuation telemetry | **Governance + Analytical** | Render-hosted internal dashboard (“Stitch Dashboard”); internal operator workflows | **Spec/Doc**: `Sovereign-Ops-Orchestrator/LINEAR_WIRING.md` |
 | `Sovereign-Strategy-Nexus` (ZK Data Room) | **DB** (implied) as sources for proofs (`yield_events`, `ip_audit_logs`, `runway_metrics`, `deployment_efficiency`) | M&A readiness: verifiable proof surfaces without raw data disclosure | **Governance + Analytical** | External acquirers/auditors consuming proof artifacts; `conxian-nexus` as verifier in the flow | **Spec/Doc**: `Sovereign-Strategy-Nexus/docs/ZK_DATA_ROOM_SCHEMA.md` |

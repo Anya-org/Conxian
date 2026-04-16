@@ -2,6 +2,7 @@ name: Branch Promotion Policy
 
 on:
   pull_request:
+    types: [opened, reopened, synchronize, edited]
     branches: [ main, staged, dev ]
 
 jobs:
@@ -16,24 +17,48 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
-            const base = context.payload.pull_request.base.ref;
-            const head = context.payload.pull_request.head.ref;
+            const pr = context.payload.pull_request;
+            const baseRef = pr.base.ref;
+            const headRef = pr.head.ref;
 
-            core.info(`Branch promotion check: ${head} -> ${base}`);
+            const baseRepoId = pr.base.repo?.id;
+            const headRepoId = pr.head.repo?.id;
 
-            if (base === 'main' && head !== 'staged') {
+            const baseFull = (
+              pr.base.repo?.full_name ?? `${context.repo.owner}/${context.repo.repo}`
+            ).toLowerCase();
+            const headFull = pr.head.repo?.full_name?.toLowerCase() ?? null;
+
+            let sameRepo = null;
+            if (baseRepoId && headRepoId) sameRepo = baseRepoId === headRepoId;
+            else if (headFull) sameRepo = headFull === baseFull;
+
+            core.info(
+              `Branch promotion check: ${headFull ?? 'unknown'}:${headRef} -> ${baseFull}:${baseRef}`
+            );
+
+            if ((baseRef === 'main' || baseRef === 'staged') && sameRepo !== true) {
               core.setFailed(
-                `PRs into 'main' must come from 'staged' (got '${head}' -> '${base}').`
+                sameRepo === null
+                  ? `Promotions into '${baseRef}' require resolvable head/base repository metadata (refusing to proceed).`
+                  : `Promotions into '${baseRef}' must come from an in-repo branch (got '${headFull ?? 'unknown'}:${headRef}' -> '${baseFull}:${baseRef}').`
               );
               return;
             }
 
-            if (base === 'staged') {
-              const allowed = head === 'dev' || head.startsWith('hotfix/');
+            if (baseRef === 'main' && headRef !== 'staged') {
+              core.setFailed(
+                `PRs into 'main' must come from 'staged' (got '${headRef}' -> '${baseRef}').`
+              );
+              return;
+            }
+
+            if (baseRef === 'staged') {
+              const allowed = headRef === 'dev' || headRef.startsWith('hotfix/');
 
               if (!allowed) {
                 core.setFailed(
-                  `PRs into 'staged' must come from 'dev' (or 'hotfix/*') (got '${head}' -> '${base}').`
+                  `PRs into 'staged' must come from 'dev' (or 'hotfix/*') (got '${headRef}' -> '${baseRef}').`
                 );
               }
             }
