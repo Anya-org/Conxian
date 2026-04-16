@@ -22,6 +22,8 @@ All contributors must adhere to the [**Branching and Promotion Policy**](./docs/
 - `staged`: Mainnet candidate validation and promotion to `main`.
 - `dev`: Default development and testnet-oriented logic.
 
+Feature branches should validate locally first, then land in `dev` via pull request.
+
 ## Bounty workflow
 
 - Only **bounty** issues in `Todo` are claimable, and claimable bounty issues must be unassigned.
