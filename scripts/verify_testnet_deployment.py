@@ -112,9 +112,12 @@ def parse_deployment_plan(plan_text: str) -> ParsedPlan:
     contracts: list[PlanContract] = []
 
     current: dict[str, str | None] | None = None
+    current_indent: int | None = None
 
     for raw_line in plan_text.splitlines():
-        line = raw_line.strip()
+        stripped = raw_line.lstrip()
+        indent = len(raw_line) - len(stripped)
+        line = stripped.strip()
         if not line or line.startswith("#"):
             continue
 
@@ -127,14 +130,16 @@ def parse_deployment_plan(plan_text: str) -> ParsedPlan:
             continue
 
         if line.startswith("-"):
-            if current is not None:
+            if current is not None and current_indent is not None and indent <= current_indent:
                 contract = _contract_from_current(current)
                 if contract is not None:
                     contracts.append(contract)
                 current = None
+                current_indent = None
 
             if line.startswith("- contract-publish:"):
                 current = {"contract-name": None, "expected-sender": None, "path": None}
+                current_indent = indent
             continue
 
         if current is None:
@@ -168,6 +173,7 @@ def _http_json(url: str) -> dict:
         timeout_secs = 30.0
     if timeout_secs <= 0:
         timeout_secs = 30.0
+    timeout_secs = min(300.0, max(1.0, timeout_secs))
     try:
         max_attempts = int(os.environ.get("HIRO_MAX_ATTEMPTS", "4"))
     except ValueError:
