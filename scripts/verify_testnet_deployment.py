@@ -436,7 +436,21 @@ def main() -> None:
                     "network": network,
                     "deployer": deployer,
                     "plan": os.path.abspath(args.plan),
-                    "contracts": [dataclasses.asdict(r) for r in results],
+                    "contracts": [
+                        {
+                            "name": r.name,
+                            "principal": r.principal,
+                            "local_path": r.local_path,
+                            "expected_sender": r.expected_sender,
+                            "sender_matches_deployer": r.sender_matches_deployer,
+                            "deployed": r.deployed is True,
+                            "lookup_failed": r.deployed is None,
+                            "tx_id": r.tx_id,
+                            "block_height": r.block_height,
+                            "source_matches": r.source_matches,
+                        }
+                        for r in results
+                    ],
                     "failures": failures,
                 },
                 indent=2,
