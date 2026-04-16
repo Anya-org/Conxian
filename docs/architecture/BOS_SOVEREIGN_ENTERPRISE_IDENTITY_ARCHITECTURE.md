@@ -134,7 +134,7 @@ Issuance MUST fail closed if any of the following cannot be verified:
 
 - attestation validity and freshness
 - enterprise policy inputs (when required)
-- allowlist membership for the subject key
+- allowlist membership for the subject principal (and, where policy requires, the specific device/workload identity key)
 - requested capability scopes vs policy
 
 The session broker MUST derive a canonical BOS principal from:
@@ -146,7 +146,9 @@ Session issuance MUST be conditioned on a configured binding between these eleme
 
 Creation, modification, or removal of the binding between a BOS principal and a device/workload identity key MUST be treated as a protected action under `docs/protocols/ENTERPRISE_CUSTODY_BASELINE.md`.
 
-The canonical BOS principal is a subject-level identifier (human operator or workload) that is bound to one or more Device/Workload Identity Records. Each Device/Workload Identity Record contributes one attested device/workload identity key for that principal. Session binding keys (mTLS client keys and PoP keys) are proof-of-possession carriers that MUST be cryptographically bound to a specific principal via their associated Device/Workload Identity Record. Allowlists, capability scopes, audit trails, and revocation entries MUST be keyed on the subject principal identifier, not on ephemeral session keys or individual device keys.
+The canonical BOS principal is a subject-level identifier (human operator or workload) that is bound to one or more Device/Workload Identity Records. Each Device/Workload Identity Record contributes one attested device/workload identity key for that principal. Session binding keys (mTLS client keys and PoP keys) are proof-of-possession carriers that MUST be cryptographically bound to a specific principal via their associated Device/Workload Identity Record. Allowlists, capability scopes, and audit trails MUST be keyed on the subject principal identifier, not on ephemeral session keys.
+
+Revocation entries MAY target a specific device/workload identity key or Device/Workload Identity Record, but every revocation entry MUST record the associated principal and MUST NOT treat the device key as an independent principal.
 
 Device identity, session binding, and approval/signature keys are credentials for a canonical BOS principal. They MUST be mapped back to that principal and MUST NOT be treated as independent principals.
 
@@ -227,10 +229,10 @@ Revocation and recovery MUST map to the protected-action and recovery baselines 
 
 Revocation targets:
 
-- subject public keys (device/workload identities)
-- Device/Workload Identity Records (to revoke unsafe posture independently of the underlying key)
+- subject public keys (device/workload identity keys for a given BOS principal)
+- Device/Workload Identity Records (to revoke unsafe posture independently of the underlying key, while still binding to the principal)
 - verifier policy versions (if an attestation root is compromised)
-- sessions issued under a compromised subject
+- sessions issued under a compromised subject principal
 
 Revocation MUST be enforceable at the session broker and at BOS service boundaries (defense in depth).
 
