@@ -233,6 +233,10 @@ def _fetch_contract_source(hiro_base: str, principal: str, name: str) -> str | N
             return None
         raise
     source = data.get("source")
+    if source is None:
+        raise HiroRequestError(
+            f"Unexpected Hiro response for {principal}.{name}: missing source"
+        )
     if not isinstance(source, str):
         raise HiroRequestError(
             f"Unexpected Hiro response for {principal}.{name}: source is {type(source).__name__}"
