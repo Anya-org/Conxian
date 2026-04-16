@@ -141,11 +141,6 @@ def parse_deployment_plan(plan_text: str) -> ParsedPlan:
 
     return ParsedPlan(network=network, deployer=deployer, contracts=contracts)
 
-
-class HiroRequestError(RuntimeError):
-    pass
-
-
 def _http_json(url: str) -> dict:
     try:
         timeout_secs = float(os.environ.get("HIRO_TIMEOUT_SECS", "30"))
@@ -173,21 +168,31 @@ def _http_json(url: str) -> dict:
             try:
                 return json.loads(payload)
             except json.JSONDecodeError as e:
-                raise HiroRequestError(f"Hiro API returned invalid JSON: {url}") from e
+                last_err = e
         except urllib.error.HTTPError as e:
             if e.code == 404:
                 raise
             if e.code == 429 or (500 <= e.code < 600):
                 last_err = e
             else:
-                raise HiroRequestError(f"Hiro API request failed: {url} (HTTP {e.code})") from e
+                raise
         except (urllib.error.URLError, TimeoutError) as e:
             last_err = e
 
         if attempt < max_attempts - 1:
             time.sleep(0.5 * (2**attempt))
 
-    raise HiroRequestError(f"Hiro API request failed after retries: {url} ({last_err})") from last_err
+    if last_err is not None:
+        is_timeout = isinstance(last_err, TimeoutError) or (
+            isinstance(last_err, urllib.error.URLError)
+            and isinstance(getattr(last_err, "reason", None), TimeoutError)
+        )
+        if is_timeout:
+            raise urllib.error.URLError(
+                f"Hiro API request timed out after retries: {url}"
+            ) from last_err
+        raise last_err
+    raise urllib.error.URLError(f"Hiro API request failed after retries: {url}")
 
 
 def _fetch_contract_source(hiro_base: str, principal: str, name: str) -> str | None:
@@ -308,7 +313,7 @@ def verify_plan(
         lookup_failed = False
         try:
             chain_source = _fetch_contract_source(hiro_base, principal, c.name)
-        except HiroRequestError as e:
+        except (urllib.error.HTTPError, urllib.error.URLError, json.JSONDecodeError) as e:
             lookup_failed = True
             failures.append(
                 f"{c.name}: Hiro API error querying source for {principal}.{c.name}: {e}"
@@ -320,7 +325,7 @@ def verify_plan(
         if deployed:
             try:
                 tx_id, block_height = _fetch_contract_meta(hiro_base, principal, c.name)
-            except HiroRequestError as e:
+            except (urllib.error.HTTPError, urllib.error.URLError, json.JSONDecodeError) as e:
                 failures.append(
                     f"{c.name}: Hiro API error querying metadata for {principal}.{c.name}: {e}"
                 )
