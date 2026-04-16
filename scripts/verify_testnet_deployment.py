@@ -187,7 +187,8 @@ def _http_json(url: str) -> dict:
             try:
                 data = json.loads(payload)
             except json.JSONDecodeError as e:
-                raise HiroRequestError(f"Hiro API returned invalid JSON: {url}") from e
+                last_err = e
+                continue
 
             if not isinstance(data, dict):
                 raise HiroRequestError(
@@ -208,6 +209,8 @@ def _http_json(url: str) -> dict:
         if attempt < max_attempts - 1:
             time.sleep(0.5 * (2**attempt))
 
+    if isinstance(last_err, json.JSONDecodeError):
+        raise HiroRequestError(f"Hiro API returned invalid JSON: {url}") from last_err
     raise HiroRequestError(f"Hiro API request failed after retries: {url} ({last_err})") from last_err
 
 
