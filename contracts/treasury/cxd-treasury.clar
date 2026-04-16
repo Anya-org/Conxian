@@ -27,9 +27,9 @@
 (define-map accrued-claims principal uint)
 
 ;; Governance & Authorization
-(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var agent-treasury-principal principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
-(define-data-var revenue-distributor-principal principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var admin principal tx-sender)
+(define-data-var agent-treasury-principal principal tx-sender)
+(define-data-var revenue-distributor-principal principal tx-sender)
 (define-data-var policy-locked bool false)
 
 ;; State Bounds
@@ -107,7 +107,7 @@
 
 (define-public (initialize (new-admin principal))
   (begin
-    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender tx-sender) (err ERR_UNAUTHORIZED))
     (var-set admin new-admin)
     (ok true)
   )

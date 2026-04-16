@@ -10,7 +10,7 @@
 ;; Errors
 (define-constant ERR_INVALID_TICK u2001)
 
-;; Get sqrt price ratio at tick (returns value with 12 decimal places)
+;; @desc Get sqrt price ratio at tick (returns value with 12 decimal places)
 ;; tick 0 -> 1.0 -> 1000000000000
 ;; tick 1 -> sqrt(1.0001) > 1.00004999875 -> 1000049998750
 (define-read-only (get-sqrt-ratio-at-tick (tick int))
@@ -35,7 +35,7 @@
   )
 )
 
-;; Get tick at sqrt price ratio
+;; @desc Get tick at sqrt price ratio
 (define-read-only (get-tick-at-sqrt-ratio (sqrt-price-x96 uint))
   (let
     (
@@ -49,7 +49,7 @@
   )
 )
 
-;; Calculate amount0 delta for a given liquidity and price range
+;; @desc Calculate amount0 delta for a given liquidity and price range
 (define-read-only (get-amount0-delta
     (sqrt-price-a-x96 uint)
     (sqrt-price-b-x96 uint)
@@ -66,7 +66,7 @@
   )
 )
 
-;; Calculate amount1 delta for a given liquidity and price range
+;; @desc Calculate amount1 delta for a given liquidity and price range
 (define-read-only (get-amount1-delta
     (sqrt-price-a-x96 uint)
     (sqrt-price-b-x96 uint)
@@ -83,17 +83,17 @@
   )
 )
 
-;; Check if tick is valid
+;; @desc Check if tick is valid
 (define-read-only (is-valid-tick (tick int))
   (and (>= tick MIN_TICK) (<= tick MAX_TICK))
 )
 
-;; Get MIN_TICK
+;; @desc Get MIN_TICK
 (define-read-only (get-min-tick)
   MIN_TICK
 )
 
-;; Get MAX_TICK
+;; @desc Get MAX_TICK
 (define-read-only (get-max-tick)
   MAX_TICK
 )

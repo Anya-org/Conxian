@@ -4,6 +4,34 @@
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Nakamoto](https://img.shields.io/badge/Nakamoto-Aligned-green.svg)](docs/CLARITY4_MIGRATION_TRACKING.md)
 
+## Purpose
+
+Ship the Conxian Finance Protocol smart contracts (Clarity), including CSF interfaces, core execution engines, and governance primitives.
+
+## Status
+
+Active development (alpha). Not production-ready; expect breaking changes.
+
+For a dated snapshot, see [Status (March 2026)](#status-march-2026). For ongoing changes, see [CHANGELOG.md](CHANGELOG.md).
+
+## Ownership
+
+Ownership and review requirements are defined in [`CODEOWNERS`](./CODEOWNERS).
+
+## Audience
+
+- Clarity engineers integrating with CSF standards and Conxian primitives.
+- Security reviewers validating contract behavior, invariants, and integration surfaces.
+- Frontend and indexer developers building on top of Conxian protocol state.
+
+## Relationship to the Conxian stack
+
+- This is the on-chain execution layer.
+- It is typically consumed via:
+  - [Conxian Gateway](https://github.com/Conxian/conxian-gateway) (API + indexing)
+  - [Conxian UI](https://github.com/Conxian/Conxian_UI) (`Conxian_UI`)
+  - [Conxius Wallet](https://github.com/Conxian/conxius-wallet)
+
 ## Overview
 
 🏦 **Conxian Finance**: A Multi-Dimensional, Stacks-Native Automated Monetary Platform.
@@ -58,20 +86,18 @@ The CSF is a standardized interface that allows third-party protocols to nativel
 └── ...               # Lending, Monitoring, Security, Compliance
 ```
 
----
-
 ## Status (March 2026)
 
-- **Maturity Level**: 🟢 **Apex Production** (CSF Standard Established)
-- **Performance**: ⚡ **[Verified Benchmarks](docs/BENCHMARKS.md)** (Avg. < 40ms CSF routing)
-- **Revenue Mechanism**: 100% Buy-back and Burn (Apex BME).
-- **Key Upgrades**:
-  - ✅ **CSF v1.1.0**: Flash liquidity and yield routing standardized.
-  - ✅ **Universal Router**: Dynamic dispatch for the entire Stacks ecosystem.
-  - ✅ **Contagion Guard**: Multi-tier isolation circuit breaking.
-  - ✅ **2026 Asset Support**: stSTX, stSTXbtc, sBTC, and USDA native tracking.
-  - ✅ **Federated Oracle**: Multi-source weighted price aggregation (CSF-aligned).
-
----
+- **Maturity (as of March 2026)**: Snapshot of the then-current alpha-stage protocol; see [Status](#status) for the latest maturity and stability guidance.
+- **Snapshot highlights**:
+  - CSF traits and interfaces: [`contracts/traits/`](contracts/traits/)
+  - Router and DEX modules: [`contracts/dex/`](contracts/dex/)
+  - Core safety and execution engines: [`contracts/core/`](contracts/core/)
+- **Nakamoto / Clarity 4 alignment**: [Clarity 4 migration tracking](docs/CLARITY4_MIGRATION_TRACKING.md)
+- **Benchmarks (simnet)**: [Protocol benchmarks](docs/BENCHMARKS.md)
+- **Recent reports and plans**:
+  - [Deployment sign-off (March 2026)](DEPLOYMENT_SIGN_OFF_MARCH_2026.md) (root-level report)
+  - [Enhancement plan (March 2026)](ENHANCEMENT_PLAN_MARCH_2026.md) (root-level report)
+  - [System alignment audit (March 2026)](docs/SYSTEM_ALIGNMENT_AUDIT_MARCH_2026.md)
 
 © 2024-2026 Conxian Finance. All rights reserved.

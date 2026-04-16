@@ -114,13 +114,25 @@
   )
 )
 
+;; @desc Returns the human-readable name of the token.
 (define-read-only (get-name) (ok "Conxian Dollar"))
+
+;; @desc Returns the ticker symbol of the token.
 (define-read-only (get-symbol) (ok "CXD"))
+
+;; @desc Returns the number of decimal places for the token.
 (define-read-only (get-decimals) (ok u8))
+
+;; @desc Returns the token balance of a specific principal.
 (define-read-only (get-balance (w principal)) (ok (ft-get-balance cxd w)))
+
+;; @desc Returns the total circulating supply of the token.
 (define-read-only (get-total-supply) (ok (ft-get-supply cxd)))
+
+;; @desc Returns an optional URI for the token's metadata.
 (define-read-only (get-token-uri) (ok none))
 
+;; @desc Updates the admin address (admin only).
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)

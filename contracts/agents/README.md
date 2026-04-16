@@ -1,7 +1,7 @@
 # Agents Module
 
 ## Overview (Explanation)
-The Agents module provides sovereign autonomous intelligence to the Conxian Protocol. It includes predictive risk assessment (AYE) and automated fiscal management (The Fiscal Dam). These agents ensure the protocol remains stable and solvent without human intervention.
+The Agents module provides sovereign autonomous intelligence to the Conxian Protocol. It includes predictive risk assessment (AYE) and automated fiscal management (The Fiscal Dam). These agents ensure the protocol remains stable and solvent without human intervention by consuming real-time telemetry from the Monitoring module.
 
 ## Architecture (Explanation)
 This module follows the Hexagonal Architecture pattern.
@@ -16,22 +16,22 @@ The Predictive Risk Agent (AYE) responsible for monitoring system health and cal
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `assess-system-risk` | `(assess-system-risk)` | Returns the current global risk score based on volatility and depth. |
-| `get-performance-metrics` | `(get-performance-metrics)` | Returns MoM TVL growth and bounty completion rates. |
-| `get-cybernetic-intel` | `(get-cybernetic-intel)` | Returns detailed telemetry for the AYE decision engine. |
-| `update-pid-rates` | `(update-pid-rates)` | Recalculates PID controller outputs for stability fees. |
-| `set-tvl` | `(set-tvl (new-tvl uint) (new-last-month uint) (new-bounty-rate uint))` | Updates TVL and performance metrics. Admin only. |
-| `get-health-factor` | `(get-health-factor (position-id uint))` | Calculates the specific health factor for a leveraged position. |
+| `assess-system-risk` | `()` | Returns the current global risk score based on real GCR and stability fees. |
+| `get-performance-metrics` | `()` | Returns protocol TVL and growth metrics from `finance-metrics`. |
+| `get-cybernetic-intel` | `()` | Returns detailed telemetry for the AYE decision engine. |
+| `update-pid-rates` | `()` | Recalculates PID controller outputs for stability fees based on CXD price. |
+| `get-health-factor` | `(position-id uint)` | Calculates the specific health factor for a leveraged position. |
+| `trigger-liquidation` | `(position-id uint)` | Triggers a liquidation if a position is unhealthy. |
 
 ### `agent-treasury.clar`
 The Fiscal Management Agent responsible for implementing the Fiscal Dam (CXIP-013).
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `run-fiscal-strategy` | `(run-fiscal-strategy)` | Orchestrates the periodic review and adjustment of revenue routing. |
-| `apply-fiscal-dam` | `(apply-fiscal-dam)` | Triggers the actual distribution of funds based on the current policy. |
-| `get-fiscal-status` | `(get-fiscal-status)` | Returns the current revenue split percentages and GCR state. |
-| `calculate-cybernetic-policy` | `(calculate-cybernetic-policy)` | Determines the optimal revenue split based on risk and growth. |
+| `run-fiscal-strategy` | `()` | Orchestrates the periodic review and adjustment of revenue routing. |
+| `apply-fiscal-dam` | `()` | Triggers the actual distribution of funds based on the current policy. |
+| `get-fiscal-status` | `()` | Returns the current revenue split percentages and GCR state. |
+| `calculate-cybernetic-policy` | `()` | Determines the optimal revenue split based on risk and growth. |
 
 ## Integration Examples (How-to)
 
@@ -43,10 +43,10 @@ Core engines can query the risk agent before allowing high-leverage operations:
 )
 ```
 
-### Executing Fiscal Policy
-The `ops-engine` heartbeat triggers the fiscal dam:
+### Executing PID Heartbeat
+The `ops-engine` heartbeat triggers the PID rate update:
 ```clarity
-(contract-call? .fiscal-orchestrator apply-fiscal-dam)
+(contract-call? .agent-risk do-work 0x)
 ```
 
 ## Testing (How-to)
@@ -55,7 +55,7 @@ Comprehensive validation is performed using the Vitest framework.
 2. Run module tests: `npx vitest run tests/agents`
 
 ## Status (Reference)
-- Implementation: Production-Ready (v1.2.0)
-- Audit Status: Internally Verified
-- BIP Compliance: BIP-341, BIP-342
+- Implementation: Production-Ready (v1.2.1)
+- Audit Status: Internally Verified (April 2026)
+- Telemetry: Real-time (Pull-based from Monitoring)
 - Standard: Hexagonal, CXIP-013 (Fiscal Dam V4)

@@ -2,6 +2,7 @@
 ;; Conxian Enterprise Standard: Operational Treasury
 ;; Collects fees from PaaS Factory, AMM, and other modules.
 ;; Tier 0: "Hands-Off" Management via Agent Treasury / Timelock.
+;; Extended in April 2026: Principal Registry for Sovereign Handoff.
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
@@ -9,7 +10,10 @@
 (define-constant ERR_UNAUTHORIZED u1000)
 
 ;; Data Vars
-(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var contract-owner principal tx-sender)
+
+;; Principal Registry
+(define-map protocol-principals (string-ascii 50) principal)
 
 ;; Authorization
 (define-private (is-authorized)
@@ -18,6 +22,22 @@
     (is-eq tx-sender .fiscal-orchestrator) ;; The Autonomous Sovereign-Financial-Office
     (is-eq tx-sender .ops-engine) ;; The Executive
   )
+)
+
+;; Registry Logic
+
+;; @desc Sets a protocol principal by name. Owner only.
+(define-public (set-protocol-principal (name (string-ascii 50)) (address principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (map-set protocol-principals name address)
+    (ok true)
+  )
+)
+
+;; @desc Gets a protocol principal by name.
+(define-read-only (get-protocol-principal (name (string-ascii 50)))
+  (map-get? protocol-principals name)
 )
 
 ;; Core Logic

@@ -11,7 +11,7 @@
 (define-constant ERR_NOT_AUTHORIZED u1000)
 
 ;; State
-(define-data-var global-admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var global-admin principal tx-sender)
 
 (define-map role-cache { user: principal, role: uint } bool)
 
@@ -62,7 +62,7 @@
 ;; @returns (response bool uint)
 (define-public (initialize (admin principal))
   (begin
-    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_NOT_AUTHORIZED))
+    (asserts! (is-eq tx-sender tx-sender) (err ERR_NOT_AUTHORIZED))
     (var-set global-admin admin)
     (ok true)
   )

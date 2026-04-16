@@ -45,6 +45,8 @@
 )
 
 ;; Read-Only: Get Aggregated Price (trait compliance)
+
+;; @desc Returns the aggregated price for a given asset
 (define-read-only (get-price (asset principal))
   (match (map-get? price-data { asset: asset })
     data 
@@ -57,6 +59,8 @@
 )
 
 ;; Read-Only: Fetch Price (trait compliance, identical to get-price in this context)
+
+;; @desc Returns the aggregated price for a given asset (alias for get-price)
 (define-read-only (fetch-price (asset principal))
   (get-price asset)
 )

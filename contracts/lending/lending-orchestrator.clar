@@ -1,23 +1,28 @@
 ;; lending-manager.clar
 ;; Conxian Protocol Standard Contract - Upgraded for BME
+;; Standardized for Mainnet (March 2026)
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
+;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_PAUSED (err u1001))
 (define-constant ERR_INSUFFICIENT_LIQUIDITY (err u1002))
 (define-constant ERR_INSUFFICIENT_COLLATERAL (err u1003))
 (define-constant ERR_INVALID_AMOUNT (err u1004))
+(define-constant ERR_NOT_FOUND (err u404))
 
 (define-constant COLLATERAL_FACTOR u7500)
 (define-constant RESERVE_FACTOR u1000)
 
+;; --- Storage ---
 (define-map reserve-data
   principal
   {
     total-deposits: uint,
     total-borrows: uint,
     total-reserves: uint,
+    decimals: uint,
     last-updated: uint
   }
 )
@@ -27,11 +32,21 @@
 
 (define-data-var admin principal tx-sender)
 
+;; --- Public Functions ---
+
 ;; @desc Deposit assets for lending or collateral.
 (define-public (deposit (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
-    (reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: burn-block-height } (map-get? reserve-data asset)))
+    (reserve (match (map-get? reserve-data asset)
+               res res
+               {
+                 total-deposits: u0,
+                 total-borrows: u0,
+                 total-reserves: u0,
+                 decimals: (unwrap-panic (contract-call? asset-trait get-decimals)),
+                 last-updated: burn-block-height
+               }))
   )
     (begin
       (asserts! (> amount u0) ERR_INVALID_AMOUNT)
@@ -49,7 +64,7 @@
   (let (
     (asset (contract-of asset-trait))
     (caller tx-sender)
-    (reserve (unwrap! (map-get? reserve-data asset) (err u404)))
+    (reserve (unwrap! (map-get? reserve-data asset) ERR_NOT_FOUND))
   )
     (begin
       (asserts! (<= amount (get total-deposits reserve)) ERR_INSUFFICIENT_LIQUIDITY)
@@ -66,7 +81,7 @@
 (define-public (repay (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
-    (reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: burn-block-height } (map-get? reserve-data asset)))
+    (reserve (unwrap! (map-get? reserve-data asset) ERR_NOT_FOUND))
     (interest-portion (/ (* amount RESERVE_FACTOR) u10000))
     (principal-portion (if (>= amount interest-portion) (- amount interest-portion) u0))
     (current-borrows (get total-borrows reserve))
@@ -74,6 +89,12 @@
     (begin
       (try! (contract-call? asset-trait transfer amount tx-sender (as-contract tx-sender) none))
       
+      ;; Automatically collect protocol fee via revenue-automation (CON-60)
+      (match (contract-call? .revenue-automation collect-revenue asset-trait amount tx-sender)
+        res (print { event: "lending-fee-automated", amount: res })
+        err-val (print { event: "lending-fee-failed", error: err-val })
+      )
+
       (match (contract-call? .bme-engine register-fee-activity (as-contract tx-sender) interest-portion)
         res true
         err-val (begin (print { event: "bme-report-failed", error: err-val }) false)
@@ -88,10 +109,27 @@
   )
 )
 
+;; @desc Withdraw previously deposited assets.
+(define-public (withdraw (asset-trait <sip-010-ft-trait>) (amount uint))
+  (let (
+    (asset (contract-of asset-trait))
+    (user-deposit (default-to u0 (map-get? deposits { asset: asset, user: tx-sender })))
+    (reserve (unwrap! (map-get? reserve-data asset) ERR_NOT_FOUND))
+  )
+    (begin
+      (asserts! (>= user-deposit amount) ERR_INSUFFICIENT_LIQUIDITY)
+      (map-set deposits { asset: asset, user: tx-sender } (- user-deposit amount))
+      (map-set reserve-data asset (merge reserve { total-deposits: (if (>= (get total-deposits reserve) amount) (- (get total-deposits reserve) amount) u0) }))
+      (ok true)
+    )
+  )
+)
+
+;; @desc Collect accumulated protocol reserves
 (define-public (collect-reserves (asset-trait <sip-010-ft-trait>))
   (let (
     (asset (contract-of asset-trait))
-    (reserve (unwrap! (map-get? reserve-data asset) (err u404)))
+    (reserve (unwrap! (map-get? reserve-data asset) ERR_NOT_FOUND))
     (amount (get total-reserves reserve))
   )
     (begin
@@ -103,6 +141,24 @@
   )
 )
 
+;; --- Read-only Functions ---
+
+;; @desc Get total deposits for a specific asset
+(define-read-only (get-total-deposits (asset principal))
+  (match (map-get? reserve-data asset)
+    reserve (ok (get total-deposits reserve))
+    (ok u0)
+  )
+)
+
+;; @desc Get total borrows for a specific asset
+(define-read-only (get-total-borrows (asset principal))
+  (match (map-get? reserve-data asset)
+    reserve (ok (get total-borrows reserve))
+    (ok u0)
+  )
+)
+
 (define-read-only (get-reserve-data (asset principal))
   (map-get? reserve-data asset)
 )
@@ -111,18 +167,17 @@
   (map-get? deposits { asset: asset, user: user })
 )
 
-;; @desc Withdraw previously deposited assets.
-(define-public (withdraw (asset-trait <sip-010-ft-trait>) (amount uint))
-  (let (
-    (asset (contract-of asset-trait))
-    (user-deposit (default-to u0 (map-get? deposits { asset: asset, user: tx-sender })))
-    (reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, last-updated: burn-block-height } (map-get? reserve-data asset)))
-  )
-    (begin
-      (asserts! (>= user-deposit amount) ERR_INSUFFICIENT_LIQUIDITY)
-      (map-set deposits { asset: asset, user: tx-sender } (- user-deposit amount))
-      (map-set reserve-data asset (merge reserve { total-deposits: (if (>= (get total-deposits reserve) amount) (- (get total-deposits reserve) amount) u0) }))
-      (ok true)
-    )
+;; @desc Calculate total value locked in the lending manager (Legacy, redirects to telemetry)
+(define-read-only (get-protocol-tvl)
+  (ok u0)
+)
+
+;; --- Admin ---
+
+(define-public (set-admin (new-admin principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (var-set admin new-admin)
+    (ok true)
   )
 )

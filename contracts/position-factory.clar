@@ -19,6 +19,7 @@
 
 (define-data-var position-nonce uint u0)
 
+;; @desc Creates a new position for a user in a specific pool
 (define-public (create-position
     (pool principal)
     (amount uint)
@@ -38,6 +39,7 @@
   )
 )
 
+;; @desc Returns position details for a given position ID
 (define-read-only (get-position (id uint))
   (map-get? positions id)
 )

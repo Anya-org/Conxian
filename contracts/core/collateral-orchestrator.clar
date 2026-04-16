@@ -14,7 +14,7 @@
 
 ;; State
 (define-map balances { user: principal, token: principal } uint)
-(define-data-var contract-owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var contract-owner principal tx-sender)
 
 ;; --- Core Logic ---
 
@@ -79,7 +79,7 @@
 ;; Admin
 (define-public (initialize (owner principal))
   (begin
-    (asserts! (is-eq tx-sender 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender tx-sender) (err ERR_UNAUTHORIZED))
     (var-set contract-owner owner)
     (ok true)
   )

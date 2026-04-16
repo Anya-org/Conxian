@@ -63,13 +63,17 @@ depends_on = ["conxian-access"]
 [contracts.mev-protector]
 path = "contracts/security/mev-protector.clar"
 
+[contracts.revenue-automation]
+path = "contracts/treasury/revenue-automation.clar"
+depends_on = ["sip-standards", "revenue-distributor"]
+
 [contracts.revenue-distributor]
 path = "contracts/treasury/revenue-distributor.clar"
 depends_on = ["bme-engine", "cxd-token"]
 
 [contracts.concentrated-liquidity-pool]
 path = "contracts/dex/concentrated-liquidity-pool.clar"
-depends_on = ["sip-standards", "bme-engine", "conxian-csf-trait"]
+depends_on = ["sip-standards", "bme-engine", "conxian-csf-trait", "revenue-automation"]
 
 [contracts.risk-unit]
 path = "contracts/core/risk-unit.clar"
@@ -77,7 +81,8 @@ depends_on = ["core-traits", "oracle-aggregator"]
 
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
-depends_on = ["oracle-aggregator", "cxd-token", "risk-unit", "conxian-protocol", "automation-traits", "conxian-service-trait"]
+clarity-version = 4
+depends_on = ["oracle-aggregator", "cxd-token", "risk-manager", "conxian-protocol", "automation-traits", "conxian-service-trait", "finance-metrics"]
 
 [contracts.order-orchestrator]
 path = "contracts/enterprise/order-orchestrator.clar"
@@ -111,9 +116,9 @@ depends_on = ["conxian-protocol", "revenue-distributor"]
 [contracts.position-nft]
 path = "contracts/dimensional/position-nft.clar"
 
-[contracts.lending-orchestrator]
-path = "contracts/lending/lending-orchestrator.clar"
-depends_on = ["sip-standards"]
+[contracts.lending-manager]
+path = "contracts/lending/lending-manager.clar"
+depends_on = ["conxian-protocol", "economic-policy-engine", "risk-manager", "bme-engine", "sip-standards", "revenue-automation"]
 
 [contracts.dimensional-engine]
 path = "contracts/core/dimensional-engine.clar"
@@ -131,7 +136,7 @@ path = "contracts/security/conxian-insurance-fund.clar"
 
 [contracts.finance-metrics]
 path = "contracts/monitoring/finance-metrics.clar"
-depends_on = ["cxd-token", "lending-orchestrator", "dimensional-core", "operational-treasury", "conxian-insurance-fund"]
+depends_on = ["cxd-token", "lending-manager", "dimensional-core", "operational-treasury", "conxian-insurance-fund", "oracle-aggregator"]
 
 [contracts.circuit-breaker]
 path = "contracts/security/circuit-breaker.clar"
@@ -330,10 +335,18 @@ path = "contracts/governance/signed-data-base.clar"
 [contracts.self-launch-coordinator]
 path = 'contracts/core/self-launch-coordinator.clar'
 
-[contracts.test-c4]
-path = "contracts/test-c4.clar"
-
-[contracts.revenue-automation]
-path = "contracts/revenue-automation.clar"
+[contracts.ops-loan-manager]
+path = "contracts/enterprise/ops-loan-manager.clar"
 depends_on = ["sip-standards"]
 
+[contracts.dlc-bond]
+path = "contracts/sbtc/dlc-bond.clar"
+depends_on = ["bond-traits", "sip-standards"]
+
+[contracts.dlc-orchestrator]
+path = "contracts/sbtc/dlc-orchestrator.clar"
+depends_on = ["bond-traits", "dlc-bond"]
+
+[contracts.dlc-manager]
+path = "contracts/sbtc/dlc-manager.clar"
+depends_on = ["conxian-access"]

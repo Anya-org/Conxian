@@ -16,9 +16,28 @@ The protocol's internal price discovery engine.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `buy` | `(buy (amount-stx uint) (min-tokens uint))` | Purchases CXD tokens from the curve. |
-| `sell` | `(sell (amount-tokens uint) (min-stx uint))` | Sells CXD tokens back to the curve. |
-| `get-buy-quote` | `(get-buy-quote (amount-stx uint))` | Returns the expected token output for a given STX input. |
+| `buy` | `(buy (uint uint) (response bool uint))` | Purchases CXD tokens from the curve. |
+| `sell` | `(sell (uint uint) (response bool uint))` | Sells CXD tokens back to the curve. |
+| `get-buy-quote` | `(get-buy-quote (uint) (response uint uint))` | Returns the expected token output for a given STX input. |
+| `get-sell-quote` | `(get-sell-quote (uint) (response uint uint))` | Returns the expected STX output for a given token input. |
+
+### `bond-factory.clar`
+The factory for creating ecosystem bonds.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `create-bond` | `(create-bond (principal uint uint) (response uint uint))` | Creates a new bond position for a user. |
+| `transfer` | `(transfer (uint principal principal (optional (buff 34))) (response bool uint))` | Standard SIP-010 transfer. |
+
+### `bond-token.clar`
+Standardized bond asset implementation.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `transfer` | `(transfer (uint principal principal (optional (buff 34))) (response bool uint))` | Standard SIP-010 transfer. |
+| `mint` | `(mint (uint principal) (response bool uint))` | Mint new bond tokens (Authorized). |
+| `burn` | `(burn (uint principal) (response bool uint))` | Burn bond tokens. |
+| `set-contract-owner` | `(set-contract-owner (principal) (response bool uint))` | Update contract administrator. |
 
 ## Integration Examples (How-to)
 
@@ -28,12 +47,11 @@ The protocol's internal price discovery engine.
 ```
 
 ## Testing (How-to)
-Comprehensive validation is performed using the Vitest framework.
-1. Install dependencies: `npm install`
-2. Run module tests: `npx vitest run tests/bonding`
+Validation is performed via integration tests.
+1. Run system tests: `npx vitest tests/csf-full-system.test.ts`
 
 ## Status (Reference)
 - Implementation: Production-Ready (v1.2.0)
 - Audit Status: Internally Verified
-- Curve Type: Linear / Exponential
+- BIP Compliance: BIP-341, BIP-342
 - Standard: Hexagonal Architecture

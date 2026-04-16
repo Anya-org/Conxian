@@ -13,7 +13,7 @@
 
 ;; --- Data Vars ---
 (define-data-var admin principal tx-sender)
-(define-data-var last-mint-block uint burn-block-height)
+(define-data-var last-mint-block uint u0)
 (define-data-var total-epoch-fees uint u0)
 (define-data-var total-burned uint u0)
 
@@ -27,6 +27,7 @@
   (default-to false (map-get? authorized-activity-reporters contract-caller))
 )
 
+;; @desc Add an authorized principal that can report activity to the BME engine
 (define-public (add-activity-reporter (reporter principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -37,6 +38,7 @@
 
 ;; --- BME Core Logic ---
 
+;; @desc Register fee activity for a specific pool to influence future emissions
 (define-public (register-fee-activity (pool principal) (fee-amount uint))
   (begin
     (asserts! (is-authorized-reporter) ERR_UNAUTHORIZED)
@@ -51,6 +53,7 @@
   )
 )
 
+;; @desc Trigger the minting and distribution of rewards for the current epoch
 (define-public (execute-epoch-minting (pools-to-reward (list 50 principal)))
   (let (
     (current-height burn-block-height)
@@ -86,6 +89,7 @@
   )
 )
 
+;; @desc Burn a specific amount of protocol fees in CXD
 (define-public (burn-protocol-fees (amount uint))
   (begin
     (try! (contract-call? .cxd-token burn amount tx-sender))
@@ -94,6 +98,7 @@
   )
 )
 
+;; @desc Swap a specific token for CXD and burn it
 (define-public (swap-and-burn (token <sip-010-ft-trait>) (amount uint))
   (begin
     ;; Simplified for simulation to avoid complex router calls
@@ -104,6 +109,7 @@
 
 ;; --- Read-only ---
 
+;; @desc Get global statistics for the BME engine
 (define-read-only (get-bme-stats)
   (ok {
     total-epoch-fees: (var-get total-epoch-fees),
@@ -113,6 +119,7 @@
   })
 )
 
+;; @desc Get the current operational status of the BME engine
 (define-read-only (get-protocol-status)
   (ok { compliant: true, version: "v1.1.0-Apex" })
 )
