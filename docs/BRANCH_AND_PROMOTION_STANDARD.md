@@ -24,6 +24,8 @@ In practice, “promotion” means opening a pull request from the source branch
 3. When the change is a mainnet candidate, open a promotion PR from `dev` into `staged`.
 4. After mainnet-candidate validation completes and approvals are in place, open a promotion PR from `staged` into `main`.
 
+Promotion checklists live in `docs/PROMOTION_CHECKLISTS.md`.
+
 For emergency fixes, open a promotion PR from `hotfix/*` into `staged`, then promote `staged` into `main`.
 
 ## Enforcement

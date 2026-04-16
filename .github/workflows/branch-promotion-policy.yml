@@ -60,5 +60,47 @@ jobs:
                 core.setFailed(
                   `PRs into 'staged' must come from 'dev' (or 'hotfix/*') (got '${headRef}' -> '${baseRef}').`
                 );
+                return;
               }
+            }
+
+            const body = pr.body ?? '';
+
+            const bodyErrors = [];
+            const requireBodyPattern = (pattern, message) => {
+              if (pattern.test(body)) return;
+              bodyErrors.push(message);
+            };
+
+            if (baseRef === 'dev') {
+              requireBodyPattern(
+                /^###\s+Feature\s*->\s*dev\s+promotion\s+checklist\b/im,
+                "PRs into 'dev' must include a '### Feature -> dev promotion checklist' section in the PR description (see docs/PROMOTION_CHECKLISTS.md)."
+              );
+            }
+
+            if (baseRef === 'staged') {
+              requireBodyPattern(
+                /^###\s+Dev\s*->\s*staged\s+promotion\s+checklist\b/im,
+                "PRs into 'staged' must include a '### Dev -> staged promotion checklist' section in the PR description (see docs/PROMOTION_CHECKLISTS.md)."
+              );
+              requireBodyPattern(
+                /wallet\s*\/\s*signer\s*\/\s*treasury\s+boundary/i,
+                "PRs into 'staged' must explicitly record wallet/signer/treasury boundary checks in the PR description (see docs/PROMOTION_CHECKLISTS.md)."
+              );
+              requireBodyPattern(
+                /deployment\s+boundary/i,
+                "PRs into 'staged' must explicitly record deployment boundary checks in the PR description (see docs/PROMOTION_CHECKLISTS.md)."
+              );
+            }
+
+            if (baseRef === 'main' && headRef === 'staged') {
+              requireBodyPattern(
+                /(^###\s+Mainnet\s+acceptance\s+evidence\s+pack\b)|audit\/mainnet-acceptance\//im,
+                "PRs into 'main' from 'staged' must include a Mainnet Acceptance Evidence Pack under '### Mainnet acceptance evidence pack' (or link to audit/mainnet-acceptance/*) per openspec/specs/mainnet-acceptance-evidence-pack/spec.md."
+              );
+            }
+
+            if (bodyErrors.length > 0) {
+              core.setFailed(bodyErrors.join("\n"));
             }

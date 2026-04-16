@@ -23,5 +23,27 @@ Provide a concise but comprehensive summary of the changes in this Pull Request.
 - [ ] Any references to temporal events on-chain are properly anchored (e.g., Bitcoin burn-block-height).
 - [ ] My commits follow the [Conventional Commits](https://www.conventionalcommits.org/) format.
 
+Reference: `docs/PROMOTION_CHECKLISTS.md`
+Delete the sections that do not apply to your PR.
+
+### Feature -> dev promotion checklist
+
+- [ ] I targeted `dev` (not `staged`/`main`) and the change is appropriate for testnet/non-production validation.
+- [ ] I ran the relevant local validation for the touched areas.
+- [ ] The PR is scoped and does not mix unrelated changes (especially across `.github/`, `openspec/`, `docs/`, `scripts/`).
+- [ ] If this change touches wallets/signers/treasury/deployment surfaces, I described the change boundary and the expected runtime lane (`dev`/testnet).
+
+### Dev -> staged promotion checklist
+
+- [ ] Integrated testnet validation completed on `dev` and is linked here.
+- [ ] Required CI checks are green for the exact promotion candidate commit.
+- [ ] Wallet / signer / treasury boundary checks are explicitly recorded.
+- [ ] Deployment boundary checks are explicitly recorded.
+- [ ] Any required submodule pins, lockfiles, and artifact provenance are updated for the promotion candidate.
+
+### Mainnet acceptance evidence pack
+
+Required for `staged` -> `main` promotions. Provide the evidence pack under this heading, or link to a versioned in-repo file per `openspec/specs/mainnet-acceptance-evidence-pack/spec.md`.
+
 ### Additional Notes
 *Any other relevant information, context, or blocking dependencies for the reviewers.*
