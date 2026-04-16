@@ -80,8 +80,10 @@ Gate semantics (Stage A):
 Stage B buckets (implementation-ready, with policy parameters):
 
 1. Compute `captured_protocol_fees = total_fee - sum(stage_A)`.
-2. Compute `founders_cut = captured_protocol_fees / 1000` (0.1% of captured), remainder stays in protocol custody.
-3. Compute `post_cut_captured = captured_protocol_fees - founders_cut`.
+2. Compute Founder’s Cut as a 10-BPS carve-out on `captured_protocol_fees`:
+   - `founders_cut = floor(captured_protocol_fees * 10 / 10000)`
+   - `post_cut_captured = captured_protocol_fees - founders_cut`
+   - Any rounding remainder stays in protocol custody as part of `post_cut_captured`.
 4. Split `post_cut_captured` using the `cxd-treasury` 6-way basis-point policy.
 
 Bucket mapping for Stage B:
@@ -96,7 +98,7 @@ Bucket mapping for Stage B:
 
 Payout-gated semantics (Stage B):
 
-- “Payout-gated” means the bucket still accrues its share on-chain, but withdrawal and downstream payout actions remain disabled until `GATE_PAYOUT_READY_ALEX` is satisfied.
+- “Payout-gated” means the bucket still accrues its share on-chain as soon as the corresponding bucket set is active under `GATE_MAINNET_BASELINE`, but withdrawal and downstream payout actions remain disabled until `GATE_PAYOUT_READY_ALEX` is satisfied.
 
 Labs-owned bucket (explicit, optional):
 
@@ -112,6 +114,12 @@ For any fee/yield flow, the implementation MUST:
 1. Evaluate buckets in the exact order defined by the bucket set.
 2. Use integer math in atomic units of the fee asset.
 3. Keep bucket ordering stable across releases; if order or membership changes, bump the bucket set version.
+
+Versioning rule of thumb:
+
+- Bucket-set versions freeze the mechanics (bucket membership, ordering, and computation rules).
+- For bucket sets with fixed BPS vectors (e.g., `productive_streaming.v1`), any BPS change should be expressed as a new bucket set version.
+- For bucket sets that reference an on-chain policy contract (e.g., the Stage B 6-way split sourced from `cxd-treasury`), percentage changes are treated as policy updates and should be logged/auditable via contract events rather than forcing a bucket set version bump.
 
 ### 2.2 Rounding / remainder behavior
 
@@ -164,7 +172,8 @@ Define 3 coarse activation gates that implementations can enforce consistently:
 
 2. `GATE_PAYOUT_READY_ALEX`
    - `docs/CSF_MAINNET_READINESS_GATE.md` payout readiness flips to payout-ready (post CON-230 + CON-233).
-   - Enables: contributor payout buckets that require ALEX funding (bounties/grants), and any referral payouts.
+   - Enables: withdrawal / downstream payout actions for payout-gated buckets that require ALEX funding (bounties/grants), and any referral payouts.
+   - This gate must not change the configured routing percentages for Stage B buckets; it only changes whether payouts can be executed.
 
 3. `GATE_OPERATOR_FEE_APPROVED`
    - Explicit governance/policy approval exists for any Labs-owned operator fee.
