@@ -96,7 +96,7 @@ The verifier emits a **Device/Workload Identity Record**:
 - posture claims (public-safe subset)
 - a verifier signature over the record
 
-Implementations MUST enforce a maximum accepted age for a Device/Workload Identity Record (policy-configurable; for example, 24 hours). The session broker MUST reject records older than this limit and require fresh attestation, even if the record’s own expiry has not been reached. Policy changes (for example, a new verifier policy version/hash) MAY also force re-attestation according to enterprise policy.
+Implementations MUST enforce a maximum accepted age for a Device/Workload Identity Record. For privileged/write surfaces this age MUST NOT exceed 24 hours and SHOULD be 12 hours or less. The session broker MUST reject records older than this limit and require fresh attestation, even if the record’s own expiry has not been reached. Policy changes (for example, a new verifier policy version/hash) MAY also force re-attestation according to enterprise policy.
 
 ### 4.3 Enterprise policy signals
 
@@ -117,7 +117,7 @@ The session broker SHOULD reject enterprise policy inputs (for example, IdP asse
 The session broker issues one of the following proof-of-possession-bound session forms:
 
 1. **mTLS client identity** (recommended for service-to-service and ERP connectors)
-   - broker mints a short-lived client certificate for a dedicated session binding key that is itself attested, or is explicitly chained to the device/workload identity key (device identity and approval keys MUST NOT be reused for TLS); where the platform supports it, the TLS private key MUST be non-exportable and hardware-backed (TPM/TEE/HSM class). If a deployment uses a software TLS key, it MUST be minted inside a hardened boundary and MUST NOT be used for the highest-privilege BOS surfaces.
+   - broker mints a short-lived client certificate for a dedicated session binding key that is itself attested, or whose certificate carries an explicit binding to the device/workload identity key (for example, a custom extension that contains the device/workload identity key hash). The TLS key pair MUST NOT be the same as the device identity key or any approval/signature key, and device identity/approval keys MUST NEVER be used directly for TLS. Where the platform supports it, the TLS private key MUST be non-exportable and hardware-backed (TPM/TEE/HSM class). If a deployment uses a software TLS key, it MUST be minted inside a hardened boundary and MUST NOT be used for the highest-privilege BOS surfaces.
 
 2. **PoP token** (recommended for browser/mobile clients)
    - broker issues a short-lived token whose requests must include a per-request signature with the bound key
@@ -183,7 +183,7 @@ Approval signatures MUST be over a structured payload that includes, at minimum:
 - the canonical BOS principal identifier derived by the session broker
 - a freshness field (timestamp + expiry and/or a broker-issued nonce)
 
-BOS services MUST reject approvals where any of these bindings do not match the current session context.
+BOS services MUST reject approvals where any of these bindings do not match the approval challenge and session context recorded by the broker at the time the approval was issued (even if the interactive session has since expired).
 
 Approval/signature keys used for mandate approvals MUST be hardware-backed, enrolled for the canonical BOS principal, and explicitly authorized for that principal’s approval capability scope. BOS services MUST verify that the signing key is authorized for the claimed principal (not just that the signature is structurally valid).
 
@@ -233,6 +233,8 @@ Revocation targets:
 - sessions issued under a compromised subject
 
 Revocation MUST be enforceable at the session broker and at BOS service boundaries (defense in depth).
+
+When a Device/Workload Identity Record is revoked due to unsafe posture, the session broker MUST treat that record as permanently invalid. Fresh attestations from the same subject key MAY result in a new Device/Workload Identity Record only if the subject key itself has not been revoked and the attested posture satisfies the current verifier policy version/hash. Issuing a new record for a high-privilege principal SHOULD require explicit policy approval.
 
 At minimum:
 
