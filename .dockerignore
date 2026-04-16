@@ -1,0 +1,8 @@
+**
+
+!conxian-gateway/**
+!docker/gateway.Dockerfile
+!.dockerignore
+
+conxian-gateway/target
+conxian-gateway/.git

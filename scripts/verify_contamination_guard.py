@@ -129,6 +129,11 @@ GATE_REQUIRED: dict[str, dict[str, GateRule]] = {
 }
 
 LABEL_ALLOWLIST: dict[str, dict[str, set[str]]] = {
+    "conxian-gateway": {
+        "Mock Pattern": {
+            "internal/compliance/src/zkc.rs",
+        },
+    },
     "conxius-wallet": {
         "Mock Pattern": {
             "components/AssetDetailModal.tsx",

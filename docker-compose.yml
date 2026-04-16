@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-nexus}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - conxian-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - conxian-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nexus:
+    build:
+      context: ./conxian-nexus
+    environment:
+      DATABASE_URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-nexus}
+      REDIS_URL: redis://redis:6379/
+      STACKS_NODE_RPC_URL: ${STACKS_NODE_RPC_URL:?set STACKS_NODE_RPC_URL}
+      REST_PORT: '3000'
+      GRPC_PORT: '50051'
+      RUST_LOG: ${NEXUS_RUST_LOG:-info}
+      NEXUS_ORACLE_ENABLED: ${NEXUS_ORACLE_ENABLED:-0}
+      NEXUS_ORACLE_STUB_OK: ${NEXUS_ORACLE_STUB_OK:-1}
+      NEXUS_EXPERIMENTAL_APIS: ${NEXUS_EXPERIMENTAL_APIS:-1}
+    ports:
+      - "127.0.0.1:3001:3000"
+      - "127.0.0.1:50051:50051"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  gateway:
+    build:
+      context: .
+      dockerfile: docker/gateway.Dockerfile
+    environment:
+      API_PORT: '3000'
+      BITCOIN_RPC_URL: ${BITCOIN_RPC_URL:?set BITCOIN_RPC_URL}
+      BITCOIN_RPC_USER: ${BITCOIN_RPC_USER:-}
+      BITCOIN_RPC_PASS: ${BITCOIN_RPC_PASS:-}
+      BITCOIN_SYNC_INTERVAL: ${BITCOIN_SYNC_INTERVAL:-10}
+      STACKS_RPC_URL: ${STACKS_RPC_URL:?set STACKS_RPC_URL}
+      STACKS_SYNC_INTERVAL: ${STACKS_SYNC_INTERVAL:-30}
+      INFOBIP_BASE_URL: ${INFOBIP_BASE_URL:-https://api.infobip.com}
+      ALEX_API_URL: ${ALEX_API_URL:-https://api.alexlab.co}
+      FIAT_WEBHOOK_SECRET: ${FIAT_WEBHOOK_SECRET:?set FIAT_WEBHOOK_SECRET}
+      SETTLEMENT_INGRESS_SECRET: ${SETTLEMENT_INGRESS_SECRET:?set SETTLEMENT_INGRESS_SECRET}
+      API_TOKEN: ${API_TOKEN:?set API_TOKEN}
+      RAMP_API_KEY: ${RAMP_API_KEY:?set RAMP_API_KEY}
+      INVESTEC_CLIENT_ID: ${INVESTEC_CLIENT_ID:?set INVESTEC_CLIENT_ID}
+      INVESTEC_SECRET: ${INVESTEC_SECRET:?set INVESTEC_SECRET}
+      ALCHEMY_PAY_APP_ID: ${ALCHEMY_PAY_APP_ID:?set ALCHEMY_PAY_APP_ID}
+      ALCHEMY_PAY_SECRET: ${ALCHEMY_PAY_SECRET:?set ALCHEMY_PAY_SECRET}
+      BANXA_API_KEY: ${BANXA_API_KEY:?set BANXA_API_KEY}
+      BANXA_SECRET: ${BANXA_SECRET:?set BANXA_SECRET}
+      INFOBIP_API_KEY: ${INFOBIP_API_KEY:?set INFOBIP_API_KEY}
+      HMAC_SECRET: ${HMAC_SECRET:?set HMAC_SECRET}
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - conxian-gateway-data:/data
+    restart: unless-stopped
+
+volumes:
+  conxian-db-data:
+  conxian-redis-data:
+  conxian-gateway-data:
