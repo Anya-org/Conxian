@@ -178,7 +178,7 @@ def _http_json(url: str) -> dict:
         max_attempts = int(os.environ.get("HIRO_MAX_ATTEMPTS", "4"))
     except ValueError:
         max_attempts = 4
-    max_attempts = max(1, max_attempts)
+    max_attempts = max(1, min(max_attempts, 10))
 
     last_err: Exception | None = None
     for attempt in range(max_attempts):
@@ -272,7 +272,8 @@ class VerificationResult:
     local_path: str
     expected_sender: str | None
     sender_matches_deployer: bool
-    deployed: bool | None
+    deployed: bool
+    lookup_failed: bool
     tx_id: str | None
     block_height: int | None
     source_matches: bool | None
@@ -342,15 +343,11 @@ def verify_plan(
             failures.append(
                 f"{c.name}: Hiro API error querying source for {principal}.{c.name}: {e}"
             )
-        deployed: bool | None
-        if lookup_failed:
-            deployed = None
-        else:
-            deployed = chain_source is not None
+        deployed = chain_source is not None
         tx_id: str | None = None
         block_height: int | None = None
 
-        if deployed is True:
+        if deployed:
             try:
                 tx_id, block_height = _fetch_contract_meta(hiro_base, principal, c.name)
             except HiroRequestError as e:
@@ -359,7 +356,7 @@ def verify_plan(
                 )
 
         source_matches: bool | None = None
-        if deployed is True and local_source is not None:
+        if deployed and local_source is not None:
             local_source_norm = _normalize_source(local_source)
             chain_source_norm = _normalize_source(chain_source)
             source_matches = local_source_norm == chain_source_norm
@@ -374,13 +371,14 @@ def verify_plan(
                 expected_sender=c.expected_sender,
                 sender_matches_deployer=sender_matches,
                 deployed=deployed,
+                lookup_failed=lookup_failed,
                 tx_id=tx_id,
                 block_height=block_height,
                 source_matches=source_matches,
             )
         )
 
-        if deployed is False:
+        if not deployed and not lookup_failed:
             failures.append(f"{c.name}: missing on-chain contract {principal}.{c.name}")
 
     return network, deployer, results, failures
@@ -438,27 +436,14 @@ def main() -> None:
     )
 
     if args.json:
+        contracts = [dataclasses.asdict(r) for r in results]
         print(
             json.dumps(
                 {
                     "network": network,
                     "deployer": deployer,
                     "plan": os.path.abspath(args.plan),
-                    "contracts": [
-                        {
-                            "name": r.name,
-                            "principal": r.principal,
-                            "local_path": r.local_path,
-                            "expected_sender": r.expected_sender,
-                            "sender_matches_deployer": r.sender_matches_deployer,
-                            "deployed": r.deployed is True,
-                            "lookup_failed": r.deployed is None,
-                            "tx_id": r.tx_id,
-                            "block_height": r.block_height,
-                            "source_matches": r.source_matches,
-                        }
-                        for r in results
-                    ],
+                    "contracts": contracts,
                     "failures": failures,
                 },
                 indent=2,
@@ -472,9 +457,9 @@ def main() -> None:
         print(f"contracts_in_plan={len(results)}")
 
         for r in results:
-            if r.deployed is None:
+            if r.lookup_failed:
                 status = "error"
-            elif r.deployed is False:
+            elif not r.deployed:
                 status = "missing"
             elif r.source_matches is True:
                 status = "ok"
