@@ -96,6 +96,8 @@ The verifier emits a **Device/Workload Identity Record**:
 - posture claims (public-safe subset)
 - a verifier signature over the record
 
+Implementations MUST enforce a maximum accepted age for a Device/Workload Identity Record (policy-configurable; for example, 24 hours). The session broker MUST reject records older than this limit and require fresh attestation, even if the record’s own expiry has not been reached. Policy changes (for example, a new verifier policy version/hash) MAY also force re-attestation according to enterprise policy.
+
 ### 4.3 Enterprise policy signals
 
 Enterprise SSO (OIDC/SAML) and provisioning (SCIM) are used to supply:
@@ -175,7 +177,7 @@ ERP connectors that call BOS MCP (or any privileged BOS surface) MUST NOT hold l
 
 Horizontally-scaled ERP connector clusters MUST either:
 
-- share a BOS-facing key that is held only in an HSM/TEE boundary and never exported to application processes, or
+- share a BOS-facing key that remains non-exportable inside a centralized HSM/TEE boundary (application instances may invoke cryptographic operations via that boundary, but must not load, cache, or distribute private key material), or
 - provision a distinct device/workload identity key per instance so compromise and revocation can be localized
 
 Distributing a single private key into multiple application instances or configuration stores is not permitted.
@@ -206,11 +208,13 @@ Revocation MUST be enforceable at the session broker and at BOS service boundari
 
 At minimum:
 
-- the session broker MUST check revocation status on every session issuance and on every session validation
+- the session broker MUST check revocation status on every session issuance and on every session validation request it handles
 - the session broker MUST reject any identity record marked as revoked, even if the corresponding subject key is not revoked
 - BOS privileged services MUST enforce revocation either by consulting the revocation registry on each request, or by honoring a strict maximum revocation-cache TTL that is shorter than the maximum session TTL
 
 If the revocation registry or attestation verifier is unavailable or returns an indeterminate result, the session broker and BOS privileged services MUST fail closed for privileged surfaces (rejecting session issuance and validation).
+
+For sessions validated via online introspection (for example, opaque tokens), the session broker acts as the validation authority. For self-contained sessions validated directly by BOS services (for example, PoP tokens or mTLS client certs), those services MUST perform equivalent revocation checks against the revocation registry (or via a cache with TTL strictly shorter than the maximum session TTL) and MUST NOT treat locally-validated sessions as exempt from the global revocation model.
 
 ### 7.2 Recovery and rotation
 
