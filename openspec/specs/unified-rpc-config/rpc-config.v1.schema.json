@@ -70,10 +70,7 @@
         "bitvm": { "$ref": "#/$defs/addOnPackHostOnly" }
       },
       "additionalProperties": {
-        "anyOf": [
-          { "$ref": "#/$defs/addOnPackHostOnly" },
-          { "$ref": "#/$defs/addOnPackHostPort" }
-        ]
+        "$ref": "#/$defs/addOnPackHostPort"
       }
     },
     "metadata": {
@@ -83,19 +80,37 @@
     }
   },
   "$defs": {
-    "addOnPackHostOnly": {
+    "rpcHost": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rpcPort": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "addOnRpcHostOnly": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "host": { "$ref": "#/$defs/rpcHost" }
+      }
+    },
+    "addOnRpcHostPort": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "host": { "$ref": "#/$defs/rpcHost" },
+        "port": { "$ref": "#/$defs/rpcPort" }
+      }
+    },
+    "addOnPackBase": {
       "type": "object",
       "additionalProperties": false,
       "required": ["enabled"],
       "properties": {
         "enabled": { "type": "boolean" },
-        "rpc": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "host": { "type": "string", "minLength": 1 }
-          }
-        }
+        "rpc": { "type": "object" }
       },
       "allOf": [
         {
@@ -114,34 +129,22 @@
         }
       ]
     },
-    "addOnPackHostPort": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["enabled"],
-      "properties": {
-        "enabled": { "type": "boolean" },
-        "rpc": {
-          "type": "object",
-          "additionalProperties": false,
+    "addOnPackHostOnly": {
+      "allOf": [
+        { "$ref": "#/$defs/addOnPackBase" },
+        {
           "properties": {
-            "host": { "type": "string", "minLength": 1 },
-            "port": { "type": "integer", "minimum": 1, "maximum": 65535 }
+            "rpc": { "$ref": "#/$defs/addOnRpcHostOnly" }
           }
         }
-      },
+      ]
+    },
+    "addOnPackHostPort": {
       "allOf": [
+        { "$ref": "#/$defs/addOnPackBase" },
         {
-          "if": {
-            "properties": { "enabled": { "const": true } },
-            "required": ["enabled"]
-          },
-          "then": {
-            "required": ["rpc"],
-            "properties": {
-              "rpc": {
-                "required": ["host"]
-              }
-            }
+          "properties": {
+            "rpc": { "$ref": "#/$defs/addOnRpcHostPort" }
           }
         }
       ]

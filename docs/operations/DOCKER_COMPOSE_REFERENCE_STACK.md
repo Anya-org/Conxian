@@ -51,5 +51,11 @@ Required endpoints:
 - `STACKS_RPC_URL` (Gateway)
 - `STACKS_NODE_RPC_URL` (Nexus)
 
+Nexus feature flags:
+
+- `NEXUS_EXPERIMENTAL_APIS` defaults to `0` (disabled).
+- `NEXUS_ORACLE_ENABLED` defaults to `0` (disabled).
+- `NEXUS_ORACLE_STUB_OK` defaults to `0` (disabled).
+
 > Note
 > `BITCOIN_RPC_URL` is required for the compose stack. For production, funds-bearing, or privacy-sensitive workloads, point it to a controlled node or vetted provider before running.

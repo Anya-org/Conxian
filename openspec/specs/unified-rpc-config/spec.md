@@ -79,7 +79,7 @@ Known packs in v1: `bisq`, `rgb`, `bitvm`.
 
 In short: pack identifiers must be lowercase alphanumeric strings that start with a letter, may include `-` separators between segments (for example `my-pack-1`), and must be no longer than 64 characters.
 
-Custom packs (producer-defined `addOns.<pack>` keys) **MUST** use the same base shape as known packs: an `enabled` boolean and an optional `rpc` object (`rpc.host` is required when enabled). Packs **MAY** also define `rpc.port` only when their env surface declares `<PACK>_RPC_PORT` (for example, Bisq).
+Custom packs (producer-defined `addOns.<pack>` keys) **MUST** use the same envelope as known packs: an `enabled` boolean and an optional `rpc` object (`rpc.host` is required when enabled). The v1 schema permits an optional `rpc.port` field.
 
 | Pack | Config field | Env var | Consumer |
 | :--- | :--- | :--- | :--- |
@@ -95,7 +95,7 @@ Notes:
 - If `addOns.<pack>` is omitted, that pack is treated as disabled.
 - If `addOns.<pack>.enabled` is `false` and `addOns.<pack>.rpc` is present, the pack is still treated as disabled; the RPC details may be retained for UI defaults but must not be used for runtime routing until enabled.
 - In the current `conxius-platform/.env.schema`, only Bisq declares an explicit `*_RPC_PORT` variable (Bisq is `host` + `port`; RGB/BitVM are `host` only).
-- Consumers **MUST** ignore `addOns.<pack>.rpc.port` unless the pack’s env surface explicitly declares a `<PACK>_RPC_PORT` variable.
+- For any pack whose schema permits `addOns.<pack>.rpc.port`, consumers **MUST** ignore it unless the pack’s env surface explicitly declares a `<PACK>_RPC_PORT` variable.
 
 For future packs, env var names **SHOULD** follow the convention:
 
