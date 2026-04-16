@@ -78,7 +78,7 @@ Key acceptance surfaces MUST be disjoint:
 - session binding keys MUST NOT be accepted for value-bearing approvals or other protected actions
 - device identity keys MUST NOT be accepted for interactive approvals
 
-At minimum, device identity, session binding, and approval/signature keys MUST be distinct key pairs (even if stored in the same secure element), and MUST be treated as separate principals at the policy layer.
+At minimum, device identity, session binding, and approval/signature keys MUST be distinct key pairs (even if stored in the same secure element). They MUST have disjoint acceptance surfaces and policy lanes, even though they all resolve to the same canonical BOS principal anchored in the device/workload identity key.
 
 ### 4.2 Attestation evidence
 
@@ -143,6 +143,8 @@ The session broker MUST derive a canonical BOS principal from:
 Session issuance MUST be conditioned on a configured binding between these elements (for example, `user_id ↔ device_key` or `workload_id ↔ device_key`), and that binding MUST be recorded in an immutable audit trail.
 
 The canonical BOS principal is anchored in the Device/Workload Identity Record (the device/workload identity key, or a stable identifier derived from it). Session binding keys (mTLS client keys and PoP keys) are proof-of-possession carriers that MUST be cryptographically bound to that principal. Allowlists, capability scopes, audit trails, and revocation entries MUST be keyed on the canonical principal, not on ephemeral session keys.
+
+Device identity, session binding, and approval/signature keys are credentials for a canonical BOS principal. They MUST be mapped back to that principal and MUST NOT be treated as independent principals.
 
 Canonical BOS principals SHOULD be modeled explicitly as one of:
 
