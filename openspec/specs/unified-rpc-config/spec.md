@@ -79,7 +79,7 @@ Known packs in v1: `bisq`, `rgb`, `bitvm`.
 
 In short: pack identifiers must be lowercase alphanumeric strings that start with a letter, may include `-` separators between segments (for example `my-pack-1`), and must be no longer than 64 characters.
 
-Custom packs (producer-defined `addOns.<pack>` keys) **MUST** use the same shape as known packs: an `enabled` boolean and an optional `rpc` object (`rpc.host` is required when enabled; `rpc.port` is optional).
+Custom packs (producer-defined `addOns.<pack>` keys) **MUST** use the same base shape as known packs: an `enabled` boolean and an optional `rpc` object (`rpc.host` is required when enabled). Packs **MAY** also define `rpc.port` only when their env surface declares `<PACK>_RPC_PORT` (for example, Bisq).
 
 | Pack | Config field | Env var | Consumer |
 | :--- | :--- | :--- | :--- |

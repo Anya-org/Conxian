@@ -39,6 +39,7 @@
 ## 🤖 Business Operations System (BOS)
 
 * [BOS wallet control model](docs/BOS_WALLET_CONTROL_MODEL.md)
+* [BOS self-executing contract trigger (CON-440)](docs/protocols/BOS_SELF_EXECUTING_CONTRACT_TRIGGER_V1.md)
 * [Conxius Wallet BOS buildout](docs/CONXIUS_WALLET_BOS_BUILDOUT.md)
 * [lib-conclave-sdk BOS buildout](docs/LIB_CONCLAVE_SDK_BOS_BUILDOUT.md)
 * [conxius-platform BOS buildout](docs/CONXIUS_PLATFORM_BOS_BUILDOUT.md)

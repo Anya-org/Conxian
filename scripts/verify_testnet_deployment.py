@@ -173,7 +173,7 @@ def _http_json(url: str) -> dict:
         timeout_secs = 30.0
     if timeout_secs <= 0:
         timeout_secs = 30.0
-    timeout_secs = min(300.0, max(1.0, timeout_secs))
+    timeout_secs = max(0.1, min(timeout_secs, 120.0))
     try:
         max_attempts = int(os.environ.get("HIRO_MAX_ATTEMPTS", "4"))
     except ValueError:
@@ -256,6 +256,10 @@ def _fetch_contract_meta(
         if e.code == 404:
             return None, None
         raise
+    except HiroRequestError as e:
+        raise HiroRequestError(
+            f"Hiro API request failed for metadata {principal}.{name}: {e}"
+        ) from e
     tx_id = data.get("tx_id")
     block_height = data.get("block_height")
     return (tx_id if isinstance(tx_id, str) else None), (
@@ -454,7 +458,6 @@ def main() -> None:
                     "deployer": deployer,
                     "plan": os.path.abspath(args.plan),
                     "contracts": contracts,
-                    "contracts": contracts,
                     "failures": failures,
                 },
                 indent=2,
@@ -477,7 +480,7 @@ def main() -> None:
             elif r.source_matches is False:
                 status = "drift"
             else:
-                status = "unverified"
+                status = "deployed"
 
             sender_flag = "ok" if r.sender_matches_deployer else "mismatch"
             meta = []
