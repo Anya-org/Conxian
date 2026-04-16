@@ -1,0 +1,230 @@
+# Fee-bucket implementation plan (CON-481)
+
+This document translates the current **fee-bucket model** into an implementation plan with:
+
+- a concrete bucket set,
+- deterministic ordering rules,
+- explicit activation conditions, and
+- a clear split between **policy-only** decisions vs **implementation-ready** work.
+
+The plan is grounded in the current Conxian mainnet and ALEX readiness posture as recorded in:
+
+- `docs/CSF_MAINNET_READINESS_GATE.md` (snapshot **2026-04-06**)
+- `openspec/changes/external-settlement-proposal-only-tee/*` (yield routing invariants)
+
+## 0) Definitions
+
+- **Fee bucket**: a named allocation of an amount (usually expressed in basis points) to a recipient category.
+- **Bucket set**: a deterministic list of buckets that applies to a specific fee or yield flow.
+- **Recipient category** (economics separation):
+  - **Protocol-owned**: protocol treasury / reserve / insurance / buyback.
+  - **Labs-owned**: explicit operator/service compensation (must not be implicitly mixed into protocol treasury).
+  - **Founder**: founder royalty / founder vault allocations.
+  - **Contributor**: bounties, grants, LP incentives, worker/industrial payouts.
+- **BPS math**: basis points, where `10000 = 100%`.
+
+## 1) Bucket sets (canonical)
+
+Conxian currently has two materially different “fee-like” flows that need explicit bucket sets:
+
+1. **Productive streaming (yield routing)**: applies to capital locked as transit bond / escrow.
+2. **Captured protocol fees**: applies to protocol-retained fees extracted from protocol actions (DEX/lending/etc).
+
+These are intentionally separated so we can keep “5/5/90 productive streaming” invariant logic independent from CSF / ALEX referral and payout toggles.
+
+### 1.1 Bucket set: `productive_streaming.v1` (5/5/90)
+
+Source of truth:
+
+- “Yield routing invariance” requirement in `openspec/changes/external-settlement-proposal-only-tee/specs/external-settlement-proposal-only-tee/spec.md`.
+- Existing data model in `conxian-gateway/pkg/conxian-core/src/settlement.rs` (`ProductiveStreaming` defaults to 5/5/90).
+
+| Order | Bucket name | Category | BPS | Recipient (resolved) | Activation |
+|---:|---|---|---:|---|---|
+| 1 | `founder_royalty` | Founder | 500 | `operational-treasury` principal key: `founder-vault` | Always on (mainnet) |
+| 2 | `ecosystem_reserve` | Protocol-owned | 500 | `operational-treasury` principal key: `ecosystem-reserve-vault` | Always on (mainnet) |
+| 3 | `productive_yield` | Contributor | 9000 | Flow-specific beneficiary (see §2.3) | Always on (mainnet) |
+
+Notes:
+
+- Labs-owned buckets are intentionally not part of `productive_streaming.v1`.
+- If governance later introduces an explicit operator fee, it must be a new versioned bucket set (e.g., `productive_streaming.v2`) so invariants remain testable.
+
+### 1.2 Bucket set: `captured_protocol_fees.v1` (fee extraction + internal allocation)
+
+Source of truth:
+
+- “Founder’s Cut” carve-out rule: `openspec/changes/csf-autonomous-launch/specs/launch-mechanics/spec.md`.
+- Internal allocation model: `Conxian/contracts/treasury/cxd-treasury.clar` (6-way split).
+
+This bucket set is defined as **a two-stage deterministic pipeline**:
+
+1. **Stage A (3rd-party / growth distributions)**: applied first, before “captured protocol fees” are computed.
+2. **Stage B (captured fee allocation)**: applied to the remaining captured protocol fee amount.
+
+Stage A buckets (policy-gated):
+
+| Order | Bucket name | Category | BPS (of total fee) | Recipient | Activation |
+|---:|---|---|---:|---|---|
+| A1 | `referrer_reward` | Contributor | 500 | Referrer principal | Requires referral engine + payout readiness |
+| A2 | `referee_reward` | Contributor | 500 | Referee principal | Requires referral engine + payout readiness |
+| A3 | `protocol_health_lock` | Protocol-owned | 500 | `operational-treasury` principal key: `protocol-health-vault` | Requires policy toggle |
+
+Stage B buckets (implementation-ready, with policy parameters):
+
+1. Compute `captured_protocol_fees = total_fee - sum(stage_A)`.
+2. Compute `founders_cut = captured_protocol_fees / 1000` (0.1% of captured), remainder stays in protocol custody.
+3. Compute `post_cut_captured = captured_protocol_fees - founders_cut`.
+4. Split `post_cut_captured` using the `cxd-treasury` 6-way basis-point policy.
+
+Bucket mapping for Stage B:
+
+- `founders_cut` → **Founder** → `operational-treasury` principal key: `founder-vault`
+- `treasury` → **Protocol-owned** → `operational-treasury` (protocol reserve / ops)
+- `buyback` → **Protocol-owned** → BME path / buyback vault (implementation-specific)
+- `insurance` → **Protocol-owned** → insurance reserve vault
+- `bounty` → **Contributor** → ConxianCSF / bounty vault (payout-gated)
+- `grant` → **Contributor** → grant vault (payout-gated)
+- `lp` → **Contributor** → LP incentives vault / emissions path
+
+Labs-owned bucket (explicit, optional):
+
+- If Conxian-Labs requires an operator fee, introduce it as an **explicit Stage B bucket** (new version, e.g. `captured_protocol_fees.v2`) and route it to a `labs-opex-vault` principal resolved via `operational-treasury`.
+- Do not “hide” Labs compensation inside the protocol treasury bucket.
+
+## 2) Ordering and rounding rules (normative for implementation)
+
+### 2.1 Deterministic ordering
+
+For any fee/yield flow, the implementation MUST:
+
+1. Evaluate buckets in the exact order defined by the bucket set.
+2. Use integer math in atomic units of the fee asset.
+3. Keep bucket ordering stable across releases; if order or membership changes, bump the bucket set version.
+
+### 2.2 Rounding / remainder behavior
+
+To avoid ambiguous “lost unit” behavior:
+
+- For a given split, compute each bucket amount using integer division.
+- Track `remainder = total - sum(bucket_amounts)`.
+- Route `remainder` to the most protocol-conservative bucket (typically `ecosystem_reserve` / protocol treasury custody), never to Labs or Founder.
+
+This matches the Founder’s Cut remainder rule in `openspec/changes/csf-autonomous-launch/specs/launch-mechanics/spec.md`.
+
+### 2.3 Beneficiary binding (productive yield)
+
+For `productive_streaming.v1`, the `productive_yield` bucket recipient is flow-specific:
+
+- If the yield is tied to a Job Card / industrial intent, the recipient is the worker/beneficiary principal bound by that intent.
+- If the yield is tied to an LP position, the recipient is the LP incentive distribution mechanism.
+
+This recipient must be treated as **input to the flow** (e.g., in the proposal/execution payload), not derived from trigger source.
+
+## 3) Activation conditions (grounded in current reality)
+
+### 3.1 Mainnet and ALEX posture (current snapshot)
+
+As of **2026-04-06**, `docs/CSF_MAINNET_READINESS_GATE.md` records:
+
+- Launch recommendation: `Conditional Go`
+- Payout readiness (ALEX-funded bounties): `Not payout-ready`
+- Remaining gating items include ALEX funding verification (CON-230) and signer/approval controls (CON-233)
+
+Separately, the gateway’s ALEX execution path is explicitly not live yet (swap returns `501` until signer integration exists).
+
+### 3.2 Bucket activation gates
+
+Define 3 coarse activation gates that implementations can enforce consistently:
+
+1. `GATE_MAINNET_BASELINE`
+   - Contracts deployed on mainnet.
+   - `operational-treasury` principal registry is populated for required vaults.
+   - Enables: `productive_streaming.v1` and non-payout protocol-owned buckets.
+
+2. `GATE_PAYOUT_READY_ALEX`
+   - `docs/CSF_MAINNET_READINESS_GATE.md` payout readiness flips to payout-ready (post CON-230 + CON-233).
+   - Enables: contributor payout buckets that require ALEX funding (bounties/grants), and any referral payouts.
+
+3. `GATE_OPERATOR_FEE_APPROVED`
+   - Explicit governance/policy approval exists for any Labs-owned operator fee.
+   - Enables: any Labs-owned fee bucket (only in a versioned bucket set).
+
+## 4) Policy-only vs implementation-ready
+
+### 4.1 Implementation-ready now
+
+These can be built immediately without depending on ALEX payout readiness:
+
+- A shared “bucket set” schema (names, ordering, BPS constraints, remainder rule).
+- A routing interface that resolves principals dynamically via `Conxian/contracts/core/operational-treasury.clar` (no hardcoded production addresses).
+- `productive_streaming.v1` routing (5/5/90), because it is invariant to trigger source.
+
+### 4.2 Policy-only (must remain gated)
+
+These should not be activated until their gates are explicitly satisfied:
+
+- Referral payouts (5/5/5) as a live distribution.
+- Any ALEX-funded bounty/grant payout semantics.
+- Any Labs-owned operator fee bucket and its percentage.
+- ALEX liquidity provisioning rules (e.g., “pair 10% proceeds for 6 months”).
+
+## 5) Implementation plan (repo-grounded)
+
+This is the concrete “what to build where” plan.
+
+### 5.1 On-chain (Conxian contracts)
+
+Target locations:
+
+- `Conxian/contracts/core/operational-treasury.clar`
+- `Conxian/contracts/treasury/*`
+
+Implementation steps:
+
+1. Define the canonical principal keys in `operational-treasury` for bucket recipients:
+   - `founder-vault`
+   - `ecosystem-reserve-vault`
+   - `protocol-health-vault`
+   - `bounty-vault` (or `csf-bounty-vault`)
+   - `grant-vault`
+   - `lp-incentives-vault`
+   - `insurance-vault`
+   - (optional, policy-only) `labs-opex-vault`
+
+2. Implement a fee routing surface that:
+   - takes `(token, amount, bucket_set_id, flow_recipient)` inputs,
+   - validates that BPS sum to `10000`,
+   - resolves any role-based recipients through `operational-treasury`,
+   - fails closed with explicit errors if a required principal key is missing.
+
+3. Wire `productive_streaming.v1` routing into the lock/escrow primitive so external vs native triggers remain yield-invariant.
+
+4. Keep “captured protocol fees” stage A (referral / protocol health lock) behind `GATE_PAYOUT_READY_ALEX`.
+
+### 5.2 Off-chain (Gateway / proposal lane)
+
+Target locations:
+
+- `conxian-gateway/pkg/conxian-core/src/settlement.rs`
+- `conxian-gateway/internal/engine/*` (proposal emission)
+
+Implementation steps:
+
+1. Make bucket computation explicit in the proposal artifact:
+   - compute bucket amounts from `ProductiveStreaming` (5/5/90),
+   - include the resulting bucket list in the proposal payload used for execution.
+
+2. Add a cross-trigger invariant test:
+   - “native trigger” vs “external trigger” must compute identical bucket outputs given the same lock type and asset path.
+
+3. Leave ALEX swap execution as fail-closed (501 / explicit error) until signer integration is production-ready.
+
+### 5.3 Derived accounting / oracle surfaces
+
+Bucket routing should emit stable, indexable events so derived stores (Nexus / treasury oracle) can:
+
+- produce a bucket-ledger view for reconciliation, and
+- prove that “what dashboards show” is derived from on-chain events.
+
+Per `docs/architecture/BOS_TREASURY_AND_YIELD_INTEGRATION_ARCHITECTURE.md`, the derived stores must not become correctness dependencies.

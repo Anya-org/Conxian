@@ -26,6 +26,7 @@
 * [Enterprise control & custody baseline (CON-460)](docs/protocols/ENTERPRISE_CUSTODY_BASELINE.md)
 * [Signed event envelope v1 (CON-472)](docs/protocols/SIGNED_EVENT_ENVELOPE_V1.md)
 * [Clarity 4 enclave authentication flow (CON-465)](docs/protocols/CLARITY4_ENCLAVE_AUTHENTICATION_FLOW.md)
+* [Fee-bucket implementation plan (CON-481)](docs/protocols/FEE_BUCKET_IMPLEMENTATION_PLAN.md)
 * [Public Visibility Audit Report](docs/PUBLIC_VISIBILITY_AUDIT_REPORT.md)
 * [CSF mainnet readiness gate](docs/CSF_MAINNET_READINESS_GATE.md)
 * [CSF-first operating sequence and proof gates](docs/CSF_FIRST_OPERATING_SEQUENCE_AND_PROOF_GATES.md)
