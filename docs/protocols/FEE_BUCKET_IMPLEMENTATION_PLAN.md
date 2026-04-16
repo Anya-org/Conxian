@@ -164,7 +164,7 @@ These can be built immediately without depending on ALEX payout readiness:
 
 These should not be activated until their gates are explicitly satisfied:
 
-- Referral payouts (5/5/5) as a live distribution.
+- Stage-A 5/5/5 path (5% `referrer_reward`, 5% `referee_reward`, 5% `protocol_health_lock`) as a live distribution.
 - Any ALEX-funded bounty/grant payout semantics.
 - Any Labs-owned operator fee bucket and its percentage.
 - ALEX liquidity provisioning rules (e.g., “pair 10% proceeds for 6 months”).
@@ -194,13 +194,15 @@ Implementation steps:
 
 2. Implement a fee routing surface that:
    - takes `(token, amount, bucket_set_id, flow_recipient)` inputs,
-   - validates that BPS sum to `10000`,
+   - validates that each full-split stage (e.g., `productive_streaming.v1`, or the Stage B split of `post_cut_captured`) has BPS that sum to `10000`,
+   - treats partial carve-outs (e.g., Stage A of `captured_protocol_fees.v1`) as bounded by `<= 10000` rather than required to sum to `10000`,
    - resolves any role-based recipients through `operational-treasury`,
    - fails closed with explicit errors if a required principal key is missing.
 
 3. Wire `productive_streaming.v1` routing into the lock/escrow primitive so external vs native triggers remain yield-invariant.
 
-4. Keep “captured protocol fees” stage A (referral / protocol health lock) behind `GATE_PAYOUT_READY_ALEX`.
+4. Keep “captured protocol fees” Stage A referral rewards behind `GATE_PAYOUT_READY_ALEX`.
+   - Gate `protocol_health_lock` behind `GATE_MAINNET_BASELINE` plus an explicit policy toggle.
 
 ### 5.2 Off-chain (Gateway / proposal lane)
 
