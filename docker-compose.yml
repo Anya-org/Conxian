@@ -5,7 +5,7 @@ services:
     image: postgres:15
     environment:
       POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME:-nexus}
     ports:
       - "127.0.0.1:5432:5432"
@@ -33,7 +33,7 @@ services:
     build:
       context: ./conxian-nexus
     environment:
-      DATABASE_URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-nexus}
+      DATABASE_URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:?set DB_PASSWORD}@db:5432/${DB_NAME:-nexus}
       REDIS_URL: redis://redis:6379/
       STACKS_NODE_RPC_URL: ${STACKS_NODE_RPC_URL:?set STACKS_NODE_RPC_URL}
       REST_PORT: '3000'
