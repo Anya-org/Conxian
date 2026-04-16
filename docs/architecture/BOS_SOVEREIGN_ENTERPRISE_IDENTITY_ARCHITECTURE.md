@@ -128,6 +128,7 @@ The session broker MUST cryptographically bind the PoP-bound session key to the 
 Session properties (normative defaults):
 
 - TTL: MUST NOT exceed 15 minutes for sessions that can reach privileged BOS surfaces (implementations SHOULD target 5–15 minutes); longer TTLs MAY be used only for explicitly non-privileged, read-only surfaces under documented enterprise policy
+- Read-only TTL: MUST still be finite (as a guideline, 1 hour or less); any revocation-cache TTL used for read-only degraded modes MUST be shorter than the read-only session TTL
 - Audience-bound: tokens/certs are issued for a specific BOS service surface
 - Scope-bound: explicit capability scopes (no implicit admin)
 - Replay-resistant: per-request nonce or signed request binding
@@ -178,7 +179,7 @@ Use case: an operator needs to approve an intent mandate originating from ERP.
 4. Operator reviews an intent mandate and produces an explicit approval signature (for example, via Conxius Wallet secure hardware).
 5. BOS services accept the approval only when:
    - the mandate signature is valid
-   - the operator session is valid _and_ PoP-bound
+   - the operator session was valid _and_ PoP-bound at the time the approval was issued
    - policy checks pass
 
 Approval signatures MUST be over a structured payload that includes, at minimum:
@@ -188,6 +189,8 @@ Approval signatures MUST be over a structured payload that includes, at minimum:
 - a freshness field (timestamp + expiry and/or a broker-issued nonce)
 
 BOS services MUST reject approvals where any of these bindings do not match the approval challenge and session context recorded by the broker at the time the approval was issued (even if the interactive session has since expired).
+
+Approval signatures for value-bearing actions MUST NOT be accepted more than 15 minutes after their embedded timestamp/expiry and MUST be rejected immediately if the associated principal, device/workload identity key, or identity record has been revoked.
 
 Approval/signature keys used for mandate approvals MUST be hardware-backed, enrolled for the canonical BOS principal, and explicitly authorized for that principal’s approval capability scope. BOS services MUST verify that the signing key is authorized for the claimed principal (not just that the signature is structurally valid).
 
@@ -261,6 +264,12 @@ Any operation that changes effective enterprise authorization (for example, onbo
 - quorum approval
 - time-lock where required by policy
 - immutable audit records bound to payload hash + policy hash
+
+Minimum recovery scenarios and invariants:
+
+- **Lost or compromised operator device**: revoke the affected Device/Workload Identity Record and any active sessions; binding a new device/workload identity key to the operator principal MUST be executed as a protected action and MUST NOT silently override prior revocations.
+- **Suspected ERP connector / automation compromise**: revoke the connector principal’s device/workload identity key and sessions immediately; if continued operation is required, provision a new connector principal or new device/workload identity key under protected-action controls before re-enabling BOS access.
+- **Attestation root / verifier policy rotation**: treat verifier policy version/hash updates as protected actions; after rotation, session issuance MUST require fresh attestation under the new policy, and previously-issued identity records SHOULD be re-evaluated or revoked according to policy.
 
 ## 8) Integration points with BOS message-level security
 
