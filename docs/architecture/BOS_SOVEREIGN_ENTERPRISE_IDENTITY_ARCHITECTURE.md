@@ -84,7 +84,7 @@ For any device/workload requesting BOS session credentials, the attestation veri
 
 The verifier emits a **Device/Workload Identity Record**:
 
-- subject public key
+- subject public key (device/workload identity key)
 - attestation type + verifier policy version/hash
 - issued-at and expiry
 - posture claims (public-safe subset)
@@ -107,7 +107,7 @@ The session broker MUST only issue sessions when enterprise policy signals are e
 The session broker issues one of the following proof-of-possession-bound session forms:
 
 1. **mTLS client identity** (recommended for service-to-service and ERP connectors)
-   - broker mints a short-lived client certificate bound to the attested device/workload key
+   - broker mints a short-lived client certificate for a dedicated session binding key that is itself attested, or is explicitly chained to the device/workload identity key (device identity and approval keys MUST NOT be reused for TLS)
 
 2. **PoP token** (recommended for browser/mobile clients)
    - broker issues a short-lived token whose requests must include a per-request signature with the bound key
