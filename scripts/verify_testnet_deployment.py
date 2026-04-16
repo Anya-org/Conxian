@@ -185,9 +185,16 @@ def _http_json(url: str) -> dict:
             with urllib.request.urlopen(req, timeout=timeout_secs) as resp:
                 payload = resp.read().decode("utf-8", "replace")
             try:
-                return json.loads(payload)
+                data = json.loads(payload)
             except json.JSONDecodeError as e:
                 raise HiroRequestError(f"Hiro API returned invalid JSON: {url}") from e
+
+            if not isinstance(data, dict):
+                raise HiroRequestError(
+                    f"Hiro API returned unexpected JSON type: {type(data).__name__}: {url}"
+                )
+
+            return data
         except urllib.error.HTTPError as e:
             if e.code == 404:
                 raise
