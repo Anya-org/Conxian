@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:conxian:rpc-config:v1",
+  "title": "Conxian unified RPC configuration (v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "rpcStrategy"],
+  "properties": {
+    "schema": {
+      "const": "conxian.rpc-config.v1"
+    },
+    "rpcStrategy": {
+      "type": "string",
+      "enum": ["Public-Only", "Mixed", "Sovereign-First"]
+    },
+    "bitcoin": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "rpcUrl": {
+          "type": "string",
+          "minLength": 1,
+          "format": "uri"
+        },
+        "rpcAuth": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["user", "pass"],
+          "properties": {
+            "user": { "type": "string", "minLength": 1 },
+            "pass": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "required": ["rpcAuth"] },
+          "then": { "required": ["rpcUrl"] }
+        }
+      ]
+    },
+    "stacks": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "gatewayRpcUrl": {
+          "type": "string",
+          "minLength": 1,
+          "format": "uri"
+        },
+        "nodeRpcUrl": {
+          "type": "string",
+          "minLength": 1,
+          "format": "uri"
+        }
+      }
+    },
+    "addOns": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+        "maxLength": 64
+      },
+      "properties": {
+        "bisq": { "$ref": "#/$defs/addOnPackHostPort" },
+        "rgb": { "$ref": "#/$defs/addOnPackHostOnly" },
+        "bitvm": { "$ref": "#/$defs/addOnPackHostOnly" }
+      },
+      "additionalProperties": {
+        "anyOf": [
+          { "$ref": "#/$defs/addOnPackHostOnly" },
+          { "$ref": "#/$defs/addOnPackHostPort" }
+        ]
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional producer-specific metadata. Consumers MUST ignore this for routing/env projection.",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "addOnPackHostOnly": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "rpc": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "host": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "enabled": { "const": true } },
+            "required": ["enabled"]
+          },
+          "then": {
+            "required": ["rpc"],
+            "properties": {
+              "rpc": {
+                "required": ["host"]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "addOnPackHostPort": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "rpc": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "host": { "type": "string", "minLength": 1 },
+            "port": { "type": "integer", "minimum": 1, "maximum": 65535 }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "enabled": { "const": true } },
+            "required": ["enabled"]
+          },
+          "then": {
+            "required": ["rpc"],
+            "properties": {
+              "rpc": {
+                "required": ["host"]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
