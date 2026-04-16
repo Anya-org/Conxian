@@ -26,7 +26,7 @@ The table below is intentionally compact; details are defined in the lane sectio
 | Lane | Build | Test | Security | Upgrade | Rollback | Verification outputs |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | `dev` | Deterministic artifact build; dependency pins intentional | CI green + testnet smoke where applicable | Secret scan + dependency review clean | Upgrade path rehearsed (non-prod) | Rollback rehearsed (non-prod) | CI run link + artifact digests + smoke evidence |
-| `staged` | Same as `dev`, plus mainnet-candidate build parity | CI green + candidate smoke + migration checks | Mainnet acceptance pre-checks; no testnet residue in production paths | Roll-forward rehearsed with prod-like config | Rollback exercised in controlled candidate env | Candidate validation notes + residue scans + pre-evidence pack |
+| `staged` | Same as `dev`, plus mainnet-candidate build parity | CI green + candidate smoke + migration checks | Secret scan + dependency review clean; no testnet residue in production paths | Roll-forward rehearsed with prod-like config | Rollback exercised in controlled candidate env | Candidate validation notes + residue scans + pre-evidence pack |
 | `main` | Reproducible production artifacts | Required checks green | Full mainnet acceptance evidence pack | Production upgrade is policy-guarded | Production rollback trigger + last-known-good proven | Evidence pack + commit SHA → artifact digest map |
 
 ## Lane criteria
@@ -46,7 +46,7 @@ The table below is intentionally compact; details are defined in the lane sectio
 
 **Security**
 
-- Secret scanning and dependency review checks are green.
+- Secret scanning and dependency review checks (e.g., automated repo security checks such as GitHub secret scanning/dependency review, where enabled) are green.
 - No new privileged control-plane assumptions are introduced (keep credentials scoped and capability-based).
 
 **Upgrade**
@@ -79,6 +79,7 @@ This lane is where packaging changes become **pilot-ready** for mainnet-candidat
 
 **Security**
 
+- Secret scanning and dependency review checks (e.g., automated repo security checks such as GitHub secret scanning/dependency review, where enabled) are green for the promotion candidate commit.
 - No “testnet defaults” remain in production paths.
 - No new stub, mock, placeholder, or debug-only behavior is introduced in any path that can reach `main`.
 
@@ -94,8 +95,8 @@ This lane is where packaging changes become **pilot-ready** for mainnet-candidat
 
 **Verification outputs (minimum evidence)**
 
-- CI run link + residue scan or boundary-check output (e.g. `python3 scripts/verify_contamination_guard.py`, `python3 scripts/verify_bos_production_boundary.py`).
-- Candidate smoke test evidence (commands + “passed” note, or CI job output link).
+- CI run link + residue scan or boundary-check output (for example, checks under `scripts/` such as `python3 scripts/verify_contamination_guard.py` or other `python3 scripts/verify_*.py`, where applicable), recorded in the PR description (or linked evidence notes).
+- Candidate smoke test evidence (CI job output link preferred), referenced in the PR description (or linked evidence notes) alongside the CI run link. If manual commands are needed, they MUST be sanitized/redacted (no endpoints, credentials, identifiers, or operational procedures) and stored outside git; link that documentation from the PR.
 - Artifact digest / checksum and the exact commit SHA the artifact was built from.
 
 ### Lane: `main` (mainnet production)
