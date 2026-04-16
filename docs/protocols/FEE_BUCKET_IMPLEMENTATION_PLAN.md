@@ -94,6 +94,10 @@ Bucket mapping for Stage B:
 - `grant` → **Contributor** → grant vault (payout-gated)
 - `lp` → **Contributor** → LP incentives vault / emissions path
 
+Payout-gated semantics (Stage B):
+
+- “Payout-gated” means the bucket still accrues its share on-chain, but withdrawal and downstream payout actions remain disabled until `GATE_PAYOUT_READY_ALEX` is satisfied.
+
 Labs-owned bucket (explicit, optional):
 
 - If Conxian-Labs requires an operator fee, introduce it as an **explicit Stage B bucket** (new version, e.g. `captured_protocol_fees.v2`) and route it to a `labs-opex-vault` principal resolved via `operational-treasury`.
@@ -114,6 +118,7 @@ For any fee/yield flow, the implementation MUST:
 To avoid ambiguous “lost unit” behavior:
 
 - For any split stage, compute each bucket amount using integer division.
+- For a split stage with total amount `T` and bucket basis points `bps_i`, compute each bucket amount as `amount_i = floor(T * bps_i / 10000)` using the same `T` for all buckets (no sequential “percentage of remaining” computation).
 - Track `remainder = total - sum(bucket_amounts)`.
 
 Remainder routing is stage-aware:
@@ -171,7 +176,7 @@ Define 3 coarse activation gates that implementations can enforce consistently:
 
 These can be built immediately without depending on ALEX payout readiness:
 
-- A shared “bucket set” schema (names, ordering, BPS constraints, remainder rule).
+- A shared “bucket set” schema (names, ordering, stage kind (full-split vs carve-out), BPS constraints, remainder rule).
 - A routing interface that resolves principals dynamically via `Conxian/contracts/core/operational-treasury.clar` (no hardcoded production addresses).
 - `productive_streaming.v1` routing (5/5/90), because it is invariant to trigger source.
 
@@ -209,6 +214,7 @@ Implementation steps:
 
 2. Implement a fee routing surface that:
    - takes `(token, amount, bucket_set_id, flow_recipient)` inputs,
+   - derives each stage’s validation rules from the bucket set’s stage-kind metadata (full-split vs carve-out), rather than hardcoding rules for specific bucket sets,
    - validates that each full-split stage (e.g., `productive_streaming.v1`, or the Stage B split of `post_cut_captured`) has BPS that sum to `10000`,
    - treats partial carve-outs (e.g., Stage A of `captured_protocol_fees.v1`) as bounded by `<= 10000` rather than required to sum to `10000`,
    - recomputes all bucket amounts on-chain from the canonical BPS configuration and fails closed if any caller-supplied breakdown disagrees,
