@@ -4,6 +4,7 @@ import argparse
 import dataclasses
 import json
 import os
+import socket
 import time
 import urllib.error
 import urllib.parse
@@ -208,24 +209,34 @@ def _http_json(url: str) -> dict:
             if e.code == 429 or (500 <= e.code < 600):
                 last_err = e
             else:
-                raise
-        except (urllib.error.URLError, TimeoutError) as e:
+                raise HiroRequestError(
+                    f"Hiro API request failed: {url} (HTTP {e.code})"
+                ) from e
+        except (urllib.error.URLError, TimeoutError, socket.timeout) as e:
             last_err = e
 
         if attempt < max_attempts - 1:
             time.sleep(0.5 * (2**attempt))
 
     if last_err is not None:
-        is_timeout = isinstance(last_err, TimeoutError) or (
+        is_timeout = isinstance(last_err, (TimeoutError, socket.timeout)) or (
             isinstance(last_err, urllib.error.URLError)
-            and isinstance(getattr(last_err, "reason", None), TimeoutError)
+            and isinstance(
+                getattr(last_err, "reason", None), (TimeoutError, socket.timeout)
+            )
         )
         if is_timeout:
-            raise urllib.error.URLError(
+            raise HiroRequestError(
                 f"Hiro API request timed out after retries: {url}"
             ) from last_err
-        raise last_err
-    raise urllib.error.URLError(f"Hiro API request failed after retries: {url}")
+        if isinstance(last_err, json.JSONDecodeError):
+            raise HiroRequestError(
+                f"Hiro API returned invalid JSON: {url}"
+            ) from last_err
+        raise HiroRequestError(
+            f"Hiro API request failed after retries: {url} ({last_err})"
+        ) from last_err
+    raise HiroRequestError(f"Hiro API request failed after retries: {url}")
 
 
 def _fetch_contract_source(hiro_base: str, principal: str, name: str) -> str | None:
@@ -347,7 +358,8 @@ def verify_plan(
                 f"{c.name}: expected-sender {c.expected_sender!r} does not match deployer {deployer!r}"
             )
 
-        principal = principal_override or c.expected_sender or deployer
+        raw_principal = principal_override or c.expected_sender or deployer
+        principal = raw_principal.strip() if raw_principal else ""
         principal_display = principal or "<missing principal>"
         chain_source: str | None = None
         lookup_failed = False
@@ -396,7 +408,7 @@ def verify_plan(
         results.append(
             VerificationResult(
                 name=c.name,
-                principal=principal_display,
+                principal=principal,
                 local_path=abs_local_path,
                 expected_sender=c.expected_sender,
                 sender_matches_deployer=sender_matches,
