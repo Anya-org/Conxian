@@ -72,6 +72,12 @@ Key purposes are separated:
 - **session binding key**: binds online sessions to proof-of-possession
 - **approval/signature key**: used only for explicit approvals (for example, signing an intent mandate)
 
+Key acceptance surfaces MUST be disjoint:
+
+- approval/signature keys MUST NOT be accepted for session establishment or generic BOS API authentication
+- session binding keys MUST NOT be accepted for value-bearing approvals or other protected actions
+- device identity keys MUST NOT be accepted for interactive approvals
+
 At minimum, device identity, session binding, and approval/signature keys MUST be distinct key pairs (even if stored in the same secure element), and MUST be treated as separate principals at the policy layer.
 
 ### 4.2 Attestation evidence
@@ -133,6 +139,8 @@ The session broker MUST derive a canonical BOS principal from:
 
 Session issuance MUST be conditioned on a configured binding between these elements (for example, `user_id ↔ device_key` or `workload_id ↔ device_key`), and that binding MUST be recorded in an immutable audit trail.
 
+Subject device/workload identity keys MUST NOT be reassigned to a different BOS principal over their lifetime. If a device or workload is reprovisioned or reassigned, it MUST generate new keys and establish a new binding.
+
 ## 6) ERP and enterprise flows
 
 ### 6.1 Operator interactive session (human-in-the-loop)
@@ -182,6 +190,7 @@ Revocation and recovery MUST map to the protected-action and recovery baselines 
 Revocation targets:
 
 - subject public keys (device/workload identities)
+- Device/Workload Identity Records (to revoke unsafe posture independently of the underlying key)
 - verifier policy versions (if an attestation root is compromised)
 - sessions issued under a compromised subject
 
@@ -190,6 +199,7 @@ Revocation MUST be enforceable at the session broker and at BOS service boundari
 At minimum:
 
 - the session broker MUST check revocation status on every session issuance and on every session validation
+- the session broker MUST reject any identity record marked as revoked, even if the corresponding subject key is not revoked
 - BOS privileged services MUST enforce revocation either by consulting the revocation registry on each request, or by honoring a strict maximum revocation-cache TTL that is shorter than the maximum session TTL
 
 ### 7.2 Recovery and rotation
