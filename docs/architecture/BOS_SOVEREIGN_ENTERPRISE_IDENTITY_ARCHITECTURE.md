@@ -64,7 +64,7 @@ Non-goals:
 Each enterprise device/workload that needs BOS access MUST provision one or more key pairs where:
 
 - the private key is non-exportable (TPM/TEE/HSM)
-- the public key becomes the stable identifier for allowlists and replay protection
+- the public key becomes a stable, non-reassignable identifier for this device/workload, used for replay protection and per-device risk controls; authorization policy and revocation are keyed on the canonical BOS principal that binds to one or more such device/workload keys
 
 Key purposes are separated:
 
@@ -117,7 +117,7 @@ The session broker SHOULD reject enterprise policy inputs (for example, IdP asse
 The session broker issues one of the following proof-of-possession-bound session forms:
 
 1. **mTLS client identity** (recommended for service-to-service and ERP connectors)
-   - broker mints a short-lived client certificate for a dedicated session binding key that is itself attested, or is explicitly chained to the device/workload identity key (device identity and approval keys MUST NOT be reused for TLS)
+   - broker mints a short-lived client certificate for a dedicated session binding key that is itself attested, or is explicitly chained to the device/workload identity key (device identity and approval keys MUST NOT be reused for TLS); where the platform supports it, the TLS private key MUST be non-exportable and hardware-backed (TPM/TEE/HSM class). If a deployment uses a software TLS key, it MUST be minted inside a hardened boundary and MUST NOT be used for the highest-privilege BOS surfaces.
 
 2. **PoP token** (recommended for browser/mobile clients)
    - broker issues a short-lived token whose requests must include a per-request signature with the bound key
