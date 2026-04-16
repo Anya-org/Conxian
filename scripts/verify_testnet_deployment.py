@@ -151,11 +151,12 @@ def _http_json(url: str) -> dict:
         timeout_secs = float(os.environ.get("HIRO_TIMEOUT_SECS", "30"))
     except ValueError:
         timeout_secs = 30.0
+    timeout_secs = max(0.1, min(timeout_secs, 120.0))
     try:
         max_attempts = int(os.environ.get("HIRO_MAX_ATTEMPTS", "4"))
     except ValueError:
         max_attempts = 4
-    max_attempts = max(1, max_attempts)
+    max_attempts = min(max(1, max_attempts), 10)
 
     last_err: Exception | None = None
     for attempt in range(max_attempts):
@@ -217,6 +218,10 @@ def _fetch_contract_meta(
         if e.code == 404:
             return None, None
         raise
+    except HiroRequestError as e:
+        raise HiroRequestError(
+            f"Hiro API request failed for metadata {principal}.{name}: {e}"
+        ) from e
     tx_id = data.get("tx_id")
     block_height = data.get("block_height")
     return (tx_id if isinstance(tx_id, str) else None), (
@@ -226,7 +231,8 @@ def _fetch_contract_meta(
 
 def _normalize_source(text: str) -> str:
     text = text.replace("\r\n", "\n").replace("\r", "\n")
-    return text.rstrip() + "\n"
+    text = text.rstrip("\n")
+    return text + "\n"
 
 
 @dataclasses.dataclass(frozen=True)
@@ -237,6 +243,7 @@ class VerificationResult:
     expected_sender: str | None
     sender_matches_deployer: bool
     deployed: bool
+    source_lookup_failed: bool
     tx_id: str | None
     block_height: int | None
     source_matches: bool | None
@@ -334,6 +341,7 @@ def verify_plan(
                 expected_sender=c.expected_sender,
                 sender_matches_deployer=sender_matches,
                 deployed=deployed,
+                source_lookup_failed=lookup_failed,
                 tx_id=tx_id,
                 block_height=block_height,
                 source_matches=source_matches,
@@ -418,14 +426,16 @@ def main() -> None:
         print(f"contracts_in_plan={len(results)}")
 
         for r in results:
-            if not r.deployed:
+            if r.source_lookup_failed:
+                status = "unknown"
+            elif not r.deployed:
                 status = "missing"
             elif r.source_matches is True:
                 status = "ok"
             elif r.source_matches is False:
                 status = "drift"
             else:
-                status = "unverified"
+                status = "deployed"
 
             sender_flag = "ok" if r.sender_matches_deployer else "mismatch"
             meta = []
