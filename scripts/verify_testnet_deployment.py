@@ -166,6 +166,8 @@ def _http_json(url: str) -> dict:
         timeout_secs = float(os.environ.get("HIRO_TIMEOUT_SECS", "30"))
     except ValueError:
         timeout_secs = 30.0
+    if timeout_secs <= 0:
+        timeout_secs = 30.0
     try:
         max_attempts = int(os.environ.get("HIRO_MAX_ATTEMPTS", "4"))
     except ValueError:
