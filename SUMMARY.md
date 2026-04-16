@@ -80,6 +80,7 @@
 ## 📦 Architecture
 
 * [Conxian Protocol](Conxian/docs/ARCHITECTURE.md)
+* [Three-lane runtime deployment architecture (CON-455)](docs/architecture/THREE_LANE_RUNTIME_DEPLOYMENT_ARCHITECTURE.md)
 * [Nexus State Node](conxian-nexus/docs/PRD.md)
 * [Fusion Gateway](conxian-gateway/PRD.md)
 * [Sovereign Shard Spec](docs/SOVEREIGN_SHARD_SPEC.md)
