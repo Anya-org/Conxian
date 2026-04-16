@@ -338,16 +338,21 @@ def verify_plan(
             )
 
         principal = principal_override or c.expected_sender or deployer
+        principal_display = principal or "<missing principal>"
         chain_source: str | None = None
         lookup_failed = False
         try:
+            if not principal:
+                raise HiroRequestError(
+                    f"Cannot determine principal for {c.name} (missing deployer, expected-sender, and principal override)"
+                )
             chain_source = _fetch_contract_source(hiro_base, principal, c.name)
         except HiroRequestError as e:
             lookup_failed = True
             failures.append(
-                f"{c.name}: Hiro API error querying source for {principal}.{c.name}: {e}"
+                f"{c.name}: Hiro API error querying source for {principal_display}.{c.name}: {e}"
             )
-        deployed = chain_source is not None
+        deployed = False if lookup_failed else (chain_source is not None)
         tx_id: str | None = None
         block_height: int | None = None
 
@@ -355,6 +360,7 @@ def verify_plan(
             try:
                 tx_id, block_height = _fetch_contract_meta(hiro_base, principal, c.name)
             except HiroRequestError as e:
+                lookup_failed = True
                 failures.append(
                     f"{c.name}: Hiro API error querying metadata for {principal}.{c.name}: {e}"
                 )
@@ -370,7 +376,7 @@ def verify_plan(
         results.append(
             VerificationResult(
                 name=c.name,
-                principal=principal,
+                principal=principal_display,
                 local_path=abs_local_path,
                 expected_sender=c.expected_sender,
                 sender_matches_deployer=sender_matches,
@@ -447,6 +453,7 @@ def main() -> None:
                     "network": network,
                     "deployer": deployer,
                     "plan": os.path.abspath(args.plan),
+                    "contracts": contracts,
                     "contracts": contracts,
                     "failures": failures,
                 },
