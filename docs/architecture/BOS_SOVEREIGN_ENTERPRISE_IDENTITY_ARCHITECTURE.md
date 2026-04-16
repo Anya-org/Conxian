@@ -146,7 +146,7 @@ The canonical BOS principal is anchored in the Device/Workload Identity Record (
 
 Subject device/workload identity keys MUST NOT be reassigned to a different BOS principal over their lifetime. If a device or workload is reprovisioned or reassigned, it MUST generate new keys and establish a new binding.
 
-Long-lived refresh credentials are not permitted for privileged BOS surfaces. Session renewal MUST require fresh attestation within the maximum accepted identity-record age window, and interactive sessions MAY additionally require enterprise IdP re-authentication per policy. If a deployment supports any renewal artifact, it MUST be a hardware-backed proof-of-possession credential that is audience-limited to the session broker only and is never accepted directly by BOS privileged services.
+Long-lived refresh credentials are not permitted for privileged BOS surfaces. Session renewal MUST require fresh attestation within the maximum accepted identity-record age window, and interactive sessions MAY additionally require enterprise IdP re-authentication per policy. If a deployment supports any renewal artifact, it MUST be a hardware-backed proof-of-possession credential that is audience-limited to the session broker only and is never accepted directly by BOS privileged services. Any renewal artifact MUST have a maximum lifetime less than or equal to the maximum accepted Device/Workload Identity Record age.
 
 ## 6) ERP and enterprise flows
 
@@ -170,6 +170,8 @@ Approval signatures MUST be over a structured payload that includes, at minimum:
 - a freshness field (timestamp + expiry and/or a broker-issued nonce)
 
 BOS services MUST reject approvals where any of these bindings do not match the current session context.
+
+Approval/signature keys used for mandate approvals MUST be hardware-backed, enrolled for the canonical BOS principal, and explicitly authorized for that principal’s approval capability scope. BOS services MUST verify that the signing key is authorized for the claimed principal (not just that the signature is structurally valid).
 
 ### 6.2 ERP-to-BOS (MCP tool call) session
 
