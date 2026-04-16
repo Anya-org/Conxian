@@ -110,6 +110,8 @@ These signals MUST be treated as time-bound inputs and must not become reusable 
 
 The session broker MUST only issue sessions when enterprise policy signals are explicitly bound to the attested subject key in an auditable way. Implementations MUST NOT combine enterprise claims from one context with attestation evidence from an unrelated key.
 
+The session broker SHOULD reject enterprise policy inputs (for example, IdP assertions or cached SCIM group membership) that are older than a deployment-defined maximum age. As a guideline, IdP assertions should be bounded to minutes (for example, 5–15 minutes).
+
 ## 5) Session brokering model
 
 The session broker issues one of the following proof-of-possession-bound session forms:
@@ -119,7 +121,7 @@ The session broker issues one of the following proof-of-possession-bound session
 
 2. **PoP token** (recommended for browser/mobile clients)
    - broker issues a short-lived token whose requests must include a per-request signature with the bound key
-   - the bound key MUST be hardware-backed and non-exportable per section 4.1 (for example, WebAuthn/FIDO or OS keystore-backed keys), not JS-managed or exportable keys
+   - the bound key MUST be hardware-backed and non-exportable per section 4.1 (for example, WebAuthn/FIDO or OS keystore-backed keys), not JS-managed or exportable keys; it MUST be the dedicated session binding key and MUST NOT be used as an approval/signature key for protected actions
 
 Session properties (normative defaults):
 
@@ -142,7 +144,9 @@ The session broker MUST derive a canonical BOS principal from:
 
 Session issuance MUST be conditioned on a configured binding between these elements (for example, `user_id ↔ device_key` or `workload_id ↔ device_key`), and that binding MUST be recorded in an immutable audit trail.
 
-The canonical BOS principal is anchored in the Device/Workload Identity Record (the device/workload identity key, or a stable identifier derived from it). Session binding keys (mTLS client keys and PoP keys) are proof-of-possession carriers that MUST be cryptographically bound to that principal. Allowlists, capability scopes, audit trails, and revocation entries MUST be keyed on the canonical principal, not on ephemeral session keys.
+Creation, modification, or removal of the binding between a BOS principal and a device/workload identity key MUST be treated as a protected action under `docs/protocols/ENTERPRISE_CUSTODY_BASELINE.md`.
+
+The canonical BOS principal is a subject-level identifier (human operator or workload) that is bound to one or more Device/Workload Identity Records. Each Device/Workload Identity Record contributes one attested device/workload identity key for that principal. Session binding keys (mTLS client keys and PoP keys) are proof-of-possession carriers that MUST be cryptographically bound to a specific principal via their associated Device/Workload Identity Record. Allowlists, capability scopes, audit trails, and revocation entries MUST be keyed on the subject principal identifier, not on ephemeral session keys or individual device keys.
 
 Device identity, session binding, and approval/signature keys are credentials for a canonical BOS principal. They MUST be mapped back to that principal and MUST NOT be treated as independent principals.
 
