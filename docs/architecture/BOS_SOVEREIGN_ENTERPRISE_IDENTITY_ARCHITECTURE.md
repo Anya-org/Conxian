@@ -142,7 +142,11 @@ The session broker MUST derive a canonical BOS principal from:
 
 Session issuance MUST be conditioned on a configured binding between these elements (for example, `user_id ↔ device_key` or `workload_id ↔ device_key`), and that binding MUST be recorded in an immutable audit trail.
 
+The canonical BOS principal is anchored in the Device/Workload Identity Record (the device/workload identity key, or a stable identifier derived from it). Session binding keys (mTLS client keys and PoP keys) are proof-of-possession carriers that MUST be cryptographically bound to that principal. Allowlists, capability scopes, audit trails, and revocation entries MUST be keyed on the canonical principal, not on ephemeral session keys.
+
 Subject device/workload identity keys MUST NOT be reassigned to a different BOS principal over their lifetime. If a device or workload is reprovisioned or reassigned, it MUST generate new keys and establish a new binding.
+
+Long-lived refresh credentials are not permitted for privileged BOS surfaces. Session renewal MUST require fresh attestation within the maximum accepted identity-record age window, and interactive sessions MAY additionally require enterprise IdP re-authentication per policy. If a deployment supports any renewal artifact, it MUST be a hardware-backed proof-of-possession credential that is audience-limited to the session broker only and is never accepted directly by BOS privileged services.
 
 ## 6) ERP and enterprise flows
 
@@ -158,6 +162,14 @@ Use case: an operator needs to approve an intent mandate originating from ERP.
    - the mandate signature is valid
    - the operator session is valid _and_ PoP-bound
    - policy checks pass
+
+Approval signatures MUST be over a structured payload that includes, at minimum:
+
+- the mandate hash (or mandate payload hash)
+- the canonical BOS principal identifier derived by the session broker
+- a freshness field (timestamp + expiry and/or a broker-issued nonce)
+
+BOS services MUST reject approvals where any of these bindings do not match the current session context.
 
 ### 6.2 ERP-to-BOS (MCP tool call) session
 
