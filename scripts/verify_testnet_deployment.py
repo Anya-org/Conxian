@@ -324,10 +324,24 @@ def _http_json(url: str) -> dict:
         )
         if is_timeout:
             raise urllib.error.URLError(
-                f"Hiro API request timed out after retries: {url}"
+                f"Hiro API request timed out after {max_attempts} attempts: {url}"
             ) from last_err
-        raise last_err
-    raise urllib.error.URLError(f"Hiro API request failed after retries: {url}")
+
+        if isinstance(last_err, urllib.error.HTTPError):
+            raise urllib.error.HTTPError(
+                last_err.url,
+                last_err.code,
+                f"Hiro API request failed after {max_attempts} attempts: {url} ({last_err})",
+                last_err.hdrs,
+                last_err.fp,
+            ) from last_err
+
+        raise urllib.error.URLError(
+            f"Hiro API request failed after {max_attempts} attempts: {url} ({last_err})"
+        ) from last_err
+    raise urllib.error.URLError(
+        f"Hiro API request failed after {max_attempts} attempts: {url}"
+    )
 
 
 def _fetch_contract_source(hiro_base: str, principal: str, name: str) -> str | None:
@@ -364,8 +378,8 @@ def _fetch_contract_meta(
         if e.code == 404:
             return None, None
         raise
-    except HiroRequestError as e:
-        raise HiroRequestError(
+    except urllib.error.URLError as e:
+        raise urllib.error.URLError(
             f"Hiro API request failed for metadata {principal}.{name}: {e}"
         ) from e
     tx_id = data.get("tx_id")
