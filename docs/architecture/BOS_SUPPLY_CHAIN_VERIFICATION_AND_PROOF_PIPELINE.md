@@ -45,6 +45,8 @@ The supply-chain pipeline is a strict consumer of the envelope rules (canonicali
 - `supplychain.gap.v1`: an explicit statement that a required checkpoint is missing beyond policy.
 - `supplychain.anomaly.v1`: an explicit integrity or policy violation statement.
 
+Checkpoint events are authored by upstream publishers. Gap and anomaly events are authored by a BOS attestor (typically Nakamoto Guardian) and are part of the same append-only evidence stream.
+
 ### `supplychain.checkpoint.v1` payload (public-safe)
 
 Minimum fields:
@@ -63,10 +65,24 @@ Minimum fields:
 
 - `subject_id`
 - `expected_checkpoint_type`
-- `expected_after_sequence`
-- `observed_until`
+- `expected_after_sequence`: the envelope `sequence` value (for the same `publisher` and `subject_id`) after which the checkpoint was expected.
+- `observed_until`: unix seconds at which the gap condition was evaluated by the attestor.
 - `reason_code`
 - `commitments` (hash commitments to internal incident notes)
+
+### `supplychain.anomaly.v1` payload
+
+Minimum fields:
+
+- `code`: stable anomaly code (see recommended codes below).
+- `severity`: stable enum (for example `info`, `warn`, `error`).
+- `subject_id` (optional)
+- `related_event_id` (optional): the `event_id` of an accepted checkpoint event.
+- `observed_envelope_hash` (optional): hash of an observed-but-rejected envelope when no valid `event_id` can be accepted.
+- `details` (optional): public-safe details for operators and verifiers.
+- `commitments` (optional): hash commitments to internal reports/logs.
+
+The `sc_anomalies` projection is derived by indexing `supplychain.anomaly.v1` events (and may additionally index `supplychain.gap.v1` events) so anomaly state remains reconstructable from append-only evidence.
 
 ## Storage model (append-only + derived)
 
@@ -74,7 +90,9 @@ Minimum fields:
 
 Store every accepted envelope in an append-only table (conceptually `sc_checkpoint_events`) that contains:
 
+- Tenant/dataset scope: `dataset_id`
 - Envelope identifiers: `event_id`, `publisher`, `kind`, `sequence`
+- Ingest ordering: `ingest_seq` (monotonic per `dataset_id`, assigned by the collector)
 - Supply-chain selectors: `subject_id`, `checkpoint_type`, `checkpoint_at`
 - Canonical payload and signature material: `payload_json`, `payload_hash`, `sigs_json`
 - Commitment material: `leaf_hash`, optional `stream_prev_event_id`, optional `stream_chain_hash`
@@ -89,6 +107,8 @@ Derived projections are operational conveniences and must be rebuildable from th
 - `sc_anomalies`: stable anomaly records (see codes below).
 - `sc_commitment_windows`: anchored commitment windows and publication metadata.
 
+If the pipeline also records rejected/invalid submissions, those records must be append-only and public-safe (for example by storing only `observed_envelope_hash` plus a `code`, and putting any sensitive details behind hash commitments).
+
 ### Trigger behavior
 
 Triggers should keep work lightweight:
@@ -102,7 +122,7 @@ To support both timeline integrity and public inclusion proofs, use a hybrid sch
 
 ### Per-subject hash chain (timeline integrity)
 
-Maintain an optional per-`subject_id` hash chain:
+Maintain a per-`subject_id` hash chain:
 
 - Each checkpoint event stores a `stream_chain_hash = sha256(prev_stream_chain_hash || leaf_hash)`.
 - A gap or reorder breaks the chain and must emit a `supplychain.anomaly.v1` (or a derived anomaly record).
@@ -111,7 +131,9 @@ This makes missing or reordered checkpoints observable without requiring Merkle 
 
 ### Windowed Merkle/MMR root (public inclusion)
 
-Build periodic commitment windows over a deterministic ordering (example ordering key: `(subject_id asc, sequence asc, event_id asc)`).
+Build periodic commitment windows over a deterministic ordering. For `SC-CHECKPOINT-V1`, the canonical ordering key is `(dataset_id asc, ingest_seq asc)`.
+
+The commitment builder must export `events.ndjson` in that exact order so any verifier can rebuild the same root without relying on database state.
 
 For each window, compute:
 
@@ -119,7 +141,13 @@ For each window, compute:
 - `scheme_id` (for example `SC-CHECKPOINT-V1`)
 - Window boundaries (`start_seq`, `end_seq` or a deterministic event-count boundary)
 
+For `SC-CHECKPOINT-V1` windows, boundaries are defined over `ingest_seq` within a single `dataset_id`.
+
 Independent parties must be able to rebuild the same root from the exported events for the window.
+
+Leaf hashing for `SC-CHECKPOINT-V1`:
+
+- `leaf_hash = event_id` (the 32-byte SHA-256 digest as defined by Signed Event Envelope v1)
 
 ## On-chain anchoring
 
@@ -180,6 +208,12 @@ Recommended bundle files (public-safe):
 - `proofs.ndjson`: inclusion proofs per `event_id` (or publish the commitment structure so proofs can be derived).
 - `anomalies.json`: public-safe anomaly details.
 
+ZSE constraints for public artifacts:
+
+- `subject_id` must be public-safe (pseudonymous or otherwise classified as non-sensitive) and must not contain names, emails, phone numbers, physical addresses, or internal account identifiers.
+- `meta` must be limited to public-safe tags and codes.
+- `details` in gap/anomaly events and `anomalies.json` must be public-safe; any sensitive details must be referenced only via hash commitments.
+
 ## Verification views
 
 Verification views are renderers of evidence, not sources of truth.
@@ -225,3 +259,5 @@ For BaaP multi-tenancy, the pipeline must support strict state isolation:
 - `dataset_id` is tenant-scoped (for example by namespace or BNS-like identifier).
 - Allowlists are tenant-scoped (publisher keys and permitted `subject_id` domains).
 - Commitment windows and manifests are per-tenant, so proofs remain portable across deployments.
+
+Commitment windows must never mix events across `dataset_id` boundaries.
