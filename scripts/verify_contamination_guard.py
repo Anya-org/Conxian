@@ -332,6 +332,10 @@ def main():
         "Nakamoto-Guardian",
         "Sovereign-Ops-Orchestrator",
         "Fiscal-Vault-Oracle",
+        "lib-conclave-sdk",
+        "showcase-dapp",
+        "conxian-labs-site",
+        "conxius-platform",
     ]
 
     for subdir in subdirs:
