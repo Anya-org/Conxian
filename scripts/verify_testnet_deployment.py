@@ -254,7 +254,7 @@ class VerificationResult:
     local_path: str
     expected_sender: str | None
     sender_matches_deployer: bool
-    deployed: bool
+    deployed: bool | None
     tx_id: str | None
     block_height: int | None
     source_matches: bool | None
@@ -324,11 +324,15 @@ def verify_plan(
             failures.append(
                 f"{c.name}: Hiro API error querying source for {principal}.{c.name}: {e}"
             )
-        deployed = chain_source is not None
+        deployed: bool | None
+        if lookup_failed:
+            deployed = None
+        else:
+            deployed = chain_source is not None
         tx_id: str | None = None
         block_height: int | None = None
 
-        if deployed:
+        if deployed is True:
             try:
                 tx_id, block_height = _fetch_contract_meta(hiro_base, principal, c.name)
             except HiroRequestError as e:
@@ -337,7 +341,7 @@ def verify_plan(
                 )
 
         source_matches: bool | None = None
-        if deployed and local_source is not None:
+        if deployed is True and local_source is not None:
             local_source_norm = _normalize_source(local_source)
             chain_source_norm = _normalize_source(chain_source)
             source_matches = local_source_norm == chain_source_norm
@@ -358,7 +362,7 @@ def verify_plan(
             )
         )
 
-        if not deployed and not lookup_failed:
+        if deployed is False:
             failures.append(f"{c.name}: missing on-chain contract {principal}.{c.name}")
 
     return network, deployer, results, failures
@@ -436,7 +440,9 @@ def main() -> None:
         print(f"contracts_in_plan={len(results)}")
 
         for r in results:
-            if not r.deployed:
+            if r.deployed is None:
+                status = "error"
+            elif r.deployed is False:
                 status = "missing"
             elif r.source_matches is True:
                 status = "ok"
