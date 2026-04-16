@@ -196,14 +196,14 @@ def _http_json(url: str) -> dict:
                 data = json.loads(payload)
             except json.JSONDecodeError as e:
                 last_err = e
-                continue
+            else:
+                if not isinstance(data, dict):
+                    raise HiroRequestError(
+                        f"Hiro API returned unexpected JSON type: {type(data).__name__}: {url}"
+                    )
 
-            if not isinstance(data, dict):
-                raise HiroRequestError(
-                    f"Hiro API returned unexpected JSON type: {type(data).__name__}: {url}"
-                )
+                return data
 
-            return data
         except urllib.error.HTTPError as e:
             if e.code == 404:
                 raise
