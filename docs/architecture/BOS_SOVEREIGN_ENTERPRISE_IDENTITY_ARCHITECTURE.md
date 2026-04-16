@@ -123,6 +123,8 @@ The session broker issues one of the following proof-of-possession-bound session
    - broker issues a short-lived token whose requests must include a per-request signature with the bound key
    - the bound key MUST be hardware-backed and non-exportable per section 4.1 (for example, WebAuthn/FIDO or OS keystore-backed keys), not JS-managed or exportable keys; it MUST be the dedicated session binding key and MUST NOT be used as an approval/signature key for protected actions
 
+The session broker MUST cryptographically bind the PoP-bound session key to the principal’s Device/Workload Identity Record (for example, by including the identity-record identifier or device/workload identity key hash in token claims and validation logic).
+
 Session properties (normative defaults):
 
 - TTL: MUST NOT exceed 15 minutes for sessions that can reach privileged BOS surfaces (implementations SHOULD target 5–15 minutes); longer TTLs MAY be used only for explicitly non-privileged, read-only surfaces under documented enterprise policy
@@ -171,7 +173,7 @@ Multi-day or indefinite refresh credentials are not permitted for privileged BOS
 Use case: an operator needs to approve an intent mandate originating from ERP.
 
 1. Operator authenticates to enterprise IdP (SSO).
-2. Operator device proves possession of an attested hardware key.
+2. Operator device proves possession of the attested session binding key associated with its Device/Workload Identity Record (per sections 4.1–4.2), not the approval/signature key.
 3. Session broker issues a short-lived operator session scoped to an approval surface.
 4. Operator reviews an intent mandate and produces an explicit approval signature (for example, via Conxius Wallet secure hardware).
 5. BOS services accept the approval only when:
@@ -211,6 +213,8 @@ Horizontally-scaled ERP connector clusters MUST either:
 - provision a distinct device/workload identity key per instance so compromise and revocation can be localized
 
 Distributing a single private key into multiple application instances or configuration stores is not permitted.
+
+Deployments that choose the centralized HSM/TEE option MUST treat the shared BOS-facing key as a single connector principal (shared blast radius across instances) and SHOULD prefer per-instance device/workload identity keys for high-privilege BOS surfaces where localized compromise and revocation are required.
 
 ### 6.3 Headless enterprise workload session (non-human)
 
