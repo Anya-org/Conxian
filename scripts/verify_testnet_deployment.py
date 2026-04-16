@@ -38,9 +38,15 @@ def _strip_yaml_scalar(value: str) -> str:
             if quote == "'" and i + 1 < len(value) and value[i + 1] == "'":
                 i += 2
                 continue
-            if quote == '"' and i > 0 and value[i - 1] == "\\":
-                i += 1
-                continue
+            if quote == '"':
+                backslashes = 0
+                j = i - 1
+                while j >= 0 and value[j] == "\\":
+                    backslashes += 1
+                    j -= 1
+                if backslashes % 2 == 1:
+                    i += 1
+                    continue
             end = i
             break
         if end is None:
@@ -86,6 +92,20 @@ class ParsedPlan:
     contracts: list[PlanContract]
 
 
+def _parse_optional_yaml_scalar(value: str) -> str | None:
+    cleaned = _strip_yaml_scalar(value)
+    return cleaned if cleaned else None
+
+
+def _contract_from_current(current: dict[str, str | None]) -> PlanContract | None:
+    name = str(current.get("contract-name") or "").strip()
+    if not name:
+        return None
+    expected_sender = current.get("expected-sender") or None
+    path = current.get("path") or None
+    return PlanContract(name=name, expected_sender=expected_sender, path=path)
+
+
 def parse_deployment_plan(plan_text: str) -> ParsedPlan:
     network: str | None = None
     deployer: str | None = None
@@ -99,43 +119,38 @@ def parse_deployment_plan(plan_text: str) -> ParsedPlan:
             continue
 
         if line.startswith("network:"):
-            network = _strip_yaml_scalar(line.split(":", 1)[1])
+            network = _parse_optional_yaml_scalar(line.split(":", 1)[1])
             continue
 
         if line.startswith("deployer:"):
-            deployer = _strip_yaml_scalar(line.split(":", 1)[1])
+            deployer = _parse_optional_yaml_scalar(line.split(":", 1)[1])
             continue
 
-        if line.startswith("- contract-publish:"):
+        if line.startswith("-"):
             if current is not None:
-                contracts.append(
-                    PlanContract(
-                        name=str(current.get("contract-name") or "").strip(),
-                        expected_sender=current.get("expected-sender"),
-                        path=current.get("path"),
-                    )
-                )
-            current = {"contract-name": None, "expected-sender": None, "path": None}
+                contract = _contract_from_current(current)
+                if contract is not None:
+                    contracts.append(contract)
+                current = None
+
+            if line.startswith("- contract-publish:"):
+                current = {"contract-name": None, "expected-sender": None, "path": None}
             continue
 
         if current is None:
             continue
 
         if line.startswith("contract-name:"):
-            current["contract-name"] = _strip_yaml_scalar(line.split(":", 1)[1])
+            current["contract-name"] = _parse_optional_yaml_scalar(line.split(":", 1)[1])
         elif line.startswith("expected-sender:"):
-            current["expected-sender"] = _strip_yaml_scalar(line.split(":", 1)[1])
+            current["expected-sender"] = _parse_optional_yaml_scalar(line.split(":", 1)[1])
         elif line.startswith("path:"):
-            current["path"] = _strip_yaml_scalar(line.split(":", 1)[1])
+            current["path"] = _parse_optional_yaml_scalar(line.split(":", 1)[1])
 
     if current is not None:
-        contracts.append(
-            PlanContract(
-                name=str(current.get("contract-name") or "").strip(),
-                expected_sender=current.get("expected-sender"),
-                path=current.get("path"),
-            )
-        )
+        contract = _contract_from_current(current)
+        if contract is not None:
+            contracts.append(contract)
 
     contracts = [c for c in contracts if c.name]
 
@@ -201,7 +216,9 @@ def _fetch_contract_source(hiro_base: str, principal: str, name: str) -> str | N
         raise
     source = data.get("source")
     if not isinstance(source, str):
-        return None
+        raise HiroRequestError(
+            f"Unexpected Hiro response for {principal}.{name}: source is {type(source).__name__}"
+        )
     return source
 
 
@@ -226,7 +243,8 @@ def _fetch_contract_meta(
 
 def _normalize_source(text: str) -> str:
     text = text.replace("\r\n", "\n").replace("\r", "\n")
-    return text.rstrip() + "\n"
+    lines = [ln.rstrip() for ln in text.split("\n")]
+    return "\n".join(lines).rstrip() + "\n"
 
 
 @dataclasses.dataclass(frozen=True)
