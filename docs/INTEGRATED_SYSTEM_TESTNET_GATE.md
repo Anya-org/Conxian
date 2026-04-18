@@ -26,6 +26,14 @@ Related policy:
 - **Integrated system**: protocol contracts + wallet signing + Gateway + Nexus + UI + platform orchestration (`conxius-platform`) working together.
 - **Evidence**: commit-pinned artifacts that a reviewer can validate without access to secrets (tx ids, block heights, verifier output, sanitized logs).
 
+### Acronyms / terms
+
+- **BOS (Business Operations System)**: the operating/control model that governs custody boundaries, role separation, and release discipline across Conxian surfaces.
+- **CSF**: the Conxian protocol contract surface (`Conxian` / `ConxianCSF`), including routing/integration paths such as `swap-router` and adapters.
+- **ZSE (Zero Secret Egress)**: the policy that secrets and operational-only procedures stay out of public git; public docs remain review-safe and non-sensitive.
+- **Gateway**: the production-boundary ingress/broadcast/API surface used by external systems and clients.
+- **Nexus**: the state indexing/projection surface that ingests chain activity and exposes derived, verifiable query outputs.
+
 ## When this gate applies
 
 This gate is required before promoting a change out of `dev` when the change can affect any of:
@@ -42,9 +50,10 @@ If a change is documentation-only or strictly local-dev ergonomics with no runti
 For a `dev` PR (or a `dev` -> `staged` promotion request), attach a single “Integrated testnet validation record” that includes:
 
 - Commit SHA(s) under validation.
-- The public-testnet window used for validation (block height range).
+- Stacks testnet block height range used for validation (`start_height` -> `end_height`).
+- When Bitcoin-side verification is in scope, Bitcoin Testnet/Signet block height range and/or Bitcoin tx ids tied to the validated flow(s).
 - The contract publish set and how it was verified.
-- A small list of transaction ids that exercise the required end-to-end flows.
+- A small list of transaction ids that exercise the required end-to-end flows (Stacks tx ids required; include Bitcoin tx ids when relevant).
 - A short list of any deviations (and whether they are blockers).
 
 Evidence must remain public-safe. If a supporting runbook/log contains sensitive material, store it outside git (per ZSE) and link it from Linear.
@@ -107,8 +116,11 @@ Goal: prove that the full stack can be operated in a testnet configuration and s
 - [ ] `conxius-platform` can run a full-stack configuration wired to public testnet.
 - [ ] Gateway and Nexus both:
   - start successfully,
-  - remain healthy for a validation window, and
-  - ingest/index the testnet transactions produced in this gate.
+  - remain healthy for at least **6 consecutive Stacks testnet blocks (~60 minutes)**, and
+  - ingest/index the testnet transactions produced in this gate within that same window.
+- [ ] Acceptable evidence for this window includes:
+  - timestamped Gateway/Nexus health snapshots captured across the window (for example, start + end snapshots, with optional periodic checks), and
+  - indexing confirmation for the proof transaction IDs used in this gate.
 - [ ] Any production-boundary service surfaces fail closed when required dependencies are missing.
 
 ### 6) Cross-surface integration checks
