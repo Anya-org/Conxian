@@ -30,6 +30,9 @@ This audit originally identified significant "stub", "mock", and "placeholder" c
 ### D. conxian-business (BOS Governance)
 - **Intentional Stubs:** MAINTAINED. `BOS_STATE_MACHINE.stub.json` remains an intentional ZSE stub; `LINEAR_WIRING.md` is a public-safe Linear-first intake/routing document (not a stub).
 
+### E. Release Plans
+- **Mainnet Release Plan:** REMEDIATED. Replaced testnet principals with mainnet addresses in `Conxian/deployments/mainnet-release-plan.yaml` (CON-371).
+
 ## 3. Enforcement
 1. **CI Guardrails:** The `scripts/verify_contamination_guard.py` script is now active and mandatory for all PRs targeting `main` and `staged`. It rejects hardcoded testnet principals and explicit stub markers in production source trees, subject to the current scan scope and allowlisted exclusions.
 2. **Fail-Closed Standard:** All new functional stubs must return a `NOT_IMPLEMENTED` or `SERVICE_UNAVAILABLE` error in the production code path.
