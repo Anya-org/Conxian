@@ -222,11 +222,12 @@ Implementation steps:
    - (optional, policy-only) `labs-opex-vault`
 
 2. Implement a fee routing surface that:
-   - takes `(token, amount, bucket_set_id, flow_recipient)` inputs,
+   - takes `(token, amount, bucket_set_id, routing_context)` inputs, where `routing_context.bindings` supports direct-recipient bindings (e.g., `flow_recipient`, `referrer_principal?`, `referee_principal?`),
    - derives each stage’s validation rules from the bucket set’s stage-kind metadata (full-split vs carve-out), rather than hardcoding rules for specific bucket sets,
    - validates that each full-split stage (e.g., `productive_streaming.v1`, or the Stage B split of `post_cut_captured`) has BPS that sum to `10000`,
    - treats partial carve-outs (e.g., Stage A of `captured_protocol_fees.v1`) as bounded by `<= 10000` rather than required to sum to `10000`,
    - recomputes all bucket amounts on-chain from the canonical BPS configuration and fails closed if any caller-supplied breakdown disagrees,
+   - fails closed with explicit errors if any gate-enabled bucket requires a recipient binding that is missing from `routing_context.bindings`,
    - resolves any role-based recipients through `operational-treasury`,
    - fails closed with explicit errors if a required principal key is missing.
 
