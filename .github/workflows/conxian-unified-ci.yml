@@ -60,13 +60,16 @@ jobs:
     - name: Verify tracked artifacts
       run: |
         python3 scripts/verify_tracked_artifacts.py
+    - name: Verify compose env templates
+      run: |
+        python3 scripts/verify_compose_env_templates.py
     - name: Verify submodule secret filename hygiene (Nexus)
       run: |
         python3 scripts/verify_submodule_secret_filenames.py --submodule conxian-nexus
     - name: Verify BOS production boundary
       run: |
         python3 scripts/verify_bos_production_boundary.py
-    - name: Verify submodule integrity
+    - name: Verify submodule integrity and update policy
       run: |
         python3 scripts/verify_submodule_integrity.py
         git submodule status --recursive

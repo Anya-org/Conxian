@@ -4,12 +4,20 @@ from __future__ import annotations
 
 This check queries the GitHub REST API. It is intended to be CI-gating, and
 requires network access plus a token via GITHUB_TOKEN or GH_TOKEN.
+
+It also enforces local policy for submodule update automation:
+- `.gitmodules` must not declare branch-tracking refs (`branch = ...`).
+- Automation files must not use `git submodule update --remote`.
+- Automation files must not set `submodule.<name>.branch`.
+- Automation files must not run `git submodule foreach` loops that perform
+  `git checkout main` + `git pull`.
 """
 
 import configparser
 import dataclasses
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -57,29 +65,35 @@ def _parse_gitlinks(repo_root: Path) -> dict[str, str]:
     return gitlinks
 
 
-def _parse_gitmodules(gitmodules_path: Path) -> tuple[dict[str, str], list[str]]:
+def _parse_gitmodules(
+    gitmodules_path: Path,
+) -> tuple[dict[str, str], list[str], list[str]]:
     if not gitmodules_path.exists():
-        return {}, []
+        return {}, [], []
 
     config = configparser.ConfigParser(interpolation=None)
     config.read(gitmodules_path, encoding="utf-8")
 
     mappings: dict[str, str] = {}
     invalid_sections: list[str] = []
+    branch_tracking_entries: list[str] = []
     for section in config.sections():
         if not section.startswith('submodule "'):
             continue
 
         path = config.get(section, "path", fallback="").strip()
         url = config.get(section, "url", fallback="").strip()
+        branch = config.get(section, "branch", fallback="").strip()
 
         if not path or not url:
             invalid_sections.append(section)
             continue
 
         mappings[path] = url
+        if branch:
+            branch_tracking_entries.append(f"{path}: branch={branch}")
 
-    return mappings, invalid_sections
+    return mappings, invalid_sections, branch_tracking_entries
 
 
 def _parse_github_repo(url: str) -> str | None:
@@ -98,6 +112,81 @@ def _parse_github_repo(url: str) -> str | None:
     if repo.endswith(".git"):
         repo = repo[:-4]
     return f"{owner}/{repo}"
+
+
+def _tracked_automation_files(repo_root: Path) -> list[Path]:
+    output = _run_git(
+        [
+            "-C",
+            repo_root.as_posix(),
+            "ls-files",
+            "--",
+            "Makefile",
+            ".github/workflows",
+            "scripts",
+        ]
+    )
+
+    files: list[Path] = []
+    allowed_suffixes = {".yml", ".yaml", ".sh", ".bash", ".ps1", ".mk"}
+
+    for rel_path in output.splitlines():
+        path = Path(rel_path)
+        if rel_path == "Makefile":
+            files.append(path)
+            continue
+
+        suffix = path.suffix.lower()
+        if suffix in allowed_suffixes:
+            files.append(path)
+
+    # Keep deterministic order and avoid duplicates if pathspecs overlap.
+    return sorted(set(files), key=lambda p: p.as_posix())
+
+
+def _scan_submodule_automation_policy(repo_root: Path) -> list[str]:
+    failures: list[str] = []
+    update_remote_regex = re.compile(r"\bgit\s+submodule\s+update\b.*\s--remote(?:\s|$)")
+    branch_config_regex = re.compile(r"\bsubmodule\.[^\s\"'=]+\.branch\b")
+    checkout_main_regex = re.compile(r"\bgit\s+checkout\s+main\b")
+    git_pull_regex = re.compile(r"\bgit\s+pull\b")
+
+    for rel_path in _tracked_automation_files(repo_root):
+        abs_path = repo_root / rel_path
+        if not abs_path.is_file():
+            continue
+
+        content = abs_path.read_text(encoding="utf-8", errors="replace")
+        non_comment_lines: list[str] = []
+
+        for line_no, line in enumerate(content.splitlines(), start=1):
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#"):
+                continue
+
+            non_comment_lines.append(line)
+
+            if update_remote_regex.search(line):
+                failures.append(
+                    f"{rel_path.as_posix()}:{line_no}: disallowed `git submodule update --remote` usage"
+                )
+
+            if branch_config_regex.search(line):
+                failures.append(
+                    f"{rel_path.as_posix()}:{line_no}: disallowed `submodule.<name>.branch` configuration"
+                )
+
+        effective_content = "\n".join(non_comment_lines)
+        if (
+            "git submodule foreach" in effective_content
+            and checkout_main_regex.search(effective_content)
+            and git_pull_regex.search(effective_content)
+        ):
+            failures.append(
+                f"{rel_path.as_posix()}: disallowed `git submodule foreach` loop containing `git checkout main` + `git pull`"
+            )
+
+    return failures
 
 
 @dataclasses.dataclass(frozen=True)
@@ -341,7 +430,10 @@ def _verify_submodule_pins(
 def verify() -> None:
     repo_root = _git_root()
     gitlinks = _parse_gitlinks(repo_root)
-    gitmodules, invalid_sections = _parse_gitmodules(repo_root / ".gitmodules")
+    gitmodules, invalid_sections, branch_tracking_entries = _parse_gitmodules(
+        repo_root / ".gitmodules"
+    )
+    automation_policy_failures = _scan_submodule_automation_policy(repo_root)
     allowlist, allowlist_failures = _load_submodule_pin_allowlist(repo_root)
     gitmodules_paths = set(gitmodules)
     gitlink_paths = set(gitlinks)
@@ -353,6 +445,14 @@ def verify() -> None:
             "Submodule integrity check failed:",
             "\nInvalid .gitmodules entries (missing path and/or url):",
             *[f"  - {s}" for s in sorted(invalid_sections)],
+        ]
+        raise RuntimeError("\n".join(lines))
+
+    if branch_tracking_entries:
+        lines = [
+            "Submodule integrity check failed:",
+            "\nBranch-tracking submodule refs are not allowed in .gitmodules:",
+            *[f"  - {entry}" for entry in sorted(branch_tracking_entries)],
         ]
         raise RuntimeError("\n".join(lines))
 
@@ -380,8 +480,15 @@ def verify() -> None:
     if not missing_mappings and not extra_mappings:
         pin_failures = _verify_submodule_pins(gitmodules, gitlinks, allowlist)
 
-    if not missing_mappings and not extra_mappings and not pin_failures:
-        print("Success: .gitmodules mappings match gitlink entries and submodule pins are on upstream default branches.")
+    if (
+        not missing_mappings
+        and not extra_mappings
+        and not pin_failures
+        and not automation_policy_failures
+    ):
+        print(
+            "Success: .gitmodules mappings match gitlink entries, submodule pins are on upstream default branches, and submodule automation policy checks passed."
+        )
         return
 
     lines: list[str] = ["Submodule integrity check failed:"]
@@ -395,6 +502,10 @@ def verify() -> None:
     if pin_failures:
         lines.append("\nSubmodule pins that are not on upstream default branches:")
         lines.extend([f"  - {p}" for p in pin_failures])
+
+    if automation_policy_failures:
+        lines.append("\nPolicy-violating submodule automation patterns:")
+        lines.extend([f"  - {failure}" for failure in automation_policy_failures])
 
     raise RuntimeError("\n".join(lines))
 

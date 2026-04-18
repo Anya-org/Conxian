@@ -21,7 +21,7 @@ active — Public-safe orchestration and wiring artifacts live here; detailed ru
 ## Key Components
 
 - **[Deployment efficiency](./DEPLOYMENT_EFFICIENCY.md)**
-- **[BOS automation wiring](./LINEAR_WIRING.md)**
+- **[ExCo Linear-first intake and wiring](./LINEAR_WIRING.md)**
 
 ## Governance
 

@@ -45,6 +45,8 @@ services:
     ports:
       - "127.0.0.1:3001:3000"
       - "127.0.0.1:50051:50051"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       db:
         condition: service_healthy
@@ -80,6 +82,8 @@ services:
       HMAC_SECRET: ${HMAC_SECRET:?set HMAC_SECRET}
     ports:
       - "127.0.0.1:3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - conxian-gateway-data:/data
     restart: unless-stopped
