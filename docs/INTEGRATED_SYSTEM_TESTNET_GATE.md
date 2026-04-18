@@ -107,8 +107,11 @@ Goal: prove that the full stack can be operated in a testnet configuration and s
 - [ ] `conxius-platform` can run a full-stack configuration wired to public testnet.
 - [ ] Gateway and Nexus both:
   - start successfully,
-  - remain healthy for a validation window, and
-  - ingest/index the testnet transactions produced in this gate.
+  - remain healthy for at least **6 consecutive Stacks testnet blocks (~60 minutes)**, and
+  - ingest/index the testnet transactions produced in this gate within that same window.
+- [ ] Acceptable evidence for this window includes:
+  - timestamped Gateway/Nexus health snapshots captured across the window (for example, start + end snapshots, with optional periodic checks), and
+  - indexing confirmation for the proof transaction IDs used in this gate.
 - [ ] Any production-boundary service surfaces fail closed when required dependencies are missing.
 
 ### 6) Cross-surface integration checks
