@@ -18,7 +18,7 @@ This checklist tracks the mainnet readiness for the `conxian-nexus` repository (
 - [x] **CON-166**: Global settlement ingress (ISO 20022/PAPSS/BRICS) wired.
 - [x] **Decentralized Sync**: Nostr state broadcast (Kind 26003) implemented.
 - [x] **Agentic MCP**: MCP server for treasury and MMR proofs deployed.
-- [x] **TEE Verification**: Mandatory TEE attestation for external triggers enforced.
+- [x] **TEE Verification**: Mandatory TEE attestation for external triggers enforced, including production ERP attestation verification (`conxian-nexus` PR #67, commit `c4c1a800fec656cdfc2a86482a0b5c904da8af79`).
 - [x] **Time-Locks**: 144-block time-lock for institutional state proposals implemented.
 
 ### 4) Release & Hygiene
