@@ -45,3 +45,13 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 - Added Strategic Growth Model (`docs/STRATEGIC_GROWTH_MODEL_2026.md`) outlining comparison with legacy/DeFi models and governance-minimized scaling rules.
 
 [... Rest of previous content ...]
+
+## [1.9.3] - 2026-04-18
+
+### Fixed
+- **Contamination Guard Compliance (CON-371):** Remediated hardcoded testnet principal in `Conxian` mainnet release plan, ensuring zero-contamination for production deployment.
+
+### Added
+- **Full System Review & Alignment (Issue521):** Executed a portfolio-wide documentation and state review.
+- **PRD Synchronization:** Created and updated `PRD.md` files for all submodules (`conxian-nexus`, `conxius-wallet`, `conxius-platform`, `lib-conxian-core`, `conxian-ui`, `lib-conclave-sdk`, `conxian-labs-site`) to reflect v1.9.2 status and Phase 6 capabilities.
+- **Release Hygiene Enforcement:** Standardized `CHANGELOG.md` structure with `## [Unreleased]` sections across the entire monorepo to improve contributor workflow and release visibility.

@@ -86,8 +86,8 @@
 
 * [Conxian Protocol](Conxian/docs/ARCHITECTURE.md)
 * [Three-lane runtime deployment architecture (CON-455)](docs/architecture/THREE_LANE_RUNTIME_DEPLOYMENT_ARCHITECTURE.md)
-* [Nexus State Node](conxian-nexus/docs/PRD.md)
-* [Fusion Gateway](conxian-gateway/PRD.md)
+* [Conxian Nexus](conxian-nexus/docs/PRD.md)
+* [Conxian Gateway](conxian-gateway/PRD.md)
 * [Sovereign Shard Spec](docs/SOVEREIGN_SHARD_SPEC.md)
 * [TEE Security Audit](docs/TEE_SECURITY_AUDIT.md)
 * [Audit Dashboard Spec](docs/DASHBOARD_SPEC.md)
