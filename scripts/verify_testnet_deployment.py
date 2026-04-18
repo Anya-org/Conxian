@@ -249,12 +249,14 @@ def normalize_deployment_plan_text(*, plan_text: str, principal: str) -> str:
         if comment:
             comment_suffix = "  #" + comment
 
-        if content.startswith("deployer:"):
+        key_match = re.match(r"^(?P<key>deployer|expected-sender)\s*:\s*", content)
+
+        if key_match and key_match.group("key") == "deployer" and indent_len == 0:
             indent = raw_line[: len(raw_line) - len(stripped)]
             out.append(f'{indent}deployer: "{principal_escaped}"{comment_suffix}')
             continue
 
-        if content.startswith("expected-sender:"):
+        if key_match and key_match.group("key") == "expected-sender":
             indent = raw_line[: len(raw_line) - len(stripped)]
             out.append(f'{indent}expected-sender: "{principal_escaped}"{comment_suffix}')
             continue
