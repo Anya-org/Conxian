@@ -6,7 +6,7 @@ This checklist tracks the mainnet readiness for the `conxian-gateway` repository
 
 ### 1) Integration & Compliance
 - [x] **CON-162**: External settlement TEE alignment complete.
-- [x] **x402 Alignment**: Payment-Required header parsing implemented.
+- [x] **x402 Alignment**: Literal `402 Payment Required` parsing and x402 filter enforcement implemented (`conxian-gateway` PR #88, commit `26da57559f79ff5e4d77962676c87d5d39d4965a`).
 - [x] **ERP Handshake**: CJCS v2.0 handshake logic verified for institutional use.
 
 ### 2) Service Integrity
