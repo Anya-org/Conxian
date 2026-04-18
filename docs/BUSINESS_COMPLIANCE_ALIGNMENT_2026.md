@@ -2,7 +2,7 @@
 
 This repository is public.
 
-Jurisdiction-specific compliance narratives, legal interpretations, and operational compliance thresholds are maintained in the Conxian Linear workspace.
+The canonical content for jurisdiction-specific compliance narratives and legal interpretations is maintained in the Conxian Linear workspace to comply with our Zero Secret Egress (ZSE) mandate and to protect sensitive strategy, legal, or operational details.
 
 See:
 

@@ -2,7 +2,7 @@
 
 This repository is public.
 
-Internal baseline snapshots, roadmap targets, and executive alignment language are maintained in the Conxian Linear workspace.
+The canonical content for internal baseline snapshots and roadmap targets is maintained in the Conxian Linear workspace to comply with our Zero Secret Egress (ZSE) mandate and to protect sensitive strategy, legal, or operational details.
 
 See:
 

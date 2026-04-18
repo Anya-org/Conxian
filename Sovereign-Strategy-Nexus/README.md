@@ -1,6 +1,6 @@
 # Sovereign Strategy Nexus
 
-> Current workspace release: **v1.8.2** (see [`CHANGELOG.md`](../CHANGELOG.md))
+> Current workspace release: **v1.9.2** (see [`CHANGELOG.md`](../CHANGELOG.md))
 
 The **Sovereign Strategy Nexus** is the strategic coordination layer of the Conxian Business Operations System (BOS).
 
@@ -13,6 +13,10 @@ This repository is public. Detailed strategy planning and internal operating mat
 
 - Strategic alignment and coordination for BOS-level work.
 - Maintaining boundaries between public specifications and internal-only material.
+
+## Status
+
+active — Public-facing strategy coordination artifacts live here; detailed internal planning and operating material is maintained in Linear. Internal details: <https://linear.app/conxian-labs/issue/CON-435/improve-portfolio-clarity-across-org-facing-repositories>.
 
 ## Key Components
 

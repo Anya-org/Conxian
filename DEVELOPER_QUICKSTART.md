@@ -18,7 +18,16 @@ First, spin up the local PostgreSQL database and Redis instance required by the 
 docker-compose up -d db redis
 ```
 
-*Note: If a root `docker-compose.yml` does not exist yet, you can run Postgres locally via standard Docker commands.*
+To run the full reference stack (Postgres + Redis + Nexus + Gateway):
+
+```bash
+cp docker-compose.env.example .env
+docker-compose up --build
+```
+
+Nexus REST will be available at `http://localhost:3001` (container port `3000`), and Gateway at `http://localhost:3000`.
+
+See [docs/operations/DOCKER_COMPOSE_REFERENCE_STACK.md](docs/operations/DOCKER_COMPOSE_REFERENCE_STACK.md) for details.
 
 ## 2. Stacks Devnet & Smart Contracts
 

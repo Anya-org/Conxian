@@ -2,11 +2,11 @@
 
 This repository is public.
 
-Operational performance metrics, bottleneck tracking, and any system-integration details are maintained in the Conxian Linear workspace to avoid publishing non-public operational telemetry.
+The canonical content for operational performance metrics and deployment efficiency is maintained in the Conxian Linear workspace to comply with our Zero Secret Egress (ZSE) mandate and to protect sensitive strategy, legal, or operational details.
 
 See:
 
 - https://linear.app/conxian-labs
 - https://linear.app/conxian-labs/issue/CON-256
 
-This file is intentionally kept as a stub so links from `SUMMARY.md` and other docs continue to resolve.
+This file is intentionally kept as a stub so existing links continue to resolve.

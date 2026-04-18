@@ -8,6 +8,24 @@ This document defines the **Conxian-Labs** Linear bounty workflow and the operat
 - Prevent assignment/claim spam from being interpreted as an accepted claim.
 - Keep payout expectations accurate until ConxianCSF is verifiably deployed and ALEX-funded payouts are explicitly enabled.
 
+Related policy docs:
+
+- [`docs/bounties/CON-137_COMMUNITY_FUNDING_MODEL.md`](./CON-137_COMMUNITY_FUNDING_MODEL.md)
+- [`docs/bounties/CON-231_BOUNTY_CLASSIFICATION_2026-04-12.md`](./CON-231_BOUNTY_CLASSIFICATION_2026-04-12.md)
+
+Being claimable under this workflow means maintainers will review contributions; it does not, by itself, mean the issue is community-funded or payable.
+
+## Labels (Linear + GitHub)
+
+These labels are used for visibility and filtering; they are separate from workflow states.
+
+- `Bounty`: the issue is managed under this workflow.
+- `Bounty Open`: the issue may be publicly advertised as an open, paid bounty only if all of the following are true:
+  - It is labeled `Bounty`.
+  - It is in `Todo` and unassigned (i.e., claimable under this workflow).
+  - It is classified as claimable per [`docs/bounties/CON-231_BOUNTY_CLASSIFICATION_2026-04-12.md`](./CON-231_BOUNTY_CLASSIFICATION_2026-04-12.md).
+  - The ConxianCSF + ALEX funding gates are met per [`docs/bounties/CON-137_COMMUNITY_FUNDING_MODEL.md`](./CON-137_COMMUNITY_FUNDING_MODEL.md).
+
 ## Status model
 
 Recommended Linear team workflow states:
@@ -42,12 +60,13 @@ Recommended Linear team workflow states:
 3. The canonical claim intent is a `/claim` comment on the synced GitHub issue (if GitHub sync + automation is enabled).
 4. If there is no `/claim` automation, maintainers may accept a claim by explicitly assigning the issue and moving it to `Claimed`.
 
+### Timeboxing (anti-parking)
+
+Within **48 hours** of assignment/claim acceptance (calendar time; resets on reassignment), the assignee must open a draft PR (or link an equivalent concrete artifact, such as an in-repo design doc, a spike branch with notes, or a reproducible test harness). If not, unassign and move the issue back to `Todo`.
+
 ## Funding + payout constraints
 
-- Assume **no dedicated bounty budget** unless explicitly funded through the ALEX launch path.
-- Until ConxianCSF is fully deployed via ALEX on Stacks mainnet, the bounty workflow must not imply treasury-backed payout certainty.
-- Once ConxianCSF is deployed, align bounty management, approval, and payout readiness through ConxianCSF.
-- Once payouts are enabled, all bounty funds must come from the ALEX launch path.
+Normative funding/payout rules are defined in [`docs/bounties/CON-137_COMMUNITY_FUNDING_MODEL.md`](./CON-137_COMMUNITY_FUNDING_MODEL.md). In particular, treat “claimable” as reviewable work, not as a payout promise, until ConxianCSF is verifiably deployed and ALEX-funded payouts are explicitly enabled.
 
 Maintainer-only payout enablement checklist:
 

@@ -13,7 +13,8 @@ $repositories = @{
     "stacksorbit" = @("NETWORK", "STACKS_DEPLOYER_PRIVKEY", "HIRO_API_KEY")
 }
 
-$workspaceRoot = "c:\Users\bmokoka\Conxian-Labs\conxian-business"
+# Use the parent directory of the script as the workspace root if not specified
+$workspaceRoot = if ($PSScriptRoot) { Split-Path $PSScriptRoot -Parent } else { "." }
 $missingFiles = 0
 $missingVars = 0
 

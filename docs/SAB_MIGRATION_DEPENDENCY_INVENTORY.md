@@ -2,17 +2,7 @@
 
 This inventory captures current Web2 dependencies that materially affect SAB sovereignty, verifiability, or operational control, and maps each to a target-state path.
 
-This file is intentionally "program-level" (by dependency). Service-level Supabase/Neon usage is captured in [DEPENDENCY_INVENTORY_SUPABASE_NEON.md](DEPENDENCY_INVENTORY_SUPABASE_NEON.md) (tracker: https://linear.app/conxian-labs/issue/CON-337/inventory-current-supabase-and-neon-dependencies-by-service).
-
-## Status and review cadence
-
-**Last reviewed:** 2026-04-05
-
-**Canonical tracker / live status:** https://linear.app/conxian-labs/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory
-
-**Review cadence:** at least monthly (aligned with `SAB_MIGRATION_CONTROL_PLANE.md`), and additionally within the same PR/commit whenever this inventory changes.
-
-Update convention: on every review, bump `Last reviewed` in the same PR/commit that updates this inventory (or a dedicated PR if no other content changes are needed).
+This file is intentionally "program-level" (by dependency). Service-level Supabase/Neon usage is being expanded in https://linear.app/conxian-labs/issue/CON-337/inventory-current-supabase-and-neon-dependencies-by-service.
 
 ## Inventory
 

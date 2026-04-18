@@ -1,0 +1,23 @@
+name: Sovereign Guard
+
+on:
+  push:
+    paths:
+      - 'Conxian/**'
+  pull_request:
+    paths:
+      - 'Conxian/**'
+
+jobs:
+  jules-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Run Contamination Guard
+        run: python scripts/verify_contamination_guard.py

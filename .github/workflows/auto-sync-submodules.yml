@@ -15,14 +15,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           ref: dev
           submodules: true
           fetch-depth: 0
           token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
 
-      - name: Update Submodules to Latest Main
+      - name: Update submodules to latest main (PR base: dev)
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'

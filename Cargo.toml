@@ -1,4 +1,6 @@
 [workspace]
+# Intentionally exclude `conxian-gateway` here: it is its own workspace root, and listing it as a member
+# causes nested-workspace conflicts that break `cargo` invocations under Unified CI.
 members = [
     "conxian-nexus",
     "lib-conclave-sdk"

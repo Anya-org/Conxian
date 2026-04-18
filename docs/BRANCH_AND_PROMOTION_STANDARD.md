@@ -11,16 +11,21 @@ This repository (and the broader Conxian portfolio) uses a three-branch model to
 ## Promotion rules
 
 - Allowed promotion path: `dev` -> `staged` -> `main`.
+- Emergency hotfix path: `hotfix/*` -> `staged` -> `main`.
 - Direct promotion from `dev` to `main` is not allowed.
+- Promotions into `staged` or `main` must originate from an in-repo branch (not a fork).
 
 In practice, “promotion” means opening a pull request from the source branch into the target branch.
 
 ## Standard workflow
 
 1. Create a feature branch from `dev`.
-2. Open a PR into `dev` and validate the change in a testnet/non-production context.
-3. When the change is a mainnet candidate, open a promotion PR from `dev` into `staged`.
-4. After mainnet-candidate validation completes and approvals are in place, open a promotion PR from `staged` into `main`.
+2. Validate locally first (run the checks relevant to the component you changed), then open a PR into `dev`.
+3. Validate the change in a testnet/non-production context.
+4. When the change is a mainnet candidate, open a promotion PR from `dev` into `staged`.
+5. After mainnet-candidate validation completes and approvals are in place, open a promotion PR from `staged` into `main`.
+
+For emergency fixes, open a promotion PR from `hotfix/*` into `staged`, then promote `staged` into `main`.
 
 ## Enforcement
 

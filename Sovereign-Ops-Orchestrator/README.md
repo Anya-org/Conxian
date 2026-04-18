@@ -1,6 +1,6 @@
 # Sovereign Ops Orchestrator
 
-> Current workspace release: **v1.8.2** (see [`CHANGELOG.md`](../CHANGELOG.md))
+> Current workspace release: **v1.9.2** (see [`CHANGELOG.md`](../CHANGELOG.md))
 
 The **Sovereign Ops Orchestrator** is the operational coordination layer of the Conxian Business Operations System (BOS).
 
@@ -13,6 +13,10 @@ This repository is public. Detailed wiring, operational dashboards, and executio
 
 - Coordinating BOS automation and operational processes.
 - Maintaining boundaries between public specs and internal operational material.
+
+## Status
+
+active — Public-safe orchestration and wiring artifacts live here; detailed runbooks and dashboards are maintained in Linear. Internal details: <https://linear.app/conxian-labs/issue/CON-435/improve-portfolio-clarity-across-org-facing-repositories>.
 
 ## Key Components
 

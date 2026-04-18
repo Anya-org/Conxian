@@ -6,7 +6,6 @@ Visualizing the Bitcoin-native floor across the Conxian Stack.
 ## 2. Visual Modules
 - **Yield Velocity (Real-Time)**: STX/sBTC yield rebalancing metrics from `Fiscal-Vault-Oracle`.
 - **Tax Sweep Monitor**: 1% Sovereign Tax extraction events captured from `revenue-automation.clar`.
-- **Fee Conversion Monitor**: keeper-run ALEX swaps that convert fee-vault balances into treasury denomination assets (see `docs/PROTOCOL_FEE_SWEEP_RUNBOOK.md`).
 - **Sovereign Shard Health**: Connectivity status of external ETH/SOL satellite routes.
 - **Audit Verification**: Green-tick status for all FASB/LSEG cross-referenced rebalances.
 

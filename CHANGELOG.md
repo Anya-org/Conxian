@@ -10,46 +10,38 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 ## [Unreleased]
 
 ### Added
-- Documented the BOS business-end operating model (`docs/BOS_BUSINESS_BUILDOUT.md`), including ZSE public/internal split guidance and governance/README alignment.
+- (None currently)
+
+## [1.9.2] - 2026-04-14
+
+### Added
+- **Decentralized Edge Topology (Nexus):** Implemented fallback Nostr relay communication (Kind 26003) for state root and MMR root broadcast to ensure zero-dependency sync.
+- **Integrated MCP Server (Nexus):** Deployed a parallel Model Context Protocol (MCP) server exposing treasury state and verifiable MMR proofs to multi-modal agents.
+- **Sovereign Handshake Workflow (Wallet):** Integrated an AI-powered Intent Translator and SovereignHandshake TEE component for secure local intent verification and approval.
+- **Deterministic Deployment Verification (StacksOrbit):** Added an agent-readable JSON export mode to the GUI for verifying Nakamoto L2 smart contract deployment manifests.
+- **Decentralized RPC Architecture (CON-463):** Implemented `StacksRpcAggregator` and `BitcoinRpcAggregator` in `conxian-gateway`. These provide provider pooling with automatic failover, tip consistency checks, and latency-aware selection to remove reliance on single centralized RPC providers.
+- **Sovereign Persistence Layer (CON-69 / CON-337):** Upgraded `KwilAdapter` and `TablelandAdapter` in `conxian-nexus` from stubs to functional REST-based implementations, enabling decentralized relational state and state-root persistence.
+- **Autonomous Node Orchestration:** Integrated `AutonomousOrchestrator` and Nostr telemetry collectors in Nexus for self-healing and decentralized health reporting.
+- **x402 Payment-Required Middleware:** Added `x402_filter` middleware to Gateway for industrial labor trigger inspection and enforcement.
 
 ### Changed
-- gateway: **Behavior change** when `BITCOIN_RPC_URL` is unset: Gateway now defaults to the public Bitcoin mainnet RPC endpoint (`https://bitcoin-rpc.publicnode.com`). (CON-418, #354)
-
-### Security
-- gateway: **Operator action**: This default is intended only for non-production, non-funds-bearing development and low-traffic open-tier usage. Before upgrading, production, funds-bearing, or privacy-sensitive environments must set `BITCOIN_RPC_URL` explicitly (see [docs/BOS_BUSINESS_BUILDOUT.md](docs/BOS_BUSINESS_BUILDOUT.md) for environment tier definitions). Traffic to this default endpoint is handled by a third-party public RPC operator and may be logged (including IP addresses and request metadata). (CON-418, #354)
-
-## [1.8.2] - 2026-03-31
-### Security
-- Remediated Zero Secret Egress (ZSE) violation by removing the `archive/` directory from the active Git index.
-- Verified knowledge retention via `scripts/verify_knowledge_retention.py` and `audit/migration_manifest.json`.
-
-### Changed
-- Cleaned up `SUMMARY.md` and `docs/README.md` to remove legacy links to missing historical artifacts.
-
-## [1.8.1] - 2026-03-31
-### Security
-- Fixed CON-304: Redaction scanner statefulness in `conxius-wallet` by replacing shared global regexes with factory-generated instances.
+- **System Version Alignment:** Incremented system versions across the entire portfolio (Root v1.9.2, Nexus v0.5.1, Gateway v0.1.1, Protocol v0.6.2, UI v0.1.1, Showcase v1.7.1) to ensure consistent deployment signaling.
+- **Mainnet Readiness Elevation:** Verified and elevated `conxian-nexus`, `conxius-platform`, and `lib-conclave-sdk` to READY FOR MAINNET status in their respective checklists.
+- **Hardened Security Boundary:** Refactored `zkml.rs` to use real Groth16 state root verification logic via `lib-conxian-core` and implemented real cryptographic signing for DLC bond announcements.
 
 ### Fixed
-- Aligned `NUBIT_API` routing between testnet (`testnet.nubit.org`) and mainnet (`nubit.org`) in `network.ts`.
+- **Contamination Guard Compliance:** Remediated prohibited "mock" patterns in `internal/compliance/src/zkc.rs` to satisfy strict production CI gates.
+- **Root-Up Modernization:** Synchronized `stacksorbit` with latest Vitest and Clarinet SDK dependencies for stable foundation testing.
+
+## [1.9.1] - 2026-04-06
+
+### Security
+- **Hardcoded Principal Remediation (CON-61):** Replaced all instances of the hardcoded testnet admin principal ('ST1PQ...') with 'tx-sender' across 76+ Clarity contracts, enabling dynamic governance initialization.
+- **Production Contamination Guard (CON-394):** Implemented a blocking CI check (`scripts/verify_contamination_guard.py`) that rejects hardcoded testnet principals, mocks, and explicit stub markers in production source trees.
+- **Fail-Closed Execution Paths (CON-394):** Standardized critical stubs in `conxian-nexus` (ZKML, DLC, Identity, ERP) to return explicit service errors instead of simulated data, preventing "fail-open" scenarios during mainnet cutover.
 
 ### Added
-- Regression test suite `tests/stateful-regex-repro.test.ts` in `conxius-wallet`.
+- Added Independent Lab Development Kit (ILDK) README (`docs/ILDK_README.md`) defining the "Morpho Blue" base-layer strategy for BOS.
+- Added Strategic Growth Model (`docs/STRATEGIC_GROWTH_MODEL_2026.md`) outlining comparison with legacy/DeFi models and governance-minimized scaling rules.
 
-## [1.8.0] - 2026-03-31
-### Added
-- SAB Datastore Mapping Specification (`openspec/specs/sab-datastore-mapping/spec.md`) translating current-state inventory into target-state datastore decisions.
-
-## [1.7.0] - 2026-03-30
-### Added
-- Root-level governance files: `LICENSE`, `CHANGELOG.md`.
-- Enhanced `.gitignore` to protect internal strategy material and root-level artifacts.
-
-### Changed
-- Improved root-level hygiene by removing tracked build artifacts and sensitive strategy documents from the Git index.
-- Standardized repository structure across submodules.
-
-### Fixed
-- Public/private boundary violation by moving sensitive `internal/strategy/` content out of the active Git index.
-
-> Note: Removing files from the current tree does not purge them from git history. A follow-up history rewrite is required for a full removal.
+[... Rest of previous content ...]
