@@ -4,7 +4,9 @@ This document translates the current **fee-bucket model** into an implementation
 
 - a concrete bucket set,
 - deterministic ordering rules,
+- deterministic founder-fee decay + Labs pivot mechanics,
 - explicit activation conditions, and
+- hybrid SAB-to-DAO governance transition conditions, and
 - a clear split between **policy-only** decisions vs **implementation-ready** work.
 
 The plan is grounded in the current Conxian mainnet and ALEX readiness posture as recorded in:
@@ -32,7 +34,7 @@ Conxian currently has two materially different “fee-like” flows that need ex
 
 These are intentionally separated so we can keep “5/5/90 productive streaming” invariant logic independent from CSF / ALEX referral and payout toggles.
 
-### 1.1 Bucket set: `productive_streaming.v1` (5/5/90)
+### 1.1 Bucket set: `productive_streaming.v1` (5/5/90 with founder-decay bracket)
 
 Source of truth:
 
@@ -41,14 +43,44 @@ Source of truth:
 
 | Order | Bucket name | Category | BPS | Recipient (resolved) | Activation |
 |---:|---|---|---:|---|---|
-| 1 | `founder_royalty` | Founder | 500 | `operational-treasury` principal key: `founder-vault` | Always on (mainnet) |
-| 2 | `ecosystem_reserve` | Protocol-owned | 500 | `operational-treasury` principal key: `ecosystem-reserve-vault` | Always on (mainnet) |
-| 3 | `productive_yield` | Contributor | 9000 | Flow-specific beneficiary (see §2.3) | Always on (mainnet) |
+| 1 | `founder_royalty` | Founder | `founder_bps(year)` | `operational-treasury` principal key: `founder-vault` | Always on (mainnet) |
+| 2 | `founder_delta_to_labs` | Labs-owned | `labs_pivot_bps(year) = 500 - founder_bps(year)` | `operational-treasury` principal key: `conxian-labs-wallet` | Always on (mainnet) |
+| 3 | `ecosystem_reserve` | Protocol-owned | 500 | `operational-treasury` principal key: `ecosystem-reserve-vault` | Always on (mainnet) |
+| 4 | `productive_yield` | Contributor | 9000 | Flow-specific beneficiary (see §2.3) | Always on (mainnet) |
 
 Notes:
 
-- Labs-owned buckets are intentionally not part of `productive_streaming.v1`.
+- `founder_royalty + founder_delta_to_labs` is always exactly `500` BPS, preserving top-level 5/5/90 invariants.
+- `conxian-labs-wallet` is a principal **key** resolved through `operational-treasury` (no hardcoded address).
 - If governance later introduces an explicit operator fee, it must be a new versioned bucket set (e.g., `productive_streaming.v2`) so invariants remain testable.
+
+#### 1.1.1 Founder-decay schedule (normative)
+
+`productive_streaming.v1` uses a deterministic year-indexed bracket for founder allocation:
+
+- `launch_ts` = immutable launch timestamp set when `productive_streaming.v1` is activated.
+- `year = floor((block_ts - launch_ts) / SECONDS_PER_YEAR) + 1`.
+- If `block_ts < launch_ts`, routing MUST fail closed with an explicit epoch error.
+
+Founder bracket (`founder_bps(year)`):
+
+- Years `1..3`: `500` (5.00%)
+- Year `4`: `400` (4.00%)
+- Year `5`: `300` (3.00%)
+- Year `6`: `200` (2.00%)
+- Year `7`: `100` (1.00%)
+- Year `8+`: `100` (1.00%) — founder allocation is capped at the year-7 floor.
+
+Labs pivot bracket:
+
+- `labs_pivot_bps(year) = 500 - founder_bps(year)`
+- Years `1..3`: `0`
+- Year `4`: `100`
+- Year `5`: `200`
+- Year `6`: `300`
+- Year `7+`: `400`
+
+This ensures founder decay is deterministic and the delta from the initial 5% founder allocation is always routed to the `conxian-labs-wallet` principal key.
 
 ### 1.2 Bucket set: `captured_protocol_fees.v1` (fee extraction + internal allocation)
 
@@ -118,7 +150,8 @@ For any fee/yield flow, the implementation MUST:
 Versioning rule of thumb:
 
 - Bucket-set versions freeze the mechanics (bucket membership, ordering, and computation rules).
-- For bucket sets with fixed BPS vectors (e.g., `productive_streaming.v1`), any BPS change should be expressed as a new bucket set version.
+- For bucket sets with fixed BPS vectors, any BPS change should be expressed as a new bucket set version.
+- For schedule-driven mechanics (e.g., `founder_bps(year)` in `productive_streaming.v1`), the schedule function and its constants (`launch_ts`, year brackets, floor) are part of the frozen mechanics; any change requires a new bucket set version.
 - For bucket sets that reference an on-chain policy contract (e.g., the Stage B 6-way split sourced from `cxd-treasury`), percentage changes are treated as policy updates and should be logged/auditable via contract events rather than forcing a bucket set version bump.
 
 ### 2.2 Rounding / remainder behavior
@@ -139,6 +172,25 @@ Remainder routing is stage-aware:
 Remainders must never be routed to Labs or Founder.
 
 This matches the Founder’s Cut remainder rule in `openspec/changes/csf-autonomous-launch/specs/launch-mechanics/spec.md`.
+
+### 2.2.1 Founder-decay arithmetic and fail-closed checks (`productive_streaming.v1`)
+
+For input amount `T` and computed year `Y`, implementations MUST:
+
+1. Compute `founder_bps = founder_bps(Y)` and `labs_bps = 500 - founder_bps`.
+2. Validate invariant `founder_bps + labs_bps = 500`; otherwise fail closed.
+3. Resolve both principal keys via `operational-treasury`:
+   - `founder-vault`
+   - `conxian-labs-wallet`
+4. Fail closed if either key is missing or invalid.
+5. Compute bucket amounts from the same `T`:
+   - `founder_amount = floor(T * founder_bps / 10000)`
+   - `labs_amount = floor(T * labs_bps / 10000)`
+   - `ecosystem_amount = floor(T * 500 / 10000)`
+   - `productive_amount = floor(T * 9000 / 10000)`
+6. Route `remainder = T - (founder_amount + labs_amount + ecosystem_amount + productive_amount)` to `ecosystem_reserve`.
+
+Implementations MUST NOT infer or substitute recipient principals from off-chain config if the canonical key lookup fails.
 
 ### 2.3 Beneficiary binding (productive yield)
 
@@ -213,6 +265,7 @@ Implementation steps:
 
 1. Define the canonical principal keys in `operational-treasury` for bucket recipients:
    - `founder-vault`
+   - `conxian-labs-wallet`
    - `ecosystem-reserve-vault`
    - `protocol-health-vault`
    - `bounty-vault` (or `csf-bounty-vault`)
@@ -224,6 +277,7 @@ Implementation steps:
 2. Implement a fee routing surface that:
    - takes `(token, amount, bucket_set_id, flow_recipient)` inputs,
    - derives each stage’s validation rules from the bucket set’s stage-kind metadata (full-split vs carve-out), rather than hardcoding rules for specific bucket sets,
+   - computes `founder_bps(year)` and `labs_pivot_bps(year)` on-chain for `productive_streaming.v1`,
    - validates that each full-split stage (e.g., `productive_streaming.v1`, or the Stage B split of `post_cut_captured`) has BPS that sum to `10000`,
    - treats partial carve-outs (e.g., Stage A of `captured_protocol_fees.v1`) as bounded by `<= 10000` rather than required to sum to `10000`,
    - recomputes all bucket amounts on-chain from the canonical BPS configuration and fails closed if any caller-supplied breakdown disagrees,
@@ -262,3 +316,36 @@ Bucket routing should emit stable, indexable events so derived stores (Nexus / t
 - prove that “what dashboards show” is derived from on-chain events.
 
 Per `docs/architecture/BOS_TREASURY_AND_YIELD_INTEGRATION_ARCHITECTURE.md`, the derived stores must not become correctness dependencies.
+
+## 6) Hybrid governance dynamics (SAB execution, DAO policy handoff)
+
+This plan follows the governance split in:
+
+- `docs/BOS_WALLET_CONTROL_MODEL.md`
+- `docs/architecture/BOS_TREASURY_AND_YIELD_INTEGRATION_ARCHITECTURE.md`
+
+Baseline model:
+
+- SAB authorities execute allowlisted operational flows.
+- DAO authorities mutate policy through `DAO_TIMELOCK` once quorum and timelock controls are live.
+
+### 6.1 DAO handoff trigger (`GATE_DAO_POLICY_QUORUM`)
+
+`GATE_DAO_POLICY_QUORUM` is true only when all are satisfied:
+
+1. `DAO_TIMELOCK` is active and bound to policy-mutating routes.
+2. `DAO_POLICY_AUTHORITY` signer quorum is verified per BOS wallet policy (target 3-of-5 end state).
+3. Emergency pause/recovery routes remain independent of routine policy mutation routes.
+4. The gate evidence is recorded in the active readiness/governance evidence surface.
+
+### 6.2 Control transition semantics
+
+- Before `GATE_DAO_POLICY_QUORUM`: routing executes under SAB operations with frozen v1 mechanics.
+- After `GATE_DAO_POLICY_QUORUM`: changes to fee-routing policy surfaces (including future founder-decay schedule changes, if any) must be timelock-governed by DAO authority.
+- In both modes, value-bearing execution remains BOS-controlled; dashboards remain propose/observe surfaces only.
+
+### 6.3 Fail-closed transition behavior
+
+- If quorum evidence is stale/missing, policy mutation routes stay disabled.
+- Routing continues using the last valid on-chain configuration; no implicit fallback to ad hoc principals.
+- Any missing timelock/admin binding must abort policy updates.
