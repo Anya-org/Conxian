@@ -19,6 +19,8 @@ All repositories in the Conxian portfolio must adhere to the [**Branching and Pr
 - **`staged` branch**: Reserved for mainnet candidate validation and promotion to `main`.
 - **`dev` branch**: Default branch for development and testnet-oriented logic.
 
+Feature branches should validate locally first, then land in `dev` via pull request.
+
 ## Approval model
 
 All changes land via pull request and must follow the workflow defined in `docs/BOS_BUSINESS_BUILDOUT.md` (Linear issue linkage, `CODEOWNERS` review, and documentation-alignment/`CHANGELOG.md` update rules for boundary or policy changes).
