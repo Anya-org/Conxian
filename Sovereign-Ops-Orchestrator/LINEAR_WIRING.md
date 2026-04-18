@@ -1,17 +1,37 @@
-# BOS automation wiring (migrated to Linear)
+# ExCo Linear-first intake and wiring (public-safe)
 
-This repository is public.
+This repository is public. ExCo-relevant newly discovered work is **Linear-first**.
 
-Do not add operational, security, financial, legal, or strategic details to this repository file beyond this pointer stub.
+Detailed strategic, financial, legal, security, and deep operational runbook content remains canonical in the Conxian Linear workspace under Zero Secret Egress (ZSE).
 
-The canonical content for Linear webhook wiring and BOS automation is maintained in the Conxian Linear workspace to comply with our Zero Secret Egress (ZSE) mandate and to protect sensitive operational, security, financial, legal, or strategic details.
+Traceability:
 
-See:
+- https://linear.app/conxian-labs/issue/CON-349/standardize-linear-first-issue-intake-for-exco-work
+
+## Minimum required intake fields
+
+Every ExCo intake issue in Linear must include:
+
+1. **Operating lens**
+2. **Owner** (single accountable owner)
+3. **Repo/business surface**
+4. **Urgency/priority**
+5. **Outcome + acceptance signal**
+6. **Source links**
+
+## Intake flow (concise)
+
+1. **Discover**: capture the originating signal and links.
+2. **Create/route issue (Linear-first)**: open or route the issue in Linear with all required fields.
+3. **Triage**: confirm owner, urgency, and execution surface.
+4. **Execution linkbacks**: link implementation artifacts (PRs/issues/docs) back to the Linear issue, and include the Linear URL in mirrored public-safe GitHub items.
+
+## ZSE boundary
+
+Sensitive strategic, financial, legal, security, and detailed operational material stays in Linear only.
+
+Public GitHub artifacts must remain sanitized/public-safe and should point back to the canonical Linear issue.
+
+See workspace:
 
 - https://linear.app/conxian-labs
-- https://linear.app/conxian-labs/issue/CON-256
-  - Canonical doc owner
-
-Internal: search Linear for "BOS automation wiring" / this document title.
-
-This file is intentionally kept as a stub so existing links continue to resolve.
