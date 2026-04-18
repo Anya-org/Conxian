@@ -80,9 +80,8 @@ Gate semantics (Stage A):
 Stage B buckets (implementation-ready, with policy parameters):
 
 1. Compute `captured_protocol_fees = total_fee - sum(stage_A)`.
-2. Compute Founder’s Cut as a 10-BPS carve-out on `captured_protocol_fees`:
-   - `founders_cut = floor(captured_protocol_fees * 10 / 10000)`
-   - `post_cut_captured = captured_protocol_fees - founders_cut`
+2. Compute Founder’s Cut as `founders_cut = floor(captured_protocol_fees * 10 / 10000)`.
+3. Compute `post_cut_captured = captured_protocol_fees - founders_cut`; this `post_cut_captured` amount is the input to the Stage B 6-way split.
    - Any rounding remainder stays in protocol custody as part of `post_cut_captured`.
 4. Split `post_cut_captured` using the `cxd-treasury` 6-way basis-point policy.
 
