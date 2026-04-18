@@ -4,6 +4,8 @@ import argparse
 import dataclasses
 import json
 import os
+import socket
+import re
 import time
 import urllib.error
 import urllib.parse
@@ -64,6 +66,59 @@ def _strip_yaml_scalar(value: str) -> str:
             value = value[: i - 1].rstrip()
             break
     return value
+
+
+def _split_yaml_comment(line: str) -> tuple[str, str]:
+    in_single = False
+    in_double = False
+    double_escaped = False
+
+    i = 0
+    while i < len(line):
+        ch = line[i]
+        if in_single:
+            if ch == "'":
+                if i + 1 < len(line) and line[i + 1] == "'":
+                    i += 2
+                    continue
+                in_single = False
+            i += 1
+            continue
+
+        if in_double:
+            if double_escaped:
+                double_escaped = False
+                i += 1
+                continue
+            if ch == "\\":
+                double_escaped = True
+                i += 1
+                continue
+            if ch == '"':
+                in_double = False
+            i += 1
+            continue
+
+        if ch == "'":
+            in_single = True
+            i += 1
+            continue
+
+        if ch == '"':
+            in_double = True
+            i += 1
+            continue
+
+        if ch == "#" and (i == 0 or line[i - 1].isspace()):
+            return line[:i].rstrip(), line[i + 1 :]
+
+        i += 1
+
+    return line.rstrip(), ""
+
+
+def _escape_yaml_double_quoted(value: str) -> str:
+    return value.replace("\\", "\\\\").replace('"', '\\"')
 
 
 def _find_clarinet_project_root(plan_path: str) -> str:
@@ -161,6 +216,55 @@ def parse_deployment_plan(plan_text: str) -> ParsedPlan:
 
     return ParsedPlan(network=network, deployer=deployer, contracts=contracts)
 
+def normalize_deployment_plan_text(*, plan_text: str, principal: str) -> str:
+    lines = plan_text.splitlines()
+    out: list[str] = []
+
+    block_scalar_start = re.compile(r":\s*[>|][+-]?[0-9]*\s*$")
+    in_block_scalar = False
+    block_scalar_key_indent: int | None = None
+
+    principal_escaped = _escape_yaml_double_quoted(principal)
+
+    for raw_line in lines:
+        stripped = raw_line.lstrip()
+        indent_len = len(raw_line) - len(stripped)
+        content, comment = _split_yaml_comment(stripped)
+        header = content
+
+        if in_block_scalar:
+            if stripped and block_scalar_key_indent is not None and indent_len <= block_scalar_key_indent:
+                in_block_scalar = False
+                block_scalar_key_indent = None
+            else:
+                out.append(raw_line)
+                continue
+
+        if block_scalar_start.search(header):
+            in_block_scalar = True
+            block_scalar_key_indent = indent_len
+            out.append(raw_line)
+            continue
+
+        comment_suffix = ""
+        if comment:
+            comment_suffix = "  #" + comment
+
+        key_match = re.match(r"^(?P<key>deployer|expected-sender)\s*:\s*", content)
+
+        if key_match and key_match.group("key") == "deployer" and indent_len == 0:
+            indent = raw_line[: len(raw_line) - len(stripped)]
+            out.append(f'{indent}deployer: "{principal_escaped}"{comment_suffix}')
+            continue
+
+        if key_match and key_match.group("key") == "expected-sender":
+            indent = raw_line[: len(raw_line) - len(stripped)]
+            out.append(f'{indent}expected-sender: "{principal_escaped}"{comment_suffix}')
+            continue
+
+        out.append(raw_line)
+
+    return "\n".join(out) + "\n"
 
 class HiroRequestError(RuntimeError):
     pass
@@ -208,24 +312,34 @@ def _http_json(url: str) -> dict:
             if e.code == 429 or (500 <= e.code < 600):
                 last_err = e
             else:
-                raise
-        except (urllib.error.URLError, TimeoutError) as e:
+                raise HiroRequestError(
+                    f"Hiro API request failed: {url} (HTTP {e.code})"
+                ) from e
+        except (urllib.error.URLError, TimeoutError, socket.timeout) as e:
             last_err = e
 
         if attempt < max_attempts - 1:
             time.sleep(0.5 * (2**attempt))
 
     if last_err is not None:
-        is_timeout = isinstance(last_err, TimeoutError) or (
+        is_timeout = isinstance(last_err, (TimeoutError, socket.timeout)) or (
             isinstance(last_err, urllib.error.URLError)
-            and isinstance(getattr(last_err, "reason", None), TimeoutError)
+            and isinstance(
+                getattr(last_err, "reason", None), (TimeoutError, socket.timeout)
+            )
         )
         if is_timeout:
-            raise urllib.error.URLError(
+            raise HiroRequestError(
                 f"Hiro API request timed out after retries: {url}"
             ) from last_err
-        raise last_err
-    raise urllib.error.URLError(f"Hiro API request failed after retries: {url}")
+        if isinstance(last_err, json.JSONDecodeError):
+            raise HiroRequestError(
+                f"Hiro API returned invalid JSON: {url}"
+            ) from last_err
+        raise HiroRequestError(
+            f"Hiro API request failed after retries: {url} ({last_err})"
+        ) from last_err
+    raise HiroRequestError(f"Hiro API request failed after retries: {url}")
 
 
 def _fetch_contract_source(hiro_base: str, principal: str, name: str) -> str | None:
@@ -262,8 +376,8 @@ def _fetch_contract_meta(
         if e.code == 404:
             return None, None
         raise
-    except HiroRequestError as e:
-        raise HiroRequestError(
+    except urllib.error.URLError as e:
+        raise urllib.error.URLError(
             f"Hiro API request failed for metadata {principal}.{name}: {e}"
         ) from e
     tx_id = data.get("tx_id")
@@ -347,7 +461,8 @@ def verify_plan(
                 f"{c.name}: expected-sender {c.expected_sender!r} does not match deployer {deployer!r}"
             )
 
-        principal = principal_override or c.expected_sender or deployer
+        raw_principal = principal_override or c.expected_sender or deployer
+        principal = raw_principal.strip() if raw_principal else ""
         principal_display = principal or "<missing principal>"
         chain_source: str | None = None
         lookup_failed = False
@@ -429,6 +544,14 @@ def main() -> None:
         help=f"Path to a Clarinet deployment plan YAML (default: {default_plan})",
     )
     parser.add_argument(
+        "--write-normalized-plan",
+        default=None,
+        help=(
+            "Write a normalized copy of the plan with deployer + all expected-sender values set to a single principal, then exit. "
+            "Uses --principal when provided; otherwise uses the plan's deployer."
+        ),
+    )
+    parser.add_argument(
         "--hiro-base",
         default="https://api.testnet.hiro.so",
         help="Hiro API base URL (default: https://api.testnet.hiro.so)",
@@ -457,8 +580,41 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    plan_path = os.path.abspath(args.plan)
+    if args.write_normalized_plan:
+        plan_text = _read_text(plan_path)
+        parsed = parse_deployment_plan(plan_text)
+        principal = args.principal or parsed.deployer
+        if not principal:
+            raise SystemExit(
+                "Unable to determine principal for normalization; provide --principal or ensure the plan has a deployer field."
+            )
+
+        out_path = os.path.abspath(args.write_normalized_plan)
+        if out_path == plan_path:
+            raise SystemExit(
+                "Refusing to overwrite the input plan in place; pass a different --write-normalized-plan output path."
+            )
+        out_dir = os.path.dirname(out_path)
+        if out_dir:
+            os.makedirs(out_dir, exist_ok=True)
+        normalized = normalize_deployment_plan_text(plan_text=plan_text, principal=principal)
+        with open(out_path, "w", encoding="utf-8", newline="\n") as f:
+            f.write(normalized)
+        if args.json:
+            print(
+                json.dumps(
+                    {"normalized_plan": out_path},
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
+        else:
+            print(out_path)
+        raise SystemExit(0)
+
     network, deployer, results, failures = verify_plan(
-        plan_path=os.path.abspath(args.plan),
+        plan_path=plan_path,
         hiro_base=args.hiro_base.rstrip("/"),
         principal_override=args.principal,
         strict_expected_sender=args.strict_expected_sender,

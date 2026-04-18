@@ -80,16 +80,17 @@ Gate semantics (Stage A):
 Stage B buckets (implementation-ready, with policy parameters):
 
 1. Compute `captured_protocol_fees = total_fee - sum(stage_A)`.
-2. Compute Founder’s Cut as `founders_cut = floor(captured_protocol_fees * 10 / 10000)`.
-3. Compute `post_cut_captured = captured_protocol_fees - founders_cut`; this `post_cut_captured` amount is the input to the Stage B 6-way split.
+2. Compute Founder’s Cut as a 10-BPS carve-out on `captured_protocol_fees`:
+   - `founders_cut = floor(captured_protocol_fees * 10 / 10000)`
+   - `post_cut_captured = captured_protocol_fees - founders_cut`
    - Any rounding remainder stays in protocol custody as part of `post_cut_captured`.
-4. Split `post_cut_captured` using the `cxd-treasury` 6-way basis-point policy.
+3. Split `post_cut_captured` using the `cxd-treasury` 6-way basis-point policy.
 
 Bucket mapping for Stage B:
 
 - `founders_cut` → **Founder** → `operational-treasury` principal key: `founder-vault`
 - `treasury` → **Protocol-owned** → `operational-treasury` (protocol reserve / ops)
-- `buyback` → **Protocol-owned** → `operational-treasury` principal key: `buyback-vault` (BME/buyback path)
+- `buyback` → **Protocol-owned** → BME path / buyback vault (implementation-specific)
 - `insurance` → **Protocol-owned** → insurance reserve vault
 - `bounty` → **Contributor** → ConxianCSF / bounty vault (payout-gated)
 - `grant` → **Contributor** → grant vault (payout-gated)
@@ -218,16 +219,14 @@ Implementation steps:
    - `grant-vault`
    - `lp-incentives-vault`
    - `insurance-vault`
-   - `buyback-vault`
    - (optional, policy-only) `labs-opex-vault`
 
 2. Implement a fee routing surface that:
-   - takes `(token, amount, bucket_set_id, routing_context)` inputs, where `routing_context.bindings` supports direct-recipient bindings (e.g., `flow_recipient`, `referrer_principal?`, `referee_principal?`),
+   - takes `(token, amount, bucket_set_id, flow_recipient)` inputs,
    - derives each stage’s validation rules from the bucket set’s stage-kind metadata (full-split vs carve-out), rather than hardcoding rules for specific bucket sets,
    - validates that each full-split stage (e.g., `productive_streaming.v1`, or the Stage B split of `post_cut_captured`) has BPS that sum to `10000`,
    - treats partial carve-outs (e.g., Stage A of `captured_protocol_fees.v1`) as bounded by `<= 10000` rather than required to sum to `10000`,
    - recomputes all bucket amounts on-chain from the canonical BPS configuration and fails closed if any caller-supplied breakdown disagrees,
-   - fails closed with explicit errors if any gate-enabled bucket requires a recipient binding that is missing from `routing_context.bindings`,
    - resolves any role-based recipients through `operational-treasury`,
    - fails closed with explicit errors if a required principal key is missing.
 
