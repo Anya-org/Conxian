@@ -64,15 +64,18 @@ Source-of-truth rule:
 - The repo’s committed git tree (submodule gitlinks) is authoritative for which submodules are pinned (and to what commits).
 - `.gitmodules` is authoritative for expected submodule configuration metadata (`path`, `url`).
 - Submodule bumps should be represented by explicit gitlink updates committed in a PR (see “How to bump a pinned submodule” below); do not rely on `git submodule update --remote` as a normal workflow.
-- The `auto-sync-submodules` workflow ([`.github/workflows/auto-sync-submodules.yml`](../.github/workflows/auto-sync-submodules.yml)) is the intentional exception: it sets a tracking branch for each submodule in CI (for example, `submodule.<name>.branch=main`) and uses `git submodule update --remote` internally to create reviewable PRs that update pinned gitlinks. It must not depend on remote `HEAD`.
+- The submodule policy workflow ([`.github/workflows/auto-sync-submodules.yml`](../.github/workflows/auto-sync-submodules.yml)) is read-only and exists to enforce pinned-SHA policy; it must not mutate refs, set branch-tracking config, or open auto-sync PRs.
 - This document is authoritative for business-unit/operating-function classification.
 - `docs/REPO_PORTFOLIO.md` is an explanatory trust-surface view; it may list additional supporting repos for context, but every pinned submodule in the ecosystem mapping table should appear there with a flagship/supporting classification.
 
 How to bump a pinned submodule (gitlink) in a PR (manual workflow):
 
 1. `git submodule update --init <path>`
-2. `cd <path> && git fetch origin --tags && git checkout <sha-or-tag-or-origin/main>`
-3. `cd - && git add <path> && git commit -m "chore: bump <path> pin"`
+2. `cd <path> && git fetch origin --tags && git checkout <exact-sha-or-immutable-tag>`
+3. `cd - && git add <path> && git commit -m "chore: bump <path> pin to <sha>"`
+4. `python3 scripts/verify_submodule_integrity.py && git submodule status --recursive`
+
+Do not use floating refs (`origin/main`, branch names) in submodule bump PRs. Include verifier output in the PR description as evidence.
 
 Portfolio hygiene automation should validate:
 
