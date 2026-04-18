@@ -4,7 +4,7 @@ This document translates the current **fee-bucket model** into an implementation
 
 - a concrete bucket set,
 - deterministic ordering rules,
-- deterministic founder-fee decay + Labs pivot mechanics,
+- deterministic founder-fee decay + protocol/Labs pivot mechanics,
 - explicit activation conditions, and
 - hybrid SAB-to-DAO governance transition conditions, and
 - a clear split between **policy-only** decisions vs **implementation-ready** work.
@@ -32,9 +32,11 @@ Conxian currently has two materially different “fee-like” flows that need ex
 1. **Productive streaming (yield routing)**: applies to capital locked as transit bond / escrow.
 2. **Captured protocol fees**: applies to protocol-retained fees extracted from protocol actions (DEX/lending/etc).
 
-These are intentionally separated so we can keep “5/5/90 productive streaming” invariant logic independent from CSF / ALEX referral and payout toggles.
+These are intentionally separated so productive streaming can evolve through explicit versioned mechanics (`productive_streaming.v1`, `productive_streaming.v2`) while remaining independent from CSF / ALEX referral and payout toggles.
 
-### 1.1 Bucket set: `productive_streaming.v1` (5/5/90 with founder-decay bracket)
+### 1.1 Bucket family: `productive_streaming` (versioned)
+
+#### 1.1.1 `productive_streaming.v1` (legacy, unchanged; 5/5/90 with founder-decay bracket)
 
 Source of truth:
 
@@ -48,15 +50,13 @@ Source of truth:
 | 3 | `ecosystem_reserve` | Protocol-owned | 500 | `operational-treasury` principal key: `ecosystem-reserve-vault` | Always on (mainnet) |
 | 4 | `productive_yield` | Contributor | 9000 | Flow-specific beneficiary (see §2.3) | Always on (mainnet) |
 
-Notes:
+Normative compatibility note:
 
+- `productive_streaming.v1` remains unchanged for legacy compatibility.
 - `founder_royalty + founder_delta_to_labs` is always exactly `500` BPS, preserving top-level 5/5/90 invariants.
 - `conxian-labs-wallet` is a principal **key** resolved through `operational-treasury` (no hardcoded address).
-- If governance later introduces an explicit operator fee, it must be a new versioned bucket set (e.g., `productive_streaming.v2`) so invariants remain testable.
 
-#### 1.1.1 Founder-decay schedule (normative)
-
-`productive_streaming.v1` uses a deterministic year-indexed bracket for founder allocation:
+Founder-decay schedule (normative, unchanged):
 
 - `launch_ts` = immutable launch timestamp set when `productive_streaming.v1` is activated.
 - `year = floor((block_ts - launch_ts) / SECONDS_PER_YEAR) + 1`.
@@ -81,6 +81,52 @@ Labs pivot bracket:
 - Year `7+`: `400`
 
 This ensures founder decay is deterministic and the delta from the initial 5% founder allocation is always routed to the `conxian-labs-wallet` principal key.
+
+#### 1.1.2 `productive_streaming.v2` (Option 1: widened founder bracket + deterministic decay-delta routing)
+
+`productive_streaming.v2` introduces a widened founder-decay bracket (`1000` BPS max vs `500` in v1) while preserving deterministic recipient routing.
+
+| Order | Bucket name | Category | BPS | Recipient (resolved) | Activation |
+|---:|---|---|---:|---|---|
+| 1 | `founder_royalty` | Founder | `founder_bps_v2(year)` | `operational-treasury` principal key: `founder-vault` | When `productive_streaming.v2` is selected |
+| 2 | `founder_decay_to_protocol` | Protocol-owned | `protocol_decay_bps(year) = min(500, 1000 - founder_bps_v2(year))` | `operational-treasury` principal key: `ecosystem-reserve-vault` | When `productive_streaming.v2` is selected |
+| 3 | `founder_delta_to_labs` | Labs-owned | `labs_pivot_bps_v2(year) = max(0, 500 - founder_bps_v2(year))` | `operational-treasury` principal key: `conxian-labs-wallet` | When `productive_streaming.v2` is selected |
+| 4 | `ecosystem_reserve_base` | Protocol-owned | 500 | `operational-treasury` principal key: `ecosystem-reserve-vault` | When `productive_streaming.v2` is selected |
+| 5 | `productive_yield` | Contributor | 8500 | Flow-specific beneficiary (see §2.3) | When `productive_streaming.v2` is selected |
+
+Founder bracket (`founder_bps_v2(year)`):
+
+- Year `1`: `1000` (10.00%)
+- Year `2`: `750` (7.50%)
+- Year `3`: `550` (5.50%)
+- Year `4`: `400` (4.00%)
+- Year `5+`: `max(35, 400 - 50 * (year - 4))`
+  - This is a deterministic `-0.5` percentage-point/year decay from year 4 onward.
+  - Floor clamp is explicit at `35` BPS (`0.35%`).
+
+Deterministic decay-delta routing arithmetic (`productive_streaming.v2`):
+
+- `decay_delta_bps(year) = 1000 - founder_bps_v2(year)`
+- `protocol_decay_bps(year) = min(500, decay_delta_bps(year))`
+- `labs_pivot_bps_v2(year) = max(0, decay_delta_bps(year) - 500)` (equivalent to `max(0, 500 - founder_bps_v2(year))`)
+- Invariant: `founder_bps_v2 + protocol_decay_bps + labs_pivot_bps_v2 = 1000` for all valid years.
+
+Economic interpretation for v2 deltas:
+
+- Founder decay from `10.00%` down to `5.00%` routes to protocol treasury (`ecosystem-reserve-vault`) via `founder_decay_to_protocol`.
+- Any decay below `5.00%` routes to Labs treasury key (`conxian-labs-wallet`) via `founder_delta_to_labs`.
+
+#### 1.1.3 Guardrails (normative)
+
+- **Explicit floor clamp:** `founder_bps_v2(year)` MUST be clamped at `35` BPS and must never route below `0.35%`.
+- **Deterministic year boundaries:**
+  - `year = floor((block_ts - launch_ts) / SECONDS_PER_YEAR) + 1`
+  - Year `N` applies over `[launch_ts + (N-1)*SECONDS_PER_YEAR, launch_ts + N*SECONDS_PER_YEAR)`.
+  - If `block_ts < launch_ts`, routing MUST fail closed with an explicit epoch error.
+- **Governance controls (no ad hoc upward changes):**
+  - `productive_streaming.v1` mechanics remain frozen for legacy compatibility.
+  - Any upward change to founder allocation in active schedules MUST NOT be applied ad hoc.
+  - Upward changes require both DAO quorum + timelock controls (`GATE_DAO_POLICY_QUORUM`) and a new versioned bucket set (for example `productive_streaming.v3`).
 
 ### 1.2 Bucket set: `captured_protocol_fees.v1` (fee extraction + internal allocation)
 
@@ -151,7 +197,7 @@ Versioning rule of thumb:
 
 - Bucket-set versions freeze the mechanics (bucket membership, ordering, and computation rules).
 - For bucket sets with fixed BPS vectors, any BPS change should be expressed as a new bucket set version.
-- For schedule-driven mechanics (e.g., `founder_bps(year)` in `productive_streaming.v1`), the schedule function and its constants (`launch_ts`, year brackets, floor) are part of the frozen mechanics; any change requires a new bucket set version.
+- For schedule-driven mechanics (e.g., `founder_bps(year)` in `productive_streaming.v1`, or `founder_bps_v2(year)` + delta routing in `productive_streaming.v2`), the schedule functions and constants (`launch_ts`, year brackets, decay rate, floor clamp, routing thresholds) are part of the frozen mechanics; any change requires a new bucket set version.
 - For bucket sets that reference an on-chain policy contract (e.g., the Stage B 6-way split sourced from `cxd-treasury`), percentage changes are treated as policy updates and should be logged/auditable via contract events rather than forcing a bucket set version bump.
 
 ### 2.2 Rounding / remainder behavior
@@ -167,6 +213,7 @@ Remainder routing is stage-aware:
 - For carve-out stages (e.g., Stage A of `captured_protocol_fees.v1`), `remainder` is the input amount for the next stage (`captured_protocol_fees`) and is not routed to any bucket.
 - For terminal stages, route the `remainder` to a specific protocol-owned bucket:
   - `productive_streaming.v1`: route remainder to `ecosystem_reserve`.
+  - `productive_streaming.v2`: route remainder to `ecosystem_reserve_base`.
   - Stage B (6-way split of `post_cut_captured`): route remainder to `treasury`.
 
 Remainders must never be routed to Labs or Founder.
@@ -192,9 +239,37 @@ For input amount `T` and computed year `Y`, implementations MUST:
 
 Implementations MUST NOT infer or substitute recipient principals from off-chain config if the canonical key lookup fails.
 
+### 2.2.2 Founder-decay arithmetic and fail-closed checks (`productive_streaming.v2`)
+
+For input amount `T` and computed year `Y`, implementations MUST:
+
+1. Compute `founder_bps = founder_bps_v2(Y)` using the v2 schedule.
+2. Enforce guardrails on founder schedule output:
+   - `founder_bps <= 1000`
+   - `founder_bps >= 35`
+3. Compute deterministic decay-routing basis points:
+   - `decay_delta_bps = 1000 - founder_bps`
+   - `protocol_decay_bps = min(500, decay_delta_bps)`
+   - `labs_bps = max(0, decay_delta_bps - 500)`
+4. Validate invariant `founder_bps + protocol_decay_bps + labs_bps = 1000`; otherwise fail closed.
+5. Resolve principal keys via `operational-treasury`:
+   - `founder-vault`
+   - `ecosystem-reserve-vault`
+   - `conxian-labs-wallet`
+6. Fail closed if any required key is missing or invalid.
+7. Compute bucket amounts from the same `T`:
+   - `founder_amount = floor(T * founder_bps / 10000)`
+   - `protocol_decay_amount = floor(T * protocol_decay_bps / 10000)`
+   - `labs_amount = floor(T * labs_bps / 10000)`
+   - `ecosystem_base_amount = floor(T * 500 / 10000)`
+   - `productive_amount = floor(T * 8500 / 10000)`
+8. Route `remainder = T - (founder_amount + protocol_decay_amount + labs_amount + ecosystem_base_amount + productive_amount)` to `ecosystem_reserve_base`.
+
+Implementations MUST NOT infer or substitute recipient principals from off-chain config if the canonical key lookup fails.
+
 ### 2.3 Beneficiary binding (productive yield)
 
-For `productive_streaming.v1`, the `productive_yield` bucket recipient is flow-specific:
+For `productive_streaming.v1` and `productive_streaming.v2`, the `productive_yield` bucket recipient is flow-specific:
 
 - If the yield is tied to a Job Card / industrial intent, the recipient is the worker/beneficiary principal bound by that intent.
 - If the yield is tied to an LP position, the recipient is the LP incentive distribution mechanism.
@@ -220,7 +295,7 @@ Define 3 coarse activation gates that implementations can enforce consistently:
 1. `GATE_MAINNET_BASELINE`
    - Contracts deployed on mainnet.
    - `operational-treasury` principal registry is populated for required vaults.
-   - Enables: `productive_streaming.v1` and non-payout protocol-owned buckets.
+   - Enables: `productive_streaming.v1` (legacy default), `productive_streaming.v2` (when explicitly selected), and non-payout protocol-owned buckets.
 
 2. `GATE_PAYOUT_READY_ALEX`
    - `docs/CSF_MAINNET_READINESS_GATE.md` payout readiness flips to payout-ready (post CON-230 + CON-233).
@@ -240,6 +315,7 @@ These can be built immediately without depending on ALEX payout readiness:
 - A shared “bucket set” schema (names, ordering, stage kind (full-split vs carve-out), BPS constraints, remainder rule).
 - A routing interface that resolves principals dynamically via `Conxian/contracts/core/operational-treasury.clar` (no hardcoded production addresses).
 - `productive_streaming.v1` routing (5/5/90), because it is invariant to trigger source.
+- `productive_streaming.v2` routing (10% widened founder bracket + deterministic protocol/Labs decay routing), with v1 preserved unchanged for legacy positions.
 
 ### 4.2 Policy-only (must remain gated)
 
@@ -277,14 +353,16 @@ Implementation steps:
 2. Implement a fee routing surface that:
    - takes `(token, amount, bucket_set_id, flow_recipient)` inputs,
    - derives each stage’s validation rules from the bucket set’s stage-kind metadata (full-split vs carve-out), rather than hardcoding rules for specific bucket sets,
-   - computes `founder_bps(year)` and `labs_pivot_bps(year)` on-chain for `productive_streaming.v1`,
+   - computes schedule outputs on-chain for both productive-streaming versions:
+     - `productive_streaming.v1`: `founder_bps(year)`, `labs_pivot_bps(year)`
+     - `productive_streaming.v2`: `founder_bps_v2(year)`, `protocol_decay_bps(year)`, `labs_pivot_bps_v2(year)`
    - validates that each full-split stage (e.g., `productive_streaming.v1`, or the Stage B split of `post_cut_captured`) has BPS that sum to `10000`,
    - treats partial carve-outs (e.g., Stage A of `captured_protocol_fees.v1`) as bounded by `<= 10000` rather than required to sum to `10000`,
    - recomputes all bucket amounts on-chain from the canonical BPS configuration and fails closed if any caller-supplied breakdown disagrees,
    - resolves any role-based recipients through `operational-treasury`,
    - fails closed with explicit errors if a required principal key is missing.
 
-3. Wire `productive_streaming.v1` routing into the lock/escrow primitive so external vs native triggers remain yield-invariant.
+3. Wire productive-streaming routing into the lock/escrow primitive so external vs native triggers remain yield-invariant for both `productive_streaming.v1` and `productive_streaming.v2`.
 
 4. Keep “captured protocol fees” Stage A referral rewards behind `GATE_PAYOUT_READY_ALEX`.
    - Gate `protocol_health_lock` behind `GATE_MAINNET_BASELINE` plus an explicit policy toggle.
@@ -340,9 +418,14 @@ Baseline model:
 
 ### 6.2 Control transition semantics
 
-- Before `GATE_DAO_POLICY_QUORUM`: routing executes under SAB operations with frozen v1 mechanics.
-- After `GATE_DAO_POLICY_QUORUM`: changes to fee-routing policy surfaces (including future founder-decay schedule changes, if any) must be timelock-governed by DAO authority.
+- Before `GATE_DAO_POLICY_QUORUM`: routing executes under SAB operations with frozen mechanics for whichever productive-streaming version is active (`productive_streaming.v1` for legacy; `productive_streaming.v2` when explicitly selected).
+- After `GATE_DAO_POLICY_QUORUM`: changes to fee-routing policy surfaces (including founder-decay schedule changes) must be timelock-governed by DAO authority.
 - In both modes, value-bearing execution remains BOS-controlled; dashboards remain propose/observe surfaces only.
+
+For avoidance of doubt:
+
+- No ad hoc upward founder-rate changes are permitted on active schedule versions.
+- Any upward founder-rate change requires quorum + timelock and a new bucket-set version.
 
 ### 6.3 Fail-closed transition behavior
 
