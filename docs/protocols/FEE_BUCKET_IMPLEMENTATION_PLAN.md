@@ -89,7 +89,7 @@ Bucket mapping for Stage B:
 
 - `founders_cut` → **Founder** → `operational-treasury` principal key: `founder-vault`
 - `treasury` → **Protocol-owned** → `operational-treasury` (protocol reserve / ops)
-- `buyback` → **Protocol-owned** → BME path / buyback vault (implementation-specific)
+- `buyback` → **Protocol-owned** → `operational-treasury` principal key: `buyback-vault` (BME/buyback path)
 - `insurance` → **Protocol-owned** → insurance reserve vault
 - `bounty` → **Contributor** → ConxianCSF / bounty vault (payout-gated)
 - `grant` → **Contributor** → grant vault (payout-gated)
@@ -218,6 +218,7 @@ Implementation steps:
    - `grant-vault`
    - `lp-incentives-vault`
    - `insurance-vault`
+   - `buyback-vault`
    - (optional, policy-only) `labs-opex-vault`
 
 2. Implement a fee routing surface that:
