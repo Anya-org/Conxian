@@ -14,6 +14,11 @@ The plan is grounded in the current Conxian mainnet and ALEX readiness posture a
 - `docs/CSF_MAINNET_READINESS_GATE.md` (snapshot **2026-04-06**)
 - `openspec/changes/external-settlement-proposal-only-tee/*` (yield routing invariants)
 
+Canonical economic-rights registry artifacts:
+
+- Human-readable registry: `docs/protocols/ECONOMIC_RIGHTS_MAP.md`
+- Machine-readable table: `docs/protocols/data/ECONOMIC_RIGHTS_MAP.v1.csv`
+
 ## 0) Definitions
 
 - **Fee bucket**: a named allocation of an amount (usually expressed in basis points) to a recipient category.
