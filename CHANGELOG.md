@@ -10,8 +10,7 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 ## [Unreleased]
 
 ### Fixed
-- **Contamination Guard Compliance (CON-371):** Remediated hardcoded testnet principal in `Conxian` mainnet release plan, ensuring zero-contamination for production deployment.
-- **Artifact Hygiene:** Cleaned up root-level scratch scripts and hardened `.gitignore` to prevent future tracking of fix-up scripts.
+- **Contamination Guard Compliance (CON-371):** Finalized remediation of hardcoded testnet principals in the `Conxian` submodule to satisfy production contamination gates.
 
 ## [1.9.2] - 2026-04-14
 
