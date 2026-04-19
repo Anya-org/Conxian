@@ -116,3 +116,4 @@ To maintain a clean and sovereign workspace, we adhere to strict hygiene standar
 - **`scripts/`**: Contains active utility scripts (e.g., `check_links.py`).
 - **`ARCHIVE_MIGRATION.md`**: ZSE-safe pointers to legacy material intentionally kept out of the Git index.
 - **`openspec/`**: Definitive technical specifications.
+- **Artifact Hygiene**: Scratch scripts and temporary fix-up files (e.g., `*_fix.py`) are excluded from the repository to maintain a clean production environment.
