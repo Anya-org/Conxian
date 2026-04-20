@@ -36,7 +36,7 @@ describe('Intelligence-Led Adaptive Yield Engine (AYE) - CXIP-013', () => {
     // Set high TVL growth
     simnet.callPublicFn('agent-risk', 'set-tvl', [Cl.uint(2000000), Cl.uint(1000000), Cl.uint(9600)], deployer);
 
-    const adj = simnet.callReadOnlyFn('agent-treasury', 'calculate-performance-adjustment', [], deployer);
+    const adj = simnet.callReadOnlyFn('fiscal-orchestrator', 'calculate-performance-adjustment', [], deployer);
     expect(adj.result).toEqual(Cl.ok(Cl.uint(500)));
   });
 });

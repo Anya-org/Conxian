@@ -7,6 +7,7 @@
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
     "test": "vitest run",
+    "deploy": "clarinet deploy revenue-automation --network testnet",
     "clarinet:check": "clarinet check",
     "check": "clarinet check",
     "clarinet:console": "clarinet console",
@@ -60,6 +61,7 @@
     "tsx": "^4.7.1",
     "typescript": "^5.4.5",
     "vitest": "^4.0.16",
+    "vitest-environment-clarinet": "^3.0.2",
     "xml2js": "^0.6.2",
     "zod": "^4.3.6"
   },

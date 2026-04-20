@@ -10,6 +10,14 @@ describe("dimensional-engine-optimization", () => {
     simnet = await initializeSimnet();
     const accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
+
+    // Register required modules for dimensional-engine
+    simnet.callPublicFn(
+      "conxian-protocol",
+      "register-module",
+      [Cl.stringAscii("position-manager"), Cl.principal(`${deployer}.position-orchestrator`)],
+      deployer
+    );
   });
 
   it("ensures open-position fails when the protocol is paused", () => {
@@ -24,7 +32,7 @@ describe("dimensional-engine-optimization", () => {
 
     // Verify dimensional-engine is deployed and accessible
     const protocolStatus = simnet.callReadOnlyFn(
-      "dimensional-engine",
+      "conxian-protocol",
       "get-protocol-status",
       [],
       deployer

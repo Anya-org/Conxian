@@ -25,9 +25,9 @@ describe('Refactor Verification Suite', () => {
     // Mint tokens first
     simnet.callPublicFn('mock-token', 'mint', [Cl.uint(10000), Cl.principal(wallet1)], wallet1);
 
-    // Deposit via lending-manager
+    // Deposit via lending-orchestrator
     let receipt = simnet.callPublicFn(
-      'lending-manager',
+      'lending-orchestrator',
       'deposit',
       [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(1000)],
       wallet1
@@ -36,7 +36,7 @@ describe('Refactor Verification Suite', () => {
 
     // Verify supply balance
     let balance = simnet.callReadOnlyFn(
-      'lending-manager',
+      'lending-orchestrator',
       'get-user-supply-balance',
       [Cl.principal(wallet1), Cl.contractPrincipal(deployer, 'mock-token')],
       wallet1
@@ -45,7 +45,7 @@ describe('Refactor Verification Suite', () => {
 
     // Withdraw
     receipt = simnet.callPublicFn(
-      'lending-manager',
+      'lending-orchestrator',
       'withdraw',
       [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(1000)],
       wallet1

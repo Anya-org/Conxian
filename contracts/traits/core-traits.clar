@@ -17,25 +17,25 @@
   (verify-passkey-signature ((buff 32) (buff 64) (buff 33)) (response bool uint))
 ))
 
-(define-trait protocol-manager-trait (
+(define-trait protocol-orchestrator-trait (
   (is-paused () (response bool uint))
   (get-protocol-admin () (response principal uint))
 ))
 
-(define-trait position-manager-trait (
+(define-trait position-orchestrator-trait (
   (open-position (principal principal uint uint bool) (response uint uint))
   (close-position (principal uint) (response bool uint))
   (liquidate-position (principal uint) (response bool uint))
 ))
 
-(define-trait collateral-manager-trait (
+(define-trait collateral-orchestrator-trait (
   (deposit-funds (uint <sip-010-ft-trait>) (response bool uint))
   (withdraw-funds (uint <sip-010-ft-trait>) (response bool uint))
   (add-collateral (principal principal uint) (response bool uint))
   (remove-collateral (principal principal uint) (response bool uint))
 ))
 
-(define-trait risk-manager-trait (
+(define-trait risk-unit-trait (
   (get-health-factor (uint) (response uint uint))
   (is-liquidatable (uint) (response bool uint))
   (liquidate (uint) (response bool uint))

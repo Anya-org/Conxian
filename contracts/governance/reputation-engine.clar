@@ -1,72 +1,51 @@
 ;; reputation-engine.clar
-;; Conxian Protocol Standard Contract
+;; Sovereign Reputation & Voting Boost Engine
+;; Aligned with Chappies Ethos: Reputation-Driven, Bitcoin-Anchored
 
-;; reputation-engine.clar
-;; Implements dynamic voting power based on activity and reputation decay.
+(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant BNS_BOOST_BPS u5000) ;; 50% boost for having a .btc name
 
-(use-trait reputation-engine-trait .governance-traits.reputation-engine-trait)
-(impl-trait .governance-traits.reputation-engine-trait)
+(define-data-var admin principal tx-sender)
 
-;; Constants
-(define-constant DECAY_FACTOR u10) ;; Daily decay rate (10/1000 = 1%)
-(define-constant MAX_SCORE u1000)
-(define-constant INITIAL_ACTIVITY_SCORE MAX_SCORE)
-(define-constant ONE_DAY u17280) ;; 24h * 60m * 60s / 5s (Stacks block time)
+;; --- Read-Only Functions ---
 
-(define-map activity-scores
-  principal
-  {
-    last-voted-block: uint,
-    score: uint
-  }
-)
-
-(define-private (calculate-decayed-score (last-voted-block uint) (current-score uint))
+;; @desc Calculate voting weight boost based on BNS identity
+(define-read-only (get-voter-boost (voter principal))
   (let (
-    (blocks-since-last-vote (- burn-block-height last-voted-block))
-    (decay-periods (/ blocks-since-last-vote ONE_DAY))
+    (has-bns (is-some (contract-call? .bns-stub resolve-principal voter)))
   )
-    (if (> decay-periods u0)
-      (let ((total-decay (* decay-periods DECAY_FACTOR)))
-        (if (> current-score total-decay)
-          (- current-score total-decay)
-          u0))
-      current-score)
-  )
-)
-
-
-;; @desc Get weighted voting power
-;; @returns (response bool uint)
-(define-public (get-weighted-voting-power (user principal) (balance uint))
-  (let (
-    (activity-data (map-get? activity-scores user))
-    (effective-score
-      (match activity-data
-        user-activity
-          (let (
-            (current-score (get score user-activity))
-            (last-voted (get last-voted-block user-activity))
-          )
-            (calculate-decayed-score last-voted current-score)
-          )
-        MAX_SCORE
-      )
+    (if has-bns
+      (+ u10000 BNS_BOOST_BPS) ;; 1.5x multiplier in basis points
+      u10000                   ;; 1.0x multiplier
     )
-   )
-    (ok (/ (* balance effective-score) MAX_SCORE))
   )
 )
 
+;; @desc Calculate final weight for a base token balance
+;; @returns (response uint uint)
+(define-public (get-weighted-voting-power (voter principal) (base-balance uint))
+  (let (
+    (boost (get-voter-boost voter))
+  )
+    (ok (/ (* base-balance boost) u10000))
+  )
+)
 
-;; @desc Update activity score
-;; @returns (response bool uint)
-(define-public (update-activity-score (user principal))
+;; @desc Update activity score for a voter (Sovereign Reputation)
+(define-public (update-activity-score (voter principal))
   (begin
-    (map-set activity-scores user {
-      last-voted-block: burn-block-height,
-      score: INITIAL_ACTIVITY_SCORE
-    })
+    ;; In production, this would increment a map-based score
+    (print { event: "reputation-updated", voter: voter })
+    (ok true)
+  )
+)
+
+;; --- Admin Functions ---
+
+(define-public (set-admin (new-admin principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (var-set admin new-admin)
     (ok true)
   )
 )

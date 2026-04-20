@@ -28,7 +28,7 @@ The Conxian Protocol utilizes a "Dual-Mode" testing architecture. This ensures t
 14. ✅ **tests/governance/enhanced-governance-nft.test.ts**: Seat minting and power tracking.
 15. ✅ **tests/governance/proposal-registry.test.ts**: Persistent proposal storage.
 16. ✅ **tests/governance/conxian-operations-engine.test.ts**: Root heartbeat coordination.
-17. ✅ **tests/governance/executive-agents.test.ts**: Autonomous Staff (CRO/CFO) logic.
+17. ✅ **tests/governance/executive-agents.test.ts**: Autonomous Staff (CRO/Sovereign-Financial-Office) logic.
 
 ### System Root Tests (Integration)
 18. ✅ **tests/system/full-protocol-journey.test.ts**: Coordination between Heartbeat, DEX, and Agents.
