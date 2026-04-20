@@ -10,6 +10,7 @@
 (define-data-var coordinator-contract principal .token-system-coordinator)
 (define-data-var cxvg-token-contract principal .cxvg-token)
 
+;; @desc Request a CXD mint for a specific recipient based on target weighting
 (define-public (request-mint (amount uint) (recipient principal))
   (let (
     (weight (default-to u0 (map-get? emission-targets tx-sender)))
@@ -20,6 +21,7 @@
   )
 )
 
+;; @desc Initialize the controller with core system principals
 (define-public (initialize (coordinator principal) (cxvg principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
@@ -29,6 +31,7 @@
   )
 )
 
+;; @desc Add or update an authorized emission target
 (define-public (add-emission-target (target principal) (weight uint))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
