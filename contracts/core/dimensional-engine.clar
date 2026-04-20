@@ -7,9 +7,9 @@
 ;; Adheres to Decentralized Modularity and Bitcoin Ethos
 
 ;; Traits
-(use-trait position-manager-trait .core-traits.position-manager-trait)
-(use-trait collateral-manager-trait .core-traits.collateral-manager-trait)
-(use-trait risk-manager-trait .core-traits.risk-manager-trait)
+(use-trait position-orchestrator-trait .core-traits.position-orchestrator-trait)
+(use-trait collateral-orchestrator-trait .core-traits.collateral-orchestrator-trait)
+(use-trait risk-unit-trait .core-traits.risk-unit-trait)
 (use-trait funding-rate-trait .core-traits.funding-rate-trait)
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 (use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
@@ -73,7 +73,7 @@
 ;; @desc Open position
 ;; @returns (response bool uint)
 (define-public (open-position
-    (position-manager <position-manager-trait>)
+    (position-manager <position-orchestrator-trait>)
     (token principal)
     (amount uint)
     (leverage uint)
@@ -104,7 +104,7 @@
 ;; @desc Close position
 ;; @returns (response bool uint)
 (define-public (close-position
-    (position-manager <position-manager-trait>)
+    (position-manager <position-orchestrator-trait>)
     (position-id uint)
     (token principal)
     (slippage-limit (optional uint))
@@ -127,7 +127,7 @@
 ;; @desc Deposit funds
 ;; @returns (response bool uint)
 (define-public (deposit-funds
-    (collateral-manager <collateral-manager-trait>)
+    (collateral-manager <collateral-orchestrator-trait>)
     (amount uint)
     (token-trait <sip-010-trait>)
   )
@@ -147,7 +147,7 @@
 ;; @desc Withdraw funds
 ;; @returns (response bool uint)
 (define-public (withdraw-funds
-    (collateral-manager <collateral-manager-trait>)
+    (collateral-manager <collateral-orchestrator-trait>)
     (amount uint)
     (token-trait <sip-010-trait>)
   )
@@ -169,7 +169,7 @@
 ;; @desc Check position health
 ;; @returns (response bool uint)
 (define-public (check-position-health
-    (risk-manager <risk-manager-trait>)
+    (risk-manager <risk-unit-trait>)
     (position-id uint)
   )
   (begin
@@ -184,7 +184,7 @@
 ;; @desc Liquidate position
 ;; @returns (response bool uint)
 (define-public (liquidate-position
-    (risk-manager <risk-manager-trait>)
+    (risk-manager <risk-unit-trait>)
     (position-id uint)
   )
   (begin

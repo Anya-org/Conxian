@@ -3,27 +3,32 @@
 The protocol is fully mapped and integrated into the Clarinet SDK ecosystem.
 
 ## 1. Core Architecture (Root)
+
 - **conxian-protocol.clar**: Root module registry and administrative authority.
 - **enhanced-circuit-breaker.clar**: Multi-tier isolation and security monitor for CSF protocols.
 - **ops-engine.clar**: Apex Heartbeat controller for orchestrating protocol updates.
 
 ## 2. Decision Logic Hubs
+
 - **agent-risk.clar**: AYE Predictive Agent (PID stability fees and real-time risk telemetry).
 - **agent-treasury.clar**: Sovereign Fiscal Agent for BME orchestration.
 - **risk-manager.clar**: Centralized liquidation logic and global solvency monitor.
 
 ## 3. Executive Engines
+
 - **dimensional-core.clar**: Leveraged position management (Nakamoto-Aligned).
 - **concentrated-liquidity-pool.clar**: Concentrated liquidity DEX engine (CSF-Compliant).
 - **lending-manager.clar**: Multi-asset money market and collateral management.
 
 ## 4. Financial Infrastructure
+
 - **cxd-token.clar**: Conxian Dollar (SIP-010) with BME integration.
 - **bme-engine.clar**: Burn-Mint Equilibrium issuance engine.
 - **swap-router.clar**: Apex Universal Router with CSF Dynamic Dispatch.
 - **revenue-distributor.clar**: Automated revenue routing for buy-back and burn.
 
 ## 5. Security & Compliance
+
 - **regulatory-adapter.clar**: SIP-018 and jurisdictional compliance.
 - **oracle-aggregator.clar**: Multi-source price aggregation for 2026 ecosystem assets.
 - **block-utils.clar**: Temporal alignment shims for Clarity 4 simulation.

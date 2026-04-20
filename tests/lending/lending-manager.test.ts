@@ -2,7 +2,7 @@ import { describe, expect, it, beforeAll } from 'vitest';
 import { Cl } from '@stacks/transactions';
 import { initSimnet, type Simnet } from '@stacks/clarinet-sdk';
 
-describe('lending-manager', () => {
+describe('lending-orchestrator', () => {
   let simnet: Simnet;
   let deployer: string;
 
@@ -16,7 +16,7 @@ describe('lending-manager', () => {
 
   it('should deposit assets successfully', async () => {
     const { result } = await simnet.callPublicFn(
-      'lending-manager',
+      'lending-orchestrator',
       'deposit',
       [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(100)],
       deployer,
@@ -26,9 +26,9 @@ describe('lending-manager', () => {
 
   it('should withdraw assets successfully', async () => {
     // Deposit first
-    simnet.callPublicFn('lending-manager', 'deposit', [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(100)], deployer);
+    simnet.callPublicFn('lending-orchestrator', 'deposit', [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(100)], deployer);
     const { result } = await simnet.callPublicFn(
-      'lending-manager',
+      'lending-orchestrator',
       'withdraw',
       [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(100)],
       deployer,
@@ -38,9 +38,9 @@ describe('lending-manager', () => {
 
   it('should borrow assets successfully', async () => {
     // Deposit first to establish liquidity
-    simnet.callPublicFn('lending-manager', 'deposit', [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(500)], deployer);
+    simnet.callPublicFn('lending-orchestrator', 'deposit', [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(500)], deployer);
     const { result } = await simnet.callPublicFn(
-      'lending-manager',
+      'lending-orchestrator',
       'borrow',
       [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(100)],
       deployer,
@@ -50,12 +50,12 @@ describe('lending-manager', () => {
 
   it('should repay assets successfully', async () => {
     // Setup: deposit + borrow
-    simnet.callPublicFn('lending-manager', 'deposit', [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(500)], deployer);
-    simnet.callPublicFn('lending-manager', 'borrow', [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(100)], deployer);
+    simnet.callPublicFn('lending-orchestrator', 'deposit', [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(500)], deployer);
+    simnet.callPublicFn('lending-orchestrator', 'borrow', [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(100)], deployer);
     // Mint repayment tokens
     simnet.callPublicFn('mock-token', 'mint', [Cl.uint(100), Cl.principal(deployer)], deployer);
     const { result } = await simnet.callPublicFn(
-      'lending-manager',
+      'lending-orchestrator',
       'repay',
       [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(100)],
       deployer,

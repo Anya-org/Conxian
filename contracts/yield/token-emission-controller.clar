@@ -9,6 +9,10 @@
 ;; Principal Injection Pattern
 (define-data-var coordinator-contract principal .token-system-coordinator)
 (define-data-var cxvg-token-contract principal .cxvg-token)
+(define-data-var self-launch-contract principal .self-launch-coordinator)
+
+(define-constant MAX_EMISSION_PER_EPOCH u10000000000) ;; Hard safety cap
+(define-data-var epoch-emission-total uint u0)
 
 ;; @desc Request a CXD mint for a specific recipient based on target weighting
 (define-public (request-mint (amount uint) (recipient principal))
@@ -16,7 +20,11 @@
     (weight (default-to u0 (map-get? emission-targets tx-sender)))
   )
     (asserts! (> weight u0) (err ERR_UNAUTHORIZED))
-    ;; Use the injected principals
+    (asserts! (<= (+ (var-get epoch-emission-total) amount) MAX_EMISSION_PER_EPOCH) (err u1003))
+
+    (var-set epoch-emission-total (+ (var-get epoch-emission-total) amount))
+    (print { event: "mint-requested", amount: amount, recipient: recipient })
+    ;; MINT LOGIC WOULD CALL CXVG TOKEN HERE
     (ok true)
   )
 )

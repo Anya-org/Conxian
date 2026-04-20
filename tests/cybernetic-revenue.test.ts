@@ -21,14 +21,14 @@ describe('Cybernetic Revenue Allocation', () => {
     // 1. STABILITY Range (GCR = 140)
     simnet.callPublicFn('agent-risk', 'set-mock-gcr', [Cl.uint(140)], admin);
 
-    let policy = simnet.callReadOnlyFn('agent-treasury', 'calculate-cybernetic-policy', [], admin);
+    let policy = simnet.callReadOnlyFn('fiscal-orchestrator', 'calculate-cybernetic-policy', [], admin);
     expect(Cl.prettyPrint(policy.result)).toContain('treasury: u4500');
     expect(Cl.prettyPrint(policy.result)).toContain('bounty: u3000');
 
     // 2. CRISIS Range (GCR = 100)
     simnet.callPublicFn('agent-risk', 'set-mock-gcr', [Cl.uint(100)], admin);
 
-    policy = simnet.callReadOnlyFn('agent-treasury', 'calculate-cybernetic-policy', [], admin);
+    policy = simnet.callReadOnlyFn('fiscal-orchestrator', 'calculate-cybernetic-policy', [], admin);
     expect(Cl.prettyPrint(policy.result)).toContain('insurance: u10000');
   });
 });

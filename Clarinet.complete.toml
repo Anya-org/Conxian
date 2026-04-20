@@ -162,7 +162,7 @@ path = "contracts/helpers/optimization-helpers.clar"
 [contracts.enterprise-loan-manager]
 path = "contracts/dex/enterprise-loan-manager.clar"
 
-[contracts.advanced-order-manager]
+[contracts.order-orchestrator]
 path = "contracts/enterprise/advanced-order-manager.clar"
 
 [contracts.on-chain-router-helper]
@@ -190,7 +190,7 @@ path = "contracts/dex/dex-registrar.clar"
 [contracts.pool-type-registry]
 path = "contracts/dex/pool-type-registry.clar"
 
-[contracts.migration-manager]
+[contracts.migration-orchestrator]
 path = "contracts/migration/migration-manager.clar"
 
 [contracts.predictive-scaling-system]
@@ -290,8 +290,8 @@ path = "contracts/identity/identity-badge.clar"
 [contracts.comprehensive-lending-system]
 path = "contracts/lending/comprehensive-lending-system.clar"
 
-[contracts.lending-manager-trait]
-path = "contracts/lending/lending-manager-trait.clar"
+[contracts.lending-orchestrator-trait]
+path = "contracts/lending/lending-orchestrator-trait.clar"
 
 [contracts.lending-position-nft]
 path = "contracts/lending/lending-position-nft.clar"
@@ -464,7 +464,7 @@ path = "contracts/monitoring/finance-metrics.clar"
 [contracts.ico-offering]
 path = "contracts/governance/ico-offering.clar"
 
-[contracts.upgrade-controller]
+[contracts.symmetry-governor]
 path = "contracts/governance/upgrade-controller.clar"
 depends_on = [ "governance",]
 
@@ -489,13 +489,13 @@ path = "contracts/governance/governance-signature-verifier.clar"
 [contracts.legal-representative-registry]
 path = "contracts/governance/legal-representative-registry.clar"
 
-[contracts.gamification-manager]
+[contracts.reputation-orchestrator]
 path = "contracts/governance/gamification-manager.clar"
 
 [contracts.signed-data-base]
 path = "contracts/governance/signed-data-base.clar"
 
-[contracts.fee-manager]
+[contracts.fee-orchestrator]
 path = "contracts/vaults/fee-manager.clar"
 
 [contracts.custody]
@@ -537,7 +537,7 @@ path = "contracts/core/conxian-access.clar"
 [contracts.funding-rate-calculator]
 path = "contracts/core/funding-rate-calculator.clar"
 
-[contracts.position-manager]
+[contracts.position-orchestrator]
 path = "contracts/core/position-manager.clar"
 
 [contracts.circuit-breaker]
@@ -590,9 +590,9 @@ path = "contracts/tokens/token-system-coordinator.clar"
 depends_on = [ "regulatory-adapter",]
 
 [contracts.risk-management]
-path = "contracts/traits/risk-manager-trait.clar"
+path = "contracts/traits/risk-unit-trait.clar"
 
-[contracts.risk-manager]
+[contracts.risk-unit]
 path = "contracts/core/risk-manager.clar"
 depends_on = [ "conxian-access",]
 
@@ -608,7 +608,7 @@ depends_on = [ "conxian-access", "nakamoto-constants", "regulatory-adapter",]
 path = "contracts/treasury/conxian-vaults.clar"
 depends_on = [ "conxian-access",]
 
-[contracts.dlc-manager]
+[contracts.dlc-orchestrator]
 path = "contracts/sbtc/dlc-manager.clar"
 depends_on = [ "conxian-access",]
 
@@ -623,7 +623,7 @@ depends_on = [ "conxian-access",]
 path = "contracts/governance/timelock.clar"
 depends_on = [ "conxian-access",]
 
-[contracts.lending-manager]
+[contracts.lending-orchestrator]
 path = "contracts/lending/lending-manager.clar"
 
 [contracts.interest-rate-model]
@@ -655,7 +655,7 @@ depends_on = [ "block-utils",]
 [contracts.concentrated-liquidity-pool]
 path = "contracts/dex/concentrated-liquidity-pool.clar"
 
-[contracts.collateral-manager]
+[contracts.collateral-orchestrator]
 path = "contracts/core/collateral-manager.clar"
 depends_on = [ "block-utils", "conxian-protocol",]
 
@@ -669,7 +669,7 @@ path = "contracts/integrations/pyth-oracle-adapter.clar"
 path = "contracts/treasury/founder-vault.clar"
 depends_on = [ "nakamoto-constants", "conxian-protocol",]
 
-[contracts.agent-treasury]
+[contracts.fiscal-orchestrator]
 path = "contracts/agents/agent-treasury.clar"
 depends_on = [ "office-manager",]
 
@@ -718,7 +718,7 @@ depends_on = [ "rbac",]
 [contracts.swap-router]
 path = "contracts/dex/swap-router.clar"
 
-[contracts.office-manager]
+[contracts.office-orchestrator]
 path = "contracts/automation/office-manager.clar"
 
 [contracts.pausable-trait]

@@ -94,25 +94,25 @@
 
 ;; @desc Calculates real health factor for a position by querying risk-manager (read-only)
 (define-read-only (get-health-factor (position-id uint))
-  (contract-call? .risk-manager get-health-factor-read-only position-id)
+  (contract-call? .risk-unit get-health-factor-read-only position-id)
 )
 
 ;; @desc Check if a position is liquidatable
 (define-read-only (is-liquidatable (position-id uint))
-  (contract-call? .risk-manager is-liquidatable position-id)
+  (contract-call? .risk-unit is-liquidatable position-id)
 )
 
 ;; @desc Trigger liquidation for an unhealthy position
 (define-public (trigger-liquidation (position-id uint))
   (let (
-    (liquidatable (unwrap! (contract-call? .risk-manager is-liquidatable position-id) (err u2002)))
+    (liquidatable (unwrap! (contract-call? .risk-unit is-liquidatable position-id) (err u2002)))
   )
     (begin
       (asserts! (not (var-get is-paused)) ERR_PAUSED)
       (asserts! liquidatable (err u2003)) ;; Position not liquidatable
       
       ;; Call risk-manager to execute liquidation
-      (try! (contract-call? .risk-manager liquidate position-id))
+      (try! (contract-call? .risk-unit liquidate position-id))
       
       (print {
         event: "liquidation-triggered",
