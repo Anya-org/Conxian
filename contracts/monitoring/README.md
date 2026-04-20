@@ -7,6 +7,7 @@ The Monitoring module provides real-time telemetry and health assessment for the
 The module acts as the protocol's "Observability Layer":
 - **Metrics**: `finance-metrics.clar` aggregates TVL and solvency data across all modules using the oracle aggregator.
 - **Analytics**: `analytics-aggregator.clar` tracks swap frequency and fee generation.
+- **Persistence**: `tableland-sync.clar` added for decentralized state archival (CON-69).
 - **Dashboard**: `monitoring-dashboard.clar` provides human-readable health statuses.
 
 ## Core Contracts (Reference)
@@ -21,6 +22,13 @@ Aggregates protocol-wide financial data.
 | `get-protocol-metrics` | `()` | Returns detailed solvency (GCR), TVL, active positions, and 24h volume metrics. |
 | `set-admin` | `(new-admin principal)` | Sets a new administrative principal for the metrics contract. |
 | `set-tracked-assets` | `(new-assets (list 10 principal))` | Updates the list of assets tracked for TVL calculation. |
+
+### `tableland-sync.clar`
+Tableland state persistence bridge.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `commit-state-to-tableland` | `(uint (string-ascii 256))` | Commits on-chain state transition to Tableland for archival. |
 
 ### `monitoring-dashboard.clar`
 Calculates high-level system status.
@@ -49,4 +57,4 @@ Comprehensive validation is performed using the Vitest framework.
 - Implementation: Production-Ready (v1.2.1)
 - Audit Status: Internally Verified (April 2026)
 - Telemetry: Real-time (Pull-based)
-- Standard: Hexagonal Architecture, Diátaxis Compliant
+- Standard: Hexagonal Architecture, Diátaxis Compliant, Tableland Integration

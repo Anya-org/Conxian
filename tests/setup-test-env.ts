@@ -10,10 +10,13 @@ export async function initializeSimnet(): Promise<Simnet> {
 
   initializationPromise = (async () => {
     try {
+      console.log('Initializing simnet with Clarinet.toml...');
       const instance = await initSimnet('Clarinet.toml');
       internalSimnet = instance;
+      console.log('Simnet initialized.');
       return instance;
     } catch (error) {
+      console.error('Failed to initialize simnet:', error);
       initializationPromise = null;
       throw error;
     }
@@ -25,7 +28,7 @@ export async function initializeSimnet(): Promise<Simnet> {
 export const simnet: Simnet = new Proxy({} as Simnet, {
   get: (_target, prop) => {
     if (!internalSimnet) {
-      throw new Error("Simnet not initialized");
+      throw new Error("Simnet not initialized. Ensure initializeSimnet() is called.");
     }
     const value = (internalSimnet as any)[prop];
     if (typeof value === 'function') {

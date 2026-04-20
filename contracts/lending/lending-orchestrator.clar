@@ -91,8 +91,8 @@
       
       ;; Automatically collect protocol fee via revenue-automation (CON-60)
       (match (contract-call? .revenue-automation collect-revenue asset-trait amount tx-sender)
-        res (print { event: "lending-fee-automated", amount: res })
-        err-val (print { event: "lending-fee-failed", error: err-val })
+        res (begin (print { event: "lending-fee-automated", amount: res }) res)
+        err-val (begin (print { event: "lending-fee-failed", error: err-val }) u0)
       )
 
       (match (contract-call? .bme-engine register-fee-activity (as-contract tx-sender) interest-portion)

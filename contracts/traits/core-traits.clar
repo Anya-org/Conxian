@@ -37,6 +37,7 @@
 
 (define-trait risk-unit-trait (
   (get-health-factor (uint) (response uint uint))
+  (is-liquidatable (uint) (response bool uint))
   (liquidate (uint) (response bool uint))
 ))
 

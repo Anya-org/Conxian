@@ -82,7 +82,7 @@ depends_on = ["core-traits", "oracle-aggregator"]
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
 clarity-version = 4
-depends_on = ["oracle-aggregator", "cxd-token", "risk-manager", "conxian-protocol", "automation-traits", "conxian-service-trait", "finance-metrics"]
+depends_on = ["oracle-aggregator", "cxd-token", "risk-unit", "conxian-protocol", "automation-traits", "conxian-service-trait", "finance-metrics", "security-monitoring"]
 
 [contracts.order-orchestrator]
 path = "contracts/enterprise/order-orchestrator.clar"
@@ -90,7 +90,7 @@ depends_on = ["security-monitoring"]
 
 [contracts.swap-router]
 path = "contracts/dex/swap-router.clar"
-depends_on = ["oracle-aggregator", "mev-protector", "conxian-protocol", "concentrated-liquidity-pool", "conxian-csf-trait", "enhanced-circuit-breaker", "bme-engine", "sip-standards"]
+depends_on = ["oracle-aggregator", "mev-protector", "conxian-protocol", "concentrated-liquidity-pool", "conxian-csf-trait", "enhanced-circuit-breaker", "bme-engine", "sip-standards", "revenue-automation"]
 
 [contracts.fiscal-orchestrator]
 path = "contracts/agents/fiscal-orchestrator.clar"
@@ -117,8 +117,8 @@ depends_on = ["conxian-protocol", "revenue-distributor"]
 path = "contracts/dimensional/position-nft.clar"
 
 [contracts.lending-manager]
-path = "contracts/lending/lending-manager.clar"
-depends_on = ["conxian-protocol", "economic-policy-engine", "risk-manager", "bme-engine", "sip-standards", "revenue-automation"]
+path = "contracts/lending/lending-orchestrator.clar"
+depends_on = ["conxian-protocol", "economic-policy-engine", "risk-unit", "bme-engine", "sip-standards", "revenue-automation"]
 
 [contracts.dimensional-engine]
 path = "contracts/core/dimensional-engine.clar"
@@ -179,9 +179,6 @@ path = "contracts/tokens/token-system-coordinator.clar"
 
 [contracts.cxs-token]
 path = "contracts/tokens/cxs-token.clar"
-
-[contracts.dlc-orchestrator]
-path = "contracts/sbtc/dlc-orchestrator.clar"
 
 [contracts.position-factory]
 path = "contracts/position-factory.clar"
@@ -350,3 +347,19 @@ depends_on = ["bond-traits", "dlc-bond"]
 [contracts.dlc-manager]
 path = "contracts/sbtc/dlc-manager.clar"
 depends_on = ["conxian-access"]
+
+[contracts.bond-traits]
+path = "contracts/traits/bond-traits.clar"
+
+[contracts.clarity-bitcoin]
+path = "contracts/lib/clarity-bitcoin.clar"
+
+[contracts.agent-treasury]
+path = "contracts/agents/agent-treasury.clar"
+depends_on = ["agent-risk", "cxd-treasury", "bme-engine", "sip-standards", "conxian-protocol", "security-monitoring", "finance-metrics"]
+
+[contracts.zkml-verifier]
+path = "contracts/compliance/zkml-verifier.clar"
+
+[contracts.tableland-sync]
+path = "contracts/monitoring/tableland-sync.clar"

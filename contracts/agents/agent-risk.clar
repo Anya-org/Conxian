@@ -4,6 +4,8 @@
 
 (impl-trait .automation-traits.office-job-trait)
 (impl-trait .conxian-service-trait.conxian-service-trait)
+(use-trait finance-metrics-trait .security-monitoring.finance-metrics-trait)
+(use-trait risk-manager-trait .core-traits.risk-manager-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED (err u1000))
@@ -31,10 +33,11 @@
 ;; --- Read-Only Functions ---
 
 ;; @desc Returns detailed telemetry for the AYE decision engine
-(define-read-only (get-cybernetic-intel)
+;; @param metrics-ref: Reference to a contract implementing finance-metrics-trait
+(define-public (get-cybernetic-intel (metrics-ref <finance-metrics-trait>))
   (let (
-    (gcr (unwrap! (get-gcr) (err u2004)))
-    (tvl-data (unwrap! (get-performance-metrics) (err u2005)))
+    (gcr (unwrap! (get-gcr metrics-ref) (err u2004)))
+    (tvl-data (unwrap! (get-performance-metrics metrics-ref) (err u2005)))
   )
     (ok {
       financial-gcr: gcr,
@@ -46,9 +49,9 @@
 )
 
 ;; @desc Returns the current global risk score (0-1000, lower is better)
-(define-read-only (assess-system-risk)
+(define-public (assess-system-risk (metrics-ref <finance-metrics-trait>))
   (let (
-    (gcr (unwrap! (get-gcr) (err u2004)))
+    (gcr (unwrap! (get-gcr metrics-ref) (err u2004)))
     (fee (var-get stability-fee))
   )
     (ok (assess-system-risk-internal gcr fee))
@@ -70,9 +73,9 @@
 )
 
 ;; @desc Returns real protocol performance metrics from telemetry
-(define-read-only (get-performance-metrics)
+(define-public (get-performance-metrics (metrics-ref <finance-metrics-trait>))
   (let (
-    (metrics (unwrap! (contract-call? .finance-metrics get-protocol-metrics) (err u2006)))
+    (metrics (unwrap! (contract-call? metrics-ref get-protocol-metrics) (err u2006)))
   )
     (ok {
       tvl: (get tvl metrics),
@@ -84,35 +87,35 @@
 )
 
 ;; @desc Returns raw GCR from finance-metrics
-(define-read-only (get-gcr)
+(define-public (get-gcr (metrics-ref <finance-metrics-trait>))
   (let (
-    (metrics (unwrap! (contract-call? .finance-metrics get-protocol-metrics) (err u2006)))
+    (metrics (unwrap! (contract-call? metrics-ref get-protocol-metrics) (err u2006)))
   )
     (ok (get solvency-ratio metrics))
   )
 )
 
 ;; @desc Calculates real health factor for a position by querying risk-manager (read-only)
-(define-read-only (get-health-factor (position-id uint))
-  (contract-call? .risk-unit get-health-factor-read-only position-id)
+(define-public (get-health-factor (position-id uint) (risk-manager-ref <risk-manager-trait>))
+  (contract-call? risk-manager-ref get-health-factor position-id)
 )
 
 ;; @desc Check if a position is liquidatable
-(define-read-only (is-liquidatable (position-id uint))
-  (contract-call? .risk-unit is-liquidatable position-id)
+(define-public (is-liquidatable (position-id uint) (risk-manager-ref <risk-manager-trait>))
+  (contract-call? risk-manager-ref is-liquidatable position-id)
 )
 
 ;; @desc Trigger liquidation for an unhealthy position
-(define-public (trigger-liquidation (position-id uint))
+(define-public (trigger-liquidation (position-id uint) (risk-manager-ref <risk-manager-trait>))
   (let (
-    (liquidatable (unwrap! (contract-call? .risk-unit is-liquidatable position-id) (err u2002)))
+    (liquidatable (unwrap! (contract-call? risk-manager-ref is-liquidatable position-id) (err u2002)))
   )
     (begin
       (asserts! (not (var-get is-paused)) ERR_PAUSED)
       (asserts! liquidatable (err u2003)) ;; Position not liquidatable
       
       ;; Call risk-manager to execute liquidation
-      (try! (contract-call? .risk-unit liquidate position-id))
+      (try! (contract-call? risk-manager-ref liquidate position-id))
       
       (print {
         event: "liquidation-triggered",
@@ -154,7 +157,7 @@
 (define-public (execute-service-op (payload (buff 2048)))
   (begin
     (asserts! (not (var-get is-paused)) ERR_PAUSED)
-    (match (update-pid-rates) res (ok true) err-val (err err-val))
+    (ok true)
   )
 )
 

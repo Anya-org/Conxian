@@ -8,6 +8,7 @@ The module follows a "Hook" pattern for non-invasive enforcement:
 - **Registry**: `compliance-manager.clar` maintains the list of authorized providers and user compliance statuses with staleness detection.
 - **Enforcement**: `compliance-hooks.clar` provides read-only checks (`check-kyc`, `check-aml`) that other contracts can use to verify callers.
 - **Institutional**: `regulatory-adapter.clar` handles SIP-018 compliant domain separators and structured data hashing for audits.
+- **ZKML**: `zkml-verifier.clar` added to the compliance module for zero-knowledge model attestation (CON-70).
 - **Enterprise**: `travel-rule-service.clar` manages VASP registration and transaction logging.
 
 ## Core Contracts (Reference)
@@ -37,15 +38,14 @@ SIP-018 Institutional compliance adapter.
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `check-clean-hands-compliance` | `(check-clean-hands-compliance (principal) (response bool uint))` | Returns institutional "Clean Hands" status for a user. |
-| `verify-and-update-compliance` | `(verify-and-update-compliance (principal (string-ascii 3) uint (buff 65)) (response bool uint))` | Verifies SIP-018 attestation signature. |
+| `verify-and-update-compliance` | `(verify-and-update-compliance (principal (string-ascii 3) uint (buff 65)) (response bool uint))` | Verifies SIP-018 attestation signature and updates registry. |
 
-### `travel-rule-service.clar`
-IVMS101 compliance for enterprise transactions.
+### `zkml-verifier.clar`
+Zero-knowledge machine learning proof verification.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `register-vasp` | `(register-vasp ((string-ascii 20)) (response bool uint))` | Registers a new VASP. |
-| `log-travel-rule-data` | `(log-travel-rule-data ((buff 32) (buff 32) (string-ascii 20) (string-ascii 20) uint principal) (response bool uint))` | Logs transaction metadata. |
+| `verify-proof` | `(verify-proof ((string-ascii 64) (buff 32) (buff 1024)) (response bool uint))` | Verifies a ZKML proof payload for model attestation. |
 
 ## Integration Examples (How-to)
 
@@ -62,7 +62,7 @@ Validation is performed via the compliance test suite.
 1. Run module tests: `npx vitest tests/compliance`
 
 ## Status (Reference)
-- Implementation: Production-Ready (v1.2.0)
-- Audit Status: Internally Verified
+- Implementation: Production-Ready (v1.2.1)
+- Audit Status: Internally Verified (April 2026)
 - BIP Compliance: BIP-341, BIP-342
-- Standard: Hexagonal, SIP-018, IVMS101
+- Standard: Hexagonal, SIP-018, IVMS101, ZKML
