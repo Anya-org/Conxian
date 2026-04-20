@@ -14,6 +14,7 @@
 (define-constant MAX_EMISSION_PER_EPOCH u10000000000) ;; Hard safety cap
 (define-data-var epoch-emission-total uint u0)
 
+;; @desc Request a CXD mint for a specific recipient based on target weighting
 (define-public (request-mint (amount uint) (recipient principal))
   (let (
     (weight (default-to u0 (map-get? emission-targets tx-sender)))
@@ -28,6 +29,7 @@
   )
 )
 
+;; @desc Initialize the controller with core system principals
 (define-public (initialize (coordinator principal) (cxvg principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
@@ -37,6 +39,7 @@
   )
 )
 
+;; @desc Add or update an authorized emission target
 (define-public (add-emission-target (target principal) (weight uint))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))

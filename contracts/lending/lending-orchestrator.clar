@@ -159,10 +159,12 @@
   )
 )
 
+;; @desc Get the reserve data for a specific asset
 (define-read-only (get-reserve-data (asset principal))
   (map-get? reserve-data asset)
 )
 
+;; @desc Get the supply balance for a specific user and asset
 (define-read-only (get-user-supply-balance (user principal) (asset principal))
   (map-get? deposits { asset: asset, user: user })
 )
@@ -174,6 +176,7 @@
 
 ;; --- Admin ---
 
+;; @desc Update the admin principal
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)

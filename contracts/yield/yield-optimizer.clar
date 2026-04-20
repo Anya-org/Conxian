@@ -80,6 +80,7 @@
 
 ;; --- Strategy Management ---
 
+;; @desc Register a new yield strategy with associated risk and APY
 (define-public (register-strategy (vault principal) (risk uint) (apy uint))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
@@ -90,6 +91,7 @@
 
 ;; --- Admin ---
 
+;; @desc Initialize the optimizer with administrative principals
 (define-public (initialize (owner principal) (risk-agent principal))
   (begin
     (asserts! (is-eq tx-sender tx-sender) (err ERR_UNAUTHORIZED))
