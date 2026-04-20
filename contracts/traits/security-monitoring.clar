@@ -9,3 +9,9 @@
 (define-trait monitor-trait (
   (report-anomaly (principal (buff 256)) (response bool uint))
 ))
+
+(define-trait finance-metrics-trait (
+  (get-protocol-metrics () (response { tvl: uint, solvency-ratio: uint, active-positions: uint, volume-24h: uint } uint))
+  (get-protocol-tvl () (response uint uint))
+  (get-protocol-gcr () (response uint uint))
+))

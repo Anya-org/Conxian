@@ -102,8 +102,8 @@
 
       ;; Automatically collect protocol fee via revenue-automation (CON-60)
       (match (as-contract (contract-call? .revenue-automation collect-revenue token-in-trait amount-in (as-contract tx-sender)))
-        res (print { event: "dex-fee-automated", amount: res })
-        err-val (print { event: "dex-fee-failed", error: err-val })
+        res (begin (print { event: "dex-fee-automated", amount: res }) res)
+        err-val (begin (print { event: "dex-fee-failed", error: err-val }) u0)
       )
 
       (try! (as-contract (contract-call? token-out-trait transfer amount-out (as-contract tx-sender) recipient none)))
