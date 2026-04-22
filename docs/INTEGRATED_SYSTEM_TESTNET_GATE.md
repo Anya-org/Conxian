@@ -6,7 +6,7 @@ Goal: before any change is treated as eligible for **Mainnet promotion** (via `d
 
 Canonical trackers:
 
-- Linear: https://linear.app/conxian-labs/issue/CON-487/define-testnet-gate-for-integrated-system-validation
+- Sovereign Coordination Layer: https://sovereign.conxian.com/issue/CON-487/define-testnet-gate-for-integrated-system-validation
 - GitHub (synced thread): https://github.com/Conxian/conxius-platform/issues/511
 
 This gate is intentionally **public-safe**:

@@ -1,12 +1,12 @@
-# ExCo Linear-first intake and wiring (public-safe)
+# ExCo Sovereign-first intake and wiring (public-safe)
 
-This repository is public. ExCo-relevant newly discovered work is **Linear-first**.
+This repository is public. ExCo-relevant newly discovered work is **Sovereign-first**.
 
-Detailed strategic, financial, legal, security, and deep operational runbook content remains canonical in the Conxian Linear workspace under Zero Secret Egress (ZSE).
+Detailed strategic, financial, legal, security, and deep operational runbook content remains canonical in the sovereign coordination layer under Zero Secret Egress (ZSE).
 
 Traceability:
 
-- https://linear.app/conxian-labs/issue/CON-349/standardize-linear-first-issue-intake-for-exco-work
+- Canonical coordination layer (see docs/SOVEREIGN_COORDINATION_LAYER.md)
 
 ## Minimum required intake fields
 
@@ -28,10 +28,6 @@ Every ExCo intake issue in Linear must include:
 
 ## ZSE boundary
 
-Sensitive strategic, financial, legal, security, and detailed operational material stays in Linear only.
+Sensitive strategic, financial, legal, security, and detailed operational material stays in the sovereign coordination layer only.
 
-Public GitHub artifacts must remain sanitized/public-safe and should point back to the canonical Linear issue.
-
-See workspace:
-
-- https://linear.app/conxian-labs
+Public GitHub artifacts must remain sanitized/public-safe and should point back to the canonical coordination layer issue.
