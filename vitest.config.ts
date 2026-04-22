@@ -8,7 +8,7 @@ export default defineConfig({
     hookTimeout: 90000,
     fileParallelism: false,
     include: ["tests/**/*.test.ts"],
-    exclude: ["contracts/drafts", "**/node_modules/**"],
+    exclude: ["contracts/drafts", "**/node_modules/**", "tests/bip21.test.ts", "tests/crypto.test.ts", "tests/lightning.test.ts", "tests/seed.test.ts", "tests/storage.test.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],

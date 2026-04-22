@@ -4,7 +4,7 @@
 (define-constant ERR_MIGRATION_COMPLETED u7000)
 
 (define-read-only (is-migration-completed)
-    (is-eq (unwrap-panic (contract-call? .migration-manager get-migration-status)) "COMPLETED")
+    (is-eq (unwrap-panic (contract-call? .migration-orchestrator get-migration-status)) "COMPLETED")
 )
 
 (define-public (legacy-function)

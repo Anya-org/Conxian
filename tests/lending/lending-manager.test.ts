@@ -1,13 +1,12 @@
 import { describe, expect, it, beforeAll } from 'vitest';
 import { Cl } from '@stacks/transactions';
-import { initSimnet, type Simnet } from '@stacks/clarinet-sdk';
+import { simnet } from '../setup-test-env';
 
-describe('lending-manager', () => {
-  let simnet: Simnet;
-  let deployer: string;
+describe('lending-orchestrator', () => {
+    let deployer: string;
 
   beforeAll(async () => {
-    simnet = await initSimnet();
+
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
     // Mint mock tokens to deployer for testing

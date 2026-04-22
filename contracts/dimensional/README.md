@@ -25,7 +25,7 @@ The primary facade for position operations.
 ### Opening a 2x Long Position
 ```clarity
 (contract-call? .dimensional-engine open-position
-  .position-manager
+  .position-orchestrator
   .cxd-token
   u1000000
   u200 ;; 2.0x

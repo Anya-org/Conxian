@@ -1,15 +1,14 @@
 
 import { describe, it, expect, beforeAll } from 'vitest';
 import { Cl } from '@stacks/transactions';
-import { initSimnet } from "@stacks/clarinet-sdk";
+import { simnet } from './setup-test-env';
 
 describe('Circuit Breaker Integration Tests', () => {
-  let simnet: any;
-  let deployer: string;
+    let deployer: string;
   let wallet1: string;
 
   beforeAll(async () => {
-    simnet = await initSimnet();
+
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
     wallet1 = accounts.get('wallet_1')!;

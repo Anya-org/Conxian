@@ -1,11 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { initSimnet } from '@stacks/clarinet-sdk';
+import { simnet } from './setup-test-env';
 
 describe('DEX and DeFi Core Existence', () => {
-  let simnet: any;
 
   beforeEach(async () => {
-    simnet = await initSimnet();
+
   });
 
   it('should have primary DEX and Core contracts deployed', () => {
@@ -15,6 +14,6 @@ describe('DEX and DeFi Core Existence', () => {
     expect(simnet.getContractSource('bme-engine')).toBeDefined();
     expect(simnet.getContractSource('enhanced-circuit-breaker')).toBeDefined();
     expect(simnet.getContractSource('agent-risk')).toBeDefined();
-    expect(simnet.getContractSource('agent-treasury')).toBeDefined();
+    expect(simnet.getContractSource('fiscal-orchestrator')).toBeDefined();
   });
 });

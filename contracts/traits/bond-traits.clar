@@ -3,25 +3,13 @@
 ;; Standardized for Mainnet (March 2026)
 
 (define-trait bond-token-trait (
-  (mint
-    (uint principal)
-    (response bool uint)
-  )
-  (burn
-    (uint principal)
-    (response bool uint)
-  )
+  (mint (uint principal) (response bool uint))
+  (burn (uint principal) (response bool uint))
 ))
 
 (define-trait bonding-curve-trait (
-  (get-price
-    (uint)
-    (response uint uint)
-  )
-  (calculate-purchase-return
-    (uint uint)
-    (response uint uint)
-  )
+  (get-price (uint) (response uint uint))
+  (calculate-purchase-return (uint uint) (response uint uint))
 ))
 
 ;; @desc DLC Bond Trait for Bitcoin-anchored debt instruments

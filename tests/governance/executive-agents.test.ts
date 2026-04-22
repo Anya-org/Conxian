@@ -1,23 +1,22 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it, beforeEach } from "vitest";
-import { initSimnet } from "@stacks/clarinet-sdk";
+import { simnet } from '../setup-test-env';
 
 describe("Autonomous Executive Agents", () => {
-  let simnet: any;
-  let deployer: string;
+    let deployer: string;
 
   beforeEach(async () => {
-    simnet = await initSimnet();
+
     const accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
   });
 
   describe("Risk Agent", () => {
     it("can assess system risk", () => {
-      const { result } = simnet.callReadOnlyFn(
+      const { result } = simnet.callPublicFn(
         "agent-risk",
         "assess-system-risk",
-        [],
+        [Cl.principal(deployer + ".finance-metrics")],
         deployer
       );
       expect(result).toBeDefined();
@@ -26,10 +25,10 @@ describe("Autonomous Executive Agents", () => {
 
   describe("Treasury Agent", () => {
     it("can calculate cybernetic policy", () => {
-      const { result } = simnet.callReadOnlyFn(
-        "agent-treasury",
+      const { result } = simnet.callPublicFn(
+        "fiscal-orchestrator",
         "calculate-cybernetic-policy",
-        [],
+        [Cl.principal(deployer + ".finance-metrics")],
         deployer
       );
       expect(result).toBeDefined();
