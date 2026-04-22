@@ -22,7 +22,7 @@
 ;; @desc Run the fiscal strategy - Orchestrates BME epoch and buy-backs
 (define-public (run-fiscal-strategy (pools-to-reward (list 50 principal)) (cxd-token-trait <sip-010-trait>))
   (let (
-    (intel (unwrap! (contract-call? .agent-risk get-cybernetic-intel) (err u2001)))
+    (intel (unwrap! (contract-call? .agent-risk get-cybernetic-intel .finance-metrics) (err u2001)))
   )
     (begin
       ;; 1. Collect protocol fees from core modules
@@ -45,7 +45,8 @@
 ;; @desc Calculates performance-based adjustment for bounty (CXIP-013)
 (define-public (calculate-performance-adjustment)
   (match (contract-call? .agent-risk get-performance-metrics .finance-metrics)
-    metrics (let (
+    metrics 
+    (let (
         (growth-bps (get tvl-growth-bps metrics))
         (bounty-rate (get bounty-completion-rate metrics))
       )
@@ -54,14 +55,16 @@
         (ok u0)
       )
     )
-    (err u0)
+    err 
+    (ok u0)
   )
 )
 
 ;; @desc Calculates dynamic allocation policy based on GCR (CXIP-013)
 (define-public (calculate-cybernetic-policy)
   (match (contract-call? .agent-risk get-gcr .finance-metrics)
-    gcr (if (< gcr u110)
+    gcr 
+    (if (< gcr u110)
       ;; CRISIS Mode
       (ok {
         treasury: u0,
@@ -93,14 +96,15 @@
       )
     )
     ;; Default to STABILITY Mode on error
-    (err (ok {
+    err 
+    (ok {
       treasury: u4500,
       bounty: u3000,
       lp: u1500,
       grant: u500,
       buyback: u500,
       insurance: u0
-    }))
+    })
   )
 )
 

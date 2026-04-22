@@ -36,24 +36,30 @@
 ;; @param metrics-ref: Reference to a contract implementing finance-metrics-trait
 (define-public (get-cybernetic-intel (metrics-ref <finance-metrics-trait>))
   (match (get-gcr metrics-ref)
-    gcr (match (get-performance-metrics metrics-ref)
-      tvl-data (ok {
+    gcr 
+    (match (get-performance-metrics metrics-ref)
+      tvl-data 
+      (ok {
         financial-gcr: gcr,
         operational-fee: (var-get stability-fee),
         tvl-growth-rate: (get tvl-growth-bps tvl-data),
         risk-score: (assess-system-risk-internal gcr (var-get stability-fee))
       })
-      (err (err u2005))
+      err 
+      (err u2005)
     )
-    (err (err u2004))
+    err 
+    (err u2004)
   )
 )
 
 ;; @desc Returns the current global risk score (0-1000, lower is better)
 (define-public (assess-system-risk (metrics-ref <finance-metrics-trait>))
   (match (get-gcr metrics-ref)
-    gcr (ok (assess-system-risk-internal gcr (var-get stability-fee)))
-    (err (err u2004))
+    gcr 
+    (ok (assess-system-risk-internal gcr (var-get stability-fee)))
+    err 
+    (err u2004)
   )
 )
 
@@ -74,21 +80,25 @@
 ;; @desc Returns real protocol performance metrics from telemetry
 (define-public (get-performance-metrics (metrics-ref <finance-metrics-trait>))
   (match (contract-call? metrics-ref get-protocol-metrics)
-    metrics (ok {
+    metrics 
+    (ok {
       tvl: (get tvl metrics),
       last-month-tvl: u1000000,
       bounty-completion-rate: u85,
       tvl-growth-bps: u100
     })
-    (err (err u2006))
+    err 
+    (err u2006)
   )
 )
 
 ;; @desc Returns raw GCR from finance-metrics
 (define-public (get-gcr (metrics-ref <finance-metrics-trait>))
   (match (contract-call? metrics-ref get-protocol-metrics)
-    metrics (ok (get solvency-ratio metrics))
-    (err (err u2006))
+    metrics 
+    (ok (get solvency-ratio metrics))
+    err 
+    (err u2006)
   )
 )
 
