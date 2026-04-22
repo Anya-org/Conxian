@@ -1,9 +1,11 @@
 ;; price-stability-monitor.clar
 ;; Monitors CXD peg stability and PID health
 
-(define-read-only (check-peg-status)
+(use-trait finance-metrics-trait .security-monitoring.finance-metrics-trait)
+
+(define-public (check-peg-status (metrics-ref <finance-metrics-trait>))
   (let (
-    (intel (unwrap-panic (contract-call? .agent-risk get-cybernetic-intel)))
+    (intel (unwrap-panic (contract-call? .agent-risk get-cybernetic-intel metrics-ref)))
     (pid-fee (get operational-fee intel))
     (gcr (get financial-gcr intel))
   )

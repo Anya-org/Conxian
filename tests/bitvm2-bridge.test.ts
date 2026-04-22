@@ -1,13 +1,12 @@
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { initSimnet, type Simnet } from "@stacks/clarinet-sdk";
+import { simnet } from './setup-test-env';
 import { Cl } from "@stacks/transactions";
 
-let simnet: Simnet;
 let deployer: string;
 
 describe("BitVM2 Bridge Logic (CON-75)", () => {
   beforeAll(async () => {
-    simnet = await initSimnet();
+
   });
 
   beforeEach(() => {
@@ -50,6 +49,6 @@ describe("BitVM2 Bridge Logic (CON-75)", () => {
       deployer
     );
 
-    expect(result.result).toEqual(Cl.err(Cl.uint(9000)));
+    expect(result.result).toEqual(Cl.error(Cl.uint(9000)));
   });
 });

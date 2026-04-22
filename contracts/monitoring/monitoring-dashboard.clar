@@ -1,6 +1,8 @@
 ;; monitoring-dashboard.clar
 ;; Conxian Monitoring Standard: Health Dashboard
 
+(use-trait finance-metrics-trait .security-monitoring.finance-metrics-trait)
+
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u5000)
 
@@ -10,12 +12,12 @@
 ;; Public Functions
 
 ;; @desc Returns comprehensive protocol health metrics and risk indicators
-(define-read-only (get-protocol-health)
+(define-public (get-protocol-health (metrics-ref <finance-metrics-trait>))
   (let (
     (status (unwrap-panic (contract-call? .conxian-protocol get-protocol-status)))
-    (risk (unwrap-panic (contract-call? .agent-risk get-cybernetic-intel)))
+    (risk (unwrap-panic (contract-call? .agent-risk get-cybernetic-intel metrics-ref)))
     (metrics (unwrap-panic (contract-call? .finance-metrics get-protocol-metrics)))
-    (gcr (unwrap-panic (contract-call? .agent-risk get-gcr)))
+    (gcr (unwrap-panic (contract-call? .agent-risk get-gcr metrics-ref)))
   )
     (ok {
         status: status,

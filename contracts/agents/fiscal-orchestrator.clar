@@ -3,6 +3,7 @@
 ;; Upgraded for Sovereign BME Orchestration
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(use-trait finance-metrics-trait .security-monitoring.finance-metrics-trait)
 
 ;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED (err u1000))
@@ -20,9 +21,9 @@
 ;; --- Public Functions ---
 
 ;; @desc Run the fiscal strategy - Orchestrates BME epoch and buy-backs
-(define-public (run-fiscal-strategy (pools-to-reward (list 50 principal)) (cxd-token-trait <sip-010-trait>))
+(define-public (run-fiscal-strategy (pools-to-reward (list 50 principal)) (cxd-token-trait <sip-010-trait>) (metrics-ref <finance-metrics-trait>))
   (let (
-    (intel (unwrap! (contract-call? .agent-risk get-cybernetic-intel) (err u2001)))
+    (intel (unwrap! (contract-call? .agent-risk get-cybernetic-intel metrics-ref) (err u2001)))
   )
     (begin
       ;; 1. Collect protocol fees from core modules
@@ -43,9 +44,9 @@
 )
 
 ;; @desc Calculates performance-based adjustment for bounty (CXIP-013)
-(define-read-only (calculate-performance-adjustment)
+(define-public (calculate-performance-adjustment (metrics-ref <finance-metrics-trait>))
   (let (
-    (metrics (unwrap-panic (contract-call? .agent-risk get-performance-metrics)))
+    (metrics (unwrap-panic (contract-call? .agent-risk get-performance-metrics metrics-ref)))
     (growth-bps (get tvl-growth-bps metrics))
     (bounty-rate (get bounty-completion-rate metrics))
   )
@@ -57,9 +58,9 @@
 )
 
 ;; @desc Calculates dynamic allocation policy based on GCR (CXIP-013)
-(define-read-only (calculate-cybernetic-policy)
+(define-public (calculate-cybernetic-policy (metrics-ref <finance-metrics-trait>))
   (let (
-    (gcr (unwrap-panic (contract-call? .agent-risk get-gcr)))
+    (gcr (unwrap-panic (contract-call? .agent-risk get-gcr metrics-ref)))
   )
     (if (< gcr u110)
       ;; CRISIS Mode

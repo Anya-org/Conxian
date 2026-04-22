@@ -1,19 +1,27 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it, beforeEach } from "vitest";
-import { initSimnet } from "@stacks/clarinet-sdk";
+import { simnet } from '../setup-test-env';
 
 describe("Swap Router", () => {
-  let simnet: any;
-  let deployer: string;
+    let deployer: string;
 
   beforeEach(async () => {
-    simnet = await initSimnet();
+
     const accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
   });
 
   it("can register a pool and execute a swap via exact-input-single", () => {
-    // 1. Create Pool
+    const poolContract = deployer + ".concentrated-liquidity-pool";
+
+    // 1. Mint tokens to deployer (user) and pool
+    simnet.callPublicFn("mock-token", "mint", [Cl.uint(2000000000000), Cl.principal(deployer)], deployer);
+    simnet.callPublicFn("cxd-token", "mint", [Cl.uint(2000000000000), Cl.principal(deployer)], deployer);
+
+    // Pool needs token-out to satisfy the swap
+    simnet.callPublicFn("mock-token", "mint", [Cl.uint(2000000000000), Cl.principal(poolContract)], deployer);
+
+    // 2. Create Pool
     simnet.callPublicFn(
       "concentrated-liquidity-pool",
       "create-pool",
@@ -27,8 +35,7 @@ describe("Swap Router", () => {
       deployer
     );
 
-    // 2. Execute Swap (User is deployer)
-    // We expect the router to handle the transfer-in and transfer-out correctly now
+    // 3. Execute Swap (User is deployer)
     const { result } = simnet.callPublicFn(
       "swap-router",
       "exact-input-single",

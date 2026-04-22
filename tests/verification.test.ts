@@ -1,14 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Cl } from '@stacks/transactions';
-import { initSimnet } from '@stacks/clarinet-sdk';
+import { simnet } from './setup-test-env';
 
 describe('BME & Intent Layer Verification', () => {
-  let simnet: any;
-  let deployer: string;
+    let deployer: string;
 
   beforeEach(async () => {
     // Force simple simnet initialization without problematic fiscal-orchestrator dependency
-    simnet = await initSimnet();
+
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
   });

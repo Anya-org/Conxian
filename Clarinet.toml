@@ -256,7 +256,7 @@ path = "contracts/test-helpers/mock-proposal.clar"
 [contracts.reputation-orchestrator]
 path = "contracts/governance/reputation-orchestrator.clar"
 
-[contracts.compliance-orchestrator]
+[contracts.compliance-manager]
 path = "contracts/compliance/compliance-orchestrator.clar"
 
 [contracts.regulatory-adapter]

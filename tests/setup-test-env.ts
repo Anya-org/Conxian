@@ -17,7 +17,7 @@ export async function initializeSimnet(): Promise<Simnet> {
       return instance;
     } catch (error) {
       console.error('Failed to initialize simnet:', error);
-      initializationPromise = null;
+      initializationPromise = null; // Allow retry on failure
       throw error;
     }
   })();
@@ -28,7 +28,7 @@ export async function initializeSimnet(): Promise<Simnet> {
 export const simnet: Simnet = new Proxy({} as Simnet, {
   get: (_target, prop) => {
     if (!internalSimnet) {
-      throw new Error("Simnet not initialized. Ensure initializeSimnet() is called.");
+      throw new Error(`Simnet not initialized. Ensure initializeSimnet() is called before accessing '${String(prop)}'.`);
     }
     const value = (internalSimnet as any)[prop];
     if (typeof value === 'function') {

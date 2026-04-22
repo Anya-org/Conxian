@@ -1,16 +1,15 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it, beforeEach } from "vitest";
-import { initSimnet } from "@stacks/clarinet-sdk";
+import { simnet } from '../setup-test-env';
 
 const CONTRACT_NAME = "enhanced-governance-nft";
 
 describe("Enhanced Governance NFT (Seats)", () => {
-  let simnet: any;
-  let deployer: string;
+    let deployer: string;
   let wallet1: string;
 
   beforeEach(async () => {
-    simnet = await initSimnet();
+
     const accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
     wallet1 = accounts.get("wallet_1")!;

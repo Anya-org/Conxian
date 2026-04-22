@@ -5,6 +5,7 @@
 
 (use-trait vault-trait .vault-traits.vault-trait)
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
+(use-trait finance-metrics-trait .security-monitoring.finance-metrics-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u1000)
@@ -35,9 +36,9 @@
 ;; --- Core Optimization Logic ---
 
 ;; @desc Autonomous Rebalance based on System Risk
-(define-public (autonomous-rebalance (vault-from <vault-trait>) (vault-to <vault-trait>) (amount uint) (token <sip-010-ft-trait>))
+(define-public (autonomous-rebalance (vault-from <vault-trait>) (vault-to <vault-trait>) (amount uint) (token <sip-010-ft-trait>) (metrics-ref <finance-metrics-trait>))
   (let (
-    (system-risk (match (contract-call? .agent-risk get-gcr) val val err-val u10000))
+    (system-risk (match (contract-call? .agent-risk get-gcr metrics-ref) val val err-val u10000))
     (target-strat (unwrap! (map-get? strategies (contract-of vault-to)) (err ERR_STRATEGY_NOT_FOUND)))
   )
     (begin
