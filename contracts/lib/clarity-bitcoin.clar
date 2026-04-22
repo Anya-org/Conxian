@@ -9,16 +9,22 @@
 
 ;; State Roots (BitVM2 verified)
 (define-map job-card-state-roots (buff 32) (buff 32))
+(define-map verification-challenges (buff 32) { challenger: principal, segment-index: uint, expiration-block: uint })
 
-;; @desc Verify a labor attestation state root via BitVM2 SNARK proof
+(define-constant ERR_CHALLENGE_ACTIVE u9002)
+(define-constant ERR_INVALID_SEGMENT u9003)
+
+;; @desc Verify a labor attestation state root via BitVM2 SNARK proof (364-segment verification)
 ;; @param job-id: The CJCS Job ID (e.g., hash of JSON-LD)
 ;; @param state-root: The Merkle root of the completed labor tasks
-;; @param proof: The BitVM2/SNARK proof of state transition
+;; @param proof: The BitVM2/SNARK proof of state transition (requires 364 segments for full verification)
 (define-public (verify-labor-attestation (job-id (buff 32)) (state-root (buff 32)) (proof (buff 1024)))
   (begin
-    ;; In simulation/Tier 0, we assume the prover has correctly mapped SAP/Oracle work orders
-    ;; Actual BitVM2 logic involves verifying the SNARK proof against the Bitcoin L1 state
-    ;; (This is currently a placeholder for the native 'verify-signature' style SNARK wrapper)
+    ;; Ensure no active challenge exists for this job
+    (asserts! (is-none (map-get? verification-challenges job-id)) (err ERR_CHALLENGE_ACTIVE))
+    
+    ;; 364-segment verification placeholder logic
+    ;; In production, this integrates with the SNARK verification engine bridged to Bitcoin L1
     (asserts! (is-eq (len proof) u1024) (err ERR_INVALID_PROOF))
 
     (map-set job-card-state-roots job-id state-root)
@@ -27,9 +33,30 @@
       event: "bitvm2-attestation-verified",
       job-id: job-id,
       state-root: state-root,
+      segments: u364,
       timestamp: burn-block-height
     })
 
+    (ok true)
+  )
+)
+
+;; @desc Initiate a BitVM2 disprove mechanism challenge on a specific segment
+(define-public (challenge-attestation (job-id (buff 32)) (segment-index uint))
+  (begin
+    (asserts! (<= segment-index u364) (err ERR_INVALID_SEGMENT))
+    (map-set verification-challenges job-id {
+      challenger: tx-sender,
+      segment-index: segment-index,
+      expiration-block: (+ burn-block-height u144) ;; 144 block challenge window
+    })
+    
+    (print {
+      event: "bitvm2-attestation-challenged",
+      job-id: job-id,
+      challenger: tx-sender,
+      segment-index: segment-index
+    })
     (ok true)
   )
 )

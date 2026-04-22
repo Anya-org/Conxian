@@ -18,6 +18,8 @@
 (define-data-var dao-policy-quorum principal tx-sender)
 (define-data-var admin principal tx-sender)
 
+(define-data-var dao-timelock-start uint u0)
+
 (define-map handoff-steps
     uint
     { name: (string-ascii 50), completed: bool, timestamp: uint }
@@ -95,10 +97,28 @@
 
 ;; @desc Advance to the next stage
 (define-public (advance-stage)
-    (begin
-        (asserts! (is-sab-member) (err u100))
-        (var-set current-stage (+ (var-get current-stage) u1))
-        (ok (var-get current-stage))
+    (let (
+        (stage (var-get current-stage))
+        (next-stage (+ stage u1))
+    )
+        (begin
+            (asserts! (is-sab-member) (err u100))
+            
+            ;; If moving to DAO Policy Gate, start the 144-block timelock
+            (if (is-eq next-stage STAGE_DAO_POLICY_GATE)
+                (var-set dao-timelock-start burn-block-height)
+                true
+            )
+            
+            ;; If moving to COMPLETE, enforce the 144-block delay
+            (if (is-eq next-stage STAGE_COMPLETE)
+                (asserts! (>= burn-block-height (+ (var-get dao-timelock-start) u144)) (err u101))
+                true
+            )
+            
+            (var-set current-stage next-stage)
+            (ok next-stage)
+        )
     )
 )
 
