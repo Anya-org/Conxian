@@ -8,9 +8,11 @@
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u1000)
+(define-constant FOUNDERS_CUT_BPS u10) ;; 0.1% in basis points
 
 ;; Data Vars
 (define-data-var contract-owner principal tx-sender)
+(define-data-var founder-vault principal .founder-vault)
 
 ;; Principal Registry
 (define-map protocol-principals (string-ascii 50) principal)
@@ -81,4 +83,23 @@
 
 (define-read-only (get-contract-owner)
   (var-get contract-owner)
+)
+
+;; @desc Set the founder vault address
+(define-public (set-founder-vault (new-vault principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
+    (var-set founder-vault new-vault)
+    (ok true)
+  )
+)
+
+;; @desc Get the founder vault address
+(define-read-only (get-founder-vault)
+  (ok (var-get founder-vault))
+)
+
+;; @desc Calculate the founders cut
+(define-read-only (calculate-founders-cut (amount uint))
+  (ok (/ (* amount FOUNDERS_CUT_BPS) u10000))
 )
