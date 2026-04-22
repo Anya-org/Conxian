@@ -5,7 +5,7 @@ Welcome to the central documentation hub for the Conxian ecosystem. This site is
 ## Purpose
 
 - Provide a single public entry point into BOS docs and the OpenSpec corpus.
-- Keep the public/private boundary clear by linking to Linear for internal-only material.
+- Keep the public/private boundary clear by linking to the sovereign coordination layer for internal-only material.
 
 ## Status
 
@@ -21,7 +21,7 @@ Note: Cross-repo docs links are pinned to the Conxian submodule SHA for reproduc
 
 ## Strategic knowledge base
 - **[Strategic Growth Model (2026)](STRATEGIC_GROWTH_MODEL_2026.md)**
-Detailed strategic alignment, roadmap, and company strategy documents have been migrated to the [Linear Virtual Office](https://linear.app/conxian-labs) (Parent Issue: CON-306) to ensure Zero Secret Egress (ZSE) compliance.
+Detailed strategic alignment, roadmap, and company strategy documents have been migrated to the sovereign coordination layer to ensure Zero Secret Egress (ZSE) compliance.
 
 ---
 © 2026 Conxian.

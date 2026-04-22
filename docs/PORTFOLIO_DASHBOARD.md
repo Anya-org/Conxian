@@ -36,3 +36,9 @@ This dashboard provides a high-level maturity and readiness overview for the Con
 ---
 *Last Updated: 2026-04-15*
 - [x] **Agentic Surface**: Read-First MCP layer and Sovereign Handshake implemented.
+
+## Mainnet Readiness Update (April 18, 2026)
+- **Nexus**: Autonomous Akash Operator implemented (v0.5.1+).
+- **Gateway**: Signer/Approval controls (Sovereign Handshake) for ALEX execution implemented.
+- **Hygiene**: Contamination Guard **PASSED** org-wide for all P0 repositories.
+- **BaaP**: Platforming enhancements (Jurisdictional Sharding, Multi-tenancy) research finalized.

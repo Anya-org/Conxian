@@ -44,3 +44,30 @@ gh release create vX.Y.Z --title "vX.Y.Z" --notes-file /tmp/release-notes.md
 - Add CI and a status badge in its own README.
 
 When bumping a pinned submodule (gitlink) in this repo, prefer bumping to a tagged release commit in the upstream submodule repo.
+
+### Safe submodule bump workflow (SHA-pinned)
+
+Use explicit immutable refs only (exact commit SHA or immutable tag):
+
+```bash
+git submodule update --init <path>
+cd <path> && git fetch origin --tags && git checkout <exact-sha-or-immutable-tag>
+cd -
+git add <path>
+git commit -m "chore: bump <path> pin to <sha>"
+python3 scripts/verify_submodule_integrity.py
+git submodule status --recursive
+```
+
+Disallowed submodule update patterns:
+
+- `git submodule update --remote`
+- `submodule.<name>.branch` tracking config
+- `git submodule foreach` loops that perform `git checkout main` + `git pull`
+
+### Evidence to include in release-adjacent submodule PRs
+
+- gitlink diff for each bumped submodule path
+- `python3 scripts/verify_submodule_integrity.py` output
+- `git submodule status --recursive` output
+- when contamination-sensitive paths changed, `python3 scripts/verify_contamination_guard.py` output

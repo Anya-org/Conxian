@@ -15,6 +15,7 @@
 * [Branching and promotion policy](docs/BRANCHING_AND_PROMOTION_POLICY.md)
 * [Branch and promotion standard (dev/staged/main)](docs/BRANCH_AND_PROMOTION_STANDARD.md)
 * [Deployment verification matrix (runtime lanes)](docs/DEPLOYMENT_VERIFICATION_MATRIX.md)
+* [Integrated system testnet gate (dev)](docs/INTEGRATED_SYSTEM_TESTNET_GATE.md)
 * [Mainnet acceptance evidence pack (staged -> main)](openspec/specs/mainnet-acceptance-evidence-pack/spec.md)
 * [Release hygiene — conxian-nexus](docs/RELEASE_HYGIENE_CONXIAN_NEXUS.md)
 * [Mainnet readiness checklist — lib-conclave-sdk](docs/MAINNET_READINESS_LIB_CONCLAVE_SDK.md)
@@ -26,6 +27,8 @@
 * [Enterprise control & custody baseline (CON-460)](docs/protocols/ENTERPRISE_CUSTODY_BASELINE.md)
 * [Signed event envelope v1 (CON-472)](docs/protocols/SIGNED_EVENT_ENVELOPE_V1.md)
 * [Clarity 4 enclave authentication flow (CON-465)](docs/protocols/CLARITY4_ENCLAVE_AUTHENTICATION_FLOW.md)
+* [Fee-bucket implementation plan (CON-481)](docs/protocols/FEE_BUCKET_IMPLEMENTATION_PLAN.md)
+* [Economic rights map (canonical registry)](docs/protocols/ECONOMIC_RIGHTS_MAP.md)
 * [Public Visibility Audit Report](docs/PUBLIC_VISIBILITY_AUDIT_REPORT.md)
 * [CSF mainnet readiness gate](docs/CSF_MAINNET_READINESS_GATE.md)
 * [CSF-first operating sequence and proof gates](docs/CSF_FIRST_OPERATING_SEQUENCE_AND_PROOF_GATES.md)
@@ -39,6 +42,7 @@
 ## 🤖 Business Operations System (BOS)
 
 * [BOS wallet control model](docs/BOS_WALLET_CONTROL_MODEL.md)
+* [BOS self-executing contract trigger (CON-440)](docs/protocols/BOS_SELF_EXECUTING_CONTRACT_TRIGGER_V1.md)
 * [Conxius Wallet BOS buildout](docs/CONXIUS_WALLET_BOS_BUILDOUT.md)
 * [lib-conclave-sdk BOS buildout](docs/LIB_CONCLAVE_SDK_BOS_BUILDOUT.md)
 * [conxius-platform BOS buildout](docs/CONXIUS_PLATFORM_BOS_BUILDOUT.md)
@@ -66,7 +70,7 @@
 * [Arch Guardian](Nakamoto-Guardian/ANTI_FRAGILITY_LOOP.md)
 * [Grid Oracle (Agnostic)](cxn-grid-oracle/README.md)
 * [Ops Engine](Sovereign-Ops-Orchestrator/DEPLOYMENT_EFFICIENCY.md)
-  * [Linear Integration Wiring](Sovereign-Ops-Orchestrator/LINEAR_WIRING.md)
+  * [ExCo intake (Linear-first) and wiring](Sovereign-Ops-Orchestrator/LINEAR_WIRING.md)
 
 ## 🏛️ Ground Truth (OpenSpec)
 
@@ -84,8 +88,8 @@
 
 * [Conxian Protocol](Conxian/docs/ARCHITECTURE.md)
 * [Three-lane runtime deployment architecture (CON-455)](docs/architecture/THREE_LANE_RUNTIME_DEPLOYMENT_ARCHITECTURE.md)
-* [Nexus State Node](conxian-nexus/docs/PRD.md)
-* [Fusion Gateway](conxian-gateway/PRD.md)
+* [Conxian Nexus](conxian-nexus/docs/PRD.md)
+* [Conxian Gateway](conxian-gateway/PRD.md)
 * [Sovereign Shard Spec](docs/SOVEREIGN_SHARD_SPEC.md)
 * [TEE Security Audit](docs/TEE_SECURITY_AUDIT.md)
 * [Audit Dashboard Spec](docs/DASHBOARD_SPEC.md)

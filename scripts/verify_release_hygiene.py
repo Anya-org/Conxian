@@ -20,6 +20,7 @@ TAG_EXPECTATION_SUBMODULE_PATHS = {
     "conxian-gateway",
     "conxian-nexus",
     "conxius-platform",
+    "conxian-ui",
 }
 
 

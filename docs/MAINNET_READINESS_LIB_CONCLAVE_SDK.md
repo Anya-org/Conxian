@@ -29,11 +29,11 @@ This checklist tracks the mainnet readiness for the `lib-conclave-sdk` repositor
 - [x] Any vendored source or copied third-party code includes clear attribution and license compatibility.
 
 ### 5) Canonical trackers
-- Linear: https://linear.app/conxian-labs/issue/CON-171
+- Sovereign Coordination Layer: https://sovereign.conxian.com/issue/CON-171
 - GitHub repo: https://github.com/Conxian/lib-conclave-sdk
 
 ## Related work
 
-- Release hygiene: https://linear.app/conxian-labs/issue/CON-214/release-hygiene-lib-conclave-sdk
-- Secret/artifact cleanup: https://linear.app/conxian-labs/issue/CON-215/secret-and-artifact-cleanup-lib-conclave-sdk
-- Security hardening: https://linear.app/conxian-labs/issue/CON-210/security-hardening-lib-conclave-sdk
+- Release hygiene: https://sovereign.conxian.com/issue/CON-214/release-hygiene-lib-conclave-sdk
+- Secret/artifact cleanup: https://sovereign.conxian.com/issue/CON-215/secret-and-artifact-cleanup-lib-conclave-sdk
+- Security hardening: https://sovereign.conxian.com/issue/CON-210/security-hardening-lib-conclave-sdk

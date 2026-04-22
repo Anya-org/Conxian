@@ -2,7 +2,7 @@
 
 This inventory captures current Web2 dependencies that materially affect SAB sovereignty, verifiability, or operational control, and maps each to a target-state path.
 
-This file is intentionally "program-level" (by dependency). Service-level Supabase/Neon usage is being expanded in https://linear.app/conxian-labs/issue/CON-337/inventory-current-supabase-and-neon-dependencies-by-service.
+This file is intentionally "program-level" (by dependency). Service-level Supabase/Neon usage is tracked in the sovereign coordination layer.
 
 ## Inventory
 
@@ -31,5 +31,5 @@ Columns:
 | Gateway runtime hosting | Google Cloud (Cloud Run) | Hosts API surface and routing layer | Routing + interchain | routing | External clients, internal services | Sovereign compute baseline (dedicated hosts / Kubernetes / enclave-adjacent constraints where required) | Medium | Medium | Botshelo Mokoka | Separate "sovereign compute" migration from datastore cutover to avoid coupled risk. |
 | Showcase DApp deployment | Vercel | Deploys public Next.js surface | Public web surface | routing | `showcase-dapp` | Sovereign static hosting (or any provider not in the correctness path) | Low | Low | Botshelo Mokoka | Not sovereignty-critical, but still a control-plane dependency. |
 | Showcase DApp hosting | Firebase Hosting | Static hosting / rewrites | Public web surface | routing | `showcase-dapp/out` artifacts | Sovereign static hosting | Low | Low | Botshelo Mokoka | Confirm whether Firebase is currently used for production, staging, or demo-only. |
-| Execution engine | Linear | Programmatic task specs and automation triggers | Ops / governance | governance/audit | Sovereign Ops Orchestrator | Explicitly accepted as "coordination dependency" (not data authority) or migrate to sovereign issue tracker | Low | Low | Botshelo Mokoka | Treat as workflow tooling, not a source of business truth. |
+| Execution engine | Sovereign Issue Tracker | Programmatic task specs and automation triggers | Ops / governance | governance/audit | Sovereign Ops Orchestrator | Migrate to sovereign issue tracker | Low | Low | Botshelo Mokoka | Treat as workflow tooling, not a source of business truth. |
 | Institutional market data | LSEG (via MCP bridge) | Pricing/volatility and compliance reference data | Treasury | analytical | Fiscal Vault Oracle | Multi-source market data + cryptographic evidence trails; isolate provider trust | Medium | Medium | Botshelo Mokoka | Define failure mode: ability to halt safely without provider availability. |

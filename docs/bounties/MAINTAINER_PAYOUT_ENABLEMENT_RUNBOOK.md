@@ -1,12 +1,11 @@
-# Maintainer runbook: bounty payout enablement (migrated to Linear)
+# Maintainer runbook: bounty payout enablement (migrated to Sovereign Coordination Layer)
 
 This repository is public.
 
-The canonical content for bounty payout enablement and maintainer runbooks is maintained in the Conxian Linear workspace to comply with our Zero Secret Egress (ZSE) mandate and to protect sensitive strategy, legal, or operational details.
+The canonical content for bounty payout enablement and maintainer runbooks is maintained in the sovereign coordination layer to comply with our Zero Secret Egress (ZSE) mandate and to protect sensitive strategy, legal, or operational details.
 
 See:
 
-- https://linear.app/conxian-labs
-- https://linear.app/conxian-labs/issue/CON-256
+- Sovereign Coordination Layer issue CON-256
 
 This file is intentionally kept as a stub so existing links continue to resolve.

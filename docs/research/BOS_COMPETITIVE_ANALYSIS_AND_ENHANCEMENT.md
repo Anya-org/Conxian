@@ -77,3 +77,8 @@ This report evaluates the **Conxian Sovereign Business Operations System (BOS)**
 
 ---
 🛡️ **THE FUTURE IS SOVEREIGN. THE SYSTEM IS PORTABLE.**
+
+## 6. Post-Audit Implementation Notes (April 2026)
+- **Hardcoded Principals**: All ST... and SP... hardcoded addresses have been removed from production paths or moved to environment-backed configurations (e.g., `BOOTSTRAP_SENDER` in Nexus).
+- **Akash Readiness**: SDL templates for autonomous deployment have been specified in `docs/research/AKASH_DEPLOYMENT_SPEC.md`.
+- **Contamination Guard**: The org-wide guard now enforces zero-testnet contamination for all P0 repositories.

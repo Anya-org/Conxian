@@ -1,6 +1,6 @@
 # CON-231: Pre-mainnet bounty claimability classification (2026-04-12)
 
-This document is the classification artifact for https://linear.app/conxian-labs/issue/CON-231/decide-which-bounties-can-open-before-mainnet-go-live.
+This document is the classification artifact for https://sovereign.conxian.com/issue/CON-231/decide-which-bounties-can-open-before-mainnet-go-live.
 
 ## Decision
 
