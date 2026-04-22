@@ -14,8 +14,9 @@
 (define-constant STAGE_COMPLETE u4)
 
 (define-data-var current-stage uint STAGE_BOOTSTRAP)
-(define-data-var sab-deployer-multisig principal 'ST1NXQXZ2NK3E3FK1F9YMRK1GE3Z6GZ1RK9Z8X7J5)
-(define-data-var dao-policy-quorum principal 'ST2REHNS5HFJ3SQ1SJGAZ3M03TZ3X2S4K3S3Z2ZK1)
+(define-data-var sab-deployer-multisig principal tx-sender)
+(define-data-var dao-policy-quorum principal tx-sender)
+(define-data-var admin principal tx-sender)
 
 (define-map handoff-steps
     uint
@@ -41,7 +42,12 @@
     (or
         (is-eq tx-sender (var-get sab-deployer-multisig))
         (is-eq tx-sender (var-get dao-policy-quorum))
+        (is-admin)
     )
+)
+
+(define-private (is-admin)
+    (is-eq tx-sender (var-get admin))
 )
 
 ;; @desc Verify that all pre-conditions for full handover are met
@@ -99,7 +105,7 @@
 ;; @desc Set the SAB deployer multisig
 (define-public (set-sab-deployer-multisig (new-msig principal))
     (begin
-        (asserts! (is-sab-member) (err u100))
+        (asserts! (is-admin) (err u100))
         (var-set sab-deployer-multisig new-msig)
         (ok true)
     )
@@ -108,8 +114,26 @@
 ;; @desc Set the DAO policy quorum
 (define-public (set-dao-policy-quorum (new-quorum principal))
     (begin
-        (asserts! (is-sab-member) (err u100))
+        (asserts! (is-admin) (err u100))
         (var-set dao-policy-quorum new-quorum)
         (ok true)
     )
+)
+
+;; @desc Set the admin
+(define-public (set-admin (new-admin principal))
+    (begin
+        (asserts! (is-admin) (err u100))
+        (var-set admin new-admin)
+        (ok true)
+    )
+)
+
+;; @desc Get current config
+(define-read-only (get-config)
+    (ok {
+        sab-deployer-multisig: (var-get sab-deployer-multisig),
+        dao-policy-quorum: (var-get dao-policy-quorum),
+        admin: (var-get admin)
+    })
 )

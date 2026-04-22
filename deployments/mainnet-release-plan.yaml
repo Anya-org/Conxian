@@ -3,23 +3,24 @@ id: 2
 name: Mainnet Release (March 2026)
 network: mainnet
 stacks-node: "https://stacks-node-api.mainnet.stacks.co"
-deployer: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
+deployer: "${SAB_DEPLOYER_MULTISIG}"
 plan:
   batches:
     - id: 0
       transactions:
         - contract-publish:
             contract-name: alex-adapter
-            expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+            # TODO: Replace ${SAB_DEPLOYER_MULTISIG} with actual multisig before deployment
+            expected-sender: "${SAB_DEPLOYER_MULTISIG}"
             cost: 50000
             path: "contracts/integrations/alex-adapter.clar"
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
         - contract-call:
-            contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.dex-factory"
-            expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+            contract-id: "${SAB_DEPLOYER_MULTISIG}.dex-factory"
+            expected-sender: "${SAB_DEPLOYER_MULTISIG}"
             method: "register-csf-protocol"
             parameters:
-              - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.alex-adapter"
+              - "'${SAB_DEPLOYER_MULTISIG}.alex-adapter"
               - '"ALEX Lab Mainnet"'

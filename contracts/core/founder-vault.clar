@@ -9,10 +9,11 @@
 (define-constant MIN_CONFIRMATIONS u2)
 (define-constant ERR_NOT_ENOUGH_CONFIRMATIONS u2000)
 
-;; Guardians (hardware-backed keys)
-(define-data-var guardian_1 principal 'ST1NXQXZ2NK3E3FK1F9YMRK1GE3Z6GZ1RK9Z8X7J5)
-(define-data-var guardian_2 principal 'ST2REHNS5HFJ3SQ1SJGAZ3M03TZ3X2S4K3S3Z2ZK1)
-(define-data-var guardian_3 principal 'ST3NBRS3T4SSQXZY3FKYSZPC2D3V2S4K3S3Z2ZK2)
+;; Guardians (hardware-backed keys) - initialized to tx-sender on deploy, configurable via admin
+(define-data-var guardian_1 principal tx-sender)
+(define-data-var guardian_2 principal tx-sender)
+(define-data-var guardian_3 principal tx-sender)
+(define-data-var admin principal tx-sender)
 
 ;; Pending transactions
 (define-map pending_txs
@@ -30,6 +31,52 @@
         (is-eq p (var-get guardian_2))
         (is-eq p (var-get guardian_3))
     )
+)
+
+(define-private (is-admin)
+    (is-eq tx-sender (var-get admin))
+)
+
+;; Admin Functions
+
+(define-public (set-guardian-1 (new-guardian principal))
+    (begin
+        (asserts! (is-admin) (err ERR_UNAUTHORIZED))
+        (var-set guardian_1 new-guardian)
+        (ok true)
+    )
+)
+
+(define-public (set-guardian-2 (new-guardian principal))
+    (begin
+        (asserts! (is-admin) (err ERR_UNAUTHORIZED))
+        (var-set guardian_2 new-guardian)
+        (ok true)
+    )
+)
+
+(define-public (set-guardian-3 (new-guardian principal))
+    (begin
+        (asserts! (is-admin) (err ERR_UNAUTHORIZED))
+        (var-set guardian_3 new-guardian)
+        (ok true)
+    )
+)
+
+(define-public (set-admin (new-admin principal))
+    (begin
+        (asserts! (is-admin) (err ERR_UNAUTHORIZED))
+        (var-set admin new-admin)
+        (ok true)
+    )
+)
+
+(define-read-only (get-guardians)
+    (ok {
+        guardian_1: (var-get guardian_1),
+        guardian_2: (var-get guardian_2),
+        guardian_3: (var-get guardian_3)
+    })
 )
 
 ;; Public Functions
