@@ -41,6 +41,12 @@
   (liquidate (uint) (response bool uint))
 ))
 
+(define-trait risk-manager-trait (
+  (get-health-factor (uint) (response uint uint))
+  (is-liquidatable (uint) (response bool uint))
+  (liquidate (uint) (response bool uint))
+))
+
 (define-trait funding-rate-trait (
   (update-funding-rate (principal) (response bool uint))
   (apply-funding (principal uint) (response bool uint))

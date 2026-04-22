@@ -43,25 +43,25 @@
 )
 
 ;; @desc Calculates performance-based adjustment for bounty (CXIP-013)
-(define-read-only (calculate-performance-adjustment)
-  (let (
-    (metrics (unwrap-panic (contract-call? .agent-risk get-performance-metrics)))
-    (growth-bps (get tvl-growth-bps metrics))
-    (bounty-rate (get bounty-completion-rate metrics))
-  )
-    (if (or (> growth-bps u1200) (> bounty-rate u9500))
-      (ok u500)
-      (ok u0)
+(define-public (calculate-performance-adjustment)
+  (match (contract-call? .agent-risk get-performance-metrics .finance-metrics)
+    metrics (let (
+        (growth-bps (get tvl-growth-bps metrics))
+        (bounty-rate (get bounty-completion-rate metrics))
+      )
+      (if (or (> growth-bps u1200) (> bounty-rate u9500))
+        (ok u500)
+        (ok u0)
+      )
     )
+    (err u0)
   )
 )
 
 ;; @desc Calculates dynamic allocation policy based on GCR (CXIP-013)
-(define-read-only (calculate-cybernetic-policy)
-  (let (
-    (gcr (unwrap-panic (contract-call? .agent-risk get-gcr)))
-  )
-    (if (< gcr u110)
+(define-public (calculate-cybernetic-policy)
+  (match (contract-call? .agent-risk get-gcr .finance-metrics)
+    gcr (if (< gcr u110)
       ;; CRISIS Mode
       (ok {
         treasury: u0,
@@ -92,6 +92,15 @@
         })
       )
     )
+    ;; Default to STABILITY Mode on error
+    (err (ok {
+      treasury: u4500,
+      bounty: u3000,
+      lp: u1500,
+      grant: u500,
+      buyback: u500,
+      insurance: u0
+    }))
   )
 )
 

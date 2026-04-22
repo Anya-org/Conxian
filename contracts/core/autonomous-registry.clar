@@ -67,21 +67,17 @@
 
 ;; @desc Get module state
 (define-read-only (get-module-state (module principal))
-    (let ((info (map-get? module-registry module)))
-        (if (is-some info)
-            (ok (get state (unwrap-panic info)))
-            ERR_MODULE_NOT_FOUND
-        )
+    (match (map-get? module-registry module)
+        info (ok (get state info))
+        (err ERR_MODULE_NOT_FOUND)
     )
 )
 
 ;; @desc Check if module is active
 (define-read-only (is-module-active (module principal))
-    (let ((info (map-get? module-registry module)))
-        (if (and (is-some info) (is-eq (get state (unwrap-panic info)) STATE_ACTIVE))
-            true
-            false
-        )
+    (match (map-get? module-registry module)
+        info (is-eq (get state info) STATE_ACTIVE)
+        (err false)
     )
 )
 

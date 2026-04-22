@@ -259,6 +259,10 @@ path = "contracts/governance/reputation-orchestrator.clar"
 [contracts.compliance-orchestrator]
 path = "contracts/compliance/compliance-orchestrator.clar"
 
+[contracts.compliance-manager]
+path = "contracts/compliance/compliance-orchestrator.clar"
+depends_on = ["block-utils"]
+
 [contracts.regulatory-adapter]
 path = "contracts/compliance/regulatory-adapter.clar"
 

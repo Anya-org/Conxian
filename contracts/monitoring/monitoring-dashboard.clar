@@ -11,19 +11,48 @@
 
 ;; @desc Returns comprehensive protocol health metrics and risk indicators
 (define-read-only (get-protocol-health)
-  (let (
-    (status (unwrap-panic (contract-call? .conxian-protocol get-protocol-status)))
-    (risk (unwrap-panic (contract-call? .agent-risk get-cybernetic-intel)))
-    (metrics (unwrap-panic (contract-call? .finance-metrics get-protocol-metrics)))
-    (gcr (unwrap-panic (contract-call? .agent-risk get-gcr)))
-  )
-    (ok {
+  (match (contract-call? .conxian-protocol get-protocol-status)
+    status (match (contract-call? .agent-risk get-cybernetic-intel .finance-metrics)
+      risk (match (contract-call? .finance-metrics get-protocol-metrics)
+        metrics (match (contract-call? .agent-risk get-gcr .finance-metrics)
+          gcr (ok {
+            status: status,
+            risk: risk,
+            metrics: metrics,
+            gcr: gcr,
+            uptime: burn-block-height
+          })
+          (err (ok {
+            status: status,
+            risk: risk,
+            metrics: metrics,
+            gcr: u0,
+            uptime: burn-block-height
+          }))
+        )
+        (err (ok {
+          status: status,
+          risk: risk,
+          metrics: { tvl: u0, solvency-ratio: u0, last-update: u0 },
+          gcr: u0,
+          uptime: burn-block-height
+        }))
+      )
+      (err (ok {
         status: status,
-        risk: risk,
-        metrics: metrics,
-        gcr: gcr,
+        risk: { financial-gcr: u0, operational-fee: u0, tvl-growth-rate: u0, risk-score: u0 },
+        metrics: { tvl: u0, solvency-ratio: u0, last-update: u0 },
+        gcr: u0,
         uptime: burn-block-height
-    })
+      }))
+    )
+    (err (ok {
+      status: "unknown",
+      risk: { financial-gcr: u0, operational-fee: u0, tvl-growth-rate: u0, risk-score: u0 },
+      metrics: { tvl: u0, solvency-ratio: u0, last-update: u0 },
+      gcr: u0,
+      uptime: burn-block-height
+    }))
   )
 )
 

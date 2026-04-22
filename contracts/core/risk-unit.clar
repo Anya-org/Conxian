@@ -4,6 +4,7 @@
 ;; Nakamoto-Aligned (Epoch 3.0 / Clarity 4)
 
 (impl-trait .core-traits.risk-manager-trait)
+(impl-trait .core-traits.risk-unit-trait)
 
 ;; Constants
 (define-constant ERR_NOT_AUTHORIZED (err u1000))
