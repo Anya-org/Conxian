@@ -2,13 +2,13 @@
 
 This document sequences the SAB migration program into ordered waves, prioritized by **strategic value**, **reversibility**, and **operational risk**.
 
-Primary tracker: https://linear.app/conxian-labs/issue/CON-336/sequence-sab-migration-waves-by-value-reversibility-and-risk
+Primary tracker: https://sovereign.conxian.com/issue/CON-336/sequence-sab-migration-waves-by-value-reversibility-and-risk
 
 Related:
 
-- https://linear.app/conxian-labs/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory
-- https://linear.app/conxian-labs/issue/CON-335/define-pilot-readiness-gates-and-evidence-requirements
-- https://linear.app/conxian-labs/issue/CON-337/inventory-current-supabase-and-neon-dependencies-by-service
+- https://sovereign.conxian.com/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory
+- https://sovereign.conxian.com/issue/CON-335/define-pilot-readiness-gates-and-evidence-requirements
+- https://sovereign.conxian.com/issue/CON-337/inventory-current-supabase-and-neon-dependencies-by-service
 
 ## Scoring rubric (why this ordering is explainable)
 
