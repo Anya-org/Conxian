@@ -11,23 +11,23 @@
 
 ;; @desc Returns comprehensive protocol health metrics and risk indicators
 (define-public (get-protocol-health)
-  (match (contract-call? .conxian-protocol get-protocol-status)
-    (ok { compliant: c, paused: p, tenure-id: tid, version: v })
-    (ok {
-      status: { compliant: c, paused: p, tenure-id: tid, version: v },
-      risk: { financial-gcr: u0, operational-fee: u0, tvl-growth-rate: u0, risk-score: u0 },
-      metrics: { tvl: u0, solvency-ratio: u0, last-update: u0 },
-      gcr: u0,
-      uptime: burn-block-height
-    })
-    err
-    (ok {
-      status: { compliant: false, paused: true, tenure-id: none, version: "unknown" },
-      risk: { financial-gcr: u0, operational-fee: u0, tvl-growth-rate: u0, risk-score: u0 },
-      metrics: { tvl: u0, solvency-ratio: u0, last-update: u0 },
-      gcr: u0,
-      uptime: burn-block-height
-    })
+  (let ((status-result (contract-call? .conxian-protocol get-protocol-status)))
+    (if (is-ok status-result)
+      (let ((status (unwrap! status-result (err u0))))
+        (ok {
+          status: status,
+          risk: { financial-gcr: u0, operational-fee: u0, tvl-growth-rate: u0, risk-score: u0 },
+          metrics: { tvl: u0, solvency-ratio: u0, last-update: u0 },
+          gcr: u0,
+          uptime: burn-block-height
+        }))
+      (ok {
+        status: { compliant: false, paused: true, tenure-id: none, version: "C4" },
+        risk: { financial-gcr: u0, operational-fee: u0, tvl-growth-rate: u0, risk-score: u0 },
+        metrics: { tvl: u0, solvency-ratio: u0, last-update: u0 },
+        gcr: u0,
+        uptime: burn-block-height
+      }))
   )
 )
 
