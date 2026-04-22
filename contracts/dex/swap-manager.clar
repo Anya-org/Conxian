@@ -109,7 +109,7 @@
 
 (define-private (check-circuit-breaker)
   (match (var-get circuit-breaker)
-    cb (if (contract-call? .circuit-breaker is-contract-paused (as-contract tx-sender))
+    cb (if (unwrap-panic (contract-call? .circuit-breaker is-contract-paused (as-contract tx-sender)))
          (err ERR_SWAP_FAILED)
          (ok true))
     (ok true)

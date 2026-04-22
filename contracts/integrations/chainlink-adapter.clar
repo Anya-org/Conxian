@@ -1,7 +1,9 @@
 ;; chainlink-adapter.clar
 ;; Conxian Oracle Standard: Chainlink Adapter
 ;; Implements oracle-trait for Chainlink price feeds
-(impl-trait .oracle-trait.oracle-trait)
+
+(use-trait oracle-trait .defi-traits.oracle-trait)
+(impl-trait .defi-traits.oracle-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u6000)
@@ -26,7 +28,7 @@
 (define-read-only (get-price (asset principal))
   (match (map-get? price-feeds asset)
     price-data (ok (get price price-data))
-    none (err ERR_NO_PRICE)
+    (err ERR_NO_PRICE)
   )
 )
 
@@ -34,7 +36,7 @@
   (get-price asset)
 )
 
-(define-read-only (get-name ())
+(define-read-only (get-name)
   (ok "Chainlink Oracle Adapter")
 )
 

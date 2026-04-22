@@ -1,17 +1,14 @@
 ;; position-manager.clar
 ;; Conxian Protocol Standard Contract
-
-;; position-manager.clar
 ;; Manages the lifecycle of trading positions
-;; Core Backend Contract - Accessed via Dimensional Engine Facade
 
-(impl-trait .core-traits.position-orchestrator-trait)
+(impl-trait .core-traits.position-manager-trait)
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 (define-constant ERR_NOT_AUTHORIZED u1000)
 (define-constant ERR_POSITION_NOT_FOUND u3000)
 
-;; State - Engine Address
+;; State
 (define-data-var contract-owner principal tx-sender)
 (define-data-var dimensional-engine principal tx-sender)
 
@@ -31,7 +28,7 @@
 
 (define-data-var next-position-id uint u1)
 
-;; Authorization: Only the Facade (Dimensional Engine) can call state-changing functions
+;; Authorization
 (define-private (is-owner)
   (is-eq tx-sender (var-get contract-owner))
 )
@@ -40,9 +37,6 @@
   (is-eq tx-sender (var-get dimensional-engine))
 )
 
-
-;; @desc Set dimensional engine
-;; @returns (response bool uint)
 (define-public (set-dimensional-engine (engine principal))
   (begin
     (asserts! (is-owner) (err ERR_NOT_AUTHORIZED))
@@ -51,9 +45,6 @@
   )
 )
 
-
-;; @desc Set contract owner
-;; @returns (response bool uint)
 (define-public (set-contract-owner (new-owner principal))
   (begin
     (asserts! (is-owner) (err ERR_NOT_AUTHORIZED))
@@ -62,72 +53,58 @@
   )
 )
 
-
-;; @desc Open position
-;; @returns (response bool uint)
-(define-public (open-position
-    (user principal)
-    (token principal)
-    (amount uint)
-    (leverage uint)
-    (long bool)
-  )
+(define-public (open-position (user principal) (token principal) (amount uint) (leverage uint) (long bool))
   (let ((pos-id (var-get next-position-id)))
-    (asserts! (is-engine) (err ERR_NOT_AUTHORIZED))
-
-    (map-set positions pos-id {
-      owner: user,
-      token: token,
-      size: (* amount leverage),
-      collateral: amount,
-      leverage: leverage,
-      entry-price: u0, ;; To be fetched from oracle via engine
-      is-long: long,
-      open: true,
-    })
-    (var-set next-position-id (+ pos-id u1))
-    (ok pos-id)
-  )
-)
-
-
-;; @desc Close position
-;; @returns (response bool uint)
-(define-public (close-position
-    (user principal)
-    (position-id uint)
-  )
-  (begin
-    (let ((pos (unwrap! (map-get? positions position-id) (err ERR_POSITION_NOT_FOUND))))
-      (asserts! (is-eq (get owner pos) user) (err ERR_NOT_AUTHORIZED))
-      (map-set positions position-id (merge pos { open: false }))
-      (ok true)
+    (begin
+      (asserts! (is-engine) (err ERR_NOT_AUTHORIZED))
+      (map-set positions pos-id {
+        owner: user,
+        token: token,
+        size: (* amount leverage),
+        collateral: amount,
+        leverage: leverage,
+        entry-price: u0,
+        is-long: long,
+        open: true,
+      })
+      (var-set next-position-id (+ pos-id u1))
+      (ok pos-id)
     )
   )
 )
 
+(define-public (close-position (user principal) (position-id uint))
+  (begin
+    (let ((pos (unwrap! (map-get? positions position-id) (err ERR_POSITION_NOT_FOUND))))
+      (begin
+        (asserts! (is-eq (get owner pos) user) (err ERR_NOT_AUTHORIZED))
+        (map-set positions position-id (merge pos { open: false }))
+        (ok true)
+      )
+    )
+  )
+)
 
-;; @desc Force close position (internal use)
-;; @returns (response bool uint)
 (define-public (force-close-position (position-id uint))
   (begin
     (asserts! (is-engine) (err ERR_NOT_AUTHORIZED))
     (let ((pos (unwrap! (map-get? positions position-id) (err ERR_POSITION_NOT_FOUND))))
-      (map-set positions position-id (merge pos { open: false }))
-      (ok true)
+      (begin
+        (map-set positions position-id (merge pos { open: false }))
+        (ok true)
+      )
     )
   )
 )
 
-;; @desc Liquidate position (trait alignment)
-;; @returns (response bool uint)
-(define-public (liquidate-position (user principal) (position-id uint))
+(define-public (liquidate-position (liquidator principal) (position-id uint))
   (begin
     (asserts! (is-engine) (err ERR_NOT_AUTHORIZED))
     (let ((pos (unwrap! (map-get? positions position-id) (err ERR_POSITION_NOT_FOUND))))
-      (asserts! (is-eq (get owner pos) user) (err ERR_NOT_AUTHORIZED))
-      (map-set positions position-id (merge pos { open: false }))
-      (ok true)
+      (begin
+        (map-set positions position-id (merge pos { open: false }))
+        (ok true)
+      )
     )
   )
 )

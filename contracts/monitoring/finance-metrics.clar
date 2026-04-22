@@ -1,35 +1,33 @@
 ;; finance-metrics.clar
-;; Unified protocol telemetry and health metrics
-(impl-trait .security-monitoring.finance-metrics-trait)
+;; Conxian Protocol: Core Financial Telemetry and Health Metrics
 
-(define-data-var mock-tvl uint u1000000)
-(define-data-var mock-gcr uint u150)
-(define-data-var mock-active-positions uint u10)
-(define-data-var mock-volume uint u50000)
+(define-constant ERR_UNAUTHORIZED (err u1000))
 
-(define-read-only (get-protocol-tvl) (ok (var-get mock-tvl)))
-(define-read-only (get-protocol-gcr) (ok (var-get mock-gcr)))
-(define-read-only (get-protocol-metrics)
-  (ok {
-    tvl: (var-get mock-tvl),
-    solvency-ratio: (var-get mock-gcr),
-    active-positions: (var-get mock-active-positions),
-    volume-24h: (var-get mock-volume)
-  })
+(define-data-var total-value-locked uint u0)
+(define-data-var global-collateral-ratio uint u0)
+(define-data-var admin principal tx-sender)
+
+(define-read-only (get-tvl) (ok (var-get total-value-locked)))
+(define-read-only (get-protocol-tvl) (ok (var-get total-value-locked)))
+(define-read-only (get-gcr) (ok (var-get global-collateral-ratio)))
+
+(define-read-only (get-protocol-status)
+  (ok { compliant: true, version: "v1.1.0-Apex", tvl: (var-get total-value-locked), gcr: (var-get global-collateral-ratio) })
 )
-(define-read-only (get-protocol-status) (ok { compliant: true }))
 
-;; Mock setters for testing
-(define-public (set-mock-tvl (new-tvl uint))
+(define-public (update-metrics (new-tvl uint) (new-gcr uint))
   (begin
-    (var-set mock-tvl new-tvl)
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (var-set total-value-locked new-tvl)
+    (var-set global-collateral-ratio new-gcr)
     (ok true)
   )
 )
 
-(define-public (set-mock-gcr (new-gcr uint))
+(define-public (set-admin (new-admin principal))
   (begin
-    (var-set mock-gcr new-gcr)
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (var-set admin new-admin)
     (ok true)
   )
 )

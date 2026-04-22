@@ -1,170 +1,78 @@
 ;; conxian-access.clar
-;; Conxian Protocol Standard Contract
-
-;; conxian-access.clar
-;; Unified Role-Based Access Control (RBAC) Backend
-;; Centralizes all permissioning for the Conxian Protocol
-;; Dual-Mode: Compatibility and Clarity 4
+;; Conxian Protocol: Core Role-Based Access Control (RBAC)
+;; Aligned with Apex CSF (v1.1.0) and Nakamoto Standard.
 
 (impl-trait .core-traits.conxian-access-trait)
 
-;; Constants
-(define-constant ERR_UNAUTHORIZED u1000)
-(define-constant ERR_ROLE_EXISTS u1001)
-(define-constant ERR_ROLE_NOT_FOUND u1002)
-(define-constant ERR_INVALID_SIGNATURE u1003)
-(define-constant ERR_PASSKEY_NOT_SUPPORTED u1004)
+;; --- Constants ---
+(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_PASSKEY_NOT_SUPPORTED (err u1001))
 
-;; Roles
 (define-constant ROLE_ADMIN u1)
-(define-constant ROLE_GOVERNANCE u2)
-(define-constant ROLE_EMERGENCY u3)
-(define-constant ROLE_OPERATOR u4)
-(define-constant ROLE_KEEPER u5)
+(define-constant ROLE_OPERATOR u2)
+(define-constant ROLE_AGENT u3)
 
-;; State
+;; --- State ---
 (define-data-var contract-owner principal tx-sender)
+(define-data-var initialized bool false)
 (define-data-var timelock-principal principal tx-sender)
-(define-map roles
-  {
-    user: principal,
-    role: uint,
-  }
-  bool
-)
 
-;; Authorization
+(define-map roles { user: principal, role: uint } bool)
+
+;; --- Internal ---
+
 (define-private (is-owner)
   (is-eq tx-sender (var-get contract-owner))
 )
 
-(define-private (is-admin (user principal))
-  (or (is-eq user (var-get contract-owner)) (default-to false (map-get? roles {
-    user: user,
-    role: ROLE_ADMIN,
-  })
+;; --- Public ---
+
+(define-public (initialize (new-owner principal))
+  (begin
+    (asserts! (not (var-get initialized)) ERR_UNAUTHORIZED)
+    (var-set contract-owner new-owner)
+    (var-set initialized true)
+    ;; Grant admin role to owner
+    (map-set roles { user: new-owner, role: ROLE_ADMIN } true)
+    (ok true)
+  )
+)
+
+(define-public (has-role (user principal) (role uint))
+  (ok (or
+    (is-eq user (var-get contract-owner))
+    (default-to false (map-get? roles { user: user, role: role }))
   ))
 )
 
-;; Trait Implementation
-
-;; @desc Has role
-;; @returns (response bool uint)
-(define-public (has-role
-    (user principal)
-    (role-id uint)
-  )
-  (ok (default-to false (map-get? roles {
-    user: user,
-    role: role-id,
-  })
-  ))
-)
-
-
-;; @desc Grant role
-;; @returns (response bool uint)
-(define-public (grant-role
-    (user principal)
-    (role-id uint)
-    (message (buff 32))
-    (signature (buff 64))
-    (public-key (buff 33))
-  )
+(define-public (grant-role (user principal) (role uint) (msg (buff 32)) (sig (buff 64)) (pub (buff 33)))
   (begin
-    (asserts! (is-admin tx-sender) (err ERR_UNAUTHORIZED))
-    ;; Verify signature for sensitive role changes (Safe Wrapper)
-    ;; (asserts! (true message signature public-key) (err ERR_INVALID_SIGNATURE))
-    (map-set roles {
-      user: user,
-      role: role-id,
-    } true
-    )
+    (asserts! (unwrap-panic (has-role tx-sender ROLE_ADMIN)) ERR_UNAUTHORIZED)
+    (map-set roles { user: user, role: role } true)
     (ok true)
   )
 )
 
-
-;; @desc Revoke role
-;; @returns (response bool uint)
-(define-public (revoke-role
-    (user principal)
-    (role-id uint)
-    (message (buff 32))
-    (signature (buff 64))
-    (public-key (buff 33))
-  )
+(define-public (revoke-role (user principal) (role uint) (msg (buff 32)) (sig (buff 64)) (pub (buff 33)))
   (begin
-    (asserts! (is-admin tx-sender) (err ERR_UNAUTHORIZED))
-    ;; Verify signature for sensitive role changes (Safe Wrapper)
-    ;; (asserts! (true message signature public-key) (err ERR_INVALID_SIGNATURE))
-    (map-delete roles {
-      user: user,
-      role: role-id,
-    })
+    (asserts! (unwrap-panic (has-role tx-sender ROLE_ADMIN)) ERR_UNAUTHORIZED)
+    (map-delete roles { user: user, role: role })
     (ok true)
   )
 )
 
-;; Admin
-
-;; @desc Initialize
-;; @returns (response bool uint)
-(define-public (initialize (owner principal))
-  (begin
-    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (var-set contract-owner owner)
-    (ok true)
-  )
+(define-public (verify-passkey-signature (msg (buff 32)) (sig (buff 64)) (pub (buff 33)))
+  (err u1001)
 )
 
-
-;; @desc Set contract owner
-;; @returns (response bool uint)
-(define-public (set-contract-owner (new-owner principal) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
+(define-public (set-owner (new-owner principal))
   (begin
-    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (asserts! (is-owner) ERR_UNAUTHORIZED)
     (var-set contract-owner new-owner)
     (ok true)
   )
 )
 
-;; Sovereign Handoff: Transfer ownership to timelock
-
-;; @desc Transfer ownership to timelock
-;; @returns (response bool uint)
-(define-public (transfer-ownership-to-timelock (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
-  (begin
-    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (var-set contract-owner (var-get timelock-principal))
-    (ok true)
-  )
-)
-
-;; @desc Returns the principal that is currently the owner of the access control contract.
-(define-read-only (get-contract-owner)
-  (var-get contract-owner)
-)
-
-;; @desc Verifies a passkey/biometric signature.
-;; @note Passkey/WebAuthn verification is not supported directly in Clarity today.
-;;       This returns (err ERR_PASSKEY_NOT_SUPPORTED) so callers cannot treat it as an authorization primitive.
-(define-read-only (verify-passkey-signature (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
-  (err ERR_PASSKEY_NOT_SUPPORTED)
-)
-
-;; @desc Returns whether the current transaction sender is a global protocol administrator.
 (define-read-only (is-global-admin)
-  (is-admin tx-sender)
-)
-
-
-;; @desc Set timelock principal
-;; @returns (response bool uint)
-(define-public (set-timelock-principal (new-timelock principal))
-  (begin
-    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (var-set timelock-principal new-timelock)
-    (ok true)
-  )
+  (is-eq tx-sender (var-get contract-owner))
 )

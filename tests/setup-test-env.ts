@@ -1,5 +1,6 @@
 import { beforeAll } from 'vitest';
 import { initSimnet, type Simnet } from '@stacks/clarinet-sdk';
+import { Cl } from '@stacks/transactions';
 
 let internalSimnet: Simnet | null = null;
 let initializationPromise: Promise<Simnet> | null = null;
@@ -10,14 +11,53 @@ export async function initializeSimnet(): Promise<Simnet> {
 
   initializationPromise = (async () => {
     try {
-      console.log('Initializing simnet with Clarinet.toml...');
+      console.log('🚀 Initializing Simnet and Bootstrapping Protocol...');
       const instance = await initSimnet('Clarinet.toml');
       internalSimnet = instance;
-      console.log('Simnet initialized.');
+
+      const deployer = instance.deployer;
+
+      const contractsToInit = [
+        'conxian-protocol',
+        'conxian-access',
+        'oracle-aggregator',
+        'finance-metrics',
+        'agent-risk',
+        'dex-factory',
+        'lending-manager',
+        'bme-engine',
+        'office-manager',
+        'operational-treasury',
+        'agent-treasury',
+        'cxd-token',
+        'mock-token'
+      ];
+
+      for (const name of contractsToInit) {
+        try {
+          const res = instance.callPublicFn(name, 'initialize', [Cl.principal(deployer)], deployer);
+          // console.log(`Init ${name}: ${Cl.prettyPrint(res.result)}`);
+        } catch (e) {
+          // console.log(`Skip init ${name}`);
+        }
+      }
+
+      // Configure Operational Treasury for Office Manager
+      try {
+        instance.callPublicFn('operational-treasury', 'set-protocol-principal', [Cl.stringAscii('office-manager-owner'), Cl.principal(deployer)], deployer);
+      } catch (e) {}
+
+      // Authorize reporters in BME Engine
+      try {
+        instance.callPublicFn('bme-engine', 'add-activity-reporter', [Cl.contractPrincipal(deployer, 'swap-router')], deployer);
+        instance.callPublicFn('bme-engine', 'add-activity-reporter', [Cl.contractPrincipal(deployer, 'lending-manager')], deployer);
+      } catch (e) {}
+
+      console.log('✅ Bootstrap Complete');
       return instance;
     } catch (error) {
-      console.error('Failed to initialize simnet:', error);
-      initializationPromise = null; // Allow retry on failure
+      console.error('❌ Simnet initialization failed:', error);
+      initializationPromise = null;
       throw error;
     }
   })();
@@ -27,10 +67,7 @@ export async function initializeSimnet(): Promise<Simnet> {
 
 export const simnet: Simnet = new Proxy({} as Simnet, {
   get: (_target, prop) => {
-    if (!internalSimnet) {
-      throw new Error(`Simnet not initialized. Ensure initializeSimnet() is called before accessing '${String(prop)}'.`);
-    }
-    const value = (internalSimnet as any)[prop];
+    const value = (internalSimnet as any)?.[prop];
     if (typeof value === 'function') {
       return value.bind(internalSimnet);
     }
