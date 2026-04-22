@@ -1,17 +1,16 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Cl } from '@stacks/transactions';
-import { initSimnet } from "@stacks/clarinet-sdk";
+import { simnet } from '../setup-test-env';
 
 const CONTRACT_NAME = 'conxian-protocol';
 
 describe('Conxian Protocol Batch Tests', () => {
-  let simnet: any;
-  let deployer: any;
+    let deployer: any;
   let wallet1: any;
   let wallet2: any;
 
   beforeEach(async () => {
-    simnet = await initSimnet();
+
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
     wallet1 = accounts.get('wallet_1') || deployer;

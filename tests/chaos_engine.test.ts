@@ -20,12 +20,15 @@ describe('Conxian Chaos Engineering Suite', () => {
 
   describe('Phase 1: Deterministic Logic & State Integrity', () => {
     it('Target 1 (Anti-LVR): DEX volatility fee updates via Heartbeat', () => {
+      // 1. Setup protocol authority
+      simnet.callPublicFn('conxian-protocol', 'set-owner', [Cl.principal(deployer)], deployer);
+
       const heartbeat = simnet.callPublicFn('ops-engine', 'trigger-epoch-update', [], deployer);
       expect(heartbeat.result).toStrictEqual(Cl.ok(Cl.bool(true)));
     });
 
     it('Target 2 (Fiscal Dam): Agent-Risk provides cybernetic telemetry', () => {
-      const intelRes = simnet.callReadOnlyFn('agent-risk', 'get-cybernetic-intel', [], deployer);
+      const intelRes = simnet.callPublicFn('agent-risk', 'get-cybernetic-intel', [Cl.principal(deployer + '.finance-metrics')], deployer);
       const intel = unwrap(intelRes.result);
       expect(intel['financial-gcr']).toBeDefined();
       expect(intel['operational-fee']).toBeDefined();
@@ -35,15 +38,15 @@ describe('Conxian Chaos Engineering Suite', () => {
 
   describe('Phase 2: Property-Based Logic', () => {
     it('Resilience: GCR Crisis (u100) triggers High Risk Score (900)', () => {
-       simnet.callPublicFn('agent-risk', 'set-mock-gcr', [Cl.uint(100)], deployer);
-       const intelRes = simnet.callReadOnlyFn('agent-risk', 'get-cybernetic-intel', [], deployer);
+       simnet.callPublicFn('finance-metrics', 'set-mock-gcr', [Cl.uint(100)], deployer);
+       const intelRes = simnet.callPublicFn('agent-risk', 'get-cybernetic-intel', [Cl.principal(deployer + '.finance-metrics')], deployer);
        const intel = unwrap(intelRes.result);
        expect(unwrap(intel['risk-score'])).toBe(900n);
     });
 
     it('Resilience: GCR Abundance (u150) triggers Healthy Risk Score (100)', () => {
-       simnet.callPublicFn('agent-risk', 'set-mock-gcr', [Cl.uint(150)], deployer);
-       const intelRes = simnet.callReadOnlyFn('agent-risk', 'get-cybernetic-intel', [], deployer);
+       simnet.callPublicFn('finance-metrics', 'set-mock-gcr', [Cl.uint(150)], deployer);
+       const intelRes = simnet.callPublicFn('agent-risk', 'get-cybernetic-intel', [Cl.principal(deployer + '.finance-metrics')], deployer);
        const intel = unwrap(intelRes.result);
        expect(unwrap(intel['risk-score'])).toBe(100n);
     });

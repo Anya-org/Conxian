@@ -1,14 +1,13 @@
 import { Cl } from '@stacks/transactions';
 import { describe, expect, it, beforeAll, beforeEach } from 'vitest';
-import { initSimnet, type Simnet } from '@stacks/clarinet-sdk';
+import { simnet } from '../setup-test-env';
 
 describe('Reputation Engine', () => {
-  let simnet: Simnet;
-  let deployer: string;
+    let deployer: string;
   let voter: string;
 
   beforeAll(async () => {
-    simnet = await initSimnet('Clarinet.toml');
+
   });
 
   beforeEach(async () => {

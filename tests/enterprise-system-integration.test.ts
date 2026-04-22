@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { Cl } from '@stacks/transactions';
-import { initSimnet } from '@stacks/clarinet-sdk';
+import { simnet, initializeSimnet } from './setup-test-env';
 // Enterprise contracts not yet deployed - skip until available
 const d = describe.skip;
 
@@ -17,14 +17,10 @@ const d = describe.skip;
  * - End-to-end workflows
  */
 d('Enterprise Loan System Integration Tests', () => {
-  let simnet: any;
-  let accounts: Map<string, string>;
+    let accounts: any;
 
   beforeAll(async () => {
-    simnet = await initSimnet("Clarinet.toml", false, {
-      trackCosts: false,
-      trackCoverage: false,
-    });
+    await initializeSimnet();
     accounts = simnet.getAccounts();
     
     console.log('🚀 Initializing Enterprise Loan System Integration Tests');
@@ -703,14 +699,10 @@ d('Enterprise Loan System Integration Tests', () => {
  * Performance Benchmarking Tests
  */
 describe.skip("Enterprise Loan System Integration Tests - Advanced Workflows", () => {
-  let simnet: any;
-  let accounts: Map<string, string>;
+    let accounts: any;
 
   beforeAll(async () => {
-    simnet = await initSimnet("Clarinet.toml", false, {
-      trackCosts: false,
-      trackCoverage: false,
-    });
+    await initializeSimnet();
     accounts = simnet.getAccounts();
   });
 
@@ -821,14 +813,10 @@ describe.skip("Enterprise Loan System Integration Tests - Advanced Workflows", (
  * Security and Edge Case Tests
  */
 describe.skip("Enterprise Loan System Integration Tests - Stress & Edge Cases", () => {
-  let simnet: any;
-  let accounts: Map<string, string>;
+    let accounts: any;
 
   beforeAll(async () => {
-    simnet = await initSimnet("Clarinet.toml", false, {
-      trackCosts: false,
-      trackCoverage: false,
-    });
+    await initializeSimnet();
     accounts = simnet.getAccounts();
   });
 
