@@ -1,0 +1,261 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.4 [39m[90m/app[39m
+
+[90mstdout[2m | tests/alex-integration.test.ts
+[22m[39m🚀 Initializing Simnet with Clarinet.toml...
+
+[90mstdout[2m | tests/alex-integration.test.ts
+[22m[39mUpdated deployment plan file
+
+[90mstderr[2m | tests/alex-integration.test.ts
+[22m[39m❌ Simnet initialization failed: error: use of unresolved contract 'ST1VXBVFNGN0CB5GH4RW4J4XERGRG5KXCPF7HMJRS.reputation-engine'
+--> /app/contracts/governance/proposal-engine.clar:69:4
+  (let (
+   ^~~
+  (let (
+      (proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id)
+        (err ERR_NOT_FOUND)
+      ))
+      (council-id (get council-id proposal))
+      (raw-voter-power (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender
+        council-id
+      )))
+      (weighted-voter-power (unwrap-panic (contract-call? .reputation-engine get-weighted-voting-power tx-sender
+        raw-voter-power
+      )))
+       ^
+    (asserts! (>= burn-block-height (get start-block proposal)) (err ERR_NOT_FOUND))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (< burn-block-height (get end-block proposal)) (err ERR_PROPOSAL_ENDED))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (> weighted-voter-power u0) (err ERR_UNAUTHORIZED))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (unwrap! (contract-call? .conxian-access has-role tx-sender u1) (err ERR_UNAUTHORIZED))
+      (err ERR_UNAUTHORIZED)
+    ^
+    (let ((rep-update (contract-call? .reputation-engine update-activity-score
+      tx-sender
+    )))
+
+    ;; Record Vote
+    (contract-call? .proposal-registry vote-proposal proposal-id support
+      weighted-voter-power
+    )
+    ^
+
+ [31m❯[39m tests/alex-integration.test.ts [2m([22m[2m3 tests[22m[2m | [22m[33m3 skipped[39m[2m)[22m[33m 3871[2mms[22m[39m
+     [2m[90m↓[39m[22m should allow registering ALEX adapter as a CSF protocol
+     [2m[90m↓[39m[22m should execute a swap through the ALEX adapter via swap-router
+     [2m[90m↓[39m[22m should return health telemetry from ALEX adapter
+[90mstdout[2m | tests/aye-engine.test.ts
+[22m[39m🚀 Initializing Simnet with Clarinet.toml...
+
+[90mstdout[2m | tests/aye-engine.test.ts
+[22m[39mUpdated deployment plan file
+
+[90mstderr[2m | tests/aye-engine.test.ts
+[22m[39m❌ Simnet initialization failed: error: use of unresolved contract 'ST23KTNS2W9XN67Y6FFZWQJWSS83S74RGYH5V4204.reputation-engine'
+--> /app/contracts/governance/proposal-engine.clar:69:4
+  (let (
+   ^~~
+  (let (
+      (proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id)
+        (err ERR_NOT_FOUND)
+      ))
+      (council-id (get council-id proposal))
+      (raw-voter-power (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender
+        council-id
+      )))
+      (weighted-voter-power (unwrap-panic (contract-call? .reputation-engine get-weighted-voting-power tx-sender
+        raw-voter-power
+      )))
+       ^
+    (asserts! (>= burn-block-height (get start-block proposal)) (err ERR_NOT_FOUND))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (< burn-block-height (get end-block proposal)) (err ERR_PROPOSAL_ENDED))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (> weighted-voter-power u0) (err ERR_UNAUTHORIZED))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (unwrap! (contract-call? .conxian-access has-role tx-sender u1) (err ERR_UNAUTHORIZED))
+      (err ERR_UNAUTHORIZED)
+    ^
+    (let ((rep-update (contract-call? .reputation-engine update-activity-score
+      tx-sender
+    )))
+
+    ;; Record Vote
+    (contract-call? .proposal-registry vote-proposal proposal-id support
+      weighted-voter-power
+    )
+    ^
+
+ [31m❯[39m tests/aye-engine.test.ts [2m([22m[2m3 tests[22m[2m | [22m[33m3 skipped[39m[2m)[22m[33m 2790[2mms[22m[39m
+     [2m[90m↓[39m[22m Agent-Risk should adjust PID stability fees
+     [2m[90m↓[39m[22m Agent-Risk should assess system risk based on GCR
+     [2m[90m↓[39m[22m Agent-Treasury should calculate performance adjustment
+[90mstdout[2m | tests/office-worker.test.ts
+[22m[39m🚀 Initializing Simnet with Clarinet.toml...
+
+[90mstdout[2m | tests/office-worker.test.ts
+[22m[39mUpdated deployment plan file
+
+[90mstderr[2m | tests/office-worker.test.ts
+[22m[39m❌ Simnet initialization failed: error: use of unresolved contract 'ST32FA9S013TS4TPCPJHFWZC81FG99D6X79M9NYVN.reputation-engine'
+--> /app/contracts/governance/proposal-engine.clar:69:4
+  (let (
+   ^~~
+  (let (
+      (proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id)
+        (err ERR_NOT_FOUND)
+      ))
+      (council-id (get council-id proposal))
+      (raw-voter-power (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender
+        council-id
+      )))
+      (weighted-voter-power (unwrap-panic (contract-call? .reputation-engine get-weighted-voting-power tx-sender
+        raw-voter-power
+      )))
+       ^
+    (asserts! (>= burn-block-height (get start-block proposal)) (err ERR_NOT_FOUND))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (< burn-block-height (get end-block proposal)) (err ERR_PROPOSAL_ENDED))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (> weighted-voter-power u0) (err ERR_UNAUTHORIZED))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (unwrap! (contract-call? .conxian-access has-role tx-sender u1) (err ERR_UNAUTHORIZED))
+      (err ERR_UNAUTHORIZED)
+    ^
+    (let ((rep-update (contract-call? .reputation-engine update-activity-score
+      tx-sender
+    )))
+
+    ;; Record Vote
+    (contract-call? .proposal-registry vote-proposal proposal-id support
+      weighted-voter-power
+    )
+    ^
+
+ [31m❯[39m tests/office-worker.test.ts [2m([22m[2m4 tests[22m[2m | [22m[33m4 skipped[39m[2m)[22m[33m 2054[2mms[22m[39m
+     [2m[90m↓[39m[22m should allow owner to register a worker
+     [2m[90m↓[39m[22m should allow owner to fund payroll
+     [2m[90m↓[39m[22m should authorize agent-treasury
+     [2m[90m↓[39m[22m should allow worker to execute job and get paid
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/alex-integration.test.ts[2m [ tests/alex-integration.test.ts ][22m
+[31m[1mUnknown Error[22m: error: use of unresolved contract 'ST1VXBVFNGN0CB5GH4RW4J4XERGRG5KXCPF7HMJRS.reputation-engine'
+--> /app/contracts/governance/proposal-engine.clar:69:4
+  (let (
+   ^~~
+  (let (
+      (proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id)
+        (err ERR_NOT_FOUND)
+      ))
+      (council-id (get council-id proposal))
+      (raw-voter-power (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender
+        council-id
+      )))
+      (weighted-voter-power (unwrap-panic (contract-call? .reputation-engine get-weighted-voting-power tx-sender
+        raw-voter-power
+      )))
+       ^
+    (asserts! (>= burn-block-height (get start-block proposal)) (err ERR_NOT_FOUND))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (< burn-block-height (get end-block proposal)) (err ERR_PROPOSAL_ENDED))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (> weighted-voter-power u0) (err ERR_UNAUTHORIZED))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (unwrap! (contract-call? .conxian-access has-role tx-sender u1) (err ERR_UNAUTHORIZED))
+      (err ERR_UNAUTHORIZED)
+    ^
+    (let ((rep-update (contract-call? .reputation-engine update-activity-score
+      tx-sender
+    )))
+
+    ;; Record Vote
+    (contract-call? .proposal-registry vote-proposal proposal-id support
+      weighted-voter-power
+    )
+    ^[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/aye-engine.test.ts[2m [ tests/aye-engine.test.ts ][22m
+[31m[1mUnknown Error[22m: error: use of unresolved contract 'ST23KTNS2W9XN67Y6FFZWQJWSS83S74RGYH5V4204.reputation-engine'
+--> /app/contracts/governance/proposal-engine.clar:69:4
+  (let (
+   ^~~
+  (let (
+      (proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id)
+        (err ERR_NOT_FOUND)
+      ))
+      (council-id (get council-id proposal))
+      (raw-voter-power (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender
+        council-id
+      )))
+      (weighted-voter-power (unwrap-panic (contract-call? .reputation-engine get-weighted-voting-power tx-sender
+        raw-voter-power
+      )))
+       ^
+    (asserts! (>= burn-block-height (get start-block proposal)) (err ERR_NOT_FOUND))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (< burn-block-height (get end-block proposal)) (err ERR_PROPOSAL_ENDED))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (> weighted-voter-power u0) (err ERR_UNAUTHORIZED))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (unwrap! (contract-call? .conxian-access has-role tx-sender u1) (err ERR_UNAUTHORIZED))
+      (err ERR_UNAUTHORIZED)
+    ^
+    (let ((rep-update (contract-call? .reputation-engine update-activity-score
+      tx-sender
+    )))
+
+    ;; Record Vote
+    (contract-call? .proposal-registry vote-proposal proposal-id support
+      weighted-voter-power
+    )
+    ^[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/office-worker.test.ts[2m [ tests/office-worker.test.ts ][22m
+[31m[1mUnknown Error[22m: error: use of unresolved contract 'ST32FA9S013TS4TPCPJHFWZC81FG99D6X79M9NYVN.reputation-engine'
+--> /app/contracts/governance/proposal-engine.clar:69:4
+  (let (
+   ^~~
+  (let (
+      (proposal (unwrap! (contract-call? .proposal-registry get-proposal proposal-id)
+        (err ERR_NOT_FOUND)
+      ))
+      (council-id (get council-id proposal))
+      (raw-voter-power (unwrap-panic (contract-call? .enhanced-governance-nft get-seat-power tx-sender
+        council-id
+      )))
+      (weighted-voter-power (unwrap-panic (contract-call? .reputation-engine get-weighted-voting-power tx-sender
+        raw-voter-power
+      )))
+       ^
+    (asserts! (>= burn-block-height (get start-block proposal)) (err ERR_NOT_FOUND))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (< burn-block-height (get end-block proposal)) (err ERR_PROPOSAL_ENDED))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (> weighted-voter-power u0) (err ERR_UNAUTHORIZED))
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    (asserts! (unwrap! (contract-call? .conxian-access has-role tx-sender u1) (err ERR_UNAUTHORIZED))
+      (err ERR_UNAUTHORIZED)
+    ^
+    (let ((rep-update (contract-call? .reputation-engine update-activity-score
+      tx-sender
+    )))
+
+    ;; Record Vote
+    (contract-call? .proposal-registry vote-proposal proposal-id support
+      weighted-voter-power
+    )
+    ^[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m3 failed[39m[22m[90m (3)[39m
+[2m      Tests [22m [33m10 skipped[39m[90m (10)[39m
+[2m   Start at [22m 07:21:26
+[2m   Duration [22m 11.04s[2m (transform 179ms, setup 1.07s, import 158ms, tests 8.72s, environment 1ms)[22m

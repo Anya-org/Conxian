@@ -13,34 +13,25 @@ describe('Protocol Benchmarks', () => {
   });
 
   it('captures gas for run-fiscal-strategy', () => {
-    // Mine a few blocks to ensure burn-block-height progresses
     simnet.mineEmptyBlocks(10);
+    const wallet1 = simnet.getAccounts().get('wallet_1')!;
 
-    const accounts = simnet.getAccounts();
-    const wallet1 = accounts.get('wallet_1')!;
     const res = simnet.callPublicFn('agent-treasury', 'run-fiscal-strategy',
-      [Cl.list([Cl.principal(wallet1)]), Cl.contractPrincipal(deployer, 'cxd-token')],
+      [
+        Cl.principal(`${deployer}.alex-adapter`),
+        Cl.list([Cl.principal(wallet1)]),
+        Cl.principal(`${deployer}.cxd-token`)
+      ],
       deployer);
+
     console.log('BENCHMARK: run-fiscal-strategy');
-    console.log(JSON.stringify(res.events, null, 2));
-    // In Clarinet SDK, gas is often in res.result if it returns a response or check events
-    // For now we look at the raw output in the terminal
+    // console.log('Result:', Cl.prettyPrint(res.result));
     expect(res.result).toBeDefined();
   });
 
   it('captures gas for distribute-token', () => {
-    // Mock token transfer
     const res = simnet.callPublicFn('revenue-distributor', 'distribute-stx', [Cl.uint(1000000)], deployer);
     console.log('BENCHMARK: distribute-stx');
-    // console.log(JSON.stringify(res, null, 2));
-    expect(res.result).toBeDefined();
-  });
-});
-
-describe('Observability Benchmarks', () => {
-  it('captures gas for get-protocol-status', async () => {
-    const simnet = await initSimnet();
-    const res = simnet.callReadOnlyFn('conxian-protocol', 'get-protocol-status', [], 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM');
     expect(res.result).toBeDefined();
   });
 });

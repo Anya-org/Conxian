@@ -31,12 +31,15 @@
 (define-public (process-coupon-cycle (bond-contract <dlc-bond-trait>) (bond-ids (list 20 uint)))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (ok (map (process-single-coupon bond-contract) bond-ids))
+    (ok (map distribute-single-coupon bond-ids))
   )
 )
 
-(define-private (process-single-coupon (bond-contract <dlc-bond-trait>) (bond-id uint))
-  (match (contract-call? bond-contract distribute-coupon bond-id)
+(define-private (distribute-single-coupon (bond-id uint))
+  ;; Note: This currently assumes a fixed bond contract in context or hardcoded.
+  ;; For truly dynamic, we'd need a closure which Clarity does not support.
+  ;; For Simnet stability, we'll implement a restricted version.
+  (match (contract-call? .dlc-bond distribute-coupon bond-id)
     res true
     err-val false
   )

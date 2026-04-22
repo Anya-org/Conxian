@@ -50,6 +50,6 @@ describe("BitVM2 Bridge Logic (CON-75)", () => {
       deployer
     );
 
-    expect(result.result).toEqual(Cl.err(Cl.uint(9000)));
+    expect(result.result).toEqual(Cl.error(Cl.uint(9000)));
   });
 });

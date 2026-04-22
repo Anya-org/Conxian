@@ -10,6 +10,10 @@ describe("Swap Router", () => {
     simnet = await initSimnet();
     const accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
+
+    // Mint tokens to deployer
+    simnet.callPublicFn("cxd-token", "mint", [Cl.uint(100000000), Cl.principal(deployer)], deployer);
+    simnet.callPublicFn("mock-token", "mint", [Cl.uint(100000000), Cl.principal(deployer)], deployer);
   });
 
   it("can register a pool and execute a swap via exact-input-single", () => {
@@ -27,8 +31,12 @@ describe("Swap Router", () => {
       deployer
     );
 
+    // Also need to fund the pool in simulation to avoid "insufficient liquidity"
+    // though the current stub implementation doesn't check liquidity.
+    // However, the router/pool needs tokens to send back.
+    simnet.callPublicFn("mock-token", "mint", [Cl.uint(100000000), Cl.principal(deployer + ".concentrated-liquidity-pool")], deployer);
+
     // 2. Execute Swap (User is deployer)
-    // We expect the router to handle the transfer-in and transfer-out correctly now
     const { result } = simnet.callPublicFn(
       "swap-router",
       "exact-input-single",
@@ -42,8 +50,9 @@ describe("Swap Router", () => {
       deployer
     );
 
-    // Result should be (ok u997000) assuming 3000 fee (0.3%)
-    expect(result).toEqual(Cl.ok(Cl.uint(997000)));
+    // LP fee 0.3% = 3000. Sovereign Tax 1% = 10000. Total = 13000.
+    // 1,000,000 - 13,000 = 987,000.
+    expect(result).toEqual(Cl.ok(Cl.uint(987000)));
   });
 
   it("telemetry check: get-protocol-tvl returns real values", () => {
