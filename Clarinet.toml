@@ -23,1128 +23,1128 @@ trusted_caller = false
 callee_filter = false
 
 [contracts.access-control-trait]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/access-control-trait.clar"
+path = "contracts/traits/access-control-trait.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.admin-facade]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/admin-facade.clar"
+path = "contracts/core/admin-facade.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.agent-risk]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/agents/agent-risk.clar"
+path = "contracts/agents/agent-risk.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["automation-traits", "conxian-service-trait", "oracle-aggregator"]
 
 [contracts.agent-treasury]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/agents/agent-treasury.clar"
+path = "contracts/agents/agent-treasury.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["agent-risk", "bme-engine"]
 
 [contracts.alex-adapter]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/integrations/alex-adapter.clar"
+path = "contracts/integrations/alex-adapter.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["alex-vault", "conxian-csf-trait", "conxian-protocol"]
 
 [contracts.allocation-policy]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/treasury/allocation-policy.clar"
+path = "contracts/treasury/allocation-policy.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.analytics-aggregator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/monitoring/analytics-aggregator.clar"
+path = "contracts/monitoring/analytics-aggregator.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.auto-compounder]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/yield/auto-compounder.clar"
+path = "contracts/yield/auto-compounder.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.automation-manager]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/automation/automation-manager.clar"
+path = "contracts/automation/automation-manager.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["operational-treasury"]
 
 [contracts.automation-traits]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/automation-traits.clar"
+path = "contracts/traits/automation-traits.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.autonomous-registry]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/autonomous-registry.clar"
+path = "contracts/core/autonomous-registry.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.batch-auction]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/batch-auction.clar"
+path = "contracts/dex/batch-auction.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.batch-operations]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/batch-operations.clar"
+path = "contracts/core/batch-operations.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.batch-processor]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/automation/batch-processor.clar"
+path = "contracts/automation/batch-processor.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.block-utils]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/utils/block-utils.clar"
+path = "contracts/utils/block-utils.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.bme-engine]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/bme-engine.clar"
+path = "contracts/core/bme-engine.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["cxd-token"]
 
 [contracts.bns-stub]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/bns-stub.clar"
+path = "contracts/governance/bns-stub.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.bond-factory]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/bonding/bond-factory.clar"
+path = "contracts/bonding/bond-factory.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["regulatory-adapter", "sip-standards"]
 
 [contracts.bond-token]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/bonding/bond-token.clar"
+path = "contracts/bonding/bond-token.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["sip-standards"]
 
 [contracts.bond-traits]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/bond-traits.clar"
+path = "contracts/traits/bond-traits.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.bridge-nft]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/cross-chain/bridge-nft.clar"
+path = "contracts/cross-chain/bridge-nft.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.btc-adapter]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/interfaces/btc-adapter.clar"
+path = "contracts/interfaces/btc-adapter.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.chainlink-adapter]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/integrations/chainlink-adapter.clar"
+path = "contracts/integrations/chainlink-adapter.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["oracle-trait"]
 
 [contracts.circuit-breaker]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/security/circuit-breaker.clar"
+path = "contracts/security/circuit-breaker.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["security-monitoring"]
 
 [contracts.clarity-bitcoin]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/lib/clarity-bitcoin.clar"
+path = "contracts/lib/clarity-bitcoin.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.collateral-orchestrator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/collateral-orchestrator.clar"
+path = "contracts/core/collateral-orchestrator.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-access", "conxian-protocol"]
 
 [contracts.community-dao]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/community-dao.clar"
+path = "contracts/governance/community-dao.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["regulatory-adapter"]
 
 [contracts.community-governance-token]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/community-governance-token.clar"
+path = "contracts/governance/community-governance-token.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["regulatory-adapter", "sip-standards"]
 
 [contracts.community-voting-engine]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/community-voting-engine.clar"
+path = "contracts/governance/community-voting-engine.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["regulatory-adapter"]
 
 [contracts.compliance-hooks]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/compliance/compliance-hooks.clar"
+path = "contracts/compliance/compliance-hooks.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["compliance-manager", "kyc-registry"]
 
 [contracts.compliance-orchestrator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/compliance/compliance-orchestrator.clar"
+path = "contracts/compliance/compliance-orchestrator.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.compliance-trait]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/compliance/compliance-trait.clar"
+path = "contracts/compliance/compliance-trait.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.concentrated-liquidity-pool]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/concentrated-liquidity-pool.clar"
+path = "contracts/dex/concentrated-liquidity-pool.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["bme-engine", "conxian-csf-trait", "revenue-automation"]
 
 [contracts.concentrated-math]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/math/concentrated-math.clar"
+path = "contracts/math/concentrated-math.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.controller-traits]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/controller-traits.clar"
+path = "contracts/traits/controller-traits.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.conxian-access]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/conxian-access.clar"
+path = "contracts/core/conxian-access.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["core-traits"]
 
 [contracts.conxian-csf-trait]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/conxian-csf-trait.clar"
+path = "contracts/traits/conxian-csf-trait.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.conxian-exit-queue]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/conxian-exit-queue.clar"
+path = "contracts/core/conxian-exit-queue.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["queue-traits"]
 
 [contracts.conxian-insurance-fund]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/security/conxian-insurance-fund.clar"
+path = "contracts/security/conxian-insurance-fund.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-access"]
 
 [contracts.conxian-intent-trait]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/conxian-intent-trait.clar"
+path = "contracts/traits/conxian-intent-trait.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.conxian-paas-factory]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/conxian-paas-factory.clar"
+path = "contracts/core/conxian-paas-factory.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["regulatory-adapter"]
 
 [contracts.conxian-protocol]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/conxian-protocol.clar"
+path = "contracts/core/conxian-protocol.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.conxian-service-trait]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/conxian-service-trait.clar"
+path = "contracts/traits/conxian-service-trait.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.conxian-vaults]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/treasury/conxian-vaults.clar"
+path = "contracts/treasury/conxian-vaults.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-access"]
 
 [contracts.core-traits]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/core-traits.clar"
+path = "contracts/traits/core-traits.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.cross-chain-traits]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/cross-chain-traits.clar"
+path = "contracts/traits/cross-chain-traits.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.cross-protocol-integrator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/yield/cross-protocol-integrator.clar"
+path = "contracts/yield/cross-protocol-integrator.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.custody]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/vaults/custody.clar"
+path = "contracts/vaults/custody.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.cxd-bonding-curve-amm]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/bonding/cxd-bonding-curve-amm.clar"
+path = "contracts/bonding/cxd-bonding-curve-amm.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["regulatory-adapter"]
 
 [contracts.cxd-price-initializer]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/tokens/cxd-price-initializer.clar"
+path = "contracts/tokens/cxd-price-initializer.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.cxd-staking]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/yield/cxd-staking.clar"
+path = "contracts/yield/cxd-staking.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["regulatory-adapter"]
 
 [contracts.cxd-token]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/tokens/cxd-token.clar"
+path = "contracts/tokens/cxd-token.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["sip-standards"]
 
 [contracts.cxd-treasury]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/treasury/cxd-treasury.clar"
+path = "contracts/treasury/cxd-treasury.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.cxlp-position-nft]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/tokens/cxlp-position-nft.clar"
+path = "contracts/tokens/cxlp-position-nft.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["sip-standards"]
 
 [contracts.cxlp-token]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/tokens/cxlp-token.clar"
+path = "contracts/tokens/cxlp-token.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["sip-standards"]
 
 [contracts.cxs-token]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/tokens/cxs-token.clar"
+path = "contracts/tokens/cxs-token.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["sip-standards"]
 
 [contracts.cxtr-token]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/tokens/cxtr-token.clar"
+path = "contracts/tokens/cxtr-token.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["sip-standards"]
 
 [contracts.cxvg-token]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/tokens/cxvg-token.clar"
+path = "contracts/tokens/cxvg-token.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["regulatory-adapter", "sip-standards"]
 
 [contracts.dao-treasury]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/dao-treasury.clar"
+path = "contracts/governance/dao-treasury.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["vault-traits"]
 
 [contracts.default-strategy-engine]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/rewards/default-strategy-engine.clar"
+path = "contracts/rewards/default-strategy-engine.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.defi-traits]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/defi-traits.clar"
+path = "contracts/traits/defi-traits.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.dex-facade]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/dex-facade.clar"
+path = "contracts/dex/dex-facade.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-protocol", "dex-factory"]
 
 [contracts.dex-factory]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/dex-factory.clar"
+path = "contracts/dex/dex-factory.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-protocol"]
 
 [contracts.dia-oracle-adapter]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/integrations/dia-oracle-adapter.clar"
+path = "contracts/integrations/dia-oracle-adapter.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["oracle-trait"]
 
 [contracts.dimensional-core]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dimensional/dimensional-core.clar"
+path = "contracts/dimensional/dimensional-core.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["position-nft"]
 
 [contracts.dimensional-engine]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/dimensional-engine.clar"
+path = "contracts/core/dimensional-engine.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-protocol"]
 
 [contracts.dimensional-engine-interface]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/interfaces/dimensional-engine-interface.clar"
+path = "contracts/interfaces/dimensional-engine-interface.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.dimensional-oracle]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/oracle/dimensional-oracle.clar"
+path = "contracts/oracle/dimensional-oracle.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["defi-traits"]
 
 [contracts.dimensional-traits]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/dimensional-traits.clar"
+path = "contracts/traits/dimensional-traits.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.dim-oracle-automation]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dimensional/dim-oracle-automation.clar"
+path = "contracts/dimensional/dim-oracle-automation.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.dlc-bond]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/sbtc/dlc-bond.clar"
+path = "contracts/sbtc/dlc-bond.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["bond-traits"]
 
 [contracts.dlc-manager]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/sbtc/dlc-manager.clar"
+path = "contracts/sbtc/dlc-manager.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-access"]
 
 [contracts.dlc-orchestrator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/sbtc/dlc-orchestrator.clar"
+path = "contracts/sbtc/dlc-orchestrator.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.dual-stacking-orchestrator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/staking/dual-stacking-orchestrator.clar"
+path = "contracts/staking/dual-stacking-orchestrator.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.early-lp-rewards]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/rewards/early-lp-rewards.clar"
+path = "contracts/rewards/early-lp-rewards.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.economic-policy-engine]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/economic-policy-engine.clar"
+path = "contracts/core/economic-policy-engine.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.emergency-governance]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/emergency-governance.clar"
+path = "contracts/governance/emergency-governance.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.encoding]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/utils/encoding.clar"
+path = "contracts/utils/encoding.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.enhanced-circuit-breaker]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/security/enhanced-circuit-breaker.clar"
+path = "contracts/security/enhanced-circuit-breaker.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["security-monitoring"]
 
 [contracts.enhanced-governance-nft]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/enhanced-governance-nft.clar"
+path = "contracts/governance/enhanced-governance-nft.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-access", "sip-standards"]
 
 [contracts.enhanced-yield-strategy]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/yield/enhanced-yield-strategy.clar"
+path = "contracts/yield/enhanced-yield-strategy.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.enterprise-api]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/enterprise/enterprise-api.clar"
+path = "contracts/enterprise/enterprise-api.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["compliance-hooks"]
 
 [contracts.enterprise-facade]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/enterprise/enterprise-facade.clar"
+path = "contracts/enterprise/enterprise-facade.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.enterprise-traits]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/enterprise-traits.clar"
+path = "contracts/traits/enterprise-traits.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.exponentiation]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/math/exponentiation.clar"
+path = "contracts/math/exponentiation.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.external-oracle-adapter]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/oracle/external-oracle-adapter.clar"
+path = "contracts/oracle/external-oracle-adapter.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.federated-oracle-adapter]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/oracle/federated-oracle-adapter.clar"
+path = "contracts/oracle/federated-oracle-adapter.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["defi-traits"]
 
 [contracts.fee-orchestrator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/vaults/fee-orchestrator.clar"
+path = "contracts/vaults/fee-orchestrator.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.finance-metrics]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/monitoring/finance-metrics.clar"
+path = "contracts/monitoring/finance-metrics.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["security-monitoring"]
 
 [contracts.fiscal-intelligence]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/agents/fiscal-intelligence.clar"
+path = "contracts/agents/fiscal-intelligence.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.fiscal-orchestrator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/agents/fiscal-orchestrator.clar"
+path = "contracts/agents/fiscal-orchestrator.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["agent-risk", "bme-engine", "concentrated-liquidity-pool"]
 
 [contracts.founder-vault]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/treasury/founder-vault.clar"
+path = "contracts/treasury/founder-vault.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.founder-vesting]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/founder-vesting.clar"
+path = "contracts/core/founder-vesting.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.funding-rate-calculator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/funding-rate-calculator.clar"
+path = "contracts/core/funding-rate-calculator.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["core-traits"]
 
 [contracts.gauge-orchestrator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/gauge-orchestrator.clar"
+path = "contracts/governance/gauge-orchestrator.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["cxlp-token"]
 
 [contracts.governance]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dimensional/governance.clar"
+path = "contracts/dimensional/governance.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.governance-handover]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/governance-handover.clar"
+path = "contracts/governance/governance-handover.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.governance-signature-verifier]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/governance-signature-verifier.clar"
+path = "contracts/governance/governance-signature-verifier.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.governance-token]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance-token.clar"
+path = "contracts/governance-token.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["sip-standards"]
 
 [contracts.governance-traits]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/governance-traits.clar"
+path = "contracts/traits/governance-traits.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.halving]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/halving.clar"
+path = "contracts/halving.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.ico-offering]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/ico-offering.clar"
+path = "contracts/governance/ico-offering.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["regulatory-adapter"]
 
 [contracts.identity-badge]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/identity/identity-badge.clar"
+path = "contracts/identity/identity-badge.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.insurance-protection-nft]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/insurance/insurance-protection-nft.clar"
+path = "contracts/insurance/insurance-protection-nft.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.intent-solver-gateway]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/gateway/intent-solver-gateway.clar"
+path = "contracts/gateway/intent-solver-gateway.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["bme-engine", "conxian-intent-trait"]
 
 [contracts.interest-rate-model]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/lending/interest-rate-model.clar"
+path = "contracts/lending/interest-rate-model.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.jurisdictional-sharding]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/compliance/jurisdictional-sharding.clar"
+path = "contracts/compliance/jurisdictional-sharding.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.kyc-registry]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/identity/kyc-registry.clar"
+path = "contracts/identity/kyc-registry.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.legacy-adapter]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/migration/legacy-adapter.clar"
+path = "contracts/migration/legacy-adapter.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["migration-orchestrator"]
 
 [contracts.legal-representative-registry]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/legal-representative-registry.clar"
+path = "contracts/governance/legal-representative-registry.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.lending-orchestrator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/lending/lending-orchestrator.clar"
+path = "contracts/lending/lending-orchestrator.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["bme-engine", "revenue-automation"]
 
 [contracts.lending-protocol-governance]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/lending-protocol-governance.clar"
+path = "contracts/governance/lending-protocol-governance.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["governance-traits"]
 
 [contracts.liquidity-manager]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/liquidity-manager.clar"
+path = "contracts/dex/liquidity-manager.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["regulatory-adapter"]
 
 [contracts.liquidity-optimization-engine]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/liquidity-optimization-engine.clar"
+path = "contracts/dex/liquidity-optimization-engine.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-protocol", "dex-facade"]
 
 [contracts.liquidity-provider]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/liquidity-provider.clar"
+path = "contracts/dex/liquidity-provider.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-protocol"]
 
 [contracts.math-utilities]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/math/math-utilities.clar"
+path = "contracts/math/math-utilities.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.memory-pool-management]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/memory-pool-management.clar"
+path = "contracts/dex/memory-pool-management.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-protocol"]
 
 [contracts.mev-protection-nft]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/mev/mev-protection-nft.clar"
+path = "contracts/mev/mev-protection-nft.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.mev-protector]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/security/mev-protector.clar"
+path = "contracts/security/mev-protector.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.migration-orchestrator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/migration/migration-orchestrator.clar"
+path = "contracts/migration/migration-orchestrator.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.mock-circuit-breaker]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/test-helpers/mock-circuit-breaker.clar"
+path = "contracts/test-helpers/mock-circuit-breaker.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["oracle-aggregator"]
 
 [contracts.mock-csf-protocol]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/test-helpers/mock-csf-protocol.clar"
+path = "contracts/test-helpers/mock-csf-protocol.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-csf-trait"]
 
 [contracts.mock-proposal]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/test-helpers/mock-proposal.clar"
+path = "contracts/test-helpers/mock-proposal.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["governance-traits"]
 
 [contracts.mock-token]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/test-helpers/mock-token.clar"
+path = "contracts/test-helpers/mock-token.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.monitoring-dashboard]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/monitoring/monitoring-dashboard.clar"
+path = "contracts/monitoring/monitoring-dashboard.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-protocol"]
 
 [contracts.nakamoto-compatibility]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/utils/nakamoto-compatibility.clar"
+path = "contracts/utils/nakamoto-compatibility.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.nakamoto-constants]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/constants/nakamoto-constants.clar"
+path = "contracts/constants/nakamoto-constants.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.native-stacking-operator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/staking/native-stacking-operator.clar"
+path = "contracts/staking/native-stacking-operator.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.nft-marketplace]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/marketplace/nft-marketplace.clar"
+path = "contracts/marketplace/nft-marketplace.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.office-manager]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/office-manager.clar"
+path = "contracts/core/office-manager.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["core-traits", "operational-treasury"]
 
 [contracts.office-orchestrator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/office-orchestrator.clar"
+path = "contracts/core/office-orchestrator.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.operational-treasury]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/operational-treasury.clar"
+path = "contracts/core/operational-treasury.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.opex-vault]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/treasury/opex-vault.clar"
+path = "contracts/treasury/opex-vault.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["regulatory-adapter"]
 
 [contracts.ops-engine]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/ops-engine.clar"
+path = "contracts/core/ops-engine.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["swap-router"]
 
 [contracts.ops-loan-manager]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/enterprise/ops-loan-manager.clar"
+path = "contracts/enterprise/ops-loan-manager.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.optimization-helpers]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/helpers/optimization-helpers.clar"
+path = "contracts/helpers/optimization-helpers.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.oracle]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/oracle.clar"
+path = "contracts/dex/oracle.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["defi-traits"]
 
 [contracts.oracle-adapter-stub]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/oracle/oracle-adapter-stub.clar"
+path = "contracts/oracle/oracle-adapter-stub.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.oracle-aggregator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/oracle/oracle-aggregator.clar"
+path = "contracts/oracle/oracle-aggregator.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-protocol"]
 
 [contracts.order-book]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/orders/order-book.clar"
+path = "contracts/orders/order-book.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.order-orchestrator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/enterprise/order-orchestrator.clar"
+path = "contracts/enterprise/order-orchestrator.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.pausable]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/base/pausable.clar"
+path = "contracts/base/pausable.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.pausable-trait]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/pausable-trait.clar"
+path = "contracts/traits/pausable-trait.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.payment-forge]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/agents/payment-forge.clar"
+path = "contracts/agents/payment-forge.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["fiscal-vault-oracle"]
 
 [contracts.performance-optimizer]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/performance/performance-optimizer.clar"
+path = "contracts/performance/performance-optimizer.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.points-oracle]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/oracle/points-oracle.clar"
+path = "contracts/oracle/points-oracle.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-protocol"]
 
 [contracts.pool-factory]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/pools/pool-factory.clar"
+path = "contracts/pools/pool-factory.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.pool-registry]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/pools/pool-registry.clar"
+path = "contracts/pools/pool-registry.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.pool-template]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/pool-template.clar"
+path = "contracts/dex/pool-template.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-protocol"]
 
 [contracts.position-factory]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/position-factory.clar"
+path = "contracts/position-factory.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.position-factory-root]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/mev/position-factory-root.clar"
+path = "contracts/mev/position-factory-root.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.position-nft]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dimensional/position-nft.clar"
+path = "contracts/dimensional/position-nft.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["sip-standards"]
 
 [contracts.position-orchestrator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/position-orchestrator.clar"
+path = "contracts/core/position-orchestrator.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["core-traits"]
 
 [contracts.predictive-scaling-system]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/predictive-scaling-system.clar"
+path = "contracts/dex/predictive-scaling-system.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.price-stability-monitor]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/monitoring/price-stability-monitor.clar"
+path = "contracts/monitoring/price-stability-monitor.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["agent-risk"]
 
 [contracts.proof-of-reserves]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/security/proof-of-reserves.clar"
+path = "contracts/security/proof-of-reserves.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.proposal-engine]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/proposal-engine.clar"
+path = "contracts/governance/proposal-engine.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-access", "enhanced-governance-nft", "proposal-executor", "proposal-registry", "reputation-engine"]
 
 [contracts.proposal-engine-trait]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/proposal-engine-trait.clar"
+path = "contracts/governance/proposal-engine-trait.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.proposal-executor]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/proposal-executor.clar"
+path = "contracts/governance/proposal-executor.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["cxvg-token", "proposal-registry"]
 
 [contracts.proposal-registry]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/proposal-registry.clar"
+path = "contracts/governance/proposal-registry.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.protocol-invariant-monitor]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/protocol-invariant-monitor.clar"
+path = "contracts/dex/protocol-invariant-monitor.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.pyth-oracle-adapter]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/oracle/pyth-oracle-adapter.clar"
+path = "contracts/oracle/pyth-oracle-adapter.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["oracle-aggregator", "pyth-oracle-v4"]
 
 [contracts.pyth-oracle-v4]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/oracle/pyth-oracle-v4.clar"
+path = "contracts/oracle/pyth-oracle-v4.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["pyth-traits"]
 
 [contracts.pyth-traits]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/pyth-traits.clar"
+path = "contracts/traits/pyth-traits.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.queue-traits]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/queue-traits.clar"
+path = "contracts/traits/queue-traits.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.rate-limiter]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/security/rate-limiter.clar"
+path = "contracts/security/rate-limiter.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.rbac]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/utils/rbac.clar"
+path = "contracts/utils/rbac.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.rebalancing-rules]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/rebalancing-rules.clar"
+path = "contracts/dex/rebalancing-rules.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.redstone-oracle-adapter]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/integrations/redstone-oracle-adapter.clar"
+path = "contracts/integrations/redstone-oracle-adapter.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.redstone-traits]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/redstone-traits.clar"
+path = "contracts/traits/redstone-traits.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.referral-aggregator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/treasury/referral-aggregator.clar"
+path = "contracts/treasury/referral-aggregator.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.regulatory-adapter]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/compliance/regulatory-adapter.clar"
+path = "contracts/compliance/regulatory-adapter.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["core-traits", "kyc-registry"]
 
 [contracts.reputation-engine]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/reputation-engine.clar"
+path = "contracts/governance/reputation-engine.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["bns-stub"]
 
 [contracts.reputation-orchestrator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/reputation-orchestrator.clar"
+path = "contracts/governance/reputation-orchestrator.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.revenue-automation]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/treasury/revenue-automation.clar"
+path = "contracts/treasury/revenue-automation.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.revenue-distributor]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/treasury/revenue-distributor.clar"
+path = "contracts/treasury/revenue-distributor.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["bme-engine"]
 
 [contracts.risk-unit]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/risk-unit.clar"
+path = "contracts/core/risk-unit.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-access", "core-traits", "dimensional-core", "position-nft"]
 
 [contracts.route-manager]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/route-manager.clar"
+path = "contracts/dex/route-manager.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["regulatory-adapter"]
 
 [contracts.sab-election]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/sab-election.clar"
+path = "contracts/governance/sab-election.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.sbtc-vault]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/vaults/sbtc-vault.clar"
+path = "contracts/vaults/sbtc-vault.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["regulatory-adapter"]
 
 [contracts.security-monitoring]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/security-monitoring.clar"
+path = "contracts/traits/security-monitoring.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.self-launch-coordinator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/core/self-launch-coordinator.clar"
+path = "contracts/core/self-launch-coordinator.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.signed-data-base]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/signed-data-base.clar"
+path = "contracts/governance/signed-data-base.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.sip-standards]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/sip-standards.clar"
+path = "contracts/traits/sip-standards.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.swap-aggregator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/swap-aggregator.clar"
+path = "contracts/dex/swap-aggregator.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-csf-trait"]
 
 [contracts.swap-manager]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/swap-manager.clar"
+path = "contracts/dex/swap-manager.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["circuit-breaker", "conxian-protocol"]
 
 [contracts.swap-router]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/swap-router.clar"
+path = "contracts/dex/swap-router.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["bme-engine", "concentrated-liquidity-pool", "enhanced-circuit-breaker", "oracle-aggregator"]
 
 [contracts.switchboard-oracle-adapter]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/integrations/switchboard-oracle-adapter.clar"
+path = "contracts/integrations/switchboard-oracle-adapter.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.symmetry-governor]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/symmetry-governor.clar"
+path = "contracts/governance/symmetry-governor.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.tableland-sync]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/monitoring/tableland-sync.clar"
+path = "contracts/monitoring/tableland-sync.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.test-c4-helper]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/test-helpers/test-c4-helper.clar"
+path = "contracts/test-helpers/test-c4-helper.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.timelock]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/timelock.clar"
+path = "contracts/governance/timelock.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-access"]
 
 [contracts.token-emission-controller]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/yield/token-emission-controller.clar"
+path = "contracts/yield/token-emission-controller.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.token-system-coordinator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/tokens/token-system-coordinator.clar"
+path = "contracts/tokens/token-system-coordinator.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["regulatory-adapter"]
 
 [contracts.travel-rule-service]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/compliance/travel-rule-service.clar"
+path = "contracts/compliance/travel-rule-service.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.treasury-governance]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/treasury-governance.clar"
+path = "contracts/governance/treasury-governance.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["cxtr-token", "governance-traits", "operational-treasury"]
 
 [contracts.twap-oracle]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/integrations/twap-oracle.clar"
+path = "contracts/integrations/twap-oracle.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["oracle-trait"]
 
 [contracts.vault]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/dex/vault.clar"
+path = "contracts/dex/vault.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["circuit-breaker", "conxian-protocol"]
 
 [contracts.vault-trait]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/traits/vault-trait.clar"
+path = "contracts/traits/vault-trait.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.voting]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/voting.clar"
+path = "contracts/governance/voting.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["conxian-access"]
 
 [contracts.wormhole-handlers]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/interoperability/wormhole-handlers.clar"
+path = "contracts/interoperability/wormhole-handlers.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.wormhole-inbox]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/interoperability/wormhole-inbox.clar"
+path = "contracts/interoperability/wormhole-inbox.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.wormhole-outbox]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/interoperability/wormhole-outbox.clar"
+path = "contracts/interoperability/wormhole-outbox.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["revenue-distributor"]
 
 [contracts.yield-aggregator]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/vaults/yield-aggregator.clar"
+path = "contracts/vaults/yield-aggregator.clar"
 clarity_version = 4
 epoch = "latest"
 
 [contracts.yield-governance]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/governance/yield-governance.clar"
+path = "contracts/governance/yield-governance.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["cxs-token", "governance-traits"]
 
 [contracts.yield-optimizer]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/yield/yield-optimizer.clar"
+path = "contracts/yield/yield-optimizer.clar"
 clarity_version = 4
 epoch = "latest"
 depends_on = ["agent-risk"]
 
 [contracts.zkml-verifier]
-path = "/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/compliance/zkml-verifier.clar"
+path = "contracts/compliance/zkml-verifier.clar"
 clarity_version = 4
 epoch = "latest"

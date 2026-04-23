@@ -231,10 +231,8 @@
 ;; ============================================================================
 
 (define-public (record-zar-settlement (tx-id (buff 32)) (sender principal) (receiver principal) (amount-zar uint))
-  (let ((zar-currency-id (default-to u0 (map-get? currency-code-to-id "ZAR"))))
-    (if (is-eq zar-currency-id u0)
-      (err ERR_UNSUPPORTED_CURRENCY)
-      (record-global-settlement tx-id sender receiver zar-currency-id amount-zar))))
+  (let ((zar-currency-id (unwrap! (map-get? currency-code-to-id "ZAR") ERR_UNSUPPORTED_CURRENCY)))
+    (record-global-settlement tx-id sender receiver zar-currency-id amount-zar)))
 
 ;; ============================================================================
 ;; QUERY FUNCTIONS
