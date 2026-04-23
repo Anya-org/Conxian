@@ -50,7 +50,7 @@
     status: (string-ascii 20),
     max-leverage: uint,
     maintenance-margin: uint,
-    tenure-id: uint         ;; Nakamoto Tenure ID (block-height based)
+    tenure-id: uint         ;; Nakamoto Tenure ID (stacks-block-height based)
   }
 )
 
@@ -126,7 +126,7 @@
         status: "ACTIVE",
         max-leverage: leverage,
         maintenance-margin: (+ DEFAULT_MAINTENANCE_MARGIN (* leverage leverage)),
-        tenure-id: (/ block-height u10)
+        tenure-id: (/ stacks-block-height u10)
       })
 
       (var-set next-position-id (+ pos-id u1))

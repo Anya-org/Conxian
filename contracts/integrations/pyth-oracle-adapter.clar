@@ -29,7 +29,7 @@
 ;; @desc Fetches the price from Pyth (Normalized to 8 decimals)
 (define-public (get-price (asset principal))
   (let (
-      (tenure-id (/ block-height u10))
+      (tenure-id (/ stacks-block-height u10))
       (price-data u100000000)
     )
     (begin

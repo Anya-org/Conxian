@@ -85,7 +85,7 @@
       grant: grant,
       buyback: buyback,
       insurance: insurance,
-      timestamp: block-height
+      timestamp: stacks-block-height
     })
     (ok true)
   )

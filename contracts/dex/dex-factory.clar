@@ -59,7 +59,7 @@
   (let ((current-index (var-get csf-registry-count)))
     (begin
       (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) ERR_UNAUTHORIZED)
-      (map-set csf-registry protocol { name: name, registered-at: block-height, active: true })
+      (map-set csf-registry protocol { name: name, registered-at: stacks-block-height, active: true })
       (map-set csf-by-index (+ current-index u1) protocol)
       (var-set csf-registry-count (+ current-index u1))
       (print { event: "csf-protocol-registered", protocol: protocol, name: name })

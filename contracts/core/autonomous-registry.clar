@@ -187,7 +187,7 @@
 
         (map-set module-registry module (merge info {
             state: STATE_ACTIVE,
-            activation-block: block-height
+            activation-block: stacks-block-height
         }))
 
         (print { event: "module-activated", module: module })
@@ -277,7 +277,7 @@
 
         (map-set module-registry module (merge info {
             state: STATE_ACTIVE,
-            activation-block: block-height
+            activation-block: stacks-block-height
         }))
 
         (print { event: "module-self-activated", module: module })

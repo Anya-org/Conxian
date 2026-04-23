@@ -74,7 +74,7 @@
 )
 
 (define-read-only (get-current-epoch)
-    (/ block-height EPOCH_LENGTH)
+    (/ stacks-block-height EPOCH_LENGTH)
 )
 
 (define-read-only (sort-nominations (nominees (list 100 { principal: principal, votes: uint })))

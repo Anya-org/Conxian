@@ -28,6 +28,12 @@
   (liquidate-position (principal uint) (response bool uint))
 ))
 
+(define-trait position-manager-trait (
+  (open-position (principal principal uint uint bool) (response uint uint))
+  (close-position (principal uint) (response bool uint))
+  (liquidate-position (principal uint) (response bool uint))
+))
+
 (define-trait collateral-orchestrator-trait (
   (deposit-funds (uint <sip-010-ft-trait>) (response bool uint))
   (withdraw-funds (uint <sip-010-ft-trait>) (response bool uint))

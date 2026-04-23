@@ -39,7 +39,7 @@
 (define-public (create-proposal (start-time uint) (end-time uint))
     (let (
         (proposal-id (+ (var-get proposal-count) u1))
-        (tenure-id (/ block-height u10))
+        (tenure-id (/ stacks-block-height u10))
     )
         ;; Check Authentication (RBAC Governance Role)
         (asserts! (is-eq (contract-call? .conxian-access has-role tx-sender ROLE_GOVERNANCE) (ok true))

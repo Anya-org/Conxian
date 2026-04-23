@@ -62,15 +62,14 @@
 (define-public (execute-yield-intent (sovereign principal) (amount uint) (vault-to <vault-trait>) (token <sip-010-ft-trait>) (nonce uint) (signature (buff 65)))
   (let (
     (expected-nonce (default-to u0 (map-get? intent-nonces sovereign)))
-    (msg-hash (sha256 (unwrap-panic (to-consensus-buff? { amount: amount, vault: (contract-of vault-to), nonce: nonce }))))
     ;; Basic validation mapping signature to intent
     (valid-sig (is-eq (len signature) u65))
   )
     (asserts! valid-sig (err ERR_INVALID_INTENT))
     (asserts! (is-eq nonce expected-nonce) (err ERR_INVALID_INTENT))
-    
+
     (map-set intent-nonces sovereign (+ nonce u1))
-    
+
     ;; Execution - transfer from sovereign to vault
     (try! (contract-call? token transfer amount sovereign (contract-of vault-to) none))
     (print { event: "intent-executed", sovereign: sovereign, vault: (contract-of vault-to), amount: amount })
