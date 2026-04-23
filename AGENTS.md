@@ -1,6 +1,7 @@
 # Conxian AGENTS.md
 
 ## BOS Operational Standards
+ Clarity-version:4
 
 ### Sovereign-First Deployment Mandate
 All Conxian core contracts must use dynamic principals fetched via `operational-treasury.clar`. Any hardcoded `ST...` or `SP...` addresses in production contract source code are considered a build-break. Jules must flag and fix these during the planning phase.
