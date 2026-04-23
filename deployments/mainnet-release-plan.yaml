@@ -24,3 +24,35 @@ plan:
             parameters:
               - "'${SAB_DEPLOYER_MULTISIG}.alex-adapter"
               - '"ALEX Lab Mainnet"'
+        - contract-publish:
+            contract-name: clarity-bitcoin
+            expected-sender: "${SAB_DEPLOYER_MULTISIG}"
+            cost: 50000
+            path: "contracts/lib/clarity-bitcoin.clar"
+            anchor-block-only: true
+            clarity-version: 4
+            epoch: "3.0"
+        - contract-publish:
+            contract-name: referral-aggregator
+            expected-sender: "${SAB_DEPLOYER_MULTISIG}"
+            cost: 50000
+            path: "contracts/treasury/referral-aggregator.clar"
+            anchor-block-only: true
+            clarity-version: 4
+            epoch: "3.0"
+        - contract-publish:
+            contract-name: jurisdictional-sharding
+            expected-sender: "${SAB_DEPLOYER_MULTISIG}"
+            cost: 50000
+            path: "contracts/compliance/jurisdictional-sharding.clar"
+            anchor-block-only: true
+            clarity-version: 4
+            epoch: "3.0"
+        - contract-publish:
+            contract-name: governance-handover
+            expected-sender: "${SAB_DEPLOYER_MULTISIG}"
+            cost: 50000
+            path: "contracts/governance/governance-handover.clar"
+            anchor-block-only: true
+            clarity-version: 4
+            epoch: "3.0"

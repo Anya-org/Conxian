@@ -358,6 +358,13 @@ path = "contracts/traits/bond-traits.clar"
 [contracts.clarity-bitcoin]
 path = "contracts/lib/clarity-bitcoin.clar"
 
+[contracts.referral-aggregator]
+path = "contracts/treasury/referral-aggregator.clar"
+depends_on = ["sip-standards"]
+
+[contracts.jurisdictional-sharding]
+path = "contracts/compliance/jurisdictional-sharding.clar"
+
 [contracts.agent-treasury]
 path = "contracts/agents/agent-treasury.clar"
 depends_on = ["agent-risk", "cxd-treasury", "bme-engine", "sip-standards", "conxian-protocol", "security-monitoring", "finance-metrics"]

@@ -47,13 +47,18 @@ Conxian Finance is a multi-dimensional, Stacks-native automated monetary platfor
 - **Status**: COMPLETED.
 - **Details**: ZKML verification and Tableland state synchronization implemented.
 
-### 3.6. Phase 7: Sovereign Labor Attestations & DAO Transition
+### 3.6. Phase 7: Sovereign Labor Attestations, Multi-Currency Sharding & DAO Transition
 - **Status**: IMPLEMENTED (April 2026).
 - **Details**: 
   - **BitVM2 Labor Attestations**: 364-segment SNARK verification with disprove mechanism for Bitcoin-anchored labor proofs.
   - **5-5-5 Referral Engine**: Dynamic fee split (5% referrer, 5% referee bonus, 5% protocol health lock, 85% worker).
-  - **ZAR Jurisdictional Sharding**: Guardian: Sovereignty sharding for South African Rand settlements with SARB/SARS compliance.
+  - **Global Jurisdictional Sharding**: Expanded from ZAR to full multi-currency and multi-jurisdiction sharding (Guardian: Sovereignty). Supports all fiat (ISO 4217 codes) and tokens with robust regional compliance logic.
   - **SAB→DAO Handoff**: 144-block timelock governance transition with multi-sig wallet control matrix.
+
+## 4. Testing & Deployment (Current)
+- **Status**: Testnet verification in progress (April 2026).
+- **Details**: All Phase 7 contracts (`clarity-bitcoin.clar`, `referral-aggregator.clar`, `jurisdictional-sharding.clar`, `governance-handover.clar`) have passed strict syntax and type checks (`clarinet check`). Simulation plans (`testnet-plan.yaml` and `mainnet-release-plan.yaml`) are structured, and branch promotion checks (dev → testnet integration) align with the multi-repo strategy outlined in CON-486.
+
 
 ## 12. Recovery Registry (Failure Points)
 
