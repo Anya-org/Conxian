@@ -28,6 +28,7 @@
 * [Signed event envelope v1 (CON-472)](docs/protocols/SIGNED_EVENT_ENVELOPE_V1.md)
 * [Clarity 4 enclave authentication flow (CON-465)](docs/protocols/CLARITY4_ENCLAVE_AUTHENTICATION_FLOW.md)
 * [Fee-bucket implementation plan (CON-481)](docs/protocols/FEE_BUCKET_IMPLEMENTATION_PLAN.md)
+* [Economic rights map (canonical registry)](docs/protocols/ECONOMIC_RIGHTS_MAP.md)
 * [Public Visibility Audit Report](docs/PUBLIC_VISIBILITY_AUDIT_REPORT.md)
 * [CSF mainnet readiness gate](docs/CSF_MAINNET_READINESS_GATE.md)
 * [CSF-first operating sequence and proof gates](docs/CSF_FIRST_OPERATING_SEQUENCE_AND_PROOF_GATES.md)
@@ -64,6 +65,7 @@
   * [LSEG MCP Audit](Fiscal-Vault-Oracle/LSEG_MCP_AUDIT.md)
 * [Treasury Oracle](Fiscal-Vault-Oracle/SOVEREIGN_RUNWAY.md)
 * [BOS treasury and yield integration architecture (CON-438)](docs/architecture/BOS_TREASURY_AND_YIELD_INTEGRATION_ARCHITECTURE.md)
+* [BOS supply-chain verification and proof pipeline (CON-442)](docs/architecture/BOS_SUPPLY_CHAIN_VERIFICATION_AND_PROOF_PIPELINE.md)
 * [BOS preserve / enhance / replace gap matrix (CON-443)](docs/architecture/BOS_PRESERVE_ENHANCE_REPLACE_GAP_MATRIX.md)
 * [Arch Guardian](Nakamoto-Guardian/ANTI_FRAGILITY_LOOP.md)
 * [Grid Oracle (Agnostic)](cxn-grid-oracle/README.md)
@@ -83,6 +85,7 @@
 * [Autonomous Launch Specs](openspec/changes/csf-autonomous-launch/specs.md)
 
 ## 📦 Architecture
+
 
 * [Conxian Protocol](Conxian/docs/ARCHITECTURE.md)
 * [Three-lane runtime deployment architecture (CON-455)](docs/architecture/THREE_LANE_RUNTIME_DEPLOYMENT_ARCHITECTURE.md)

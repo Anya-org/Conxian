@@ -4,7 +4,7 @@ This is the single canonical gate artifact for deciding **Go / Conditional Go / 
 
 Canonical trackers:
 
-- Linear: https://linear.app/conxian-labs/issue/CON-129/csf-mainnet-readiness-gate
+- Sovereign Coordination Layer: https://sovereign.conxian.com/issue/CON-129/csf-mainnet-readiness-gate
 - GitHub (synced thread): https://github.com/Conxian/conxius-platform/issues/101
 
 Related operating order + cross-domain proof gates:
@@ -64,7 +64,7 @@ This repo pins the following dependency SHAs via submodules:
 ### Missing dependency references (must be reconciled)
 
 - As of the `2026-04-06` gate snapshot, the description of Linear issue `CON-129` referenced missing/deleted issue IDs: `CON-130`, `CON-64`, `CON-65`, `CON-79` (see `CON-375` for current status).
-- Track replacements and/or removals under: https://linear.app/conxian-labs/issue/CON-375/reconcile-deleted-issue-refs-in-con-129-con-130646579
+- Track replacements and/or removals under: https://sovereign.conxian.com/issue/CON-375/reconcile-deleted-issue-refs-in-con-129
 - Treat CON-375 as a **documentation blocker** for this gate until the replacements/removals are fully reconciled.
 
 ## Mainnet deployment stages (checklist)

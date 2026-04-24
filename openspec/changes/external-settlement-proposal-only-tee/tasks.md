@@ -6,7 +6,7 @@ Execution should be tracked in the relevant implementation repos (Gateway, Nexus
 
 ## Primary issue
 
-- https://linear.app/conxian-labs/issue/CON-162/enforce-proposal-only-external-settlement-triggers-in-tee
+- https://sovereign.conxian.com/issue/CON-162/enforce-proposal-only-external-settlement-triggers-in-tee
 
 ## Suggested implementation work-items
 

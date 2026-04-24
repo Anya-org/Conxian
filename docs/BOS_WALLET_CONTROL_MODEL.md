@@ -66,7 +66,7 @@ Splitting emergency into **fast pause** (2-of-3) vs **slow recovery** (3-of-5) i
 | --- | --- | --- | --- |
 | `BOOTSTRAP_OPERATOR_WALLET` | Operator (temporary) | Initial deployment and one-time initialization to create SAB/DAO control paths | Any ongoing automation signing; durable admin authority; durable treasury/payout custody |
 | `SAB_DEPLOYER_MULTISIG` | SAB multisig | Deploy/upgrade contracts; transfer ownership away from bootstrap; set admin principals; grant/revoke roles during migration | Routine treasury spending; signing day-to-day keeper ops; discretionary payouts |
-| `SAB_BOS_EXECUTOR_KEY` | SAB (system custody) | Keeper ops: epoch triggers, fee sweeps, reporting, and other explicitly allowlisted operational calls | Any admin/owner writes; any payout signing; acting as custody wallet |
+| `SAB_BOS_EXECUTOR_KEY` | SAB (system custody) | Keeper ops: epoch triggers, fee sweeps, reporting, explicitly allowlisted operational calls, and automated payments for approved Web3 SaaS subscriptions (e.g., Charmverse) and ZSE decentralized storage (e.g., Lit Protocol/IPFS). | Any admin/owner writes; any payout signing; acting as custody wallet |
 | `SAB_PAYOUT_MULTISIG` | SAB multisig | Sign outbound maintainer/bounty payouts only after payout enablement evidence | Receiving protocol fee sweeps; acting as treasury vault; uncapped/discretionary payouts |
 | `SAB_EMERGENCY_PAUSE_MULTISIG` | SAB multisig | Pause/isolate specific contracts or the protocol globally | Unpause; governance parameter changes; treasury withdrawals |
 | `SAB_EMERGENCY_RECOVERY_MULTISIG` | SAB multisig | Unpause (after review); rotate/revoke executor keys; revoke compromised roles; restore safe configuration | Routine ops; policy changes outside timelock |

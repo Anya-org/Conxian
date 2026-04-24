@@ -84,6 +84,7 @@ Thumbs.db
 
 # Developer scratch files and patches
 *.patch
+*_fix.py
 code_review_input.txt
 debug_regex.js
 test_match.js
