@@ -853,7 +853,7 @@ checksum = "c2459377285ad874054d797f3ccebf984978aa39129f6eafde5cdc8315b612f8"
 
 [[package]]
 name = "conxian-nexus"
-version = "0.5.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "axum",
@@ -2103,6 +2103,7 @@ dependencies = [
  "k256",
  "musig2",
  "pbkdf2",
+ "quick-xml",
  "rand 0.10.1",
  "rand_core 0.10.0",
  "reqwest 0.13.2",
@@ -2967,6 +2968,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "95067976aca6421a523e491fce939a3e65249bac4b977adee0ee9771568e8aa3"
 
 [[package]]
+name = "quick-xml"
+version = "0.38.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b66c2058c55a409d601666cffe35f04333cf1013010882cec174a7467cd4e21c"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
 name = "quinn"
 version = "0.11.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3620,7 +3630,7 @@ version = "0.28.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d24b59d129cdadea20aea4fb2352fa053712e5d713eee47d700cd4b2bc002f10"
 dependencies = [
- "bitcoin_hashes 0.12.0",
+ "bitcoin_hashes 0.13.1",
  "rand 0.8.5",
  "secp256k1-sys 0.9.2",
  "serde",

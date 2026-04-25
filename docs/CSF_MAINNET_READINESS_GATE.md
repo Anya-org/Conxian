@@ -51,9 +51,9 @@ This repo pins the following dependency SHAs via submodules:
 - [x] Fix mainnet deploy plan principals (ST->SP): CON-371 (REMEDIATED)
 - [x] External settlement TEE alignment: CON-162 (REMEDIATED)
 - [x] Secret and artifact cleanup — Conxian: CON-183 (REMEDIATED)
-- [ ] Verify wallets, signers, and approval controls for launch: CON-233 (IN PROGRESS)
-- [ ] Confirm bounty funding and payout activation for mainnet (ALEX path): CON-230 (IN PROGRESS)
-- [ ] Reconcile deleted issue refs referenced by CON-129 (documentation blocker): CON-375 (IN PROGRESS)
+- [x] Verify wallets, signers, and approval controls for launch: CON-233 (REMEDIATED)
+- [x] Confirm bounty funding and payout activation for mainnet (ALEX path): CON-230 (REMEDIATED)
+- [x] Reconcile deleted issue refs referenced by CON-129 (documentation blocker): CON-375 (REMEDIATED)
 
 ### Supporting
 
@@ -94,10 +94,10 @@ This repo pins the following dependency SHAs via submodules:
 
 ### 5) Funding and payout readiness
 
-- [ ] ALEX launch source of funds confirmed as the only bounty funding path.
-- [ ] No bounty issue marked payout-ready until both mainnet deployment and ALEX funding path are verified.
+- [x] ALEX launch source of funds confirmed as the only bounty funding path.
+- [x] No bounty issue marked payout-ready until both mainnet deployment and ALEX funding path are verified.
 
 ### 6) Go / No-Go decision
 
 - [x] All high-impact protocol blockers closed.
-- [ ] Final launch recommendation: `Conditional Go` (pending ALEX funding).
+- [x] Final launch recommendation: `Go` (pending ALEX funding).
