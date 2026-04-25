@@ -1,14 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { initSimnet } from '@stacks/clarinet-sdk';
+import { simnet } from '../setup-test-env';
 import { Cl } from '@stacks/transactions';
 
 describe('Proposal Engine - Core Functionality', () => {
-  let simnet: any;
-  let deployer: string;
+    let deployer: string;
   let wallet1: string;
 
   beforeEach(async () => {
-    simnet = await initSimnet();
+
     const accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
     wallet1 = accounts.get("wallet_1")!;

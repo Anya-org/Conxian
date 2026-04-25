@@ -53,7 +53,7 @@
 
 (define-private (check-circuit-breaker)
   (match (var-get circuit-breaker-var)
-    cb (if (contract-call? .circuit-breaker is-contract-paused (as-contract tx-sender))
+    cb (if (unwrap-panic (contract-call? .circuit-breaker is-contract-paused (as-contract tx-sender)))
          (err ERR_VAULT_NOT_ACTIVE)
          (ok true))
     (ok true)

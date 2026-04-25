@@ -1,13 +1,12 @@
 import { describe, expect, it, beforeAll } from 'vitest';
-import { initSimnet, type Simnet } from '@stacks/clarinet-sdk';
+import { simnet } from '../setup-test-env';
 import { Cl } from '@stacks/transactions';
 
-let simnet: Simnet;
 let deployer: string;
 
 describe('math-lib-concentrated', () => {
   beforeAll(async () => {
-    simnet = await initSimnet();
+
     deployer = simnet.getAccounts().get('deployer')!;
   });
 

@@ -1,13 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Cl } from '@stacks/transactions';
-import { initSimnet } from '@stacks/clarinet-sdk';
+import { simnet } from '../setup-test-env';
 
 describe('AYE PID Controller (Agent-Risk)', () => {
-  let simnet: any;
-  let deployer: string;
+    let deployer: string;
 
   beforeEach(async () => {
-    simnet = await initSimnet();
+
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
 

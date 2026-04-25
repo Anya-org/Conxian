@@ -17,6 +17,7 @@
 
 (define-read-only (is-paused) (var-get paused))
 (define-read-only (get-protocol-admin) (var-get contract-owner))
+(define-read-only (get-admin) (var-get contract-owner))
 
 (define-read-only (get-module (name (string-ascii 50)))
   (map-get? modules name)

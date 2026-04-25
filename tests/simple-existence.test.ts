@@ -1,9 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { initSimnet } from '@stacks/clarinet-sdk';
+import { simnet } from './setup-test-env';
 
 describe('Existence Check', () => {
   it('checks if core contracts are deployed', async () => {
-    const simnet = await initSimnet();
     const accounts = simnet.getAccounts();
     const deployer = accounts.get('deployer')!;
 

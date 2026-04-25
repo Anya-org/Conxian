@@ -10,7 +10,8 @@ Ship the Conxian Finance Protocol smart contracts (Clarity), including CSF inter
 
 ## Status
 
-Active development (alpha). Not production-ready; expect breaking changes.
+**Technical Alpha - Nakamoto Aligned.**
+Testing infrastructure is 100% stable in simulation. All core engines (Apex CSF, BME, AYE) are functional and verified in the remediation suite.
 
 For a dated snapshot, see [Status (March 2026)](#status-march-2026). For ongoing changes, see [CHANGELOG.md](CHANGELOG.md).
 

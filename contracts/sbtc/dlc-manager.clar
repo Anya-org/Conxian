@@ -38,7 +38,7 @@
 (define-private (is-authorized)
   (or
     (is-eq tx-sender (var-get admin))
-    (is-eq (contract-call? .conxian-access has-role tx-sender u4) (ok true))
+    (unwrap-panic (contract-call? .conxian-access has-role tx-sender u4))
   )
 )
 
