@@ -27,6 +27,10 @@
 * [Enterprise control & custody baseline (CON-460)](docs/protocols/ENTERPRISE_CUSTODY_BASELINE.md)
 * [Signed event envelope v1 (CON-472)](docs/protocols/SIGNED_EVENT_ENVELOPE_V1.md)
 * [Clarity 4 enclave authentication flow (CON-465)](docs/protocols/CLARITY4_ENCLAVE_AUTHENTICATION_FLOW.md)
+* [Session broker normative spec (CON-441)](docs/protocols/SESSION_BROKER_NORMATIVE_SPEC.md)
+* [Conxian L3 profile ADR (CON-441)](docs/architecture/CONXIAN_L3_PROFILE_ADR.md)
+* [BitVM2 & sBTC bridge target architecture (CON-464)](docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md)
+* [Compatibility matrix and acceptance gate checklist (CON-441)](docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md)
 * [Fee-bucket implementation plan (CON-481)](docs/protocols/FEE_BUCKET_IMPLEMENTATION_PLAN.md)
 * [Economic rights map (canonical registry)](docs/protocols/ECONOMIC_RIGHTS_MAP.md)
 * [Public Visibility Audit Report](docs/PUBLIC_VISIBILITY_AUDIT_REPORT.md)
@@ -81,6 +85,7 @@
   * [Datastore decision log](docs/SAB_DATASTORE_DECISION_LOG.md)
   * [Readiness gates](docs/SAB_MIGRATION_READINESS_GATES.md)
   * [Migration waves](docs/SAB_MIGRATION_WAVES.md)
+  * [Compatibility matrix and acceptance gate checklist (CON-441)](docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md)
 * [Trust & Proof Messaging (Public Surfaces)](docs/TRUST_AND_PROOF_MESSAGING.md)
 * [Autonomous Launch Specs](openspec/changes/csf-autonomous-launch/specs.md)
 
@@ -89,6 +94,8 @@
 
 * [Conxian Protocol](Conxian/docs/ARCHITECTURE.md)
 * [Three-lane runtime deployment architecture (CON-455)](docs/architecture/THREE_LANE_RUNTIME_DEPLOYMENT_ARCHITECTURE.md)
+* [Conxian L3 profile ADR (CON-441)](docs/architecture/CONXIAN_L3_PROFILE_ADR.md)
+* [BitVM2 & sBTC bridge target architecture (CON-464)](docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md)
 * [Conxian Nexus](conxian-nexus/docs/PRD.md)
 * [Conxian Gateway](conxian-gateway/PRD.md)
 * [Sovereign Shard Spec](docs/SOVEREIGN_SHARD_SPEC.md)
