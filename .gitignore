@@ -20,14 +20,17 @@ target/
 
 # Test and coverage
 test-results/
+**/test-results/
 playwright-report/
+**/playwright-report/
 coverage/
+**/coverage/
 .nyc_output/
+**/.nyc_output/
 tests/report.md
-/*.log
+*.log
 /*.txt
-/*.patch
-/*.bak
+*.bak
 
 # Firebase local state
 .firebase/
@@ -50,6 +53,10 @@ secrets.json
 
 # Generated audit artifacts
 /conxian-business/.generated/
+**/.generated/
+
+# Runtime session state artifacts
+**/active_session.json
 
 # Internal-only BOS runtime artifacts (public repo keeps `*.stub.json` instead)
 /conxian-business/BOS_STATE_MACHINE.json
