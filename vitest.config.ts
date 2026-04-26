@@ -2,15 +2,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    environment: "clarinet",
-    environmentOptions: {
-      clarinet: {
-        coverage: true,
-        coverageFilename: "coverage.lcov",
-        costs: true,
-        costsFilename: "costs-reports.json"
-      }
-    },
+    environment: "node",
     setupFiles: ["tests/setup-test-env.ts"],
     testTimeout: 300000,
     hookTimeout: 90000,

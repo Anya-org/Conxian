@@ -10,12 +10,12 @@
 ;; @desc Verify a ZKML proof payload for model attestation
 ;; @param model-id: The identifier for the ML model
 ;; @param input-hash: Hash of the input data
-;; @param proof: The ZK proof payload (e.g., Groth16/Plonk)
+;; @param proof: The ZK proof payload (e.g. Groth16/Plonk)
 (define-public (verify-proof (model-id (string-ascii 64)) (input-hash (buff 32)) (proof (buff 1024)))
   (begin
-    ;; In simulation, we verify the length of the proof to simulate verification
+    ;; In simulation we verify the length of the proof to simulate verification
     (asserts! (is-eq (len proof) u1024) ERR_INVALID_PROOF)
-    (print { event: "zkml-verified", model: model-id, input: input-hash })
+    (print { event: "zkml-verified" model: model-id input: input-hash })
     (ok true)
   )
 )
@@ -30,5 +30,5 @@
 )
 
 (define-read-only (get-protocol-status)
-  (ok { compliant: true, version: "v1.1.0-Apex", mode: "ZKML-ACTIVE" })
+  (ok { compliant: true version: "v1.1.0-Apex" mode: "ZKML-ACTIVE" })
 )

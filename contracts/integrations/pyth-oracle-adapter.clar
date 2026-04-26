@@ -29,15 +29,15 @@
 ;; @desc Fetches the price from Pyth (Normalized to 8 decimals)
 (define-public (get-price (asset principal))
   (let (
-      (tenure-id (/ stacks-block-height u10))
+      (tenure-id (/ block-height u10))
       (price-data u100000000)
     )
     (begin
       (print {
-        event: "pyth-price-update",
-        asset: asset,
-        price: price-data,
-        tenure-id: tenure-id,
+        event: "pyth-price-update"
+        asset: asset
+        price: price-data
+        tenure-id: tenure-id
       })
       (ok price-data)
     )

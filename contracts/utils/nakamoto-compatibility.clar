@@ -3,7 +3,7 @@
 ;; Provides fallbacks and helpers for Clarity 4 keywords.
 
 ;; @desc Get block time (Unix seconds)
-;; Shims to burn-block-height in simulation, but uses native in production.
+;; Shims to burn-block-height in simulation but uses native in production.
 (define-read-only (get-stacks-block-time)
     burn-block-height
 )
@@ -16,5 +16,5 @@
 
 ;; @desc Check if currently in Nakamoto epoch
 (define-read-only (is-nakamoto-epoch)
-    (>= burn-block-height u1) ;; In simulation, we assume Nakamoto is active.
+    (>= burn-block-height u1) ;; In simulation we assume Nakamoto is active.
 )

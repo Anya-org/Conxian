@@ -1,13 +1,12 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { Cl, cvToValue } from '@stacks/transactions';
-import { initSimnet, type Simnet } from '@stacks/clarinet-sdk';
+import { simnet } from '../setup-test-env';
 
 describe('Proposal Engine Security Audit', () => {
-  let simnet: Simnet;
-  let deployer: string;
+    let deployer: string;
 
   beforeAll(async () => {
-    simnet = await initSimnet();
+
     deployer = simnet.getAccounts().get('deployer')!;
   });
 

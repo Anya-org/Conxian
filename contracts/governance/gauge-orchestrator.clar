@@ -18,13 +18,13 @@
 
 ;; Data Maps
 (define-map pool-weights
-  { epoch: uint, pool: principal }
+  { epoch: uint pool: principal }
   uint
 )
 
 (define-map user-votes
-  { epoch: uint, user: principal }
-  { pool: principal, amount: uint }
+  { epoch: uint user: principal }
+  { pool: principal amount: uint }
 )
 
 (define-map total-epoch-votes uint uint)
@@ -43,11 +43,11 @@
     (begin
       (asserts! (>= balance amount) (err ERR_UNAUTHORIZED))
       ;; Record user vote
-      (map-set user-votes { epoch: epoch, user: voter } { pool: pool, amount: amount })
+      (map-set user-votes { epoch: epoch user: voter } { pool: pool amount: amount })
 
       ;; Update pool weight
-      (let ((current-weight (default-to u0 (map-get? pool-weights { epoch: epoch, pool: pool }))))
-        (map-set pool-weights { epoch: epoch, pool: pool } (+ current-weight amount))
+      (let ((current-weight (default-to u0 (map-get? pool-weights { epoch: epoch pool: pool }))))
+        (map-set pool-weights { epoch: epoch pool: pool } (+ current-weight amount))
       )
 
       ;; Update total epoch votes
@@ -55,7 +55,7 @@
         (map-set total-epoch-votes epoch (+ current-total amount))
       )
 
-      (print { event: "gauge-vote", epoch: epoch, pool: pool, amount: amount, voter: voter })
+      (print { event: "gauge-vote" epoch: epoch pool: pool amount: amount voter: voter })
       (ok true)
     )
   )
@@ -66,7 +66,7 @@
 ;; @returns (response bool uint)
 (define-public (advance-epoch)
   (begin
-    ;; Simplified: anyone can advance for now, or use automated agent
+    ;; Simplified: anyone can advance for now or use automated agent
     (var-set current-epoch (+ (var-get current-epoch) u1))
     (ok (var-get current-epoch))
   )
@@ -74,7 +74,7 @@
 
 ;; Read-only
 (define-read-only (get-pool-weight (epoch uint) (pool principal))
-  (default-to u0 (map-get? pool-weights { epoch: epoch, pool: pool }))
+  (default-to u0 (map-get? pool-weights { epoch: epoch pool: pool }))
 )
 
 (define-read-only (get-relative-weight (epoch uint) (pool principal))

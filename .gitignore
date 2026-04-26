@@ -79,3 +79,16 @@ android/.gradle
 android/local.properties
 android/captures
 .gradle
+
+# Environment noise
+node_modules/
+target/
+dist/
+build/
+.next/
+*.log
+.DS_Store
+__pycache__/
+coverage/
+.stacksorbit/
+.windsurf/

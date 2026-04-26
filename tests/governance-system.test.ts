@@ -1,14 +1,13 @@
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { initSimnet, type Simnet } from "@stacks/clarinet-sdk";
+import { simnet } from './setup-test-env';
 import { Cl } from "@stacks/transactions";
 
-let simnet: Simnet;
 let deployer: string;
 let wallet1: string;
 
 describe("Governance Tests", () => {
   beforeAll(async () => {
-    simnet = await initSimnet();
+
   });
 
   beforeEach(() => {

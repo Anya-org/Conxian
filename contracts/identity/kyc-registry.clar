@@ -7,12 +7,12 @@
 ;; Data Vars
 (define-data-var admin principal tx-sender)
 
-;; Map: User -> { tier: uint, flags: uint, country: (string-ascii 3) }
+;; Map: User -> { tier: uint flags: uint country: (string-ascii 3) }
 (define-map identity-status
   principal
   {
-    tier: uint,
-    flags: uint,
+    tier: uint
+    flags: uint
     country: (string-ascii 3)
   }
 )
@@ -26,8 +26,8 @@
   (begin
     (asserts! (is-admin) (err ERR_UNAUTHORIZED))
     (map-set identity-status user {
-      tier: tier,
-      flags: flags,
+      tier: tier
+      flags: flags
       country: country
     })
     (ok true)
@@ -45,7 +45,7 @@
 ;; Read-only Functions
 
 (define-read-only (get-identity-status (user principal))
-  (default-to { tier: u0, flags: u0, country: "???" } (map-get? identity-status user))
+  (default-to { tier: u0 flags: u0 country: "???" } (map-get? identity-status user))
 )
 
 (define-read-only (is-sanctioned (user principal))

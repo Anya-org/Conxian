@@ -1,13 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Simnet, initSimnet } from '@stacks/clarinet-sdk';
+import { simnet } from './setup-test-env';
 import { Cl } from '@stacks/transactions';
 
 describe('Temporary Sanity Test for ownable contract', () => {
-  let simnet: Simnet;
-  let deployer: string;
+    let deployer: string;
 
   beforeEach(async () => {
-    simnet = await initSimnet();
+
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
   });

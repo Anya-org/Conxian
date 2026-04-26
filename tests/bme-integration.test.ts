@@ -1,14 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Cl } from '@stacks/transactions';
-import { initSimnet } from '@stacks/clarinet-sdk';
+import { simnet } from './setup-test-env';
 
 describe('Sovereign BME Integration', () => {
-  let simnet: any;
-  let accounts: any;
+    let accounts: any;
   let deployer: string;
 
   beforeEach(async () => {
-    simnet = await initSimnet();
+
     accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
   });

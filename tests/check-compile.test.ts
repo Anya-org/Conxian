@@ -1,15 +1,10 @@
 
-import { describe, it, beforeAll } from 'vitest';
-import { initSimnet } from '@stacks/clarinet-sdk';
+import { describe, it } from 'vitest';
+import { initializeSimnet } from './setup-test-env';
 
 describe('Compilation Check', () => {
   it('should initialize simnet without errors', async () => {
-    try {
-      const simnet = await initSimnet();
-      console.log('Simnet initialized successfully');
-    } catch (e) {
-      console.error('Simnet initialization failed:', e);
-      throw e;
-    }
+    await initializeSimnet();
+    console.log('Simnet initialized successfully');
   }, 300000);
 });

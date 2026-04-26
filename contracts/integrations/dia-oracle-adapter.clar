@@ -1,7 +1,7 @@
 ;; dia-oracle-adapter.clar
 ;; Conxian Oracle Standard: DIA Data Adapter
 ;; Implements oracle-trait for DIA decentralized price feeds
-(impl-trait .oracle-trait.oracle-trait)
+(impl-trait .defi-traits.oracle-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u6100)
@@ -15,8 +15,8 @@
 (define-map dia-prices
     principal ;; Asset
     {
-        price: uint,
-        timestamp: uint,
+        price: uint
+        timestamp: uint
         signature: (buff 65)
     }
 )
@@ -25,7 +25,7 @@
 (define-read-only (get-price (asset principal))
   (match (map-get? dia-prices asset)
     price-data (ok (get price price-data))
-    none (err ERR_NO_PRICE)
+    (err ERR_NO_PRICE)
   )
 )
 
@@ -33,7 +33,7 @@
   (get-price asset)
 )
 
-(define-read-only (get-name ())
+(define-read-only (get-name)
   (ok "DIA Oracle Adapter")
 )
 
@@ -44,11 +44,11 @@
     (begin
         (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
         (map-set dia-prices asset {
-            price: price,
-            timestamp: burn-block-height,
+            price: price
+            timestamp: burn-block-height
             signature: signature
         })
-        (print { event: "dia-price-update", asset: asset, price: price })
+        (print { event: "dia-price-update" asset: asset price: price })
         (ok true)
     )
 )

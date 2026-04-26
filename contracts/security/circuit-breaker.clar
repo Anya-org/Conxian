@@ -41,7 +41,7 @@
   )
 )
 
-;; @desc Triggers a veto. If quorum is reached, the system enters a vetoed state locking admin functions.
+;; @desc Triggers a veto. If quorum is reached the system enters a vetoed state locking admin functions.
 (define-public (trigger-veto)
   (let ((current-count (var-get veto-count)))
     (asserts! (not (default-to false (map-get? veto-signatures tx-sender))) ERR_ALREADY_VETOED)
@@ -57,7 +57,7 @@
   )
 )
 
-;; @desc Resolves an active veto, assuming the issue is handled via ExecutorDAO overrides or emergency updates.
+;; @desc Resolves an active veto assuming the issue is handled via ExecutorDAO overrides or emergency updates.
 (define-public (resolve-veto)
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
