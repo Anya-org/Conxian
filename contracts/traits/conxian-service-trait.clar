@@ -15,9 +15,9 @@
     ()
     (
       response       {
-      uptime: uint,
-      error-rate: uint,
-      last-heartbeat: uint,
+      uptime: uint
+      error-rate: uint
+      last-heartbeat: uint
     }
       uint
     )

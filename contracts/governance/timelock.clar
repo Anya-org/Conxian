@@ -6,7 +6,7 @@
 ;; Aligned with Nakamoto 5s block times
 ;; Decentralized: Uses Unified RBAC via .conxian-access
 ;;
-;; REPAIRED: Added proper proposal execution, admin transfer, and sovereign handoff support
+;; REPAIRED: Added proper proposal execution admin transfer and sovereign handoff support
 
 (use-trait proposal-trait .governance-traits.proposal-trait)
 
@@ -31,12 +31,12 @@
 (define-data-var admin principal tx-sender)
 (define-data-var governance-contract principal tx-sender)
 
-;; Queued proposals: principal -> {eta, executed}
+;; Queued proposals: principal -> {eta executed}
 (define-map queued-proposals
     principal
     {
-        eta: uint,
-        executed: bool,
+        eta: uint
+        executed: bool
         target: principal
     }
 )
@@ -44,27 +44,27 @@
 ;; Events
 (define-private (emit-queued (proposal principal) (eta uint) (target principal))
     (print {
-        event: "proposal-queued",
-        proposal: proposal,
-        eta: eta,
-        target: target,
+        event: "proposal-queued"
+        proposal: proposal
+        eta: eta
+        target: target
         timestamp: burn-block-height
     })
 )
 
 (define-private (emit-executed (proposal principal) (target principal))
     (print {
-        event: "proposal-executed",
-        proposal: proposal,
-        target: target,
+        event: "proposal-executed"
+        proposal: proposal
+        target: target
         timestamp: burn-block-height
     })
 )
 
 (define-private (emit-cancelled (proposal principal))
     (print {
-        event: "proposal-cancelled",
-        proposal: proposal,
+        event: "proposal-cancelled"
+        proposal: proposal
         timestamp: burn-block-height
     })
 )
@@ -105,8 +105,8 @@
         
         (let ((eta (+ burn-block-height (var-get delay))))
             (map-set queued-proposals proposal-principal {
-                eta: eta,
-                executed: false,
+                eta: eta
+                executed: false
                 target: target
             })
             (emit-queued proposal-principal eta target)
@@ -158,7 +158,7 @@
     )
 )
 
-;; Sovereign Handoff: Transfer admin to another principal (e.g., DAO or new timelock)
+;; Sovereign Handoff: Transfer admin to another principal (e.g. DAO or new timelock)
 
 ;; @desc Transfer admin
 ;; @returns (response bool uint)
@@ -167,9 +167,9 @@
         (asserts! (is-admin) (err ERR_UNAUTHORIZED))
         (var-set admin new-admin)
         (print {
-            event: "admin-transferred",
-            old-admin: tx-sender,
-            new-admin: new-admin,
+            event: "admin-transferred"
+            old-admin: tx-sender
+            new-admin: new-admin
             timestamp: burn-block-height
         })
         (ok true)
@@ -204,9 +204,9 @@
 ;; Verify this timelock is ready for sovereign handoff
 (define-read-only (is-sovereign-ready)
     {
-        admin: (var-get admin),
-        has-valid-delay: (and (>= (var-get delay) MIN_DELAY) (<= (var-get delay) MAX_DELAY)),
-        governance-contract: (var-get governance-contract),
+        admin: (var-get admin)
+        has-valid-delay: (and (>= (var-get delay) MIN_DELAY) (<= (var-get delay) MAX_DELAY))
+        governance-contract: (var-get governance-contract)
         timestamp: burn-block-height
     }
 )

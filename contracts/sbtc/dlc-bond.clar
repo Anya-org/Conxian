@@ -19,12 +19,12 @@
 (define-map bonds
   uint
   {
-    issuer: principal,
-    token: principal,
-    principal-amount: uint,
-    coupon-rate: uint,
-    maturity: uint,
-    created-at: uint,
+    issuer: principal
+    token: principal
+    principal-amount: uint
+    coupon-rate: uint
+    maturity: uint
+    created-at: uint
     status: (string-ascii 20)
   }
 )
@@ -46,16 +46,16 @@
     (begin
       (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
       (map-set bonds bond-id {
-        issuer: tx-sender,
-        token: token,
-        principal-amount: principal-amount,
-        coupon-rate: coupon-rate,
-        maturity: maturity,
-        created-at: burn-block-height,
+        issuer: tx-sender
+        token: token
+        principal-amount: principal-amount
+        coupon-rate: coupon-rate
+        maturity: maturity
+        created-at: burn-block-height
         status: "ACTIVE"
       })
       (var-set bond-nonce bond-id)
-      (print { event: "bond-initialized", id: bond-id, amount: principal-amount, maturity: maturity })
+      (print { event: "bond-initialized" id: bond-id amount: principal-amount maturity: maturity })
       (ok bond-id)
     )
   )
@@ -69,7 +69,7 @@
     (coupon-amount (/ (* (get principal-amount bond) (get coupon-rate bond)) u10000))
   )
     (begin
-      (print { event: "coupon-distributed", id: bond-id, amount: coupon-amount })
+      (print { event: "coupon-distributed" id: bond-id amount: coupon-amount })
       (ok true)
     )
   )
@@ -86,7 +86,7 @@
       (asserts! (not (is-eq (get status bond) "REDEEMED")) ERR_ALREADY_REDEEMED)
 
       (map-set bonds bond-id (merge bond { status: "REDEEMED" }))
-      (print { event: "bond-redeemed", id: bond-id })
+      (print { event: "bond-redeemed" id: bond-id })
       (ok true)
     )
   )
@@ -107,7 +107,7 @@
 
 ;; @desc Get protocol status for DLC bonds
 (define-read-only (get-protocol-status)
-  (ok { compliant: true, version: "v1.1.0-Apex", active-bonds: (var-get bond-nonce) })
+  (ok { compliant: true version: "v1.1.0-Apex" active-bonds: (var-get bond-nonce) })
 )
 
 ;; --- Admin ---

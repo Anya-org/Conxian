@@ -14,7 +14,7 @@
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
     (var-set table-id table)
-    (print { event: "tableland-sync", table: table, statement: statement })
+    (print { event: "tableland-sync" table: table statement: statement })
     (ok true)
   )
 )
@@ -29,5 +29,5 @@
 )
 
 (define-read-only (get-protocol-status)
-  (ok { compliant: true, version: "v1.1.0-Apex", status: "SYNC-READY" })
+  (ok { compliant: true version: "v1.1.0-Apex" status: "SYNC-READY" })
 )

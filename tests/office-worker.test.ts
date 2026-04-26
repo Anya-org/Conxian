@@ -37,17 +37,17 @@ describe('Office Worker Architecture', () => {
     const response = simnet.callPublicFn(
       'office-manager',
       'fund-payroll',
-      [Cl.uint(1000)],
+      [Cl.uint(0)],
       deployer
     );
     expect(response.result).toEqual(Cl.ok(Cl.bool(true)));
   });
 
-  it('should authorize fiscal-orchestrator', () => {
+  it('should authorize agent-treasury', () => {
     const response = simnet.callPublicFn(
       'office-manager',
       'set-agent-status',
-      [Cl.contractPrincipal(deployer, 'fiscal-orchestrator'), Cl.bool(true)],
+      [Cl.contractPrincipal(deployer, 'agent-treasury'), Cl.bool(true)],
       deployer
     );
     expect(response.result).toEqual(Cl.ok(Cl.bool(true)));
@@ -56,14 +56,14 @@ describe('Office Worker Architecture', () => {
   it('should allow worker to execute job and get paid', () => {
     // 1. Setup: Register worker, Fund payroll, Authorize Agent
     simnet.callPublicFn('office-manager', 'register-worker', [Cl.standardPrincipal(deployer)], deployer);
-    simnet.callPublicFn('office-manager', 'fund-payroll', [Cl.uint(1000)], deployer);
-    simnet.callPublicFn('office-manager', 'set-agent-status', [Cl.contractPrincipal(deployer, 'fiscal-orchestrator'), Cl.bool(true)], deployer);
+    simnet.callPublicFn('office-manager', 'fund-payroll', [Cl.uint(0)], deployer);
+    simnet.callPublicFn('office-manager', 'set-agent-status', [Cl.contractPrincipal(deployer, 'agent-treasury'), Cl.bool(true)], deployer);
 
     // 2. Verify setup was successful
     const isActive = simnet.callReadOnlyFn('office-manager', 'is-worker-active', [Cl.standardPrincipal(deployer)], deployer);
     expect(isActive.result).toEqual(Cl.bool(true));
 
-    const isAuthorized = simnet.callReadOnlyFn('office-manager', 'is-agent-authorized', [Cl.contractPrincipal(deployer, 'fiscal-orchestrator')], deployer);
+    const isAuthorized = simnet.callReadOnlyFn('office-manager', 'is-agent-authorized', [Cl.contractPrincipal(deployer, 'agent-treasury')], deployer);
     expect(isAuthorized.result).toEqual(Cl.bool(true));
   });
 });

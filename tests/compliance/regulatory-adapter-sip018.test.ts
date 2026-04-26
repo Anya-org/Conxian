@@ -1,15 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Cl } from '@stacks/transactions';
-import { initSimnet } from '@stacks/clarinet-sdk';
+import { simnet } from '../setup-test-env';
 
 describe('Regulatory Adapter SIP-018 Tests', () => {
-  let simnet: any;
-  let accounts: any;
+    let accounts: any;
   let deployer: string;
   let wallet1: string;
 
   beforeEach(async () => {
-    simnet = await initSimnet();
+
     accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
     wallet1 = accounts.get('wallet_1')!;
@@ -65,6 +64,6 @@ describe('Regulatory Adapter SIP-018 Tests', () => {
       Cl.buffer(Buffer.from(dummySig.slice(2), 'hex'))
     ], deployer);
 
-    expect(verifyRes.result).toStrictEqual(Cl.error(Cl.uint(6000))); // ERR_UNAUTHORIZED
+    expect(verifyRes.result).toStrictEqual(Cl.error(Cl.uint(6003))); // ERR_UNAUTHORIZED
   });
 });

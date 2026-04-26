@@ -10,89 +10,66 @@
 (define-constant ERR_NOT_FOUND (err u404))
 
 ;; Roles & Config
-(define-data-var admin principal tx-sender)
-(define-data-var worker-share-bps uint u8500) ;; 85%
+(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var worker-share-bps uint u9500) ;; 95%
 (define-data-var referrer-share-bps uint u500) ;; 5%
-(define-data-var referee-bonus-bps uint u500) ;; 5%
-(define-data-var health-lock-bps uint u500) ;; 5%
-(define-data-var health-lock-address principal tx-sender) ;; Placeholder for protocol health lock
 
 ;; Mapping of Referrals: Worker -> Referrer
 (define-map worker-referrals principal principal)
 
-;; @desc Register a referrer for a specific worker (referee)
+;; @desc Register a referrer for a specific worker
 (define-public (register-referral (worker principal) (referrer principal))
     (begin
         (asserts! (or (is-eq tx-sender worker) (is-eq tx-sender (var-get admin))) ERR_UNAUTHORIZED)
         (map-set worker-referrals worker referrer)
-        (print { event: "referral-registered", worker: worker, referrer: referrer })
+        (print { event: "referral-registered" worker: worker referrer: referrer })
         (ok true)
     )
 )
 
-;; @desc Disburse STX payment using 5-5-5 split (5% Referrer, 5% Referee, 5% Health Lock)
+;; @desc Disburse STX payment splitting between worker and their referrer
 (define-public (disburse-stx-payment (worker principal) (amount uint))
     (let (
         (referrer (map-get? worker-referrals worker))
-        (has-referrer (is-some referrer))
-        (referrer-fee (if has-referrer (/ (* amount (var-get referrer-share-bps)) u10000) u0))
-        (referee-bonus (if has-referrer (/ (* amount (var-get referee-bonus-bps)) u10000) u0))
-        (health-lock-fee (if has-referrer (/ (* amount (var-get health-lock-bps)) u10000) u0))
-        (worker-net (if has-referrer 
-                        (- amount (+ referrer-fee health-lock-fee)) ;; Worker gets the remainder (85% + 5% bonus = 90%, but we just subtract the fees that go elsewhere)
-                        amount))
+        (referrer-fee (if (is-some referrer) (/ (* amount (var-get referrer-share-bps)) u10000) u0))
+        (worker-net (- amount referrer-fee))
     )
         (begin
             (asserts! (> amount u0) ERR_INVALID_AMOUNT)
-            
-            ;; Pay Worker (Referee) - They get their base share + referee bonus if referred
+            ;; Pay Worker
             (unwrap! (stx-transfer? worker-net tx-sender worker) ERR_TRANSFER_FAILED)
             
-            ;; Pay Referrer and Health Lock if referred
-            (if has-referrer
-                (begin
-                    (unwrap! (stx-transfer? referrer-fee tx-sender (unwrap! referrer ERR_NOT_FOUND)) ERR_TRANSFER_FAILED)
-                    (unwrap! (stx-transfer? health-lock-fee tx-sender (var-get health-lock-address)) ERR_TRANSFER_FAILED)
-                    true
-                )
+            ;; Pay Referrer if exists
+            (if (is-some referrer)
+                (unwrap! (stx-transfer? referrer-fee tx-sender (unwrap! referrer ERR_NOT_FOUND)) ERR_TRANSFER_FAILED)
                 true
             )
             
-            (print { event: "payment-disbursed-stx-555", worker: worker, amount: worker-net, referrer: referrer, referrer-fee: referrer-fee, health-lock-fee: health-lock-fee })
+            (print { event: "payment-disbursed-stx" worker: worker amount: worker-net referrer: referrer referrer-fee: referrer-fee })
             (ok true)
         )
     )
 )
 
-;; @desc Disburse SIP-010 token payment using 5-5-5 split
+;; @desc Disburse SIP-010 token payment splitting between worker and their referrer
 (define-public (disburse-sip010-payment (worker principal) (amount uint) (token <sip-010-ft-trait>))
     (let (
         (referrer (map-get? worker-referrals worker))
-        (has-referrer (is-some referrer))
-        (referrer-fee (if has-referrer (/ (* amount (var-get referrer-share-bps)) u10000) u0))
-        (referee-bonus (if has-referrer (/ (* amount (var-get referee-bonus-bps)) u10000) u0))
-        (health-lock-fee (if has-referrer (/ (* amount (var-get health-lock-bps)) u10000) u0))
-        (worker-net (if has-referrer 
-                        (- amount (+ referrer-fee health-lock-fee))
-                        amount))
+        (referrer-fee (if (is-some referrer) (/ (* amount (var-get referrer-share-bps)) u10000) u0))
+        (worker-net (- amount referrer-fee))
     )
         (begin
             (asserts! (> amount u0) ERR_INVALID_AMOUNT)
-            
             ;; Pay Worker
             (unwrap! (contract-call? token transfer worker-net tx-sender worker none) ERR_TRANSFER_FAILED)
             
-            ;; Pay Referrer and Health Lock
-            (if has-referrer
-                (begin
-                    (unwrap! (contract-call? token transfer referrer-fee tx-sender (unwrap! referrer ERR_NOT_FOUND) none) ERR_TRANSFER_FAILED)
-                    (unwrap! (contract-call? token transfer health-lock-fee tx-sender (var-get health-lock-address) none) ERR_TRANSFER_FAILED)
-                    true
-                )
+            ;; Pay Referrer if exists
+            (if (is-some referrer)
+                (unwrap! (contract-call? token transfer referrer-fee tx-sender (unwrap! referrer ERR_NOT_FOUND) none) ERR_TRANSFER_FAILED)
                 true
             )
             
-            (print { event: "payment-disbursed-sip010-555", worker: worker, amount: worker-net, referrer: referrer, referrer-fee: referrer-fee, health-lock-fee: health-lock-fee })
+            (print { event: "payment-disbursed-sip010" worker: worker amount: worker-net referrer: referrer referrer-fee: referrer-fee })
             (ok true)
         )
     )

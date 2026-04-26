@@ -30,59 +30,59 @@
 (define-map swap-routes
   { route-id: (buff 32) }
   {
-    token-in: principal,
-    token-out: principal,
-    pools: (list 5 uint), ;; Changed from principal to uint for Singleton IDs
-    estimated-output: uint,
-    slippage: uint,
-    gas-estimate: uint,
-    confidence: uint,
-    created-at: uint,
-    last-used: uint,
-    active: bool,
+    token-in: principal
+    token-out: principal
+    pools: (list 5 uint) ;; Changed from principal to uint for Singleton IDs
+    estimated-output: uint
+    slippage: uint
+    gas-estimate: uint
+    confidence: uint
+    created-at: uint
+    last-used: uint
+    active: bool
   }
 )
 
 (define-map swap-executions
   { swap-id: (buff 32) }
   {
-    route-id: (buff 32),
-    user: principal,
-    token-in: principal,
-    amount-in: uint,
-    token-out: principal,
-    amount-out: uint,
-    actual-slippage: uint,
-    gas-used: uint,
-    timestamp: uint,
-    success: bool,
-    error: (optional (string-ascii 256)),
+    route-id: (buff 32)
+    user: principal
+    token-in: principal
+    amount-in: uint
+    token-out: principal
+    amount-out: uint
+    actual-slippage: uint
+    gas-used: uint
+    timestamp: uint
+    success: bool
+    error: (optional (string-ascii 256))
   }
 )
 
 (define-map user-swap-history
   { user: principal }
   {
-    total-swaps: uint,
-    total-volume: uint,
-    successful-swaps: uint,
-    last-swap: uint,
+    total-swaps: uint
+    total-volume: uint
+    successful-swaps: uint
+    last-swap: uint
     favorite-pairs: (list 10 {
-      token-in: principal,
-      token-out: principal,
-    }),
+      token-in: principal
+      token-out: principal
+    })
   }
 )
 
 (define-map pool-performance
   { pool: principal }
   {
-    total-swaps: uint,
-    successful-swaps: uint,
-    total-volume: uint,
-    average-slippage: uint,
-    last-swap: uint,
-    performance-score: uint,
+    total-swaps: uint
+    successful-swaps: uint
+    total-volume: uint
+    average-slippage: uint
+    last-swap: uint
+    performance-score: uint
   }
 )
 
@@ -90,14 +90,14 @@
   { token-pair: (string-ascii 64) }
   {
     routes: (list 5 {
-        route-id: (buff 32),
-        pools: (list 5 uint), ;; Changed from principal to uint
-        estimated-output: uint,
-        slippage: uint,
-        confidence: uint,
-      }),
-    last-updated: uint,
-    cache-hits: uint,
+        route-id: (buff 32)
+        pools: (list 5 uint) ;; Changed from principal to uint
+        estimated-output: uint
+        slippage: uint
+        confidence: uint
+      })
+    last-updated: uint
+    cache-hits: uint
   }
 )
 
@@ -109,7 +109,7 @@
 
 (define-private (check-circuit-breaker)
   (match (var-get circuit-breaker)
-    cb (if (contract-call? .circuit-breaker is-contract-paused (as-contract tx-sender))
+    cb (if (unwrap-panic (contract-call? .circuit-breaker is-contract-paused (as-contract tx-sender)))
          (err ERR_SWAP_FAILED)
          (ok true))
     (ok true)
@@ -245,29 +245,29 @@
 
               ;; Update successful swap record
               (map-set swap-executions { swap-id: swap-id } {
-                route-id: route-id,
-                user: tx-sender,
-                token-in: (get token-in route),
-                amount-in: amount-in,
-                token-out: (get token-out route),
-                amount-out: amount-out,
-                actual-slippage: u100,
-                gas-used: u50000,
-                timestamp: burn-block-height,
-                success: true,
-                error: none,
+                route-id: route-id
+                user: tx-sender
+                token-in: (get token-in route)
+                amount-in: amount-in
+                token-out: (get token-out route)
+                amount-out: amount-out
+                actual-slippage: u100
+                gas-used: u50000
+                timestamp: burn-block-height
+                success: true
+                error: none
               })
 
               ;; Update global counters
               (var-set total-swaps (+ (var-get total-swaps) u1))
               (var-set total-volume (+ (var-get total-volume) amount-in))
 
-              (print { event: "swap-executed", swap-id: swap-id, user: tx-sender, amount-in: amount-in, amount-out: amount-out })
+              (print { event: "swap-executed" swap-id: swap-id user: tx-sender amount-in: amount-in amount-out: amount-out })
               (ok {
-                swap-id: swap-id,
-                amount-out: amount-out,
-                actual-slippage: u100,
-                gas-used: u50000,
+                swap-id: swap-id
+                amount-out: amount-out
+                actual-slippage: u100
+                gas-used: u50000
               })
             )
           )
@@ -279,10 +279,10 @@
 
 ;; @desc Batch execute swaps (removed lambda for compatibility)
 (define-public (batch-execute-swaps (swaps (list 10 {
-    route-id: (buff 32),
-    amount-in: uint,
-    min-amount-out: uint,
-    max-slippage: uint,
+    route-id: (buff 32)
+    amount-in: uint
+    min-amount-out: uint
+    max-slippage: uint
   })))
   (begin
     (asserts! (<= (len swaps) u10) (err ERR_INVALID_SWAP))
@@ -291,10 +291,10 @@
 )
 
 (define-private (batch-swap-helper (swap {
-    route-id: (buff 32),
-    amount-in: uint,
-    min-amount-out: uint,
-    max-slippage: uint,
+    route-id: (buff 32)
+    amount-in: uint
+    min-amount-out: uint
+    max-slippage: uint
   }) (result uint))
   (match (execute-swap (get route-id swap) (get amount-in swap) (get min-amount-out swap) (get max-slippage swap))
     okv (+ result u1)
@@ -352,14 +352,14 @@
     (amount-in uint)
   )
   (begin
-    ;; In practice, would use graph traversal. Returning direct route stub.
+    ;; In practice would use graph traversal. Returning direct route stub.
     (ok {
-      route-id: (sha256 0x00),
-      pools: (list u1), ;; Stub: Pool ID 1
-      estimated-output: amount-in,
-      slippage: u100,
-      confidence: u9500,
-      from-cache: false,
+      route-id: (sha256 0x00)
+      pools: (list u1) ;; Stub: Pool ID 1
+      estimated-output: amount-in
+      slippage: u100
+      confidence: u9500
+      from-cache: false
     })
   )
 )

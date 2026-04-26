@@ -10,10 +10,13 @@ describe("ALEX CSF Integration", () => {
     simnet = await initializeSimnet();
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
+
+    // Mint tokens for testing
+    simnet.callPublicFn("cxd-token", "mint", [Cl.uint(100000000), Cl.principal(deployer)], deployer);
+    simnet.callPublicFn("mock-token", "mint", [Cl.uint(100000000), Cl.principal(deployer + ".swap-router")], deployer);
   });
 
   it("should allow registering ALEX adapter as a CSF protocol", () => {
-    const admin = simnet.callReadOnlyFn("conxian-protocol", "get-protocol-admin", [], deployer).result;
     const registerCall = simnet.callPublicFn(
       "dex-factory",
       "register-csf-protocol",
@@ -34,16 +37,16 @@ describe("ALEX CSF Integration", () => {
         Cl.principal(`${deployer}.alex-adapter`),
         Cl.principal(`${deployer}.cxd-token`),
         Cl.principal(`${deployer}.mock-token`),
-        Cl.uint(1000000n),
-        Cl.uint(900000n)
+        Cl.uint(1000000),
+        Cl.uint(900000)
       ],
       deployer
     );
-    expect(swapCall.result).toEqual(Cl.ok(Cl.uint(1000000n)));
+    expect(swapCall.result).toEqual(Cl.ok(Cl.uint(1000000)));
   });
 
   it("should return health telemetry from ALEX adapter", () => {
-    const healthCall = simnet.callReadOnlyFn(
+    const healthCall = simnet.callPublicFn(
       "alex-adapter",
       "get-csf-health",
       [],
@@ -51,8 +54,8 @@ describe("ALEX CSF Integration", () => {
     );
     expect(healthCall.result).toEqual(
       Cl.ok(Cl.tuple({
-        tvl: Cl.uint(100000000000n),
-        utilization: Cl.uint(50n),
+        tvl: Cl.uint(100000000000),
+        utilization: Cl.uint(50),
         "is-active": Cl.bool(true)
       }))
     );

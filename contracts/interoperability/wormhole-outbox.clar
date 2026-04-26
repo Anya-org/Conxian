@@ -16,11 +16,11 @@
 (define-map outgoing-messages
     uint
     {
-        target-chain: uint,
-        recipient: (buff 32),
-        payload: (buff 1024),
-        sender: principal,
-        sent-at: uint,
+        target-chain: uint
+        recipient: (buff 32)
+        payload: (buff 1024)
+        sender: principal
+        sent-at: uint
     }
 )
 
@@ -31,11 +31,11 @@
     (begin
       (try! (stx-transfer? BRIDGE_FEE tx-sender (contract-call? .revenue-distributor get-operational-treasury)))
       (map-set outgoing-messages seq {
-          target-chain: target-chain,
-          recipient: recipient,
-          payload: payload,
-          sender: tx-sender,
-          sent-at: burn-block-height,
+          target-chain: target-chain
+          recipient: recipient
+          payload: payload
+          sender: tx-sender
+          sent-at: burn-block-height
       })
       (var-set sequence seq)
       (ok seq)

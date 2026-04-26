@@ -7,11 +7,11 @@
 
 (define-data-var admin principal tx-sender)
 
-;; 1. Bootstrap, 2. Core, 3. Liquidity, 4. Governance, 5. Autonomous
+;; 1. Bootstrap 2. Core 3. Liquidity 4. Governance 5. Autonomous
 (define-data-var current-phase uint u1)
 (define-data-var current-funding-stx uint u0)
 
-;; Phase Targets (in STX micro-units: 1 STX = 1,000,000)
+;; Phase Targets (in STX micro-units: 1 STX = 1000000)
 (define-constant PHASE_1_TARGET u10000000000)  ;; 10k STX
 (define-constant PHASE_2_TARGET u100000000000) ;; 100k STX
 (define-constant PHASE_3_TARGET u250000000000) ;; 250k STX
@@ -48,7 +48,7 @@
     (var-set current-funding-stx (+ (var-get current-funding-stx) amount))
     (check-and-advance-phase)
 
-    (print { event: "launch-contribution", contributor: caller, amount: amount, phase: (var-get current-phase) })
+    (print { event: "launch-contribution" contributor: caller amount: amount phase: (var-get current-phase) })
     (ok true)
   )
 )

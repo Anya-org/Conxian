@@ -1,7 +1,9 @@
 ;; chainlink-adapter.clar
 ;; Conxian Oracle Standard: Chainlink Adapter
 ;; Implements oracle-trait for Chainlink price feeds
-(impl-trait .oracle-trait.oracle-trait)
+
+(use-trait oracle-trait .defi-traits.oracle-trait)
+(impl-trait .defi-traits.oracle-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u6000)
@@ -16,9 +18,9 @@
 (define-map price-feeds
     principal ;; Asset
     {
-        price: uint,
-        timestamp: uint,
-        confidence: uint,
+        price: uint
+        timestamp: uint
+        confidence: uint
     }
 )
 
@@ -26,7 +28,7 @@
 (define-read-only (get-price (asset principal))
   (match (map-get? price-feeds asset)
     price-data (ok (get price price-data))
-    none (err ERR_NO_PRICE)
+    (err ERR_NO_PRICE)
   )
 )
 
@@ -34,7 +36,7 @@
   (get-price asset)
 )
 
-(define-read-only (get-name ())
+(define-read-only (get-name)
   (ok "Chainlink Oracle Adapter")
 )
 
@@ -45,11 +47,11 @@
     (begin
         (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
         (map-set price-feeds asset {
-            price: price,
-            timestamp: burn-block-height,
-            confidence: u5000, ;; Default confidence
+            price: price
+            timestamp: burn-block-height
+            confidence: u5000 ;; Default confidence
         })
-        (print { event: "chainlink-price-update", asset: asset, price: price, round: round-id })
+        (print { event: "chainlink-price-update" asset: asset price: price round: round-id })
         (ok true)
     )
 )
