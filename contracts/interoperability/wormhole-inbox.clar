@@ -4,7 +4,7 @@
 
 ;; --- Read-Only Functions ---
 
-;; @desc Returns the current message nonce, representing the total count of messages processed.
+;; @desc Returns the current message nonce representing the total count of messages processed.
 (define-read-only (get-message-count)
     (ok (var-get message-nonce))
 )

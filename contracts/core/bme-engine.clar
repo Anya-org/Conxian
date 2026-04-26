@@ -102,7 +102,7 @@
 (define-public (swap-and-burn (token <sip-010-ft-trait>) (amount uint))
   (begin
     ;; Simplified for simulation to avoid complex router calls
-    (print { event: "swap-and-burn-simulated", token: (contract-of token), amount: amount })
+    (print { event: "swap-and-burn-simulated" token: (contract-of token) amount: amount })
     (ok true)
   )
 )
@@ -112,14 +112,14 @@
 ;; @desc Get global statistics for the BME engine
 (define-read-only (get-bme-stats)
   (ok {
-    total-epoch-fees: (var-get total-epoch-fees),
-    last-mint-block: (var-get last-mint-block),
-    total-burned: (var-get total-burned),
+    total-epoch-fees: (var-get total-epoch-fees)
+    last-mint-block: (var-get last-mint-block)
+    total-burned: (var-get total-burned)
     mint-per-epoch: MINT_PER_EPOCH
   })
 )
 
 ;; @desc Get the current operational status of the BME engine
 (define-read-only (get-protocol-status)
-  (ok { compliant: true, version: "v1.1.0-Apex" })
+  (ok { compliant: true version: "v1.1.0-Apex" })
 )

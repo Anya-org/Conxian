@@ -57,12 +57,12 @@
           (try! (as-contract (contract-call? token-out transfer amount-out (as-contract tx-sender) user none)))
 
           (print {
-            event: "csf-swap-executed",
-            source: (contract-of liquidity-source),
-            token-in: (contract-of token-in),
-            token-out: (contract-of token-out),
-            amount-out: amount-out,
-            fee: fee-collected,
+            event: "csf-swap-executed"
+            source: (contract-of liquidity-source)
+            token-in: (contract-of token-in)
+            token-out: (contract-of token-out)
+            amount-out: amount-out
+            fee: fee-collected
             sender: user
           })
           (ok amount-out)
@@ -130,5 +130,5 @@
 
 ;; @desc Get the current operational status of the swap router
 (define-read-only (get-protocol-status)
-  (ok { compliant: true, version: "v1.1.0-Apex", tenure-id: (some (/ stacks-block-height u10)) })
+  (ok { compliant: true version: "v1.1.0-Apex" tenure-id: (some (/ stacks-stacks-block-height u10)) })
 )

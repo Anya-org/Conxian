@@ -10,9 +10,9 @@
     (gcr (get financial-gcr intel))
   )
     (ok {
-      stable: (and (<= pid-fee u500) (>= gcr u130)),
-      pid-fee: pid-fee,
-      gcr: gcr,
+      stable: (and (<= pid-fee u500) (>= gcr u130))
+      pid-fee: pid-fee
+      gcr: gcr
       timestamp: burn-block-height
     })
   )

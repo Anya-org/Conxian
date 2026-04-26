@@ -3,56 +3,23 @@ id: 2
 name: Mainnet Release (March 2026)
 network: mainnet
 stacks-node: "https://stacks-node-api.mainnet.stacks.co"
-deployer: "${SAB_DEPLOYER_MULTISIG}"
+deployer: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
 plan:
   batches:
     - id: 0
       transactions:
         - contract-publish:
             contract-name: alex-adapter
-            # TODO: Replace ${SAB_DEPLOYER_MULTISIG} with actual multisig before deployment
-            expected-sender: "${SAB_DEPLOYER_MULTISIG}"
+            expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
             cost: 50000
             path: "contracts/integrations/alex-adapter.clar"
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
         - contract-call:
-            contract-id: "${SAB_DEPLOYER_MULTISIG}.dex-factory"
-            expected-sender: "${SAB_DEPLOYER_MULTISIG}"
+            contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.dex-factory"
+            expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
             method: "register-csf-protocol"
             parameters:
-              - "'${SAB_DEPLOYER_MULTISIG}.alex-adapter"
+              - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.alex-adapter"
               - '"ALEX Lab Mainnet"'
-        - contract-publish:
-            contract-name: clarity-bitcoin
-            expected-sender: "${SAB_DEPLOYER_MULTISIG}"
-            cost: 50000
-            path: "contracts/lib/clarity-bitcoin.clar"
-            anchor-block-only: true
-            clarity-version: 4
-            epoch: "3.0"
-        - contract-publish:
-            contract-name: referral-aggregator
-            expected-sender: "${SAB_DEPLOYER_MULTISIG}"
-            cost: 50000
-            path: "contracts/treasury/referral-aggregator.clar"
-            anchor-block-only: true
-            clarity-version: 4
-            epoch: "3.0"
-        - contract-publish:
-            contract-name: jurisdictional-sharding
-            expected-sender: "${SAB_DEPLOYER_MULTISIG}"
-            cost: 50000
-            path: "contracts/compliance/jurisdictional-sharding.clar"
-            anchor-block-only: true
-            clarity-version: 4
-            epoch: "3.0"
-        - contract-publish:
-            contract-name: governance-handover
-            expected-sender: "${SAB_DEPLOYER_MULTISIG}"
-            cost: 50000
-            path: "contracts/governance/governance-handover.clar"
-            anchor-block-only: true
-            clarity-version: 4
-            epoch: "3.0"

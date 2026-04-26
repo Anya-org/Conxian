@@ -18,8 +18,8 @@
 (define-map pending-updates
     uint ;; Proposal ID
     {
-        target: principal,
-        param: (string-ascii 20),
+        target: principal
+        param: (string-ascii 20)
         value: uint
     }
 )
@@ -47,7 +47,7 @@
 (define-public (execute (proposer principal))
     (begin
         ;; Start execution logic
-        (print { event: "execute-proposal", proposer: proposer })
+        (print { event: "execute-proposal" proposer: proposer })
         (ok true)
     )
 )
@@ -60,8 +60,8 @@
     (begin
         ;; Logic to create a proposal for IR change
         (print {
-            event: "propose-ir-change",
-            asset: asset,
+            event: "propose-ir-change"
+            asset: asset
             new-rate: new-base-rate
         })
         (ok true)
@@ -75,8 +75,8 @@
     (begin
         ;; Logic to create a proposal for CF change
         (print {
-            event: "propose-cf-change",
-            asset: asset,
+            event: "propose-cf-change"
+            asset: asset
             new-factor: new-factor
         })
         (ok true)
@@ -90,7 +90,7 @@
     (begin
         (asserts! (is-authorized) (err ERR_UNAUTHORIZED))
         ;; Update risk logic here
-        (print { event: "risk-param-update", asset: asset, score: risk-score })
+        (print { event: "risk-param-update" asset: asset score: risk-score })
         (ok true)
     )
 )

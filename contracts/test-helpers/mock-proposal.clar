@@ -31,10 +31,10 @@
 (define-public (execute (caller principal))
   (begin
     (asserts! (not (var-get executed)) (err ERR_ALREADY_EXECUTED))
-    ;; In a real proposal, this would contain the actual execution logic
-    ;; For mock purposes, we just mark it as executed
+    ;; In a real proposal this would contain the actual execution logic
+    ;; For mock purposes we just mark it as executed
     (var-set executed true)
-    (print { event: "proposal-executed", proposer: (var-get proposer), executor: caller })
+    (print { event: "proposal-executed" proposer: (var-get proposer) executor: caller })
     (ok true)
   )
 )

@@ -23,7 +23,7 @@
     (asserts! (<= (+ (var-get epoch-emission-total) amount) MAX_EMISSION_PER_EPOCH) (err u1003))
 
     (var-set epoch-emission-total (+ (var-get epoch-emission-total) amount))
-    (print { event: "mint-requested", amount: amount, recipient: recipient })
+    (print { event: "mint-requested" amount: amount recipient: recipient })
     ;; MINT LOGIC WOULD CALL CXVG TOKEN HERE
     (ok true)
   )

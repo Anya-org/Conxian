@@ -25,14 +25,14 @@
 (define-map pool-templates
   { template-id: uint }
   {
-    name: (string-ascii 64),
-    description: (string-ascii 256),
-    pool-type: (string-ascii 32),
-    min-liquidity: uint,
-    max-liquidity: uint,
-    default-fee: uint,
-    active: bool,
-    created-at: uint,
+    name: (string-ascii 64)
+    description: (string-ascii 256)
+    pool-type: (string-ascii 32)
+    min-liquidity: uint
+    max-liquidity: uint
+    default-fee: uint
+    active: bool
+    created-at: uint
   }
 )
 
@@ -60,17 +60,17 @@
 
     (let ((template-id (+ (var-get total-templates) u1)))
       (map-set pool-templates { template-id: template-id } {
-        name: name,
-        description: description,
-        pool-type: pool-type,
-        min-liquidity: min-liquidity,
-        max-liquidity: max-liquidity,
-        default-fee: default-fee,
-        active: true,
-        created-at: burn-block-height,
+        name: name
+        description: description
+        pool-type: pool-type
+        min-liquidity: min-liquidity
+        max-liquidity: max-liquidity
+        default-fee: default-fee
+        active: true
+        created-at: burn-block-height
       })
       (var-set total-templates template-id)
-      (print { event: "template-created", template-id: template-id, name: name })
+      (print { event: "template-created" template-id: template-id name: name })
       (ok template-id)
     )
   )

@@ -22,8 +22,8 @@
 (define-data-var circuit-breaker (optional principal) none)
 
 (define-map source-submissions
-  { asset: principal, source: principal }
-  { price: uint, block: uint }
+  { asset: principal source: principal }
+  { price: uint block: uint }
 )
 
 (define-map asset-sources principal (list 10 principal))
@@ -63,12 +63,12 @@
         true
       )
 
-      (map-set source-submissions { asset: asset, source: source } { price: price, block: burn-block-height })
+      (map-set source-submissions { asset: asset source: source } { price: price block: burn-block-height })
       (if (is-none (index-of current-sources source))
         (map-set asset-sources asset (unwrap! (as-max-len? (append current-sources source) u10) (err ERR_INTERNAL)))
         true
       )
-      (print { event: "price-submitted", asset: asset, source: source, price: price })
+      (print { event: "price-submitted" asset: asset source: source price: price })
       (ok true)
     )
   )
@@ -77,8 +77,8 @@
 (define-public (set-price (asset principal) (price uint))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (map-set source-submissions { asset: asset, source: (var-get admin) } { price: price, block: burn-block-height })
-    (map-set source-submissions { asset: asset, source: tx-sender } { price: price, block: burn-block-height })
+    (map-set source-submissions { asset: asset source: (var-get admin) } { price: price block: burn-block-height })
+    (map-set source-submissions { asset: asset source: tx-sender } { price: price block: burn-block-height })
     (map-set asset-sources asset (list (var-get admin) tx-sender))
     (ok true)
   )
@@ -98,7 +98,7 @@
 (define-read-only (get-price-internal (asset principal))
   (let (
     (sources (default-to (list) (map-get? asset-sources asset)))
-    (aggregation (fold aggregate-prices sources { asset: asset, total-price: u0, count: u0, min-block: burn-block-height }))
+    (aggregation (fold aggregate-prices sources { asset: asset total-price: u0 count: u0 min-block: burn-block-height }))
   )
     (if (and (>= (get count aggregation) MIN_QUORUM) (<= (- burn-block-height (get min-block aggregation)) MAX_PRICE_AGE))
       (some (/ (get total-price aggregation) (get count aggregation)))
@@ -108,7 +108,7 @@
 )
 
 (define-read-only (get-protocol-status)
-  (ok { compliant: true, version: "v1.1.0-Apex", tenure-id: (some (/ block-height u10)) })
+  (ok { compliant: true version: "v1.1.0-Apex" tenure-id: (some (/ block-height u10)) })
 )
 
 (define-read-only (get-volatility-index)
@@ -128,9 +128,9 @@
 )
 
 ;; --- Private Helpers ---
-(define-private (aggregate-prices (source principal) (acc { asset: principal, total-price: uint, count: uint, min-block: uint }))
+(define-private (aggregate-prices (source principal) (acc { asset: principal total-price: uint count: uint min-block: uint }))
   (let (
-    (submission (map-get? source-submissions { asset: (get asset acc), source: source }))
+    (submission (map-get? source-submissions { asset: (get asset acc) source: source }))
   )
     (if (is-some submission)
       (let (
@@ -138,9 +138,9 @@
       )
         (if (is-authorized source)
           {
-            asset: (get asset acc),
-            total-price: (+ (get total-price acc) (get price sub)),
-            count: (+ (get count acc) u1),
+            asset: (get asset acc)
+            total-price: (+ (get total-price acc) (get price sub))
+            count: (+ (get count acc) u1)
             min-block: (if (< (get block sub) (get min-block acc)) (get block sub) (get min-block acc))
           }
           acc

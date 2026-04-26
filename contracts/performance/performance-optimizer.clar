@@ -6,7 +6,7 @@
 (define-map function-gas-costs
     (string-ascii 40) ;; function name
     {
-        total-cost: uint,
+        total-cost: uint
         call-count: uint
     }
 )
@@ -19,12 +19,12 @@
 (define-public (record-gas-cost (func-name (string-ascii 40)) (cost uint))
     (let
         (
-            (data (default-to { total-cost: u0, call-count: u0 } (map-get? function-gas-costs func-name)))
+            (data (default-to { total-cost: u0 call-count: u0 } (map-get? function-gas-costs func-name)))
             (total-cost (get total-cost data))
             (call-count (get call-count data))
         )
         (map-set function-gas-costs func-name {
-            total-cost: (+ total-cost cost),
+            total-cost: (+ total-cost cost)
             call-count: (+ call-count u1)
         })
         (ok true)

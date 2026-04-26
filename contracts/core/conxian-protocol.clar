@@ -8,11 +8,11 @@
 (define-data-var contract-owner principal tx-sender)
 (define-data-var initialized bool true)
 
-(define-map modules (string-ascii 50) { contract: principal, active: bool })
+(define-map modules (string-ascii 50) { contract: principal active: bool })
 
 ;; @desc Returns the current status of the protocol
 (define-read-only (get-protocol-status)
-  (ok { compliant: true, paused: (var-get paused), tenure-id: (some (/ stacks-block-height u10)), version: "C4" })
+  (ok { compliant: true paused: (var-get paused) tenure-id: (some (/ stacks-stacks-block-height u10)) version: "C4" })
 )
 
 (define-read-only (is-paused) (var-get paused))
@@ -36,7 +36,7 @@
 (define-public (register-module (name (string-ascii 50)) (contract principal))
   (begin
     (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
-    (map-set modules name { contract: contract, active: true })
+    (map-set modules name { contract: contract active: true })
     (ok true)
   )
 )

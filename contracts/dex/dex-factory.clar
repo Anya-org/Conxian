@@ -13,17 +13,17 @@
 
 ;; --- Maps ---
 (define-map pools 
-    { token0: principal, token1: principal, type: uint } 
+    { token0: principal token1: principal type: uint }
     principal
 )
 
 (define-map pool-by-id
     uint
-    { token0: principal, token1: principal, type: uint, pool: principal }
+    { token0: principal token1: principal type: uint pool: principal }
 )
 
-;; CSF Registry: Tracks external protocols (e.g., Zest, StackingDAO, Arkadiko) that implement CSF
-(define-map csf-registry principal { name: (string-ascii 256), registered-at: uint, active: bool })
+;; CSF Registry: Tracks external protocols (e.g. Zest StackingDAO Arkadiko) that implement CSF
+(define-map csf-registry principal { name: (string-ascii 256) registered-at: uint active: bool })
 (define-map csf-by-index uint principal)
 
 ;; --- Public Administrative Functions ---
@@ -39,13 +39,13 @@
         )
         (begin
             (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) ERR_UNAUTHORIZED)
-            (asserts! (is-none (map-get? pools { token0: token0, token1: token1, type: type })) ERR_POOL_EXISTS)
+            (asserts! (is-none (map-get? pools { token0: token0 token1: token1 type: type })) ERR_POOL_EXISTS)
 
-            (map-set pools { token0: token0, token1: token1, type: type } pool-contract)
+            (map-set pools { token0: token0 token1: token1 type: type } pool-contract)
             (map-set pool-by-id (+ current-count u1) {
-                token0: token0,
-                token1: token1,
-                type: type,
+                token0: token0
+                token1: token1
+                type: type
                 pool: pool-contract
             })
             (var-set pool-count (+ current-count u1))
@@ -59,10 +59,10 @@
   (let ((current-index (var-get csf-registry-count)))
     (begin
       (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) ERR_UNAUTHORIZED)
-      (map-set csf-registry protocol { name: name, registered-at: stacks-block-height, active: true })
+      (map-set csf-registry protocol { name: name registered-at: block-height active: true })
       (map-set csf-by-index (+ current-index u1) protocol)
       (var-set csf-registry-count (+ current-index u1))
-      (print { event: "csf-protocol-registered", protocol: protocol, name: name })
+      (print { event: "csf-protocol-registered" protocol: protocol name: name })
       (ok true)
     )
   )
@@ -82,7 +82,7 @@
 ;; --- Read-only Functions ---
 
 (define-read-only (get-pool (token0 principal) (token1 principal) (type uint))
-    (map-get? pools { token0: token0, token1: token1, type: type })
+    (map-get? pools { token0: token0 token1: token1 type: type })
 )
 
 (define-read-only (get-pool-count) (ok (var-get pool-count)))
