@@ -26,6 +26,8 @@ active — This module documents BOS-level service-loop expectations and public-
 
 - **[Service Loop Specification](./SERVICE_LOOP.md)**: Mermaid diagrams of the BOS Gateway and Nexus relationship, including multi-tenant orchestration.
 - **[BOS State Machine](./BOS_STATE_MACHINE.stub.json)**: Morgan Stanley CALM Standard state transitions (ZSE Stub).
+- **[Provisioning Template](./BOS_PROVISIONING_TEMPLATE.yaml)**: Declarative BiaB deployment manifest (v2.1).
+- **[Tenant Manifest Example](./BOS_TENANT_MANIFEST_EXAMPLE.yaml)**: Configuration example for jurisdictional sharding.
 - **[IP & Compliance Audit](./system_ip_audit.md)**: Intellectual Property ownership audit (ZSE Stub).
 - **[Section 42 Swap Agreement](./SECTION_42_SWAP_AGREEMENT.md)**: Legal integrity for asset transfer (ZSE Stub).
 
