@@ -48,6 +48,9 @@ These are the “operating-model” documents that explain how BOS components re
 | `docs/protocols/BOS_SELF_EXECUTING_CONTRACT_TRIGGER_V1.md` | Canonical | Public-safe | Verified CLM webhook → queued pending on-chain action with 144-block timelock → multisig finalization, with replay protection, cancellation semantics, monitoring, and audit traceability. |
 | `docs/architecture/THREE_LANE_RUNTIME_DEPLOYMENT_ARCHITECTURE.md` | Canonical | Public-safe | Canonical runtime deployment model across community sovereign-node, business-managed, and enterprise/private-cloud lanes (controls, upgrade paths, and trust assumptions). |
 | `docs/architecture/BOS_PRESERVE_ENHANCE_REPLACE_GAP_MATRIX.md` | Canonical | Public-safe | Control matrix for preserve/enhance/replace/defer decisions across BOS components (prevents destructive refactors; locks sequencing). |
+| `docs/architecture/CONXIAN_L3_PROFILE_ADR.md` | Canonical | Public-safe | Decision ADR for the Conxian L3 profile (settlement model, Nakamoto vs sBTC signer boundary, compatibility-first dual lane, and promotion/rollback gates). |
+| `docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md` | Canonical | Public-safe | Target-state BitVM2 + sBTC bridge architecture (components, trust boundaries, proof/verification flow, failure controls, and phased rollout checkpoints). |
+| `docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md` | Canonical | Public-safe | Cross-repo compatibility matrix and objective acceptance-gate evidence checklist for the 13-repo migration set. |
 | `Nakamoto-Guardian/ANTI_FRAGILITY_LOOP.md` | Canonical | Public-safe stub (canonical in Linear) | ATS enforcement + collision audits framing (standardized ZSE stub). |
 | `cxn-grid-oracle/README.md` | Supporting | Public-safe | Grid oracle overview (agnostic). |
 
@@ -124,6 +127,7 @@ These are the documents most likely to answer “what are we building?” and �
 | `docs/MAINNET_READINESS_CONXIUS_PLATFORM.md` | Supporting | Public-safe | Mainnet readiness checklist for conxius-platform. |
 | `docs/WALLET_SIGNER_CONTROL_VERIFICATION_REPORT.md` | Supporting | Public-safe | Wallet and signer control verification report for mainnet launch. |
 | `docs/PUBLIC_VISIBILITY_AUDIT_REPORT.md` | Supporting | Public-safe | Public visibility boundary audit report. |
+| `docs/protocols/SESSION_BROKER_NORMATIVE_SPEC.md` | Canonical | Public-safe | Normative session-broker boundary spec (actors, handshake, TTL semantics, PoP/mTLS binding, replay/idempotency, revocation/attestation checks, fail-closed behavior, errors, and audit requirements). |
 | `conxius-platform/services/lib-conxian-core/docs/PRD.md` | Supporting | Public-safe | Service-local copy; treat `lib-conxian-core/docs/PRD.md` as canonical. |
 | `conxius-wallet/lib-conxian-core/docs/PRD.md` | Supporting | Public-safe | Wallet-local copy; treat `lib-conxian-core/docs/PRD.md` as canonical. |
 
@@ -162,6 +166,8 @@ See `docs/BOS_BUSINESS_BUILDOUT.md` for repo business purpose, business-unit pla
 | `.github/PULL_REQUEST_TEMPLATE.md` | Supporting | Public-safe | PR checklist and norms. |
 | `docs/CSF_FIRST_OPERATING_SEQUENCE_AND_PROOF_GATES.md` | Canonical | Public-safe | Locks the CSF → economy → gateway operating order and the minimum proof gates that keep launch, economy design, and go-to-market claims aligned. |
 | `docs/BOS_WALLET_CONTROL_MODEL.md` | Canonical | Public-safe | Canonical BOS wallet-control model (bootstrap → SAB custody → DAO-aligned governance). |
+| `docs/SAB_MIGRATION_WAVES.md` | Canonical | Public-safe | Canonical SAB migration sequencing (`W0`…`W6`) including reconciliation notes from the legacy 4-wave framing. |
+| `docs/operations/SAB_MIGRATION_WAVES.md` | Supporting | Public-safe | Deprecated non-canonical pointer kept for link continuity; directs readers to `docs/SAB_MIGRATION_WAVES.md`. |
 | `docs/bounties/MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md` | Canonical | Public-safe stub (canonical in Linear) | How maintainer payouts are enabled and validated (standardized ZSE stub). |
 | `admin/SECRETS.md` | Canonical | Public-safe stub (canonical in Linear) | Secret registry + pointers to Linear docs (standardized ZSE stub). |
 
