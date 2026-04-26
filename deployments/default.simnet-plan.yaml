@@ -922,6 +922,11 @@ plan:
       path: contracts/dex/route-manager.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
+      contract-name: sab-election
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/governance/sab-election.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
       contract-name: sbtc-vault
       emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
       path: contracts/vaults/sbtc-vault.clar
