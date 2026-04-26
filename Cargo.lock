@@ -2123,8 +2123,7 @@ dependencies = [
 
 [[package]]
 name = "lib-conxian-core"
-version = "0.2.0"
-source = "git+https://github.com/Conxian/lib-conxian-core?rev=3b091d2700d840514427e4190c40d631b6d8132c#3b091d2700d840514427e4190c40d631b6d8132c"
+version = "0.2.2"
 dependencies = [
  "anyhow",
  "ark-bn254",
