@@ -8,15 +8,22 @@
 ;; @desc Trigger a protocol heartbeat update
 (define-public (trigger-heartbeat)
   (begin
+    (asserts! (is-eq tx-sender (var-get admin)) (err u1000))
     (var-set last-action-block burn-block-height)
+    (print { event: "heartbeat", height: burn-block-height })
     (ok true)
   )
 )
 
-;; @desc Trigger a protocol epoch update (expected by tests)
 (define-public (trigger-epoch-update)
+  (trigger-heartbeat)
+)
+
+;; @desc Set a new administrator for the heartbeat
+(define-public (set-admin (new-admin principal))
   (begin
-    (var-set last-action-block burn-block-height)
+    (asserts! (is-eq tx-sender (var-get admin)) (err u1000))
+    (var-set admin new-admin)
     (ok true)
   )
 )
@@ -24,6 +31,11 @@
 ;; @desc Get the block height of the last action
 (define-read-only (get-last-action)
   (ok (var-get last-action-block))
+)
+
+;; @desc Returns the status of the operations engine.
+(define-read-only (get-engine-status)
+  (ok { last-action: (var-get last-action-block), admin: (var-get admin) })
 )
 
 ;; @desc Get operational status of the ops engine
@@ -35,7 +47,9 @@
   })
 )
 
-;; @desc Emergency pause trigger
-(define-public (trigger-emergency-pause)
-  (contract-call? .enhanced-circuit-breaker toggle-global-pause)
+(define-public (initialize (new-admin principal))
+  (begin
+    (var-set admin new-admin)
+    (ok true)
+  )
 )

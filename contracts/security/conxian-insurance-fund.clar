@@ -19,7 +19,9 @@
     uint
 )
 
-;; Events
+;; @desc Deposits tokens into the protocol insurance fund.
+;; @param token: The trait of the token to deposit.
+;; @param amount: The quantity of tokens to deposit.
 (define-public (deposit
         (token <sip-010-trait>)
         (amount uint)
@@ -35,6 +37,10 @@
     )
 )
 
+;; @desc Disburses funds from the insurance fund to cover bad debt or protocol losses. Admin/Emergency only.
+;; @param token: The trait of the token to disburse.
+;; @param recipient: The principal receiving the coverage.
+;; @param amount: The quantity of tokens to disburse.
 (define-public (cover-loss
         (token <sip-010-trait>)
         (recipient principal)
@@ -57,6 +63,8 @@
     )
 )
 
+;; @desc Retrieves the insurance fund balance for a specific token.
+;; @param token: The principal of the token to check.
 (define-read-only (get-balance (token principal))
     (default-to u0 (map-get? balances token))
 )

