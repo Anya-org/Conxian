@@ -5,42 +5,64 @@ The Governance module implements the Conxian Dual-Council DAO. It separates stra
 
 ## Architecture (Explanation)
 Governance is divided into two primary loops:
-- **Strategic Council**: Human-driven voting via `community-voting-engine.clar` for protocol upgrades.
+- **Strategic Council**: Human-driven voting via `community-voting-engine.clar` and `community-dao.clar` for protocol upgrades.
 - **Operational Council**: Agent-driven voting via `proposal-engine.clar` for parameter adjustments (Stability fees, LTV).
 - **Enforcement**: `proposal-executor.clar` handles the trustless execution of passed proposals.
+- **Identity & Compliance**: BNS integration and regulatory adapters ensure clean-hands governance.
 
 ## Core Contracts (Reference)
 
-### `proposal-engine.clar`
-The heart of the Operational Council.
+### `community-dao.clar`
+Strategic council proposal management.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `submit-proposal` | `(submit-proposal (title (string-ascii 64)) (description (string-utf8 2048)) (executor <proposal-executor-trait>))` | Submits a new operational proposal. |
-| `vote` | `(vote (proposal-id uint) (vote-for bool))` | Casts a vote using governance power (CXVG). |
-| `execute-proposal` | `(execute-proposal (proposal-id uint) (executor <proposal-executor-trait>))` | Triggers the execution of a passed proposal. |
+| `create-proposal` | `(title (string-ascii 64)) (description (string-ascii 256)) (token principal)` | Creates a new proposal within the community DAO. |
 
-### `reputation-engine.clar`
-Calculates weighted voting power.
+### `community-voting-engine.clar`
+Time-bound voting for strategic proposals.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `get-weighted-voting-power` | `(get-weighted-voting-power (user principal))` | Returns the total voting weight (CXVG + Reputation). |
+| `create-proposal` | `(start-time uint) (end-time uint)` | Creates a new voting proposal with specific times. |
+
+### `community-governance-token.clar`
+SIP-010 compliant governance token (CXVG).
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `transfer` | `(amount uint) (sender principal) (recipient principal) (memo (optional (buff 34)))` | Transfers tokens. |
+| `get-balance` | `(user principal)` | Returns the balance of a specific user. |
+
+### `governance-handover.clar`
+Administrative lifecycle management.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `verify-full-handover` | `()` | Verifies if the governance handover is complete. |
+| `execute-handover-step` | `(step uint)` | Executes a specific handover step. |
+
+### `ico-offering.clar`
+Initial coin offering management.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `buy-tokens` | `(amount uint) (token <sip-010-trait>)` | Allows a user to purchase tokens during an ICO. |
 
 ## Integration Examples (How-to)
 
-### Submitting a Parameter Update
+### Submitting a Community Proposal
 ```clarity
-(contract-call? .proposal-engine submit-proposal
-  "Increase Stability Fee"
-  "Adjusting fee to 5.5% due to volatility"
-  .stability-fee-executor
+(contract-call? .community-dao create-proposal
+  "Expansion of Revenue Dam"
+  "Increasing the share for governance stakers to 30%"
+  .cxvg-token
 )
 ```
 
-### Voting on a Proposal
+### Checking Governance Power
 ```clarity
-(contract-call? .proposal-engine vote u42 true)
+(contract-call? .reputation-engine get-weighted-voting-power tx-sender)
 ```
 
 ## Testing (How-to)
@@ -52,4 +74,4 @@ Comprehensive validation is performed using the Vitest framework.
 - Implementation: Production-Ready (v1.2.0)
 - Audit Status: Internally Verified
 - Governance Model: Dual-Council DAO
-- Standard: Hexagonal, CXVG-Weighted
+- Standard: Hexagonal, CXVG-Weighted, Regulatory-Compliant

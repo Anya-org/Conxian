@@ -29,7 +29,8 @@
     (is-eq tx-sender (var-get contract-owner))
 )
 
-;; Public functions
+;; @desc Validates if a user is within their allowed rate limit.
+;; @param user: The principal to check.
 (define-public (check-rate-limit (user principal))
     (let
         (
@@ -69,6 +70,10 @@
     )
 )
 
+;; @desc Configures a custom rate limit for a specific user. Owner only.
+;; @param user: The principal to configure.
+;; @param window-size: Optional custom window duration in blocks.
+;; @param max-ops: Optional custom maximum operations per window.
 (define-public (set-custom-limit (user principal) (window-size (optional uint)) (max-ops (optional uint)))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -93,6 +98,8 @@
     )
 )
 
+;; @desc Transfers contract ownership to a new principal. Owner only.
+;; @param new-owner: The new owner principal.
 (define-public (transfer-ownership (new-owner principal))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -101,7 +108,8 @@
     )
 )
 
-;; Read-only functions
+;; @desc Retrieves the current rate limit data for a specific user.
+;; @param user: The principal to query.
 (define-read-only (get-user-data (user principal))
     (map-get? user-rate-limits user)
 )

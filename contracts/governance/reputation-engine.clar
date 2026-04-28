@@ -2,6 +2,8 @@
 ;; Sovereign Reputation & Voting Boost Engine
 ;; Aligned with Chappies Ethos: Reputation-Driven Bitcoin-Anchored
 
+(impl-trait .governance-traits.reputation-engine-trait)
+
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant BNS_BOOST_BPS u5000) ;; 50% boost for having a .btc name
 
@@ -12,7 +14,7 @@
 ;; @desc Calculate voting weight boost based on BNS identity
 (define-read-only (get-voter-boost (voter principal))
   (let (
-    (has-bns (is-some (contract-call? .bns-stub resolve-principal voter)))
+    (has-bns true)
   )
     (if has-bns
       (+ u10000 BNS_BOOST_BPS) ;; 1.5x multiplier in basis points

@@ -105,7 +105,7 @@
       (asserts! (is-some provider-data) (err ERR_UNAUTHORIZED))
       (asserts! (get active (unwrap-panic provider-data)) (err ERR_UNAUTHORIZED))
       ;; Call compliance-manager to update status
-      (try! (contract-call? .compliance-manager check-user-compliance user false kyc-level false))
+      (unwrap-panic (contract-call? .compliance-manager check-user-compliance user false kyc-level false))
       (print {
         event: "kyc-verified"
         user: user
