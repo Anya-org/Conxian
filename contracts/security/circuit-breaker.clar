@@ -17,10 +17,14 @@
 (define-data-var quorum-threshold uint u3)
 (define-data-var veto-active bool false)
 
+;; @desc Checks if a specific contract principal is currently paused.
+;; @param target: The contract principal to check.
 (define-read-only (is-contract-paused (target principal))
   (ok (default-to false (map-get? paused-contracts target)))
 )
 
+;; @desc Toggles the pause state for a specific contract. Admin only.
+;; @param target: The contract principal to toggle.
 (define-public (toggle-contract-pause (target principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -32,6 +36,8 @@
   )
 )
 
+;; @desc Sets a new administrator for the circuit breaker. Admin only.
+;; @param new-admin: The new administrator principal.
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)

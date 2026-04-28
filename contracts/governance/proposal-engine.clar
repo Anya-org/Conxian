@@ -51,9 +51,8 @@
       (err ERR_UNAUTHORIZED)
     )
 
-    ;; Register proposal
-    (contract-call? .proposal-registry add-proposal contract-principal council-id
-      start-block end-block
+    (let ((proposal-id (unwrap-panic (contract-call? .proposal-registry add-proposal contract-principal council-id start-block end-block))))
+      (ok proposal-id)
     )
   )
 )
@@ -111,16 +110,13 @@
     (proposal-contract <proposal-trait>)
   )
   (contract-call? .proposal-executor execute proposal-id
-    proposal-contract u5000
+    proposal-contract
+    u50
   )
-  ;; 50% quorum hardcoded for now
 )
 
-;; Admin functions
+;; Admin Functions
 
-;; @desc Updates the default voting period for operational proposals.
-;; @param new-period uint - The new duration in blocks.
-;; @returns (response bool uint)
 (define-public (set-voting-period (new-period uint))
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
@@ -140,12 +136,9 @@
   )
 )
 
-;; @desc Updates the contract principal authorized to execute proposals.
-;; @param new-executor principal - The new executor contract principal.
-;; @returns (response bool uint)
 (define-public (set-proposal-executor (new-executor principal))
   (begin
-    (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (var-get access-control)) (err ERR_UNAUTHORIZED))
     (var-set proposal-executor-contract new-executor)
     (print { event: "set-proposal-executor" executor: new-executor })
     (ok true)
@@ -174,37 +167,17 @@
   )
 )
 
-;; @desc Updates the data store used for recording proposals.
-;; @param new-registry principal - The new registry contract principal.
-;; @returns (response bool uint)
 (define-public (set-proposal-registry (new-registry principal))
   (begin
-    (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (var-get access-control)) (err ERR_UNAUTHORIZED))
     (var-set proposal-registry-contract new-registry)
     (ok true)
   )
 )
 
-;; @desc Legacy function for backward compatibility with previous governance versions.
-;; @param title (string-ascii 50) - The proposal title.
-;; @param signatures (list 10 principal) - Required signatures.
-;; @param action-ids (list 10 uint) - Action identifiers.
-;; @param action-types (list 10 (string-ascii 20)) - Types of actions.
-;; @param action-params (list 10 (buff 256)) - Parameters for actions.
-;; @param start-block uint - Start block height.
-;; @param end-block uint - End block height.
-;; @returns (response bool uint)
-(define-public (propose
-    (title (string-ascii 50))
-    (signatures (list 10 principal))
-    (action-ids (list 10 uint))
-    (action-types (list 10 (string-ascii 20)))
-    (action-params (list 10 (buff 256)))
-    (start-block uint)
-    (end-block uint)
-  )
+(define-public (initialize (new-coordinator principal))
   (begin
-    (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
+    (var-set access-control new-coordinator)
     (ok true)
   )
 )
