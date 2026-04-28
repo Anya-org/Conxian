@@ -13,6 +13,8 @@
     }
 )
 
+;; @desc Registers a new institutional account with a specific tier.
+;; @param tier: The numeric tier level for the account.
 (define-public (register-account (tier uint))
     (begin
         (map-set institutional-accounts tx-sender {
@@ -23,6 +25,9 @@
     )
 )
 
+;; @desc Updates the KYC compliance status for an institutional user.
+;; @param user: The account principal to update.
+;; @param status: Boolean indicating the new KYC status.
 (define-public (update-kyc-status (user principal) (status bool))
     (begin
         ;; Add authorization logic here
@@ -34,6 +39,9 @@
     )
 )
 
+;; @desc Submits an advanced institutional order (e.g., TWAP, VWAP).
+;; @param order-type: A string identifying the order execution type.
+;; @param params: Encoded parameters for the specific order type.
 (define-public (submit-advanced-order (order-type (string-ascii 10)) (params (buff 128)))
     (begin
         (try! (contract-call? .compliance-hooks verify-kyc tx-sender u1))
