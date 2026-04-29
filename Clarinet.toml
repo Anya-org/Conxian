@@ -180,9 +180,6 @@ path = "contracts/tokens/token-system-coordinator.clar"
 [contracts.cxs-token]
 path = "contracts/tokens/cxs-token.clar"
 
-[contracts.dlc-orchestrator]
-path = "contracts/sbtc/dlc-orchestrator.clar"
-
 [contracts.position-factory]
 path = "contracts/position-factory.clar"
 
