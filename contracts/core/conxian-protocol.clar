@@ -12,7 +12,7 @@
 
 ;; @desc Returns the current status of the protocol
 (define-read-only (get-protocol-status)
-  (ok { compliant: true paused: (var-get paused) tenure-id: (some (/ stacks-stacks-block-height u10)) version: "C4" })
+  (ok { compliant: true paused: (var-get paused) tenure-id: (some (/ stacks-block-height u10)) version: "C4" })
 )
 
 (define-read-only (is-paused) (var-get paused))
