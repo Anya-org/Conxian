@@ -5,8 +5,8 @@
 (use-trait csf-liquidity-trait .conxian-csf-trait.trait-csf-liquidity-v1)
 
 ;; --- Constants ---
-(define-constant BASE_FEE u30)
-(define-constant MAX_FEE u100)
+(define-constant BASE-FEE u30)
+(define-constant MAX-FEE u100)
 (define-constant ERR_INTERNAL u500)
 (define-constant ERR_SLIPPAGE u501)
 (define-constant ERR_NON_COMPLIANT u502)
@@ -87,7 +87,7 @@
 (define-public (update-volatility-fees)
   (let (
     (vol (let ((v-res (contract-call? .oracle-aggregator get-volatility-index))) (if (is-ok v-res) (unwrap-panic v-res) u0)))
-    (new-fee (if (> vol u75) MAX_FEE BASE_FEE))
+    (new-fee (if (> vol u75) MAX-FEE BASE-FEE))
   )
     (begin
       (var-set current-fee new-fee)

@@ -606,6 +606,69 @@ plan:
       path: contracts/insurance/insurance-protection-nft.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
+      contract-name: founder-vesting
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/core/founder-vesting.clar
+      clarity-version: 1
+    epoch: '2.05'
+  - id: 4
+    transactions:
+    - transaction-type: emulated-contract-publish
+      contract-name: funding-rate-calculator
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/core/funding-rate-calculator.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: gamification-manager
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/governance/gamification-manager.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: gauge-manager
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/governance/gauge-manager.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: governance
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/dimensional/governance.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: governance-handover
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/governance/governance-handover.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: governance-signature-verifier
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/governance/governance-signature-verifier.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: governance-token
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/governance-token.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: governance-traits
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/traits/governance-traits.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: ico-offering
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/governance/ico-offering.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: identity-badge
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/identity/identity-badge.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: insurance-protection-nft
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/insurance/insurance-protection-nft.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
       contract-name: intent-solver-gateway
       emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
       path: contracts/gateway/intent-solver-gateway.clar
@@ -907,6 +970,164 @@ plan:
       path: contracts/integrations/redstone-oracle-adapter.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
+      contract-name: optimization-helpers
+      emulated-sender: ST3ESC2255QKTH7AJECCJNV8TTH12BB2FJCHFCFKX
+      path: contracts/helpers/optimization-helpers.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: oracle
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/dex/oracle.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: oracle-adapter-stub
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/oracle/oracle-adapter-stub.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: oracle-traits
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/integrations/twap-oracle.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: order-book
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/orders/order-book.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: pausable
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/base/pausable.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: performance-optimizer
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/performance/performance-optimizer.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: points-oracle
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/oracle/points-oracle.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: pool-factory
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/pools/pool-factory.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: pool-registry
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/pools/pool-registry.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: pool-template
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/dex/pool-template.clar
+      clarity-version: 1
+    epoch: '2.05'
+  - id: 6
+    transactions:
+    - transaction-type: emulated-contract-publish
+      contract-name: position-factory
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/position-factory.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: position-factory-root
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/mev/position-factory-root.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: position-manager
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/core/position-manager.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: position-nft
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/dimensional/position-nft.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: predictive-scaling-system
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/dex/predictive-scaling-system.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: price-stability-monitor
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/monitoring/price-stability-monitor.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: proof-of-reserves
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/security/proof-of-reserves.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: proposal-registry
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/governance/proposal-registry.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: proposal-executor
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/governance/proposal-executor.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: reputation-engine
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/governance/reputation-engine.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: proposal-engine
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/governance/proposal-engine.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: proposal-engine-trait
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/governance/proposal-engine-trait.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: protocol-invariant-monitor
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/dex/protocol-invariant-monitor.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: pyth-traits
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/traits/pyth-traits.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: pyth-oracle-adapter
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/integrations/pyth-oracle-adapter.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: rate-limiter
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/security/rate-limiter.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: rbac
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/utils/rbac.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: rebalancing-rules
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/dex/rebalancing-rules.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: redstone-traits
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/traits/redstone-traits.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: redstone-oracle-adapter
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/integrations/redstone-oracle-adapter.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
       contract-name: revenue-distributor
       emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
       path: contracts/treasury/revenue-distributor.clar
@@ -925,6 +1146,34 @@ plan:
       contract-name: sab-election
       emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
       path: contracts/governance/sab-election.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: sbtc-vault
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/vaults/sbtc-vault.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: signed-data-base
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/governance/signed-data-base.clar
+      clarity-version: 1
+    epoch: '2.05'
+  - id: 7
+    transactions:
+    - transaction-type: emulated-contract-publish
+      contract-name: revenue-distributor
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/treasury/revenue-distributor.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: risk-manager
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/core/risk-manager.clar
+      clarity-version: 1
+    - transaction-type: emulated-contract-publish
+      contract-name: route-manager
+      emulated-sender: STHAF6XE3TZ18ZZTXS1R32H5KRC8XJ46KK2PE1BY
+      path: contracts/dex/route-manager.clar
       clarity-version: 1
     - transaction-type: emulated-contract-publish
       contract-name: sbtc-vault

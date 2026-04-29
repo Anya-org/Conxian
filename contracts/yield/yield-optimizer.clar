@@ -19,7 +19,7 @@
 
 (define-public (autonomous-rebalance (vault-from <vault-trait>) (vault-to <vault-trait>) (amount uint) (token <sip-010-ft-trait>))
   (let (
-    (system-risk u150)
+    (system-risk (unwrap-panic (contract-call? .agent-risk get-gcr)))
     (target-strat (unwrap! (map-get? strategies (contract-of vault-to)) (err ERR_STRATEGY_NOT_FOUND)))
   )
     (begin
