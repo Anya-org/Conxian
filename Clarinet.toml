@@ -951,6 +951,10 @@ clarity-version = 4
 depends_on = ["regulatory-adapter", "sip-standards"]
 
 
+[contracts.sab-election]
+path = "contracts/governance/sab-election.clar"
+clarity-version = 4
+
 [contracts.sbtc-vault]
 path = "contracts/vaults/sbtc-vault.clar"
 clarity-version = 4

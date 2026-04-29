@@ -130,5 +130,5 @@
 
 ;; @desc Get the current operational status of the swap router
 (define-read-only (get-protocol-status)
-  (ok { compliant: true version: "v1.1.0-Apex" tenure-id: (some (/ stacks-stacks-block-height u10)) })
+  (ok { compliant: true version: "v1.1.0-Apex" tenure-id: (some (/ block-height u10)) })
 )

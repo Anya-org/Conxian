@@ -6,16 +6,11 @@
 
 ;; --- BNS Mock Implementation ---
 
-;; @desc Resolves a principal from a BNS-like voter registry.
-;; @param voter: The principal to resolve.
 (define-read-only (resolve-principal (voter principal))
-  (ok voter)
+  (map-get? owner-to-name voter)
 )
 
-;; @desc Seeds a BNS name for simulation and testing purposes.
-;; @param owner: The owner of the seeded name.
-;; @param namespace: The BNS namespace.
-;; @param name: The BNS name.
+;; Admin function to seed BNS names for testing
 (define-public (seed-bns-name (owner principal) (namespace (buff 20)) (name (buff 48)))
   (begin
     (map-set names { namespace: namespace name: name } { owner: owner lease-ending-at: none })

@@ -27,7 +27,10 @@
   )
     (begin
       ;; 1. Collect protocol fees from core modules
-      (unwrap-panic (contract-call? .concentrated-liquidity-pool collect-protocol-fees cxd-token-trait))
+      (match (contract-call? .concentrated-liquidity-pool collect-protocol-fees cxd-token-trait)
+        res true
+        err-val false
+      )
 
       ;; 2. Trigger BME epoch minting
       (match (contract-call? .bme-engine execute-epoch-minting pools-to-reward)
