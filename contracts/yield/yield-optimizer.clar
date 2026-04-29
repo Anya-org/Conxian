@@ -12,14 +12,14 @@
 (define-map strategies
   principal
   {
-    risk-score: uint,
+    risk-score: uint
     active: bool
   }
 )
 
 (define-public (autonomous-rebalance (vault-from <vault-trait>) (vault-to <vault-trait>) (amount uint) (token <sip-010-ft-trait>))
   (let (
-    (system-risk u150)
+    (system-risk (unwrap-panic (contract-call? .agent-risk get-gcr)))
     (target-strat (unwrap! (map-get? strategies (contract-of vault-to)) (err ERR_STRATEGY_NOT_FOUND)))
   )
     (begin
@@ -35,7 +35,7 @@
 (define-public (set-strategy (vault principal) (risk uint))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (map-set strategies vault { risk-score: risk, active: true })
+    (map-set strategies vault { risk-score: risk active: true })
     (ok true)
   )
 )

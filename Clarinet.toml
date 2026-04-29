@@ -111,11 +111,6 @@ path = "contracts/traits/bond-traits.clar"
 clarity-version = 4
 
 
-[contracts.bns-stub]
-path = "contracts/governance/bns-stub.clar"
-clarity-version = 4
-
-
 [contracts.bridge-nft]
 path = "contracts/cross-chain/bridge-nft.clar"
 clarity-version = 4
@@ -662,11 +657,6 @@ path = "contracts/migration/migration-manager.clar"
 clarity-version = 4
 
 
-[contracts.migration-orchestrator]
-path = "contracts/migration/migration-manager.clar"
-clarity-version = 4
-
-
 [contracts.mock-circuit-breaker]
 path = "contracts/test-helpers/mock-circuit-breaker.clar"
 clarity-version = 4
@@ -784,24 +774,6 @@ path = "contracts/base/pausable.clar"
 clarity-version = 4
 
 
-[contracts.payment-forge]
-path = "contracts/agents/payment-forge.clar"
-clarity-version = 4
-depends_on = ["conxian-csf-trait", "fiscal-vault-oracle", "sip-standards"]
-
-
-[contracts.fiscal-orchestrator]
-path = "contracts/agents/fiscal-orchestrator.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-
-[contracts.fiscal-vault-oracle]
-path = "contracts/treasury/fiscal-vault-oracle.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-
 [contracts.pausable-trait]
 path = "contracts/traits/pausable-trait.clar"
 clarity-version = 4
@@ -872,12 +844,6 @@ depends_on = ["agent-risk"]
 path = "contracts/security/proof-of-reserves.clar"
 clarity-version = 4
 depends_on = ["sip-standards"]
-
-
-[contracts.reputation-engine]
-path = "contracts/governance/reputation-engine.clar"
-clarity-version = 4
-depends_on = ["governance-traits", "bns-stub"]
 
 
 [contracts.proposal-engine]
@@ -954,6 +920,11 @@ path = "contracts/compliance/regulatory-adapter.clar"
 clarity-version = 4
 depends_on = ["core-traits", "kyc-registry"]
 
+
+[contracts.reputation-engine]
+path = "contracts/governance/reputation-engine.clar"
+clarity-version = 4
+depends_on = ["governance-traits"]
 
 
 [contracts.revenue-automation]

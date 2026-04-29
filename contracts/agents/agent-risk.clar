@@ -1,8 +1,6 @@
 ;; agent-risk.clar
 ;; Conxian Autonomous Agent: Risk Monitoring and PID Controller
 
-(use-trait finance-metrics-trait .security-monitoring.finance-metrics-trait)
-
 (define-constant ERR_UNAUTHORIZED (err u1000))
 
 (define-data-var current-risk-score uint u0)
@@ -11,15 +9,10 @@
 (define-data-var admin principal tx-sender)
 
 (define-read-only (get-risk-score) (ok (var-get current-risk-score)))
-(define-public (get-gcr (metrics-ref <finance-metrics-trait>)) (contract-call? metrics-ref get-protocol-gcr))
-
-;; @desc Returns the owner of the contract.
-(define-read-only (get-contract-owner)
-  (ok (var-get admin))
-)
+(define-read-only (get-gcr) (contract-call? .finance-metrics get-gcr))
 
 (define-read-only (get-protocol-status)
-  (ok { compliant: true, version: "v1.1.0-Apex" })
+  (ok { compliant: true version: "v1.1.0-Apex" })
 )
 
 (define-read-only (assess-system-risk)
@@ -42,16 +35,12 @@
   (ok (var-get stability-fee))
 )
 
-(define-public (get-cybernetic-intel (metrics-ref <finance-metrics-trait>))
+(define-read-only (get-cybernetic-intel)
   (ok {
-    operational-fee: (var-get stability-fee),
-    financial-gcr: (unwrap-panic (contract-call? metrics-ref get-protocol-gcr)),
+    operational-fee: (var-get stability-fee)
+    financial-gcr: (unwrap-panic (get-gcr))
     risk-score: (var-get current-risk-score)
   })
-)
-
-(define-public (get-performance-metrics (metrics-ref <finance-metrics-trait>))
-  (ok { tvl-growth-bps: u1000, bounty-completion-rate: u9000 })
 )
 
 ;; Mock functions for testing

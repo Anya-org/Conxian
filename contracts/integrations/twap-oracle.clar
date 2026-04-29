@@ -12,9 +12,9 @@
 (define-data-var admin principal tx-sender)
 (define-data-var twap-window uint u144) ;; 24 hours in blocks
 
-;; Price History Storage: { asset, block } -> price
+;; Price History Storage: { asset block } -> price
 (define-map price-observations
-  { asset: principal, block: uint }
+  { asset: principal block: uint }
   uint
 )
 
@@ -25,9 +25,9 @@
           (window (var-get twap-window)))
       (if (>= current-block window)
           ;; Get price at start of window
-          (match (map-get? price-observations { asset: asset, block: (- current-block window) })
+          (match (map-get? price-observations { asset: asset block: (- current-block window) })
             start-price
-              (match (map-get? price-observations { asset: asset, block: current-block })
+              (match (map-get? price-observations { asset: asset block: current-block })
                 end-price
                   (ok (/ (+ start-price end-price) u2)) ;; Simple average
                 (err ERR_NO_PRICE)
@@ -52,7 +52,7 @@
 (define-public (update-price-observation (asset principal) (price uint))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (map-set price-observations { asset: asset, block: burn-block-height } price)
+    (map-set price-observations { asset: asset block: burn-block-height } price)
     (ok true)
   )
 )

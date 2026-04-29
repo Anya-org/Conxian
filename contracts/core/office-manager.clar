@@ -29,7 +29,7 @@
 )
 
 (define-map authorized-agents principal bool)
-(define-map roles { user: principal, role: uint } bool)
+(define-map roles { user: principal role: uint } bool)
 
 (define-public (set-agent-status (agent principal) (active bool))
   (begin
@@ -47,7 +47,7 @@
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (map-set workers worker true)
-    (print { event: "worker-registered", worker: worker })
+    (print { event: "worker-registered" worker: worker })
     (ok true)
   )
 )
@@ -68,7 +68,7 @@
   (begin
     (try! (stx-transfer? amount tx-sender (as-contract tx-sender)))
     (var-set payroll-balance (+ (var-get payroll-balance) amount))
-    (print { event: "payroll-funded", amount: amount, new-balance: (var-get payroll-balance) })
+    (print { event: "payroll-funded" amount: amount new-balance: (var-get payroll-balance) })
     (ok true)
   )
 )
@@ -94,19 +94,19 @@
     (asserts! (<= amount (var-get payroll-balance)) (err ERR_INSUFFICIENT_FUNDS))
     (try! (as-contract (stx-transfer? amount tx-sender worker)))
     (var-set payroll-balance (- (var-get payroll-balance) amount))
-    (print { event: "worker-paid", job-contract: contract-caller, worker: worker, amount: amount })
+    (print { event: "worker-paid" job-contract: contract-caller worker: worker amount: amount })
     (ok true)
   )
 )
 
 (define-public (has-role (user principal) (role-id uint))
-  (ok (or (default-to false (map-get? roles { user: user, role: role-id })) (is-owner-principal user)))
+  (ok (or (default-to false (map-get? roles { user: user role: role-id })) (is-owner-principal user)))
 )
 
 (define-public (grant-role (user principal) (role-id uint) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (map-set roles { user: user, role: role-id } true)
+    (map-set roles { user: user role: role-id } true)
     (ok true)
   )
 )
@@ -114,7 +114,7 @@
 (define-public (revoke-role (user principal) (role-id uint) (message (buff 32)) (signature (buff 64)) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (map-delete roles { user: user, role: role-id })
+    (map-delete roles { user: user role: role-id })
     (ok true)
   )
 )

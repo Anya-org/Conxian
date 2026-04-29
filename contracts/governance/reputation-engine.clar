@@ -1,6 +1,6 @@
 ;; reputation-engine.clar
 ;; Sovereign Reputation & Voting Boost Engine
-;; Aligned with Chappies Ethos: Reputation-Driven, Bitcoin-Anchored
+;; Aligned with Chappies Ethos: Reputation-Driven Bitcoin-Anchored
 
 (impl-trait .governance-traits.reputation-engine-trait)
 
@@ -36,8 +36,8 @@
 ;; @desc Update activity score for a voter (Sovereign Reputation)
 (define-public (update-activity-score (voter principal))
   (begin
-    ;; In production, this would increment a map-based score
-    (print { event: "reputation-updated", voter: voter })
+    ;; In production this would increment a map-based score
+    (print { event: "reputation-updated" voter: voter })
     (ok true)
   )
 )

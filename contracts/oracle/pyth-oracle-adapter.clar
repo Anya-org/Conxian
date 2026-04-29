@@ -1,6 +1,6 @@
 ;; pyth-oracle-adapter.clar
 ;; Sovereign Oracle Adapter for Conxian Protocol
-;; Aligned with Chappies Ethos: Reactive, Non-Custodial, Bitcoin-Native
+;; Aligned with Chappies Ethos: Reactive Non-Custodial Bitcoin-Native
 
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_PYTH_FAILED (err u1001))

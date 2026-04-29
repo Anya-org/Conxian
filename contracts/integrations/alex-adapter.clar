@@ -12,7 +12,7 @@
 (define-constant ERR_ALEX_SWAP_FAILED (err u2001))
 
 ;; --- Data Vars ---
-;; Initialized to dummy values, must be set via set-alex-endpoints by admin
+;; Initialized to dummy values must be set via set-alex-endpoints by admin
 (define-data-var alex-vault principal tx-sender)
 (define-data-var alex-amm-pool principal tx-sender)
 (define-data-var is-active bool true)
@@ -40,16 +40,16 @@
     (amount uint)
     (recipient principal))
   (let (
-    (pool-data { amount-out: amount, fee-collected: u0 }) ;; Placeholder for simulation
+    (pool-data { amount-out: amount fee-collected: u0 }) ;; Placeholder for simulation
   )
     (begin
       (asserts! (var-get is-active) ERR_UNAUTHORIZED)
 
-      ;; In production, this would call ALEX swap-helper or amm-pool directly
+      ;; In production this would call ALEX swap-helper or amm-pool directly
       ;; (contract-call? .alex-vault ...) or similar
 
-      ;; For Conxian Universal Router compliance, we must return the results
-      (ok { amount-out: amount, fee-collected: u30 }) ;; Standard 30bps fee
+      ;; For Conxian Universal Router compliance we must return the results
+      (ok { amount-out: amount fee-collected: u30 }) ;; Standard 30bps fee
     )
   )
 )
@@ -60,7 +60,7 @@
 ;; @param memo: Optional 32-byte memo.
 (define-public (request-flash-liquidity (token <sip-010-ft-trait>) (amount uint) (memo (buff 32)))
   (begin
-    ;; ALEX doesn't natively support CSF flash liquidity in this manner, so we return not implemented or simulate
+    ;; ALEX doesn't natively support CSF flash liquidity in this manner so we return not implemented or simulate
     ERR_NOT_IMPLEMENTED
   )
 )
@@ -90,7 +90,7 @@
 
 ;; @desc Retrieves health telemetry for the ALEX integration.
 (define-public (get-csf-health)
-  (ok { tvl: u100000000000, utilization: u50, is-active: (var-get is-active) })
+  (ok { tvl: u100000000000 utilization: u50 is-active: (var-get is-active) })
 )
 
 ;; --- Admin ---
@@ -120,7 +120,7 @@
 ;; @desc Collect accumulated protocol fees from the ALEX integration.
 (define-public (collect-protocol-fees (token-trait <sip-010-ft-trait>))
   (begin
-    (print { event: "collect-fees-triggered", caller: contract-caller })
+    (print { event: "collect-fees-triggered" caller: contract-caller })
     (ok true)
   )
 )

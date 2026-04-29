@@ -11,23 +11,23 @@
 (define-map proposals
   uint
   {
-    proposer: principal,
-    proposal-contract: principal,
-    council-id: uint,
-    start-block: uint,
-    end-block: uint,
-    for-votes: uint,
-    against-votes: uint,
-    executed: bool,
-    canceled: bool,
+    proposer: principal
+    proposal-contract: principal
+    council-id: uint
+    start-block: uint
+    end-block: uint
+    for-votes: uint
+    against-votes: uint
+    executed: bool
+    canceled: bool
   }
 )
 
 ;; Track if a user has voted on a proposal
 (define-map vote-receipts
   {
-    proposal-id: uint,
-    voter: principal,
+    proposal-id: uint
+    voter: principal
   }
   bool
 )
@@ -47,8 +47,8 @@
   )
   (default-to false
     (map-get? vote-receipts {
-      proposal-id: proposal-id,
-      voter: voter,
+      proposal-id: proposal-id
+      voter: voter
     })
   )
 )
@@ -64,17 +64,17 @@
   )
   (let ((proposal-id (+ (var-get proposal-count) u1)))
     (begin
-      ;; In production, this should check if caller is proposal-engine
+      ;; In production this should check if caller is proposal-engine
       (map-set proposals proposal-id {
-        proposer: tx-sender,
-        proposal-contract: proposal-contract,
-        council-id: council-id,
-        start-block: start,
-        end-block: end,
-        for-votes: u0,
-        against-votes: u0,
-        executed: false,
-        canceled: false,
+        proposer: tx-sender
+        proposal-contract: proposal-contract
+        council-id: council-id
+        start-block: start
+        end-block: end
+        for-votes: u0
+        against-votes: u0
+        executed: false
+        canceled: false
       })
       (var-set proposal-count proposal-id)
       (ok proposal-id)
@@ -88,7 +88,7 @@
 (define-public (set-executed (proposal-id uint))
   (let ((proposal (unwrap! (map-get? proposals proposal-id) (err ERR_NOT_FOUND))))
     (begin
-      ;; In a real scenario, this would check if the caller is the proposal-executor
+      ;; In a real scenario this would check if the caller is the proposal-executor
       (map-set proposals proposal-id (merge proposal { executed: true }))
       (ok true)
     )
@@ -105,13 +105,13 @@
   )
   (let ((proposal (unwrap! (map-get? proposals proposal-id) (err ERR_NOT_FOUND))))
     (begin
-      ;; In production, check if caller is proposal-engine
+      ;; In production check if caller is proposal-engine
       (asserts! (not (has-voted proposal-id tx-sender)) (err ERR_ALREADY_VOTED))
 
       ;; Record receipt
       (map-set vote-receipts {
-        proposal-id: proposal-id,
-        voter: tx-sender,
+        proposal-id: proposal-id
+        voter: tx-sender
       }
         true
       )
@@ -122,11 +122,11 @@
           for-votes: (if support
             (+ (get for-votes proposal) weight)
             (get for-votes proposal)
-          ),
+          )
           against-votes: (if (not support)
             (+ (get against-votes proposal) weight)
             (get against-votes proposal)
-          ),
+          )
         })
       )
       (ok true)

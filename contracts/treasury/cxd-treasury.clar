@@ -1,6 +1,6 @@
 ;; cxd-treasury.clar
 ;; "Intelligence-Led Adaptive Yield Engine (AYE)" - Upgraded for CXIP-013
-;; Consolidates revenue allocation, dynamic rebalancing, and accrued claims.
+;; Consolidates revenue allocation dynamic rebalancing and accrued claims.
 ;; Nakamoto-Aligned (Epoch 3.0 / Clarity 4)
 
 (define-constant ERR_UNAUTHORIZED u1000)
@@ -40,13 +40,13 @@
 
 (define-read-only (get-allocation-percentages)
   (ok {
-    treasury: (var-get treasury-share),
-    bounty: (var-get bounty-share),
-    lp: (var-get lp-share),
-    grant: (var-get grant-share),
-    buyback: (var-get buyback-share),
-    insurance: (var-get insurance-share),
-    staking: (var-get lp-share),
+    treasury: (var-get treasury-share)
+    bounty: (var-get bounty-share)
+    lp: (var-get lp-share)
+    grant: (var-get grant-share)
+    buyback: (var-get buyback-share)
+    insurance: (var-get insurance-share)
+    staking: (var-get lp-share)
     dev: (var-get treasury-share)
   })
 )
@@ -78,13 +78,13 @@
     (var-set insurance-share insurance)
 
     (print {
-      event: "rebalanced",
-      treasury: treasury,
-      bounty: bounty,
-      lp: lp,
-      grant: grant,
-      buyback: buyback,
-      insurance: insurance,
+      event: "rebalanced"
+      treasury: treasury
+      bounty: bounty
+      lp: lp
+      grant: grant
+      buyback: buyback
+      insurance: insurance
       timestamp: block-height
     })
     (ok true)

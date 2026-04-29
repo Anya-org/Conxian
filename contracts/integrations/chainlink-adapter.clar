@@ -18,9 +18,9 @@
 (define-map price-feeds
     principal ;; Asset
     {
-        price: uint,
-        timestamp: uint,
-        confidence: uint,
+        price: uint
+        timestamp: uint
+        confidence: uint
     }
 )
 
@@ -47,11 +47,11 @@
     (begin
         (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
         (map-set price-feeds asset {
-            price: price,
-            timestamp: burn-block-height,
-            confidence: u5000, ;; Default confidence
+            price: price
+            timestamp: burn-block-height
+            confidence: u5000 ;; Default confidence
         })
-        (print { event: "chainlink-price-update", asset: asset, price: price, round: round-id })
+        (print { event: "chainlink-price-update" asset: asset price: price round: round-id })
         (ok true)
     )
 )

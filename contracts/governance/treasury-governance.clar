@@ -26,7 +26,7 @@
     ;; Logic to trigger a withdrawal from operational-treasury
     ;; (contract-call? .operational-treasury withdraw-stx u1000000 proposer)
 
-    (print { event: "treasury-allocation-executed", proposer: proposer })
+    (print { event: "treasury-allocation-executed" proposer: proposer })
     (ok true)
   )
 )

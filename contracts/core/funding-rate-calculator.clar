@@ -21,7 +21,7 @@
 ;; @returns (response bool uint)
 (define-public (update-funding-rate (asset principal))
   (begin
-    ;; In a real implementation, we would fetch prices from an oracle
+    ;; In a real implementation we would fetch prices from an oracle
     (map-set funding-rates asset 0)
     (map-set last-funding-blocks asset burn-block-height)
     (ok true)
