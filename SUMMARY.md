@@ -67,6 +67,7 @@
   * [LSEG MCP Audit](Fiscal-Vault-Oracle/LSEG_MCP_AUDIT.md)
 * [Treasury Oracle](Fiscal-Vault-Oracle/SOVEREIGN_RUNWAY.md)
 * [BOS treasury and yield integration architecture (CON-438)](docs/architecture/BOS_TREASURY_AND_YIELD_INTEGRATION_ARCHITECTURE.md)
+* [BOS sovereign enterprise identity architecture (CON-441)](docs/architecture/BOS_SOVEREIGN_ENTERPRISE_IDENTITY_ARCHITECTURE.md)
 * [BOS supply-chain verification and proof pipeline (CON-442)](docs/architecture/BOS_SUPPLY_CHAIN_VERIFICATION_AND_PROOF_PIPELINE.md)
 * [BOS preserve / enhance / replace gap matrix (CON-443)](docs/architecture/BOS_PRESERVE_ENHANCE_REPLACE_GAP_MATRIX.md)
 * [Arch Guardian](Nakamoto-Guardian/ANTI_FRAGILITY_LOOP.md)
