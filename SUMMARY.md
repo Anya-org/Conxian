@@ -51,7 +51,7 @@
 * [Conxian Protocol BOS buildout](docs/CONXIAN_PROTOCOL_BOS_BUILDOUT.md)
 * [conxian-gateway BOS buildout](docs/CONXIAN_GATEWAY_BOS_BUILDOUT.md)
 * [conxian-nexus BOS buildout](docs/CONXIAN_NEXUS_BOS_BUILDOUT.md)
-* [stacksorbit BOS buildout](docs/STACKSORBIT_BOS_BUILDOUT.md)
+* [conxius-orbit BOS buildout](docs/CONXIUS_ORBIT_BOS_BUILDOUT.md)
 * [Conxian_UI BOS buildout](docs/CONXIAN_UI_BOS_BUILDOUT.md)
 * [.github BOS buildout](docs/GITHUB_GOVERNANCE_BOS_BUILDOUT.md)
 * [Bounty workflow](docs/bounties/BOUNTY_WORKFLOW.md)
