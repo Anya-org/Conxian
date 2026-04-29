@@ -4,10 +4,7 @@
 
 The **Fiscal Vault Oracle** is the treasury and policy coordination layer of the Conxian Business Operations System (BOS).
 
-This repository is public. Detailed treasury operations, vendor integrations, and financial instrument terms are maintained in Linear:
-
-- https://linear.app/conxian-labs
-- https://linear.app/conxian-labs/issue/CON-256
+This repository is public. Detailed treasury operations, vendor integrations, and financial instrument terms are maintained in the sovereign coordination layer.
 
 ## Purpose
 
@@ -16,7 +13,7 @@ This repository is public. Detailed treasury operations, vendor integrations, an
 
 ## Status
 
-active — Public-safe treasury policy constraints and interfaces live here; detailed treasury operations and vendor terms are maintained in Linear. Internal details: <https://linear.app/conxian-labs/issue/CON-435/improve-portfolio-clarity-across-org-facing-repositories>.
+active — Public-safe treasury policy constraints and interfaces live here; detailed treasury operations and vendor terms are maintained in the sovereign coordination layer.
 
 ## Key Components
 

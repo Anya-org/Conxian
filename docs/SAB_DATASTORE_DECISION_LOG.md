@@ -27,6 +27,10 @@ Status meanings:
 | SAB-DS-006 | Derived query layer (decentralized SQL) | Kwil | Open | Candidate for decentralized SQL query surfaces. Must not become an availability dependency for correctness; evaluate whether it should be limited to mirrors and public query ergonomics. | Botshelo Mokoka | After CON-334 domain mapping pass |
 | SAB-DS-007 | Institutional egress datasets (read-only subledger export) | Postgres views + deterministic exports | Accepted | Egress is read-only and proof-carrying: datasets are produced by Nexus as a Glass Node and are verifiable via on-chain checkpoints. | Botshelo Mokoka | Update after first dataset list is finalized |
 
+### SAB-DS-002
+
+Proof/visual-proof analytics (derived datasets) — Space and Time (Open). See the `SAB-DS-002` row in the decision table above for constraints and next review.
+
 ## Open questions (cross-domain)
 
 | Question | Impact | Notes |

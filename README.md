@@ -67,9 +67,7 @@ git submodule update --init services/conxian-ui
 
 ## Repository visibility and public/private boundary
 
-Treat this repository as public for boundary purposes. Detailed strategy, legal interpretations, operational runbooks, infrastructure identifiers, and any secret inventory are maintained in the Conxian Linear workspace (not in git), in compliance with our Zero Secret Egress (ZSE) mandate.
-
-See https://linear.app/conxian-labs/issue/CON-256 for ZSE background and operating requirements.
+Treat this repository as public for boundary purposes. Detailed strategy, legal interpretations, operational runbooks, infrastructure identifiers, and any secret inventory are maintained in the sovereign coordination layer (not in git), in compliance with our Zero Secret Egress (ZSE) mandate.
 
 Detailed strategy and roadmap content must not be duplicated in this README; see `docs/BOS_BUSINESS_BUILDOUT.md` for the public vs internal documentation rules.
 
@@ -81,7 +79,7 @@ The Conxian Business Operations System (BOS) follows a strict **SAB-owned wallet
 
 - **Wallet Architecture**: See [`docs/SAB_WALLET_ARCHITECTURE_AND_CONTROL_MATRIX.md`](./docs/SAB_WALLET_ARCHITECTURE_AND_CONTROL_MATRIX.md).
 - **Handoff Protocol**: The staged migration from personal bootstrap control to SAB and DAO governance is defined in [`docs/SAB_DAO_HANDOFF_PROTOCOL.md`](./docs/SAB_DAO_HANDOFF_PROTOCOL.md).
-- **Implementation Manifest**: Technical remediation of hardcoded principals and stubbed roles is tracked in [`docs/WALLET_REMAPPING_MANIFEST_CON_61_CON_423.md`](./docs/WALLET_REMAPPING_MANIFEST_CON_61_CON_423.md).
+- **Controlled Operational Mappings**: Detailed wallet remapping and signer mapping records are maintained in private governance/operations systems; public stubs are retained only for link continuity.
 
 ## Ground truth (OpenSpec)
 
@@ -116,3 +114,4 @@ To maintain a clean and sovereign workspace, we adhere to strict hygiene standar
 - **`scripts/`**: Contains active utility scripts (e.g., `check_links.py`).
 - **`ARCHIVE_MIGRATION.md`**: ZSE-safe pointers to legacy material intentionally kept out of the Git index.
 - **`openspec/`**: Definitive technical specifications.
+- **Artifact Hygiene**: Scratch scripts and temporary fix-up files (e.g., `*_fix.py`) are excluded from the repository to maintain a clean production environment.
