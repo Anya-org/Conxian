@@ -15,7 +15,9 @@ Define and version Conxian's Business Operations System (BOS) as an auditable, p
 
 ## Status
 
-Active. This is the public source of truth for BOS-level specifications and how the broader Conxian stack fits together.
+Active. This repository is private (as of April 8, 2026) and is the canonical in-repo source for BOS-level specifications and how the broader Conxian stack fits together.
+
+Documentation here follows public-safe boundary rules; internal-only strategy and operational details remain in the sovereign coordination layer under ZSE.
 
 Releases are tracked in `CHANGELOG.md` and published as SemVer tags (`vX.Y.Z`). See `RELEASING.md`.
 
@@ -67,7 +69,7 @@ git submodule update --init services/conxian-ui
 
 ## Repository visibility and public/private boundary
 
-Treat this repository as public for boundary purposes. Detailed strategy, legal interpretations, operational runbooks, infrastructure identifiers, and any secret inventory are maintained in the sovereign coordination layer (not in git), in compliance with our Zero Secret Egress (ZSE) mandate.
+Treat this repository as private in hosting visibility, but public-safe for boundary purposes. Detailed strategy, legal interpretations, operational runbooks, infrastructure identifiers, and any secret inventory are maintained in the sovereign coordination layer (not in git), in compliance with our Zero Secret Egress (ZSE) mandate.
 
 Detailed strategy and roadmap content must not be duplicated in this README; see `docs/BOS_BUSINESS_BUILDOUT.md` for the public vs internal documentation rules.
 

@@ -4,7 +4,7 @@ Welcome to the Conxian ecosystem. We are building a Bitcoin-native Business Oper
 
 ## Scope of this repository
 
-This repository is the public source of truth for BOS governance artifacts and OpenSpec.
+This repository is private (as of April 8, 2026) and is the canonical in-repo source for BOS governance artifacts and OpenSpec under public-safe documentation boundaries.
 
 Most implementation work happens in the individual service repositories (often pinned here as submodules). If your change affects a submodule, prefer opening a PR in that submodule repository, then update the pinned commit in this repo.
 
