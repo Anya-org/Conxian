@@ -1,998 +1,997 @@
----
 id: 0
-name: "Simulated deployment, used as a default for `clarinet console`, `clarinet test` and `clarinet check`"
+name: Simulated deployment, used as a default for `clarinet console`, `clarinet test` and `clarinet check`
 network: simnet
 genesis:
   wallets:
-    - name: deployer
-      address: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-      balance: "0"
-      sbtc-balance: "1000000000"
-    - name: wallet_1
-      address: ST185VAXFTBXHD2BAR1R2T8DB4E2RYM32ATRKD5H9
-      balance: "0"
-      sbtc-balance: "1000000000"
-    - name: wallet_2
-      address: ST3WQV65GJM3JRVQQYQWNRHCGJDS3D92EZ1J0VNVZ
-      balance: "0"
-      sbtc-balance: "1000000000"
-    - name: wallet_3
-      address: ST1HZ7J3B7AM7KZWFVV55NG275DNGZQA7GY993BV4
-      balance: "0"
-      sbtc-balance: "1000000000"
+  - name: deployer
+    address: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+    balance: '0'
+    sbtc-balance: '1000000000'
+  - name: wallet_1
+    address: ST29S7HY4JGKDYA2CQQTGSY55D612M31SJX2BN92S
+    balance: '0'
+    sbtc-balance: '1000000000'
+  - name: wallet_2
+    address: ST2EH2MR7RAZHD6BPC6JH86RX171V2EV03CMEWT7G
+    balance: '0'
+    sbtc-balance: '1000000000'
+  - name: wallet_3
+    address: ST2YV522F4HKJH4HJCCF5GMGVWVAN7YPWBJN9J3P1
+    balance: '0'
+    sbtc-balance: '1000000000'
   contracts:
-    - genesis
-    - lockup
-    - bns
-    - cost-voting
-    - costs
-    - pox
-    - costs-2
-    - pox-2
-    - costs-3
-    - pox-3
-    - pox-4
-    - signers
-    - signers-voting
-    - costs-4
+  - genesis
+  - lockup
+  - bns
+  - cost-voting
+  - costs
+  - pox
+  - costs-2
+  - pox-2
+  - costs-3
+  - pox-3
+  - pox-4
+  - signers
+  - signers-voting
+  - costs-4
 plan:
   batches:
-    - id: 0
-      transactions:
-        - emulated-contract-publish:
-            contract-name: access-control-trait
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\access-control-trait.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: sip-standards
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\sip-standards.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: core-traits
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\core-traits.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: admin-facade
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\core\\admin-facade.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: finance-metrics
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\monitoring\\finance-metrics.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: agent-risk
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\agents\\agent-risk.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: conxian-csf-trait
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\conxian-csf-trait.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: agent-treasury
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\agents\\agent-treasury.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: conxian-protocol
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\core\\conxian-protocol.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: alex-adapter
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\integrations\\alex-adapter.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: allocation-policy
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\treasury\\allocation-policy.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: analytics-aggregator
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\monitoring\\analytics-aggregator.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: auto-compounder
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\yield\\auto-compounder.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: operational-treasury
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\core\\operational-treasury.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: automation-manager
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\automation\\automation-manager.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: automation-traits
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\automation-traits.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: batch-auction
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\batch-auction.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: batch-operations
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\core\\batch-operations.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: batch-processor
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\automation\\batch-processor.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: block-utils
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\utils\\block-utils.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: cxd-token
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\tokens\\cxd-token.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: bme-engine
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\core\\bme-engine.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: kyc-registry
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\identity\\kyc-registry.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: regulatory-adapter
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\compliance\\regulatory-adapter.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: bond-factory
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\bonding\\bond-factory.clar"
-            clarity-version: 3
-      epoch: "3.2"
-    - id: 1
-      transactions:
-        - emulated-contract-publish:
-            contract-name: bond-token
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\bonding\\bond-token.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: bond-traits
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\bond-traits.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: bridge-nft
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\cross-chain\\bridge-nft.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: btc-adapter
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\interfaces\\btc-adapter.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: defi-traits
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\defi-traits.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: chainlink-adapter
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\integrations\\chainlink-adapter.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: security-monitoring
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\security-monitoring.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: circuit-breaker
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\security\\circuit-breaker.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: clarity-bitcoin
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\lib\\clarity-bitcoin.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: community-dao
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\community-dao.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: community-governance-token
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\community-governance-token.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: community-voting-engine
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\community-voting-engine.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: compliance-hooks
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\compliance\\compliance-hooks.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: compliance-trait
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\compliance\\compliance-trait.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: revenue-automation
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\treasury\\revenue-automation.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: concentrated-liquidity-pool
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\concentrated-liquidity-pool.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: concentrated-math
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\math\\concentrated-math.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: controller-traits
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\controller-traits.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: conxian-access
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\core\\conxian-access.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: queue-traits
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\queue-traits.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: conxian-exit-queue
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\core\\conxian-exit-queue.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: conxian-insurance-fund
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\security\\conxian-insurance-fund.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: conxian-intent-trait
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\conxian-intent-trait.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: conxian-paas-factory
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\core\\conxian-paas-factory.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: conxian-service-trait
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\conxian-service-trait.clar"
-            clarity-version: 3
-      epoch: "3.2"
-    - id: 2
-      transactions:
-        - emulated-contract-publish:
-            contract-name: vault-traits
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\vault-trait.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: conxian-vaults
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\treasury\\conxian-vaults.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: cross-chain-traits
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\cross-chain-traits.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: cross-protocol-integrator
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\yield\\cross-protocol-integrator.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: custody
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\vaults\\custody.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: cxd-bonding-curve-amm
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\bonding\\cxd-bonding-curve-amm.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: cxd-price-initializer
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\tokens\\cxd-price-initializer.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: cxd-staking
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\yield\\cxd-staking.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: cxd-treasury
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\treasury\\cxd-treasury.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: cxlp-position-nft
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\tokens\\cxlp-position-nft.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: cxlp-token
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\tokens\\cxlp-token.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: cxs-token
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\tokens\\cxs-token.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: cxtr-token
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\tokens\\cxtr-token.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: cxvg-token
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\tokens\\cxvg-token.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: dao-treasury
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\dao-treasury.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: default-strategy-engine
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\rewards\\default-strategy-engine.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: dex-factory
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\dex-factory.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: dex-defi
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\dex-facade.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: dex-facade
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\dex-facade.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: dia-oracle-adapter
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\integrations\\dia-oracle-adapter.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: dim-oracle-automation
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dimensional\\dim-oracle-automation.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: enhanced-circuit-breaker
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\security\\enhanced-circuit-breaker.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: dimensional-core
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dimensional\\dimensional-core.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: dimensional-engine
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\core\\dimensional-engine.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: dimensional-engine-interface
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\interfaces\\dimensional-engine-interface.clar"
-            clarity-version: 3
-      epoch: "3.2"
-    - id: 3
-      transactions:
-        - emulated-contract-publish:
-            contract-name: dimensional-oracle
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\oracle\\dimensional-oracle.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: dimensional-traits
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\dimensional-traits.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: dlc-bond
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\sbtc\\dlc-bond.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: dlc-manager
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\sbtc\\dlc-manager.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: dlc-orchestrator
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\sbtc\\dlc-orchestrator.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: dual-stacking-orchestrator
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\staking\\dual-stacking-orchestrator.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: early-lp-rewards
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\rewards\\early-lp-rewards.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: economic-policy-engine
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\core\\economic-policy-engine.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: pausable-trait
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\pausable-trait.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: emergency-governance
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\emergency-governance.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: encoding
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\utils\\encoding.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: enhanced-governance-nft
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\enhanced-governance-nft.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: enhanced-yield-strategy
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\yield\\enhanced-yield-strategy.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: enterprise-api
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\enterprise\\enterprise-api.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: enterprise-facade
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\enterprise\\enterprise-facade.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: enterprise-traits
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\enterprise-traits.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: exponentiation
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\math\\exponentiation.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: external-oracle-adapter
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\oracle\\external-oracle-adapter.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: federated-oracle-adapter
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\oracle\\federated-oracle-adapter.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: founder-vault
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\treasury\\founder-vault.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: founder-vesting
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\core\\founder-vesting.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: funding-rate-calculator
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\core\\funding-rate-calculator.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: governance
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dimensional\\governance.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: governance-handover
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\governance-handover.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: governance-signature-verifier
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\governance-signature-verifier.clar"
-            clarity-version: 3
-      epoch: "3.2"
-    - id: 4
-      transactions:
-        - emulated-contract-publish:
-            contract-name: governance-token
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance-token.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: governance-traits
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\governance-traits.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: ico-offering
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\ico-offering.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: identity-badge
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\identity\\identity-badge.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: insurance-protection-nft
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\insurance\\insurance-protection-nft.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: intent-solver-gateway
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\gateway\\intent-solver-gateway.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: interest-rate-model
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\lending\\interest-rate-model.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: legacy-adapter
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\migration\\legacy-adapter.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: legal-representative-registry
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\legal-representative-registry.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: lending-manager
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\lending\\lending-manager.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: lending-protocol-governance
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\lending-protocol-governance.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: liquidity-manager
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\liquidity-manager.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: liquidity-optimization-engine
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\liquidity-optimization-engine.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: liquidity-provider
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\liquidity-provider.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: math-utilities
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\math\\math-utilities.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: memory-pool-management
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\memory-pool-management.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: mev-protection-nft
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\mev\\mev-protection-nft.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: mev-protector
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\security\\mev-protector.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: mock-circuit-breaker
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\test-helpers\\mock-circuit-breaker.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: mock-csf-protocol
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\test-helpers\\mock-csf-protocol.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: mock-proposal
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\test-helpers\\mock-proposal.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: mock-token
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\test-helpers\\mock-token.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: monitoring-dashboard
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\monitoring\\monitoring-dashboard.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: nakamoto-compatibility
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\utils\\nakamoto-compatibility.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: nakamoto-constants
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\constants\\nakamoto-constants.clar"
-            clarity-version: 3
-      epoch: "3.2"
-    - id: 5
-      transactions:
-        - emulated-contract-publish:
-            contract-name: native-stacking-operator
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\staking\\native-stacking-operator.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: nft-marketplace
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\marketplace\\nft-marketplace.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: office-manager
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\core\\office-manager.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: opex-vault
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\treasury\\opex-vault.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: ops-engine
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\core\\ops-engine.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: ops-loan-manager
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\enterprise\\ops-loan-manager.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: optimization-helpers
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\helpers\\optimization-helpers.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: oracle
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\oracle.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: oracle-adapter-stub
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\oracle\\oracle-adapter-stub.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: oracle-aggregator
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\oracle\\oracle-aggregator.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: oracle-traits
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\integrations\\twap-oracle.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: order-book
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\orders\\order-book.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: pausable
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\base\\pausable.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: performance-optimizer
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\performance\\performance-optimizer.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: points-oracle
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\oracle\\points-oracle.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: pool-factory
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\pools\\pool-factory.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: pool-registry
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\pools\\pool-registry.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: pool-template
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\pool-template.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: position-factory
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\position-factory.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: position-factory-root
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\mev\\position-factory-root.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: position-nft
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dimensional\\position-nft.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: predictive-scaling-system
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\predictive-scaling-system.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: price-stability-monitor
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\monitoring\\price-stability-monitor.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: proof-of-reserves
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\security\\proof-of-reserves.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: proposal-registry
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\proposal-registry.clar"
-            clarity-version: 3
-      epoch: "3.2"
-    - id: 6
-      transactions:
-        - emulated-contract-publish:
-            contract-name: proposal-executor
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\proposal-executor.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: reputation-engine
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\reputation-engine.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: proposal-engine
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\proposal-engine.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: proposal-engine-trait
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\proposal-engine-trait.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: protocol-invariant-monitor
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\protocol-invariant-monitor.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: pyth-traits
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\pyth-traits.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: pyth-oracle-adapter
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\integrations\\pyth-oracle-adapter.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: rate-limiter
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\security\\rate-limiter.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: rbac
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\utils\\rbac.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: rebalancing-rules
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\rebalancing-rules.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: redstone-traits
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\redstone-traits.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: redstone-oracle-adapter
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\integrations\\redstone-oracle-adapter.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: revenue-distributor
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\treasury\\revenue-distributor.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: route-manager
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\route-manager.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: sab-election
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\sab-election.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: sbtc-vault
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\vaults\\sbtc-vault.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: signed-data-base
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\signed-data-base.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: sip-010-ft-trait
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\sip-standards.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: swap-manager
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\swap-manager.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: swap-router
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\swap-router.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: switchboard-oracle-adapter
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\integrations\\switchboard-oracle-adapter.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: test-c4-helper
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\test-helpers\\test-c4-helper.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: timelock
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\timelock.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: token-emission-controller
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\yield\\token-emission-controller.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: token-system-coordinator
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\tokens\\token-system-coordinator.clar"
-            clarity-version: 3
-      epoch: "3.2"
-    - id: 7
-      transactions:
-        - emulated-contract-publish:
-            contract-name: travel-rule-service
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\compliance\\travel-rule-service.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: treasury-governance
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\treasury-governance.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: twap-oracle
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\integrations\\twap-oracle.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: vault
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\dex\\vault.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: vault-trait
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\traits\\vault-trait.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: voting
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\voting.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: wormhole-handlers
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\interoperability\\wormhole-handlers.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: wormhole-inbox
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\interoperability\\wormhole-inbox.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: wormhole-outbox
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\interoperability\\wormhole-outbox.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: yield-aggregator
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\vaults\\yield-aggregator.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: yield-governance
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\governance\\yield-governance.clar"
-            clarity-version: 3
-        - emulated-contract-publish:
-            contract-name: yield-optimizer
-            emulated-sender: STXZS5EG3PJK6ZDX4Q8DEKDHQQBM4WVCW97787KQ
-            path: "contracts\\yield\\yield-optimizer.clar"
-            clarity-version: 3
-      epoch: "3.2"
+  - id: 0
+    transactions:
+    - transaction-type: emulated-contract-publish
+      contract-name: access-control-trait
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/access-control-trait.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: sip-standards
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/sip-standards.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: core-traits
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/core-traits.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: admin-facade
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/core/admin-facade.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: finance-metrics
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/monitoring/finance-metrics.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: agent-risk
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/agents/agent-risk.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: conxian-csf-trait
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/conxian-csf-trait.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: agent-treasury
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/agents/agent-treasury.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: conxian-protocol
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/core/conxian-protocol.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: alex-adapter
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/integrations/alex-adapter.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: allocation-policy
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/treasury/allocation-policy.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: analytics-aggregator
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/monitoring/analytics-aggregator.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: auto-compounder
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/yield/auto-compounder.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: operational-treasury
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/core/operational-treasury.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: automation-manager
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/automation/automation-manager.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: automation-traits
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/automation-traits.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: batch-auction
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/batch-auction.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: batch-operations
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/core/batch-operations.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: batch-processor
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/automation/batch-processor.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: block-utils
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/utils/block-utils.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: cxd-token
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/tokens/cxd-token.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: bme-engine
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/core/bme-engine.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: kyc-registry
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/identity/kyc-registry.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: regulatory-adapter
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/compliance/regulatory-adapter.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: bond-factory
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/bonding/bond-factory.clar
+      clarity-version: 4
+    epoch: '3.3'
+  - id: 1
+    transactions:
+    - transaction-type: emulated-contract-publish
+      contract-name: bond-token
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/bonding/bond-token.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: bond-traits
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/bond-traits.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: bridge-nft
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/cross-chain/bridge-nft.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: btc-adapter
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/interfaces/btc-adapter.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: defi-traits
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/defi-traits.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: chainlink-adapter
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/integrations/chainlink-adapter.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: security-monitoring
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/security-monitoring.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: circuit-breaker
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/security/circuit-breaker.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: clarity-bitcoin
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/lib/clarity-bitcoin.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: community-dao
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/community-dao.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: community-governance-token
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/community-governance-token.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: community-voting-engine
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/community-voting-engine.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: compliance-hooks
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/compliance/compliance-hooks.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: compliance-trait
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/compliance/compliance-trait.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: revenue-automation
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/treasury/revenue-automation.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: concentrated-liquidity-pool
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/concentrated-liquidity-pool.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: concentrated-math
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/math/concentrated-math.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: controller-traits
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/controller-traits.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: conxian-access
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/core/conxian-access.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: queue-traits
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/queue-traits.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: conxian-exit-queue
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/core/conxian-exit-queue.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: conxian-insurance-fund
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/security/conxian-insurance-fund.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: conxian-intent-trait
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/conxian-intent-trait.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: conxian-paas-factory
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/core/conxian-paas-factory.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: conxian-service-trait
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/conxian-service-trait.clar
+      clarity-version: 4
+    epoch: '3.3'
+  - id: 2
+    transactions:
+    - transaction-type: emulated-contract-publish
+      contract-name: vault-traits
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/vault-trait.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: conxian-vaults
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/treasury/conxian-vaults.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: cross-chain-traits
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/cross-chain-traits.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: cross-protocol-integrator
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/yield/cross-protocol-integrator.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: custody
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/vaults/custody.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: cxd-bonding-curve-amm
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/bonding/cxd-bonding-curve-amm.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: cxd-price-initializer
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/tokens/cxd-price-initializer.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: cxd-staking
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/yield/cxd-staking.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: cxd-treasury
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/treasury/cxd-treasury.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: cxlp-position-nft
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/tokens/cxlp-position-nft.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: cxlp-token
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/tokens/cxlp-token.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: cxs-token
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/tokens/cxs-token.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: cxtr-token
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/tokens/cxtr-token.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: cxvg-token
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/tokens/cxvg-token.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: dao-treasury
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/dao-treasury.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: default-strategy-engine
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/rewards/default-strategy-engine.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: dex-factory
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/dex-factory.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: dex-defi
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/dex-facade.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: dex-facade
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/dex-facade.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: dia-oracle-adapter
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/integrations/dia-oracle-adapter.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: dim-oracle-automation
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dimensional/dim-oracle-automation.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: enhanced-circuit-breaker
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/security/enhanced-circuit-breaker.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: dimensional-core
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dimensional/dimensional-core.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: dimensional-engine
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/core/dimensional-engine.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: dimensional-engine-interface
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/interfaces/dimensional-engine-interface.clar
+      clarity-version: 4
+    epoch: '3.3'
+  - id: 3
+    transactions:
+    - transaction-type: emulated-contract-publish
+      contract-name: dimensional-oracle
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/oracle/dimensional-oracle.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: dimensional-traits
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/dimensional-traits.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: dlc-bond
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/sbtc/dlc-bond.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: dlc-manager
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/sbtc/dlc-manager.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: dlc-orchestrator
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/sbtc/dlc-orchestrator.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: dual-stacking-orchestrator
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/staking/dual-stacking-orchestrator.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: early-lp-rewards
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/rewards/early-lp-rewards.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: economic-policy-engine
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/core/economic-policy-engine.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: pausable-trait
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/pausable-trait.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: emergency-governance
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/emergency-governance.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: encoding
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/utils/encoding.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: enhanced-governance-nft
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/enhanced-governance-nft.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: enhanced-yield-strategy
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/yield/enhanced-yield-strategy.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: enterprise-api
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/enterprise/enterprise-api.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: enterprise-facade
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/enterprise/enterprise-facade.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: enterprise-traits
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/enterprise-traits.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: exponentiation
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/math/exponentiation.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: external-oracle-adapter
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/oracle/external-oracle-adapter.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: federated-oracle-adapter
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/oracle/federated-oracle-adapter.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: founder-vault
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/treasury/founder-vault.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: founder-vesting
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/core/founder-vesting.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: funding-rate-calculator
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/core/funding-rate-calculator.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: governance
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dimensional/governance.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: governance-handover
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/governance-handover.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: governance-signature-verifier
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/governance-signature-verifier.clar
+      clarity-version: 4
+    epoch: '3.3'
+  - id: 4
+    transactions:
+    - transaction-type: emulated-contract-publish
+      contract-name: governance-token
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance-token.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: governance-traits
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/governance-traits.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: ico-offering
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/ico-offering.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: identity-badge
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/identity/identity-badge.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: insurance-protection-nft
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/insurance/insurance-protection-nft.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: intent-solver-gateway
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/gateway/intent-solver-gateway.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: interest-rate-model
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/lending/interest-rate-model.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: legacy-adapter
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/migration/legacy-adapter.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: legal-representative-registry
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/legal-representative-registry.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: lending-manager
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/lending/lending-manager.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: lending-protocol-governance
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/lending-protocol-governance.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: liquidity-manager
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/liquidity-manager.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: liquidity-optimization-engine
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/liquidity-optimization-engine.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: liquidity-provider
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/liquidity-provider.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: math-utilities
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/math/math-utilities.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: memory-pool-management
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/memory-pool-management.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: mev-protection-nft
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/mev/mev-protection-nft.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: mev-protector
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/security/mev-protector.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: mock-circuit-breaker
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/test-helpers/mock-circuit-breaker.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: mock-csf-protocol
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/test-helpers/mock-csf-protocol.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: mock-proposal
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/test-helpers/mock-proposal.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: mock-token
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/test-helpers/mock-token.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: monitoring-dashboard
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/monitoring/monitoring-dashboard.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: nakamoto-compatibility
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/utils/nakamoto-compatibility.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: nakamoto-constants
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/constants/nakamoto-constants.clar
+      clarity-version: 4
+    epoch: '3.3'
+  - id: 5
+    transactions:
+    - transaction-type: emulated-contract-publish
+      contract-name: native-stacking-operator
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/staking/native-stacking-operator.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: nft-marketplace
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/marketplace/nft-marketplace.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: office-manager
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/core/office-manager.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: opex-vault
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/treasury/opex-vault.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: ops-engine
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/core/ops-engine.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: ops-loan-manager
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/enterprise/ops-loan-manager.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: optimization-helpers
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/helpers/optimization-helpers.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: oracle
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/oracle.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: oracle-adapter-stub
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/oracle/oracle-adapter-stub.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: oracle-aggregator
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/oracle/oracle-aggregator.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: oracle-traits
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/integrations/twap-oracle.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: order-book
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/orders/order-book.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: pausable
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/base/pausable.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: performance-optimizer
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/performance/performance-optimizer.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: points-oracle
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/oracle/points-oracle.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: pool-factory
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/pools/pool-factory.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: pool-registry
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/pools/pool-registry.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: pool-template
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/pool-template.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: position-factory
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/position-factory.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: position-factory-root
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/mev/position-factory-root.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: position-nft
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dimensional/position-nft.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: predictive-scaling-system
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/predictive-scaling-system.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: price-stability-monitor
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/monitoring/price-stability-monitor.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: proof-of-reserves
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/security/proof-of-reserves.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: proposal-registry
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/proposal-registry.clar
+      clarity-version: 4
+    epoch: '3.3'
+  - id: 6
+    transactions:
+    - transaction-type: emulated-contract-publish
+      contract-name: proposal-executor
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/proposal-executor.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: reputation-engine
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/reputation-engine.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: proposal-engine
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/proposal-engine.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: proposal-engine-trait
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/proposal-engine-trait.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: protocol-invariant-monitor
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/protocol-invariant-monitor.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: pyth-traits
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/pyth-traits.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: pyth-oracle-adapter
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/integrations/pyth-oracle-adapter.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: rate-limiter
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/security/rate-limiter.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: rbac
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/utils/rbac.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: rebalancing-rules
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/rebalancing-rules.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: redstone-traits
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/redstone-traits.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: redstone-oracle-adapter
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/integrations/redstone-oracle-adapter.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: revenue-distributor
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/treasury/revenue-distributor.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: route-manager
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/route-manager.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: sab-election
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/sab-election.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: sbtc-vault
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/vaults/sbtc-vault.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: signed-data-base
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/signed-data-base.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: sip-010-ft-trait
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/sip-standards.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: swap-manager
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/swap-manager.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: swap-router
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/swap-router.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: switchboard-oracle-adapter
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/integrations/switchboard-oracle-adapter.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: test-c4-helper
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/test-helpers/test-c4-helper.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: timelock
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/timelock.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: token-emission-controller
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/yield/token-emission-controller.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: token-system-coordinator
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/tokens/token-system-coordinator.clar
+      clarity-version: 4
+    epoch: '3.3'
+  - id: 7
+    transactions:
+    - transaction-type: emulated-contract-publish
+      contract-name: travel-rule-service
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/compliance/travel-rule-service.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: treasury-governance
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/treasury-governance.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: twap-oracle
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/integrations/twap-oracle.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: vault
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/dex/vault.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: vault-trait
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/traits/vault-trait.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: voting
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/voting.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: wormhole-handlers
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/interoperability/wormhole-handlers.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: wormhole-inbox
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/interoperability/wormhole-inbox.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: wormhole-outbox
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/interoperability/wormhole-outbox.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: yield-aggregator
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/vaults/yield-aggregator.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: yield-governance
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/governance/yield-governance.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: yield-optimizer
+      emulated-sender: STK19EEPNDSHCJEXRB0XX3WSMMR3934WYMDX9STX
+      path: contracts/yield/yield-optimizer.clar
+      clarity-version: 4
+    epoch: '3.3'

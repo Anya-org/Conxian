@@ -34,8 +34,8 @@
 
       ;; 2. Trigger BME epoch minting
       (match (contract-call? .bme-engine execute-epoch-minting pools-to-reward)
-        res (begin (print { event: "bme-epoch-minted" success: true }) true)
-        err-val (begin (print { event: "bme-epoch-skipped" reason: err-val }) false)
+        res (begin (print { event: "bme-epoch-minted", success: true }) true)
+        err-val (begin (print { event: "bme-epoch-skipped", reason: err-val }) false)
       )
 
       (ok true)
@@ -65,31 +65,16 @@
     (if (< gcr u110)
       ;; CRISIS Mode
       (ok {
-        treasury: u0
-        bounty: u0
-        lp: u0
-        grant: u0
-        buyback: u0
-        insurance: u10000
+        treasury: u0, bounty: u0, lp: u0, grant: u0, buyback: u0, insurance: u10000
       })
       (if (< gcr u150)
         ;; STABILITY Mode
         (ok {
-          treasury: u4500
-          bounty: u3000
-          lp: u1500
-          grant: u500
-          buyback: u500
-          insurance: u0
+          treasury: u4500, bounty: u3000, lp: u1500, grant: u500, buyback: u500, insurance: u0
         })
         ;; ABUNDANCE Mode
         (ok {
-          treasury: u1000
-          bounty: u0
-          lp: u8000
-          grant: u0
-          buyback: u0
-          insurance: u1000
+          treasury: u1000, bounty: u0, lp: u8000, grant: u0, buyback: u0, insurance: u1000
         })
       )
     )
@@ -114,5 +99,5 @@
 )
 
 (define-read-only (get-protocol-status)
-  (ok { compliant: true version: "v1.1.0-Apex" })
+  (ok { compliant: true, version: "v1.1.0-Apex" })
 )

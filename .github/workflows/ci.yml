@@ -1,0 +1,30 @@
+name: Conxian Protocol CI
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  clarity-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Enforce Clarity 4 Standards (No missing commas, no legacy block-height)
+        run: node scripts/validate-c4-syntax.cjs
+
+      - name: Run Clarinet Check
+        run: npx clarinet check
+
+      - name: Run Tests with Coverage (Vitest / Clarinet SDK)
+        run: npm run coverage

@@ -62,8 +62,7 @@ epoch = "latest"
 [contracts.automation-manager]
 path = "contracts/automation/automation-manager.clar"
 clarity-version = 4
-depends_on = ["operational-treasury"]
-
+depends_on = ["conxian-protocol", "operational-treasury"]
 epoch = "latest"
 
 [contracts.automation-traits]
