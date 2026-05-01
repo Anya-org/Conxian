@@ -179,8 +179,6 @@ epoch = "latest"
 [contracts.compliance-hooks]
 path = "contracts/compliance/compliance-hooks.clar"
 clarity-version = 4
-depends_on = ["compliance-manager", "kyc-registry"]
-
 epoch = "latest"
 
 [contracts.compliance-trait]
@@ -659,8 +657,6 @@ epoch = "latest"
 [contracts.legacy-adapter]
 path = "contracts/migration/legacy-adapter.clar"
 clarity-version = 4
-depends_on = ["migration-manager"]
-
 epoch = "latest"
 
 [contracts.legal-representative-registry]

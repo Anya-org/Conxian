@@ -6,6 +6,7 @@
   "description": "Conxian Finance Protocol - Sovereign Autonomous Business (SAB) on Stacks",
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
+    "pretest": "node ./scripts/validate-c4-syntax.cjs",
     "test": "vitest run",
     "deploy": "clarinet deploy revenue-automation --network testnet",
     "clarinet:check": "clarinet check",

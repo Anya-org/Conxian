@@ -5,15 +5,13 @@
 
 (define-public (check-peg-status (metrics-ref <finance-metrics-trait>))
   (let (
-    (intel (unwrap-panic (contract-call? .agent-risk get-cybernetic-intel metrics-ref)))
+    (intel (unwrap-panic (contract-call? .agent-risk get-cybernetic-intel)))
     (pid-fee (get operational-fee intel))
     (gcr (get financial-gcr intel))
   )
     (ok {
-      stable: (and (<= pid-fee u500) (>= gcr u130))
-      pid-fee: pid-fee
-      gcr: gcr
-      timestamp: burn-block-height
+      stable: (and (<= pid-fee u500) (>= gcr u130)),
+      pid-fee: pid-fee, gcr: gcr, timestamp: burn-block-height
     })
   )
 )

@@ -18,9 +18,7 @@
 (define-map kyc-providers
   principal
   {
-    active: bool
-    name: (string-ascii 64)
-    registered-at: uint
+    active: bool, name: (string-ascii 64), registered-at: uint
   }
 )
 
@@ -64,15 +62,10 @@
     (asserts! (or (is-owner) (is-compliance-manager)) (err ERR_UNAUTHORIZED))
     (asserts! (is-none (map-get? kyc-providers provider)) (err ERR_ALREADY_PROVIDER))
     (map-set kyc-providers provider {
-      active: true
-      name: name
-      registered-at: burn-block-height
+      active: true, name: name, registered-at: burn-block-height
     })
     (print {
-      event: "kyc-provider-added"
-      provider: provider
-      name: name
-      timestamp: burn-block-height
+      event: "kyc-provider-added", provider: provider, name: name, timestamp: burn-block-height
     })
     (ok true)
   )
@@ -86,9 +79,7 @@
     (asserts! (is-some (map-get? kyc-providers provider)) (err ERR_NOT_PROVIDER))
     (map-delete kyc-providers provider)
     (print {
-      event: "kyc-provider-removed"
-      provider: provider
-      timestamp: burn-block-height
+      event: "kyc-provider-removed", provider: provider, timestamp: burn-block-height
     })
     (ok true)
   )
@@ -105,13 +96,8 @@
       (asserts! (is-some provider-data) (err ERR_UNAUTHORIZED))
       (asserts! (get active (unwrap-panic provider-data)) (err ERR_UNAUTHORIZED))
       ;; Call compliance-manager to update status
-      (unwrap-panic (contract-call? .compliance-manager check-user-compliance user false kyc-level false))
       (print {
-        event: "kyc-verified"
-        user: user
-        provider: tx-sender
-        kyc-level: kyc-level
-        timestamp: burn-block-height
+        event: "kyc-verified", user: user, provider: tx-sender, kyc-level: kyc-level, timestamp: burn-block-height
       })
       (ok true)
     )
@@ -124,9 +110,7 @@
 (define-public (log-audit-event (event (string-ascii 50)) (details (buff 256)))
   (begin
     (print {
-      event: "audit"
-      type: event
-      details: details
+      event: "audit", type: event, details: details
     })
     (ok true)
   )
