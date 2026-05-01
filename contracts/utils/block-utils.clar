@@ -22,11 +22,11 @@
 )
 
 ;; @desc Get current tenure information
-;; @returns (response {tenure-id: uint, block-height: uint, block-time: uint} uint)
+;; @returns (response {tenure-id: uint block-height: uint block-time: uint} uint)
 (define-read-only (get-tenure-info)
     (ok {
-        tenure-id: (get-current-tenure-id),
-        block-height: block-height,
+        tenure-id: (get-current-tenure-id)
+        block-height: block-height
         block-time: burn-block-height
     })
 )

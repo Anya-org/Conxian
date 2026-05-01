@@ -1,0 +1,4 @@
+
+> conxian-protocol@0.6.1 test C:\Users\bmokoka\Conxian-Labs\conxian-business\Conxian
+> vitest run
+

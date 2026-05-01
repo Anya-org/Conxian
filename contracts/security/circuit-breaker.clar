@@ -17,10 +17,14 @@
 (define-data-var quorum-threshold uint u3)
 (define-data-var veto-active bool false)
 
+;; @desc Checks if a specific contract principal is currently paused.
+;; @param target: The contract principal to check.
 (define-read-only (is-contract-paused (target principal))
   (ok (default-to false (map-get? paused-contracts target)))
 )
 
+;; @desc Toggles the pause state for a specific contract. Admin only.
+;; @param target: The contract principal to toggle.
 (define-public (toggle-contract-pause (target principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -32,6 +36,8 @@
   )
 )
 
+;; @desc Sets a new administrator for the circuit breaker. Admin only.
+;; @param new-admin: The new administrator principal.
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -41,7 +47,7 @@
   )
 )
 
-;; @desc Triggers a veto. If quorum is reached, the system enters a vetoed state locking admin functions.
+;; @desc Triggers a veto. If quorum is reached the system enters a vetoed state locking admin functions.
 (define-public (trigger-veto)
   (let ((current-count (var-get veto-count)))
     (asserts! (not (default-to false (map-get? veto-signatures tx-sender))) ERR_ALREADY_VETOED)
@@ -57,7 +63,7 @@
   )
 )
 
-;; @desc Resolves an active veto, assuming the issue is handled via ExecutorDAO overrides or emergency updates.
+;; @desc Resolves an active veto assuming the issue is handled via ExecutorDAO overrides or emergency updates.
 (define-public (resolve-veto)
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)

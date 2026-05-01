@@ -11,12 +11,12 @@
 (define-map job-card-state-roots (buff 32) (buff 32))
 
 ;; @desc Verify a labor attestation state root via BitVM2 SNARK proof
-;; @param job-id: The CJCS Job ID (e.g., hash of JSON-LD)
+;; @param job-id: The CJCS Job ID (e.g. hash of JSON-LD)
 ;; @param state-root: The Merkle root of the completed labor tasks
 ;; @param proof: The BitVM2/SNARK proof of state transition
 (define-public (verify-labor-attestation (job-id (buff 32)) (state-root (buff 32)) (proof (buff 1024)))
   (begin
-    ;; In simulation/Tier 0, we assume the prover has correctly mapped SAP/Oracle work orders
+    ;; In simulation/Tier 0 we assume the prover has correctly mapped SAP/Oracle work orders
     ;; Actual BitVM2 logic involves verifying the SNARK proof against the Bitcoin L1 state
     ;; (This is currently a placeholder for the native 'verify-signature' style SNARK wrapper)
     (asserts! (is-eq (len proof) u1024) (err ERR_INVALID_PROOF))
@@ -24,9 +24,9 @@
     (map-set job-card-state-roots job-id state-root)
 
     (print {
-      event: "bitvm2-attestation-verified",
-      job-id: job-id,
-      state-root: state-root,
+      event: "bitvm2-attestation-verified"
+      job-id: job-id
+      state-root: state-root
       timestamp: burn-block-height
     })
 

@@ -1,17 +1,9 @@
-;; community-governance-token.clar
 (impl-trait .sip-standards.sip-010-ft-trait)
-(define-constant ERR_UNAUTHORIZED u3000)
-(define-fungible-token cg-token)
-(define-public (mint (amount uint) (recipient principal))
-  (begin
-    (asserts! (unwrap-panic (contract-call? .regulatory-adapter check-clean-hands-compliance recipient)) (err ERR_UNAUTHORIZED))
-    (ft-mint? cg-token amount recipient)
-  )
-)
+(define-fungible-token token)
 (define-public (transfer (a uint) (s principal) (r principal) (m (optional (buff 34)))) (ok true))
-(define-read-only (get-name) (ok "CGT"))
-(define-read-only (get-symbol) (ok "CGT"))
+(define-read-only (get-name) (ok "Token Name                     ")) ;; 32 chars
+(define-read-only (get-symbol) (ok "TKN                            ")) ;; 32 chars
 (define-read-only (get-decimals) (ok u8))
-(define-read-only (get-balance (u principal)) (ok (ft-get-balance cg-token u)))
-(define-read-only (get-total-supply) (ok (ft-get-supply cg-token)))
+(define-read-only (get-balance (u principal)) (ok u0))
+(define-read-only (get-total-supply) (ok u0))
 (define-read-only (get-token-uri) (ok none))

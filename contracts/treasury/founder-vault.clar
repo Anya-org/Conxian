@@ -9,7 +9,7 @@
 (define-constant ERR_INVALID_PARAMS u1001)
 
 ;; State
-(define-map allocations { beneficiary: principal, token: principal } { total: uint, claimed: uint, start-height: uint })
+(define-map allocations { beneficiary: principal token: principal } { total: uint claimed: uint start-height: uint })
 (define-data-var contract-owner principal tx-sender)
 
 ;; --- Core Logic ---
@@ -20,15 +20,15 @@
     ;; Fixed: Call conxian-protocol get-admin-raw or is-paused helper
     (asserts! (is-eq tx-sender tx-sender) (err ERR_UNAUTHORIZED))
     (try! (contract-call? token transfer amount tx-sender (as-contract tx-sender) none))
-    (map-set allocations { beneficiary: beneficiary, token: (contract-of token) } { total: amount, claimed: u0, start-height: burn-block-height })
-    (print { event: "allocation-created", beneficiary: beneficiary, token: (contract-of token), amount: amount })
+    (map-set allocations { beneficiary: beneficiary token: (contract-of token) } { total: amount claimed: u0 start-height: burn-block-height })
+    (print { event: "allocation-created" beneficiary: beneficiary token: (contract-of token) amount: amount })
     (ok true)
   )
 )
 
 ;; Read-only
 (define-read-only (get-allocation (beneficiary principal) (token principal))
-  (map-get? allocations { beneficiary: beneficiary, token: token })
+  (map-get? allocations { beneficiary: beneficiary token: token })
 )
 
 ;; Admin

@@ -22,7 +22,7 @@
     (begin
         (asserts! (or (is-eq tx-sender worker) (is-eq tx-sender (var-get admin))) ERR_UNAUTHORIZED)
         (map-set worker-referrals worker referrer)
-        (print { event: "referral-registered", worker: worker, referrer: referrer })
+        (print { event: "referral-registered" worker: worker referrer: referrer })
         (ok true)
     )
 )
@@ -45,7 +45,7 @@
                 true
             )
             
-            (print { event: "payment-disbursed-stx", worker: worker, amount: worker-net, referrer: referrer, referrer-fee: referrer-fee })
+            (print { event: "payment-disbursed-stx" worker: worker amount: worker-net referrer: referrer referrer-fee: referrer-fee })
             (ok true)
         )
     )
@@ -69,7 +69,7 @@
                 true
             )
             
-            (print { event: "payment-disbursed-sip010", worker: worker, amount: worker-net, referrer: referrer, referrer-fee: referrer-fee })
+            (print { event: "payment-disbursed-sip010" worker: worker amount: worker-net referrer: referrer referrer-fee: referrer-fee })
             (ok true)
         )
     )

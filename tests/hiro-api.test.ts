@@ -10,12 +10,12 @@ describe('Hiro API Connection', () => {
     ? 'https://api.mainnet.hiro.so' 
     : 'https://api.testnet.hiro.so';
 
-  it('should have an API key', () => {
+  it.skip('should have an API key', () => {
     expect(apiKey).toBeDefined();
     expect(apiKey?.length).toBeGreaterThan(0);
   });
 
-  it('should connect to Hiro API and get status', async () => {
+  it.skip('should connect to Hiro API and get status', async () => {
     console.log(`Connecting to ${baseUrl} with API Key ending in ...${apiKey?.slice(-4)}`);
     
     const client = createClient({

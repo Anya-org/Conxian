@@ -12,11 +12,11 @@
 
 ;; Map: AuctionID -> Details
 (define-map auctions uint {
-    token-in: principal,
-    token-out: principal,
-    seller: principal,
-    amount: uint,
-    min-bid: uint,
+    token-in: principal
+    token-out: principal
+    seller: principal
+    amount: uint
+    min-bid: uint
     end-block: uint
 })
 
@@ -35,11 +35,11 @@
   )
     (asserts! (> amount u0) (err ERR_INVALID_PARAMS))
     (map-set auctions auction-id {
-        token-in: token-in,
-        token-out: token-out,
-        seller: tx-sender,
-        amount: amount,
-        min-bid: min-bid,
+        token-in: token-in
+        token-out: token-out
+        seller: tx-sender
+        amount: amount
+        min-bid: min-bid
         end-block: (+ burn-block-height duration)
     })
     (var-set auction-counter auction-id)

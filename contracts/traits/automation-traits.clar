@@ -1,5 +1,5 @@
 ;; automation-traits.clar
-;; Traits for Automation Systems (Keepers, etc.)
+;; Traits for Automation Systems (Keepers etc.)
 
 (define-trait office-job-trait (
   (check-work-needed

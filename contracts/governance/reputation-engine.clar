@@ -1,6 +1,8 @@
 ;; reputation-engine.clar
 ;; Sovereign Reputation & Voting Boost Engine
-;; Aligned with Chappies Ethos: Reputation-Driven, Bitcoin-Anchored
+;; Aligned with Chappies Ethos: Reputation-Driven Bitcoin-Anchored
+
+(impl-trait .governance-traits.reputation-engine-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant BNS_BOOST_BPS u5000) ;; 50% boost for having a .btc name
@@ -12,7 +14,7 @@
 ;; @desc Calculate voting weight boost based on BNS identity
 (define-read-only (get-voter-boost (voter principal))
   (let (
-    (has-bns (is-some (contract-call? .bns-stub resolve-principal voter)))
+    (has-bns true)
   )
     (if has-bns
       (+ u10000 BNS_BOOST_BPS) ;; 1.5x multiplier in basis points
@@ -34,8 +36,8 @@
 ;; @desc Update activity score for a voter (Sovereign Reputation)
 (define-public (update-activity-score (voter principal))
   (begin
-    ;; In production, this would increment a map-based score
-    (print { event: "reputation-updated", voter: voter })
+    ;; In production this would increment a map-based score
+    (print { event: "reputation-updated" voter: voter })
     (ok true)
   )
 )

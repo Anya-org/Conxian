@@ -18,8 +18,8 @@
 (define-data-var compliance-validator principal tx-sender)
 (define-data-var authority-pubkey (optional (buff 33)) none)
 
-;; Map: User -> { validated: bool, expires-at: uint }
-(define-map compliance-attestations principal { validated: bool, expires-at: uint })
+;; Map: User -> { validated: bool expires-at: uint }
+(define-map compliance-attestations principal { validated: bool expires-at: uint })
 
 ;; --- Authorization ---
 
@@ -59,7 +59,7 @@
   (begin
     (asserts! (or (is-validator) (is-owner)) ERR_UNAUTHORIZED)
     (map-set compliance-attestations user {
-      validated: true,
+      validated: true
       expires-at: expires-at
     })
     (ok true)
@@ -89,7 +89,7 @@
 )
 
 ;; @desc Update the authority pubkey used for signature verification
-;; @param authority: The authority principal (not used in current logic but kept for future proofing)
+;; @param authority: The authority principal
 ;; @param pubkey: The 33-byte compressed public key
 (define-public (update-authority (authority principal) (pubkey (buff 33)))
   (begin
@@ -110,11 +110,25 @@
     (tier uint)
     (signature (buff 65))
   )
-  (let ((pubkey-opt (var-get authority-pubkey)))
+  (let (
+    (pubkey (unwrap! (var-get authority-pubkey) ERR_NO_AUTHORITY))
+    ;; Using placeholder hash in simulation
+    (msg-hash (sha256 0x00))
+  )
     (begin
-      (asserts! (is-some pubkey-opt) ERR_UNAUTHORIZED)
-      ;; In simnet, signature verification always fails (C4 mainnet-only feature)
-      ERR_INVALID_SIGNATURE
+      ;; SIP-018: secp256k1-verify returns bool
+      (asserts! (secp256k1-verify msg-hash signature pubkey) ERR_INVALID_SIGNATURE)
+
+      ;; Update the central KYC Registry
+      (try! (contract-call? .kyc-registry set-identity-status user tier u0 jurisdiction))
+
+      ;; Record local attestation (valid for 52560 blocks ~ 1 year)
+      (map-set compliance-attestations user {
+        validated: true
+        expires-at: (+ burn-block-height u52560)
+      })
+
+      (ok true)
     )
   )
 )

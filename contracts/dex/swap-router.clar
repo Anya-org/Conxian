@@ -7,11 +7,11 @@
 ;; --- Constants ---
 (define-constant BASE-FEE u30)
 (define-constant MAX-FEE u100)
-(define-constant ERR_INTERNAL (err u500))
-(define-constant ERR_SLIPPAGE (err u501))
-(define-constant ERR_NON_COMPLIANT (err u502))
-(define-constant ERR_PROTOCOL_PAUSED (err u503))
-(define-constant ERR_SOURCE_ISOLATED (err u504))
+(define-constant ERR_INTERNAL u500)
+(define-constant ERR_SLIPPAGE u501)
+(define-constant ERR_NON_COMPLIANT u502)
+(define-constant ERR_PROTOCOL_PAUSED u503)
+(define-constant ERR_SOURCE_ISOLATED u504)
 
 ;; --- Data Vars ---
 (define-data-var current-fee uint u30)
@@ -28,13 +28,13 @@
     (min-amount-out uint)
   )
   (let (
-    (paused-state (unwrap! (contract-call? .enhanced-circuit-breaker is-contract-paused .swap-router) ERR_INTERNAL))
-    (is-isolated-res (unwrap! (contract-call? .enhanced-circuit-breaker is-isolated (contract-of liquidity-source)) ERR_INTERNAL))
+    (paused-state (let ((cb-res (contract-call? .enhanced-circuit-breaker is-contract-paused .swap-router))) (if (is-ok cb-res) (unwrap-panic cb-res) true)))
+    (is-isolated-res (let ((cb-res (contract-call? .enhanced-circuit-breaker is-isolated (contract-of liquidity-source)))) (if (is-ok cb-res) (unwrap-panic cb-res) true)))
     (user tx-sender)
   )
     (begin
-      (asserts! (not paused-state) ERR_PROTOCOL_PAUSED)
-      (asserts! (not is-isolated-res) ERR_SOURCE_ISOLATED)
+      (asserts! (not paused-state) (err ERR_PROTOCOL_PAUSED))
+      (asserts! (not is-isolated-res) (err ERR_SOURCE_ISOLATED))
 
       ;; 1. Transfer tokens from User to Router
       (try! (contract-call? token-in transfer amount-in user (as-contract tx-sender) none))
@@ -46,7 +46,7 @@
         (fee-collected (get fee-collected swap-res))
       )
         (begin
-          (asserts! (>= amount-out min-amount-out) ERR_SLIPPAGE)
+          (asserts! (>= amount-out min-amount-out) (err ERR_SLIPPAGE))
 
           (match (contract-call? .bme-engine register-fee-activity (contract-of liquidity-source) fee-collected)
             res true
@@ -57,12 +57,12 @@
           (try! (as-contract (contract-call? token-out transfer amount-out (as-contract tx-sender) user none)))
 
           (print {
-            event: "csf-swap-executed",
-            source: (contract-of liquidity-source),
-            token-in: (contract-of token-in),
-            token-out: (contract-of token-out),
-            amount-out: amount-out,
-            fee: fee-collected,
+            event: "csf-swap-executed"
+            source: (contract-of liquidity-source)
+            token-in: (contract-of token-in)
+            token-out: (contract-of token-out)
+            amount-out: amount-out
+            fee: fee-collected
             sender: user
           })
           (ok amount-out)
@@ -86,7 +86,7 @@
 ;; @desc Update the protocol fees based on current market volatility
 (define-public (update-volatility-fees)
   (let (
-    (vol (unwrap! (contract-call? .oracle-aggregator get-volatility-index) ERR_INTERNAL))
+    (vol (let ((v-res (contract-call? .oracle-aggregator get-volatility-index))) (if (is-ok v-res) (unwrap-panic v-res) u0)))
     (new-fee (if (> vol u75) MAX-FEE BASE-FEE))
   )
     (begin
@@ -116,7 +116,7 @@
         (amount-out (try! (as-contract (contract-call? .concentrated-liquidity-pool swap pool-id true amount-in token-in token-out (as-contract tx-sender)))))
       )
         (begin
-          (asserts! (>= amount-out min-amount-out) ERR_SLIPPAGE)
+          (asserts! (>= amount-out min-amount-out) (err ERR_SLIPPAGE))
 
           ;; 3. Transfer tokens back to User
           (try! (as-contract (contract-call? token-out transfer amount-out (as-contract tx-sender) user none)))
@@ -130,5 +130,5 @@
 
 ;; @desc Get the current operational status of the swap router
 (define-read-only (get-protocol-status)
-  (ok { compliant: true, version: "v1.1.0-Apex", tenure-id: (some (/ block-height u10)) })
+  (ok { compliant: true version: "v1.1.0-Apex" tenure-id: (some (/ block-height u10)) })
 )

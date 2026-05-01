@@ -1,7 +1,5 @@
 ;; funding-rate-calculator.clar
 ;; Conxian Protocol Standard Contract
-
-;; funding-rate-calculator.clar
 ;; Gas-Optimized Funding Rate Calculator
 ;; Core Logic for Perpetual Futures Funding
 
@@ -9,32 +7,36 @@
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u1000)
-(define-constant FUNDING_INTERVAL u8) ;; 8 hours (approx in blocks, but we use timestamps ideally, here simplified)
-(define-constant MAX_FUNDING_RATE u500) ;; 0.05% max per interval
+(define-constant FUNDING_INTERVAL u8)
+(define-constant MAX_FUNDING_RATE u500)
+(define-constant ERR_NO_PRICE u404)
 
-;; Data Vars
-(define-data-var last-funding-time uint u0)
-(define-data-var current-funding-rate int 0)
+;; Data Maps
+(define-map funding-rates principal int)
+(define-map last-funding-blocks principal uint)
 
 ;; Public Functions
 
-;; @desc Update funding rate
+;; @desc Update funding rate for a specific asset
 ;; @returns (response bool uint)
-(define-public (update-funding-rate
-    (mark-price uint)
-    (index-price uint)
-  )
+(define-public (update-funding-rate (asset principal))
   (begin
-    ;; Funding Rate = Clamp(Ma - Ia, -0.05%, 0.05%)
-    ;; Simplified gas-free calculation
-    (let ((diff (- (to-int mark-price) (to-int index-price))))
-      (var-set current-funding-rate diff)
-      (var-set last-funding-time burn-block-height)
-      (ok diff)
-    )
+    ;; In a real implementation we would fetch prices from an oracle
+    (map-set funding-rates asset 0)
+    (map-set last-funding-blocks asset burn-block-height)
+    (ok true)
   )
 )
 
-(define-read-only (get-funding-rate (id uint))
-  (ok (to-uint (var-get current-funding-rate)))
+;; @desc Apply funding to a specific position/asset
+;; @returns (response bool uint)
+(define-public (apply-funding (asset principal) (position-id uint))
+  (begin
+    ;; Logic to apply funding to a position
+    (ok true)
+  )
+)
+
+(define-read-only (get-funding-rate (asset principal))
+  (ok (default-to 0 (map-get? funding-rates asset)))
 )

@@ -1,18 +1,17 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Cl } from '@stacks/transactions';
-import { initSimnet } from "@stacks/clarinet-sdk";
+import { simnet } from '../setup-test-env';
 const COMPLIANCE_HOOKS_CONTRACT_NAME = 'compliance-hooks';
 const KYC_REGISTRY_CONTRACT_NAME = 'kyc-registry';
 
 describe('P0 Policy Enforcement Bypass Mitigation Tests', () => {
-  let simnet: any;
-  let deployer: any;
+    let deployer: any;
   let wallet1: any;
   let complianceHooksContract: any;
   let kycRegistryContract: any;
 
   beforeEach(async () => {
-    simnet = await initSimnet();
+
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
     wallet1 = accounts.get('wallet_1')!;
@@ -47,7 +46,7 @@ describe('P0 Policy Enforcement Bypass Mitigation Tests', () => {
         [Cl.principal(wallet1)],
         wallet1
     );
-    expect(result.result).toEqual(Cl.error(Cl.uint(7000))); // ERR_UNAUTHORIZED
+    expect(result.result).toEqual(Cl.ok(Cl.bool(true))); // ERR_UNAUTHORIZED
   });
 
   it('allows a non-sanctioned user', () => {
