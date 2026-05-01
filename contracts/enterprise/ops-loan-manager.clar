@@ -21,15 +21,7 @@
 (define-map loans
   uint
   {
-    invoice-id: (string-ascii 64)
-    total-amount: uint
-    senior-funded: uint
-    junior-funded: uint
-    senior-target: uint
-    junior-target: uint
-    status: (string-ascii 20)
-    guardian: principal
-    intent-verified: bool
+    invoice-id: (string-ascii 64), total-amount: uint, senior-funded: uint, junior-funded: uint, senior-target: uint, junior-target: uint, status: (string-ascii 20), guardian: principal, intent-verified: bool
   }
 )
 
@@ -46,15 +38,7 @@
   )
     (begin
       (map-set loans loan-id {
-        invoice-id: invoice-id
-        total-amount: amount
-        senior-funded: u0
-        junior-funded: u0
-        senior-target: senior-target
-        junior-target: junior-target
-        status: "funding"
-        guardian: guardian
-        intent-verified: false
+        invoice-id: invoice-id, total-amount: amount, senior-funded: u0, junior-funded: u0, senior-target: senior-target, junior-target: junior-target, status: "funding", guardian: guardian, intent-verified: false
       })
       (var-set loan-nonce loan-id)
       (ok loan-id)

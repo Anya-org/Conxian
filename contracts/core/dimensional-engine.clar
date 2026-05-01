@@ -33,7 +33,7 @@
 
 ;; --- Internal Guards ---
 
-(define-private (guard-entry (protocol-status { compliant: bool paused: bool tenure-id: (optional uint) version: (string-ascii 2) }))
+(define-private (guard-entry (protocol-status { compliant: bool, paused: bool, tenure-id: (optional uint), version: (string-ascii 2) }))
   (begin
     (asserts! (not (get paused protocol-status)) (err ERR_CONTRACT_PAUSED))
     (asserts! (get compliant protocol-status) (err ERR_NON_COMPLIANT))
@@ -89,9 +89,7 @@
       (try! (guard-entry protocol-status))
       (let ((result (contract-call? position-manager open-position tx-sender token amount leverage long)))
         (print {
-          event: "facade-open-position"
-          sender: tx-sender
-          tenure-id: (get tenure-id protocol-status)
+          event: "facade-open-position", sender: tx-sender, tenure-id: (get tenure-id protocol-status)
         })
         result
       )
@@ -197,8 +195,6 @@
 ;; @desc Get operational status of the dimensional engine (expected by tests)
 (define-read-only (get-protocol-status)
   (ok {
-    compliant: true
-    version: "v1.1.0-Apex"
-    tenure-id: (some (/ block-height u10))
+    compliant: true, version: "v1.1.0-Apex", tenure-id: (some (/ stacks-block-height u10))
   })
 )

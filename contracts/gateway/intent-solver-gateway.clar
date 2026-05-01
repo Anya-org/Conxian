@@ -14,7 +14,7 @@
 ;; State
 (define-data-var admin principal tx-sender)
 (define-map settled-intents (buff 32) bool)
-(define-map registered-dapps principal { metadata-uri: (string-ascii 256) registered-at: uint })
+(define-map registered-dapps principal { metadata-uri: (string-ascii 256), registered-at: uint })
 
 ;; --- Implementation ---
 
@@ -35,10 +35,7 @@
     (map-set settled-intents intent-id true)
 
     (print {
-      event: "intent-executed"
-      intent-id: intent-id
-      solver: solver
-      timestamp: burn-block-height
+      event: "intent-executed", intent-id: intent-id, solver: solver, timestamp: burn-block-height
     })
 
     ;; Register fee generation to BME engine for the solver's activity
@@ -54,8 +51,7 @@
 (define-public (register-dapp (dapp-principal principal) (metadata-uri (string-ascii 256)))
   (begin
     (map-set registered-dapps dapp-principal {
-      metadata-uri: metadata-uri
-      registered-at: burn-block-height
+      metadata-uri: metadata-uri, registered-at: burn-block-height
     })
     (ok true)
   )

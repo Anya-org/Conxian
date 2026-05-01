@@ -42,9 +42,7 @@
 ;; @desc Get position data for risk-manager
 (define-read-only (get-position (owner principal) (position-id uint))
   (ok {
-    collateral: u1000
-    maintenance-margin: u500
-    asset: .cxd-token
+    collateral: u1000, maintenance-margin: u500, asset: .cxd-token
   })
 )
 

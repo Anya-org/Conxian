@@ -32,9 +32,7 @@
     (begin
         (asserts! (is-governance) (err ERR_UNAUTHORIZED))
         (print { 
-            event: "upgrade-signaled"
-            contract: contract
-            new-hash: new-impl-hash 
+            event: "upgrade-signaled", contract: contract, new-hash: new-impl-hash 
         })
         (ok true)
     )

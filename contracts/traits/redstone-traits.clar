@@ -13,8 +13,7 @@
   (recover-signer
     (
       uint       (list 10 {
-      asset: (buff 32)
-      value: uint
+      asset: (buff 32), value: uint
     })
       (buff 65)
     )

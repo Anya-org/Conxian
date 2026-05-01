@@ -12,7 +12,7 @@
 (define-read-only (get-gcr) (contract-call? .finance-metrics get-gcr))
 
 (define-read-only (get-protocol-status)
-  (ok { compliant: true version: "v1.1.0-Apex" })
+  (ok { compliant: true, version: "v1.1.0-Apex" })
 )
 
 (define-read-only (assess-system-risk)
@@ -37,8 +37,7 @@
 
 (define-read-only (get-cybernetic-intel)
   (ok {
-    operational-fee: (var-get stability-fee)
-    financial-gcr: (unwrap-panic (get-gcr))
+    operational-fee: (var-get stability-fee), financial-gcr: (unwrap-panic (get-gcr)),
     risk-score: (var-get current-risk-score)
   })
 )

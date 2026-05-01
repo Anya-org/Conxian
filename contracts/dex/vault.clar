@@ -30,23 +30,14 @@
 
 ;; Storage maps
 (define-map vaults { vault-id: (buff 20) } {
-  owner: principal
-  vault-type: (string-ascii 32)
-  tokens: (list 10 principal)
-  created-at: uint
-  last-updated: uint
-  active: bool
-  metadata: (string-ascii 256)
-  cooldown-end: uint
+  owner: principal, vault-type: (string-ascii 32), tokens: (list 10 principal), created-at: uint, last-updated: uint, active: bool, metadata: (string-ascii 256), cooldown-end: uint
 })
 
-(define-map vault-balances { vault-id: (buff 20) token: principal } uint)
+(define-map vault-balances { vault-id: (buff 20), token: principal } uint)
 
 (define-map user-vaults { user: principal } { 
-  vault-ids: (list 10 (buff 20))
-  total-vaults: uint
-  active-vaults: uint
-  last-activity: uint
+  vault-ids: (list 10 (buff 20)),
+  total-vaults: uint, active-vaults: uint, last-activity: uint
 })
 
 ;; Helpers
@@ -76,7 +67,7 @@
 
 ;; @desc Get the balance of a specific token in a vault
 (define-read-only (get-vault-balance (vault-id (buff 20)) (token principal))
-  (ok (default-to u0 (map-get? vault-balances { vault-id: vault-id token: token })))
+  (ok (default-to u0 (map-get? vault-balances { vault-id: vault-id, token: token })))
 )
 
 ;; @desc Check if a vault is active
@@ -106,18 +97,11 @@
       (asserts! (is-none (map-get? vaults { vault-id: vault-id })) (err ERR_VAULT_ALREADY_EXISTS))
       
       (map-set vaults { vault-id: vault-id } {
-        owner: tx-sender
-        vault-type: vault-type
-        tokens: tokens
-        created-at: burn-block-height
-        last-updated: burn-block-height
-        active: true
-        metadata: metadata
-        cooldown-end: u0
+        owner: tx-sender, vault-type: vault-type, tokens: tokens, created-at: burn-block-height, last-updated: burn-block-height, active: true, metadata: metadata, cooldown-end: u0
       })
       
       (var-set total-vaults (+ (var-get total-vaults) u1))
-      (print { event: "vault-created" vault-id: vault-id owner: tx-sender vault-type: vault-type timestamp: burn-block-height })
+      (print { event: "vault-created", vault-id: vault-id, owner: tx-sender, vault-type: vault-type, timestamp: burn-block-height })
       (ok vault-id)
     )
   )
@@ -137,10 +121,10 @@
 
     (try! (contract-call? token-trait transfer amount tx-sender (as-contract tx-sender) none))
     
-    (let ((current-balance (default-to u0 (map-get? vault-balances { vault-id: vault-id token: token }))))
-      (map-set vault-balances { vault-id: vault-id token: token } (+ current-balance amount))
+    (let ((current-balance (default-to u0 (map-get? vault-balances { vault-id: vault-id, token: token }))))
+      (map-set vault-balances { vault-id: vault-id, token: token } (+ current-balance amount))
       (var-set total-deposits (+ (var-get total-deposits) u1))
-      (print { event: "vault-deposited" vault-id: vault-id token: token amount: amount timestamp: burn-block-height })
+      (print { event: "vault-deposited", vault-id: vault-id, token: token, amount: amount, timestamp: burn-block-height })
       (ok true)
     )
   )
@@ -151,7 +135,7 @@
   (let (
     (token (contract-of token-trait))
     (vault-info (unwrap! (get-vault vault-id) (err ERR_VAULT_NOT_FOUND)))
-    (current-balance (default-to u0 (map-get? vault-balances { vault-id: vault-id token: token })))
+    (current-balance (default-to u0 (map-get? vault-balances { vault-id: vault-id, token: token })))
   )
     (try! (check-circuit-breaker))
     (asserts! (var-get vault-system-active) (err ERR_VAULT_NOT_ACTIVE))
@@ -164,9 +148,9 @@
 
     (try! (as-contract (contract-call? token-trait transfer amount (as-contract tx-sender) (get owner vault-info) none)))
     
-    (map-set vault-balances { vault-id: vault-id token: token } (- current-balance amount))
+    (map-set vault-balances { vault-id: vault-id, token: token } (- current-balance amount))
     (var-set total-withdrawals (+ (var-get total-withdrawals) u1))
-    (print { event: "vault-withdrawn" vault-id: vault-id token: token amount: amount timestamp: burn-block-height })
+    (print { event: "vault-withdrawn", vault-id: vault-id, token: token, amount: amount, timestamp: burn-block-height })
     (ok true)
   )
 )
@@ -192,9 +176,6 @@
 
 (define-read-only (get-vault-system-status)
   {
-    active: (var-get vault-system-active)
-    total-vaults: (var-get total-vaults)
-    total-deposits: (var-get total-deposits)
-    total-withdrawals: (var-get total-withdrawals)
+    active: (var-get vault-system-active), total-vaults: (var-get total-vaults), total-deposits: (var-get total-deposits), total-withdrawals: (var-get total-withdrawals)
   }
 )

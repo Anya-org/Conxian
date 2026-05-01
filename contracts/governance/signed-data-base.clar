@@ -11,9 +11,7 @@
 (define-map signed-data
     (buff 32) ;; Data Hash
     {
-        signer: principal
-        timestamp: uint
-        data-uri: (string-ascii 256)
+        signer: principal, timestamp: uint, data-uri: (string-ascii 256)
     }
 )
 
@@ -32,11 +30,9 @@
     (begin
         ;; Anyone can store but we track the signer
         (map-set signed-data hash {
-            signer: tx-sender
-            timestamp: burn-block-height
-            data-uri: uri
+            signer: tx-sender, timestamp: burn-block-height, data-uri: uri
         })
-        (print { event: "data-stored" hash: hash signer: tx-sender })
+        (print { event: "data-stored", hash: hash, signer: tx-sender })
         (ok true)
     )
 )

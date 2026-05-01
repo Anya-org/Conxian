@@ -6,7 +6,7 @@
 ;; @desc Get current tenure ID
 ;; @returns uint
 (define-read-only (get-current-tenure-id)
-  (/ block-height BLOCKS_PER_TENURE)
+  (/ stacks-block-height BLOCKS_PER_TENURE)
 )
 
 ;; @desc Get burn block height
@@ -17,24 +17,22 @@
 
 ;; @desc Get block height
 ;; @returns uint
-(define-read-only (get-block-height)
-  block-height
+(define-read-only (get-stacks-block-height)
+  stacks-block-height
 )
 
 ;; @desc Get current tenure information
-;; @returns (response {tenure-id: uint block-height: uint block-time: uint} uint)
+;; @returns (response {tenure-id: uint, stacks-block-height: uint, block-time: uint} uint)
 (define-read-only (get-tenure-info)
     (ok {
-        tenure-id: (get-current-tenure-id)
-        block-height: block-height
-        block-time: burn-block-height
+        tenure-id: (get-current-tenure-id), stacks-block-height: stacks-block-height, block-time: burn-block-height
     })
 )
 
 ;; @desc Get blocks processed in current tenure
 ;; @returns uint
 (define-read-only (get-blocks-in-current-tenure)
-    (mod block-height BLOCKS_PER_TENURE)
+    (mod stacks-block-height BLOCKS_PER_TENURE)
 )
 
 ;; @desc Check if current tenure is still fresh

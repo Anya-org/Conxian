@@ -17,16 +17,7 @@
 (define-map twap-orders
     uint
     {
-        owner: principal
-        token-in: principal
-        token-out: principal
-        total-amount: uint
-        remaining-amount: uint
-        intervals: uint
-        intervals-left: uint
-        blocks-between: uint
-        last-execution-block: uint
-        status: (string-ascii 20)
+        owner: principal, token-in: principal, token-out: principal, total-amount: uint, remaining-amount: uint, intervals: uint, intervals-left: uint, blocks-between: uint, last-execution-block: uint, status: (string-ascii 20)
     }
 )
 
@@ -47,20 +38,11 @@
         (try! (contract-call? token-in transfer amount tx-sender (as-contract tx-sender) none))
 
         (map-set twap-orders order-id {
-            owner: tx-sender
-            token-in: (contract-of token-in)
-            token-out: token-out
-            total-amount: amount
-            remaining-amount: amount
-            intervals: intervals
-            intervals-left: intervals
-            blocks-between: blocks-between
-            last-execution-block: u0
-            status: "active"
+            owner: tx-sender, token-in: (contract-of token-in), token-out: token-out, total-amount: amount, remaining-amount: amount, intervals: intervals, intervals-left: intervals, blocks-between: blocks-between, last-execution-block: u0, status: "active"
         })
 
         (var-set next-order-id (+ order-id u1))
-        (print {event: "twap-order-placed" order-id: order-id owner: tx-sender})
+        (print {event: "twap-order-placed", order-id: order-id, owner: tx-sender})
         (ok order-id)
     )
 )
@@ -77,13 +59,12 @@
 
         ;; Execution logic (calling the DEX router)
         ;; For now we simulate the swap
-        (print {event: "twap-leg-executed" order-id: order-id amount: amount-per-leg})
+        (print {event: "twap-leg-executed", order-id: order-id, amount: amount-per-leg})
 
         (map-set twap-orders order-id (merge order {
-            remaining-amount: (- (get remaining-amount order) amount-per-leg)
-            intervals-left: (- (get intervals-left order) u1)
-            last-execution-block: burn-block-height
-            status: (if (is-eq (get intervals-left order) u1) "completed" "active")
+            remaining-amount: (- (get remaining-amount order) amount-per-leg),
+            intervals-left: (- (get intervals-left order) u1),
+            last-execution-block: burn-block-height, status: (if (is-eq (get intervals-left order) u1) "completed" "active")
         }))
 
         (ok true)

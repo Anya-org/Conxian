@@ -48,7 +48,7 @@
     (var-set current-funding-stx (+ (var-get current-funding-stx) amount))
     (check-and-advance-phase)
 
-    (print { event: "launch-contribution" contributor: caller amount: amount phase: (var-get current-phase) })
+    (print { event: "launch-contribution", contributor: caller, amount: amount, phase: (var-get current-phase) })
     (ok true)
   )
 )

@@ -18,7 +18,7 @@
   )
   (begin
     ;; Simulate a successful swap: 1-to-1 return for mock
-    (ok { amount-out: amount-in fee-collected: (/ amount-in u100) })
+    (ok { amount-out: amount-in, fee-collected: (/ amount-in u100) })
   )
 )
 
@@ -39,13 +39,13 @@
 
 ;; @desc [Standardized description for function]
 (define-public (get-csf-health)
-  (ok { tvl: u1000000 utilization: u50 is-active: true })
+  (ok { tvl: u1000000, utilization: u50, is-active: true })
 )
 
 ;; @desc Collect accumulated protocol fees (Apex v1.1.0)
 (define-public (collect-protocol-fees (token-trait <sip-010-ft-trait>))
   (begin
-    (print { event: "collect-fees-triggered" caller: contract-caller })
+    (print { event: "collect-fees-triggered", caller: contract-caller })
     (ok true)
   )
 )

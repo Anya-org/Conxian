@@ -10,10 +10,7 @@
 (define-map positions
   uint
   {
-    owner: principal
-    pool: principal
-    amount: uint
-    created: uint
+    owner: principal, pool: principal, amount: uint, created: uint
   }
 )
 
@@ -29,10 +26,7 @@
       (sender tx-sender)
     )
     (map-set positions id {
-      owner: sender
-      pool: pool
-      amount: amount
-      created: burn-block-height
+      owner: sender, pool: pool, amount: amount, created: burn-block-height
     })
     (var-set position-nonce id)
     (ok id)

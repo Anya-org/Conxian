@@ -40,14 +40,7 @@
 
 (define-read-only (get-allocation-percentages)
   (ok {
-    treasury: (var-get treasury-share)
-    bounty: (var-get bounty-share)
-    lp: (var-get lp-share)
-    grant: (var-get grant-share)
-    buyback: (var-get buyback-share)
-    insurance: (var-get insurance-share)
-    staking: (var-get lp-share)
-    dev: (var-get treasury-share)
+    treasury: (var-get treasury-share), bounty: (var-get bounty-share), lp: (var-get lp-share), grant: (var-get grant-share), buyback: (var-get buyback-share), insurance: (var-get insurance-share), staking: (var-get lp-share), dev: (var-get treasury-share)
   })
 )
 
@@ -78,14 +71,7 @@
     (var-set insurance-share insurance)
 
     (print {
-      event: "rebalanced"
-      treasury: treasury
-      bounty: bounty
-      lp: lp
-      grant: grant
-      buyback: buyback
-      insurance: insurance
-      timestamp: block-height
+      event: "rebalanced", treasury: treasury, bounty: bounty, lp: lp, grant: grant, buyback: buyback, insurance: insurance, timestamp: stacks-block-height
     })
     (ok true)
   )

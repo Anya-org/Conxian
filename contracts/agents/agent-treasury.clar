@@ -9,7 +9,7 @@
 )
 
 (define-read-only (calculate-performance-adjustment) (ok u500))
-(define-read-only (calculate-cybernetic-policy) (ok { treasury: u0 bounty: u0 lp: u0 grant: u0 buyback: u0 insurance: u0 }))
+(define-read-only (calculate-cybernetic-policy) (ok { treasury: u0, bounty: u0, lp: u0, grant: u0, buyback: u0, insurance: u0 }))
 (define-public (initialize (new-admin principal)) (ok true))
 (define-public (set-admin (new-admin principal)) (ok true))
-(define-read-only (get-protocol-status) (ok { compliant: true version: "MOCK" }))
+(define-read-only (get-protocol-status) (ok { compliant: true, version: "MOCK" }))

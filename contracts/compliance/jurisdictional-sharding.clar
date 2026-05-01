@@ -26,13 +26,7 @@
 (define-data-var next-currency-id uint u0)
 
 (define-map currency-registry uint {
-  code: (string-ascii 10)
-  principal: (optional principal)
-  is-fiat: bool
-  is-stablecoin: bool
-  decimal-places: uint
-  risk-tier: uint
-  is-active: bool
+  code: (string-ascii 10), principal: (optional principal), is-fiat: bool, is-stablecoin: bool, decimal-places: uint, risk-tier: uint, is-active: bool
 })
 
 (define-map currency-code-to-id (string-ascii 10) uint)
@@ -45,13 +39,7 @@
 (define-data-var next-jurisdiction-id uint u0)
 
 (define-map jurisdiction-registry uint {
-  country-code: (string-ascii 2)
-  region-code: (string-ascii 3)
-  name: (string-ascii 50)
-  compliance-tier: uint
-  requires-kyc: bool
-  requires-travel-rule: bool
-  is-active: bool
+  country-code: (string-ascii 2), region-code: (string-ascii 3), name: (string-ascii 50), compliance-tier: uint, requires-kyc: bool, requires-travel-rule: bool, is-active: bool
 })
 
 (define-map country-to-jurisdiction-id (string-ascii 2) uint)
@@ -63,11 +51,7 @@
 (define-map settlement-shards (buff 32) (string-ascii 45))
 
 (define-map kyc-registry principal {
-  country: (string-ascii 2)
-  region: (string-ascii 3)
-  status: (string-ascii 10)
-  risk-score: uint
-  last-verified: uint
+  country: (string-ascii 2), region: (string-ascii 3), status: (string-ascii 10), risk-score: uint, last-verified: uint
 })
 
 ;; ============================================================================
@@ -105,8 +89,7 @@
     (asserts! (<= decimal-places u18) ERR_INVALID_CURRENCY_CODE)
     (let ((currency-id (var-get next-currency-id)))
       (map-set currency-registry currency-id
-        { code: code principal: token-principal is-fiat: is-fiat is-stablecoin: is-stablecoin
-          decimal-places: decimal-places risk-tier: risk-tier is-active: true })
+        { code: code, principal: token-principal, is-fiat: is-fiat, is-stablecoin: is-stablecoin, decimal-places: decimal-places, risk-tier: risk-tier, is-active: true })
       (map-set currency-code-to-id code currency-id)
       (if (is-some token-principal)
         (map-set token-to-currency-id (unwrap-panic token-principal) currency-id)
@@ -140,9 +123,7 @@
     (asserts! (is-none (map-get? country-to-jurisdiction-id country-code)) ERR_JURISDICTION_ALREADY_REGISTERED)
     (let ((jurisdiction-id (var-get next-jurisdiction-id)))
       (map-set jurisdiction-registry jurisdiction-id
-        { country-code: country-code region-code: region-code name: name
-          compliance-tier: compliance-tier requires-kyc: requires-kyc
-          requires-travel-rule: requires-travel-rule is-active: true })
+        { country-code: country-code, region-code: region-code, name: name, compliance-tier: compliance-tier, requires-kyc: requires-kyc, requires-travel-rule: requires-travel-rule, is-active: true })
       (map-set country-to-jurisdiction-id country-code jurisdiction-id)
       (var-set next-jurisdiction-id (+ jurisdiction-id u1))
       (ok jurisdiction-id))))
@@ -200,8 +181,7 @@
     (asserts! (or (is-owner) (is-czar)) ERR_UNAUTHORIZED)
     (asserts! (validate-country-code country) ERR_INVALID_COUNTRY_CODE)
     (map-set kyc-registry user
-      { country: country region: region status: "verified"
-        risk-score: risk-score last-verified: (unwrap! (get-block-info? time stacks-block-height) ERR_BLOCK_TIME_UNAVAILABLE) })
+      { country: country, region: region, status: "verified", risk-score: risk-score, last-verified: (unwrap! (get-block-info? time stacks-block-height) ERR_BLOCK_TIME_UNAVAILABLE) })
     (ok true)))
 
 (define-public (record-global-settlement
@@ -221,10 +201,8 @@
       (receiver-risk (get risk-score receiver-data))
       (shard (unwrap! (compute-global-shard sender-country receiver-country currency-id amount sender-risk receiver-risk) ERR_UNSUPPORTED_COUNTRY)))
       (map-set settlement-shards tx-id shard)
-      (print { event: "global-settlement-recorded" tx-id: tx-id shard: shard
-                sender: sender receiver: receiver currency-id: currency-id amount: amount
-                sender-country: sender-country receiver-country: receiver-country })
-      (ok { tx-id: tx-id shard: shard currency-id: currency-id }))))
+      (print { event: "global-settlement-recorded", tx-id: tx-id, shard: shard, sender: sender, receiver: receiver, currency-id: currency-id, amount: amount, sender-country: sender-country, receiver-country: receiver-country })
+      (ok { tx-id: tx-id, shard: shard, currency-id: currency-id }))))
 
 ;; ============================================================================
 ;; BACKWARD COMPATIBILITY LAYER

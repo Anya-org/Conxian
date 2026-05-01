@@ -37,7 +37,7 @@
 (define-public (update-activity-score (voter principal))
   (begin
     ;; In production this would increment a map-based score
-    (print { event: "reputation-updated" voter: voter })
+    (print { event: "reputation-updated", voter: voter })
     (ok true)
   )
 )

@@ -18,7 +18,7 @@
 (define-public (create-dlc (amount uint))
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
-    (print { event: "dlc-created" amount: amount creator: tx-sender })
+    (print { event: "dlc-created", amount: amount, creator: tx-sender })
     (ok true)
   )
 )
@@ -56,8 +56,6 @@
 ;; @desc Get protocol status for DLC manager
 (define-read-only (get-protocol-status)
   (ok {
-    compliant: true
-    version: "v1.1.0-Apex"
-    mode: "BITVM2-READY"
+    compliant: true, version: "v1.1.0-Apex", mode: "BITVM2-READY"
   })
 )

@@ -27,49 +27,30 @@
 (define-data-var conxian-protocol-contract principal tx-sender)
 
 ;; Event definitions
-(define-map points-earned { event-id: uint } { user: principal amount: uint source: (string-ascii 16) })
-(define-map points-burned { event-id: uint } { user: principal amount: uint reason: (string-ascii 16) })
-(define-map points-transferred { event-id: uint } { from: principal to: principal amount: uint })
-(define-map reward-claimed { event-id: uint } { user: principal reward-id: (string-ascii 32) cost: uint })
+(define-map points-earned { event-id: uint } { user: principal, amount: uint, source: (string-ascii 16) })
+(define-map points-burned { event-id: uint } { user: principal, amount: uint, reason: (string-ascii 16) })
+(define-map points-transferred { event-id: uint } { from: principal, to: principal, amount: uint })
+(define-map reward-claimed { event-id: uint } { user: principal, reward-id: (string-ascii 32), cost: uint })
 
 ;; Storage maps
 (define-map user-points { user: principal } { 
-  balance: uint
-  earned: uint
-  burned: uint
-  last-activity: uint
-  points-tier: uint
-  expiry-time: uint
+  balance: uint, earned: uint, burned: uint, last-activity: uint, points-tier: uint, expiry-time: uint
 })
 
 (define-map points-transactions { tx-id: (buff 32) } { 
-  from: principal
-  to: principal
-  amount: uint
-  timestamp: uint
-  transaction-type: (string-ascii 16)
-  metadata: (optional (string-ascii 256))
+  from: principal, to: principal, amount: uint, timestamp: uint, transaction-type: (string-ascii 16), metadata: (optional (string-ascii 256))
 })
 
 (define-map points-rewards { reward-id: (string-ascii 32) } { 
-  name: (string-ascii 64)
-  description: (string-ascii 256)
-  points-cost: uint
-  reward-type: (string-ascii 16)
-  active: bool
-  max-claims: uint
-  claims-used: uint
+  name: (string-ascii 64), description: (string-ascii 256), points-cost: uint, reward-type: (string-ascii 16), active: bool, max-claims: uint, claims-used: uint
 })
 
-(define-map user-rewards { user: principal reward-id: (string-ascii 32) } {
-  claimed-at: uint
-  claim-count: uint
+(define-map user-rewards { user: principal, reward-id: (string-ascii 32) } {
+  claimed-at: uint, claim-count: uint
 })
 
 (define-map points-tiers { tier: uint } { 
-  name: (string-ascii 32)
-  min-points: uint
-  benefits: (list 10 (string-ascii 64))
+  name: (string-ascii 32), min-points: uint, benefits: (list 10 (string-ascii 64)),
   decay-rate: uint
 })
 
@@ -77,12 +58,7 @@
 
 (define-read-only (get-user-points (user principal))
   (ok (default-to {
-    balance: u0
-    earned: u0
-    burned: u0
-    last-activity: u0
-    points-tier: u0
-    expiry-time: u0
+    balance: u0, earned: u0, burned: u0, last-activity: u0, points-tier: u0, expiry-time: u0
   } (map-get? user-points { user: user })))
 )
 
@@ -109,7 +85,7 @@
   (map-get? points-tiers { tier: tier }))
 
 (define-read-only (get-user-reward-claim (user principal) (reward-id (string-ascii 32)))
-  (map-get? user-rewards { user: user reward-id: reward-id }))
+  (map-get? user-rewards { user: user, reward-id: reward-id }))
 
 (define-read-only (get-total-points-issued)
   (var-get total-points-issued))
@@ -157,24 +133,17 @@
         
         ;; Update user points
         (map-set user-points { user: user } {
-          balance: (+ current-balance amount)
-          earned: (+ current-earned amount)
-          burned: (get burned current-points)
-          last-activity: burn-block-height
-          points-tier: current-tier
-          expiry-time: (+ burn-block-height POINTS_EXPIRY_SECONDS)
+          balance: (+ current-balance amount), earned: (+ current-earned amount), burned: (get burned current-points), last-activity: burn-block-height, points-tier: current-tier, expiry-time: (+ burn-block-height POINTS_EXPIRY_SECONDS)
         })
         
         ;; Update totals
         (var-set total-points-issued (+ (var-get total-points-issued) amount))
         
         ;; Emit event
-        (print { event: "points-earned" user: user amount: amount source: source })
+        (print { event: "points-earned", user: user, amount: amount, source: source })
         
         (ok {
-          new-balance: (+ current-balance amount)
-          total-earned: (+ current-earned amount)
-          tier: current-tier
+          new-balance: (+ current-balance amount), total-earned: (+ current-earned amount), tier: current-tier
         })
       )
     )
@@ -198,11 +167,7 @@
         
         ;; Update user points
         (map-set user-points { user: tx-sender } {
-          balance: (- current-balance amount)
-          earned: (get earned current-points)
-          burned: (+ current-burned amount)
-          last-activity: burn-block-height
-          points-tier: (unwrap-panic (calculate-user-tier tx-sender))
+          balance: (- current-balance amount), earned: (get earned current-points), burned: (+ current-burned amount), last-activity: burn-block-height, points-tier: (unwrap-panic (calculate-user-tier tx-sender)),
           expiry-time: (get expiry-time current-points)
         })
         
@@ -210,11 +175,10 @@
         (var-set total-points-burned (+ (var-get total-points-burned) amount))
         
         ;; Emit event
-        (print { event: "points-burned" user: tx-sender amount: amount reason: reason })
+        (print { event: "points-burned", user: tx-sender, amount: amount, reason: reason })
         
         (ok {
-          new-balance: (- current-balance amount)
-          total-burned: (+ current-burned amount)
+          new-balance: (- current-balance amount), total-burned: (+ current-burned amount)
         })
       )
     )
@@ -241,30 +205,21 @@
           
           ;; Update sender points
           (map-set user-points { user: tx-sender } {
-            balance: (- sender-balance amount)
-            earned: (get earned sender-points)
-            burned: (get burned sender-points)
-            last-activity: burn-block-height
-            points-tier: (unwrap-panic (calculate-user-tier tx-sender))
+            balance: (- sender-balance amount), earned: (get earned sender-points), burned: (get burned sender-points), last-activity: burn-block-height, points-tier: (unwrap-panic (calculate-user-tier tx-sender)),
             expiry-time: (get expiry-time sender-points)
           })
           
           ;; Update receiver points
           (map-set user-points { user: to } {
-            balance: (+ receiver-balance amount)
-            earned: (get earned receiver-points)
-            burned: (get burned receiver-points)
-            last-activity: burn-block-height
-            points-tier: (unwrap-panic (calculate-user-tier to))
+            balance: (+ receiver-balance amount), earned: (get earned receiver-points), burned: (get burned receiver-points), last-activity: burn-block-height, points-tier: (unwrap-panic (calculate-user-tier to)),
             expiry-time: (+ burn-block-height POINTS_EXPIRY_SECONDS)
           })
           
           ;; Emit event
-          (print { event: "points-transferred" from: tx-sender to: to amount: amount })
+          (print { event: "points-transferred", from: tx-sender, to: to, amount: amount })
           
           (ok {
-            sender-balance: (- sender-balance amount)
-            receiver-balance: (+ receiver-balance amount)
+            sender-balance: (- sender-balance amount), receiver-balance: (+ receiver-balance amount)
           })
         )
       )
@@ -307,30 +262,21 @@
                 (begin
                   ;; Update user reward claim
                   (let ((current-claims (if (is-some user-claim) (get claim-count (unwrap! user-claim (err ERR_POINTS_NOT_AVAILABLE))) u0)))
-                    (map-set user-rewards { user: tx-sender reward-id: reward-id } {
-                      claimed-at: burn-block-height
-                      claim-count: (+ current-claims u1)
+                    (map-set user-rewards { user: tx-sender, reward-id: reward-id } {
+                      claimed-at: burn-block-height, claim-count: (+ current-claims u1)
                     })
                   )
                   
                   ;; Update reward claims used
                   (map-set points-rewards { reward-id: reward-id } {
-                    name: (get name reward)
-                    description: (get description reward)
-                    points-cost: (get points-cost reward)
-                    reward-type: (get reward-type reward)
-                    active: (get active reward)
-                    max-claims: (get max-claims reward)
-                    claims-used: (+ (get claims-used reward) u1)
+                    name: (get name reward), description: (get description reward), points-cost: (get points-cost reward), reward-type: (get reward-type reward), active: (get active reward), max-claims: (get max-claims reward), claims-used: (+ (get claims-used reward) u1)
                   })
                   
                   ;; Emit event
-                  (print { event: "reward-claimed" user: tx-sender reward-id: reward-id cost: (get points-cost reward) })
+                  (print { event: "reward-claimed", user: tx-sender, reward-id: reward-id, cost: (get points-cost reward) })
                   
                   (ok {
-                    reward-name: (get name reward)
-                    reward-type: (get reward-type reward)
-                    points-spent: (get points-cost reward)
+                    reward-name: (get name reward), reward-type: (get reward-type reward), points-spent: (get points-cost reward)
                   })
                 )
               error (err error)
@@ -371,13 +317,7 @@
     
     ;; Create reward
     (map-set points-rewards { reward-id: reward-id } {
-      name: name
-      description: description
-      points-cost: points-cost
-      reward-type: reward-type
-      active: true
-      max-claims: max-claims
-      claims-used: u0
+      name: name, description: description, points-cost: points-cost, reward-type: reward-type, active: true, max-claims: max-claims, claims-used: u0
     })
     
     (ok true)
@@ -438,12 +378,7 @@
     
     ;; Reset user points
     (map-set user-points { user: user } {
-      balance: u0
-      earned: u0
-      burned: u0
-      last-activity: burn-block-height
-      points-tier: u0
-      expiry-time: u0
+      balance: u0, earned: u0, burned: u0, last-activity: burn-block-height, points-tier: u0, expiry-time: u0
     })
     (ok true)
   )
@@ -461,13 +396,7 @@
       
       (let ((reward (unwrap! reward-info (err ERR_POINTS_NOT_AVAILABLE))))
         (map-set points-rewards { reward-id: reward-id } {
-          name: (get name reward)
-          description: (get description reward)
-          points-cost: (get points-cost reward)
-          reward-type: (get reward-type reward)
-          active: false
-          max-claims: (get max-claims reward)
-          claims-used: (get claims-used reward)
+          name: (get name reward), description: (get description reward), points-cost: (get points-cost reward), reward-type: (get reward-type reward), active: false, max-claims: (get max-claims reward), claims-used: (get claims-used reward)
         })
         (ok true)
       )

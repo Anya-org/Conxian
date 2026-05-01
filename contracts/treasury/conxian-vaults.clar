@@ -10,8 +10,7 @@
 ;; Data
 (define-map vault-balances
   {
-    user: principal
-    token: principal
+    user: principal, token: principal
   }
   uint
 )
@@ -35,14 +34,12 @@
     )
     (try! (contract-call? token transfer amount sender (as-contract tx-sender) none))
     (map-set vault-balances {
-      user: sender
-      token: token-contract
+      user: sender, token: token-contract
     }
       (+
         (default-to u0
           (map-get? vault-balances {
-            user: sender
-            token: token-contract
+            user: sender, token: token-contract
           })
         )
         amount
@@ -63,8 +60,7 @@
       (token-contract (contract-of token))
       (user-balance (default-to u0
         (map-get? vault-balances {
-          user: sender
-          token: token-contract
+          user: sender, token: token-contract
         })
       ))
     )
@@ -76,8 +72,7 @@
     (try! (as-contract (contract-call? token transfer amount tx-sender sender none)))
 
     (map-set vault-balances {
-      user: sender
-      token: token-contract
+      user: sender, token: token-contract
     }
       (- user-balance amount)
     )
@@ -94,8 +89,7 @@
   )
   (default-to u0
     (map-get? vault-balances {
-      user: user
-      token: token
+      user: user, token: token
     })
   )
 )

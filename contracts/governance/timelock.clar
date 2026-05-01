@@ -35,37 +35,26 @@
 (define-map queued-proposals
     principal
     {
-        eta: uint
-        executed: bool
-        target: principal
+        eta: uint, executed: bool, target: principal
     }
 )
 
 ;; Events
 (define-private (emit-queued (proposal principal) (eta uint) (target principal))
     (print {
-        event: "proposal-queued"
-        proposal: proposal
-        eta: eta
-        target: target
-        timestamp: burn-block-height
+        event: "proposal-queued", proposal: proposal, eta: eta, target: target, timestamp: burn-block-height
     })
 )
 
 (define-private (emit-executed (proposal principal) (target principal))
     (print {
-        event: "proposal-executed"
-        proposal: proposal
-        target: target
-        timestamp: burn-block-height
+        event: "proposal-executed", proposal: proposal, target: target, timestamp: burn-block-height
     })
 )
 
 (define-private (emit-cancelled (proposal principal))
     (print {
-        event: "proposal-cancelled"
-        proposal: proposal
-        timestamp: burn-block-height
+        event: "proposal-cancelled", proposal: proposal, timestamp: burn-block-height
     })
 )
 
@@ -105,9 +94,7 @@
         
         (let ((eta (+ burn-block-height (var-get delay))))
             (map-set queued-proposals proposal-principal {
-                eta: eta
-                executed: false
-                target: target
+                eta: eta, executed: false, target: target
             })
             (emit-queued proposal-principal eta target)
             (ok eta)
@@ -167,10 +154,7 @@
         (asserts! (is-admin) (err ERR_UNAUTHORIZED))
         (var-set admin new-admin)
         (print {
-            event: "admin-transferred"
-            old-admin: tx-sender
-            new-admin: new-admin
-            timestamp: burn-block-height
+            event: "admin-transferred", old-admin: tx-sender, new-admin: new-admin, timestamp: burn-block-height
         })
         (ok true)
     )
@@ -204,10 +188,8 @@
 ;; Verify this timelock is ready for sovereign handoff
 (define-read-only (is-sovereign-ready)
     {
-        admin: (var-get admin)
-        has-valid-delay: (and (>= (var-get delay) MIN_DELAY) (<= (var-get delay) MAX_DELAY))
-        governance-contract: (var-get governance-contract)
-        timestamp: burn-block-height
+        admin: (var-get admin), has-valid-delay: (and (>= (var-get delay) MIN_DELAY) (<= (var-get delay) MAX_DELAY)),
+        governance-contract: (var-get governance-contract), timestamp: burn-block-height
     }
 )
 

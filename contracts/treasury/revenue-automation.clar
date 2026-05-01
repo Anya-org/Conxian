@@ -28,7 +28,7 @@
         (ok u0)
         (begin
           (try! (contract-call? token transfer fee payer .revenue-distributor none))
-          (print { event: "revenue-collected" token: (contract-of token) amount: fee payer: payer })
+          (print { event: "revenue-collected", token: (contract-of token), amount: fee, payer: payer })
           (ok fee)
         )
       )
@@ -51,5 +51,5 @@
 
 ;; @desc Returns the current operational status of the revenue automation engine.
 (define-read-only (get-protocol-status)
-  (ok { compliant: true version: "v1.1.0-Apex" fee-bps: PROTOCOL_FEE_BPS })
+  (ok { compliant: true, version: "v1.1.0-Apex", fee-bps: PROTOCOL_FEE_BPS })
 )

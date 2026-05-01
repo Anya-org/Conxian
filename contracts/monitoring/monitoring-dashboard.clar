@@ -13,30 +13,24 @@
 ;; @desc Returns comprehensive protocol health metrics and risk indicators
 (define-read-only (get-protocol-health)
   (ok {
-      status: { compliant: true version: "C4" }
-      risk: { risk-score: u100 }
-      metrics: { tvl: u0 solvency-ratio: u150 }
-      gcr: u150
-      uptime: burn-block-height
+      status: { compliant: true, version: "C4" },
+      risk: { risk-score: u100 },
+      metrics: { tvl: u0, solvency-ratio: u150 },
+      gcr: u150, uptime: burn-block-height
   })
 )
 
 ;; @desc Returns the operational status of a specific protocol module
 (define-read-only (get-module-status (module-id (string-ascii 32)))
   (ok {
-    module: module-id
-    healthy: true
-    last-update: burn-block-height
+    module: module-id, healthy: true, last-update: burn-block-height
   })
 )
 
 ;; @desc Returns a high-level summary of the entire system's health
 (define-read-only (get-system-health-summary)
   (ok {
-    total-modules: u5
-    healthy-modules: u5
-    overall-healthy: true
-    timestamp: burn-block-height
+    total-modules: u5, healthy-modules: u5, overall-healthy: true, timestamp: burn-block-height
   })
 )
 

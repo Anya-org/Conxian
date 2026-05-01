@@ -18,8 +18,7 @@
 (define-map exit-queue
   uint
   {
-    user: principal
-    amount: uint
+    user: principal, amount: uint
   }
 )
 
@@ -39,7 +38,7 @@
     (begin
       ;; Access control: Only allow approved contracts (placeholder for now effectively public or restricted)
       ;; In production this should check a whitelist from conxian-protocol
-      (map-set exit-queue current-tail { user: user amount: amount })
+      (map-set exit-queue current-tail { user: user, amount: amount })
       (var-set tail (+ current-tail u1))
       (ok true)
     )

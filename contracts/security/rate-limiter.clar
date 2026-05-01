@@ -17,10 +17,7 @@
 (define-map user-rate-limits
     principal
     {
-        window-start: uint
-        operation-count: uint
-        custom-window-size: (optional uint)
-        custom-max-operations: (optional uint)
+        window-start: uint, operation-count: uint, custom-window-size: (optional uint), custom-max-operations: (optional uint)
     }
 )
 
@@ -37,10 +34,7 @@
             (current-block burn-block-height)
             (user-data (default-to
                 {
-                    window-start: current-block
-                    operation-count: u0
-                    custom-window-size: none
-                    custom-max-operations: none
+                    window-start: current-block, operation-count: u0, custom-window-size: none, custom-max-operations: none
                 }
                 (map-get? user-rate-limits user)
             ))
@@ -51,8 +45,7 @@
             ;; New window
             (begin
                 (map-set user-rate-limits user (merge user-data {
-                    window-start: current-block
-                    operation-count: u1
+                    window-start: current-block, operation-count: u1
                 }))
                 (ok true)
             )
@@ -81,17 +74,13 @@
             (
                 (user-data (default-to
                     {
-                        window-start: burn-block-height
-                        operation-count: u0
-                        custom-window-size: none
-                        custom-max-operations: none
+                        window-start: burn-block-height, operation-count: u0, custom-window-size: none, custom-max-operations: none
                     }
                     (map-get? user-rate-limits user)
                 ))
             )
             (map-set user-rate-limits user (merge user-data {
-                custom-window-size: window-size
-                custom-max-operations: max-ops
+                custom-window-size: window-size, custom-max-operations: max-ops
             }))
             (ok true)
         )
