@@ -1,4 +1,6 @@
-# Conxian Protocol: Agent Directives (Feb 2026)
+# Conxian Protocol: Agent Directives 
+(v2.0 - OpenSpec Aligned)
+(production code only get pr'd to merge to main/master branches - checked against mainnet)
 
 ## 1. System Build Ethos
 - **Sovereign Autonomy**: All core logic must be autonomous. Avoid manual admin interventions.
