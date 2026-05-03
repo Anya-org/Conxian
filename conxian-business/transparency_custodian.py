@@ -23,7 +23,12 @@ def generate_manifest():
     }
 
     # Audit strategic and executive directories
-    targets = ["docs", "Conxian", "conxian-business", "Nakamoto-Guardian", "Sovereign-Ops-Orchestrator", "Sovereign-Strategy-Nexus", "Fiscal-Vault-Oracle"]
+    targets = [
+        "docs", "Conxian", "conxian-business", "Nakamoto-Guardian",
+        "Sovereign-Ops-Orchestrator", "Sovereign-Strategy-Nexus", "Fiscal-Vault-Oracle",
+        "conxian-gateway", "conxian-nexus", "conxian-ui", "conxius-platform",
+        "conxius-wallet", "lib-conclave-sdk", "lib-conxian-core", "stacksorbit"
+    ]
 
     for target in targets:
         if os.path.isdir(target):
@@ -37,6 +42,17 @@ def generate_manifest():
                                 "path": file_path,
                                 "sha256": file_hash
                             })
+
+    # ZSE Compliance Check
+    sensitive_patterns = [".env", "id_rsa", "key.json", "secret"]
+    for root, dirs, files in os.walk("."):
+        for file in files:
+            for pattern in sensitive_patterns:
+                if pattern in file.lower() and not ".stub" in file:
+                    # Ignore .git and node_modules
+                    if ".git" in root or "node_modules" in root:
+                        continue
+                    print(f"ZSE ALERT: Potential sensitive file found: {os.path.join(root, file)}")
 
     # Anchor to Stacks (Simulated in this step)
     anchor_payload = hashlib.sha256(json.dumps(manifest, sort_keys=True).encode()).hexdigest()
