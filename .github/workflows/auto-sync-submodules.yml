@@ -1,53 +1,34 @@
-name: Auto Sync Submodules
+name: Submodule Pin Integrity Audit
 
 on:
   schedule:
-    # Run at 00:00 every day
+    # Daily policy audit; does not mutate branches or open PRs.
     - cron: '0 0 * * *'
-  workflow_dispatch: # Allow manual triggering
+  workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
-  sync:
+  verify-submodule-policy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository (pinned submodule SHAs)
         uses: actions/checkout@v4
         with:
-          ref: dev
-          submodules: true
-          fetch-depth: 0
+          submodules: recursive
           token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
+          persist-credentials: false
 
-      - name: Update submodules to latest main (PR base: dev)
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
-          # `.gitmodules` intentionally does not set `submodule.<name>.branch`.
-          # Ensure `git submodule update --remote` tracks `main` rather than each remote's `HEAD`.
-          while read -r key _path; do
-            name=${key#submodule.}
-            name=${name%.path}
-            git config "submodule.${name}.branch" main
-          done < <(git config -f .gitmodules --get-regexp '^submodule\..*\.path$')
-
-          # Initialize and update submodules recursively to track their configured branches.
-          git submodule update --init --recursive --remote
-
-      - name: Create pull request
-        uses: peter-evans/create-pull-request@v8
+      - name: Setup Python
+        uses: actions/setup-python@v6
         with:
-          token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
-          commit-message: "chore: auto-sync submodules"
-          title: "chore: auto-sync submodules"
-          body: |
-            Automated submodule update to the latest configured branches.
+          python-version: '3.10'
 
-            This workflow intentionally opens a PR rather than pushing directly to protected branches.
-          base: dev
-          branch: bot/auto-sync-submodules
-          delete-branch: true
+      - name: Verify submodule integrity and update-policy hardening
+        run: |
+          python3 scripts/verify_submodule_integrity.py
+
+      - name: Verify production contamination guard
+        run: |
+          python3 scripts/verify_contamination_guard.py

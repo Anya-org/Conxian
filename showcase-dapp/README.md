@@ -1,6 +1,6 @@
 # Showcase dapp
 
-Supporting — Demo & Integration Showcase for Conxian UI patterns.
+A demo & integration showcase for Conxian UI patterns.
 
 ## Purpose
 

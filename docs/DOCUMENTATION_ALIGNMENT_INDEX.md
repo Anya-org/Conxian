@@ -7,12 +7,12 @@ This page is a practical index of the documentation already present in this repo
 - **Canonical**: the current “source of truth” for a domain. If two docs disagree, update the non-canonical doc to match the canonical one.
 - **Supporting**: helpful context, audits, reports, briefs, or deep dives that clarify (but don’t define) the system.
 - **Public-safe**: ok to link in public contexts and external conversations.
-- **Public-safe stub (canonical in Linear)**: safe to link publicly; this repo file is a short pointer stub (see [ZSE stub template](./templates/ZSE_STUB_TEMPLATE.md)). It must not contain any operational, security, financial, legal, and strategic details beyond the pointer. The full canonical content is maintained in Linear under ZSE.
-- **Internal-only (canonical in Linear only)**: operational, security, financial, legal, and strategic material whose canonical document must live only in the Conxian Linear workspace. If a repo link target must be preserved, use a **Public-safe stub (canonical in Linear)** (see [ZSE stub template](./templates/ZSE_STUB_TEMPLATE.md)) so existing links continue to resolve.
+- **Public-safe stub (canonical in Sovereign Coordination Layer)**: safe to link publicly; this repo file is a short pointer stub (see [ZSE stub template](./templates/ZSE_STUB_TEMPLATE.md)). It must not contain any operational, security, financial, legal, and strategic details beyond the pointer. The full canonical content is maintained in the sovereign coordination layer under ZSE.
+- **Internal-only (canonical in Sovereign Coordination Layer only)**: operational, security, financial, legal, and strategic material whose canonical document must live only in the sovereign coordination layer. If a repo link target must be preserved, use a **Public-safe stub (canonical in Sovereign Coordination Layer)** (see [ZSE stub template](./templates/ZSE_STUB_TEMPLATE.md)) so existing links continue to resolve.
 
 Notes:
 
-- Treat this repo as public for boundary purposes. (This GitHub repository is private as of April 8, 2026.) “Internal-only” material should not be stored here; when we preserve link targets we use public-safe ZSE stubs (see https://linear.app/conxian-labs/issue/CON-256).
+- Treat this repo as public for boundary purposes. (This GitHub repository is private as of April 8, 2026.) "Internal-only" material should not be stored here; when we preserve link targets we use public-safe ZSE stubs (see sovereign coordination layer issue CON-256).
 - OpenSpec change sets typically have 4 layers: `proposal.md` (intent), `design.md` (architecture), `specs/*/spec.md` (requirements), `tasks.md` (execution).
 
 ## 1) Repo navigation (start here)
@@ -26,6 +26,7 @@ Notes:
 | `docs/PRIVATE_REPO_REPO_CHECK_WORKFLOW.md` | Canonical | Public-safe | Repo-check workflow for private repositories (boundary, secrets, hygiene, governance, release maturity). |
 | `docs/BRANCH_AND_PROMOTION_STANDARD.md` | Canonical | Public-safe | Canonical `dev`/`staged`/`main` branch roles and promotion workflow. |
 | `docs/PROMOTION_CHECKLISTS.md` | Canonical | Public-safe | Required checklists and evidence for feature -> `dev` -> `staged` -> `main` promotions. |
+| `docs/INTEGRATED_SYSTEM_TESTNET_GATE.md` | Canonical | Public-safe | Full-system public-testnet gate for `dev` before promotion to `staged`/`main`. |
 | `ARCHIVE_MIGRATION.md` | Canonical | Public-safe | ZSE placeholder + pointer to Linear Virtual Office for legacy material. |
 
 ## 2) BOS (Business Operations System)
@@ -36,7 +37,7 @@ These are the “operating-model” documents that explain how BOS components re
 | --- | --- | --- | --- |
 | `conxian-business/SERVICE_LOOP.md` | Canonical | Public-safe | BOS service loop (how client/supplier loops connect). |
 | `conxian-business/BOS_STATE_MACHINE.stub.json` | Supporting | Public-safe stub (canonical in Linear) | Public-safe BOS state machine pointer stub (standardized ZSE stub). |
-| `Sovereign-Ops-Orchestrator/LINEAR_WIRING.md` | Canonical | Public-safe stub (canonical in Linear) | Intended Linear ↔ state-layer wiring and webhook triggers (standardized ZSE stub). |
+| `Sovereign-Ops-Orchestrator/LINEAR_WIRING.md` | Canonical | Public-safe | ExCo Linear-first intake standard (required fields, triage flow, execution linkbacks) with sensitive details remaining in Linear under ZSE. |
 | `Sovereign-Ops-Orchestrator/DEPLOYMENT_EFFICIENCY.md` | Supporting | Public-safe stub (canonical in Linear) | Bottleneck and deployment efficiency metrics (standardized ZSE stub). |
 | `Sovereign-Strategy-Nexus/REALTIME_M&A_VELOCITY.md` | Supporting | Public-safe stub (canonical in Linear) | Strategy velocity tracking and exit-readiness framing (standardized ZSE stub). |
 | `Sovereign-Strategy-Nexus/docs/SOVEREIGN_MOI_ALIGNMENT.md` | Canonical | Public-safe stub (canonical in Linear) | “MOI” alignment source for Strategy Nexus narratives (standardized ZSE stub). |
@@ -45,9 +46,13 @@ These are the “operating-model” documents that explain how BOS components re
 | `Fiscal-Vault-Oracle/SOVEREIGN_RUNWAY.md` | Canonical | Public-safe stub (canonical in Linear) | Treasury runway and yield execution constraints (standardized ZSE stub). |
 | `Fiscal-Vault-Oracle/LSEG_MCP_AUDIT.md` | Supporting | Public-safe stub (canonical in Linear) | LSEG MCP audit context for treasury/oracle integrity (standardized ZSE stub). |
 | `docs/architecture/BOS_TREASURY_AND_YIELD_INTEGRATION_ARCHITECTURE.md` | Canonical | Public-safe | Treasury/yield integration boundary: intent-based ops, oracle publishing, reconciliation, and failure handling (no dashboard-to-contract coupling). |
+| `docs/architecture/BOS_SOVEREIGN_ENTERPRISE_IDENTITY_ARCHITECTURE.md` | Canonical | Public-safe | Enterprise identity + ERP session brokering architecture: hardware-backed keys, attestation, short-lived PoP-bound sessions, and recovery. |
 | `docs/protocols/BOS_SELF_EXECUTING_CONTRACT_TRIGGER_V1.md` | Canonical | Public-safe | Verified CLM webhook → queued pending on-chain action with 144-block timelock → multisig finalization, with replay protection, cancellation semantics, monitoring, and audit traceability. |
 | `docs/architecture/THREE_LANE_RUNTIME_DEPLOYMENT_ARCHITECTURE.md` | Canonical | Public-safe | Canonical runtime deployment model across community sovereign-node, business-managed, and enterprise/private-cloud lanes (controls, upgrade paths, and trust assumptions). |
 | `docs/architecture/BOS_PRESERVE_ENHANCE_REPLACE_GAP_MATRIX.md` | Canonical | Public-safe | Control matrix for preserve/enhance/replace/defer decisions across BOS components (prevents destructive refactors; locks sequencing). |
+| `docs/architecture/CONXIAN_L3_PROFILE_ADR.md` | Canonical | Public-safe | Decision ADR for the Conxian L3 profile (settlement model, Nakamoto vs sBTC signer boundary, compatibility-first dual lane, and promotion/rollback gates). |
+| `docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md` | Canonical | Public-safe | Target-state BitVM2 + sBTC bridge architecture (components, trust boundaries, proof/verification flow, failure controls, and phased rollout checkpoints). |
+| `docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md` | Canonical | Public-safe | Cross-repo compatibility matrix and objective acceptance-gate evidence checklist for the 13-repo migration set. |
 | `Nakamoto-Guardian/ANTI_FRAGILITY_LOOP.md` | Canonical | Public-safe stub (canonical in Linear) | ATS enforcement + collision audits framing (standardized ZSE stub). |
 | `cxn-grid-oracle/README.md` | Supporting | Public-safe | Grid oracle overview (agnostic). |
 
@@ -108,7 +113,7 @@ These are the documents most likely to answer “what are we building?” and �
 | `conxian-gateway/PRD.md` | Canonical | Public-safe | Gateway PRD (institutional compliance pipe). |
 | `conxian-nexus/docs/PRD.md` | Canonical | Public-safe | Nexus PRD (Glass Node). |
 | `lib-conxian-core/docs/PRD.md` | Canonical | Public-safe | Core library PRD (shared models + gateway alignment). |
-| `docs/LIB_CONCLAVE_SDK_BOS_BUILDOUT.md` | Supporting | Public-safe | BOS-level business role, governance controls, and internal-only vs public-safe separation guidance for the SDK. |
+| `docs/CONXIUS_ENCLAVE_SDK_BOS_BUILDOUT.md` | Supporting | Public-safe | BOS-level business role, governance controls, and internal-only vs public-safe separation guidance for the SDK. |
 | `docs/CONXIUS_PLATFORM_BOS_BUILDOUT.md` | Supporting | Public-safe | BOS-level business role, governance controls, and documentation separation guidance for conxius-platform. |
 | `docs/CONXIAN_PROTOCOL_BOS_BUILDOUT.md` | Supporting | Public-safe | BOS-level business role, governance controls, and documentation separation guidance for Conxian protocol. |
 | `docs/CONXIAN_GATEWAY_BOS_BUILDOUT.md` | Supporting | Public-safe | BOS-level business role, governance controls, and documentation separation guidance for conxian-gateway. |
@@ -124,6 +129,7 @@ These are the documents most likely to answer “what are we building?” and �
 | `docs/MAINNET_READINESS_CONXIUS_PLATFORM.md` | Supporting | Public-safe | Mainnet readiness checklist for conxius-platform. |
 | `docs/WALLET_SIGNER_CONTROL_VERIFICATION_REPORT.md` | Supporting | Public-safe | Wallet and signer control verification report for mainnet launch. |
 | `docs/PUBLIC_VISIBILITY_AUDIT_REPORT.md` | Supporting | Public-safe | Public visibility boundary audit report. |
+| `docs/protocols/SESSION_BROKER_NORMATIVE_SPEC.md` | Canonical | Public-safe | Normative session-broker boundary spec (actors, handshake, TTL semantics, PoP/mTLS binding, replay/idempotency, revocation/attestation checks, fail-closed behavior, errors, and audit requirements). |
 | `conxius-platform/services/lib-conxian-core/docs/PRD.md` | Supporting | Public-safe | Service-local copy; treat `lib-conxian-core/docs/PRD.md` as canonical. |
 | `conxius-wallet/lib-conxian-core/docs/PRD.md` | Supporting | Public-safe | Wallet-local copy; treat `lib-conxian-core/docs/PRD.md` as canonical. |
 
@@ -162,6 +168,8 @@ See `docs/BOS_BUSINESS_BUILDOUT.md` for repo business purpose, business-unit pla
 | `.github/PULL_REQUEST_TEMPLATE.md` | Supporting | Public-safe | PR checklist and norms. |
 | `docs/CSF_FIRST_OPERATING_SEQUENCE_AND_PROOF_GATES.md` | Canonical | Public-safe | Locks the CSF → economy → gateway operating order and the minimum proof gates that keep launch, economy design, and go-to-market claims aligned. |
 | `docs/BOS_WALLET_CONTROL_MODEL.md` | Canonical | Public-safe | Canonical BOS wallet-control model (bootstrap → SAB custody → DAO-aligned governance). |
+| `docs/SAB_MIGRATION_WAVES.md` | Canonical | Public-safe | Canonical SAB migration sequencing (`W0`…`W6`) including reconciliation notes from the legacy 4-wave framing. |
+| `docs/operations/SAB_MIGRATION_WAVES.md` | Supporting | Public-safe | Deprecated non-canonical pointer kept for link continuity; directs readers to `docs/SAB_MIGRATION_WAVES.md`. |
 | `docs/bounties/MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md` | Canonical | Public-safe stub (canonical in Linear) | How maintainer payouts are enabled and validated (standardized ZSE stub). |
 | `admin/SECRETS.md` | Canonical | Public-safe stub (canonical in Linear) | Secret registry + pointers to Linear docs (standardized ZSE stub). |
 
