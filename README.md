@@ -28,20 +28,30 @@ Ownership and review requirements are defined in [`CODEOWNERS`](./CODEOWNERS).
 - Contributors implementing Conxian's protocol, infrastructure, and tools.
 - Partners and auditors who need a canonical, versioned view of OpenSpec.
 
-## Relationship to the Conxian stack
+## Repository Portfolio & Relationship to the Conxian stack
 
-This repository pins and coordinates the flagship Conxian repositories, including:
+The Conxian ecosystem is organized by function to ensure clarity and modularity across the Sovereign Autonomous Business (SAB) stack. See the **[BOS Runtime Ownership Map](./BOS_RUNTIME_OWNERSHIP_MAP.md)** for detailed responsibility boundaries.
 
-- [`Conxian/`](./Conxian): Conxian Finance Protocol (Protocol; Clarity smart contracts)
-- [`conxian-gateway/`](./conxian-gateway): Conxian Gateway (Gateway; Rust)
-- [`conxian-nexus/`](./conxian-nexus): Conxian Nexus (State node; Rust)
-- [`lib-conxian-core/`](./lib-conxian-core): Shared core libraries centered around the Gateway (Shared core; Rust)
-- [`lib-conclave-sdk/`](./lib-conclave-sdk): Enclave + hardware attestation SDK (SDK)
-- [`conxian-ui/`](./conxian-ui): Conxian UI (UI; web) — upstream: `Conxian_UI` *(to be renamed to `conxian-ui`)*
-- [`conxius-wallet/`](./conxius-wallet): Conxius Wallet (Wallet; mobile)
-- [`conxius-platform/`](./conxius-platform): Stack orchestration and local development (Platform)
-- [`stacksorbit/`](./stacksorbit): Deployment and operations tooling (Tooling)
-- [`conxian-labs-site/`](./conxian-labs-site): Conxian Labs public site (Website)
+### 1. Platform & Governance
+- **[`conxian-business/`](./conxian-business)**: **BOS Operations**. Commercial, legal, and platform specifications (ZSE Stubs).
+- **[`conxius-platform/`](./conxius-platform)**: **Orchestration**. Stack orchestration and local development.
+- **[`stacksorbit/`](./stacksorbit)**: **Ops Tooling**. Deployment and operations automation.
+
+### 2. Core Operating Suite (EXCO Agents)
+- **[`conxian-nexus/`](./conxian-nexus)**: **State Node**. High-level orchestration, state roots (MMR), and decentralized storage.
+- **[`conxian-gateway/`](./conxian-gateway)**: **Middleware**. x402 mandates, RPC pooling, and ZKML compliance.
+- **[`Fiscal-Vault-Oracle/`](./Fiscal-Vault-Oracle)**: **Finance**. Treasury and yield management.
+- **[`Nakamoto-Guardian/`](./Nakamoto-Guardian)**: **Compliance**. Policy enforcement and anti-fragility monitoring.
+
+### 3. Protocol & SDKs
+- **[`Conxian/`](./Conxian)**: **Protocol**. Conxian Finance Protocol (Clarity smart contracts).
+- **[`lib-conclave-sdk/`](./lib-conclave-sdk)**: **Agentic SDK**. Enclave + hardware attestation primitives.
+- **[`lib-conxian-core/`](./lib-conxian-core)**: **Shared Core**. Common models for BitVM2, CJCS, and Gateway engine.
+
+### 4. User Interfaces
+- **[`conxius-wallet/`](./conxius-wallet)**: **Mobile**. Sovereign hardware-grade mobile vault.
+- **[`conxian-ui/`](./conxian-ui)**: **Web**. Institutional operator dashboard.
+- **[`conxian-labs-site/`](./conxian-labs-site)**: **Website**. Public ecosystem landing.
 
 ## Cloning
 

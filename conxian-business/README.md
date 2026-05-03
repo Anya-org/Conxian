@@ -22,14 +22,15 @@ This repository is public. Internal BOS state-machine configuration, multi-tenan
 
 active — This module documents BOS-level service-loop expectations and public-safe operational boundaries; detailed state-machine configuration and compliance reports live in Linear. Internal details: <https://linear.app/conxian-labs/issue/CON-435/improve-portfolio-clarity-across-org-facing-repositories>.
 
-## Key Components
+## Key Components & Platform Standards
 
-- **[Service Loop Specification](./SERVICE_LOOP.md)**: Mermaid diagrams of the BOS Gateway and Nexus relationship, including multi-tenant orchestration.
+- **[Sovereign Runtime Ownership Map](./BOS_RUNTIME_OWNERSHIP_MAP.md)**: Canonical mapping of BOS capabilities to production repositories.
+- **[Multi-Tenant Orchestration Guide](./BOS_MULTI_TENANT_ORCHESTRATION.md)**: Multi-Agent System (M.A.S.) patterns and jurisdictional sharding logic.
+- **[BOS Platform Specification](./BOS_PLATFORM_SPEC.md)**: v2.2 Industrial Standard for Business-as-a-Platform (BaaP).
+- **[BOS Enhancement Plan](./BOS_ENHANCEMENT_PLAN_v2.md)**: Roadmap for BitVM2, ZKML, and ERP integration.
 - **[BOS State Machine](./BOS_STATE_MACHINE.stub.json)**: Morgan Stanley CALM Standard state transitions (ZSE Stub).
-- **[Provisioning Template](./BOS_PROVISIONING_TEMPLATE.yaml)**: Declarative BiaB deployment manifest (v2.1).
-- **[Tenant Manifest Example](./BOS_TENANT_MANIFEST_EXAMPLE.yaml)**: Configuration example for jurisdictional sharding.
-- **[IP & Compliance Audit](./system_ip_audit.md)**: Intellectual Property ownership audit (ZSE Stub).
-- **[Section 42 Swap Agreement](./SECTION_42_SWAP_AGREEMENT.md)**: Legal integrity for asset transfer (ZSE Stub).
+- **[Provisioning Template](./BOS_PROVISIONING_TEMPLATE.yaml)**: Declarative BiaB deployment manifest (v2.2).
+- **[Tenant Manifest Example](./BOS_TENANT_MANIFEST_EXAMPLE.yaml)**: Configuration example for multi-agent jurisdictional sharding.
 
 ## Business Logic Skills (Skills 07-09)
 
