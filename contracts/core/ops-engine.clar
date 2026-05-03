@@ -29,8 +29,8 @@
 ;; @desc Get operational status of the ops engine
 (define-read-only (get-protocol-status)
   (ok {
-    compliant: true
-    version: "v1.1.0-Apex"
+    compliant: true,
+    version: "v1.1.0-Apex",
     last-heartbeat: (var-get last-action-block)
   })
 )

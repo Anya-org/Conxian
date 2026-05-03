@@ -34,9 +34,9 @@
     )
     (begin
       (print {
-        event: "pyth-price-update"
-        asset: asset
-        price: price-data
+        event: "pyth-price-update",
+        asset: asset,
+        price: price-data,
         tenure-id: tenure-id
       })
       (ok price-data)

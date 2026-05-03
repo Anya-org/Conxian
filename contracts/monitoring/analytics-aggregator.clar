@@ -23,10 +23,10 @@
     ;; Logic: Update totals and print analytics map
     (var-set total-volume (+ (var-get total-volume) amount))
     (print {
-      event: "analytics-swap"
-      token-in: token-in
-      token-out: token-out
-      amount: amount
+      event: "analytics-swap",
+      token-in: token-in,
+      token-out: token-out,
+      amount: amount,
       tenure-id: (/ block-height u10)
     })
     (ok true)
@@ -44,7 +44,7 @@
 ;; Read Only
 (define-read-only (get-protocol-metrics)
   (ok {
-    volume: (var-get total-volume)
+    volume: (var-get total-volume),
     fees: (var-get total-fees)
   })
 )

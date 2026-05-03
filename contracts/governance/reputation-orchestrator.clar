@@ -36,7 +36,7 @@
     )
         (asserts! (is-admin) (err ERR_UNAUTHORIZED))
         (map-set user-xp user new-xp)
-        (print { event: "xp-awarded" user: user amount: amount total: new-xp })
+        (print { event: "xp-awarded", user: user, amount: amount, total: new-xp })
         (ok new-xp)
     )
 )

@@ -18,8 +18,8 @@
 (define-data-var compliance-validator principal tx-sender)
 (define-data-var authority-pubkey (optional (buff 33)) none)
 
-;; Map: User -> { validated: bool expires-at: uint }
-(define-map compliance-attestations principal { validated: bool expires-at: uint })
+;; Map: User -> { validated: bool, expires-at: uint }
+(define-map compliance-attestations principal { validated: bool, expires-at: uint })
 
 ;; --- Authorization ---
 
@@ -59,7 +59,7 @@
   (begin
     (asserts! (or (is-validator) (is-owner)) ERR_UNAUTHORIZED)
     (map-set compliance-attestations user {
-      validated: true
+      validated: true,
       expires-at: expires-at
     })
     (ok true)
@@ -124,7 +124,7 @@
 
       ;; Record local attestation (valid for 52560 blocks ~ 1 year)
       (map-set compliance-attestations user {
-        validated: true
+        validated: true,
         expires-at: (+ burn-block-height u52560)
       })
 

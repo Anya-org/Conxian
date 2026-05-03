@@ -17,7 +17,7 @@
 (define-public (verify-data-package
     (timestamp uint)
     (entries (list 10 {
-      asset: (buff 32)
+      asset: (buff 32),
       value: uint
     }))
     (signature (buff 65))
@@ -29,8 +29,8 @@
     )
     (try! (contract-call? verifier recover-signer timestamp entries signature))
     (print {
-      event: "redstone-data-verified"
-      timestamp: timestamp
+      event: "redstone-data-verified",
+      timestamp: timestamp,
       tenure-id: (/ block-height u10)
     })
     (ok true)

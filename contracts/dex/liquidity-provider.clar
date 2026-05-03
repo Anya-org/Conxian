@@ -23,25 +23,25 @@
 (define-data-var liquidity-provider-active bool true)
 
 ;; Storage maps
-(define-map liquidity-positions { pool: principal provider: principal } {
-  liquidity-amount: uint
-  pool-shares: uint
-  last-deposit: uint
-  rewards-earned: uint
-  rewards-claimed: uint
+(define-map liquidity-positions { pool: principal, provider: principal } {
+  liquidity-amount: uint,
+  pool-shares: uint,
+  last-deposit: uint,
+  rewards-earned: uint,
+  rewards-claimed: uint,
   fee-tier: uint
 })
 
 (define-map provider-stats { provider: principal } {
-  total-liquidity: uint
-  total-rewards: uint
-  pool-count: uint
+  total-liquidity: uint,
+  total-rewards: uint,
+  pool-count: uint,
   first-provision: uint
 })
 
 (define-map reward-history { provider: principal } {
-  timestamp: uint
-  pool: principal
+  timestamp: uint,
+  pool: principal,
   amount: uint
 })
 
@@ -49,7 +49,7 @@
 
 ;; @desc Get liquidity position for a provider in a specific pool
 (define-read-only (get-liquidity-position (pool principal) (provider principal))
-  (map-get? liquidity-positions { pool: pool provider: provider })
+  (map-get? liquidity-positions { pool: pool, provider: provider })
 )
 
 ;; @desc Get cumulative stats for a liquidity provider
@@ -66,31 +66,31 @@
     (asserts! (>= amount MIN_LIQUIDITY) (err ERR_INSUFFICIENT_BALANCE))
     
     (let ((existing-position (default-to
-                               { liquidity-amount: u0 pool-shares: u0 last-deposit: u0 rewards-earned: u0 rewards-claimed: u0 fee-tier: u0 }
-                               (map-get? liquidity-positions { pool: pool provider: tx-sender }))))
+                               { liquidity-amount: u0, pool-shares: u0, last-deposit: u0, rewards-earned: u0, rewards-claimed: u0, fee-tier: u0 }
+                               (map-get? liquidity-positions { pool: pool, provider: tx-sender }))))
       
       ;; Update position
-      (map-set liquidity-positions { pool: pool provider: tx-sender } {
-        liquidity-amount: (+ (get liquidity-amount existing-position) amount)
-        pool-shares: (+ (get pool-shares existing-position) amount) ;; Simplified share calculation
-        last-deposit: burn-block-height
-        rewards-earned: (get rewards-earned existing-position)
-        rewards-claimed: (get rewards-claimed existing-position)
+      (map-set liquidity-positions { pool: pool, provider: tx-sender } {
+        liquidity-amount: (+ (get liquidity-amount existing-position) amount),
+        pool-shares: (+ (get pool-shares existing-position) amount), ;; Simplified share calculation
+        last-deposit: burn-block-height,
+        rewards-earned: (get rewards-earned existing-position),
+        rewards-claimed: (get rewards-claimed existing-position),
         fee-tier: u1000
       })
 
       ;; Update provider stats
-      (let ((stats (default-to { total-liquidity: u0 total-rewards: u0 pool-count: u0 first-provision: burn-block-height } (map-get? provider-stats { provider: tx-sender }))))
+      (let ((stats (default-to { total-liquidity: u0, total-rewards: u0, pool-count: u0, first-provision: burn-block-height } (map-get? provider-stats { provider: tx-sender }))))
         (map-set provider-stats { provider: tx-sender } {
-          total-liquidity: (+ (get total-liquidity stats) amount)
-          total-rewards: (get total-rewards stats)
-          pool-count: (+ (get pool-count stats) u1)
+          total-liquidity: (+ (get total-liquidity stats) amount),
+          total-rewards: (get total-rewards stats),
+          pool-count: (+ (get pool-count stats) u1),
           first-provision: (get first-provision stats)
         })
       )
 
       (var-set total-liquidity-supplied (+ (var-get total-liquidity-supplied) amount))
-      (print { event: "liquidity-added" provider: tx-sender pool: pool amount: amount })
+      (print { event: "liquidity-added", provider: tx-sender, pool: pool, amount: amount })
       (ok true)
     )
   )
@@ -98,29 +98,29 @@
 
 ;; @desc Remove liquidity from a specific pool
 (define-public (remove-liquidity (pool principal) (amount uint))
-  (let ((position (unwrap! (map-get? liquidity-positions { pool: pool provider: tx-sender }) (err ERR_NOT_PROVIDER))))
+  (let ((position (unwrap! (map-get? liquidity-positions { pool: pool, provider: tx-sender }) (err ERR_NOT_PROVIDER))))
     (asserts! (<= amount (get liquidity-amount position)) (err ERR_INSUFFICIENT_BALANCE))
     
-    (map-set liquidity-positions { pool: pool provider: tx-sender } {
-      liquidity-amount: (- (get liquidity-amount position) amount)
-      pool-shares: (- (get pool-shares position) amount) ;; Simplified
-      last-deposit: (get last-deposit position)
-      rewards-earned: (get rewards-earned position)
-      rewards-claimed: (get rewards-claimed position)
+    (map-set liquidity-positions { pool: pool, provider: tx-sender } {
+      liquidity-amount: (- (get liquidity-amount position) amount),
+      pool-shares: (- (get pool-shares position) amount), ;; Simplified
+      last-deposit: (get last-deposit position),
+      rewards-earned: (get rewards-earned position),
+      rewards-claimed: (get rewards-claimed position),
       fee-tier: (get fee-tier position)
     })
 
     (let ((stats (unwrap-panic (map-get? provider-stats { provider: tx-sender }))))
       (map-set provider-stats { provider: tx-sender } {
-        total-liquidity: (- (get total-liquidity stats) amount)
-        total-rewards: (get total-rewards stats)
-        pool-count: (get pool-count stats)
+        total-liquidity: (- (get total-liquidity stats) amount),
+        total-rewards: (get total-rewards stats),
+        pool-count: (get pool-count stats),
         first-provision: (get first-provision stats)
       })
     )
 
     (var-set total-liquidity-supplied (- (var-get total-liquidity-supplied) amount))
-    (print { event: "liquidity-removed" provider: tx-sender pool: pool amount: amount })
+    (print { event: "liquidity-removed", provider: tx-sender, pool: pool, amount: amount })
     (ok true)
   )
 )
@@ -128,31 +128,31 @@
 ;; @desc Claim earned rewards from a specific pool
 (define-public (claim-rewards (pool principal))
   (let (
-    (position (unwrap! (map-get? liquidity-positions { pool: pool provider: tx-sender }) (err ERR_NOT_PROVIDER)))
+    (position (unwrap! (map-get? liquidity-positions { pool: pool, provider: tx-sender }) (err ERR_NOT_PROVIDER)))
     (unclaimed (- (get rewards-earned position) (get rewards-claimed position)))
   )
     (asserts! (> unclaimed u0) (err ERR_ZERO_AMOUNT))
     
-    (map-set liquidity-positions { pool: pool provider: tx-sender } {
-      liquidity-amount: (get liquidity-amount position)
-      pool-shares: (get pool-shares position)
-      last-deposit: (get last-deposit position)
-      rewards-earned: (get rewards-earned position)
-      rewards-claimed: (get rewards-earned position)
+    (map-set liquidity-positions { pool: pool, provider: tx-sender } {
+      liquidity-amount: (get liquidity-amount position),
+      pool-shares: (get pool-shares position),
+      last-deposit: (get last-deposit position),
+      rewards-earned: (get rewards-earned position),
+      rewards-claimed: (get rewards-earned position),
       fee-tier: (get fee-tier position)
     })
 
     (let ((stats (unwrap-panic (map-get? provider-stats { provider: tx-sender }))))
       (map-set provider-stats { provider: tx-sender } {
-        total-liquidity: (get total-liquidity stats)
-        total-rewards: (+ (get total-rewards stats) unclaimed)
-        pool-count: (get pool-count stats)
+        total-liquidity: (get total-liquidity stats),
+        total-rewards: (+ (get total-rewards stats) unclaimed),
+        pool-count: (get pool-count stats),
         first-provision: (get first-provision stats)
       })
     )
 
     (var-set total-rewards-distributed (+ (var-get total-rewards-distributed) unclaimed))
-    (print { event: "rewards-claimed" provider: tx-sender pool: pool amount: unclaimed })
+    (print { event: "rewards-claimed", provider: tx-sender, pool: pool, amount: unclaimed })
     (ok unclaimed)
   )
 )

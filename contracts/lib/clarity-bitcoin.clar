@@ -24,9 +24,9 @@
     (map-set job-card-state-roots job-id state-root)
 
     (print {
-      event: "bitvm2-attestation-verified"
-      job-id: job-id
-      state-root: state-root
+      event: "bitvm2-attestation-verified",
+      job-id: job-id,
+      state-root: state-root,
       timestamp: burn-block-height
     })
 
