@@ -78,6 +78,7 @@ Notes:
 - One PR = one focused change (keep it reviewable).
 - PRs should map to a Linear issue (include it in the PR description).
 - Follow `CODEOWNERS` for review routing.
+- Validate locally before requesting review (CI is the gate, not the first signal).
 - Before merge:
   - Required checks are green.
   - Appropriate label-gated suites ran (when relevant).

@@ -9,11 +9,11 @@ To ensure the integrity of the Conxian Production Environment, all repositories 
 | `main` | **Mainnet-Only** | Only production-ready, mainnet-validated code. No stubs, mocks, or placeholders. |
 | `staged` | Mainnet Candidate | Pre-production validation branch for mainnet releases. The only branch allowed to merge into `main`. |
 | `dev` | **Testnet-Only** | Default development branch. Non-production validation and testnet-oriented logic. |
-| `feat/*`, `fix/*` | Local/Asynchronous | Ephemeral branches for individual work. Must merge into `dev`. |
+| `feat/*`, `fix/*` | Local/Asynchronous | Ephemeral branches for individual work. Branch from `dev`, validate locally first, then merge into `dev`. |
 
 ## 2. Required Promotion Path
 
-1. **Development & Unit Testing**: All work starts on feature branches and is merged into `dev` after passing standard CI checks and unit tests.
+1. **Development & Unit Testing**: All work starts on feature branches. Validate locally first, then open a PR into `dev`. Merge only after standard CI checks and unit tests pass.
 2. **Testnet Validation**: Functional validation is performed on the `dev` branch against testnet (Stacks Testnet, Bitcoin Testnet/Signet).
 3. **Staging (Promotion Candidate)**: Once testnet validation is complete, code is promoted from `dev` to `staged`.
 4. **Mainnet Acceptance Evidence**: Promotion from `staged` to `main` requires a strict "Mainnet Acceptance Evidence Pack" that satisfies all requirements defined in the canonical spec: [`openspec/specs/mainnet-acceptance-evidence-pack/spec.md`](../openspec/specs/mainnet-acceptance-evidence-pack/spec.md).
@@ -28,6 +28,7 @@ To ensure the integrity of the Conxian Production Environment, all repositories 
 
 ## 3. Enforcement (CI/CD Gates)
 - **Protected Branches**: `main` and `staged` must be protected with required reviews and passing status checks (including the Contamination Guard).
+- **Promotion checklists**: PR descriptions targeting `dev`, `staged`, or `main` must include the relevant promotion checklist sections in `docs/PROMOTION_CHECKLISTS.md`.
 - **Contamination Guard**: CI suites on `main` and `staged` must run a blocking scan for and reject non-production patterns, and the scan must be explicitly scoped to avoid false positives.
   - **Scope**: Run as a required status check on pull requests targeting `main` and `staged`. Scan only production source trees (repo-defined allowlist; e.g., `contracts/**`, `src/**`).
   - **Exclusions**: Explicitly exclude `docs/**`, `audit/**`, `**/*.md`, and test/mocks/fixtures paths.

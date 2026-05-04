@@ -1,0 +1,31 @@
+# Example Tenant Manifest for Conxian BaaP (v2.2)
+tenant_id: "global-logistics-hub.stx"
+state_anchoring:
+  l1: "bitcoin"
+  l2: "stacks"
+  rpc_pooling: true
+  rpc_endpoints:
+    - "https://stacks-node-1.conxian.com"
+    - "https://stacks-node-2.conxian.com"
+    - "https://lava.conxian.network"
+
+business_logic:
+  mas_config:
+    supervisor: "strategy-nexus"
+    worker_crews:
+      - name: "logistics-finance"
+        agents: ["liquidity-analyst", "payout-executor"]
+      - name: "customs-compliance"
+        agents: ["policy-auditor", "zk-verifier"]
+  skills:
+    - "cxn-inventory-bridge"
+    - "cxn-settlement-orchestrator"
+  mcp_tools:
+    - "process_shipping_invoice"
+    - "verify_customs_clearance"
+
+persistence:
+  relational: "kwil"
+  audit_mirror: "tableland"
+  storage_id: "logistics_tenant_01"
+  telemetry: "nostr-signed"

@@ -20,9 +20,12 @@ In practice, “promotion” means opening a pull request from the source branch
 ## Standard workflow
 
 1. Create a feature branch from `dev`.
-2. Open a PR into `dev` and validate the change in a testnet/non-production context.
-3. When the change is a mainnet candidate, open a promotion PR from `dev` into `staged`.
-4. After mainnet-candidate validation completes and approvals are in place, open a promotion PR from `staged` into `main`.
+2. Validate locally first (run the checks relevant to the component you changed), then open a PR into `dev`.
+3. Validate the change in a testnet/non-production context.
+4. When the change is a mainnet candidate, open a promotion PR from `dev` into `staged`.
+5. After mainnet-candidate validation completes and approvals are in place, open a promotion PR from `staged` into `main`.
+
+Promotion checklists live in `docs/PROMOTION_CHECKLISTS.md`.
 
 For emergency fixes, open a promotion PR from `hotfix/*` into `staged`, then promote `staged` into `main`.
 
