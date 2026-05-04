@@ -124,7 +124,7 @@
 (define-public (set-voting-period (new-period uint))
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
-    (print { event: "set-voting-period" period: new-period })
+    (print { event: "set-voting-period", period: new-period })
     (ok true)
   )
 )
@@ -135,7 +135,7 @@
 (define-public (set-quorum-percentage (new-quorum uint))
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
-    (print { event: "set-quorum-percentage" quorum: new-quorum })
+    (print { event: "set-quorum-percentage", quorum: new-quorum })
     (ok true)
   )
 )
@@ -147,7 +147,7 @@
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
     (var-set proposal-executor-contract new-executor)
-    (print { event: "set-proposal-executor" executor: new-executor })
+    (print { event: "set-proposal-executor", executor: new-executor })
     (ok true)
   )
 )
@@ -158,7 +158,7 @@
 (define-public (transfer-ownership (new-owner principal))
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
-    (print { event: "transfer-ownership" owner: new-owner })
+    (print { event: "transfer-ownership", owner: new-owner })
     (ok true)
   )
 )
@@ -169,7 +169,7 @@
 (define-public (set-protocol-coordinator (new-coordinator principal))
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
-    (print { event: "set-protocol-coordinator" coordinator: new-coordinator })
+    (print { event: "set-protocol-coordinator", coordinator: new-coordinator })
     (ok true)
   )
 )

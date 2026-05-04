@@ -33,10 +33,10 @@
 (define-map pool-optimization-data
     { pool: principal }
     {
-        last-optimization: uint
-        target-liquidity: uint
-        current-utilization: uint
-        optimization-score: uint
+        last-optimization: uint,
+        target-liquidity: uint,
+        current-utilization: uint,
+        optimization-score: uint,
         fee-tier: uint
     }
 )
@@ -44,9 +44,9 @@
 (define-map optimization-history
     { pool: principal }
     {
-        timestamp: uint
-        action: (string-ascii 32)
-        old-value: uint
+        timestamp: uint,
+        action: (string-ascii 32),
+        old-value: uint,
         new-value: uint
     }
 )
@@ -104,20 +104,20 @@
                 )
                 ;; Update optimization data
                 (map-set pool-optimization-data { pool: pool } {
-                    last-optimization: burn-block-height
-                    target-liquidity: optimal-liquidity
-                    current-utilization: current-utilization
-                    optimization-score: optimization-score
+                    last-optimization: burn-block-height,
+                    target-liquidity: optimal-liquidity,
+                    current-utilization: current-utilization,
+                    optimization-score: optimization-score,
                     fee-tier: (get-pool-fee-tier pool)
                 })
 
                 ;; Emit optimization event
                 (print {
-                    event: "liquidity-optimized"
-                    pool: pool
-                    old-liquidity: target-liquidity
-                    new-liquidity: optimal-liquidity
-                    delta: liquidity-delta
+                    event: "liquidity-optimized",
+                    pool: pool,
+                    old-liquidity: target-liquidity,
+                    new-liquidity: optimal-liquidity,
+                    delta: liquidity-delta,
                     recommended-action: (if (> optimal-liquidity target-liquidity)
                         "add-liquidity"
                         "remove-liquidity"
@@ -125,10 +125,10 @@
                 })
 
                 (ok {
-                    pool: pool
-                    old-liquidity: target-liquidity
-                    new-liquidity: optimal-liquidity
-                    delta: liquidity-delta
+                    pool: pool,
+                    old-liquidity: target-liquidity,
+                    new-liquidity: optimal-liquidity,
+                    delta: liquidity-delta,
                     recommended-action: (if (> optimal-liquidity target-liquidity)
                         "add-liquidity"
                         "remove-liquidity"
@@ -159,25 +159,25 @@
         (let ((old-fee-tier (get-pool-fee-tier pool)))
             ;; Update fee tier
             (map-set pool-optimization-data { pool: pool } {
-                last-optimization: burn-block-height
-                target-liquidity: (get-pool-target-liquidity pool)
-                current-utilization: (get-pool-utilization pool)
-                optimization-score: (get-optimization-score pool)
+                last-optimization: burn-block-height,
+                target-liquidity: (get-pool-target-liquidity pool),
+                current-utilization: (get-pool-utilization pool),
+                optimization-score: (get-optimization-score pool),
                 fee-tier: new-fee-tier
             })
 
             ;; Record optimization history
             (map-set optimization-history { pool: pool } {
-                timestamp: burn-block-height
-                action: "fee-tier-update"
-                old-value: old-fee-tier
+                timestamp: burn-block-height,
+                action: "fee-tier-update",
+                old-value: old-fee-tier,
                 new-value: new-fee-tier
             })
 
             (print {
-                event: "fee-tier-updated"
-                pool: pool
-                old-fee-tier: old-fee-tier
+                event: "fee-tier-updated",
+                pool: pool,
+                old-fee-tier: old-fee-tier,
                 new-fee-tier: new-fee-tier
             })
 
@@ -188,10 +188,10 @@
 
 (define-read-only (get-optimization-data (pool principal))
     (default-to {
-        last-optimization: u0
-        target-liquidity: u0
-        current-utilization: u0
-        optimization-score: u0
+        last-optimization: u0,
+        target-liquidity: u0,
+        current-utilization: u0,
+        optimization-score: u0,
         fee-tier: u3000
     }
         (map-get? pool-optimization-data { pool: pool })

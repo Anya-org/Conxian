@@ -15,11 +15,11 @@
 (define-map pools
   uint
   {
-    token-0: principal
-    token-1: principal
-    fee: uint ;; bps with 1M denominator e.g. 3000 = 0.3%
-    liquidity: uint
-    sqrt-price: uint
+    token-0: principal,
+    token-1: principal,
+    fee: uint, ;; bps with 1M denominator e.g. 3000 = 0.3%
+    liquidity: uint,
+    sqrt-price: uint,
     tick: int
   }
 )
@@ -36,7 +36,7 @@
   (let (
     (amount-out (try! (swap-execute u1 amount-in token-in token-out recipient)))
   )
-    (ok { amount-out: amount-out fee-collected: u0 })
+    (ok { amount-out: amount-out, fee-collected: u0 })
   )
 )
 
@@ -53,7 +53,7 @@
 )
 
 (define-public (get-csf-health)
-  (ok { tvl: u0 utilization: u0 is-active: true })
+  (ok { tvl: u0, utilization: u0, is-active: true })
 )
 
 (define-public (collect-protocol-fees (token <sip-010-ft-trait>))
@@ -81,11 +81,11 @@
   )
     (begin
       (map-set pools id {
-        token-0: token-0
-        token-1: token-1
-        fee: fee
-        liquidity: u0
-        sqrt-price: initial-price
+        token-0: token-0,
+        token-1: token-1,
+        fee: fee,
+        liquidity: u0,
+        sqrt-price: initial-price,
         tick: initial-tick
       })
       (var-set pool-nonce id)
@@ -100,7 +100,7 @@
 
 (define-private (swap-execute (pool-id uint) (amount-in uint) (token-in-trait <sip-010-ft-trait>) (token-out-trait <sip-010-ft-trait>) (recipient principal))
   (let (
-    (pool (match (map-get? pools pool-id) p p { token-0: tx-sender token-1: tx-sender fee: u3000 liquidity: u0 sqrt-price: u0 tick: 0 }))
+    (pool (match (map-get? pools pool-id) p p { token-0: tx-sender, token-1: tx-sender, fee: u3000, liquidity: u0, sqrt-price: u0, tick: 0 }))
     (lp-fee (/ (* amount-in (get fee pool)) u1000000))
     ;; Mandatory Protocol Fee (Sovereign Tax) - 100 bps (1%) = 10000 / 1000000
     (gov-tax (/ (* amount-in u10000) u1000000))
@@ -117,7 +117,7 @@
       (let (
         (tax-res (as-contract (contract-call? .revenue-automation collect-revenue token-in-trait amount-in (as-contract tx-sender))))
       )
-        (print { event: "dex-tax-processed" success: (is-ok tax-res) })
+        (print { event: "dex-tax-processed", success: (is-ok tax-res) })
       )
 
       ;; 3. Transfer out
@@ -127,7 +127,7 @@
       (let (
         (bme-res (contract-call? .bme-engine register-fee-activity (as-contract tx-sender) bme-fee))
       )
-        (print { event: "bme-report-processed" success: (is-ok bme-res) })
+        (print { event: "bme-report-processed", success: (is-ok bme-res) })
       )
       (ok amount-out)
     )

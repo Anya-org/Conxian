@@ -11,14 +11,14 @@
 (define-map proposals
   uint
   {
-    proposer: principal
-    proposal-contract: principal
-    council-id: uint
-    start-block: uint
-    end-block: uint
-    for-votes: uint
-    against-votes: uint
-    executed: bool
+    proposer: principal,
+    proposal-contract: principal,
+    council-id: uint,
+    start-block: uint,
+    end-block: uint,
+    for-votes: uint,
+    against-votes: uint,
+    executed: bool,
     canceled: bool
   }
 )
@@ -26,7 +26,7 @@
 ;; Track if a user has voted on a proposal
 (define-map vote-receipts
   {
-    proposal-id: uint
+    proposal-id: uint,
     voter: principal
   }
   bool
@@ -47,7 +47,7 @@
   )
   (default-to false
     (map-get? vote-receipts {
-      proposal-id: proposal-id
+      proposal-id: proposal-id,
       voter: voter
     })
   )
@@ -66,14 +66,14 @@
     (begin
       ;; In production this should check if caller is proposal-engine
       (map-set proposals proposal-id {
-        proposer: tx-sender
-        proposal-contract: proposal-contract
-        council-id: council-id
-        start-block: start
-        end-block: end
-        for-votes: u0
-        against-votes: u0
-        executed: false
+        proposer: tx-sender,
+        proposal-contract: proposal-contract,
+        council-id: council-id,
+        start-block: start,
+        end-block: end,
+        for-votes: u0,
+        against-votes: u0,
+        executed: false,
         canceled: false
       })
       (var-set proposal-count proposal-id)
@@ -110,7 +110,7 @@
 
       ;; Record receipt
       (map-set vote-receipts {
-        proposal-id: proposal-id
+        proposal-id: proposal-id,
         voter: tx-sender
       }
         true
@@ -122,7 +122,7 @@
           for-votes: (if support
             (+ (get for-votes proposal) weight)
             (get for-votes proposal)
-          )
+          ),
           against-votes: (if (not support)
             (+ (get against-votes proposal) weight)
             (get against-votes proposal)

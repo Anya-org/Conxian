@@ -19,15 +19,15 @@
 (define-map proposals
     uint 
     {
-        start-time: uint
-        end-time: uint
-        yes-votes: uint
-        no-votes: uint
+        start-time: uint,
+        end-time: uint,
+        yes-votes: uint,
+        no-votes: uint,
         executed: bool
     }
 )
 
-(define-map votes { proposal-id: uint voter: principal } bool)
+(define-map votes { proposal-id: uint, voter: principal } bool)
 (define-map proposal-councils uint uint)
 
 ;; Core Logic
@@ -50,10 +50,10 @@
         (asserts! (> start-time burn-block-height) (err ERR_START_TIME_IN_PAST))
         
         (map-set proposals proposal-id {
-            start-time: start-time
-            end-time: end-time
-            yes-votes: u0
-            no-votes: u0
+            start-time: start-time,
+            end-time: end-time,
+            yes-votes: u0,
+            no-votes: u0,
             executed: false
         })
         
@@ -62,10 +62,10 @@
         (var-set proposal-count proposal-id)
         
         (print {
-            event: "create-proposal"
-            proposal-id: proposal-id
-            start-time: start-time
-            tenure-id: tenure-id
+            event: "create-proposal",
+            proposal-id: proposal-id,
+            start-time: start-time,
+            tenure-id: tenure-id,
             timestamp: burn-block-height
         })
         
@@ -84,20 +84,20 @@
     )
         ;; Check if voting period is active using burn-block-height
         (asserts! (and (>= burn-block-height (get start-time proposal)) (<= burn-block-height (get end-time proposal))) (err ERR_VOTING_CLOSED))
-        (asserts! (is-none (map-get? votes { proposal-id: proposal-id voter: tx-sender })) (err ERR_ALREADY_VOTED))
+        (asserts! (is-none (map-get? votes { proposal-id: proposal-id, voter: tx-sender })) (err ERR_ALREADY_VOTED))
         
         ;; User must have a seat (voting power > 0)
         (asserts! (> voter-power u0) (err ERR_UNAUTHORIZED))
         
-        (map-set votes { proposal-id: proposal-id voter: tx-sender } true)
+        (map-set votes { proposal-id: proposal-id, voter: tx-sender } true)
         
         ;; Update Vote Counts with WEIGHTED voting power
         (map-set proposals proposal-id (merge proposal {
-            yes-votes: (if support (+ (get yes-votes proposal) voter-power) (get yes-votes proposal))
+            yes-votes: (if support (+ (get yes-votes proposal) voter-power) (get yes-votes proposal)),
             no-votes: (if (not support) (+ (get no-votes proposal) voter-power) (get no-votes proposal))
         }))
         
-        (print { event: "vote-cast" proposal-id: proposal-id voter: tx-sender power: voter-power support: support timestamp: burn-block-height })
+        (print { event: "vote-cast", proposal-id: proposal-id, voter: tx-sender, power: voter-power, support: support, timestamp: burn-block-height })
         
         (ok true)
     )

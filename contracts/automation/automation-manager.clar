@@ -9,7 +9,7 @@
 (define-public (trigger-automation (job-id uint))
   (begin
     (asserts! (var-get automation-active) (err u1000))
-    (print { event: "automation-triggered" job-id: job-id })
+    (print { event: "automation-triggered", job-id: job-id })
     (ok true)
   )
 )

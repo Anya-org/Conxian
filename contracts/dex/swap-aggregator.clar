@@ -37,15 +37,15 @@
       (try! (as-contract (contract-call? token-out transfer amount-out (as-contract tx-sender) recipient none)))
       
       (print {
-        event: "sovereign-swap-executed"
-        token-in: (contract-of token-in)
-        token-out: (contract-of token-out)
-        amount-in: amount-in
-        amount-out: amount-out
+        event: "sovereign-swap-executed",
+        token-in: (contract-of token-in),
+        token-out: (contract-of token-out),
+        amount-in: amount-in,
+        amount-out: amount-out,
         fee: fee
       })
       
-      (ok { amount-out: amount-out fee-collected: fee })
+      (ok { amount-out: amount-out, fee-collected: fee })
     )
   )
 )
@@ -70,7 +70,7 @@
 )
 
 (define-read-only (get-csf-health)
-  (ok { tvl: u1000000000 utilization: u500 is-active: true })
+  (ok { tvl: u1000000000, utilization: u500, is-active: true })
 )
 
 ;; --- Admin Functions ---

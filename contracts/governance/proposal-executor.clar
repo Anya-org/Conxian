@@ -117,11 +117,11 @@
       (try! (contract-call? .proposal-registry set-executed proposal-id))
 
       (print {
-        event: "proposal-executed"
-        proposal-id: proposal-id
-        votes-for: (get for-votes proposal)
-        votes-against: (get against-votes proposal)
-        contract: (contract-of proposal-contract)
+        event: "proposal-executed",
+        proposal-id: proposal-id,
+        votes-for: (get for-votes proposal),
+        votes-against: (get against-votes proposal),
+        contract: (contract-of proposal-contract),
         council-id: council-id
       })
       (ok true)
