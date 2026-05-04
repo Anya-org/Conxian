@@ -115,13 +115,13 @@
 
       ;; 2. Pay Sovereign Tax (CON-60)
       (let (
-        (tax-res (as-contract (contract-call? .revenue-automation collect-revenue token-in-trait amount-in (as-contract tx-sender))))
+        (tax-res (contract-call? .revenue-automation collect-revenue token-in-trait amount-in tx-sender))
       )
         (print { event: "dex-tax-processed", success: (is-ok tax-res) })
       )
 
       ;; 3. Transfer out
-      (try! (as-contract (contract-call? token-out-trait transfer amount-out (as-contract tx-sender) recipient none)))
+      (try! (contract-call? token-out-trait transfer amount-out tx-sender recipient none))
 
       ;; 4. Report activity to BME
       (let (

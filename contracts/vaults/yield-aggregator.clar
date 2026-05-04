@@ -2,7 +2,7 @@
 ;; Vault strategy aggregator
 ;; Manages deposits across multiple strategies
 
-(use-trait vault-trait .vault-traits.vault-trait)
+(use-trait vault-trait .vault-trait.vault-trait)
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 (define-map strategies principal bool)

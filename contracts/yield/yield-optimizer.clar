@@ -1,6 +1,6 @@
 ;; yield-optimizer.clar
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
-(use-trait vault-trait .vault-traits.vault-trait)
+(use-trait vault-trait .vault-trait.vault-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_STRATEGY_NOT_FOUND (err u1001))

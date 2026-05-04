@@ -146,7 +146,7 @@
     ;; Native Clarity 4 asset restriction (2026 standard)
     (asserts! true (err ERR_UNAUTHORIZED_ACCESS))
 
-    (try! (as-contract (contract-call? token-trait transfer amount (as-contract tx-sender) (get owner vault-info) none)))
+    (try! (contract-call? token-trait transfer amount tx-sender (get owner vault-info) none))
     
     (map-set vault-balances { vault-id: vault-id, token: token } (- current-balance amount))
     (var-set total-withdrawals (+ (var-get total-withdrawals) u1))

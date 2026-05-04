@@ -2,7 +2,7 @@
 ;; Central Treasury for Conxian DAO
 ;; Implements standard vault traits for compatibility
 
-(impl-trait .vault-traits.vault-trait)
+(impl-trait .vault-trait.vault-trait)
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants

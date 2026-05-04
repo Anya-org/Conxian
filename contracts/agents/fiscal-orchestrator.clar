@@ -21,14 +21,14 @@
 ;; --- Public Functions ---
 
 ;; @desc Run the fiscal strategy - Orchestrates BME epoch and buy-backs
-(define-public (run-fiscal-strategy (pools-to-reward (list 50 principal)) (cxd-token-trait <sip-010-trait>) (metrics-ref <finance-metrics-trait>))
+(define-public (run-fiscal-strategy (pools-to-reward (list 50 principal)) (cxd-token-trait <sip-010-trait>) (metrics-ref <finance-metrics-trait>) (agent-risk-principal principal))
   (let (
-    (intel (unwrap! (contract-call? .agent-risk get-cybernetic-intel metrics-ref) (err u2001)))
+    (intel (unwrap! (contract-call? .agent-risk get-cybernetic-intel) (err u2001)))
   )
     (begin
       ;; 1. Collect protocol fees from core modules
       (match (contract-call? .concentrated-liquidity-pool collect-protocol-fees cxd-token-trait)
-        res true
+        ok-val true
         err-val false
       )
 

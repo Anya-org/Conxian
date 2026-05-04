@@ -181,7 +181,7 @@
     (asserts! (or (is-owner) (is-czar)) ERR_UNAUTHORIZED)
     (asserts! (validate-country-code country) ERR_INVALID_COUNTRY_CODE)
     (map-set kyc-registry user
-      { country: country, region: region, status: "verified", risk-score: risk-score, last-verified: (unwrap! (get-block-info? time stacks-block-height) ERR_BLOCK_TIME_UNAVAILABLE) })
+      { country: country, region: region, status: "verified", risk-score: risk-score, last-verified: (unwrap-panic (get-block-info? time stacks-block-height)) })
     (ok true)))
 
 (define-public (record-global-settlement

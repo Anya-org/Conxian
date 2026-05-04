@@ -54,7 +54,7 @@
           )
 
           ;; 3. Transfer tokens back to User
-          (try! (as-contract (contract-call? token-out transfer amount-out (as-contract tx-sender) user none)))
+          (try! (contract-call? token-out transfer amount-out tx-sender user none))
 
           (print {
             event: "csf-swap-executed", source: (contract-of liquidity-source), token-in: (contract-of token-in), token-out: (contract-of token-out), amount-out: amount-out, fee: fee-collected, sender: user

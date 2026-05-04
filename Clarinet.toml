@@ -1,1229 +1,1168 @@
 [project]
-name = "conxian"
-authors = []
+name = "Conxian"
 description = ""
+authors = []
 telemetry = false
-cache_dir = "./.cache"
-
-
-[contracts.access-control-trait]
-path = "contracts/traits/access-control-trait.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.admin-facade]
-path = "contracts/core/admin-facade.clar"
-clarity-version = 4
-depends_on = ["core-traits", "timelock"]
-
-epoch = "latest"
-
-[contracts.agent-risk]
-path = "contracts/agents/agent-risk.clar"
-clarity-version = 4
-depends_on = ["finance-metrics"]
-
-epoch = "latest"
-
-[contracts.agent-treasury]
-path = "contracts/agents/agent-treasury.clar"
-clarity-version = 4
-depends_on = ["conxian-csf-trait", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.alex-adapter]
-path = "contracts/integrations/alex-adapter.clar"
-clarity-version = 4
-depends_on = ["conxian-csf-trait", "conxian-protocol", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.allocation-policy]
-path = "contracts/treasury/allocation-policy.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.analytics-aggregator]
-path = "contracts/monitoring/analytics-aggregator.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.auto-compounder]
-path = "contracts/yield/auto-compounder.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.automation-manager]
-path = "contracts/automation/automation-manager.clar"
-clarity-version = 4
-depends_on = ["conxian-protocol", "operational-treasury"]
-epoch = "latest"
-
-[contracts.automation-traits]
-path = "contracts/traits/automation-traits.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.batch-auction]
-path = "contracts/dex/batch-auction.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.batch-operations]
-path = "contracts/core/batch-operations.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.batch-processor]
-path = "contracts/automation/batch-processor.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.block-utils]
-path = "contracts/utils/block-utils.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.bme-engine]
-path = "contracts/core/bme-engine.clar"
-clarity-version = 4
-depends_on = ["cxd-token", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.bond-factory]
-path = "contracts/bonding/bond-factory.clar"
-clarity-version = 4
-depends_on = ["core-traits", "regulatory-adapter", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.bond-token]
-path = "contracts/bonding/bond-token.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.bond-traits]
-path = "contracts/traits/bond-traits.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.bridge-nft]
-path = "contracts/cross-chain/bridge-nft.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.btc-adapter]
-path = "contracts/interfaces/btc-adapter.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.chainlink-adapter]
-path = "contracts/integrations/chainlink-adapter.clar"
-clarity-version = 4
-depends_on = ["defi-traits"]
-
-epoch = "latest"
-
-[contracts.circuit-breaker]
-path = "contracts/security/circuit-breaker.clar"
-clarity-version = 4
-depends_on = ["security-monitoring"]
-
-epoch = "latest"
-
-[contracts.clarity-bitcoin]
-path = "contracts/lib/clarity-bitcoin.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.community-dao]
-path = "contracts/governance/community-dao.clar"
-clarity-version = 4
-depends_on = ["regulatory-adapter"]
-
-epoch = "latest"
-
-[contracts.community-governance-token]
-path = "contracts/governance/community-governance-token.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.community-voting-engine]
-path = "contracts/governance/community-voting-engine.clar"
-clarity-version = 4
-depends_on = ["regulatory-adapter"]
-
-epoch = "latest"
-
-[contracts.compliance-hooks]
-path = "contracts/compliance/compliance-hooks.clar"
-clarity-version = 4
-epoch = "latest"
-
-[contracts.compliance-trait]
-path = "contracts/compliance/compliance-trait.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.concentrated-liquidity-pool]
-path = "contracts/dex/concentrated-liquidity-pool.clar"
-clarity-version = 4
-depends_on = ["bme-engine", "conxian-csf-trait", "revenue-automation", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.concentrated-math]
-path = "contracts/math/concentrated-math.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.controller-traits]
-path = "contracts/traits/controller-traits.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.conxian-access]
-path = "contracts/core/conxian-access.clar"
-clarity-version = 4
-depends_on = ["core-traits"]
-
-epoch = "latest"
-
-[contracts.conxian-csf-trait]
-path = "contracts/traits/conxian-csf-trait.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.conxian-exit-queue]
-path = "contracts/core/conxian-exit-queue.clar"
-clarity-version = 4
-depends_on = ["queue-traits"]
-
-epoch = "latest"
-
-[contracts.conxian-insurance-fund]
-path = "contracts/security/conxian-insurance-fund.clar"
-clarity-version = 4
-depends_on = ["conxian-access", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.conxian-intent-trait]
-path = "contracts/traits/conxian-intent-trait.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.conxian-paas-factory]
-path = "contracts/core/conxian-paas-factory.clar"
-clarity-version = 4
-depends_on = ["regulatory-adapter"]
-
-epoch = "latest"
-
-[contracts.conxian-protocol]
-path = "contracts/core/conxian-protocol.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.conxian-service-trait]
-path = "contracts/traits/conxian-service-trait.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.conxian-vaults]
-path = "contracts/treasury/conxian-vaults.clar"
-clarity-version = 4
-depends_on = ["conxian-access", "sip-standards", "vault-traits"]
-
-epoch = "latest"
-
-[contracts.core-traits]
-path = "contracts/traits/core-traits.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.cross-chain-traits]
-path = "contracts/traits/cross-chain-traits.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.cross-protocol-integrator]
-path = "contracts/yield/cross-protocol-integrator.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.custody]
-path = "contracts/vaults/custody.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.cxd-bonding-curve-amm]
-path = "contracts/bonding/cxd-bonding-curve-amm.clar"
-clarity-version = 4
-depends_on = ["regulatory-adapter"]
-
-epoch = "latest"
-
-[contracts.cxd-price-initializer]
-path = "contracts/tokens/cxd-price-initializer.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.cxd-staking]
-path = "contracts/yield/cxd-staking.clar"
-clarity-version = 4
-depends_on = ["regulatory-adapter"]
-
-epoch = "latest"
-
-[contracts.cxd-token]
-path = "contracts/tokens/cxd-token.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.cxd-treasury]
-path = "contracts/treasury/cxd-treasury.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.cxlp-position-nft]
-path = "contracts/tokens/cxlp-position-nft.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.cxlp-token]
-path = "contracts/tokens/cxlp-token.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.cxs-token]
-path = "contracts/tokens/cxs-token.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.cxtr-token]
-path = "contracts/tokens/cxtr-token.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.cxvg-token]
-path = "contracts/tokens/cxvg-token.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.dao-treasury]
-path = "contracts/governance/dao-treasury.clar"
-clarity-version = 4
-depends_on = ["sip-standards", "vault-traits"]
-
-epoch = "latest"
-
-[contracts.default-strategy-engine]
-path = "contracts/rewards/default-strategy-engine.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.defi-traits]
-path = "contracts/traits/defi-traits.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.dex-defi]
-path = "contracts/dex/dex-facade.clar"
-clarity-version = 4
-depends_on = ["conxian-protocol", "dex-factory", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.dex-facade]
-path = "contracts/dex/dex-facade.clar"
-clarity-version = 4
-depends_on = ["conxian-protocol", "dex-factory", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.dex-factory]
-path = "contracts/dex/dex-factory.clar"
-clarity-version = 4
-depends_on = ["conxian-protocol"]
-
-epoch = "latest"
-
-[contracts.dia-oracle-adapter]
-path = "contracts/integrations/dia-oracle-adapter.clar"
-clarity-version = 4
-depends_on = ["defi-traits"]
-
-epoch = "latest"
-
-[contracts.dim-oracle-automation]
-path = "contracts/dimensional/dim-oracle-automation.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.dimensional-core]
-path = "contracts/dimensional/dimensional-core.clar"
-clarity-version = 4
-depends_on = ["cxd-token", "enhanced-circuit-breaker", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.dimensional-engine]
-path = "contracts/core/dimensional-engine.clar"
-clarity-version = 4
-depends_on = ["conxian-protocol", "core-traits", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.dimensional-engine-interface]
-path = "contracts/interfaces/dimensional-engine-interface.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.dimensional-oracle]
-path = "contracts/oracle/dimensional-oracle.clar"
-clarity-version = 4
-depends_on = ["defi-traits"]
-
-epoch = "latest"
-
-[contracts.dimensional-traits]
-path = "contracts/traits/dimensional-traits.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.dlc-bond]
-path = "contracts/sbtc/dlc-bond.clar"
-clarity-version = 4
-depends_on = ["bond-traits", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.dlc-manager]
-path = "contracts/sbtc/dlc-manager.clar"
-clarity-version = 4
-depends_on = ["conxian-access"]
-
-epoch = "latest"
-
-[contracts.dlc-orchestrator]
-path = "contracts/sbtc/dlc-orchestrator.clar"
-clarity-version = 4
-depends_on = ["bond-traits", "dlc-bond"]
-
-epoch = "latest"
-
-[contracts.dual-stacking-orchestrator]
-path = "contracts/staking/dual-stacking-orchestrator.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.early-lp-rewards]
-path = "contracts/rewards/early-lp-rewards.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.economic-policy-engine]
-path = "contracts/core/economic-policy-engine.clar"
-clarity-version = 4
-depends_on = ["revenue-distributor"]
-
-epoch = "latest"
-
-[contracts.emergency-governance]
-path = "contracts/governance/emergency-governance.clar"
-clarity-version = 4
-depends_on = ["pausable-trait"]
-
-epoch = "latest"
-
-[contracts.encoding]
-path = "contracts/utils/encoding.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.enhanced-circuit-breaker]
-path = "contracts/security/enhanced-circuit-breaker.clar"
-clarity-version = 4
-depends_on = ["security-monitoring"]
-
-epoch = "latest"
-
-[contracts.enhanced-governance-nft]
-path = "contracts/governance/enhanced-governance-nft.clar"
-clarity-version = 4
-depends_on = ["conxian-access", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.enhanced-yield-strategy]
-path = "contracts/yield/enhanced-yield-strategy.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.enterprise-api]
-path = "contracts/enterprise/enterprise-api.clar"
-clarity-version = 4
-depends_on = ["compliance-hooks"]
-
-epoch = "latest"
-
-[contracts.enterprise-facade]
-path = "contracts/enterprise/enterprise-facade.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.enterprise-traits]
-path = "contracts/traits/enterprise-traits.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.exponentiation]
-path = "contracts/math/exponentiation.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.external-oracle-adapter]
-path = "contracts/oracle/external-oracle-adapter.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.federated-oracle-adapter]
-path = "contracts/oracle/federated-oracle-adapter.clar"
-clarity-version = 4
-depends_on = ["defi-traits"]
-
-epoch = "latest"
+requirements = []
+clarinet_version = "3.12.0"
+
+[accounts]
+deployer = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
+
+[simnet]
+mnemonic = "cute bird surprise boring old news cake design aisle helmet choose tree"
+
+[repl.analysis]
+passes = ["check_checker"]
+
+[repl.analysis.check_checker]
+strict = false
+trusted_sender = false
+trusted_caller = false
+callee_filter = false
 
 [contracts.finance-metrics]
 path = "contracts/monitoring/finance-metrics.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.founder-vault]
-path = "contracts/treasury/founder-vault.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.founder-vesting]
-path = "contracts/core/founder-vesting.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.funding-rate-calculator]
-path = "contracts/core/funding-rate-calculator.clar"
-clarity-version = 4
-depends_on = ["core-traits"]
-
-epoch = "latest"
-
-[contracts.governance]
-path = "contracts/dimensional/governance.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.governance-handover]
-path = "contracts/governance/governance-handover.clar"
-clarity-version = 4
-depends_on = ["timelock"]
-
-epoch = "latest"
-
-[contracts.governance-signature-verifier]
-path = "contracts/governance/governance-signature-verifier.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.governance-token]
-path = "contracts/governance-token.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.governance-traits]
-path = "contracts/traits/governance-traits.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.ico-offering]
-path = "contracts/governance/ico-offering.clar"
-clarity-version = 4
-depends_on = ["regulatory-adapter", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.identity-badge]
-path = "contracts/identity/identity-badge.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.insurance-protection-nft]
-path = "contracts/insurance/insurance-protection-nft.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.intent-solver-gateway]
-path = "contracts/gateway/intent-solver-gateway.clar"
-clarity-version = 4
-depends_on = ["bme-engine", "conxian-intent-trait"]
-
-epoch = "latest"
-
-[contracts.interest-rate-model]
-path = "contracts/lending/interest-rate-model.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.kyc-registry]
-path = "contracts/identity/kyc-registry.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.legacy-adapter]
-path = "contracts/migration/legacy-adapter.clar"
-clarity-version = 4
-epoch = "latest"
-
-[contracts.legal-representative-registry]
-path = "contracts/governance/legal-representative-registry.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.lending-manager]
-path = "contracts/lending/lending-manager.clar"
-clarity-version = 4
-depends_on = ["bme-engine", "enhanced-circuit-breaker", "oracle-aggregator", "revenue-automation", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.lending-protocol-governance]
-path = "contracts/governance/lending-protocol-governance.clar"
-clarity-version = 4
-depends_on = ["governance-traits"]
-
-epoch = "latest"
-
-[contracts.liquidity-manager]
-path = "contracts/dex/liquidity-manager.clar"
-clarity-version = 4
-depends_on = ["regulatory-adapter"]
-
-epoch = "latest"
-
-[contracts.liquidity-optimization-engine]
-path = "contracts/dex/liquidity-optimization-engine.clar"
-clarity-version = 4
-depends_on = ["conxian-protocol", "defi-traits", "dex-facade"]
-
-epoch = "latest"
-
-[contracts.liquidity-provider]
-path = "contracts/dex/liquidity-provider.clar"
-clarity-version = 4
-depends_on = ["conxian-protocol", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.math-utilities]
-path = "contracts/math/math-utilities.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.memory-pool-management]
-path = "contracts/dex/memory-pool-management.clar"
-clarity-version = 4
-depends_on = ["conxian-protocol"]
-
-epoch = "latest"
-
-[contracts.mev-protection-nft]
-path = "contracts/mev/mev-protection-nft.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.mev-protector]
-path = "contracts/security/mev-protector.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.mock-circuit-breaker]
-path = "contracts/test-helpers/mock-circuit-breaker.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.mock-csf-protocol]
-path = "contracts/test-helpers/mock-csf-protocol.clar"
-clarity-version = 4
-depends_on = ["conxian-csf-trait", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.mock-proposal]
-path = "contracts/test-helpers/mock-proposal.clar"
-clarity-version = 4
-depends_on = ["governance-traits"]
-
-epoch = "latest"
-
-[contracts.mock-token]
-path = "contracts/test-helpers/mock-token.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.monitoring-dashboard]
-path = "contracts/monitoring/monitoring-dashboard.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.nakamoto-compatibility]
-path = "contracts/utils/nakamoto-compatibility.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.nakamoto-constants]
-path = "contracts/constants/nakamoto-constants.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.native-stacking-operator]
-path = "contracts/staking/native-stacking-operator.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.nft-marketplace]
-path = "contracts/marketplace/nft-marketplace.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.office-manager]
-path = "contracts/core/office-manager.clar"
-clarity-version = 4
-depends_on = ["core-traits", "operational-treasury"]
-
-epoch = "latest"
-
-[contracts.operational-treasury]
-path = "contracts/core/operational-treasury.clar"
-clarity-version = 4
-depends_on = ["agent-treasury", "ops-engine", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.opex-vault]
-path = "contracts/treasury/opex-vault.clar"
-clarity-version = 4
-depends_on = ["regulatory-adapter"]
-
-epoch = "latest"
-
-[contracts.ops-engine]
-path = "contracts/core/ops-engine.clar"
-clarity-version = 4
-depends_on = ["enhanced-circuit-breaker"]
-
-epoch = "latest"
-
-[contracts.ops-loan-manager]
-path = "contracts/enterprise/ops-loan-manager.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.optimization-helpers]
-path = "contracts/helpers/optimization-helpers.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.oracle]
-path = "contracts/dex/oracle.clar"
-clarity-version = 4
-depends_on = ["defi-traits"]
-
-epoch = "latest"
-
-[contracts.oracle-adapter-stub]
-path = "contracts/oracle/oracle-adapter-stub.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.oracle-aggregator]
-path = "contracts/oracle/oracle-aggregator.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.oracle-traits]
-path = "contracts/integrations/twap-oracle.clar"
-clarity-version = 4
-depends_on = ["defi-traits"]
-
-epoch = "latest"
-
-[contracts.order-book]
-path = "contracts/orders/order-book.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.pausable]
-path = "contracts/base/pausable.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.pausable-trait]
-path = "contracts/traits/pausable-trait.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.performance-optimizer]
-path = "contracts/performance/performance-optimizer.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.points-oracle]
-path = "contracts/oracle/points-oracle.clar"
-clarity-version = 4
-depends_on = ["conxian-protocol", "defi-traits"]
-
-epoch = "latest"
-
-[contracts.pool-factory]
-path = "contracts/pools/pool-factory.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.pool-registry]
-path = "contracts/pools/pool-registry.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.pool-template]
-path = "contracts/dex/pool-template.clar"
-clarity-version = 4
-depends_on = ["conxian-protocol"]
-
-epoch = "latest"
-
-[contracts.position-factory]
-path = "contracts/position-factory.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.position-factory-root]
-path = "contracts/mev/position-factory-root.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.position-nft]
-path = "contracts/dimensional/position-nft.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.predictive-scaling-system]
-path = "contracts/dex/predictive-scaling-system.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.price-stability-monitor]
-path = "contracts/monitoring/price-stability-monitor.clar"
-clarity-version = 4
-depends_on = ["agent-risk"]
-
-epoch = "latest"
-
-[contracts.proof-of-reserves]
-path = "contracts/security/proof-of-reserves.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-epoch = "latest"
-
-[contracts.proposal-engine]
-path = "contracts/governance/proposal-engine.clar"
-clarity-version = 4
-depends_on = ["conxian-access", "enhanced-governance-nft", "governance-traits", "proposal-executor", "proposal-registry", "reputation-engine", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.proposal-engine-trait]
-path = "contracts/governance/proposal-engine-trait.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.proposal-executor]
-path = "contracts/governance/proposal-executor.clar"
-clarity-version = 4
-depends_on = ["cxvg-token", "governance-traits", "proposal-registry", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.proposal-registry]
-path = "contracts/governance/proposal-registry.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.protocol-invariant-monitor]
-path = "contracts/dex/protocol-invariant-monitor.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.pyth-oracle-adapter]
-path = "contracts/integrations/pyth-oracle-adapter.clar"
-clarity-version = 4
-depends_on = ["conxian-protocol", "defi-traits", "pyth-traits"]
-
-epoch = "latest"
-
-[contracts.pyth-traits]
-path = "contracts/traits/pyth-traits.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.queue-traits]
-path = "contracts/traits/queue-traits.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.rate-limiter]
-path = "contracts/security/rate-limiter.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.rbac]
-path = "contracts/utils/rbac.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.rebalancing-rules]
-path = "contracts/dex/rebalancing-rules.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.redstone-oracle-adapter]
-path = "contracts/integrations/redstone-oracle-adapter.clar"
-clarity-version = 4
-depends_on = ["defi-traits", "redstone-traits"]
-
-epoch = "latest"
-
-[contracts.redstone-traits]
-path = "contracts/traits/redstone-traits.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.regulatory-adapter]
-path = "contracts/compliance/regulatory-adapter.clar"
-clarity-version = 4
-depends_on = ["core-traits", "kyc-registry"]
-
-epoch = "latest"
-
-[contracts.reputation-engine]
-path = "contracts/governance/reputation-engine.clar"
-clarity-version = 4
-depends_on = ["governance-traits"]
-
-epoch = "latest"
-
-[contracts.revenue-automation]
-path = "contracts/treasury/revenue-automation.clar"
-clarity-version = 4
-depends_on = ["revenue-distributor", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.revenue-distributor]
-path = "contracts/treasury/revenue-distributor.clar"
-clarity-version = 4
-depends_on = ["bme-engine", "cxd-token", "operational-treasury", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.route-manager]
-path = "contracts/dex/route-manager.clar"
-clarity-version = 4
-depends_on = ["regulatory-adapter", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.sab-election]
-path = "contracts/governance/sab-election.clar"
-clarity-version = 4
-epoch = "latest"
-
-[contracts.sbtc-vault]
-path = "contracts/vaults/sbtc-vault.clar"
-clarity-version = 4
-depends_on = ["regulatory-adapter", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.security-monitoring]
-path = "contracts/traits/security-monitoring.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.signed-data-base]
-path = "contracts/governance/signed-data-base.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.sip-010-ft-trait]
-path = "contracts/traits/sip-standards.clar"
-clarity-version = 4
-
-epoch = "latest"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.agent-risk]
+path = "contracts/agents/agent-risk.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["finance-metrics"]
 
 [contracts.sip-standards]
 path = "contracts/traits/sip-standards.clar"
-clarity-version = 4
+clarity_version = 4
+epoch = "3.3"
 
-epoch = "latest"
+[contracts.conxian-csf-trait]
+path = "contracts/traits/conxian-csf-trait.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
 
-[contracts.swap-manager]
-path = "contracts/dex/swap-manager.clar"
-clarity-version = 4
-depends_on = ["circuit-breaker", "conxian-protocol"]
+[contracts.agent-treasury]
+path = "contracts/agents/agent-treasury.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards", "conxian-csf-trait"]
 
-epoch = "latest"
+[contracts.fiscal-intelligence]
+path = "contracts/agents/fiscal-intelligence.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
 
-[contracts.swap-router]
-path = "contracts/dex/swap-router.clar"
-clarity-version = 4
-depends_on = ["oracle-aggregator"]
+[contracts.revenue-automation]
+path = "contracts/treasury/revenue-automation.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
 
-epoch = "latest"
+[contracts.cxd-token]
+path = "contracts/tokens/cxd-token.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
 
-[contracts.switchboard-oracle-adapter]
-path = "contracts/integrations/switchboard-oracle-adapter.clar"
-clarity-version = 4
+[contracts.bme-engine]
+path = "contracts/core/bme-engine.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["cxd-token", "sip-standards"]
 
-epoch = "latest"
+[contracts.concentrated-liquidity-pool]
+path = "contracts/dex/concentrated-liquidity-pool.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["revenue-automation", "bme-engine", "sip-standards", "conxian-csf-trait"]
 
-[contracts.test-c4-helper]
-path = "contracts/test-helpers/test-c4-helper.clar"
-clarity-version = 4
+[contracts.security-monitoring]
+path = "contracts/traits/security-monitoring.clar"
+clarity_version = 4
+epoch = "3.3"
 
-epoch = "latest"
+[contracts.fiscal-orchestrator]
+path = "contracts/agents/fiscal-orchestrator.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["agent-risk", "concentrated-liquidity-pool", "bme-engine", "sip-standards", "security-monitoring"]
 
-[contracts.timelock]
-path = "contracts/governance/timelock.clar"
-clarity-version = 4
-depends_on = ["conxian-access", "governance-traits"]
+[contracts.fiscal-vault-oracle]
+path = "contracts/treasury/fiscal-vault-oracle.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
 
-epoch = "latest"
+[contracts.payment-forge]
+path = "contracts/agents/payment-forge.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["fiscal-vault-oracle", "sip-standards", "conxian-csf-trait"]
 
-[contracts.token-emission-controller]
-path = "contracts/yield/token-emission-controller.clar"
-clarity-version = 4
-depends_on = ["cxvg-token", "sip-standards", "token-system-coordinator"]
+[contracts.operational-treasury]
+path = "contracts/core/operational-treasury.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
 
-epoch = "latest"
+[contracts.automation-manager]
+path = "contracts/automation/automation-manager.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["operational-treasury"]
 
-[contracts.token-system-coordinator]
-path = "contracts/tokens/token-system-coordinator.clar"
-clarity-version = 4
-depends_on = ["regulatory-adapter", "sip-standards"]
+[contracts.batch-processor]
+path = "contracts/automation/batch-processor.clar"
+clarity_version = 4
+epoch = "3.3"
 
-epoch = "latest"
+[contracts.pausable]
+path = "contracts/base/pausable.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.kyc-registry]
+path = "contracts/identity/kyc-registry.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.core-traits]
+path = "contracts/traits/core-traits.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.regulatory-adapter]
+path = "contracts/compliance/regulatory-adapter.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["kyc-registry", "core-traits"]
+
+[contracts.bond-factory]
+path = "contracts/bonding/bond-factory.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["regulatory-adapter", "sip-standards", "core-traits"]
+
+[contracts.bond-token]
+path = "contracts/bonding/bond-token.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.cxd-bonding-curve-amm]
+path = "contracts/bonding/cxd-bonding-curve-amm.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["regulatory-adapter"]
+
+[contracts.compliance-hooks]
+path = "contracts/compliance/compliance-hooks.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["kyc-registry"]
+
+[contracts.compliance-orchestrator]
+path = "contracts/compliance/compliance-orchestrator.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.compliance-trait]
+path = "contracts/compliance/compliance-trait.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.jurisdictional-sharding]
+path = "contracts/compliance/jurisdictional-sharding.clar"
+clarity_version = 4
+epoch = "3.3"
 
 [contracts.travel-rule-service]
 path = "contracts/compliance/travel-rule-service.clar"
-clarity-version = 4
+clarity_version = 4
+epoch = "3.3"
 
-epoch = "latest"
+[contracts.zkml-verifier]
+path = "contracts/compliance/zkml-verifier.clar"
+clarity_version = 4
+epoch = "3.3"
 
-[contracts.treasury-governance]
-path = "contracts/governance/treasury-governance.clar"
-clarity-version = 4
-depends_on = ["cxtr-token", "governance-traits", "operational-treasury", "proposal-executor"]
+[contracts.nakamoto-constants]
+path = "contracts/constants/nakamoto-constants.clar"
+clarity_version = 4
+epoch = "3.3"
 
-epoch = "latest"
+[contracts.admin-facade]
+path = "contracts/core/admin-facade.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["core-traits"]
 
-[contracts.twap-oracle]
-path = "contracts/integrations/twap-oracle.clar"
-clarity-version = 4
+[contracts.batch-operations]
+path = "contracts/core/batch-operations.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.conxian-protocol]
+path = "contracts/core/conxian-protocol.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.conxian-access]
+path = "contracts/core/conxian-access.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["core-traits"]
+
+[contracts.collateral-orchestrator]
+path = "contracts/core/collateral-orchestrator.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-protocol", "conxian-access", "sip-standards"]
+
+[contracts.queue-traits]
+path = "contracts/traits/queue-traits.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.conxian-exit-queue]
+path = "contracts/core/conxian-exit-queue.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["queue-traits"]
+
+[contracts.conxian-paas-factory]
+path = "contracts/core/conxian-paas-factory.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["regulatory-adapter"]
+
+[contracts.dimensional-engine]
+path = "contracts/core/dimensional-engine.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-protocol", "core-traits", "sip-standards"]
+
+[contracts.economic-policy-engine]
+path = "contracts/core/economic-policy-engine.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.founder-vesting]
+path = "contracts/core/founder-vesting.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.funding-rate-calculator]
+path = "contracts/core/funding-rate-calculator.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["core-traits"]
+
+[contracts.office-manager]
+path = "contracts/core/office-manager.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["operational-treasury", "core-traits"]
+
+[contracts.office-orchestrator]
+path = "contracts/core/office-orchestrator.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.enhanced-circuit-breaker]
+path = "contracts/security/enhanced-circuit-breaker.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["security-monitoring"]
+
+[contracts.ops-engine]
+path = "contracts/core/ops-engine.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["enhanced-circuit-breaker"]
+
+[contracts.position-orchestrator]
+path = "contracts/core/position-orchestrator.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["core-traits", "sip-standards"]
+
+[contracts.position-nft]
+path = "contracts/dimensional/position-nft.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.dimensional-core]
+path = "contracts/dimensional/dimensional-core.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["enhanced-circuit-breaker", "sip-standards"]
+
+[contracts.risk-unit]
+path = "contracts/core/risk-unit.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-access", "position-nft", "dimensional-core"]
+
+[contracts.self-launch-coordinator]
+path = "contracts/core/self-launch-coordinator.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.bridge-nft]
+path = "contracts/cross-chain/bridge-nft.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.batch-auction]
+path = "contracts/dex/batch-auction.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.dex-factory]
+path = "contracts/dex/dex-factory.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-protocol"]
+
+[contracts.dex-facade]
+path = "contracts/dex/dex-facade.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-protocol", "dex-factory", "sip-standards"]
+
+[contracts.liquidity-manager]
+path = "contracts/dex/liquidity-manager.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["regulatory-adapter"]
+
+[contracts.defi-traits]
+path = "contracts/traits/defi-traits.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.liquidity-optimization-engine]
+path = "contracts/dex/liquidity-optimization-engine.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["dex-facade", "conxian-protocol", "defi-traits"]
+
+[contracts.liquidity-provider]
+path = "contracts/dex/liquidity-provider.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-protocol", "sip-standards"]
+
+[contracts.memory-pool-management]
+path = "contracts/dex/memory-pool-management.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-protocol"]
+
+[contracts.oracle]
+path = "contracts/dex/oracle.clar"
+clarity_version = 4
+epoch = "3.3"
 depends_on = ["defi-traits"]
 
-epoch = "latest"
+[contracts.pool-template]
+path = "contracts/dex/pool-template.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-protocol"]
+
+[contracts.predictive-scaling-system]
+path = "contracts/dex/predictive-scaling-system.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.protocol-invariant-monitor]
+path = "contracts/dex/protocol-invariant-monitor.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.rebalancing-rules]
+path = "contracts/dex/rebalancing-rules.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.route-manager]
+path = "contracts/dex/route-manager.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["regulatory-adapter", "sip-standards"]
+
+[contracts.swap-aggregator]
+path = "contracts/dex/swap-aggregator.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-csf-trait", "sip-standards"]
+
+[contracts.circuit-breaker]
+path = "contracts/security/circuit-breaker.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["security-monitoring"]
+
+[contracts.swap-manager]
+path = "contracts/dex/swap-manager.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-protocol", "circuit-breaker"]
+
+[contracts.oracle-aggregator]
+path = "contracts/oracle/oracle-aggregator.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.swap-router]
+path = "contracts/dex/swap-router.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["enhanced-circuit-breaker", "bme-engine", "oracle-aggregator", "concentrated-liquidity-pool", "sip-standards", "conxian-csf-trait"]
 
 [contracts.vault]
 path = "contracts/dex/vault.clar"
-clarity-version = 4
+clarity_version = 4
+epoch = "3.3"
 depends_on = ["circuit-breaker", "conxian-protocol", "sip-standards"]
 
-epoch = "latest"
+[contracts.dim-oracle-automation]
+path = "contracts/dimensional/dim-oracle-automation.clar"
+clarity_version = 4
+epoch = "3.3"
 
-[contracts.vault-trait]
-path = "contracts/traits/vault-trait.clar"
-clarity-version = 4
+[contracts.governance]
+path = "contracts/dimensional/governance.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.enterprise-api]
+path = "contracts/enterprise/enterprise-api.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.enterprise-facade]
+path = "contracts/enterprise/enterprise-facade.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.ops-loan-manager]
+path = "contracts/enterprise/ops-loan-manager.clar"
+clarity_version = 4
+epoch = "3.3"
 depends_on = ["sip-standards"]
 
-epoch = "latest"
-
-[contracts.vault-traits]
-path = "contracts/traits/vault-trait.clar"
-clarity-version = 4
+[contracts.order-orchestrator]
+path = "contracts/enterprise/order-orchestrator.clar"
+clarity_version = 4
+epoch = "3.3"
 depends_on = ["sip-standards"]
 
-epoch = "latest"
+[contracts.conxian-intent-trait]
+path = "contracts/traits/conxian-intent-trait.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.intent-solver-gateway]
+path = "contracts/gateway/intent-solver-gateway.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["bme-engine", "conxian-intent-trait"]
+
+[contracts.bns-stub]
+path = "contracts/governance/bns-stub.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.community-dao]
+path = "contracts/governance/community-dao.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["regulatory-adapter"]
+
+[contracts.community-governance-token]
+path = "contracts/governance/community-governance-token.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.community-voting-engine]
+path = "contracts/governance/community-voting-engine.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["regulatory-adapter"]
+
+[contracts.dao-treasury]
+path = "contracts/governance/dao-treasury.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["vault-traits", "sip-standards"]
+
+[contracts.pausable-trait]
+path = "contracts/traits/pausable-trait.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.emergency-governance]
+path = "contracts/governance/emergency-governance.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["pausable-trait"]
+
+[contracts.enhanced-governance-nft]
+path = "contracts/governance/enhanced-governance-nft.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-access", "sip-standards"]
+
+[contracts.cxlp-token]
+path = "contracts/tokens/cxlp-token.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.gauge-orchestrator]
+path = "contracts/governance/gauge-orchestrator.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["cxlp-token", "sip-standards"]
+
+[contracts.governance-handover]
+path = "contracts/governance/governance-handover.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.governance-signature-verifier]
+path = "contracts/governance/governance-signature-verifier.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.ico-offering]
+path = "contracts/governance/ico-offering.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["regulatory-adapter", "sip-standards"]
+
+[contracts.legal-representative-registry]
+path = "contracts/governance/legal-representative-registry.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.governance-traits]
+path = "contracts/traits/governance-traits.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.lending-protocol-governance]
+path = "contracts/governance/lending-protocol-governance.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["governance-traits"]
+
+[contracts.proposal-engine-trait]
+path = "contracts/governance/proposal-engine-trait.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.proposal-registry]
+path = "contracts/governance/proposal-registry.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.reputation-engine]
+path = "contracts/governance/reputation-engine.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["governance-traits"]
+
+[contracts.cxvg-token]
+path = "contracts/tokens/cxvg-token.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.proposal-executor]
+path = "contracts/governance/proposal-executor.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["cxvg-token", "proposal-registry", "governance-traits", "sip-standards"]
+
+[contracts.proposal-engine]
+path = "contracts/governance/proposal-engine.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["enhanced-governance-nft", "proposal-registry", "reputation-engine", "conxian-access", "proposal-executor", "governance-traits", "sip-standards"]
+
+[contracts.reputation-orchestrator]
+path = "contracts/governance/reputation-orchestrator.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.sab-election]
+path = "contracts/governance/sab-election.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.signed-data-base]
+path = "contracts/governance/signed-data-base.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.symmetry-governor]
+path = "contracts/governance/symmetry-governor.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.timelock]
+path = "contracts/governance/timelock.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-access", "governance-traits"]
+
+[contracts.cxtr-token]
+path = "contracts/tokens/cxtr-token.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.treasury-governance]
+path = "contracts/governance/treasury-governance.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["operational-treasury", "cxtr-token", "governance-traits"]
 
 [contracts.voting]
 path = "contracts/governance/voting.clar"
-clarity-version = 4
+clarity_version = 4
+epoch = "3.3"
 depends_on = ["conxian-access", "sip-standards"]
 
-epoch = "latest"
-
-[contracts.wormhole-handlers]
-path = "contracts/interoperability/wormhole-handlers.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.wormhole-inbox]
-path = "contracts/interoperability/wormhole-inbox.clar"
-clarity-version = 4
-
-epoch = "latest"
-
-[contracts.wormhole-outbox]
-path = "contracts/interoperability/wormhole-outbox.clar"
-clarity-version = 4
-depends_on = ["revenue-distributor", "sip-standards"]
-
-epoch = "latest"
-
-[contracts.yield-aggregator]
-path = "contracts/vaults/yield-aggregator.clar"
-clarity-version = 4
-depends_on = ["sip-standards", "vault-traits"]
-
-epoch = "latest"
+[contracts.cxs-token]
+path = "contracts/tokens/cxs-token.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
 
 [contracts.yield-governance]
 path = "contracts/governance/yield-governance.clar"
-clarity-version = 4
-depends_on = ["cxs-token", "governance-traits", "proposal-executor"]
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["cxs-token", "governance-traits"]
 
-epoch = "latest"
+[contracts.governance-token]
+path = "contracts/governance-token.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.optimization-helpers]
+path = "contracts/helpers/optimization-helpers.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.identity-badge]
+path = "contracts/identity/identity-badge.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.insurance-protection-nft]
+path = "contracts/insurance/insurance-protection-nft.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.alex-adapter]
+path = "contracts/integrations/alex-adapter.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-protocol", "alex-vault", "conxian-csf-trait", "sip-standards"]
+
+[contracts.chainlink-adapter]
+path = "contracts/integrations/chainlink-adapter.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["defi-traits"]
+
+[contracts.dia-oracle-adapter]
+path = "contracts/integrations/dia-oracle-adapter.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["defi-traits"]
+
+[contracts.pyth-traits]
+path = "contracts/traits/pyth-traits.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.pyth-oracle-v4]
+path = "contracts/oracle/pyth-oracle-v4.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["pyth-traits"]
+
+[contracts.pyth-oracle-adapter]
+path = "contracts/oracle/pyth-oracle-adapter.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["pyth-oracle-v4", "oracle-aggregator"]
+
+[contracts.redstone-traits]
+path = "contracts/traits/redstone-traits.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.redstone-oracle-adapter]
+path = "contracts/integrations/redstone-oracle-adapter.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["defi-traits", "redstone-traits"]
+
+[contracts.switchboard-oracle-adapter]
+path = "contracts/integrations/switchboard-oracle-adapter.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.twap-oracle]
+path = "contracts/integrations/twap-oracle.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["defi-traits"]
+
+[contracts.btc-adapter]
+path = "contracts/interfaces/btc-adapter.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.dimensional-engine-interface]
+path = "contracts/interfaces/dimensional-engine-interface.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.wormhole-handlers]
+path = "contracts/interoperability/wormhole-handlers.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.wormhole-inbox]
+path = "contracts/interoperability/wormhole-inbox.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.revenue-distributor]
+path = "contracts/treasury/revenue-distributor.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["bme-engine", "sip-standards"]
+
+[contracts.wormhole-outbox]
+path = "contracts/interoperability/wormhole-outbox.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["revenue-distributor", "sip-standards"]
+
+[contracts.interest-rate-model]
+path = "contracts/lending/interest-rate-model.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.lending-manager]
+path = "contracts/lending/lending-manager.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.lending-orchestrator]
+path = "contracts/lending/lending-orchestrator.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["enhanced-circuit-breaker", "revenue-automation", "bme-engine", "oracle-aggregator", "sip-standards"]
+
+[contracts.clarity-bitcoin]
+path = "contracts/lib/clarity-bitcoin.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.nft-marketplace]
+path = "contracts/marketplace/nft-marketplace.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.concentrated-math]
+path = "contracts/math/concentrated-math.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.exponentiation]
+path = "contracts/math/exponentiation.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.math-utilities]
+path = "contracts/math/math-utilities.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.mev-protection-nft]
+path = "contracts/mev/mev-protection-nft.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.position-factory-root]
+path = "contracts/mev/position-factory-root.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.legacy-adapter]
+path = "contracts/migration/legacy-adapter.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.migration-orchestrator]
+path = "contracts/migration/migration-orchestrator.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.analytics-aggregator]
+path = "contracts/monitoring/analytics-aggregator.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.monitoring-dashboard]
+path = "contracts/monitoring/monitoring-dashboard.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.price-stability-monitor]
+path = "contracts/monitoring/price-stability-monitor.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["agent-risk", "security-monitoring"]
+
+[contracts.tableland-sync]
+path = "contracts/monitoring/tableland-sync.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.dimensional-oracle]
+path = "contracts/oracle/dimensional-oracle.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["defi-traits"]
+
+[contracts.external-oracle-adapter]
+path = "contracts/oracle/external-oracle-adapter.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.federated-oracle-adapter]
+path = "contracts/oracle/federated-oracle-adapter.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["defi-traits"]
+
+[contracts.oracle-adapter-stub]
+path = "contracts/oracle/oracle-adapter-stub.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.points-oracle]
+path = "contracts/oracle/points-oracle.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-protocol", "defi-traits"]
+
+[contracts.order-book]
+path = "contracts/orders/order-book.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.performance-optimizer]
+path = "contracts/performance/performance-optimizer.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.pool-factory]
+path = "contracts/pools/pool-factory.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.pool-registry]
+path = "contracts/pools/pool-registry.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.position-factory]
+path = "contracts/position-factory.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.default-strategy-engine]
+path = "contracts/rewards/default-strategy-engine.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.early-lp-rewards]
+path = "contracts/rewards/early-lp-rewards.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.bond-traits]
+path = "contracts/traits/bond-traits.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.dlc-bond]
+path = "contracts/sbtc/dlc-bond.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["bond-traits", "sip-standards"]
+
+[contracts.dlc-manager]
+path = "contracts/sbtc/dlc-manager.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-access"]
+
+[contracts.dlc-orchestrator]
+path = "contracts/sbtc/dlc-orchestrator.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["dlc-bond", "bond-traits"]
+
+[contracts.conxian-insurance-fund]
+path = "contracts/security/conxian-insurance-fund.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-access", "sip-standards"]
+
+[contracts.mev-protector]
+path = "contracts/security/mev-protector.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.proof-of-reserves]
+path = "contracts/security/proof-of-reserves.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.rate-limiter]
+path = "contracts/security/rate-limiter.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.dual-stacking-orchestrator]
+path = "contracts/staking/dual-stacking-orchestrator.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.native-stacking-operator]
+path = "contracts/staking/native-stacking-operator.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.mock-circuit-breaker]
+path = "contracts/test-helpers/mock-circuit-breaker.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.mock-csf-protocol]
+path = "contracts/test-helpers/mock-csf-protocol.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-csf-trait", "sip-standards"]
+
+[contracts.mock-proposal]
+path = "contracts/test-helpers/mock-proposal.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["governance-traits"]
+
+[contracts.mock-token]
+path = "contracts/test-helpers/mock-token.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.test-c4-helper]
+path = "contracts/test-helpers/test-c4-helper.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.cxd-price-initializer]
+path = "contracts/tokens/cxd-price-initializer.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.cxlp-position-nft]
+path = "contracts/tokens/cxlp-position-nft.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.token-system-coordinator]
+path = "contracts/tokens/token-system-coordinator.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["regulatory-adapter", "sip-standards"]
+
+[contracts.access-control-trait]
+path = "contracts/traits/access-control-trait.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.automation-traits]
+path = "contracts/traits/automation-traits.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.controller-traits]
+path = "contracts/traits/controller-traits.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.conxian-service-trait]
+path = "contracts/traits/conxian-service-trait.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.cross-chain-traits]
+path = "contracts/traits/cross-chain-traits.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.dimensional-traits]
+path = "contracts/traits/dimensional-traits.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.enterprise-traits]
+path = "contracts/traits/enterprise-traits.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.vault-trait]
+path = "contracts/traits/vault-trait.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.allocation-policy]
+path = "contracts/treasury/allocation-policy.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.conxian-vaults]
+path = "contracts/treasury/conxian-vaults.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["conxian-access", "sip-standards", "vault-traits"]
+
+[contracts.cxd-treasury]
+path = "contracts/treasury/cxd-treasury.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.founder-vault]
+path = "contracts/treasury/founder-vault.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.opex-vault]
+path = "contracts/treasury/opex-vault.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["regulatory-adapter"]
+
+[contracts.referral-aggregator]
+path = "contracts/treasury/referral-aggregator.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.block-utils]
+path = "contracts/utils/block-utils.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.encoding]
+path = "contracts/utils/encoding.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.nakamoto-compatibility]
+path = "contracts/utils/nakamoto-compatibility.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.rbac]
+path = "contracts/utils/rbac.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.custody]
+path = "contracts/vaults/custody.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
+
+[contracts.fee-orchestrator]
+path = "contracts/vaults/fee-orchestrator.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.sbtc-vault]
+path = "contracts/vaults/sbtc-vault.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["regulatory-adapter", "sip-standards"]
+
+[contracts.yield-aggregator]
+path = "contracts/vaults/yield-aggregator.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["vault-traits", "sip-standards"]
+
+[contracts.auto-compounder]
+path = "contracts/yield/auto-compounder.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.cross-protocol-integrator]
+path = "contracts/yield/cross-protocol-integrator.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.cxd-staking]
+path = "contracts/yield/cxd-staking.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["regulatory-adapter"]
+
+[contracts.enhanced-yield-strategy]
+path = "contracts/yield/enhanced-yield-strategy.clar"
+clarity_version = 4
+epoch = "3.3"
+
+[contracts.token-emission-controller]
+path = "contracts/yield/token-emission-controller.clar"
+clarity_version = 4
+epoch = "3.3"
+depends_on = ["sip-standards"]
 
 [contracts.yield-optimizer]
 path = "contracts/yield/yield-optimizer.clar"
-clarity-version = 4
+clarity_version = 4
+epoch = "3.3"
 depends_on = ["agent-risk", "sip-standards", "vault-traits"]
-
-epoch = "latest"

@@ -2,7 +2,7 @@
 ;; Conxian Protocol Standard Contract
 ;; Manages the lifecycle of trading positions
 
-(impl-trait .core-traits.position-manager-trait)
+(impl-trait .core-traits.position-orchestrator-trait)
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 (define-constant ERR_NOT_AUTHORIZED u1000)

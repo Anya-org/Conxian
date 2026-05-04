@@ -43,7 +43,7 @@
     (asset (contract-of asset-trait))
     (reserve (match (map-get? reserve-data asset)
                res-val res-val
-               { total-deposits: u0, total-borrows: u0, total-reserves: u0, decimals: (unwrap! (contract-call? asset-trait get-decimals) (err ERR_INTERNAL)) last-updated: burn-block-height }))
+               { total-deposits: u0, total-borrows: u0, total-reserves: u0, decimals: (unwrap! (contract-call? asset-trait get-decimals) (err ERR_INTERNAL)), last-updated: burn-block-height }))
   )
     (begin
       (asserts! (not (is-paused)) (err ERR_PAUSED))
@@ -74,7 +74,7 @@
       (let ((hf (unwrap! (calculate-account-health caller) (err ERR_INTERNAL))))
         (asserts! (>= hf u10000) (err ERR_INSUFFICIENT_COLLATERAL))
       )
-      (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) caller none)))
+      (try! (contract-call? asset-trait transfer amount tx-sender caller none))
       (ok true)
     )
   )

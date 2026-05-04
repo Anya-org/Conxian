@@ -80,7 +80,7 @@
         (asserts! (is-eq (get status order) "active") (err ERR_ORDER_EXPIRED))
         (asserts! (is-eq (get token-in order) (contract-of token-in)) (err ERR_INVALID_PARAMS))
 
-        (try! (as-contract (contract-call? token-in transfer (get remaining-amount order) (as-contract tx-sender) (get owner order) none)))
+        (try! (contract-call? token-in transfer (get remaining-amount order) tx-sender (get owner order) none))
 
         (map-set twap-orders order-id (merge order { status: "cancelled" }))
         (ok true)

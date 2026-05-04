@@ -1,31 +1,20 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from "vitest/config";
+import { vitestSetupFilePath, getClarinetVitestsArgv } from "@stacks/clarinet-sdk/vitest";
 
 export default defineConfig({
   test: {
     environment: "clarinet",
+    pool: "forks",
+    poolOptions: {
+      forks: { singleFork: true },
+    },
+    setupFiles: [vitestSetupFilePath],
     environmentOptions: {
       clarinet: {
-        coverage: true,
-        coverageFilename: "coverage.lcov",
-        costs: true,
-        costsFilename: "costs-reports.json"
-      }
+        ...getClarinetVitestsArgv(),
+      },
     },
-    setupFiles: ["tests/setup-test-env.ts"],
-    testTimeout: 300000,
-    hookTimeout: 90000,
-    fileParallelism: false,
-    include: ["tests/**/*.test.ts"],
-    exclude: ["contracts/drafts", "**/node_modules/**", "tests/bip21.test.ts", "tests/crypto.test.ts", "tests/lightning.test.ts", "tests/seed.test.ts", "tests/storage.test.ts"],
-    coverage: {
-      provider: "v8",
-      reporter: ["text", "json", "html"],
-      include: ["contracts/**/*.clar"],
-    },
-  },
-  poolOptions: {
-    threads: {
-      singleThread: true,
-    },
+    maxWorkers: 1,
+    passWithNoTests: true,
   },
 });
