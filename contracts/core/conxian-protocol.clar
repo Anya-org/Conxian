@@ -44,6 +44,7 @@
 ;; @desc Sets the owner. Only the current owner can transfer ownership.
 (define-public (set-owner (new-owner principal))
   (begin
+    (asserts! (is-standard? new-owner) (err ERR_UNAUTHORIZED))
     (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_UNAUTHORIZED)
     (var-set contract-owner new-owner)
     (ok true)

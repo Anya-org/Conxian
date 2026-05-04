@@ -1,4 +1,4 @@
-// @vitest-environment node
+// @vitest-environment clarinet
 import "dotenv/config";
 import { describe, it, expect } from 'vitest';
 import { createClient } from '@stacks/blockchain-api-client';

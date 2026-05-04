@@ -28,6 +28,7 @@
 ;; @returns (response bool uint)
 (define-public (initialize (owner principal))
   (begin
+    (asserts! (is-standard? owner) (err ERR_UNAUTHORIZED))
     (asserts! (is-eq tx-sender CONTRACT_OWNER) (err ERR_UNAUTHORIZED))
     (var-set contract-owner owner)
     (var-set vesting-start burn-block-height)

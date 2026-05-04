@@ -9,6 +9,7 @@ export default defineConfig({
       forks: { singleFork: true },
     },
     setupFiles: [vitestSetupFilePath],
+    exclude: ["tests/integration/**"],
     environmentOptions: {
       clarinet: {
         ...getClarinetVitestsArgv(),

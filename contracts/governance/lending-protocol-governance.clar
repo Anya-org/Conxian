@@ -32,6 +32,7 @@
 ;; @returns (response bool uint)
 (define-public (set-governance-contract (new-gov principal))
     (begin
+    (asserts! (is-standard? new-gov) (err ERR_UNAUTHORIZED))
         (asserts! (is-authorized) (err ERR_UNAUTHORIZED))
         (var-set governance-contract new-gov)
         (ok true)

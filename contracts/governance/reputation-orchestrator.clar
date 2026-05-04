@@ -46,6 +46,7 @@
 ;; @returns (response bool uint)
 (define-public (set-admin (new-admin principal))
     (begin
+    (asserts! (is-standard? new-admin) (err ERR_UNAUTHORIZED))
         (asserts! (is-admin) (err ERR_UNAUTHORIZED))
         (var-set admin new-admin)
         (ok true)

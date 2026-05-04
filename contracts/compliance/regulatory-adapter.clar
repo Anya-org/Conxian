@@ -71,6 +71,7 @@
 ;; @param new-validator: The new validator principal
 (define-public (set-validator (new-validator principal))
   (begin
+    (asserts! (is-standard? new-validator) (err ERR_UNAUTHORIZED))
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (var-set compliance-validator new-validator)
     (ok true)
@@ -81,6 +82,7 @@
 ;; @param new-owner: The new administrator principal
 (define-public (transfer-ownership (new-owner principal))
   (begin
+    (asserts! (is-standard? new-owner) (err ERR_UNAUTHORIZED))
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (var-set contract-owner new-owner)
     (ok true)

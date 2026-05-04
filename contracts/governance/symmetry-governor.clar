@@ -18,6 +18,7 @@
 ;; @returns (response bool uint)
 (define-public (set-governance (new-gov principal))
     (begin
+    (asserts! (is-standard? new-gov) (err ERR_UNAUTHORIZED))
         (asserts! (is-governance) (err ERR_UNAUTHORIZED))
         (var-set governance new-gov)
         (ok true)

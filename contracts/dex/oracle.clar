@@ -37,6 +37,7 @@
 ;; @desc Transfer contract ownership to a new principal
 (define-public (transfer-ownership (new-owner principal))
   (begin
+    (asserts! (is-standard? new-owner) (err ERR_UNAUTHORIZED))
     (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (var-set contract-owner new-owner)
     (ok true)

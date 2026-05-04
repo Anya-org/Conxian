@@ -16,6 +16,7 @@
 
 (define-public (register-worker (worker principal))
   (begin
+    (asserts! (is-standard? worker) (err ERR_UNAUTHORIZED))
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
     (map-set workers worker true)
     (ok true)

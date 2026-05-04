@@ -30,6 +30,7 @@
 ;; @desc Add an authorized principal that can report activity to the BME engine
 (define-public (add-activity-reporter (reporter principal))
   (begin
+    (asserts! (is-standard? reporter) (err ERR_UNAUTHORIZED))
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
     (map-set authorized-activity-reporters reporter true)
     (ok true)

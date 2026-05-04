@@ -25,6 +25,7 @@
 ;; @returns (response bool uint)
 (define-public (set-emergency-admin (new-admin principal))
     (begin
+    (asserts! (is-standard? new-admin) (err ERR_UNAUTHORIZED))
         (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
         (var-set emergency-admin new-admin)
         (ok true)

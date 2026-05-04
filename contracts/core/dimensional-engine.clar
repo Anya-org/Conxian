@@ -48,6 +48,7 @@
 ;; @returns (response bool uint)
 (define-public (set-protocol-coordinator (new-coordinator principal))
   (begin
+    (asserts! (is-standard? new-coordinator) (err ERR_UNAUTHORIZED))
     (asserts! (is-authorized) (err ERR_UNAUTHORIZED))
     (var-set protocol-coordinator new-coordinator)
     (ok true)

@@ -42,6 +42,7 @@
 (define-public (register-provider (provider principal))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (asserts! (is-standard? provider) (err ERR_INVALID_PROVIDER))
     (map-set approved-providers provider true)
     (ok true)
   )
@@ -52,6 +53,8 @@
 (define-public (remove-provider (provider principal))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (asserts! (is-standard? provider) (err ERR_INVALID_PROVIDER))
+    (asserts! (not (is-eq provider (var-get contract-owner))) (err ERR_UNAUTHORIZED))
     (map-delete approved-providers provider)
     (ok true)
   )
@@ -62,6 +65,7 @@
 (define-public (set-sanctions-provider (provider principal))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (asserts! (is-standard? provider) (err ERR_INVALID_PROVIDER))
     (var-set sanctions-provider provider)
     (ok true)
   )
@@ -77,6 +81,7 @@
 (define-public (check-user-compliance (user principal) (sanctions-checked bool) (kyc-level uint) (travel-rule-checked bool))
   (begin
     (asserts! (or (is-owner) (is-approved-provider tx-sender)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-standard? user) (err ERR_INVALID_PROVIDER))
     (map-set compliance-records user {
       sanctions-checked: sanctions-checked, kyc-level: kyc-level, travel-rule-checked: travel-rule-checked, last-updated: burn-block-height
     })
@@ -92,6 +97,7 @@
 (define-public (set-owner (new-owner principal))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (asserts! (is-standard? new-owner) (err ERR_INVALID_PROVIDER))
     (var-set contract-owner new-owner)
     (ok true)
   )

@@ -39,6 +39,7 @@
 (define-public (set-contract-owner (new-owner principal))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (asserts! (is-standard? new-owner) (err ERR_UNAUTHORIZED))
     (var-set contract-owner new-owner)
     (ok true)
   )
@@ -49,6 +50,7 @@
 (define-public (set-compliance-manager (new-manager principal))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (asserts! (is-standard? new-manager) (err ERR_UNAUTHORIZED))
     (var-set compliance-manager new-manager)
     (ok true)
   )
@@ -60,6 +62,7 @@
 (define-public (add-kyc-provider (provider principal) (name (string-ascii 64)))
   (begin
     (asserts! (or (is-owner) (is-compliance-manager)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-standard? provider) (err ERR_UNAUTHORIZED))
     (asserts! (is-none (map-get? kyc-providers provider)) (err ERR_ALREADY_PROVIDER))
     (map-set kyc-providers provider {
       active: true, name: name, registered-at: burn-block-height
@@ -76,6 +79,7 @@
 (define-public (remove-kyc-provider (provider principal))
   (begin
     (asserts! (or (is-owner) (is-compliance-manager)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-standard? provider) (err ERR_UNAUTHORIZED))
     (asserts! (is-some (map-get? kyc-providers provider)) (err ERR_NOT_PROVIDER))
     (map-delete kyc-providers provider)
     (print {

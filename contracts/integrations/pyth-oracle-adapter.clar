@@ -44,6 +44,7 @@
 ;; @desc Admin function to switch the Pyth provider
 (define-public (set-pyth-provider (new-provider principal))
   (begin
+    (asserts! (is-standard? new-provider) (err ERR_UNAUTHORIZED))
     (asserts!
       (is-eq tx-sender (contract-call? .conxian-protocol get-admin))
       (err ERR_UNAUTHORIZED)

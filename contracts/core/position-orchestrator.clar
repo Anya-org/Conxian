@@ -32,6 +32,7 @@
 
 (define-public (set-dimensional-engine (engine principal))
   (begin
+    (asserts! (is-standard? engine) (err ERR_UNAUTHORIZED))
     (asserts! (is-owner) (err ERR_NOT_AUTHORIZED))
     (var-set dimensional-engine engine)
     (ok true)
@@ -40,6 +41,7 @@
 
 (define-public (set-contract-owner (new-owner principal))
   (begin
+    (asserts! (is-standard? new-owner) (err ERR_UNAUTHORIZED))
     (asserts! (is-owner) (err ERR_NOT_AUTHORIZED))
     (var-set contract-owner new-owner)
     (ok true)

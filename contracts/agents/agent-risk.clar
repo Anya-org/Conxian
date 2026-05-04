@@ -67,6 +67,7 @@
 
 (define-public (initialize (new-admin principal))
   (begin
+    (asserts! (is-standard? new-admin) (err ERR_UNAUTHORIZED))
     (var-set admin new-admin)
     (ok true)
   )

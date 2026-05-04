@@ -182,6 +182,7 @@
 ;; Admin
 (define-public (initialize (new-admin principal))
   (begin
+    (asserts! (is-standard? new-admin) (err ERR_UNAUTHORIZED))
     (asserts! (not (var-get initialized)) (err ERR_UNAUTHORIZED))
     (var-set admin new-admin)
     (ok true)
@@ -190,6 +191,7 @@
 
 (define-public (set-admin (new-admin principal))
   (begin
+    (asserts! (is-standard? new-admin) (err ERR_UNAUTHORIZED))
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
     (var-set admin new-admin)
     (ok true)

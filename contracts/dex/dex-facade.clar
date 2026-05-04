@@ -20,6 +20,7 @@
 
 (define-public (add-authorized-pool (pool principal))
   (begin
+    (asserts! (is-standard? pool) (err ERR_UNAUTHORIZED))
     (asserts! (is-admin) (err ERR_UNAUTHORIZED))
     (map-set authorized-pools pool true)
     (ok true)
@@ -28,6 +29,7 @@
 
 (define-public (remove-authorized-pool (pool principal))
   (begin
+    (asserts! (is-standard? pool) (err ERR_UNAUTHORIZED))
     (asserts! (is-admin) (err ERR_UNAUTHORIZED))
     (map-delete authorized-pools pool)
     (ok true)

@@ -68,6 +68,7 @@
 ;; @desc Toggle the active state of a registered CSF protocol
 (define-public (toggle-csf-protocol (protocol principal))
   (begin
+    (asserts! (is-standard? protocol) (err ERR_UNAUTHORIZED))
     (asserts! (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin)) ERR_UNAUTHORIZED)
     (let ((current-data (unwrap! (map-get? csf-registry protocol) ERR_PROTOCOL_NOT_REGISTERED)))
       (map-set csf-registry protocol (merge current-data { active: (not (get active current-data)) }))

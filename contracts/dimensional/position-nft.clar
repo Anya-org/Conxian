@@ -74,6 +74,7 @@
 ;; @returns (response bool uint)
 (define-public (set-minter (new-minter principal))
     (begin
+    (asserts! (is-standard? new-minter) (err ERR_UNAUTHORIZED))
         (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
         (var-set authorized-minter new-minter)
         (ok true)

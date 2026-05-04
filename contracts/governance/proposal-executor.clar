@@ -60,6 +60,7 @@
 ;; @returns (response bool uint)
 (define-public (set-ops-engine (new-engine principal))
   (begin
+    (asserts! (is-standard? new-engine) (err ERR_UNAUTHORIZED))
     (asserts! (is-ops-engine) (err ERR_UNAUTHORIZED))
     (var-set ops-engine new-engine)
     (ok true)

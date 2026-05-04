@@ -29,6 +29,7 @@
 
 (define-public (initialize (new-owner principal))
   (begin
+    (asserts! (is-standard? new-owner) (err ERR_UNAUTHORIZED))
     (asserts! (not (var-get initialized)) ERR_UNAUTHORIZED)
     (var-set contract-owner new-owner)
     (var-set initialized true)
@@ -67,6 +68,7 @@
 
 (define-public (set-owner (new-owner principal))
   (begin
+    (asserts! (is-standard? new-owner) (err ERR_UNAUTHORIZED))
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (var-set contract-owner new-owner)
     (ok true)

@@ -45,6 +45,7 @@
 
 (define-public (register-worker (worker principal))
   (begin
+    (asserts! (is-standard? worker) (err ERR_UNAUTHORIZED))
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (map-set workers worker true)
     (print { event: "worker-registered", worker: worker })
@@ -54,6 +55,7 @@
 
 (define-public (remove-worker (worker principal))
   (begin
+    (asserts! (is-standard? worker) (err ERR_UNAUTHORIZED))
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (map-delete workers worker)
     (ok true)

@@ -145,6 +145,7 @@
 ;; @returns (response bool uint)
 (define-public (set-proposal-executor (new-executor principal))
   (begin
+    (asserts! (is-standard? new-executor) (err ERR_UNAUTHORIZED))
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
     (var-set proposal-executor-contract new-executor)
     (print { event: "set-proposal-executor", executor: new-executor })
@@ -179,6 +180,7 @@
 ;; @returns (response bool uint)
 (define-public (set-proposal-registry (new-registry principal))
   (begin
+    (asserts! (is-standard? new-registry) (err ERR_UNAUTHORIZED))
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
     (var-set proposal-registry-contract new-registry)
     (ok true)

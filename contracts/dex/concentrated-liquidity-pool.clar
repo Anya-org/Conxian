@@ -57,7 +57,7 @@
 )
 
 (define-public (collect-protocol-fees (token <sip-010-ft-trait>))
-  (ok true)
+  (ok { amount-out: u0, fee-collected: u0 })
 )
 
 ;; --- SIP-010 Trait Implementation (Stub) ---

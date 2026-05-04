@@ -76,6 +76,7 @@
 ;; @returns (response bool uint)
 (define-public (set-governance-contract (new-governance principal))
     (begin
+    (asserts! (is-standard? new-governance) (err ERR_UNAUTHORIZED))
         (asserts! (is-admin) (err ERR_UNAUTHORIZED))
         (var-set governance-contract new-governance)
         (ok true)
@@ -136,6 +137,7 @@
 ;; @returns (response bool uint)
 (define-public (cancel-proposal (proposal-principal principal))
     (begin
+    (asserts! (is-standard? proposal-principal) (err ERR_UNAUTHORIZED))
         (asserts! (is-governance) (err ERR_UNAUTHORIZED))
         (asserts! (is-some (map-get? queued-proposals proposal-principal)) (err ERR_NOT_QUEUED))
         
@@ -151,6 +153,7 @@
 ;; @returns (response bool uint)
 (define-public (transfer-admin (new-admin principal))
     (begin
+    (asserts! (is-standard? new-admin) (err ERR_UNAUTHORIZED))
         (asserts! (is-admin) (err ERR_UNAUTHORIZED))
         (var-set admin new-admin)
         (print {

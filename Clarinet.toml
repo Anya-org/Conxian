@@ -5,6 +5,10 @@ authors = []
 telemetry = false
 requirements = []
 clarinet_version = "3.12.0"
+epoch = "3.3"
+
+[project.boot]
+contracts = ["operational-treasury"]
 
 [accounts]
 deployer = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"

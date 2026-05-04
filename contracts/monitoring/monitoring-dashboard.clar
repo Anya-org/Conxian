@@ -39,6 +39,7 @@
 ;; @desc Transfers administrative privileges to a new principal
 (define-public (transfer-admin (new-admin principal))
   (begin
+    (asserts! (is-standard? new-admin) (err ERR_UNAUTHORIZED))
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
     (var-set admin new-admin)
     (ok true)
