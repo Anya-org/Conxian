@@ -11,8 +11,8 @@
 (define-map legal-registry
     principal
     {
-        name-hash: (buff 32)
-        jurisdiction: (string-ascii 64)
+        name-hash: (buff 32),
+        jurisdiction: (string-ascii 64),
         active: bool
     }
 )
@@ -39,11 +39,11 @@
     (begin
         (asserts! (is-eq tx-sender (var-get registrar)) (err ERR_UNAUTHORIZED))
         (map-set legal-registry entity {
-            name-hash: name-hash
-            jurisdiction: jurisdiction
+            name-hash: name-hash,
+            jurisdiction: jurisdiction,
             active: true
         })
-        (print { event: "entity-registered" entity: entity jurisdiction: jurisdiction })
+        (print { event: "entity-registered", entity: entity, jurisdiction: jurisdiction })
         (ok true)
     )
 )

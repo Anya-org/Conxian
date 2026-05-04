@@ -27,7 +27,7 @@
 
     ;; Example: Update global interest rate parameters
     ;; In a full implementation the parameters would be passed in the proposal data.
-    (print { event: "yield-parameters-updated" proposer: proposer })
+    (print { event: "yield-parameters-updated", proposer: proposer })
     (ok true)
   )
 )

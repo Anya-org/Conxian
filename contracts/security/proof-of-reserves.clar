@@ -29,20 +29,20 @@
 (define-map asset-reserves
     principal
     {
-        total-supply: uint
-        on-chain-balance: uint
-        off-chain-backing: uint
-        last-update: uint
+        total-supply: uint,
+        on-chain-balance: uint,
+        off-chain-backing: uint,
+        last-update: uint,
         attestation-count: uint
     }
 )
 
 ;; Individual attestations: asset -> attestor -> {amount timestamp}
 (define-map attestations
-    { asset: principal attestor: principal }
+    { asset: principal, attestor: principal }
     {
-        amount: uint
-        timestamp: uint
+        amount: uint,
+        timestamp: uint,
         signature: (buff 64)
     }
 )
@@ -50,19 +50,19 @@
 ;; Events
 (define-private (emit-reserves-updated (asset principal) (amount uint))
     (print {
-        event: "reserves-updated"
-        asset: asset
-        amount: amount
+        event: "reserves-updated",
+        asset: asset,
+        amount: amount,
         timestamp: burn-block-height
     })
 )
 
 (define-private (emit-attestation-received (asset principal) (attestor principal) (amount uint))
     (print {
-        event: "attestation-received"
-        asset: asset
-        attestor: attestor
-        amount: amount
+        event: "attestation-received",
+        asset: asset,
+        attestor: attestor,
+        amount: amount,
         timestamp: burn-block-height
     })
 )
@@ -82,8 +82,8 @@
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
         (map-set authorized-attestors attestor true)
         (print {
-            event: "attestor-added"
-            attestor: attestor
+            event: "attestor-added",
+            attestor: attestor,
             timestamp: burn-block-height
         })
         (ok true)
@@ -96,8 +96,8 @@
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
         (map-delete authorized-attestors attestor)
         (print {
-            event: "attestor-removed"
-            attestor: attestor
+            event: "attestor-removed",
+            attestor: attestor,
             timestamp: burn-block-height
         })
         (ok true)
@@ -116,34 +116,34 @@
       )
         ;; Verify attestor is authorized
         (asserts! (is-authorized-attestor) (err ERR_UNAUTHORIZED))
-        
+
         ;; Store attestation
-        (map-set attestations { asset: asset attestor: attestor } {
-            amount: off-chain-amount
-            timestamp: current-time
+        (map-set attestations { asset: asset, attestor: attestor } {
+            amount: off-chain-amount,
+            timestamp: current-time,
             signature: signature
         })
-        
+
         (emit-attestation-received asset attestor off-chain-amount)
-        
+
         ;; Update reserve data
         (match (map-get? asset-reserves asset)
             existing-data
             (map-set asset-reserves asset (merge existing-data {
-                off-chain-backing: off-chain-amount
-                last-update: current-time
+                off-chain-backing: off-chain-amount,
+                last-update: current-time,
                 attestation-count: (+ (get attestation-count existing-data) u1)
             }))
             ;; First attestation for this asset
             (map-set asset-reserves asset {
-                total-supply: u0 ;; Will be updated by sync
-                on-chain-balance: u0
-                off-chain-backing: off-chain-amount
-                last-update: current-time
+                total-supply: u0 ;; Will be updated by sync,
+                on-chain-balance: u0,
+                off-chain-backing: off-chain-amount,
+                last-update: current-time,
                 attestation-count: u1
             })
         )
-        
+
         (ok true)
     )
 )
@@ -156,24 +156,24 @@
         (total-supply (unwrap-panic (contract-call? asset get-total-supply)))
       )
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-        
+
         (match (map-get? asset-reserves asset-principal)
             existing-data
             (map-set asset-reserves asset-principal (merge existing-data {
-                on-chain-balance: balance
-                total-supply: total-supply
+                on-chain-balance: balance,
+                total-supply: total-supply,
                 last-update: burn-block-height
             }))
             ;; First sync for this asset
             (map-set asset-reserves asset-principal {
-                total-supply: total-supply
-                on-chain-balance: balance
-                off-chain-backing: u0
-                last-update: burn-block-height
+                total-supply: total-supply,
+                on-chain-balance: balance,
+                off-chain-backing: u0,
+                last-update: burn-block-height,
                 attestation-count: u0
             })
         )
-        
+
         (emit-reserves-updated asset-principal balance)
         (ok true)
     )
@@ -229,7 +229,7 @@
 )
 
 (define-read-only (get-attestation (asset principal) (attestor principal))
-    (map-get? attestations { asset: asset attestor: attestor })
+    (map-get? attestations { asset: asset, attestor: attestor })
 )
 
 (define-read-only (is-attestor (principal principal))
@@ -240,17 +240,17 @@
     (match (map-get? asset-reserves asset)
         data
         {
-            fully-backed: (is-fully-backed asset)
-            reserve-ratio: (get-reserve-ratio asset)
-            attestation-count: (get attestation-count data)
-            last-update: (get last-update data)
+            fully-backed: (is-fully-backed asset),
+            reserve-ratio: (get-reserve-ratio asset),
+            attestation-count: (get attestation-count data),
+            last-update: (get last-update data),
             is-stale: (> (- burn-block-height (get last-update data)) PROOF_VALIDITY_PERIOD)
         }
         {
-            fully-backed: false
-            reserve-ratio: u0
-            attestation-count: u0
-            last-update: u0
+            fully-backed: false,
+            reserve-ratio: u0,
+            attestation-count: u0,
+            last-update: u0,
             is-stale: true
         }
     )

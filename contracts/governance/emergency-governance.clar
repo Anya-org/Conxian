@@ -66,7 +66,7 @@
     (begin
         (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
         (var-set global-circuit-breaker true)
-        (print { event: "circuit-breaker-triggered" sender: tx-sender })
+        (print { event: "circuit-breaker-triggered", sender: tx-sender })
         (ok true)
     )
 )
@@ -78,7 +78,7 @@
     (begin
         (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
         (var-set global-circuit-breaker false)
-        (print { event: "circuit-breaker-reset" sender: tx-sender })
+        (print { event: "circuit-breaker-reset", sender: tx-sender })
         (ok true)
     )
 )

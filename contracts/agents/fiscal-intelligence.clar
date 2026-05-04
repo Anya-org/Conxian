@@ -12,13 +12,13 @@
 (define-data-var admin principal tx-sender)
 
 ;; --- Sovereign Business Cells (SBC) ---
-(define-map business-cells 
-  (string-ascii 32) 
-  { 
-    liquid-reserve: uint
-    yield-harvested: uint
-    last-audit-block: uint
-    status: (string-ascii 12) 
+(define-map business-cells
+  (string-ascii 32)
+  {
+    liquid-reserve: uint,
+    yield-harvested: uint,
+    last-audit-block: uint,
+    status: (string-ascii 12)
   }
 )
 
@@ -32,10 +32,10 @@
 (define-public (codify-sbc (name (string-ascii 32)))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (map-set business-cells name { 
-      liquid-reserve: u0
-      yield-harvested: u0
-      last-audit-block: burn-block-height
+    (map-set business-cells name {
+      liquid-reserve: u0,
+      yield-harvested: u0,
+      last-audit-block: burn-block-height,
       status: "ACTIVE"
     })
     (ok true)
@@ -65,11 +65,11 @@
       (map-set business-cells sbc-name (merge cell { liquid-reserve: (- (get liquid-reserve cell) amount) }))
       ;; 2. Update Strategic Symmetry
       (let (
-        (current-symmetry (default-to u0 (map-get? strategic-symmetry { sbc: sbc-name strategy: strategy })))
+        (current-symmetry (default-to u0 (map-get? strategic-symmetry { sbc: sbc-name, strategy: strategy })))
       )
-        (map-set strategic-symmetry { sbc: sbc-name strategy: strategy } (+ current-symmetry amount))
+        (map-set strategic-symmetry { sbc: sbc-name, strategy: strategy } (+ current-symmetry amount))
       )
-      (print { event: "symmetry-deployed" sbc: sbc-name strategy: strategy amount: amount })
+      (print { event: "symmetry-deployed", sbc: sbc-name, strategy: strategy, amount: amount })
       (ok true)
     )
   )
@@ -82,11 +82,11 @@
   )
     (begin
       (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-      (map-set business-cells sbc-name (merge cell { 
-        yield-harvested: (+ (get yield-harvested cell) yield-amount)
+      (map-set business-cells sbc-name (merge cell {
+        yield-harvested: (+ (get yield-harvested cell) yield-amount),
         liquid-reserve: (+ (get liquid-reserve cell) yield-amount)
       }))
-      (print { event: "sovereign-yield-harvested" sbc: sbc-name yield: yield-amount })
+      (print { event: "sovereign-yield-harvested", sbc: sbc-name, yield: yield-amount })
       (ok true)
     )
   )
@@ -104,7 +104,7 @@
       ;; 1. Execute Deployment
       (try! (deploy-symmetry sbc-name strategy sweep-amount))
       ;; 2. Notify Orchestrator
-      (print { event: "autonomous-yield-sweep" sbc: sbc-name amount: sweep-amount strategy: strategy })
+      (print { event: "autonomous-yield-sweep", sbc: sbc-name, amount: sweep-amount, strategy: strategy })
       (ok sweep-amount)
     )
   )

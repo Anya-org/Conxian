@@ -35,8 +35,8 @@
 (define-map queued-proposals
     principal
     {
-        eta: uint
-        executed: bool
+        eta: uint,
+        executed: bool,
         target: principal
     }
 )
@@ -44,27 +44,27 @@
 ;; Events
 (define-private (emit-queued (proposal principal) (eta uint) (target principal))
     (print {
-        event: "proposal-queued"
-        proposal: proposal
-        eta: eta
-        target: target
+        event: "proposal-queued",
+        proposal: proposal,
+        eta: eta,
+        target: target,
         timestamp: burn-block-height
     })
 )
 
 (define-private (emit-executed (proposal principal) (target principal))
     (print {
-        event: "proposal-executed"
-        proposal: proposal
-        target: target
+        event: "proposal-executed",
+        proposal: proposal,
+        target: target,
         timestamp: burn-block-height
     })
 )
 
 (define-private (emit-cancelled (proposal principal))
     (print {
-        event: "proposal-cancelled"
-        proposal: proposal
+        event: "proposal-cancelled",
+        proposal: proposal,
         timestamp: burn-block-height
     })
 )
@@ -75,7 +75,7 @@
 )
 
 (define-private (is-governance)
-    (or 
+    (or
         (is-admin)
         (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_GOVERNANCE))
     )
@@ -102,11 +102,11 @@
         (asserts! (is-governance) (err ERR_UNAUTHORIZED))
         ;; Check not already queued
         (asserts! (is-none (map-get? queued-proposals proposal-principal)) (err ERR_ALREADY_EXECUTED))
-        
+
         (let ((eta (+ burn-block-height (var-get delay))))
             (map-set queued-proposals proposal-principal {
-                eta: eta
-                executed: false
+                eta: eta,
+                executed: false,
                 target: target
             })
             (emit-queued proposal-principal eta target)
@@ -131,13 +131,13 @@
         (asserts! (>= burn-block-height eta) (err ERR_TOO_EARLY))
         (asserts! (<= burn-block-height (+ eta GRACE_PERIOD)) (err ERR_EXPIRED))
         (asserts! (is-eq (contract-of proposal-contract) proposal-principal) (err ERR_UNAUTHORIZED))
-        
+
         ;; Mark as executed BEFORE calling to prevent reentrancy
         (map-set queued-proposals proposal-principal (merge proposal { executed: true }))
-        
+
         ;; Execute the proposal
         (try! (contract-call? proposal-contract execute target))
-        
+
         (emit-executed proposal-principal target)
         (ok true)
     )
@@ -151,7 +151,7 @@
     (begin
         (asserts! (is-governance) (err ERR_UNAUTHORIZED))
         (asserts! (is-some (map-get? queued-proposals proposal-principal)) (err ERR_NOT_QUEUED))
-        
+
         (map-delete queued-proposals proposal-principal)
         (emit-cancelled proposal-principal)
         (ok true)
@@ -167,9 +167,9 @@
         (asserts! (is-admin) (err ERR_UNAUTHORIZED))
         (var-set admin new-admin)
         (print {
-            event: "admin-transferred"
-            old-admin: tx-sender
-            new-admin: new-admin
+            event: "admin-transferred",
+            old-admin: tx-sender,
+            new-admin: new-admin,
             timestamp: burn-block-height
         })
         (ok true)
@@ -191,8 +191,8 @@
 
 (define-read-only (is-executable (proposal principal))
     (match (map-get? queued-proposals proposal)
-        proposal-data 
-        (and 
+        proposal-data
+        (and
             (not (get executed proposal-data))
             (>= burn-block-height (get eta proposal-data))
             (<= burn-block-height (+ (get eta proposal-data) GRACE_PERIOD))
@@ -204,9 +204,9 @@
 ;; Verify this timelock is ready for sovereign handoff
 (define-read-only (is-sovereign-ready)
     {
-        admin: (var-get admin)
-        has-valid-delay: (and (>= (var-get delay) MIN_DELAY) (<= (var-get delay) MAX_DELAY))
-        governance-contract: (var-get governance-contract)
+        admin: (var-get admin),
+        has-valid-delay: (and (>= (var-get delay) MIN_DELAY) (<= (var-get delay) MAX_DELAY)),
+        governance-contract: (var-get governance-contract),
         timestamp: burn-block-height
     }
 )

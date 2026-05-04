@@ -21,27 +21,24 @@
 (define-map oracle-sources
   { source: principal }
   {
-    active: bool
-    last-update: uint
-    weight: uint
-  }
+    active: bool,
+    last-update: uint,
+    weight: uint }
 )
 
 (define-map price-data
   { asset: principal }
   {
-    aggregated-price: uint
-    last-update: uint
-    source-count: uint
-  }
+    aggregated-price: uint,
+    last-update: uint,
+    source-count: uint }
 )
 
 (define-map individual-prices
-  { asset: principal source: principal }
+  { asset: principal, source: principal }
   {
-    price: uint
-    timestamp: uint
-  }
+    price: uint,
+    timestamp: uint }
 )
 
 ;; Read-Only: Get Aggregated Price (trait compliance)
@@ -49,7 +46,7 @@
 ;; @desc Returns the aggregated price for a given asset
 (define-read-only (get-price (asset principal))
   (match (map-get? price-data { asset: asset })
-    data 
+    data
       (if (> (- burn-block-height (get last-update data)) MAX_PRICE_AGE)
         (err ERR_STALE_PRICE)
         (ok (get aggregated-price data))
@@ -72,10 +69,9 @@
       (asserts! (default-to false (get active (map-get? oracle-sources { source: source }))) (err ERR_UNAUTHORIZED))
 
       ;; Update individual price
-      (map-set individual-prices { asset: asset source: source } {
-        price: price
-        timestamp: burn-block-height
-      })
+      (map-set individual-prices { asset: asset, source: source } {
+        price: price,
+        timestamp: burn-block-height })
 
       ;; Recalculate aggregated price
       (recalculate-aggregated-price asset)
@@ -91,7 +87,7 @@
 (define-private (recalculate-aggregated-price (asset principal))
   (let (
     (sources (var-get oracle-source-list))
-    (calculation (fold calculate-weighted-sum sources { asset: asset total-weighted-price: u0 total-weight: u0 valid-sources: u0 }))
+    (calculation (fold calculate-weighted-sum sources { asset: asset, total-weighted-price: u0, total-weight: u0, valid-sources: u0 }))
   )
     (if (>= (get valid-sources calculation) (var-get required-sources))
       (if (> (get total-weight calculation) u0)
@@ -100,10 +96,9 @@
         )
           (begin
             (map-set price-data { asset: asset } {
-              aggregated-price: new-aggregated-price
-              last-update: burn-block-height
-              source-count: (get valid-sources calculation)
-            })
+              aggregated-price: new-aggregated-price,
+              last-update: burn-block-height,
+              source-count: (get valid-sources calculation) })
             (ok true)
           )
         )
@@ -115,7 +110,7 @@
 )
 
 ;; Fold function for weighted sum calculation
-(define-private (calculate-weighted-sum (source principal) (acc { asset: principal total-weighted-price: uint total-weight: uint valid-sources: uint }))
+(define-private (calculate-weighted-sum (source principal) (acc { asset: principal, total-weighted-price: uint, total-weight: uint, valid-sources: uint }))
   (let (
     (source-info (unwrap! (map-get? oracle-sources { source: source }) acc))
     (price-info (map-get? individual-prices { asset: (get asset acc) source: source }))
@@ -126,11 +121,10 @@
       )
         (if (<= (- burn-block-height (get timestamp price-data-actual)) MAX_PRICE_AGE)
           {
-            asset: (get asset acc)
-            total-weighted-price: (+ (get total-weighted-price acc) (* (get price price-data-actual) (get weight source-info)))
-            total-weight: (+ (get total-weight acc) (get weight source-info))
-            valid-sources: (+ (get valid-sources acc) u1)
-          }
+            asset: (get asset acc),
+            total-weighted-price: (+ (get total-weighted-price acc) (* (get price price-data-actual) (get weight source-info))),
+            total-weight: (+ (get total-weight acc) (get weight source-info)),
+            valid-sources: (+ (get valid-sources acc) u1) }
           acc ;; Stale price
         )
       )
@@ -148,10 +142,9 @@
       true
     )
     (map-set oracle-sources { source: source } {
-      active: true
-      last-update: burn-block-height
-      weight: weight
-    })
+      active: true,
+      last-update: burn-block-height,
+      weight: weight })
     (var-set active-sources-count (+ (var-get active-sources-count) u1))
     (ok true)
   )
@@ -162,10 +155,9 @@
   (begin
     (asserts! (is-eq contract-caller (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (map-set oracle-sources { source: source } {
-      active: false
-      last-update: burn-block-height
-      weight: u0
-    })
+      active: false,
+      last-update: burn-block-height,
+      weight: u0 })
     (var-set active-sources-count (- (var-get active-sources-count) u1))
     (ok true)
   )

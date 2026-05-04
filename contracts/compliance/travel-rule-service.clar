@@ -41,7 +41,7 @@
 ;; @param beneficiary-vasp: The VASP ID of the recipient
 ;; @param amount: The transaction amount
 ;; @param token: The token being transferred
-(define-public (log-travel-rule-data 
+(define-public (log-travel-rule-data
     (transaction-ref (buff 32))
     (ivms101-hash (buff 32))
     (originator-vasp (string-ascii 20))
@@ -53,13 +53,13 @@
     (asserts! (or (is-vasp-registered originator-vasp) (is-admin)) (err ERR_UNAUTHORIZED))
     (map-set travel-rule-logs transaction-ref ivms101-hash)
     (print {
-      event: "travel-rule-log"
-      tx-ref: transaction-ref
-      data-hash: ivms101-hash
-      originator: originator-vasp
-      beneficiary: beneficiary-vasp
-      amount: amount
-      token: token
+      event: "travel-rule-log",
+      tx-ref: transaction-ref,
+      data-hash: ivms101-hash,
+      originator: originator-vasp,
+      beneficiary: beneficiary-vasp,
+      amount: amount,
+      token: token,
       timestamp: burn-block-height
     })
     (ok true)

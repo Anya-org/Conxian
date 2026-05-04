@@ -10,7 +10,7 @@
     ()
     (
       response       (optional {
-      user: principal
+      user: principal,
       amount: uint
     })
       uint

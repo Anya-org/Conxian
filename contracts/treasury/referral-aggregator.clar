@@ -10,7 +10,7 @@
 (define-constant ERR_NOT_FOUND (err u404))
 
 ;; Roles & Config
-(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var admin principal tx-sender)
 (define-data-var worker-share-bps uint u9500) ;; 95%
 (define-data-var referrer-share-bps uint u500) ;; 5%
 
@@ -22,7 +22,16 @@
     (begin
         (asserts! (or (is-eq tx-sender worker) (is-eq tx-sender (var-get admin))) ERR_UNAUTHORIZED)
         (map-set worker-referrals worker referrer)
-        (print { event: "referral-registered" worker: worker referrer: referrer })
+        (print { event: "referral-registered", worker: worker, referrer: referrer })
+        (ok true)
+    )
+)
+
+;; @desc Update the admin principal
+(define-public (set-admin (new-admin principal))
+    (begin
+        (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+        (var-set admin new-admin)
         (ok true)
     )
 )
@@ -38,14 +47,14 @@
             (asserts! (> amount u0) ERR_INVALID_AMOUNT)
             ;; Pay Worker
             (unwrap! (stx-transfer? worker-net tx-sender worker) ERR_TRANSFER_FAILED)
-            
+
             ;; Pay Referrer if exists
             (if (is-some referrer)
                 (unwrap! (stx-transfer? referrer-fee tx-sender (unwrap! referrer ERR_NOT_FOUND)) ERR_TRANSFER_FAILED)
                 true
             )
-            
-            (print { event: "payment-disbursed-stx" worker: worker amount: worker-net referrer: referrer referrer-fee: referrer-fee })
+
+            (print { event: "payment-disbursed-stx", worker: worker, amount: worker-net, referrer: referrer, referrer-fee: referrer-fee })
             (ok true)
         )
     )
@@ -62,14 +71,14 @@
             (asserts! (> amount u0) ERR_INVALID_AMOUNT)
             ;; Pay Worker
             (unwrap! (contract-call? token transfer worker-net tx-sender worker none) ERR_TRANSFER_FAILED)
-            
+
             ;; Pay Referrer if exists
             (if (is-some referrer)
                 (unwrap! (contract-call? token transfer referrer-fee tx-sender (unwrap! referrer ERR_NOT_FOUND) none) ERR_TRANSFER_FAILED)
                 true
             )
-            
-            (print { event: "payment-disbursed-sip010" worker: worker amount: worker-net referrer: referrer referrer-fee: referrer-fee })
+
+            (print { event: "payment-disbursed-sip010", worker: worker, amount: worker-net, referrer: referrer, referrer-fee: referrer-fee })
             (ok true)
         )
     )

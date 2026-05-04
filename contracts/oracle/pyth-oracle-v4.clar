@@ -3,7 +3,7 @@
 
 (impl-trait .pyth-traits.pyth-core-trait)
 
-(define-map price-feeds principal { price: uint conf: uint ema-price: uint ema-conf: uint expo: int timestamp: uint })
+(define-map price-feeds principal { price: uint, conf: uint, ema-price: uint, ema-conf: uint, expo: int, timestamp: uint })
 
 ;; --- Pyth Core Implementation ---
 
@@ -11,7 +11,7 @@
   (begin
     ;; In a real contract this would verify Merkle proofs / VAAs
     ;; For simulation we assume the update is valid
-    (print { event: "pyth-update-verified" data-len: (len update-data) })
+    (print { event: "pyth-update-verified", data-len: (len update-data) })
     (ok (list u100000000)) ;; Return 8-decimal base price
   )
 )
@@ -30,7 +30,7 @@
 ;; Admin function to seed prices for testing
 (define-public (set-mock-price (feed-id principal) (price uint))
   (begin
-    (map-set price-feeds feed-id { price: price conf: u100 ema-price: price ema-conf: u100 expo: -8 timestamp: burn-block-height })
+    (map-set price-feeds feed-id { price: price, conf: u100, ema-price: price, ema-conf: u100, expo: -8, timestamp: burn-block-height })
     (ok true)
   )
 )

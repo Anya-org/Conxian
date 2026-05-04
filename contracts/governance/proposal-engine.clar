@@ -33,6 +33,7 @@
 ;; @param start-block: The block height at which voting begins.
 ;; @param end-block: The block height at which voting ends.
 ;; @returns (response uint uint) The ID of the newly created proposal.
+;; @desc Submits a new parameter adjustment proposal.
 (define-public (submit-proposal
     (proposal-contract <proposal-trait>)
     (council-id uint)
@@ -62,6 +63,7 @@
 ;; @param proposal-id: The ID of the proposal to vote on.
 ;; @param support: A boolean indicating the voter's choice (true for 'yes' false for 'no').
 ;; @returns (response bool uint)
+;; @desc Casts a vote on an active proposal.
 (define-public (vote
     (proposal-id uint)
     (support bool)
@@ -124,7 +126,7 @@
 (define-public (set-voting-period (new-period uint))
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
-    (print { event: "set-voting-period" period: new-period })
+    (print { event: "set-voting-period", period: new-period })
     (ok true)
   )
 )
@@ -135,7 +137,7 @@
 (define-public (set-quorum-percentage (new-quorum uint))
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
-    (print { event: "set-quorum-percentage" quorum: new-quorum })
+    (print { event: "set-quorum-percentage", quorum: new-quorum })
     (ok true)
   )
 )
@@ -147,7 +149,7 @@
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
     (var-set proposal-executor-contract new-executor)
-    (print { event: "set-proposal-executor" executor: new-executor })
+    (print { event: "set-proposal-executor", executor: new-executor })
     (ok true)
   )
 )
@@ -158,7 +160,7 @@
 (define-public (transfer-ownership (new-owner principal))
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
-    (print { event: "transfer-ownership" owner: new-owner })
+    (print { event: "transfer-ownership", owner: new-owner })
     (ok true)
   )
 )
@@ -169,7 +171,7 @@
 (define-public (set-protocol-coordinator (new-coordinator principal))
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
-    (print { event: "set-protocol-coordinator" coordinator: new-coordinator })
+    (print { event: "set-protocol-coordinator", coordinator: new-coordinator })
     (ok true)
   )
 )

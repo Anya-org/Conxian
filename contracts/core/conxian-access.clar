@@ -17,7 +17,7 @@
 (define-data-var initialized bool false)
 (define-data-var timelock-principal principal tx-sender)
 
-(define-map roles { user: principal role: uint } bool)
+(define-map roles { user: principal, role: uint } bool)
 
 ;; --- Internal ---
 
@@ -33,7 +33,7 @@
     (var-set contract-owner new-owner)
     (var-set initialized true)
     ;; Grant admin role to owner
-    (map-set roles { user: new-owner role: ROLE_ADMIN } true)
+    (map-set roles { user: new-owner, role: ROLE_ADMIN } true)
     (ok true)
   )
 )
@@ -41,14 +41,14 @@
 (define-public (has-role (user principal) (role uint))
   (ok (or
     (is-eq user (var-get contract-owner))
-    (default-to false (map-get? roles { user: user role: role }))
+    (default-to false (map-get? roles { user: user, role: role }))
   ))
 )
 
 (define-public (grant-role (user principal) (role uint) (msg (buff 32)) (sig (buff 64)) (pub (buff 33)))
   (begin
     (asserts! (unwrap-panic (has-role tx-sender ROLE_ADMIN)) ERR_UNAUTHORIZED)
-    (map-set roles { user: user role: role } true)
+    (map-set roles { user: user, role: role } true)
     (ok true)
   )
 )
@@ -56,7 +56,7 @@
 (define-public (revoke-role (user principal) (role uint) (msg (buff 32)) (sig (buff 64)) (pub (buff 33)))
   (begin
     (asserts! (unwrap-panic (has-role tx-sender ROLE_ADMIN)) ERR_UNAUTHORIZED)
-    (map-delete roles { user: user role: role })
+    (map-delete roles { user: user, role: role })
     (ok true)
   )
 )

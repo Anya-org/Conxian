@@ -12,7 +12,7 @@
 (define-map strategies
   principal
   {
-    risk-score: uint
+    risk-score: uint,
     active: bool
   }
 )
@@ -35,7 +35,7 @@
 (define-public (set-strategy (vault principal) (risk uint))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (map-set strategies vault { risk-score: risk active: true })
+    (map-set strategies vault { risk-score: risk, active: true })
     (ok true)
   )
 )

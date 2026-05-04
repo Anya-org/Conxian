@@ -24,7 +24,7 @@
 (define-map position-health
   uint
   {
-    health-factor: uint
+    health-factor: uint,
     last-update: uint
   }
 )
@@ -68,7 +68,7 @@
   )
     (begin
       (map-set position-health position-id {
-        health-factor: hf
+        health-factor: hf,
         last-update: burn-block-height
       })
       (ok hf)
@@ -107,16 +107,16 @@
       ) ERR_NOT_AUTHORIZED)
 
       (asserts! (< hf adjusted-threshold) ERR_HEALTHY_POSITION)
-      
+
       (try! (contract-call? .dimensional-core liquidate-position owner position-id .oracle-aggregator))
 
       (map-delete position-health position-id)
 
       (print {
-        event: "risk-triggered-liquidation"
-        position-id: position-id
-        health-factor: hf
-        system-risk: current-risk
+        event: "risk-triggered-liquidation",
+        position-id: position-id,
+        health-factor: hf,
+        system-risk: current-risk,
         threshold: adjusted-threshold
       })
       (ok true)

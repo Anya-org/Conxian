@@ -40,7 +40,7 @@
     (amount uint)
     (recipient principal))
   (let (
-    (pool-data { amount-out: amount fee-collected: u0 }) ;; Placeholder for simulation
+    (pool-data { amount-out: amount, fee-collected: u0 }) ;; Placeholder for simulation
   )
     (begin
       (asserts! (var-get is-active) ERR_UNAUTHORIZED)
@@ -49,7 +49,7 @@
       ;; (contract-call? .alex-vault ...) or similar
 
       ;; For Conxian Universal Router compliance we must return the results
-      (ok { amount-out: amount fee-collected: u30 }) ;; Standard 30bps fee
+      (ok { amount-out: amount, fee-collected: u30 }) ;; Standard 30bps fee
     )
   )
 )
@@ -90,7 +90,7 @@
 
 ;; @desc Retrieves health telemetry for the ALEX integration.
 (define-public (get-csf-health)
-  (ok { tvl: u100000000000 utilization: u50 is-active: (var-get is-active) })
+  (ok { tvl: u100000000000, utilization: u50, is-active: (var-get is-active) })
 )
 
 ;; --- Admin ---
@@ -120,7 +120,7 @@
 ;; @desc Collect accumulated protocol fees from the ALEX integration.
 (define-public (collect-protocol-fees (token-trait <sip-010-ft-trait>))
   (begin
-    (print { event: "collect-fees-triggered" caller: contract-caller })
+    (print { event: "collect-fees-triggered", caller: contract-caller })
     (ok true)
   )
 )

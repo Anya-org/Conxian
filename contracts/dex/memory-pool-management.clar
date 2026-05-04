@@ -24,19 +24,19 @@
 (define-data-var cleanup-frequency uint u100)
 
 ;; Storage maps
-(define-map memory-pools { pool-id: uint } { 
-  pool-size: uint
-  allocated-slots: uint
-  free-slots: uint
-  last-cleanup: uint
+(define-map memory-pools { pool-id: uint } {
+  pool-size: uint,
+  allocated-slots: uint,
+  free-slots: uint,
+  last-cleanup: uint,
   pool-type: (string-ascii 16)
 })
 
-(define-map memory-allocations { pool-id: uint slot-id: uint } {
-  allocated-to: principal
-  allocation-size: uint
-  allocation-time: uint
-  last-access: uint
+(define-map memory-allocations { pool-id: uint, slot-id: uint } {
+  allocated-to: principal,
+  allocation-size: uint,
+  allocation-time: uint,
+  last-access: uint,
   data: (buff 256)
 })
 
@@ -68,20 +68,20 @@
   (begin
     (asserts! (>= pool-size MIN_POOL_SIZE) (err ERR_INVALID_POOL_SIZE))
     (asserts! (<= pool-size MAX_POOL_SIZE) (err ERR_INVALID_POOL_SIZE))
-    
+
     (let ((pool-id (+ (var-get total-pools-allocated) u1)))
       (map-set memory-pools { pool-id: pool-id } {
-        pool-size: pool-size
-        allocated-slots: u0
-        free-slots: pool-size
-        last-cleanup: burn-block-height
+        pool-size: pool-size,
+        allocated-slots: u0,
+        free-slots: pool-size,
+        last-cleanup: burn-block-height,
         pool-type: pool-type
       })
-      
+
       (var-set total-pools-allocated pool-id)
       (var-set total-memory-allocated (+ (var-get total-memory-allocated) pool-size))
-      
-      (print { event: "pool-created" pool-id: pool-id pool-size: pool-size pool-type: pool-type })
+
+      (print { event: "pool-created", pool-id: pool-id, pool-size: pool-size, pool-type: pool-type })
       (ok pool-id)
     )
   )
@@ -92,29 +92,29 @@
   (begin
     (asserts! (> allocation-size u0) (err ERR_INVALID_ALLOCATION))
     (asserts! (<= allocation-size MAX_ALLOCATION_SIZE) (err ERR_INVALID_ALLOCATION))
-    
+
     (let ((pool (unwrap! (map-get? memory-pools { pool-id: pool-id }) (err ERR_INVALID_ALLOCATION))))
       (asserts! (> (get free-slots pool) u0) (err ERR_POOL_FULL))
-      
+
       (let ((slot-id (+ (get allocated-slots pool) u1)))
-        (map-set memory-allocations { pool-id: pool-id slot-id: slot-id } {
-          allocated-to: tx-sender
-          allocation-size: allocation-size
-          allocation-time: burn-block-height
-          last-access: burn-block-height
+        (map-set memory-allocations { pool-id: pool-id, slot-id: slot-id } {
+          allocated-to: tx-sender,
+          allocation-size: allocation-size,
+          allocation-time: burn-block-height,
+          last-access: burn-block-height,
           data: initial-data
         })
-        
+
         (map-set memory-pools { pool-id: pool-id } {
-          pool-size: (get pool-size pool)
-          allocated-slots: slot-id
-          free-slots: (- (get free-slots pool) u1)
-          last-cleanup: (get last-cleanup pool)
+          pool-size: (get pool-size pool),
+          allocated-slots: slot-id,
+          free-slots: (- (get free-slots pool) u1),
+          last-cleanup: (get last-cleanup pool),
           pool-type: (get pool-type pool)
         })
 
-        (print { event: "memory-allocated" pool-id: pool-id slot-id: slot-id principal: tx-sender size: allocation-size })
-        (ok { pool-id: pool-id slot-id: slot-id })
+        (print { event: "memory-allocated", pool-id: pool-id, slot-id: slot-id, principal: tx-sender, size: allocation-size })
+        (ok { pool-id: pool-id, slot-id: slot-id })
       )
     )
   )
@@ -123,21 +123,21 @@
 ;; @desc Deallocate a slot from a memory pool
 (define-public (deallocate-memory (pool-id uint) (slot-id uint))
   (begin
-    (let ((alloc (unwrap! (map-get? memory-allocations { pool-id: pool-id slot-id: slot-id }) (err ERR_INVALID_ALLOCATION))))
+    (let ((alloc (unwrap! (map-get? memory-allocations { pool-id: pool-id, slot-id: slot-id }) (err ERR_INVALID_ALLOCATION))))
       (asserts! (is-eq (get allocated-to alloc) tx-sender) (err ERR_UNAUTHORIZED))
-      
-      (map-delete memory-allocations { pool-id: pool-id slot-id: slot-id })
-      
+
+      (map-delete memory-allocations { pool-id: pool-id, slot-id: slot-id })
+
       (let ((pool (unwrap-panic (map-get? memory-pools { pool-id: pool-id }))))
         (map-set memory-pools { pool-id: pool-id } {
-          pool-size: (get pool-size pool)
-          allocated-slots: (- (get allocated-slots pool) u1)
-          free-slots: (+ (get free-slots pool) u1)
-          last-cleanup: (get last-cleanup pool)
+          pool-size: (get pool-size pool),
+          allocated-slots: (- (get allocated-slots pool) u1),
+          free-slots: (+ (get free-slots pool) u1),
+          last-cleanup: (get last-cleanup pool),
           pool-type: (get pool-type pool)
         })
-        
-        (print { event: "memory-deallocated" pool-id: pool-id slot-id: slot-id principal: tx-sender })
+
+        (print { event: "memory-deallocated", pool-id: pool-id, slot-id: slot-id, principal: tx-sender })
         (ok true)
       )
     )

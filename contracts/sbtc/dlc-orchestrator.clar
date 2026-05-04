@@ -21,7 +21,7 @@
     (let (
       (bond-id (try! (contract-call? bond-contract initialize-bond amount rate maturity token)))
     )
-      (print { event: "bond-launch-orchestrated" id: bond-id contract: (contract-of bond-contract) })
+      (print { event: "bond-launch-orchestrated", id: bond-id, contract: (contract-of bond-contract) })
       (ok bond-id)
     )
   )
@@ -58,5 +58,5 @@
 
 ;; @desc Get protocol status for DLC orchestrator
 (define-read-only (get-protocol-status)
-  (ok { compliant: true version: "v1.1.0-Apex" orchestrator: tx-sender })
+  (ok { compliant: true, version: "v1.1.0-Apex", orchestrator: tx-sender })
 )

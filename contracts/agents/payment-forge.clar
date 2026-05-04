@@ -23,7 +23,7 @@
 ;; Inspired by HTTP 402: Payment Required. AI Agent triggers instant settlement.
 (define-public (trigger-x402-settlement (amount uint) (token <sip-010-trait>) (signature (buff 65)))
   (let (
-    (msg-hash (sha256 (unwrap-panic (to-consensus-buff? { amount: amount requester: tx-sender epoch: burn-block-height }))))
+    (msg-hash (sha256 (unwrap-panic (to-consensus-buff? { amount: amount, requester: tx-sender, epoch: burn-block-height }))))
   )
     (begin
       ;; 1. Signature Verification (Placeholder: In production verify against Sovereign DID)
@@ -32,7 +32,7 @@
       ;; 2. Execute Transfer to SFC Vault
       (try! (contract-call? token transfer amount tx-sender .fiscal-vault-oracle none))
 
-      (print { event: "x402-settlement-executed" amount: amount token: (contract-of token) actor: tx-sender })
+      (print { event: "x402-settlement-executed", amount: amount, token: (contract-of token) actor: tx-sender })
       (ok true)
     )
   )
@@ -44,7 +44,7 @@
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
     (map-set settlement-registry tx-id iso-xml-hash)
-    (print { event: "iso-20022-authorized" tx-id: tx-id xml-hash: iso-xml-hash })
+    (print { event: "iso-20022-authorized", tx-id: tx-id, xml-hash: iso-xml-hash })
     (ok true)
   )
 )

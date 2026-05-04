@@ -16,9 +16,9 @@
 (define-constant RESERVE_FACTOR u1000)
 
 ;; --- Storage ---
-(define-map reserve-data principal { total-deposits: uint total-borrows: uint total-reserves: uint decimals: uint last-updated: uint })
-(define-map deposits { asset: principal user: principal } uint)
-(define-map borrows { asset: principal user: principal } uint)
+(define-map reserve-data principal { total-deposits: uint, total-borrows: uint, total-reserves: uint, decimals: uint, last-updated: uint })
+(define-map deposits { asset: principal, user: principal } uint)
+(define-map borrows { asset: principal, user: principal } uint)
 
 (define-data-var admin principal tx-sender)
 (define-data-var initialized bool false)
@@ -43,7 +43,7 @@
     (asset (contract-of asset-trait))
     (reserve (match (map-get? reserve-data asset)
                res-val res-val
-               { total-deposits: u0 total-borrows: u0 total-reserves: u0 decimals: (unwrap! (contract-call? asset-trait get-decimals) (err ERR_INTERNAL)) last-updated: burn-block-height }))
+               { total-deposits: u0, total-borrows: u0, total-reserves: u0, decimals: (unwrap! (contract-call? asset-trait get-decimals) (err ERR_INTERNAL)) last-updated: burn-block-height }))
   )
     (begin
       (asserts! (not (is-paused)) (err ERR_PAUSED))
@@ -53,7 +53,7 @@
         (var-set assets-list (unwrap! (as-max-len? (append (var-get assets-list) asset) u20) (err ERR_INTERNAL)))
         true
       )
-      (map-set deposits { asset: asset user: tx-sender } (+ (default-to u0 (map-get? deposits { asset: asset user: tx-sender })) amount))
+      (map-set deposits { asset: asset, user: tx-sender } (+ (default-to u0 (map-get? deposits { asset: asset, user: tx-sender })) amount))
       (map-set reserve-data asset (merge reserve { total-deposits: (+ (get total-deposits reserve) amount) }))
       (ok true)
     )
@@ -69,7 +69,7 @@
     (begin
       (asserts! (not (is-paused)) (err ERR_PAUSED))
       (asserts! (<= amount (get total-deposits reserve)) (err ERR_INSUFFICIENT_LIQUIDITY))
-      (map-set borrows { asset: asset user: caller } (+ (default-to u0 (map-get? borrows { asset: asset user: caller })) amount))
+      (map-set borrows { asset: asset, user: caller } (+ (default-to u0 (map-get? borrows { asset: asset, user: caller })) amount))
       (map-set reserve-data asset (merge reserve { total-borrows: (+ (get total-borrows reserve) amount) }))
       (let ((hf (unwrap! (calculate-account-health caller) (err ERR_INTERNAL))))
         (asserts! (>= hf u10000) (err ERR_INSUFFICIENT_COLLATERAL))
@@ -87,19 +87,19 @@
     (interest-portion (/ (* amount RESERVE_FACTOR) u10000))
     (principal-portion (if (>= amount interest-portion) (- amount interest-portion) u0))
     (current-borrows (get total-borrows reserve))
-    (user-borrows (default-to u0 (map-get? borrows { asset: asset user: tx-sender })))
+    (user-borrows (default-to u0 (map-get? borrows { asset: asset, user: tx-sender })))
   )
     (begin
       (try! (contract-call? asset-trait transfer amount tx-sender (as-contract tx-sender) none))
       (let ((fee-res (contract-call? .revenue-automation collect-revenue asset-trait amount tx-sender)))
-        (print { event: "lending-fee-processed" success: (is-ok fee-res) })
+        (print { event: "lending-fee-processed", success: (is-ok fee-res) })
       )
       (let ((bme-res (contract-call? .bme-engine register-fee-activity (as-contract tx-sender) interest-portion)))
-        (print { event: "bme-report-processed" success: (is-ok bme-res) })
+        (print { event: "bme-report-processed", success: (is-ok bme-res) })
       )
-      (map-set borrows { asset: asset user: tx-sender } (if (>= user-borrows principal-portion) (- user-borrows principal-portion) u0))
+      (map-set borrows { asset: asset, user: tx-sender } (if (>= user-borrows principal-portion) (- user-borrows principal-portion) u0))
       (map-set reserve-data asset (merge reserve {
-        total-borrows: (if (>= current-borrows principal-portion) (- current-borrows principal-portion) u0)
+        total-borrows: (if (>= current-borrows principal-portion) (- current-borrows principal-portion) u0),
         total-reserves: (+ (get total-reserves reserve) interest-portion)
       }))
       (ok true)
@@ -110,14 +110,14 @@
 (define-public (withdraw (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
-    (user-deposit (default-to u0 (map-get? deposits { asset: asset user: tx-sender })))
+    (user-deposit (default-to u0 (map-get? deposits { asset: asset, user: tx-sender })))
     (reserve (unwrap! (map-get? reserve-data asset) (err ERR_NOT_FOUND)))
     (recipient tx-sender)
   )
     (begin
       (asserts! (not (is-paused)) (err ERR_PAUSED))
       (asserts! (>= user-deposit amount) (err ERR_INVALID_AMOUNT))
-      (map-set deposits { asset: asset user: tx-sender } (- user-deposit amount))
+      (map-set deposits { asset: asset, user: tx-sender } (- user-deposit amount))
       (let ((hf (unwrap! (calculate-account-health tx-sender) (err ERR_INTERNAL))))
         (begin
           (asserts! (>= hf u10000) (err ERR_INSUFFICIENT_COLLATERAL))
@@ -133,7 +133,7 @@
 ;; Read-only Functions
 (define-read-only (calculate-account-health (user principal))
   (let (
-    (summary (fold sum-user-asset-values (var-get assets-list) { user: user collateral-value: u0 debt-value: u0 }))
+    (summary (fold sum-user-asset-values (var-get assets-list) { user: user, collateral-value: u0, debt-value: u0 }))
   )
     (ok (if (is-eq (get debt-value summary) u0)
       u100000
@@ -142,11 +142,11 @@
   )
 )
 
-(define-private (sum-user-asset-values (asset principal) (acc { user: principal collateral-value: uint debt-value: uint }))
+(define-private (sum-user-asset-values (asset principal) (acc { user: principal, collateral-value: uint, debt-value: uint }))
   (let (
     (user (get user acc))
-    (deposit-amt (default-to u0 (map-get? deposits { asset: asset user: user })))
-    (borrow-amt (default-to u0 (map-get? borrows { asset: asset user: user })))
+    (deposit-amt (default-to u0 (map-get? deposits { asset: asset, user: user })))
+    (borrow-amt (default-to u0 (map-get? borrows { asset: asset, user: user })))
     (price-res (contract-call? .oracle-aggregator get-price asset))
     (price (if (is-ok price-res) (unwrap-panic price-res) u100000000))
     (reserve-opt (map-get? reserve-data asset))
@@ -158,7 +158,7 @@
         (asset-collateral-value (/ (* deposit-amt price COLLATERAL_FACTOR) (* (pow u10 decimals) u10000)))
         (asset-debt-value (/ (* borrow-amt price) (pow u10 decimals)))
       )
-        { user: user collateral-value: (+ (get collateral-value acc) asset-collateral-value) debt-value: (+ (get debt-value acc) asset-debt-value) }
+        { user: user, collateral-value: (+ (get collateral-value acc) asset-collateral-value) debt-value: (+ (get debt-value acc) asset-debt-value) }
       )
       acc
     )
@@ -166,7 +166,7 @@
 )
 
 (define-read-only (get-user-supply-balance (user principal) (asset principal))
-  (some (default-to u0 (map-get? deposits { asset: asset user: user })))
+  (some (default-to u0 (map-get? deposits { asset: asset, user: user })))
 )
 
 (define-read-only (get-total-deposits (asset principal))

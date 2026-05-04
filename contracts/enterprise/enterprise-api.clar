@@ -8,7 +8,7 @@
 (define-map institutional-accounts
     principal
     {
-        tier: uint
+        tier: uint,
         kyc-status: bool
     }
 )
@@ -18,7 +18,7 @@
 (define-public (register-account (tier uint))
     (begin
         (map-set institutional-accounts tx-sender {
-            tier: tier
+            tier: tier,
             kyc-status: false
         })
         (ok true)
@@ -32,7 +32,7 @@
     (begin
         ;; Add authorization logic here
         (map-set institutional-accounts user {
-            tier: (get tier (unwrap! (map-get? institutional-accounts user) (err ERR_ACCOUNT_NOT_FOUND)))
+            tier: (get tier (unwrap! (map-get? institutional-accounts user) (err ERR_ACCOUNT_NOT_FOUND))),
             kyc-status: status
         })
         (ok true)
