@@ -138,16 +138,58 @@ def _load_branch_meta(repo_slug: str, branch: str) -> BranchMeta:
     )
 
 
-def _ref_matches_rule_patterns(*, ref: str, includes: list[str], excludes: list[str]) -> bool:
+def _load_repo_default_branch(repo_slug: str) -> str:
+    path = f"/repos/{repo_slug}"
+    payload = _github_json(path)
+    if not isinstance(payload, dict):
+        raise RuntimeError(f"Unexpected repository metadata payload: {type(payload)}")
+
+    default_branch = payload.get("default_branch")
+    if not isinstance(default_branch, str) or not default_branch:
+        raise RuntimeError("Repository metadata did not include a default branch")
+
+    return default_branch
+
+
+def _include_pattern_matches_ref(*, ref: str, pattern: str, default_branch: str | None) -> bool:
+    if pattern == "~ALL":
+        return True
+
+    if pattern == "~DEFAULT_BRANCH":
+        if not default_branch:
+            return False
+        return ref == f"refs/heads/{default_branch}"
+
+    return fnmatch.fnmatch(ref, pattern)
+
+
+def _ref_matches_rule_patterns(
+    *,
+    ref: str,
+    includes: list[str],
+    excludes: list[str],
+    default_branch: str | None,
+) -> bool:
     if not includes:
         return False
 
-    included = any(fnmatch.fnmatch(ref, pattern) for pattern in includes)
+    included = any(
+        _include_pattern_matches_ref(
+            ref=ref,
+            pattern=pattern,
+            default_branch=default_branch,
+        )
+        for pattern in includes
+    )
     excluded = any(fnmatch.fnmatch(ref, pattern) for pattern in excludes)
     return included and not excluded
 
 
-def _branch_covered_by_active_ruleset(rulesets: list[dict[str, Any]], branch: str) -> bool:
+def _branch_covered_by_active_ruleset(
+    rulesets: list[dict[str, Any]],
+    branch: str,
+    default_branch: str | None,
+) -> bool:
     ref = f"refs/heads/{branch}"
 
     for ruleset in rulesets:
@@ -180,6 +222,7 @@ def _branch_covered_by_active_ruleset(rulesets: list[dict[str, Any]], branch: st
             ref=ref,
             includes=include_patterns,
             excludes=exclude_patterns,
+            default_branch=default_branch,
         ):
             return True
 
@@ -208,6 +251,13 @@ def verify() -> None:
 
     rulesets: list[dict[str, Any]] = []
     rulesets_error: str | None = None
+    default_branch: str | None = None
+    default_branch_error: str | None = None
+
+    try:
+        default_branch = _load_repo_default_branch(repo_slug)
+    except Exception as e:
+        default_branch_error = str(e)
 
     try:
         payload = _github_json(f"/repos/{repo_slug}/rulesets?includes_parents=true")
@@ -223,6 +273,16 @@ def verify() -> None:
     except Exception as e:
         rulesets_error = str(e)
 
+    if default_branch_error:
+        if rulesets_error:
+            rulesets_error = (
+                f"{rulesets_error}; unable to resolve repository default branch: {default_branch_error}"
+            )
+        else:
+            rulesets_error = (
+                f"unable to resolve repository default branch: {default_branch_error}"
+            )
+
     for branch in ("staged", "main"):
         meta = branch_meta.get(branch)
         if not meta:
@@ -231,7 +291,7 @@ def verify() -> None:
         if meta.protected:
             continue
 
-        if _branch_covered_by_active_ruleset(rulesets, branch):
+        if _branch_covered_by_active_ruleset(rulesets, branch, default_branch):
             continue
 
         if rulesets_error:
