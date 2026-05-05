@@ -14,7 +14,7 @@
 ;; State
 (define-data-var admin principal tx-sender)
 (define-map settled-intents (buff 32) bool)
-(define-map registered-dapps principal { metadata-uri: (string-ascii 256) registered-at: uint })
+(define-map registered-dapps principal { metadata-uri: (string-ascii 256), registered-at: uint })
 
 ;; --- Implementation ---
 

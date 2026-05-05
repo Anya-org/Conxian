@@ -122,7 +122,7 @@
           for-votes: (if support
             (+ (get for-votes proposal) weight)
             (get for-votes proposal)
-          )
+          ),
           against-votes: (if (not support)
             (+ (get against-votes proposal) weight)
             (get against-votes proposal)

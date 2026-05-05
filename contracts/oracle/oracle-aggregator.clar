@@ -130,7 +130,7 @@
 ;; --- Private Helpers ---
 (define-private (aggregate-prices (source principal) (acc { asset: principal, total-price: uint, count: uint, min-block: uint }))
   (let (
-    (submission (map-get? source-submissions { asset: (get asset acc) source: source }))
+    (submission (map-get? source-submissions { asset: (get asset acc), source: source }))
   )
     (if (is-some submission)
       (let (
