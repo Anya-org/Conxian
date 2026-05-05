@@ -64,15 +64,15 @@
   (begin
     (asserts! (> amount u0) (err ERR_ZERO_AMOUNT))
     (asserts! (>= amount MIN_LIQUIDITY) (err ERR_INSUFFICIENT_BALANCE))
-    
+
     (let ((existing-position (default-to
                                { liquidity-amount: u0, pool-shares: u0, last-deposit: u0, rewards-earned: u0, rewards-claimed: u0, fee-tier: u0 }
                                (map-get? liquidity-positions { pool: pool, provider: tx-sender }))))
-      
+
       ;; Update position
       (map-set liquidity-positions { pool: pool, provider: tx-sender } {
         liquidity-amount: (+ (get liquidity-amount existing-position) amount),
-        pool-shares: (+ (get pool-shares existing-position) amount), ;; Simplified share calculation
+        pool-shares: (+ (get pool-shares existing-position) amount) ;; Simplified share calculation,
         last-deposit: burn-block-height,
         rewards-earned: (get rewards-earned existing-position),
         rewards-claimed: (get rewards-claimed existing-position),
@@ -100,10 +100,10 @@
 (define-public (remove-liquidity (pool principal) (amount uint))
   (let ((position (unwrap! (map-get? liquidity-positions { pool: pool, provider: tx-sender }) (err ERR_NOT_PROVIDER))))
     (asserts! (<= amount (get liquidity-amount position)) (err ERR_INSUFFICIENT_BALANCE))
-    
+
     (map-set liquidity-positions { pool: pool, provider: tx-sender } {
       liquidity-amount: (- (get liquidity-amount position) amount),
-      pool-shares: (- (get pool-shares position) amount), ;; Simplified
+      pool-shares: (- (get pool-shares position) amount) ;; Simplified,
       last-deposit: (get last-deposit position),
       rewards-earned: (get rewards-earned position),
       rewards-claimed: (get rewards-claimed position),
@@ -132,7 +132,7 @@
     (unclaimed (- (get rewards-earned position) (get rewards-claimed position)))
   )
     (asserts! (> unclaimed u0) (err ERR_ZERO_AMOUNT))
-    
+
     (map-set liquidity-positions { pool: pool, provider: tx-sender } {
       liquidity-amount: (get liquidity-amount position),
       pool-shares: (get pool-shares position),

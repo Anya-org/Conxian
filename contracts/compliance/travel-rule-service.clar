@@ -41,7 +41,7 @@
 ;; @param beneficiary-vasp: The VASP ID of the recipient
 ;; @param amount: The transaction amount
 ;; @param token: The token being transferred
-(define-public (log-travel-rule-data 
+(define-public (log-travel-rule-data
     (transaction-ref (buff 32))
     (ivms101-hash (buff 32))
     (originator-vasp (string-ascii 20))

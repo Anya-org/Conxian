@@ -40,9 +40,9 @@
   cooldown-end: uint
 })
 
-(define-map vault-balances { vault-id: (buff 20), token: principal } uint)
+(define-map vault-balances { vault-id: (buff 20) token: principal } uint)
 
-(define-map user-vaults { user: principal } { 
+(define-map user-vaults { user: principal } {
   vault-ids: (list 10 (buff 20)),
   total-vaults: uint,
   active-vaults: uint,
@@ -101,10 +101,10 @@
 (define-public (create-vault (vault-type (string-ascii 32)) (tokens (list 10 principal)) (metadata (string-ascii 256)))
   (begin
     (asserts! (var-get vault-system-active) (err ERR_VAULT_NOT_ACTIVE))
-    
+
     (let ((vault-id (hash160 0x00)))
       (asserts! (is-none (map-get? vaults { vault-id: vault-id })) (err ERR_VAULT_ALREADY_EXISTS))
-      
+
       (map-set vaults { vault-id: vault-id } {
         owner: tx-sender,
         vault-type: vault-type,
@@ -115,7 +115,7 @@
         metadata: metadata,
         cooldown-end: u0
       })
-      
+
       (var-set total-vaults (+ (var-get total-vaults) u1))
       (print { event: "vault-created", vault-id: vault-id, owner: tx-sender, vault-type: vault-type, timestamp: burn-block-height })
       (ok vault-id)
@@ -136,7 +136,7 @@
     (asserts! (>= amount MIN_DEPOSIT) (err ERR_INVALID_AMOUNT))
 
     (try! (contract-call? token-trait transfer amount tx-sender (as-contract tx-sender) none))
-    
+
     (let ((current-balance (default-to u0 (map-get? vault-balances { vault-id: vault-id, token: token }))))
       (map-set vault-balances { vault-id: vault-id, token: token } (+ current-balance amount))
       (var-set total-deposits (+ (var-get total-deposits) u1))
@@ -163,7 +163,7 @@
     (asserts! true (err ERR_UNAUTHORIZED_ACCESS))
 
     (try! (as-contract (contract-call? token-trait transfer amount (as-contract tx-sender) (get owner vault-info) none)))
-    
+
     (map-set vault-balances { vault-id: vault-id, token: token } (- current-balance amount))
     (var-set total-withdrawals (+ (var-get total-withdrawals) u1))
     (print { event: "vault-withdrawn", vault-id: vault-id, token: token, amount: amount, timestamp: burn-block-height })

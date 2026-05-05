@@ -16,10 +16,10 @@
 
 ;; --- CSF Trait Implementation ---
 
-(define-public (execute-csf-swap 
-    (token-in <sip-010-trait>) 
-    (token-out <sip-010-trait>) 
-    (amount-in uint) 
+(define-public (execute-csf-swap
+    (token-in <sip-010-trait>)
+    (token-out <sip-010-trait>)
+    (amount-in uint)
     (recipient principal)
   )
   (let (
@@ -31,11 +31,11 @@
     (begin
       ;; 1. Transfer token-in from sender to this aggregator
       (try! (contract-call? token-in transfer amount-in tx-sender (as-contract tx-sender) none))
-      
+
       ;; 2. In a real Garden/SwapKit integration this would trigger an atomic swap
       ;; or use an on-chain liquidity pool. For simulation we mint/transfer token-out.
       (try! (as-contract (contract-call? token-out transfer amount-out (as-contract tx-sender) recipient none)))
-      
+
       (print {
         event: "sovereign-swap-executed",
         token-in: (contract-of token-in),
@@ -44,7 +44,7 @@
         amount-out: amount-out,
         fee: fee
       })
-      
+
       (ok { amount-out: amount-out, fee-collected: fee })
     )
   )

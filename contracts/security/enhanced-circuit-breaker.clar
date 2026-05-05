@@ -27,6 +27,7 @@
   (ok (default-to false (map-get? isolated-protocols protocol)))
 )
 
+;; @desc Toggles the protocol-wide emergency pause.
 (define-public (toggle-global-pause)
   (begin
     (asserts! (is-admin tx-sender) ERR_UNAUTHORIZED)
@@ -45,6 +46,7 @@
   )
 )
 
+;; @desc Toggles isolation mode for a specific external protocol.
 (define-public (toggle-isolation (protocol principal))
   (begin
     (asserts! (is-admin tx-sender) ERR_UNAUTHORIZED)

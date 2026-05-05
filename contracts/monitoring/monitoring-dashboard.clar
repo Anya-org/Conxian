@@ -13,9 +13,9 @@
 ;; @desc Returns comprehensive protocol health metrics and risk indicators
 (define-read-only (get-protocol-health)
   (ok {
-      status: { compliant: true version: "C4" },
+      status: { compliant: true, version: "C4" },
       risk: { risk-score: u100 },
-      metrics: { tvl: u0 solvency-ratio: u150 },
+      metrics: { tvl: u0, solvency-ratio: u150 },
       gcr: u150,
       uptime: burn-block-height
   })

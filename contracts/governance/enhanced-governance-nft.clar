@@ -32,7 +32,7 @@
   {
     council-id: uint,
     voting-power: uint,
-    member-type: (string-ascii 20), ;; "human" "autonomous-agent"
+    member-type: (string-ascii 20) ;; "human" "autonomous-agent",
     created-at: uint
   }
 )

@@ -55,7 +55,7 @@
     )
     (begin
       (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-      
+
       (if (is-eq current-head current-tail)
         (ok none) ;; Queue is empty
         (let ((request (map-get? exit-queue current-head)))

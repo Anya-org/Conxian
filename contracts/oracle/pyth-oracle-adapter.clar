@@ -20,7 +20,7 @@
     (begin
       ;; 1. Update Pyth Storage with fresh VAA
       (unwrap-panic (contract-call? .pyth-oracle-v4 verify-and-update-price-feeds vaa-data))
-      
+
       ;; 2. Read the newly verified price
       (let (
         (price (unwrap! (contract-call? .pyth-oracle-v4 get-price pyth-feed) ERR_PYTH_FAILED))

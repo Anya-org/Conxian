@@ -17,7 +17,7 @@
   {
     token-0: principal,
     token-1: principal,
-    fee: uint, ;; bps with 1M denominator e.g. 3000 = 0.3%
+    fee: uint ;; bps with 1M denominator e.g. 3000 = 0.3%,
     liquidity: uint,
     sqrt-price: uint,
     tick: int

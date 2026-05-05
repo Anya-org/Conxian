@@ -12,7 +12,7 @@
 (define-data-var csf-registry-count uint u0)
 
 ;; --- Maps ---
-(define-map pools 
+(define-map pools
     { token0: principal, token1: principal, type: uint }
     principal
 )
@@ -23,7 +23,7 @@
 )
 
 ;; CSF Registry: Tracks external protocols (e.g. Zest StackingDAO Arkadiko) that implement CSF
-(define-map csf-registry principal { name: (string-ascii 256), registered-at: uint, active: bool })
+(define-map csf-registry principal { name: (string-ascii 256) registered-at: uint, active: bool })
 (define-map csf-by-index uint principal)
 
 ;; --- Public Administrative Functions ---

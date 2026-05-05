@@ -75,7 +75,7 @@
 )
 
 (define-private (is-governance)
-    (or 
+    (or
         (is-admin)
         (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_GOVERNANCE))
     )
@@ -102,7 +102,7 @@
         (asserts! (is-governance) (err ERR_UNAUTHORIZED))
         ;; Check not already queued
         (asserts! (is-none (map-get? queued-proposals proposal-principal)) (err ERR_ALREADY_EXECUTED))
-        
+
         (let ((eta (+ burn-block-height (var-get delay))))
             (map-set queued-proposals proposal-principal {
                 eta: eta,
@@ -131,13 +131,13 @@
         (asserts! (>= burn-block-height eta) (err ERR_TOO_EARLY))
         (asserts! (<= burn-block-height (+ eta GRACE_PERIOD)) (err ERR_EXPIRED))
         (asserts! (is-eq (contract-of proposal-contract) proposal-principal) (err ERR_UNAUTHORIZED))
-        
+
         ;; Mark as executed BEFORE calling to prevent reentrancy
         (map-set queued-proposals proposal-principal (merge proposal { executed: true }))
-        
+
         ;; Execute the proposal
         (try! (contract-call? proposal-contract execute target))
-        
+
         (emit-executed proposal-principal target)
         (ok true)
     )
@@ -151,7 +151,7 @@
     (begin
         (asserts! (is-governance) (err ERR_UNAUTHORIZED))
         (asserts! (is-some (map-get? queued-proposals proposal-principal)) (err ERR_NOT_QUEUED))
-        
+
         (map-delete queued-proposals proposal-principal)
         (emit-cancelled proposal-principal)
         (ok true)
@@ -191,8 +191,8 @@
 
 (define-read-only (is-executable (proposal principal))
     (match (map-get? queued-proposals proposal)
-        proposal-data 
-        (and 
+        proposal-data
+        (and
             (not (get executed proposal-data))
             (>= burn-block-height (get eta proposal-data))
             (<= burn-block-height (+ (get eta proposal-data) GRACE_PERIOD))

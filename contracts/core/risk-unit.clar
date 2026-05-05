@@ -107,7 +107,7 @@
       ) ERR_NOT_AUTHORIZED)
 
       (asserts! (< hf adjusted-threshold) ERR_HEALTHY_POSITION)
-      
+
       (try! (contract-call? .dimensional-core liquidate-position owner position-id .oracle-aggregator))
 
       (map-delete position-health position-id)

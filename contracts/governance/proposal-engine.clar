@@ -33,6 +33,7 @@
 ;; @param start-block: The block height at which voting begins.
 ;; @param end-block: The block height at which voting ends.
 ;; @returns (response uint uint) The ID of the newly created proposal.
+;; @desc Submits a new parameter adjustment proposal.
 (define-public (submit-proposal
     (proposal-contract <proposal-trait>)
     (council-id uint)
@@ -62,6 +63,7 @@
 ;; @param proposal-id: The ID of the proposal to vote on.
 ;; @param support: A boolean indicating the voter's choice (true for 'yes' false for 'no').
 ;; @returns (response bool uint)
+;; @desc Casts a vote on an active proposal.
 (define-public (vote
     (proposal-id uint)
     (support bool)

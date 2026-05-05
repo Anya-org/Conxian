@@ -116,16 +116,16 @@
       )
         ;; Verify attestor is authorized
         (asserts! (is-authorized-attestor) (err ERR_UNAUTHORIZED))
-        
+
         ;; Store attestation
         (map-set attestations { asset: asset, attestor: attestor } {
             amount: off-chain-amount,
             timestamp: current-time,
             signature: signature
         })
-        
+
         (emit-attestation-received asset attestor off-chain-amount)
-        
+
         ;; Update reserve data
         (match (map-get? asset-reserves asset)
             existing-data
@@ -136,14 +136,14 @@
             }))
             ;; First attestation for this asset
             (map-set asset-reserves asset {
-                total-supply: u0, ;; Will be updated by sync
+                total-supply: u0 ;; Will be updated by sync,
                 on-chain-balance: u0,
                 off-chain-backing: off-chain-amount,
                 last-update: current-time,
                 attestation-count: u1
             })
         )
-        
+
         (ok true)
     )
 )
@@ -156,7 +156,7 @@
         (total-supply (unwrap-panic (contract-call? asset get-total-supply)))
       )
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-        
+
         (match (map-get? asset-reserves asset-principal)
             existing-data
             (map-set asset-reserves asset-principal (merge existing-data {
@@ -173,7 +173,7 @@
                 attestation-count: u0
             })
         )
-        
+
         (emit-reserves-updated asset-principal balance)
         (ok true)
     )

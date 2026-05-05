@@ -48,8 +48,8 @@
     )
     (begin
         ;; Access Control: Must be Admin or Emergency role
-        (asserts! 
-            (or 
+        (asserts!
+            (or
                 (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_ADMIN))
                 (unwrap-panic (contract-call? .conxian-access has-role tx-sender ROLE_EMERGENCY))
             )

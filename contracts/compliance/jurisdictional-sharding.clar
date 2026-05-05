@@ -90,7 +90,7 @@
 ;; CURRENCY MANAGEMENT
 ;; ============================================================================
 
-(define-public (register-currency 
+(define-public (register-currency
     (code (string-ascii 10))
     (token-principal (optional principal))
     (is-fiat bool)

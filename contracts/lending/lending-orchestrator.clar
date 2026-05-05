@@ -43,7 +43,7 @@
     (asset (contract-of asset-trait))
     (reserve (match (map-get? reserve-data asset)
                res-val res-val
-               { total-deposits: u0, total-borrows: u0, total-reserves: u0, decimals: (unwrap! (contract-call? asset-trait get-decimals) (err ERR_INTERNAL)), last-updated: burn-block-height }))
+               { total-deposits: u0, total-borrows: u0, total-reserves: u0, decimals: (unwrap! (contract-call? asset-trait get-decimals) (err ERR_INTERNAL)) last-updated: burn-block-height }))
   )
     (begin
       (asserts! (not (is-paused)) (err ERR_PAUSED))
@@ -158,7 +158,7 @@
         (asset-collateral-value (/ (* deposit-amt price COLLATERAL_FACTOR) (* (pow u10 decimals) u10000)))
         (asset-debt-value (/ (* borrow-amt price) (pow u10 decimals)))
       )
-        { user: user, collateral-value: (+ (get collateral-value acc) asset-collateral-value), debt-value: (+ (get debt-value acc) asset-debt-value) }
+        { user: user, collateral-value: (+ (get collateral-value acc) asset-collateral-value) debt-value: (+ (get debt-value acc) asset-debt-value) }
       )
       acc
     )

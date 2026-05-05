@@ -12,19 +12,19 @@
 (define-data-var admin principal tx-sender)
 
 ;; --- Sovereign Business Cells (SBC) ---
-(define-map business-cells 
-  (string-ascii 32) 
-  { 
+(define-map business-cells
+  (string-ascii 32)
+  {
     liquid-reserve: uint,
     yield-harvested: uint,
     last-audit-block: uint,
-    status: (string-ascii 12) 
+    status: (string-ascii 12)
   }
 )
 
 ;; --- Strategic Symmetry (Allocations) ---
 ;; SBC ID -> Strategy Principal -> Allocated Symmetry (Amount)
-(define-map strategic-symmetry { sbc: (string-ascii 32), strategy: principal } uint)
+(define-map strategic-symmetry { sbc: (string-ascii 32) strategy: principal } uint)
 
 ;; --- Public Functions: Fiscal Orchestration ---
 
@@ -32,7 +32,7 @@
 (define-public (codify-sbc (name (string-ascii 32)))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (map-set business-cells name { 
+    (map-set business-cells name {
       liquid-reserve: u0,
       yield-harvested: u0,
       last-audit-block: burn-block-height,
@@ -82,7 +82,7 @@
   )
     (begin
       (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-      (map-set business-cells sbc-name (merge cell { 
+      (map-set business-cells sbc-name (merge cell {
         yield-harvested: (+ (get yield-harvested cell) yield-amount),
         liquid-reserve: (+ (get liquid-reserve cell) yield-amount)
       }))

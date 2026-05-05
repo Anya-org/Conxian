@@ -31,10 +31,10 @@
 (define-public (signal-upgrade (contract principal) (new-impl-hash (buff 32)))
     (begin
         (asserts! (is-governance) (err ERR_UNAUTHORIZED))
-        (print { 
+        (print {
             event: "upgrade-signaled",
             contract: contract,
-            new-hash: new-impl-hash 
+            new-hash: new-impl-hash
         })
         (ok true)
     )

@@ -32,7 +32,7 @@
       ;; 2. Execute Transfer to SFC Vault
       (try! (contract-call? token transfer amount tx-sender .fiscal-vault-oracle none))
 
-      (print { event: "x402-settlement-executed", amount: amount, token: (contract-of token), actor: tx-sender })
+      (print { event: "x402-settlement-executed", amount: amount, token: (contract-of token) actor: tx-sender })
       (ok true)
     )
   )

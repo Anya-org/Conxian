@@ -51,7 +51,7 @@
   )
     (begin
       (asserts! (is-authorized source) (err ERR_UNAUTHORIZED))
-      
+
       (if (is-some agg-opt)
         (let (
           (avg (unwrap-panic agg-opt))

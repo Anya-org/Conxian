@@ -122,8 +122,7 @@
         votes-for: (get for-votes proposal),
         votes-against: (get against-votes proposal),
         contract: (contract-of proposal-contract),
-        council-id: council-id
-      })
+        council-id: council-id })
       (ok true)
     )
   )
