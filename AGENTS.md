@@ -15,6 +15,11 @@ Hard-coded `ST…` / `SP…` addresses in production source trigger an **immedia
 | On-chain | Expose **State-Proof** primitives only; never raw config. |
 | Stubs | Production paths return `err-u501` / `err-u503` and **fail-closed**. |
 
+### Knowledge Management (BOS Knowledge Graph)
+- **Crystallization**: Every session must conclude with a structured digest summarizing entities (People, Projects, Libraries, Decisions) and relationships.
+- **Typed Knowledge**: Agents must prioritize structured entity extraction over flat prose to enable graph-aware traversal.
+- **Verification**: All claims must be cross-referenced against the existing knowledge graph in `conxian-business/BOS_KNOWLEDGE_GRAPH.md`.
+
 ### BitVM2 Integration
 - SNARK proofs verified through `lib-conxian-core`.  
 - Bridge validates Bitcoin L1 state against BitVM2 engine per **CJCS v2.0**.

@@ -7,6 +7,12 @@ This repo uses **Semantic Versioning** and **tagged releases**.
 
 For release note format requirements, see `docs/RELEASE_NOTES_AND_CHANGELOG.md`.
 For required checks and label-gated CI suites, see `.github/RELEASE_HYGIENE.md`.
+
+## Branch model for releases
+
+- Releases and SemVer tags should be cut from `main`.
+- `main` should only move via promotion PRs from `staged` (see `docs/BRANCH_AND_PROMOTION_STANDARD.md`).
+
 ## When to cut a release
 
 Cut a release when a change is user-facing (behavior, security posture, public docs that reframe the system), or when a set of changes should be pinned to an immutable reference for downstream repos.

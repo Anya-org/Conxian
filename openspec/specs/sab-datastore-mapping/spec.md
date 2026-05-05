@@ -42,7 +42,7 @@ All non-enclave datastores (including PostgreSQL, Supabase, Tableland, Redis, an
 | :--- | :--- | :--- | :--- |
 | **Transactional Application State** | **Stacks L1 (Clarity contracts)** | **PostgreSQL** (currently **Neon**, later sovereign/self-hosted) | Write-path is on-chain. Postgres is a materialized read model for Nexus/Gateway sync, MMR node indexing, and service-level query performance. |
 | **Proof-Oriented Analytics** | **Stacks L1 (events + state roots)** | **Supabase** (or equivalent SQL analytics layer) | Analytics datasets are derived from the on-chain event stream. Verification is anchored by on-chain checkpoints/hashes of derived datasets; canonical truth is always the raw L1 events/state. |
-| **Immutable Governance & Audit** | **Stacks L1 (event log + audit registry contract)** | **Tableland** (optional mirror) | Default is on-chain auditability. Tableland is an optional public mirror when decentralized SQL materially improves discoverability without becoming a dependency for correctness. |
+| **Immutable Governance & Audit** | **Stacks L1 (event log + audit registry contract)** | **Fluree** (append-only governance ledger) + **Tableland** (optional mirror) | Default is on-chain auditability. Fluree is a non-authoritative, queryable append-only ledger for governance records (resolutions, policy bundles, audit trails) anchored on-chain by content hash. Tableland is an optional public mirror when decentralized SQL materially improves discoverability without becoming a dependency for correctness. |
 | **Hardware-Anchored Identity** | **Stacks L1 (public key registry + enclave key identifiers + attestation commitments)** | N/A | Mandated for Zero Secret Egress (ZSE). Private keys remain enclave-only; only public keys, key IDs, and attestations are anchored on-chain. |
 | **High-Frequency Caching** | N/A | **Redis** | Volatile cache for millisecond-latency session management, real-time mempool tracking, and telemetry buffering. |
 | **Offline Wallet Cache** | N/A | **Local SQLite** | Offline lookups and UX continuity. See [Offline Wallet Cache (SQLite) encryption key material handling](#offline-wallet-cache-sqlite-encryption-key-material-handling). |
@@ -68,7 +68,7 @@ In this subsection, “key” refers to cryptographic key material (e.g., KEKs/D
 #### 3.1.2. Data Flow & Verification
 
 1. **Stacks L1 emits canonical state transitions** via contract state + events.
-2. **Indexers derive replicas** (Postgres/Supabase/Tableland) by consuming L1 events and projecting them into query-optimized schemas.
+2. **Indexers derive replicas** (Postgres/Supabase/Fluree/Tableland) by consuming L1 events and projecting them into query-optimized schemas.
 3. **Verification** is performed by anchoring periodic dataset checkpoints on-chain (a deterministic root hash over a defined canonicalization and hashing scheme) and requiring indexers/clients to match those checkpoints.
 4. **Mismatch handling**: any replica that fails checkpoint validation is treated as stale/corrupted and **MUST** be rebuilt from the on-chain event stream.
 
@@ -116,7 +116,7 @@ Each record **MUST** be encoded as a single UTF-8 line with `|` separators and a
 
 #### 3.1.3. Constraints for Non-authoritative Query Layers
 
-Any non-authoritative central derived or query layer that is used as a shared read model (including PostgreSQL read models, Supabase or equivalent analytics layers, and optional mirrors such as Tableland) **MUST** satisfy the following constraints.
+Any non-authoritative central derived or query layer that is used as a shared read model (including PostgreSQL read models, Supabase or equivalent analytics layers, Fluree governance ledgers, and optional mirrors such as Tableland) **MUST** satisfy the following constraints.
 
 These constraints do not apply to ephemeral caches (e.g., Redis) or device-local wallet caches, which may hold only non-canonical, non-secret convenience state.
 
