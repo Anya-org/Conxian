@@ -53,6 +53,24 @@ These workflows run on every pull request targeting `dev`, `staged`, or `main`. 
 - Secret scan (see [`secret-scan.yml`](./workflows/secret-scan.yml))
 - Dependency review (see [`dependency-review.yml`](./workflows/dependency-review.yml))
 
+## GitHub settings required outside this repository
+
+Some promotion controls are configured in **GitHub repository settings** (not in Git-tracked files).
+
+Minimum required setup:
+
+1. Ensure `staged` exists as a long-lived branch (typically created from `dev`).
+2. Add branch protection (or an active branch ruleset) for `staged` and `main`.
+3. Require these status checks on `staged` and `main`:
+   - `Conxian Unified CI`
+   - `Branch Promotion Policy / Enforce branch promotion rules`
+   - `Secret Scan`
+   - `Dependency Review`
+4. Require at least one approving review on `staged` and `main`.
+5. Disable force-pushes and branch deletion on `staged` and `main`.
+
+`scripts/verify_promotion_controls.py` validates the in-repo workflow policy plus `dev`/`staged`/`main` branch topology and protection/ruleset presence.
+
 ### Label-gated suites (opt-in, based on change scope)
 
 Some suites only run when a label is applied. Most label-gated suites live in the Unified CI workflow (see [`conxian-unified-ci.yml`](./workflows/conxian-unified-ci.yml)). Apply the label early so CI starts immediately.
