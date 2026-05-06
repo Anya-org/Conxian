@@ -8,7 +8,7 @@ The `conxian-business` repository is an umbrella repo that vendors key Conxian r
 
 - **Platform**: orchestration stacks and operator-facing service surfaces (local dev, admin portals).
 - **Wallet**: end-user, non-custodial wallet applications.
-- **Gateway**: institutional middleware and API surfaces.
+- **Gateway**: sovereign middleware and API surfaces.
 - **UI**: web frontends (distinct from the broader Platform stack).
 - **Website**: marketing, docs, and landing pages.
 - **Shared core**: libraries intended to be depended on by other repos.

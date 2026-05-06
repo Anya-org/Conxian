@@ -129,7 +129,7 @@ These constraints do not apply to ephemeral caches (e.g., Redis) or device-local
 #### Central Datastores (PostgreSQL, Supabase)
 
 - **Aggregation**: Consolidating materialized views derived from on-chain state across multiple Nexus instances.
-- **Historical Persistence**: Maintaining long-term records for reporting and institutional compliance as query-optimized replicas; all compliance evidence **MUST** remain provably derivable from on-chain state and published checkpoints.
+- **Historical Persistence**: Maintaining long-term records for reporting and sovereign compliance as query-optimized replicas; all compliance evidence **MUST** remain provably derivable from on-chain state and published checkpoints.
 - **Query Acceleration**: Serving as derived read models for inter-module communication (e.g., Nexus to Gateway) without becoming the source of truth.
 
 #### Edge Datastores (Enclave, Redis, Local SQLite)

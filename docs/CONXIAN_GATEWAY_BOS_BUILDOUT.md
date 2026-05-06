@@ -7,7 +7,7 @@ This document defines the BOS-level business role, governance controls, and docu
 Per the repo portfolio, `conxian-gateway` is a **flagship** repo:
 
 - **Portfolio classification**: `Flagship — Fusion integration and compliance gateway.`
-- **Business Purpose (External)**: Provide a high-integrity integration surface for institutional partners, enabling seamless connection between legacy ERP systems and the Bitcoin economy.
+- **Business Purpose (External)**: Provide a high-integrity integration surface for sovereign partners, enabling seamless connection between legacy ERP systems and the Bitcoin economy.
 - **Business Purpose (Internal)**: Act as the primary compliance and aggregation pipeline, ensuring all inbound settlement requests meet protocol standards before execution.
 
 ## 2) Workflow Governance and Approval Paths

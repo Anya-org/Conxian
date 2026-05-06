@@ -1,6 +1,6 @@
 # ZKML & ISO 20022 Compliance Feasibility (CON-467)
 
-This report assesses whether privacy-preserving proof workflows (including zkML) can satisfy institutional requirements that are commonly expressed as “ISO 20022 compliance” in the Conxian model.
+This report assesses whether privacy-preserving proof workflows (including zkML) can satisfy sovereign requirements that are commonly expressed as “ISO 20022 compliance” in the Conxian model.
 
 ## Executive summary
 
@@ -14,7 +14,7 @@ This report assesses whether privacy-preserving proof workflows (including zkML)
 
 ## Scope and definitions
 
-### What “ISO 20022 compliance” usually means in institutional conversations
+### What “ISO 20022 compliance” usually means in sovereign conversations
 
 Institutions often use “ISO 20022 compliance” as shorthand for a bundle:
 
@@ -34,8 +34,8 @@ For this report:
 
 The repo already encodes key constraints that strongly shape feasibility:
 
-1. **Institutional egress is read-only and proof-carrying** (datasets are derived, checkpointed, and verifiable).
-   - See: [`sovereign-data-migration-institutional-egress` spec](../../openspec/changes/sovereign-data-migration-institutional-egress/specs/sovereign-data-migration-institutional-egress/spec.md).
+1. **Sovereign egress is read-only and proof-carrying** (datasets are derived, checkpointed, and verifiable).
+   - See: [`sovereign-data-migration-sovereign-egress` spec](../../openspec/changes/sovereign-data-migration-sovereign-egress/specs/sovereign-data-migration-sovereign-egress/spec.md).
 2. **TradFi payloads are not execution authority; ingestion is proposal-only and verified inside a TEE**.
    - See: [`external-settlement-proposal-only-tee` spec](../../openspec/changes/external-settlement-proposal-only-tee/specs/external-settlement-proposal-only-tee/spec.md).
 3. **Fail closed**: functional stubs (including ZKML) must return explicit errors in production paths.
@@ -75,7 +75,7 @@ Key feasibility enablers already exist in OpenSpec:
 
 ### Privacy-preserving compliance evidence: feasible, but requires an explicit private artifact lane
 
-Institutional compliance is typically identity-heavy (names, addresses, account identifiers, screening results). Given the “no private identity disclosures in egress datasets” constraint, the likely pattern is:
+Sovereign compliance is typically identity-heavy (names, addresses, account identifiers, screening results). Given the “no private identity disclosures in egress datasets” constraint, the likely pattern is:
 
 1. **Store ISO 20022 payloads as encrypted objects** in an authorized storage plane.
 2. **Expose only commitments and minimal identifiers** in verifiable datasets.
@@ -236,7 +236,7 @@ Minimum verification expectations for a pilot:
 1. Which compliance checks are required for the pilot (rule-based vs. ML)?
 2. Is verifiable inference required, or is TEE attestation sufficient?
 3. What is the exact privacy model (who learns what, when)?
-4. Which ISO 20022 message family/version(s) are required by the institutional partner?
+4. Which ISO 20022 message family/version(s) are required by the sovereign partner?
 
 ## Suggested next steps
 

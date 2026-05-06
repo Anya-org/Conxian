@@ -23,11 +23,11 @@ The Conxian Sovereign BOS is transitioning from a standalone protocol into a **B
 - **TAM**: $150B (Bitcoin DeFi Ecosystem).
 
 ### 2.3 Conxian Fusion / Gateway (The Connectivity Layer)
-- **What**: Institutional Routing Hub ("The Engine").
+- **What**: Sovereign Routing Hub ("The Engine").
 - **Who**: B2B Enterprises, Fintechs, and Legacy Treasury (SAP/Oracle).
 - **Where**: GCP/Hybrid Cloud.
 - **Why**: Deterministic ERP synchronization and ISO 20022 compliance egress.
-- **TAM**: $100B (Institutional Treasury).
+- **TAM**: $100B (Sovereign Treasury).
 
 ### 2.4 Conxian Nexus (The State Layer)
 - **What**: Trustless State Oracle ("Glass Node").

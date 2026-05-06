@@ -8,7 +8,7 @@
 - **Goal**: Finalize `SP...` principals and alex-adapter registration.
 - **Risk**: Low (Mainnet deployment only).
 
-## Wave 3: Institutional Ingress & TEE Enforcement (T-0)
+## Wave 3: Sovereign Ingress & TEE Enforcement (T-0)
 - **Goal**: Activate ISO 20022 and PAPSS ingress.
 - **Risk**: Medium (External signal dependency).
 

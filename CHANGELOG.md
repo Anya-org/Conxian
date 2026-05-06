@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Release Hygiene**: Added missing `## [Unreleased]` sections to submodule changelogs in `conxian-gateway`, `conxian-nexus`, `conxius-wallet`, `conxius-platform`, `Conxian`, and `lib-conxian-core`.
+
+### Changed
+- **Nomenclature Realignment**: Executed a system-wide realignment of public-facing documentation, replacing "Institutional" with "Sovereign" across root README, Gateway PRD, and ecosystem-wide specifications to improve public clarity and align with the sovereignty-first mandate.
+
 ## [1.9.4] - 2026-05-03
 
 ### Added
@@ -33,6 +39,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **Release Hygiene:** Remediated missing `## [Unreleased]` and versioning gaps in submodule changelogs identified by CI.
+
+### Added
+- **Release Hygiene**: Added missing `## [Unreleased]` sections to submodule changelogs in `conxian-gateway`, `conxian-nexus`, `conxius-wallet`, `conxius-platform`, `Conxian`, and `lib-conxian-core`.
+
+### Changed
+- **Nomenclature Realignment**: Executed a system-wide realignment of public-facing documentation, replacing "Institutional" with "Sovereign" across root README, Gateway PRD, and ecosystem-wide specifications to improve public clarity and align with the sovereignty-first mandate.
 - **Repository Hygiene:** Executed portfolio-wide pruning of merged branches in root and submodules.
 
 ## [1.9.2] - 2026-04-14

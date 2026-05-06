@@ -14,12 +14,12 @@ This checklist tracks the mainnet readiness for the `conxian-nexus` repository (
 - [x] **MMR Persistence**: Persistent MMR peaks and nodes in PostgreSQL verified.
 - [x] **Reorg Handling**: Microblock reorg detection and automated rollback implemented.
 
-### 3) Institutional Ingress
+### 3) Sovereign Ingress
 - [x] **CON-166**: Global settlement ingress (ISO 20022/PAPSS/BRICS) wired.
 - [x] **Decentralized Sync**: Nostr state broadcast (Kind 26003) implemented.
 - [x] **Agentic MCP**: MCP server for treasury and MMR proofs deployed.
 - [x] **TEE Verification**: Mandatory TEE attestation for external triggers enforced.
-- [x] **Time-Locks**: 144-block time-lock for institutional state proposals implemented.
+- [x] **Time-Locks**: 144-block time-lock for sovereign state proposals implemented.
 
 ### 4) Release & Hygiene
 - [x] **README**: Standardized with Purpose, Status, Ownership, and Releases.

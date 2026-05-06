@@ -52,7 +52,7 @@ This report outlines the transition path for the Conxian ecosystem from its "Web
 
 ### Identity & Messaging (The Connection)
 - **Nostr**: The universal transport layer for Agentic Intents (NIP-47 NWC).
-- **Web5/DIDs**: Decentralized identifiers for institutional participants.
+- **Web5/DIDs**: Decentralized identifiers for sovereign participants.
 
 ## 5. Migration Roadmap: The 2026 Sovereign Clean Break
 

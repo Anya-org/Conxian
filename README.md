@@ -50,7 +50,7 @@ The Conxian ecosystem is organized by function to ensure clarity and modularity 
 
 ### 4. User Interfaces
 - **[`conxius-wallet/`](./conxius-wallet)**: **Mobile**. Sovereign hardware-grade mobile vault.
-- **[`conxian-ui/`](./conxian-ui)**: **Web**. Institutional operator dashboard.
+- **[`conxian-ui/`](./conxian-ui)**: **Web**. Sovereign operator dashboard.
 - **[`conxian-labs-site/`](./conxian-labs-site)**: **Website**. Public ecosystem landing.
 
 ## Cloning

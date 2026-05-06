@@ -44,7 +44,7 @@ This applies to any referenced evidence artifacts pinned in this repo.
 | --- | --- | --- | --- | --- | --- |
 | `conxian-nexus` (Rust) | **Postgres persistence** (current-state described as “currently Neon”) powering Nexus read model (state history, event logs, MMR persistence) | Derived read model (“Glass Node”) for high-concurrency state queries + verifiable history primitives | **Transactional + Routing** (derived query layer; canonical truth is Stacks L1) | Gateway endpoints; internal/external consumers of state/proof APIs | **Code + Spec/Doc**: Postgres usage in `conxian-nexus/src/**` + `openspec/specs/sab-datastore-mapping/spec.md` + `conxius-platform/GAPS.md` |
 | `conxius-platform` (orchestration) | Neon described as “serverless Postgres for Nexus state history and high-concurrency event logs” | Platform-level persistence dependency for Nexus/Gateway stack | **Transactional** | Local dev uses `postgres:15` container; prod provider not captured in this repo | **Spec/Doc**: `conxius-platform/GAPS.md`; **Code**: `conxius-platform/.env.example`, `conxius-platform/docker-compose.yml` (provider unspecified) |
-| `conxian-gateway` (docs) | Neon described as “institutional ledger storage” | Institutional API surface / ERP translation mapping | **Routing** | ERP/OData simulation paths | **Spec/Doc only**: `conxian-gateway/ENHANCEMENT_PLAN.md` (no DB integration code found) |
+| `conxian-gateway` (docs) | Neon described as “sovereign ledger storage” | Sovereign API surface / ERP translation mapping | **Routing** | ERP/OData simulation paths | **Spec/Doc only**: `conxian-gateway/ENHANCEMENT_PLAN.md` (no DB integration code found) |
 | `conxius-platform/services/elizaos-plugin-conxian` | Optional **Neon serverless driver** appears as an optional peer dependency via `drizzle-orm` (`@neondatabase/serverless`) | Potential DB connector capability, not proven used | **Unknown (dependency-only)** | N/A | **Dependency-only**: `conxius-platform/pnpm-lock.yaml`, `conxius-platform/services/elizaos-plugin-conxian/package-lock.json` |
 
 ### Neon scope notes (what we did **not** find in-repo)
@@ -54,16 +54,16 @@ This applies to any referenced evidence artifacts pinned in this repo.
 
 ## Downstream consumer summary (cross-cutting)
 
-- **Core services**: `conxian-nexus` (derived state) → `conxian-gateway` (institutional API) → UI surfaces.
+- **Core services**: `conxian-nexus` (derived state) → `conxian-gateway` (sovereign API) → UI surfaces.
 - **UI surfaces**: `conxian-ui`, `conxius-platform/services/admin-dashboard`, `showcase-dapp` appear to consume APIs rather than connect directly to Supabase/Neon.
 - **Internal dashboards**: “Stitch Dashboard” (Render-hosted) visualizes Supabase state (docs-only evidence).
-- **External consumers**: ZK Data Room / institutional egress consumers rely on derived datasets and checkpoint verification (OpenSpec).
+- **External consumers**: ZK Data Room / sovereign egress consumers rely on derived datasets and checkpoint verification (OpenSpec).
 
 ## Migration constraints (captured from OpenSpec)
 
 These are the constraints that impact any migration away from Supabase/Neon:
 
-- **Correctness isolation**: Supabase and Neon **must not** be required for protocol correctness, final auditability, or institutional accounting truth.
+- **Correctness isolation**: Supabase and Neon **must not** be required for protocol correctness, final auditability, or sovereign accounting truth.
 - **Supabase phase-out (analytics)**:
   - deterministic snapshot export required (schema + ordering + serialization)
   - on-chain checkpointing required (e.g., `SAB-CHECKPOINT-V1`)
@@ -72,7 +72,7 @@ These are the constraints that impact any migration away from Supabase/Neon:
   - Nexus must not rely on Neon-specific features (branching, proprietary pooling, hosted-only extensions)
   - local dev parity required (Postgres + Redis under developer control)
 
-Sources: `openspec/changes/sovereign-data-migration-institutional-egress/specs/sovereign-data-migration-institutional-egress/spec.md`, `openspec/specs/sab-datastore-mapping/spec.md`.
+Sources: `openspec/changes/sovereign-data-migration-sovereign-egress/specs/sovereign-data-migration-sovereign-egress/spec.md`, `openspec/specs/sab-datastore-mapping/spec.md`.
 
 ## Major unknowns / missing evidence (to close)
 

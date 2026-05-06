@@ -69,7 +69,7 @@ OpenSpec is the best place to point issue descriptions when work is “spec-firs
 | Change set | Role | Visibility | What it’s for |
 | --- | --- | --- | --- |
 | `openspec/changes/remediate-enterprise-sovereignty/*` | Canonical | Public-safe | Baseline enterprise sovereignty requirements. |
-| `openspec/changes/sovereign-data-migration-institutional-egress/*` | Canonical | Public-safe | Clean-break data migration + institutional egress requirements. |
+| `openspec/changes/sovereign-data-migration-sovereign-egress/*` | Canonical | Public-safe | Clean-break data migration + sovereign egress requirements. |
 | `openspec/changes/csf-autonomous-launch/*` | Supporting | Public-safe | Launch mechanics and autonomous launch framing. |
 
 ### Audit docs that complement OpenSpec
@@ -105,7 +105,7 @@ These are the documents most likely to answer “what are we building?” and �
 
 | Document | Role | Visibility | What it’s for |
 | --- | --- | --- | --- |
-| `conxian-gateway/PRD.md` | Canonical | Public-safe | Gateway PRD (institutional compliance pipe). |
+| `conxian-gateway/PRD.md` | Canonical | Public-safe | Gateway PRD (sovereign compliance pipe). |
 | `conxian-nexus/docs/PRD.md` | Canonical | Public-safe | Nexus PRD (Glass Node). |
 | `lib-conxian-core/docs/PRD.md` | Canonical | Public-safe | Core library PRD (shared models + gateway alignment). |
 | `docs/LIB_CONCLAVE_SDK_BOS_BUILDOUT.md` | Supporting | Public-safe | BOS-level business role, governance controls, and internal-only vs public-safe separation guidance for the SDK. |
@@ -180,7 +180,7 @@ If an issue is in a planning or execution state, the description should link to 
 
 | Issue | Add links to | Why |
 | --- | --- | --- |
-| https://linear.app/conxian-labs/issue/CON-343 | `openspec/changes/sovereign-data-migration-institutional-egress/specs.md`, `openspec/changes/sovereign-data-migration-institutional-egress/specs/sovereign-data-migration-institutional-egress/spec.md`, `ARCHIVE_MIGRATION.md` | This issue is spec-first and directly tied to ZSE + migration. |
+| https://linear.app/conxian-labs/issue/CON-343 | `openspec/changes/sovereign-data-migration-sovereign-egress/specs.md`, `openspec/changes/sovereign-data-migration-sovereign-egress/specs/sovereign-data-migration-sovereign-egress/spec.md`, `ARCHIVE_MIGRATION.md` | This issue is spec-first and directly tied to ZSE + migration. |
 | https://linear.app/conxian-labs/issue/CON-158 | `docs/DOCUMENTATION_ALIGNMENT_INDEX.md`, `SUMMARY.md`, `openspec/changes/remediate-enterprise-sovereignty/specs.md` | This is the “alignment” umbrella; it should anchor to the index + baseline OpenSpec. |
 | https://linear.app/conxian-labs/issue/CON-152 | `conxian-business/SERVICE_LOOP.md`, `Sovereign-Ops-Orchestrator/LINEAR_WIRING.md`, `conxian-business/BOS_STATE_MACHINE.stub.json` | BOS operating model work should reference the service loop + wiring + state machine. |
 | https://linear.app/conxian-labs/issue/CON-157 | `Conxian/PRD.md`, `conxian-gateway/PRD.md`, `conxian-nexus/docs/PRD.md` | “Business-unit model” extraction should start from PRDs (what exists and how it’s separated). |
@@ -202,8 +202,8 @@ These are the highest-value sources to copy into Linear so day-to-day work stays
    - Source: `ARCHIVE_MIGRATION.md`, `docs/AGENTS.md` (Knowledge retention & hygiene section), `admin/SECRETS.md`.
 4. **OpenSpec: Enterprise Sovereignty baseline (canonical)**
    - Source: `openspec/changes/remediate-enterprise-sovereignty/specs/enterprise-sovereignty/spec.md`.
-5. **OpenSpec: Sovereign Data Migration & Institutional Egress (canonical)**
-   - Source: `openspec/changes/sovereign-data-migration-institutional-egress/specs/sovereign-data-migration-institutional-egress/spec.md`.
+5. **OpenSpec: Sovereign Data Migration & Sovereign Egress (canonical)**
+   - Source: `openspec/changes/sovereign-data-migration-sovereign-egress/specs/sovereign-data-migration-sovereign-egress/spec.md`.
 6. **SAB datastore mapping rules (canonical)**
    - Source: `openspec/specs/sab-datastore-mapping/spec.md`.
 7. **Conxian protocol PRD + roadmap (canonical)**

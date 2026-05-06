@@ -31,7 +31,7 @@ A "Sovereign Node" is a containerized "Business-in-a-Box" (BiaB) deployment inst
 The **Conclave SDK** is the industrial primitive for BaaP. It provides:
 - **Hardware Enclave Abstraction**: Native support for StrongBox/TEE.
 - **Sovereign Handshake**: Non-custodial signing for cross-chain swaps and A2P (Application-to-Person) verification.
-- **B2B Identity**: Cryptographic identity for institutional partners and automated billing.
+- **B2B Identity**: Cryptographic identity for sovereign partners and automated billing.
 
 ## 5. Market Positioning (SAM/TAM)
 | Segment | TAM (2026) | SAM | Target |
