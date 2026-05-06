@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS public.cxn_referrals (
 );
 
 -- 5. CSF PROTOCOL STATE (MULTI-DIMENSIONAL)
--- High-level protocol state for rebalancing logic and institutional audits.
+-- High-level protocol state for rebalancing logic and sovereign audits.
 CREATE TABLE IF NOT EXISTS public.cxn_csf_state (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     timestamp TIMESTAMPTZ DEFAULT now(),
@@ -73,8 +73,8 @@ CREATE TABLE IF NOT EXISTS public.cxn_csf_state (
     circuit_breaker_status TEXT DEFAULT 'NORMAL' -- NORMAL, WARNING, HALTED
 );
 
--- 6. INSTITUTIONAL TIMELOCK (144-BLOCK)
--- Tracking institutional settlements exceeding R100M threshold.
+-- 6. SOVEREIGN TIMELOCK (144-BLOCK)
+-- Tracking sovereign settlements exceeding R100M threshold.
 CREATE TABLE IF NOT EXISTS public.cxn_timelock_status (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at TIMESTAMPTZ DEFAULT now(),
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS public.cxn_timelock_status (
     status TEXT DEFAULT 'PENDING'           -- PENDING, READY, EXECUTED, CANCELLED
 );
 
--- 7. RUNWAY METRICS & INSTITUTIONAL YIELD TRACKING
+-- 7. RUNWAY METRICS & SOVEREIGN YIELD TRACKING
 -- Update existing runway_metrics to include SARB limit tracking and deep analytics.
 DO $$
 BEGIN
@@ -93,7 +93,7 @@ BEGIN
         ALTER TABLE public.runway_metrics ADD COLUMN sarb_sda_utilized_zar NUMERIC DEFAULT 0;
         ALTER TABLE public.runway_metrics ADD COLUMN sarb_fia_utilized_zar NUMERIC DEFAULT 0;
         ALTER TABLE public.runway_metrics ADD COLUMN sovereign_yield_index NUMERIC; -- SYI tracking
-        ALTER TABLE public.runway_metrics ADD COLUMN mrr_institutional_zar NUMERIC DEFAULT 0;
+        ALTER TABLE public.runway_metrics ADD COLUMN mrr_sovereign_zar NUMERIC DEFAULT 0;
         ALTER TABLE public.runway_metrics ADD COLUMN yield_velocity_score NUMERIC; -- Momentum tracking
     END IF;
 END $$;

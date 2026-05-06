@@ -17,7 +17,7 @@ Start here:
 
 Other change specs:
 
-- [Sovereign Data Migration & Institutional Egress](./changes/sovereign-data-migration-institutional-egress/specs.md)
+- [Sovereign Data Migration & Sovereign Egress](./changes/sovereign-data-migration-sovereign-egress/specs.md)
 - [Autonomous Launch Specs](./changes/csf-autonomous-launch/specs.md)
 
 Spec catalog:

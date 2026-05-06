@@ -46,7 +46,7 @@ clarinet integrate
 
 ## 3. Middleware Orchestration
 
-The Conxian stack relies on two primary Rust services: the Nexus (Glass Node) and the Gateway (Institutional Pipe).
+The Conxian stack relies on two primary Rust services: the Nexus (Glass Node) and the Gateway (Sovereign Pipe).
 
 ### Conxian Nexus
 Synchronizes state with Stacks L1 and serves the internal API.
@@ -61,7 +61,7 @@ cargo run --bin conxian-nexus
 ```
 
 ### Conxian Gateway
-Handles institutional B2B traffic and compliance.
+Handles sovereign B2B traffic and compliance.
 
 Gateway defaults to the public Bitcoin mainnet RPC endpoint `https://bitcoin-rpc.publicnode.com` whenever `BITCOIN_RPC_URL` is unset. This default is only appropriate for non-production, non-funds-bearing local development and low-traffic open-tier environments (see [environment tier definitions](docs/BOS_BUSINESS_BUILDOUT.md)).
 
