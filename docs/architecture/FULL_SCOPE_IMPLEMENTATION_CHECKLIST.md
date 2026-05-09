@@ -1,0 +1,65 @@
+# Full Scope Implementation Checklist
+
+## Purpose
+
+This checklist tracks the end-to-end alignment work across strategy, architecture, repo roles, documentation, and future cleanup.
+
+## Completed or in progress
+
+- strategy docs for Bitcoin-layer support
+- repo alignment plan
+- repo boundary overlap audit
+- repo boundary decision record
+- portfolio alignment baseline preserving strongest existing work
+- role decision record for `conxian-nexus` and `conxian_ui`
+- repo ownership docs for strategic repos
+- role alignment docs for `conxian-nexus` and `conxian_ui`
+
+## Remaining implementation path
+
+### Architecture and strategy
+
+- [ ] merge all active architecture PRs in `conxian-business`
+- [ ] cross-link older portfolio docs to newer authority docs
+
+### Repo-local docs
+
+- [ ] merge strategic repo ownership PRs
+- [ ] merge supporting repo role-alignment PRs
+- [ ] update any remaining supporting repos with ownership docs where helpful
+
+### Code placement cleanup
+
+- [ ] audit `lib-conxian-core` for adapter leakage
+- [ ] audit `conxian-gateway` for non-gateway concerns
+- [ ] audit `conxius-wallet` for infrastructure overlap
+- [ ] audit `Conxian` for mixed gateway or app concerns
+- [ ] audit `conxius-platform` for catch-all drift
+- [ ] audit `conxian-nexus` for gateway overlap
+- [ ] review `conxian_ui` for overlap with wallet or site
+
+### Release and narrative alignment
+
+- [ ] apply release standard to strategic repos
+- [ ] align public repo descriptions with the builder-platform thesis
+- [ ] update site and public portfolio narrative incrementally
+
+### Layer implementation roadmap
+
+- [ ] define concrete milestones for Bitcoin mainnet support
+- [ ] define concrete milestones for Lightning support
+- [ ] define concrete milestones for Stacks support
+- [ ] define secondary milestones for Rootstock and Liquid adapters
+
+## Working rule
+
+For all remaining work:
+
+- read existing material first
+- preserve the strongest current work
+- converge on one portfolio direction
+- do not create duplicate narratives or hidden ownership
+
+## Summary
+
+This checklist is the implementation spine for the approved full scope.
