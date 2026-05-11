@@ -45,6 +45,12 @@ tests/report.md
 .env.production.local
 *.pem
 *.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.jks
+*.keystore
 secrets.json
 
 # Internal Strategy and Private Operations
