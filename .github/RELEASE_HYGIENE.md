@@ -48,6 +48,11 @@ These workflows run on every pull request targeting `dev`, `staged`, or `main`. 
           - `audit/reports` matches any tracked file under `audit/reports/` (path-boundary directory-prefix match; does not match `audit/reports-old/`).
           - `*.log` matches any tracked `.log` file by basename, so use with care.
     - Submodule integrity via `scripts/verify_submodule_integrity.py`.
+    - Release hygiene via `scripts/verify_release_hygiene.py`.
+      - Fails when root `CHANGELOG.md` is missing `## [Unreleased]`.
+      - Fails when the root `README.md` BOS version marker (`(BOS vX.Y.Z)`) does not match the latest root `CHANGELOG.md` release.
+      - Checks release tags for this repository origin and critical user-facing submodules when `VERIFY_RELEASE_HYGIENE_CHECK_ORIGIN_TAGS=true` (enabled in Unified CI).
+    - Docs public-safe preflight via `scripts/build_pages_artifact_public_safe.sh` (fail-fast allowlist validation used by both Unified CI and docs deploy).
     - Governance baseline via `scripts/verify_repo_governance_baseline.py`.
 - Branch promotion policy (see [`branch-promotion-policy.yml`](./workflows/branch-promotion-policy.yml))
 - Secret scan (see [`secret-scan.yml`](./workflows/secret-scan.yml))
@@ -109,7 +114,7 @@ For user-facing repositories (starting with `conxius-wallet`), we expect release
 - a matching `CHANGELOG.md` entry, and
 - GitHub Release notes copied from the matching changelog section.
 
-`Conxian Unified CI` runs `scripts/verify_release_hygiene.py` to enforce that this repo’s root `CHANGELOG.md` contains an `## [Unreleased]` section, and to emit warnings when critical user-facing repos are missing tags.
+`Conxian Unified CI` runs `scripts/verify_release_hygiene.py` to enforce that this repo’s root `CHANGELOG.md` contains an `## [Unreleased]` section, that the root `README.md` BOS marker matches the latest root `CHANGELOG.md` release, and to perform origin/submodule tag checks (enabled in CI via `VERIFY_RELEASE_HYGIENE_CHECK_ORIGIN_TAGS=true`).
 
 Merge preference:
 

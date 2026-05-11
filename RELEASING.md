@@ -22,9 +22,9 @@ Cut a release when a change is user-facing (behavior, security posture, public d
 1. Update `CHANGELOG.md`
    - Ensure `## [Unreleased]` exists.
    - Move the changes being released from `## [Unreleased]` into a new `## [X.Y.Z] - YYYY-MM-DD` section.
-   - Keep user-facing version strings in sync (for example, the BOS version in `README.md`).
+   - Keep user-facing version strings in sync (for example, the BOS version marker in `README.md` line 1: `(BOS vX.Y.Z)`).
 
-   Note: `Conxian Unified CI` enforces the `## [Unreleased]` section via `scripts/verify_release_hygiene.py`.
+   Note: `Conxian Unified CI` enforces release hygiene via `scripts/verify_release_hygiene.py`, including `## [Unreleased]`, README BOS marker sync with the latest `CHANGELOG.md` release, and origin/submodule tag checks.
 2. Create an annotated tag locally:
 
 ```bash
