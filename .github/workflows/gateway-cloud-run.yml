@@ -8,6 +8,9 @@ on:
       - 'conxian-gateway/**'
       - '.github/workflows/gateway-cloud-run.yml'
 
+permissions:
+  contents: read
+
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: us-central1
