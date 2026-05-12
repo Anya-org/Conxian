@@ -2,91 +2,95 @@
 
 ## Purpose
 
-This document standardizes release discipline and public-facing narrative across the Conxian portfolio after adoption of the builder-platform strategy.
+This document standardizes portfolio classification, release discipline, and public narrative decisions for Conxian.
+
+## Canonical repository classification categories
+
+Use these categories exactly across portfolio docs:
+
+- `primary strategic`
+- `supporting`
+- `reference`
+- `internal strategy`
+- `governance baseline`
+
+### Current classification baseline (repos in scope for issue #639)
+
+| Repository | Category | Role |
+| --- | --- | --- |
+| `Conxian` | `primary strategic` | Protocol and core Bitcoin-connected interfaces. |
+| `conxian-gateway` | `primary strategic` | Integration and middleware layer for builders/institutions. |
+| `conxian-nexus` | `primary strategic` | Authoritative state and telemetry layer. |
+| `conxius-wallet` | `primary strategic` | Native wallet and signing surface for users/builders. |
+| `lib-conxian-core` | `supporting` | Shared primitives and models used across strategic repos. |
+| `conxius-enclave-sdk` | `supporting` | Enclave/attestation SDK surface consumed by higher layers. |
+| `conxius-platform` | `supporting` | Local stack orchestration and developer operations. |
+| `conxian-labs-site` | `reference` | Public-facing narrative and documentation surface. |
+| `conxian-business` | `governance baseline` | Portfolio governance, standards, and release policy source. |
 
 ## Strategic narrative standard
 
-Conxian should be described as:
+Conxian should be positioned as infrastructure that helps builders support Bitcoin and Bitcoin-connected layers natively.
 
-- infrastructure for builders
+Use this framing consistently:
+
+- infrastructure for builders, not a generic consumer fintech suite
 - native support tooling for Bitcoin mainnet and Bitcoin-connected layers
-- a platform for capability interfaces, secure signing, integration quality, and reference implementations
+- platform-level capability interfaces for secure signing, integration quality, and reference implementations
 
-Conxian should not be described primarily as:
+Avoid framing Conxian primarily as:
 
 - a direct full-service financial operator
-- a generic consumer wallet company
-- a clone of every upstream SDK or application layer
+- a generic wallet-only company
+- a duplicate of upstream SDK/application layers
 
-## Public repo narrative guidance
+## Release discipline standard
 
-### Primary strategic repos
+### Applies to `primary strategic` repositories
 
-Each should clearly state:
-
-- what layer of the platform it owns
-- what it does not own
-- how it relates to the rest of the portfolio
-
-### Reference repos
-
-Each should clearly state:
-
-- that it is a reference or example surface
-- that canonical integration logic lives below it
-
-### Supporting repos
-
-Each should clearly state:
-
-- its narrow supporting role
-- the strategic repo it sits above, beside, or in front of
-
-## Release standard
-
-### Applies strongly to
-
-- `lib-conxian-core`
+- `Conxian`
 - `conxian-gateway`
-- `conxius-enclave-sdk`
-- `conxius-platform`
-
-### Recommended for
-
 - `conxian-nexus`
-- `conxius-orbit`
-- `Conxian` where versioned protocol artifacts are relevant
+- `conxius-wallet`
 
-## Minimum release expectations
+### Minimum release expectations (required)
 
-- versioned tags
-- release notes
-- changelog maintenance
-- compatibility or upgrade notes where needed
+1. **Changelog discipline**
+   - Root `CHANGELOG.md` is required.
+   - `## [Unreleased]` must be present and updated for user-visible behavior changes before merge.
+2. **Version tagging discipline**
+   - Every release must map to an immutable SemVer tag (`vX.Y.Z`).
+   - Annotated tags are required unless repository policy explicitly documents an alternative.
+3. **Release notes discipline**
+   - GitHub Release notes (or equivalent artifact) must be generated from tagged content.
+   - Notes must include impact summary, breaking-change callouts, and upgrade guidance where needed.
+4. **Compatibility signaling**
+   - Breaking changes require explicit migration/compatibility notes.
+   - Security-sensitive changes require explicit security section entries.
 
-## Release note template guidance
+### Expectations for `supporting` and `reference`
 
-Each release should answer:
+- `supporting` repos should follow the same changelog/tag model when consumed by strategic repos.
+- `reference` repos should publish clear narrative updates and link to canonical strategic release artifacts when no versioned release exists.
 
-- what changed
-- what layer or capability was affected
-- whether this is breaking or non-breaking
-- whether builders need to change integrations
-- whether security, signer, or verification behavior changed
+## Public narrative update plan (concrete rollout)
 
-## Narrative consistency rule
-
-Whenever repo READMEs, site copy, or portfolio docs are updated:
-
-- align the wording to the builder-platform thesis
-- preserve the strongest older messaging where still true
-- avoid creating a parallel narrative that re-centers the portfolio on consumer service identity
+1. **Repository README alignment (strategic + supporting)**
+   - Update `Purpose`, `Status`, and `Releases` sections to reflect the builder-infrastructure framing.
+   - Ensure each README states scope and non-scope clearly.
+2. **Public surface alignment (`conxian-labs-site`)**
+   - Update homepage and trust pages to foreground “Bitcoin-native builder infrastructure.”
+   - Link proof artifacts (`CHANGELOG.md`, tags/releases, `SECURITY.md`, OpenSpec references).
+3. **Portfolio catalog alignment (`conxian-business`)**
+   - Keep classification and release standards in sync across `docs/PORTFOLIO_BUSINESS_UNIT_MAP.md`, `docs/REPOSITORY_CATALOG.md`, and `docs/RELEASE_NOTES_AND_CHANGELOG.md`.
+4. **Narrative drift checks (ongoing governance)**
+   - During repo metadata/README updates, reject copy that drifts back to deprecated positioning.
+   - Prefer statements that explain how each repo helps builders ship Bitcoin and Bitcoin-connected integrations natively.
 
 ## Summary
 
-Release discipline and public narrative should make the portfolio look coherent:
+The portfolio baseline is:
 
-- strategic repos look like builder infrastructure
-- reference repos look like reference surfaces
-- supporting repos look narrow and intentional
-- the org story reinforces Bitcoin-layer support rather than drifting back into a blended identity
+- one canonical five-category classification model
+- strict changelog + tag discipline for `primary strategic` repos
+- a concrete narrative rollout plan anchored on Conxian as builder infrastructure for Bitcoin and Bitcoin-connected layers
