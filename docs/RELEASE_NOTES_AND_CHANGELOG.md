@@ -27,6 +27,16 @@ For these repositories, the following are required:
 
 `supporting` repositories (for example `lib-conxian-core`, `conxius-enclave-sdk`, and `conxius-platform`) should follow the same model whenever their changes affect strategic repo consumers.
 
+## CI and publication criteria mapping (compact)
+
+| Scope | CI behavior in this repo | Publication expectation |
+| --- | --- | --- |
+| Root `CHANGELOG.md` (`conxian-business`) | **Blocking:** `scripts/verify_release_hygiene.py` fails if `## [Unreleased]` is missing. | Keep `## [Unreleased]` current for user-visible changes. |
+| Strategic/public tag expectations (`Conxian`, `conxian-gateway`, `conxian-nexus`, `conxius-wallet`) | **Advisory (default):** CI runs tag checks in `warn` mode via `VERIFY_RELEASE_HYGIENE_TAG_EXPECTATION_MODE=warn`. | Cut immutable SemVer tags (`vX.Y.Z`) for published releases and keep release notes aligned with changelog entries. |
+| Strategic/public submodule changelog hygiene | **Advisory:** missing submodule changelog signals are warnings. | Maintain changelog discipline in each governed strategic/public repo. |
+
+Tag expectation modes are staged: `warn` (default), `require` (merge-blocking), and `off` (disabled).
+
 ## `CHANGELOG.md` (structure)
 
 All user-facing repositories **SHOULD** have a root `CHANGELOG.md`.
@@ -75,7 +85,7 @@ For user-facing repos, a version in `CHANGELOG.md` should correspond to an immut
 In this BOS repo, `Conxian Unified CI` runs `scripts/verify_release_hygiene.py` to:
 
 - enforce that the root `CHANGELOG.md` has an `## [Unreleased]` section, and
-- emit warnings when user-facing repos (starting with `conxius-wallet`) are missing tags.
+- evaluate tag expectations for the governed strategic/public set (`Conxian`, `conxian-gateway`, `conxian-nexus`, `conxius-wallet`) using staged modes (`warn`/`require`/`off`).
 
 ## Bootstrapping repos with versions but no tags
 
