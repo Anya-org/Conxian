@@ -15,13 +15,15 @@ from pathlib import Path
 UNRELEASED_RE = re.compile(r"^##\s*\[Unreleased\]\s*$", re.MULTILINE)
 
 
-TAG_EXPECTATION_SUBMODULE_PATHS = {
+GOVERNED_PUBLIC_REPO_SUBMODULE_PATHS = {
+    "Conxian",
     "conxius-wallet",
     "conxian-gateway",
     "conxian-nexus",
-    "conxius-platform",
-    "conxian-ui",
 }
+
+TAG_EXPECTATION_MODE_ENV = "VERIFY_RELEASE_HYGIENE_TAG_EXPECTATION_MODE"
+VALID_TAG_EXPECTATION_MODES = {"warn", "require", "off"}
 
 
 def _run_git(args: list[str]) -> str:
@@ -60,6 +62,17 @@ def _warning(message: str) -> None:
 
 def _error(message: str) -> None:
     _notice("error", message)
+
+
+def _tag_expectation_mode() -> str:
+    raw = os.environ.get(TAG_EXPECTATION_MODE_ENV, "warn")
+    mode = raw.strip().lower() or "warn"
+    if mode not in VALID_TAG_EXPECTATION_MODES:
+        allowed = ", ".join(sorted(VALID_TAG_EXPECTATION_MODES))
+        raise RuntimeError(
+            f"{TAG_EXPECTATION_MODE_ENV} must be one of: {allowed} (got {raw!r})"
+        )
+    return mode
 
 
 def _parse_gitmodules(repo_root: Path) -> dict[str, str]:
@@ -150,38 +163,84 @@ def _is_checked_out_submodule(submodule_path: Path) -> bool:
 def _verify_submodule_changelog(rel_path: str, submodule_path: Path) -> None:
     changelog_path = submodule_path / "CHANGELOG.md"
     if not changelog_path.exists():
-        _warning(f"{rel_path}: Missing CHANGELOG.md")
+        _warning(f"[advisory][changelog] {rel_path}: Missing CHANGELOG.md")
         return
 
     text = changelog_path.read_text(encoding="utf-8", errors="replace")
     if not UNRELEASED_RE.search(text):
         _warning(
-            f"{rel_path}: CHANGELOG.md is missing an '## [Unreleased]' section"
+            f"[advisory][changelog] {rel_path}: CHANGELOG.md is missing an '## [Unreleased]' section"
         )
 
 
 def verify() -> None:
     repo_root = _git_root()
+    tag_mode = _tag_expectation_mode()
+
+    print("Release hygiene policy:")
+    print("- Blocking: root CHANGELOG.md includes '## [Unreleased]'.")
+    if tag_mode == "off":
+        print(
+            f"- Advisory: strategic/public tag expectations disabled ({TAG_EXPECTATION_MODE_ENV}=off)."
+        )
+    elif tag_mode == "warn":
+        print(
+            f"- Advisory: strategic/public tag expectations run in warn mode ({TAG_EXPECTATION_MODE_ENV}=warn)."
+        )
+    else:
+        print(
+            f"- Blocking: strategic/public tag expectations run in require mode ({TAG_EXPECTATION_MODE_ENV}=require)."
+        )
 
     errors = _verify_root_changelog(repo_root)
     for err in errors:
-        _error(err)
+        _error(f"[blocking][changelog] {err}")
     if errors:
         raise RuntimeError("Release hygiene check failed")
 
     gitmodules = _parse_gitmodules(repo_root)
     for rel_path in sorted(gitmodules):
-        if rel_path not in TAG_EXPECTATION_SUBMODULE_PATHS:
+        if rel_path not in GOVERNED_PUBLIC_REPO_SUBMODULE_PATHS:
             continue
 
         submodule_path = repo_root / rel_path
         if not _is_checked_out_submodule(submodule_path):
-            _warning(f"{rel_path}: submodule is not checked out; cannot validate CHANGELOG.md")
+            _warning(
+                f"[advisory][changelog] {rel_path}: submodule is not checked out; cannot validate CHANGELOG.md"
+            )
             continue
         _verify_submodule_changelog(rel_path, submodule_path)
 
-    # Tag expectations (advisory for now): user-facing repos should have release tags.
+    if tag_mode == "off":
+        return
+
+    # Tag expectations for strategic/public repos.
     repos_to_check: dict[str, str] = {}
+    tag_failures: list[str] = []
+
+    for rel_path in sorted(GOVERNED_PUBLIC_REPO_SUBMODULE_PATHS):
+        url = gitmodules.get(rel_path)
+        if not url:
+            message = (
+                f"{rel_path}: missing from .gitmodules; cannot validate tag expectations"
+            )
+            if tag_mode == "require":
+                _error(f"[blocking][tags] {message}")
+                tag_failures.append(message)
+            else:
+                _warning(f"[advisory][tags] {message}")
+            continue
+        gh_repo = _parse_github_repo(url)
+        if not gh_repo:
+            message = f"{rel_path}: unsupported repo URL in .gitmodules ({url})"
+            if tag_mode == "require":
+                _error(f"[blocking][tags] {message}")
+                tag_failures.append(message)
+            else:
+                _warning(f"[advisory][tags] {message}")
+            continue
+        repos_to_check[rel_path] = gh_repo
+
     check_origin_tags = (
         os.environ.get("VERIFY_RELEASE_HYGIENE_CHECK_ORIGIN_TAGS", "").lower() == "true"
     )
@@ -195,27 +254,36 @@ def verify() -> None:
             if origin_repo:
                 repos_to_check["."] = origin_repo
 
-    for rel_path, url in sorted(gitmodules.items()):
-        if rel_path not in TAG_EXPECTATION_SUBMODULE_PATHS:
-            continue
-        gh_repo = _parse_github_repo(url)
-        if gh_repo:
-            repos_to_check[rel_path] = gh_repo
+    tag_failure_prefix = "[blocking][tags]" if tag_mode == "require" else "[advisory][tags]"
 
     for rel_path, gh_repo in sorted(repos_to_check.items()):
         try:
             count, latest = _repo_tag_status(gh_repo)
         except (urllib.error.HTTPError, urllib.error.URLError, RuntimeError) as exc:
-            _warning(f"{rel_path}: unable to fetch tags for {gh_repo} ({exc})")
+            message = f"{rel_path}: unable to fetch tags for {gh_repo} ({exc})"
+            if tag_mode == "require":
+                _error(f"{tag_failure_prefix} {message}")
+                tag_failures.append(message)
+            else:
+                _warning(f"{tag_failure_prefix} {message}")
             continue
 
         if count == 0:
-            _warning(
-                f"{rel_path}: {gh_repo} has no git tags yet. User-facing repos should cut tagged releases (vX.Y.Z)."
+            message = (
+                f"{rel_path}: {gh_repo} has no git tags yet. Strategic/public repos should cut tagged releases (vX.Y.Z)."
             )
+            if tag_mode == "require":
+                _error(f"{tag_failure_prefix} {message}")
+                tag_failures.append(message)
+            else:
+                _warning(f"{tag_failure_prefix} {message}")
         else:
             note = f" (latest: {latest})" if latest else ""
-            print(f"Release tags: OK for {rel_path} -> {gh_repo}{note}")
+            check_level = "blocking" if tag_mode == "require" else "advisory"
+            print(f"Release tags ({check_level}): OK for {rel_path} -> {gh_repo}{note}")
+
+    if tag_failures:
+        raise RuntimeError("Release hygiene check failed")
 
 
 if __name__ == "__main__":
