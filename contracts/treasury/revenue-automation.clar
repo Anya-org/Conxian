@@ -28,7 +28,7 @@
         (ok u0)
         (begin
           (try! (contract-call? token transfer fee payer .revenue-distributor none))
-          (print { event: "revenue-collected", token: (contract-of token) amount: fee, payer: payer })
+          (print { event: "revenue-collected", token: (contract-of token), amount: fee, payer: payer })
           (ok fee)
         )
       )

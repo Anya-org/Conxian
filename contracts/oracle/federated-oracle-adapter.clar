@@ -113,7 +113,7 @@
 (define-private (calculate-weighted-sum (source principal) (acc { asset: principal, total-weighted-price: uint, total-weight: uint, valid-sources: uint }))
   (let (
     (source-info (unwrap! (map-get? oracle-sources { source: source }) acc))
-    (price-info (map-get? individual-prices { asset: (get asset acc) source: source }))
+    (price-info (map-get? individual-prices { asset: (get asset acc), source: source }))
   )
     (if (and (get active source-info) (is-some price-info))
       (let (

@@ -23,7 +23,7 @@
 )
 
 ;; CSF Registry: Tracks external protocols (e.g. Zest StackingDAO Arkadiko) that implement CSF
-(define-map csf-registry principal { name: (string-ascii 256) registered-at: uint, active: bool })
+(define-map csf-registry principal { name: (string-ascii 256), registered-at: uint, active: bool })
 (define-map csf-by-index uint principal)
 
 ;; --- Public Administrative Functions ---

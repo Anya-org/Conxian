@@ -33,7 +33,7 @@
 
 ;; --- Internal Guards ---
 
-(define-private (guard-entry (protocol-status { compliant: bool, paused: bool, tenure-id: (optional uint) version: (string-ascii 2) }))
+(define-private (guard-entry (protocol-status { compliant: bool, paused: bool, tenure-id: (optional uint), version: (string-ascii 2) }))
   (begin
     (asserts! (not (get paused protocol-status)) (err ERR_CONTRACT_PAUSED))
     (asserts! (get compliant protocol-status) (err ERR_NON_COMPLIANT))

@@ -136,7 +136,7 @@
             }))
             ;; First attestation for this asset
             (map-set asset-reserves asset {
-                total-supply: u0 ;; Will be updated by sync,
+                total-supply: u0, ;; Will be updated by sync
                 on-chain-balance: u0,
                 off-chain-backing: off-chain-amount,
                 last-update: current-time,

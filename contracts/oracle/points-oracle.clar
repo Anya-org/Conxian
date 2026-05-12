@@ -30,7 +30,7 @@
 (define-map points-earned { event-id: uint } { user: principal, amount: uint, source: (string-ascii 16) })
 (define-map points-burned { event-id: uint } { user: principal, amount: uint, reason: (string-ascii 16) })
 (define-map points-transferred { event-id: uint } { from: principal, to: principal, amount: uint })
-(define-map reward-claimed { event-id: uint } { user: principal, reward-id: (string-ascii 32) cost: uint })
+(define-map reward-claimed { event-id: uint } { user: principal, reward-id: (string-ascii 32), cost: uint })
 
 ;; Storage maps
 (define-map user-points { user: principal } {
