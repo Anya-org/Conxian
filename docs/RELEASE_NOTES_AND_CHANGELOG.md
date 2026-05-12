@@ -1,6 +1,6 @@
 # Release notes and changelog format
 
-This document defines a repeatable release note and changelog structure for Conxian user-facing repositories.
+This document defines a repeatable release note and changelog structure for Conxian strategic and user-facing repositories.
 
 The goal is to make public updates easy to scan, easy to verify, and hard to misinterpret.
 
@@ -8,6 +8,24 @@ The goal is to make public updates easy to scan, easy to verify, and hard to mis
 
 - `CHANGELOG.md` is the durable, diff-friendly record of what changed.
 - GitHub Releases (or an equivalent release artifact in other forges) are the narrative summary of a tagged release.
+
+## Strategic release discipline baseline (issue #639)
+
+The `primary strategic` repositories are:
+
+- `Conxian`
+- `conxian-gateway`
+- `conxian-nexus`
+- `conxius-wallet`
+
+For these repositories, the following are required:
+
+1. Root `CHANGELOG.md` with `## [Unreleased]` kept current for user-visible changes.
+2. Immutable SemVer tags (`vX.Y.Z`) for every published release.
+3. Release notes tied to the corresponding tag.
+4. Explicit upgrade notes when changes are breaking or integration-sensitive.
+
+`supporting` repositories (for example `lib-conxian-core`, `conxius-enclave-sdk`, and `conxius-platform`) should follow the same model whenever their changes affect strategic repo consumers.
 
 ## `CHANGELOG.md` (structure)
 
