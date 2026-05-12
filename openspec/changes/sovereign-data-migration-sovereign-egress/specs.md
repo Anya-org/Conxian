@@ -1,6 +1,6 @@
-# Specifications: Sovereign Data Migration & Institutional Egress
+# Specifications: Sovereign Data Migration & Sovereign Egress
 
-(Note: Technical requirements are formally defined in `specs/sovereign-data-migration-institutional-egress/spec.md`.)
+(Note: Technical requirements are formally defined in `specs/sovereign-data-migration-sovereign-egress/spec.md`.)
 
 ## 1. Phase 5 clean-break requirements
 - **SPEC-SDM-001**: Supabase MUST NOT be correctness-critical.
@@ -11,7 +11,7 @@
 - **SPEC-AN-001**: Proof/visual-proof datasets MUST be checkpointed on-chain.
 - **SPEC-AN-002**: Analytics providers MAY change without changing dataset truth.
 
-## 3. Institutional egress (subledger) requirements
+## 3. Sovereign egress (subledger) requirements
 - **SPEC-IE-001**: Egress is standardized read-only subledger export.
 - **SPEC-IE-002**: Egress datasets MUST be verifiable against on-chain checkpoints.
 - **SPEC-IE-003**: Egress datasets MUST NOT contain secrets or enclave-only material.

@@ -35,7 +35,7 @@ The 6-way revenue split MUST be calculated in Clarity based on the Global Collat
 - **Then** the Treasury module MUST apply CXIP-013 logic.
 
 ### Requirement: ISO 20022 Compliance
-All institutional egress MUST match ISO 20022 XML standards.
+All sovereign egress MUST match ISO 20022 XML standards.
 
 #### Scenario: ERP Integration
 - **Given** a transaction ready for ERP synchronization

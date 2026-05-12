@@ -72,7 +72,7 @@
 ## 🏛️ Ground Truth (OpenSpec)
 
 * [OpenSpec Baseline](openspec/changes/remediate-enterprise-sovereignty/specs.md)
-* [Sovereign Data Migration & Institutional Egress](openspec/changes/sovereign-data-migration-institutional-egress/specs.md)
+* [Sovereign Data Migration & Sovereign Egress](openspec/changes/sovereign-data-migration-sovereign-egress/specs.md)
 * [SAB migration control plane](docs/SAB_MIGRATION_CONTROL_PLANE.md)
   * [Dependency inventory](docs/SAB_MIGRATION_DEPENDENCY_INVENTORY.md)
   * [Datastore decision log](docs/SAB_DATASTORE_DECISION_LOG.md)
