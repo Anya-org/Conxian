@@ -21,16 +21,12 @@ Documentation here follows public-safe boundary rules; internal-only strategy an
 
 Releases are tracked in `CHANGELOG.md` and published as SemVer tags (`vX.Y.Z`). See `RELEASING.md`.
 
-## Ownership
-
-Ownership and review requirements are defined in [`CODEOWNERS`](./CODEOWNERS).
-
 ## Audience
 
 - Contributors implementing Conxian's protocol, infrastructure, and tools.
 - Partners and auditors who need a canonical, versioned view of OpenSpec.
 
-## Repository Portfolio & Relationship to the Conxian stack
+## Relation to Conxian stack
 
 The Conxian ecosystem is organized by function to ensure clarity and modularity across the Sovereign Autonomous Business (SAB) stack. See the **[BOS Runtime Ownership Map](./BOS_RUNTIME_OWNERSHIP_MAP.md)** for detailed responsibility boundaries.
 
@@ -55,7 +51,7 @@ The Conxian ecosystem is organized by function to ensure clarity and modularity 
 - **[`conxian-ui/`](./conxian-ui)**: **Web**. Institutional operator dashboard.
 - **[`conxian-labs-site/`](./conxian-labs-site)**: **Website**. Public ecosystem landing.
 
-## Cloning
+## Quick start / Next action
 
 This repository uses Git submodules.
 
@@ -76,6 +72,16 @@ If you need the `conxius-platform/` nested submodules, initialize them from with
 cd conxius-platform
 git submodule update --init services/conxian-ui
 ```
+
+Next action after clone: review `docs/REPO_PORTFOLIO.md` for ecosystem context and `docs/BOS_BUSINESS_BUILDOUT.md` for public/internal boundary rules.
+
+## Security / Governance
+
+Ownership and review requirements are defined in [`CODEOWNERS`](./CODEOWNERS).
+
+For general support and non-security bug reports, open a GitHub issue. For security vulnerabilities, follow the private reporting process in [`SECURITY.md`](./SECURITY.md).
+
+This repository follows Zero Secret Egress (ZSE) boundary discipline. See [Repository visibility and public/private boundary](#repository-visibility-and-publicprivate-boundary).
 
 ## Repository visibility and public/private boundary
 
