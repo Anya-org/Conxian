@@ -37,6 +37,21 @@ Boundary interpretation:
 - Phase 1 layers are treated as first-class portfolio support targets.
 - Phase 2 layers are handled via the adapter model and should reuse the same canonical verb vocabulary where applicable.
 
+## M0 canonical Lightning boundary decision
+
+Lightning is **gateway-first / gateway-owned adapter surface**.
+
+Boundary implications:
+
+- `conxian-gateway` owns Lightning adapter implementation and provider/node integration surfaces.
+- `lib-conxian-core` owns shared capability interfaces and verification primitives, not Lightning provider adapters.
+- `conxius-enclave-sdk` owns signer controls consumed by gateway-owned Lightning adapter paths.
+
+Linked M0 artifacts:
+
+- `docs/BITCOIN_LAYER_CAPABILITY_OWNERSHIP_MATRIX_M0.md`
+- `docs/BITCOIN_LAYER_MAINNET_READINESS_GATE_CHECKLIST_M0.md`
+
 ## Repository ownership boundaries
 
 | Repository | Owns | Does not own |
