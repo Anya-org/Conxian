@@ -1,6 +1,6 @@
 # Portfolio business-unit map and separation of concerns
 
-> Verification: expected to be enforced by P0 portfolio hygiene automation (see the prioritized build/repair list). Until then, keep the repo’s submodule gitlinks, `.gitmodules`, and the portfolio docs (`docs/PORTFOLIO_BUSINESS_UNIT_MAP.md`, `docs/REPO_PORTFOLIO.md`) consistent on the pinned submodule set and their flagship/supporting classifications in every PR (see “Source-of-truth rule” below).
+> Verification: expected to be enforced by P0 portfolio hygiene automation (see the prioritized build/repair list). Until then, keep the repo’s submodule gitlinks, `.gitmodules`, and the portfolio docs (`docs/PORTFOLIO_BUSINESS_UNIT_MAP.md`, `docs/REPO_PORTFOLIO.md`) consistent on the pinned submodule set and their canonical classifications (`primary strategic`, `supporting`, `reference`, `internal strategy`, `governance baseline`) in every PR (see “Source-of-truth rule” below).
 
 This document is the portfolio-level map that assigns every repo/subrepo (submodule) and BOS asset to a **business unit** or **operating function**, and defines the separation-of-concerns boundaries needed for business development and business unit management.
 
@@ -35,7 +35,7 @@ Control note: this map must be updated whenever the set of pinned submodule path
 
 This complements (and should remain consistent with):
 
-- `docs/REPO_PORTFOLIO.md` (flagship vs supporting trust surface)
+- `docs/REPO_PORTFOLIO.md` (trust-surface view aligned to canonical classification categories)
 - `openspec/changes/remediate-enterprise-sovereignty/specs/enterprise-sovereignty/spec.md` (4-unit consolidation requirement)
 
 ## Target business-unit structure
@@ -51,11 +51,36 @@ OpenSpec anchors the ecosystem into four standalone businesses:
 
 Alongside the four units, BOS requires separate operating functions that should not be mixed into product repos (examples: governance/specs, treasury, compliance, ops, strategy, UI/public web, platform/DevEx, DevOps tooling, and showcase surfaces).
 
+## Canonical repository classification standard (issue #639)
+
+Use these categories exactly in portfolio documentation:
+
+- `primary strategic`
+- `supporting`
+- `reference`
+- `internal strategy`
+- `governance baseline`
+
+Current baseline for key ecosystem repos:
+
+| Repository | Category | Notes |
+| --- | --- | --- |
+| `Conxian/` | `primary strategic` | Protocol authority and on-chain interfaces. |
+| `conxian-gateway/` | `primary strategic` | Integration gateway and institutional middleware. |
+| `conxian-nexus/` | `primary strategic` | Authoritative state and telemetry node. |
+| `conxius-wallet/` | `primary strategic` | Wallet/signing surface for end users and builders. |
+| `lib-conxian-core/` | `supporting` | Shared primitives and cross-repo models. |
+| `conxius-enclave-sdk/` | `supporting` | Enclave/attestation SDK for higher layers. |
+| `conxius-platform/` | `supporting` | Local stack and developer orchestration. |
+| `conxian-labs-site/` | `reference` | Public narrative and docs distribution surface. |
+| `Sovereign-Strategy-Nexus/` | `internal strategy` | Internal strategy and M&A operating surface. |
+| `conxian-business` | `governance baseline` | Portfolio governance and standards source. |
+
 ## Portfolio-level map (repos, subrepos, and BOS assets)
 
 ### Ecosystem repos (submodules pinned by this BOS repo)
 
-This table should be kept consistent with the repo’s submodule gitlinks (what is actually pinned), `.gitmodules` (expected submodule config metadata), and `docs/REPO_PORTFOLIO.md` (flagship vs supporting classification).
+This table should be kept consistent with the repo’s submodule gitlinks (what is actually pinned), `.gitmodules` (expected submodule config metadata), and `docs/REPO_PORTFOLIO.md` (trust-surface descriptions aligned to canonical category assignments).
 
 Maintainer note: until the P0 portfolio manifest exists, changes to the asset list here should be reflected in the “Unique value + scope definition” section below as well.
 
@@ -66,7 +91,7 @@ Source-of-truth rule:
 - Submodule bumps should be represented by explicit gitlink updates committed in a PR (see “How to bump a pinned submodule” below); do not rely on `git submodule update --remote` as a normal workflow.
 - The submodule policy workflow ([`.github/workflows/auto-sync-submodules.yml`](../.github/workflows/auto-sync-submodules.yml)) is read-only and exists to enforce pinned-SHA policy; it must not mutate refs, set branch-tracking config, or open auto-sync PRs.
 - This document is authoritative for business-unit/operating-function classification.
-- `docs/REPO_PORTFOLIO.md` is an explanatory trust-surface view; it may list additional supporting repos for context, but every pinned submodule in the ecosystem mapping table should appear there with a flagship/supporting classification.
+- `docs/REPO_PORTFOLIO.md` is an explanatory trust-surface view; it may list additional context repos, but every pinned submodule in the ecosystem mapping table should appear there with one of the canonical classifications.
 
 How to bump a pinned submodule (gitlink) in a PR (manual workflow):
 
@@ -82,7 +107,7 @@ Portfolio hygiene automation should validate:
 - Every pinned gitlink has a `.gitmodules` entry and a corresponding row in the ecosystem submodule mapping table.
 - Every `.gitmodules` entry has a corresponding pinned gitlink and row in the ecosystem submodule mapping table.
 - Every row in the ecosystem submodule mapping table corresponds to a pinned gitlink and `.gitmodules` entry (no extra rows).
-- Every pinned gitlink with a row in the ecosystem submodule mapping table appears in `docs/REPO_PORTFOLIO.md` with a flagship/supporting classification.
+- Every pinned gitlink with a row in the ecosystem submodule mapping table appears in `docs/REPO_PORTFOLIO.md` with a canonical classification.
 - Every BOS-native asset path enumerated in the BOS-native assets table exists in this repo (one-way check; new BOS-native assets must be added to the table during review).
 
 Until portfolio hygiene automation is live, reviewers should treat these invariants as manual review criteria and reject PRs that violate them.
@@ -96,8 +121,8 @@ Until portfolio hygiene automation is live, reviewers should treat these invaria
 | `conxian-ui/` | Submodule | Operating function (UI) | UI | Web UI for interacting with the ecosystem; should avoid embedding protocol logic beyond calls. |
 | `conxian-labs-site/` | Submodule | Operating function (Public web) | Public documentation + marketing | Public site; should not include internal-only strategy material. |
 | `conxius-platform/` | Submodule | Operating function (Platform/DevEx) | Local stack orchestration | Dev stack only; should not become a home for core product logic. |
-| `stacksorbit/` | Submodule | Operating function (DevOps tooling) | Deployment tooling | Primarily supports CSF protocol deployment. |
-| `lib-conclave-sdk/` | Submodule | Operating function (Shared SDK) | Shared libraries | Supports services across Fusion/Nexus; should stay dependency-light. |
+| `conxius-orbit/` | Submodule | Operating function (DevOps tooling) | Deployment tooling | Primarily supports CSF protocol deployment. |
+| `conxius-enclave-sdk/` | Submodule | Operating function (Shared SDK) | Shared libraries | Supports services across Fusion/Nexus; should stay dependency-light. |
 | `lib-conxian-core/` | Submodule | Operating function (Shared core) | Shared models + conventions | Shared primitives only; must not contain BU-specific business logic or depend directly on product repos. Layering: sits beneath product repos and shared SDKs; may not depend on them. |
 
 ### BOS-native assets (tracked in this repo)
@@ -112,7 +137,7 @@ Until portfolio hygiene automation is live, reviewers should treat these invaria
 | `audit/` | Governance (Assurance) | Audits and alignment reports | Outputs should be cross-unit and non-sensitive. |
 | `infrastructure/terraform/` | Operating function (Infra) | Infrastructure as code | Shared infra definitions; avoid coupling to a single business unit. |
 | `admin/` | Operating function (Admin) | Internal runbooks/ops | Must respect Zero Secret Egress; secrets must remain out of git. |
-| `showcase-dapp/` | Operating function (Showcase) | Demonstration UI | Public demo surface; should stay clearly separate from flagship product repos. |
+| `showcase-dapp/` | Operating function (Showcase) | Demonstration UI | Public demo surface; should stay clearly separate from `primary strategic` repos. |
 | `Fiscal-Vault-Oracle/` | Operating function (Treasury) | Treasury automation | Financial engine module (BOS EXCO suite). |
 | `Nakamoto-Guardian/` | Operating function (Compliance) | Enforcement/compliance | Architecture + regulatory enforcement module (BOS EXCO suite). |
 | `Sovereign-Ops-Orchestrator/` | Operating function (Ops) | Execution orchestration | Work/ops engine; connects BOS state machine to execution platforms. |
@@ -153,7 +178,7 @@ Published boundary interfaces include:
 - On-chain interfaces and traits in `Conxian/`.
 - Nexus APIs/schemas in `conxian-nexus/`.
 - Gateway integration APIs/event schemas in `conxian-gateway/`.
-- Shared SDK surfaces intended for cross-unit use (for example, `lib-conclave-sdk/` and `lib-conxian-core/`).
+- Shared SDK surfaces intended for cross-unit use (for example, `conxius-enclave-sdk/` and `lib-conxian-core/`).
 
 ### 3) Example cross-unit workflows
 
@@ -209,9 +234,9 @@ This section intentionally repeats the asset list with additional positioning de
 | `conxian-nexus/` | Authoritative state + telemetry | Block height authority, state services, metrics | UI, treasury automation |
 | `conxian-ui/` | Web interaction surface | Web app UX consuming boundary APIs | Defining protocol logic |
 | `conxius-platform/` | End-to-end local stack | Dev orchestration, local ops | Shipping product features |
-| `stacksorbit/` | Protocol deployment tooling | Contract deployment and ops | Wallet features |
+| `conxius-orbit/` | Protocol deployment tooling | Contract deployment and ops | Wallet features |
 | `conxian-labs-site/` | Public web presence | Marketing, docs surfacing | Internal strategy |
-| `lib-conclave-sdk/` | Enclave/crypto SDK | Attested flows, SDK primitives | Protocol decisions |
+| `conxius-enclave-sdk/` | Enclave/crypto SDK | Attested flows, SDK primitives | Protocol decisions |
 | `lib-conxian-core/` | Shared conventions | Models, shared primitives | Business logic or product UX |
 
 #### Preserve vs enhance ownership boundaries (CON-433)
@@ -298,7 +323,7 @@ P0 (portfolio integrity and “who owns what”):
 P1 (separation enforcement and partner legibility):
 
 1. Extend `make unbundle` (root `Makefile`) into a portfolio-wide boundary check (disallowing known cross-contamination patterns).
-2. Ensure every flagship repo README follows the role-line and linkage rules defined in `docs/REPO_PORTFOLIO.md` and links back to this map.
+2. Ensure every `primary strategic` repo README follows the role-line and linkage rules defined in `docs/REPO_PORTFOLIO.md` and links back to this map.
 
 P2 (operating controls):
 

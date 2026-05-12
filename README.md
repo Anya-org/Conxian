@@ -33,7 +33,7 @@ The Conxian ecosystem is organized by function to ensure clarity and modularity 
 ### 1. Platform & Governance
 - **[`conxian-business/`](./conxian-business)**: **BOS Operations**. Commercial, legal, and platform specifications (ZSE Stubs).
 - **[`conxius-platform/`](./conxius-platform)**: **Orchestration**. Stack orchestration and local development.
-- **[`stacksorbit/`](./stacksorbit)**: **Ops Tooling**. Deployment and operations automation.
+- **[`conxius-orbit/`](./conxius-orbit)**: **Ops Tooling**. Deployment and operations automation.
 
 ### 2. Core Operating Suite (EXCO Agents)
 - **[`conxian-nexus/`](./conxian-nexus)**: **State Node**. High-level orchestration, state roots (MMR), and decentralized storage.
@@ -43,7 +43,7 @@ The Conxian ecosystem is organized by function to ensure clarity and modularity 
 
 ### 3. Protocol & SDKs
 - **[`Conxian/`](./Conxian)**: **Protocol**. Conxian Finance Protocol (Clarity smart contracts).
-- **[`lib-conclave-sdk/`](./lib-conclave-sdk)**: **Agentic SDK**. Enclave + hardware attestation primitives.
+- **[`conxius-enclave-sdk/`](./conxius-enclave-sdk)**: **Agentic SDK**. Enclave + hardware attestation primitives.
 - **[`lib-conxian-core/`](./lib-conxian-core)**: **Shared Core**. Common models for BitVM2, CJCS, and Gateway engine.
 
 ### 4. User Interfaces
