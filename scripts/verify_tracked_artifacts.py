@@ -193,6 +193,7 @@ RULES: tuple[Rule, ...] = (
             "target/**",
             "debug/**",
             "release/**",
+            "_pages/**",
         ),
     ),
     Rule(
@@ -201,6 +202,7 @@ RULES: tuple[Rule, ...] = (
             "coverage/**",
             "test-results/**",
             "playwright-report/**",
+            "blob-report/**",
             ".nyc_output/**",
             "junit.xml",
         ),
@@ -209,6 +211,7 @@ RULES: tuple[Rule, ...] = (
         "Runtime and tool state",
         (
             ".firebase/**",
+            ".vercel/**",
             ".terraform/**",
             "*.tfstate",
             "*.tfstate.*",
@@ -254,13 +257,22 @@ def _secret_filename_violation(rel_path: str) -> str | None:
     lower = base.lower()
     is_example = any(token in lower for token in ("example", "sample", "template"))
 
-    if base == ".env":
+    if lower == ".env":
         return "Secrets and env files"
-    if base.startswith(".env.") and not is_example:
+    if lower.startswith(".env.") and not is_example:
         return "Secrets and env files"
-    if base in {"secrets.json", "id_rsa", "id_ed25519"}:
+    if lower in {"secrets.json", "id_rsa", "id_ed25519", "id_ecdsa"}:
         return "Secrets and env files"
-    if base.endswith((".pem", ".key")):
+    if lower.endswith((
+        ".pem",
+        ".key",
+        ".p12",
+        ".pfx",
+        ".jks",
+        ".keystore",
+        ".crt",
+        ".cer",
+    )):
         return "Secrets and env files"
 
     return None
