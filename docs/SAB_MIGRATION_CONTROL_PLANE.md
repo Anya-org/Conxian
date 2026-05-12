@@ -41,12 +41,12 @@ Update convention: on every review (cadence- or milestone-driven), bump `Last re
 Baseline specs that constrain decisions:
 
 - SAB datastore mapping: [openspec/specs/sab-datastore-mapping/spec.md](../openspec/specs/sab-datastore-mapping/spec.md)
-- Sovereign data migration & institutional egress synthesis: [openspec/changes/sovereign-data-migration-institutional-egress/specs.md](../openspec/changes/sovereign-data-migration-institutional-egress/specs.md)
+- Sovereign data migration & sovereign egress synthesis: [openspec/changes/sovereign-data-migration-sovereign-egress/specs.md](../openspec/changes/sovereign-data-migration-sovereign-egress/specs.md)
 
 ## Working rules (program-level)
 
 1. **Canonical truth remains Stacks L1.** All off-chain stores are derived/query layers and must be rebuildable.
-2. **Correctness isolation:** Supabase and Neon must not be required for protocol correctness, final auditability, or institutional accounting truth.
+2. **Correctness isolation:** Supabase and Neon must not be required for protocol correctness, final auditability, or sovereign accounting truth.
 3. **Zero Secret Egress (ZSE):** no enclave-only secrets or signing keys in any non-enclave datastore.
 4. **Evidence over assertion:** readiness gates are only "met" when linked evidence exists (commit-pinned docs, checklists, or reproducible scripts).
 

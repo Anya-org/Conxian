@@ -6,7 +6,7 @@ This checklist tracks the mainnet readiness for the `conxian-nexus` repository (
 
 ### 1) Production Sanitization
 - [x] **CON-384**: Testnet principals (ST...) removed from source.
-- [x] **Wallet Alignment**: Bootstrap wallet (`SPSZXAKV7DWTDZN2601WR31BM51BD3YTQWE97VRM`) integrated for identity.
+- [x] **Wallet Alignment**: Bootstrap wallet (`SP3FBR2AGK5H9QPNVFJWC7636X22Y620S00000000`) integrated for identity.
 - [x] **Contamination Guard**: `scripts/check_production_boundary.sh` integrated and passing.
 
 ### 2) Core Implementation

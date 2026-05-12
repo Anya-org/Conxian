@@ -13,10 +13,10 @@ This OpenSpec package is an architecture synthesis only. Execution remains track
 ## Neon phase-out (transactional SQL)
 - [ ] [CON-330](https://linear.app/conxian-labs/issue/CON-330/pilot-sovereign-transactional-sql-for-conxian-nexus) — pilot sovereign transactional SQL for `conxian-nexus`
 
-## Institutional egress policy (read-only subledger export)
+## Sovereign egress policy (read-only subledger export)
 - [ ] [CON-161](https://linear.app/conxian-labs/issue/CON-161/extend-treasury-oracle-schema-for-external-settlement-logs) — extend treasury oracle schema for external settlement logs
 - [ ] [CON-164](https://linear.app/conxian-labs/issue/CON-164/add-external-settlement-log-schema-in-treasury-oracle-repo) — add external settlement log schema in treasury oracle repo
-- [ ] Treat [spec: Export field naming conventions](./specs/sovereign-data-migration-institutional-egress/spec.md#export-field-naming-conventions) as shared acceptance criteria for CON-161 and CON-164.
+- [ ] Treat [spec: Export field naming conventions](./specs/sovereign-data-migration-sovereign-egress/spec.md#export-field-naming-conventions) as shared acceptance criteria for CON-161 and CON-164.
 
 ## Gateway readiness (non-egress)
 - [ ] [CON-160](https://linear.app/conxian-labs/issue/CON-160/add-global-settlement-ingress-to-gateway) — add global settlement ingress to gateway (not an external-subledger write-path)

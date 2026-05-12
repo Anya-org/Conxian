@@ -5,7 +5,7 @@
 This report confirms the full launch wallet and signer control path for the Conxian ecosystem.
 
 ### 1) Ownership & Approval Model
-- **Bootstrap Wallet**: `SPSZXAKV7DWTDZN2601WR31BM51BD3YTQWE97VRM` is confirmed as the temporary operator for initialization (Stage 0).
+- **Bootstrap Wallet**: `SP3FBR2AGK5H9QPNVFJWC7636X22Y620S00000000` is confirmed as the temporary operator for initialization (Stage 0).
 - **SAB Multi-sigs**: Architecture for `SAB_DEPLOYER_MULTISIG`, `SAB_PAYOUT_MULTISIG`, and `SAB_EMERGENCY_RECOVERY_MULTISIG` is established and documented.
 - **Role-Based Access**: Contract roles in `conxian-access.clar` are mapped to the intended SAB authorities.
 

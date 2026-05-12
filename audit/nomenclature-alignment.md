@@ -12,7 +12,7 @@ This audit confirms the strict separation between the Corporate Entity (**Conxia
 | **Platform** | **Conxian** | The Global Settlement Layer & PaaS |
 | **Wallet** | **Conxius** | The Sovereign Wallet |
 | **Intelligence** | **Nexus** | On-Chain Intelligence & Data |
-| **On-Ramp/Compliance** | **Gateway** | Institutional Entry Point |
+| **On-Ramp/Compliance** | **Gateway** | Sovereign Entry Point |
 
 ## 2. Modified Files & String Changes
 
@@ -28,7 +28,7 @@ This audit confirms the strict separation between the Corporate Entity (**Conxia
 
 ### Conxian Platform & Gateway
 - `Conxian/REPAIR_REPORT_JANUARY_2026.md`: "Prepared by: Jules (Conxian Labs AI Agent)" -> "Prepared by: Jules (Conxian AI Agent)"
-- `RENDER_BOS_PAYLOAD.md`: "Conxian-Labs Institutional UI" -> "Conxian Institutional UI"
+- `RENDER_BOS_PAYLOAD.md`: "Conxian-Labs Sovereign UI" -> "Conxian Sovereign UI"
 - `conxius-platform/services/admin-dashboard/...`: Updated copyright/identity to "Conxian".
 
 ### Web Presence (`conxian-labs-site`)

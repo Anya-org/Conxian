@@ -1,4 +1,4 @@
-# Sovereign Data Migration & Institutional Egress Specification
+# Sovereign Data Migration & Sovereign Egress Specification
 
 ## 0. Conventions & Definitions
 
@@ -8,13 +8,13 @@ This specification uses requirement keywords (**MUST**, **MUST NOT**, **SHOULD**
 - **Canonical system of record**: authoritative source for correctness (Stacks L1).
 - **Derived dataset / read model**: a deterministic projection derived from canonical truth.
 - **Glass Node**: a read-only system that exposes derived datasets and proofs of correctness.
-- **Institutional egress**: standardized read-only export of accounting-relevant datasets to external subledgers.
+- **Sovereign egress**: standardized read-only export of accounting-relevant datasets to external subledgers.
 - **External subledger**: any external accounting system ingesting Conxian datasets (ERP subledger, auditor subledger, reporting pipeline).
 - **Proof/visual-proof flow**: any workflow that presents derived analytics as evidence (dashboards, reports, attestations).
 
 ## Export field naming conventions
 
-To reduce ambiguity across institutional egress consumers, exported datasets **MUST** define a representation-agnostic canonical field schema and a deterministic mapping to any export-format-specific representations. These conventions apply to all institutional egress datasets; existing datasets **MUST** adopt them by the next versioned schema release after this spec is accepted into the canonical OpenSpec baseline. A versioned schema release is any published dataset schema update that increments the dataset schema version marker (for example `schema_version`).
+To reduce ambiguity across sovereign egress consumers, exported datasets **MUST** define a representation-agnostic canonical field schema and a deterministic mapping to any export-format-specific representations. These conventions apply to all sovereign egress datasets; existing datasets **MUST** adopt them by the next versioned schema release after this spec is accepted into the canonical OpenSpec baseline. A versioned schema release is any published dataset schema update that increments the dataset schema version marker (for example `schema_version`).
 
 - Canonical dataset fields **MUST** use `snake_case`.
 - JSON exports, CSV headers, the column names of any SQL views or tables used as egress-facing datasets, and any other direct machine-readable serializations of the dataset (**excluding** message formats) **MUST** expose canonical fields using their canonical `snake_case` field names; these exports **MAY** additionally expose deprecated alias fields as described below.
@@ -29,14 +29,14 @@ To reduce ambiguity across institutional egress consumers, exported datasets **M
 
 ## 1. Purpose
 
-Define Phase 5 "clean break" constraints for Supabase and Neon, and define institutional accounting egress as standardized read-only subledger export. This spec synthesizes and sharpens existing SAB migration and treasury/oracle work without creating a duplicate execution lane.
+Define Phase 5 "clean break" constraints for Supabase and Neon, and define sovereign accounting egress as standardized read-only subledger export. This spec synthesizes and sharpens existing SAB migration and treasury/oracle work without creating a duplicate execution lane.
 
 ## 2. Scope
 
 In scope:
 - Supabase phase-out requirements for proof/visual-proof analytics.
 - Neon phase-out requirements for `conxian-nexus` transactional persistence.
-- Institutional egress policy and verifiability requirements for external settlement logs and ISO 20022 outputs.
+- Sovereign egress policy and verifiability requirements for external settlement logs and ISO 20022 outputs.
 
 Out of scope:
 - Implementation details for any specific ERP vendor.
@@ -48,7 +48,7 @@ Out of scope:
 
 1. **Canonical truth**: Stacks L1 **MUST** remain the canonical system of record for SAB-critical business state.
 2. **Replaceability**: Any off-chain datastore that is not the canonical system of record **MUST** be replaceable without changing truth, by rebuilding from Stacks L1 events/state.
-3. **Correctness isolation**: Supabase and Neon **MUST NOT** be required for protocol correctness, final auditability, or institutional accounting truth.
+3. **Correctness isolation**: Supabase and Neon **MUST NOT** be required for protocol correctness, final auditability, or sovereign accounting truth.
 
 ### 3.2 Supabase phase-out (proof/visual-proof analytics)
 
@@ -68,12 +68,12 @@ Out of scope:
    - Backup and restore semantics.
    - Connection pooling and TLS requirements.
 
-### 3.4 Institutional egress policy (read-only subledger export)
+### 3.4 Sovereign egress policy (read-only subledger export)
 
-1. **Read-only framing**: Institutional egress **MUST** be treated as a standardized read-only export of derived datasets.
+1. **Read-only framing**: Sovereign egress **MUST** be treated as a standardized read-only export of derived datasets.
 2. **No write-path coupling**: External subledgers **MUST NOT** be required (or trusted) to write data back into Conxian for correctness.
 3. **Nexus as Glass Node**: `conxian-nexus` **SHOULD** be the primary producer of egress datasets as a Glass Node (derived datasets + proofs).
-4. **Gateway as institutional API**: `conxian-gateway` **SHOULD** be the institutional interface for:
+4. **Gateway as sovereign API**: `conxian-gateway` **SHOULD** be the sovereign interface for:
    - serving egress datasets,
    - serving verification materials,
    - rendering standardized message formats (e.g., ISO 20022) over verifiable datasets.
@@ -103,5 +103,5 @@ Out of scope:
 
 - [x] No duplicate execution lane is created; work maps to existing SAB migration and treasury/oracle issues.
 - [x] Supabase and Neon phase-out work is linked to explicit pilot and cutover decisions.
-- [x] Institutional egress is defined as standardized read-only subledger export with checkpoint verification.
+- [x] Sovereign egress is defined as standardized read-only subledger export with checkpoint verification.
 - [x] `conxian-nexus` is positioned as the Glass Node producer for verifiable egress datasets.
