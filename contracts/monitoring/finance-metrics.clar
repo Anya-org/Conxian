@@ -12,7 +12,12 @@
 (define-read-only (get-gcr) (ok (var-get global-collateral-ratio)))
 
 (define-read-only (get-protocol-status)
-  (ok { compliant: true, version: "v1.1.0-Apex", tvl: (var-get total-value-locked) gcr: (var-get global-collateral-ratio) })
+  (ok {
+    compliant: true,
+    version: "v1.1.0-Apex",
+    tvl: (var-get total-value-locked),
+    gcr: (var-get global-collateral-ratio)
+  })
 )
 
 (define-public (update-metrics (new-tvl uint) (new-gcr uint))

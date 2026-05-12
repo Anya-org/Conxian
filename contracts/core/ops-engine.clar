@@ -13,7 +13,7 @@
   )
 )
 
-;; @desc Trigger a protocol epoch update (expected by tests)
+;; @desc Triggers a protocol-wide epoch update, synchronizing state and processing scheduled updates.
 (define-public (trigger-epoch-update)
   (begin
     (var-set last-action-block burn-block-height)
@@ -26,7 +26,7 @@
   (ok (var-get last-action-block))
 )
 
-;; @desc Get operational status of the ops engine
+;; @desc Returns the current operational status, last update height, and version of the ops engine.
 (define-read-only (get-protocol-status)
   (ok {
     compliant: true,

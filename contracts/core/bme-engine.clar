@@ -102,7 +102,7 @@
 (define-public (swap-and-burn (token <sip-010-ft-trait>) (amount uint))
   (begin
     ;; Simplified for simulation to avoid complex router calls
-    (print { event: "swap-and-burn-simulated", token: (contract-of token) amount: amount })
+    (print { event: "swap-and-burn-simulated", token: (contract-of token), amount: amount })
     (ok true)
   )
 )

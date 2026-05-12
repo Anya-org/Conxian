@@ -40,7 +40,7 @@
   cooldown-end: uint
 })
 
-(define-map vault-balances { vault-id: (buff 20) token: principal } uint)
+(define-map vault-balances { vault-id: (buff 20), token: principal } uint)
 
 (define-map user-vaults { user: principal } {
   vault-ids: (list 10 (buff 20)),

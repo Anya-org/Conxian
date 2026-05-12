@@ -64,6 +64,7 @@
   (default-to false (map-get? workers worker))
 )
 
+;; @desc Adds STX funds to the incentive pool for agent payroll and operations.
 (define-public (fund-payroll (amount uint))
   (begin
     (try! (stx-transfer? amount tx-sender (as-contract tx-sender)))
@@ -123,6 +124,7 @@
   (err ERR_PASSKEY_NOT_SUPPORTED)
 )
 
+;; @desc Checks if a given principal is authorized as an agent in the office manager.
 (define-read-only (is-agent-authorized (agent principal))
   (is-authorized-agent agent)
 )

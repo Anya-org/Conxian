@@ -72,7 +72,7 @@
       ;; Update position
       (map-set liquidity-positions { pool: pool, provider: tx-sender } {
         liquidity-amount: (+ (get liquidity-amount existing-position) amount),
-        pool-shares: (+ (get pool-shares existing-position) amount) ;; Simplified share calculation,
+        pool-shares: (+ (get pool-shares existing-position) amount), ;; Simplified share calculation
         last-deposit: burn-block-height,
         rewards-earned: (get rewards-earned existing-position),
         rewards-claimed: (get rewards-claimed existing-position),
@@ -103,7 +103,7 @@
 
     (map-set liquidity-positions { pool: pool, provider: tx-sender } {
       liquidity-amount: (- (get liquidity-amount position) amount),
-      pool-shares: (- (get pool-shares position) amount) ;; Simplified,
+      pool-shares: (- (get pool-shares position) amount), ;; Simplified
       last-deposit: (get last-deposit position),
       rewards-earned: (get rewards-earned position),
       rewards-claimed: (get rewards-claimed position),
