@@ -8,6 +8,9 @@ on:
     paths:
       - 'Conxian/**'
 
+permissions:
+  contents: read
+
 jobs:
   jules-audit:
     runs-on: ubuntu-latest

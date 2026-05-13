@@ -107,14 +107,31 @@ Notes:
   - Appropriate label-gated suites ran (when relevant).
   - Changelog is updated when user-facing behavior or security posture changes.
 
-## Tagged releases (public repos)
+## Tagged releases (governed strategic/public repos)
 
-For user-facing repositories (starting with `conxius-wallet`), we expect releases to be cut as **SemVer tags** (`vX.Y.Z`) with:
+The governed strategic/public repository set is:
+
+- `Conxian`
+- `conxian-gateway`
+- `conxian-nexus`
+- `conxius-wallet`
+
+For these repositories, we expect releases to be cut as **SemVer tags** (`vX.Y.Z`) with:
 
 - a matching `CHANGELOG.md` entry, and
 - GitHub Release notes copied from the matching changelog section.
 
-`Conxian Unified CI` runs `scripts/verify_release_hygiene.py` to enforce that this repo’s root `CHANGELOG.md` contains an `## [Unreleased]` section, that the root `README.md` BOS marker matches the latest root `CHANGELOG.md` release, and to perform origin/submodule tag checks (enabled in CI via `VERIFY_RELEASE_HYGIENE_CHECK_ORIGIN_TAGS=true`).
+`Conxian Unified CI` runs `scripts/verify_release_hygiene.py` with staged enforcement:
+
+- **Merge-blocking:** root `CHANGELOG.md` in this repo must include `## [Unreleased]`.
+- **Advisory (current default):** governed strategic/public repo tag expectations run in `warn` mode (`VERIFY_RELEASE_HYGIENE_TAG_EXPECTATION_MODE=warn`).
+- **Advisory scope extension:** set `VERIFY_RELEASE_HYGIENE_CHECK_ORIGIN_TAGS=true` to include this repository origin in tag checks.
+
+Available tag expectation modes:
+
+- `warn` (default): emit warnings only.
+- `require`: fail CI when governed strategic/public tag expectations are not met.
+- `off`: skip tag expectation checks.
 
 Merge preference:
 
