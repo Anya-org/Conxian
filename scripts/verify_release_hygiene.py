@@ -13,6 +13,11 @@ from pathlib import Path
 
 
 UNRELEASED_RE = re.compile(r"^##\s*\[Unreleased\]\s*$", re.MULTILINE)
+CHANGELOG_RELEASE_RE = re.compile(
+    r"^##\s*\[(\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?)\]\s*-\s*.+$",
+    re.MULTILINE,
+)
+README_BOS_VERSION_RE = re.compile(r"\(BOS v(\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?)\)")
 
 
 GOVERNED_PUBLIC_REPO_SUBMODULE_PATHS = {
@@ -142,15 +147,57 @@ def _repo_tag_status(repo: str) -> tuple[int, str | None]:
     return 1, str(name) if name else None
 
 
-def _verify_root_changelog(repo_root: Path) -> list[str]:
+def _latest_changelog_release_version(changelog_text: str) -> str | None:
+    match = CHANGELOG_RELEASE_RE.search(changelog_text)
+    return match.group(1) if match else None
+
+
+def _verify_root_changelog(repo_root: Path) -> tuple[list[str], str | None]:
     changelog_path = repo_root / "CHANGELOG.md"
     if not changelog_path.exists():
-        return ["Missing root CHANGELOG.md"]
+        return ["Missing root CHANGELOG.md"], None
 
     text = changelog_path.read_text(encoding="utf-8", errors="replace")
+    errors: list[str] = []
+
     if not UNRELEASED_RE.search(text):
-        return [
+        errors.append(
             "Root CHANGELOG.md must include an '## [Unreleased]' section (Keep a Changelog)."
+        )
+
+    latest_release = _latest_changelog_release_version(text)
+    if latest_release is None:
+        errors.append(
+            "Root CHANGELOG.md must include at least one released section in the format '## [X.Y.Z] - YYYY-MM-DD'."
+        )
+
+    return errors, latest_release
+
+
+def _verify_root_readme_version_marker(
+    repo_root: Path, *, expected_version: str
+) -> list[str]:
+    readme_path = repo_root / "README.md"
+    if not readme_path.exists():
+        return ["Missing root README.md"]
+
+    text = readme_path.read_text(encoding="utf-8", errors="replace")
+    match = README_BOS_VERSION_RE.search(text)
+    if not match:
+        return [
+            (
+                "README.md must include a BOS version marker in the format "
+                f"'(BOS vX.Y.Z)' and match the latest CHANGELOG.md release (expected v{expected_version})."
+            )
+        ]
+
+    observed_version = match.group(1)
+    if observed_version != expected_version:
+        return [
+            (
+                f"README.md BOS version marker v{observed_version} must match the latest "
+                f"CHANGELOG.md release v{expected_version}."
+            )
         ]
 
     return []
@@ -192,7 +239,14 @@ def verify() -> None:
             f"- Blocking: strategic/public tag expectations run in require mode ({TAG_EXPECTATION_MODE_ENV}=require)."
         )
 
-    errors = _verify_root_changelog(repo_root)
+    errors, latest_release = _verify_root_changelog(repo_root)
+    if latest_release is not None:
+        errors.extend(
+            _verify_root_readme_version_marker(
+                repo_root, expected_version=latest_release
+            )
+        )
+
     for err in errors:
         _error(f"[blocking][changelog] {err}")
     if errors:

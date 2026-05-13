@@ -1,0 +1,145 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "$#" -gt 1 ]; then
+  echo "Usage: $0 [output_dir]" >&2
+  exit 1
+fi
+
+output_dir="${1:-_pages}"
+
+if ! command -v rsync >/dev/null 2>&1; then
+  echo 'rsync is required to build the Pages artifact' >&2
+  exit 1
+fi
+
+assert_no_symlink_segments() {
+  local path="$1"
+  local check="$path"
+
+  while [ "$check" != '.' ] && [ "$check" != '/' ] && [ -n "$check" ]; do
+    if [ -L "$check" ]; then
+      echo "Symlinks are not allowed in required Pages artifact paths: $path" >&2
+      return 1
+    fi
+
+    check="$(dirname "$check")"
+  done
+
+  return 0
+}
+
+required=(
+  SUMMARY.md
+  README.md
+  SECURITY.md
+  CONTRIBUTING.md
+  CHANGELOG.md
+  GOVERNANCE.md
+  DEVELOPER_QUICKSTART.md
+  docs/README.md
+  docs/ILDK_README.md
+  docs/STRATEGIC_GROWTH_MODEL_2026.md
+  docs/CJCS_v2.0_SPEC.md
+  docs/CSF_MAINNET_READINESS_GATE.md
+  docs/PARTNER_OVERVIEW_AND_LAUNCH_FAQ.md
+  docs/RELEASE_NOTES_AND_CHANGELOG.md
+  docs/REPO_PORTFOLIO.md
+  docs/TRUST_AND_PROOF_MESSAGING.md
+  openspec/README.md
+)
+
+openspec_specs_dir=openspec/specs
+rsync_sources=()
+
+for f in "${required[@]}"; do
+  if ! assert_no_symlink_segments "$f"; then
+    exit 1
+  fi
+
+  if [ ! -f "$f" ]; then
+    echo "Missing required Pages artifact file: $f" >&2
+    exit 1
+  fi
+
+  rsync_sources+=("./$f")
+done
+
+if ! assert_no_symlink_segments "$openspec_specs_dir"; then
+  exit 1
+fi
+
+if [ ! -d "$openspec_specs_dir" ]; then
+  echo "Missing required Pages artifact path: $openspec_specs_dir" >&2
+  exit 1
+fi
+
+rm -rf "$output_dir"
+mkdir -p "$output_dir"
+: > "$output_dir/.nojekyll"
+
+rsync -a --relative "${rsync_sources[@]}" "$output_dir/"
+
+openspec_specs_allowed_exts=(md json)
+
+find_disallow_ext_args=(-type f)
+for ext in "${openspec_specs_allowed_exts[@]}"; do
+  find_disallow_ext_args+=( ! -name "*.${ext}" )
+done
+
+if ! unexpected_openspec_files="$(find "$openspec_specs_dir" "${find_disallow_ext_args[@]}" -print)"; then
+  echo "Failed to scan $openspec_specs_dir" >&2
+  exit 1
+fi
+if [ -n "$unexpected_openspec_files" ]; then
+  echo "Unexpected file type(s) under $openspec_specs_dir (allowed: ${openspec_specs_allowed_exts[*]}):" >&2
+  echo "$unexpected_openspec_files" >&2
+  exit 1
+fi
+
+if ! unexpected_openspec_symlink="$(find "$openspec_specs_dir" -type l -print)"; then
+  echo "Failed to scan $openspec_specs_dir for symlinks" >&2
+  exit 1
+fi
+if [ -n "$unexpected_openspec_symlink" ]; then
+  echo "Symlinks are not allowed under $openspec_specs_dir:" >&2
+  echo "$unexpected_openspec_symlink" >&2
+  exit 1
+fi
+
+mkdir -p "$output_dir/openspec/specs"
+rsync_includes=(--include='*/')
+for ext in "${openspec_specs_allowed_exts[@]}"; do
+  rsync_includes+=(--include="*.${ext}")
+done
+rsync_includes+=(--exclude='*')
+
+rsync -a --delete "${rsync_includes[@]}" "$openspec_specs_dir/" "$output_dir/openspec/specs/"
+
+cat > "$output_dir/index.html" <<'EOF_HTML'
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Conxian Documentation</title>
+  </head>
+  <body>
+    <h1>Conxian Documentation</h1>
+    <p>
+      This GitHub Pages site intentionally publishes a minimal, public-safe subset of the repository.
+      The repository itself remains the source of truth for version-controlled material.
+    </p>
+    <h2>Entry points</h2>
+    <ul>
+      <li><a href="README.md">README.md</a></li>
+      <li><a href="SECURITY.md">SECURITY.md</a></li>
+      <li><a href="docs/README.md">docs/README.md</a></li>
+      <li><a href="docs/PARTNER_OVERVIEW_AND_LAUNCH_FAQ.md">docs/PARTNER_OVERVIEW_AND_LAUNCH_FAQ.md</a></li>
+      <li><a href="docs/TRUST_AND_PROOF_MESSAGING.md">docs/TRUST_AND_PROOF_MESSAGING.md</a></li>
+      <li><a href="docs/CSF_MAINNET_READINESS_GATE.md">docs/CSF_MAINNET_READINESS_GATE.md</a></li>
+      <li><a href="openspec/README.md">openspec/README.md</a></li>
+    </ul>
+  </body>
+</html>
+EOF_HTML

@@ -78,12 +78,16 @@ jobs:
       run: |
         python3 scripts/verify_submodule_integrity.py
         git submodule status --recursive
-    - name: Verify release hygiene (tags + changelog)
+    - name: Verify release hygiene (tags + changelog + README sync)
       env:
         GITHUB_TOKEN: ${{ github.token }}
+        VERIFY_RELEASE_HYGIENE_CHECK_ORIGIN_TAGS: 'true'
         VERIFY_RELEASE_HYGIENE_TAG_EXPECTATION_MODE: 'warn'
       run: |
         python3 scripts/verify_release_hygiene.py
+    - name: Verify docs public-safe preflight
+      run: |
+        bash scripts/build_pages_artifact_public_safe.sh _pages_preflight
     - name: Verify governance baseline
       env:
         BOS_REQUIRE_PORTFOLIO_DOCS: 'true'
