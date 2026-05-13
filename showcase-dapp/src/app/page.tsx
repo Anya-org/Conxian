@@ -45,7 +45,7 @@ export default function Home() {
           <nav className="hidden md:flex gap-6 text-sm text-gray-400">
             <a href="#" className="hover:text-white transition-colors">Documentation</a>
             <a href="#" className="hover:text-white transition-colors">Pricing</a>
-            <a href="#" className="hover:text-white transition-colors">B2B Institutional</a>
+            <a href="#" className="hover:text-white transition-colors">B2B Sovereign</a>
           </nav>
           <div className="flex items-center gap-4">
             <button className="text-sm font-medium hover:text-[#d4a017] transition-colors">
@@ -69,7 +69,7 @@ export default function Home() {
             Now supporting Musig2 & Android StrongBox
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter leading-tight">
-            The Institutional <br/>
+            The Sovereign <br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#d4a017] to-amber-600">
               Citadel.
             </span>

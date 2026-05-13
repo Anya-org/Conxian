@@ -31,7 +31,7 @@ When older issues or runbooks still mention “Wave 1–4” (legacy framing), m
 
 ## Scoring rubric (why this ordering is explainable)
 
-- **Strategic value:** reduces correctness dependence on Supabase/Neon, increases rebuildability from Stacks L1, improves institutional/audit readiness.
+- **Strategic value:** reduces correctness dependence on Supabase/Neon, increases rebuildability from Stacks L1, improves sovereign/audit readiness.
 - **Reversibility:** rollback by flipping reads, rebuilding derived state, or re-pointing clients without data loss.
 - **Operational risk:** likelihood of downtime, data divergence, or irrecoverable hidden coupling (especially on write paths).
 
@@ -67,7 +67,7 @@ When older issues or runbooks still mention “Wave 1–4” (legacy framing), m
 **Cutover-sensitive paths (Wave 1)**
 
 - Anything relying on Nexus query results (notably Gateway-facing endpoints) must be **read-switchable** and **rollback-first**.
-- Any “institutional egress” outputs sourced from the Nexus read model only proceed if datasets remain verifiable via checkpoints and can be regenerated from L1.
+- Any “sovereign egress” outputs sourced from the Nexus read model only proceed if datasets remain verifiable via checkpoints and can be regenerated from L1.
 
 ## Blockers + sequencing dependencies
 

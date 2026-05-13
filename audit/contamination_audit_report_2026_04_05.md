@@ -15,7 +15,7 @@ This audit originally identified significant "stub", "mock", and "placeholder" c
 - **Mocks:** REMEDIATED. Non-production mocks in `agent-risk.clar` and `bns-stub.clar` are isolated from production paths.
 - **Placeholders:** REMEDIATED. Placeholder comments in `alex-adapter.clar` and `redstone-oracle-adapter.clar` have been updated to production integration status.
 
-### B. conxian-gateway (Institutional Pipe)
+### B. conxian-gateway (Sovereign Pipe)
 - **Auth Mocks:** GATED. Infobip API simulation in `a2p.rs` is now explicitly feature-gated to fail closed in production.
 - **Identity Mocks:** REMEDIATED. Mocked addresses and tokens in compliance logic have been removed or replaced with dynamic resolution.
 

@@ -32,7 +32,7 @@ Yield rebalancing currently requires a "Keeper" or manual trigger. It should be 
 
 ### Technical Specification (Proposed)
 - **Contract**: `treasury-automation.clar`
-- **Logic**: Implements "Intent-Based Execution". Rebalances when yield exceeds a certain threshold, using LSEG institutional data for verification.
+- **Logic**: Implements "Intent-Based Execution". Rebalances when yield exceeds a certain threshold, using LSEG sovereign data for verification.
 
 ## 5. ZKML & TEE Integration
 Missing the RISC Zero / Gemini verifier in the gateway for high-integrity AI output verification.

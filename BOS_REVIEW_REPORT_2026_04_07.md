@@ -19,7 +19,7 @@ The Conxian Business Operations System (BOS) is architecturally sound and follow
 - **Wallet Remapping**: Technical manifest exists (`docs/WALLET_REMAPPING_MANIFEST_CON_61_CON_423.md`) but implementation in `Conxian` is incomplete.
 
 ### 2.3. Data Persistence (SAB Datastore Mapping)
-- **Neon (Postgres)**: Active (`Conxian-backend`). Authoritative for telemetry and institutional egress.
+- **Neon (Postgres)**: Active (`Conxian-backend`). Authoritative for telemetry and sovereign egress.
 - **Supabase (Postgres)**: Active (`Conxian-platform`). Used for analytics and IP/ZSE audit logging.
 - **Tableland/Kwil**: Defined as conditional/pilot datastores for sovereign persistence.
 
