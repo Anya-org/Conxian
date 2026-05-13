@@ -12,6 +12,10 @@ jspm_packages/
 dist/
 build/
 target/
+_pages/
+**/_pages/
+.vercel/
+**/.vercel/
 *.so
 *.dylib
 *.dll
@@ -23,6 +27,8 @@ test-results/
 **/test-results/
 playwright-report/
 **/playwright-report/
+blob-report/
+**/blob-report/
 coverage/
 **/coverage/
 .nyc_output/
@@ -37,21 +43,25 @@ tests/report.md
 
 # Environment and secrets
 .env
-.env.local
-.env.development
-.env.production
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+!.env.*.example
+!.env.*.sample
+!.env.*.template
 *.pem
 *.key
 *.p12
 *.pfx
-*.crt
-*.cer
 *.jks
 *.keystore
+*.crt
+*.cer
 secrets.json
+id_rsa
+id_ed25519
+id_ecdsa
 
 # Internal Strategy and Private Operations
 /internal/strategy/

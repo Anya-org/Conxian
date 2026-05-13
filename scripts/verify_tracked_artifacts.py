@@ -202,6 +202,7 @@ RULES: tuple[Rule, ...] = (
             "target/**",
             "debug/**",
             "release/**",
+            "_pages/**",
         ),
     ),
     Rule(
@@ -210,6 +211,7 @@ RULES: tuple[Rule, ...] = (
             "coverage/**",
             "test-results/**",
             "playwright-report/**",
+            "blob-report/**",
             ".nyc_output/**",
             "junit.xml",
         ),
@@ -218,7 +220,9 @@ RULES: tuple[Rule, ...] = (
         "Runtime and tool state",
         (
             ".firebase/**",
+            ".vercel/**",
             ".terraform/**",
+            ".direnv/**",
             "*.tfstate",
             "*.tfstate.*",
             "*.tfvars",
@@ -227,6 +231,15 @@ RULES: tuple[Rule, ...] = (
             ".venv/**",
             "venv/**",
             "ENV/**",
+        ),
+    ),
+    Rule(
+        "Cloud and cluster credential state",
+        (
+            ".aws/**",
+            ".kube/**",
+            ".azure/**",
+            ".config/gcloud/**",
         ),
     ),
     Rule(
@@ -262,29 +275,56 @@ def _secret_filename_violation(rel_path: str) -> str | None:
     rel_path = _normalize_path(rel_path)
     base = rel_path.rsplit("/", 1)[-1]
 
+    rel_lower = rel_path.lower()
     lower = base.lower()
     is_example = any(token in lower for token in ("example", "sample", "template"))
+    label = "Secrets and env files"
 
-    if base == ".env":
-        return "Secrets and env files"
-    if base.startswith(".env.") and not is_example:
-        return "Secrets and env files"
-    if base in {"secrets.json", "id_rsa", "id_ed25519"}:
-        return "Secrets and env files"
-    if lower.endswith(
-        (
-            ".pem",
-            ".key",
-            ".p12",
-            ".pfx",
-            ".crt",
-            ".cer",
-            ".jks",
-            ".keystore",
-            ".tfvars",
-        )
+    sensitive_path_suffixes = (
+        ".aws/credentials",
+        ".kube/config",
+        ".docker/config.json",
+        ".config/gcloud/application_default_credentials.json",
+        ".config/gcloud/credentials.db",
+        ".azure/accesstokens.json",
+    )
+
+    if any(
+        rel_lower == suffix or rel_lower.endswith("/" + suffix)
+        for suffix in sensitive_path_suffixes
     ):
-        return "Secrets and env files"
+        return label
+
+    if lower == ".env":
+        return label
+    if lower.startswith(".env.") and not is_example:
+        return label
+    if lower in {
+        "secrets.json",
+        "id_rsa",
+        "id_ed25519",
+        "id_ecdsa",
+        "id_dsa",
+        ".netrc",
+        ".pypirc",
+        ".dockercfg",
+        "application_default_credentials.json",
+    }:
+        return label
+    if lower.endswith((
+        ".pem",
+        ".key",
+        ".p12",
+        ".pfx",
+        ".p8",
+        ".jks",
+        ".keystore",
+        ".crt",
+        ".cer",
+    )):
+        return label
+    if lower.endswith((".tfvars", ".tfvars.json")) and not is_example:
+        return label
 
     return None
 
