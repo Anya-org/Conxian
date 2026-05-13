@@ -193,6 +193,7 @@ RULES: tuple[Rule, ...] = (
             "target/**",
             "debug/**",
             "release/**",
+            "_pages/**",
         ),
     ),
     Rule(
@@ -201,6 +202,7 @@ RULES: tuple[Rule, ...] = (
             "coverage/**",
             "test-results/**",
             "playwright-report/**",
+            "blob-report/**",
             ".nyc_output/**",
             "junit.xml",
         ),
@@ -209,6 +211,7 @@ RULES: tuple[Rule, ...] = (
         "Runtime and tool state",
         (
             ".firebase/**",
+            ".vercel/**",
             ".terraform/**",
             ".direnv/**",
             "*.tfstate",
@@ -297,10 +300,21 @@ def _secret_filename_violation(rel_path: str) -> str | None:
         "application_default_credentials.json",
     }:
         return label
-    if lower.endswith((".pem", ".key", ".p12", ".pfx", ".p8", ".jks", ".keystore")):
+    if lower.endswith((
+        ".pem",
+        ".key",
+        ".p12",
+        ".pfx",
+        ".p8",
+        ".jks",
+        ".keystore",
+        ".crt",
+        ".cer",
+    )):
         return label
     if lower.endswith((".tfvars", ".tfvars.json")) and not is_example:
         return label
+
 
     return None
 

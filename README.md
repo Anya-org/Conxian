@@ -21,23 +21,19 @@ Documentation here follows public-safe boundary rules; internal-only strategy an
 
 Releases are tracked in `CHANGELOG.md` and published as SemVer tags (`vX.Y.Z`). See `RELEASING.md`.
 
-## Ownership
-
-Ownership and review requirements are defined in [`CODEOWNERS`](./CODEOWNERS).
-
 ## Audience
 
 - Contributors implementing Conxian's protocol, infrastructure, and tools.
 - Partners and auditors who need a canonical, versioned view of OpenSpec.
 
-## Repository Portfolio & Relationship to the Conxian stack
+## Relation to Conxian stack
 
 The Conxian ecosystem is organized by function to ensure clarity and modularity across the Sovereign Autonomous Business (SAB) stack. See the **[BOS Runtime Ownership Map](./BOS_RUNTIME_OWNERSHIP_MAP.md)** for detailed responsibility boundaries.
 
 ### 1. Platform & Governance
 - **[`conxian-business/`](./conxian-business)**: **BOS Operations**. Commercial, legal, and platform specifications (ZSE Stubs).
 - **[`conxius-platform/`](./conxius-platform)**: **Orchestration**. Stack orchestration and local development.
-- **[`stacksorbit/`](./stacksorbit)**: **Ops Tooling**. Deployment and operations automation.
+- **[`conxius-orbit/`](./conxius-orbit)**: **Ops Tooling**. Deployment and operations automation.
 
 ### 2. Core Operating Suite (EXCO Agents)
 - **[`conxian-nexus/`](./conxian-nexus)**: **State Node**. High-level orchestration, state roots (MMR), and decentralized storage.
@@ -47,7 +43,7 @@ The Conxian ecosystem is organized by function to ensure clarity and modularity 
 
 ### 3. Protocol & SDKs
 - **[`Conxian/`](./Conxian)**: **Protocol**. Conxian Finance Protocol (Clarity smart contracts).
-- **[`lib-conclave-sdk/`](./lib-conclave-sdk)**: **Agentic SDK**. Enclave + hardware attestation primitives.
+- **[`conxius-enclave-sdk/`](./conxius-enclave-sdk)**: **Agentic SDK**. Enclave + hardware attestation primitives.
 - **[`lib-conxian-core/`](./lib-conxian-core)**: **Shared Core**. Common models for BitVM2, CJCS, and Gateway engine.
 
 ### 4. User Interfaces
@@ -55,7 +51,7 @@ The Conxian ecosystem is organized by function to ensure clarity and modularity 
 - **[`conxian-ui/`](./conxian-ui)**: **Web**. Institutional operator dashboard.
 - **[`conxian-labs-site/`](./conxian-labs-site)**: **Website**. Public ecosystem landing.
 
-## Cloning
+## Quick start / Next action
 
 This repository uses Git submodules.
 
@@ -76,6 +72,16 @@ If you need the `conxius-platform/` nested submodules, initialize them from with
 cd conxius-platform
 git submodule update --init services/conxian-ui
 ```
+
+Next action after clone: review `docs/REPO_PORTFOLIO.md` for ecosystem context and `docs/BOS_BUSINESS_BUILDOUT.md` for public/internal boundary rules.
+
+## Security / Governance
+
+Ownership and review requirements are defined in [`CODEOWNERS`](./CODEOWNERS).
+
+For general support and non-security bug reports, open a GitHub issue. For security vulnerabilities, follow the private reporting process in [`SECURITY.md`](./SECURITY.md).
+
+This repository follows Zero Secret Egress (ZSE) boundary discipline. See [Repository visibility and public/private boundary](#repository-visibility-and-publicprivate-boundary).
 
 ## Repository visibility and public/private boundary
 
