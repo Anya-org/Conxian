@@ -48,10 +48,33 @@ These workflows run on every pull request targeting `dev`, `staged`, or `main`. 
           - `audit/reports` matches any tracked file under `audit/reports/` (path-boundary directory-prefix match; does not match `audit/reports-old/`).
           - `*.log` matches any tracked `.log` file by basename, so use with care.
     - Submodule integrity via `scripts/verify_submodule_integrity.py`.
+    - Release hygiene via `scripts/verify_release_hygiene.py`.
+      - Fails when root `CHANGELOG.md` is missing `## [Unreleased]`.
+      - Fails when the root `README.md` BOS version marker (`(BOS vX.Y.Z)`) does not match the latest root `CHANGELOG.md` release.
+      - Checks release tags for this repository origin and critical user-facing submodules when `VERIFY_RELEASE_HYGIENE_CHECK_ORIGIN_TAGS=true` (enabled in Unified CI).
+    - Docs public-safe preflight via `scripts/build_pages_artifact_public_safe.sh` (fail-fast allowlist validation used by both Unified CI and docs deploy).
     - Governance baseline via `scripts/verify_repo_governance_baseline.py`.
 - Branch promotion policy (see [`branch-promotion-policy.yml`](./workflows/branch-promotion-policy.yml))
 - Secret scan (see [`secret-scan.yml`](./workflows/secret-scan.yml))
 - Dependency review (see [`dependency-review.yml`](./workflows/dependency-review.yml))
+
+## GitHub settings required outside this repository
+
+Some promotion controls are configured in **GitHub repository settings** (not in Git-tracked files).
+
+Minimum required setup:
+
+1. Ensure `staged` exists as a long-lived branch (typically created from `dev`).
+2. Add branch protection (or an active branch ruleset) for `staged` and `main`.
+3. Require these status checks on `staged` and `main`:
+   - `Conxian Unified CI`
+   - `Branch Promotion Policy / Enforce branch promotion rules`
+   - `Secret Scan`
+   - `Dependency Review`
+4. Require at least one approving review on `staged` and `main`.
+5. Disable force-pushes and branch deletion on `staged` and `main`.
+
+`scripts/verify_promotion_controls.py` validates the in-repo workflow policy plus `dev`/`staged`/`main` branch topology and protection/ruleset presence.
 
 ### Label-gated suites (opt-in, based on change scope)
 
@@ -84,14 +107,31 @@ Notes:
   - Appropriate label-gated suites ran (when relevant).
   - Changelog is updated when user-facing behavior or security posture changes.
 
-## Tagged releases (public repos)
+## Tagged releases (governed strategic/public repos)
 
-For user-facing repositories (starting with `conxius-wallet`), we expect releases to be cut as **SemVer tags** (`vX.Y.Z`) with:
+The governed strategic/public repository set is:
+
+- `Conxian`
+- `conxian-gateway`
+- `conxian-nexus`
+- `conxius-wallet`
+
+For these repositories, we expect releases to be cut as **SemVer tags** (`vX.Y.Z`) with:
 
 - a matching `CHANGELOG.md` entry, and
 - GitHub Release notes copied from the matching changelog section.
 
-`Conxian Unified CI` runs `scripts/verify_release_hygiene.py` to enforce that this repo’s root `CHANGELOG.md` contains an `## [Unreleased]` section, and to emit warnings when critical user-facing repos are missing tags.
+`Conxian Unified CI` runs `scripts/verify_release_hygiene.py` with staged enforcement:
+
+- **Merge-blocking:** root `CHANGELOG.md` in this repo must include `## [Unreleased]`.
+- **Advisory (current default):** governed strategic/public repo tag expectations run in `warn` mode (`VERIFY_RELEASE_HYGIENE_TAG_EXPECTATION_MODE=warn`).
+- **Advisory scope extension:** set `VERIFY_RELEASE_HYGIENE_CHECK_ORIGIN_TAGS=true` to include this repository origin in tag checks.
+
+Available tag expectation modes:
+
+- `warn` (default): emit warnings only.
+- `require`: fail CI when governed strategic/public tag expectations are not met.
+- `off`: skip tag expectation checks.
 
 Merge preference:
 

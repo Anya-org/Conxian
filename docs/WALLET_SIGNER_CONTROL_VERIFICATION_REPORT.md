@@ -1,32 +1,28 @@
 # Wallet & Signer Control Verification Report (CON-233)
 
-## Status: VERIFIED (Mainnet Ready)
+## Status: PUBLIC-SAFE SUMMARY
 
-This report confirms the full launch wallet and signer control path for the Conxian ecosystem.
+This file provides a non-sensitive summary of wallet and signer control posture.
 
-### 1) Ownership & Approval Model
-- **Bootstrap Wallet**: `SP3FBR2AGK5H9QPNVFJWC7636X22Y620S00000000` is confirmed as the temporary operator for initialization (Stage 0).
-- **SAB Multi-sigs**: Architecture for `SAB_DEPLOYER_MULTISIG`, `SAB_PAYOUT_MULTISIG`, and `SAB_EMERGENCY_RECOVERY_MULTISIG` is established and documented.
-- **Role-Based Access**: Contract roles in `conxian-access.clar` are mapped to the intended SAB authorities.
+Detailed signer inventories, principal/address assignments, and readiness evidence are maintained in restricted governance records.
 
-### 2) Signing Authority Path
-- **BOS Executor**: `SAB_BOS_EXECUTOR_KEY` is provisioned in system custody (TEE/HSM) for automated keeper operations.
-- **Intent Verification**: Signer authority for ERP invoices is enforced via the 'Guardian' class in `ops-loans`.
-- **ZSE Compliance**: No production private keys are tracked in version control.
+### 1) Ownership & approval model
+- Bootstrap and successor control roles are documented in governed private records.
+- SAB custody architecture and role boundaries are defined and reviewable through authorized channels.
+- Role-based access remains a required control for protocol-critical functions.
 
-### 3) Emergency & Recovery Controls
-- **Emergency Pause**: `SAB_EMERGENCY_PAUSE_MULTISIG` has unilateral authority to stop the bleeding without timelock.
-- **Recovery Authority**: Higher-quorum recovery multisig is required for unpausing and key rotation.
-- **Rollback Path**: Documented in `docs/SAB_DAO_HANDOFF_PROTOCOL.md`.
+### 2) Signing authority path
+- Signing authority is managed under controlled custody standards.
+- Verification pathways for operational signatures are documented in private implementation records.
+- Public repositories do not publish production signer identifiers.
 
-### 4) Stage 3 Automation Cutover
-- [x] All launch-critical automation uses `SAB_BOS_EXECUTOR_KEY`.
-- [x] Bootstrap wallet is not required for daily operations.
-- [x] Signer-path sensitivity is remediated across all flagship repos.
+### 3) Emergency & recovery controls
+- Emergency and recovery responsibilities are governed by approved custody policy.
+- Recovery and rollback procedures exist in private operational runbooks.
 
-### 5) Stage 4 DAO Alignment
-- **DAO Timelock**: Default 144-block delay for policy changes implemented in `timelock.clar`.
-- **Policy Authority**: Move of fee/limit management behind the timelock is verified.
+### 4) Governance alignment
+- Policy-mutation pathways follow staged governance controls.
+- Public documentation excludes sensitive operational readiness evidence by design.
 
 ---
 © 2026 Conxian-Labs (Pty) Ltd.

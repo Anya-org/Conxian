@@ -4,11 +4,7 @@
 
 **Conxian Business** defines the core service loop and state machine transitions of the Sovereign Autonomous Business (SAB), now evolving into a **Business-as-a-Platform (BaaP)** ecosystem.
 
-This repository is public. Internal BOS state-machine configuration, multi-tenant templates, and compliance reports are maintained in Linear:
-
-- https://linear.app/conxian-labs
-- https://linear.app/conxian-labs/issue/CON-256
-- https://linear.app/conxian-labs/issue/CON-474 (Platforming)
+This repository is public. Internal BOS state-machine configuration, multi-tenant templates, and compliance reports are maintained in the sovereign coordination layer.
 
 ## Purpose
 
@@ -20,7 +16,7 @@ This repository is public. Internal BOS state-machine configuration, multi-tenan
 
 ## Status
 
-active — This module documents BOS-level service-loop expectations and public-safe operational boundaries; detailed state-machine configuration and compliance reports live in Linear. Internal details: <https://linear.app/conxian-labs/issue/CON-435/improve-portfolio-clarity-across-org-facing-repositories>.
+active — This module documents BOS-level service-loop expectations and public-safe operational boundaries; detailed state-machine configuration and compliance reports live in the sovereign coordination layer.
 
 ## Key Components & Platform Standards
 

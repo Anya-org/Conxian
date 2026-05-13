@@ -1,20 +1,19 @@
-# SAB Migration Waves: Sequence & Risk (CON-336)
+# Deprecated pointer: SAB migration waves (non-canonical)
 
-## Wave 1: Governance & Transparency (Current)
-- **Goal**: Establish ZSE-compliant stubs and audit trails.
-- **Status**: COMPLETE.
+This file is retained only for backward compatibility with older links and references.
 
-## Wave 2: Core Protocol & Mainnet Cutover (T-7)
-- **Goal**: Finalize `SP...` principals and alex-adapter registration.
-- **Risk**: Low (Mainnet deployment only).
+## Canonical source
 
-## Wave 3: Sovereign Ingress & TEE Enforcement (T-0)
-- **Goal**: Activate ISO 20022 and PAPSS ingress.
-- **Risk**: Medium (External signal dependency).
+Use **`docs/SAB_MIGRATION_WAVES.md`** as the source of truth for:
 
-## Wave 4: BitVM2 & sBTC Maturity (Post-Launch)
-- **Goal**: Full trust-minimized settlement.
-- **Risk**: High (Protocol complexity).
+- current wave definitions (`W0`…`W6`),
+- legacy 4-wave reconciliation notes, and
+- migration sequencing decisions.
 
----
-© 2026 Conxian-Labs (Pty) Ltd.
+## Status of this file
+
+- **Canonical status:** non-canonical (deprecated pointer)
+- **Allowed use:** link continuity only
+- **Do not use for:** planning, gate sign-off, or execution decisions
+
+If any content here conflicts with `docs/SAB_MIGRATION_WAVES.md`, the canonical file takes precedence.

@@ -21,7 +21,12 @@ docker-compose up -d db redis
 To run the full reference stack (Postgres + Redis + Nexus + Gateway):
 
 ```bash
-cp docker-compose.env.example .env
+# Choose one lane template before starting the stack:
+cp docker-compose.env.local.example .env   # local simulation lane
+# cp docker-compose.env.testnet.example .env  # public testnet lane
+# cp docker-compose.env.mainnet.example .env  # mainnet lane
+# (docker-compose.env.example is a mainnet alias)
+
 docker-compose up --build
 ```
 

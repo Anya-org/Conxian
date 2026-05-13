@@ -4,7 +4,7 @@ Welcome to the Conxian ecosystem. We are building a Bitcoin-native Business Oper
 
 ## Scope of this repository
 
-This repository is the public source of truth for BOS governance artifacts and OpenSpec.
+This repository is private (as of April 8, 2026) and is the canonical in-repo source for BOS governance artifacts and OpenSpec under public-safe documentation boundaries.
 
 Most implementation work happens in the individual service repositories (often pinned here as submodules). If your change affects a submodule, prefer opening a PR in that submodule repository, then update the pinned commit in this repo.
 
@@ -31,6 +31,12 @@ Feature branches should validate locally first, then land in `dev` via pull requ
 - Preferred claim path is a `/claim` comment on the synced GitHub issue (when automation is enabled). Otherwise, maintainers accept claims by assigning the issue and moving it to `Claimed`.
 
 Reference: [`docs/bounties/BOUNTY_WORKFLOW.md`](./docs/bounties/BOUNTY_WORKFLOW.md).
+
+## ExCo intake (Linear-first)
+
+- For ExCo-relevant newly discovered work, create/route the item in Linear first using the [ExCo intake standard](./Sovereign-Ops-Orchestrator/LINEAR_WIRING.md).
+- If work is mirrored to GitHub, include the full Linear issue URL in the issue/PR body for traceability.
+- Keep sensitive strategic, financial, legal, security, and detailed operational content in Linear only (ZSE).
 
 ## Pull Request Process
 

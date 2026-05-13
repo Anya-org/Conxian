@@ -5,6 +5,8 @@ All notable changes to the Conxian Business Operations System (BOS) will be docu
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.md](docs/RELEASE_NOTES_AND_CHANGELOG.md).
+
 ## [Unreleased]
 
 ### Added
@@ -18,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **Testnet Principals Remediation**: Replaced hardcoded testnet principals (`ST...`) with environment-agnostic or Sovereign-aligned principals (`SP...`) in `conxius-wallet`, `conxian-ui`, and `Conxian` mainnet release plans.
+- **Contamination Guard Compliance (CON-371):** Finalized remediation of hardcoded testnet principals in the `Conxian` submodule to satisfy production contamination gates.
 - **DEX Logic Correction**: Resolved a result-type mismatch in the `concentrated-liquidity-pool.clar` swap-execution path.
 
 ### Security

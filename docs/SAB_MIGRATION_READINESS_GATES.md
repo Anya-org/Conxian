@@ -4,7 +4,7 @@ This document defines first-pass readiness gates and cutover criteria for the SA
 
 Canonical tracker:
 
-- https://linear.app/conxian-labs/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory
+- Sovereign Coordination Layer: https://sovereign.conxian.com/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory
 
 This gate is intentionally framed around evidence and invariants, not "progress updates".
 
@@ -12,7 +12,7 @@ This gate is intentionally framed around evidence and invariants, not "progress 
 
 **Last reviewed:** 2026-04-16
 
-**Canonical live status:** https://linear.app/conxian-labs/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory
+**Canonical live status:** https://sovereign.conxian.com/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory
 
 Update convention: update this section (including `Last reviewed`) whenever either gate changes (unmet→met or met→unmet), ideally in the same PR/commit that updates the underlying evidence.
 
