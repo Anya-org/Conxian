@@ -136,6 +136,7 @@ def _match_any(rel_path: str, patterns: tuple[str, ...]) -> bool:
     """Return True if `rel_path` matches any pattern.
 
     Semantics (intentionally more explicit than shell-style globbing):
+    - Patterns prefixed with `/` are anchored to the repository root.
     - Patterns ending in `/**` match descendants of that directory.
       - For patterns like `foo/**` (no `/` in `foo`), `foo` is treated as a directory
         segment that can appear anywhere in the path.
@@ -146,14 +147,17 @@ def _match_any(rel_path: str, patterns: tuple[str, ...]) -> bool:
     rel_path = _normalize_path(rel_path)
     base = rel_path.rsplit("/", 1)[-1]
     for pattern in patterns:
-        normalized = _normalize_path(pattern)
+        is_root_anchored = pattern.startswith("/")
+        normalized = _normalize_path(pattern.lstrip("/") if is_root_anchored else pattern)
+        if not normalized:
+            continue
 
         if normalized.endswith("/**"):
             dir_name = normalized[:-3].rstrip("/")
             if not dir_name:
                 continue
 
-            if "/" in dir_name:
+            if is_root_anchored or "/" in dir_name:
                 if rel_path.startswith(dir_name + "/"):
                     return True
             else:
@@ -164,6 +168,11 @@ def _match_any(rel_path: str, patterns: tuple[str, ...]) -> bool:
 
         if "/" in normalized:
             if fnmatch.fnmatchcase(rel_path, normalized):
+                return True
+            continue
+
+        if is_root_anchored:
+            if "/" not in rel_path and fnmatch.fnmatchcase(rel_path, normalized):
                 return True
             continue
 
@@ -216,6 +225,7 @@ RULES: tuple[Rule, ...] = (
             ".direnv/**",
             "*.tfstate",
             "*.tfstate.*",
+            "*.tfvars",
             "__pycache__/**",
             ".pytest_cache/**",
             ".venv/**",
@@ -252,6 +262,7 @@ RULES: tuple[Rule, ...] = (
             "*.rej",
             "*.patch",
             "*.log",
+            "/*.txt",
             "code_review_input.txt",
             "debug_regex.js",
             "test_match.js",
@@ -314,7 +325,6 @@ def _secret_filename_violation(rel_path: str) -> str | None:
         return label
     if lower.endswith((".tfvars", ".tfvars.json")) and not is_example:
         return label
-
 
     return None
 
