@@ -20,6 +20,12 @@ jobs:
           token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
           persist-credentials: false
 
+      - name: Ensure submodules are initialized
+        run: |
+          git submodule sync --recursive
+          git submodule update --init
+          git -c submodule.conxius-platform.update=checkout submodule update --init conxius-platform
+
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
