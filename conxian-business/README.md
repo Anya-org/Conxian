@@ -24,6 +24,8 @@ active — This module documents BOS-level service-loop expectations and public-
 
 ## Key Components & Platform Standards
 
+- **[Unified Theory of Sovereign Enterprise](../docs/CONXIAN_UNIFIED_THEORY_v2.md)**: Mathematical framework for minimizing founder tax ($O_C$) while maximizing autonomy ($A_S$).
+
 - **[Sovereign Runtime Ownership Map](./BOS_RUNTIME_OWNERSHIP_MAP.md)**: Canonical mapping of BOS capabilities to production repositories.
 - **[Multi-Tenant Orchestration Guide](./BOS_MULTI_TENANT_ORCHESTRATION.md)**: Multi-Agent System (M.A.S.) patterns and jurisdictional sharding logic.
 - **[BOS Platform Specification](./BOS_PLATFORM_SPEC.md)**: v2.2 Industrial Standard for Business-as-a-Platform (BaaP).

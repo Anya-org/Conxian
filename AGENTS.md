@@ -2,6 +2,12 @@
 
 ## BOS Operational Standards
 
+### Sovereign Enterprise Mandate (Unified Theory v2.0)
+All agentic sessions must adhere to the equations defined in `docs/CONXIAN_UNIFIED_THEORY_v2.md`.
+- **Execution Velocity ($V_X$)**: Prioritize AI leverage (Windsurf, Jules) to crush milestones before $O_C$ exhaustion.
+- **System Autonomy ($A_S$)**: Minimize manual oversight. If a process requires manual intervention, it is a Phase 3 failure and must be remediated to $O_C \to 0$.
+
+
 ### Sovereign-First Deployment Mandate
 All Conxian core contracts must use dynamic principals fetched via `operational-treasury.clar`. Any hardcoded `ST...` or `SP...` addresses in production contract source code are considered a build-break. Jules must flag and fix these during the planning phase.
 
