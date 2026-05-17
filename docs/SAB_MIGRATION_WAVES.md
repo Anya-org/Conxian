@@ -2,17 +2,36 @@
 
 This document sequences the SAB migration program into ordered waves, prioritized by **strategic value**, **reversibility**, and **operational risk**.
 
-Primary tracker: https://linear.app/conxian-labs/issue/CON-336/sequence-sab-migration-waves-by-value-reversibility-and-risk
+Primary tracker: https://sovereign.conxian.com/issue/CON-336/sequence-sab-migration-waves-by-value-reversibility-and-risk
 
 Related:
 
-- https://linear.app/conxian-labs/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory
-- https://linear.app/conxian-labs/issue/CON-335/define-pilot-readiness-gates-and-evidence-requirements
-- https://linear.app/conxian-labs/issue/CON-337/inventory-current-supabase-and-neon-dependencies-by-service
+- https://sovereign.conxian.com/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory
+- https://sovereign.conxian.com/issue/CON-335/define-pilot-readiness-gates-and-evidence-requirements
+- https://sovereign.conxian.com/issue/CON-337/inventory-current-supabase-and-neon-dependencies-by-service
+
+## Canonical status and legacy-wave reconciliation
+
+This file (`docs/SAB_MIGRATION_WAVES.md`) is the **canonical migration-wave source**.
+
+The legacy 4-wave framing in `docs/operations/SAB_MIGRATION_WAVES.md` is retained only as a historical pointer and is **non-canonical**.
+
+### Mapping: legacy 4-wave framing → canonical wave model
+
+| Legacy framing (non-canonical) | Canonical mapping in this document | Reconciliation notes |
+| :--- | :--- | :--- |
+| **Legacy Wave 1: Governance & Transparency** | **W0: Inventory + invariants** (plus governance checks that continue through W1–W6) | Governance artifacts are no longer treated as a standalone migration endpoint; they are a prerequisite and recurring control. |
+| **Legacy Wave 2: Core Protocol & Mainnet Cutover** | Primarily **W1: Transactional SQL pilot**, with prerequisite ties to **W0** and follow-on containment in **W2** | What was called “cutover” is now split into a reversible pilot first, then correctness isolation. |
+| **Legacy Wave 3: Institutional Ingress & TEE Enforcement** | Spans **W2: Supabase correctness isolation**, **W3: Analytics phase-out**, and selected **W6: Sovereign compute baseline** controls | Ingress/TEE readiness depends on datastore correctness and operational hosting posture, so it is distributed across waves instead of isolated in one wave. |
+| **Legacy Wave 4: BitVM2 & sBTC Maturity** | Cross-cutting architecture track aligned to **W4–W6** promotion gates, with concrete target-state defined in `docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md` | BitVM2/sBTC readiness is controlled by explicit promotion/rollback gates and signer-boundary checks rather than a single terminal wave. |
+
+### Translation rule for issue and runbook references
+
+When older issues or runbooks still mention “Wave 1–4” (legacy framing), map them to canonical wave IDs (`W0`…`W6`) and gate evidence requirements before using them for execution decisions.
 
 ## Scoring rubric (why this ordering is explainable)
 
-- **Strategic value:** reduces correctness dependence on Supabase/Neon, increases rebuildability from Stacks L1, improves institutional/audit readiness.
+- **Strategic value:** reduces correctness dependence on Supabase/Neon, increases rebuildability from Stacks L1, improves sovereign/audit readiness.
 - **Reversibility:** rollback by flipping reads, rebuilding derived state, or re-pointing clients without data loss.
 - **Operational risk:** likelihood of downtime, data divergence, or irrecoverable hidden coupling (especially on write paths).
 
@@ -48,7 +67,7 @@ Related:
 **Cutover-sensitive paths (Wave 1)**
 
 - Anything relying on Nexus query results (notably Gateway-facing endpoints) must be **read-switchable** and **rollback-first**.
-- Any “institutional egress” outputs sourced from the Nexus read model only proceed if datasets remain verifiable via checkpoints and can be regenerated from L1.
+- Any “sovereign egress” outputs sourced from the Nexus read model only proceed if datasets remain verifiable via checkpoints and can be regenerated from L1.
 
 ## Blockers + sequencing dependencies
 

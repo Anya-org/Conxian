@@ -50,6 +50,11 @@ jobs:
         submodules: recursive
         token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
         persist-credentials: false
+    - name: Ensure submodules are initialized
+      run: |
+        git submodule sync --recursive
+        git submodule update --init
+        git -c submodule.conxius-platform.update=checkout submodule update --init conxius-platform
     - name: Setup Python
       uses: actions/setup-python@v6
       with:
@@ -60,21 +65,29 @@ jobs:
     - name: Verify tracked artifacts
       run: |
         python3 scripts/verify_tracked_artifacts.py
-    - name: Verify submodule secret filename hygiene (Nexus)
+    - name: Verify compose env templates
       run: |
-        python3 scripts/verify_submodule_secret_filenames.py --submodule conxian-nexus
+        python3 scripts/verify_compose_env_templates.py
+    - name: Verify submodule secret filename hygiene (all)
+      run: |
+        python3 scripts/verify_submodule_secret_filenames.py --all
     - name: Verify BOS production boundary
       run: |
         python3 scripts/verify_bos_production_boundary.py
-    - name: Verify submodule integrity
+    - name: Verify submodule integrity and update policy
       run: |
         python3 scripts/verify_submodule_integrity.py
         git submodule status --recursive
-    - name: Verify release hygiene (tags + changelog)
+    - name: Verify release hygiene (tags + changelog + README sync)
       env:
         GITHUB_TOKEN: ${{ github.token }}
+        VERIFY_RELEASE_HYGIENE_CHECK_ORIGIN_TAGS: 'true'
+        VERIFY_RELEASE_HYGIENE_TAG_EXPECTATION_MODE: 'warn'
       run: |
         python3 scripts/verify_release_hygiene.py
+    - name: Verify docs public-safe preflight
+      run: |
+        bash scripts/build_pages_artifact_public_safe.sh _pages_preflight
     - name: Verify governance baseline
       env:
         BOS_REQUIRE_PORTFOLIO_DOCS: 'true'
@@ -207,13 +220,15 @@ jobs:
       uses: actions/setup-node@v6
       with:
         node-version: '20'
-        cache: 'npm'
-        cache-dependency-path: conxius-wallet/package-lock.json
+        # conxius-wallet is pnpm-lockfile-first; keep cache/install aligned to pnpm lockfile.
+        cache: 'pnpm'
+        cache-dependency-path: conxius-wallet/pnpm-lock.yaml
     - name: Install & Test
       run: |
         cd conxius-wallet
-        npm ci
-        npm test
+        corepack enable
+        pnpm install --frozen-lockfile
+        pnpm test
 
     - name: Upload test artifacts
       if: always()
@@ -284,5 +299,5 @@ jobs:
         python-version: '3.10'
     - name: Install & Simulate
       run: |
-        pip install -r stacksorbit/requirements.txt
-        python3 stacksorbit/conxian_testnet_deploy.py --help
+        pip install -r conxius-orbit/requirements.txt
+        python3 conxius-orbit/conxian_testnet_deploy.py --help

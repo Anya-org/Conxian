@@ -5,7 +5,7 @@ The following table defines the protection levels for Bitcoin private keys durin
 
 | Level | Hardware Anchor | Egress Policy | Use Case |
 |-------|-----------------|---------------|----------|
-| **L4: BitVM2** | BitVM Fraud Proofs | Zero Secret Egress | Institutional Settlement |
+| **L4: BitVM2** | BitVM Fraud Proofs | Zero Secret Egress | Sovereign Settlement |
 | **L3: StrongBox** | Android TEE/Keystore | Hardware-Enclosed | Retail / High-Frequency |
 | **L2: CloudTEE** | AWS Nitro / GCP Confidential | Stateless / Ephemeral | B2B / Enterprise Routes |
 | **L1: Software** | LocalStorage / Mock | Unprotected | R&D / Simulation Only |

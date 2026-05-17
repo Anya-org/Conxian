@@ -57,6 +57,10 @@ CHECKS: tuple[Check, ...] = (
         env={"BOS_REQUIRE_PORTFOLIO_DOCS": "true"},
     ),
     Check(
+        "Promotion controls",
+        (sys.executable, str(SCRIPT_DIR / "verify_promotion_controls.py")),
+    ),
+    Check(
         "Contamination guard",
         (sys.executable, str(SCRIPT_DIR / "verify_contamination_guard.py")),
     ),

@@ -9,7 +9,7 @@ It classifies governance record domains, establishes datastore boundaries with o
 2. **Derived datastores exist for query ergonomics, not correctness.** If a derived store is unavailable or fails validation, execution MUST halt (for policy-sensitive paths) or fall back to on-chain reads (for read-only UI/query paths).
 3. **Append-only governance records MUST be content-addressed and provenance-carrying.** Every record MUST include an immutable `record_id` (content hash) and actor provenance (who/what authorized it).
 4. **Zero Secret Egress (ZSE):** Governance datastores MUST NOT contain enclave-only secrets, signing keys, seed phrases, or private key material in any form.
-5. **Legal and institutional content is indexed, not replicated.** The full text of privileged legal/institutional documents lives in Linear Virtual Office (or another approved protected store). The governance ledger stores only public-safe metadata, content hashes, and access pointers.
+5. **Legal and sovereign content is indexed, not replicated.** The full text of privileged legal/sovereign documents lives in Linear Virtual Office (or another approved protected store). The governance ledger stores only public-safe metadata, content hashes, and access pointers.
 6. **Policy validation failures MUST fail closed.** No “best effort”, no inferred defaults, no degraded execution for writes.
 
 ### Record canonicalization and hashing
@@ -74,7 +74,7 @@ The table below classifies governance record domains by immutability, retention,
 | Control-plane manifests | Release-policy snapshots, deployment allowlists, contract manifests, artifact digests, submodule pins | Append-only. Must be content-addressed. | Audit registry anchor for manifest hash; on-chain contract ownership for enforcement | Fluree + Git (for public-safe manifests) | Indefinite | Diff manifests across versions; prove which artifact produced an on-chain change |
 | Audit trails (agent/operator) | Signing requests, approvals, executions, policy denials, break-glass actions | Append-only. Redaction via additive “sealed” records only. | Audit/checkpoint registry entry for dataset roots and/or record hash anchors | Fluree (queryable) + derived exports | 7+ years minimum (or longer if mandated) | Multi-dimensional queries (actor, action type, contract, txid); point-in-time reconstruction |
 | Compliance evidence indexes | Sanctions screening attestations, KYC status commitments, regulatory reports (metadata only) | Append-only. Must not store private inputs. | Audit registry anchor of evidence package hash | Fluree (metadata only) | 7+ years minimum | Evidence package discovery by hash, timeframe, and policy version |
-| Legal/institutional indexes | Charter, bylaws, contracts, custodian agreements (metadata only) | Append-only metadata and content hash only; privileged content remains protected. | Audit registry anchor of content hash + pointer to canonical protected store | Fluree (metadata only) | Per legal retention; default 7+ years | Search by parties, effective dates, and referenced policy/decision |
+| Legal/sovereign indexes | Charter, bylaws, contracts, custodian agreements (metadata only) | Append-only metadata and content hash only; privileged content remains protected. | Audit registry anchor of content hash + pointer to canonical protected store | Fluree (metadata only) | Per legal retention; default 7+ years | Search by parties, effective dates, and referenced policy/decision |
 
 ## Data boundaries with operational systems
 
@@ -148,7 +148,7 @@ For any component that can sign, deploy, or move value:
 
 ### Protected record surfaces (legal/compliance)
 
-- Privileged legal and institutional documents MUST remain outside runtime-accessible stores.
+- Privileged legal and sovereign documents MUST remain outside runtime-accessible stores.
 - Runtime agents MUST only see:
   - public-safe metadata
   - content hashes

@@ -4,6 +4,10 @@
 **Protocols**: OData v4, x402 Intent Mandate, MCP
 **Target Systems**: SAP S/4HANA (Release 26A), Oracle Cloud ERP
 
+## Implementation References (CON-494)
+- `conxian-gateway` PR #88 (`26da57559f79ff5e4d77962676c87d5d39d4965a`): literal `402 Payment Required` parsing and x402 filter enforcement.
+- `conxian-nexus` PR #67 (`c4c1a800fec656cdfc2a86482a0b5c904da8af79`): production ERP attestation verification for signed mandates.
+
 ## 1. Overview
 The MCP (Model Context Protocol) server acts as a secure bridge between enterprise AI agents (like SAP Joule) and the Conxian Sovereign Stack. It allows the ERP to authorize high-value "Intent Mandates" that are cryptographically signed by Conxius.
 

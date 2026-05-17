@@ -9,7 +9,7 @@ This document maps the Conxian Sovereign BOS capabilities to their respective ru
 | Capability | Primary Repository | Responsibility | Implementation Status |
 | :--- | :--- | :--- | :--- |
 | **Strategy Nexus** | `conxian-nexus` | High-level orchestration, State Roots (MMR), Dec. Storage (Kwil/Tableland). | Production (v0.5.1) |
-| **Institutional Gateway** | `conxian-gateway` | x402 Mandates, Bitcoin/Stacks RPC Pooling, ZKML compliance pipe. | Production (v0.1.1) |
+| **Sovereign Gateway** | `conxian-gateway` | x402 Mandates, Bitcoin/Stacks RPC Pooling, ZKML compliance pipe. | Production (v0.1.1) |
 | **Fiscal Vault** | `Fiscal-Vault-Oracle` | Treasury management, DLC Bonds, Yield execution logic. | Active |
 | **Nakamoto Guardian** | `Nakamoto-Guardian` | Policy enforcement, Compliance auditing, Anti-fragility monitoring. | Active |
 
@@ -24,7 +24,7 @@ This document maps the Conxian Sovereign BOS capabilities to their respective ru
 
 | Capability | Repository | Audience | Implementation Status |
 | :--- | :--- | :--- | :--- |
-| **Conxian UI** | `conxian-ui` | Institutional Operators | Active |
+| **Conxian UI** | `conxian-ui` | Sovereign Operators | Active |
 | **Conxius Wallet** | `conxius-wallet` | Retail/Mobile Users | Beta (Native-Track) |
 | **Sovereign Platform** | `conxius-platform` | Developers & Ecosystem | Active |
 | **BOS Operations** | `conxian-business` | Commercial, Legal, and Platform Specs (ZSE Stubs). | Canonical Reference |

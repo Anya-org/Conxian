@@ -70,7 +70,7 @@ def _assert_initialized_submodule(submodule_dir: Path, submodule_path: str) -> N
         )
 
     try:
-        out = subprocess.check_output(
+        inside_work_tree = subprocess.check_output(
             [
                 "git",
                 "-C",
@@ -83,15 +83,40 @@ def _assert_initialized_submodule(submodule_dir: Path, submodule_path: str) -> N
             encoding="utf-8",
             errors="replace",
         )
+        resolved_toplevel = subprocess.check_output(
+            ["git", "-C", submodule_dir.as_posix(), "rev-parse", "--show-toplevel"],
+            stderr=subprocess.STDOUT,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
     except (subprocess.CalledProcessError, FileNotFoundError) as exc:
         raise RuntimeError(
             f"Submodule not initialized: {submodule_path}\n"
             "Run: git submodule update --init --recursive"
         ) from exc
 
-    if out.strip().lower() != "true":
+    if inside_work_tree.strip().lower() != "true":
         raise RuntimeError(
             f"Submodule not initialized: {submodule_path}\n"
+            "Run: git submodule update --init --recursive"
+        )
+
+    toplevel = resolved_toplevel.strip()
+    if not toplevel:
+        raise RuntimeError(
+            f"Submodule not initialized: {submodule_path}\n"
+            "Run: git submodule update --init --recursive"
+        )
+
+    expected_toplevel = submodule_dir.resolve()
+    actual_toplevel = Path(toplevel).resolve()
+    if actual_toplevel != expected_toplevel:
+        raise RuntimeError(
+            f"Submodule not initialized or misresolved: {submodule_path}\n"
+            "Git resolved this path to a different repository context.\n"
+            f"Expected top-level: {expected_toplevel.as_posix()}\n"
+            f"Resolved top-level: {actual_toplevel.as_posix()}\n"
             "Run: git submodule update --init --recursive"
         )
 

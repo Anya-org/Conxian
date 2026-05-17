@@ -17,5 +17,5 @@ The Conxian ecosystem has transitioned from a centralized research project to a 
 
 ## Impact
 - **Developer Experience**: Clearer mapping between specs and code.
-- **Institutional Trust**: Audit-ready specifications for due diligence.
+- **Sovereign Trust**: Audit-ready specifications for due diligence.
 - **System Integrity**: Prevention of "Truth Drift" between different business units.

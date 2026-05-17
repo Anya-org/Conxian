@@ -12,6 +12,10 @@ jspm_packages/
 dist/
 build/
 target/
+_pages/
+**/_pages/
+.vercel/
+**/.vercel/
 *.so
 *.dylib
 *.dll
@@ -20,29 +24,44 @@ target/
 
 # Test and coverage
 test-results/
+**/test-results/
 playwright-report/
+**/playwright-report/
+blob-report/
+**/blob-report/
 coverage/
+**/coverage/
 .nyc_output/
+**/.nyc_output/
 tests/report.md
-/*.log
+*.log
 /*.txt
-/*.patch
-/*.bak
+*.bak
 
 # Firebase local state
 .firebase/
 
 # Environment and secrets
 .env
-.env.local
-.env.development
-.env.production
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+!.env.*.example
+!.env.*.sample
+!.env.*.template
 *.pem
 *.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.crt
+*.cer
 secrets.json
+id_rsa
+id_ed25519
+id_ecdsa
 
 # Internal Strategy and Private Operations
 /internal/strategy/
@@ -50,6 +69,10 @@ secrets.json
 
 # Generated audit artifacts
 /conxian-business/.generated/
+**/.generated/
+
+# Runtime session state artifacts
+**/active_session.json
 
 # Internal-only BOS runtime artifacts (public repo keeps `*.stub.json` instead)
 /conxian-business/BOS_STATE_MACHINE.json
@@ -84,6 +107,7 @@ Thumbs.db
 
 # Developer scratch files and patches
 *.patch
+*_fix.py
 code_review_input.txt
 debug_regex.js
 test_match.js

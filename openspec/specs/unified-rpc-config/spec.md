@@ -2,7 +2,7 @@
 
 This document defines a minimal, machine-consumable configuration contract for Conxian RPC routing.
 
-It captures the approved packaging decisions from https://linear.app/conxian-labs/issue/CON-457:
+It captures the approved packaging decisions from the sovereign coordination layer (CON-457):
 
 - Personas are tiers (not separate codebases): Home = `Public-Only`, Retail = `Mixed`, Enterprise = `Sovereign-First`.
 - Add-ons are optional packs (extensible catalog).
@@ -53,7 +53,7 @@ The contract is designed so `.env` generation is a straightforward projection.
 - `Mixed`: remote/public RPC is allowed, but local/sovereign endpoints should be used when available.
 - `Sovereign-First`: local/private RPC is preferred; remote endpoints should be treated as a fallback (or disabled) depending on the distribution.
 
-Tier defaults (from https://linear.app/conxian-labs/issue/CON-457): Home = `Public-Only`, Retail = `Mixed`, Enterprise = `Sovereign-First`.
+Tier defaults (from sovereign coordination layer CON-457): Home = `Public-Only`, Retail = `Mixed`, Enterprise = `Sovereign-First`.
 
 ### 3.2 Core routing
 

@@ -13,7 +13,7 @@ help:
 	@echo "  make init        - Initialize and update all submodules"
 	@echo "  make unbundle    - Verify architectural compartmentalization"
 	@echo "  make test-all    - Run tests across all isolated suites"
-	@echo "  make update-all  - Sync all modules to latest main"
+	@echo "  make update-all  - Sync all modules to pinned SHAs"
 
 init:
 	@echo "Initializing unbundled submodules..."
@@ -49,8 +49,10 @@ test-all:
 	cd conxius-wallet && npm test
 
 update-all:
-	@echo "Updating all suites to main..."
-	git submodule foreach 'git fetch origin && git checkout main && git pull'
+	@echo "Syncing all suites to committed pinned submodule SHAs..."
+	git submodule sync --recursive
+	git submodule update --init --recursive
+	@echo "Pinned submodule sync complete. To bump a submodule, check out an explicit SHA or tag in that submodule and commit the gitlink update."
 
 # Legacy compatibility
 start:

@@ -10,7 +10,7 @@
 - **Impact**: Removes the "Federation Risk" identified in the March 2026 audit.
 
 ## 2. sBTC SIP-034 Throughput Optimization
-**Objective**: Utilize sBTC v2 performance for real-time institutional yield rebalancing.
+**Objective**: Utilize sBTC v2 performance for real-time sovereign yield rebalancing.
 
 ### Technical Analysis:
 - **SIP-034 Highlights**: Enables batching of peg-out requests and significantly reduces block latency for sBTC movements.

@@ -8,7 +8,7 @@
 - **SPEC-CSF-001**: **CXIP-013 Revenue Distribution**. The 6-way split MUST be calculated in Clarity based on GCR.
 - **SPEC-CSF-002**: **Principal Injection**. All module-to-module calls MUST be traversable via the core registry.
 - **SPEC-FU-001**: **Deterministic Sync**. ERP webhooks MUST be queued with a minimum 5-retry exponential backoff.
-- **SPEC-FU-002**: **ISO 20022 Compliance**. All institutional egress MUST match ISO 20022 XML standards.
+- **SPEC-FU-002**: **ISO 20022 Compliance**. All sovereign egress MUST match ISO 20022 XML standards.
 - **SPEC-NX-001**: **Nexus-First State**. The Nexus MUST be the authoritative source for block height for the Gateway.
 - **SPEC-NX-002**: **Glass Node Telemetry**. All risk metrics MUST be exported via Prometheus on port 3000 (internal).
 

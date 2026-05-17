@@ -6,9 +6,9 @@ Conxian is a Bitcoin-anchored operating system for sovereign finance and industr
 ## Audience (who this is for)
 
 **1) Protocol builders and Bitcoin-layer teams**
-Teams shipping Bitcoin-native services (L2/L3s, bridges, wallets, DeFi primitives) that need deterministic risk policy, auditable execution, and institutional-grade integration.
+Teams shipping Bitcoin-native services (L2/L3s, bridges, wallets, DeFi primitives) that need deterministic risk policy, auditable execution, and sovereign-grade integration.
 
-**2) Institutional and enterprise operators**
+**2) Sovereign and enterprise operators**
 CFOs, treasury teams, compliance leads, and security engineers who want to monitor and automate Bitcoin/Stacks financial operations with provable controls, clear audit trails, and standards-aligned egress.
 
 **3) Industrial operations teams**
@@ -42,11 +42,11 @@ Conxian is a sovereign execution stack that treats the business itself as a stat
 - Nakamoto-aware finality handling (Bitcoin-anchored burn-block height vs Stacks block height)
 - Transparency and audit surfaces for transaction ordering, state roots, and proof reconstruction
 
-**C) Conxian Gateway (Institutional Compliance Pipe)** ([PRD](../conxian-gateway/PRD.md))
+**C) Conxian Gateway (Sovereign Compliance Pipe)** ([PRD](../conxian-gateway/PRD.md))
 
 - Rust middleware that bridges Bitcoin/Stacks state to enterprise-grade APIs
 - Proof-oriented monitoring (health, metrics, traceability) for audit-ready operations
-- Standards-aligned egress paths (e.g., [ISO 20022-aligned institutional egress outputs](../openspec/changes/sovereign-data-migration-institutional-egress/specs/sovereign-data-migration-institutional-egress/spec.md)) designed for institutional workflows
+- Standards-aligned egress paths (e.g., [ISO 20022-aligned sovereign egress outputs](../openspec/changes/sovereign-data-migration-sovereign-egress/specs/sovereign-data-migration-sovereign-egress/spec.md)) designed for sovereign workflows
 
 **D) Industrial engine (job cards + enforcement)** ([CJCS spec](CJCS_v2.0_SPEC.md))
 
@@ -66,7 +66,7 @@ By aligning with Bitcoin settlement through Stacks Nakamoto finality primitives,
 The system is documented in OpenSpec and backed by an auditable, repository-first trail of decisions and interfaces.
 
 **4) Enterprise and compliance alignment**
-Instead of hand-waving “institutional readiness,” Conxian expresses integration surfaces in the language enterprises already use (job card mappings, standards-aligned egress, structured telemetry).
+Instead of hand-waving “sovereign readiness,” Conxian expresses integration surfaces in the language enterprises already use (job card mappings, standards-aligned egress, structured telemetry).
 
 **5) Security posture as a product feature**
 Conxian treats secret hygiene and auditability as first-class requirements (not optional documentation).
@@ -76,7 +76,7 @@ Conxian treats secret hygiene and auditability as first-class requirements (not 
 **1) Bitcoin is entering its “productive asset” phase.**
 The ecosystem is shifting from passive holding to yield, collateral, and programmable settlement. That increases the need for automation that is provable, not discretionary.
 
-**2) Institutional operators require audit surfaces, not dashboards.**
+**2) Sovereign operators require audit surfaces, not dashboards.**
 Post-2022, trust is earned through verifiable execution, strong key hygiene, and defensible controls.
 
 **3) Agents are proliferating, but guardrails are missing.**
@@ -97,5 +97,5 @@ Conxian turns business policy into deterministic execution. Instead of relying o
 
 - Smart-contract policy primitives for sovereign finance (fiscal policy, risk, revenue routing)
 - A transparency layer (Nexus) for verifiable state, finality-aware monitoring, and audit reconstruction
-- A gateway layer for institutional APIs, standards-aligned egress, and operational telemetry
+- A gateway layer for sovereign APIs, standards-aligned egress, and operational telemetry
 - A job-card standard and enforcement model for turning real work into measurable, settlement-grade events

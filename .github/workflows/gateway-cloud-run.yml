@@ -8,11 +8,16 @@ on:
       - 'conxian-gateway/**'
       - '.github/workflows/gateway-cloud-run.yml'
 
+permissions:
+  contents: read
+
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: us-central1
   SERVICE_NAME: conxian-gateway
   IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/conxian-gateway
+  GATEWAY_ALLOW_UNAUTHENTICATED_INGRESS: ${{ vars.GATEWAY_ALLOW_UNAUTHENTICATED_INGRESS || 'false' }}
+  GATEWAY_ALLOW_UNAUTHENTICATED_INGRESS_JUSTIFICATION: ${{ vars.GATEWAY_ALLOW_UNAUTHENTICATED_INGRESS_JUSTIFICATION || '' }}
 
 jobs:
   deploy:
@@ -41,6 +46,31 @@ jobs:
           docker build -t $IMAGE_NAME:${{ github.sha }} .
           docker push $IMAGE_NAME:${{ github.sha }}
 
+      - name: Resolve ingress authentication mode
+        id: ingress_auth
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          allow_unauth="$(echo "${GATEWAY_ALLOW_UNAUTHENTICATED_INGRESS}" | tr '[:upper:]' '[:lower:]')"
+
+          if [[ "${allow_unauth}" == "true" || "${allow_unauth}" == "1" || "${allow_unauth}" == "yes" ]]; then
+            if [[ -z "${GATEWAY_ALLOW_UNAUTHENTICATED_INGRESS_JUSTIFICATION//[[:space:]]/}" ]]; then
+              echo "::error::GATEWAY_ALLOW_UNAUTHENTICATED_INGRESS_JUSTIFICATION must be set to a non-empty human-readable reason when GATEWAY_ALLOW_UNAUTHENTICATED_INGRESS is enabled."
+              exit 1
+            fi
+
+            auth_flag="--allow-unauthenticated"
+            mode="temporary-unauthenticated"
+          else
+            auth_flag="--no-allow-unauthenticated"
+            mode="authenticated-default"
+          fi
+
+          echo "auth_flag=${auth_flag}" >> "$GITHUB_OUTPUT"
+          echo "mode=${mode}" >> "$GITHUB_OUTPUT"
+          echo "Deploy mode: ${mode}"
+
       - name: Deploy to Cloud Run
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v3
@@ -49,7 +79,7 @@ jobs:
           region: ${{ env.REGION }}
           image: ${{ env.IMAGE_NAME }}:${{ github.sha }}
           flags: |
-            --allow-unauthenticated
+            ${{ steps.ingress_auth.outputs.auth_flag }}
             --memory=512Mi
             --cpu=1
             --min-instances=0

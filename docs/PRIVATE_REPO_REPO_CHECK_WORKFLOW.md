@@ -86,10 +86,18 @@ python3 scripts/verify_submodule_integrity.py
 git submodule status --recursive
 ```
 
+`verify_submodule_integrity.py` is expected to fail if any branch-tracking submodule behavior is introduced (for example `.gitmodules` `branch = ...`, `git submodule update --remote`, `submodule.<name>.branch`, or `git submodule foreach` loops that do `checkout main` + `pull`).
+
 2. Portfolio docs are up to date:
 
 - `docs/REPO_PORTFOLIO.md`
 - `docs/PORTFOLIO_BUSINESS_UNIT_MAP.md`
+
+3. Submodule update evidence is attached to the PR:
+
+- explicit gitlink diff(s)
+- `python3 scripts/verify_submodule_integrity.py` output
+- `git submodule status --recursive` output
 
 ## One-command runner
 
@@ -125,6 +133,7 @@ When findings are present, remediate in this order:
 
 - **No single “repo-check” entrypoint (fixed):** added `scripts/bos_repo_check.py` to run the BOS hygiene + governance verifiers locally in a consistent order.
 - **Submodule pin drift (fixed):** updated the `conxian-nexus` and `lib-conxian-core` gitlink pins to match the current upstream default branches so `scripts/verify_submodule_integrity.py` remains a stable gate.
+- **Branch-tracking submodule automation risk (fixed):** `scripts/verify_submodule_integrity.py` now fails on branch-tracking and floating-ref patterns (`.gitmodules branch = ...`, `git submodule update --remote`, `submodule.<name>.branch`, and checkout-main+pull loops inside submodule foreach automation).
 
 ### Governance
 
