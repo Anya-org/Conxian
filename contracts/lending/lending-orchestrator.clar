@@ -1,4 +1,5 @@
-;; lending-manager.clar
+;; lending-orchestrator.clar
+;; Unified lending and borrowing engine
 ;; Conxian Protocol Standard Contract - Upgraded for BME
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
@@ -25,6 +26,8 @@
 (define-data-var assets-list (list 20 principal) (list))
 
 ;; --- Internal Helpers ---
+
+;; @desc Check if the contract is paused
 (define-read-only (is-paused)
   (let (
     (cb-res (contract-call? .enhanced-circuit-breaker is-contract-paused .lending-manager))
@@ -38,12 +41,16 @@
 
 ;; --- Public Functions ---
 
+;; @desc Deposits an asset into the lending pool.
+;; @param asset-trait: The token being deposited.
+;; @param amount: The quantity to deposit.
+;; @returns (response bool uint)
 (define-public (deposit (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
     (reserve (match (map-get? reserve-data asset)
                res-val res-val
-               { total-deposits: u0, total-borrows: u0, total-reserves: u0, decimals: (unwrap! (contract-call? asset-trait get-decimals) (err ERR_INTERNAL)) last-updated: burn-block-height }))
+               { total-deposits: u0, total-borrows: u0, total-reserves: u0, decimals: (unwrap! (contract-call? asset-trait get-decimals) (err ERR_INTERNAL)), last-updated: burn-block-height }))
   )
     (begin
       (asserts! (not (is-paused)) (err ERR_PAUSED))
@@ -60,6 +67,10 @@
   )
 )
 
+;; @desc Borrows an asset against collateral.
+;; @param asset-trait: The token to borrow.
+;; @param amount: The quantity to borrow.
+;; @returns (response bool uint)
 (define-public (borrow (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
@@ -80,6 +91,10 @@
   )
 )
 
+;; @desc Repays a borrowed asset.
+;; @param asset-trait: The token to repay.
+;; @param amount: The quantity to repay.
+;; @returns (response bool uint)
 (define-public (repay (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
@@ -107,6 +122,10 @@
   )
 )
 
+;; @desc Withdraws a previously deposited asset.
+;; @param asset-trait: The token to withdraw.
+;; @param amount: The quantity to withdraw.
+;; @returns (response bool uint)
 (define-public (withdraw (asset-trait <sip-010-ft-trait>) (amount uint))
   (let (
     (asset (contract-of asset-trait))
@@ -130,7 +149,11 @@
   )
 )
 
-;; Read-only Functions
+;; --- Read-only Functions ---
+
+;; @desc Calculates the health factor for a given user.
+;; @param user: The principal to check.
+;; @returns (response uint uint)
 (define-read-only (calculate-account-health (user principal))
   (let (
     (summary (fold sum-user-asset-values (var-get assets-list) { user: user, collateral-value: u0, debt-value: u0 }))
@@ -142,13 +165,13 @@
   )
 )
 
+;; @desc Private helper for health factor calculation.
 (define-private (sum-user-asset-values (asset principal) (acc { user: principal, collateral-value: uint, debt-value: uint }))
   (let (
     (user (get user acc))
     (deposit-amt (default-to u0 (map-get? deposits { asset: asset, user: user })))
     (borrow-amt (default-to u0 (map-get? borrows { asset: asset, user: user })))
-    (price-res (contract-call? .oracle-aggregator get-price asset))
-    (price (if (is-ok price-res) (unwrap-panic price-res) u100000000))
+    (price (unwrap-panic (contract-call? .oracle-aggregator get-price asset)))
     (reserve-opt (map-get? reserve-data asset))
   )
     (if (is-some reserve-opt)
@@ -158,36 +181,57 @@
         (asset-collateral-value (/ (* deposit-amt price COLLATERAL_FACTOR) (* (pow u10 decimals) u10000)))
         (asset-debt-value (/ (* borrow-amt price) (pow u10 decimals)))
       )
-        { user: user, collateral-value: (+ (get collateral-value acc) asset-collateral-value) debt-value: (+ (get debt-value acc) asset-debt-value) }
+        { user: user, collateral-value: (+ (get collateral-value acc) asset-collateral-value), debt-value: (+ (get debt-value acc) asset-debt-value) }
       )
       acc
     )
   )
 )
 
+;; @desc Returns supply balance for a user and asset.
+;; @param user: The user principal.
+;; @param asset: The asset principal.
+;; @returns (optional uint)
 (define-read-only (get-user-supply-balance (user principal) (asset principal))
   (some (default-to u0 (map-get? deposits { asset: asset, user: user })))
 )
 
+;; @desc Returns total deposits for a specific asset.
+;; @param asset: The asset principal.
+;; @returns (response uint uint)
 (define-read-only (get-total-deposits (asset principal))
   (match (map-get? reserve-data asset) reserve-val (ok (get total-deposits reserve-val)) (ok u0))
 )
 
+;; @desc Returns total borrows for a specific asset.
+;; @param asset: The asset principal.
+;; @returns (response uint uint)
 (define-read-only (get-total-borrows (asset principal))
   (match (map-get? reserve-data asset) reserve-val (ok (get total-borrows reserve-val)) (ok u0))
 )
 
+;; @desc Returns raw reserve data for a specific asset.
+;; @param asset: The asset principal.
+;; @returns (optional { total-deposits: uint, total-borrows: uint, total-reserves: uint, decimals: uint, last-updated: uint })
 (define-read-only (get-reserve-data (asset principal)) (map-get? reserve-data asset))
 
-;; Admin
+;; --- Admin ---
+
+;; @desc Initialize the contract with an admin.
+;; @param new-admin: The admin principal.
+;; @returns (response bool uint)
 (define-public (initialize (new-admin principal))
   (begin
     (asserts! (not (var-get initialized)) (err ERR_UNAUTHORIZED))
     (var-set admin new-admin)
+    (var-set initialized true)
     (ok true)
   )
 )
 
+;; @desc Updates the administrator principal.
+;; @param new-admin: The new admin principal.
+;; @returns (response bool uint)
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
