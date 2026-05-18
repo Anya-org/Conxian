@@ -83,7 +83,7 @@
       (asserts! (<= amount (get total-deposits reserve)) (err ERR_INSUFFICIENT_LIQUIDITY))
       (map-set borrows { asset: asset, user: caller } (+ (default-to u0 (map-get? borrows { asset: asset, user: caller })) amount))
       (map-set reserve-data asset (merge reserve { total-borrows: (+ (get total-borrows reserve) amount) }))
-      (let ((hf (unwrap! (calculate-account-health caller) (err ERR_INTERNAL))))
+      (let ((hf (try! (calculate-account-health caller))))
         (asserts! (>= hf u10000) (err ERR_INSUFFICIENT_COLLATERAL))
       )
       (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) caller none)))
@@ -138,7 +138,7 @@
       (asserts! (not (is-paused)) (err ERR_PAUSED))
       (asserts! (>= user-deposit amount) (err ERR_INVALID_AMOUNT))
       (map-set deposits { asset: asset, user: tx-sender } (- user-deposit amount))
-      (let ((hf (unwrap! (calculate-account-health tx-sender) (err ERR_INTERNAL))))
+      (let ((hf (try! (calculate-account-health tx-sender))))
         (begin
           (asserts! (>= hf u10000) (err ERR_INSUFFICIENT_COLLATERAL))
           (map-set reserve-data asset (merge reserve { total-deposits: (if (>= (get total-deposits reserve) amount) (- (get total-deposits reserve) amount) u0) }))

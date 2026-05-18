@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-18T04:35:00Z",
+  "timestamp": "2026-05-18T04:45:00Z",
   "audit_results": {
     "layer_1_structural": {
       "score": 100,
@@ -18,7 +18,7 @@
       "gaps": {}
     },
     "layer_5_code_doc_alignment": {
-      "score": 100,
+      "score": 95,
       "alignment_issues": {}
     },
     "layer_6_accessibility": {
@@ -26,7 +26,7 @@
       "clarity_issues": []
     }
   },
-  "overall_standards_score": 99.6,
+  "overall_standards_score": 98.8,
   "critical_issues": [],
   "high_issues": [],
   "medium_issues": [
@@ -65,9 +65,9 @@
       "diataxis": "N/A",
       "github": 100,
       "conxian": 100,
-      "alignment": 100,
+      "alignment": 90,
       "accessibility": 95,
-      "overall": 98.7
+      "overall": 96.2
     }
   }
 }
