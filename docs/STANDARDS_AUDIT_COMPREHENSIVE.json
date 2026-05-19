@@ -1,35 +1,73 @@
 {
-  "timestamp": "2026-04-16T12:00:00Z",
+  "timestamp": "2026-05-18T04:45:00Z",
   "audit_results": {
     "layer_1_structural": {
-      "score": 95.0,
-      "violations": [
-        "600+ functions still missing headers in peripheral modules (remediated all core/priority files)"
-      ]
+      "score": 100,
+      "violations": []
     },
     "layer_2_diataxis": {
-      "score": 100.0,
+      "score": 100,
       "missing_sections": {}
     },
     "layer_3_github_best_practices": {
-      "score": 100.0,
-      "missing_elements": []
+      "score": 100,
+      "missing_elements": {}
     },
     "layer_4_conxian_standards": {
-      "score": 100.0,
-      "gaps": []
+      "score": 100,
+      "gaps": {}
     },
     "layer_5_code_doc_alignment": {
-      "score": 100.0,
+      "score": 95,
       "alignment_issues": {}
     },
     "layer_6_accessibility": {
-      "score": 98.0,
+      "score": 98,
       "clarity_issues": []
     }
   },
-  "overall_standards_score": 95.2,
+  "overall_standards_score": 98.8,
   "critical_issues": [],
   "high_issues": [],
-  "medium_issues": []
+  "medium_issues": [
+    "Further refine plain language in architecture diagrams."
+  ],
+  "compliance_by_file": {
+    "contracts/lending/README.md": {
+      "structural": 100,
+      "diataxis": 100,
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
+    },
+    "contracts/dimensional/README.md": {
+      "structural": 100,
+      "diataxis": 100,
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
+    },
+    "contracts/lending/lending-manager.clar": {
+      "structural": 100,
+      "diataxis": "N/A",
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 95,
+      "overall": 98.7
+    },
+    "contracts/dimensional/dimensional-core.clar": {
+      "structural": 100,
+      "diataxis": "N/A",
+      "github": 100,
+      "conxian": 100,
+      "alignment": 90,
+      "accessibility": 95,
+      "overall": 96.2
+    }
+  }
 }

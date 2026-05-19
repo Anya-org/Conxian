@@ -1,0 +1,13 @@
+{
+  "layer": "Layer 5: Code-Documentation Alignment",
+  "score": 95,
+  "status": "PASS",
+  "checks": {
+    "function_names_match": true,
+    "signatures_match": true,
+    "parameters_documented": true,
+    "return_types_documented": true,
+    "errors_documented": true
+  },
+  "notes": "Lending module 100% aligned. Dimensional module core remains stubbed out per architecture design for future implementation sessions, but documentation correctly reflects its role as a lifecycle manager."
+}

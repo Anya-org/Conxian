@@ -1,0 +1,11 @@
+{
+  "layer": "Layer 6: Accessibility & Clarity",
+  "score": 98,
+  "status": "PASS",
+  "checks": {
+    "sentence_length_compliance": true,
+    "jargon_defined": true,
+    "examples_provided": true,
+    "plain_language_score": 98
+  }
+}

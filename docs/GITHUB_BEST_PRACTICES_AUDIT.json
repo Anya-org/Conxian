@@ -1,0 +1,13 @@
+{
+  "layer": "Layer 3: GitHub Best Practices",
+  "score": 100,
+  "status": "PASS",
+  "required_files": {
+    "README.md": "PRESENT",
+    "CONTRIBUTING.md": "PRESENT",
+    "CODE_OF_CONDUCT.md": "PRESENT",
+    "SECURITY.md": "PRESENT",
+    "LICENSE": "PRESENT",
+    "CHANGELOG.md": "PRESENT"
+  }
+}

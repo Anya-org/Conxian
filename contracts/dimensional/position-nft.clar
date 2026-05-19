@@ -1,7 +1,5 @@
 ;; position-nft.clar
 ;; Conxian Protocol Standard Contract
-
-;; position-nft.clar
 ;; Dimensional Risk Token (DRT) - Represents a multi-dimensional position in Conxian
 ;; Implements SIP-009
 
@@ -18,20 +16,31 @@
 
 ;; --- SIP-009 Functions ---
 
+;; @desc Get the last minted token ID.
+;; @returns (response uint uint)
 (define-read-only (get-last-token-id)
     (ok (var-get last-token-id))
 )
 
+;; @desc Get the URI for a given token ID.
+;; @param token-id: The unique identifier for the position NFT.
+;; @returns (response (optional (string-ascii 256)) uint)
 (define-read-only (get-token-uri (token-id uint))
     (ok none) ;; metadata-base-uri + token-id
 )
 
+;; @desc Get the owner of a given token ID.
+;; @param token-id: The unique identifier for the position NFT.
+;; @returns (response (optional principal) uint)
 (define-read-only (get-owner (token-id uint))
     (ok (nft-get-owner? dimensional-risk-token token-id))
 )
 
 
-;; @desc Transfer
+;; @desc Transfer a position NFT to a new owner.
+;; @param token-id: The identifier for the NFT.
+;; @param sender: The current owner.
+;; @param recipient: The new owner.
 ;; @returns (response bool uint)
 (define-public (transfer (token-id uint) (sender principal) (recipient principal))
     (begin
@@ -43,8 +52,10 @@
 ;; --- Internal Functions ---
 
 
-;; @desc Mint
-;; @returns (response bool uint)
+;; @desc Mint a new position NFT.
+;; @param recipient: The owner of the new position.
+;; @param token-id: The identifier for the new NFT.
+;; @returns (response uint uint)
 (define-public (mint (recipient principal) (token-id uint))
     (begin
         (asserts! (is-eq tx-sender (var-get authorized-minter)) (err ERR_UNAUTHORIZED))
@@ -58,7 +69,8 @@
 )
 
 
-;; @desc Burn
+;; @desc Burn an existing position NFT.
+;; @param token-id: The identifier for the NFT to burn.
 ;; @returns (response bool uint)
 (define-public (burn (token-id uint))
     (begin
@@ -70,7 +82,8 @@
 ;; --- Admin Functions ---
 
 
-;; @desc Set minter
+;; @desc Set a new authorized minter.
+;; @param new-minter: The principal to authorize.
 ;; @returns (response bool uint)
 (define-public (set-minter (new-minter principal))
     (begin
