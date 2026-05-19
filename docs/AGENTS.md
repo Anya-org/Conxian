@@ -1,5 +1,11 @@
 # Conxian Industrial Engine & SIDL (ATS v12.0) - Agent Guidelines
 
+## 0. THE CONXIAN UNIFIED THEORY (v2.0)
+All agentic sessions must adhere to the equations defined in `docs/CONXIAN_UNIFIED_THEORY_v2.md`.
+- **Execution Velocity ($V_X$)**: Prioritize AI leverage to crush milestones before $O_C$ exhaustion.
+- **System Autonomy ($A_S$)**: Minimize manual oversight. Manual intervention is a Phase 3 failure; drive $O_C 	o 0$.
+
+
 ## 1. THE CONXIAN JOB CARD SCHEMA (CJCS v2.0)
 - All industrial labor must be defined using the **CJCS v2.0 JSON-LD** (docs/CJCS_v2.0_SPEC.md).
 - Ensure 100% compatibility with SAP BAPI and Oracle REST fields for all "Gap Job Cards".
