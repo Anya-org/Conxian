@@ -34,3 +34,50 @@ updates:
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
+
+  # Maintain npm dependencies for repository-owned JavaScript workspaces
+  - package-ecosystem: "npm"
+    directory: "/"
+    target-branch: "dev"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "npm"
+    assignees:
+      - "botshelomokoka"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+  - package-ecosystem: "npm"
+    directory: "/showcase-dapp"
+    target-branch: "dev"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "npm"
+    assignees:
+      - "botshelomokoka"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+  # Maintain cargo dependencies for repository-owned Rust workspace manifests
+  - package-ecosystem: "cargo"
+    directory: "/"
+    target-branch: "dev"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "rust"
+    assignees:
+      - "botshelomokoka"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"

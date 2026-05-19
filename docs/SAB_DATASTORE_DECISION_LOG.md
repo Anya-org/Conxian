@@ -25,7 +25,7 @@ Status meanings:
 | SAB-DS-004 | Governance + audit mirror (public discoverability) | Tableland | Open | Acceptable only as an optional mirror of on-chain audit registries; must never be required for correctness. Confirm which audit datasets benefit from decentralized SQL discoverability. | Botshelo Mokoka | After audit dataset inventory is complete |
 | SAB-DS-005 | Governance + audit ledger (append-only, queryable) | Fluree | Open | Candidate for governance/audit querying where "append-only + provenance" properties matter. Must remain derived from on-chain truth and must not introduce secret-bearing state. | Botshelo Mokoka | After governance/audit record flow mapping |
 | SAB-DS-006 | Derived query layer (decentralized SQL) | Kwil | Open | Candidate for decentralized SQL query surfaces. Must not become an availability dependency for correctness; evaluate whether it should be limited to mirrors and public query ergonomics. | Botshelo Mokoka | After CON-334 domain mapping pass |
-| SAB-DS-007 | Institutional egress datasets (read-only subledger export) | Postgres views + deterministic exports | Accepted | Egress is read-only and proof-carrying: datasets are produced by Nexus as a Glass Node and are verifiable via on-chain checkpoints. | Botshelo Mokoka | Update after first dataset list is finalized |
+| SAB-DS-007 | Sovereign egress datasets (read-only subledger export) | Postgres views + deterministic exports | Accepted | Egress is read-only and proof-carrying: datasets are produced by Nexus as a Glass Node and are verifiable via on-chain checkpoints. | Botshelo Mokoka | Update after first dataset list is finalized |
 
 ### SAB-DS-002
 

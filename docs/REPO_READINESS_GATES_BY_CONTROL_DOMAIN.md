@@ -9,7 +9,7 @@ This page defines the **minimum control gates** required for each active flagshi
 
 Canonical tracker:
 
-- Linear: https://linear.app/conxian-labs/issue/CON-227/map-repo-readiness-gates-by-control-domain
+- Sovereign Coordination Layer: https://sovereign.conxian.com/issue/CON-227/map-repo-readiness-gates-by-control-domain
 
 ## Current status
 

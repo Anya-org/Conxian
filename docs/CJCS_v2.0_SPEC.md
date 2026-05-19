@@ -9,7 +9,7 @@
 > **Versioning & compatibility:** CJCS v2.0.1 is intended as an additive revision of CJCS v2.0 (no existing v2.0 terms are redefined; new terms may be added). New integrations should prefer the `https://conxian.com/contexts/job-card/v2.0.1` `@context`. Integrations pinned to `https://conxian.com/contexts/job-card/v2.0` should continue to process v2.0.1 Job Cards if they ignore unknown terms, but strict `@context` validators should migrate.
 
 ## 1. Overview
-The Conxian Job Card Schema (CJCS) is a machine-readable JSON-LD definition for ERP-to-Bitcoin labor coordination. It bridges the gap between institutional work orders (SAP/Oracle) and sovereign agent execution.
+The Conxian Job Card Schema (CJCS) is a machine-readable JSON-LD definition for ERP-to-Bitcoin labor coordination. It bridges the gap between sovereign work orders (SAP/Oracle) and sovereign agent execution.
 
 ## 2. JSON-LD Definition
 

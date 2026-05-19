@@ -1,10 +1,10 @@
 # Business Operations Systems (BOS) Full System Review
-**Date:** April 7, 2026
+**Date:** April 7, 2026 (Updated April 14, 2026)
 **Auditor:** Jules (Software Engineer)
-**Status:** AUDIT COMPLETE - CRITICAL DISCREPANCY IDENTIFIED
+**Status:** AUDIT COMPLETE - RESOLVED
 
 ## 1. Executive Summary
-The Conxian Business Operations System (BOS) is architecturally sound and follows a sophisticated "Sovereign" model. It leverages Stacks/Bitcoin L1 as the source of truth, with derived query layers in Neon and Supabase. However, a significant discrepancy exists between the reported remediation status in audit documents and the actual state of the `Conxian` submodule, which still contains numerous hardcoded testnet principals (`ST1PQ...`).
+The Conxian Business Operations System (BOS) is architecturally sound and follows a sophisticated "Sovereign" model. It leverages Stacks/Bitcoin L1 as the source of truth, with derived query layers in Neon and Supabase. A previously identified discrepancy regarding hardcoded testnet principals in the `Conxian` submodule has been fully remediated as of April 14, 2026 (commit `01b260d`).
 
 ## 2. Component Status
 
@@ -19,16 +19,16 @@ The Conxian Business Operations System (BOS) is architecturally sound and follow
 - **Wallet Remapping**: Technical manifest exists (`docs/WALLET_REMAPPING_MANIFEST_CON_61_CON_423.md`) but implementation in `Conxian` is incomplete.
 
 ### 2.3. Data Persistence (SAB Datastore Mapping)
-- **Neon (Postgres)**: Active (`Conxian-backend`). Authoritative for telemetry and institutional egress.
+- **Neon (Postgres)**: Active (`Conxian-backend`). Authoritative for telemetry and sovereign egress.
 - **Supabase (Postgres)**: Active (`Conxian-platform`). Used for analytics and IP/ZSE audit logging.
 - **Tableland/Kwil**: Defined as conditional/pilot datastores for sovereign persistence.
 
 ## 3. Technical Audit Findings
 
-### 3.1. "Audit-to-Code" Discrepancy (CRITICAL)
+### 3.1. "Audit-to-Code" Discrepancy (RESOLVED)
 - **Reported Status**: `audit/contamination_audit_report_2026_04_05.md` claims all hardcoded principals in `Conxian` are REMEDIATED.
-- **Actual Status**: `scripts/verify_contamination_guard.py` reports **45+ failures** in the `Conxian` submodule, specifically hardcoded `ST1PQ...` principals in core contracts (e.g., `automation-manager.clar`, `operational-treasury.clar`).
-- **Probable Cause**: The `Conxian` submodule is currently pinned to commit `9f24243` on `main`, which appears to lack the remediation claimed in the root repository's audit reports.
+- **Resolution Status**: REMEDIATED (April 14, 2026). The `Conxian` submodule was updated to commit `01b260d`, which eradicated all remaining hardcoded `ST1PQ...` principals in core contracts.
+- **Verification**: `scripts/verify_contamination_guard.py` now passes for all submodules including `Conxian`.
 
 ### 3.2. Functional Stubs
 - **Nexus Stubs**: Remediated to fail-closed status. ZKML, DLC, and ERP integration endpoints return 501/503 errors rather than simulated data, preventing fail-open risks.
@@ -40,8 +40,8 @@ The Conxian Business Operations System (BOS) is architecturally sound and follow
 - **Knowledge Retention**: Verified via `scripts/verify_knowledge_retention.py`.
 
 ## 5. Recommended Actions
-1. **Remediate Submodule Drift**: Sync the `Conxian` submodule with the branch containing the `ST1PQ...` remediation or apply the remediation directly to the current pin.
-2. **Update Mainnet Plans**: Replace remaining `ST...` addresses in `Conxian/deployments/` with mainnet `SP...` principals.
+1. **Maintain Submodule Alignment**: Ensure `Conxian` and other submodules remain aligned with the Sovereign-First deployment mandate.
+2. **Update Mainnet Plans**: Replace remaining `ST...` addresses in `Conxian/deployments/` with mainnet `SP...` principals (Tracked in CON-371).
 3. **Bridge BitVM2 Integration**: Address the remaining [STUB] in `lib-conxian-core` for state root verification (CON-75).
 
 ---

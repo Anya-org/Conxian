@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import fnmatch
 import json
+import re
 import subprocess
 import sys
 from functools import lru_cache
@@ -10,6 +11,23 @@ from typing import Any
 
 SENSITIVE_ROOTS = ("internal/strategy", "archive")
 MANIFEST_PATH = Path("audit/migration_manifest.json")
+
+STRATEGY_SENSITIVE_STUBS: dict[str, tuple[str, ...]] = {
+    "docs/research/BOS_COMPETITIVE_ANALYSIS_AND_ENHANCEMENT.md": (
+        "migrated to linear",
+        "treat this repository as public for boundary purposes",
+        "linear.app/conxian-labs",
+        "intentionally kept as a stub",
+    ),
+    "docs/STRATEGIC_GROWTH_MODEL_2026.md": (
+        "migrated to linear",
+        "treat this repository as public for boundary purposes",
+        "linear.app/conxian-labs",
+        "intentionally kept as a stub",
+    ),
+}
+
+MAX_STUB_WORDS = 220
 
 
 def _run_git(args: list[str]) -> str:
@@ -103,6 +121,37 @@ def _matches_any(path: str, patterns: list[str]) -> bool:
     return any(_matches(path, pattern) for pattern in patterns)
 
 
+def _verify_strategy_stub(
+    repo_root: Path,
+    tracked_paths: set[str],
+    rel_path: str,
+    required_markers: tuple[str, ...],
+) -> list[str]:
+    errors: list[str] = []
+    if rel_path not in tracked_paths:
+        errors.append(f"Required strategy-sensitive stub is no longer tracked: {rel_path}")
+        return errors
+
+    doc_path = repo_root / rel_path
+    if not doc_path.is_file():
+        errors.append(f"Required strategy-sensitive stub file is missing on disk: {rel_path}")
+        return errors
+
+    content = doc_path.read_text(encoding="utf-8", errors="replace")
+    lower = content.lower()
+    for marker in required_markers:
+        if marker not in lower:
+            errors.append(f"{rel_path} is missing required stub marker: {marker!r}")
+
+    word_count = len(re.findall(r"\S+", content))
+    if word_count > MAX_STUB_WORDS:
+        errors.append(
+            f"{rel_path} exceeds stub size limit ({word_count} words > {MAX_STUB_WORDS}); move strategy detail to Linear"
+        )
+
+    return errors
+
+
 def verify() -> None:
     repo_root = _git_root()
     manifest_path = repo_root / MANIFEST_PATH
@@ -153,6 +202,22 @@ def verify() -> None:
             *[f"  - {p}" for p in missing_from_manifest],
             "",
             "Please migrate the knowledge to Linear and add the corresponding coverage patterns before ignoring these paths.",
+        ]
+        raise RuntimeError("\n".join(lines))
+
+    tracked_set = set(tracked)
+    strategy_stub_errors: list[str] = []
+    for rel_path, required_markers in STRATEGY_SENSITIVE_STUBS.items():
+        strategy_stub_errors.extend(
+            _verify_strategy_stub(repo_root, tracked_set, rel_path, required_markers)
+        )
+
+    if strategy_stub_errors:
+        lines = [
+            "Strategy-sensitive stub policy violation:",
+            *[f"  - {err}" for err in strategy_stub_errors],
+            "",
+            "Keep these paths as concise public-safe stubs and maintain canonical strategy detail in Linear.",
         ]
         raise RuntimeError("\n".join(lines))
 

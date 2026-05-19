@@ -5,7 +5,7 @@
 tenant:
   id: "your-business-bns-name.stx"
   namespace: "tenant_alpha_relational"
-  tier: "institutional"
+  tier: "sovereign"
   orchestration: "supervisor-worker-mas"
 
 services:

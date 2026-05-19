@@ -4,7 +4,7 @@ This document defines first-pass readiness gates and cutover criteria for the SA
 
 Canonical tracker:
 
-- https://linear.app/conxian-labs/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory
+- Sovereign Coordination Layer: https://sovereign.conxian.com/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory
 
 This gate is intentionally framed around evidence and invariants, not "progress updates".
 
@@ -12,13 +12,13 @@ This gate is intentionally framed around evidence and invariants, not "progress 
 
 **Last reviewed:** 2026-04-16
 
-**Canonical live status:** https://linear.app/conxian-labs/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory
+**Canonical live status:** https://sovereign.conxian.com/issue/CON-329/create-sab-migration-control-plane-and-dependency-inventory
 
 Update convention: update this section (including `Last reviewed`) whenever either gate changes (unmet→met or met→unmet), ideally in the same PR/commit that updates the underlying evidence.
 
 ## Program-level success metrics
 
-1. **Correctness isolation:** Supabase and Neon are not required for protocol correctness, final auditability, or institutional accounting truth.
+1. **Correctness isolation:** Supabase and Neon are not required for protocol correctness, final auditability, or sovereign accounting truth.
 2. **Rebuildability:** all derived datasets can be deterministically rebuilt from Stacks L1 events/state plus the on-chain checkpoint history.
 3. **Verifiability:** each derived dataset that is used for decisions has a published dataset ID and an on-chain checkpoint scheme.
 4. **Operational control:** sovereign deployments have an owner-operated baseline (ability to run without vendor-specific features).
@@ -112,7 +112,7 @@ This gate applies to the Nexus/Glass-Node class of derived read models (currentl
   - [ ] Evidence for dual-run thresholds and SLO deltas is recorded in a commit-pinned artifact, satisfying Gate 1's common exit criteria requirements for thresholds/SLOs.
   - [ ] Read-switch mechanism exists (ability to flip reads between baselines without code changes).
   - [ ] Checkpoint mismatch behavior is defined and wired to explicit service behavior (rebuild vs safe-halt).
-  - [ ] Snapshot/export format is defined for any institutional egress datasets produced from this read model.
+  - [ ] Snapshot/export format is defined for any sovereign egress datasets produced from this read model.
 
 - **TSQL-G2: Operational-ready**
   - [ ] Backup/restore plan exists with declared RPO/RTO (RPO/RTO values linked) and evidence of at least one restore drill.
@@ -143,7 +143,7 @@ This gate applies to "proof/visual-proof" datasets used as evidence in decision 
 
 Canonical constraints to align to:
 
-- [Sovereign data migration / institutional egress spec](../openspec/changes/sovereign-data-migration-institutional-egress/specs/sovereign-data-migration-institutional-egress/spec.md)
+- [Sovereign data migration / sovereign egress spec](../openspec/changes/sovereign-data-migration-sovereign-egress/specs/sovereign-data-migration-sovereign-egress/spec.md)
 - [SAB datastore mapping spec](../openspec/specs/sab-datastore-mapping/spec.md)
 
 **Success metrics (minimums)**
@@ -249,6 +249,6 @@ This gate is satisfied when Supabase and Neon can be removed from correctness-cr
 All of the following must be true:
 
 - [ ] No production correctness-path read depends on Supabase or Neon.
-- [ ] Institutional egress datasets are produced from sovereign baselines and are checkpoint-verifiable.
+- [ ] Sovereign egress datasets are produced from sovereign baselines and are checkpoint-verifiable.
 - [ ] Governance/audit records are anchored on-chain; any mirrors are non-authoritative.
 - [ ] Production can maintain correctness through a full checkpoint interval without Supabase/Neon availability, either by continuing from sovereign baselines or by entering a defined safe-halt/degraded mode with documented behavior.

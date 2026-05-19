@@ -21,7 +21,12 @@ docker-compose up -d db redis
 To run the full reference stack (Postgres + Redis + Nexus + Gateway):
 
 ```bash
-cp docker-compose.env.example .env
+# Choose one lane template before starting the stack:
+cp docker-compose.env.local.example .env   # local simulation lane
+# cp docker-compose.env.testnet.example .env  # public testnet lane
+# cp docker-compose.env.mainnet.example .env  # mainnet lane
+# (docker-compose.env.example is a mainnet alias)
+
 docker-compose up --build
 ```
 
@@ -46,7 +51,7 @@ clarinet integrate
 
 ## 3. Middleware Orchestration
 
-The Conxian stack relies on two primary Rust services: the Nexus (Glass Node) and the Gateway (Institutional Pipe).
+The Conxian stack relies on two primary Rust services: the Nexus (Glass Node) and the Gateway (Sovereign Pipe).
 
 ### Conxian Nexus
 Synchronizes state with Stacks L1 and serves the internal API.
@@ -61,7 +66,7 @@ cargo run --bin conxian-nexus
 ```
 
 ### Conxian Gateway
-Handles institutional B2B traffic and compliance.
+Handles sovereign B2B traffic and compliance.
 
 Gateway defaults to the public Bitcoin mainnet RPC endpoint `https://bitcoin-rpc.publicnode.com` whenever `BITCOIN_RPC_URL` is unset. This default is only appropriate for non-production, non-funds-bearing local development and low-traffic open-tier environments (see [environment tier definitions](docs/BOS_BUSINESS_BUILDOUT.md)).
 

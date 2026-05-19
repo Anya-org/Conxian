@@ -20,7 +20,7 @@ If any pre-publication drafts of this report contained infrastructure identifier
 
 ### A. Managed Postgres (Neon)
 - **Status:** Active (PG 17).
-- **Scope (high level):** institutional egress telemetry, treasury/runway monitoring, managed auth, and verifiable state commitment storage.
+- **Scope (high level):** sovereign egress telemetry, treasury/runway monitoring, managed auth, and verifiable state commitment storage.
 
 ### B. Managed Postgres (Supabase)
 - **Status:** Active (PG 17).
@@ -37,7 +37,7 @@ If any pre-publication drafts of this report contained infrastructure identifier
 | **Governance** | Branching Policy Enforcement | IN PROGRESS | `main`/`staged`/`dev` model defined. |
 | **Security** | Zero Secret Egress (ZSE) | COMPLIANT | No secrets in Git; sensitive strategy migrated. |
 | **Protocol** | Clarity 4 Alignment | PENDING | Audit identified `ST1...` principals and stubs. |
-| **Gateway** | Institutional Egress | SIMULATED | ISO 20022 pacs.008 is formatted but OData is stubbed. |
+| **Gateway** | Sovereign Egress | SIMULATED | ISO 20022 pacs.008 is formatted but OData is stubbed. |
 | **Nexus** | State Authority | ENHANCED | ZKML and DLC are currently stubs; Nexus API is priority. |
 | **Wallet** | Enclave Signing | VERIFIED | ZSE compliance in `services/identity.ts`. |
 

@@ -1,73 +1,55 @@
 # Repository catalog
 
-This catalog is the Conxian organization-level map of _what each repository is for_ and _how it should be presented publicly_.
+This catalog is the Conxian organization-level map of what each repository is for and how it should be classified publicly.
 
-The `conxian-business` repository is an umbrella repo that vendors key Conxian repositories as Git submodules (see `.gitmodules`).
+The `conxian-business` repository vendors key Conxian repositories as Git submodules (see `.gitmodules`) and is the governance baseline for portfolio standards.
 
-## Categories
+## Canonical categories (use exactly)
 
-- **Platform**: orchestration stacks and operator-facing service surfaces (local dev, admin portals).
-- **Wallet**: end-user, non-custodial wallet applications.
-- **Gateway**: institutional middleware and API surfaces.
-- **UI**: web frontends (distinct from the broader Platform stack).
-- **Website**: marketing, docs, and landing pages.
-- **Shared core**: libraries intended to be depended on by other repos.
-- **Protocol**: smart contracts and protocol logic.
-- **State node**: long-running nodes that maintain Conxian/BOS state and participate in protocol operations.
-- **Specs**: `OpenSpec` and other public technical specification corpora.
-- **Internal (Ops/Admin)**: governance, audits, and internal orchestration.
-- **Tooling**: CLI tools and supporting utilities used for deployment, monitoring, or developer workflows.
+- `primary strategic`
+- `supporting`
+- `reference`
+- `internal strategy`
+- `governance baseline`
 
-## Quick map (by function)
+### Category intent
 
-- **Wallet**: `conxius-wallet`
-- **Gateway**: `conxian-gateway`
-- **Platform**: `conxius-platform`
-- **UI**: `conxian-ui/` (Git submodule; upstream `Conxian_UI`, planned rename to `conxian-ui`).
-- **Shared core**: `lib-conxian-core`, `lib-conclave-sdk`
-- **Protocol**: `Conxian`
-- **State node**: `conxian-nexus`
-- **Tooling**: `stacksorbit`
-- **Website**: `conxian-labs-site`
-- **Internal (Ops/Admin)**: `conxian-business`
+| Category | Intent | Release expectation |
+| --- | --- | --- |
+| `primary strategic` | Core product/infrastructure surfaces that define Conxian’s builder platform | Required: SemVer tags + maintained `CHANGELOG.md` + release notes |
+| `supporting` | Shared dependencies and delivery support repos used by strategic surfaces | Strongly recommended: same changelog/tag discipline as strategic repos |
+| `reference` | Public-facing examples, docs, and narrative surfaces | Narrative updates required; tags/changelogs encouraged when versioned |
+| `internal strategy` | Internal strategy/planning systems not intended as public product surfaces | Keep sensitive strategy in private systems; no public over-sharing |
+| `governance baseline` | Governance/specification baseline that sets standards for the portfolio | Must keep policy and classification docs current |
 
-## Recommended pins (GitHub org profile)
+## Current classification map
 
-If we can only pin a few repos on the GitHub org profile, these are the clearest entry points:
-
-1. `conxius-wallet` (Wallet)
-2. `conxian-gateway` (Gateway)
-3. `Conxian_UI` (UI; vendored as `conxian-ui/`) or `conxius-platform` (Platform)
-4. `Conxian` (Protocol)
-5. `lib-conxian-core` (Shared core)
-6. `conxian-labs-site` (Website)
-
-## Repositories (as vendored submodules)
-
-| Category | Repository | Primary audience | Notes |
+| Repository / asset | Category | Primary audience | Notes |
 | --- | --- | --- | --- |
-| Gateway | [conxian-gateway](https://github.com/Conxian/conxian-gateway) | Integrators, institutions | Rust gateway services and API surface. |
-| Wallet | [conxius-wallet](https://github.com/Conxian/conxius-wallet) | End users | Non-custodial wallet product. |
-| Platform | [conxius-platform](https://github.com/Conxian/conxius-platform) | Operators, institutions | Platform services (admin dashboards, etc.). |
-| UI | [Conxian_UI](https://github.com/Conxian/Conxian_UI) (vendored as `conxian-ui/`) | Operators, institutions | UI app(s) and specs. |
-| Protocol | [Conxian](https://github.com/Conxian/Conxian) | Protocol engineers | Contracts + protocol logic. |
-| State node | [conxian-nexus](https://github.com/Conxian/conxian-nexus) | Operators | Nexus state node implementation. |
-| Shared core | [lib-conxian-core](https://github.com/Conxian/lib-conxian-core) | App / service developers | Shared core library. |
-| Shared core | [lib-conclave-sdk](https://github.com/Conxian/lib-conclave-sdk) | Integrators | Conclave/TEE-related SDK components. |
-| Website | [conxian-labs-site](https://github.com/Conxian/conxian-labs-site) | Public | Marketing + public docs site. |
-| Tooling | [stacksorbit](https://github.com/Conxian/stacksorbit) | Developers | Stacks deployment and monitoring CLI/tooling. |
+| [Conxian](https://github.com/Conxian/Conxian) | `primary strategic` | Protocol engineers, integrators | Canonical protocol and on-chain interfaces. |
+| [conxian-gateway](https://github.com/Conxian/conxian-gateway) | `primary strategic` | Integrators, institutions | Integration/middleware layer for external systems. |
+| [conxian-nexus](https://github.com/Conxian/conxian-nexus) | `primary strategic` | Operators, integrators | Authoritative state and telemetry services. |
+| [conxius-wallet](https://github.com/Conxian/conxius-wallet) | `primary strategic` | End users, integrators | Wallet and signing experience. |
+| [lib-conxian-core](https://github.com/Conxian/lib-conxian-core) | `supporting` | App/service developers | Shared primitives and models. |
+| [conxius-enclave-sdk](https://github.com/Conxian/conxius-enclave-sdk) | `supporting` | Integrators, platform engineers | Enclave/attestation SDK components. |
+| [conxius-platform](https://github.com/Conxian/conxius-platform) | `supporting` | Operators, developers | Local stack orchestration and developer operations. |
+| [conxius-orbit](https://github.com/Conxian/conxius-orbit) | `supporting` | Developers, operators | Deployment and operational tooling. |
+| [Conxian_UI](https://github.com/Conxian/Conxian_UI) (vendored as `conxian-ui/`) | `reference` | Operators, institutions | Web interaction surface; consume strategic APIs/interfaces. |
+| [conxian-labs-site](https://github.com/Conxian/conxian-labs-site) | `reference` | Public | Website and public narrative surface. |
+| `Sovereign-Strategy-Nexus/` (tracked in this repo) | `internal strategy` | Leadership/strategy | Internal strategic intelligence surface. |
+| [conxian-business](https://github.com/Conxian/conxian-business) | `governance baseline` | Contributors, auditors | Portfolio governance, OpenSpec, and standards. |
 
-## Public README expectations (per repository)
+## README and release expectations
 
-For all user-facing repos (Wallet, Gateway, Platform, UI, Website, Shared core), the README should include:
+For all `primary strategic` and `supporting` repos, README files should include:
 
-- `## Purpose`: a 2–5 line description of the repository’s job.
-- `## Status`: one of `active`, `alpha`, `beta`, `stable`, `maintenance`, `archived`, plus a short “what’s safe to use”.
-- `## Ownership`: pointer to CODEOWNERS/maintainers.
-- `## Releases`: how versions/tags are produced and where to find release notes.
+- `## Purpose`
+- `## Status`
+- `## Ownership`
+- `## Releases`
 
-## Release discipline (minimum bar)
+Minimum release discipline for `primary strategic` repos:
 
-- Use SemVer tags: `vX.Y.Z`.
-- Keep `CHANGELOG.md` in [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format with a top-level `## [Unreleased]` section.
-- For user-facing behavior changes, do not merge without an entry in `CHANGELOG.md`.
+- Use SemVer tags (`vX.Y.Z`).
+- Keep `CHANGELOG.md` in Keep a Changelog format with `## [Unreleased]`.
+- Do not merge user-facing behavior changes without a corresponding changelog entry.

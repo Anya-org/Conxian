@@ -14,7 +14,7 @@ The ecosystem is organized into four standalone businesses, each with dedicated 
 - **State**: Stacks L1 / sBTC v1.0.
 
 ### 1.3 Conxian Fusion (B2B Connectivity)
-- **Role**: Institutional Gateway & ERP Bridge.
+- **Role**: Sovereign Gateway & ERP Bridge.
 - **Components**: Rust Actix-web Gateway, "The Engine" (Deterministic Sync).
 - **State**: ERP/TMS Webhooks, stateless translation.
 

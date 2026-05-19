@@ -1,4 +1,4 @@
-# Design: Phase 5 Sovereign Data Migration & Institutional Egress
+# Design: Phase 5 Sovereign Data Migration & Sovereign Egress
 
 ## 1. Architectural framing
 
@@ -18,8 +18,8 @@
   - deterministic dataset construction from L1 events/state, and
   - on-chain checkpoint anchoring (e.g., SAB-CHECKPOINT-V1).
 
-### 1.4 Institutional egress (subledger)
-- Institutional accounting egress is a **read-only export** of standardized datasets.
+### 1.4 Sovereign egress (subledger)
+- Sovereign accounting egress is a **read-only export** of standardized datasets.
 - External subledgers are consumers:
   - they ingest snapshots,
   - they verify them against on-chain checkpoints,
@@ -47,7 +47,7 @@
 1. **Stacks L1** emits canonical events and state transitions.
 2. **Nexus** ingests events and materializes datasets into sovereign Postgres.
 3. **Checkpoints** for each dataset are anchored on-chain (audit/checkpoint registry).
-4. **Gateway** exposes institutional read endpoints and ISO 20022 renderers over Nexus-derived datasets.
+4. **Gateway** exposes sovereign read endpoints and ISO 20022 renderers over Nexus-derived datasets.
 5. **External subledgers** ingest verified snapshots (read-only egress).
 
 ## 4. Decision gates (no new execution lane)

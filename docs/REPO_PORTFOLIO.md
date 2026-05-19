@@ -35,7 +35,7 @@ These repos are the public trust surface.
 - [conxius-wallet](https://github.com/Conxian/conxius-wallet) — Sovereign wallet (Android-first, offline-first) for Bitcoin L1 and Bitcoin-adjacent layers.
 - [conxian-gateway](https://github.com/Conxian/conxian-gateway) — “Fusion” gateway aggregating cross-layer state + compliance pipelines.
 - [Conxian](https://github.com/Conxian/Conxian) — Core protocol + on-chain contracts.
-- [Conxian_UI](https://github.com/Conxian/Conxian_UI) *(planned rename to `Conxian/conxian-ui`; see [CON-238](https://linear.app/conxian-labs/issue/CON-238/define-flagship-repos-and-external-trust-surface))* — Primary UI for interacting with the Conxian ecosystem.
+- [Conxian_UI](https://github.com/Conxian/Conxian_UI) *(planned rename to `Conxian/conxian-ui`)* — Primary UI for interacting with the Conxian ecosystem.
 - [conxian-labs-site](https://github.com/Conxian/conxian-labs-site) — Public Conxian Labs website.
 - [conxius-platform](https://github.com/Conxian/conxius-platform) — Local dev stack to run the ecosystem end-to-end.
 

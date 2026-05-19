@@ -17,15 +17,15 @@
 	path = conxius-platform
 	url = https://github.com/Conxian/conxius-platform
 	update = none
-[submodule "stacksorbit"]
-	path = stacksorbit
-	url = https://github.com/Conxian/stacksorbit
+[submodule "conxius-orbit"]
+	path = conxius-orbit
+	url = https://github.com/Conxian/conxius-orbit
 [submodule "conxian-labs-site"]
 	path = conxian-labs-site
 	url = https://github.com/Conxian/conxian-labs-site
-[submodule "lib-conclave-sdk"]
-	path = lib-conclave-sdk
-	url = https://github.com/Conxian/lib-conclave-sdk
+[submodule "conxius-enclave-sdk"]
+	path = conxius-enclave-sdk
+	url = https://github.com/Conxian/conxius-enclave-sdk
 [submodule "lib-conxian-core"]
 	path = lib-conxian-core
 	url = https://github.com/Conxian/lib-conxian-core
