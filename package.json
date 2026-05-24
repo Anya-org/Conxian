@@ -17,22 +17,22 @@
   },
   "dependencies": {
     "@opentelemetry/api": "1.9.0",
-    "@stacks/wallet-sdk": "^7.2.0",
+    "@stacks/wallet-sdk": "^7.4.0",
     "bech32": "^2.0.0",
-    "bignumber.js": "^9.1.2",
-    "bip32": "^4.0.0",
+    "bignumber.js": "^11.1.1",
+    "bip32": "^5.0.1",
     "bip39": "^3.1.0",
     "bitcoinjs-lib": "^7.0.1",
     "buffer": "^6.0.3",
-    "ecpair": "^2.1.0",
+    "ecpair": "^3.0.1",
     "elliptic": "^6.6.1",
     "generator-function": "^2.0.1",
     "is-generator-function": "^1.1.2",
     "js-sha256": "^0.11.1",
-    "light-bolt11-decoder": "^3.0.0",
+    "light-bolt11-decoder": "^3.2.0",
     "node-fetch": "^3.3.2",
     "tiny-secp256k1": "^2.2.4",
-    "ws": "^8.18.3"
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
