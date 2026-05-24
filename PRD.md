@@ -47,6 +47,10 @@ Conxian Finance is a multi-dimensional, Stacks-native automated monetary platfor
 - **Status**: COMPLETED.
 - **Details**: ZKML verification and Tableland state synchronization implemented.
 
+### 3.6. SIP-018 Compliance (CON-76)
+- **Status**: COMPLETED (April 2026).
+- **Details**: Implemented real structured data hashing and signature verification in `regulatory-adapter.clar` using the SIP-018 standard.
+
 ## 12. Recovery Registry (Failure Points)
 
 | Issue ID | Title | Status | Details |
@@ -56,7 +60,7 @@ Conxian Finance is a multi-dimensional, Stacks-native automated monetary platfor
 | **REC-003** | Simulation Gap | **CLOSED** | Resolved via shimmed keywords. |
 | **REC-006** | Systemic Stub Elimination | **CLOSED** | Removed all stubs for DLC, ERP, and Telemetry (April 2026). |
 | **REC-007** | Simulation Race Condition | **CLOSED** | Resolved asynchronous race condition in Simnet initialization and standardized test suite (April 2026). |
-
+| **REC-008** | SIP-018 Compliance Logic | **CLOSED** | Implemented real domain hashing and message verification (April 2026). |
 ## 13. Benchmarks (Verified)
 
 | Module | Function | Gas Cost (Execution) | Latency (Sim) |
@@ -64,3 +68,4 @@ Conxian Finance is a multi-dimensional, Stacks-native automated monetary platfor
 | Core | `set-paused` | < 10,000 | < 10ms |
 | DEX | `csf-swap` | ~45,000 | < 40ms |
 | Treasury | `run-fiscal-strategy` | ~30,000 | < 25ms |
+| Compliance | `verify-and-update-compliance` | ~25,000 | < 20ms |

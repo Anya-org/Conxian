@@ -7,6 +7,17 @@
 
 ;; --- Constants ---
 
+;; --- SIP-018 Domain Separator ---
+(define-constant DOMAIN_NAME "Conxian Regulatory Adapter")
+(define-constant DOMAIN_VERSION "1.0.0")
+(define-constant CHAIN_ID u1) ;; Mainnet: u1, Testnet: u2147483648
+
+(define-constant DOMAIN_HASH (sha256 (unwrap-panic (to-consensus-buff? {
+  name: DOMAIN_NAME,
+  version: DOMAIN_VERSION,
+  chain-id: CHAIN_ID
+}))))
+
 (define-constant ERR_UNAUTHORIZED (err u6000))
 (define-constant ERR_EXPIRED (err u6002))
 (define-constant ERR_INVALID_SIGNATURE (err u6003))
@@ -112,8 +123,7 @@
   )
   (let (
     (pubkey (unwrap! (var-get authority-pubkey) ERR_NO_AUTHORITY))
-    ;; Using placeholder hash in simulation
-    (msg-hash (sha256 0x00))
+    (msg-hash (unwrap-panic (get-sip018-hash user jurisdiction tier)))
   )
     (begin
       ;; SIP-018: secp256k1-verify returns bool
@@ -145,5 +155,13 @@
 ;; @param jurisdiction: 3-character ISO code
 ;; @param tier: Compliance tier
 (define-read-only (get-sip018-hash (user principal) (jurisdiction (string-ascii 3)) (tier uint))
-  (ok (sha256 0x00))
+  (let (
+    (message-hash (sha256 (unwrap-panic (to-consensus-buff? {
+      user: user,
+      jurisdiction: jurisdiction,
+      tier: tier
+    }))))
+  )
+    (ok (sha256 (concat 0x534950303138 (concat DOMAIN_HASH message-hash))))
+  )
 )
