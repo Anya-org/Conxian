@@ -18,12 +18,18 @@
 (define-constant RESERVE_FACTOR u1000)
 
 ;; --- Storage ---
+;; @desc Stores protocol-wide reserve data for each supported asset.
 (define-map reserve-data principal { total-deposits: uint, total-borrows: uint, total-reserves: uint, decimals: uint, last-updated: uint })
+;; @desc Tracks individual user deposit balances per asset.
 (define-map deposits { asset: principal, user: principal } uint)
+;; @desc Tracks individual user borrow balances per asset.
 (define-map borrows { asset: principal, user: principal } uint)
 
+;; @desc The administrative principal authorized to manage lending parameters.
 (define-data-var admin principal tx-sender)
+;; @desc Flag indicating if the contract has been initialized.
 (define-data-var initialized bool false)
+;; @desc List of all supported asset principals in the lending pool.
 (define-data-var assets-list (list 20 principal) (list))
 
 ;; --- Internal Helpers ---

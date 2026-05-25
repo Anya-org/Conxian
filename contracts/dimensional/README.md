@@ -2,13 +2,13 @@
 
 ## Overview (Explanation)
 
-The Dimensional module enables multi-dimensional leveraged trading and position management within the Conxian Protocol. It allows users to open isolated or cross-margin positions on various assets, utilizing the protocol's deep liquidity and autonomous risk management systems. The module is designed to provide professional-grade trading tools while maintaining decentralized sovereignty.
+The Dimensional module enables multi-dimensional leveraged trading and position management within the Conxian Protocol. It allows users to open isolated or **cross-margin positions** on various assets. Cross-margin positions are trading positions that use the entire available account balance as collateral, rather than a specific allocated amount. The module utilizes the protocol's deep liquidity and autonomous risk management systems to provide professional-grade trading tools while maintaining decentralized sovereignty.
 
 ## Architecture (Explanation)
 
 The module follows a strictly decoupled architecture separating position tracking, execution, and risk assessment:
 
-- **Core Logic**: `dimensional-core.clar` manages the lifecycle of leveraged positions, including creation, closure, and liquidation triggers.
+- **Core Logic**: `dimensional-core.clar` manages the lifecycle of leveraged positions, including creation, closure, and liquidation triggers for **undercollateralized positions**. An undercollateralized position is one where the collateral value has dropped below the required threshold to maintain the position's safety.
 - **Protocol Facade**: `dimensional-engine.clar` (located in `contracts/core/`) acts as the primary entry point for users and integrators, coordinating between positions, collateral, and risk units.
 - **Position NFTs**: `position-nft.clar` represents active positions as SIP-009 assets, enabling positions to be transferable or used as collateral in other protocol layers.
 - **Automation**: `dim-oracle-automation.clar` ensures that price feeds for dimensional assets are updated consistently.
@@ -26,6 +26,7 @@ The engine managing position lifecycles.
 | `close-position` | `(close-position (position-id uint))` | Settles and closes an active position. |
 | `liquidate-position` | `(liquidate-position (owner principal) (position-id uint) (oracle principal))` | Forces closure of undercollateralized positions. |
 | `get-position` | `(get-position (owner principal) (position-id uint))` | Returns detailed data for a specific position. |
+| `is-paused` | `(is-paused)` | Returns whether the contract or global protocol is currently paused. |
 
 ### `dimensional-engine.clar` (Core Facade)
 
@@ -33,8 +34,8 @@ The primary interface for external interactions.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `open-position` | `(open-position (manager <trait>) (token principal) (amount uint) (leverage uint) (long bool) ...)` | High-level call to open a position via the orchestrator. |
-| `close-position` | `(close-position (manager <trait>) (position-id uint) (token principal) ...)` | High-level call to close a position. |
+| `open-position` | `(open-position (position-manager <position-orchestrator-trait>) (token principal) (amount uint) (leverage uint) (long bool) (slippage-limit (optional uint)) (metadata (optional (string-utf8 1024))))` | High-level call to open a position via the orchestrator. |
+| `close-position` | `(close-position (position-manager <position-orchestrator-trait>) (position-id uint) (token principal) (slippage-limit (optional uint)))` | High-level call to close a position. |
 
 ## Integration Examples (How-to)
 

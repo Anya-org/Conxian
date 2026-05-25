@@ -2,17 +2,17 @@
 
 ## Overview (Explanation)
 
-The Lending module provides automated money markets for the Conxian Protocol. It allows users to deposit assets to earn interest and borrow assets against their collateral. Interest rates are determined dynamically based on market utilization.
+The Lending module provides automated money markets for the Conxian Protocol. It allows users to deposit assets to earn interest and borrow assets against their collateral. Interest rates are determined dynamically based on **market utilization**, which is the ratio of total borrowed funds to total deposits.
 
 ## Architecture (Explanation)
 
 The module utilizes a decentralized reserve system optimized for capital efficiency and risk management. It consists of three primary components:
 
 - **Lending Manager**: `lending-manager.clar` serves as the central entry point for all money market operations. It maintains user balances and reserve states.
-- **Economic Model**: `interest-rate-model.clar` provides the mathematical curves for variable interest rates based on pool utilization.
+- **Economic Model**: `interest-rate-model.clar` provides **utilization-based interest curves**. These are mathematical curves that adjust interest rates dynamically: rates increase as borrowing demand grows to encourage more deposits and maintain pool liquidity.
 - **Orchestrator**: `lending-orchestrator.clar` provides an alternative, BME-integrated (Business Machine Engine) execution path for advanced protocol interactions.
 
-The module integrates with the protocol's `oracle-aggregator` for real-time asset pricing and the `enhanced-circuit-breaker` for fail-closed security.
+The module integrates with the protocol's `oracle-aggregator` for real-time asset pricing and the `enhanced-circuit-breaker` for **fail-closed security**. Fail-closed security is a safety mechanism that automatically pauses the protocol if critical price feeds or contract dependencies become unavailable, preventing incorrect executions during market volatility.
 
 ## Core Contracts (Reference)
 
@@ -58,7 +58,7 @@ To deposit 1000 CXD into the lending pool:
 To verify if a user is eligible for further borrowing or at risk of liquidation:
 
 ```clarity
-(let ((health-factor (unwrap-panic (contract-call? .lending-manager calculate-account-health 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRX9864))))
+(let ((health-factor (unwrap-panic (contract-call? .lending-manager calculate-account-health tx-sender))))
   (print health-factor)
 )
 ```

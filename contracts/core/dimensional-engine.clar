@@ -45,6 +45,7 @@
 
 
 ;; @desc Set protocol coordinator
+;; @param new-coordinator: The new principal to be authorized as the protocol coordinator.
 ;; @returns (response bool uint)
 (define-public (set-protocol-coordinator (new-coordinator principal))
   (begin
@@ -69,7 +70,14 @@
 )
 
 
-;; @desc Open position
+;; @desc Open position via the specified position orchestrator.
+;; @param position-manager: The authorized position orchestrator trait implementation.
+;; @param token: The principal of the asset used for the position.
+;; @param amount: The quantity of the asset to be utilized.
+;; @param leverage: The desired leverage multiplier for the position.
+;; @param long: A boolean indicating if the position is a long (true) or short (false) bias.
+;; @param slippage-limit: An optional parameter defining the maximum allowed slippage.
+;; @param metadata: Optional UTF-8 metadata string describing the position.
 ;; @returns (response bool uint)
 (define-public (open-position
     (position-manager <position-orchestrator-trait>)
@@ -100,7 +108,11 @@
 )
 
 
-;; @desc Close position
+;; @desc Close an existing position via the specified position orchestrator.
+;; @param position-manager: The authorized position orchestrator trait implementation.
+;; @param position-id: The unique identifier of the position to be closed.
+;; @param token: The principal of the asset associated with the position.
+;; @param slippage-limit: An optional parameter defining the maximum allowed slippage upon closure.
 ;; @returns (response bool uint)
 (define-public (close-position
     (position-manager <position-orchestrator-trait>)
@@ -123,7 +135,10 @@
 ;; --- Facade Functions: Collateral Management ---
 
 
-;; @desc Deposit funds
+;; @desc Deposit collateral funds into the protocol via a collateral manager.
+;; @param collateral-manager: The authorized collateral orchestrator trait implementation.
+;; @param amount: The quantity of funds to deposit.
+;; @param token-trait: The SIP-010 compliant token trait for the deposit.
 ;; @returns (response bool uint)
 (define-public (deposit-funds
     (collateral-manager <collateral-orchestrator-trait>)
@@ -143,7 +158,10 @@
 )
 
 
-;; @desc Withdraw funds
+;; @desc Withdraw collateral funds from the protocol via a collateral manager.
+;; @param collateral-manager: The authorized collateral orchestrator trait implementation.
+;; @param amount: The quantity of funds to withdraw.
+;; @param token-trait: The SIP-010 compliant token trait for the withdrawal.
 ;; @returns (response bool uint)
 (define-public (withdraw-funds
     (collateral-manager <collateral-orchestrator-trait>)
@@ -165,8 +183,10 @@
 ;; --- Facade Functions: Risk Management ---
 
 
-;; @desc Check position health
-;; @returns (response bool uint)
+;; @desc Check the current health factor of a dimensional position.
+;; @param risk-manager: The authorized risk unit trait implementation.
+;; @param position-id: The unique identifier of the position to check.
+;; @returns (response uint uint)
 (define-public (check-position-health
     (risk-manager <risk-unit-trait>)
     (position-id uint)
@@ -180,7 +200,9 @@
 )
 
 
-;; @desc Liquidate position
+;; @desc Trigger the liquidation of an undercollateralized position.
+;; @param risk-manager: The authorized risk unit trait implementation.
+;; @param position-id: The unique identifier of the position to liquidate.
 ;; @returns (response bool uint)
 (define-public (liquidate-position
     (risk-manager <risk-unit-trait>)
