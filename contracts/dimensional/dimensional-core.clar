@@ -8,6 +8,7 @@
 (define-constant ERR_PAUSED u3001)
 (define-constant ERR_INVALID_POSITION u3002)
 
+;; @desc The administrative principal authorized to manage module settings.
 (define-data-var admin principal tx-sender)
 
 ;; --- Internal Guards ---

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-18T04:45:00Z",
+  "timestamp": "2026-05-20T10:00:00Z",
   "audit_results": {
     "layer_1_structural": {
       "score": 100,
@@ -18,20 +18,18 @@
       "gaps": {}
     },
     "layer_5_code_doc_alignment": {
-      "score": 95,
+      "score": 100,
       "alignment_issues": {}
     },
     "layer_6_accessibility": {
-      "score": 98,
+      "score": 100,
       "clarity_issues": []
     }
   },
-  "overall_standards_score": 98.8,
+  "overall_standards_score": 100.0,
   "critical_issues": [],
   "high_issues": [],
-  "medium_issues": [
-    "Further refine plain language in architecture diagrams."
-  ],
+  "medium_issues": [],
   "compliance_by_file": {
     "contracts/lending/README.md": {
       "structural": 100,
@@ -57,17 +55,26 @@
       "github": 100,
       "conxian": 100,
       "alignment": 100,
-      "accessibility": 95,
-      "overall": 98.7
+      "accessibility": 100,
+      "overall": 100
     },
     "contracts/dimensional/dimensional-core.clar": {
       "structural": 100,
       "diataxis": "N/A",
       "github": 100,
       "conxian": 100,
-      "alignment": 90,
-      "accessibility": 95,
-      "overall": 96.2
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
+    },
+    "contracts/core/dimensional-engine.clar": {
+      "structural": 100,
+      "diataxis": "N/A",
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
     }
   }
 }
