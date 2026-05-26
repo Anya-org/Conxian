@@ -1,0 +1,13 @@
+# CON-683 evidence artifact
+timestamp_utc=2026-05-26T03:34:36Z
+command=rg -n 'Evidence format \(minimum\)|link it from Linear|No-go conditions|must fail closed|6 consecutive Stacks testnet blocks' docs/INTEGRATED_SYSTEM_TESTNET_GATE.md
+
+## output
+48:## Evidence format (minimum)
+59:Evidence must remain public-safe. If a supporting runbook/log contains sensitive material, store it outside git (per ZSE) and link it from Linear.
+119:  - remain healthy for at least **6 consecutive Stacks testnet blocks (~60 minutes)**, and
+133:## No-go conditions
+139:- Any value-bearing path silently succeeds when a dependency/proof is missing (must fail closed).
+
+## exit_code
+0

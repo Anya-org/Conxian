@@ -1,0 +1,19 @@
+# CON-683 evidence artifact
+timestamp_utc=2026-05-26T03:31:56Z
+command=timeout 300 make test-all
+
+## output
+Executing Full System Test Suite...
+cd conxian-gateway && cargo test
+error: failed to load manifest for workspace member `/home/user/conxian-business/conxian-nexus`
+referenced by workspace at `/home/user/conxian-business/Cargo.toml`
+
+Caused by:
+  failed to read `/home/user/conxian-business/conxian-nexus/Cargo.toml`
+
+Caused by:
+  No such file or directory (os error 2)
+make: *** [Makefile:47: test-all] Error 101
+
+## exit_code
+2
