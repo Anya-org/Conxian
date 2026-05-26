@@ -17,9 +17,11 @@ Define and version Conxian's Business Operations System (BOS) as an auditable, p
 
 Active. This repository is private (as of April 8, 2026) and is the canonical in-repo source for BOS-level specifications and how the broader Conxian stack fits together.
 
+This status framing is being kept aligned during the `conxius-platform` documentation transition.
+
 Documentation here follows public-safe boundary rules; internal-only strategy and operational details remain in the sovereign coordination layer under ZSE.
 
-Releases are tracked in `CHANGELOG.md` and published as SemVer tags (`vX.Y.Z`). See `RELEASING.md`.
+Release and SemVer tagging follows the process in `RELEASING.md` (`vX.Y.Z`), with history tracked in `CHANGELOG.md`.
 
 ## Audience
 
@@ -28,7 +30,7 @@ Releases are tracked in `CHANGELOG.md` and published as SemVer tags (`vX.Y.Z`). 
 
 ## Relation to Conxian stack
 
-The Conxian ecosystem is organized by function to ensure clarity and modularity across the Sovereign Autonomous Business (SAB) stack. See the **[BOS Runtime Ownership Map](./BOS_RUNTIME_OWNERSHIP_MAP.md)** for detailed responsibility boundaries.
+The Conxian ecosystem is organized by function to ensure clarity and modularity across the Sovereign Autonomous Business (SAB) stack. See the **[BOS Runtime Ownership Map](./conxian-business/BOS_RUNTIME_OWNERSHIP_MAP.md)** for detailed responsibility boundaries.
 
 ### 1. Platform & Governance
 - **[`conxian-business/`](./conxian-business)**: **BOS Operations**. Commercial, legal, and platform specifications (ZSE Stubs).
