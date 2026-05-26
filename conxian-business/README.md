@@ -1,10 +1,10 @@
 # Conxian Business
 
-> Current workspace release: **v1.9.1** (see [`CHANGELOG.md`](../CHANGELOG.md))
+> Releases are tracked in [`CHANGELOG.md`](../CHANGELOG.md) and published as SemVer tags.
 
 **Conxian Business** defines the core service loop and state machine transitions of the Sovereign Autonomous Business (SAB), now evolving into a **Business-as-a-Platform (BaaP)** ecosystem.
 
-This repository is public. Internal BOS state-machine configuration, multi-tenant templates, and compliance reports are maintained in the sovereign coordination layer.
+This repository is private (as of April 8, 2026). Internal BOS state-machine configuration, multi-tenant templates, and compliance reports are maintained in the sovereign coordination layer.
 
 ## Purpose
 
@@ -16,11 +16,12 @@ This repository is public. Internal BOS state-machine configuration, multi-tenan
 
 ## Status
 
-active — This module documents BOS-level service-loop expectations and public-safe operational boundaries; detailed state-machine configuration and compliance reports live in the sovereign coordination layer.
+Stable — This module documents BOS-level service-loop expectations and public-safe operational boundaries; detailed state-machine configuration and compliance reports live in the sovereign coordination layer.
 
 ## Key Components & Platform Standards
 
 - **[Sovereign Runtime Ownership Map](./BOS_RUNTIME_OWNERSHIP_MAP.md)**: Canonical mapping of BOS capabilities to production repositories.
+- **[Conxian Unified Theory (v2)](../docs/CONXIAN_UNIFIED_THEORY_v2.md)**: Foundational framework for capital, time, and code deployment.
 - **[Multi-Tenant Orchestration Guide](./BOS_MULTI_TENANT_ORCHESTRATION.md)**: Multi-Agent System (M.A.S.) patterns and jurisdictional sharding logic.
 - **[BOS Platform Specification](./BOS_PLATFORM_SPEC.md)**: v2.2 Industrial Standard for Business-as-a-Platform (BaaP).
 - **[BOS Enhancement Plan](./BOS_ENHANCEMENT_PLAN_v2.md)**: Roadmap for BitVM2, ZKML, and ERP integration.

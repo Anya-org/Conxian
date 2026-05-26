@@ -92,43 +92,43 @@ This report outlines the transition path for the Conxian ecosystem from its "Web
 
 ### 7.1. Decentralization-Critical (P0)
 
-#### [Conxian (CSF Protocol)](./Conxian)
+#### [Conxian (CSF Protocol)](../Conxian)
 - **Status**: Mainnet Pending.
 - **Advice**: Ensure `bounty.clar` and `agent-registry.clar` are prioritized to enable autonomous agent economies. Verify that no hardcoded testnet principals remain in the deployment plans.
 
-#### [conxian-nexus](./conxian-nexus)
+#### [conxian-nexus](../conxian-nexus)
 - **Status**: Mainnet Pending.
 - **Advice**: Finalize the cutover to `KwilAdapter` for all transactional state. Implement a "Self-Healing" mode where the node automatically reconciles against on-chain checkpoints every 144 blocks.
 
-#### [conxian-gateway](./conxian-gateway)
+#### [conxian-gateway](../conxian-gateway)
 - **Status**: Mainnet Pending.
 - **Advice**: Transition from Google Cloud Run to Akash Network. Add support for x402x micro-payments to enable machine-to-machine coordination.
 
-#### [conxius-wallet](./conxius-wallet)
+#### [conxius-wallet](../conxius-wallet)
 - **Status**: Mainnet Pending.
 - **Advice**: Move AI logic to a "Sovereign-First" model. Allow users to point to their own local LLM endpoint or a decentralized inference provider. Hardcode support for Nostr NIP-47 (NWC) for all remote actions.
 
 ### 7.2. Governance & EXCO (P0)
 
-#### [Fiscal-Vault-Oracle](./Fiscal-Vault-Oracle)
+#### [Fiscal-Vault-Oracle](../Fiscal-Vault-Oracle)
 - **Status**: Active (Stubbed).
 - **Advice**: Move the "Treasury MCP" logic from Linear to a sovereign, encrypted coordination layer. Implement the DLC Bond principal drawdown logic as a fully automated on-chain flow.
 
-#### [Nakamoto-Guardian](./Nakamoto-Guardian)
+#### [Nakamoto-Guardian](../Nakamoto-Guardian)
 - **Status**: Active (Stubbed).
 - **Advice**: Automate the "Anti-Fragility Loop" to run as a GitHub Action (and eventually an Akash Worker) that scans the entire portfolio for ethos drift.
 
-#### [Sovereign-Ops-Orchestrator](./Sovereign-Ops-Orchestrator)
+#### [Sovereign-Ops-Orchestrator](../Sovereign-Ops-Orchestrator)
 - **Status**: Active (Stubbed).
 - **Advice**: Build a decentralized "Ops Dashboard" that consumes state directly from Kwil and Tableland, removing the need for Render-hosted visualizations.
 
 ### 7.3. User Surface & Shared Runtime (P1/P2)
 
-#### [conxian-ui](./conxian-ui)
+#### [conxian-ui](../conxian-ui)
 - **Status**: Incubating.
 - **Advice**: Align with the "Sovereign UI" standard: strictly static, IPFS-ready, and provider-agnostic. Remove all references to `api.testnet.hiro.so` and replace with a dynamic `CXN_GATEWAY_URL` that can point to a local or sovereign Gateway.
 
-#### [showcase-dapp](./showcase-dapp)
+#### [showcase-dapp](../showcase-dapp)
 - **Status**: Incubating.
 - **Advice**: Use this as the "Sovereignty Sandbox." Test new decentralized hosting (Akash/IPFS) and storage (Kwil) here before rolling out to P0 repos.
 
