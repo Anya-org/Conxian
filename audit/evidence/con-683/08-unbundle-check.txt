@@ -1,0 +1,10 @@
+# CON-683 evidence artifact
+timestamp_utc=2026-05-26T03:31:56Z
+command=make unbundle
+
+## output
+Verifying no cross-contamination between B2B and B2C...
+Compartmentalization verified: OK
+
+## exit_code
+0

@@ -1,0 +1,8 @@
+# CON-683 evidence artifact
+timestamp_utc=2026-05-26T03:31:55Z
+command=rg -n --glob '!docs/**' --glob '!openspec/**' --glob '!**/*.md' --glob '!**/*.test.*' --glob '!**/*.spec.*' '(MOCK_|\bstub\b|\bmock\b|\bplaceholder\b|\bFIXME\b|\bTODO\b)'
+
+## output
+
+## exit_code
+1

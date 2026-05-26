@@ -1,0 +1,27 @@
+# CON-683 evidence artifact
+timestamp_utc=2026-05-26T03:31:56Z
+command=rg -n 'Known doc gaps|Public-safe stub|canonical in Linear|Internal-only' docs/DOCUMENTATION_ALIGNMENT_INDEX.md docs/bounties/MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md
+
+## output
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:10:- **Public-safe stub (canonical in Sovereign Coordination Layer)**: safe to link publicly; this repo file is a short pointer stub (see [ZSE stub template](./templates/ZSE_STUB_TEMPLATE.md)). It must not contain any operational, security, financial, legal, and strategic details beyond the pointer. The full canonical content is maintained in the sovereign coordination layer under ZSE.
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:11:- **Internal-only (canonical in Sovereign Coordination Layer only)**: operational, security, financial, legal, and strategic material whose canonical document must live only in the sovereign coordination layer. If a repo link target must be preserved, use a **Public-safe stub (canonical in Sovereign Coordination Layer)** (see [ZSE stub template](./templates/ZSE_STUB_TEMPLATE.md)) so existing links continue to resolve.
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:15:- Treat this repo as public for boundary purposes. (This GitHub repository is private as of April 8, 2026.) "Internal-only" material should not be stored here; when we preserve link targets we use public-safe ZSE stubs (see sovereign coordination layer issue CON-256).
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:39:| `conxian-business/BOS_STATE_MACHINE.stub.json` | Supporting | Public-safe stub (canonical in Linear) | Public-safe BOS state machine pointer stub (standardized ZSE stub). |
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:41:| `Sovereign-Ops-Orchestrator/DEPLOYMENT_EFFICIENCY.md` | Supporting | Public-safe stub (canonical in Linear) | Bottleneck and deployment efficiency metrics (standardized ZSE stub). |
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:42:| `Sovereign-Strategy-Nexus/REALTIME_M&A_VELOCITY.md` | Supporting | Public-safe stub (canonical in Linear) | Strategy velocity tracking and exit-readiness framing (standardized ZSE stub). |
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:43:| `Sovereign-Strategy-Nexus/docs/SOVEREIGN_MOI_ALIGNMENT.md` | Canonical | Public-safe stub (canonical in Linear) | “MOI” alignment source for Strategy Nexus narratives (standardized ZSE stub). |
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:44:| `Sovereign-Strategy-Nexus/docs/ZK_DATA_ROOM_SCHEMA.md` | Canonical | Public-safe stub (canonical in Linear) | ZK data room schema (standardized ZSE stub). |
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:45:| `Sovereign-Strategy-Nexus/docs/SOVEREIGN_PITCH_DECK_NARRATIVE.md` | Supporting | Public-safe stub (canonical in Linear) | Pitch narrative scaffolding (standardized ZSE stub). |
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:46:| `Fiscal-Vault-Oracle/SOVEREIGN_RUNWAY.md` | Canonical | Public-safe stub (canonical in Linear) | Treasury runway and yield execution constraints (standardized ZSE stub). |
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:47:| `Fiscal-Vault-Oracle/LSEG_MCP_AUDIT.md` | Supporting | Public-safe stub (canonical in Linear) | LSEG MCP audit context for treasury/oracle integrity (standardized ZSE stub). |
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:56:| `Nakamoto-Guardian/ANTI_FRAGILITY_LOOP.md` | Canonical | Public-safe stub (canonical in Linear) | ATS enforcement + collision audits framing (standardized ZSE stub). |
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:84:| `audit/strategos-alignment.md` | Supporting | Internal-only | Audit of repo alignment to Strategos mandate + next steps. |
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:146:| `conxius-wallet/docs/archive/*` | Supporting | Internal-only | Historical context; useful for archaeology but shouldn’t drive new decisions. |
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:155:| `docs/ATS_v11.0_MASTER_BASELINE.md` | Supporting | Internal-only | Baseline snapshot and executive alignment language. |
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:159:| `docs/BUSINESS_COMPLIANCE_ALIGNMENT_2026.md` | Supporting | Internal-only | Strategy/compliance narrative for 2026 regulatory framing. |
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:174:| `docs/bounties/MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md` | Canonical | Public-safe stub (canonical in Linear) | How maintainer payouts are enabled and validated (standardized ZSE stub). |
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:175:| `admin/SECRETS.md` | Canonical | Public-safe stub (canonical in Linear) | Secret registry + pointers to Linear docs (standardized ZSE stub). |
+docs/DOCUMENTATION_ALIGNMENT_INDEX.md:177:## 7) Known doc gaps / broken references (should not be re-created blindly)
+
+## exit_code
+0

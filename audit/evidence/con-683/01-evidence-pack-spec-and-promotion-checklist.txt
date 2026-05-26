@@ -1,0 +1,13 @@
+# CON-683 evidence artifact
+timestamp_utc=2026-05-26T03:31:55Z
+command=rg -n 'Mainnet acceptance evidence pack|Requirement: Evidence pack content|## Template' openspec/specs/mainnet-acceptance-evidence-pack/spec.md docs/PROMOTION_CHECKLISTS.md
+
+## output
+openspec/specs/mainnet-acceptance-evidence-pack/spec.md:74:1. In the promotion PR description, under a heading `### Mainnet acceptance evidence pack`, or
+openspec/specs/mainnet-acceptance-evidence-pack/spec.md:82:### Requirement: Evidence pack content
+openspec/specs/mainnet-acceptance-evidence-pack/spec.md:192:## Template
+openspec/specs/mainnet-acceptance-evidence-pack/spec.md:197:### Mainnet acceptance evidence pack
+docs/PROMOTION_CHECKLISTS.md:50:### Mainnet acceptance evidence pack
+
+## exit_code
+0

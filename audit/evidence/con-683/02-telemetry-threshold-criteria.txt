@@ -1,0 +1,25 @@
+# CON-683 evidence artifact
+timestamp_utc=2026-05-26T03:31:55Z
+command=rg -n 'latency \(>200ms\)|SLO/error-budget|RTO|RPO|threshold|No-go conditions' docs/PHASE6_OBSERVABILITY_RUNBOOK.md docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md docs/SAB_MIGRATION_READINESS_GATES.md
+
+## output
+docs/PHASE6_OBSERVABILITY_RUNBOOK.md:13:- **MCP Telemetry Logging**: Monitor the rate of `get_system_telemetry` and `get_yield_metrics` calls. Elevated latency (>200ms) indicates Gateway strain.
+docs/SAB_MIGRATION_READINESS_GATES.md:78:- [ ] Pilot outputs meet the target-state spec and the domain's defined comparison/validation thresholds (dual-run or equivalent) when compared to the existing baseline path (or deltas are explicitly documented and accepted).
+docs/SAB_MIGRATION_READINESS_GATES.md:79:- [ ] Any comparison thresholds, SLOs, RPO/RTOs, or divergence deltas referenced by the pilot have commit-pinned evidence (runbook, SLO doc, benchmark artifact, or dashboard snapshot) linked.
+docs/SAB_MIGRATION_READINESS_GATES.md:97:- **Correctness parity:** key query surfaces match the hosted baseline for an agreed validation window (validation plan + divergence threshold linked), or any deltas are explicitly documented and accepted.
+docs/SAB_MIGRATION_READINESS_GATES.md:111:  - [ ] Dual-run comparison plan (which queries compare, how often, and the divergence threshold that triggers rollback; threshold evidence linked).
+docs/SAB_MIGRATION_READINESS_GATES.md:112:  - [ ] Evidence for dual-run thresholds and SLO deltas is recorded in a commit-pinned artifact, satisfying Gate 1's common exit criteria requirements for thresholds/SLOs.
+docs/SAB_MIGRATION_READINESS_GATES.md:118:  - [ ] Backup/restore plan exists with declared RPO/RTO (RPO/RTO values linked) and evidence of at least one restore drill.
+docs/SAB_MIGRATION_READINESS_GATES.md:124:  - [ ] Validation window completed with no correctness regressions beyond the accepted thresholds (threshold evidence linked).
+docs/SAB_MIGRATION_READINESS_GATES.md:126:**No-go conditions (do not cut over)**
+docs/SAB_MIGRATION_READINESS_GATES.md:134:- Sustained correctness divergence beyond the agreed threshold.
+docs/SAB_MIGRATION_READINESS_GATES.md:176:**No-go conditions (do not cut over)**
+docs/SAB_MIGRATION_READINESS_GATES.md:222:**No-go conditions (do not cut over)**
+docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md:47:| **G3: Rollback readiness** | Demonstrate controlled fallback within RTO | Executed rollback drill report (timed) + post-drill reconciliation |
+docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md:48:| **G4: Promotion readiness** | Approve controlled production promotion | Gate review packet with SLO/error-budget results and owner approvals |
+docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md:82:- [ ] Deterministic mismatch thresholds approved.
+docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md:96:- [ ] Measured rollback completion time meets RTO target.
+docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md:102:- [ ] SLO/error-budget results captured for promotion window.
+
+## exit_code
+0
