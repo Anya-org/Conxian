@@ -32,3 +32,27 @@
     (ok true)
   )
 )
+
+;; Unified Theory Metric Extensions (v1.2.0)
+(define-data-var system-autonomy uint u0) ;; A_S (0-10000 basis points)
+(define-data-var execution-velocity uint u0) ;; V_X (scaled index)
+(define-data-var cost-of-reproduction uint u0) ;; C_R (scaled index)
+
+(define-read-only (get-theory-metrics)
+  (ok {
+    cr: (var-get cost-of-reproduction),
+    vx: (var-get execution-velocity),
+    as: (var-get system-autonomy),
+    ne: (unwrap-panic (get-tvl)) ;; N_E proxy via TVL
+  })
+)
+
+(define-public (update-theory-metrics (new-cr uint) (new-vx uint) (new-as uint))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (var-set cost-of-reproduction new-cr)
+    (var-set execution-velocity new-vx)
+    (var-set system-autonomy new-as)
+    (ok true)
+  )
+)
