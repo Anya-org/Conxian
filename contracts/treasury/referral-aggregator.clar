@@ -10,7 +10,7 @@
 (define-constant ERR_NOT_FOUND (err u404))
 
 ;; Roles & Config
-(define-data-var admin principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var admin principal tx-sender)
 (define-data-var worker-share-bps uint u9500) ;; 95%
 (define-data-var referrer-share-bps uint u500) ;; 5%
 
