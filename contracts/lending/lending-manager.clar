@@ -21,21 +21,21 @@
 
 ;; --- Read-Only Functions ---
 
-;; @desc Get total deposits for a specific asset
+;; @desc Get total deposits for a specific asset.
 (define-read-only (get-total-deposits (asset principal))
   (let ((reserve (unwrap! (map-get? reserves asset) ERR_ASSET_NOT_FOUND)))
     (ok (get total-deposits reserve))
   )
 )
 
-;; @desc Get total borrows for a specific asset
+;; @desc Get total borrows for a specific asset.
 (define-read-only (get-total-borrows (asset principal))
   (let ((reserve (unwrap! (map-get? reserves asset) ERR_ASSET_NOT_FOUND)))
     (ok (get total-borrows reserve))
   )
 )
 
-;; @desc Get full reserve data
+;; @desc Get full reserve data.
 (define-read-only (get-reserve-data (asset principal))
   (map-get? reserves asset)
 )
