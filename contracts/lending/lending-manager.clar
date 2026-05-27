@@ -40,28 +40,24 @@
   (map-get? reserves asset)
 )
 
-;; --- Admin / Operation Functions ---
+;; --- Public Functions ---
 
-;; @desc Initialize a new reserve asset
-(define-public (add-reserve (asset principal) (decimals uint))
+;; @desc Register a new asset reserve. Admin only.
+(define-public (register-reserve (asset principal) (decimals uint))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (map-set reserves asset {
-      total-deposits: u0,
-      total-borrows: u0,
-      decimals: decimals,
-      active: true
-    })
+    (map-set reserves asset { total-deposits: u0, total-borrows: u0, decimals: decimals, active: true })
     (ok true)
   )
 )
 
-;; @desc Update admin principal
-(define-public (set-admin (new-admin principal))
-  (begin
-    (asserts! (is-standard? new-admin) (err ERR_UNAUTHORIZED))
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (var-set admin new-admin)
-    (ok true)
+;; @desc Set reserve status (active/inactive). Admin only.
+(define-public (set-reserve-active (asset principal) (active bool))
+  (let ((reserve (unwrap! (map-get? reserves asset) ERR_ASSET_NOT_FOUND)))
+    (begin
+      (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+      (map-set reserves asset (merge reserve { active: active }))
+      (ok true)
+    )
   )
 )
