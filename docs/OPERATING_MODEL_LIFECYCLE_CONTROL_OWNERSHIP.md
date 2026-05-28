@@ -118,7 +118,7 @@ This model aligns to the following standards and records.
 | --- | --- | --- |
 | `lib-conxian-core` | Publish/refresh repo ownership statement and add a compatibility evidence checklist for downstream consumers. | Ownership statement and quality/security evidence links are committed and referenced in release PR templates/checklists. |
 | `conxian-gateway` | Add explicit service-management and partner-governance evidence checklist to release workflow. | Promotion PRs require service owner approval, cross-unit change-control reference, and partner-impact evidence links. |
-| `conxius-wallet` | Add privacy/custody control checklist mapped to lifecycle `Verify`, `Release`, and `Operate` gates. | Wallet release candidates include custody boundary evidence, privacy control checks, and rollback owner assignment. |
+| `conxius-wallet` | Implement and maintain wallet lifecycle control checklist: [`docs/WALLET_LIFECYCLE_CONTROL_CHECKLIST.md`](./WALLET_LIFECYCLE_CONTROL_CHECKLIST.md), mapped to lifecycle `Verify`, `Release`, and `Operate` gates. | Wallet release candidates include completed `VER-*`/`REL-*`/`OPS-*` evidence in the checklist, including custody boundary checks, privacy controls, and rollback owner assignment. |
 | `conxius-platform` | Align platform ownership + production-boundary docs with this lifecycle/control model and expose a reusable verify/operate evidence pack template. | **[Cross-repo]** `REPO_OWNERSHIP.md`, `docs/REPO_BOUNDARY_CONTRACT_V1.md`, and `docs/PRODUCTION_BOUNDARY.md` are updated and linked from release/rollout evidence. |
 
 ## Appendix A: RACI by lifecycle phase

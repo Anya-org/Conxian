@@ -61,6 +61,10 @@ CHECKS: tuple[Check, ...] = (
         (sys.executable, str(SCRIPT_DIR / "verify_promotion_controls.py")),
     ),
     Check(
+        "Wallet lifecycle control gates",
+        (sys.executable, str(SCRIPT_DIR / "verify_wallet_lifecycle_control_gates.py")),
+    ),
+    Check(
         "Contamination guard",
         (sys.executable, str(SCRIPT_DIR / "verify_contamination_guard.py")),
     ),

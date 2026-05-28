@@ -26,5 +26,8 @@ This checklist tracks the mainnet readiness for the `conxius-wallet` repository.
 - [x] **Artifact Hygiene**: Tracked artifacts (logs, node_modules) removed.
 - [x] **License**: Standardized GPL-3.0 added.
 
+### 5) Lifecycle Control Gates
+- [x] **Wallet Lifecycle Checklist**: Verify/Release/Operate evidence is tracked in [`docs/WALLET_LIFECYCLE_CONTROL_CHECKLIST.md`](./WALLET_LIFECYCLE_CONTROL_CHECKLIST.md) for `VER-1`, `VER-2`, `REL-1`, `REL-2`, `OPS-1`, and `OPS-2`.
+
 ---
 © 2026 Conxian-Labs (Pty) Ltd.
