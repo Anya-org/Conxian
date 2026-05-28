@@ -6,6 +6,8 @@
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u1000)
+(define-constant TREASURY_CONTROL_KEY "treasury-control")
+(define-constant TREASURY_WRAPPER_KEY "treasury-wrapper")
 
 ;; Data Vars
 (define-data-var contract-owner principal tx-sender)
@@ -15,10 +17,20 @@
 (define-map protocol-principals (string-ascii 50) principal)
 
 ;; Authorization
+(define-private (is-authorized-principal (name (string-ascii 50)))
+  (match (map-get? protocol-principals name)
+    authorized-principal (is-eq tx-sender authorized-principal)
+    false
+  )
+)
+
 (define-private (is-authorized)
   (or
     (is-eq tx-sender (var-get contract-owner))
-    (is-eq tx-sender .agent-treasury)
+    ;; Canonical treasury controller path (Phase 1, principal-injected)
+    (is-authorized-principal TREASURY_CONTROL_KEY)
+    ;; Legacy compatibility wrapper path (principal-injected)
+    (is-authorized-principal TREASURY_WRAPPER_KEY)
     (is-eq tx-sender .ops-engine)
   )
 )

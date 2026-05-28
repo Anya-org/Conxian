@@ -69,6 +69,19 @@
   )
 )
 
+;; @desc Resolve canonical risk module first, then fallback to legacy key for compatibility.
+(define-private (get-risk-module-contract)
+  (let ((risk-unit-module (contract-call? .conxian-protocol get-module "risk-unit")))
+    (match risk-unit-module
+      data (begin
+        (asserts! (get active data) (err ERR_MODULE_NOT_ACTIVE))
+        (ok (get contract data))
+      )
+      (get-module-contract "risk-manager")
+    )
+  )
+)
+
 
 ;; @desc Open position via the specified position orchestrator.
 ;; @param position-manager: The authorized position orchestrator trait implementation.
@@ -192,7 +205,7 @@
     (position-id uint)
   )
   (begin
-    (let ((registered-manager (try! (get-module-contract "risk-manager"))))
+    (let ((registered-manager (try! (get-risk-module-contract))))
       (asserts! (is-eq (contract-of risk-manager) registered-manager) (err ERR_UNAUTHORIZED))
       (contract-call? risk-manager get-health-factor position-id)
     )
@@ -209,7 +222,7 @@
     (position-id uint)
   )
   (begin
-    (let ((registered-manager (try! (get-module-contract "risk-manager"))))
+    (let ((registered-manager (try! (get-risk-module-contract))))
       (asserts! (is-eq (contract-of risk-manager) registered-manager) (err ERR_UNAUTHORIZED))
       (contract-call? risk-manager liquidate position-id)
     )
