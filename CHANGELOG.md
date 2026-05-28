@@ -12,6 +12,8 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 ### Added
 - **Release Hygiene**: Added missing `## [Unreleased]` sections to submodule changelogs in `conxian-gateway`, `conxian-nexus`, `conxius-wallet`, `conxius-platform`, `Conxian`, and `lib-conxian-core`.
 - **System Trait Alignment**: Added missing `bond-traits` to the Simnet deployment plan in the `Conxian` repository to stabilize protocol integration tests.
+- **Conxian Unified Theory v2.0:** Integrated the foundational mathematical framework for sovereign enterprise into `docs/CONXIAN_UNIFIED_THEORY_v2.md`.
+- **Sovereign Enterprise Mandate:** Updated `AGENTS.md` and `docs/AGENTS.md` to enforce $V_X$ and $A_S$ alignment across agentic sessions.
 
 ### Changed
 - **Nomenclature Realignment**: Executed a system-wide realignment of public-facing documentation, replacing "Institutional" with "Sovereign" across root README, Gateway PRD, and ecosystem-wide specifications to improve public clarity and align with the sovereignty-first mandate.
@@ -57,3 +59,10 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 - **Repository Hygiene:** Executed portfolio-wide pruning of merged branches in root and submodules.
 
 ## [1.9.2] - 2026-04-14
+
+### Added
+- **BitVM2 Verification Bridge:** Integrated SNARK-based verification for CJCS v2.0 Job Cards in `conxian-gateway` and `lib-conxian-core`.
+- **Sovereign Hook Standard:** Defined the standard for "Sovereign Hooks" in `conxian-business/BOS_PLATFORM_SPEC.md` to align with SAP Clean Core patterns.
+
+### Changed
+- **BOS Governance Baseline:** Hardened the repository governance model in `GOVERNANCE.md` and `CODEOWNERS` to meet Phase 5 production mandates.

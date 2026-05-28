@@ -1,11 +1,17 @@
 # Conxian AGENTS.md
 
 ## BOS Operational Standards
-> clarity-version: 4  
+> clarity-version: 4
 > epoch: latest
 
+### Sovereign Enterprise Mandate (Unified Theory v2.0)
+All agentic sessions must adhere to the equations defined in `docs/CONXIAN_UNIFIED_THEORY_v2.md`.
+- **Execution Velocity ($V_X$)**: Prioritize AI leverage (Windsurf, Jules) to crush milestones before $O_C$ exhaustion.
+- **System Autonomy ($A_S$)**: Minimize manual oversight. If a process requires manual intervention, it is a Phase 3 failure and must be remediated to $O_C \to 0$.
+
+
 ### Sovereign-First Deployment Mandate
-All Conxian core contracts **MUST** source dynamic principals from `operational-treasury.clar`.  
+All Conxian core contracts **MUST** source dynamic principals from `operational-treasury.clar`.
 Hard-coded `ST…` / `SP…` addresses in production source trigger an **immediate build-break**; CI blocks merge until Jules resolves.
 
 ### Zero Secret Egress (ZSE) Compliance
@@ -21,12 +27,12 @@ Hard-coded `ST…` / `SP…` addresses in production source trigger an **immedia
 - **Verification**: All claims must be cross-referenced against the existing knowledge graph in `conxian-business/BOS_KNOWLEDGE_GRAPH.md`.
 
 ### BitVM2 Integration
-- SNARK proofs verified through `lib-conxian-core`.  
+- SNARK proofs verified through `lib-conxian-core`.
 - Bridge validates Bitcoin L1 state against BitVM2 engine per **CJCS v2.0**.
 
 ### Repository Hygiene
-- **CI Contamination Guard** enforces submodule-pin freshness.  
-- Pins updated **≤ 5 min** after validated remediation.  
+- **CI Contamination Guard** enforces submodule-pin freshness.
+- Pins updated **≤ 5 min** after validated remediation.
 - Zero launch-critical automation tied to personal/bootstrap wallets.
 
 ---
@@ -34,8 +40,8 @@ Hard-coded `ST…` / `SP…` addresses in production source trigger an **immedia
 ## Clarity 4 Compliance Mandate (2026-04-23)
 
 ### Non-Negotiables
-- `clarity-version = 4` **only** (v1–v3 banned).  
-- `epoch = "latest"` **mandatory** in every `Clarinet.toml` entry.  
+- `clarity-version = 4` **only** (v1–v3 banned).
+- `epoch = "latest"` **mandatory** in every `Clarinet.toml` entry.
 - **207 contracts** already migrated; CI rejects any regression.
 
 ### Breaking-Change Audit Log
@@ -62,9 +68,9 @@ Hard-coded `ST…` / `SP…` addresses in production source trigger an **immedia
 | `utils/block-utils.clar` | Util | ✅ |
 
 ### Next Actions
-1. `clarinet check --coverage` → zero warnings.  
-2. Resolve any gas / logic nits surfaced.  
-3. Phase-7 testnet rollout.  
+1. `clarinet check --coverage` → zero warnings.
+2. Resolve any gas / logic nits surfaced.
+3. Phase-7 testnet rollout.
 4. External audit (ZKC + SYI scope).
 
 ### Tooling Quick-Start

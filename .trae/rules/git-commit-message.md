@@ -1,6 +1,6 @@
 ---
 alwaysApply: false
-description: 
+description:
 scene: git_message
 ---
 # Git Message Rules
