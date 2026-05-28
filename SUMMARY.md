@@ -5,6 +5,7 @@
 * [Conxian: one-page market narrative](docs/CONXIAN_MARKET_NARRATIVE_ONE_PAGER.md)
 * [Documentation Alignment Index](docs/DOCUMENTATION_ALIGNMENT_INDEX.md)
 * [BOS business buildout (this repo)](docs/BOS_BUSINESS_BUILDOUT.md)
+* [Conxian-business parent-control alignment baseline (CON-694)](docs/CONXIAN_BUSINESS_PARENT_CONTROL_ALIGNMENT.md)
 * [Repo Portfolio (Flagship vs Supporting)](docs/REPO_PORTFOLIO.md)
 * [Portfolio repository and subrepository inventory](docs/PORTFOLIO_REPOSITORY_INVENTORY.md)
 * [Governance files standardization (public repos)](docs/GOVERNANCE_FILES_STANDARDIZATION.md)

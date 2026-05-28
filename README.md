@@ -77,9 +77,11 @@ git submodule update --init services/conxian-ui
 
 Next action after clone: review `docs/REPO_PORTFOLIO.md` for ecosystem context and `docs/BOS_BUSINESS_BUILDOUT.md` for public/internal boundary rules.
 
-## Security / Governance
+## Ownership
 
-Ownership and review requirements are defined in [`CODEOWNERS`](./CODEOWNERS).
+Ownership and review requirements are defined in [`CODEOWNERS`](./CODEOWNERS). `CODEOWNERS`-designated policy owners are authoritative for governance, security, and documentation-policy changes.
+
+## Security / Governance
 
 For general support and non-security bug reports, open a GitHub issue. For security vulnerabilities, follow the private reporting process in [`SECURITY.md`](./SECURITY.md).
 

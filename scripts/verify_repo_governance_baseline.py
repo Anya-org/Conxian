@@ -32,6 +32,9 @@ def _repo_root() -> Path:
     return Path(out.strip())
 
 
+PARENT_CONTROL_ALIGNMENT_PATH = "docs/CONXIAN_BUSINESS_PARENT_CONTROL_ALIGNMENT.md"
+
+
 REQUIRED_FILES: tuple[RequiredFile, ...] = (
     RequiredFile("README.md", 256),
     RequiredFile("LICENSE", 256),
@@ -41,6 +44,7 @@ REQUIRED_FILES: tuple[RequiredFile, ...] = (
     RequiredFile("CHANGELOG.md", 256),
     RequiredFile("RELEASING.md", 128),
     RequiredFile(".github/RELEASE_HYGIENE.md", 256),
+    RequiredFile(PARENT_CONTROL_ALIGNMENT_PATH, 512),
 )
 
 PORTFOLIO_DOCS: tuple[RequiredFile, ...] = (RequiredFile("docs/REPO_PORTFOLIO.md", 256),)
@@ -138,6 +142,30 @@ def _verify_changelog(repo_root: Path, errors: list[str]) -> None:
         errors.append("CHANGELOG.md: missing '## [Unreleased]' section")
 
 
+def _verify_parent_control_alignment(repo_root: Path, errors: list[str]) -> None:
+    text = _read_text(repo_root / PARENT_CONTROL_ALIGNMENT_PATH)
+
+    required_headings = (
+        "Scope boundary",
+        "Control-domain mapping",
+        "Confidentiality",
+        "Operating policy",
+        "Service management",
+        "Quality",
+        "Risk",
+        "Rollback",
+        "Evidence expectations",
+        "Rollback and accountability expectations",
+        "Definition of done",
+    )
+    for heading in required_headings:
+        if not _require_heading(text, heading):
+            errors.append(
+                PARENT_CONTROL_ALIGNMENT_PATH
+                + f": missing required section heading '{heading}'"
+            )
+
+
 def verify() -> None:
     repo_root = _repo_root()
     errors: list[str] = []
@@ -208,6 +236,8 @@ def verify() -> None:
 
     if "CHANGELOG.md" not in missing:
         _verify_changelog(repo_root, errors)
+    if PARENT_CONTROL_ALIGNMENT_PATH not in missing:
+        _verify_parent_control_alignment(repo_root, errors)
 
     if errors:
         lines = ["Repository governance baseline: FAILED", "", *[f"- {e}" for e in errors]]
