@@ -35,6 +35,7 @@
 * [Compatibility matrix and acceptance gate checklist (CON-441)](docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md)
 * [Phase 6 production rollout runbook (CON-681)](docs/operations/CON-681_PHASE6_PRODUCTION_ROLLOUT_RUNBOOK.md)
 * [Phase 6 rollback drill simulation (CON-681)](docs/operations/CON-681_PHASE6_ROLLBACK_DRILL_SIMULATION.md)
+* [Approved metric spec (CON-682)](docs/operations/CON-682_APPROVED_METRIC_SPEC.md)
 * [Public Visibility Audit Report](docs/PUBLIC_VISIBILITY_AUDIT_REPORT.md)
 * [CSF mainnet readiness gate](docs/CSF_MAINNET_READINESS_GATE.md)
 * [CSF-first operating sequence and proof gates](docs/CSF_FIRST_OPERATING_SEQUENCE_AND_PROOF_GATES.md)
