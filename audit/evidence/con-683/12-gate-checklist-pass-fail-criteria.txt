@@ -1,0 +1,18 @@
+# CON-683 evidence artifact
+timestamp_utc=2026-05-26T03:34:36Z
+command=rg -n 'G3: Rollback readiness|G4: Promotion readiness|rollback completion time meets RTO|SLO/error-budget results captured|Decision log includes go/no-go|Evidence quality standard|Objective:|Traceable:|Scoped:|Current:' docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md
+
+## output
+47:| **G3: Rollback readiness** | Demonstrate controlled fallback within RTO | Executed rollback drill report (timed) + post-drill reconciliation |
+48:| **G4: Promotion readiness** | Approve controlled production promotion | Gate review packet with SLO/error-budget results and owner approvals |
+96:- [ ] Measured rollback completion time meets RTO target.
+102:- [ ] SLO/error-budget results captured for promotion window.
+105:- [ ] Decision log includes go/no-go rationale and fallback trigger conditions.
+107:## 5) Evidence quality standard (applies to every gate)
+111:1. **Objective:** generated from tests, CI logs, or reproducible scripts (not narrative-only).
+112:2. **Traceable:** linked to commit SHA, run ID, or immutable artifact hash.
+113:3. **Scoped:** clearly tied to one repo and one gate.
+114:4. **Current:** produced in the same release window as the gate decision.
+
+## exit_code
+0

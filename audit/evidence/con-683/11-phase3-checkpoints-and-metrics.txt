@@ -1,0 +1,17 @@
+# CON-683 evidence artifact
+timestamp_utc=2026-05-26T03:34:35Z
+command=rg -n 'proof_job_success_rate|proof_generation_latency_p95|verifier_mismatch_count|bridge_state_freshness_seconds|rollback_trigger_count|P3 — Controlled production slice|SLO-compliant run|rollback remains < target RTO|Promotion and rollback gates|G3 — Operational readiness|G4 — Controlled promotion' docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md docs/architecture/CONXIAN_L3_PROFILE_ADR.md
+
+## output
+docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md:119:- `proof_job_success_rate`
+docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md:120:- `proof_generation_latency_p95`
+docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md:121:- `verifier_mismatch_count`
+docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md:122:- `bridge_state_freshness_seconds`
+docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md:124:- `rollback_trigger_count`
+docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md:133:| **P3 — Controlled production slice** | Promote limited live traffic to target lane | P2 exit + rollback drill completed | SLO-compliant run at approved traffic %, rollback remains < target RTO |
+docs/architecture/CONXIAN_L3_PROFILE_ADR.md:56:### 4) Promotion and rollback gates (must pass in order)
+docs/architecture/CONXIAN_L3_PROFILE_ADR.md:63:| **G3 — Operational readiness** | Runbooks/alerts/ownership complete for cutover | On-call map, alert drills, rollback rehearsal evidence | Missing owner, missing drill, or failed drill |
+docs/architecture/CONXIAN_L3_PROFILE_ADR.md:64:| **G4 — Controlled promotion** | Gradual traffic promotion within SLO/error budget | Promotion report with traffic percentages and rollback decision log | SLO breach or untriaged bridge/finality anomaly |
+
+## exit_code
+0

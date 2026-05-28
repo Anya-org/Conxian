@@ -1,0 +1,17 @@
+# CON-683 evidence artifact
+timestamp_utc=2026-05-26T03:35:05Z
+command=rg -n 'latency \(>200ms\)|failure rate > 5%|proof_job_success_rate|proof_generation_latency_p95|verifier_mismatch_count|bridge_state_freshness_seconds|rollback_trigger_count|SLO/error-budget' docs/PHASE6_OBSERVABILITY_RUNBOOK.md docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md
+
+## output
+docs/PHASE6_OBSERVABILITY_RUNBOOK.md:13:- **MCP Telemetry Logging**: Monitor the rate of `get_system_telemetry` and `get_yield_metrics` calls. Elevated latency (>200ms) indicates Gateway strain.
+docs/PHASE6_OBSERVABILITY_RUNBOOK.md:15:- **Enclave Yield Stats**: Stream the enclave attestation success rate. If biometric signature failure rate > 5%, alert the on-call engineer.
+docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md:119:- `proof_job_success_rate`
+docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md:120:- `proof_generation_latency_p95`
+docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md:121:- `verifier_mismatch_count`
+docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md:122:- `bridge_state_freshness_seconds`
+docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md:124:- `rollback_trigger_count`
+docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md:48:| **G4: Promotion readiness** | Approve controlled production promotion | Gate review packet with SLO/error-budget results and owner approvals |
+docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md:102:- [ ] SLO/error-budget results captured for promotion window.
+
+## exit_code
+0

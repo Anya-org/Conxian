@@ -6,6 +6,8 @@ This repository is private (as of April 8, 2026), but is treated as public for b
 
 Canonical business-purpose and public/private split guidance for this repo lives in `docs/BOS_BUSINESS_BUILDOUT.md`.
 
+Canonical parent-control alignment guidance for this repo (scope boundaries, control-domain mapping, evidence, rollback, and accountability) lives in `docs/CONXIAN_BUSINESS_PARENT_CONTROL_ALIGNMENT.md`.
+
 ## Ownership
 
 - **Repo owners:** defined by `CODEOWNERS`.
@@ -38,5 +40,6 @@ Conxian operates under a Zero Secret Egress (ZSE) mandate.
 - Contributing guidelines: [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 - Security policy: [`SECURITY.md`](./SECURITY.md)
 - BOS business buildout and repo operating model: [`docs/BOS_BUSINESS_BUILDOUT.md`](./docs/BOS_BUSINESS_BUILDOUT.md)
+- Parent-control alignment baseline (CON-694): [`docs/CONXIAN_BUSINESS_PARENT_CONTROL_ALIGNMENT.md`](./docs/CONXIAN_BUSINESS_PARENT_CONTROL_ALIGNMENT.md)
 - Branching and promotion: [`docs/BRANCHING_AND_PROMOTION_POLICY.md`](./docs/BRANCHING_AND_PROMOTION_POLICY.md)
 - License: [`LICENSE`](./LICENSE) (GNU GPL v3.0)

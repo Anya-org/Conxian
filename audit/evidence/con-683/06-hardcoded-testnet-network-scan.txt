@@ -1,0 +1,8 @@
+# CON-683 evidence artifact
+timestamp_utc=2026-05-26T03:31:56Z
+command=rg -n --glob 'scripts/**' 'networkFromName\(\s*["'\'' ]testnet["'\'' ]\s*\)'
+
+## output
+
+## exit_code
+1

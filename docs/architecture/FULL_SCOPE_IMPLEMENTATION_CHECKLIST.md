@@ -36,7 +36,10 @@ This checklist tracks the end-to-end alignment work across strategy, architectur
 - [ ] audit `Conxian` for mixed gateway or app concerns
 - [ ] audit `conxius-platform` for catch-all drift
 - [ ] audit `conxian-nexus` for gateway overlap
-- [ ] review `conxian_ui` for overlap with wallet or site
+- [ ] execute CON-702 `Conxian_UI` parent-control alignment checkpoint
+- [ ] set `Conxian_UI` public role line to supporting/reference UI surface (not parent control plane)
+- [ ] document boundary that `Conxian_UI` owns no secrets, signing keys, or privileged transaction/broadcast authority
+- [ ] verify `Conxian_UI` consumes approved/public outputs from authoritative systems and capture evidence in `docs/architecture/CONXIAN_UI_PARENT_CONTROL_ALIGNMENT_PLAN.md`
 
 ### Release and narrative alignment
 
@@ -50,6 +53,14 @@ This checklist tracks the end-to-end alignment work across strategy, architectur
 - [ ] define concrete milestones for Lightning support
 - [ ] define concrete milestones for Stacks support
 - [ ] define secondary milestones for Rootstock and Liquid adapters
+
+### Emerging rails (Research-lane baseline)
+
+- [ ] register each emerging-rail intake with a maturity lane (`Build-now`, `Pilot`, `Partner`, `Research`)
+- [ ] apply and record the required default (`Research`) when lane is unspecified
+- [ ] capture required intake fields: rail scope, target adapter interface, owner, review cadence, risk register, and promotion blockers
+- [ ] define lane-promotion evidence for each candidate rail (`Research -> Pilot` at minimum)
+- [ ] align `conxian-gateway` implementation handoff with `conxius-platform` harness/runtime and observability evidence
 
 ## Working rule
 

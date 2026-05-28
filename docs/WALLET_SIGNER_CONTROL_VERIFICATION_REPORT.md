@@ -23,6 +23,7 @@ Detailed signer inventories, principal/address assignments, and readiness eviden
 ### 4) Governance alignment
 - Policy-mutation pathways follow staged governance controls.
 - Public documentation excludes sensitive operational readiness evidence by design.
+- Lifecycle `Verify`/`Release`/`Operate` control evidence for wallet custody and signer posture is tracked in [`docs/WALLET_LIFECYCLE_CONTROL_CHECKLIST.md`](./WALLET_LIFECYCLE_CONTROL_CHECKLIST.md).
 
 ---
 © 2026 Conxian-Labs (Pty) Ltd.

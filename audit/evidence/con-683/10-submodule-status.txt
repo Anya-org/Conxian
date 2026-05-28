@@ -1,0 +1,18 @@
+# CON-683 evidence artifact
+timestamp_utc=2026-05-26T03:31:56Z
+command=git submodule status --recursive
+
+## output
+-4f4fd90ef4adcdb74dcdffaeed8ad67a629bfb88 Conxian
+-377a1398d9b7d4f107dcb9f672a0567156b5713f conxian-gateway
+-f661a660a26b88718088d095d4c50f586e75f52d conxian-labs-site
+-abcac0ef01ded87c16ca7369297709d2fec87942 conxian-nexus
+-876710a2566cdb33edc6b78a6e0e3af41f6b95eb conxian-ui
+-a8ce87adf2c866150fba87bbcf5a89160009d1d5 conxius-enclave-sdk
+-74d7b35ee88721b36bebdc0b0fdfc1791ba69c1f conxius-orbit
+-7d76fcce6408caa882013efa2871e121b7e7125f conxius-platform
+-7f472f22e189036170b597db15e63bf6fc478ddb conxius-wallet
+-fa542c122f62b6eb74371636cdd74662436f55dc lib-conxian-core
+
+## exit_code
+0

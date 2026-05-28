@@ -114,6 +114,19 @@ It should not become a shadow product center or overlap heavily with `conxius-wa
 
 If overlap remains high, it should be narrowed, merged, archived, or demoted further.
 
+## CON-702 checkpoint resolution (`conxian_ui` parent control alignment)
+
+Issue link: [CON-702 — Align Conxian_UI to parent control model](https://linear.app/conxian-labs/issue/CON-702/align-conxian-ui-to-parent-control-model)
+
+This checkpoint resolves the role contradiction and sets an implementation baseline:
+
+- `Conxian_UI` is confirmed as a supporting/reference UI surface, not a flagship or primary control plane.
+- Parent control authority remains in private control/governance sources and core runtime systems.
+- `Conxian_UI` is constrained to consume approved/public outputs.
+- `Conxian_UI` must not own secrets, signing keys, or privileged transaction/broadcast authority.
+
+See `docs/architecture/CONXIAN_UI_PARENT_CONTROL_ALIGNMENT_PLAN.md` for the control ownership map, execution checklist, and evidence placeholders.
+
 ## Portfolio classification update
 
 ### Primary strategic repos
@@ -128,7 +141,7 @@ If overlap remains high, it should be narrowed, merged, archived, or demoted fur
 - `conxian-nexus`
 - `conxius-orbit`
 - `conxian-labs-site`
-- `conxian_ui` if retained with a narrow role
+- `conxian_ui` as a supporting/reference UI surface with a consumer-only boundary
 
 ### Reference repos
 
@@ -156,11 +169,11 @@ Update `conxian-nexus` README to say it is an API facade or interoperability lay
 
 ### Action 3
 
-Review `conxian_ui` and decide whether its best future is:
+Execute the CON-702 checkpoint for `conxian_ui`:
 
-1. supporting UI repo with a narrow role
-2. merge target
-3. archive candidate
+1. keep `Conxian_UI` explicitly classified as a supporting/reference surface
+2. enforce the consumer-only boundary (approved/public outputs only)
+3. document and evidence that `Conxian_UI` does not own secrets, signing keys, or privileged broadcast authority
 
 ### Action 4
 

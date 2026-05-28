@@ -38,6 +38,7 @@ Use this checklist for promotion PRs that move a testnet-validated change from `
   - no launch-critical automation depends on personal or bootstrap wallets
   - production principals are not hardcoded (contracts fetch principals dynamically where required)
   - signer scope is correct for the runtime lane (no mainnet keys used in testnet contexts)
+- [ ] If this promotion includes wallet custody/signer/privacy scope, [`docs/WALLET_LIFECYCLE_CONTROL_CHECKLIST.md`](./WALLET_LIFECYCLE_CONTROL_CHECKLIST.md) is updated with `VER-1`, `VER-2`, and `REL-1` evidence for the exact candidate commit.
 - [ ] Deployment boundary checks are explicitly recorded:
   - no testnet endpoints/default networks leak into production paths
   - environment-specific behavior is guarded by the branch/runtime lane (not ad-hoc conditionals)
@@ -50,3 +51,5 @@ Promotion to `main` is only allowed from `staged` and MUST include a Mainnet Acc
 ### Mainnet acceptance evidence pack
 
 Provide the evidence pack directly in the PR description under this heading, or link to a versioned in-repo file per `openspec/specs/mainnet-acceptance-evidence-pack/spec.md`.
+
+- [ ] If wallet custody/signer/privacy scope is included, link the completed [`docs/WALLET_LIFECYCLE_CONTROL_CHECKLIST.md`](./WALLET_LIFECYCLE_CONTROL_CHECKLIST.md) entry with `REL-2`, `OPS-1`, and `OPS-2` evidence.

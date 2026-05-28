@@ -7,6 +7,8 @@ Related canonical docs:
 - `docs/architecture/CONXIAN_L3_PROFILE_ADR.md`
 - `docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md`
 - `docs/SAB_MIGRATION_WAVES.md`
+- `docs/operations/CON-681_PHASE6_PRODUCTION_ROLLOUT_RUNBOOK.md`
+- `docs/operations/CON-681_PHASE6_ROLLBACK_DRILL_SIMULATION.md`
 
 ## 1) Scope (13-repo migration set)
 
@@ -44,8 +46,8 @@ This matrix covers the 13-repo execution set used for migration gate decisions.
 | **G0: Interface freeze** | Prevent mid-cutover contract/API/schema drift | Version manifest + changelog entries + compatibility sign-off |
 | **G1: Dual-lane compatibility** | Prove legacy lane and target lane produce equivalent outcomes for in-scope flows | Replay/parallel-run report with mismatch classification |
 | **G2: Boundary enforcement** | Ensure signer/finality/bridge boundaries are enforced and non-bypassable | Tests + policy checks + negative test evidence |
-| **G3: Rollback readiness** | Demonstrate controlled fallback within RTO | Executed rollback drill report (timed) + post-drill reconciliation |
-| **G4: Promotion readiness** | Approve controlled production promotion | Gate review packet with SLO/error-budget results and owner approvals |
+| **G3: Rollback readiness** | Demonstrate controlled fallback within RTO | Executed rollback drill report (timed) + post-drill reconciliation + link to `docs/operations/CON-681_PHASE6_ROLLBACK_DRILL_SIMULATION.md` |
+| **G4: Promotion readiness** | Approve controlled production promotion | Gate review packet with SLO/error-budget results, owner approvals, and canonical rollout reference (`docs/operations/CON-681_PHASE6_PRODUCTION_ROLLOUT_RUNBOOK.md`) |
 
 A repo is considered “gate-ready” only when required evidence is attached to its gate checklist entry.
 
@@ -96,6 +98,7 @@ A repo is considered “gate-ready” only when required evidence is attached to
 - [ ] Measured rollback completion time meets RTO target.
 - [ ] Reconciliation report proves no orphaned settlement state.
 - [ ] On-call ownership and escalation paths confirmed.
+- [ ] Evidence packet links to `docs/operations/CON-681_PHASE6_ROLLBACK_DRILL_SIMULATION.md`.
 
 ### G4 — Promotion readiness checklist
 
@@ -103,6 +106,7 @@ A repo is considered “gate-ready” only when required evidence is attached to
 - [ ] Required owner approvals recorded (protocol, gateway, nexus, governance).
 - [ ] User-facing communication/docs updated and link-checked.
 - [ ] Decision log includes go/no-go rationale and fallback trigger conditions.
+- [ ] Decision log references `docs/operations/CON-681_PHASE6_PRODUCTION_ROLLOUT_RUNBOOK.md` as canonical rollout authority.
 
 ## 5) Evidence quality standard (applies to every gate)
 

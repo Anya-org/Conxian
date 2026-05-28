@@ -1,0 +1,8 @@
+# CON-683 evidence artifact
+timestamp_utc=2026-05-26T03:31:56Z
+command=rg -n --glob '!docs/**' --glob '!openspec/**' --glob '!**/*.md' '"(?:ST|SN)[0-9A-Z]{20,}(?:\.[a-zA-Z0-9-]{1,128})?"'
+
+## output
+
+## exit_code
+1
