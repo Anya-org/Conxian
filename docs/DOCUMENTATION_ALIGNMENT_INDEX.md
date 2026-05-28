@@ -131,6 +131,7 @@ These are the documents most likely to answer “what are we building?” and �
 | `docs/WALLET_SIGNER_CONTROL_VERIFICATION_REPORT.md` | Supporting | Public-safe | Wallet and signer control verification report for mainnet launch. |
 | `docs/PUBLIC_VISIBILITY_AUDIT_REPORT.md` | Supporting | Public-safe | Public visibility boundary audit report. |
 | `docs/architecture/BITCOIN_LAYER_ARCHITECTURE_BOUNDARY_NOTE.md` | Canonical | Public-safe | Canonical Bitcoin layer boundary note (capability verbs, phase scope, and repo ownership rules). |
+| `docs/architecture/PROTOCOL_ADAPTER_MATURITY_LANES.md` | Canonical | Public-safe | Protocol-adapter maturity lane taxonomy and default handling (`Research` when unspecified), plus intake schema, promotion criteria, and cross-repo handoffs. |
 | `docs/protocols/SESSION_BROKER_NORMATIVE_SPEC.md` | Canonical | Public-safe | Normative session-broker boundary spec (actors, handshake, TTL semantics, PoP/mTLS binding, replay/idempotency, revocation/attestation checks, fail-closed behavior, errors, and audit requirements). |
 | `conxius-platform/services/lib-conxian-core/docs/PRD.md` | Supporting | Public-safe | Service-local copy; treat `lib-conxian-core/docs/PRD.md` as canonical. |
 | `conxius-wallet/lib-conxian-core/docs/PRD.md` | Supporting | Public-safe | Wallet-local copy; treat `lib-conxian-core/docs/PRD.md` as canonical. |

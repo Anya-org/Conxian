@@ -54,6 +54,14 @@ This checklist tracks the end-to-end alignment work across strategy, architectur
 - [ ] define concrete milestones for Stacks support
 - [ ] define secondary milestones for Rootstock and Liquid adapters
 
+### Emerging rails (Research-lane baseline)
+
+- [ ] register each emerging-rail intake with a maturity lane (`Build-now`, `Pilot`, `Partner`, `Research`)
+- [ ] apply and record the required default (`Research`) when lane is unspecified
+- [ ] capture required intake fields: rail scope, target adapter interface, owner, review cadence, risk register, and promotion blockers
+- [ ] define lane-promotion evidence for each candidate rail (`Research -> Pilot` at minimum)
+- [ ] align `conxian-gateway` implementation handoff with `conxius-platform` harness/runtime and observability evidence
+
 ## Working rule
 
 For all remaining work:

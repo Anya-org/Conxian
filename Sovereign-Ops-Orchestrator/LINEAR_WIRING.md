@@ -19,6 +19,20 @@ Every ExCo intake issue in Linear must include:
 5. **Outcome + acceptance signal**
 6. **Source links**
 
+## Protocol-adapter intake extension (required for emerging rails)
+
+When intake touches protocol-adapter execution (including emerging rails), include the lane extension fields from
+[`docs/architecture/PROTOCOL_ADAPTER_MATURITY_LANES.md`](../docs/architecture/PROTOCOL_ADAPTER_MATURITY_LANES.md):
+
+1. **Maturity lane** (`Build-now`, `Pilot`, `Partner`, `Research`)
+2. **Default handling note** (if lane was omitted at creation, record that it defaulted to `Research`)
+3. **Rail scope**
+4. **Target adapter interface**
+5. **Owner** (single accountable owner)
+6. **Review cadence**
+7. **Risk register**
+8. **Promotion blockers**
+
 ## Intake flow (concise)
 
 1. **Discover**: capture the originating signal and links.

@@ -37,6 +37,15 @@ Boundary interpretation:
 - Phase 1 layers are treated as first-class portfolio support targets.
 - Phase 2 layers are handled via the adapter model and should reuse the same canonical verb vocabulary where applicable.
 
+## Protocol-adapter maturity lane baseline
+
+Protocol-adapter intake and promotion for emerging rails must follow
+`docs/architecture/PROTOCOL_ADAPTER_MATURITY_LANES.md`.
+
+- Intake records must include lane, rail scope, target adapter interface, owner, review cadence, risk register, and promotion blockers.
+- If lane is unspecified, the required default is `Research`.
+- Lane decisions must preserve gateway-first adapter implementation ownership and platform-owned harness/observability evidence.
+
 ## M0 canonical Lightning boundary decision
 
 Lightning is **gateway-first / gateway-owned adapter surface**.

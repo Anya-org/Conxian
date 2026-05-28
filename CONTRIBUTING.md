@@ -35,6 +35,8 @@ Reference: [`docs/bounties/BOUNTY_WORKFLOW.md`](./docs/bounties/BOUNTY_WORKFLOW.
 ## ExCo intake (Linear-first)
 
 - For ExCo-relevant newly discovered work, create/route the item in Linear first using the [ExCo intake standard](./Sovereign-Ops-Orchestrator/LINEAR_WIRING.md).
+- For protocol-adapter or emerging-rail intake, include the maturity lane fields defined in [Protocol Adapter Maturity Lanes](./docs/architecture/PROTOCOL_ADAPTER_MATURITY_LANES.md).
+- If the maturity lane is missing at intake, record and proceed with the required default: `Research`.
 - If work is mirrored to GitHub, include the full Linear issue URL in the issue/PR body for traceability.
 - Keep sensitive strategic, financial, legal, security, and detailed operational content in Linear only (ZSE).
 
