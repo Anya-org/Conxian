@@ -29,10 +29,16 @@ clarity-version = 4
 depends_on = ["finance-metrics"]
 
 
+[contracts.fiscal-orchestrator]
+path = "contracts/agents/fiscal-orchestrator.clar"
+clarity-version = 4
+depends_on = ["agent-risk", "bme-engine", "concentrated-liquidity-pool", "finance-metrics", "sip-standards"]
+
+
 [contracts.agent-treasury]
 path = "contracts/agents/agent-treasury.clar"
 clarity-version = 4
-depends_on = ["conxian-csf-trait", "sip-standards"]
+depends_on = ["agent-risk", "bme-engine", "concentrated-liquidity-pool", "conxian-csf-trait", "sip-standards"]
 
 
 [contracts.alex-adapter]
@@ -715,7 +721,7 @@ depends_on = ["core-traits", "operational-treasury"]
 [contracts.operational-treasury]
 path = "contracts/core/operational-treasury.clar"
 clarity-version = 4
-depends_on = ["agent-treasury", "ops-engine", "sip-standards"]
+depends_on = ["ops-engine", "sip-standards"]
 
 
 [contracts.opex-vault]
@@ -939,10 +945,16 @@ clarity-version = 4
 depends_on = ["bme-engine", "cxd-token", "operational-treasury", "sip-standards"]
 
 
+[contracts.risk-unit]
+path = "contracts/core/risk-unit.clar"
+clarity-version = 4
+depends_on = ["conxian-access", "dimensional-core", "oracle-aggregator", "position-nft"]
+
+
 [contracts.risk-manager]
 path = "contracts/core/risk-manager.clar"
 clarity-version = 4
-depends_on = ["conxian-access", "dimensional-core", "oracle-aggregator", "position-nft"]
+depends_on = ["risk-unit"]
 
 
 [contracts.route-manager]
