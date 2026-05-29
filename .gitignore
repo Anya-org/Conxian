@@ -67,6 +67,14 @@ id_ecdsa
 /internal/strategy/
 /archive/
 
+# Prevent duplicate submodule checkouts (managed at root level only)
+/conxius-wallet/lib-conxian-core/
+/conxius-wallet/conxian-gateway/
+/conxius-platform/services/lib-conxian-core/
+/conxius-platform/services/conxian-ui/
+/conxius-wallet/.gitmodules
+/conxius-platform/.gitmodules
+
 # Generated audit artifacts
 /conxian-business/.generated/
 **/.generated/
