@@ -1,0 +1,7 @@
+[target.x86_64-pc-windows-gnu]
+linker = "C:\\tools\\llvm-mingw\\llvm-mingw-20260519-ucrt-x86_64\\bin\\x86_64-w64-mingw32-gcc.exe"
+rustflags = ["-C", "link-args=-LC:\\tools\\llvm-mingw\\llvm-mingw-20260519-ucrt-x86_64\\x86_64-w64-mingw32\\lib -lunwind"]
+
+[env]
+CC_x86_64-pc-windows-gnu = "C:\\tools\\llvm-mingw\\llvm-mingw-20260519-ucrt-x86_64\\bin\\x86_64-w64-mingw32-gcc.exe"
+AR_x86_64-pc-windows-gnu = "C:\\tools\\llvm-mingw\\llvm-mingw-20260519-ucrt-x86_64\\bin\\llvm-ar.exe"
