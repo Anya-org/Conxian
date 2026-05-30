@@ -1,8 +1,4 @@
-# Code owners for the Conxian protocol repository.
-#
-# Notes:
-# - GitHub uses this file to auto-request reviews when a PR touches matching paths.
-# - Owners must be valid GitHub users (`@username`) or teams (`@org/team`).
+# Code owners for the Conxian protocol repository
 
 * @botshelomokoka @admin-conxian-labs
 
@@ -11,6 +7,5 @@
 /SECURITY.md @botshelomokoka @admin-conxian-labs
 /CONTRIBUTING.md @botshelomokoka @admin-conxian-labs
 /CODEOWNERS @botshelomokoka @admin-conxian-labs
-
 /contracts/ @botshelomokoka @admin-conxian-labs
 /docs/ @botshelomokoka @admin-conxian-labs

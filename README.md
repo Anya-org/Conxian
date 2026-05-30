@@ -1,104 +1,62 @@
 # Conxian Finance Protocol
 
-[![Status](https://img.shields.io/badge/Status-Apex_CSF_Active-green.svg)](https://conxian.io)
+[![Status](https://img.shields.io/badge/Status-Active-green.svg)](https://www.conxian-labs.com)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
-[![Nakamoto](https://img.shields.io/badge/Nakamoto-Aligned-green.svg)](docs/CLARITY4_MIGRATION_TRACKING.md)
 
 ## Purpose
 
-Ship the Conxian Finance Protocol smart contracts (Clarity), including CSF interfaces, core execution engines, and governance primitives.
+Ship the Conxian Protocol smart contracts and related protocol logic for the Conxian ecosystem.
 
 ## Status
 
-**Technical Beta - Nakamoto Aligned.**
-Testing infrastructure is 100% stable in simulation. All core engines (Apex CSF, BME, AYE) are functional and verified in the remediation suite.
+**Active development.** This repository is the canonical public protocol codebase and should be treated as the source repository for protocol-facing smart-contract development.
 
-For a dated snapshot, see [Status (March 2026)](#status-march-2026). For ongoing changes, see [CHANGELOG.md](CHANGELOG.md).
+## Scope
 
-## Ownership
+This repository contains protocol contracts, protocol documentation, and related technical materials. It does not contain company administrative systems, legal operations, or private business workflows.
 
-Ownership and review requirements are defined in [`CODEOWNERS`](./CODEOWNERS).
+## Governance relation
+
+This repository is maintained by Conxian Labs. The code is public and GPL-3.0 licensed, while governance of the protocol is intended to decentralize progressively after mainnet.
 
 ## Audience
 
-- Clarity engineers integrating with CSF standards and Conxian primitives.
-- Security reviewers validating contract behavior, invariants, and integration surfaces.
-- Frontend and indexer developers building on top of Conxian protocol state.
+- protocol engineers
+- security reviewers
+- integrators and indexer developers
+- contributors building on Conxian contracts
 
 ## Relationship to the Conxian stack
 
-- This is the on-chain execution layer.
-- It is typically consumed via:
-  - [Conxian Gateway](https://github.com/Conxian/conxian-gateway) (API + indexing)
-  - [Conxian UI](https://github.com/Conxian/Conxian_UI) (`Conxian_UI`)
-  - [Conxius Wallet](https://github.com/Conxian/conxius-wallet)
+- protocol core: this repository
+- middleware and indexing: [Conxian Gateway](https://github.com/Conxian/conxian-gateway)
+- wallet and reference client: [Conxius Wallet](https://github.com/Conxian/conxius-wallet)
+- interface layer: [Conxian UI](https://github.com/Conxian/conxian_ui)
 
-## Overview
-
-🏦 **Conxian Finance**: A Multi-Dimensional, Stacks-Native Automated Monetary Platform.
-
-📜 **SAXAAP Manifesto**
-> "Code is Law, Logic is Sovereign."
-
-In 2026, Conxian has evolved from an isolated protocol into the **foundational liquidity gravitational center** of the Stacks ecosystem through the **Common Settlement Framework (CSF)**. It operates as a digital corporation where smart contracts are Managers/Staff reporting to the DAO (Board), now with native integrations for dominant players like StackingDAO, Zest, and Arkadiko.
-
-- **Autonomous**: Decisions are executed by code agents (AYE, Apex BME).
-- **Standardized**: Inter-protocol routing via CSF (`trait-csf-liquidity-v1`).
-- **Resilient**: Multi-tier isolation and circuit breaking for external protocol risks.
-
-## Apex Architecture (2026)
-
-### 🗳️ **Dual-Council Governance (Staff vs Board)**
-
-- **Operational Council (Staff)**: 24/7 voting by autonomous agents (`agent-risk`, `agent-treasury`) for parameter tuning and daily operations.
-- **Strategic Council (Board/AGM)**: Periodic Human General Meetings for structural upgrades and major fiscal changes.
-
-### 💰 **Apex BME Engine (Burn-Mint Equilibrium)**
-
-Conxian employs a strictly on-chain algorithmic issuance model (1B CXD hard cap):
-- **100% Fee Buy-back**: All protocol fees (Lending, DEX, Subscription) are autonomously swapped for CXD and burned/vaulted.
-- **Meritocratic Emissions**: Emissions are distributed based on block-epoch activity markers registered via CSF.
-- **Yield Routing**: Automated rewards for liquid staking (stSTX) and BTC lending (sBTC) without breaking the custody chain.
-
-### 🌐 **Common Settlement Framework (CSF)**
-
-The CSF is a standardized interface that allows third-party protocols to natively plug into Conxian's reward engine:
-- **Liquid Staking**: Treats stSTX and stSTXbtc as Tier-1 collateral.
-- **BTC Lending**: Guaranteed liquidation sinks for Zest Protocol sBTC loans.
-- **Stable Routing**: USDA (Arkadiko 2.0) as the base asset for risk-off routing.
-
-## Technical Stack
-
-- **Clarity 4**: Nakamoto-native utilizing `stacks-block-time` and `burn-block-height`.
-- **Apex Universal Router**: Dynamic dispatch router with circuit-breaker protection.
-- **Enhanced Security**: Isolation Mode to prevent cross-protocol contagion.
-
-## Repository Structure
+## Repository structure
 
 ```text
 /contracts/
-├── traits/           # CSF standards (v1.1.0) and SIP traits
-├── core/             # Ops engine, Enhanced Circuit Breaker, BME
-├── dex/              # Apex Universal Router, CL Pools (CSF-Compliant)
-├── agents/           # AYE Predictive Risk, Sovereign Fiscal Agent
-├── tokens/           # CXD (BME-Enabled), Governance, Position NFTs
-├── oracle/           # Multi-source aggregator for 2026 assets (sBTC, stSTX)
-├── treasury/         # Revenue routing and Apex BME Vaults
-└── ...               # Lending, Monitoring, Security, Compliance
+├── traits/
+├── core/
+├── dex/
+├── agents/
+├── tokens/
+├── oracle/
+├── treasury/
+└── ...
 ```
 
-## Status (March 2026)
+## Security
 
-- **Maturity (as of March 2026)**: Snapshot of the then-current alpha-stage protocol; see [Status](#status) for the latest maturity and stability guidance.
-- **Snapshot highlights**:
-  - CSF traits and interfaces: [`contracts/traits/`](contracts/traits/)
-  - Router and DEX modules: [`contracts/dex/`](contracts/dex/)
-  - Core safety and execution engines: [`contracts/core/`](contracts/core/)
-- **Nakamoto / Clarity 4 alignment**: [Clarity 4 migration tracking](docs/CLARITY4_MIGRATION_TRACKING.md)
-- **Benchmarks (simnet)**: [Protocol benchmarks](docs/BENCHMARKS.md)
-- **Recent reports and plans**:
-  - [Deployment sign-off (March 2026)](DEPLOYMENT_SIGN_OFF_MARCH_2026.md) (root-level report)
-  - [Enhancement plan (March 2026)](ENHANCEMENT_PLAN_MARCH_2026.md) (root-level report)
-  - [System alignment audit (March 2026)](docs/SYSTEM_ALIGNMENT_AUDIT_MARCH_2026.md)
+Do not disclose vulnerabilities publicly. Use [SECURITY.md](SECURITY.md) or GitHub private vulnerability reporting.
 
-© 2024-2026 Conxian Finance. All rights reserved.
+## Contact
+
+- General: [info@conxian-labs.com](mailto:info@conxian-labs.com)
+- Support: [support@conxian-labs.com](mailto:support@conxian-labs.com)
+- Security: [security@conxian-labs.com](mailto:security@conxian-labs.com)
+
+## License
+
+GPL-3.0
