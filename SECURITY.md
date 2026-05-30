@@ -2,52 +2,33 @@
 
 ## Supported Versions
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.1.x (Apex) | :white_check_mark: |
-| 0.7.x   | :white_check_mark: |
-| < 0.7.0 | :x:                |
+| Version | Supported |
+| ------- | --------- |
+| 1.1.x | ✅ |
+| 0.7.x | ✅ |
+| < 0.7.0 | ❌ |
 
 ## Reporting a Vulnerability
 
-We take the security of the Conxian Protocol very seriously. If you find a security vulnerability, please report it via:
+We take the security of the Conxian Protocol seriously.
 
-- **Email**: security@conxian.io
-- **GitHub**: Use the "Report a vulnerability" button on the Security tab.
+Do **not** disclose vulnerabilities in public issues.
 
-We acknowledge reports within 48 hours.
+Report privately using one of these channels:
+
+- GitHub private vulnerability reporting on this repository
+- Email [security@conxian-labs.com](mailto:security@conxian-labs.com)
+
+We aim to acknowledge reports within 48 hours.
 
 ## Secret handling
 
-- Do not commit any `.env*` files (for example: `.env`, `.env.local`, `ui/.env.local`), private keys, or API tokens.
-- Use `.env.example` as a template for local configuration.
-- This repository runs `gitleaks` in GitHub Actions on pull requests and pushes to `main` to catch new secret leaks.
+- do not commit `.env*` files, private keys, or API tokens
+- use `.env.example` only as a non-secret template
+- rotate any exposed credentials immediately
 
-## Security Standards (Apex Upgrade v1.1.0)
+## Security expectations
 
-- **Code is Law**: All logic is verifiable and sovereign.
-- **Enhanced Circuit Breakers**: Protocol features a multi-tier system including global pauses and per-protocol **Isolation Mode** (`enhanced-circuit-breaker.clar`).
-- **Contagion Guard**: Trustlessly isolate from external CSF-compliant protocol insolvency.
-- **Rate Limiting**: Sensitive operations protected via window-based limiting.
-- **Proof of Reserves**: Treasury verified via multi-attestor system.
-- **Sovereign Handoff**: Admin roles transferable to DAO via staged process.
-- **Compliance**: SIP-018 and jurisdictional compliance via `regulatory-adapter.clar`.
-
-## Security Features (March 2026)
-
-### Operational Safety
-- **Enhanced Circuit Breaker**: Automated and manual pause triggers with fine-grained isolation for external liquidity sources.
-- **Proof of Reserves**: Multi-attestor verification requiring 3+ attestations.
-- **Rate Limiting**: 600-block window limiting per operation type.
-
-### Access Control
-- **Timelock Governance**: Delayed execution for critical parameter changes.
-- **CSF Registry**: Restricted discovery and management of third-party routing targets.
-
-### Compliance
-- **Regulatory Adapter**: SIP-018 attestation aggregation.
-- **KYC Registry**: On-chain verification of user/provider status.
-
----
-
-*Last updated: March 15, 2026*
+- protocol logic should remain verifiable and reviewable
+- breaking security changes should be documented clearly
+- governance and admin controls should be explicit in code and docs
