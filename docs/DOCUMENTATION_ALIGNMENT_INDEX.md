@@ -176,6 +176,7 @@ See `docs/BOS_BUSINESS_BUILDOUT.md` for repo business purpose, business-unit pla
 | `docs/operations/SAB_MIGRATION_WAVES.md` | Supporting | Public-safe | Deprecated non-canonical pointer kept for link continuity; directs readers to `docs/SAB_MIGRATION_WAVES.md`. |
 | `docs/operations/CON-681_PHASE6_PRODUCTION_ROLLOUT_RUNBOOK.md` | Canonical | Public-safe | Canonical CON-681 Phase 6 rollout runbook with staged gates, observability thresholds, rollback triggers/actions, and operator communication templates. |
 | `docs/operations/CON-681_PHASE6_ROLLBACK_DRILL_SIMULATION.md` | Supporting | Public-safe | CON-681 rollback drill simulation artifact (scenario, timeline, observed metrics, RTO/RPO outcome, and corrective actions). |
+| `docs/operations/CON-762_PARTNER_SCORECARD_AND_SHORTLIST.md` | Canonical | Public-safe | Canonical CON-762 partner scorecard model and scenario artifact index (`docs/operations/con-762-partner-scorecard/*`) covering weights, weighted partner scores, first-wave shortlist, and build-vs-partner decisions. |
 | `docs/bounties/MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md` | Canonical | Public-safe stub (canonical in Linear) | How maintainer payouts are enabled and validated (standardized ZSE stub). |
 | `admin/SECRETS.md` | Canonical | Public-safe stub (canonical in Linear) | Secret registry + pointers to Linear docs (standardized ZSE stub). |
 

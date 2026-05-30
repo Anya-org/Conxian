@@ -1,0 +1,8 @@
+capability,decision,why
+Custody and key management,partner,Institutional-grade controls and certifications are faster to obtain via established custody providers.
+Compliance screening and transaction monitoring,partner,Regulatory coverage depth and rule updates are strongest with specialized compliance vendors.
+Fiat/USDC payment settlement rails,partner,"Network access, liquidity reach, and operational readiness favor partnering for initial launch."
+Bitcoin node/RPC infrastructure,hybrid,"Use partner infrastructure for speed now, while preserving a path to self-managed infra where required."
+ERP workflow orchestration and canonical business logic,build,Control over enterprise-specific process semantics and approvals should remain core intellectual property.
+ERP connector adapters (SAP/Oracle/NetSuite),partner-assisted build,Leverage partner implementation accelerators while retaining ownership of adapter contracts.
+"Policy engine, approvals, and audit evidence layer",build,Sovereign governance and accountability requirements require first-party control.
