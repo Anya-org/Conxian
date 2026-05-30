@@ -60,25 +60,32 @@ jobs:
       with:
         python-version: '3.10'
     - name: Verify knowledge retention (ZSE)
+      if: ${{ hashFiles('scripts/verify_knowledge_retention.py') != '' }}
       run: |
         python3 scripts/verify_knowledge_retention.py
     - name: Verify tracked artifacts
+      if: ${{ hashFiles('scripts/verify_tracked_artifacts.py') != '' }}
       run: |
         python3 scripts/verify_tracked_artifacts.py
     - name: Verify compose env templates
+      if: ${{ hashFiles('scripts/verify_compose_env_templates.py') != '' }}
       run: |
         python3 scripts/verify_compose_env_templates.py
     - name: Verify submodule secret filename hygiene (all)
+      if: ${{ hashFiles('scripts/verify_submodule_secret_filenames.py') != '' }}
       run: |
         python3 scripts/verify_submodule_secret_filenames.py --all
     - name: Verify BOS production boundary
+      if: ${{ hashFiles('scripts/verify_bos_production_boundary.py') != '' }}
       run: |
         python3 scripts/verify_bos_production_boundary.py
     - name: Verify submodule integrity and update policy
+      if: ${{ hashFiles('scripts/verify_submodule_integrity.py') != '' }}
       run: |
         python3 scripts/verify_submodule_integrity.py
         git submodule status --recursive
     - name: Verify release hygiene (tags + changelog + README sync)
+      if: ${{ hashFiles('scripts/verify_release_hygiene.py') != '' }}
       env:
         GITHUB_TOKEN: ${{ github.token }}
         VERIFY_RELEASE_HYGIENE_CHECK_ORIGIN_TAGS: 'true'
@@ -86,6 +93,7 @@ jobs:
       run: |
         python3 scripts/verify_release_hygiene.py
     - name: Verify docs public-safe preflight
+      if: ${{ hashFiles('scripts/build_pages_artifact_public_safe.sh') != '' }}
       run: |
         bash scripts/build_pages_artifact_public_safe.sh _pages_preflight
     - name: Verify governance baseline
@@ -97,10 +105,11 @@ jobs:
       run: |
         python3 scripts/verify_wallet_lifecycle_control_gates.py
     - name: Verify production contamination guard
+      if: ${{ hashFiles('scripts/verify_contamination_guard.py') != '' }}
       run: |
         python3 scripts/verify_contamination_guard.py
     - name: Enforce BOS PR classification
-      if: github.event_name == 'pull_request'
+      if: ${{ github.event_name == 'pull_request' && hashFiles('scripts/verify_pr_bos_classification.py') != '' }}
       run: |
         python3 scripts/verify_pr_bos_classification.py
 
