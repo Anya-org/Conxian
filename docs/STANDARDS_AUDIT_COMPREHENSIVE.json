@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-20T10:00:00Z",
+  "timestamp": "2026-05-20T14:30:00Z",
   "audit_results": {
     "layer_1_structural": {
       "score": 100,
@@ -68,6 +68,51 @@
       "overall": 100
     },
     "contracts/core/dimensional-engine.clar": {
+      "structural": 100,
+      "diataxis": "N/A",
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
+    },
+    "contracts/dex/README.md": {
+      "structural": 100,
+      "diataxis": 100,
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
+    },
+    "contracts/dex/concentrated-liquidity-pool.clar": {
+      "structural": 100,
+      "diataxis": "N/A",
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
+    },
+    "contracts/dex/dex-factory.clar": {
+      "structural": 100,
+      "diataxis": "N/A",
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
+    },
+    "contracts/dex/swap-router.clar": {
+      "structural": 100,
+      "diataxis": "N/A",
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
+    },
+    "contracts/dex/swap-aggregator.clar": {
       "structural": 100,
       "diataxis": "N/A",
       "github": 100,

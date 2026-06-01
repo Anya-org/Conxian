@@ -3,11 +3,19 @@
 ## Overview (Explanation)
 The DEX module provides high-efficiency trading and liquidity provision for the Conxian ecosystem. In 2026, it evolved into a **Universal Routing Layer** powered by the Apex Router and the Common Settlement Framework (CSF).
 
+### Key Concepts
+
+- **Concentrated Liquidity**: A system where liquidity providers (LPs) can specify the price range in which their capital is used, significantly increasing capital efficiency.
+- **Universal Routing Layer**: An abstraction layer that allows users to swap assets across any CSF-compliant protocol (e.g., Bitflow, Alex) through a single entry point.
+- **Common Settlement Framework (CSF)**: A standardized interface that enables different DeFi protocols to interact seamlessly, allowing for unified liquidity discovery and execution.
+- **Apex Router**: The core routing engine that dynamically dispatches trades to the most efficient liquidity source available in the CSF network.
+
 ## Architecture (Explanation)
-The DEX follows a dynamic routing architecture:
-- **Universal Router**: `swap-router.clar` handles dynamic dispatch to any CSF-compliant liquidity source.
-- **Protocol Registry**: `dex-factory.clar` maintains the list of permitted external protocol integrations.
-- **Native Engine**: `concentrated-liquidity-pool.clar` provides high-efficiency native Stacks liquidity.
+The DEX follows a dynamic routing architecture designed for maximum interoperability:
+- **Universal Router** (`swap-router.clar`): Handles dynamic dispatch to any CSF-compliant liquidity source. It acts as the primary user-facing entry point for all swap operations.
+- **Protocol Registry** (`dex-factory.clar`): Maintains the list of permitted external protocol integrations and manages native pool discovery.
+- **Native Engine** (`concentrated-liquidity-pool.clar`): Provides high-efficiency native Stacks liquidity using a concentrated liquidity model.
+- **Swap Aggregator** (`swap-aggregator.clar`): A specialized adapter for sovereign, non-custodial Bitcoin-native swaps.
 
 ## Core Contracts (Reference)
 
@@ -41,16 +49,15 @@ Native High-Efficiency Liquidity.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `register-liquidity-marker` | `(metadata-uri (string-ascii 256))` | Register a liquidity marker for the protocol. |
+| `register-liquidity-marker` | `(marker (string-ascii 256))` | Register a liquidity marker for the protocol. |
 | `execute-csf-swap` | `(token-in <sip-010-ft-trait>) (token-out <sip-010-ft-trait>) (amount-in uint) (recipient principal)` | Execute a swap through the Common Settlement Framework. |
-| `request-flash-liquidity` | `(token <sip-010-ft-trait>) (amount uint) (memo (buff 32))` | Request flash liquidity from the pool. |
-| `settle-arbitrage` | `(token-a <sip-010-ft-trait>) (token-b <sip-010-ft-trait>) (amount uint) (path (list 10 principal))` | Settle an arbitrage path through the CSF. |
+| `request-flash-liquidity` | `(token <sip-010-ft-trait>) (amount uint) (payload (buff 32))` | Request flash liquidity from the pool. |
+| `settle-arbitrage` | `(token-in <sip-010-ft-trait>) (token-out <sip-010-ft-trait>) (amount uint) (route (list 10 principal))` | Settle an arbitrage path through the CSF. |
 | `claim-conxian-yield` | `(reward-token <sip-010-ft-trait>) (amount uint) (recipient principal)` | Claim protocol yield through the CSF. |
 | `get-csf-health` | `()` | Get the health metrics of the CSF integration. |
-| `swap` | `(pool-id uint) (zero-for-one bool) (amount-in uint) (token0-trait <sip-010-ft-trait>) (token1-trait <sip-010-ft-trait>)` | Execute a swap in a concentrated liquidity pool. |
-| `create-pool` | `(token0 principal) (token1 principal) (fee uint) (sqrt-price uint) (tick int)` | Create a new concentrated liquidity pool. |
-| `set-authorized-collector` | `(new-collector principal)` | Set the authorized collector for protocol fees. |
-| `collect-protocol-fees` | `(token-trait <sip-010-ft-trait>)` | Collect accumulated protocol fees. |
+| `swap` | `(pool-id uint) (is-token-0 bool) (amount-in uint) (token-in <sip-010-ft-trait>) (token-out <sip-010-ft-trait>) (recipient principal)` | Execute a swap in a concentrated liquidity pool. |
+| `create-pool` | `(token-0 principal) (token-1 principal) (fee uint) (initial-price uint) (initial-tick int)` | Create a new concentrated liquidity pool. |
+| `collect-protocol-fees` | `(token <sip-010-ft-trait>)` | Collect accumulated protocol fees. |
 | `get-protocol-status` | `()` | Get the status of the CL pool contract. |
 
 ### `liquidity-manager.clar`

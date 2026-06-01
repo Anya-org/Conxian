@@ -49,10 +49,12 @@
 
 ;; Read-only Functions
 
+;; @desc Get details of a specific auction
 (define-read-only (get-auction (id uint))
   (map-get? auctions id)
 )
 
+;; @desc Set the admin for the auction contract
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))

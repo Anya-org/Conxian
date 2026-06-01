@@ -53,24 +53,28 @@
 
 ;; Private functions
 
+;; @desc Get the utilization of a pool
 (define-read-only (get-pool-utilization (pool principal))
     ;; Simplified implementation - would integrate with DEX in production
     u5000
     ;; 50% utilization placeholder
 )
 
+;; @desc Get the target liquidity for a pool
 (define-read-only (get-pool-target-liquidity (pool principal))
     ;; Calculate optimal liquidity based on historical data
     u1000000
     ;; Placeholder
 )
 
+;; @desc Get the optimization score for a pool
 (define-read-only (get-optimization-score (pool principal))
     ;; Score based on efficiency volume and other metrics
     u8000
     ;; Placeholder
 )
 
+;; @desc Get the fee tier for a pool
 (define-read-only (get-pool-fee-tier (pool principal))
     (default-to u3000
         (get fee-tier (map-get? pool-optimization-data { pool: pool }))
@@ -186,6 +190,7 @@
     )
 )
 
+;; @desc Get the optimization data for a pool
 (define-read-only (get-optimization-data (pool principal))
     (default-to {
         last-optimization: u0,

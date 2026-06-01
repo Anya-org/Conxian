@@ -2,14 +2,14 @@
 ;; Conxian Protocol Standard Contract
 
 ;; protocol-invariant-monitor.clar
-;; Safety check automation
+;; Conxian Protocol: Safety check automation
 
+;; @desc Check protocol invariants to ensure safety
 (define-read-only (check-invariants (total-assets uint) (total-liabilities uint))
   (ok (>= total-assets total-liabilities))
 )
 
-
-;; @desc Placeholder
+;; @desc Placeholder function for future implementation
 ;; @returns (response bool uint)
 (define-public (placeholder)
   (ok true)
