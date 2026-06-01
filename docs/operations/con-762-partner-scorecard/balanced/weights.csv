@@ -1,0 +1,8 @@
+dimension,weight,definition
+integration_speed,0.20,Time-to-production for initial integration and go-live.
+sovereignty_fit,0.15,Alignment with sovereign control requirements and data/key boundary expectations.
+erp_compatibility,0.15,Practical compatibility with SAP/Oracle style enterprise workflows and systems.
+compliance_leverage,0.15,Strength of compliance coverage and audit-readiness leverage out of the box.
+operational_control_value,0.15,"Degree of operational control, observability, and policy enforcement enabled."
+buyer_trust_impact,0.10,Expected enterprise buyer trust lift from partner credibility and controls posture.
+cost_switching_risk,0.10,Commercial flexibility and switching-risk posture (higher means lower lock-in exposure).

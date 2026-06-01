@@ -1,0 +1,6 @@
+priority,partner,role,rationale
+1,Fireblocks,Custody/KMS fast-path,Best speed-first weighted score overall; strongest custody go-live profile.
+2,Circle,Rapid settlement rail,High integration speed and buyer trust make settlement onboarding materially faster.
+3,TRM,Compliance launch control,Strong compliance leverage keeps launch velocity without sacrificing controls.
+4,QuickNode,Bitcoin infra quick-start,Top speed-first infra score for immediate developer and platform throughput.
+5,SAP,Enterprise process bridge,Maintains ERP continuity for early design-partner procurement and operations.

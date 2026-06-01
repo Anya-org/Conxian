@@ -18,6 +18,11 @@
 	path = Conxian
 	url = https://github.com/Conxian/Conxian
 	branch = main
+	update = none
+[submodule "Conxian/ui"]
+	path = Conxian/ui
+	url = https://github.com/Conxian/Conxian_UI
+	branch = main
 [submodule "conxius-platform"]
 	path = conxius-platform
 	url = https://github.com/Conxian/conxius-platform
