@@ -28,10 +28,12 @@
 
 ;; --- CSF Trait Implementation ---
 
+;; @desc Register a liquidity marker for the protocol
 (define-public (register-liquidity-marker (marker (string-ascii 256)))
   (ok true)
 )
 
+;; @desc Execute a swap through the Common Settlement Framework
 (define-public (execute-csf-swap (token-in <sip-010-ft-trait>) (token-out <sip-010-ft-trait>) (amount-in uint) (recipient principal))
   (let (
     (amount-out (try! (swap-execute u1 amount-in token-in token-out recipient)))
@@ -40,41 +42,59 @@
   )
 )
 
+;; @desc Request flash liquidity from the pool
 (define-public (request-flash-liquidity (token <sip-010-ft-trait>) (amount uint) (payload (buff 32)))
   (ok true)
 )
 
+;; @desc Settle an arbitrage path through the CSF
 (define-public (settle-arbitrage (token-in <sip-010-ft-trait>) (token-out <sip-010-ft-trait>) (amount uint) (route (list 10 principal)))
   (ok amount)
 )
 
+;; @desc Claim protocol yield through the CSF
 (define-public (claim-conxian-yield (reward-token <sip-010-ft-trait>) (amount uint) (recipient principal))
   (ok amount)
 )
 
+;; @desc Get the health metrics of the CSF integration
 (define-public (get-csf-health)
   (ok { tvl: u0, utilization: u0, is-active: true })
 )
 
+;; @desc Collect accumulated protocol fees
 (define-public (collect-protocol-fees (token <sip-010-ft-trait>))
   (ok true)
 )
 
 ;; --- SIP-010 Trait Implementation (Stub) ---
 
+;; @desc Transfer tokens to a recipient
 (define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
   (ok true)
 )
 
+;; @desc Get the name of the LP token
 (define-read-only (get-name) (ok "Conxian LP Token"))
+
+;; @desc Get the symbol of the LP token
 (define-read-only (get-symbol) (ok "CXLP"))
+
+;; @desc Get the decimals of the LP token
 (define-read-only (get-decimals) (ok u8))
+
+;; @desc Get the balance of a user
 (define-read-only (get-balance (user principal)) (ok u0))
+
+;; @desc Get the total supply of the LP token
 (define-read-only (get-total-supply) (ok u0))
+
+;; @desc Get the token URI
 (define-read-only (get-token-uri) (ok none))
 
 ;; --- Internal Logic ---
 
+;; @desc Create a new concentrated liquidity pool
 (define-public (create-pool (token-0 principal) (token-1 principal) (fee uint) (initial-price uint) (initial-tick int))
   (let (
     (id (+ (var-get pool-nonce) u1))
@@ -94,8 +114,19 @@
   )
 )
 
+;; @desc Execute a swap in a concentrated liquidity pool
 (define-public (swap (pool-id uint) (is-token-0 bool) (amount-in uint) (token-in <sip-010-ft-trait>) (token-out <sip-010-ft-trait>) (recipient principal))
   (swap-execute pool-id amount-in token-in token-out recipient)
+)
+
+;; @desc Get the status of the CL pool contract
+(define-read-only (get-protocol-status)
+  (ok {
+    active: true,
+    version: "v1.1.0-Apex",
+    pool-count: (var-get pool-nonce),
+    fee-share: PROTOCOL_FEE_SHARE
+  })
 )
 
 (define-private (swap-execute (pool-id uint) (amount-in uint) (token-in-trait <sip-010-ft-trait>) (token-out-trait <sip-010-ft-trait>) (recipient principal))

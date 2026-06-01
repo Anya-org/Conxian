@@ -81,18 +81,23 @@
 
 ;; --- Read-only Functions ---
 
+;; @desc Returns the contract principal for a specific pool
 (define-read-only (get-pool (token0 principal) (token1 principal) (type uint))
     (map-get? pools { token0: token0, token1: token1, type: type })
 )
 
+;; @desc Returns the total number of registered pools
 (define-read-only (get-pool-count) (ok (var-get pool-count)))
 
+;; @desc Returns metadata for a registered external protocol
 (define-read-only (get-csf-protocol (protocol principal))
   (ok (map-get? csf-registry protocol))
 )
 
+;; @desc Returns the total number of registered CSF protocols
 (define-read-only (get-csf-registry-count) (ok (var-get csf-registry-count)))
 
+;; @desc Returns the protocol principal at a specific registry index
 (define-read-only (get-csf-protocol-by-index (index uint))
   (ok (map-get? csf-by-index index))
 )

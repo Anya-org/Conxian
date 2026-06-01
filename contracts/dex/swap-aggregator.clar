@@ -16,6 +16,7 @@
 
 ;; --- CSF Trait Implementation ---
 
+;; @desc Execute a swap through the Common Settlement Framework
 (define-public (execute-csf-swap
     (token-in <sip-010-trait>)
     (token-out <sip-010-trait>)
@@ -50,6 +51,7 @@
   )
 )
 
+;; @desc Register a liquidity marker for the protocol
 (define-public (register-liquidity-marker (metadata (string-ascii 256)))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -57,24 +59,29 @@
   )
 )
 
+;; @desc Request flash liquidity from the aggregator
 (define-public (request-flash-liquidity (token <sip-010-trait>) (amount uint) (payload (buff 32)))
   (ok true)
 )
 
+;; @desc Settle an arbitrage path through the CSF
 (define-public (settle-arbitrage (token-in <sip-010-trait>) (token-out <sip-010-trait>) (amount uint) (path (list 10 principal)))
   (ok amount)
 )
 
+;; @desc Claim protocol yield through the CSF
 (define-public (claim-conxian-yield (token <sip-010-trait>) (amount uint) (recipient principal))
   (ok amount)
 )
 
+;; @desc Get the health metrics of the CSF integration
 (define-read-only (get-csf-health)
   (ok { tvl: u1000000000, utilization: u500, is-active: true })
 )
 
 ;; --- Admin Functions ---
 
+;; @desc Set the admin for the aggregator
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)

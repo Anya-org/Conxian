@@ -12,12 +12,15 @@
 (define-map authorized-pools principal bool)
 
 ;; Authorization
+
+;; @desc Check if the sender is a protocol admin
 (define-private (is-admin)
   (is-eq tx-sender (contract-call? .conxian-protocol get-protocol-admin))
 )
 
 ;; Public Functions
 
+;; @desc Authorize a pool contract
 (define-public (add-authorized-pool (pool principal))
   (begin
     (asserts! (is-admin) (err ERR_UNAUTHORIZED))
@@ -26,6 +29,7 @@
   )
 )
 
+;; @desc Remove authorization from a pool contract
 (define-public (remove-authorized-pool (pool principal))
   (begin
     (asserts! (is-admin) (err ERR_UNAUTHORIZED))
@@ -48,6 +52,7 @@
   (contract-call? .dex-factory get-pool token0 token1 type)
 )
 
+;; @desc Initialize the DEX facade
 (define-public (initialize)
   (begin
     (asserts! (is-admin) (err ERR_UNAUTHORIZED))

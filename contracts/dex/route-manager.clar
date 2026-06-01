@@ -1,4 +1,6 @@
 ;; route-manager.clar
+;; Conxian Protocol: Multi-hop Swap Routing
+
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 (define-constant ERR_NON_COMPLIANT u2003)
 

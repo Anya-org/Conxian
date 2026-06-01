@@ -1,4 +1,6 @@
 ;; liquidity-manager.clar
+;; Conxian Protocol: Liquidity Provision Management
+
 (define-constant ERR_NON_COMPLIANT u2003)
 
 ;; @desc Open a new liquidity position in a pool
