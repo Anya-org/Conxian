@@ -1,62 +1,40 @@
-# Conxian Finance Protocol
+# Conxian
 
-[![Status](https://img.shields.io/badge/Status-Active-green.svg)](https://www.conxian-labs.com)
-[![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+Conxian is the protocol and public ecosystem layer.
 
-## Purpose
+Conxian Labs is the builder and operator layer that develops, ships, and operates infrastructure around the Conxian ecosystem.
 
-Ship the Conxian Protocol smart contracts and related protocol logic for the Conxian ecosystem.
+## Identity split (authoritative)
 
-## Status
+- **Conxian (protocol + public ecosystem):** protocol primitives, public interfaces, SDKs, wallet and gateway surfaces, and ecosystem-facing standards.
+- **Conxian Labs (builder + operator):** engineering execution, deployment tooling, operations, and managed delivery for Conxian-aligned infrastructure.
 
-**Active development.** This repository is the canonical public protocol codebase and should be treated as the source repository for protocol-facing smart-contract development.
+## Pinned portfolio logic
 
-## Scope
+Pinned repositories are ordered to make the split visible at a glance:
 
-This repository contains protocol contracts, protocol documentation, and related technical materials. It does not contain company administrative systems, legal operations, or private business workflows.
+1. Protocol/public ecosystem first.
+2. Builder/operator repositories second.
+
+## Portfolio map
+
+### Conxian protocol + public ecosystem
+
+- `Conxian/Conxian`
+- `Conxian/lib-conxian-core`
+- `Conxian/conxian-gateway`
+- `Conxian/conxius-wallet`
+
+### Conxian Labs builder + operator
+
+- `Conxian/conxius-orbit`
+- `Conxian/conxian-labs-site`
 
 ## Governance relation
 
-This repository is maintained by Conxian Labs. The code is public and GPL-3.0 licensed, while governance of the protocol is intended to decentralize progressively after mainnet.
-
-## Audience
-
-- protocol engineers
-- security reviewers
-- integrators and indexer developers
-- contributors building on Conxian contracts
-
-## Relationship to the Conxian stack
-
-- protocol core: this repository
-- middleware and indexing: [Conxian Gateway](https://github.com/Conxian/conxian-gateway)
-- wallet and reference client: [Conxius Wallet](https://github.com/Conxian/conxius-wallet)
-- interface layer: [Conxian UI](https://github.com/Conxian/conxian_ui)
-
-## Repository structure
-
-```text
-/contracts/
-├── traits/
-├── core/
-├── dex/
-├── agents/
-├── tokens/
-├── oracle/
-├── treasury/
-└── ...
-```
-
-## Security
-
-Do not disclose vulnerabilities publicly. Use [SECURITY.md](SECURITY.md) or GitHub private vulnerability reporting.
+Conxian Labs contributes to and operates infrastructure for the Conxian ecosystem, but Conxian (the protocol/public layer) remains the ecosystem-facing identity.
 
 ## Contact
 
-- General: [info@conxian-labs.com](mailto:info@conxian-labs.com)
-- Support: [support@conxian-labs.com](mailto:support@conxian-labs.com)
-- Security: [security@conxian-labs.com](mailto:security@conxian-labs.com)
-
-## License
-
-GPL-3.0
+- Ecosystem and protocol collaboration: open an issue in the relevant public repository.
+- Operations and commercial engagement: `support@conxian-labs.com`
