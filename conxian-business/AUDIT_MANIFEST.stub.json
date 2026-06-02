@@ -1,0 +1,12 @@
+{
+  "org": "Conxian",
+  "timestamp": "1970-01-01T00:00:00Z",
+  "version": "v0.0.0-redacted",
+  "files": [],
+  "stacks_anchor_payload": "0000000000000000000000000000000000000000000000000000000000000000",
+  "note": "Public-safe stub. Generated audit output is written to ./conxian-business/.generated/AUDIT_MANIFEST.json (ignored). Canonical audit details are maintained in the Conxian Linear workspace.",
+  "linear": {
+    "workspace": "https://linear.app/conxian-labs",
+    "tracking_issue": "https://linear.app/conxian-labs/issue/CON-256"
+  }
+}

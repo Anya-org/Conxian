@@ -1,0 +1,82 @@
+# Branching and Promotion Policy (CON-381, CON-389)
+
+To ensure the integrity of the Conxian Production Environment, all repositories in the portfolio must adhere to the following branch model and promotion gates.
+
+## 1. Branch Taxonomy
+
+| Branch | Network / Scope | Rules |
+| --- | --- | --- |
+| `main` | **Mainnet-Only** | Only production-ready, mainnet-validated code. No stubs, mocks, or placeholders. |
+| `staged` | Mainnet Candidate | Pre-production validation branch for mainnet releases. The only branch allowed to merge into `main`. |
+| `dev` | **Testnet-Only** | Default development branch. Non-production validation and testnet-oriented logic. |
+| `feat/*`, `fix/*` | Local/Asynchronous | Ephemeral branches for individual work. Branch from `dev`, validate locally first, then merge into `dev`. |
+
+## 2. Required Promotion Path
+
+1. **Development & Unit Testing**: All work starts on feature branches. Validate locally first, then open a PR into `dev`. Merge only after standard CI checks and unit tests pass.
+2. **Testnet Validation**: Functional validation is performed on the `dev` branch against testnet (Stacks Testnet, Bitcoin Testnet/Signet).
+3. **Staging (Promotion Candidate)**: Once testnet validation is complete, code is promoted from `dev` to `staged`.
+4. **Mainnet Acceptance Evidence**: Promotion from `staged` to `main` requires a strict "Mainnet Acceptance Evidence Pack" that satisfies all requirements defined in the canonical spec: [`openspec/specs/mainnet-acceptance-evidence-pack/spec.md`](../openspec/specs/mainnet-acceptance-evidence-pack/spec.md).
+   - The strict acceptance checklist, hard blockers, and merge-evidence requirements are also defined in that spec and MUST be satisfied before merging.
+   - The pack typically demonstrates:
+     - mainnet-only production scope
+     - no stub, mock, placeholder, or testnet residue in production paths
+     - successful production validation
+     - release-readiness sign-off
+     - clear owner accountability for the promoted code
+5. **Production Merge**: Only after the evidence pack is verified can `staged` be merged into `main`. **Direct merges from `dev` to `main` are strictly prohibited.**
+
+## 3. Enforcement (CI/CD Gates)
+- **Protected Branches**: `main` and `staged` must be protected with required reviews and passing status checks (including the Contamination Guard).
+- **Promotion checklists**: PR descriptions targeting `dev`, `staged`, or `main` must include the relevant promotion checklist sections in `docs/PROMOTION_CHECKLISTS.md`.
+- **Contamination Guard**: CI suites on `main` and `staged` must run a blocking scan for and reject non-production patterns, and the scan must be explicitly scoped to avoid false positives.
+  - **Scope**: Run as a required status check on pull requests targeting `main` and `staged`. Scan only production source trees (repo-defined allowlist; e.g., `contracts/**`, `src/**`).
+  - **Exclusions**: Explicitly exclude `docs/**`, `audit/**`, `**/*.md`, and test/mocks/fixtures paths.
+  - **Patterns**: Prefer precise patterns over broad substrings (avoid generic terms like "placeholder" unless heavily scoped). Include stable stub sentinels used across the portfolio (e.g., `[STUB]`).
+  - **Example**:
+    ```bash
+    # Repo-defined allowlist (update these globs to match this repo's production paths)
+    RG_GLOBS=(
+      --glob 'contracts/**'
+      --glob 'src/**'
+      --glob '!**/docs/**'
+      --glob '!**/audit/**'
+      --glob '!**/*.md'
+      --glob '!**/test/**'
+      --glob '!**/tests/**'
+      --glob '!**/__tests__/**'
+      --glob '!**/fixtures/**'
+      --glob '!**/mocks/**'
+    )
+
+    if ! rg --files "${RG_GLOBS[@]}" -- . | head -n 1 | grep -q .; then
+      echo "ERROR: contamination allowlist matched no files; update the allowlist globs"
+      exit 2
+    fi
+
+    if rg -n "${RG_GLOBS[@]}" -- 'MOCK_[A-Z0-9_]+|\bstub-func\b|\[STUB\]' .; then
+      echo 'ERROR: non-production patterns detected in production paths'
+      exit 1
+    else
+      status=$?
+      if [ "$status" -ne 1 ]; then
+        echo "ERROR: contamination scan failed (rg exit ${status})"
+        exit "$status"
+      fi
+    fi
+
+    # status == 1: no matches; scan passes
+    exit 0
+    ```
+- **Submodule Integrity**: Parent repositories (like `conxian-business`) must ensure all submodules are pinned to their respective production-ready commits before merging to `main`.
+
+## 4. Remediation Standard (April 2026)
+
+Following the remediation of CON-394 and CON-61:
+- **No Hardcoded Principals:** Production Clarity contracts must use `tx-sender` or dynamic `data-vars` for administrative roles.
+- **Fail-Closed by Default:** Functional stubs (e.g., ZKML, DLC) must return explicit errors in the production path if the implementation is incomplete. Simulated data is only allowed on `dev` branches or behind explicit `mock-integrations` feature gates.
+- **Contamination Guard:** All PRs targeting `main` or `staged` are subject to the `verify_contamination_guard.py` check.
+
+---
+**Verified by:** Jules (cxn-arch-guardian)
+**Date:** April 6, 2026

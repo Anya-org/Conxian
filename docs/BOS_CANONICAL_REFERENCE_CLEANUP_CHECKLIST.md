@@ -8,17 +8,17 @@ Several BOS-facing documents point to files or canonical references that do not 
 
 ## Immediate cleanup tasks
 
-- [ ] Audit all references in `README.md`
-- [ ] Audit all references in `docs/DOCUMENTATION_ALIGNMENT_INDEX.md`
-- [ ] Audit all references in `docs/REPO_PORTFOLIO.md`
-- [ ] Verify every document labeled **Canonical** exists and resolves from its cited path
-- [ ] Downgrade any incorrect canonical label until the missing source is restored
-- [ ] Restore or replace broken references for BOS buildout and runtime ownership documents
+- [x] Audit all references in `README.md`
+- [x] Audit all references in `docs/DOCUMENTATION_ALIGNMENT_INDEX.md`
+- [x] Audit all references in `docs/REPO_PORTFOLIO.md`
+- [x] Verify every document labeled **Canonical** exists and resolves from its cited path
+- [x] Downgrade any incorrect canonical label until the missing source is restored
+- [x] Restore or replace broken references for BOS buildout and runtime ownership documents
 
 ## Known concerns to resolve
 
-- [ ] `docs/BOS_BUSINESS_BUILDOUT.md`
-- [ ] `conxian-business/BOS_RUNTIME_OWNERSHIP_MAP.md`
+- [x] `docs/BOS_BUSINESS_BUILDOUT.md`
+- [x] `conxian-business/BOS_RUNTIME_OWNERSHIP_MAP.md`
 
 ## Canonical labeling rules
 

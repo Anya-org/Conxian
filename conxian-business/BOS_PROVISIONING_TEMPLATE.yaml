@@ -1,0 +1,51 @@
+# BOS Sovereign Node (BiaB) Provisioning Template
+# Version: v2.2 (M.A.S. Era)
+# Description: Standard declarative manifest for deploying a new business tenant on the Conxian network.
+
+tenant:
+  id: "your-business-bns-name.stx"
+  namespace: "tenant_alpha_relational"
+  tier: "sovereign"
+  orchestration: "supervisor-worker-mas"
+
+services:
+  nexus:
+    image: "conxian/nexus:v0.5.1"
+    env:
+      - DB_TYPE=kwil_hybrid
+      - KWIL_PROVIDER=https://kwil.conxian.network
+      - TABLELAND_MIRROR=true
+      - TELEMETRY_PROTOCOL=nostr
+      - NOSTR_RELAYS=wss://relay.conxian.com,wss://nos.lol
+    resources:
+      cpu: 2
+      memory: "4Gi"
+
+  vault:
+    image: "conxian/fiscal-vault:v1.2.0"
+    enclave: "strongbox"
+    env:
+      - TIMELOCK_BLOCKS=144
+      - MULTISIG_THRESHOLD=2
+      - YIELD_OPTIMIZER_ACTIVE=true
+
+  guardian:
+    image: "conxian/nakamoto-guardian:v0.8.5"
+    policy: "standard-compliance-v1"
+    attestation: "zkml-risc0"
+
+infrastructure:
+  provider: "akash"
+  region: "us-west"
+  persistence:
+    - type: "kwil"
+      size: "100Gi"
+    - type: "tableland"
+      mirror: true
+
+governance:
+  type: "sovereign-autonomous"
+  admin_principal: "SP...[YOUR_STX_ADDRESS]"
+  emergency_multisig:
+    - "SP..."
+    - "SP..."

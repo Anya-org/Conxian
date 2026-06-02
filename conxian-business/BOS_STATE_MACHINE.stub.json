@@ -1,0 +1,38 @@
+{
+  "name": "Conxian Sovereign BOS State Machine",
+  "version": "v2.1",
+  "standard": "Morgan Stanley CALM (Commercial and Legal Monitoring)",
+  "context": "Multi-Tenant BaaP Orchestration",
+  "states": {
+    "IDLE": {
+      "description": "Tenant node is active but no pending intents.",
+      "transitions": ["INTENT_RECEIVED"]
+    },
+    "INTENT_RECEIVED": {
+      "description": "MCP intent (Payment/Policy/Audit) received and hashed.",
+      "transitions": ["POLICY_VALIDATION", "FAILED_INVALID"]
+    },
+    "POLICY_VALIDATION": {
+      "description": "Nakamoto Guardian verifying intent against sovereign guardrails.",
+      "transitions": ["AWAITING_TIMELOCK", "FAILED_POLICY_VIOLATION"]
+    },
+    "AWAITING_TIMELOCK": {
+      "description": "144-block Stacks timelock active for transparency.",
+      "transitions": ["EXECUTION_PENDING", "CANCELLED"]
+    },
+    "EXECUTION_PENDING": {
+      "description": "Final multi-sig threshold reached; ready for settlement.",
+      "transitions": ["SETTLED", "FAILED_EXECUTION"]
+    },
+    "SETTLED": {
+      "description": "State root anchored to Bitcoin; payout completed.",
+      "transitions": ["IDLE"]
+    }
+  },
+  "platform_controls": {
+    "tenant_isolation": "Jurisdictional Sharding enabled",
+    "mcp_interface": "v1.0",
+    "sovereign_guardrail_default": "144-block timelock"
+  },
+  "ZSE_NOTICE": "Internal state transition logic, weights, and private actor IDs are maintained in Linear: https://linear.app/conxian-labs/issue/CON-256"
+}
