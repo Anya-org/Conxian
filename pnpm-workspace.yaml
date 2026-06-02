@@ -1,4 +1,6 @@
 packages:
+  - "apps/*"
+  - "packages/*"
   - "conxian-ui"
   - "conxius-wallet"
   - "conxius-platform"

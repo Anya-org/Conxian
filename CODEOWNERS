@@ -10,6 +10,10 @@
 /Conxian/ @botshelomokoka @admin-conxian-labs
 /openspec/ @botshelomokoka @admin-conxian-labs
 
+# BOS control plane
+/apps/ @botshelomokoka @admin-conxian-labs
+/packages/ @botshelomokoka @admin-conxian-labs
+
 # Product suites
 /conxian-*/ @botshelomokoka @admin-conxian-labs
 /conxius-*/ @botshelomokoka @admin-conxian-labs
