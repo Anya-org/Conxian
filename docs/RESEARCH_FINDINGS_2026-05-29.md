@@ -86,7 +86,7 @@ NFT / Semi-Fungible Layer (ERC-1155 pattern)
 ### ISO 38500:2024 (IT Governance — Board Level)
 - 12 principles: Purpose, Value Generation, Strategy, Risk Governance, Accountability, etc.
 - Evaluate-Direct-Monitor → Unified Theory Phases 1-3
-- Positions Conxian for institutional trust
+- Positions Conxian for sovereign trust
 
 ---
 

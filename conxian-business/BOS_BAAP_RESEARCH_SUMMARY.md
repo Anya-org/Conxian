@@ -7,7 +7,7 @@
 - **SAP Clean Core**: BaaP enforces "Sovereign Guardrails" (144-block timelocks) as the standard state machine for all tenants, preventing logic drift.
 - **Salesforce Agentforce**: BaaP utilizes a **M.A.S. (Multi-Agent System)** pattern where Strategy Nexus acts as the Supervisor for per-tenant Worker agents.
 
-## 2. SDK Viewpoint: Conclave SDK Utilization
+## 2. SDK Viewpoint: Conxius Enclave SDK Utilization
 - **Capabilities Used**: Hardware-grade key isolation (StrongBox), MuSig2 multi-sig, and A2P (Application-to-Person) secure routing.
 - **Enhancements Identified**: Native BIP341 (Taproot) signing is fully active; next phase requires integrating RISC0 ZKML proofs for off-chain compliance attestation.
 

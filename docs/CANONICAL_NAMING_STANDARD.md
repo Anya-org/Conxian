@@ -96,7 +96,7 @@ Allowed secondary description:
 
 Not recommended as the primary identity unless the product is intentionally repositioned:
 - sovereign operator dashboard
-- institutional protocol terminal
+- sovereign protocol terminal
 - reference-only UI
 
 ## Public-safe glossary rule

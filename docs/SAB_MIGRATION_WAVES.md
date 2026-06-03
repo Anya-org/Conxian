@@ -22,7 +22,7 @@ The legacy 4-wave framing in `docs/operations/SAB_MIGRATION_WAVES.md` is retaine
 | :--- | :--- | :--- |
 | **Legacy Wave 1: Governance & Transparency** | **W0: Inventory + invariants** (plus governance checks that continue through W1–W6) | Governance artifacts are no longer treated as a standalone migration endpoint; they are a prerequisite and recurring control. |
 | **Legacy Wave 2: Core Protocol & Mainnet Cutover** | Primarily **W1: Transactional SQL pilot**, with prerequisite ties to **W0** and follow-on containment in **W2** | What was called “cutover” is now split into a reversible pilot first, then correctness isolation. |
-| **Legacy Wave 3: Institutional Ingress & TEE Enforcement** | Spans **W2: Supabase correctness isolation**, **W3: Analytics phase-out**, and selected **W6: Sovereign compute baseline** controls | Ingress/TEE readiness depends on datastore correctness and operational hosting posture, so it is distributed across waves instead of isolated in one wave. |
+| **Legacy Wave 3: Sovereign Ingress & TEE Enforcement** | Spans **W2: Supabase correctness isolation**, **W3: Analytics phase-out**, and selected **W6: Sovereign compute baseline** controls | Ingress/TEE readiness depends on datastore correctness and operational hosting posture, so it is distributed across waves instead of isolated in one wave. |
 | **Legacy Wave 4: BitVM2 & sBTC Maturity** | Cross-cutting architecture track aligned to **W4–W6** promotion gates, with concrete target-state defined in `docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md` | BitVM2/sBTC readiness is controlled by explicit promotion/rollback gates and signer-boundary checks rather than a single terminal wave. |
 
 ### Translation rule for issue and runbook references

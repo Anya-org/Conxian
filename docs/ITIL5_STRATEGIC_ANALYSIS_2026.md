@@ -25,7 +25,7 @@ Here is what we got wrong, and we own it before we fix it:
 | "Our stack justifies premium pricing" | The market doesn't care about our 207 Clarity contracts. They care about one thing: does this solve my problem cheaper/faster than the alternative? | Technical hubris. We priced for our effort, not their willingness to pay. |
 | "We can grow organically through quality" | In crypto, growth is predatory or it doesn't happen. Organic growth in 2026 is a myth for new protocols. | We ignored every successful crypto GTM playbook (SushiSwap, Blur, LooksRare). |
 | "Enterprise sales cycles are 6-12 months" | Yes, but we don't have 6-12 months of runway. We need revenue in 90 days or we die. | Wishful thinking about timeline. |
-| "Stacks ecosystem competitors are collaborators" | Zest Protocol has 664 BTC TVL at 4.13% APY and **zero** enterprise compliance. Bitflow processes $67.4M/quarter with **zero** institutional onboarding. They are prey. | We treated them as ecosystem partners when they are market share waiting to be taken. |
+| "Stacks ecosystem competitors are collaborators" | Zest Protocol has 664 BTC TVL at 4.13% APY and **zero** enterprise compliance. Bitflow processes $67.4M/quarter with **zero** sovereign onboarding. They are prey. | We treated them as ecosystem partners when they are market share waiting to be taken. |
 
 **This document is the correction.** No more polite positioning. No more consulting-speak. We are going to war.
 
@@ -109,7 +109,7 @@ Conxian-Labs will not compete for market share. We will **take** it.
 The Bitcoin L2 infrastructure market in May 2026 is characterized by:
 - **Stacks TVL**: $437M-$545M (sBTC)
 - **Zest Protocol**: 664 BTC deposits, 4.13% APY, $75.9M TVL — **no compliance, no enterprise layer**
-- **Bitflow**: $67.4M quarterly volume, $5.24M TVL — **protocol-only, no institutional onboarding**
+- **Bitflow**: $67.4M quarterly volume, $5.24M TVL — **protocol-only, no sovereign onboarding**
 - **Velar**: Liquid staking DEX — **early, undercapitalized, vulnerable**
 - **Alex Labs**: TVL declining post-bridge issues — **wounded, waiting to be finished**
 
@@ -168,7 +168,7 @@ The macro conditions for a vampire attack are perfect:
 | Quarterly Volume | $67.4M |
 | TVL | $5.24M |
 | LP APR | 3-10% (pool-dependent) |
-| Weakness | No compliance, no institutional onboarding, no mobile |
+| Weakness | No compliance, no sovereign onboarding, no mobile |
 | Users | ~5K-15K active LPs |
 | Defensibility | Low — AMM code is forkable, liquidity is mercenary |
 
@@ -237,7 +237,7 @@ Rules:
 | Payment Forge | R5K-R25K/mo | **R0-R1K/mo** | Free for first 100 transactions/month. R10/transaction after. |
 | Yield Optimizer | 15-25% rev share | **5-10% rev share** | Cut share by 60%. Volume makes up for rate. |
 | Regulatory Adapter Lite | R5K-R15K/mo | **R0-R500/mo** | Free CASP scaffolding. Premium compliance reports at R500/report. |
-| Conxius Orbit Premium | N/A | **R500-R2K/mo** | Was Developer tier. Reduced from $50-$200/mo to R500-R2K/mo. |
+| conxius_orbit Premium | N/A | **R500-R2K/mo** | Was Developer tier. Reduced from $50-$200/mo to R500-R2K/mo. |
 
 **Total Monthly:** **R0-R2K** ($0-$110) — was R10K-R45K
 **Target Market:** 1,500+ crypto startups across Africa. At 10% conversion to paid = 150 customers x R1K avg = R150K/month.
@@ -246,8 +246,8 @@ Rules:
 
 | Component | Old Price | New Price | Rationale |
 |---|---|---|---|
-| Conxius Orbit (CLI/TUI) | Free | **Free** | No change. Loss leader. |
-| Conxius Orbit Premium | $50-$200/mo | **Free** | Eliminated. All features free. Monetize through enterprise support contracts. |
+| conxius_orbit (CLI/TUI) | Free | **Free** | No change. Loss leader. |
+| conxius_orbit Premium | $50-$200/mo | **Free** | Eliminated. All features free. Monetize through enterprise support contracts. |
 | Clarity 4 SDK | Free | **Free** | No change. |
 | Testnet Faucet API | Free | **Free** | No change. |
 | Deployment Verification | $200-$500/deploy | **Free+Grants** | Free. We apply for ecosystem grants to fund infrastructure. |
@@ -482,7 +482,7 @@ The vampire attack phases use token incentives as a loss leader. Sustainable rev
 ### 7.2 Failure Scenarios
 
 **Worst Case:** Token fails, enterprise deals don't close, grants run dry.
-**Survival Mode:** Drop to bare ops. Conxius Wallet + Conxius Orbit as revenue drivers. Everything else on ice. Team of 3-5. R500K/month burn.
+**Survival Mode:** Drop to bare ops. Conxius Wallet + conxius_orbit as revenue drivers. Everything else on ice. Team of 3-5. R500K/month burn.
 
 **Break-Even Analysis:**
 - Monthly burn: R500K-R1M (team + infrastructure)

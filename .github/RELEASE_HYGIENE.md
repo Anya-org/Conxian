@@ -86,7 +86,7 @@ Some suites only run when a label is applied. Most label-gated suites live in th
 | `conxian-nexus/` or `lib-conclave-sdk/` | `b2b` | B2B suite (Nexus & SDK) |
 | `conxius-wallet/` | `b2c` | B2C wallet suite |
 | transparency audit or documentation validation | `audit` | Transparency audit + docs |
-| StacksOrbit testnet simulation scripts | `simulation` | Testnet simulation |
+| Conxius Orbit testnet simulation scripts | `simulation` | Testnet simulation |
 
 Notes:
 

@@ -40,7 +40,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Shield className="w-6 h-6 text-[#d4a017]" />
-            <span className="font-bold text-xl tracking-tight">Conclave SDK</span>
+            <span className="font-bold text-xl tracking-tight">Conxius Enclave SDK</span>
           </div>
           <nav className="hidden md:flex gap-6 text-sm text-gray-400">
             <a href="#" className="hover:text-white transition-colors">Documentation</a>

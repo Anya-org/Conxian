@@ -31,7 +31,7 @@ This matrix covers the 13-repo execution set used for migration gate decisions.
 7. `lib-conxian-core`
 8. `lib-conclave-sdk`
 9. `conxius-platform`
-10. `stacksorbit`
+10. `conxius_orbit`
 11. `cxn-grid-oracle`
 
 ### Group D — Governance and control plane
@@ -64,7 +64,7 @@ A repo is considered “gate-ready” only when required evidence is attached to
 | Shared runtime | `lib-conxian-core` | Shared model/version semantics used by Gateway/Nexus/Wallet | G0, G1, G2 | Semantic-version delta report; downstream compile/test compatibility report across dependents |
 | Shared runtime | `lib-conclave-sdk` | Attestation/session primitives and signer-boundary helper APIs | G0, G1, G2 | Interface freeze tag; attestation boundary test report; compatibility matrix of consumers |
 | Shared runtime | `conxius-platform` | Environment orchestration for dual-lane validation and rollback drills | G0, G1, G3 | Reproducible environment manifests; drill execution logs; dependency lockfile integrity evidence |
-| Shared runtime | `stacksorbit` | Deployment/promote/rollback tooling behavior for contract/service rollout | G0, G2, G3, G4 | Tooling dry-run logs; signed promotion script checksum; rollback rehearsal evidence |
+| Shared runtime | `conxius_orbit` | Deployment/promote/rollback tooling behavior for contract/service rollout | G0, G2, G3, G4 | Tooling dry-run logs; signed promotion script checksum; rollback rehearsal evidence |
 | Shared runtime | `cxn-grid-oracle` | Oracle feed schema and freshness semantics consumed by migration flows | G0, G1, G2 | Feed schema contract tests; freshness/staleness alarm evidence; fail-closed behavior test |
 | Governance | `conxian-business` | Canonical docs, gates, and migration decision records | G0, G4 | Updated canonical docs with gate mapping; review approvals captured in change log |
 | Governance | `.github` | CI policy/workflow enforcement of gate evidence and link integrity | G0, G2, G4 | Required-check configuration evidence; workflow run logs proving gate check enforcement |

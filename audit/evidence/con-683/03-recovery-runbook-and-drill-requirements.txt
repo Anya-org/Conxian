@@ -9,7 +9,7 @@ docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md:47:| **G3: Rollback r
 docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md:56:| Protocol core | `Conxian` | Contract traits, event schema, settlement-state transitions | G0, G1, G2, G3, G4 | Versioned ABI/trait manifest; deterministic test vectors; signed rollback drill result for contract-level feature flags |
 docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md:58:| Protocol core | `conxian-gateway` | Ingress/egress policy APIs, bridge-state gating, idempotency semantics | G0, G1, G2, G3, G4 | API contract test report; policy boundary negative tests; cutover canary and rollback logs |
 docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md:64:| Shared runtime | `conxius-platform` | Environment orchestration for dual-lane validation and rollback drills | G0, G1, G3 | Reproducible environment manifests; drill execution logs; dependency lockfile integrity evidence |
-docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md:65:| Shared runtime | `stacksorbit` | Deployment/promote/rollback tooling behavior for contract/service rollout | G0, G2, G3, G4 | Tooling dry-run logs; signed promotion script checksum; rollback rehearsal evidence |
+docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md:65:| Shared runtime | `conxius_orbit` | Deployment/promote/rollback tooling behavior for contract/service rollout | G0, G2, G3, G4 | Tooling dry-run logs; signed promotion script checksum; rollback rehearsal evidence |
 docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md:96:- [ ] Measured rollback completion time meets RTO target.
 
 ## exit_code

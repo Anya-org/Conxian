@@ -27,8 +27,8 @@ A "Sovereign Node" is a containerized "Business-in-a-Box" (BiaB) deployment inst
 - **Interface**: Model Context Protocol (MCP) v1.0.
 - **Telemetry**: Nostr (Kind 26001-26003).
 
-## 4. SDK Viewpoint: Conclave SDK
-The **Conclave SDK** is the industrial primitive for BaaP. It provides:
+## 4. SDK Viewpoint: Conxius Enclave SDK
+The **Conxius Enclave SDK** is the industrial primitive for BaaP. It provides:
 - **Hardware Enclave Abstraction**: Native support for StrongBox/TEE.
 - **Sovereign Handshake**: Non-custodial signing for cross-chain swaps and A2P (Application-to-Person) verification.
 - **B2B Identity**: Cryptographic identity for sovereign partners and automated billing.

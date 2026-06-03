@@ -1,7 +1,7 @@
 # Proposal: ERP sync + ISO 20022 mapping + MVCR artifact foundation (Milestone 1)
 
 ## Context
-Institutional adoption requires deterministic ERP synchronization behavior, clear ISO 20022 field mapping, and auditable compliance artifacts.
+Sovereign adoption requires deterministic ERP synchronization behavior, clear ISO 20022 field mapping, and auditable compliance artifacts.
 
 This change initializes that foundation in `Conxian/conxian-business` for follow-on integration work tracked from `Conxian/conxius-platform#635`.
 

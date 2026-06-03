@@ -43,7 +43,7 @@ Additional Linear bounty items labeled `Bounty` (but not `Bounty Open`) and not 
 From `Conxian/conxius-platform` open issues labeled `Bounty`:
 
 - https://github.com/Conxian/conxius-platform/issues/210 → https://linear.app/conxian-labs/issue/CON-231/decide-which-bounties-can-open-before-mainnet-go-live
-- https://github.com/Conxian/conxius-platform/issues/197 → https://linear.app/conxian-labs/issue/CON-222/release-hygiene-stacksorbit
+- https://github.com/Conxian/conxius-platform/issues/197 → https://linear.app/conxian-labs/issue/CON-222/release-hygiene-conxius_orbit
 - https://github.com/Conxian/conxius-platform/issues/170 → https://linear.app/conxian-labs/issue/CON-198/release-hygiene-conxian-labs-site
 - https://github.com/Conxian/conxius-platform/issues/159 → https://linear.app/conxian-labs/issue/CON-186/release-hygiene-conxian-ui
 - https://github.com/Conxian/conxius-platform/issues/152 → https://linear.app/conxian-labs/issue/CON-178/release-hygiene-github
@@ -77,7 +77,7 @@ These are expected to have `Bounty Open` removed for the pre-mainnet window per 
 - https://linear.app/conxian-labs/issue/CON-186/release-hygiene-conxian-ui
 - https://linear.app/conxian-labs/issue/CON-198/release-hygiene-conxian-labs-site
 - https://linear.app/conxian-labs/issue/CON-218/release-hygiene-lib-conxian-core
-- https://linear.app/conxian-labs/issue/CON-222/release-hygiene-stacksorbit
+- https://linear.app/conxian-labs/issue/CON-222/release-hygiene-conxius_orbit
 - https://linear.app/conxian-labs/issue/CON-78/con-75-bounty-gateway-edge-offline-first-pos-sync
 
 As of 2026-04-12, the lists above represent the full set of active `Bounty` / `Bounty Open` items that were included in this classification (limited to the Conxian-Labs Linear team and the `Conxian/conxius-platform` GitHub repository).
@@ -97,7 +97,7 @@ _The `Bounty Open` column shows the label state at snapshot time, not the recomm
 | https://linear.app/conxian-labs/issue/CON-186/release-hygiene-conxian-ui | Security-sensitive | Yes |
 | https://linear.app/conxian-labs/issue/CON-198/release-hygiene-conxian-labs-site | Security-sensitive | Yes |
 | https://linear.app/conxian-labs/issue/CON-218/release-hygiene-lib-conxian-core | Security-sensitive | Yes |
-| https://linear.app/conxian-labs/issue/CON-222/release-hygiene-stacksorbit | Security-sensitive | Yes |
+| https://linear.app/conxian-labs/issue/CON-222/release-hygiene-conxius_orbit | Security-sensitive | Yes |
 | https://linear.app/conxian-labs/issue/CON-129/csf-mainnet-readiness-gate | Security-sensitive | No |
 | https://linear.app/conxian-labs/issue/CON-167/maintainer-payout-enablement-checklist-for-alex-funded-bounties | Payout-gated | No |
 | https://linear.app/conxian-labs/issue/CON-230/confirm-bounty-funding-and-payout-activation-for-mainnet | Payout-gated | No |
@@ -130,7 +130,7 @@ These items touch release discipline, required checks, tags, and/or `.github`-pr
 - https://linear.app/conxian-labs/issue/CON-186/release-hygiene-conxian-ui (release/CI discipline)
 - https://linear.app/conxian-labs/issue/CON-198/release-hygiene-conxian-labs-site (deploy hygiene)
 - https://linear.app/conxian-labs/issue/CON-218/release-hygiene-lib-conxian-core (core library release gating)
-- https://linear.app/conxian-labs/issue/CON-222/release-hygiene-stacksorbit (release discipline)
+- https://linear.app/conxian-labs/issue/CON-222/release-hygiene-conxius_orbit (release discipline)
 - https://linear.app/conxian-labs/issue/CON-129/csf-mainnet-readiness-gate (launch readiness gate)
 
 ### Payout-gated (blocked on verified mainnet + funding path + maintainer controls)
@@ -164,7 +164,7 @@ GitHub (`Conxian/conxius-platform`) open issues labeled `Bounty`:
 
 ```txt
 #210 Decide which bounties can open before mainnet go-live [Governance, Bounty]
-#197 Release hygiene — stacksorbit [Release, Bounty, Bounty Open]
+#197 Release hygiene — conxius_orbit [Release, Bounty, Bounty Open]
 #170 Release hygiene — conxian-labs-site [Release, Bounty, Bounty Open]
 #159 Release hygiene — Conxian_UI [Release, Bounty, Bounty Open]
 #152 Release hygiene — .github [Release, Bounty, Bounty Open]
@@ -177,7 +177,7 @@ GitHub (`Conxian/conxius-platform`) open issues labeled `Bounty`:
 GitHub (`Conxian/conxius-platform`) open issues labeled `Bounty Open`:
 
 ```txt
-#197 Release hygiene — stacksorbit [Release, Bounty, Bounty Open]
+#197 Release hygiene — conxius_orbit [Release, Bounty, Bounty Open]
 #170 Release hygiene — conxian-labs-site [Release, Bounty, Bounty Open]
 #159 Release hygiene — Conxian_UI [Release, Bounty, Bounty Open]
 #152 Release hygiene — .github [Release, Bounty, Bounty Open]
@@ -192,7 +192,7 @@ CON-182 Release hygiene — Conxian [Release, Bounty, Bounty Open]
 CON-186 Release hygiene — Conxian_UI [Release, Bounty, Bounty Open]
 CON-198 Release hygiene — conxian-labs-site [Release, Bounty, Bounty Open]
 CON-218 Release hygiene — lib-conxian-core [Release, Bounty, Bounty Open]
-CON-222 Release hygiene — stacksorbit [Release, Bounty, Bounty Open]
+CON-222 Release hygiene — conxius_orbit [Release, Bounty, Bounty Open]
 CON-78 CON-75: [BOUNTY] Gateway Edge - Offline-First POS Sync [Bounty, Bounty Open]
 ```
 

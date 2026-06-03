@@ -10,7 +10,7 @@ $repositories = @{
     "Conxian" = @("DEPLOYER_PRIVKEY", "NETWORK")
     "conxian-nexus" = @("DATABASE_URL", "REDIS_URL")
     "conxius-platform" = @("NODE_ENV", "GATEWAY_JWT_SECRET", "POSTGRES_USER", "POSTGRES_PASSWORD")
-    "stacksorbit" = @("NETWORK", "STACKS_DEPLOYER_PRIVKEY", "HIRO_API_KEY")
+    "conxius_orbit" = @("NETWORK", "STACKS_DEPLOYER_PRIVKEY", "HIRO_API_KEY")
 }
 
 # Use the parent directory of the script as the workspace root if not specified

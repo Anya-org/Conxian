@@ -1,5 +1,5 @@
 priority,partner,role,rationale
-1,Fireblocks,Primary custody/KMS lane,Highest sovereignty-first weighted score while preserving institutional trust and control breadth.
+1,Fireblocks,Primary custody/KMS lane,Highest sovereignty-first weighted score while preserving sovereign trust and control breadth.
 2,BitGo,Custody sovereignty redundancy,Elevated sovereignty fit supports dual-lane custody resilience and vendor optionality.
 3,TRM,Compliance sovereignty control,Best compliance analytics score with strong operational-control alignment.
 4,SAP,ERP control-plane alignment,Top ERP compatibility supports governance-heavy enterprise operating models.

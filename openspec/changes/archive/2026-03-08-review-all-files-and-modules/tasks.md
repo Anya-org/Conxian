@@ -15,7 +15,7 @@
 - [x] 2.7 Audit files in `conxius-wallet` submodule
 - [x] 2.8 Audit files in `lib-conclave-sdk` submodule
 - [x] 2.9 Audit files in `lib-conxian-core` submodule
-- [x] 2.10 Audit files in `stacksorbit` submodule
+- [x] 2.10 Audit files in `conxius_orbit` submodule
 - [x] 2.11 Audit files in root workspace (`02_strategy`, `showcase-dapp`, etc.)
 
 ## 3. Review Git Status and Conflict Resolution

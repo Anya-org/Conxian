@@ -27,7 +27,7 @@ def generate_manifest():
         "docs", "Conxian", "conxian-business", "Nakamoto-Guardian",
         "Sovereign-Ops-Orchestrator", "Sovereign-Strategy-Nexus", "Fiscal-Vault-Oracle",
         "conxian-gateway", "conxian-nexus", "conxian-ui", "conxius-platform",
-        "conxius-wallet", "lib-conclave-sdk", "lib-conxian-core", "stacksorbit"
+        "conxius-wallet", "lib-conclave-sdk", "lib-conxian-core", "conxius_orbit"
     ]
 
     for target in targets:

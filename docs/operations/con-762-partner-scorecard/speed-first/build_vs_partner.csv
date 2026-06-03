@@ -1,5 +1,5 @@
 capability,decision,why
-Custody and key management,partner,Institutional-grade controls and certifications are faster to obtain via established custody providers.
+Custody and key management,partner,Sovereign-grade controls and certifications are faster to obtain via established custody providers.
 Compliance screening and transaction monitoring,partner,Regulatory coverage depth and rule updates are strongest with specialized compliance vendors.
 Fiat/USDC payment settlement rails,partner,"Network access, liquidity reach, and operational readiness favor partnering for initial launch."
 Bitcoin node/RPC infrastructure,hybrid,"Use partner infrastructure for speed now, while preserving a path to self-managed infra where required."

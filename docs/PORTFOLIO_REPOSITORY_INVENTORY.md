@@ -26,7 +26,7 @@ This is the canonical map of all repositories in the Conxian-Labs ecosystem, cla
 | `conxius-wallet` | User Surface | Sovereign Multi-chain Wallet | @botshelomokoka | P0 |
 | `lib-conxian-core` | Shared Runtime | Shared Cryptographic & State Logic | @botshelomokoka | P0 |
 | `lib-conclave-sdk` | Shared Runtime | TEE & Enclave SDK | @botshelomokoka | P0 |
-| `stacksorbit` | Shared Runtime | DevOps & Deployment Tooling | @botshelomokoka | P0 |
+| `conxius_orbit` | Shared Runtime | DevOps & Deployment Tooling | @botshelomokoka | P0 |
 | `conxian-ui` | User Surface | Operating Dashboard (Next.js) | @botshelomokoka | P1 |
 | `conxius-platform` | Shared Runtime | Developer Platform & Orchestration | @conxian/core-devs | P1 |
 | `conxian-labs-site` | User Surface | Public Communication Surface | @botshelomokoka | P2 |

@@ -66,7 +66,7 @@ Current baseline for key ecosystem repos:
 | Repository | Category | Notes |
 | --- | --- | --- |
 | `Conxian/` | `primary strategic` | Protocol authority and on-chain interfaces. |
-| `conxian-gateway/` | `primary strategic` | Integration gateway and institutional middleware. |
+| `conxian-gateway/` | `primary strategic` | Integration gateway and sovereign middleware. |
 | `conxian-nexus/` | `primary strategic` | Authoritative state and telemetry node. |
 | `conxius-wallet/` | `primary strategic` | Wallet/signing surface for end users and builders. |
 | `lib-conxian-core/` | `supporting` | Shared primitives and cross-repo models. |

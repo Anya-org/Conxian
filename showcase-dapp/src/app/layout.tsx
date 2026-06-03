@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Conclave SDK | Sovereign Identity",
+  title: "Conxius Enclave SDK | Sovereign Identity",
   description: "Hardware-anchored Nakamoto finality for the Bitcoin ecosystem",
 };
 

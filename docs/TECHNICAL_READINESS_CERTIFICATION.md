@@ -234,7 +234,7 @@ All contracts across both projects have been migrated to **Clarity 4**:
 
 ---
 
-## 4. Conxian Gateway — Institutional Middleware
+## 4. Conxian Gateway — Sovereign Middleware
 
 ### 4.1 Project Structure
 
@@ -333,7 +333,7 @@ All contracts across both projects have been migrated to **Clarity 4**:
 | Phase 7 Sovereign Design | 🔄 IN PROGRESS | NixOS control plane migration |
 | WHITEPAPER | ✅ COMPLETE | [WHITEPAPER.md](file:///c:/Users/bmokoka/Conxian-Labs/conxian-business/conxius-platform/WHITEPAPER.md) |
 
-### 7.2 Conxius Orbit
+### 7.2 conxius_orbit
 
 | Feature | Status |
 |:---|---|

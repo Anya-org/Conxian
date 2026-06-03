@@ -22,5 +22,5 @@ The entire Conxian workspace consists of multiple repositories and submodules ac
 
 ## Impact
 
-- All repositories within the `conxian-business` workspace and its submodules (`Conxian`, `conxian-gateway`, `conxian-labs-site`, `conxian-nexus`, `conxian-ui`, `conxius-platform`, `conxius-wallet`, `lib-conclave-sdk`, `lib-conxian-core`, `stacksorbit`).
+- All repositories within the `conxian-business` workspace and its submodules (`Conxian`, `conxian-gateway`, `conxian-labs-site`, `conxian-nexus`, `conxian-ui`, `conxius-platform`, `conxius-wallet`, `lib-conclave-sdk`, `lib-conxian-core`, `conxius_orbit`).
 - No code will be mutated directly in this proposal, but the review might yield subsequent tasks and fixes.

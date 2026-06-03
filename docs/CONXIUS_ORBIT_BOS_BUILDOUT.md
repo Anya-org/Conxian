@@ -1,10 +1,10 @@
-# stacksorbit — BOS business buildout (CON-155)
+# conxius_orbit — BOS business buildout (CON-155)
 
-This document defines the BOS-level business role, governance controls, and documentation separation guidance for `stacksorbit`.
+This document defines the BOS-level business role, governance controls, and documentation separation guidance for `conxius_orbit`.
 
 ## 1) Business-unit role (DevOps Tooling)
 
-Per the repo portfolio, `stacksorbit` is a **tooling** repo:
+Per the repo portfolio, `conxius_orbit` is a **tooling** repo:
 
 - **Portfolio classification**: `Tooling — Stacks deployment and monitoring CLI/tooling.`
 - **Business Purpose (External)**: Provide developers and operators with reliable, sovereign tools for deploying and monitoring Stacks smart contracts and network health.

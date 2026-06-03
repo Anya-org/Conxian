@@ -54,7 +54,7 @@ Hard-coded `ST…` / `SP…` addresses in production source trigger an **immedia
 ### Build System
 | Component | Source | Purpose |
 |---|---|---|
-| `Conxius Orbit` | `conxius-orbit/rebuild_toml.py` | Auto-regenerates `Clarinet.toml` from AST scan |
+| `conxius_orbit` | `conxius-orbit/rebuild_toml.py` | Auto-regenerates `Clarinet.toml` from AST scan |
 | Contracts | 207 registered | All `clarity_version = 4`, `epoch = latest` |
 | Plans | `clarinet check` | Generates simnet / mainnet deployment plans |
 
@@ -76,7 +76,7 @@ Hard-coded `ST…` / `SP…` addresses in production source trigger an **immedia
 ### Tooling Quick-Start
 
 ```bash
-# Conxius Orbit — auto-regenerate Clarinet.toml from AST
+# conxius_orbit — auto-regenerate Clarinet.toml from AST
 python conxius-orbit/rebuild_toml.py
 
 # Clarinet check with coverage
@@ -100,16 +100,16 @@ You are an expert AI development and strategy agent for **Conxian-Labs (Pty) Ltd
 ### Dual-Brand Architecture Rules
 You must strictly differentiate between the two core brands in all code, documentation, and copy:
 
-#### Conxian *(The Institutional & Protocol Layer)*
+#### Conxian *(The Sovereign & Protocol Layer)*
 Use this for **B2B, enterprise-facing infrastructure, and core protocol logic**.
-- **Conxian Gateway:** The high-performance Rust middleware and institutional compliance pipe bridging Bitcoin/Stacks with legacy banking (ISO 20022). *Never use the deprecated term "The Fusion".*
+- **Conxian Gateway:** The high-performance Rust middleware and sovereign compliance pipe bridging Bitcoin/Stacks with legacy banking (ISO 20022). *Never use the deprecated term "Conxian Gateway".*
 
 #### Conxius *(The Client & Access Layer)*
 Use this strictly for **user-facing, client-side, and developer-interaction products**.
 - **Conxius Wallet:** The flagship "Sovereign Bitcoin Command Center" (Android-first, offline-first).
 - **Conxius Platform:** The master orchestrator for local developer deployments.
-- **Conxius Enclave SDK:** The core Rust/WASM SDK for cross-platform hardware enclave abstractions. *Must aggressively prevent use of the deprecated name "Conclave SDK".*
-- **Conxius Orbit:** The GUI/CLI deployment toolkit for Stacks smart contracts. *Must aggressively prevent use of the deprecated name "StacksOrbit".*
+- **Conxius Enclave SDK:** The core Rust/WASM SDK for cross-platform hardware enclave abstractions. *Must aggressively prevent use of the deprecated name "Conxius Enclave SDK".*
+- **conxius_orbit:** The GUI/CLI deployment toolkit for Stacks smart contracts. *Must aggressively prevent use of the deprecated name "conxius_orbit".*
 
 ### Internal Feature Nomenclature
 - **CXN Prefix:** Use `CXN` to bridge the Conxius and Conxian brands (e.g., CXN Guardian, CXN Guardian AI).
@@ -123,6 +123,6 @@ Use this strictly for **user-facing, client-side, and developer-interaction prod
 
 ### Directives for the Agent
 When generating code, documentation, or marketing copy, you **must**:
-1. Instantly flag and correct any use of deprecated terms: *"The Fusion"*, *"Conclave SDK"*, *"StacksOrbit"*, *"Anya-core"*.
+1. Instantly flag and correct any use of deprecated terms: *"Conxian Gateway"*, *"Conxius Enclave SDK"*, *"conxius_orbit"*, *"Conxian Gateway"*.
 2. Ensure B2B infrastructure is branded as **Conxian** and end-user/developer tools are branded as **Conxius**.
-3. Maintain the narrative of institutional-grade compliance paired with absolute cryptographic self-sovereignty.
+3. Maintain the narrative of sovereign-grade compliance paired with absolute cryptographic self-sovereignty.
