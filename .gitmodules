@@ -18,12 +18,13 @@
 	path = Conxian
 	url = https://github.com/Conxian/Conxian
 	branch = main
+	# update=none: Conxian repo has its own broken submodule mapping (path 'ui' not in its .gitmodules).
+	# Tracked as a pinned dependency until that repo's submodule config is repaired.
 	update = none
 [submodule "conxius-platform"]
 	path = conxius-platform
 	url = https://github.com/Conxian/conxius-platform
 	branch = main
-	update = none
 [submodule "conxius-orbit"]
 	path = conxius-orbit
 	url = https://github.com/Conxian/conxius-orbit
