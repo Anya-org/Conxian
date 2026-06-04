@@ -130,4 +130,6 @@ tmp/
 # Submodules and workspace-specific ignores (already handled by their own .gitignores)
 
 .gemini/
+.idx/
+.trae/
 gha-creds-*.json
