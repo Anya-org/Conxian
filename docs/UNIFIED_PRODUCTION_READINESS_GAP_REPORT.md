@@ -411,10 +411,10 @@ Scoring: 0=Not started, 1=Early, 2=Functional, 3=Production
 
 | Issue | Roadmap Phase | Status |
 |---|---|---|
-| #718 (Naming standard) | Sprint 3 | Can be resolved in 1-2h |
-| #715 (12-month roadmap) | Already exists in `docs/architecture/ROADMAP_12_MONTH_CONTROL_PLANE.md` | Needs closure |
-| #714 (Control plane modules) | Sprint 2-3 | Blocked by GAP-004 |
-| #713 (Admin API contract) | Sprint 3 | Needs assignee |
+| #718 (Naming standard) | Sprint 3 | Needs naming standard doc — no doc exists yet |
+| #715 (12-month roadmap) | Already exists in `docs/architecture/ROADMAP_12_MONTH_CONTROL_PLANE.md` | **CLOSED** |
+| #714 (Control plane modules) | Sprint 3 | Unblocked (GAP-004 closed Sprint 2) |
+| #713 (Admin API contract) | Sprint 3 | Needs assignee — contract docs exist, recommend review for closure |
 | #710 (Control plane boundaries) | Sprint 1 | Unblocked (GAP-004 closed in Sprint 2). Ready for closure. |
 
 ### Team Structure Suggestion
