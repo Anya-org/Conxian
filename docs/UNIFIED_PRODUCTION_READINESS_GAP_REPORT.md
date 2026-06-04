@@ -366,14 +366,15 @@ Scoring: 0=Not started, 1=Early, 2=Functional, 3=Production
 | 3-5 | Fix hardcoded dependencies (GAP-012) | Core team | None | **CLOSED** | -- |
 | 5 | Close mock stubs (GAP-014) | Core team | GAP-012 | **CLOSED** | -- |
 
-### Sprint 3: Coverage Expansion (Weeks 3-4)
+### Sprint 3: Coverage Expansion (Weeks 3-4) [LAUNCHED 2026-06-04]
 
-| Task | Owner | Dependencies |
-|---|---|---|
-| Bitcoin coverage expansion (GAP-008) | Nexus team | None |
-| Lightning coverage expansion (GAP-009) | Nexus team | None |
-| Control plane admin API contracts (GAP-013) | Platform team | None (GAP-004 closed) |
-| Cross-link portfolio docs (GAP-020) | Business team | None |
+| Task | Owner | Dependencies | GitHub Issue |
+|---|---|---|---|
+| Bitcoin coverage expansion (GAP-008) | Nexus team | None | [#722](https://github.com/Conxian/conxian-business/issues/722) |
+| Lightning coverage expansion (GAP-009) | Nexus team | None | [#723](https://github.com/Conxian/conxian-business/issues/723) |
+| Control plane admin API contracts (GAP-013) | Platform team | None (GAP-004 closed) | [#713](https://github.com/Conxian/conxian-business/issues/713), [#714](https://github.com/Conxian/conxian-business/issues/714) |
+| Cross-link portfolio docs (GAP-020) | Business team | None | [#724](https://github.com/Conxian/conxian-business/issues/724) |
+| Naming standard (#718) | Business team | None | [#718](https://github.com/Conxian/conxian-business/issues/718) |
 
 ### Sprint 4: Developer Experience (Weeks 5-6)
 
@@ -401,21 +402,25 @@ Scoring: 0=Not started, 1=Early, 2=Functional, 3=Production
 
 | Issue | Title | Assignee | Linked GAP | Priority |
 |---|---|---|---|---|
+| #722 | Expand Bitcoin test coverage (80% -> 95%+) | botshelomokoka | GAP-008 | P1 |
+| #723 | Expand Lightning test coverage (67% -> 90%+) | botshelomokoka | GAP-009 | P1 |
 | #718 | Create standard naming convention | botshelomokoka | — | P2 |
-| #715 | 12-month control plane roadmap | botshelomokoka | GAP-013 | P1 |
 | #714 | Implement first control plane modules | botshelomokoka | GAP-013 | P1 |
 | #713 | Design control plane admin API contract | — | GAP-013 | P1 |
-| #710 | Define BOS control plane boundaries | botshelomokoka | GAP-004 | P0 |
+| #724 | Cross-link older portfolio docs | botshelomokoka | GAP-020 | P2 |
 
 ### Issue → Roadmap Alignment
 
 | Issue | Roadmap Phase | Status |
 |---|---|---|
+| #722 (Bitcoin coverage GAP-008) | Sprint 3 | P1 — expand 80% -> 95%+ conxian-nexus |
+| #723 (Lightning coverage GAP-009) | Sprint 3 | P1 — expand 67% -> 90%+ conxian-nexus |
 | #718 (Naming standard) | Sprint 3 | Needs naming standard doc — no doc exists yet |
-| #715 (12-month roadmap) | Already exists in `docs/architecture/ROADMAP_12_MONTH_CONTROL_PLANE.md` | **CLOSED** |
 | #714 (Control plane modules) | Sprint 3 | Unblocked (GAP-004 closed Sprint 2) |
 | #713 (Admin API contract) | Sprint 3 | Needs assignee — contract docs exist, recommend review for closure |
-| #710 (Control plane boundaries) | Sprint 1 | Unblocked (GAP-004 closed in Sprint 2). Ready for closure. |
+| #724 (Cross-link docs GAP-020) | Sprint 3 | P2 — cross-link portfolio docs from sub-repos |
+| #715 (12-month roadmap) | Complete | **CLOSED** — doc exists |
+| #710 (Control plane boundaries) | Complete | **CLOSED** — evidence in architecture docs |
 
 ### Team Structure Suggestion
 
@@ -461,21 +466,21 @@ Scoring: 0=Not started, 1=Early, 2=Functional, 3=Production
 
 1. **Sprint 1 completed** — All 7 P0/P1 gaps closed (2026-06-03)
 2. **Sprint 2 completed** — All 5 gaps closed (GAP-011, GAP-010, GAP-004, GAP-012, GAP-014)
-3. **Assign issue #713** — Admin API contract needs an owner
-4. **Close issue #718** — Naming standard can be resolved quickly
+3. **Sprint 3 launched (2026-06-04)** — 6 issues created: #722 (GAP-008), #723 (GAP-009), #724 (GAP-020), plus existing #713, #714, #718
+4. **Sync Linear KB** — Sprint 3 kickoff recorded in knowledge base
 
 ### This Week
 
-1. **Sprint 2 completed** — All 5 gaps closed. Proceed to Sprint 3 prep.
-2. **Push fix branch to all subrepos** — Ensure nested `.gitmodules` are correct
-3. **Set up Linear sync** — Verify Linear MCP for issue alignment
-4. **Begin Sprint 3 prep**: GAP-008 (Bitcoin coverage), GAP-009 (Lightning coverage)
+1. **Sprint 2 completed** — All 5 gaps closed.
+2. **Sprint 3 in progress** — GAP-008 (#722), GAP-009 (#723), GAP-013 (#713/#714), GAP-020 (#724), #718
+3. **Push fix branch to all subrepos** — Ensure nested `.gitmodules` are correct
+4. **Begin work**: Bitcoin coverage (#722), Lightning coverage (#723)
 
 ### This Month
 
 1. **P0 gaps** — DONE (Sprint 1: 3/3 closed)
-2. **P1 gaps** — 4/7 closed (Sprint 2: GAP-010, GAP-011, GAP-012, GAP-014); remaining 3 (GAP-008, GAP-009, GAP-013) in Sprint 3
-3. **Sprint 2 completed** — All 5 gaps closed (GAP-011, GAP-010, GAP-004, GAP-012, GAP-014)
+2. **P1 gaps** — 4/7 closed (Sprint 2: GAP-010, GAP-011, GAP-012, GAP-014); 3 in Sprint 3 (GAP-008 #722, GAP-009 #723, GAP-013 #713/#714)
+3. **Sprint 3 launched (2026-06-04)** — Bitcoin/Lightning coverage, control plane APIs, naming standard, docs cross-linking
 4. **Engage GTM team**: Start wallet commercialization, compliance filings
 
 ### Q3 2026
