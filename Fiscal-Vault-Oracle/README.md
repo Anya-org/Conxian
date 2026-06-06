@@ -15,6 +15,12 @@ This repository is public. Detailed treasury operations, vendor integrations, an
 
 active — Public-safe treasury policy constraints and interfaces live here; detailed treasury operations and vendor terms are maintained in the sovereign coordination layer.
 
+## Canonical documentation
+
+- [Repo portfolio](../docs/REPO_PORTFOLIO.md)
+- [Portfolio business-unit map](../docs/PORTFOLIO_BUSINESS_UNIT_MAP.md)
+- [Documentation alignment index](../docs/DOCUMENTATION_ALIGNMENT_INDEX.md)
+
 ## Key Components
 
 - **[BOS integration map](./BOS_INTEGRATION_MAP.md)**

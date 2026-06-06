@@ -15,6 +15,32 @@ Notes:
 - Treat this repo as public for boundary purposes. (This GitHub repository is private as of April 8, 2026.) "Internal-only" material should not be stored here; when we preserve link targets we use public-safe ZSE stubs (see sovereign coordination layer issue CON-256).
 - OpenSpec change sets typically have 4 layers: `proposal.md` (intent), `design.md` (architecture), `specs/*/spec.md` (requirements), `tasks.md` (execution).
 
+## GAP-020 cross-link alignment (issue #724)
+
+### Canonical documentation set
+
+- `docs/REPO_PORTFOLIO.md`
+- `docs/PORTFOLIO_BUSINESS_UNIT_MAP.md`
+- `docs/DOCUMENTATION_ALIGNMENT_INDEX.md`
+
+### README canonical-link coverage
+
+| README | Coverage | Notes |
+| --- | --- | --- |
+| `conxian-business/README.md` | ✅ | Includes a `Canonical documentation` block with links to all GAP-020 canonical docs. |
+| `Fiscal-Vault-Oracle/README.md` | ✅ | Includes a `Canonical documentation` block with links to all GAP-020 canonical docs. |
+| `Nakamoto-Guardian/README.md` | ✅ | Includes a `Canonical documentation` block with links to all GAP-020 canonical docs. |
+| `Sovereign-Ops-Orchestrator/README.md` | ✅ | Includes a `Canonical documentation` block with links to all GAP-020 canonical docs. |
+| `Sovereign-Strategy-Nexus/README.md` | ✅ | Includes a `Canonical documentation` block with links to all GAP-020 canonical docs. |
+| `cxn-grid-oracle/README.md` | ✅ | Includes a `Canonical documentation` block with links to all GAP-020 canonical docs. |
+| `showcase-dapp/README.md` | ✅ | Includes a `Canonical documentation` block with links to all GAP-020 canonical docs. |
+
+### Archival candidates
+
+- `docs/LINEAR_TASK_INVENTORY_2026-05-29.md` — date-stamped task snapshot; planning source of truth now lives in active work systems and canonical policy docs.
+- `docs/RESEARCH_FINDINGS_2026-05-29.md` — point-in-time findings snapshot superseded by maintained canonical docs and OpenSpec changes.
+- `docs/BUSINESS_ANALYSIS_2026-05-29.md` — dated analysis snapshot that risks drift against current canonical portfolio/control docs.
+
 ## 1) Repo navigation (start here)
 
 | Document | Role | Visibility | What it’s for |

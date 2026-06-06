@@ -13,6 +13,16 @@ For the portfolio-level business-unit/operating-function mapping (and separation
 - Supporting repos that are not pinned as submodule gitlinks may be listed here for context, but they are not governed by this BOS repo’s hygiene invariants unless and until they are added as submodules and mapped in `docs/PORTFOLIO_BUSINESS_UNIT_MAP.md`.
 - This file is an explanatory trust-surface view; see the “Source-of-truth rule” section in `docs/PORTFOLIO_BUSINESS_UNIT_MAP.md` for the canonical invariants and validation rules.
 
+## Required README canonical links
+
+Portfolio-entry/sub-repo READMEs should include a `Canonical documentation` block that links to:
+
+- `../docs/REPO_PORTFOLIO.md`
+- `../docs/PORTFOLIO_BUSINESS_UNIT_MAP.md`
+- `../docs/DOCUMENTATION_ALIGNMENT_INDEX.md`
+
+If a README lives at a different depth, keep the same targets and adjust the relative path accordingly.
+
 ## Standard role line (GitHub description + README top section)
 
 Use the same single **role line** in both the GitHub repo description (plain text; keep it concise—aim for ~160 chars) and the README “top section” (right below the opening paragraph). You may add a separate README-only line below it (for example, a link to this repo portfolio). The 1-line purposes should match the descriptions in the [Ecosystem repos](#ecosystem-repos) section.

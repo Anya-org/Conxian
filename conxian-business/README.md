@@ -18,6 +18,12 @@ This repository is private (as of April 8, 2026). Internal BOS state-machine con
 
 Stable — This module documents BOS-level service-loop expectations and public-safe operational boundaries; detailed state-machine configuration and compliance reports live in the sovereign coordination layer.
 
+## Canonical documentation
+
+- [Repo portfolio](../docs/REPO_PORTFOLIO.md)
+- [Portfolio business-unit map](../docs/PORTFOLIO_BUSINESS_UNIT_MAP.md)
+- [Documentation alignment index](../docs/DOCUMENTATION_ALIGNMENT_INDEX.md)
+
 ## Key Components & Platform Standards
 
 - **[Unified Theory of Sovereign Enterprise](../docs/CONXIAN_UNIFIED_THEORY_v2.md)**: Mathematical framework for minimizing founder tax ($O_C$) while maximizing autonomy ($A_S$).

@@ -15,6 +15,12 @@ This repository is public. Detailed strategy planning and internal operating mat
 
 active — Public-facing strategy coordination artifacts live here; detailed internal planning and operating material is maintained in the sovereign coordination layer.
 
+## Canonical documentation
+
+- [Repo portfolio](../docs/REPO_PORTFOLIO.md)
+- [Portfolio business-unit map](../docs/PORTFOLIO_BUSINESS_UNIT_MAP.md)
+- [Documentation alignment index](../docs/DOCUMENTATION_ALIGNMENT_INDEX.md)
+
 ## Key Components
 
 - **[Strategy tracking](./REALTIME_M&A_VELOCITY.md)**

@@ -10,6 +10,12 @@ A lightweight Next.js app used to demonstrate Conxian UI patterns and end-to-end
 
 alpha — This app is intended for demos and experimentation rather than production deployment.
 
+## Canonical documentation
+
+- [Repo portfolio](../docs/REPO_PORTFOLIO.md)
+- [Portfolio business-unit map](../docs/PORTFOLIO_BUSINESS_UNIT_MAP.md)
+- [Documentation alignment index](../docs/DOCUMENTATION_ALIGNMENT_INDEX.md)
+
 ## Ownership
 
 Ownership and review requirements are defined in [`CODEOWNERS`](../CODEOWNERS).

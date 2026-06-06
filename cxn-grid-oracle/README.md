@@ -13,6 +13,12 @@ The cxn-grid-oracle module handles agnostic demand-response routing and energy o
 
 alpha — This module currently provides schema documentation and governance scaffolding; production integrations should treat it as non-stable.
 
+## Canonical documentation
+
+- [Repo portfolio](../docs/REPO_PORTFOLIO.md)
+- [Portfolio business-unit map](../docs/PORTFOLIO_BUSINESS_UNIT_MAP.md)
+- [Documentation alignment index](../docs/DOCUMENTATION_ALIGNMENT_INDEX.md)
+
 ## Universal Oracle Schema
 
 ### JSON Input

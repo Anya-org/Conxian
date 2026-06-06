@@ -16,6 +16,12 @@ This repository is public. Detailed operational enforcement rules and internal c
 
 active — Public-safe enforcement and audit artifacts live here; detailed enforcement rules and compliance reporting are maintained in the sovereign coordination layer.
 
+## Canonical documentation
+
+- [Repo portfolio](../docs/REPO_PORTFOLIO.md)
+- [Portfolio business-unit map](../docs/PORTFOLIO_BUSINESS_UNIT_MAP.md)
+- [Documentation alignment index](../docs/DOCUMENTATION_ALIGNMENT_INDEX.md)
+
 ## Key Components
 
 - **[Anti-Fragility Loop](./ANTI_FRAGILITY_LOOP.md)**: Logic for collision detection and generic identifier flagging.

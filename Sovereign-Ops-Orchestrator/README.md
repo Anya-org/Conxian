@@ -15,6 +15,12 @@ This repository is public. Detailed wiring, operational dashboards, and executio
 
 active — Public-safe orchestration and wiring artifacts live here; detailed runbooks and dashboards are maintained in the sovereign coordination layer.
 
+## Canonical documentation
+
+- [Repo portfolio](../docs/REPO_PORTFOLIO.md)
+- [Portfolio business-unit map](../docs/PORTFOLIO_BUSINESS_UNIT_MAP.md)
+- [Documentation alignment index](../docs/DOCUMENTATION_ALIGNMENT_INDEX.md)
+
 ## Key Components
 
 - **[Deployment efficiency](./DEPLOYMENT_EFFICIENCY.md)**
