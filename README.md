@@ -9,6 +9,12 @@ Supporting — Governance + OpenSpec + submodule wiring for the Conxian ecosyste
 
 See the [repo portfolio](docs/REPO_PORTFOLIO.md#ecosystem-repos) for the flagship/supporting repo map and `docs/BOS_BUSINESS_BUILDOUT.md` for the business-end operating model and public/internal split.
 
+## Canonical documentation
+
+- [`docs/REPO_PORTFOLIO.md`](./docs/REPO_PORTFOLIO.md)
+- [`docs/PORTFOLIO_BUSINESS_UNIT_MAP.md`](./docs/PORTFOLIO_BUSINESS_UNIT_MAP.md)
+- [`docs/DOCUMENTATION_ALIGNMENT_INDEX.md`](./docs/DOCUMENTATION_ALIGNMENT_INDEX.md)
+
 ## Purpose
 
 Define and version Conxian's Business Operations System (BOS) as an auditable, programmatic state machine (OpenSpec, governance, and operational artifacts).
