@@ -34,6 +34,7 @@
 * [Protocol adapter maturity lanes (CON-715)](docs/architecture/PROTOCOL_ADAPTER_MATURITY_LANES.md)
 * [BitVM2 & sBTC bridge target architecture (CON-464)](docs/architecture/BITVM2_SBTC_BRIDGE_TARGET_ARCHITECTURE.md)
 * [Compatibility matrix and acceptance gate checklist (CON-441)](docs/COMPATIBILITY_MATRIX_AND_ACCEPTANCE_GATE_CHECKLIST.md)
+* [Lightning coverage tracker (CON-780, GAP-009)](docs/operations/CON-780_LIGHTNING_COVERAGE_TRACKER.md)
 * [Phase 6 production rollout runbook (CON-681)](docs/operations/CON-681_PHASE6_PRODUCTION_ROLLOUT_RUNBOOK.md)
 * [Phase 6 rollback drill simulation (CON-681)](docs/operations/CON-681_PHASE6_ROLLBACK_DRILL_SIMULATION.md)
 * [Approved metric spec (CON-682)](docs/operations/CON-682_APPROVED_METRIC_SPEC.md)
