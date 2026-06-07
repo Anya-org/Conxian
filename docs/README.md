@@ -12,6 +12,7 @@ This directory contains the public-safe documentation entrypoints for `conxian-b
 - [`GITHUB_TECHNICAL_RESEARCH_AND_REMEDIATION_PLAN.md`](./GITHUB_TECHNICAL_RESEARCH_AND_REMEDIATION_PLAN.md) — current GitHub research findings, remediation plan, and execution order.
 - [`CLAIM_EVIDENCE_MATRIX.md`](./CLAIM_EVIDENCE_MATRIX.md) — claim-vs-evidence decision surface for public messaging and readiness framing.
 - [`ENVIRONMENT_VERIFICATION_CHECKLIST.md`](./ENVIRONMENT_VERIFICATION_CHECKLIST.md) — items requiring runtime, device, or deployment verification outside GitHub.
+- [`NEXUS_GATEWAY_UNIVERSAL_CHAIN_ARCHITECTURE.md`](./NEXUS_GATEWAY_UNIVERSAL_CHAIN_ARCHITECTURE.md) — aligned architecture for multichain-universal Nexus and Gateway evolution.
 
 ## Governance and release workflow
 
