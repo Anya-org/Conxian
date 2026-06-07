@@ -9,6 +9,9 @@ This directory contains the public-safe documentation entrypoints for `conxian-b
 - [`PORTFOLIO_BUSINESS_UNIT_MAP.md`](./PORTFOLIO_BUSINESS_UNIT_MAP.md) — canonical portfolio business-unit mapping and separation-of-concerns rules.
 - [`DOCUMENTATION_ALIGNMENT_INDEX.md`](./DOCUMENTATION_ALIGNMENT_INDEX.md) — documentation index and canonical/supporting classification.
 - [`BOS_BUSINESS_BUILDOUT.md`](./BOS_BUSINESS_BUILDOUT.md) — repo purpose, governance model, and public/internal split.
+- [`GITHUB_TECHNICAL_RESEARCH_AND_REMEDIATION_PLAN.md`](./GITHUB_TECHNICAL_RESEARCH_AND_REMEDIATION_PLAN.md) — current GitHub research findings, remediation plan, and execution order.
+- [`CLAIM_EVIDENCE_MATRIX.md`](./CLAIM_EVIDENCE_MATRIX.md) — claim-vs-evidence decision surface for public messaging and readiness framing.
+- [`ENVIRONMENT_VERIFICATION_CHECKLIST.md`](./ENVIRONMENT_VERIFICATION_CHECKLIST.md) — items requiring runtime, device, or deployment verification outside GitHub.
 
 ## Governance and release workflow
 
