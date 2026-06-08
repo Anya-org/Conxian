@@ -10,4 +10,4 @@ This package is the future home for admin-facing clients that talk to trusted ru
 - `src/governance.ts` for governance workflow helpers
 
 ## Current behavior
-The workflow clients currently return accepted bootstrap responses and are intended to be replaced with real admin/runtime calls that implement the v1 contracts documented in `docs/architecture/CONTROL_PLANE_ADMIN_API_V1.md`.
+The workflow clients currently return accepted bootstrap responses and are intended to be replaced with real admin/runtime calls that implement the canonical v1 contract documented in `docs/architecture/CONTROL_PLANE_ADMIN_RUNTIME_API_CONTRACT.md`.

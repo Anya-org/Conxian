@@ -1,39 +1,9 @@
-# Nexus Admin Service Boundary v1
+# Nexus Admin Service Boundary v1 (Superseded)
 
-This document defines the expected ownership split between the BOS control plane and `conxian-nexus` for admin workflow integration.
+> **Superseded document:** This file is retained for historical links only.
+>
+> Use the canonical contract instead:
+> - [`CONTROL_PLANE_ADMIN_RUNTIME_API_CONTRACT.md`](./CONTROL_PLANE_ADMIN_RUNTIME_API_CONTRACT.md)
+> - [`ADR-005: Admin/runtime API contract canonicalization`](./adrs/ADR-005-admin-runtime-api-contract-canonicalization.md)
 
-## Control-plane responsibilities
-
-- present workflow state
-- collect operator intent
-- submit typed admin requests
-- display decision outcomes
-- display audit records
-
-## `conxian-nexus` responsibilities
-
-- validate admin requests
-- enforce policy and approval rules
-- emit durable audit events
-- coordinate downstream runtime actions
-- reject invalid or unauthorized actions
-
-## Required runtime guarantees
-
-- request validation happens server-side
-- authorization is re-checked server-side
-- audit events are durable
-- downstream execution is fail-closed
-
-## Near-term integration target
-
-The first concrete integration target is:
-- release approval request
-- release decision submission
-- governance decision submission
-
-## Non-goals for v1
-
-- direct runtime promotion from the UI
-- direct signing or secret handling in the control plane
-- embedding banking or settlement execution in `conxian-business`
+The boundary ownership and runtime guarantee guidance previously maintained here now lives in the canonical admin/runtime contract.

@@ -4,4 +4,4 @@ This directory contains admin and control-plane contract surfaces for the Conxia
 
 ## Current documents
 
-- [`../ADMIN_RUNTIME_API_BOUNDARY.md`](../ADMIN_RUNTIME_API_BOUNDARY.md) — initial control-plane to Nexus admin/runtime boundary.
+- [`../architecture/CONTROL_PLANE_ADMIN_RUNTIME_API_CONTRACT.md`](../architecture/CONTROL_PLANE_ADMIN_RUNTIME_API_CONTRACT.md) — canonical control-plane ↔ `conxian-nexus` admin/runtime API contract.

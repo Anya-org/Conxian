@@ -1,93 +1,110 @@
-# Control-Plane Admin/Runtime API Contract
+# Control-Plane ↔ Conxian-Nexus Admin Runtime API Contract
 
-This document defines the initial boundary between the BOS control plane in `conxian-business` and trusted runtime services, primarily in `conxian-nexus`.
+> **Canonical contract (CON-772):** This file is the single source of truth for the control-plane (`conxian-business`) ↔ runtime (`conxian-nexus`) admin API contract.
+>
+> Superseded drafts preserved as pointers:
+> - `docs/ADMIN_RUNTIME_API_BOUNDARY.md`
+> - `docs/architecture/CONTROL_PLANE_ADMIN_API_V1.md`
+> - `docs/architecture/NEXUS_ADMIN_SERVICE_BOUNDARY_V1.md`
 
-## Boundary rule
+## Scope
 
-The control plane orchestrates, reviews, approves, and observes.
+This contract defines authenticated admin/operator API interactions between `conxian-business` and `conxian-nexus`.
 
-The runtime validates, executes, signs, persists, and integrates.
+In scope:
+- release governance workflows
+- policy/governance decisions
+- audit and evidence visibility
+- runtime readiness and safety signals
+- environment registry metadata used for control-plane decisions
 
-## Design principles
+Out of scope:
+- public integration APIs (owned by `conxian-gateway`)
+- signer/key custody and secret material handling
+- transaction building/submission execution logic
 
-- Fail closed for sensitive operations
-- Keep privileged execution out of the control-plane app
-- Use typed contracts for admin-facing operations
-- Treat auditability as a first-class concern
-- Keep public/runtime APIs distinct from internal admin APIs
+## Boundary and ownership
 
-## Admin-facing capability groups
+`conxian-business` owns orchestration UX, operator intent capture, and workflow presentation.
 
-### 1. Release governance
-Used by the control plane to manage release readiness and approvals.
+`conxian-nexus` owns validation, policy enforcement, runtime execution state, and durable audit/event evidence.
 
-Candidate endpoints:
-- `GET /admin/releases`
-- `GET /admin/releases/:id`
-- `POST /admin/releases/:id/request-approval`
-- `POST /admin/releases/:id/approve`
-- `POST /admin/releases/:id/reject`
-- `POST /admin/releases/:id/promote`
+Implementation rules:
+- the control plane must never bypass runtime authorization/policy checks
+- runtime validation and authorization must always execute server-side in `conxian-nexus`
+- sensitive runtime decisions must be represented as explicit API outcomes, never inferred by the control plane
 
-### 2. Audit visibility
-Used by the control plane to inspect operational evidence and historical actions.
+## v1 endpoint surface (canonical)
 
-Candidate endpoints:
-- `GET /admin/audit-events`
-- `GET /admin/audit-events/:id`
-- `GET /admin/audit-events/stream`
+All new admin/runtime routes are versioned under `/admin/v1`.
 
-### 3. Policy approvals
-Used by the control plane to review and approve governance/policy actions before runtime execution.
+### Release governance
+- `GET /admin/v1/releases`
+- `POST /admin/v1/releases/request-approval`
+- `POST /admin/v1/releases/decision`
 
-Candidate endpoints:
-- `GET /admin/governance-actions`
-- `GET /admin/governance-actions/:id`
-- `POST /admin/governance-actions/:id/approve`
-- `POST /admin/governance-actions/:id/reject`
-- `POST /admin/governance-actions/:id/request-changes`
+### Policy approvals
+- `GET /admin/v1/governance-actions`
+- `POST /admin/v1/governance/decision`
 
-### 4. Environment registry
-Used by the control plane to view environment metadata and promotion state.
+### Audit visibility
+- `GET /admin/v1/audit-events`
 
-Candidate endpoints:
-- `GET /admin/environments`
-- `GET /admin/environments/:id`
-- `POST /admin/environments/:id/verify`
-- `GET /admin/promotions`
+### Environment registry
+- `GET /admin/v1/environments`
 
-## Operations that must remain outside the control plane
+### Runtime readiness and evidence
+- `GET /admin/v1/runtime/health`
+- `GET /admin/v1/runtime/readiness`
+- `GET /admin/v1/chains`
+- `GET /admin/v1/chains/{chain}/status`
+- `GET /admin/v1/attestations`
+- `GET /admin/v1/attestations/{id}`
+- `GET /admin/v1/drift`
+- `GET /admin/v1/safety-mode`
+- `POST /admin/v1/safety-mode/ack`
+- `GET /admin/v1/promotion-evidence/{release}`
 
-The following must not be implemented as direct privileged logic in `conxian-business`:
-- key custody
-- transaction signing
-- banking/ISO middleware execution
-- oracle execution
-- contract submission
-- external protocol settlement
-- direct secret material management
+Compatibility note:
+- legacy unversioned `/admin/...` drafts are non-canonical and must not be extended
+- if temporary aliases are required during migration, they must be explicitly marked deprecated and route to the same v1 handlers
 
-## Response shape guidance
+## Authentication and authorization baseline
 
-Admin endpoints should return typed payloads aligned with `packages/schemas`.
+- every endpoint requires authenticated actor context
+- mutating operations require role/policy checks enforced in `conxian-nexus`
+- write operations must emit durable audit events
+- high-risk actions should enforce dual-control approval when policy requires it
+- control-plane clients must treat authorization failures as terminal outcomes and surface them directly
 
-Minimum common fields:
-- `id`
-- `status`
-- `owner`
-- `updatedAt`
-- `auditRef` when applicable
+## Fail-closed baseline
 
-## Security expectations
+The contract defaults to safe denial/blocked states when evidence is incomplete:
 
-- All write operations require authenticated actor context
-- High-risk operations must emit audit events
-- Sensitive actions should support dual-control approval where needed
-- Missing runtime dependencies should return explicit failure states, not simulated success
+- unknown trust tier => non-promotable (`blocked`)
+- unavailable proof verification state => `degraded`
+- stale attestation freshness => promotion/critical admin workflows blocked
+- missing or inconsistent chain/runtime status => explicit `unknown`/`degraded` (never inferred healthy)
+- safety-mode acknowledgements (`POST /admin/v1/safety-mode/ack`) must not disable protections by themselves
+- no endpoint may return keys, signing material, or privileged bypass tokens
 
-## Next implementation steps
+## Schema alignment
 
-- formalize TypeScript types in `packages/schemas`
-- add client helpers in `packages/client-sdk`
-- wire route modules in `apps/control-plane`
-- map runtime ownership to `conxian-nexus` implementation tickets
+`packages/schemas` is the source package for shared TypeScript contracts.
+
+Alignment rules:
+- request/response interfaces for v1 admin routes must be defined/exported from `@conxian/schemas`
+- naming stays camelCase in TypeScript and JSON payloads
+- timestamps use ISO-8601 strings
+- workflow mutations should align with `WorkflowMutationResponse` + route-specific IDs (`requestId`, `decisionId`)
+- list/read responses should include stable identifiers and state fields (`id`, `status`, `owner`, `updatedAt`) where applicable
+- runtime evidence responses should include explicit classification fields (`status`, `trustTier`, `evidenceLevel`, `lastUpdated`)
+
+## Rollout guidance
+
+1. **Canonicalize docs first**: keep this file canonical and keep superseded docs as pointer stubs only.
+2. **Schema-first updates**: add/adjust v1 request/response interfaces in `packages/schemas` before route expansion.
+3. **Runtime implementation**: implement canonical `/admin/v1/...` handlers in `conxian-nexus` with server-side validation, policy enforcement, and durable audit emission.
+4. **Control-plane integration**: wire `packages/client-sdk` helpers and `apps/control-plane` routes to canonical v1 endpoints only.
+5. **Fail-closed verification**: add tests that assert degraded/blocked behavior for missing evidence, stale attestations, and unknown trust posture.
+6. **Alias retirement**: remove temporary non-v1 aliases once all consumers are migrated.
