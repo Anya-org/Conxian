@@ -100,3 +100,155 @@ export interface ReleaseDecisionResponse extends WorkflowMutationResponse {
 export interface GovernanceDecisionResponse extends WorkflowMutationResponse {
   decisionId: string;
 }
+
+export type AdminRuntimeStatus = "ready" | "degraded" | "blocked" | "unknown";
+export type AdminTrustTier = "nativeObservation" | "proofVerified" | "attesterVerified" | "observerOnly" | "unknown";
+export type AdminEvidenceLevel = "none" | "partial" | "strong" | "verified" | "unknown";
+export type AttestationStatus = "fresh" | "stale" | "expired" | "unknown";
+export type DriftStatus = "clear" | "warning" | "drifted" | "blocked" | "unknown";
+export type SafetyModeState = "enabled" | "disabled" | "unknown";
+
+export interface AdminApiError {
+  code: string;
+  message: string;
+  traceId?: string;
+  retryable: boolean;
+  details?: Record<string, unknown>;
+}
+
+export interface AdminApiErrorEnvelope {
+  error: AdminApiError;
+}
+
+export interface RuntimeHealthResponse {
+  status: AdminRuntimeStatus;
+  message: string;
+  trustTier: AdminTrustTier;
+  evidenceLevel: AdminEvidenceLevel;
+  lastUpdated: string;
+}
+
+export interface RuntimeReadinessResponse {
+  status: AdminRuntimeStatus;
+  ready: boolean;
+  blockers: string[];
+  trustTier: AdminTrustTier;
+  evidenceLevel: AdminEvidenceLevel;
+  lastUpdated: string;
+}
+
+export interface ChainRuntimeRecord {
+  id: string;
+  status: AdminRuntimeStatus;
+  trustTier: AdminTrustTier;
+  evidenceLevel: AdminEvidenceLevel;
+  lastUpdated: string;
+}
+
+export interface ChainsResponse {
+  chains: ChainRuntimeRecord[];
+}
+
+export interface ChainRuntimeStatus extends ChainRuntimeRecord {
+  chain: string;
+  driftStatus: DriftStatus;
+  latestBlockRef?: string;
+  finalityClass?: string;
+}
+
+export interface ChainStatusResponse {
+  chain: ChainRuntimeStatus;
+}
+
+export interface AttestationRecord {
+  id: string;
+  chain: string;
+  status: AttestationStatus;
+  trustTier: AdminTrustTier;
+  evidenceLevel: AdminEvidenceLevel;
+  lastUpdated: string;
+}
+
+export interface AttestationsResponse {
+  attestations: AttestationRecord[];
+}
+
+export interface AttestationDetail extends AttestationRecord {
+  proofType: string;
+  issuedAt: string;
+  expiresAt?: string;
+  subjectId?: string;
+}
+
+export interface AttestationResponse {
+  attestation: AttestationDetail;
+}
+
+export interface DriftRecord {
+  id: string;
+  status: DriftStatus;
+  summary: string;
+  trustTier: AdminTrustTier;
+  evidenceLevel: AdminEvidenceLevel;
+  lastUpdated: string;
+}
+
+export interface DriftResponse {
+  status: AdminRuntimeStatus;
+  drifts: DriftRecord[];
+  trustTier: AdminTrustTier;
+  evidenceLevel: AdminEvidenceLevel;
+  lastUpdated: string;
+}
+
+export interface SafetyModeResponse {
+  status: AdminRuntimeStatus;
+  mode: SafetyModeState;
+  reason: string;
+  trustTier: AdminTrustTier;
+  evidenceLevel: AdminEvidenceLevel;
+  lastUpdated: string;
+}
+
+export interface SafetyModeAckRequest {
+  acknowledgedBy: string;
+  reason: string;
+}
+
+export interface SafetyModeAckResponse extends WorkflowMutationResponse {
+  ackId: string;
+  status: AdminRuntimeStatus;
+  acknowledgedAt: string;
+}
+
+export interface PromotionEvidenceResponse {
+  releaseId: string;
+  status: AdminRuntimeStatus;
+  trustTier: AdminTrustTier;
+  evidenceLevel: AdminEvidenceLevel;
+  summary: string;
+  lastUpdated: string;
+}
+
+export interface RuntimeEnvironmentRecord extends EnvironmentRecord {
+  status: AdminRuntimeStatus;
+  trustTier: AdminTrustTier;
+  evidenceLevel: AdminEvidenceLevel;
+  lastUpdated: string;
+}
+
+export interface EnvironmentsResponse {
+  environments: RuntimeEnvironmentRecord[];
+}
+
+export interface AuditEventsResponse {
+  events: AuditEvent[];
+}
+
+export interface ReleaseArtifactsResponse {
+  releases: ReleaseArtifact[];
+}
+
+export interface GovernanceActionsResponse {
+  governanceActions: GovernanceAction[];
+}

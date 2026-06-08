@@ -2,12 +2,16 @@ import type {
   GovernanceDecision,
   GovernanceDecisionResponse,
 } from "@conxian/schemas";
+import type { AdminRuntimeRequestOptions } from "./runtime-client";
+import { postAdminRuntimeJson } from "./runtime-client";
 
-export function submitGovernanceDecisionV1(input: GovernanceDecision): GovernanceDecisionResponse {
-  return {
-    accepted: true,
-    decisionId: `governance_decision_${input.actionId}`,
-    auditEventId: `audit_governance_${input.actionId}`,
-    message: `Governance decision ${input.decision} accepted via v1 workflow client.`,
-  };
+export function submitGovernanceDecisionV1(
+  input: GovernanceDecision,
+  options?: AdminRuntimeRequestOptions,
+): Promise<GovernanceDecisionResponse> {
+  return postAdminRuntimeJson<GovernanceDecision, GovernanceDecisionResponse>(
+    "/admin/v1/governance/decision",
+    input,
+    options,
+  );
 }

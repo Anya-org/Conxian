@@ -4,21 +4,27 @@ import type {
   ReleaseDecisionRequest,
   ReleaseDecisionResponse,
 } from "@conxian/schemas";
+import type { AdminRuntimeRequestOptions } from "./runtime-client";
+import { postAdminRuntimeJson } from "./runtime-client";
 
-export function requestReleaseApprovalV1(input: ReleaseApprovalRequest): ReleaseApprovalResponse {
-  return {
-    accepted: true,
-    requestId: `req_${input.artifactId}`,
-    auditEventId: `audit_${input.artifactId}`,
-    message: "Release approval request accepted via v1 workflow client.",
-  };
+export function requestReleaseApprovalV1(
+  input: ReleaseApprovalRequest,
+  options?: AdminRuntimeRequestOptions,
+): Promise<ReleaseApprovalResponse> {
+  return postAdminRuntimeJson<ReleaseApprovalRequest, ReleaseApprovalResponse>(
+    "/admin/v1/releases/request-approval",
+    input,
+    options,
+  );
 }
 
-export function submitReleaseDecisionV1(input: ReleaseDecisionRequest): ReleaseDecisionResponse {
-  return {
-    accepted: true,
-    decisionId: `release_decision_${input.artifactId}`,
-    auditEventId: `audit_release_${input.artifactId}`,
-    message: `Release decision ${input.decision} accepted via v1 workflow client.`,
-  };
+export function submitReleaseDecisionV1(
+  input: ReleaseDecisionRequest,
+  options?: AdminRuntimeRequestOptions,
+): Promise<ReleaseDecisionResponse> {
+  return postAdminRuntimeJson<ReleaseDecisionRequest, ReleaseDecisionResponse>(
+    "/admin/v1/releases/decision",
+    input,
+    options,
+  );
 }
