@@ -1,7 +1,5 @@
 ;; proposal-executor.clar
 ;; Conxian Protocol Standard Contract
-
-;; proposal-executor.clar
 ;;
 ;; This contract is responsible for the execution of governance proposals.
 ;; It contains the logic for validating quorums and checking proposal states.
@@ -56,8 +54,9 @@
 )
 
 
-;; @desc Set ops engine
-;; @returns (response bool uint)
+;; @desc Updates the contract principal authorized to trigger proposal execution.
+;; @param new-engine: The new operational engine principal.
+;; @return (response bool uint) - Returns true on success.
 (define-public (set-ops-engine (new-engine principal))
   (begin
     (asserts! (is-ops-engine) (err ERR_UNAUTHORIZED))
@@ -67,8 +66,11 @@
 )
 
 
-;; @desc Execute
-;; @returns (response bool uint)
+;; @desc Executes a passed proposal by delegating to the proposal logic contract.
+;; @param proposal-id: The ID of the proposal to execute.
+;; @param proposal-contract: The contract principal of the proposal.
+;; @param quorum-percentage: The required quorum (in bps).
+;; @return (response bool uint) - Returns true on success.
 (define-public (execute
     (proposal-id uint)
     (proposal-contract <proposal-trait>)
@@ -122,7 +124,8 @@
         votes-for: (get for-votes proposal),
         votes-against: (get against-votes proposal),
         contract: (contract-of proposal-contract),
-        council-id: council-id })
+        council-id: council-id
+      })
       (ok true)
     )
   )
