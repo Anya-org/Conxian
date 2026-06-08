@@ -13,6 +13,7 @@ This directory contains the public-safe documentation entrypoints for `conxian-b
 - [`CLAIM_EVIDENCE_MATRIX.md`](./CLAIM_EVIDENCE_MATRIX.md) — claim-vs-evidence decision surface for public messaging and readiness framing.
 - [`ENVIRONMENT_VERIFICATION_CHECKLIST.md`](./ENVIRONMENT_VERIFICATION_CHECKLIST.md) — items requiring runtime, device, or deployment verification outside GitHub.
 - [`NEXUS_GATEWAY_UNIVERSAL_CHAIN_ARCHITECTURE.md`](./NEXUS_GATEWAY_UNIVERSAL_CHAIN_ARCHITECTURE.md) — aligned architecture for multichain-universal Nexus and Gateway evolution.
+- [`REMAINING_UNIVERSAL_SUPPORT_RESEARCH.md`](./REMAINING_UNIVERSAL_SUPPORT_RESEARCH.md) — remaining research backlog before broader multichain expansion.
 
 ## Governance and release workflow
 
