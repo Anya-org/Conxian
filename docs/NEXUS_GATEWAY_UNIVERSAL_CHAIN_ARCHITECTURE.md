@@ -172,5 +172,5 @@ Gateway policy should operate on normalized entities, not raw chain strings when
 
 - Which three families are Tier 1 for execution?
 - Does Nexus also own the cross-chain event bus, or only the proof/state layer?
-- Which bridge/messaging systems are approved by trust tier?
+- Which bridge/messaging systems are approved by trust tier? (Resolved: `docs/architecture/APPROVED_BRIDGE_AND_MESSAGING_SYSTEMS_BY_TRUST_TIER.md`)
 - Which signer backends are allowed for production by family?

@@ -23,6 +23,8 @@ Decide whether Nexus should also own the cross-chain event bus, or remain limite
 ### 3. Approved bridge and messaging systems by trust tier
 Define which bridge and messaging systems are approved and how each maps to trust tiers.
 
+Status: resolved and canonicalized in `docs/architecture/APPROVED_BRIDGE_AND_MESSAGING_SYSTEMS_BY_TRUST_TIER.md`.
+
 ### 4. Allowed signer backends by chain family
 Define which signer backends are allowed for production by family.
 
