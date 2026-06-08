@@ -58,6 +58,25 @@ These workflows run on every pull request targeting `dev`, `staged`, or `main`. 
 - Secret scan (see [`secret-scan.yml`](./workflows/secret-scan.yml))
 - Dependency review (see [`dependency-review.yml`](./workflows/dependency-review.yml))
 
+## CI failure taxonomy and summary interpretation
+
+CI summaries use this failure taxonomy:
+
+- `repo-content`: failure is attributable to this PR's repository changes. This is merge-blocking.
+- `external-platform`: failure is likely caused by platform/API/entitlement/baseline conditions outside this PR's content. This is non-blocking in summary-gate classification and should be retried or escalated.
+
+How maintainers should interpret summary checks:
+
+1. **`Conxian Unified CI / CI Summary Gate`**
+   - Reports PR scope as `docs-only` vs `code-impacting`.
+   - For `docs-only` PRs, repo-hygiene + governance/security baseline checks still run; heavyweight implementation suites are intentionally skipped.
+   - The summary gate fails only when required `repo-content` checks fail.
+2. **`Dependency Review / Dependency Review Gate`**
+   - Always posts a check result (never disappears due path-ignore behavior).
+   - If no dependency manifests/lockfiles changed, it passes with explicit `not applicable` evidence.
+   - If dependency risk findings are detected, classification is `repo-content` (merge-blocking).
+   - If execution fails without dependency findings, classification is `external-platform` (non-blocking) with retry guidance.
+
 ## GitHub settings required outside this repository
 
 Some promotion controls are configured in **GitHub repository settings** (not in Git-tracked files).

@@ -18,26 +18,66 @@ jobs:
       contents: read
       pull-requests: read
     outputs:
-      b2b: ${{ (github.event_name == 'push' && steps.filter_push.outputs.b2b) || (github.event_name == 'pull_request' && steps.filter_pr.outputs.b2b) || 'false' }}
+      b2b: ${{ (github.event_name == 'push' && steps.filter_push.outputs.b2b) || (github.event_name == 'pull_request' && steps.classify_pr.outputs.b2b) || 'false' }}
+      docs_only: ${{ (github.event_name == 'push' && steps.filter_push.outputs.docs_only) || (github.event_name == 'pull_request' && steps.classify_pr.outputs.docs_only) || 'false' }}
+      code_impacting: ${{ (github.event_name == 'push' && steps.filter_push.outputs.code_impacting) || (github.event_name == 'pull_request' && steps.classify_pr.outputs.code_impacting) || 'true' }}
     steps:
-    - name: Detect B2B changes (PR)
+    - name: Classify PR change scope
       if: github.event_name == 'pull_request'
-      id: filter_pr
-      uses: dorny/paths-filter@v4
+      id: classify_pr
+      uses: actions/github-script@v7
       with:
-        filters: |
-          b2b:
-            - 'conxian-nexus'
-            - 'conxian-nexus/**'
-            - 'lib-conclave-sdk'
-            - 'lib-conclave-sdk/**'
-            - '.gitmodules'
+        script: |
+          const pr = context.payload.pull_request;
+          if (!pr) {
+            core.setOutput('b2b', 'false');
+            core.setOutput('docs_only', 'false');
+            core.setOutput('code_impacting', 'true');
+            return;
+          }
 
-    - name: Default B2B changes (push)
+          const changedFiles = await github.paginate(github.rest.pulls.listFiles, {
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: pr.number,
+            per_page: 100,
+          });
+
+          const paths = changedFiles.map((file) => file.filename);
+
+          const isDocsOnlyPath = (path) => (
+            path.startsWith('docs/') ||
+            path.endsWith('.md') ||
+            path.endsWith('.rst') ||
+            path === 'SUMMARY.md' ||
+            path === 'CHANGELOG.md' ||
+            (path.startsWith('.github/') && path.endsWith('.md'))
+          );
+
+          const codeImpacting = paths.some((path) => !isDocsOnlyPath(path));
+          const docsOnly = !codeImpacting;
+          const b2b = paths.some((path) => (
+            path === 'conxian-nexus' ||
+            path.startsWith('conxian-nexus/') ||
+            path === 'lib-conclave-sdk' ||
+            path.startsWith('lib-conclave-sdk/') ||
+            path === '.gitmodules'
+          ));
+
+          core.setOutput('b2b', b2b ? 'true' : 'false');
+          core.setOutput('docs_only', docsOnly ? 'true' : 'false');
+          core.setOutput('code_impacting', codeImpacting ? 'true' : 'false');
+
+          core.info(`Detected ${paths.length} changed files for PR #${pr.number}.`);
+          core.info(`b2b=${b2b}, docs_only=${docsOnly}, code_impacting=${codeImpacting}`);
+
+    - name: Default push classification
       if: github.event_name == 'push'
       id: filter_push
       run: |
         echo "b2b=true" >> $GITHUB_OUTPUT
+        echo "docs_only=false" >> $GITHUB_OUTPUT
+        echo "code_impacting=true" >> $GITHUB_OUTPUT
 
   repo-hygiene:
     name: Repo Hygiene (ZSE & Submodules)
@@ -116,11 +156,13 @@ jobs:
   gateway-suite:
     name: Gateway Suite
     runs-on: ubuntu-latest
+    needs: [change_detection]
     if: >-
       github.event_name == 'push' ||
       (
         github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        needs.change_detection.outputs.docs_only != 'true'
       )
     steps:
     - uses: actions/checkout@v4
@@ -149,6 +191,7 @@ jobs:
       (
         github.event_name == 'pull_request' &&
         github.event.pull_request.head.repo.full_name == github.repository &&
+        needs.change_detection.outputs.docs_only != 'true' &&
         (
           needs.change_detection.outputs.b2b == 'true' ||
           contains(github.event.pull_request.labels.*.name, 'b2b')
@@ -179,11 +222,13 @@ jobs:
   lib-conxian-core-suite:
     name: Core Library Suite (lib-conxian-core)
     runs-on: ubuntu-latest
+    needs: [change_detection]
     if: >-
       github.event_name == 'push' ||
       (
         github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        needs.change_detection.outputs.docs_only != 'true'
       )
     steps:
     - uses: actions/checkout@v4
@@ -216,11 +261,13 @@ jobs:
   b2c-wallet-suite:
     name: B2C Wallet Suite
     runs-on: ubuntu-latest
+    needs: [change_detection]
     if: >-
       github.event_name == 'push' ||
       (
         github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        needs.change_detection.outputs.docs_only != 'true'
       )
     steps:
     - uses: actions/checkout@v4
@@ -313,3 +360,103 @@ jobs:
       run: |
         pip install -r conxius-orbit/requirements.txt
         python3 conxius-orbit/conxian_testnet_deploy.py --help
+
+  ci-summary:
+    name: CI Summary Gate
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - change_detection
+      - repo-hygiene
+      - gateway-suite
+      - b2b-suite
+      - lib-conxian-core-suite
+      - b2c-wallet-suite
+      - audit-and-docs
+      - testnet-simulation
+    steps:
+    - name: Summarize results and enforce repo-content gate
+      env:
+        CHANGE_DETECTION_RESULT: ${{ needs.change_detection.result }}
+        DOCS_ONLY: ${{ needs.change_detection.outputs.docs_only }}
+        CODE_IMPACTING: ${{ needs.change_detection.outputs.code_impacting }}
+        B2B_TRIGGER: ${{ needs.change_detection.outputs.b2b }}
+        REPO_HYGIENE_RESULT: ${{ needs.repo-hygiene.result }}
+        GATEWAY_SUITE_RESULT: ${{ needs.gateway-suite.result }}
+        B2B_SUITE_RESULT: ${{ needs.b2b-suite.result }}
+        LIB_CORE_SUITE_RESULT: ${{ needs.lib-conxian-core-suite.result }}
+        B2C_WALLET_SUITE_RESULT: ${{ needs.b2c-wallet-suite.result }}
+        AUDIT_DOCS_RESULT: ${{ needs.audit-and-docs.result }}
+        TESTNET_SIMULATION_RESULT: ${{ needs.testnet-simulation.result }}
+      run: |
+        python3 - <<'PY'
+        import os
+        import sys
+
+        docs_only = os.getenv('DOCS_ONLY', 'false').lower() == 'true'
+        code_impacting = os.getenv('CODE_IMPACTING', 'true').lower() == 'true'
+        b2b_trigger = os.getenv('B2B_TRIGGER', 'false').lower() == 'true'
+
+        rows = [
+            ('Change detection', os.getenv('CHANGE_DETECTION_RESULT', 'unknown'), False),
+            ('Repo Hygiene (ZSE & Submodules)', os.getenv('REPO_HYGIENE_RESULT', 'unknown'), True),
+            ('Gateway Suite', os.getenv('GATEWAY_SUITE_RESULT', 'unknown'), code_impacting),
+            (
+                'B2B Suite (Nexus & SDK)',
+                os.getenv('B2B_SUITE_RESULT', 'unknown'),
+                code_impacting and os.getenv('B2B_SUITE_RESULT', 'skipped') != 'skipped',
+            ),
+            (
+                'Core Library Suite (lib-conxian-core)',
+                os.getenv('LIB_CORE_SUITE_RESULT', 'unknown'),
+                code_impacting,
+            ),
+            ('B2C Wallet Suite', os.getenv('B2C_WALLET_SUITE_RESULT', 'unknown'), code_impacting),
+            ('Transparency Audit & Docs', os.getenv('AUDIT_DOCS_RESULT', 'unknown'), False),
+            ('Testnet Simulation', os.getenv('TESTNET_SIMULATION_RESULT', 'unknown'), False),
+        ]
+
+        blocking_states = {'failure', 'cancelled', 'timed_out'}
+        blocking_jobs = [
+            name
+            for name, result, required in rows
+            if required and result in blocking_states
+        ]
+
+        with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
+            summary.write('## Conxian Unified CI summary\n\n')
+            summary.write(
+                f"- PR classification: **{'docs-only' if docs_only else 'code-impacting'}**\n"
+            )
+            summary.write(f"- B2B trigger detected: **{'yes' if b2b_trigger else 'no'}**\n")
+            if docs_only:
+                summary.write(
+                    '- Docs-only PR detected: heavy implementation suites are intentionally skipped.\n\n'
+                )
+            else:
+                summary.write(
+                    '- Code-impacting PR detected: core implementation suites are required for merge.\n\n'
+                )
+
+            summary.write('| Job | Result | Required for repo-content merge gate |\n')
+            summary.write('| --- | --- | --- |\n')
+            for name, result, required in rows:
+                summary.write(
+                    f"| {name} | `{result}` | {'yes' if required else 'no'} |\n"
+                )
+
+            if blocking_jobs:
+                summary.write('\n### Merge gate result\n')
+                summary.write('❌ **Fail** — required repo-content checks failed:\n')
+                for job in blocking_jobs:
+                    summary.write(f'- `{job}`\n')
+            else:
+                summary.write('\n### Merge gate result\n')
+                summary.write('✅ **Pass** — no required repo-content check failures detected.\n')
+
+        if blocking_jobs:
+            print('Blocking repo-content check failures:', ', '.join(blocking_jobs))
+            sys.exit(1)
+
+        print('CI summary gate passed.')
+        PY

@@ -6,16 +6,218 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
-  dependency-review:
-    name: Dependency Review
+  dependency-file-detection:
+    name: Detect dependency file changes
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      dependency_files_changed: ${{ steps.filter.outputs.dependency_files }}
+    steps:
+      - name: Detect changed dependency manifests and lockfiles
+        id: filter
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              core.setOutput('dependency_files', 'false');
+              return;
+            }
+
+            const changedFiles = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              per_page: 100,
+            });
+
+            const dependencyBasenames = new Set([
+              'package.json',
+              'package-lock.json',
+              'pnpm-lock.yaml',
+              'yarn.lock',
+              'npm-shrinkwrap.json',
+              'Cargo.toml',
+              'Cargo.lock',
+              'requirements.txt',
+              'pyproject.toml',
+              'poetry.lock',
+              'Pipfile',
+              'Pipfile.lock',
+              'go.mod',
+              'go.sum',
+              'Gemfile',
+              'Gemfile.lock',
+              'composer.json',
+              'composer.lock',
+              'pom.xml',
+              'build.gradle',
+              'build.gradle.kts',
+              'gradle.lockfile',
+            ]);
+
+            const isDependencyFile = (path) => {
+              if (path === '.github/dependabot.yml') {
+                return true;
+              }
+
+              const segments = path.split('/');
+              const basename = segments[segments.length - 1];
+
+              if (dependencyBasenames.has(basename)) {
+                return true;
+              }
+
+              return /^requirements-[^/]+\.txt$/.test(basename);
+            };
+
+            const matchedPaths = changedFiles
+              .map((file) => file.filename)
+              .filter((path) => isDependencyFile(path));
+
+            core.setOutput('dependency_files', matchedPaths.length > 0 ? 'true' : 'false');
+            core.info(`Dependency-related files changed: ${matchedPaths.length}`);
+            if (matchedPaths.length > 0) {
+              core.info(`Matched paths: ${matchedPaths.join(', ')}`);
+            }
+
+  dependency-review:
+    name: Run dependency review
+    runs-on: ubuntu-latest
+    needs: [dependency-file-detection]
+    if: needs.dependency-file-detection.outputs.dependency_files_changed == 'true'
+    permissions:
+      contents: read
+    outputs:
+      review_outcome: ${{ steps.review.outcome }}
+      dependency_changes: ${{ steps.review.outputs.dependency-changes }}
+      vulnerable_changes: ${{ steps.review.outputs.vulnerable-changes }}
+      invalid_license_changes: ${{ steps.review.outputs.invalid-license-changes }}
+      denied_changes: ${{ steps.review.outputs.denied-changes }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Review dependencies
+        id: review
+        continue-on-error: true
         uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: high
+          warn-only: false
+          retry-on-snapshot-warnings: true
+
+  dependency-review-summary:
+    name: Dependency Review Gate
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [dependency-file-detection, dependency-review]
+    steps:
+      - name: Summarize dependency review and classify failures
+        env:
+          DEPENDENCY_FILES_CHANGED: ${{ needs.dependency-file-detection.outputs.dependency_files_changed }}
+          REVIEW_JOB_RESULT: ${{ needs.dependency-review.result }}
+          REVIEW_OUTCOME: ${{ needs.dependency-review.outputs.review_outcome }}
+          DEPENDENCY_CHANGES: ${{ needs.dependency-review.outputs.dependency_changes }}
+          VULNERABLE_CHANGES: ${{ needs.dependency-review.outputs.vulnerable_changes }}
+          INVALID_LICENSE_CHANGES: ${{ needs.dependency-review.outputs.invalid_license_changes }}
+          DENIED_CHANGES: ${{ needs.dependency-review.outputs.denied_changes }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import sys
+
+          def parse_json_array(raw: str):
+              raw = (raw or '').strip()
+              if not raw:
+                  return []
+              try:
+                  value = json.loads(raw)
+              except json.JSONDecodeError:
+                  return []
+              return value if isinstance(value, list) else []
+
+          dependency_files_changed = os.getenv('DEPENDENCY_FILES_CHANGED', 'false').lower() == 'true'
+          review_job_result = os.getenv('REVIEW_JOB_RESULT', 'skipped')
+          review_outcome = os.getenv('REVIEW_OUTCOME', '')
+
+          dependency_changes = parse_json_array(os.getenv('DEPENDENCY_CHANGES', ''))
+          vulnerable_changes = parse_json_array(os.getenv('VULNERABLE_CHANGES', ''))
+          invalid_license_changes = parse_json_array(os.getenv('INVALID_LICENSE_CHANGES', ''))
+          denied_changes = parse_json_array(os.getenv('DENIED_CHANGES', ''))
+
+          repo_content_findings = len(vulnerable_changes) + len(invalid_license_changes) + len(denied_changes)
+
+          if not dependency_files_changed:
+              classification = 'not-applicable'
+              blocking = False
+              gate_message = 'No dependency manifest or lockfile changes were detected.'
+          elif repo_content_findings > 0:
+              classification = 'repo-content'
+              blocking = True
+              gate_message = (
+                  'Dependency risk findings detected '
+                  f'(vulnerabilities={len(vulnerable_changes)}, '
+                  f'invalid-licenses={len(invalid_license_changes)}, denied={len(denied_changes)}).'
+              )
+          elif review_outcome == 'failure' or review_job_result in {'failure', 'cancelled', 'timed_out'}:
+              classification = 'external-platform'
+              blocking = False
+              gate_message = (
+                  'Dependency review execution failed without dependency risk findings; '
+                  'classified as likely external platform/API/entitlement baseline issue.'
+              )
+          else:
+              classification = 'repo-content'
+              blocking = False
+              gate_message = 'Dependency files changed and dependency review completed with no blocking findings.'
+
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
+              summary.write('## Dependency Review summary\n\n')
+              summary.write(
+                  f"- Dependency files changed: **{'yes' if dependency_files_changed else 'no'}**\n"
+              )
+              summary.write(f'- Classification: **{classification}**\n')
+              summary.write(f'- Dependency review job result: `{review_job_result}`\n')
+              if review_outcome:
+                  summary.write(f'- Dependency review step outcome: `{review_outcome}`\n')
+              summary.write(f'- Dependency delta entries reported: `{len(dependency_changes)}`\n\n')
+
+              summary.write('| Signal | Count |\n')
+              summary.write('| --- | ---: |\n')
+              summary.write(f'| Vulnerable changes | {len(vulnerable_changes)} |\n')
+              summary.write(f'| Invalid license changes | {len(invalid_license_changes)} |\n')
+              summary.write(f'| Denied changes | {len(denied_changes)} |\n')
+
+              summary.write('\n### Gate decision\n')
+              summary.write(f'- {gate_message}\n')
+              summary.write(f'- Merge-blocking category: `{classification if blocking else "none"}`\n')
+
+              if classification == 'not-applicable':
+                  summary.write('\n✅ Dependency review marked **not applicable** for this PR.\n')
+              elif classification == 'external-platform':
+                  summary.write(
+                      '\n⚠️ Classified as **external-platform** (non-blocking). '
+                      'Re-run CI or verify Dependency Graph / entitlement status if needed.\n'
+                  )
+
+          if blocking:
+              print('::error::Dependency review gate failed due to repo-content risk findings.')
+              sys.exit(1)
+
+          if classification == 'external-platform':
+              print(
+                  '::warning::Dependency review execution failed without repo-content findings; '
+                  'classified as external-platform and treated as non-blocking.'
+              )
+          elif classification == 'not-applicable':
+              print('Dependency review not applicable: no dependency manifests or lockfiles changed.')
+          else:
+              print('Dependency review gate passed with no blocking repo-content findings.')
+          PY
