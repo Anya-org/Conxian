@@ -1,12 +1,7 @@
 ;; timelock.clar
-;; Conxian Protocol Standard Contract
-
-;; timelock.clar
 ;; Time-delayed execution controller for critical protocol changes
 ;; Aligned with Nakamoto 5s block times
 ;; Decentralized: Uses Unified RBAC via .conxian-access
-;;
-;; REPAIRED: Added proper proposal execution admin transfer and sovereign handoff support
 
 (use-trait proposal-trait .governance-traits.proposal-trait)
 
@@ -84,7 +79,8 @@
 ;; Governance Configuration
 
 ;; @desc Set governance contract
-;; @returns (response bool uint)
+;; @param new-governance: The principal of the new governance contract.
+;; @return (response bool uint)
 (define-public (set-governance-contract (new-governance principal))
     (begin
         (asserts! (is-admin) (err ERR_UNAUTHORIZED))
@@ -95,8 +91,10 @@
 
 ;; Proposal Management
 
-;; @desc Queue proposal
-;; @returns (response bool uint)
+;; @desc Queues a proposal for time-delayed execution.
+;; @param proposal-principal: The principal of the proposal contract.
+;; @param target: The target principal for the execution.
+;; @return (response uint uint) - Returns the eta (burn-block-height).
 (define-public (queue-proposal (proposal-principal principal) (target principal))
     (begin
         (asserts! (is-governance) (err ERR_UNAUTHORIZED))
@@ -117,8 +115,10 @@
 
 ;; Execute Proposal - Can be called by anyone once timelock expires (permissionless execution)
 
-;; @desc Execute proposal
-;; @returns (response bool uint)
+;; @desc Executes a queued proposal after the timelock has expired.
+;; @param proposal-principal: The principal of the proposal to execute.
+;; @param proposal-contract: The contract implementing the proposal-trait.
+;; @return (response bool uint)
 (define-public (execute-proposal (proposal-principal principal) (proposal-contract <proposal-trait>))
     (let (
         (proposal (unwrap! (map-get? queued-proposals proposal-principal) (err ERR_NOT_QUEUED)))
@@ -145,8 +145,9 @@
 
 ;; Cancel Proposal - Only governance can cancel
 
-;; @desc Cancel proposal
-;; @returns (response bool uint)
+;; @desc Cancels a queued proposal.
+;; @param proposal-principal: The principal of the proposal to cancel.
+;; @return (response bool uint)
 (define-public (cancel-proposal (proposal-principal principal))
     (begin
         (asserts! (is-governance) (err ERR_UNAUTHORIZED))
@@ -160,8 +161,9 @@
 
 ;; Sovereign Handoff: Transfer admin to another principal (e.g. DAO or new timelock)
 
-;; @desc Transfer admin
-;; @returns (response bool uint)
+;; @desc Transfers administrative ownership of the timelock.
+;; @param new-admin: The new admin principal.
+;; @return (response bool uint)
 (define-public (transfer-admin (new-admin principal))
     (begin
         (asserts! (is-admin) (err ERR_UNAUTHORIZED))
@@ -177,18 +179,29 @@
 )
 
 ;; Read-only Functions
+
+;; @desc Returns the current timelock delay in blocks.
+;; @return (response uint uint)
 (define-read-only (get-delay)
     (ok (var-get delay))
 )
 
+;; @desc Returns the current admin principal.
+;; @return principal
 (define-read-only (get-admin)
     (var-get admin)
 )
 
+;; @desc Returns the status of a specific proposal.
+;; @param proposal: The principal of the proposal.
+;; @return (optional {eta: uint, executed: bool, target: principal})
 (define-read-only (get-proposal-status (proposal principal))
     (map-get? queued-proposals proposal)
 )
 
+;; @desc Checks if a proposal is currently executable.
+;; @param proposal: The principal of the proposal.
+;; @return bool
 (define-read-only (is-executable (proposal principal))
     (match (map-get? queued-proposals proposal)
         proposal-data
@@ -201,7 +214,8 @@
     )
 )
 
-;; Verify this timelock is ready for sovereign handoff
+;; @desc Returns the readiness status for sovereign handoff.
+;; @return {admin: principal, has-valid-delay: bool, ...}
 (define-read-only (is-sovereign-ready)
     {
         admin: (var-get admin),
@@ -210,4 +224,3 @@
         timestamp: burn-block-height
     }
 )
-

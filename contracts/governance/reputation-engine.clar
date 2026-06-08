@@ -12,6 +12,8 @@
 ;; --- Read-Only Functions ---
 
 ;; @desc Calculate voting weight boost based on BNS identity
+;; @param voter: The principal of the voter.
+;; @return uint - The boost multiplier in basis points (e.g., 15000 for 1.5x).
 (define-read-only (get-voter-boost (voter principal))
   (let (
     (has-bns true)
@@ -24,7 +26,9 @@
 )
 
 ;; @desc Calculate final weight for a base token balance
-;; @returns (response uint uint)
+;; @param voter: The principal of the voter.
+;; @param base-balance: The raw token balance or voting power.
+;; @return (response uint uint) - The weighted voting power.
 (define-public (get-weighted-voting-power (voter principal) (base-balance uint))
   (let (
     (boost (get-voter-boost voter))
@@ -34,6 +38,8 @@
 )
 
 ;; @desc Update activity score for a voter (Sovereign Reputation)
+;; @param voter: The principal of the voter.
+;; @return (response bool uint)
 (define-public (update-activity-score (voter principal))
   (begin
     ;; In production this would increment a map-based score
@@ -44,6 +50,9 @@
 
 ;; --- Admin Functions ---
 
+;; @desc Updates the admin principal of the reputation engine.
+;; @param new-admin: The new admin principal.
+;; @return (response bool uint)
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)

@@ -46,6 +46,8 @@ deployment-registry-*.json
 
 # 5. TESTING & COVERAGE
 test-results/
+test-results.txt
+test-run-output.txt
 junit.xml
 coverage.xml
 coverage/

@@ -1,4 +1,5 @@
 ;; community-voting-engine.clar
+;; Time-bound Voting for Strategic Proposals
 
 (define-constant ERR_NON_COMPLIANT u2001)
 
