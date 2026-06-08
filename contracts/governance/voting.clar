@@ -33,9 +33,9 @@
 ;; Core Logic
 
 ;; @desc Creates a proposal
-;; @param start-time uint (Unix timestamp)
-;; @param end-time uint (Unix timestamp)
-;; @returns (response uint uint)
+;; @param start-time: Unix timestamp
+;; @param end-time: Unix timestamp
+;; @return (response uint uint)
 (define-public (create-proposal (start-time uint) (end-time uint))
     (let (
         (proposal-id (+ (var-get proposal-count) u1))
@@ -74,9 +74,9 @@
 )
 
 ;; @desc Vote on a proposal
-;; @param proposal-id uint
-;; @param support bool
-;; @returns (response bool uint)
+;; @param proposal-id: The ID of the proposal.
+;; @param support: Boolean indicating vote direction.
+;; @return (response bool uint)
 (define-public (vote (proposal-id uint) (support bool))
     (let (
         (proposal (unwrap! (map-get? proposals proposal-id) (err u404)))

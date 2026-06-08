@@ -1,7 +1,4 @@
 ;; proposal-registry.clar
-;; Conxian Protocol Standard Contract
-
-;; proposal-registry.clar
 ;; Registry for Conxian Governance Proposals
 
 (define-constant ERR_UNAUTHORIZED u4000)
@@ -37,10 +34,17 @@
 ;; Access Control
 (define-data-var access-control principal tx-sender)
 
+;; @desc Returns proposal details for a given ID.
+;; @param proposal-id: The ID of the proposal.
+;; @return (optional {proposer: principal, proposal-contract: principal, council-id: uint, ...})
 (define-read-only (get-proposal (proposal-id uint))
   (map-get? proposals proposal-id)
 )
 
+;; @desc Checks if a voter has already cast a vote on a proposal.
+;; @param proposal-id: The ID of the proposal.
+;; @param voter: The principal of the voter.
+;; @return bool
 (define-read-only (has-voted
     (proposal-id uint)
     (voter principal)
@@ -54,8 +58,12 @@
 )
 
 
-;; @desc Add proposal
-;; @returns (response bool uint)
+;; @desc Registers a new proposal in the registry.
+;; @param proposal-contract: The contract principal of the proposal logic.
+;; @param council-id: The council ID responsible for the proposal.
+;; @param start: The starting block height.
+;; @param end: The ending block height.
+;; @return (response uint uint) - Returns the new proposal ID.
 (define-public (add-proposal
     (proposal-contract principal)
     (council-id uint)
@@ -83,8 +91,9 @@
 )
 
 
-;; @desc Set executed
-;; @returns (response bool uint)
+;; @desc Marks a proposal as executed.
+;; @param proposal-id: The ID of the proposal.
+;; @return (response bool uint)
 (define-public (set-executed (proposal-id uint))
   (let ((proposal (unwrap! (map-get? proposals proposal-id) (err ERR_NOT_FOUND))))
     (begin
@@ -96,8 +105,11 @@
 )
 
 
-;; @desc Vote proposal
-;; @returns (response bool uint)
+;; @desc Records a vote for a proposal.
+;; @param proposal-id: The ID of the proposal.
+;; @param support: Vote direction (true for yes).
+;; @param weight: The voting weight/power.
+;; @return (response bool uint)
 (define-public (vote-proposal
     (proposal-id uint)
     (support bool)

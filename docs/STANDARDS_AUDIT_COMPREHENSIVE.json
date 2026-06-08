@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-20T14:30:00Z",
+  "timestamp": "2026-05-21T04:35:00Z",
   "audit_results": {
     "layer_1_structural": {
       "score": 100,
@@ -49,33 +49,6 @@
       "accessibility": 100,
       "overall": 100
     },
-    "contracts/lending/lending-manager.clar": {
-      "structural": 100,
-      "diataxis": "N/A",
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
-    "contracts/dimensional/dimensional-core.clar": {
-      "structural": 100,
-      "diataxis": "N/A",
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
-    "contracts/core/dimensional-engine.clar": {
-      "structural": 100,
-      "diataxis": "N/A",
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
     "contracts/dex/README.md": {
       "structural": 100,
       "diataxis": 100,
@@ -85,7 +58,16 @@
       "accessibility": 100,
       "overall": 100
     },
-    "contracts/dex/concentrated-liquidity-pool.clar": {
+    "contracts/governance/README.md": {
+      "structural": 100,
+      "diataxis": 100,
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
+    },
+    "contracts/governance/community-dao.clar": {
       "structural": 100,
       "diataxis": "N/A",
       "github": 100,
@@ -94,7 +76,7 @@
       "accessibility": 100,
       "overall": 100
     },
-    "contracts/dex/dex-factory.clar": {
+    "contracts/governance/proposal-engine.clar": {
       "structural": 100,
       "diataxis": "N/A",
       "github": 100,
@@ -103,7 +85,7 @@
       "accessibility": 100,
       "overall": 100
     },
-    "contracts/dex/swap-router.clar": {
+    "contracts/governance/dao-treasury.clar": {
       "structural": 100,
       "diataxis": "N/A",
       "github": 100,
@@ -112,7 +94,16 @@
       "accessibility": 100,
       "overall": 100
     },
-    "contracts/dex/swap-aggregator.clar": {
+    "contracts/governance/emergency-governance.clar": {
+      "structural": 100,
+      "diataxis": "N/A",
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
+    },
+    "contracts/governance/voting.clar": {
       "structural": 100,
       "diataxis": "N/A",
       "github": 100,

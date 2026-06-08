@@ -1,7 +1,4 @@
 ;; emergency-governance.clar
-;; Conxian Protocol Standard Contract
-
-;; emergency-governance.clar
 ;; "Break Glass" Emergency Protocol
 ;; Allows specific roles to pause the protocol in crisis
 
@@ -21,8 +18,9 @@
 )
 
 
-;; @desc Set emergency admin
-;; @returns (response bool uint)
+;; @desc Updates the emergency admin principal.
+;; @param new-admin: The new admin principal.
+;; @return (response bool uint)
 (define-public (set-emergency-admin (new-admin principal))
     (begin
         (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
@@ -33,8 +31,9 @@
 
 ;; Emergency Actions
 
-;; @desc Activate emergency pause
-;; @returns (response bool uint)
+;; @desc Activates emergency pause on a target contract.
+;; @param contract: The contract implementing the pausable-trait.
+;; @return (response bool uint)
 (define-public (activate-emergency-pause (contract <pausable-trait>))
     (begin
         (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
@@ -43,8 +42,9 @@
 )
 
 
-;; @desc Deactivate emergency pause
-;; @returns (response bool uint)
+;; @desc Deactivates emergency pause on a target contract.
+;; @param contract: The contract implementing the pausable-trait.
+;; @return (response bool uint)
 (define-public (deactivate-emergency-pause (contract <pausable-trait>))
     (begin
         (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
@@ -55,13 +55,15 @@
 ;; Global Circuit Breaker (Signal only)
 (define-data-var global-circuit-breaker bool false)
 
+;; @desc Returns whether the global circuit breaker is active.
+;; @return (response bool uint)
 (define-read-only (is-circuit-breaker-active)
     (ok (var-get global-circuit-breaker))
 )
 
 
-;; @desc Trigger circuit breaker
-;; @returns (response bool uint)
+;; @desc Manually triggers the global circuit breaker.
+;; @return (response bool uint)
 (define-public (trigger-circuit-breaker)
     (begin
         (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))
@@ -72,8 +74,8 @@
 )
 
 
-;; @desc Reset circuit breaker
-;; @returns (response bool uint)
+;; @desc Resets the global circuit breaker.
+;; @return (response bool uint)
 (define-public (reset-circuit-breaker)
     (begin
         (asserts! (is-emergency-admin) (err ERR_UNAUTHORIZED))

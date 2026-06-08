@@ -26,7 +26,8 @@
 ;; Ownership Timelock Functions
 
 ;; @desc Initiates the transfer of contract ownership.
-;; @param new-owner principal
+;; @param new-owner: The new owner principal.
+;; @return (response bool uint)
 (define-public (request-ownership-transfer (new-owner principal))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -38,6 +39,7 @@
 )
 
 ;; @desc Completes the transfer of contract ownership after the timelock expires.
+;; @return (response bool uint)
 (define-public (claim-ownership)
     (let (
         (new-owner (unwrap! (var-get pending-owner) (err ERR_NO_PENDING_OWNER)))
@@ -53,15 +55,26 @@
 )
 
 ;; @desc Legacy setter for compatibility (now restricted)
+;; @param new-owner: The new owner principal.
+;; @return (response bool uint)
 (define-public (set-owner (new-owner principal))
     (request-ownership-transfer new-owner)
 )
 
 ;; Vault Trait Implementation
+
+;; @desc Deposits tokens into the treasury.
+;; @param amount: The amount to deposit.
+;; @param token: The SIP-010 token being deposited.
+;; @return (response bool uint)
 (define-public (deposit (amount uint) (token <sip-010-trait>))
     (contract-call? token transfer amount tx-sender (as-contract tx-sender) none)
 )
 
+;; @desc Withdraws tokens from the treasury to the owner.
+;; @param amount: The amount to withdraw.
+;; @param token: The SIP-010 token being withdrawn.
+;; @return (response bool uint)
 (define-public (withdraw (amount uint) (token <sip-010-trait>))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -69,11 +82,20 @@
     )
 )
 
-(define-public (get-balance (token <sip-010-trait>))
+;; @desc Returns the balance of a token held by the treasury.
+;; @param token: The SIP-010 token.
+;; @return (response uint uint)
+(define-read-only (get-balance (token <sip-010-trait>))
     (ok (contract-call? token get-balance (as-contract tx-sender)))
 )
 
 ;; Additional Treasury Functions
+
+;; @desc Withdraws tokens from the treasury to a specific recipient.
+;; @param amount: The amount to withdraw.
+;; @param token: The SIP-010 token.
+;; @param recipient: The recipient principal.
+;; @return (response bool uint)
 (define-public (withdraw-to (amount uint) (token <sip-010-trait>) (recipient principal))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -85,6 +107,10 @@
 (define-map strategy-allocations principal uint)
 (define-data-var total-allocated uint u0)
 
+;; @desc Allocates treasury funds to a specific strategy.
+;; @param strategy: The strategy contract principal.
+;; @param amount: The amount to allocate.
+;; @return (response bool uint)
 (define-public (allocate-to-strategy (strategy principal) (amount uint))
     (let (
         (current-allocation (default-to u0 (map-get? strategy-allocations strategy)))
@@ -107,16 +133,22 @@
 )
 
 ;; @desc Get allocation for a specific strategy
+;; @param strategy: The strategy contract principal.
+;; @return (response uint uint)
 (define-read-only (get-strategy-allocation (strategy principal))
     (ok (default-to u0 (map-get? strategy-allocations strategy)))
 )
 
 ;; @desc Get total allocated across all strategies
+;; @return (response uint uint)
 (define-read-only (get-total-allocated)
     (ok (var-get total-allocated))
 )
 
 ;; @desc Deallocate from a strategy
+;; @param strategy: The strategy contract principal.
+;; @param amount: The amount to deallocate.
+;; @return (response bool uint)
 (define-public (deallocate-from-strategy (strategy principal) (amount uint))
     (let (
         (current-allocation (default-to u0 (map-get? strategy-allocations strategy)))
@@ -137,6 +169,8 @@
     )
 )
 
+;; @desc Finalizes a withdrawal process.
+;; @return (response bool uint)
 (define-public (complete-withdrawal)
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
