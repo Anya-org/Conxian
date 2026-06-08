@@ -133,3 +133,5 @@ tmp/
 .idx/
 .trae/
 gha-creds-*.json
+.jules/
+.Jules/
