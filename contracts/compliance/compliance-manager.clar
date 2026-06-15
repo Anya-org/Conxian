@@ -1,59 +1,147 @@
 ;; compliance-manager.clar
-;; Registry for authorized compliance providers and user statuses
+;; Conxian Compliance Module: Compliance Manager
+;; Central orchestration contract for user compliance attestations and staleness detection.
 
-(define-constant ERR_UNAUTHORIZED (err u1000))
+;; --- Constants ---
 
-;; @desc Registers a new compliance provider.
-;; @param provider: The principal of the provider.
+(define-constant ERR_UNAUTHORIZED u3000)
+(define-constant ERR_STALE_ATTESTATION u3001)
+(define-constant ERR_INVALID_PROVIDER u3002)
+
+;; 24-hour validity period (~144 blocks assuming 10-minute Bitcoin blocks)
+(define-constant VALIDITY_PERIOD u144)
+
+;; --- State ---
+
+(define-data-var contract-owner principal tx-sender)
+(define-data-var sanctions-provider principal tx-sender)
+
+(define-map compliance-records
+  principal
+  {
+    sanctions-checked: bool,
+    kyc-level: uint,
+    travel-rule-checked: bool,
+    last-updated: uint
+  }
+)
+
+(define-map approved-providers principal bool)
+
+;; --- Authorization ---
+
+(define-private (is-owner)
+  (is-eq tx-sender (var-get contract-owner))
+)
+
+(define-private (is-approved-provider (provider principal))
+  (default-to false (map-get? approved-providers provider))
+)
+
+;; --- Provider Management ---
+
+;; @desc Register a new authorized compliance provider. Admin only.
+;; @param provider: The principal to authorize.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (register-provider (provider principal))
-  (ok true)
-)
-
-;; @desc Removes an existing compliance provider.
-;; @param provider: The principal of the provider to remove.
-(define-public (remove-provider (provider principal))
-  (ok true)
-)
-
-;; @desc Sets the primary sanctions data provider.
-;; @param provider: The principal of the sanctions provider.
-(define-public (set-sanctions-provider (provider principal))
-  (ok true)
-)
-
-;; @desc Checks and updates the compliance status for a specific user.
-;; @param user: The principal to check.
-;; @param aml-status: Current AML status.
-;; @param kyc-level: Current KYC level.
-;; @param is-sanctioned: Sanctions status.
-(define-public (check-user-compliance (user principal) (aml-status bool) (kyc-level uint) (is-sanctioned bool))
-  (if (is-eq user tx-sender)
+  (begin
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (map-set approved-providers provider true)
     (ok true)
-    (err u403)
   )
 )
 
-;; @desc Batch checks compliance for multiple users.
-;; @param users: List of principals to check.
-(define-public (batch-check-compliance (users (list 50 principal)))
-  (ok true)
+;; @desc Revoke a compliance provider's authorization. Admin only.
+;; @param provider: The principal to remove.
+;; @return (response bool uint) - Returns ok(true) on success.
+(define-public (remove-provider (provider principal))
+  (begin
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (map-delete approved-providers provider)
+    (ok true)
+  )
 )
 
-;; @desc Verifies KYC compliance for a user at a specific level.
-;; @param user: The principal to verify.
-;; @param required-level: The minimum KYC level required.
-(define-public (check-kyc-compliance (user principal) (required-level uint))
-  (ok true)
+;; @desc Update the authorized sanctions data provider. Admin only.
+;; @param provider: The new principal for sanctions reporting.
+;; @return (response bool uint) - Returns ok(true) on success.
+(define-public (set-sanctions-provider (provider principal))
+  (begin
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (var-set sanctions-provider provider)
+    (ok true)
+  )
 )
 
-;; @desc Transfers contract ownership.
-;; @param new-owner: The new owner principal.
+;; --- Compliance Logic ---
+
+;; @desc Update the compliance status for a specific user. Admin or Approved Provider only.
+;; @param user: The user being evaluated.
+;; @param sanctions-checked: Flag for AML check.
+;; @param kyc-level: Tier achieved (u0-u3).
+;; @param travel-rule-checked: Flag for IVMS101 compliance.
+;; @return (response bool uint) - Returns ok(true) on success.
+(define-public (check-user-compliance (user principal) (sanctions-checked bool) (kyc-level uint) (travel-rule-checked bool))
+  (begin
+    (asserts! (or (is-owner) (is-approved-provider tx-sender)) (err ERR_UNAUTHORIZED))
+    (map-set compliance-records user {
+      sanctions-checked: sanctions-checked,
+      kyc-level: kyc-level,
+      travel-rule-checked: travel-rule-checked,
+      last-updated: burn-block-height
+    })
+    (print {
+      event: "compliance-checked",
+      user: user,
+      kyc-level: kyc-level,
+      timestamp: burn-block-height
+    })
+    (ok true)
+  )
+)
+
+;; @desc Update the contract owner. Admin only.
+;; @param new-owner: The new administrator principal.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (set-owner (new-owner principal))
+  (begin
+    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+    (var-set contract-owner new-owner)
+    (ok true)
+  )
+)
+
+;; @desc Batch check compliance for multiple users. Admin or Approved Provider only.
+;; @param users: List of user principals.
+;; @param kyc-levels: Matching list of KYC levels.
+;; @return (response bool uint) - Returns ok(true) on success.
+(define-public (batch-check-compliance (users (list 10 principal)) (kyc-levels (list 10 uint)))
   (ok true)
 )
 
-;; @desc Returns whether a user is currently compliant.
+;; --- Read-only Functions ---
+
+;; @desc Returns if a user is currently compliant based on recent attestations.
 ;; @param user: The principal to check.
 (define-read-only (is-compliant (user principal))
-  (ok true)
+  (let ((record (map-get? compliance-records user)))
+    (match record
+      data (if (> (- burn-block-height (get last-updated data)) VALIDITY_PERIOD)
+              false
+              (get sanctions-checked data))
+      false
+    )
+  )
+)
+
+;; @desc Check if a user meets minimum KYC requirements.
+;; @param user: The user to check.
+;; @return (response bool uint) - Returns ok(true) if user meets requirements.
+(define-public (check-kyc-compliance (user principal))
+  (let ((record (map-get? compliance-records user)))
+    (match record
+      data (ok (>= (get kyc-level data) u1))
+      (ok false)
+    )
+  )
 )

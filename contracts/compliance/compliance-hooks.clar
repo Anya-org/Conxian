@@ -36,8 +36,9 @@
 
 ;; --- Admin Functions ---
 
-;; @desc Update the contract owner
-;; @param new-owner: The new administrator principal
+;; @desc Update the contract owner. Owner only.
+;; @param new-owner: The new administrator principal.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (set-contract-owner (new-owner principal))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -46,8 +47,9 @@
   )
 )
 
-;; @desc Update the authorized compliance manager
-;; @param new-manager: The new manager principal
+;; @desc Update the authorized compliance manager. Owner only.
+;; @param new-manager: The new manager principal.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (set-compliance-manager (new-manager principal))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -56,9 +58,10 @@
   )
 )
 
-;; @desc Register a new KYC provider
-;; @param provider: The principal of the provider
-;; @param name: The name of the provider organization
+;; @desc Register a new KYC provider. Owner or Compliance Manager only.
+;; @param provider: The principal of the provider.
+;; @param name: The name of the provider organization.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (add-kyc-provider (provider principal) (name (string-ascii 64)))
   (begin
     (asserts! (or (is-owner) (is-compliance-manager)) (err ERR_UNAUTHORIZED))
@@ -78,8 +81,9 @@
   )
 )
 
-;; @desc Revoke a KYC provider's authorization
-;; @param provider: The principal to remove
+;; @desc Revoke a KYC provider's authorization. Owner or Compliance Manager only.
+;; @param provider: The principal to remove.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (remove-kyc-provider (provider principal))
   (begin
     (asserts! (or (is-owner) (is-compliance-manager)) (err ERR_UNAUTHORIZED))
@@ -96,9 +100,10 @@
 
 ;; --- Verification Functions ---
 
-;; @desc Verify a user's KYC level (Authorized providers only)
-;; @param user: The principal being verified
-;; @param kyc-level: The tier level achieved
+;; @desc Verify a user's KYC level (Authorized providers only).
+;; @param user: The principal being verified.
+;; @param kyc-level: The tier level achieved.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (verify-kyc (user principal) (kyc-level uint))
   (let ((provider-data (map-get? kyc-providers tx-sender)))
     (begin
@@ -118,9 +123,10 @@
   )
 )
 
-;; @desc Log an audit event for institutional compliance
-;; @param event: The type of event (e.g. "DEPOSIT")
-;; @param details: Hex-encoded event data
+;; @desc Log an audit event for institutional compliance.
+;; @param event: The type of event (e.g. "DEPOSIT").
+;; @param details: Hex-encoded event data.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (log-audit-event (event (string-ascii 50)) (details (buff 256)))
   (begin
     (print {

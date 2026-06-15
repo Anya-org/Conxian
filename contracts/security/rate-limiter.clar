@@ -31,6 +31,7 @@
 
 ;; @desc Validates if a user is within their allowed rate limit.
 ;; @param user: The principal to check.
+;; @return (response bool uint) - Returns ok(true) if within limits, or err(ERR_RATE_LIMIT_EXCEEDED).
 (define-public (check-rate-limit (user principal))
     (let
         (
@@ -74,6 +75,7 @@
 ;; @param user: The principal to configure.
 ;; @param window-size: Optional custom window duration in blocks.
 ;; @param max-ops: Optional custom maximum operations per window.
+;; @return (response bool uint) - Returns ok(true) on success, or an error.
 (define-public (set-custom-limit (user principal) (window-size (optional uint)) (max-ops (optional uint)))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -100,6 +102,7 @@
 
 ;; @desc Transfers contract ownership to a new principal. Owner only.
 ;; @param new-owner: The new owner principal.
+;; @return (response bool uint) - Returns ok(true) on success, or an error.
 (define-public (transfer-ownership (new-owner principal))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))

@@ -22,6 +22,7 @@
 ;; @desc Deposits tokens into the protocol insurance fund.
 ;; @param token: The trait of the token to deposit.
 ;; @param amount: The quantity of tokens to deposit.
+;; @return (response bool uint) - Returns ok(true) on success, or an error.
 (define-public (deposit
         (token <sip-010-trait>)
         (amount uint)
@@ -41,6 +42,7 @@
 ;; @param token: The trait of the token to disburse.
 ;; @param recipient: The principal receiving the coverage.
 ;; @param amount: The quantity of tokens to disburse.
+;; @return (response bool uint) - Returns ok(true) on success, or an error.
 (define-public (cover-loss
         (token <sip-010-trait>)
         (recipient principal)
