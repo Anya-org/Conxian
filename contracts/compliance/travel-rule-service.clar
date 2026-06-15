@@ -24,8 +24,9 @@
 
 ;; --- Public Functions ---
 
-;; @desc Register a new Virtual Asset Service Provider (VASP)
-;; @param vasp-id: 20-character identifier for the VASP
+;; @desc Register a new Virtual Asset Service Provider (VASP). Admin only.
+;; @param vasp-id: 20-character identifier for the VASP.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (register-vasp (vasp-id (string-ascii 20)))
   (begin
     (asserts! (is-admin) (err ERR_UNAUTHORIZED))
@@ -34,13 +35,14 @@
   )
 )
 
-;; @desc Log travel rule data for a transaction
-;; @param transaction-ref: The 32-byte transaction reference
-;; @param ivms101-hash: The 32-byte hash of the IVMS101 data package
-;; @param originator-vasp: The VASP ID of the sender
-;; @param beneficiary-vasp: The VASP ID of the recipient
-;; @param amount: The transaction amount
-;; @param token: The token being transferred
+;; @desc Log travel rule data for a transaction. Registered VASP or Admin only.
+;; @param transaction-ref: The 32-byte transaction reference.
+;; @param ivms101-hash: The 32-byte hash of the IVMS101 data package.
+;; @param originator-vasp: The VASP ID of the sender.
+;; @param beneficiary-vasp: The VASP ID of the recipient.
+;; @param amount: The transaction amount.
+;; @param token: The token being transferred.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (log-travel-rule-data
     (transaction-ref (buff 32))
     (ivms101-hash (buff 32))

@@ -7,10 +7,11 @@
 
 (define-data-var admin principal tx-sender)
 
-;; @desc Verify a ZKML proof payload for model attestation
-;; @param model-id: The identifier for the ML model
-;; @param input-hash: Hash of the input data
-;; @param proof: The ZK proof payload (e.g. Groth16/Plonk)
+;; @desc Verify a ZKML proof payload for model attestation.
+;; @param model-id: The identifier for the ML model.
+;; @param input-hash: Hash of the input data.
+;; @param proof: The ZK proof payload (e.g. Groth16/Plonk).
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (verify-proof (model-id (string-ascii 64)) (input-hash (buff 32)) (proof (buff 1024)))
   (begin
     ;; In simulation we verify the length of the proof to simulate verification
@@ -21,6 +22,10 @@
 )
 
 ;; Admin functions
+
+;; @desc Update the contract administrator. Admin only.
+;; @param new-admin: The new administrator principal.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)

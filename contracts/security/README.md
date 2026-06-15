@@ -63,6 +63,17 @@ Comprehensive validation is performed using the Vitest framework.
 1. Install dependencies: `npm install`
 2. Run module tests: `npx vitest run tests/security`
 
+## Jargon Definition (Explanation)
+
+| Term | Definition |
+|------|------------|
+| **Circuit Breaker** | An emergency mechanism that halts specific protocol functions or entire modules during a security incident to prevent further damage. |
+| **MEV (Maximal Extractable Value)** | The profit a block producer (or other actors) can extract by reordering, including, or excluding transactions within a block. |
+| **Proof of Reserves (PoR)** | A transparency mechanism that proves an entity has sufficient on-chain and off-chain assets to cover its liabilities. |
+| **Insurance Fund** | A reserve of assets held by the protocol to cover unexpected losses, such as liquidations that fail to cover debt. |
+| **Veto Quorum** | The minimum number of authorized participants required to trigger a systemic veto and halt administrative functions. |
+| **Rate Limiting** | A defensive strategy that limits the number of operations or amount of value a user can move within a specific time window. |
+
 ## Status (Reference)
 - Implementation: Production-Ready (v1.2.0)
 - Audit Status: Internally Verified

@@ -44,8 +44,9 @@
 
 ;; --- Public Functions ---
 
-;; @desc Check if a user is compliant
-;; @param user: The user to check
+;; @desc Check if a user is compliant.
+;; @param user: The user to check.
+;; @return (response bool uint) - Returns ok(true) if compliant, ok(false) otherwise.
 (define-public (check-clean-hands-compliance (user principal))
   (let (
     (is-sanctioned (contract-call? .kyc-registry is-sanctioned user))
@@ -63,9 +64,10 @@
   )
 )
 
-;; @desc Register a new compliance attestation
-;; @param user: The principal to attest
-;; @param expires-at: The block height expiration
+;; @desc Register a new compliance attestation. Validator or Owner only.
+;; @param user: The principal to attest.
+;; @param expires-at: The block height expiration.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (register-attestation (user principal) (expires-at uint))
   (begin
     (asserts! (or (is-validator) (is-owner)) ERR_UNAUTHORIZED)
@@ -79,8 +81,9 @@
 
 ;; --- Admin Functions ---
 
-;; @desc Set the authorized compliance validator
-;; @param new-validator: The new validator principal
+;; @desc Set the authorized compliance validator. Owner only.
+;; @param new-validator: The new validator principal.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (set-validator (new-validator principal))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
@@ -89,8 +92,9 @@
   )
 )
 
-;; @desc Transfer contract ownership
-;; @param new-owner: The new administrator principal
+;; @desc Transfer contract ownership. Owner only.
+;; @param new-owner: The new administrator principal.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (transfer-ownership (new-owner principal))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
@@ -99,9 +103,10 @@
   )
 )
 
-;; @desc Update the authority pubkey used for signature verification
-;; @param authority: The authority principal
-;; @param pubkey: The 33-byte compressed public key
+;; @desc Update the authority pubkey used for signature verification. Owner only.
+;; @param authority: The authority principal.
+;; @param pubkey: The 33-byte compressed public key.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (update-authority (authority principal) (pubkey (buff 33)))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
@@ -110,11 +115,12 @@
   )
 )
 
-;; @desc Verify a SIP-018 compliance attestation signature and update compliance records
-;; @param user: The user principal
-;; @param jurisdiction: 3-character ISO code
-;; @param tier: Compliance tier (u0-u3)
-;; @param signature: 65-byte ECDSA signature
+;; @desc Verify a SIP-018 compliance attestation signature and update compliance records.
+;; @param user: The user principal.
+;; @param jurisdiction: 3-character ISO code.
+;; @param tier: Compliance tier (u0-u3).
+;; @param signature: 65-byte ECDSA signature.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (verify-and-update-compliance
     (user principal)
     (jurisdiction (string-ascii 3))
