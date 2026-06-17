@@ -76,7 +76,9 @@
     (default-to false (map-get? authorized-attestors tx-sender))
 )
 
-;; @desc Add an authorized attestor
+;; @desc Add an authorized attestor. Owner only.
+;; @param attestor: The principal to authorize as an attestor.
+;; @return (response bool uint) - Returns ok(true) on success, or an error.
 (define-public (add-attestor (attestor principal))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -90,7 +92,9 @@
     )
 )
 
-;; @desc Remove an authorized attestor
+;; @desc Remove an authorized attestor. Owner only.
+;; @param attestor: The principal to remove.
+;; @return (response bool uint) - Returns ok(true) on success, or an error.
 (define-public (remove-attestor (attestor principal))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -104,7 +108,11 @@
     )
 )
 
-;; @desc Submit an attestation for asset reserves
+;; @desc Submit an attestation for asset reserves. Authorized attestors only.
+;; @param asset: The principal of the asset.
+;; @param off-chain-amount: The amount of off-chain backing verified.
+;; @param signature: The 64-byte signature of the attestation.
+;; @return (response bool uint) - Returns ok(true) on success, or an error.
 (define-public (submit-attestation
     (asset principal)
     (off-chain-amount uint)
@@ -148,7 +156,9 @@
     )
 )
 
-;; @desc Sync on-chain balance for an asset
+;; @desc Sync on-chain balance for an asset. Owner only.
+;; @param asset: The trait of the token to sync.
+;; @return (response bool uint) - Returns ok(true) on success, or an error.
 (define-public (sync-on-chain-balance (asset <sip-010-trait>))
     (let (
         (asset-principal (contract-of asset))
@@ -207,6 +217,10 @@
 )
 
 ;; Admin Functions
+
+;; @desc Update the oracle aggregator principal. Owner only.
+;; @param new-aggregator: The new oracle aggregator principal.
+;; @return (response bool uint) - Returns ok(true) on success, or an error.
 (define-public (set-oracle-aggregator (new-aggregator principal))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
@@ -215,6 +229,9 @@
     )
 )
 
+;; @desc Update the contract owner principal. Owner only.
+;; @param new-owner: The new administrator principal.
+;; @return (response bool uint) - Returns ok(true) on success, or an error.
 (define-public (set-contract-owner (new-owner principal))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))

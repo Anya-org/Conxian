@@ -1,38 +1,47 @@
 # Conxian
 
-Conxian is the protocol and public ecosystem layer.
+Conxian is the protocol, DeFi, and DAO-facing public layer.
 
-Conxian Labs is the builder and operator layer that develops, ships, and operates infrastructure around the Conxian ecosystem.
+Conxian-Labs is the builder and operator layer that develops, ships, and supports public infrastructure around the Conxian ecosystem without replacing protocol ownership.
 
 ## Identity split (authoritative)
 
-- **Conxian (protocol + public ecosystem):** protocol primitives, public interfaces, SDKs, wallet and gateway surfaces, and ecosystem-facing standards.
-- **Conxian Labs (builder + operator):** engineering execution, deployment tooling, operations, and managed delivery for Conxian-aligned infrastructure.
+- **Conxian (protocol / DeFi / DAO-facing):** protocol primitives, public economic logic, governance-facing standards, and public ecosystem surfaces.
+- **Conxian-Labs (builder / operator / company-facing):** engineering execution, portfolio operations, deployment tooling, and public support infrastructure around the ecosystem.
 
 ## Pinned portfolio logic
 
-Pinned repositories are ordered to make the split visible at a glance:
+Pinned repositories should make the split visible at a glance:
 
-1. Protocol/public ecosystem first.
-2. Builder/operator repositories second.
+1. Conxian protocol and DAO-facing surfaces first.
+2. Support and access surfaces second.
+3. Conxian-Labs narrative and operator surfaces last.
 
 ## Portfolio map
 
-### Conxian protocol + public ecosystem
+### Conxian protocol / DAO-facing layer
 
 - `Conxian/Conxian`
 - `Conxian/lib-conxian-core`
-- `Conxian/conxian-gateway`
+
+### Support and access layer
+
 - `Conxian/conxius-wallet`
-
-### Conxian Labs builder + operator
-
+- `Conxian/conxian-gateway`
+- `Conxian/conxian-nexus`
+- `Conxian/conxius-platform`
 - `Conxian/conxius-orbit`
+- `Conxian/conxius-enclave-sdk`
+- `Conxian/conxian_ui`
+
+### Conxian-Labs public narrative layer
+
 - `Conxian/conxian-labs-site`
+- `Conxian/.github`
 
 ## Governance relation
 
-Conxian Labs contributes to and operates infrastructure for the Conxian ecosystem, but Conxian (the protocol/public layer) remains the ecosystem-facing identity.
+Conxian-Labs contributes to and operates infrastructure around the Conxian ecosystem, but Conxian remains the protocol and DAO-facing identity.
 
 ## Contact
 
