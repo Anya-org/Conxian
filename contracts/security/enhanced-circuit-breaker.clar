@@ -27,7 +27,8 @@
   (ok (default-to false (map-get? isolated-protocols protocol)))
 )
 
-;; @desc Toggles the protocol-wide emergency pause.
+;; @desc Toggles the protocol-wide emergency pause. Admin only.
+;; @return (response bool uint) - Returns ok(new-pause-state) on success, or an error.
 (define-public (toggle-global-pause)
   (begin
     (asserts! (is-admin tx-sender) ERR_UNAUTHORIZED)
@@ -36,6 +37,9 @@
   )
 )
 
+;; @desc Toggles the pause state for a specific contract. Admin only.
+;; @param target: The contract principal to toggle.
+;; @return (response bool uint) - Returns ok(new-pause-state) on success, or an error.
 (define-public (toggle-contract-pause (target principal))
   (begin
     (asserts! (is-admin tx-sender) ERR_UNAUTHORIZED)
@@ -46,7 +50,9 @@
   )
 )
 
-;; @desc Toggles isolation mode for a specific external protocol.
+;; @desc Toggles isolation mode for a specific external protocol. Admin only.
+;; @param protocol: The external protocol principal to toggle isolation for.
+;; @return (response bool uint) - Returns ok(new-isolation-state) on success, or an error.
 (define-public (toggle-isolation (protocol principal))
   (begin
     (asserts! (is-admin tx-sender) ERR_UNAUTHORIZED)
@@ -57,6 +63,9 @@
   )
 )
 
+;; @desc Sets a new administrator for the enhanced circuit breaker. Admin only.
+;; @param new-admin: The new administrator principal.
+;; @return (response bool uint) - Returns ok(true) on success, or an error.
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-admin tx-sender) ERR_UNAUTHORIZED)

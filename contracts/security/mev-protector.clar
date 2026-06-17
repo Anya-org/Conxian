@@ -16,6 +16,8 @@
 ;; Public Functions
 
 ;; @desc Commit to an order hash before execution
+;; @param order-hash: The 32-byte hash of the order to protect.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (commit-order (order-hash (buff 32)))
   (begin
     (map-set committed-orders order-hash burn-block-height)
@@ -24,6 +26,8 @@
 )
 
 ;; @desc Verify if an order is valid for execution
+;; @param order-hash: The 32-byte hash of the order to verify and consume.
+;; @return (response bool uint) - Returns ok(true) if valid, or an error.
 (define-public (verify-and-consume (order-hash (buff 32)))
   (let (
     (commit-height (unwrap! (map-get? committed-orders order-hash) (err ERR_UNAUTHORIZED)))

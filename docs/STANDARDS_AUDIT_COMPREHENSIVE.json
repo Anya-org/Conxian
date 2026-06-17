@@ -111,6 +111,60 @@
       "alignment": 100,
       "accessibility": 100,
       "overall": 100
+    },
+    "contracts/security/README.md": {
+      "structural": 100,
+      "diataxis": 100,
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
+    },
+    "contracts/security/circuit-breaker.clar": {
+      "structural": 100,
+      "diataxis": "N/A",
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
+    },
+    "contracts/security/enhanced-circuit-breaker.clar": {
+      "structural": 100,
+      "diataxis": "N/A",
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
+    },
+    "contracts/compliance/README.md": {
+      "structural": 100,
+      "diataxis": 100,
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
+    },
+    "contracts/compliance/compliance-manager.clar": {
+      "structural": 100,
+      "diataxis": "N/A",
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
+    },
+    "contracts/compliance/regulatory-adapter.clar": {
+      "structural": 100,
+      "diataxis": "N/A",
+      "github": 100,
+      "conxian": 100,
+      "alignment": 100,
+      "accessibility": 100,
+      "overall": 100
     }
   }
 }

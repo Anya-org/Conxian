@@ -61,6 +61,18 @@ Vaults can use the compliance hooks to protect deposits:
 Validation is performed via the compliance test suite.
 1. Run module tests: `npx vitest tests/compliance`
 
+## Jargon Definition (Explanation)
+
+| Term | Definition |
+|------|------------|
+| **KYC (Know Your Customer)** | The process of verifying the identity of protocol users to prevent fraud and satisfy regulatory requirements. |
+| **AML (Anti-Money Laundering)** | A set of procedures designed to prevent the generation of income through illegal actions. |
+| **Travel Rule (IVMS101)** | A regulatory requirement (IVMS101 standard) for VASPs to share originator and beneficiary information for transactions above a certain threshold. |
+| **ZKML (Zero-Knowledge Machine Learning)** | The use of zero-knowledge proofs to verify that a machine learning model was executed correctly on specific input data without revealing the data or the model itself. |
+| **SIP-018** | A Stacks Improvement Proposal for structured data signing, providing a standard way for users to sign off-chain data that can be verified on-chain. |
+| **VASP (Virtual Asset Service Provider)** | Any entity that facilitates the exchange, transfer, or custody of virtual assets. |
+| **Jurisdictional Sharding** | An architectural pattern where protocol state or transactions are partitioned based on the legal jurisdiction of the participants to ensure local compliance. |
+
 ## Status (Reference)
 - Implementation: Production-Ready (v1.2.1)
 - Audit Status: Internally Verified (April 2026)
