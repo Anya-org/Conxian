@@ -6,7 +6,7 @@ export function verifyWebhookSignature(req: Request, res: Response, next: NextFu
   const secret = process.env.WEBHOOK_SECRET;
 
   if (!secret) {
-    return next(); // Skip if not configured
+    return res.status(500).json({ status: "ERROR", message: "Webhook security misconfigured" });
   }
 
   if (!signature) {

@@ -8,7 +8,7 @@ export const handleX402Payment = async (req: Request, res: Response) => {
     const requirements = {
       scheme: 'exact',
       network: 'stacks:mainnet',
-      payTo: process.env.TREASURY_PRINCIPAL || 'SP1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P',
+      payTo: process.env.TREASURY_PRINCIPAL || (() => { throw new Error("TREASURY_PRINCIPAL not configured"); })(),
       price: '$0.05', // Standard API fee
       description: 'Conxian Gateway API Access',
     };

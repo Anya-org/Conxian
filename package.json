@@ -11,7 +11,7 @@
     "check": "clarinet check",
     "clarinet:console": "clarinet console",
     "validate:docs": "node ./scripts/validate-docs.js",
-    "ci": "npx vitest run --config vitest.config.enhanced.ts --pool=threads",
+    "ci": "npx vitest run --config vitest.config.ts --pool=threads",
     "coverage": "vitest run --coverage",
     "derive:wallets": "tsx scripts/derive_wallets.ts"
   },
