@@ -10,6 +10,9 @@ on:
     paths:
       - 'ui/**'
 
+permissions:
+  contents: read
+
 jobs:
   validate-ui:
     runs-on: ubuntu-latest
