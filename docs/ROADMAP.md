@@ -41,3 +41,8 @@ permalink: /docs/ROADMAP/
 ## Phase 3.5: Mainnet Release (March 2026) - CURRENT
 - **ALEX Lab Integration**: CSF adapter deployed and registered. [COMPLETED]
 - **Mainnet Readiness**: Protocol registry updated for Stacks mainnet deployment. [COMPLETED]
+
+## Phase 3.6: Protocol-First Hardening (June 2026) - IN PROGRESS
+- **Repository Narrowing**: Implementation of CXIP-014 to isolate protocol core. [IN PROGRESS]
+- **CI/CD Alignment**: Dedicated validation workflows for UI, Gateway, and Protocol paths. [COMPLETED]
+- **Universal Chain Research**: Identification of Tier 1 interoperability patterns (LayerZero V2/Axelar). [COMPLETED]

@@ -65,3 +65,20 @@ This document is a strategic research surface.
 - **Universal Interoperability:** **LayerZero V2** (Endpoint-Peer model) and **Axelar** (Amplifier/Verifier model) have been identified as core integration patterns for the Conxian routing layer.
 - **Verifiable Compute:** The **Nexus** network provides ZK-verifiable system state, suitable for off-chain maneuver orchestration and institutional-grade proof generation.
 - **Trust Policy:** Tier 1 (Strict) integrations require synchronous settlement finality or sovereign proof verification.
+
+## 8. SDK and Library Alignment (June 2026 Update)
+
+- **Protocol-First Narrowing**: Alignment with the "protocol-first" architecture requires isolating canonical protocol logic from integration runtime concerns.
+- **Client SDKs**: The Stacks.js and Clarinet SDKs remain the foundational libraries for protocol interaction and verification.
+- **Library Decoupling**: High-level service adapters (e.g., ISO 20022 parsers, OData v4 translators) are classified as "Gateway Runtime" and are scheduled for relocation to dedicated service repositories to preserve protocol purity.
+
+## 9. Institutional Bridge Architecture (Research Paper Summary)
+
+- **BitVM2 Integration**: Using SNARK-based state proofs to bridge Bitcoin liquidity without trusting a central federation.
+- **ISO 20022 & x402**: Standardizing institutional payment mandates for Bitcoin L2 settlement. The x402 standard provides a deterministic mapping between legacy banking instructions and on-chain payment mandates.
+- **Risk Telemetry**: Real-time monitoring of system-wide GCR (Global Collateral Ratio) and TVL (Total Value Locked) is critical for institutional risk committees to verify protocol health autonomously.
+
+## 10. Cross-Chain Agentic Orchestration
+
+- **Autonomous Office Manager**: An orchestration layer that allows AI-driven agents to manage multi-chain positions across EVM, Stacks, and Bitcoin.
+- **Sovereign Hand-off Protocols**: Procedures for transferring management of cross-chain vaults between human councils and autonomous agents based on predefined "State Signatures".

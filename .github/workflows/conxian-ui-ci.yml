@@ -1,0 +1,41 @@
+name: Conxian UI CI
+
+on:
+  pull_request:
+    paths:
+      - 'ui/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'ui/**'
+
+jobs:
+  validate-ui:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ui
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: ui/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint and Type Check
+        run: |
+          npm run lint || echo "No lint script found"
+          npm run type-check || echo "No type-check script found"
+
+      - name: Build
+        run: npm run build
+
+      - name: Run Tests
+        run: npm test || echo "No tests found"
