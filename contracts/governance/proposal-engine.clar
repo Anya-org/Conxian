@@ -21,6 +21,7 @@
 
 ;; Access Control
 (define-data-var access-control principal tx-sender)
+(define-data-var quorum-threshold uint u5000)
 
 ;; Routes
 (define-data-var registry principal tx-sender)
@@ -111,9 +112,8 @@
     (proposal-contract <proposal-trait>)
   )
   (contract-call? .proposal-executor execute proposal-id
-    proposal-contract u5000
+    proposal-contract (var-get quorum-threshold)
   )
-  ;; 50% quorum hardcoded for now
 )
 
 ;; Admin functions
@@ -135,6 +135,7 @@
 (define-public (set-quorum-percentage (new-quorum uint))
   (begin
     (asserts! (contract-call? .conxian-access is-global-admin) (err ERR_UNAUTHORIZED))
+    (var-set quorum-threshold new-quorum)
     (print { event: "set-quorum-percentage", quorum: new-quorum })
     (ok true)
   )

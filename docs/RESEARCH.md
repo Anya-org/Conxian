@@ -58,3 +58,10 @@ This document is a strategic research surface.
 
 ---
 © 2024-2026 Conxian Finance. All rights reserved.
+
+## 7. Universal Chain Support (June 2026 Update)
+
+- **Tier 1 Chain Families:** ADR-006 confirmed **EVM**, **Bitcoin/UTXO**, and **Cosmos/IBC** as primary integration targets.
+- **Universal Interoperability:** **LayerZero V2** (Endpoint-Peer model) and **Axelar** (Amplifier/Verifier model) have been identified as core integration patterns for the Conxian routing layer.
+- **Verifiable Compute:** The **Nexus** network provides ZK-verifiable system state, suitable for off-chain maneuver orchestration and institutional-grade proof generation.
+- **Trust Policy:** Tier 1 (Strict) integrations require synchronous settlement finality or sovereign proof verification.
