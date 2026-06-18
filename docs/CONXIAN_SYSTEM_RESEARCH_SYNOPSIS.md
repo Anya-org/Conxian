@@ -18,9 +18,9 @@ The Conxian Protocol is baselined as a **Sovereign Autonomous Business (SAB)**. 
 - **BME Engine**: Transitioned to Burn-Mint Equilibrium (CXIP-013), converting 100% of fees to CXD buy-back and burn.
 
 ### 2.3. Institutional Gateway (Bridge)
-- **Status**: Production-Ready (v1.1.0).
+- **Status**: Partial Readiness (v1.1.0 parser/mapping support; production verification pending).
 - **Parsing**: Operational support for ISO 20022 (pacs.008/009) and ERP (OData v4/SAP/Oracle) normalization.
-- **x402 Protocol**: Native mapping of HTTP 402 "Payment Required" mandates to on-chain mandates.
+- **x402 Protocol**: Prototype mapping of HTTP 402 "Payment Required" mandates to on-chain mandates; full readiness is pending real signature verification in `gateway/src/handlers/x402.ts`.
 
 ### 2.4. Compliance & Regulatory
 - **Status**: MiCA-Aligned.
