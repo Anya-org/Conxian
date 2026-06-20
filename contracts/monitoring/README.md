@@ -13,15 +13,17 @@ The module acts as the protocol's "Observability Layer":
 ## Core Contracts (Reference)
 
 ### `finance-metrics.clar`
-Aggregates protocol-wide financial data.
+Aggregates protocol-wide financial data and Unified Theory variables.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `get-protocol-tvl` | `()` | Returns the total system TVL (normalized to u8) from Lending and Dimensional modules. |
 | `get-protocol-gcr` | `()` | Returns the Global Collateral Ratio (GCR) as a percentage. |
-| `get-protocol-metrics` | `()` | Returns detailed solvency (GCR), TVL, active positions, and 24h volume metrics. |
-| `set-admin` | `(new-admin principal)` | Sets a new administrative principal for the metrics contract. |
-| `set-tracked-assets` | `(new-assets (list 10 principal))` | Updates the list of assets tracked for TVL calculation. |
+| `get-cost-of-reproduction` | `()` | Returns the Cost of Reproduction (C_R) theory variable. |
+| `get-execution-velocity` | `()` | Returns the Execution Velocity (V_X) theory variable. |
+| `get-system-autonomy` | `()` | Returns the System Autonomy (A_S) theory variable. |
+| `get-protocol-status` | `()` | Returns detailed solvency (GCR), TVL, and Unified Theory metrics. |
+| `update-theory-metrics` | `(uint uint uint)` | Updates C_R, V_X, and A_S variables (Admin only). |
 
 ### `tableland-sync.clar`
 Tableland state persistence bridge.
@@ -41,10 +43,10 @@ Calculates high-level system status.
 
 ## Integration Examples (How-to)
 
-### Querying Protocol TVL
+### Querying Unified Theory Metrics
 ```clarity
-(let ((tvl (unwrap-panic (contract-call? .finance-metrics get-protocol-tvl))))
-  (print tvl)
+(let ((theory (unwrap-panic (contract-call? .finance-metrics get-protocol-status))))
+  (print (get theory theory))
 )
 ```
 
@@ -54,7 +56,7 @@ Comprehensive validation is performed using the Vitest framework.
 2. Run module tests: `npx vitest run tests/monitoring`
 
 ## Status (Reference)
-- Implementation: Production-Ready (v1.2.1)
-- Audit Status: Internally Verified (April 2026)
+- Implementation: Production-Ready (v1.2.0)
+- Audit Status: Internally Verified (June 2026)
 - Telemetry: Real-time (Pull-based)
-- Standard: Hexagonal Architecture, Diátaxis Compliant, Tableland Integration
+- Standard: Hexagonal Architecture, Diátaxis Compliant, Tableland Integration, Unified Theory v2.0

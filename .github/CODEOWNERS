@@ -1,12 +1,14 @@
-# CODEOWNERS: require reviews for sensitive paths
+# Conxian Protocol Code Owners
 
-# Centralized traits and trait policy
-/contracts/traits/* @Conxian/Conxian
+# Global owners
+* @Conxian/core-maintainers
 
-# Deployments
-/deployments/** @Conxian/devops @Conxian/Conxian
-# Stacks runtime & tests
-/stacks/** @Conxian/Conxian
+# Module specific owners
+/contracts/dex/ @Conxian/dex-team
+/contracts/lending/ @Conxian/lending-team
+/contracts/governance/ @Conxian/governance-team
+/contracts/security/ @Conxian/security-team
 
-# All contracts (catch-all for review)
-/contracts/** @Conxian/Conxian
+# Infrastructure and CI
+/.github/workflows/ @Conxian/devops-team
+/scripts/ @Conxian/devops-team
