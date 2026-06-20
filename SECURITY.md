@@ -2,33 +2,20 @@
 
 ## Supported Versions
 
-| Version | Supported |
-| ------- | --------- |
-| 1.1.x | ✅ |
-| 0.7.x | ✅ |
-| < 0.7.0 | ❌ |
+The following versions of Conxian are currently being supported with security updates:
+
+| Version | Supported          |
+| ------- | ------------------ |
+| 0.6.x   | :white_check_mark: |
+| < 0.6   | :x:                |
 
 ## Reporting a Vulnerability
 
-We take the security of the Conxian Protocol seriously.
+We take the security of our protocol seriously. If you believe you have found a security vulnerability, please report it to us by emailing security@conxian-labs.com.
 
-Do **not** disclose vulnerabilities in public issues.
+Please include the following information in your report:
+- A description of the vulnerability and its potential impact.
+- Steps to reproduce the issue.
+- Any supporting material (e.g., code snippets, transaction IDs).
 
-Report privately using one of these channels:
-
-- GitHub private vulnerability reporting on this repository
-- Email [security@conxian-labs.com](mailto:security@conxian-labs.com)
-
-We aim to acknowledge reports within 48 hours.
-
-## Secret handling
-
-- do not commit `.env*` files, private keys, or API tokens
-- use `.env.example` only as a non-secret template
-- rotate any exposed credentials immediately
-
-## Security expectations
-
-- protocol logic should remain verifiable and reviewable
-- breaking security changes should be documented clearly
-- governance and admin controls should be explicit in code and docs
+We will acknowledge your report within 48 hours and provide a timeline for resolution. We ask that you do not disclose the vulnerability publicly until we have had a chance to address it.
