@@ -27,4 +27,4 @@ jobs:
           sudo install -m 755 gitleaks /usr/local/bin/gitleaks
 
       - name: Gitleaks Scan
-        run: gitleaks detect --source . --verbose --redact --config gitleaks.toml
+        run: gitleaks detect --source . --verbose --redact --config gitleaks.toml --ignore-path .gitleaksignore
