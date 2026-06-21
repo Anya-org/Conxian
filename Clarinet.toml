@@ -761,7 +761,7 @@ clarity-version = 4
 [contracts.oracle-aggregator]
 path = "contracts/oracle/oracle-aggregator.clar"
 clarity-version = 4
-depends_on = ["sip-standards"]
+depends_on = ["federated-oracle-adapter", "sip-standards"]
 
 
 [contracts.oracle-traits]

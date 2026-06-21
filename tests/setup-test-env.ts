@@ -24,6 +24,7 @@ export async function initializeSimnet(): Promise<Simnet> {
         'finance-metrics',
         'agent-risk',
         'dex-factory',
+        'federated-oracle-adapter',
         'lending-manager',
         'bme-engine',
         'office-manager',
