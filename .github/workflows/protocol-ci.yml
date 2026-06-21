@@ -33,9 +33,7 @@ jobs:
         run: npm ci
 
       - name: Install Clarinet
-        uses: LUDO-VIC/setup-clarinet@v2
-        with:
-          clarinet-version: 'latest'
+        uses: hirosystems/setup-clarinet@v0.1.1
 
       - name: Clarinet Check
         run: npm run clarinet:check
