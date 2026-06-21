@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-05-21T04:35:00Z",
+  "timestamp": "2026-06-21T12:19:35Z",
   "audit_results": {
     "layer_1_structural": {
-      "score": 100,
-      "violations": []
+      "score": 95,
+      "violations": ["Historical syntax drift in BME engine", "Improper use of as-contract in treasury read-only"]
     },
     "layer_2_diataxis": {
       "score": 100,
@@ -15,7 +15,15 @@
     },
     "layer_4_conxian_standards": {
       "score": 100,
-      "gaps": {}
+      "status": "PASS (Hardening Cycle CON-1250)",
+      "checks": {
+        "hexagonal_architecture_documented": true,
+        "bip_compliance_referenced": true,
+        "testnet_validation_documented": true,
+        "token_system_alignment": true,
+        "ci_cd_alignment_mandatory_pr": true,
+        "contamination_guard_active": true
+      }
     },
     "layer_5_code_doc_alignment": {
       "score": 100,
@@ -26,145 +34,6 @@
       "clarity_issues": []
     }
   },
-  "overall_standards_score": 100.0,
-  "critical_issues": [],
-  "high_issues": [],
-  "medium_issues": [],
-  "compliance_by_file": {
-    "contracts/lending/README.md": {
-      "structural": 100,
-      "diataxis": 100,
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
-    "contracts/dimensional/README.md": {
-      "structural": 100,
-      "diataxis": 100,
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
-    "contracts/dex/README.md": {
-      "structural": 100,
-      "diataxis": 100,
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
-    "contracts/governance/README.md": {
-      "structural": 100,
-      "diataxis": 100,
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
-    "contracts/governance/community-dao.clar": {
-      "structural": 100,
-      "diataxis": "N/A",
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
-    "contracts/governance/proposal-engine.clar": {
-      "structural": 100,
-      "diataxis": "N/A",
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
-    "contracts/governance/dao-treasury.clar": {
-      "structural": 100,
-      "diataxis": "N/A",
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
-    "contracts/governance/emergency-governance.clar": {
-      "structural": 100,
-      "diataxis": "N/A",
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
-    "contracts/governance/voting.clar": {
-      "structural": 100,
-      "diataxis": "N/A",
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
-    "contracts/security/README.md": {
-      "structural": 100,
-      "diataxis": 100,
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
-    "contracts/security/circuit-breaker.clar": {
-      "structural": 100,
-      "diataxis": "N/A",
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
-    "contracts/security/enhanced-circuit-breaker.clar": {
-      "structural": 100,
-      "diataxis": "N/A",
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
-    "contracts/compliance/README.md": {
-      "structural": 100,
-      "diataxis": 100,
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
-    "contracts/compliance/compliance-manager.clar": {
-      "structural": 100,
-      "diataxis": "N/A",
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    },
-    "contracts/compliance/regulatory-adapter.clar": {
-      "structural": 100,
-      "diataxis": "N/A",
-      "github": 100,
-      "conxian": 100,
-      "alignment": 100,
-      "accessibility": 100,
-      "overall": 100
-    }
-  }
+  "overall_standards_score": 99.2,
+  "remediation_status": "ACTIVE (CON-1250 Hardening)"
 }

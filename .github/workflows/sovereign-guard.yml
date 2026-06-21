@@ -5,13 +5,22 @@ on:
       - 'contracts/**'
       - 'deployments/**'
       - 'ui/**'
+  pull_request:
+    paths:
+      - 'contracts/**'
+      - 'deployments/**'
+      - 'ui/**'
+
+permissions:
+  contents: read
+
 jobs:
   jules-audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
       - name: Run Contamination Guard

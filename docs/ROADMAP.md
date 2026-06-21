@@ -1,48 +1,28 @@
+# Conxian Protocol Roadmap (2026)
+
+## Phase 1: Foundation (COMPLETED)
+- Clarity 4 Migration (Epoch 3.0)
+- Nakamoto Upgrade Alignment
+- Core Ecosystem Registry (v1.0.0)
+
+## Phase 2: Apex Liquidity (IN PROGRESS)
+- Common Settlement Framework (CSF) implementation
+- Apex Universal Router (v1.1.0)
+- Concentrated Liquidity Pools (v1.2.0)
+- **Repo Hardening & CI/CD Alignment (CON-1250)**
+
+## Phase 3: Sovereign Autonomy (Q3 2026)
+- Protocol Narrowing (CXIP-014): Isolate core protocol from Gateway/UI
+- AYE Risk Agent (v2.0.0) with PID predictive scaling
+- Revenue Automation (100 bps mandatory fee enforcement)
+- Unified Theory Telemetry (C_R, A_S, V_X tracking)
+
+## Phase 4: Institutional Scaling (Q4 2026)
+- ISO 20022 / pacs.008 full verification
+- ERP Gateway (OData v4) production rollout
+- Universal Chain Support (ADR-006): LayerZero V2 and Axelar integration
+- FDC3/FINOS Desktop Interoperability
+
 ---
-layout: default
-title: Protocol Roadmap
-permalink: /docs/ROADMAP/
----
-
-# Conxian Protocol Roadmap (v0.7.0)
-
-## Phase 1: MVP (Foundation Recovery) - COMPLETED
-
-- **Root Sovereignty**: Implementation of `conxian-protocol` registry and `conxian-access` RBAC.
-- **Trait Standardization**: Consolidation of core DeFi and Governance traits in `contracts/traits/`.
-- **Nakamoto Alignment**: Migration of all temporal logic to `burn-block-height` (Bitcoin-anchored height) for cross-era consistency and Bitcoin finality.
-- **Clarity 4 Preparation**: Core contracts prepared for Clarity 4 (Epoch 3.1) with `stacks-block-time` and `contract-hash?` features. Currently Clarity 3 (Epoch 3.0) for mainnet compatibility.
-- **Fiscal Policy**: Implementation of the 60/20/20 `revenue-distributor` and `cxd-treasury`.
-
-## Phase 2: Alpha (Autonomous Operations) - COMPLETED (January 2026)
-
-- **Agent Staffing**: Deployment of Agent-Risk 2.0 (`agent-risk`) and Agent-Treasury (`agent-treasury`) for autonomous protocol management.
-- **Circuit Breaker**: Integration of protocol-wide safety pauses in DEX and Lending modules.
-- **Adaptive Yield Engine (AYE)**: Activation of Intelligence-Led fiscal policy with PID control and Fuzzy Logic state transitions (Equilibrium, Pre-emptive, Defensive).
-- **Cybernetic Logic (CXIP-012)**: Implementation of Anti-LVR dynamic fees and the **Cybernetic Fiscal Dam (V3)** for fully automated, variable revenue distribution based on real-time metrics.
-- **Dual-Council Governance**: Activation of `proposal-engine` (Staff) and `community-voting-engine` (Board).
-- **Reputation Integration**: Merit-based voting weight adjustment via `reputation-engine`.
-
-## Phase 3: Institutional (Compliance & Scale) - CURRENT
-
-- **Regulatory Hardening**: Expansion of `regulatory-adapter` to include MiCA-compliant reporting, passporting, and VASP registration. [IN PROGRESS]
-- **Enterprise Vaults**: Advanced sBTC integration and institutional yield aggregation. [PLANNED]
-- **Clarity 4 Mainnet Standard**: Full migration to Clarity 4 (Epoch 3.0) with native `stacks-block-time`, `contract-hash?`, `secp256r1-verify`, and `restrict-assets?`. [COMPLETED]
-- **Multi-Council Expansion**: Activation of specialized token governance (CXS, CXTR, CXLP).
-- **Security Audits**: Comprehensive cross-contract audit of the "Full Truth" codebase.
-
-## Phase 4: Scale (Sovereign Expansion) - FUTURE
-
-- **Cross-Chain Sovereignty**: Integration with other Bitcoin L2s (Liquid, Merlin) and non-Bitcoin ecosystems via `interoperability` module.
-- **Autonomous Office Manager**: Advanced AI-orchestration for complex multi-agent workflows.
-- **Retail Abstraction**: Launch of the Conxian Unified Interface (UI) with full UX abstraction of Clarity logic.
-- **AGM Maturation**: First full-cycle Annual General Meeting (AGM) execution.
-
-## Phase 3.5: Mainnet Release (March 2026) - CURRENT
-- **ALEX Lab Integration**: CSF adapter deployed and registered. [COMPLETED]
-- **Mainnet Readiness**: Protocol registry updated for Stacks mainnet deployment. [COMPLETED]
-
-## Phase 3.6: Protocol-First Hardening (June 2026) - IN PROGRESS
-- **Repository Narrowing**: Implementation of CXIP-014 to isolate protocol core. [IN PROGRESS]
-- **CI/CD Alignment**: Dedicated validation workflows for UI, Gateway, and Protocol paths. [COMPLETED]
-- **Universal Chain Research**: Identification of Tier 1 interoperability patterns (LayerZero V2/Axelar). [COMPLETED]
+**Status**: Active
+**Last Updated**: June 2026

@@ -26,7 +26,7 @@
 ;; @desc NTT Hardened Minting leveraging TEE-attested payloads
 (define-public (cross-chain-mint (nft-id uint) (recipient principal) (nonce (buff 32)) (endpoint-pubkey (buff 33)) (attestation-sig (buff 65)))
   (let (
-    (payload-hash (sha256 (unwrap! (to-consensus-buff? { id: nft-id, to: recipient, nonce: nonce }) (err u500))))
+    (payload-hash (sha256 (unwrap! ( { id: nft-id, to: recipient, nonce: nonce }) (err u500))))
     (valid-sig (secp256k1-verify payload-hash attestation-sig endpoint-pubkey))
   )
     ;; 1. Validate the pubkey is authorized

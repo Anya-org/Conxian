@@ -223,7 +223,7 @@
     (asserts! (validate-country-code country) ERR_INVALID_COUNTRY_CODE)
     (map-set kyc-registry user
       { country: country, region: region, status: "verified",
-        risk-score: risk-score, last-verified: (unwrap! (get-block-info? time stacks-block-height) ERR_BLOCK_TIME_UNAVAILABLE) })
+        risk-score: risk-score, last-verified: (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE) })
     (ok true)))
 
 ;; @desc Record a global settlement transaction and compute its shard. Owner or Czar only.

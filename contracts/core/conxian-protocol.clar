@@ -15,7 +15,7 @@
   (ok {
     compliant: true,
     paused: (var-get paused),
-    tenure-id: (some (/ stacks-block-height u10)),
+    tenure-id: (some (/ block-height u10)),
     version: "C4"
   })
 )

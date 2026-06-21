@@ -9,6 +9,14 @@ Conxian-Labs is the builder and operator layer that develops, ships, and support
 - **Conxian (protocol / DeFi / DAO-facing):** protocol primitives, public economic logic, governance-facing standards, and public ecosystem surfaces.
 - **Conxian-Labs (builder / operator / company-facing):** engineering execution, portfolio operations, deployment tooling, and public support infrastructure around the ecosystem.
 
+## CI/CD and Release Posture
+
+This repository follows a strict CI/CD and hardening baseline:
+- **Mandatory PR CI**: Every pull request must pass Node.js installation, `clarinet check`, `vitest` (CI pool), and coverage reports.
+- **Security Guards**: Automatic scanning via `gitleaks`, dependency review, and a custom contamination guard to prevent testnet leakage.
+- **Tag-Driven Releases**: Official protocol versions are identified by Git tags (e.g., `v0.6.1`).
+- **Protected Environments**: Testnet and Mainnet deployment paths are guarded by GitHub Environments and manual approvals.
+
 ## Pinned portfolio logic
 
 Pinned repositories should make the split visible at a glance:

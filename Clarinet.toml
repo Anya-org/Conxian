@@ -26,19 +26,19 @@ depends_on = ["sip-standards"]
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
 clarity-version = 4
-depends_on = ["finance-metrics"]
+depends_on = ["conxian-protocol", "finance-metrics"]
 
 
 [contracts.fiscal-orchestrator]
 path = "contracts/agents/fiscal-orchestrator.clar"
 clarity-version = 4
-depends_on = ["agent-risk", "bme-engine", "concentrated-liquidity-pool", "finance-metrics", "sip-standards"]
+depends_on = ["conxian-protocol", "agent-risk", "bme-engine", "concentrated-liquidity-pool", "finance-metrics", "sip-standards"]
 
 
 [contracts.agent-treasury]
 path = "contracts/agents/agent-treasury.clar"
 clarity-version = 4
-depends_on = ["agent-risk", "bme-engine", "concentrated-liquidity-pool", "conxian-csf-trait", "sip-standards"]
+depends_on = ["conxian-protocol", "agent-risk", "bme-engine", "concentrated-liquidity-pool", "conxian-csf-trait", "sip-standards"]
 
 
 [contracts.alex-adapter]
@@ -120,9 +120,9 @@ clarity-version = 4
 [contracts.bridge-nft]
 path = "contracts/cross-chain/bridge-nft.clar"
 clarity-version = 4
+depends_on = ["conxian-protocol", "sip-standards"]
 
 
-[contracts.btc-adapter]
 path = "contracts/interfaces/btc-adapter.clar"
 clarity-version = 4
 
@@ -187,7 +187,7 @@ clarity-version = 4
 [contracts.concentrated-liquidity-pool]
 path = "contracts/dex/concentrated-liquidity-pool.clar"
 clarity-version = 4
-depends_on = ["bme-engine", "conxian-csf-trait", "revenue-automation", "sip-standards"]
+depends_on = ["conxian-protocol", "bme-engine", "conxian-csf-trait", "revenue-automation", "sip-standards"]
 
 
 [contracts.concentrated-math]
@@ -276,7 +276,7 @@ depends_on = ["sip-standards"]
 [contracts.cxd-bonding-curve-amm]
 path = "contracts/bonding/cxd-bonding-curve-amm.clar"
 clarity-version = 4
-depends_on = ["regulatory-adapter"]
+depends_on = ["conxian-protocol", "regulatory-adapter"]
 
 
 [contracts.cxd-price-initializer]
@@ -583,7 +583,7 @@ clarity-version = 4
 [contracts.intent-solver-gateway]
 path = "contracts/gateway/intent-solver-gateway.clar"
 clarity-version = 4
-depends_on = ["bme-engine", "conxian-intent-trait"]
+depends_on = ["conxian-protocol", "bme-engine", "conxian-intent-trait"]
 
 
 [contracts.interest-rate-model]
@@ -599,7 +599,7 @@ clarity-version = 4
 [contracts.legacy-adapter]
 path = "contracts/migration/legacy-adapter.clar"
 clarity-version = 4
-depends_on = ["migration-manager"]
+depends_on = ["conxian-protocol", "migration-manager"]
 
 
 [contracts.legal-representative-registry]
@@ -610,7 +610,7 @@ clarity-version = 4
 [contracts.lending-manager]
 path = "contracts/lending/lending-manager.clar"
 clarity-version = 4
-depends_on = ["bme-engine", "enhanced-circuit-breaker", "oracle-aggregator", "revenue-automation", "sip-standards"]
+depends_on = ["conxian-protocol", "bme-engine", "enhanced-circuit-breaker", "oracle-aggregator", "revenue-automation", "sip-standards"]
 
 
 [contracts.lending-protocol-governance]
@@ -843,7 +843,7 @@ clarity-version = 4
 [contracts.price-stability-monitor]
 path = "contracts/monitoring/price-stability-monitor.clar"
 clarity-version = 4
-depends_on = ["agent-risk"]
+depends_on = ["conxian-protocol", "agent-risk"]
 
 
 [contracts.proof-of-reserves]
@@ -942,7 +942,7 @@ depends_on = ["revenue-distributor", "sip-standards"]
 [contracts.revenue-distributor]
 path = "contracts/treasury/revenue-distributor.clar"
 clarity-version = 4
-depends_on = ["bme-engine", "cxd-token", "operational-treasury", "sip-standards"]
+depends_on = ["conxian-protocol", "bme-engine", "cxd-token", "operational-treasury", "sip-standards"]
 
 
 [contracts.risk-unit]
@@ -960,7 +960,7 @@ depends_on = ["risk-unit"]
 [contracts.route-manager]
 path = "contracts/dex/route-manager.clar"
 clarity-version = 4
-depends_on = ["regulatory-adapter", "sip-standards"]
+depends_on = ["conxian-protocol", "regulatory-adapter", "sip-standards"]
 
 
 [contracts.sab-election]
@@ -1002,7 +1002,7 @@ depends_on = ["circuit-breaker", "conxian-protocol"]
 [contracts.swap-router]
 path = "contracts/dex/swap-router.clar"
 clarity-version = 4
-depends_on = ["bme-engine", "concentrated-liquidity-pool", "conxian-csf-trait", "enhanced-circuit-breaker", "oracle-aggregator", "sip-standards"]
+depends_on = ["conxian-protocol", "bme-engine", "concentrated-liquidity-pool", "conxian-csf-trait", "enhanced-circuit-breaker", "oracle-aggregator", "sip-standards"]
 
 
 [contracts.switchboard-oracle-adapter]
@@ -1092,7 +1092,7 @@ clarity-version = 4
 [contracts.wormhole-outbox]
 path = "contracts/interoperability/wormhole-outbox.clar"
 clarity-version = 4
-depends_on = ["revenue-distributor", "sip-standards"]
+depends_on = ["conxian-protocol", "revenue-distributor", "sip-standards"]
 
 
 [contracts.yield-aggregator]
