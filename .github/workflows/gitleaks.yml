@@ -14,121 +14,12 @@ jobs:
     name: gitleaks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install gitleaks
-        run: |
-          set -euo pipefail
-
-          version="8.30.1"
-          asset="gitleaks_${version}_linux_x64.tar.gz"
-          expected_sha256="551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
-
-          curl -sSL -o "$asset" \
-            "https://github.com/gitleaks/gitleaks/releases/download/v${version}/${asset}"
-
-          echo "${expected_sha256}  ${asset}" | sha256sum -c -
-
-          install_dir="$RUNNER_TEMP/gitleaks"
-          mkdir -p "$install_dir"
-          tar -xzf "$asset" -C "$install_dir" gitleaks
-          echo "$install_dir" >> "$GITHUB_PATH"
-
-      - name: Validate gitleaks.toml (pull_request head)
-        if: github.event_name == 'pull_request'
-        run: |
-          set -euo pipefail
-
-          tmp_dir="${RUNNER_TEMP:-/tmp}"
-          mkdir -p "$tmp_dir"
-
-          base_sha="${{ github.event.pull_request.base.sha }}"
-          head_sha="${{ github.event.pull_request.head.sha }}"
-
-          if ! git diff --name-only "$base_sha" "$head_sha" -- gitleaks.toml | grep -q .; then
-            echo "gitleaks.toml unchanged; skipping validation."
-            exit 0
-          fi
-
-          if [ ! -f gitleaks.toml ]; then
-            echo "gitleaks.toml missing in PR head; nothing to validate."
-            exit 0
-          fi
-
-          empty_dir="$(mktemp -d "${tmp_dir}/gitleaks-empty-XXXXXX")"
-          trap 'rm -rf "$empty_dir"' EXIT
-
-          gitleaks detect \
-            --no-banner \
-            --redact \
-            --exit-code=0 \
-            --no-git \
-            --source="$empty_dir" \
-            --config="gitleaks.toml"
-
-      - name: Scan (pull_request)
-        if: github.event_name == 'pull_request'
-        run: |
-          set -euo pipefail
-          tmp_dir="${RUNNER_TEMP:-/tmp}"
-
-          base_sha="${{ github.event.pull_request.base.sha }}"
-          head_sha="${{ github.event.pull_request.head.sha }}"
-
-          config_args=()
-          # Use the base branch's gitleaks config so PRs can't weaken rules for their own scan.
-          if git cat-file -e "${base_sha}:gitleaks.toml" 2>/dev/null; then
-            mkdir -p "$tmp_dir"
-            config_path="$(mktemp "${tmp_dir}/gitleaks-config-XXXXXX")"
-            git show "${base_sha}:gitleaks.toml" > "$config_path"
-            config_args+=(--config="$config_path")
-          fi
-
-          gitleaks detect \
-            --no-banner \
-            --redact \
-            "${config_args[@]}" \
-            --log-opts="${base_sha}..${head_sha}"
-
-      - name: Scan (push/workflow_dispatch)
-        if: github.event_name != 'pull_request'
-        run: |
-          set -euo pipefail
-          event_name="${{ github.event_name }}"
-
-          config_args=()
-          if [ -f "gitleaks.toml" ]; then
-            config_args+=(--config="gitleaks.toml")
-          fi
-
-          if [ "$event_name" = "push" ]; then
-            if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
-              gitleaks detect \
-                --no-banner \
-                --redact \
-                "${config_args[@]}" \
-                --no-git
-              exit 0
-            fi
-
-            gitleaks detect \
-              --no-banner \
-              --redact \
-              "${config_args[@]}" \
-              --log-opts="${{ github.event.before }}..${{ github.sha }}"
-            exit 0
-          fi
-
-          if [ "$event_name" = "workflow_dispatch" ]; then
-            gitleaks detect \
-              --no-banner \
-              --redact \
-              "${config_args[@]}" \
-              --no-git
-            exit 0
-          fi
-
-          echo "Unsupported event: $event_name"
-          exit 1
+      - name: Gitleaks Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: gitleaks.toml
