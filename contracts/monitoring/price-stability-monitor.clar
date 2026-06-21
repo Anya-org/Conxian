@@ -13,7 +13,7 @@
       stable: (and (<= pid-fee u500) (>= gcr u130)),
       pid-fee: pid-fee,
       gcr: gcr,
-      timestamp: burn-block-height
+      metrics-ref: (contract-of metrics-ref)
     })
   )
 )

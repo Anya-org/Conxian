@@ -11,12 +11,13 @@
 (define-constant ERR_TIMELOCK_ACTIVE u1002)
 (define-constant ERR_NO_PENDING_OWNER u1003)
 
-(define-constant TIMELOCK_DELAY u86400) ;; 24 hours in seconds (Clarity 4 burn-block-height)
+(define-constant TIMELOCK_DELAY u144) ;; 24 hours in blocks (Clarity 4 standard)
 
 ;; Data Vars
 (define-data-var owner principal tx-sender)
 (define-data-var pending-owner (optional principal) none)
 (define-data-var transfer-delay-end uint u0)
+(define-data-var contract-address principal (as-contract tx-sender))
 
 ;; Authorization
 (define-read-only (is-owner)
@@ -54,13 +55,6 @@
     )
 )
 
-;; @desc Legacy setter for compatibility (now restricted)
-;; @param new-owner: The new owner principal.
-;; @return (response bool uint)
-(define-public (set-owner (new-owner principal))
-    (request-ownership-transfer new-owner)
-)
-
 ;; Vault Trait Implementation
 
 ;; @desc Deposits tokens into the treasury.
@@ -86,7 +80,7 @@
 ;; @param token: The SIP-010 token.
 ;; @return (response uint uint)
 (define-read-only (get-balance (token <sip-010-trait>))
-    (ok (contract-call? token get-balance (as-contract tx-sender)))
+    (contract-call? token get-balance (var-get contract-address))
 )
 
 ;; Additional Treasury Functions

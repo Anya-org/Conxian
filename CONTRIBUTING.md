@@ -15,7 +15,7 @@ Thank you for your interest in contributing to the Conxian Protocol!
 
 ## Release Process
 
-- **Tagging**: Releases are driven by Git tags following SemVer.
+- **Tagging**: Releases are driven by Git tags following SemVer (e.g., `v0.6.1`).
 - **Provenance**: We use GitHub Actions to generate build artifacts and provenance records for official releases.
 - **Changelog**: Every release should be accompanied by a comprehensive changelog update.
 
