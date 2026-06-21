@@ -34,7 +34,7 @@ jobs:
 
       - name: Install Clarinet
         run: |
-          VERSION="v3.2.0"
+          VERSION="v3.20.0"
           curl -sSL -o clarinet.tar.gz "https://github.com/hirosystems/clarinet/releases/download/${VERSION}/clarinet-linux-x64-glibc.tar.gz"
           tar -xzf clarinet.tar.gz
           sudo install -m 755 clarinet /usr/local/bin/clarinet
