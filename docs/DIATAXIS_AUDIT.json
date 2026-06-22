@@ -18,6 +18,38 @@
       "integration_examples": "PASS",
       "testing": "PASS",
       "status": "PASS"
+    },
+    "agents": {
+      "overview": "PASS",
+      "architecture": "PASS",
+      "core_contracts": "PASS",
+      "integration_examples": "PASS",
+      "testing": "PASS",
+      "status": "PASS"
+    },
+    "tokens": {
+      "overview": "PASS",
+      "architecture": "PASS",
+      "core_contracts": "PASS",
+      "integration_examples": "PASS",
+      "testing": "PASS",
+      "status": "PASS"
+    },
+    "staking": {
+      "overview": "PASS",
+      "architecture": "PASS",
+      "core_contracts": "PASS",
+      "integration_examples": "PASS",
+      "testing": "PASS",
+      "status": "PASS"
+    },
+    "treasury": {
+      "overview": "PASS",
+      "architecture": "PASS",
+      "core_contracts": "PASS",
+      "integration_examples": "PASS",
+      "testing": "PASS",
+      "status": "PASS"
     }
   }
 }
