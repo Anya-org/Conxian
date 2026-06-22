@@ -1,6 +1,6 @@
 {
   "layer": "Layer 3: GitHub Best Practices",
-  "score": 100,
+  "score": 98,
   "status": "PASS",
   "required_files": {
     "README.md": "PRESENT",
@@ -9,5 +9,8 @@
     "SECURITY.md": "PRESENT",
     "LICENSE": "PRESENT",
     "CHANGELOG.md": "PRESENT"
-  }
+  },
+  "gaps": [
+    "README.md missing status/license badges"
+  ]
 }

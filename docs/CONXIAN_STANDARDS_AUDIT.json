@@ -1,11 +1,14 @@
 {
   "layer": "Layer 4: Conxian-Specific Standards",
-  "score": 100,
+  "score": 92,
   "status": "PASS",
   "checks": {
     "hexagonal_architecture_documented": true,
     "bip_compliance_referenced": true,
     "testnet_validation_documented": true,
     "token_system_alignment": true
-  }
+  },
+  "gaps": [
+    "Token alignment documentation (60/20/20) is fragmented and sometimes inconsistent with CXIP-013 6-way split"
+  ]
 }

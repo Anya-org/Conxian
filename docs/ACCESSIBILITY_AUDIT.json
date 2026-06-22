@@ -1,11 +1,14 @@
 {
   "layer": "Layer 6: Accessibility & Clarity",
-  "score": 98,
+  "score": 85,
   "status": "PASS",
   "checks": {
     "sentence_length_compliance": true,
-    "jargon_defined": true,
+    "jargon_defined": false,
     "examples_provided": true,
-    "plain_language_score": 98
-  }
+    "plain_language_score": 90
+  },
+  "clarity_issues": [
+    "Missing dedicated 'Jargon' or 'Terminology' sections in Agents, Tokens, Staking, and Treasury module READMEs"
+  ]
 }
