@@ -4,48 +4,56 @@
 
 Track the remaining research work needed before broad multichain-universal implementation can proceed cleanly across Nexus, Gateway, and control-plane surfaces.
 
-## Remaining research items
+## Research items — ALL RESOLVED (2026-06-13)
 
-### 1. Tier 1 chain families
-Decide the first three adapter families for initial execution.
+All four foundational research questions have been closed. This document is retained as a decision record.
 
-Candidate families:
-- EVM
-- Bitcoin / UTXO
-- Cosmos / IBC
-- Solana / SVM
-- Move
-- Substrate
+### 1. Tier 1 chain families ✅ RESOLVED (#735, closed 2026-06-12)
 
-### 2. Cross-chain event bus ownership
-Decide whether Nexus should also own the cross-chain event bus, or remain limited to state, proof, ordering, and trust classification.
+**Decision:** Three Tier 1 families selected for initial execution:
 
-### 3. Approved bridge and messaging systems by trust tier
-Define which bridge and messaging systems are approved and how each maps to trust tiers.
+| Family | Chains |
+|---|---|
+| Bitcoin/UTXO | Bitcoin, Stacks, Liquid, Babylon, BOB |
+| EVM | Ethereum, Base, Arbitrum, Optimism, Polygon |
+| Cosmos/IBC | Cosmos Hub, Osmosis, Celestia |
 
-Status: resolved and canonicalized in `docs/architecture/APPROVED_BRIDGE_AND_MESSAGING_SYSTEMS_BY_TRUST_TIER.md`.
+**Rationale:**
+- Bitcoin/UTXO: Core to Conxian sovereignty
+- EVM: Highest TVL and developer activity
+- Cosmos/IBC: Interoperability standard for non-EVM chains
 
-### 4. Allowed signer backends by chain family
-Define which signer backends are allowed for production by family.
+### 2. Cross-chain event bus ownership ✅ RESOLVED (#736, closed 2026-06-08)
 
-## Why these are the remaining gaps
+**Decision:** Nexus does **not** own the cross-chain event bus runtime.
 
-These questions remain open in the current Nexus/Gateway architecture and directly affect implementation order, scope boundaries, and production trust posture.
+- **Nexus owns:** Canonical event semantics — ingestion normalization, event identity, ordering, finality/reorg handling, proof/state materialization, trust classification, canonical routing.
+- **Gateway owns:** Event bus runtime, pub/sub, fan-out, delivery guarantees, subscriber management.
+- This separation keeps Nexus stateless/provable and Gateway operational.
 
-## Current tracked issues
+### 3. Approved bridge and messaging systems by trust tier ✅ RESOLVED (#737, closed 2026-06-10)
 
-- `conxian-business` #735 — Tier 1 chain families
-- `conxian-business` #736 — cross-chain event bus ownership
-- `conxian-business` #737 — approved bridge and messaging systems by trust tier
-- `conxian-business` #738 — allowed signer backends for production by family
+**Decision:** Canonicalized in `docs/architecture/APPROVED_BRIDGE_AND_MESSAGING_SYSTEMS_BY_TRUST_TIER.md`.
 
-## Working rule
+- Trust-tier matrix defined
+- Constraints and forbidden patterns documented
+- Gateway and Nexus implementation implications captured
 
-No new broad multichain implementation expansion should outrun these four decisions.
+### 4. Allowed signer backends by chain family ✅ RESOLVED (#738, closed 2026-06-13)
 
-## Sequence
+**Decision:** Per-chain-family signer backend policy defined for production.
 
-1. resolve Tier 1 chain families
-2. resolve event-bus ownership
-3. resolve approved bridge/messaging systems
-4. resolve signer backend policy by family
+- Signing remains outside Nexus and Gateway (wallet/enclave/HSM boundaries)
+- Trust-tier enforcement per family
+- Production signer backend matrix documented
+
+## Status: COMPLETE
+
+All tracked research issues are resolved. No remaining blockers for multichain-universal implementation.
+
+## Resolved tracked issues
+
+- `conxian-business` #735 — Tier 1 chain families ✅
+- `conxian-business` #736 — cross-chain event bus ownership ✅
+- `conxian-business` #737 — approved bridge and messaging systems by trust tier ✅
+- `conxian-business` #738 — allowed signer backends for production by family ✅

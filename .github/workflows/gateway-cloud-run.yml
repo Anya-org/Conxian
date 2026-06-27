@@ -24,9 +24,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: recursive
+          token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
+          persist-credentials: false
 
       - name: Google Auth
         id: auth

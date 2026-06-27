@@ -12,14 +12,16 @@ permissions:
   contents: read
 
 jobs:
-  jules-audit:
+  contamination-guard:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+          token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
+          persist-credentials: false
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.10'
       - name: Run Contamination Guard
