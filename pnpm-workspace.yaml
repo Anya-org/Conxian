@@ -6,3 +6,13 @@ packages:
   - "conxius-platform"
   - "conxian-labs-site"
   - "conxius-orbit"
+
+overrides:
+  protobufjs: ^7.5.8
+  axios: ^1.15.2
+  next: ^16.2.6
+  flatted: ^3.4.1
+  lodash: ^4.18.0
+  '@xmldom/xmldom': ^0.8.13
+  ajv: ^8.18.0
+  postcss: ^8.5.14
