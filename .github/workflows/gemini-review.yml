@@ -41,7 +41,32 @@ jobs:
       - name: 'Checkout repository'
         uses: 'actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8' # ratchet:actions/checkout@v6
 
+      - name: 'Detect Gemini authentication configuration'
+        id: 'gemini_auth'
+        env:
+          GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}'
+          GOOGLE_API_KEY: '${{ secrets.GOOGLE_API_KEY }}'
+          GCP_WIF_PROVIDER: '${{ vars.GCP_WIF_PROVIDER }}'
+          SERVICE_ACCOUNT_EMAIL: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'
+          GOOGLE_CLOUD_PROJECT: '${{ vars.GOOGLE_CLOUD_PROJECT }}'
+          GOOGLE_CLOUD_LOCATION: '${{ vars.GOOGLE_CLOUD_LOCATION }}'
+        run: |
+          has_auth='false'
+          if [[ -n "${GEMINI_API_KEY}" || -n "${GOOGLE_API_KEY}" ]]; then
+            has_auth='true'
+          elif [[ -n "${GCP_WIF_PROVIDER}" && -n "${SERVICE_ACCOUNT_EMAIL}" && -n "${GOOGLE_CLOUD_PROJECT}" && -n "${GOOGLE_CLOUD_LOCATION}" ]]; then
+            has_auth='true'
+          fi
+          echo "has_auth=${has_auth}" >> "${GITHUB_OUTPUT}"
+
+      - name: 'Skip review when Gemini auth is not configured'
+        if: ${{ steps.gemini_auth.outputs.has_auth != 'true' }}
+        run: |
+          echo 'Gemini authentication is not configured (no API keys and no complete Vertex/WIF settings).'
+          echo 'Skipping Gemini review as a no-op success.'
+
       - name: 'Run Gemini pull request review'
+        if: ${{ steps.gemini_auth.outputs.has_auth == 'true' }}
         uses: 'google-github-actions/run-gemini-cli@v0' # ratchet:exclude
         id: 'gemini_pr_review'
         env:
