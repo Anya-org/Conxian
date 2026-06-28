@@ -25,7 +25,7 @@ jobs:
     - name: Classify PR change scope
       if: github.event_name == 'pull_request'
       id: classify_pr
-      uses: actions/github-script@v7
+      uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # ratchet:actions/github-script@v7
       with:
         script: |
           const pr = context.payload.pull_request;
@@ -129,7 +129,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
         VERIFY_RELEASE_HYGIENE_CHECK_ORIGIN_TAGS: 'true'
-        VERIFY_RELEASE_HYGIENE_TAG_EXPECTATION_MODE: 'warn'
+        VERIFY_RELEASE_HYGIENE_TAG_EXPECTATION_MODE: 'require'
       run: |
         python3 scripts/verify_release_hygiene.py
     - name: Verify docs public-safe preflight
@@ -141,6 +141,10 @@ jobs:
         BOS_REQUIRE_PORTFOLIO_DOCS: 'true'
       run: |
         python3 scripts/verify_repo_governance_baseline.py
+    - name: Verify LTS compliance
+      if: ${{ hashFiles('scripts/verify_lts_compliance.py') != '' }}
+      run: |
+        python3 scripts/verify_lts_compliance.py
     - name: Verify wallet lifecycle control gates
       run: |
         python3 scripts/verify_wallet_lifecycle_control_gates.py
@@ -171,7 +175,7 @@ jobs:
         token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
         persist-credentials: false
     - name: Setup Rust
-      uses: dtolnay/rust-toolchain@stable
+      uses: dtolnay/rust-toolchain@v1
     - name: Rust Cache
       uses: Swatinem/rust-cache@v2
       with:
@@ -204,7 +208,7 @@ jobs:
         token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
         persist-credentials: false
     - name: Setup Rust
-      uses: dtolnay/rust-toolchain@stable
+      uses: dtolnay/rust-toolchain@v1
     - name: Rust Cache
       uses: Swatinem/rust-cache@v2
       with:

@@ -1,0 +1,216 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'SemVer bump type'
+        required: true
+        type: choice
+        default: 'patch'
+        options: [patch, minor, major]
+      scope:
+        description: 'Release scope (which governed repo)'
+        required: true
+        type: choice
+        default: 'bos'
+        options:
+          - bos
+          - conxian-gateway
+          - conxian-nexus
+          - conxius-wallet
+          - conxius-platform
+      dry_run:
+        description: 'Dry run (preview only, no tag created)'
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - 'conxian-gateway/**'
+      - 'conxian-nexus/**'
+      - 'conxius-wallet/**'
+      - 'Conxian/**'
+      - 'CHANGELOG.md'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release]')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ github.token }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+
+      - name: Determine release parameters
+        id: params
+        env:
+          BUMP_INPUT: ${{ inputs.bump || 'patch' }}
+          SCOPE_INPUT: ${{ inputs.scope || 'bos' }}
+          DRY_RUN: ${{ inputs.dry_run || false }}
+        run: |
+          python3 -c "
+          import os, re, subprocess, sys
+
+          bump = os.environ.get('BUMP_INPUT', 'patch')
+          scope = os.environ.get('SCOPE_INPUT', 'bos')
+          dry_run = os.environ.get('DRY_RUN', 'false').lower() == 'true'
+
+          # Read current BOS version from README.md
+          readme = open('README.md').read()
+          m = re.search(r'\(BOS\s+v([\d.]+)\)', readme)
+          if not m:
+              print('ERROR: Could not find BOS version in README.md')
+              sys.exit(1)
+          current = m.group(1)
+          parts = [int(x) for x in current.split('.')]
+          if bump == 'major':
+              parts = [parts[0] + 1, 0, 0]
+          elif bump == 'minor':
+              parts = [parts[0], parts[1] + 1, 0]
+          else:
+              parts = [parts[0], parts[1], parts[2] + 1]
+          new_ver = '.'.join(str(x) for x in parts)
+
+          # Determine tag
+          if scope == 'bos':
+              tag = f'bos-v{new_ver}'
+              title = f'BOS v{new_ver}'
+          elif scope == 'conxius-platform':
+              tag = f'v{new_ver}'
+              title = f'Conxius Platform v{new_ver}'
+          else:
+              tag = f'{scope}-v{new_ver}'
+              title = f'{scope} v{new_ver}'
+
+          # Get commits since last tag for changelog
+          try:
+              last_tag = subprocess.check_output(
+                  ['git', 'describe', '--tags', '--abbrev=0', '--match', f'{scope}-v*'],
+                  stderr=subprocess.DEVNULL, text=True
+              ).strip()
+              commits = subprocess.check_output(
+                  ['git', 'log', f'{last_tag}..HEAD', '--oneline', '--no-merges'],
+                  text=True
+              ).strip()
+          except subprocess.CalledProcessError:
+              commits = subprocess.check_output(
+                  ['git', 'log', '--oneline', '--no-merges', '-20'],
+                  text=True
+              ).strip()
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f'current={current}\n')
+              f.write(f'new={new_ver}\n')
+              f.write(f'tag={tag}\n')
+              f.write(f'title={title}\n')
+              f.write(f'bump={bump}\n')
+              f.write(f'scope={scope}\n')
+              f.write(f'dry_run={str(dry_run).lower()}\n')
+              # Escape commits for output
+              f.write('commits<<EOF\n')
+              f.write(commits + '\n')
+              f.write('EOF\n')
+
+          print(f'Release: {current} -> {new_ver} ({bump})')
+          print(f'Tag: {tag}')
+          print(f'Scope: {scope}')
+          print(f'Dry run: {dry_run}')
+          print(f'Commits:\n{commits}')
+          "
+
+      - name: Update CHANGELOG.md
+        if: steps.params.outputs.dry_run != 'true'
+        run: |
+          python3 -c "
+          import re
+
+          version = '${{ steps.params.outputs.new }}'
+          scope = '${{ steps.params.outputs.scope }}'
+          tag = '${{ steps.params.outputs.tag }}'
+          date = '$(date +%Y-%m-%d)'
+          commits = '''${{ steps.params.outputs.commits }}'''
+
+          changelog = open('CHANGELOG.md').read()
+
+          # Replace [Unreleased] with new version
+          new_section = f'## [{version}] — {date}\n\n'
+          if commits.strip():
+              for line in commits.strip().split('\n'):
+                  new_section += f'- {line}\n'
+
+          # Keep [Unreleased] at top for next cycle
+          changelog = changelog.replace(
+              '## [Unreleased]',
+              f'## [Unreleased]\n\n{new_section}'
+          )
+
+          open('CHANGELOG.md', 'w').write(changelog)
+          print(f'Updated CHANGELOG.md with version {version}')
+          "
+
+      - name: Update README BOS version marker
+        if: steps.params.outputs.dry_run != 'true' && steps.params.outputs.scope == 'bos'
+        run: |
+          sed -i "s/(BOS v${{ steps.params.outputs.current }})/(BOS v${{ steps.params.outputs.new }})/g" README.md
+
+      - name: Commit and tag
+        if: steps.params.outputs.dry_run != 'true'
+        env:
+          TAG: ${{ steps.params.outputs.tag }}
+          TITLE: ${{ steps.params.outputs.title }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add CHANGELOG.md README.md
+          git commit -m "release: $TITLE
+
+          Bump ${{ steps.params.outputs.scope }} from ${{ steps.params.outputs.current }} to ${{ steps.params.outputs.new }} (${{ steps.params.outputs.bump }}).
+
+          Auto-generated by the Release workflow." || echo "Nothing to commit"
+
+          git tag -a "$TAG" -m "$TITLE"
+          git push origin HEAD:main
+          git push origin "$TAG"
+
+          echo "Pushed tag: $TAG"
+
+      - name: Create GitHub Release
+        if: steps.params.outputs.dry_run != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.params.outputs.tag }}
+          TITLE: ${{ steps.params.outputs.title }}
+          COMMITS: ${{ steps.params.outputs.commits }}
+        run: |
+          gh release create "$TAG" \
+            --repo "${{ github.repository }}" \
+            --title "$TITLE" \
+            --notes "$(cat <<EOF
+          ## $TITLE
+
+          ### Changes
+          \`\`\`
+          $COMMITS
+          \`\`\`
+
+          See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for full details.
+          EOF
+          )" \
+            --target main
+
+      - name: Dry run summary
+        if: steps.params.outputs.dry_run == 'true'
+        run: |
+          echo "::notice::DRY RUN — would create tag ${{ steps.params.outputs.tag }} (${{ steps.params.outputs.current }} → ${{ steps.params.outputs.new }})"
