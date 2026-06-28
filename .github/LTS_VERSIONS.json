@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "LTS (Long-Term Support) version pins for Conxian ecosystem SDKs and frameworks.",
+  "last_updated": "2026-06-28",
+  "lts": {
+    "rust": {
+      "toolchain": "1.82.0",
+      "edition": "2021",
+      "note": "MSRV for conxian-gateway Dockerfile and workspace crates"
+    },
+    "node": {
+      "version": "22",
+      "note": "Required minimum for node:sqlite (≥22.5); matches B2C Wallet Suite CI"
+    },
+    "pnpm": {
+      "version": "9",
+      "note": "Workspace package manager; enforced via --frozen-lockfile in CI"
+    },
+    "python": {
+      "version": "3.10",
+      "note": "Used by scripts and clarity-sim; matches Unified CI setup-python"
+    }
+  },
+  "sdk": {
+    "client-sdk": {
+      "current": "0.1.0",
+      "lts": null,
+      "note": "Pre-release. Define LTS at first stable (≥1.0.0). Consumers should pin exact."
+    },
+    "schemas": {
+      "current": "0.1.0",
+      "lts": null,
+      "note": "Pre-release. Define LTS at first stable (≥1.0.0)."
+    },
+    "conxius-enclave-sdk": {
+      "current": "workspace",
+      "lts": null,
+      "note": "Rust workspace member. Follows root Cargo workspace version."
+    },
+    "lib-conxian-core": {
+      "current": "workspace",
+      "lts": null,
+      "note": "Rust workspace member (submodule). Define LTS when stabilized."
+    }
+  },
+  "frameworks": {
+    "next.js": {
+      "lts_range": "^15.0.0",
+      "note": "Used by showcase-dapp and apps/control-plane. Pin exact in production."
+    },
+    "react": {
+      "lts_range": "^19.0.0",
+      "note": "React 19 is the supported version for all frontend surfaces."
+    }
+  },
+  "governed_repos_requiring_semver": [
+    "Conxian",
+    "conxian-gateway",
+    "conxian-nexus",
+    "conxius-wallet"
+  ]
+}
