@@ -176,6 +176,8 @@ jobs:
         persist-credentials: false
     - name: Setup Rust
       uses: dtolnay/rust-toolchain@v1
+      with:
+        toolchain: stable
     - name: Rust Cache
       uses: Swatinem/rust-cache@v2
       with:
@@ -279,6 +281,10 @@ jobs:
         submodules: recursive
         token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
         persist-credentials: false
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        run_install: false
     - name: Setup Node.js
       uses: actions/setup-node@v6
       with:

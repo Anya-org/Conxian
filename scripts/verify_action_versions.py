@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Validate that all `uses:` action references in workflow YAML files point to real versions.
 
-Queries the GitHub API to confirm each owner/repo@ref exists. Exits non-zero if any
-reference is invalid, catching issues like `actions/checkout@v6` (doesn't exist).
+Queries the GitHub API to confirm each action reference resolves against the backing
+repository and ref. Exits non-zero if any reference is invalid.
 """
 
 from __future__ import annotations
@@ -10,10 +10,10 @@ from __future__ import annotations
 import json
 import os
 import re
-import subprocess
 import sys
 import time
 from pathlib import Path
+from urllib import error, parse, request
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 WORKFLOW_DIR = REPO_ROOT / ".github" / "workflows"
@@ -26,19 +26,41 @@ EXCLUDE_PATTERNS: tuple[re.Pattern, ...] = (
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 
 CACHE_FILE = REPO_ROOT / ".github" / ".action-version-cache.json"
+CACHE_SCHEMA_VERSION = 2
+
+SHA40_RE = re.compile(r"^[0-9a-fA-F]{40}$")
+OWNER_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9-]{0,38}$")
+REPO_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
 
 
 def _load_cache() -> dict[str, bool]:
     if CACHE_FILE.exists():
         try:
-            return json.loads(CACHE_FILE.read_text(encoding="utf-8"))
+            payload = json.loads(CACHE_FILE.read_text(encoding="utf-8"))
+            if (
+                isinstance(payload, dict)
+                and isinstance(payload.get("_meta"), dict)
+                and payload["_meta"].get("schemaVersion") == CACHE_SCHEMA_VERSION
+                and isinstance(payload.get("results"), dict)
+            ):
+                results = payload["results"]
+                return {
+                    key: value
+                    for key, value in results.items()
+                    if isinstance(key, str) and isinstance(value, bool)
+                }
         except (json.JSONDecodeError, OSError):
             pass
     return {}
 
 
 def _save_cache(cache: dict[str, bool]) -> None:
-    CACHE_FILE.write_text(json.dumps(cache, indent=2, sort_keys=True), encoding="utf-8")
+    payload = {
+        "_meta": {"schemaVersion": CACHE_SCHEMA_VERSION},
+        "results": cache,
+    }
+    CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    CACHE_FILE.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
 
 
 def _extract_uses_refs() -> dict[str, list[str]]:
@@ -61,47 +83,136 @@ def _extract_uses_refs() -> dict[str, list[str]]:
     return refs
 
 
-def _check_ref(action_ref: str) -> tuple[bool, str]:
-    """Query GitHub API to check if action ref exists. Returns (exists, detail)."""
-    parts = action_ref.split("@", 1)
-    if len(parts) != 2:
-        return False, f"malformed action ref: {action_ref}"
-    repo_path, ref = parts
+def _parse_action_ref(action_ref: str) -> tuple[tuple[str, str] | None, str]:
+    """Extract owner/repo and ref from owner/repo[/subpath]@ref."""
+    if "@" not in action_ref:
+        return None, f"malformed action ref: {action_ref}"
 
-    # Only validate major-version tags and full SHAs
-    if not re.match(r"^v\d+$", ref) and not re.match(r"^[0-9a-f]{40}$", ref):
-        return True, f"skipped (non-version ref: {ref})"
+    action_path, ref = action_ref.rsplit("@", 1)
+    if not action_path or not ref:
+        return None, f"malformed action ref: {action_ref}"
 
-    url = f"https://api.github.com/repos/{repo_path}/git/ref/tags/{ref}"
-    headers = {"Accept": "application/vnd.github.v3+json"}
+    parts = [part for part in action_path.split("/") if part]
+    if len(parts) < 2:
+        return None, f"malformed action path: {action_path}"
+
+    owner, repo = parts[0], parts[1]
+    if not OWNER_RE.fullmatch(owner):
+        return None, f"invalid owner in action ref: {owner}"
+    if not REPO_RE.fullmatch(repo):
+        return None, f"invalid repository in action ref: {repo}"
+
+    return (f"{owner}/{repo}", ref), ""
+
+
+def _github_status(path: str) -> tuple[int | None, str | None]:
+    """Return (status_code, error_message)."""
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "conxian-action-version-audit",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
     if GITHUB_TOKEN:
         headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
 
+    url = f"https://api.github.com{path}"
+    req = request.Request(url, headers=headers, method="GET")
+
     try:
-        proc = subprocess.run(
-            ["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", "-H",
-             f"Authorization: Bearer {GITHUB_TOKEN}" if GITHUB_TOKEN else "Accept: application/vnd.github.v3+json",
-             url],
-            capture_output=True, text=True, timeout=15,
-        )
-        # Re-run with proper headers
-        proc = subprocess.run(
-            ["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}"] +
-            sum([["-H", f"{k}: {v}"] for k, v in headers.items()], []) +
-            [url],
-            capture_output=True, text=True, timeout=15,
-        )
-        status = int(proc.stdout.strip())
-        if status == 200:
-            return True, "exists"
-        elif status == 404:
-            return False, "tag not found (404)"
-        elif status == 403:
-            return True, f"skipped (rate limited, HTTP {status})"
-        else:
-            return True, f"skipped (HTTP {status})"
-    except (subprocess.TimeoutExpired, ValueError, OSError) as exc:
-        return True, f"skipped (network error: {exc})"
+        with request.urlopen(req, timeout=15) as response:
+            return response.status, None
+    except error.HTTPError as exc:
+        return exc.code, None
+    except (error.URLError, TimeoutError, OSError) as exc:
+        return None, str(exc)
+
+
+def _resolve_status_result(
+    *,
+    status: int | None,
+    network_error: str | None,
+    missing_detail: str,
+    success_detail: str,
+    context: str,
+) -> tuple[bool, str] | None:
+    """Map a GitHub API status into checker output.
+
+    Returns None when caller should continue trying another ref type.
+    """
+    if status == 200:
+        return True, success_detail
+    if status in {404, 422}:
+        return False, missing_detail
+    if status in {401, 403, 429}:
+        return True, f"skipped ({context} HTTP {status})"
+    if status is None:
+        return True, f"skipped ({context} network error: {network_error})"
+    return True, f"skipped ({context} HTTP {status})"
+
+
+def _check_sha_ref(repo_path: str, sha: str) -> tuple[bool, str]:
+    encoded_sha = parse.quote(sha, safe="")
+    status, network_error = _github_status(f"/repos/{repo_path}/commits/{encoded_sha}")
+    resolved = _resolve_status_result(
+        status=status,
+        network_error=network_error,
+        missing_detail="commit not found (404)",
+        success_detail="commit exists",
+        context="commit lookup",
+    )
+    if resolved is None:
+        return False, "commit not found"
+    return resolved
+
+
+def _check_named_ref(repo_path: str, ref: str) -> tuple[bool, str]:
+    encoded_ref = parse.quote(ref, safe="")
+
+    status, network_error = _github_status(f"/repos/{repo_path}/git/ref/tags/{encoded_ref}")
+    resolved = _resolve_status_result(
+        status=status,
+        network_error=network_error,
+        missing_detail="tag missing",
+        success_detail="tag exists",
+        context="tag lookup",
+    )
+    if resolved and (resolved[0] or "skipped" in resolved[1]):
+        return resolved
+
+    status, network_error = _github_status(f"/repos/{repo_path}/git/ref/heads/{encoded_ref}")
+    resolved = _resolve_status_result(
+        status=status,
+        network_error=network_error,
+        missing_detail="branch missing",
+        success_detail="branch exists",
+        context="branch lookup",
+    )
+    if resolved and (resolved[0] or "skipped" in resolved[1]):
+        return resolved
+
+    status, network_error = _github_status(f"/repos/{repo_path}/commits/{encoded_ref}")
+    resolved = _resolve_status_result(
+        status=status,
+        network_error=network_error,
+        missing_detail="ref not found as tag, branch, or commit (404)",
+        success_detail="commit-like ref resolves",
+        context="commit fallback",
+    )
+    if resolved is None:
+        return False, "ref not found"
+    return resolved
+
+
+def _check_ref(action_ref: str) -> tuple[bool, str]:
+    """Query GitHub API to check if action ref exists. Returns (exists, detail)."""
+    parsed, parse_error = _parse_action_ref(action_ref)
+    if parsed is None:
+        return False, parse_error
+
+    repo_path, ref = parsed
+    if SHA40_RE.fullmatch(ref):
+        return _check_sha_ref(repo_path, ref)
+    return _check_named_ref(repo_path, ref)
 
 
 def main() -> int:
@@ -117,7 +228,9 @@ def main() -> int:
     checked = 0
 
     for action_ref, files in sorted(refs.items()):
-        if action_ref in cache:
+        # Only trust cached passing results. Re-check failures to avoid stale false negatives
+        # when validation logic changes.
+        if action_ref in cache and cache[action_ref]:
             exists = cache[action_ref]
             status = "cached-OK" if exists else "cached-FAIL"
         else:
