@@ -28,9 +28,22 @@ def load_lts() -> dict:
     return json.loads(LTS_FILE.read_text(encoding="utf-8"))
 
 
-def check_node_version(lts: dict, errors: list[str], warnings: list[str]) -> None:
-    """Validate Node.js version in CI configs matches LTS."""
-    expected = lts["lts"]["node"]["version"]
+def get_track() -> str:
+    """Determine which track to validate against. Default: lts."""
+    return os.environ.get("LTS_TRACK", "lts").strip().lower()
+
+
+def get_lts_pins(lts: dict, track: str) -> dict:
+    """Get version pins for the specified track."""
+    tracks = lts.get("tracks", {})
+    if track not in tracks:
+        raise RuntimeError(f"Unknown LTS track: {track}. Valid: {list(tracks.keys())}")
+    return tracks[track]
+
+
+def check_node_version(pins: dict, errors: list[str], warnings: list[str]) -> None:
+    """Validate Node.js version in CI configs matches LTS track."""
+    expected = pins.get("node", "22")
     unified_ci = REPO_ROOT / ".github" / "workflows" / "conxian-unified-ci.yml"
     if unified_ci.exists():
         text = unified_ci.read_text(encoding="utf-8", errors="replace")
@@ -76,13 +89,17 @@ def check_sdk_versions(lts: dict, errors: list[str], warnings: list[str]) -> Non
                         errors.append(msg)
 
 
-def check_framework_lts(lts: dict, errors: list[str], warnings: list[str]) -> None:
+def check_framework_lts(pins: dict, errors: list[str], warnings: list[str]) -> None:
     """Validate framework versions are within LTS ranges."""
     import re
     from packaging.version import Version
     from packaging.specifiers import SpecifierSet
 
-    frameworks = lts.get("frameworks", {})
+    frameworks = {
+        "next": pins.get("nextjs", ""),
+        "react": pins.get("react", ""),
+        "vite": pins.get("vite", ""),
+    }
     if not frameworks:
         return
 
@@ -94,12 +111,9 @@ def check_framework_lts(lts: dict, errors: list[str], warnings: list[str]) -> No
             continue
 
         deps = {**data.get("dependencies", {}), **data.get("devDependencies", {})}
-        for fw_name, fw_info in frameworks.items():
-            if fw_name in deps:
+        for fw_name, lts_range in frameworks.items():
+            if fw_name in deps and lts_range:
                 dep_ver = deps[fw_name]
-                lts_range = fw_info["lts_range"]
-
-                # Strip leading non-version chars (^, ~, >=, etc.) for validation
                 clean_ver = re.sub(r'^[\^~>=<]+', '', dep_ver)
                 try:
                     if not SpecifierSet(lts_range).contains(clean_ver):
@@ -109,10 +123,10 @@ def check_framework_lts(lts: dict, errors: list[str], warnings: list[str]) -> No
                     pass  # Can't parse, skip
 
 
-def check_toolchain_in_dockerfiles(lts: dict, errors: list[str], warnings: list[str]) -> None:
+def check_toolchain_in_dockerfiles(pins: dict, errors: list[str], warnings: list[str]) -> None:
     """Validate Dockerfiles use LTS toolchain versions."""
-    rust_lts = lts["lts"]["rust"]["toolchain"]
-    node_lts = lts["lts"]["node"]["version"]
+    rust_lts = pins.get("rust", "1.82")
+    node_lts = pins.get("node", "22")
 
     import re
     for dockerfile in REPO_ROOT.rglob("Dockerfile*"):
@@ -141,13 +155,21 @@ def main() -> int:
         print(f"ERROR: {exc}")
         return 1
 
+    track = get_track()
+    try:
+        pins = get_lts_pins(lts, track)
+    except RuntimeError as exc:
+        print(f"ERROR: {exc}")
+        return 1
+
     errors: list[str] = []
     warnings: list[str] = []
 
-    check_node_version(lts, errors, warnings)
+    print(f"LTS Compliance: validating against '{track}' track")
+    check_node_version(pins, errors, warnings)
     check_sdk_versions(lts, errors, warnings)
-    check_framework_lts(lts, errors, warnings)
-    check_toolchain_in_dockerfiles(lts, errors, warnings)
+    check_framework_lts(pins, errors, warnings)
+    check_toolchain_in_dockerfiles(pins, errors, warnings)
 
     if errors:
         print("LTS Compliance: FAILED")
