@@ -1,0 +1,18 @@
+# gitleaks config — tuned for Conxian monorepo
+# https://github.com/gitleaks/gitleaks#configuration
+
+title = "Conxian gitleaks config"
+
+[allowlist]
+description = "Global allowlist"
+
+# W3C DID:key identifiers use did:key: prefix followed by a multibase-encoded public key.
+# These are public-key anchors (not secrets) but trigger generic-api-key heuristics.
+regexes = [
+  '''did:key:z[a-zA-Z0-9]+''',
+]
+
+# Files that never contain secrets
+paths = [
+  '''\.gitleaks\.toml''',
+]
