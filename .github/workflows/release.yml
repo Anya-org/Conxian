@@ -19,6 +19,7 @@ on:
           - conxian-gateway
           - conxian-nexus
           - conxius-wallet
+          - conxius-platform
       dry_run:
         description: 'Dry run (preview only, no tag created)'
         type: boolean
@@ -85,6 +86,9 @@ jobs:
           if scope == 'bos':
               tag = f'bos-v{new_ver}'
               title = f'BOS v{new_ver}'
+          elif scope == 'conxius-platform':
+              tag = f'v{new_ver}'
+              title = f'Conxius Platform v{new_ver}'
           else:
               tag = f'{scope}-v{new_ver}'
               title = f'{scope} v{new_ver}'
