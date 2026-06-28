@@ -41,7 +41,34 @@ jobs:
       - name: 'Checkout repository'
         uses: 'actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8' # ratchet:actions/checkout@v6
 
+      - name: 'Check Gemini auth configuration'
+        id: 'gemini_auth'
+        env:
+          GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}'
+          GOOGLE_API_KEY: '${{ secrets.GOOGLE_API_KEY }}'
+          GOOGLE_GENAI_USE_GCA: '${{ vars.GOOGLE_GENAI_USE_GCA }}'
+          GOOGLE_GENAI_USE_VERTEXAI: '${{ vars.GOOGLE_GENAI_USE_VERTEXAI }}'
+        run: |
+          set -euo pipefail
+
+          if [[ -n "${GEMINI_API_KEY}" || -n "${GOOGLE_API_KEY}" || "${GOOGLE_GENAI_USE_VERTEXAI}" == 'true' || "${GOOGLE_GENAI_USE_GCA}" == 'true' ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "enabled=false" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Gemini review skipped"
+            echo
+            echo "No Gemini auth method is configured for this repository. Configure at least one of:"
+            echo "- \\`secrets.GEMINI_API_KEY\\`"
+            echo "- \\`secrets.GOOGLE_API_KEY\\`"
+            echo "- \\`vars.GOOGLE_GENAI_USE_VERTEXAI=true\\` (with the required GCP settings)"
+            echo "- \\`vars.GOOGLE_GENAI_USE_GCA=true\\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: 'Run Gemini pull request review'
+        if: steps.gemini_auth.outputs.enabled == 'true'
         uses: 'google-github-actions/run-gemini-cli@v0' # ratchet:exclude
         id: 'gemini_pr_review'
         env:
