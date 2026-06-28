@@ -1,82 +1,17 @@
-# CON-762 Partner scorecard and shortlist artifacts
+# CON-762 Partner scorecard and shortlist (migrated to Linear)
 
-Issue: https://linear.app/conxian-labs/issue/CON-762/build-weighted-partner-scorecard-and-shortlist
+This repository is intended to be public-safe.
 
-## Purpose
+The canonical CON-762 partner scorecard content — including baseline dimension scores, scenario weight profiles, weighted partner scores, first-wave recommendations, and the build-vs-partner decision matrix — is maintained in the Conxian Linear workspace to comply with our Zero Secret Egress (ZSE) mandate and to protect commercially sensitive procurement strategy.
 
-This document is the human-readable index/spec for the CON-762 partner scorecard artifact set.
-It captures the baseline partner-dimension inputs, scenario weights, scoring method, recommendation-tier policy, and the generated CSV outputs used for shortlist decisions.
+See:
 
-## Artifact bundle
+- https://linear.app/conxian-labs
+- https://linear.app/conxian-labs/issue/CON-762
 
-All machine-readable artifacts are under:
+The CSV artifacts under `docs/operations/con-762-partner-scorecard/*/` are ZSE stubs.
+This file is intentionally kept as a stub so existing links continue to resolve.
 
-- `docs/operations/con-762-partner-scorecard/balanced/`
-- `docs/operations/con-762-partner-scorecard/speed-first/`
-- `docs/operations/con-762-partner-scorecard/sovereignty-first/`
+## Boundary decision (Issue #1078)
 
-Each scenario folder includes:
-
-- `weights.csv`
-- `partner_scores.csv`
-- `first_wave_recommendation.csv`
-- `build_vs_partner.csv`
-
-## Baseline raw partner dimension scores
-
-| partner | category | integration_speed | sovereignty_fit | erp_compatibility | compliance_leverage | operational_control_value | buyer_trust_impact | cost_switching_risk |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Fireblocks | Custody/KMS | 4.5 | 3.5 | 3.0 | 4.0 | 4.5 | 4.0 | 3.0 |
-| BitGo | Custody/KMS | 3.5 | 4.0 | 2.5 | 3.5 | 4.0 | 4.0 | 3.0 |
-| TRM | Compliance analytics | 3.5 | 3.0 | 2.5 | 4.5 | 4.0 | 4.5 | 2.5 |
-| Chainalysis | Compliance analytics | 3.5 | 2.5 | 2.5 | 4.5 | 3.5 | 4.5 | 2.5 |
-| Circle | Payments/settlement | 4.0 | 2.5 | 2.0 | 4.0 | 3.5 | 4.5 | 2.5 |
-| QuickNode | Bitcoin infra | 4.0 | 3.0 | 2.0 | 3.0 | 3.5 | 4.0 | 3.0 |
-| Hiro | Bitcoin infra | 2.5 | 4.0 | 2.0 | 2.5 | 3.5 | 3.0 | 2.5 |
-| SAP | ERP | 3.0 | 3.0 | 4.5 | 3.5 | 3.5 | 4.5 | 2.5 |
-| Oracle/NetSuite | ERP | 3.5 | 2.5 | 4.0 | 3.0 | 3.0 | 4.0 | 2.0 |
-
-## Scoring method
-
-For each scenario:
-
-- `weighted_score = Σ(dimension_score × dimension_weight)`
-- `weighted_score` is rounded to 2 decimal places in `partner_scores.csv`.
-- `shortlist_rank` is computed within each `category` (`1` = highest weighted score in that category).
-
-## Recommendation tiers
-
-`recommendation_tier` is scenario-aware and uses four action lanes:
-
-- `first_wave`: immediate partner-engagement lane for initial launch sequence.
-- `second_wave`: strong option, sequenced after first-wave contracting/integration.
-- `discovery_lane`: targeted due-diligence lane before commit.
-- `monitor`: keep active watchlist posture; no near-term integration commitment.
-
-## Scenario weight profiles
-
-| dimension | balanced | speed-first | sovereignty-first |
-| --- | ---: | ---: | ---: |
-| integration_speed | 0.20 | 0.30 | 0.10 |
-| sovereignty_fit | 0.15 | 0.10 | 0.30 |
-| erp_compatibility | 0.15 | 0.10 | 0.05 |
-| compliance_leverage | 0.15 | 0.15 | 0.15 |
-| operational_control_value | 0.15 | 0.15 | 0.20 |
-| buyer_trust_impact | 0.10 | 0.10 | 0.05 |
-| cost_switching_risk | 0.10 | 0.10 | 0.15 |
-
-## Build-vs-partner baseline
-
-`build_vs_partner.csv` is intentionally consistent across scenarios unless strategy materially changes:
-
-- Partner where external certification/network effects materially accelerate delivery.
-- Build where sovereign governance, policy control, and enterprise workflow semantics are core IP/control-plane responsibilities.
-- Use hybrid where near-term partner acceleration is useful but long-term internal optionality is required.
-
-## Validation criteria
-
-The generated artifacts satisfy these checks:
-
-1. Each `weights.csv` sums to exactly `1.00`.
-2. Each `partner_scores.csv` weighted score matches the scenario formula (rounded to 2 decimals).
-3. CSV files have valid headers and no malformed rows.
+During the Conxian/conxius-platform#1078 boundary review (2026-06-28), the partner scorecard artifact set was classified as **not public-safe**. All dimension scores, partner names, scenario weight profiles, weighted scores, recommendation tiers, and build-vs-partner decisions contain commercially sensitive procurement strategy. Canonical content resides in Linear; the Git-tracked CSVs and this document are retained as ZSE stubs for link continuity.
