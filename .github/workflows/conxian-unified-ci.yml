@@ -278,7 +278,7 @@ jobs:
     - name: Setup pnpm
       uses: pnpm/action-setup@v4
       with:
-        version: '11.9.0'
+        version: '9.15.9'
         run_install: false
     - name: Setup Node.js
       uses: actions/setup-node@v6
@@ -291,7 +291,8 @@ jobs:
       run: |
         cd conxius-wallet
         corepack enable
-        pnpm install --frozen-lockfile
+        # Install against conxius-wallet/pnpm-lock.yaml instead of the repo workspace lockfile.
+        pnpm install --frozen-lockfile --ignore-workspace
         pnpm test
 
     - name: Upload test artifacts
