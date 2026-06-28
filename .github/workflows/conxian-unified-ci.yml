@@ -299,7 +299,7 @@ jobs:
     - name: Install & Test
       run: |
         cd conxius-wallet
-        pnpm install --frozen-lockfile
+        pnpm install --no-frozen-lockfile
         pnpm test
 
     - name: Upload test artifacts
