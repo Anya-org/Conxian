@@ -129,7 +129,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
         VERIFY_RELEASE_HYGIENE_CHECK_ORIGIN_TAGS: 'true'
-        VERIFY_RELEASE_HYGIENE_TAG_EXPECTATION_MODE: 'warn'
+        VERIFY_RELEASE_HYGIENE_TAG_EXPECTATION_MODE: 'require'
       run: |
         python3 scripts/verify_release_hygiene.py
     - name: Verify docs public-safe preflight
@@ -141,6 +141,10 @@ jobs:
         BOS_REQUIRE_PORTFOLIO_DOCS: 'true'
       run: |
         python3 scripts/verify_repo_governance_baseline.py
+    - name: Verify LTS compliance
+      if: ${{ hashFiles('scripts/verify_lts_compliance.py') != '' }}
+      run: |
+        python3 scripts/verify_lts_compliance.py
     - name: Verify wallet lifecycle control gates
       run: |
         python3 scripts/verify_wallet_lifecycle_control_gates.py
