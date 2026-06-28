@@ -20,7 +20,7 @@ Use this checklist for PRs that merge a feature branch into `dev`.
 ### Feature -> dev promotion checklist
 
 - [ ] I targeted `dev` (not `staged`/`main`) and the change is appropriate for testnet/non-production validation.
-- [ ] I ran the relevant local validation for the touched areas (examples: `python3 scripts/bos_repo_check.py`, `cargo test`, `npm test`, `pnpm -C showcase-dapp lint`).
+- [ ] I ran the relevant local validation for the touched areas (examples: `python3 scripts/bos_repo_check.py`, `cargo test`, `npm test`, `npm --prefix showcase-dapp run lint`).
 - [ ] The PR is scoped and does not mix unrelated changes (especially across `.github/`, `openspec/`, `docs/`, `scripts/`).
 - [ ] If this change touches wallets/signers/treasury/deployment surfaces, I described the change boundary and the expected runtime lane (`dev`/testnet).
 
