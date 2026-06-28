@@ -1,0 +1,52 @@
+name: Action Version Audit
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - 'scripts/verify_action_versions.py'
+  push:
+    branches: [main, staged, dev]
+    paths:
+      - '.github/workflows/**'
+      - 'scripts/verify_action_versions.py'
+  schedule:
+    - cron: '0 6 * * 1'  # weekly Monday morning
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Validate action version references
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore version check cache
+        uses: actions/cache/restore@v4
+        id: cache-restore
+        with:
+          path: .github/.action-version-cache.json
+          key: action-version-cache-${{ github.run_id }}
+          restore-keys: |
+            action-version-cache-
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+
+      - name: Validate action versions
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 scripts/verify_action_versions.py
+
+      - name: Save version check cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .github/.action-version-cache.json
+          key: action-version-cache-${{ github.run_id }}

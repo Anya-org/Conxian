@@ -1,0 +1,197 @@
+name: Auto-Promotion
+
+on:
+  push:
+    branches: [dev, staged]
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: 'Source branch to promote from'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staged
+      target_branch:
+        description: 'Target branch to promote into'
+        required: true
+        type: choice
+        options:
+          - staged
+          - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  promote:
+    name: Create promotion PR
+    runs-on: ubuntu-latest
+    # On push, only run for the actual merge commit (not tag pushes)
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/'))
+    steps:
+      - name: Determine source and target
+        id: branches
+        env:
+          SOURCE_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.source_branch || github.ref_name }}
+        run: |
+          SOURCE="${SOURCE_REF}"
+          if [ "$SOURCE" = "dev" ]; then
+            TARGET="staged"
+            CHECKLIST_TAG="PROMOTION:DEV->STAGED"
+          elif [ "$SOURCE" = "staged" ]; then
+            TARGET="main"
+            CHECKLIST_TAG="PROMOTION:STAGED->MAIN"
+          else
+            echo "::error::Unsupported source branch: $SOURCE"
+            exit 1
+          fi
+          echo "source=${SOURCE}" >> "$GITHUB_OUTPUT"
+          echo "target=${TARGET}" >> "$GITHUB_OUTPUT"
+          echo "checklist_tag=${CHECKLIST_TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Check for existing promotion PR
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE: ${{ steps.branches.outputs.source }}
+          TARGET: ${{ steps.branches.outputs.target }}
+        run: |
+          EXISTING=$(gh pr list \
+            --repo "${{ github.repository }}" \
+            --base "$TARGET" \
+            --head "$SOURCE" \
+            --state open \
+            --json number \
+            --jq '.[0].number // ""')
+          if [ -n "$EXISTING" ]; then
+            echo "number=${EXISTING}" >> "$GITHUB_OUTPUT"
+            echo "An existing promotion PR #${EXISTING} is already open from ${SOURCE} -> ${TARGET}."
+          else
+            echo "number=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout repository
+        if: steps.existing.outputs.number == ''
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.branches.outputs.source }}
+          fetch-depth: 0
+
+      - name: Get promotion details
+        if: steps.existing.outputs.number == ''
+        id: details
+        env:
+          SOURCE: ${{ steps.branches.outputs.source }}
+          TARGET: ${{ steps.branches.outputs.target }}
+        run: |
+          # Get commits in source that are not in target
+          git fetch origin "$TARGET" 2>/dev/null || true
+          COMMITS=$(git log "origin/${TARGET}..HEAD" --oneline --no-merges 2>/dev/null | head -20)
+          COUNT=$(echo "$COMMITS" | grep -c . || echo "0")
+
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::notice::No new commits to promote from ${SOURCE} to ${TARGET}."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          # Write commit summary for PR body
+          {
+            echo 'commit_summary<<EOF'
+            echo "$COMMITS"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create promotion branch and PR
+        if: steps.existing.outputs.number == '' && steps.details.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE: ${{ steps.branches.outputs.source }}
+          TARGET: ${{ steps.branches.outputs.target }}
+          CHECKLIST_TAG: ${{ steps.branches.outputs.checklist_tag }}
+          COMMIT_SUMMARY: ${{ steps.details.outputs.commit_summary }}
+        run: |
+          PROMO_BRANCH="promotion/${SOURCE}-to-${TARGET}-$(date +%Y%m%d-%H%M)"
+
+          git checkout -b "$PROMO_BRANCH"
+          git push -u origin "$PROMO_BRANCH"
+
+          python3 -c "
+          import os, datetime
+          source = os.environ['SOURCE']
+          target = os.environ['TARGET']
+          commits = os.environ['COMMIT_SUMMARY']
+          date_str = datetime.date.today().isoformat()
+
+          if source == 'dev' and target == 'staged':
+              body = f'''## Dev → Staged Promotion
+
+          Auto-generated promotion PR from \`dev\` to \`staged\`.
+
+          ### Included changes
+          \`\`\`
+          {commits}
+          \`\`\`
+
+          ---
+
+          <!-- PROMOTION:DEV->STAGED -->
+          ### Dev -> staged promotion checklist
+
+          - [ ] Integrated testnet validation completed on \`dev\` and is linked here.
+          - [ ] Required CI checks are green for the exact promotion candidate commit.
+          - [ ] Wallet / signer / treasury boundary checks are explicitly recorded.
+          - [ ] Deployment boundary checks are explicitly recorded.
+          - [ ] Any required submodule pins, lockfiles, and artifact provenance are updated.
+
+          ---
+
+          *This PR was auto-generated by the Auto-Promotion workflow.*'''
+              title = f'PROMOTION:DEV->STAGED — {date_str}'
+          else:
+              body = f'''## Staged → Main Promotion
+
+          Auto-generated promotion PR from \`staged\` to \`main\`.
+
+          ### Included changes
+          \`\`\`
+          {commits}
+          \`\`\`
+
+          ---
+
+          <!-- PROMOTION:STAGED->MAIN -->
+          ### Mainnet acceptance evidence pack
+
+          Required for \`staged\` -> \`main\` promotions. Provide the evidence pack under this heading, or link to a versioned in-repo file per \`openspec/specs/mainnet-acceptance-evidence-pack/spec.md\`.
+
+          ---
+
+          *This PR was auto-generated by the Auto-Promotion workflow.*'''
+              title = f'PROMOTION:STAGED->MAIN — {date_str}'
+
+          with open('pr_body.md', 'w') as f:
+              f.write(body)
+          with open('pr_title.txt', 'w') as f:
+              f.write(title)
+          "
+
+          gh pr create \
+            --repo "${{ github.repository }}" \
+            --base "$TARGET" \
+            --head "$PROMO_BRANCH" \
+            --title "$(cat pr_title.txt)" \
+            --body "$(cat pr_body.md)"
+
+      - name: Report existing promotion PR
+        if: steps.existing.outputs.number != ''
+        run: |
+          echo "::notice::Promotion PR #${{ steps.existing.outputs.number }} is already open."
+
+      - name: Report nothing to promote
+        if: steps.details.outputs.skip == 'true'
+        run: |
+          echo "::notice::No new commits between ${{ steps.branches.outputs.source }} and ${{ steps.branches.outputs.target }}."
