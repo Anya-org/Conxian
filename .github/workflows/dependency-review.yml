@@ -105,7 +105,6 @@ jobs:
 
       - name: Review dependencies
         id: review
-        continue-on-error: true
         uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: high
