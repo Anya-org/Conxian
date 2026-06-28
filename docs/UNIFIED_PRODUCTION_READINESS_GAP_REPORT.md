@@ -312,12 +312,12 @@ Scoring: 0=Not started, 1=Early, 2=Functional, 3=Production
 
 | ID | Gap | Repo | Effort | Dependencies | Status |
 |---|---|---|---|---|---|---|
-| GAP-008 | Bitcoin coverage (80% -> 95%+) | conxian-nexus | 5-10d | None | OPEN |
-| GAP-009 | Lightning coverage (67% -> 90%+) | conxian-nexus | 5-10d | None | OPEN — active tracker: [CON-780](docs/operations/CON-780_LIGHTNING_COVERAGE_TRACKER.md) |
+| GAP-008 | Bitcoin coverage (80% -> 95%+) | conxian-nexus | 5-10d | None | ✅ CLOSED (#722) |
+| GAP-009 | Lightning coverage (67% -> 90%+) | conxian-nexus | 5-10d | None | ✅ CLOSED (#723) — active tracker: [CON-780](docs/operations/CON-780_LIGHTNING_COVERAGE_TRACKER.md) |
 | GAP-010 | Document public API surface | lib-conxian-core | 2-3d | None | **CLOSED (Sprint 2)** |
 | GAP-011 | Create PRD for missing repos | conxian-ui, conxius-platform, enclave-sdk | 3-5d | None | **CLOSED (Sprint 2)** |
 | GAP-012 | Fix hardcoded dependencies | lib-conxian-core | 1-2d | None | **CLOSED (Sprint 2)**
-| GAP-013 | Control plane admin API contracts | conxius-platform | 5-10d | GAP-004 | OPEN |
+| GAP-013 | Control plane admin API contracts | conxius-platform | 5-10d | GAP-004 | ✅ CLOSED (#713, #714) |
 | GAP-014 | Close mock stubs integration tests | lib-conxian-core | 2-3d | None | **CLOSED (Sprint 2)** |
 
 - GAP-009 active tracker: [docs/operations/CON-780_LIGHTNING_COVERAGE_TRACKER.md](docs/operations/CON-780_LIGHTNING_COVERAGE_TRACKER.md)
@@ -327,11 +327,11 @@ Scoring: 0=Not started, 1=Early, 2=Functional, 3=Production
 | ID | Gap | Repo | Effort | Status |
 |---|---|---|---|---|
 | GAP-015 | Stale STUB_CONTRACTS.md archival/refresh | Conxian | <1d | **CLOSED (Sprint 1)** |
-| GAP-016 | API documentation consolidation | All | 5-10d | OPEN |
-| GAP-017 | Developer portal setup | conxian-labs-site | 5-10d | OPEN |
-| GAP-018 | Public marketing narrative alignment | conxian-labs-site | 2-3d | OPEN |
-| GAP-019 | Telemetry instrumentation | conxian-nexus, Gateway | 3-5d | OPEN |
-| GAP-020 | Cross-link older portfolio docs | conxian-business | 2-3d | OPEN |
+| GAP-016 | API documentation consolidation | All | 5-10d | OPEN (Sprint 4) |
+| GAP-017 | Developer portal setup | conxian-labs-site | 5-10d | OPEN (Sprint 4) |
+| GAP-018 | Public marketing narrative alignment | conxian-labs-site | 2-3d | OPEN (Sprint 4) |
+| GAP-019 | Telemetry instrumentation | conxian-nexus, Gateway | 3-5d | OPEN (Sprint 4) |
+| GAP-020 | Cross-link older portfolio docs | conxian-business | 2-3d | ✅ CLOSED (#724) |
 
 ### P3 — Lower Priority
 
@@ -368,15 +368,15 @@ Scoring: 0=Not started, 1=Early, 2=Functional, 3=Production
 | 3-5 | Fix hardcoded dependencies (GAP-012) | Core team | None | **CLOSED** | -- |
 | 5 | Close mock stubs (GAP-014) | Core team | GAP-012 | **CLOSED** | -- |
 
-### Sprint 3: Coverage Expansion (Weeks 3-4) [LAUNCHED 2026-06-04]
+### Sprint 3: Coverage Expansion (Weeks 3-4) [COMPLETED 2026-06-27]
 
-| Task | Owner | Dependencies | GitHub Issue |
-|---|---|---|---|
-| Bitcoin coverage expansion (GAP-008) | Nexus team | None | [#722](https://github.com/Conxian/conxian-business/issues/722) |
-| Lightning coverage expansion (GAP-009) | Nexus + Gateway teams | Shared matrix + boundary in [CON-780 tracker](docs/operations/CON-780_LIGHTNING_COVERAGE_TRACKER.md) | [#723](https://github.com/Conxian/conxian-business/issues/723), [conxian-nexus#104](https://github.com/Conxian/conxian-nexus/issues/104), [conxian-gateway#117](https://github.com/Conxian/conxian-gateway/issues/117) |
-| Control plane admin API contracts (GAP-013) | Platform team | None (GAP-004 closed) | [#713](https://github.com/Conxian/conxian-business/issues/713), [#714](https://github.com/Conxian/conxian-business/issues/714) |
-| Cross-link portfolio docs (GAP-020) | Business team | None | [#724](https://github.com/Conxian/conxian-business/issues/724) |
-| Naming standard (#718) | Business team | None | [#718](https://github.com/Conxian/conxian-business/issues/718) |
+| Task | Owner | Dependencies | GitHub Issue | Status |
+|---|---|---|---|---|
+| Bitcoin coverage expansion (GAP-008) | Nexus team | None | [#722](https://github.com/Conxian/conxian-business/issues/722) | ✅ CLOSED |
+| Lightning coverage expansion (GAP-009) | Nexus + Gateway teams | Shared matrix + boundary in [CON-780 tracker](docs/operations/CON-780_LIGHTNING_COVERAGE_TRACKER.md) | [#723](https://github.com/Conxian/conxian-business/issues/723), [conxian-nexus#104](https://github.com/Conxian/conxian-nexus/issues/104), [conxian-gateway#117](https://github.com/Conxian/conxian-gateway/issues/117) | ✅ CLOSED |
+| Control plane admin API contracts (GAP-013) | Platform team | None (GAP-004 closed) | [#713](https://github.com/Conxian/conxian-business/issues/713), [#714](https://github.com/Conxian/conxian-business/issues/714) | ✅ CLOSED |
+| Cross-link portfolio docs (GAP-020) | Business team | None | [#724](https://github.com/Conxian/conxian-business/issues/724) | ✅ CLOSED |
+| Naming standard (#718) | Business team | None | [#718](https://github.com/Conxian/conxian-business/issues/718) | ✅ CLOSED |
 
 ### Sprint 4: Developer Experience (Weeks 5-6)
 
@@ -400,31 +400,22 @@ Scoring: 0=Not started, 1=Early, 2=Functional, 3=Production
 
 ## 9. GitHub / Linear / Team Alignment
 
-### Open Issues Mapping
+### Open Issues Mapping (Sprint 3 — ALL CLOSED)
 
-| Issue | Title | Assignee | Linked GAP | Priority |
-|---|---|---|---|---|
-| #722 | Expand Bitcoin test coverage (80% -> 95%+) | botshelomokoka | GAP-008 | P1 |
-| #723 | Expand Lightning test coverage (67% -> 90%+) | botshelomokoka | GAP-009 | P1 |
-| conxian-nexus#104 | Execute GAP-009 service-layer Lightning test expansion | — | GAP-009 | P1 |
-| conxian-gateway#117 | Execute GAP-009 adapter-layer Lightning test expansion | — | GAP-009 | P1 |
-| #718 | Create standard naming convention | botshelomokoka | — | P2 |
-| #714 | Implement first control plane modules | botshelomokoka | GAP-013 | P1 |
-| #713 | Design control plane admin API contract | — | GAP-013 | P1 |
-| #724 | Cross-link older portfolio docs | botshelomokoka | GAP-020 | P2 |
+Sprint 3 issues are all closed. See Sprint 3 table above for details. Remaining open work moves to Sprint 4.
 
 ### Issue → Roadmap Alignment
 
 | Issue | Roadmap Phase | Status |
 |---|---|---|
-| #722 (Bitcoin coverage GAP-008) | Sprint 3 | P1 — expand 80% -> 95%+ conxian-nexus |
-| #723 (Lightning coverage GAP-009) | Sprint 3 | P1 — expand 67% -> 90%+ conxian-nexus with active tracker [CON-780](docs/operations/CON-780_LIGHTNING_COVERAGE_TRACKER.md); execution links: [conxian-nexus#104](https://github.com/Conxian/conxian-nexus/issues/104), [conxian-gateway#117](https://github.com/Conxian/conxian-gateway/issues/117) |
-| #718 (Naming standard) | Sprint 3 | Needs naming standard doc — no doc exists yet |
-| #714 (Control plane modules) | Sprint 3 | Unblocked (GAP-004 closed Sprint 2) |
-| #713 (Admin API contract) | Sprint 3 | Needs assignee — contract docs exist, recommend review for closure |
-| #724 (Cross-link docs GAP-020) | Sprint 3 | P2 — cross-link portfolio docs from sub-repos |
-| #715 (12-month roadmap) | Complete | **CLOSED** — doc exists |
-| #710 (Control plane boundaries) | Complete | **CLOSED** — evidence in architecture docs |
+| #722 (Bitcoin coverage GAP-008) | Sprint 3 | ✅ CLOSED |
+| #723 (Lightning coverage GAP-009) | Sprint 3 | ✅ CLOSED |
+| #718 (Naming standard) | Sprint 3 | ✅ CLOSED |
+| #714 (Control plane modules) | Sprint 3 | ✅ CLOSED |
+| #713 (Admin API contract) | Sprint 3 | ✅ CLOSED |
+| #724 (Cross-link docs GAP-020) | Sprint 3 | ✅ CLOSED |
+| #715 (12-month roadmap) | Complete | ✅ CLOSED — doc exists |
+| #710 (Control plane boundaries) | Complete | ✅ CLOSED — evidence in architecture docs |
 
 ### Team Structure Suggestion
 
@@ -470,22 +461,22 @@ Scoring: 0=Not started, 1=Early, 2=Functional, 3=Production
 
 1. **Sprint 1 completed** — All 7 P0/P1 gaps closed (2026-06-03)
 2. **Sprint 2 completed** — All 5 gaps closed (GAP-011, GAP-010, GAP-004, GAP-012, GAP-014)
-3. **Sprint 3 launched (2026-06-04)** — 6 issues created: #722 (GAP-008), #723 (GAP-009), #724 (GAP-020), plus existing #713, #714, #718
-4. **Sync Linear KB** — Sprint 3 kickoff recorded in knowledge base
+3. **Sprint 3 completed (2026-06-27)** — All 6 issues closed: #722 (GAP-008), #723 (GAP-009), #724 (GAP-020), #713, #714, #718
+4. **Launch Sprint 4** — Developer Experience: API docs consolidation, developer portal, marketing alignment, telemetry
 
 ### This Week
 
-1. **Sprint 2 completed** — All 5 gaps closed.
-2. **Sprint 3 in progress** — GAP-008 (#722), GAP-009 (#723; execution: [conxian-nexus#104](https://github.com/Conxian/conxian-nexus/issues/104), [conxian-gateway#117](https://github.com/Conxian/conxian-gateway/issues/117); tracker: [CON-780](docs/operations/CON-780_LIGHTNING_COVERAGE_TRACKER.md)), GAP-013 (#713/#714), GAP-020 (#724), #718
-3. **Push fix branch to all subrepos** — Ensure nested `.gitmodules` are correct
-4. **Begin work**: Bitcoin coverage (#722), Lightning coverage (#723)
+1. **Sprint 3 completed** — All 6 issues closed.
+2. **Prepare Sprint 4 kickoff** — GAP-016 (API docs), GAP-017 (dev portal), GAP-018 (marketing), GAP-019 (telemetry)
+3. **CI Pipeline Hardening** — Added clippy + audit to gateway-suite and b2b-suite; resolved Submodule Pin Integrity Audit failures; fixed Gemini workflow issues
+4. **Branch sync** — Evaluate dev/staged promotion pipeline staleness
 
 ### This Month
 
 1. **P0 gaps** — DONE (Sprint 1: 3/3 closed)
-2. **P1 gaps** — 4/7 closed (Sprint 2: GAP-010, GAP-011, GAP-012, GAP-014); 3 in Sprint 3 (GAP-008 #722, GAP-009 #723, GAP-013 #713/#714)
-3. **Sprint 3 launched (2026-06-04)** — Bitcoin/Lightning coverage, control plane APIs, naming standard, docs cross-linking
-4. **Engage GTM team**: Start wallet commercialization, compliance filings
+2. **P1 gaps** — 7/7 closed (Sprints 2+3: all resolved)
+3. **Sprint 3 completed (2026-06-27)** — Bitcoin/Lightning coverage, control plane APIs, naming standard, docs cross-linking — all closed
+4. **Sprint 4 launch** — Developer Experience and telemetry instrumentation
 
 ### Q3 2026
 
@@ -498,7 +489,7 @@ Scoring: 0=Not started, 1=Early, 2=Functional, 3=Production
 | Criterion | Target | Timeline | Status |
 |---|---|---|---|
 | All P0 gaps closed | 0 open P0 items | Week 1 | ACHIEVED |
-| All P1 gaps closed | 0 open P1 items | Month 1 | 4/7 closed (Sprint 2); 3 remaining (GAP-008, GAP-009, GAP-013) in Sprint 3 |
+| All P1 gaps closed | 0 open P1 items | Month 1 | ACHIEVED (7/7 closed across Sprints 2+3) |
 | Production launch | Live user traffic, revenue | Q3 2026 | Pending |
 | Developer adoption | 10+ external contributors | Q4 2026 | Pending |
 | Institutional onboarded | 1+ enterprise client | Q4 2026 | Pending |

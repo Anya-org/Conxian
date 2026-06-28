@@ -189,7 +189,7 @@ jobs:
       - 'invoke'
       - 'plan-execute'
     if: |-
-      ${{ always() && !cancelled() && (failure() || needs.dispatch.outputs.command == 'fallthrough') }}
+      ${{ always() && !cancelled() && needs.dispatch.result == 'success' && (failure() || needs.dispatch.outputs.command == 'fallthrough') }}
     runs-on: 'ubuntu-latest'
     permissions:
       contents: 'read'

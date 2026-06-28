@@ -25,5 +25,16 @@ Current status note (updated April 8, 2026): `conxian-business` is now private i
 - [x] Repository descriptions sanitized.
 - [x] ZSE compliance verified repo-wide.
 
+### 5) Follow-up Boundary Reviews
+
+#### CON-762 Partner Scorecard (Issue #1078, 2026-06-28)
+
+- **Scope**: Strategy documents under `Sovereign-Strategy-Nexus/docs/` and partner scorecard CSVs under `docs/operations/con-762-partner-scorecard/`.
+- **Strategy stubs**: All four files under `Sovereign-Strategy-Nexus/docs/` are already ZSE stubs pointing to Linear. No action required.
+- **Partner scorecard**: The entire CON-762 artifact set — baseline dimension scores, weighted partner scores, first-wave recommendations, scenario weight profiles, and build-vs-partner decisions — was classified as **not public-safe**. Content names specific commercial partners and reveals weighted procurement evaluation across multiple scenarios.
+- **Disposition**: All CSV files replaced with ZSE stubs; master document (`CON-762_PARTNER_SCORECARD_AND_SHORTLIST.md`) replaced with ZSE stub and boundary decision record. Decision-record README placed in `docs/operations/con-762-partner-scorecard/README.md`.
+- **Canonical location**: https://linear.app/conxian-labs/issue/CON-762
+- **Cross-references updated**: `SUMMARY.md`, `DOCUMENTATION_ALIGNMENT_INDEX.md`.
+
 ---
 © 2026 Conxian-Labs (Pty) Ltd.
