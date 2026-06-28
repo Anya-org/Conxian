@@ -57,12 +57,33 @@ def check_node_version(pins: dict, errors: list[str], warnings: list[str]) -> No
 
 def check_sdk_versions(lts: dict, errors: list[str], warnings: list[str]) -> None:
     """Validate SDK consumers pin to compatible versions."""
-    import re
+    sdk_catalog: dict[str, dict] = {}
 
-    for sdk_name, sdk_info in lts["sdk"].items():
-        lts_ver = sdk_info.get("lts")
-        if not lts_ver:
+    legacy_sdk_catalog = lts.get("sdk")
+    if isinstance(legacy_sdk_catalog, dict):
+        sdk_catalog.update(legacy_sdk_catalog)
+
+    current_sdk_catalog = lts.get("conxian_sdks")
+    if isinstance(current_sdk_catalog, dict):
+        sdk_catalog.update(current_sdk_catalog)
+
+    if not sdk_catalog:
+        warnings.append("No SDK catalog found under 'sdk' or 'conxian_sdks'; skipping SDK dependency checks.")
+        return
+
+    for sdk_name, sdk_info in sdk_catalog.items():
+        if not isinstance(sdk_info, dict):
+            continue
+
+        lts_ver = (
+            sdk_info.get("lts")
+            or sdk_info.get("lts_version")
+            or sdk_info.get("target")
+            or sdk_info.get("current")
+        )
+        if not isinstance(lts_ver, str) or not lts_ver.strip():
             continue  # No LTS defined yet for this SDK
+        lts_ver = lts_ver.strip()
 
         for pkg_json in REPO_ROOT.rglob("package.json"):
             rel = pkg_json.relative_to(REPO_ROOT)
@@ -73,12 +94,12 @@ def check_sdk_versions(lts: dict, errors: list[str], warnings: list[str]) -> Non
 
             deps = {**data.get("dependencies", {}), **data.get("devDependencies", {})}
 
-            # Check if this package.json consumes the SDK
-            sdk_pkg_name = f"@conxian/{sdk_name}" if sdk_name not in ("client-sdk", "schemas") else f"@conxian/{sdk_name}"
-            # Also check local workspace references
+            sdk_name_normalized = sdk_name.lower().replace("_", "-")
+
+            # Check local workspace and floating references
             for dep_name, dep_ver in deps.items():
                 normalized = dep_name.lower().replace("_", "-")
-                if sdk_name in normalized or sdk_name.replace("-", "/") in normalized:
+                if sdk_name_normalized in normalized or sdk_name_normalized.replace("-", "/") in normalized:
                     # Check if version is a local workspace ref (should be published version)
                     if dep_ver.startswith("workspace:") or dep_ver.startswith("file:") or dep_ver.startswith("link:"):
                         msg = f"{rel}: {dep_name}@{dep_ver} — SDK dependency uses local workspace ref. Pin to published version {lts_ver} for production."
