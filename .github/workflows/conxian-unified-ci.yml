@@ -256,7 +256,15 @@ jobs:
     - name: Dependency audit
       run: |
         cd lib-conxian-core
-        cargo audit
+        # Temporary, narrow advisory allowlist:
+        # rustls-webpki 0.101.7 is pulled transitively via bdk -> electrum-client.
+        # lib-conxian-core currently tracks upstream bdk/electrum-client versions,
+        # and a safe local upgrade path is not available in this repo without
+        # broader dependency migration.
+        cargo audit \
+          --ignore RUSTSEC-2026-0098 \
+          --ignore RUSTSEC-2026-0099 \
+          --ignore RUSTSEC-2026-0104
 
   b2c-wallet-suite:
     name: B2C Wallet Suite
@@ -275,6 +283,11 @@ jobs:
         submodules: recursive
         token: ${{ secrets.CI_SUBMODULES_PAT || github.token }}
         persist-credentials: false
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 9
+        run_install: false
     - name: Setup Node.js
       uses: actions/setup-node@v6
       with:
