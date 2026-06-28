@@ -1,0 +1,32 @@
+# CODEOWNERS — Automated review routing for Conxian Business monorepo
+#
+# Last line match wins. See docs/BRANCH_AND_PROMOTION_STANDARD.md for routing policy.
+
+# Global catch-all — main branch guardians
+* @botshelomokoka
+
+# CI/CD and automation — requires infra review
+.github/                                 @botshelomokoka
+scripts/                                 @botshelomokoka
+
+# Core libraries — requires core team review
+lib-conclave-sdk/                        @botshelomokoka
+lib-conxian-core/                        @botshelomokoka
+lib-conxian-enterprise/                  @botshelomokoka
+
+# B2C / Wallet services
+conxius-wallet/                          @botshelomokoka
+
+# Gateway / infrastructure
+conxian-gateway/                         @botshelomokoka
+
+# Documentation — open to wider review
+docs/                                    @botshelomokoka
+*.md                                     @botshelomokoka
+
+# Policy, governance, and compliance
+GOVERNANCE.md                            @botshelomokoka
+SECURITY.md                              @botshelomokoka
+docs/BRANCHING_AND_PROMOTION_POLICY.md   @botshelomokoka
+docs/PROMOTION_CHECKLISTS.md             @botshelomokoka
+openspec/                                @botshelomokoka
