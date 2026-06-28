@@ -1,5 +1,8 @@
 # Changelog
 
+
+## Unreleased
+
 ## [0.7.0] - 2026-02-15 - The Jan 2026 Sovereign Refactor (Ground Truth Clarity 4)
 
 ### Added
@@ -54,37 +57,6 @@
 
 - **Static Policy**: Deprecated `allocation-policy.clar` in favor of the Intelligence-Led AYE.
 
-## [2024-07-22] - Documentation Realignment
-
-### Changed
-
-- Realigned all module-level `README.md` files in the `contracts` directory to accurately reflect the implemented contract architecture, public functions, and current status.
-- Updated the main `README.md` and `documentation/README.md` to ensure they provide an accurate overview of the project and link to the realigned module-level documentation.
-- Removed the redundant `PRD.md` file from the `documentation` directory.
-- Moved the `DOCUMENTATION_STRUCTURE.md` file to the `documentation/reference` directory.
-
-## [0.3.0] - 2024-08-20
-
-### Added
-
-- **Investment-Grade Analysis**: Integrated refined SWOT, PESTLE, and Six-Pillar View into `PRD.md`.
-- **Project Roadmap**: Refined `docs/ROADMAP.md` (v0.3.0) detailing 4-phase execution (MVP to Scale).
-- **SAB Whitepaper**: Enhanced `docs/WHITEPAPER.md` with Sovereign Autonomous Business (SAB) narrative and VC pitch.
-- **Verification Suite**: Updated `docs/REQUIREMENTS_TESTING.md` with specific unit tests for autonomous agents and fiscal policy.
-- **CAPEX/OPEX Modeling**: Integrated detailed financial estimates and "Staff" payroll models in `PRD.md`.
-- **Research Findings**: Documented 2024 Bitcoin L2 landscape and MiCA regulatory findings in `docs/RESEARCH.md` (updated to 2026).
-
-### Changed
-
-- **PRD Synchronization**: Fully synchronized `PRD.md` with implementation state, including "Kill-Switch" risks and "Blue Ocean" opportunities.
-- **Configuration Alignment**: Re-enabled `agent-risk` in `Clarinet.toml` and verified dependency chain.
-- **Protocol Recovery**: Completed "Full Truth" consolidation of core DeFi and Governance modules.
-
-### Security
-
-- **Circuit Breaker**: Documented integration of the protocol-wide circuit breaker in all service modules.
-- **Regulatory Hardening**: Documented "Clean-Hands" compliance via `regulatory-adapter`.
-
 ## [0.5.0] - 2026-01-31 - Protocol Repairs Complete
 
 ### Added (Priority Repairs P1-P6)
@@ -124,17 +96,33 @@
 - **Precision Temporal Logic**: Replaced `block-height` and `burn-block-height` with `stacks-block-time` for all yield, vesting, and governance logic.
 - **Gap Analysis**: Updated `gap-analysis.md` with Jan 2026 "Jules Persona" investment-grade analysis.
 
+## [0.3.0] - 2024-08-20
+
+### Added
+
+- **Investment-Grade Analysis**: Integrated refined SWOT, PESTLE, and Six-Pillar View into `PRD.md`.
+- **Project Roadmap**: Refined `docs/ROADMAP.md` (v0.3.0) detailing 4-phase execution (MVP to Scale).
+- **SAB Whitepaper**: Enhanced `docs/WHITEPAPER.md` with Sovereign Autonomous Business (SAB) narrative and VC pitch.
+- **Verification Suite**: Updated `docs/REQUIREMENTS_TESTING.md` with specific unit tests for autonomous agents and fiscal policy.
+- **CAPEX/OPEX Modeling**: Integrated detailed financial estimates and "Staff" payroll models in `PRD.md`.
+- **Research Findings**: Documented 2024 Bitcoin L2 landscape and MiCA regulatory findings in `docs/RESEARCH.md` (updated to 2026).
+
+### Changed
+
+- **PRD Synchronization**: Fully synchronized `PRD.md` with implementation state, including "Kill-Switch" risks and "Blue Ocean" opportunities.
+- **Configuration Alignment**: Re-enabled `agent-risk` in `Clarinet.toml` and verified dependency chain.
+- **Protocol Recovery**: Completed "Full Truth" consolidation of core DeFi and Governance modules.
+
+### Security
+
+- **Circuit Breaker**: Documented integration of the protocol-wide circuit breaker in all service modules.
+- **Regulatory Hardening**: Documented "Clean-Hands" compliance via `regulatory-adapter`.
+
 ## [2024-07-22] - Documentation Realignment
 
-## [0.7.0] - 2026-02-13
-### Added
-- Dual-Mode testing architecture via `block-utils.clar`.
-- Principal Injection pattern for breaking contract circularity.
-- Comprehensive Root-to-Leaf and Leaf-to-Root verification suite (21 files).
-- Multi-council seat minting and power tracking in `enhanced-governance-nft`.
+### Changed
 
-### Fixed
-- Resolved simulation failures for Clarity 4 native keywords.
-- Fixed 15+ "Unresolved Contract" errors in Simnet.
-- Standardized account naming across all test suites.
-- Corrected `dimensional-engine` pre-flight check logic.
+- Realigned all module-level `README.md` files in the `contracts` directory to accurately reflect the implemented contract architecture, public functions, and current status.
+- Updated the main `README.md` and `documentation/README.md` to ensure they provide an accurate overview of the project and link to the realigned module-level documentation.
+- Removed the redundant `PRD.md` file from the `documentation` directory.
+- Moved the `DOCUMENTATION_STRUCTURE.md` file to the `documentation/reference` directory.
