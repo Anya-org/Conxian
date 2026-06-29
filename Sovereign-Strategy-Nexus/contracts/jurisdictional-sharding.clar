@@ -1,3 +1,5 @@
+;; clarity-version 4
+;; epoch latest
 ;; jurisdictional-sharding.clar
 ;; Guardian: Sovereignty
 ;; Jurisdictional sharding + SARB/SARS monitoring for ZAR-linked settlements.
@@ -284,7 +286,7 @@
           ERR_TX_REPLAY_MISMATCH
         )
       (let (
-          (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+          (block-time (unwrap! (get-block-info? time stacks-block-height) ERR_BLOCK_TIME_UNAVAILABLE))
           (sender-country (get country (contract-call? .kyc-registry get-identity-status sender)))
           (receiver-country (get country (contract-call? .kyc-registry get-identity-status receiver)))
           (tier1-rail (is-tier1-rail sender receiver))
@@ -319,7 +321,7 @@
                 year: year,
                 tier1-rail: tier1-rail,
                 block-time: block-time,
-                block-height: block-height,
+                stacks-block-height: stacks-block-height,
                 burn-block-height: burn-block-height
               })
               (ok { tx-id: tx-id, shard: shard })
@@ -332,7 +334,7 @@
 )
 
 (define-read-only (get-current-year)
-  (let ((block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE)))
+  (let ((block-time (unwrap! (get-block-info? time stacks-block-height) ERR_BLOCK_TIME_UNAVAILABLE)))
     (begin
       (assert-supported-block-time block-time)
       (ok (year-from-unix-time block-time))
@@ -341,12 +343,12 @@
 )
 
 (define-read-only (get-network-time)
-  (let ((block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE)))
+  (let ((block-time (unwrap! (get-block-info? time stacks-block-height) ERR_BLOCK_TIME_UNAVAILABLE)))
     (begin
       (assert-supported-block-time block-time)
       (ok {
         block-time: block-time,
-        block-height: block-height,
+        stacks-block-height: stacks-block-height,
         burn-block-height: burn-block-height,
         year: (year-from-unix-time block-time)
       })
@@ -380,7 +382,7 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (let (
-        (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+        (block-time (unwrap! (get-block-info? time stacks-block-height) ERR_BLOCK_TIME_UNAVAILABLE))
         (prev-czar (var-get compliance-czar))
       )
       (begin
@@ -391,7 +393,7 @@
           prev-czar: prev-czar,
           new-czar: new-czar,
           block-time: block-time,
-          block-height: block-height,
+          stacks-block-height: stacks-block-height,
           burn-block-height: burn-block-height
         })
         (ok true)
@@ -408,7 +410,7 @@
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (asserts! (not (is-eq region REGION_UNKNOWN)) ERR_INVALID_REGION)
     (let (
-        (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+        (block-time (unwrap! (get-block-info? time stacks-block-height) ERR_BLOCK_TIME_UNAVAILABLE))
         (prev-country (var-get jurisdiction-country))
         (prev-region (var-get jurisdiction-region))
       )
@@ -423,7 +425,7 @@
           new-country: country,
           new-region: region,
           block-time: block-time,
-          block-height: block-height,
+          stacks-block-height: stacks-block-height,
           burn-block-height: burn-block-height
         })
         (ok true)
@@ -439,7 +441,7 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (let (
-        (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+        (block-time (unwrap! (get-block-info? time stacks-block-height) ERR_BLOCK_TIME_UNAVAILABLE))
         (prev (map-get? country-regions { country: country }))
       )
       (begin
@@ -451,7 +453,7 @@
           prev-region: (get region (default-to { region: REGION_UNKNOWN } prev)),
           new-region: region,
           block-time: block-time,
-          block-height: block-height,
+          stacks-block-height: stacks-block-height,
           burn-block-height: burn-block-height
         })
         (ok true)
@@ -464,7 +466,7 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (let (
-        (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+        (block-time (unwrap! (get-block-info? time stacks-block-height) ERR_BLOCK_TIME_UNAVAILABLE))
         (prev (map-get? country-regions { country: country }))
       )
       (begin
@@ -475,7 +477,7 @@
           country: country,
           prev-region: (get region (default-to { region: REGION_UNKNOWN } prev)),
           block-time: block-time,
-          block-height: block-height,
+          stacks-block-height: stacks-block-height,
           burn-block-height: burn-block-height
         })
         (ok true)
@@ -488,7 +490,7 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (let (
-        (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+        (block-time (unwrap! (get-block-info? time stacks-block-height) ERR_BLOCK_TIME_UNAVAILABLE))
         (prev-trigger-zar (var-get onshore-trigger-zar))
       )
       (begin
@@ -499,7 +501,7 @@
           prev-onshore-trigger-zar: prev-trigger-zar,
           new-onshore-trigger-zar: new-trigger-zar,
           block-time: block-time,
-          block-height: block-height,
+          stacks-block-height: stacks-block-height,
           burn-block-height: burn-block-height
         })
         (ok true)
@@ -512,7 +514,7 @@
   (begin
     (asserts! (or (is-owner) (is-czar)) ERR_UNAUTHORIZED)
     (let (
-        (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+        (block-time (unwrap! (get-block-info? time stacks-block-height) ERR_BLOCK_TIME_UNAVAILABLE))
         (prev (default-to false (map-get? tier1-counterparties counterparty)))
       )
       (begin
@@ -527,7 +529,7 @@
           prev-enabled: prev,
           new-enabled: enabled,
           block-time: block-time,
-          block-height: block-height,
+          stacks-block-height: stacks-block-height,
           burn-block-height: burn-block-height
         })
         (ok true)
@@ -544,7 +546,7 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (let (
-        (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+        (block-time (unwrap! (get-block-info? time stacks-block-height) ERR_BLOCK_TIME_UNAVAILABLE))
         (prev-enabled (var-get enable-sadc-fallback))
       )
       (begin
@@ -555,7 +557,7 @@
           prev-enabled: prev-enabled,
           new-enabled: enabled,
           block-time: block-time,
-          block-height: block-height,
+          stacks-block-height: stacks-block-height,
           burn-block-height: burn-block-height
         })
         (ok true)
@@ -568,7 +570,7 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (let (
-        (block-time (unwrap! (get-block-info? time block-height) ERR_BLOCK_TIME_UNAVAILABLE))
+        (block-time (unwrap! (get-block-info? time stacks-block-height) ERR_BLOCK_TIME_UNAVAILABLE))
         (prev-owner (var-get contract-owner))
       )
       (begin
@@ -579,7 +581,7 @@
           prev-owner: prev-owner,
           new-owner: new-owner,
           block-time: block-time,
-          block-height: block-height,
+          stacks-block-height: stacks-block-height,
           burn-block-height: burn-block-height
         })
         (ok true)
