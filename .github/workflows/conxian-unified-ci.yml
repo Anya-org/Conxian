@@ -98,7 +98,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v6
       with:
-        python-version: '3.10'
+        python-version: '3.11'
     - name: Verify knowledge retention (ZSE)
       if: ${{ hashFiles('scripts/verify_knowledge_retention.py') != '' }}
       run: |
@@ -330,7 +330,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v6
       with:
-        python-version: '3.10'
+        python-version: '3.11'
     - name: Run Audit
       run: |
         python3 conxian-business/transparency_custodian.py
@@ -359,7 +359,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v6
       with:
-        python-version: '3.10'
+        python-version: '3.11'
     - name: Install & Simulate
       run: |
         pip install -r conxius-orbit/requirements.txt
