@@ -972,6 +972,7 @@ path = "contracts/governance/signed-data-base.clar"
 clarity-version = 4
 
 
+[contracts.sip-standards]
 path = "contracts/traits/sip-standards.clar"
 clarity-version = 4
 
