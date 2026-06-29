@@ -342,6 +342,7 @@ path = "contracts/traits/defi-traits.clar"
 clarity-version = 4
 
 
+
 [contracts.dex-facade]
 path = "contracts/dex/dex-facade.clar"
 clarity-version = 4
@@ -371,15 +372,15 @@ clarity-version = 4
 depends_on = ["cxd-token", "enhanced-circuit-breaker", "sip-standards"]
 
 
+[contracts.dimensional-engine-interface]
+path = "contracts/interfaces/dimensional-engine-interface.clar"
+clarity-version = 4
+
+
 [contracts.dimensional-engine]
 path = "contracts/core/dimensional-engine.clar"
 clarity-version = 4
 depends_on = ["conxian-protocol", "core-traits", "sip-standards"]
-
-
-[contracts.dimensional-engine-interface]
-path = "contracts/interfaces/dimensional-engine-interface.clar"
-clarity-version = 4
 
 
 [contracts.dimensional-oracle]
@@ -532,11 +533,6 @@ clarity-version = 4
 depends_on = ["cxlp-token", "sip-standards"]
 
 
-[contracts.governance]
-path = "contracts/dimensional/governance.clar"
-clarity-version = 4
-
-
 [contracts.governance-handover]
 path = "contracts/governance/governance-handover.clar"
 clarity-version = 4
@@ -556,6 +552,11 @@ depends_on = ["sip-standards"]
 
 [contracts.governance-traits]
 path = "contracts/traits/governance-traits.clar"
+clarity-version = 4
+
+
+[contracts.governance]
+path = "contracts/dimensional/governance.clar"
 clarity-version = 4
 
 
@@ -742,12 +743,6 @@ path = "contracts/helpers/optimization-helpers.clar"
 clarity-version = 4
 
 
-[contracts.oracle]
-path = "contracts/dex/oracle.clar"
-clarity-version = 4
-depends_on = ["defi-traits"]
-
-
 [contracts.oracle-adapter-stub]
 path = "contracts/oracle/oracle-adapter-stub.clar"
 clarity-version = 4
@@ -759,18 +754,25 @@ clarity-version = 4
 depends_on = ["federated-oracle-adapter", "sip-standards"]
 
 
+
+[contracts.oracle]
+path = "contracts/dex/oracle.clar"
+clarity-version = 4
+depends_on = ["defi-traits"]
+
+
 [contracts.order-book]
 path = "contracts/orders/order-book.clar"
 clarity-version = 4
 
 
-[contracts.pausable]
-path = "contracts/base/pausable.clar"
+[contracts.pausable-trait]
+path = "contracts/traits/pausable-trait.clar"
 clarity-version = 4
 
 
-[contracts.pausable-trait]
-path = "contracts/traits/pausable-trait.clar"
+[contracts.pausable]
+path = "contracts/base/pausable.clar"
 clarity-version = 4
 
 
@@ -801,15 +803,15 @@ clarity-version = 4
 depends_on = ["conxian-protocol"]
 
 
+[contracts.position-factory-root]
+path = "contracts/mev/position-factory-root.clar"
+clarity-version = 4
+
+
 [contracts.position-factory]
 path = "contracts/position-factory.clar"
 clarity-version = 4
 depends_on = ["sip-standards"]
-
-
-[contracts.position-factory-root]
-path = "contracts/mev/position-factory-root.clar"
-clarity-version = 4
 
 
 [contracts.position-manager]
@@ -841,15 +843,15 @@ clarity-version = 4
 depends_on = ["sip-standards"]
 
 
+[contracts.proposal-engine-trait]
+path = "contracts/governance/proposal-engine-trait.clar"
+clarity-version = 4
+
+
 [contracts.proposal-engine]
 path = "contracts/governance/proposal-engine.clar"
 clarity-version = 4
 depends_on = ["conxian-access", "enhanced-governance-nft", "governance-traits", "proposal-executor", "proposal-registry", "reputation-engine", "sip-standards"]
-
-
-[contracts.proposal-engine-trait]
-path = "contracts/governance/proposal-engine-trait.clar"
-clarity-version = 4
 
 
 [contracts.proposal-executor]
@@ -1039,16 +1041,16 @@ path = "contracts/governance/upgrade-controller.clar"
 clarity-version = 4
 
 
-[contracts.vault]
-path = "contracts/dex/vault.clar"
-clarity-version = 4
-depends_on = ["circuit-breaker", "conxian-protocol", "sip-standards"]
-
-
 [contracts.vault-trait]
 path = "contracts/traits/vault-trait.clar"
 clarity-version = 4
 depends_on = ["sip-standards"]
+
+
+[contracts.vault]
+path = "contracts/dex/vault.clar"
+clarity-version = 4
+depends_on = ["circuit-breaker", "conxian-protocol", "sip-standards"]
 
 
 [contracts.voting]

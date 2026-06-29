@@ -31,7 +31,7 @@ Governance Voting Power token.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `transfer` | `(transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))` | Standard SIP-010 transfer. |
+| `transfer` | `(transfer (amount uint) (from principal) (to principal) (memo (optional (buff 34))))` | Standard SIP-010 transfer. |
 | `mint` | `(mint (amount uint) (recipient principal))` | Mints CXVG tokens. |
 | `burn` | `(burn (amount uint) (owner principal))` | Burns CXVG tokens. |
 | `get-balance` | `(get-balance (user principal))` | Returns token balance. |
@@ -41,7 +41,7 @@ Standard SIP-010 tokens for Staking, Liquidity, and Treasury.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `transfer` | `(transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))` | Standard SIP-010 transfer. |
+| `transfer` | `(transfer (amount uint) (from principal) (to principal) (memo (optional (buff 34))))` | Standard SIP-010 transfer. |
 | `mint` | `(mint (amount uint) (recipient principal))` | Mints tokens. |
 | `burn` | `(burn (amount uint) (owner principal))` | Burns tokens. |
 | `get-balance` | `(user principal)` | Returns token balance. |
@@ -61,7 +61,7 @@ SIP-009 NFT for concentrated liquidity positions.
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `mint-position` | `(mint-position (owner principal) (pool principal) (token0 principal) (token1 principal) (tick-lower int) (tick-upper int) (liquidity uint))` | Mints a new position NFT. |
-| `transfer` | `(transfer (token-id uint) (sender principal) (recipient principal))` | Transfers a position NFT. |
+| `transfer` | `(transfer (token-id uint) (from principal) (to principal))` | Transfers a position NFT. |
 | `get-position` | `(get-position (position-id uint))` | Returns position details. |
 
 ## Jargon & Terminology (Layer 6)

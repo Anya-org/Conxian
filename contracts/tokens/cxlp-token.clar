@@ -8,13 +8,13 @@
 
 ;; @desc Standard SIP-010 transfer function.
 ;; @param amount: Quantity of tokens to transfer.
-;; @param sender: Sender principal.
-;; @param recipient: Recipient principal.
+;; @param from: Sender principal.
+;; @param to: Recipient principal.
 ;; @param memo: Optional 34-byte memo.
-(define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
+(define-public (transfer (amount uint) (from principal) (to principal) (memo (optional (buff 34))))
   (begin
-    (asserts! (is-eq tx-sender sender) (err u1))
-    (ft-transfer? cxlp-token amount sender recipient)
+    (asserts! (is-eq tx-sender from) (err u1))
+    (ft-transfer? cxlp-token amount from to)
   )
 )
 
