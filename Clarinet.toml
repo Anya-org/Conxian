@@ -29,12 +29,6 @@ clarity-version = 4
 depends_on = ["conxian-protocol", "finance-metrics"]
 
 
-[contracts.fiscal-orchestrator]
-path = "contracts/agents/fiscal-orchestrator.clar"
-clarity-version = 4
-depends_on = ["conxian-protocol", "agent-risk", "bme-engine", "concentrated-liquidity-pool", "finance-metrics", "sip-standards"]
-
-
 [contracts.agent-treasury]
 path = "contracts/agents/agent-treasury.clar"
 clarity-version = 4
@@ -348,12 +342,6 @@ path = "contracts/traits/defi-traits.clar"
 clarity-version = 4
 
 
-[contracts.dex-defi]
-path = "contracts/dex/dex-facade.clar"
-clarity-version = 4
-depends_on = ["conxian-protocol", "dex-factory", "sip-standards"]
-
-
 [contracts.dex-facade]
 path = "contracts/dex/dex-facade.clar"
 clarity-version = 4
@@ -507,6 +495,12 @@ clarity-version = 4
 [contracts.finance-metrics]
 path = "contracts/monitoring/finance-metrics.clar"
 clarity-version = 4
+
+
+[contracts.fiscal-orchestrator]
+path = "contracts/agents/fiscal-orchestrator.clar"
+clarity-version = 4
+depends_on = ["conxian-protocol", "agent-risk", "bme-engine", "concentrated-liquidity-pool", "finance-metrics", "sip-standards"]
 
 
 [contracts.founder-vault]
@@ -765,12 +759,6 @@ clarity-version = 4
 depends_on = ["federated-oracle-adapter", "sip-standards"]
 
 
-[contracts.oracle-traits]
-path = "contracts/integrations/twap-oracle.clar"
-clarity-version = 4
-depends_on = ["defi-traits"]
-
-
 [contracts.order-book]
 path = "contracts/orders/order-book.clar"
 clarity-version = 4
@@ -946,16 +934,16 @@ clarity-version = 4
 depends_on = ["conxian-protocol", "bme-engine", "cxd-token", "operational-treasury", "sip-standards"]
 
 
-[contracts.risk-unit]
-path = "contracts/core/risk-unit.clar"
-clarity-version = 4
-depends_on = ["conxian-access", "dimensional-core", "oracle-aggregator", "position-nft"]
-
-
 [contracts.risk-manager]
 path = "contracts/core/risk-manager.clar"
 clarity-version = 4
 depends_on = ["risk-unit"]
+
+
+[contracts.risk-unit]
+path = "contracts/core/risk-unit.clar"
+clarity-version = 4
+depends_on = ["conxian-access", "dimensional-core", "oracle-aggregator", "position-nft"]
 
 
 [contracts.route-manager]
@@ -984,12 +972,6 @@ path = "contracts/governance/signed-data-base.clar"
 clarity-version = 4
 
 
-[contracts.sip-010-ft-trait]
-path = "contracts/traits/sip-standards.clar"
-clarity-version = 4
-
-
-[contracts.sip-standards]
 path = "contracts/traits/sip-standards.clar"
 clarity-version = 4
 
@@ -1063,12 +1045,6 @@ depends_on = ["circuit-breaker", "conxian-protocol", "sip-standards"]
 
 
 [contracts.vault-trait]
-path = "contracts/traits/vault-trait.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-
-[contracts.vault-traits]
 path = "contracts/traits/vault-trait.clar"
 clarity-version = 4
 depends_on = ["sip-standards"]
