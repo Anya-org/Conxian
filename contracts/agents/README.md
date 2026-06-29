@@ -15,11 +15,11 @@ The module follows an autonomous intelligence loop:
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `assess-system-risk` | `()` | Returns the current global risk score. |
-| `get-cybernetic-intel` | `()` | Returns combined telemetry (GCR, Fee, Risk). |
+| `get-cybernetic-intel` | `(metrics-ref <finance-metrics-trait>)` | Returns combined telemetry (GCR, Fee, Risk). |
 | `update-pid-rates` | `()` | Heartbeat for PID controller updates. |
 | `initialize` | `(new-admin principal)` | Initializes the risk agent with a designated administrator. |
 | `get-risk-score` | `()` | Returns the current system risk score. |
-| `get-gcr` | `()` | Retrieves the Global Collateralization Ratio (GCR) from metrics. |
+| `get-gcr` | `(metrics-ref <finance-metrics-trait>)` | Retrieves the Global Collateralization Ratio (GCR) from metrics. |
 | `get-protocol-status` | `()` | Returns the current operational status and version. |
 | `set-risk-score` | `(new-score uint)` | Updates the current system risk score (Admin only). |
 | `get-stability-fee` | `()` | Returns the current stability fee percentage. |
@@ -43,7 +43,7 @@ The module follows an autonomous intelligence loop:
 ### Accessing Risk Telemetry
 Integrated modules can query the risk agent for system status:
 ```clarity
-(let ((intel (unwrap-panic (contract-call? .agent-risk get-cybernetic-intel))))
+(let ((intel (unwrap-panic (contract-call? .agent-risk get-cybernetic-intel .finance-metrics))))
   (print intel)
 )
 ```
