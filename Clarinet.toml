@@ -595,7 +595,7 @@ clarity-version = 4
 [contracts.legacy-adapter]
 path = "contracts/migration/legacy-adapter.clar"
 clarity-version = 4
-depends_on = ["conxian-protocol", "migration-manager"]
+depends_on = ["conxian-protocol", "migration-orchestrator"]
 
 
 [contracts.legal-representative-registry]
@@ -656,6 +656,11 @@ clarity-version = 4
 
 [contracts.migration-manager]
 path = "contracts/migration/migration-manager.clar"
+clarity-version = 4
+
+
+[contracts.migration-orchestrator]
+path = "contracts/migration/migration-orchestrator.clar"
 clarity-version = 4
 
 
@@ -1041,7 +1046,7 @@ path = "contracts/governance/upgrade-controller.clar"
 clarity-version = 4
 
 
-[contracts.vault-trait]
+[contracts.vault-traits]
 path = "contracts/traits/vault-trait.clar"
 clarity-version = 4
 depends_on = ["sip-standards"]

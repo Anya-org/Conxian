@@ -1,8 +1,6 @@
 ;; regulatory-adapter.clar
 ;; SIP-018 Compliant Regulatory Adapter for Conxian Protocol
 
-(use-trait kyc-registry-trait .identity.kyc-registry-trait)
-
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_NON_COMPLIANT (err u1001))
 
@@ -15,12 +13,15 @@
 
 ;; @desc Checks if a principal is compliant with "Clean Hands" policy.
 (define-read-only (check-clean-hands-compliance (user principal))
-  (ok (is-ok (contract-call? .kyc-registry is-verified user)))
+  (ok (and
+    (not (contract-call? .kyc-registry is-sanctioned user))
+    (> (contract-call? .kyc-registry get-tier user) u0)
+  ))
 )
 
 ;; @desc Verify a structured data signature (SIP-018 inspired)
 (define-public (verify-structured-data (payload { amount: uint, recipient: principal, nonce: uint }) (signature (buff 65)) (pubkey (buff 33)))
-  (let ((msg-hash (sha256 (keccak256 (unwrap-panic (to-consensus-buff? payload))))))
+  (let ((msg-hash (sha256 (concat signature pubkey))))
     (ok (secp256k1-verify msg-hash signature pubkey))
   )
 )
