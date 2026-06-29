@@ -17,12 +17,26 @@ The module follows an autonomous intelligence loop:
 | `assess-system-risk` | `()` | Returns the current global risk score. |
 | `get-cybernetic-intel` | `()` | Returns combined telemetry (GCR, Fee, Risk). |
 | `update-pid-rates` | `()` | Heartbeat for PID controller updates. |
+| `initialize` | `(new-admin principal)` | Initializes the risk agent with a designated administrator. |
+| `get-risk-score` | `()` | Returns the current system risk score. |
+| `get-gcr` | `()` | Retrieves the Global Collateralization Ratio (GCR) from metrics. |
+| `get-protocol-status` | `()` | Returns the current operational status and version. |
+| `set-risk-score` | `(new-score uint)` | Updates the current system risk score (Admin only). |
+| `get-stability-fee` | `()` | Returns the current stability fee percentage. |
+| `set-stability-fee` | `(new-fee uint)` | Updates the global stability fee (Admin only). |
 
 ### `agent-treasury.clar`
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `run-fiscal-strategy` | `(pool-trait <csf-trait>) (pools (list 50 principal)) (cxd <sip-010-trait>)` | Orchestrates revenue routing. |
 | `calculate-performance-adjustment` | `()` | Returns the current growth-based multiplier. |
+
+## Jargon & Terminology (Layer 6)
+- **PID Controller**: Proportional-Integral-Derivative controller, a control loop mechanism that continuously calculates an error value and applies a correction based on proportional, integral, and derivative terms.
+- **GCR (Global Collateralization Ratio)**: The total value of collateral across the protocol divided by the total value of outstanding debt.
+- **Telemetry**: Automated measurement and transmission of data from remote sources.
+- **Cybernetic Intelligence**: Intelligence derived from the study of control and communication in complex systems.
+- **Apex BME**: The specific implementation of the Burn-Mint Equilibrium for the Conxian Apex protocol.
 
 ## Integration Examples (How-to)
 
