@@ -88,7 +88,7 @@ def check_submodule_pins(submodules: dict[str, dict[str, str]]) -> list[str]:
         errors.append(f"git submodule status failed: {result.stderr.strip()}")
         return errors
 
-    for line in result.stdout.strip().splitlines():
+    for line in result.stdout.rstrip().splitlines():
         if not line.strip():
             continue
         # Format: [ ]<sha> <path> [(<branch>)]
@@ -102,7 +102,7 @@ def check_submodule_pins(submodules: dict[str, dict[str, str]]) -> list[str]:
 
     # Verify no .gitmodules entries are missing from submodule status
     status_paths = set()
-    for line in result.stdout.strip().splitlines():
+    for line in result.stdout.rstrip().splitlines():
         if line.strip() and len(line) > 42:
             status_paths.add(line[42:].split()[0])
 
