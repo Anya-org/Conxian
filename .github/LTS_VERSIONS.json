@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "LTS (Long-Term Support) version pins for Conxian ecosystem. Three tracks: LTS (5yr), Stable (quarterly, 6mo behind supplier), Bleeding Edge (monthly). See docs/LTS_VERSIONING_STRATEGY.md for full policy.",
+  "last_updated": "2026-06-28",
+  "strategy": {
+    "lts_cadence": "annual (October)",
+    "lts_support_window": "5 years",
+    "stable_lag": "6 months behind supplier stable",
+    "bleeding_edge_cadence": "monthly",
+    "first_lts": "v1.0.0 — October 2026"
+  },
+  "tracks": {
+    "lts": {
+      "node": "22",
+      "rust": "1.82",
+      "rust_edition": "2021",
+      "python": "3.12",
+      "pnpm": "9",
+      "docker": "25.0.x",
+      "nextjs": "15.3.x",
+      "react": "19.0.x",
+      "vite": "6.x",
+      "typescript": "5.7.x",
+      "tailwind": "3.4.x",
+      "stacks_core": "3.4.0.0.3",
+      "bitcoin_crate": "0.32",
+      "bdk_wallet": "3.0.0",
+      "secp256k1": "0.29",
+      "wormhole_sdk": "5.0.x"
+    },
+    "stable": {
+      "node": "24",
+      "rust": "1.96",
+      "rust_edition": "2024",
+      "python": "3.13",
+      "pnpm": "10",
+      "nextjs": "16.2.x",
+      "react": "19.2.x",
+      "vite": "7.x",
+      "typescript": "5.8.x",
+      "tailwind": "4.x",
+      "bdk_wallet": "3.1.0",
+      "bitcoin_crate": "0.33.0",
+      "secp256k1": "0.31",
+      "wormhole_sdk": "5.2.x"
+    },
+    "bleeding_edge": {
+      "node": "26",
+      "rust": "1.96",
+      "rust_edition": "2024",
+      "python": "3.14",
+      "pnpm": "11",
+      "nextjs": "16.3.x",
+      "react": "19.2.x",
+      "vite": "8.x",
+      "typescript": "6.x",
+      "tailwind": "4.x",
+      "bdk_wallet": "3.2.x-beta",
+      "bitcoin_crate": "0.33.0-beta",
+      "secp256k1": "0.32.0-beta",
+      "wormhole_sdk": "5.2.x"
+    }
+  },
+  "conxian_sdks": {
+    "lib-conxian-core": {
+      "current": "0.2.10",
+      "latest_tag": "v0.2.8",
+      "drift": "-2 patches",
+      "rust_edition": "2021",
+      "lts_target": "v1.0.0 (Oct 2026)",
+      "crates_io": false,
+      "consumers": ["conxian-nexus"]
+    },
+    "conxius-enclave-sdk": {
+      "current": "0.2.0",
+      "latest_tag": null,
+      "drift": "no tags",
+      "rust_edition": "2024",
+      "lts_target": "v1.0.0 (Oct 2026)",
+      "crates_io": false,
+      "consumers": ["conxian-nexus (workspace)"],
+      "risk": "uses beta/rc dependencies (bitcoin 0.33-beta, secp256k1 0.32-beta, k256 0.14-rc.9)"
+    },
+    "conxian-gateway": {
+      "current": "0.1.4",
+      "latest_tag": "v0.1.0",
+      "drift": "-4 minors",
+      "rust_edition": "2021",
+      "docker_base": "rust:1.85-slim-bookworm",
+      "lts_target": "v1.0.0 (Oct 2026)",
+      "crates_io": false,
+      "consumers": ["Cloud Run deployment"]
+    },
+    "conxian-nexus": {
+      "current": "0.4.17",
+      "latest_tag": null,
+      "drift": "no tags",
+      "rust_edition": "2021",
+      "lts_target": "v1.0.0 (Oct 2026)",
+      "crates_io": false,
+      "consumers": ["docker-compose services"],
+      "risk": "pins lib-conxian-core by raw git SHA, not version tag"
+    },
+    "conxius-wallet": {
+      "current": "1.9.2",
+      "latest_tag": "v1.9.2",
+      "drift": "clean",
+      "lts_target": "v1.10.0 (Oct 2026)",
+      "npm_published": false,
+      "consumers": ["Android (Capacitor)"]
+    },
+    "conxian-protocol": {
+      "current": "0.6.1 (pkg) / 0.7.0 (changelog)",
+      "latest_tag": "v1.0.0",
+      "drift": "conflicting",
+      "clarity_version": 4,
+      "epoch": "3.0 (Nakamoto)",
+      "lts_target": "v1.0.0 reconciliation (Oct 2026)",
+      "consumers": ["Stacks mainnet deployment"]
+    }
+  },
+  "supplier_eol_watch": [
+    {"supplier": "Python", "version": "3.10", "eol": "2026-10", "severity": "critical", "action": "migrate CI scripts and Dockerfiles to 3.12"},
+    {"supplier": "Node.js", "version": "24", "event": "Active→Maintenance LTS", "date": "2026-10-20", "severity": "warning"},
+    {"supplier": "Node.js", "version": "22", "eol": "2027-04-30", "severity": "high", "action": "migrate to Node 27 by Q1 2027"},
+    {"supplier": "Python", "version": "3.13", "event": "Active→Security", "date": "2026-10-01", "severity": "info"}
+  ],
+  "cross_sdk_inconsistencies": [
+    {"dep": "ark-groth16", "nexus": "0.4.0", "lib-conxian-core": "0.6", "resolution": "upgrade nexus to 0.6"},
+    {"dep": "tokio", "nexus": "1.43", "gateway": "1.52.3", "enclave": "1.52.3", "resolution": "upgrade nexus to 1.52"},
+    {"dep": "k256", "enclave": "0.14-rc.9", "lib-conxian-core": "0.13", "nexus": "0.13.4", "resolution": "downgrade enclave to 0.13 stable"},
+    {"dep": "rust_edition", "enclave": "2024", "others": "2021", "resolution": "all adopt 2024 for LTS v1.0"}
+  ]
+}
