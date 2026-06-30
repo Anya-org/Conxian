@@ -15,6 +15,8 @@ permissions:
 
 jobs:
   analyze:
+    # Avoid conflicts with CodeQL default setup unless explicitly enabled.
+    if: ${{ vars.ENABLE_ADVANCED_CODEQL == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
