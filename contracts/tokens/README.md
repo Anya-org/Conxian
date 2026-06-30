@@ -17,29 +17,34 @@ The primary SIP-010 token for the Conxian ecosystem.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `transfer` | `(transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))` | Standard SIP-010 transfer. |
-| `mint` | `(mint (amount uint) (recipient principal))` | Mints new CXD. Authorized minters only. |
-| `burn` | `(burn (amount uint) (owner principal))` | Burns CXD. Authorized burners only. |
-| `add-minter` | `(add-minter (minter principal))` | Adds an authorized minter (Admin only). |
-| `add-burner` | `(add-burner (burner principal))` | Adds an authorized burner (Admin only). |
-| `get-balance` | `(get-balance (w principal))` | Returns the balance of an account. |
+| `transfer` | `(transfer (amount uint) (from principal) (to principal) (memo (optional (buff 34))))` | Standard SIP-010 transfer. |
+| `mint` | `(mint (amount uint) (recipient principal))` | Mints new CXD. |
+| `burn` | `(burn (amount uint) (sender principal))` | Burns CXD. |
+| `get-balance` | `(get-balance (user principal))` | Returns the balance of an account. |
+| `get-name` | `(get-name)` | Returns the human-readable name. |
+| `get-symbol` | `(get-symbol)` | Returns the token symbol. |
+| `get-decimals` | `(get-decimals)` | Returns the number of decimals. |
+| `get-total-supply` | `(get-total-supply)` | Returns the total supply. |
 
 ### `cxvg-token.clar`
 Governance Voting Power token.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `mint` | `(mint (amount uint) (recipient principal))` | Mints CXVG tokens. Regulatory check enforced. |
+| `transfer` | `(transfer (amount uint) (from principal) (to principal) (memo (optional (buff 34))))` | Standard SIP-010 transfer. |
+| `mint` | `(mint (amount uint) (recipient principal))` | Mints CXVG tokens. |
 | `burn` | `(burn (amount uint) (owner principal))` | Burns CXVG tokens. |
-| `transfer` | `(transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))` | Transfers CXVG with regulatory checks. |
+| `get-balance` | `(get-balance (user principal))` | Returns token balance. |
 
 ### `cxs-token.clar`, `cxlp-token.clar`, `cxtr-token.clar`
 Standard SIP-010 tokens for Staking, Liquidity, and Treasury.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `transfer` | `(transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))` | Standard SIP-010 transfer. |
-| `get-balance` | `(get-balance (w principal))` | Returns token balance. |
+| `transfer` | `(transfer (amount uint) (from principal) (to principal) (memo (optional (buff 34))))` | Standard SIP-010 transfer. |
+| `mint` | `(mint (amount uint) (recipient principal))` | Mints tokens. |
+| `burn` | `(burn (amount uint) (owner principal))` | Burns tokens. |
+| `get-balance` | `(user principal)` | Returns token balance. |
 
 ### `token-system-coordinator.clar`
 Administrative interface for system-wide token minting and burning.
@@ -56,8 +61,16 @@ SIP-009 NFT for concentrated liquidity positions.
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `mint-position` | `(mint-position (owner principal) (pool principal) (token0 principal) (token1 principal) (tick-lower int) (tick-upper int) (liquidity uint))` | Mints a new position NFT. |
-| `transfer` | `(transfer (token-id uint) (sender principal) (recipient principal))` | Transfers a position NFT. |
+| `transfer` | `(transfer (token-id uint) (from principal) (to principal))` | Transfers a position NFT. |
 | `get-position` | `(get-position (position-id uint))` | Returns position details. |
+
+## Jargon & Terminology (Layer 6)
+- **SIP-010**: The standard for fungible tokens on the Stacks blockchain.
+- **SIP-009**: The standard for non-fungible tokens (NFTs) on the Stacks blockchain.
+- **BME (Burn-Mint Equilibrium)**: An economic model where tokens are burned to access a service and minted to reward service providers.
+- **CXD**: Conxian Dollar, the primary utility token.
+- **CXVG**: Conxian Vanguard, representing governance voting power.
+- **Concentrated Liquidity**: A feature of DEXs (like Uniswap V3) where liquidity providers can specify the price range in which their funds are used.
 
 ## Integration Examples (How-to)
 

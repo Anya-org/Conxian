@@ -1,8 +1,6 @@
 ;; agent-risk.clar
 ;; Conxian Autonomous Agent: Risk Monitoring and PID Controller
 
-(use-trait finance-metrics-trait .security-monitoring.finance-metrics-trait)
-
 (define-constant ERR_UNAUTHORIZED (err u1000))
 
 (define-data-var current-risk-score uint u0)
@@ -14,7 +12,9 @@
 (define-read-only (get-risk-score) (ok (var-get current-risk-score)))
 
 ;; @desc Retrieves the Global Collateralization Ratio (GCR) from metrics.
-(define-read-only (get-gcr (metrics-ref <finance-metrics-trait>)) (contract-call? metrics-ref get-gcr))
+(define-read-only (get-gcr)
+  (contract-call? .finance-metrics get-gcr)
+)
 
 ;; @desc Returns the current operational status and version of the risk agent.
 (define-read-only (get-protocol-status)
@@ -47,10 +47,10 @@
 )
 
 ;; @desc Consolidates and returns key risk and financial telemetry.
-(define-read-only (get-cybernetic-intel (metrics-ref <finance-metrics-trait>))
+(define-read-only (get-cybernetic-intel)
   (ok {
     operational-fee: (var-get stability-fee),
-    financial-gcr: (unwrap-panic (contract-call? metrics-ref get-gcr)),
+    financial-gcr: (unwrap-panic (contract-call? .finance-metrics get-gcr)),
     risk-score: (var-get current-risk-score)
   })
 )

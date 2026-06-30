@@ -79,7 +79,7 @@
 ;; @desc Returns the balance of a token held by the treasury.
 ;; @param token: The SIP-010 token.
 ;; @return (response uint uint)
-(define-read-only (get-balance (token <sip-010-trait>))
+(define-public (get-balance (token <sip-010-trait>))
     (contract-call? token get-balance (var-get contract-address))
 )
 

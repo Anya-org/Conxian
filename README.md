@@ -1,5 +1,9 @@
 # Conxian
 
+[![Status](https://img.shields.io/badge/Status-Apex_v1.2.1-blue.svg)](https://github.com/Conxian/Conxian)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Standards](https://img.shields.io/badge/Standards-Layer_1--6_Compliant-gold.svg)](docs/STANDARDS_AUDIT_COMPREHENSIVE.json)
+
 Conxian is the protocol, DeFi, and DAO-facing public layer.
 
 Conxian-Labs is the builder and operator layer that develops, ships, and supports public infrastructure around the Conxian ecosystem without replacing protocol ownership.

@@ -40,7 +40,9 @@ The policy management contract for the CXD ecosystem, implementing CXIP-013.
 | `record-diverted-claim` | `(token principal) (amount uint)` | Records claims diverted to the treasury for later allocation. |
 | `get-allocation-percentages` | `()` | Returns the current percentage weights for the 6-way split. |
 | `get-accrued-claim` | `(token principal)` | Returns the total accrued claim for a specific token. |
+| `initialize` | `(new-admin principal)` | Initializes the treasury with a designated administrator. |
 | `set-authorized-principals` | `(agent principal) (distributor principal)` | Authorizes specific contracts to trigger rebalancing or record claims. |
+| `set-admin` | `(new-admin principal)` | Updates the administrative principal. |
 
 ### `conxian-vaults.clar`
 Multi-asset storage for protocol-controlled liquidity with role-based access control.
@@ -51,6 +53,16 @@ Multi-asset storage for protocol-controlled liquidity with role-based access con
 | `withdraw` | `(token <sip-010-trait>) (amount uint)` | Withdraws tokens from the vault (requires RBAC role). |
 | `get-balance` | `(user principal) (token principal)` | Returns the vault balance for a specific user and token. |
 | `get-total-assets` | `(token principal)` | Returns the total balance of a specific asset held in the vaults. |
+
+## Jargon & Terminology (Layer 6)
+- **Fiscal Dam (CXIP-013)**: The protocol's revenue allocation framework that directs incoming fees into six distinct buckets.
+- **BPS (Basis Points)**: A unit of measure for percentages where 1 basis point equals 0.01% (100 bps = 1%).
+- **Revenue Automation**: The system that automatically extracts protocol fees from transactions.
+- **BME Engine**: Burn-Mint Equilibrium engine responsible for token supply adjustments.
+- **RBAC (Role-Based Access Control)**: A security approach that restricts system access to authorized users based on their role.
+- **Neon DB**: The off-chain database used for institutional reporting and audit logs.
+- **PAPSS**: Pan-African Payment and Settlement System.
+- **BRICS**: An intergovernmental organization comprising Brazil, Russia, India, China, and South Africa, often used here to refer to related cross-border settlement networks.
 
 ## External Data Schema (Institutional Reporting)
 

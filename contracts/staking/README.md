@@ -20,6 +20,12 @@ Core logic for native stacking operator.
 Public Functions:
 - `placeholder`: Action for placeholder.
 
+## Jargon & Terminology (Layer 6)
+- **Staking**: The process of locking up crypto assets to support a network's operation and, in return, earning rewards.
+- **Dual Stacking**: A mechanism where two different assets (e.g., STX and CXD) are stacked simultaneously to provide enhanced security or yield.
+- **Orchestrator**: A contract that coordinates actions between multiple other contracts or modules.
+- **Operator**: A contract or entity that executes specific technical tasks within the protocol.
+- **Nakamoto-Aligned**: Referring to the Nakamoto release of Stacks, which brings faster blocks and Bitcoin finality.
 
 ## Integration Examples (How-to)
 ### Calling Staking from other modules
