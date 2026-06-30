@@ -67,6 +67,7 @@ jobs:
       command: '${{ steps.extract_command.outputs.command }}'
       request: '${{ steps.extract_command.outputs.request }}'
       additional_context: '${{ steps.extract_command.outputs.additional_context }}'
+      gemini_auth_available: '${{ steps.gemini_auth.outputs.available }}'
       issue_number: '${{ github.event.pull_request.number || github.event.issue.number }}'
     steps:
       - name: 'Mint identity token'
@@ -113,6 +114,44 @@ jobs:
               core.setOutput('command', 'fallthrough');
             }
 
+      - name: 'Check Gemini auth configuration'
+        id: 'gemini_auth'
+        env:
+          COMMAND: '${{ steps.extract_command.outputs.command }}'
+          GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}'
+          GOOGLE_API_KEY: '${{ secrets.GOOGLE_API_KEY }}'
+          GOOGLE_GENAI_USE_VERTEXAI: '${{ vars.GOOGLE_GENAI_USE_VERTEXAI }}'
+          GOOGLE_GENAI_USE_GCA: '${{ vars.GOOGLE_GENAI_USE_GCA }}'
+          GOOGLE_CLOUD_PROJECT: '${{ vars.GOOGLE_CLOUD_PROJECT }}'
+          GOOGLE_CLOUD_LOCATION: '${{ vars.GOOGLE_CLOUD_LOCATION }}'
+          SERVICE_ACCOUNT_EMAIL: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'
+          GCP_WIF_PROVIDER: '${{ vars.GCP_WIF_PROVIDER }}'
+        run: |-
+          has_api_key='false'
+          has_vertex='false'
+          has_gca='false'
+
+          if [[ -n "${GEMINI_API_KEY}" || -n "${GOOGLE_API_KEY}" ]]; then
+            has_api_key='true'
+          fi
+
+          if [[ "${GOOGLE_GENAI_USE_VERTEXAI}" == 'true' && -n "${GOOGLE_CLOUD_PROJECT}" && -n "${GOOGLE_CLOUD_LOCATION}" && -n "${SERVICE_ACCOUNT_EMAIL}" && -n "${GCP_WIF_PROVIDER}" ]]; then
+            has_vertex='true'
+          fi
+
+          if [[ "${GOOGLE_GENAI_USE_GCA}" == 'true' ]]; then
+            has_gca='true'
+          fi
+
+          if [[ "${has_api_key}" == 'true' || "${has_vertex}" == 'true' || "${has_gca}" == 'true' ]]; then
+            echo 'available=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'available=false' >> "$GITHUB_OUTPUT"
+            if [[ "${COMMAND}" =~ ^(review|triage|invoke|approve)$ ]]; then
+              echo '::notice::Skipping Gemini command because auth is not configured. Configure one of: GEMINI_API_KEY/GOOGLE_API_KEY, Vertex AI (GOOGLE_GENAI_USE_VERTEXAI=true + GCP vars), or GOOGLE_GENAI_USE_GCA=true.'
+            fi
+          fi
+
       - name: 'Acknowledge request'
         env:
           GITHUB_TOKEN: '${{ steps.mint_identity_token.outputs.token || github.token }}'
@@ -128,7 +167,7 @@ jobs:
   review:
     needs: 'dispatch'
     if: |-
-      ${{ needs.dispatch.outputs.command == 'review' }}
+      ${{ needs.dispatch.outputs.command == 'review' && needs.dispatch.outputs.gemini_auth_available == 'true' }}
     uses: './.github/workflows/gemini-review.yml'
     permissions:
       contents: 'read'
@@ -142,7 +181,7 @@ jobs:
   triage:
     needs: 'dispatch'
     if: |-
-      ${{ needs.dispatch.outputs.command == 'triage' }}
+      ${{ needs.dispatch.outputs.command == 'triage' && needs.dispatch.outputs.gemini_auth_available == 'true' }}
     uses: './.github/workflows/gemini-triage.yml'
     permissions:
       contents: 'read'
@@ -156,7 +195,7 @@ jobs:
   invoke:
     needs: 'dispatch'
     if: |-
-      ${{ needs.dispatch.outputs.command == 'invoke' }}
+      ${{ needs.dispatch.outputs.command == 'invoke' && needs.dispatch.outputs.gemini_auth_available == 'true' }}
     uses: './.github/workflows/gemini-invoke.yml'
     permissions:
       contents: 'read'
@@ -170,7 +209,7 @@ jobs:
   plan-execute:
     needs: 'dispatch'
     if: |-
-      ${{ needs.dispatch.outputs.command == 'approve' }}
+      ${{ needs.dispatch.outputs.command == 'approve' && needs.dispatch.outputs.gemini_auth_available == 'true' }}
     uses: './.github/workflows/gemini-plan-execute.yml'
     permissions:
       contents: 'write'

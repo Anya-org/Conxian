@@ -1,0 +1,15 @@
+[project]
+name = "conxian-business"
+description = "Conxian Sovereign-First Financial Infrastructure — Clarity 4 Contracts"
+clarity_version = 4
+epoch = "latest"
+
+[contracts.dlc-bond]
+path = "Fiscal-Vault-Oracle/dlc-bond.clar"
+clarity_version = 4
+epoch = "latest"
+
+[contracts.jurisdictional-sharding]
+path = "Sovereign-Strategy-Nexus/contracts/jurisdictional-sharding.clar"
+clarity_version = 4
+epoch = "latest"
