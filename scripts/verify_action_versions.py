@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Validate that all `uses:` action references in workflow YAML files point to real versions.
 
-Queries the GitHub API to confirm each action reference resolves against the backing
-repository and ref. Exits non-zero if any reference is invalid.
+Queries the GitHub API to confirm each owner/repo[/path]@ref exists. Exits non-zero if any
+reference is invalid, catching issues like `actions/checkout@v6` (doesn't exist).
 """
 
 from __future__ import annotations
@@ -12,55 +12,100 @@ import os
 import re
 import sys
 import time
+import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
-from urllib import error, parse, request
+from typing import TypedDict
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 WORKFLOW_DIR = REPO_ROOT / ".github" / "workflows"
 
-EXCLUDE_PATTERNS: tuple[re.Pattern, ...] = (
-    re.compile(r"^\./"),          # local composite actions
-    re.compile(r"^docker://"),    # Docker images
+EXCLUDE_PATTERNS: tuple[re.Pattern[str], ...] = (
+    re.compile(r"^\./"),  # local composite actions
+    re.compile(r"^docker://"),  # Docker images
 )
 
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
 
 CACHE_FILE = REPO_ROOT / ".github" / ".action-version-cache.json"
 CACHE_SCHEMA_VERSION = 2
+CACHE_TTL_OK_SECONDS = 7 * 24 * 60 * 60
 
-SHA40_RE = re.compile(r"^[0-9a-fA-F]{40}$")
-OWNER_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9-]{0,38}$")
-REPO_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
-
-
-def _load_cache() -> dict[str, bool]:
-    if CACHE_FILE.exists():
-        try:
-            payload = json.loads(CACHE_FILE.read_text(encoding="utf-8"))
-            if (
-                isinstance(payload, dict)
-                and isinstance(payload.get("_meta"), dict)
-                and payload["_meta"].get("schemaVersion") == CACHE_SCHEMA_VERSION
-                and isinstance(payload.get("results"), dict)
-            ):
-                results = payload["results"]
-                return {
-                    key: value
-                    for key, value in results.items()
-                    if isinstance(key, str) and isinstance(value, bool)
-                }
-        except (json.JSONDecodeError, OSError):
-            pass
-    return {}
+REQUEST_TIMEOUT_SECONDS = 15
 
 
-def _save_cache(cache: dict[str, bool]) -> None:
+class CacheEntry(TypedDict):
+    exists: bool
+    detail: str
+    checkedAt: int
+
+
+def _load_cache() -> dict[str, CacheEntry]:
+    if not CACHE_FILE.exists():
+        return {}
+
+    try:
+        payload = json.loads(CACHE_FILE.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+    # Deterministic invalidation: only accept known schema; discard legacy bool maps.
+    if not isinstance(payload, dict):
+        return {}
+    if payload.get("schemaVersion") != CACHE_SCHEMA_VERSION:
+        return {}
+
+    entries = payload.get("entries")
+    if not isinstance(entries, dict):
+        return {}
+
+    cache: dict[str, CacheEntry] = {}
+    for action_ref, raw in entries.items():
+        if not isinstance(action_ref, str) or not isinstance(raw, dict):
+            continue
+
+        exists = raw.get("exists")
+        detail = raw.get("detail")
+        checked_at = raw.get("checkedAt")
+        if not isinstance(exists, bool):
+            continue
+        if not isinstance(detail, str):
+            continue
+        if not isinstance(checked_at, (int, float)):
+            continue
+
+        cache[action_ref] = {
+            "exists": exists,
+            "detail": detail,
+            "checkedAt": int(checked_at),
+        }
+
+    return cache
+
+
+def _save_cache(cache: dict[str, CacheEntry]) -> None:
     payload = {
-        "_meta": {"schemaVersion": CACHE_SCHEMA_VERSION},
-        "results": cache,
+        "schemaVersion": CACHE_SCHEMA_VERSION,
+        "entries": dict(sorted(cache.items())),
     }
-    CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
-    CACHE_FILE.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    CACHE_FILE.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _cache_lookup(cache: dict[str, CacheEntry], action_ref: str) -> tuple[bool, str] | None:
+    entry = cache.get(action_ref)
+    if not entry:
+        return None
+
+    # Deterministic refresh strategy: only cache definitive successes for a bounded TTL.
+    if not entry["exists"] or entry["detail"] != "exists":
+        return None
+
+    age = int(time.time()) - entry["checkedAt"]
+    if age < 0 or age > CACHE_TTL_OK_SECONDS:
+        return None
+
+    return True, "cached-OK"
 
 
 def _extract_uses_refs() -> dict[str, list[str]]:
@@ -76,143 +121,109 @@ def _extract_uses_refs() -> dict[str, list[str]]:
             raw = match.group(1).strip().strip("'\"")
             if any(p.match(raw) for p in EXCLUDE_PATTERNS):
                 continue
-            # Normalize: owner/repo@ref
             if "@" not in raw:
                 continue
             refs.setdefault(raw, []).append(rel)
     return refs
 
 
-def _parse_action_ref(action_ref: str) -> tuple[tuple[str, str] | None, str]:
-    """Extract owner/repo and ref from owner/repo[/subpath]@ref."""
+def _parse_action_ref(action_ref: str) -> tuple[str, str, str | None] | None:
     if "@" not in action_ref:
-        return None, f"malformed action ref: {action_ref}"
+        return None
 
-    action_path, ref = action_ref.rsplit("@", 1)
-    if not action_path or not ref:
-        return None, f"malformed action ref: {action_ref}"
+    repo_and_path, ref = action_ref.split("@", 1)
+    pieces = [piece for piece in repo_and_path.split("/") if piece]
+    if len(pieces) < 2:
+        return None
 
-    parts = [part for part in action_path.split("/") if part]
-    if len(parts) < 2:
-        return None, f"malformed action path: {action_path}"
-
-    owner, repo = parts[0], parts[1]
-    if not OWNER_RE.fullmatch(owner):
-        return None, f"invalid owner in action ref: {owner}"
-    if not REPO_RE.fullmatch(repo):
-        return None, f"invalid repository in action ref: {repo}"
-
-    return (f"{owner}/{repo}", ref), ""
+    repo_slug = f"{pieces[0]}/{pieces[1]}"
+    action_path = "/".join(pieces[2:]) or None
+    return repo_slug, ref, action_path
 
 
-def _github_status(path: str) -> tuple[int | None, str | None]:
-    """Return (status_code, error_message)."""
-    headers = {
-        "Accept": "application/vnd.github+json",
-        "User-Agent": "conxian-action-version-audit",
-        "X-GitHub-Api-Version": "2022-11-28",
-    }
+def _github_api_status(url: str) -> tuple[int | None, str | None]:
+    headers = {"Accept": "application/vnd.github.v3+json"}
     if GITHUB_TOKEN:
         headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
 
-    url = f"https://api.github.com{path}"
-    req = request.Request(url, headers=headers, method="GET")
-
+    request = urllib.request.Request(url, headers=headers)
     try:
-        with request.urlopen(req, timeout=15) as response:
-            return response.status, None
-    except error.HTTPError as exc:
+        with urllib.request.urlopen(request, timeout=REQUEST_TIMEOUT_SECONDS) as response:
+            return getattr(response, "status", 200), None
+    except urllib.error.HTTPError as exc:
         return exc.code, None
-    except (error.URLError, TimeoutError, OSError) as exc:
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
         return None, str(exc)
 
 
-def _resolve_status_result(
-    *,
+def _evaluate_status(
     status: int | None,
+    *,
+    not_found_detail: str,
     network_error: str | None,
-    missing_detail: str,
-    success_detail: str,
-    context: str,
-) -> tuple[bool, str] | None:
-    """Map a GitHub API status into checker output.
-
-    Returns None when caller should continue trying another ref type.
-    """
+) -> tuple[bool, str | None]:
     if status == 200:
-        return True, success_detail
-    if status in {404, 422}:
-        return False, missing_detail
-    if status in {401, 403, 429}:
-        return True, f"skipped ({context} HTTP {status})"
+        return True, None
+    if status == 404:
+        return False, not_found_detail
+    if status == 403:
+        return True, "skipped (rate limited, HTTP 403)"
     if status is None:
-        return True, f"skipped ({context} network error: {network_error})"
-    return True, f"skipped ({context} HTTP {status})"
-
-
-def _check_sha_ref(repo_path: str, sha: str) -> tuple[bool, str]:
-    encoded_sha = parse.quote(sha, safe="")
-    status, network_error = _github_status(f"/repos/{repo_path}/commits/{encoded_sha}")
-    resolved = _resolve_status_result(
-        status=status,
-        network_error=network_error,
-        missing_detail="commit not found (404)",
-        success_detail="commit exists",
-        context="commit lookup",
-    )
-    if resolved is None:
-        return False, "commit not found"
-    return resolved
-
-
-def _check_named_ref(repo_path: str, ref: str) -> tuple[bool, str]:
-    encoded_ref = parse.quote(ref, safe="")
-
-    status, network_error = _github_status(f"/repos/{repo_path}/git/ref/tags/{encoded_ref}")
-    resolved = _resolve_status_result(
-        status=status,
-        network_error=network_error,
-        missing_detail="tag missing",
-        success_detail="tag exists",
-        context="tag lookup",
-    )
-    if resolved and (resolved[0] or "skipped" in resolved[1]):
-        return resolved
-
-    status, network_error = _github_status(f"/repos/{repo_path}/git/ref/heads/{encoded_ref}")
-    resolved = _resolve_status_result(
-        status=status,
-        network_error=network_error,
-        missing_detail="branch missing",
-        success_detail="branch exists",
-        context="branch lookup",
-    )
-    if resolved and (resolved[0] or "skipped" in resolved[1]):
-        return resolved
-
-    status, network_error = _github_status(f"/repos/{repo_path}/commits/{encoded_ref}")
-    resolved = _resolve_status_result(
-        status=status,
-        network_error=network_error,
-        missing_detail="ref not found as tag, branch, or commit (404)",
-        success_detail="commit-like ref resolves",
-        context="commit fallback",
-    )
-    if resolved is None:
-        return False, "ref not found"
-    return resolved
+        return True, f"skipped (network error: {network_error or 'unknown'})"
+    return True, f"skipped (HTTP {status})"
 
 
 def _check_ref(action_ref: str) -> tuple[bool, str]:
     """Query GitHub API to check if action ref exists. Returns (exists, detail)."""
-    parsed, parse_error = _parse_action_ref(action_ref)
+    parsed = _parse_action_ref(action_ref)
     if parsed is None:
-        return False, parse_error
+        return False, f"malformed action ref: {action_ref}"
 
-    repo_path, ref = parsed
-    if SHA40_RE.fullmatch(ref):
-        return _check_sha_ref(repo_path, ref)
-    return _check_named_ref(repo_path, ref)
+    repo_slug, ref, action_path = parsed
+
+    is_major_tag = bool(re.fullmatch(r"v\d+", ref))
+    is_full_sha = bool(re.fullmatch(r"[0-9a-fA-F]{40}", ref))
+    if not is_major_tag and not is_full_sha:
+        return True, f"skipped (non-version ref: {ref})"
+
+    if is_major_tag:
+        url = f"https://api.github.com/repos/{repo_slug}/git/ref/tags/{urllib.parse.quote(ref, safe='')}"
+        status, network_error = _github_api_status(url)
+        exists, detail = _evaluate_status(
+            status,
+            not_found_detail="tag not found (404)",
+            network_error=network_error,
+        )
+        if not exists or detail is not None:
+            return exists, detail or "tag check failed"
+    else:
+        # Pinned action SHAs are commit refs, not tags.
+        url = f"https://api.github.com/repos/{repo_slug}/commits/{urllib.parse.quote(ref, safe='')}"
+        status, network_error = _github_api_status(url)
+        exists, detail = _evaluate_status(
+            status,
+            not_found_detail="commit not found (404)",
+            network_error=network_error,
+        )
+        if not exists or detail is not None:
+            return exists, detail or "commit check failed"
+
+    if action_path:
+        encoded_path = urllib.parse.quote(action_path, safe="/")
+        encoded_ref = urllib.parse.quote(ref, safe="")
+        path_url = (
+            f"https://api.github.com/repos/{repo_slug}/contents/{encoded_path}?ref={encoded_ref}"
+        )
+        status, network_error = _github_api_status(path_url)
+        exists, detail = _evaluate_status(
+            status,
+            not_found_detail=f"action path not found at ref (404): {action_path}",
+            network_error=network_error,
+        )
+        if not exists or detail is not None:
+            return exists, detail or "action path check failed"
+
+    return True, "exists"
 
 
 def main() -> int:
@@ -224,19 +235,32 @@ def main() -> int:
     print(f"Checking {len(refs)} unique action reference(s)...\n")
     cache = _load_cache()
 
+    # Keep cache aligned with current workflow refs.
+    active_refs = set(refs)
+    for stale_ref in list(cache):
+        if stale_ref not in active_refs:
+            del cache[stale_ref]
+
     errors: list[str] = []
     checked = 0
 
     for action_ref, files in sorted(refs.items()):
-        # Only trust cached passing results. Re-check failures to avoid stale false negatives
-        # when validation logic changes.
-        if action_ref in cache and cache[action_ref]:
-            exists = cache[action_ref]
-            status = "cached-OK" if exists else "cached-FAIL"
+        cached = _cache_lookup(cache, action_ref)
+        if cached is not None:
+            exists, status = cached
         else:
             exists, detail = _check_ref(action_ref)
-            cache[action_ref] = exists
             status = detail
+
+            if exists and detail == "exists":
+                cache[action_ref] = {
+                    "exists": True,
+                    "detail": detail,
+                    "checkedAt": int(time.time()),
+                }
+            else:
+                cache.pop(action_ref, None)
+
             time.sleep(0.1)  # gentle rate limiting
 
         checked += 1
@@ -254,7 +278,7 @@ def main() -> int:
         print(f"\n❌ {len(errors)} invalid action version(s) found:")
         for err in errors:
             print(f"  • {err}")
-        print("\nThese version tags do not exist on GitHub. Check for typos or removed versions.")
+        print("\nThese version refs do not exist on GitHub. Check for typos or removed versions.")
         return 1
 
     print(f"\n✅ All {checked} action version(s) valid.")
