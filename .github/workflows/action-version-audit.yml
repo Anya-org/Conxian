@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Restore version check cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         id: cache-restore
         with:
           path: .github/.action-version-cache.json
@@ -46,7 +46,7 @@ jobs:
 
       - name: Save version check cache
         if: always()
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: .github/.action-version-cache.json
           key: action-version-cache-${{ github.run_id }}
