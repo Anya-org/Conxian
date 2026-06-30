@@ -19,8 +19,8 @@ permissions:
 
 jobs:
   validate-protocol:
-    # Skip heavy protocol validation for Dependabot-only pull requests.
-    if: ${{ !(github.event_name == 'pull_request' && github.actor == 'dependabot[bot]') }}
+    # Skip heavy protocol validation for Dependabot-authored pull requests.
+    if: ${{ !(github.event_name == 'pull_request' && github.event.pull_request.user.login == 'dependabot[bot]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
