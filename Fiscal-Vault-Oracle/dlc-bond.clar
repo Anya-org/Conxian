@@ -1,3 +1,5 @@
+;; clarity-version 4
+;; epoch latest
 ;; dlc-bond.clar
 ;; Bitcoin-native DLC Bond Lifecycle (sBTC-backed)
 ;;
