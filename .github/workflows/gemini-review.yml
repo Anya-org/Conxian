@@ -25,11 +25,13 @@ jobs:
       id-token: 'write'
       issues: 'write'
       pull-requests: 'write'
+    env:
+      GEMINI_AUTH_AVAILABLE: "${{ secrets.GEMINI_API_KEY != '' || secrets.GOOGLE_API_KEY != '' || (vars.GOOGLE_CLOUD_PROJECT != '' && vars.SERVICE_ACCOUNT_EMAIL != '' && vars.GCP_WIF_PROVIDER != '') }}"
     steps:
       - name: 'Mint identity token'
         id: 'mint_identity_token'
         if: |-
-          ${{ vars.APP_ID }}
+          ${{ env.GEMINI_AUTH_AVAILABLE == 'true' && vars.APP_ID }}
         uses: 'actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf' # ratchet:actions/create-github-app-token@v2
         with:
           app-id: '${{ vars.APP_ID }}'
@@ -39,6 +41,8 @@ jobs:
           permission-pull-requests: 'write'
 
       - name: 'Checkout repository'
+        if: |-
+          ${{ env.GEMINI_AUTH_AVAILABLE == 'true' }}
         uses: 'actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8' # ratchet:actions/checkout@v6
 
       - name: 'Detect Gemini authentication configuration'
@@ -132,3 +136,9 @@ jobs:
               }
             }
           prompt: '/gemini-review'
+
+      - name: 'Skip Gemini review (no auth configured)'
+        if: |-
+          ${{ env.GEMINI_AUTH_AVAILABLE != 'true' }}
+        run: |-
+          echo "::notice title=Gemini review skipped::No Gemini auth is configured (GEMINI_API_KEY, GOOGLE_API_KEY, or Vertex AI WIF variables)."
