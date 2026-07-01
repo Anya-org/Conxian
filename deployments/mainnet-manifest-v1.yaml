@@ -8,68 +8,68 @@ batches:
     transactions:
       - contract-publish:
           contract-name: sip-standards
-          path: "contracts/traits/sip-standards.clar"
+          path = "contracts/traits/sip-standards.clar"
       - contract-publish:
           contract-name: core-traits
-          path: "contracts/traits/core-traits.clar"
+          path = "contracts/traits/core-traits.clar"
       - contract-publish:
           contract-name: defi-traits
-          path: "contracts/traits/defi-traits.clar"
+          path = "contracts/traits/defi-traits.clar"
       - contract-publish:
           contract-name: governance-traits
-          path: "contracts/traits/governance-traits.clar"
+          path = "contracts/traits/governance-traits.clar"
       - contract-publish:
           contract-name: conxian-csf-trait
-          path: "contracts/traits/conxian-csf-trait.clar"
+          path = "contracts/traits/conxian-csf-trait.clar"
 
   - id: 1
     description: "Protocol Identity and Access"
     transactions:
       - contract-publish:
           contract-name: conxian-protocol
-          path: "contracts/core/conxian-protocol.clar"
+          path = "contracts/core/conxian-protocol.clar"
       - contract-publish:
           contract-name: conxian-access
-          path: "contracts/core/conxian-access.clar"
+          path = "contracts/core/conxian-access.clar"
 
   - id: 2
     description: "Financial Infrastructure"
     transactions:
       - contract-publish:
           contract-name: operational-treasury
-          path: "contracts/core/operational-treasury.clar"
+          path = "contracts/core/operational-treasury.clar"
       - contract-publish:
           contract-name: cxd-token
-          path: "contracts/tokens/cxd-token.clar"
+          path = "contracts/tokens/cxd-token.clar"
       - contract-publish:
           contract-name: bme-engine
-          path: "contracts/core/bme-engine.clar"
+          path = "contracts/core/bme-engine.clar"
 
   - id: 3
     description: "DEX and Lending Engines"
     transactions:
       - contract-publish:
           contract-name: pool-factory
-          path: "contracts/pools/pool-factory.clar"
+          path = "contracts/pools/pool-factory.clar"
       - contract-publish:
           contract-name: swap-router
-          path: "contracts/dex/swap-router.clar"
+          path = "contracts/dex/swap-router.clar"
       - contract-publish:
           contract-name: lending-manager
-          path: "contracts/lending/lending-manager.clar"
+          path = "contracts/lending/lending-manager.clar"
 
   - id: 4
     description: "Risk and Monitoring"
     transactions:
       - contract-publish:
           contract-name: finance-metrics
-          path: "contracts/monitoring/finance-metrics.clar"
+          path = "contracts/monitoring/finance-metrics.clar"
       - contract-publish:
           contract-name: agent-risk
-          path: "contracts/agents/agent-risk.clar"
+          path = "contracts/agents/agent-risk.clar"
       - contract-publish:
           contract-name: enhanced-circuit-breaker
-          path: "contracts/security/enhanced-circuit-breaker.clar"
+          path = "contracts/security/enhanced-circuit-breaker.clar"
 
   - id: 5
     description: "System Wiring"

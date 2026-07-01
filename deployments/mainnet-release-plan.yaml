@@ -12,7 +12,7 @@ plan:
             contract-name: alex-adapter
             expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
             cost: 50000
-            path: "contracts/integrations/alex-adapter.clar"
+            path = "contracts/integrations/alex-adapter.clar"
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
