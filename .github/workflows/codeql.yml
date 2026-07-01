@@ -15,8 +15,6 @@ permissions:
 
 jobs:
   analyze:
-    # Avoid conflicts with CodeQL default setup unless explicitly enabled.
-    if: ${{ vars.ENABLE_ADVANCED_CODEQL == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -25,15 +23,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
+        uses: github/codeql-action/init@dd903d2d3a44e283e92f8a7e5c61556db4bc1f5c
         with:
           languages: ${{ matrix.language }}
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v4
+        uses: github/codeql-action/autobuild@dd903d2d3a44e283e92f8a7e5c61556db4bc1f5c
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4
+        uses: github/codeql-action/analyze@dd903d2d3a44e283e92f8a7e5c61556db4bc1f5c
