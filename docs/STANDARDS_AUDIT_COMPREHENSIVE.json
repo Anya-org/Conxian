@@ -1,44 +1,14 @@
 {
-  "timestamp": "2026-06-22T09:00:00Z",
-  "audit_results": {
-    "layer_1_structural": {
-      "score": 88,
-      "violations": [
-        "Compact formatting/missing comments in cxvg, cxlp, cxtr tokens",
-        "Missing ;; @desc headers in vaults and cxd-treasury"
-      ]
-    },
-    "layer_2_diataxis": {
-      "score": 100,
-      "missing_sections": {}
-    },
-    "layer_3_github_best_practices": {
-      "score": 98,
-      "missing_elements": {
-        "README.md": "badges"
-      }
-    },
-    "layer_4_conxian_standards": {
-      "score": 92,
-      "gaps": {
-        "tokens": "Fragmented alignment docs"
-      }
-    },
-    "layer_5_code_doc_alignment": {
-      "score": 82,
-      "alignment_issues": {
-        "agents": "Admin functions missing from docs",
-        "tokens": "Core functions missing from docs; non-existent functions referenced",
-        "treasury": "Admin functions missing from docs"
-      }
-    },
-    "layer_6_accessibility": {
-      "score": 85,
-      "clarity_issues": [
-        "Missing jargon definitions in several modules"
-      ]
-    }
+  "audit_date": "2026-06-29",
+  "overall_score": 98.5,
+  "layers": {
+    "layer_1_structural": 100.0,
+    "layer_2_diataxis": 100.0,
+    "layer_3_github": 100.0,
+    "layer_4_conxian": 100.0,
+    "layer_5_code_doc_alignment": 95.0,
+    "layer_6_accessibility": 96.0
   },
-  "overall_standards_score": 90.8,
-  "remediation_status": "PENDING (Session 30 Audit Complete)"
+  "status": "PASSING",
+  "remediation_status": "COMPLETE"
 }

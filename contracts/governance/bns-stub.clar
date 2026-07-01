@@ -1,8 +1,8 @@
 ;; bns-stub.clar
 ;; Mock for the Bitcoin Name System (BNS)
 
-(define-map names { namespace: (buff 20) name: (buff 48) } { owner: principal, lease-ending-at: (optional uint) })
-(define-map owner-to-name principal { namespace: (buff 20) name: (buff 48) })
+(define-map names { namespace: (buff 20), name: (buff 48) } { owner: principal, lease-ending-at: (optional uint) })
+(define-map owner-to-name principal { namespace: (buff 20), name: (buff 48) })
 
 ;; --- BNS Mock Implementation ---
 

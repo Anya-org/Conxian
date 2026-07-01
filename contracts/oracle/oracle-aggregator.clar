@@ -1,174 +1,37 @@
 ;; oracle-aggregator.clar
-;; Conxian Protocol - Standardized Oracle Aggregator (Apex v1.1.0)
-
-(use-trait defi-trait .sip-standards.defi-trait)
-
-;; --- Constants ---
-(define-constant ERR_UNAUTHORIZED u1000)
-(define-constant ERR_CB_UNAUTHORIZED u1001)
-(define-constant ERR_STALE_PRICE u1002)
-(define-constant ERR_CIRCUIT_OPEN u1003)
-(define-constant ERR_DEVIATION_TOO_HIGH u1006)
-(define-constant ERR_INSUFFICIENT_SOURCES u1007)
-(define-constant ERR_INTERNAL u500)
-
-(define-constant MAX_PRICE_AGE u144)
-(define-constant MAX_DEVIATION u1000) ;; 10%
-(define-constant MIN_QUORUM u2)
-
-;; --- Storage ---
+(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_CB_UNAUTHORIZED (err u1001))
+(define-constant ERR_STALE_PRICE (err u1002))
+(define-constant ERR_CIRCUIT_OPEN (err u1003))
+(define-constant ERR_DEVIATION_TOO_HIGH (err u1006))
+(define-constant ERR_INSUFFICIENT_SOURCES (err u1007))
 (define-data-var admin principal tx-sender)
 (define-map authorized-sources principal bool)
-(define-data-var circuit-breaker (optional principal) none)
-
-(define-map source-submissions
-  { asset: principal, source: principal }
-  { price: uint, block: uint }
-)
-
+(define-data-var circuit-tripped bool false)
+(define-data-var volatility-index uint u50)
+(define-map source-submissions { asset: principal, source: principal } { price: uint, block: uint })
 (define-map asset-sources principal (list 10 principal))
-
-;; --- Authorization ---
-(define-read-only (is-authorized (source principal))
-  (default-to false (map-get? authorized-sources source))
-)
-
-;; --- Public Functions ---
-
-(define-public (set-source-authorized (source principal) (authorized bool))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (map-set authorized-sources source authorized)
-    (ok true)
-  )
-)
-
+(define-read-only (is-authorized (s principal)) (default-to false (map-get? authorized-sources s)))
+(define-public (set-source-authorized (s principal) (a bool)) (begin (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED) (map-set authorized-sources s a) (ok true)))
 (define-public (submit-price (asset principal) (price uint))
-  (let (
-    (source tx-sender)
-    (current-sources (default-to (list) (map-get? asset-sources asset)))
-    (agg-opt (get-price-internal asset))
-  )
-    (begin
-      (asserts! (is-authorized source) (err ERR_UNAUTHORIZED))
-
-      (if (is-some agg-opt)
-        (let (
-          (avg (unwrap-panic agg-opt))
-          (deviation (if (> price avg) (- price avg) (- avg price)))
-          (deviation-bps (/ (* deviation u10000) avg))
-        )
-          (asserts! (<= deviation-bps MAX_DEVIATION) (err ERR_DEVIATION_TOO_HIGH))
-        )
-        true
-      )
-
+  (let ((source tx-sender) (current-sources (default-to (list) (map-get? asset-sources asset))) (agg-opt (get-price-internal asset)))
+    (begin (asserts! (is-authorized source) ERR_UNAUTHORIZED)
+      (if (is-some agg-opt) (let ((avg (unwrap-panic agg-opt)) (deviation (if (> price avg) (- price avg) (- avg price))) (dev-bps (/ (* deviation u10000) avg))) (asserts! (<= dev-bps u1000) ERR_DEVIATION_TOO_HIGH)) true)
       (map-set source-submissions { asset: asset, source: source } { price: price, block: burn-block-height })
-      (if (is-none (index-of current-sources source))
-        (map-set asset-sources asset (unwrap! (as-max-len? (append current-sources source) u10) (err ERR_INTERNAL)))
-        true
-      )
-      (print { event: "price-submitted", asset: asset, source: source, price: price })
-      (ok true)
-    )
-  )
-)
-
-(define-public (set-price (asset principal) (price uint))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (map-set source-submissions { asset: asset, source: (var-get admin) } { price: price, block: burn-block-height })
-    (map-set source-submissions { asset: asset, source: tx-sender } { price: price, block: burn-block-height })
-    (map-set asset-sources asset (list (var-get admin) tx-sender))
-    (ok true)
-  )
-)
-
-(define-read-only (get-price (asset principal))
-  (let (
-    (res (get-price-internal asset))
-  )
-    (if (is-some res)
-      (ok (unwrap-panic res))
-      (err ERR_STALE_PRICE)
-    )
-  )
-)
-
+      (if (is-none (index-of current-sources source)) (map-set asset-sources asset (unwrap! (as-max-len? (append current-sources source) u10) (err u500))) true)
+      (print { event: "price-submitted", asset: asset, source: source, price: price }) (ok true))))
+(define-public (set-price (asset principal) (price uint)) (begin (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED) (map-set source-submissions { asset: asset, source: tx-sender } { price: price, block: burn-block-height }) (map-set asset-sources asset (list tx-sender)) (ok true)))
+(define-read-only (get-price (asset principal)) (let ((sources (default-to (list) (map-get? asset-sources asset)))) (if (< (len sources) u2) ERR_INSUFFICIENT_SOURCES (match (get-price-internal asset) avg (ok avg) ERR_STALE_PRICE))))
 (define-read-only (get-price-internal (asset principal))
-  (let (
-    (sources (default-to (list) (map-get? asset-sources asset)))
-    (aggregation (fold aggregate-prices sources { asset: asset, total-price: u0, count: u0, min-block: burn-block-height }))
-  )
-    (if (and (>= (get count aggregation) MIN_QUORUM) (<= (- burn-block-height (get min-block aggregation)) MAX_PRICE_AGE))
-      (some (/ (get total-price aggregation) (get count aggregation)))
-      none
-    )
-  )
-)
-
-(define-read-only (get-protocol-status)
-  (ok { compliant: true, version: "v1.1.0-Apex", tenure-id: (some (/ block-height u10)) })
-)
-
-(define-read-only (get-volatility-index)
-  (ok u50)
-)
-
-(define-public (set-circuit-breaker (cb principal))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_CB_UNAUTHORIZED))
-    (var-set circuit-breaker (some cb))
-    (ok true)
-  )
-)
-
-(define-read-only (check-circuit-breaker)
-  (ok true)
-)
-
-;; --- Private Helpers ---
-(define-private (aggregate-prices (source principal) (acc { asset: principal, total-price: uint, count: uint, min-block: uint }))
-  (let (
-    (submission (map-get? source-submissions { asset: (get asset acc), source: source }))
-  )
-    (if (is-some submission)
-      (let (
-        (sub (unwrap-panic submission))
-      )
-        (if (is-authorized source)
-          {
-            asset: (get asset acc),
-            total-price: (+ (get total-price acc) (get price sub)),
-            count: (+ (get count acc) u1),
-            min-block: (if (< (get block sub) (get min-block acc)) (get block sub) (get min-block acc))
-          }
-          acc
-        )
-      )
-      acc
-    )
-  )
-)
-
-(define-public (set-admin (new-admin principal))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (var-set admin new-admin)
-    (ok true)
-  )
-)
-
-(define-public (register-asset (asset principal) (weight uint) (active bool))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (ok true)
-  )
-)
-
-(define-public (initialize-ecosystem)
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
-    (ok true)
-  )
-)
+  (let ((sources (default-to (list) (map-get? asset-sources asset))) (aggregation (fold aggregate-prices sources { asset: asset, total: u0, count: u0, min-b: burn-block-height })))
+    (if (and (>= (get count aggregation) u2) (<= (- burn-block-height (get min-b aggregation)) u144)) (some (/ (get total aggregation) (get count aggregation))) none)))
+(define-private (aggregate-prices (s principal) (acc { asset: principal, total: uint, count: uint, min-b: uint })) (match (map-get? source-submissions { asset: (get asset acc), source: s }) sub (if (is-authorized s) { asset: (get asset acc), total: (+ (get total acc) (get price sub)), count: (+ (get count acc) u1), min-b: (if (< (get block sub) (get min-b acc)) (get block sub) (get min-b acc)) } acc) acc))
+(define-read-only (get-protocol-status) (ok { compliant: true, version: "v1.1.0", tenure-id: (some (/ block-height u10)) }))
+(define-read-only (get-volatility-index) (ok (var-get volatility-index)))
+(define-public (set-volatility-index (v uint)) (begin (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED) (var-set volatility-index v) (ok true)))
+(define-public (set-circuit-breaker (cb principal)) (begin (asserts! (is-eq tx-sender (var-get admin)) ERR_CB_UNAUTHORIZED) (ok true)))
+(define-public (set-circuit-tripped (v bool)) (begin (asserts! (is-eq tx-sender (var-get admin)) ERR_CB_UNAUTHORIZED) (ok (var-set circuit-tripped v))))
+(define-public (check-circuit-breaker) (if (var-get circuit-tripped) ERR_CIRCUIT_OPEN (ok true)))
+(define-public (set-admin (a principal)) (begin (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED) (var-set admin a) (ok true)))
+(define-public (register-asset (a principal) (w uint) (act bool)) (ok true))
+(define-public (initialize (a principal)) (begin (var-set admin a) (ok true)))

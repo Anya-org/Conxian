@@ -3,7 +3,7 @@
 ;; Manages asset custody and yield strategies
 ;; Decentralized: Uses Unified RBAC via .conxian-access
 
-(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (use-trait vault-trait .vault-traits.vault-trait)
 (define-constant ERR_UNAUTHORIZED u1000)
 
@@ -23,7 +23,7 @@
 
 ;; Public Functions
 (define-public (deposit
-    (token <sip-010-trait>)
+    (token <sip-010-ft-trait>)
     (amount uint)
   )
   (let (
@@ -55,7 +55,7 @@
 )
 
 (define-public (withdraw
-    (token <sip-010-trait>)
+    (token <sip-010-ft-trait>)
     (amount uint)
   )
   (let (

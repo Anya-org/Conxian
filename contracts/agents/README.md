@@ -1,41 +1,43 @@
 # Agents Module
 
 ## Overview (Explanation)
-The Agents module provides autonomous intelligence for risk and treasury management. It serves as the protocol's decision-making layer, utilizing real-time telemetry and control theory to maintain stability and optimize fiscal policy.
+The Agents module implements autonomous "Fiscal Agents" that manage protocol risk, treasury health, and automated payments. These agents operate based on Grounded Telemetry and Unified Theory variables (C_R, V_X, A_S).
 
 ## Architecture (Explanation)
-The module follows an autonomous intelligence loop:
-- **Predictive Risk**: `agent-risk.clar` monitors system-wide health and calculates stability adjustments using a PID controller.
-- **Sovereign Treasury**: `agent-treasury.clar` orchestrates revenue routing and buy-back strategies based on growth metrics.
-- **Cybernetic Intel**: Agents share telemetry through a common interface to ensure coordinated responses to market volatility.
+- **Risk Agent**: `agent-risk.clar` calculates cybernetic risk scores for lending and liquidity.
+- **Treasury Agent**: `agent-treasury.clar` manages protocol-owned liquidity (POL).
+- **Orchestrator**: `fiscal-orchestrator.clar` dispatches jobs to specialized agents.
 
 ## Core Contracts (Reference)
 
 ### `agent-risk.clar`
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `assess-system-risk` | `()` | Returns the current global risk score. |
-| `get-cybernetic-intel` | `()` | Returns combined telemetry (GCR, Fee, Risk). |
-| `update-pid-rates` | `()` | Heartbeat for PID controller updates. |
+| `get-risk-score` | `()` | Returns the current system-wide risk score. |
+| `assess-system-risk` | `(metrics-ref <finance-metrics-trait>)` | Evaluates protocol health and updates score (Public). |
+| `set-stability-fee` | `(fee uint)` | Updates the PID stability fee (Admin only). |
+| `set-risk-score` | `(score uint)` | Manually overrides the risk score (Admin only). |
+| `initialize` | `(admin principal)` | Sets the initial administrator (Admin only). |
 
 ### `agent-treasury.clar`
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `run-fiscal-strategy` | `(pool-trait <csf-trait>) (pools (list 50 principal)) (cxd <sip-010-trait>)` | Orchestrates revenue routing. |
-| `calculate-performance-adjustment` | `()` | Returns the current growth-based multiplier. |
+| `execute-rebalance` | `()` | Triggers POL rebalancing based on finance-metrics. |
+| `calculate-performance-adjustment` | `(metrics <finance-metrics-trait>)` | Computes yield adjustments based on Unified Theory metrics. |
+| `set-allocation-target` | `(target uint)` | Sets the target allocation for a specific asset (Admin only). |
+| `initialize` | `(admin principal)` | Sets the initial administrator (Admin only). |
 
-## Integration Examples (How-to)
-
-### Accessing Risk Telemetry
-Integrated modules can query the risk agent for system status:
-```clarity
-(let ((intel (unwrap-panic (contract-call? .agent-risk get-cybernetic-intel))))
-  (print intel)
-)
-```
+## Jargon (Accessibility)
+- **Fiscal Agent**: An autonomous smart contract program designed to execute financial policies without human intervention.
+- **Grounded Telemetry**: The practice of using live, on-chain protocol metrics (like TVL or utilization) to drive agentic decisions.
+- **Cybernetic Risk Score**: A dynamic value representing the safety of a position, calculated using feedback loops from market data.
+- **System Autonomy (A_S)**: A Unified Theory variable measuring the degree of protocol independence from manual intervention.
+- **Execution Velocity (V_X)**: A measure of how quickly the protocol processes transactions and state transitions.
+- **Cost of Reproduction (C_R)**: The theoretical cost to replicate the protocol's state and liquidity on a new chain.
 
 ## Testing (How-to)
-`npx vitest run tests/aye-engine.test.ts`
+`npx vitest run tests/agents`
 
 ## Status (Reference)
-- Implementation: Apex v1.1.0 Ready
+- Implementation: Production-Ready (v1.1.0)
+- Nakamoto Standards: Compliant

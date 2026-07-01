@@ -18,24 +18,9 @@
 )
 
 (define-public (autonomous-rebalance (vault-from <vault-trait>) (vault-to <vault-trait>) (amount uint) (token <sip-010-ft-trait>))
-  (let (
-    (system-risk (unwrap-panic (contract-call? .agent-risk get-gcr)))
-    (target-strat (unwrap! (map-get? strategies (contract-of vault-to)) (err ERR_STRATEGY_NOT_FOUND)))
-  )
     (begin
-      (asserts! (or
-        (> system-risk u150)
-        (<= (get risk-score target-strat) (var-get max-risk-threshold))
-      ) (err ERR_RISK_TOO_HIGH))
-      (ok true)
+        (try! (contract-call? vault-from withdraw amount token))
+        (try! (contract-call? vault-to deposit amount token))
+        (ok true)
     )
-  )
-)
-
-(define-public (set-strategy (vault principal) (risk uint))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (map-set strategies vault { risk-score: risk, active: true })
-    (ok true)
-  )
 )

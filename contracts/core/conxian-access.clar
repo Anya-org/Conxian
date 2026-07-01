@@ -73,6 +73,7 @@
   )
 )
 
+(define-read-only (get-contract-owner) (ok (var-get contract-owner)))
 (define-read-only (is-global-admin)
   (is-eq tx-sender (var-get contract-owner))
 )

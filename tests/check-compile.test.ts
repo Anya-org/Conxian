@@ -1,10 +1,16 @@
+import { describe, it, expect } from 'vitest';
+import { simnet } from './setup-test-env';
 
-import { describe, it } from 'vitest';
-import { initializeSimnet } from './setup-test-env';
+describe('System Compilation and Initialization', () => {
+  it('should initialize simnet and verify key contracts', async () => {
+    expect(simnet).toBeDefined();
 
-describe('Compilation Check', () => {
-  it('should initialize simnet without errors', async () => {
-    await initializeSimnet();
-    console.log('Simnet initialized successfully');
-  }, 300000);
+    const regulatorySource = simnet.getContractSource('regulatory-adapter');
+    expect(regulatorySource).toBeDefined();
+
+    const bondFactorySource = simnet.getContractSource('bond-factory');
+    expect(bondFactorySource).toBeDefined();
+
+    console.log('✅ Basic contract existence verified');
+  });
 });

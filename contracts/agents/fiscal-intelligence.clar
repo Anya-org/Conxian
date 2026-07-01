@@ -24,7 +24,7 @@
 
 ;; --- Strategic Symmetry (Allocations) ---
 ;; SBC ID -> Strategy Principal -> Allocated Symmetry (Amount)
-(define-map strategic-symmetry { sbc: (string-ascii 32) strategy: principal } uint)
+(define-map strategic-symmetry { sbc: (string-ascii 32), strategy: principal } uint)
 
 ;; --- Public Functions: Fiscal Orchestration ---
 

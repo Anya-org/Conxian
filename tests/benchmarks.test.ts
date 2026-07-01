@@ -20,7 +20,8 @@ describe('Protocol Benchmarks', () => {
       [
         Cl.principal(`${deployer}.alex-adapter`),
         Cl.list([Cl.principal(wallet1)]),
-        Cl.principal(`${deployer}.cxd-token`)
+        Cl.principal(`${deployer}.cxd-token`),
+        Cl.principal(`${deployer}.finance-metrics`)
       ],
       deployer);
 

@@ -4,7 +4,7 @@
 
 (impl-trait .conxian-csf-trait.trait-csf-liquidity-v1)
 
-(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED (err u1000))
@@ -18,8 +18,8 @@
 
 ;; @desc Execute a swap through the Common Settlement Framework
 (define-public (execute-csf-swap
-    (token-in <sip-010-trait>)
-    (token-out <sip-010-trait>)
+    (token-in <sip-010-ft-trait>)
+    (token-out <sip-010-ft-trait>)
     (amount-in uint)
     (recipient principal)
   )
@@ -60,23 +60,31 @@
 )
 
 ;; @desc Request flash liquidity from the aggregator
-(define-public (request-flash-liquidity (token <sip-010-trait>) (amount uint) (payload (buff 32)))
+(define-public (request-flash-liquidity (token <sip-010-ft-trait>) (amount uint) (payload (buff 32)))
   (ok true)
 )
 
 ;; @desc Settle an arbitrage path through the CSF
-(define-public (settle-arbitrage (token-in <sip-010-trait>) (token-out <sip-010-trait>) (amount uint) (path (list 10 principal)))
+(define-public (settle-arbitrage (token-in <sip-010-ft-trait>) (token-out <sip-010-ft-trait>) (amount uint) (path (list 10 principal)))
   (ok amount)
 )
 
 ;; @desc Claim protocol yield through the CSF
-(define-public (claim-conxian-yield (token <sip-010-trait>) (amount uint) (recipient principal))
+(define-public (claim-conxian-yield (token <sip-010-ft-trait>) (amount uint) (recipient principal))
   (ok amount)
 )
 
 ;; @desc Get the health metrics of the CSF integration
-(define-read-only (get-csf-health)
+(define-public (get-csf-health)
   (ok { tvl: u1000000000, utilization: u500, is-active: true })
+)
+
+;; @desc Collect protocol fees for a specific token
+(define-public (collect-protocol-fees (token <sip-010-ft-trait>))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (ok true)
+  )
 )
 
 ;; --- Admin Functions ---

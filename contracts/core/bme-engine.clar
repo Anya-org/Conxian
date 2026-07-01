@@ -1,6 +1,7 @@
 ;; bme-engine.clar
 ;; Burn-Mint Equilibrium Engine for Conxian Protocol
 
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_INVALID_EPOCH (err u1001))
 
@@ -16,6 +17,7 @@
 (define-map lending-activity principal uint)
 (define-map bounty-activity principal uint)
 (define-map gov-activity principal uint)
+(define-map activity-reporters principal bool)
 
 (define-data-var total-dex-activity uint u0)
 (define-data-var total-lending-activity uint u0)
@@ -23,9 +25,22 @@
 (define-data-var total-gov-activity uint u0)
 (define-data-var total-burned uint u0)
 (define-data-var last-mint-block uint burn-block-height)
+(define-data-var admin principal tx-sender)
 
 (define-private (is-authorized-reporter)
-  (is-ok (contract-call? .conxian-access has-role tx-sender u2))
+  (or
+    (is-eq tx-sender (var-get admin))
+    (default-to false (map-get? activity-reporters tx-sender))
+    (is-ok (contract-call? .conxian-access has-role tx-sender u2))
+  )
+)
+
+(define-public (add-activity-reporter (reporter principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (map-set activity-reporters reporter true)
+    (ok true)
+  )
 )
 
 (define-public (register-fee-activity (lp principal) (amount uint))
@@ -35,6 +50,10 @@
     (var-set total-dex-activity (+ (var-get total-dex-activity) amount))
     (ok true)
   )
+)
+
+(define-public (register-dex-activity (contributor principal) (amount uint))
+  (register-fee-activity contributor amount)
 )
 
 (define-public (register-lending-activity (user principal) (amount uint))
@@ -132,4 +151,12 @@
 
 (define-read-only (get-protocol-status)
   (ok { compliant: true, version: "v1.1.0-Apex" })
+)
+
+(define-public (initialize (new-admin principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (var-set admin new-admin)
+    (ok true)
+  )
 )
