@@ -12,7 +12,7 @@ plan:
             contract-name: sip-standards
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/traits/sip-standards.clar"
+            path: contracts/traits/sip-standards.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -20,7 +20,7 @@ plan:
             contract-name: core-traits
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/traits/core-traits.clar"
+            path: contracts/traits/core-traits.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -28,7 +28,7 @@ plan:
             contract-name: security-monitoring
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/traits/security-monitoring.clar"
+            path: contracts/traits/security-monitoring.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -36,7 +36,7 @@ plan:
             contract-name: automation-traits
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/traits/automation-traits.clar"
+            path: contracts/traits/automation-traits.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -44,7 +44,7 @@ plan:
             contract-name: conxian-service-trait
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/traits/conxian-service-trait.clar"
+            path: contracts/traits/conxian-service-trait.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -52,7 +52,7 @@ plan:
             contract-name: defi-traits
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/traits/defi-traits.clar"
+            path: contracts/traits/defi-traits.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -60,7 +60,7 @@ plan:
             contract-name: conxian-access
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/core/conxian-access.clar"
+            path: contracts/core/conxian-access.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -68,7 +68,7 @@ plan:
             contract-name: conxian-protocol
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/core/conxian-protocol.clar"
+            path: contracts/core/conxian-protocol.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -76,7 +76,7 @@ plan:
             contract-name: oracle-aggregator
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/oracle/oracle-aggregator.clar"
+            path: contracts/oracle/oracle-aggregator.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -84,7 +84,7 @@ plan:
             contract-name: cxd-token
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/tokens/cxd-token.clar"
+            path: contracts/tokens/cxd-token.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -92,7 +92,7 @@ plan:
             contract-name: cxd-treasury
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/treasury/cxd-treasury.clar"
+            path: contracts/treasury/cxd-treasury.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -100,7 +100,7 @@ plan:
             contract-name: mev-protector
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/security/mev-protector.clar"
+            path: contracts/security/mev-protector.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -108,7 +108,7 @@ plan:
             contract-name: swap-router
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/dex/swap-router.clar"
+            path: contracts/dex/swap-router.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -116,7 +116,7 @@ plan:
             contract-name: agent-risk
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/agents/agent-risk.clar"
+            path: contracts/agents/agent-risk.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -124,7 +124,7 @@ plan:
             contract-name: agent-treasury
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/agents/agent-treasury.clar"
+            path: contracts/agents/agent-treasury.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -132,7 +132,7 @@ plan:
             contract-name: ops-engine
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/core/ops-engine.clar"
+            path: contracts/core/ops-engine.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -140,7 +140,7 @@ plan:
             contract-name: conxian-csf-trait
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/traits/conxian-csf-trait.clar"
+            path: contracts/traits/conxian-csf-trait.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
@@ -148,7 +148,7 @@ plan:
             contract-name: alex-adapter
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             cost: 20000
-            path = "contracts/integrations/alex-adapter.clar"
+            path: contracts/integrations/alex-adapter.clar
             anchor-block-only: true
             clarity-version: 4
             epoch: "3.0"
