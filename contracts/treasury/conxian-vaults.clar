@@ -22,6 +22,10 @@
 )
 
 ;; Public Functions
+
+;; @desc Deposits tokens into the vault.
+;; @param token: The SIP-010 token to deposit.
+;; @param amount: The quantity to deposit.
 (define-public (deposit
     (token <sip-010-ft-trait>)
     (amount uint)
@@ -54,6 +58,9 @@
   )
 )
 
+;; @desc Withdraws tokens from the vault.
+;; @param token: The SIP-010 token to withdraw.
+;; @param amount: The quantity to withdraw.
 (define-public (withdraw
     (token <sip-010-ft-trait>)
     (amount uint)
@@ -88,6 +95,9 @@
   )
 )
 
+;; @desc Returns the vault balance for a specific user and token.
+;; @param user: The principal to query.
+;; @param token: The token principal.
 (define-read-only (get-balance
     (user principal)
     (token principal)
@@ -100,6 +110,8 @@
   )
 )
 
+;; @desc Returns the total balance of a specific asset held in the vaults.
+;; @param token: The token principal.
 (define-read-only (get-total-assets (token principal))
   (default-to u0 (map-get? total-holdings token))
 )
