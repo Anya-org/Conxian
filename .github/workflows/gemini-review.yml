@@ -32,7 +32,7 @@ jobs:
         id: 'mint_identity_token'
         if: |-
           ${{ env.GEMINI_AUTH_AVAILABLE == 'true' && vars.APP_ID }}
-        uses: 'actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf' # ratchet:actions/create-github-app-token@v2
+        uses: 'actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1' # ratchet:actions/create-github-app-token@v3
         with:
           app-id: '${{ vars.APP_ID }}'
           private-key: '${{ secrets.APP_PRIVATE_KEY }}'
@@ -43,7 +43,7 @@ jobs:
       - name: 'Checkout repository'
         if: |-
           ${{ env.GEMINI_AUTH_AVAILABLE == 'true' }}
-        uses: 'actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8' # ratchet:actions/checkout@v6
+        uses: 'actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10' # ratchet:actions/checkout@v6
 
       - name: 'Check Gemini auth configuration'
         id: 'gemini_auth'
