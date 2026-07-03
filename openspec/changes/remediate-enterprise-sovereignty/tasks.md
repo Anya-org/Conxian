@@ -1,8 +1,8 @@
 # Tasks: Remediation Execution (March 2026)
 
 ## 1. Spec-Driven Consolidation
-- [ ] 1.1 Finalize OpenSpec `proposal.md`, `design.md`, and `specs.md`.
-- [ ] 1.2 Validate OpenSpec structure using `openspec validate`.
+- [x] 1.1 Finalize OpenSpec `proposal.md`, `design.md`, and `specs.md`.
+- [x] 1.2 Validate OpenSpec structure using `openspec validate`.
 
 ## 2. Business Unit Alignment
 - [x] 2.1 Map all business logic from `ALIGNMENT.md` and `PRD.md` into the new specs.

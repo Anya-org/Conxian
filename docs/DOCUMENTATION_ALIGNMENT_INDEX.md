@@ -257,3 +257,25 @@ These are the highest-value sources to copy into Linear so day-to-day work stays
    - Source: `docs/CJCS_v2.0_SPEC.md`, `docs/ERP_MCP_HANDSHAKE_SPEC.md`.
 10. **Maintainer payout enablement runbook (internal-only, but operationally critical)**
    - Source: `docs/bounties/MAINTAINER_PAYOUT_ENABLEMENT_RUNBOOK.md`.
+
+## 10) Boundary & Commercial Doctrine (2026-07-03 Sprint)
+
+These documents were created during the 2026-07-03 cross-issue boundary and doctrine sprint. They form a coherent set that defines repository boundaries, trust verification, operating lane assignments, commercial packaging, and technical communication strategy.
+
+| Document | Role | Visibility | What it's for |
+| --- | --- | --- | --- |
+| `docs/DEVELOPER_QUICKSTART.md` | Canonical | Public-safe | Ecosystem architecture, submodule map, build/test commands for all 4 suites, CI/CD pipeline, promotion workflow, and contribution guide. |
+| `docs/BOUNDARY_DECISION_LOG.md` | Canonical | Public-safe | Systematic boundary register classifying 20+ artifacts (strategy, BOS state, architecture, bounties, CI/CD) as public-safe, public-safe stub, or internal-only. |
+| `docs/TRUST_AND_READINESS_VERIFICATION.md` | Canonical | Public-safe | Evaluator-facing trust audit of 5 flagship repos against implementation truth. Separates implemented, verified, production-ready, and target-state. Defines explicit non-claim boundary. |
+| `docs/TRUST_AND_PROOF_MESSAGING.md` | Canonical | Public-safe | Standard framework for trust signals on public surfaces (security posture, governance, repo maturity, release discipline, audience fit, portfolio boundaries). |
+| `docs/OPERATING_LANE_BOUNDARIES.md` | Canonical | Public-safe | Explicit lane boundaries for Packaging (doctrine), GTM (execution), and Operations (coordination). Includes escalation paths, anti-patterns, and cross-lane operating loop. |
+| `docs/operations/WEEKLY_GROWTH_DRIVER_REVIEW.md` | Canonical | Public-safe | Weekly GTM metrics review template covering qualified conversations, demos, pilots, proofs, and responsiveness. Cross-references BOS operational metrics (CON-682). |
+| `docs/TECHNICAL_WHITEPAPER_OUTLINE.md` | Canonical | Public-safe | 10-section flagship whitepaper outline with evidence references: system architecture, BOS state machine, security model, protocol layer, execution layer, compliance layer, client layer. |
+| `docs/COMMERCIAL_PACKAGING_DOCTRINE.md` | Canonical | Public-safe | Offer structure (Gateway/Wallet/SDK), 3-tier packaging matrix, pricing doctrine, customer journey stages, pilot path, and executive one-pager template (pricing details in Linear per ZSE). |
+
+### Cross-references
+
+- `BOUNDARY_DECISION_LOG.md` ← `TRUST_AND_READINESS_VERIFICATION.md` ← `TRUST_AND_PROOF_MESSAGING.md`
+- `OPERATING_LANE_BOUNDARIES.md` ← `WEEKLY_GROWTH_DRIVER_REVIEW.md` ← `COMMERCIAL_PACKAGING_DOCTRINE.md`
+- `TECHNICAL_WHITEPAPER_OUTLINE.md` ← `DEVELOPER_QUICKSTART.md` ← `CONXIAN_UNIFIED_THEORY_v2.md`
+- All documents cross-reference `REPO_PORTFOLIO.md` and `PORTFOLIO_BUSINESS_UNIT_MAP.md`
