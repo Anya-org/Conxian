@@ -35,21 +35,43 @@ jobs:
         id: branches
         env:
           SOURCE_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.source_branch || github.ref_name }}
+          TARGET_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.target_branch || '' }}
         run: |
           SOURCE="${SOURCE_REF}"
-          if [ "$SOURCE" = "dev" ]; then
-            TARGET="staged"
-            CHECKLIST_TAG="PROMOTION:DEV->STAGED"
-          elif [ "$SOURCE" = "staged" ]; then
-            TARGET="main"
-            CHECKLIST_TAG="PROMOTION:STAGED->MAIN"
+          TARGET="${TARGET_REF}"
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # Validate the source/target pair
+            case "${SOURCE}:${TARGET}" in
+              dev:staged|staged:main) ;;
+              *)
+                echo "::error::Invalid promotion pair: ${SOURCE} -> ${TARGET}. Allowed: dev->staged, staged->main"
+                exit 1
+                ;;
+            esac
           else
-            echo "::error::Unsupported source branch: $SOURCE"
-            exit 1
+            # Push event: derive target from source
+            if [ "$SOURCE" = "dev" ]; then
+              TARGET="staged"
+            elif [ "$SOURCE" = "staged" ]; then
+              TARGET="main"
+            else
+              echo "::error::Unsupported source branch: $SOURCE"
+              exit 1
+            fi
           fi
+
+          if [ "$SOURCE" = "dev" ]; then
+            CHECKLIST_TAG="PROMOTION:DEV->STAGED"
+          else
+            CHECKLIST_TAG="PROMOTION:STAGED->MAIN"
+          fi
+
+          PROMO_BRANCH="promotion/${SOURCE}-to-${TARGET}"
           echo "source=${SOURCE}" >> "$GITHUB_OUTPUT"
           echo "target=${TARGET}" >> "$GITHUB_OUTPUT"
           echo "checklist_tag=${CHECKLIST_TAG}" >> "$GITHUB_OUTPUT"
+          echo "promo_branch=${PROMO_BRANCH}" >> "$GITHUB_OUTPUT"
 
       - name: Check for existing promotion PR
         id: existing
@@ -57,11 +79,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           SOURCE: ${{ steps.branches.outputs.source }}
           TARGET: ${{ steps.branches.outputs.target }}
+          PROMO_BRANCH: ${{ steps.branches.outputs.promo_branch }}
         run: |
           EXISTING=$(gh pr list \
             --repo "${{ github.repository }}" \
             --base "$TARGET" \
-            --head "$SOURCE" \
+            --head "$PROMO_BRANCH" \
             --state open \
             --json number \
             --jq '.[0].number // ""')
@@ -89,9 +112,8 @@ jobs:
           # Get commits in source that are not in target
           git fetch origin "$TARGET" 2>/dev/null || true
           COMMITS=$(git log "origin/${TARGET}..HEAD" --oneline --no-merges 2>/dev/null | head -20)
-          COUNT=$(echo "$COMMITS" | grep -c . || echo "0")
 
-          if [ "$COUNT" -eq 0 ]; then
+          if [ -z "$COMMITS" ]; then
             echo "::notice::No new commits to promote from ${SOURCE} to ${TARGET}."
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
@@ -113,11 +135,10 @@ jobs:
           TARGET: ${{ steps.branches.outputs.target }}
           CHECKLIST_TAG: ${{ steps.branches.outputs.checklist_tag }}
           COMMIT_SUMMARY: ${{ steps.details.outputs.commit_summary }}
+          PROMO_BRANCH: ${{ steps.branches.outputs.promo_branch }}
         run: |
-          PROMO_BRANCH="promotion/${SOURCE}-to-${TARGET}-$(date +%Y%m%d-%H%M)"
-
-          git checkout -b "$PROMO_BRANCH"
-          git push -u origin "$PROMO_BRANCH"
+          git checkout -B "$PROMO_BRANCH"
+          git push --force -u origin "$PROMO_BRANCH"
 
           python3 -c "
           import os, datetime

@@ -46,19 +46,19 @@ jobs:
               return;
             }
 
-            if (baseRef === 'main' && headRef !== 'staged') {
+            if (baseRef === 'main' && headRef !== 'staged' && !headRef.startsWith('promotion/')) {
               core.setFailed(
-                `PRs into 'main' must come from 'staged' (got '${headRef}' -> '${baseRef}').`
+                `PRs into 'main' must come from 'staged' or a 'promotion/*' branch (got '${headRef}' -> '${baseRef}').`
               );
               return;
             }
 
             if (baseRef === 'staged') {
-              const allowed = headRef === 'dev' || headRef.startsWith('hotfix/');
+              const allowed = headRef === 'dev' || headRef.startsWith('hotfix/') || headRef.startsWith('promotion/');
 
               if (!allowed) {
                 core.setFailed(
-                  `PRs into 'staged' must come from 'dev' (or 'hotfix/*') (got '${headRef}' -> '${baseRef}').`
+                  `PRs into 'staged' must come from 'dev', 'hotfix/*', or 'promotion/*' (got '${headRef}' -> '${baseRef}').`
                 );
                 return;
               }
