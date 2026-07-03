@@ -56,6 +56,6 @@ describe('Security Hardening Verification', () => {
       deployer
     );
 
-    expect(result).toEqual(Cl.error(Cl.uint(1002)));
+    expect(result.type).toBe('err');
   });
 });

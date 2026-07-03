@@ -3,7 +3,7 @@
 ;; Manages asset custody and yield strategies
 ;; Decentralized: Uses Unified RBAC via .conxian-access
 
-(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (use-trait vault-trait .vault-traits.vault-trait)
 (define-constant ERR_UNAUTHORIZED u1000)
 
@@ -22,12 +22,8 @@
 )
 
 ;; Public Functions
-
-;; @desc Deposits tokens into the vault.
-;; @param token: The SIP-010 token to deposit.
-;; @param amount: The quantity to deposit.
 (define-public (deposit
-    (token <sip-010-trait>)
+    (token <sip-010-ft-trait>)
     (amount uint)
   )
   (let (
@@ -58,11 +54,8 @@
   )
 )
 
-;; @desc Withdraws tokens from the vault.
-;; @param token: The SIP-010 token to withdraw.
-;; @param amount: The quantity to withdraw.
 (define-public (withdraw
-    (token <sip-010-trait>)
+    (token <sip-010-ft-trait>)
     (amount uint)
   )
   (let (
@@ -95,9 +88,6 @@
   )
 )
 
-;; @desc Returns the vault balance for a specific user and token.
-;; @param user: The principal to query.
-;; @param token: The token principal.
 (define-read-only (get-balance
     (user principal)
     (token principal)
@@ -110,8 +100,6 @@
   )
 )
 
-;; @desc Returns the total balance of a specific asset held in the vaults.
-;; @param token: The token principal.
 (define-read-only (get-total-assets (token principal))
   (default-to u0 (map-get? total-holdings token))
 )

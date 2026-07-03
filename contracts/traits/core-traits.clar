@@ -51,3 +51,7 @@
   (update-funding-rate (principal) (response bool uint))
   (apply-funding (principal uint) (response bool uint))
 ))
+
+(define-trait position-manager-trait (
+  (get-position (uint) (response (optional { owner: principal, token: principal, size: uint, collateral: uint, leverage: uint, entry-price: uint, is-long: bool, open: bool }) uint))
+))

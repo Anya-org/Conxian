@@ -3,7 +3,7 @@
 ;; Implements standard vault traits for compatibility
 
 (impl-trait .vault-traits.vault-trait)
-(use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; Constants
 (define-constant ERR_UNAUTHORIZED u1000)
@@ -61,7 +61,7 @@
 ;; @param amount: The amount to deposit.
 ;; @param token: The SIP-010 token being deposited.
 ;; @return (response bool uint)
-(define-public (deposit (amount uint) (token <sip-010-trait>))
+(define-public (deposit (amount uint) (token <sip-010-ft-trait>))
     (contract-call? token transfer amount tx-sender (as-contract tx-sender) none)
 )
 
@@ -69,7 +69,7 @@
 ;; @param amount: The amount to withdraw.
 ;; @param token: The SIP-010 token being withdrawn.
 ;; @return (response bool uint)
-(define-public (withdraw (amount uint) (token <sip-010-trait>))
+(define-public (withdraw (amount uint) (token <sip-010-ft-trait>))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
         (as-contract (contract-call? token transfer amount tx-sender (var-get owner) none))
@@ -79,7 +79,7 @@
 ;; @desc Returns the balance of a token held by the treasury.
 ;; @param token: The SIP-010 token.
 ;; @return (response uint uint)
-(define-public (get-balance (token <sip-010-trait>))
+(define-public (get-balance (token <sip-010-ft-trait>))
     (contract-call? token get-balance (var-get contract-address))
 )
 
@@ -90,7 +90,7 @@
 ;; @param token: The SIP-010 token.
 ;; @param recipient: The recipient principal.
 ;; @return (response bool uint)
-(define-public (withdraw-to (amount uint) (token <sip-010-trait>) (recipient principal))
+(define-public (withdraw-to (amount uint) (token <sip-010-ft-trait>) (recipient principal))
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
         (as-contract (contract-call? token transfer amount tx-sender recipient none))

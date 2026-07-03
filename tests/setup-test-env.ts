@@ -79,3 +79,21 @@ export const simnet: Simnet = new Proxy({} as Simnet, {
 beforeAll(async () => {
   await initializeSimnet();
 });
+
+export async function checkDeployments(instance: Simnet) {
+    const deployer = instance.deployer;
+    const contracts = [
+        'conxian-protocol',
+        'regulatory-adapter',
+        'kyc-registry',
+        'bond-factory'
+    ];
+    for (const name of contracts) {
+        const source = instance.getContractSource(name);
+        if (!source) {
+            console.error(`❌ Contract ${name} not found in simnet`);
+        } else {
+            console.log(`✅ Contract ${name} is deployed`);
+        }
+    }
+}

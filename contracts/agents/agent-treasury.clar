@@ -4,6 +4,7 @@
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (use-trait csf-trait .conxian-csf-trait.trait-csf-liquidity-v1)
+(use-trait finance-metrics-trait .security-monitoring.finance-metrics-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_RISK_SIGNAL_UNAVAILABLE (err u2001))
@@ -47,27 +48,10 @@
   )
 )
 
-(define-private (compute-performance-adjustment)
-  (let (
-    (intel (unwrap! (contract-call? .agent-risk get-cybernetic-intel) ERR_RISK_SIGNAL_UNAVAILABLE))
-  )
-    (ok (if (< (get risk-score intel) u1000) u500 u0))
-  )
-)
-
-(define-private (compute-cybernetic-policy)
-  (let (
-    (gcr (unwrap! (contract-call? .agent-risk get-gcr) ERR_RISK_SIGNAL_UNAVAILABLE))
-  )
-    (ok (resolve-cybernetic-policy gcr))
-  )
-)
-
 ;; @desc Executes the compatibility fiscal strategy across designated pools.
-;; @param pool-trait retained for backward compatibility with legacy callers.
-(define-public (run-fiscal-strategy (pool-trait <csf-trait>) (pools-to-reward (list 50 principal)) (cxd-token-trait <sip-010-ft-trait>))
+(define-public (run-fiscal-strategy (pool-trait <csf-trait>) (pools-to-reward (list 50 principal)) (cxd-token-trait <sip-010-ft-trait>) (metrics-ref <finance-metrics-trait>))
   (let (
-    (intel (unwrap! (contract-call? .agent-risk get-cybernetic-intel) ERR_RISK_SIGNAL_UNAVAILABLE))
+    (intel (unwrap! (contract-call? .agent-risk get-cybernetic-intel metrics-ref) ERR_RISK_SIGNAL_UNAVAILABLE))
   )
     (begin
       (unwrap! (contract-call? .concentrated-liquidity-pool collect-protocol-fees cxd-token-trait) ERR_FISCAL_EXECUTION_FAILED)
@@ -99,13 +83,21 @@
 )
 
 ;; @desc Calculates the performance-based adjustment for fiscal policy.
-(define-read-only (calculate-performance-adjustment)
-  (compute-performance-adjustment)
+(define-public (calculate-performance-adjustment (metrics-ref <finance-metrics-trait>))
+  (let (
+    (intel (unwrap! (contract-call? .agent-risk get-cybernetic-intel metrics-ref) ERR_RISK_SIGNAL_UNAVAILABLE))
+  )
+    (ok (if (< (get risk-score intel) u1000) u500 u0))
+  )
 )
 
 ;; @desc Calculates the cybernetic fiscal policy based on current system state.
-(define-read-only (calculate-cybernetic-policy)
-  (compute-cybernetic-policy)
+(define-public (calculate-cybernetic-policy (metrics-ref <finance-metrics-trait>))
+  (let (
+    (gcr (unwrap! (contract-call? .agent-risk get-gcr metrics-ref) ERR_RISK_SIGNAL_UNAVAILABLE))
+  )
+    (ok (resolve-cybernetic-policy gcr))
+  )
 )
 
 ;; @desc Initializes the treasury compatibility controller with an administrator.

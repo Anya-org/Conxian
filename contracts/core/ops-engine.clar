@@ -27,6 +27,7 @@
 )
 
 ;; @desc Returns the current operational status, last update height, and version of the ops engine.
+(define-read-only (get-engine-status) (get-protocol-status))
 (define-read-only (get-protocol-status)
   (ok {
     compliant: true,

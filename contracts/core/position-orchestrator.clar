@@ -109,9 +109,6 @@
   )
 )
 
-(define-read-only (get-position (position-id uint))
-  (match (map-get? positions position-id)
-    pos (ok pos)
-    (err u3000)
-  )
+(define-public (get-position (position-id uint))
+  (ok (map-get? positions position-id))
 )

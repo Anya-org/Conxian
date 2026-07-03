@@ -7,7 +7,7 @@
 
 ;; --- Constants ---
 
-(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_UNAUTHORIZED (err u1000))
 
 ;; --- Data ---
 
@@ -22,7 +22,7 @@
 (define-public (create-bond (user principal) (amount uint) (duration uint))
   (begin
     ;; Verify compliance before bond creation
-    (asserts! (unwrap-panic (contract-call? .regulatory-adapter check-clean-hands-compliance user)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-ok (contract-call? .regulatory-adapter check-clean-hands-compliance user)) ERR_UNAUTHORIZED)
     (ok u1)
   )
 )

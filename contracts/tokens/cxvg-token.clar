@@ -1,53 +1,44 @@
-;; cxvg-token.clar
-;; Conxian Protocol: CXVG Vanguard Token
-;; Governance Voting Power token (SIP-010 + Mintable).
+;; @contract cxvg-token
+;; @desc Conxian Vanguard Governance Token (SIP-010)
+;; @version 1.1.0
 
 (impl-trait .sip-standards.sip-010-ft-trait)
 (impl-trait .sip-standards.ft-mintable-trait)
 
 (define-fungible-token cxvg-token)
 
-;; @desc Standard SIP-010 transfer function.
-;; @param amount: Quantity of tokens to transfer.
-;; @param from: Sender principal.
-;; @param to: Recipient principal.
-;; @param memo: Optional 34-byte memo.
-(define-public (transfer (amount uint) (from principal) (to principal) (memo (optional (buff 34))))
+(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-data-var admin principal tx-sender)
+
+(define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
   (begin
-    (asserts! (is-eq tx-sender from) (err u1))
-    (ft-transfer? cxvg-token amount from to)
+    (asserts! (is-eq tx-sender sender) ERR_UNAUTHORIZED)
+    (try! (ft-transfer? cxvg-token amount sender recipient))
+    (match memo to-print (print to-print) 0x)
+    (ok true)
   )
 )
 
-;; @desc Returns the human-readable name of the token.
-(define-read-only (get-name) (ok "Conxian Vanguard"))
-
-;; @desc Returns the token symbol.
-(define-read-only (get-symbol) (ok "CXVG"))
-
-;; @desc Returns the number of decimals used by the token.
+(define-read-only (get-name) (ok "Conxian Vanguard               "))
+(define-read-only (get-symbol) (ok "CXVG                            "))
 (define-read-only (get-decimals) (ok u8))
-
-;; @desc Returns the token balance of a specific principal.
-;; @param user: The principal to query.
-(define-read-only (get-balance (user principal)) (ok (ft-get-balance cxvg-token user)))
-
-;; @desc Returns the total supply of the token.
+(define-read-only (get-balance (who principal)) (ok (ft-get-balance cxvg-token who)))
 (define-read-only (get-total-supply) (ok (ft-get-supply cxvg-token)))
-
-;; @desc Returns the token URI containing metadata.
 (define-read-only (get-token-uri) (ok none))
 
-;; @desc Mints new CXVG tokens. Authorized minters only.
-;; @param amount: Quantity to mint.
-;; @param recipient: Principal receiving the tokens.
 (define-public (mint (amount uint) (recipient principal))
-  (ft-mint? cxvg-token amount recipient)
+  (begin
+    (asserts! (is-eq contract-caller (var-get admin)) ERR_UNAUTHORIZED)
+    (ft-mint? cxvg-token amount recipient)
+  )
 )
 
-;; @desc Burns CXVG tokens from a specific owner.
-;; @param amount: Quantity to burn.
-;; @param owner: Principal whose tokens are being burned.
 (define-public (burn (amount uint) (owner principal))
-  (ft-burn? cxvg-token amount owner)
+  (begin
+    (asserts! (is-eq tx-sender owner) ERR_UNAUTHORIZED)
+    (ft-burn? cxvg-token amount owner)
+  )
 )
+
+(define-read-only (get-protocol-status) (ok { compliant: true, version: "v1.1.0" }))
+(define-public (initialize (a principal)) (begin (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED) (ok (var-set admin a))))

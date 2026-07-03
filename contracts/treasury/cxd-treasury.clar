@@ -38,7 +38,6 @@
 
 ;; --- Read Functions ---
 
-;; @desc Returns the current percentage weights for the 6-way split.
 (define-read-only (get-allocation-percentages)
   (ok {
     treasury: (var-get treasury-share),
@@ -52,21 +51,12 @@
   })
 )
 
-;; @desc Returns the total accrued claim for a specific token.
-;; @param token: The token principal.
 (define-read-only (get-accrued-claim (token principal))
   (default-to u0 (map-get? accrued-claims token))
 )
 
 ;; --- Public Functions ---
 
-;; @desc Updates the 6-way split percentages (must sum to 10000).
-;; @param treasury: Treasury share in bps.
-;; @param bounty: Bounty share in bps.
-;; @param lp: LP share in bps.
-;; @param grant: Grant share in bps.
-;; @param buyback: Buyback share in bps.
-;; @param insurance: Insurance share in bps.
 (define-public (rebalance
     (treasury uint)
     (bounty uint)
@@ -101,9 +91,6 @@
   )
 )
 
-;; @desc Records claims diverted to the treasury for later allocation.
-;; @param token: The token principal.
-;; @param amount: The quantity diverted.
 (define-public (record-diverted-claim (token principal) (amount uint))
   (begin
     (asserts! (or (is-eq contract-caller (var-get admin)) (is-eq contract-caller (var-get revenue-distributor-principal))) (err ERR_UNAUTHORIZED))
@@ -118,8 +105,6 @@
 
 ;; --- Admin Functions ---
 
-;; @desc Initializes the treasury with a designated administrator.
-;; @param new-admin: The administrator principal.
 (define-public (initialize (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender tx-sender) (err ERR_UNAUTHORIZED))
@@ -128,9 +113,6 @@
   )
 )
 
-;; @desc Authorizes specific contracts to trigger rebalancing or record claims.
-;; @param agent: The agent treasury principal.
-;; @param distributor: The revenue distributor principal.
 (define-public (set-authorized-principals (agent principal) (distributor principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
@@ -140,8 +122,6 @@
   )
 )
 
-;; @desc Updates the administrative principal.
-;; @param new-admin: The new administrator principal.
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))

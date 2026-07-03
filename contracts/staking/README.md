@@ -1,46 +1,40 @@
 # Staking Module
 
 ## Overview (Explanation)
-The Staking module is a critical component of the Conxian Protocol, handling specialized operations for staking. It implements sovereign autonomous logic to ensure mathematical certainty and neutrality.
+The Staking module manages the protocol's participation in the Stacks Nakamoto stacking and the native Conxian dual-staking model. It allows users to lock CXS or STX to secure the protocol and earn yield in CXD or sBTC.
 
 ## Architecture (Explanation)
-This module follows the Hexagonal Architecture pattern. It defines clear ports via traits and provides robust adapter implementations. The core logic is isolated from external dependencies, ensuring high security and auditability.
+This module follows the Hexagonal Architecture pattern:
+- **Orchestrator**: `dual-stacking-orchestrator.clar` manages the logic for simultaneous STX and CXS locking.
+- **Operators**: `native-stacking-operator.clar` interfaces with the Stacks PoX-4 contract.
+- **Traits**: Implements `staking-trait` for universal yield eligibility.
 
 ## Core Contracts (Reference)
-The following contracts provide the backbone of the staking system:
-### `dual-stacking-orchestrator.clar`
-Core logic for dual stacking orchestrator.
 
-Public Functions:
-- `placeholder`: Action for placeholder.
+### `dual-stacking-orchestrator.clar`
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `stake-dual` | `(amount-stx uint) (amount-cxs uint)` | Locks both assets for a specific period. |
+| `unstake` | `(stake-id uint)` | Unlocks assets after the cooldown period. |
+| `initialize` | `(admin principal)` | Sets the initial administrator (Admin only). |
 
 ### `native-stacking-operator.clar`
-Core logic for native stacking operator.
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `stack-stx` | `(amount uint) (pox-addr { version: (buff 1), hashbytes: (buff 20) })` | Proxies stacking to PoX-4. |
+| `set-admin` | `(new-admin principal)` | Updates the administrator (Admin only). |
 
-Public Functions:
-- `placeholder`: Action for placeholder.
-
-## Jargon & Terminology (Layer 6)
-- **Staking**: The process of locking up crypto assets to support a network's operation and, in return, earning rewards.
-- **Dual Stacking**: A mechanism where two different assets (e.g., STX and CXD) are stacked simultaneously to provide enhanced security or yield.
-- **Orchestrator**: A contract that coordinates actions between multiple other contracts or modules.
-- **Operator**: A contract or entity that executes specific technical tasks within the protocol.
-- **Nakamoto-Aligned**: Referring to the Nakamoto release of Stacks, which brings faster blocks and Bitcoin finality.
-
-## Integration Examples (How-to)
-### Calling Staking from other modules
-Use the standard trait patterns. For example:
-```clarity
-(contract-call? .conxian-protocol get-module "staking")
-```
+## Jargon (Accessibility)
+- **Dual Stacking**: The process of locking both STX and native CXS tokens to maximize yield and governance weight.
+- **PoX-4**: Proof of Transfer version 4, the Nakamoto-era consensus mechanism for Stacks.
+- **Cooldown Period**: A mandatory waiting time between initiating an unstake and when assets become liquid.
+- **Slashing Protection**: Mechanisms implemented in BitVM2 to prevent or penalize malicious behavior by validators.
+- **Yield Eligibility**: A status that determines if a staked position is qualified to receive protocol emissions based on BME rules.
 
 ## Testing (How-to)
-Comprehensive validation is performed using the Vitest framework.
-1. Install dependencies: `npm install`
-2. Run module tests: `npx vitest run tests/staking`
+`npx vitest run tests/staking`
 
 ## Status (Reference)
 - Implementation: Production-Ready (v1.2.0)
 - Audit Status: Internally Verified
-- BIP Compliance: BIP-341, BIP-342, BIP-174
-- Standard: Hexagonal, 60/20/20 split
+- BIP Compliance: BIP-341, BIP-342

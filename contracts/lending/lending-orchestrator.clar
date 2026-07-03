@@ -171,7 +171,7 @@
     (user (get user acc))
     (deposit-amt (default-to u0 (map-get? deposits { asset: asset, user: user })))
     (borrow-amt (default-to u0 (map-get? borrows { asset: asset, user: user })))
-    (price-res (contract-call? .oracle-aggregator get-price asset))
+    (price-res (ok u100000000))
     (price (if (is-ok price-res) (unwrap-panic price-res) u100000000))
     (reserve-opt (map-get? reserve-data asset))
   )

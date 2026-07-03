@@ -5,7 +5,7 @@
 
 (define-public (check-peg-status (metrics-ref <finance-metrics-trait>))
   (let (
-    (intel (unwrap-panic (contract-call? .agent-risk get-cybernetic-intel)))
+    (intel (unwrap-panic (contract-call? .agent-risk get-cybernetic-intel metrics-ref)))
     (pid-fee (get operational-fee intel))
     (gcr (get financial-gcr intel))
   )

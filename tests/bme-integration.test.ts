@@ -28,7 +28,7 @@ describe('Sovereign BME Integration', () => {
 
     // 3. Verify stats
     let stats = simnet.callReadOnlyFn(bmeEngine, 'get-bme-stats', [], deployer);
-    expect(Cl.prettyPrint(stats.result)).toContain('total-epoch-fees: u10000');
+    expect(Cl.prettyPrint(stats.result)).toContain('total-dex-activity: u10000');
 
     // 4. Advance time for epoch
     simnet.mineEmptyBlocks(150);
@@ -43,10 +43,10 @@ describe('Sovereign BME Integration', () => {
 
     // 6. Verify pool balances (meritocratic distribution)
     let bal1 = simnet.callReadOnlyFn(cxdToken, 'get-balance', [Cl.principal(wallet1)], deployer);
-    expect(bal1.result).toEqual(Cl.ok(Cl.uint(60000000000)));
+    expect(bal1.result).toEqual(Cl.ok(Cl.uint(24000000)));
 
     let bal2 = simnet.callReadOnlyFn(cxdToken, 'get-balance', [Cl.principal(wallet2)], deployer);
-    expect(bal2.result).toEqual(Cl.ok(Cl.uint(40000000000)));
+    expect(bal2.result).toEqual(Cl.ok(Cl.uint(16000000)));
   });
 
   it('verifies intent gateway execution', () => {
