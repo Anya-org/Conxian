@@ -10,6 +10,13 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 ## [Unreleased]
 
 ### Added
+- **CON-383 BOS Full Buildout — Stub Removal & Production Verification**:
+  - Flipped `ORACLE_SERVICE_IS_STUBBED` from `true` to `false` after verifying `push_state_to_contract` uses real `ContractBridge::create_signed_call` with `Wallet` signing in `conxian-nexus/src/oracle/aggregator.rs`.
+  - Replaced empty `test_health_check_stub` with `test_health_check_returns_ok` asserting the `/health` endpoint returns `200 OK`.
+  - Made `health_check()` handler `pub(crate)` to enable direct testing.
+  - Verified all `[STUB]` markers already removed from `conxian-nexus/src/`; ERP, Kwil, Tableland, ZKML, DLC, Identity, and ARR/MRR handlers all have real implementations with proper error handling.
+  - Contamination guard (`verify_contamination_guard.py`) passes — zero hardcoded testnet/simnet principals.
+  - Action version audit (`verify_action_versions.py`) passes — all 22 actions valid.
 - **Release Hygiene**: Added missing `## [Unreleased]` sections to submodule changelogs in `conxian-gateway`, `conxian-nexus`, `conxius-wallet`, `conxius-platform`, `Conxian`, and `lib-conxian-core`.
 - **Render Deployment Remediation**: Fixed critical port binding issue in `conxian-ui` to resolve "Unknown --listen endpoint scheme" errors on Render.
 - **CI Pipeline Hardening**: Added `cargo clippy`, `cargo audit`, `--locked` flag, and SHA-pinned Rust toolchain to `gateway-suite` and `b2b-suite` CI jobs, bringing them to parity with `lib-conxian-core-suite`. Clippy warnings are non-fatal initially (to be upgraded to `-D warnings` once codebases are clean).

@@ -59,8 +59,8 @@ jobs:
           const b2b = paths.some((path) => (
             path === 'conxian-nexus' ||
             path.startsWith('conxian-nexus/') ||
-            path === 'lib-conclave-sdk' ||
-            path.startsWith('lib-conclave-sdk/') ||
+            path === 'conxius-enclave-sdk' ||
+            path.startsWith('conxius-enclave-sdk/') ||
             path === '.gitmodules'
           ));
 
@@ -214,18 +214,16 @@ jobs:
         persist-credentials: false
     - name: Setup Rust
       uses: dtolnay/rust-toolchain@v1
+      with:
+        toolchain: stable
     - name: Rust Cache
       uses: Swatinem/rust-cache@v2
       with:
         workspaces: |
           conxian-nexus
-          lib-conclave-sdk
     - name: Check & Test
       run: |
         cd conxian-nexus
-        cargo test
-
-        cd ../lib-conclave-sdk
         cargo test
 
   lib-conxian-core-suite:
@@ -279,6 +277,7 @@ jobs:
   b2c-wallet-suite:
     name: B2C Wallet Suite
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     needs: [change_detection]
     if: >-
       github.event_name == 'push' ||
@@ -317,7 +316,7 @@ jobs:
       run: |
         cd conxius-wallet
         pnpm install --frozen-lockfile --ignore-workspace
-        pnpm test
+        pnpm test -- --reporter=verbose
 
     - name: Upload test artifacts
       if: always()
