@@ -50,7 +50,10 @@ jobs:
               - 'tests/**'
               - 'Clarinet.toml'
               - 'package.json'
+              - 'package-lock.json'
               - 'vitest.config.ts'
+              - '.github/workflows/**'
+              - 'deployments/**'
             contracts:
               - 'contracts/**'
             tests:
