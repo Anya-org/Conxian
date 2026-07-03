@@ -113,7 +113,7 @@ The recommended v2.1 upgrades add **quantitative precision** for real-world busi
 | **conxian-nexus** | Core Rust crate | ✅ COMPILED |
 | **conxius-enclave-sdk** | Core Rust crate | ✅ COMPILED |
 
-**Workspace Root:** [Cargo.toml](file:///c:/Users/bmokoka/Conxian-Labs/conxian-business/Cargo.toml)
+**Workspace Root:** [Cargo.toml](Cargo.toml)
 
 ### 1.2 Build Results
 
@@ -152,7 +152,7 @@ The recommended v2.1 upgrades add **quantitative precision** for real-world busi
 
 ### 2.1 Setup Script
 
-[setup_windows.ps1](file:///c:/Users/bmokoka/Conxian-Labs/conxian-business/setup_windows.ps1) — verified working, idempotent, fully automated.
+[setup_windows.ps1](setup_windows.ps1) — verified working, idempotent, fully automated.
 
 ### 2.2 What It Verifies
 
@@ -183,7 +183,7 @@ The recommended v2.1 upgrades add **quantitative precision** for real-world busi
 
 ### 3.1 Conxian Protocol Contracts
 
-**Location:** [Conxian/contracts/](file:///c:/Users/bmokoka/Conxian-Labs/conxian-business/Conxian/contracts/)
+**Location:** [Conxian/contracts/](Conxian/contracts/)
 
 | Category | Count | Examples |
 |:---|---:|:---|
@@ -206,7 +206,7 @@ The recommended v2.1 upgrades add **quantitative precision** for real-world busi
 
 ### 3.2 Conxius Wallet Contracts
 
-**Location:** [conxius-wallet/](file:///c:/Users/bmokoka/Conxian-Labs/conxian-business/conxius-wallet/)
+**Location:** [conxius-wallet/](conxius-wallet/)
 
 | Contract | Category | Purpose |
 |:---|---|:---|
@@ -238,7 +238,7 @@ All contracts across both projects have been migrated to **Clarity 4**:
 
 ### 4.1 Project Structure
 
-**Workspace Root:** [conxian-gateway/Cargo.toml](file:///c:/Users/bmokoka/Conxian-Labs/conxian-business/conxian-gateway/Cargo.toml)
+**Workspace Root:** [conxian-gateway/Cargo.toml](conxian-gateway/Cargo.toml)
 
 | Member | Purpose | Rust Files |
 |:---|---|:---:|
@@ -328,10 +328,10 @@ All contracts across both projects have been migrated to **Clarity 4**:
 
 | Component | Status | Documentation |
 |:---|---|:---:|
-| System Graph | ✅ COMPLETE | [SYSTEM_GRAPH.md](file:///c:/Users/bmokoka/Conxian-Labs/conxian-business/conxius-platform/SYSTEM_GRAPH.md) |
-| Phase 5/6 Risk Register | ✅ COMPLETE | [PHASE_5_6_RISK_REGISTER.md](file:///c:/Users/bmokoka/Conxian-Labs/conxian-business/conxius-platform/docs/PHASE_5_6_RISK_REGISTER.md) |
+| System Graph | ✅ COMPLETE | [SYSTEM_GRAPH.md](conxius-platform/SYSTEM_GRAPH.md) |
+| Phase 5/6 Risk Register | ✅ COMPLETE | [PHASE_5_6_RISK_REGISTER.md](conxius-platform/docs/PHASE_5_6_RISK_REGISTER.md) |
 | Phase 7 Sovereign Design | 🔄 IN PROGRESS | NixOS control plane migration |
-| WHITEPAPER | ✅ COMPLETE | [WHITEPAPER.md](file:///c:/Users/bmokoka/Conxian-Labs/conxian-business/conxius-platform/WHITEPAPER.md) |
+| WHITEPAPER | ✅ COMPLETE | [WHITEPAPER.md](conxius-platform/WHITEPAPER.md) |
 
 ### 7.2 conxius_orbit
 
@@ -385,7 +385,7 @@ All contracts across both projects have been migrated to **Clarity 4**:
 | `cargo build --workspace` | ✅ PASS | Exit code 0, 181+ crates |
 | `cargo test --workspace` | ⚠️ BLOCKED | Disk space exhaustion (56 MB free) — NOT a code issue |
 | `conxian-gateway cargo build` | ⚠️ BLOCKED | Disk space exhaustion — requires 10+ GB |
-| Rust source files (Gateway) | ✅ 32 files statically verified | [Full module tree confirmed](file:///c:/Users/bmokoka/Conxian-Labs/conxian-business/conxian-gateway) |
+| Rust source files (Gateway) | ✅ 32 files statically verified | [Full module tree confirmed](conxian-gateway) |
 | Clarity 4 contracts | ✅ 199+ entries verified | 100% at clarity-version = 4, zero on v1-3 |
 | Windows setup reproducibility | ✅ Idempotent script verified | setup_windows.ps1 |
 | LLVM MinGW toolchain | ✅ Working | secp256k1-sys links |
