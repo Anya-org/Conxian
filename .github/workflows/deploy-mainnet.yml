@@ -1,0 +1,101 @@
+name: Deploy Mainnet
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (generate plan only, no deploy)'
+        type: boolean
+        default: true
+      confirm:
+        description: 'Type "DEPLOY_MAINNET" to confirm mainnet deployment'
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate-protocol:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Clarinet
+        run: |
+          set -euo pipefail
+          VERSION="v3.2.0"
+          curl -sSL -o clarinet.tar.gz "https://github.com/hirosystems/clarinet/releases/download/${VERSION}/clarinet-linux-x64-glibc.tar.gz"
+          tar -xzf clarinet.tar.gz clarinet
+          chmod +x clarinet
+          sudo mv clarinet /usr/local/bin/clarinet
+          clarinet --version
+
+      - name: Clarinet Check
+        run: clarinet check --manifest-path Clarinet.toml
+
+      - name: Run Full Test Suite
+        run: npm run ci
+
+      - name: Run Coverage
+        run: npm run coverage
+
+  deploy-mainnet:
+    needs: validate-protocol
+    runs-on: ubuntu-latest
+    environment: mainnet
+    if: ${{ inputs.confirm == 'DEPLOY_MAINNET' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Clarinet
+        run: |
+          set -euo pipefail
+          VERSION="v3.2.0"
+          curl -sSL -o clarinet.tar.gz "https://github.com/hirosystems/clarinet/releases/download/${VERSION}/clarinet-linux-x64-glibc.tar.gz"
+          tar -xzf clarinet.tar.gz clarinet
+          chmod +x clarinet
+          sudo mv clarinet /usr/local/bin/clarinet
+          clarinet --version
+
+      - name: Generate Mainnet Deployment Plan
+        run: |
+          clarinet deployment generate \
+            --manifest-path Clarinet.toml \
+            --mainnet \
+            --plan-path deployments/default.mainnet-plan.yaml
+
+      - name: Deploy to Mainnet
+        if: ${{ !inputs.dry_run }}
+        env:
+          DEPLOYER_MNEMONIC: ${{ secrets.MAINNET_DEPLOYER_MNEMONIC }}
+        run: |
+          clarinet deployment apply \
+            --manifest-path Clarinet.toml \
+            --plan-path deployments/default.mainnet-plan.yaml \
+            --mainnet
+
+      - name: Upload Deployment Plan Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mainnet-deployment-plan
+          path: deployments/default.mainnet-plan.yaml
