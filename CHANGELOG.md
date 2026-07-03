@@ -10,6 +10,13 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 ## [Unreleased]
 
 ### Added
+- **Cross-Issue Boundary & Doctrine Sprint — 6 artifacts delivered**:
+  - **#825**: Created `docs/BOUNDARY_DECISION_LOG.md` — systematic boundary register for all public-safe vs internal-only artifacts. Classifies 20+ artifacts across strategy, BOS state, architecture, bounties, and CI/CD.
+  - **#830**: Created `docs/TRUST_AND_READINESS_VERIFICATION.md` — evaluator-facing trust audit of 5 flagship repos against implementation truth. Separates implemented, verified, production-ready, and target-state. Defines explicit non-claim boundary.
+  - **#832**: Created `docs/OPERATING_LANE_BOUNDARIES.md` — explicit lane boundaries for Packaging (doctrine), GTM (execution), and Operations (coordination). Includes escalation paths, anti-patterns, and cross-lane operating loop.
+  - **#831**: Created `docs/operations/WEEKLY_GROWTH_DRIVER_REVIEW.md` — weekly GTM metrics review template covering qualified conversations, demos, pilots, proofs, and responsiveness. Cross-references BOS operational metrics (CON-682).
+  - **#827**: Created `docs/TECHNICAL_WHITEPAPER_OUTLINE.md` — 10-section whitepaper outline with evidence references. Covers system architecture, BOS state machine, security model, protocol layer, execution layer, compliance layer, and client layer.
+  - **#829**: Created `docs/COMMERCIAL_PACKAGING_DOCTRINE.md` — offer structure (Gateway/Wallet/SDK), 3-tier packaging matrix, pricing doctrine, customer journey stages, pilot path, and executive one-pager template.
 - **Developer Quickstart & Architecture Guide**: Created `docs/DEVELOPER_QUICKSTART.md` covering ecosystem architecture, build/test commands for all suites, key concepts (ZSE, dual-brand, Unified Theory, Oracle, BitVM2), CI/CD pipeline, and contribution workflow. Resolves #828.
 - **CON-383 BOS Full Buildout - Stub Removal & Production Verification**:
   - Flipped `ORACLE_SERVICE_IS_STUBBED` from `true` to `false` after verifying `push_state_to_contract` uses real `ContractBridge::create_signed_call` with `Wallet` signing in `conxian-nexus/src/oracle/aggregator.rs`.
