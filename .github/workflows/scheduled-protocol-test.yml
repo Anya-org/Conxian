@@ -42,7 +42,9 @@ jobs:
         run: npm run ci
 
       - name: Run Coverage
-        run: npm run coverage
+        run: |
+          npm run coverage
+          npx vitest run --coverage --coverage.thresholds.lines=60 --coverage.thresholds.branches=50 --coverage.thresholds.functions=60 --coverage.thresholds.statements=60
 
       - name: Upload Test Artifacts
         if: always()

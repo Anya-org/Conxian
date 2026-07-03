@@ -3,13 +3,9 @@ on:
   push:
     paths:
       - 'contracts/**'
-      - 'deployments/**'
-      - 'ui/**'
   pull_request:
     paths:
       - 'contracts/**'
-      - 'deployments/**'
-      - 'ui/**'
 
 permissions:
   contents: read
