@@ -18,7 +18,81 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      contracts: ${{ steps.filter.outputs.contracts }}
+      tests: ${{ steps.filter.outputs.tests }}
+      any_protocol: ${{ steps.filter.outputs.any_protocol }}
+      # Specific paths for intelligent testing
+      access: ${{ steps.filter.outputs.access }}
+      agents: ${{ steps.filter.outputs.agents }}
+      compliance: ${{ steps.filter.outputs.compliance }}
+      core: ${{ steps.filter.outputs.core }}
+      dex: ${{ steps.filter.outputs.dex }}
+      dimensional: ${{ steps.filter.outputs.dimensional }}
+      enterprise: ${{ steps.filter.outputs.enterprise }}
+      governance: ${{ steps.filter.outputs.governance }}
+      lending: ${{ steps.filter.outputs.lending }}
+      monitoring: ${{ steps.filter.outputs.monitoring }}
+      oracle: ${{ steps.filter.outputs.oracle }}
+      tokens: ${{ steps.filter.outputs.tokens }}
+      treasury: ${{ steps.filter.outputs.treasury }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            any_protocol:
+              - 'contracts/**'
+              - 'tests/**'
+              - 'Clarinet.toml'
+              - 'package.json'
+              - 'vitest.config.ts'
+            contracts:
+              - 'contracts/**'
+            tests:
+              - 'tests/**'
+            access:
+              - 'contracts/access/**'
+            agents:
+              - 'contracts/agents/**'
+              - 'tests/agents/**'
+            compliance:
+              - 'contracts/compliance/**'
+              - 'tests/compliance/**'
+            core:
+              - 'contracts/core/**'
+              - 'tests/core/**'
+            dex:
+              - 'contracts/dex/**'
+              - 'tests/dex/**'
+            dimensional:
+              - 'contracts/dimensional/**'
+            enterprise:
+              - 'contracts/enterprise/**'
+              - 'tests/enterprise/**'
+            governance:
+              - 'contracts/governance/**'
+              - 'tests/governance/**'
+            lending:
+              - 'contracts/lending/**'
+              - 'tests/lending/**'
+            monitoring:
+              - 'contracts/monitoring/**'
+              - 'tests/monitoring/**'
+            oracle:
+              - 'contracts/oracle/**'
+              - 'tests/oracle/**'
+            tokens:
+              - 'contracts/tokens/**'
+            treasury:
+              - 'contracts/treasury/**'
+
   validate-protocol:
+    needs: changes
+    if: ${{ needs.changes.outputs.any_protocol == 'true' || github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,8 +119,47 @@ jobs:
       - name: Clarinet Check
         run: clarinet check --manifest-path Clarinet.toml
 
-      - name: Run CI Tests
+      - name: Run Intelligent Tests (PR only)
+        if: github.event_name == 'pull_request'
+        run: |
+          TEST_TARGETS=""
+          if [[ "${{ needs.changes.outputs.access }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/core/access.test.ts"; fi
+          if [[ "${{ needs.changes.outputs.agents }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/agents/"; fi
+          if [[ "${{ needs.changes.outputs.compliance }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/compliance/"; fi
+          if [[ "${{ needs.changes.outputs.core }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/core/"; fi
+          if [[ "${{ needs.changes.outputs.dex }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/dex/"; fi
+          if [[ "${{ needs.changes.outputs.enterprise }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/enterprise/"; fi
+          if [[ "${{ needs.changes.outputs.governance }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/governance/"; fi
+          if [[ "${{ needs.changes.outputs.lending }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/lending/"; fi
+          if [[ "${{ needs.changes.outputs.monitoring }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/monitoring/"; fi
+          if [[ "${{ needs.changes.outputs.oracle }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/oracle/"; fi
+
+          if [ -z "$TEST_TARGETS" ] && [[ "${{ needs.changes.outputs.any_protocol }}" == "true" ]]; then
+            echo "Generic protocol change detected, running core tests..."
+            TEST_TARGETS="tests/core/ tests/sanity.test.ts"
+          fi
+
+          if [ ! -z "$TEST_TARGETS" ]; then
+            echo "Running tests for: $TEST_TARGETS"
+            npx vitest run $TEST_TARGETS --config vitest.config.ts --pool=threads
+          else
+            echo "No specific protocol tests to run."
+          fi
+
+      - name: Run Full Tests (Push to Main)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: npm run ci
 
-      - name: Run Coverage
+      - name: Run Coverage (Push to Main)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: npm run coverage
+
+      - name: Upload Test Logs on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: protocol-test-logs
+          path: |
+            *.log
+            npm-debug.log*
+            coverage/
