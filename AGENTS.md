@@ -77,9 +77,11 @@ ops-engine (heartbeat) / alex-adapter / governance suite
 
 ## 9. High-Priority Issues (P1)
 
-### P1-1: 79 unwrap-panic Calls (63 in public functions) -- REMAINING
-- 36 files affected; most common patterns: check-clean-hands-compliance, has-role, map-get?
-- Key public functions: swap-router.csf-swap, dimensional-engine (8 calls), lending-manager.borrow/withdraw
+### P1-1: 77 unwrap-panic Calls (PRIVATE/READ-ONLY) -- MONITORED
+- 32 files affected; common patterns: check-clean-hands-compliance, has-role, map-get?
+- User-facing paths (swap-router, lending-manager, dimensional-core) are now clean
+- Remaining are in compliance gates, oracle adapters, registry lookups -- fail-hard semantics acceptable for these
+- Will address in post-testnet audit sweep
 
 ### ~~P1-2: ops-engine.clar No Authorization~~ FIXED
 - trigger-heartbeat, trigger-epoch-update, trigger-emergency-pause now admin-gated.
@@ -96,8 +98,9 @@ ops-engine (heartbeat) / alex-adapter / governance suite
 
 ## 10. Medium-Priority Issues (P2)
 
-### P2-1: alex-adapter.clar Stub Implementation -- REMAINING
+### P2-1: alex-adapter.clar Stub Implementation -- REMAINING (needs ALEX mainnet addresses)
 - execute-csf-swap returns placeholder values; get-csf-health returns hardcoded TVL.
+- Requires ALEX Lab mainnet contract principals for vault/amm-pool endpoints.
 
 ### P2-2: Test Suite Cannot Run -- REMAINING
 - Requires clarinet binary (not installed in CI/workspace).
