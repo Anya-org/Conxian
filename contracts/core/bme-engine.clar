@@ -137,20 +137,23 @@
 
 (define-public (swap-and-burn (token <sip-010-ft-trait>) (amount uint))
   (begin
-    ;; Transfer tokens from self to swap-router for the swap
+    ;; Transfer tokens from tx-sender to swap-router for the swap
     (try! (as-contract (contract-call? token transfer amount tx-sender .swap-router none)))
-    ;; Execute swap: token → CXD via CSF swap-router, receiving CXD at self
-    (match (contract-call? .swap-router csf-swap token .cxd-token amount (as-contract tx-sender))
-      swap-result (let ((cxd-received (get amount-out swap-result)))
-        ;; Burn the received CXD
-        (try! (contract-call? .cxd-token burn cxd-received (as-contract tx-sender)))
-        (var-set total-burned (+ (var-get total-burned) cxd-received))
-        (print { event: "swap-and-burn-executed", token: (contract-of token), amount: amount, cxd-burned: cxd-received })
-        (ok true)
-      )
-      swap-err (begin
-        (print { event: "swap-and-burn-failed", token: (contract-of token), amount: amount })
-        ERR_SWAP_FAILED
+    ;; Execute swap: token -> CXD via CSF swap-router, receiving CXD at self
+    ;; Entire swap+burn runs as-contract so tx-sender is bme-engine
+    (as-contract
+      (match (contract-call? .swap-router csf-swap token .cxd-token amount tx-sender)
+        swap-result (let ((cxd-received (get amount-out swap-result)))
+          ;; Burn the received CXD
+          (try! (contract-call? .cxd-token burn cxd-received tx-sender))
+          (var-set total-burned (+ (var-get total-burned) cxd-received))
+          (print { event: "swap-and-burn-executed", token: (contract-of token), amount: amount, cxd-burned: cxd-received })
+          (ok true)
+        )
+        swap-err (begin
+          (print { event: "swap-and-burn-failed", token: (contract-of token), amount: amount })
+          ERR_SWAP_FAILED
+        )
       )
     )
   )
