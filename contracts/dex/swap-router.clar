@@ -111,18 +111,52 @@
       ;; 1. Transfer tokens from User to Router
       (try! (contract-call? token-in transfer amount-in user (as-contract tx-sender) none))
 
+      ;; 2. Collect protocol fee (sovereign tax) before swap
       (let (
-        ;; 2. Execute swap as Router
+        (tax-res (as-contract (contract-call? .revenue-automation collect-revenue token-in amount-in (as-contract tx-sender))))
+      )
+        (print { event: "dex-tax-processed", success: (is-ok tax-res) })
+      )
+
+      (let (
+        ;; 3. Execute swap as Router
         (amount-out (try! (as-contract (contract-call? .concentrated-liquidity-pool swap pool-id true amount-in token-in token-out (as-contract tx-sender)))))
       )
         (begin
           (asserts! (>= amount-out min-amount-out) (err ERR_SLIPPAGE))
 
-          ;; 3. Transfer tokens back to User
+          ;; 4. Transfer tokens back to User
           (try! (as-contract (contract-call? token-out transfer amount-out (as-contract tx-sender) user none)))
 
           (ok amount-out)
         )
+      )
+    )
+  )
+)
+
+;; @desc Swap external token to CXD and burn the proceeds.
+;; Orchestrates token->CXD swap via CLP, then burns CXD via bme-engine.
+;; Callable by revenue-distributor or any authorized module.
+(define-public (swap-and-burn (token <sip-010-ft-trait>) (amount uint))
+  (let (
+    (user tx-sender)
+  )
+    (begin
+      ;; 1. Transfer tokens from user to router
+      (try! (contract-call? token transfer amount user (as-contract tx-sender) none))
+      ;; 2. Collect protocol fee
+      (let (
+        (tax-res (as-contract (contract-call? .revenue-automation collect-revenue token amount (as-contract tx-sender))))
+      )
+        (print { event: "swap-and-burn-tax", success: (is-ok tax-res) })
+      )
+      ;; 3. Swap token -> CXD via CLP (pool u1, token-in is token-0)
+      (let ((amount-out (try! (as-contract (contract-call? .concentrated-liquidity-pool swap u1 true amount token .cxd-token (as-contract tx-sender))))))
+        ;; 4. Burn the received CXD via bme-engine
+        (try! (contract-call? .bme-engine burn-cxd amount-out))
+        (print { event: "swap-and-burn-executed", token: (contract-of token), amount: amount, cxd-burned: amount-out })
+        (ok true)
       )
     )
   )

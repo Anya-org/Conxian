@@ -23,9 +23,9 @@
           (ok true)
         )
         (begin
-          ;; Transfer non-CXD tokens to bme-engine, then swap-and-burn
-          (try! (as-contract (contract-call? token transfer amount tx-sender .bme-engine none)))
-          (try! (contract-call? .bme-engine swap-and-burn token amount))
+          ;; Transfer non-CXD tokens to swap-router, then swap-and-burn
+          (try! (as-contract (contract-call? token transfer amount tx-sender .swap-router none)))
+          (try! (contract-call? .swap-router swap-and-burn token amount))
           (ok true)
         )
     )

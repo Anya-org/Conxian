@@ -144,12 +144,7 @@
       ;; 1. Transfer in
       (try! (contract-call? token-in-trait transfer amount-in tx-sender (as-contract tx-sender) none))
 
-      ;; 2. Pay Sovereign Tax (CON-60)
-      (let (
-        (tax-res (as-contract (contract-call? .revenue-automation collect-revenue token-in-trait amount-in (as-contract tx-sender))))
-      )
-        (print { event: "dex-tax-processed", success: (is-ok tax-res) })
-      )
+      ;; 2. Protocol fee collection handled by swap-router (avoids circular dep)
 
       ;; 3. Transfer out
       (try! (as-contract (contract-call? token-out-trait transfer amount-out (as-contract tx-sender) recipient none)))
