@@ -17,11 +17,15 @@
     ;; 100% Policy: All collected fees are routed to BME for burn or swap-and-burn
     (if (is-eq (contract-of token) .cxd-token)
         (begin
-          (unwrap-panic (contract-call? .bme-engine burn-protocol-fees amount))
+          ;; Transfer CXD to bme-engine, then burn
+          (try! (as-contract (contract-call? token transfer amount tx-sender .bme-engine none)))
+          (try! (contract-call? .bme-engine burn-protocol-fees amount))
           (ok true)
         )
         (begin
-          (unwrap-panic (contract-call? .bme-engine swap-and-burn token amount))
+          ;; Transfer non-CXD tokens to bme-engine, then swap-and-burn
+          (try! (as-contract (contract-call? token transfer amount tx-sender .bme-engine none)))
+          (try! (contract-call? .bme-engine swap-and-burn token amount))
           (ok true)
         )
     )
@@ -32,8 +36,9 @@
 ;; @param amount: Quantity of STX to distribute.
 (define-public (distribute-stx (amount uint))
   (begin
-    ;; In production, routes STX to swap-router for CXD buy-back
-    (print { event: "stx-revenue-routed", amount: amount })
+    ;; Route STX to swap-router for CXD buy-back via the BME engine
+    (try! (stx-transfer? amount tx-sender .swap-router))
+    (print { event: "stx-revenue-routed-for-buyback", amount: amount })
     (ok true)
   )
 )

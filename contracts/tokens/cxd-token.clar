@@ -33,8 +33,8 @@
   )
 )
 
-(define-read-only (get-name) (ok "Conxian Dollar"))
-(define-read-only (get-symbol) (ok "CXD"))
+(define-read-only (get-name) (ok "Conxian Dollar                 "))
+(define-read-only (get-symbol) (ok "CXD                             "))
 (define-read-only (get-decimals) (ok u8))
 (define-read-only (get-balance (user principal)) (ok (ft-get-balance cxd user)))
 (define-read-only (get-total-supply) (ok (ft-get-supply cxd)))
