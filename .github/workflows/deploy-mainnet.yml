@@ -89,7 +89,7 @@ jobs:
         run: |
           clarinet deployments apply \
             --manifest-path Clarinet.toml \
-            --deployment-plan-path deployments/mainnet-manifest-v1.yaml \
+            --deployment-plan-path deployments/full-system.mainnet-plan.yaml \
             --mainnet
 
       - name: Upload Deployment Plan Artifact
@@ -97,4 +97,4 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: mainnet-deployment-plan
-          path: deployments/mainnet-manifest-v1.yaml
+          path: deployments/full-system.mainnet-plan.yaml
