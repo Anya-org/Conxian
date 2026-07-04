@@ -1,8 +1,9 @@
-name: Conxian Protocol Mainnet Manifest v1.0.0
+name: Conxian Protocol Mainnet Manifest v2.0.0 (Apex CSF v1.1.0)
 network: mainnet
 deployer: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
 
 batches:
+  # --- Phase 0: Traits & Standards (zero deps) ---
   - id: 0
     description: "Core Traits and SIP Standards"
     transactions:
@@ -21,9 +22,19 @@ batches:
       - contract-publish:
           contract-name: conxian-csf-trait
           path: contracts/traits/conxian-csf-trait.clar
+      - contract-publish:
+          contract-name: security-monitoring
+          path: contracts/traits/security-monitoring.clar
+      - contract-publish:
+          contract-name: automation-traits
+          path: contracts/traits/automation-traits.clar
+      - contract-publish:
+          contract-name: access-control-trait
+          path: contracts/traits/access-control-trait.clar
 
+  # --- Phase 1: Identity, Access & Compliance ---
   - id: 1
-    description: "Protocol Identity and Access"
+    description: "Protocol Registry, Access Control, KYC, Compliance"
     transactions:
       - contract-publish:
           contract-name: conxian-protocol
@@ -31,54 +42,217 @@ batches:
       - contract-publish:
           contract-name: conxian-access
           path: contracts/core/conxian-access.clar
-
-  - id: 2
-    description: "Financial Infrastructure"
-    transactions:
       - contract-publish:
-          contract-name: operational-treasury
-          path: contracts/core/operational-treasury.clar
+          contract-name: kyc-registry
+          path: contracts/identity/kyc-registry.clar
+      - contract-publish:
+          contract-name: regulatory-adapter
+          path: contracts/compliance/regulatory-adapter.clar
+      - contract-publish:
+          contract-name: block-utils
+          path: contracts/utils/block-utils.clar
+
+  # --- Phase 2: Financial Core ---
+  - id: 2
+    description: "Tokens, Treasury, Oracle, BME Engine"
+    transactions:
       - contract-publish:
           contract-name: cxd-token
           path: contracts/tokens/cxd-token.clar
       - contract-publish:
-          contract-name: bme-engine
-          path: contracts/core/bme-engine.clar
-
-  - id: 3
-    description: "DEX and Lending Engines"
-    transactions:
+          contract-name: operational-treasury
+          path: contracts/core/operational-treasury.clar
       - contract-publish:
-          contract-name: pool-factory
-          path: contracts/pools/pool-factory.clar
+          contract-name: federated-oracle-adapter
+          path: contracts/oracle/federated-oracle-adapter.clar
       - contract-publish:
-          contract-name: swap-router
-          path: contracts/dex/swap-router.clar
-      - contract-publish:
-          contract-name: lending-manager
-          path: contracts/lending/lending-manager.clar
-
-  - id: 4
-    description: "Risk and Monitoring"
-    transactions:
+          contract-name: oracle-aggregator
+          path: contracts/oracle/oracle-aggregator.clar
       - contract-publish:
           contract-name: finance-metrics
           path: contracts/monitoring/finance-metrics.clar
       - contract-publish:
-          contract-name: agent-risk
-          path: contracts/agents/agent-risk.clar
+          contract-name: bme-engine
+          path: contracts/core/bme-engine.clar
+      - contract-publish:
+          contract-name: revenue-distributor
+          path: contracts/treasury/revenue-distributor.clar
+      - contract-publish:
+          contract-name: revenue-automation
+          path: contracts/treasury/revenue-automation.clar
+
+  # --- Phase 3: Security Infrastructure ---
+  - id: 3
+    description: "Circuit Breakers, Proof of Reserves, Rate Limiter"
+    transactions:
       - contract-publish:
           contract-name: enhanced-circuit-breaker
           path: contracts/security/enhanced-circuit-breaker.clar
+      - contract-publish:
+          contract-name: circuit-breaker
+          path: contracts/security/circuit-breaker.clar
+      - contract-publish:
+          contract-name: proof-of-reserves
+          path: contracts/security/proof-of-reserves.clar
+      - contract-publish:
+          contract-name: conxian-insurance-fund
+          path: contracts/security/conxian-insurance-fund.clar
+      - contract-publish:
+          contract-name: compliance-manager
+          path: contracts/compliance/compliance-manager.clar
+      - contract-publish:
+          contract-name: compliance-hooks
+          path: contracts/compliance/compliance-hooks.clar
 
+  # --- Phase 4: DEX & Liquidity Engines ---
+  - id: 4
+    description: "Concentrated Liquidity, Swap Router, DEX Infrastructure"
+    transactions:
+      - contract-publish:
+          contract-name: concentrated-math
+          path: contracts/math/concentrated-math.clar
+      - contract-publish:
+          contract-name: concentrated-liquidity-pool
+          path: contracts/dex/concentrated-liquidity-pool.clar
+      - contract-publish:
+          contract-name: swap-router
+          path: contracts/dex/swap-router.clar
+      - contract-publish:
+          contract-name: swap-manager
+          path: contracts/dex/swap-manager.clar
+      - contract-publish:
+          contract-name: route-manager
+          path: contracts/dex/route-manager.clar
+      - contract-publish:
+          contract-name: pool-factory
+          path: contracts/pools/pool-factory.clar
+      - contract-publish:
+          contract-name: pool-registry
+          path: contracts/pools/pool-registry.clar
+      - contract-publish:
+          contract-name: vault
+          path: contracts/dex/vault.clar
+
+  # --- Phase 5: Lending & Dimensional Markets ---
   - id: 5
-    description: "System Wiring"
+    description: "Lending Manager, Dimensional Core, Position Management"
+    transactions:
+      - contract-publish:
+          contract-name: lending-manager
+          path: contracts/lending/lending-manager.clar
+      - contract-publish:
+          contract-name: interest-rate-model
+          path: contracts/lending/interest-rate-model.clar
+      - contract-publish:
+          contract-name: position-nft
+          path: contracts/dimensional/position-nft.clar
+      - contract-publish:
+          contract-name: dimensional-core
+          path: contracts/dimensional/dimensional-core.clar
+      - contract-publish:
+          contract-name: dimensional-engine
+          path: contracts/core/dimensional-engine.clar
+      - contract-publish:
+          contract-name: collateral-manager
+          path: contracts/core/collateral-manager.clar
+      - contract-publish:
+          contract-name: position-manager
+          path: contracts/core/position-manager.clar
+
+  # --- Phase 6: Autonomous Agents & Risk ---
+  - id: 6
+    description: "Risk Unit, Agent Risk, Agent Treasury, Ops Engine"
+    transactions:
+      - contract-publish:
+          contract-name: risk-unit
+          path: contracts/core/risk-unit.clar
+      - contract-publish:
+          contract-name: risk-manager
+          path: contracts/core/risk-manager.clar
+      - contract-publish:
+          contract-name: agent-risk
+          path: contracts/agents/agent-risk.clar
+      - contract-publish:
+          contract-name: agent-treasury
+          path: contracts/agents/agent-treasury.clar
+      - contract-publish:
+          contract-name: ops-engine
+          path: contracts/core/ops-engine.clar
+
+  # --- Phase 7: Integrations & Governance ---
+  - id: 7
+    description: "ALEX Adapter, Governance, Tokens, Bridge NFT"
+    transactions:
+      - contract-publish:
+          contract-name: alex-adapter
+          path: contracts/integrations/alex-adapter.clar
+      - contract-publish:
+          contract-name: cxlp-token
+          path: contracts/tokens/cxlp-token.clar
+      - contract-publish:
+          contract-name: cxvg-token
+          path: contracts/tokens/cxvg-token.clar
+      - contract-publish:
+          contract-name: cxtr-token
+          path: contracts/tokens/cxtr-token.clar
+      - contract-publish:
+          contract-name: token-system-coordinator
+          path: contracts/tokens/token-system-coordinator.clar
+      - contract-publish:
+          contract-name: bridge-nft
+          path: contracts/cross-chain/bridge-nft.clar
+      - contract-publish:
+          contract-name: proposal-engine
+          path: contracts/governance/proposal-engine.clar
+      - contract-publish:
+          contract-name: proposal-executor
+          path: contracts/governance/proposal-executor.clar
+      - contract-publish:
+          contract-name: enhanced-governance-nft
+          path: contracts/governance/enhanced-governance-nft.clar
+
+  # --- Phase 8: System Wiring & Initialization ---
+  - id: 8
+    description: "Protocol Initialization and Role Configuration"
     transactions:
       - contract-call:
           contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.conxian-protocol"
-          method: "initialize"
+          method: "set-owner"
           parameters: ["'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"]
       - contract-call:
           contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.operational-treasury"
           method: "initialize"
           parameters: ["'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"]
+      - contract-call:
+          contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.cxd-token"
+          method: "add-minter"
+          parameters: ["'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.bme-engine"]
+      - contract-call:
+          contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.cxd-token"
+          method: "add-burner"
+          parameters: ["'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.bme-engine"]
+      - contract-call:
+          contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.bme-engine"
+          method: "add-activity-reporter"
+          parameters: ["'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.swap-router"]
+      - contract-call:
+          contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.bme-engine"
+          method: "add-activity-reporter"
+          parameters: ["'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.lending-manager"]
+      - contract-call:
+          contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.risk-unit"
+          method: "initialize"
+          parameters:
+            - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
+            - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.agent-risk"
+            - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.dimensional-engine"
+      - contract-call:
+          contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.risk-unit"
+          method: "set-ops-engine"
+          parameters: ["'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.ops-engine"]
+      - contract-call:
+          contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.conxian-protocol"
+          method: "register-module"
+          parameters:
+            - "\"alex-adapter\""
+            - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.alex-adapter"

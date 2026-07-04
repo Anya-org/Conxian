@@ -49,7 +49,7 @@
 
 (define-public (burn (amount uint) (sender principal))
   (begin
-    (asserts! (or (is-eq tx-sender (var-get admin)) (is-minter tx-sender)) ERR_UNAUTHORIZED)
+    (asserts! (or (is-eq tx-sender (var-get admin)) (default-to false (map-get? burners tx-sender))) ERR_UNAUTHORIZED)
     (ft-burn? cxd amount sender)
   )
 )
