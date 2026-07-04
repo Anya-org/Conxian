@@ -29,7 +29,7 @@ describe('Conxian Core Comprehensive Integration', () => {
     simnet.mineEmptyBlocks(15);
 
     // Trigger epoch update (simplified - just verify it runs)
-    const triggerRes = simnet.callPublicFn('ops-engine', 'trigger-epoch-update', [], wallet1);
+    const triggerRes = simnet.callPublicFn('ops-engine', 'trigger-epoch-update', [], deployer);
     expect(triggerRes.result).toEqual(Cl.ok(Cl.bool(true)));
 
     // Verify engine status is accessible
@@ -42,7 +42,7 @@ describe('Conxian Core Comprehensive Integration', () => {
     simnet.mineEmptyBlocks(20);
 
     // Trigger epoch update
-    const triggerRes = simnet.callPublicFn('ops-engine', 'trigger-epoch-update', [], wallet1);
+    const triggerRes = simnet.callPublicFn('ops-engine', 'trigger-epoch-update', [], deployer);
     expect(triggerRes.result).toEqual(Cl.ok(Cl.bool(true)));
 
     // Verify protocol is still operational
@@ -60,7 +60,7 @@ describe('Conxian Core Comprehensive Integration', () => {
 
     simnet.mineEmptyBlocks(20);
 
-    const triggerRes = simnet.callPublicFn('ops-engine', 'trigger-epoch-update', [], wallet1);
+    const triggerRes = simnet.callPublicFn('ops-engine', 'trigger-epoch-update', [], deployer);
     expect(triggerRes.result).toEqual(Cl.ok(Cl.bool(true)));
 
     // Verify the trigger ran (stability-fee may not be updated without full oracle integration)

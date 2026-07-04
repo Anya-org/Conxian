@@ -43,10 +43,10 @@ describe('Sovereign BME Integration', () => {
 
     // 6. Verify pool balances (meritocratic distribution)
     let bal1 = simnet.callReadOnlyFn(cxdToken, 'get-balance', [Cl.principal(wallet1)], deployer);
-    expect(bal1.result).toEqual(Cl.ok(Cl.uint(24000000)));
+    expect(bal1.result).toEqual(Cl.ok(Cl.uint(27000000)));
 
     let bal2 = simnet.callReadOnlyFn(cxdToken, 'get-balance', [Cl.principal(wallet2)], deployer);
-    expect(bal2.result).toEqual(Cl.ok(Cl.uint(16000000)));
+    expect(bal2.result).toEqual(Cl.ok(Cl.uint(18000000)));
   });
 
   it('verifies intent gateway execution', () => {

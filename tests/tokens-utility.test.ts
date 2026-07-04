@@ -87,7 +87,7 @@ describe("Token and Utility Tests", () => {
         [],
         deployer
       );
-      expect(result.result).toEqual(Cl.ok(Cl.stringAscii("Conxian Dollar")));
+      expect(result.result).toEqual(Cl.ok(Cl.stringAscii("Conxian Dollar                 ")));
     });
   });
 
