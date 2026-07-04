@@ -99,11 +99,11 @@ ops-engine (heartbeat) / alex-adapter / governance suite
 ## 10. Medium-Priority Issues (P2)
 
 ### ~~P2-1: alex-adapter.clar Stub Implementation~~ -- FIXED (July 2026)
-- execute-csf-swap now calls ALEX swap-helper-v1-03 with real routing and fee calculation.
+- execute-csf-swap calls ALEX swap-helper-v1-03 via compile-time constant.
 - claim-conxian-yield routes through alex-reserve-pool.
 - get-csf-health queries reserve pool balance.
-- All ALEX endpoints configurable via set-alex-endpoints (mainnet/testnet addresses documented).
-- Zero hardcoded SP... principals -- contamination policy compliant.
+- ALEX protocol addresses documented with source URLs.
+- Uses define-constant for integration references (Clarity requires static principals for contract-call?).
 
 ### P2-2: Test Suite Cannot Run -- REMAINING
 - Requires clarinet binary (not installed in CI/workspace).
@@ -151,3 +151,9 @@ Before sign-off for mainnet deployment via ALEX:
 12. ~~Finalize mainnet manifest~~ -- DONE (v2.0.0, 55 contracts, 9 phased batches)
 
 Progress: 10/12 complete. 2 items remain before mainnet sign-off.
+
+## CI Status (July 2026)
+- `clarinet check` produces 15 errors on both main and this branch (all pre-existing, none from our changes).
+- Pre-existing errors affect: concentrated-liquidity-pool, bme-engine, swap-router, dimensional-core, revenue-distributor, risk-unit, swap-aggregator, exponentiation, pool-factory, nakamoto-compatibility, position-factory-root, cxd-staking, concentrated-math, optimization-helpers, insurance-protection-nft, treasury-governance.
+- Root cause: simnet deployment plan does not register all contracts as deployed by the simnet deployer.
+- Our branch eliminated 1 error (alex-adapter dynamic contract-call?) vs 16 on main.
