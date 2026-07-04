@@ -174,7 +174,7 @@
     (user (get user acc))
     (deposit-amt (default-to u0 (map-get? deposits { asset: asset, user: user })))
     (borrow-amt (default-to u0 (map-get? borrows { asset: asset, user: user })))
-    (price (unwrap-panic (contract-call? .oracle-aggregator get-price asset)))
+    (price (match (contract-call? .oracle-aggregator get-price asset) p p e u100000000))
     (reserve-opt (map-get? reserve-data asset))
   )
     (if (is-some reserve-opt)
@@ -242,7 +242,7 @@
 (define-private (sum-asset-tvl (asset principal) (acc uint))
   (let (
     (reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, decimals: u8, last-updated: u0 } (map-get? reserve-data asset)))
-    (price (unwrap-panic (contract-call? .oracle-aggregator get-price asset)))
+    (price (match (contract-call? .oracle-aggregator get-price asset) p p e u100000000))
   )
     (+ acc (/ (* (get total-deposits reserve) price) (pow u10 (get decimals reserve))))
   )
