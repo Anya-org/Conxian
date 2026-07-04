@@ -87,7 +87,7 @@ jobs:
         env:
           DEPLOYER_MNEMONIC: ${{ secrets.MAINNET_DEPLOYER_MNEMONIC }}
         run: |
-          clarinet deployments apply \
+          yes | clarinet deployments apply \
             --manifest-path Clarinet.toml \
             --deployment-plan-path deployments/full-system.mainnet-plan.yaml
 
