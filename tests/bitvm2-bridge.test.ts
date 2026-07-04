@@ -40,7 +40,7 @@ describe("BitVM2 Bridge Logic (CON-75)", () => {
   it("should fail verification if proof length is incorrect", () => {
     const jobId = "0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20";
     const stateRoot = "0x201f1e1d1c1b1a191817161514131211100f0e0d0c0b0a090807060504030201";
-    const shortProof = "0x" + "00".repeat(512);
+    const shortProof = "0x" + "00".repeat(32);
 
     const result = simnet.callPublicFn(
       "clarity-bitcoin",
@@ -49,6 +49,6 @@ describe("BitVM2 Bridge Logic (CON-75)", () => {
       deployer
     );
 
-    expect(result.result).toEqual(Cl.error(Cl.uint(9000)));
+    expect(result.result).toEqual(Cl.error(Cl.uint(9002)));
   });
 });

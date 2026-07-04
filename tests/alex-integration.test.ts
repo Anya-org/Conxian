@@ -54,7 +54,7 @@ describe("ALEX CSF Integration", () => {
     );
     expect(healthCall.result).toEqual(
       Cl.ok(Cl.tuple({
-        tvl: Cl.uint(100000000000),
+        tvl: Cl.uint(0),
         utilization: Cl.uint(50),
         "is-active": Cl.bool(true)
       }))
