@@ -6,12 +6,12 @@
   "description": "Conxian Finance Protocol - Sovereign Autonomous Business (SAB) on Stacks",
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
-    "test": "vitest run",
+    "test": "bash scripts/run-tests.sh",
     "clarinet:check": "clarinet check",
     "check": "clarinet check",
     "clarinet:console": "clarinet console",
     "validate:docs": "node ./scripts/validate-docs.js",
-    "ci": "npx vitest run --config vitest.config.ts --pool=threads",
+    "ci": "bash scripts/run-tests.sh",
     "coverage": "vitest run --coverage",
     "derive:wallets": "tsx scripts/derive_wallets.ts"
   },

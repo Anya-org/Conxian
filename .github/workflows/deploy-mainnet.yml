@@ -40,8 +40,14 @@ jobs:
           sudo mv clarinet /usr/local/bin/clarinet
           clarinet --version
 
+      - name: Snapshot deployment plan
+        run: cp deployments/default.simnet-plan.yaml deployments/default.simnet-plan.yaml.bak
+
       - name: Clarinet Check
         run: clarinet check --manifest-path Clarinet.toml
+
+      - name: Restore deployment plan (guard against clarinet rewrite)
+        run: cp deployments/default.simnet-plan.yaml.bak deployments/default.simnet-plan.yaml
 
       - name: Run Full Test Suite
         run: npm run ci
@@ -76,21 +82,14 @@ jobs:
           sudo mv clarinet /usr/local/bin/clarinet
           clarinet --version
 
-      - name: Generate Mainnet Deployment Plan
-        run: |
-          clarinet deployment generate \
-            --manifest-path Clarinet.toml \
-            --mainnet \
-            --plan-path deployments/default.mainnet-plan.yaml
-
       - name: Deploy to Mainnet
         if: ${{ !inputs.dry_run }}
         env:
           DEPLOYER_MNEMONIC: ${{ secrets.MAINNET_DEPLOYER_MNEMONIC }}
         run: |
-          clarinet deployment apply \
+          clarinet deployments apply \
             --manifest-path Clarinet.toml \
-            --plan-path deployments/default.mainnet-plan.yaml \
+            --deployment-plan-path deployments/mainnet-manifest-v1.yaml \
             --mainnet
 
       - name: Upload Deployment Plan Artifact
@@ -98,4 +97,4 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: mainnet-deployment-plan
-          path: deployments/default.mainnet-plan.yaml
+          path: deployments/mainnet-manifest-v1.yaml
