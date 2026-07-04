@@ -36,10 +36,7 @@
 
 ;; @desc Check if the contract is paused
 (define-read-only (is-paused)
-  (match (contract-call? .enhanced-circuit-breaker is-contract-paused .lending-manager)
-    ok-val ok-val
-    err-val true  ;; Fail-closed: treat errors as paused
-  )
+  (unwrap-panic (contract-call? .enhanced-circuit-breaker is-contract-paused .lending-manager))
 )
 
 ;; --- Public Functions ---
@@ -85,16 +82,8 @@
       (asserts! (<= amount (get total-deposits reserve)) (err ERR_INSUFFICIENT_LIQUIDITY))
       (map-set borrows { asset: asset, user: caller } (+ (default-to u0 (map-get? borrows { asset: asset, user: caller })) amount))
       (map-set reserve-data asset (merge reserve { total-borrows: (+ (get total-borrows reserve) amount) }))
-      (match (calculate-account-health caller)
-        hf (begin
-          (asserts! (>= hf u10000) (err ERR_INSUFFICIENT_COLLATERAL))
-        )
-        err-val (begin
-          ;; Revert borrow state on health check failure
-          (map-set borrows { asset: asset, user: caller } (- (default-to u0 (map-get? borrows { asset: asset, user: caller })) amount))
-          (map-set reserve-data asset (merge reserve { total-borrows: (- (get total-borrows reserve) amount) }))
-          (err ERR_INTERNAL)
-        )
+      (let ((hf (unwrap-panic (calculate-account-health caller))))
+        (asserts! (>= hf u10000) (err ERR_INSUFFICIENT_COLLATERAL))
       )
       (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) caller none)))
       (ok true)
@@ -148,18 +137,11 @@
       (asserts! (not (is-paused)) (err ERR_PAUSED))
       (asserts! (>= user-deposit amount) (err ERR_INVALID_AMOUNT))
       (map-set deposits { asset: asset, user: tx-sender } (- user-deposit amount))
-      (match (calculate-account-health tx-sender)
-        hf (begin
-          (asserts! (>= hf u10000) (err ERR_INSUFFICIENT_COLLATERAL))
-          (map-set reserve-data asset (merge reserve { total-deposits: (if (>= (get total-deposits reserve) amount) (- (get total-deposits reserve) amount) u0) }))
-          (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) recipient none)))
-          (ok true)
-        )
-        err-val (begin
-          ;; Revert deposit state on health check failure
-          (map-set deposits { asset: asset, user: tx-sender } (+ user-deposit amount))
-          (err ERR_INTERNAL)
-        )
+      (let ((hf (unwrap-panic (calculate-account-health tx-sender))))
+        (asserts! (>= hf u10000) (err ERR_INSUFFICIENT_COLLATERAL))
+        (map-set reserve-data asset (merge reserve { total-deposits: (if (>= (get total-deposits reserve) amount) (- (get total-deposits reserve) amount) u0) }))
+        (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) recipient none)))
+        (ok true)
       )
     )
   )
@@ -186,6 +168,29 @@
 
 ;; --- Read-only Functions ---
 
+;; @desc Private helper for health factor calculation.
+(define-private (sum-user-asset-values (asset principal) (acc { user: principal, collateral-value: uint, debt-value: uint }))
+  (let (
+    (user (get user acc))
+    (deposit-amt (default-to u0 (map-get? deposits { asset: asset, user: user })))
+    (borrow-amt (default-to u0 (map-get? borrows { asset: asset, user: user })))
+    (price (unwrap-panic (contract-call? .oracle-aggregator get-price asset)))
+    (reserve-opt (map-get? reserve-data asset))
+  )
+    (if (is-some reserve-opt)
+      (let (
+        (reserve-val (unwrap-panic reserve-opt))
+        (decimals (get decimals reserve-val))
+        (asset-collateral-value (/ (* deposit-amt price COLLATERAL_FACTOR) (* (pow u10 decimals) u10000)))
+        (asset-debt-value (/ (* borrow-amt price) (pow u10 decimals)))
+      )
+        { user: user, collateral-value: (+ (get collateral-value acc) asset-collateral-value), debt-value: (+ (get debt-value acc) asset-debt-value) }
+      )
+      acc
+    )
+  )
+)
+
 ;; @desc Calculates the health factor for a given user.
 ;; @param user: The principal to check.
 ;; @returns (response uint uint)
@@ -197,29 +202,6 @@
       u100000
       (/ (* (get collateral-value summary) u10000) (get debt-value summary))
     ))
-  )
-)
-
-;; @desc Private helper for health factor calculation.
-(define-private (sum-user-asset-values (asset principal) (acc { user: principal, collateral-value: uint, debt-value: uint }))
-  (let (
-    (user (get user acc))
-    (deposit-amt (default-to u0 (map-get? deposits { asset: asset, user: user })))
-    (borrow-amt (default-to u0 (map-get? borrows { asset: asset, user: user })))
-    (price (match (contract-call? .oracle-aggregator get-price asset) p p e u100000000))
-    (reserve-opt (map-get? reserve-data asset))
-  )
-    (if (is-some reserve-opt)
-      (let (
-        (reserve-val (unwrap! reserve-opt (err ERR_INTERNAL)))
-        (decimals (get decimals reserve-val))
-        (asset-collateral-value (/ (* deposit-amt price COLLATERAL_FACTOR) (* (pow u10 decimals) u10000)))
-        (asset-debt-value (/ (* borrow-amt price) (pow u10 decimals)))
-      )
-        { user: user, collateral-value: (+ (get collateral-value acc) asset-collateral-value), debt-value: (+ (get debt-value acc) asset-debt-value) }
-      )
-      acc
-    )
   )
 )
 
@@ -260,7 +242,7 @@
 (define-private (sum-asset-tvl (asset principal) (acc uint))
   (let (
     (reserve (default-to { total-deposits: u0, total-borrows: u0, total-reserves: u0, decimals: u8, last-updated: u0 } (map-get? reserve-data asset)))
-    (price (match (contract-call? .oracle-aggregator get-price asset) p p e u100000000))
+    (price (unwrap-panic (contract-call? .oracle-aggregator get-price asset)))
   )
     (+ acc (/ (* (get total-deposits reserve) price) (pow u10 (get decimals reserve))))
   )

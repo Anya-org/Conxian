@@ -73,7 +73,10 @@
     (asserts! (var-get is-active) ERR_INACTIVE)
 
     ;; Call ALEX swap-helper which handles pool routing and fee calculation.
-    (let ((swap-result (contract-call? ALEX_SWAP_HELPER swap-helper
+    ;; NOTE: Uses .alex-swap-helper for Clarinet static analysis.
+    ;; In production deployment, the ALEX mainnet contract 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.swap-helper-v1-03
+    ;; must be set as the deployment address for alex-swap-helper.
+    (let ((swap-result (contract-call? .alex-swap-helper swap-helper
                           (contract-of token-in) (contract-of token-out) amount u0)))
       (match swap-result
         dy (let ((fee-collected (/ (* amount u30) u10000)))
@@ -108,7 +111,9 @@
 ;; @desc Claims protocol yield from ALEX reserve pool distributions.
 (define-public (claim-conxian-yield (token <sip-010-ft-trait>) (amount uint) (recipient principal))
   (begin
-    (let ((claim-result (contract-call? ALEX_RESERVE_POOL claim-yield
+    ;; NOTE: Uses .alex-reserve-pool for Clarinet static analysis.
+    ;; In production, set address to 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.alex-reserve-pool.
+    (let ((claim-result (contract-call? .alex-reserve-pool claim-yield
                            (contract-of token) amount recipient)))
       (match claim-result
         success (ok amount)
@@ -124,15 +129,13 @@
 ;; @desc Retrieves health telemetry for the ALEX integration.
 (define-public (get-csf-health)
   (begin
-    (let ((reserve-balance (match (contract-call? ALEX_RESERVE_POOL get-reserve-balance)
+    (let ((reserve-balance (match (contract-call? .alex-reserve-pool get-reserve-balance)
                              bal bal
                              err-val u0)))
       (ok {
         tvl: reserve-balance,
         utilization: u50,
-        is-active: (var-get is-active),
-        amm-pool: ALEX_AMM_POOL,
-        swap-helper: ALEX_SWAP_HELPER
+        is-active: (var-get is-active)
       })
     )
   )
