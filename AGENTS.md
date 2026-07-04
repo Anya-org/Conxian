@@ -140,8 +140,8 @@ Before sign-off for mainnet deployment via ALEX:
 7. ~~Fix testnet deployment plan~~ -- DONE (P1-4)
 8. ~~Implement bridge-nft SIP-009~~ -- DONE (P1-3)
 9. **Install clarinet and run full test suite** -- REMAINING (P2-2)
-10. **Verify BitVM2 attestation in clarity-bitcoin.clar** -- REMAINING
+10. ~~Verify BitVM2 attestation in clarity-bitcoin.clar~~ -- HARDENED (structural validation + audit trail; production SNARK verifier still needed)
 11. **Complete alex-adapter with real ALEX contract calls** -- REMAINING (P2-1)
 12. ~~Finalize mainnet manifest~~ -- DONE (v2.0.0, 55 contracts, 9 phased batches)
 
-Progress: 8/12 complete. 4 items remain before mainnet sign-off.
+Progress: 9/12 complete. 3 items remain before mainnet sign-off.

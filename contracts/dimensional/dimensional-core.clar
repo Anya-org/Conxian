@@ -17,13 +17,9 @@
 ;; @desc Check if the contract or protocol is paused.
 ;; @returns bool
 (define-read-only (is-paused)
-  (let (
-    (cb-res (contract-call? .enhanced-circuit-breaker is-contract-paused .dimensional-core))
-  )
-    (if (is-ok cb-res)
-      (unwrap-panic cb-res)
-      true ;; Fail-closed
-    )
+  (match (contract-call? .enhanced-circuit-breaker is-contract-paused .dimensional-core)
+    ok-val ok-val
+    err-val true  ;; Fail-closed
   )
 )
 
