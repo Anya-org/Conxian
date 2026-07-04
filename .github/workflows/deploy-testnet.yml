@@ -89,8 +89,7 @@ jobs:
         run: |
           clarinet deployments apply \
             --manifest-path Clarinet.toml \
-            --deployment-plan-path deployments/full-system.testnet-plan.yaml \
-            --testnet
+            --deployment-plan-path deployments/full-system.testnet-plan.yaml
 
       - name: Smoke Test Deployed Contracts
         if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}

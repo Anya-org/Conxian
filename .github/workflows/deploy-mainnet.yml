@@ -89,8 +89,7 @@ jobs:
         run: |
           clarinet deployments apply \
             --manifest-path Clarinet.toml \
-            --deployment-plan-path deployments/full-system.mainnet-plan.yaml \
-            --mainnet
+            --deployment-plan-path deployments/full-system.mainnet-plan.yaml
 
       - name: Upload Deployment Plan Artifact
         if: always()
