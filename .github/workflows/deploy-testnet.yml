@@ -82,13 +82,6 @@ jobs:
           sudo mv clarinet /usr/local/bin/clarinet
           clarinet --version
 
-      - name: Generate Testnet Deployment Plan
-        run: |
-          clarinet deployments generate \
-            --manifest-path Clarinet.toml \
-            --testnet \
-            --low-cost
-
       - name: Deploy to Testnet
         if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
         env:
@@ -96,7 +89,7 @@ jobs:
         run: |
           clarinet deployments apply \
             --manifest-path Clarinet.toml \
-            --deployment-plan-path deployments/default.testnet-plan.yaml \
+            --deployment-plan-path deployments/full-system.testnet-plan.yaml \
             --testnet
 
       - name: Smoke Test Deployed Contracts
@@ -111,11 +104,11 @@ jobs:
           echo "## Testnet Deployment Report" >> $GITHUB_STEP_SUMMARY
           echo "**Deployer:** ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P" >> $GITHUB_STEP_SUMMARY
           echo "**Network:** Testnet" >> $GITHUB_STEP_SUMMARY
-          echo "**Plan:** deployments/default.testnet-plan.yaml" >> $GITHUB_STEP_SUMMARY
+          echo "**Plan:** deployments/full-system.testnet-plan.yaml" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Deployment Plan Artifact
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: testnet-deployment-plan
-          path: deployments/default.testnet-plan.yaml
+          path: deployments/full-system.testnet-plan.yaml

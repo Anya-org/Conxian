@@ -82,12 +82,6 @@ jobs:
           sudo mv clarinet /usr/local/bin/clarinet
           clarinet --version
 
-      - name: Generate Mainnet Deployment Plan
-        run: |
-          clarinet deployments generate \
-            --manifest-path Clarinet.toml \
-            --mainnet
-
       - name: Deploy to Mainnet
         if: ${{ !inputs.dry_run }}
         env:
@@ -95,7 +89,7 @@ jobs:
         run: |
           clarinet deployments apply \
             --manifest-path Clarinet.toml \
-            --deployment-plan-path deployments/default.mainnet-plan.yaml \
+            --deployment-plan-path deployments/mainnet-manifest-v1.yaml \
             --mainnet
 
       - name: Upload Deployment Plan Artifact
@@ -103,4 +97,4 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: mainnet-deployment-plan
-          path: deployments/default.mainnet-plan.yaml
+          path: deployments/mainnet-manifest-v1.yaml
