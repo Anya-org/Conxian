@@ -110,15 +110,25 @@ jobs:
       - name: Install Clarinet
         run: |
           set -euo pipefail
-          VERSION="v3.2.0"
-          curl -sSL -o clarinet.tar.gz "https://github.com/hirosystems/clarinet/releases/download/${VERSION}/clarinet-linux-x64-glibc.tar.gz"
+          VERSION="v3.21.0"
+          curl -sSL -o clarinet.tar.gz "https://github.com/stx-labs/clarinet/releases/download/${VERSION}/clarinet-linux-x64-glibc.tar.gz"
           tar -xzf clarinet.tar.gz clarinet
           chmod +x clarinet
           sudo mv clarinet /usr/local/bin/clarinet
           clarinet --version
 
+      - name: Snapshot deployment plan
+        run: cp deployments/default.simnet-plan.yaml deployments/default.simnet-plan.yaml.bak
+
       - name: Clarinet Check
         run: clarinet check --manifest-path Clarinet.toml
+
+      - name: Restore deployment plan (guard against clarinet rewrite)
+        run: |
+          if ! diff -q deployments/default.simnet-plan.yaml deployments/default.simnet-plan.yaml.bak > /dev/null 2>&1; then
+            echo "⚠️  Clarinet modified deployment plan - restoring original"
+            cp deployments/default.simnet-plan.yaml.bak deployments/default.simnet-plan.yaml
+          fi
 
       - name: Run Intelligent Tests (PR only)
         if: github.event_name == 'pull_request'
