@@ -98,9 +98,12 @@ ops-engine (heartbeat) / alex-adapter / governance suite
 
 ## 10. Medium-Priority Issues (P2)
 
-### P2-1: alex-adapter.clar Stub Implementation -- REMAINING (needs ALEX mainnet addresses)
-- execute-csf-swap returns placeholder values; get-csf-health returns hardcoded TVL.
-- Requires ALEX Lab mainnet contract principals for vault/amm-pool endpoints.
+### ~~P2-1: alex-adapter.clar Stub Implementation~~ -- FIXED (July 2026)
+- execute-csf-swap now calls ALEX swap-helper-v1-03 with real routing and fee calculation.
+- claim-conxian-yield routes through alex-reserve-pool.
+- get-csf-health queries reserve pool balance.
+- All ALEX endpoints configurable via set-alex-endpoints (mainnet/testnet addresses documented).
+- Zero hardcoded SP... principals -- contamination policy compliant.
 
 ### P2-2: Test Suite Cannot Run -- REMAINING
 - Requires clarinet binary (not installed in CI/workspace).
@@ -147,4 +150,4 @@ Before sign-off for mainnet deployment via ALEX:
 11. **Complete alex-adapter with real ALEX contract calls** -- REMAINING (P2-1)
 12. ~~Finalize mainnet manifest~~ -- DONE (v2.0.0, 55 contracts, 9 phased batches)
 
-Progress: 9/12 complete. 3 items remain before mainnet sign-off.
+Progress: 10/12 complete. 2 items remain before mainnet sign-off.
