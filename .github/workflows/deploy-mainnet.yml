@@ -87,9 +87,10 @@ jobs:
         env:
           DEPLOYER_MNEMONIC: ${{ secrets.MAINNET_DEPLOYER_MNEMONIC }}
         run: |
-          yes | clarinet deployments apply \
+          script -q -c "clarinet deployments apply \
             --manifest-path Clarinet.toml \
-            --deployment-plan-path deployments/full-system.mainnet-plan.yaml
+            --deployment-plan-path deployments/full-system.mainnet-plan.yaml" \
+            /dev/null <<< "y"
 
       - name: Upload Deployment Plan Artifact
         if: always()
