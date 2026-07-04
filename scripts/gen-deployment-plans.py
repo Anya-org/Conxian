@@ -11,31 +11,51 @@ TEST_HELPERS = {
 COST_TESTNET = 20000
 COST_MAINNET = 50000
 
+
+class QuotedString(str):
+    """A string subclass that pyyaml will emit as a double-quoted YAML string."""
+    pass
+
+
+def _quoted_representer(dumper, data):
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data, style='"')
+
+
+yaml.add_representer(QuotedString, _quoted_representer)
+
+
+def q(s):
+    """Wrap a string so pyyaml emits it with double quotes."""
+    return QuotedString(s)
+
+
+A = lambda s: q(f"'{DEPLOYER}{s}'")  # Single-quoted principal string, double-quoted in YAML
+
+INIT_CALL_COST = 10000  # Fixed cost for each init call
 INIT_CALLS = [
     {"contract-id": f"{DEPLOYER}.conxian-protocol", "expected-sender": DEPLOYER,
-     "method": "set-owner", "parameters": [f"'{DEPLOYER}'"]},
+     "method": "set-owner", "parameters": [A("")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.operational-treasury", "expected-sender": DEPLOYER,
-     "method": "initialize", "parameters": [f"'{DEPLOYER}'"]},
+     "method": "initialize", "parameters": [A("")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.cxd-token", "expected-sender": DEPLOYER,
-     "method": "add-minter", "parameters": [f"'{DEPLOYER}.bme-engine'"]},
+     "method": "add-minter", "parameters": [A(".bme-engine")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.cxd-token", "expected-sender": DEPLOYER,
-     "method": "add-burner", "parameters": [f"'{DEPLOYER}.bme-engine'"]},
+     "method": "add-burner", "parameters": [A(".bme-engine")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.bme-engine", "expected-sender": DEPLOYER,
      "method": "add-activity-reporter",
-     "parameters": [f"'{DEPLOYER}.swap-router'"]},
+     "parameters": [A(".swap-router")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.bme-engine", "expected-sender": DEPLOYER,
      "method": "add-activity-reporter",
-     "parameters": [f"'{DEPLOYER}.lending-manager'"]},
+     "parameters": [A(".lending-manager")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.risk-unit", "expected-sender": DEPLOYER,
      "method": "initialize", "parameters": [
-         f"'{DEPLOYER}'", f"'{DEPLOYER}.agent-risk'",
-         f"'{DEPLOYER}.dimensional-engine'"]},
+         A(""), A(".agent-risk"), A(".dimensional-engine")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.risk-unit", "expected-sender": DEPLOYER,
      "method": "set-ops-engine",
-     "parameters": [f"'{DEPLOYER}.ops-engine'"]},
+     "parameters": [A(".ops-engine")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.conxian-protocol", "expected-sender": DEPLOYER,
      "method": "register-module", "parameters": [
-         '"alex-adapter"', f"'{DEPLOYER}.alex-adapter'"]},
+         q('"alex-adapter"'), A(".alex-adapter")], "cost": INIT_CALL_COST},
 ]
 
 
@@ -90,7 +110,7 @@ def make_plan(contracts, network, name, stacks_node, cost):
                     "path": c["path"],
                     "anchor-block-only": True,
                     "clarity-version": c["clarity-version"],
-                    "epoch": "3.0",
+                    "epoch": 3.0,
                 }
             })
         plan["plan"]["batches"].append({
