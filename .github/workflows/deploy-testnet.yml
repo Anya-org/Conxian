@@ -87,10 +87,13 @@ jobs:
         env:
           DEPLOYER_MNEMONIC: ${{ secrets.TESTNET_DEPLOYER_MNEMONIC }}
         run: |
-          clarinet deployments apply \
+          DEPLOY_LOG=$(mktemp)
+          echo y | script -q -c "clarinet deployments apply \
             --manifest-path Clarinet.toml \
-            --deployment-plan-path deployments/full-system.testnet-plan.yaml \
-            --testnet
+            --deployment-plan-path deployments/full-system.testnet-plan.yaml" \
+            "$DEPLOY_LOG"
+          cat "$DEPLOY_LOG"
+          rm "$DEPLOY_LOG"
 
       - name: Smoke Test Deployed Contracts
         if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}

@@ -87,14 +87,17 @@ jobs:
         env:
           DEPLOYER_MNEMONIC: ${{ secrets.MAINNET_DEPLOYER_MNEMONIC }}
         run: |
-          clarinet deployments apply \
+          DEPLOY_LOG=$(mktemp)
+          echo y | script -q -c "clarinet deployments apply \
             --manifest-path Clarinet.toml \
-            --deployment-plan-path deployments/mainnet-manifest-v1.yaml \
-            --mainnet
+            --deployment-plan-path deployments/full-system.mainnet-plan.yaml" \
+            "$DEPLOY_LOG"
+          cat "$DEPLOY_LOG"
+          rm "$DEPLOY_LOG"
 
       - name: Upload Deployment Plan Artifact
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: mainnet-deployment-plan
-          path: deployments/mainnet-manifest-v1.yaml
+          path: deployments/full-system.mainnet-plan.yaml
