@@ -44,8 +44,14 @@ jobs:
           sudo mv clarinet /usr/local/bin/clarinet
           clarinet --version
 
+      - name: Snapshot deployment plan
+        run: cp deployments/default.simnet-plan.yaml deployments/default.simnet-plan.yaml.bak
+
       - name: Clarinet Check
         run: clarinet check --manifest-path Clarinet.toml
+
+      - name: Restore deployment plan (guard against clarinet rewrite)
+        run: cp deployments/default.simnet-plan.yaml.bak deployments/default.simnet-plan.yaml
 
       - name: Run Full Test Suite
         run: npm run ci
@@ -78,20 +84,19 @@ jobs:
 
       - name: Generate Testnet Deployment Plan
         run: |
-          clarinet deployment generate \
+          clarinet deployments generate \
             --manifest-path Clarinet.toml \
             --testnet \
-            --low-cost \
-            --plan-path deployments/default.testnet-plan.yaml
+            --low-cost
 
       - name: Deploy to Testnet
         if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
         env:
           DEPLOYER_MNEMONIC: ${{ secrets.TESTNET_DEPLOYER_MNEMONIC }}
         run: |
-          clarinet deployment apply \
+          clarinet deployments apply \
             --manifest-path Clarinet.toml \
-            --plan-path deployments/default.testnet-plan.yaml \
+            --deployment-plan-path deployments/default.testnet-plan.yaml \
             --testnet
 
       - name: Smoke Test Deployed Contracts
