@@ -71,7 +71,7 @@
 
     ;; 5. Execution
     (try! (nft-mint? bridge-nft nft-id recipient))
-    (var-set last-token-id (max (var-get last-token-id) nft-id))
+    (var-set last-token-id (if (> nft-id (var-get last-token-id)) nft-id (var-get last-token-id)))
     (ok true)
   )
 )

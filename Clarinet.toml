@@ -63,7 +63,7 @@ depends_on = ["sip-standards"]
 [contracts.bme-engine]
 path = "contracts/core/bme-engine.clar"
 clarity-version = 4
-depends_on = ["cxd-token", "sip-standards"]
+depends_on = ["conxian-access", "cxd-token", "sip-standards"]
 
 [contracts.revenue-automation]
 path = "contracts/treasury/revenue-automation.clar"
@@ -108,10 +108,18 @@ path = "contracts/agents/agent-treasury.clar"
 clarity-version = 4
 depends_on = ["agent-risk", "bme-engine", "concentrated-liquidity-pool", "conxian-csf-trait", "conxian-protocol", "sip-standards"]
 
+[contracts.alex-swap-helper]
+path = "contracts/integrations/stubs/alex-swap-helper-v1-03.clar"
+clarity-version = 4
+
+[contracts.alex-reserve-pool]
+path = "contracts/integrations/stubs/alex-reserve-pool.clar"
+clarity-version = 4
+
 [contracts.alex-adapter]
 path = "contracts/integrations/alex-adapter.clar"
 clarity-version = 4
-depends_on = ["conxian-csf-trait", "sip-standards"]
+depends_on = ["alex-reserve-pool", "alex-swap-helper", "conxian-csf-trait", "sip-standards"]
 
 [contracts.allocation-policy]
 path = "contracts/treasury/allocation-policy.clar"

@@ -28,8 +28,8 @@
     (min-amount-out uint)
   )
   (let (
-    (paused-state (match (contract-call? .enhanced-circuit-breaker is-contract-paused .swap-router) ok-val ok-val err-val true))
-    (is-isolated-res (match (contract-call? .enhanced-circuit-breaker is-isolated (contract-of liquidity-source)) ok-val ok-val err-val true))
+    (paused-state (unwrap-panic (contract-call? .enhanced-circuit-breaker is-contract-paused .swap-router)))
+    (is-isolated-res (unwrap-panic (contract-call? .enhanced-circuit-breaker is-isolated (contract-of liquidity-source))))
     (user tx-sender)
   )
     (begin
@@ -86,7 +86,7 @@
 ;; @desc Update the protocol fees based on current market volatility
 (define-public (update-volatility-fees)
   (let (
-    (vol (match (contract-call? .oracle-aggregator get-volatility-index) ok-val ok-val err-val u0))
+    (vol (unwrap-panic (contract-call? .oracle-aggregator get-volatility-index)))
     (new-fee (if (> vol u75) MAX-FEE BASE-FEE))
   )
     (begin
