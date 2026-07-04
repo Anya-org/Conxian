@@ -1,5 +1,6 @@
 name: Conxian Protocol Mainnet Manifest v2.0.0 (Apex CSF v1.1.0)
 network: mainnet
+stacks-node: "https://api.mainnet.hiro.so"
 deployer: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
 
 batches:

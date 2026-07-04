@@ -1,8 +1,8 @@
 ---
 id: 1
-name: Full System Deployment (March 2026)
+name: Full System Deployment (July 2026)
 network: testnet
-stacks-node: "https://stacks-node-api.testnet.stacks.co"
+stacks-node: "https://api.testnet.hiro.so"
 deployer: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
 plan:
   batches:
