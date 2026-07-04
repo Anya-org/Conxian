@@ -29,10 +29,11 @@
 (define-constant ERR_INACTIVE (err u2002))
 
 ;; ALEX Protocol Contract References (Mainnet, July 2026)
+;; Full principals required because .prefix resolves to current deployer, not ALEX.
 (define-constant ALEX_DEPLOYER 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9)
-(define-constant ALEX_SWAP_HELPER .swap-helper-v1-03)
-(define-constant ALEX_RESERVE_POOL .alex-reserve-pool)
-(define-constant ALEX_AMM_POOL .amm-swap-pool-v1-1)
+(define-constant ALEX_SWAP_HELPER 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.swap-helper-v1-03)
+(define-constant ALEX_RESERVE_POOL 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.alex-reserve-pool)
+(define-constant ALEX_AMM_POOL 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.amm-swap-pool-v1-1)
 
 ;; --- State ---
 (define-data-var is-active bool true)
