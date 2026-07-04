@@ -73,7 +73,7 @@ depends_on = ["revenue-distributor", "sip-standards"]
 [contracts.revenue-distributor]
 path = "contracts/treasury/revenue-distributor.clar"
 clarity-version = 4
-depends_on = ["bme-engine", "conxian-protocol", "cxd-token", "operational-treasury", "sip-standards"]
+depends_on = ["bme-engine", "conxian-protocol", "cxd-token", "operational-treasury", "sip-standards", "swap-router"]
 
 [contracts.enhanced-circuit-breaker]
 path = "contracts/security/enhanced-circuit-breaker.clar"
@@ -111,7 +111,7 @@ depends_on = ["agent-risk", "bme-engine", "concentrated-liquidity-pool", "conxia
 [contracts.alex-adapter]
 path = "contracts/integrations/alex-adapter.clar"
 clarity-version = 4
-depends_on = ["conxian-csf-trait", "conxian-protocol", "sip-standards"]
+depends_on = ["conxian-csf-trait", "sip-standards"]
 
 [contracts.allocation-policy]
 path = "contracts/treasury/allocation-policy.clar"
@@ -172,6 +172,7 @@ clarity-version = 4
 [contracts.bridge-nft]
 path = "contracts/cross-chain/bridge-nft.clar"
 clarity-version = 4
+depends_on = ["sip-standards"]
 
 [contracts.btc-adapter]
 path = "contracts/interfaces/btc-adapter.clar"
@@ -231,7 +232,7 @@ clarity-version = 4
 [contracts.concentrated-liquidity-pool]
 path = "contracts/dex/concentrated-liquidity-pool.clar"
 clarity-version = 4
-depends_on = ["bme-engine", "conxian-csf-trait", "conxian-protocol", "revenue-automation", "sip-standards"]
+depends_on = ["bme-engine", "conxian-csf-trait", "conxian-protocol", "sip-standards"]
 
 [contracts.concentrated-math]
 path = "contracts/math/concentrated-math.clar"
@@ -881,7 +882,7 @@ depends_on = ["circuit-breaker", "conxian-protocol"]
 [contracts.swap-router]
 path = "contracts/dex/swap-router.clar"
 clarity-version = 4
-depends_on = ["bme-engine", "concentrated-liquidity-pool", "conxian-csf-trait", "conxian-protocol", "enhanced-circuit-breaker", "oracle-aggregator", "sip-standards"]
+depends_on = ["bme-engine", "concentrated-liquidity-pool", "conxian-csf-trait", "conxian-protocol", "cxd-token", "enhanced-circuit-breaker", "oracle-aggregator", "sip-standards"]
 
 [contracts.switchboard-oracle-adapter]
 path = "contracts/integrations/switchboard-oracle-adapter.clar"

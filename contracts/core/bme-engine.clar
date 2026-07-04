@@ -1,5 +1,6 @@
 ;; bme-engine.clar
 ;; Burn-Mint Equilibrium Engine for Conxian Protocol
+;; CXIP-013 Aligned: DEX 45% / Bounty 30% / Governance 15% / Grants 10%
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (define-constant ERR_UNAUTHORIZED (err u1000))
@@ -8,21 +9,22 @@
 (define-constant MINT_PER_EPOCH u100000000)
 (define-constant EPOCH_LENGTH u144)
 
-(define-constant WEIGHT_DEX u4000)
-(define-constant WEIGHT_LENDING u3000)
-(define-constant WEIGHT_BOUNTY u2000)
-(define-constant WEIGHT_GOV u1000)
+;; CXIP-013 Emission Weights (basis points, total = 10000)
+(define-constant WEIGHT_DEX u4500)      ;; 45% - DEX Liquidity
+(define-constant WEIGHT_BOUNTY u3000)   ;; 30% - Bounty Completion
+(define-constant WEIGHT_GOV u1500)      ;; 15% - Governance Staking
+(define-constant WEIGHT_GRANTS u1000)   ;; 10% - Strategic Grants
 
 (define-map dex-activity principal uint)
-(define-map lending-activity principal uint)
 (define-map bounty-activity principal uint)
 (define-map gov-activity principal uint)
+(define-map grants-activity principal uint)
 (define-map activity-reporters principal bool)
 
 (define-data-var total-dex-activity uint u0)
-(define-data-var total-lending-activity uint u0)
 (define-data-var total-bounty-activity uint u0)
 (define-data-var total-gov-activity uint u0)
+(define-data-var total-grants-activity uint u0)
 (define-data-var total-burned uint u0)
 (define-data-var last-mint-block uint burn-block-height)
 (define-data-var admin principal tx-sender)
@@ -56,15 +58,6 @@
   (register-fee-activity contributor amount)
 )
 
-(define-public (register-lending-activity (user principal) (amount uint))
-  (begin
-    (asserts! (is-authorized-reporter) ERR_UNAUTHORIZED)
-    (map-set lending-activity user (+ (default-to u0 (map-get? lending-activity user)) amount))
-    (var-set total-lending-activity (+ (var-get total-lending-activity) amount))
-    (ok true)
-  )
-)
-
 (define-public (register-bounty-activity (contributor principal) (amount uint))
   (begin
     (asserts! (is-authorized-reporter) ERR_UNAUTHORIZED)
@@ -83,6 +76,15 @@
   )
 )
 
+(define-public (register-grants-activity (contributor principal) (amount uint))
+  (begin
+    (asserts! (is-authorized-reporter) ERR_UNAUTHORIZED)
+    (map-set grants-activity contributor (+ (default-to u0 (map-get? grants-activity contributor)) amount))
+    (var-set total-grants-activity (+ (var-get total-grants-activity) amount))
+    (ok true)
+  )
+)
+
 (define-public (execute-epoch-minting (targets (list 100 principal)))
   (let ((current-height burn-block-height)
         (last-mint (var-get last-mint-block)))
@@ -90,9 +92,9 @@
       (asserts! (>= (- current-height last-mint) EPOCH_LENGTH) ERR_INVALID_EPOCH)
       (map distribute-merit-rewards targets)
       (var-set total-dex-activity u0)
-      (var-set total-lending-activity u0)
       (var-set total-bounty-activity u0)
       (var-set total-gov-activity u0)
+      (var-set total-grants-activity u0)
       (var-set last-mint-block current-height)
       (ok true)
     )
@@ -104,10 +106,6 @@
                          (total (var-get total-dex-activity))
                          (allocation (/ (* MINT_PER_EPOCH WEIGHT_DEX) u10000)))
                      (if (and (> total u0) (> activity u0)) (/ (* activity allocation) total) u0)))
-        (lending-share (let ((activity (default-to u0 (map-get? lending-activity target)))
-                             (total (var-get total-lending-activity))
-                             (allocation (/ (* MINT_PER_EPOCH WEIGHT_LENDING) u10000)))
-                         (if (and (> total u0) (> activity u0)) (/ (* activity allocation) total) u0)))
         (bounty-share (let ((activity (default-to u0 (map-get? bounty-activity target)))
                             (total (var-get total-bounty-activity))
                             (allocation (/ (* MINT_PER_EPOCH WEIGHT_BOUNTY) u10000)))
@@ -116,7 +114,11 @@
                          (total (var-get total-gov-activity))
                          (allocation (/ (* MINT_PER_EPOCH WEIGHT_GOV) u10000)))
                      (if (and (> total u0) (> activity u0)) (/ (* activity allocation) total) u0)))
-        (total-mint (+ dex-share lending-share bounty-share gov-share)))
+        (grants-share (let ((activity (default-to u0 (map-get? grants-activity target)))
+                            (total (var-get total-grants-activity))
+                            (allocation (/ (* MINT_PER_EPOCH WEIGHT_GRANTS) u10000)))
+                        (if (and (> total u0) (> activity u0)) (/ (* activity allocation) total) u0)))
+        (total-mint (+ dex-share bounty-share gov-share grants-share)))
     (if (> total-mint u0)
       (is-ok (contract-call? .cxd-token mint total-mint target))
       false
@@ -132,10 +134,11 @@
   )
 )
 
-(define-public (swap-and-burn (token <sip-010-ft-trait>) (amount uint))
+(define-public (burn-cxd (amount uint))
   (begin
-    (print { event: "swap-and-burn-triggered", token: (contract-of token), amount: amount })
+    (try! (contract-call? .cxd-token burn amount tx-sender))
     (var-set total-burned (+ (var-get total-burned) amount))
+    (print { event: "burn-executed", amount: amount })
     (ok true)
   )
 )

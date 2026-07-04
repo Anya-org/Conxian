@@ -36,13 +36,9 @@
 
 ;; @desc Check if the contract is paused
 (define-read-only (is-paused)
-  (let (
-    (cb-res (contract-call? .enhanced-circuit-breaker is-contract-paused .lending-manager))
-  )
-    (if (is-ok cb-res)
-      (unwrap-panic cb-res)
-      true
-    )
+  (match (contract-call? .enhanced-circuit-breaker is-contract-paused .lending-manager)
+    ok-val ok-val
+    err-val true  ;; Fail-closed: treat errors as paused
   )
 )
 
@@ -89,8 +85,16 @@
       (asserts! (<= amount (get total-deposits reserve)) (err ERR_INSUFFICIENT_LIQUIDITY))
       (map-set borrows { asset: asset, user: caller } (+ (default-to u0 (map-get? borrows { asset: asset, user: caller })) amount))
       (map-set reserve-data asset (merge reserve { total-borrows: (+ (get total-borrows reserve) amount) }))
-      (let ((hf (unwrap-panic (calculate-account-health caller))))
-        (asserts! (>= hf u10000) (err ERR_INSUFFICIENT_COLLATERAL))
+      (match (calculate-account-health caller)
+        hf (begin
+          (asserts! (>= hf u10000) (err ERR_INSUFFICIENT_COLLATERAL))
+        )
+        err-val (begin
+          ;; Revert borrow state on health check failure
+          (map-set borrows { asset: asset, user: caller } (- (default-to u0 (map-get? borrows { asset: asset, user: caller })) amount))
+          (map-set reserve-data asset (merge reserve { total-borrows: (- (get total-borrows reserve) amount) }))
+          (err ERR_INTERNAL)
+        )
       )
       (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) caller none)))
       (ok true)
@@ -144,12 +148,17 @@
       (asserts! (not (is-paused)) (err ERR_PAUSED))
       (asserts! (>= user-deposit amount) (err ERR_INVALID_AMOUNT))
       (map-set deposits { asset: asset, user: tx-sender } (- user-deposit amount))
-      (let ((hf (unwrap-panic (calculate-account-health tx-sender))))
-        (begin
+      (match (calculate-account-health tx-sender)
+        hf (begin
           (asserts! (>= hf u10000) (err ERR_INSUFFICIENT_COLLATERAL))
           (map-set reserve-data asset (merge reserve { total-deposits: (if (>= (get total-deposits reserve) amount) (- (get total-deposits reserve) amount) u0) }))
           (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) recipient none)))
           (ok true)
+        )
+        err-val (begin
+          ;; Revert deposit state on health check failure
+          (map-set deposits { asset: asset, user: tx-sender } (+ user-deposit amount))
+          (err ERR_INTERNAL)
         )
       )
     )
@@ -202,7 +211,7 @@
   )
     (if (is-some reserve-opt)
       (let (
-        (reserve-val (unwrap-panic reserve-opt))
+        (reserve-val (unwrap! reserve-opt (err ERR_INTERNAL)))
         (decimals (get decimals reserve-val))
         (asset-collateral-value (/ (* deposit-amt price COLLATERAL_FACTOR) (* (pow u10 decimals) u10000)))
         (asset-debt-value (/ (* borrow-amt price) (pow u10 decimals)))

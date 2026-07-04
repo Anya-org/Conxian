@@ -28,8 +28,8 @@
     (min-amount-out uint)
   )
   (let (
-    (paused-state (let ((cb-res (contract-call? .enhanced-circuit-breaker is-contract-paused .swap-router))) (if (is-ok cb-res) (unwrap-panic cb-res) true)))
-    (is-isolated-res (let ((cb-res (contract-call? .enhanced-circuit-breaker is-isolated (contract-of liquidity-source)))) (if (is-ok cb-res) (unwrap-panic cb-res) true)))
+    (paused-state (match (contract-call? .enhanced-circuit-breaker is-contract-paused .swap-router) ok-val ok-val err-val true))
+    (is-isolated-res (match (contract-call? .enhanced-circuit-breaker is-isolated (contract-of liquidity-source)) ok-val ok-val err-val true))
     (user tx-sender)
   )
     (begin
@@ -86,7 +86,7 @@
 ;; @desc Update the protocol fees based on current market volatility
 (define-public (update-volatility-fees)
   (let (
-    (vol (let ((v-res (contract-call? .oracle-aggregator get-volatility-index))) (if (is-ok v-res) (unwrap-panic v-res) u0)))
+    (vol (match (contract-call? .oracle-aggregator get-volatility-index) ok-val ok-val err-val u0))
     (new-fee (if (> vol u75) MAX-FEE BASE-FEE))
   )
     (begin
@@ -112,7 +112,7 @@
       (try! (contract-call? token-in transfer amount-in user (as-contract tx-sender) none))
 
       (let (
-        ;; 2. Execute swap as Router
+        ;; 2. Execute swap as Router (fee collection handled upstream)
         (amount-out (try! (as-contract (contract-call? .concentrated-liquidity-pool swap pool-id true amount-in token-in token-out (as-contract tx-sender)))))
       )
         (begin
@@ -123,6 +123,27 @@
 
           (ok amount-out)
         )
+      )
+    )
+  )
+)
+
+;; @desc Swap external token to CXD and burn the proceeds.
+;; Orchestrates token->CXD swap via CLP, then burns CXD via bme-engine.
+;; Callable by revenue-distributor or any authorized module.
+(define-public (swap-and-burn (token <sip-010-ft-trait>) (amount uint))
+  (let (
+    (user tx-sender)
+  )
+    (begin
+      ;; 1. Transfer tokens from user to router
+      (try! (contract-call? token transfer amount user (as-contract tx-sender) none))
+      ;; 2. Swap token -> CXD via CLP (pool u1, token-in is token-0)
+      (let ((amount-out (try! (as-contract (contract-call? .concentrated-liquidity-pool swap u1 true amount token .cxd-token (as-contract tx-sender))))))
+        ;; 3. Burn the received CXD via bme-engine
+        (try! (contract-call? .bme-engine burn-cxd amount-out))
+        (print { event: "swap-and-burn-executed", token: (contract-of token), amount: amount, cxd-burned: amount-out })
+        (ok true)
       )
     )
   )

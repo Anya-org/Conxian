@@ -7,6 +7,7 @@
 (define-constant ERR_UNAUTHORIZED u3000)
 (define-constant ERR_PAUSED u3001)
 (define-constant ERR_INVALID_POSITION u3002)
+(define-constant ERR_NOT_AUTHORIZED u3003)
 
 ;; @desc The administrative principal authorized to manage module settings.
 (define-data-var admin principal tx-sender)
@@ -16,13 +17,9 @@
 ;; @desc Check if the contract or protocol is paused.
 ;; @returns bool
 (define-read-only (is-paused)
-  (let (
-    (cb-res (contract-call? .enhanced-circuit-breaker is-contract-paused .dimensional-core))
-  )
-    (if (is-ok cb-res)
-      (unwrap-panic cb-res)
-      true ;; Fail-closed
-    )
+  (match (contract-call? .enhanced-circuit-breaker is-contract-paused .dimensional-core)
+    ok-val ok-val
+    err-val true  ;; Fail-closed
   )
 )
 
@@ -60,6 +57,11 @@
 (define-public (liquidate-position (owner principal) (position-id uint) (oracle principal))
   (begin
     (asserts! (not (is-paused)) (err ERR_PAUSED))
+    (asserts! (or
+      (is-eq contract-caller .risk-unit)
+      (is-eq contract-caller .risk-manager)
+      (is-eq contract-caller (var-get admin))
+    ) (err ERR_NOT_AUTHORIZED))
     (ok true)
   )
 )
