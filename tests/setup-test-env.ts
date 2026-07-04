@@ -5,37 +5,6 @@ import { Cl } from '@stacks/transactions';
 let internalSimnet: Simnet | null = null;
 let initializationPromise: Promise<Simnet> | null = null;
 
-function captureRuntimeErrors<T>(label: string, fn: () => Promise<T>): Promise<T> {
-  return new Promise((resolve, reject) => {
-    const errors: string[] = [];
-    const originalWrite = process.stderr.write.bind(process.stderr);
-    
-    process.stderr.write = ((chunk: any, ...args: any[]): boolean => {
-      const str = typeof chunk === 'string' ? chunk : chunk.toString();
-      if (str.includes('Runtime error while interpreting')) {
-        errors.push(str.trim());
-      }
-      return originalWrite(chunk, ...args);
-    }) as typeof process.stderr.write;
-
-    fn()
-      .then((result) => {
-        process.stderr.write = originalWrite;
-        if (errors.length > 0) {
-          const message = `❌ ${label}: ${errors.length} runtime error(s) during contract interpretation:\n${errors.join('\n')}`;
-          console.error(message);
-          reject(new Error(message));
-        } else {
-          resolve(result);
-        }
-      })
-      .catch((err) => {
-        process.stderr.write = originalWrite;
-        reject(err);
-      });
-  });
-}
-
 export async function initializeSimnet(): Promise<Simnet> {
   if (internalSimnet) return internalSimnet;
   if (initializationPromise) return initializationPromise;
@@ -43,7 +12,7 @@ export async function initializeSimnet(): Promise<Simnet> {
   initializationPromise = (async () => {
     try {
       console.log('🚀 Initializing Simnet and Bootstrapping Protocol...');
-      const instance = await captureRuntimeErrors('Simnet init', () => initSimnet('Clarinet.toml'));
+      const instance = await initSimnet('Clarinet.toml');
       internalSimnet = instance;
 
       const deployer = instance.deployer;

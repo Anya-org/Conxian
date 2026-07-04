@@ -158,10 +158,10 @@ jobs:
 
           if [ ! -z "$TEST_TARGETS" ]; then
             echo "Running domain-specific tests: $TEST_TARGETS"
-            npx vitest run $TEST_TARGETS --config vitest.config.ts --pool=threads
+            bash scripts/run-tests.sh $TEST_TARGETS
           else
             echo "Running full test suite..."
-            npx vitest run --config vitest.config.ts --pool=threads
+            bash scripts/run-tests.sh
           fi
 
       - name: Run Full Tests (Push)
