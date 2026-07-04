@@ -37,8 +37,8 @@ jobs:
       - name: Install Clarinet
         run: |
           set -euo pipefail
-          VERSION="v3.2.0"
-          curl -sSL -o clarinet.tar.gz "https://github.com/hirosystems/clarinet/releases/download/${VERSION}/clarinet-linux-x64-glibc.tar.gz"
+          VERSION="v3.21.0"
+          curl -sSL -o clarinet.tar.gz "https://github.com/stx-labs/clarinet/releases/download/${VERSION}/clarinet-linux-x64-glibc.tar.gz"
           tar -xzf clarinet.tar.gz clarinet
           chmod +x clarinet
           sudo mv clarinet /usr/local/bin/clarinet
@@ -69,8 +69,8 @@ jobs:
       - name: Install Clarinet
         run: |
           set -euo pipefail
-          VERSION="v3.2.0"
-          curl -sSL -o clarinet.tar.gz "https://github.com/hirosystems/clarinet/releases/download/${VERSION}/clarinet-linux-x64-glibc.tar.gz"
+          VERSION="v3.21.0"
+          curl -sSL -o clarinet.tar.gz "https://github.com/stx-labs/clarinet/releases/download/${VERSION}/clarinet-linux-x64-glibc.tar.gz"
           tar -xzf clarinet.tar.gz clarinet
           chmod +x clarinet
           sudo mv clarinet /usr/local/bin/clarinet
@@ -85,7 +85,7 @@ jobs:
             --plan-path deployments/default.testnet-plan.yaml
 
       - name: Deploy to Testnet
-        if: ${{ !inputs.dry_run }}
+        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
         env:
           DEPLOYER_MNEMONIC: ${{ secrets.TESTNET_DEPLOYER_MNEMONIC }}
         run: |
@@ -95,13 +95,13 @@ jobs:
             --testnet
 
       - name: Smoke Test Deployed Contracts
-        if: ${{ !inputs.dry_run }}
+        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
         run: |
           echo "Running post-deployment smoke tests..."
           npx vitest run tests/sanity.test.ts tests/check-compile.test.ts --config vitest.config.ts --pool=threads
 
       - name: Generate Deployment Report
-        if: always() && !inputs.dry_run
+        if: ${{ always() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)) }}
         run: |
           echo "## Testnet Deployment Report" >> $GITHUB_STEP_SUMMARY
           echo "**Deployer:** ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P" >> $GITHUB_STEP_SUMMARY

@@ -34,11 +34,11 @@ jobs:
 
       - name: Lint and Type Check
         run: |
-          npm run lint || echo "No lint script found"
-          npm run type-check || echo "No type-check script found"
+          npm run lint
+          npm run type-check
 
       - name: Build
         run: npm run build
 
       - name: Run Tests
-        run: npm test || echo "No tests found"
+        run: npm test

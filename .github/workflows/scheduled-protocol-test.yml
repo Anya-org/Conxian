@@ -28,8 +28,8 @@ jobs:
       - name: Install Clarinet
         run: |
           set -euo pipefail
-          VERSION="v3.2.0"
-          curl -sSL -o clarinet.tar.gz "https://github.com/hirosystems/clarinet/releases/download/${VERSION}/clarinet-linux-x64-glibc.tar.gz"
+          VERSION="v3.21.0"
+          curl -sSL -o clarinet.tar.gz "https://github.com/stx-labs/clarinet/releases/download/${VERSION}/clarinet-linux-x64-glibc.tar.gz"
           tar -xzf clarinet.tar.gz clarinet
           chmod +x clarinet
           sudo mv clarinet /usr/local/bin/clarinet
@@ -42,7 +42,9 @@ jobs:
         run: npm run ci
 
       - name: Run Coverage
-        run: npm run coverage
+        run: |
+          npm run coverage
+          npx vitest run --coverage --coverage.thresholds.lines=60 --coverage.thresholds.branches=50 --coverage.thresholds.functions=60 --coverage.thresholds.statements=60
 
       - name: Upload Test Artifacts
         if: always()

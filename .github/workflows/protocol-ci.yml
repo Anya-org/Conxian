@@ -50,7 +50,10 @@ jobs:
               - 'tests/**'
               - 'Clarinet.toml'
               - 'package.json'
+              - 'package-lock.json'
               - 'vitest.config.ts'
+              - '.github/workflows/**'
+              - 'deployments/**'
             contracts:
               - 'contracts/**'
             tests:
@@ -110,21 +113,32 @@ jobs:
       - name: Install Clarinet
         run: |
           set -euo pipefail
-          VERSION="v3.2.0"
-          curl -sSL -o clarinet.tar.gz "https://github.com/hirosystems/clarinet/releases/download/${VERSION}/clarinet-linux-x64-glibc.tar.gz"
+          VERSION="v3.21.0"
+          curl -sSL -o clarinet.tar.gz "https://github.com/stx-labs/clarinet/releases/download/${VERSION}/clarinet-linux-x64-glibc.tar.gz"
           tar -xzf clarinet.tar.gz clarinet
           chmod +x clarinet
           sudo mv clarinet /usr/local/bin/clarinet
           clarinet --version
 
+      - name: Snapshot deployment plan
+        run: cp deployments/default.simnet-plan.yaml deployments/default.simnet-plan.yaml.bak
+
       - name: Clarinet Check
         run: clarinet check --manifest-path Clarinet.toml
+
+      - name: Restore deployment plan (guard against clarinet rewrite)
+        run: |
+          if ! diff -q deployments/default.simnet-plan.yaml deployments/default.simnet-plan.yaml.bak > /dev/null 2>&1; then
+            echo "⚠️  Clarinet modified deployment plan - restoring original"
+            cp deployments/default.simnet-plan.yaml.bak deployments/default.simnet-plan.yaml
+          fi
 
       - name: Run Intelligent Tests (PR only)
         if: github.event_name == 'pull_request'
         run: |
           TEST_TARGETS=""
-          if [[ "${{ needs.changes.outputs.access }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/core/access.test.ts"; fi
+          # Only access has dedicated test files; tokens, treasury, dimensional
+          # tests live in tests/core/ and are picked up by the fallback.
           if [[ "${{ needs.changes.outputs.agents }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/agents/"; fi
           if [[ "${{ needs.changes.outputs.compliance }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/compliance/"; fi
           if [[ "${{ needs.changes.outputs.core }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/core/"; fi
@@ -134,25 +148,28 @@ jobs:
           if [[ "${{ needs.changes.outputs.lending }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/lending/"; fi
           if [[ "${{ needs.changes.outputs.monitoring }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/monitoring/"; fi
           if [[ "${{ needs.changes.outputs.oracle }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/oracle/"; fi
+          # tokens, treasury, dimensional have no dedicated test dirs;
+          # changes there trigger the fallback below.
 
           if [ -z "$TEST_TARGETS" ] && [[ "${{ needs.changes.outputs.any_protocol }}" == "true" ]]; then
-            echo "Generic protocol change detected, running core tests..."
-            TEST_TARGETS="tests/core/ tests/sanity.test.ts"
+            echo "Generic or infrastructure protocol change detected, running full test suite..."
+            TEST_TARGETS=""
           fi
 
           if [ ! -z "$TEST_TARGETS" ]; then
-            echo "Running tests for: $TEST_TARGETS"
+            echo "Running domain-specific tests: $TEST_TARGETS"
             npx vitest run $TEST_TARGETS --config vitest.config.ts --pool=threads
           else
-            echo "No specific protocol tests to run."
+            echo "Running full test suite..."
+            npx vitest run --config vitest.config.ts --pool=threads
           fi
 
-      - name: Run Full Tests (Push to Main)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Run Full Tests (Push)
+        if: github.event_name == 'push'
         run: npm run ci
 
-      - name: Run Coverage (Push to Main)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Run Coverage (Push)
+        if: github.event_name == 'push'
         run: npm run coverage
 
       - name: Upload Test Logs on Failure
