@@ -53,7 +53,7 @@
 ;; @desc Registers a liquidity marker for the ALEX adapter to track BME emissions.
 (define-public (register-liquidity-marker (metadata (string-ascii 256)))
   (begin
-    (only-admin)
+    (try! (only-admin))
     (ok true)
   )
 )
@@ -143,7 +143,7 @@
 ;; @desc Toggles the active status of the ALEX adapter.
 (define-public (set-active (active bool))
   (begin
-    (only-admin)
+    (try! (only-admin))
     (var-set is-active active)
     (ok true)
   )
