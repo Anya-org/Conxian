@@ -42,7 +42,10 @@
 ;; --- Internal Helpers ---
 
 (define-private (only-admin)
-  (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+  (if (is-eq tx-sender (var-get admin))
+      (ok true)
+      ERR_UNAUTHORIZED
+  )
 )
 
 ;; --- CSF Implementation ---
