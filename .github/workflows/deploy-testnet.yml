@@ -18,6 +18,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
   validate:
@@ -115,3 +116,18 @@ jobs:
         with:
           name: testnet-deployment-plan
           path: deployments/full-system.testnet-plan.yaml
+
+  promote-to-mainnet:
+    needs: deploy-testnet
+    if: ${{ success() && github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Mainnet Deployment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run deploy-mainnet.yml \
+            --repo Conxian/Conxian \
+            --ref main \
+            -f dry_run=false \
+            -f confirm=DEPLOY_MAINNET
