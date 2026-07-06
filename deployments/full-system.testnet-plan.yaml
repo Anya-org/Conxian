@@ -202,14 +202,6 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
-        contract-name: bns-stub
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 20000
-        path: contracts/governance/bns-stub.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
         contract-name: regulatory-adapter
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 20000
@@ -1200,14 +1192,6 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 20000
         path: contracts/dex/oracle.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: oracle-adapter-stub
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 20000
-        path: contracts/oracle/oracle-adapter-stub.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
