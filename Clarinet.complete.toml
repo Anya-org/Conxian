@@ -106,15 +106,6 @@ path = "contracts/tokens/cxlp-token.clar"
 path = "contracts/compliance/regulatory-adapter.clar"
 clarity-version = 4
 
-[contracts.cxs-token]
-path = "contracts/tokens/cxs-token.clar"
-
-[contracts.cxtr-token]
-path = "contracts/tokens/cxtr-token.clar"
-
-[contracts.cxlp-position-nft]
-path = "contracts/tokens/cxlp-position-nft.clar"
-
 [contracts.cxd-token]
 path = "contracts/tokens/cxd-token.clar"
 

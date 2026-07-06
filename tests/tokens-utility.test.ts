@@ -27,18 +27,8 @@ describe("Token and Utility Tests", () => {
       expect(contract).toBeDefined();
     });
 
-    it("should have cxtr-token deployed", () => {
-      const contract = simnet.getContractSource("cxtr-token");
-      expect(contract).toBeDefined();
-    });
-
     it("should have cxlp-token deployed", () => {
       const contract = simnet.getContractSource("cxlp-token");
-      expect(contract).toBeDefined();
-    });
-
-    it("should have cxlp-position-nft deployed", () => {
-      const contract = simnet.getContractSource("cxlp-position-nft");
       expect(contract).toBeDefined();
     });
 

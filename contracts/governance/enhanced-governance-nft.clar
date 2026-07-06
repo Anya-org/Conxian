@@ -16,7 +16,7 @@
 ;; Council IDs
 (define-constant COUNCIL_CXD u1) ;; Core Protocol & Architecture
 (define-constant COUNCIL_CXVG u2) ;; Risk & Vault Management
-(define-constant COUNCIL_CXTR u3) ;; Treasury & Capital Allocation
+(define-constant COUNCIL_CXTR u3) ;; Treasury & Capital Allocation (CXVG-powered)
 (define-constant COUNCIL_CXS u4) ;; Staking & Yield Curves
 (define-constant COUNCIL_CXLP u5) ;; Liquidity & AMM Weighting
 

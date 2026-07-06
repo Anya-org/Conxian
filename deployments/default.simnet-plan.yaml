@@ -367,24 +367,9 @@ plan:
       path: contracts/treasury/cxd-treasury.clar
       clarity-version: 4
     - transaction-type: emulated-contract-publish
-      contract-name: cxlp-position-nft
-      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
-      path: contracts/tokens/cxlp-position-nft.clar
-      clarity-version: 4
-    - transaction-type: emulated-contract-publish
       contract-name: cxlp-token
       emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
       path: contracts/tokens/cxlp-token.clar
-      clarity-version: 4
-    - transaction-type: emulated-contract-publish
-      contract-name: cxs-token
-      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
-      path: contracts/tokens/cxs-token.clar
-      clarity-version: 4
-    - transaction-type: emulated-contract-publish
-      contract-name: cxtr-token
-      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
-      path: contracts/tokens/cxtr-token.clar
       clarity-version: 4
     - transaction-type: emulated-contract-publish
       contract-name: cxvg-token
