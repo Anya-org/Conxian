@@ -40,7 +40,7 @@
 - **218 Clarity contracts** across 45+ modules
 - **76+ test files** (Vitest + Clarinet SDK)
 - **2 Clarinet configs**: `Clarinet.toml` (217 contracts, active) and `Clarinet.complete.toml` (218 contracts, legacy)
-- **Key tokens**: CXD (stablecoin), CXLP (LP), CXVG (governance), CXTR (treasury reward), CXS (stub)
+- **Key tokens**: CXD (stablecoin), CXLP (LP), CXVG (governance) — consolidated from 6 to 3 tokens per Sprint 2026-07
 - **Key NFTs**: position-nft (SIP-009 compliant), bridge-nft (NON-COMPLIANT), enhanced-governance-nft (soulbound)
 
 ### Contract Dependency Hierarchy

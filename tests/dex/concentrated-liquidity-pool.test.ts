@@ -22,7 +22,7 @@ describe("Concentrated Liquidity Pool", () => {
       "create-pool",
       [
         Cl.principal(deployer + ".cxd-token"),
-        Cl.principal(deployer + ".cxs-token"),
+        Cl.principal(deployer + ".cxvg-token"),
         Cl.uint(3000),
         Cl.uint(1000000000000),
         Cl.int(0)

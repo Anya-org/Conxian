@@ -117,7 +117,7 @@ path = "contracts/integrations/stubs/alex-reserve-pool.clar"
 clarity-version = 4
 
 [contracts.alex-adapter]
-path = "contracts/integrations/alex-adapter.clar"
+path = "contracts/integrations/simnet/alex-adapter.clar"
 clarity-version = 4
 depends_on = ["alex-reserve-pool", "alex-swap-helper", "conxian-csf-trait", "sip-standards"]
 
@@ -314,23 +314,8 @@ depends_on = ["regulatory-adapter"]
 path = "contracts/treasury/cxd-treasury.clar"
 clarity-version = 4
 
-[contracts.cxlp-position-nft]
-path = "contracts/tokens/cxlp-position-nft.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
 [contracts.cxlp-token]
 path = "contracts/tokens/cxlp-token.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-[contracts.cxs-token]
-path = "contracts/tokens/cxs-token.clar"
-clarity-version = 4
-depends_on = ["sip-standards"]
-
-[contracts.cxtr-token]
-path = "contracts/tokens/cxtr-token.clar"
 clarity-version = 4
 depends_on = ["sip-standards"]
 
@@ -930,7 +915,7 @@ clarity-version = 4
 [contracts.treasury-governance]
 path = "contracts/governance/treasury-governance.clar"
 clarity-version = 4
-depends_on = ["cxtr-token", "governance-traits", "operational-treasury", "proposal-executor"]
+depends_on = ["governance-traits", "operational-treasury", "proposal-executor"]
 
 [contracts.twap-oracle]
 path = "contracts/integrations/twap-oracle.clar"
@@ -977,7 +962,7 @@ depends_on = ["sip-standards"]
 [contracts.yield-governance]
 path = "contracts/governance/yield-governance.clar"
 clarity-version = 4
-depends_on = ["cxs-token", "governance-traits", "proposal-executor"]
+depends_on = ["governance-traits", "proposal-executor"]
 
 [contracts.yield-optimizer]
 path = "contracts/yield/yield-optimizer.clar"

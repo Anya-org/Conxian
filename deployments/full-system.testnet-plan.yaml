@@ -112,22 +112,6 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
-        contract-name: alex-reserve-pool
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 20000
-        path: contracts/integrations/stubs/alex-reserve-pool.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: alex-swap-helper
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 20000
-        path: contracts/integrations/stubs/alex-swap-helper-v1-03.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
         contract-name: alex-adapter
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 20000
@@ -214,14 +198,6 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 20000
         path: contracts/utils/block-utils.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: bns-stub
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 20000
-        path: contracts/governance/bns-stub.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -524,34 +500,10 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
-        contract-name: cxlp-position-nft
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 20000
-        path: contracts/tokens/cxlp-position-nft.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
         contract-name: cxlp-token
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 20000
         path: contracts/tokens/cxlp-token.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: cxs-token
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 20000
-        path: contracts/tokens/cxs-token.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: cxtr-token
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 20000
-        path: contracts/tokens/cxtr-token.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -1216,14 +1168,6 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 20000
         path: contracts/dex/oracle.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: oracle-adapter-stub
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 20000
-        path: contracts/oracle/oracle-adapter-stub.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0

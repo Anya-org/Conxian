@@ -2,7 +2,7 @@
 ;; Conxian Protocol Standard Contract
 
 ;; treasury-governance.clar
-;; CXTR Use Case: Treasury & Capital Allocation Governance
+;; Treasury & Capital Allocation Governance (CXVG-powered, was CXTR)
 ;; Specialized controller for Operational Treasury disbursements.
 
 (impl-trait .governance-traits.proposal-trait)
@@ -20,7 +20,7 @@
 ;; @returns (response bool uint)
 (define-public (execute (proposer principal))
   (begin
-    ;; Called by proposal-executor after a successful CXTR vote
+    ;; Called by proposal-executor after a successful council vote
     (asserts! (is-eq tx-sender .proposal-executor) (err ERR_UNAUTHORIZED))
 
     ;; Logic to trigger a withdrawal from operational-treasury
@@ -31,7 +31,7 @@
   )
 )
 
-;; Specialized Voting Power check for CXTR
+;; Voting power derived from CXVG balance (was CXTR)
 (define-read-only (get-cxtr-voting-power (user principal))
-  (contract-call? .cxtr-token get-balance user)
+  (contract-call? .cxvg-token get-balance user)
 )

@@ -2,7 +2,7 @@
 ;; Conxian Protocol Standard Contract
 
 ;; yield-governance.clar
-;; CXS Use Case: Staking & Yield Curve Governance
+;; Staking & Yield Curve Governance (CXVG-powered, was CXS)
 ;; Specialized controller for updating Economic Policy Engine parameters.
 
 (impl-trait .governance-traits.proposal-trait)
@@ -32,7 +32,7 @@
   )
 )
 
-;; Specialized Voting Power check for CXS
+;; Voting power derived from CXVG balance (was CXS)
 (define-read-only (get-cxs-voting-power (user principal))
-  (contract-call? .cxs-token get-balance user)
+  (contract-call? .cxvg-token get-balance user)
 )

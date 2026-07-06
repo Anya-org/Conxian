@@ -194,9 +194,6 @@ batches:
           contract-name: cxvg-token
           path: contracts/tokens/cxvg-token.clar
       - contract-publish:
-          contract-name: cxtr-token
-          path: contracts/tokens/cxtr-token.clar
-      - contract-publish:
           contract-name: token-system-coordinator
           path: contracts/tokens/token-system-coordinator.clar
       - contract-publish:
