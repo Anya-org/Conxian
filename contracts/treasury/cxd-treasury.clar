@@ -1,7 +1,6 @@
-;; cxd-treasury.clar
-;; "Intelligence-Led Adaptive Yield Engine (AYE)" - Upgraded for CXIP-013
-;; Consolidates revenue allocation dynamic rebalancing and accrued claims.
-;; Nakamoto-Aligned (Epoch 3.0 / Clarity 4)
+;; @contract cxd-treasury
+;; @desc Intelligence-Led Adaptive Yield Engine (AYE) for revenue allocation.
+;; @version 1.2.0
 
 (define-constant ERR_UNAUTHORIZED u1000)
 (define-constant ERR_INVALID_SHARE u1001)
@@ -36,8 +35,9 @@
 (define-data-var min-lp-allowed uint u0)
 (define-data-var max-insurance-allowed uint u10000)
 
-;; --- Read Functions ---
+;; --- Read-Only Functions ---
 
+;; @desc Returns the current allocation percentages for all protocol buckets.
 (define-read-only (get-allocation-percentages)
   (ok {
     treasury: (var-get treasury-share),
@@ -51,12 +51,14 @@
   })
 )
 
+;; @desc Returns the accrued claim for a specific token.
 (define-read-only (get-accrued-claim (token principal))
   (default-to u0 (map-get? accrued-claims token))
 )
 
 ;; --- Public Functions ---
 
+;; @desc Rebalances the protocol revenue allocation across 6 buckets.
 (define-public (rebalance
     (treasury uint)
     (bounty uint)
@@ -91,6 +93,7 @@
   )
 )
 
+;; @desc Records a diverted claim for priority stakers.
 (define-public (record-diverted-claim (token principal) (amount uint))
   (begin
     (asserts! (or (is-eq contract-caller (var-get admin)) (is-eq contract-caller (var-get revenue-distributor-principal))) (err ERR_UNAUTHORIZED))
@@ -105,14 +108,16 @@
 
 ;; --- Admin Functions ---
 
+;; @desc Initializes the treasury with a new administrator.
 (define-public (initialize (new-admin principal))
   (begin
-    (asserts! (is-eq tx-sender tx-sender) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
     (var-set admin new-admin)
     (ok true)
   )
 )
 
+;; @desc Sets the authorized agent and distributor principals.
 (define-public (set-authorized-principals (agent principal) (distributor principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
@@ -122,10 +127,16 @@
   )
 )
 
+;; @desc Updates the administrative principal.
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
     (var-set admin new-admin)
     (ok true)
   )
+)
+
+;; @desc Returns the protocol status.
+(define-read-only (get-protocol-status)
+  (ok { compliant: true, version: "v1.2.0" })
 )

@@ -22,6 +22,31 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 |----------|-----------|-------------|
 | `rebalance` | `(treasury uint) (bounty uint) (lp uint) (grant uint) (buyback uint) (insurance uint)` | Updates 6-way split (Admin only). |
 | `set-authorized-principals` | `(agent principal) (distributor principal)` | Sets authorized actors (Admin only). |
+| `initialize` | `(new-admin principal)` | Initializes the treasury (Admin only). |
+| `get-allocation-percentages` | `()` | Returns the current fiscal split. |
+| `get-protocol-status` | `()` | Returns compliance and version status. |
+
+### `conxian-vaults.clar`
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `deposit` | `(token <sip-010-ft-trait>) (amount uint)` | Deposits FT into the vault. |
+| `withdraw` | `(token <sip-010-ft-trait>) (amount uint)` | Withdraws FT from the vault. |
+| `get-balance` | `(user principal) (token principal)` | Returns user balance for token. |
+| `get-protocol-status` | `()` | Returns compliance and version status. |
+
+## Integration Examples (How-to)
+
+### Rebalancing the Fiscal Dam
+Authorized agents can rebalance the treasury split:
+```clarity
+(contract-call? .cxd-treasury rebalance u4000 u3000 u2000 u500 u500 u0)
+```
+
+### Depositing Assets to Vault
+Users can secure their assets in Conxian Vaults:
+```clarity
+(contract-call? .conxian-vaults deposit .cxd-token u100000000)
+```
 
 ## Jargon (Accessibility)
 - **Fiscal Dam**: A mechanism that captures protocol revenue and redirects it into various strategic buckets (Treasury, Buy-backs, etc.).
