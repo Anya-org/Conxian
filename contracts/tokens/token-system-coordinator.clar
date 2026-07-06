@@ -1,5 +1,6 @@
-;; token-system-coordinator.clar
-;; Coordinator for token system operations including minting and burning.
+;; @contract token-system-coordinator
+;; @desc Coordinator for token system operations including minting and burning.
+;; @version 1.1.0
 
 (use-trait ft-mintable-trait .sip-standards.ft-mintable-trait)
 

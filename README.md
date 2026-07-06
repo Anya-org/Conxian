@@ -1,5 +1,9 @@
 # Conxian
 
+[![Protocol Status](https://img.shields.io/badge/Status-Mainnet--Ready-green.svg)](https://conxian.com)
+[![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+[![Clarity 4](https://img.shields.io/badge/Clarity-4.0-orange.svg)](https://docs.stacks.co)
+
 Conxian is the protocol, DeFi, and DAO-facing public layer.
 
 Conxian-Labs is the builder and operator layer that develops, ships, and supports public infrastructure around the Conxian ecosystem without replacing protocol ownership.
@@ -55,3 +59,8 @@ Conxian-Labs contributes to and operates infrastructure around the Conxian ecosy
 
 - Ecosystem and protocol collaboration: open an issue in the relevant public repository.
 - Operations and commercial engagement: `support@conxian-labs.com`
+
+---
+
+## Contributing
+Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.

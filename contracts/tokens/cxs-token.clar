@@ -1,6 +1,6 @@
-;; cxs-token.clar
-;; Conxian Protocol: CXS Fungible Token
-;; SIP-010 compliant staking representation token.
+;; @contract cxs-token
+;; @desc Conxian Staking Representation Token (SIP-010)
+;; @version 1.1.0
 
 (impl-trait .sip-standards.sip-010-ft-trait)
 (define-fungible-token token)

@@ -1,7 +1,6 @@
-;; conxian-vaults.clar
-;; Core Vault Implementation
-;; Manages asset custody and yield strategies
-;; Decentralized: Uses Unified RBAC via .conxian-access
+;; @contract conxian-vaults
+;; @desc Core Vault Implementation for asset custody and yield strategies.
+;; @version 1.1.0
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (use-trait vault-trait .vault-traits.vault-trait)
@@ -21,7 +20,9 @@
   uint
 )
 
-;; Public Functions
+;; --- Public Functions ---
+
+;; @desc Deposits a SIP-010 token into the vault.
 (define-public (deposit
     (token <sip-010-ft-trait>)
     (amount uint)
@@ -54,6 +55,7 @@
   )
 )
 
+;; @desc Withdraws a SIP-010 token from the vault.
 (define-public (withdraw
     (token <sip-010-ft-trait>)
     (amount uint)
@@ -88,6 +90,7 @@
   )
 )
 
+;; @desc Returns the vault balance for a specific user and token.
 (define-read-only (get-balance
     (user principal)
     (token principal)
@@ -100,6 +103,12 @@
   )
 )
 
+;; @desc Returns the total holdings of a specific token in the vault.
 (define-read-only (get-total-assets (token principal))
   (default-to u0 (map-get? total-holdings token))
+)
+
+;; @desc Returns the protocol status.
+(define-read-only (get-protocol-status)
+  (ok { compliant: true, version: "v1.1.0" })
 )

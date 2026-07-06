@@ -41,4 +41,10 @@
 )
 
 (define-read-only (get-protocol-status) (ok { compliant: true, version: "v1.1.0" }))
-(define-public (initialize (a principal)) (begin (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED) (ok (var-set admin a))))
+;; @desc Initializes the contract with a new administrator.
+(define-public (initialize (new-admin principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (ok (var-set admin new-admin))
+  )
+)
