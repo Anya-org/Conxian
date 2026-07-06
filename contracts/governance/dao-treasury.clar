@@ -171,3 +171,23 @@
         (ok true)
     )
 )
+
+;; --- Native STX Support ---
+
+;; @desc Withdraws native STX from the treasury to a recipient.
+;; @param amount: The amount of STX in microstacks (uSTX) to withdraw.
+;; @param recipient: The principal receiving the STX.
+;; @return (response bool uint)
+(define-public (withdraw-stx (amount uint) (recipient principal))
+    (begin
+        (asserts! (is-owner) (err ERR_UNAUTHORIZED))
+        (asserts! (>= (stx-get-balance (var-get contract-address)) amount) (err ERR_INSUFFICIENT_BALANCE))
+        (as-contract (stx-transfer? amount tx-sender recipient none))
+    )
+)
+
+;; @desc Returns the native STX balance held by the treasury.
+;; @return (response uint uint)
+(define-read-only (get-stx-balance)
+    (ok (stx-get-balance (var-get contract-address)))
+)
