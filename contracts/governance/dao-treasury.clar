@@ -182,7 +182,7 @@
     (begin
         (asserts! (is-owner) (err ERR_UNAUTHORIZED))
         (asserts! (>= (stx-get-balance (var-get contract-address)) amount) (err ERR_INSUFFICIENT_BALANCE))
-        (as-contract (stx-transfer? amount tx-sender recipient none))
+        (as-contract (stx-transfer? amount tx-sender recipient))
     )
 )
 
