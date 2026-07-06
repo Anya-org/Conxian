@@ -976,3 +976,4 @@ clarity-version = 4
 
 [contracts.math-lib-concentrated]
 path = "contracts/math/concentrated-math.clar"
+clarity-version = 4

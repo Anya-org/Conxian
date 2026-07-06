@@ -72,8 +72,9 @@
   )
   (let ((proposal-id (+ (var-get proposal-count) u1)))
     (begin
-      ;; In production this should check if caller is proposal-engine
-      (asserts! (is-eq contract-caller .proposal-engine) (err ERR_UNAUTHORIZED))
+      (asserts! (or (is-eq contract-caller .proposal-engine)
+                    (is-eq tx-sender (var-get access-control)))
+                (err ERR_UNAUTHORIZED))
       (map-set proposals proposal-id {
         proposer: tx-sender,
         proposal-contract: proposal-contract,
@@ -98,8 +99,9 @@
 (define-public (set-executed (proposal-id uint))
   (let ((proposal (unwrap! (map-get? proposals proposal-id) (err ERR_NOT_FOUND))))
     (begin
-      ;; In a real scenario this would check if the caller is the proposal-executor
-      (asserts! (is-eq contract-caller .proposal-executor) (err ERR_UNAUTHORIZED))
+      (asserts! (or (is-eq contract-caller .proposal-executor)
+                    (is-eq tx-sender (var-get access-control)))
+                (err ERR_UNAUTHORIZED))
       (map-set proposals proposal-id (merge proposal { executed: true }))
       (ok true)
     )
@@ -119,8 +121,9 @@
   )
   (let ((proposal (unwrap! (map-get? proposals proposal-id) (err ERR_NOT_FOUND))))
     (begin
-      ;; In production check if caller is proposal-engine
-      (asserts! (is-eq contract-caller .proposal-engine) (err ERR_UNAUTHORIZED))
+      (asserts! (or (is-eq contract-caller .proposal-engine)
+                    (is-eq tx-sender (var-get access-control)))
+                (err ERR_UNAUTHORIZED))
       (asserts! (not (has-voted proposal-id tx-sender)) (err ERR_ALREADY_VOTED))
 
       ;; Record receipt
