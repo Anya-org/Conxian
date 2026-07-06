@@ -16,11 +16,10 @@
 	branch = main
 [submodule "Conxian"]
 	path = Conxian
-	url = https://github.com/Conxian/Conxian
+	url = https://github.com/Conxian/Conxian.git
 	branch = main
-	# update=none: Conxian repo has its own broken submodule mapping (path 'ui' not in its .gitmodules).
-	# Tracked as a pinned dependency until that repo's submodule config is repaired.
-	update = none
+	
+	# Fixed: Conxian repo .gitmodules is now empty (no nested submodules).
 [submodule "conxius-platform"]
 	path = conxius-platform
 	url = https://github.com/Conxian/conxius-platform
