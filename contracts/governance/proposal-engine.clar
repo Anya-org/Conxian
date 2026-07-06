@@ -88,9 +88,6 @@
     (asserts! (> weighted-voter-power u0) (err ERR_UNAUTHORIZED))
 
     ;; Update activity score
-    (asserts! (unwrap! (contract-call? .conxian-access has-role tx-sender u1) (err ERR_UNAUTHORIZED))
-      (err ERR_UNAUTHORIZED)
-    )
     (let ((rep-update (contract-call? .reputation-engine update-activity-score
       tx-sender
     )))

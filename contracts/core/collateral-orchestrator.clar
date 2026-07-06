@@ -79,7 +79,7 @@
 ;; Admin
 (define-public (initialize (owner principal))
   (begin
-    (asserts! (is-eq tx-sender tx-sender) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (var-set contract-owner owner)
     (ok true)
   )

@@ -62,7 +62,7 @@
 ;; @returns (response bool uint)
 (define-public (initialize (admin principal))
   (begin
-    (asserts! (is-eq tx-sender tx-sender) (err ERR_NOT_AUTHORIZED))
+    (asserts! (is-eq tx-sender (var-get global-admin)) (err ERR_NOT_AUTHORIZED))
     (var-set global-admin admin)
     (ok true)
   )
