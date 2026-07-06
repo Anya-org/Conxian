@@ -117,7 +117,7 @@ path = "contracts/integrations/stubs/alex-reserve-pool.clar"
 clarity-version = 4
 
 [contracts.alex-adapter]
-path = "contracts/integrations/alex-adapter.clar"
+path = "contracts/integrations/simnet/alex-adapter.clar"
 clarity-version = 4
 depends_on = ["alex-reserve-pool", "alex-swap-helper", "conxian-csf-trait", "sip-standards"]
 

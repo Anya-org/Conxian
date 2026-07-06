@@ -118,7 +118,7 @@ plan:
     - transaction-type: emulated-contract-publish
       contract-name: alex-adapter
       emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
-      path: contracts/integrations/alex-adapter.clar
+      path: contracts/integrations/simnet/alex-adapter.clar
       clarity-version: 4
     - transaction-type: emulated-contract-publish
       contract-name: allocation-policy
