@@ -42,6 +42,7 @@ NON_PRODUCTION_DIRS = {
     "examples",
     "playground",
     "sandbox",
+    "simnet",
 }
 
 

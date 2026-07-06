@@ -18,7 +18,7 @@
 	path = Conxian
 	url = https://github.com/Conxian/Conxian.git
 	branch = main
-	
+	update = none
 	# Fixed: Conxian repo .gitmodules is now empty (no nested submodules).
 [submodule "conxius-platform"]
 	path = conxius-platform
