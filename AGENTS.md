@@ -162,6 +162,20 @@ curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
 | `GITLEAKS_LICENSE` | Gitleaks v8.24.2 full functionality | Add via GitHub → Settings → Secrets → Actions |
 | `CI_SUBMODULES_PAT` | Cross-repo submodule access | PAT with `repo` scope for `Conxian/*` repos |
 
+### Docker/ZSE Secret Patterns
+```yaml
+# ✅ Correct: Require env var
+POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD required}
+
+# ❌ Wrong: Hardcoded secret (triggers GitGuardian)
+POSTGRES_PASSWORD: conxian_dev
+```
+
+- Use `${VAR:?message}` syntax to require env vars
+- Use `${VAR:-default}` for optional env vars with defaults
+- Add `.env.example` template for developer onboarding
+- `.env` files are gitignored; never commit real secrets
+
 ### GitHub API Usage for Workflows
 ```bash
 # Get PR details
