@@ -281,6 +281,79 @@ vulnerabilities:
       affects: [pnpm-lock.yaml]
 ```
 
+---
+
+## 🔍 CodeQL Alerts (External Repos)
+
+```yaml
+codeql-alerts:
+  audit-date: "2026-07-08"
+  requires-attention: true
+  api-access: false  # Requires code Scanning API permissions
+
+  # HIGH SEVERITY - REQUIRES FIX
+  high:
+    - id: CSQL-H001
+      repo: Conxian
+      rule: "Clear-text logging of sensitive information"
+      file: "tests/hiro-api.test.ts:19"
+      action: "Remove sensitive data from logs"
+      
+    - id: CSQL-H002
+      repo: Conxian
+      rule: "DOM text reinterpreted as HTML"
+      file: "src/.../page.tsx:137"
+      action: "Sanitize output with DOMPurify/textContent"
+      
+    - id: CSQL-H003
+      repo: Conxian_UI
+      rule: "DOM text reinterpreted as HTML"
+      file: "src/.../page.tsx:137"
+      action: "Sanitize output with DOMPurify/textContent"
+
+  # MEDIUM SEVERITY - WORKFLOW PERMISSIONS
+  medium:
+    - id: CSQL-M001
+      repo: conxius-wallet
+      workflow: "secret-scan.yml"
+      action: "Add permissions: {contents: read}"
+      
+    - id: CSQL-M002
+      repo: conxius-wallet
+      workflow: "ci.yml"
+      action: "Add permissions: {contents: read}"
+      
+    - id: CSQL-M003
+      repo: conxius-wallet
+      workflow: "cleanup-artifacts.yml"
+      action: "Add permissions: {contents: read}"
+      
+    - id: CSQL-M004
+      repo: .github (Conxian org)
+      workflow: "standard-ci.yml"
+      action: "Add permissions block"
+      
+    - id: CSQL-M005
+      repo: conxian-nexus
+      workflow: "rust.yml"
+      action: "Add permissions block"
+
+  # FIX PATTERN
+  workflow-permissions-fix:
+    pattern: |
+      # Add at top of workflow YAML
+      permissions:
+        contents: read  # Or specific: actions: read, contents: read, etc.
+    example: |
+      name: CI
+      on: [push, pull_request]
+      permissions:
+        contents: read
+        actions: read
+      jobs:
+        ...
+```
+
 ### Temporal Dimension: Decision Log
 
 ```yaml
@@ -415,6 +488,13 @@ conxian-business
 
 ```yaml
 changelog:
+  - version: 2.2
+    date: 2026-07-08
+    changes:
+      - "Added CodeQL Alerts Registry"
+      - "Mapped alerts to submodules"
+      - "Added remediation patterns"
+
   - version: 2.1
     date: 2026-07-08
     changes:
