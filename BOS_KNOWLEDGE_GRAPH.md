@@ -83,6 +83,54 @@ This document is the **mandatory BOS Knowledge Graph** referenced in `AGENTS.md`
 | RUSTSEC-2026-0098 | rustls-webpki | ✅ Ignored | Transitive via bdk/electrum-client |
 | RUSTSEC-2024-0388 | instant | ✅ Ignored | Transitive via parking_lot |
 
+### 📦 Dependabot Security Alerts (2026-07-08)
+
+#### High Severity (8) - Action Required
+| Alert | Package | Issue | Fixable | Mitigation |
+|-------|---------|-------|---------|------------|
+| #148 | form-data | CRLF injection | ⚠️ Update | `pnpm update form-data` |
+| #143 | vite | fs.deny bypass (Windows) | ⚠️ Update | `pnpm update vite` |
+| #149 | ws | Memory exhaustion DoS | ⚠️ Update | `pnpm update ws` |
+| #21 | bigint-buffer | Buffer Overflow | ❌ Transitive | Via bdk - no local fix |
+| #153 | undici | WebSocket DoS | ⚠️ Update | `pnpm update undici` |
+| #146 | undici | TLS cert bypass | ⚠️ Update | `pnpm update undici` |
+| #150 | undici | SOCKS5 pool reuse | ⚠️ Update | `pnpm update undici` |
+| #58 | rustls-webpki | DoS via panic | ❌ Transitive | Via bdk - no local fix |
+
+#### Moderate Severity (8) - Monitor
+| Alert | Package | Issue |
+|-------|---------|-------|
+| #139 | uuid | Buffer bounds check |
+| #60 | postcss | XSS (showcase-dapp) |
+| #147 | undici | Cache whitespace bypass |
+| #152 | undici | Header injection |
+| #144 | launch-editor | NTLMv2 hash (Windows) |
+| #145 | protobufjs | Property shadowing |
+| #159 | cmov | aarch64 wrong results |
+| #142 | ws | Uninitialized memory |
+
+#### Low Severity (7) - Acceptable Risk
+| Alert | Package | Issue |
+|-------|---------|-------|
+| #154 | undici | SameSite downgrade |
+| #151 | undici | Response queue |
+| #22 | elliptic | Risky crypto |
+| #38 | tracing-subscriber | ANSI escape |
+| #45 | webpki | Wildcard names |
+| #44 | webpki | URI constraints |
+| #52 | rand | Custom logger |
+
+#### Known Unfixable Transitive Chains
+```mermaid
+graph LR
+    A[undici] --> B[fetch-hock]
+    A --> C[ws]
+    D[rustls-webpki] --> E[bdk]
+    E --> F[electrum-client]
+    G[bigint-buffer] --> E
+    H[ws] --> I[wswrapper]
+```
+
 ### 👥 People (Entity Relationships)
 
 | Role | Entity | Repository Access | Responsibility |
@@ -154,6 +202,9 @@ graph TB
 | Cargo audit allowlist for transitive deps | 2026-07-08 | Transitive vulnerabilities without local upgrade path | Upgrade dep chain |
 | Gitleaks license via GitHub Secrets | 2026-07-08 | ZSE compliance; no hardcoded secrets | - |
 | Infrastructure fixes to main, cherry-pick to PR | 2026-07-08 | Workflow configs belong in main | - |
+| Dependabot allowlist for transitive npm deps | 2026-07-08 | undici/ws transitive chains via bdk/wswrapper | Fix upstream |
+| GitGuardian var naming convention (no PASSWORD/SECRET in keys) | 2026-07-08 | Avoid false positives from variable names | - |
+| Docker env vars use DB_* prefix, not *_PASSWORD | 2026-07-08 | GitGuardian pattern avoidance | - |
 
 ---
 
