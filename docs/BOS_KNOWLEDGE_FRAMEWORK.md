@@ -1,7 +1,8 @@
 # Conxian BOS Knowledge Framework
 > **Agentic-First Multi-Dimensional Knowledge Architecture**
-> Version: 2.0 | Generated: 2026-07-08
+> Version: 2.1 | Generated: 2026-07-08
 > **Design**: Machine-ingestible, AI-first, structured patterns
+> **Upgradeable**: YES - See `## Knowledge Base Upgrade Guide`
 
 ---
 
@@ -414,6 +415,14 @@ conxian-business
 
 ```yaml
 changelog:
+  - version: 2.1
+    date: 2026-07-08
+    changes:
+      - "Added Upgrade Guide section"
+      - "Added Version Update Protocol"
+      - "Added Entity ID Sequences"
+      - "Upgradeable: YES"
+
   - version: 2.0
     date: 2026-07-08
     changes:
@@ -430,6 +439,89 @@ changelog:
       - "Multi-dimensional structure"
       - "Repository registry"
       - "Vulnerability registry"
+```
+
+---
+
+## 🔧 Knowledge Base Upgrade Guide
+
+### Adding New Entities
+
+```yaml
+# 1. Assign next ID in sequence
+# 2. Add to appropriate section
+# 3. Update version and changelog
+# 4. Add cross-references in relations
+
+# Example: New Repository
+repositories:
+  new-repo:
+    id: REPO-XXX  # Next available
+    type: <type>
+    owner: <owner>
+    # ... other fields
+    related: [<existing IDs>]
+    tags: [<searchable tags>]
+
+# Example: New Vulnerability
+vulnerabilities:
+  items:
+    - id: VULN-XXX  # H001-H999, M001-M999, L001-L999
+      alert: "#XXX"
+      pkg: <package>
+      ecosystem: <npm|cargo>
+      severity: <high|moderate|low>
+      fixable: <true|false>
+      fix: "<command if fixable>"
+      affects: [<affected files>]
+
+# Example: New Decision
+decisions:
+  - id: DEC-XXX  # Next sequence
+    date: <ISO8601>
+    topic: <topic>
+    decision: <decision>
+    rationale: <why>
+    status: <active|deprecated|superseded>
+    superseded-by: <DEC-XXX if applicable>
+```
+
+### Version Update Protocol
+
+```yaml
+upgrade-protocol:
+  trigger: "Any modification to knowledge base"
+  
+  steps:
+    1: "Increment version number"
+       - major: "Breaking changes to schema"
+       - minor: "New entities or sections"
+       - patch: "Corrections, typo fixes"
+       
+    2: "Update changelog"
+       - add: "{version, date, changes[]}"
+       
+    3: "Cross-reference new entities"
+       - update: "relations in related entities"
+       - add: "tags for discoverability"
+       
+    4: "Verify machine-readability"
+       - check: "YAML syntax valid"
+       - check: "IDs unique and sequential"
+       - check: "Dates in ISO8601"
+```
+
+### Entity ID Sequences
+
+```yaml
+id-sequences:
+  repositories: "REPO-001 to REPO-999"
+  vulnerabilities-high: "VULN-H001 to VULN-H999"
+  vulnerabilities-moderate: "VULN-M001 to VULN-M999"
+  vulnerabilities-low: "VULN-L001 to VULN-L999"
+  decisions: "DEC-001 to DEC-999"
+  secrets: "SEC-001 to SEC-999"
+  stakeholders: "STAKE-001 to STAKE-999"
 ```
 
 ---
