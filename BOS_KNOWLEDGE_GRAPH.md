@@ -1,5 +1,5 @@
 # Conxian Labs BOS Knowledge Graph
-> Clarity-version: 4 | Epoch: latest | Generated: 2026-07-06
+> Clarity-version: 4 | Epoch: latest | Generated: 2026-07-08
 
 ## Overview
 
@@ -62,6 +62,26 @@ This document is the **mandatory BOS Knowledge Graph** referenced in `AGENTS.md`
 | **SYI** | Sovereign Yield Index | Yield measurement | ✅ Designed |
 | **BitVM2** | Groth16 | L2 state verification | ⚠️ Stub |
 | **RGB** | Client-side | Asset validation | ⚠️ In progress |
+
+### 🔧 CI/CD & DevOps
+
+| Component | Technology | Purpose | Status |
+|-----------|------------|---------|--------|
+| **Gitleaks** | v8.24.2 | Secret scanning | ✅ Configured |
+| **cargo audit** | Rust advisory db | Dependency vulnerability scanning | ✅ Active |
+| **Conxian Unified CI** | GitHub Actions | Multi-suite test orchestration | ✅ Active |
+| **Secret Scan** | Gitleaks workflow | Pre-commit secret detection | ✅ Active |
+| **Branch Promotion Policy** | GitHub Actions | Enforce dev → staged → main flow | ✅ Active |
+
+### 🛡️ Vulnerability Allowlist (Cargo Audit)
+
+| RUSTSEC ID | Crate | Status | Rationale |
+|------------|-------|--------|------------|
+| RUSTSEC-2026-0204 | crossbeam-epoch | ✅ Ignored | Transitive via sled → bdk → electrum-client; no local upgrade path |
+| RUSTSEC-2026-0104 | (various) | ✅ Ignored | Transitive dep chain |
+| RUSTSEC-2026-0099 | rustls-webpki | ✅ Ignored | Transitive via bdk/electrum-client |
+| RUSTSEC-2026-0098 | rustls-webpki | ✅ Ignored | Transitive via bdk/electrum-client |
+| RUSTSEC-2024-0388 | instant | ✅ Ignored | Transitive via parking_lot |
 
 ### 👥 People (Entity Relationships)
 
@@ -131,6 +151,9 @@ graph TB
 | Dynamic principals from treasury | 2026-04-23 | Eliminate hardcoded SPOF | - |
 | TEE via conxius-enclave-sdk | 2026-04-23 | Hardware key isolation | - |
 | ISO 20022 via Conxian Gateway | 2026-04-23 | Legacy banking bridge | - |
+| Cargo audit allowlist for transitive deps | 2026-07-08 | Transitive vulnerabilities without local upgrade path | Upgrade dep chain |
+| Gitleaks license via GitHub Secrets | 2026-07-08 | ZSE compliance; no hardcoded secrets | - |
+| Infrastructure fixes to main, cherry-pick to PR | 2026-07-08 | Workflow configs belong in main | - |
 
 ---
 
