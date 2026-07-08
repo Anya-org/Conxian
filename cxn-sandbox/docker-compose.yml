@@ -5,9 +5,9 @@ services:
   db:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: conxian
-      POSTGRES_USER: conxian
-      POSTGRES_PASSWORD: conxian_dev
+      POSTGRES_DB: ${POSTGRES_DB:-conxian}
+      POSTGRES_USER: ${POSTGRES_USER:-conxian}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD required}
     ports:
       - "5432:5432"
     volumes:
@@ -39,8 +39,8 @@ services:
     ports:
       - "3001:3001"
     environment:
-      DATABASE_URL: postgres://conxian:conxian_dev@db:5432/conxian
-      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://${POSTGRES_USER:-conxian}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-conxian}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       STACKS_NETWORK: testnet
       RUST_LOG: info
     depends_on:
@@ -59,8 +59,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgres://conxian:conxian_dev@db:5432/conxian
-      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://${POSTGRES_USER:-conxian}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-conxian}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       NEXUS_URL: http://nexus:3001
       BITCOIN_RPC_URL: ${BITCOIN_RPC_URL:-https://bitcoin-testnet.publicnode.com}
       STACKS_NETWORK: testnet
