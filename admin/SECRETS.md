@@ -12,7 +12,7 @@ This file is intentionally kept as a stub so existing links continue to resolve.
 
 ## GitHub Secrets Inventory (metadata only — no secret values)
 
-Audited: 2026-06-04 | Source: `.github/workflows/*.yml` | Status: 7/17 configured
+Audited: 2026-07-08 | Source: `.github/workflows/*.yml` | Status: 8/18 configured
 
 | Secret | Used By | Status | Source Required |
 |---|---|---|---|
@@ -23,6 +23,7 @@ Audited: 2026-06-04 | Source: `.github/workflows/*.yml` | Status: 7/17 configure
 | `CONXIAN_INTERNAL_KEY_2` | internal workflows | ✅ Set | — |
 | `NEXUS_ADMIN_API_TOKEN` | conxian-nexus Admin API | ✅ Set | — |
 | `NOSTR_SECRET_KEY` | Nostr telemetry bridge | ✅ Set | — |
+| `GITLEAKS_LICENSE` | secret-scan workflow | ✅ Set | Gitleaks GitHub Action license key (enables full gitleaks v8.24.2 functionality) |
 | `CI_SUBMODULES_PAT` | ALL workflows (submodule checkout) | ❌ Missing | GitHub PAT with `repo` scope for `Conxian/*` org repos; fallback `github.token` has limited cross-org scope |
 | `APP_PRIVATE_KEY` | Gemini AI workflows | ❌ Missing | GitHub App private key (PEM); created in GitHub App settings |
 | `GEMINI_API_KEY` | Gemini AI workflows | ❌ Missing | Google AI Studio API key |
