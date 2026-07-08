@@ -1,6 +1,28 @@
 # Conxian AGENTS.md
 
 ## BOS Operational Standards
+> **Framework**: Multi-Dimensional ITIL5-Aligned Knowledge Architecture
+> **Version**: 1.0 (2026-07-08)
+> **Reference**: `docs/BOS_KNOWLEDGE_FRAMEWORK.md`
+
+---
+
+### Multi-Dimensional Query Lens
+
+When approaching any task, analyze through these dimensions:
+
+| Dimension | Question | Framework Section |
+|-----------|----------|-------------------|
+| **Spatial** | Where in the system? | Repository → Component |
+| **Temporal** | When in the lifecycle? | Phase → Quarter → Decision |
+| **Relational** | Who/what is connected? | Stakeholders → Dependencies |
+| **Logical** | Why was this decided? | Decision Registry |
+| **Security** | What's the risk exposure? | Vulnerability Registry |
+| **Operational** | How does it execute? | CI/CD → Deploy |
+
+---
+
+## BOS Operational Standards
 > clarity-version: 4
 > epoch: latest
 
@@ -129,9 +151,10 @@ When generating code, documentation, or marketing copy, you **must**:
 
 ---
 
-## CI/CD Auto-Resolution Patterns
+## CI/CD Auto-Resolution Patterns (Multi-Dimensional)
 
-### Workflow Diagnostic Command
+### Operational Dimension: Diagnostic Commands
+
 ```bash
 # Get PR checks status via GitHub CLI
 gh pr checks <PR_NUMBER> --repo Conxian/conxian-business
@@ -145,16 +168,17 @@ curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
   | jq '.workflow_runs[] | {name, head_branch, status, conclusion, html_url}'
 ```
 
-### Common CI Failures & Auto-Fix Patterns
+### Logical Dimension: Failure → Resolution Mapping
 
-| Failure Type | Detection | Resolution |
-|-------------|----------|------------|
-| **RUSTSEC vulnerability in transitive deps** | `cargo audit` failure, RUSTSEC-XXXX in output | Add `--ignore RUSTSEC-XXXX` to `.github/workflows/conxian-unified-ci.yml` cargo audit command |
-| **Branch promotion policy** | `PRs into 'X' must come from 'Y'` error | Verify PR target branch is correct; PRs must flow: feature → dev → staged → main |
-| **PR body missing checklist** | Body validation error in workflow | Add required checklist section to PR description |
-| **Submodule pin drift** | `verify_submodule_integrity.py` failure | Update submodule SHA in `.gitmodules` and push |
-| **GITLEAKS_LICENSE missing** | OSS fallback notice in logs | Secret not set in GitHub repo; user must add via Settings → Secrets |
-| **Dependabot vulnerability** | GitHub Security advisories | Run `pnpm update <package>` or add to allowlist |
+| Failure Type | Detection (What) | Resolution (How) | Spatial (Where) |
+|-------------|------------------|------------------|-----------------|
+| **RUSTSEC vulnerability (transitive)** | `cargo audit` failure, RUSTSEC-XXXX | Add `--ignore RUSTSEC-XXXX` to CI workflow | `.github/workflows/conxian-unified-ci.yml` |
+| **Branch promotion policy** | `PRs into 'X' must come from 'Y'` | Verify target: feature → dev → staged → main | PR base branch |
+| **PR body missing checklist** | Body validation error | Add required checklist per `docs/PROMOTION_CHECKLISTS.md` | PR description |
+| **Submodule pin drift** | `verify_submodule_integrity.py` failure | Update `.gitmodules` SHA | `.gitmodules` |
+| **GITLEAKS_LICENSE missing** | OSS fallback notice | User adds via GitHub → Settings → Secrets | GitHub Actions secrets |
+| **Dependabot vulnerability (fixable)** | Security advisory | `pnpm update <package>` | `pnpm-lock.yaml` |
+| **Dependabot vulnerability (transitive)** | Security advisory, no patch | Add to allowlist with rationale | `dependabot.yml` |
 
 ### Dependabot Vulnerability Triage
 

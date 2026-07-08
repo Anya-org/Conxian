@@ -1,5 +1,24 @@
 # Dependabot configuration for GitHub Actions and ecosystem management
 # Enforces automated security and version updates for standard workspace integrations
+#
+# SECURITY POSTURE (2026-07-08)
+# =============================
+# Open vulnerabilities: 23 (8 High, 8 Moderate, 7 Low)
+#
+# Fixable: 11 (via pnpm update)
+# - undici (6), ws (2), form-data (1), vite (1), postcss (1)
+#
+# Unfixable transitive: 12 (documented in BOS_KNOWLEDGE_FRAMEWORK.md)
+# - rustls-webpki → bdk chain
+# - bigint-buffer → bdk chain
+# - crossbeam-epoch → sled chain
+# - Others (monitor upstream)
+#
+# See: docs/BOS_KNOWLEDGE_FRAMEWORK.md for full vulnerability registry
+#
+# Vulnerability allowlist management:
+# - GitHub UI: Settings → Security → Dependabot → Alert rules
+# - Or: Dismiss with reason "Acceptable risk"
 
 version: 2
 updates:
