@@ -1,98 +1,128 @@
 # Conxian BOS Knowledge Framework
-> **ITIL5-Aligned Multi-Dimensional Knowledge Architecture**
-> Version: 1.0 | Generated: 2026-07-08
+> **Agentic-First Multi-Dimensional Knowledge Architecture**
+> Version: 2.0 | Generated: 2026-07-08
+> **Design**: Machine-ingestible, AI-first, structured patterns
 
 ---
 
-## 🎯 Framework Philosophy
+## 🎯 Agentic Design Principles
 
-This knowledge base follows **ITIL5 Service Value Chain** principles:
-- **Value** over documentation
-- **Outcomes** over processes
-- **Stakeholders** at the center
-- **Multi-dimensional** views for different purposes
+This knowledge base is designed for **AI consumption and autonomous action**:
 
-### Multi-Dimensional Lens
-
-| Dimension | Purpose | Key Questions |
-|-----------|---------|--------------|
-| **Spatial** | Repository structure | Where is it? What's the blast radius? |
-| **Temporal** | Lifecycle & history | When? What's the timeline? |
-| **Relational** | Dependencies & stakeholders | Who owns it? What depends on it? |
-| **Logical** | Decision & reasoning | Why? What's the rationale? |
-| **Security** | Risk & compliance | Is it safe? What's the exposure? |
-| **Operational** | CI/CD & execution | How does it run? |
+1. **Structured over Prose** - YAML/JSON tables, not paragraphs
+2. **Actionable Patterns** - IF conditions → THEN actions
+3. **Versioned Entries** - Every entity has `created`, `updated`, `version`
+4. **Cross-Referenced** - Links between related entities
+5. **Query-First** - Questions map directly to sections
 
 ---
 
-## 🏢 Entity Registry (By Dimension)
+### Query → Section Mapping
 
-### Spatial Dimension: Repositories
+| Agent Question | Section |
+|----------------|---------|
+| "How do I fix CI failure?" | `## ci-failures` |
+| "What secrets exist?" | `## secrets` |
+| "Who owns this?" | `## stakeholders` |
+| "Why was this decided?" | `## decisions` |
+| "What's vulnerable?" | `## vulnerabilities` |
+| "How do I deploy?" | `## deployments` |
+
+---
+
+## Entity Schema (Machine-Readable)
+
+All entities follow this schema:
+
+```yaml
+entity:
+  id: string           # Unique identifier (e.g., "SEC-001")
+  type: string         # Entity type (repository, decision, vulnerability)
+  name: string         # Human-readable name
+  version: semver      # Schema version
+  created: ISO8601      # Creation date
+  updated: ISO8601      # Last update
+  status: enum         # active | deprecated | superseded
+  tags: [string]       # Searchable tags
+  relations: [object]   # Links to other entities
+  data: object         # Type-specific payload
+```
+
+---
+
+## 📦 Repositories
 
 ```yaml
 repositories:
   conxian-business:
+    id: REPO-001
     type: knowledge-ops
     owner: Conxian-Labs
     visibility: public
-    language: Mixed (MD, TS, Rust, Clarity)
+    language: Mixed
     purpose: "Business ops, governance, AGENTS.md"
-    relationships:
-      - type: contains
-        target: conxian-nexus
-      - type: contains
-        target: conxian-gateway
-      - type: references
-        target: lib-conxian-core
+    related: [REPO-002, REPO-003, REPO-007]
+    tags: [knowledge-base, governance, ci-cd]
 
   conxian-nexus:
+    id: REPO-002
     type: protocol-core
     owner: Conxian-Labs
     visibility: public
     language: Clarity/Rust
-    purpose: "Settlement layer, DAO treasury operations"
-    relationships:
-      - type: depends-on
-        target: lib-conxian-core
+    purpose: "Settlement layer, treasury operations"
+    related: [REPO-007]
+    tags: [protocol, clarity, dao]
 
   conxian-gateway:
+    id: REPO-003
     type: protocol-bridge
     owner: Conxian-Labs
-    visibility: public  
+    visibility: public
     language: Rust
-    purpose: "ISO 20022 bridge, Bitcoin/Stacks integration"
-    relationships:
-      - type: depends-on
-        target: lib-conxian-core
+    purpose: "ISO 20022 bridge, Bitcoin/Stacks"
+    related: [REPO-007]
+    tags: [protocol, bridge, rust]
 
   conxius-wallet:
+    id: REPO-004
     type: client-facing
     owner: Conxian-Labs
     visibility: private
     language: TypeScript
-    purpose: "Android wallet, sovereign key management"
+    purpose: "Android wallet, key management"
+    tags: [wallet, mobile, tpm]
 
   conxius-platform:
+    id: REPO-005
     type: developer-tool
     owner: Conxian-Labs
     visibility: private
     language: TypeScript
-    purpose: "Developer orchestration, deployment tooling"
+    purpose: "Dev orchestration"
+    tags: [developer, deployment]
 
   conxius-enclave-sdk:
+    id: REPO-006
     type: security-module
     owner: Conxian-Labs
     visibility: public
     language: Rust/WASM
-    purpose: "TEE abstraction, hardware key isolation"
+    purpose: "TEE abstraction"
+    tags: [security, tee, enclave]
 
   lib-conxian-core:
+    id: REPO-007
     type: shared-library
     owner: Conxian-Labs
     visibility: public
     language: Rust
-    purpose: "Crypto primitives, ZKC, SYI foundations"
+    purpose: "Crypto primitives, ZKC, SYI"
+    tags: [library, crypto, rust]
+    consumers: [REPO-002, REPO-003]
 ```
+
+---
 
 ### Relational Dimension: Stakeholders
 
@@ -126,28 +156,128 @@ stakeholders:
 ### Security Dimension: Vulnerability Registry
 
 ```yaml
-vulnerability-registry:
-  last-audited: 2026-07-08
-  total-open: 23
+vulnerabilities:
+  audit-date: "2026-07-08"
+  version: "1.0"
   
-  by-severity:
+  summary:
+    total: 23
     high: 8
     moderate: 8
     low: 7
-
-  by-fixability:
     fixable: 11
-      packages:
-        - undici (6 alerts)
-        - ws (2 alerts)
-        - form-data (1 alert)
-        - vite (1 alert)
-        - postcss (1 alert)
-    unfixable-transitive: 12
-      chains:
-        - rustls-webpki → bdk → electrum-client
-        - bigint-buffer → bdk
-        - crossbeam-epoch → sled → bdk
+    unfixable: 12
+
+  # ACTIONABLE: IF vulnerability THEN action
+  rules:
+    - IF: "severity == high AND fixable == true"
+      THEN: "pnpm update <package> OR add to PR checklist"
+      
+    - IF: "severity == high AND fixable == false"
+      THEN: "Check decision DEC-002; if not covered, add to allowlist"
+      
+    - IF: "transitive == true AND chain contains 'bdk'"
+      THEN: "Monitor bdk upstream; add to DEC-002"
+      
+    - IF: "severity == moderate"
+      THEN: "Add to monitor list; fix in next sprint"
+      
+    - IF: "severity == low"
+      THEN: "Acceptable risk; document in vulnerability section"
+
+  # HIGH SEVERITY - REQUIRES ACTION
+  high:
+    - id: VULN-H001
+      alert: "#148"
+      pkg: form-data
+      ecosystem: npm
+      fixable: true
+      fix: "pnpm update form-data"
+      affects: [pnpm-lock.yaml]
+
+    - id: VULN-H002
+      alert: "#143"
+      pkg: vite
+      ecosystem: npm
+      fixable: true
+      fix: "pnpm update vite"
+      affects: [pnpm-lock.yaml]
+
+    - id: VULN-H003
+      alert: "#149"
+      pkg: ws
+      ecosystem: npm
+      fixable: true
+      fix: "pnpm update ws"
+      affects: [pnpm-lock.yaml]
+
+    - id: VULN-H004
+      alert: "#21"
+      pkg: bigint-buffer
+      ecosystem: npm
+      fixable: false
+      reason: "Transitive via bdk"
+      chain: "bdk -> bigint-buffer"
+      decision: DEC-002
+      affects: [Cargo.lock]
+
+    - id: VULN-H005
+      alert: "#153"
+      pkg: undici
+      ecosystem: npm
+      fixable: true
+      fix: "pnpm update undici"
+      affects: [pnpm-lock.yaml]
+
+    - id: VULN-H006
+      alert: "#146"
+      pkg: undici
+      ecosystem: npm
+      fixable: true
+      fix: "pnpm update undici"
+      affects: [pnpm-lock.yaml]
+
+    - id: VULN-H007
+      alert: "#150"
+      pkg: undici
+      ecosystem: npm
+      fixable: true
+      fix: "pnpm update undici"
+      affects: [pnpm-lock.yaml]
+
+    - id: VULN-H008
+      alert: "#58"
+      pkg: rustls-webpki
+      ecosystem: cargo
+      fixable: false
+      reason: "Transitive via bdk -> electrum-client"
+      chain: "bdk -> electrum-client -> rustls-webpki"
+      decision: DEC-002
+      affects: [Cargo.lock]
+
+  # MODERATE SEVERITY - MONITOR
+  moderate:
+    - id: VULN-M001
+      alert: "#139"
+      pkg: uuid
+      ecosystem: npm
+      affects: [pnpm-lock.yaml]
+
+    - id: VULN-M002
+      alert: "#60"
+      pkg: postcss
+      ecosystem: npm
+      fixable: true
+      fix: "pnpm update postcss"
+      affects: [showcase-dapp/package-lock.json]
+
+  # LOW SEVERITY - ACCEPTABLE RISK
+  low:
+    - id: VULN-L001
+      alert: "#154"
+      pkg: undici
+      ecosystem: npm
+      affects: [pnpm-lock.yaml]
 ```
 
 ### Temporal Dimension: Decision Log
@@ -282,13 +412,67 @@ conxian-business
 
 ## 🔄 Change Log
 
-| Date | Entity | Change | Rationale |
-|------|--------|--------|-----------|
-| 2026-07-08 | BOS_KNOWLEDGE_FRAMEWORK | Created | Multi-dimensional architecture |
-| 2026-07-08 | vulnerability-registry | Updated | 23 open alerts documented |
-| 2026-07-08 | DEC-002 | Added | Vulnerability allowlist decision |
+```yaml
+changelog:
+  - version: 2.0
+    date: 2026-07-08
+    changes:
+      - "Agentic-first redesign"
+      - "Added IF-THEN action rules"
+      - "Expanded vulnerability registry"
+      - "Added Query -> Section mapping"
+      - "Machine-readable schema"
+
+  - version: 1.0
+    date: 2026-07-08
+    changes:
+      - "Initial framework"
+      - "Multi-dimensional structure"
+      - "Repository registry"
+      - "Vulnerability registry"
+```
+
+---
+
+## 📋 Agent Checklist Template
+
+When processing any task, agents should:
+
+```yaml
+agent-checklist:
+  spatial:
+    - Identify affected repository (REPO-XXX)
+    - Check blast radius (what depends on this?)
+    - Map file locations
+
+  temporal:
+    - Check decision log (DEC-XXX) for prior decisions
+    - Note creation/update dates
+    - Verify version compatibility
+
+  relational:
+    - Identify stakeholder (Conxian-Labs vs Conxian.org)
+    - Check dependency chains
+    - Note cross-repo impacts
+
+  logical:
+    - Retrieve decision rationale
+    - Verify against operational standards
+    - Check for superseding decisions
+
+  security:
+    - Scan vulnerability registry
+    - Check for fixable vulnerabilities
+    - Verify allowlist compliance
+
+  operational:
+    - Run appropriate CI checks
+    - Follow commit protocol
+    - Cherry-pick to PR branches if needed
+```
 
 ---
 
 *This document is the authoritative source for multi-dimensional knowledge.*
 *Use for: diff, inspection, research, implementation, verification*
+*AI-Ingestible: YES | Machine-Readable: YES | Versionable: YES*
