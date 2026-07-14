@@ -2,8 +2,30 @@
 
 ## BOS Operational Standards
 > **Framework**: Multi-Dimensional ITIL5-Aligned Knowledge Architecture
-> **Version**: 1.0 (2026-07-08)
+> **Version**: 1.1 (2026-07-14)
 > **Reference**: `docs/BOS_KNOWLEDGE_FRAMEWORK.md`
+
+---
+
+### Session Initialization Protocol (SIP)
+
+Every session **MUST** begin with full environment initialization:
+
+```bash
+# 1. Ensure on dev branch with latest BOS state
+git checkout dev && git pull origin dev
+
+# 2. Sync all submodules to latest pinned commits
+git submodule update --init --recursive
+
+# 3. Verify submodule health
+git submodule status
+```
+
+**Why this matters:**
+- Submodules drift between sessions; stale pins cause CI failures
+- `conxian-business` gates CI on submodule pin freshness
+- The pinned gitlinks are the **authoritative portfolio state**
 
 ---
 

@@ -1,0 +1,131 @@
+name: Session Initialization
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_pull:
+        description: 'Force pull latest from all remotes'
+        required: false
+        default: 'false'
+        type: boolean
+      target_branch:
+        description: 'Target branch to sync'
+        required: false
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - main
+          - staged
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  initialize-submodules:
+    name: Sync Submodules & Environment
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CI_SUBMODULES_PAT }}
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "openhands@all-hands.dev"
+          git config --local user.name "OpenHands Agent"
+          git config --local push.default simple
+
+      - name: Display current state
+        run: |
+          echo "Current branch: $(git branch --show-current)"
+          echo "Submodule status before:"
+          git submodule status
+
+      - name: Sync to target branch
+        run: |
+          TARGET_BRANCH="${{ inputs.target_branch }}"
+          echo "Switching to $TARGET_BRANCH..."
+          git fetch origin "$TARGET_BRANCH"
+          git checkout "$TARGET_BRANCH"
+          if [ "${{ inputs.force_pull }}" == "true" ]; then
+            echo "Force pulling..."
+            git reset --hard "origin/$TARGET_BRANCH"
+          fi
+
+      - name: Initialize all submodules
+        run: |
+          echo "Initializing submodules..."
+          git submodule update --init --recursive
+          echo ""
+          echo "Submodule status after:"
+          git submodule status
+
+      - name: Check for submodule updates
+        id: check_updates
+        run: |
+          echo "Checking for updates..."
+          git submodule foreach 'git fetch origin $(git rev-parse --abbrev-ref HEAD) 2>/dev/null || true'
+          
+          BEHIND=0
+          for sm in $(git submodule status | awk '{print $2}'); do
+            if [ "$sm" != "Conxian" ]; then
+              cd "$sm"
+              git fetch origin 2>/dev/null || true
+              LOCAL=$(git rev-parse HEAD)
+              REMOTE=$(git rev-parse origin/$(git rev-parse --abbrev-ref HEAD) 2>/dev/null) || REMOTE=$LOCAL
+              if [ "$LOCAL" != "$REMOTE" ]; then
+                BEHIND=$((BEHIND + 1))
+                echo "📦 $sm has updates"
+              fi
+              cd - > /dev/null
+            fi
+          done
+          echo "updates_available=$BEHIND" >> $GITHUB_OUTPUT
+
+      - name: Summary
+        run: |
+          echo ""
+          echo "=========================================="
+          echo "Session Initialization Summary"
+          echo "=========================================="
+          echo "Branch: ${{ inputs.target_branch }}"
+          echo "Force Pull: ${{ inputs.force_pull }}"
+          echo "Updates Available: ${{ steps.check_updates.outputs.updates_available }}"
+          echo ""
+          echo "Submodules:"
+          git submodule status
+          echo ""
+          echo "✅ Initialization complete"
+
+      - name: Create PR if updates available
+        if: steps.check_updates.outputs.updates_available > 0 && inputs.target_branch == 'dev'
+        run: |
+          echo "Creating PR for submodule updates..."
+          git checkout -b chore/sync-submodules-$(date +%Y%m%d)
+          git add -A
+          git commit -m "chore: sync submodules
+
+Automated submodule synchronization
+
+Updated by session-initialization workflow"
+          git push origin HEAD -f
+          
+          gh pr create \
+            --title "chore: sync submodules $(date +%Y-%m-%d)" \
+            --body "Automated submodule sync via Session Initialization Protocol
+
+This PR updates all submodules to their latest commits on the dev branch.
+
+Updates available: ${{ steps.check_updates.outputs.updates_available }}
+
+_This PR was created by the Session Initialization workflow._" \
+            --base dev \
+            --label "automated,chore"
+          echo ""
+          echo "✅ PR created"
