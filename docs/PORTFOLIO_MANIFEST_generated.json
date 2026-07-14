@@ -1,0 +1,267 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Conxian Portfolio Manifest",
+  "description": "Machine-readable portfolio manifest for BOS submodules",
+  "version": "1.0.0",
+  "lastUpdated": "2026-07-14T10:58:57.757339+00:00",
+  "metadata": {
+    "generated": "2026-07-14T10:58:57.757354+00:00",
+    "generator": "scripts/generate_portfolio_manifest.py",
+    "source-of-truth": ".gitmodules"
+  },
+  "submodules": [
+    {
+      "path": "conxian-gateway",
+      "url": "https://github.com/Conxian/conxian-gateway",
+      "branch": "main",
+      "category": "primary strategic",
+      "businessUnit": "Fusion",
+      "updatePolicy": "checkout",
+      "dependencies": [
+        "Conxian",
+        "lib-conxian-core",
+        "conxian-nexus"
+      ],
+      "pinned": {
+        "sha": "2d7a517c289fac42e82b3b263ea48c5d939cd026",
+        "pinnedAt": "2026-07-14T10:58:57.759616+00:00",
+        "pinnedBy": "conxian-business CI"
+      },
+      "consumers": [
+        "conxius-wallet",
+        "conxian-ui",
+        "conxius-platform",
+        "conxian-market"
+      ]
+    },
+    {
+      "path": "conxius-wallet",
+      "url": "https://github.com/Conxian/conxius-wallet",
+      "branch": "main",
+      "category": "primary strategic",
+      "businessUnit": "Conxius",
+      "updatePolicy": "checkout",
+      "dependencies": [
+        "conxius-enclave-sdk",
+        "conxian-gateway"
+      ],
+      "pinned": {
+        "sha": "9772009c93363ed8ccd3ea105d2b6ebb9f113cc4",
+        "pinnedAt": "2026-07-14T10:58:57.761609+00:00",
+        "pinnedBy": "conxian-business CI"
+      },
+      "consumers": [
+        "conxius-platform"
+      ]
+    },
+    {
+      "path": "conxian-nexus",
+      "url": "https://github.com/Conxian/conxian-nexus",
+      "branch": "main",
+      "category": "primary strategic",
+      "businessUnit": "Nexus",
+      "updatePolicy": "checkout",
+      "dependencies": [
+        "Conxian",
+        "lib-conxian-core"
+      ],
+      "pinned": {
+        "sha": "e1aeb305ab945ec98308cdcba1509b214910e909",
+        "pinnedAt": "2026-07-14T10:58:57.763465+00:00",
+        "pinnedBy": "conxian-business CI"
+      },
+      "consumers": [
+        "conxian-gateway",
+        "conxian-ui",
+        "conxius-platform",
+        "conxian-market"
+      ]
+    },
+    {
+      "path": "conxian-ui",
+      "url": "https://github.com/Conxian/Conxian_UI",
+      "branch": "main",
+      "category": "supporting",
+      "businessUnit": "Operating",
+      "updatePolicy": "checkout",
+      "dependencies": [
+        "conxian-gateway",
+        "conxian-nexus"
+      ],
+      "pinned": {
+        "sha": "21bf5991ad93672d5b1115692a9323d4d5034ce0",
+        "pinnedAt": "2026-07-14T10:58:57.765300+00:00",
+        "pinnedBy": "conxian-business CI"
+      },
+      "consumers": []
+    },
+    {
+      "path": "Conxian",
+      "url": "https://github.com/Conxian/Conxian.git",
+      "branch": "main",
+      "category": "primary strategic",
+      "businessUnit": "CSF",
+      "updatePolicy": "none",
+      "dependencies": [],
+      "pinned": {
+        "sha": "051cbb7fc2a9a643fb991908a64e1df983831444",
+        "pinnedAt": "2026-07-14T10:58:57.767148+00:00",
+        "pinnedBy": "conxian-business CI"
+      },
+      "consumers": [
+        "conxian-gateway",
+        "conxian-nexus",
+        "conxius-platform",
+        "conxius-orbit"
+      ]
+    },
+    {
+      "path": "conxius-platform",
+      "url": "https://github.com/Conxian/conxius-platform",
+      "branch": "main",
+      "category": "supporting",
+      "businessUnit": "Conxius",
+      "updatePolicy": "checkout",
+      "dependencies": [
+        "Conxian",
+        "conxian-gateway",
+        "conxian-nexus",
+        "conxius-wallet"
+      ],
+      "pinned": {
+        "sha": "70dfa0d5916e10e1c570ad8c3db52750dd0a43c6",
+        "pinnedAt": "2026-07-14T10:58:57.769045+00:00",
+        "pinnedBy": "conxian-business CI"
+      },
+      "consumers": []
+    },
+    {
+      "path": "conxius-orbit",
+      "url": "https://github.com/Conxian/conxius-orbit",
+      "branch": "main",
+      "category": "supporting",
+      "businessUnit": "Conxius",
+      "updatePolicy": "checkout",
+      "dependencies": [
+        "Conxian"
+      ],
+      "pinned": {
+        "sha": "d4843b4ad265a049235001967210d1c0ee5c21c0",
+        "pinnedAt": "2026-07-14T10:58:57.770873+00:00",
+        "pinnedBy": "conxian-business CI"
+      },
+      "consumers": []
+    },
+    {
+      "path": "conxian-labs-site",
+      "url": "https://github.com/Conxian/conxian-labs-site",
+      "branch": "main",
+      "category": "reference",
+      "businessUnit": "Operating",
+      "updatePolicy": "checkout",
+      "dependencies": [],
+      "pinned": {
+        "sha": "b36df0b3ba1522f68b3fee36a0999732b8a7f7a2",
+        "pinnedAt": "2026-07-14T10:58:57.772665+00:00",
+        "pinnedBy": "conxian-business CI"
+      },
+      "consumers": []
+    },
+    {
+      "path": "conxius-enclave-sdk",
+      "url": "https://github.com/Conxian/conxius-enclave-sdk",
+      "branch": "master",
+      "category": "supporting",
+      "businessUnit": "Conxius",
+      "updatePolicy": "checkout",
+      "dependencies": [
+        "lib-conxian-core"
+      ],
+      "pinned": {
+        "sha": "600f9760ae98a620723f12418b4ca885ae9afc10",
+        "pinnedAt": "2026-07-14T10:58:57.774610+00:00",
+        "pinnedBy": "conxian-business CI"
+      },
+      "consumers": [
+        "conxius-wallet"
+      ]
+    },
+    {
+      "path": "lib-conxian-core",
+      "url": "https://github.com/Conxian/lib-conxian-core",
+      "branch": "main",
+      "category": "supporting",
+      "businessUnit": "Operating",
+      "updatePolicy": "checkout",
+      "dependencies": [],
+      "pinned": {
+        "sha": "05e1d3fb6b424ee5fa3ed67a3da0a0bc7a68d550",
+        "pinnedAt": "2026-07-14T10:58:57.776517+00:00",
+        "pinnedBy": "conxian-business CI"
+      },
+      "consumers": [
+        "conxian-gateway",
+        "conxian-nexus",
+        "conxius-enclave-sdk",
+        "conxian-market"
+      ]
+    },
+    {
+      "path": "conxian-market",
+      "url": "https://github.com/Conxian/conxian_market",
+      "branch": "main",
+      "category": "primary strategic",
+      "businessUnit": "Nexus",
+      "updatePolicy": "checkout",
+      "dependencies": [
+        "conxian-gateway",
+        "conxian-nexus",
+        "lib-conxian-core"
+      ],
+      "pinned": {
+        "sha": "85e6caa4bce441850c3de35e5bfd570766a978b6",
+        "pinnedAt": "2026-07-14T10:58:57.778399+00:00",
+        "pinnedBy": "conxian-business CI"
+      },
+      "consumers": []
+    }
+  ],
+  "businessUnits": [
+    {
+      "name": "CSF",
+      "submodules": [
+        "Conxian"
+      ]
+    },
+    {
+      "name": "Conxius",
+      "submodules": [
+        "conxius-wallet",
+        "conxius-platform",
+        "conxius-orbit",
+        "conxius-enclave-sdk"
+      ]
+    },
+    {
+      "name": "Fusion",
+      "submodules": [
+        "conxian-gateway"
+      ]
+    },
+    {
+      "name": "Nexus",
+      "submodules": [
+        "conxian-nexus",
+        "conxian-market"
+      ]
+    },
+    {
+      "name": "Operating",
+      "submodules": [
+        "conxian-ui",
+        "conxian-labs-site",
+        "lib-conxian-core"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Conxian Portfolio Manifest",
+  "description": "Machine-readable portfolio manifest for BOS submodules",
+  "version": "1.0.0",
+  "lastUpdated": "2026-07-14",
+  "type": "object",
+  "required": ["submodules", "metadata"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["generated", "generator"],
+      "properties": {
+        "generated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "generator": {
+          "type": "string"
+        },
+        "source-of-truth": {
+          "type": "string",
+          "enum": [".gitmodules", "gitlinks"]
+        }
+      }
+    },
+    "submodules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/submodule"
+      },
+      "minItems": 1
+    },
+    "businessUnits": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/businessUnit"
+      }
+    }
+  },
+  "definitions": {
+    "submodule": {
+      "type": "object",
+      "required": ["path", "url", "branch", "category"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Relative path in parent repo"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Git remote URL"
+        },
+        "branch": {
+          "type": "string",
+          "description": "Tracking branch"
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "primary strategic",
+            "supporting",
+            "reference",
+            "internal strategy",
+            "governance baseline"
+          ]
+        },
+        "businessUnit": {
+          "type": "string",
+          "enum": ["Conxius", "CSF", "Fusion", "Nexus", "Operating"]
+        },
+        "updatePolicy": {
+          "type": "string",
+          "enum": ["checkout", "rebase", "merge", "none"],
+          "default": "checkout"
+        },
+        "pinned": {
+          "type": "object",
+          "description": "Pinned gitlink state",
+          "properties": {
+            "sha": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{40}$"
+            },
+            "pinnedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "pinnedBy": {
+              "type": "string"
+            }
+          }
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Paths of upstream submodules"
+        },
+        "consumers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Paths of downstream submodules"
+        },
+        "exposes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/exposedInterface"
+          }
+        }
+      }
+    },
+    "exposedInterface": {
+      "type": "object",
+      "required": ["name", "type"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["api", "contract", "cli", "sdk"]
+        },
+        "version": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "businessUnit": {
+      "type": "object",
+      "required": ["name", "market", "obligations"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "market": {
+          "type": "string",
+          "enum": ["B2C", "Protocol", "B2B/B2G", "State"]
+        },
+        "obligations": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "submodules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
