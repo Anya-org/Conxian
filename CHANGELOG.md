@@ -10,6 +10,28 @@ Release note and changelog guidance lives in [docs/RELEASE_NOTES_AND_CHANGELOG.m
 ## [Unreleased]
 
 ### Added
+- **Context Synchronization Protocol (CSP v1.2):** Added comprehensive 5-phase protocol for full context sync at session start:
+  - Phase 1: Core BOS Sync (dev branch + pull)
+  - Phase 2: Submodule Synchronization (12 submodules)
+  - Phase 3: Cross-Repo Context Pull (conxian_ui, etc.)
+  - Phase 4: Knowledge Graph Refresh (transparency_custodian)
+  - Phase 5: Sub-Context Verification (divergence checks)
+- **conxian-market submodule:** Added AI settlement core as new portfolio submodule.
+- **Session Initialization Script:** Added `scripts/init_session.sh` with colored output and flags (`--full`, `--verify`, `--kg`, `--force-pull`).
+- **GitHub Actions Workflow:** Added `.github/workflows/session-initialization.yml` for manual session initialization.
+- **BOS Knowledge Graph Updated:** Added conxian-market to repos table and relationship graph.
+
+### Changed
+- **PORTFOLIO_BUSINESS_UNIT_MAP.md:** Added conxian-market as `primary strategic`.
+- **REPO_PORTFOLIO.md:** Updated flagship repos to include conxian-market, conxian-nexus.
+- **SPEC.md CON-383:** Marked as completed with full verification table.
+
+### Fixed
+- **BOS_KNOWLEDGE_GRAPH.md:** Updated generated date to 2026-07-14, added conxian-market decisions, updated relationship graph.
+
+## [1.9.5] - 2026-07-14
+
+### Added
 - **Cross-Issue Boundary & Doctrine Sprint — 6 artifacts delivered**:
   - **#825**: Created `docs/BOUNDARY_DECISION_LOG.md` — systematic boundary register for all public-safe vs internal-only artifacts. Classifies 20+ artifacts across strategy, BOS state, architecture, bounties, and CI/CD.
   - **#830**: Created `docs/TRUST_AND_READINESS_VERIFICATION.md` — evaluator-facing trust audit of 5 flagship repos against implementation truth. Separates implemented, verified, production-ready, and target-state. Defines explicit non-claim boundary.

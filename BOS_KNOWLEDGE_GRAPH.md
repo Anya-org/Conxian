@@ -1,5 +1,5 @@
 # Conxian Labs BOS Knowledge Graph
-> Clarity-version: 4 | Epoch: latest | Generated: 2026-07-08
+> Clarity-version: 4 | Epoch: latest | Generated: 2026-07-14
 
 ## Overview
 
@@ -22,9 +22,10 @@ This document is the **mandatory BOS Knowledge Graph** referenced in `AGENTS.md`
 | Entity | GitHub | Language | Focus | Status |
 |--------|--------|----------|-------|--------|
 | `conxian-business` | Conxian/conxian-business | Mixed | Business ops, AGENTS.md | ✅ Active |
-| `Conxian` | Conxian/Conxian | Clarity | Smart contracts (221) | ⚠️ 27 issues |
+| `Conxian` | Conxian/Conxian | Clarity | Smart contracts (221) | ⚠️ Maintenance |
 | `conxian-gateway` | Conxian/conxian-gateway | Rust | ISO 20022 bridge | ✅ Active |
 | `conxian-nexus` | Conxian/conxian-nexus | Clarity/Rust | Settlement layer | ✅ Active |
+| `conxian-market` | Conxian/conxian_market | Mixed | AI settlement, ERC-8183 | 🆕 New |
 | `conxius-wallet` | Conxian/conxius-wallet | TypeScript | Android wallet | ✅ Active |
 | `conxius-platform` | Conxian/conxius-platform | TypeScript | Dev orchestration | ✅ Active |
 | `conxius-orbit` | Conxian/conxius-orbit | TypeScript | Deployment toolkit | ✅ Active |
@@ -157,6 +158,7 @@ graph TB
         CXVG[CXVG Token]
         NEXUS[conxian-nexus]
         GATEWAY[conxian-gateway]
+        MARKET[conxian-market]
     end
     
     subgraph "Conxius (Client Layer)"
@@ -172,6 +174,7 @@ graph TB
     
     CL --> CNX
     CL --> WALLET
+    CL --> MARKET
     
     CNX --> CXD
     CNX --> CXLP
@@ -179,6 +182,11 @@ graph TB
     
     CNX --> GATEWAY
     CNX --> NEXUS
+    CNX -.-> MARKET
+    
+    MARKET --> GATEWAY
+    MARKET --> NEXUS
+    MARKET -.-> WALLET
     
     GATEWAY --> CORE
     NEXUS --> CORE
@@ -205,6 +213,8 @@ graph TB
 | Dependabot allowlist for transitive npm deps | 2026-07-08 | undici/ws transitive chains via bdk/wswrapper | Fix upstream |
 | GitGuardian var naming convention (no PASSWORD/SECRET in keys) | 2026-07-08 | Avoid false positives from variable names | - |
 | Docker env vars use DB_* prefix, not *_PASSWORD | 2026-07-08 | GitGuardian pattern avoidance | - |
+| conxian-market added as BOS submodule | 2026-07-14 | AI settlement core for autonomous labor | - |
+| Context Synchronization Protocol (CSP v1.2) | 2026-07-14 | Ensure full context sync every session | - |
 
 ---
 
@@ -212,11 +222,12 @@ graph TB
 
 | Topic | Knowledge Doc | Last Updated |
 |-------|---------------|--------------|
-| Operational Standards | `AGENTS.md` | 2026-07-06 |
+| Operational Standards | `AGENTS.md` | 2026-07-14 |
 | Mathematical Framework | `lib-conxian-core/docs/CONXIAN_UNIFIED_THEORY_v2.md` | 2026-04-23 |
 | Security Audit | `lib-conxian-core/docs/ADVISORY_REPORT_2026_07_06.md` | 2026-07-06 |
 | Knowledge Gaps | `docs/KNOWLEDGE_GAP_ANALYSIS.md` | 2026-07-06 |
 | Gateway Research | `conxian-gateway/docs/research/KNOWLEDGE_MAP.md` | 2026-04-23 |
+| Market/AI Settlement | `conxian-market/README.md` | 2026-07-08 |
 | ISO 20022 Patterns | External: BIS d218, ISO white paper | 2025 |
 | Clarity Patterns | External: Stacks Cookbook, CertiK | 2026 |
 
@@ -249,9 +260,11 @@ graph TB
 3. Decision outcomes
 4. Issue resolutions
 
+**CSP Alignment:** After running `scripts/init_session.sh`, verify this graph reflects current submodule state.
+
 **Verification:** Cross-reference claims against this graph before acting.
 
 ---
 
 *Generated per AGENTS.md Knowledge Management mandate*
-*Next update: After Phase 1 remediation (Week 2)*
+*Updated: 2026-07-14 (conxian-market added, CSP v1.2 implemented)*

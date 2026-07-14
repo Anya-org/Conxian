@@ -1,12 +1,24 @@
 # Spec: CON-383 Full BOS Buildout — Stub Removal, Production Implementation & Verification
 
-**Sovereign Coordination Layer:** [CON-383](https://sovereign.conxian.com/issue/CON-383/remove-bos-state-machine-stub-from-production-path)
-**Related:** CON-385, CON-392, CON-394, CON-396
-**Scope:** `conxian-business` (primary), `conxian-nexus` (stubs), devcontainer
+> **STATUS:** ✅ COMPLETED (2026-07-14)
+> **Sovereign Coordination Layer:** [CON-383](https://sovereign.conxian.com/issue/CON-383/remove-bos-state-machine-stub-from-production-path)
+> **Related:** CON-385, CON-392, CON-394, CON-396 ✅ All completed
+> **Scope:** `conxian-business` (primary), `conxian-nexus` (stubs), devcontainer
 
 ---
 
-## Problem Statement
+## Status: Completed ✅
+
+All requirements in this spec have been implemented:
+- ORACLE_SERVICE_IS_STUBBED flipped to `false`
+- Empty test replaced with real assertions
+- All `[STUB]` markers removed from conxian-nexus
+- Contamination guard passes
+- Action version audit passes
+
+---
+
+## Problem Statement (Historical)
 
 The Conxian stack has two categories of unresolved stub/placeholder contamination that block mainnet readiness:
 
@@ -153,3 +165,27 @@ Once all `[STUB]` markers are removed from the above files, remove those file pa
 11. **CHANGELOG + audit docs (R6)** — Update `CHANGELOG.md`, `audit/active_session.json`, `audit/contamination_audit_report_2026_04_05.md`.
 
 12. **Commit on feature branch** — Branch name: `con-383-bos-full-buildout`. Commit with Linear issue reference.
+
+---
+
+## Completion Summary (2026-07-14)
+
+All requirements from this spec have been completed:
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| R1: Devcontainer Rust + Python | ✅ | CI runs on Python 3.10 + Rust stable |
+| R2: BOS Production Boundary | ✅ | Stub files isolated, `execute_tx` comment removed |
+| R3a: ZKML stub → 501 | ✅ | Handler returns fail-closed |
+| R3b: DLC stub → 501 | ✅ | Handler returns fail-closed |
+| R3c: Identity real BNS | ✅ | BNS API integration implemented |
+| R3d: ERP real signing | ✅ | Wallet::sign() wired |
+| R3e: Kwil real HTTP | ✅ | reqwest call implemented |
+| R3f: Tableland real POST | ✅ | reqwest HTTP POST implemented |
+| R3g: ARR/MRR Supabase | ✅ | REST upsert implemented |
+| R3h: Oracle flag = false | ✅ | ORACLE_SERVICE_IS_STUBBED flipped |
+| R4: Contamination guard | ✅ | REPO_EXCLUSIONS cleaned |
+| R5: Test suite | ✅ | cargo test passes |
+| R6: CHANGELOG | ✅ | Entry added to Unreleased |
+
+**All acceptance criteria verified. This spec is COMPLETE.**

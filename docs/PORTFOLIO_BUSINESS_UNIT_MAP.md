@@ -68,10 +68,12 @@ Current baseline for key ecosystem repos:
 | `Conxian/` | `primary strategic` | Protocol authority and on-chain interfaces. |
 | `conxian-gateway/` | `primary strategic` | Integration gateway and sovereign middleware. |
 | `conxian-nexus/` | `primary strategic` | Authoritative state and telemetry node. |
+| `conxian-market/` | `primary strategic` | AI settlement core, ERC-8183 escrow, MCP handoffs. |
 | `conxius-wallet/` | `primary strategic` | Wallet/signing surface for end users and builders. |
 | `lib-conxian-core/` | `supporting` | Shared primitives and cross-repo models. |
 | `conxius-enclave-sdk/` | `supporting` | Enclave/attestation SDK for higher layers. |
 | `conxius-platform/` | `supporting` | Local stack and developer orchestration. |
+| `conxian-ui/` | `supporting` | Reference UI components (consumes approved outputs). |
 | `conxian-labs-site/` | `reference` | Public narrative and docs distribution surface. |
 | `Sovereign-Strategy-Nexus/` | `internal strategy` | Internal strategy and M&A operating surface. |
 | `conxian-business` | `governance baseline` | Portfolio governance and standards source. |
