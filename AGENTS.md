@@ -2,15 +2,20 @@
 
 ## BOS Operational Standards
 > **Framework**: Multi-Dimensional ITIL5-Aligned Knowledge Architecture
-> **Version**: 1.1 (2026-07-14)
+> **Version**: 1.2 (2026-07-14)
 > **Reference**: `docs/BOS_KNOWLEDGE_FRAMEWORK.md`
 
 ---
 
-### Session Initialization Protocol (SIP)
+## 🔄 Context Synchronization Protocol (CSP v1.2)
 
-Every session **MUST** begin with full environment initialization:
+Every session **MUST** begin with full context synchronization. This ensures the agent has:
+1. Latest BOS state and portfolio context
+2. All submodules synced to pinned commits
+3. Cross-repo awareness of active repos
+4. Fresh knowledge graph
 
+### Phase 1: Core BOS Sync
 ```bash
 # 1. Ensure on dev branch with latest BOS state
 git checkout dev && git pull origin dev
@@ -22,10 +27,50 @@ git submodule update --init --recursive
 git submodule status
 ```
 
-**Why this matters:**
-- Submodules drift between sessions; stale pins cause CI failures
-- `conxian-business` gates CI on submodule pin freshness
-- The pinned gitlinks are the **authoritative portfolio state**
+### Phase 2: Cross-Repo Context Pull
+Pull latest from repos that are NOT submodules but need awareness:
+```bash
+# conxian_ui (separate from conxian-ui submodule)
+git clone --depth 1 https://github.com/Conxian/conxian_ui.git /tmp/conxian_ui 2>/dev/null || \
+  (cd /tmp/conxian_ui && git pull origin main)
+
+# .github-private (internal strategy)
+# NOTE: Only clone if credentials available, skip if not
+```
+
+### Phase 3: Knowledge Graph Refresh
+```bash
+# Regenerate local audit manifest (writes to .generated/)
+python3 ./conxian-business/transparency_custodian.py 2>/dev/null || true
+
+# Check for stale entries in BOS_KNOWLEDGE_GRAPH.md
+grep -q "2026-07" BOS_KNOWLEDGE_GRAPH.md || echo "⚠️ KG may need refresh"
+```
+
+### Phase 4: Sub-Context Verification
+```bash
+# Verify all submodule remotes are accessible
+for sm in conxian-gateway conxian-nexus conxian-market conxius-wallet conxius-platform; do
+  git remote get-url origin 2>/dev/null | grep -q Conxian && echo "✅ $sm"
+done
+
+# Check for divergent branches (stale state)
+git status | grep -q diverged && echo "⚠️ Branch divergence detected"
+```
+
+### One-Command Full Sync
+```bash
+# Run the initialization script
+./scripts/init_session.sh --force-pull
+```
+
+### Why This Matters
+| Issue | Impact | Prevention |
+|-------|--------|------------|
+| Stale submodules | CI failures, broken builds | Phase 1 sync |
+| Old context | Wrong assumptions, duplicate work | Phase 2 context pull |
+| Inconsistent KG | Bad agent decisions | Phase 3 refresh |
+| Branch drift | Merge conflicts, lost commits | Phase 4 verification |
 
 ---
 
