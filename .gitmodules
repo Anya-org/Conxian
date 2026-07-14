@@ -40,3 +40,7 @@
 	path = lib-conxian-core
 	url = https://github.com/Conxian/lib-conxian-core
 	branch = main
+[submodule "conxian-market"]
+	path = conxian-market
+	url = https://github.com/Conxian/conxian_market
+	branch = main
