@@ -315,12 +315,12 @@ Notes on the requested repos:
 
 P0 (portfolio integrity and “who owns what”):
 
-1. Add explicit **business unit charters** and a lightweight portfolio **ownership model** (approvers, escalation).
-2. Fix submodule hygiene so the pinned portfolio is mechanically reliable (including CI/automation that fails when `.gitmodules` and this map diverge in either direction, or when any gitlink is missing a `.gitmodules` entry).
-3. Add a boundary **interface registry** (APIs/schemas/contracts) so units can move independently without silent drift.
+1. ✅ Add explicit **business unit charters** and a lightweight portfolio **ownership model** (approvers, escalation). → `docs/BUSINESS_UNIT_CHARTERS.md`
+2. ✅ Fix submodule hygiene. → CSP v1.2 (`AGENTS.md`, `scripts/init_session.sh`, `docs/M2M_CONTEXT_MATRIX.md`)
+3. ✅ Add a boundary **interface registry** (APIs/schemas/contracts). → `docs/M2M_CONTEXT_MATRIX.md`
 4. Add cross-unit **change control** rules so BOS/OpenSpec updates happen at the right times.
 5. Standardize **documentation classification** rules (git vs Linear) to prevent ZSE drift.
-6. Introduce a machine-readable portfolio manifest that can be validated against `.gitmodules` and used to prevent drift between this document and BOS runtime artifacts (including resolving the `./conxian-business/` naming collision by renaming the nested state directory to something unambiguous).
+6. ✅ Introduce a machine-readable portfolio manifest. → `docs/PORTFOLIO_MANIFEST.json`, `scripts/generate_portfolio_manifest.py`
 
 P1 (separation enforcement and partner legibility):
 
