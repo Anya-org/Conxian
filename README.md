@@ -1,5 +1,10 @@
 # Conxian
 
+## Canonical Documentation
+> - [BOS M2M Context Matrix](../docs/M2M_CONTEXT_MATRIX.md)
+> - [Portfolio Business Unit Map](../docs/PORTFOLIO_BUSINESS_UNIT_MAP.md)
+> - [BOS Knowledge Graph](../BOS_KNOWLEDGE_GRAPH.md)
+
 [![Protocol Status](https://img.shields.io/badge/Status-Mainnet--Ready-green.svg)](https://conxian.com)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Clarity 4](https://img.shields.io/badge/Clarity-4.0-orange.svg)](https://docs.stacks.co)
