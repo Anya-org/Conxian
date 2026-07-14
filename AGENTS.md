@@ -58,6 +58,14 @@ done
 git status | grep -q diverged && echo "⚠️ Branch divergence detected"
 ```
 
+### Phase 5: M2M Context Matrix (for cross-repo work)
+```bash
+# Read the M2M context matrix for cross-repo dependencies
+cat docs/M2M_CONTEXT_MATRIX.md
+
+# When working on a submodule, verify its context is up-to-date
+```
+
 ### One-Command Full Sync
 ```bash
 # Run the initialization script
@@ -71,6 +79,7 @@ git status | grep -q diverged && echo "⚠️ Branch divergence detected"
 | Old context | Wrong assumptions, duplicate work | Phase 2 context pull |
 | Inconsistent KG | Bad agent decisions | Phase 3 refresh |
 | Branch drift | Merge conflicts, lost commits | Phase 4 verification |
+| Missing M2M context | Broken cross-repo communication | Phase 5 verification |
 
 ---
 
