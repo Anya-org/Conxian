@@ -66,6 +66,22 @@ cat docs/M2M_CONTEXT_MATRIX.md
 # When working on a submodule, verify its context is up-to-date
 ```
 
+### Phase 6: Git & PR Protocol
+```bash
+# Verify clean state before commit
+git status
+
+# Standard commit format
+git commit -m "type(scope): description"
+
+# Push with co-author for AI work
+git commit --amend --author "openhands <openhands@all-hands.dev>" --no-edit
+git push origin <branch>
+
+# PR process: feature → dev → staged → main
+# See: docs/GIT_PROCESS.md
+```
+
 ### One-Command Full Sync
 ```bash
 # Run the initialization script

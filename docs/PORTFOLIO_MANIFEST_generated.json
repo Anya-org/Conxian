@@ -3,9 +3,9 @@
   "title": "Conxian Portfolio Manifest",
   "description": "Machine-readable portfolio manifest for BOS submodules",
   "version": "1.0.0",
-  "lastUpdated": "2026-07-14T10:58:57.757339+00:00",
+  "lastUpdated": "2026-07-14T11:00:22.462350+00:00",
   "metadata": {
-    "generated": "2026-07-14T10:58:57.757354+00:00",
+    "generated": "2026-07-14T11:00:22.462369+00:00",
     "generator": "scripts/generate_portfolio_manifest.py",
     "source-of-truth": ".gitmodules"
   },
@@ -24,7 +24,7 @@
       ],
       "pinned": {
         "sha": "2d7a517c289fac42e82b3b263ea48c5d939cd026",
-        "pinnedAt": "2026-07-14T10:58:57.759616+00:00",
+        "pinnedAt": "2026-07-14T11:00:22.464879+00:00",
         "pinnedBy": "conxian-business CI"
       },
       "consumers": [
@@ -47,7 +47,7 @@
       ],
       "pinned": {
         "sha": "9772009c93363ed8ccd3ea105d2b6ebb9f113cc4",
-        "pinnedAt": "2026-07-14T10:58:57.761609+00:00",
+        "pinnedAt": "2026-07-14T11:00:22.467318+00:00",
         "pinnedBy": "conxian-business CI"
       },
       "consumers": [
@@ -67,7 +67,7 @@
       ],
       "pinned": {
         "sha": "e1aeb305ab945ec98308cdcba1509b214910e909",
-        "pinnedAt": "2026-07-14T10:58:57.763465+00:00",
+        "pinnedAt": "2026-07-14T11:00:22.469511+00:00",
         "pinnedBy": "conxian-business CI"
       },
       "consumers": [
@@ -90,7 +90,7 @@
       ],
       "pinned": {
         "sha": "21bf5991ad93672d5b1115692a9323d4d5034ce0",
-        "pinnedAt": "2026-07-14T10:58:57.765300+00:00",
+        "pinnedAt": "2026-07-14T11:00:22.471616+00:00",
         "pinnedBy": "conxian-business CI"
       },
       "consumers": []
@@ -105,7 +105,7 @@
       "dependencies": [],
       "pinned": {
         "sha": "051cbb7fc2a9a643fb991908a64e1df983831444",
-        "pinnedAt": "2026-07-14T10:58:57.767148+00:00",
+        "pinnedAt": "2026-07-14T11:00:22.473668+00:00",
         "pinnedBy": "conxian-business CI"
       },
       "consumers": [
@@ -130,7 +130,7 @@
       ],
       "pinned": {
         "sha": "70dfa0d5916e10e1c570ad8c3db52750dd0a43c6",
-        "pinnedAt": "2026-07-14T10:58:57.769045+00:00",
+        "pinnedAt": "2026-07-14T11:00:22.475664+00:00",
         "pinnedBy": "conxian-business CI"
       },
       "consumers": []
@@ -147,7 +147,7 @@
       ],
       "pinned": {
         "sha": "d4843b4ad265a049235001967210d1c0ee5c21c0",
-        "pinnedAt": "2026-07-14T10:58:57.770873+00:00",
+        "pinnedAt": "2026-07-14T11:00:22.477703+00:00",
         "pinnedBy": "conxian-business CI"
       },
       "consumers": []
@@ -162,7 +162,7 @@
       "dependencies": [],
       "pinned": {
         "sha": "b36df0b3ba1522f68b3fee36a0999732b8a7f7a2",
-        "pinnedAt": "2026-07-14T10:58:57.772665+00:00",
+        "pinnedAt": "2026-07-14T11:00:22.479658+00:00",
         "pinnedBy": "conxian-business CI"
       },
       "consumers": []
@@ -179,7 +179,7 @@
       ],
       "pinned": {
         "sha": "600f9760ae98a620723f12418b4ca885ae9afc10",
-        "pinnedAt": "2026-07-14T10:58:57.774610+00:00",
+        "pinnedAt": "2026-07-14T11:00:22.481669+00:00",
         "pinnedBy": "conxian-business CI"
       },
       "consumers": [
@@ -196,7 +196,7 @@
       "dependencies": [],
       "pinned": {
         "sha": "05e1d3fb6b424ee5fa3ed67a3da0a0bc7a68d550",
-        "pinnedAt": "2026-07-14T10:58:57.776517+00:00",
+        "pinnedAt": "2026-07-14T11:00:22.483742+00:00",
         "pinnedBy": "conxian-business CI"
       },
       "consumers": [
@@ -220,7 +220,7 @@
       ],
       "pinned": {
         "sha": "85e6caa4bce441850c3de35e5bfd570766a978b6",
-        "pinnedAt": "2026-07-14T10:58:57.778399+00:00",
+        "pinnedAt": "2026-07-14T11:00:22.485750+00:00",
         "pinnedBy": "conxian-business CI"
       },
       "consumers": []

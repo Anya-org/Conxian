@@ -19,7 +19,9 @@ Portfolio-entry/sub-repo READMEs should include a `Canonical documentation` bloc
 
 - `../docs/REPO_PORTFOLIO.md`
 - `../docs/PORTFOLIO_BUSINESS_UNIT_MAP.md`
-- `../docs/DOCUMENTATION_ALIGNMENT_INDEX.md`
+- `../docs/M2M_CONTEXT_MATRIX.md`
+- `../docs/GIT_PROCESS.md`
+- `../docs/BUSINESS_UNIT_CHARTERS.md`
 
 If a README lives at a different depth, keep the same targets and adjust the relative path accordingly.
 
