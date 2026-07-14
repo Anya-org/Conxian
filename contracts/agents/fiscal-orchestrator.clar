@@ -14,12 +14,6 @@
 (define-data-var admin principal tx-sender)
 (define-data-var initialized bool false)
 
-;; --- Authorization ---
-
-(define-read-only (is-authorized-admin)
-  (or (is-eq tx-sender (var-get admin)) (not (var-get initialized)))
-)
-
 ;; --- Internal Policy Helpers ---
 
 (define-private (resolve-cybernetic-policy (gcr uint))
@@ -59,6 +53,10 @@
 ;; --- Public Functions ---
 
 ;; @desc Run the fiscal strategy - Orchestrates fee collection and BME epoch routing.
+;; @param pools-to-reward (list 50 principal)
+;; @param cxd-token-trait <sip-010-ft-trait>
+;; @param metrics-ref <finance-metrics-trait>
+;; @return (ok bool)
 (define-public (run-fiscal-strategy (pools-to-reward (list 50 principal)) (cxd-token-trait <sip-010-ft-trait>) (metrics-ref <finance-metrics-trait>))
   (let (
     (intel (unwrap! (contract-call? .agent-risk get-cybernetic-intel metrics-ref) ERR_RISK_SIGNAL_UNAVAILABLE))
@@ -94,7 +92,9 @@
   )
 )
 
-;; @desc Calculates performance-based adjustment for bounty (CXIP-013)
+;; @desc Calculates performance-based adjustment for bounty (CXIP-013).
+;; @param metrics-ref <finance-metrics-trait>
+;; @return (ok uint)
 (define-public (calculate-performance-adjustment (metrics-ref <finance-metrics-trait>))
   (let (
     (intel (unwrap! (contract-call? .agent-risk get-cybernetic-intel metrics-ref) ERR_RISK_SIGNAL_UNAVAILABLE))
@@ -103,7 +103,9 @@
   )
 )
 
-;; @desc Calculates dynamic allocation policy based on GCR (CXIP-013)
+;; @desc Calculates dynamic allocation policy based on GCR (CXIP-013).
+;; @param metrics-ref <finance-metrics-trait>
+;; @return (ok { treasury: uint, bounty: uint, lp: uint, grant: uint, buyback: uint, insurance: uint })
 (define-public (calculate-cybernetic-policy (metrics-ref <finance-metrics-trait>))
   (let (
     (gcr (unwrap! (contract-call? .agent-risk get-gcr metrics-ref) ERR_RISK_SIGNAL_UNAVAILABLE))
@@ -112,15 +114,21 @@
   )
 )
 
+;; @desc Initializes the fiscal orchestrator with an administrator.
+;; @param new-admin principal
+;; @return (ok bool)
 (define-public (initialize (new-admin principal))
   (begin
-    (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
+    (asserts! (or (is-eq tx-sender (var-get admin)) (not (var-get initialized))) ERR_UNAUTHORIZED)
     (var-set admin new-admin)
     (var-set initialized true)
     (ok true)
   )
 )
 
+;; @desc Updates the administrator principal.
+;; @param new-admin principal
+;; @return (ok bool)
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -129,6 +137,16 @@
   )
 )
 
+;; --- Read-Only Functions ---
+
+;; @desc Returns the current status and version of the fiscal orchestrator.
+;; @return (ok { compliant: bool, version: (string-ascii 20) })
 (define-read-only (get-protocol-status)
   (ok { compliant: true, version: "v1.1.0-Apex" })
+)
+
+;; @desc Returns whether the sender is the current administrator.
+;; @return bool
+(define-read-only (is-authorized-admin)
+  (or (is-eq tx-sender (var-get admin)) (not (var-get initialized)))
 )

@@ -9,6 +9,7 @@
 (define-constant ERR_SBC_NOT_FOUND (err u4001))
 (define-constant ERR_INSUFFICIENT_LIQUIDITY (err u4002))
 
+;; --- Data Variables ---
 (define-data-var admin principal tx-sender)
 
 ;; --- Sovereign Business Cells (SBC) ---
@@ -29,6 +30,8 @@
 ;; --- Public Functions: Fiscal Orchestration ---
 
 ;; @desc Codify a new Sovereign Business Cell (SBC)
+;; @param name (string-ascii 32)
+;; @return (ok bool)
 (define-public (codify-sbc (name (string-ascii 32)))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -43,6 +46,9 @@
 )
 
 ;; @desc Infuse a Business Cell with Liquid Reserves
+;; @param name (string-ascii 32)
+;; @param amount uint
+;; @return (ok bool)
 (define-public (infuse-sbc (name (string-ascii 32)) (amount uint))
   (let (
     (cell (unwrap! (map-get? business-cells name) ERR_SBC_NOT_FOUND))
@@ -54,7 +60,11 @@
   )
 )
 
-;; @desc Deploy Symmetry to a Yield Strategy (stSTX zBTC etc.)
+;; @desc Deploy Symmetry to a Yield Strategy (stSTX, zBTC, etc.)
+;; @param sbc-name (string-ascii 32)
+;; @param strategy principal
+;; @param amount uint
+;; @return (ok bool)
 (define-public (deploy-symmetry (sbc-name (string-ascii 32)) (strategy principal) (amount uint))
   (let (
     (cell (unwrap! (map-get? business-cells sbc-name) ERR_SBC_NOT_FOUND))
@@ -76,6 +86,10 @@
 )
 
 ;; @desc Harvest Sovereign Yield from strategies
+;; @param sbc-name (string-ascii 32)
+;; @param strategy principal
+;; @param yield-amount uint
+;; @return (ok bool)
 (define-public (harvest-sovereign-yield (sbc-name (string-ascii 32)) (strategy principal) (yield-amount uint))
   (let (
     (cell (unwrap! (map-get? business-cells sbc-name) ERR_SBC_NOT_FOUND))
@@ -94,6 +108,9 @@
 
 ;; @desc Autonomous Yield Sweep
 ;; Periodically audits SBC liquid reserves and sweeps 20% to the yield optimizer.
+;; @param sbc-name (string-ascii 32)
+;; @param strategy principal
+;; @return (ok uint)
 (define-public (autonomous-yield-sweep (sbc-name (string-ascii 32)) (strategy principal))
   (let (
     (cell (unwrap! (map-get? business-cells sbc-name) ERR_SBC_NOT_FOUND))
@@ -110,14 +127,29 @@
   )
 )
 
+;; @desc Updates the administrator principal.
+;; @param new-admin principal
+;; @return (ok bool)
+(define-public (set-admin (new-admin principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (var-set admin new-admin)
+    (ok true)
+  )
+)
+
 ;; --- Read-Only Functions: Fiscal Intelligence ---
 
-;; @desc Get SBC Status
+;; @desc Returns the status of a specific SBC.
+;; @param name (string-ascii 32)
+;; @return (optional { liquid-reserve: uint, yield-harvested: uint, last-audit-block: uint, status: (string-ascii 12) })
 (define-read-only (get-sbc-status (name (string-ascii 32)))
   (map-get? business-cells name)
 )
 
-;; @desc Calculate "Sovereign Yield Index" (SYI) for a Business Cell
+;; @desc Calculates "Sovereign Yield Index" (SYI) for a Business Cell.
+;; @param name (string-ascii 32)
+;; @return (ok uint)
 (define-read-only (calculate-syi (name (string-ascii 32)))
   (let (
     (cell (unwrap! (map-get? business-cells name) ERR_SBC_NOT_FOUND))
@@ -130,19 +162,15 @@
   )
 )
 
+;; @desc Returns the current status and version of the fiscal intelligence unit.
+;; @return (ok { compliant: bool, version: (string-ascii 20) })
+(define-read-only (get-protocol-status)
+  (ok { compliant: true, version: "v1.1.0" })
+)
+
 ;; --- Internal Helpers ---
 
 (define-private (get-sbc-allocated-total (sbc-name (string-ascii 32)))
   ;; In production this would sum all strategic-symmetry entries for the SBC
   u0 ;; Placeholder for complex map iteration (requires folding in Clarity 4)
-)
-
-;; --- Admin Functions ---
-
-(define-public (set-admin (new-admin principal))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (var-set admin new-admin)
-    (ok true)
-  )
 )
