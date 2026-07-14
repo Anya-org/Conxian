@@ -1,17 +1,21 @@
 ;; agent-treasury.clar
-;; Compatibility treasury controller for legacy callers.
-;; Mirrors canonical fiscal-orchestrator policy logic (Phase 1 cutover).
+;; Compatibility Treasury Controller
+;; Mirrors canonical fiscal-orchestrator policy logic for legacy callers.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (use-trait csf-trait .conxian-csf-trait.trait-csf-liquidity-v1)
 (use-trait finance-metrics-trait .security-monitoring.finance-metrics-trait)
 
+;; --- Constants ---
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_RISK_SIGNAL_UNAVAILABLE (err u2001))
 (define-constant ERR_FISCAL_EXECUTION_FAILED (err u2002))
 
+;; --- Data Variables ---
 (define-data-var admin principal tx-sender)
 (define-data-var initialized bool false)
+
+;; --- Internal Helpers ---
 
 (define-private (is-authorized-admin)
   (or (is-eq tx-sender (var-get admin)) (not (var-get initialized)))
@@ -48,7 +52,14 @@
   )
 )
 
+;; --- Public Functions ---
+
 ;; @desc Executes the compatibility fiscal strategy across designated pools.
+;; @param pool-trait <csf-trait>
+;; @param pools-to-reward (list 50 principal)
+;; @param cxd-token-trait <sip-010-ft-trait>
+;; @param metrics-ref <finance-metrics-trait>
+;; @return (ok bool)
 (define-public (run-fiscal-strategy (pool-trait <csf-trait>) (pools-to-reward (list 50 principal)) (cxd-token-trait <sip-010-ft-trait>) (metrics-ref <finance-metrics-trait>))
   (let (
     (intel (unwrap! (contract-call? .agent-risk get-cybernetic-intel metrics-ref) ERR_RISK_SIGNAL_UNAVAILABLE))
@@ -83,6 +94,8 @@
 )
 
 ;; @desc Calculates the performance-based adjustment for fiscal policy.
+;; @param metrics-ref <finance-metrics-trait>
+;; @return (ok uint)
 (define-public (calculate-performance-adjustment (metrics-ref <finance-metrics-trait>))
   (let (
     (intel (unwrap! (contract-call? .agent-risk get-cybernetic-intel metrics-ref) ERR_RISK_SIGNAL_UNAVAILABLE))
@@ -92,6 +105,8 @@
 )
 
 ;; @desc Calculates the cybernetic fiscal policy based on current system state.
+;; @param metrics-ref <finance-metrics-trait>
+;; @return (ok { treasury: uint, bounty: uint, lp: uint, grant: uint, buyback: uint, insurance: uint })
 (define-public (calculate-cybernetic-policy (metrics-ref <finance-metrics-trait>))
   (let (
     (gcr (unwrap! (contract-call? .agent-risk get-gcr metrics-ref) ERR_RISK_SIGNAL_UNAVAILABLE))
@@ -101,6 +116,8 @@
 )
 
 ;; @desc Initializes the treasury compatibility controller with an administrator.
+;; @param new-admin principal
+;; @return (ok bool)
 (define-public (initialize (new-admin principal))
   (begin
     (asserts! (is-authorized-admin) ERR_UNAUTHORIZED)
@@ -111,6 +128,8 @@
 )
 
 ;; @desc Updates the administrator principal.
+;; @param new-admin principal
+;; @return (ok bool)
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -119,7 +138,10 @@
   )
 )
 
+;; --- Read-Only Functions ---
+
 ;; @desc Returns the current status and version of the treasury compatibility controller.
+;; @return (ok { compliant: bool, version: (string-ascii 20) })
 (define-read-only (get-protocol-status)
-  (ok { compliant: true, version: "v1.1.0-Apex-Compat" })
+  (ok { compliant: true, version: "v1.1.0-Compat" })
 )
