@@ -1,9 +1,8 @@
 # Conxian
 
 ## Canonical Documentation
-> - [BOS M2M Context Matrix](../docs/M2M_CONTEXT_MATRIX.md)
-> - [Portfolio Business Unit Map](../docs/PORTFOLIO_BUSINESS_UNIT_MAP.md)
-> - [BOS Knowledge Graph](../BOS_KNOWLEDGE_GRAPH.md)
+> - [Portfolio Business Unit Map](https://github.com/Conxian/conxian-business/blob/main/docs/PORTFOLIO_BUSINESS_UNIT_MAP.md)
+> - [BOS Knowledge Graph](https://github.com/Conxian/conxian-business/blob/main/BOS_KNOWLEDGE_GRAPH.md)
 
 [![Protocol Status](https://img.shields.io/badge/Status-Mainnet--Ready-green.svg)](https://conxian.com)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
