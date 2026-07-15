@@ -360,7 +360,7 @@ The repository uses GitHub Actions for repository-level automation:
 |---|-------|----------|--------|
 | 489 | MAINNET DEPLOYMENT NOT EXECUTED | - | **ACTION REQUIRED** |
 | 494 | Implement Native Stacking Operator | `native-stacking-operator.clar` | STUB |
-| 495 | Implement Interest Rate Model | `interest-rate-model.clar` | STUB |
+| ~~495~~ | ~~Implement Interest Rate Model~~ | `interest-rate-model.clar` | **✅ IMPLEMENTED** |
 | 501 | Implement Dual Stacking Orchestrator | `dual-stacking-orchestrator.clar` | STUB |
 
 ### P1 High Priority (L+30)
