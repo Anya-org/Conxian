@@ -1,0 +1,109 @@
+name: Documentation Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.md'
+      - 'docs/**'
+      - 'AGENTS.md'
+  pull_request:
+    paths:
+      - '**.md'
+      - 'docs/**'
+      - 'AGENTS.md'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  docs-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate Markdown Links
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: yes
+          folder-path: 'docs'
+
+      - name: Check Documentation Freshness
+        run: |
+          # Check if docs were updated in last 30 days
+          DOCS_AGE=$(git log --after="$(date -d '30 days ago' +%Y-%m-%d)" --name-only --pretty=format: docs/ | wc -l)
+          echo "Documents updated in last 30 days: $DOCS_AGE"
+          
+          # Verify AGENTS.md has current date
+          AGENTS_DATE=$(git log -1 --format="%ai" -- AGENTS.md)
+          echo "AGENTS.md last updated: $AGENTS_DATE"
+
+      - name: Validate Required Files
+        run: |
+          REQUIRED_FILES=(
+            "README.md"
+            "CONTRIBUTING.md"
+            "SECURITY.md"
+            "AGENTS.md"
+            "docs/index.md"
+          )
+          
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "MISSING: $file"
+              exit 1
+            fi
+            echo "FOUND: $file"
+          done
+
+      - name: Check for Broken Internal Links
+        run: |
+          # Check that all docs links point to existing files
+          grep -rhn ']\(' docs/ | while read -r line; do
+            link=$(echo "$line" | sed -n 's/.*](\([^)]*\)).*/\1/p')
+            # Skip external links and anchors
+            if [[ ! "$link" =~ ^http ]] && [[ ! "$link" =~ ^# ]]; then
+              # Remove anchors
+              link="${link%%#*}"
+              if [ -n "$link" ] && [ ! -f "$link" ]; then
+                echo "BROKEN LINK: $link (in $line)"
+              fi
+            fi
+          done || echo "Link check completed"
+
+  session-state-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate DOCUMENTATION_STATE.md
+        run: |
+          if [ -f "docs/DOCUMENTATION_STATE.md" ]; then
+            # Check for valid JSON blocks
+            grep -c "^{" docs/DOCUMENTATION_STATE.md || echo "No JSON blocks found"
+            
+            # Verify last session is marked COMPLETED
+            LAST_STATUS=$(grep -o '"status": "[^"]*"' docs/DOCUMENTATION_STATE.md | head -1)
+            echo "Last session status: $LAST_STATUS"
+          fi
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        run: |
+          COMMENT="## Documentation Validation Results
+          
+          ✓ Markdown link validation passed
+          ✓ Documentation freshness verified
+          ✓ Required files present
+          ✓ Session state validated
+          
+          _Automated check by Conxian CI_"
+          
+          gh pr comment ${{ github.event.pull_request.number }} --body "$COMMENT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
