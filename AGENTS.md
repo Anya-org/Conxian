@@ -52,8 +52,10 @@ git var GIT_AUTHOR_EMAIL
    - Or set env vars and recommit
 
 **Current Config Status:**
-- Local git config: `botshelo@conxian-labs.com` (PRIVATE - causes push failures)
-- Required for push: Use `--reset-author` or env vars
+- ✅ Environment variables verified for commits
+- Use `GIT_AUTHOR_EMAIL=openhands@all-hands.dev` for commits
+- Push via PR required (main branch protected)
+- PR pending: [#490](https://github.com/Conxian/Conxian/pull/490)
 
 ---
 
