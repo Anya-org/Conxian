@@ -27,6 +27,34 @@ This repository uses OpenHands Cloud automations for knowledge base maintenance 
 4. **Progressive Rollout**: Start with narrow scope, expand with validation
 5. **Embed Drift Monitoring**: Track when KB content drifts from source truth
 
+#### Environment Variables for Commits
+**ALWAYS use environment variables for git commits to avoid email privacy issues:**
+
+```bash
+# Set environment variables BEFORE any git operations
+export GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-openhands}"
+export GIT_AUTHOR_EMAIL="${GIT_AUTHOR_EMAIL:-openhands@all-hands.dev}"
+export GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-openhands}"
+export GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-openhands@all-hands.dev}"
+
+# Configure git to use environment (overrides .gitconfig)
+git config --global user.useconfigonly true
+
+# Verify before committing
+git var GIT_AUTHOR_NAME
+git var GIT_AUTHOR_EMAIL
+```
+
+**Verification Steps:**
+1. Check `git var GIT_AUTHOR_EMAIL` returns `openhands@all-hands.dev`
+2. If push fails with "GH007: Your push would publish a private email address":
+   - Amend with: `git commit --amend --reset-author`
+   - Or set env vars and recommit
+
+**Current Config Status:**
+- Local git config: `botshelo@conxian-labs.com` (PRIVATE - causes push failures)
+- Required for push: Use `--reset-author` or env vars
+
 ---
 
 ## 1. System Build Ethos
@@ -327,10 +355,10 @@ The repository uses GitHub Actions for repository-level automation:
 
 | # | Title | Priority | Labels | Status |
 |---|-------|----------|--------|--------|
+| 489 | [P0] MAINNET DEPLOYMENT NOT EXECUTED | P0 | deployment, critical | **ACTION REQUIRED** |
 | 488 | [CON-1427] Implement 2% Protocol Fee Collection | HIGH | protocol-fee, treasury | OPEN |
 | 480 | [P0] Developer Sandbox: TTFV < 15 minutes | P0 | deployment, developer-experience | OPEN |
 | 458 | [HIGH] Fake mock pollution: createMockSimnet() returns hardcoded success | HIGH | bug, testing | OPEN |
-| NEW | ⚠️ MAINNET DEPLOYMENT NOT EXECUTED | P0 | deployment, critical | **ACTION REQUIRED** |
 
 **Deployment Status (VERIFIED ON-CHAIN):**
 - Deployer: `ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
@@ -338,5 +366,5 @@ The repository uses GitHub Actions for repository-level automation:
 - Conclusion: Deployment workflow ran but `dry_run: true` prevented actual deployment
 - **ACTION**: Fund deployer, trigger workflow with `confirm: DEPLOY_MAINNET` and `dry_run: false`
 
-**Last Updated**: 2026-07-15T13:30:00Z
+**Last Updated**: 2026-07-15T13:31:00Z
 
