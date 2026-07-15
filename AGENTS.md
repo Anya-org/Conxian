@@ -355,18 +355,52 @@ The repository uses GitHub Actions for repository-level automation:
 
 ## 15. Open Issues Summary (Session 34)
 
-| # | Title | Priority | Labels | Status |
-|---|-------|----------|--------|--------|
-| 489 | [P0] MAINNET DEPLOYMENT NOT EXECUTED | P0 | deployment, critical | **ACTION REQUIRED** |
-| 488 | [CON-1427] Implement 2% Protocol Fee Collection | HIGH | protocol-fee, treasury | OPEN |
-| 480 | [P0] Developer Sandbox: TTFV < 15 minutes | P0 | deployment, developer-experience | OPEN |
-| 458 | [HIGH] Fake mock pollution: createMockSimnet() returns hardcoded success | HIGH | bug, testing | OPEN |
+### P0 Blockers (Must Fix Before Launch)
+| # | Title | Contract | Status |
+|---|-------|----------|--------|
+| 489 | MAINNET DEPLOYMENT NOT EXECUTED | - | **ACTION REQUIRED** |
+| 494 | Implement Native Stacking Operator | `native-stacking-operator.clar` | STUB |
+| 495 | Implement Interest Rate Model | `interest-rate-model.clar` | STUB |
+| 501 | Implement Dual Stacking Orchestrator | `dual-stacking-orchestrator.clar` | STUB |
+
+### P1 High Priority (L+30)
+| # | Title | Category |
+|---|-------|----------|
+| 496 | Implement Partnership Fee Contracts | Business Dev |
+| 497 | Implement Integration Fee Contracts | Business Dev |
+| 498 | Implement Risk Manager Contract | Risk Mgmt |
+
+### P2 Medium Priority (L+60)
+| # | Title | Category |
+|---|-------|----------|
+| 499 | Governance Stubs (SAB, Upgrade, Gauge) | Governance |
+| 500 | Complete Oracle Adapter Stubs | Oracle |
+| 502 | Treasury Infrastructure (Fiscal, OPEX) | Treasury |
+| 503 | Enterprise Subscription Contracts | Business Dev |
+| 504 | Registration Fee Contracts | Business Dev |
+| 505 | Complete DEX Infrastructure Stubs | DEX |
+| 506 | Complete Yield Infrastructure Stubs | Yield |
+| 507 | Complete sBTC Vault | Vaults |
+
+### P3 Low Priority (Backlog)
+| # | Title | Category |
+|---|-------|----------|
+| 488 | Implement 2% Protocol Fee Collection | Treasury |
+| 480 | Developer Sandbox: TTFV < 15 min | DX |
+| 458 | Fake mock pollution in tests | Testing |
+
+### Issue Summary by Priority
+| Priority | Count | Blockers |
+|----------|-------|----------|
+| P0 | 4 | Mainnet, Stacking x2, IRM |
+| P1 | 3 | Partnership, Integration, Risk |
+| P2 | 9 | Governance, Oracle, Treasury, etc. |
+| P3 | 3 | Misc improvements |
 
 **Deployment Status (VERIFIED ON-CHAIN):**
 - Deployer: `ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
 - Balance: **0 STX** | Transactions: **0**
-- Conclusion: Deployment workflow ran but `dry_run: true` prevented actual deployment
 - **ACTION**: Fund deployer, trigger workflow with `confirm: DEPLOY_MAINNET` and `dry_run: false`
 
-**Last Updated**: 2026-07-15T13:31:00Z
+**Last Updated**: 2026-07-15T14:00:00Z
 
