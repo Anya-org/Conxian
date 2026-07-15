@@ -1,5 +1,34 @@
 # Conxian Protocol: Agent Directives (July 2026 — Sprint Complete)
 
+## 0. Knowledge Base Automation (M2M Native Induction)
+
+### OpenHands Automation Framework
+This repository uses OpenHands Cloud automations for knowledge base maintenance and cross-session alignment.
+
+#### Active Automations
+| Automation | Trigger | Purpose |
+|------------|---------|---------|
+| **Repo Sync & Alignment** | Cron: `0 9 * * *` (daily) | Pull latest code, sync AGENTS.md, verify alignment |
+| **Issue Triage** | Event: `issues.opened` | Auto-label, prioritize, and route new issues |
+| **PR Review Assistant** | Event: `pull_request.opened` | Run standards validation, post automated review |
+| **Documentation Validator** | Event: `push` to main | Validate docs freshness, check for broken links |
+| **Session State Tracker** | Event: `workflow_run.completed` | Update DOCUMENTATION_STATE.md with session results |
+
+#### M2M Integration Patterns
+- **GitHub App (openhands-ai)**: Primary M2M identity for cross-repo operations
+- **GitHub Actions Workflows**: Repository-level CI/CD automation (see `.github/workflows/`)
+- **KV Store State**: Automations persist "last processed" state between runs
+- **Webhook Filters**: Use JMESPath expressions to filter events (see automation docs)
+
+#### Automation Best Practices (per GitHub Agentic Workflows best practices)
+1. **Human-in-the-loop**: All agent drafts go through PR review; no auto-commits
+2. **Mirrored Checkouts**: For cross-repo edits, use separate tokens per repo
+3. **Docs-Worthy Gate**: Automation validates if changes require documentation
+4. **Progressive Rollout**: Start with narrow scope, expand with validation
+5. **Embed Drift Monitoring**: Track when KB content drifts from source truth
+
+---
+
 ## 1. System Build Ethos
 - **Sovereign Autonomy**: All core logic must be autonomous. Avoid manual admin interventions.
 - **Nakamoto Alignment**: Use `burn-block-height` for slow-path strategy and `block-height` for fast-path reflexes.
@@ -60,14 +89,29 @@ ops-engine (heartbeat) / alex-adapter / governance suite
 
 ## 8. Deployment Pipeline (July 2026 Sprint)
 
+### ⚠️ CRITICAL: Mainnet Deployment Status (NOT ACTUAL)
+
+**Verification Required**: The deploy-mainnet workflow has `dry_run: true` by default. 
+The workflow runs validate-protocol successfully but **does NOT execute actual deployment** 
+unless `dry_run: false` AND `confirm: DEPLOY_MAINNET` are provided.
+
+| Target | Plan Ready | Actually Deployed? | On-Chain Verified |
+|--------|-----------|-------------------|-------------------|
+| **Testnet** | ✅ Yes | ⚠️ NEEDS VERIFICATION | Check 28719280478 |
+| **Mainnet** | ✅ Yes | ❌ **NO** | 0 STX, 0 TX (user verified) |
+
 ### Deployer Address
 `ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
 
-### Deployments
-| Target | Status | Contracts | Init Calls | Cost | CI Run |
-|--------|--------|-----------|------------|------|--------|
-| **Testnet** | ✅ Deployed | 214 | 9 | 4.37 STX | [28719280478](https://github.com/Conxian/Conxian/actions/runs/28719280478) |
-| **Mainnet** | ✅ Deployed | 214 | 9 | 10.79 STX | [28732058625](https://github.com/Conxian/Conxian/actions/runs/28732058625) |
+### What Was Actually Done
+- Deployment plans generated (214 contracts)
+- CI validation passed
+- **Actual blockchain deployment NOT executed**
+
+### To Execute Real Deployment
+1. Fund deployer address with STX (estimate ~11 STX for 214 contracts)
+2. Run workflow with `confirm: DEPLOY_MAINNET` and `dry_run: false`
+3. Verify with: `curl https://stacks-node-api.mainnet.stacks.co/accounts/ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
 
 ### Deployment Plans
 - `deployments/full-system.testnet-plan.yaml` — 10 batches (9 contract-publish + 1 contract-call wiring)
@@ -191,3 +235,108 @@ All 12 prerequisites resolved. Mainnet deployed July 2026.
 - Test suite: 7 suites pass (236 known benign clarinet-sdk stderr warnings suppressed).
 - Runtime error detection active via `run-tests.sh`: allowlists 4 known benign contracts, fails on new errors.
 - Deploy workflows (testnet + mainnet) operational with `script -q -c` PTY wrapper for clarinet v3.21.0.
+
+---
+
+## 13. OpenHands Automations Setup
+
+### Available Automations (OpenHands Cloud)
+
+Run the following curl commands to set up automations:
+
+```bash
+# 1. Daily Repo Sync & Alignment (Cron-based)
+curl -X POST "${OPENHANDS_HOST}/api/automation/v1/preset/prompt" \
+  -H "Authorization: Bearer ${OPENHANDS_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Conxian Daily Repo Sync",
+    "prompt": "Pull latest code from origin/main. Read AGENTS.md and verify it is up-to-date with current branch. Check DOCUMENTATION_STATE.md and update if session results are missing. Verify all 4 open issues have corresponding labels. Report any misalignments found.",
+    "trigger": {"type": "cron", "schedule": "0 9 * * *", "timezone": "UTC"}
+  }'
+
+# 2. Issue Triage (Event-based)
+curl -X POST "${OPENHANDS_HOST}/api/automation/v1/preset/prompt" \
+  -H "Authorization: Bearer ${OPENHANDS_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Conxian Issue Triage",
+    "prompt": "Analyze new issue. Extract: priority (P0/P1/P2 based on severity keywords), category (protocol-fee/treasury/security/dex/governance/other), and description summary. Post automated triage comment with labels suggestion.",
+    "trigger": {
+      "type": "event",
+      "source": "github",
+      "on": "issues.opened",
+      "filter": "repository.full_name == '\''Conxian/Conxian'\''"
+    }
+  }'
+
+# 3. PR Standards Validation (Event-based)
+curl -X POST "${OPENHANDS_HOST}/api/automation/v1/preset/prompt" \
+  -H "Authorization: Bearer ${OPENHANDS_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Conxian PR Standards Check",
+    "prompt": "Review the PR for: 1) Does it update AGENTS.md if changing agent-facing code? 2) Does it add tests for new contracts? 3) Does it update docs/STANDARDS_VALIDATION_SESSION_N.md for standards changes? Post review comments with pass/fail for each criterion.",
+    "trigger": {
+      "type": "event",
+      "source": "github",
+      "on": "pull_request.opened",
+      "filter": "repository.full_name == '\''Conxian/Conxian'\''"
+    }
+  }'
+```
+
+### GitHub Actions Workflows (`.github/workflows/`)
+
+The repository uses GitHub Actions for repository-level automation:
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| `validate.yml` | PR + push | `clarinet check` → `run-tests.sh` → coverage |
+| `docs-validate.yml` | Push to main | Validate doc freshness, broken links |
+| `session-tracker.yml` | Workflow completion | Track session outcomes in DOCUMENTATION_STATE.md |
+
+---
+
+## 14. Session Alignment Protocol (Per-Session Induction)
+
+### Every Session Checklist
+
+1. **Pull latest**: `git fetch origin && git log --oneline -1 origin/main`
+2. **Check AGENTS.md**: Verify section 13 (Automations Setup) has current automation IDs
+3. **Sync state**: Update DOCUMENTATION_STATE.md with session results
+4. **Verify issues**: Ensure all open issues have appropriate labels
+5. **Align docs**: If contract changes made, update corresponding README.md
+
+### M2M Native Induction Pattern
+
+```
+[External Event] 
+    → GitHub Webhook 
+    → OpenHands Automation Trigger 
+    → Agent Context (AGENTS.md loaded)
+    → Task Execution
+    → Human-in-the-loop (PR Review)
+    → State Update (DOCUMENTATION_STATE.md)
+    → Next Agent Context
+```
+
+---
+
+## 15. Open Issues Summary (Session 34)
+
+| # | Title | Priority | Labels | Status |
+|---|-------|----------|--------|--------|
+| 488 | [CON-1427] Implement 2% Protocol Fee Collection | HIGH | protocol-fee, treasury | OPEN |
+| 480 | [P0] Developer Sandbox: TTFV < 15 minutes | P0 | deployment, developer-experience | OPEN |
+| 458 | [HIGH] Fake mock pollution: createMockSimnet() returns hardcoded success | HIGH | bug, testing | OPEN |
+| NEW | ⚠️ MAINNET DEPLOYMENT NOT EXECUTED | P0 | deployment, critical | **ACTION REQUIRED** |
+
+**Deployment Status (VERIFIED ON-CHAIN):**
+- Deployer: `ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
+- Balance: **0 STX** | Transactions: **0**
+- Conclusion: Deployment workflow ran but `dry_run: true` prevented actual deployment
+- **ACTION**: Fund deployer, trigger workflow with `confirm: DEPLOY_MAINNET` and `dry_run: false`
+
+**Last Updated**: 2026-07-15T13:30:00Z
+
