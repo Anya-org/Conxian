@@ -9,6 +9,33 @@ Adapters implement the `oracle-trait` defined in `contracts/traits/defi-traits.c
 - **Push Models**: Chainlink and DIA.
 - **Internal Models**: TWAP Oracle based on DEX observations.
 
+## Integration Fee Billing (STX-first MVP)
+`integration-registry.clar` and `integration-fee-collector.clar` provide the
+commercial integration-fee path:
+
+- The registry controls integration ownership, payer, reporter, fee, billing
+  mode, status, and API-key lifecycle. Raw API keys are authenticated
+  off-chain; only their SHA-256 `(buff 32)` commitments are stored on-chain.
+- The collector records reporter-authorized usage against replay-protected
+  `(buff 32)` usage IDs and maintains per-integration, per-period audit ledgers.
+- When a period ledger is first created it snapshots `billing-mode`,
+  `fee-per-unit`, and `monthly-fee`. Later registry changes affect only a new
+  period; they cannot reinterpret usage already accrued in the open ledger.
+- Billing mode `u1` is per-use. Billing mode `u2` is monthly, with the period
+  calculated as `burn-block-height / 4320`. A monthly period must close before
+  it can be settled.
+- Deactivation blocks new usage records but does not strand an existing
+  ledger; its configured payer can still settle the outstanding snapshot.
+- Payers settle the exact outstanding STX amount. The collector routes 100% of
+  the payment by invoking the existing `distribute-stx` function under
+  contract context, preserving the swap-router/BME/CXIP-013 path and adding
+  no partner split or distributor-specific integration setter.
+
+The MVP trusts one configured reporter principal per integration. Payer-signed
+usage attestations are a later hardening step. Generic FT settlement is also
+future work: it will require a two-step deposit-and-route flow rather than
+accepting an FT directly in this STX-first collector.
+
 ## Core Contracts (Reference)
 
 ### `chainlink-adapter.clar`
