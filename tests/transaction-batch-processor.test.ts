@@ -1,83 +1,60 @@
-/**
- * Transaction Batch Processor Tests
- * Validates 5x throughput improvement implementation
- */
-
-import { describe, expect, it, beforeAll } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { initSimnet } from '@stacks/clarinet-sdk';
 import { Cl } from '@stacks/transactions';
-import { createMockSimnet } from './helpers/test-setup';
-import { HEAVY_DISABLED } from './helpers/env';
 
-// NOTE: Using batch-processor contract which exists in automation/
-// The original transaction-batch-processor contract does not exist
+describe('Transaction Batch Processor', () => {
+  let simnet: any;
+  let deployer: string;
+  let wallet1: string;
+  let wallet2: string;
 
-const d = HEAVY_DISABLED ? describe.skip : describe;
-
-const mockSimnet = createMockSimnet();
-
-d('Transaction Batch Processor', () => {
-  let accounts: Map<string, string>;
-
-  beforeAll(() => {
-    accounts = mockSimnet.getAccounts();
+  beforeAll(async () => {
+    simnet = await initSimnet();
+    const accounts = simnet.getAccounts();
+    deployer = accounts.get('deployer')!;
+    wallet1 = accounts.get('wallet_1')!;
+    wallet2 = accounts.get('wallet_2')!;
   });
 
-  it('should initialize batch processor correctly', () => {
-    const deployer = accounts.get('deployer')!;
-    
-    // Check initial state
-    const stats = mockSimnet.callReadOnlyFn('batch-processor', 'get-processing-stats', [], deployer);
-    
-    expect(stats.result).toBeDefined();
-    console.log('✅ Transaction Batch Processor: Initialization test passed');
+  const batchCall = (calls: ReturnType<typeof Cl.list>) =>
+    simnet.callPublicFn('batch-processor', 'batch-call', [calls], deployer);
+
+  const targetCall = (target: string, payload: string) =>
+    Cl.tuple({
+      target: Cl.principal(target),
+      payload: Cl.bufferFromUtf8(payload),
+    });
+
+  it('returns zero for an empty batch', () => {
+    const { result } = batchCall(Cl.list([]));
+
+    expect(result).toEqual(Cl.ok(Cl.uint(0)));
   });
 
-  it('should add transactions to batch successfully', () => {
-    const deployer = accounts.get('deployer')!;
-    const wallet1 = accounts.get('wallet_1')!;
-    const wallet2 = accounts.get('wallet_2')!;
-    
-    // Add transfer transaction to batch
-    const addResult = mockSimnet.callPublicFn('batch-processor', 'add-to-batch', [
-      Cl.uint(1), // TX_TYPE_TRANSFER
-      Cl.principal(wallet1),
-      Cl.principal(wallet2),
-      Cl.uint(1000),
-      Cl.contractPrincipal(deployer, 'cxd-token')
-    ], deployer);
-    
-    expect(addResult.result).toBeDefined();
-    
-    // Check batch size increased (mocked response)
-    const stats = mockSimnet.callReadOnlyFn('batch-processor', 'get-processing-stats', [], deployer);
-    expect(stats.result).toBeDefined();
-    console.log('✅ Transaction Batch Processor: Add to batch test passed');
+  it('returns one for a one-item batch', () => {
+    const calls = Cl.list([targetCall(wallet1, 'call-1')]);
+    const { result } = batchCall(calls);
+
+    expect(result).toEqual(Cl.ok(Cl.uint(1)));
   });
 
-  it('should validate transaction batching logic', () => {
-    const deployer = accounts.get('deployer')!;
-    
-    // Test batch processing logic
-    const processResult = mockSimnet.callPublicFn('batch-processor', 'process-current-batch', [], deployer);
-    expect(processResult.result).toBeDefined();
-    console.log('✅ Transaction Batch Processor: Batch processing test passed');
+  it('returns the exact number of calls for a multiple-item batch', () => {
+    const calls = Cl.list([
+      targetCall(wallet1, 'call-1'),
+      targetCall(wallet2, 'call-2'),
+      targetCall(deployer, 'call-3'),
+    ]);
+    const { result } = batchCall(calls);
+
+    expect(result).toEqual(Cl.ok(Cl.uint(3)));
   });
 
-  it('should handle emergency operations', () => {
-    const deployer = accounts.get('deployer')!;
-    
-    // Test emergency flush
-    const flushResult = mockSimnet.callPublicFn('batch-processor', 'emergency-flush-batch', [], deployer);
-    expect(flushResult.result).toBeDefined();
-    console.log('✅ Transaction Batch Processor: Emergency flush test passed');
-  });
+  it('accepts the maximum batch size of ten calls', () => {
+    const calls = Cl.list(
+      Array.from({ length: 10 }, (_, index) => targetCall(wallet1, `call-${index + 1}`))
+    );
+    const { result } = batchCall(calls);
 
-  it('should validate batch metrics tracking', () => {
-    const deployer = accounts.get('deployer')!;
-    
-    // Test metrics collection
-    const stats = mockSimnet.callReadOnlyFn('batch-processor', 'get-processing-stats', [], deployer);
-    expect(stats.result).toBeDefined();
-    console.log('✅ Transaction Batch Processor: Metrics tracking test passed');
+    expect(result).toEqual(Cl.ok(Cl.uint(10)));
   });
 });
