@@ -479,6 +479,7 @@ depends_on = ["agent-risk", "bme-engine", "concentrated-liquidity-pool", "conxia
 [contracts.fiscal-vault-oracle]
 path = "contracts/treasury/fiscal-vault-oracle.clar"
 clarity-version = 4
+depends_on = ["sip-standards"]
 
 [contracts.founder-vault]
 path = "contracts/treasury/founder-vault.clar"
@@ -667,7 +668,7 @@ depends_on = ["ops-engine", "sip-standards"]
 [contracts.opex-vault]
 path = "contracts/treasury/opex-vault.clar"
 clarity-version = 4
-depends_on = ["regulatory-adapter"]
+depends_on = ["regulatory-adapter", "sip-standards"]
 
 [contracts.ops-engine]
 path = "contracts/core/ops-engine.clar"
