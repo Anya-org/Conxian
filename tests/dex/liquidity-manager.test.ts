@@ -3,7 +3,10 @@ import { tx } from '@stacks/clarinet-sdk';
 import { Cl } from '@stacks/transactions';
 import { initializeSimnet, simnet } from '../setup-test-env';
 
+const BASIS_POINTS = 10000n;
 const MAX_UINT = (2n ** 128n) - 1n;
+const MAX_BPS_QUOTIENT = MAX_UINT / BASIS_POINTS;
+const MAX_BPS_REMAINDER = MAX_UINT % BASIS_POINTS;
 
 describe('Liquidity manager intent and risk ledger', () => {
   let deployer: string;
@@ -624,6 +627,50 @@ describe('Liquidity manager intent and risk ledger', () => {
         'liquidity-manager',
         'get-il-protection-status',
         [Cl.uint(overflowId), oracle()],
+        deployer,
+      ).result,
+    ).toEqual(error(2016));
+  });
+
+  it('rejects exact quotient-boundary fractional overflow through the public risk path', () => {
+    const reference = 4999n;
+    const remainder = (MAX_BPS_REMAINDER * reference) / BASIS_POINTS + 1n;
+    const difference = MAX_BPS_QUOTIENT * reference + remainder;
+    const currentPrice = reference + difference;
+
+    expect(difference / reference).toBe(MAX_BPS_QUOTIENT);
+    expect(difference % reference).toBe(remainder);
+    expect((remainder * BASIS_POINTS) / reference).toBeGreaterThan(MAX_BPS_REMAINDER);
+    expect(currentPrice * 2n).toBeLessThanOrEqual(MAX_UINT);
+
+    const boundary0 = token('lm-quotient-boundary-token-0');
+    const boundary1 = token('lm-quotient-boundary-token-1');
+    seedValidatedPrices([
+      { asset: boundary0, firstSpot: reference, secondSpot: reference, twapPrice: reference },
+      { asset: boundary1, firstSpot: 1n, secondSpot: 1n, twapPrice: 1n },
+    ]);
+
+    const opened = openPositionWithValidatedAssets(
+      wallet1,
+      [Cl.uint(3), Cl.int(-2), Cl.int(2), Cl.uint(1), boundary0, boundary1, oracle(), Cl.uint(100)],
+      boundary0,
+      boundary1,
+      reference,
+      1n,
+    );
+    const id = positionId(opened);
+    expect(opened.result).toEqual(Cl.ok(Cl.uint(id)));
+
+    seedValidatedPricesWithAdminOverride([
+      { asset: boundary0, price: currentPrice },
+      { asset: boundary1, price: 1n },
+    ]);
+
+    expect(
+      simnet.callReadOnlyFn(
+        'liquidity-manager',
+        'get-il-protection-status',
+        [Cl.uint(id), oracle()],
         deployer,
       ).result,
     ).toEqual(error(2016));

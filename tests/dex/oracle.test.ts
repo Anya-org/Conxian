@@ -3,7 +3,10 @@ import { tx } from '@stacks/clarinet-sdk';
 import { Cl } from '@stacks/transactions';
 import { simnet } from '../setup-test-env';
 
+const BASIS_POINTS = 10000n;
 const MAX_UINT = (2n ** 128n) - 1n;
+const MAX_BPS_QUOTIENT = MAX_UINT / BASIS_POINTS;
+const MAX_BPS_REMAINDER = MAX_UINT % BASIS_POINTS;
 
 describe('DEX oracle facade', () => {
   let deployer: string;
@@ -341,6 +344,28 @@ describe('DEX oracle facade', () => {
     ).toEqual(error(7005));
     expect(
       simnet.callReadOnlyFn('oracle', 'get-validated-price', [overflowToken], deployer).result,
+    ).toEqual(error(7005));
+  });
+
+  it('rejects exact quotient-boundary fractional overflow in diagnostics and validation', () => {
+    const reference = 4999n;
+    const remainder = (MAX_BPS_REMAINDER * reference) / BASIS_POINTS + 1n;
+    const difference = MAX_BPS_QUOTIENT * reference + remainder;
+    const spot = reference + difference;
+
+    expect(difference / reference).toBe(MAX_BPS_QUOTIENT);
+    expect(difference % reference).toBe(remainder);
+    expect((remainder * BASIS_POINTS) / reference).toBeGreaterThan(MAX_BPS_REMAINDER);
+    expect(spot * 2n).toBeLessThanOrEqual(MAX_UINT);
+
+    const boundaryToken = asset('oracle-quotient-boundary-fraction-token');
+    seedTwapAndAggregatedPrice(boundaryToken, spot, spot, reference);
+
+    expect(
+      simnet.callReadOnlyFn('oracle', 'get-price-diagnostics', [boundaryToken], deployer).result,
+    ).toEqual(error(7005));
+    expect(
+      simnet.callReadOnlyFn('oracle', 'get-validated-price', [boundaryToken], deployer).result,
     ).toEqual(error(7005));
   });
 

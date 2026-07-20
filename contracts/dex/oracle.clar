@@ -92,17 +92,24 @@
 
 ;; Compute floor(difference * 10,000 / reference) without an overflowing
 ;; multiplication. The integral portion is checked explicitly; the remainder
-;; portion is solved with the bounded binary helper above.
+;; portion is solved with the bounded binary helper above. At the quotient
+;; boundary, the fractional portion must also fit in MAX_UINT.
 (define-private (calculate-deviation-bps (difference uint) (reference uint))
   (if (is-eq reference u0)
     ERR_ZERO_TWAP_PRICE
-    (let ((whole-part (/ difference reference)))
+    (let (
+        (whole-part (/ difference reference))
+        (fractional-part (calculate-fractional-bps (mod difference reference) reference))
+      )
       (if (> whole-part (/ MAX_UINT BASIS_POINTS))
         ERR_ARITHMETIC_OVERFLOW
-        (ok (+
-          (* whole-part BASIS_POINTS)
-          (calculate-fractional-bps (mod difference reference) reference)
-        ))
+        (if (and
+            (is-eq whole-part (/ MAX_UINT BASIS_POINTS))
+            (> fractional-part (mod MAX_UINT BASIS_POINTS))
+          )
+          ERR_ARITHMETIC_OVERFLOW
+          (ok (+ (* whole-part BASIS_POINTS) fractional-part))
+        )
       )
     )
   )

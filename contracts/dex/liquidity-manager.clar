@@ -207,6 +207,8 @@
 )
 
 ;; Compute floor(abs(current-entry) * 10,000 / entry) without overflowing.
+;; At the quotient boundary, the fractional portion must also fit in
+;; MAX_UINT before the final addition is evaluated.
 (define-private (calculate-movement-bps (entry-price uint) (current-price uint))
   (if (is-eq entry-price u0)
     ERR_ZERO_ORACLE_PRICE
@@ -216,13 +218,17 @@
           (- entry-price current-price)
         ))
         (whole-part (/ difference entry-price))
+        (fractional-part (calculate-fractional-bps (mod difference entry-price) entry-price))
       )
       (if (> whole-part (/ MAX_UINT BASIS_POINTS))
         ERR_ARITHMETIC_OVERFLOW
-        (ok (+
-          (* whole-part BASIS_POINTS)
-          (calculate-fractional-bps (mod difference entry-price) entry-price)
-        ))
+        (if (and
+            (is-eq whole-part (/ MAX_UINT BASIS_POINTS))
+            (> fractional-part (mod MAX_UINT BASIS_POINTS))
+          )
+          ERR_ARITHMETIC_OVERFLOW
+          (ok (+ (* whole-part BASIS_POINTS) fractional-part))
+        )
       )
     )
   )

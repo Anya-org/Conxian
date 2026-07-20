@@ -101,7 +101,11 @@
     "block-utils",
     "pyth-oracle-adapter"
   ],
-  "oracle": [],
+  "oracle": [
+    "defi-traits",
+    "oracle-aggregator",
+    "twap-oracle"
+  ],
   "oracle-adapter-stub": [],
   "sanctions-oracle": [],
   "travel-rule-service": [],
