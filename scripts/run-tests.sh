@@ -61,11 +61,17 @@ echo "---"
 echo "vitest exit: $vitest_exit"
 echo "runtime errors: $total_errors ($known_errors known, $expected_errors expected, $new_errors new)"
 
-if [ "$expected_contexts" -ne 1 ] || [ "$expected_errors" -ne 1 ]; then
-  echo "❌ Expected exactly one 11-item batch boundary diagnostic with its test context"
-  echo "   matching contexts: $expected_contexts"
-  echo "   matching diagnostics: $expected_errors"
-  exit 1
+if [ "$expected_contexts" -gt 0 ]; then
+  # Targeted runs that do not select the boundary test have no matching
+  # context and must not be required to emit its expected diagnostic. When
+  # the context is present, fail closed unless it pairs with exactly one
+  # exact diagnostic; any additional diagnostic remains a new error below.
+  if [ "$expected_contexts" -ne 1 ] || [ "$expected_errors" -ne 1 ]; then
+    echo "❌ Expected exactly one 11-item batch boundary diagnostic with its test context"
+    echo "   matching contexts: $expected_contexts"
+    echo "   matching diagnostics: $expected_errors"
+    exit 1
+  fi
 fi
 
 if [ "$vitest_exit" -ne 0 ]; then
