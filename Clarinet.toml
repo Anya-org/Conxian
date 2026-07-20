@@ -712,6 +712,7 @@ clarity-version = 4
 [contracts.payment-forge]
 path = "contracts/agents/payment-forge.clar"
 clarity-version = 4
+depends_on = ["conxian-csf-trait", "fiscal-vault-oracle", "sip-standards"]
 
 [contracts.performance-optimizer]
 path = "contracts/performance/performance-optimizer.clar"
@@ -906,6 +907,7 @@ clarity-version = 4
 [contracts.test-c4-helper]
 path = "contracts/test-helpers/test-c4-helper.clar"
 clarity-version = 4
+depends_on = ["opex-vault", "sip-standards"]
 
 [contracts.timelock]
 path = "contracts/governance/timelock.clar"

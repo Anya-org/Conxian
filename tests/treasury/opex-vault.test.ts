@@ -7,6 +7,7 @@ describe('OPEX Vault', () => {
   let governance: string;
   let approver: string;
   let secondApprover: string;
+  let nestedHelper: string;
   let unauthorized: string;
   let nonCompliantPayee: string;
   let token: ReturnType<typeof Cl.contractPrincipal>;
@@ -18,6 +19,7 @@ describe('OPEX Vault', () => {
     governance = accounts.get('wallet_1')!;
     approver = accounts.get('wallet_2')!;
     secondApprover = accounts.get('wallet_3')!;
+    nestedHelper = `${deployer}.test-c4-helper`;
     // The simnet plan provisions three wallets; use a valid but unconfigured
     // standard principal for negative authorization paths.
     unauthorized = 'ST000000000000000000002AMW42H';
@@ -57,6 +59,15 @@ describe('OPEX Vault', () => {
         'opex-vault',
         'set-approver',
         [Cl.principal(secondApprover), Cl.bool(true)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(
+      simnet.callPublicFn(
+        'opex-vault',
+        'set-approver',
+        [Cl.principal(nestedHelper), Cl.bool(true)],
         deployer,
       ).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
@@ -244,6 +255,47 @@ describe('OPEX Vault', () => {
     expect(replay.result).toEqual(Cl.error(Cl.uint(1009)));
   });
 
+  it('records the immediate nested caller and blocks nested self-approval', () => {
+    const create = simnet.callPublicFn(
+      'test-c4-helper',
+      'submit-opex-expense',
+      [
+        token,
+        Cl.uint(1),
+        Cl.uint(40),
+        Cl.principal(governance),
+        Cl.stringAscii('nested caller regression'),
+      ],
+      deployer,
+    );
+    expect(create.result).toEqual(Cl.ok(Cl.uint(2)));
+
+    const storedExpense = simnet.callReadOnlyFn(
+      'opex-vault',
+      'get-expense',
+      [Cl.uint(2)],
+      deployer,
+    );
+    expect(Cl.prettyPrint(storedExpense.result)).toContain(nestedHelper);
+
+    expect(
+      simnet.callPublicFn(
+        'test-c4-helper',
+        'approve-opex-expense',
+        [Cl.uint(2)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.error(Cl.uint(1011)));
+
+    expect(
+      simnet.callPublicFn('opex-vault', 'approve-expense', [Cl.uint(2)], approver).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(
+      simnet.callPublicFn('opex-vault', 'cancel-expense', [Cl.uint(2)], governance).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+  });
+
   it('cancels pending expenses, rejects non-compliant payees, and protects reservations', () => {
     const canceled = simnet.callPublicFn(
       'opex-vault',
@@ -257,16 +309,16 @@ describe('OPEX Vault', () => {
       ],
       deployer,
     );
-    expect(canceled.result).toEqual(Cl.ok(Cl.uint(2)));
+    expect(canceled.result).toEqual(Cl.ok(Cl.uint(3)));
 
     expect(
-      simnet.callPublicFn('opex-vault', 'cancel-expense', [Cl.uint(2)], governance).result,
+      simnet.callPublicFn('opex-vault', 'cancel-expense', [Cl.uint(3)], governance).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
 
     const canceledExpense = simnet.callReadOnlyFn(
       'opex-vault',
       'get-expense',
-      [Cl.uint(2)],
+      [Cl.uint(3)],
       deployer,
     );
     expect(Cl.prettyPrint(canceledExpense.result)).toContain('status: u2');
@@ -274,7 +326,7 @@ describe('OPEX Vault', () => {
     const executeCanceled = simnet.callPublicFn(
       'opex-vault',
       'execute-expense',
-      [Cl.uint(2), token],
+      [Cl.uint(3), token],
       governance,
     );
     expect(executeCanceled.result).toEqual(Cl.error(Cl.uint(1009)));
@@ -282,7 +334,7 @@ describe('OPEX Vault', () => {
     const cancelAgain = simnet.callPublicFn(
       'opex-vault',
       'cancel-expense',
-      [Cl.uint(2)],
+      [Cl.uint(3)],
       governance,
     );
     expect(cancelAgain.result).toEqual(Cl.error(Cl.uint(1009)));
@@ -313,7 +365,7 @@ describe('OPEX Vault', () => {
       ],
       deployer,
     );
-    expect(reserved.result).toEqual(Cl.ok(Cl.uint(3)));
+    expect(reserved.result).toEqual(Cl.ok(Cl.uint(4)));
 
     const unsafeBudgetReduction = simnet.callPublicFn(
       'opex-vault',
@@ -338,7 +390,7 @@ describe('OPEX Vault', () => {
     expect(overBudget.result).toEqual(Cl.error(Cl.uint(1005)));
 
     expect(
-      simnet.callPublicFn('opex-vault', 'cancel-expense', [Cl.uint(3)], governance).result,
+      simnet.callPublicFn('opex-vault', 'cancel-expense', [Cl.uint(4)], governance).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
   });
 
@@ -372,25 +424,25 @@ describe('OPEX Vault', () => {
         ],
         deployer,
       ).result,
-    ).toEqual(Cl.ok(Cl.uint(4)));
+    ).toEqual(Cl.ok(Cl.uint(5)));
 
     expect(
-      simnet.callPublicFn('opex-vault', 'approve-expense', [Cl.uint(4)], approver).result,
+      simnet.callPublicFn('opex-vault', 'approve-expense', [Cl.uint(5)], approver).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
     expect(
-      simnet.callPublicFn('opex-vault', 'approve-expense', [Cl.uint(4)], secondApprover).result,
+      simnet.callPublicFn('opex-vault', 'approve-expense', [Cl.uint(5)], secondApprover).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
 
     const wrongToken = simnet.callPublicFn(
       'opex-vault',
       'execute-expense',
-      [Cl.uint(4), Cl.contractPrincipal(deployer, 'cxd-token')],
+      [Cl.uint(5), Cl.contractPrincipal(deployer, 'cxd-token')],
       governance,
     );
     expect(wrongToken.result).toEqual(Cl.error(Cl.uint(1014)));
 
     expect(
-      simnet.callPublicFn('opex-vault', 'cancel-expense', [Cl.uint(4)], governance).result,
+      simnet.callPublicFn('opex-vault', 'cancel-expense', [Cl.uint(5)], governance).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
   });
 
@@ -424,14 +476,74 @@ describe('OPEX Vault', () => {
       simnet.callPublicFn('opex-vault', 'set-approval-threshold', [Cl.uint(0)], deployer).result,
     ).toEqual(Cl.error(Cl.uint(1012)));
     expect(
-      simnet.callPublicFn('opex-vault', 'set-approval-threshold', [Cl.uint(4)], deployer).result,
+      simnet.callPublicFn('opex-vault', 'set-approval-threshold', [Cl.uint(5)], deployer).result,
     ).toEqual(Cl.error(Cl.uint(1012)));
     expect(
       simnet.callPublicFn('opex-vault', 'set-approval-threshold', [Cl.uint(2)], unauthorized).result,
     ).toEqual(Cl.error(Cl.uint(1000)));
   });
 
-  it('fails execution when live token solvency is lower than tracked reservations', () => {
+  it('prevents cross-category reservations from exceeding tracked funds', () => {
+    expect(
+      simnet.callPublicFn(
+        'opex-vault',
+        'set-category-budget',
+        [Cl.principal(tokenPrincipal), Cl.uint(2), Cl.uint(1000)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn(
+        'opex-vault',
+        'set-category-budget',
+        [Cl.principal(tokenPrincipal), Cl.uint(3), Cl.uint(1000)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(
+      simnet.callPublicFn(
+        'opex-vault',
+        'create-expense',
+        [
+          token,
+          Cl.uint(2),
+          Cl.uint(400),
+          Cl.principal(governance),
+          Cl.stringAscii('category two reservation'),
+        ],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.uint(6)));
+
+    const overGlobalReservation = simnet.callPublicFn(
+      'opex-vault',
+      'create-expense',
+      [
+        token,
+        Cl.uint(3),
+        Cl.uint(400),
+        Cl.principal(governance),
+        Cl.stringAscii('category three reservation'),
+      ],
+      deployer,
+    );
+    expect(overGlobalReservation.result).toEqual(Cl.error(Cl.uint(1006)));
+
+    const summary = simnet.callReadOnlyFn(
+      'opex-vault',
+      'get-summary',
+      [Cl.principal(tokenPrincipal)],
+      deployer,
+    );
+    expect(Cl.prettyPrint(summary.result)).toContain('reserved: u400');
+
+    expect(
+      simnet.callPublicFn('opex-vault', 'cancel-expense', [Cl.uint(6)], governance).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+  });
+
+  it('fails execution when live token solvency is lower than all tracked reservations', () => {
     const cxdToken = Cl.contractPrincipal(deployer, 'cxd-token');
     const vaultPrincipal = Cl.contractPrincipal(deployer, 'opex-vault');
 
@@ -467,18 +579,38 @@ describe('OPEX Vault', () => {
         [
           cxdToken,
           Cl.uint(4),
-          Cl.uint(80),
+          Cl.uint(40),
           Cl.principal(governance),
-          Cl.stringAscii('live solvency check'),
+          Cl.stringAscii('live solvency check one'),
         ],
         deployer,
       ).result,
-    ).toEqual(Cl.ok(Cl.uint(5)));
+    ).toEqual(Cl.ok(Cl.uint(7)));
     expect(
-      simnet.callPublicFn('opex-vault', 'approve-expense', [Cl.uint(5)], approver).result,
+      simnet.callPublicFn(
+        'opex-vault',
+        'create-expense',
+        [
+          cxdToken,
+          Cl.uint(4),
+          Cl.uint(40),
+          Cl.principal(governance),
+          Cl.stringAscii('live solvency check two'),
+        ],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.uint(8)));
+    expect(
+      simnet.callPublicFn('opex-vault', 'approve-expense', [Cl.uint(7)], approver).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
     expect(
-      simnet.callPublicFn('opex-vault', 'approve-expense', [Cl.uint(5)], secondApprover).result,
+      simnet.callPublicFn('opex-vault', 'approve-expense', [Cl.uint(7)], secondApprover).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn('opex-vault', 'approve-expense', [Cl.uint(8)], approver).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn('opex-vault', 'approve-expense', [Cl.uint(8)], secondApprover).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
 
     // Use the token's existing administrative burn hook to model a live
@@ -487,7 +619,7 @@ describe('OPEX Vault', () => {
       simnet.callPublicFn(
         'cxd-token',
         'burn',
-        [Cl.uint(60), vaultPrincipal],
+        [Cl.uint(30), vaultPrincipal],
         deployer,
       ).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
@@ -495,7 +627,7 @@ describe('OPEX Vault', () => {
     const insufficientLiveBalance = simnet.callPublicFn(
       'opex-vault',
       'execute-expense',
-      [Cl.uint(5), cxdToken],
+      [Cl.uint(7), cxdToken],
       governance,
     );
     expect(insufficientLiveBalance.result).toEqual(Cl.error(Cl.uint(1006)));
@@ -507,18 +639,21 @@ describe('OPEX Vault', () => {
       governance,
     );
     expect(Cl.prettyPrint(liveSummary.result)).toContain('tracked-balance: u100');
-    expect(Cl.prettyPrint(liveSummary.result)).toContain('live-balance: u40');
+    expect(Cl.prettyPrint(liveSummary.result)).toContain('live-balance: u70');
     expect(Cl.prettyPrint(liveSummary.result)).toContain('reserved: u80');
     expect(Cl.prettyPrint(liveSummary.result)).toContain('live-solvent: false');
 
     expect(
-      simnet.callPublicFn('opex-vault', 'cancel-expense', [Cl.uint(5)], governance).result,
+      simnet.callPublicFn('opex-vault', 'cancel-expense', [Cl.uint(7)], governance).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn('opex-vault', 'cancel-expense', [Cl.uint(8)], governance).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
   });
 
   it('prevents admin approver collisions and preserves distinct threshold accounting', () => {
     expect(
-      simnet.callPublicFn('opex-vault', 'set-approval-threshold', [Cl.uint(3)], deployer).result,
+      simnet.callPublicFn('opex-vault', 'set-approval-threshold', [Cl.uint(4)], deployer).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
     expect(
       simnet.callPublicFn(

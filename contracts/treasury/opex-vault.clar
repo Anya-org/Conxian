@@ -303,6 +303,7 @@
       (spent (default-to u0 (map-get? category-spent key)))
       (reserved (default-to u0 (map-get? category-reserved key)))
       (balance (default-to u0 (map-get? vault-balances (contract-of token))))
+      (total-reserved-value (default-to u0 (map-get? total-reserved (contract-of token))))
       (expense-id (var-get next-expense-id))
     )
     (begin
@@ -312,6 +313,9 @@
       (asserts! (> budget u0) (err ERR_BUDGET_NOT_SET))
       (asserts! (<= (+ spent (+ reserved amount)) budget) (err ERR_BUDGET_EXCEEDED))
       (asserts! (>= balance (+ reserved amount)) (err ERR_INSUFFICIENT_BALANCE))
+      ;; Reservations are global per token, not isolated by category. Keep the
+      ;; tracked vault balance solvent after adding this expense.
+      (asserts! (>= balance (+ total-reserved-value amount)) (err ERR_INSUFFICIENT_BALANCE))
       (asserts!
         (unwrap!
           (contract-call? .regulatory-adapter check-clean-hands-compliance payee)
@@ -325,7 +329,10 @@
         amount: amount,
         payee: payee,
         memo: memo,
-        submitter: tx-sender,
+        ;; Preserve the immediate authorized caller across nested calls. This
+        ;; prevents a configured approver contract from submitting and then
+        ;; approving its own expense on behalf of the transaction origin.
+        submitter: contract-caller,
         status: EXPENSE_PENDING,
         approvals: u0
       })
@@ -415,8 +422,11 @@
               (asserts! (>= total-reserved-value (get amount expense-data)) (err ERR_INSUFFICIENT_BALANCE))
               ;; Tracked balances protect the internal ledger; the live token
               ;; balance protects against direct outflows or other balance
-              ;; drift that the vault did not record.
+              ;; drift that the vault did not record. Both balances must cover
+              ;; every outstanding reservation before one can execute.
+              (asserts! (>= balance total-reserved-value) (err ERR_INSUFFICIENT_BALANCE))
               (asserts! (>= balance (get amount expense-data)) (err ERR_INSUFFICIENT_BALANCE))
+              (asserts! (>= live-balance total-reserved-value) (err ERR_INSUFFICIENT_BALANCE))
               (asserts! (>= live-balance (get amount expense-data)) (err ERR_INSUFFICIENT_BALANCE))
               (asserts!
                 (unwrap!

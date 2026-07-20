@@ -76,8 +76,26 @@ The Agents module implements autonomous "Fiscal Agents" that manage protocol ris
 | `trigger-x402-settlement` | `(amount uint, token <sip-010-trait>, signature (buff 65))` | Triggers x402 M2M Settlement. |
 | `authorize-iso-20022-egress` | `(tx-id (buff 32), iso-xml-hash (buff 32))` | Authorizes ISO 20022 Egress (Admin only). |
 | `settle-sbc-obligation` | `(sbc (string-ascii 32), amount uint, token <sip-010-trait>)` | Settles SBC obligations via the Fiscal-Vault. |
+| `set-settlement-authority` | `(new-authority principal)` | Rotates the primary settlement authority (Admin only). |
+| `set-settlement-operator` | `(operator principal, active bool)` | Adds or removes an EOA or contract settlement operator (Admin only). |
 | `get-iso-hash` | `(tx-id (buff 32))` | Returns the ISO hash for a transaction. |
+| `get-settlement-authority` | `()` | Returns the configured settlement authority. |
+| `is-settlement-operator` | `(operator principal)` | Reports whether a principal is an active settlement operator. |
 | `get-protocol-status` | `()` | Returns the compliance status and version. |
+
+### Payment Forge settlement authority and operators
+`settle-sbc-obligation` is fail-closed unless the immediate `contract-caller`
+is either the configured settlement authority or an active settlement
+operator. A fresh deployment initializes both `admin` and
+`settlement-authority` from the deploying `tx-sender`; this is only an initial
+configuration, not a substitute for deployment-specific access control.
+
+The admin configures the authority and operators with
+`set-settlement-authority` and `set-settlement-operator`. Both EOAs and
+contract principals are supported, but a contract integration must invoke
+`settle-sbc-obligation` itself because an originating transaction sender cannot
+impersonate its nested `contract-caller`. The configured payment-forge caller
+must also be authorized by `fiscal-vault-oracle` for the downstream release.
 
 ## Integration Examples (How-to)
 
@@ -115,7 +133,10 @@ npx vitest run tests/agents
 ```
 
 ## Status (Reference)
-- Implementation: Production-Ready (v1.1.0)
+- Implementation: Audit-remediated settlement control path (v1.2.0)
+- Production readiness: Not claimed; x402 signature verification remains a
+  placeholder and deployment-specific authority/operator configuration is
+  required before production use.
 - Nakamoto Standards: Compliant (Epoch 3.0)
 - Audit: Session 33 Remediation Complete
 - Bitcoin Compliance: BIP-341/342/174 verification procedures integrated into the global deployment runbook.

@@ -105,6 +105,10 @@ OPEX budgets and reservations are keyed by `{ period, token, category }`.
 Deposits and expenses are tracked per token in native units. The administrator
 is an implicit approver on a fresh deployment; additional approvers can be
 configured and the threshold must remain within the active approver count.
+Each new reservation is checked against the token's global tracked balance,
+not only its category budget. Execution also rechecks the live token balance
+against every outstanding reservation so settling one expense cannot make the
+remaining reservations insolvent.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
@@ -151,11 +155,27 @@ Users can secure their assets in Conxian Vaults:
 ```
 
 ### Funding OPEX and approving an expense
+The creator and approver must be distinct immediate callers. Configure the
+governance and approver principals before creating an expense, then submit and
+approve from separate transactions. The addresses below are simnet-style
+examples; replace them with the principals for the deployment.
 ```clarity
+;; Run as the admin/deployer.
+(contract-call? .opex-vault set-authorized-principals
+  'STSZXAKV7DWTDZN2601WR31BM51BD3YTQXKCF9EZ
+  'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5)
+(contract-call? .opex-vault set-approver
+  'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG true)
 (contract-call? .opex-vault deposit .cxd-token u100000000)
+
+;; Run as the configured governance principal (ST1SJ3D...).
 (contract-call? .opex-vault create-expense
   .cxd-token u3 u25000000 tx-sender "infrastructure invoice")
+
+;; Run as the distinct configured approver principal (ST2CY5...).
 (contract-call? .opex-vault approve-expense u1)
+
+;; Run as the configured governance principal or another authorized executor.
 (contract-call? .opex-vault execute-expense u1 .cxd-token)
 ```
 
