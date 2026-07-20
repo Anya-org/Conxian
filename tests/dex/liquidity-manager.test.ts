@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest';
+import { tx } from '@stacks/clarinet-sdk';
 import { Cl } from '@stacks/transactions';
 import { initializeSimnet, simnet } from '../setup-test-env';
 
@@ -70,6 +71,161 @@ describe('Liquidity manager intent and risk ledger', () => {
     expect(second.result).toEqual(Cl.ok(Cl.bool(true)));
   }
 
+  function seedValidatedPrices(
+    entries: Array<{
+      asset: ReturnType<typeof token>;
+      firstSpot: bigint;
+      secondSpot: bigint;
+      twapPrice: bigint;
+    }>,
+  ) {
+    const startResults = simnet.mineBlock(
+      entries.map(({ asset, twapPrice }) =>
+        tx.callPublicFn(
+          'twap-oracle',
+          'update-price-observation',
+          [asset, Cl.uint(twapPrice)],
+          deployer,
+        ),
+      ),
+    );
+    expect(startResults.map((result) => result.result)).toEqual(
+      entries.map(() => Cl.ok(Cl.bool(true))),
+    );
+
+    simnet.mineBlock(
+      entries.map(({ asset, twapPrice }) =>
+        tx.callPublicFn(
+          'twap-oracle',
+          'update-price-observation',
+          [asset, Cl.uint(twapPrice)],
+          deployer,
+        ),
+      ),
+    );
+
+    const results = simnet.mineBlock(
+      entries.flatMap(({ asset, firstSpot, secondSpot, twapPrice }) => [
+        tx.callPublicFn(
+          'oracle-aggregator',
+          'submit-price',
+          [asset, Cl.uint(firstSpot)],
+          deployer,
+        ),
+        tx.callPublicFn(
+          'oracle-aggregator',
+          'submit-price',
+          [asset, Cl.uint(secondSpot)],
+          wallet1,
+        ),
+        tx.callPublicFn(
+          'twap-oracle',
+          'update-price-observation',
+          [asset, Cl.uint(twapPrice)],
+          deployer,
+        ),
+      ]),
+    );
+
+    expect(results.map((result) => result.result)).toEqual(
+      entries.flatMap(() => [
+        Cl.ok(Cl.bool(true)),
+        Cl.ok(Cl.bool(true)),
+        Cl.ok(Cl.bool(true)),
+      ]),
+    );
+  }
+
+  function seedValidatedPrice(
+    asset: ReturnType<typeof token>,
+    firstSpot: bigint,
+    secondSpot: bigint,
+    twapPrice: bigint,
+  ) {
+    seedValidatedPrices([{ asset, firstSpot, secondSpot, twapPrice }]);
+  }
+
+  function seedValidatedPricesWithAdminOverride(
+    entries: Array<{ asset: ReturnType<typeof token>; price: bigint }>,
+  ) {
+    const startResults = simnet.mineBlock(
+      entries.map(({ asset, price }) =>
+        tx.callPublicFn(
+          'twap-oracle',
+          'update-price-observation',
+          [asset, Cl.uint(price)],
+          deployer,
+        ),
+      ),
+    );
+    expect(startResults.map((result) => result.result)).toEqual(
+      entries.map(() => Cl.ok(Cl.bool(true))),
+    );
+
+    simnet.mineBlock(
+      entries.map(({ asset, price }) =>
+        tx.callPublicFn(
+          'twap-oracle',
+          'update-price-observation',
+          [asset, Cl.uint(price)],
+          deployer,
+        ),
+      ),
+    );
+
+    const results = simnet.mineBlock(
+      entries.flatMap(({ asset, price }) => [
+        tx.callPublicFn('oracle-aggregator', 'set-price', [asset, Cl.uint(price)], deployer),
+        tx.callPublicFn('oracle-aggregator', 'submit-price', [asset, Cl.uint(price)], wallet1),
+        tx.callPublicFn(
+          'twap-oracle',
+          'update-price-observation',
+          [asset, Cl.uint(price)],
+          deployer,
+        ),
+      ]),
+    );
+
+    expect(results.map((result) => result.result)).toEqual(
+      entries.flatMap(() => [
+        Cl.ok(Cl.bool(true)),
+        Cl.ok(Cl.bool(true)),
+        Cl.ok(Cl.bool(true)),
+      ]),
+    );
+  }
+
+  function openPositionWithValidatedAssets(
+    caller: string,
+    args: any[],
+    token0: ReturnType<typeof token>,
+    token1: ReturnType<typeof token>,
+    twap0: bigint,
+    twap1: bigint,
+  ) {
+    const results = simnet.mineBlock([
+      tx.callPublicFn(
+        'twap-oracle',
+        'update-price-observation',
+        [token0, Cl.uint(twap0)],
+        deployer,
+      ),
+      tx.callPublicFn(
+        'twap-oracle',
+        'update-price-observation',
+        [token1, Cl.uint(twap1)],
+        deployer,
+      ),
+      tx.callPublicFn('liquidity-manager', 'open-position-with-assets', args, caller),
+    ]);
+
+    expect(results.slice(0, 2).map((result) => result.result)).toEqual([
+      Cl.ok(Cl.bool(true)),
+      Cl.ok(Cl.bool(true)),
+    ]);
+    return results[2];
+  }
+
   function openPosition(
     caller: string,
     poolId = 1n,
@@ -122,6 +278,14 @@ describe('Liquidity manager intent and risk ledger', () => {
       ).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
     expect(
+      simnet.callPublicFn(
+        'twap-oracle',
+        'set-twap-window',
+        [Cl.uint(1)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
       simnet.callPublicFn('liquidity-manager', 'set-oracle', [oracle()], deployer).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
   });
@@ -129,15 +293,19 @@ describe('Liquidity manager intent and risk ledger', () => {
   it('preserves the open-position signature, allocates IDs from one, and records no custody', () => {
     const first = openPosition(wallet1);
     const second = openPosition(wallet1, 2n, -20, 20, 2000n);
+    const firstId = positionId(first);
+    const secondId = positionId(second);
 
-    expect(first.result).toEqual(Cl.ok(Cl.uint(1)));
-    expect(second.result).toEqual(Cl.ok(Cl.uint(2)));
+    expect(first.result).toEqual(Cl.ok(Cl.uint(firstId)));
+    expect(second.result).toEqual(Cl.ok(Cl.uint(secondId)));
+    expect(secondId).toBe(firstId + 1n);
+    expect(firstId).toBeGreaterThan(0n);
     expect(first.events.some((event) => event.event === 'ft_transfer_event')).toBe(false);
 
     const stored = simnet.callReadOnlyFn(
       'liquidity-manager',
       'get-position',
-      [Cl.uint(1)],
+      [Cl.uint(firstId)],
       deployer,
     );
     const printed = pretty(stored.result);
@@ -157,11 +325,26 @@ describe('Liquidity manager intent and risk ledger', () => {
     expect(openPosition(wallet1, 1n, 0, 887273).result).toEqual(error(2006));
   });
 
-  it('requires an owner-configured matching oracle and records nonzero entry prices', () => {
+  it('requires the canonical oracle and records validated nonzero entry prices', () => {
     const asset0 = token('lm-entry-token-0');
     const asset1 = token('lm-entry-token-1');
-    submitPrice(asset0, 100n);
-    submitPrice(asset1, 200n);
+
+    expect(
+      simnet.callPublicFn(
+        'liquidity-manager',
+        'set-oracle',
+        [Cl.contractPrincipal(deployer, 'chainlink-adapter')],
+        deployer,
+      ).result,
+    ).toEqual(error(2008));
+    expect(
+      simnet.callPublicFn(
+        'liquidity-manager',
+        'set-oracle-source',
+        [Cl.contractPrincipal(deployer, 'chainlink-adapter')],
+        deployer,
+      ).result,
+    ).toEqual(error(2008));
 
     expect(
       simnet.callPublicFn('liquidity-manager', 'set-oracle', [oracle()], wallet1).result,
@@ -171,7 +354,7 @@ describe('Liquidity manager intent and risk ledger', () => {
         'liquidity-manager',
         'open-position-with-assets',
         [
-          Cl.uint(3),
+          Cl.uint(1),
           Cl.int(-10),
           Cl.int(10),
           Cl.uint(500),
@@ -184,19 +367,27 @@ describe('Liquidity manager intent and risk ledger', () => {
       ).result,
     ).toEqual(error(2008));
 
-    const opened = simnet.callPublicFn(
-      'liquidity-manager',
-      'open-position-with-assets',
-      [Cl.uint(3), Cl.int(-10), Cl.int(10), Cl.uint(500), asset0, asset1, oracle(), Cl.uint(100)],
+    seedValidatedPrices([
+      { asset: asset0, firstSpot: 100n, secondSpot: 100n, twapPrice: 100n },
+      { asset: asset1, firstSpot: 200n, secondSpot: 200n, twapPrice: 200n },
+    ]);
+
+    const opened = openPositionWithValidatedAssets(
       wallet1,
+      [Cl.uint(1), Cl.int(-10), Cl.int(10), Cl.uint(500), asset0, asset1, oracle(), Cl.uint(100)],
+      asset0,
+      asset1,
+      100n,
+      200n,
     );
-    expect(opened.result).toEqual(Cl.ok(Cl.uint(3)));
+    const openedId = positionId(opened);
+    expect(opened.result).toEqual(Cl.ok(Cl.uint(openedId)));
     expect(opened.events.some((event) => event.event === 'ft_transfer_event')).toBe(false);
 
     const stored = simnet.callReadOnlyFn(
       'liquidity-manager',
       'get-position',
-      [Cl.uint(3)],
+      [Cl.uint(openedId)],
       deployer,
     );
     const printed = pretty(stored.result);
@@ -211,8 +402,10 @@ describe('Liquidity manager intent and risk ledger', () => {
   it('rejects zero prices, duplicate assets, and limits above 10000 bps', () => {
     const valid0 = token('lm-boundary-token-0');
     const valid1 = token('lm-boundary-token-1');
-    submitPrice(valid0, 10n);
-    submitPrice(valid1, 20n);
+    seedValidatedPrices([
+      { asset: valid0, firstSpot: 10n, secondSpot: 10n, twapPrice: 10n },
+      { asset: valid1, firstSpot: 20n, secondSpot: 20n, twapPrice: 20n },
+    ]);
 
     expect(
       simnet.callPublicFn(
@@ -232,15 +425,90 @@ describe('Liquidity manager intent and risk ledger', () => {
     ).toEqual(error(2011));
 
     const zero0 = token('lm-zero-token-0');
-    submitPrice(zero0, 0n);
+    seedValidatedPrice(zero0, 0n, 0n, 0n);
+    const zeroOpening = openPositionWithValidatedAssets(
+      wallet1,
+      [Cl.uint(4), Cl.int(-1), Cl.int(1), Cl.uint(1), zero0, valid1, oracle(), Cl.uint(100)],
+      zero0,
+      valid1,
+      0n,
+      20n,
+    );
+    expect(zeroOpening.result).toEqual(error(7003));
+  });
+
+  it('requires fresh canonical TWAP data and enforces the inclusive deviation boundary', () => {
+    const missingTwap0 = token('lm-missing-twap-token-0');
+    const missingTwap1 = token('lm-missing-twap-token-1');
+    submitPrice(missingTwap0, 100n);
+    submitPrice(missingTwap1, 200n);
+
     expect(
       simnet.callPublicFn(
         'liquidity-manager',
         'open-position-with-assets',
-        [Cl.uint(4), Cl.int(-1), Cl.int(1), Cl.uint(1), zero0, valid1, oracle(), Cl.uint(100)],
+        [
+          Cl.uint(1),
+          Cl.int(-1),
+          Cl.int(1),
+          Cl.uint(1),
+          missingTwap0,
+          missingTwap1,
+          oracle(),
+          Cl.uint(100),
+        ],
         wallet1,
       ).result,
-    ).toEqual(error(2010));
+    ).toEqual(error(6001));
+
+    const boundary0 = token('lm-twap-boundary-token-0');
+    const boundary1 = token('lm-twap-boundary-token-1');
+    seedValidatedPrices([
+      { asset: boundary0, firstSpot: 105n, secondSpot: 105n, twapPrice: 100n },
+      { asset: boundary1, firstSpot: 200n, secondSpot: 200n, twapPrice: 200n },
+    ]);
+
+    const opened = openPositionWithValidatedAssets(
+      wallet1,
+      [Cl.uint(1), Cl.int(-1), Cl.int(1), Cl.uint(1), boundary0, boundary1, oracle(), Cl.uint(100)],
+      boundary0,
+      boundary1,
+      100n,
+      200n,
+    );
+    const id = positionId(opened);
+    expect(opened.result).toEqual(Cl.ok(Cl.uint(id)));
+
+    const aboveBoundary = token('lm-twap-over-boundary-token');
+    seedValidatedPrice(aboveBoundary, 106n, 106n, 100n);
+    const aboveOpening = openPositionWithValidatedAssets(
+      wallet1,
+      [
+        Cl.uint(2),
+        Cl.int(-1),
+        Cl.int(1),
+        Cl.uint(1),
+        aboveBoundary,
+        boundary1,
+        oracle(),
+        Cl.uint(100),
+      ],
+      aboveBoundary,
+      boundary1,
+      100n,
+      200n,
+    );
+    expect(aboveOpening.result).toEqual(error(7006));
+
+    updatePrice(boundary0, 106n);
+    expect(
+      simnet.callReadOnlyFn(
+        'liquidity-manager',
+        'get-il-protection-status',
+        [Cl.uint(id), oracle()],
+        deployer,
+      ).result,
+    ).toEqual(error(6001));
   });
 
   it('enforces owner-or-position-owner close and risk-limit updates', () => {
@@ -277,20 +545,26 @@ describe('Liquidity manager intent and risk ledger', () => {
   it('reports price-movement proxy status with strict threshold semantics and overflow guard', () => {
     const risk0 = token('lm-risk-token-0');
     const risk1 = token('lm-risk-token-1');
-    submitPrice(risk0, 100n);
-    submitPrice(risk1, 200n);
+    seedValidatedPrices([
+      { asset: risk0, firstSpot: 100n, secondSpot: 100n, twapPrice: 100n },
+      { asset: risk1, firstSpot: 200n, secondSpot: 200n, twapPrice: 200n },
+    ]);
 
-    const opened = simnet.callPublicFn(
-      'liquidity-manager',
-      'open-position-with-assets',
-      [Cl.uint(6), Cl.int(-10), Cl.int(10), Cl.uint(1000), risk0, risk1, oracle(), Cl.uint(100)],
+    const opened = openPositionWithValidatedAssets(
       wallet1,
+      [Cl.uint(1), Cl.int(-10), Cl.int(10), Cl.uint(1000), risk0, risk1, oracle(), Cl.uint(100)],
+      risk0,
+      risk1,
+      100n,
+      200n,
     );
-    expect(opened.result).toEqual(Cl.ok(Cl.uint(5)));
     const id = positionId(opened);
+    expect(opened.result).toEqual(Cl.ok(Cl.uint(id)));
 
-    updatePrice(risk0, 101n);
-    updatePrice(risk1, 202n);
+    seedValidatedPrices([
+      { asset: risk0, firstSpot: 101n, secondSpot: 101n, twapPrice: 101n },
+      { asset: risk1, firstSpot: 202n, secondSpot: 202n, twapPrice: 202n },
+    ]);
     let status = simnet.callReadOnlyFn(
       'liquidity-manager',
       'get-il-protection-status',
@@ -305,44 +579,45 @@ describe('Liquidity manager intent and risk ledger', () => {
     expect(
       simnet.callPublicFn('liquidity-manager', 'update-risk-limit', [Cl.uint(id), Cl.uint(99)], wallet1).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
+    seedValidatedPrices([
+      { asset: risk0, firstSpot: 101n, secondSpot: 101n, twapPrice: 101n },
+      { asset: risk1, firstSpot: 202n, secondSpot: 202n, twapPrice: 202n },
+    ]);
     status = simnet.callReadOnlyFn('liquidity-manager', 'get-il-protection-status', [Cl.uint(id), oracle()], deployer);
     expect(pretty(status.result)).toContain('triggered: true');
 
     expect(
       simnet.callPublicFn('liquidity-manager', 'update-risk-limit', [Cl.uint(id), Cl.uint(101)], wallet1).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
+    seedValidatedPrices([
+      { asset: risk0, firstSpot: 101n, secondSpot: 101n, twapPrice: 101n },
+      { asset: risk1, firstSpot: 202n, secondSpot: 202n, twapPrice: 202n },
+    ]);
     status = simnet.callReadOnlyFn('liquidity-manager', 'get-il-protection-status', [Cl.uint(id), oracle()], deployer);
     expect(pretty(status.result)).toContain('triggered: false');
 
     const overflow0 = token('lm-overflow-token-0');
     const overflow1 = token('lm-overflow-token-1');
-    submitPrice(overflow0, 1n);
-    submitPrice(overflow1, 1n);
-    const overflowPosition = simnet.callPublicFn(
-      'liquidity-manager',
-      'open-position-with-assets',
-      [Cl.uint(7), Cl.int(-2), Cl.int(2), Cl.uint(1), overflow0, overflow1, oracle(), Cl.uint(100)],
+    seedValidatedPrices([
+      { asset: overflow0, firstSpot: 1n, secondSpot: 1n, twapPrice: 1n },
+      { asset: overflow1, firstSpot: 1n, secondSpot: 1n, twapPrice: 1n },
+    ]);
+    const overflowPosition = openPositionWithValidatedAssets(
       wallet1,
+      [Cl.uint(2), Cl.int(-2), Cl.int(2), Cl.uint(1), overflow0, overflow1, oracle(), Cl.uint(100)],
+      overflow0,
+      overflow1,
+      1n,
+      1n,
     );
-    expect(overflowPosition.result).toEqual(Cl.ok(Cl.uint(6)));
     const overflowId = positionId(overflowPosition);
+    expect(overflowPosition.result).toEqual(Cl.ok(Cl.uint(overflowId)));
 
-    expect(
-      simnet.callPublicFn(
-        'oracle-aggregator',
-        'set-price',
-        [overflow0, Cl.uint(MAX_UINT)],
-        deployer,
-      ).result,
-    ).toEqual(Cl.ok(Cl.bool(true)));
-    expect(
-      simnet.callPublicFn(
-        'oracle-aggregator',
-        'submit-price',
-        [overflow0, Cl.uint(0)],
-        wallet1,
-      ).result,
-    ).toEqual(Cl.ok(Cl.bool(true)));
+    const overflowPrice = MAX_UINT / 2n;
+    seedValidatedPricesWithAdminOverride([
+      { asset: overflow0, price: overflowPrice },
+      { asset: overflow1, price: 1n },
+    ]);
 
     expect(
       simnet.callReadOnlyFn(
@@ -356,8 +631,8 @@ describe('Liquidity manager intent and risk ledger', () => {
 
   it('supports position-owner rebalance intents without mutating position liquidity', () => {
     const opened = openPosition(wallet1, 8n, -10, 10, 1234n);
-    expect(opened.result).toEqual(Cl.ok(Cl.uint(7)));
     const id = positionId(opened);
+    expect(opened.result).toEqual(Cl.ok(Cl.uint(id)));
     const before = pretty(simnet.callReadOnlyFn('liquidity-manager', 'get-position', [Cl.uint(id)], deployer).result);
 
     expect(
@@ -436,7 +711,9 @@ describe('Liquidity manager intent and risk ledger', () => {
   });
 
   it('gives inclusive caller-observed tick advice and rejects mismatched oracle status calls', () => {
-    const id = 7n;
+    const opened = openPosition(wallet1, 9n, -10, 10, 1234n);
+    const id = positionId(opened);
+    expect(opened.result).toEqual(Cl.ok(Cl.uint(id)));
     for (const [observed, inRange, shouldRebalance] of [
       [-11, false, true],
       [-10, true, false],
@@ -460,7 +737,7 @@ describe('Liquidity manager intent and risk ledger', () => {
       simnet.callReadOnlyFn(
         'liquidity-manager',
         'get-il-protection-status',
-        [Cl.uint(5), Cl.contractPrincipal(deployer, 'chainlink-adapter')],
+        [Cl.uint(id), Cl.contractPrincipal(deployer, 'chainlink-adapter')],
         deployer,
       ).result,
     ).toEqual(error(2008));

@@ -1,21 +1,33 @@
 # DEX Module
 
-## Overview (Explanation)
-The DEX module provides high-efficiency trading and liquidity provision for the Conxian ecosystem. In 2026, it evolved into a **Universal Routing Layer** powered by the Apex Router and the Common Settlement Framework (CSF).
+## Scope
 
-### Key Concepts
+The DEX module currently provides **oracle, deterministic policy, and
+liquidity-intent infrastructure**. It does not yet provide a complete LP
+execution or custody system. In particular, the liquidity-manager ledger does
+not transfer tokens, custody assets, mutate a pool, collect fees, or prove that
+an LP position was executed.
 
-- **Concentrated Liquidity**: A system where liquidity providers (LPs) can specify the price range in which their capital is used, significantly increasing capital efficiency.
-- **Universal Routing Layer**: An abstraction layer that allows users to swap assets across any CSF-compliant protocol (e.g., Bitflow, Alex) through a single entry point.
-- **Common Settlement Framework (CSF)**: A standardized interface that enables different DeFi protocols to interact seamlessly, allowing for unified liquidity discovery and execution.
-- **Apex Router**: The core routing engine that dynamically dispatches trades to the most efficient liquidity source available in the CSF network.
+The existing swap and concentrated-liquidity contracts remain separate
+integration surfaces. This README describes the production-safe behavior of
+the DEX contracts covered by the current implementation and tests.
 
-## Architecture (Explanation)
-The DEX follows a dynamic routing architecture designed for maximum interoperability:
-- **Universal Router** (`swap-router.clar`): Handles dynamic dispatch to any CSF-compliant liquidity source. It acts as the primary user-facing entry point for all swap operations.
-- **Protocol Registry** (`dex-factory.clar`): Maintains the list of permitted external protocol integrations and manages native pool discovery.
-- **Native Engine** (`concentrated-liquidity-pool.clar`): Provides high-efficiency native Stacks liquidity using a concentrated liquidity model.
-- **Swap Aggregator** (`swap-aggregator.clar`): A specialized adapter for sovereign, non-custodial Bitcoin-native swaps.
+## Architecture
+
+- **Oracle facade** (`oracle.clar`) — canonical aggregate spot and TWAP
+  validation.
+- **Policy helpers** — pure/read-only checks for invariants, rebalancing, and
+  bounded scaling decisions.
+- **Liquidity intent ledger** (`liquidity-manager.clar`) — records validated
+  position and rebalance intents plus a price-movement risk proxy.
+- **Execution prerequisites** — concentrated-liquidity pool custody, position
+  accounting, fee accounting, and a current-tick API are still required before
+  the intent ledger can execute or settle LP operations.
+
+Pool IDs and token principals accepted by the liquidity-manager are
+**caller-supplied intent metadata**. They are stored and emitted for later
+execution, but they are not verified against an on-chain pool or token
+registry.
 
 ## Core Contracts (Reference)
 
@@ -61,11 +73,31 @@ Native High-Efficiency Liquidity.
 | `get-protocol-status` | `()` | Get the status of the CL pool contract. |
 
 ### `liquidity-manager.clar`
-Liquidity Provision Management.
+The liquidity-manager is a validated, unexecuted intent ledger. Every recorded
+position starts with `accounted-liquidity: u0`; no token or pool mutation is
+performed.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `open-position` | `(pool-id uint) (tick-lower int) (tick-upper int) (liquidity uint)` | Open a new liquidity position in a pool. |
+| `set-oracle` | `(oracle-source <oracle-trait>)` | Owner-only configuration. Only the canonical `.oracle` facade is accepted; the configured principal is stored and rechecked through `(contract-of oracle-source)`. |
+| `set-oracle-source` | `(oracle-source <oracle-trait>)` | Compatibility alias with the same canonical-principal guard. |
+| `set-contract-owner` | `(new-owner principal)` | Owner-only owner transfer. |
+| `open-position` | `(pool-id uint) (tick-lower int) (tick-upper int) (liquidity uint)` | Records a compliant, unexecuted position intent. Pool ID is caller-supplied metadata; no pool registry lookup or token movement occurs. |
+| `open-position-with-assets` | `(pool-id uint) (tick-lower int) (tick-upper int) (liquidity uint) (token-0 principal) (token-1 principal) (oracle-source <oracle-trait>) (max-price-move-bps uint)` | Records token metadata and captures both entry prices through `.oracle get-validated-price`. The supplied trait must be the configured canonical facade. |
+| `get-position` | `(position-id uint)` | Reads the local intent record, including requested and accounted liquidity. |
+| `close-position` | `(position-id uint)` | Closes only the local intent record. It does not withdraw or settle liquidity. |
+| `update-risk-limit` | `(position-id uint) (max-price-move-bps uint)` | Updates the owner-managed movement threshold. |
+| `set-risk-limit` | `(position-id uint) (max-price-move-bps uint)` | Compatibility alias for `update-risk-limit`. |
+| `get-il-protection-status` | `(position-id uint) (oracle-source <oracle-trait>)` | Compares entry prices with current `.oracle get-validated-price` values. This is a deterministic price-movement proxy, not exact concentrated-liquidity impermanent-loss accounting. Equality at the threshold is safe. |
+| `request-rebalance` | `(position-id uint) (target-tick-lower int) (target-tick-upper int) (target-liquidity uint)` | Records a position-owner-only rebalance intent without mutating position liquidity or pool state. |
+| `get-rebalance` | `(position-id uint)` | Reads the rebalance intent. |
+| `get-rebalance-plan` | `(position-id uint)` | Compatibility alias for `get-rebalance`. |
+| `cancel-rebalance` | `(position-id uint)` | Cancels the local rebalance intent. |
+| `get-rebalance-advice` | `(position-id uint) (observed-tick int)` | Evaluates a caller-observed tick against the stored range. The observation is advisory; the pool has no current-tick getter here and no rebalance is executed. |
+
+The risk endpoint fails closed when canonical aggregate/TWAP data is missing,
+stale, zero, or excessively divergent. It does not call a dynamic oracle
+implementation for pricing after the canonical principal check.
 
 ### `route-manager.clar`
 Multi-hop Swap Routing.
@@ -75,14 +107,25 @@ Multi-hop Swap Routing.
 | `swap-route` | `(amount-in uint) (amount-out-min uint) (token-in <sip-010-trait>) (token-out <sip-010-trait>) (route (list 5 principal))` | Execute a multi-hop swap route. |
 
 ### `oracle.clar`
-DEX Price Oracle.
+Canonical aggregate/TWAP oracle facade implementing
+`defi-traits.oracle-trait`.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `set-price` | `(token principal) (price uint)` | Set the price for a specific token. |
-| `get-price` | `(token principal)` | Get the price for a specific token. |
-| `fetch-price` | `(token principal)` | Fetch the latest price for a token. |
+| `get-price` | `(token principal)` | Returns the nonzero raw aggregate spot from `oracle-aggregator`; it does not apply the TWAP deviation policy. |
+| `fetch-price` | `(token principal)` | Public compatibility wrapper for the same raw aggregate spot. |
+| `get-twap-price` | `(token principal)` | Returns the nonzero TWAP from `twap-oracle`. |
+| `get-price-diagnostics` | `(token principal)` | Returns spot, TWAP, and absolute deviation in basis points. |
+| `get-validated-price` | `(token principal)` | Returns aggregate spot only when spot-vs-TWAP deviation is at or below the configured inclusive limit. |
+| `set-max-twap-deviation-bps` | `(new-deviation-bps uint)` | Owner-only inclusive deviation policy, bounded to 10,000 bps. |
+| `set-price` | `(token principal) (price uint)` | Owner-only legacy advisory metadata. It is not read by canonical price or validation paths. |
+| `get-legacy-price` | `(token principal)` | Reads retained advisory metadata, if present. |
 | `transfer-ownership` | `(new-owner principal)` | Transfer contract ownership to a new principal. |
+
+Canonical aggregate or TWAP data that is missing, stale, zero, or outside the
+configured deviation limit returns an error; it no longer appears as
+`(ok u0)`. Consumers that need a risk-safe price should call
+`get-validated-price`, not raw `get-price`.
 
 ## Integration Examples (How-to)
 
@@ -97,10 +140,43 @@ DEX Price Oracle.
 )
 ```
 
-## Testing (How-to)
-Comprehensive validation is performed via `tests/csf-full-system.test.ts`.
+## Deterministic policy helpers
 
-## Status (Reference)
-- Implementation: Apex v1.1.0 Ready
-- Audit Status: Internally Verified (March 2026)
-- Standard: CSF Dynamic Dispatch, 100% Fee Buy-back
+These contracts are pure/read-only policy helpers and do not execute swaps or
+move assets:
+
+- `protocol-invariant-monitor.clar` — solvency and constant-product checks,
+  including bounded tolerance and overflow handling.
+- `rebalancing-rules.clar` — strict-threshold rebalance decisions, absolute
+  deltas, and signed direction.
+- `predictive-scaling-system.clar` — bounded activity scaling,
+  volatility-adjusted fees, and depth-adjusted liquidity.
+- `concentrated-math.clar` — concentrated-liquidity tick and math helpers used
+  for input validation.
+
+The removed `placeholder` entrypoints were nonfunctional stubs. Callers should
+use the deterministic helper functions listed above rather than relying on
+those compatibility-only no-op entrypoints.
+
+## Focused tests
+
+- `tests/dex/oracle.test.ts` — aggregate/TWAP facade behavior, diagnostics,
+  inclusive deviation boundaries, zero/missing data, and overflow handling.
+- `tests/dex/liquidity-manager.test.ts` — canonical oracle configuration,
+  validated openings, missing/stale TWAP fail-closed behavior, intent
+  isolation, movement-proxy thresholds, and rebalance/tick advice.
+- `tests/dex/dex-policy-stubs.test.ts` — deterministic invariant and
+  rebalancing helpers.
+
+## Remaining prerequisites for full LP execution
+
+Before this module can claim full concentrated-liquidity execution, the CLP
+integration still needs:
+
+1. token custody and transfer authorization;
+2. on-chain LP position creation, ownership, and settlement accounting;
+3. pool reserve/liquidity reads and fee accrual/collection accounting; and
+4. a trusted current-tick/current-price observation API for rebalance advice.
+
+Until those prerequisites exist, `liquidity-manager` remains a validated intent
+ledger and deterministic risk proxy, not an LP executor.

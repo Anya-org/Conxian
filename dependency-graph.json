@@ -159,12 +159,10 @@
     "block-utils"
   ],
   "liquidity-manager": [
-    "regulatory-adapter",
-    "concentrated-liquidity-pool",
-    "conxian-protocol",
-    "sip-standards",
-    "vault-trait",
-    "block-utils"
+    "concentrated-math",
+    "defi-traits",
+    "oracle",
+    "regulatory-adapter"
   ],
   "protocol-invariant-monitor": [],
   "swap-manager": [],

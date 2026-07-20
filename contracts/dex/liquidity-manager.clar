@@ -6,6 +6,10 @@
 ;; therefore records validated user intents and risk metadata only. It never
 ;; transfers tokens, claims pool liquidity, changes pool state, or represents
 ;; an executed LP position.
+;;
+;; pool-id and token principals are caller-supplied intent metadata. They are
+;; stored for later execution, but this ledger does not verify them against an
+;; on-chain pool or token registry.
 
 (use-trait oracle-trait .defi-traits.oracle-trait)
 
@@ -121,39 +125,33 @@
 )
 
 (define-private (assert-configured-oracle (oracle-source <oracle-trait>))
-  (match (var-get configured-oracle)
-    configured
-      (if (is-eq configured (contract-of oracle-source))
-        (ok true)
-        ERR_ORACLE_MISMATCH
-      )
-    ERR_ORACLE_NOT_CONFIGURED
+  (begin
+    ;; Configuration and all consuming calls are restricted to the canonical
+    ;; facade, while the stored principal comparison preserves the injected
+    ;; trait/principal guard pattern.
+    (asserts! (is-eq (contract-of oracle-source) .oracle) ERR_ORACLE_MISMATCH)
+    (match (var-get configured-oracle)
+      configured
+        (if (is-eq configured (contract-of oracle-source))
+          (ok true)
+          ERR_ORACLE_MISMATCH
+        )
+      ERR_ORACLE_NOT_CONFIGURED
+    )
   )
 )
 
-(define-private (fetch-nonzero-price (oracle-source <oracle-trait>) (token principal))
-  (match (contract-call? oracle-source get-price token)
+;; Read the canonical aggregate spot only after the facade validates it against
+;; its configured TWAP deviation. Upstream response errors are preserved so
+;; missing, stale, or divergent data remains deterministic to callers.
+(define-private (fetch-nonzero-validated-price (token principal))
+  (match (contract-call? .oracle get-validated-price token)
     price
       (if (> price u0)
         (ok price)
         ERR_ZERO_ORACLE_PRICE
       )
-    error-value ERR_ZERO_ORACLE_PRICE
-  )
-)
-
-;; Clarity's read-only checker cannot prove that a dynamic trait call is
-;; read-only. The canonical facade is statically known to expose read-only
-;; get-price, so the read-only risk endpoint uses it after validating that the
-;; caller-supplied trait and configured principal are both .oracle.
-(define-private (fetch-nonzero-canonical-price (token principal))
-  (match (contract-call? .oracle get-price token)
-    price
-      (if (> price u0)
-        (ok price)
-        ERR_ZERO_ORACLE_PRICE
-      )
-    error-value ERR_ZERO_ORACLE_PRICE
+    error-value (err error-value)
   )
 )
 
@@ -268,6 +266,12 @@
         position-id: position-id,
         owner: tx-sender,
         pool-id: pool-id,
+        pool-id-source: "caller-supplied-intent-metadata",
+        pool-registry-verified: false,
+        token-0: token-0,
+        token-1: token-1,
+        token-source: "caller-supplied-intent-metadata",
+        token-registry-verified: false,
         requested-liquidity: liquidity,
         accounted-liquidity: u0
       })
@@ -306,6 +310,7 @@
 (define-public (set-oracle (oracle-source <oracle-trait>))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-eq (contract-of oracle-source) .oracle) ERR_ORACLE_MISMATCH)
     (var-set configured-oracle (some (contract-of oracle-source)))
     (print {
       event: "liquidity-manager-oracle-configured",
@@ -320,6 +325,7 @@
 (define-public (set-oracle-source (oracle-source <oracle-trait>))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-eq (contract-of oracle-source) .oracle) ERR_ORACLE_MISMATCH)
     (var-set configured-oracle (some (contract-of oracle-source)))
     (print {
       event: "liquidity-manager-oracle-configured",
@@ -364,9 +370,11 @@
   )
 )
 
-;; @desc Record an intent with token principals and nonzero oracle entry
-;; prices. The oracle trait argument must be the configured source. This still
-;; performs no token transfer, custody, pool execution, or balance claim.
+;; @desc Record an intent with caller-supplied token/pool metadata and
+;; nonzero entry prices validated by the canonical oracle facade. The oracle
+;; trait argument must be the configured .oracle principal. This still
+;; performs no token transfer, custody, pool execution, registry lookup, or
+;; balance claim.
 (define-public (open-position-with-assets
     (pool-id uint)
     (tick-lower int)
@@ -384,8 +392,8 @@
     (asserts! (<= max-price-move-bps BASIS_POINTS) ERR_INVALID_PRICE_MOVE_LIMIT)
     (try! (assert-configured-oracle oracle-source))
     (let (
-        (entry-price-0 (try! (fetch-nonzero-price oracle-source token-0)))
-        (entry-price-1 (try! (fetch-nonzero-price oracle-source token-1)))
+        (entry-price-0 (try! (fetch-nonzero-validated-price token-0)))
+        (entry-price-1 (try! (fetch-nonzero-validated-price token-1)))
       )
       (create-position
         pool-id
@@ -459,14 +467,13 @@
     (begin
       (asserts! (get active position) ERR_POSITION_CLOSED)
       (try! (assert-configured-oracle oracle-source))
-      (asserts! (is-eq (contract-of oracle-source) .oracle) ERR_ORACLE_MISMATCH)
       (let (
           (token-0 (unwrap! (get token-0 position) ERR_ENTRY_PRICES_REQUIRED))
           (token-1 (unwrap! (get token-1 position) ERR_ENTRY_PRICES_REQUIRED))
           (entry-price-0 (unwrap! (get entry-price-0 position) ERR_ENTRY_PRICES_REQUIRED))
           (entry-price-1 (unwrap! (get entry-price-1 position) ERR_ENTRY_PRICES_REQUIRED))
-          (current-price-0 (try! (fetch-nonzero-canonical-price token-0)))
-          (current-price-1 (try! (fetch-nonzero-canonical-price token-1)))
+          (current-price-0 (try! (fetch-nonzero-validated-price token-0)))
+          (current-price-1 (try! (fetch-nonzero-validated-price token-1)))
           (movement-bps-0 (try! (calculate-movement-bps entry-price-0 current-price-0)))
           (movement-bps-1 (try! (calculate-movement-bps entry-price-1 current-price-1)))
           (max-price-move-bps (get max-price-move-bps position))
