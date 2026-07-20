@@ -6,6 +6,24 @@ As of April 2026, the Conxian Sovereign Autonomous Business (SAB) implements a m
 - **Enforcement**: Managed by `revenue-automation.clar`.
 - **Distribution**: 100% of collected fees flow to the Burn-Mint Equilibrium (BME) engine via `revenue-distributor.clar`.
 
+### Integration Fees (STX-first MVP)
+Registered integrations may use `integration-fee-collector.clar` for:
+
+- **Per-use billing (`u1`)**: each reporter-authorized usage record accrues
+  the configured fee multiplied by usage units.
+- **Monthly billing (`u2`)**: usage is audited throughout a period derived
+  from `burn-block-height / 4320`; the fixed monthly fee becomes settleable
+  only after that period closes.
+- **Settlement**: the configured payer must settle the exact outstanding STX
+  amount. The collector invokes the existing `distribute-stx` route under
+  contract context, so one hundred percent enters `revenue-distributor.clar`;
+  no partner split and no direct operational-treasury bypass are introduced.
+
+API keys are authenticated off-chain and represented on-chain only by SHA-256
+hashes for lifecycle and audit purposes. The MVP trusts a configured reporter
+per integration. Generic FT settlement and payer-signed usage attestations are
+future extensions, not part of this STX-first contract path.
+
 ## 2. Revenue Split (CXIP-013)
 The protocol treasury (`cxd-treasury.clar`) manages the allocation of collected revenue based on the following target baseline:
 - **Treasury (SAB Operations)**: 45.0%

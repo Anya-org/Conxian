@@ -8,6 +8,10 @@ Commercialization of ConxianCSF follows a three-phase activation sequence:
 - **BME Engine**: Fee collection and buy-back/burn mechanism active.
 - **ALEX Adapter**: Trustless routing through ALEX pools enabled.
 - **Internal Bounty Funding**: ALEX-linked treasury path for core maintenance.
+- **Integration Fee MVP (contract scope)**: STX per-use and monthly billing is
+  implemented through the registry/collector pair, with exact payer
+  settlement routed through the existing revenue distributor. Activation is
+  still gated on production-profile/ALEX drift repair and deployment review.
 
 ### Phase 2: Community Expansion (L+30 Days)
 - **External CSF Registry**: Permitting community-governed addition of new protocols (e.g., Zest, StackingDAO).
@@ -25,6 +29,10 @@ Before moving between phases, the following gates must be satisfied:
 - **Audit Verification**: Final security report for all CSF-compliant adapters.
 - **Liquidity Depth**: Minimum TVL (M equivalent) in core pools.
 - **Agent Performance**: Verified PID stability in `agent-risk` for at least 14 days on mainnet.
+- **Integration Billing Controls**: Each integration has an active owner/payer,
+  reporter, fee configuration, and rotated key commitment; monthly settlement
+  is gated by burn-block period closure. Reporter trust is an MVP boundary,
+  with payer-signed attestations reserved for a later hardening phase.
 
 ## 3. Prohibited Actions (Ethos Compliance)
 To preserve the Conxian Sovereign Ethos, the following are strictly avoided:
