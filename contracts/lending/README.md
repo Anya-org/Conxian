@@ -40,8 +40,20 @@ Provider of mathematical curves for interest rate calculations.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `get-borrow-rate` | `(get-borrow-rate (utilization uint))` | Returns the current borrow rate (APY in basis points). |
-| `get-supply-rate` | `(get-supply-rate (utilization uint))` | Returns the current supply rate (APY in basis points). |
+| `get-borrow-rate` | `(get-borrow-rate (asset principal) (utilization uint))` | Returns the annual borrow rate in basis points for an asset. |
+| `get-supply-rate` | `(get-supply-rate (asset principal) (utilization uint))` | Returns the annual supply rate in basis points for an asset. |
+| `get-asset-params` | `(get-asset-params (asset principal))` | Returns the current interest rate parameters for an asset. |
+| `get-utilization-rate` | `(get-utilization-rate (total-deposits uint) (total-borrows uint))` | Returns the utilization rate in basis points (0 to 10000). |
+| `calculate-interest` | `(calculate-interest (amount uint) (borrow-rate uint) (seconds uint))` | Calculates the annual interest amount for a duration. |
+| `set-asset-params` | `(set-asset-params (asset principal) (base-rate uint) (slope1 uint) (slope2 uint) (kink uint) (reserve-factor uint))` | Configures the interest rate parameters for an asset. |
+| `set-asset-enabled` | `(set-asset-enabled (asset principal) (enabled bool))` | Enables or disables interest accrual for an asset. |
+| `remove-asset` | `(remove-asset (asset principal))` | Removes an asset's interest rate configuration. |
+| `initialize` | `(initialize (new-admin principal))` | Initializes the contract with an admin principal. |
+| `transfer-admin` | `(transfer-admin (new-admin principal))` | Transfers admin rights to a new principal. |
+| `configure-stx-market` | `(configure-stx-market (asset principal))` | Configures conservative STX parameters (higher rates for volatility). |
+| `configure-sbtc-market` | `(configure-sbtc-market (asset principal))` | Configures standard sBTC parameters (lower rates for stability). |
+| `configure-alt-market` | `(configure-alt-market (asset principal))` | Configures aggressive ALT parameters (max yield). |
+| `get-protocol-status` | `(get-protocol-status)` | Returns protocol status and version info. |
 
 ## Integration Examples (How-to)
 
@@ -60,6 +72,20 @@ To verify if a user is eligible for further borrowing or at risk of liquidation:
 ```clarity
 (let ((health-factor (unwrap-panic (contract-call? .lending-manager calculate-account-health tx-sender))))
   (print health-factor)
+)
+```
+
+### Fetching Interest Rates
+
+To retrieve borrow and supply interest rates for STX at 50% utilization (5000 bps):
+
+```clarity
+(let (
+  (borrow-rate (unwrap-panic (contract-call? .interest-rate-model get-borrow-rate .wallet-3 u5000)))
+  (supply-rate (unwrap-panic (contract-call? .interest-rate-model get-supply-rate .wallet-3 u5000)))
+)
+  (print borrow-rate)
+  (print supply-rate)
 )
 ```
 
