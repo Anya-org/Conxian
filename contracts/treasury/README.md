@@ -70,6 +70,8 @@ the token's native units and are never aggregated across assets.
 | `cancel-allocation` | `(sbc (string-ascii 32)) (token principal)` | Cancels an active allocation and releases its commitment. |
 | `release-funds-to-sbc` | `(sbc (string-ascii 32)) (amount uint) (token <sip-010-ft-trait>)` | Backwards-compatible payment-forge API; validates live balance, reserve, cap, commitment, and beneficiary before transfer. |
 | `get-allocation` | `(sbc (string-ascii 32)) (token principal)` | Returns allocation status, amount, and released total. |
+| `get-allocation-by-id` | `(allocation-id uint)` | Returns the immutable historical record for one allocation ID. |
+| `get-active-allocation-id` | `(sbc (string-ascii 32)) (token principal)` | Returns the currently active allocation ID for a pair, if any. |
 | `get-category-report` | `(period uint) (token principal) (category uint)` | Reports cap, spent, committed, and remaining capacity. |
 | `get-treasury-health` | `(token principal)` | Returns the tracked per-token balance and reserve health. |
 | `get-treasury-health-live` | `(token <sip-010-ft-trait>)` | Public live balance report for callers that need an external SIP-010 read. |
@@ -78,6 +80,25 @@ the token's native units and are never aggregated across assets.
 `agents/payment-forge.clar` calls it directly. Contract-to-contract
 authorization uses `contract-caller`, so payment-forge can be rotated without
 hardcoding a principal.
+
+Allocation records are stored by monotonically increasing `allocation-id`.
+The `{ sbc, token }` pair has separate active and latest-ID indexes: the active
+index drives approval, cancellation, and release compatibility calls, while
+the latest index keeps pair lookup useful after a terminal allocation. A
+completed or cancelled allocation clears only the active index, so reusing a
+pair creates a new ID without overwriting `get-allocation-by-id` history.
+
+### Payment-forge settlement authorization
+`agents/payment-forge.clar` keeps the public
+`settle-sbc-obligation(sbc, amount, token)` signature, but settlement is
+fail-closed unless `contract-caller` is either the configured settlement
+authority or an active settlement operator. The initial authority is the
+deploying `tx-sender`; no principal is hardcoded. The payment-forge admin can
+rotate the authority with `set-settlement-authority` and can add or remove
+operators with `set-settlement-operator`. These setters are admin-only and
+accept both EOAs and contract principals. A contract integration must be
+configured explicitly because authorization follows the immediate
+`contract-caller`, not the transaction origin.
 
 ### `opex-vault.clar`
 OPEX budgets and reservations are keyed by `{ period, token, category }`.
@@ -99,10 +120,21 @@ configured and the threshold must remain within the active approver count.
 | `get-expense` | `(expense-id uint)` | Returns the detailed expense record and status. |
 | `get-category-report` | `(period uint) (token principal) (category uint)` | Reports budget, spent, reserved, and remaining budget. |
 | `get-summary` | `(token principal)` | Reports balance, reserved, and available funds for one token. |
+| `get-summary-live` | `(token <sip-010-ft-trait>)` | Reports tracked balance alongside the live SIP-010 balance and both solvency views. |
 
 `execute-expense` accepts the SIP-010 trait again because Clarity does not
 support dynamic contract calls from a stored principal. It verifies that the
-provided token principal matches the recorded expense before transferring.
+provided token principal matches the recorded expense before transferring. It
+also checks tracked balance, reservations, and the supplied token's live vault
+balance at execution time. `get-summary` and the expense reports describe
+tracked accounting; `get-summary-live` explicitly exposes live versus tracked
+values. A direct token transfer into the vault can increase the live balance,
+but it is not spendable tracked funding until recorded through `deposit`.
+
+The admin is an implicit approver, so admin rotation is rejected when the new
+principal is already an active approver. Approver removal is rejected if it
+would leave the configured threshold above the remaining distinct eligible
+approvers; duplicate and self-approval are rejected as well.
 
 ## Integration Examples (How-to)
 

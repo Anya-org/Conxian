@@ -62,10 +62,12 @@
 (define-map required-reserves principal uint)
 (define-map tracked-balances principal uint)
 
-(define-map allocations
-  { sbc: (string-ascii 32), token: principal }
+(define-map allocation-records
+  uint
   {
     id: uint,
+    sbc: (string-ascii 32),
+    token: principal,
     period: uint,
     category: uint,
     amount: uint,
@@ -77,9 +79,19 @@
   }
 )
 
-(define-map allocation-keys
-  uint
+;; The active index is the only pair-keyed state used by the compatibility
+;; release wrapper. Terminal allocations are removed from this index so an
+;; SBC/token pair can be reused without mutating its prior record.
+(define-map active-allocation-ids
   { sbc: (string-ascii 32), token: principal }
+  uint
+)
+
+;; Keep the latest record available through the existing pair lookup API while
+;; retaining every historical record in allocation-records.
+(define-map latest-allocation-ids
+  { sbc: (string-ascii 32), token: principal }
+  uint
 )
 
 (define-private (is-valid-category (category uint))
@@ -300,11 +312,16 @@
       (match beneficiary
         beneficiary-principal
           (begin
-            (match (map-get? allocations key)
-              existing (asserts! (not (get active existing)) (err ERR_ALLOCATION_ACTIVE))
+            (match (map-get? active-allocation-ids key)
+              active-id
+                (match (map-get? allocation-records active-id)
+                  active-record (asserts! (not (get active active-record)) (err ERR_ALLOCATION_ACTIVE))
+                  true)
               true)
-            (map-set allocations key {
+            (map-set allocation-records allocation-id {
               id: allocation-id,
+              sbc: sbc,
+              token: token,
               period: (var-get current-period),
               category: category,
               amount: amount,
@@ -314,7 +331,8 @@
               active: true,
               cancelled: false
             })
-            (map-set allocation-keys allocation-id key)
+            (map-set active-allocation-ids key allocation-id)
+            (map-set latest-allocation-ids key allocation-id)
             (var-set next-allocation-id (+ allocation-id u1))
             (print {
               event: "fiscal-allocation-created",
@@ -338,48 +356,54 @@
     (token principal))
   (let (
       (key (allocation-key sbc token))
-      (allocation (map-get? allocations (allocation-key sbc token)))
+      (active-id (map-get? active-allocation-ids (allocation-key sbc token)))
     )
     (begin
       (asserts! (is-config-authorized) (err ERR_UNAUTHORIZED))
-      (match allocation
-        allocation-data
-          (let (
-              (period (get period allocation-data))
-              (category (get category allocation-data))
-              (amount (get amount allocation-data))
-              (cap (default-to u0 (map-get? category-caps (category-key period token category))))
-              (spent (default-to u0 (map-get? category-spent (category-key period token category))))
-              (committed (default-to u0 (map-get? category-commitments (category-key period token category))))
-            )
-            (begin
-              (asserts! (get active allocation-data) (err ERR_ALLOCATION_CANCELLED))
-              (asserts! (not (get approved allocation-data)) (err ERR_ALLOCATION_ALREADY_APPROVED))
-              (asserts! (> cap u0) (err ERR_CAP_NOT_SET))
-              (asserts! (<= (+ spent (+ committed amount)) cap) (err ERR_CAP_EXCEEDED))
-              (map-set allocations key {
-                id: (get id allocation-data),
-                period: period,
-                category: category,
-                amount: amount,
-                released: (get released allocation-data),
-                beneficiary: (get beneficiary allocation-data),
-                approved: true,
-                active: true,
-                cancelled: false
-              })
-              (map-set category-commitments
-                (category-key period token category)
-                (+ committed amount))
-              (print {
-                event: "fiscal-allocation-approved",
-                allocation-id: (get id allocation-data),
-                sbc: sbc,
-                token: token,
-                block-height: block-height
-              })
-              (ok true)
-            )
+      (match active-id
+        allocation-id
+          (match (map-get? allocation-records allocation-id)
+            allocation-data
+              (let (
+                  (period (get period allocation-data))
+                  (category (get category allocation-data))
+                  (amount (get amount allocation-data))
+                  (cap (default-to u0 (map-get? category-caps (category-key period token category))))
+                  (spent (default-to u0 (map-get? category-spent (category-key period token category))))
+                  (committed (default-to u0 (map-get? category-commitments (category-key period token category))))
+                )
+                (begin
+                  (asserts! (get active allocation-data) (err ERR_ALLOCATION_CANCELLED))
+                  (asserts! (not (get approved allocation-data)) (err ERR_ALLOCATION_ALREADY_APPROVED))
+                  (asserts! (> cap u0) (err ERR_CAP_NOT_SET))
+                  (asserts! (<= (+ spent (+ committed amount)) cap) (err ERR_CAP_EXCEEDED))
+                  (map-set allocation-records allocation-id {
+                    id: (get id allocation-data),
+                    sbc: (get sbc allocation-data),
+                    token: (get token allocation-data),
+                    period: period,
+                    category: category,
+                    amount: amount,
+                    released: (get released allocation-data),
+                    beneficiary: (get beneficiary allocation-data),
+                    approved: true,
+                    active: true,
+                    cancelled: false
+                  })
+                  (map-set category-commitments
+                    (category-key period token category)
+                    (+ committed amount))
+                  (print {
+                    event: "fiscal-allocation-approved",
+                    allocation-id: (get id allocation-data),
+                    sbc: sbc,
+                    token: token,
+                    block-height: block-height
+                  })
+                  (ok true)
+                )
+              )
+            (err ERR_ALLOCATION_NOT_FOUND)
           )
         (err ERR_ALLOCATION_NOT_FOUND)
       )
@@ -392,51 +416,58 @@
     (token principal))
   (let (
       (key (allocation-key sbc token))
-      (allocation (map-get? allocations (allocation-key sbc token)))
+      (active-id (map-get? active-allocation-ids (allocation-key sbc token)))
     )
     (begin
       (asserts! (is-config-authorized) (err ERR_UNAUTHORIZED))
-      (match allocation
-        allocation-data
-          (let (
-              (period (get period allocation-data))
-              (category (get category allocation-data))
-              (committed (default-to u0 (map-get? category-commitments (category-key period token category))))
-              (remaining (if
-                (>= (get amount allocation-data) (get released allocation-data))
-                (- (get amount allocation-data) (get released allocation-data))
-                u0))
-            )
-            (begin
-              (asserts! (get active allocation-data) (err ERR_ALLOCATION_CANCELLED))
-              (if (get approved allocation-data)
-                (begin
-                  (asserts! (>= committed remaining) (err ERR_COMMITMENT_EXCEEDED))
-                  (map-set category-commitments
-                    (category-key period token category)
-                    (- committed remaining))
+      (match active-id
+        allocation-id
+          (match (map-get? allocation-records allocation-id)
+            allocation-data
+              (let (
+                  (period (get period allocation-data))
+                  (category (get category allocation-data))
+                  (committed (default-to u0 (map-get? category-commitments (category-key period token category))))
+                  (remaining (if
+                    (>= (get amount allocation-data) (get released allocation-data))
+                    (- (get amount allocation-data) (get released allocation-data))
+                    u0))
                 )
-                true)
-              (map-set allocations key {
-                id: (get id allocation-data),
-                period: period,
-                category: category,
-                amount: (get amount allocation-data),
-                released: (get released allocation-data),
-                beneficiary: (get beneficiary allocation-data),
-                approved: (get approved allocation-data),
-                active: false,
-                cancelled: true
-              })
-              (print {
-                event: "fiscal-allocation-cancelled",
-                allocation-id: (get id allocation-data),
-                sbc: sbc,
-                token: token,
-                block-height: block-height
-              })
-              (ok true)
-            )
+                (begin
+                  (asserts! (get active allocation-data) (err ERR_ALLOCATION_CANCELLED))
+                  (if (get approved allocation-data)
+                    (begin
+                      (asserts! (>= committed remaining) (err ERR_COMMITMENT_EXCEEDED))
+                      (map-set category-commitments
+                        (category-key period token category)
+                        (- committed remaining))
+                    )
+                    true)
+                  (map-set allocation-records allocation-id {
+                    id: (get id allocation-data),
+                    sbc: (get sbc allocation-data),
+                    token: (get token allocation-data),
+                    period: period,
+                    category: category,
+                    amount: (get amount allocation-data),
+                    released: (get released allocation-data),
+                    beneficiary: (get beneficiary allocation-data),
+                    approved: (get approved allocation-data),
+                    active: false,
+                    cancelled: true
+                  })
+                  (map-delete active-allocation-ids key)
+                  (print {
+                    event: "fiscal-allocation-cancelled",
+                    allocation-id: (get id allocation-data),
+                    sbc: sbc,
+                    token: token,
+                    block-height: block-height
+                  })
+                  (ok true)
+                )
+              )
+            (err ERR_ALLOCATION_NOT_FOUND)
           )
         (err ERR_ALLOCATION_NOT_FOUND)
       )
@@ -453,70 +484,79 @@
       (token-principal (contract-of token))
       (key (allocation-key sbc (contract-of token)))
       (beneficiary (map-get? sbc-beneficiaries sbc))
-      (allocation (map-get? allocations (allocation-key sbc (contract-of token))))
+      (active-id (map-get? active-allocation-ids (allocation-key sbc (contract-of token))))
     )
     (begin
       (asserts! (is-release-authorized) (err ERR_UNAUTHORIZED))
       (asserts! (> amount u0) (err ERR_INVALID_AMOUNT))
       (match beneficiary
         beneficiary-principal
-          (match allocation
-            allocation-data
-              (let (
-                  (period (get period allocation-data))
-                  (category (get category allocation-data))
-                  (allocation-amount (get amount allocation-data))
-                  (released (get released allocation-data))
-                  (remaining (if (>= allocation-amount released) (- allocation-amount released) u0))
-                  (category-key-value (category-key period token-principal category))
-                  (cap (default-to u0 (map-get? category-caps category-key-value)))
-                  (spent (default-to u0 (map-get? category-spent category-key-value)))
-                  (committed (default-to u0 (map-get? category-commitments category-key-value)))
-                  (reserve (default-to u0 (map-get? required-reserves token-principal)))
-                  (vault-balance (try! (contract-call? token get-balance (as-contract tx-sender))))
-                  (new-released (+ released amount))
-                )
-                (begin
-                  (asserts! (get active allocation-data) (err ERR_ALLOCATION_CANCELLED))
-                  (asserts! (get approved allocation-data) (err ERR_ALLOCATION_NOT_APPROVED))
-                  (asserts! (is-eq beneficiary-principal (get beneficiary allocation-data)) (err ERR_SBC_NOT_REGISTERED))
-                  (asserts! (<= amount remaining) (err ERR_CAP_EXCEEDED))
-                  (asserts! (> cap u0) (err ERR_CAP_NOT_SET))
-                  (asserts! (<= (+ spent amount) cap) (err ERR_CAP_EXCEEDED))
-                  (asserts! (>= committed amount) (err ERR_COMMITMENT_EXCEEDED))
-                  ;; The live balance must cover the required reserve and all
-                  ;; outstanding commitments, including this release. This
-                  ;; keeps a successful release from making the vault
-                  ;; insolvent for another approved allocation.
-                  (asserts! (>= vault-balance (+ reserve committed)) (err ERR_RESERVE_VIOLATION))
-                  (try! (as-contract (contract-call? token transfer amount tx-sender beneficiary-principal none)))
-                  (map-set allocations key {
-                    id: (get id allocation-data),
-                    period: period,
-                    category: category,
-                    amount: allocation-amount,
-                    released: new-released,
-                    beneficiary: beneficiary-principal,
-                    approved: true,
-                    active: (not (is-eq new-released allocation-amount)),
-                    cancelled: false
-                  })
-                  (map-set category-commitments category-key-value (- committed amount))
-                  (map-set category-spent category-key-value (+ spent amount))
-                  ;; Use the live pre-transfer balance as the source of truth
-                  ;; so direct payment-forge deposits are reflected too.
-                  (map-set tracked-balances token-principal (- vault-balance amount))
-                  (print {
-                    event: "fiscal-funds-released",
-                    allocation-id: (get id allocation-data),
-                    sbc: sbc,
-                    token: token-principal,
-                    beneficiary: beneficiary-principal,
-                    amount: amount,
-                    block-height: block-height
-                  })
-                  (ok true)
-                )
+          (match active-id
+            allocation-id
+              (match (map-get? allocation-records allocation-id)
+                allocation-data
+                  (let (
+                      (period (get period allocation-data))
+                      (category (get category allocation-data))
+                      (allocation-amount (get amount allocation-data))
+                      (released (get released allocation-data))
+                      (remaining (if (>= allocation-amount released) (- allocation-amount released) u0))
+                      (category-key-value (category-key period token-principal category))
+                      (cap (default-to u0 (map-get? category-caps category-key-value)))
+                      (spent (default-to u0 (map-get? category-spent category-key-value)))
+                      (committed (default-to u0 (map-get? category-commitments category-key-value)))
+                      (reserve (default-to u0 (map-get? required-reserves token-principal)))
+                      (vault-balance (try! (contract-call? token get-balance (as-contract tx-sender))))
+                      (new-released (+ released amount))
+                    )
+                    (begin
+                      (asserts! (get active allocation-data) (err ERR_ALLOCATION_CANCELLED))
+                      (asserts! (get approved allocation-data) (err ERR_ALLOCATION_NOT_APPROVED))
+                      (asserts! (is-eq beneficiary-principal (get beneficiary allocation-data)) (err ERR_SBC_NOT_REGISTERED))
+                      (asserts! (<= amount remaining) (err ERR_CAP_EXCEEDED))
+                      (asserts! (> cap u0) (err ERR_CAP_NOT_SET))
+                      (asserts! (<= (+ spent amount) cap) (err ERR_CAP_EXCEEDED))
+                      (asserts! (>= committed amount) (err ERR_COMMITMENT_EXCEEDED))
+                      ;; The live balance must cover the required reserve and all
+                      ;; outstanding commitments, including this release. This
+                      ;; keeps a successful release from making the vault
+                      ;; insolvent for another approved allocation.
+                      (asserts! (>= vault-balance (+ reserve committed)) (err ERR_RESERVE_VIOLATION))
+                      (try! (as-contract (contract-call? token transfer amount tx-sender beneficiary-principal none)))
+                      (map-set allocation-records allocation-id {
+                        id: (get id allocation-data),
+                        sbc: (get sbc allocation-data),
+                        token: (get token allocation-data),
+                        period: period,
+                        category: category,
+                        amount: allocation-amount,
+                        released: new-released,
+                        beneficiary: beneficiary-principal,
+                        approved: true,
+                        active: (not (is-eq new-released allocation-amount)),
+                        cancelled: false
+                      })
+                      (if (is-eq new-released allocation-amount)
+                        (map-delete active-allocation-ids key)
+                        true)
+                      (map-set category-commitments category-key-value (- committed amount))
+                      (map-set category-spent category-key-value (+ spent amount))
+                      ;; Use the live pre-transfer balance as the source of truth
+                      ;; so direct payment-forge deposits are reflected too.
+                      (map-set tracked-balances token-principal (- vault-balance amount))
+                      (print {
+                        event: "fiscal-funds-released",
+                        allocation-id: (get id allocation-data),
+                        sbc: sbc,
+                        token: token-principal,
+                        beneficiary: beneficiary-principal,
+                        amount: amount,
+                        block-height: block-height
+                      })
+                      (ok true)
+                    )
+                  )
+                (err ERR_ALLOCATION_NOT_FOUND)
               )
             (err ERR_ALLOCATION_NOT_FOUND)
           )
@@ -533,14 +573,20 @@
 (define-read-only (get-allocation
     (sbc (string-ascii 32))
     (token principal))
-  (map-get? allocations (allocation-key sbc token))
+  (match (map-get? latest-allocation-ids (allocation-key sbc token))
+    allocation-id (map-get? allocation-records allocation-id)
+    none
+  )
 )
 
 (define-read-only (get-allocation-by-id (allocation-id uint))
-  (match (map-get? allocation-keys allocation-id)
-    key (map-get? allocations key)
-    none
-  )
+  (map-get? allocation-records allocation-id)
+)
+
+(define-read-only (get-active-allocation-id
+    (sbc (string-ascii 32))
+    (token principal))
+  (map-get? active-allocation-ids (allocation-key sbc token))
 )
 
 (define-read-only (get-category-report

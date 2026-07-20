@@ -20,6 +20,7 @@
 (define-constant ERR_NOT_ENOUGH_APPROVALS u1013)
 (define-constant ERR_TRANSFER_FAILED u1014)
 (define-constant ERR_NOT_APPROVER u1015)
+(define-constant ERR_ADMIN_APPROVER_COLLISION u1016)
 
 (define-constant CATEGORY_MIN u1)
 (define-constant CATEGORY_MAX u8)
@@ -114,6 +115,9 @@
     (new-governance principal))
   (begin
     (asserts! (is-admin contract-caller) (err ERR_UNAUTHORIZED))
+    (asserts!
+      (not (default-to false (map-get? approvers new-admin)))
+      (err ERR_ADMIN_APPROVER_COLLISION))
     (var-set admin new-admin)
     (var-set governance new-governance)
     (print {
@@ -129,6 +133,9 @@
 (define-public (initialize (new-admin principal))
   (begin
     (asserts! (is-admin contract-caller) (err ERR_UNAUTHORIZED))
+    (asserts!
+      (not (default-to false (map-get? approvers new-admin)))
+      (err ERR_ADMIN_APPROVER_COLLISION))
     (var-set admin new-admin)
     (ok true)
   )
@@ -137,6 +144,9 @@
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-admin contract-caller) (err ERR_UNAUTHORIZED))
+    (asserts!
+      (not (default-to false (map-get? approvers new-admin)))
+      (err ERR_ADMIN_APPROVER_COLLISION))
     (var-set admin new-admin)
     (ok true)
   )
@@ -170,22 +180,20 @@
   (let ((currently-active (default-to false (map-get? approvers approver))))
     (begin
       (asserts! (is-config-authorized) (err ERR_UNAUTHORIZED))
-      (if (is-eq approver (var-get admin))
-        (ok true)
-        (if active
-          (begin
-            (asserts! (not currently-active) (err ERR_DUPLICATE_APPROVAL))
-            (map-set approvers approver true)
-            (var-set approver-count (+ (var-get approver-count) u1))
-            (ok true)
-          )
-          (begin
-            (asserts! currently-active (err ERR_NOT_APPROVER))
-            (asserts! (>= (- (var-get approver-count) u1) (var-get approval-threshold)) (err ERR_THRESHOLD_INVALID))
-            (map-set approvers approver false)
-            (var-set approver-count (- (var-get approver-count) u1))
-            (ok true)
-          )
+      (asserts! (not (is-eq approver (var-get admin))) (err ERR_DUPLICATE_APPROVAL))
+      (if active
+        (begin
+          (asserts! (not currently-active) (err ERR_DUPLICATE_APPROVAL))
+          (map-set approvers approver true)
+          (var-set approver-count (+ (var-get approver-count) u1))
+          (ok true)
+        )
+        (begin
+          (asserts! currently-active (err ERR_NOT_APPROVER))
+          (asserts! (>= (- (var-get approver-count) u1) (var-get approval-threshold)) (err ERR_THRESHOLD_INVALID))
+          (map-set approvers approver false)
+          (var-set approver-count (- (var-get approver-count) u1))
+          (ok true)
         )
       )
     )
@@ -395,6 +403,7 @@
               (reserved (default-to u0 (map-get? category-reserved category-key-value)))
               (total-reserved-value (default-to u0 (map-get? total-reserved token-principal)))
               (balance (default-to u0 (map-get? vault-balances token-principal)))
+              (live-balance (try! (contract-call? token get-balance (as-contract tx-sender))))
             )
             (begin
               (asserts! (is-eq (get status expense-data) EXPENSE_PENDING) (err ERR_EXPENSE_NOT_PENDING))
@@ -404,7 +413,11 @@
               (asserts! (<= (+ spent (get amount expense-data)) budget) (err ERR_BUDGET_EXCEEDED))
               (asserts! (>= reserved (get amount expense-data)) (err ERR_INSUFFICIENT_BALANCE))
               (asserts! (>= total-reserved-value (get amount expense-data)) (err ERR_INSUFFICIENT_BALANCE))
+              ;; Tracked balances protect the internal ledger; the live token
+              ;; balance protects against direct outflows or other balance
+              ;; drift that the vault did not record.
               (asserts! (>= balance (get amount expense-data)) (err ERR_INSUFFICIENT_BALANCE))
+              (asserts! (>= live-balance (get amount expense-data)) (err ERR_INSUFFICIENT_BALANCE))
               (asserts!
                 (unwrap!
                   (contract-call? .regulatory-adapter check-clean-hands-compliance (get payee expense-data))
@@ -537,10 +550,36 @@
     {
       token: token,
       balance: balance,
+      tracked-balance: balance,
       reserved: reserved,
       available: (if (>= balance reserved) (- balance reserved) u0),
+      available-tracked: (if (>= balance reserved) (- balance reserved) u0),
       period: (var-get current-period)
     }
+  )
+)
+
+;; @desc Reports both the internal tracked balance and the live SIP-010
+;; balance. Direct token transfers may increase live-balance without becoming
+;; spendable tracked funds until a deposit records them.
+(define-public (get-summary-live (token <sip-010-trait>))
+  (let (
+      (token-principal (contract-of token))
+      (tracked-balance (default-to u0 (map-get? vault-balances (contract-of token))))
+      (reserved (default-to u0 (map-get? total-reserved (contract-of token))))
+      (live-balance (try! (contract-call? token get-balance (as-contract tx-sender))))
+    )
+    (ok {
+      token: token-principal,
+      tracked-balance: tracked-balance,
+      live-balance: live-balance,
+      reserved: reserved,
+      available-tracked: (if (>= tracked-balance reserved) (- tracked-balance reserved) u0),
+      available-live: (if (>= live-balance reserved) (- live-balance reserved) u0),
+      tracked-solvent: (>= tracked-balance reserved),
+      live-solvent: (>= live-balance reserved),
+      period: (var-get current-period)
+    })
   )
 )
 

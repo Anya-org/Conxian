@@ -2,6 +2,10 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { Cl } from '@stacks/transactions';
 import { simnet } from '../setup-test-env';
 
+function uintFromOk(result: any): number {
+  return Number(result.value.value);
+}
+
 describe('Fiscal Vault Oracle', () => {
   let deployer: string;
   let governance: string;
@@ -331,5 +335,318 @@ describe('Fiscal Vault Oracle', () => {
         deployer,
       ).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
+  });
+
+  it('rejects unauthorized payment-forge settlement and honors configured operators', () => {
+    const paymentForgeContract = Cl.contractPrincipal(deployer, 'payment-forge');
+    const firstSbc = 'SBC-FISCAL-AUTH-001';
+    const operatorSbc = 'SBC-FISCAL-AUTH-002';
+
+    expect(
+      simnet.callPublicFn(
+        'payment-forge',
+        'set-settlement-authority',
+        [Cl.principal(unauthorized)],
+        unauthorized,
+      ).result,
+    ).toEqual(Cl.error(Cl.uint(1000)));
+
+    for (const sbc of [firstSbc, operatorSbc]) {
+      expect(
+        simnet.callPublicFn(
+          'fiscal-vault-oracle',
+          'register-sbc',
+          [Cl.stringAscii(sbc), Cl.principal(beneficiary)],
+          deployer,
+        ).result,
+      ).toEqual(Cl.ok(Cl.bool(true)));
+    }
+
+    expect(
+      simnet.callPublicFn(
+        'fiscal-vault-oracle',
+        'set-category-cap',
+        [Cl.principal(tokenPrincipal), Cl.uint(4), Cl.uint(35)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    for (const [sbc, amount, id] of [
+      [firstSbc, 20, 4],
+      [operatorSbc, 15, 5],
+    ] as const) {
+      expect(
+        simnet.callPublicFn(
+          'fiscal-vault-oracle',
+          'create-allocation',
+          [Cl.stringAscii(sbc), Cl.principal(tokenPrincipal), Cl.uint(4), Cl.uint(amount)],
+          deployer,
+        ).result,
+      ).toEqual(Cl.ok(Cl.uint(id)));
+
+      expect(
+        simnet.callPublicFn(
+          'fiscal-vault-oracle',
+          'approve-allocation',
+          [Cl.stringAscii(sbc), Cl.principal(tokenPrincipal)],
+          governance,
+        ).result,
+      ).toEqual(Cl.ok(Cl.bool(true)));
+    }
+
+    const unauthorizedSettlement = simnet.callPublicFn(
+      'payment-forge',
+      'settle-sbc-obligation',
+      [Cl.stringAscii(firstSbc), Cl.uint(20), token],
+      unauthorized,
+    );
+    expect(unauthorizedSettlement.result).toEqual(Cl.error(Cl.uint(1000)));
+
+    expect(
+      simnet.callPublicFn(
+        'fiscal-vault-oracle',
+        'set-payment-forge',
+        [paymentForgeContract],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(
+      simnet.callPublicFn(
+        'payment-forge',
+        'settle-sbc-obligation',
+        [Cl.stringAscii(firstSbc), Cl.uint(20), token],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(
+      simnet.callPublicFn(
+        'payment-forge',
+        'set-settlement-operator',
+        [Cl.principal(unauthorized), Cl.bool(true)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(
+      simnet.callPublicFn(
+        'payment-forge',
+        'settle-sbc-obligation',
+        [Cl.stringAscii(operatorSbc), Cl.uint(15), token],
+        unauthorized,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(
+      simnet.callPublicFn(
+        'payment-forge',
+        'set-settlement-operator',
+        [Cl.principal(unauthorized), Cl.bool(false)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    // A configured contract principal must be the contract-caller. An EOA
+    // that merely originated the transaction cannot impersonate it.
+    expect(
+      simnet.callPublicFn(
+        'payment-forge',
+        'set-settlement-authority',
+        [paymentForgeContract],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn(
+        'payment-forge',
+        'settle-sbc-obligation',
+        [Cl.stringAscii(firstSbc), Cl.uint(1), token],
+        deployer,
+      ).result,
+    ).toEqual(Cl.error(Cl.uint(1000)));
+    expect(
+      simnet.callPublicFn(
+        'payment-forge',
+        'set-settlement-authority',
+        [Cl.principal(deployer)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(
+      simnet.callPublicFn(
+        'fiscal-vault-oracle',
+        'set-payment-forge',
+        [Cl.principal(paymentForge)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+  });
+
+  it('keeps immutable IDs, blocks competing commitments, and accounts for partial cancellation', () => {
+    const reusableSbc = 'SBC-FISCAL-REUSE';
+    const competingSbc = 'SBC-FISCAL-COMPETING';
+    const category = 6;
+
+    for (const sbc of [reusableSbc, competingSbc]) {
+      expect(
+        simnet.callPublicFn(
+          'fiscal-vault-oracle',
+          'register-sbc',
+          [Cl.stringAscii(sbc), Cl.principal(beneficiary)],
+          deployer,
+        ).result,
+      ).toEqual(Cl.ok(Cl.bool(true)));
+    }
+
+    expect(
+      simnet.callPublicFn(
+        'fiscal-vault-oracle',
+        'set-category-cap',
+        [Cl.principal(tokenPrincipal), Cl.uint(category), Cl.uint(150)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    const firstAllocation = simnet.callPublicFn(
+      'fiscal-vault-oracle',
+      'create-allocation',
+      [Cl.stringAscii(reusableSbc), Cl.principal(tokenPrincipal), Cl.uint(category), Cl.uint(100)],
+      deployer,
+    );
+    expect(firstAllocation.result).toEqual(Cl.ok(Cl.uint(6)));
+    const firstId = uintFromOk(firstAllocation.result);
+
+    expect(
+      simnet.callPublicFn(
+        'fiscal-vault-oracle',
+        'approve-allocation',
+        [Cl.stringAscii(reusableSbc), Cl.principal(tokenPrincipal)],
+        governance,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    const competingAllocation = simnet.callPublicFn(
+      'fiscal-vault-oracle',
+      'create-allocation',
+      [Cl.stringAscii(competingSbc), Cl.principal(tokenPrincipal), Cl.uint(category), Cl.uint(60)],
+      deployer,
+    );
+    expect(competingAllocation.result).toEqual(Cl.ok(Cl.uint(7)));
+    expect(
+      simnet.callPublicFn(
+        'fiscal-vault-oracle',
+        'approve-allocation',
+        [Cl.stringAscii(competingSbc), Cl.principal(tokenPrincipal)],
+        governance,
+      ).result,
+    ).toEqual(Cl.error(Cl.uint(412)));
+
+    expect(
+      simnet.callPublicFn(
+        'fiscal-vault-oracle',
+        'release-funds-to-sbc',
+        [Cl.stringAscii(reusableSbc), Cl.uint(40), token],
+        paymentForge,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    const afterPartial = simnet.callReadOnlyFn(
+      'fiscal-vault-oracle',
+      'get-category-report',
+      [Cl.uint(100), Cl.principal(tokenPrincipal), Cl.uint(category)],
+      deployer,
+    );
+    expect(Cl.prettyPrint(afterPartial.result)).toContain('spent: u40');
+    expect(Cl.prettyPrint(afterPartial.result)).toContain('committed: u60');
+
+    expect(
+      simnet.callPublicFn(
+        'fiscal-vault-oracle',
+        'cancel-allocation',
+        [Cl.stringAscii(reusableSbc), Cl.principal(tokenPrincipal)],
+        governance,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn(
+        'fiscal-vault-oracle',
+        'cancel-allocation',
+        [Cl.stringAscii(competingSbc), Cl.principal(tokenPrincipal)],
+        governance,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    const afterCancellation = simnet.callReadOnlyFn(
+      'fiscal-vault-oracle',
+      'get-category-report',
+      [Cl.uint(100), Cl.principal(tokenPrincipal), Cl.uint(category)],
+      deployer,
+    );
+    expect(Cl.prettyPrint(afterCancellation.result)).toContain('spent: u40');
+    expect(Cl.prettyPrint(afterCancellation.result)).toContain('committed: u0');
+
+    const historicalBeforeReuse = simnet.callReadOnlyFn(
+      'fiscal-vault-oracle',
+      'get-allocation-by-id',
+      [Cl.uint(firstId)],
+      deployer,
+    );
+    expect(Cl.prettyPrint(historicalBeforeReuse.result)).toContain('released: u40');
+    expect(Cl.prettyPrint(historicalBeforeReuse.result)).toContain('cancelled: true');
+
+    const reusedAllocation = simnet.callPublicFn(
+      'fiscal-vault-oracle',
+      'create-allocation',
+      [Cl.stringAscii(reusableSbc), Cl.principal(tokenPrincipal), Cl.uint(category), Cl.uint(80)],
+      deployer,
+    );
+    expect(reusedAllocation.result).toEqual(Cl.ok(Cl.uint(8)));
+    const reusedId = uintFromOk(reusedAllocation.result);
+    expect(reusedId).toBeGreaterThan(firstId);
+
+    const activeId = simnet.callReadOnlyFn(
+      'fiscal-vault-oracle',
+      'get-active-allocation-id',
+      [Cl.stringAscii(reusableSbc), Cl.principal(tokenPrincipal)],
+      deployer,
+    );
+    expect(activeId.result).toEqual(Cl.some(Cl.uint(reusedId)));
+
+    const latestPairRecord = simnet.callReadOnlyFn(
+      'fiscal-vault-oracle',
+      'get-allocation',
+      [Cl.stringAscii(reusableSbc), Cl.principal(tokenPrincipal)],
+      deployer,
+    );
+    expect(Cl.prettyPrint(latestPairRecord.result)).toContain(`id: u${reusedId}`);
+    expect(Cl.prettyPrint(latestPairRecord.result)).toContain('amount: u80');
+
+    const historicalAfterReuse = simnet.callReadOnlyFn(
+      'fiscal-vault-oracle',
+      'get-allocation-by-id',
+      [Cl.uint(firstId)],
+      deployer,
+    );
+    expect(Cl.prettyPrint(historicalAfterReuse.result)).toContain('released: u40');
+    expect(Cl.prettyPrint(historicalAfterReuse.result)).toContain('cancelled: true');
+
+    expect(
+      simnet.callPublicFn(
+        'fiscal-vault-oracle',
+        'cancel-allocation',
+        [Cl.stringAscii(reusableSbc), Cl.principal(tokenPrincipal)],
+        governance,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callReadOnlyFn(
+        'fiscal-vault-oracle',
+        'get-active-allocation-id',
+        [Cl.stringAscii(reusableSbc), Cl.principal(tokenPrincipal)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.none());
   });
 });

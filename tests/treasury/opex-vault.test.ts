@@ -7,6 +7,7 @@ describe('OPEX Vault', () => {
   let governance: string;
   let approver: string;
   let secondApprover: string;
+  let unauthorized: string;
   let nonCompliantPayee: string;
   let token: ReturnType<typeof Cl.contractPrincipal>;
   let tokenPrincipal: string;
@@ -17,6 +18,9 @@ describe('OPEX Vault', () => {
     governance = accounts.get('wallet_1')!;
     approver = accounts.get('wallet_2')!;
     secondApprover = accounts.get('wallet_3')!;
+    // The simnet plan provisions three wallets; use a valid but unconfigured
+    // standard principal for negative authorization paths.
+    unauthorized = 'ST000000000000000000002AMW42H';
     nonCompliantPayee = deployer;
     token = Cl.contractPrincipal(deployer, 'mock-token');
     tokenPrincipal = `${deployer}.mock-token`;
@@ -185,6 +189,38 @@ describe('OPEX Vault', () => {
     expect(Cl.prettyPrint(summary.result)).toContain('balance: u700');
     expect(Cl.prettyPrint(summary.result)).toContain('reserved: u0');
     expect(Cl.prettyPrint(summary.result)).toContain('available: u700');
+
+    // A direct transfer is visible on-chain but remains outside the tracked
+    // spendable ledger until an explicit deposit records it.
+    expect(
+      simnet.callPublicFn(
+        'mock-token',
+        'mint',
+        [Cl.uint(50), Cl.principal(deployer)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn(
+        'mock-token',
+        'transfer',
+        [Cl.uint(50), Cl.principal(deployer), Cl.contractPrincipal(deployer, 'opex-vault'), Cl.none()],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    const liveSummary = simnet.callPublicFn(
+      'opex-vault',
+      'get-summary-live',
+      [token],
+      governance,
+    );
+    expect(liveSummary.result.type).toBe('ok');
+    expect(Cl.prettyPrint(liveSummary.result)).toContain('tracked-balance: u700');
+    expect(Cl.prettyPrint(liveSummary.result)).toContain('live-balance: u750');
+    expect(Cl.prettyPrint(liveSummary.result)).toContain('available-tracked: u700');
+    expect(Cl.prettyPrint(liveSummary.result)).toContain('available-live: u750');
+    expect(Cl.prettyPrint(liveSummary.result)).toContain('live-solvent: true');
 
     const categoryReport = simnet.callReadOnlyFn(
       'opex-vault',
@@ -356,5 +392,183 @@ describe('OPEX Vault', () => {
     expect(
       simnet.callPublicFn('opex-vault', 'cancel-expense', [Cl.uint(4)], governance).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
+  });
+
+  it('rejects unauthorized workflow calls and prevents threshold bypasses', () => {
+    expect(
+      simnet.callPublicFn(
+        'opex-vault',
+        'create-expense',
+        [
+          token,
+          Cl.uint(3),
+          Cl.uint(1),
+          Cl.principal(governance),
+          Cl.stringAscii('unauthorized request'),
+        ],
+        unauthorized,
+      ).result,
+    ).toEqual(Cl.error(Cl.uint(1000)));
+
+    expect(
+      simnet.callPublicFn('opex-vault', 'approve-expense', [Cl.uint(999)], unauthorized).result,
+    ).toEqual(Cl.error(Cl.uint(1015)));
+    expect(
+      simnet.callPublicFn('opex-vault', 'execute-expense', [Cl.uint(999), token], unauthorized).result,
+    ).toEqual(Cl.error(Cl.uint(1000)));
+    expect(
+      simnet.callPublicFn('opex-vault', 'cancel-expense', [Cl.uint(999)], unauthorized).result,
+    ).toEqual(Cl.error(Cl.uint(1000)));
+
+    expect(
+      simnet.callPublicFn('opex-vault', 'set-approval-threshold', [Cl.uint(0)], deployer).result,
+    ).toEqual(Cl.error(Cl.uint(1012)));
+    expect(
+      simnet.callPublicFn('opex-vault', 'set-approval-threshold', [Cl.uint(4)], deployer).result,
+    ).toEqual(Cl.error(Cl.uint(1012)));
+    expect(
+      simnet.callPublicFn('opex-vault', 'set-approval-threshold', [Cl.uint(2)], unauthorized).result,
+    ).toEqual(Cl.error(Cl.uint(1000)));
+  });
+
+  it('fails execution when live token solvency is lower than tracked reservations', () => {
+    const cxdToken = Cl.contractPrincipal(deployer, 'cxd-token');
+    const vaultPrincipal = Cl.contractPrincipal(deployer, 'opex-vault');
+
+    expect(
+      simnet.callPublicFn(
+        'cxd-token',
+        'mint',
+        [Cl.uint(100), Cl.principal(deployer)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn(
+        'opex-vault',
+        'deposit',
+        [cxdToken, Cl.uint(100)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn(
+        'opex-vault',
+        'set-category-budget',
+        [Cl.principal(`${deployer}.cxd-token`), Cl.uint(4), Cl.uint(100)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(
+      simnet.callPublicFn(
+        'opex-vault',
+        'create-expense',
+        [
+          cxdToken,
+          Cl.uint(4),
+          Cl.uint(80),
+          Cl.principal(governance),
+          Cl.stringAscii('live solvency check'),
+        ],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.uint(5)));
+    expect(
+      simnet.callPublicFn('opex-vault', 'approve-expense', [Cl.uint(5)], approver).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn('opex-vault', 'approve-expense', [Cl.uint(5)], secondApprover).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    // Use the token's existing administrative burn hook to model a live
+    // balance falling below the vault's tracked reservation.
+    expect(
+      simnet.callPublicFn(
+        'cxd-token',
+        'burn',
+        [Cl.uint(60), vaultPrincipal],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    const insufficientLiveBalance = simnet.callPublicFn(
+      'opex-vault',
+      'execute-expense',
+      [Cl.uint(5), cxdToken],
+      governance,
+    );
+    expect(insufficientLiveBalance.result).toEqual(Cl.error(Cl.uint(1006)));
+
+    const liveSummary = simnet.callPublicFn(
+      'opex-vault',
+      'get-summary-live',
+      [cxdToken],
+      governance,
+    );
+    expect(Cl.prettyPrint(liveSummary.result)).toContain('tracked-balance: u100');
+    expect(Cl.prettyPrint(liveSummary.result)).toContain('live-balance: u40');
+    expect(Cl.prettyPrint(liveSummary.result)).toContain('reserved: u80');
+    expect(Cl.prettyPrint(liveSummary.result)).toContain('live-solvent: false');
+
+    expect(
+      simnet.callPublicFn('opex-vault', 'cancel-expense', [Cl.uint(5)], governance).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+  });
+
+  it('prevents admin approver collisions and preserves distinct threshold accounting', () => {
+    expect(
+      simnet.callPublicFn('opex-vault', 'set-approval-threshold', [Cl.uint(3)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn(
+        'opex-vault',
+        'set-admin',
+        [Cl.principal(approver)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.error(Cl.uint(1016)));
+    expect(
+      simnet.callPublicFn(
+        'opex-vault',
+        'set-authorized-principals',
+        [Cl.principal(secondApprover), Cl.principal(governance)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.error(Cl.uint(1016)));
+    expect(
+      simnet.callPublicFn(
+        'opex-vault',
+        'set-approver',
+        [Cl.principal(deployer), Cl.bool(true)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.error(Cl.uint(1010)));
+
+    expect(
+      simnet.callPublicFn(
+        'opex-vault',
+        'set-approver',
+        [Cl.principal(secondApprover), Cl.bool(false)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.error(Cl.uint(1012)));
+    expect(
+      simnet.callPublicFn('opex-vault', 'set-approval-threshold', [Cl.uint(1)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn(
+        'opex-vault',
+        'set-approver',
+        [Cl.principal(secondApprover), Cl.bool(false)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callReadOnlyFn('opex-vault', 'is-approver-address', [Cl.principal(secondApprover)], deployer).result,
+    ).toEqual(Cl.bool(false));
+    expect(
+      simnet.callReadOnlyFn('opex-vault', 'get-approval-threshold', [], deployer).result,
+    ).toEqual(Cl.uint(1));
   });
 });
