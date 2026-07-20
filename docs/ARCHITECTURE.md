@@ -30,9 +30,27 @@ The "Blood" and "Vaults" of the protocol.
 - `cxd-token.clar`: Native utility/governance token.
 - `revenue-distributor.clar`: Real-time fee distribution.
 
+### 2.5. Commercial Integration Layer (`contracts/integrations`)
+The controlled boundary for metered external usage.
+- `integration-registry.clar`: Registers integrations, configures billing,
+  assigns the trusted reporter, and rotates stored key commitments.
+- `integration-fee-collector.clar`: Records replay-protected usage, maintains
+  per-period ledgers, and settles STX fees from the configured payer.
+- Billing periods use `burn-block-height / 4320`; monthly settlement requires a
+  closed period. Raw API keys stay off-chain and only SHA-256 hashes are stored.
+
+The settlement path is `payer -> integration-fee-collector ->
+revenue-distributor -> swap-router` and retains the existing BME/CXIP-013
+economics. The collector invokes the existing `distribute-stx` entrypoint
+under contract context; no distributor-specific setter or second collector
+entrypoint is introduced.
+
 ## 3. Communication Patterns
 - **Internal**: Trait-driven cross-contract calls using relative literals (`.contract-name`) for simulation and Principal Injection for production.
 - **External**: Facade contracts provide simplified, gas-efficient entry points for UIs and third-party integrations.
+- **Commercial Usage**: A configured reporter records usage on behalf of an
+  integration; payer authorization is required for exact settlement. Payer-
+  signed usage attestations and generic FT settlement are future extensions.
 
 ## 4. Revenue & Economics
 The protocol utilizes **The Fiscal Dam V4** (CXIP-013) to manage its 6-way revenue split, adjusting dynamically based on the Global Collateral Ratio (GCR) and system health scores.

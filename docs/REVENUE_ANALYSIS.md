@@ -4,10 +4,26 @@
 The Conxian Protocol implements a sophisticated, cybernetic revenue management system known as "The Fiscal Dam V4" (CXIP-013). This system utilizes autonomous agents to assess risk and performance, dynamically adjusting the distribution of protocol income to ensure long-term solvency and growth.
 
 ## 2. Revenue Generation Mechanisms
-Protocol revenue is currently sourced from three primary channels:
+Protocol revenue is currently sourced from these contract-supported channels:
 - **DEX Operations**: Swap fees collected via `swap-router.clar`. Fees are dynamically capped at 100 bps (1.0%) to mitigate LVR (Loss Versus Rebalancing).
 - **Lending Markets**: A 10% reserve factor is applied to interest paid by borrowers in `lending-manager.clar`.
-- **Service Subscriptions**: Advanced monetary features require a subscription fee processed by `economic-policy-engine.clar`.
+- **Integration Fees**: Registered integrations can accrue STX fees through `integration-fee-collector.clar` using per-use or monthly billing.
+- **Service Subscriptions**: Existing subscription policy surfaces remain separate from the integration-fee MVP and are not used as its security boundary.
+
+### Integration Fee Flow (STX-first)
+`integration-registry.clar` stores integration configuration and SHA-256 API-key
+commitments; raw API keys are authenticated off-chain and never enter the
+contracts. A configured reporter records replay-protected usage IDs. The
+collector tracks usage and fees by integration and burn-block period, then
+accepts an exact payer settlement only after the monthly period closes when
+monthly billing is selected.
+
+Settled STX moves through the existing `revenue-distributor.clar`
+`distribute-stx` route under collector contract context and then follows the
+existing swap-router/BME route. This is a 100% protocol route with no partner
+split, so the existing CXIP-013 economics remain authoritative. Generic FT
+settlement is deferred to a future two-step deposit-and-route design, and
+payer-signed usage attestations are a future trust-boundary hardening step.
 
 ## 3. Dynamic Intelligence: The AYE Agent (`agent-risk.clar`)
 The "AYE" Risk Agent serves as the protocol's sensory organ, tracking:

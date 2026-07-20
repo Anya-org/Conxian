@@ -1,5 +1,22 @@
 # Documentation State
 
+## Current Session (36) - Integration Fee Settlement (Issue #497)
+
+{
+  "status": "IMPLEMENTED_LOCALLY",
+  "session_timestamp": "2026-07-20",
+  "scope": "Added the STX-first integration registry and fee collector, immutable per-period billing snapshots, collector-facing trait, tests, manifests, and focused documentation. Settlements invoke the existing revenue-distributor distribute-stx route under contract context.",
+  "economic_boundary": "All settled integration fees enter revenue-distributor with no partner split; existing swap-router/BME/CXIP-013 behavior remains authoritative.",
+  "security_boundary": "Raw API keys remain off-chain; SHA-256 commitments, reporter authorization, usage replay protection, payer-only exact settlement, and monthly burn-block closure are enforced on-chain.",
+  "validation": {
+    "targeted_tests": "PASS: integration-fees.test.ts (11 tests); monthly-to-per-use and structured read-only regressions also pass when selected alone",
+    "full_tests": "PASS: 60 files and 178 tests passed; 10 files and 70 tests skipped; 240 known benign clarinet-sdk runtime warnings",
+    "native_clarinet": "BLOCKED: clarinet binary is not installed in the workspace",
+    "docs_validator": "BLOCKED: repository npm docs validation script is absent",
+    "deployment": "Not attempted. Production plan generation/deployment is a follow-up blocked on repairing the pre-existing production profile/ALEX drift; no deployment readiness is claimed."
+  }
+}
+
 
 ## Current Session (35) - Lending Module Interest Rate Model Remediation
 
