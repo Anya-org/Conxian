@@ -19,6 +19,8 @@
 (define-constant ERR_ZERO_TWAP_PRICE (err u7004))
 (define-constant ERR_ARITHMETIC_OVERFLOW (err u7005))
 (define-constant ERR_DEVIATION_TOO_HIGH (err u7006))
+(define-constant ERR_PRICE_SCALE_NOT_CONFIGURED (err u7007))
+(define-constant ERR_PRICE_SCALE_MISMATCH (err u7008))
 
 ;; State
 (define-data-var contract-owner principal tx-sender)
@@ -36,6 +38,28 @@
   (match price-result
     price (if (> price u0) (ok price) ERR_ZERO_PRICE)
     error (err error)
+  )
+)
+
+;; Both canonical sources must declare the same decimal precision. This facade
+;; validates the boundary but deliberately performs no guessed conversion.
+(define-private (get-configured-price-decimals)
+  (let (
+      (spot-decimals (contract-call? .oracle-aggregator get-price-decimals))
+      (twap-decimals (contract-call? .twap-oracle get-price-decimals))
+    )
+    (match spot-decimals
+      configured-spot-decimals
+        (match twap-decimals
+          configured-twap-decimals
+            (if (is-eq configured-spot-decimals configured-twap-decimals)
+              (ok configured-spot-decimals)
+              ERR_PRICE_SCALE_MISMATCH
+            )
+          ERR_PRICE_SCALE_NOT_CONFIGURED
+        )
+      ERR_PRICE_SCALE_NOT_CONFIGURED
+    )
   )
 )
 
@@ -117,20 +141,23 @@
 
 ;; Read and validate both canonical sources while preserving upstream errors.
 (define-private (get-spot-twap (token principal))
-  (match (contract-call? .oracle-aggregator get-price token)
-    spot
-      (if (is-eq spot u0)
-        ERR_ZERO_SPOT_PRICE
-        (match (contract-call? .twap-oracle get-price token)
-          twap
-            (if (is-eq twap u0)
-              ERR_ZERO_TWAP_PRICE
-              (ok { spot: spot, twap: twap })
-            )
-          error (err error)
+  (begin
+    (try! (get-configured-price-decimals))
+    (match (contract-call? .oracle-aggregator get-price token)
+      spot
+        (if (is-eq spot u0)
+          ERR_ZERO_SPOT_PRICE
+          (match (contract-call? .twap-oracle get-price token)
+            twap
+              (if (is-eq twap u0)
+                ERR_ZERO_TWAP_PRICE
+                (ok { spot: spot, twap: twap })
+              )
+            error (err error)
+          )
         )
-      )
-    error (err error)
+      error (err error)
+    )
   )
 )
 
@@ -193,17 +220,30 @@
 
 ;; @desc Get the canonical multi-source aggregate price.
 (define-read-only (get-price (token principal))
-  (require-nonzero-price (contract-call? .oracle-aggregator get-price token))
+  (begin
+    (try! (get-configured-price-decimals))
+    (require-nonzero-price (contract-call? .oracle-aggregator get-price token))
+  )
 )
 
 ;; @desc Fetch the canonical multi-source aggregate price.
 (define-public (fetch-price (token principal))
-  (require-nonzero-price (contract-call? .oracle-aggregator get-price token))
+  (begin
+    (try! (get-configured-price-decimals))
+    (require-nonzero-price (contract-call? .oracle-aggregator get-price token))
+  )
 )
 
 ;; @desc Get the canonical TWAP price.
 (define-read-only (get-twap-price (token principal))
-  (require-nonzero-price (contract-call? .twap-oracle get-price token))
+  (begin
+    (try! (get-configured-price-decimals))
+    (require-nonzero-price (contract-call? .twap-oracle get-price token))
+  )
+)
+
+(define-read-only (get-price-decimals)
+  (get-configured-price-decimals)
 )
 
 ;; @desc Return the advisory legacy price and its update height, if present.

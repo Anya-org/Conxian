@@ -282,6 +282,17 @@ describe('Liquidity manager intent and risk ledger', () => {
     ).toEqual(Cl.ok(Cl.bool(true)));
     expect(
       simnet.callPublicFn(
+        'oracle-aggregator',
+        'set-price-decimals',
+        [Cl.uint(8)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn('twap-oracle', 'set-price-decimals', [Cl.uint(8)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn(
         'twap-oracle',
         'set-twap-window',
         [Cl.uint(1)],
@@ -543,6 +554,42 @@ describe('Liquidity manager intent and risk ledger', () => {
     expect(printed).toContain('active: false');
     expect(printed).toContain('requested-liquidity: u777');
     expect(printed).toContain('accounted-liquidity: u0');
+  });
+
+  it('invalidates an active rebalance intent when its position closes', () => {
+    const position = openPosition(wallet1, 6n, -10, 10, 600n);
+    const id = positionId(position);
+    expect(position.result).toEqual(Cl.ok(Cl.uint(id)));
+
+    expect(
+      simnet.callPublicFn(
+        'liquidity-manager',
+        'request-rebalance',
+        [Cl.uint(id), Cl.int(-5), Cl.int(5), Cl.uint(800)],
+        wallet1,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      pretty(simnet.callReadOnlyFn('liquidity-manager', 'get-rebalance', [Cl.uint(id)], deployer).result),
+    ).toContain('active: true');
+
+    expect(
+      simnet.callPublicFn('liquidity-manager', 'close-position', [Cl.uint(id)], wallet1).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    const closedPlan = pretty(
+      simnet.callReadOnlyFn('liquidity-manager', 'get-rebalance-plan', [Cl.uint(id)], deployer).result,
+    );
+    expect(closedPlan).toContain('active: false');
+    expect(closedPlan).toMatch(/cancelled-at: \(some u\d+\)/);
+    expect(
+      simnet.callPublicFn(
+        'liquidity-manager',
+        'request-rebalance',
+        [Cl.uint(id), Cl.int(-4), Cl.int(4), Cl.uint(700)],
+        wallet1,
+      ).result,
+    ).toEqual(error(2012));
   });
 
   it('reports price-movement proxy status with strict threshold semantics and overflow guard', () => {

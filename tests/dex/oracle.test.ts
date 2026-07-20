@@ -136,6 +136,65 @@ describe('DEX oracle facade', () => {
         deployer,
       ).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn(
+        'oracle-aggregator',
+        'set-price-decimals',
+        [Cl.uint(8)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn('twap-oracle', 'set-price-decimals', [Cl.uint(8)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+  });
+
+  it('rejects a zero TWAP window while accepting the one-block minimum', () => {
+    expect(simnet.callReadOnlyFn('twap-oracle', 'get-twap-window', [], deployer).result).toEqual(
+      Cl.uint(2),
+    );
+    expect(
+      simnet.callPublicFn('twap-oracle', 'set-twap-window', [Cl.uint(0)], deployer).result,
+    ).toEqual(error(6002));
+    expect(simnet.callReadOnlyFn('twap-oracle', 'get-twap-window', [], deployer).result).toEqual(
+      Cl.uint(2),
+    );
+    expect(
+      simnet.callPublicFn('twap-oracle', 'set-twap-window', [Cl.uint(1)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callReadOnlyFn('twap-oracle', 'get-twap-window', [], deployer).result).toEqual(
+      Cl.uint(1),
+    );
+    expect(
+      simnet.callPublicFn('twap-oracle', 'set-twap-window', [Cl.uint(2)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+  });
+
+  it('requires matching explicit decimal metadata across canonical sources', () => {
+    expect(simnet.callReadOnlyFn('oracle', 'get-price-decimals', [], deployer).result).toEqual(
+      Cl.ok(Cl.uint(8)),
+    );
+    expect(
+      simnet.callReadOnlyFn('oracle-aggregator', 'get-price-decimals', [], deployer).result,
+    ).toEqual(Cl.some(Cl.uint(8)));
+    expect(simnet.callReadOnlyFn('twap-oracle', 'get-price-decimals', [], deployer).result).toEqual(
+      Cl.some(Cl.uint(8)),
+    );
+
+    expect(
+      simnet.callPublicFn('twap-oracle', 'set-price-decimals', [Cl.uint(18)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callReadOnlyFn('oracle', 'get-price-decimals', [], deployer).result).toEqual(
+      error(7008),
+    );
+    expect(
+      simnet.callReadOnlyFn('oracle', 'get-price', [asset('oracle-scale-mismatch-token')], deployer)
+        .result,
+    ).toEqual(error(7008));
+
+    expect(
+      simnet.callPublicFn('twap-oracle', 'set-price-decimals', [Cl.uint(8)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
   });
 
   it('keeps owner-only legacy metadata isolated from canonical prices', () => {

@@ -90,6 +90,29 @@
   (or (is-owner) (is-position-owner position))
 )
 
+(define-private (deactivate-rebalance-plan (position-id uint))
+  (match (map-get? rebalance-plans position-id)
+    plan
+      (if (get active plan)
+        (begin
+          (map-set rebalance-plans position-id (merge plan {
+            cancelled-at: (some burn-block-height),
+            active: false
+          }))
+          (print {
+            event: "unexecuted-rebalance-intent-invalidated",
+            execution: "not-executed",
+            position-id: position-id,
+            reason: "position-closed"
+          })
+          true
+        )
+        true
+      )
+    true
+  )
+)
+
 (define-private (valid-tick-range (tick-lower int) (tick-upper int))
   (and
     (< tick-lower tick-upper)
@@ -440,6 +463,7 @@
         active: false,
         closed-at: (some burn-block-height)
       }))
+      (deactivate-rebalance-plan position-id)
       (print {
         event: "position-intent-closed",
         execution: "not-executed",

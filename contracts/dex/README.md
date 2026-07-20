@@ -115,6 +115,7 @@ Canonical aggregate/TWAP oracle facade implementing
 | `get-price` | `(token principal)` | Returns the nonzero raw aggregate spot from `oracle-aggregator`; it does not apply the TWAP deviation policy. |
 | `fetch-price` | `(token principal)` | Public compatibility wrapper for the same raw aggregate spot. |
 | `get-twap-price` | `(token principal)` | Returns the nonzero TWAP from `twap-oracle`. |
+| `get-price-decimals` | `()` | Returns the shared price precision only when `oracle-aggregator` and `twap-oracle` declare the same explicit decimal scale. |
 | `get-price-diagnostics` | `(token principal)` | Returns spot, TWAP, and absolute deviation in basis points. |
 | `get-validated-price` | `(token principal)` | Returns aggregate spot only when spot-vs-TWAP deviation is at or below the configured inclusive limit. |
 | `set-max-twap-deviation-bps` | `(new-deviation-bps uint)` | Owner-only inclusive deviation policy, bounded to 10,000 bps. |
@@ -126,6 +127,18 @@ Canonical aggregate or TWAP data that is missing, stale, zero, or outside the
 configured deviation limit returns an error; it no longer appears as
 `(ok u0)`. Consumers that need a risk-safe price should call
 `get-validated-price`, not raw `get-price`.
+
+### Price-scale boundary
+
+`oracle-aggregator` and `twap-oracle` expose owner-configured
+`set-price-decimals`/`get-price-decimals` metadata. The DEX facade requires both
+sources to declare the same scale before returning canonical prices or applying
+the TWAP policy. It validates equality and does **not** invent a conversion
+factor or normalize token-native decimals. Deployments must choose and record a
+shared price precision before configuring the facade; token-specific
+conversion remains outside this intent-only PR.
+
+`twap-oracle.set-twap-window` rejects `u0`; `u1` is the minimum accepted window.
 
 ## Integration Examples (How-to)
 

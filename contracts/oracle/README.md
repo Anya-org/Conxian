@@ -20,6 +20,8 @@ The primary interface for price data consumption.
 | `register-asset` | `(asset principal) (tier uint) (is-yield-bearing bool)` | Register a 2026 Ecosystem Asset (sBTC, stSTX, etc). |
 | `get-price` | `(asset principal)` | Returns the aggregated price for a specific asset. |
 | `fetch-price` | `(asset principal)` | Fetch price (alias). |
+| `set-price-decimals` | `(new-decimals uint)` | Owner-only declaration of the aggregate source's integer price precision. |
+| `get-price-decimals` | `()` | Read the optional declared aggregate price precision. |
 | `set-source-authorized` | `(source principal) (authorized bool)` | Authorize or deauthorize a price source. |
 | `set-volatility-index` | `(new-vol uint)` | Update the protocol volatility index. |
 | `set-circuit-breaker` | `(cb-contract principal)` | Set dynamic circuit breaker contract. |
@@ -60,6 +62,15 @@ Manages reputation and loyalty points.
   (print price)
 )
 ```
+
+## Price units (Reference)
+
+The DEX facade compares the aggregate spot and TWAP as integers only after both
+sources declare the same `price-decimals` metadata. The facade validates the
+shared scale and fails closed when it is missing or mismatched; it does not
+guess a token-decimal conversion factor. Configure the aggregate and TWAP
+source metadata as part of deployment before using `get-validated-price` as a
+canonical financial input.
 
 ## Testing (How-to)
 Comprehensive validation is performed using the Vitest framework.
