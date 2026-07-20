@@ -673,7 +673,7 @@ clarity-version = 4
 [contracts.oracle]
 path = "contracts/dex/oracle.clar"
 clarity-version = 4
-depends_on = ["defi-traits"]
+depends_on = ["defi-traits", "oracle-aggregator", "twap-oracle"]
 
 [contracts.oracle-adapter-stub]
 path = "contracts/oracle/oracle-adapter-stub.clar"
