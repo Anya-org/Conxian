@@ -15,6 +15,11 @@ set -o pipefail
 # Contracts with known benign runtime warnings
 ALLOWLIST="conxian-protocol|dex-factory|office-manager|mock-token"
 
+# The real batch-processor API rejects an 11-item list at the Clarity type
+# boundary. Its test asserts that rejection, but clarinet-sdk still emits the
+# expected runtime diagnostic on stderr.
+EXPECTED_ERRORS="batch-processor"
+
 temp=$(mktemp)
 trap "rm -f $temp deployments/default.simnet-plan.yaml.bak" EXIT
 
@@ -29,12 +34,13 @@ cp deployments/default.simnet-plan.yaml.bak deployments/default.simnet-plan.yaml
 
 total_errors=$(grep -c 'Runtime error while interpreting' "$temp" || true)
 known_errors=$(grep -cE "Runtime error while interpreting [^ ]*\.($ALLOWLIST)" "$temp" || true)
-new_errors=$((total_errors - known_errors))
+expected_errors=$(grep -cE "Runtime error while interpreting [^ ]*\.($EXPECTED_ERRORS)" "$temp" || true)
+new_errors=$((total_errors - known_errors - expected_errors))
 
 echo ""
 echo "---"
 echo "vitest exit: $vitest_exit"
-echo "runtime errors: $total_errors ($known_errors known, $new_errors new)"
+echo "runtime errors: $total_errors ($known_errors known, $expected_errors expected, $new_errors new)"
 
 if [ "$vitest_exit" -ne 0 ]; then
   echo "❌ Tests failed (vitest exit code: $vitest_exit)"
@@ -43,12 +49,16 @@ fi
 
 if [ "$new_errors" -gt 0 ]; then
   echo "❌ Tests had $new_errors unexpected runtime error(s)"
-  grep -E 'Runtime error' "$temp" | grep -vE "\.($ALLOWLIST)" || true
+  grep -E 'Runtime error' "$temp" | grep -vE "\.($ALLOWLIST|$EXPECTED_ERRORS)" || true
   exit 1
 fi
 
 if [ "$known_errors" -gt 0 ]; then
   echo "⚠️  $known_errors known benign runtime warning(s) — suppressed (clarinet-sdk bug)"
+fi
+
+if [ "$expected_errors" -gt 0 ]; then
+  echo "ℹ️  $expected_errors expected contract-boundary rejection(s) — asserted by tests"
 fi
 
 echo "✅ All checks passed"

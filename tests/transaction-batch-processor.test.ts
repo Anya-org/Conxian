@@ -57,4 +57,12 @@ describe('Transaction Batch Processor', () => {
 
     expect(result).toEqual(Cl.ok(Cl.uint(10)));
   });
+
+  it('rejects an eleven-item batch at the contract list boundary', () => {
+    const calls = Cl.list(
+      Array.from({ length: 11 }, (_, index) => targetCall(wallet1, `call-${index + 1}`))
+    );
+
+    expect(() => batchCall(calls)).toThrow(/batch-processor::batch-call/);
+  });
 });
