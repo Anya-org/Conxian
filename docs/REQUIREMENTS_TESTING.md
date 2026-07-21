@@ -12,8 +12,11 @@
 ### 1.2. Governance (Dual-Council)
 
 - **TEST_GOV_01**: Verify that `submit-proposal` in `proposal-engine.clar` requires the sender to hold an `enhanced-governance-nft` seat.
-- **TEST_GOV_02**: Verify that `vote` in `community-voting-engine.clar` correctly applies reputation weighting from `reputation-engine.clar`.
-- **TEST_GOV_03**: Verify that non-compliant users (blacklisted in `regulatory-adapter.clar`) cannot vote in the Strategic Council.
+- **TEST_GOV_02**: Verify that `community-voting-engine.clar` snapshots nonzero CXVG supply at proposal creation, accepts only nonzero escrowed CXVG votes, stores one immutable vote per principal, and accounts for yes/no deposited totals.
+- **TEST_GOV_03**: Verify that non-compliant proposers and voters (as reported by the routed regulatory adapter) are rejected, and that missing or mismatched operational-treasury routes fail closed.
+- **TEST_GOV_04**: Verify future start blocks, positive bounded durations, `[start-block, end-block)` enforcement, per-proposal quorum and approval thresholds, strict tie failure, permissionless one-time finalization, and one-time stake claims for both passed and failed proposals.
+- **TEST_GOV_05**: Verify unknown proposal IDs, duplicate votes, zero amounts, zero supply, premature finalization, and double claims return deterministic errors without changing escrow state.
+- **TEST_GOV_06**: Reputation weighting and arbitrary action execution are explicitly deferred. The current voting engine uses raw escrowed CXVG only and never calls `reputation-engine.clar` or executes proposal payloads.
 
 ### 1.3. Autonomous Agents (Staff)
 
@@ -32,7 +35,7 @@
 ### 2.2. Governance Resilience
 
 - **TEST_GOV_RES_01**: Verify that a malicious "Staff" agent cannot pause the protocol without Strategic Council (Board) approval for longer than a 144-block "Emergency Tenure."
-- **TEST_GOV_RES_02**: Verify that the `reputation-engine` correctly decays voting weight for inactive "Board" members over a 52,560 block (1 year) period.
+- **TEST_GOV_RES_02**: Future-only requirement. Reputation weighting and decay are not integrated into `community-voting-engine.clar`; do not treat this as a current voting-engine acceptance test until a trustworthy reputation source and weighting policy are approved.
 
 ## 3. Compliance Checklist (Release Prep)
 
@@ -50,9 +53,9 @@
 
 ### 2.3. Nakamoto/Clarity 4 Standards
 
-- [ ] `stacks-block-time` used for all temporal logic (Vesting, Voting).
+- [ ] `stacks-block-height` used for community voting windows; other temporal modules document their own approved clock.
 - [ ] `contract-hash?` used for module verification in `conxian-protocol.clar`.
-- [ ] `Clarinet.toml` epoch set to `"3.0"` and `clarity-version` set to `2` (stable).
+- [ ] Touched `Clarinet.toml` entries use Clarity 4 and an epoch supported by the repository toolchain.
 
 ## 3. Definition of Done (DoD)
 

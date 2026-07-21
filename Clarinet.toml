@@ -236,6 +236,8 @@ depends_on = ["regulatory-adapter"]
 [contracts.community-voting-engine]
 path = "contracts/governance/community-voting-engine.clar"
 clarity-version = 4
+epoch = 3.0
+depends_on = ["core-traits", "cxvg-token", "operational-treasury", "regulatory-adapter", "sip-standards"]
 
 [contracts.compliance-hooks]
 path = "contracts/compliance/compliance-hooks.clar"
