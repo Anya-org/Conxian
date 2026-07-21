@@ -180,13 +180,10 @@ batches:
           contract-name: ops-engine
           path: contracts/core/ops-engine.clar
 
-  # --- Phase 7: Integrations & Governance ---
+  # --- Phase 7: Governance & Tokens ---
   - id: 7
-    description: "ALEX Adapter, Governance, Tokens, Bridge NFT"
+    description: "Governance, Tokens, Bridge NFT"
     transactions:
-      - contract-publish:
-          contract-name: alex-adapter
-          path: contracts/integrations/alex-adapter.clar
       - contract-publish:
           contract-name: cxlp-token
           path: contracts/tokens/cxlp-token.clar
@@ -248,9 +245,3 @@ batches:
           contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.risk-unit"
           method: "set-ops-engine"
           parameters: ["'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.ops-engine"]
-      - contract-call:
-          contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.conxian-protocol"
-          method: "register-module"
-          parameters:
-            - "\"alex-adapter\""
-            - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.alex-adapter"

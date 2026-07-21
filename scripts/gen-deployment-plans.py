@@ -13,11 +13,8 @@ TEST_HELPERS = {
 # testnet/mainnet plans; promoting them is a separate deployment decision.
 RELEASE_PLAN_EXCLUSIONS = {
     "integration-fee-trait", "integration-registry", "alex-reserve-pool",
-    "alex-swap-helper", "bns-stub", "math-lib-concentrated",
+    "alex-swap-helper", "alex-adapter", "bns-stub", "math-lib-concentrated",
     "oracle-adapter-stub", "integration-fee-collector",
-}
-RELEASE_PATH_OVERRIDES = {
-    "alex-adapter": "contracts/integrations/alex-adapter.clar",
 }
 
 COST_TESTNET = 20000
@@ -71,9 +68,6 @@ INIT_CALLS = [
     {"contract-id": f"{DEPLOYER}.risk-unit", "expected-sender": DEPLOYER,
      "method": "set-ops-engine",
      "parameters": [A(".ops-engine")], "cost": INIT_CALL_COST},
-    {"contract-id": f"{DEPLOYER}.conxian-protocol", "expected-sender": DEPLOYER,
-     "method": "register-module", "parameters": [
-         q('"alex-adapter"'), A(".alex-adapter")], "cost": INIT_CALL_COST},
 ]
 
 
@@ -102,7 +96,7 @@ def extract_contracts(simnet):
             seen.add(name)
             batch_contracts.append({
                 "contract-name": name,
-                "path": RELEASE_PATH_OVERRIDES.get(name, tx["path"]),
+                "path": tx["path"],
                 "clarity-version": tx.get("clarity-version", 4),
             })
         if batch_contracts:
