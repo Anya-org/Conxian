@@ -29,12 +29,15 @@ The Conxian Protocol utilizes a "Dual-Mode" testing architecture. This ensures t
 15. ✅ **tests/governance/proposal-registry.test.ts**: Persistent proposal storage.
 16. ✅ **tests/governance/conxian-operations-engine.test.ts**: Root heartbeat coordination.
 17. ✅ **tests/governance/executive-agents.test.ts**: Autonomous Staff (CRO/Sovereign-Financial-Office) logic.
+18. ✅ **tests/governance/sab-election.test.ts**: Escrowed SAB election cycles, quorum/tie finalization, and stake claims.
+19. ✅ **tests/governance/upgrade-controller.test.ts**: Release authorization, signer thresholds, timelock, rollout, and rollback.
+20. ✅ **tests/governance/gauge-manager.test.ts**: Canonical escrowed gauge voting, caps, epoch finalization, and withdrawals.
 
 ### System Root Tests (Integration)
-18. ✅ **tests/system/full-protocol-journey.test.ts**: Coordination between Heartbeat, DEX, and Agents.
-19. ✅ **tests/cybernetic-revenue.test.ts**: Dynamic "Fiscal Dam" allocation (CXIP-013).
-20. ✅ **tests/cxip-012.test.ts**: Volatility-based DEX fee adjustments.
-21. ✅ **tests/nakamoto_verification.test.ts**: Tenure info and block utility checks.
+21. ✅ **tests/system/full-protocol-journey.test.ts**: Coordination between Heartbeat, DEX, and Agents.
+22. ✅ **tests/cybernetic-revenue.test.ts**: Dynamic "Fiscal Dam" allocation (CXIP-013).
+23. ✅ **tests/cxip-012.test.ts**: Volatility-based DEX fee adjustments.
+24. ✅ **tests/nakamoto_verification.test.ts**: Tenure info and block utility checks.
 
 ## How to Run Tests
 ```bash
