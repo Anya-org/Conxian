@@ -1,6 +1,7 @@
 ;; lending-orchestrator.clar
 ;; Unified lending and borrowing engine
-;; Conxian Protocol Standard Contract - Upgraded for BME
+;; Conxian Protocol Standard Contract - Upgraded for BME and Dynamic Multi-Asset Collateral
+;; Compliant with Clarity 4 and Sovereign Autonomy standards
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
@@ -13,16 +14,32 @@
 (define-constant ERR_NOT_FOUND u404)
 (define-constant ERR_INTERNAL u500)
 
-(define-constant COLLATERAL_FACTOR u7500)
+(define-constant COLLATERAL_FACTOR u7500)      ;; Default: 75%
+(define-constant LIQUIDATION_THRESHOLD u8000)   ;; Default: 80%
 (define-constant RESERVE_FACTOR u1000)
 
 ;; --- Storage ---
-(define-map reserve-data principal { total-deposits: uint, total-borrows: uint, total-reserves: uint, decimals: uint, last-updated: uint })
+;; @desc Stores protocol-wide reserve data for each supported asset, including dynamic risk parameters.
+(define-map reserve-data principal {
+  total-deposits: uint,
+  total-borrows: uint,
+  total-reserves: uint,
+  decimals: uint,
+  collateral-factor: uint,
+  liquidation-threshold: uint,
+  last-updated: uint
+})
+
+;; @desc Tracks individual user deposit balances per asset.
 (define-map deposits { asset: principal, user: principal } uint)
+;; @desc Tracks individual user borrow balances per asset.
 (define-map borrows { asset: principal, user: principal } uint)
 
+;; @desc The administrative principal authorized to manage lending parameters.
 (define-data-var admin principal tx-sender)
+;; @desc Flag indicating if the contract has been initialized.
 (define-data-var initialized bool false)
+;; @desc List of all supported asset principals in the lending pool.
 (define-data-var assets-list (list 20 principal) (list))
 
 ;; --- Internal Helpers ---
@@ -50,7 +67,15 @@
     (asset (contract-of asset-trait))
     (reserve (match (map-get? reserve-data asset)
                res-val res-val
-               { total-deposits: u0, total-borrows: u0, total-reserves: u0, decimals: (unwrap! (contract-call? asset-trait get-decimals) (err ERR_INTERNAL)), last-updated: burn-block-height }))
+               {
+                 total-deposits: u0,
+                 total-borrows: u0,
+                 total-reserves: u0,
+                 decimals: (unwrap! (contract-call? asset-trait get-decimals) (err ERR_INTERNAL)),
+                 collateral-factor: COLLATERAL_FACTOR,
+                 liquidation-threshold: LIQUIDATION_THRESHOLD,
+                 last-updated: burn-block-height
+               }))
   )
     (begin
       (asserts! (not (is-paused)) (err ERR_PAUSED))
@@ -179,7 +204,8 @@
       (let (
         (reserve-val (unwrap-panic reserve-opt))
         (decimals (get decimals reserve-val))
-        (asset-collateral-value (/ (* deposit-amt price COLLATERAL_FACTOR) (* (pow u10 decimals) u10000)))
+        (c-factor (get collateral-factor reserve-val))
+        (asset-collateral-value (/ (* deposit-amt price c-factor) (* (pow u10 decimals) u10000)))
         (asset-debt-value (/ (* borrow-amt price) (pow u10 decimals)))
       )
         { user: user, collateral-value: (+ (get collateral-value acc) asset-collateral-value), debt-value: (+ (get debt-value acc) asset-debt-value) }
@@ -213,7 +239,7 @@
 
 ;; @desc Returns raw reserve data for a specific asset.
 ;; @param asset: The asset principal.
-;; @returns (optional { total-deposits: uint, total-borrows: uint, total-reserves: uint, decimals: uint, last-updated: uint })
+;; @returns (optional { total-deposits: uint, total-borrows: uint, total-reserves: uint, decimals: uint, collateral-factor: uint, liquidation-threshold: uint, last-updated: uint })
 (define-read-only (get-reserve-data (asset principal)) (map-get? reserve-data asset))
 
 ;; --- Admin ---
@@ -235,8 +261,45 @@
 ;; @returns (response bool uint)
 (define-public (set-admin (new-admin principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq contract-caller (var-get admin)) (err ERR_UNAUTHORIZED))
     (var-set admin new-admin)
     (ok true)
+  )
+)
+
+;; @desc Configures risk and collateral parameters for a specific asset.
+;; @param asset: The asset principal.
+;; @param collateral-factor: Loan-to-Value (LTV) ratio in basis points.
+;; @param liquidation-threshold: Liquidation threshold in basis points.
+;; @returns (response bool uint)
+(define-public (configure-asset-collateral (asset principal) (collateral-factor uint) (liquidation-threshold uint))
+  (begin
+    (asserts! (is-eq contract-caller (var-get admin)) (err ERR_UNAUTHORIZED))
+    (asserts! (<= collateral-factor u10000) (err ERR_INVALID_AMOUNT))
+    (asserts! (<= liquidation-threshold u10000) (err ERR_INVALID_AMOUNT))
+    (asserts! (>= liquidation-threshold collateral-factor) (err ERR_INVALID_AMOUNT))
+    (let (
+      (reserve (match (map-get? reserve-data asset)
+                 res-val res-val
+                 {
+                   total-deposits: u0,
+                   total-borrows: u0,
+                   total-reserves: u0,
+                   decimals: u8,
+                   collateral-factor: collateral-factor,
+                   liquidation-threshold: liquidation-threshold,
+                   last-updated: burn-block-height
+                 }))
+    )
+      (map-set reserve-data asset (merge reserve {
+        collateral-factor: collateral-factor,
+        liquidation-threshold: liquidation-threshold
+      }))
+      (if (is-none (index-of (var-get assets-list) asset))
+        (var-set assets-list (unwrap! (as-max-len? (append (var-get assets-list) asset) u20) (err ERR_INTERNAL)))
+        true
+      )
+      (ok true)
+    )
   )
 )

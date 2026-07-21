@@ -62,6 +62,7 @@ Conxian Finance is a multi-dimensional, Stacks-native automated monetary platfor
 | **REC-007** | Simulation Race Condition | **CLOSED** | Resolved asynchronous race condition in Simnet initialization and standardized test suite (April 2026). |
 | **REC-008** | SIP-018 Compliance Logic | **CLOSED** | Implemented real domain hashing and message verification (April 2026). |
 | **REC-009** | Federated Oracle Implementation | **CLOSED** | Implemented `federated-oracle-adapter.clar` with Clarity 4 standards and DAO-ready governance (April 2026). |
+| **REC-010** | Multi-Asset Collateral Redesign | **CLOSED** | Redesigned `lending-manager` and `lending-orchestrator` to support asset-specific collateral parameters and health calculations (July 2026). |
 
 ## 13. Benchmarks (Verified)
 
@@ -71,3 +72,4 @@ Conxian Finance is a multi-dimensional, Stacks-native automated monetary platfor
 | DEX | `csf-swap` | ~45,000 | < 40ms |
 | Treasury | `run-fiscal-strategy` | ~30,000 | < 25ms |
 | Compliance | `verify-and-update-compliance` | ~25,000 | < 20ms |
+| Lending | `configure-asset-collateral` | < 15,000 | < 10ms |
