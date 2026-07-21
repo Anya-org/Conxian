@@ -3,6 +3,64 @@
 ## Overview (Explanation)
 The Governance module implements the Conxian Dual-Council DAO. It separates strategic human oversight (Board) from high-frequency autonomous agent operations (Staff), ensuring the protocol remains both stable and adaptable. This module handles everything from token-weighted voting to emergency circuit breakers and treasury management.
 
+## Canonical governance registries
+
+The following contracts provide production-oriented state and authorization
+surfaces for the governance paths that previously contained seven-line stubs:
+
+### `sab-election.clar`
+
+- Opens one burn-block-height election cycle at a time and snapshots the
+  configured SIP-010 token supply, voting-token principal, quorum BPS, and
+  approval BPS. The token and rules are immutable for that cycle; global
+  configuration changes apply only to future cycles.
+- Records self-nominations with 32-byte metadata hashes and one escrowed,
+  token-weighted vote per voter. Voting and claims must use the token bound to
+  the cycle, so changing the configured token cannot strand historical escrow.
+- Finalization is permissionless after voting ends. Quorum, approval share, and
+  tie handling determine whether an optional winner is recorded.
+- Voters can reclaim their escrow once per finalized cycle, including failed or
+  tied cycles. Thresholds use overflow-safe ceiling arithmetic, and election
+  duration inputs are bounded to a one-million burn-block protocol window. The
+  contract records election results but does not mint or install governance NFT
+  seats.
+
+### `upgrade-controller.clar`
+
+This is an on-chain **release authorization registry**, not a bytecode
+replacement mechanism. It records target principals, implementation hashes,
+timelocked activation approvals, rollout percentages, and thresholded emergency
+rollback approvals. Deployment tooling or target contracts must consume the
+authorization record separately; activation never mutates target code. Signer
+approvals are keyed to a monotonically increasing signer-set generation.
+Enabling/disabling a signer or changing the threshold advances the generation
+and invalidates both activation and rollback approvals from earlier
+generations. Rollback windows are bounded to one million burn blocks and their
+deadline addition is checked for overflow.
+
+### `gauge-manager.clar`
+
+- Registers enabled gauges with metadata hashes and relative-weight caps.
+- Accepts one escrowed vote per voter/gauge/epoch, binds an epoch to the token
+  used by its first accepted vote, allows voters to support multiple gauges,
+  and preserves finalized epoch weights and eligibility snapshots.
+- A disabled gauge has zero canonical capped weight in the active epoch even
+  when it already has votes. Re-enabling it during that active epoch restores
+  eligibility; after finalization, the epoch's eligibility and cap snapshots
+  never change when the gauge is later enabled, disabled, or reconfigured.
+- Uses an explicit burn-block epoch-end boundary, permissionless epoch
+  finalization, and one-time post-finalization vote withdrawals. After the
+  first epoch is initialized, `set-epoch-length` schedules the next epoch only
+  and cannot rewrite the current boundary.
+- Raw and capped relative weights are read-only accounting values. A cap may
+  leave some emission weight unallocated; aggregate votes are bounded so the
+  BPS calculation cannot overflow. This contract does not call
+  `token-emission-controller` or claim to distribute emissions.
+
+`gauge-manager.clar` is the canonical gauge voting/weight registry.
+`gauge-orchestrator.clar` is retained as a compatibility surface and must not
+be treated as a parallel source of emission truth.
+
 ## Architecture (Explanation)
 Governance is divided into two primary loops:
 - **Strategic Council**: Human-driven voting via `community-voting-engine.clar` and `community-dao.clar` for protocol upgrades and long-term strategy.
@@ -78,6 +136,19 @@ Identity-anchored voting power management.
 Comprehensive validation is performed using the Vitest framework.
 1. Install dependencies: `npm install`
 2. Run module tests: `npx vitest run tests/governance`
+
+Focused coverage for these registries is in:
+
+- `tests/governance/sab-election.test.ts`
+- `tests/governance/upgrade-controller.test.ts`
+- `tests/governance/gauge-manager.test.ts`
+
+The focused suites cover authorization and validation, exact burn-block phase
+boundaries, token-bound escrow/withdrawal behavior, in-flight election-rule
+snapshots, quorum/tie outcomes, signer-generation invalidation for activation
+and rollback, timelocks, gauge caps, disabled-gauge history, frozen epoch
+timing, arithmetic bounds, and source guards against the former
+`stub-func`/`unwrap-panic` paths.
 
 ## Jargon Definition (Accessibility)
 - **Dual-Council DAO**: A governance structure split between human strategic oversight and autonomous/agent operational control.
