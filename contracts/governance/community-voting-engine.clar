@@ -36,10 +36,15 @@
 (define-constant ERR_ALREADY_CLAIMED u2118)
 (define-constant ERR_TOKEN_MISMATCH u2119)
 (define-constant ERR_COMPLIANCE_MISMATCH u2120)
+(define-constant ERR_SUPPLY_TOO_LARGE u2121)
+(define-constant ERR_SNAPSHOT_CAP u2122)
 
-;; Governance limits and basis-point arithmetic.
+;; Governance limits and basis-point arithmetic. Clarity uint values are
+;; bounded at 2^128 - 1, so this cap makes every multiplication by the
+;; basis-point denominator provably safe.
 (define-constant BPS_DENOMINATOR u10000)
 (define-constant MAX_VOTING_DURATION u100000)
+(define-constant MAX_SAFE_SUPPLY u34028236692093846346337460743176821)
 
 ;; Proposal IDs start at one so u0 remains an unambiguous invalid ID.
 (define-data-var next-proposal-id uint u1)
@@ -145,6 +150,9 @@
 ;;
 ;; The token and compliance trait parameters are intentional: principals read
 ;; from operational-treasury cannot be used as arbitrary contract-call targets.
+;; The supply snapshot fixes the aggregate denominator, not each wallet's
+;; balance. Tokens acquired after creation may vote during the window, but the
+;; total escrow for the proposal cannot exceed this snapshot.
 (define-public (create-proposal
     (start-block uint)
     (end-block uint)
@@ -178,6 +186,7 @@
 
       (let ((total-supply (try! (read-total-supply token))))
         (asserts! (> total-supply u0) (err ERR_ZERO_SUPPLY))
+        (asserts! (<= total-supply MAX_SAFE_SUPPLY) (err ERR_SUPPLY_TOO_LARGE))
 
         (map-set proposals proposal-id {
           proposer: tx-sender,
@@ -230,6 +239,8 @@
         (unwrap! (map-get? proposals proposal-id) (err ERR_UNKNOWN_PROPOSAL)))
       (current-block stacks-block-height)
       (existing-vote (map-get? votes { proposal-id: proposal-id, voter: tx-sender }))
+      (participation
+        (+ (get yes-deposited proposal) (get no-deposited proposal)))
     )
     (begin
       (asserts! (>= current-block (get start-block proposal)) (err ERR_NOT_STARTED))
@@ -246,6 +257,16 @@
       (try! (verify-token-route token))
       (try! (verify-compliance-route compliance))
       (try! (assert-compliant compliance tx-sender))
+
+      ;; Every successful vote preserves the invariant that cumulative escrow
+      ;; is at most the immutable proposal supply snapshot. Compare against
+      ;; remaining capacity before transfer so the addition cannot overflow.
+      (asserts!
+        (<= participation (get total-supply-snapshot proposal))
+        (err ERR_SNAPSHOT_CAP))
+      (asserts!
+        (<= amount (- (get total-supply-snapshot proposal) participation))
+        (err ERR_SNAPSHOT_CAP))
 
       ;; The token's SIP-010 sender check binds this transfer to the voter;
       ;; the recipient is this contract under the current contract context.
@@ -347,8 +368,11 @@
     )
     (begin
       (asserts! (get finalized proposal) (err ERR_NOT_FINALIZED))
+      ;; Claims validate the immutable token principal recorded with the
+      ;; proposal. The current treasury route may rotate after escrow or
+      ;; finalization; historical claims must remain live through the
+      ;; proposal's original token contract.
       (asserts! (is-eq (get token proposal) (contract-of token)) (err ERR_TOKEN_MISMATCH))
-      (try! (verify-token-route token))
       (asserts! (not (get claimed vote-record)) (err ERR_ALREADY_CLAIMED))
 
       (try!
@@ -384,6 +408,10 @@
 ;; @desc Returns the next proposal ID that will be allocated.
 (define-read-only (get-next-proposal-id)
   (var-get next-proposal-id))
+
+;; @desc Returns the maximum supply accepted for safe basis-point arithmetic.
+(define-read-only (get-max-safe-supply)
+  MAX_SAFE_SUPPLY)
 
 ;; @desc Reads a protocol route directly from operational-treasury.
 (define-read-only (get-route (key (string-ascii 50)))

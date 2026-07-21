@@ -12,11 +12,12 @@
 ### 1.2. Governance (Dual-Council)
 
 - **TEST_GOV_01**: Verify that `submit-proposal` in `proposal-engine.clar` requires the sender to hold an `enhanced-governance-nft` seat.
-- **TEST_GOV_02**: Verify that `community-voting-engine.clar` snapshots nonzero CXVG supply at proposal creation, accepts only nonzero escrowed CXVG votes, stores one immutable vote per principal, and accounts for yes/no deposited totals.
-- **TEST_GOV_03**: Verify that non-compliant proposers and voters (as reported by the routed regulatory adapter) are rejected, and that missing or mismatched operational-treasury routes fail closed.
-- **TEST_GOV_04**: Verify future start blocks, positive bounded durations, `[start-block, end-block)` enforcement, per-proposal quorum and approval thresholds, strict tie failure, permissionless one-time finalization, and one-time stake claims for both passed and failed proposals.
-- **TEST_GOV_05**: Verify unknown proposal IDs, duplicate votes, zero amounts, zero supply, premature finalization, and double claims return deterministic errors without changing escrow state.
-- **TEST_GOV_06**: Reputation weighting and arbitrary action execution are explicitly deferred. The current voting engine uses raw escrowed CXVG only and never calls `reputation-engine.clar` or executes proposal payloads.
+- **TEST_GOV_02**: Verify that `community-voting-engine.clar` snapshots nonzero aggregate CXVG supply at proposal creation, accepts only nonzero escrowed CXVG votes, stores one immutable vote per principal, and accounts for yes/no deposited totals. The denominator is not a per-wallet balance snapshot: tokens acquired after creation may vote only within the fixed aggregate escrow cap.
+- **TEST_GOV_03**: Verify that non-compliant proposers and voters (as reported by the routed regulatory adapter) are rejected, and that missing or mismatched operational-treasury routes fail closed. Fresh simnet bootstrap wiring and testnet/mainnet plans must register the canonical `cxvg-token` and `regulatory-adapter` routes after publication.
+- **TEST_GOV_04**: Verify future start blocks, positive bounded durations, `[start-block, end-block)` enforcement, per-proposal quorum and approval thresholds including exact equality, strict tie failure, permissionless one-time finalization, and one-time stake claims for both passed and failed proposals. A finalized claim remains live when the current token route rotates because the proposal stores the original token principal.
+- **TEST_GOV_05**: Verify unknown proposal IDs, duplicate votes, zero amounts, zero supply, over-bound snapshots, snapshot-cap violations, wrong token/compliance traits, adapter errors versus negative compliance, insufficient-balance transfer failures, premature finalization, and double claims return deterministic errors without changing escrow state.
+- **TEST_GOV_06**: Verify that the published maximum safe supply bounds finalization arithmetic without rounding governance thresholds; exact-bound and above-bound snapshots are covered by tests.
+- **TEST_GOV_07**: Reputation weighting and arbitrary action execution are explicitly deferred. The current voting engine uses raw escrowed CXVG only and never calls `reputation-engine.clar` or executes proposal payloads.
 
 ### 1.3. Autonomous Agents (Staff)
 

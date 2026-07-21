@@ -30,6 +30,19 @@ implementations because principals loaded from a map cannot be arbitrary
 `(contract-of ...)` matches the registered route; missing or mismatched routes
 fail closed.
 
+The proposal's total-supply snapshot is an aggregate denominator, not a
+per-wallet balance snapshot. CXVG acquired after proposal creation may still
+be escrowed during the voting window, but cumulative escrow cannot exceed the
+immutable snapshot. The engine rejects snapshots above its published
+`get-max-safe-supply` bound so the finalization basis-point arithmetic remains
+within Clarity's uint range.
+
+Claims validate the immutable token principal stored in the proposal. They do
+not require that the current `operational-treasury` token route still points
+to that principal, so a route rotation after escrow or finalization does not
+strand historical claims. Voting and proposal creation continue to require
+the live canonical token and compliance routes.
+
 This replaces the former two-argument mock `create-proposal` entry point. The
 public signature now includes the voting window, thresholds, and routed token
 and compliance traits; no production call sites were found for the old stub.
@@ -42,6 +55,7 @@ and compliance traits; no production call sites were found for the old stub.
 | `claim-stake` | `(proposal-id uint) (token <sip-010-ft-trait>)` | Returns a voter's escrow after finalization, whether the proposal passed or failed. Claims are one-time. |
 | `get-proposal` | `(proposal-id uint)` | Returns proposal metadata, snapshot, thresholds, escrow totals, and outcome flags. |
 | `get-vote` | `(proposal-id uint) (voter principal)` | Returns the immutable vote direction, amount, and claim state. |
+| `get-max-safe-supply` | `()` | Returns the maximum proposal snapshot accepted for safe basis-point arithmetic. |
 
 ### `proposal-engine.clar`
 The primary controller for multi-council governance routing.
@@ -107,6 +121,14 @@ rules are trustworthy and independently reviewed.
 The operational treasury must already contain matching routes before either
 call can succeed. The example uses the current production token and adapter;
 the engine still verifies both against the registry at runtime.
+
+Fresh deployments register both routes after all contracts are published.
+For simnet, the Clarinet SDK regenerates the default publish plan and does not
+reliably execute custom emulated post-deploy calls, so
+`tests/setup-test-env.ts` is the supported fresh-simnet wiring artifact and
+uses the runtime deployer. `scripts/gen-deployment-plans.py` emits explicit
+post-publication calls for testnet and mainnet. The bootstrap and generated
+plans are checked by `scripts/assert-community-voting-wiring.py`.
 
 ### Finalizing and Claiming
 ```clarity

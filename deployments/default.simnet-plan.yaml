@@ -194,6 +194,11 @@ plan:
       path: contracts/compliance/regulatory-adapter.clar
       clarity-version: 4
     - transaction-type: emulated-contract-publish
+      contract-name: mock-regulatory-adapter
+      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
+      path: contracts/test-helpers/mock-regulatory-adapter.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
       contract-name: bond-factory
       emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
       path: contracts/bonding/bond-factory.clar

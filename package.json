@@ -11,6 +11,7 @@
     "check": "clarinet check",
     "clarinet:console": "clarinet console",
     "validate:docs": "node ./scripts/validate-docs.js",
+    "assert:community-voting-wiring": "python3 scripts/assert-community-voting-wiring.py",
     "ci": "bash scripts/run-tests.sh",
     "coverage": "vitest run --coverage",
     "derive:wallets": "tsx scripts/derive_wallets.ts"
