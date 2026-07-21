@@ -1,6 +1,18 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 import { beforeAll } from 'vitest';
 import { initSimnet, type Simnet } from '@stacks/clarinet-sdk';
 import { Cl } from '@stacks/transactions';
+
+const deploymentPlanPath = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../deployments/default.simnet-plan.yaml',
+);
+
+// Clarinet SDK may rewrite default.simnet-plan.yaml during initSimnet. Keep a
+// source snapshot available to tests that validate generator-owned artifacts.
+export const canonicalDeploymentPlan = readFileSync(deploymentPlanPath, 'utf8');
 
 let internalSimnet: Simnet | null = null;
 let initializationPromise: Promise<Simnet> | null = null;

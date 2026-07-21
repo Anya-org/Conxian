@@ -1,15 +1,20 @@
-import { readFileSync, existsSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { canonicalDeploymentPlan } from "./setup-test-env";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const simnetPlanPath = path.join(repoRoot, "deployments/default.simnet-plan.yaml");
+const releasePlanGeneratorPath = path.join(repoRoot, "scripts/gen-deployment-plans.py");
 const activeReleaseArtifactPaths = [
   "deployments/full-system.testnet-plan.yaml",
   "deployments/full-system.mainnet-plan.yaml",
   "deployments/mainnet-manifest-v1.yaml",
 ].map((relativePath) => path.join(repoRoot, relativePath));
+const generatedReleaseArtifactPaths = activeReleaseArtifactPaths.slice(0, 2);
 const legacyReleaseArtifactPath = path.join(repoRoot, "deployments/mainnet-release-plan.yaml");
 const releaseArtifactPaths = [...activeReleaseArtifactPaths, legacyReleaseArtifactPath];
 
@@ -122,6 +127,44 @@ describe("ALEX release wiring guard", () => {
           `${relativePath}:${entry.line} references missing contract-publish path ${entry.path}`,
         ).toBe(true);
       }
+    }
+  });
+
+  it("keeps generated release plans in sync without writing to the worktree", () => {
+    const beforeCheck = new Map(
+      generatedReleaseArtifactPaths
+        .map((artifactPath) => [artifactPath, readArtifact(artifactPath)]),
+    );
+    const temporaryDirectory = mkdtempSync(path.join(tmpdir(), "conxian-alex-release-"));
+    const temporarySimnetPlanPath = path.join(temporaryDirectory, "default.simnet-plan.yaml");
+    writeFileSync(temporarySimnetPlanPath, canonicalDeploymentPlan);
+
+    const result = (() => {
+      try {
+        return spawnSync(
+          "python3",
+          [releasePlanGeneratorPath, "--check", "--simnet-plan", temporarySimnetPlanPath],
+          { cwd: repoRoot, encoding: "utf8" },
+        );
+      } finally {
+        rmSync(temporaryDirectory, { recursive: true, force: true });
+      }
+    })();
+
+    expect(
+      result.error,
+      `generator check could not start: ${result.error?.message ?? "unknown error"}`,
+    ).toBeUndefined();
+    expect(
+      result.status,
+      `generator check failed:\n${result.stdout}\n${result.stderr}`,
+    ).toBe(0);
+
+    for (const [artifactPath, beforeContents] of beforeCheck) {
+      expect(
+        readArtifact(artifactPath),
+        `${path.relative(repoRoot, artifactPath)} changed while running generator --check`,
+      ).toBe(beforeContents);
     }
   });
 

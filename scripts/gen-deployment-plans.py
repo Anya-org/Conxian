@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 """Generate testnet and mainnet deployment plans from simnet plan."""
+import argparse
+from pathlib import Path
+import tempfile
+
 import yaml
 
 DEPLOYER = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
@@ -71,8 +75,14 @@ INIT_CALLS = [
 ]
 
 
-def load_simnet_plan():
-    with open("deployments/default.simnet-plan.yaml") as f:
+GENERATED_PLAN_NAMES = (
+    "full-system.testnet-plan.yaml",
+    "full-system.mainnet-plan.yaml",
+)
+
+
+def load_simnet_plan(path):
+    with path.open() as f:
         return yaml.safe_load(f)
 
 
@@ -148,13 +158,14 @@ def make_plan(contracts, network, name, stacks_node, cost):
 
 
 def save_plan(plan, path):
-    with open(path, "w") as f:
+    with path.open("w") as f:
         yaml.dump(plan, f, default_flow_style=False, sort_keys=False,
                   width=120, allow_unicode=True)
 
 
-def main():
-    simnet = load_simnet_plan()
+def generate_plans(simnet_path, output_dir):
+    """Generate the release plans into ``output_dir`` and return their paths."""
+    simnet = load_simnet_plan(simnet_path)
     contracts = extract_contracts(simnet)
 
     total = sum(len(b) for b in contracts)
@@ -167,8 +178,8 @@ def main():
         stacks_node="https://api.testnet.hiro.so",
         cost=COST_TESTNET,
     )
-    save_plan(testnet, "deployments/full-system.testnet-plan.yaml")
-    print("Generated: deployments/full-system.testnet-plan.yaml")
+    testnet_path = output_dir / GENERATED_PLAN_NAMES[0]
+    save_plan(testnet, testnet_path)
 
     # Mainnet
     mainnet = make_plan(contracts,
@@ -177,11 +188,54 @@ def main():
         stacks_node="https://stacks-node-api.mainnet.stacks.co",
         cost=COST_MAINNET,
     )
-    save_plan(mainnet, "deployments/full-system.mainnet-plan.yaml")
-    print("Generated: deployments/full-system.mainnet-plan.yaml")
+    mainnet_path = output_dir / GENERATED_PLAN_NAMES[1]
+    save_plan(mainnet, mainnet_path)
 
+    return (testnet_path, mainnet_path)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Generate or verify testnet and mainnet deployment plans."
+    )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="regenerate plans in a temporary directory and verify checked-in artifacts",
+    )
+    parser.add_argument(
+        "--simnet-plan",
+        type=Path,
+        help="use a specific simnet plan as the generator source",
+    )
+    args = parser.parse_args()
+
+    repo_root = Path(__file__).resolve().parent.parent
+    deployments_dir = repo_root / "deployments"
+    simnet_path = args.simnet_plan or deployments_dir / "default.simnet-plan.yaml"
+
+    if args.check:
+        with tempfile.TemporaryDirectory(prefix="conxian-release-plans-") as temp_dir:
+            generated_paths = generate_plans(simnet_path, Path(temp_dir))
+            mismatches = []
+            for generated_path, name in zip(generated_paths, GENERATED_PLAN_NAMES):
+                checked_in_path = deployments_dir / name
+                if generated_path.read_bytes() != checked_in_path.read_bytes():
+                    mismatches.append(name)
+
+            if mismatches:
+                print("Generator drift detected in: " + ", ".join(mismatches))
+                return 1
+
+            print("Checked-in release plans match a fresh generator run.")
+            return 0
+
+    generated_paths = generate_plans(simnet_path, deployments_dir)
+    for generated_path in generated_paths:
+        print(f"Generated: {generated_path.relative_to(repo_root)}")
     print("Done!")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
