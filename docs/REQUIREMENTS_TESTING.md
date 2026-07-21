@@ -9,7 +9,7 @@
 - **TEST_REV_03**: Verify that total shares must always sum to 10,000 (100%).
 - **TEST_REV_04**: Verify that "Accrued Claims" are correctly recorded in `cxd-treasury.clar` when staker dividends are diverted to the Insurance Fund.
 
-### 1.2. Governance (Dual-Council)
+### 1.2. Governance (Community & Strategic Voting Deferred)
 
 - **TEST_GOV_01**: Verify that `submit-proposal` in `proposal-engine.clar` requires the sender to hold an `enhanced-governance-nft` seat.
 - **TEST_GOV_02**: **Deferred** — Reputation-weighted voting through `community-voting-engine.clar` is not active; coverage remains pending an architecture/API design.
