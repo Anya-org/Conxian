@@ -111,11 +111,20 @@ describe("Governance Tests", () => {
     });
   });
 
-  describe("Upgrade Controller", () => {
+  describe("Governance Registries", () => {
+    it("should have sab-election deployed", () => {
+      const contract = simnet.getContractSource("sab-election");
+      expect(contract).toBeDefined();
+    });
+
     it("should have upgrade-controller deployed", () => {
-      // The upgrade-controller contract is not currently in Clarinet.toml
-      // const contract = simnet.getContractSource("upgrade-controller");
-      // expect(contract).toBeDefined();
+      const contract = simnet.getContractSource("upgrade-controller");
+      expect(contract).toBeDefined();
+    });
+
+    it("should have gauge-manager deployed", () => {
+      const contract = simnet.getContractSource("gauge-manager");
+      expect(contract).toBeDefined();
     });
   });
 

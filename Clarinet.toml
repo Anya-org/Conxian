@@ -508,7 +508,7 @@ clarity-version = 4
 [contracts.gauge-manager]
 path = "contracts/governance/gauge-manager.clar"
 clarity-version = 4
-depends_on = ["cxlp-token", "sip-standards"]
+depends_on = ["sip-standards"]
 
 [contracts.gauge-orchestrator]
 path = "contracts/governance/gauge-orchestrator.clar"
@@ -874,6 +874,7 @@ depends_on = ["conxian-protocol", "regulatory-adapter", "sip-standards"]
 [contracts.sab-election]
 path = "contracts/governance/sab-election.clar"
 clarity-version = 4
+depends_on = ["sip-standards"]
 
 [contracts.sbtc-vault]
 path = "contracts/vaults/sbtc-vault.clar"
