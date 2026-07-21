@@ -1,25 +1,10 @@
 ---
 id: 2
-name: Mainnet Release (March 2026)
+# Disabled/readiness-gated legacy artifact: intentionally non-actionable until
+# docs/ALEX_LAUNCH_READINESS.md contains verified production inputs and evidence.
+name: Legacy Mainnet Release Plan (disabled; no-op)
 network: mainnet
 stacks-node: "https://stacks-node-api.mainnet.stacks.co"
 deployer: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
 plan:
-  batches:
-    - id: 0
-      transactions:
-        - contract-publish:
-            contract-name: alex-adapter
-            expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-            cost: 50000
-            path: contracts/integrations/alex-adapter.clar
-            anchor-block-only: true
-            clarity-version: 4
-            epoch: "3.0"
-        - contract-call:
-            contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.dex-factory"
-            expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-            method: "register-csf-protocol"
-            parameters:
-              - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.alex-adapter"
-              - '"ALEX Lab Mainnet"'
+  batches: []

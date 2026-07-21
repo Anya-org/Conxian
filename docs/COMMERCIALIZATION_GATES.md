@@ -6,8 +6,12 @@ Commercialization of ConxianCSF follows a three-phase activation sequence:
 ### Phase 1: Mainnet Genesis (Immediate)
 - **CSF Core**: Universal Router and Concentrated Liquidity Pools enabled.
 - **BME Engine**: Fee collection and buy-back/burn mechanism active.
-- **ALEX Adapter**: Trustless routing through ALEX pools enabled.
-- **Internal Bounty Funding**: ALEX-linked treasury path for core maintenance.
+- **ALEX Adapter**: Production ALEX routing is disabled pending the verified
+  inputs and evidence listed in `docs/ALEX_LAUNCH_READINESS.md`. Local simnet
+  fixtures remain available for integration coverage only.
+- **Internal Bounty Funding**: ALEX-linked treasury flow remains disabled; no
+  production ALEX funding path is active until the same readiness gate is
+  satisfied.
 - **Integration Fee MVP (contract scope)**: STX per-use and monthly billing is
   implemented through the registry/collector pair, with exact payer
   settlement routed through the existing revenue distributor. Activation is

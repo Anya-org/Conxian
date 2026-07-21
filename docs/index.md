@@ -13,6 +13,7 @@ Welcome to the official documentation for Conxian Finance, a Sovereign Autonomou
 - **[Protocol Overview](../README.md)**: The high-level vision and architecture.
 - **[Product Requirements (PRD)](../PRD.md)**: Detailed specifications and implementation status.
 - **[Whitepaper](WHITEPAPER.md)**: The philosophical and economic foundation.
+- **[ALEX Launch Readiness](ALEX_LAUNCH_READINESS.md)**: Operational gates for distinguishing local ALEX simulation from production launch wiring.
 
 ## 📊 Performance & Research
 
