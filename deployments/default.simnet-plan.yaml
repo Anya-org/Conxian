@@ -264,11 +264,6 @@ plan:
       path: contracts/governance/community-governance-token.clar
       clarity-version: 4
     - transaction-type: emulated-contract-publish
-      contract-name: community-voting-engine
-      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
-      path: contracts/governance/community-voting-engine.clar
-      clarity-version: 4
-    - transaction-type: emulated-contract-publish
       contract-name: compliance-manager
       emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
       path: contracts/compliance/compliance-manager.clar
@@ -1108,11 +1103,6 @@ plan:
       contract-name: twap-oracle
       emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
       path: contracts/integrations/twap-oracle.clar
-      clarity-version: 4
-    - transaction-type: emulated-contract-publish
-      contract-name: upgrade-controller
-      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
-      path: contracts/governance/upgrade-controller.clar
       clarity-version: 4
     - transaction-type: emulated-contract-publish
       contract-name: vault

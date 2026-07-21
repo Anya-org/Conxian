@@ -12,8 +12,8 @@
 ### 1.2. Governance (Dual-Council)
 
 - **TEST_GOV_01**: Verify that `submit-proposal` in `proposal-engine.clar` requires the sender to hold an `enhanced-governance-nft` seat.
-- **TEST_GOV_02**: Verify that `vote` in `community-voting-engine.clar` correctly applies reputation weighting from `reputation-engine.clar`.
-- **TEST_GOV_03**: Verify that non-compliant users (blacklisted in `regulatory-adapter.clar`) cannot vote in the Strategic Council.
+- **TEST_GOV_02**: **Deferred** — Reputation-weighted voting through `community-voting-engine.clar` is not active; coverage remains pending an architecture/API design.
+- **TEST_GOV_03**: **Deferred** — The community Strategic Council voting/compliance path is not active; coverage remains pending an architecture/API design.
 
 ### 1.3. Autonomous Agents (Staff)
 

@@ -233,10 +233,6 @@ path = "contracts/governance/community-governance-token.clar"
 clarity-version = 4
 depends_on = ["regulatory-adapter"]
 
-[contracts.community-voting-engine]
-path = "contracts/governance/community-voting-engine.clar"
-clarity-version = 4
-
 [contracts.compliance-hooks]
 path = "contracts/compliance/compliance-hooks.clar"
 clarity-version = 4
@@ -937,10 +933,6 @@ depends_on = ["governance-traits", "operational-treasury", "proposal-executor"]
 path = "contracts/integrations/twap-oracle.clar"
 clarity-version = 4
 depends_on = ["defi-traits"]
-
-[contracts.upgrade-controller]
-path = "contracts/governance/upgrade-controller.clar"
-clarity-version = 4
 
 [contracts.vault]
 path = "contracts/dex/vault.clar"

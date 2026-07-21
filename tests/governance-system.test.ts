@@ -111,14 +111,6 @@ describe("Governance Tests", () => {
     });
   });
 
-  describe("Upgrade Controller", () => {
-    it("should have upgrade-controller deployed", () => {
-      // The upgrade-controller contract is not currently in Clarinet.toml
-      // const contract = simnet.getContractSource("upgrade-controller");
-      // expect(contract).toBeDefined();
-    });
-  });
-
   describe("Voting System", () => {
     it("should have voting contract deployed", () => {
       const contract = simnet.getContractSource("voting");

@@ -463,10 +463,6 @@ path = "contracts/monitoring/finance-metrics.clar"
 [contracts.ico-offering]
 path = "contracts/governance/ico-offering.clar"
 
-[contracts.symmetry-governor]
-path = "contracts/governance/upgrade-controller.clar"
-depends_on = [ "governance",]
-
 [contracts.lending-protocol-governance]
 path = "contracts/governance/lending-protocol-governance.clar"
 

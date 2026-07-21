@@ -24,6 +24,22 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
+        contract-name: integration-fee-trait
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/traits/integration-fee-trait.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: integration-registry
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/integrations/integration-registry.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
         contract-name: core-traits
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
@@ -112,10 +128,26 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
+        contract-name: alex-reserve-pool
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/integrations/stubs/alex-reserve-pool.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: alex-swap-helper
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/integrations/stubs/alex-swap-helper-v1-03.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
         contract-name: alex-adapter
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
-        path: contracts/integrations/alex-adapter.clar
+        path: contracts/integrations/simnet/alex-adapter.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -198,6 +230,14 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/utils/block-utils.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: bns-stub
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/governance/bns-stub.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -318,14 +358,6 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/governance/community-governance-token.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: community-voting-engine
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/governance/community-voting-engine.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -1026,6 +1058,14 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
+        contract-name: math-lib-concentrated
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/math/concentrated-math.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
         contract-name: math-utilities
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
@@ -1160,6 +1200,14 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/dex/oracle.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: oracle-adapter-stub
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/oracle/oracle-adapter-stub.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -1446,6 +1494,14 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
+        contract-name: integration-fee-collector
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/integrations/integration-fee-collector.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
         contract-name: risk-unit
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
@@ -1588,14 +1644,6 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/integrations/twap-oracle.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: upgrade-controller
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/governance/upgrade-controller.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
