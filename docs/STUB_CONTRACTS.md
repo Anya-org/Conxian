@@ -14,10 +14,11 @@ This document catalogs the status of placeholder (stub) contracts in the Conxian
 |----------|--------|-------------|
 | `bond-token.clar` | ✅ Active | SIP-010 Bond Token implementation |
 | `batch-auction.clar` | ✅ Active | MEV-protected batch auction engine |
-| `oracle.clar` | ✅ Active | Manual price oracle for testing |
-| `rebalancing-rules.clar` | ✅ Active | Logic for vault rebalancing |
-| `predictive-scaling-system.clar` | ✅ Active | Dynamic scaling estimation |
-| `protocol-invariant-monitor.clar` | ✅ Active | Safety invariant checks |
+| `oracle.clar` | ✅ Active | Canonical aggregate/TWAP oracle facade; raw spot and TWAP-validated price paths are explicit, while `set-price` remains advisory compatibility metadata |
+| `protocol-invariant-monitor.clar` | ✅ Active | Deterministic solvency and constant-product invariant helpers with bounded tolerance and overflow handling |
+| `rebalancing-rules.clar` | ✅ Active | Deterministic strict-threshold rebalance delta and direction helpers |
+| `predictive-scaling-system.clar` | ✅ Active | Deterministic bounded activity, volatility-fee, and depth-liquidity helpers |
+| `liquidity-manager.clar` | 🟡 Partial | Validated position/rebalance intent ledger and price-movement risk proxy; no LP custody, pool execution, fee accounting, or exact IL calculation |
 | `automation-manager.clar` | ✅ Active | Automation coordination |
 | `batch-processor.clar` | ✅ Active | Batch transaction helper |
 | `rate-limiter.clar` | ✅ Active | Operation-specific rate limiting |

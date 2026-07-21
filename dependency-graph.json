@@ -101,7 +101,11 @@
     "block-utils",
     "pyth-oracle-adapter"
   ],
-  "oracle": [],
+  "oracle": [
+    "defi-traits",
+    "oracle-aggregator",
+    "twap-oracle"
+  ],
   "oracle-adapter-stub": [],
   "sanctions-oracle": [],
   "travel-rule-service": [],
@@ -159,12 +163,10 @@
     "block-utils"
   ],
   "liquidity-manager": [
-    "regulatory-adapter",
-    "concentrated-liquidity-pool",
-    "conxian-protocol",
-    "sip-standards",
-    "vault-trait",
-    "block-utils"
+    "concentrated-math",
+    "defi-traits",
+    "oracle",
+    "regulatory-adapter"
   ],
   "protocol-invariant-monitor": [],
   "swap-manager": [],
