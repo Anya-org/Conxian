@@ -55,6 +55,14 @@ accepting an FT directly in this STX-first collector.
 |----------|-----------|-------------|
 | `update-price-observation` | `(asset principal) (price uint)` | Record a price observation at the current block. |
 | `get-price` | `(asset principal)` | Calculate average price over the TWAP window. |
+| `set-twap-window` | `(new-window uint)` | Set a nonzero TWAP window; `u1` is the minimum. |
+| `get-twap-window` | `()` | Read the configured TWAP window. |
+| `set-price-decimals` | `(new-decimals uint)` | Declare the source price precision for facade validation. |
+| `get-price-decimals` | `()` | Read the optional declared source price precision. |
+
+The DEX oracle facade requires `oracle-aggregator` and `twap-oracle` to declare
+the same price precision before it compares or returns canonical policy prices.
+The metadata is validation-only: no implicit conversion factor is applied.
 
 ## Testing (How-to)
 `npx vitest run tests/security-hardening.test.ts`
