@@ -1,6 +1,8 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { Cl } from '@stacks/transactions';
 import { simnet } from '../setup-test-env';
+import { ec as EC } from 'elliptic';
+import crypto from 'crypto';
 
 describe('OPEX Vault', () => {
   let deployer: string;
@@ -81,16 +83,50 @@ describe('OPEX Vault', () => {
       ).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
 
+    const ec = new EC('secp256k1');
+    const key = ec.genKeyPair();
+    const pubkeyHex = key.getPublic(true, 'hex');
+    const pubkeyBuff = Buffer.from(pubkeyHex, 'hex');
+
+    expect(
+      simnet.callPublicFn(
+        'regulatory-adapter',
+        'update-authority',
+        [Cl.principal(deployer), Cl.buffer(pubkeyBuff)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
     for (const payee of [governance, approver, secondApprover]) {
+      // 0. Register user principal hash
+      const payeeHash = crypto.createHash('sha256').update(payee).digest();
       expect(
         simnet.callPublicFn(
           'regulatory-adapter',
-          'update-authority',
-          [Cl.principal(deployer), Cl.buffer(Buffer.alloc(33, 1))],
+          'register-user-hash',
+          [Cl.principal(payee), Cl.buffer(payeeHash)],
           deployer,
         ).result,
       ).toEqual(Cl.ok(Cl.bool(true)));
 
+      // 1. Get SIP-018 hash from the contract
+      const hashRes = simnet.callReadOnlyFn(
+        'regulatory-adapter',
+        'get-sip018-hash',
+        [Cl.principal(payee), Cl.stringAscii('USA'), Cl.uint(1)],
+        deployer,
+      );
+      const hashHex = (hashRes.result as any).value.value;
+      const hashBytes = Buffer.from(hashHex.startsWith('0x') ? hashHex.slice(2) : hashHex, 'hex');
+
+      // 2. Sign hash with canonical: true
+      const signatureObj = key.sign(hashBytes, { canonical: true });
+      const r = Buffer.from(signatureObj.r.toArray('be', 32));
+      const s = Buffer.from(signatureObj.s.toArray('be', 32));
+      const v = Buffer.from([signatureObj.recoveryParam]);
+      const sigBuff = Buffer.concat([r, s, v]);
+
+      // 3. Verify and update compliance
       expect(
         simnet.callPublicFn(
           'regulatory-adapter',
@@ -99,7 +135,7 @@ describe('OPEX Vault', () => {
             Cl.principal(payee),
             Cl.stringAscii('USA'),
             Cl.uint(1),
-            Cl.buffer(Buffer.alloc(65, 1)),
+            Cl.buffer(sigBuff),
           ],
           deployer,
         ).result,

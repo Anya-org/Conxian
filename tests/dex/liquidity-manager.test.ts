@@ -2,6 +2,8 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { tx } from '@stacks/clarinet-sdk';
 import { Cl } from '@stacks/transactions';
 import { initializeSimnet, simnet } from '../setup-test-env';
+import { ec as EC } from 'elliptic';
+import crypto from 'crypto';
 
 const BASIS_POINTS = 10000n;
 const MAX_UINT = (2n ** 128n) - 1n;
@@ -25,7 +27,39 @@ describe('Liquidity manager intent and risk ledger', () => {
     return Cl.prettyPrint(value);
   }
 
+  const ec = new EC('secp256k1');
+  const key = ec.genKeyPair();
+
   function setCompliance(user: string) {
+    // 0. Register user principal hash
+    const userHash = crypto.createHash('sha256').update(user).digest();
+    expect(
+      simnet.callPublicFn(
+        'regulatory-adapter',
+        'register-user-hash',
+        [Cl.principal(user), Cl.buffer(userHash)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    // 1. Get SIP-018 hash from the contract
+    const hashRes = simnet.callReadOnlyFn(
+      'regulatory-adapter',
+      'get-sip018-hash',
+      [Cl.principal(user), Cl.stringAscii('USA'), Cl.uint(1)],
+      deployer,
+    );
+    const hashHex = (hashRes.result as any).value.value;
+    const hashBytes = Buffer.from(hashHex.startsWith('0x') ? hashHex.slice(2) : hashHex, 'hex');
+
+    // 2. Sign hash with canonical: true
+    const signatureObj = key.sign(hashBytes, { canonical: true });
+    const r = Buffer.from(signatureObj.r.toArray('be', 32));
+    const s = Buffer.from(signatureObj.s.toArray('be', 32));
+    const v = Buffer.from([signatureObj.recoveryParam]);
+    const sigBuff = Buffer.concat([r, s, v]);
+
+    // 3. Verify and update compliance
     const result = simnet.callPublicFn(
       'regulatory-adapter',
       'verify-and-update-compliance',
@@ -33,7 +67,7 @@ describe('Liquidity manager intent and risk ledger', () => {
         Cl.principal(user),
         Cl.stringAscii('USA'),
         Cl.uint(1),
-        Cl.buffer(Buffer.alloc(65, 1)),
+        Cl.buffer(sigBuff),
       ],
       deployer,
     );
@@ -251,13 +285,17 @@ describe('Liquidity manager intent and risk ledger', () => {
     wallet1 = accounts.get('wallet_1')!;
     wallet2 = accounts.get('wallet_2')!;
 
+    // Set generated public key as the authority public key
+    const pubkeyHex = key.getPublic(true, 'hex');
+    const pubkeyBuff = Buffer.from(pubkeyHex, 'hex');
+
     expect(
       simnet.callPublicFn(
         'regulatory-adapter',
         'update-authority',
         [
           Cl.principal(deployer),
-          Cl.buffer(Buffer.concat([Buffer.from([2]), Buffer.alloc(32, 1)])),
+          Cl.buffer(pubkeyBuff),
         ],
         deployer,
       ).result,
