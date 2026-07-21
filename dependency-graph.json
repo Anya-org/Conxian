@@ -479,10 +479,10 @@
     "sip-standards"
   ],
   "community-voting-engine": [
-    "reputation-engine-trait",
-    "regulatory-adapter",
-    "reputation-engine",
+    "core-traits",
     "cxvg-token",
+    "operational-treasury",
+    "regulatory-adapter",
     "sip-standards"
   ],
   "conxian-seat-manager": [],
