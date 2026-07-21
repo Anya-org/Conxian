@@ -43,6 +43,28 @@ export async function initializeSimnet(): Promise<Simnet> {
         }
       }
 
+      // Clarinet SDK simnet bootstrapping regenerates the publish plan and
+      // does not reliably execute custom emulated post-deploy calls. Keep the
+      // canonical fresh-simnet wiring here, using the runtime deployer so no
+      // production principal is embedded in the test harness.
+      try {
+        instance.callPublicFn(
+          'operational-treasury',
+          'set-protocol-principal',
+          [Cl.stringAscii('cxvg-token'), Cl.contractPrincipal(deployer, 'cxvg-token')],
+          deployer,
+        );
+        instance.callPublicFn(
+          'operational-treasury',
+          'set-protocol-principal',
+          [Cl.stringAscii('regulatory-adapter'), Cl.contractPrincipal(deployer, 'regulatory-adapter')],
+          deployer,
+        );
+      } catch (e) {
+        // Individual tests assert route availability and fail closed if this
+        // bootstrap wiring cannot be applied.
+      }
+
       // Configure Operational Treasury for Office Manager
       try {
         instance.callPublicFn('operational-treasury', 'set-protocol-principal', [Cl.stringAscii('office-manager-owner'), Cl.principal(deployer)], deployer);

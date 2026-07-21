@@ -1688,6 +1688,22 @@ plan:
         - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P'"
         cost: 10000
     - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.operational-treasury
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: set-protocol-principal
+        parameters:
+        - "\"cxvg-token\""
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.cxvg-token'"
+        cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.operational-treasury
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: set-protocol-principal
+        parameters:
+        - "\"regulatory-adapter\""
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.regulatory-adapter'"
+        cost: 10000
+    - contract-call:
         contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.cxd-token
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         method: add-minter

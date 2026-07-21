@@ -236,6 +236,11 @@ depends_on = ["regulatory-adapter"]
 [contracts.community-voting-engine]
 path = "contracts/governance/community-voting-engine.clar"
 clarity-version = 4
+# The active Clarinet SDK exposes stacks-block-height for this contract only
+# with the contract-local epoch override; keep this existing exception scoped
+# here rather than changing the project's default epoch.
+epoch = 3.0
+depends_on = ["core-traits", "cxvg-token", "operational-treasury", "regulatory-adapter", "sip-standards"]
 
 [contracts.compliance-hooks]
 path = "contracts/compliance/compliance-hooks.clar"
@@ -625,6 +630,11 @@ depends_on = ["conxian-csf-trait", "sip-standards"]
 path = "contracts/test-helpers/mock-proposal.clar"
 clarity-version = 4
 depends_on = ["governance-traits"]
+
+[contracts.mock-regulatory-adapter]
+path = "contracts/test-helpers/mock-regulatory-adapter.clar"
+clarity-version = 4
+depends_on = ["core-traits"]
 
 [contracts.mock-token]
 path = "contracts/test-helpers/mock-token.clar"

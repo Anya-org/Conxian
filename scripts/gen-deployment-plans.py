@@ -5,7 +5,19 @@ import yaml
 DEPLOYER = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
 TEST_HELPERS = {
     "mock-circuit-breaker", "mock-csf-protocol",
-    "mock-proposal", "mock-token", "test-c4-helper",
+    "mock-proposal", "mock-regulatory-adapter", "mock-token", "test-c4-helper",
+}
+
+# Keep regeneration scoped to the existing full-system release set. These
+# simnet entries are useful locally but were not part of the checked-in
+# testnet/mainnet plans; promoting them is a separate deployment decision.
+RELEASE_PLAN_EXCLUSIONS = {
+    "integration-fee-trait", "integration-registry", "alex-reserve-pool",
+    "alex-swap-helper", "bns-stub", "math-lib-concentrated",
+    "oracle-adapter-stub", "integration-fee-collector",
+}
+RELEASE_PATH_OVERRIDES = {
+    "alex-adapter": "contracts/integrations/alex-adapter.clar",
 }
 
 COST_TESTNET = 20000
@@ -37,6 +49,12 @@ INIT_CALLS = [
      "method": "set-owner", "parameters": [A("")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.operational-treasury", "expected-sender": DEPLOYER,
      "method": "initialize", "parameters": [A("")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.operational-treasury", "expected-sender": DEPLOYER,
+     "method": "set-protocol-principal", "parameters": [
+         q('"cxvg-token"'), A(".cxvg-token")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.operational-treasury", "expected-sender": DEPLOYER,
+     "method": "set-protocol-principal", "parameters": [
+         q('"regulatory-adapter"'), A(".regulatory-adapter")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.cxd-token", "expected-sender": DEPLOYER,
      "method": "add-minter", "parameters": [A(".bme-engine")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.cxd-token", "expected-sender": DEPLOYER,
@@ -71,7 +89,11 @@ def extract_contracts(simnet):
     for batch in simnet["plan"]["batches"]:
         batch_contracts = []
         for tx in batch["transactions"]:
+            if tx.get("transaction-type") != "emulated-contract-publish":
+                continue
             name = tx["contract-name"]
+            if name in RELEASE_PLAN_EXCLUSIONS:
+                continue
             if name in TEST_HELPERS:
                 continue
             if name in seen:
@@ -80,7 +102,7 @@ def extract_contracts(simnet):
             seen.add(name)
             batch_contracts.append({
                 "contract-name": name,
-                "path": tx["path"],
+                "path": RELEASE_PATH_OVERRIDES.get(name, tx["path"]),
                 "clarity-version": tx.get("clarity-version", 4),
             })
         if batch_contracts:
