@@ -7,6 +7,9 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 - **Automation**: `revenue-automation.clar` enforces a non-negotiable 100 bps protocol fee.
 - **Registry**: `cxd-treasury.clar` maintains the global allocation policy.
 - **Distribution**: `revenue-distributor.clar` executes token buy-backs and burns.
+- **Integration Billing**: `integration-fee-collector.clar` sends 100% of
+  settled STX integration fees through the same distributor route; there is no
+  partner split or direct bypass to `operational-treasury`.
 
 ## Core Contracts (Reference)
 
@@ -25,6 +28,16 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 | `initialize` | `(new-admin principal)` | Initializes the treasury (Admin only). |
 | `get-allocation-percentages` | `()` | Returns the current fiscal split. |
 | `get-protocol-status` | `()` | Returns compliance and version status. |
+
+### `revenue-distributor.clar` integration route
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `distribute-stx` | `(uint)` | Existing STX route used by the collector under contract context. |
+
+The collector calls the existing route from contract custody after receiving
+an exact settlement from the configured payer. No distributor setter or
+separate integration route is added; the distributor remains the system of
+record for downstream revenue routing and CXIP-013 behavior.
 
 ### `conxian-vaults.clar`
 | Function | Signature | Description |

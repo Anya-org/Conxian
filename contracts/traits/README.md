@@ -41,6 +41,20 @@ This module serves as the "Interface Layer" of the protocol's Hexagonal Architec
 | `ft-trait` | SIP-010 Fungible Token standard. |
 | `nft-trait` | SIP-009 Non-Fungible Token standard. |
 
+### `integration-fee-trait.clar`
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `record-usage` | `(principal (buff 32) uint)` | Records reporter-authorized usage and returns the accrued fee. |
+| `settle-period` | `(principal uint uint (buff 32))` | Settles the exact outstanding amount for one integration and period. |
+| `settle-fees` | `(principal uint uint (buff 32))` | Alias with the same payer authorization and accounting as `settle-period`. |
+| `get-usage-record` | `((buff 32))` | Reads a replay-protected usage/audit record. |
+| `get-period-ledger` | `(principal uint)` | Reads immutable billing snapshots plus usage, accrual, and settlement totals for a period. |
+| `get-current-period` | `()` | Returns the burn-block-based billing period. |
+
+This trait is intentionally collector-focused. Integration registration,
+reporter configuration, payer authorization, and key rotation remain in the
+separate `integration-registry.clar` lifecycle API.
+
 ## Integration Examples (How-to)
 
 ### Implementing CSF Liquidity (External Protocol)
