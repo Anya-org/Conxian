@@ -13,12 +13,29 @@
 
 ;; --- Data Variables ---
 (define-data-var admin principal tx-sender)
+(define-data-var settlement-authority principal tx-sender)
+
+;; Operators may be EOAs or contract principals. The caller check below uses
+;; contract-caller so a configured contract must invoke settlement itself;
+;; an originating tx-sender cannot impersonate that contract.
+(define-map settlement-operators principal bool)
 
 ;; --- Settlement Registry ---
 ;; Transaction Hash -> ISO 20022 Verification Hash
 (define-map settlement-registry (buff 32) (buff 32))
 
 ;; --- Public Functions ---
+
+(define-private (is-admin-caller)
+  (is-eq contract-caller (var-get admin))
+)
+
+(define-private (is-settlement-authorized)
+  (or
+    (is-eq contract-caller (var-get settlement-authority))
+    (default-to false (map-get? settlement-operators contract-caller))
+  )
+)
 
 ;; @desc Trigger x402 M2M Settlement.
 ;; Inspired by HTTP 402: Payment Required. AI Agent triggers instant settlement.
@@ -50,7 +67,7 @@
 ;; @return (ok bool)
 (define-public (authorize-iso-20022-egress (tx-id (buff 32)) (iso-xml-hash (buff 32)))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
     (map-set settlement-registry tx-id iso-xml-hash)
     (print { event: "iso-20022-authorized", tx-id: tx-id, xml-hash: iso-xml-hash })
     (ok true)
@@ -65,8 +82,34 @@
 ;; @return (ok bool)
 (define-public (settle-sbc-obligation (sbc (string-ascii 32)) (amount uint) (token <sip-010-trait>))
   (begin
+    (asserts! (is-settlement-authorized) ERR_UNAUTHORIZED)
     ;; Logic to verify SBC state via .fiscal-intelligence and trigger vault release
     (try! (contract-call? .fiscal-vault-oracle release-funds-to-sbc sbc amount token))
+    (ok true)
+  )
+)
+
+;; @desc Sets the primary settlement authority. The principal may be an EOA
+;; for direct calls or a contract that invokes this contract.
+;; @param new-authority principal
+;; @return (ok bool)
+(define-public (set-settlement-authority (new-authority principal))
+  (begin
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
+    (var-set settlement-authority new-authority)
+    (ok true)
+  )
+)
+
+;; @desc Adds or removes a settlement operator. Operators may be EOAs or
+;; contract principals and are checked through contract-caller.
+;; @param operator principal
+;; @param active bool
+;; @return (ok bool)
+(define-public (set-settlement-operator (operator principal) (active bool))
+  (begin
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
+    (map-set settlement-operators operator active)
     (ok true)
   )
 )
@@ -76,7 +119,7 @@
 ;; @return (ok bool)
 (define-public (set-admin (new-admin principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
     (var-set admin new-admin)
     (ok true)
   )
@@ -91,8 +134,22 @@
   (map-get? settlement-registry tx-id)
 )
 
+(define-read-only (get-settlement-authority)
+  (var-get settlement-authority)
+)
+
+(define-read-only (is-settlement-operator (operator principal))
+  (default-to false (map-get? settlement-operators operator))
+)
+
 ;; @desc Returns the current status and version of the payment forge agent.
-;; @return (ok { compliant: bool, version: (string-ascii 20) })
+;; @return (ok { compliant: bool, version: (string-ascii 20), admin: principal,
+;;   settlement-authority: principal })
 (define-read-only (get-protocol-status)
-  (ok { compliant: true, version: "v1.1.0" })
+  (ok {
+    compliant: true,
+    version: "v1.2.0",
+    admin: (var-get admin),
+    settlement-authority: (var-get settlement-authority)
+  })
 )

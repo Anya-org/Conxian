@@ -479,6 +479,7 @@ depends_on = ["agent-risk", "bme-engine", "concentrated-liquidity-pool", "conxia
 [contracts.fiscal-vault-oracle]
 path = "contracts/treasury/fiscal-vault-oracle.clar"
 clarity-version = 4
+depends_on = ["sip-standards"]
 
 [contracts.founder-vault]
 path = "contracts/treasury/founder-vault.clar"
@@ -667,7 +668,7 @@ depends_on = ["ops-engine", "sip-standards"]
 [contracts.opex-vault]
 path = "contracts/treasury/opex-vault.clar"
 clarity-version = 4
-depends_on = ["regulatory-adapter"]
+depends_on = ["regulatory-adapter", "sip-standards"]
 
 [contracts.ops-engine]
 path = "contracts/core/ops-engine.clar"
@@ -711,6 +712,7 @@ clarity-version = 4
 [contracts.payment-forge]
 path = "contracts/agents/payment-forge.clar"
 clarity-version = 4
+depends_on = ["conxian-csf-trait", "fiscal-vault-oracle", "sip-standards"]
 
 [contracts.performance-optimizer]
 path = "contracts/performance/performance-optimizer.clar"
@@ -905,6 +907,7 @@ clarity-version = 4
 [contracts.test-c4-helper]
 path = "contracts/test-helpers/test-c4-helper.clar"
 clarity-version = 4
+depends_on = ["opex-vault", "sip-standards"]
 
 [contracts.timelock]
 path = "contracts/governance/timelock.clar"
