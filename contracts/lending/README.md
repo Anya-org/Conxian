@@ -2,13 +2,13 @@
 
 ## Overview (Explanation)
 
-The Lending module provides automated money markets for the Conxian Protocol. It allows users to deposit assets to earn interest and borrow assets against their collateral. Interest rates are determined dynamically based on **market utilization**, which is the ratio of total borrowed funds to total deposits.
+The Lending module provides automated money markets for the Conxian Protocol. It allows users to deposit assets to earn interest and borrow assets against their collateral. Interest rates are determined dynamically based on **market utilization**, which is the ratio of total borrowed funds to total deposits. Now redesigned with **Dynamic Multi-Asset Collateral**, the module allows the protocol to support a wide range of asset-specific risk profiles (e.g. conservative, standard, or aggressive Loan-to-Value ratios).
 
 ## Architecture (Explanation)
 
 The module utilizes a decentralized reserve system optimized for capital efficiency and risk management. It consists of three primary components:
 
-- **Lending Manager**: `lending-manager.clar` serves as the central entry point for all money market operations. It maintains user balances and reserve states.
+- **Lending Manager**: `lending-manager.clar` serves as the central entry point for all money market operations. It maintains user balances, dynamic risk configurations, and reserve states.
 - **Economic Model**: `interest-rate-model.clar` provides **utilization-based interest curves**. These are mathematical curves that adjust interest rates dynamically: rates increase as borrowing demand grows to encourage more deposits and maintain pool liquidity.
 - **Orchestrator**: `lending-orchestrator.clar` provides an alternative, BME-integrated (Business Machine Engine) execution path for advanced protocol interactions.
 
@@ -33,6 +33,7 @@ The primary engine for money market operations.
 | `get-user-supply-balance` | `(get-user-supply-balance (user principal) (asset principal))` | Returns supply balance for a user and asset. |
 | `get-protocol-tvl` | `(get-protocol-tvl)` | Returns total value locked across all assets. |
 | `calculate-account-health` | `(calculate-account-health (user principal))` | Returns the current health factor for a user. |
+| `configure-asset-collateral` | `(configure-asset-collateral (asset principal) (collateral-factor uint) (liquidation-threshold uint))` | Configures risk and collateral parameters for a specific asset. |
 
 ### `interest-rate-model.clar`
 
