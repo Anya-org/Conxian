@@ -1,6 +1,8 @@
 ---
 id: 2
-name: Mainnet Release (March 2026)
+# Disabled/readiness-gated legacy artifact: intentionally non-actionable until
+# docs/ALEX_LAUNCH_READINESS.md contains verified production inputs and evidence.
+name: Legacy Mainnet Release Plan (disabled; no-op)
 network: mainnet
 stacks-node: "https://stacks-node-api.mainnet.stacks.co"
 deployer: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
