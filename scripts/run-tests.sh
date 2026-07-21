@@ -15,6 +15,14 @@ set -o pipefail
 # Contracts with known benign runtime warnings
 ALLOWLIST="conxian-protocol|dex-factory|office-manager|mock-token"
 
+# The real batch-processor API rejects an 11-item list at the Clarity type
+# boundary. Its test asserts that rejection, but clarinet-sdk still emits the
+# expected runtime diagnostic on stderr. Match the test's stderr context and
+# the complete diagnostic line so an unrelated batch-processor error cannot be
+# hidden by a contract-name allowlist.
+BATCH_BOUNDARY_CONTEXT='stderr | tests/transaction-batch-processor.test.ts > Transaction Batch Processor > rejects an eleven-item batch at the contract list boundary'
+BATCH_BOUNDARY_DIAGNOSTIC_RE='^Error: Runtime error while interpreting [A-Z0-9]+[.]batch-processor$'
+
 temp=$(mktemp)
 trap "rm -f $temp deployments/default.simnet-plan.yaml.bak" EXIT
 
@@ -27,14 +35,44 @@ vitest_exit=${PIPESTATUS[0]}
 # Restore simnet plan
 cp deployments/default.simnet-plan.yaml.bak deployments/default.simnet-plan.yaml
 
-total_errors=$(grep -c 'Runtime error while interpreting' "$temp" || true)
-known_errors=$(grep -cE "Runtime error while interpreting [^ ]*\.($ALLOWLIST)" "$temp" || true)
-new_errors=$((total_errors - known_errors))
+total_errors=$(grep -cE '^Error: Runtime error while interpreting [^ ]+$' "$temp" || true)
+known_errors=$(grep -cE "^Error: Runtime error while interpreting [^ ]+\.($ALLOWLIST)$" "$temp" || true)
+expected_contexts=$(grep -Fc "$BATCH_BOUNDARY_CONTEXT" "$temp" || true)
+expected_errors=$(awk \
+  -v context="$BATCH_BOUNDARY_CONTEXT" \
+  -v diagnostic_re="$BATCH_BOUNDARY_DIAGNOSTIC_RE" \
+  '
+    $0 == context {
+      saw_context = 1
+      next
+    }
+    saw_context {
+      if ($0 ~ diagnostic_re) {
+        count++
+      }
+      saw_context = 0
+    }
+    END { print count + 0 }
+  ' "$temp")
+new_errors=$((total_errors - known_errors - expected_errors))
 
 echo ""
 echo "---"
 echo "vitest exit: $vitest_exit"
-echo "runtime errors: $total_errors ($known_errors known, $new_errors new)"
+echo "runtime errors: $total_errors ($known_errors known, $expected_errors expected, $new_errors new)"
+
+if [ "$expected_contexts" -gt 0 ]; then
+  # Targeted runs that do not select the boundary test have no matching
+  # context and must not be required to emit its expected diagnostic. When
+  # the context is present, fail closed unless it pairs with exactly one
+  # exact diagnostic; any additional diagnostic remains a new error below.
+  if [ "$expected_contexts" -ne 1 ] || [ "$expected_errors" -ne 1 ]; then
+    echo "❌ Expected exactly one 11-item batch boundary diagnostic with its test context"
+    echo "   matching contexts: $expected_contexts"
+    echo "   matching diagnostics: $expected_errors"
+    exit 1
+  fi
+fi
 
 if [ "$vitest_exit" -ne 0 ]; then
   echo "❌ Tests failed (vitest exit code: $vitest_exit)"
@@ -43,12 +81,16 @@ fi
 
 if [ "$new_errors" -gt 0 ]; then
   echo "❌ Tests had $new_errors unexpected runtime error(s)"
-  grep -E 'Runtime error' "$temp" | grep -vE "\.($ALLOWLIST)" || true
+  grep -E '^Error: Runtime error while interpreting ' "$temp" || true
   exit 1
 fi
 
 if [ "$known_errors" -gt 0 ]; then
   echo "⚠️  $known_errors known benign runtime warning(s) — suppressed (clarinet-sdk bug)"
+fi
+
+if [ "$expected_errors" -gt 0 ]; then
+  echo "ℹ️  $expected_errors expected contract-boundary rejection(s) — asserted by tests"
 fi
 
 echo "✅ All checks passed"
