@@ -20,6 +20,8 @@
   }
 )
 
+(define-map user-hashes principal { hash: (buff 32) })
+
 ;; --- SIP-018 Standard Compliance ---
 
 (define-public (check-clean-hands-compliance (user principal))
@@ -30,8 +32,25 @@
 )
 
 (define-read-only (get-sip018-hash (user principal) (jurisdiction (string-ascii 3)) (tier uint))
-  ;; Simplified hash for simulation environment compatibility
-  (ok (sha256 0x01))
+  (let (
+    (prefix 0x534950303138)
+    (jurisdiction-hash (if (is-eq jurisdiction "USA") 0x0100000000000000000000000000000000000000000000000000000000000000
+                        (if (is-eq jurisdiction "GBR") 0x0200000000000000000000000000000000000000000000000000000000000000
+                        (if (is-eq jurisdiction "CAN") 0x0300000000000000000000000000000000000000000000000000000000000000
+                        0x0000000000000000000000000000000000000000000000000000000000000000))))
+    (tier-buff (if (is-eq tier u1) 0x01 (if (is-eq tier u2) 0x02 (if (is-eq tier u3) 0x03 0x00))))
+    (user-hash (match (map-get? user-hashes user) val (get hash val) 0x0000000000000000000000000000000000000000000000000000000000000000))
+  )
+    (ok (sha256 (concat prefix (sha256 (concat jurisdiction-hash (concat tier-buff user-hash))))))
+  )
+)
+
+(define-public (register-user-hash (user principal) (user-hash (buff 32)))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) (err u6003))
+    (map-set user-hashes user { hash: user-hash })
+    (ok true)
+  )
 )
 
 (define-public (verify-and-update-compliance
@@ -40,20 +59,22 @@
     (tier uint)
     (signature (buff 65))
   )
-  (begin
-    ;; In a real implementation, we would verify the signature against authority-pubkey
-    (asserts! (not (is-eq (var-get authority-pubkey) 0x000000000000000000000000000000000000000000000000000000000000000000)) ERR_UNAUTHORIZED)
+  (let (
+    (hash (unwrap-panic (get-sip018-hash user jurisdiction tier)))
+    (pubkey (var-get authority-pubkey))
+  )
+    (begin
+      (asserts! (not (is-eq pubkey 0x000000000000000000000000000000000000000000000000000000000000000000)) ERR_UNAUTHORIZED)
+      (asserts! (secp256k1-verify hash signature pubkey) ERR_INVALID_SIGNATURE)
 
-    ;; SIP-018 verification placeholder: fail if signature is all zeros
-    (asserts! (not (is-eq signature 0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)) ERR_INVALID_SIGNATURE)
-
-    (map-set user-compliance user {
-      compliant: true,
-      jurisdiction: jurisdiction,
-      last-updated: burn-block-height,
-      tier: tier
-    })
-    (ok true)
+      (map-set user-compliance user {
+        compliant: true,
+        jurisdiction: jurisdiction,
+        last-updated: burn-block-height,
+        tier: tier
+      })
+      (ok true)
+    )
   )
 )
 
