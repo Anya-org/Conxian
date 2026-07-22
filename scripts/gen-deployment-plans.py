@@ -5,6 +5,7 @@ import hashlib
 from pathlib import Path
 import sys
 import tempfile
+import tomllib
 
 try:
     import yaml
@@ -51,6 +52,30 @@ except ModuleNotFoundError as exc:
     )
 
 DEPLOYER = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
+TEST_HELPERS = {
+    "mock-circuit-breaker", "mock-csf-protocol",
+    "mock-pox-adapter", "mock-pox-adapter-2", "mock-proposal",
+    "mock-regulatory-adapter",
+    "mock-settlement-intermediary",
+    "mock-reward-token", "mock-stacking-adapter", "mock-stacking-adapter-2",
+    "mock-token", "mock-compoundable-vault", "mock-admin-forwarder",
+    "test-c4-helper",
+}
+
+# Keep regeneration scoped to the existing full-system release set. These
+# simnet entries are useful locally but were not part of the checked-in
+# testnet/mainnet plans; promoting them is a separate deployment decision.
+RELEASE_PLAN_EXCLUSIONS = {
+    "integration-fee-trait", "integration-registry", "alex-reserve-pool",
+    "alex-swap-helper", "alex-adapter", "bns-stub", "math-lib-concentrated",
+    "oracle-adapter-stub", "integration-fee-collector", "protocol-fee-collector",
+}
+
+ISSUE_501_CONTRACTS = {
+    "stacking-traits",
+    "native-stacking-operator",
+    "dual-stacking-orchestrator",
+}
 
 COST_TESTNET = EXPECTED_PUBLISH_COSTS["testnet"]
 COST_MAINNET = EXPECTED_PUBLISH_COSTS["mainnet"]
@@ -182,6 +207,17 @@ def load_simnet_plan(path):
         return yaml.safe_load(f)
 
 
+def load_manifest_clarity_versions(path):
+    """Load contract clarity versions from the active Clarinet manifest."""
+    with path.open("rb") as f:
+        manifest = tomllib.load(f)
+    return {
+        name: int(config["clarity-version"])
+        for name, config in manifest.get("contracts", {}).items()
+        if "clarity-version" in config
+    }
+
+
 def extract_contracts(simnet, manifest, repo_root, path_label="default.simnet-plan.yaml"):
     """Extract and dependency-order release contract-publish transactions."""
     source_batches = validate_simnet_source(
@@ -189,6 +225,7 @@ def extract_contracts(simnet, manifest, repo_root, path_label="default.simnet-pl
         manifest,
         repo_root,
         path_label=path_label,
+        allow_stale_clarity_versions=True,
     )
     ordered_batches = dependency_ordered_batches(source_batches, manifest)
     return [
@@ -196,12 +233,30 @@ def extract_contracts(simnet, manifest, repo_root, path_label="default.simnet-pl
             {
                 "contract-name": entry.contract_name,
                 "path": entry.path,
-                "clarity-version": entry.clarity_version,
+                "clarity-version": manifest[entry.contract_name].clarity_version,
             }
             for entry in batch
         ]
         for batch in ordered_batches
     ]
+
+
+def assert_issue_501_clarity_versions(contracts):
+    """Fail closed if the issue-501 production entries are not Clarity 4."""
+    versions = {
+        contract["contract-name"]: contract["clarity-version"]
+        for batch in contracts
+        for contract in batch
+        if contract["contract-name"] in ISSUE_501_CONTRACTS
+    }
+    missing = ISSUE_501_CONTRACTS - versions.keys()
+    if missing:
+        raise ValueError("Missing issue-501 contracts: " + ", ".join(sorted(missing)))
+    invalid = {
+        name: version for name, version in versions.items() if version != 4
+    }
+    if invalid:
+        raise ValueError(f"Issue-501 contracts must use Clarity 4: {invalid}")
 
 
 def make_plan(contracts, network, name, stacks_node, cost):
@@ -268,7 +323,18 @@ def generate_plans(simnet_path, output_dir):
     manifest_path = repo_root / "Clarinet.toml"
     manifest = load_clarinet_manifest(manifest_path, repo_root)
     simnet = load_simnet_plan(simnet_path)
+    manifest_clarity_versions = load_manifest_clarity_versions(manifest_path)
     contracts = extract_contracts(simnet, manifest, repo_root, path_label=str(simnet_path))
+    assert_issue_501_clarity_versions(contracts)
+    invalid_manifest_versions = {
+        name: manifest_clarity_versions.get(name)
+        for name in ISSUE_501_CONTRACTS
+        if manifest_clarity_versions.get(name) != 4
+    }
+    if invalid_manifest_versions:
+        raise ValueError(
+            f"Issue-501 contracts must use Clarity 4 in Clarinet.toml: {invalid_manifest_versions}"
+        )
 
     total = sum(len(b) for b in contracts)
     print(f"Extracted {total} production contracts in {len(contracts)} batches")

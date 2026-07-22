@@ -1,9 +1,10 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { beforeAll } from 'vitest';
 import { initSimnet, type Simnet } from '@stacks/clarinet-sdk';
 import { Cl } from '@stacks/transactions';
+import { validateIssue501RuntimePlan } from './issue501-plan-validation';
 
 const deploymentPlanPath = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -32,7 +33,12 @@ export async function initializeSimnet(): Promise<Simnet> {
     try {
       console.log('🚀 Initializing Simnet and Bootstrapping Protocol...');
       const instance = await initSimnet('Clarinet.toml');
-      internalSimnet = instance;
+
+      // Validate the SDK-generated plan before restoring the canonical source.
+      // This is intentionally limited to issue-501 artifact presence/order:
+      // the pinned SDK can emit stale Clarity 1 metadata, while canonical
+      // version enforcement remains in the generator and plan regressions.
+      validateIssue501RuntimePlan(readFileSync(deploymentPlanPath, 'utf8'));
 
       const deployer = instance.deployer;
 
@@ -150,12 +156,18 @@ export async function initializeSimnet(): Promise<Simnet> {
         // any required principal injection cannot be applied.
       }
 
+      internalSimnet = instance;
       console.log('✅ Bootstrap Complete');
       return instance;
     } catch (error) {
-      console.error('❌ Simnet initialization failed:', error);
+      console.error('❌ Simnet initialization or runtime-plan validation failed:', error);
       initializationPromise = null;
       throw error;
+    } finally {
+      // initSimnet can rewrite the plan even when initialization or the
+      // compatibility gate fails. Always restore the canonical source so a
+      // failed setup cannot leave generator-owned artifacts dirty.
+      writeFileSync(deploymentPlanPath, canonicalDeploymentPlan);
     }
   })();
 
