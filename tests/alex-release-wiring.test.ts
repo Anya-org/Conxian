@@ -7,7 +7,13 @@ import { describe, expect, it } from "vitest";
 import { canonicalDeploymentPlan } from "./setup-test-env";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const simnetPlanPath = path.join(repoRoot, "deployments/default.simnet-plan.yaml");
+// The test wrapper snapshots this file before Simnet starts. Direct runs use
+// setup-test-env's pre-initialization snapshot instead of the mutable worktree.
+const immutableCanonicalPlanPath = process.env.CONXIAN_CANONICAL_SIMNET_PLAN_PATH;
+const canonicalSimnetPlanPath =
+  immutableCanonicalPlanPath && existsSync(immutableCanonicalPlanPath)
+    ? immutableCanonicalPlanPath
+    : undefined;
 const releasePlanGeneratorPath = path.join(repoRoot, "scripts/gen-deployment-plans.py");
 const activeReleaseArtifactPaths = [
   "deployments/full-system.testnet-plan.yaml",
@@ -27,6 +33,12 @@ const localOnlyIntegrationPath = /contracts\/integrations\/(?:simnet|stubs)\//;
 
 function readArtifact(filePath: string): string {
   return readFileSync(filePath, "utf8");
+}
+
+function readCanonicalSimnetPlan(): string {
+  return canonicalSimnetPlanPath === undefined
+    ? canonicalDeploymentPlan
+    : readArtifact(canonicalSimnetPlanPath);
 }
 
 type PublishEntry = {
@@ -94,7 +106,7 @@ function extractManifestPhases(content: string): Map<string, number> {
 
 describe("ALEX release wiring guard", () => {
   it("keeps the ALEX adapter and helper/reserve stubs available only to simnet", () => {
-    const simnetPlan = readArtifact(simnetPlanPath);
+    const simnetPlan = readCanonicalSimnetPlan();
     const simnetPublishes = extractContractPublishEntries(simnetPlan);
 
     for (const [name, localPath] of [
@@ -185,7 +197,7 @@ describe("ALEX release wiring guard", () => {
     );
     const temporaryDirectory = mkdtempSync(path.join(tmpdir(), "conxian-alex-release-"));
     const temporarySimnetPlanPath = path.join(temporaryDirectory, "default.simnet-plan.yaml");
-    writeFileSync(temporarySimnetPlanPath, canonicalDeploymentPlan);
+    writeFileSync(temporarySimnetPlanPath, readCanonicalSimnetPlan());
 
     const result = (() => {
       try {
