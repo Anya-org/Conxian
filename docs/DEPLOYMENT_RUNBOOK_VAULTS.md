@@ -81,6 +81,11 @@ The repository workflows are currently preflight-only. They validate the config 
 Every non-dry path is blocked before signing until a structured receipt-producing broadcaster and complete evidence verifier are implemented for issue #531. Do not run `clarinet deployments apply` manually as a workaround, and do not treat dashboard or debug logs as deployment proof.
 
 The current full-system mainnet plan also contains an unresolved `ST...` deployer identity. It must be replaced only by an approved identity derived from and verified against the configured signer; do not guess an `SP...`/`SM...` address.
+The supported `Deploy Mainnet` workflow remains preflight-only. It requires
+`confirm: DEPLOY_MAINNET` and an `expected_plan_sha256` matching the checked-in
+`deployments/full-system.mainnet-plan.yaml` digest. Keep `dry_run: true` for
+plan-only artifacts; setting `dry_run: false` is rejected by the fail-closed
+gate before signing and does not deploy.
 
 ## 5. Post-Deployment & Role Wiring
 If a later deployment is approved, configure the Phase 2A vault in this order
