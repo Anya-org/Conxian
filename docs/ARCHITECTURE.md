@@ -22,7 +22,7 @@ The "Arms" of the protocol.
 
 ### 2.3. Agent Layer (`contracts/agents`)
 The "Senses" and "Nerves" of the protocol.
-- `agent-risk.clar` (AYE): Predictive PID-based risk monitoring.
+- `agent-risk.clar` (AYE): GCR-based compatibility scoring with explicit normalized publication to canonical `risk-unit`; liquidation ownership remains in the core risk unit.
 - `agent-treasury.clar`: Autonomous fiscal policy execution (The Fiscal Dam).
 
 ### 2.4. Asset Layer (`contracts/tokens`, `contracts/treasury`)

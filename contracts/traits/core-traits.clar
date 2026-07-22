@@ -47,6 +47,10 @@
   (liquidate (uint) (response bool uint))
 ))
 
+(define-trait risk-signal-publisher-trait (
+  (update-system-risk (uint) (response bool uint))
+))
+
 (define-trait funding-rate-trait (
   (update-funding-rate (principal) (response bool uint))
   (apply-funding (principal uint) (response bool uint))

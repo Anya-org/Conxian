@@ -14,35 +14,36 @@ The Conxian Protocol utilizes a "Dual-Mode" testing architecture. This ensures t
 2. ✅ **tests/core/dimensional-engine.test.ts**: Executive facade for leverage trading.
 3. ✅ **tests/core/founder-vesting.test.ts**: Time-locked vesting logic.
 4. ✅ **tests/core/conxian-protocol-batch.test.ts**: Batch operations availability.
-5. ✅ **tests/agents/aye-pid.test.ts**: PID stability controller for borrow rates.
-6. ✅ **tests/core-contracts.test.ts**: Basic contract deployment and status checks.
+5. ✅ **tests/core/risk-manager.test.ts**: Canonical risk-unit initialization, math, cache freshness, score bounds, facade safety, and agent publication.
+6. ✅ **tests/agents/aye-pid.test.ts**: Agent-risk compatibility/PID entrypoint coverage; full PID dynamics remain outside this suite.
+7. ✅ **tests/core-contracts.test.ts**: Basic contract deployment and status checks.
 
 ### Intermediate Leaf Tests (DEX & Governance)
-7. ✅ **tests/dex/concentrated-liquidity-pool.test.ts**: Pool creation and state.
-8. ✅ **tests/dex/concentrated-liquidity.test.ts**: Math library for CL.
-9. ✅ **tests/dex/swap-router.test.ts**: Swap routing and fee logic.
-10. ✅ **tests/governance/reputation-engine.test.ts**: Weighted voting power.
-11. ✅ **tests/governance/proposal-engine.test.ts**: Governance signal processing.
-12. ✅ **tests/governance/proposal-engine-core.test.ts**: Seat-based voting and submission.
-13. ✅ **tests/governance/proposal-engine-admin.test.ts**: Admin overrides.
-14. ✅ **tests/governance/enhanced-governance-nft.test.ts**: Seat minting and power tracking.
-15. ✅ **tests/governance/proposal-registry.test.ts**: Persistent proposal storage.
-16. ✅ **tests/governance/conxian-operations-engine.test.ts**: Root heartbeat coordination.
-17. ✅ **tests/governance/executive-agents.test.ts**: Autonomous Staff (CRO/Sovereign-Financial-Office) logic.
-18. ✅ **tests/governance/sab-election.test.ts**: Escrowed SAB election cycles, quorum/tie finalization, and stake claims.
-19. ✅ **tests/governance/upgrade-controller.test.ts**: Release authorization, signer thresholds, timelock, rollout, and rollback.
-20. ✅ **tests/governance/gauge-manager.test.ts**: Canonical escrowed gauge voting, caps, epoch finalization, and withdrawals.
+8. ✅ **tests/dex/concentrated-liquidity-pool.test.ts**: Pool creation and state.
+9. ✅ **tests/dex/concentrated-liquidity.test.ts**: Math library for CL.
+10. ✅ **tests/dex/swap-router.test.ts**: Swap routing and fee logic.
+11. ✅ **tests/governance/reputation-engine.test.ts**: Weighted voting power.
+12. ✅ **tests/governance/proposal-engine.test.ts**: Governance signal processing.
+13. ✅ **tests/governance/proposal-engine-core.test.ts**: Seat-based voting and submission.
+14. ✅ **tests/governance/proposal-engine-admin.test.ts**: Admin overrides.
+15. ✅ **tests/governance/enhanced-governance-nft.test.ts**: Seat minting and power tracking.
+16. ✅ **tests/governance/proposal-registry.test.ts**: Persistent proposal storage.
+17. ✅ **tests/governance/conxian-operations-engine.test.ts**: Root heartbeat coordination.
+18. ✅ **tests/governance/executive-agents.test.ts**: Autonomous Staff (CRO/Sovereign-Financial-Office) logic.
+19. ✅ **tests/governance/sab-election.test.ts**: Escrowed SAB election cycles, quorum/tie finalization, and stake claims.
+20. ✅ **tests/governance/upgrade-controller.test.ts**: Release authorization, signer thresholds, timelock, rollout, and rollback.
+21. ✅ **tests/governance/gauge-manager.test.ts**: Canonical escrowed gauge voting, caps, epoch finalization, and withdrawals.
 
 ### Vault & Custody Tests
-21. ✅ **tests/vaults/sbtc-vault.test.ts**: Canonical-token-bound sBTC custody, immutable token configuration, receipt reconciliation, aggregate insolvency rejection, cap/pause controls, admin transfer, share accounting, withdrawals, and disabled strategy allocation.
+22. ✅ **tests/vaults/sbtc-vault.test.ts**: Canonical-token-bound sBTC custody, immutable token configuration, receipt reconciliation, aggregate insolvency rejection, cap/pause controls, admin transfer, share accounting, withdrawals, and disabled strategy allocation.
 
 ### System Root Tests (Integration)
-22. ✅ **tests/system/full-protocol-journey.test.ts**: Coordination between Heartbeat, DEX, and Agents.
-23. ✅ **tests/cybernetic-revenue.test.ts**: Dynamic "Fiscal Dam" allocation (CXIP-013).
-24. ✅ **tests/cxip-012.test.ts**: Volatility-based DEX fee adjustments.
-25. ✅ **tests/nakamoto_verification.test.ts**: Tenure info and block utility checks.
-26. ✅ **tests/protocol-fee-collector.test.ts**: Burn-block phase boundaries, fixed collector-custody FT/STX settlement, direct-deposit excess recovery, explicit operational-treasury routing, residual and phase-change accounting, split admin/governance authorization, immediate-caller admin handoff, source-scoped replay, exact events, and rollback.
-27. ✅ **tests/operational-treasury-init.test.ts**: Publish-time-owner initialization, first-caller front-run rejection, and STX/SIP-010 withdrawal custody.
+23. ✅ **tests/system/full-protocol-journey.test.ts**: Coordination between Heartbeat, DEX, and Agents.
+24. ✅ **tests/cybernetic-revenue.test.ts**: Dynamic "Fiscal Dam" allocation (CXIP-013).
+25. ✅ **tests/cxip-012.test.ts**: Volatility-based DEX fee adjustments.
+26. ✅ **tests/nakamoto_verification.test.ts**: Tenure info and block utility checks.
+27. ✅ **tests/protocol-fee-collector.test.ts**: Burn-block phase boundaries, fixed collector-custody FT/STX settlement, direct-deposit excess recovery, explicit operational-treasury routing, residual and phase-change accounting, split admin/governance authorization, immediate-caller admin handoff, source-scoped replay, exact events, and rollback.
+28. ✅ **tests/operational-treasury-init.test.ts**: Publish-time-owner initialization, first-caller front-run rejection, and STX/SIP-010 withdrawal custody.
 
 ## How to Run Tests
 ```bash
@@ -55,5 +56,10 @@ All tests adhere to the Conxian Standards Framework:
 - **Structural**: Standardized `initSimnet` pattern.
 - **Dynamic Addressing**: No hardcoded `ST1PQ...` principals in test logic.
 - **Verification**: Explicit assertion of `Cl.ok` and `Cl.error` responses.
+
+Risk-specific limitations and wiring requirements are documented in
+`docs/RISK_MANAGEMENT.md`. The focused risk suite intentionally does not claim
+oracle-valued production solvency while `dimensional-core.get-position` is
+placeholder-backed.
 
 Last Updated: July 22, 2026
