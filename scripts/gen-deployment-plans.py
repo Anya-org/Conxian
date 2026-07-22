@@ -101,6 +101,13 @@ def q(s):
 A = lambda s: q(f"'{DEPLOYER}{s}'")  # Single-quoted principal string, double-quoted in YAML
 
 INIT_CALL_COST = EXPECTED_CALL_COST  # Fixed cost for each init call
+SOURCE_PRICE_SCALE = 8
+SOURCE_PRICE_SCALE_PARAMETER = q(f"u{SOURCE_PRICE_SCALE}")
+ORACLE_AGGREGATOR_CONTRACT = f"{DEPLOYER}.oracle-aggregator"
+TWAP_ORACLE_CONTRACT = f"{DEPLOYER}.twap-oracle"
+ORACLE_FACADE_CONTRACT = f"{DEPLOYER}.oracle"
+LIQUIDITY_MANAGER_CONTRACT = f"{DEPLOYER}.liquidity-manager"
+CANONICAL_ORACLE_PRINCIPAL = q(f"'{ORACLE_FACADE_CONTRACT}'")
 # The generated release plans wire only the canonical payment route. They do
 # not publish prices/plans, configure bucket recipients, or register product
 # consumers: those are governance decisions that require audited principals.
@@ -164,6 +171,15 @@ INIT_CALLS = [
     {"contract-id": f"{DEPLOYER}.revenue-automation", "expected-sender": DEPLOYER,
      "method": "authorize-stx-source",
      "parameters": [A(".enterprise-subscription")], "cost": INIT_CALL_COST},
+    {"contract-id": ORACLE_AGGREGATOR_CONTRACT, "expected-sender": DEPLOYER,
+     "method": "set-price-decimals",
+     "parameters": [SOURCE_PRICE_SCALE_PARAMETER], "cost": INIT_CALL_COST},
+    {"contract-id": TWAP_ORACLE_CONTRACT, "expected-sender": DEPLOYER,
+     "method": "set-price-decimals",
+     "parameters": [SOURCE_PRICE_SCALE_PARAMETER], "cost": INIT_CALL_COST},
+    {"contract-id": LIQUIDITY_MANAGER_CONTRACT, "expected-sender": DEPLOYER,
+     "method": "set-oracle",
+     "parameters": [CANONICAL_ORACLE_PRINCIPAL], "cost": INIT_CALL_COST},
 ]
 
 
@@ -178,12 +194,10 @@ REQUIRED_ENTERPRISE_ROUTE_CALLS = [
 
 def validate_enterprise_wiring(plan):
     """Fail fast if subscription routing drifts or governance is auto-wired."""
-    calls = []
-    for batch in plan["plan"]["batches"]:
-        for tx in batch["transactions"]:
-            call = tx.get("contract-call")
-            if call:
-                calls.append((call["contract-id"], call["method"], call["parameters"]))
+    calls = [
+        (call["contract-id"], call["method"], call["parameters"])
+        for _, _, call in iter_contract_calls(plan)
+    ]
 
     missing = [required for required in REQUIRED_ENTERPRISE_ROUTE_CALLS if required not in calls]
     if missing:
@@ -193,6 +207,102 @@ def validate_enterprise_wiring(plan):
     unexpected = [call for call in calls if call[1] in forbidden]
     if unexpected:
         raise ValueError(f"release plan must remain fail-closed for governance/product setup: {unexpected}")
+
+
+def iter_contract_calls(plan):
+    """Yield batch/transaction positions and structured contract-call bodies."""
+    for batch in plan["plan"]["batches"]:
+        for transaction_index, tx in enumerate(batch["transactions"]):
+            call = tx.get("contract-call")
+            if call is not None:
+                yield batch["id"], transaction_index, call
+
+
+FORBIDDEN_SOURCE_INDEPENDENT_METHODS = {
+    "set-source-authorized",
+    "submit-price",
+    "set-price",
+    "register-asset",
+    "update-price-observation",
+}
+
+
+def validate_oracle_wiring(plan):
+    """Validate deterministic oracle metadata wiring without selecting a provider."""
+    records = list(iter_contract_calls(plan))
+    batches = plan["plan"]["batches"]
+    if not batches:
+        raise ValueError("release plan has no batch for oracle wiring")
+    final_batch_id = batches[-1]["id"]
+
+    forbidden = [
+        (batch_id, transaction_index, call["contract-id"], call["method"])
+        for batch_id, transaction_index, call in records
+        if call.get("method") in FORBIDDEN_SOURCE_INDEPENDENT_METHODS
+    ]
+    if forbidden:
+        raise ValueError(
+            "source-independent release plan must not configure providers, submit prices, "
+            f"or publish guessed feed mappings: {forbidden}"
+        )
+
+    expected = [
+        (ORACLE_AGGREGATOR_CONTRACT, "set-price-decimals", [SOURCE_PRICE_SCALE_PARAMETER]),
+        (TWAP_ORACLE_CONTRACT, "set-price-decimals", [SOURCE_PRICE_SCALE_PARAMETER]),
+        (LIQUIDITY_MANAGER_CONTRACT, "set-oracle", [CANONICAL_ORACLE_PRINCIPAL]),
+    ]
+    positions = []
+    for contract_id, method, parameters in expected:
+        matches = [
+            (batch_id, transaction_index, call)
+            for batch_id, transaction_index, call in records
+            if call.get("contract-id") == contract_id and call.get("method") == method
+        ]
+        if len(matches) != 1:
+            raise ValueError(
+                f"oracle wiring requires exactly one {contract_id}.{method} call; found {len(matches)}"
+            )
+
+        batch_id, transaction_index, call = matches[0]
+        if call.get("expected-sender") != DEPLOYER:
+            raise ValueError(
+                f"oracle wiring sender mismatch for {contract_id}.{method}: "
+                f"{call.get('expected-sender')}"
+            )
+        if call.get("parameters") != parameters:
+            raise ValueError(
+                f"oracle wiring parameters mismatch for {contract_id}.{method}: "
+                f"expected {parameters}, got {call.get('parameters')}"
+            )
+        if batch_id != final_batch_id:
+            raise ValueError(
+                f"oracle wiring call {contract_id}.{method} must be in final batch {final_batch_id}; "
+                f"found batch {batch_id}"
+            )
+        positions.append((batch_id, transaction_index))
+
+    scale_calls = [
+        (batch_id, transaction_index, call)
+        for batch_id, transaction_index, call in records
+        if call.get("method") == "set-price-decimals"
+    ]
+    if len(scale_calls) != 2:
+        raise ValueError(
+            "source-independent release plan must contain exactly two set-price-decimals calls; "
+            f"found {len(scale_calls)}"
+        )
+    if positions != sorted(positions):
+        raise ValueError(f"oracle wiring calls are out of order: {positions}")
+
+    set_oracle_calls = [
+        (batch_id, transaction_index, call)
+        for batch_id, transaction_index, call in records
+        if call.get("method") == "set-oracle"
+    ]
+    if len(set_oracle_calls) != 1 or set_oracle_calls[0][2].get("contract-id") != LIQUIDITY_MANAGER_CONTRACT:
+        raise ValueError(
+            "source-independent release plan must contain exactly one canonical liquidity-manager.set-oracle call"
+        )
 
 
 GENERATED_PLAN_NAMES = (
@@ -347,6 +457,7 @@ def generate_plans(simnet_path, output_dir):
         cost=COST_TESTNET,
     )
     validate_enterprise_wiring(testnet)
+    validate_oracle_wiring(testnet)
     testnet_path = output_dir / GENERATED_PLAN_NAMES[0]
     save_plan(testnet, testnet_path)
 
@@ -358,6 +469,7 @@ def generate_plans(simnet_path, output_dir):
         cost=COST_MAINNET,
     )
     validate_enterprise_wiring(mainnet)
+    validate_oracle_wiring(mainnet)
     mainnet_path = output_dir / GENERATED_PLAN_NAMES[1]
     save_plan(mainnet, mainnet_path)
 
