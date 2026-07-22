@@ -2,6 +2,11 @@
 
 ## Phase 2A boundary
 
+Phase 1/2A merged via [PR #546](https://github.com/Conxian/Conxian/pull/546) at
+commit `11d598c2ec098088032d1e78f608887dd8441d5b`. That delivery remains a
+custody-only core and is not official bridge, signer, peg, yield, deployment,
+or settlement proof.
+
 The current approved sBTC slice is custody-only. Users are expected to obtain
 already-issued canonical sBTC through official sBTC infrastructure outside this
 repository, then deposit and later withdraw that same token through
@@ -73,7 +78,7 @@ Run the custody/accounting tests with:
 bash scripts/run-tests.sh tests/vaults/sbtc-vault.test.ts
 ```
 
-This documents local simnet behavior only; it is not deployment evidence.
+This documents simnet behavior only; it is not deployment evidence.
 The current tests cover the 1:1 custody path and adversarial receipt/solvency
 guards. They do not claim non-1:1 rounding coverage because this phase has no
 safe state transition that changes the asset/share ratio.
