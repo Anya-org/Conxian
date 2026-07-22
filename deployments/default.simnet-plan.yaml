@@ -279,14 +279,14 @@ plan:
       path: contracts/governance/community-voting-engine.clar
       clarity-version: 4
     - transaction-type: emulated-contract-publish
-      contract-name: compliance-manager
-      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
-      path: contracts/compliance/compliance-manager.clar
-      clarity-version: 4
-    - transaction-type: emulated-contract-publish
       contract-name: kyc-registry
       emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
       path: contracts/identity/kyc-registry.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: compliance-manager
+      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
+      path: contracts/compliance/compliance-manager.clar
       clarity-version: 4
     - transaction-type: emulated-contract-publish
       contract-name: compliance-hooks

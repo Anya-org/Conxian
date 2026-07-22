@@ -251,6 +251,7 @@ depends_on = ["compliance-manager", "kyc-registry"]
 [contracts.compliance-manager]
 path = "contracts/compliance/compliance-manager.clar"
 clarity-version = 4
+depends_on = ["kyc-registry"]
 
 [contracts.compliance-trait]
 path = "contracts/compliance/compliance-trait.clar"

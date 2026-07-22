@@ -25,6 +25,24 @@ split, so the existing CXIP-013 economics remain authoritative. Generic FT
 settlement is deferred to a future two-step deposit-and-route design, and
 payer-signed usage attestations are a future trust-boundary hardening step.
 
+### Registration fees — roadmap only
+
+Registration fees are **not currently a contract-supported revenue source**.
+Issue [#504](https://github.com/Conxian/Conxian/issues/504) remains a roadmap
+item. The bounded Phase 3 work adds only the read-only
+`compliance-manager.is-registration-compliant` gate; it does not add a fee
+amount, escrow manager, refund lifecycle, activation path, or revenue route.
+The gate requires a fresh `compliance-manager` record plus an existing,
+minimum-tier, non-sanctioned record from the authoritative `kyc-registry`.
+It does not treat the legacy manager `sanctions-checked` boolean as registry
+evidence; `compliance-hooks.verify-kyc` therefore remains a tier/update hook,
+not a sanctions attestation.
+
+The issue's earlier bounty/operations wording is not an approved split. The
+repository policy in [`CXIP-013.md`](../CXIP-013.md) currently says registration
+fees use 100% vault recycling. That conflict remains explicitly deferred until
+an approved registration-fee policy exists.
+
 ## 3. Dynamic Intelligence: The AYE Agent (`agent-risk.clar`)
 The "AYE" Risk Agent serves as the protocol's sensory organ, tracking:
 - **Global Collateral Ratio (GCR)**: The ratio of total system collateral to total debt.
