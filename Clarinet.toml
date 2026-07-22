@@ -918,7 +918,7 @@ depends_on = ["sip-standards"]
 [contracts.sbtc-vault]
 path = "contracts/vaults/sbtc-vault.clar"
 clarity-version = 4
-depends_on = ["regulatory-adapter", "sip-standards"]
+depends_on = ["core-traits", "regulatory-adapter", "sip-standards", "vault-traits"]
 
 [contracts.self-launch-coordinator]
 path = "contracts/core/self-launch-coordinator.clar"

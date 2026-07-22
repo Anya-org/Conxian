@@ -638,7 +638,8 @@ depends_on = [ "integration-fee-trait", "integration-registry", "revenue-distrib
 
 [contracts.sbtc-vault]
 path = "contracts/vaults/sbtc-vault.clar"
-depends_on = [ "regulatory-adapter",]
+clarity-version = 4
+depends_on = [ "core-traits", "regulatory-adapter", "sip-standards", "vault-traits",]
 
 [contracts.token-system-coordinator]
 path = "contracts/tokens/token-system-coordinator.clar"
