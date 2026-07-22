@@ -1,35 +1,39 @@
 # Documentation State
 
-## Current Session (39) - Phase 2A sBTC Checkpoint 2 Remediation (Issue #507)
+## Current Session (39) - Phase 2A sBTC Checkpoint 2 Follow-up (Issue #507)
 
 {
-  "status": "IMPLEMENTED_LOCALLY",
+  "status": "FOLLOW_UP_IN_PROGRESS",
   "session_timestamp": "2026-07-22",
-  "scope": "Resolved the material Checkpoint 2 findings for the Phase 2A canonical-token-bound sBTC custody and share-accounting core before push.",
+  "scope": "Aligned the repository with the merged Phase 1/2A custody core, documented the plan-only initialization boundary and unresolved Phase 2 evidence gates, synchronized the sbtc-vault dependency graph, and added focused negative-path coverage.",
   "components_modified": [
-    "contracts/vaults/sbtc-vault.clar",
     "tests/vaults/sbtc-vault.test.ts",
     "contracts/vaults/README.md",
     "contracts/sbtc/README.md",
     "docs/DEPLOYMENT_RUNBOOK_VAULTS.md",
     "docs/ISSUE_507_PHASE_2A_ACCEPTANCE.md",
+    "docs/ISSUE_507_PHASE_2_INTEGRATION_EVIDENCE.md",
     "tests/TEST_INDEX.md",
+    "dependency-graph.json",
     "docs/DOCUMENTATION_STATE.md"
   ],
+  "delivery_boundary": "Phase 1/2A merged via PR #546 at commit 11d598c2ec098088032d1e78f608887dd8441d5b. The merged core remains custody-only; it is not official bridge, signer, peg, yield, deployment, or settlement proof.",
   "security_boundary": "The vault accepts only the one-time immutable approved token principal, reconciles every deposit against the live balance delta, rejects aggregate insolvency before any withdrawal, normalizes compliance and token-call failures, uses explicit local errors, and keeps strategy allocation disabled. It does not bridge BTC, mint or burn sBTC, prove settlement through DLC/BitVM2/oracle stubs, repair a peg, or allocate yield.",
   "accounting_boundary": "First deposits mint one share per asset; later deposits use floor-pro-rata shares; withdrawals request underlying assets and burn ceiling-pro-rata shares. Accounted assets exclude direct token donations, and there is no generic rescue/sweep path. The focused custody state transitions remain 1:1 because strategy and donation synchronization are deferred.",
   "validation": {
-    "targeted_tests": "PASS: bash scripts/run-tests.sh tests/vaults/sbtc-vault.test.ts (1 file, 10 tests; 4 known benign Clarinet SDK warnings, 0 new errors)",
-    "compile_initialization": "PASS: bash scripts/run-tests.sh tests/check-compile.test.ts tests/vaults/sbtc-vault.test.ts (2 files, 11 tests; 8 known benign Clarinet SDK warnings, 0 new errors)",
-    "ad_hoc_fixtures": "PASS: Clarinet SDK deployContract supports inline test-only contracts when explicitly set to the simnet-compatible Clarity version; the under-crediting and aggregate-insolvency fixtures are not in production manifests.",
+    "targeted_tests": "PASS: bash scripts/run-tests.sh tests/vaults/sbtc-vault.test.ts (1 file, 13 tests; 4 known benign Clarinet SDK warnings, 0 new errors)",
+    "compile_initialization": "PASS: bash scripts/run-tests.sh tests/check-compile.test.ts tests/vaults/sbtc-vault.test.ts (2 files, 14 tests; 8 known benign Clarinet SDK warnings, 0 new errors)",
+    "ad_hoc_fixtures": "PASS: inline adversarial SIP-010 transfer/balance fixtures and compliance adapter harness; no production contract semantics changed",
     "rounding_scope": "LIMITATION: no non-1:1 floor/ceiling rounding claim; this custody-only slice has no safe state transition that changes the asset/share ratio.",
     "contamination_guard": "PASS: python3 scripts/verify_contamination_guard.py",
     "diff_hygiene": "PASS: git diff --check",
-    "native_clarinet": "BLOCKED: the direct Clarinet binary is not installed in the workspace",
-    "typescript": "BLOCKED by pre-existing repository tsconfig error: TypeScript 6 rejects the root baseUrl option (TS5102)",
-    "docs_validator": "BLOCKED: npm run validate:docs references missing scripts/validate-docs.js"
+    "native_clarinet": "BLOCKED: direct clarinet binary is not installed in the environment",
+    "typescript": "BLOCKED: npx tsc --noEmit reports pre-existing unrelated repository errors; no touched vault-test errors were reported",
+    "docs_validator": "BLOCKED: npm run validate:docs cannot load missing scripts/validate-docs.js",
+    "release_plan_consistency": "PASS: python3 scripts/gen-deployment-plans.py --check (212 production contracts in 10 batches)",
+    "full_suite": "FAILS on pre-existing unrelated tests/deployment-evidence.test.ts expectation (expected 229 effective testnet-plan entries, current checked-in plan parses 233); 84 files passed, 8 skipped, 1 failed, 359 tests passed, 59 skipped"
   },
-  "source_control": "Local branch charlie/507-sbtc-vault-core only; no push, PR, deployment, or production-readiness claim."
+  "source_control": "Phase 1/2A is merged via PR #546 at commit 11d598c2ec098088032d1e78f608887dd8441d5b. This follow-up remains review-scoped and makes no deployment or production-readiness claim."
 }
 
 ## Parallel Session (39) - Registration Compliance Trust-Model Follow-up (Issue #504)
@@ -85,9 +89,9 @@
 ## Previous Session (38) - Phase 2A sBTC Custody and Share Accounting (Issue #507)
 
 {
-  "status": "IMPLEMENTED_LOCALLY",
+  "status": "MERGED_PHASE_2A",
   "session_timestamp": "2026-07-22",
-  "scope": "Implemented the selected Phase 2A candidate: a canonical-token-bound sBTC custody and share-accounting core with focused simnet tests and corrected vault/sBTC documentation.",
+  "scope": "Implemented the selected Phase 2A candidate: a canonical-token-bound sBTC custody and share-accounting core with focused simnet tests and corrected vault/sBTC documentation; the work merged via PR #546.",
   "components_modified": [
     "contracts/vaults/sbtc-vault.clar",
     "tests/vaults/sbtc-vault.test.ts",
@@ -106,7 +110,7 @@
     "typescript": "BLOCKED by pre-existing repository tsconfig error: TypeScript 6 rejects the root baseUrl option (TS5102)",
     "docs_validator": "BLOCKED: npm run validate:docs references missing scripts/validate-docs.js"
   },
-  "source_control": "Local branch charlie/507-sbtc-vault-core only; no push, PR, deployment, or production-readiness claim."
+  "source_control": "Merged via PR #546 at commit 11d598c2ec098088032d1e78f608887dd8441d5b. The Phase 2A core remains custody-only and is not official bridge, signer, peg, yield, deployment, or settlement proof."
 }
 
 ## Parallel Session (38) - Enterprise Subscription Audit Hardening (Issue #503)

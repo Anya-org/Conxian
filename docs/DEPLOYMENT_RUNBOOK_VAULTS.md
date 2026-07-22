@@ -55,7 +55,38 @@ trait identifier. `yield-aggregator` does not require `sbtc-vault` and the
 active manifest does not list `vault-traits` in that contract's
 `depends_on` array.
 
-### 3.3. Enterprise Subscription and Fiscal Dam Gate
+### 3.3. Publication is not vault initialization
+
+The checked-in `deployments/default.simnet-plan.yaml`,
+`deployments/full-system.testnet-plan.yaml`, and
+`deployments/full-system.mainnet-plan.yaml` each publish
+`contracts/vaults/sbtc-vault.clar`. Their transactions do **not** call
+`set-approved-token`, `set-deposit-cap`, `set-paused`, or `set-admin` for the
+vault. Publishing the contract therefore does not prove that a network has an
+approved canonical token, an operational cap, a pause policy, or an approved
+admin handoff. The source defaults remain subject to the contract's own
+configuration rules; deposits are not operationally enabled until the token
+and cap are configured.
+
+Network-specific vault initialization must be separately approved and
+evidenced after publication. The evidence pack must identify the target
+network, the officially documented token reference, the approved cap/pause/admin
+values, the signer-derived caller, transaction receipts, and post-call readback
+without treating a plan artifact or workflow success as deployment proof.
+
+### 3.4. Checked-in mainnet manifest authority
+
+Repository evidence does not make `deployments/mainnet-manifest-v1.yaml` the
+authoritative mainnet workflow input. The checked-in generator produces
+`deployments/full-system.mainnet-plan.yaml`, and `.github/workflows/deploy-mainnet.yml`
+validates that plan plus `deployments/full-system.mainnet-plan.sha256`. No
+current generator or deployment workflow references `mainnet-manifest-v1.yaml`.
+Treat it as a non-authoritative legacy/reference artifact: do not use it to
+infer current network principals, vault initialization, signer identity, or
+deployment completion. The separate `deployments/mainnet-release-plan.yaml`
+is explicitly disabled/readiness-gated and contains no actionable batches.
+
+### 3.5. Enterprise Subscription and Fiscal Dam Gate
 The enterprise subscription contracts are publishable in a fail-closed state,
 but deployment does not publish plan prices, activate plan versions, configure
 STX bucket recipients, or register arbitrary product consumers. Before product

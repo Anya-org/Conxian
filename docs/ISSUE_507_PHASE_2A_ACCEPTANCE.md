@@ -6,6 +6,14 @@ Implement a canonical-token-bound sBTC custody and share-accounting core
 without pretending to implement the BTC bridge, signer, peg repair, or yield
 strategy portions of issue #507.
 
+## Delivery status
+
+Phase 1/2A merged via [PR #546](https://github.com/Conxian/Conxian/pull/546) at
+commit `11d598c2ec098088032d1e78f608887dd8441d5b`. The merged core remains
+custody-only and is not official bridge, signer, peg, yield, deployment, or
+settlement proof. Phase 2 integration evidence is tracked separately in
+[`ISSUE_507_PHASE_2_INTEGRATION_EVIDENCE.md`](ISSUE_507_PHASE_2_INTEGRATION_EVIDENCE.md).
+
 ## Acceptance boundary
 
 | Requirement | Acceptance condition |
@@ -40,11 +48,15 @@ strategy portions of issue #507.
 `tests/vaults/sbtc-vault.test.ts` covers:
 
 - admin/configuration authorization;
+- invalid cap and cap-below-assets rejection;
 - canonical-token rejection;
 - zero deposit and withdrawal amounts;
 - compliance rejection;
+- compliance adapter error normalization through a test-only trait harness;
 - first and subsequent deposits with per-user shares;
 - deposit receipt reconciliation failure with a test-only under-crediting SIP-010 fixture;
+- token transfer `err` and `ok false` normalization with a test-only SIP-010 fixture;
+- token balance `err` normalization with a test-only SIP-010 fixture;
 - cap enforcement;
 - paused deposit rejection and withdrawal continuity;
 - insufficient assets and shares;
@@ -65,8 +77,10 @@ included in `total-assets`; any future reconciliation or yield design must make
 that policy explicit before changing share-price semantics. Because strategy
 allocation is disabled and donation synchronization is deliberately absent,
 the current state transitions remain at a 1:1 asset/share ratio. The focused
-suite does not claim non-1:1 floor/ceiling rounding coverage; a future strategy
-or donation-sync phase must add a safe harness and invariant tests.
+suite does not claim non-1:1 floor/ceiling rounding coverage, and it does not
+fabricate an `ERR_ZERO_SHARES` state: a legitimate zero-share floor-pro-rata
+case requires a future strategy or donation-sync transition that changes the
+asset/share ratio. That phase must add a safe harness and invariant tests.
 
 The custody slice also does not use `operational-treasury`. Its post-deploy
 sequence is local to the vault: `set-approved-token` once, `set-deposit-cap`,
@@ -80,7 +94,7 @@ Authoritative public sBTC references:
 - [Stacks mainnet and testnets](https://docs.stacks.co/learn/network-fundamentals/mainnet-and-testnets)
 - [stacks-sbtc source repository](https://github.com/stacks-sbtc/sbtc)
 
-## Local validation
+## Simnet validation
 
 The supported package test path is:
 
