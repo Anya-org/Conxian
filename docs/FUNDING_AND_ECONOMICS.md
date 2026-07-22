@@ -24,6 +24,21 @@ hashes for lifecycle and audit purposes. The MVP trusts a configured reporter
 per integration. Generic FT settlement and payer-signed usage attestations are
 future extensions, not part of this STX-first contract path.
 
+### Registration fees — not implemented
+
+No registration-fee manager currently accepts or escrows payment for user,
+protocol, or integration registration. The Phase 3 Issue #504 candidate adds
+only a canonical, fail-closed compliance read-only gate in
+`compliance-manager.clar`; it does not select fee amounts, refund rules,
+activation timing, or a revenue split. Until those decisions are approved,
+[`CXIP-013.md`](../CXIP-013.md) remains the repository's authoritative policy
+language for registration-fee destination: 100% vault recycling. The earlier
+issue wording about bounty/operations distribution must not be treated as
+implemented economics. The read-only gate itself requires a fresh
+`compliance-manager` record and matching authoritative `kyc-registry` evidence
+(record presence, minimum tier, and `is-sanctioned == false`); it does not use
+the legacy `sanctions-checked` boolean as a substitute for registry evidence.
+
 ## 2. Revenue Split (CXIP-013)
 The protocol treasury (`cxd-treasury.clar`) manages the allocation of collected revenue based on the following target baseline:
 - **Treasury (SAB Operations)**: 45.0%

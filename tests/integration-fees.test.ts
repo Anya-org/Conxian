@@ -264,9 +264,11 @@ describe('Integration fee registry and STX settlement', () => {
     expect(recordUsage(insufficient, nextFill(), 1).result).toEqual(Cl.ok(Cl.uint(MAX_UINT)));
     const router = contractPrincipal('swap-router');
     const collector = contractPrincipal('integration-fee-collector');
+    const fiscalDam = contractPrincipal('cxd-treasury');
     const payerBeforeFailure = stxBalance(insufficient.payer);
     const collectorBeforeFailure = stxBalance(collector);
     const routerBeforeFailure = stxBalance(router);
+    const fiscalDamBeforeFailure = stxBalance(fiscalDam);
 
     // The existing distributor route has no injected collector setter. A
     // direct transfer with an unfunded sender is the route-failure case.
@@ -290,6 +292,7 @@ describe('Integration fee registry and STX settlement', () => {
     expect(stxBalance(insufficient.payer)).toBe(payerBeforeFailure);
     expect(stxBalance(collector)).toBe(collectorBeforeFailure);
     expect(stxBalance(router)).toBe(routerBeforeFailure);
+    expect(stxBalance(fiscalDam)).toBe(fiscalDamBeforeFailure);
     expect(readUint(
       'integration-fee-collector',
       'get-outstanding-fee',
@@ -301,6 +304,7 @@ describe('Integration fee registry and STX settlement', () => {
     const payerBeforeSettlement = stxBalance(fixture.payer);
     const collectorBeforeSettlement = stxBalance(collector);
     const routerBeforeSettlement = stxBalance(router);
+    const fiscalDamBeforeSettlement = stxBalance(fiscalDam);
     expect(simnet.callPublicFn(
       'integration-fee-collector',
       'settle-period',
@@ -309,7 +313,8 @@ describe('Integration fee registry and STX settlement', () => {
     ).result).toEqual(Cl.ok(Cl.bool(true)));
     expect(stxBalance(fixture.payer)).toBe(payerBeforeSettlement - 500n);
     expect(stxBalance(collector)).toBe(collectorBeforeSettlement);
-    expect(stxBalance(router)).toBe(routerBeforeSettlement + 500n);
+    expect(stxBalance(router)).toBe(routerBeforeSettlement);
+    expect(stxBalance(fiscalDam)).toBe(fiscalDamBeforeSettlement + 500n);
     expect(readUint(
       'integration-fee-collector',
       'get-outstanding-fee',

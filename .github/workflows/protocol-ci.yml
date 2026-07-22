@@ -111,7 +111,7 @@ jobs:
         run: npm ci
 
       - name: Install deployment assertion dependencies
-        run: python3 -m pip install --user --disable-pip-version-check pyyaml
+        run: python3 -m pip install --user --disable-pip-version-check 'PyYAML==6.0.2'
 
       - name: Assert community voting deployment wiring
         run: npm run assert:community-voting-wiring
