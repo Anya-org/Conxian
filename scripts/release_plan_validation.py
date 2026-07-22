@@ -44,6 +44,9 @@ RELEASE_PLAN_EXCLUSIONS = frozenset(
         "math-lib-concentrated",
         "oracle-adapter-stub",
         "integration-fee-collector",
+        # Production fee-source authorization remains intentionally out of
+        # release scope; #488 leaves this collector and its artifacts unchanged.
+        "protocol-fee-collector",
     }
 )
 

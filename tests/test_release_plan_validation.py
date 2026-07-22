@@ -474,13 +474,16 @@ assert module.DEPLOYER
     def test_explicit_exclusion_is_allowed_when_absent_but_not_as_dependency(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
-            manifest_path = self.write_manifest(root, [("consumer", []), ("alex-adapter", [])])
+            manifest_path = self.write_manifest(root, [("consumer", []), ("protocol-fee-collector", [])])
             self.validate_pair(root, manifest_path, [("consumer", None)])
 
-            manifest_path = self.write_manifest(root, [("consumer", ["alex-adapter"]), ("alex-adapter", [])])
+            manifest_path = self.write_manifest(
+                root,
+                [("consumer", ["protocol-fee-collector"]), ("protocol-fee-collector", [])],
+            )
             with self.assertRaisesRegex(
                 release_plan_validation.ReleasePlanValidationError,
-                r"depends on explicitly excluded contract alex-adapter",
+                r"depends on explicitly excluded contract protocol-fee-collector",
             ):
                 self.validate_pair(root, manifest_path, [("consumer", None)])
 
