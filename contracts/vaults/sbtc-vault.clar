@@ -29,6 +29,9 @@
 (define-constant ERR_ARITHMETIC u5115)
 (define-constant ERR_ACTIVE_VAULT u5116)
 (define-constant ERR_STRATEGY_DISABLED u5117)
+(define-constant ERR_INSOLVENT u5118)
+(define-constant ERR_DEPOSIT_RECONCILIATION u5119)
+(define-constant ERR_TOKEN_ALREADY_CONFIGURED u5120)
 
 ;; --- Bounds and state -----------------------------------------------------
 (define-constant MAX_UINT u340282366920938463463374607431768211455)
@@ -180,11 +183,13 @@
   (var-get approved-token)
 )
 
-;; @desc Configure the canonical SIP-010 token. Reconfiguration is allowed
-;; only while the vault has no accounted assets or outstanding shares.
+;; @desc Configure the canonical SIP-010 token exactly once from the initial
+;; unconfigured state. The token is immutable after this call; there is no
+;; rescue or sweep path for direct donations in Phase 2A.
 (define-public (set-approved-token (token <sip-010-ft-trait>))
   (begin
     (asserts! (is-admin) (err ERR_UNAUTHORIZED))
+    (asserts! (is-none (var-get approved-token)) (err ERR_TOKEN_ALREADY_CONFIGURED))
     (asserts!
       (and
         (is-eq (var-get total-assets) u0)
@@ -254,7 +259,9 @@
 ;; @desc Deposit approved canonical sBTC and mint pro-rata vault shares.
 ;;
 ;; Trait order is (amount, token). The token argument is checked against the
-;; admin-configured principal before any transfer or accounting mutation.
+;; admin-configured principal before any transfer or accounting mutation. The
+;; live balance delta is reconciled after transfer before any accounting state
+;; is committed.
 (define-public (deposit (amount uint) (token <sip-010-ft-trait>))
   (begin
     (try! (assert-approved-token token))
@@ -266,27 +273,35 @@
       (current-assets (var-get total-assets))
       (current-shares (var-get total-shares))
       (new-assets (try! (safe-add current-assets amount)))
-      (new-shares-minted (try! (calculate-deposit-shares amount current-assets current-shares)))
-      (current-user-shares (default-to u0 (map-get? user-shares tx-sender)))
-      (new-user-shares (try! (safe-add current-user-shares new-shares-minted)))
-      (new-total-shares (try! (safe-add current-shares new-shares-minted)))
+      (live-assets-before (try! (get-live-balance token)))
+      (expected-live-assets (try! (safe-add live-assets-before amount)))
     )
       (asserts! (<= new-assets (var-get deposit-cap)) (err ERR_CAP_EXCEEDED))
       (try! (transfer-token token amount tx-sender (var-get vault-principal)))
-      (map-set user-shares tx-sender new-user-shares)
-      (var-set total-assets new-assets)
-      (var-set total-shares new-total-shares)
-      (print {
-        event: "sbtc-vault-deposit",
-        user: tx-sender,
-        token: (contract-of token),
-        assets: amount,
-        shares: new-shares-minted,
-        total-assets: new-assets,
-        total-shares: new-total-shares,
-        block: burn-block-height
-      })
-      (ok true)
+      (let ((live-assets-after (try! (get-live-balance token))))
+        (asserts! (>= live-assets-after expected-live-assets) (err ERR_DEPOSIT_RECONCILIATION))
+        (let (
+          (new-shares-minted (try! (calculate-deposit-shares amount current-assets current-shares)))
+          (current-user-shares (default-to u0 (map-get? user-shares tx-sender)))
+          (new-user-shares (try! (safe-add current-user-shares new-shares-minted)))
+          (new-total-shares (try! (safe-add current-shares new-shares-minted)))
+        )
+          (map-set user-shares tx-sender new-user-shares)
+          (var-set total-assets new-assets)
+          (var-set total-shares new-total-shares)
+          (print {
+            event: "sbtc-vault-deposit",
+            user: tx-sender,
+            token: (contract-of token),
+            assets: amount,
+            shares: new-shares-minted,
+            total-assets: new-assets,
+            total-shares: new-total-shares,
+            block: burn-block-height
+          })
+          (ok true)
+        )
+      )
     )
   )
 )
@@ -305,15 +320,19 @@
       (current-assets (var-get total-assets))
       (current-shares (var-get total-shares))
       (current-user-shares (default-to u0 (map-get? user-shares tx-sender)))
+      (live-assets (try! (get-live-balance token)))
     )
+      ;; Check aggregate solvency before the requested amount. This prevents
+      ;; an insolvent vault from servicing whichever withdrawal happens to be
+      ;; requested first.
+      (asserts! (>= live-assets current-assets) (err ERR_INSOLVENT))
       (asserts! (>= current-assets amount) (err ERR_INSUFFICIENT_ASSETS))
+      (asserts! (>= live-assets amount) (err ERR_INSUFFICIENT_ASSETS))
       (asserts! (> current-shares u0) (err ERR_INSUFFICIENT_SHARES))
       (let (
         (shares-to-burn (try! (calculate-withdraw-shares amount current-assets current-shares)))
-        (live-assets (try! (get-live-balance token)))
       )
         (asserts! (>= current-user-shares shares-to-burn) (err ERR_INSUFFICIENT_SHARES))
-        (asserts! (>= live-assets amount) (err ERR_INSUFFICIENT_ASSETS))
         (let (
           (new-total-assets (- current-assets amount))
           (new-total-shares (- current-shares shares-to-burn))

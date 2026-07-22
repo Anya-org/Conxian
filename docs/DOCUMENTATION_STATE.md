@@ -1,6 +1,38 @@
 # Documentation State
 
-## Current Session (38) - Phase 2A sBTC Custody and Share Accounting (Issue #507)
+## Current Session (39) - Phase 2A sBTC Checkpoint 2 Remediation (Issue #507)
+
+{
+  "status": "IMPLEMENTED_LOCALLY",
+  "session_timestamp": "2026-07-22",
+  "scope": "Resolved the material Checkpoint 2 findings for the Phase 2A canonical-token-bound sBTC custody and share-accounting core before push.",
+  "components_modified": [
+    "contracts/vaults/sbtc-vault.clar",
+    "tests/vaults/sbtc-vault.test.ts",
+    "contracts/vaults/README.md",
+    "contracts/sbtc/README.md",
+    "docs/DEPLOYMENT_RUNBOOK_VAULTS.md",
+    "docs/ISSUE_507_PHASE_2A_ACCEPTANCE.md",
+    "tests/TEST_INDEX.md",
+    "docs/DOCUMENTATION_STATE.md"
+  ],
+  "security_boundary": "The vault accepts only the one-time immutable approved token principal, reconciles every deposit against the live balance delta, rejects aggregate insolvency before any withdrawal, normalizes compliance and token-call failures, uses explicit local errors, and keeps strategy allocation disabled. It does not bridge BTC, mint or burn sBTC, prove settlement through DLC/BitVM2/oracle stubs, repair a peg, or allocate yield.",
+  "accounting_boundary": "First deposits mint one share per asset; later deposits use floor-pro-rata shares; withdrawals request underlying assets and burn ceiling-pro-rata shares. Accounted assets exclude direct token donations, and there is no generic rescue/sweep path. The focused custody state transitions remain 1:1 because strategy and donation synchronization are deferred.",
+  "validation": {
+    "targeted_tests": "PASS: bash scripts/run-tests.sh tests/vaults/sbtc-vault.test.ts (1 file, 10 tests; 4 known benign Clarinet SDK warnings, 0 new errors)",
+    "compile_initialization": "PASS: bash scripts/run-tests.sh tests/check-compile.test.ts tests/vaults/sbtc-vault.test.ts (2 files, 11 tests; 8 known benign Clarinet SDK warnings, 0 new errors)",
+    "ad_hoc_fixtures": "PASS: Clarinet SDK deployContract supports inline test-only contracts when explicitly set to the simnet-compatible Clarity version; the under-crediting and aggregate-insolvency fixtures are not in production manifests.",
+    "rounding_scope": "LIMITATION: no non-1:1 floor/ceiling rounding claim; this custody-only slice has no safe state transition that changes the asset/share ratio.",
+    "contamination_guard": "PASS: python3 scripts/verify_contamination_guard.py",
+    "diff_hygiene": "PASS: git diff --check",
+    "native_clarinet": "BLOCKED: the direct Clarinet binary is not installed in the workspace",
+    "typescript": "BLOCKED by pre-existing repository tsconfig error: TypeScript 6 rejects the root baseUrl option (TS5102)",
+    "docs_validator": "BLOCKED: npm run validate:docs references missing scripts/validate-docs.js"
+  },
+  "source_control": "Local branch charlie/507-sbtc-vault-core only; no push, PR, deployment, or production-readiness claim."
+}
+
+## Previous Session (38) - Phase 2A sBTC Custody and Share Accounting (Issue #507)
 
 {
   "status": "IMPLEMENTED_LOCALLY",

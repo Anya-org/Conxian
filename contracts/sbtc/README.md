@@ -9,12 +9,21 @@ repository, then deposit and later withdraw that same token through
 
 The Phase 2A vault:
 
-- accepts only the admin-configured SIP-010 token principal;
+- accepts only the admin-configured SIP-010 token principal, configured once
+  from the initial unconfigured state;
 - records accounted assets and per-user shares with deterministic rounding;
+- reconciles every successful deposit against the live token balance delta;
+- rejects aggregate insolvency before any withdrawal transfer;
 - enforces a deposit cap, pause behavior, compliance checks, and explicit
   transfer/error handling; and
 - leaves strategy allocation disabled until a separate approval and accounting
   design exists.
+
+Direct token donations remain visible in the token's live balance but are not
+silently added to `total-assets` or used to change the share price. This slice
+has no generic rescue or sweep function. Any donation synchronization, strategy
+loss accounting, or peg accounting must be designed and reviewed as a later
+phase.
 
 No contract in this slice:
 
@@ -45,6 +54,14 @@ Any future implementation must be reviewed separately for:
 3. strategy adapters, allocation authorization, loss accounting, and paused
    withdrawal guarantees.
 
+## Authoritative public sBTC references
+
+- [Stacks sBTC overview](https://docs.stacks.co/learn/sbtc)
+- [sBTC Clarity contracts](https://docs.stacks.co/learn/sbtc/clarity-contracts)
+- [Clarinet sBTC integration](https://docs.stacks.co/clarinet/integrations/sbtc)
+- [Stacks mainnet and testnets](https://docs.stacks.co/learn/network-fundamentals/mainnet-and-testnets)
+- [stacks-sbtc source repository](https://github.com/stacks-sbtc/sbtc)
+
 The issue-focused acceptance boundary is recorded in
 `docs/ISSUE_507_PHASE_2A_ACCEPTANCE.md`.
 
@@ -57,3 +74,6 @@ bash scripts/run-tests.sh tests/vaults/sbtc-vault.test.ts
 ```
 
 This documents local simnet behavior only; it is not deployment evidence.
+The current tests cover the 1:1 custody path and adversarial receipt/solvency
+guards. They do not claim non-1:1 rounding coverage because this phase has no
+safe state transition that changes the asset/share ratio.

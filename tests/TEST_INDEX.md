@@ -1,4 +1,4 @@
-# Conxian Protocol: Testing Index (Feb 2026)
+# Conxian Protocol: Testing Index (July 2026)
 
 ## Overview
 The Conxian Protocol utilizes a "Dual-Mode" testing architecture. This ensures that contracts are fully compatible with current simulation environments (Clarinet SDK / Simnet) while remaining pre-wired for the Clarity 4 Mainnet Standard (Stacks Epoch 3.0).
@@ -34,7 +34,7 @@ The Conxian Protocol utilizes a "Dual-Mode" testing architecture. This ensures t
 20. ✅ **tests/governance/gauge-manager.test.ts**: Canonical escrowed gauge voting, caps, epoch finalization, and withdrawals.
 
 ### Vault & Custody Tests
-21. ✅ **tests/vaults/sbtc-vault.test.ts**: Canonical-token-bound sBTC custody, cap/pause controls, share accounting, withdrawals, and disabled strategy allocation.
+21. ✅ **tests/vaults/sbtc-vault.test.ts**: Canonical-token-bound sBTC custody, immutable token configuration, receipt reconciliation, aggregate insolvency rejection, cap/pause controls, admin transfer, share accounting, withdrawals, and disabled strategy allocation.
 
 ### System Root Tests (Integration)
 22. ✅ **tests/system/full-protocol-journey.test.ts**: Coordination between Heartbeat, DEX, and Agents.
@@ -45,7 +45,7 @@ The Conxian Protocol utilizes a "Dual-Mode" testing architecture. This ensures t
 ## How to Run Tests
 ```bash
 npm install
-npx vitest run tests/[path_to_test]
+bash scripts/run-tests.sh tests/[path_to_test]
 ```
 
 ## Standards Compliance
@@ -54,4 +54,4 @@ All tests adhere to the Conxian Standards Framework:
 - **Dynamic Addressing**: No hardcoded `ST1PQ...` principals in test logic.
 - **Verification**: Explicit assertion of `Cl.ok` and `Cl.error` responses.
 
-Last Updated: Jul 22, 2026
+Last Updated: July 22, 2026
