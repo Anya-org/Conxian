@@ -34,9 +34,26 @@ The Tokens module manages all native protocol assets including CXD (Sovereign De
 ### `cxlp-token.clar`
 | Function | Signature | Description |
 |----------|-----------|-------------|
+| `mint` | `(amount uint) (recipient principal)` | Mints CXLP for the admin or an authorized immediate caller; zero amounts are rejected. |
+| `burn` | `(amount uint) (owner principal)` | Burns CXLP for an authorized immediate caller; non-admin callers must initiate a burn for `owner`. The admin retains an explicit emergency path that may burn any owner's balance. |
+| `add-minter` / `remove-minter` | `(principal)` | Adds or removes a minter (current admin's immediate caller only). |
+| `add-burner` / `remove-burner` | `(principal)` | Adds or removes a burner (current admin's immediate caller only). |
+| `is-minter` / `is-burner` | `(principal)` | Reads the independent minter and burner authorization maps. |
+| `is-admin` | `(caller principal)` | Reports whether a principal is the current administrator. |
+| `get-admin` | `()` | Returns the current administrator. |
+| `initialize` | `(new-admin principal)` | Rotates the administrator; authorization uses the immediate `contract-caller`, so direct standard-principal admin calls remain supported. |
 | `transfer` | `(amount uint) (sender principal) (recipient principal) (memo (optional (buff 34)))` | SIP-010 compliant transfer. |
 | `get-balance` | `(who principal)` | Returns the token balance for a user. |
+| `get-name` | `()` | Returns the SIP-010 token name. |
+| `get-symbol` | `()` | Returns the SIP-010 token symbol. |
+| `get-decimals` | `()` | Returns the SIP-010 decimal precision (`u8`). |
+| `get-total-supply` | `()` | Returns the current CXLP total supply. |
+| `get-token-uri` | `()` | Returns the optional SIP-010 metadata URI. |
 | `get-protocol-status` | `()` | Returns compliance and version status. |
+
+Privileged failures use `u1000` (unauthorized), `u1001` (invalid amount), `u1002` (owner mismatch), and `u1003` (insufficient balance). The focused suite rotates the admin through a standard principal because the existing coordinator exposes token mint/burn wrappers but no admin-role wrapper; the same immediate-`contract-caller` predicate is exercised by the nested coordinator calls, so contract-principal rotation does not require a production-only test helper.
+
+Pool creation records concentrated-pool metadata only; it does not mint CXLP. This is the #536 integration boundary: custody, position accounting, and settlement remain separate work.
 
 ### `cxtr-token.clar`
 | Function | Signature | Description |
@@ -77,7 +94,7 @@ Standard SIP-010 transfer:
 - **Meritocratic Emission**: A token distribution model where rewards are earned through verified protocol contributions.
 
 ## Testing (How-to)
-`npx vitest run tests/tokens-utility.test.ts`
+`bash scripts/run-tests.sh tests/tokens/cxlp-token.test.ts tests/tokens-utility.test.ts`
 
 ## Status (Reference)
 - Implementation: Production-Ready (v1.2.0)

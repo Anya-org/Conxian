@@ -1,13 +1,47 @@
 ;; @contract cxlp-token
 ;; @desc Conxian Liquidity Pool Token (SIP-010)
-;; @version 1.1.0
+;; @version 1.2.0
 
 (impl-trait .sip-standards.sip-010-ft-trait)
+(impl-trait .sip-standards.ft-mintable-trait)
 
 (define-fungible-token cxlp-token)
 
 (define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_INVALID_AMOUNT (err u1001))
+(define-constant ERR_OWNER_MISMATCH (err u1002))
+(define-constant ERR_INSUFFICIENT_BALANCE (err u1003))
+(define-data-var admin principal tx-sender)
+(define-map minters principal bool)
+(define-map burners principal bool)
 (define-data-var token-uri (optional (string-ascii 256)) none)
+
+;; @desc Checks the immediate caller against the current administrator.
+;; Direct standard-principal calls continue to work because contract-caller
+;; equals tx-sender when no contract is in between.
+(define-private (is-admin-caller)
+  (is-eq contract-caller (var-get admin))
+)
+
+;; @desc Checks whether a principal is the current administrator.
+(define-read-only (is-admin (caller principal))
+  (is-eq caller (var-get admin))
+)
+
+;; @desc Checks if a principal is an authorized minter.
+(define-read-only (is-minter (caller principal))
+  (default-to false (map-get? minters caller))
+)
+
+;; @desc Checks if a principal is an authorized burner.
+(define-read-only (is-burner (caller principal))
+  (default-to false (map-get? burners caller))
+)
+
+;; @desc Returns the current administrator.
+(define-read-only (get-admin)
+  (ok (var-get admin))
+)
 
 ;; @desc Standard SIP-010 transfer function.
 (define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
@@ -16,6 +50,75 @@
     (try! (ft-transfer? cxlp-token amount sender recipient))
     (match memo to-print (print to-print) 0x)
     (ok true)
+  )
+)
+
+;; @desc Adds an authorized minter. Admin only.
+(define-public (add-minter (minter principal))
+  (begin
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
+    (map-set minters minter true)
+    (ok true)
+  )
+)
+
+;; @desc Removes an authorized minter. Admin only.
+(define-public (remove-minter (minter principal))
+  (begin
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
+    (map-delete minters minter)
+    (ok true)
+  )
+)
+
+;; @desc Adds an authorized burner. Admin only.
+(define-public (add-burner (burner principal))
+  (begin
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
+    (map-set burners burner true)
+    (ok true)
+  )
+)
+
+;; @desc Removes an authorized burner. Admin only.
+(define-public (remove-burner (burner principal))
+  (begin
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
+    (map-delete burners burner)
+    (ok true)
+  )
+)
+
+;; @desc Mints CXLP through the immediate caller's authorization.
+(define-public (mint (amount uint) (recipient principal))
+  (begin
+    (asserts! (> amount u0) ERR_INVALID_AMOUNT)
+    (asserts!
+      (or (is-admin-caller) (is-minter contract-caller))
+      ERR_UNAUTHORIZED
+    )
+    (ft-mint? cxlp-token amount recipient)
+  )
+)
+
+;; @desc Burns CXLP through an authorized immediate caller.
+;; Non-admin callers must initiate burns for their own balance. This keeps an
+;; approved pool from burning a different user's CXLP when invoked by that user.
+;; The admin path is an intentional emergency burn path and may burn any
+;; owner's balance, subject to the same explicit balance check below.
+(define-public (burn (amount uint) (owner principal))
+  (begin
+    (asserts! (> amount u0) ERR_INVALID_AMOUNT)
+    (asserts!
+      (or (is-admin-caller) (is-burner contract-caller))
+      ERR_UNAUTHORIZED
+    )
+    (asserts!
+      (or (is-admin-caller) (is-eq tx-sender owner))
+      ERR_OWNER_MISMATCH
+    )
+    (asserts! (>= (ft-get-balance cxlp-token owner) amount) ERR_INSUFFICIENT_BALANCE)
+    (ft-burn? cxlp-token amount owner)
   )
 )
 
@@ -32,4 +135,13 @@
 ;; @desc Standard SIP-010 metadata URI.
 (define-read-only (get-token-uri) (ok (var-get token-uri)))
 ;; @desc Returns the protocol status.
-(define-read-only (get-protocol-status) (ok { compliant: true, version: "v1.1.0" }))
+(define-read-only (get-protocol-status) (ok { compliant: true, version: "v1.2.0" }))
+
+;; @desc Initializes the contract with a new administrator.
+(define-public (initialize (new-admin principal))
+  (begin
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
+    (var-set admin new-admin)
+    (ok true)
+  )
+)
