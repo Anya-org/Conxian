@@ -32,6 +32,9 @@ batches:
       - contract-publish:
           contract-name: access-control-trait
           path: contracts/traits/access-control-trait.clar
+      - contract-publish:
+          contract-name: compoundable-vault-trait
+          path: contracts/traits/compoundable-vault-trait.clar
 
   # --- Phase 1: Identity, Access & Compliance ---
   - id: 1

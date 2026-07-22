@@ -146,6 +146,7 @@ depends_on = ["sip-standards"]
 [contracts.auto-compounder]
 path = "contracts/yield/auto-compounder.clar"
 clarity-version = 4
+depends_on = ["compoundable-vault-trait"]
 
 [contracts.automation-manager]
 path = "contracts/automation/automation-manager.clar"
@@ -641,6 +642,11 @@ path = "contracts/test-helpers/mock-token.clar"
 clarity-version = 4
 depends_on = ["sip-standards"]
 
+[contracts.mock-compoundable-vault]
+path = "contracts/test-helpers/mock-compoundable-vault.clar"
+clarity-version = 4
+depends_on = ["compoundable-vault-trait"]
+
 [contracts.monitoring-dashboard]
 path = "contracts/monitoring/monitoring-dashboard.clar"
 clarity-version = 4
@@ -962,6 +968,10 @@ depends_on = ["circuit-breaker", "conxian-protocol", "sip-standards"]
 path = "contracts/traits/vault-traits.clar"
 clarity-version = 4
 depends_on = ["sip-standards"]
+
+[contracts.compoundable-vault-trait]
+path = "contracts/traits/compoundable-vault-trait.clar"
+clarity-version = 4
 
 [contracts.voting]
 path = "contracts/governance/voting.clar"
