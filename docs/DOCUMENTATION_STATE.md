@@ -1,5 +1,21 @@
 # Documentation State
 
+## Current Session (37) - Enterprise Subscription MVP (Issue #503)
+
+{
+  "status": "IMPLEMENTED_LOCALLY",
+  "session_timestamp": "2026-07-22",
+  "scope": "Added the STX-only prepaid enterprise subscription MVP: immutable versioned plan records and generic features, explicit subscribe/renew/cancel lifecycle, KYC/AML checks, consumer entitlement/usage trait, canonical gross-STX Fiscal Dam routing, immutable source/payment receipts, deployment manifests, focused tests, and scoped module documentation.",
+  "economic_boundary": "Subscription prices enter revenue-automation, revenue-distributor, and cxd-treasury at gross value with no 1% deduction or operational-treasury/commercial-wallet bypass. The six-way allocation uses the current cxd-treasury percentages, safe floor math for the first five buckets, and assigns all integer remainder to the sixth bucket.",
+  "security_boundary": "Plans publish inactive and activate explicitly; plan versions and feature limits are immutable; payment and usage IDs are replay-protected; consumers are allowlisted; entitlement derives directly from burn-block-height; no PII or product-specific feature mapping is stored on-chain.",
+  "validation": {
+    "targeted_tests": "PASS: tests/enterprise/enterprise-subscriptions.test.ts (2 tests); tests/integration-fees.test.ts (11 tests); tests/simple.test.ts (1 test)",
+    "full_tests": "Not run in this implementation phase",
+    "native_clarinet": "Blocked: clarinet binary is not installed in the workspace",
+    "deployment": "Deployment plans regenerated locally; no deployment or push performed"
+  }
+}
+
 ## Current Session (36) - Integration Fee Settlement (Issue #497)
 
 {

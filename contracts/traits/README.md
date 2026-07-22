@@ -55,6 +55,23 @@ This trait is intentionally collector-focused. Integration registration,
 reporter configuration, payer authorization, and key rotation remain in the
 separate `integration-registry.clar` lifecycle API.
 
+### Enterprise subscription traits
+
+The enterprise MVP keeps its consumer-facing interfaces in separate traits:
+
+| Trait | Contract | Purpose |
+|-------|----------|---------|
+| `enterprise-plan-trait` | `enterprise-plan-trait.clar` | Reads immutable versioned plan and generic feature records. |
+| `enterprise-compliance-trait` | `enterprise-compliance-trait.clar` | Reads KYC tier and AML clearance without exposing identity metadata. |
+| `enterprise-revenue-trait` | `enterprise-revenue-trait.clar` | Defines the full gross-STX revenue adapter entry point. |
+| `enterprise-subscription-trait` | `enterprise-subscription-trait.clar` | Defines subscription lifecycle, entitlement, and usage reads/writes. |
+
+`enterprise-subscription-trait` is intentionally generic: consumer contracts
+provide feature identifiers and namespaced usage IDs, while plan prices,
+limits, and entitlement state remain in the plan registry and subscription
+contract. The stable read surface lets products integrate without adding
+product-specific mappings or on-chain PII to the protocol core.
+
 ## Integration Examples (How-to)
 
 ### Implementing CSF Liquidity (External Protocol)

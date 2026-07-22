@@ -10,6 +10,78 @@ The module follows a layered approach:
 - **Advanced Order Manager**: `advanced-order-manager.clar` serves as the institutional execution engine for TWAP/VWAP orders with integrated escrow.
 - **Ops Loan Manager**: `ops-loan-manager.clar` enables structured B2B finance through Junior/Senior tranches.
 
+## Enterprise Subscription MVP (Issue #503)
+
+The subscription MVP is an STX-only, prepaid billing layer. Purchases and
+renewals are explicit transactions; the protocol never pulls funds
+automatically. The implementation deliberately keeps plan prices as owner
+configuration rather than protocol constants, so publication and activation
+are separate operations.
+
+### Plan registry
+
+`enterprise-plan-registry.clar` stores immutable versioned records keyed by
+`{ plan-id, version }`. The four fixed tier identifiers are `u1` Bronze, `u2`
+Silver, `u3` Gold, and `u4` Platinum. A published plan starts inactive and
+becomes purchasable only after the owner explicitly activates it. Prices,
+required KYC tier, and generic feature limits are set at publication time and
+cannot be edited afterward; activation is the only mutable plan field.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `publish-plan` | `(uint uint uint uint uint uint)` | Publishes an inactive plan version with owner-supplied prices and KYC tier. |
+| `publish-feature` | `(uint uint (string-ascii 32) bool uint)` | Adds one immutable generic feature/limit record to a plan version. |
+| `set-plan-active` | `(uint uint bool)` | Explicitly activates or deactivates a published plan version. |
+| `get-plan` | `(uint uint)` | Reads an optional versioned plan record. |
+| `get-plan-feature` | `(uint uint (string-ascii 32))` | Reads an optional generic feature record for a plan version. |
+
+### Subscription lifecycle
+
+`enterprise-subscription.clar` stores one subscription per subscriber. Monthly
+and annual billing periods are fixed at `u4320` and `u51840` burn blocks. An
+active renewal extends from the existing `paid-through` height; a renewal at
+or after expiry starts at the current `burn-block-height`. Cancellation is
+period-end only: it marks the record without refunds, proration, credits, or
+debt, and entitlement remains derived directly from
+`burn-block-height < paid-through`.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `subscribe` | `(uint uint uint uint)` | Pays the selected active plan in full STX and creates the subscription. |
+| `renew` | `(uint uint uint uint)` | Pays a new period explicitly and extends the subscription. |
+| `cancel` | `()` | Marks an active subscription cancelled for period-end termination. |
+| `get-subscription` | `(principal)` | Reads lifecycle state and current active status. |
+| `is-entitled` | `(principal (string-ascii 32))` | Reads a generic feature entitlement. |
+| `get-entitlement` | `(principal (string-ascii 32))` | Reads entitlement, limit, usage, remaining units, and paid-through. |
+| `record-usage` | `(principal (string-ascii 32) (buff 32) uint)` | Records authorized consumer usage with a namespaced replay key and limit check. |
+
+KYC tier and AML status are checked on every subscribe and renew through
+`compliance-hooks.clar`. No PII is stored on-chain; feature identifiers are
+generic strings and product-specific mappings remain in consumer contracts.
+Only explicitly registered consumer contract principals may record usage.
+`enterprise-facade.clar` exposes a generic forwarding boundary for that
+consumer path without inventing product mappings.
+
+### Gross-STX Fiscal Dam route
+
+Every subscription payment enters the canonical route in full:
+
+```text
+enterprise-subscription
+  -> revenue-automation.route-stx-revenue
+  -> revenue-distributor.route-stx-revenue
+  -> cxd-treasury.record-stx-revenue
+```
+
+The subscription contract first takes exact STX custody, calls the route, and
+writes payment/subscription state only after the route succeeds. A successful
+payment leaves zero STX in subscription, automation, and distributor custody.
+`cxd-treasury` records an immutable `{ source, payment-id }` receipt and adds
+the gross amount to six accounting buckets. The first five allocations use
+safe floor arithmetic and the sixth bucket receives the integer remainder, so
+bucket totals equal gross STX exactly. The buyback bucket is governed STX; the
+contracts do not claim native-STX buyback execution.
+
 ## Core Contracts (Reference)
 
 ### `enterprise-api.clar`

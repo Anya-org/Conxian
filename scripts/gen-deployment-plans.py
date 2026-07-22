@@ -72,6 +72,27 @@ INIT_CALLS = [
     {"contract-id": f"{DEPLOYER}.risk-unit", "expected-sender": DEPLOYER,
      "method": "set-ops-engine",
      "parameters": [A(".ops-engine")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.cxd-treasury", "expected-sender": DEPLOYER,
+     "method": "set-authorized-principals", "parameters": [
+         A(""), A(".revenue-distributor")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.cxd-treasury", "expected-sender": DEPLOYER,
+     "method": "authorize-stx-source",
+     "parameters": [A(".integration-fee-collector")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.cxd-treasury", "expected-sender": DEPLOYER,
+     "method": "authorize-stx-source",
+     "parameters": [A(".enterprise-subscription")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.revenue-distributor", "expected-sender": DEPLOYER,
+     "method": "set-revenue-automation",
+     "parameters": [A(".revenue-automation")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.revenue-distributor", "expected-sender": DEPLOYER,
+     "method": "authorize-stx-source",
+     "parameters": [A(".integration-fee-collector")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.revenue-distributor", "expected-sender": DEPLOYER,
+     "method": "authorize-stx-source",
+     "parameters": [A(".enterprise-subscription")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.revenue-automation", "expected-sender": DEPLOYER,
+     "method": "authorize-stx-source",
+     "parameters": [A(".enterprise-subscription")], "cost": INIT_CALL_COST},
 ]
 
 

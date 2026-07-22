@@ -4,12 +4,13 @@
 The Treasury module manages the protocol's capital allocation and revenue distribution. It implements the "Fiscal Dam" (CXIP-013) and enforces mandatory protocol fees via the Revenue Automation engine.
 
 ## Architecture (Explanation)
-- **Automation**: `revenue-automation.clar` enforces a non-negotiable 100 bps protocol fee.
+- **Automation**: `revenue-automation.clar` retains the legacy 100 bps token
+  fee path and also exposes the full gross-STX enterprise adapter.
 - **Registry**: `cxd-treasury.clar` maintains the global allocation policy.
 - **Distribution**: `revenue-distributor.clar` executes token buy-backs and burns.
 - **Integration Billing**: `integration-fee-collector.clar` sends 100% of
   settled STX integration fees through the same distributor route; there is no
-  partner split or direct bypass to `operational-treasury`.
+  partner split, 1% deduction, or direct bypass to `operational-treasury`.
 - **Fiscal allocations**: `fiscal-vault-oracle.clar` registers SBC beneficiaries,
   reserves period/category caps, and releases SIP-010 assets only from approved
   allocations.
@@ -22,6 +23,8 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `collect-revenue` | `(token <sip-010-ft-trait>) (amount uint) (payer principal)` | Calculates and transfers 1% fee. |
+| `route-stx-revenue` | `(uint principal uint)` | Moves a full gross STX payment from an authorized source into `revenue-distributor`. |
+| `authorize-stx-source` | `(principal)` | Authorizes an explicit source contract for the gross-STX adapter. |
 | `initialize` | `(admin principal)` | Sets the initial administrator (Admin only). |
 | `set-admin` | `(new-admin principal)` | Updates the admin principal (Admin only). |
 
@@ -30,19 +33,41 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 |----------|-----------|-------------|
 | `rebalance` | `(treasury uint) (bounty uint) (lp uint) (grant uint) (buyback uint) (insurance uint)` | Updates 6-way split (Admin only). |
 | `set-authorized-principals` | `(agent principal) (distributor principal)` | Sets authorized actors (Admin only). |
+| `authorize-stx-source` | `(principal)` | Authorizes a source contract for gross-STX receipts. |
+| `record-stx-revenue` | `(principal uint uint)` | Receives distributor STX, snapshots the six-way split, and records an immutable receipt. |
+| `get-stx-receipt` | `(principal uint)` | Reads one immutable source/payment receipt. |
+| `get-stx-bucket-balances` | `()` | Reads the six accumulated gross-STX accounting buckets. |
 | `initialize` | `(new-admin principal)` | Initializes the treasury (Admin only). |
 | `get-allocation-percentages` | `()` | Returns the current fiscal split. |
 | `get-protocol-status` | `()` | Returns compliance and version status. |
 
-### `revenue-distributor.clar` integration route
+### `revenue-distributor.clar` STX routes
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `distribute-stx` | `(uint)` | Existing STX route used by the collector under contract context. |
+| `distribute-stx` | `(uint)` | Compatibility route for authorized legacy sources; it now terminates in the Fiscal Dam. |
+| `route-stx-revenue` | `(uint principal uint)` | Enterprise adapter hop callable only by configured `revenue-automation`. |
 
 The collector calls the existing route from contract custody after receiving
-an exact settlement from the configured payer. No distributor setter or
-separate integration route is added; the distributor remains the system of
-record for downstream revenue routing and CXIP-013 behavior.
+an exact settlement from the configured payer. Both the compatibility and
+enterprise paths move gross STX through `cxd-treasury`; neither uses
+`swap-router` for STX and neither bypasses the six-way Fiscal Dam.
+
+### Enterprise gross-STX route
+
+Subscription payments use the following custody sequence:
+
+```text
+source contract -> revenue-automation -> revenue-distributor -> cxd-treasury
+```
+
+Each hop authenticates its immediate caller and authorized source. The
+subscription contract records payment state only after the final hop succeeds,
+so a route failure rolls back custody and accounting together. Receipts are
+replay-protected by source and payment ID. Allocation percentages are read at
+payment time and snapshotted into each receipt; the first five buckets use
+safe floor math and the sixth bucket receives all integer remainder. The
+buyback allocation is an STX accounting bucket, not a claim that native-STX
+buyback execution exists.
 
 ### `conxian-vaults.clar`
 | Function | Signature | Description |

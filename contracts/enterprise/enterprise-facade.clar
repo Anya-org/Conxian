@@ -18,3 +18,14 @@
 ;; @param intervals: Number of execution windows.
 ;; @param interval-blocks: Block duration of each execution window.
 (define-public (submit-twap-order (token-in principal) (token-out principal) (amount uint) (intervals uint) (interval-blocks uint)) (ok u1))
+
+;; Generic consumer boundary for products that meter an approved enterprise
+;; entitlement. Product-specific feature mappings remain outside this facade;
+;; the subscription contract owns authorization, replay protection, and limits.
+(define-public (record-subscription-usage
+    (subscriber principal)
+    (feature-id (string-ascii 32))
+    (usage-id (buff 32))
+    (units uint))
+  (contract-call? .enterprise-subscription record-usage subscriber feature-id usage-id units)
+)
