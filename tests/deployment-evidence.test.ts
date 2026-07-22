@@ -62,6 +62,28 @@ function writePlan(path: string, options: Parameters<typeof planYaml>[0] = {}): 
   writeFileSync(path, planYaml(options), "utf8");
 }
 
+const PUBLISH_ENTRY = `        - contract-publish:
+            contract-name: alpha
+            expected-sender: ${DEPLOYER}
+            path: contracts/alpha.clar`;
+const CALL_ENTRY = `        - contract-call:
+            contract-id: ${CONTRACT_ID}
+            expected-sender: ${DEPLOYER}
+            method: initialize
+            parameters:
+              - u1`;
+
+function planWithEntries(entries: string[]): string {
+  return `network: testnet
+deployer: ${DEPLOYER}
+plan:
+  batches:
+    - id: 0
+      transactions:
+${entries.join("\n")}
+`;
+}
+
 writePlan(PLAN_PATH);
 
 afterAll(() => rmSync(tempDirectory, { recursive: true, force: true }));
@@ -249,13 +271,95 @@ async function expectVerificationError(
 describe("deployment evidence verification", () => {
   it("parses every effective testnet plan entry and blocks the unresolved mainnet identity", () => {
     const testnetPlan = readDeploymentPlan(join(import.meta.dirname, "../deployments/full-system.testnet-plan.yaml"));
-    expect(testnetPlan.entries).toHaveLength(215);
-    expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-publish")).toHaveLength(205);
+    expect(testnetPlan.entries).toHaveLength(216);
+    expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-publish")).toHaveLength(206);
     expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-call")).toHaveLength(10);
 
     expect(() => readDeploymentPlan(join(import.meta.dirname, "../deployments/full-system.mainnet-plan.yaml"))).toThrowError(
       expect.objectContaining({ code: "NETWORK_DEPLOYER_MISMATCH" }),
     );
+  });
+
+  it("fails closed on unsupported, multiple, and malformed transaction entries", () => {
+    const unsupportedPath = join(tempDirectory, "unsupported-kind-plan.yaml");
+    writeFileSync(unsupportedPath, planWithEntries(["        - contract-deploy: true"]), "utf8");
+    expect(() => readDeploymentPlan(unsupportedPath)).toThrowError(
+      expect.objectContaining({
+        code: "PLAN_MALFORMED",
+        message: expect.stringContaining("0:0"),
+      }),
+    );
+
+    const emptyEntryPath = join(tempDirectory, "empty-transaction-plan.yaml");
+    writeFileSync(emptyEntryPath, planWithEntries(["        - {}"]), "utf8");
+    expect(() => readDeploymentPlan(emptyEntryPath)).toThrowError(
+      expect.objectContaining({
+        code: "PLAN_MALFORMED",
+        message: expect.stringContaining("0:0"),
+      }),
+    );
+
+    const extraKindPath = join(tempDirectory, "extra-kind-plan.yaml");
+    writeFileSync(
+      extraKindPath,
+      planWithEntries([
+        `        - contract-publish:
+            contract-name: alpha
+            expected-sender: ${DEPLOYER}
+          transaction-type: unsupported`,
+      ]),
+      "utf8",
+    );
+    expect(() => readDeploymentPlan(extraKindPath)).toThrowError(
+      expect.objectContaining({
+        code: "PLAN_MALFORMED",
+        message: expect.stringContaining("0:0"),
+      }),
+    );
+
+    const multipleKindsPath = join(tempDirectory, "multiple-kinds-plan.yaml");
+    writeFileSync(
+      multipleKindsPath,
+      planWithEntries([
+        `        - contract-publish:
+            contract-name: alpha
+            expected-sender: ${DEPLOYER}
+          contract-call:
+            contract-id: ${CONTRACT_ID}
+            expected-sender: ${DEPLOYER}
+            method: initialize
+            parameters:
+              - u1`,
+      ]),
+      "utf8",
+    );
+    expect(() => readDeploymentPlan(multipleKindsPath)).toThrowError(
+      expect.objectContaining({
+        code: "PLAN_MALFORMED",
+        message: expect.stringContaining("0:0"),
+      }),
+    );
+
+    const malformedPath = join(tempDirectory, "malformed-transaction-plan.yaml");
+    writeFileSync(malformedPath, planWithEntries(["        - contract-call: []"]), "utf8");
+    expect(() => readDeploymentPlan(malformedPath)).toThrowError(
+      expect.objectContaining({
+        code: "PLAN_MALFORMED",
+        message: expect.stringContaining("0:0"),
+      }),
+    );
+  });
+
+  it("preserves exact source ordinals when an entry is inserted", () => {
+    const insertedPath = join(tempDirectory, "inserted-entry-plan.yaml");
+    writeFileSync(insertedPath, planWithEntries([PUBLISH_ENTRY, CALL_ENTRY, CALL_ENTRY]), "utf8");
+
+    const plan = readDeploymentPlan(insertedPath);
+    expect(plan.entries.map((entry) => `${entry.planPosition.batchId}:${entry.planPosition.transactionIndex}`)).toEqual([
+      "0:0",
+      "0:1",
+      "0:2",
+    ]);
   });
 
   it("confirms complete plan evidence with nullable burn hash and rich Hiro interfaces", async () => {

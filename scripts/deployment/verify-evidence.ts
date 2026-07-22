@@ -712,8 +712,21 @@ export function readDeploymentPlan(planPath: string): ParsedDeploymentPlan {
     for (const [transactionIndex, transaction] of batch.transactions.entries()) {
       assertCondition(isObject(transaction), `plan.batches[${batchIndex}].transactions[${transactionIndex}] must be an object`, "PLAN_MALFORMED");
       const position = readPlanPosition(batchId, transactionIndex, `plan.batches[${batchIndex}]`);
-      if (transaction["contract-publish"] !== undefined) {
-        const body = transaction["contract-publish"];
+      const transactionKeys = Object.keys(transaction);
+      assertCondition(
+        transactionKeys.length === 1,
+        `plan transaction ${position.batchId}:${position.transactionIndex} must contain exactly one transaction kind`,
+        "PLAN_MALFORMED",
+      );
+      const transactionKind = transactionKeys[0];
+      assertCondition(
+        transactionKind === "contract-publish" || transactionKind === "contract-call",
+        `plan transaction ${position.batchId}:${position.transactionIndex} has unsupported transaction kind ${transactionKind}`,
+        "PLAN_MALFORMED",
+      );
+
+      if (transactionKind === "contract-publish") {
+        const body = transaction[transactionKind];
         assertCondition(isObject(body), `plan transaction ${position.batchId}:${position.transactionIndex} publish body is invalid`, "PLAN_MALFORMED");
         const contractName = readPlanString(body["contract-name"], "contract-publish.contract-name");
         assertContractName(contractName, "contract-publish.contract-name", "PLAN_MALFORMED");
@@ -728,8 +741,8 @@ export function readDeploymentPlan(planPath: string): ParsedDeploymentPlan {
           expectedSender,
         });
       }
-      if (transaction["contract-call"] !== undefined) {
-        const body = transaction["contract-call"];
+      if (transactionKind === "contract-call") {
+        const body = transaction[transactionKind];
         assertCondition(isObject(body), `plan transaction ${position.batchId}:${position.transactionIndex} call body is invalid`, "PLAN_MALFORMED");
         const contractId = readPlanString(body["contract-id"], "contract-call.contract-id");
         assertContractId(contractId, "contract-call.contract-id", network);
@@ -755,11 +768,6 @@ export function readDeploymentPlan(planPath: string): ParsedDeploymentPlan {
           parameters,
         });
       }
-      assertCondition(
-        !(transaction["contract-publish"] !== undefined && transaction["contract-call"] !== undefined),
-        `plan transaction ${position.batchId}:${position.transactionIndex} contains multiple effective transaction kinds`,
-        "PLAN_MALFORMED",
-      );
     }
   }
 
