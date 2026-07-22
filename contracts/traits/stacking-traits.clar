@@ -43,7 +43,9 @@
         cycle-id: uint,
         unlock-height: uint,
         external-commit-id: uint,
-        state: uint
+        state: uint,
+        pox-adapter: principal,
+        bound-orchestrator: (optional principal)
       } uint))
 
     ;; Reconcile/finalize the authoritative external lifecycle. This is
@@ -57,7 +59,9 @@
         cycle-id: uint,
         unlock-height: uint,
         external-commit-id: uint,
-        state: uint
+        state: uint,
+        pox-adapter: principal,
+        bound-orchestrator: (optional principal)
       } uint))
 
     ;; Consume one exact, cycle/recipient/amount-bound settlement attestation.

@@ -656,6 +656,16 @@ path = "contracts/test-helpers/mock-pox-adapter.clar"
 clarity-version = 4
 depends_on = ["stacking-traits"]
 
+[contracts.mock-pox-adapter-2]
+path = "contracts/test-helpers/mock-pox-adapter-2.clar"
+clarity-version = 4
+depends_on = ["stacking-traits"]
+
+[contracts.mock-settlement-intermediary]
+path = "contracts/test-helpers/mock-settlement-intermediary.clar"
+clarity-version = 4
+depends_on = ["stacking-traits"]
+
 [contracts.mock-stacking-adapter]
 path = "contracts/test-helpers/mock-stacking-adapter.clar"
 clarity-version = 4

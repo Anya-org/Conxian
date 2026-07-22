@@ -13,7 +13,7 @@ plan:
         cost: 50000
         path: contracts/traits/access-control-trait.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: sip-standards
@@ -21,7 +21,7 @@ plan:
         cost: 50000
         path: contracts/traits/sip-standards.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: core-traits
@@ -29,7 +29,7 @@ plan:
         cost: 50000
         path: contracts/traits/core-traits.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: admin-facade
@@ -37,7 +37,7 @@ plan:
         cost: 50000
         path: contracts/core/admin-facade.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: advanced-order-manager
@@ -45,7 +45,7 @@ plan:
         cost: 50000
         path: contracts/enterprise/advanced-order-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: security-monitoring
@@ -53,7 +53,7 @@ plan:
         cost: 50000
         path: contracts/traits/security-monitoring.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: agent-risk
@@ -61,7 +61,7 @@ plan:
         cost: 50000
         path: contracts/agents/agent-risk.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: conxian-access
@@ -69,7 +69,7 @@ plan:
         cost: 50000
         path: contracts/core/conxian-access.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: cxd-token
@@ -77,7 +77,7 @@ plan:
         cost: 50000
         path: contracts/tokens/cxd-token.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: bme-engine
@@ -85,7 +85,7 @@ plan:
         cost: 50000
         path: contracts/core/bme-engine.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: conxian-csf-trait
@@ -93,7 +93,7 @@ plan:
         cost: 50000
         path: contracts/traits/conxian-csf-trait.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: concentrated-liquidity-pool
@@ -101,7 +101,7 @@ plan:
         cost: 50000
         path: contracts/dex/concentrated-liquidity-pool.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: agent-treasury
@@ -109,7 +109,7 @@ plan:
         cost: 50000
         path: contracts/agents/agent-treasury.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: allocation-policy
@@ -117,7 +117,7 @@ plan:
         cost: 50000
         path: contracts/treasury/allocation-policy.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: analytics-aggregator
@@ -125,7 +125,7 @@ plan:
         cost: 50000
         path: contracts/monitoring/analytics-aggregator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: auto-compounder
@@ -133,7 +133,7 @@ plan:
         cost: 50000
         path: contracts/yield/auto-compounder.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: operational-treasury
@@ -141,7 +141,7 @@ plan:
         cost: 50000
         path: contracts/core/operational-treasury.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: automation-manager
@@ -149,7 +149,7 @@ plan:
         cost: 50000
         path: contracts/automation/automation-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: automation-traits
@@ -157,7 +157,7 @@ plan:
         cost: 50000
         path: contracts/traits/automation-traits.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: batch-auction
@@ -165,7 +165,7 @@ plan:
         cost: 50000
         path: contracts/dex/batch-auction.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: batch-operations
@@ -173,7 +173,7 @@ plan:
         cost: 50000
         path: contracts/core/batch-operations.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: batch-processor
@@ -181,7 +181,7 @@ plan:
         cost: 50000
         path: contracts/automation/batch-processor.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
   - id: 1
     transactions:
@@ -191,7 +191,7 @@ plan:
         cost: 50000
         path: contracts/utils/block-utils.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: regulatory-adapter
@@ -199,7 +199,7 @@ plan:
         cost: 50000
         path: contracts/compliance/regulatory-adapter.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: bond-factory
@@ -207,7 +207,7 @@ plan:
         cost: 50000
         path: contracts/bonding/bond-factory.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: bond-token
@@ -215,7 +215,7 @@ plan:
         cost: 50000
         path: contracts/bonding/bond-token.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: bond-traits
@@ -223,7 +223,7 @@ plan:
         cost: 50000
         path: contracts/traits/bond-traits.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: bridge-nft
@@ -231,7 +231,7 @@ plan:
         cost: 50000
         path: contracts/cross-chain/bridge-nft.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: btc-adapter
@@ -239,7 +239,7 @@ plan:
         cost: 50000
         path: contracts/interfaces/btc-adapter.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: defi-traits
@@ -247,7 +247,7 @@ plan:
         cost: 50000
         path: contracts/traits/defi-traits.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: chainlink-adapter
@@ -255,7 +255,7 @@ plan:
         cost: 50000
         path: contracts/integrations/chainlink-adapter.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: circuit-breaker
@@ -263,7 +263,7 @@ plan:
         cost: 50000
         path: contracts/security/circuit-breaker.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: clarity-bitcoin
@@ -271,7 +271,7 @@ plan:
         cost: 50000
         path: contracts/lib/clarity-bitcoin.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: collateral-manager
@@ -279,7 +279,7 @@ plan:
         cost: 50000
         path: contracts/core/collateral-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: conxian-protocol
@@ -287,7 +287,7 @@ plan:
         cost: 50000
         path: contracts/core/conxian-protocol.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: collateral-orchestrator
@@ -295,7 +295,7 @@ plan:
         cost: 50000
         path: contracts/core/collateral-orchestrator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: community-dao
@@ -303,7 +303,7 @@ plan:
         cost: 50000
         path: contracts/governance/community-dao.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: community-governance-token
@@ -311,7 +311,7 @@ plan:
         cost: 50000
         path: contracts/governance/community-governance-token.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: compliance-manager
@@ -319,7 +319,7 @@ plan:
         cost: 50000
         path: contracts/compliance/compliance-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: kyc-registry
@@ -327,7 +327,7 @@ plan:
         cost: 50000
         path: contracts/identity/kyc-registry.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: compliance-hooks
@@ -335,7 +335,7 @@ plan:
         cost: 50000
         path: contracts/compliance/compliance-hooks.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: compliance-trait
@@ -343,7 +343,7 @@ plan:
         cost: 50000
         path: contracts/compliance/compliance-trait.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: concentrated-math
@@ -351,7 +351,7 @@ plan:
         cost: 50000
         path: contracts/math/concentrated-math.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: controller-traits
@@ -359,7 +359,7 @@ plan:
         cost: 50000
         path: contracts/traits/controller-traits.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: queue-traits
@@ -367,7 +367,7 @@ plan:
         cost: 50000
         path: contracts/traits/queue-traits.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: conxian-exit-queue
@@ -375,7 +375,7 @@ plan:
         cost: 50000
         path: contracts/core/conxian-exit-queue.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
   - id: 2
     transactions:
@@ -385,7 +385,7 @@ plan:
         cost: 50000
         path: contracts/security/conxian-insurance-fund.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: conxian-intent-trait
@@ -393,7 +393,7 @@ plan:
         cost: 50000
         path: contracts/traits/conxian-intent-trait.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: conxian-paas-factory
@@ -401,7 +401,7 @@ plan:
         cost: 50000
         path: contracts/core/conxian-paas-factory.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: conxian-service-trait
@@ -409,7 +409,7 @@ plan:
         cost: 50000
         path: contracts/traits/conxian-service-trait.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: vault-traits
@@ -417,7 +417,7 @@ plan:
         cost: 50000
         path: contracts/traits/vault-traits.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: conxian-vaults
@@ -425,7 +425,7 @@ plan:
         cost: 50000
         path: contracts/treasury/conxian-vaults.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: cross-chain-traits
@@ -433,7 +433,7 @@ plan:
         cost: 50000
         path: contracts/traits/cross-chain-traits.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: cross-protocol-integrator
@@ -441,7 +441,7 @@ plan:
         cost: 50000
         path: contracts/yield/cross-protocol-integrator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: custody
@@ -449,7 +449,7 @@ plan:
         cost: 50000
         path: contracts/vaults/custody.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: cxd-bonding-curve-amm
@@ -457,7 +457,7 @@ plan:
         cost: 50000
         path: contracts/bonding/cxd-bonding-curve-amm.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: cxd-price-initializer
@@ -465,7 +465,7 @@ plan:
         cost: 50000
         path: contracts/tokens/cxd-price-initializer.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: cxd-staking
@@ -473,7 +473,7 @@ plan:
         cost: 50000
         path: contracts/yield/cxd-staking.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: cxd-treasury
@@ -481,7 +481,7 @@ plan:
         cost: 50000
         path: contracts/treasury/cxd-treasury.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: cxlp-token
@@ -489,7 +489,7 @@ plan:
         cost: 50000
         path: contracts/tokens/cxlp-token.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: cxvg-token
@@ -497,7 +497,7 @@ plan:
         cost: 50000
         path: contracts/tokens/cxvg-token.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: dao-treasury
@@ -505,7 +505,7 @@ plan:
         cost: 50000
         path: contracts/governance/dao-treasury.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: default-strategy-engine
@@ -513,7 +513,7 @@ plan:
         cost: 50000
         path: contracts/rewards/default-strategy-engine.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: dex-factory
@@ -521,7 +521,7 @@ plan:
         cost: 50000
         path: contracts/dex/dex-factory.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: dex-facade
@@ -529,7 +529,7 @@ plan:
         cost: 50000
         path: contracts/dex/dex-facade.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: dia-oracle-adapter
@@ -537,7 +537,7 @@ plan:
         cost: 50000
         path: contracts/integrations/dia-oracle-adapter.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: dim-oracle-automation
@@ -545,7 +545,7 @@ plan:
         cost: 50000
         path: contracts/dimensional/dim-oracle-automation.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: enhanced-circuit-breaker
@@ -553,7 +553,7 @@ plan:
         cost: 50000
         path: contracts/security/enhanced-circuit-breaker.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: dimensional-core
@@ -561,7 +561,7 @@ plan:
         cost: 50000
         path: contracts/dimensional/dimensional-core.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: dimensional-engine
@@ -569,7 +569,7 @@ plan:
         cost: 50000
         path: contracts/core/dimensional-engine.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: dimensional-engine-interface
@@ -577,7 +577,7 @@ plan:
         cost: 50000
         path: contracts/interfaces/dimensional-engine-interface.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
   - id: 3
     transactions:
@@ -587,7 +587,7 @@ plan:
         cost: 50000
         path: contracts/oracle/dimensional-oracle.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: dimensional-traits
@@ -595,7 +595,7 @@ plan:
         cost: 50000
         path: contracts/traits/dimensional-traits.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: dlc-bond
@@ -603,7 +603,7 @@ plan:
         cost: 50000
         path: contracts/sbtc/dlc-bond.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: dlc-manager
@@ -611,7 +611,7 @@ plan:
         cost: 50000
         path: contracts/sbtc/dlc-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: dlc-orchestrator
@@ -619,7 +619,7 @@ plan:
         cost: 50000
         path: contracts/sbtc/dlc-orchestrator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: stacking-traits
@@ -627,7 +627,7 @@ plan:
         cost: 50000
         path: contracts/traits/stacking-traits.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: dual-stacking-orchestrator
@@ -635,7 +635,7 @@ plan:
         cost: 50000
         path: contracts/staking/dual-stacking-orchestrator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: early-lp-rewards
@@ -643,7 +643,7 @@ plan:
         cost: 50000
         path: contracts/rewards/early-lp-rewards.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: economic-policy-engine
@@ -651,7 +651,7 @@ plan:
         cost: 50000
         path: contracts/core/economic-policy-engine.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: pausable-trait
@@ -659,7 +659,7 @@ plan:
         cost: 50000
         path: contracts/traits/pausable-trait.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: emergency-governance
@@ -667,7 +667,7 @@ plan:
         cost: 50000
         path: contracts/governance/emergency-governance.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: encoding
@@ -675,7 +675,7 @@ plan:
         cost: 50000
         path: contracts/utils/encoding.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: enhanced-governance-nft
@@ -683,7 +683,7 @@ plan:
         cost: 50000
         path: contracts/governance/enhanced-governance-nft.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: enhanced-yield-strategy
@@ -691,7 +691,7 @@ plan:
         cost: 50000
         path: contracts/yield/enhanced-yield-strategy.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: enterprise-api
@@ -699,7 +699,7 @@ plan:
         cost: 50000
         path: contracts/enterprise/enterprise-api.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: enterprise-facade
@@ -707,7 +707,7 @@ plan:
         cost: 50000
         path: contracts/enterprise/enterprise-facade.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: enterprise-traits
@@ -715,7 +715,7 @@ plan:
         cost: 50000
         path: contracts/traits/enterprise-traits.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: exponentiation
@@ -723,7 +723,7 @@ plan:
         cost: 50000
         path: contracts/math/exponentiation.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: external-oracle-adapter
@@ -731,7 +731,7 @@ plan:
         cost: 50000
         path: contracts/oracle/external-oracle-adapter.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: federated-oracle-adapter
@@ -739,7 +739,7 @@ plan:
         cost: 50000
         path: contracts/oracle/federated-oracle-adapter.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: fee-manager
@@ -747,7 +747,7 @@ plan:
         cost: 50000
         path: contracts/vaults/fee-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: fee-orchestrator
@@ -755,7 +755,7 @@ plan:
         cost: 50000
         path: contracts/vaults/fee-orchestrator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: finance-metrics
@@ -763,7 +763,7 @@ plan:
         cost: 50000
         path: contracts/monitoring/finance-metrics.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: fiscal-intelligence
@@ -771,7 +771,7 @@ plan:
         cost: 50000
         path: contracts/agents/fiscal-intelligence.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: fiscal-orchestrator
@@ -779,7 +779,7 @@ plan:
         cost: 50000
         path: contracts/agents/fiscal-orchestrator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
   - id: 4
     transactions:
@@ -789,7 +789,7 @@ plan:
         cost: 50000
         path: contracts/treasury/fiscal-vault-oracle.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: founder-vault
@@ -797,7 +797,7 @@ plan:
         cost: 50000
         path: contracts/treasury/founder-vault.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: founder-vesting
@@ -805,7 +805,7 @@ plan:
         cost: 50000
         path: contracts/core/founder-vesting.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: funding-rate-calculator
@@ -813,7 +813,7 @@ plan:
         cost: 50000
         path: contracts/core/funding-rate-calculator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: gamification-manager
@@ -821,7 +821,7 @@ plan:
         cost: 50000
         path: contracts/governance/gamification-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: gauge-manager
@@ -829,7 +829,7 @@ plan:
         cost: 50000
         path: contracts/governance/gauge-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: gauge-orchestrator
@@ -837,7 +837,7 @@ plan:
         cost: 50000
         path: contracts/governance/gauge-orchestrator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: governance
@@ -845,7 +845,7 @@ plan:
         cost: 50000
         path: contracts/dimensional/governance.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: governance-handover
@@ -853,7 +853,7 @@ plan:
         cost: 50000
         path: contracts/governance/governance-handover.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: governance-signature-verifier
@@ -861,7 +861,7 @@ plan:
         cost: 50000
         path: contracts/governance/governance-signature-verifier.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: governance-token
@@ -869,7 +869,7 @@ plan:
         cost: 50000
         path: contracts/governance-token.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: governance-traits
@@ -877,7 +877,7 @@ plan:
         cost: 50000
         path: contracts/traits/governance-traits.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: ico-offering
@@ -885,7 +885,7 @@ plan:
         cost: 50000
         path: contracts/governance/ico-offering.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: identity-badge
@@ -893,7 +893,7 @@ plan:
         cost: 50000
         path: contracts/identity/identity-badge.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: insurance-protection-nft
@@ -901,7 +901,7 @@ plan:
         cost: 50000
         path: contracts/insurance/insurance-protection-nft.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: oracle-aggregator
@@ -909,7 +909,7 @@ plan:
         cost: 50000
         path: contracts/oracle/oracle-aggregator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: swap-router
@@ -917,7 +917,7 @@ plan:
         cost: 50000
         path: contracts/dex/swap-router.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: revenue-distributor
@@ -925,7 +925,7 @@ plan:
         cost: 50000
         path: contracts/treasury/revenue-distributor.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: intent-solver-gateway
@@ -933,7 +933,7 @@ plan:
         cost: 50000
         path: contracts/gateway/intent-solver-gateway.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: interest-rate-model
@@ -941,7 +941,7 @@ plan:
         cost: 50000
         path: contracts/lending/interest-rate-model.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: jurisdictional-sharding
@@ -949,7 +949,7 @@ plan:
         cost: 50000
         path: contracts/compliance/jurisdictional-sharding.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: migration-orchestrator
@@ -957,7 +957,7 @@ plan:
         cost: 50000
         path: contracts/migration/migration-orchestrator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
   - id: 5
     transactions:
@@ -967,7 +967,7 @@ plan:
         cost: 50000
         path: contracts/migration/legacy-adapter.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: legal-representative-registry
@@ -975,7 +975,7 @@ plan:
         cost: 50000
         path: contracts/governance/legal-representative-registry.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: revenue-automation
@@ -983,7 +983,7 @@ plan:
         cost: 50000
         path: contracts/treasury/revenue-automation.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: lending-manager
@@ -991,7 +991,7 @@ plan:
         cost: 50000
         path: contracts/lending/lending-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: lending-orchestrator
@@ -999,7 +999,7 @@ plan:
         cost: 50000
         path: contracts/lending/lending-orchestrator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: lending-protocol-governance
@@ -1007,7 +1007,7 @@ plan:
         cost: 50000
         path: contracts/governance/lending-protocol-governance.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: twap-oracle
@@ -1015,7 +1015,7 @@ plan:
         cost: 50000
         path: contracts/integrations/twap-oracle.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: oracle
@@ -1023,7 +1023,7 @@ plan:
         cost: 50000
         path: contracts/dex/oracle.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: liquidity-manager
@@ -1031,7 +1031,7 @@ plan:
         cost: 50000
         path: contracts/dex/liquidity-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: liquidity-optimization-engine
@@ -1039,7 +1039,7 @@ plan:
         cost: 50000
         path: contracts/dex/liquidity-optimization-engine.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: liquidity-provider
@@ -1047,7 +1047,7 @@ plan:
         cost: 50000
         path: contracts/dex/liquidity-provider.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: math-utilities
@@ -1055,7 +1055,7 @@ plan:
         cost: 50000
         path: contracts/math/math-utilities.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: memory-pool-management
@@ -1063,7 +1063,7 @@ plan:
         cost: 50000
         path: contracts/dex/memory-pool-management.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: mev-protection-nft
@@ -1071,7 +1071,7 @@ plan:
         cost: 50000
         path: contracts/mev/mev-protection-nft.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: mev-protector
@@ -1079,7 +1079,7 @@ plan:
         cost: 50000
         path: contracts/security/mev-protector.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: migration-manager
@@ -1087,7 +1087,7 @@ plan:
         cost: 50000
         path: contracts/migration/migration-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
   - id: 6
     transactions:
@@ -1097,7 +1097,7 @@ plan:
         cost: 50000
         path: contracts/monitoring/monitoring-dashboard.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: nakamoto-compatibility
@@ -1105,7 +1105,7 @@ plan:
         cost: 50000
         path: contracts/utils/nakamoto-compatibility.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: nakamoto-constants
@@ -1113,7 +1113,7 @@ plan:
         cost: 50000
         path: contracts/constants/nakamoto-constants.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: native-stacking-operator
@@ -1121,7 +1121,7 @@ plan:
         cost: 50000
         path: contracts/staking/native-stacking-operator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: nft-marketplace
@@ -1129,7 +1129,7 @@ plan:
         cost: 50000
         path: contracts/marketplace/nft-marketplace.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: office-manager
@@ -1137,7 +1137,7 @@ plan:
         cost: 50000
         path: contracts/core/office-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: office-orchestrator
@@ -1145,7 +1145,7 @@ plan:
         cost: 50000
         path: contracts/core/office-orchestrator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: opex-vault
@@ -1153,7 +1153,7 @@ plan:
         cost: 50000
         path: contracts/treasury/opex-vault.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: ops-engine
@@ -1161,7 +1161,7 @@ plan:
         cost: 50000
         path: contracts/core/ops-engine.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: ops-loan-manager
@@ -1169,7 +1169,7 @@ plan:
         cost: 50000
         path: contracts/enterprise/ops-loan-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: optimization-helpers
@@ -1177,7 +1177,7 @@ plan:
         cost: 50000
         path: contracts/helpers/optimization-helpers.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: order-book
@@ -1185,7 +1185,7 @@ plan:
         cost: 50000
         path: contracts/orders/order-book.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: order-orchestrator
@@ -1193,7 +1193,7 @@ plan:
         cost: 50000
         path: contracts/enterprise/order-orchestrator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: pausable
@@ -1201,7 +1201,7 @@ plan:
         cost: 50000
         path: contracts/base/pausable.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: payment-forge
@@ -1209,7 +1209,7 @@ plan:
         cost: 50000
         path: contracts/agents/payment-forge.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: performance-optimizer
@@ -1217,7 +1217,7 @@ plan:
         cost: 50000
         path: contracts/performance/performance-optimizer.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: points-oracle
@@ -1225,7 +1225,7 @@ plan:
         cost: 50000
         path: contracts/oracle/points-oracle.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: pool-factory
@@ -1233,7 +1233,7 @@ plan:
         cost: 50000
         path: contracts/pools/pool-factory.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: pool-registry
@@ -1241,7 +1241,7 @@ plan:
         cost: 50000
         path: contracts/pools/pool-registry.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: pool-template
@@ -1249,7 +1249,7 @@ plan:
         cost: 50000
         path: contracts/dex/pool-template.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: position-factory
@@ -1257,7 +1257,7 @@ plan:
         cost: 50000
         path: contracts/position-factory.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: position-factory-root
@@ -1265,7 +1265,7 @@ plan:
         cost: 50000
         path: contracts/mev/position-factory-root.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: position-manager
@@ -1273,7 +1273,7 @@ plan:
         cost: 50000
         path: contracts/core/position-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
   - id: 7
     transactions:
@@ -1283,7 +1283,7 @@ plan:
         cost: 50000
         path: contracts/dimensional/position-nft.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: position-orchestrator
@@ -1291,7 +1291,7 @@ plan:
         cost: 50000
         path: contracts/core/position-orchestrator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: predictive-scaling-system
@@ -1299,7 +1299,7 @@ plan:
         cost: 50000
         path: contracts/dex/predictive-scaling-system.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: price-stability-monitor
@@ -1307,7 +1307,7 @@ plan:
         cost: 50000
         path: contracts/monitoring/price-stability-monitor.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: proof-of-reserves
@@ -1315,7 +1315,7 @@ plan:
         cost: 50000
         path: contracts/security/proof-of-reserves.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: proposal-registry
@@ -1323,7 +1323,7 @@ plan:
         cost: 50000
         path: contracts/governance/proposal-registry.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: proposal-executor
@@ -1331,7 +1331,7 @@ plan:
         cost: 50000
         path: contracts/governance/proposal-executor.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: reputation-engine
@@ -1339,7 +1339,7 @@ plan:
         cost: 50000
         path: contracts/governance/reputation-engine.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: proposal-engine
@@ -1347,7 +1347,7 @@ plan:
         cost: 50000
         path: contracts/governance/proposal-engine.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: proposal-engine-trait
@@ -1355,7 +1355,7 @@ plan:
         cost: 50000
         path: contracts/governance/proposal-engine-trait.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: protocol-invariant-monitor
@@ -1363,7 +1363,7 @@ plan:
         cost: 50000
         path: contracts/dex/protocol-invariant-monitor.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: pyth-traits
@@ -1371,7 +1371,7 @@ plan:
         cost: 50000
         path: contracts/traits/pyth-traits.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: pyth-oracle-v4
@@ -1379,7 +1379,7 @@ plan:
         cost: 50000
         path: contracts/oracle/pyth-oracle-v4.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: pyth-oracle-adapter
@@ -1387,7 +1387,7 @@ plan:
         cost: 50000
         path: contracts/oracle/pyth-oracle-adapter.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: rate-limiter
@@ -1395,7 +1395,7 @@ plan:
         cost: 50000
         path: contracts/security/rate-limiter.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: rbac
@@ -1403,7 +1403,7 @@ plan:
         cost: 50000
         path: contracts/utils/rbac.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: rebalancing-rules
@@ -1411,7 +1411,7 @@ plan:
         cost: 50000
         path: contracts/dex/rebalancing-rules.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: redstone-traits
@@ -1419,7 +1419,7 @@ plan:
         cost: 50000
         path: contracts/traits/redstone-traits.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: redstone-oracle-adapter
@@ -1427,7 +1427,7 @@ plan:
         cost: 50000
         path: contracts/integrations/redstone-oracle-adapter.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: referral-aggregator
@@ -1435,7 +1435,7 @@ plan:
         cost: 50000
         path: contracts/treasury/referral-aggregator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: reputation-orchestrator
@@ -1443,7 +1443,7 @@ plan:
         cost: 50000
         path: contracts/governance/reputation-orchestrator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: risk-unit
@@ -1451,7 +1451,7 @@ plan:
         cost: 50000
         path: contracts/core/risk-unit.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: risk-manager
@@ -1459,7 +1459,7 @@ plan:
         cost: 50000
         path: contracts/core/risk-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: route-manager
@@ -1467,7 +1467,7 @@ plan:
         cost: 50000
         path: contracts/dex/route-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: sab-election
@@ -1475,7 +1475,7 @@ plan:
         cost: 50000
         path: contracts/governance/sab-election.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
   - id: 8
     transactions:
@@ -1485,7 +1485,7 @@ plan:
         cost: 50000
         path: contracts/vaults/sbtc-vault.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: self-launch-coordinator
@@ -1493,7 +1493,7 @@ plan:
         cost: 50000
         path: contracts/core/self-launch-coordinator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: signed-data-base
@@ -1501,7 +1501,7 @@ plan:
         cost: 50000
         path: contracts/governance/signed-data-base.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: swap-aggregator
@@ -1509,7 +1509,7 @@ plan:
         cost: 50000
         path: contracts/dex/swap-aggregator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: swap-manager
@@ -1517,7 +1517,7 @@ plan:
         cost: 50000
         path: contracts/dex/swap-manager.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: switchboard-oracle-adapter
@@ -1525,7 +1525,7 @@ plan:
         cost: 50000
         path: contracts/integrations/switchboard-oracle-adapter.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: symmetry-governor
@@ -1533,7 +1533,7 @@ plan:
         cost: 50000
         path: contracts/governance/symmetry-governor.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: tableland-sync
@@ -1541,7 +1541,7 @@ plan:
         cost: 50000
         path: contracts/monitoring/tableland-sync.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: timelock
@@ -1549,7 +1549,7 @@ plan:
         cost: 50000
         path: contracts/governance/timelock.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: token-emission-controller
@@ -1557,7 +1557,7 @@ plan:
         cost: 50000
         path: contracts/yield/token-emission-controller.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: token-system-coordinator
@@ -1565,7 +1565,7 @@ plan:
         cost: 50000
         path: contracts/tokens/token-system-coordinator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: travel-rule-service
@@ -1573,7 +1573,7 @@ plan:
         cost: 50000
         path: contracts/compliance/travel-rule-service.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: treasury-governance
@@ -1581,7 +1581,7 @@ plan:
         cost: 50000
         path: contracts/governance/treasury-governance.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: upgrade-controller
@@ -1589,7 +1589,7 @@ plan:
         cost: 50000
         path: contracts/governance/upgrade-controller.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: vault
@@ -1597,7 +1597,7 @@ plan:
         cost: 50000
         path: contracts/dex/vault.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: voting
@@ -1605,7 +1605,7 @@ plan:
         cost: 50000
         path: contracts/governance/voting.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: wormhole-handlers
@@ -1613,7 +1613,7 @@ plan:
         cost: 50000
         path: contracts/interoperability/wormhole-handlers.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: wormhole-inbox
@@ -1621,7 +1621,7 @@ plan:
         cost: 50000
         path: contracts/interoperability/wormhole-inbox.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: wormhole-outbox
@@ -1629,7 +1629,7 @@ plan:
         cost: 50000
         path: contracts/interoperability/wormhole-outbox.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: yield-aggregator
@@ -1637,7 +1637,7 @@ plan:
         cost: 50000
         path: contracts/vaults/yield-aggregator.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: yield-governance
@@ -1645,7 +1645,7 @@ plan:
         cost: 50000
         path: contracts/governance/yield-governance.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: yield-optimizer
@@ -1653,7 +1653,7 @@ plan:
         cost: 50000
         path: contracts/yield/yield-optimizer.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
     - contract-publish:
         contract-name: zkml-verifier
@@ -1661,7 +1661,7 @@ plan:
         cost: 50000
         path: contracts/compliance/zkml-verifier.clar
         anchor-block-only: true
-        clarity-version: 1
+        clarity-version: 4
         epoch: 3.0
   - id: 9
     transactions:
@@ -1671,7 +1671,7 @@ plan:
         cost: 50000
         path: contracts/governance/community-voting-engine.clar
         anchor-block-only: true
-        clarity-version: 3
+        clarity-version: 4
         epoch: 3.0
   - id: 10
     transactions:

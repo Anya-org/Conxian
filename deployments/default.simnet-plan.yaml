@@ -453,12 +453,12 @@ plan:
       contract-name: stacking-traits
       emulated-sender: ST2AV1NAVB9BF83655KAG5PSQBFMK60R76QGBA0CF
       path: contracts/traits/stacking-traits.clar
-      clarity-version: 1
+      clarity-version: 4
     - transaction-type: emulated-contract-publish
       contract-name: dual-stacking-orchestrator
       emulated-sender: ST2AV1NAVB9BF83655KAG5PSQBFMK60R76QGBA0CF
       path: contracts/staking/dual-stacking-orchestrator.clar
-      clarity-version: 1
+      clarity-version: 4
     - transaction-type: emulated-contract-publish
       contract-name: early-lp-rewards
       emulated-sender: ST2AV1NAVB9BF83655KAG5PSQBFMK60R76QGBA0CF
@@ -832,7 +832,7 @@ plan:
       contract-name: native-stacking-operator
       emulated-sender: ST2AV1NAVB9BF83655KAG5PSQBFMK60R76QGBA0CF
       path: contracts/staking/native-stacking-operator.clar
-      clarity-version: 1
+      clarity-version: 4
     - transaction-type: emulated-contract-publish
       contract-name: nft-marketplace
       emulated-sender: ST2AV1NAVB9BF83655KAG5PSQBFMK60R76QGBA0CF

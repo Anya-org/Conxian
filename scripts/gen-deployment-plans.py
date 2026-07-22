@@ -3,6 +3,7 @@
 import argparse
 from pathlib import Path
 import tempfile
+import tomllib
 
 import yaml
 
@@ -10,6 +11,7 @@ DEPLOYER = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
 TEST_HELPERS = {
     "mock-circuit-breaker", "mock-csf-protocol",
     "mock-pox-adapter", "mock-proposal", "mock-regulatory-adapter",
+    "mock-pox-adapter-2", "mock-settlement-intermediary",
     "mock-reward-token", "mock-stacking-adapter", "mock-stacking-adapter-2",
     "mock-token", "test-c4-helper",
 }
@@ -21,6 +23,12 @@ RELEASE_PLAN_EXCLUSIONS = {
     "integration-fee-trait", "integration-registry", "alex-reserve-pool",
     "alex-swap-helper", "alex-adapter", "bns-stub", "math-lib-concentrated",
     "oracle-adapter-stub", "integration-fee-collector",
+}
+
+ISSUE_501_CONTRACTS = {
+    "stacking-traits",
+    "native-stacking-operator",
+    "dual-stacking-orchestrator",
 }
 
 COST_TESTNET = 20000
@@ -88,7 +96,18 @@ def load_simnet_plan(path):
         return yaml.safe_load(f)
 
 
-def extract_contracts(simnet):
+def load_manifest_clarity_versions(path):
+    """Load contract clarity versions from the active Clarinet manifest."""
+    with path.open("rb") as f:
+        manifest = tomllib.load(f)
+    return {
+        name: int(config["clarity-version"])
+        for name, config in manifest.get("contracts", {}).items()
+        if "clarity-version" in config
+    }
+
+
+def extract_contracts(simnet, manifest_clarity_versions):
     """Extract contract-publish transactions, filtering out test helpers."""
     contracts = []
     seen = set()
@@ -105,15 +124,35 @@ def extract_contracts(simnet):
             if name in seen:
                 print(f"WARNING: duplicate contract {name}, skipping")
                 continue
+            if name not in manifest_clarity_versions:
+                raise ValueError(f"{name} is missing from Clarinet.toml")
             seen.add(name)
             batch_contracts.append({
                 "contract-name": name,
                 "path": tx["path"],
-                "clarity-version": tx.get("clarity-version", 4),
+                "clarity-version": manifest_clarity_versions[name],
             })
         if batch_contracts:
             contracts.append(batch_contracts)
     return contracts
+
+
+def assert_issue_501_clarity_versions(contracts):
+    """Fail closed if the issue-501 production entries are not Clarity 4."""
+    versions = {
+        contract["contract-name"]: contract["clarity-version"]
+        for batch in contracts
+        for contract in batch
+        if contract["contract-name"] in ISSUE_501_CONTRACTS
+    }
+    missing = ISSUE_501_CONTRACTS - versions.keys()
+    if missing:
+        raise ValueError("Missing issue-501 contracts: " + ", ".join(sorted(missing)))
+    invalid = {
+        name: version for name, version in versions.items() if version != 4
+    }
+    if invalid:
+        raise ValueError(f"Issue-501 contracts must use Clarity 4: {invalid}")
 
 
 def make_plan(contracts, network, name, stacks_node, cost):
@@ -168,7 +207,10 @@ def save_plan(plan, path):
 def generate_plans(simnet_path, output_dir):
     """Generate the release plans into ``output_dir`` and return their paths."""
     simnet = load_simnet_plan(simnet_path)
-    contracts = extract_contracts(simnet)
+    repo_root = Path(__file__).resolve().parent.parent
+    manifest_clarity_versions = load_manifest_clarity_versions(repo_root / "Clarinet.toml")
+    contracts = extract_contracts(simnet, manifest_clarity_versions)
+    assert_issue_501_clarity_versions(contracts)
 
     total = sum(len(b) for b in contracts)
     print(f"Extracted {total} production contracts in {len(contracts)} batches")

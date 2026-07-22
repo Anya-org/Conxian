@@ -7,6 +7,8 @@ const OPERATOR = "native-stacking-operator";
 const TOKEN = "mock-token";
 const REWARD_TOKEN = "mock-reward-token";
 const POX_ADAPTER = "mock-pox-adapter";
+const POX_ADAPTER_2 = "mock-pox-adapter-2";
+const INTERMEDIARY = "mock-settlement-intermediary";
 const STACKING_ADAPTER = "mock-stacking-adapter";
 const STACKING_ADAPTER_2 = "mock-stacking-adapter-2";
 
@@ -37,11 +39,17 @@ describe("dual stacking and delegated native operator", () => {
   let wallet3: string;
   let wallet4: string;
   let poxAdapter: any;
+  let poxAdapter2: any;
+  let intermediary: any;
   let stackingAdapter: any;
   let stackingAdapter2: any;
   let token: any;
   let rewardToken: any;
   let operator: any;
+  let commit1: number;
+  let commit2: number;
+  let commit3: number;
+  let commit4: number;
 
   beforeAll(() => {
     const accounts = simnet.getAccounts();
@@ -52,6 +60,8 @@ describe("dual stacking and delegated native operator", () => {
     wallet4 = accounts.get("wallet_4") ?? deployer;
 
     poxAdapter = contract(deployer, POX_ADAPTER);
+    poxAdapter2 = contract(deployer, POX_ADAPTER_2);
+    intermediary = contract(deployer, INTERMEDIARY);
     stackingAdapter = contract(deployer, STACKING_ADAPTER);
     stackingAdapter2 = contract(deployer, STACKING_ADAPTER_2);
     token = contract(deployer, TOKEN);
@@ -117,6 +127,8 @@ describe("dual stacking and delegated native operator", () => {
       .toEqual(Cl.error(Cl.uint(1133)));
     expect(simnet.callPublicFn(OPERATOR, "set-orchestrator", [Cl.principal(wallet4)], deployer).result)
       .toEqual(Cl.ok(Cl.bool(true)));
+    expect(tupleValue(simnet.callReadOnlyFn(OPERATOR, "get-config", [], deployer).result).orchestrator.value)
+      .toBe(wallet4);
     expect(simnet.callPublicFn(ORCHESTRATOR, "set-native-operator", [operator], deployer).result)
       .toEqual(Cl.error(Cl.uint(1124)));
     expect(simnet.callPublicFn(
@@ -149,6 +161,64 @@ describe("dual stacking and delegated native operator", () => {
       .toBe(3000);
     expect(tupleUint(simnet.callReadOnlyFn(ORCHESTRATOR, "get-adapter", [stackingAdapter2], deployer).result, "max-exposure"))
       .toBe(200);
+
+    // The intermediary is temporarily authoritative before any commit is
+    // bound. A later failure must roll back the operator's consumed proof.
+    expect(simnet.callPublicFn(OPERATOR, "set-orchestrator", [intermediary], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    const intermediaryCommit = registerCommit(wallet3, 10, 1, 9);
+    const intermediaryCommitData = simnet.callReadOnlyFn(
+      OPERATOR,
+      "get-commit",
+      [Cl.uint(intermediaryCommit)],
+      deployer,
+    ).result;
+    expect(simnet.callPublicFn(
+      INTERMEDIARY,
+      "attempt-bind-commit",
+      [operator, Cl.uint(intermediaryCommit)],
+      wallet3,
+    ).result.type).toBe("ok");
+    expect(simnet.callPublicFn(OPERATOR, "set-orchestrator", [contract(deployer, ORCHESTRATOR)], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    mineTo(tupleUint(intermediaryCommitData, "unlock-height"));
+    expect(simnet.callPublicFn(
+      INTERMEDIARY,
+      "finalize-commit",
+      [operator, Cl.uint(intermediaryCommit), poxAdapter],
+      wallet3,
+    ).result.type)
+      .toBe("ok");
+    expect(simnet.callPublicFn(
+      OPERATOR,
+      "record-btc-settlement",
+      [Cl.uint(intermediaryCommit), Cl.uint(7), proof(90)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(
+      INTERMEDIARY,
+      "attempt-bind-btc",
+      [operator, Cl.uint(intermediaryCommit), proof(90), Cl.uint(7)],
+      wallet3,
+    ).result).toEqual(Cl.error(Cl.uint(9300)));
+    expect(Cl.prettyPrint(simnet.callReadOnlyFn(OPERATOR, "get-btc-settlement", [proof(90)], deployer).result))
+      .toContain("consumed: false");
+    expect(simnet.callPublicFn(
+      INTERMEDIARY,
+      "bind-btc",
+      [operator, Cl.uint(intermediaryCommit), proof(90), Cl.uint(7)],
+      wallet3,
+    ).result.type).toBe("ok");
+    expect(Cl.prettyPrint(simnet.callReadOnlyFn(OPERATOR, "get-btc-settlement", [proof(90)], deployer).result))
+      .toContain("consumed: true");
+    expect(simnet.callPublicFn(OPERATOR, "revoke-delegation", [poxAdapter], wallet3).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(
+      OPERATOR,
+      "set-orchestrator",
+      [contract(deployer, ORCHESTRATOR)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
   });
 
   function registerCommit(user: string, amount: number, lockPeriod: number, byte: number): number {
@@ -169,7 +239,16 @@ describe("dual stacking and delegated native operator", () => {
   }
 
   it("binds unique authoritative commits and separates native/STX exposure", () => {
-    const commit1 = registerCommit(wallet1, 40, 100, 1);
+    commit1 = registerCommit(wallet1, 40, 100, 1);
+
+    expect(simnet.callPublicFn(OPERATOR, "bind-commit", [Cl.uint(commit1)], wallet1).result)
+      .toEqual(Cl.error(Cl.uint(1021)));
+    expect(simnet.callPublicFn(
+      INTERMEDIARY,
+      "attempt-bind-commit",
+      [operator, Cl.uint(commit1)],
+      wallet1,
+    ).result).toEqual(Cl.error(Cl.uint(1021)));
 
     expect(simnet.callPublicFn(
       ORCHESTRATOR,
@@ -190,6 +269,20 @@ describe("dual stacking and delegated native operator", () => {
       [stackingAdapter, Cl.uint(10), token, operator, Cl.uint(commit1)],
       wallet1,
     ).result).toEqual(Cl.ok(Cl.uint(1)));
+    expect(Cl.prettyPrint(simnet.callReadOnlyFn(ORCHESTRATOR, "get-position", [Cl.uint(1)], deployer).result))
+      .toContain("pox-adapter:");
+    expect(simnet.callPublicFn(OPERATOR, "set-orchestrator", [Cl.principal(wallet4)], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(
+      OPERATOR,
+      "set-orchestrator",
+      [contract(deployer, ORCHESTRATOR)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "set-native-token", [rewardToken], deployer).result)
+      .toEqual(Cl.error(Cl.uint(1134)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "set-reward-token", [token], deployer).result)
+      .toEqual(Cl.error(Cl.uint(1134)));
     expect(simnet.callPublicFn(
       ORCHESTRATOR,
       "open-position",
@@ -197,7 +290,7 @@ describe("dual stacking and delegated native operator", () => {
       wallet1,
     ).result).toEqual(Cl.error(Cl.uint(1022)));
 
-    const commit2 = registerCommit(wallet2, 20, 100, 2);
+    commit2 = registerCommit(wallet2, 20, 100, 2);
     expect(simnet.callPublicFn(
       STACKING_ADAPTER_2,
       "set-config",
@@ -258,7 +351,7 @@ describe("dual stacking and delegated native operator", () => {
     expect(tupleUint(simnet.callReadOnlyFn(ORCHESTRATOR, "get-config", [], deployer).result, "total-stx-exposure"))
       .toBe(60);
 
-    const commit3 = registerCommit(wallet3, 20, 100, 3);
+    commit3 = registerCommit(wallet3, 20, 100, 3);
     expect(simnet.callPublicFn(
       ORCHESTRATOR,
       "open-position",
@@ -281,14 +374,14 @@ describe("dual stacking and delegated native operator", () => {
     expect(simnet.callPublicFn(
       ORCHESTRATOR,
       "open-position",
-      [stackingAdapter, Cl.uint(5), token, operator, Cl.uint(3)],
+      [stackingAdapter, Cl.uint(5), token, operator, Cl.uint(commit3)],
       wallet3,
     ).result).toEqual(Cl.error(Cl.uint(2)));
     expect(simnet.callReadOnlyFn(TOKEN, "get-balance", [Cl.principal(wallet3)], deployer).result)
       .toEqual(beforeBalance);
     expect(simnet.callReadOnlyFn(ORCHESTRATOR, "get-position", [Cl.uint(beforeNextPosition)], deployer).result)
       .toEqual(Cl.none());
-    expect(Cl.prettyPrint(simnet.callReadOnlyFn(OPERATOR, "get-commit", [Cl.uint(3)], deployer).result))
+    expect(Cl.prettyPrint(simnet.callReadOnlyFn(OPERATOR, "get-commit", [Cl.uint(commit3)], deployer).result))
       .toContain("bound: false");
     expect(simnet.callPublicFn(TOKEN, "set-fail-transfer", [Cl.bool(false)], deployer).result)
       .toEqual(Cl.ok(Cl.bool(true)));
@@ -298,12 +391,12 @@ describe("dual stacking and delegated native operator", () => {
     expect(simnet.callPublicFn(
       ORCHESTRATOR,
       "open-position",
-      [stackingAdapter, Cl.uint(5), token, operator, Cl.uint(3)],
+      [stackingAdapter, Cl.uint(5), token, operator, Cl.uint(commit3)],
       wallet3,
     ).result).toEqual(Cl.error(Cl.uint(9101)));
     expect(simnet.callReadOnlyFn(ORCHESTRATOR, "get-config", [], deployer).result)
       .toEqual(beforeConfig);
-    expect(Cl.prettyPrint(simnet.callReadOnlyFn(OPERATOR, "get-commit", [Cl.uint(3)], deployer).result))
+    expect(Cl.prettyPrint(simnet.callReadOnlyFn(OPERATOR, "get-commit", [Cl.uint(commit3)], deployer).result))
       .toContain("bound: false");
     expect(simnet.callPublicFn(STACKING_ADAPTER, "set-failures", [Cl.bool(false), Cl.bool(false), Cl.bool(false)], deployer).result)
       .toEqual(Cl.ok(Cl.bool(true)));
@@ -338,7 +431,7 @@ describe("dual stacking and delegated native operator", () => {
       [Cl.uint(2), Cl.uint(0), Cl.uint(10), Cl.uint(base)],
       deployer,
     ).result).toEqual(Cl.ok(Cl.bool(true)));
-    const commit4 = registerCommit(wallet4, 10, 3, 4);
+    commit4 = registerCommit(wallet4, 10, 3, 4);
     expect(simnet.callPublicFn(OPERATOR, "revoke-delegation", [poxAdapter], wallet4).result)
       .toEqual(Cl.error(Cl.uint(1009)));
     expect(simnet.callPublicFn(OPERATOR, "finalize-commit", [Cl.uint(commit4), poxAdapter], wallet4).result)
@@ -357,7 +450,12 @@ describe("dual stacking and delegated native operator", () => {
       .toEqual(Cl.error(Cl.uint(9001)));
     expect(Cl.prettyPrint(simnet.callReadOnlyFn(OPERATOR, "get-commit", [Cl.uint(commit4)], deployer).result))
       .toContain("state: u0");
-    expect(Cl.prettyPrint(simnet.callReadOnlyFn(POX_ADAPTER, "get-external-commit", [Cl.uint(1)], deployer).result))
+    expect(Cl.prettyPrint(simnet.callReadOnlyFn(
+      POX_ADAPTER,
+      "get-external-commit",
+      [Cl.uint(tupleUint(commit4Data, "external-commit-id"))],
+      deployer,
+    ).result))
       .toContain("state: u0");
 
     expect(simnet.callPublicFn(
@@ -383,11 +481,13 @@ describe("dual stacking and delegated native operator", () => {
     ).result).toEqual(Cl.ok(Cl.uint(100)));
     expect(tupleUint(simnet.callReadOnlyFn(ORCHESTRATOR, "get-cycle-snapshot", [Cl.uint(0)], deployer).result, "weight"))
       .toBe(30);
+    expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-reward-dust", [Cl.uint(0), rewardToken], deployer).result)
+      .toEqual(Cl.error(Cl.uint(1136)));
 
     expect(simnet.callPublicFn(
       ORCHESTRATOR,
       "open-position",
-      [stackingAdapter, Cl.uint(5), token, operator, Cl.uint(3)],
+      [stackingAdapter, Cl.uint(5), token, operator, Cl.uint(commit3)],
       wallet3,
     ).result).toEqual(Cl.error(Cl.uint(1129)));
 
@@ -403,20 +503,42 @@ describe("dual stacking and delegated native operator", () => {
       [Cl.uint(0), Cl.uint(1), rewardToken],
       deployer,
     ).result).toEqual(Cl.error(Cl.uint(1118)));
+    expect(simnet.callReadOnlyFn(
+      REWARD_TOKEN,
+      "get-balance",
+      [contract(deployer, ORCHESTRATOR)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.uint(1)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-reward-dust", [Cl.uint(0), rewardToken], deployer).result)
+      .toEqual(Cl.ok(Cl.uint(1)));
+    expect(simnet.callReadOnlyFn(
+      REWARD_TOKEN,
+      "get-balance",
+      [contract(deployer, ORCHESTRATOR)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.uint(0)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-reward-dust", [Cl.uint(0), rewardToken], deployer).result)
+      .toEqual(Cl.error(Cl.uint(1137)));
     expect(tupleUint(simnet.callReadOnlyFn(ORCHESTRATOR, "get-reward-pool", [Cl.uint(0), rewardToken], deployer).result, "claimed"))
       .toBe(99);
 
     simnet.mintSTX(deployer, 1_000n);
-    expect(simnet.callPublicFn(ORCHESTRATOR, "fund-stx-reward", [Cl.uint(0), Cl.uint(90)], deployer).result)
-      .toEqual(Cl.ok(Cl.uint(90)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "fund-stx-reward", [Cl.uint(0), Cl.uint(100)], deployer).result)
+      .toEqual(Cl.ok(Cl.uint(100)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-stx-reward-dust", [Cl.uint(0)], deployer).result)
+      .toEqual(Cl.error(Cl.uint(1136)));
     expect(simnet.callPublicFn(ORCHESTRATOR, "claim-stx-reward", [Cl.uint(1), Cl.uint(0)], wallet1).result)
-      .toEqual(Cl.ok(Cl.uint(30)));
+      .toEqual(Cl.ok(Cl.uint(33)));
     expect(simnet.callPublicFn(ORCHESTRATOR, "claim-stx-reward", [Cl.uint(2), Cl.uint(0)], wallet2).result)
-      .toEqual(Cl.ok(Cl.uint(60)));
+      .toEqual(Cl.ok(Cl.uint(66)));
     expect(simnet.callPublicFn(ORCHESTRATOR, "claim-stx-reward", [Cl.uint(2), Cl.uint(0)], wallet2).result)
       .toEqual(Cl.error(Cl.uint(1115)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-stx-reward-dust", [Cl.uint(0)], deployer).result)
+      .toEqual(Cl.ok(Cl.uint(1)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-stx-reward-dust", [Cl.uint(0)], deployer).result)
+      .toEqual(Cl.error(Cl.uint(1137)));
     expect(tupleUint(simnet.callReadOnlyFn(ORCHESTRATOR, "get-stx-reward-pool", [Cl.uint(0)], deployer).result, "claimed"))
-      .toBe(90);
+      .toBe(99);
   });
 
   it("requires authoritative PoX maturity before exit and decrements both exposure ledgers", () => {
@@ -472,6 +594,34 @@ describe("dual stacking and delegated native operator", () => {
       .toEqual(Cl.error(Cl.uint(1116)));
     expect(simnet.callPublicFn(ORCHESTRATOR, "set-liquid-reserve", [Cl.uint(0), Cl.uint(0), Cl.uint(0)], deployer).result)
       .toEqual(Cl.ok(Cl.bool(true)));
+    const beforeNativePosition = simnet.callReadOnlyFn(ORCHESTRATOR, "get-position", [Cl.uint(1)], deployer).result;
+    const beforeNativeConfig = simnet.callReadOnlyFn(ORCHESTRATOR, "get-config", [], deployer).result;
+    const beforeNativeCustody = simnet.callReadOnlyFn(
+      TOKEN,
+      "get-balance",
+      [contract(deployer, ORCHESTRATOR)],
+      deployer,
+    ).result;
+    expect(simnet.callPublicFn(TOKEN, "set-fail-transfer", [Cl.bool(true)], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "finalize-native-unstake", [Cl.uint(1), stackingAdapter, token], wallet1).result)
+      .toEqual(Cl.error(Cl.uint(2)));
+    expect(Cl.prettyPrint(simnet.callReadOnlyFn(STACKING_ADAPTER, "get-position", [Cl.uint(1)], deployer).result))
+      .toContain("status: u2");
+    expect(Cl.prettyPrint(simnet.callReadOnlyFn(ORCHESTRATOR, "get-position", [Cl.uint(1)], deployer).result))
+      .toContain("status: u1");
+    expect(simnet.callReadOnlyFn(ORCHESTRATOR, "get-config", [], deployer).result)
+      .toEqual(beforeNativeConfig);
+    expect(simnet.callReadOnlyFn(
+      TOKEN,
+      "get-balance",
+      [contract(deployer, ORCHESTRATOR)],
+      deployer,
+    ).result).toEqual(beforeNativeCustody);
+    expect(simnet.callPublicFn(TOKEN, "set-fail-transfer", [Cl.bool(false)], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callReadOnlyFn(ORCHESTRATOR, "get-position", [Cl.uint(1)], deployer).result)
+      .toEqual(beforeNativePosition);
     expect(simnet.callPublicFn(ORCHESTRATOR, "finalize-native-unstake", [Cl.uint(1), stackingAdapter, token], wallet1).result)
       .toEqual(Cl.ok(Cl.uint(10)));
     expect(simnet.callPublicFn(ORCHESTRATOR, "finalize-native-unstake", [Cl.uint(2), stackingAdapter2, token], wallet2).result)
@@ -488,13 +638,13 @@ describe("dual stacking and delegated native operator", () => {
     expect(simnet.callPublicFn(
       OPERATOR,
       "record-btc-settlement",
-      [Cl.uint(1), Cl.uint(12), proof(7)],
+      [Cl.uint(commit1), Cl.uint(12), proof(7)],
       deployer,
     ).result).toEqual(Cl.ok(Cl.bool(true)));
     expect(simnet.callPublicFn(
       OPERATOR,
       "record-btc-settlement",
-      [Cl.uint(2), Cl.uint(8), proof(8)],
+      [Cl.uint(commit2), Cl.uint(8), proof(8)],
       deployer,
     ).result).toEqual(Cl.ok(Cl.bool(true)));
 
@@ -532,7 +682,7 @@ describe("dual stacking and delegated native operator", () => {
     expect(simnet.callPublicFn(
       ORCHESTRATOR,
       "open-position",
-      [stackingAdapter, Cl.uint(5), token, operator, Cl.uint(3)],
+      [stackingAdapter, Cl.uint(5), token, operator, Cl.uint(commit3)],
       wallet3,
     ).result).toEqual(Cl.ok(Cl.uint(3)));
     expect(Cl.prettyPrint(simnet.callReadOnlyFn(ORCHESTRATOR, "get-position", [Cl.uint(3)], deployer).result))
@@ -543,12 +693,184 @@ describe("dual stacking and delegated native operator", () => {
       .toEqual(Cl.ok(Cl.bool(true)));
   });
 
+  it("keeps old PoX adapter bindings finalizable and settles zero-floor rewards", () => {
+    const position3 = simnet.callReadOnlyFn(ORCHESTRATOR, "get-position", [Cl.uint(3)], deployer).result;
+    expect(Cl.prettyPrint(position3)).toContain("pox-adapter:");
+    expect(simnet.callPublicFn(OPERATOR, "set-pox-adapter", [poxAdapter2], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(
+      ORCHESTRATOR,
+      "finalize-pox-exit",
+      [Cl.uint(3), operator, poxAdapter2],
+      wallet3,
+    ).result).toEqual(Cl.error(Cl.uint(1107)));
+    expect(Cl.prettyPrint(simnet.callReadOnlyFn(OPERATOR, "get-commit", [Cl.uint(commit3)], deployer).result))
+      .toContain("state: u0");
+    expect(simnet.callPublicFn(
+      ORCHESTRATOR,
+      "finalize-pox-exit",
+      [Cl.uint(3), operator, poxAdapter],
+      wallet3,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(OPERATOR, "set-pox-adapter", [poxAdapter], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(OPERATOR, "revoke-delegation", [poxAdapter], wallet3).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(simnet.callPublicFn(OPERATOR, "revoke-delegation", [poxAdapter], wallet1).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(OPERATOR, "revoke-delegation", [poxAdapter], wallet2).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    const base = currentBurnHeight();
+    expect(simnet.callPublicFn(
+      POX_ADAPTER,
+      "set-cycle",
+      [Cl.uint(3), Cl.uint(0), Cl.uint(10), Cl.uint(base)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    const cycle2Commit1 = registerCommit(wallet1, 10, 2, 31);
+    const cycle2Commit2 = registerCommit(wallet2, 20, 2, 32);
+    expect(simnet.callPublicFn(
+      ORCHESTRATOR,
+      "open-position",
+      [stackingAdapter, Cl.uint(1), token, operator, Cl.uint(cycle2Commit1)],
+      wallet1,
+    ).result).toEqual(Cl.ok(Cl.uint(4)));
+    expect(simnet.callPublicFn(
+      ORCHESTRATOR,
+      "open-position",
+      [stackingAdapter, Cl.uint(2), token, operator, Cl.uint(cycle2Commit2)],
+      wallet2,
+    ).result).toEqual(Cl.ok(Cl.uint(5)));
+
+    expect(simnet.callPublicFn(ORCHESTRATOR, "fund-reward", [Cl.uint(2), Cl.uint(1), rewardToken], deployer).result)
+      .toEqual(Cl.ok(Cl.uint(1)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-reward-dust", [Cl.uint(2), rewardToken], deployer).result)
+      .toEqual(Cl.error(Cl.uint(1136)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "claim-reward", [Cl.uint(4), Cl.uint(2), rewardToken], wallet1).result)
+      .toEqual(Cl.ok(Cl.uint(0)));
+    expect(simnet.callReadOnlyFn(
+      ORCHESTRATOR,
+      "get-reward-claim",
+      [Cl.uint(4), Cl.uint(2), rewardToken],
+      deployer,
+    ).result).toEqual(Cl.none());
+    expect(simnet.callPublicFn(ORCHESTRATOR, "claim-reward", [Cl.uint(5), Cl.uint(2), rewardToken], wallet2).result)
+      .toEqual(Cl.ok(Cl.uint(0)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-reward-dust", [Cl.uint(2), rewardToken], deployer).result)
+      .toEqual(Cl.ok(Cl.uint(1)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-reward-dust", [Cl.uint(2), rewardToken], deployer).result)
+      .toEqual(Cl.error(Cl.uint(1137)));
+
+    expect(simnet.callPublicFn(ORCHESTRATOR, "fund-stx-reward", [Cl.uint(2), Cl.uint(100)], deployer).result)
+      .toEqual(Cl.ok(Cl.uint(100)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "claim-stx-reward", [Cl.uint(4), Cl.uint(2)], wallet1).result)
+      .toEqual(Cl.ok(Cl.uint(33)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "claim-stx-reward", [Cl.uint(5), Cl.uint(2)], wallet2).result)
+      .toEqual(Cl.ok(Cl.uint(66)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-stx-reward-dust", [Cl.uint(2)], deployer).result)
+      .toEqual(Cl.ok(Cl.uint(1)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-stx-reward-dust", [Cl.uint(2)], deployer).result)
+      .toEqual(Cl.error(Cl.uint(1137)));
+  });
+
+  it("rejects zero, regressing, and preserves same-cycle PoX commits", () => {
+    const position4 = simnet.callReadOnlyFn(ORCHESTRATOR, "get-position", [Cl.uint(4)], deployer).result;
+    const position5 = simnet.callReadOnlyFn(ORCHESTRATOR, "get-position", [Cl.uint(5)], deployer).result;
+    const position4Commit = tupleUint(position4, "pox-commit-id");
+    const position5Commit = tupleUint(position5, "pox-commit-id");
+    mineTo(tupleUint(simnet.callReadOnlyFn(OPERATOR, "get-commit", [Cl.uint(position4Commit)], deployer).result, "unlock-height"));
+    expect(simnet.callPublicFn(OPERATOR, "finalize-commit", [Cl.uint(position4Commit), poxAdapter], deployer).result.type)
+      .toBe("ok");
+    mineTo(tupleUint(simnet.callReadOnlyFn(OPERATOR, "get-commit", [Cl.uint(position5Commit)], deployer).result, "unlock-height"));
+    expect(simnet.callPublicFn(OPERATOR, "finalize-commit", [Cl.uint(position5Commit), poxAdapter], deployer).result.type)
+      .toBe("ok");
+    expect(simnet.callPublicFn(OPERATOR, "revoke-delegation", [poxAdapter], wallet1).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(OPERATOR, "revoke-delegation", [poxAdapter], wallet2).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(simnet.callPublicFn(OPERATOR, "register-delegation", [Cl.uint(40), poxAdapter], wallet1).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(POX_ADAPTER, "set-cycle", [Cl.uint(0), Cl.uint(0), Cl.uint(10), Cl.uint(currentBurnHeight())], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    const beforeZeroConfig = simnet.callReadOnlyFn(OPERATOR, "get-config", [], deployer).result;
+    const beforeZeroExternal = simnet.callReadOnlyFn(POX_ADAPTER, "get-next-external-commit-id", [], deployer).result;
+    const beforeZeroNext = tupleUint(beforeZeroConfig, "next-commit-id");
+    expect(simnet.callPublicFn(
+      OPERATOR,
+      "commit-delegation",
+      [Cl.principal(wallet1), Cl.uint(20), Cl.uint(1), proof(41), poxAdapter],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(1012)));
+    expect(simnet.callReadOnlyFn(OPERATOR, "get-config", [], deployer).result)
+      .toEqual(beforeZeroConfig);
+    expect(simnet.callReadOnlyFn(POX_ADAPTER, "get-next-external-commit-id", [], deployer).result)
+      .toEqual(beforeZeroExternal);
+    expect(simnet.callReadOnlyFn(OPERATOR, "get-commit", [Cl.uint(beforeZeroNext)], deployer).result)
+      .toEqual(Cl.none());
+    expect(Cl.prettyPrint(simnet.callReadOnlyFn(OPERATOR, "get-delegation", [Cl.principal(wallet1)], deployer).result))
+      .toContain("active: true");
+    expect(simnet.callPublicFn(OPERATOR, "revoke-delegation", [poxAdapter], wallet1).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(simnet.callPublicFn(POX_ADAPTER, "set-cycle", [Cl.uint(4), Cl.uint(0), Cl.uint(10), Cl.uint(currentBurnHeight())], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(OPERATOR, "register-delegation", [Cl.uint(40), poxAdapter], wallet1).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    const highResult = simnet.callPublicFn(
+      OPERATOR,
+      "commit-delegation",
+      [Cl.principal(wallet1), Cl.uint(20), Cl.uint(1), proof(42), poxAdapter],
+      deployer,
+    ).result;
+    expect(highResult.type).toBe("ok");
+
+    expect(simnet.callPublicFn(OPERATOR, "register-delegation", [Cl.uint(40), poxAdapter], wallet2).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    const sameResult = simnet.callPublicFn(
+      OPERATOR,
+      "commit-delegation",
+      [Cl.principal(wallet2), Cl.uint(20), Cl.uint(1), proof(43), poxAdapter],
+      deployer,
+    ).result;
+    expect(sameResult.type).toBe("ok");
+    expect(tupleUint(simnet.callReadOnlyFn(OPERATOR, "get-config", [], deployer).result, "last-cycle-id"))
+      .toBe(4);
+
+    expect(simnet.callPublicFn(OPERATOR, "register-delegation", [Cl.uint(40), poxAdapter], wallet3).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(POX_ADAPTER, "set-cycle", [Cl.uint(3), Cl.uint(0), Cl.uint(10), Cl.uint(currentBurnHeight())], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    const beforeLowerConfig = simnet.callReadOnlyFn(OPERATOR, "get-config", [], deployer).result;
+    const beforeLowerExternal = simnet.callReadOnlyFn(POX_ADAPTER, "get-next-external-commit-id", [], deployer).result;
+    const beforeLowerNext = tupleUint(beforeLowerConfig, "next-commit-id");
+    expect(simnet.callPublicFn(
+      OPERATOR,
+      "commit-delegation",
+      [Cl.principal(wallet3), Cl.uint(20), Cl.uint(1), proof(44), poxAdapter],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(1012)));
+    expect(simnet.callReadOnlyFn(OPERATOR, "get-config", [], deployer).result)
+      .toEqual(beforeLowerConfig);
+    expect(simnet.callReadOnlyFn(POX_ADAPTER, "get-next-external-commit-id", [], deployer).result)
+      .toEqual(beforeLowerExternal);
+    expect(simnet.callReadOnlyFn(OPERATOR, "get-commit", [Cl.uint(beforeLowerNext)], deployer).result)
+      .toEqual(Cl.none());
+    expect(simnet.callPublicFn(OPERATOR, "revoke-delegation", [poxAdapter], wallet3).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(POX_ADAPTER, "set-cycle", [Cl.uint(4), Cl.uint(0), Cl.uint(10), Cl.uint(currentBurnHeight())], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+  });
+
   it("keeps new staking sources free of hardcoded principals and unwrap-panic", () => {
     for (const file of [
       "contracts/traits/stacking-traits.clar",
       "contracts/staking/native-stacking-operator.clar",
       "contracts/staking/dual-stacking-orchestrator.clar",
       "contracts/test-helpers/mock-pox-adapter.clar",
+      "contracts/test-helpers/mock-pox-adapter-2.clar",
+      "contracts/test-helpers/mock-settlement-intermediary.clar",
       "contracts/test-helpers/mock-stacking-adapter.clar",
       "contracts/test-helpers/mock-stacking-adapter-2.clar",
       "contracts/test-helpers/mock-token.clar",
@@ -557,6 +879,7 @@ describe("dual stacking and delegated native operator", () => {
       const source = require("node:fs").readFileSync(file, "utf8");
       expect(source).not.toMatch(/\bS[TP][0-9A-Z]{38,}/);
       expect(source).not.toContain("unwrap-panic");
+      expect(source).not.toContain("STAKING_CYCLE");
     }
   });
 });

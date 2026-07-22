@@ -29,8 +29,12 @@ The boot PoX contract is not assumed to nominally implement the local trait in
 Simnet. `native-stacking-operator` stores the configured adapter principal and
 checks `(contract-of adapter)` on every adapter call. Production wiring must
 supply an adapter that enforces the real PoX delegation, commit, and finalization
-rules. The external PoX adapter remains a deployment trust boundary: the
-Simnet mock is deterministic and is not a production oracle.
+rules. Each commit additionally stores the exact adapter principal returned by
+`(contract-of pox-adapter)` at commit creation. Finalization accepts only that
+recorded adapter, so an administrator may upgrade the global adapter for new
+delegations without stranding old commits. The external PoX adapter remains a
+deployment trust boundary: the Simnet mock is deterministic and is not a
+production oracle.
 
 ### Generic stacking adapters
 
@@ -48,6 +52,17 @@ token and optional SIP-010 reward token. The operator does not custody STX.
 Every token operation validates the injected trait's principal against stored
 configuration. Native, reward-token, and STX reserves are separate minimum
 balance floors; native custody is never used as the reward-token reserve.
+
+### Historical configuration bindings
+
+The operator records the orchestrator principal that binds each commit. Changing
+the configured orchestrator is therefore a version change for new bindings, not
+a rewrite of historical state: finalization and settlement calls for a bound
+commit remain authorized through its recorded orchestrator. The orchestrator's
+native-token, reward-token, and native-operator setters are locked after the
+first position exists; administrator rotation remains separate from ordinary
+asset/operator rewiring. This prevents a live position from being stranded by a
+configuration setter.
 
 ### Bitcoin settlement
 
@@ -67,8 +82,10 @@ is accounting-only: no native BTC transfer, sBTC mint, or sBTC payout is implied
 2. A user registers delegated STX intent through the native operator. The
    operator asks the adapter to delegate and records no user STX balance.
 3. A keeper commits a user's delegated amount with a unique auth hash. The
-   adapter returns the cycle snapshot and unlock height; both are stored with a
-   monotonic local commit ID.
+   adapter returns the cycle snapshot and unlock height; cycle `u0` is rejected
+   and accepted cycles must be greater than or equal to the last accepted cycle
+   (same-cycle commits are valid). Both are stored with a monotonic local commit
+   ID and the exact adapter principal used for that commit.
 4. A user opens a dual position with a native-token amount and commit ID. The
    orchestrator atomically binds the unique active operator commit, derives the
    owner/STX amount/cycle/unlock metadata, re-queries adapter policy, transfers
@@ -82,10 +99,15 @@ is accounting-only: no native BTC transfer, sBTC mint, or sBTC payout is implied
    after the authoritative unlock height. STX remains delegated to the external
    PoX system, and STX exposure is decremented once on reconciled exit.
 7. Reward pools are funded before claims begin. The first funding freezes the
-   cycle denominator; later positions cannot dilute it, claims do not close the
-   pool for other positions, and total claimed cannot exceed funded total. The
-   native-token amount is the v1 reward-share weight; STX and generic-token units
-   are not combined.
+   cycle denominator and eligible-position count; later positions cannot dilute
+   it, claims do not close the pool for other positions, and total claimed cannot
+   exceed funded total. Pro-rata amounts use deterministic floor division. A
+   zero-floor position records a separate settlement marker without masquerading
+   as a paid claim. After every eligible position has settled, an authorized
+   `sweep-reward-dust` or `sweep-stx-reward-dust` transfers exactly
+   `funded - total-claimed` once, preventing permanent remainder dust and double
+   sweeps. The native-token amount is the v1 reward-share weight; STX and
+   generic-token units are not combined.
 8. A matured operator settlement is consumed once to record a position-bound BTC
    entitlement. The later claim only marks accounting state and returns the
    attested amount.
@@ -108,11 +130,17 @@ claims.
 
 ## Deployment posture
 
-The source contracts and mocks are registered in `Clarinet.toml` and
-`Clarinet.complete.toml`. The local Clarinet CLI is not installed in the
-implementation environment, so the repository's Clarinet SDK/test
+The issue-501 production contracts are registered in both `Clarinet.toml` and
+`Clarinet.complete.toml`; the adversarial test-only mocks are registered in the
+active `Clarinet.toml` test manifest. The local Clarinet CLI is not installed in
+the implementation environment, so the repository's Clarinet SDK/test
 initialization regenerates `deployments/default.simnet-plan.yaml`. The release
 plans are then regenerated with `scripts/gen-deployment-plans.py`; the new test
 mocks remain in `TEST_HELPERS`, while `stacking-traits` and the issue-501
 production contracts are retained in the release dependency order. These
-contracts are not production deployed by this change.
+production entries are emitted from the active `Clarinet.toml` metadata as
+Clarity 4 with epoch 3.0 in both canonical `full-system.*` plans. Issue #501 is
+included only in those canonical full-system plans; legacy artifacts such as
+`deployments/mainnet-manifest-v1.yaml` and `deployments/mainnet-release-plan.yaml`
+are not deployment sources. These contracts are not production deployed by this
+change.

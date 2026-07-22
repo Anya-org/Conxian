@@ -1,5 +1,5 @@
-;; mock-pox-adapter.clar
-;; Deterministic injected PoX adapter for lifecycle and rollback tests.
+;; mock-pox-adapter-2.clar
+;; Independent deterministic adapter used to test historical adapter binding.
 
 (impl-trait .stacking-traits.pox-adapter-trait)
 

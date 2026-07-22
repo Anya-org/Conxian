@@ -48,6 +48,8 @@
 (define-constant ERR_CYCLE_NOT_MONOTONIC (err u1133))
 (define-constant ERR_CONFIG_LOCKED (err u1134))
 (define-constant ERR_EMPTY_CYCLE (err u1135))
+(define-constant ERR_REWARD_DUST_NOT_READY (err u1136))
+(define-constant ERR_REWARD_DUST_SWEPT (err u1137))
 
 (define-constant MAX_UINT u340282366920938463463374607431768211455)
 (define-constant BPS u10000)
@@ -98,6 +100,8 @@
   adapter: principal,
   adapter-risk-bps: uint,
   operator: principal,
+  pox-adapter: principal,
+  binding-orchestrator: (optional principal),
   reward-cycle: uint,
   status: uint,
   opened-at: uint,
@@ -112,23 +116,34 @@
 (define-map cycle-weights uint uint)
 (define-map cycle-snapshots uint {
   weight: uint,
-  frozen: bool
+  frozen: bool,
+  eligible-count: uint
 })
+
+(define-map cycle-position-counts uint uint)
 
 ;; --- Reward state ---
 (define-map reward-pools { cycle-id: uint, token: principal } {
   total: uint,
   claimed: uint,
-  claims-started: bool
+  claims-started: bool,
+  settled-count: uint,
+  eligible-count: uint,
+  swept: bool
 })
 (define-map reward-claims { position-id: uint, cycle-id: uint, token: principal } bool)
+(define-map reward-zero-claims { position-id: uint, cycle-id: uint, token: principal } bool)
 
 (define-map stx-reward-pools uint {
   total: uint,
   claimed: uint,
-  claims-started: bool
+  claims-started: bool,
+  settled-count: uint,
+  eligible-count: uint,
+  swept: bool
 })
 (define-map stx-reward-claims { position-id: uint, cycle-id: uint } bool)
+(define-map stx-reward-zero-claims { position-id: uint, cycle-id: uint } bool)
 
 ;; BTC entitlements are accounting-only records. The operator consumes the
 ;; exact settlement proof before this map is populated, so one proof cannot be
@@ -219,12 +234,26 @@
 )
 
 (define-private (reward-pool-or-empty (cycle-id uint) (token principal))
-  (default-to { total: u0, claimed: u0, claims-started: false }
+  (default-to {
+    total: u0,
+    claimed: u0,
+    claims-started: false,
+    settled-count: u0,
+    eligible-count: u0,
+    swept: false
+  }
     (map-get? reward-pools { cycle-id: cycle-id, token: token }))
 )
 
 (define-private (stx-reward-pool-or-empty (cycle-id uint))
-  (default-to { total: u0, claimed: u0, claims-started: false }
+  (default-to {
+    total: u0,
+    claimed: u0,
+    claims-started: false,
+    settled-count: u0,
+    eligible-count: u0,
+    swept: false
+  }
     (map-get? stx-reward-pools cycle-id))
 )
 
@@ -458,6 +487,10 @@
           (default-to u0 (map-get? cycle-weights reward-cycle-id))
           weight
         ) ERR_ARITHMETIC_OVERFLOW))
+        (new-position-count (unwrap! (safe-add
+          (default-to u0 (map-get? cycle-position-counts reward-cycle-id))
+          u1
+        ) ERR_ARITHMETIC_OVERFLOW))
       )
       (begin
         (asserts! (get active config) ERR_ADAPTER_INACTIVE)
@@ -486,6 +519,8 @@
           adapter: (contract-of adapter),
           adapter-risk-bps: (get risk-bps config),
           operator: (contract-of operator),
+          pox-adapter: (get pox-adapter commit-data),
+          binding-orchestrator: (get bound-orchestrator commit-data),
           reward-cycle: reward-cycle-id,
           status: POSITION_ACTIVE,
           opened-at: burn-block-height,
@@ -501,6 +536,7 @@
           risk-exposure: new-adapter-risk
         }))
         (map-set cycle-weights reward-cycle-id new-cycle-weight)
+        (map-set cycle-position-counts reward-cycle-id new-position-count)
         (var-set total-exposure new-total-exposure)
         (var-set total-stx-exposure new-total-stx-exposure)
         (var-set total-risk-exposure new-risk-exposure)
@@ -618,6 +654,7 @@
       (asserts! (is-eq tx-sender (get owner position)) ERR_POSITION_OWNER)
       (asserts! (is-eq (get operator position) (contract-of operator)) ERR_ADAPTER_MISMATCH)
       (asserts! (is-configured-operator operator) ERR_OPERATOR_NOT_CONFIGURED)
+      (asserts! (is-eq (get pox-adapter position) (contract-of adapter)) ERR_ADAPTER_MISMATCH)
       (asserts! (> (get pox-commit-id position) u0) ERR_POSITION_STATE)
       (asserts! (not (get pox-unlocked position)) ERR_ALREADY_CLAIMED)
       (let ((commit-data (try! (contract-call? operator finalize-commit (get pox-commit-id position) adapter))))
@@ -627,6 +664,8 @@
           (asserts! (is-eq (get amount commit-data) (get stx-amount position)) ERR_COMMIT_MISMATCH)
           (asserts! (is-eq (get cycle-id commit-data) (get pox-cycle-id position)) ERR_COMMIT_MISMATCH)
           (asserts! (is-eq (get unlock-height commit-data) (get pox-unlock-height position)) ERR_COMMIT_MISMATCH)
+          (asserts! (is-eq (get pox-adapter commit-data) (get pox-adapter position)) ERR_COMMIT_MISMATCH)
+          (asserts! (is-eq (get bound-orchestrator commit-data) (get binding-orchestrator position)) ERR_COMMIT_MISMATCH)
           (asserts! (is-eq (get state commit-data) COMMIT_MATURED) ERR_COMMIT_INVALID)
           (map-set positions position-id (merge position {
             pox-unlocked: true,
@@ -669,16 +708,27 @@
         (snapshot-weight (match snapshot
           snapshot-data (get weight snapshot-data)
           (default-to u0 (map-get? cycle-weights cycle-id))))
+        (eligible-count (match snapshot
+          snapshot-data (get eligible-count snapshot-data)
+          (default-to u0 (map-get? cycle-position-counts cycle-id))))
         (new-total (unwrap! (safe-add (get total pool) amount) ERR_ARITHMETIC_OVERFLOW))
       )
       (begin
         (asserts! (> snapshot-weight u0) ERR_EMPTY_CYCLE)
+        (asserts! (> eligible-count u0) ERR_EMPTY_CYCLE)
         (asserts! (not (get claims-started pool)) ERR_REWARD_REPLAYED)
         (try! (contract-call? token transfer amount tx-sender (as-contract tx-sender) none))
         (if (is-none snapshot)
-          (map-set cycle-snapshots cycle-id { weight: snapshot-weight, frozen: true })
+          (map-set cycle-snapshots cycle-id {
+            weight: snapshot-weight,
+            frozen: true,
+            eligible-count: eligible-count
+          })
           true)
-        (map-set reward-pools key (merge pool { total: new-total }))
+        (map-set reward-pools key (merge pool {
+          total: new-total,
+          eligible-count: eligible-count
+        }))
         (print {
           event: "dual-stacking-reward-funded",
           cycle-id: cycle-id,
@@ -707,30 +757,57 @@
           (key { cycle-id: cycle-id, token: (contract-of token) })
           (pool (unwrap! (map-get? reward-pools key) ERR_REWARD_NOT_FOUND))
           (claim-key { position-id: position-id, cycle-id: cycle-id, token: (contract-of token) })
+          (zero-claim-key { position-id: position-id, cycle-id: cycle-id, token: (contract-of token) })
           (snapshot (unwrap! (map-get? cycle-snapshots cycle-id) ERR_REWARD_SNAPSHOT))
           (amount (unwrap! (safe-mul-div (get total pool) (get weight position) (get weight snapshot)) ERR_ARITHMETIC_OVERFLOW))
-          (balance (try! (contract-call? token get-balance (as-contract tx-sender))))
-          (new-claimed (unwrap! (safe-add (get claimed pool) amount) ERR_ARITHMETIC_OVERFLOW))
         )
         (begin
           (asserts! (is-none (map-get? reward-claims claim-key)) ERR_ALREADY_CLAIMED)
-          (asserts! (> amount u0) ERR_INVALID_AMOUNT)
-          (asserts! (<= new-claimed (get total pool)) ERR_REWARD_OVERCLAIM)
-          (asserts! (>= balance (unwrap! (required-balance amount (var-get reward-liquid-reserve)) ERR_ARITHMETIC_OVERFLOW)) ERR_LIQUIDITY_RESERVE)
-          (try! (as-contract (contract-call? token transfer amount tx-sender (get owner position) none)))
-          (map-set reward-claims claim-key true)
-          (map-set reward-pools key (merge pool {
-            claimed: new-claimed,
-            claims-started: true
-          }))
-          (print {
-            event: "dual-stacking-reward-claimed",
-            position-id: position-id,
-            cycle-id: cycle-id,
-            token: (contract-of token),
-            amount: amount
-          })
-          (ok amount)
+          (asserts! (is-none (map-get? reward-zero-claims zero-claim-key)) ERR_ALREADY_CLAIMED)
+          (asserts! (not (get swept pool)) ERR_REWARD_DUST_SWEPT)
+          (if (is-eq amount u0)
+            (begin
+              ;; A zero-floor position is settled without claiming funds. It
+              ;; remains absent from reward-claims so a zero result cannot
+              ;; masquerade as a paid claim or block other accounting.
+              (map-set reward-zero-claims zero-claim-key true)
+              (map-set reward-pools key (merge pool {
+                claims-started: true,
+                settled-count: (unwrap! (safe-add (get settled-count pool) u1) ERR_ARITHMETIC_OVERFLOW)
+              }))
+              (print {
+                event: "dual-stacking-reward-zero-settled",
+                position-id: position-id,
+                cycle-id: cycle-id,
+                token: (contract-of token)
+              })
+              (ok u0)
+            )
+            (let (
+                (balance (try! (contract-call? token get-balance (as-contract tx-sender))))
+                (new-claimed (unwrap! (safe-add (get claimed pool) amount) ERR_ARITHMETIC_OVERFLOW))
+              )
+              (begin
+                (asserts! (<= new-claimed (get total pool)) ERR_REWARD_OVERCLAIM)
+                (asserts! (>= balance (unwrap! (required-balance amount (var-get reward-liquid-reserve)) ERR_ARITHMETIC_OVERFLOW)) ERR_LIQUIDITY_RESERVE)
+                (try! (as-contract (contract-call? token transfer amount tx-sender (get owner position) none)))
+                (map-set reward-claims claim-key true)
+                (map-set reward-pools key (merge pool {
+                  claimed: new-claimed,
+                  claims-started: true,
+                  settled-count: (unwrap! (safe-add (get settled-count pool) u1) ERR_ARITHMETIC_OVERFLOW)
+                }))
+                (print {
+                  event: "dual-stacking-reward-claimed",
+                  position-id: position-id,
+                  cycle-id: cycle-id,
+                  token: (contract-of token),
+                  amount: amount
+                })
+                (ok amount)
+              )
+            )
+          )
         )
       )
     )
@@ -750,16 +827,27 @@
         (snapshot-weight (match snapshot
           snapshot-data (get weight snapshot-data)
           (default-to u0 (map-get? cycle-weights cycle-id))))
+        (eligible-count (match snapshot
+          snapshot-data (get eligible-count snapshot-data)
+          (default-to u0 (map-get? cycle-position-counts cycle-id))))
         (new-total (unwrap! (safe-add (get total pool) amount) ERR_ARITHMETIC_OVERFLOW))
       )
       (begin
         (asserts! (> snapshot-weight u0) ERR_EMPTY_CYCLE)
+        (asserts! (> eligible-count u0) ERR_EMPTY_CYCLE)
         (asserts! (not (get claims-started pool)) ERR_REWARD_REPLAYED)
         (try! (stx-transfer? amount tx-sender (as-contract tx-sender)))
         (if (is-none snapshot)
-          (map-set cycle-snapshots cycle-id { weight: snapshot-weight, frozen: true })
+          (map-set cycle-snapshots cycle-id {
+            weight: snapshot-weight,
+            frozen: true,
+            eligible-count: eligible-count
+          })
           true)
-        (map-set stx-reward-pools cycle-id (merge pool { total: new-total }))
+        (map-set stx-reward-pools cycle-id (merge pool {
+          total: new-total,
+          eligible-count: eligible-count
+        }))
         (print {
           event: "dual-stacking-stx-reward-funded",
           cycle-id: cycle-id,
@@ -781,26 +869,106 @@
       (let (
           (pool (unwrap! (map-get? stx-reward-pools cycle-id) ERR_REWARD_NOT_FOUND))
           (claim-key { position-id: position-id, cycle-id: cycle-id })
+          (zero-claim-key { position-id: position-id, cycle-id: cycle-id })
           (snapshot (unwrap! (map-get? cycle-snapshots cycle-id) ERR_REWARD_SNAPSHOT))
           (amount (unwrap! (safe-mul-div (get total pool) (get weight position) (get weight snapshot)) ERR_ARITHMETIC_OVERFLOW))
-          (balance (stx-get-balance (as-contract tx-sender)))
-          (new-claimed (unwrap! (safe-add (get claimed pool) amount) ERR_ARITHMETIC_OVERFLOW))
         )
         (begin
           (asserts! (is-none (map-get? stx-reward-claims claim-key)) ERR_ALREADY_CLAIMED)
-          (asserts! (> amount u0) ERR_INVALID_AMOUNT)
-          (asserts! (<= new-claimed (get total pool)) ERR_REWARD_OVERCLAIM)
-          (asserts! (>= balance (unwrap! (required-balance amount (var-get stx-liquid-reserve)) ERR_ARITHMETIC_OVERFLOW)) ERR_LIQUIDITY_RESERVE)
-          (try! (as-contract (stx-transfer? amount tx-sender (get owner position))))
-          (map-set stx-reward-claims claim-key true)
-          (map-set stx-reward-pools cycle-id (merge pool {
-            claimed: new-claimed,
-            claims-started: true
-          }))
-          (print { event: "dual-stacking-stx-reward-claimed", position-id: position-id, cycle-id: cycle-id, amount: amount })
-          (ok amount)
+          (asserts! (is-none (map-get? stx-reward-zero-claims zero-claim-key)) ERR_ALREADY_CLAIMED)
+          (asserts! (not (get swept pool)) ERR_REWARD_DUST_SWEPT)
+          (if (is-eq amount u0)
+            (begin
+              (map-set stx-reward-zero-claims zero-claim-key true)
+              (map-set stx-reward-pools cycle-id (merge pool {
+                claims-started: true,
+                settled-count: (unwrap! (safe-add (get settled-count pool) u1) ERR_ARITHMETIC_OVERFLOW)
+              }))
+              (print { event: "dual-stacking-stx-reward-zero-settled", position-id: position-id, cycle-id: cycle-id })
+              (ok u0)
+            )
+            (let (
+                (balance (stx-get-balance (as-contract tx-sender)))
+                (new-claimed (unwrap! (safe-add (get claimed pool) amount) ERR_ARITHMETIC_OVERFLOW))
+              )
+              (begin
+                (asserts! (<= new-claimed (get total pool)) ERR_REWARD_OVERCLAIM)
+                (asserts! (>= balance (unwrap! (required-balance amount (var-get stx-liquid-reserve)) ERR_ARITHMETIC_OVERFLOW)) ERR_LIQUIDITY_RESERVE)
+                (try! (as-contract (stx-transfer? amount tx-sender (get owner position))))
+                (map-set stx-reward-claims claim-key true)
+                (map-set stx-reward-pools cycle-id (merge pool {
+                  claimed: new-claimed,
+                  claims-started: true,
+                  settled-count: (unwrap! (safe-add (get settled-count pool) u1) ERR_ARITHMETIC_OVERFLOW)
+                }))
+                (print { event: "dual-stacking-stx-reward-claimed", position-id: position-id, cycle-id: cycle-id, amount: amount })
+                (ok amount)
+              )
+            )
+          )
         )
       )
+    )
+  )
+)
+
+;; Sweep only the deterministic pro-rata floor remainder after every frozen
+;; cycle position has either received a positive claim or acknowledged a zero
+;; floor. The caller receives the exact funded-minus-claimed dust once.
+(define-public (sweep-reward-dust
+    (cycle-id uint)
+    (token <sip-010-ft-trait>)
+  )
+  (let (
+      (key { cycle-id: cycle-id, token: (contract-of token) })
+      (pool (unwrap! (map-get? reward-pools key) ERR_REWARD_NOT_FOUND))
+      (recipient tx-sender)
+      (dust (unwrap! (safe-sub (get total pool) (get claimed pool)) ERR_ARITHMETIC_OVERFLOW))
+    )
+    (begin
+      (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
+      (asserts! (is-authorized-operator) ERR_UNAUTHORIZED)
+      (asserts! (is-reward-token token) ERR_INVALID_TOKEN)
+      (asserts! (not (get swept pool)) ERR_REWARD_DUST_SWEPT)
+      (asserts! (is-eq (get settled-count pool) (get eligible-count pool)) ERR_REWARD_DUST_NOT_READY)
+      (if (> dust u0)
+        (try! (as-contract (contract-call? token transfer dust (as-contract tx-sender) recipient none)))
+        true)
+      (map-set reward-pools key (merge pool { swept: true }))
+      (print {
+        event: "dual-stacking-reward-dust-swept",
+        cycle-id: cycle-id,
+        token: (contract-of token),
+        recipient: recipient,
+        amount: dust
+      })
+      (ok dust)
+    )
+  )
+)
+
+(define-public (sweep-stx-reward-dust (cycle-id uint))
+  (let (
+      (pool (unwrap! (map-get? stx-reward-pools cycle-id) ERR_REWARD_NOT_FOUND))
+      (recipient tx-sender)
+      (dust (unwrap! (safe-sub (get total pool) (get claimed pool)) ERR_ARITHMETIC_OVERFLOW))
+    )
+    (begin
+      (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
+      (asserts! (is-authorized-operator) ERR_UNAUTHORIZED)
+      (asserts! (not (get swept pool)) ERR_REWARD_DUST_SWEPT)
+      (asserts! (is-eq (get settled-count pool) (get eligible-count pool)) ERR_REWARD_DUST_NOT_READY)
+      (if (> dust u0)
+        (try! (as-contract (stx-transfer? dust (as-contract tx-sender) recipient)))
+        true)
+      (map-set stx-reward-pools cycle-id (merge pool { swept: true }))
+      (print {
+        event: "dual-stacking-stx-reward-dust-swept",
+        cycle-id: cycle-id,
+        recipient: recipient,
+        amount: dust
+      })
+      (ok dust)
     )
   )
 )
@@ -920,12 +1088,32 @@
   (map-get? cycle-snapshots cycle-id)
 )
 
+(define-read-only (get-cycle-position-count (cycle-id uint))
+  (default-to u0 (map-get? cycle-position-counts cycle-id))
+)
+
 (define-read-only (get-reward-pool (cycle-id uint) (token-principal principal))
   (map-get? reward-pools { cycle-id: cycle-id, token: token-principal })
 )
 
 (define-read-only (get-stx-reward-pool (cycle-id uint))
   (map-get? stx-reward-pools cycle-id)
+)
+
+(define-read-only (get-reward-claim
+    (position-id uint)
+    (cycle-id uint)
+    (token-principal principal)
+  )
+  (map-get? reward-claims {
+    position-id: position-id,
+    cycle-id: cycle-id,
+    token: token-principal
+  })
+)
+
+(define-read-only (get-stx-reward-claim (position-id uint) (cycle-id uint))
+  (map-get? stx-reward-claims { position-id: position-id, cycle-id: cycle-id })
 )
 
 (define-read-only (get-btc-entitlement (position-id uint))

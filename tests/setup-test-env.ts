@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { beforeAll } from 'vitest';
@@ -87,6 +87,11 @@ export async function initializeSimnet(): Promise<Simnet> {
         instance.callPublicFn('bme-engine', 'add-activity-reporter', [Cl.contractPrincipal(deployer, 'swap-router')], deployer);
         instance.callPublicFn('bme-engine', 'add-activity-reporter', [Cl.contractPrincipal(deployer, 'lending-manager')], deployer);
       } catch (e) {}
+
+      // The SDK may emit stale Clarity 1 metadata while regenerating the
+      // runtime plan. Restore the checked-in canonical source so deployment
+      // plan regression tests and generator checks inspect the intended file.
+      writeFileSync(deploymentPlanPath, canonicalDeploymentPlan);
 
       console.log('✅ Bootstrap Complete');
       return instance;

@@ -55,6 +55,7 @@
 (define-data-var orchestrator-configured bool false)
 (define-data-var next-commit-id uint u1)
 (define-data-var last-cycle-id uint u0)
+(define-data-var bound-commit-count uint u0)
 
 (define-map keepers principal bool)
 
@@ -63,7 +64,8 @@
   amount: uint,
   active: bool,
   registered-at: uint,
-  revoked-at: (optional uint)
+  revoked-at: (optional uint),
+  adapter: principal
 })
 
 (define-map active-commits principal uint)
@@ -80,7 +82,9 @@
   state: uint,
   created-at: uint,
   finalized-at: (optional uint),
-  bound: bool
+  bound: bool,
+  pox-adapter: principal,
+  bound-orchestrator: (optional principal)
 })
 
 (define-map auth-ids (buff 32) uint)
@@ -129,6 +133,28 @@
   )
 )
 
+(define-private (is-bound-orchestrator-caller (commit {
+    user: principal,
+    amount: uint,
+    cycle-id: uint,
+    cycle-start: uint,
+    cycle-length: uint,
+    lock-period: uint,
+    unlock-height: uint,
+    auth-id: (buff 32),
+    external-commit-id: uint,
+    state: uint,
+    created-at: uint,
+    finalized-at: (optional uint),
+    bound: bool,
+    pox-adapter: principal,
+    bound-orchestrator: (optional principal)
+  }))
+  (match (get bound-orchestrator commit)
+    bound-principal (is-eq contract-caller bound-principal)
+    false)
+)
+
 (define-private (safe-add (left uint) (right uint))
   (if (> left (- MAX_UINT right))
     none
@@ -157,7 +183,9 @@
     state: uint,
     created-at: uint,
     finalized-at: (optional uint),
-    bound: bool
+    bound: bool,
+    pox-adapter: principal,
+    bound-orchestrator: (optional principal)
   }))
   {
     commit-id: commit-id,
@@ -166,7 +194,9 @@
     cycle-id: (get cycle-id commit),
     unlock-height: (get unlock-height commit),
     external-commit-id: (get external-commit-id commit),
-    state: (get state commit)
+    state: (get state commit),
+    pox-adapter: (get pox-adapter commit),
+    bound-orchestrator: (get bound-orchestrator commit)
   }
 )
 
@@ -262,7 +292,8 @@
       amount: amount,
       active: true,
       registered-at: burn-block-height,
-      revoked-at: none
+      revoked-at: none,
+      adapter: (contract-of adapter)
     })
     (print {
       event: "native-stacking-delegation-registered",
@@ -280,7 +311,7 @@
 (define-public (revoke-delegation (adapter <pox-adapter-trait>))
   (let ((delegation (unwrap! (map-get? delegations tx-sender) ERR_DELEGATION_NOT_FOUND)))
     (begin
-      (asserts! (is-configured-adapter adapter) ERR_ADAPTER_MISMATCH)
+      (asserts! (is-eq (contract-of adapter) (get adapter delegation)) ERR_ADAPTER_MISMATCH)
       (asserts! (get active delegation) ERR_DELEGATION_INACTIVE)
       (let ((active-commit-id (default-to u0 (map-get? active-commits tx-sender))))
         (begin
@@ -314,7 +345,6 @@
     (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
     (asserts! (not (var-get paused)) ERR_PAUSED)
     (asserts! (is-authorized-operator) ERR_UNAUTHORIZED)
-    (asserts! (is-configured-adapter adapter) ERR_ADAPTER_MISMATCH)
     (asserts! (> amount u0) ERR_INVALID_AMOUNT)
     (asserts! (is-none (map-get? auth-ids auth-id)) ERR_COMMIT_REPLAYED)
     (let (
@@ -325,18 +355,23 @@
         (cycle-start (get cycle-start cycle-info))
         (cycle-length (get cycle-length cycle-info))
         (commit-id (var-get next-commit-id))
-        (unlock-height (try! (contract-call? adapter get-unlock-height cycle-id lock-period)))
-        (external-commit-id (try! (contract-call? adapter commit-stx user amount cycle-id lock-period auth-id)))
       )
       (begin
         (asserts! (get active delegation) ERR_DELEGATION_INACTIVE)
         (asserts! (is-eq active-commit-id u0) ERR_ACTIVE_COMMIT)
         (asserts! (<= amount (get amount delegation)) ERR_INVALID_AMOUNT)
+        (asserts! (is-eq (contract-of adapter) (get adapter delegation)) ERR_ADAPTER_MISMATCH)
+        (asserts! (> cycle-id u0) ERR_INVALID_CYCLE)
+        (asserts! (>= cycle-id (var-get last-cycle-id)) ERR_INVALID_CYCLE)
         (asserts! (>= burn-block-height cycle-start) ERR_INVALID_CYCLE)
-        (asserts! (> unlock-height burn-block-height) ERR_INVALID_CYCLE)
         (asserts! (< commit-id MAX_UINT) ERR_ARITHMETIC_OVERFLOW)
-        (let ((ledger (cycle-ledger-or-empty cycle-id)))
+        (let (
+            (unlock-height (try! (contract-call? adapter get-unlock-height cycle-id lock-period)))
+            (external-commit-id (try! (contract-call? adapter commit-stx user amount cycle-id lock-period auth-id)))
+            (ledger (cycle-ledger-or-empty cycle-id))
+          )
           (begin
+            (asserts! (> unlock-height burn-block-height) ERR_INVALID_CYCLE)
             (map-set commits commit-id {
               user: user,
               amount: amount,
@@ -350,7 +385,9 @@
               state: COMMIT_ACTIVE,
               created-at: burn-block-height,
               finalized-at: none,
-              bound: false
+              bound: false,
+              pox-adapter: (contract-of adapter),
+              bound-orchestrator: none
             })
             (map-set auth-ids auth-id commit-id)
             (map-set active-commits user commit-id)
@@ -391,10 +428,13 @@
       (asserts! (is-eq tx-sender (get user commit)) ERR_COMMIT_OWNER)
       (asserts! (is-eq (get state commit) COMMIT_ACTIVE) ERR_INVALID_STATE)
       (asserts! (not (get bound commit)) ERR_COMMIT_BOUND)
-      (asserts! (var-get adapter-configured) ERR_ADAPTER_NOT_CONFIGURED)
       (asserts! (> (get amount commit) u0) ERR_INVALID_AMOUNT)
       (asserts! (> (get cycle-id commit) u0) ERR_INVALID_CYCLE)
-      (map-set commits commit-id (merge commit { bound: true }))
+      (map-set commits commit-id (merge commit {
+        bound: true,
+        bound-orchestrator: (some contract-caller)
+      }))
+      (var-set bound-commit-count (+ (var-get bound-commit-count) u1))
       (print {
         event: "native-stacking-commit-bound",
         commit-id: commit-id,
@@ -402,9 +442,13 @@
         amount: (get amount commit),
         cycle-id: (get cycle-id commit),
         unlock-height: (get unlock-height commit),
-        orchestrator: contract-caller
+        orchestrator: contract-caller,
+        pox-adapter: (get pox-adapter commit)
       })
-      (ok (commit-metadata commit-id (merge commit { bound: true })))
+      (ok (commit-metadata commit-id (merge commit {
+        bound: true,
+        bound-orchestrator: (some contract-caller)
+      })))
     )
   )
 )
@@ -417,9 +461,9 @@
       (asserts!
         (or
           (is-authorized-operator)
-          (and (is-orchestrator-caller) (is-eq tx-sender (get user commit))))
+          (and (is-bound-orchestrator-caller commit) (is-eq tx-sender (get user commit))))
         ERR_UNAUTHORIZED)
-      (asserts! (is-configured-adapter adapter) ERR_ADAPTER_MISMATCH)
+      (asserts! (is-eq (contract-of adapter) (get pox-adapter commit)) ERR_ADAPTER_MISMATCH)
       (if (is-eq (get state commit) COMMIT_MATURED)
         (ok (commit-metadata commit-id commit))
         (begin
@@ -506,7 +550,7 @@
     )
     (begin
       (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
-      (asserts! (is-orchestrator-caller) ERR_BINDING_UNAUTHORIZED)
+      (asserts! (is-bound-orchestrator-caller commit) ERR_BINDING_UNAUTHORIZED)
       (asserts! (is-eq tx-sender (get user commit)) ERR_COMMIT_OWNER)
       (asserts! (is-eq (get state commit) COMMIT_MATURED) ERR_INVALID_STATE)
       (asserts! (not (get consumed settlement)) ERR_SETTLEMENT_CONSUMED)
@@ -555,7 +599,8 @@
     orchestrator: (var-get orchestrator),
     orchestrator-configured: (var-get orchestrator-configured),
     next-commit-id: (var-get next-commit-id),
-    last-cycle-id: (var-get last-cycle-id)
+    last-cycle-id: (var-get last-cycle-id),
+    bound-commit-count: (var-get bound-commit-count)
   }
 )
 
