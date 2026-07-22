@@ -13,10 +13,14 @@ const ERR_UNAUTHORIZED = 5100;
 const ERR_TOKEN_MISMATCH = 5102;
 const ERR_ZERO_AMOUNT = 5103;
 const ERR_NON_COMPLIANT = 5104;
+const ERR_COMPLIANCE_CALL = 5105;
 const ERR_PAUSED = 5106;
 const ERR_CAP_EXCEEDED = 5108;
+const ERR_INVALID_CAP = 5109;
+const ERR_CAP_BELOW_ASSETS = 5110;
 const ERR_INSUFFICIENT_ASSETS = 5111;
 const ERR_INSUFFICIENT_SHARES = 5112;
+const ERR_TOKEN_CALL = 5114;
 const ERR_STRATEGY_DISABLED = 5117;
 const ERR_INSOLVENT = 5118;
 const ERR_DEPOSIT_RECONCILIATION = 5119;
@@ -33,6 +37,8 @@ const ADVERSARIAL_TOKEN_SOURCE = `
 (define-data-var admin principal tx-sender)
 (define-data-var under-credit bool false)
 (define-data-var balance-offset uint u0)
+(define-data-var transfer-mode uint u0)
+(define-data-var balance-error bool false)
 
 (define-private (is-admin)
   (is-eq tx-sender (var-get admin))
@@ -54,6 +60,22 @@ const ADVERSARIAL_TOKEN_SOURCE = `
   )
 )
 
+(define-public (set-transfer-mode (mode uint))
+  (begin
+    (asserts! (is-admin) (err u1))
+    (var-set transfer-mode mode)
+    (ok true)
+  )
+)
+
+(define-public (set-balance-error (enabled bool))
+  (begin
+    (asserts! (is-admin) (err u1))
+    (var-set balance-error enabled)
+    (ok true)
+  )
+)
+
 (define-public (mint (amount uint) (recipient principal))
   (begin
     (asserts! (is-admin) (err u1))
@@ -64,11 +86,17 @@ const ADVERSARIAL_TOKEN_SOURCE = `
 (define-public (transfer (amount uint) (from principal) (to principal) (memo (optional (buff 34))))
   (begin
     (asserts! (is-eq tx-sender from) (err u2))
-    (ft-transfer?
-      adversarial-token
-      (if (and (var-get under-credit) (> amount u0)) (- amount u1) amount)
-      from
-      to
+    (if (is-eq (var-get transfer-mode) u1)
+      (err u3)
+      (if (is-eq (var-get transfer-mode) u2)
+        (ok false)
+        (ft-transfer?
+          adversarial-token
+          (if (and (var-get under-credit) (> amount u0)) (- amount u1) amount)
+          from
+          to
+        )
+      )
     )
   )
 )
@@ -77,15 +105,46 @@ const ADVERSARIAL_TOKEN_SOURCE = `
 (define-read-only (get-symbol) (ok "ADVR"))
 (define-read-only (get-decimals) (ok u8))
 (define-read-only (get-balance (user principal))
-  (let (
-    (actual (ft-get-balance adversarial-token user))
-    (offset (var-get balance-offset))
-  )
-    (ok (if (> actual offset) (- actual offset) u0))
+  (if (var-get balance-error)
+    (err u4)
+    (let (
+      (actual (ft-get-balance adversarial-token user))
+      (offset (var-get balance-offset))
+    )
+      (ok (if (> actual offset) (- actual offset) u0))
+    )
   )
 )
 (define-read-only (get-total-supply) (ok (ft-get-supply adversarial-token)))
 (define-read-only (get-token-uri) (ok none))
+`;
+
+// This harness exercises the same adapter-error normalization boundary as
+// sbtc-vault.clar without changing the production vault's fixed
+// .regulatory-adapter binding or adding a production dependency.
+const COMPLIANCE_HARNESS_SOURCE = `
+(use-trait regulatory-adapter-trait .core-traits.regulatory-adapter-trait)
+
+(define-constant ERR_NON_COMPLIANT u5104)
+(define-constant ERR_COMPLIANCE_CALL u5105)
+
+(define-private (check-compliance
+    (adapter <regulatory-adapter-trait>)
+    (user principal)
+  )
+  (match (contract-call? adapter check-clean-hands-compliance user)
+    compliant
+      (if compliant
+        (ok true)
+        (err ERR_NON_COMPLIANT)
+      )
+    adapter-error (err ERR_COMPLIANCE_CALL)
+  )
+)
+
+(define-public (check (adapter <regulatory-adapter-trait>) (user principal))
+  (check-compliance adapter user)
+)
 `;
 
 type SimnetLike = any;
@@ -230,6 +289,10 @@ describe('sBTC vault Phase 2A custody and share accounting', () => {
       simnet.callPublicFn(VAULT, 'set-paused', [Cl.bool(true)], wallet3).result,
       ERR_UNAUTHORIZED,
     );
+    expectError(
+      simnet.callPublicFn(VAULT, 'set-deposit-cap', [Cl.uint(0)], deployer).result,
+      ERR_INVALID_CAP,
+    );
 
     expect(
       simnet.callReadOnlyFn(VAULT, 'get-admin', [], deployer).result,
@@ -290,6 +353,11 @@ describe('sBTC vault Phase 2A custody and share accounting', () => {
     expect(accounting(wallet1)).toContain('total-assets: u150');
     expect(accounting(wallet1)).toContain('total-shares: u150');
     expect(accounting(wallet1)).toContain('user-shares: u100');
+
+    expectError(
+      simnet.callPublicFn(VAULT, 'set-deposit-cap', [Cl.uint(149)], deployer).result,
+      ERR_CAP_BELOW_ASSETS,
+    );
 
     expectError(
       simnet.callPublicFn(VAULT, 'deposit', [Cl.uint(1), canonicalToken()], wallet1).result,
@@ -425,6 +493,7 @@ describe('sBTC vault test-only custody failure fixtures', () => {
   let deployer: string;
   let wallet1: string;
   let fixtureName: string;
+  let complianceHarnessName: string;
 
   const fixtureToken = () => Cl.contractPrincipal(deployer, fixtureName);
   const vaultPrincipal = () => `${deployer}.${VAULT}`;
@@ -484,6 +553,7 @@ describe('sBTC vault test-only custody failure fixtures', () => {
     deployer = simnet.deployer;
     wallet1 = simnet.getAccounts().get('wallet_1')!;
     fixtureName = 'sbtc-vault-adversarial-token';
+    complianceHarnessName = 'sbtc-vault-compliance-harness';
 
     const key = new EC('secp256k1').genKeyPair();
     expect(
@@ -505,6 +575,13 @@ describe('sBTC vault test-only custody failure fixtures', () => {
       deployer,
     );
     expect(deployment.result).toEqual(Cl.bool(true));
+    const complianceHarnessDeployment = simnet.deployContract(
+      complianceHarnessName,
+      COMPLIANCE_HARNESS_SOURCE,
+      { clarityVersion: ClarityVersion.Clarity3 },
+      deployer,
+    );
+    expect(complianceHarnessDeployment.result).toEqual(Cl.bool(true));
     expect(
       simnet.callPublicFn(
         fixtureName,
@@ -541,6 +618,79 @@ describe('sBTC vault test-only custody failure fixtures', () => {
     expect(
       simnet.callReadOnlyFn(fixtureName, 'get-balance', [Cl.principal(wallet1)], deployer).result,
     ).toEqual(Cl.ok(Cl.uint(100)));
+  });
+
+  it('normalizes token transfer err and ok false without changing withdrawal state', () => {
+    expect(
+      simnet.callPublicFn(
+        VAULT,
+        'deposit',
+        [Cl.uint(10), fixtureToken()],
+        wallet1,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(
+      simnet.callPublicFn(fixtureName, 'set-transfer-mode', [Cl.uint(1)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expectError(
+      simnet.callPublicFn(VAULT, 'withdraw', [Cl.uint(1), fixtureToken()], wallet1).result,
+      ERR_TOKEN_CALL,
+    );
+    expect(readAccounting(wallet1)).toContain('total-assets: u10');
+    expect(readAccounting(wallet1)).toContain('total-shares: u10');
+
+    expect(
+      simnet.callPublicFn(fixtureName, 'set-transfer-mode', [Cl.uint(2)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expectError(
+      simnet.callPublicFn(VAULT, 'withdraw', [Cl.uint(1), fixtureToken()], wallet1).result,
+      ERR_TOKEN_CALL,
+    );
+    expect(readAccounting(wallet1)).toContain('total-assets: u10');
+    expect(readAccounting(wallet1)).toContain('total-shares: u10');
+  });
+
+  it('normalizes token balance err before servicing a withdrawal', () => {
+    expect(
+      simnet.callPublicFn(
+        VAULT,
+        'deposit',
+        [Cl.uint(10), fixtureToken()],
+        wallet1,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn(fixtureName, 'set-balance-error', [Cl.bool(true)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    expectError(
+      simnet.callPublicFn(VAULT, 'withdraw', [Cl.uint(1), fixtureToken()], wallet1).result,
+      ERR_TOKEN_CALL,
+    );
+    expect(readAccounting(wallet1)).toContain('total-assets: u10');
+    expect(readAccounting(wallet1)).toContain('total-shares: u10');
+  });
+
+  it('normalizes compliance adapter err through a test-only trait harness', () => {
+    expect(
+      simnet.callPublicFn(
+        'mock-regulatory-adapter',
+        'set-mode',
+        [Cl.uint(1)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    expectError(
+      simnet.callPublicFn(
+        complianceHarnessName,
+        'check',
+        [Cl.contractPrincipal(deployer, 'mock-regulatory-adapter'), Cl.principal(wallet1)],
+        wallet1,
+      ).result,
+      ERR_COMPLIANCE_CALL,
+    );
   });
 
   it('rejects every withdrawal when live assets are below aggregate accounting', () => {

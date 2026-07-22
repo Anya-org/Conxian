@@ -35,13 +35,21 @@ The Tokens module manages all native protocol assets including CXD (Sovereign De
 ### `cxlp-token.clar`
 | Function | Signature | Description |
 |----------|-----------|-------------|
+| `get-name` | `()` | Returns the SIP-010 token name. |
+| `get-symbol` | `()` | Returns the SIP-010 token symbol. |
+| `get-decimals` | `()` | Returns the SIP-010 decimal precision (`u8`). |
 | `transfer` | `(amount uint) (sender principal) (recipient principal) (memo (optional (buff 34)))` | SIP-010 compliant transfer. |
 | `get-balance` | `(who principal)` | Returns the token balance for a user. |
 | `get-total-supply` | `()` | Returns the canonical fungible-token supply. |
+| `get-token-uri` | `()` | Returns the optional SIP-010 metadata URI. |
 | `mint` | `(amount uint) (recipient principal)` | Mints CXLP for an authorized minter principal. |
 | `burn` | `(amount uint) (owner principal)` | Burns CXLP for an authorized burner principal. |
 | `add-minter` / `remove-minter` | `(principal)` | Admin-only minter role management, including revocation. |
 | `add-burner` / `remove-burner` | `(principal)` | Admin-only burner role management, including revocation. |
+| `add-approved-contract` / `remove-approved-contract` | `(principal)` | Compatibility helpers that grant or revoke both minter and burner roles. |
+| `is-minter` / `is-burner` | `(principal)` | Reads the independent minter and burner authorization maps. |
+| `is-approved-contract` | `(principal)` | Reports whether a principal has both mint and burn roles. |
+| `is-admin` / `get-admin` | `(caller principal)` / `()` | Reports or returns the current administrator. |
 | `initialize` / `set-admin` | `(new-admin principal)` | Rotates the admin under the current admin authorization. |
 | `get-protocol-status` | `()` | Returns compliance and version status. |
 
@@ -55,13 +63,22 @@ contract-only roles. Production deployment authorizes only the
 token's native fungible-token balance and supply are the accounting source of
 truth; no duplicate supply is tracked inside the token contract.
 
+Privileged failures use `u1000` (unauthorized), `u1001` (invalid amount),
+`u1002` (owner mismatch), `u1003` (insufficient balance), and `u1004`
+(supply overflow). The focused suite rotates the admin through a standard
+principal because the existing coordinator exposes token mint/burn wrappers
+but no admin-role wrapper; the same immediate-`contract-caller` predicate is
+exercised by the nested coordinator calls, so contract-principal rotation does
+not require a production-only test helper.
+
 The token is deliberately only a primitive. CXLP balances represent aggregate
 LP ownership and remain transferable through the SIP-010 interface. Pool
 authorization is wired after publication by adding
 `concentrated-liquidity-pool` as both a minter and burner. The CLP tracks only
 per-pool outstanding share totals and a protocol-wide outstanding total; it
 does not duplicate owner or owner/pool balances that ordinary transfers could
-make stale. Issue #536 must provide per-position/per-pool attribution, custody,
+make stale. Pool creation records concentrated-pool metadata only; it does not
+mint CXLP. Issue #536 must provide per-position/per-pool attribution, custody,
 and settlement validation before a burn is treated as a user withdrawal.
 
 ### `cxtr-token.clar`

@@ -17,7 +17,7 @@
     "coverage": "vitest run --coverage",
     "derive:wallets": "tsx scripts/derive_wallets.ts",
     "verify:deployment-evidence": "tsx scripts/deployment/verify-evidence.ts",
-    "test:deployment-evidence": "vitest run tests/deployment-evidence.test.ts --config vitest.config.ts --pool=threads",
+    "test:deployment-evidence": "node scripts/test-deployment-evidence.mjs",
     "test:release-plan-validation": "python3 -m unittest tests/test_release_plan_validation.py"
   },
   "dependencies": {

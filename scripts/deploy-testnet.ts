@@ -41,6 +41,29 @@ const network = { ...STACKS_TESTNET, coreApiUrl: CORE_API_URL };
 
 export const DEPLOYMENT_SCOPE = "testnet-helper-preparatory-only" as const;
 
+export class DeploymentPreflightError extends Error {
+  readonly code = "PREEXISTING_CONTRACT" as const;
+  readonly contractIds: string[];
+
+  constructor(contractIds: string[], phase: "bounded preflight" | "broadcast recheck" = "bounded preflight") {
+    super(
+      `${phase} found pre-existing target contract(s): ${contractIds.join(", ")}. ` +
+        "Abort before broadcasting; independent original publish receipt and interface evidence is required.",
+    );
+    this.name = "DeploymentPreflightError";
+    this.contractIds = [...contractIds];
+  }
+
+  toJSON(): { code: string; contractIds: string[]; message: string; independentEvidenceRequired: true } {
+    return {
+      code: this.code,
+      contractIds: this.contractIds,
+      message: this.message,
+      independentEvidenceRequired: true,
+    };
+  }
+}
+
 function apiHeaders(): Record<string, string> {
   return {
     accept: "application/json",
@@ -101,21 +124,47 @@ function requiredEnvironment(name: string): string {
   return value;
 }
 
-async function getJson(url: string): Promise<{ status: number; body: unknown }> {
-  let response: Response;
-  try {
-    response = await fetch(url, { headers: apiHeaders() });
-  } catch {
-    throw new Error(`request failed for ${url}`);
+export async function getJson(
+  url: string,
+  fetcher: typeof fetch = fetch,
+): Promise<{ status: number; body: unknown }> {
+  const requestTimeoutMs = Number(process.env.DEPLOY_API_TIMEOUT_MS || 30_000);
+  if (!Number.isInteger(requestTimeoutMs) || requestTimeoutMs <= 0) {
+    throw new Error("DEPLOY_API_TIMEOUT_MS must be a positive integer");
   }
+  const controller = new AbortController();
+  let timedOut = false;
+  const requestTimeout = Symbol("request-timeout");
+  const malformedResponse = Symbol("malformed-response");
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_, reject) => {
+    timeout = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+      reject(requestTimeout);
+    }, requestTimeoutMs);
+  });
 
-  let body: unknown;
   try {
-    body = await response.json();
-  } catch {
-    throw new Error(`API returned malformed JSON for ${url}`);
+    const response = await Promise.race([
+      fetcher(url, { headers: apiHeaders(), signal: controller.signal }),
+      deadline,
+    ]);
+    let body: unknown;
+    try {
+      body = await Promise.race([response.json(), deadline]);
+    } catch (error) {
+      if (error === requestTimeout || timedOut) throw error;
+      throw malformedResponse;
+    }
+    return { status: response.status, body };
+  } catch (error) {
+    if (error === requestTimeout || timedOut) throw new Error("request timed out");
+    if (error === malformedResponse) throw new Error("API returned malformed JSON");
+    throw new Error("request failed");
+  } finally {
+    if (timeout !== undefined) clearTimeout(timeout);
   }
-  return { status: response.status, body };
 }
 
 async function getAccountNonce(address: string): Promise<number> {
@@ -137,6 +186,21 @@ async function checkContractExists(address: string, contractName: string): Promi
   if (response.status === 404) return false;
   if (response.status === 200) return true;
   throw new Error(`interface preflight failed for ${contractName} (HTTP ${response.status})`);
+}
+
+export async function preflightTargetContracts(
+  address: string,
+  existsChecker: (address: string, contractName: string) => Promise<boolean> = checkContractExists,
+): Promise<void> {
+  const preexistingContracts: string[] = [];
+  for (const contract of DEPLOYMENT_SEQUENCE) {
+    if (await existsChecker(address, contract.name)) {
+      preexistingContracts.push(`${address}.${contract.name}`);
+    }
+  }
+  if (preexistingContracts.length > 0) {
+    throw new DeploymentPreflightError(preexistingContracts);
+  }
 }
 
 async function deployContract(contract: DeploymentContract, nonce: number, deployerPrivateKey: string): Promise<string> {
@@ -209,7 +273,10 @@ export async function main(): Promise<void> {
   const planSha256 = sha256File(planPath);
   const commit = sourceCommit();
   const contractPublications: ContractPublicationEvidence[] = [];
-  const interfaces: InterfaceExpectation[] = [];
+  const interfaces: InterfaceExpectation[] = DEPLOYMENT_SEQUENCE.map((contract) => ({
+    contractId: `${deployerAddress}.${contract.name}`,
+    requiredFunctions: contract.requiredFunctions ?? [],
+  }));
   const preexistingContracts: string[] = [];
 
   const buildBroadcastEvidence = (): DeploymentEvidence => ({
@@ -252,20 +319,21 @@ export async function main(): Promise<void> {
     console.log(`Deployer: ${deployerAddress}`);
     console.log("");
 
+    try {
+      await preflightTargetContracts(deployerAddress);
+    } catch (error) {
+      if (error instanceof DeploymentPreflightError) preexistingContracts.push(...error.contractIds);
+      throw error;
+    }
+
     let nonce = await getAccountNonce(deployerAddress);
     for (const contract of DEPLOYMENT_SEQUENCE) {
       const contractId = `${deployerAddress}.${contract.name}`;
-      interfaces.push({
-        contractId,
-        requiredFunctions: contract.requiredFunctions ?? [],
-      });
 
       const exists = await checkContractExists(deployerAddress, contract.name);
       if (exists) {
         preexistingContracts.push(contractId);
-        console.log(`  ↩ ${contract.name} - already present at checked address, skipping broadcast`);
-        writeBroadcastCandidate();
-        continue;
+        throw new DeploymentPreflightError([contractId], "broadcast recheck");
       }
 
       const txid = await deployContract(contract, nonce, deployerPrivateKey);
@@ -311,8 +379,12 @@ export async function main(): Promise<void> {
 const isDirectRun = process.argv[1] !== undefined && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isDirectRun) {
   void main().catch((error: unknown) => {
-    const message = error instanceof Error ? error.message : "testnet deployment failed";
-    process.stderr.write(`testnet deployment failed: ${message}\n`);
+    if (error instanceof DeploymentPreflightError) {
+      process.stderr.write(`${JSON.stringify(error.toJSON())}\n`);
+    } else {
+      const message = error instanceof Error ? error.message : "testnet deployment failed";
+      process.stderr.write(`testnet deployment failed: ${message}\n`);
+    }
     process.exitCode = 1;
   });
 }

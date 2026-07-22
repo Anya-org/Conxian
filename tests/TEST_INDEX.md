@@ -36,7 +36,7 @@ The Conxian Protocol utilizes a "Dual-Mode" testing architecture. This ensures t
 22. ✅ **tests/governance/gauge-manager.test.ts**: Canonical escrowed gauge voting, caps, epoch finalization, and withdrawals.
 
 ### Vault & Custody Tests
-23. ✅ **tests/vaults/sbtc-vault.test.ts**: Canonical-token-bound sBTC custody, immutable token configuration, receipt reconciliation, aggregate insolvency rejection, cap/pause controls, admin transfer, share accounting, withdrawals, and disabled strategy allocation.
+23. ✅ **tests/vaults/sbtc-vault.test.ts**: Canonical-token-bound sBTC custody, immutable token configuration, receipt reconciliation, token transfer/balance failure normalization, compliance adapter failure isolation, aggregate insolvency rejection, cap validation, pause controls, admin transfer, share accounting, withdrawals, and disabled strategy allocation.
 
 ### System Root Tests (Integration)
 24. ✅ **tests/system/full-protocol-journey.test.ts**: Coordination between Heartbeat, DEX, and Agents.
