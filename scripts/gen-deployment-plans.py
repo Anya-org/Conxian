@@ -76,6 +76,11 @@ def q(s):
 A = lambda s: q(f"'{DEPLOYER}{s}'")  # Single-quoted principal string, double-quoted in YAML
 
 INIT_CALL_COST = EXPECTED_CALL_COST  # Fixed cost for each init call
+# The generated release plans wire only the canonical payment route. They do
+# not publish prices/plans, configure bucket recipients, or register product
+# consumers: those are governance decisions that require audited principals.
+# The generic enterprise facade remains a test/integration boundary, not a
+# trusted product consumer by default.
 INIT_CALLS = [
     {"contract-id": f"{DEPLOYER}.conxian-protocol", "expected-sender": DEPLOYER,
      "method": "set-owner", "parameters": [A("")], "cost": INIT_CALL_COST},
@@ -103,7 +108,56 @@ INIT_CALLS = [
     {"contract-id": f"{DEPLOYER}.risk-unit", "expected-sender": DEPLOYER,
      "method": "set-ops-engine",
      "parameters": [A(".ops-engine")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.cxd-treasury", "expected-sender": DEPLOYER,
+     "method": "set-authorized-principals", "parameters": [
+         A(""), A(".revenue-distributor")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.cxd-treasury", "expected-sender": DEPLOYER,
+     "method": "authorize-stx-source",
+     "parameters": [A(".integration-fee-collector")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.cxd-treasury", "expected-sender": DEPLOYER,
+     "method": "authorize-stx-source",
+     "parameters": [A(".enterprise-subscription")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.revenue-distributor", "expected-sender": DEPLOYER,
+     "method": "set-revenue-automation",
+     "parameters": [A(".revenue-automation")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.revenue-distributor", "expected-sender": DEPLOYER,
+     "method": "authorize-stx-source",
+     "parameters": [A(".integration-fee-collector")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.revenue-distributor", "expected-sender": DEPLOYER,
+     "method": "authorize-stx-source",
+     "parameters": [A(".enterprise-subscription")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.revenue-automation", "expected-sender": DEPLOYER,
+     "method": "authorize-stx-source",
+     "parameters": [A(".enterprise-subscription")], "cost": INIT_CALL_COST},
 ]
+
+
+REQUIRED_ENTERPRISE_ROUTE_CALLS = [
+    (f"{DEPLOYER}.cxd-treasury", "set-authorized-principals", [A(""), A(".revenue-distributor")]),
+    (f"{DEPLOYER}.cxd-treasury", "authorize-stx-source", [A(".enterprise-subscription")]),
+    (f"{DEPLOYER}.revenue-distributor", "set-revenue-automation", [A(".revenue-automation")]),
+    (f"{DEPLOYER}.revenue-distributor", "authorize-stx-source", [A(".enterprise-subscription")]),
+    (f"{DEPLOYER}.revenue-automation", "authorize-stx-source", [A(".enterprise-subscription")]),
+]
+
+
+def validate_enterprise_wiring(plan):
+    """Fail fast if subscription routing drifts or governance is auto-wired."""
+    calls = []
+    for batch in plan["plan"]["batches"]:
+        for tx in batch["transactions"]:
+            call = tx.get("contract-call")
+            if call:
+                calls.append((call["contract-id"], call["method"], call["parameters"]))
+
+    missing = [required for required in REQUIRED_ENTERPRISE_ROUTE_CALLS if required not in calls]
+    if missing:
+        raise ValueError(f"missing enterprise route wiring: {missing}")
+
+    forbidden = {"publish-plan", "publish-feature", "register-consumer", "set-stx-bucket-recipient"}
+    unexpected = [call for call in calls if call[1] in forbidden]
+    if unexpected:
+        raise ValueError(f"release plan must remain fail-closed for governance/product setup: {unexpected}")
 
 
 GENERATED_PLAN_NAMES = (
@@ -213,6 +267,7 @@ def generate_plans(simnet_path, output_dir):
         stacks_node=EXPECTED_STACKS_NODES["testnet"],
         cost=COST_TESTNET,
     )
+    validate_enterprise_wiring(testnet)
     testnet_path = output_dir / GENERATED_PLAN_NAMES[0]
     save_plan(testnet, testnet_path)
 
@@ -223,6 +278,7 @@ def generate_plans(simnet_path, output_dir):
         stacks_node=EXPECTED_STACKS_NODES["mainnet"],
         cost=COST_MAINNET,
     )
+    validate_enterprise_wiring(mainnet)
     mainnet_path = output_dir / GENERATED_PLAN_NAMES[1]
     save_plan(mainnet, mainnet_path)
 

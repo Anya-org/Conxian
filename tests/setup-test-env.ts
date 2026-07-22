@@ -88,6 +88,57 @@ export async function initializeSimnet(): Promise<Simnet> {
         instance.callPublicFn('bme-engine', 'add-activity-reporter', [Cl.contractPrincipal(deployer, 'lending-manager')], deployer);
       } catch (e) {}
 
+      // Wire the canonical gross-STX enterprise route. The production
+      // deployment plan performs the same explicit principal injection; the
+      // simnet bootstrap keeps focused tests independent of post-deploy calls.
+      try {
+        instance.callPublicFn(
+          'cxd-treasury',
+          'set-authorized-principals',
+          [Cl.principal(deployer), Cl.contractPrincipal(deployer, 'revenue-distributor')],
+          deployer,
+        );
+        instance.callPublicFn(
+          'cxd-treasury',
+          'authorize-stx-source',
+          [Cl.contractPrincipal(deployer, 'integration-fee-collector')],
+          deployer,
+        );
+        instance.callPublicFn(
+          'cxd-treasury',
+          'authorize-stx-source',
+          [Cl.contractPrincipal(deployer, 'enterprise-subscription')],
+          deployer,
+        );
+        instance.callPublicFn(
+          'revenue-distributor',
+          'set-revenue-automation',
+          [Cl.contractPrincipal(deployer, 'revenue-automation')],
+          deployer,
+        );
+        instance.callPublicFn(
+          'revenue-distributor',
+          'authorize-stx-source',
+          [Cl.contractPrincipal(deployer, 'integration-fee-collector')],
+          deployer,
+        );
+        instance.callPublicFn(
+          'revenue-distributor',
+          'authorize-stx-source',
+          [Cl.contractPrincipal(deployer, 'enterprise-subscription')],
+          deployer,
+        );
+        instance.callPublicFn(
+          'revenue-automation',
+          'authorize-stx-source',
+          [Cl.contractPrincipal(deployer, 'enterprise-subscription')],
+          deployer,
+        );
+      } catch (e) {
+        // Focused route tests assert the configured route and fail closed if
+        // any required principal injection cannot be applied.
+      }
+
       console.log('✅ Bootstrap Complete');
       return instance;
     } catch (error) {
