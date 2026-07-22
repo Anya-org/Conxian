@@ -42,6 +42,10 @@
 (define-public (initialize (new-owner principal))
   (begin
     (asserts! (not (var-get initialized)) (err ERR_UNAUTHORIZED))
+    ;; `contract-owner` is initialized to the publish-time tx-sender. Require
+    ;; that principal to perform the first call so an arbitrary first caller
+    ;; cannot front-run initialization and take custody ownership.
+    (asserts! (is-eq tx-sender (var-get contract-owner)) (err ERR_UNAUTHORIZED))
     (var-set contract-owner new-owner)
     (var-set initialized true)
     (ok true)
@@ -107,4 +111,11 @@
 ;; @desc Returns the current contract owner principal.
 (define-read-only (get-contract-owner)
   (var-get contract-owner)
+)
+
+;; Returns whether the publish-time owner has completed initialization. The
+;; collector uses this fixed read-only gate before any custody route so assets
+;; cannot be forwarded into an uninitialized treasury.
+(define-read-only (is-initialized)
+  (var-get initialized)
 )

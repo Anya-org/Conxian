@@ -34,16 +34,21 @@ The Conxian Protocol utilizes a "Dual-Mode" testing architecture. This ensures t
 20. ✅ **tests/governance/upgrade-controller.test.ts**: Release authorization, signer thresholds, timelock, rollout, and rollback.
 21. ✅ **tests/governance/gauge-manager.test.ts**: Canonical escrowed gauge voting, caps, epoch finalization, and withdrawals.
 
+### Vault & Custody Tests
+22. ✅ **tests/vaults/sbtc-vault.test.ts**: Canonical-token-bound sBTC custody, immutable token configuration, receipt reconciliation, aggregate insolvency rejection, cap/pause controls, admin transfer, share accounting, withdrawals, and disabled strategy allocation.
+
 ### System Root Tests (Integration)
-22. ✅ **tests/system/full-protocol-journey.test.ts**: Coordination between Heartbeat, DEX, and Agents.
-23. ✅ **tests/cybernetic-revenue.test.ts**: Dynamic "Fiscal Dam" allocation (CXIP-013).
-24. ✅ **tests/cxip-012.test.ts**: Volatility-based DEX fee adjustments.
-25. ✅ **tests/nakamoto_verification.test.ts**: Tenure info and block utility checks.
+23. ✅ **tests/system/full-protocol-journey.test.ts**: Coordination between Heartbeat, DEX, and Agents.
+24. ✅ **tests/cybernetic-revenue.test.ts**: Dynamic "Fiscal Dam" allocation (CXIP-013).
+25. ✅ **tests/cxip-012.test.ts**: Volatility-based DEX fee adjustments.
+26. ✅ **tests/nakamoto_verification.test.ts**: Tenure info and block utility checks.
+27. ✅ **tests/protocol-fee-collector.test.ts**: Burn-block phase boundaries, fixed collector-custody FT/STX settlement, direct-deposit excess recovery, explicit operational-treasury routing, residual and phase-change accounting, split admin/governance authorization, immediate-caller admin handoff, source-scoped replay, exact events, and rollback.
+28. ✅ **tests/operational-treasury-init.test.ts**: Publish-time-owner initialization, first-caller front-run rejection, and STX/SIP-010 withdrawal custody.
 
 ## How to Run Tests
 ```bash
 npm install
-npx vitest run tests/[path_to_test]
+bash scripts/run-tests.sh tests/[path_to_test]
 ```
 
 ## Standards Compliance

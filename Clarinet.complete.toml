@@ -631,6 +631,11 @@ path = "contracts/enterprise/enterprise-facade.clar"
 clarity-version = 4
 depends_on = [ "enterprise-subscription",]
 
+[contracts.protocol-fee-collector]
+path = "contracts/treasury/protocol-fee-collector.clar"
+clarity-version = 4
+depends_on = [ "operational-treasury", "sip-standards",]
+
 [contracts.integration-fee-collector]
 path = "contracts/integrations/integration-fee-collector.clar"
 clarity-version = 4
@@ -638,7 +643,8 @@ depends_on = [ "integration-fee-trait", "integration-registry", "revenue-distrib
 
 [contracts.sbtc-vault]
 path = "contracts/vaults/sbtc-vault.clar"
-depends_on = [ "regulatory-adapter",]
+clarity-version = 4
+depends_on = [ "core-traits", "regulatory-adapter", "sip-standards", "vault-traits",]
 
 [contracts.token-system-coordinator]
 path = "contracts/tokens/token-system-coordinator.clar"
