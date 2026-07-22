@@ -104,7 +104,12 @@
 
 ;; @desc Check if the contract is paused
 (define-read-only (is-paused)
-  (unwrap-panic (contract-call? .enhanced-circuit-breaker is-contract-paused .lending-manager))
+  ;; A circuit-breaker read failure is itself a fail-closed signal. Do not
+  ;; panic in a read-only guard that gates every public lending operation.
+  (let ((pause-result (contract-call? .enhanced-circuit-breaker is-contract-paused .lending-manager)))
+    (if (is-ok pause-result)
+      (unwrap! pause-result true)
+      true))
 )
 
 ;; --- Public Functions ---
@@ -158,7 +163,9 @@
       (asserts! (<= amount (get total-deposits reserve)) (err ERR_INSUFFICIENT_LIQUIDITY))
       (map-set borrows { asset: asset, user: caller } (+ (default-to u0 (map-get? borrows { asset: asset, user: caller })) amount))
       (map-set reserve-data asset (merge reserve { total-borrows: (+ (get total-borrows reserve) amount) }))
-      (let ((hf (unwrap-panic (calculate-account-health caller))))
+      ;; Preserve a defined health-calculation error instead of converting it
+      ;; into a runtime panic in this public path.
+      (let ((hf (unwrap! (calculate-account-health caller) (err ERR_INTERNAL))))
         (asserts! (>= hf u10000) (err ERR_INSUFFICIENT_COLLATERAL))
       )
       (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) caller none)))
@@ -326,7 +333,9 @@
       (asserts! (not (is-paused)) (err ERR_PAUSED))
       (asserts! (>= user-deposit amount) (err ERR_INVALID_AMOUNT))
       (map-set deposits { asset: asset, user: tx-sender } (- user-deposit amount))
-      (let ((hf (unwrap-panic (calculate-account-health tx-sender))))
+      ;; Preserve a defined health-calculation error instead of converting it
+      ;; into a runtime panic in this public path.
+      (let ((hf (unwrap! (calculate-account-health tx-sender) (err ERR_INTERNAL))))
         (asserts! (>= hf u10000) (err ERR_INSUFFICIENT_COLLATERAL))
         (map-set reserve-data asset (merge reserve { total-deposits: (if (>= (get total-deposits reserve) amount) (- (get total-deposits reserve) amount) u0) }))
         (try! (as-contract (contract-call? asset-trait transfer amount (as-contract tx-sender) recipient none)))
@@ -450,6 +459,10 @@
 (define-public (initialize (new-admin principal))
   (begin
     (asserts! (not (var-get initialized)) (err ERR_UNAUTHORIZED))
+    ;; `admin` is initialized to the publish-time tx-sender. Require that
+    ;; principal to perform the one-time handoff so an arbitrary first caller
+    ;; cannot front-run initialization and seize administrative control.
+    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
     (var-set admin new-admin)
     (var-set initialized true)
     (ok true)

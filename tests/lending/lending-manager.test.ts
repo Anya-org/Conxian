@@ -1,4 +1,7 @@
 import { describe, expect, it, beforeAll } from 'vitest';
+import { execFileSync } from 'node:child_process';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Cl } from '@stacks/transactions';
 import { simnet } from '../setup-test-env';
 
@@ -6,11 +9,13 @@ describe('lending-orchestrator', () => {
   let deployer: string;
   let wallet1: string;
   let wallet2: string;
+  let wallet3: string;
   let managerPrincipal: string;
   let mockTokenPrincipal: string;
 
   const MAX_UINT = 340282366920938463463374607431768211455n;
   const ERR_PROTOCOL_FEE_ARITHMETIC_OVERFLOW = 5021;
+  const ERR_PROTOCOL_FEE_SETTLEMENT = 5017;
   const ERR_PROTOCOL_FEE_STREAM_INVALID = 5022;
   const ERR_PROTOCOL_FEE_STREAM_ALREADY_SET = 5023;
 
@@ -47,6 +52,7 @@ describe('lending-orchestrator', () => {
     deployer = accounts.get('deployer')!;
     wallet1 = accounts.get('wallet_1')!;
     wallet2 = accounts.get('wallet_2')!;
+    wallet3 = accounts.get('wallet_3')!;
     managerPrincipal = `${deployer}.lending-manager`;
     mockTokenPrincipal = `${deployer}.mock-token`;
     // Mint mock tokens to deployer for testing
@@ -54,6 +60,7 @@ describe('lending-orchestrator', () => {
     // Mint mock tokens to wallet1 for testing
     simnet.callPublicFn('mock-token', 'mint', [Cl.uint(1000000), Cl.principal(wallet1)], deployer);
     simnet.callPublicFn('mock-token', 'mint', [Cl.uint(1000000), Cl.principal(wallet2)], deployer);
+    simnet.callPublicFn('mock-token', 'mint', [Cl.uint(1000000), Cl.principal(wallet3)], deployer);
 
     // The lending manager is the only source for this asset's scheduled
     // protocol-fee stream. Repayment tests must fail closed if this mapping or
@@ -191,6 +198,60 @@ describe('lending-orchestrator', () => {
       deployer,
     );
     expect(result).toEqual(Cl.ok(Cl.bool(true)));
+  });
+
+  it('rejects a source trait whose principal is not lending-manager without changing repayment custody or state', async () => {
+    const asset = Cl.contractPrincipal(deployer, 'mock-token');
+    const wrongSource = Cl.contractPrincipal(deployer, 'mock-fee-source');
+    const borrower = wallet3;
+
+    await simnet.callPublicFn('lending-manager', 'deposit', [asset, Cl.uint(300)], borrower);
+    await simnet.callPublicFn('lending-manager', 'borrow', [asset, Cl.uint(100)], borrower);
+
+    const reserveBefore = simnet.callReadOnlyFn('lending-manager', 'get-reserve-data', [asset], deployer).result;
+    const borrowBefore = simnet.callReadOnlyFn(
+      'lending-manager',
+      'get-user-borrow-balance',
+      [Cl.principal(borrower), Cl.principal(mockTokenPrincipal)],
+      deployer,
+    ).result;
+    const borrowerBefore = tokenBalance('mock-token', borrower);
+    const managerBefore = tokenBalance('mock-token', managerPrincipal);
+    const collectorBefore = tokenBalance('mock-token', `${deployer}.protocol-fee-collector`);
+    const nonceBefore = simnet.callReadOnlyFn('lending-manager', 'get-protocol-fee-nonce', [], deployer).result;
+    const pendingBefore = simnet.callReadOnlyFn(
+      'lending-manager',
+      'get-pending-protocol-fee',
+      [Cl.principal(borrower)],
+      deployer,
+    ).result;
+
+    expect(simnet.callPublicFn(
+      'lending-manager',
+      'repay',
+      [asset, Cl.uint(100), wrongSource],
+      borrower,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_PROTOCOL_FEE_SETTLEMENT)));
+
+    expect(simnet.callReadOnlyFn('lending-manager', 'get-reserve-data', [asset], deployer).result)
+      .toEqual(reserveBefore);
+    expect(simnet.callReadOnlyFn(
+      'lending-manager',
+      'get-user-borrow-balance',
+      [Cl.principal(borrower), Cl.principal(mockTokenPrincipal)],
+      deployer,
+    ).result).toEqual(borrowBefore);
+    expect(tokenBalance('mock-token', borrower)).toBe(borrowerBefore);
+    expect(tokenBalance('mock-token', managerPrincipal)).toBe(managerBefore);
+    expect(tokenBalance('mock-token', `${deployer}.protocol-fee-collector`)).toBe(collectorBefore);
+    expect(simnet.callReadOnlyFn('lending-manager', 'get-protocol-fee-nonce', [], deployer).result)
+      .toEqual(nonceBefore);
+    expect(simnet.callReadOnlyFn(
+      'lending-manager',
+      'get-pending-protocol-fee',
+      [Cl.principal(borrower)],
+      deployer,
+    ).result).toEqual(pendingBefore);
   });
 
   it('charges the launch schedule on interest only and credits net reserves', async () => {
@@ -569,5 +630,77 @@ describe('lending-orchestrator', () => {
       );
       expect(overBorrowRes.result).toEqual(Cl.error(Cl.uint(1003))); // ERR_INSUFFICIENT_COLLATERAL
     });
+  });
+
+  it('rejects an arbitrary first initializer and permits the publish-time admin handoff exactly once', () => {
+    const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+    const probe = `
+      import { readFileSync, writeFileSync } from 'node:fs';
+      import { resolve } from 'node:path';
+      import { initSimnet } from '@stacks/clarinet-sdk';
+      import { Cl } from '@stacks/transactions';
+
+      const planPath = resolve('deployments/default.simnet-plan.yaml');
+      const plan = readFileSync(planPath);
+      try {
+        const isolatedSimnet = await initSimnet('Clarinet.toml');
+        const isolatedDeployer = isolatedSimnet.deployer;
+        const isolatedWallet1 = isolatedSimnet.getAccounts().get('wallet_1');
+        const unauthorized = isolatedSimnet.callPublicFn(
+          'lending-manager',
+          'initialize',
+          [Cl.principal(isolatedWallet1)],
+          isolatedWallet1,
+        );
+        const adminBefore = isolatedSimnet.getDataVar('lending-manager', 'admin');
+        const initializedBefore = isolatedSimnet.getDataVar('lending-manager', 'initialized');
+        const authorized = isolatedSimnet.callPublicFn(
+          'lending-manager',
+          'initialize',
+          [Cl.principal(isolatedWallet1)],
+          isolatedDeployer,
+        );
+        const adminAfter = isolatedSimnet.getDataVar('lending-manager', 'admin');
+        const initializedAfter = isolatedSimnet.getDataVar('lending-manager', 'initialized');
+        const repeated = isolatedSimnet.callPublicFn(
+          'lending-manager',
+          'initialize',
+          [Cl.principal(isolatedDeployer)],
+          isolatedDeployer,
+        );
+        console.log('LENDING_INIT_REGRESSION ' + JSON.stringify({
+          unauthorized: Cl.prettyPrint(unauthorized.result),
+          adminBefore: Cl.prettyPrint(adminBefore),
+          initializedBefore: Cl.prettyPrint(initializedBefore),
+          authorized: Cl.prettyPrint(authorized.result),
+          adminAfter: Cl.prettyPrint(adminAfter),
+          initializedAfter: Cl.prettyPrint(initializedAfter),
+          repeated: Cl.prettyPrint(repeated.result),
+          wallet1: Cl.prettyPrint(Cl.principal(isolatedWallet1)),
+        }));
+      } finally {
+        writeFileSync(planPath, plan);
+      }
+    `;
+    const output = execFileSync(
+      process.execPath,
+      ['--import', 'tsx/esm', '--eval', probe],
+      { cwd: repoRoot, encoding: 'utf8' },
+    );
+    const match = output.match(/LENDING_INIT_REGRESSION (\{.*\})/);
+    expect(match).not.toBeNull();
+    const result = JSON.parse(match![1]);
+    expect(result).toEqual({
+      unauthorized: '(err u1000)',
+      adminBefore: expect.stringMatching(/^'.+$/),
+      initializedBefore: 'false',
+      authorized: '(ok true)',
+      adminAfter: expect.stringMatching(/^'.+$/),
+      initializedAfter: 'true',
+      repeated: '(err u1000)',
+      wallet1: expect.stringMatching(/^'.+$/),
+    });
+    expect(result.adminAfter).toBe(result.wallet1);
+    expect(result.adminAfter).not.toBe(result.adminBefore);
   });
 });

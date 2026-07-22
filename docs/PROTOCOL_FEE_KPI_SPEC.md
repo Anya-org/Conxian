@@ -70,6 +70,22 @@ zero-value transfer, but it still records the base, residual, and accounting
 row and consumes the authenticated pending record. Existing untracked excess
 remains outside collected-fee totals.
 
+#### Indexer-derived custody mode
+
+`custody_mode` is a normalized indexer field, not an explicit member of the
+collector's on-chain settlement tuple or `protocol-fee-collected` event. Derive
+it deterministically from the successful collector public function recorded in
+the transaction call trace:
+
+- `settle-ft` or `settle-stx` means `custody_mode = payer`;
+- `settle-source-ft` or `settle-source-stx` means `custody_mode = source`.
+
+The rule must use the collector function actually called for the accepted
+settlement. Do not infer the value only from the `payer`, `source`, or transfer
+events, and do not report that an on-chain `custody_mode` field exists. If the
+call trace cannot identify one of these four entrypoints, retain the receipt
+for audit but mark the normalized field unavailable rather than guessing.
+
 The approved lending migration uses this API only for the interest component
 `floor(amount * 1000 / 10000)`. The fee replaces the legacy 1% full-repayment
 charge on that designated base; principal is never an eligible fee base, and
@@ -228,7 +244,7 @@ The minimum normalized settlement row is:
 | `burn_height` | uint | yes | Burn-block context emitted by Clarity |
 | `stacks_height` | uint | yes | Stacks-block context emitted by Clarity |
 | `block_time` | timestamp | yes for USD windows | Indexer-resolved block timestamp |
-| `custody_mode` | enum | yes | `payer` or `source`; identifies which atomic custody API supplied the assessed amount |
+| `custody_mode` | enum (indexer-derived) | yes | `payer` or `source`, derived from the collector public function; not an on-chain tuple/event field |
 | `decimals` | integer | yes for USD | Immutable/versioned asset metadata |
 | `oracle_source` | string | yes for USD | Price source identifier |
 | `oracle_round` | string/uint | yes for USD | Price round/version |

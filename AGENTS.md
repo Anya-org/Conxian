@@ -135,10 +135,10 @@ Non-dry attempts are blocked before signing/broadcast pending issue #531's struc
 - Any address check is scoped to the checked address or addresses; it must not be read as a claim of global nonexistence.
 
 ### Deployment Plans
-- `deployments/full-system.testnet-plan.yaml` — 10 batches (9 contract-publish + 1 contract-call wiring)
+- `deployments/full-system.testnet-plan.yaml` — 11 batches (10 contract-publish + 1 contract-call wiring)
 - `deployments/full-system.mainnet-plan.yaml` — same structure, mainnet costs
 - Generated via `scripts/gen-deployment-plans.py` from `default.simnet-plan.yaml`
-- 5 test helpers excluded: `mock-circuit-breaker`, `mock-csf-protocol`, `mock-proposal`, `mock-token`, `test-c4-helper`
+- 9 test helpers excluded: `mock-circuit-breaker`, `mock-csf-protocol`, `mock-proposal`, `mock-regulatory-adapter`, `mock-token`, `mock-fee-source`, `mock-compoundable-vault`, `mock-admin-forwarder`, `test-c4-helper`
 - All contracts: `clarity-version: 4`, `epoch: 3.0`, `anchor-block-only: true`
 
 ### CI Workflows
