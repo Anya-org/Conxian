@@ -14,7 +14,6 @@ const ERR_STREAM_INACTIVE = 4106;
 const ERR_INVALID_ROUTE = 4107;
 const ERR_INVALID_AMOUNT = 4109;
 const ERR_SETTLEMENT_REPLAYED = 4110;
-const ERR_SETTLEMENT_IN_PROGRESS = 4116;
 const ERR_STREAM_ALREADY_REGISTERED = 4117;
 const ERR_EXCESS_RECOVERY_EXCEEDS_AVAILABLE = 4122;
 const MODE_EXACT = 0;
@@ -1247,7 +1246,6 @@ describe('Canonical protocol fee collector', () => {
       deployer,
     ).result;
     expect(wrongTokenPreview.type).toBe('ok');
-    const wrongTokenFee = BigInt(wrongTokenPreview.value.value['assessed-amount'].value);
     expect(simnet.callPublicFn(
       'mock-fee-source',
       'settle-ft',
