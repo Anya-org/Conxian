@@ -330,18 +330,18 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
-        contract-name: compliance-manager
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/compliance/compliance-manager.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
         contract-name: kyc-registry
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/identity/kyc-registry.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: compliance-manager
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/compliance/compliance-manager.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0

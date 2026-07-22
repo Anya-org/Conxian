@@ -48,6 +48,10 @@
   (default-to { tier: u0, flags: u0, country: "???" } (map-get? identity-status user))
 )
 
+(define-read-only (has-identity-status (user principal))
+  (is-some (map-get? identity-status user))
+)
+
 (define-read-only (is-sanctioned (user principal))
   (let ((status (get-identity-status user)))
     ;; flag u2 = sanctioned

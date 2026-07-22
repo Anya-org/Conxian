@@ -1,5 +1,97 @@
 # Documentation State
 
+## Current Session (39) - Registration Compliance Trust-Model Follow-up (Issue #504)
+
+{
+  "status": "IMPLEMENTED_LOCALLY",
+  "session_timestamp": "2026-07-22",
+  "scope": "Resolved the adversarial review findings on the registration compliance gate without changing the fee boundary or communicating externally.",
+  "base": {
+    "prior_commit": "ed935a2cd916cdebd31d59eeb5d4fdf28d403c0f",
+    "branch": "charlie/504-registration-compliance-gate"
+  },
+  "trust_model": {
+    "registration_gate": "is-registration-compliant requires a fresh compliance-manager record, manager tier u1-u3 at or above the requested minimum, an existing kyc-registry record, a registry tier u1-u3 at or above the same minimum, and kyc-registry.is-sanctioned == false.",
+    "legacy_sanctions_field": "The gate does not use compliance-records.sanctions-checked. Existing false writes remain valid for the normal KYC path; positive true writes are restricted to the configured sanctions-provider.",
+    "kyc_hook": "compliance-hooks.verify-kyc safely records sanctions-checked=false in compliance-manager and does not create kyc-registry evidence. The gate therefore returns ok(false) until the registry admin writes a matching clean record.",
+    "freshness": "Manager freshness remains inclusive at u144 burn blocks. Future timestamps fail closed defensively, but no direct fixture test is claimed because production APIs cannot create future-dated records without weakening the trust boundary."
+  },
+  "changed_components": [
+    "contracts/compliance/compliance-manager.clar",
+    "contracts/compliance/compliance-hooks.clar",
+    "contracts/identity/kyc-registry.clar",
+    "Clarinet.toml",
+    "Clarinet.complete.toml",
+    "deployments/default.simnet-plan.yaml",
+    "deployments/full-system.testnet-plan.yaml",
+    "deployments/full-system.mainnet-plan.yaml",
+    "tests/compliance/compliance-manager-registration.test.ts"
+  ],
+  "documentation": [
+    "contracts/compliance/README.md",
+    "contracts/identity/README.md",
+    "docs/REGISTRATION_FEE_AUDIT_AND_ROADMAP.md",
+    "docs/REVENUE_ANALYSIS.md",
+    "docs/FUNDING_AND_ECONOMICS.md",
+    "docs/DOCUMENTATION_STATE.md"
+  ],
+  "validation": {
+    "registration_tests": "PASS: bash scripts/run-tests.sh tests/compliance/compliance-manager-registration.test.ts (7 tests; 4 known benign Clarinet SDK runtime warnings, 0 new errors)",
+    "compliance_regressions": "PASS: bash scripts/run-tests.sh tests/enterprise/p0-compliance-hooks.test.ts tests/compliance/regulatory-adapter-sip018.test.ts (8 tests; 8 known benign Clarinet SDK runtime warnings, 0 new errors)",
+    "integration_fee_regression": "PASS: bash scripts/run-tests.sh tests/integration-fees.test.ts (11 tests; 4 known benign Clarinet SDK runtime warnings, 0 new errors)",
+    "compile_initialization": "PASS: bash scripts/run-tests.sh tests/check-compile.test.ts (1 test; 4 known benign Clarinet SDK runtime warnings, 0 new errors)",
+    "release_plan_consistency": "PASS: python3 scripts/gen-deployment-plans.py --check (206 production contracts in 9 batches)",
+    "contamination_and_hygiene": "PASS: python3 scripts/verify_contamination_guard.py; git diff --check",
+    "changed_doc_links": "PASS: local relative-link check for 6 changed Markdown files",
+    "native_clarinet": "BLOCKED: direct clarinet binary is not installed in the workspace",
+    "docs_validator": "BLOCKED: npm run validate:docs cannot load missing scripts/validate-docs.js",
+    "deployment": "Not attempted; only dependency ordering in checked-in plans changed. No on-chain deployment or readiness claim was made."
+  },
+  "source_control": "Follow-up signed-off commit is created locally on this branch only; no push, PR, or GitHub communication."
+}
+
+## Superseded Session (38) - Initial Registration Compliance Gate (Issue #504)
+
+This historical entry describes the initial candidate in commit
+`ed935a2cd916cdebd31d59eeb5d4fdf28d403c0f`; Session 39 above supersedes its
+trust-model and coverage claims.
+
+{
+  "status": "IMPLEMENTED_LOCALLY",
+  "session_timestamp": "2026-07-22",
+  "scope": "Implemented the bounded Phase 3 candidate for Issue #504: one canonical, fail-closed read-only registration-compliance gate in compliance-manager.clar, focused boundary/regression tests, and a durable registration-fee audit/roadmap.",
+  "base": {
+    "origin_main": "d9aa09d281886f0efabc0b78416e1d373eae03cf",
+    "branch": "charlie/504-registration-compliance-gate"
+  },
+  "implementation": {
+    "contract": "contracts/compliance/compliance-manager.clar",
+    "api": "is-registration-compliant(principal,uint) -> (response bool uint)",
+    "semantics": "Requires an existing compliance record, caller/configured KYC minimum u1-u3, positive clean-screen sanctions-checked=true, and inclusive burn-block freshness <= VALIDITY_PERIOD (u144). Missing, low-tier, non-clean, stale, or future-dated records return ok(false); invalid minimum tiers return ERR_INVALID_MINIMUM_KYC_LEVEL u3003.",
+    "economic_boundary": "No registration-fee manager, escrow, refund, activation, revenue split, deployment-plan change, issue closure, or GitHub comment was added. CXIP-013 registration-fee vault-recycling language remains authoritative pending policy approval."
+  },
+  "documentation": [
+    "docs/REGISTRATION_FEE_AUDIT_AND_ROADMAP.md",
+    "contracts/compliance/README.md",
+    "docs/REVENUE_ANALYSIS.md",
+    "docs/FUNDING_AND_ECONOMICS.md"
+  ],
+  "tests": [
+    "tests/compliance/compliance-manager-registration.test.ts"
+  ],
+  "validation": {
+    "targeted_tests": "PASS: bash scripts/run-tests.sh tests/compliance/compliance-manager-registration.test.ts (8 tests; 4 known benign Clarinet SDK runtime warnings, 0 new errors)",
+    "existing_compliance_tests": "PASS: bash scripts/run-tests.sh tests/enterprise/p0-compliance-hooks.test.ts tests/compliance/regulatory-adapter-sip018.test.ts (8 tests; 8 known benign Clarinet SDK runtime warnings, 0 new errors)",
+    "integration_fee_regression": "PASS: bash scripts/run-tests.sh tests/integration-fees.test.ts (11 tests; 4 known benign Clarinet SDK runtime warnings, 0 new errors)",
+    "compile_initialization": "PASS: bash scripts/run-tests.sh tests/check-compile.test.ts (1 test; 4 known benign Clarinet SDK runtime warnings, 0 new errors)",
+    "contamination_and_hygiene": "PASS: python3 scripts/verify_contamination_guard.py; git diff --check",
+    "changed_doc_links": "PASS: local relative-link check for the 4 changed documentation files",
+    "native_clarinet": "BLOCKED: `clarinet --version` fails with `bash: clarinet: command not found`; Clarinet SDK initialization/compile smoke passes instead.",
+    "docs_validator": "BLOCKED: `npm run validate:docs` fails because `/home/user/Conxian/scripts/validate-docs.js` is missing (MODULE_NOT_FOUND).",
+    "deployment": "Not attempted; no deployment readiness claimed."
+  }
+}
+
 ## Current Session (37) - Yield Infrastructure Final Review (Issue #506)
 
 {
