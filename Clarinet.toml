@@ -78,6 +78,11 @@ path = "contracts/treasury/revenue-automation.clar"
 clarity-version = 4
 depends_on = ["enterprise-revenue-trait", "revenue-distributor", "sip-standards"]
 
+[contracts.protocol-fee-collector]
+path = "contracts/treasury/protocol-fee-collector.clar"
+clarity-version = 4
+depends_on = ["operational-treasury", "sip-standards"]
+
 [contracts.revenue-distributor]
 path = "contracts/treasury/revenue-distributor.clar"
 clarity-version = 4
@@ -957,7 +962,7 @@ clarity-version = 4
 [contracts.test-c4-helper]
 path = "contracts/test-helpers/test-c4-helper.clar"
 clarity-version = 4
-depends_on = ["opex-vault", "sip-standards"]
+depends_on = ["opex-vault", "protocol-fee-collector", "sip-standards"]
 
 [contracts.timelock]
 path = "contracts/governance/timelock.clar"

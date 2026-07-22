@@ -631,6 +631,11 @@ path = "contracts/enterprise/enterprise-facade.clar"
 clarity-version = 4
 depends_on = [ "enterprise-subscription",]
 
+[contracts.protocol-fee-collector]
+path = "contracts/treasury/protocol-fee-collector.clar"
+clarity-version = 4
+depends_on = [ "operational-treasury", "sip-standards",]
+
 [contracts.integration-fee-collector]
 path = "contracts/integrations/integration-fee-collector.clar"
 clarity-version = 4

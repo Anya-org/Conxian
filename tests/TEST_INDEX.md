@@ -41,6 +41,8 @@ The Conxian Protocol utilizes a "Dual-Mode" testing architecture. This ensures t
 23. ✅ **tests/cybernetic-revenue.test.ts**: Dynamic "Fiscal Dam" allocation (CXIP-013).
 24. ✅ **tests/cxip-012.test.ts**: Volatility-based DEX fee adjustments.
 25. ✅ **tests/nakamoto_verification.test.ts**: Tenure info and block utility checks.
+26. ✅ **tests/protocol-fee-collector.test.ts**: Burn-block phase boundaries, fixed collector-custody FT/STX settlement, direct-deposit excess recovery, explicit operational-treasury routing, residual and phase-change accounting, split admin/governance authorization, immediate-caller admin handoff, source-scoped replay, exact events, and rollback.
+27. ✅ **tests/operational-treasury-init.test.ts**: Publish-time-owner initialization, first-caller front-run rejection, and STX/SIP-010 withdrawal custody.
 
 ## How to Run Tests
 ```bash
