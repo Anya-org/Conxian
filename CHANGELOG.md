@@ -3,6 +3,25 @@
 
 ## Unreleased
 
+### Added
+- **Enterprise Subscription MVP (Issue #503)**: Added explicit STX-only prepaid
+  subscribe/renew/cancel flows, immutable versioned plan and generic feature
+  records, KYC/AML checks, allowlisted consumer usage metering, and
+  burn-block-derived entitlements.
+- **Gross-STX Fiscal Dam Route**: Routed enterprise payments through
+  `revenue-automation`, `revenue-distributor`, and `cxd-treasury` without a
+  1% deduction or operational-treasury bypass. Added immutable source/payment
+  receipts and exact six-bucket gross-STX accounting with remainder handling.
+- **Enterprise Audit Hardening**: Plan identity is now `{tier-id, version}`
+  with exactly four tiers, nonzero price/KYC invariants, explicit activation,
+  and immutable active features. Payment IDs are global across the subscription
+  route; usage IDs are period-scoped and require subscriber-originated calls.
+- **Governed Fiscal Dam Custody**: Added policy-version receipt evidence,
+  existing LP/insurance rebalance bounds, stable bucket IDs, fail-closed
+  governed recipients, replay-safe bucket release receipts, and gross/released
+  accounting reads. No production plan prices, product consumers, recipients,
+  or native-STX buyback adapter are preconfigured.
+
 ## [0.7.0] - 2026-02-15 - The Jan 2026 Sovereign Refactor (Ground Truth Clarity 4)
 
 ### Added

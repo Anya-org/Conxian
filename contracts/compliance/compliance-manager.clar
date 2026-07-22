@@ -7,9 +7,12 @@
 (define-constant ERR_UNAUTHORIZED u3000)
 (define-constant ERR_STALE_ATTESTATION u3001)
 (define-constant ERR_INVALID_PROVIDER u3002)
+(define-constant ERR_INVALID_MINIMUM_KYC_LEVEL u3003)
 
 ;; 24-hour validity period (~144 blocks assuming 10-minute Bitcoin blocks)
 (define-constant VALIDITY_PERIOD u144)
+(define-constant MIN_KYC_LEVEL u1)
+(define-constant MAX_KYC_LEVEL u3)
 
 ;; --- State ---
 
@@ -19,6 +22,8 @@
 (define-map compliance-records
   principal
   {
+    ;; Positive clean-screen attestation: true means the provider found no
+    ;; sanction match; false means the user is not clean for fail-closed use.
     sanctions-checked: bool,
     kyc-level: uint,
     travel-rule-checked: bool,
@@ -36,6 +41,10 @@
 
 (define-private (is-approved-provider (provider principal))
   (default-to false (map-get? approved-providers provider))
+)
+
+(define-private (is-sanctions-provider)
+  (is-eq tx-sender (var-get sanctions-provider))
 )
 
 ;; --- Provider Management ---
@@ -75,15 +84,24 @@
 
 ;; --- Compliance Logic ---
 
-;; @desc Update the compliance status for a specific user. Admin or Approved Provider only.
+;; @desc Update the compliance status for a specific user. Admin, approved
+;; provider, or configured sanctions provider may write records. A positive
+;; clean-screen attestation (`sanctions-checked: true`) is restricted to the
+;; configured sanctions provider; false remains available to the normal KYC
+;; update path because it does not assert that a sanctions screen passed.
 ;; @param user: The user being evaluated.
-;; @param sanctions-checked: Flag for AML check.
+;; @param sanctions-checked: Positive clean-screen result. True means the
+;;   provider found no sanction match; false means not clean or not attested.
 ;; @param kyc-level: Tier achieved (u0-u3).
 ;; @param travel-rule-checked: Flag for IVMS101 compliance.
 ;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (check-user-compliance (user principal) (sanctions-checked bool) (kyc-level uint) (travel-rule-checked bool))
   (begin
-    (asserts! (or (is-owner) (is-approved-provider tx-sender)) (err ERR_UNAUTHORIZED))
+    (asserts! (or
+      (is-owner)
+      (is-approved-provider tx-sender)
+      (is-sanctions-provider)) (err ERR_UNAUTHORIZED))
+    (asserts! (or (not sanctions-checked) (is-sanctions-provider)) (err ERR_UNAUTHORIZED))
     (map-set compliance-records user {
       sanctions-checked: sanctions-checked,
       kyc-level: kyc-level,
@@ -131,6 +149,45 @@
               (get sanctions-checked data))
       false
     )
+  )
+)
+
+;; @desc Return the canonical registration eligibility decision for a user.
+;; @param user: The principal being evaluated.
+;; @param minimum-kyc-level: Caller/configured minimum tier. Valid values are
+;;   u1 through u3, matching the current compliance-manager convention.
+;; @return (response bool uint) - `(ok true)` only when a fresh compliance
+;;   record exists, its tier is within u1-u3 and meets the requested minimum,
+;;   an authoritative KYC-registry record exists with a matching minimum tier,
+;;   and the registry does not mark the user sanctioned. Missing, stale,
+;;   future-dated, low-tier, malformed, or sanctioned evidence returns
+;;   `(ok false)`. The legacy `sanctions-checked` field is intentionally not
+;;   used by this gate because its historical meaning is broader than an
+;;   authoritative registry decision.
+;;   A minimum tier outside u1-u3 returns ERR_INVALID_MINIMUM_KYC_LEVEL.
+;;
+;; This is the single read-only gate future registration-fee code should call;
+;; callers must not recreate the tier, sanctions, registry-presence, or
+;; freshness checks separately.
+(define-read-only (is-registration-compliant (user principal) (minimum-kyc-level uint))
+  (if (or (< minimum-kyc-level MIN_KYC_LEVEL)
+          (> minimum-kyc-level MAX_KYC_LEVEL))
+      (err ERR_INVALID_MINIMUM_KYC_LEVEL)
+      (match (map-get? compliance-records user)
+        data
+          (if (<= (get last-updated data) burn-block-height)
+              (let ((registry-status (contract-call? .kyc-registry get-identity-status user)))
+                (ok (and
+                  (contract-call? .kyc-registry has-identity-status user)
+                  (>= (get kyc-level data) minimum-kyc-level)
+                  (<= (get kyc-level data) MAX_KYC_LEVEL)
+                  (>= (get tier registry-status) minimum-kyc-level)
+                  (<= (get tier registry-status) MAX_KYC_LEVEL)
+                  (not (contract-call? .kyc-registry is-sanctioned user))
+                  (<= (- burn-block-height (get last-updated data)) VALIDITY_PERIOD))))
+              (ok false))
+        (ok false)
+      )
   )
 )
 
