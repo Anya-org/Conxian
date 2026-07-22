@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 const repoRoot = join(import.meta.dirname, "..");
 const testnetWorkflowPath = join(repoRoot, ".github/workflows/deploy-testnet.yml");
 const mainnetWorkflowPath = join(repoRoot, ".github/workflows/deploy-mainnet.yml");
+const evidenceWrapperPath = join(repoRoot, "scripts/test-deployment-evidence.mjs");
 
 function readWorkflow(path: string): string {
   return readFileSync(path, "utf8");
@@ -53,5 +54,16 @@ describe("deployment workflow safety gates", () => {
     expect(source).toContain("Current mainnet plan identity is unresolved");
     expect(source).toContain("if: ${{ !inputs.dry_run }}");
     expect(source).toContain("automatic");
+  });
+
+  it("runs the generator check after focused tests while retaining the simnet hash guard", () => {
+    const source = readFileSync(evidenceWrapperPath, "utf8");
+    const testInvocation = source.indexOf('"vitest", "run"');
+    const generatorInvocation = source.indexOf('"scripts/gen-deployment-plans.py", "--check"');
+    expect(testInvocation).toBeGreaterThanOrEqual(0);
+    expect(generatorInvocation).toBeGreaterThan(testInvocation);
+    expect(source).toContain("const before = hashPlan();");
+    expect(source).toContain("const after = hashPlan();");
+    expect(source).toContain("Focused deployment evidence tests mutated");
   });
 });

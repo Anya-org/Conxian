@@ -32,6 +32,12 @@ export interface RequiredFunction {
   access: InterfaceAccess;
 }
 
+export interface InterfaceFunction extends RequiredFunction {
+  argumentCount?: number;
+}
+
+export type ReadOnlySender = string;
+
 export interface CanonicalFunctionArgument {
   name: string;
   type: string;
@@ -89,13 +95,13 @@ export interface InterfaceApiEvidence {
   observedAt: string;
   endpoint: string;
   httpStatus: 200;
-  functions: RequiredFunction[];
+  functions: InterfaceFunction[];
 }
 
 export interface ReadOnlyCheck {
   network: DeploymentNetwork;
   contractId: string;
-  sender: string;
+  sender: ReadOnlySender;
   functionName: string;
   arguments: string[];
   expectedOkay: true;
@@ -107,7 +113,7 @@ export interface ReadOnlyApiEvidence {
   observedAt: string;
   endpoint: string;
   httpStatus: 200;
-  sender: string;
+  sender: ReadOnlySender;
   arguments: string[];
   okay: true;
   resultHex: string;
@@ -290,6 +296,25 @@ function assertAddress(value: unknown, path: string, network?: DeploymentNetwork
   }
 }
 
+interface ParsedReadOnlySender {
+  address: string;
+  contractName?: string;
+}
+
+function parseReadOnlySender(value: unknown, path: string, network: DeploymentNetwork): ParsedReadOnlySender {
+  assertCondition(typeof value === "string", `${path} must be a valid Stacks standard or contract principal`);
+  const separator = value.lastIndexOf(".");
+  if (separator > 0) {
+    const address = value.slice(0, separator);
+    const contractName = value.slice(separator + 1);
+    assertAddress(address, `${path} address`, network);
+    assertContractName(contractName, `${path} contract name`);
+    return { address, contractName };
+  }
+  assertAddress(value, path, network);
+  return { address: value };
+}
+
 function assertContractName(value: unknown, path: string, code = "MALFORMED_EVIDENCE"): asserts value is string {
   assertCondition(
     typeof value === "string" && CONTRACT_NAME_PATTERN.test(value),
@@ -426,7 +451,7 @@ function assertRecordedInterfaceEvidence(value: unknown, path: string): void {
   assertIsoTimestamp(value.observedAt, `${path}.observedAt`);
   assertCondition(isNonEmptyString(value.endpoint), `${path}.endpoint must be non-empty`);
   assertCondition(value.httpStatus === 200, `${path}.httpStatus must be 200`);
-  assertInterfaceFunctions(value.functions, `${path}.functions`);
+  assertLiveInterfaceFunctions(value.functions, `${path}.functions`);
 }
 
 function assertCanonicalSerializedClarityValues(value: unknown, path: string): asserts value is string[] {
@@ -449,7 +474,7 @@ function assertReadOnlyApiEvidence(value: unknown, path: string, network: Deploy
   assertIsoTimestamp(value.observedAt, `${path}.observedAt`);
   assertCondition(isNonEmptyString(value.endpoint), `${path}.endpoint must be non-empty`);
   assertCondition(value.httpStatus === 200, `${path}.httpStatus must be 200`);
-  assertAddress(value.sender, `${path}.sender`, network);
+  parseReadOnlySender(value.sender, `${path}.sender`, network);
   assertCanonicalSerializedClarityValues(value.arguments, `${path}.arguments`);
   assertCondition(value.okay === true, `${path}.okay must be true`);
   assertCanonicalClarityHex(value.resultHex, `${path}.resultHex`);
@@ -470,7 +495,7 @@ function assertReadOnlyCheck(value: unknown, path: string, network: DeploymentNe
   );
   assertCondition(value.network === network, `${path}.network must match the evidence network`, "READ_ONLY_NETWORK_MISMATCH");
   assertContractId(value.contractId, `${path}.contractId`, network);
-  assertAddress(value.sender, `${path}.sender`, network);
+  parseReadOnlySender(value.sender, `${path}.sender`, network);
   assertFunctionName(value.functionName, `${path}.functionName`);
   assertCanonicalSerializedClarityValues(value.arguments, `${path}.arguments`);
   assertCondition(value.expectedOkay === true, `${path}.expectedOkay must be true`, "READ_ONLY_EXPECTATION_INVALID");
@@ -508,6 +533,35 @@ function assertInterfaceFunctions(
   }
 }
 
+function assertLiveInterfaceFunctions(
+  value: unknown,
+  path: string,
+  code = "MALFORMED_EVIDENCE",
+): asserts value is InterfaceFunction[] {
+  assertCondition(Array.isArray(value), `${path} must be an array`, code);
+  const names = new Set<string>();
+  for (const [index, item] of value.entries()) {
+    const itemPath = `${path}[${index}]`;
+    assertCondition(isObject(item), `${itemPath} must be an object`, code);
+    assertOnlyKeys(item, ["name", "access", "argumentCount"], itemPath, code);
+    assertFunctionName(item.name, `${itemPath}.name`, code);
+    assertCondition(
+      item.access === "public" || item.access === "read_only",
+      `${itemPath}.access is unsupported`,
+      code,
+    );
+    if (item.argumentCount !== undefined) {
+      assertCondition(
+        Number.isInteger(item.argumentCount) && (item.argumentCount as number) >= 0,
+        `${itemPath}.argumentCount is invalid`,
+        code,
+      );
+    }
+    assertCondition(!names.has(item.name), `${path} contains duplicate function ${item.name}`, code);
+    names.add(item.name);
+  }
+}
+
 function assertHiroFunctionArguments(value: unknown, path: string, code: string): void {
   assertCondition(Array.isArray(value), `${path} must be an array`, code);
   for (const [index, item] of value.entries()) {
@@ -529,10 +583,10 @@ function assertHiroOutputs(value: unknown, path: string, code: string): void {
   assertCondition(isObject(value) && isNonEmptyString(value.type), `${path} must contain a type`, code);
 }
 
-function readHiroInterfaceFunctions(value: unknown, path: string): RequiredFunction[] {
+function readHiroInterfaceFunctions(value: unknown, path: string): InterfaceFunction[] {
   const code = "UNSUPPORTED_API_PAYLOAD";
   assertCondition(Array.isArray(value), `${path} must be an array`, code);
-  const functions: RequiredFunction[] = [];
+  const functions: InterfaceFunction[] = [];
   const names = new Set<string>();
   for (const [index, item] of value.entries()) {
     const itemPath = `${path}[${index}]`;
@@ -552,7 +606,9 @@ function readHiroInterfaceFunctions(value: unknown, path: string): RequiredFunct
     if (item.access === "private") continue;
     assertCondition(!names.has(item.name), `${path} contains duplicate function ${item.name}`, code);
     names.add(item.name);
-    functions.push({ name: item.name, access: item.access });
+    const functionEvidence: InterfaceFunction = { name: item.name, access: item.access };
+    if (Array.isArray(item.args)) functionEvidence.argumentCount = item.args.length;
+    functions.push(functionEvidence);
   }
   return functions;
 }
@@ -758,10 +814,15 @@ async function fetchJson(
 
   const controller = new AbortController();
   let timedOut = false;
-  const timeout = setTimeout(() => {
-    timedOut = true;
-    controller.abort();
-  }, requestTimeoutMs);
+  const requestTimeout = Symbol("request-timeout");
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_, reject) => {
+    timeout = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+      reject(requestTimeout);
+    }, requestTimeoutMs);
+  });
 
   try {
     const headers: Record<string, string> = { accept: "application/json" };
@@ -775,21 +836,15 @@ async function fetchJson(
       headers["content-type"] = "application/json";
       requestInit.body = JSON.stringify(options.body);
     }
-    const response = await fetcher(url, requestInit);
+    const response = await Promise.race([fetcher(url, requestInit), deadline]);
     let body: unknown = undefined;
     try {
-      body = await response.json();
-    } catch {
-      if (timedOut) {
-        throw new DeploymentVerificationError(
-          `request timed out for ${url}`,
-          options.requestTimeoutCode ?? "HTTP_REQUEST_TIMEOUT",
-          true,
-        );
-      }
+      body = await Promise.race([response.json(), deadline]);
+    } catch (error) {
+      if (error === requestTimeout || timedOut) throw error;
       if (response.status >= 200 && response.status < 300) {
         throw new DeploymentVerificationError(
-          `API returned malformed JSON for ${url}`,
+          "API returned malformed JSON",
           options.malformedCode ?? "UNSUPPORTED_API_PAYLOAD",
         );
       }
@@ -797,21 +852,21 @@ async function fetchJson(
 
     return { status: response.status, body };
   } catch (error) {
-    if (error instanceof DeploymentVerificationError) throw error;
-    if (timedOut) {
+    if (error === requestTimeout || timedOut) {
       throw new DeploymentVerificationError(
-        `request timed out for ${url}`,
+        "API request timed out",
         options.requestTimeoutCode ?? "HTTP_REQUEST_TIMEOUT",
         true,
       );
     }
+    if (error instanceof DeploymentVerificationError) throw error;
     throw new DeploymentVerificationError(
-      `request failed for ${url}`,
+      "API request failed",
       options.requestFailureCode ?? "HTTP_REQUEST_FAILED",
       true,
     );
   } finally {
-    clearTimeout(timeout);
+    if (timeout !== undefined) clearTimeout(timeout);
   }
 }
 
@@ -1006,6 +1061,12 @@ function validateReadOnlyCheckBinding(bundle: DeploymentEvidence, plan: ParsedDe
       "READ_ONLY_PLAN_MISMATCH",
     );
 
+    assertCondition(
+      bundle.interfaces.some((item) => item.contractId === check.contractId),
+      `${path}.contractId has no exact interface expectation`,
+      "READ_ONLY_INTERFACE_MISMATCH",
+    );
+
     const evidenceEntries = [
       ...bundle.contractPublications,
       ...bundle.contractCalls,
@@ -1016,9 +1077,15 @@ function validateReadOnlyCheckBinding(bundle: DeploymentEvidence, plan: ParsedDe
       "READ_ONLY_PLAN_MISMATCH",
     );
 
-    const senders = new Set(evidenceEntries.map((entry) => entry.expectedSender));
+    const parsedSender = parseReadOnlySender(check.sender, `${path}.sender`, check.network);
+    const senderIsBound =
+      parsedSender.contractName === undefined
+        ? evidenceEntries.some((entry) => entry.expectedSender === parsedSender.address)
+        : evidenceEntries.some(
+            (entry) => entry.expectedSender === parsedSender.address && entry.contractId === check.sender,
+          );
     assertCondition(
-      senders.has(check.sender),
+      senderIsBound,
       `${path}.sender is not a canonical sender for the covered contract evidence`,
       "READ_ONLY_SENDER_MISMATCH",
     );
@@ -1300,8 +1367,28 @@ async function verifyReadOnlyCheck(
   options: VerifyEvidenceOptions,
   baseUrl: string,
   fetcher: typeof fetch,
+  interfaceEvidence: InterfaceApiEvidence,
   observedAt: string,
 ): Promise<ReadOnlyApiEvidence> {
+  const liveFunction = interfaceEvidence.functions.find((candidate) => candidate.name === check.functionName);
+  assertCondition(
+    liveFunction !== undefined,
+    `interface ${check.contractId} does not declare read-only function ${check.functionName}`,
+    "READ_ONLY_FUNCTION_MISSING",
+  );
+  assertCondition(
+    liveFunction.access === "read_only",
+    `interface ${check.contractId}.${check.functionName} is not read_only`,
+    "READ_ONLY_FUNCTION_NOT_READ_ONLY",
+  );
+  if (liveFunction.argumentCount !== undefined) {
+    assertCondition(
+      check.arguments.length === liveFunction.argumentCount,
+      `read-only function ${check.contractId}.${check.functionName} expects ${liveFunction.argumentCount} argument(s) in the live interface`,
+      "READ_ONLY_ARGUMENT_COUNT_MISMATCH",
+    );
+  }
+
   const separator = check.contractId.lastIndexOf(".");
   const address = check.contractId.slice(0, separator);
   const contractName = check.contractId.slice(separator + 1);
@@ -1421,13 +1508,22 @@ export async function verifyDeploymentEvidence(
   }
 
   const readOnlyChecks: ReadOnlyCheck[] = [];
+  const interfaceEvidenceByContractId = new Map(
+    interfaces.map((item) => [item.contractId, item.interfaceEvidence] as const),
+  );
   for (const item of bundle.readOnlyChecks ?? []) {
     const observedAt = now().toISOString();
+    const interfaceEvidence = interfaceEvidenceByContractId.get(item.contractId);
+    assertCondition(
+      interfaceEvidence !== undefined,
+      `read-only check ${item.contractId}.${item.functionName} has no verified live interface`,
+      "READ_ONLY_INTERFACE_MISMATCH",
+    );
     readOnlyChecks.push({
       ...item,
       arguments: item.arguments.map((argument) => cvToHex(hexToCV(argument)).toLowerCase()),
       expectedResultHex: cvToHex(hexToCV(item.expectedResultHex)).toLowerCase(),
-      apiEvidence: await verifyReadOnlyCheck(item, options, baseUrl, fetcher, observedAt),
+      apiEvidence: await verifyReadOnlyCheck(item, options, baseUrl, fetcher, interfaceEvidence, observedAt),
     });
   }
 

@@ -112,6 +112,18 @@
       "description": "A checksum-valid standard Stacks principal. Runtime verification uses @stacks/transactions; this schema intentionally does not impose a fixed address length.",
       "pattern": "^S[PMTN][0-9A-Z]+$"
     },
+    "readOnlySender": {
+      "type": "string",
+      "description": "A checksum-valid standard Stacks principal or contract principal accepted by the call-read API. Runtime verification validates the address component, network, and contract name.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/address"
+        },
+        {
+          "pattern": "^S[PMTN][0-9A-Z]+\\.[a-zA-Z][a-zA-Z0-9-]{0,39}$"
+        }
+      ]
+    },
     "contractName": {
       "type": "string",
       "pattern": "^[a-zA-Z][a-zA-Z0-9-]{0,39}$"
@@ -143,6 +155,23 @@
         },
         "access": {
           "enum": ["public", "read_only"]
+        }
+      }
+    },
+    "interfaceFunction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "access"],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/functionName"
+        },
+        "access": {
+          "enum": ["public", "read_only"]
+        },
+        "argumentCount": {
+          "type": "integer",
+          "minimum": 0
         }
       }
     },
@@ -292,7 +321,7 @@
         "functions": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/requiredFunction"
+            "$ref": "#/$defs/interfaceFunction"
           }
         }
       }
@@ -397,7 +426,7 @@
           "const": 200
         },
         "sender": {
-          "$ref": "#/$defs/address"
+          "$ref": "#/$defs/readOnlySender"
         },
         "arguments": {
           "type": "array",
@@ -433,7 +462,7 @@
           "$ref": "#/$defs/contractId"
         },
         "sender": {
-          "$ref": "#/$defs/address"
+          "$ref": "#/$defs/readOnlySender"
         },
         "functionName": {
           "$ref": "#/$defs/functionName"

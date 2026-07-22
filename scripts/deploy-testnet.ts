@@ -124,35 +124,47 @@ function requiredEnvironment(name: string): string {
   return value;
 }
 
-async function getJson(url: string): Promise<{ status: number; body: unknown }> {
+export async function getJson(
+  url: string,
+  fetcher: typeof fetch = fetch,
+): Promise<{ status: number; body: unknown }> {
   const requestTimeoutMs = Number(process.env.DEPLOY_API_TIMEOUT_MS || 30_000);
   if (!Number.isInteger(requestTimeoutMs) || requestTimeoutMs <= 0) {
     throw new Error("DEPLOY_API_TIMEOUT_MS must be a positive integer");
   }
   const controller = new AbortController();
   let timedOut = false;
-  const timeout = setTimeout(() => {
-    timedOut = true;
-    controller.abort();
-  }, requestTimeoutMs);
+  const requestTimeout = Symbol("request-timeout");
+  const malformedResponse = Symbol("malformed-response");
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_, reject) => {
+    timeout = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+      reject(requestTimeout);
+    }, requestTimeoutMs);
+  });
 
-  let response: Response;
   try {
-    response = await fetch(url, { headers: apiHeaders(), signal: controller.signal });
-  } catch {
-    if (timedOut) throw new Error(`request timed out for ${url}`);
-    throw new Error(`request failed for ${url}`);
+    const response = await Promise.race([
+      fetcher(url, { headers: apiHeaders(), signal: controller.signal }),
+      deadline,
+    ]);
+    let body: unknown;
+    try {
+      body = await Promise.race([response.json(), deadline]);
+    } catch (error) {
+      if (error === requestTimeout || timedOut) throw error;
+      throw malformedResponse;
+    }
+    return { status: response.status, body };
+  } catch (error) {
+    if (error === requestTimeout || timedOut) throw new Error("request timed out");
+    if (error === malformedResponse) throw new Error("API returned malformed JSON");
+    throw new Error("request failed");
   } finally {
-    clearTimeout(timeout);
+    if (timeout !== undefined) clearTimeout(timeout);
   }
-
-  let body: unknown;
-  try {
-    body = await response.json();
-  } catch {
-    throw new Error(`API returned malformed JSON for ${url}`);
-  }
-  return { status: response.status, body };
 }
 
 async function getAccountNonce(address: string): Promise<number> {

@@ -14,13 +14,29 @@ const result = spawnSync(
   ["vitest", "run", "--config", "vitest.deployment-evidence.config.ts", "--pool=threads"],
   { stdio: "inherit" },
 );
+const generatorResult = spawnSync("python3", ["scripts/gen-deployment-plans.py", "--check"], {
+  stdio: "inherit",
+});
 const after = hashPlan();
 
+let failed = false;
 if (before !== after) {
   console.error(`Focused deployment evidence tests mutated ${planPath}.`);
   console.error(`before=${before}`);
   console.error(`after=${after}`);
-  process.exitCode = 1;
-} else if (result.status !== 0) {
-  process.exitCode = result.status ?? 1;
+  failed = true;
 }
+if (result.error) {
+  console.error(`Focused deployment evidence tests failed to start: ${result.error.message}`);
+  failed = true;
+} else if (result.status !== 0) {
+  failed = true;
+}
+if (generatorResult.error) {
+  console.error(`Deployment plan generator check failed to start: ${generatorResult.error.message}`);
+  failed = true;
+} else if (generatorResult.status !== 0) {
+  failed = true;
+}
+
+if (failed) process.exitCode = 1;

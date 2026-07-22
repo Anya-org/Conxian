@@ -163,6 +163,7 @@ function mockHiroFetch(
     readOnlyStatus?: number;
     readOnlyThrows?: boolean;
     readOnlyHangs?: boolean;
+    readOnlyBodyHangs?: boolean;
     publishStatus?: number;
     interfaceStatus?: number;
     interfaceBody?: Record<string, unknown>;
@@ -196,6 +197,12 @@ function mockHiroFetch(
         });
       }
       if (overrides.readOnlyThrows) throw new Error("provider unavailable");
+      if (overrides.readOnlyBodyHangs) {
+        return {
+          status: overrides.readOnlyStatus ?? 200,
+          json: () => new Promise<unknown>(() => {}),
+        } as Response;
+      }
       return new Response(JSON.stringify(overrides.readOnly ?? { okay: true, result: "0x03" }), {
         status: overrides.readOnlyStatus ?? 200,
       });
@@ -412,8 +419,8 @@ describe("deployment evidence verification", () => {
     expect(result.contractPublications[0].apiEvidence?.burnBlockHeight).toBe(456);
     expect(result.contractCalls[0].apiEvidence?.functionArgs?.[0].hex).toBe(CALL_ARG_HEX);
     expect(result.interfaces[0].interfaceEvidence?.functions).toEqual([
-      { name: "get-name", access: "read_only" },
-      { name: "initialize", access: "public" },
+      { name: "get-name", access: "read_only", argumentCount: 0 },
+      { name: "initialize", access: "public", argumentCount: 1 },
     ]);
     expect(result.readOnlyChecks?.[0].apiEvidence).toEqual({
       observedAt: FIXED_TIME.toISOString(),
@@ -493,6 +500,78 @@ describe("deployment evidence verification", () => {
       "READ_ONLY_TIMEOUT",
       { requestTimeoutMs: 1 },
     );
+    const bodyTimeout = await expectVerificationError(
+      baseEvidence(),
+      mockHiroFetch({ readOnlyBodyHangs: true }),
+      "READ_ONLY_TIMEOUT",
+      { requestTimeoutMs: 1 },
+    );
+    expect(bodyTimeout.message).not.toContain("hiro.test");
+  });
+
+  it("requires the exact live read-only function and access classification", async () => {
+    const unknownFunction = baseEvidence();
+    unknownFunction.readOnlyChecks![0].functionName = "not-in-interface";
+    const unknownFetcher = mockHiroFetch();
+    await expectVerificationError(unknownFunction, unknownFetcher, "READ_ONLY_FUNCTION_MISSING");
+    expect(
+      (unknownFetcher as ReturnType<typeof vi.fn>).mock.calls.some(([input]) =>
+        String(input).includes("/v2/contracts/call-read/"),
+      ),
+    ).toBe(false);
+
+    const publicFunction = baseEvidence();
+    publicFunction.readOnlyChecks![0].functionName = "initialize";
+    const publicFetcher = mockHiroFetch();
+    await expectVerificationError(publicFunction, publicFetcher, "READ_ONLY_FUNCTION_NOT_READ_ONLY");
+    expect(
+      (publicFetcher as ReturnType<typeof vi.fn>).mock.calls.some(([input]) =>
+        String(input).includes("/v2/contracts/call-read/"),
+      ),
+    ).toBe(false);
+
+    const countMismatch = baseEvidence();
+    countMismatch.readOnlyChecks![0].arguments = [CALL_ARG_HEX];
+    const countFetcher = mockHiroFetch();
+    await expectVerificationError(countMismatch, countFetcher, "READ_ONLY_ARGUMENT_COUNT_MISMATCH");
+    expect(
+      (countFetcher as ReturnType<typeof vi.fn>).mock.calls.some(([input]) =>
+        String(input).includes("/v2/contracts/call-read/"),
+      ),
+    ).toBe(false);
+  });
+
+  it("accepts a canonical contract principal as a read-only sender", async () => {
+    const evidence = baseEvidence();
+    evidence.readOnlyChecks![0].sender = CONTRACT_ID;
+    const fetcher = mockHiroFetch();
+    const result = await verifyDeploymentEvidence(evidence, {
+      network: "testnet",
+      deployer: DEPLOYER,
+      baseUrl: "http://hiro.test",
+      planPath: PLAN_PATH,
+      fetcher,
+      now: () => FIXED_TIME,
+    });
+    expect(result.readOnlyChecks?.[0].apiEvidence?.sender).toBe(CONTRACT_ID);
+    const readOnlyCall = (fetcher as ReturnType<typeof vi.fn>).mock.calls.find(([input]) =>
+      String(input).includes("/v2/contracts/call-read/"),
+    );
+    expect(JSON.parse((readOnlyCall?.[1] as RequestInit).body as string).sender).toBe(CONTRACT_ID);
+  });
+
+  it("rejects malformed or wrong-network contract-principal read-only senders before network calls", async () => {
+    const malformed = baseEvidence();
+    malformed.readOnlyChecks![0].sender = `${DEPLOYER}.bad.name`;
+    const malformedFetcher = mockHiroFetch();
+    await expectVerificationError(malformed, malformedFetcher, "MALFORMED_EVIDENCE");
+    expect(malformedFetcher).not.toHaveBeenCalled();
+
+    const wrongNetwork = baseEvidence();
+    wrongNetwork.readOnlyChecks![0].sender = "SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B.alpha";
+    const wrongNetworkFetcher = mockHiroFetch();
+    await expectVerificationError(wrongNetwork, wrongNetworkFetcher, "NETWORK_DEPLOYER_MISMATCH");
+    expect(wrongNetworkFetcher).not.toHaveBeenCalled();
   });
 
   it("binds each read-only check to the plan, evidence network, and canonical sender", async () => {
