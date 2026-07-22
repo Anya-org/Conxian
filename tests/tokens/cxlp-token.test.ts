@@ -77,9 +77,10 @@ function restoreCxlpState() {
       restored = true;
       break;
     }
+    expect(result).toEqual(error(ERR_UNAUTHORIZED));
   }
 
-  if (!restored) return;
+  expect(restored).toBe(true);
 
   const owners = [deployer, wallet1, wallet2, wallet3, `${deployer}.${COORDINATOR}`];
   for (const owner of owners) {
@@ -96,8 +97,12 @@ function restoreCxlpState() {
 
   const roleTargets = [wallet1, wallet2, wallet3, `${deployer}.${COORDINATOR}`];
   for (const target of roleTargets) {
-    simnet.callPublicFn(CXLP, 'remove-minter', [principalValue(target)], deployer);
-    simnet.callPublicFn(CXLP, 'remove-burner', [principalValue(target)], deployer);
+    expect(
+      simnet.callPublicFn(CXLP, 'remove-minter', [principalValue(target)], deployer).result,
+    ).toEqual(okTrue());
+    expect(
+      simnet.callPublicFn(CXLP, 'remove-burner', [principalValue(target)], deployer).result,
+    ).toEqual(okTrue());
   }
 }
 
@@ -252,6 +257,22 @@ describe('CXLP mint and burn authorization', () => {
     expect(balanceOf(wallet2, deployer)).toEqual(Cl.ok(Cl.uint(250)));
     expect(totalSupply(deployer)).toEqual(Cl.ok(Cl.uint(350)));
 
+    const revokedBalance = balanceOf(wallet2, deployer);
+    const revokedSupply = totalSupply(deployer);
+    expect(simnet.callPublicFn(CXLP, 'remove-minter', [coordinator], deployer).result).toEqual(
+      okTrue(),
+    );
+    expect(
+      simnet.callPublicFn(
+        COORDINATOR,
+        'mint-cxd',
+        [cxlpPrincipal(deployer), Cl.uint(25), Cl.principal(wallet2)],
+        deployer,
+      ).result,
+    ).toEqual(error(ERR_UNAUTHORIZED));
+    expect(balanceOf(wallet2, deployer)).toEqual(revokedBalance);
+    expect(totalSupply(deployer)).toEqual(revokedSupply);
+
     expect(
       simnet.callPublicFn(CXLP, 'mint', [Cl.uint(1), Cl.principal(wallet2)], wallet2).result,
     ).toEqual(error(ERR_UNAUTHORIZED));
@@ -309,6 +330,22 @@ describe('CXLP mint and burn authorization', () => {
     ).toEqual(okTrue());
     expect(balanceOf(wallet1, deployer)).toEqual(Cl.ok(Cl.uint(500)));
     expect(totalSupply(deployer)).toEqual(Cl.ok(Cl.uint(500)));
+
+    const revokedBalance = balanceOf(wallet1, deployer);
+    const revokedSupply = totalSupply(deployer);
+    expect(simnet.callPublicFn(CXLP, 'remove-burner', [coordinator], deployer).result).toEqual(
+      okTrue(),
+    );
+    expect(
+      simnet.callPublicFn(
+        COORDINATOR,
+        'burn-cxd',
+        [cxlpPrincipal(deployer), Cl.uint(1), Cl.principal(wallet1)],
+        wallet1,
+      ).result,
+    ).toEqual(error(ERR_UNAUTHORIZED));
+    expect(balanceOf(wallet1, deployer)).toEqual(revokedBalance);
+    expect(totalSupply(deployer)).toEqual(revokedSupply);
 
     const insufficientBalance = balanceOf(wallet1, deployer);
     const insufficientSupply = totalSupply(deployer);
