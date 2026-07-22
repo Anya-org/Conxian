@@ -4,7 +4,13 @@ import argparse
 from pathlib import Path
 import tempfile
 
-import yaml
+try:
+    import yaml
+except ModuleNotFoundError as exc:
+    raise SystemExit(
+        "PyYAML==6.0.2 is required to generate deployment plans; "
+        "install it with: python3 -m pip install --user --disable-pip-version-check 'PyYAML==6.0.2'"
+    ) from exc
 
 DEPLOYER = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
 TEST_HELPERS = {
