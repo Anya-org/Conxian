@@ -275,6 +275,19 @@ describe("deployment evidence verification", () => {
     expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-publish")).toHaveLength(212);
     expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-call")).toHaveLength(21);
 
+    const riskOrchestrationCalls = testnetPlan.entries.flatMap((entry) =>
+      entry.kind === "contract-call" &&
+      (entry.contractId.endsWith(".risk-unit") || entry.contractId.endsWith(".agent-risk"))
+        ? [{ contractId: entry.contractId, functionName: entry.functionName }]
+        : [],
+    );
+    expect(riskOrchestrationCalls).toEqual([
+      { contractId: `${testnetPlan.deployer}.risk-unit`, functionName: "initialize" },
+      { contractId: `${testnetPlan.deployer}.risk-unit`, functionName: "set-ops-engine" },
+      { contractId: `${testnetPlan.deployer}.agent-risk`, functionName: "initialize" },
+      { contractId: `${testnetPlan.deployer}.agent-risk`, functionName: "set-risk-unit" },
+    ]);
+
     expect(() => readDeploymentPlan(join(import.meta.dirname, "../deployments/full-system.mainnet-plan.yaml"))).toThrowError(
       expect.objectContaining({ code: "NETWORK_DEPLOYER_MISMATCH" }),
     );
