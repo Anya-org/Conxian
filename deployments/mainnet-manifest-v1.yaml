@@ -35,6 +35,9 @@ batches:
       - contract-publish:
           contract-name: compoundable-vault-trait
           path: contracts/traits/compoundable-vault-trait.clar
+      - contract-publish:
+          contract-name: auto-compounder
+          path: contracts/yield/auto-compounder.clar
 
   # --- Phase 1: Identity, Access & Compliance ---
   - id: 1

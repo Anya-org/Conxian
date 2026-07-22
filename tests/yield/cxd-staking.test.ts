@@ -7,6 +7,7 @@ import crypto from 'node:crypto';
 const STAKING = 'cxd-staking';
 const CXD = 'cxd-token';
 const REGULATORY = 'regulatory-adapter';
+const FORWARDER = 'mock-admin-forwarder';
 
 const ERR_UNAUTHORIZED = 8000;
 const ERR_NON_COMPLIANT = 8001;
@@ -27,6 +28,7 @@ describe('CXD staking Phase 1', () => {
   let wallet1: string;
   let wallet2: string;
   let wallet3: string;
+  let forwarder: string;
   const unregisteredUser = 'ST000000000000000000002AMW42H';
 
   const readOkUint = (contract: string, functionName: string, args: any[], sender = deployer): bigint => {
@@ -44,6 +46,9 @@ describe('CXD staking Phase 1', () => {
 
   const cxdBalance = (user: string): bigint =>
     readOkUint(CXD, 'get-balance', [Cl.principal(user)]);
+
+  const callForwarder = (method: string, args: any[], sender = deployer) =>
+    simnet.callPublicFn(FORWARDER, method, args, sender);
 
   const expectError = (result: any, code: number) => {
     expect(result).toEqual(Cl.error(Cl.uint(code)));
@@ -100,6 +105,7 @@ describe('CXD staking Phase 1', () => {
     wallet1 = simnet.getAccounts().get('wallet_1')!;
     wallet2 = simnet.getAccounts().get('wallet_2')!;
     wallet3 = simnet.getAccounts().get('wallet_3')!;
+    forwarder = `${deployer}.${FORWARDER}`;
 
     const key = new EC('secp256k1').genKeyPair();
     expect(
@@ -156,6 +162,69 @@ describe('CXD staking Phase 1', () => {
       simnet.callPublicFn(STAKING, 'stake', [Cl.uint(1_001)], wallet1).result,
       ERR_INSUFFICIENT_BALANCE,
     );
+  });
+
+  it('authenticates the immediate caller and supports deliberate contract-admin forwarding', () => {
+    expectError(
+      callForwarder('forward-staking-set-admin', [Cl.principal(wallet1)], deployer).result,
+      ERR_UNAUTHORIZED,
+    );
+    expectError(
+      callForwarder('forward-staking-set-reward-rate', [Cl.uint(7)], deployer).result,
+      ERR_UNAUTHORIZED,
+    );
+    expectError(
+      callForwarder('forward-staking-fund-rewards', [Cl.uint(100)], deployer).result,
+      ERR_UNAUTHORIZED,
+    );
+    expect(Cl.prettyPrint(simnet.callReadOnlyFn(STAKING, 'get-config', [], deployer).result)).toContain(
+      `admin: '${deployer}`,
+    );
+
+    expect(
+      simnet.callPublicFn(STAKING, 'set-admin', [Cl.contractPrincipal(deployer, FORWARDER)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    mintCxd(500, forwarder);
+
+    const forwardedRate = callForwarder('forward-staking-set-reward-rate', [Cl.uint(7)], wallet2);
+    expect(forwardedRate.result).toEqual(Cl.ok(Cl.bool(true)));
+
+    const forwardedFunding = callForwarder('forward-staking-fund-rewards', [Cl.uint(100)], wallet2);
+    expect(forwardedFunding.result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(cxdBalance(forwarder)).toBe(400n);
+    expect(readOkUint(STAKING, 'get-available-reward-reserve', [], deployer)).toBe(100n);
+    expect(JSON.stringify(forwardedFunding.events)).toContain(forwarder);
+
+    const handoff = callForwarder('forward-staking-set-admin', [Cl.principal(wallet1)], wallet2);
+    expect(handoff.result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(JSON.stringify(handoff.events)).toContain(`old-admin`);
+    expect(JSON.stringify(handoff.events)).toContain(forwarder);
+
+    expectError(
+      callForwarder('forward-staking-set-reward-rate', [Cl.uint(8)], wallet2).result,
+      ERR_UNAUTHORIZED,
+    );
+    expect(
+      simnet.callPublicFn(STAKING, 'set-reward-rate', [Cl.uint(8)], wallet1).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+  });
+
+  it('checkpoints accrued rewards when the admin changes the reward rate', () => {
+    expect(
+      simnet.callPublicFn(STAKING, 'stake', [Cl.uint(100)], wallet1).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn(STAKING, 'set-reward-rate', [Cl.uint(100)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    simnet.mineEmptyBlocks(5);
+    expect(
+      simnet.callPublicFn(STAKING, 'set-reward-rate', [Cl.uint(200)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(readOkUint(STAKING, 'get-earned', [Cl.principal(wallet1)], wallet1)).toBe(500n);
+
+    simnet.mineEmptyBlocks(3);
+    expect(readOkUint(STAKING, 'get-earned', [Cl.principal(wallet1)], wallet1)).toBe(1_100n);
   });
 
   it('moves CXD, accrues proportionally with checkpoints, and protects prefunded principal', () => {

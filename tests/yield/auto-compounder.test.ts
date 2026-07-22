@@ -4,6 +4,7 @@ import { Cl } from '@stacks/transactions';
 
 const AUTO_COMPOUNDER = 'auto-compounder';
 const MOCK_VAULT = 'mock-compoundable-vault';
+const FORWARDER = 'mock-admin-forwarder';
 
 const ERR_UNAUTHORIZED = 1000;
 const ERR_INVALID_TRIGGER_MODE = 1001;
@@ -28,7 +29,9 @@ describe('Trait-driven auto-compounder Phase 2', () => {
   let simnet: SimnetLike;
   let deployer: string;
   let wallet1: string;
+  let wallet2: string;
   let vault: string;
+  let forwarder: string;
 
   const vaultArg = () => Cl.contractPrincipal(deployer, MOCK_VAULT);
   const vaultPrincipal = () => `${deployer}.${MOCK_VAULT}`;
@@ -40,6 +43,9 @@ describe('Trait-driven auto-compounder Phase 2', () => {
 
   const callMock = (method: string, args: any[]) =>
     simnet.callPublicFn(MOCK_VAULT, method, args, deployer);
+
+  const callForwarder = (method: string, args: any[], sender = deployer) =>
+    simnet.callPublicFn(FORWARDER, method, args, sender);
 
   const setPending = (amount: number | bigint) => {
     expect(callMock('set-pending-rewards', [Cl.uint(amount)]).result).toEqual(Cl.ok(Cl.bool(true)));
@@ -79,6 +85,37 @@ describe('Trait-driven auto-compounder Phase 2', () => {
       deployer,
     );
 
+  const forwardRegisterVault = ({
+    destination = vaultPrincipal(),
+    mode = TRIGGER_THRESHOLD,
+    interval = 0,
+    threshold = 1,
+    minOutput = 1,
+    enabled = true,
+    sender = deployer,
+  }: {
+    destination?: string;
+    mode?: number;
+    interval?: number;
+    threshold?: number;
+    minOutput?: number;
+    enabled?: boolean;
+    sender?: string;
+  } = {}) =>
+    callForwarder(
+      'forward-auto-register-vault',
+      [
+        vaultArg(),
+        principal(destination),
+        Cl.uint(mode),
+        Cl.uint(interval),
+        Cl.uint(threshold),
+        Cl.uint(minOutput),
+        Cl.bool(enabled),
+      ],
+      sender,
+    );
+
   const status = (pendingRewards: number | bigint) =>
     simnet.callReadOnlyFn(
       AUTO_COMPOUNDER,
@@ -94,7 +131,9 @@ describe('Trait-driven auto-compounder Phase 2', () => {
     simnet = await initSimnet('Clarinet.toml');
     deployer = simnet.deployer;
     wallet1 = simnet.getAccounts().get('wallet_1')!;
+    wallet2 = simnet.getAccounts().get('wallet_2')!;
     vault = vaultPrincipal();
+    forwarder = `${deployer}.${FORWARDER}`;
   });
 
   it('enforces admin registration and rejects invalid trigger/slippage configurations', () => {
@@ -140,6 +179,46 @@ describe('Trait-driven auto-compounder Phase 2', () => {
         Cl.uint(1),
         Cl.bool(true),
       ], wallet1).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+  });
+
+  it('authenticates the immediate caller and supports deliberate contract-admin forwarding', () => {
+    expectError(
+      callForwarder('forward-auto-set-admin', [principal(wallet1)], deployer).result,
+      ERR_UNAUTHORIZED,
+    );
+    expectError(forwardRegisterVault({ sender: deployer }).result, ERR_UNAUTHORIZED);
+
+    expect(
+      simnet.callPublicFn(AUTO_COMPOUNDER, 'set-admin', [principal(forwarder)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(forwardRegisterVault({ sender: wallet1 }).result).toEqual(Cl.ok(Cl.bool(true)));
+
+    const update = callForwarder(
+      'forward-auto-update-vault-config',
+      [
+        vaultArg(),
+        principal(wallet1),
+        Cl.uint(TRIGGER_THRESHOLD),
+        Cl.uint(0),
+        Cl.uint(20),
+        Cl.uint(5),
+        Cl.bool(false),
+      ],
+      wallet2,
+    );
+    expect(update.result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(Cl.prettyPrint(config().result)).toContain('min-reward-threshold: u20');
+
+    const handoff = callForwarder('forward-auto-set-admin', [principal(wallet1)], wallet2);
+    expect(handoff.result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(JSON.stringify(handoff.events)).toContain(forwarder);
+    expectError(
+      callForwarder('forward-auto-set-vault-enabled', [vaultArg(), Cl.bool(true)], wallet2).result,
+      ERR_UNAUTHORIZED,
+    );
+    expect(
+      simnet.callPublicFn(AUTO_COMPOUNDER, 'set-vault-enabled', [vaultArg(), Cl.bool(true)], wallet1).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
   });
 
@@ -202,7 +281,9 @@ describe('Trait-driven auto-compounder Phase 2', () => {
     expect(Cl.prettyPrint(before.result)).toContain('frequency-ready: false');
     expectError(simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1).result, ERR_TRIGGER_NOT_READY);
 
-    simnet.mineEmptyBlocks(9);
+    simnet.mineEmptyBlocks(19);
+    expect(Cl.prettyPrint(status(0).result)).toContain('frequency-ready: false');
+    simnet.mineEmptyBlocks(1);
     expect(Cl.prettyPrint(status(0).result)).toContain('frequency-ready: true');
     expect(simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1).result).toEqual(Cl.ok(Cl.uint(10)));
   });
@@ -238,7 +319,45 @@ describe('Trait-driven auto-compounder Phase 2', () => {
     expect(Cl.prettyPrint(status(100).result)).toContain('frequency-ready: false');
     expectError(simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1).result, ERR_TRIGGER_NOT_READY);
 
-    simnet.mineEmptyBlocks(9);
+    simnet.mineEmptyBlocks(20);
+    expect(simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1).result).toEqual(Cl.ok(Cl.uint(10)));
+  });
+
+  it('allows EITHER to become ready through frequency alone', () => {
+    expect(registerVault({ mode: TRIGGER_EITHER, interval: 5, threshold: 100 }).result).toEqual(Cl.ok(Cl.bool(true)));
+    setPending(0);
+    setOutput(10);
+
+    expect(Cl.prettyPrint(status(0).result)).toContain('frequency-ready: false');
+    expect(Cl.prettyPrint(status(0).result)).toContain('threshold-ready: false');
+    expect(Cl.prettyPrint(status(0).result)).toContain('should-compound: false');
+
+    simnet.mineEmptyBlocks(5);
+    expect(Cl.prettyPrint(status(0).result)).toContain('frequency-ready: true');
+    expect(Cl.prettyPrint(status(0).result)).toContain('threshold-ready: false');
+    expect(Cl.prettyPrint(status(0).result)).toContain('should-compound: true');
+    expect(simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1).result).toEqual(Cl.ok(Cl.uint(10)));
+  });
+
+  it('preserves successful interval history when a vault is re-registered', () => {
+    expect(registerVault({ mode: TRIGGER_FREQUENCY, interval: 5, threshold: 0 }).result).toEqual(Cl.ok(Cl.bool(true)));
+    setPending(0);
+    setOutput(10);
+    simnet.mineEmptyBlocks(5);
+    expect(simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1).result).toEqual(Cl.ok(Cl.uint(10)));
+
+    const before = Cl.prettyPrint(config().result);
+    const lastBlock = before.match(/last-compound-block: u(\d+)/)?.[1];
+    expect(lastBlock).toBeDefined();
+
+    expect(
+      registerVault({ mode: TRIGGER_FREQUENCY, interval: 5, threshold: 0, minOutput: 2 }).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    const after = Cl.prettyPrint(config().result);
+    expect(after).toContain(`last-compound-block: u${lastBlock}`);
+    expectError(simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1).result, ERR_TRIGGER_NOT_READY);
+
+    simnet.mineEmptyBlocks(5);
     expect(simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1).result).toEqual(Cl.ok(Cl.uint(10)));
   });
 
@@ -270,7 +389,10 @@ describe('Trait-driven auto-compounder Phase 2', () => {
     expectError(simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1).result, ERR_OUTPUT_TOO_LOW);
     expect(simnet.callReadOnlyFn(MOCK_VAULT, 'get-pending-rewards', [], deployer).result).toEqual(Cl.ok(Cl.uint(100)));
     expect(simnet.callReadOnlyFn(MOCK_VAULT, 'get-compound-count', [], deployer).result).toEqual(Cl.uint(0));
-    expect(Cl.prettyPrint(config().result)).toContain('last-compound-block: u0');
+    expect(Cl.prettyPrint(config().result)).toContain('last-compound-block: u11');
+
+    setOutput(50);
+    expect(simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1).result).toEqual(Cl.ok(Cl.uint(50)));
   });
 
   it('propagates a failed vault call and rolls back the coordinator state', () => {
@@ -281,7 +403,10 @@ describe('Trait-driven auto-compounder Phase 2', () => {
 
     expectError(simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1).result, ERR_COMPOUND_FAILED);
     expect(simnet.callReadOnlyFn(MOCK_VAULT, 'get-pending-rewards', [], deployer).result).toEqual(Cl.ok(Cl.uint(10)));
-    expect(Cl.prettyPrint(config().result)).toContain('last-compound-block: u0');
+    expect(Cl.prettyPrint(config().result)).toContain('last-compound-block: u11');
+
+    expect(callMock('set-compound-failure', [Cl.bool(false)]).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1).result).toEqual(Cl.ok(Cl.uint(10)));
   });
 
   it('updates last-success state and emits an execution event only after success', () => {
@@ -289,11 +414,13 @@ describe('Trait-driven auto-compounder Phase 2', () => {
     setPending(10);
     setOutput(7);
 
-    const result = simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1);
+    const result = callForwarder('forward-auto-compound', [vaultArg()], wallet1);
     expect(result.result).toEqual(Cl.ok(Cl.uint(7)));
     expect(simnet.callReadOnlyFn(MOCK_VAULT, 'get-last-min-output', [], deployer).result).toEqual(Cl.uint(4));
     expect(simnet.callReadOnlyFn(MOCK_VAULT, 'get-compound-count', [], deployer).result).toEqual(Cl.uint(1));
     expect(result.events.some((event: any) => JSON.stringify(event).includes('compound-executed'))).toBe(true);
+    expect(JSON.stringify(result.events)).toContain(forwarder);
+    expect(JSON.stringify(result.events)).toContain(wallet1);
     expect(Cl.prettyPrint(config().result)).not.toContain('last-compound-block: u0');
   });
 

@@ -647,6 +647,11 @@ path = "contracts/test-helpers/mock-compoundable-vault.clar"
 clarity-version = 4
 depends_on = ["compoundable-vault-trait"]
 
+[contracts.mock-admin-forwarder]
+path = "contracts/test-helpers/mock-admin-forwarder.clar"
+clarity-version = 4
+depends_on = ["auto-compounder", "compoundable-vault-trait", "cxd-staking"]
+
 [contracts.monitoring-dashboard]
 path = "contracts/monitoring/monitoring-dashboard.clar"
 clarity-version = 4

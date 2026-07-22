@@ -92,8 +92,11 @@
 )
 
 ;; --- Authorization and compliance ---
+;; Admin checks use the immediate caller so an EOA admin cannot accidentally
+;; delegate its authority through an untrusted forwarding contract. A contract
+;; principal can still be an admin when it deliberately forwards its own call.
 (define-private (is-admin)
-  (is-eq tx-sender (var-get admin))
+  (is-eq contract-caller (var-get admin))
 )
 
 (define-private (check-compliance
@@ -417,30 +420,43 @@
 
 ;; @desc Transfer administrative configuration authority.
 (define-public (set-admin (new-admin principal))
-  (begin
-    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
-    (var-set admin new-admin)
-    (print { event: "cxd-staking-admin-updated", admin: new-admin, block: burn-block-height })
-    (ok true)
+  (let ((previous-admin (var-get admin)))
+    (begin
+      (asserts! (is-admin) (err ERR_UNAUTHORIZED))
+      (var-set admin new-admin)
+      (print {
+        event: "cxd-staking-admin-updated",
+        old-admin: previous-admin,
+        admin: new-admin,
+        block: burn-block-height
+      })
+      (ok true)
+    )
   )
 )
 
 ;; @desc Pre-fund the contract's tracked CXD reward reserve.
 (define-public (fund-rewards (amount uint))
-  (begin
-    (asserts! (is-admin) (err ERR_UNAUTHORIZED))
-    (asserts! (> amount u0) (err ERR_ZERO_STAKE))
-    (let ((new-reserve (try! (safe-add (var-get reward-reserve) amount))))
-      (try! (cxd-transfer .cxd-token amount tx-sender (as-contract tx-sender)))
-      (var-set reward-reserve new-reserve)
-      (print {
-        event: "cxd-rewards-funded",
-        funder: tx-sender,
-        amount: amount,
-        reward-reserve: new-reserve,
-        block: burn-block-height
-      })
-      (ok true)
+  (let ((funder contract-caller))
+    (begin
+      (asserts! (is-admin) (err ERR_UNAUTHORIZED))
+      (asserts! (> amount u0) (err ERR_ZERO_STAKE))
+      (let ((new-reserve (try! (safe-add (var-get reward-reserve) amount))))
+        ;; The source is the authenticated immediate admin caller, not the
+        ;; transaction origin. Contract-principal admins should call this entry
+        ;; point from their own execution context so the token sees that same
+        ;; principal as tx-sender.
+        (try! (cxd-transfer .cxd-token amount funder (as-contract tx-sender)))
+        (var-set reward-reserve new-reserve)
+        (print {
+          event: "cxd-rewards-funded",
+          funder: funder,
+          amount: amount,
+          reward-reserve: new-reserve,
+          block: burn-block-height
+        })
+        (ok true)
+      )
     )
   )
 )

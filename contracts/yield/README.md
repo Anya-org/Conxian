@@ -26,6 +26,13 @@ the principal protected, and becomes withdrawable through `complete-unstake`
 after the configured burn-block cooldown. Each account may have one pending
 unstake position.
 
+Administrative functions authenticate `contract-caller`, the immediate caller
+of the entry point. This keeps an EOA admin from forwarding privileged calls
+through an untrusted wrapper while allowing a deliberately configured contract
+principal to administer through its own forwarding function. `fund-rewards`
+draws CXD from that authenticated immediate caller; a contract admin must
+execute the token transfer from its own contract context.
+
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `stake` | `(stake (amount uint))` | Transfers CXD into the contract after pause, balance, and compliance checks. |
@@ -78,7 +85,12 @@ The production trait is defined in `contracts/traits/compoundable-vault-trait.cl
 #### Configuration API
 
 All configuration functions are admin-only. The admin is initialized to the
-contract deployer and can be changed with `set-admin`.
+contract deployer and can be changed with `set-admin`. Authorization uses the
+immediate `contract-caller`, so contract-principal admins remain usable through
+controlled forwarding. A first registration initializes `last-compound-block`
+to the current burn block; frequency-based triggers therefore wait the full
+configured `min-interval`. Re-registration and configuration updates preserve
+the last successful compound block.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
@@ -118,6 +130,17 @@ trait principals or dynamically dispatch a list of vault calls. Off-chain
 keepers should batch submission across transactions and use the O(1) preflight
 helper to avoid unnecessary calls.
 
+Each source vault has an in-progress guard set before the first external trait
+call. A callback or re-entry for that vault is rejected with
+`ERR_REENTRANT` (`u1010`). Failed calls roll the guard back atomically; only a
+successful compound clears it. The `compound-executed` event's `caller` field
+is the immediate relaying keeper (`contract-caller`), while `origin` preserves
+the transaction origin (`tx-sender`) when a keeper uses a forwarding contract.
+The simnet vault intentionally does not call back into `auto-compounder`: adding
+that direct dependency to a trait implementation creates a Clarinet circular
+reference. The defensive lock remains active in production, and the regression
+suite verifies atomic rollback by retrying after failed vault and slippage calls.
+
 The coordinator propagates vault errors. A disabled, unregistered, identity
 mismatch, not-ready, or below-minimum-output call returns an explicit error.
 `last-compound-block` is written only after the vault call and minimum-output
@@ -129,7 +152,7 @@ The coordinator's explicit errors are `ERR_UNAUTHORIZED` (`u1000`),
 `ERR_INVALID_THRESHOLD` (`u1003`), `ERR_INVALID_MIN_OUTPUT` (`u1004`),
 `ERR_VAULT_NOT_REGISTERED` (`u1005`), `ERR_VAULT_DISABLED` (`u1006`),
 `ERR_VAULT_IDENTITY_MISMATCH` (`u1007`), `ERR_TRIGGER_NOT_READY` (`u1008`),
-and `ERR_OUTPUT_TOO_LOW` (`u1009`). Vault-specific errors returned by the
+`ERR_OUTPUT_TOO_LOW` (`u1009`), and `ERR_REENTRANT` (`u1010`). Vault-specific errors returned by the
 typed `compound` method are propagated unchanged.
 
 ### `cross-protocol-integrator.clar` & `enhanced-yield-strategy.clar`
@@ -147,8 +170,14 @@ stake and two-step exit are:
 ```clarity
 (contract-call? .cxd-staking stake u100000000)
 (contract-call? .cxd-staking request-unstake u25000000)
+;; Read get-position and wait/mine until burn-block-height >= cooldown-end.
+;; complete-unstake reverts with ERR_COOLDOWN before that boundary.
 (contract-call? .cxd-staking complete-unstake)
 ```
+
+The final call must be submitted only after the configured burn-block cooldown
+has elapsed; callers may mine empty blocks on simnet or wait for the chain to
+reach the recorded `cooldown-end`.
 
 An administrator pre-funds rewards and configures the raw base-unit rate:
 ```clarity
@@ -164,9 +193,12 @@ Administrators can register new vaults for optimization:
 ```
 
 ## Testing (How-to)
-Comprehensive validation is performed using the Vitest framework.
+Comprehensive validation is performed using the Vitest framework. Prefer the
+repository wrapper so Clarinet SDK plan regeneration is restored after every
+run:
 1. Install dependencies: `npm install`
-2. Run module tests: `npx vitest run tests/check-compile.test.ts`
+2. Run module tests: `bash scripts/run-tests.sh tests/yield/cxd-staking.test.ts tests/yield/auto-compounder.test.ts`
+3. Run the repository initialization check: `bash scripts/run-tests.sh tests/check-compile.test.ts`
 
 ## Status (Reference)
 - `cxd-staking.clar`: Phase 1 implementation with focused Vitest coverage.

@@ -15,6 +15,7 @@
 (define-constant ERR_VAULT_IDENTITY_MISMATCH (err u1007))
 (define-constant ERR_TRIGGER_NOT_READY (err u1008))
 (define-constant ERR_OUTPUT_TOO_LOW (err u1009))
+(define-constant ERR_REENTRANT (err u1010))
 
 ;; --- Trigger modes ---
 ;; Frequency: interval must be met.
@@ -43,7 +44,15 @@
   }
 )
 
+;; A vault is locked before the first external trait call. Errors roll the
+;; write back automatically; successful execution clears the lock explicitly.
+(define-map compound-in-progress principal bool)
+
 ;; --- Internal validation and trigger helpers ---
+
+(define-private (is-admin)
+  (is-eq contract-caller (var-get admin))
+)
 
 (define-private (validate-config
     (trigger-mode uint)
@@ -96,7 +105,8 @@
 (define-private (last-successful-block (vault principal))
   (match (map-get? vault-configs vault)
     config (get last-compound-block config)
-    u0
+    ;; A first registration starts its interval clock at registration time.
+    burn-block-height
   )
 )
 
@@ -193,18 +203,20 @@
 
 ;; @desc Transfer administrative control.
 (define-public (set-admin (new-admin principal))
-  (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (var-set admin new-admin)
-    (print
-      {
-        event: "compounder-admin-updated",
-        old-admin: tx-sender,
-        new-admin: new-admin,
-        block: burn-block-height
-      }
+  (let ((previous-admin (var-get admin)))
+    (begin
+      (asserts! (is-admin) ERR_UNAUTHORIZED)
+      (var-set admin new-admin)
+      (print
+        {
+          event: "compounder-admin-updated",
+          old-admin: previous-admin,
+          new-admin: new-admin,
+          block: burn-block-height
+        }
+      )
+      (ok true)
     )
-    (ok true)
   )
 )
 
@@ -219,7 +231,7 @@
     (enabled bool)
   )
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-admin) ERR_UNAUTHORIZED)
     (try! (validate-config trigger-mode min-interval min-reward-threshold min-output))
     (let
       (
@@ -267,7 +279,7 @@
     (enabled bool)
   )
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-admin) ERR_UNAUTHORIZED)
     (try! (validate-config trigger-mode min-interval min-reward-threshold min-output))
     (let
       (
@@ -308,7 +320,7 @@
 ;; @desc Enable or disable an existing typed source vault.
 (define-public (set-vault-enabled (vault <compoundable-vault-trait>) (enabled bool))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-admin) ERR_UNAUTHORIZED)
     (let
       (
         (source-vault (contract-of vault))
@@ -344,6 +356,13 @@
       )
       (begin
         (asserts! (get enabled config) ERR_VAULT_DISABLED)
+        (asserts!
+          (not (default-to false (map-get? compound-in-progress source-vault)))
+          ERR_REENTRANT
+        )
+        ;; Set the guard before either external trait call. If a call or a
+        ;; later assertion fails, Clarity rolls this write back atomically.
+        (map-set compound-in-progress source-vault true)
         (let
           (
             (pending-rewards (try! (contract-call? vault get-pending-rewards)))
@@ -386,6 +405,7 @@
                 (map-set vault-configs source-vault
                   (merge config { last-compound-block: burn-block-height })
                 )
+                (map-set compound-in-progress source-vault false)
                 (print
                   {
                     event: "compound-executed",
@@ -396,7 +416,8 @@
                     min-output: (get min-output config),
                     trigger-mode: (get trigger-mode config),
                     block: burn-block-height,
-                    caller: tx-sender
+                    caller: contract-caller,
+                    origin: tx-sender
                   }
                 )
                 (ok actual-output)
