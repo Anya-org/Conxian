@@ -34,9 +34,16 @@ The Tokens module manages all native protocol assets including CXD (Sovereign De
 ### `cxlp-token.clar`
 | Function | Signature | Description |
 |----------|-----------|-------------|
+| `mint` | `(amount uint) (recipient principal)` | Mints CXLP for the admin or an authorized immediate caller; zero amounts are rejected. |
+| `burn` | `(amount uint) (owner principal)` | Burns CXLP for an authorized immediate caller; non-admin callers must initiate a burn for `owner`. |
+| `add-minter` / `remove-minter` | `(principal)` | Adds or removes a minter (Admin only). |
+| `add-burner` / `remove-burner` | `(principal)` | Adds or removes a burner (Admin only). |
+| `is-minter` / `is-burner` | `(principal)` | Reads the independent minter and burner authorization maps. |
 | `transfer` | `(amount uint) (sender principal) (recipient principal) (memo (optional (buff 34)))` | SIP-010 compliant transfer. |
 | `get-balance` | `(who principal)` | Returns the token balance for a user. |
 | `get-protocol-status` | `()` | Returns compliance and version status. |
+
+Pool creation records concentrated-pool metadata only; it does not mint CXLP. Custody, position accounting, and settlement remain separate integration work.
 
 ### `cxtr-token.clar`
 | Function | Signature | Description |
