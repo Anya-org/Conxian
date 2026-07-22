@@ -114,6 +114,7 @@ path = "contracts/tokens/cxd-price-initializer.clar"
 
 [contracts.cxlp-token]
 path = "contracts/tokens/cxlp-token.clar"
+depends_on = [ "sip-standards",]
 
 [contracts.regulatory-adapter]
 path = "contracts/compliance/regulatory-adapter.clar"
@@ -744,6 +745,7 @@ depends_on = [ "block-utils",]
 
 [contracts.concentrated-liquidity-pool]
 path = "contracts/dex/concentrated-liquidity-pool.clar"
+depends_on = [ "cxlp-token", "sip-standards",]
 
 [contracts.collateral-orchestrator]
 path = "contracts/core/collateral-manager.clar"

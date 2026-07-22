@@ -269,7 +269,7 @@ clarity-version = 4
 [contracts.concentrated-liquidity-pool]
 path = "contracts/dex/concentrated-liquidity-pool.clar"
 clarity-version = 4
-depends_on = ["bme-engine", "conxian-csf-trait", "conxian-protocol", "sip-standards"]
+depends_on = ["bme-engine", "conxian-csf-trait", "conxian-protocol", "cxlp-token", "sip-standards"]
 
 [contracts.concentrated-math]
 path = "contracts/math/concentrated-math.clar"

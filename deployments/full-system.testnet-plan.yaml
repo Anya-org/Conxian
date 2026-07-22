@@ -218,14 +218,6 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
-        contract-name: concentrated-liquidity-pool
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 20000
-        path: contracts/dex/concentrated-liquidity-pool.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
         contract-name: btc-adapter
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 20000
@@ -377,8 +369,6 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
-  - id: 2
-    transactions:
     - contract-publish:
         contract-name: conxian-service-trait
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -387,6 +377,8 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
+  - id: 2
+    transactions:
     - contract-publish:
         contract-name: vault-traits
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -464,6 +456,14 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 20000
         path: contracts/tokens/cxlp-token.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: concentrated-liquidity-pool
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 20000
+        path: contracts/dex/concentrated-liquidity-pool.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -1776,6 +1776,20 @@ plan:
         method: add-burner
         parameters:
         - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.bme-engine'"
+        cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.cxlp-token
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: add-minter
+        parameters:
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.concentrated-liquidity-pool'"
+        cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.cxlp-token
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: add-burner
+        parameters:
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.concentrated-liquidity-pool'"
         cost: 10000
     - contract-call:
         contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.bme-engine
