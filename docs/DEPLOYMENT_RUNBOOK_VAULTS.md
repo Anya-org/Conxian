@@ -83,20 +83,15 @@ clarinet deployments generate --testnet --devnet
 clarinet deployments generate --mainnet
 ```
 
-### Step 3: Network Deployment
-**Testnet:**
-```bash
-clarinet deployments apply --testnet
-```
+### Step 3: Broadcast Gate (Currently Blocked)
+The repository workflows are currently preflight-only. They validate the config and exact plan digest, then emit clearly labeled plan/preflight/log artifacts; they do **not** invoke `clarinet deployments apply`, load a mnemonic, sign, or broadcast.
 
-**Mainnet (Requires CONFIRM_MAINNET=1):**
-```bash
-# Note: Ensure deployer has sufficient STX and authority in operational-treasury
-clarinet deployments apply --mainnet
-```
+Every non-dry path is blocked before signing until a structured receipt-producing broadcaster and complete evidence verifier are implemented for issue #531. Do not run `clarinet deployments apply` manually as a workaround, and do not treat dashboard or debug logs as deployment proof.
+
+The current full-system mainnet plan also contains an unresolved `ST...` deployer identity. It must be replaced only by an approved identity derived from and verified against the configured signer; do not guess an `SP...`/`SM...` address.
 
 ## 5. Post-Deployment & Role Wiring
-Once deployed, the following administrative actions are required:
+Once an approved, fully evidenced deployment exists, the following administrative actions are required:
 1. **Registry Update**: Call `set-protocol-principal("sbtc-vault", <deployed-address>)` in `operational-treasury`.
 2. **Fee Initialization**: Set default fees in `fee-manager.clar`.
 3. **Manager Authorization**: Add necessary managers in `custody.clar`.
@@ -105,11 +100,13 @@ Once deployed, the following administrative actions are required:
    custody.
 
 ## 6. Evidence Capture
-Record the following for the Mainnet Acceptance Evidence Pack:
-- Git Commit SHA: `2d9cc30c28005d2096f1a8bdbe23d1d38361fa24`
-- Deployment Plan Hash
-- Transaction IDs (txids)
-- Deployed Contract Principals
+Until the broadcast gate is cleared, record only preflight artifacts for the acceptance pack:
+- Source commit SHA from the preflight run
+- Exact deployment plan path and SHA-256
+- Network, approved signer-derived deployer identity, and validation results
+- Preflight logs and any explicitly labeled broadcast/partial candidate
+
+Do not record txids or deployed contract principals as acceptance proof without a structured receipt and complete plan-bound verification. A partial candidate is retained for bounded recovery and must never be labeled confirmed or completed.
 
 ---
 *Last Updated: April 2026*

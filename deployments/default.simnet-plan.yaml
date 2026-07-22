@@ -141,6 +141,11 @@ plan:
       path: contracts/monitoring/analytics-aggregator.clar
       clarity-version: 4
     - transaction-type: emulated-contract-publish
+      contract-name: compoundable-vault-trait
+      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
+      path: contracts/traits/compoundable-vault-trait.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
       contract-name: auto-compounder
       emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
       path: contracts/yield/auto-compounder.clar
@@ -784,6 +789,11 @@ plan:
       contract-name: mock-token
       emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
       path: contracts/test-helpers/mock-token.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: mock-compoundable-vault
+      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
+      path: contracts/test-helpers/mock-compoundable-vault.clar
       clarity-version: 4
     - transaction-type: emulated-contract-publish
       contract-name: monitoring-dashboard

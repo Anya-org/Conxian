@@ -32,6 +32,12 @@ batches:
       - contract-publish:
           contract-name: access-control-trait
           path: contracts/traits/access-control-trait.clar
+      - contract-publish:
+          contract-name: compoundable-vault-trait
+          path: contracts/traits/compoundable-vault-trait.clar
+      - contract-publish:
+          contract-name: auto-compounder
+          path: contracts/yield/auto-compounder.clar
 
   # --- Phase 1: Identity, Access & Compliance ---
   - id: 1
@@ -82,10 +88,13 @@ batches:
           contract-name: revenue-automation
           path: contracts/treasury/revenue-automation.clar
 
-  # --- Phase 3: Security Infrastructure ---
+  # --- Phase 3: Staking & Security Infrastructure ---
   - id: 3
-    description: "Circuit Breakers, Proof of Reserves, Rate Limiter"
+    description: "CXD Staking, Circuit Breakers, Proof of Reserves, Rate Limiter"
     transactions:
+      - contract-publish:
+          contract-name: cxd-staking
+          path: contracts/yield/cxd-staking.clar
       - contract-publish:
           contract-name: enhanced-circuit-breaker
           path: contracts/security/enhanced-circuit-breaker.clar
