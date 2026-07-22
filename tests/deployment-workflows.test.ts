@@ -23,6 +23,8 @@ describe("deployment workflow safety gates", () => {
       expect(source).toContain("plan-only");
       expect(source).toContain("blocked before signing");
       expect(source).toContain("issue #531");
+      expect(source).toContain("cancel-in-progress: false");
+      expect(source).toContain("timeout-minutes:");
     }
   });
 
@@ -41,7 +43,10 @@ describe("deployment workflow safety gates", () => {
     expect(source).toContain("workflow_dispatch:");
     expect(source).not.toMatch(/^\s+push:/m);
     expect(source).toContain('required: true');
-    expect(source).toContain('inputs.confirm == \'DEPLOY_MAINNET\'');
+    expect(source).toContain("Require exact mainnet confirmation");
+    expect(source).toContain('CONFIRM: ${{ inputs.confirm }}');
+    expect(source).toContain('"$CONFIRM" != "DEPLOY_MAINNET"');
+    expect(source).not.toContain("if: ${{ inputs.confirm == 'DEPLOY_MAINNET' }}");
     expect(source).toContain("expected_plan_sha256");
     expect(source).toContain("deployments/full-system.mainnet-plan.sha256");
     expect(source).toContain("SP*|SM*");

@@ -39,5 +39,16 @@
       ]
     }
   ],
+  "readOnlyChecks": [
+    {
+      "network": "testnet",
+      "contractId": "REPLACE_WITH_DEPLOYER.CONTRACT_NAME",
+      "sender": "REPLACE_WITH_NETWORK_DEPLOYER_ADDRESS",
+      "functionName": "REPLACE_WITH_READ_ONLY_FUNCTION_NAME",
+      "arguments": [],
+      "expectedOkay": true,
+      "expectedResultHex": "REPLACE_WITH_0X_SERIALIZED_CLARITY_RESULT"
+    }
+  ],
   "preexistingContracts": []
 }

@@ -92,6 +92,12 @@
         "$ref": "#/$defs/interfaceExpectation"
       }
     },
+    "readOnlyChecks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/readOnlyCheck"
+      }
+    },
     "preexistingContracts": {
       "type": "array",
       "uniqueItems": true,
@@ -114,6 +120,10 @@
       "type": "string",
       "pattern": "^(?:[a-zA-Z](?:[a-zA-Z0-9]|[-_!?+<>=/*])*|[-+=/*]|[<>]=?)$",
       "maxLength": 127
+    },
+    "clarityHex": {
+      "type": "string",
+      "pattern": "^0x[0-9a-fA-F]+$"
     },
     "contractId": {
       "type": "string",
@@ -361,6 +371,89 @@
           "$ref": "#/$defs/interfaceApiEvidence"
         }
       }
+    },
+    "readOnlyApiEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observedAt",
+        "endpoint",
+        "httpStatus",
+        "sender",
+        "arguments",
+        "okay",
+        "resultHex"
+      ],
+      "properties": {
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endpoint": {
+          "type": "string",
+          "format": "uri"
+        },
+        "httpStatus": {
+          "const": 200
+        },
+        "sender": {
+          "$ref": "#/$defs/address"
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/clarityHex"
+          }
+        },
+        "okay": {
+          "const": true
+        },
+        "resultHex": {
+          "$ref": "#/$defs/clarityHex"
+        }
+      }
+    },
+    "readOnlyCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "network",
+        "contractId",
+        "sender",
+        "functionName",
+        "arguments",
+        "expectedOkay",
+        "expectedResultHex"
+      ],
+      "properties": {
+        "network": {
+          "enum": ["testnet", "mainnet"]
+        },
+        "contractId": {
+          "$ref": "#/$defs/contractId"
+        },
+        "sender": {
+          "$ref": "#/$defs/address"
+        },
+        "functionName": {
+          "$ref": "#/$defs/functionName"
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/clarityHex"
+          }
+        },
+        "expectedOkay": {
+          "const": true
+        },
+        "expectedResultHex": {
+          "$ref": "#/$defs/clarityHex"
+        },
+        "apiEvidence": {
+          "$ref": "#/$defs/readOnlyApiEvidence"
+        }
+      }
     }
   },
   "allOf": [
@@ -377,6 +470,14 @@
         "properties": {
           "coverage": {
             "const": "complete"
+          },
+          "preexistingContracts": {
+            "maxItems": 0
+          },
+          "readOnlyChecks": {
+            "items": {
+              "required": ["apiEvidence"]
+            }
           }
         }
       }

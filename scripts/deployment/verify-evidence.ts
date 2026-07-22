@@ -92,6 +92,27 @@ export interface InterfaceApiEvidence {
   functions: RequiredFunction[];
 }
 
+export interface ReadOnlyCheck {
+  network: DeploymentNetwork;
+  contractId: string;
+  sender: string;
+  functionName: string;
+  arguments: string[];
+  expectedOkay: true;
+  expectedResultHex: string;
+  apiEvidence?: ReadOnlyApiEvidence;
+}
+
+export interface ReadOnlyApiEvidence {
+  observedAt: string;
+  endpoint: string;
+  httpStatus: 200;
+  sender: string;
+  arguments: string[];
+  okay: true;
+  resultHex: string;
+}
+
 export interface DeploymentEvidence {
   schemaVersion: "1";
   evidenceStatus: EvidenceStatus;
@@ -112,6 +133,7 @@ export interface DeploymentEvidence {
   contractPublications: ContractPublicationEvidence[];
   contractCalls: ContractCallEvidence[];
   interfaces: InterfaceExpectation[];
+  readOnlyChecks?: ReadOnlyCheck[];
   preexistingContracts?: string[];
 }
 
@@ -124,6 +146,7 @@ export interface VerifyEvidenceOptions {
   sourceCommit?: string;
   fetcher?: typeof fetch;
   now?: () => Date;
+  requestTimeoutMs?: number;
 }
 
 export interface WaitForEvidenceOptions extends VerifyEvidenceOptions {
@@ -190,12 +213,22 @@ const NETWORK_ADDRESS_VERSIONS: Readonly<Record<DeploymentNetwork, ReadonlySet<n
 };
 
 const KNOWN_HIRO_HOSTS = new Set(Object.values(HIRO_API_BASE_URLS).map((baseUrl) => new URL(baseUrl).hostname));
+const DEFAULT_REQUEST_TIMEOUT_MS = 30_000;
 
 type JsonObject = Record<string, unknown>;
 
 interface HttpJsonResponse {
   status: number;
   body: unknown;
+}
+
+interface FetchJsonOptions {
+  method?: "GET" | "POST";
+  body?: unknown;
+  requestTimeoutMs?: number;
+  requestFailureCode?: string;
+  requestTimeoutCode?: string;
+  malformedCode?: string;
 }
 
 function isObject(value: unknown): value is JsonObject {
@@ -396,6 +429,64 @@ function assertRecordedInterfaceEvidence(value: unknown, path: string): void {
   assertInterfaceFunctions(value.functions, `${path}.functions`);
 }
 
+function assertCanonicalSerializedClarityValues(value: unknown, path: string): asserts value is string[] {
+  assertCondition(Array.isArray(value), `${path} must be an array`);
+  for (const [index, item] of value.entries()) {
+    const itemPath = `${path}[${index}]`;
+    assertCanonicalClarityHex(item, itemPath);
+    assertCondition(item.startsWith("0x"), `${itemPath} must use a 0x-prefixed canonical Clarity value`);
+    assertCondition(
+      cvToHex(hexToCV(item)).toLowerCase() === item.toLowerCase(),
+      `${itemPath} must use canonical Clarity serialization`,
+      "MALFORMED_EVIDENCE",
+    );
+  }
+}
+
+function assertReadOnlyApiEvidence(value: unknown, path: string, network: DeploymentNetwork): void {
+  assertCondition(isObject(value), `${path} must be an object`);
+  assertOnlyKeys(value, ["observedAt", "endpoint", "httpStatus", "sender", "arguments", "okay", "resultHex"], path);
+  assertIsoTimestamp(value.observedAt, `${path}.observedAt`);
+  assertCondition(isNonEmptyString(value.endpoint), `${path}.endpoint must be non-empty`);
+  assertCondition(value.httpStatus === 200, `${path}.httpStatus must be 200`);
+  assertAddress(value.sender, `${path}.sender`, network);
+  assertCanonicalSerializedClarityValues(value.arguments, `${path}.arguments`);
+  assertCondition(value.okay === true, `${path}.okay must be true`);
+  assertCanonicalClarityHex(value.resultHex, `${path}.resultHex`);
+  assertCondition(value.resultHex.startsWith("0x"), `${path}.resultHex must use a 0x-prefixed canonical Clarity value`);
+  assertCondition(
+    cvToHex(hexToCV(value.resultHex)).toLowerCase() === value.resultHex.toLowerCase(),
+    `${path}.resultHex must use canonical Clarity serialization`,
+    "MALFORMED_EVIDENCE",
+  );
+}
+
+function assertReadOnlyCheck(value: unknown, path: string, network: DeploymentNetwork): void {
+  assertCondition(isObject(value), `${path} must be an object`);
+  assertOnlyKeys(
+    value,
+    ["network", "contractId", "sender", "functionName", "arguments", "expectedOkay", "expectedResultHex", "apiEvidence"],
+    path,
+  );
+  assertCondition(value.network === network, `${path}.network must match the evidence network`, "READ_ONLY_NETWORK_MISMATCH");
+  assertContractId(value.contractId, `${path}.contractId`, network);
+  assertAddress(value.sender, `${path}.sender`, network);
+  assertFunctionName(value.functionName, `${path}.functionName`);
+  assertCanonicalSerializedClarityValues(value.arguments, `${path}.arguments`);
+  assertCondition(value.expectedOkay === true, `${path}.expectedOkay must be true`, "READ_ONLY_EXPECTATION_INVALID");
+  assertCanonicalClarityHex(value.expectedResultHex, `${path}.expectedResultHex`);
+  assertCondition(
+    value.expectedResultHex.startsWith("0x"),
+    `${path}.expectedResultHex must use a 0x-prefixed canonical Clarity value`,
+  );
+  assertCondition(
+    cvToHex(hexToCV(value.expectedResultHex)).toLowerCase() === value.expectedResultHex.toLowerCase(),
+    `${path}.expectedResultHex must use canonical Clarity serialization`,
+    "READ_ONLY_EXPECTATION_INVALID",
+  );
+  if (value.apiEvidence !== undefined) assertReadOnlyApiEvidence(value.apiEvidence, `${path}.apiEvidence`, network);
+}
+
 function assertInterfaceFunctions(
   value: unknown,
   path: string,
@@ -484,6 +575,7 @@ function parseEvidenceBundle(value: unknown): DeploymentEvidence {
       "contractPublications",
       "contractCalls",
       "interfaces",
+      "readOnlyChecks",
       "preexistingContracts",
     ],
     "evidence",
@@ -574,6 +666,22 @@ function parseEvidenceBundle(value: unknown): DeploymentEvidence {
     }
   }
 
+  const declaredReadOnlyChecksValue = value.readOnlyChecks;
+  let declaredReadOnlyChecks: ReadOnlyCheck[] = [];
+  if (declaredReadOnlyChecksValue !== undefined) {
+    assertCondition(Array.isArray(declaredReadOnlyChecksValue), "readOnlyChecks must be an array");
+    declaredReadOnlyChecks = declaredReadOnlyChecksValue as ReadOnlyCheck[];
+    const readOnlyKeys = new Set<string>();
+    for (const [index, item] of declaredReadOnlyChecks.entries()) {
+      const path = `readOnlyChecks[${index}]`;
+      assertReadOnlyCheck(item, path, value.network);
+      const check = item as ReadOnlyCheck;
+      const key = `${check.network}:${check.contractId}:${check.sender}:${check.functionName}:${check.arguments.join(",")}:${check.expectedResultHex}`;
+      assertCondition(!readOnlyKeys.has(key), `${path} duplicates another declared read-only check`, "DUPLICATE_READ_ONLY_CHECK");
+      readOnlyKeys.add(key);
+    }
+  }
+
   for (const contractId of publicationIds) {
     assertCondition(interfaceIds.has(contractId), `missing interface expectation for ${contractId}`, "MISSING_INTERFACE_EXPECTATION");
   }
@@ -596,6 +704,9 @@ function parseEvidenceBundle(value: unknown): DeploymentEvidence {
     }
     for (const [index, item] of value.interfaces.entries()) {
       assertCondition(item.interfaceEvidence !== undefined, `confirmed evidence is missing interfaces[${index}].interfaceEvidence`);
+    }
+    for (const [index, item] of declaredReadOnlyChecks.entries()) {
+      assertCondition(item.apiEvidence !== undefined, `confirmed evidence is missing readOnlyChecks[${index}].apiEvidence`);
     }
   }
   if (value.evidenceStatus === "broadcast") {
@@ -636,26 +747,72 @@ async function fetchJson(
   url: string,
   apiKey: string | undefined,
   baseUrl: string,
+  options: FetchJsonOptions = {},
 ): Promise<HttpJsonResponse> {
-  let response: Response;
+  const requestTimeoutMs = options.requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS;
+  assertCondition(
+    Number.isInteger(requestTimeoutMs) && requestTimeoutMs > 0,
+    "requestTimeoutMs must be a positive integer",
+    "INVALID_REQUEST_TIMEOUT",
+  );
+
+  const controller = new AbortController();
+  let timedOut = false;
+  const timeout = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, requestTimeoutMs);
+
   try {
     const headers: Record<string, string> = { accept: "application/json" };
     if (apiKey && isKnownHiroApiBaseUrl(baseUrl)) headers["x-hiro-api-key"] = apiKey;
-    response = await fetcher(url, { headers });
-  } catch {
-    throw new DeploymentVerificationError(`request failed for ${url}`, "HTTP_REQUEST_FAILED", true);
-  }
-
-  let body: unknown = undefined;
-  try {
-    body = await response.json();
-  } catch {
-    if (response.status >= 200 && response.status < 300) {
-      throw new DeploymentVerificationError(`API returned malformed JSON for ${url}`, "UNSUPPORTED_API_PAYLOAD");
+    const requestInit: RequestInit = {
+      method: options.method ?? "GET",
+      headers,
+      signal: controller.signal,
+    };
+    if (options.body !== undefined) {
+      headers["content-type"] = "application/json";
+      requestInit.body = JSON.stringify(options.body);
     }
-  }
+    const response = await fetcher(url, requestInit);
+    let body: unknown = undefined;
+    try {
+      body = await response.json();
+    } catch {
+      if (timedOut) {
+        throw new DeploymentVerificationError(
+          `request timed out for ${url}`,
+          options.requestTimeoutCode ?? "HTTP_REQUEST_TIMEOUT",
+          true,
+        );
+      }
+      if (response.status >= 200 && response.status < 300) {
+        throw new DeploymentVerificationError(
+          `API returned malformed JSON for ${url}`,
+          options.malformedCode ?? "UNSUPPORTED_API_PAYLOAD",
+        );
+      }
+    }
 
-  return { status: response.status, body };
+    return { status: response.status, body };
+  } catch (error) {
+    if (error instanceof DeploymentVerificationError) throw error;
+    if (timedOut) {
+      throw new DeploymentVerificationError(
+        `request timed out for ${url}`,
+        options.requestTimeoutCode ?? "HTTP_REQUEST_TIMEOUT",
+        true,
+      );
+    }
+    throw new DeploymentVerificationError(
+      `request failed for ${url}`,
+      options.requestFailureCode ?? "HTTP_REQUEST_FAILED",
+      true,
+    );
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 function planError(message: string, code = "PLAN_MALFORMED"): never {
@@ -836,6 +993,38 @@ function validateCompletePlanBinding(bundle: DeploymentEvidence, plan: ParsedDep
   assertCondition(actual.size === expected.size, "evidence does not have a one-to-one mapping to the deployment plan", "PLAN_EVIDENCE_MISMATCH");
 }
 
+function validateReadOnlyCheckBinding(bundle: DeploymentEvidence, plan: ParsedDeploymentPlan): void {
+  for (const [index, check] of (bundle.readOnlyChecks ?? []).entries()) {
+    const path = `readOnlyChecks[${index}]`;
+    assertCondition(check.network === plan.network, `${path}.network does not match the deployment plan`, "READ_ONLY_NETWORK_MISMATCH");
+    assertCondition(check.network === bundle.network, `${path}.network does not match the evidence network`, "READ_ONLY_NETWORK_MISMATCH");
+
+    const plannedEntries = plan.entries.filter((entry) => entry.contractId === check.contractId);
+    assertCondition(
+      plannedEntries.length > 0,
+      `${path}.contractId is not covered by the bound deployment plan`,
+      "READ_ONLY_PLAN_MISMATCH",
+    );
+
+    const evidenceEntries = [
+      ...bundle.contractPublications,
+      ...bundle.contractCalls,
+    ].filter((entry) => entry.contractId === check.contractId);
+    assertCondition(
+      evidenceEntries.length > 0,
+      `${path}.contractId is not covered by the bound deployment evidence`,
+      "READ_ONLY_PLAN_MISMATCH",
+    );
+
+    const senders = new Set(evidenceEntries.map((entry) => entry.expectedSender));
+    assertCondition(
+      senders.has(check.sender),
+      `${path}.sender is not a canonical sender for the covered contract evidence`,
+      "READ_ONLY_SENDER_MISMATCH",
+    );
+  }
+}
+
 function validatePlanAndSource(bundle: DeploymentEvidence, options: VerifyEvidenceOptions): ParsedDeploymentPlan {
   assertCondition(bundle.network === options.network, "evidence network does not match requested network", "NETWORK_MISMATCH");
   assertCondition(bundle.deployer === options.deployer, "evidence deployer does not match requested deployer", "IDENTITY_MISMATCH");
@@ -851,6 +1040,7 @@ function validatePlanAndSource(bundle: DeploymentEvidence, options: VerifyEviden
   assertCondition(bundle.plan.sha256 === expectedHash, "evidence plan hash does not match deployment plan", "PLAN_HASH_MISMATCH");
   const plan = readDeploymentPlan(options.planPath);
   validateCompletePlanBinding(bundle, plan);
+  validateReadOnlyCheckBinding(bundle, plan);
   return plan;
 }
 
@@ -881,12 +1071,20 @@ function normaliseClarityHex(value: string): string {
   return `0x${value.replace(/^0x/i, "").toLowerCase()}`;
 }
 
-function assertCanonicalClarityHex(value: unknown, path: string): asserts value is string {
-  assertCondition(typeof value === "string" && CLARITY_HEX_PATTERN.test(value) && value.replace(/^0x/i, "").length % 2 === 0, `${path} must be valid Clarity value hex`);
+function assertCanonicalClarityHex(
+  value: unknown,
+  path: string,
+  code = "MALFORMED_EVIDENCE",
+): asserts value is string {
+  assertCondition(
+    typeof value === "string" && CLARITY_HEX_PATTERN.test(value) && value.replace(/^0x/i, "").length % 2 === 0,
+    `${path} must be valid Clarity value hex`,
+    code,
+  );
   try {
     cvToHex(hexToCV(value));
   } catch {
-    throw new DeploymentVerificationError(`${path} must encode one valid Clarity value`, "ARGUMENT_MISMATCH");
+    throw new DeploymentVerificationError(`${path} must encode one valid Clarity value`, code);
   }
 }
 
@@ -984,7 +1182,9 @@ async function verifyTransaction(
   observedAt: string,
 ): Promise<TransactionApiEvidence> {
   const endpoint = endpointUrl(baseUrl, `/extended/v1/tx/${encodeURIComponent(item.txid)}`);
-  const response = await fetchJson(fetcher, endpoint, options.apiKey, baseUrl);
+  const response = await fetchJson(fetcher, endpoint, options.apiKey, baseUrl, {
+    requestTimeoutMs: options.requestTimeoutMs,
+  });
   if (response.status === 404) {
     throw new DeploymentVerificationError(`transaction ${item.txid} was not found at the checked API address`, "TRANSACTION_NOT_FOUND", true);
   }
@@ -1069,7 +1269,9 @@ async function verifyInterface(
     baseUrl,
     `/v2/contracts/interface/${encodeURIComponent(address)}/${encodeURIComponent(contractName)}`,
   );
-  const response = await fetchJson(fetcher, endpoint, options.apiKey, baseUrl);
+  const response = await fetchJson(fetcher, endpoint, options.apiKey, baseUrl, {
+    requestTimeoutMs: options.requestTimeoutMs,
+  });
   if (response.status === 404) {
     throw new DeploymentVerificationError(`interface ${item.contractId} was not found at the checked API address`, "INTERFACE_NOT_FOUND", true);
   }
@@ -1090,6 +1292,89 @@ async function verifyInterface(
     endpoint,
     httpStatus: 200,
     functions,
+  };
+}
+
+async function verifyReadOnlyCheck(
+  check: ReadOnlyCheck,
+  options: VerifyEvidenceOptions,
+  baseUrl: string,
+  fetcher: typeof fetch,
+  observedAt: string,
+): Promise<ReadOnlyApiEvidence> {
+  const separator = check.contractId.lastIndexOf(".");
+  const address = check.contractId.slice(0, separator);
+  const contractName = check.contractId.slice(separator + 1);
+  const endpoint = endpointUrl(
+    baseUrl,
+    `/v2/contracts/call-read/${encodeURIComponent(address)}/${encodeURIComponent(contractName)}/${encodeURIComponent(check.functionName)}`,
+  );
+  const response = await fetchJson(fetcher, endpoint, options.apiKey, baseUrl, {
+    method: "POST",
+    body: {
+      sender: check.sender,
+      arguments: check.arguments,
+    },
+    requestTimeoutMs: options.requestTimeoutMs,
+    requestFailureCode: "READ_ONLY_REQUEST_FAILED",
+    requestTimeoutCode: "READ_ONLY_TIMEOUT",
+    malformedCode: "READ_ONLY_MALFORMED_RESPONSE",
+  });
+
+  if (response.status === 404) {
+    throw new DeploymentVerificationError(
+      `read-only function ${check.contractId}.${check.functionName} was not found at the checked API address`,
+      "READ_ONLY_NOT_FOUND",
+      true,
+    );
+  }
+  if (response.status !== 200) {
+    throw new DeploymentVerificationError(
+      `read-only lookup returned HTTP ${response.status}`,
+      "READ_ONLY_HTTP_ERROR",
+      response.status >= 500 || response.status === 429,
+    );
+  }
+
+  assertCondition(isObject(response.body), "read-only API payload must be an object", "READ_ONLY_MALFORMED_RESPONSE");
+  assertCondition(typeof response.body.okay === "boolean", "read-only API payload is missing boolean okay", "READ_ONLY_MALFORMED_RESPONSE");
+  if (response.body.okay !== true) {
+    assertCondition(
+      isNonEmptyString(response.body.cause),
+      "read-only API failure payload is missing cause",
+      "READ_ONLY_MALFORMED_RESPONSE",
+    );
+    throw new DeploymentVerificationError(
+      `read-only function ${check.contractId}.${check.functionName} did not execute successfully`,
+      "READ_ONLY_API_ERROR",
+      false,
+      "failed",
+    );
+  }
+
+  assertCondition(
+    check.expectedOkay === true,
+    `read-only check ${check.contractId}.${check.functionName} has an unsupported expected okay state`,
+    "READ_ONLY_EXPECTATION_INVALID",
+  );
+  assertCanonicalClarityHex(response.body.result, "read-only.result", "READ_ONLY_MALFORMED_RESPONSE");
+  assertCondition(response.body.result.startsWith("0x"), "read-only.result must be 0x-prefixed", "READ_ONLY_MALFORMED_RESPONSE");
+  const resultHex = cvToHex(hexToCV(response.body.result)).toLowerCase();
+  const expectedResultHex = cvToHex(hexToCV(check.expectedResultHex)).toLowerCase();
+  assertCondition(
+    resultHex === expectedResultHex,
+    `read-only result for ${check.contractId}.${check.functionName} did not match the declared expected result`,
+    "READ_ONLY_MISMATCH",
+  );
+
+  return {
+    observedAt,
+    endpoint,
+    httpStatus: 200,
+    sender: check.sender,
+    arguments: check.arguments.map((argument) => cvToHex(hexToCV(argument)).toLowerCase()),
+    okay: true,
+    resultHex,
   };
 }
 
@@ -1135,6 +1420,17 @@ export async function verifyDeploymentEvidence(
     });
   }
 
+  const readOnlyChecks: ReadOnlyCheck[] = [];
+  for (const item of bundle.readOnlyChecks ?? []) {
+    const observedAt = now().toISOString();
+    readOnlyChecks.push({
+      ...item,
+      arguments: item.arguments.map((argument) => cvToHex(hexToCV(argument)).toLowerCase()),
+      expectedResultHex: cvToHex(hexToCV(item.expectedResultHex)).toLowerCase(),
+      apiEvidence: await verifyReadOnlyCheck(item, options, baseUrl, fetcher, observedAt),
+    });
+  }
+
   return {
     ...bundle,
     evidenceStatus: "confirmed",
@@ -1143,6 +1439,7 @@ export async function verifyDeploymentEvidence(
     contractPublications,
     contractCalls,
     interfaces,
+    ...(bundle.readOnlyChecks !== undefined ? { readOnlyChecks } : {}),
   };
 }
 

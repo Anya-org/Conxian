@@ -159,6 +159,10 @@ function mockHiroFetch(
   overrides: {
     publish?: Record<string, unknown>;
     call?: Record<string, unknown>;
+    readOnly?: Record<string, unknown>;
+    readOnlyStatus?: number;
+    readOnlyThrows?: boolean;
+    readOnlyHangs?: boolean;
     publishStatus?: number;
     interfaceStatus?: number;
     interfaceBody?: Record<string, unknown>;
@@ -177,8 +181,25 @@ function mockHiroFetch(
     transactions.set(transaction.txid, txPayload(transaction.txid, transaction.kind, transaction.overrides));
   }
 
-  return vi.fn(async (input: string | URL) => {
+  return vi.fn(async (input: string | URL, init?: RequestInit) => {
     const url = new URL(String(input));
+    if (url.pathname.includes("/v2/contracts/call-read/")) {
+      if (overrides.readOnlyHangs) {
+        return await new Promise<Response>((_resolve, reject) => {
+          const signal = init?.signal;
+          const timer = setTimeout(() => reject(new Error("mock read-only timeout")), 60_000);
+          const onAbort = () => {
+            clearTimeout(timer);
+            reject(new DOMException("Aborted", "AbortError"));
+          };
+          signal?.addEventListener("abort", onAbort, { once: true });
+        });
+      }
+      if (overrides.readOnlyThrows) throw new Error("provider unavailable");
+      return new Response(JSON.stringify(overrides.readOnly ?? { okay: true, result: "0x03" }), {
+        status: overrides.readOnlyStatus ?? 200,
+      });
+    }
     const txid = [...transactions.keys()].find((candidate) => url.pathname.endsWith(candidate));
     if (txid !== undefined) {
       const body = transactions.get(txid);
@@ -239,6 +260,17 @@ function baseEvidence(): DeploymentEvidence {
           { name: "get-name", access: "read_only" },
           { name: "initialize", access: "public" },
         ],
+      },
+    ],
+    readOnlyChecks: [
+      {
+        network: "testnet",
+        contractId: CONTRACT_ID,
+        sender: DEPLOYER,
+        functionName: "get-name",
+        arguments: [],
+        expectedOkay: true,
+        expectedResultHex: "0x03",
       },
     ],
   };
@@ -363,12 +395,13 @@ describe("deployment evidence verification", () => {
   });
 
   it("confirms complete plan evidence with nullable burn hash and rich Hiro interfaces", async () => {
+    const fetcher = mockHiroFetch({ publish: { burn_block_hash: null } });
     const result = await verifyDeploymentEvidence(baseEvidence(), {
       network: "testnet",
       deployer: DEPLOYER,
       baseUrl: "http://hiro.test",
       planPath: PLAN_PATH,
-      fetcher: mockHiroFetch({ publish: { burn_block_hash: null } }),
+      fetcher,
       now: () => FIXED_TIME,
     });
 
@@ -382,6 +415,24 @@ describe("deployment evidence verification", () => {
       { name: "get-name", access: "read_only" },
       { name: "initialize", access: "public" },
     ]);
+    expect(result.readOnlyChecks?.[0].apiEvidence).toEqual({
+      observedAt: FIXED_TIME.toISOString(),
+      endpoint: "http://hiro.test/v2/contracts/call-read/ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P/alpha/get-name",
+      httpStatus: 200,
+      sender: DEPLOYER,
+      arguments: [],
+      okay: true,
+      resultHex: "0x03",
+    });
+
+    const readOnlyCall = (fetcher as ReturnType<typeof vi.fn>).mock.calls.find(([input]) =>
+      String(input).includes("/v2/contracts/call-read/"),
+    );
+    expect(readOnlyCall).toBeDefined();
+    expect(JSON.parse((readOnlyCall?.[1] as RequestInit).body as string)).toEqual({
+      sender: DEPLOYER,
+      arguments: [],
+    });
   });
 
   it("keeps pending retryable and classifies aborted transactions as terminal", async () => {
@@ -400,6 +451,68 @@ describe("deployment evidence verification", () => {
     );
     expect(aborted.retryable).toBe(false);
     expect(aborted.status).toBe("abort_by_response");
+  });
+
+  it("fails closed on read-only API, malformed, failed, missing, and mismatched responses", async () => {
+    await expectVerificationError(
+      baseEvidence(),
+      mockHiroFetch({ readOnly: { okay: false, cause: "RuntimeCheck(ReadOnlyFunctionFailure)" } }),
+      "READ_ONLY_API_ERROR",
+    );
+    await expectVerificationError(
+      baseEvidence(),
+      mockHiroFetch({ readOnly: { okay: true } }),
+      "READ_ONLY_MALFORMED_RESPONSE",
+    );
+    await expectVerificationError(
+      baseEvidence(),
+      mockHiroFetch({ readOnly: { okay: true, result: "0x04" } }),
+      "READ_ONLY_MISMATCH",
+    );
+    await expectVerificationError(
+      baseEvidence(),
+      mockHiroFetch({ readOnlyStatus: 404 }),
+      "READ_ONLY_NOT_FOUND",
+    );
+    await expectVerificationError(
+      baseEvidence(),
+      mockHiroFetch({ readOnlyStatus: 503 }),
+      "READ_ONLY_HTTP_ERROR",
+    );
+  });
+
+  it("classifies read-only provider failures and bounded request timeouts", async () => {
+    await expectVerificationError(
+      baseEvidence(),
+      mockHiroFetch({ readOnlyThrows: true }),
+      "READ_ONLY_REQUEST_FAILED",
+    );
+    await expectVerificationError(
+      baseEvidence(),
+      mockHiroFetch({ readOnlyHangs: true }),
+      "READ_ONLY_TIMEOUT",
+      { requestTimeoutMs: 1 },
+    );
+  });
+
+  it("binds each read-only check to the plan, evidence network, and canonical sender", async () => {
+    const uncovered = baseEvidence();
+    uncovered.readOnlyChecks![0].contractId = `${DEPLOYER}.uncovered`;
+    const uncoveredFetcher = mockHiroFetch();
+    await expectVerificationError(uncovered, uncoveredFetcher, "READ_ONLY_PLAN_MISMATCH");
+    expect(uncoveredFetcher).not.toHaveBeenCalled();
+
+    const wrongNetwork = baseEvidence();
+    wrongNetwork.readOnlyChecks![0].network = "mainnet";
+    const wrongNetworkFetcher = mockHiroFetch();
+    await expectVerificationError(wrongNetwork, wrongNetworkFetcher, "READ_ONLY_NETWORK_MISMATCH");
+    expect(wrongNetworkFetcher).not.toHaveBeenCalled();
+
+    const wrongSender = baseEvidence();
+    wrongSender.readOnlyChecks![0].sender = "ST1MTCGFNPSA2CC81F2C8HASNACV3P42RF3TRSRSH";
+    const wrongSenderFetcher = mockHiroFetch();
+    await expectVerificationError(wrongSender, wrongSenderFetcher, "READ_ONLY_SENDER_MISMATCH");
+    expect(wrongSenderFetcher).not.toHaveBeenCalled();
   });
 
   it("rejects noncanonical transactions, wrong identities, and argument mismatches", async () => {

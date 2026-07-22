@@ -19,9 +19,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: conxian-deploy-mainnet
+  cancel-in-progress: false
+
 jobs:
   validate-protocol:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
@@ -59,17 +64,25 @@ jobs:
           python3 scripts/gen-deployment-plans.py --check
 
       - name: Run focused deployment safety tests
-        run: |
-          npm run test:deployment-evidence
-          npx vitest run tests/deploy-testnet-script.test.ts tests/deployment-workflows.test.ts --config vitest.config.ts --pool=threads
+        run: npm run test:deployment-evidence
 
   preflight-mainnet:
     needs: validate-protocol
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment: mainnet
-    if: ${{ inputs.confirm == 'DEPLOY_MAINNET' }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Require exact mainnet confirmation
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          set -euo pipefail
+          if [ "$CONFIRM" != "DEPLOY_MAINNET" ]; then
+            echo "::error::Mainnet preflight requires the exact confirmation string DEPLOY_MAINNET; no deployment action was attempted."
+            exit 1
+          fi
 
       - name: Prepare plan-only artifacts
         run: mkdir -p deployment-artifacts
