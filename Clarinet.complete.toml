@@ -422,6 +422,16 @@ path = "contracts/test-helpers/mock-stacking-adapter.clar"
 clarity-version = 4
 depends_on = ["stacking-traits"]
 
+[contracts.mock-stacking-adapter-2]
+path = "contracts/test-helpers/mock-stacking-adapter-2.clar"
+clarity-version = 4
+depends_on = ["stacking-traits"]
+
+[contracts.mock-reward-token]
+path = "contracts/test-helpers/mock-reward-token.clar"
+clarity-version = 4
+depends_on = ["sip-standards"]
+
 [contracts.wormhole-inbox]
 path = "contracts/interoperability/wormhole-inbox.clar"
 

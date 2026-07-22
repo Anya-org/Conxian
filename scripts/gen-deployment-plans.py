@@ -10,7 +10,8 @@ DEPLOYER = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
 TEST_HELPERS = {
     "mock-circuit-breaker", "mock-csf-protocol",
     "mock-pox-adapter", "mock-proposal", "mock-regulatory-adapter",
-    "mock-stacking-adapter", "mock-token", "test-c4-helper",
+    "mock-reward-token", "mock-stacking-adapter", "mock-stacking-adapter-2",
+    "mock-token", "test-c4-helper",
 }
 
 # Keep regeneration scoped to the existing full-system release set. These

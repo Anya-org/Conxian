@@ -1,11 +1,11 @@
 ;; native-stacking-operator.clar
-;; Delegated PoX/operator accounting boundary for the staking module.
 ;;
-;; This contract does not custody user STX. It records user delegation intent,
-;; asks a configured PoX-compatible adapter to perform delegated operations,
-;; and snapshots the adapter-returned cycle/unlock values. A production
-;; deployment supplies the adapter principal during initialization/wiring.
+;; Authoritative accounting boundary for delegated native/STX commitments.
+;; This contract does not custody STX. It records the user-owned commitment,
+;; asks a configured PoX adapter to perform the external lifecycle, and exposes
+;; only verified metadata to the configured dual-stacking orchestrator.
 
+(impl-trait .stacking-traits.native-stacking-operator-trait)
 (use-trait pox-adapter-trait .stacking-traits.pox-adapter-trait)
 
 ;; --- Errors ---
@@ -28,11 +28,20 @@
 (define-constant ERR_PROOF_REPLAYED (err u1016))
 (define-constant ERR_INVALID_PROOF_AMOUNT (err u1017))
 (define-constant ERR_ARITHMETIC_OVERFLOW (err u1018))
+(define-constant ERR_OPERATOR_NOT_CONFIGURED (err u1019))
+(define-constant ERR_ORCHESTRATOR_NOT_CONFIGURED (err u1020))
+(define-constant ERR_BINDING_UNAUTHORIZED (err u1021))
+(define-constant ERR_COMMIT_BOUND (err u1022))
+(define-constant ERR_COMMIT_OWNER (err u1023))
+(define-constant ERR_EXTERNAL_FINALIZE (err u1024))
+(define-constant ERR_SETTLEMENT_NOT_FOUND (err u1025))
+(define-constant ERR_SETTLEMENT_MISMATCH (err u1026))
+(define-constant ERR_SETTLEMENT_CONSUMED (err u1027))
+(define-constant ERR_INVALID_STATE (err u1028))
 
 (define-constant MAX_UINT u340282366920938463463374607431768211455)
 (define-constant COMMIT_ACTIVE u0)
 (define-constant COMMIT_MATURED u1)
-(define-constant COMMIT_REVOKED u2)
 
 ;; --- Configuration ---
 (define-data-var admin principal tx-sender)
@@ -42,6 +51,8 @@
 (define-data-var adapter-configured bool false)
 (define-data-var operator principal tx-sender)
 (define-data-var operator-configured bool false)
+(define-data-var orchestrator principal tx-sender)
+(define-data-var orchestrator-configured bool false)
 (define-data-var next-commit-id uint u1)
 (define-data-var last-cycle-id uint u0)
 
@@ -68,7 +79,8 @@
   external-commit-id: uint,
   state: uint,
   created-at: uint,
-  finalized-at: (optional uint)
+  finalized-at: (optional uint),
+  bound: bool
 })
 
 (define-map auth-ids (buff 32) uint)
@@ -76,18 +88,18 @@
 (define-map cycle-ledger uint {
   committed: uint,
   matured: uint,
-  revoked: uint,
   last-commit-id: uint
 })
 
-;; BTC is native to Bitcoin and cannot be transferred by Clarity. These
-;; records are authorized, cycle-bound settlement attestations only.
+;; BTC is native to Bitcoin and cannot be transferred by Clarity. These are
+;; exact, cycle/recipient/amount-bound settlement attestations only.
 (define-map btc-settlements (buff 32) {
   cycle-id: uint,
   recipient: principal,
   amount: uint,
+  commit-id: uint,
   recorded-at: uint,
-  claimed: bool
+  consumed: bool
 })
 
 ;; --- Helpers ---
@@ -110,6 +122,13 @@
   )
 )
 
+(define-private (is-orchestrator-caller)
+  (and
+    (var-get orchestrator-configured)
+    (is-eq contract-caller (var-get orchestrator))
+  )
+)
+
 (define-private (safe-add (left uint) (right uint))
   (if (> left (- MAX_UINT right))
     none
@@ -121,15 +140,37 @@
   (default-to {
     committed: u0,
     matured: u0,
-    revoked: u0,
     last-commit-id: u0
   } (map-get? cycle-ledger cycle-id))
 )
 
-;; --- Initialization and controls ---
+(define-private (commit-metadata (commit-id uint) (commit {
+    user: principal,
+    amount: uint,
+    cycle-id: uint,
+    cycle-start: uint,
+    cycle-length: uint,
+    lock-period: uint,
+    unlock-height: uint,
+    auth-id: (buff 32),
+    external-commit-id: uint,
+    state: uint,
+    created-at: uint,
+    finalized-at: (optional uint),
+    bound: bool
+  }))
+  {
+    commit-id: commit-id,
+    user: (get user commit),
+    amount: (get amount commit),
+    cycle-id: (get cycle-id commit),
+    unlock-height: (get unlock-height commit),
+    external-commit-id: (get external-commit-id commit),
+    state: (get state commit)
+  }
+)
 
-;; @desc One-time initialization. The deployer principal is the bootstrap
-;; authority; subsequent administration uses the configured admin.
+;; --- Initialization and controls ---
 (define-public (initialize (new-admin principal))
   (begin
     (asserts! (not (var-get initialized)) ERR_ALREADY_INITIALIZED)
@@ -183,6 +224,17 @@
   )
 )
 
+(define-public (set-orchestrator (new-orchestrator principal))
+  (begin
+    (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
+    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (var-set orchestrator new-orchestrator)
+    (var-set orchestrator-configured true)
+    (print { event: "native-stacking-operator-orchestrator-configured", orchestrator: new-orchestrator })
+    (ok true)
+  )
+)
+
 (define-public (set-paused (should-pause bool))
   (begin
     (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
@@ -194,9 +246,6 @@
 )
 
 ;; --- Delegated PoX lifecycle ---
-
-;; @desc Register a user's delegated STX amount through the injected adapter.
-;; No STX is transferred into this contract.
 (define-public (register-delegation (amount uint) (adapter <pox-adapter-trait>))
   (begin
     (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
@@ -226,8 +275,8 @@
   )
 )
 
-;; @desc Revoke a delegation before a new commit is created. Revocation is
-;; deliberately allowed while paused so exits remain available.
+;; Delegation revocation is separate from the committed lock lifecycle. An
+;; active commit cannot be locally canceled; it must mature/finalize externally.
 (define-public (revoke-delegation (adapter <pox-adapter-trait>))
   (let ((delegation (unwrap! (map-get? delegations tx-sender) ERR_DELEGATION_NOT_FOUND)))
     (begin
@@ -254,9 +303,6 @@
   )
 )
 
-;; @desc Commit a delegated amount for the adapter's current burn cycle.
-;; `auth-id` is a caller-supplied replay-resistant identifier; the contract
-;; also issues a monotonic local commit ID.
 (define-public (commit-delegation
     (user principal)
     (amount uint)
@@ -303,7 +349,8 @@
               external-commit-id: external-commit-id,
               state: COMMIT_ACTIVE,
               created-at: burn-block-height,
-              finalized-at: none
+              finalized-at: none,
+              bound: false
             })
             (map-set auth-ids auth-id commit-id)
             (map-set active-commits user commit-id)
@@ -332,102 +379,170 @@
   )
 )
 
-;; @desc Mark a delegated commit matured at its adapter-returned unlock height.
-;; This is an accounting transition; native STX remains with the PoX system.
-(define-public (finalize-commit (commit-id uint))
+;; Bind exactly once to the configured orchestrator. The original transaction
+;; sender remains the commitment owner; contract-caller is the orchestrator.
+(define-public (bind-commit (commit-id uint))
   (let ((commit (unwrap! (map-get? commits commit-id) ERR_COMMIT_NOT_FOUND)))
     (begin
-      (asserts! (is-eq (get state commit) COMMIT_ACTIVE) ERR_COMMIT_FINALIZED)
-      (asserts! (>= burn-block-height (get unlock-height commit)) ERR_COMMIT_NOT_MATURED)
-      (let ((ledger (cycle-ledger-or-empty (get cycle-id commit))))
+      (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
+      (asserts! (not (var-get paused)) ERR_PAUSED)
+      (asserts! (var-get orchestrator-configured) ERR_ORCHESTRATOR_NOT_CONFIGURED)
+      (asserts! (is-orchestrator-caller) ERR_BINDING_UNAUTHORIZED)
+      (asserts! (is-eq tx-sender (get user commit)) ERR_COMMIT_OWNER)
+      (asserts! (is-eq (get state commit) COMMIT_ACTIVE) ERR_INVALID_STATE)
+      (asserts! (not (get bound commit)) ERR_COMMIT_BOUND)
+      (asserts! (var-get adapter-configured) ERR_ADAPTER_NOT_CONFIGURED)
+      (asserts! (> (get amount commit) u0) ERR_INVALID_AMOUNT)
+      (asserts! (> (get cycle-id commit) u0) ERR_INVALID_CYCLE)
+      (map-set commits commit-id (merge commit { bound: true }))
+      (print {
+        event: "native-stacking-commit-bound",
+        commit-id: commit-id,
+        user: (get user commit),
+        amount: (get amount commit),
+        cycle-id: (get cycle-id commit),
+        unlock-height: (get unlock-height commit),
+        orchestrator: contract-caller
+      })
+      (ok (commit-metadata commit-id (merge commit { bound: true })))
+    )
+  )
+)
+
+;; Finalize the external lock before mutating local state. A matured local
+;; record is returned idempotently for orchestrator reconciliation.
+(define-public (finalize-commit (commit-id uint) (adapter <pox-adapter-trait>))
+  (let ((commit (unwrap! (map-get? commits commit-id) ERR_COMMIT_NOT_FOUND)))
+    (begin
+      (asserts!
+        (or
+          (is-authorized-operator)
+          (and (is-orchestrator-caller) (is-eq tx-sender (get user commit))))
+        ERR_UNAUTHORIZED)
+      (asserts! (is-configured-adapter adapter) ERR_ADAPTER_MISMATCH)
+      (if (is-eq (get state commit) COMMIT_MATURED)
+        (ok (commit-metadata commit-id commit))
         (begin
-          (map-set commits commit-id (merge commit {
-            state: COMMIT_MATURED,
-            finalized-at: (some burn-block-height)
-          }))
-          (map-delete active-commits (get user commit))
-          (map-set cycle-ledger (get cycle-id commit) (merge ledger {
-            matured: (unwrap! (safe-add (get matured ledger) (get amount commit)) ERR_ARITHMETIC_OVERFLOW)
-          }))
-          (print {
-            event: "native-stacking-commit-matured",
-            commit-id: commit-id,
-            user: (get user commit),
-            amount: (get amount commit),
-            cycle-id: (get cycle-id commit),
-            matured-at: burn-block-height
-          })
-          (ok true)
+          (asserts! (is-eq (get state commit) COMMIT_ACTIVE) ERR_COMMIT_FINALIZED)
+          (asserts! (>= burn-block-height (get unlock-height commit)) ERR_COMMIT_NOT_MATURED)
+          (asserts! (try! (contract-call? adapter finalize-commit (get external-commit-id commit))) ERR_EXTERNAL_FINALIZE)
+          (let ((ledger (cycle-ledger-or-empty (get cycle-id commit))))
+            (begin
+              (map-set commits commit-id (merge commit {
+                state: COMMIT_MATURED,
+                finalized-at: (some burn-block-height)
+              }))
+              (map-delete active-commits (get user commit))
+              (map-set cycle-ledger (get cycle-id commit) (merge ledger {
+                matured: (unwrap! (safe-add (get matured ledger) (get amount commit)) ERR_ARITHMETIC_OVERFLOW)
+              }))
+              (print {
+                event: "native-stacking-commit-matured",
+                commit-id: commit-id,
+                user: (get user commit),
+                amount: (get amount commit),
+                cycle-id: (get cycle-id commit),
+                matured-at: burn-block-height
+              })
+              (ok (commit-metadata commit-id (merge commit {
+                state: COMMIT_MATURED,
+                finalized-at: (some burn-block-height)
+              })))
+            )
+          )
         )
       )
     )
   )
 )
 
-;; @desc Revoke an active accounting commit without claiming native STX.
-;; Adapter-specific cancellation remains an explicit integration concern.
-(define-public (revoke-commit (commit-id uint))
-  (let ((commit (unwrap! (map-get? commits commit-id) ERR_COMMIT_NOT_FOUND)))
-    (begin
-      (asserts! (is-authorized-operator) ERR_UNAUTHORIZED)
-      (asserts! (is-eq (get state commit) COMMIT_ACTIVE) ERR_COMMIT_FINALIZED)
-      (let ((ledger (cycle-ledger-or-empty (get cycle-id commit))))
-        (begin
-          (map-set commits commit-id (merge commit { state: COMMIT_REVOKED }))
-          (map-delete active-commits (get user commit))
-          (map-set cycle-ledger (get cycle-id commit) (merge ledger {
-            revoked: (unwrap! (safe-add (get revoked ledger) (get amount commit)) ERR_ARITHMETIC_OVERFLOW)
-          }))
-          (print {
-            event: "native-stacking-commit-revoked",
-            commit-id: commit-id,
-            user: (get user commit),
-            amount: (get amount commit),
-            cycle-id: (get cycle-id commit),
-            revoked-at: burn-block-height
-          })
-          (ok true)
-        )
-      )
-    )
-  )
-)
-
-;; @desc Record an authorized BTC settlement attestation. No native BTC is
-;; transferred or implied by this call.
+;; Record an exact settlement against an already matured commit. BTC remains
+;; external; this is an operator-authenticated accounting attestation.
 (define-public (record-btc-settlement
-    (cycle-id uint)
-    (recipient principal)
+    (commit-id uint)
     (amount uint)
     (proof-hash (buff 32))
   )
-  (begin
-    (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
-    (asserts! (not (var-get paused)) ERR_PAUSED)
-    (asserts! (is-authorized-operator) ERR_UNAUTHORIZED)
-    (asserts! (> amount u0) ERR_INVALID_PROOF_AMOUNT)
-    (asserts! (<= cycle-id (var-get last-cycle-id)) ERR_INVALID_CYCLE)
-    (asserts! (is-none (map-get? btc-settlements proof-hash)) ERR_PROOF_REPLAYED)
-    (map-set btc-settlements proof-hash {
-      cycle-id: cycle-id,
-      recipient: recipient,
-      amount: amount,
-      recorded-at: burn-block-height,
-      claimed: false
-    })
-    (print {
-      event: "native-stacking-btc-settlement-attested",
-      cycle-id: cycle-id,
-      recipient: recipient,
-      amount: amount,
-      proof-hash: proof-hash,
-      recorded-at: burn-block-height
-    })
-    (ok true)
+  (let ((commit (unwrap! (map-get? commits commit-id) ERR_COMMIT_NOT_FOUND)))
+    (begin
+      (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
+      (asserts! (not (var-get paused)) ERR_PAUSED)
+      (asserts! (is-authorized-operator) ERR_UNAUTHORIZED)
+      (asserts! (is-eq (get state commit) COMMIT_MATURED) ERR_INVALID_STATE)
+      (asserts! (> amount u0) ERR_INVALID_PROOF_AMOUNT)
+      (asserts! (is-none (map-get? btc-settlements proof-hash)) ERR_PROOF_REPLAYED)
+      (map-set btc-settlements proof-hash {
+        cycle-id: (get cycle-id commit),
+        recipient: (get user commit),
+        amount: amount,
+        commit-id: commit-id,
+        recorded-at: burn-block-height,
+        consumed: false
+      })
+      (print {
+        event: "native-stacking-btc-settlement-attested",
+        commit-id: commit-id,
+        cycle-id: (get cycle-id commit),
+        recipient: (get user commit),
+        amount: amount,
+        proof-hash: proof-hash,
+        recorded-at: burn-block-height
+      })
+      (ok true)
+    )
+  )
+)
+
+;; Consume a settlement exactly once. The caller supplies only the expected
+;; amount and proof; recipient and cycle are derived from the bound commit.
+(define-public (bind-btc-settlement
+    (commit-id uint)
+    (proof-hash (buff 32))
+    (expected-amount uint)
+  )
+  (let (
+      (commit (unwrap! (map-get? commits commit-id) ERR_COMMIT_NOT_FOUND))
+      (settlement (unwrap! (map-get? btc-settlements proof-hash) ERR_SETTLEMENT_NOT_FOUND))
+    )
+    (begin
+      (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
+      (asserts! (is-orchestrator-caller) ERR_BINDING_UNAUTHORIZED)
+      (asserts! (is-eq tx-sender (get user commit)) ERR_COMMIT_OWNER)
+      (asserts! (is-eq (get state commit) COMMIT_MATURED) ERR_INVALID_STATE)
+      (asserts! (not (get consumed settlement)) ERR_SETTLEMENT_CONSUMED)
+      (asserts! (is-eq (get commit-id settlement) commit-id) ERR_SETTLEMENT_MISMATCH)
+      (asserts! (is-eq (get cycle-id settlement) (get cycle-id commit)) ERR_SETTLEMENT_MISMATCH)
+      (asserts! (is-eq (get recipient settlement) (get user commit)) ERR_SETTLEMENT_MISMATCH)
+      (asserts! (is-eq (get amount settlement) expected-amount) ERR_SETTLEMENT_MISMATCH)
+      (map-set btc-settlements proof-hash (merge settlement { consumed: true }))
+      (print {
+        event: "native-stacking-btc-settlement-bound",
+        commit-id: commit-id,
+        cycle-id: (get cycle-id settlement),
+        recipient: (get recipient settlement),
+        amount: (get amount settlement),
+        proof-hash: proof-hash
+      })
+      (ok {
+        commit-id: commit-id,
+        cycle-id: (get cycle-id settlement),
+        recipient: (get recipient settlement),
+        amount: (get amount settlement),
+        proof-hash: proof-hash
+      })
+    )
   )
 )
 
 ;; --- Read-only views ---
+(define-read-only (get-operator-config)
+  (ok {
+    initialized: (var-get initialized),
+    orchestrator: (var-get orchestrator),
+    orchestrator-configured: (var-get orchestrator-configured)
+  })
+)
+
 (define-read-only (get-config)
   {
     admin: (var-get admin),
@@ -437,6 +552,8 @@
     adapter-configured: (var-get adapter-configured),
     operator: (var-get operator),
     operator-configured: (var-get operator-configured),
+    orchestrator: (var-get orchestrator),
+    orchestrator-configured: (var-get orchestrator-configured),
     next-commit-id: (var-get next-commit-id),
     last-cycle-id: (var-get last-cycle-id)
   }

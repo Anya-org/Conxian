@@ -1,18 +1,18 @@
-;; mock-stacking-adapter.clar
-;; Deterministic generic stacking adapter for orchestrator tests.
+;; mock-stacking-adapter-2.clar
+;; Second registered adapter used to exercise distinct risk/capacity ledgers.
 
 (impl-trait .stacking-traits.stacking-adapter-trait)
 
-(define-constant ERR_UNAUTHORIZED (err u9100))
-(define-constant ERR_FORCED_FAILURE (err u9101))
-(define-constant ERR_INVALID_STATE (err u9105))
-(define-constant ERR_OWNER_MISMATCH (err u9106))
-(define-constant ERR_AMOUNT_MISMATCH (err u9107))
+(define-constant ERR_UNAUTHORIZED (err u9200))
+(define-constant ERR_FORCED_FAILURE (err u9201))
+(define-constant ERR_INVALID_STATE (err u9205))
+(define-constant ERR_OWNER_MISMATCH (err u9206))
+(define-constant ERR_AMOUNT_MISMATCH (err u9207))
 
 (define-data-var admin principal tx-sender)
 (define-data-var active bool true)
-(define-data-var risk-bps uint u5000)
-(define-data-var max-exposure uint u1000000)
+(define-data-var risk-bps uint u7000)
+(define-data-var max-exposure uint u2000)
 (define-data-var fail-prepare bool false)
 (define-data-var fail-request bool false)
 (define-data-var fail-finalize bool false)
@@ -42,8 +42,8 @@
   )
   (begin
     (asserts! (is-admin) ERR_UNAUTHORIZED)
-    (asserts! (<= new-risk-bps u10000) (err u9102))
-    (asserts! (> new-max-exposure u0) (err u9103))
+    (asserts! (<= new-risk-bps u10000) (err u9202))
+    (asserts! (> new-max-exposure u0) (err u9203))
     (var-set active new-active)
     (var-set risk-bps new-risk-bps)
     (var-set max-exposure new-max-exposure)
@@ -80,8 +80,8 @@
 (define-public (prepare-stake (position-id uint) (amount uint) (owner principal))
   (begin
     (asserts! (not (var-get fail-prepare)) ERR_FORCED_FAILURE)
-    (asserts! (var-get active) (err u9104))
-    (asserts! (> amount u0) (err u9108))
+    (asserts! (var-get active) (err u9204))
+    (asserts! (> amount u0) (err u9208))
     (asserts! (is-none (map-get? positions position-id)) ERR_INVALID_STATE)
     (map-set positions position-id { amount: amount, owner: owner, status: u1 })
     (ok true)

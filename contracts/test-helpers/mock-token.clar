@@ -3,10 +3,20 @@
 
 (define-fungible-token mock)
 
+(define-data-var fail-transfer bool false)
+
 (define-public (transfer (amount uint) (from principal) (to principal) (memo (optional (buff 34))))
   (begin
+    (asserts! (not (var-get fail-transfer)) (err u2))
     (asserts! (is-eq tx-sender from) (err u1))
     (ft-transfer? mock amount from to)
+  )
+)
+
+(define-public (set-fail-transfer (should-fail bool))
+  (begin
+    (var-set fail-transfer should-fail)
+    (ok true)
   )
 )
 

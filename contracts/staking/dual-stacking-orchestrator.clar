@@ -1,10 +1,15 @@
 ;; dual-stacking-orchestrator.clar
-;; Accounting/policy coordinator for delegated PoX plus a configurable SIP-010
-;; native token. The native token is injected at runtime; CXD is a valid
-;; initial configuration but is not hardcoded here.
+;;
+;; Accounting/policy coordinator for a verified native/STX commitment plus a
+;; configurable SIP-010 token position. STX and generic-token units are never
+;; combined: v1 uses custody-backed native-amount as the reward-share weight,
+;; while authoritative STX commitment is a required eligibility and separately
+;; capped exposure leg.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (use-trait stacking-adapter-trait .stacking-traits.stacking-adapter-trait)
+(use-trait native-stacking-operator-trait .stacking-traits.native-stacking-operator-trait)
+(use-trait pox-adapter-trait .stacking-traits.pox-adapter-trait)
 
 ;; --- Errors ---
 (define-constant ERR_UNAUTHORIZED (err u1100))
@@ -31,9 +36,23 @@
 (define-constant ERR_INVALID_CYCLE (err u1121))
 (define-constant ERR_ARITHMETIC_OVERFLOW (err u1122))
 (define-constant ERR_PAYOUT_NOT_CONFIGURED (err u1123))
+(define-constant ERR_OPERATOR_NOT_CONFIGURED (err u1124))
+(define-constant ERR_COMMIT_INVALID (err u1125))
+(define-constant ERR_COMMIT_MISMATCH (err u1126))
+(define-constant ERR_ADAPTER_CONFIG_DRIFT (err u1127))
+(define-constant ERR_STX_EXPOSURE_CAP (err u1128))
+(define-constant ERR_REWARD_SNAPSHOT (err u1129))
+(define-constant ERR_REWARD_OVERCLAIM (err u1130))
+(define-constant ERR_BTC_NOT_MATURE (err u1131))
+(define-constant ERR_BTC_SETTLEMENT (err u1132))
+(define-constant ERR_CYCLE_NOT_MONOTONIC (err u1133))
+(define-constant ERR_CONFIG_LOCKED (err u1134))
+(define-constant ERR_EMPTY_CYCLE (err u1135))
 
 (define-constant MAX_UINT u340282366920938463463374607431768211455)
 (define-constant BPS u10000)
+(define-constant COMMIT_ACTIVE u0)
+(define-constant COMMIT_MATURED u1)
 
 (define-constant POSITION_ACTIVE u0)
 (define-constant POSITION_NATIVE_UNLOCKING u1)
@@ -53,9 +72,12 @@
 (define-data-var next-position-id uint u1)
 (define-data-var reward-cycle uint u0)
 (define-data-var max-total-exposure uint MAX_UINT)
+(define-data-var max-total-stx-exposure uint MAX_UINT)
 (define-data-var total-exposure uint u0)
+(define-data-var total-stx-exposure uint u0)
 (define-data-var total-risk-exposure uint u0)
-(define-data-var liquid-reserve uint u0)
+(define-data-var native-liquid-reserve uint u0)
+(define-data-var reward-liquid-reserve uint u0)
 (define-data-var stx-liquid-reserve uint u0)
 (define-data-var native-cooldown uint u144)
 
@@ -74,6 +96,8 @@
   native-amount: uint,
   weight: uint,
   adapter: principal,
+  adapter-risk-bps: uint,
+  operator: principal,
   reward-cycle: uint,
   status: uint,
   opened-at: uint,
@@ -86,24 +110,29 @@
 })
 
 (define-map cycle-weights uint uint)
+(define-map cycle-snapshots uint {
+  weight: uint,
+  frozen: bool
+})
 
 ;; --- Reward state ---
 (define-map reward-pools { cycle-id: uint, token: principal } {
   total: uint,
   claimed: uint,
-  claims-closed: bool
+  claims-started: bool
 })
 (define-map reward-claims { position-id: uint, cycle-id: uint, token: principal } bool)
 
 (define-map stx-reward-pools uint {
   total: uint,
   claimed: uint,
-  claims-closed: bool
+  claims-started: bool
 })
 (define-map stx-reward-claims { position-id: uint, cycle-id: uint } bool)
 
-;; BTC entitlements are accounting-only records. A proof hash can back only
-;; one position in this contract and can be claimed only once.
+;; BTC entitlements are accounting-only records. The operator consumes the
+;; exact settlement proof before this map is populated, so one proof cannot be
+;; replayed across positions or contracts.
 (define-map btc-entitlements uint {
   cycle-id: uint,
   amount: uint,
@@ -131,6 +160,13 @@
 
 (define-private (is-reward-token (token <sip-010-ft-trait>))
   (and (var-get reward-token-configured) (is-eq (contract-of token) (var-get reward-token)))
+)
+
+(define-private (is-configured-operator (operator <native-stacking-operator-trait>))
+  (and
+    (var-get native-operator-configured)
+    (is-eq (contract-of operator) (var-get native-operator))
+  )
 )
 
 (define-private (safe-add (left uint) (right uint))
@@ -183,21 +219,20 @@
 )
 
 (define-private (reward-pool-or-empty (cycle-id uint) (token principal))
-  (default-to { total: u0, claimed: u0, claims-closed: false }
+  (default-to { total: u0, claimed: u0, claims-started: false }
     (map-get? reward-pools { cycle-id: cycle-id, token: token }))
 )
 
 (define-private (stx-reward-pool-or-empty (cycle-id uint))
-  (default-to { total: u0, claimed: u0, claims-closed: false }
+  (default-to { total: u0, claimed: u0, claims-started: false }
     (map-get? stx-reward-pools cycle-id))
 )
 
-(define-private (required-token-balance (amount uint) (reserve uint))
+(define-private (required-balance (amount uint) (reserve uint))
   (safe-add amount reserve)
 )
 
 ;; --- Initialization and policy controls ---
-
 (define-public (initialize (new-admin principal))
   (begin
     (asserts! (not (var-get initialized)) ERR_ALREADY_INITIALIZED)
@@ -219,36 +254,45 @@
   )
 )
 
-(define-public (set-native-token (token principal))
+;; Token and operator wiring are trait-typed and locked once a position exists.
+(define-public (set-native-token (token <sip-010-ft-trait>))
   (begin
     (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
     (asserts! (is-admin) ERR_UNAUTHORIZED)
-    (var-set native-token token)
+    (asserts! (or (is-eq (var-get next-position-id) u1) (is-native-token token)) ERR_CONFIG_LOCKED)
+    (var-set native-token (contract-of token))
     (var-set native-token-configured true)
-    (print { event: "dual-stacking-native-token-configured", token: token })
+    (print { event: "dual-stacking-native-token-configured", token: (contract-of token) })
     (ok true)
   )
 )
 
-(define-public (set-reward-token (token principal))
+(define-public (set-reward-token (token <sip-010-ft-trait>))
   (begin
     (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
     (asserts! (is-admin) ERR_UNAUTHORIZED)
-    (var-set reward-token token)
+    (asserts! (or (is-eq (var-get next-position-id) u1) (is-reward-token token)) ERR_CONFIG_LOCKED)
+    (var-set reward-token (contract-of token))
     (var-set reward-token-configured true)
-    (print { event: "dual-stacking-reward-token-configured", token: token })
+    (print { event: "dual-stacking-reward-token-configured", token: (contract-of token) })
     (ok true)
   )
 )
 
-(define-public (set-native-operator (operator-principal principal))
-  (begin
-    (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
-    (asserts! (is-admin) ERR_UNAUTHORIZED)
-    (var-set native-operator operator-principal)
-    (var-set native-operator-configured true)
-    (print { event: "dual-stacking-native-operator-configured", operator: operator-principal })
-    (ok true)
+(define-public (set-native-operator (operator <native-stacking-operator-trait>))
+  (let ((operator-config (try! (contract-call? operator get-operator-config))))
+    (begin
+      (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
+      (asserts! (is-admin) ERR_UNAUTHORIZED)
+      (asserts! (get initialized operator-config) ERR_OPERATOR_NOT_CONFIGURED)
+      (asserts! (get orchestrator-configured operator-config) ERR_OPERATOR_NOT_CONFIGURED)
+      (asserts! (is-eq (get orchestrator operator-config) (as-contract tx-sender)) ERR_OPERATOR_NOT_CONFIGURED)
+      (asserts! (or (is-eq (var-get next-position-id) u1) (is-configured-operator operator)) ERR_CONFIG_LOCKED)
+      (var-set native-operator (contract-of operator))
+      (var-set native-operator-configured true)
+      (print { event: "dual-stacking-native-operator-configured", operator: (contract-of operator) })
+      (ok true)
+    )
   )
 )
 
@@ -262,10 +306,12 @@
   )
 )
 
+;; Reward cycles are strictly increasing. Cycle u0 is the initial cycle.
 (define-public (set-reward-cycle (cycle-id uint))
   (begin
     (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
     (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (asserts! (> cycle-id (var-get reward-cycle)) ERR_CYCLE_NOT_MONOTONIC)
     (asserts! (< cycle-id MAX_UINT) ERR_ARITHMETIC_OVERFLOW)
     (var-set reward-cycle cycle-id)
     (print { event: "dual-stacking-reward-cycle-updated", cycle-id: cycle-id })
@@ -285,15 +331,33 @@
   )
 )
 
-(define-public (set-liquid-reserve (native-reserve uint) (stx-reserve uint))
+(define-public (set-stx-allocation-cap (cap uint))
   (begin
     (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
     (asserts! (is-admin) ERR_UNAUTHORIZED)
-    (var-set liquid-reserve native-reserve)
+    (asserts! (> cap u0) ERR_INVALID_AMOUNT)
+    (asserts! (<= (var-get total-stx-exposure) cap) ERR_STX_EXPOSURE_CAP)
+    (var-set max-total-stx-exposure cap)
+    (print { event: "dual-stacking-stx-allocation-cap-updated", cap: cap })
+    (ok true)
+  )
+)
+
+(define-public (set-liquid-reserve
+    (native-reserve uint)
+    (reward-reserve uint)
+    (stx-reserve uint)
+  )
+  (begin
+    (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
+    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (var-set native-liquid-reserve native-reserve)
+    (var-set reward-liquid-reserve reward-reserve)
     (var-set stx-liquid-reserve stx-reserve)
     (print {
       event: "dual-stacking-liquid-reserve-updated",
       native-reserve: native-reserve,
+      reward-reserve: reward-reserve,
       stx-reserve: stx-reserve
     })
     (ok true)
@@ -312,7 +376,6 @@
 )
 
 ;; --- Adapter registry and exposure policy ---
-
 (define-public (register-adapter
     (adapter <stacking-adapter-trait>)
     (risk-bps uint)
@@ -358,41 +421,61 @@
 
 ;; --- Position lifecycle ---
 
-;; @desc Open one dual position. STX is delegated/accounted by the operator;
-;; only the configured SIP-010 native token is transferred into custody.
+;; A position requires a unique, active operator commit. The STX amount is
+;; authoritative metadata returned by bind-commit; it is not caller supplied.
+;; Reward weight is native-amount only, because asset decimals are not combined.
 (define-public (open-position
     (adapter <stacking-adapter-trait>)
-    (stx-amount uint)
     (native-amount uint)
     (token <sip-010-ft-trait>)
+    (operator <native-stacking-operator-trait>)
+    (commit-id uint)
   )
   (begin
     (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
     (asserts! (not (var-get paused)) ERR_PAUSED)
     (asserts! (is-native-token token) ERR_INVALID_TOKEN)
-    (asserts! (> stx-amount u0) ERR_INVALID_AMOUNT)
+    (asserts! (is-configured-operator operator) ERR_OPERATOR_NOT_CONFIGURED)
     (asserts! (> native-amount u0) ERR_INVALID_AMOUNT)
+    (asserts! (> commit-id u0) ERR_COMMIT_INVALID)
     (let (
         (config (unwrap! (adapter-for adapter) ERR_ADAPTER_NOT_FOUND))
         (position-id (var-get next-position-id))
-        (weight (unwrap! (safe-add stx-amount native-amount) ERR_ARITHMETIC_OVERFLOW))
+        (current-active (try! (contract-call? adapter is-active)))
+        (current-risk (try! (contract-call? adapter get-risk-bps)))
+        (current-max-exposure (try! (contract-call? adapter get-max-exposure)))
+        (commit-data (try! (contract-call? operator bind-commit commit-id)))
+        (stx-amount (get amount commit-data))
+        (reward-cycle-id (var-get reward-cycle))
+        (weight native-amount)
         (new-total-exposure (unwrap! (safe-add (var-get total-exposure) native-amount) ERR_ARITHMETIC_OVERFLOW))
+        (new-total-stx-exposure (unwrap! (safe-add (var-get total-stx-exposure) stx-amount) ERR_ARITHMETIC_OVERFLOW))
         (new-adapter-exposure (unwrap! (safe-add (get exposure config) native-amount) ERR_ARITHMETIC_OVERFLOW))
         (risk-add (unwrap! (safe-mul-div native-amount (get risk-bps config) BPS) ERR_ARITHMETIC_OVERFLOW))
         (new-risk-exposure (unwrap! (safe-add (var-get total-risk-exposure) risk-add) ERR_ARITHMETIC_OVERFLOW))
         (new-adapter-risk (unwrap! (safe-add (get risk-exposure config) risk-add) ERR_ARITHMETIC_OVERFLOW))
         (new-cycle-weight (unwrap! (safe-add
-          (default-to u0 (map-get? cycle-weights (var-get reward-cycle)))
+          (default-to u0 (map-get? cycle-weights reward-cycle-id))
           weight
         ) ERR_ARITHMETIC_OVERFLOW))
       )
       (begin
         (asserts! (get active config) ERR_ADAPTER_INACTIVE)
+        (asserts! current-active ERR_ADAPTER_INACTIVE)
+        (asserts! (is-eq current-risk (get risk-bps config)) ERR_ADAPTER_CONFIG_DRIFT)
+        (asserts! (is-eq current-max-exposure (get max-exposure config)) ERR_ADAPTER_CONFIG_DRIFT)
+        (asserts! (is-eq (get state commit-data) COMMIT_ACTIVE) ERR_COMMIT_INVALID)
+        (asserts! (is-eq (get user commit-data) tx-sender) ERR_COMMIT_MISMATCH)
+        (asserts! (is-eq (get commit-id commit-data) commit-id) ERR_COMMIT_MISMATCH)
+        (asserts! (> stx-amount u0) ERR_COMMIT_INVALID)
+        (asserts! (> (get cycle-id commit-data) u0) ERR_COMMIT_INVALID)
+        (asserts! (is-none (map-get? cycle-snapshots reward-cycle-id)) ERR_REWARD_SNAPSHOT)
         (asserts! (<= new-total-exposure (var-get max-total-exposure)) ERR_EXPOSURE_CAP)
+        (asserts! (<= new-total-stx-exposure (var-get max-total-stx-exposure)) ERR_STX_EXPOSURE_CAP)
         (asserts! (<= new-adapter-exposure (get max-exposure config)) ERR_EXPOSURE_CAP)
         (asserts! (< position-id MAX_UINT) ERR_ARITHMETIC_OVERFLOW)
-        ;; External failure reverts this token transfer and every subsequent
-        ;; state write in the transaction.
+        ;; Binding happens before token custody and adapter preparation. Any
+        ;; later failure atomically rolls the authoritative binding back.
         (try! (contract-call? token transfer native-amount tx-sender (as-contract tx-sender) none))
         (try! (contract-call? adapter prepare-stake position-id native-amount tx-sender))
         (map-set positions position-id {
@@ -401,22 +484,25 @@
           native-amount: native-amount,
           weight: weight,
           adapter: (contract-of adapter),
-          reward-cycle: (var-get reward-cycle),
+          adapter-risk-bps: (get risk-bps config),
+          operator: (contract-of operator),
+          reward-cycle: reward-cycle-id,
           status: POSITION_ACTIVE,
           opened-at: burn-block-height,
           native-unlock-height: u0,
           native-claimed: false,
-          pox-cycle-id: u0,
-          pox-unlock-height: u0,
-          pox-commit-id: u0,
+          pox-cycle-id: (get cycle-id commit-data),
+          pox-unlock-height: (get unlock-height commit-data),
+          pox-commit-id: (get commit-id commit-data),
           pox-unlocked: false
         })
         (map-set adapters (contract-of adapter) (merge config {
           exposure: new-adapter-exposure,
           risk-exposure: new-adapter-risk
         }))
-        (map-set cycle-weights (var-get reward-cycle) new-cycle-weight)
+        (map-set cycle-weights reward-cycle-id new-cycle-weight)
         (var-set total-exposure new-total-exposure)
+        (var-set total-stx-exposure new-total-stx-exposure)
         (var-set total-risk-exposure new-risk-exposure)
         (var-set next-position-id (+ position-id u1))
         (print {
@@ -426,7 +512,9 @@
           stx-amount: stx-amount,
           native-amount: native-amount,
           adapter: (contract-of adapter),
-          reward-cycle: (var-get reward-cycle)
+          operator: (contract-of operator),
+          pox-commit-id: (get commit-id commit-data),
+          reward-cycle: reward-cycle-id
         })
         (ok position-id)
       )
@@ -434,14 +522,14 @@
   )
 )
 
-;; Compatibility name for callers that prefer the issue's original wording.
 (define-public (stake-dual
     (adapter <stacking-adapter-trait>)
-    (stx-amount uint)
     (native-amount uint)
     (token <sip-010-ft-trait>)
+    (operator <native-stacking-operator-trait>)
+    (commit-id uint)
   )
-  (open-position adapter stx-amount native-amount token)
+  (open-position adapter native-amount token operator commit-id)
 )
 
 (define-public (request-native-unstake (position-id uint) (adapter <stacking-adapter-trait>))
@@ -471,8 +559,6 @@
   )
 )
 
-;; @desc Finalize native unstake after the injected adapter and local cooldown
-;; both agree. This is allowed while paused and preserves the reserve floor.
 (define-public (finalize-native-unstake
     (position-id uint)
     (adapter <stacking-adapter-trait>)
@@ -488,9 +574,9 @@
       (let (
           (amount (get native-amount position))
           (balance (try! (contract-call? token get-balance (as-contract tx-sender))))
-          (required (unwrap! (required-token-balance amount (var-get liquid-reserve)) ERR_ARITHMETIC_OVERFLOW))
+          (required (unwrap! (required-balance amount (var-get native-liquid-reserve)) ERR_ARITHMETIC_OVERFLOW))
           (config (unwrap! (adapter-for adapter) ERR_ADAPTER_NOT_FOUND))
-          (risk-sub (unwrap! (safe-mul-div amount (get risk-bps config) BPS) ERR_ARITHMETIC_OVERFLOW))
+          (risk-sub (unwrap! (safe-mul-div amount (get adapter-risk-bps position) BPS) ERR_ARITHMETIC_OVERFLOW))
         )
         (begin
           (asserts! (>= balance required) ERR_LIQUIDITY_RESERVE)
@@ -520,57 +606,44 @@
   )
 )
 
-;; --- PoX leg synchronization ---
+;; --- Authoritative PoX lifecycle synchronization ---
 
-(define-public (record-pox-commit
+(define-public (finalize-pox-exit
     (position-id uint)
-    (cycle-id uint)
-    (unlock-height uint)
-    (commit-id uint)
+    (operator <native-stacking-operator-trait>)
+    (adapter <pox-adapter-trait>)
   )
-  (let ((position (unwrap! (position-or-error position-id) ERR_POSITION_NOT_FOUND)))
-    (begin
-      (asserts! (is-authorized-operator) ERR_UNAUTHORIZED)
-      (asserts! (> cycle-id u0) ERR_INVALID_CYCLE)
-      (asserts! (> unlock-height burn-block-height) ERR_INVALID_CYCLE)
-      (asserts! (> commit-id u0) ERR_INVALID_CYCLE)
-      (asserts! (is-eq (get pox-commit-id position) u0) ERR_POSITION_STATE)
-      (map-set positions position-id (merge position {
-        pox-cycle-id: cycle-id,
-        pox-unlock-height: unlock-height,
-        pox-commit-id: commit-id
-      }))
-      (print {
-        event: "dual-stacking-pox-commit-synchronized",
-        position-id: position-id,
-        cycle-id: cycle-id,
-        unlock-height: unlock-height,
-        commit-id: commit-id
-      })
-      (ok true)
-    )
-  )
-)
-
-(define-public (finalize-pox-exit (position-id uint))
   (let ((position (unwrap! (position-or-error position-id) ERR_POSITION_NOT_FOUND)))
     (begin
       (asserts! (is-eq tx-sender (get owner position)) ERR_POSITION_OWNER)
+      (asserts! (is-eq (get operator position) (contract-of operator)) ERR_ADAPTER_MISMATCH)
+      (asserts! (is-configured-operator operator) ERR_OPERATOR_NOT_CONFIGURED)
       (asserts! (> (get pox-commit-id position) u0) ERR_POSITION_STATE)
       (asserts! (not (get pox-unlocked position)) ERR_ALREADY_CLAIMED)
-      (asserts! (>= burn-block-height (get pox-unlock-height position)) ERR_UNLOCK_NOT_MATURED)
-      (map-set positions position-id (merge position {
-        pox-unlocked: true,
-        status: (if (get native-claimed position) POSITION_CLOSED (get status position))
-      }))
-      (print {
-        event: "dual-stacking-pox-exit-finalized",
-        position-id: position-id,
-        owner: (get owner position),
-        cycle-id: (get pox-cycle-id position),
-        finalized-at: burn-block-height
-      })
-      (ok true)
+      (let ((commit-data (try! (contract-call? operator finalize-commit (get pox-commit-id position) adapter))))
+        (begin
+          (asserts! (is-eq (get commit-id commit-data) (get pox-commit-id position)) ERR_COMMIT_MISMATCH)
+          (asserts! (is-eq (get user commit-data) (get owner position)) ERR_COMMIT_MISMATCH)
+          (asserts! (is-eq (get amount commit-data) (get stx-amount position)) ERR_COMMIT_MISMATCH)
+          (asserts! (is-eq (get cycle-id commit-data) (get pox-cycle-id position)) ERR_COMMIT_MISMATCH)
+          (asserts! (is-eq (get unlock-height commit-data) (get pox-unlock-height position)) ERR_COMMIT_MISMATCH)
+          (asserts! (is-eq (get state commit-data) COMMIT_MATURED) ERR_COMMIT_INVALID)
+          (map-set positions position-id (merge position {
+            pox-unlocked: true,
+            status: (if (get native-claimed position) POSITION_CLOSED (get status position))
+          }))
+          (var-set total-stx-exposure
+            (unwrap! (safe-sub (var-get total-stx-exposure) (get stx-amount position)) ERR_ARITHMETIC_OVERFLOW))
+          (print {
+            event: "dual-stacking-pox-exit-finalized",
+            position-id: position-id,
+            owner: (get owner position),
+            cycle-id: (get pox-cycle-id position),
+            finalized-at: burn-block-height
+          })
+          (ok true)
+        )
+      )
     )
   )
 )
@@ -587,21 +660,31 @@
     (asserts! (not (var-get paused)) ERR_PAUSED)
     (asserts! (is-authorized-operator) ERR_UNAUTHORIZED)
     (asserts! (is-reward-token token) ERR_INVALID_TOKEN)
+    (asserts! (is-eq cycle-id (var-get reward-cycle)) ERR_INVALID_CYCLE)
     (asserts! (> amount u0) ERR_INVALID_AMOUNT)
     (let (
         (key { cycle-id: cycle-id, token: (contract-of token) })
         (pool (reward-pool-or-empty cycle-id (contract-of token)))
+        (snapshot (map-get? cycle-snapshots cycle-id))
+        (snapshot-weight (match snapshot
+          snapshot-data (get weight snapshot-data)
+          (default-to u0 (map-get? cycle-weights cycle-id))))
         (new-total (unwrap! (safe-add (get total pool) amount) ERR_ARITHMETIC_OVERFLOW))
       )
       (begin
-        (asserts! (not (get claims-closed pool)) ERR_REWARD_REPLAYED)
+        (asserts! (> snapshot-weight u0) ERR_EMPTY_CYCLE)
+        (asserts! (not (get claims-started pool)) ERR_REWARD_REPLAYED)
         (try! (contract-call? token transfer amount tx-sender (as-contract tx-sender) none))
+        (if (is-none snapshot)
+          (map-set cycle-snapshots cycle-id { weight: snapshot-weight, frozen: true })
+          true)
         (map-set reward-pools key (merge pool { total: new-total }))
         (print {
           event: "dual-stacking-reward-funded",
           cycle-id: cycle-id,
           token: (contract-of token),
           amount: amount,
+          snapshot-weight: snapshot-weight,
           total: new-total
         })
         (ok new-total)
@@ -624,19 +707,21 @@
           (key { cycle-id: cycle-id, token: (contract-of token) })
           (pool (unwrap! (map-get? reward-pools key) ERR_REWARD_NOT_FOUND))
           (claim-key { position-id: position-id, cycle-id: cycle-id, token: (contract-of token) })
-          (total-weight (default-to u0 (map-get? cycle-weights cycle-id)))
-          (amount (unwrap! (safe-mul-div (get total pool) (get weight position) total-weight) ERR_ARITHMETIC_OVERFLOW))
+          (snapshot (unwrap! (map-get? cycle-snapshots cycle-id) ERR_REWARD_SNAPSHOT))
+          (amount (unwrap! (safe-mul-div (get total pool) (get weight position) (get weight snapshot)) ERR_ARITHMETIC_OVERFLOW))
           (balance (try! (contract-call? token get-balance (as-contract tx-sender))))
+          (new-claimed (unwrap! (safe-add (get claimed pool) amount) ERR_ARITHMETIC_OVERFLOW))
         )
         (begin
           (asserts! (is-none (map-get? reward-claims claim-key)) ERR_ALREADY_CLAIMED)
           (asserts! (> amount u0) ERR_INVALID_AMOUNT)
-          (asserts! (>= balance (unwrap! (required-token-balance amount (var-get liquid-reserve)) ERR_ARITHMETIC_OVERFLOW)) ERR_LIQUIDITY_RESERVE)
+          (asserts! (<= new-claimed (get total pool)) ERR_REWARD_OVERCLAIM)
+          (asserts! (>= balance (unwrap! (required-balance amount (var-get reward-liquid-reserve)) ERR_ARITHMETIC_OVERFLOW)) ERR_LIQUIDITY_RESERVE)
           (try! (as-contract (contract-call? token transfer amount tx-sender (get owner position) none)))
           (map-set reward-claims claim-key true)
           (map-set reward-pools key (merge pool {
-            claimed: (unwrap! (safe-add (get claimed pool) amount) ERR_ARITHMETIC_OVERFLOW),
-            claims-closed: true
+            claimed: new-claimed,
+            claims-started: true
           }))
           (print {
             event: "dual-stacking-reward-claimed",
@@ -657,16 +742,31 @@
     (asserts! (var-get initialized) ERR_NOT_INITIALIZED)
     (asserts! (not (var-get paused)) ERR_PAUSED)
     (asserts! (is-authorized-operator) ERR_UNAUTHORIZED)
+    (asserts! (is-eq cycle-id (var-get reward-cycle)) ERR_INVALID_CYCLE)
     (asserts! (> amount u0) ERR_INVALID_AMOUNT)
     (let (
         (pool (stx-reward-pool-or-empty cycle-id))
+        (snapshot (map-get? cycle-snapshots cycle-id))
+        (snapshot-weight (match snapshot
+          snapshot-data (get weight snapshot-data)
+          (default-to u0 (map-get? cycle-weights cycle-id))))
         (new-total (unwrap! (safe-add (get total pool) amount) ERR_ARITHMETIC_OVERFLOW))
       )
       (begin
-        (asserts! (not (get claims-closed pool)) ERR_REWARD_REPLAYED)
+        (asserts! (> snapshot-weight u0) ERR_EMPTY_CYCLE)
+        (asserts! (not (get claims-started pool)) ERR_REWARD_REPLAYED)
         (try! (stx-transfer? amount tx-sender (as-contract tx-sender)))
+        (if (is-none snapshot)
+          (map-set cycle-snapshots cycle-id { weight: snapshot-weight, frozen: true })
+          true)
         (map-set stx-reward-pools cycle-id (merge pool { total: new-total }))
-        (print { event: "dual-stacking-stx-reward-funded", cycle-id: cycle-id, amount: amount, total: new-total })
+        (print {
+          event: "dual-stacking-stx-reward-funded",
+          cycle-id: cycle-id,
+          amount: amount,
+          snapshot-weight: snapshot-weight,
+          total: new-total
+        })
         (ok new-total)
       )
     )
@@ -681,19 +781,21 @@
       (let (
           (pool (unwrap! (map-get? stx-reward-pools cycle-id) ERR_REWARD_NOT_FOUND))
           (claim-key { position-id: position-id, cycle-id: cycle-id })
-          (total-weight (default-to u0 (map-get? cycle-weights cycle-id)))
-          (amount (unwrap! (safe-mul-div (get total pool) (get weight position) total-weight) ERR_ARITHMETIC_OVERFLOW))
+          (snapshot (unwrap! (map-get? cycle-snapshots cycle-id) ERR_REWARD_SNAPSHOT))
+          (amount (unwrap! (safe-mul-div (get total pool) (get weight position) (get weight snapshot)) ERR_ARITHMETIC_OVERFLOW))
           (balance (stx-get-balance (as-contract tx-sender)))
+          (new-claimed (unwrap! (safe-add (get claimed pool) amount) ERR_ARITHMETIC_OVERFLOW))
         )
         (begin
           (asserts! (is-none (map-get? stx-reward-claims claim-key)) ERR_ALREADY_CLAIMED)
           (asserts! (> amount u0) ERR_INVALID_AMOUNT)
-          (asserts! (>= balance (unwrap! (required-token-balance amount (var-get stx-liquid-reserve)) ERR_ARITHMETIC_OVERFLOW)) ERR_LIQUIDITY_RESERVE)
+          (asserts! (<= new-claimed (get total pool)) ERR_REWARD_OVERCLAIM)
+          (asserts! (>= balance (unwrap! (required-balance amount (var-get stx-liquid-reserve)) ERR_ARITHMETIC_OVERFLOW)) ERR_LIQUIDITY_RESERVE)
           (try! (as-contract (stx-transfer? amount tx-sender (get owner position))))
           (map-set stx-reward-claims claim-key true)
           (map-set stx-reward-pools cycle-id (merge pool {
-            claimed: (unwrap! (safe-add (get claimed pool) amount) ERR_ARITHMETIC_OVERFLOW),
-            claims-closed: true
+            claimed: new-claimed,
+            claims-started: true
           }))
           (print { event: "dual-stacking-stx-reward-claimed", position-id: position-id, cycle-id: cycle-id, amount: amount })
           (ok amount)
@@ -707,46 +809,61 @@
 
 (define-public (record-btc-entitlement
     (position-id uint)
-    (cycle-id uint)
     (amount uint)
     (proof-hash (buff 32))
+    (operator <native-stacking-operator-trait>)
   )
   (let ((position (unwrap! (position-or-error position-id) ERR_POSITION_NOT_FOUND)))
     (begin
-      (asserts! (is-authorized-operator) ERR_UNAUTHORIZED)
+      (asserts! (is-eq tx-sender (get owner position)) ERR_POSITION_OWNER)
+      (asserts! (is-eq (get operator position) (contract-of operator)) ERR_ADAPTER_MISMATCH)
+      (asserts! (is-configured-operator operator) ERR_OPERATOR_NOT_CONFIGURED)
+      (asserts! (get pox-unlocked position) ERR_BTC_NOT_MATURE)
       (asserts! (> amount u0) ERR_INVALID_AMOUNT)
-      (asserts! (> (get pox-commit-id position) u0) ERR_INVALID_CYCLE)
-      (asserts! (is-eq cycle-id (get pox-cycle-id position)) ERR_INVALID_CYCLE)
       (asserts! (is-none (map-get? btc-entitlements position-id)) ERR_REWARD_REPLAYED)
       (asserts! (is-none (map-get? btc-proofs proof-hash)) ERR_BTC_PROOF_REPLAYED)
-      (map-set btc-entitlements position-id {
-        cycle-id: cycle-id,
-        amount: amount,
-        proof-hash: proof-hash,
-        recorded-at: burn-block-height,
-        claimed: false
-      })
-      (map-set btc-proofs proof-hash position-id)
-      (print {
-        event: "dual-stacking-btc-entitlement-recorded",
-        position-id: position-id,
-        cycle-id: cycle-id,
-        amount: amount,
-        proof-hash: proof-hash,
-        recorded-at: burn-block-height
-      })
-      (ok true)
+      (let ((settlement (try! (contract-call? operator bind-btc-settlement
+          (get pox-commit-id position)
+          proof-hash
+          amount))))
+        (begin
+          (asserts! (is-eq (get commit-id settlement) (get pox-commit-id position)) ERR_BTC_SETTLEMENT)
+          (asserts! (is-eq (get cycle-id settlement) (get pox-cycle-id position)) ERR_BTC_SETTLEMENT)
+          (asserts! (is-eq (get recipient settlement) (get owner position)) ERR_BTC_SETTLEMENT)
+          (asserts! (is-eq (get amount settlement) amount) ERR_BTC_SETTLEMENT)
+          (asserts! (is-eq (get proof-hash settlement) proof-hash) ERR_BTC_SETTLEMENT)
+          (map-set btc-entitlements position-id {
+            cycle-id: (get cycle-id settlement),
+            amount: (get amount settlement),
+            proof-hash: proof-hash,
+            recorded-at: burn-block-height,
+            claimed: false
+          })
+          (map-set btc-proofs proof-hash position-id)
+          (print {
+            event: "dual-stacking-btc-entitlement-recorded",
+            position-id: position-id,
+            cycle-id: (get cycle-id settlement),
+            amount: (get amount settlement),
+            proof-hash: proof-hash,
+            recorded-at: burn-block-height
+          })
+          (ok true)
+        )
+      )
     )
   )
 )
 
-;; @desc Claim an attested BTC entitlement. This returns accounting data only;
-;; no native BTC or sBTC is transferred by this function.
+;; Claim is accounting-only. No BTC/sBTC transfer is implied here.
 (define-public (claim-btc-entitlement (position-id uint))
   (let ((entitlement (unwrap! (map-get? btc-entitlements position-id) ERR_BTC_ENTITLEMENT_NOT_FOUND)))
     (begin
       (let ((position (unwrap! (position-or-error position-id) ERR_POSITION_NOT_FOUND)))
-        (asserts! (is-eq tx-sender (get owner position)) ERR_POSITION_OWNER))
+        (begin
+          (asserts! (is-eq tx-sender (get owner position)) ERR_POSITION_OWNER)
+          (asserts! (get pox-unlocked position) ERR_BTC_NOT_MATURE)
+        ))
       (asserts! (not (get claimed entitlement)) ERR_ALREADY_CLAIMED)
       (map-set btc-entitlements position-id (merge entitlement { claimed: true }))
       (print {
@@ -762,7 +879,6 @@
 )
 
 ;; --- Read-only views ---
-
 (define-read-only (get-config)
   {
     admin: (var-get admin),
@@ -777,9 +893,12 @@
     next-position-id: (var-get next-position-id),
     reward-cycle: (var-get reward-cycle),
     max-total-exposure: (var-get max-total-exposure),
+    max-total-stx-exposure: (var-get max-total-stx-exposure),
     total-exposure: (var-get total-exposure),
+    total-stx-exposure: (var-get total-stx-exposure),
     total-risk-exposure: (var-get total-risk-exposure),
-    liquid-reserve: (var-get liquid-reserve),
+    native-liquid-reserve: (var-get native-liquid-reserve),
+    reward-liquid-reserve: (var-get reward-liquid-reserve),
     stx-liquid-reserve: (var-get stx-liquid-reserve),
     native-cooldown: (var-get native-cooldown)
   }
@@ -795,6 +914,10 @@
 
 (define-read-only (get-cycle-weight (cycle-id uint))
   (default-to u0 (map-get? cycle-weights cycle-id))
+)
+
+(define-read-only (get-cycle-snapshot (cycle-id uint))
+  (map-get? cycle-snapshots cycle-id)
 )
 
 (define-read-only (get-reward-pool (cycle-id uint) (token-principal principal))
