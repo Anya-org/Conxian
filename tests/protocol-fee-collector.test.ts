@@ -22,6 +22,7 @@ describe('Canonical protocol fee collector', () => {
   let wallet2: string;
   let collectorPrincipal: string;
   let operationalTreasury: string;
+  let governanceProxy: string;
   let mockToken: string;
 
   const settlementId = (fill: number) => Cl.buffer(Buffer.alloc(32, fill));
@@ -112,6 +113,7 @@ describe('Canonical protocol fee collector', () => {
     wallet2 = accounts.get('wallet_2')!;
     collectorPrincipal = `${deployer}.${COLLECTOR}`;
     operationalTreasury = `${deployer}.operational-treasury`;
+    governanceProxy = `${deployer}.test-c4-helper`;
     mockToken = `${deployer}.mock-token`;
     simnet.mintSTX(wallet1, 100_000_000n);
     simnet.mintSTX(wallet2, 100_000_000n);
@@ -219,9 +221,9 @@ describe('Canonical protocol fee collector', () => {
     ).result).toEqual(Cl.ok(Cl.uint(currentHeight)));
   });
 
-  it('uses an injected passive ingress and separates EOA and immediate governance-caller authorization', () => {
-    expect(simnet.callReadOnlyFn(COLLECTOR, 'get-ingress-recipient', [], deployer).result)
-      .toEqual(Cl.ok(Cl.principal(operationalTreasury)));
+  it('uses fixed collector custody and separates admin from contract-only governance authority', () => {
+    expect(simnet.callReadOnlyFn(COLLECTOR, 'get-collector-ingress', [], deployer).result)
+      .toEqual(Cl.ok(Cl.principal(collectorPrincipal)));
 
     expect(simnet.callPublicFn(
       COLLECTOR,
@@ -229,16 +231,8 @@ describe('Canonical protocol fee collector', () => {
       [],
       wallet1,
     ).result).toEqual(Cl.error(Cl.uint(ERR_UNAUTHORIZED)));
-    expect(simnet.callPublicFn(
-      COLLECTOR,
-      'set-ingress-recipient',
-      [Cl.principal(operationalTreasury)],
-      wallet1,
-    ).result).toEqual(Cl.error(Cl.uint(ERR_UNAUTHORIZED)));
-
-    // The governance slot is tested with a distinct immediate caller. In
-    // production it should contain the governance contract principal; the
-    // contract checks contract-caller, not a user-controlled tx-sender.
+    // The governance slot is tested with a contract stand-in. Production
+    // deployment must use the approved DAO/timelock contract, never a wallet.
     expect(simnet.callPublicFn(
       COLLECTOR,
       'set-governance',
@@ -247,18 +241,41 @@ describe('Canonical protocol fee collector', () => {
     ).result).toEqual(Cl.ok(Cl.bool(true)));
     expect(simnet.callPublicFn(
       COLLECTOR,
-      'set-ingress-recipient',
-      [Cl.principal(operationalTreasury)],
+      'pause',
+      [],
       wallet2,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_UNAUTHORIZED)));
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'set-governance',
+      [Cl.principal(governanceProxy)],
+      deployer,
     ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'set-authorized-source',
+      [Cl.principal(wallet2), Cl.bool(true)],
+      wallet2,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_UNAUTHORIZED)));
     expect(simnet.callPublicFn(
       COLLECTOR,
       'pause',
       [],
       wallet1,
     ).result).toEqual(Cl.error(Cl.uint(ERR_UNAUTHORIZED)));
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'route-stx',
+      [Cl.uint(1)],
+      wallet1,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_UNAUTHORIZED)));
     expect(simnet.callReadOnlyFn(COLLECTOR, 'get-governance', [], deployer).result)
-      .toEqual(Cl.ok(Cl.principal(wallet2)));
+      .toEqual(Cl.ok(Cl.principal(governanceProxy)));
+
+    expect(simnet.callPublicFn('test-c4-helper', 'collector-pause', [], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn('test-c4-helper', 'collector-unpause', [], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
 
     expect(simnet.callPublicFn(
       COLLECTOR,
@@ -329,7 +346,7 @@ describe('Canonical protocol fee collector', () => {
     ).result).toEqual(Cl.error(Cl.uint(ERR_INVALID_AMOUNT)));
   });
 
-  it('settles STX to the configured recipient, records exact ingress events, and scopes replay by source', () => {
+  it('settles STX to collector custody, routes explicitly, and scopes replay by source', () => {
     const streamId = 1003;
     const id = settlementId(10);
     const base = 10_000n;
@@ -337,7 +354,7 @@ describe('Canonical protocol fee collector', () => {
 
     const fee = readUint('calculate-current-fee', [Cl.uint(base)]);
     const payerBefore = stxBalance(wallet1);
-    const recipientBefore = stxBalance(operationalTreasury);
+    const treasuryBefore = stxBalance(operationalTreasury);
     const collectorBefore = stxBalance(collectorPrincipal);
     const receipt: any = simnet.callPublicFn(
       COLLECTOR,
@@ -347,8 +364,8 @@ describe('Canonical protocol fee collector', () => {
     );
     expect(receipt.result).toEqual(Cl.ok(Cl.uint(fee)));
     expect(stxBalance(wallet1)).toBe(payerBefore - fee);
-    expect(stxBalance(operationalTreasury)).toBe(recipientBefore + fee);
-    expect(stxBalance(collectorPrincipal)).toBe(collectorBefore);
+    expect(stxBalance(operationalTreasury)).toBe(treasuryBefore);
+    expect(stxBalance(collectorPrincipal)).toBe(collectorBefore + fee);
 
     const accounting = readOptionalTuple('get-accounting', [
       Cl.principal(wallet1),
@@ -374,7 +391,7 @@ describe('Canonical protocol fee collector', () => {
     expect(settlement?.phase).toEqual(Cl.uint(1));
     expect(settlement?.['assessed-amount']).toEqual(Cl.uint(fee));
     expect(settlement?.['settled-amount']).toEqual(Cl.uint(fee));
-    expect(settlement?.recipient).toEqual(Cl.principal(operationalTreasury));
+    expect(settlement?.recipient).toEqual(Cl.principal(collectorPrincipal));
     expect(settlement?.['burn-height']).toBeDefined();
     expect(settlement?.['stacks-height']).toBeDefined();
 
@@ -391,10 +408,62 @@ describe('Canonical protocol fee collector', () => {
       phase: Cl.uint(1),
       'assessed-amount': Cl.uint(fee),
       'settled-amount': Cl.uint(fee),
-      recipient: Cl.principal(operationalTreasury),
+      recipient: Cl.principal(collectorPrincipal),
       'burn-height': settlement?.['burn-height'],
       'stacks-height': settlement?.['stacks-height'],
     }));
+
+    const failedRouteCollector = stxBalance(collectorPrincipal);
+    const failedRouteTreasury = stxBalance(operationalTreasury);
+    const failedRoute: any = simnet.callPublicFn(
+      COLLECTOR,
+      'route-stx',
+      [Cl.uint(fee + 1n)],
+      deployer,
+    );
+    expect(failedRoute.result.type).toBe('err');
+    expect(stxBalance(collectorPrincipal)).toBe(failedRouteCollector);
+    expect(stxBalance(operationalTreasury)).toBe(failedRouteTreasury);
+    expect(simnet.callReadOnlyFn(
+      COLLECTOR,
+      'get-total-routed-stx',
+      [],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.uint(0)));
+
+    const routeCollectorBefore = stxBalance(collectorPrincipal);
+    const routeTreasuryBefore = stxBalance(operationalTreasury);
+    const routeReceipt: any = simnet.callPublicFn(
+      'test-c4-helper',
+      'collector-route-stx',
+      [Cl.uint(fee)],
+      deployer,
+    );
+    expect(routeReceipt.result).toEqual(Cl.ok(Cl.uint(fee)));
+    expect(stxBalance(collectorPrincipal)).toBe(routeCollectorBefore - fee);
+    expect(stxBalance(operationalTreasury)).toBe(routeTreasuryBefore + fee);
+    const routeEvent: any = printEvent(routeReceipt);
+    expect(routeEvent.value.event).toEqual(Cl.stringAscii('protocol-fee-routed-to-operational-treasury'));
+    expect(routeEvent.value['asset-kind']).toEqual(Cl.uint(ASSET_KIND_STX));
+    expect(routeEvent.value.asset).toEqual(Cl.none());
+    expect(routeEvent.value.amount).toEqual(Cl.uint(fee));
+    expect(routeEvent.value.collector).toEqual(Cl.principal(collectorPrincipal));
+    expect(routeEvent.value.destination).toEqual(Cl.principal(operationalTreasury));
+    expect(routeEvent.value['collected-total']).toEqual(Cl.uint(fee));
+    expect(routeEvent.value['routed-total']).toEqual(Cl.uint(fee));
+    expect(routeEvent.value['route-count']).toEqual(Cl.uint(1));
+    expect(simnet.callReadOnlyFn(
+      COLLECTOR,
+      'get-total-collected-stx',
+      [],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.uint(fee)));
+    expect(simnet.callReadOnlyFn(
+      COLLECTOR,
+      'get-total-routed-stx',
+      [],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.uint(fee)));
 
     const payerBeforeReplay = stxBalance(wallet1);
     expect(simnet.callPublicFn(
@@ -420,7 +489,7 @@ describe('Canonical protocol fee collector', () => {
       .toEqual(Cl.principal(wallet2));
   });
 
-  it('settles SIP-010 tokens to ingress and rolls back all state on a failed transfer', () => {
+  it('settles SIP-010 tokens to collector custody, routes them explicitly, and rolls back failures', () => {
     const streamId = 1005;
     registerFtStream(wallet1, streamId);
     expect(simnet.callPublicFn(
@@ -435,6 +504,7 @@ describe('Canonical protocol fee collector', () => {
     const id = settlementId(20);
     const payerBefore = mockTokenBalance(wallet1);
     const recipientBefore = mockTokenBalance(operationalTreasury);
+    const collectorBefore = mockTokenBalance(collectorPrincipal);
     const receipt: any = simnet.callPublicFn(
       COLLECTOR,
       'settle-ft',
@@ -443,13 +513,14 @@ describe('Canonical protocol fee collector', () => {
     );
     expect(receipt.result).toEqual(Cl.ok(Cl.uint(fee)));
     expect(mockTokenBalance(wallet1)).toBe(payerBefore - fee);
-    expect(mockTokenBalance(operationalTreasury)).toBe(recipientBefore + fee);
+    expect(mockTokenBalance(operationalTreasury)).toBe(recipientBefore);
+    expect(mockTokenBalance(collectorPrincipal)).toBe(collectorBefore + fee);
 
     const settlement = readOptionalTuple('get-settlement', [Cl.principal(wallet1), id]);
     expect(settlement?.source).toEqual(Cl.principal(wallet1));
     expect(settlement?.['asset-kind']).toEqual(Cl.uint(ASSET_KIND_FT));
     expect(settlement?.asset).toEqual(Cl.some(Cl.principal(mockToken)));
-    expect(settlement?.recipient).toEqual(Cl.principal(operationalTreasury));
+    expect(settlement?.recipient).toEqual(Cl.principal(collectorPrincipal));
     expect(printEvent(receipt)).toEqual(Cl.tuple({
       event: Cl.stringAscii('protocol-fee-collected'),
       'settlement-id': id,
@@ -463,16 +534,67 @@ describe('Canonical protocol fee collector', () => {
       phase: Cl.uint(1),
       'assessed-amount': Cl.uint(fee),
       'settled-amount': Cl.uint(fee),
-      recipient: Cl.principal(operationalTreasury),
+      recipient: Cl.principal(collectorPrincipal),
       'burn-height': settlement?.['burn-height'],
       'stacks-height': settlement?.['stacks-height'],
     }));
+
+    const routeReceipt: any = simnet.callPublicFn(
+      'test-c4-helper',
+      'collector-route-ft',
+      [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(fee)],
+      deployer,
+    );
+    expect(routeReceipt.result).toEqual(Cl.ok(Cl.uint(fee)));
+    expect(mockTokenBalance(collectorPrincipal)).toBe(collectorBefore);
+    expect(mockTokenBalance(operationalTreasury)).toBe(recipientBefore + fee);
+    const routeEvent: any = printEvent(routeReceipt);
+    expect(routeEvent.value.event).toEqual(Cl.stringAscii('protocol-fee-routed-to-operational-treasury'));
+    expect(routeEvent.value['asset-kind']).toEqual(Cl.uint(ASSET_KIND_FT));
+    expect(routeEvent.value.asset).toEqual(Cl.some(Cl.principal(mockToken)));
+    expect(routeEvent.value.amount).toEqual(Cl.uint(fee));
+    expect(routeEvent.value.collector).toEqual(Cl.principal(collectorPrincipal));
+    expect(routeEvent.value.destination).toEqual(Cl.principal(operationalTreasury));
+    expect(routeEvent.value['collected-total']).toEqual(Cl.uint(fee));
+    expect(routeEvent.value['routed-total']).toEqual(Cl.uint(fee));
+    expect(routeEvent.value['route-count']).toEqual(Cl.uint(1));
+    expect(simnet.callReadOnlyFn(
+      COLLECTOR,
+      'get-collected-ft',
+      [Cl.principal(mockToken)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.uint(fee)));
+    expect(simnet.callReadOnlyFn(
+      COLLECTOR,
+      'get-routed-ft',
+      [Cl.principal(mockToken)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.uint(fee)));
+
+    const failedRouteCollector = mockTokenBalance(collectorPrincipal);
+    const failedRouteTreasury = mockTokenBalance(operationalTreasury);
+    const failedRoute: any = simnet.callPublicFn(
+      COLLECTOR,
+      'route-ft',
+      [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(1)],
+      deployer,
+    );
+    expect(failedRoute.result.type).toBe('err');
+    expect(mockTokenBalance(collectorPrincipal)).toBe(failedRouteCollector);
+    expect(mockTokenBalance(operationalTreasury)).toBe(failedRouteTreasury);
+    expect(simnet.callReadOnlyFn(
+      COLLECTOR,
+      'get-routed-ft',
+      [Cl.principal(mockToken)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.uint(fee)));
 
     const failedStream = 1006;
     registerFtStream(wallet1, failedStream);
     const failedId = settlementId(21);
     const failedPayerBefore = mockTokenBalance(wallet1);
     const failedRecipientBefore = mockTokenBalance(operationalTreasury);
+    const failedCollectorBefore = mockTokenBalance(collectorPrincipal);
     const failedReceipt: any = simnet.callPublicFn(
       COLLECTOR,
       'settle-ft',
@@ -482,6 +604,7 @@ describe('Canonical protocol fee collector', () => {
     expect(failedReceipt.result.type).toBe('err');
     expect(mockTokenBalance(wallet1)).toBe(failedPayerBefore);
     expect(mockTokenBalance(operationalTreasury)).toBe(failedRecipientBefore);
+    expect(mockTokenBalance(collectorPrincipal)).toBe(failedCollectorBefore);
     expect(readOptionalTuple('get-accounting', [
       Cl.principal(wallet1),
       Cl.uint(failedStream),
@@ -530,7 +653,7 @@ describe('Canonical protocol fee collector', () => {
       phase: Cl.uint(1),
       'assessed-amount': Cl.uint(0),
       'settled-amount': Cl.uint(0),
-      recipient: Cl.principal(operationalTreasury),
+      recipient: Cl.principal(collectorPrincipal),
       'burn-height': afterZero?.['last-settled-burn-height'],
       'stacks-height': afterZero?.['last-settled-stacks-height'],
     }));

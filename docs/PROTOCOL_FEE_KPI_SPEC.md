@@ -106,18 +106,20 @@ not an activation gate and does not change the collector's burn-block schedule.
 | --- | --- | --- |
 | Eligible fee-base volume | Registered source base before the scheduled rate | `protocol-fee-collected.eligible-fee-base` event |
 | Fees assessed | Scheduled fee computed with the stream's residual numerator | `assessed-amount` event field and collector accounting |
-| Fees settled at ingress | Assessed amount atomically transferred from payer to the configured passive ingress recipient; may be zero when only a residual is carried | `settled-amount`, `recipient`, transfer event, and collector accounting |
+| Fees settled at collector ingress | Assessed amount atomically transferred from payer to `.protocol-fee-collector`; may be zero when only a residual is carried | `settled-amount`, fixed `recipient`, transfer event, and collector accounting |
+| Fees routed to operational treasury | Amount later forwarded from collector custody to the immutable `.operational-treasury` destination | `protocol-fee-routed-to-operational-treasury` event and asset accounting |
 | Realized downstream protocol revenue | Amount later accepted by a downstream revenue, swap, burn, or Fiscal Dam operation | Downstream transfer/route events; never inferred from ingress assessment |
 | Treasury inflows | Amount actually received by the treasury or its configured vault | Destination transfer events and vault state |
 | Executed allocation | Amount released by the approved Fiscal Dam/vault allocation | Allocation approval/release events and vault state |
 
 In phase 1, the collector writes `assessed-fees` and `settled-fees` only after
-the payer-to-ingress transfer succeeds; it does not call a downstream route in
+the payer-to-collector transfer succeeds; it does not call a downstream route in
 that transaction. For a positive base whose residual calculation yields zero,
 the accepted event and accounting row are still evidence, but no zero-value
-transfer is attempted. A collector event proves collection at ingress only; it
-is not proof of realized downstream revenue, treasury inflow beyond the stated
-recipient transfer, or later allocation execution.
+transfer is attempted. A `protocol-fee-collected` event proves collection at
+collector ingress only. A separate route event proves only the fixed
+collector-to-treasury transfer; neither event alone proves realized downstream
+revenue or later allocation execution.
 
 ## 3. KPI formulas
 
@@ -191,9 +193,9 @@ The minimum normalized settlement row is:
 | `rate_bps` | uint | yes | Resolved on-chain rate: 200, 150, or 100 |
 | `phase` | enum | yes | Launch, growth, or mature |
 | `assessed_native` | uint | yes | Fee calculated by the collector, including zero-fee residual settlements |
-| `settled_native` | uint | yes | Amount transferred to the passive ingress recipient; equal to assessed in phase 1 |
+| `settled_native` | uint | yes | Amount transferred to `.protocol-fee-collector`; equal to assessed in phase 1 |
 | `fee_remainder` | uint | yes for accounting snapshots | Numerator remainder modulo 10,000 after the settlement |
-| `recipient` | principal | yes | Admin-injected protocol-owned passive ingress recipient |
+| `recipient` | principal | yes | Fixed `.protocol-fee-collector` settlement custody principal |
 | `burn_height` | uint | yes | Burn-block context emitted by Clarity |
 | `stacks_height` | uint | yes | Stacks-block context emitted by Clarity |
 | `block_time` | timestamp | yes for USD windows | Indexer-resolved block timestamp |
@@ -238,13 +240,17 @@ own successful economic operation derives and submits the eligible base. An
 admin-authorized EOA may be used operationally, but its events must not be
 treated as independent KPI evidence without an external trust designation.
 
-The collector's configured ingress recipient defaults to the relative
-`.operational-treasury` principal and can be rotated only by the configured
-admin or immediate governance caller. The recipient is passive: the collector
-does not invoke it and does not claim that Fiscal Dam allocation, DEX routing,
-lending routing, burning, or downstream realized revenue occurred in the same
-transaction. The `$1M daily eligible volume` milestone remains an
-indexed/oracle-derived KPI and is not an activation gate.
+The collector's settlement ingress is the immutable relative
+`.protocol-fee-collector` principal. Authorized admin or approved governance
+contracts may route custody only to the immutable relative
+`.operational-treasury` principal; no function accepts an arbitrary destination.
+The collector requires the treasury's initialized flag before routing and
+rejects any amount beyond the asset's collected-but-not-yet-routed balance.
+Collection and routing totals are exposed separately by asset, and a route
+failure rolls back its accounting and event. Neither collection nor routing
+claims Fiscal Dam allocation, DEX/lending routing, burning, or downstream
+realized revenue in the same transaction. The `$1M daily eligible volume`
+milestone remains an indexed/oracle-derived KPI and is not an activation gate.
 
 ## 7. Research and implementation references
 

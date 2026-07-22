@@ -586,6 +586,11 @@ path = "contracts/vaults/yield-aggregator.clar"
 path = "contracts/treasury/revenue-distributor.clar"
 depends_on = [ "allocation-policy",]
 
+[contracts.protocol-fee-collector]
+path = "contracts/treasury/protocol-fee-collector.clar"
+clarity-version = 4
+depends_on = [ "operational-treasury", "sip-standards",]
+
 [contracts.integration-fee-collector]
 path = "contracts/integrations/integration-fee-collector.clar"
 clarity-version = 4

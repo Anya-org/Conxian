@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { beforeAll } from 'vitest';
@@ -9,10 +9,17 @@ const deploymentPlanPath = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '../deployments/default.simnet-plan.yaml',
 );
+const canonicalDeploymentPlanPath = `${deploymentPlanPath}.bak`;
 
 // Clarinet SDK may rewrite default.simnet-plan.yaml during initSimnet. Keep a
 // source snapshot available to tests that validate generator-owned artifacts.
-export const canonicalDeploymentPlan = readFileSync(deploymentPlanPath, 'utf8');
+// scripts/run-tests.sh keeps the checked-in source at the .bak path while the
+// SDK is running; direct Vitest invocations fall back to the working-tree
+// artifact.
+export const canonicalDeploymentPlan = readFileSync(
+  existsSync(canonicalDeploymentPlanPath) ? canonicalDeploymentPlanPath : deploymentPlanPath,
+  'utf8',
+);
 
 let internalSimnet: Simnet | null = null;
 let initializationPromise: Promise<Simnet> | null = null;

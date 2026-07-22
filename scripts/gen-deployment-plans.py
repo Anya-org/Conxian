@@ -51,6 +51,8 @@ INIT_CALLS = [
      "method": "set-owner", "parameters": [A("")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.operational-treasury", "expected-sender": DEPLOYER,
      "method": "initialize", "parameters": [A("")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.protocol-fee-collector", "expected-sender": DEPLOYER,
+     "method": "set-governance", "parameters": [A(".timelock")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.operational-treasury", "expected-sender": DEPLOYER,
      "method": "set-protocol-principal", "parameters": [
          q('"cxvg-token"'), A(".cxvg-token")], "cost": INIT_CALL_COST},

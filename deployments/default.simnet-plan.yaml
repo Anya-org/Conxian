@@ -957,6 +957,11 @@ plan:
       path: contracts/governance/proposal-engine-trait.clar
       clarity-version: 4
     - transaction-type: emulated-contract-publish
+      contract-name: protocol-fee-collector
+      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
+      path: contracts/treasury/protocol-fee-collector.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
       contract-name: protocol-invariant-monitor
       emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
       path: contracts/dex/protocol-invariant-monitor.clar

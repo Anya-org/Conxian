@@ -4,15 +4,14 @@
 ;; source/stream/asset combinations. The collector replaces a legacy charge on
 ;; a designated fee base; it must not be called in addition to that charge.
 ;;
-;; Phase 1 settles only at a protocol-owned passive ingress recipient. It does
-;; not call the Fiscal Dam, a DEX, lending, or a burn route in the same
-;; transaction. Downstream realization and allocation are separate evidence
-;; stages for indexers and treasury automation.
+;; Phase 1 settles only into this contract's own principal. It does not call the
+;; Fiscal Dam, a DEX, lending, or a burn route in the same transaction.
+;; Downstream treasury routing is an explicit, separately authorized sweep.
 ;;
 ;; The payer is always tx-sender. A source contract may call this contract on
 ;; behalf of a payer only when that payer initiated the transaction. SIP-010
 ;; transfer implementations therefore receive tx-sender as `from`, while the
-;; collector supplies the configured ingress recipient as `to`.
+;; collector supplies `.protocol-fee-collector` as `to`.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
@@ -34,6 +33,8 @@
 (define-constant ERR_ACCOUNTING_OVERFLOW (err u4114))
 (define-constant ERR_INVALID_ASSET_KIND (err u4115))
 (define-constant ERR_STREAM_ALREADY_REGISTERED (err u4117))
+(define-constant ERR_TREASURY_NOT_INITIALIZED (err u4118))
+(define-constant ERR_ROUTE_EXCEEDS_COLLECTED (err u4119))
 
 ;; --- Constants ---
 
@@ -60,10 +61,14 @@
 (define-constant ASSET_KIND_FT u1)
 (define-constant ASSET_KIND_STX u2)
 
-;; The route is an invariant label for the phase-1 passive ingress path. It is
-;; intentionally not a compile-time call target or a claim of downstream
-;; Fiscal Dam allocation.
+;; The route is an invariant label for the phase-1 collector-ingress path. It is
+;; intentionally not a claim of downstream Fiscal Dam allocation.
 (define-constant ROUTE_PROTOCOL_INGRESS u1)
+
+;; Settlement custody and route destination are compile-time fixed. There is no
+;; setter or settlement argument that can redirect either boundary.
+(define-constant COLLECTOR_INGRESS .protocol-fee-collector)
+(define-constant OPERATIONAL_TREASURY .operational-treasury)
 
 ;; --- Administrative and schedule state ---
 
@@ -71,8 +76,10 @@
 (define-data-var governance principal tx-sender)
 (define-data-var paused bool false)
 (define-data-var activation-burn-height uint burn-block-height)
-(define-data-var ingress-recipient principal .operational-treasury)
 (define-data-var total-settlements uint u0)
+(define-data-var total-routes uint u0)
+(define-data-var total-collected-stx uint u0)
+(define-data-var total-routed-stx uint u0)
 
 ;; An authorized source is the immediate contract caller. Direct EOAs remain
 ;; available for simnet and controlled operations, but production KPI evidence
@@ -117,6 +124,21 @@
     last-phase: uint,
     last-settled-burn-height: uint,
     last-settled-stacks-height: uint
+  }
+)
+
+;; Asset totals deliberately separate collection at this contract's ingress
+;; from later routing to operational-treasury. The key keeps FT totals in the
+;; token's native unit and keeps native STX separate via asset-kind + none.
+(define-map asset-accounting
+  {
+    asset-kind: uint,
+    asset: (optional principal)
+  }
+  {
+    collected-fees: uint,
+    routed-fees: uint,
+    route-count: uint
   }
 )
 
@@ -209,6 +231,14 @@
   }
 )
 
+(define-private (empty-asset-accounting)
+  {
+    collected-fees: u0,
+    routed-fees: u0,
+    route-count: u0
+  }
+)
+
 ;; --- Schedule resolution ---
 
 ;; Boundaries are exact and half-open:
@@ -236,19 +266,31 @@
 
 ;; --- Configuration helpers ---
 
-;; Admin authorization deliberately distinguishes a direct EOA from a
-;; contract-mediated call. An EOA admin is accepted only when
-;; contract-caller = tx-sender = admin. A configured admin or governance
-;; contract is accepted only as the immediate contract-caller, so an arbitrary
-;; contract cannot borrow the admin EOA's tx-sender authority.
-(define-private (is-admin)
+;; Admin/configuration authorization deliberately distinguishes a direct EOA
+;; from a contract-mediated call. An EOA admin is accepted only when
+;; contract-caller = tx-sender = admin. A configured admin contract is accepted
+;; only as the immediate contract-caller.
+(define-private (is-admin-authorized)
   (or
     (and
       (is-eq contract-caller tx-sender)
       (is-eq tx-sender (var-get admin)))
     (is-eq contract-caller (var-get admin))
+  )
+)
+
+;; Governance/emergency authority is intentionally contract-only. A configured
+;; wallet cannot act as production governance merely by matching tx-sender;
+;; deployments must configure an approved DAO or timelock contract here.
+(define-private (is-governance-authorized)
+  (and
+    (not (is-eq contract-caller tx-sender))
     (is-eq contract-caller (var-get governance))
   )
+)
+
+(define-private (is-admin-or-governance)
+  (or (is-admin-authorized) (is-governance-authorized))
 )
 
 (define-private (load-stream-config
@@ -282,7 +324,7 @@
 
 (define-public (set-admin (new-admin principal))
   (begin
-    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-admin-authorized) ERR_UNAUTHORIZED)
     (var-set admin new-admin)
     (ok true)
   )
@@ -290,28 +332,15 @@
 
 (define-public (set-governance (new-governance principal))
   (begin
-    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-admin-authorized) ERR_UNAUTHORIZED)
     (var-set governance new-governance)
-    (ok true)
-  )
-)
-
-(define-public (set-ingress-recipient (new-recipient principal))
-  (begin
-    (asserts! (is-admin) ERR_UNAUTHORIZED)
-    (var-set ingress-recipient new-recipient)
-    (print {
-      event: "protocol-fee-ingress-recipient-updated",
-      recipient: new-recipient,
-      block-height: block-height
-    })
     (ok true)
   )
 )
 
 (define-public (set-authorized-source (source principal) (authorized bool))
   (begin
-    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-admin-authorized) ERR_UNAUTHORIZED)
     (map-set authorized-sources source authorized)
     (ok authorized)
   )
@@ -323,7 +352,7 @@
     (token principal)
     (route uint))
   (begin
-    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-admin-authorized) ERR_UNAUTHORIZED)
     (asserts! (default-to false (map-get? authorized-sources source)) ERR_SOURCE_NOT_AUTHORIZED)
     (asserts! (> stream-id u0) ERR_INVALID_CONFIG)
     (asserts! (is-eq route ROUTE_PROTOCOL_INGRESS) ERR_INVALID_ROUTE)
@@ -351,7 +380,7 @@
     (stream-id uint)
     (route uint))
   (begin
-    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-admin-authorized) ERR_UNAUTHORIZED)
     (asserts! (default-to false (map-get? authorized-sources source)) ERR_SOURCE_NOT_AUTHORIZED)
     (asserts! (> stream-id u0) ERR_INVALID_CONFIG)
     (asserts! (is-eq route ROUTE_PROTOCOL_INGRESS) ERR_INVALID_ROUTE)
@@ -386,7 +415,7 @@
     })
   )
     (begin
-      (asserts! (is-admin) ERR_UNAUTHORIZED)
+      (asserts! (is-admin-authorized) ERR_UNAUTHORIZED)
       (asserts! (or (is-eq asset-kind ASSET_KIND_FT) (is-eq asset-kind ASSET_KIND_STX)) ERR_INVALID_ASSET_KIND)
       (asserts!
         (or
@@ -407,7 +436,7 @@
 
 (define-public (pause)
   (begin
-    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-admin-or-governance) ERR_UNAUTHORIZED)
     (var-set paused true)
     (ok true)
   )
@@ -415,7 +444,7 @@
 
 (define-public (unpause)
   (begin
-    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-admin-or-governance) ERR_UNAUTHORIZED)
     (var-set paused false)
     (ok true)
   )
@@ -423,7 +452,7 @@
 
 (define-public (set-activation-burn-height (new-height uint))
   (begin
-    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (asserts! (is-admin-authorized) ERR_UNAUTHORIZED)
     (asserts! (is-eq (var-get total-settlements) u0) ERR_ACTIVATION_LOCKED)
     (asserts! (>= new-height burn-block-height) ERR_INVALID_ACTIVATION)
     (asserts! (is-some (safe-add new-height MATURE_PHASE_BLOCKS)) ERR_INVALID_ACTIVATION)
@@ -434,7 +463,7 @@
 
 ;; --- Settlement ---
 
-;; FT settlement transfers payer -> configured passive ingress. There is no
+;; FT settlement transfers payer -> this collector's own principal. There is no
 ;; downstream contract call. All state writes and the event occur only after
 ;; that transfer succeeds; a failed transfer rolls the transaction back.
 (define-public (settle-ft
@@ -447,10 +476,14 @@
     (asset (some (contract-of token)))
     (config (try! (load-stream-config source stream-id ASSET_KIND_FT asset)))
     (phase (try! (resolve-phase-at burn-block-height)))
-    (recipient (var-get ingress-recipient))
+    (recipient COLLECTOR_INGRESS)
     (accounting-key {
       source: source,
       stream-id: stream-id,
+      asset-kind: ASSET_KIND_FT,
+      asset: asset
+    })
+    (asset-key {
       asset-kind: ASSET_KIND_FT,
       asset: asset
     })
@@ -459,6 +492,7 @@
       settlement-id: settlement-id
     })
     (old-accounting (default-to (empty-accounting) (map-get? fee-accounting accounting-key)))
+    (old-asset-accounting (default-to (empty-asset-accounting) (map-get? asset-accounting asset-key)))
     (fee-calculation (unwrap! (calculate-fee-at-rate
       eligible-fee-base
       (get rate-bps phase)
@@ -470,6 +504,7 @@
     (new-settled-fees (unwrap! (safe-add (get settled-fees old-accounting) assessed-amount) ERR_ACCOUNTING_OVERFLOW))
     (new-settlement-count (unwrap! (safe-add (get settlement-count old-accounting) u1) ERR_ACCOUNTING_OVERFLOW))
     (new-total-settlements (unwrap! (safe-add (var-get total-settlements) u1) ERR_ACCOUNTING_OVERFLOW))
+    (new-collected-fees (unwrap! (safe-add (get collected-fees old-asset-accounting) assessed-amount) ERR_ACCOUNTING_OVERFLOW))
   )
     (begin
       (asserts! (not (var-get paused)) ERR_PAUSED)
@@ -482,7 +517,7 @@
       ;; issuing an invalid zero-value transfer.
       (if (> assessed-amount u0)
         (begin
-          (try! (contract-call? token transfer assessed-amount tx-sender recipient none))
+          (try! (contract-call? token transfer assessed-amount tx-sender COLLECTOR_INGRESS none))
           true)
         true)
 
@@ -512,6 +547,11 @@
         last-phase: (get phase phase),
         last-settled-burn-height: burn-block-height,
         last-settled-stacks-height: block-height
+      })
+      (map-set asset-accounting asset-key {
+        collected-fees: new-collected-fees,
+        routed-fees: (get routed-fees old-asset-accounting),
+        route-count: (get route-count old-asset-accounting)
       })
       (var-set total-settlements new-total-settlements)
       (print {
@@ -537,7 +577,7 @@
 )
 
 ;; Native STX follows the same accounting and event shape, with a native
-;; transfer from tx-sender to the configured passive ingress recipient.
+;; transfer from tx-sender to this collector's own principal.
 (define-public (settle-stx
     (stream-id uint)
     (eligible-fee-base uint)
@@ -547,7 +587,7 @@
     (asset none)
     (config (try! (load-stream-config source stream-id ASSET_KIND_STX asset)))
     (phase (try! (resolve-phase-at burn-block-height)))
-    (recipient (var-get ingress-recipient))
+    (recipient COLLECTOR_INGRESS)
     (accounting-key {
       source: source,
       stream-id: stream-id,
@@ -559,6 +599,10 @@
       settlement-id: settlement-id
     })
     (old-accounting (default-to (empty-accounting) (map-get? fee-accounting accounting-key)))
+    (old-asset-accounting (default-to (empty-asset-accounting) (map-get? asset-accounting {
+      asset-kind: ASSET_KIND_STX,
+      asset: asset
+    })))
     (fee-calculation (unwrap! (calculate-fee-at-rate
       eligible-fee-base
       (get rate-bps phase)
@@ -570,6 +614,8 @@
     (new-settled-fees (unwrap! (safe-add (get settled-fees old-accounting) assessed-amount) ERR_ACCOUNTING_OVERFLOW))
     (new-settlement-count (unwrap! (safe-add (get settlement-count old-accounting) u1) ERR_ACCOUNTING_OVERFLOW))
     (new-total-settlements (unwrap! (safe-add (var-get total-settlements) u1) ERR_ACCOUNTING_OVERFLOW))
+    (new-collected-fees (unwrap! (safe-add (get collected-fees old-asset-accounting) assessed-amount) ERR_ACCOUNTING_OVERFLOW))
+    (new-total-collected-stx (unwrap! (safe-add (var-get total-collected-stx) assessed-amount) ERR_ACCOUNTING_OVERFLOW))
   )
     (begin
       (asserts! (not (var-get paused)) ERR_PAUSED)
@@ -581,7 +627,7 @@
       ;; and audit record without attempting a zero STX transfer.
       (if (> assessed-amount u0)
         (begin
-          (try! (stx-transfer? assessed-amount tx-sender recipient))
+          (try! (stx-transfer? assessed-amount tx-sender COLLECTOR_INGRESS))
           true)
         true)
 
@@ -612,6 +658,15 @@
         last-settled-burn-height: burn-block-height,
         last-settled-stacks-height: block-height
       })
+      (map-set asset-accounting {
+        asset-kind: ASSET_KIND_STX,
+        asset: asset
+      } {
+        collected-fees: new-collected-fees,
+        routed-fees: (get routed-fees old-asset-accounting),
+        route-count: (get route-count old-asset-accounting)
+      })
+      (var-set total-collected-stx new-total-collected-stx)
       (var-set total-settlements new-total-settlements)
       (print {
         event: "protocol-fee-collected",
@@ -635,6 +690,107 @@
   )
 )
 
+;; --- Explicit custody routes ---
+
+;; Route collector-held FT custody only to the immutable operational treasury.
+;; `as-contract` makes the collector the SIP-010 `from` principal. The transfer
+;; is attempted before route accounting/event writes, so any failure rolls the
+;; entire route back.
+(define-public (route-ft (token <sip-010-ft-trait>) (amount uint))
+  (let (
+    (asset (some (contract-of token)))
+    (asset-key {
+      asset-kind: ASSET_KIND_FT,
+      asset: asset
+    })
+    (old-asset-accounting (default-to (empty-asset-accounting) (map-get? asset-accounting asset-key)))
+    (new-routed-fees (unwrap! (safe-add (get routed-fees old-asset-accounting) amount) ERR_ACCOUNTING_OVERFLOW))
+    (new-route-count (unwrap! (safe-add (get route-count old-asset-accounting) u1) ERR_ACCOUNTING_OVERFLOW))
+    (new-total-routes (unwrap! (safe-add (var-get total-routes) u1) ERR_ACCOUNTING_OVERFLOW))
+  )
+    (begin
+      (asserts! (is-admin-or-governance) ERR_UNAUTHORIZED)
+      (asserts! (> amount u0) ERR_INVALID_AMOUNT)
+      (asserts! (contract-call? .operational-treasury is-initialized) ERR_TREASURY_NOT_INITIALIZED)
+      (asserts! (<= (get routed-fees old-asset-accounting) (get collected-fees old-asset-accounting)) ERR_INVALID_ROUTE)
+      (asserts!
+        (<= amount (- (get collected-fees old-asset-accounting) (get routed-fees old-asset-accounting)))
+        ERR_ROUTE_EXCEEDS_COLLECTED)
+      (try! (as-contract (contract-call? token transfer amount tx-sender OPERATIONAL_TREASURY none)))
+      (map-set asset-accounting asset-key {
+        collected-fees: (get collected-fees old-asset-accounting),
+        routed-fees: new-routed-fees,
+        route-count: new-route-count
+      })
+      (var-set total-routes new-total-routes)
+      (print {
+        event: "protocol-fee-routed-to-operational-treasury",
+        asset-kind: ASSET_KIND_FT,
+        asset: asset,
+        amount: amount,
+        collector: COLLECTOR_INGRESS,
+        destination: OPERATIONAL_TREASURY,
+        collected-total: (get collected-fees old-asset-accounting),
+        routed-total: new-routed-fees,
+        route-count: new-route-count,
+        burn-height: burn-block-height,
+        stacks-height: block-height
+      })
+      (ok amount)
+    )
+  )
+)
+
+;; Route collector-held STX custody only to the immutable operational treasury.
+;; Routing remains available while settlement is paused so emergency custody
+;; forwarding cannot be blocked by the settlement switch.
+(define-public (route-stx (amount uint))
+  (let (
+    (asset none)
+    (asset-key {
+      asset-kind: ASSET_KIND_STX,
+      asset: asset
+    })
+    (old-asset-accounting (default-to (empty-asset-accounting) (map-get? asset-accounting asset-key)))
+    (new-routed-fees (unwrap! (safe-add (get routed-fees old-asset-accounting) amount) ERR_ACCOUNTING_OVERFLOW))
+    (new-route-count (unwrap! (safe-add (get route-count old-asset-accounting) u1) ERR_ACCOUNTING_OVERFLOW))
+    (new-total-routes (unwrap! (safe-add (var-get total-routes) u1) ERR_ACCOUNTING_OVERFLOW))
+    (new-total-routed-stx (unwrap! (safe-add (var-get total-routed-stx) amount) ERR_ACCOUNTING_OVERFLOW))
+  )
+    (begin
+      (asserts! (is-admin-or-governance) ERR_UNAUTHORIZED)
+      (asserts! (> amount u0) ERR_INVALID_AMOUNT)
+      (asserts! (contract-call? .operational-treasury is-initialized) ERR_TREASURY_NOT_INITIALIZED)
+      (asserts! (<= (get routed-fees old-asset-accounting) (get collected-fees old-asset-accounting)) ERR_INVALID_ROUTE)
+      (asserts!
+        (<= amount (- (get collected-fees old-asset-accounting) (get routed-fees old-asset-accounting)))
+        ERR_ROUTE_EXCEEDS_COLLECTED)
+      (try! (as-contract (stx-transfer? amount tx-sender OPERATIONAL_TREASURY)))
+      (map-set asset-accounting asset-key {
+        collected-fees: (get collected-fees old-asset-accounting),
+        routed-fees: new-routed-fees,
+        route-count: new-route-count
+      })
+      (var-set total-routed-stx new-total-routed-stx)
+      (var-set total-routes new-total-routes)
+      (print {
+        event: "protocol-fee-routed-to-operational-treasury",
+        asset-kind: ASSET_KIND_STX,
+        asset: asset,
+        amount: amount,
+        collector: COLLECTOR_INGRESS,
+        destination: OPERATIONAL_TREASURY,
+        collected-total: (get collected-fees old-asset-accounting),
+        routed-total: new-routed-fees,
+        route-count: new-route-count,
+        burn-height: burn-block-height,
+        stacks-height: block-height
+      })
+      (ok amount)
+    )
+  )
+)
+
 ;; --- Read-only audit API ---
 
 (define-read-only (get-admin)
@@ -645,8 +801,8 @@
   (ok (var-get governance))
 )
 
-(define-read-only (get-ingress-recipient)
-  (ok (var-get ingress-recipient))
+(define-read-only (get-collector-ingress)
+  (ok COLLECTOR_INGRESS)
 )
 
 (define-read-only (is-paused)
@@ -697,6 +853,47 @@
 
 (define-read-only (get-total-settlements)
   (ok (var-get total-settlements))
+)
+
+(define-read-only (get-total-routes)
+  (ok (var-get total-routes))
+)
+
+(define-read-only (get-total-collected-stx)
+  (ok (var-get total-collected-stx))
+)
+
+(define-read-only (get-total-routed-stx)
+  (ok (var-get total-routed-stx))
+)
+
+(define-read-only (get-asset-accounting
+    (asset-kind uint)
+    (asset (optional principal)))
+  (ok (map-get? asset-accounting {
+    asset-kind: asset-kind,
+    asset: asset
+  }))
+)
+
+(define-read-only (get-collected-ft (token principal))
+  (match (map-get? asset-accounting {
+      asset-kind: ASSET_KIND_FT,
+      asset: (some token)
+    })
+    accounting (ok (get collected-fees accounting))
+    (ok u0)
+  )
+)
+
+(define-read-only (get-routed-ft (token principal))
+  (match (map-get? asset-accounting {
+      asset-kind: ASSET_KIND_FT,
+      asset: (some token)
+    })
+    accounting (ok (get routed-fees accounting))
+    (ok u0)
+  )
 )
 
 (define-read-only (get-activation-burn-height)

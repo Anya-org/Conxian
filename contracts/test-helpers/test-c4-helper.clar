@@ -16,6 +16,24 @@
   (contract-call? .opex-vault approve-expense expense-id)
 )
 
+;; Contract-only governance stand-in used by collector tests. Production
+;; deployments must use the approved DAO/timelock contract, not a wallet.
+(define-public (collector-pause)
+  (contract-call? .protocol-fee-collector pause)
+)
+
+(define-public (collector-unpause)
+  (contract-call? .protocol-fee-collector unpause)
+)
+
+(define-public (collector-route-stx (amount uint))
+  (contract-call? .protocol-fee-collector route-stx amount)
+)
+
+(define-public (collector-route-ft (token <sip-010-trait>) (amount uint))
+  (contract-call? .protocol-fee-collector route-ft token amount)
+)
+
 (define-read-only (test-c4)
     (ok {
         time: burn-block-height,
