@@ -26,6 +26,12 @@ TEST_HELPERS = frozenset(
         "mock-token",
         "mock-compoundable-vault",
         "mock-admin-forwarder",
+        "mock-pox-adapter",
+        "mock-pox-adapter-2",
+        "mock-reward-token",
+        "mock-settlement-intermediary",
+        "mock-stacking-adapter",
+        "mock-stacking-adapter-2",
         "test-c4-helper",
     }
 )
@@ -364,8 +370,18 @@ def validate_simnet_source(
     contracts: Mapping[str, ContractDefinition],
     repo_root: Path,
     path_label: str = "default.simnet-plan.yaml",
+    *,
+    allow_stale_clarity_versions: bool = False,
 ) -> list[list[PublishTransaction]]:
-    """Validate simnet-to-manifest mapping and return release-filtered batches."""
+    """Validate simnet-to-manifest mapping and return release-filtered batches.
+
+    The pinned Clarinet SDK can rewrite the local simnet artifact with stale
+    Clarity 1 metadata (and the existing community-voting Clarity 3
+    compatibility entry) even when the active manifest is Clarity 4. Callers
+    may opt into that narrowly scoped compatibility mode for the simnet source
+    only; generated release plans remain strictly validated against the active
+    manifest.
+    """
 
     batches = extract_simnet_publish_batches(document, path_label)
     errors: list[str] = []
@@ -387,7 +403,19 @@ def validate_simnet_source(
                     f"{path_label}: contract {entry.contract_name} path {entry.path} does not match "
                     f"active Clarinet.toml path {definition.source_path}"
                 )
-            if entry.clarity_version != definition.clarity_version:
+            if (
+                entry.clarity_version != definition.clarity_version
+                and not (
+                    allow_stale_clarity_versions
+                    and (
+                        entry.clarity_version == 1
+                        or (
+                            entry.clarity_version == 3
+                            and entry.contract_name == "community-voting-engine"
+                        )
+                    )
+                )
+            ):
                 errors.append(
                     f"{path_label}: contract {entry.contract_name} clarity-version {entry.clarity_version} "
                     f"does not match active Clarinet.toml value {definition.clarity_version}"

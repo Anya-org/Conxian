@@ -14,6 +14,13 @@
   )
 )
 
+(define-public (set-fail-transfer (should-fail bool))
+  (begin
+    (var-set transfer-failure should-fail)
+    (ok true)
+  )
+)
+
 (define-read-only (get-name) (ok "Mock Token"))
 (define-read-only (get-symbol) (ok "MOCK"))
 (define-read-only (get-decimals) (ok u8))

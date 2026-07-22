@@ -12,6 +12,17 @@ Conxian is the protocol, DeFi, and DAO-facing public layer.
 
 Conxian-Labs is the builder and operator layer that develops, ships, and supports public infrastructure around the Conxian ecosystem without replacing protocol ownership.
 
+## Dual-stacking architecture
+
+The Issue #501 staking boundary is documented in
+[`docs/DUAL_STACKING_ARCHITECTURE.md`](docs/DUAL_STACKING_ARCHITECTURE.md). Its
+live-state protections include per-commit PoX adapter binding, monotonic
+adapter-returned cycles, historical orchestrator bindings across configuration
+versions, locked token/operator rewiring after the first position, and explicit
+pro-rata reward-dust settlement for both SIP-010 and STX pools. This remains a
+compile/test-oriented boundary; the documentation does not claim a production
+deployment or atomic cross-chain settlement.
+
 ## Identity split (authoritative)
 
 - **Conxian (protocol / DeFi / DAO-facing):** protocol primitives, public economic logic, governance-facing standards, and public ecosystem surfaces.

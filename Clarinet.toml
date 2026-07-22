@@ -9,6 +9,10 @@ cache_dir = "./.cache"
 path = "contracts/traits/sip-standards.clar"
 clarity-version = 4
 
+[contracts.stacking-traits]
+path = "contracts/traits/stacking-traits.clar"
+clarity-version = 4
+
 [contracts.integration-fee-trait]
 path = "contracts/traits/integration-fee-trait.clar"
 clarity-version = 4
@@ -422,6 +426,7 @@ depends_on = ["bond-traits", "dlc-bond"]
 [contracts.dual-stacking-orchestrator]
 path = "contracts/staking/dual-stacking-orchestrator.clar"
 clarity-version = 4
+depends_on = ["sip-standards", "stacking-traits"]
 
 [contracts.early-lp-rewards]
 path = "contracts/rewards/early-lp-rewards.clar"
@@ -685,6 +690,36 @@ path = "contracts/test-helpers/mock-admin-forwarder.clar"
 clarity-version = 4
 depends_on = ["auto-compounder", "compoundable-vault-trait", "cxd-staking"]
 
+[contracts.mock-reward-token]
+path = "contracts/test-helpers/mock-reward-token.clar"
+clarity-version = 4
+depends_on = ["sip-standards"]
+
+[contracts.mock-pox-adapter]
+path = "contracts/test-helpers/mock-pox-adapter.clar"
+clarity-version = 4
+depends_on = ["stacking-traits"]
+
+[contracts.mock-pox-adapter-2]
+path = "contracts/test-helpers/mock-pox-adapter-2.clar"
+clarity-version = 4
+depends_on = ["stacking-traits"]
+
+[contracts.mock-settlement-intermediary]
+path = "contracts/test-helpers/mock-settlement-intermediary.clar"
+clarity-version = 4
+depends_on = ["stacking-traits"]
+
+[contracts.mock-stacking-adapter]
+path = "contracts/test-helpers/mock-stacking-adapter.clar"
+clarity-version = 4
+depends_on = ["stacking-traits"]
+
+[contracts.mock-stacking-adapter-2]
+path = "contracts/test-helpers/mock-stacking-adapter-2.clar"
+clarity-version = 4
+depends_on = ["stacking-traits"]
+
 [contracts.monitoring-dashboard]
 path = "contracts/monitoring/monitoring-dashboard.clar"
 clarity-version = 4
@@ -700,6 +735,7 @@ clarity-version = 4
 [contracts.native-stacking-operator]
 path = "contracts/staking/native-stacking-operator.clar"
 clarity-version = 4
+depends_on = ["stacking-traits"]
 
 [contracts.nft-marketplace]
 path = "contracts/marketplace/nft-marketplace.clar"
