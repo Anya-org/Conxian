@@ -90,7 +90,9 @@ safe harness and its invariant tests before making that claim.
 
 ## Status
 
-Phase 2A is implemented locally on the issue #507 branch. This is not a
-production-readiness or deployment claim. Later phases must separately approve
-official sBTC bridge/redemption integration, peg monitoring/repair, and any
-strategy custody and loss-accounting design.
+Phase 1/2A merged via [PR #546](https://github.com/Conxian/Conxian/pull/546) at
+commit `11d598c2ec098088032d1e78f608887dd8441d5b`. The merged implementation
+remains custody-only: it is not official bridge, signer, peg, yield,
+deployment, or settlement proof. Later phases must separately approve official
+sBTC bridge/redemption integration, peg monitoring/repair, and any strategy
+custody and loss-accounting design.

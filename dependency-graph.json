@@ -525,9 +525,9 @@
   ],
   "vault-registrar": [],
   "sbtc-vault": [
+    "core-traits",
     "regulatory-adapter",
     "sip-standards",
-    "sbtc-token",
     "vault-traits"
   ],
   "fee-manager": [],
