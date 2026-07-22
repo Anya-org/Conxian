@@ -31,6 +31,11 @@ path = "contracts/budget-manager.clar"
 
 [contracts.sip-standards]
 path = "contracts/traits/sip-standards.clar"
+clarity-version = 4
+
+[contracts.stacking-traits]
+path = "contracts/traits/stacking-traits.clar"
+clarity-version = 4
 
 [contracts.integration-fee-trait]
 path = "contracts/traits/integration-fee-trait.clar"
@@ -345,6 +350,8 @@ path = "contracts/automation/batch-processor.clar"
 
 [contracts.native-stacking-operator]
 path = "contracts/staking/native-stacking-operator.clar"
+clarity-version = 4
+depends_on = ["stacking-traits"]
 
 [contracts.migration-adapter]
 path = "contracts/automation/migration-adapter.clar"
@@ -402,6 +409,18 @@ path = "contracts/constants/nakamoto-constants.clar"
 
 [contracts.dual-stacking-orchestrator]
 path = "contracts/staking/dual-stacking-orchestrator.clar"
+clarity-version = 4
+depends_on = ["sip-standards", "stacking-traits"]
+
+[contracts.mock-pox-adapter]
+path = "contracts/test-helpers/mock-pox-adapter.clar"
+clarity-version = 4
+depends_on = ["stacking-traits"]
+
+[contracts.mock-stacking-adapter]
+path = "contracts/test-helpers/mock-stacking-adapter.clar"
+clarity-version = 4
+depends_on = ["stacking-traits"]
 
 [contracts.wormhole-inbox]
 path = "contracts/interoperability/wormhole-inbox.clar"
