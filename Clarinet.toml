@@ -78,6 +78,11 @@ path = "contracts/treasury/revenue-automation.clar"
 clarity-version = 4
 depends_on = ["revenue-distributor", "sip-standards"]
 
+[contracts.protocol-fee-collector]
+path = "contracts/treasury/protocol-fee-collector.clar"
+clarity-version = 4
+depends_on = ["revenue-distributor", "sip-standards"]
+
 [contracts.revenue-distributor]
 path = "contracts/treasury/revenue-distributor.clar"
 clarity-version = 4

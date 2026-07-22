@@ -1,10 +1,11 @@
 # Treasury Module
 
 ## Overview (Explanation)
-The Treasury module manages the protocol's capital allocation and revenue distribution. It implements the "Fiscal Dam" (CXIP-013) and enforces mandatory protocol fees via the Revenue Automation engine.
+The Treasury module manages the protocol's capital allocation and revenue distribution. It implements the "Fiscal Dam" (CXIP-013) and provides one canonical scheduled protocol-fee settlement path. The phase-1 collector is designed to replace a designated legacy charge on a registered fee base, never to add a second charge to the same flow.
 
 ## Architecture (Explanation)
-- **Automation**: `revenue-automation.clar` enforces a non-negotiable 100 bps protocol fee.
+- **Canonical collection**: `protocol-fee-collector.clar` resolves 200/150/100 bps from an explicit activation burn-block height, enforces source/stream registration, pauses fail closed, prevents settlement replay, and records native-unit accounting.
+- **Legacy compatibility**: `revenue-automation.clar` remains a legacy 100 bps surface until phase 2 migrates each approved source. Do not compose it with the canonical collector on the same fee base.
 - **Registry**: `cxd-treasury.clar` maintains the global allocation policy.
 - **Distribution**: `revenue-distributor.clar` executes token buy-backs and burns.
 - **Integration Billing**: `integration-fee-collector.clar` sends 100% of
@@ -24,6 +25,37 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 | `collect-revenue` | `(token <sip-010-ft-trait>) (amount uint) (payer principal)` | Calculates and transfers 1% fee. |
 | `initialize` | `(admin principal)` | Sets the initial administrator (Admin only). |
 | `set-admin` | `(new-admin principal)` | Updates the admin principal (Admin only). |
+
+### `protocol-fee-collector.clar`
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `set-authorized-source` | `(source principal) (authorized bool)` | Enables or disables an immediate source caller (Admin only). |
+| `register-ft-stream` | `(source principal) (stream-id uint) (token principal) (route uint)` | Registers a SIP-010 asset stream on the fixed revenue-distributor route (Admin only). |
+| `register-stx-stream` | `(source principal) (stream-id uint) (route uint)` | Registers a native STX stream on the fixed revenue-distributor route (Admin only). |
+| `set-stream-active` | `(source principal) (stream-id uint) (asset-kind uint) (asset (optional principal)) (active bool)` | Pauses or resumes one registered stream (Admin only); use `none` for native STX. |
+| `pause` / `unpause` | `()` | Fail-closed global settlement switch (Admin only). |
+| `set-activation-burn-height` | `(new-height uint)` | Sets the non-retroactive schedule anchor before the first settlement. |
+| `settle-ft` | `(token <sip-010-ft-trait>) (stream-id uint) (eligible-fee-base uint) (settlement-id (buff 32))` | Calculates the scheduled fee and atomically routes a SIP-010 settlement. |
+| `settle-stx` | `(stream-id uint) (eligible-fee-base uint) (settlement-id (buff 32))` | Calculates the scheduled fee and atomically routes a native STX settlement. |
+| `get-accounting` | `(source principal) (stream-id uint) (asset-kind uint) (asset (optional principal))` | Reads cumulative eligible, assessed, settled, and settlement-count state; use `none` for native STX. |
+| `get-settlement` | `(settlement-id (buff 32))` | Reads the immutable settlement record used by indexers. |
+
+The launch rate is 200 bps for the half-open interval
+`[activation, activation + 12 * 4320)`, growth is 150 bps for
+`[activation + 12 * 4320, activation + 36 * 4320)`, and mature is 100 bps from
+`activation + 36 * 4320` onward. `4320` is a documented approximation of a
+30-day calendar month at six ten-minute Bitcoin blocks per hour; the contract
+uses burn-block boundaries, not wall-clock months. Positive fee bases use
+ceiling arithmetic with a one-native-unit minimum when the exact percentage is
+fractional.
+
+Phase 1 does not wire DEX or lending callers and does not change
+`conxian-access.clar`. It also does not hand-edit generated deployment plans;
+the new Clarinet manifest entry must be included when deployment plans are
+regenerated at the phase-2 integration checkpoint.
+
+See [`docs/PROTOCOL_FEE_KPI_SPEC.md`](../../docs/PROTOCOL_FEE_KPI_SPEC.md) for
+the indexed volume, fee, revenue, allocation, and USD-normalization schema.
 
 ### `cxd-treasury.clar`
 | Function | Signature | Description |
