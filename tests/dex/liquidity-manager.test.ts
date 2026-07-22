@@ -130,6 +130,8 @@ describe('Liquidity manager intent and risk ledger', () => {
       entries.map(() => Cl.ok(Cl.bool(true))),
     );
 
+    simnet.mineEmptyBlocks(1);
+
     simnet.mineBlock(
       entries.map(({ asset, twapPrice }) =>
         tx.callPublicFn(
@@ -198,6 +200,8 @@ describe('Liquidity manager intent and risk ledger', () => {
     expect(startResults.map((result) => result.result)).toEqual(
       entries.map(() => Cl.ok(Cl.bool(true))),
     );
+
+    simnet.mineEmptyBlocks(1);
 
     simnet.mineBlock(
       entries.map(({ asset, price }) =>

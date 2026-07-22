@@ -48,7 +48,7 @@ describe('DEX oracle facade', () => {
     );
     expect(startObservation.result).toEqual(Cl.ok(Cl.bool(true)));
 
-    simnet.mineEmptyBlocks(1);
+    simnet.mineEmptyBlocks(2);
 
     const endObservation = simnet.callPublicFn(
       'twap-oracle',
@@ -59,9 +59,8 @@ describe('DEX oracle facade', () => {
     expect(endObservation.result).toEqual(Cl.ok(Cl.bool(true)));
   }
 
-  // The TWAP contract indexes observations by exact burn height. The start
-  // observation is written one block before an empty block and the end
-  // observation, so a two-block window is deterministic in simnet.
+  // The TWAP contract indexes observations by exact burn height. Advance two
+  // empty burn blocks so the end observation is two blocks after the start.
   function seedTwapAndAggregatedPrice(
     token: ReturnType<typeof asset>,
     firstSpot: bigint,
@@ -76,7 +75,7 @@ describe('DEX oracle facade', () => {
     );
     expect(startObservation.result).toEqual(Cl.ok(Cl.bool(true)));
 
-    simnet.mineEmptyBlocks(1);
+    simnet.mineEmptyBlocks(2);
 
     const results = simnet.mineBlock([
       tx.callPublicFn(
