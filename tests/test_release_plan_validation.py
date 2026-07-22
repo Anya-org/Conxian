@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -16,6 +17,9 @@ assert SPEC is not None and SPEC.loader is not None
 release_plan_validation = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = release_plan_validation
 SPEC.loader.exec_module(release_plan_validation)
+
+
+FIXTURE_DEPLOYER = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
 
 
 class ReleasePlanValidationTests(unittest.TestCase):
@@ -57,8 +61,8 @@ class ReleasePlanValidationTests(unittest.TestCase):
                 {
                     "contract-publish": {
                         "contract-name": name,
-                        "expected-sender": "ST1FIXTUREDEPLOYER000000000000000000000",
-                        "cost": 20000,
+                        "expected-sender": FIXTURE_DEPLOYER,
+                        "cost": release_plan_validation.EXPECTED_PUBLISH_COSTS[network],
                         "path": source_path or f"contracts/{name}.clar",
                         "anchor-block-only": True,
                         "clarity-version": 4,
@@ -71,7 +75,7 @@ class ReleasePlanValidationTests(unittest.TestCase):
                 {
                     "contract-call": {
                         "contract-id": contract_id,
-                        "expected-sender": "ST1FIXTUREDEPLOYER000000000000000000000",
+                        "expected-sender": FIXTURE_DEPLOYER,
                         "method": method,
                         "parameters": [],
                         "cost": 10000,
@@ -80,10 +84,10 @@ class ReleasePlanValidationTests(unittest.TestCase):
             )
         document = {
             "id": 1,
-            "name": f"fixture {network}",
+            "name": release_plan_validation.EXPECTED_PLAN_NAMES[network],
             "network": network,
-            "stacks-node": f"https://{network}.example.invalid",
-            "deployer": "ST1FIXTUREDEPLOYER000000000000000000000",
+            "stacks-node": release_plan_validation.EXPECTED_STACKS_NODES[network],
+            "deployer": FIXTURE_DEPLOYER,
             "plan": {"batches": [{"id": 0, "transactions": transactions}]},
         }
         path.write_text(yaml.safe_dump(document, sort_keys=False))
@@ -108,6 +112,42 @@ class ReleasePlanValidationTests(unittest.TestCase):
             root,
             yaml,
         )
+
+    def fixture_pair(
+        self,
+        root: Path,
+        definitions: list[tuple[str, list[str]]] | None = None,
+        publishes: list[tuple[str, str | None]] | None = None,
+        calls: list[tuple[str, str]] | None = None,
+    ) -> tuple[Path, Path, Path, dict, dict]:
+        manifest_path = self.write_manifest(
+            root,
+            definitions or [("a", []), ("b", [])],
+        )
+        publish_entries = publishes or [("a", None), ("b", None)]
+        testnet_path = root / "testnet.yaml"
+        mainnet_path = root / "mainnet.yaml"
+        self.write_plan(testnet_path, "testnet", publish_entries, calls)
+        self.write_plan(mainnet_path, "mainnet", publish_entries, calls)
+        return (
+            manifest_path,
+            testnet_path,
+            mainnet_path,
+            yaml.safe_load(testnet_path.read_text()),
+            yaml.safe_load(mainnet_path.read_text()),
+        )
+
+    def write_document(self, path: Path, document: dict) -> None:
+        path.write_text(yaml.safe_dump(document, sort_keys=False))
+
+    @staticmethod
+    def transaction_bodies(document: dict, transaction_type: str) -> list[dict]:
+        return [
+            transaction[transaction_type]
+            for batch in document["plan"]["batches"]
+            for transaction in batch["transactions"]
+            if transaction_type in transaction
+        ]
 
     def test_valid_pair_and_stable_dependency_order(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
@@ -221,6 +261,215 @@ class ReleasePlanValidationTests(unittest.TestCase):
                     [("a", None), ("b", None)],
                     [("b", None), ("a", None)],
                 )
+
+    def test_deployer_format_and_pair_consistency_are_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            manifest_path, testnet_path, mainnet_path, testnet, mainnet = self.fixture_pair(root)
+            testnet["deployer"] = "not-a-stacks-address"
+            self.write_document(testnet_path, testnet)
+            with self.assertRaisesRegex(
+                release_plan_validation.ReleasePlanValidationError,
+                r"deployer must be a 41-character Stacks address",
+            ):
+                release_plan_validation.validate_release_plan_files(
+                    testnet_path, mainnet_path, manifest_path, root, yaml
+                )
+
+            manifest_path, testnet_path, mainnet_path, testnet, mainnet = self.fixture_pair(root)
+            alternate_deployer = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM5Q"
+            mainnet["deployer"] = alternate_deployer
+            for body in self.transaction_bodies(mainnet, "contract-publish"):
+                body["expected-sender"] = alternate_deployer
+            self.write_document(mainnet_path, mainnet)
+            with self.assertRaisesRegex(
+                release_plan_validation.ReleasePlanValidationError,
+                r"testnet/mainnet release deployer drift",
+            ):
+                release_plan_validation.validate_release_plan_files(
+                    testnet_path, mainnet_path, manifest_path, root, yaml
+                )
+
+    def test_every_transaction_expected_sender_must_match_deployer(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            manifest_path, testnet_path, mainnet_path, testnet, _ = self.fixture_pair(
+                root,
+                calls=[(f"{FIXTURE_DEPLOYER}.a", "initialize")],
+            )
+            testnet["plan"]["batches"][0]["transactions"][0]["contract-publish"]["expected-sender"] = (
+                "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM5Q"
+            )
+            self.write_document(testnet_path, testnet)
+            with self.assertRaisesRegex(
+                release_plan_validation.ReleasePlanValidationError,
+                r"publish a .* expected-sender .* does not equal plan deployer",
+            ):
+                release_plan_validation.validate_release_plan_files(
+                    testnet_path, mainnet_path, manifest_path, root, yaml
+                )
+
+            manifest_path, testnet_path, mainnet_path, testnet, _ = self.fixture_pair(
+                root,
+                calls=[(f"{FIXTURE_DEPLOYER}.a", "initialize")],
+            )
+            call_body = self.transaction_bodies(testnet, "contract-call")[0]
+            call_body["expected-sender"] = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM5Q"
+            self.write_document(testnet_path, testnet)
+            with self.assertRaisesRegex(
+                release_plan_validation.ReleasePlanValidationError,
+                r"call .*\.initialize .* expected-sender .* does not equal plan deployer",
+            ):
+                release_plan_validation.validate_release_plan_files(
+                    testnet_path, mainnet_path, manifest_path, root, yaml
+                )
+
+    def test_canonical_stacks_node_is_required_for_each_network(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            manifest_path, testnet_path, mainnet_path, testnet, _ = self.fixture_pair(root)
+            testnet["stacks-node"] = "https://api.testnet.example.invalid"
+            self.write_document(testnet_path, testnet)
+            with self.assertRaisesRegex(
+                release_plan_validation.ReleasePlanValidationError,
+                r"stacks-node .* expected 'https://api\.testnet\.hiro\.so'",
+            ):
+                release_plan_validation.validate_release_plan_files(
+                    testnet_path, mainnet_path, manifest_path, root, yaml
+                )
+
+    def test_plan_id_and_name_are_canonical_for_the_declared_network(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            manifest_path, testnet_path, mainnet_path, testnet, _ = self.fixture_pair(root)
+            testnet["id"] = 2
+            self.write_document(testnet_path, testnet)
+            with self.assertRaisesRegex(
+                release_plan_validation.ReleasePlanValidationError,
+                r"plan id is 2, expected 1 for testnet",
+            ):
+                release_plan_validation.validate_release_plan_files(
+                    testnet_path, mainnet_path, manifest_path, root, yaml
+                )
+
+            manifest_path, testnet_path, mainnet_path, testnet, _ = self.fixture_pair(root)
+            testnet["name"] = "Unexpected release plan"
+            self.write_document(testnet_path, testnet)
+            with self.assertRaisesRegex(
+                release_plan_validation.ReleasePlanValidationError,
+                r"plan name is .* expected 'Full System Deployment \(July 2026\)'",
+            ):
+                release_plan_validation.validate_release_plan_files(
+                    testnet_path, mainnet_path, manifest_path, root, yaml
+                )
+
+    def test_publish_and_call_costs_are_positive_and_network_specific(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            manifest_path, testnet_path, mainnet_path, testnet, _ = self.fixture_pair(
+                root,
+                calls=[(f"{FIXTURE_DEPLOYER}.a", "initialize")],
+            )
+            publish_body = self.transaction_bodies(testnet, "contract-publish")[0]
+            publish_body["cost"] = 0
+            self.write_document(testnet_path, testnet)
+            with self.assertRaisesRegex(
+                release_plan_validation.ReleasePlanValidationError,
+                r"release publish a cost must be a positive integer",
+            ):
+                release_plan_validation.validate_release_plan_files(
+                    testnet_path, mainnet_path, manifest_path, root, yaml
+                )
+
+            manifest_path, testnet_path, mainnet_path, testnet, _ = self.fixture_pair(
+                root,
+                calls=[(f"{FIXTURE_DEPLOYER}.a", "initialize")],
+            )
+            publish_body = self.transaction_bodies(testnet, "contract-publish")[0]
+            publish_body["cost"] = 30000
+            self.write_document(testnet_path, testnet)
+            with self.assertRaisesRegex(
+                release_plan_validation.ReleasePlanValidationError,
+                r"publish a .* does not match the testnet publish cost 20000",
+            ):
+                release_plan_validation.validate_release_plan_files(
+                    testnet_path, mainnet_path, manifest_path, root, yaml
+                )
+
+            manifest_path, testnet_path, mainnet_path, testnet, _ = self.fixture_pair(
+                root,
+                calls=[(f"{FIXTURE_DEPLOYER}.a", "initialize")],
+            )
+            call_body = self.transaction_bodies(testnet, "contract-call")[0]
+            call_body["cost"] = 9999
+            self.write_document(testnet_path, testnet)
+            with self.assertRaisesRegex(
+                release_plan_validation.ReleasePlanValidationError,
+                r"call .*\.initialize .* does not match the release call cost 10000",
+            ):
+                release_plan_validation.validate_release_plan_files(
+                    testnet_path, mainnet_path, manifest_path, root, yaml
+                )
+
+    def test_batch_ids_must_be_present_unique_and_deterministic(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            manifest_path, testnet_path, mainnet_path, testnet, _ = self.fixture_pair(root)
+            del testnet["plan"]["batches"][0]["id"]
+            self.write_document(testnet_path, testnet)
+            with self.assertRaisesRegex(
+                release_plan_validation.ReleasePlanValidationError,
+                r"batch 0 is missing required id",
+            ):
+                release_plan_validation.validate_release_plan_files(
+                    testnet_path, mainnet_path, manifest_path, root, yaml
+                )
+
+            manifest_path, testnet_path, mainnet_path, testnet, _ = self.fixture_pair(root)
+            testnet["plan"]["batches"].append({"id": 0, "transactions": []})
+            self.write_document(testnet_path, testnet)
+            with self.assertRaisesRegex(
+                release_plan_validation.ReleasePlanValidationError,
+                r"batch ids must be unique",
+            ):
+                release_plan_validation.validate_release_plan_files(
+                    testnet_path, mainnet_path, manifest_path, root, yaml
+                )
+
+            manifest_path, testnet_path, mainnet_path, testnet, _ = self.fixture_pair(root)
+            testnet["plan"]["batches"][0]["id"] = 1
+            self.write_document(testnet_path, testnet)
+            with self.assertRaisesRegex(
+                release_plan_validation.ReleasePlanValidationError,
+                r"batch ids must be the deterministic sequence 0\.\.0",
+            ):
+                release_plan_validation.validate_release_plan_files(
+                    testnet_path, mainnet_path, manifest_path, root, yaml
+                )
+
+    def test_generator_imports_via_importlib_from_repo_root(self) -> None:
+        repo_root = Path(__file__).resolve().parents[1]
+        import_script = """
+from importlib.util import module_from_spec, spec_from_file_location
+from pathlib import Path
+import sys
+
+path = Path("scripts/gen-deployment-plans.py").resolve()
+spec = spec_from_file_location("gen_deployment_plans_fixture", path)
+assert spec is not None and spec.loader is not None
+module = module_from_spec(spec)
+sys.modules[spec.name] = module
+spec.loader.exec_module(module)
+assert module.DEPLOYER
+"""
+        result = subprocess.run(
+            [sys.executable, "-c", import_script],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_explicit_exclusion_is_allowed_when_absent_but_not_as_dependency(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:

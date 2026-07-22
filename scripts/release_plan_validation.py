@@ -48,6 +48,19 @@ RELEASE_PLAN_EXCLUSIONS = frozenset(
 )
 
 STACKS_PRINCIPAL_RE = re.compile(r"\b(?:SP|ST|SN|SM)[0-9A-Z]+\b")
+STACKS_ADDRESS_RE = re.compile(r"^(?:ST|SP|SN|SM)[0-9A-HJ-KM-NP-TV-Z]{39}$")
+
+EXPECTED_PLAN_IDS = {"testnet": 1, "mainnet": 1}
+EXPECTED_PLAN_NAMES = {
+    "testnet": "Full System Deployment (July 2026)",
+    "mainnet": "Full System Deployment - Mainnet (July 2026)",
+}
+EXPECTED_STACKS_NODES = {
+    "testnet": "https://api.testnet.hiro.so",
+    "mainnet": "https://stacks-node-api.mainnet.stacks.co",
+}
+EXPECTED_PUBLISH_COSTS = {"testnet": 20000, "mainnet": 50000}
+EXPECTED_CALL_COST = 10000
 
 
 class ReleasePlanValidationError(ValueError):
@@ -71,6 +84,8 @@ class PublishTransaction:
     contract_name: str
     path: str
     clarity_version: int
+    expected_sender: str
+    cost: Any
     batch_index: int
     transaction_index: int
     ordinal: int
@@ -82,6 +97,8 @@ class PlannedCall:
     contract_name: str
     method: str
     parameters: tuple[Any, ...]
+    expected_sender: str
+    cost: Any
     batch_index: int
     transaction_index: int
     ordinal: int
@@ -91,7 +108,11 @@ class PlannedCall:
 class ParsedReleasePlan:
     path_label: str
     network: str
+    plan_id: Any
+    name: str
+    stacks_node: str
     deployer: str
+    batch_ids: tuple[Any, ...]
     publishes: tuple[PublishTransaction, ...]
     calls: tuple[PlannedCall, ...]
     topology: tuple[tuple[tuple[Any, ...], ...], ...]
@@ -104,6 +125,14 @@ def _raise_if_errors(errors: list[str]) -> None:
 
 def _is_mapping(value: Any) -> bool:
     return isinstance(value, Mapping)
+
+
+def _is_positive_int(value: Any) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool) and value > 0
+
+
+def _is_nonnegative_int(value: Any) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool) and value >= 0
 
 
 def _source_file(repo_root: Path, source_path: str) -> Path | None:
@@ -311,6 +340,8 @@ def extract_simnet_publish_batches(document: Mapping[str, Any], path_label: str 
                     contract_name=name,
                     path=source_path,
                     clarity_version=clarity_version,
+                    expected_sender="",
+                    cost=None,
                     batch_index=batch_index,
                     transaction_index=transaction_index,
                     ordinal=ordinal,
@@ -481,23 +512,48 @@ def parse_release_plan(document: Mapping[str, Any], path_label: str) -> ParsedRe
 
     errors: list[str] = []
     network = document.get("network")
+    plan_id = document.get("id")
+    plan_name = document.get("name")
+    stacks_node = document.get("stacks-node")
     deployer = document.get("deployer")
     if not isinstance(network, str) or not network:
         errors.append(f"{path_label}: release plan network is missing")
         network = ""
+    if not _is_positive_int(plan_id):
+        errors.append(f"{path_label}: release plan id must be a positive integer")
+        plan_id = None
+    if not isinstance(plan_name, str) or not plan_name:
+        errors.append(f"{path_label}: release plan name is missing")
+        plan_name = ""
+    if not isinstance(stacks_node, str) or not stacks_node:
+        errors.append(f"{path_label}: release plan stacks-node is missing")
+        stacks_node = ""
     if not isinstance(deployer, str) or not deployer:
         errors.append(f"{path_label}: release plan deployer is missing")
         deployer = ""
+    elif STACKS_ADDRESS_RE.fullmatch(deployer) is None:
+        errors.append(
+            f"{path_label}: release plan deployer must be a 41-character Stacks address "
+            "with an ST/SP/SN/SM prefix; signer authorization is validated separately"
+        )
 
     publishes: list[PublishTransaction] = []
     calls: list[PlannedCall] = []
+    batch_ids: list[Any] = []
     topology: list[tuple[tuple[Any, ...], ...]] = []
     ordinal = 0
 
     for batch_index, raw_batch in enumerate(_require_release_batches(document, path_label)):
+        batch_ids.append(None)
         if not _is_mapping(raw_batch):
             errors.append(f"{path_label}: batch {batch_index} must be a mapping")
             continue
+        raw_batch_id = raw_batch.get("id")
+        batch_ids[-1] = raw_batch_id
+        if "id" not in raw_batch:
+            errors.append(f"{path_label}: batch {batch_index} is missing required id")
+        elif not _is_nonnegative_int(raw_batch_id):
+            errors.append(f"{path_label}: batch {batch_index} id must be a non-negative integer")
         raw_transactions = raw_batch.get("transactions")
         if not isinstance(raw_transactions, list):
             errors.append(f"{path_label}: batch {batch_index}.transactions must be a list")
@@ -527,25 +583,38 @@ def parse_release_plan(document: Mapping[str, Any], path_label: str) -> ParsedRe
                         f"{path_label}: batch {batch_index} transaction {transaction_index} contract-publish must be a mapping"
                     )
                     continue
-                name = body.get("contract-name")
+                contract_name = body.get("contract-name")
                 source_path = body.get("path")
-                if not isinstance(name, str) or not name:
+                if not isinstance(contract_name, str) or not contract_name:
                     errors.append(
                         f"{path_label}: batch {batch_index} transaction {transaction_index} publish has no contract-name"
                     )
                     continue
                 if not isinstance(source_path, str) or not source_path:
-                    errors.append(f"{path_label}: release publish {name} has no source path")
+                    errors.append(f"{path_label}: release publish {contract_name} has no source path")
                     continue
+                expected_sender = body.get("expected-sender")
+                if not isinstance(expected_sender, str) or not expected_sender:
+                    errors.append(
+                        f"{path_label}: release publish {contract_name} expected-sender must be a non-empty string"
+                    )
+                    expected_sender = ""
+                cost = body.get("cost")
+                if not _is_positive_int(cost):
+                    errors.append(
+                        f"{path_label}: release publish {contract_name} cost must be a positive integer"
+                    )
                 clarity_version = body.get("clarity-version", 4)
                 if not isinstance(clarity_version, int):
-                    errors.append(f"{path_label}: release publish {name} clarity-version must be an integer")
+                    errors.append(f"{path_label}: release publish {contract_name} clarity-version must be an integer")
                     clarity_version = 4
                 publishes.append(
                     PublishTransaction(
-                        contract_name=name,
+                        contract_name=contract_name,
                         path=source_path,
                         clarity_version=clarity_version,
+                        expected_sender=expected_sender,
+                        cost=cost,
                         batch_index=batch_index,
                         transaction_index=transaction_index,
                         ordinal=ordinal,
@@ -554,11 +623,13 @@ def parse_release_plan(document: Mapping[str, Any], path_label: str) -> ParsedRe
                 normalized_batch.append(
                     (
                         "publish",
-                        name,
+                        contract_name,
                         source_path,
                         clarity_version,
                         bool(body.get("anchor-block-only", False)),
                         body.get("epoch"),
+                        _normalize_principals(expected_sender),
+                        cost,
                     )
                 )
             else:
@@ -577,6 +648,17 @@ def parse_release_plan(document: Mapping[str, Any], path_label: str) -> ParsedRe
                 if not isinstance(method, str) or not method:
                     errors.append(f"{path_label}: release call {contract_id} has no method")
                     continue
+                expected_sender = body.get("expected-sender")
+                if not isinstance(expected_sender, str) or not expected_sender:
+                    errors.append(
+                        f"{path_label}: release call {contract_id}.{method} expected-sender must be a non-empty string"
+                    )
+                    expected_sender = ""
+                cost = body.get("cost")
+                if not _is_positive_int(cost):
+                    errors.append(
+                        f"{path_label}: release call {contract_id}.{method} cost must be a positive integer"
+                    )
                 if not isinstance(parameters, list):
                     errors.append(f"{path_label}: release call {contract_id}.{method} parameters must be a list")
                     parameters = []
@@ -591,6 +673,8 @@ def parse_release_plan(document: Mapping[str, Any], path_label: str) -> ParsedRe
                         contract_name=contract_name,
                         method=method,
                         parameters=tuple(parameters),
+                        expected_sender=expected_sender,
+                        cost=cost,
                         batch_index=batch_index,
                         transaction_index=transaction_index,
                         ordinal=ordinal,
@@ -602,10 +686,31 @@ def parse_release_plan(document: Mapping[str, Any], path_label: str) -> ParsedRe
                         _normalize_principals(contract_id),
                         method,
                         _normalize_principals(parameters),
+                        _normalize_principals(expected_sender),
+                        cost,
                     )
                 )
             ordinal += 1
         topology.append(tuple(normalized_batch))
+
+    valid_batch_ids = all(_is_nonnegative_int(batch_id) for batch_id in batch_ids)
+    if valid_batch_ids:
+        duplicate_batch_ids = sorted(
+            batch_id
+            for batch_id in set(batch_ids)
+            if batch_ids.count(batch_id) > 1
+        )
+        if duplicate_batch_ids:
+            errors.append(
+                f"{path_label}: batch ids must be unique; duplicate ids: "
+                + ", ".join(str(batch_id) for batch_id in duplicate_batch_ids)
+            )
+        expected_batch_ids = tuple(range(len(batch_ids)))
+        if tuple(batch_ids) != expected_batch_ids:
+            errors.append(
+                f"{path_label}: batch ids must be the deterministic sequence "
+                f"0..{len(batch_ids) - 1}; found {batch_ids!r}"
+            )
 
     if not publishes:
         errors.append(f"{path_label}: release plan contains no contract-publish transactions")
@@ -622,7 +727,11 @@ def parse_release_plan(document: Mapping[str, Any], path_label: str) -> ParsedRe
     return ParsedReleasePlan(
         path_label=path_label,
         network=network,
+        plan_id=plan_id,
+        name=plan_name,
+        stacks_node=stacks_node,
         deployer=deployer,
+        batch_ids=tuple(batch_ids),
         publishes=tuple(publishes),
         calls=tuple(calls),
         topology=tuple(topology),
@@ -643,11 +752,54 @@ def validate_release_plan(
             f"{parsed.path_label}: network is {parsed.network!r}, expected {expected_network!r}"
         )
 
+    metadata_network = parsed.network if parsed.network in EXPECTED_PLAN_IDS else expected_network
+    if metadata_network in EXPECTED_PLAN_IDS:
+        expected_plan_id = EXPECTED_PLAN_IDS[metadata_network]
+        if parsed.plan_id != expected_plan_id:
+            errors.append(
+                f"{parsed.path_label}: plan id is {parsed.plan_id!r}, expected {expected_plan_id} "
+                f"for {metadata_network}"
+            )
+        expected_name = EXPECTED_PLAN_NAMES[metadata_network]
+        if parsed.name != expected_name:
+            errors.append(
+                f"{parsed.path_label}: plan name is {parsed.name!r}, expected {expected_name!r}"
+            )
+        expected_node = EXPECTED_STACKS_NODES[metadata_network]
+        if parsed.stacks_node != expected_node:
+            errors.append(
+                f"{parsed.path_label}: stacks-node is {parsed.stacks_node!r}, expected "
+                f"{expected_node!r} for {metadata_network}"
+            )
+    else:
+        errors.append(
+            f"{parsed.path_label}: network {parsed.network!r} is not a supported testnet/mainnet release network"
+        )
+
+    if STACKS_ADDRESS_RE.fullmatch(parsed.deployer) is None:
+        errors.append(
+            f"{parsed.path_label}: deployer {parsed.deployer!r} is not a supported ST/SP/SN/SM "
+            "Stacks address; this syntax check does not authorize a signer"
+        )
+
     positions: dict[str, tuple[int, int]] = {}
     duplicate_positions: dict[str, list[tuple[int, int]]] = {}
     for entry in parsed.publishes:
         position = (entry.batch_index, entry.transaction_index)
         duplicate_positions.setdefault(entry.contract_name, []).append(position)
+        if entry.expected_sender != parsed.deployer:
+            errors.append(
+                f"{parsed.path_label}: publish {entry.contract_name} at batch {entry.batch_index} "
+                f"transaction {entry.transaction_index} expected-sender {entry.expected_sender!r} "
+                f"does not equal plan deployer {parsed.deployer!r}"
+            )
+        expected_publish_cost = EXPECTED_PUBLISH_COSTS.get(parsed.network)
+        if expected_publish_cost is not None and entry.cost != expected_publish_cost:
+            errors.append(
+                f"{parsed.path_label}: publish {entry.contract_name} at batch {entry.batch_index} "
+                f"transaction {entry.transaction_index} cost {entry.cost!r} does not match the "
+                f"{parsed.network} publish cost {expected_publish_cost}"
+            )
         if entry.contract_name in positions:
             continue
         positions[entry.contract_name] = position
@@ -697,6 +849,18 @@ def validate_release_plan(
         )
 
     for call in parsed.calls:
+        if call.expected_sender != parsed.deployer:
+            errors.append(
+                f"{parsed.path_label}: call {call.contract_id}.{call.method} at batch {call.batch_index} "
+                f"transaction {call.transaction_index} expected-sender {call.expected_sender!r} "
+                f"does not equal plan deployer {parsed.deployer!r}"
+            )
+        if call.cost != EXPECTED_CALL_COST:
+            errors.append(
+                f"{parsed.path_label}: call {call.contract_id}.{call.method} at batch {call.batch_index} "
+                f"transaction {call.transaction_index} cost {call.cost!r} does not match the "
+                f"release call cost {EXPECTED_CALL_COST}"
+            )
         definition = contracts.get(call.contract_name)
         if definition is None:
             errors.append(
@@ -751,7 +915,22 @@ def validate_release_plan(
 
 
 def compare_plan_topology(testnet: ParsedReleasePlan, mainnet: ParsedReleasePlan) -> None:
-    """Ensure network plans have equivalent ordered publish/call topology."""
+    """Ensure network plans have equivalent ordered publish/call topology.
+
+    The generated pair currently shares one declared deployer.  Comparing that
+    metadata is a consistency check for the artifacts, not signer approval;
+    mainnet authorization remains outside this validator and blocked by the
+    preflight workflow until the approved signer gate is satisfied.
+    """
+
+    if testnet.deployer != mainnet.deployer:
+        raise ReleasePlanValidationError(
+            [
+                "testnet/mainnet release deployer drift: "
+                f"testnet={testnet.deployer!r}, mainnet={mainnet.deployer!r}; "
+                "the generated pair must use one declared deployer"
+            ]
+        )
 
     if testnet.topology == mainnet.topology:
         return
@@ -760,8 +939,31 @@ def compare_plan_topology(testnet: ParsedReleasePlan, mainnet: ParsedReleasePlan
     for batch_index in range(max_batches):
         left = testnet.topology[batch_index] if batch_index < len(testnet.topology) else None
         right = mainnet.topology[batch_index] if batch_index < len(mainnet.topology) else None
-        if left == right:
+        if left is not None and right is not None and len(left) == len(right):
+            for transaction_index, (left_tx, right_tx) in enumerate(zip(left, right)):
+                if left_tx == right_tx:
+                    continue
+                if (
+                    left_tx
+                    and right_tx
+                    and left_tx[0] == "publish"
+                    and right_tx[0] == "publish"
+                    and left_tx[:-1] == right_tx[:-1]
+                    and left_tx[-1] == EXPECTED_PUBLISH_COSTS["testnet"]
+                    and right_tx[-1] == EXPECTED_PUBLISH_COSTS["mainnet"]
+                ):
+                    continue
+                raise ReleasePlanValidationError(
+                    [
+                        "testnet/mainnet release topology drift at batch "
+                        f"{batch_index} transaction {transaction_index}: "
+                        f"testnet={left_tx!r}, mainnet={right_tx!r}; "
+                        "only the intentional testnet/mainnet publish-cost difference "
+                        "and network/deployer-specific fields may differ"
+                    ]
+                )
             continue
+
         max_transactions = max(len(left or ()), len(right or ()))
         for transaction_index in range(max_transactions):
             left_tx = left[transaction_index] if left is not None and transaction_index < len(left) else None
@@ -772,7 +974,8 @@ def compare_plan_topology(testnet: ParsedReleasePlan, mainnet: ParsedReleasePlan
                         "testnet/mainnet release topology drift at batch "
                         f"{batch_index} transaction {transaction_index}: "
                         f"testnet={left_tx!r}, mainnet={right_tx!r}; "
-                        "only network/deployer-specific fields may differ"
+                        "only the intentional testnet/mainnet publish-cost difference "
+                        "and network/deployer-specific fields may differ"
                     ]
                 )
         raise ReleasePlanValidationError(

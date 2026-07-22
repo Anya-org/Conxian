@@ -14,18 +14,46 @@ except ModuleNotFoundError as exc:
         "install it with: python3 -m pip install --user --disable-pip-version-check 'PyYAML==6.0.2'"
     ) from exc
 
-from release_plan_validation import (
-    ReleasePlanValidationError,
-    dependency_ordered_batches,
-    load_clarinet_manifest,
-    validate_release_plan_files,
-    validate_simnet_source,
-)
+try:
+    from release_plan_validation import (
+        EXPECTED_CALL_COST,
+        EXPECTED_PLAN_NAMES,
+        EXPECTED_PLAN_IDS,
+        EXPECTED_PUBLISH_COSTS,
+        EXPECTED_STACKS_NODES,
+        ReleasePlanValidationError,
+        dependency_ordered_batches,
+        load_clarinet_manifest,
+        validate_release_plan_files,
+        validate_simnet_source,
+    )
+except ModuleNotFoundError as exc:
+    if exc.name != "release_plan_validation":
+        raise
+    # ``python3 scripts/gen-deployment-plans.py`` puts this directory on
+    # sys.path automatically, but importlib loading from the repository root
+    # does not.  Resolve the sibling explicitly without requiring a package
+    # marker or a caller-managed PYTHONPATH.
+    scripts_dir = str(Path(__file__).resolve().parent)
+    if scripts_dir not in sys.path:
+        sys.path.insert(0, scripts_dir)
+    from release_plan_validation import (
+        EXPECTED_CALL_COST,
+        EXPECTED_PLAN_NAMES,
+        EXPECTED_PLAN_IDS,
+        EXPECTED_PUBLISH_COSTS,
+        EXPECTED_STACKS_NODES,
+        ReleasePlanValidationError,
+        dependency_ordered_batches,
+        load_clarinet_manifest,
+        validate_release_plan_files,
+        validate_simnet_source,
+    )
 
 DEPLOYER = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
 
-COST_TESTNET = 20000
-COST_MAINNET = 50000
+COST_TESTNET = EXPECTED_PUBLISH_COSTS["testnet"]
+COST_MAINNET = EXPECTED_PUBLISH_COSTS["mainnet"]
 
 
 class QuotedString(str):
@@ -47,7 +75,7 @@ def q(s):
 
 A = lambda s: q(f"'{DEPLOYER}{s}'")  # Single-quoted principal string, double-quoted in YAML
 
-INIT_CALL_COST = 10000  # Fixed cost for each init call
+INIT_CALL_COST = EXPECTED_CALL_COST  # Fixed cost for each init call
 INIT_CALLS = [
     {"contract-id": f"{DEPLOYER}.conxian-protocol", "expected-sender": DEPLOYER,
      "method": "set-owner", "parameters": [A("")], "cost": INIT_CALL_COST},
@@ -115,7 +143,7 @@ def extract_contracts(simnet, manifest, repo_root, path_label="default.simnet-pl
 def make_plan(contracts, network, name, stacks_node, cost):
     """Build deployment plan YAML structure."""
     plan = {
-        "id": 1,
+        "id": EXPECTED_PLAN_IDS[network],
         "name": name,
         "network": network,
         "stacks-node": stacks_node,
@@ -181,8 +209,8 @@ def generate_plans(simnet_path, output_dir):
     # Testnet
     testnet = make_plan(contracts,
         network="testnet",
-        name="Full System Deployment (July 2026)",
-        stacks_node="https://api.testnet.hiro.so",
+        name=EXPECTED_PLAN_NAMES["testnet"],
+        stacks_node=EXPECTED_STACKS_NODES["testnet"],
         cost=COST_TESTNET,
     )
     testnet_path = output_dir / GENERATED_PLAN_NAMES[0]
@@ -191,8 +219,8 @@ def generate_plans(simnet_path, output_dir):
     # Mainnet
     mainnet = make_plan(contracts,
         network="mainnet",
-        name="Full System Deployment - Mainnet (July 2026)",
-        stacks_node="https://stacks-node-api.mainnet.stacks.co",
+        name=EXPECTED_PLAN_NAMES["mainnet"],
+        stacks_node=EXPECTED_STACKS_NODES["mainnet"],
         cost=COST_MAINNET,
     )
     mainnet_path = output_dir / GENERATED_PLAN_NAMES[1]
