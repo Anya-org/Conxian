@@ -3,8 +3,9 @@
 This document provides the formal deployment research and execution path for the Conxian Vault products, as requested in **CON-54**. It is designed to be environment-agnostic and Zero Secret Egress (ZSE) compliant.
 
 ## 1. Product Scope
-- **White-Label Vault**: Powered by `contracts/vaults/sbtc-vault.clar` and `contracts/vaults/custody.clar`.
-- **Alpha Yield Router**: Powered by `contracts/vaults/yield-aggregator.clar` and `contracts/vaults/fee-manager.clar`.
+- **Phase 2A sBTC custody core**: `contracts/vaults/sbtc-vault.clar` accepts one immutable, admin-configured canonical SIP-010 token, reconciles deposit receipts against live balance deltas, accounts shares, and supports fail-closed withdrawals.
+- **Separate vault modules**: `contracts/vaults/custody.clar`, `contracts/vaults/yield-aggregator.clar`, and `contracts/vaults/fee-manager.clar` are not strategy or bridge implementations for the Phase 2A sBTC boundary.
+- **Explicit non-scope**: BTC bridging/redemption, signer logic, peg repair, official sBTC mint/burn calls, strategy allocation, donation sweeping, and peg-in/peg-out workflows remain later phases.
 
 ## 2. Contract Inventory & Dependency Order
 To ensure successful deployment, contracts must be published in the following order:
@@ -19,27 +20,40 @@ To ensure successful deployment, contracts must be published in the following or
    - `contracts/vaults/fee-manager.clar`
    - `contracts/vaults/custody.clar`
 4. **Product Entry Points**
-   - `contracts/vaults/sbtc-vault.clar` (Depends on regulatory-adapter)
-   - `contracts/vaults/yield-aggregator.clar` (Depends on vault-trait)
+   - `contracts/vaults/sbtc-vault.clar` (Depends on core-traits, regulatory-adapter, sip-standards, and vault-traits)
+   - `contracts/vaults/yield-aggregator.clar` (Imports `.vault-traits.vault-trait` and `.sip-standards.sip-010-ft-trait`; the active manifest lists `sip-standards` and does not depend on `sbtc-vault`)
 
 ## 3. Deployment Configuration
-### 3.1. Principal Wiring
-All Vault contracts use the **Principal Registry** in `contracts/core/operational-treasury.clar` for dynamic resolution.
+### 3.1. Principal and token wiring
+The Phase 2A `sbtc-vault` does **not** use `contracts/core/operational-treasury.clar`.
+Its administrator, vault principal, and approved token are stored locally in the
+contract. There is no `set-protocol-principal` step for this custody slice.
+
 - **NEVER** hardcode `SP...` or `ST...` addresses in the source.
-- After deployment, use the `set-protocol-principal` function in `operational-treasury.clar` to register the new Vault addresses.
+- Configure the canonical token with `set-approved-token` exactly once from the
+  initial unconfigured state; the token is immutable afterward.
 
 ### 3.2. Clarinet Integration
-The following snippet should be added to the production `Clarinet.toml` or a dedicated `Clarinet.vaults.toml`:
+The active production `Clarinet.toml` uses the following shape (a dedicated
+vault manifest may mirror it):
 
 ```toml
 [contracts.sbtc-vault]
 path = "contracts/vaults/sbtc-vault.clar"
-depends_on = ["sip-010-ft-trait", "regulatory-adapter"]
+clarity-version = 4
+depends_on = ["core-traits", "regulatory-adapter", "sip-standards", "vault-traits"]
 
 [contracts.yield-aggregator]
 path = "contracts/vaults/yield-aggregator.clar"
-depends_on = ["vault-trait", "sbtc-vault"]
+clarity-version = 4
+depends_on = ["sip-standards"]
 ```
+
+The names above mirror the source imports and the active `Clarinet.toml`:
+`vault-traits` is the trait contract name, while `vault-trait` is only the
+trait identifier. `yield-aggregator` does not require `sbtc-vault` and the
+active manifest does not list `vault-traits` in that contract's
+`depends_on` array.
 
 ### 3.3. Enterprise Subscription and Fiscal Dam Gate
 The enterprise subscription contracts are publishable in a fail-closed state,
@@ -89,9 +103,26 @@ The repository workflows are currently preflight-only. They validate the config 
 Every non-dry path is blocked before signing until a structured receipt-producing broadcaster and complete evidence verifier are implemented for issue #531. Do not run `clarinet deployments apply` manually as a workaround, and do not treat dashboard or debug logs as deployment proof.
 
 The current full-system mainnet plan also contains an unresolved `ST...` deployer identity. It must be replaced only by an approved identity derived from and verified against the configured signer; do not guess an `SP...`/`SM...` address.
+The supported `Deploy Mainnet` workflow remains preflight-only. It requires
+`confirm: DEPLOY_MAINNET` and an `expected_plan_sha256` matching the checked-in
+`deployments/full-system.mainnet-plan.yaml` digest. Keep `dry_run: true` for
+plan-only artifacts; setting `dry_run: false` is rejected by the fail-closed
+gate before signing and does not deploy.
 
 ## 5. Post-Deployment & Role Wiring
-Once an approved, fully evidenced deployment exists, the following administrative actions are required:
+If a later deployment is approved, configure the Phase 2A vault in this order
+before accepting deposits:
+1. **Canonical token**: Call `set-approved-token` once with the official sBTC SIP-010 contract reference for that network. It is only valid from the initial `none` state and cannot be reconfigured.
+2. **Deposit cap**: Call `set-deposit-cap` with an explicit nonzero cap that is at least the current accounted assets.
+3. **Optional pause**: Call `set-paused` only when an operational pause is required; withdrawals remain available while paused if the vault is solvent and the caller is compliant.
+4. **Admin handoff**: If required, call `set-admin` last from the current admin and verify that the previous admin is rejected afterward.
+5. **Compliance**: Ensure the existing `regulatory-adapter` has valid compliance records for intended users.
+
+Do not register this Phase 2A vault through `operational-treasury`, and do not
+treat `allocate-to-strategy` as available; it remains fail-closed.
+
+For other registry-backed vault products, once an approved, fully evidenced
+deployment exists, complete the corresponding administrative wiring:
 1. **Registry Update**: Call `set-protocol-principal("sbtc-vault", <deployed-address>)` in `operational-treasury`.
 2. **Fee Initialization**: Set default fees in `fee-manager.clar`.
 3. **Manager Authorization**: Add necessary managers in `custody.clar`.
@@ -100,13 +131,28 @@ Once an approved, fully evidenced deployment exists, the following administrativ
    custody.
 
 ## 6. Evidence Capture
-Until the broadcast gate is cleared, record only preflight artifacts for the acceptance pack:
+The Phase 2A implementation task creates no deployment evidence. Until the
+broadcast gate is cleared, record only preflight artifacts for the acceptance
+pack:
 - Source commit SHA from the preflight run
 - Exact deployment plan path and SHA-256
 - Network, approved signer-derived deployer identity, and validation results
 - Preflight logs and any explicitly labeled broadcast/partial candidate
 
-Do not record txids or deployed contract principals as acceptance proof without a structured receipt and complete plan-bound verification. A partial candidate is retained for bounded recovery and must never be labeled confirmed or completed.
+A later network-specific acceptance pack must additionally record transaction
+IDs, the configured canonical token principal, and post-deployment
+reconciliation checks before any production claim is made. Do not record txids
+or deployed contract principals as acceptance proof without a structured
+receipt and complete plan-bound verification. A partial candidate is retained
+for bounded recovery and must never be labeled confirmed or completed.
+
+## 7. Authoritative public sBTC references
+
+- [Stacks sBTC overview](https://docs.stacks.co/learn/sbtc)
+- [sBTC Clarity contracts](https://docs.stacks.co/learn/sbtc/clarity-contracts)
+- [Clarinet sBTC integration](https://docs.stacks.co/clarinet/integrations/sbtc)
+- [Stacks mainnet and testnets](https://docs.stacks.co/learn/network-fundamentals/mainnet-and-testnets)
+- [stacks-sbtc source repository](https://github.com/stacks-sbtc/sbtc)
 
 ---
-*Last Updated: April 2026*
+*Last Updated: July 22, 2026*
