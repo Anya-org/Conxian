@@ -50,6 +50,22 @@
   "source_control": "Follow-up signed-off commit is created locally on this branch only; no push, PR, or GitHub communication."
 }
 
+## Parallel Session (38) - Enterprise Subscription Audit Hardening (Issue #503)
+
+{
+  "status": "HARDENED_LOCALLY",
+  "session_timestamp": "2026-07-22",
+  "scope": "Hardened the STX-only prepaid enterprise subscription MVP after independent audit: tier/version plan identity, nonzero publication invariants, active feature immutability, exact payment amounts, global payment replay scope, period-scoped usage replay, subscriber-origin usage authorization, governed Fiscal Dam bucket custody release, policy-version evidence, and deployment/documentation gates.",
+  "economic_boundary": "Subscription prices enter revenue-automation, revenue-distributor, and cxd-treasury at gross value with no 1% deduction or operational-treasury/commercial-wallet bypass. The six-way allocation uses safe floor math for the first five buckets, assigns all integer remainder to insurance, and records the policy version. Buyback remains only a governed STX bucket.",
+  "security_boundary": "Plans use exactly tier IDs u1-u4 and publish inactive; prices and KYC tier are immutable after publication, and feature records cannot be extended after a version is activated. Payment IDs are global across the subscription route; usage IDs include paid-period start; the authoritative usage boundary requires tx-sender == subscriber. Product consumers and bucket recipients remain empty/unconfigured until governance registers audited principals.",
+  "validation": {
+    "targeted_tests": "PASS: tests/enterprise/enterprise-subscriptions.test.ts (7 tests); tests/treasury/cxd-treasury.test.ts (2 tests); tests/integration-fees.test.ts (11 tests); tests/cybernetic-revenue.test.ts (1 test); tests/alex-release-wiring.test.ts (5 tests)",
+    "full_tests": "Not rerun on the hardening branch. A temporary worktree at baseline ee6368a8db967707c1e731da397b04705ca41fa5 reproduced 4 SAB-election failures out of 6 tests (2 passed); no current-branch broad-suite status is claimed",
+    "native_clarinet": "Blocked: clarinet binary is not installed in the workspace",
+    "deployment": "Deployment plans regenerated locally; no deployment or push performed"
+  }
+}
+
 ## Superseded Session (38) - Initial Registration Compliance Gate (Issue #504)
 
 This historical entry describes the initial candidate in commit

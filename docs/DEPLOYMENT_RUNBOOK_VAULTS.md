@@ -41,6 +41,28 @@ path = "contracts/vaults/yield-aggregator.clar"
 depends_on = ["vault-trait", "sbtc-vault"]
 ```
 
+### 3.3. Enterprise Subscription and Fiscal Dam Gate
+The enterprise subscription contracts are publishable in a fail-closed state,
+but deployment does not publish plan prices, activate plan versions, configure
+STX bucket recipients, or register arbitrary product consumers. Before product
+activation, governance must complete these separate steps:
+
+1. Publish an approved `{tier-id, version}` plan with nonzero monthly/annual
+   prices and a valid nonzero KYC tier.
+2. Publish all generic features, then explicitly activate the immutable plan
+   version.
+3. Register only audited product consumer contracts with
+   `enterprise-subscription`; the generic facade is not trusted by default.
+4. Configure each audited Fiscal Dam bucket recipient with
+   `cxd-treasury.set-stx-bucket-recipient`. Unconfigured destinations must
+   remain fail-closed.
+5. Verify the generated plan contains the enterprise subscription ->
+   revenue-automation -> revenue-distributor -> cxd-treasury route wiring.
+
+Settled STX terminates in `cxd-treasury` accounting; it does not end at
+`swap-router`. The buyback bucket is only a governed STX allocation until a
+separate native-STX adapter is reviewed and approved.
+
 ## 4. Execution Workflow
 
 ### Step 1: Preflight & Safety
@@ -73,6 +95,9 @@ Once an approved, fully evidenced deployment exists, the following administrativ
 1. **Registry Update**: Call `set-protocol-principal("sbtc-vault", <deployed-address>)` in `operational-treasury`.
 2. **Fee Initialization**: Set default fees in `fee-manager.clar`.
 3. **Manager Authorization**: Add necessary managers in `custody.clar`.
+4. **Enterprise Governance**: Complete the enterprise subscription gate above;
+   generated route wiring is not approval to sell plans or release Fiscal Dam
+   custody.
 
 ## 6. Evidence Capture
 Until the broadcast gate is cleared, record only preflight artifacts for the acceptance pack:

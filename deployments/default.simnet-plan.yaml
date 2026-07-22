@@ -180,6 +180,26 @@ plan:
       emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
       path: contracts/automation/batch-processor.clar
       clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: enterprise-plan-trait
+      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
+      path: contracts/traits/enterprise-plan-trait.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: enterprise-compliance-trait
+      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
+      path: contracts/traits/enterprise-compliance-trait.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: enterprise-revenue-trait
+      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
+      path: contracts/traits/enterprise-revenue-trait.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: enterprise-subscription-trait
+      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
+      path: contracts/traits/enterprise-subscription-trait.clar
+      clarity-version: 4
     epoch: '3.0'
   - id: 1
     transactions:
@@ -520,14 +540,14 @@ plan:
       path: contracts/enterprise/enterprise-api.clar
       clarity-version: 4
     - transaction-type: emulated-contract-publish
-      contract-name: enterprise-facade
-      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
-      path: contracts/enterprise/enterprise-facade.clar
-      clarity-version: 4
-    - transaction-type: emulated-contract-publish
       contract-name: enterprise-traits
       emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
       path: contracts/traits/enterprise-traits.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: enterprise-plan-registry
+      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
+      path: contracts/enterprise/enterprise-plan-registry.clar
       clarity-version: 4
     - transaction-type: emulated-contract-publish
       contract-name: exponentiation
@@ -1173,5 +1193,18 @@ plan:
       contract-name: zkml-verifier
       emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
       path: contracts/compliance/zkml-verifier.clar
+      clarity-version: 4
+    epoch: '3.0'
+  - id: 9
+    transactions:
+    - transaction-type: emulated-contract-publish
+      contract-name: enterprise-subscription
+      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
+      path: contracts/enterprise/enterprise-subscription.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: enterprise-facade
+      emulated-sender: ST1XSQD6E09E32GBGHDWY36N1FJKS4W8WGKGFZJ9N
+      path: contracts/enterprise/enterprise-facade.clar
       clarity-version: 4
     epoch: '3.0'

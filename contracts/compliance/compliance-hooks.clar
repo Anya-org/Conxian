@@ -2,6 +2,8 @@
 ;; Conxian Compliance Hooks: KYC/AML checks and audit trails
 ;; Manages KYC providers and provides hooks for user verification.
 
+(impl-trait .enterprise-compliance-trait.enterprise-compliance-trait)
+
 ;; --- Constants ---
 
 (define-constant ERR_UNAUTHORIZED u4000)
@@ -9,6 +11,8 @@
 (define-constant ERR_ALREADY_PROVIDER u4002)
 (define-constant ERR_NOT_PROVIDER u4003)
 (define-constant ERR_POLICY_VIOLATION u7000)
+(define-constant ERR_ENTERPRISE_KYC_FAILED u7001)
+(define-constant ERR_ENTERPRISE_AML_FAILED u7002)
 
 ;; --- State ---
 
@@ -177,5 +181,34 @@
   (if (contract-call? .kyc-registry is-sanctioned user)
     (err ERR_POLICY_VIOLATION)
     (ok true)
+  )
+)
+
+;; --- Enterprise purchase adapter ---
+
+;; Return the registry tier without exposing identity metadata or PII.
+(define-read-only (get-kyc-tier (user principal))
+  (ok (contract-call? .kyc-registry get-tier user))
+)
+
+;; Return only the AML decision needed by an enterprise purchase.
+(define-read-only (is-aml-clear (user principal))
+  (ok (not (contract-call? .kyc-registry is-sanctioned user)))
+)
+
+;; Validate the minimum plan tier and sanctions state atomically for callers
+;; such as enterprise-subscription.clar.
+(define-read-only (validate-enterprise-compliance
+    (user principal)
+    (required-kyc-tier uint))
+  (let (
+    (kyc-tier (contract-call? .kyc-registry get-tier user))
+    (aml-clear (not (contract-call? .kyc-registry is-sanctioned user)))
+  )
+    (if (not (>= kyc-tier required-kyc-tier))
+      (err ERR_ENTERPRISE_KYC_FAILED)
+      (if (not aml-clear)
+        (err ERR_ENTERPRISE_AML_FAILED)
+        (ok true)))
   )
 )

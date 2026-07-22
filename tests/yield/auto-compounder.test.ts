@@ -383,13 +383,15 @@ describe('Trait-driven auto-compounder Phase 2', () => {
 
   it('enforces minimum output and rolls back vault/coordinator state on slippage failure', () => {
     expect(registerVault({ minOutput: 50 }).result).toEqual(Cl.ok(Cl.bool(true)));
+    const initialLastCompoundBlock = Cl.prettyPrint(config().result).match(/last-compound-block: u(\d+)/)?.[1] ?? '';
+    expect(initialLastCompoundBlock).not.toBe('');
     setPending(100);
     setOutput(49);
 
     expectError(simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1).result, ERR_OUTPUT_TOO_LOW);
     expect(simnet.callReadOnlyFn(MOCK_VAULT, 'get-pending-rewards', [], deployer).result).toEqual(Cl.ok(Cl.uint(100)));
     expect(simnet.callReadOnlyFn(MOCK_VAULT, 'get-compound-count', [], deployer).result).toEqual(Cl.uint(0));
-    expect(Cl.prettyPrint(config().result)).toContain('last-compound-block: u11');
+    expect(Cl.prettyPrint(config().result)).toContain(`last-compound-block: u${initialLastCompoundBlock}`);
 
     setOutput(50);
     expect(simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1).result).toEqual(Cl.ok(Cl.uint(50)));
@@ -397,13 +399,15 @@ describe('Trait-driven auto-compounder Phase 2', () => {
 
   it('propagates a failed vault call and rolls back the coordinator state', () => {
     expect(registerVault().result).toEqual(Cl.ok(Cl.bool(true)));
+    const initialLastCompoundBlock = Cl.prettyPrint(config().result).match(/last-compound-block: u(\d+)/)?.[1] ?? '';
+    expect(initialLastCompoundBlock).not.toBe('');
     setPending(10);
     setOutput(10);
     expect(callMock('set-compound-failure', [Cl.bool(true)]).result).toEqual(Cl.ok(Cl.bool(true)));
 
     expectError(simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1).result, ERR_COMPOUND_FAILED);
     expect(simnet.callReadOnlyFn(MOCK_VAULT, 'get-pending-rewards', [], deployer).result).toEqual(Cl.ok(Cl.uint(10)));
-    expect(Cl.prettyPrint(config().result)).toContain('last-compound-block: u11');
+    expect(Cl.prettyPrint(config().result)).toContain(`last-compound-block: u${initialLastCompoundBlock}`);
 
     expect(callMock('set-compound-failure', [Cl.bool(false)]).result).toEqual(Cl.ok(Cl.bool(true)));
     expect(simnet.callPublicFn(AUTO_COMPOUNDER, 'compound', [vaultArg()], wallet1).result).toEqual(Cl.ok(Cl.uint(10)));

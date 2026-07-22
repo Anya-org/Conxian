@@ -8,7 +8,10 @@ Protocol revenue is currently sourced from these contract-supported channels:
 - **DEX Operations**: Swap fees collected via `swap-router.clar`. Fees are dynamically capped at 100 bps (1.0%) to mitigate LVR (Loss Versus Rebalancing).
 - **Lending Markets**: A 10% reserve factor is applied to interest paid by borrowers in `lending-manager.clar`.
 - **Integration Fees**: Registered integrations can accrue STX fees through `integration-fee-collector.clar` using per-use or monthly billing.
-- **Service Subscriptions**: Existing subscription policy surfaces remain separate from the integration-fee MVP and are not used as its security boundary.
+- **Service Subscriptions**: The STX-only enterprise subscription MVP uses an
+  explicit prepaid plan route with exact payment amounts and no automatic
+  renewal. It is separate from integration-fee policy and has its own
+  subscriber/consumer authorization boundary.
 
 ### Integration Fee Flow (STX-first)
 `integration-registry.clar` stores integration configuration and SHA-256 API-key
@@ -19,11 +22,26 @@ accepts an exact payer settlement only after the monthly period closes when
 monthly billing is selected.
 
 Settled STX moves through the existing `revenue-distributor.clar`
-`distribute-stx` route under collector contract context and then follows the
-existing swap-router/BME route. This is a 100% protocol route with no partner
-split, so the existing CXIP-013 economics remain authoritative. Generic FT
-settlement is deferred to a future two-step deposit-and-route design, and
-payer-signed usage attestations are a future trust-boundary hardening step.
+`distribute-stx` route under collector contract context and terminates in the
+`cxd-treasury` Fiscal Dam accounting buckets. It does not end at
+`swap-router`. This is a 100% protocol route with no partner split, so the
+existing CXIP-013 economics remain authoritative. Generic FT settlement is
+deferred to a future two-step deposit-and-route design, and payer-signed usage
+attestations are a future trust-boundary hardening step.
+
+### Enterprise subscription route
+Enterprise payments use the canonical gross-STX sequence:
+
+```text
+subscriber -> enterprise-subscription -> revenue-automation
+           -> revenue-distributor -> cxd-treasury
+```
+
+The treasury receipt snapshots the policy version and all six integer
+allocations. Payment IDs are globally unique across the subscription route;
+usage IDs are replay-protected per paid period. Bucket recipients are not
+preconfigured, and buyback remains only a governed STX allocation until a
+separate native-STX adapter exists.
 
 ### Registration fees — roadmap only
 
