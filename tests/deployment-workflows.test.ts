@@ -23,6 +23,7 @@ describe("deployment workflow safety gates", () => {
       expect(source).toContain("plan-only");
       expect(source).toContain("blocked before signing");
       expect(source).toContain("issue #531");
+      expect(source).toContain("test:release-plan-validation");
     }
   });
 

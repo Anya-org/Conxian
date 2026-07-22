@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Generate testnet and mainnet deployment plans from simnet plan."""
 import argparse
+import hashlib
 from pathlib import Path
+import sys
 import tempfile
 
 try:
@@ -12,21 +14,15 @@ except ModuleNotFoundError as exc:
         "install it with: python3 -m pip install --user --disable-pip-version-check 'PyYAML==6.0.2'"
     ) from exc
 
-DEPLOYER = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
-TEST_HELPERS = {
-    "mock-circuit-breaker", "mock-csf-protocol",
-    "mock-proposal", "mock-regulatory-adapter", "mock-token",
-    "mock-compoundable-vault", "mock-admin-forwarder", "test-c4-helper",
-}
+from release_plan_validation import (
+    ReleasePlanValidationError,
+    dependency_ordered_batches,
+    load_clarinet_manifest,
+    validate_release_plan_files,
+    validate_simnet_source,
+)
 
-# Keep regeneration scoped to the existing full-system release set. These
-# simnet entries are useful locally but were not part of the checked-in
-# testnet/mainnet plans; promoting them is a separate deployment decision.
-RELEASE_PLAN_EXCLUSIONS = {
-    "integration-fee-trait", "integration-registry", "alex-reserve-pool",
-    "alex-swap-helper", "alex-adapter", "bns-stub", "math-lib-concentrated",
-    "oracle-adapter-stub", "integration-fee-collector",
-}
+DEPLOYER = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
 
 COST_TESTNET = 20000
 COST_MAINNET = 50000
@@ -86,6 +82,7 @@ GENERATED_PLAN_NAMES = (
     "full-system.testnet-plan.yaml",
     "full-system.mainnet-plan.yaml",
 )
+GENERATED_HASH_NAME = "full-system.mainnet-plan.sha256"
 
 
 def load_simnet_plan(path):
@@ -93,32 +90,26 @@ def load_simnet_plan(path):
         return yaml.safe_load(f)
 
 
-def extract_contracts(simnet):
-    """Extract contract-publish transactions, filtering out test helpers."""
-    contracts = []
-    seen = set()
-    for batch in simnet["plan"]["batches"]:
-        batch_contracts = []
-        for tx in batch["transactions"]:
-            if tx.get("transaction-type") != "emulated-contract-publish":
-                continue
-            name = tx["contract-name"]
-            if name in RELEASE_PLAN_EXCLUSIONS:
-                continue
-            if name in TEST_HELPERS:
-                continue
-            if name in seen:
-                print(f"WARNING: duplicate contract {name}, skipping")
-                continue
-            seen.add(name)
-            batch_contracts.append({
-                "contract-name": name,
-                "path": tx["path"],
-                "clarity-version": tx.get("clarity-version", 4),
-            })
-        if batch_contracts:
-            contracts.append(batch_contracts)
-    return contracts
+def extract_contracts(simnet, manifest, repo_root, path_label="default.simnet-plan.yaml"):
+    """Extract and dependency-order release contract-publish transactions."""
+    source_batches = validate_simnet_source(
+        simnet,
+        manifest,
+        repo_root,
+        path_label=path_label,
+    )
+    ordered_batches = dependency_ordered_batches(source_batches, manifest)
+    return [
+        [
+            {
+                "contract-name": entry.contract_name,
+                "path": entry.path,
+                "clarity-version": entry.clarity_version,
+            }
+            for entry in batch
+        ]
+        for batch in ordered_batches
+    ]
 
 
 def make_plan(contracts, network, name, stacks_node, cost):
@@ -170,10 +161,19 @@ def save_plan(plan, path):
                   width=120, allow_unicode=True)
 
 
+def save_mainnet_hash(plan_path, hash_path):
+    """Write the checked-in mainnet plan digest in its existing bare format."""
+    digest = hashlib.sha256(plan_path.read_bytes()).hexdigest()
+    hash_path.write_text(f"{digest}\n")
+
+
 def generate_plans(simnet_path, output_dir):
     """Generate the release plans into ``output_dir`` and return their paths."""
+    repo_root = Path(__file__).resolve().parent.parent
+    manifest_path = repo_root / "Clarinet.toml"
+    manifest = load_clarinet_manifest(manifest_path, repo_root)
     simnet = load_simnet_plan(simnet_path)
-    contracts = extract_contracts(simnet)
+    contracts = extract_contracts(simnet, manifest, repo_root, path_label=str(simnet_path))
 
     total = sum(len(b) for b in contracts)
     print(f"Extracted {total} production contracts in {len(contracts)} batches")
@@ -197,6 +197,20 @@ def generate_plans(simnet_path, output_dir):
     )
     mainnet_path = output_dir / GENERATED_PLAN_NAMES[1]
     save_plan(mainnet, mainnet_path)
+
+    hash_path = output_dir / GENERATED_HASH_NAME
+    save_mainnet_hash(mainnet_path, hash_path)
+
+    # This is intentionally part of generation, not only a separate test:
+    # every generated artifact must pass the same strict validator before it
+    # can be used by --check or copied into deployments/.
+    validate_release_plan_files(
+        testnet_path,
+        mainnet_path,
+        manifest_path,
+        repo_root,
+        yaml,
+    )
 
     return (testnet_path, mainnet_path)
 
@@ -230,6 +244,11 @@ def main():
                 if generated_path.read_bytes() != checked_in_path.read_bytes():
                     mismatches.append(name)
 
+            generated_hash_path = Path(temp_dir) / GENERATED_HASH_NAME
+            checked_in_hash_path = deployments_dir / GENERATED_HASH_NAME
+            if generated_hash_path.read_bytes() != checked_in_hash_path.read_bytes():
+                mismatches.append(GENERATED_HASH_NAME)
+
             if mismatches:
                 print("Generator drift detected in: " + ", ".join(mismatches))
                 return 1
@@ -240,9 +259,16 @@ def main():
     generated_paths = generate_plans(simnet_path, deployments_dir)
     for generated_path in generated_paths:
         print(f"Generated: {generated_path.relative_to(repo_root)}")
+    print(f"Generated: {(deployments_dir / GENERATED_HASH_NAME).relative_to(repo_root)}")
     print("Done!")
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except ReleasePlanValidationError as exc:
+        print("Release-plan validation failed:", file=sys.stderr)
+        for error in exc.errors:
+            print(f"- {error}", file=sys.stderr)
+        raise SystemExit(1)
