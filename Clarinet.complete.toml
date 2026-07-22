@@ -151,7 +151,7 @@ path = "contracts/compliance/travel-rule-service.clar"
 
 [contracts.compliance-manager]
 path = "contracts/compliance/compliance-manager.clar"
-depends_on = [ "block-utils",]
+depends_on = [ "block-utils", "kyc-registry",]
 
 [contracts.compliance-trait]
 path = "contracts/compliance/compliance-trait.clar"
@@ -515,7 +515,7 @@ path = "contracts/cross-chain/bridge-nft.clar"
 
 [contracts.enterprise-compliance-manager]
 path = "contracts/compliance/compliance-manager.clar"
-depends_on = [ "block-utils",]
+depends_on = [ "block-utils", "kyc-registry",]
 
 [contracts.position-factory]
 path = "contracts/position-factory.clar"

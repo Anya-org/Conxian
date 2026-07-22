@@ -114,7 +114,9 @@
       provider
         (begin
           (asserts! (get active provider) (err ERR_UNAUTHORIZED))
-          ;; Call compliance-manager to update status.
+          ;; This compatibility hook records the KYC tier and deliberately
+          ;; writes sanctions-checked=false; the registration gate uses the
+          ;; authoritative kyc-registry record for sanction status instead.
           (try! (contract-call? .compliance-manager check-user-compliance user false kyc-level false))
           (print {
             event: "kyc-verified",
@@ -125,7 +127,8 @@
           })
           (ok true)
         )
-      (err ERR_UNAUTHORIZED))
+      (err ERR_UNAUTHORIZED)
+    )
   )
 )
 
