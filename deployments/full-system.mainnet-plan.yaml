@@ -128,6 +128,14 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
+        contract-name: compoundable-vault-trait
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/traits/compoundable-vault-trait.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
         contract-name: auto-compounder
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000

@@ -1,5 +1,26 @@
 # Documentation State
 
+## Current Session (37) - Yield Infrastructure Final Review (Issue #506)
+
+{
+  "status": "IMPLEMENTED_LOCALLY",
+  "session_timestamp": "2026-07-22",
+  "scope": "Completed the final pre-push review for the two Issue #506 production contracts: CXD staking and trait-driven auto-compounding.",
+  "completed_production_contracts": [
+    "contracts/yield/cxd-staking.clar",
+    "contracts/yield/auto-compounder.clar"
+  ],
+  "design_and_security_choices": "cxd-staking is published in the mainnet manifest after cxd-token and regulatory-adapter; get-staking-stats now returns a response and propagates reward-accumulator arithmetic errors instead of returning stale state; MAX_REWARD_RATE and cooldown bounds are exercised through public APIs; auto-compounder's documented ERR_REENTRANT guard remains in place.",
+  "validation": {
+    "targeted_tests": "PASS: bash scripts/run-tests.sh tests/yield/cxd-staking.test.ts tests/yield/auto-compounder.test.ts (2 files, 23 tests; 8 known benign Clarinet SDK warnings, 0 new errors)",
+    "compile_initialization": "PASS: bash scripts/run-tests.sh tests/check-compile.test.ts (1 test; 4 known benign Clarinet SDK warnings, 0 new errors)",
+    "release_metadata_and_hygiene": "PASS: release metadata tests (6 tests), generator --check, YAML/order/helper-exclusion checks, git diff --check, and contamination guard",
+    "native_clarinet": "BLOCKED: the direct Clarinet binary is not installed in the workspace; Clarinet SDK initialization and the compile test pass",
+    "callback_fixture": "Not added: the known direct callback fixture would create the existing Clarinet dependency cycle; the production reentrancy constraint remains documented and enforced."
+  },
+  "source_control": "Branch: charlie/issue-506-yield-infrastructure. Prior commits: 62aac1a4, 925a4f51, 431d53c9, plus one final fixup commit for this session. PR: pending and not opened in this session."
+}
+
 ## Current Session (36) - Integration Fee Settlement (Issue #497)
 
 {

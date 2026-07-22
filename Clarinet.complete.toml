@@ -129,6 +129,10 @@ path = "contracts/yield/cross-protocol-integrator.clar"
 [contracts.vault-traits]
 path = "contracts/traits/vault-traits.clar"
 
+[contracts.compoundable-vault-trait]
+path = "contracts/traits/compoundable-vault-trait.clar"
+clarity-version = 4
+
 [contracts.enhanced-yield-strategy]
 path = "contracts/yield/enhanced-yield-strategy.clar"
 
@@ -572,6 +576,8 @@ depends_on = [ "regulatory-adapter",]
 
 [contracts.auto-compounder]
 path = "contracts/yield/auto-compounder.clar"
+clarity-version = 4
+depends_on = ["compoundable-vault-trait"]
 
 [contracts.yield-aggregator]
 path = "contracts/vaults/yield-aggregator.clar"
@@ -702,7 +708,7 @@ path = "contracts/core/ops-engine.clar"
 
 [contracts.cxd-staking]
 path = "contracts/yield/cxd-staking.clar"
-depends_on = [ "regulatory-adapter",]
+depends_on = [ "core-traits", "cxd-token", "regulatory-adapter", "sip-standards",]
 
 [contracts.operational-treasury]
 path = "contracts/core/operational-treasury.clar"
