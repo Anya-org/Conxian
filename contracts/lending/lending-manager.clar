@@ -22,11 +22,13 @@
 (define-constant ERR_PROTOCOL_FEE_CALLBACK_RECIPIENT u5013)
 (define-constant ERR_PROTOCOL_FEE_CALLBACK_ASSET u5014)
 (define-constant ERR_PROTOCOL_FEE_CALLBACK_AMOUNT u5015)
-(define-constant ERR_PROTOCOL_FEE_CALLBACK_BLOCK u5016)
 (define-constant ERR_PROTOCOL_FEE_SETTLEMENT u5017)
 (define-constant ERR_PROTOCOL_FEE_OVERDRAW u5018)
 (define-constant ERR_PROTOCOL_FEE_NONCE_OVERFLOW u5019)
 (define-constant ERR_PROTOCOL_FEE_UNSUPPORTED_ASSET u5020)
+(define-constant ERR_PROTOCOL_FEE_ARITHMETIC_OVERFLOW u5021)
+(define-constant ERR_PROTOCOL_FEE_STREAM_INVALID u5022)
+(define-constant ERR_PROTOCOL_FEE_STREAM_ALREADY_SET u5023)
 
 (define-constant COLLATERAL_FACTOR u7500)      ;; Default: 75%
 (define-constant LIQUIDATION_THRESHOLD u8000)   ;; Default: 80%
@@ -74,8 +76,7 @@
   stream-id: uint,
   asset: principal,
   expected-amount: uint,
-  recipient: principal,
-  created-at: uint
+  recipient: principal
 })
 
 ;; --- Internal Helpers ---
@@ -84,6 +85,14 @@
   (if (> left (- MAX_UINT right))
     none
     (some (+ left right)))
+)
+
+(define-private (safe-multiply (left uint) (right uint))
+  (if (or (is-eq left u0) (is-eq right u0))
+    (some u0)
+    (if (> left (/ MAX_UINT right))
+      none
+      (some (* left right))))
 )
 
 (define-private (derive-protocol-fee-settlement-id (nonce uint))
@@ -171,7 +180,8 @@
     (source-principal (contract-of source))
     (manager-principal (as-contract tx-sender))
     (reserve (unwrap! (map-get? reserve-data asset) (err ERR_NOT_FOUND)))
-    (interest-portion (/ (* amount RESERVE_FACTOR) u10000))
+    (interest-numerator (unwrap! (safe-multiply amount RESERVE_FACTOR) (err ERR_PROTOCOL_FEE_ARITHMETIC_OVERFLOW)))
+    (interest-portion (/ interest-numerator u10000))
     (principal-portion (if (>= amount interest-portion) (- amount interest-portion) u0))
     (current-borrows (get total-borrows reserve))
     (user-borrows (default-to u0 (map-get? borrows { asset: asset, user: tx-sender })))
@@ -211,8 +221,7 @@
                   stream-id: stream-id,
                   asset: asset,
                   expected-amount: expected-amount,
-                  recipient: .protocol-fee-collector,
-                  created-at: block-height
+                  recipient: .protocol-fee-collector
                 })
                 (var-set protocol-fee-nonce next-nonce)
                 (let ((settled-fee (try! (contract-call? .protocol-fee-collector
@@ -276,7 +285,7 @@
 
 ;; The callback is the only manager path that can consume the pending source
 ;; debit. It authenticates the collector, fixed recipient, exact token, exact
-;; amount, and same-transaction block before spending manager custody. A zero
+;; amount before spending manager custody. A zero
 ;; assessed amount consumes the pending record without attempting a zero-value
 ;; token transfer.
 (define-public (prepay-ft-fee
@@ -291,7 +300,6 @@
         (begin
           (asserts! (is-eq asset (get asset pending)) (err ERR_PROTOCOL_FEE_CALLBACK_ASSET))
           (asserts! (is-eq amount (get expected-amount pending)) (err ERR_PROTOCOL_FEE_CALLBACK_AMOUNT))
-          (asserts! (is-eq block-height (get created-at pending)) (err ERR_PROTOCOL_FEE_CALLBACK_BLOCK))
           (if (> amount u0)
             (try! (as-contract (contract-call? token transfer amount tx-sender recipient none)))
             true)
@@ -395,6 +403,10 @@
   (some (default-to u0 (map-get? deposits { asset: asset, user: user })))
 )
 
+(define-read-only (get-user-borrow-balance (user principal) (asset principal))
+  (some (default-to u0 (map-get? borrows { asset: asset, user: user })))
+)
+
 ;; @desc Returns total deposits for a specific asset.
 ;; @param asset: The asset principal.
 ;; @returns (response uint uint)
@@ -455,29 +467,44 @@
   )
 )
 
-;; @desc Maps one supported lending asset to its canonical collector stream.
+;; @desc Maps one supported lending asset to its canonical collector stream once.
 ;; @param asset: The SIP-010 token principal.
-;; @param stream-id: The immutable stream registered for this source/asset.
+;; @param stream-id: The active FT stream registered for `.lending-manager` and
+;; the same asset in the canonical collector.
 (define-public (set-protocol-fee-stream (asset principal) (stream-id uint))
   (begin
     (asserts! (is-eq contract-caller (var-get admin)) (err ERR_UNAUTHORIZED))
     (asserts! (> stream-id u0) (err ERR_INVALID_AMOUNT))
-    (map-set protocol-fee-streams asset stream-id)
-    (ok stream-id)
-  )
-)
-
-;; @desc Removes an asset mapping so repayments fail closed until reconfigured.
-(define-public (clear-protocol-fee-stream (asset principal))
-  (begin
-    (asserts! (is-eq contract-caller (var-get admin)) (err ERR_UNAUTHORIZED))
-    (map-delete protocol-fee-streams asset)
-    (ok true)
+    (asserts! (is-none (map-get? protocol-fee-streams asset)) (err ERR_PROTOCOL_FEE_STREAM_ALREADY_SET))
+    (let ((config-opt (unwrap! (contract-call? .protocol-fee-collector
+        get-stream-config
+        .lending-manager
+        stream-id
+        u1
+        (some asset)) (err ERR_PROTOCOL_FEE_STREAM_INVALID))))
+      (let ((config (unwrap! config-opt (err ERR_PROTOCOL_FEE_STREAM_INVALID))))
+        (begin
+          ;; The source principal is fixed in the read-only query above; the
+          ;; remaining checks protect this binding if the collector API grows
+          ;; additional stream kinds or activation states.
+          (asserts! (is-eq (get asset-kind config) u1) (err ERR_PROTOCOL_FEE_STREAM_INVALID))
+          (asserts! (is-eq (get asset config) (some asset)) (err ERR_PROTOCOL_FEE_STREAM_INVALID))
+          (asserts! (get active config) (err ERR_PROTOCOL_FEE_STREAM_INVALID))
+          (asserts! (is-eq (get route config) u1) (err ERR_PROTOCOL_FEE_STREAM_INVALID))
+          (map-set protocol-fee-streams asset stream-id)
+          (ok stream-id)
+        )
+      )
+    )
   )
 )
 
 (define-read-only (get-protocol-fee-stream (asset principal))
   (ok (map-get? protocol-fee-streams asset))
+)
+
+(define-read-only (get-protocol-fee-nonce)
+  (ok (var-get protocol-fee-nonce))
 )
 
 (define-read-only (get-pending-protocol-fee (payer principal))

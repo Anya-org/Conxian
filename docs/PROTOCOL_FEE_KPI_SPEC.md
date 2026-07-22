@@ -49,22 +49,26 @@ The following rules prevent double counting:
 ### 1.1.1 Source-custody settlement contract
 
 The source-custody API preserves the same eligible-base and scheduled-rate
-policy while changing who supplies the assessed fee. A source must first call
-`preview-source-ft` or `preview-source-stx` for its registered source/stream/
-asset, store a short-lived pending record containing the exact assessed amount,
-and then call `settle-source-ft` or `settle-source-stx`. The collector
-recomputes the preview and passes only the computed amount and fixed
-`.protocol-fee-collector` recipient to the source callback.
+policy while changing who supplies the assessed fee. A source's single atomic
+entrypoint must call `preview-source-ft` or `preview-source-stx`, store a
+private pending record containing the exact assessed amount, and immediately
+call `settle-source-ft` or `settle-source-stx` in the same call stack. The
+collector recomputes the preview and passes only the computed amount and fixed
+`.protocol-fee-collector` recipient to the source callback. A separate public
+prepare-then-consume flow is not an accepted implementation pattern, and a
+`block-height` equality is not evidence that state was created in the same
+transaction.
 
 The callback authenticates the collector, fixed recipient, exact token (for
-FT), exact amount, and same-transaction pending record. The collector proves
-source custody with an exact live-balance delta around the callback: the
-collector balance must increase by exactly `assessed_native`. Underpay,
-overpay, no-transfer, wrong-destination, callback, replay, transfer, or
-accounting failure reverts the whole transaction. A zero-assessed settlement
-does not attempt a zero-value transfer, but it still records the base, residual,
-and accounting row and consumes the authenticated pending record. Existing
-untracked excess remains outside collected-fee totals.
+FT), exact amount, and the source's private pending record. The collector
+authenticates the source/callback relationship and proves source custody with
+an exact live-balance delta around the callback: the collector balance must
+increase by exactly `assessed_native`. Underpay, overpay, no-transfer,
+wrong-destination, callback, replay, transfer, or accounting failure reverts
+the whole transaction. A zero-assessed settlement does not attempt a
+zero-value transfer, but it still records the base, residual, and accounting
+row and consumes the authenticated pending record. Existing untracked excess
+remains outside collected-fee totals.
 
 The approved lending migration uses this API only for the interest component
 `floor(amount * 1000 / 10000)`. The fee replaces the legacy 1% full-repayment

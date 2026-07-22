@@ -39,8 +39,7 @@ The primary engine for money market operations.
 | `get-protocol-tvl` | `(get-protocol-tvl)` | Returns total value locked across all assets. |
 | `calculate-account-health` | `(calculate-account-health (user principal))` | Returns the current health factor for a user. |
 | `configure-asset-collateral` | `(configure-asset-collateral (asset principal) (collateral-factor uint) (liquidation-threshold uint))` | Configures risk and collateral parameters for a specific asset. |
-| `set-protocol-fee-stream` | `(set-protocol-fee-stream (asset principal) (stream-id uint))` | Admin-only mapping from a lending asset to its registered collector stream; repayments fail closed without it. |
-| `clear-protocol-fee-stream` | `(clear-protocol-fee-stream (asset principal))` | Removes the asset mapping and disables protocol-fee settlement for that asset until reconfigured. |
+| `set-protocol-fee-stream` | `(set-protocol-fee-stream (asset principal) (stream-id uint))` | Admin-only, write-once mapping from a lending asset to an active collector FT stream whose source, asset, and route are validated before binding. Repayments fail closed without it. |
 
 For `repay`, the canonical eligible base is exactly
 `interest-portion = floor(amount * 1000 / 10000)`. The scheduled collector rate
@@ -51,7 +50,12 @@ callback, and credits `total-reserves` with
 `interest-portion - protocol-fee`. Principal is never included in the fee base.
 Each repayment uses a manager-local monotonic nonce hashed to a fixed
 `(buff 32)` settlement ID; the caller cannot provide the debit or choose an
-unmapped stream.
+unmapped stream. Stream bindings are write-once so residual and accounting
+namespaces cannot be reset by reconfiguration. The manager creates its pending
+source debit privately and immediately invokes the collector in the same call
+stack; a `block-height` equality is not treated as proof of same-transaction
+state. The collector authenticates the source, callback, fixed recipient, and
+exact custody delta, while each source owns the atomicity of its pending record.
 
 ### `interest-rate-model.clar`
 

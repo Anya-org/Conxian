@@ -9,6 +9,39 @@ describe('lending-orchestrator', () => {
   let managerPrincipal: string;
   let mockTokenPrincipal: string;
 
+  const MAX_UINT = 340282366920938463463374607431768211455n;
+  const ERR_PROTOCOL_FEE_ARITHMETIC_OVERFLOW = 5021;
+  const ERR_PROTOCOL_FEE_STREAM_INVALID = 5022;
+  const ERR_PROTOCOL_FEE_STREAM_ALREADY_SET = 5023;
+
+  const tokenBalance = (token: string, principal: string): bigint => {
+    const result: any = simnet.callReadOnlyFn(
+      token,
+      'get-balance',
+      [Cl.principal(principal)],
+      deployer,
+    ).result;
+    expect(result.type).toBe('ok');
+    return BigInt(result.value.value);
+  };
+
+  const optionalTuple = (contract: string, functionName: string, args: any[]): any | null => {
+    const result: any = simnet.callReadOnlyFn(contract, functionName, args, deployer).result;
+    expect(result.type).toBe('ok');
+    if (result.value.type === 'none') return null;
+    expect(result.value.type).toBe('some');
+    return result.value.value.value;
+  };
+
+  const printEvent = (receipt: any, eventName: string): any => {
+    const event = receipt.events.find((candidate: any) =>
+      candidate.event === 'print_event'
+      && candidate.data?.value?.value?.event?.value === eventName,
+    );
+    expect(event).toBeDefined();
+    return event.data.value;
+  };
+
   beforeAll(async () => {
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
@@ -33,16 +66,82 @@ describe('lending-orchestrator', () => {
     );
     simnet.callPublicFn(
       'protocol-fee-collector',
+      'set-authorized-source',
+      [Cl.principal(wallet1), Cl.bool(true)],
+      deployer,
+    );
+    simnet.callPublicFn(
+      'protocol-fee-collector',
+      'register-ft-stream',
+      [Cl.principal(wallet1), Cl.uint(70), Cl.principal(mockTokenPrincipal), Cl.uint(1)],
+      deployer,
+    );
+    simnet.callPublicFn(
+      'protocol-fee-collector',
+      'register-ft-stream',
+      [Cl.principal(managerPrincipal), Cl.uint(71), Cl.principal(`${deployer}.cxvg-token`), Cl.uint(1)],
+      deployer,
+    );
+    simnet.callPublicFn(
+      'protocol-fee-collector',
+      'register-ft-stream',
+      [Cl.principal(managerPrincipal), Cl.uint(72), Cl.principal(mockTokenPrincipal), Cl.uint(1)],
+      deployer,
+    );
+    simnet.callPublicFn(
+      'protocol-fee-collector',
+      'set-stream-active',
+      [Cl.principal(managerPrincipal), Cl.uint(72), Cl.uint(1), Cl.some(Cl.principal(mockTokenPrincipal)), Cl.bool(false)],
+      deployer,
+    );
+    simnet.callPublicFn(
+      'protocol-fee-collector',
       'register-ft-stream',
       [Cl.principal(managerPrincipal), Cl.uint(77), Cl.principal(mockTokenPrincipal), Cl.uint(1)],
       deployer,
     );
-    simnet.callPublicFn(
+    expect(simnet.callPublicFn(
+      'lending-manager',
+      'set-protocol-fee-stream',
+      [Cl.principal(mockTokenPrincipal), Cl.uint(0)],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(1004)));
+    expect(simnet.callPublicFn(
+      'lending-manager',
+      'set-protocol-fee-stream',
+      [Cl.principal(mockTokenPrincipal), Cl.uint(999)],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_PROTOCOL_FEE_STREAM_INVALID)));
+    expect(simnet.callPublicFn(
+      'lending-manager',
+      'set-protocol-fee-stream',
+      [Cl.principal(mockTokenPrincipal), Cl.uint(70)],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_PROTOCOL_FEE_STREAM_INVALID)));
+    expect(simnet.callPublicFn(
+      'lending-manager',
+      'set-protocol-fee-stream',
+      [Cl.principal(mockTokenPrincipal), Cl.uint(71)],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_PROTOCOL_FEE_STREAM_INVALID)));
+    expect(simnet.callPublicFn(
+      'lending-manager',
+      'set-protocol-fee-stream',
+      [Cl.principal(mockTokenPrincipal), Cl.uint(72)],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_PROTOCOL_FEE_STREAM_INVALID)));
+    expect(simnet.callPublicFn(
       'lending-manager',
       'set-protocol-fee-stream',
       [Cl.principal(mockTokenPrincipal), Cl.uint(77)],
       deployer,
-    );
+    ).result).toEqual(Cl.ok(Cl.uint(77)));
+    expect(simnet.callReadOnlyFn(
+      'lending-manager',
+      'get-protocol-fee-stream',
+      [Cl.principal(mockTokenPrincipal)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.some(Cl.uint(77))));
   });
 
   it('should deposit assets successfully', async () => {
@@ -96,6 +195,7 @@ describe('lending-orchestrator', () => {
 
   it('charges the launch schedule on interest only and credits net reserves', async () => {
     const asset = Cl.contractPrincipal(deployer, 'mock-token');
+    const collectorPrincipal = `${deployer}.protocol-fee-collector`;
     const beforeLoan: any = simnet.callReadOnlyFn('lending-manager', 'get-reserve-data', [asset], deployer).result;
     expect(beforeLoan.type).toBe('some');
 
@@ -113,6 +213,16 @@ describe('lending-orchestrator', () => {
     ).result;
     expect(managerBeforeResult.type).toBe('ok');
     const managerBefore = BigInt(managerBeforeResult.value.value);
+    const userBefore = tokenBalance('mock-token', wallet2);
+    const collectorBefore = tokenBalance('mock-token', collectorPrincipal);
+    const nonceBefore: any = simnet.callReadOnlyFn('lending-manager', 'get-protocol-fee-nonce', [], deployer).result;
+    const pendingBefore: any = simnet.callReadOnlyFn(
+      'lending-manager',
+      'get-pending-protocol-fee',
+      [Cl.principal(wallet2)],
+      deployer,
+    ).result;
+    expect(pendingBefore).toEqual(Cl.ok(Cl.none()));
     const revenueBefore: any = simnet.callReadOnlyFn(
       'mock-token',
       'get-balance',
@@ -128,14 +238,33 @@ describe('lending-orchestrator', () => {
     ).result;
     expect(accountingBefore.type).toBe('ok');
     expect(accountingBefore.value.type).toBe('some');
+    const assetAccountingBefore = optionalTuple(
+      'protocol-fee-collector',
+      'get-asset-accounting',
+      [Cl.uint(1), Cl.some(Cl.principal(mockTokenPrincipal))],
+    );
+    const totalSettlementsBefore: any = simnet.callReadOnlyFn(
+      'protocol-fee-collector',
+      'get-total-settlements',
+      [],
+      deployer,
+    ).result;
+    const collectedBefore: any = simnet.callReadOnlyFn(
+      'protocol-fee-collector',
+      'get-collected-ft',
+      [Cl.principal(mockTokenPrincipal)],
+      deployer,
+    ).result;
 
-    const { result } = await simnet.callPublicFn(
+    const receipt: any = await simnet.callPublicFn(
       'lending-manager',
       'repay',
       [asset, Cl.uint(1000), Cl.contractPrincipal(deployer, 'lending-manager')],
       wallet2,
     );
-    expect(result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(receipt.result).toEqual(Cl.ok(Cl.bool(true)));
+    const feeEvent: any = printEvent(receipt, 'protocol-fee-collected');
+    const settlementId = feeEvent.value['settlement-id'];
 
     const after: any = simnet.callReadOnlyFn('lending-manager', 'get-reserve-data', [asset], deployer).result;
     expect(after.type).toBe('some');
@@ -143,6 +272,8 @@ describe('lending-orchestrator', () => {
     const beforeRepayData: any = beforeRepay.value.value;
     expect(BigInt(afterData['total-reserves'].value) - BigInt(beforeRepayData['total-reserves'].value)).toBe(98n);
     expect(BigInt(beforeRepayData['total-borrows'].value) - BigInt(afterData['total-borrows'].value)).toBe(900n);
+    expect(tokenBalance('mock-token', wallet2)).toBe(userBefore - 1000n);
+    expect(tokenBalance('mock-token', collectorPrincipal)).toBe(collectorBefore + 2n);
 
     const managerAfterResult: any = simnet.callReadOnlyFn(
       'mock-token',
@@ -160,6 +291,14 @@ describe('lending-orchestrator', () => {
       deployer,
     ).result;
     expect(revenueAfter).toEqual(revenueBefore);
+    expect(simnet.callReadOnlyFn('lending-manager', 'get-protocol-fee-nonce', [], deployer).result)
+      .toEqual(Cl.ok(Cl.uint(BigInt(nonceBefore.value.value) + 1n)));
+    expect(simnet.callReadOnlyFn(
+      'lending-manager',
+      'get-pending-protocol-fee',
+      [Cl.principal(wallet2)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.none()));
 
     const collectorAccounting: any = simnet.callReadOnlyFn(
       'protocol-fee-collector',
@@ -176,48 +315,174 @@ describe('lending-orchestrator', () => {
     expect(collectorAccounting.value.type).toBe('some');
     expect(BigInt(collectorAccounting.value.value.value['eligible-base'].value) - BigInt(accountingBefore.value.value.value['eligible-base'].value)).toBe(100n);
     expect(BigInt(collectorAccounting.value.value.value['assessed-fees'].value) - BigInt(accountingBefore.value.value.value['assessed-fees'].value)).toBe(2n);
+
+    const settlement = optionalTuple(
+      'protocol-fee-collector',
+      'get-settlement',
+      [Cl.principal(managerPrincipal), settlementId],
+    );
+    expect(settlement?.source).toEqual(Cl.principal(managerPrincipal));
+    expect(settlement?.['stream-id']).toEqual(Cl.uint(77));
+    expect(settlement?.['asset-kind']).toEqual(Cl.uint(1));
+    expect(settlement?.asset).toEqual(Cl.some(Cl.principal(mockTokenPrincipal)));
+    expect(settlement?.payer).toEqual(Cl.principal(wallet2));
+    expect(settlement?.['eligible-base']).toEqual(Cl.uint(100));
+    expect(settlement?.['assessed-amount']).toEqual(Cl.uint(2));
+    expect(settlement?.['settled-amount']).toEqual(Cl.uint(2));
+    expect(settlement?.recipient).toEqual(Cl.principal(collectorPrincipal));
+    expect(simnet.callReadOnlyFn(
+      'protocol-fee-collector',
+      'get-total-settlements',
+      [],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.uint(BigInt(totalSettlementsBefore.value.value) + 1n)));
+    expect(simnet.callReadOnlyFn(
+      'protocol-fee-collector',
+      'get-collected-ft',
+      [Cl.principal(mockTokenPrincipal)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.uint(BigInt(collectedBefore.value.value) + 2n)));
+    const assetAccountingAfter = optionalTuple(
+      'protocol-fee-collector',
+      'get-asset-accounting',
+      [Cl.uint(1), Cl.some(Cl.principal(mockTokenPrincipal))],
+    );
+    expect(BigInt(assetAccountingAfter?.['collected-fees'].value)
+      - BigInt(assetAccountingBefore?.['collected-fees'].value)).toBe(2n);
+    expect(assetAccountingAfter?.['routed-fees']).toEqual(assetAccountingBefore?.['routed-fees']);
   });
 
-  it('fails closed when the asset stream mapping is absent or mismatched', async () => {
+  it('rejects near-MAX repayment arithmetic without changing debt, custody, or fee state', async () => {
     const asset = Cl.contractPrincipal(deployer, 'mock-token');
     const source = Cl.contractPrincipal(deployer, 'lending-manager');
-    const beforeUser: any = simnet.callReadOnlyFn('mock-token', 'get-balance', [Cl.principal(wallet1)], deployer).result;
-    const beforeManager: any = simnet.callReadOnlyFn('mock-token', 'get-balance', [Cl.principal(managerPrincipal)], deployer).result;
-    expect(beforeUser.type).toBe('ok');
-    expect(beforeManager.type).toBe('ok');
+    const reserveBefore: any = simnet.callReadOnlyFn('lending-manager', 'get-reserve-data', [asset], deployer).result;
+    const borrowBefore: any = simnet.callReadOnlyFn(
+      'lending-manager',
+      'get-user-borrow-balance',
+      [Cl.principal(wallet2), Cl.principal(mockTokenPrincipal)],
+      deployer,
+    ).result;
+    const userBefore = tokenBalance('mock-token', wallet2);
+    const managerBefore = tokenBalance('mock-token', managerPrincipal);
+    const collectorBefore = tokenBalance('mock-token', `${deployer}.protocol-fee-collector`);
+    const nonceBefore: any = simnet.callReadOnlyFn('lending-manager', 'get-protocol-fee-nonce', [], deployer).result;
+    const pendingBefore: any = simnet.callReadOnlyFn(
+      'lending-manager',
+      'get-pending-protocol-fee',
+      [Cl.principal(wallet2)],
+      deployer,
+    ).result;
+    const accountingBefore: any = simnet.callReadOnlyFn(
+      'protocol-fee-collector',
+      'get-accounting',
+      [Cl.principal(managerPrincipal), Cl.uint(77), Cl.uint(1), Cl.some(Cl.principal(mockTokenPrincipal))],
+      deployer,
+    ).result;
+    const assetAccountingBefore: any = simnet.callReadOnlyFn(
+      'protocol-fee-collector',
+      'get-asset-accounting',
+      [Cl.uint(1), Cl.some(Cl.principal(mockTokenPrincipal))],
+      deployer,
+    ).result;
+    const totalSettlementsBefore: any = simnet.callReadOnlyFn(
+      'protocol-fee-collector',
+      'get-total-settlements',
+      [],
+      deployer,
+    ).result;
 
-    expect(simnet.callPublicFn('lending-manager', 'clear-protocol-fee-stream', [Cl.principal(mockTokenPrincipal)], deployer).result)
-      .toEqual(Cl.ok(Cl.bool(true)));
-    const missing = await simnet.callPublicFn(
+    const failed = await simnet.callPublicFn(
       'lending-manager',
       'repay',
-      [asset, Cl.uint(1000), source],
-      wallet1,
+      [asset, Cl.uint(MAX_UINT), source],
+      wallet2,
     );
-    expect(missing.result).toEqual(Cl.error(Cl.uint(5010)));
-
-    expect(simnet.callPublicFn(
+    expect(failed.result).toEqual(Cl.error(Cl.uint(ERR_PROTOCOL_FEE_ARITHMETIC_OVERFLOW)));
+    expect(simnet.callReadOnlyFn('lending-manager', 'get-reserve-data', [asset], deployer).result)
+      .toEqual(reserveBefore);
+    expect(simnet.callReadOnlyFn(
+      'lending-manager',
+      'get-user-borrow-balance',
+      [Cl.principal(wallet2), Cl.principal(mockTokenPrincipal)],
+      deployer,
+    ).result).toEqual(borrowBefore);
+    expect(tokenBalance('mock-token', wallet2)).toBe(userBefore);
+    expect(tokenBalance('mock-token', managerPrincipal)).toBe(managerBefore);
+    expect(tokenBalance('mock-token', `${deployer}.protocol-fee-collector`)).toBe(collectorBefore);
+    expect(simnet.callReadOnlyFn('lending-manager', 'get-protocol-fee-nonce', [], deployer).result)
+      .toEqual(nonceBefore);
+    expect(simnet.callReadOnlyFn(
+      'lending-manager',
+      'get-pending-protocol-fee',
+      [Cl.principal(wallet2)],
+      deployer,
+    ).result).toEqual(pendingBefore);
+    expect(simnet.callReadOnlyFn(
       'protocol-fee-collector',
-      'register-ft-stream',
-      [Cl.principal(managerPrincipal), Cl.uint(78), Cl.principal(`${deployer}.cxvg-token`), Cl.uint(1)],
+      'get-accounting',
+      [Cl.principal(managerPrincipal), Cl.uint(77), Cl.uint(1), Cl.some(Cl.principal(mockTokenPrincipal))],
+      deployer,
+    ).result).toEqual(accountingBefore);
+    expect(simnet.callReadOnlyFn(
+      'protocol-fee-collector',
+      'get-asset-accounting',
+      [Cl.uint(1), Cl.some(Cl.principal(mockTokenPrincipal))],
+      deployer,
+    ).result).toEqual(assetAccountingBefore);
+    expect(simnet.callReadOnlyFn('protocol-fee-collector', 'get-total-settlements', [], deployer).result)
+      .toEqual(totalSettlementsBefore);
+  });
+
+  it('fails closed for invalid stream bindings, missing mappings, and rebinding attempts', async () => {
+    const asset = Cl.contractPrincipal(deployer, 'cxvg-token');
+    const source = Cl.contractPrincipal(deployer, 'lending-manager');
+    expect(simnet.callPublicFn(
+      'lending-manager',
+      'configure-asset-collateral',
+      [asset, Cl.uint(7500), Cl.uint(8000)],
       deployer,
     ).result).toEqual(Cl.ok(Cl.bool(true)));
-    expect(simnet.callPublicFn('lending-manager', 'set-protocol-fee-stream', [Cl.principal(mockTokenPrincipal), Cl.uint(78)], deployer).result)
-      .toEqual(Cl.ok(Cl.uint(78)));
-    const mismatched = await simnet.callPublicFn(
+    expect(simnet.callPublicFn(
+      'cxvg-token',
+      'mint',
+      [Cl.uint(1000), Cl.principal(wallet1)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+
+    const beforeUser = tokenBalance('cxvg-token', wallet1);
+    const beforeManager = tokenBalance('cxvg-token', managerPrincipal);
+    const beforeReserve: any = simnet.callReadOnlyFn('lending-manager', 'get-reserve-data', [asset], deployer).result;
+    const beforeNonce: any = simnet.callReadOnlyFn('lending-manager', 'get-protocol-fee-nonce', [], deployer).result;
+    const beforePending: any = simnet.callReadOnlyFn(
+      'lending-manager',
+      'get-pending-protocol-fee',
+      [Cl.principal(wallet1)],
+      deployer,
+    ).result;
+    expect(simnet.callPublicFn(
       'lending-manager',
       'repay',
       [asset, Cl.uint(1000), source],
       wallet1,
-    );
-    expect(mismatched.result.type).toBe('err');
-
-    const afterUser: any = simnet.callReadOnlyFn('mock-token', 'get-balance', [Cl.principal(wallet1)], deployer).result;
-    const afterManager: any = simnet.callReadOnlyFn('mock-token', 'get-balance', [Cl.principal(managerPrincipal)], deployer).result;
-    expect(afterUser).toEqual(beforeUser);
-    expect(afterManager).toEqual(beforeManager);
-    expect(simnet.callPublicFn('lending-manager', 'set-protocol-fee-stream', [Cl.principal(mockTokenPrincipal), Cl.uint(77)], deployer).result)
-      .toEqual(Cl.ok(Cl.uint(77)));
+    ).result).toEqual(Cl.error(Cl.uint(5010)));
+    expect(tokenBalance('cxvg-token', wallet1)).toBe(beforeUser);
+    expect(tokenBalance('cxvg-token', managerPrincipal)).toBe(beforeManager);
+    expect(simnet.callReadOnlyFn('lending-manager', 'get-reserve-data', [asset], deployer).result)
+      .toEqual(beforeReserve);
+    expect(simnet.callReadOnlyFn('lending-manager', 'get-protocol-fee-nonce', [], deployer).result)
+      .toEqual(beforeNonce);
+    expect(simnet.callReadOnlyFn(
+      'lending-manager',
+      'get-pending-protocol-fee',
+      [Cl.principal(wallet1)],
+      deployer,
+    ).result).toEqual(beforePending);
+    expect(simnet.callPublicFn(
+      'lending-manager',
+      'set-protocol-fee-stream',
+      [Cl.principal(mockTokenPrincipal), Cl.uint(78)],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_PROTOCOL_FEE_STREAM_ALREADY_SET)));
   });
 
   describe('Multi-Asset Collateral Risk Configuration and Health Calculations', () => {

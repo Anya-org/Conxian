@@ -68,20 +68,23 @@ cannot be erased by reconfiguration.
 
 ### Phase-2 source-custody settlement
 
-Source custody is a callback protocol, not a second fee calculator. Before
-calling `settle-source-ft` or `settle-source-stx`, the source derives the same
-read-only preview and stores a short-lived pending debit keyed by the current
-transaction payer. The collector authenticates the immediate source caller,
-recomputes the preview, and passes only the assessed amount plus the fixed
-collector recipient to the source callback. The callback must authenticate the
-collector, recipient, asset, amount, and same-transaction pending record before
-transferring. The collector measures its live balance before and after the
-callback and requires an exact delta equal to the assessed amount; underpay,
-overpay, wrong-destination, no-transfer, callback, transfer, replay, or
-accounting failures roll back the complete settlement. A zero-assessed
-settlement skips the token/STX transfer but still consumes the authenticated
-pending record and records residual/accounting state. Any pre-existing
-untracked collector excess is not counted as a settlement.
+Source custody is a callback protocol, not a second fee calculator. A source's
+single atomic entrypoint derives the same read-only preview, stores a private
+pending debit keyed by the current transaction payer, and immediately calls
+`settle-source-ft` or `settle-source-stx` in the same call stack. A separate
+externally callable prepare-then-consume flow is not a valid source pattern,
+and a `block-height` equality is not proof of same-transaction state. The
+collector authenticates the immediate source caller, recomputes the preview,
+and passes only the assessed amount plus the fixed collector recipient to the
+source callback. The callback must authenticate the collector, recipient,
+asset, amount, and its private pending record before transferring. The
+collector measures its live balance before and after the callback and requires
+an exact delta equal to the assessed amount; underpay, overpay,
+wrong-destination, no-transfer, callback, transfer, replay, or accounting
+failures roll back the complete settlement. A zero-assessed settlement skips
+the token/STX transfer but still consumes the authenticated pending record and
+records residual/accounting state. Any pre-existing untracked collector excess
+is not counted as a settlement.
 
 Authority is deliberately split. Configuration functions (`set-authorized-source`,
 stream registration/activation, activation height, and governance assignment)

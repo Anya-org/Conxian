@@ -42,6 +42,7 @@
 (define-constant ERR_ASSET_BALANCE_READ_FAILED (err u4123))
 (define-constant ERR_SOURCE_CALLBACK_UNAUTHORIZED (err u4124))
 (define-constant ERR_SOURCE_CUSTODY_DELTA_MISMATCH (err u4125))
+(define-constant ERR_SETTLEMENT_IN_PROGRESS (err u4116))
 
 ;; --- Constants ---
 
@@ -187,6 +188,17 @@
     burn-height: uint,
     stacks-height: uint
   }
+)
+
+;; A settlement is marked before invoking source custody. This closes the
+;; reentrant same-ID window before the immutable receipt exists; any failed
+;; callback or accounting path rolls the marker back with the transaction.
+(define-map settlement-in-progress
+  {
+    source: principal,
+    settlement-id: (buff 32)
+  }
+  bool
 )
 
 ;; --- Safe arithmetic ---
@@ -497,10 +509,12 @@
 ;; --- Source preview ---
 
 ;; The preview is intentionally read-only and uses the same stream lookup,
-;; schedule resolution, and residual arithmetic as settlement. A source uses
-;; it immediately before creating its transaction-local pending debit record;
+;; schedule resolution, and residual arithmetic as settlement. A source may use
+;; it inside one atomic source entrypoint to create private pending debit state;
 ;; the settlement entrypoint recomputes the values and never trusts a
-;; caller-supplied fee amount.
+;; caller-supplied fee amount. The collector authenticates the source, callback,
+;; fixed recipient, and observed custody delta; each source owns the atomicity
+;; of its pending-state creation.
 (define-private (build-settlement-preview
     (source principal)
     (stream-id uint)
@@ -795,13 +809,9 @@
   )
 )
 
-;; Source-custody FT settlement. The source must implement the focused callback
-;; trait and must be the immediate contract caller. The callback receives only
-;; the collector-computed debit and the fixed collector recipient. Exact live
-;; balance delta around that callback proves custody while retaining any
-;; untracked collector excess. A zero assessed amount still invokes the
-;; authenticated no-op callback so the source can consume its transaction-local
-;; pending record; no zero-value token transfer is attempted by the source.
+;; Source-custody FT settlement. Replay is rejected before the source callback,
+;; and a keyed in-progress marker closes the same-ID recursive window while the
+;; source proves custody through its authenticated callback.
 (define-public (settle-source-ft
     (source <protocol-fee-source-trait>)
     (token <sip-010-ft-trait>)
@@ -840,68 +850,75 @@
     (new-settlement-count (unwrap! (safe-add (get settlement-count old-accounting) u1) ERR_ACCOUNTING_OVERFLOW))
     (new-total-settlements (unwrap! (safe-add (var-get total-settlements) u1) ERR_ACCOUNTING_OVERFLOW))
     (new-collected-fees (unwrap! (safe-add (get collected-fees old-asset-accounting) assessed-amount) ERR_ACCOUNTING_OVERFLOW))
-    (before-balance (unwrap! (contract-call? token get-balance COLLECTOR_INGRESS) ERR_ASSET_BALANCE_READ_FAILED))
-    (after-balance (begin
-      (asserts! (is-eq contract-caller source-principal) ERR_SOURCE_CALLBACK_UNAUTHORIZED)
-      (try! (contract-call? source prepay-ft-fee token assessed-amount COLLECTOR_INGRESS))
-      (unwrap! (contract-call? token get-balance COLLECTOR_INGRESS) ERR_ASSET_BALANCE_READ_FAILED)))
-    (settled-amount (unwrap! (safe-sub after-balance before-balance) ERR_SOURCE_CUSTODY_DELTA_MISMATCH))
   )
     (begin
       (asserts! (is-none (map-get? settlements settlement-key)) ERR_SETTLEMENT_REPLAYED)
-      (asserts! (is-eq settled-amount assessed-amount) ERR_SOURCE_CUSTODY_DELTA_MISMATCH)
-
-      (map-set settlements settlement-key {
-        settlement-id: settlement-id,
-        source: source-principal,
-        stream-id: stream-id,
-        asset-kind: ASSET_KIND_FT,
-        asset: asset,
-        payer: tx-sender,
-        eligible-base: eligible-fee-base,
-        rate-bps: (get rate-bps preview),
-        phase: (get phase preview),
-        assessed-amount: assessed-amount,
-        settled-amount: settled-amount,
-        recipient: COLLECTOR_INGRESS,
-        burn-height: burn-block-height,
-        stacks-height: block-height
-      })
-      (map-set fee-accounting accounting-key {
-        eligible-base: new-eligible-base,
-        assessed-fees: new-assessed-fees,
-        settled-fees: new-settled-fees,
-        settlement-count: new-settlement-count,
-        fee-remainder: (get fee-remainder preview),
-        last-rate-bps: (get rate-bps preview),
-        last-phase: (get phase preview),
-        last-settled-burn-height: burn-block-height,
-        last-settled-stacks-height: block-height
-      })
-      (map-set asset-accounting asset-key {
-        collected-fees: new-collected-fees,
-        routed-fees: (get routed-fees old-asset-accounting),
-        route-count: (get route-count old-asset-accounting)
-      })
-      (var-set total-settlements new-total-settlements)
-      (print {
-        event: "protocol-fee-collected",
-        settlement-id: settlement-id,
-        source: source-principal,
-        stream-id: stream-id,
-        payer: tx-sender,
-        asset-kind: ASSET_KIND_FT,
-        asset: asset,
-        eligible-fee-base: eligible-fee-base,
-        rate-bps: (get rate-bps preview),
-        phase: (get phase preview),
-        assessed-amount: assessed-amount,
-        settled-amount: settled-amount,
-        recipient: COLLECTOR_INGRESS,
-        burn-height: burn-block-height,
-        stacks-height: block-height
-      })
-      (ok settled-amount)
+      (asserts! (is-none (map-get? settlement-in-progress settlement-key)) ERR_SETTLEMENT_IN_PROGRESS)
+      (map-set settlement-in-progress settlement-key true)
+      (let (
+        (before-balance (unwrap! (contract-call? token get-balance COLLECTOR_INGRESS) ERR_ASSET_BALANCE_READ_FAILED))
+        (after-balance (begin
+          (asserts! (is-eq contract-caller source-principal) ERR_SOURCE_CALLBACK_UNAUTHORIZED)
+          (try! (contract-call? source prepay-ft-fee token assessed-amount COLLECTOR_INGRESS))
+          (unwrap! (contract-call? token get-balance COLLECTOR_INGRESS) ERR_ASSET_BALANCE_READ_FAILED)))
+        (settled-amount (unwrap! (safe-sub after-balance before-balance) ERR_SOURCE_CUSTODY_DELTA_MISMATCH))
+      )
+        (begin
+          (asserts! (is-eq settled-amount assessed-amount) ERR_SOURCE_CUSTODY_DELTA_MISMATCH)
+          (map-delete settlement-in-progress settlement-key)
+          (map-set settlements settlement-key {
+            settlement-id: settlement-id,
+            source: source-principal,
+            stream-id: stream-id,
+            asset-kind: ASSET_KIND_FT,
+            asset: asset,
+            payer: tx-sender,
+            eligible-base: eligible-fee-base,
+            rate-bps: (get rate-bps preview),
+            phase: (get phase preview),
+            assessed-amount: assessed-amount,
+            settled-amount: settled-amount,
+            recipient: COLLECTOR_INGRESS,
+            burn-height: burn-block-height,
+            stacks-height: block-height
+          })
+          (map-set fee-accounting accounting-key {
+            eligible-base: new-eligible-base,
+            assessed-fees: new-assessed-fees,
+            settled-fees: new-settled-fees,
+            settlement-count: new-settlement-count,
+            fee-remainder: (get fee-remainder preview),
+            last-rate-bps: (get rate-bps preview),
+            last-phase: (get phase preview),
+            last-settled-burn-height: burn-block-height,
+            last-settled-stacks-height: block-height
+          })
+          (map-set asset-accounting asset-key {
+            collected-fees: new-collected-fees,
+            routed-fees: (get routed-fees old-asset-accounting),
+            route-count: (get route-count old-asset-accounting)
+          })
+          (var-set total-settlements new-total-settlements)
+          (print {
+            event: "protocol-fee-collected",
+            settlement-id: settlement-id,
+            source: source-principal,
+            stream-id: stream-id,
+            payer: tx-sender,
+            asset-kind: ASSET_KIND_FT,
+            asset: asset,
+            eligible-fee-base: eligible-fee-base,
+            rate-bps: (get rate-bps preview),
+            phase: (get phase preview),
+            assessed-amount: assessed-amount,
+            settled-amount: settled-amount,
+            recipient: COLLECTOR_INGRESS,
+            burn-height: burn-block-height,
+            stacks-height: block-height
+          })
+          (ok settled-amount)
+        )
+      )
     )
   )
 )
@@ -946,69 +963,76 @@
     (new-total-settlements (unwrap! (safe-add (var-get total-settlements) u1) ERR_ACCOUNTING_OVERFLOW))
     (new-collected-fees (unwrap! (safe-add (get collected-fees old-asset-accounting) assessed-amount) ERR_ACCOUNTING_OVERFLOW))
     (new-total-collected-stx (unwrap! (safe-add (var-get total-collected-stx) assessed-amount) ERR_ACCOUNTING_OVERFLOW))
-    (before-balance (stx-get-balance COLLECTOR_INGRESS))
-    (after-balance (begin
-      (asserts! (is-eq contract-caller source-principal) ERR_SOURCE_CALLBACK_UNAUTHORIZED)
-      (try! (contract-call? source prepay-stx-fee assessed-amount COLLECTOR_INGRESS))
-      (stx-get-balance COLLECTOR_INGRESS)))
-    (settled-amount (unwrap! (safe-sub after-balance before-balance) ERR_SOURCE_CUSTODY_DELTA_MISMATCH))
   )
     (begin
       (asserts! (is-none (map-get? settlements settlement-key)) ERR_SETTLEMENT_REPLAYED)
-      (asserts! (is-eq settled-amount assessed-amount) ERR_SOURCE_CUSTODY_DELTA_MISMATCH)
-
-      (map-set settlements settlement-key {
-        settlement-id: settlement-id,
-        source: source-principal,
-        stream-id: stream-id,
-        asset-kind: ASSET_KIND_STX,
-        asset: asset,
-        payer: tx-sender,
-        eligible-base: eligible-fee-base,
-        rate-bps: (get rate-bps preview),
-        phase: (get phase preview),
-        assessed-amount: assessed-amount,
-        settled-amount: settled-amount,
-        recipient: COLLECTOR_INGRESS,
-        burn-height: burn-block-height,
-        stacks-height: block-height
-      })
-      (map-set fee-accounting accounting-key {
-        eligible-base: new-eligible-base,
-        assessed-fees: new-assessed-fees,
-        settled-fees: new-settled-fees,
-        settlement-count: new-settlement-count,
-        fee-remainder: (get fee-remainder preview),
-        last-rate-bps: (get rate-bps preview),
-        last-phase: (get phase preview),
-        last-settled-burn-height: burn-block-height,
-        last-settled-stacks-height: block-height
-      })
-      (map-set asset-accounting asset-key {
-        collected-fees: new-collected-fees,
-        routed-fees: (get routed-fees old-asset-accounting),
-        route-count: (get route-count old-asset-accounting)
-      })
-      (var-set total-collected-stx new-total-collected-stx)
-      (var-set total-settlements new-total-settlements)
-      (print {
-        event: "protocol-fee-collected",
-        settlement-id: settlement-id,
-        source: source-principal,
-        stream-id: stream-id,
-        payer: tx-sender,
-        asset-kind: ASSET_KIND_STX,
-        asset: asset,
-        eligible-fee-base: eligible-fee-base,
-        rate-bps: (get rate-bps preview),
-        phase: (get phase preview),
-        assessed-amount: assessed-amount,
-        settled-amount: settled-amount,
-        recipient: COLLECTOR_INGRESS,
-        burn-height: burn-block-height,
-        stacks-height: block-height
-      })
-      (ok settled-amount)
+      (asserts! (is-none (map-get? settlement-in-progress settlement-key)) ERR_SETTLEMENT_IN_PROGRESS)
+      (map-set settlement-in-progress settlement-key true)
+      (let (
+        (before-balance (stx-get-balance COLLECTOR_INGRESS))
+        (after-balance (begin
+          (asserts! (is-eq contract-caller source-principal) ERR_SOURCE_CALLBACK_UNAUTHORIZED)
+          (try! (contract-call? source prepay-stx-fee assessed-amount COLLECTOR_INGRESS))
+          (stx-get-balance COLLECTOR_INGRESS)))
+        (settled-amount (unwrap! (safe-sub after-balance before-balance) ERR_SOURCE_CUSTODY_DELTA_MISMATCH))
+      )
+        (begin
+          (asserts! (is-eq settled-amount assessed-amount) ERR_SOURCE_CUSTODY_DELTA_MISMATCH)
+          (map-delete settlement-in-progress settlement-key)
+          (map-set settlements settlement-key {
+            settlement-id: settlement-id,
+            source: source-principal,
+            stream-id: stream-id,
+            asset-kind: ASSET_KIND_STX,
+            asset: asset,
+            payer: tx-sender,
+            eligible-base: eligible-fee-base,
+            rate-bps: (get rate-bps preview),
+            phase: (get phase preview),
+            assessed-amount: assessed-amount,
+            settled-amount: settled-amount,
+            recipient: COLLECTOR_INGRESS,
+            burn-height: burn-block-height,
+            stacks-height: block-height
+          })
+          (map-set fee-accounting accounting-key {
+            eligible-base: new-eligible-base,
+            assessed-fees: new-assessed-fees,
+            settled-fees: new-settled-fees,
+            settlement-count: new-settlement-count,
+            fee-remainder: (get fee-remainder preview),
+            last-rate-bps: (get rate-bps preview),
+            last-phase: (get phase preview),
+            last-settled-burn-height: burn-block-height,
+            last-settled-stacks-height: block-height
+          })
+          (map-set asset-accounting asset-key {
+            collected-fees: new-collected-fees,
+            routed-fees: (get routed-fees old-asset-accounting),
+            route-count: (get route-count old-asset-accounting)
+          })
+          (var-set total-collected-stx new-total-collected-stx)
+          (var-set total-settlements new-total-settlements)
+          (print {
+            event: "protocol-fee-collected",
+            settlement-id: settlement-id,
+            source: source-principal,
+            stream-id: stream-id,
+            payer: tx-sender,
+            asset-kind: ASSET_KIND_STX,
+            asset: asset,
+            eligible-fee-base: eligible-fee-base,
+            rate-bps: (get rate-bps preview),
+            phase: (get phase preview),
+            assessed-amount: assessed-amount,
+            settled-amount: settled-amount,
+            recipient: COLLECTOR_INGRESS,
+            burn-height: burn-block-height,
+            stacks-height: block-height
+          })
+          (ok settled-amount)
+        )
+      )
     )
   )
 )
@@ -1278,6 +1302,15 @@
     source: source,
     settlement-id: settlement-id
   }))
+)
+
+(define-read-only (is-settlement-in-progress
+    (source principal)
+    (settlement-id (buff 32)))
+  (ok (default-to false (map-get? settlement-in-progress {
+    source: source,
+    settlement-id: settlement-id
+  })))
 )
 
 (define-read-only (get-total-settlements)

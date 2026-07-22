@@ -14,8 +14,15 @@ const ERR_STREAM_INACTIVE = 4106;
 const ERR_INVALID_ROUTE = 4107;
 const ERR_INVALID_AMOUNT = 4109;
 const ERR_SETTLEMENT_REPLAYED = 4110;
+const ERR_SETTLEMENT_IN_PROGRESS = 4116;
 const ERR_STREAM_ALREADY_REGISTERED = 4117;
 const ERR_EXCESS_RECOVERY_EXCEEDS_AVAILABLE = 4122;
+const MODE_EXACT = 0;
+const MODE_UNDERPAY = 1;
+const MODE_OVERPAY = 2;
+const MODE_NO_TRANSFER = 3;
+const MODE_WRONG_DESTINATION = 4;
+const MODE_WRONG_ASSET = 5;
 
 describe('Canonical protocol fee collector', () => {
   let deployer: string;
@@ -32,6 +39,12 @@ describe('Canonical protocol fee collector', () => {
 
   const readUint = (functionName: string, args: any[] = []): bigint => {
     const result: any = simnet.callReadOnlyFn(COLLECTOR, functionName, args, deployer).result;
+    expect(result.type).toBe('ok');
+    return BigInt(result.value.value);
+  };
+
+  const readMockUint = (functionName: string): bigint => {
+    const result: any = simnet.callReadOnlyFn('mock-fee-source', functionName, [], deployer).result;
     expect(result.type).toBe('ok');
     return BigInt(result.value.value);
   };
@@ -1035,14 +1048,8 @@ describe('Canonical protocol fee collector', () => {
     const stxCollectorBefore = stxBalance(collectorPrincipal);
     expect(simnet.callPublicFn(
       'mock-fee-source',
-      'prepare-stx',
-      [Cl.principal(wallet1), Cl.uint(stxFee), Cl.uint(0)],
-      deployer,
-    ).result).toEqual(Cl.ok(Cl.bool(true)));
-    expect(simnet.callPublicFn(
-      'mock-fee-source',
       'settle-stx',
-      [sourceTrait, Cl.uint(stxStream), Cl.uint(stxBase), settlementId(60)],
+      [sourceTrait, Cl.uint(stxStream), Cl.uint(stxBase), settlementId(60), Cl.uint(MODE_EXACT)],
       wallet1,
     ).result).toEqual(Cl.ok(Cl.uint(stxFee)));
     expect(stxBalance(mockFeeSource)).toBe(stxSourceBefore - stxFee);
@@ -1079,14 +1086,8 @@ describe('Canonical protocol fee collector', () => {
     const ftCollectorBefore = mockTokenBalance(collectorPrincipal);
     expect(simnet.callPublicFn(
       'mock-fee-source',
-      'prepare-ft',
-      [Cl.principal(wallet1), Cl.principal(mockToken), Cl.uint(ftFee), Cl.uint(0)],
-      deployer,
-    ).result).toEqual(Cl.ok(Cl.bool(true)));
-    expect(simnet.callPublicFn(
-      'mock-fee-source',
       'settle-ft',
-      [sourceTrait, tokenTrait, Cl.uint(ftStream), Cl.uint(ftBase), settlementId(61)],
+      [sourceTrait, tokenTrait, Cl.uint(ftStream), Cl.uint(ftBase), settlementId(61), Cl.uint(MODE_EXACT)],
       wallet1,
     ).result).toEqual(Cl.ok(Cl.uint(ftFee)));
     expect(mockTokenBalance(mockFeeSource)).toBe(ftSourceBefore - ftFee);
@@ -1105,14 +1106,8 @@ describe('Canonical protocol fee collector', () => {
     const excessCollectorBefore = mockTokenBalance(collectorPrincipal);
     expect(simnet.callPublicFn(
       'mock-fee-source',
-      'prepare-ft',
-      [Cl.principal(wallet2), Cl.principal(mockToken), Cl.uint(ftFee), Cl.uint(0)],
-      deployer,
-    ).result).toEqual(Cl.ok(Cl.bool(true)));
-    expect(simnet.callPublicFn(
-      'mock-fee-source',
       'settle-ft',
-      [sourceTrait, tokenTrait, Cl.uint(ftStream), Cl.uint(ftBase), settlementId(62)],
+      [sourceTrait, tokenTrait, Cl.uint(ftStream), Cl.uint(ftBase), settlementId(62), Cl.uint(MODE_EXACT)],
       wallet2,
     ).result).toEqual(Cl.ok(Cl.uint(ftFee)));
     expect(mockTokenBalance(collectorPrincipal)).toBe(excessCollectorBefore + ftFee);
@@ -1132,17 +1127,11 @@ describe('Canonical protocol fee collector', () => {
     expect(zeroPreview.type).toBe('ok');
     const rate = BigInt(zeroPreview.value.value['rate-bps'].value);
     expect(zeroPreview.value.value['assessed-amount']).toEqual(Cl.uint(0));
-    expect(simnet.callPublicFn(
-      'mock-fee-source',
-      'prepare-ft',
-      [Cl.principal(wallet1), Cl.principal(mockToken), Cl.uint(0), Cl.uint(0)],
-      deployer,
-    ).result).toEqual(Cl.ok(Cl.bool(true)));
     const zeroCollectorBefore = mockTokenBalance(collectorPrincipal);
     expect(simnet.callPublicFn(
       'mock-fee-source',
       'settle-ft',
-      [sourceTrait, tokenTrait, Cl.uint(residualStream), Cl.uint(zeroBase), settlementId(63)],
+      [sourceTrait, tokenTrait, Cl.uint(residualStream), Cl.uint(zeroBase), settlementId(63), Cl.uint(MODE_EXACT)],
       wallet1,
     ).result).toEqual(Cl.ok(Cl.uint(0)));
     expect(mockTokenBalance(collectorPrincipal)).toBe(zeroCollectorBefore);
@@ -1166,14 +1155,8 @@ describe('Canonical protocol fee collector', () => {
     expect(secondFee).toBe(1n);
     expect(simnet.callPublicFn(
       'mock-fee-source',
-      'prepare-ft',
-      [Cl.principal(wallet1), Cl.principal(mockToken), Cl.uint(secondFee), Cl.uint(0)],
-      deployer,
-    ).result).toEqual(Cl.ok(Cl.bool(true)));
-    expect(simnet.callPublicFn(
-      'mock-fee-source',
       'settle-ft',
-      [sourceTrait, tokenTrait, Cl.uint(residualStream), Cl.uint(secondBase), settlementId(64)],
+      [sourceTrait, tokenTrait, Cl.uint(residualStream), Cl.uint(secondBase), settlementId(64), Cl.uint(MODE_EXACT)],
       wallet1,
     ).result).toEqual(Cl.ok(Cl.uint(secondFee)));
     const afterResidual = readOptionalTuple('get-accounting', [
@@ -1203,23 +1186,19 @@ describe('Canonical protocol fee collector', () => {
     expect(fee).toBeGreaterThan(0n);
 
     const expectModeRollback = (payer: string, mode: number, id: number) => {
-      expect(simnet.callPublicFn(
-        'mock-fee-source',
-        'prepare-ft',
-        [Cl.principal(payer), Cl.principal(mockToken), Cl.uint(fee), Cl.uint(mode)],
-        deployer,
-      ).result).toEqual(Cl.ok(Cl.bool(true)));
       const sourceBefore = mockTokenBalance(mockFeeSource);
       const collectorBefore = mockTokenBalance(collectorPrincipal);
+      const callbacksBefore = readMockUint('get-ft-callback-invocations');
       const receipt: any = simnet.callPublicFn(
         'mock-fee-source',
         'settle-ft',
-        [sourceTrait, tokenTrait, Cl.uint(streamId), Cl.uint(base), settlementId(id)],
+        [sourceTrait, tokenTrait, Cl.uint(streamId), Cl.uint(base), settlementId(id), Cl.uint(mode)],
         payer,
       );
       expect(receipt.result).toEqual(Cl.error(Cl.uint(4125)));
       expect(mockTokenBalance(mockFeeSource)).toBe(sourceBefore);
       expect(mockTokenBalance(collectorPrincipal)).toBe(collectorBefore);
+      expect(readMockUint('get-ft-callback-invocations')).toBe(callbacksBefore);
       const pending: any = simnet.callReadOnlyFn(
         'mock-fee-source',
         'get-pending-ft',
@@ -1227,7 +1206,13 @@ describe('Canonical protocol fee collector', () => {
         deployer,
       ).result;
       expect(pending.type).toBe('ok');
-      expect(pending.value.type).toBe('some');
+      expect(pending.value.type).toBe('none');
+      expect(simnet.callReadOnlyFn(
+        COLLECTOR,
+        'is-settlement-in-progress',
+        [Cl.principal(mockFeeSource), settlementId(id)],
+        deployer,
+      ).result).toEqual(Cl.ok(Cl.bool(false)));
     };
 
     expectModeRollback(wallet1, 1, 65);
@@ -1244,14 +1229,8 @@ describe('Canonical protocol fee collector', () => {
       wallet1,
     ).result).toEqual(Cl.error(Cl.uint(4124)));
 
-    // The source callback rejects a non-collector caller once a pending record
-    // exists, before checking any spend instruction.
-    expect(simnet.callPublicFn(
-      'mock-fee-source',
-      'prepare-ft',
-      [Cl.principal(wallet2), Cl.principal(mockToken), Cl.uint(fee), Cl.uint(0)],
-      deployer,
-    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    // Pending source state is not externally preparable; direct callback calls
+    // fail closed without a private record.
     expect(simnet.callPublicFn(
       'mock-fee-source',
       'prepay-ft-fee',
@@ -1271,14 +1250,8 @@ describe('Canonical protocol fee collector', () => {
     const wrongTokenFee = BigInt(wrongTokenPreview.value.value['assessed-amount'].value);
     expect(simnet.callPublicFn(
       'mock-fee-source',
-      'prepare-ft',
-      [Cl.principal(wallet1), Cl.principal(mockToken), Cl.uint(wrongTokenFee), Cl.uint(0)],
-      deployer,
-    ).result).toEqual(Cl.ok(Cl.bool(true)));
-    expect(simnet.callPublicFn(
-      'mock-fee-source',
       'settle-ft',
-      [sourceTrait, Cl.contractPrincipal(deployer, 'cxvg-token'), Cl.uint(wrongTokenStream), Cl.uint(base), settlementId(70)],
+      [sourceTrait, Cl.contractPrincipal(deployer, 'cxvg-token'), Cl.uint(wrongTokenStream), Cl.uint(base), settlementId(70), Cl.uint(MODE_WRONG_ASSET)],
       wallet1,
     ).result).toEqual(Cl.error(Cl.uint(6004)));
 
@@ -1288,14 +1261,8 @@ describe('Canonical protocol fee collector', () => {
       .toEqual(Cl.ok(Cl.bool(true)));
     expect(simnet.callPublicFn(
       'mock-fee-source',
-      'prepare-ft',
-      [Cl.principal(wallet1), Cl.principal(mockToken), Cl.uint(fee), Cl.uint(0)],
-      deployer,
-    ).result).toEqual(Cl.ok(Cl.bool(true)));
-    expect(simnet.callPublicFn(
-      'mock-fee-source',
       'settle-ft',
-      [sourceTrait, tokenTrait, Cl.uint(pausedStream), Cl.uint(base), settlementId(71)],
+      [sourceTrait, tokenTrait, Cl.uint(pausedStream), Cl.uint(base), settlementId(71), Cl.uint(MODE_EXACT)],
       wallet1,
     ).result).toEqual(Cl.error(Cl.uint(ERR_PAUSED)));
     expect(simnet.callPublicFn(COLLECTOR, 'unpause', [], deployer).result)
@@ -1306,41 +1273,31 @@ describe('Canonical protocol fee collector', () => {
     const replayId = settlementId(72);
     expect(simnet.callPublicFn(
       'mock-fee-source',
-      'prepare-ft',
-      [Cl.principal(wallet2), Cl.principal(mockToken), Cl.uint(fee), Cl.uint(0)],
-      deployer,
-    ).result).toEqual(Cl.ok(Cl.bool(true)));
-    expect(simnet.callPublicFn(
-      'mock-fee-source',
       'settle-ft',
-      [sourceTrait, tokenTrait, Cl.uint(replayStream), Cl.uint(base), replayId],
+      [sourceTrait, tokenTrait, Cl.uint(replayStream), Cl.uint(base), replayId, Cl.uint(MODE_EXACT)],
       wallet2,
     ).result).toEqual(Cl.ok(Cl.uint(fee)));
-    expect(simnet.callPublicFn(
-      'mock-fee-source',
-      'prepare-ft',
-      [Cl.principal(wallet2), Cl.principal(mockToken), Cl.uint(fee), Cl.uint(0)],
-      deployer,
-    ).result).toEqual(Cl.ok(Cl.bool(true)));
     const replaySourceBefore = mockTokenBalance(mockFeeSource);
     const replayCollectorBefore = mockTokenBalance(collectorPrincipal);
+    const replayCallbacksBefore = readMockUint('get-ft-callback-invocations');
     expect(simnet.callPublicFn(
       'mock-fee-source',
       'settle-ft',
-      [sourceTrait, tokenTrait, Cl.uint(replayStream), Cl.uint(base), replayId],
+      [sourceTrait, tokenTrait, Cl.uint(replayStream), Cl.uint(base), replayId, Cl.uint(MODE_EXACT)],
       wallet2,
     ).result).toEqual(Cl.error(Cl.uint(ERR_SETTLEMENT_REPLAYED)));
     expect(mockTokenBalance(mockFeeSource)).toBe(replaySourceBefore);
     expect(mockTokenBalance(collectorPrincipal)).toBe(replayCollectorBefore);
+    expect(readMockUint('get-ft-callback-invocations')).toBe(replayCallbacksBefore);
+    expect(simnet.callReadOnlyFn(
+      COLLECTOR,
+      'is-settlement-in-progress',
+      [Cl.principal(mockFeeSource), replayId],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(false)));
 
     const failedStream = 1107;
     registerSourceFtStream(failedStream, mockToken);
-    expect(simnet.callPublicFn(
-      'mock-fee-source',
-      'prepare-ft',
-      [Cl.principal(wallet1), Cl.principal(mockToken), Cl.uint(fee), Cl.uint(0)],
-      deployer,
-    ).result).toEqual(Cl.ok(Cl.bool(true)));
     expect(simnet.callPublicFn(
       'mock-token',
       'set-transfer-failure',
@@ -1352,7 +1309,7 @@ describe('Canonical protocol fee collector', () => {
     expect(simnet.callPublicFn(
       'mock-fee-source',
       'settle-ft',
-      [sourceTrait, tokenTrait, Cl.uint(failedStream), Cl.uint(base), settlementId(73)],
+      [sourceTrait, tokenTrait, Cl.uint(failedStream), Cl.uint(base), settlementId(73), Cl.uint(MODE_EXACT)],
       wallet1,
     ).result).toEqual(Cl.error(Cl.uint(2)));
     expect(mockTokenBalance(mockFeeSource)).toBe(failedSourceBefore);
@@ -1363,5 +1320,139 @@ describe('Canonical protocol fee collector', () => {
       [Cl.bool(false)],
       deployer,
     ).result).toEqual(Cl.ok(Cl.bool(false)));
+  });
+
+  it('keeps STX source custody atomic across underpay, overpay, no-transfer, wrong-destination, callback failure, and replay', () => {
+    const sourceTrait = Cl.contractPrincipal(deployer, 'mock-fee-source');
+    const streamId = 1110;
+    const base = 10_000n;
+    registerSourceStxStream(streamId);
+
+    const preview: any = simnet.callReadOnlyFn(
+      COLLECTOR,
+      'preview-source-stx',
+      [Cl.principal(mockFeeSource), Cl.uint(streamId), Cl.uint(base)],
+      deployer,
+    ).result;
+    expect(preview.type).toBe('ok');
+    const fee = BigInt(preview.value.value['assessed-amount'].value);
+    expect(fee).toBeGreaterThan(0n);
+
+    const expectModeRollback = (mode: number, id: number) => {
+      const sourceBefore = stxBalance(mockFeeSource);
+      const collectorBefore = stxBalance(collectorPrincipal);
+      const callbacksBefore = readMockUint('get-stx-callback-invocations');
+      const receipt: any = simnet.callPublicFn(
+        'mock-fee-source',
+        'settle-stx',
+        [sourceTrait, Cl.uint(streamId), Cl.uint(base), settlementId(id), Cl.uint(mode)],
+        wallet1,
+      );
+      expect(receipt.result).toEqual(Cl.error(Cl.uint(4125)));
+      expect(stxBalance(mockFeeSource)).toBe(sourceBefore);
+      expect(stxBalance(collectorPrincipal)).toBe(collectorBefore);
+      expect(readMockUint('get-stx-callback-invocations')).toBe(callbacksBefore);
+      expect(simnet.callReadOnlyFn(
+        'mock-fee-source',
+        'get-pending-stx',
+        [Cl.principal(wallet1)],
+        deployer,
+      ).result).toEqual(Cl.ok(Cl.none()));
+      expect(readOptionalTuple('get-accounting', [
+        Cl.principal(mockFeeSource),
+        Cl.uint(streamId),
+        Cl.uint(ASSET_KIND_STX),
+        Cl.none(),
+      ])).toBeNull();
+      expect(simnet.callReadOnlyFn(
+        COLLECTOR,
+        'is-settlement-in-progress',
+        [Cl.principal(mockFeeSource), settlementId(id)],
+        deployer,
+      ).result).toEqual(Cl.ok(Cl.bool(false)));
+    };
+
+    expectModeRollback(MODE_UNDERPAY, 80);
+    expectModeRollback(MODE_OVERPAY, 81);
+    expectModeRollback(MODE_NO_TRANSFER, 82);
+    expectModeRollback(MODE_WRONG_DESTINATION, 83);
+
+    expect(simnet.callPublicFn(
+      'mock-fee-source',
+      'set-stx-transfer-failure',
+      [Cl.bool(true)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    const failedSourceBefore = stxBalance(mockFeeSource);
+    const failedCollectorBefore = stxBalance(collectorPrincipal);
+    const failedCallbacksBefore = readMockUint('get-stx-callback-invocations');
+    const failedReceipt: any = simnet.callPublicFn(
+      'mock-fee-source',
+      'settle-stx',
+      [sourceTrait, Cl.uint(streamId), Cl.uint(base), settlementId(84), Cl.uint(MODE_EXACT)],
+      wallet1,
+    );
+    expect(failedReceipt.result.type).toBe('err');
+    expect(stxBalance(mockFeeSource)).toBe(failedSourceBefore);
+    expect(stxBalance(collectorPrincipal)).toBe(failedCollectorBefore);
+    expect(readMockUint('get-stx-callback-invocations')).toBe(failedCallbacksBefore);
+    expect(simnet.callReadOnlyFn(
+      'mock-fee-source',
+      'get-pending-stx',
+      [Cl.principal(wallet1)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.none()));
+    expect(readOptionalTuple('get-accounting', [
+      Cl.principal(mockFeeSource),
+      Cl.uint(streamId),
+      Cl.uint(ASSET_KIND_STX),
+      Cl.none(),
+    ])).toBeNull();
+    expect(simnet.callReadOnlyFn(
+      COLLECTOR,
+      'is-settlement-in-progress',
+      [Cl.principal(mockFeeSource), settlementId(84)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(false)));
+    expect(simnet.callPublicFn(
+      'mock-fee-source',
+      'set-stx-transfer-failure',
+      [Cl.bool(false)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(false)));
+
+    const replayId = settlementId(85);
+    const firstSourceBefore = stxBalance(mockFeeSource);
+    const firstCollectorBefore = stxBalance(collectorPrincipal);
+    expect(simnet.callPublicFn(
+      'mock-fee-source',
+      'settle-stx',
+      [sourceTrait, Cl.uint(streamId), Cl.uint(base), replayId, Cl.uint(MODE_EXACT)],
+      wallet1,
+    ).result).toEqual(Cl.ok(Cl.uint(fee)));
+    expect(stxBalance(mockFeeSource)).toBe(firstSourceBefore - fee);
+    expect(stxBalance(collectorPrincipal)).toBe(firstCollectorBefore + fee);
+    const replayCallbacksBefore = readMockUint('get-stx-callback-invocations');
+    const replaySourceBefore = stxBalance(mockFeeSource);
+    const replayCollectorBefore = stxBalance(collectorPrincipal);
+    expect(simnet.callPublicFn(
+      'mock-fee-source',
+      'settle-stx',
+      [sourceTrait, Cl.uint(streamId), Cl.uint(base), replayId, Cl.uint(MODE_EXACT)],
+      wallet1,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_SETTLEMENT_REPLAYED)));
+    expect(stxBalance(mockFeeSource)).toBe(replaySourceBefore);
+    expect(stxBalance(collectorPrincipal)).toBe(replayCollectorBefore);
+    expect(readMockUint('get-stx-callback-invocations')).toBe(replayCallbacksBefore);
+    expect(simnet.callReadOnlyFn(
+      COLLECTOR,
+      'is-settlement-in-progress',
+      [Cl.principal(mockFeeSource), replayId],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(false)));
+    const settlement = readOptionalTuple('get-settlement', [Cl.principal(mockFeeSource), replayId]);
+    expect(settlement?.['asset-kind']).toEqual(Cl.uint(ASSET_KIND_STX));
+    expect(settlement?.asset).toEqual(Cl.none());
+    expect(settlement?.['settled-amount']).toEqual(Cl.uint(fee));
   });
 });

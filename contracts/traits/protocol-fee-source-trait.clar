@@ -4,7 +4,10 @@
 ;; A collector callback receives only the collector-computed debit, the
 ;; collector's fixed recipient, and (for SIP-010) the collector-selected token.
 ;; Implementations must authenticate the immediate caller before spending their
-;; own custody.
+;; own custody. A production source should create its pending debit privately
+;; and immediately invoke the collector from one atomic entrypoint; the
+;; collector authenticates source/callback/delta but cannot use block-height
+;; equality as proof that a separately prepared record is same-transaction.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
