@@ -1,16 +1,16 @@
 # Documentation State
 
-## Current Session (37) - Enterprise Subscription MVP (Issue #503)
+## Current Session (38) - Enterprise Subscription Audit Hardening (Issue #503)
 
 {
-  "status": "IMPLEMENTED_LOCALLY",
+  "status": "HARDENED_LOCALLY",
   "session_timestamp": "2026-07-22",
-  "scope": "Added the STX-only prepaid enterprise subscription MVP: immutable versioned plan records and generic features, explicit subscribe/renew/cancel lifecycle, KYC/AML checks, consumer entitlement/usage trait, canonical gross-STX Fiscal Dam routing, immutable source/payment receipts, deployment manifests, focused tests, and scoped module documentation.",
-  "economic_boundary": "Subscription prices enter revenue-automation, revenue-distributor, and cxd-treasury at gross value with no 1% deduction or operational-treasury/commercial-wallet bypass. The six-way allocation uses the current cxd-treasury percentages, safe floor math for the first five buckets, and assigns all integer remainder to the sixth bucket.",
-  "security_boundary": "Plans publish inactive and activate explicitly; plan versions and feature limits are immutable; payment and usage IDs are replay-protected; consumers are allowlisted; entitlement derives directly from burn-block-height; no PII or product-specific feature mapping is stored on-chain.",
+  "scope": "Hardened the STX-only prepaid enterprise subscription MVP after independent audit: tier/version plan identity, nonzero publication invariants, active feature immutability, exact payment amounts, global payment replay scope, period-scoped usage replay, subscriber-origin usage authorization, governed Fiscal Dam bucket custody release, policy-version evidence, and deployment/documentation gates.",
+  "economic_boundary": "Subscription prices enter revenue-automation, revenue-distributor, and cxd-treasury at gross value with no 1% deduction or operational-treasury/commercial-wallet bypass. The six-way allocation uses safe floor math for the first five buckets, assigns all integer remainder to insurance, and records the policy version. Buyback remains only a governed STX bucket.",
+  "security_boundary": "Plans use exactly tier IDs u1-u4 and publish inactive; prices and KYC tier are immutable after publication, and feature records cannot be extended after a version is activated. Payment IDs are global across the subscription route; usage IDs include paid-period start; the authoritative usage boundary requires tx-sender == subscriber. Product consumers and bucket recipients remain empty/unconfigured until governance registers audited principals.",
   "validation": {
-    "targeted_tests": "PASS: tests/enterprise/enterprise-subscriptions.test.ts (2 tests); tests/integration-fees.test.ts (11 tests); tests/simple.test.ts (1 test)",
-    "full_tests": "Not run in this implementation phase",
+    "targeted_tests": "PASS: tests/enterprise/enterprise-subscriptions.test.ts (7 tests); tests/treasury/cxd-treasury.test.ts (2 tests); tests/integration-fees.test.ts (11 tests); tests/cybernetic-revenue.test.ts (1 test); tests/alex-release-wiring.test.ts (5 tests)",
+    "full_tests": "Not rerun on the hardening branch. A temporary worktree at baseline ee6368a8db967707c1e731da397b04705ca41fa5 reproduced 4 SAB-election failures out of 6 tests (2 passed); no current-branch broad-suite status is claimed",
     "native_clarinet": "Blocked: clarinet binary is not installed in the workspace",
     "deployment": "Deployment plans regenerated locally; no deployment or push performed"
   }

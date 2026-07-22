@@ -70,7 +70,16 @@ The enterprise MVP keeps its consumer-facing interfaces in separate traits:
 provide feature identifiers and namespaced usage IDs, while plan prices,
 limits, and entitlement state remain in the plan registry and subscription
 contract. The stable read surface lets products integrate without adding
-product-specific mappings or on-chain PII to the protocol core.
+product-specific mappings or on-chain PII to the protocol core. Plan identity
+is `{tier-id, version}` with exactly four valid tier IDs (`u1` through `u4`),
+and `subscribe`/`renew` include the caller-supplied exact payment amount.
+Payment IDs are global across the subscription route; usage replay keys also
+include the paid period start. The subscription contract requires the original
+subscriber wallet at the authoritative usage boundary, even when a registered
+consumer facade is used. Deployment does not register product consumers by
+default; governance must add only audited consumer contracts. Generic feature
+records may be added only before a plan version is activated; deactivation does
+not reopen the version for feature publication.
 
 ## Integration Examples (How-to)
 

@@ -7,7 +7,8 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 - **Automation**: `revenue-automation.clar` retains the legacy 100 bps token
   fee path and also exposes the full gross-STX enterprise adapter.
 - **Registry**: `cxd-treasury.clar` maintains the global allocation policy.
-- **Distribution**: `revenue-distributor.clar` executes token buy-backs and burns.
+- **Distribution**: `revenue-distributor.clar` executes token buy-backs and burns
+  for token routes; native STX buyback execution is not claimed.
 - **Integration Billing**: `integration-fee-collector.clar` sends 100% of
   settled STX integration fees through the same distributor route; there is no
   partner split, 1% deduction, or direct bypass to `operational-treasury`.
@@ -31,12 +32,19 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 ### `cxd-treasury.clar`
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `rebalance` | `(treasury uint) (bounty uint) (lp uint) (grant uint) (buyback uint) (insurance uint)` | Updates 6-way split (Admin only). |
+| `rebalance` | `(treasury uint) (bounty uint) (lp uint) (grant uint) (buyback uint) (insurance uint)` | Updates the 6-way split for authorized admin/agent callers, enforcing the configured LP minimum, insurance maximum, and exact 10,000-bps sum. |
 | `set-authorized-principals` | `(agent principal) (distributor principal)` | Sets authorized actors (Admin only). |
+| `set-bounds` | `(uint uint)` | Sets the existing LP-minimum and insurance-maximum safety bounds (Admin only). |
 | `authorize-stx-source` | `(principal)` | Authorizes a source contract for gross-STX receipts. |
 | `record-stx-revenue` | `(principal uint uint)` | Receives distributor STX, snapshots the six-way split, and records an immutable receipt. |
+| `set-stx-bucket-recipient` | `(uint principal)` | Configures one governed destination for a stable bucket ID (Admin only). |
+| `clear-stx-bucket-recipient` | `(uint)` | Removes a bucket destination and returns releases to fail-closed state. |
+| `release-stx-bucket` | `(uint uint uint)` | Transfers custody from one configured bucket once per `{bucket, release-id}` and decrements only after success. |
 | `get-stx-receipt` | `(principal uint)` | Reads one immutable source/payment receipt. |
 | `get-stx-bucket-balances` | `()` | Reads the six accumulated gross-STX accounting buckets. |
+| `get-stx-accounting` | `()` | Proves gross receipts equal current buckets plus governed releases. |
+| `get-stx-release-receipt` | `(uint uint)` | Reads one immutable bucket release receipt. |
+| `get-policy-version` | `()` | Reads the monotonically increasing allocation policy version. |
 | `initialize` | `(new-admin principal)` | Initializes the treasury (Admin only). |
 | `get-allocation-percentages` | `()` | Returns the current fiscal split. |
 | `get-protocol-status` | `()` | Returns compliance and version status. |
@@ -51,6 +59,8 @@ The collector calls the existing route from contract custody after receiving
 an exact settlement from the configured payer. Both the compatibility and
 enterprise paths move gross STX through `cxd-treasury`; neither uses
 `swap-router` for STX and neither bypasses the six-way Fiscal Dam.
+The canonical settled-STX endpoint is `cxd-treasury`; older descriptions that
+said settled STX ends at `swap-router` are obsolete.
 
 ### Enterprise gross-STX route
 
@@ -64,10 +74,21 @@ Each hop authenticates its immediate caller and authorized source. The
 subscription contract records payment state only after the final hop succeeds,
 so a route failure rolls back custody and accounting together. Receipts are
 replay-protected by source and payment ID. Allocation percentages are read at
-payment time and snapshotted into each receipt; the first five buckets use
-safe floor math and the sixth bucket receives all integer remainder. The
-buyback allocation is an STX accounting bucket, not a claim that native-STX
-buyback execution exists.
+payment time, snapshotted into each receipt, and identified by a monotonically
+increasing policy version; the first five buckets use safe floor math and the
+sixth bucket receives all integer remainder. The buyback allocation is an STX
+accounting bucket, not a claim that native-STX buyback execution exists.
+
+### Governed STX bucket release
+
+The six stable bucket IDs are `u1` treasury, `u2` bounty, `u3` LP, `u4` grant,
+`u5` buyback, and `u6` insurance. No recipient is preconfigured in production
+plans. Governance must configure an audited recipient with
+`set-stx-bucket-recipient` before `release-stx-bucket` can transfer custody;
+otherwise the contract fails closed. Release IDs are unique per bucket,
+over-release is rejected, and `get-stx-accounting` preserves total gross
+receipt evidence after release. Buyback remains only a governed STX bucket
+until a separate native-STX adapter is approved.
 
 ### `conxian-vaults.clar`
 | Function | Signature | Description |

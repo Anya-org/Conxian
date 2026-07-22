@@ -1,10 +1,10 @@
 ;; enterprise-plan-registry.clar
 ;; Owner-published, versioned enterprise plans.
 ;;
-;; Plan prices are deliberately configuration, not protocol constants. A plan
-;; is published inactive and can only become active through the explicit
-;; activation function. Once published, all plan fields and feature records
-;; are immutable; activation is the only mutable plan property.
+;; A tier identifier is the plan identity. Only the four protocol tiers are
+;; accepted, and every version is immutable after publication except for the
+;; explicit active-for-sale flag. Prices are configuration, not protocol
+;; constants; this contract deliberately publishes no production prices.
 
 (impl-trait .enterprise-plan-trait.enterprise-plan-trait)
 
@@ -16,6 +16,7 @@
 (define-constant ERR_FEATURE_NOT_FOUND (err u5005))
 (define-constant ERR_INVALID_TIER (err u5006))
 (define-constant ERR_INVALID_KYC_TIER (err u5007))
+(define-constant ERR_PLAN_ACTIVE (err u5008))
 
 (define-constant TIER_BRONZE u1)
 (define-constant TIER_SILVER u2)
@@ -25,11 +26,10 @@
 (define-data-var owner principal tx-sender)
 
 (define-map plans
-  { plan-id: uint, version: uint }
+  { tier-id: uint, version: uint }
   {
-    plan-id: uint,
-    version: uint,
     tier-id: uint,
+    version: uint,
     monthly-price: uint,
     annual-price: uint,
     required-kyc-tier: uint,
@@ -38,8 +38,16 @@
 )
 
 (define-map plan-features
-  { plan-id: uint, version: uint, feature-id: (string-ascii 32) }
+  { tier-id: uint, version: uint, feature-id: (string-ascii 32) }
   { enabled: bool, limit: uint }
+)
+
+;; Activation is a one-way publication boundary for feature records. The
+;; active sale flag may be turned off, but a version that was ever activated
+;; cannot be extended with new features afterward.
+(define-map activated-plan-versions
+  { tier-id: uint, version: uint }
+  bool
 )
 
 (define-private (is-owner)
@@ -48,6 +56,10 @@
 
 (define-private (is-valid-tier (tier-id uint))
   (and (>= tier-id TIER_BRONZE) (<= tier-id TIER_PLATINUM))
+)
+
+(define-private (is-valid-kyc-tier (required-kyc-tier uint))
+  (and (> required-kyc-tier u0) (<= required-kyc-tier u255))
 )
 
 (define-public (initialize (new-owner principal))
@@ -66,24 +78,25 @@
   )
 )
 
-;; Prices are supplied by the owner and are not hardcoded by this contract.
+;; Publication is inactive by default. Governance must explicitly activate a
+;; fully configured version after prices and product terms are approved.
 (define-public (publish-plan
-    (plan-id uint)
-    (version uint)
     (tier-id uint)
+    (version uint)
     (monthly-price uint)
     (annual-price uint)
     (required-kyc-tier uint))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (asserts! (and (> plan-id u0) (> version u0)) ERR_INVALID_PLAN)
+    (asserts! (> version u0) ERR_INVALID_PLAN)
     (asserts! (is-valid-tier tier-id) ERR_INVALID_TIER)
-    (asserts! (<= required-kyc-tier u255) ERR_INVALID_KYC_TIER)
-    (asserts! (is-none (map-get? plans { plan-id: plan-id, version: version })) ERR_PLAN_EXISTS)
-    (map-set plans { plan-id: plan-id, version: version } {
-      plan-id: plan-id,
-      version: version,
+    (asserts! (> monthly-price u0) ERR_INVALID_PLAN)
+    (asserts! (> annual-price u0) ERR_INVALID_PLAN)
+    (asserts! (is-valid-kyc-tier required-kyc-tier) ERR_INVALID_KYC_TIER)
+    (asserts! (is-none (map-get? plans { tier-id: tier-id, version: version })) ERR_PLAN_EXISTS)
+    (map-set plans { tier-id: tier-id, version: version } {
       tier-id: tier-id,
+      version: version,
       monthly-price: monthly-price,
       annual-price: annual-price,
       required-kyc-tier: required-kyc-tier,
@@ -94,40 +107,60 @@
 )
 
 ;; Features and limits are immutable per plan version. Product-specific
-;; mappings stay off-chain; only generic feature identifiers are stored.
+;; mappings stay off-chain; only generic feature identifiers are stored. A
+;; feature cannot be published after the plan version has ever been active.
 (define-public (publish-feature
-    (plan-id uint)
+    (tier-id uint)
     (version uint)
     (feature-id (string-ascii 32))
     (enabled bool)
     (limit uint))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (asserts! (is-some (map-get? plans { plan-id: plan-id, version: version })) ERR_PLAN_NOT_FOUND)
-    (asserts!
-      (is-none (map-get? plan-features {
-        plan-id: plan-id,
-        version: version,
-        feature-id: feature-id
-      }))
-      ERR_FEATURE_EXISTS)
-    (map-set plan-features {
-      plan-id: plan-id,
-      version: version,
-      feature-id: feature-id
-    } { enabled: enabled, limit: limit })
-    (ok true)
+    (asserts! (is-valid-tier tier-id) ERR_INVALID_TIER)
+    (asserts! (> version u0) ERR_INVALID_PLAN)
+    (let ((plan (unwrap! (map-get? plans { tier-id: tier-id, version: version }) ERR_PLAN_NOT_FOUND)))
+      (begin
+        (asserts! (not (get active plan)) ERR_PLAN_ACTIVE)
+        (asserts!
+          (not (default-to false (map-get? activated-plan-versions {
+            tier-id: tier-id,
+            version: version
+          })))
+          ERR_PLAN_ACTIVE)
+        (asserts!
+          (is-none (map-get? plan-features {
+            tier-id: tier-id,
+            version: version,
+            feature-id: feature-id
+          }))
+          ERR_FEATURE_EXISTS)
+        (map-set plan-features {
+          tier-id: tier-id,
+          version: version,
+          feature-id: feature-id
+        } { enabled: enabled, limit: limit })
+        (ok true)
+      )
+    )
   )
 )
 
 ;; Activation is intentionally separate from publication and is the only
 ;; mutable field on a published plan record.
-(define-public (set-plan-active (plan-id uint) (version uint) (active bool))
-  (let ((plan (unwrap! (map-get? plans { plan-id: plan-id, version: version }) ERR_PLAN_NOT_FOUND)))
-    (begin
-      (asserts! (is-owner) ERR_UNAUTHORIZED)
-      (map-set plans { plan-id: plan-id, version: version } (merge plan { active: active }))
-      (ok active)
+(define-public (set-plan-active (tier-id uint) (version uint) (active bool))
+  (begin
+    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-valid-tier tier-id) ERR_INVALID_TIER)
+    (asserts! (> version u0) ERR_INVALID_PLAN)
+    (let ((plan (unwrap! (map-get? plans { tier-id: tier-id, version: version }) ERR_PLAN_NOT_FOUND)))
+      (begin
+        (map-set plans { tier-id: tier-id, version: version } (merge plan { active: active }))
+        (if active
+          (map-set activated-plan-versions { tier-id: tier-id, version: version } true)
+          true)
+        (ok active)
+      )
     )
   )
 )
@@ -136,23 +169,23 @@
   (var-get owner)
 )
 
-(define-read-only (get-plan (plan-id uint) (version uint))
-  (ok (map-get? plans { plan-id: plan-id, version: version }))
+(define-read-only (get-plan (tier-id uint) (version uint))
+  (ok (map-get? plans { tier-id: tier-id, version: version }))
 )
 
 (define-read-only (get-plan-feature
-    (plan-id uint)
+    (tier-id uint)
     (version uint)
     (feature-id (string-ascii 32)))
   (ok (map-get? plan-features {
-      plan-id: plan-id,
-      version: version,
-      feature-id: feature-id
-    }))
+    tier-id: tier-id,
+    version: version,
+    feature-id: feature-id
+  }))
 )
 
-(define-read-only (is-plan-active (plan-id uint) (version uint))
-  (ok (match (map-get? plans { plan-id: plan-id, version: version })
+(define-read-only (is-plan-active (tier-id uint) (version uint))
+  (ok (match (map-get? plans { tier-id: tier-id, version: version })
     plan (get active plan)
     false))
 )

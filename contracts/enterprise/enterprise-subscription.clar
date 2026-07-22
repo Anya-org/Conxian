@@ -23,7 +23,9 @@
 (define-constant ERR_USAGE_INVALID u5112)
 (define-constant ERR_USAGE_REPLAYED u5113)
 (define-constant ERR_USAGE_LIMIT u5114)
-(define-constant ERR_PLAN_REGISTRY u5115)
+(define-constant ERR_SUBSCRIBER_MISMATCH u5115)
+(define-constant ERR_PLAN_REGISTRY u5116)
+(define-constant ERR_INVALID_AMOUNT u5117)
 
 (define-constant MONTHLY_PERIOD_BLOCKS u4320)
 (define-constant ANNUAL_PERIOD_BLOCKS u51840)
@@ -34,7 +36,7 @@
 (define-map subscriptions
   principal
   {
-    plan-id: uint,
+    tier-id: uint,
     plan-version: uint,
     billing-period: uint,
     paid-from: uint,
@@ -44,14 +46,18 @@
   }
 )
 
-;; Payment IDs are scoped by subscriber here and by source/payment in the
-;; treasury receipt. This prevents replay across both layers.
+;; Payment IDs are globally unique across this subscription route. The same
+;; ID is therefore also unique in the downstream {source, payment-id}
+;; treasury receipt because every payment uses this contract as its source.
 (define-map payment-records
-  { subscriber: principal, payment-id: uint }
+  uint
   {
     subscriber: principal,
     payment-id: uint,
     amount: uint,
+    tier-id: uint,
+    plan-version: uint,
+    billing-period: uint,
     paid-at: uint
   }
 )
@@ -68,6 +74,7 @@
     consumer: principal,
     subscriber: principal,
     feature-id: (string-ascii 32),
+    period-start: uint,
     usage-id: (buff 32)
   }
   {
@@ -87,29 +94,28 @@
     (some (+ left right)))
 )
 
-(define-private (load-plan (plan-id uint) (version uint))
+(define-private (load-plan (tier-id uint) (version uint))
   (let ((plan-option (unwrap!
-    (contract-call? .enterprise-plan-registry get-plan plan-id version)
+    (contract-call? .enterprise-plan-registry get-plan tier-id version)
     (err ERR_PLAN_REGISTRY))))
     (ok (unwrap! plan-option (err ERR_PLAN_NOT_FOUND)))
   )
 )
 
 (define-private (load-feature
-    (plan-id uint)
+    (tier-id uint)
     (version uint)
     (feature-id (string-ascii 32)))
   (let ((feature-option (unwrap!
-    (contract-call? .enterprise-plan-registry get-plan-feature plan-id version feature-id)
+    (contract-call? .enterprise-plan-registry get-plan-feature tier-id version feature-id)
     (err ERR_PLAN_REGISTRY))))
     (ok (unwrap! feature-option (err ERR_FEATURE_NOT_FOUND)))
   )
 )
 
 (define-private (price-for (plan {
-    plan-id: uint,
-    version: uint,
     tier-id: uint,
+    version: uint,
     monthly-price: uint,
     annual-price: uint,
     required-kyc-tier: uint,
@@ -153,7 +159,7 @@
   (match (map-get? subscriptions subscriber)
     subscription
       (let ((feature (try! (load-feature
-        (get plan-id subscription)
+        (get tier-id subscription)
         (get plan-version subscription)
         feature-id))))
         (let (
@@ -169,7 +175,7 @@
             used: used,
             remaining: remaining,
             paid-through: (get paid-through subscription),
-            plan-id: (get plan-id subscription),
+            tier-id: (get tier-id subscription),
             plan-version: (get plan-version subscription)
           }))
         )
@@ -210,21 +216,20 @@
 )
 
 (define-public (subscribe
-    (plan-id uint)
+    (tier-id uint)
     (version uint)
     (billing-period uint)
-    (payment-id uint))
+    (payment-id uint)
+    (amount uint))
   (let (
     (subscriber tx-sender)
     (source (as-contract tx-sender))
   )
     (begin
       (asserts! (is-none (map-get? subscriptions subscriber)) (err ERR_SUBSCRIPTION_EXISTS))
-      (asserts!
-        (is-none (map-get? payment-records { subscriber: subscriber, payment-id: payment-id }))
-        (err ERR_PAYMENT_REPLAYED))
+      (asserts! (is-none (map-get? payment-records payment-id)) (err ERR_PAYMENT_REPLAYED))
       (let (
-        (plan (try! (load-plan plan-id version)))
+        (plan (try! (load-plan tier-id version)))
         (price (try! (price-for plan billing-period)))
         (paid-through (unwrap!
           (safe-add burn-block-height billing-period)
@@ -236,15 +241,19 @@
             validate-enterprise-compliance
             subscriber
             (get required-kyc-tier plan)))
-          (try! (route-payment price source payment-id))
-          (map-set payment-records { subscriber: subscriber, payment-id: payment-id } {
+          (asserts! (is-eq amount price) (err ERR_INVALID_AMOUNT))
+          (try! (route-payment amount source payment-id))
+          (map-set payment-records payment-id {
             subscriber: subscriber,
             payment-id: payment-id,
-            amount: price,
+            amount: amount,
+            tier-id: tier-id,
+            plan-version: version,
+            billing-period: billing-period,
             paid-at: burn-block-height
           })
           (map-set subscriptions subscriber {
-            plan-id: plan-id,
+            tier-id: tier-id,
             plan-version: version,
             billing-period: billing-period,
             paid-from: burn-block-height,
@@ -255,10 +264,10 @@
           (print {
             event: "enterprise-subscription-created",
             subscriber: subscriber,
-            plan-id: plan-id,
+            tier-id: tier-id,
             plan-version: version,
             billing-period: billing-period,
-            amount: price,
+            amount: amount,
             payment-id: payment-id,
             paid-through: paid-through
           })
@@ -270,10 +279,11 @@
 )
 
 (define-public (renew
-    (plan-id uint)
+    (tier-id uint)
     (version uint)
     (billing-period uint)
-    (payment-id uint))
+    (payment-id uint)
+    (amount uint))
   (let (
     (subscriber tx-sender)
     (source (as-contract tx-sender))
@@ -283,11 +293,9 @@
       burn-block-height))
   )
     (begin
-      (asserts!
-        (is-none (map-get? payment-records { subscriber: subscriber, payment-id: payment-id }))
-        (err ERR_PAYMENT_REPLAYED))
+      (asserts! (is-none (map-get? payment-records payment-id)) (err ERR_PAYMENT_REPLAYED))
       (let (
-        (plan (try! (load-plan plan-id version)))
+        (plan (try! (load-plan tier-id version)))
         (price (try! (price-for plan billing-period)))
         (paid-through (unwrap!
           (safe-add base-height billing-period)
@@ -295,19 +303,23 @@
       )
         (begin
           (asserts! (get active plan) (err ERR_PLAN_INACTIVE))
+          (asserts! (is-eq amount price) (err ERR_INVALID_AMOUNT))
           (try! (contract-call? .compliance-hooks
             validate-enterprise-compliance
             subscriber
             (get required-kyc-tier plan)))
-          (try! (route-payment price source payment-id))
-          (map-set payment-records { subscriber: subscriber, payment-id: payment-id } {
+          (try! (route-payment amount source payment-id))
+          (map-set payment-records payment-id {
             subscriber: subscriber,
             payment-id: payment-id,
-            amount: price,
+            amount: amount,
+            tier-id: tier-id,
+            plan-version: version,
+            billing-period: billing-period,
             paid-at: burn-block-height
           })
           (map-set subscriptions subscriber {
-            plan-id: plan-id,
+            tier-id: tier-id,
             plan-version: version,
             billing-period: billing-period,
             paid-from: base-height,
@@ -318,10 +330,10 @@
           (print {
             event: "enterprise-subscription-renewed",
             subscriber: subscriber,
-            plan-id: plan-id,
+            tier-id: tier-id,
             plan-version: version,
             billing-period: billing-period,
-            amount: price,
+            amount: amount,
             payment-id: payment-id,
             paid-through: paid-through
           })
@@ -362,16 +374,20 @@
       consumer: consumer,
       subscriber: subscriber,
       feature-id: feature-id,
+      period-start: (get usage-period-start subscription),
       usage-id: usage-id
     })
   )
     (begin
+      ;; The original payer must be the subscription owner. This check lives
+      ;; at the authoritative boundary, not only in the generic facade.
+      (asserts! (is-eq tx-sender subscriber) (err ERR_SUBSCRIBER_MISMATCH))
       (asserts! (default-to false (map-get? authorized-consumers consumer)) (err ERR_CONSUMER_UNAUTHORIZED))
       (asserts! (> units u0) (err ERR_USAGE_INVALID))
       (asserts! (< burn-block-height (get paid-through subscription)) (err ERR_SUBSCRIPTION_EXPIRED))
       (asserts! (is-none (map-get? usage-records usage-key)) (err ERR_USAGE_REPLAYED))
       (let ((feature (try! (load-feature
-        (get plan-id subscription)
+        (get tier-id subscription)
         (get plan-version subscription)
         feature-id))))
         (begin
@@ -400,6 +416,7 @@
                 subscriber: subscriber,
                 feature-id: feature-id,
                 usage-id: usage-id,
+                period-start: (get usage-period-start subscription),
                 units: units,
                 used: new-used
               })
@@ -423,7 +440,7 @@
 (define-read-only (get-subscription (subscriber principal))
   (ok (match (map-get? subscriptions subscriber)
     subscription (some {
-      plan-id: (get plan-id subscription),
+      tier-id: (get tier-id subscription),
       plan-version: (get plan-version subscription),
       billing-period: (get billing-period subscription),
       paid-from: (get paid-from subscription),
@@ -454,11 +471,13 @@
     (consumer principal)
     (subscriber principal)
     (feature-id (string-ascii 32))
+    (period-start uint)
     (usage-id (buff 32)))
   (ok (map-get? usage-records {
     consumer: consumer,
     subscriber: subscriber,
     feature-id: feature-id,
+    period-start: period-start,
     usage-id: usage-id
   }))
 )
@@ -470,6 +489,6 @@
   (ok (get-used subscriber feature-id period-start))
 )
 
-(define-read-only (get-payment-record (subscriber principal) (payment-id uint))
-  (ok (map-get? payment-records { subscriber: subscriber, payment-id: payment-id }))
+(define-read-only (get-payment-record (payment-id uint))
+  (ok (map-get? payment-records payment-id))
 )

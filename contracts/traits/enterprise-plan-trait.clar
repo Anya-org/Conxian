@@ -1,14 +1,13 @@
 ;; enterprise-plan-trait.clar
-;; Stable read interface for immutable, versioned enterprise plan records.
+;; Stable read interface for immutable {tier-id, version} enterprise plans.
 
 (define-trait enterprise-plan-trait
   (
     (get-plan
       (uint uint)
       (response (optional {
-        plan-id: uint,
-        version: uint,
         tier-id: uint,
+        version: uint,
         monthly-price: uint,
         annual-price: uint,
         required-kyc-tier: uint,

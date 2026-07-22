@@ -22,10 +22,17 @@
 ;; Generic consumer boundary for products that meter an approved enterprise
 ;; entitlement. Product-specific feature mappings remain outside this facade;
 ;; the subscription contract owns authorization, replay protection, and limits.
+(define-constant ERR_SUBSCRIBER_MISMATCH (err u5200))
+
 (define-public (record-subscription-usage
     (subscriber principal)
     (feature-id (string-ascii 32))
     (usage-id (buff 32))
     (units uint))
-  (contract-call? .enterprise-subscription record-usage subscriber feature-id usage-id units)
+  (begin
+    ;; The facade is a convenience boundary, not a trusted proxy. Preserve
+    ;; the MVP rule that only the subscriber wallet can meter its entitlement.
+    (asserts! (is-eq tx-sender subscriber) ERR_SUBSCRIBER_MISMATCH)
+    (contract-call? .enterprise-subscription record-usage subscriber feature-id usage-id units)
+  )
 )
