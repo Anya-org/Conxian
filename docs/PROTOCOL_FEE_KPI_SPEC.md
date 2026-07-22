@@ -20,14 +20,15 @@ The canonical eligible fee-base volume for a reporting window is:
 
 ```text
 eligible_fee_base_native(window, asset, stream)
-  = sum(eligible-fee-base from successful protocol-fee-settled events
-        whose settlement-id is unique and whose block is in window)
+  = sum(eligible-fee-base from successful protocol-fee-collected events
+        whose (source, settlement-id) is unique and whose block is in window)
 ```
 
-The collector emits exactly one settlement event per accepted settlement ID.
-An indexer must de-duplicate by `(settlement-id, tx-id, event-index)` and must
-exclude reverted transactions. The source integration owns the fee-base
-definition and must call the collector once for that base.
+The collector emits exactly one `protocol-fee-collected` event per accepted
+`(source, settlement-id)` pair. An indexer must de-duplicate by
+`(source, settlement-id, tx-id, event-index)` and must exclude reverted
+transactions. The source integration owns the fee-base definition and must call
+the collector once for that base.
 
 The following rules prevent double counting:
 
@@ -45,7 +46,37 @@ The following rules prevent double counting:
   allocations are excluded unless governance registers a separate fee-bearing
   stream.
 
-### 1.2 Native units and USD normalization
+### 1.2 Scheduled rates and residual arithmetic
+
+The schedule is driven by the burn-block policy clock, not wall time:
+
+- launch: 200 bps from `activation` through `activation + 52,559`;
+- growth: 150 bps from `activation + 52,560` through
+  `activation + 157,679`; and
+- mature: 100 bps from `activation + 157,680` onward.
+
+`52,560` is the 365-day approximation at six burn blocks per hour and
+`157,680` is the three-year approximation. Bitcoin burn-block production is not
+exactly six blocks per hour, so these are policy boundaries rather than exact
+calendar dates. A future activation height returns `not active` before launch.
+
+Settlement arithmetic carries a numerator remainder per registered
+`(source, stream, asset)`:
+
+```text
+numerator = eligible_base * rate_bps + prior_remainder
+assessed  = floor(numerator / 10,000)
+remainder = numerator mod 10,000
+```
+
+The remainder is retained across phase changes because every phase uses the
+same denominator. A positive base can therefore produce an assessed amount of
+zero; the collector records the accepted base, zero assessed/settled amount,
+and new remainder without attempting a zero-value transfer. Stream asset and
+route identity is immutable after registration, so a later configuration call
+cannot erase economically relevant residual state.
+
+### 1.3 Native units and USD normalization
 
 On-chain values are stored and summed per asset in native base units. No value
 such as `u1000000` is interpreted as `$1M` without all of the following:
@@ -66,25 +97,27 @@ eligible_fee_base_usd(window)
 Rows missing any required normalization evidence are retained in native units
 but excluded from the USD total and marked `usd_status = unavailable`.
 
-The `$1M daily volume` milestone is this indexed, USD-normalized KPI. It is
+The `$1M daily eligible volume` milestone is this indexed, USD-normalized KPI. It is
 not an activation gate and does not change the collector's burn-block schedule.
 
 ## 2. Fee and revenue vocabulary
 
 | Measure | Definition | Phase-1 evidence |
 | --- | --- | --- |
-| Eligible fee-base volume | Registered source base before the scheduled rate | `protocol-fee-settled.eligible-fee-base` event |
-| Fees assessed | Scheduled fee computed from the base | `assessed-amount` event and collector accounting |
-| Fees settled | Amount transferred successfully through the configured route | `settled-amount` event and collector accounting |
-| Realized protocol revenue | Amount that reaches the protocol-owned downstream revenue route after settlement | Transfer/route events; not inferred from assessment alone |
+| Eligible fee-base volume | Registered source base before the scheduled rate | `protocol-fee-collected.eligible-fee-base` event |
+| Fees assessed | Scheduled fee computed with the stream's residual numerator | `assessed-amount` event field and collector accounting |
+| Fees settled at ingress | Assessed amount atomically transferred from payer to the configured passive ingress recipient; may be zero when only a residual is carried | `settled-amount`, `recipient`, transfer event, and collector accounting |
+| Realized downstream protocol revenue | Amount later accepted by a downstream revenue, swap, burn, or Fiscal Dam operation | Downstream transfer/route events; never inferred from ingress assessment |
 | Treasury inflows | Amount actually received by the treasury or its configured vault | Destination transfer events and vault state |
 | Executed allocation | Amount released by the approved Fiscal Dam/vault allocation | Allocation approval/release events and vault state |
 
-In phase 1, the collector writes `assessed-fees` and `settled-fees` together
-only after both the payer transfer and fixed downstream call succeed. The
-separate vocabulary is retained so future routing can distinguish a fee that
-was assessed from one that was realized or allocated. A collector event is not
-proof that a later treasury allocation executed.
+In phase 1, the collector writes `assessed-fees` and `settled-fees` only after
+the payer-to-ingress transfer succeeds; it does not call a downstream route in
+that transaction. For a positive base whose residual calculation yields zero,
+the accepted event and accounting row are still evidence, but no zero-value
+transfer is attempted. A collector event proves collection at ingress only; it
+is not proof of realized downstream revenue, treasury inflow beyond the stated
+recipient transfer, or later allocation execution.
 
 ## 3. KPI formulas
 
@@ -148,8 +181,8 @@ The minimum normalized settlement row is:
 | --- | --- | --- | --- |
 | `tx_id` | hex string | yes | Stacks transaction identifier |
 | `event_index` | integer | yes | Indexer event position in the transaction |
-| `settlement_id` | 32-byte hex | yes | Collector replay-protection key |
-| `source` | principal | yes | Registered immediate caller |
+| `settlement_id` | 32-byte hex | yes | Collector replay-protection key scoped by `source` |
+| `source` | principal | yes | Registered immediate caller; production KPI evidence should prefer a contract source |
 | `stream_id` | uint | yes | Registered fee stream |
 | `payer` | principal | yes | `tx-sender` that funded the atomic transfer |
 | `asset_kind` | enum | yes | `ft` or `stx` |
@@ -157,8 +190,10 @@ The minimum normalized settlement row is:
 | `eligible_base_native` | uint | yes | Fee base in the asset's native units |
 | `rate_bps` | uint | yes | Resolved on-chain rate: 200, 150, or 100 |
 | `phase` | enum | yes | Launch, growth, or mature |
-| `assessed_native` | uint | yes | Fee calculated by the collector |
-| `settled_native` | uint | yes | Fee successfully routed by the collector |
+| `assessed_native` | uint | yes | Fee calculated by the collector, including zero-fee residual settlements |
+| `settled_native` | uint | yes | Amount transferred to the passive ingress recipient; equal to assessed in phase 1 |
+| `fee_remainder` | uint | yes for accounting snapshots | Numerator remainder modulo 10,000 after the settlement |
+| `recipient` | principal | yes | Admin-injected protocol-owned passive ingress recipient |
 | `burn_height` | uint | yes | Burn-block context emitted by Clarity |
 | `stacks_height` | uint | yes | Stacks-block context emitted by Clarity |
 | `block_time` | timestamp | yes for USD windows | Indexer-resolved block timestamp |
@@ -180,7 +215,7 @@ reproduced after an oracle or decimal registry update.
 | --- | --- | --- |
 | Rate, phase, activation, stream config | Collector Clarity read-only state | Yes for a connected simnet/node call |
 | Assessed/settled native amounts | Collector state and successful `print` event | Yes for transaction receipts in tests; historical production data needs an indexer |
-| Settlement ID uniqueness | Collector replay map plus indexed transaction events | No, not as a chain-wide historical query |
+| `(source, settlement-id)` uniqueness | Collector replay map plus indexed transaction events | No, not as a chain-wide historical query |
 | Payer/source/asset/fee-base event fields | Hiro transaction `contract_log` / `print` events | No, use the indexed API or equivalent indexer |
 | Daily and 30d windows | Indexed finalized events plus block timestamps | No |
 | Decimals and token identity | Clarity token metadata and a versioned asset registry | Partially |
@@ -193,7 +228,25 @@ production index. A production KPI job must persist transaction IDs, event
 indices, block timestamps, normalization evidence, and the query version used
 to build each window.
 
-## 6. Research and implementation references
+## 6. Source trust and phase-1 boundary
+
+The collector accepts admin-authorized source principals so simnet fixtures and
+controlled migrations can exercise the same settlement surface. This is an
+operational authorization boundary, not proof that an EOA-derived base is
+trustless. Production source registrations should be contract principals whose
+own successful economic operation derives and submits the eligible base. An
+admin-authorized EOA may be used operationally, but its events must not be
+treated as independent KPI evidence without an external trust designation.
+
+The collector's configured ingress recipient defaults to the relative
+`.operational-treasury` principal and can be rotated only by the configured
+admin or immediate governance caller. The recipient is passive: the collector
+does not invoke it and does not claim that Fiscal Dam allocation, DEX routing,
+lending routing, burning, or downstream realized revenue occurred in the same
+transaction. The `$1M daily eligible volume` milestone remains an
+indexed/oracle-derived KPI and is not an activation gate.
+
+## 7. Research and implementation references
 
 These are the canonical references used for the schema and evidence model:
 

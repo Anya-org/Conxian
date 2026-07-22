@@ -4,13 +4,13 @@
 The Treasury module manages the protocol's capital allocation and revenue distribution. It implements the "Fiscal Dam" (CXIP-013) and provides one canonical scheduled protocol-fee settlement path. The phase-1 collector is designed to replace a designated legacy charge on a registered fee base, never to add a second charge to the same flow.
 
 ## Architecture (Explanation)
-- **Canonical collection**: `protocol-fee-collector.clar` resolves 200/150/100 bps from an explicit activation burn-block height, enforces source/stream registration, pauses fail closed, prevents settlement replay, and records native-unit accounting.
+- **Canonical collection**: `protocol-fee-collector.clar` resolves 200/150/100 bps from an explicit activation burn-block height, enforces immutable source/stream/asset registration, pauses fail closed, prevents `(source, settlement-id)` replay, carries numerator residuals, and records native-unit accounting.
 - **Legacy compatibility**: `revenue-automation.clar` remains a legacy 100 bps surface until phase 2 migrates each approved source. Do not compose it with the canonical collector on the same fee base.
 - **Registry**: `cxd-treasury.clar` maintains the global allocation policy.
 - **Distribution**: `revenue-distributor.clar` executes token buy-backs and burns.
-- **Integration Billing**: `integration-fee-collector.clar` sends 100% of
-  settled STX integration fees through the same distributor route; there is no
-  partner split or direct bypass to `operational-treasury`.
+- **Integration Billing**: `integration-fee-collector.clar` remains a separate
+  legacy integration settlement surface. It is not the phase-1 protocol-fee
+  collector and is not evidence of downstream realization for collector events.
 - **Fiscal allocations**: `fiscal-vault-oracle.clar` registers SBC beneficiaries,
   reserves period/category caps, and releases SIP-010 assets only from approved
   allocations.
@@ -29,30 +29,43 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 ### `protocol-fee-collector.clar`
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `set-authorized-source` | `(source principal) (authorized bool)` | Enables or disables an immediate source caller (Admin only). |
-| `register-ft-stream` | `(source principal) (stream-id uint) (token principal) (route uint)` | Registers a SIP-010 asset stream on the fixed revenue-distributor route (Admin only). |
-| `register-stx-stream` | `(source principal) (stream-id uint) (route uint)` | Registers a native STX stream on the fixed revenue-distributor route (Admin only). |
-| `set-stream-active` | `(source principal) (stream-id uint) (asset-kind uint) (asset (optional principal)) (active bool)` | Pauses or resumes one registered stream (Admin only); use `none` for native STX. |
-| `pause` / `unpause` | `()` | Fail-closed global settlement switch (Admin only). |
-| `set-activation-burn-height` | `(new-height uint)` | Sets the non-retroactive schedule anchor before the first settlement. |
-| `settle-ft` | `(token <sip-010-ft-trait>) (stream-id uint) (eligible-fee-base uint) (settlement-id (buff 32))` | Calculates the scheduled fee and atomically routes a SIP-010 settlement. |
-| `settle-stx` | `(stream-id uint) (eligible-fee-base uint) (settlement-id (buff 32))` | Calculates the scheduled fee and atomically routes a native STX settlement. |
-| `get-accounting` | `(source principal) (stream-id uint) (asset-kind uint) (asset (optional principal))` | Reads cumulative eligible, assessed, settled, and settlement-count state; use `none` for native STX. |
-| `get-settlement` | `(settlement-id (buff 32))` | Reads the immutable settlement record used by indexers. |
+| `set-governance` | `(new-governance principal)` | Configures the immediate governance caller used alongside the admin (Admin or configured governance caller). |
+| `set-ingress-recipient` | `(new-recipient principal)` | Sets the fixed protocol-owned passive ingress destination; the caller never supplies it during settlement. |
+| `set-authorized-source` | `(source principal) (authorized bool)` | Enables or disables an immediate source caller (admin or configured governance caller). |
+| `register-ft-stream` | `(source principal) (stream-id uint) (token principal) (route uint)` | Registers one immutable SIP-010 asset stream on the passive ingress route (admin or configured governance caller). |
+| `register-stx-stream` | `(source principal) (stream-id uint) (route uint)` | Registers one immutable native STX stream on the passive ingress route (admin or configured governance caller). |
+| `set-stream-active` | `(source principal) (stream-id uint) (asset-kind uint) (asset (optional principal)) (active bool)` | Pauses or resumes one registered stream (admin or configured governance caller); use `none` for native STX. |
+| `pause` / `unpause` | `()` | Fail-closed global settlement switch (admin or configured governance caller). |
+| `set-activation-burn-height` | `(new-height uint)` | Sets the non-retroactive schedule anchor before the first settlement (admin or configured governance caller). |
+| `settle-ft` | `(token <sip-010-ft-trait>) (stream-id uint) (eligible-fee-base uint) (settlement-id (buff 32))` | Calculates residual-aware fee and atomically transfers SIP-010 units from payer to the configured ingress recipient. |
+| `settle-stx` | `(stream-id uint) (eligible-fee-base uint) (settlement-id (buff 32))` | Calculates residual-aware fee and atomically transfers STX from payer to the configured ingress recipient. |
+| `get-accounting` | `(source principal) (stream-id uint) (asset-kind uint) (asset (optional principal))` | Reads cumulative eligible, assessed, settled-at-ingress, residual, and settlement-count state; use `none` for native STX. |
+| `get-settlement` | `(source principal) (settlement-id (buff 32))` | Reads the immutable `(source, settlement-id)` record used by indexers. |
 
 The launch rate is 200 bps for the half-open interval
-`[activation, activation + 12 * 4320)`, growth is 150 bps for
-`[activation + 12 * 4320, activation + 36 * 4320)`, and mature is 100 bps from
-`activation + 36 * 4320` onward. `4320` is a documented approximation of a
-30-day calendar month at six ten-minute Bitcoin blocks per hour; the contract
-uses burn-block boundaries, not wall-clock months. Positive fee bases use
-ceiling arithmetic with a one-native-unit minimum when the exact percentage is
-fractional.
+`[activation, activation + 52,560)`, growth is 150 bps for
+`[activation + 52,560, activation + 157,680)`, and mature is 100 bps from
+`activation + 157,680` onward. `52,560` is the 365-day approximation and
+`157,680` is the three-year approximation at six ten-minute burn blocks per
+hour. These are policy clocks, not exact wall-time dates.
+
+Settlement arithmetic carries `base * rate-bps + prior-remainder` over the
+10,000 denominator. A positive base that produces zero fee is still recorded
+with its residual and does not attempt a zero-value transfer. Asset and route
+identity cannot be replaced after registration, so residual/accounting state
+cannot be erased by reconfiguration.
+
+Admin authorization uses a deliberate caller model: a direct EOA must satisfy
+`contract-caller = tx-sender = admin`; a configured admin or governance contract
+must be the immediate `contract-caller`. An arbitrary contract cannot borrow an
+admin EOA's `tx-sender` authority. Production source registrations should use
+contracts that derive their own base from successful economic operations; an
+admin-authorized EOA is an operational trust boundary, not trustless KPI proof.
 
 Phase 1 does not wire DEX or lending callers and does not change
 `conxian-access.clar`. It also does not hand-edit generated deployment plans;
-the new Clarinet manifest entry must be included when deployment plans are
-regenerated at the phase-2 integration checkpoint.
+the collector's updated passive-ingress dependency must be included when
+deployment plans are regenerated at the phase-2 integration checkpoint.
 
 See [`docs/PROTOCOL_FEE_KPI_SPEC.md`](../../docs/PROTOCOL_FEE_KPI_SPEC.md) for
 the indexed volume, fee, revenue, allocation, and USD-normalization schema.
@@ -66,15 +79,17 @@ the indexed volume, fee, revenue, allocation, and USD-normalization schema.
 | `get-allocation-percentages` | `()` | Returns the current fiscal split. |
 | `get-protocol-status` | `()` | Returns compliance and version status. |
 
-### `revenue-distributor.clar` integration route
+### `revenue-distributor.clar` downstream route
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `distribute-stx` | `(uint)` | Existing STX route used by the collector under contract context. |
+| `distribute-stx` | `(uint)` | Existing downstream STX route; not called by the phase-1 collector. |
 
-The collector calls the existing route from contract custody after receiving
-an exact settlement from the configured payer. No distributor setter or
-separate integration route is added; the distributor remains the system of
-record for downstream revenue routing and CXIP-013 behavior.
+The phase-1 collector does **not** call this route. It transfers the assessed
+FT or STX amount directly from the payer to its configured passive ingress
+recipient, which defaults to `.operational-treasury`. A later downstream
+operation may consume that ingress balance, but its realized revenue, treasury
+inflow, and Fiscal Dam allocation must be evidenced separately. This deliberate
+boundary removes the collector-to-distributor-to-DEX dependency cycle.
 
 ### `conxian-vaults.clar`
 | Function | Signature | Description |

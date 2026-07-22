@@ -4,15 +4,15 @@
 ;; source/stream/asset combinations. The collector replaces a legacy charge on
 ;; a designated fee base; it must not be called in addition to that charge.
 ;;
-;; Phase 1 deliberately supports only two concrete settlement paths:
-;; - SIP-010 fungible tokens through the existing revenue-distributor route.
-;; - native STX through the existing revenue-distributor route.
+;; Phase 1 settles only at a protocol-owned passive ingress recipient. It does
+;; not call the Fiscal Dam, a DEX, lending, or a burn route in the same
+;; transaction. Downstream realization and allocation are separate evidence
+;; stages for indexers and treasury automation.
 ;;
-;; The payer is always tx-sender. This is intentional: standard SIP-010
-;; transfer implementations require the transaction sender to equal `from`,
-;; and STX settlement has the same atomic sender requirement. A source contract
-;; can call this contract on behalf of a payer only when that payer initiated
-;; the transaction. No allowance or generic token behavior is assumed.
+;; The payer is always tx-sender. A source contract may call this contract on
+;; behalf of a payer only when that payer initiated the transaction. SIP-010
+;; transfer implementations therefore receive tx-sender as `from`, while the
+;; collector supplies the configured ingress recipient as `to`.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
@@ -33,21 +33,21 @@
 (define-constant ERR_ACTIVATION_LOCKED (err u4113))
 (define-constant ERR_ACCOUNTING_OVERFLOW (err u4114))
 (define-constant ERR_INVALID_ASSET_KIND (err u4115))
+(define-constant ERR_STREAM_ALREADY_REGISTERED (err u4117))
 
 ;; --- Constants ---
 
 (define-constant MAX_UINT u340282366920938463463374607431768211455)
 (define-constant BPS_DENOMINATOR u10000)
-(define-constant BPS_ROUNDING_OFFSET u9999)
 
-;; Six ten-minute Bitcoin blocks per hour and thirty days per calendar month
-;; is the documented approximation used for phase labels. The schedule itself
-;; is block-based and has no wall-clock dependency.
-(define-constant BURN_BLOCKS_PER_MONTH u4320)
-(define-constant GROWTH_PHASE_MONTHS u12)
-(define-constant MATURE_PHASE_MONTHS u36)
-(define-constant GROWTH_PHASE_BLOCKS u51840)
-(define-constant MATURE_PHASE_BLOCKS u155520)
+;; Six ten-minute Bitcoin blocks per hour. These are policy-clock
+;; approximations: they are burn-block boundaries, not exact wall-clock dates.
+;; 365 days * 24 hours * 6 burn blocks/hour = 52,560.
+(define-constant BURN_BLOCKS_PER_YEAR u52560)
+(define-constant GROWTH_PHASE_BLOCKS u52560)
+(define-constant MATURE_PHASE_BLOCKS u157680)
+(define-constant GROWTH_PHASE_YEARS u1)
+(define-constant MATURE_PHASE_YEARS u3)
 
 (define-constant RATE_LAUNCH_BPS u200)
 (define-constant RATE_GROWTH_BPS u150)
@@ -59,29 +59,39 @@
 
 (define-constant ASSET_KIND_FT u1)
 (define-constant ASSET_KIND_STX u2)
-(define-constant ROUTE_REVENUE_DISTRIBUTOR u1)
+
+;; The route is an invariant label for the phase-1 passive ingress path. It is
+;; intentionally not a compile-time call target or a claim of downstream
+;; Fiscal Dam allocation.
+(define-constant ROUTE_PROTOCOL_INGRESS u1)
 
 ;; --- Administrative and schedule state ---
 
 (define-data-var admin principal tx-sender)
+(define-data-var governance principal tx-sender)
 (define-data-var paused bool false)
 (define-data-var activation-burn-height uint burn-block-height)
+(define-data-var ingress-recipient principal .operational-treasury)
 (define-data-var total-settlements uint u0)
 
-;; An authorized source is the immediate contract caller. A direct EOA source
-;; is also supported because contract-caller equals tx-sender for a top-level
-;; call. Stream registration remains admin-only and binds one asset to one
-;; source/stream pair.
+;; An authorized source is the immediate contract caller. Direct EOAs remain
+;; available for simnet and controlled operations, but production KPI evidence
+;; should prefer contract sources that derive the base from their own
+;; successful economic operation. Clarity does not provide a safe general
+;; contract-principal type test for this registry.
 (define-map authorized-sources principal bool)
 
+;; A source/stream identity is immutable after registration. Asset and route
+;; are stored in the value rather than the key so a later registration cannot
+;; silently create a new asset namespace and discard residual accounting.
 (define-map stream-configs
   {
     source: principal,
-    stream-id: uint,
-    asset-kind: uint,
-    asset: (optional principal)
+    stream-id: uint
   }
   {
+    asset-kind: uint,
+    asset: (optional principal),
     active: bool,
     route: uint
   }
@@ -102,15 +112,24 @@
     assessed-fees: uint,
     settled-fees: uint,
     settlement-count: uint,
+    fee-remainder: uint,
+    last-rate-bps: uint,
+    last-phase: uint,
     last-settled-burn-height: uint,
     last-settled-stacks-height: uint
   }
 )
 
-(define-map settlements (buff 32)
-  ;; `block-height` is the Stacks context keyword exposed by the repository's
-  ;; Clarinet 3.21 SDK; indexers should normalize this field as stacks height.
+;; Replay protection is scoped to the authorized source plus settlement ID.
+;; This permits independent sources to use the same local ID while preserving
+;; uniqueness for every source's own settlement stream.
+(define-map settlements
   {
+    source: principal,
+    settlement-id: (buff 32)
+  }
+  {
+    settlement-id: (buff 32),
     source: principal,
     stream-id: uint,
     asset-kind: uint,
@@ -121,6 +140,7 @@
     phase: uint,
     assessed-amount: uint,
     settled-amount: uint,
+    recipient: principal,
     burn-height: uint,
     stacks-height: uint
   }
@@ -142,22 +162,38 @@
       (some (* left right))))
 )
 
-(define-private (calculate-fee-at-rate (eligible-fee-base uint) (rate-bps uint))
-  (if (is-eq eligible-fee-base u0)
-    (some u0)
-    (let (
-      (product-opt (safe-multiply eligible-fee-base rate-bps))
-    )
+;; Fee arithmetic carries the numerator remainder, rather than rounding each
+;; settlement independently:
+;;   numerator = base * rate-bps + prior-remainder
+;;   assessed = floor(numerator / 10,000)
+;;   remainder = numerator mod 10,000
+;; The remainder is keyed by source/stream/asset in fee-accounting and is
+;; retained through phase changes because every phase uses the same denominator.
+(define-private (calculate-fee-at-rate
+    (eligible-fee-base uint)
+    (rate-bps uint)
+    (fee-remainder uint))
+  (if (>= fee-remainder BPS_DENOMINATOR)
+    none
+    (let ((product-opt (safe-multiply eligible-fee-base rate-bps)))
       (if (is-none product-opt)
         none
-        (let (
-          (rounded-product-opt (safe-add
+        (let ((numerator-opt (safe-add
             (default-to u0 product-opt)
-            BPS_ROUNDING_OFFSET))
-        )
-          (if (is-none rounded-product-opt)
+            fee-remainder)))
+          (if (is-none numerator-opt)
             none
-            (some (/ (default-to u0 rounded-product-opt) BPS_DENOMINATOR))))))))
+            (let ((numerator (default-to u0 numerator-opt)))
+              (some {
+                assessed-amount: (/ numerator BPS_DENOMINATOR),
+                fee-remainder: (mod numerator BPS_DENOMINATOR)
+              }))
+          )
+        )
+      )
+    )
+  )
+)
 
 (define-private (empty-accounting)
   {
@@ -165,6 +201,9 @@
     assessed-fees: u0,
     settled-fees: u0,
     settlement-count: u0,
+    fee-remainder: u0,
+    last-rate-bps: u0,
+    last-phase: u0,
     last-settled-burn-height: u0,
     last-settled-stacks-height: u0
   }
@@ -173,9 +212,9 @@
 ;; --- Schedule resolution ---
 
 ;; Boundaries are exact and half-open:
-;; [activation, activation + 12 months) = 200 bps
-;; [activation + 12 months, activation + 36 months) = 150 bps
-;; [activation + 36 months, infinity) = 100 bps
+;; [activation, activation + 52,560) = 200 bps
+;; [activation + 52,560, activation + 157,680) = 150 bps
+;; [activation + 157,680, infinity) = 100 bps
 (define-private (resolve-phase-at (height uint))
   (let (
     (activation (var-get activation-burn-height))
@@ -197,8 +236,19 @@
 
 ;; --- Configuration helpers ---
 
+;; Admin authorization deliberately distinguishes a direct EOA from a
+;; contract-mediated call. An EOA admin is accepted only when
+;; contract-caller = tx-sender = admin. A configured admin or governance
+;; contract is accepted only as the immediate contract-caller, so an arbitrary
+;; contract cannot borrow the admin EOA's tx-sender authority.
 (define-private (is-admin)
-  (is-eq tx-sender (var-get admin))
+  (or
+    (and
+      (is-eq contract-caller tx-sender)
+      (is-eq tx-sender (var-get admin)))
+    (is-eq contract-caller (var-get admin))
+    (is-eq contract-caller (var-get governance))
+  )
 )
 
 (define-private (load-stream-config
@@ -210,17 +260,17 @@
     (source-authorized (default-to false (map-get? authorized-sources source)))
     (config-opt (map-get? stream-configs {
       source: source,
-      stream-id: stream-id,
-      asset-kind: asset-kind,
-      asset: asset
+      stream-id: stream-id
     }))
   )
     (begin
       (asserts! source-authorized ERR_SOURCE_NOT_AUTHORIZED)
       (let ((config (unwrap! config-opt ERR_STREAM_NOT_FOUND)))
         (begin
+          (asserts! (is-eq (get asset-kind config) asset-kind) ERR_INVALID_CONFIG)
+          (asserts! (is-eq (get asset config) asset) ERR_INVALID_CONFIG)
           (asserts! (get active config) ERR_STREAM_INACTIVE)
-          (asserts! (is-eq (get route config) ROUTE_REVENUE_DISTRIBUTOR) ERR_INVALID_ROUTE)
+          (asserts! (is-eq (get route config) ROUTE_PROTOCOL_INGRESS) ERR_INVALID_ROUTE)
           (ok config)
         )
       )
@@ -234,6 +284,27 @@
   (begin
     (asserts! (is-admin) ERR_UNAUTHORIZED)
     (var-set admin new-admin)
+    (ok true)
+  )
+)
+
+(define-public (set-governance (new-governance principal))
+  (begin
+    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (var-set governance new-governance)
+    (ok true)
+  )
+)
+
+(define-public (set-ingress-recipient (new-recipient principal))
+  (begin
+    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (var-set ingress-recipient new-recipient)
+    (print {
+      event: "protocol-fee-ingress-recipient-updated",
+      recipient: new-recipient,
+      block-height: block-height
+    })
     (ok true)
   )
 )
@@ -255,13 +326,19 @@
     (asserts! (is-admin) ERR_UNAUTHORIZED)
     (asserts! (default-to false (map-get? authorized-sources source)) ERR_SOURCE_NOT_AUTHORIZED)
     (asserts! (> stream-id u0) ERR_INVALID_CONFIG)
-    (asserts! (is-eq route ROUTE_REVENUE_DISTRIBUTOR) ERR_INVALID_ROUTE)
+    (asserts! (is-eq route ROUTE_PROTOCOL_INGRESS) ERR_INVALID_ROUTE)
+    (asserts!
+      (is-none (map-get? stream-configs { source: source, stream-id: stream-id }))
+      ERR_STREAM_ALREADY_REGISTERED)
+    ;; The registered token must implement SIP-010 when settle-ft supplies the
+    ;; trait argument. The collector never pretends to support arbitrary token
+    ;; behavior or a downstream burn operation.
     (map-set stream-configs {
       source: source,
-      stream-id: stream-id,
-      asset-kind: ASSET_KIND_FT,
-      asset: (some token)
+      stream-id: stream-id
     } {
+      asset-kind: ASSET_KIND_FT,
+      asset: (some token),
       active: true,
       route: route
     })
@@ -277,13 +354,16 @@
     (asserts! (is-admin) ERR_UNAUTHORIZED)
     (asserts! (default-to false (map-get? authorized-sources source)) ERR_SOURCE_NOT_AUTHORIZED)
     (asserts! (> stream-id u0) ERR_INVALID_CONFIG)
-    (asserts! (is-eq route ROUTE_REVENUE_DISTRIBUTOR) ERR_INVALID_ROUTE)
+    (asserts! (is-eq route ROUTE_PROTOCOL_INGRESS) ERR_INVALID_ROUTE)
+    (asserts!
+      (is-none (map-get? stream-configs { source: source, stream-id: stream-id }))
+      ERR_STREAM_ALREADY_REGISTERED)
     (map-set stream-configs {
       source: source,
-      stream-id: stream-id,
-      asset-kind: ASSET_KIND_STX,
-      asset: none
+      stream-id: stream-id
     } {
+      asset-kind: ASSET_KIND_STX,
+      asset: none,
       active: true,
       route: route
     })
@@ -291,6 +371,8 @@
   )
 )
 
+;; Activation and route/asset identity are intentionally separate controls:
+;; this setter can pause a stream, but it cannot replace its asset or route.
 (define-public (set-stream-active
     (source principal)
     (stream-id uint)
@@ -300,9 +382,7 @@
   (let (
     (key {
       source: source,
-      stream-id: stream-id,
-      asset-kind: asset-kind,
-      asset: asset
+      stream-id: stream-id
     })
   )
     (begin
@@ -315,6 +395,8 @@
         ERR_INVALID_CONFIG)
       (let ((config (unwrap! (map-get? stream-configs key) ERR_STREAM_NOT_FOUND)))
         (begin
+          (asserts! (is-eq (get asset-kind config) asset-kind) ERR_INVALID_CONFIG)
+          (asserts! (is-eq (get asset config) asset) ERR_INVALID_CONFIG)
           (map-set stream-configs key (merge config { active: active }))
           (ok active)
         )
@@ -352,9 +434,9 @@
 
 ;; --- Settlement ---
 
-;; The FT path transfers payer -> revenue-distributor, then invokes the
-;; distributor under collector custody. Both calls and all accounting updates
-;; are in one Clarity transaction and therefore roll back together on failure.
+;; FT settlement transfers payer -> configured passive ingress. There is no
+;; downstream contract call. All state writes and the event occur only after
+;; that transfer succeeds; a failed transfer rolls the transaction back.
 (define-public (settle-ft
     (token <sip-010-ft-trait>)
     (stream-id uint)
@@ -365,14 +447,24 @@
     (asset (some (contract-of token)))
     (config (try! (load-stream-config source stream-id ASSET_KIND_FT asset)))
     (phase (try! (resolve-phase-at burn-block-height)))
-    (assessed-amount (unwrap! (calculate-fee-at-rate eligible-fee-base (get rate-bps phase)) ERR_ARITHMETIC_OVERFLOW))
+    (recipient (var-get ingress-recipient))
     (accounting-key {
       source: source,
       stream-id: stream-id,
       asset-kind: ASSET_KIND_FT,
       asset: asset
     })
+    (settlement-key {
+      source: source,
+      settlement-id: settlement-id
+    })
     (old-accounting (default-to (empty-accounting) (map-get? fee-accounting accounting-key)))
+    (fee-calculation (unwrap! (calculate-fee-at-rate
+      eligible-fee-base
+      (get rate-bps phase)
+      (get fee-remainder old-accounting)) ERR_ARITHMETIC_OVERFLOW))
+    (assessed-amount (get assessed-amount fee-calculation))
+    (new-remainder (get fee-remainder fee-calculation))
     (new-eligible-base (unwrap! (safe-add (get eligible-base old-accounting) eligible-fee-base) ERR_ACCOUNTING_OVERFLOW))
     (new-assessed-fees (unwrap! (safe-add (get assessed-fees old-accounting) assessed-amount) ERR_ACCOUNTING_OVERFLOW))
     (new-settled-fees (unwrap! (safe-add (get settled-fees old-accounting) assessed-amount) ERR_ACCOUNTING_OVERFLOW))
@@ -382,14 +474,20 @@
     (begin
       (asserts! (not (var-get paused)) ERR_PAUSED)
       (asserts! (> eligible-fee-base u0) ERR_INVALID_AMOUNT)
-      (asserts! (> assessed-amount u0) ERR_INVALID_AMOUNT)
-      (asserts! (is-none (map-get? settlements settlement-id)) ERR_SETTLEMENT_REPLAYED)
-      (asserts! (is-eq (get route config) ROUTE_REVENUE_DISTRIBUTOR) ERR_INVALID_ROUTE)
+      (asserts! (is-none (map-get? settlements settlement-key)) ERR_SETTLEMENT_REPLAYED)
+      (asserts! (is-eq (get route config) ROUTE_PROTOCOL_INGRESS) ERR_INVALID_ROUTE)
 
-      (try! (contract-call? token transfer assessed-amount tx-sender .revenue-distributor none))
-      (try! (as-contract (contract-call? .revenue-distributor distribute-token token assessed-amount)))
+      ;; A positive base can legitimately produce a zero assessed fee while
+      ;; the residual is accumulated. Record that auditable settlement without
+      ;; issuing an invalid zero-value transfer.
+      (if (> assessed-amount u0)
+        (begin
+          (try! (contract-call? token transfer assessed-amount tx-sender recipient none))
+          true)
+        true)
 
-      (map-set settlements settlement-id {
+      (map-set settlements settlement-key {
+        settlement-id: settlement-id,
         source: source,
         stream-id: stream-id,
         asset-kind: ASSET_KIND_FT,
@@ -400,6 +498,7 @@
         phase: (get phase phase),
         assessed-amount: assessed-amount,
         settled-amount: assessed-amount,
+        recipient: recipient,
         burn-height: burn-block-height,
         stacks-height: block-height
       })
@@ -408,12 +507,15 @@
         assessed-fees: new-assessed-fees,
         settled-fees: new-settled-fees,
         settlement-count: new-settlement-count,
+        fee-remainder: new-remainder,
+        last-rate-bps: (get rate-bps phase),
+        last-phase: (get phase phase),
         last-settled-burn-height: burn-block-height,
         last-settled-stacks-height: block-height
       })
       (var-set total-settlements new-total-settlements)
       (print {
-        event: "protocol-fee-settled",
+        event: "protocol-fee-collected",
         settlement-id: settlement-id,
         source: source,
         stream-id: stream-id,
@@ -425,6 +527,7 @@
         phase: (get phase phase),
         assessed-amount: assessed-amount,
         settled-amount: assessed-amount,
+        recipient: recipient,
         burn-height: burn-block-height,
         stacks-height: block-height
       })
@@ -433,9 +536,8 @@
   )
 )
 
-;; Native STX uses the same schedule and accounting shape, but a separate
-;; function so no caller can pretend an arbitrary FT has native transfer
-;; semantics.
+;; Native STX follows the same accounting and event shape, with a native
+;; transfer from tx-sender to the configured passive ingress recipient.
 (define-public (settle-stx
     (stream-id uint)
     (eligible-fee-base uint)
@@ -445,14 +547,24 @@
     (asset none)
     (config (try! (load-stream-config source stream-id ASSET_KIND_STX asset)))
     (phase (try! (resolve-phase-at burn-block-height)))
-    (assessed-amount (unwrap! (calculate-fee-at-rate eligible-fee-base (get rate-bps phase)) ERR_ARITHMETIC_OVERFLOW))
+    (recipient (var-get ingress-recipient))
     (accounting-key {
       source: source,
       stream-id: stream-id,
       asset-kind: ASSET_KIND_STX,
       asset: asset
     })
+    (settlement-key {
+      source: source,
+      settlement-id: settlement-id
+    })
     (old-accounting (default-to (empty-accounting) (map-get? fee-accounting accounting-key)))
+    (fee-calculation (unwrap! (calculate-fee-at-rate
+      eligible-fee-base
+      (get rate-bps phase)
+      (get fee-remainder old-accounting)) ERR_ARITHMETIC_OVERFLOW))
+    (assessed-amount (get assessed-amount fee-calculation))
+    (new-remainder (get fee-remainder fee-calculation))
     (new-eligible-base (unwrap! (safe-add (get eligible-base old-accounting) eligible-fee-base) ERR_ACCOUNTING_OVERFLOW))
     (new-assessed-fees (unwrap! (safe-add (get assessed-fees old-accounting) assessed-amount) ERR_ACCOUNTING_OVERFLOW))
     (new-settled-fees (unwrap! (safe-add (get settled-fees old-accounting) assessed-amount) ERR_ACCOUNTING_OVERFLOW))
@@ -462,16 +574,19 @@
     (begin
       (asserts! (not (var-get paused)) ERR_PAUSED)
       (asserts! (> eligible-fee-base u0) ERR_INVALID_AMOUNT)
-      (asserts! (> assessed-amount u0) ERR_INVALID_AMOUNT)
-      (asserts! (is-none (map-get? settlements settlement-id)) ERR_SETTLEMENT_REPLAYED)
-      (asserts! (is-eq (get route config) ROUTE_REVENUE_DISTRIBUTOR) ERR_INVALID_ROUTE)
+      (asserts! (is-none (map-get? settlements settlement-key)) ERR_SETTLEMENT_REPLAYED)
+      (asserts! (is-eq (get route config) ROUTE_PROTOCOL_INGRESS) ERR_INVALID_ROUTE)
 
-      ;; Keep custody in the collector until the downstream route succeeds.
-      ;; `as-contract tx-sender` evaluates to this collector principal.
-      (try! (stx-transfer? assessed-amount tx-sender (as-contract tx-sender)))
-      (try! (as-contract (contract-call? .revenue-distributor distribute-stx assessed-amount)))
+      ;; A positive base can produce a zero assessed fee; retain its residual
+      ;; and audit record without attempting a zero STX transfer.
+      (if (> assessed-amount u0)
+        (begin
+          (try! (stx-transfer? assessed-amount tx-sender recipient))
+          true)
+        true)
 
-      (map-set settlements settlement-id {
+      (map-set settlements settlement-key {
+        settlement-id: settlement-id,
         source: source,
         stream-id: stream-id,
         asset-kind: ASSET_KIND_STX,
@@ -482,6 +597,7 @@
         phase: (get phase phase),
         assessed-amount: assessed-amount,
         settled-amount: assessed-amount,
+        recipient: recipient,
         burn-height: burn-block-height,
         stacks-height: block-height
       })
@@ -490,12 +606,15 @@
         assessed-fees: new-assessed-fees,
         settled-fees: new-settled-fees,
         settlement-count: new-settlement-count,
+        fee-remainder: new-remainder,
+        last-rate-bps: (get rate-bps phase),
+        last-phase: (get phase phase),
         last-settled-burn-height: burn-block-height,
         last-settled-stacks-height: block-height
       })
       (var-set total-settlements new-total-settlements)
       (print {
-        event: "protocol-fee-settled",
+        event: "protocol-fee-collected",
         settlement-id: settlement-id,
         source: source,
         stream-id: stream-id,
@@ -507,6 +626,7 @@
         phase: (get phase phase),
         assessed-amount: assessed-amount,
         settled-amount: assessed-amount,
+        recipient: recipient,
         burn-height: burn-block-height,
         stacks-height: block-height
       })
@@ -519,6 +639,14 @@
 
 (define-read-only (get-admin)
   (ok (var-get admin))
+)
+
+(define-read-only (get-governance)
+  (ok (var-get governance))
+)
+
+(define-read-only (get-ingress-recipient)
+  (ok (var-get ingress-recipient))
 )
 
 (define-read-only (is-paused)
@@ -534,12 +662,15 @@
     (stream-id uint)
     (asset-kind uint)
     (asset (optional principal)))
-  (ok (map-get? stream-configs {
-    source: source,
-    stream-id: stream-id,
-    asset-kind: asset-kind,
-    asset: asset
-  }))
+  (match (map-get? stream-configs { source: source, stream-id: stream-id })
+    config
+      (ok (if
+        (and
+          (is-eq (get asset-kind config) asset-kind)
+          (is-eq (get asset config) asset))
+        (some config)
+        none))
+    (ok none))
 )
 
 (define-read-only (get-accounting
@@ -555,8 +686,13 @@
   }))
 )
 
-(define-read-only (get-settlement (settlement-id (buff 32)))
-  (ok (map-get? settlements settlement-id))
+(define-read-only (get-settlement
+    (source principal)
+    (settlement-id (buff 32)))
+  (ok (map-get? settlements {
+    source: source,
+    settlement-id: settlement-id
+  }))
 )
 
 (define-read-only (get-total-settlements)
@@ -580,9 +716,9 @@
       mature-rate-bps: RATE_MATURE_BPS,
       growth-boundary-inclusive: growth-boundary,
       mature-boundary-inclusive: mature-boundary,
-      burn-blocks-per-month: BURN_BLOCKS_PER_MONTH,
-      growth-phase-months: GROWTH_PHASE_MONTHS,
-      mature-phase-months: MATURE_PHASE_MONTHS
+      burn-blocks-per-year: BURN_BLOCKS_PER_YEAR,
+      growth-phase-years: GROWTH_PHASE_YEARS,
+      mature-phase-years: MATURE_PHASE_YEARS
     })
   )
 )
@@ -595,16 +731,19 @@
   (resolve-phase-at burn-block-height)
 )
 
+;; This read-only calculation starts with zero residual. Settlement calls use
+;; the source/stream/asset residual from fee-accounting instead.
 (define-read-only (calculate-fee-at
     (eligible-fee-base uint)
     (height uint))
   (let (
     (phase (try! (resolve-phase-at height)))
+    (fee-calculation (unwrap! (calculate-fee-at-rate
+      eligible-fee-base
+      (get rate-bps phase)
+      u0) ERR_ARITHMETIC_OVERFLOW))
   )
-    (if (is-eq eligible-fee-base u0)
-      (ok u0)
-      (ok (unwrap! (calculate-fee-at-rate eligible-fee-base (get rate-bps phase)) ERR_ARITHMETIC_OVERFLOW))
-    )
+    (ok (get assessed-amount fee-calculation))
   )
 )
 
