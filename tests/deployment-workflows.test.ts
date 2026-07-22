@@ -26,6 +26,7 @@ describe("deployment workflow safety gates", () => {
       expect(source).toContain("issue #531");
       expect(source).toContain("cancel-in-progress: false");
       expect(source).toContain("timeout-minutes:");
+      expect(source).toContain("test:release-plan-validation");
     }
   });
 

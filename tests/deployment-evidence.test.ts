@@ -310,9 +310,22 @@ async function expectVerificationError(
 describe("deployment evidence verification", () => {
   it("parses every effective testnet plan entry and blocks the unresolved mainnet identity", () => {
     const testnetPlan = readDeploymentPlan(join(import.meta.dirname, "../deployments/full-system.testnet-plan.yaml"));
-    expect(testnetPlan.entries).toHaveLength(216);
-    expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-publish")).toHaveLength(206);
-    expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-call")).toHaveLength(10);
+    expect(testnetPlan.entries).toHaveLength(233);
+    expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-publish")).toHaveLength(212);
+    expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-call")).toHaveLength(21);
+
+    const riskOrchestrationCalls = testnetPlan.entries.flatMap((entry) =>
+      entry.kind === "contract-call" &&
+      (entry.contractId.endsWith(".risk-unit") || entry.contractId.endsWith(".agent-risk"))
+        ? [{ contractId: entry.contractId, functionName: entry.functionName }]
+        : [],
+    );
+    expect(riskOrchestrationCalls).toEqual([
+      { contractId: `${testnetPlan.deployer}.risk-unit`, functionName: "initialize" },
+      { contractId: `${testnetPlan.deployer}.risk-unit`, functionName: "set-ops-engine" },
+      { contractId: `${testnetPlan.deployer}.agent-risk`, functionName: "initialize" },
+      { contractId: `${testnetPlan.deployer}.agent-risk`, functionName: "set-risk-unit" },
+    ]);
 
     expect(() => readDeploymentPlan(join(import.meta.dirname, "../deployments/full-system.mainnet-plan.yaml"))).toThrowError(
       expect.objectContaining({ code: "NETWORK_DEPLOYER_MISMATCH" }),

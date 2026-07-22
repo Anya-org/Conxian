@@ -64,7 +64,10 @@ jobs:
           python3 scripts/gen-deployment-plans.py --check
 
       - name: Run focused deployment safety tests
-        run: npm run test:deployment-evidence
+        run: |
+          npm run test:deployment-evidence
+          npm run test:release-plan-validation
+          npx vitest run tests/deploy-testnet-script.test.ts tests/deployment-workflows.test.ts --config vitest.config.ts --pool=threads
 
   preflight-mainnet:
     needs: validate-protocol

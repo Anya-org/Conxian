@@ -22,7 +22,7 @@ The "Arms" of the protocol.
 
 ### 2.3. Agent Layer (`contracts/agents`)
 The "Senses" and "Nerves" of the protocol.
-- `agent-risk.clar` (AYE): Predictive PID-based risk monitoring.
+- `agent-risk.clar` (AYE): GCR-based compatibility scoring with explicit normalized publication to canonical `risk-unit`; liquidation ownership remains in the core risk unit.
 - `agent-treasury.clar`: Autonomous fiscal policy execution (The Fiscal Dam).
 
 ### 2.4. Asset Layer (`contracts/tokens`, `contracts/treasury`)
@@ -40,10 +40,27 @@ The controlled boundary for metered external usage.
   closed period. Raw API keys stay off-chain and only SHA-256 hashes are stored.
 
 The settlement path is `payer -> integration-fee-collector ->
-revenue-distributor -> swap-router` and retains the existing BME/CXIP-013
-economics. The collector invokes the existing `distribute-stx` entrypoint
-under contract context; no distributor-specific setter or second collector
-entrypoint is introduced.
+revenue-distributor -> cxd-treasury` and retains the existing BME/CXIP-013
+accounting boundary. The collector invokes the existing `distribute-stx`
+entrypoint under contract context; settled STX does not end at `swap-router`.
+No distributor-specific setter or second collector entrypoint is introduced.
+
+### 2.5. Enterprise Subscription Layer (`contracts/enterprise`)
+The STX-only prepaid subscription route is explicit and fail-closed:
+
+```text
+subscriber -> enterprise-subscription -> revenue-automation
+           -> revenue-distributor -> cxd-treasury
+```
+
+Plans are identified by `{tier-id, version}` with exactly four valid tier IDs,
+publish inactive, and require nonzero prices and KYC tier. Deployment does not
+publish prices, configure bucket recipients, or register arbitrary product
+consumers. Governance must activate approved plans, register only audited
+consumer contracts, and configure each governed STX bucket destination before
+release. Payment IDs are global across this route; usage replay keys include
+the paid period start. The generic facade is for self-directed integration and
+testing, not a trusted product consumer by default.
 
 ## 3. Communication Patterns
 - **Internal**: Trait-driven cross-contract calls using relative literals (`.contract-name`) for simulation and Principal Injection for production.

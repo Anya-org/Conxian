@@ -1,63 +1,79 @@
-# Sbtc Module
+# sBTC Module
 
-## Overview (Explanation)
-The Sbtc module is a critical component of the Conxian Protocol, handling specialized operations for Bitcoin-anchored assets (sBTC). It implements sovereign autonomous logic for DLC (Discreet Log Contracts) bonds, enabling trust-minimized debt instruments on Stacks.
+## Phase 2A boundary
 
-## Architecture (Explanation)
-This module follows the Hexagonal Architecture pattern.
-- **Bonds**: `dlc-bond.clar` manages the lifecycle of individual Bitcoin debt instruments (CON-72).
-- **Orchestration**: `dlc-orchestrator.clar` coordinates bond issuance and coupon distribution.
-- **Integrations**: `dlc-manager.clar` acts as the bridge to sBTC and BitVM2 verification floors.
+The current approved sBTC slice is custody-only. Users are expected to obtain
+already-issued canonical sBTC through official sBTC infrastructure outside this
+repository, then deposit and later withdraw that same token through
+`contracts/vaults/sbtc-vault.clar`.
 
-## Core Contracts (Reference)
+The Phase 2A vault:
 
-### `dlc-bond.clar`
-Manages the issuance, tracking, and redemption of DLC bonds.
+- accepts only the admin-configured SIP-010 token principal, configured once
+  from the initial unconfigured state;
+- records accounted assets and per-user shares with deterministic rounding;
+- reconciles every successful deposit against the live token balance delta;
+- rejects aggregate insolvency before any withdrawal transfer;
+- enforces a deposit cap, pause behavior, compliance checks, and explicit
+  transfer/error handling; and
+- leaves strategy allocation disabled until a separate approval and accounting
+  design exists.
 
-| Function | Signature | Description |
-|----------|-----------|-------------|
-| `initialize-bond` | `(initialize-bond (principal-amount uint) (coupon-rate uint) (maturity-blocks uint) (token principal))` | Creates a new bond with principal, rate, maturity, and token. |
-| `distribute-coupon` | `(distribute-coupon (bond-id uint))` | Distributes yield to bond holders. |
-| `redeem-bond` | `(redeem-bond (bond-id uint))` | Handles redemption at maturity. |
-| `get-bond-data` | `(get-bond-data (bond-id uint))` | Returns detailed bond data. |
-| `get-admin` | `(get-admin)` | Returns the current admin principal. |
-| `get-protocol-status` | `(get-protocol-status)` | Returns the protocol status and version. |
-| `set-admin` | `(set-admin (new-admin principal))` | Updates the admin principal. |
+Direct token donations remain visible in the token's live balance but are not
+silently added to `total-assets` or used to change the share price. This slice
+has no generic rescue or sweep function. Any donation synchronization, strategy
+loss accounting, or peg accounting must be designed and reviewed as a later
+phase.
 
-### `dlc-manager.clar`
-Bridge to sBTC and BitVM2 verification floors.
+No contract in this slice:
 
-| Function | Signature | Description |
-|----------|-----------|-------------|
-| `create-dlc` | `(create-dlc (amount uint))` | Creates a new DLC commitment for Bitcoin settlement. |
-| `verify-bitvm2-root` | `(verify-bitvm2-root (root (buff 32)) (proof (buff 1024)))` | Verifies a BitVM2 state root proof. |
-| `get-protocol-status` | `(get-protocol-status)` | Returns the protocol status and version. |
-| `set-admin` | `(set-admin (new-admin principal))` | Updates the admin principal. |
+- wraps native BTC or redeems BTC for sBTC;
+- calls privileged official sBTC mint or burn functions;
+- treats `btc-adapter`, DLC, BitVM2, or oracle stubs as settlement proof;
+- monitors or repairs the BTC/sBTC peg; or
+- claims a deployed or production-ready integration.
 
-### `dlc-orchestrator.clar`
-Executive layer for batch processing DLC events.
+## Related contracts
 
-| Function | Signature | Description |
-|----------|-----------|-------------|
-| `orchestrate-bond-launch` | `(orchestrate-bond-launch (bond-contract <dlc-bond-trait>) (amount uint) (rate uint) (maturity uint) (token principal))` | Atomically launches and registers a new bond. |
-| `process-coupon-cycle` | `(process-coupon-cycle (bond-contract <dlc-bond-trait>) (bond-ids (list 20 uint)))` | Triggers coupon payments for a list of bonds. |
-| `get-protocol-status` | `(get-protocol-status)` | Returns the protocol status and version. |
-| `set-admin` | `(set-admin (new-admin principal))` | Updates the admin principal. |
+The existing sBTC directory contains research and integration-adjacent
+contracts. They are not implicitly part of the Phase 2A custody boundary:
 
-## Integration Examples (How-to)
+| Contract | Current boundary |
+|----------|------------------|
+| `dlc-manager.clar` | Existing DLC/BitVM2-oriented placeholder surface; not redemption proof for the vault. |
+| `dlc-bond.clar` | DLC bond lifecycle model; not an sBTC custody adapter. |
+| `dlc-orchestrator.clar` | DLC orchestration model; not a BTC bridge or signer. |
+| `contracts/interfaces/btc-adapter.clar` | Interface stub only; not called by `sbtc-vault.clar`. |
 
-### Launching a Bitcoin Bond
-```clarity
-(contract-call? .dlc-orchestrator orchestrate-bond-launch .dlc-bond u100000000 u450 u1440 .cxd-token)
+## Later phases
+
+Any future implementation must be reviewed separately for:
+
+1. official sBTC deposit/redemption integration and failure handling;
+2. peg data, freshness, deviation thresholds, and emergency response; and
+3. strategy adapters, allocation authorization, loss accounting, and paused
+   withdrawal guarantees.
+
+## Authoritative public sBTC references
+
+- [Stacks sBTC overview](https://docs.stacks.co/learn/sbtc)
+- [sBTC Clarity contracts](https://docs.stacks.co/learn/sbtc/clarity-contracts)
+- [Clarinet sBTC integration](https://docs.stacks.co/clarinet/integrations/sbtc)
+- [Stacks mainnet and testnets](https://docs.stacks.co/learn/network-fundamentals/mainnet-and-testnets)
+- [stacks-sbtc source repository](https://github.com/stacks-sbtc/sbtc)
+
+The issue-focused acceptance boundary is recorded in
+`docs/ISSUE_507_PHASE_2A_ACCEPTANCE.md`.
+
+## Validation
+
+Run the custody/accounting tests with:
+
+```bash
+bash scripts/run-tests.sh tests/vaults/sbtc-vault.test.ts
 ```
 
-## Testing (How-to)
-Comprehensive validation is performed using the Vitest framework.
-1. Install dependencies: `npm install`
-2. Run module tests: `npx vitest run tests/bitvm2-bridge.test.ts`
-
-## Status (Reference)
-- Implementation: Production-Ready (v1.2.1)
-- Audit Status: Internally Verified (April 2026)
-- BIP Compliance: BIP-341, BIP-342, BIP-174 (DLC Standard)
-- Standard: Hexagonal, BitVM2 Verification Ready
+This documents local simnet behavior only; it is not deployment evidence.
+The current tests cover the 1:1 custody path and adversarial receipt/solvency
+guards. They do not claim non-1:1 rounding coverage because this phase has no
+safe state transition that changes the asset/share ratio.

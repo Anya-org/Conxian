@@ -1,15 +1,16 @@
 # Treasury Module
 
 ## Overview (Explanation)
-The Treasury module manages the protocol's capital allocation and revenue distribution. It implements the "Fiscal Dam" (CXIP-013) and enforces mandatory protocol fees via the Revenue Automation engine.
+The Treasury module manages the protocol's capital allocation and revenue distribution. It implements the "Fiscal Dam" (CXIP-013) and provides one canonical scheduled protocol-fee settlement path. The phase-1 collector is designed to replace a designated legacy charge on a registered fee base, never to add a second charge to the same flow.
 
 ## Architecture (Explanation)
-- **Automation**: `revenue-automation.clar` enforces a non-negotiable 100 bps protocol fee.
+- **Canonical collection**: `protocol-fee-collector.clar` resolves 200/150/100 bps from an explicit activation burn-block height, enforces immutable source/stream/asset registration, pauses fail closed, prevents `(source, settlement-id)` replay, carries numerator residuals, and records native-unit accounting.
+- **Canonical custody**: FT and STX settlements transfer payer -> `.protocol-fee-collector`. The collector never accepts a caller-supplied ingress destination.
+- **Explicit routing**: Authorized admin or approved governance/timelock calls route collector-held assets only to the fixed `.operational-treasury` principal after treasury initialization. Each asset's routed total cannot exceed its collected total, and collection/routing totals remain separate.
+- **Legacy compatibility**: `revenue-automation.clar` retains the legacy 100 bps token fee path and also exposes the full gross-STX enterprise adapter. It remains a compatibility surface until phase 2 migrates each approved source; do not compose it with the canonical collector on the same fee base.
 - **Registry**: `cxd-treasury.clar` maintains the global allocation policy.
-- **Distribution**: `revenue-distributor.clar` executes token buy-backs and burns.
-- **Integration Billing**: `integration-fee-collector.clar` sends 100% of
-  settled STX integration fees through the same distributor route; there is no
-  partner split or direct bypass to `operational-treasury`.
+- **Distribution**: `revenue-distributor.clar` routes token assets to the BME buy-back/burn path and accepts legacy or enterprise gross-STX routes into the Fiscal Dam; native STX buyback execution is not claimed.
+- **Integration Billing**: `contracts/integrations/integration-fee-collector.clar` remains a separate legacy integration settlement surface. It sends 100% of settled STX through the distributor route; there is no partner split, 1% deduction, or direct bypass to `operational-treasury`. It is not the phase-1 protocol-fee collector and is not evidence of downstream realization for phase-1 collector events.
 - **Fiscal allocations**: `fiscal-vault-oracle.clar` registers SBC beneficiaries,
   reserves period/category caps, and releases SIP-010 assets only from approved
   allocations.
@@ -22,27 +23,151 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `collect-revenue` | `(token <sip-010-ft-trait>) (amount uint) (payer principal)` | Calculates and transfers 1% fee. |
+| `route-stx-revenue` | `(uint principal uint)` | Moves a full gross STX payment from an authorized source into `revenue-distributor`. |
+| `authorize-stx-source` | `(principal)` | Authorizes an explicit source contract for the gross-STX adapter. |
 | `initialize` | `(admin principal)` | Sets the initial administrator (Admin only). |
 | `set-admin` | `(new-admin principal)` | Updates the admin principal (Admin only). |
+
+### `protocol-fee-collector.clar`
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `set-governance` | `(new-governance principal)` | Admin-only assignment of the immediate governance/emergency contract caller. Production deployments must use the approved DAO/timelock contract, not a wallet. |
+| `set-authorized-source` | `(source principal) (authorized bool)` | Admin-only source authorization/revocation. Governance cannot rewrite source configuration. |
+| `register-ft-stream` | `(source principal) (stream-id uint) (token principal) (route uint)` | Registers one immutable SIP-010 asset stream on collector ingress (admin only). |
+| `register-stx-stream` | `(source principal) (stream-id uint) (route uint)` | Registers one immutable native STX stream on collector ingress (admin only). |
+| `set-stream-active` | `(source principal) (stream-id uint) (asset-kind uint) (asset (optional principal)) (active bool)` | Activates or deactivates one registered stream (admin only); use `none` for native STX. |
+| `pause` / `unpause` | `()` | Fail-closed settlement switch callable by admin or the configured governance contract. It does not change custody. |
+| `set-activation-burn-height` | `(new-height uint)` | Sets the non-retroactive schedule anchor before the first settlement (admin only). |
+| `settle-ft` | `(token <sip-010-ft-trait>) (stream-id uint) (eligible-fee-base uint) (settlement-id (buff 32))` | Calculates residual-aware fee and atomically transfers SIP-010 units from payer to `.protocol-fee-collector`. |
+| `settle-stx` | `(stream-id uint) (eligible-fee-base uint) (settlement-id (buff 32))` | Calculates residual-aware fee and atomically transfers STX from payer to `.protocol-fee-collector`. |
+| `route-ft` | `(token <sip-010-ft-trait>) (amount uint)` | After secure treasury initialization, routes still-unrouted collector-held FT custody to the immutable `.operational-treasury` destination (admin or governance contract). |
+| `route-stx` | `(amount uint)` | After secure treasury initialization, routes still-unrouted collector-held STX custody to the immutable `.operational-treasury` destination (admin or governance contract). |
+| `recover-excess-ft` | `(token <sip-010-ft-trait>) (amount uint)` | Recovers only live FT balance above tracked collected-but-not-routed custody to the immutable `.operational-treasury` destination; does not change normal route/revenue totals. |
+| `recover-excess-stx` | `(amount uint)` | Recovers only live STX balance above tracked collected-but-not-routed custody to the immutable `.operational-treasury` destination; does not change normal route/revenue totals. |
+| `get-accounting` | `(source principal) (stream-id uint) (asset-kind uint) (asset (optional principal))` | Reads cumulative eligible, assessed, settled-at-collector-ingress, residual, and settlement-count state; use `none` for native STX. |
+| `get-settlement` | `(source principal) (settlement-id (buff 32))` | Reads the immutable `(source, settlement-id)` record used by indexers. |
+| `get-asset-accounting` | `(asset-kind uint) (asset (optional principal))` | Separates collected-at-collector totals from routed-to-treasury totals and route count; use `none` for native STX. |
+| `get-excess-recovery-accounting` | `(asset-kind uint) (asset (optional principal))` | Reads separate excess-recovered totals by asset; use `none` for native STX. |
+
+The launch rate is 200 bps for the half-open interval
+`[activation, activation + 52,560)`, growth is 150 bps for
+`[activation + 52,560, activation + 157,680)`, and mature is 100 bps from
+`activation + 157,680` onward. `52,560` is the 365-day approximation and
+`157,680` is the three-year approximation at six ten-minute burn blocks per
+hour. These are policy clocks, not exact wall-time dates.
+
+Settlement arithmetic carries `base * rate-bps + prior-remainder` over the
+10,000 denominator. A positive base that produces zero fee is still recorded
+with its residual and does not attempt a zero-value transfer. Asset and route
+identity cannot be replaced after registration, so residual/accounting state
+cannot be erased by reconfiguration.
+
+Authority is deliberately split. Configuration functions (`set-authorized-source`,
+stream registration/activation, activation height, and governance assignment)
+are admin-only: a direct admin EOA must satisfy `contract-caller = tx-sender =
+admin`, while a configured admin contract must be the immediate
+`contract-caller`. Pause/unpause and custody routes accept the admin or the
+configured governance contract as the immediate caller. A governance wallet is
+not a production role; deployments must assign the approved DAO/timelock or
+emergency contract. Production source registrations should use contracts that
+derive their own base from successful economic operations; an admin-authorized
+EOA is an operational trust boundary, not trustless KPI proof.
+
+Phase 1 does not authorize or wire DEX/lending sources and does not change
+`conxian-access.clar`; no source is production-authorized. The checked-in
+production deployment plans and generator intentionally do not publish or wire
+this collector yet. They are deferred until network-correct deployer identities
+and source migrations are separately approved, so those artifacts are not a
+deployability claim.
+
+Production bootstrap must initialize `.operational-treasury`, configure the
+approved governance/timelock/multisig, and then use `set-admin` to hand the
+collector admin role to that approved contract before registering any source.
+Retaining deployer admin is not production-ready. The deliberate immediate
+caller model permits the configured admin contract to perform admin operations,
+while governance and admin custody operations always use the immutable
+`.operational-treasury` destination; no caller can redirect custody to an
+arbitrary recipient. Direct deposits are recoverable only as live balance above
+tracked collected-but-not-routed custody, with separate excess-recovered
+accounting and events.
+
+See [`docs/PROTOCOL_FEE_KPI_SPEC.md`](../../docs/PROTOCOL_FEE_KPI_SPEC.md) for
+the indexed volume, fee, revenue, allocation, and USD-normalization schema.
 
 ### `cxd-treasury.clar`
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `rebalance` | `(treasury uint) (bounty uint) (lp uint) (grant uint) (buyback uint) (insurance uint)` | Updates 6-way split (Admin only). |
+| `rebalance` | `(treasury uint) (bounty uint) (lp uint) (grant uint) (buyback uint) (insurance uint)` | Updates the 6-way split for authorized admin/agent callers, enforcing the configured LP minimum, insurance maximum, and exact 10,000-bps sum. |
 | `set-authorized-principals` | `(agent principal) (distributor principal)` | Sets authorized actors (Admin only). |
+| `set-bounds` | `(uint uint)` | Sets the existing LP-minimum and insurance-maximum safety bounds (Admin only). |
+| `authorize-stx-source` | `(principal)` | Authorizes a source contract for gross-STX receipts. |
+| `record-stx-revenue` | `(principal uint uint)` | Receives distributor STX, snapshots the six-way split, and records an immutable receipt. |
+| `set-stx-bucket-recipient` | `(uint principal)` | Configures one governed destination for a stable bucket ID (Admin only). |
+| `clear-stx-bucket-recipient` | `(uint)` | Removes a bucket destination and returns releases to fail-closed state. |
+| `release-stx-bucket` | `(uint uint uint)` | Transfers custody from one configured bucket once per `{bucket, release-id}` and decrements only after success. |
+| `get-stx-receipt` | `(principal uint)` | Reads one immutable source/payment receipt. |
+| `get-stx-bucket-balances` | `()` | Reads the six accumulated gross-STX accounting buckets. |
+| `get-stx-accounting` | `()` | Proves gross receipts equal current buckets plus governed releases. |
+| `get-stx-release-receipt` | `(uint uint)` | Reads one immutable bucket release receipt. |
+| `get-policy-version` | `()` | Reads the monotonically increasing allocation policy version. |
 | `initialize` | `(new-admin principal)` | Initializes the treasury (Admin only). |
 | `get-allocation-percentages` | `()` | Returns the current fiscal split. |
 | `get-protocol-status` | `()` | Returns compliance and version status. |
 
-### `revenue-distributor.clar` integration route
+### `revenue-distributor.clar` routes
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `distribute-stx` | `(uint)` | Existing STX route used by the collector under contract context. |
+| `initialize` | `(principal)` | Performs the deployer/admin-authorized administrator handoff exactly once. |
+| `set-admin` | `(principal)` | Updates the administrator through the current-admin-only handoff path. |
+| `distribute-stx` | `(uint)` | Compatibility route for authorized legacy sources; it terminates in the Fiscal Dam. |
+| `route-stx-revenue` | `(uint principal uint)` | Enterprise adapter hop callable only by configured `revenue-automation`. |
 
-The collector calls the existing route from contract custody after receiving
-an exact settlement from the configured payer. No distributor setter or
-separate integration route is added; the distributor remains the system of
-record for downstream revenue routing and CXIP-013 behavior.
+The phase-1 collector does **not** call these routes. It first transfers assessed
+FT or STX from the payer to `.protocol-fee-collector`. A later explicit
+`route-ft`/`route-stx` operation may forward only still-unrouted, collected
+custody to the fixed `.operational-treasury` destination after initialization;
+`recover-excess-ft`/`recover-excess-stx` may forward only unaccounted live
+balance to that same fixed destination. Failed transfers roll back route or
+recovery accounting and events. Collection at ingress,
+routed treasury inflow, realized downstream revenue, and Fiscal Dam allocation
+remain separate evidence stages. This deliberate boundary removes the
+collector-to-distributor-to-DEX dependency cycle.
+
+The compatibility `distribute-stx` route is used by
+`integration-fee-collector`, while the enterprise `route-stx-revenue` route is
+called by `revenue-automation` after source authorization. Both routes move
+gross STX through `cxd-treasury`; neither uses `swap-router` for STX and neither
+bypasses the six-way Fiscal Dam. The canonical settled-STX endpoint for these
+routes is `cxd-treasury`; older descriptions that said settled STX ends at
+`swap-router` are obsolete.
+
+### Enterprise gross-STX route
+
+Subscription payments use the following custody sequence:
+
+```text
+source contract -> revenue-automation -> revenue-distributor -> cxd-treasury
+```
+
+Each hop authenticates its immediate caller and authorized source. The
+subscription contract records payment state only after the final hop succeeds,
+so a route failure rolls back custody and accounting together. Receipts are
+replay-protected by source and payment ID. Allocation percentages are read at
+payment time, snapshotted into each receipt, and identified by a monotonically
+increasing policy version; the first five buckets use safe floor math and the
+sixth bucket receives all integer remainder. The buyback allocation is an STX
+accounting bucket, not a claim that native-STX buyback execution exists.
+
+### Governed STX bucket release
+
+The six stable bucket IDs are `u1` treasury, `u2` bounty, `u3` LP, `u4` grant,
+`u5` buyback, and `u6` insurance. No recipient is preconfigured in production
+plans. Governance must configure an audited recipient with
+`set-stx-bucket-recipient` before `release-stx-bucket` can transfer custody;
+otherwise the contract fails closed. Release IDs are unique per bucket,
+over-release is rejected, and `get-stx-accounting` preserves total gross
+receipt evidence after release. Buyback remains only a governed STX bucket
+until a separate native-STX adapter is approved.
 
 ### `conxian-vaults.clar`
 | Function | Signature | Description |

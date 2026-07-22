@@ -13,7 +13,9 @@ The current issue #531 scope is deployment safety and evidence only.
 
 ## 2. Dependency order
 
-Use the checked-in release plan as the source of dependency order. The current production sequence is:
+Use the checked-in release plan as the source of dependency order. The generator reads only the active `Clarinet.toml`; `Clarinet.complete.toml` is not a release dependency source. Every active `depends_on` edge is treated as a hard publish prerequisite. If an edge is stale or its release meaning is ambiguous, resolve the manifest or classify the artifact explicitly before release; the validator does not guess. `python3 scripts/gen-deployment-plans.py --check` now fails closed on manifest/source drift, duplicate or unknown publishes, missing or excluded dependencies, dependency inversions/cycles, and testnet/mainnet topology drift. It retains the existing nine publish batches and final ten-call wiring batch while applying a stable topological order within that shape.
+
+The current production sequence is:
 
 1. Traits and standards.
 2. Core access and protocol contracts.
@@ -44,6 +46,8 @@ The plan generator requires the repository's pinned CI prerequisite. When Python
 ```bash
 python3 -m pip install --user --disable-pip-version-check 'PyYAML==6.0.2'
 python3 scripts/gen-deployment-plans.py --check
+npm run validate:deployment-plans
+npm run test:release-plan-validation
 ```
 
 Capture all of the following in the evidence bundle and operator handoff:
@@ -147,6 +151,35 @@ Configuration calls are verified as `contract-call` transactions. A workflow sum
 
 ## 8. Correction, pause, and recovery
 
+### Current pause gate
+
+The current GitHub workflows are preflight-only and cannot pause routes or submit a transaction. If a future approved broadcaster is used, pause the affected routes before the first write and keep them paused through read-after-write verification. Use only the approved admin/governance path; do not invent a principal or bypass authorization.
+
+The current Clarity pause controls are:
+
+- Protocol-wide pause write: `ops-engine.trigger-emergency-pause`, which is admin-gated and calls `enhanced-circuit-breaker.toggle-global-pause`.
+- Targeted pause write: `enhanced-circuit-breaker.toggle-contract-pause(target)`, also admin-gated.
+- Pause reads before and after each release segment: `enhanced-circuit-breaker.is-globally-paused()`, `enhanced-circuit-breaker.is-contract-paused(target)`, `conxian-protocol.is-paused()`, and `conxian-protocol.get-protocol-status()`.
+- The older `circuit-breaker.is-contract-paused(target)` read is retained for contracts using that trait implementation; do not treat it as equivalent to the enhanced global pause read.
+
+Record the pause read results, observed block height, target principals, and operator decision in the evidence pack. A failed or contradictory pause read is a stop condition.
+
+### Read-before-write controls
+
+Before every publish or configuration call, record and compare:
+
+1. Clean worktree, source commit, exact plan bytes, generated-plan check result, and plan SHA-256.
+2. Network and deployer identity. Derive the signer address from the configured signer and compare it to the plan; never replace the unresolved mainnet `ST...` identity with a guessed `SP...`/`SM...` address.
+3. Pause state using the read-only controls above, plus the current route/registry/treasury state that the next call is expected to change.
+4. Network API observations for the target address/interface and any prior transaction. An existing interface is recorded as `preexisting`/`checked-addresses` evidence, not proof that this run published it.
+5. The exact batch and transaction ordinal, contract path, function, and canonical call arguments that will be written.
+
+Do not write when the plan hash, signer, pause state, interface, read-only state, or expected ordinal is unknown or mismatched. The current workflows stop at this preflight boundary and do not sign or broadcast.
+
+### Read-after-write controls
+
+After each future accepted transaction, pause the next dependent write until the network API shows a canonical, anchored, successful transaction with the expected sender, contract/function, and arguments. For a publish, also require HTTP 200 interface evidence and the requested `public`/`read_only` function inventory. For a call, re-read the exact state changed by that call and repeat the pause/route/registry/treasury reads before continuing. Pending, aborted, dropped, noncanonical, missing-interface, or read-only-mismatch results remain non-confirmed evidence and stop the sequence.
+
 ### Before broadcast
 
 Stop on any mismatch in plan hash, source commit, network, deployer, contract path, or expected identity. Correct the artifact and re-run preflight. Do not bypass a gate by editing a report or summary.
@@ -162,6 +195,21 @@ A published Clarity contract cannot be rolled back or deleted from the chain. A 
 ### Partial deployment or settlement
 
 Record exactly which publications and calls are confirmed, pending, failed, or pre-existing. Pause dependent configuration until the dependency graph is repaired. Any recovery of partial settlement must preserve debt, claim, and settlement state; do not silently erase obligations or invent partnership fee treatment. Resume forward only from an approved plan revision with a new source commit and plan hash.
+
+### Recovery decision table
+
+| Condition | Immediate control | Recovery decision |
+| --- | --- | --- |
+| Plan hash mismatch | Pause before any write; retain both hashes and source commits. | Regenerate from the reviewed source, review the diff, and issue a new approved plan/hash. Never edit evidence to make the old hash pass. |
+| Signer identity mismatch | Pause before signing; do not guess or substitute an address. | Derive the identity from the configured signer, re-run network validation, and obtain approval for a new plan if the deployer changes. |
+| Pending, aborted, or dropped transaction | Keep routes paused; preserve txid, nonce/ordinal, API responses, and timestamps. | Reconcile canonical status with bounded polling. Do not blindly rebroadcast the same nonce or treat absence as success; resume only from an approved forward plan. |
+| Confirmed publish followed by a failed call | Keep dependent routes paused; mark the publish confirmed and the call failed separately. | Do not republish the same contract identity. Repair with an approved forward call or new contract/configuration identity, then verify the complete revised plan. |
+| Missing interface | Treat the publication as unconfirmed and keep routes paused. | Retry only the bounded read path. If the interface remains absent or malformed, fail closed and classify the result as checked-address evidence, not global absence. |
+| Read-only mismatch | Pause before the next write; preserve pre-state, post-state, and expected value. | Reconcile the exact getter/argument/ordinal and investigate the failed or unexpected state transition. Do not issue a compensating write without an approved recovery plan. |
+| Immutable defect | Keep affected routes paused and preserve the original publication evidence. | Clarity publication is immutable. Deploy a reviewed replacement under a new identity and migrate registry/router/configuration state forward-only. |
+| Partial settlement | Pause dependent settlement and record confirmed, pending, failed, and pre-existing obligations separately. | Preserve debt, claims, and settlement state. Resume only with an approved forward recovery plan; never silently erase obligations or alter integration-fee economics. |
+
+Clarity publication is immutable. After routes are paused, every recovery is forward-only: preserve the original evidence, create a reviewed plan revision with a new source commit and hash, and verify the revised transaction/interface set before resuming routes.
 
 ## 9. Evidence retention and handoff
 

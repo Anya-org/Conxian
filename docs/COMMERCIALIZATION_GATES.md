@@ -27,6 +27,24 @@ Commercialization of ConxianCSF follows a three-phase activation sequence:
 - **Enterprise Vaults**: Deployment of specialized sBTC yield strategies.
 - **Global Compliance**: Activation of MiCA/VASP reporting logic.
 
+### Enterprise Subscription Activation Gate
+The enterprise subscription contracts may be published without being
+commercially active. Before a product sale is enabled, governance must:
+
+- publish and review a `{tier-id, version}` plan with nonzero monthly/annual
+  prices and a valid KYC tier;
+- explicitly activate the approved plan version and publish all immutable
+  generic features before activation;
+- register only audited product consumer contracts; the deployment plan leaves
+  the consumer allowlist empty and does not auto-register the generic facade;
+- configure audited recipients for each STX Fiscal Dam bucket before any
+  release; unconfigured buckets are intentionally fail-closed;
+- verify the generated route wiring and policy-version receipt evidence.
+
+Buyback is only an STX allocation bucket until a separate native-STX adapter
+has been reviewed and approved; no deployment step may imply native buyback
+execution.
+
 ## 2. Market-Access Gates
 Before moving between phases, the following gates must be satisfied:
 - **Legal Review**: Counsel sign-off on token rights and royalty distribution model.

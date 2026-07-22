@@ -17,7 +17,7 @@
 The Agents module implements autonomous "Fiscal Agents" that manage protocol risk, treasury health, and automated payments. These agents operate based on Grounded Telemetry and Unified Theory variables (C_R, V_X, A_S), ensuring the protocol remains adaptive and sovereign in volatile market conditions.
 
 ## Architecture (Explanation)
-- **Risk Agent**: `agent-risk.clar` calculates cybernetic risk scores for lending and liquidity by observing protocol health metrics (GCR).
+- **Risk Agent**: `agent-risk.clar` calculates compatibility-scale cybernetic scores from GCR and explicitly publishes normalized scores to the canonical `risk-unit`; it does not own liquidation or circuit-breaker administration.
 - **Treasury Agent**: `agent-treasury.clar` provides a compatibility layer for executing fiscal strategies across designated pools.
 - **Orchestrator**: `fiscal-orchestrator.clar` serves as the canonical implementation for fee collection and BME epoch routing.
 - **Intelligence Unit**: `fiscal-intelligence.clar` (SFIU) manages Sovereign Business Cells (SBC) and yield strategies.
@@ -35,8 +35,12 @@ The Agents module implements autonomous "Fiscal Agents" that manage protocol ris
 | `assess-system-risk` | `(m <finance-metrics-trait>)` | Evaluates protocol health and updates score. |
 | `get-cybernetic-intel` | `(m <finance-metrics-trait>)` | Aggregates fees, GCR, and risk score. |
 | `set-stability-fee` | `(f uint)` | Updates the PID stability fee (Admin only). |
-| `set-risk-score` | `(s uint)` | Manually overrides the risk score (Admin only). |
-| `initialize` | `(a principal)` | Sets the initial administrator. |
+| `set-risk-score` | `(s uint)` | Manually overrides the compatibility score, bounded to `0..1000` (Admin only). |
+| `publish-system-risk` | `(m <finance-metrics-trait>, risk-module <risk-signal-publisher-trait>)` | Publishes the normalized `0..10000` score to the configured canonical risk unit (Admin only). |
+| `get-published-risk-score` | `()` | Returns the current compatibility score normalized to canonical units. |
+| `set-risk-unit` | `(risk-unit principal)` | Configures the canonical publication target (Admin only). |
+| `get-risk-unit` | `()` | Returns the configured publication target. |
+| `initialize` | `(a principal)` | One-shot initialization; only the deployment-time admin may call it. |
 
 ### `agent-treasury.clar` (Compatibility Layer)
 | Function | Signature | Description |
@@ -104,6 +108,19 @@ To assess system risk from an external contract or service:
 ```clarity
 (contract-call? .agent-risk assess-system-risk .finance-metrics)
 ```
+
+`assess-system-risk` and `get-cybernetic-intel` update only the agent's
+compatibility score. Canonical system-risk state is changed only through the
+explicit, admin-gated publication path after `set-risk-unit` wiring:
+
+```clarity
+(contract-call? .agent-risk publish-system-risk
+  .finance-metrics
+  .risk-unit)
+```
+
+The configured target must be the canonical `risk-unit`; the agent does not
+grant itself circuit-breaker or liquidation authority.
 
 ### Running Fiscal Strategy
 The orchestrator can be triggered periodically to process protocol rewards:

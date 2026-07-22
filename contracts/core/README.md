@@ -9,6 +9,7 @@ The core architecture follows a hub-and-spoke model for authority and execution:
 - **Heartbeat & Updates**: `ops-engine.clar` triggers epoch-based state transitions and synchronizes global parameters.
 - **Access Control**: `conxian-access.clar` provides unified RBAC across the entire protocol ecosystem.
 - **Self-Launch & Funding**: `self-launch-coordinator.clar` handles the protocol's bootstrap and initial liquidity orchestration.
+- **Risk Ownership**: `risk-unit.clar` is the canonical health, cache, score, and liquidation authorization unit. `risk-manager.clar` remains a compatibility facade; its privileged methods fail closed and new integrations should use `risk-unit`.
 
 ## Core Contracts (Reference)
 
@@ -23,6 +24,22 @@ The core architecture follows a hub-and-spoke model for authority and execution:
 |----------|-----------|-------------|
 | `is-agent-authorized` | `(agent principal)` | Verifies system agent authority. |
 | `fund-payroll` | `(amount uint)` | Adds STX to the incentive pool. |
+
+### `risk-unit.clar` (Canonical Risk Unit)
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `calculate-health-factor` | `(collateral-value uint, total-debt uint)` | Returns the direct health-factor math result; `u10000` is `1.0x`. |
+| `get-health-factor` | `(position-id uint)` | Refreshes the burn-block-based position cache. |
+| `get-health-factor-read-only` | `(position-id uint)` | Reads only fresh cached health data. |
+| `get-position-health` | `(position-id uint)` | Exposes cached health, update height, and freshness. |
+| `get-risk-config` | `()` | Exposes thresholds, score bounds, configured callers, and cache age. |
+| `get-system-risk-score` | `()` | Returns the canonical `0..10000` system score. |
+| `is-liquidatable` | `(position-id uint)` | Fails closed on absent/stale cache and preserves exact-threshold health. |
+| `liquidate` | `(position-id uint)` | Canonical authorized liquidation control path. |
+
+See [`docs/RISK_MANAGEMENT.md`](../../docs/RISK_MANAGEMENT.md) for the
+authorization matrix, initialization order, agent publication, and the
+dimensional-core placeholder limitation.
 
 ## Integration Examples (How-to)
 

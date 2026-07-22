@@ -191,6 +191,7 @@ describe('CXD staking Phase 1', () => {
     expect(
       simnet.callPublicFn(STAKING, 'stake', [Cl.uint(100)], wallet1).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
+    const requestBlock = readUint('block-utils', 'get-burn-block-height', []);
     expect(
       simnet.callPublicFn(STAKING, 'request-unstake', [Cl.uint(100)], wallet1).result,
     ).toEqual(Cl.ok(Cl.bool(true)));
@@ -199,7 +200,7 @@ describe('CXD staking Phase 1', () => {
       simnet.callReadOnlyFn(STAKING, 'get-position', [Cl.principal(wallet1)], deployer).result,
     );
     expect(position).toContain('pending-unstake: u100');
-    expect(position).toContain('cooldown-end: u1000011');
+    expect(position).toContain(`cooldown-end: u${requestBlock + 1_000_000n}`);
   });
 
   it('authenticates the immediate caller and supports deliberate contract-admin forwarding', () => {
