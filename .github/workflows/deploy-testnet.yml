@@ -18,7 +18,6 @@ on:
 
 permissions:
   contents: read
-  actions: write
 
 jobs:
   validate:
@@ -83,51 +82,70 @@ jobs:
           sudo mv clarinet /usr/local/bin/clarinet
           clarinet --version
 
+      - name: Prepare deployment artifacts
+        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
+        run: mkdir -p deployment-artifacts
+
       - name: Deploy to Testnet
         if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
         env:
           DEPLOYER_MNEMONIC: ${{ secrets.TESTNET_DEPLOYER_MNEMONIC }}
         run: |
-          DEPLOY_LOG=$(mktemp)
-          echo y | script -q -c "clarinet deployments apply \
+          set -euo pipefail
+          DEPLOY_LOG="deployment-artifacts/testnet-clarinet.log"
+          if ! echo y | script -q -c "clarinet deployments apply \
             --manifest-path Clarinet.toml \
             --deployment-plan-path deployments/full-system.testnet-plan.yaml" \
-            "$DEPLOY_LOG"
+            "$DEPLOY_LOG"; then
+            cat "$DEPLOY_LOG"
+            echo "Clarinet deployment failed; no completion claim is emitted."
+            exit 1
+          fi
           cat "$DEPLOY_LOG"
-          rm "$DEPLOY_LOG"
+
+      - name: Verify canonical deployment evidence
+        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
+        run: |
+          set -euo pipefail
+          EVIDENCE="deployment-artifacts/testnet-evidence.json"
+          if [ ! -s "$EVIDENCE" ]; then
+            echo "Missing deployment evidence bundle at $EVIDENCE. A plan, workflow success, or broadcast is not a receipt."
+            exit 1
+          fi
+          DEPLOYER=$(awk '$1 == "deployer:" { print $2; exit }' deployments/full-system.testnet-plan.yaml)
+          test -n "$DEPLOYER"
+          npx tsx scripts/deployment/verify-evidence.ts \
+            --evidence "$EVIDENCE" \
+            --network testnet \
+            --deployer "$DEPLOYER" \
+            --plan deployments/full-system.testnet-plan.yaml \
+            --source-commit "$GITHUB_SHA" \
+            --output deployment-artifacts/testnet-evidence.verified.json
 
       - name: Smoke Test Deployed Contracts
         if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
         run: |
-          echo "Running post-deployment smoke tests..."
+          echo "Running post-deployment smoke tests after canonical evidence verification..."
           npx vitest run tests/sanity.test.ts tests/check-compile.test.ts --config vitest.config.ts --pool=threads
 
       - name: Generate Deployment Report
-        if: ${{ always() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)) }}
+        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
         run: |
-          echo "## Testnet Deployment Report" >> $GITHUB_STEP_SUMMARY
-          echo "**Deployer:** ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P" >> $GITHUB_STEP_SUMMARY
-          echo "**Network:** Testnet" >> $GITHUB_STEP_SUMMARY
-          echo "**Plan:** deployments/full-system.testnet-plan.yaml" >> $GITHUB_STEP_SUMMARY
+          set -euo pipefail
+          DEPLOYER=$(awk '$1 == "deployer:" { print $2; exit }' deployments/full-system.testnet-plan.yaml)
+          echo "## Testnet Deployment Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Deployer:** $DEPLOYER" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Network:** Testnet" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Plan:** deployments/full-system.testnet-plan.yaml" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Evidence:** deployment-artifacts/testnet-evidence.verified.json" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Status:** canonical receipt and interface verification passed" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload Deployment Plan Artifact
+      - name: Upload Deployment Artifacts
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: testnet-deployment-plan
-          path: deployments/full-system.testnet-plan.yaml
-
-  promote-to-mainnet:
-    needs: deploy-testnet
-    if: ${{ success() && github.event_name == 'push' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger Mainnet Deployment
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh workflow run deploy-mainnet.yml \
-            --repo Conxian/Conxian \
-            --ref main \
-            -f dry_run=false \
-            -f confirm=DEPLOY_MAINNET
+          name: testnet-deployment-artifacts
+          path: |
+            deployments/full-system.testnet-plan.yaml
+            deployment-artifacts/
+          if-no-files-found: warn

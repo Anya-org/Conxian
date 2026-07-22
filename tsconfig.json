@@ -11,7 +11,9 @@
     "skipLibCheck": true,
     "outDir": "dist",
     "rootDir": ".",
-    "baseUrl": "."
+    "paths": {
+      "*": ["./*"]
+    }
   },
   "include": ["tests/**/*.ts", "scripts/**/*.ts"],
   "exclude": ["node_modules", "dist", "contracts"]

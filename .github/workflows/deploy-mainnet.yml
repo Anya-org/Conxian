@@ -82,22 +82,89 @@ jobs:
           sudo mv clarinet /usr/local/bin/clarinet
           clarinet --version
 
+      - name: Verify exact mainnet plan identity
+        if: ${{ !inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          EXPECTED=$(tr -d '[:space:]' < deployments/full-system.mainnet-plan.sha256)
+          ACTUAL=$(sha256sum deployments/full-system.mainnet-plan.yaml | awk '{print $1}')
+          if ! [[ "$EXPECTED" =~ ^[0-9a-f]{64}$ ]]; then
+            echo "Committed mainnet plan digest is malformed."
+            exit 1
+          fi
+          if [ "$EXPECTED" != "$ACTUAL" ]; then
+            echo "Mainnet deployment plan hash mismatch; refusing non-dry deployment."
+            echo "Expected: $EXPECTED"
+            echo "Actual:   $ACTUAL"
+            exit 1
+          fi
+          PLAN_NETWORK=$(awk '$1 == "network:" { print $2; exit }' deployments/full-system.mainnet-plan.yaml)
+          PLAN_DEPLOYER=$(awk '$1 == "deployer:" { print $2; exit }' deployments/full-system.mainnet-plan.yaml)
+          test "$PLAN_NETWORK" = "mainnet"
+          if ! [[ "$PLAN_DEPLOYER" == SP* ]]; then
+            echo "Mainnet plan deployer must be a mainnet SP address; refusing deployment."
+            exit 1
+          fi
+
+      - name: Prepare deployment artifacts
+        if: ${{ !inputs.dry_run }}
+        run: mkdir -p deployment-artifacts
+
       - name: Deploy to Mainnet
         if: ${{ !inputs.dry_run }}
         env:
           DEPLOYER_MNEMONIC: ${{ secrets.MAINNET_DEPLOYER_MNEMONIC }}
         run: |
-          DEPLOY_LOG=$(mktemp)
-          echo y | script -q -c "clarinet deployments apply \
+          set -euo pipefail
+          DEPLOY_LOG="deployment-artifacts/mainnet-clarinet.log"
+          if ! echo y | script -q -c "clarinet deployments apply \
             --manifest-path Clarinet.toml \
             --deployment-plan-path deployments/full-system.mainnet-plan.yaml" \
-            "$DEPLOY_LOG"
+            "$DEPLOY_LOG"; then
+            cat "$DEPLOY_LOG"
+            echo "Clarinet deployment failed; no completion claim is emitted."
+            exit 1
+          fi
           cat "$DEPLOY_LOG"
-          rm "$DEPLOY_LOG"
 
-      - name: Upload Deployment Plan Artifact
+      - name: Verify canonical deployment evidence
+        if: ${{ !inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          EVIDENCE="deployment-artifacts/mainnet-evidence.json"
+          if [ ! -s "$EVIDENCE" ]; then
+            echo "Missing deployment evidence bundle at $EVIDENCE. A plan, workflow success, or broadcast is not a receipt."
+            exit 1
+          fi
+          DEPLOYER=$(awk '$1 == "deployer:" { print $2; exit }' deployments/full-system.mainnet-plan.yaml)
+          test -n "$DEPLOYER"
+          npx tsx scripts/deployment/verify-evidence.ts \
+            --evidence "$EVIDENCE" \
+            --network mainnet \
+            --deployer "$DEPLOYER" \
+            --plan deployments/full-system.mainnet-plan.yaml \
+            --source-commit "$GITHUB_SHA" \
+            --output deployment-artifacts/mainnet-evidence.verified.json
+
+      - name: Generate Mainnet Deployment Report
+        if: ${{ !inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          DEPLOYER=$(awk '$1 == "deployer:" { print $2; exit }' deployments/full-system.mainnet-plan.yaml)
+          echo "## Mainnet Deployment Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Deployer:** $DEPLOYER" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Network:** Mainnet" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Plan:** deployments/full-system.mainnet-plan.yaml" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Evidence:** deployment-artifacts/mainnet-evidence.verified.json" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Status:** canonical receipt and interface verification passed" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Deployment Artifacts
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: mainnet-deployment-plan
-          path: deployments/full-system.mainnet-plan.yaml
+          name: mainnet-deployment-artifacts
+          path: |
+            deployments/full-system.mainnet-plan.yaml
+            deployments/full-system.mainnet-plan.sha256
+            deployment-artifacts/
+          if-no-files-found: warn
