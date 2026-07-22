@@ -96,9 +96,9 @@ git var GIT_AUTHOR_EMAIL
 ## 7. Architecture Overview (July 2026 Audit)
 
 ### Repository Scale
-- **218 Clarity contracts** across 45+ modules
+- **231 Clarity contract source files** across 45+ modules
 - **76+ test files** (Vitest + Clarinet SDK)
-- **2 Clarinet configs**: `Clarinet.toml` (217 contracts, active) and `Clarinet.complete.toml` (218 contracts, legacy)
+- **2 Clarinet configs**: `Clarinet.toml` (232 contract-section entries, active) and `Clarinet.complete.toml` (231 contract-section entries, legacy)
 - **Key tokens**: CXD (stablecoin), CXLP (LP), CXVG (governance) — consolidated from 6 to 3 tokens per Sprint 2026-07
 - **Key NFTs**: position-nft (SIP-009 compliant), bridge-nft (NON-COMPLIANT), enhanced-governance-nft (soulbound)
 
@@ -214,7 +214,7 @@ These are clarinet-sdk v3.21.0 artifacts from plan regeneration with different r
 
 | Area | Status | Detail |
 |------|--------|--------|
-| Hardcoded principals | CLEAN | 0 ST.../SP... addresses in all 218 contracts |
+| Hardcoded principals | SCOPED CLEAN | `scripts/verify_contamination_guard.py` found no matches for its configured testnet-contamination principal in scanned core paths; this is not a global ST.../SP... audit |
 | Principal injection | GOOD | All admin/owner state initialized via tx-sender |
 | cxlp-token.clar SIP-010 | COMPLIANT | 32-char padded strings, correct transfer |
 | cxtr-token.clar SIP-010 | COMPLIANT | 32-char padded strings, correct transfer |
