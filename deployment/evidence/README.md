@@ -12,6 +12,11 @@ the manual verification workflow. It does not infer global nonexistence from a
 missing result, and it never treats a deployment plan, workflow result, or
 broadcast-only ID as proof.
 
+There is no successful unbound or diagnostic invocation. The library and CLI
+fail closed before any Hiro request unless all five binding values are present,
+the deployer is network-correct, and the plan path is exactly the canonical
+network path.
+
 Run it with:
 
 ```bash
@@ -28,5 +33,6 @@ npx tsx scripts/verify-deployment-evidence.ts \
 The successful report says **declared evidence entries verified**. It does not
 claim complete deployment-plan coverage unless a separate approved coverage
 check proves every relevant publish and wiring transaction. Keep the manifest
-and report with the release evidence artifact, but never include mnemonics,
-private keys, API keys, or raw environment values.
+and report with the release evidence artifact. The broadcast workflows upload
+sanitized attempt metadata and the plan only; never include mnemonics, private
+keys, API keys, raw environment values, or raw Clarinet session logs.

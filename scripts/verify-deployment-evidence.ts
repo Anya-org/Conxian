@@ -18,6 +18,11 @@ export const NETWORK_API_BASE_URLS = {
 
 export type DeploymentNetwork = keyof typeof NETWORK_API_BASE_URLS;
 
+export const CANONICAL_PLAN_PATHS: Record<DeploymentNetwork, string> = {
+  testnet: "deployments/full-system.testnet-plan.yaml",
+  mainnet: "deployments/full-system.mainnet-plan.yaml",
+};
+
 export type FailureClassification =
   | "malformed-manifest"
   | "network-mismatch"
@@ -517,6 +522,17 @@ export function validateManifest(input: unknown): {
           "malformed-manifest",
           "evidence.planPath",
           "evidence.planPath is required and must be a non-empty path",
+        ),
+      );
+    } else if (
+      network &&
+      input.evidence.planPath !== CANONICAL_PLAN_PATHS[network]
+    ) {
+      failures.push(
+        failure(
+          "network-mismatch",
+          "evidence.planPath",
+          `evidence.planPath must be the canonical ${network} deployment plan path`,
         ),
       );
     }
@@ -1217,13 +1233,100 @@ function verifyReadOnly(
   };
 }
 
+function validateCompleteEvidenceBinding(expected: unknown): VerificationFailure[] {
+  const failures: VerificationFailure[] = [];
+
+  if (!isRecord(expected)) {
+    return [
+      failure(
+        "evidence-binding-mismatch",
+        "expected-binding",
+        "complete verification binding is required: network, deployer, deployed git commit, canonical plan path, and plan SHA-256",
+      ),
+    ];
+  }
+
+  const network = expected.network;
+  const deployer = expected.deployer;
+  const gitCommit = expected.gitCommit;
+  const planPath = expected.planPath;
+  const planSha256 = expected.planSha256;
+
+  if (!isDeploymentNetwork(network)) {
+    failures.push(
+      failure(
+        "evidence-binding-mismatch",
+        "expected-binding.network",
+        "expected verification network must be testnet or mainnet",
+      ),
+    );
+  }
+
+  if (
+    !isDeploymentNetwork(network) ||
+    typeof deployer !== "string" ||
+    !isCanonicalStacksAddress(deployer, network)
+  ) {
+    failures.push(
+      failure(
+        "evidence-binding-mismatch",
+        "expected-binding.deployer",
+        "expected deployer must be a canonical Stacks address for the explicit verification network",
+      ),
+    );
+  }
+
+  if (typeof gitCommit !== "string" || !COMMIT_PATTERN.test(gitCommit)) {
+    failures.push(
+      failure(
+        "evidence-binding-mismatch",
+        "expected-binding.gitCommit",
+        "expected deployed git commit must be a 40-character commit SHA",
+      ),
+    );
+  }
+
+  if (
+    typeof planPath !== "string" ||
+    !isDeploymentNetwork(network) ||
+    planPath !== CANONICAL_PLAN_PATHS[network]
+  ) {
+    failures.push(
+      failure(
+        "evidence-binding-mismatch",
+        "expected-binding.planPath",
+        isDeploymentNetwork(network)
+          ? `expected plan path must be the canonical ${network} path: ${CANONICAL_PLAN_PATHS[network]}`
+          : "expected plan path cannot be validated until the network is testnet or mainnet",
+      ),
+    );
+  }
+
+  if (typeof planSha256 !== "string" || !SHA256_PATTERN.test(planSha256)) {
+    failures.push(
+      failure(
+        "evidence-binding-mismatch",
+        "expected-binding.planSha256",
+        "expected plan SHA-256 must be a 64-character digest",
+      ),
+    );
+  }
+
+  return failures;
+}
+
 export function validateEvidenceBinding(
   manifest: DeploymentEvidenceManifest,
   expected: EvidenceBinding,
 ): VerificationFailure[] {
-  const failures: VerificationFailure[] = [];
+  const failures = validateCompleteEvidenceBinding(expected);
+  if (failures.length > 0) {
+    return failures;
+  }
 
-  if (manifest.network !== expected.network) {
+  const binding = expected as EvidenceBinding;
+
+  if (manifest.network !== binding.network) {
     failures.push(
       failure(
         "evidence-binding-mismatch",
@@ -1233,7 +1336,7 @@ export function validateEvidenceBinding(
     );
   }
 
-  if (manifest.deployer !== expected.deployer) {
+  if (manifest.deployer !== binding.deployer) {
     failures.push(
       failure(
         "evidence-binding-mismatch",
@@ -1243,22 +1346,7 @@ export function validateEvidenceBinding(
     );
   }
 
-  if (
-    !isCanonicalStacksAddress(expected.deployer, expected.network) ||
-    !COMMIT_PATTERN.test(expected.gitCommit) ||
-    expected.planPath.length === 0 ||
-    !SHA256_PATTERN.test(expected.planSha256)
-  ) {
-    failures.push(
-      failure(
-        "evidence-binding-mismatch",
-        "expected-binding",
-        "expected verification binding is malformed",
-      ),
-    );
-  }
-
-  if (manifest.evidence.gitCommit.toLowerCase() !== expected.gitCommit.toLowerCase()) {
+  if (manifest.evidence.gitCommit.toLowerCase() !== binding.gitCommit.toLowerCase()) {
     failures.push(
       failure(
         "evidence-binding-mismatch",
@@ -1268,7 +1356,7 @@ export function validateEvidenceBinding(
     );
   }
 
-  if (manifest.evidence.planPath !== expected.planPath) {
+  if (manifest.evidence.planPath !== binding.planPath) {
     failures.push(
       failure(
         "evidence-binding-mismatch",
@@ -1278,7 +1366,7 @@ export function validateEvidenceBinding(
     );
   }
 
-  if (manifest.evidence.planSha256.toLowerCase() !== expected.planSha256.toLowerCase()) {
+  if (manifest.evidence.planSha256.toLowerCase() !== binding.planSha256.toLowerCase()) {
     failures.push(
       failure(
         "evidence-binding-mismatch",
@@ -1310,7 +1398,7 @@ async function safeApiCall(call: () => Promise<HttpResult>): Promise<HttpResult>
 export async function verifyDeploymentEvidence(
   input: unknown,
   api: HiroApi,
-  expectedBinding?: EvidenceBinding,
+  expectedBinding: EvidenceBinding,
 ): Promise<VerificationReport> {
   const validation = validateManifest(input);
   if (!validation.ok || !validation.manifest) {
@@ -1332,9 +1420,7 @@ export async function verifyDeploymentEvidence(
   }
 
   const manifest = validation.manifest;
-  const bindingFailures = expectedBinding
-    ? validateEvidenceBinding(manifest, expectedBinding)
-    : [];
+  const bindingFailures = validateEvidenceBinding(manifest, expectedBinding);
   if (bindingFailures.length > 0) {
     return {
       verifierVersion: VERIFIER_VERSION,
@@ -1419,10 +1505,10 @@ export async function verifyDeploymentEvidence(
   };
 }
 
-function parseCliArgs(args: string[]): {
+export function parseCliArgs(args: string[]): {
   manifestPath: string;
   outputPath?: string;
-  expectedBinding?: EvidenceBinding;
+  expectedBinding: EvidenceBinding;
 } {
   let manifestPath: string | undefined;
   let outputPath: string | undefined;
@@ -1469,7 +1555,7 @@ function parseCliArgs(args: string[]): {
       index += 1;
     } else if (arg === "--help" || arg === "-h") {
       console.error(
-        "Usage: npx tsx scripts/verify-deployment-evidence.ts --manifest <path> [--output <path>] [--expected-network <testnet|mainnet> --expected-deployer <address> --expected-git-commit <sha> --expected-plan-path <path> --expected-plan-sha256 <sha256>]",
+        "Usage: npx tsx scripts/verify-deployment-evidence.ts --manifest <path> --expected-network <testnet|mainnet> --expected-deployer <address> --expected-git-commit <sha> --expected-plan-path <canonical-plan-path> --expected-plan-sha256 <sha256> [--output <path>]",
       );
       process.exit(0);
     } else {
@@ -1490,28 +1576,31 @@ function parseCliArgs(args: string[]): {
     expectedPlanPath,
     expectedPlanSha256,
   ];
-  const hasSomeBinding = bindingValues.some((value) => value !== undefined);
   const hasCompleteBinding = bindingValues.every((value) => value !== undefined);
-  if (hasSomeBinding && !hasCompleteBinding) {
+  if (!hasCompleteBinding) {
     throw new Error(
-      "expected verification binding requires network, deployer, git commit, plan path, and plan SHA-256",
+      "all five verification binding flags are required: network, deployer, git commit, canonical plan path, and plan SHA-256",
+    );
+  }
+
+  const bindingNetwork = expectedNetwork as DeploymentNetwork;
+  const bindingPlanPath = expectedPlanPath as string;
+  if (bindingPlanPath !== CANONICAL_PLAN_PATHS[bindingNetwork]) {
+    throw new Error(
+      `--expected-plan-path must be the canonical ${bindingNetwork} path: ${CANONICAL_PLAN_PATHS[bindingNetwork]}`,
     );
   }
 
   return {
     manifestPath,
     outputPath,
-    ...(hasCompleteBinding
-      ? {
-          expectedBinding: {
-            network: expectedNetwork as DeploymentNetwork,
-            deployer: expectedDeployer as string,
-            gitCommit: expectedGitCommit as string,
-            planPath: expectedPlanPath as string,
-            planSha256: expectedPlanSha256 as string,
-          },
-        }
-      : {}),
+    expectedBinding: {
+      network: bindingNetwork,
+      deployer: expectedDeployer as string,
+      gitCommit: expectedGitCommit as string,
+      planPath: bindingPlanPath,
+      planSha256: expectedPlanSha256 as string,
+    },
   };
 }
 

@@ -68,23 +68,7 @@ jobs:
           EXPECTED_DEPLOYER: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         run: |
           set -euo pipefail
-          ruby -ryaml <<'RUBY'
-          plan = YAML.load_file(ENV.fetch("PLAN_PATH"))
-          network = ENV.fetch("EXPECTED_NETWORK")
-          deployer = ENV.fetch("EXPECTED_DEPLOYER")
-          abort "deployment plan network mismatch" unless plan["network"] == network
-          abort "deployment plan deployer mismatch" unless plan["deployer"] == deployer
-          expected_prefix = network == "testnet" ? "ST" : "SP"
-          abort "deployment plan deployer has the wrong network prefix" unless deployer.start_with?(expected_prefix)
-          batches = plan.fetch("plan").fetch("batches")
-          publishes = batches.flat_map { |batch| batch.fetch("transactions", []) }.filter_map { |tx| tx["contract-publish"] }
-          invalid = publishes.reject do |publish|
-            sender = publish["expected-sender"]
-            sender == deployer && sender.to_s.start_with?(expected_prefix)
-          end
-          abort "#{invalid.length} contract-publish entries have the wrong expected-sender" unless invalid.empty?
-          puts "Validated #{publishes.length} testnet contract-publish sender entries"
-          RUBY
+          ruby scripts/validate-deployment-plan.rb "$PLAN_PATH" "$EXPECTED_NETWORK" "$EXPECTED_DEPLOYER"
 
       - name: Run Full Test Suite
         run: npm run ci
@@ -127,13 +111,11 @@ jobs:
           DEPLOY_LOG=$(mktemp)
           if ! (echo y | script -q -c "clarinet deployments apply \
             --manifest-path Clarinet.toml \
-            --deployment-plan-path ${PLAN_PATH}" "$DEPLOY_LOG") 2>&1 | tee deployment-artifacts/clarinet-apply.log; then
-            cp "$DEPLOY_LOG" deployment-artifacts/clarinet-session.log || true
+            --deployment-plan-path ${PLAN_PATH}" "$DEPLOY_LOG") >/dev/null 2>&1; then
             rm -f "$DEPLOY_LOG"
             echo "::error::Testnet broadcast/apply failed. Verification remains pending; no deployment is verified."
             exit 1
           fi
-          cp "$DEPLOY_LOG" deployment-artifacts/clarinet-session.log
           rm -f "$DEPLOY_LOG"
 
       - name: Capture deployment attempt metadata
@@ -202,6 +184,6 @@ jobs:
         with:
           name: testnet-deployment-attempt
           path: |
-            deployment-artifacts
+            deployment-artifacts/deployment-attempt.json
             deployments/full-system.testnet-plan.yaml
           if-no-files-found: warn

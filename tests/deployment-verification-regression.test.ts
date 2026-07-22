@@ -1,10 +1,13 @@
 // @vitest-environment node
-import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { execFileSync, spawnSync } from "node:child_process";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+import { tmpdir } from "node:os";
 import { describe, expect, it } from "vitest";
 
 const repoRoot = resolve(".");
+const testnetDeployer = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P";
+const mainnetDeployer = "SP000000000000000000002Q6VF78";
 
 function read(relativePath: string): string {
   return readFileSync(resolve(repoRoot, relativePath), "utf8");
@@ -26,6 +29,23 @@ function parseWorkflow(relativePath: string): Record<string, any> {
   return {
     ...parsed,
     on: parsed.on ?? parsed["true"] ?? parsed[true as unknown as string],
+  };
+}
+
+function runPlanGuard(
+  relativePath: string,
+  network: "testnet" | "mainnet",
+  deployer: string,
+): { status: number | null; stdout: string; stderr: string } {
+  const result = spawnSync(
+    "ruby",
+    ["scripts/validate-deployment-plan.rb", resolve(repoRoot, relativePath), network, deployer],
+    { encoding: "utf8" },
+  );
+  return {
+    status: result.status,
+    stdout: result.stdout,
+    stderr: result.stderr,
   };
 }
 
@@ -61,6 +81,7 @@ describe("deployment verification drift guards", () => {
     expect(verifier).toContain("--expected-git-commit");
     expect(verifier).toContain("--expected-plan-path");
     expect(verifier).toContain("--expected-plan-sha256");
+    expect(verifier).toContain("validate-deployment-plan.rb");
     expect(verifier).toContain("declared evidence entries verified");
     expect(verifier).toContain("complete plan coverage is not claimed");
   });
@@ -92,6 +113,107 @@ describe("deployment verification drift guards", () => {
     expect(workflow).toContain("deployer:");
     expect(workflow).toContain("Canonical SP... mainnet deployer");
     expect(workflow).toContain("Validate mainnet plan principals");
+  });
+
+  it("validates the exact bound plan before Hiro and rejects the current mainnet plan", () => {
+    const testnetResult = runPlanGuard(
+      "deployments/full-system.testnet-plan.yaml",
+      "testnet",
+      testnetDeployer,
+    );
+    expect(testnetResult.status).toBe(0);
+    expect(testnetResult.stdout).toContain("semantic binding passed");
+
+    const mainnetResult = runPlanGuard(
+      "deployments/full-system.mainnet-plan.yaml",
+      "mainnet",
+      mainnetDeployer,
+    );
+    expect(mainnetResult.status).not.toBe(0);
+    expect(`${mainnetResult.stdout}${mainnetResult.stderr}`).toContain("deployer mismatch");
+
+    const verifierWorkflow = read(".github/workflows/verify-deployment-evidence.yml");
+    const guardStep = verifierWorkflow.indexOf("Validate bound deployment plan semantics");
+    const hiroStep = verifierWorkflow.indexOf("Verify declared evidence entries against Hiro");
+    expect(guardStep).toBeGreaterThan(-1);
+    expect(hiroStep).toBeGreaterThan(guardStep);
+
+    const guardScript = read("scripts/validate-deployment-plan.rb");
+    expect(guardScript).toContain("YAML.safe_load_file");
+    expect(guardScript).toContain("aliases: false");
+    expect(guardScript).toContain("contract-publish");
+    expect(guardScript).toContain("expected-sender");
+    expect(guardScript).toContain("at least one contract-publish");
+  });
+
+  it("fails closed for plan network, address, sender, and publish-shape mutations", () => {
+    const temporaryDirectory = mkdtempSync(join(tmpdir(), "conxian-plan-guard-"));
+    const planPath = join(temporaryDirectory, "plan.yaml");
+    const writePlan = (network: string, planDeployer: string, sender?: string) => {
+      writeFileSync(
+        planPath,
+        [
+          `network: ${network}`,
+          `deployer: ${planDeployer}`,
+          "plan:",
+          "  batches:",
+          "    - id: 0",
+          "      transactions:",
+          ...(sender === undefined
+            ? ["        - contract-call:", "            contract-name: wiring"]
+            : [
+                "        - contract-publish:",
+                `            expected-sender: ${sender}`,
+              ]),
+          "",
+        ].join("\n"),
+        "utf8",
+      );
+    };
+
+    try {
+      writePlan("testnet", testnetDeployer, testnetDeployer);
+      expect(runPlanGuard(planPath, "testnet", testnetDeployer).status).toBe(0);
+
+      writePlan("mainnet", testnetDeployer, testnetDeployer);
+      expect(runPlanGuard(planPath, "mainnet", testnetDeployer).status).not.toBe(0);
+
+      writePlan("testnet", testnetDeployer, "ST111111111111111111111111111111111111111");
+      expect(runPlanGuard(planPath, "testnet", testnetDeployer).status).not.toBe(0);
+
+      writePlan("testnet", testnetDeployer);
+      expect(runPlanGuard(planPath, "testnet", testnetDeployer).status).not.toBe(0);
+    } finally {
+      rmSync(temporaryDirectory, { recursive: true, force: true });
+    }
+  });
+
+  it("does not upload raw sessions or interpolate secrets into commands or artifact metadata", () => {
+    const workflowPaths = [
+      ".github/workflows/deploy-testnet.yml",
+      ".github/workflows/deploy-mainnet.yml",
+      ".github/workflows/verify-deployment-evidence.yml",
+    ];
+
+    for (const relativePath of workflowPaths) {
+      const workflow = read(relativePath);
+      const parsed = parseWorkflow(relativePath);
+      const steps = Object.values(parsed.jobs ?? {}).flatMap((job: any) => job.steps ?? []);
+      const uploadMetadata = steps
+        .filter((step: any) => String(step.uses ?? "").includes("actions/upload-artifact"))
+        .map((step: any) => JSON.stringify(step.with ?? {}))
+        .join("\n");
+      const runCommands = steps
+        .map((step: any) => String(step.run ?? ""))
+        .join("\n");
+
+      expect(uploadMetadata).not.toMatch(/mnemonic|private|api.?key|secret/i);
+      expect(uploadMetadata).not.toMatch(/session|apply\.log/i);
+      expect(runCommands).not.toMatch(/\$\{\{\s*secrets\./);
+      expect(runCommands).not.toMatch(/\b(?:HIRO_API_KEY|DEPLOYER_MNEMONIC)\b/);
+      expect(workflow).not.toContain("clarinet-session.log");
+      expect(workflow).not.toContain("clarinet-apply.log");
+    }
   });
 
   it("keeps the broadcast helper distinguishable from verification", () => {

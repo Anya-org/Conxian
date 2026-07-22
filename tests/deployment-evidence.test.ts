@@ -4,7 +4,9 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   createHiroApi,
+  parseCliArgs,
   type DeploymentEvidenceManifest,
+  type EvidenceBinding,
   type FetchInitLike,
   type FetchLike,
   isCanonicalStacksAddress,
@@ -132,16 +134,28 @@ function defaultRoutes(manifest = baseManifest()): Record<string, MockRoute> {
   };
 }
 
+function baseBinding(overrides: Partial<EvidenceBinding> = {}): EvidenceBinding {
+  return {
+    network: "testnet",
+    deployer,
+    gitCommit,
+    planPath: "deployments/full-system.testnet-plan.yaml",
+    planSha256,
+    ...overrides,
+  };
+}
+
 async function verifyWith(
   manifest: DeploymentEvidenceManifest,
   routes: Record<string, MockRoute> = defaultRoutes(manifest),
   calls: Array<{ url: string; init?: FetchInitLike }> = [],
+  binding: EvidenceBinding = baseBinding(),
 ) {
   const api = createHiroApi({
     baseUrl: manifest.apiBaseUrl,
     fetchImpl: mockFetch(routes, calls),
   });
-  return verifyDeploymentEvidence(manifest, api);
+  return verifyDeploymentEvidence(manifest, api, binding);
 }
 
 function classifications(report: Awaited<ReturnType<typeof verifyWith>>): string[] {
@@ -412,7 +426,7 @@ describe("deployment evidence verifier", () => {
       getTransaction: async () => ({ status: null, ok: false }),
       getContractInterface: async () => ({ status: null, ok: false }),
       callReadOnly: async () => ({ status: null, ok: false }),
-    });
+    }, baseBinding());
 
     expect(report.ok).toBe(false);
     expect(classifications(report)).toContain("malformed-manifest");
@@ -462,7 +476,7 @@ describe("deployment evidence verifier", () => {
       callReadOnly: async () => {
         throw new Error(`injected failure ${secret}`);
       },
-    });
+    }, baseBinding());
 
     expect(report.ok).toBe(false);
     expect(classifications(report)).toContain("transaction-api-error");
@@ -509,6 +523,80 @@ describe("deployment evidence verifier", () => {
     expect(report.ok).toBe(false);
     expect(classifications(report)).toContain("evidence-binding-mismatch");
     expect(calls).toHaveLength(0);
+  });
+
+  it("rejects an unbound library invocation without querying Hiro", async () => {
+    const manifest = baseManifest();
+    const calls: Array<{ url: string; init?: FetchInitLike }> = [];
+    const api = createHiroApi({
+      baseUrl,
+      fetchImpl: mockFetch(defaultRoutes(manifest), calls),
+    });
+
+    const report = await Reflect.apply(verifyDeploymentEvidence, undefined, [manifest, api]) as Awaited<
+      ReturnType<typeof verifyDeploymentEvidence>
+    >;
+
+    expect(report.ok).toBe(false);
+    expect(report.claim).toBe("no deployment is verified");
+    expect(classifications(report)).toContain("evidence-binding-mismatch");
+    expect(calls).toHaveLength(0);
+  });
+
+  it("rejects a noncanonical plan binding before querying Hiro", async () => {
+    const manifest = baseManifest();
+    const calls: Array<{ url: string; init?: FetchInitLike }> = [];
+    const report = await verifyDeploymentEvidence(
+      manifest,
+      createHiroApi({ baseUrl, fetchImpl: mockFetch(defaultRoutes(manifest), calls) }),
+      baseBinding({ planPath: "deployments/alternate.testnet-plan.yaml" }),
+    );
+
+    expect(report.ok).toBe(false);
+    expect(report.claim).toBe("no deployment is verified");
+    expect(classifications(report)).toContain("evidence-binding-mismatch");
+    expect(calls).toHaveLength(0);
+  });
+
+  it.each([
+    ["network", "--expected-network"],
+    ["deployer", "--expected-deployer"],
+    ["deployed git commit", "--expected-git-commit"],
+    ["canonical plan path", "--expected-plan-path"],
+    ["plan SHA-256", "--expected-plan-sha256"],
+  ])("rejects CLI use when the %s binding flag is missing", (_label, missingFlag) => {
+    const values: Record<string, string> = {
+      "--manifest": "deployment/evidence/examples/testnet.example.json",
+      "--expected-network": "testnet",
+      "--expected-deployer": deployer,
+      "--expected-git-commit": gitCommit,
+      "--expected-plan-path": "deployments/full-system.testnet-plan.yaml",
+      "--expected-plan-sha256": planSha256,
+    };
+    const args = Object.entries(values)
+      .filter(([flag]) => flag !== missingFlag)
+      .flatMap(([flag, value]) => [flag, value]);
+
+    expect(() => parseCliArgs(args)).toThrow("all five verification binding flags are required");
+  });
+
+  it("rejects a noncanonical CLI plan path before any API setup", () => {
+    expect(() =>
+      parseCliArgs([
+        "--manifest",
+        "deployment/evidence/examples/testnet.example.json",
+        "--expected-network",
+        "testnet",
+        "--expected-deployer",
+        deployer,
+        "--expected-git-commit",
+        gitCommit,
+        "--expected-plan-path",
+        "deployments/alternate.testnet-plan.yaml",
+        "--expected-plan-sha256",
+        planSha256,
+      ]),
+    ).toThrow("canonical testnet path");
   });
 
   it("accepts only an exact evidence binding", () => {

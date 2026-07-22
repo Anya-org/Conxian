@@ -104,6 +104,15 @@ jobs:
             exit 1
           fi
 
+      - name: Validate bound deployment plan semantics
+        env:
+          EXPECTED_NETWORK: ${{ inputs.network }}
+          EXPECTED_DEPLOYER: ${{ inputs.deployer }}
+          PLAN_PATH: ${{ inputs.plan_path }}
+        run: |
+          set -euo pipefail
+          ruby scripts/validate-deployment-plan.rb "$PLAN_PATH" "$EXPECTED_NETWORK" "$EXPECTED_DEPLOYER"
+
       - name: Verify declared evidence entries against Hiro
         id: verify-evidence
         env:

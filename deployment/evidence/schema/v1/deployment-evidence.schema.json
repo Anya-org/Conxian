@@ -79,6 +79,46 @@
           }
         }
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "network": {
+            "const": "testnet"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "evidence": {
+            "properties": {
+              "planPath": {
+                "const": "deployments/full-system.testnet-plan.yaml"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "network": {
+            "const": "mainnet"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "evidence": {
+            "properties": {
+              "planPath": {
+                "const": "deployments/full-system.mainnet-plan.yaml"
+              }
+            }
+          }
+        }
+      }
     }
   ],
   "$defs": {
@@ -126,7 +166,8 @@
         },
         "planPath": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "The canonical deployment plan path for the selected network."
         },
         "planSha256": {
           "type": "string",

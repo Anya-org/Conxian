@@ -53,9 +53,10 @@ It contains zero-value identifiers and must not be used as live evidence.
 3. Review the exact network plan and calculate its SHA-256. Before any apply,
    confirm that the plan network, top-level deployer, and every contract-publish
    `expected-sender` match the selected network and explicitly approved deployer.
-   The workflow fails closed when they do not. The plan hash binds the evidence
-   to the deployed artifact; it does not replace receipt evidence or prove
-   complete plan coverage.
+   The workflow parses the exact bound YAML plan safely and fails closed when
+   any of those checks fail, before contacting Hiro. The plan hash binds the
+   evidence to the deployed artifact; it does not replace receipt evidence or
+   prove complete plan coverage.
 4. Keep mainnet approval separate from testnet validation. The mainnet workflow
    is manual and requires the literal `DEPLOY_MAINNET` confirmation plus the
    protected `mainnet` environment.
@@ -65,8 +66,9 @@ It contains zero-value identifiers and must not be used as live evidence.
 Clarinet's current `deployments apply` output is not a reliable, machine-readable
 receipt manifest. It may broadcast transactions and print IDs without proving
 inclusion, success, canonicality, or contract contents. The broadcast workflows
-retain the output as a non-secret attempt artifact, but do not parse it as
-verification and do not report success from the plan artifact.
+retain only sanitized attempt metadata and the exact plan; raw Clarinet session
+logs are intentionally omitted from uploaded artifacts. They do not parse the
+plan artifact as verification and do not report success from it.
 
 After an approved deployment attempt, capture the transaction IDs and query the
 matching Hiro API. For every contract publish, record the response fields that
@@ -77,6 +79,12 @@ network named in the manifest.
 Populate a copy of the versioned manifest, setting
 `evidence.source` to `confirmed-receipts`. Keep contract entries exact; do not
 invent names or principals for unresolved partnership work.
+
+The verifier has no successful unbound or diagnostic mode. Direct CLI use must
+provide all five binding flags: `--expected-network`, `--expected-deployer`,
+`--expected-git-commit`, the canonical network-specific `--expected-plan-path`,
+and `--expected-plan-sha256`. The CLI and library both fail closed before any
+Hiro request when a binding is missing, malformed, or noncanonical.
 
 ## 3. Interface and read-only verification
 
@@ -152,6 +160,12 @@ promotion job. Mainnet remains a manual `workflow_dispatch` operation with:
 3. `dry_run=false` only after human approval; and
 4. a separate manual evidence workflow supplied with the exact network,
    deployer, deployed commit, plan path, and plan hash.
+
+The checked-in `deployments/full-system.mainnet-plan.yaml` intentionally remains
+blocked: its current top-level deployer and publish senders are testnet `ST...`
+values, while no approved mainnet `SP...` deployer exists. The semantic guard
+rejects it; this external approval/plan blocker must not be masked by changing
+the plan in an evidence-verifier repair.
 
 If Clarinet cannot supply the manifest in the same run, the broadcast workflow
 must report **verification pending** rather than guess, forge, or infer

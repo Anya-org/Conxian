@@ -152,7 +152,7 @@ testnet `ST...` address is never valid for mainnet evidence.
    workflow with the exact commit, plan path, and plan SHA-256
 
 ### Deployment Plans
-- `deployments/full-system.testnet-plan.yaml` — 10 batches (205 contract-publish + 10 contract-call wiring entries)
+- `deployments/full-system.testnet-plan.yaml` — 10 batches (206 contract-publish + 10 contract-call wiring entries)
 - `deployments/full-system.mainnet-plan.yaml` — same structure, mainnet costs
 - Generated via `scripts/gen-deployment-plans.py` from `default.simnet-plan.yaml`
 - The mainnet workflow fails closed before apply until the mainnet plan's top-level deployer and every contract-publish `expected-sender` are canonical `SP...` values matching the explicitly supplied deployer; the checked-in plan currently contains the testnet `ST...` sender and is not a mainnet receipt.
