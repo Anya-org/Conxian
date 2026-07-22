@@ -54,6 +54,7 @@ jobs:
               - 'vitest.config.ts'
               - '.github/workflows/**'
               - 'deployments/**'
+              - 'scripts/**'
             contracts:
               - 'contracts/**'
             tests:
@@ -138,6 +139,11 @@ jobs:
             echo "⚠️  Clarinet modified deployment plan - restoring original"
             cp deployments/default.simnet-plan.yaml.bak deployments/default.simnet-plan.yaml
           fi
+
+      - name: Validate generated release plans
+        run: |
+          npm run validate:deployment-plans
+          npm run test:release-plan-validation
 
       - name: Run Intelligent Tests (PR only)
         if: github.event_name == 'pull_request'
