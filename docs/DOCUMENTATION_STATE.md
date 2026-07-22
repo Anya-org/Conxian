@@ -8,16 +8,19 @@
   "scope": "Recorded the approved phase-2 source-custody protocol-fee settlement and active lending-manager repayment migration for issue #488, including the final documentation alignment.",
   "implementation": {
     "branch": "charlie/issue-488-lending-protocol-fee",
-    "commit": "c1762fd4050509622bd47f747320e2af0e881c13",
-    "baseline": "origin/main f1d9c8ebf2e0880a01dd857ff180435c6ceb9fdc",
+    "commit": "4dbde753fcf70ce90e9f5ba4f23a834f71f85387",
+    "baseline": "origin/main 8e1c382e96671588316c42e271e7d50407111d51",
     "boundary": "Source-custody settlement is atomic around the authenticated callback and exact live-balance delta; lending charges the scheduled fee only on the interest/reserve component and excludes principal. DEX migration, partnership fees, direct 50/30/20 allocation, and an on-chain $1M activation gate remain outside this slice."
   },
   "validation": {
-    "focused_tests": "PASS on implementation commit: protocol-fee-collector plus lending-manager (2 files, 24 tests; 8 known benign Clarinet SDK runtime warnings); lending plus treasury revenue-distributor regression set (4 files, 31 tests; 16 known benign runtime warnings); deployment-evidence tests (12 tests; 4 known benign runtime warnings); 0 new errors.",
-    "release_plans": "PASS on implementation commit: uv run --with PyYAML==6.0.2 python3 scripts/gen-deployment-plans.py --check; 11 batches, 235 entries, 214 publishes, and 21 calls, with the source trait and collector ordered before lending-manager and test helpers excluded.",
-    "hygiene": "PASS: python3 scripts/verify_contamination_guard.py, git diff --check, changed-document relative-link checks, and required-file checks.",
+    "focused_tests": "PASS after rebase: protocol-fee-collector plus lending-manager (2 files, 24 tests; 8 known benign Clarinet SDK runtime warnings); 0 new errors.",
+    "related_tests": "Prior audit recorded the lending plus treasury revenue-distributor regression set (4 files, 31 tests; 16 known benign runtime warnings); not rerun after rebase.",
+    "deployment_evidence": "PASS after rebase: tests/deployment-evidence.test.ts (18 tests; 4 known benign Clarinet SDK runtime warnings); 0 new errors.",
+    "release_plans": "PASS after rebase: uv run --with PyYAML==6.0.2 python3 scripts/gen-deployment-plans.py --check; 12 batches, 238 entries, 215 publishes, and 23 calls, with protocol-fee-source-trait and protocol-fee-collector ordered before lending-manager and test helpers excluded.",
+    "hygiene": "PASS after rebase: python3 scripts/verify_contamination_guard.py, git diff --check, and required-file checks.",
     "direct_clarinet": "BLOCKED: the direct Clarinet binary is not installed in the workspace.",
-    "docs_validator": "BLOCKED: scripts/validate-docs.js is absent from the repository."
+    "docs_validator": "BLOCKED: scripts/validate-docs.js is absent from the repository.",
+    "direct_plan_rewrite": "NOT RERUN after rebase: direct Clarinet plan-rewriting behavior and runner normalization are not claimed as passed."
   },
   "deployment": "Not attempted. Checked-in deployment plans remain preflight artifacts only and are not deployment proof or evidence of on-chain state/readiness."
 }
