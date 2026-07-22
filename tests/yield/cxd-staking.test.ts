@@ -149,6 +149,9 @@ describe('CXD staking Phase 1', () => {
     expect(
       simnet.callPublicFn(STAKING, 'set-cooldown-blocks', [Cl.uint(0)], deployer).result,
     ).toEqual(Cl.error(Cl.uint(ERR_INVALID_COOLDOWN)));
+    expect(
+      simnet.callPublicFn(STAKING, 'set-cooldown-blocks', [Cl.uint(1_000_001)], deployer).result,
+    ).toEqual(Cl.error(Cl.uint(ERR_INVALID_COOLDOWN)));
 
     expectError(
       simnet.callPublicFn(STAKING, 'stake', [Cl.uint(0)], wallet1).result,
@@ -162,6 +165,41 @@ describe('CXD staking Phase 1', () => {
       simnet.callPublicFn(STAKING, 'stake', [Cl.uint(1_001)], wallet1).result,
       ERR_INSUFFICIENT_BALANCE,
     );
+  });
+
+  it('accepts the maximum reward rate and accumulates over mined blocks without overflow', () => {
+    expect(
+      simnet.callPublicFn(STAKING, 'stake', [Cl.uint(100)], wallet1).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn(STAKING, 'set-reward-rate', [Cl.uint(1_000_000_000_000)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    simnet.mineEmptyBlocks(3);
+
+    const stats = simnet.callReadOnlyFn(STAKING, 'get-staking-stats', [], deployer).result as any;
+    expect(stats.type).toBe('ok');
+    expect(Cl.prettyPrint(stats)).toContain('reward-rate: u1000000000000');
+    expect(Cl.prettyPrint(stats)).not.toContain('reward-per-token: u0');
+    expect(readOkUint(STAKING, 'get-earned', [Cl.principal(wallet1)], wallet1)).toBeGreaterThan(0n);
+  });
+
+  it('accepts the maximum cooldown and exercises the checked block-boundary addition', () => {
+    expect(
+      simnet.callPublicFn(STAKING, 'set-cooldown-blocks', [Cl.uint(1_000_000)], deployer).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn(STAKING, 'stake', [Cl.uint(100)], wallet1).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+    expect(
+      simnet.callPublicFn(STAKING, 'request-unstake', [Cl.uint(100)], wallet1).result,
+    ).toEqual(Cl.ok(Cl.bool(true)));
+
+    const position = Cl.prettyPrint(
+      simnet.callReadOnlyFn(STAKING, 'get-position', [Cl.principal(wallet1)], deployer).result,
+    );
+    expect(position).toContain('pending-unstake: u100');
+    expect(position).toContain('cooldown-end: u1000011');
   });
 
   it('authenticates the immediate caller and supports deliberate contract-admin forwarding', () => {

@@ -26,6 +26,16 @@ the principal protected, and becomes withdrawable through `complete-unstake`
 after the configured burn-block cooldown. Each account may have one pending
 unstake position.
 
+Arithmetic is fail-closed. `MAX_REWARD_RATE` is `1e12` raw CXD units per burn
+block and the cooldown is bounded to `1..1,000,000` burn blocks. Checked
+addition/multiplication errors propagate from reward queries and state-changing
+entry points; no read-only statistics endpoint substitutes a previously stored
+accumulator after an arithmetic failure. Within those configuration bounds,
+the public API tests exercise the accepted rate and cooldown maxima. The
+fungible-token supply and contract accounting values remain Clarity `uint`s;
+the checked helpers are retained as the final guard for any future state or
+chain-height combination outside the tested operating envelope.
+
 Administrative functions authenticate `contract-caller`, the immediate caller
 of the entry point. This keeps an EOA admin from forwarding privileged calls
 through an untrusted wrapper while allowing a deliberately configured contract
@@ -48,7 +58,7 @@ execute the token transfer from its own contract context.
 | `earned` / `get-earned` | `(earned (account principal))` | Current accrued reward for an account. |
 | `get-position` | `(get-position (user principal))` | Active stake, paid accumulator, accrued reward, and pending cooldown data. |
 | `get-governance-weight` | `(get-governance-weight (user principal))` | Returns active stake only. |
-| `get-staking-stats` | `(get-staking-stats)` | Global active/pending stake, rate, reserve, pause, cooldown, and accumulator data. |
+| `get-staking-stats` | `(get-staking-stats)` → `(response { ... } uint)` | Global active/pending stake, rate, reserve, pause, cooldown, and current accumulator data; arithmetic errors are returned instead of masking them with stale state. |
 
 ### `token-emission-controller.clar`
 The central authority for CXD distribution targets and weights.

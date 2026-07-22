@@ -17,6 +17,10 @@ const activeReleaseArtifactPaths = [
 const generatedReleaseArtifactPaths = activeReleaseArtifactPaths.slice(0, 2);
 const legacyReleaseArtifactPath = path.join(repoRoot, "deployments/mainnet-release-plan.yaml");
 const releaseArtifactPaths = [...activeReleaseArtifactPaths, legacyReleaseArtifactPath];
+const issue506ProductionContracts = [
+  ["auto-compounder", "contracts/yield/auto-compounder.clar"],
+  ["cxd-staking", "contracts/yield/cxd-staking.clar"],
+] as const;
 
 const alexProductionNames = /\b(?:alex-adapter|alex-reserve-pool|alex-swap-helper|swap-helper-v1-03)\b/i;
 const localOnlyIntegrationPath = /contracts\/integrations\/(?:simnet|stubs)\//;
@@ -69,6 +73,23 @@ function extractContractPublishEntries(content: string): PublishEntry[] {
 
   if (currentEntry) entries.push(currentEntry);
   return entries;
+}
+
+function extractManifestPhases(content: string): Map<string, number> {
+  const phaseLines = content.split("\n").flatMap((line, index) => {
+    const match = line.match(/^\s+- id:\s*(\d+)\s*$/);
+    return match ? [{ line: index + 1, phase: Number(match[1]) }] : [];
+  });
+
+  return new Map(
+    extractContractPublishEntries(content).flatMap((entry) => {
+      const priorPhases = phaseLines.filter((candidate) => candidate.line < entry.line);
+      const phase = priorPhases[priorPhases.length - 1]?.phase;
+      return entry.contractName === undefined || phase === undefined
+        ? []
+        : [[entry.contractName, phase] as const];
+    }),
+  );
 }
 
 describe("ALEX release wiring guard", () => {
@@ -128,6 +149,33 @@ describe("ALEX release wiring guard", () => {
         ).toBe(true);
       }
     }
+  });
+
+  it("keeps both Issue #506 production contracts present and dependency-ordered", () => {
+    for (const artifactPath of activeReleaseArtifactPaths) {
+      const relativePath = path.relative(repoRoot, artifactPath);
+      const publishEntries = extractContractPublishEntries(readArtifact(artifactPath));
+
+      for (const [contractName, contractPath] of issue506ProductionContracts) {
+        expect(
+          publishEntries.some((entry) => entry.contractName === contractName && entry.path === contractPath),
+          `${relativePath} must keep Issue #506 contract ${contractName} paired with ${contractPath}`,
+        ).toBe(true);
+      }
+
+      const present = issue506ProductionContracts.map(([contractName]) =>
+        publishEntries.some((entry) => entry.contractName === contractName),
+      );
+      expect(
+        present[0],
+        `${relativePath} must not include only one of the paired Issue #506 production contracts`,
+      ).toBe(present[1]);
+    }
+
+    const manifestPath = path.join(repoRoot, "deployments/mainnet-manifest-v1.yaml");
+    const phases = extractManifestPhases(readArtifact(manifestPath));
+    expect(phases.get("cxd-staking")).toBeGreaterThan(phases.get("cxd-token") ?? -1);
+    expect(phases.get("cxd-staking")).toBeGreaterThan(phases.get("regulatory-adapter") ?? -1);
   });
 
   it("keeps generated release plans in sync without writing to the worktree", () => {

@@ -516,20 +516,19 @@
 
 ;; @desc Return global staking, reward, reserve, and cooldown statistics.
 (define-read-only (get-staking-stats)
-  {
-    total-staked: (var-get total-active-stake),
-    total-active-stake: (var-get total-active-stake),
-    total-pending-unstake: (var-get total-pending-unstake),
-    reward-rate: (var-get reward-rate),
-    reward-reserve: (var-get reward-reserve),
-    staking-paused: (var-get staking-paused),
-    cooldown-blocks: (var-get cooldown-blocks),
-    reward-per-token: (match (calculate-reward-per-token)
-      current current
-      arithmetic-error (var-get reward-per-token-stored)
-    ),
-    last-update-block: (var-get last-update-block)
-  }
+  (let ((current-reward-per-token (try! (calculate-reward-per-token))))
+    (ok {
+      total-staked: (var-get total-active-stake),
+      total-active-stake: (var-get total-active-stake),
+      total-pending-unstake: (var-get total-pending-unstake),
+      reward-rate: (var-get reward-rate),
+      reward-reserve: (var-get reward-reserve),
+      staking-paused: (var-get staking-paused),
+      cooldown-blocks: (var-get cooldown-blocks),
+      reward-per-token: current-reward-per-token,
+      last-update-block: (var-get last-update-block)
+    })
+  )
 )
 
 ;; @desc Return current administrative and configuration values.
