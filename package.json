@@ -11,10 +11,14 @@
     "check": "clarinet check",
     "clarinet:console": "clarinet console",
     "validate:docs": "node ./scripts/validate-docs.js",
+    "validate:deployment-plans": "python3 scripts/gen-deployment-plans.py --check",
     "assert:community-voting-wiring": "python3 scripts/assert-community-voting-wiring.py",
     "ci": "bash scripts/run-tests.sh",
     "coverage": "vitest run --coverage",
-    "derive:wallets": "tsx scripts/derive_wallets.ts"
+    "derive:wallets": "tsx scripts/derive_wallets.ts",
+    "verify:deployment-evidence": "tsx scripts/deployment/verify-evidence.ts",
+    "test:deployment-evidence": "vitest run tests/deployment-evidence.test.ts --config vitest.config.ts --pool=threads",
+    "test:release-plan-validation": "python3 -m unittest tests/test_release_plan_validation.py"
   },
   "dependencies": {
     "@opentelemetry/api": "1.9.1",
@@ -62,6 +66,7 @@
     "typescript": "^7.0.2",
     "vitest": "^4.1.9",
     "xml2js": "^0.6.2",
+    "yaml": "2.8.1",
     "zod": "^4.4.3"
   },
   "pnpm": {

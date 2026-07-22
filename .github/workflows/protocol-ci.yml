@@ -54,6 +54,7 @@ jobs:
               - 'vitest.config.ts'
               - '.github/workflows/**'
               - 'deployments/**'
+              - 'scripts/**'
             contracts:
               - 'contracts/**'
             tests:
@@ -111,7 +112,7 @@ jobs:
         run: npm ci
 
       - name: Install deployment assertion dependencies
-        run: python3 -m pip install --user --disable-pip-version-check pyyaml
+        run: python3 -m pip install --user --disable-pip-version-check 'PyYAML==6.0.2'
 
       - name: Assert community voting deployment wiring
         run: npm run assert:community-voting-wiring
@@ -138,6 +139,11 @@ jobs:
             echo "⚠️  Clarinet modified deployment plan - restoring original"
             cp deployments/default.simnet-plan.yaml.bak deployments/default.simnet-plan.yaml
           fi
+
+      - name: Validate generated release plans
+        run: |
+          npm run validate:deployment-plans
+          npm run test:release-plan-validation
 
       - name: Run Intelligent Tests (PR only)
         if: github.event_name == 'pull_request'

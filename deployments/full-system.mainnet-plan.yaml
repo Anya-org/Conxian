@@ -24,34 +24,10 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
-        contract-name: cxlp-token
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/tokens/cxlp-token.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: concentrated-liquidity-pool
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/dex/concentrated-liquidity-pool.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
         contract-name: core-traits
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/traits/core-traits.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: admin-facade
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/core/admin-facade.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -68,14 +44,6 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/traits/security-monitoring.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: agent-risk
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/agents/agent-risk.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -112,14 +80,6 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
-        contract-name: agent-treasury
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/agents/agent-treasury.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
         contract-name: allocation-policy
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
@@ -136,26 +96,18 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
+        contract-name: compoundable-vault-trait
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/traits/compoundable-vault-trait.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
         contract-name: auto-compounder
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/yield/auto-compounder.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: operational-treasury
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/core/operational-treasury.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: automation-manager
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/automation/automation-manager.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -191,29 +143,43 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
-  - id: 1
-    transactions:
+    - contract-publish:
+        contract-name: enterprise-plan-trait
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/traits/enterprise-plan-trait.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: enterprise-compliance-trait
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/traits/enterprise-compliance-trait.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: enterprise-revenue-trait
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/traits/enterprise-revenue-trait.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: enterprise-subscription-trait
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/traits/enterprise-subscription-trait.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
     - contract-publish:
         contract-name: block-utils
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/utils/block-utils.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: regulatory-adapter
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/compliance/regulatory-adapter.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: bond-factory
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/bonding/bond-factory.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -242,14 +208,6 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
-        contract-name: btc-adapter
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/interfaces/btc-adapter.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
         contract-name: defi-traits
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
@@ -265,6 +223,8 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
+  - id: 1
+    transactions:
     - contract-publish:
         contract-name: circuit-breaker
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -282,14 +242,6 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
-        contract-name: collateral-manager
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/core/collateral-manager.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
         contract-name: conxian-protocol
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
@@ -298,10 +250,50 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
+        contract-name: btc-adapter
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/interfaces/btc-adapter.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: collateral-manager
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/core/collateral-manager.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
         contract-name: collateral-orchestrator
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/core/collateral-orchestrator.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: kyc-registry
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/identity/kyc-registry.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: regulatory-adapter
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/compliance/regulatory-adapter.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: bond-factory
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/bonding/bond-factory.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -322,26 +314,10 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
-        contract-name: community-voting-engine
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/governance/community-voting-engine.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
         contract-name: compliance-manager
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/compliance/compliance-manager.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: kyc-registry
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/identity/kyc-registry.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -385,8 +361,6 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
-  - id: 2
-    transactions:
     - contract-publish:
         contract-name: conxian-exit-queue
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -443,6 +417,8 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
+  - id: 2
+    transactions:
     - contract-publish:
         contract-name: cross-chain-traits
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -496,6 +472,22 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/treasury/cxd-treasury.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: cxlp-token
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/tokens/cxlp-token.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: concentrated-liquidity-pool
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/dex/concentrated-liquidity-pool.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -555,8 +547,6 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
-  - id: 3
-    transactions:
     - contract-publish:
         contract-name: enhanced-circuit-breaker
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -605,6 +595,8 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
+  - id: 3
+    transactions:
     - contract-publish:
         contract-name: dlc-bond
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -642,14 +634,6 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/rewards/early-lp-rewards.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: economic-policy-engine
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/core/economic-policy-engine.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -702,18 +686,18 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
-        contract-name: enterprise-facade
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/enterprise/enterprise-facade.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
         contract-name: enterprise-traits
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/traits/enterprise-traits.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: enterprise-plan-registry
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/enterprise/enterprise-plan-registry.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -757,13 +741,27 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
-  - id: 4
-    transactions:
     - contract-publish:
         contract-name: finance-metrics
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/monitoring/finance-metrics.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: agent-risk
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/agents/agent-risk.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: agent-treasury
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/agents/agent-treasury.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -799,6 +797,8 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
+  - id: 4
+    transactions:
     - contract-publish:
         contract-name: founder-vesting
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -844,14 +844,6 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/dimensional/governance.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: governance-handover
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/governance/governance-handover.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -936,14 +928,6 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
-        contract-name: legacy-adapter
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/migration/legacy-adapter.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
         contract-name: legal-representative-registry
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
@@ -956,24 +940,6 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/oracle/oracle-aggregator.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-  - id: 5
-    transactions:
-    - contract-publish:
-        contract-name: revenue-automation
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/treasury/revenue-automation.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: lending-manager
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/lending/lending-manager.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -990,14 +956,6 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/governance/lending-protocol-governance.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: liquidity-manager
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/dex/liquidity-manager.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -1041,6 +999,8 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
+  - id: 5
+    transactions:
     - contract-publish:
         contract-name: mev-protector
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -1054,6 +1014,14 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/migration/migration-manager.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: legacy-adapter
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/migration/legacy-adapter.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -1098,14 +1066,6 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
-        contract-name: office-manager
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/core/office-manager.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
         contract-name: office-orchestrator
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
@@ -1121,13 +1081,43 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
-  - id: 6
-    transactions:
     - contract-publish:
         contract-name: ops-engine
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/core/ops-engine.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: operational-treasury
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/core/operational-treasury.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: automation-manager
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/automation/automation-manager.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: community-voting-engine
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/governance/community-voting-engine.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: office-manager
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/core/office-manager.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -1144,14 +1134,6 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/helpers/optimization-helpers.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
-        contract-name: oracle
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/dex/oracle.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -1179,6 +1161,8 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
+  - id: 6
+    transactions:
     - contract-publish:
         contract-name: payment-forge
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -1315,8 +1299,6 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
-  - id: 7
-    transactions:
     - contract-publish:
         contract-name: proposal-engine
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -1373,6 +1355,8 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
+  - id: 7
+    transactions:
     - contract-publish:
         contract-name: rbac
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -1434,6 +1418,30 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/treasury/revenue-distributor.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: economic-policy-engine
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/core/economic-policy-engine.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: revenue-automation
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/treasury/revenue-automation.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: lending-manager
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/lending/lending-manager.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -1517,8 +1525,6 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
-  - id: 8
-    transactions:
     - contract-publish:
         contract-name: symmetry-governor
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -1544,10 +1550,20 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
-        contract-name: token-emission-controller
+        contract-name: admin-facade
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
-        path: contracts/yield/token-emission-controller.clar
+        path: contracts/core/admin-facade.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+  - id: 8
+    transactions:
+    - contract-publish:
+        contract-name: governance-handover
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/governance/governance-handover.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -1556,6 +1572,14 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/tokens/token-system-coordinator.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: token-emission-controller
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/yield/token-emission-controller.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -1580,6 +1604,22 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
         path: contracts/integrations/twap-oracle.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: oracle
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/dex/oracle.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: liquidity-manager
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/dex/liquidity-manager.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -1664,6 +1704,24 @@ plan:
         clarity-version: 4
         epoch: 3.0
   - id: 9
+    transactions:
+    - contract-publish:
+        contract-name: enterprise-subscription
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/enterprise/enterprise-subscription.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: enterprise-facade
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 50000
+        path: contracts/enterprise/enterprise-facade.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+  - id: 10
     transactions:
     - contract-call:
         contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.conxian-protocol
@@ -1752,4 +1810,84 @@ plan:
         method: set-ops-engine
         parameters:
         - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.ops-engine'"
+        cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.agent-risk
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: initialize
+        parameters:
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P'"
+        cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.agent-risk
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: set-risk-unit
+        parameters:
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.risk-unit'"
+        cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.conxian-protocol
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: register-module
+        parameters:
+        - "\"risk-unit\""
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.risk-unit'"
+        cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.conxian-protocol
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: register-module
+        parameters:
+        - "\"risk-manager\""
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.risk-manager'"
+        cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.cxd-treasury
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: set-authorized-principals
+        parameters:
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P'"
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.revenue-distributor'"
+        cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.cxd-treasury
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: authorize-stx-source
+        parameters:
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.integration-fee-collector'"
+        cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.cxd-treasury
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: authorize-stx-source
+        parameters:
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.enterprise-subscription'"
+        cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.revenue-distributor
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: set-revenue-automation
+        parameters:
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.revenue-automation'"
+        cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.revenue-distributor
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: authorize-stx-source
+        parameters:
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.integration-fee-collector'"
+        cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.revenue-distributor
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: authorize-stx-source
+        parameters:
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.enterprise-subscription'"
+        cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.revenue-automation
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: authorize-stx-source
+        parameters:
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.enterprise-subscription'"
         cost: 10000

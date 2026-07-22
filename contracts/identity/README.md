@@ -16,8 +16,17 @@ The primary registry for user verification data.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `set-identity-status` | `(set-identity-status (user principal) (status bool) (level uint))` | Updates the verification level for a user. Authorized only. |
-| `get-identity-status` | `(get-identity-status (user principal))` | Returns the current status and tier for a specific user. |
+| `set-identity-status` | `(set-identity-status (principal uint uint (string-ascii 3)) (response bool uint))` | Admin-only update of a user's tier, flags, and three-character country code. |
+| `get-identity-status` | `(get-identity-status (principal) (tuple {tier:uint, flags:uint, country:(string-ascii 3)}))` | Returns the stored status or a zero/default tuple when no record exists. |
+| `has-identity-status` | `(has-identity-status (principal) (bool))` | Distinguishes a stored identity record from the default tuple returned by `get-identity-status`. |
+| `is-sanctioned` | `(is-sanctioned (principal) (bool))` | Returns the registry's own sanction decision; flag `u2` means sanctioned. |
+| `get-tier` | `(get-tier (principal) (uint))` | Returns the stored tier or `u0` when no record exists. |
+
+The registration gate uses `has-identity-status`, the registry tier, and
+`is-sanctioned`; it does not infer record existence from the default tuple or
+from a separate compliance-manager boolean. The registry has no freshness
+timestamp of its own, so the gate's freshness requirement applies to the
+companion `compliance-manager` record.
 
 ### `identity-badge.clar`
 Reputation and achievement tokens.
@@ -30,8 +39,9 @@ Reputation and achievement tokens.
 
 ### Checking User Verification
 ```clarity
-(let ((status (unwrap-panic (contract-call? .kyc-registry get-identity-status tx-sender))))
-  (asserts! (get status status) (err u5001))
+(let ((status (contract-call? .kyc-registry get-identity-status tx-sender)))
+  (asserts! (contract-call? .kyc-registry has-identity-status tx-sender) (err u5001))
+  (asserts! (>= (get tier status) u1) (err u5001))
 )
 ```
 

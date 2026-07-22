@@ -5,8 +5,15 @@ import { simnet } from "../setup-test-env";
 
 const CONTRACT = "sab-election";
 const MOCK_TOKEN = "mock-token";
+const NOMINATION_PHASE_BLOCKS = 10;
+const VOTING_PHASE_BLOCKS = 10;
 
 const hash = (byte: number) => Cl.buffer(Buffer.alloc(32, byte));
+
+// These tests configure both cycle phases to ten burn blocks. Mine the full
+// phase so assertions exercise the contract's exact boundary transitions.
+const advanceNominationPhase = () => simnet.mineEmptyBlocks(NOMINATION_PHASE_BLOCKS);
+const advanceVotingPhase = () => simnet.mineEmptyBlocks(VOTING_PHASE_BLOCKS);
 
 describe("SAB election", () => {
   let deployer: string;
@@ -126,7 +133,7 @@ describe("SAB election", () => {
       .toEqual(Cl.error(Cl.uint(1002)));
 
     // At nomination-end/voting-start, nomination is closed and voting opens.
-    simnet.mineEmptyBlocks(6);
+    advanceNominationPhase();
     expect(simnet.callPublicFn(CONTRACT, "nominate", [cycleId, hash(3)], wallet3).result)
       .toEqual(Cl.error(Cl.uint(1008)));
     expect(simnet.callReadOnlyFn(CONTRACT, "is-voting-open", [cycleId], deployer).result)
@@ -155,7 +162,7 @@ describe("SAB election", () => {
       .toContain("total-votes: u1000");
 
     // At voting-end, voting is closed and permissionless finalization succeeds.
-    simnet.mineEmptyBlocks(6);
+    advanceVotingPhase();
     expect(simnet.callReadOnlyFn(CONTRACT, "is-voting-open", [cycleId], deployer).result)
       .toEqual(Cl.bool(false));
     expect(simnet.callPublicFn(CONTRACT, "finalize-cycle", [cycleId], wallet3).result)
@@ -183,7 +190,7 @@ describe("SAB election", () => {
       .toEqual(Cl.ok(Cl.bool(true)));
     expect(simnet.callPublicFn(CONTRACT, "nominate", [cycleId, hash(5)], wallet2).result)
       .toEqual(Cl.ok(Cl.bool(true)));
-    simnet.mineEmptyBlocks(8);
+    advanceNominationPhase();
 
     expect(simnet.callPublicFn(
       CONTRACT,
@@ -197,7 +204,7 @@ describe("SAB election", () => {
       [cycleId, Cl.principal(wallet2), Cl.uint(300), token],
       wallet2,
     ).result).toEqual(Cl.ok(Cl.bool(true)));
-    simnet.mineEmptyBlocks(8);
+    advanceVotingPhase();
 
     expect(simnet.callPublicFn(CONTRACT, "finalize-cycle", [cycleId], wallet3).result)
       .toEqual(Cl.ok(Cl.bool(false)));
@@ -224,7 +231,7 @@ describe("SAB election", () => {
       .toEqual(Cl.ok(Cl.bool(true)));
     expect(simnet.callPublicFn(CONTRACT, "nominate", [cycleId, hash(7)], wallet2).result)
       .toEqual(Cl.ok(Cl.bool(true)));
-    simnet.mineEmptyBlocks(12);
+    advanceNominationPhase();
 
     expect(simnet.callPublicFn(
       CONTRACT,
@@ -254,7 +261,7 @@ describe("SAB election", () => {
     expect(simnet.callReadOnlyFn(MOCK_TOKEN, "get-balance", [Cl.principal(wallet2)], deployer).result)
       .toEqual(Cl.ok(Cl.uint(600)));
 
-    simnet.mineEmptyBlocks(12);
+    advanceVotingPhase();
     expect(simnet.callPublicFn(CONTRACT, "finalize-cycle", [cycleId], wallet3).result)
       .toEqual(Cl.ok(Cl.bool(true)));
     expect(simnet.callPublicFn(CONTRACT, "claim-stake", [cycleId, alternateToken], wallet1).result)
@@ -291,7 +298,7 @@ describe("SAB election", () => {
 
     expect(simnet.callPublicFn(CONTRACT, "nominate", [cycleId, hash(8)], wallet1).result)
       .toEqual(Cl.ok(Cl.bool(true)));
-    simnet.mineEmptyBlocks(12);
+    advanceNominationPhase();
     expect(simnet.callPublicFn(
       CONTRACT,
       "vote",
@@ -311,7 +318,7 @@ describe("SAB election", () => {
     expect(afterUpdate).toContain("quorum-bps: u2000");
     expect(afterUpdate).toContain("approval-bps: u5000");
 
-    simnet.mineEmptyBlocks(12);
+    advanceVotingPhase();
     expect(simnet.callPublicFn(CONTRACT, "finalize-cycle", [cycleId], wallet3).result)
       .toEqual(Cl.ok(Cl.bool(true)));
     expect(Cl.prettyPrint(simnet.callReadOnlyFn(CONTRACT, "get-cycle", [cycleId], deployer).result))
