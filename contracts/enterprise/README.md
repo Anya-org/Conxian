@@ -10,6 +10,90 @@ The module follows a layered approach:
 - **Advanced Order Manager**: `advanced-order-manager.clar` serves as the institutional execution engine for TWAP/VWAP orders with integrated escrow.
 - **Ops Loan Manager**: `ops-loan-manager.clar` enables structured B2B finance through Junior/Senior tranches.
 
+## Enterprise Subscription MVP (Issue #503)
+
+The subscription MVP is an STX-only, prepaid billing layer. Purchases and
+renewals are explicit transactions; the protocol never pulls funds
+automatically. The implementation deliberately keeps plan prices as owner
+configuration rather than protocol constants, so publication and activation
+are separate operations.
+
+### Plan registry
+
+`enterprise-plan-registry.clar` stores immutable versioned records keyed by
+`{ tier-id, version }`; there is no independent arbitrary `plan-id`. The only
+valid tier identities are `u1` Bronze, `u2` Silver, `u3` Gold, and `u4`
+Platinum. Versions, monthly/annual prices, and required KYC tier must all be
+nonzero at publication. A published plan starts inactive and becomes
+purchasable only after the owner explicitly activates it. Prices and generic
+feature records cannot be edited afterward; new features may be added only
+before the version is activated. Activation is the only mutable plan field,
+and no production plan or price is preconfigured by deployment.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `publish-plan` | `(uint uint uint uint uint)` | Publishes an inactive `{tier-id, version}` with owner-supplied nonzero prices and KYC tier. |
+| `publish-feature` | `(uint uint (string-ascii 32) bool uint)` | Adds one generic feature/limit record before activation; versions that were ever activated reject new features. |
+| `set-plan-active` | `(uint uint bool)` | Explicitly activates or deactivates a published plan version. |
+| `get-plan` | `(uint uint)` | Reads an optional versioned plan record. |
+| `get-plan-feature` | `(uint uint (string-ascii 32))` | Reads an optional generic feature record for a plan version. |
+
+### Subscription lifecycle
+
+`enterprise-subscription.clar` stores one subscription per subscriber. Monthly
+and annual billing periods are fixed at `u4320` and `u51840` burn blocks. An
+active renewal extends from the existing `paid-through` height; a renewal at
+or after expiry starts at the current `burn-block-height`. Cancellation is
+period-end only: it marks the record without refunds, proration, credits, or
+debt, and entitlement remains derived directly from
+`burn-block-height < paid-through`.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `subscribe` | `(uint uint uint uint uint)` | Pays the selected active plan in the exact supplied amount and creates the subscription. |
+| `renew` | `(uint uint uint uint uint)` | Pays a new period explicitly in the exact supplied amount and extends the subscription. |
+| `cancel` | `()` | Marks an active subscription cancelled for period-end termination. |
+| `get-subscription` | `(principal)` | Reads lifecycle state and current active status. |
+| `is-entitled` | `(principal (string-ascii 32))` | Reads a generic feature entitlement. |
+| `get-entitlement` | `(principal (string-ascii 32))` | Reads entitlement, limit, usage, remaining units, and paid-through. |
+| `record-usage` | `(principal (string-ascii 32) (buff 32) uint)` | Records subscriber-originated usage with an authorized consumer, consumer-independent period-scoped replay key, and limit check. |
+
+KYC tier and AML status are checked on every subscribe and renew through
+`compliance-hooks.clar`. No PII is stored on-chain; feature identifiers are
+generic strings and product-specific mappings remain in consumer contracts.
+Only explicitly registered consumer contract principals may record usage, and
+the authoritative boundary also requires `tx-sender == subscriber` for the
+MVP. Payment IDs are globally unique across the subscription route. Usage IDs
+are replay-protected across all authorized consumers within a paid period and
+may be reused after renewal
+because the period start is part of the key. Production deployment leaves the
+consumer allowlist empty; governance must register only audited product
+contracts. `enterprise-facade.clar` is a generic self-directed testing and
+integration boundary, not a trusted product consumer by default.
+
+### Gross-STX Fiscal Dam route
+
+Every subscription payment enters the canonical route in full:
+
+```text
+enterprise-subscription
+  -> revenue-automation.route-stx-revenue
+  -> revenue-distributor.route-stx-revenue
+  -> cxd-treasury.record-stx-revenue
+```
+
+The subscription contract first takes exact STX custody, calls the route, and
+writes payment/subscription state only after the route succeeds. A successful
+payment leaves zero STX in subscription, automation, and distributor custody.
+`cxd-treasury` records an immutable `{ source, payment-id }` receipt with the
+active policy version and adds the gross amount to six accounting buckets. The
+first five allocations use safe floor arithmetic and the sixth bucket receives
+the integer remainder, so bucket totals equal gross STX exactly. Bucket
+recipients are unset by default and every release requires an explicit
+governance-configured destination, a unique release ID, and sufficient bucket
+balance. The buyback bucket is governed STX; the contracts do not claim
+native-STX buyback execution.
+
 ## Core Contracts (Reference)
 
 ### `enterprise-api.clar`

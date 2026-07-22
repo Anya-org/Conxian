@@ -151,7 +151,7 @@ path = "contracts/compliance/travel-rule-service.clar"
 
 [contracts.compliance-manager]
 path = "contracts/compliance/compliance-manager.clar"
-depends_on = [ "block-utils",]
+depends_on = [ "block-utils", "kyc-registry",]
 
 [contracts.compliance-trait]
 path = "contracts/compliance/compliance-trait.clar"
@@ -515,7 +515,7 @@ path = "contracts/cross-chain/bridge-nft.clar"
 
 [contracts.enterprise-compliance-manager]
 path = "contracts/compliance/compliance-manager.clar"
-depends_on = [ "block-utils",]
+depends_on = [ "block-utils", "kyc-registry",]
 
 [contracts.position-factory]
 path = "contracts/position-factory.clar"
@@ -584,7 +584,52 @@ path = "contracts/vaults/yield-aggregator.clar"
 
 [contracts.revenue-distributor]
 path = "contracts/treasury/revenue-distributor.clar"
-depends_on = [ "allocation-policy",]
+depends_on = [ "allocation-policy", "cxd-treasury",]
+
+[contracts.cxd-treasury]
+path = "contracts/treasury/cxd-treasury.clar"
+clarity-version = 4
+
+[contracts.revenue-automation]
+path = "contracts/treasury/revenue-automation.clar"
+clarity-version = 4
+depends_on = [ "enterprise-revenue-trait", "revenue-distributor",]
+
+[contracts.compliance-hooks]
+path = "contracts/compliance/compliance-hooks.clar"
+clarity-version = 4
+depends_on = [ "compliance-manager", "enterprise-compliance-trait", "kyc-registry",]
+
+[contracts.enterprise-plan-trait]
+path = "contracts/traits/enterprise-plan-trait.clar"
+clarity-version = 4
+
+[contracts.enterprise-compliance-trait]
+path = "contracts/traits/enterprise-compliance-trait.clar"
+clarity-version = 4
+
+[contracts.enterprise-revenue-trait]
+path = "contracts/traits/enterprise-revenue-trait.clar"
+clarity-version = 4
+
+[contracts.enterprise-subscription-trait]
+path = "contracts/traits/enterprise-subscription-trait.clar"
+clarity-version = 4
+
+[contracts.enterprise-plan-registry]
+path = "contracts/enterprise/enterprise-plan-registry.clar"
+clarity-version = 4
+depends_on = [ "enterprise-plan-trait",]
+
+[contracts.enterprise-subscription]
+path = "contracts/enterprise/enterprise-subscription.clar"
+clarity-version = 4
+depends_on = [ "compliance-hooks", "enterprise-plan-registry", "enterprise-subscription-trait", "revenue-automation",]
+
+[contracts.enterprise-facade]
+path = "contracts/enterprise/enterprise-facade.clar"
+clarity-version = 4
+depends_on = [ "enterprise-subscription",]
 
 [contracts.integration-fee-collector]
 path = "contracts/integrations/integration-fee-collector.clar"
