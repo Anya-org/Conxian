@@ -127,16 +127,16 @@ unless `dry_run: false` AND `confirm: DEPLOY_MAINNET` are provided.
 
 | Target | Plan Ready | Actually Deployed? | On-Chain Verified |
 |--------|-----------|-------------------|-------------------|
-| **Testnet** | ✅ Yes | ⚠️ NEEDS VERIFICATION | Check 28719280478 |
-| **Mainnet** | ✅ Yes | ❌ **NO** | 0 STX, 0 TX (user verified) |
+| **Testnet** | ✅ Yes | ❌ **NOT VERIFIED** | Receipt/interface/read-only evidence manifest required |
+| **Mainnet** | ✅ Yes | ❌ **NOT VERIFIED** | 0 STX, 0 TX (user verified) |
 
 ### Deployer Address
 `ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
 
 ### What Was Actually Done
-- Deployment plans generated (214 contracts)
+- Deployment plans generated; plans are not receipts
 - CI validation passed
-- **Actual blockchain deployment NOT executed**
+- **Actual blockchain deployment is not verified**
 
 ### To Execute Real Deployment
 1. Fund deployer address with STX (estimate ~11 STX for 214 contracts)
@@ -152,8 +152,8 @@ unless `dry_run: false` AND `confirm: DEPLOY_MAINNET` are provided.
 
 ### CI Workflows
 - **Validate** (PR + push): `clarinet check` → `run-tests.sh` → `coverage`
-- **Deploy Testnet** (workflow_dispatch + push to main): validate → `clarinet deployments apply`
-- **Deploy Mainnet** (workflow_dispatch only): validate → confirm `DEPLOY_MAINNET` → `clarinet deployments apply`
+- **Deploy Testnet** (workflow_dispatch only): validate → optional apply → required receipt/interface/read-only evidence verification
+- **Deploy Mainnet** (workflow_dispatch only): validate → confirm `DEPLOY_MAINNET` → optional apply → required receipt/interface/read-only evidence verification
 - **Clarinet version**: v3.21.0 (requires `script -q -c` PTY wrapper for non-interactive `deployments apply`)
 - **Runtime error detection**: `run-tests.sh` captures fd 2, allowlists 4 known benign clarinet-sdk errors, fails on new errors
 
@@ -238,9 +238,12 @@ These are clarinet-sdk v3.21.0 artifacts from plan regeneration with different r
 | bme-engine.clar CXIP-013 | COMPLIANT | Weights aligned: DEX 45%, Bounty 30%, Gov 15%, Grants 10% |
 | dimensional-core.clar | SECURE | liquidation-position gated to risk-unit/risk-manager/admin |
 
-## 12. Mainnet Deployment Prerequisites -- COMPLETE
+## 12. Mainnet Deployment Prerequisites -- BLOCKED ON EVIDENCE
 
-All 12 prerequisites resolved. Mainnet deployed July 2026.
+The repository has deployment plans and validation tooling, but no current
+testnet or mainnet receipt/interface/read-only evidence bundle proves a
+deployment. Partnership deployment readiness is separately blocked on #527-
+#530.
 
 1. ~~Fix cxd-token get-name/get-symbol~~ -- DONE (P0-1)
 2. ~~Add liquidation auth to dimensional-core~~ -- DONE (P0-2)
@@ -250,9 +253,9 @@ All 12 prerequisites resolved. Mainnet deployed July 2026.
 6. ~~Fix testnet deployment plan~~ -- DONE (P1-4)
 7. ~~Implement bridge-nft SIP-009~~ -- DONE (P1-3)
 8. ~~Verify BitVM2 attestation in clarity-bitcoin.clar~~ -- HARDENED
-9. ~~Finalize mainnet manifest~~ -- DONE (214 contracts, 10 batches)
-10. ~~Deploy to testnet~~ -- DONE (28719280478, 4.37 STX)
-11. ~~Deploy to mainnet~~ -- DONE (28732058625, 10.79 STX)
+9. ~~Finalize mainnet manifest~~ -- PLAN ONLY; a plan is not receipt evidence
+10. Deploy to testnet -- BLOCKED until a confirmed evidence manifest passes
+11. Deploy to mainnet -- BLOCKED until explicit approval and a confirmed evidence manifest pass
 12. ~~Merge all sprint PRs (#446, #447, #448, #449, #450)~~ -- DONE
 
 ### Remaining Post-Deployment Work (not blockers)
@@ -260,11 +263,11 @@ All 12 prerequisites resolved. Mainnet deployed July 2026.
 - Complete alex-adapter with real ALEX contract calls (P2-1)
 - cxs-token.clar stub implementation (P2-3)
 
-## CI Status (July 2026 -- Post-Deployment)
+## CI Status (July 2026 -- Evidence Foundation)
 - `clarinet check` passes on all active contracts in `Clarinet.toml`.
 - Test suite: 7 suites pass (236 known benign clarinet-sdk stderr warnings suppressed).
 - Runtime error detection active via `run-tests.sh`: allowlists 4 known benign contracts, fails on new errors.
-- Deploy workflows (testnet + mainnet) operational with `script -q -c` PTY wrapper for clarinet v3.21.0.
+- Deploy workflows (testnet + mainnet) use the `script -q -c` PTY wrapper for Clarinet v3.21.0 and fail closed without receipt/interface/read-only evidence.
 
 ---
 
@@ -362,7 +365,7 @@ The repository uses GitHub Actions for repository-level automation:
 | 480 | [P0] Developer Sandbox: TTFV < 15 minutes | P0 | deployment, developer-experience | OPEN |
 | 458 | [HIGH] Fake mock pollution: createMockSimnet() returns hardcoded success | HIGH | bug, testing | OPEN |
 
-**Deployment Status (VERIFIED ON-CHAIN):**
+**Deployment Status (NOT VERIFIED ON-CHAIN):**
 - Deployer: `ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
 - Balance: **0 STX** | Transactions: **0**
 - Conclusion: Deployment workflow ran but `dry_run: true` prevented actual deployment

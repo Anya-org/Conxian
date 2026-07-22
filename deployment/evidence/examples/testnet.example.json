@@ -1,0 +1,34 @@
+{
+  "$schema": "../schema/v1/deployment-evidence.schema.json",
+  "schemaVersion": "1.0.0",
+  "network": "testnet",
+  "apiBaseUrl": "https://api.testnet.hiro.so",
+  "deployer": "ST000000000000000000000000000000000000000",
+  "evidence": {
+    "source": "confirmed-receipts",
+    "capturedAt": "2026-07-22T00:00:00Z",
+    "planPath": "deployments/full-system.testnet-plan.yaml"
+  },
+  "contracts": [
+    {
+      "name": "example-contract",
+      "principal": "ST000000000000000000000000000000000000000.example-contract",
+      "publishTxId": "0x1111111111111111111111111111111111111111111111111111111111111111",
+      "interface": {
+        "required": true,
+        "expectedContractName": "example-contract",
+        "expectedFunctions": [
+          "get-version"
+        ]
+      },
+      "readOnlyChecks": [
+        {
+          "function": "get-version",
+          "sender": "ST000000000000000000000000000000000000000",
+          "arguments": [],
+          "expectedResultHex": "0x0701"
+        }
+      ]
+    }
+  ]
+}

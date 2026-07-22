@@ -1,5 +1,27 @@
 # Documentation State
 
+## Current Session (38) - Deployment Evidence Foundation (Issue #531 / CON-1539)
+
+{
+  "status": "IMPLEMENTED_POLICY_INDEPENDENT_FOUNDATION",
+  "session_timestamp": "2026-07-22",
+  "scope": "Added a versioned, fail-closed deployment evidence verifier for testnet and mainnet, canonical address/interface/block-hash checks, timeout-safe API handling, network-bound plan guards, split broadcast/verification workflows, binding tests, and an operator runbook. No partnership contracts, fee policy, registry, collector, or gateway ABI was added.",
+  "verification_boundary": "Plans, workflow success, broadcast-only IDs, local simnet tests, and missing results are not deployment proof. Manual verification binds the exact network, deployer, deployed git commit, plan path, and plan SHA-256, then reports declared evidence entries verified without claiming complete plan coverage.",
+  "dependency_gate": "Partnership deployment readiness remains blocked on #527, #528, #529, and #530.",
+  "validation": {
+    "targeted_tests": "PASS: deployment-evidence.test.ts (33 tests) and deployment-verification-regression.test.ts (6 tests); live network verification was not attempted.",
+    "focused_typecheck": "PASS: verifier, broadcast helper, and focused test files typecheck with TypeScript 7.0.2.",
+    "workflow_schema_parsing": "PASS: changed workflow YAML and evidence schema/example JSON parse successfully.",
+    "full_typecheck": "BLOCKED by pre-existing repository errors in unrelated services/tests and stale Clarinet matcher/API typings.",
+    "deployment": "Not attempted. No testnet or mainnet deployment was performed, and no deployment readiness is claimed."
+  },
+  "artifacts": [
+    "scripts/verify-deployment-evidence.ts",
+    "deployment/evidence/schema/v1/deployment-evidence.schema.json",
+    "docs/DEPLOYMENT_EVIDENCE_RUNBOOK.md"
+  ]
+}
+
 ## Current Session (37) - Yield Infrastructure Final Review (Issue #506)
 
 {

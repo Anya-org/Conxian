@@ -1,7 +1,7 @@
 /**
- * ConxianCSF Testnet Deployment Script
- * Deploys all CSF contracts to Stacks testnet in the correct dependency order
- */
+* ConxianCSF Testnet Broadcast Helper
+* Broadcasts contracts in dependency order; it never proves deployment.
+*/
 import "dotenv/config";
 import { makeContractDeploy, broadcastTransaction } from "@stacks/transactions";
 import { STACKS_TESTNET } from "@stacks/network";
@@ -158,7 +158,19 @@ async function main() {
     });
   }
   
-  console.log("\nDeployment complete!");
+  if (failed.length > 0 || Object.keys(results).length === 0) {
+    console.error("\nDeployment broadcast did not complete for every requested contract.");
+    console.error("No deployment is verified. Capture confirmed receipt evidence before reporting success.");
+    process.exitCode = 1;
+    return;
+  }
+
+  console.log("\nBroadcast complete; no deployment is verified.");
+  console.log("Run scripts/verify-deployment-evidence.ts with a confirmed evidence manifest before reporting success.");
+  process.exitCode = 1;
 }
 
-main().catch(console.error);
+main().catch(() => {
+  console.error("Deployment broadcast failed; no deployment is verified.");
+  process.exitCode = 1;
+});

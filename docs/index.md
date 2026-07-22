@@ -34,6 +34,7 @@ Explore the core components of the Conxian ecosystem:
 
 - **[Requirements & Testing](REQUIREMENTS_TESTING.md)**: How we ensure "Full Truth" alignment.
 - **[Standards Report](STANDARDS_VALIDATION_REPORT.md)**: Our commitment to documentation and code excellence.
+- **[Deployment Evidence Runbook](DEPLOYMENT_EVIDENCE_RUNBOOK.md)**: Fail-closed receipt, interface, read-only, and recovery procedures.
 
 ---
 © 2024-2026 Conxian Finance. All rights reserved.

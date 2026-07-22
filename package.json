@@ -14,7 +14,8 @@
     "assert:community-voting-wiring": "python3 scripts/assert-community-voting-wiring.py",
     "ci": "bash scripts/run-tests.sh",
     "coverage": "vitest run --coverage",
-    "derive:wallets": "tsx scripts/derive_wallets.ts"
+    "derive:wallets": "tsx scripts/derive_wallets.ts",
+    "verify:deployment-evidence": "tsx scripts/verify-deployment-evidence.ts"
   },
   "dependencies": {
     "@opentelemetry/api": "1.9.1",
