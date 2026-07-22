@@ -47,6 +47,40 @@
       }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "network": {
+            "const": "testnet"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "deployer": {
+            "pattern": "^ST[0-9A-Z]{39}$"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "network": {
+            "const": "mainnet"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "deployer": {
+            "pattern": "^SP[0-9A-Z]{39}$"
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "contractName": {
       "type": "string",
@@ -73,7 +107,10 @@
       "additionalProperties": false,
       "required": [
         "source",
-        "capturedAt"
+        "capturedAt",
+        "gitCommit",
+        "planPath",
+        "planSha256"
       ],
       "properties": {
         "source": {

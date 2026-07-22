@@ -1,8 +1,14 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import {
+  AddressVersion,
+  addressToString,
+  createAddress,
+  validateStacksAddress,
+} from "@stacks/transactions";
 
-export const VERIFIER_VERSION = "1.0.0";
+export const VERIFIER_VERSION = "1.1.0";
 export const EVIDENCE_SCHEMA_VERSION = "1.0.0";
 
 export const NETWORK_API_BASE_URLS = {
@@ -30,7 +36,8 @@ export type FailureClassification =
   | "read-only-missing"
   | "read-only-mismatch"
   | "read-only-api-error"
-  | "read-only-not-checked";
+  | "read-only-not-checked"
+  | "evidence-binding-mismatch";
 
 export interface DeploymentEvidenceManifest {
   $schema?: string;
@@ -41,9 +48,9 @@ export interface DeploymentEvidenceManifest {
   evidence: {
     source: "confirmed-receipts";
     capturedAt: string;
-    gitCommit?: string;
-    planPath?: string;
-    planSha256?: string;
+    gitCommit: string;
+    planPath: string;
+    planSha256: string;
   };
   contracts: ContractEvidence[];
 }
@@ -86,7 +93,7 @@ export interface TransactionEvidenceSummary {
 
 export interface InterfaceEvidenceSummary {
   available: true;
-  contractId?: string;
+  contractId: string;
   functionCount: number;
   expectedFunctionsChecked: string[];
 }
@@ -116,8 +123,17 @@ export interface VerificationReport {
   apiBaseUrl?: string;
   deployer?: string;
   scope: "documented-transaction-ids-and-contract-addresses-only";
+  claim: "declared evidence entries verified" | "no deployment is verified";
   contracts: ContractVerificationReport[];
   failures: VerificationFailure[];
+}
+
+export interface EvidenceBinding {
+  network: DeploymentNetwork;
+  deployer: string;
+  gitCommit: string;
+  planPath: string;
+  planSha256: string;
 }
 
 export interface FetchResponseLike {
@@ -130,6 +146,7 @@ export interface FetchInitLike {
   method?: string;
   headers?: Record<string, string>;
   body?: string;
+  signal?: AbortSignal;
 }
 
 export type FetchLike = (
@@ -151,18 +168,32 @@ export interface HttpResult {
   status: number | null;
   ok: boolean;
   data?: unknown;
-  error?: "network-error" | "invalid-json";
+  error?: "network-error" | "invalid-json" | "timeout";
 }
 
 interface RecordValue {
   [key: string]: unknown;
 }
 
-const ADDRESS_PATTERN = /^S[TP][0-9A-Z]{39}$/;
 const CONTRACT_NAME_PATTERN = /^[a-z][a-z0-9-]{0,127}$/;
 const TX_ID_PATTERN = /^(?:0x)?[0-9a-f]{64}$/i;
-const HEX_PATTERN = /^0x[0-9a-f]*$/i;
+const HEX_PATTERN = /^0x[0-9a-f]+$/i;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/i;
+const COMMIT_PATTERN = /^[0-9a-f]{40}$/i;
+const BLOCK_HASH_PATTERN = /^0x[0-9a-f]{64}$/;
+const ISO_DATETIME_PATTERN =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
+const DEFAULT_HIRO_TIMEOUT_MS = 15_000;
+
+const NETWORK_ADDRESS_PREFIXES: Record<DeploymentNetwork, string> = {
+  testnet: "ST",
+  mainnet: "SP",
+};
+
+const NETWORK_ADDRESS_VERSIONS: Record<DeploymentNetwork, readonly number[]> = {
+  testnet: [AddressVersion.TestnetSingleSig, AddressVersion.TestnetMultiSig],
+  mainnet: [AddressVersion.MainnetSingleSig, AddressVersion.MainnetMultiSig],
+};
 
 function isRecord(value: unknown): value is RecordValue {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -202,8 +233,31 @@ function rejectUnknownProperties(
   }
 }
 
-function isAddress(value: unknown): value is string {
-  return typeof value === "string" && ADDRESS_PATTERN.test(value);
+function isDeploymentNetwork(value: unknown): value is DeploymentNetwork {
+  return value === "testnet" || value === "mainnet";
+}
+
+export function isCanonicalStacksAddress(
+  value: unknown,
+  network: DeploymentNetwork,
+): value is string {
+  if (
+    typeof value !== "string" ||
+    !value.startsWith(NETWORK_ADDRESS_PREFIXES[network]) ||
+    !validateStacksAddress(value)
+  ) {
+    return false;
+  }
+
+  try {
+    const address = createAddress(value);
+    return (
+      NETWORK_ADDRESS_VERSIONS[network].includes(address.version) &&
+      addressToString(address) === value
+    );
+  } catch {
+    return false;
+  }
 }
 
 function isContractName(value: unknown): value is string {
@@ -221,6 +275,18 @@ function normalizeTxId(txId: string): string {
 
 function isHex(value: unknown): value is string {
   return typeof value === "string" && HEX_PATTERN.test(value);
+}
+
+function isCanonicalBlockHash(value: unknown): value is string {
+  return typeof value === "string" && BLOCK_HASH_PATTERN.test(value);
+}
+
+function isIsoDateTime(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    ISO_DATETIME_PATTERN.test(value) &&
+    !Number.isNaN(Date.parse(value))
+  );
 }
 
 function validateApiBaseUrl(
@@ -256,10 +322,7 @@ function validateApiBaseUrl(
     return;
   }
 
-  if (
-    (network === "testnet" || network === "mainnet") &&
-    apiBaseUrl.replace(/\/$/, "") !== NETWORK_API_BASE_URLS[network]
-  ) {
+  if (isDeploymentNetwork(network) && apiBaseUrl !== NETWORK_API_BASE_URLS[network]) {
     failures.push(
       failure(
         "network-mismatch",
@@ -273,6 +336,7 @@ function validateApiBaseUrl(
 function validateReadOnlyCheck(
   value: unknown,
   scope: string,
+  network: DeploymentNetwork | undefined,
   failures: VerificationFailure[],
 ): value is ReadOnlyCheck {
   if (!isRecord(value)) {
@@ -297,7 +361,7 @@ function validateReadOnlyCheck(
     );
   }
 
-  if (!isAddress(value.sender)) {
+  if (!network || !isCanonicalStacksAddress(value.sender, network)) {
     failures.push(
       failure(
         "malformed-manifest",
@@ -329,7 +393,8 @@ function validateReadOnlyCheck(
 
   return (
     isContractName(value.function) &&
-    isAddress(value.sender) &&
+    network !== undefined &&
+    isCanonicalStacksAddress(value.sender, network) &&
     Array.isArray(value.arguments) &&
     value.arguments.every(isHex) &&
     isHex(value.expectedResultHex) &&
@@ -370,7 +435,7 @@ export function validateManifest(input: unknown): {
     );
   }
 
-  if (input.network !== "testnet" && input.network !== "mainnet") {
+  if (!isDeploymentNetwork(input.network)) {
     failures.push(
       failure(
         "malformed-manifest",
@@ -382,9 +447,16 @@ export function validateManifest(input: unknown): {
 
   validateApiBaseUrl(input.network, input.apiBaseUrl, failures);
 
-  if (!isAddress(input.deployer)) {
+  const network = isDeploymentNetwork(input.network) ? input.network : undefined;
+  if (!network || !isCanonicalStacksAddress(input.deployer, network)) {
     failures.push(
-      failure("malformed-manifest", "deployer", "deployer must be a valid Stacks address"),
+      failure(
+        "malformed-manifest",
+        "deployer",
+        network
+          ? `deployer must be a canonical ${network} Stacks address with a valid checksum and network version`
+          : "deployer must be a canonical Stacks address for the explicit deployment network",
+      ),
     );
   }
 
@@ -413,43 +485,51 @@ export function validateManifest(input: unknown): {
       );
     }
 
-    if (
-      typeof input.evidence.capturedAt !== "string" ||
-      Number.isNaN(Date.parse(input.evidence.capturedAt))
-    ) {
+    if (!isIsoDateTime(input.evidence.capturedAt)) {
       failures.push(
         failure(
           "malformed-manifest",
           "evidence.capturedAt",
-          "evidence.capturedAt must be an ISO-8601 timestamp",
+          "evidence.capturedAt must be a valid RFC 3339/ISO-8601 timestamp with an explicit timezone",
         ),
       );
     }
 
     if (
-      input.evidence.gitCommit !== undefined &&
-      (typeof input.evidence.gitCommit !== "string" ||
-        !/^[0-9a-f]{40}$/i.test(input.evidence.gitCommit))
+      typeof input.evidence.gitCommit !== "string" ||
+      !COMMIT_PATTERN.test(input.evidence.gitCommit)
     ) {
       failures.push(
         failure(
           "malformed-manifest",
           "evidence.gitCommit",
-          "evidence.gitCommit must be a 40-character commit SHA when provided",
+          "evidence.gitCommit is required and must be a 40-character commit SHA",
         ),
       );
     }
 
     if (
-      input.evidence.planSha256 !== undefined &&
-      (typeof input.evidence.planSha256 !== "string" ||
-        !SHA256_PATTERN.test(input.evidence.planSha256))
+      typeof input.evidence.planPath !== "string" ||
+      input.evidence.planPath.length === 0
+    ) {
+      failures.push(
+        failure(
+          "malformed-manifest",
+          "evidence.planPath",
+          "evidence.planPath is required and must be a non-empty path",
+        ),
+      );
+    }
+
+    if (
+      typeof input.evidence.planSha256 !== "string" ||
+      !SHA256_PATTERN.test(input.evidence.planSha256)
     ) {
       failures.push(
         failure(
           "malformed-manifest",
           "evidence.planSha256",
-          "evidence.planSha256 must be a 64-character SHA-256 digest when provided",
+          "evidence.planSha256 is required and must be a 64-character SHA-256 digest",
         ),
       );
     }
@@ -509,7 +589,8 @@ export function validateManifest(input: unknown): {
         typeof principal === "string" ? principal.match(/^([^\.]+)\.([^.]+)$/) : null;
       if (
         !principalParts ||
-        !isAddress(principalParts[1]) ||
+        !network ||
+        !isCanonicalStacksAddress(principalParts[1], network) ||
         !isContractName(principalParts[2])
       ) {
         failures.push(
@@ -529,7 +610,7 @@ export function validateManifest(input: unknown): {
             ),
           );
         }
-        if (isAddress(input.deployer) && principalParts[1] !== input.deployer) {
+        if (network && principalParts[1] !== input.deployer) {
           failures.push(
             failure(
               "deployer-mismatch",
@@ -614,6 +695,22 @@ export function validateManifest(input: unknown): {
         );
       }
 
+      if (
+        isRecord(interfaceValue) &&
+        Array.isArray(interfaceValue.expectedFunctions)
+      ) {
+        const expectedFunctionNames = interfaceValue.expectedFunctions as unknown[];
+        if (new Set(expectedFunctionNames).size !== expectedFunctionNames.length) {
+          failures.push(
+            failure(
+              "malformed-manifest",
+              `${scope}.interface.expectedFunctions`,
+              "expectedFunctions must not contain duplicate function names",
+            ),
+          );
+        }
+      }
+
       const readOnlyChecks: ReadOnlyCheck[] = [];
       if (value.readOnlyChecks !== undefined) {
         if (!Array.isArray(value.readOnlyChecks)) {
@@ -627,7 +724,7 @@ export function validateManifest(input: unknown): {
         } else {
           value.readOnlyChecks.forEach((check, checkIndex) => {
             const checkScope = `${scope}.readOnlyChecks[${checkIndex}]`;
-            if (validateReadOnlyCheck(check, checkScope, failures)) {
+            if (validateReadOnlyCheck(check, checkScope, network, failures)) {
               readOnlyChecks.push(check);
             }
           });
@@ -669,7 +766,7 @@ export function validateManifest(input: unknown): {
       ...(typeof input.$schema === "string" ? { $schema: input.$schema } : {}),
       schemaVersion: input.schemaVersion as typeof EVIDENCE_SCHEMA_VERSION,
       network: input.network as DeploymentNetwork,
-      apiBaseUrl: (input.apiBaseUrl as string).replace(/\/$/, ""),
+      apiBaseUrl: input.apiBaseUrl as string,
       deployer: input.deployer as string,
       evidence: input.evidence as DeploymentEvidenceManifest["evidence"],
       contracts: validContracts,
@@ -682,38 +779,68 @@ async function requestJson(
   fetchImpl: FetchLike,
   url: string,
   init: FetchInitLike,
+  timeoutMs = DEFAULT_HIRO_TIMEOUT_MS,
 ): Promise<HttpResult> {
-  let response: FetchResponseLike;
-  try {
-    response = await fetchImpl(url, init);
-  } catch {
-    return { status: null, ok: false, error: "network-error" };
-  }
+  const controller = new AbortController();
+  let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutHandle = setTimeout(() => {
+      controller.abort();
+      reject(new Error("request timeout"));
+    }, timeoutMs);
+  });
 
-  let data: unknown;
   try {
-    data = await response.json();
-  } catch {
+    let response: FetchResponseLike;
+    try {
+      response = await Promise.race([
+        fetchImpl(url, { ...init, signal: controller.signal }),
+        timeoutPromise,
+      ]);
+    } catch (error) {
+      return {
+        status: null,
+        ok: false,
+        error: error instanceof Error && error.message === "request timeout"
+          ? "timeout"
+          : "network-error",
+      };
+    }
+
+    let data: unknown;
+    try {
+      data = await Promise.race([response.json(), timeoutPromise]);
+    } catch (error) {
+      if (error instanceof Error && error.message === "request timeout") {
+        return { status: response.status, ok: false, error: "timeout" };
+      }
+      return {
+        status: response.status,
+        ok: false,
+        error: "invalid-json",
+      };
+    }
+
     return {
       status: response.status,
-      ok: false,
-      error: "invalid-json",
+      ok: response.ok && response.status >= 200 && response.status < 300,
+      data,
     };
+  } finally {
+    if (timeoutHandle !== undefined) {
+      clearTimeout(timeoutHandle);
+    }
   }
-
-  return {
-    status: response.status,
-    ok: response.ok && response.status >= 200 && response.status < 300,
-    data,
-  };
 }
 
 export function createHiroApi(options: {
   baseUrl: string;
   fetchImpl?: FetchLike;
   apiKey?: string;
+  timeoutMs?: number;
 }): HiroApi {
-  const baseUrl = options.baseUrl.replace(/\/$/, "");
+  const baseUrl = options.baseUrl.replace(/\/+$/, "");
+  const timeoutMs = options.timeoutMs ?? DEFAULT_HIRO_TIMEOUT_MS;
   const fetchImpl: FetchLike =
     options.fetchImpl ??
     ((url, init) =>
@@ -728,10 +855,15 @@ export function createHiroApi(options: {
 
   return {
     getTransaction(txId) {
-      return requestJson(fetchImpl, `${baseUrl}/extended/v1/tx/${encodeURIComponent(txId)}`, {
-        method: "GET",
-        headers,
-      });
+      return requestJson(
+        fetchImpl,
+        `${baseUrl}/extended/v1/tx/${encodeURIComponent(txId)}`,
+        {
+          method: "GET",
+          headers,
+        },
+        timeoutMs,
+      );
     },
     getContractInterface(principal) {
       return requestJson(
@@ -741,6 +873,7 @@ export function createHiroApi(options: {
           method: "GET",
           headers,
         },
+        timeoutMs,
       );
     },
     callReadOnly(principal, functionName, request) {
@@ -758,6 +891,7 @@ export function createHiroApi(options: {
             arguments: request.arguments,
           }),
         },
+        timeoutMs,
       );
     },
   };
@@ -793,6 +927,8 @@ function responseFailure(
     scope,
     result.error === "network-error"
       ? `${apiErrorMessage}; the Hiro API request failed before a response was received`
+      : result.error === "timeout"
+        ? `${apiErrorMessage}; the Hiro API request timed out`
       : result.error === "invalid-json"
         ? `${apiErrorMessage}; Hiro returned invalid JSON`
         : `${apiErrorMessage}; Hiro returned HTTP ${String(result.status)}`,
@@ -908,13 +1044,16 @@ function verifyTransaction(
   if (
     status === "success" &&
     transaction.canonical === true &&
-    (blockHash.length === 0 || typeof blockHeight !== "number" || !Number.isInteger(blockHeight) || blockHeight <= 0)
+    (!isCanonicalBlockHash(blockHash) ||
+      typeof blockHeight !== "number" ||
+      !Number.isInteger(blockHeight) ||
+      blockHeight <= 0)
   ) {
     failures.push(
       failure(
         "transaction-unconfirmed",
         scope,
-        "successful canonical transaction lacks confirmed block metadata",
+        "successful canonical transaction lacks a canonical 32-byte Hiro block hash and positive block height",
       ),
     );
   }
@@ -971,7 +1110,7 @@ function verifyContractInterface(
 
   const interfaceData = result.data;
   if (
-    typeof interfaceData.contract_id === "string" &&
+    typeof interfaceData.contract_id !== "string" ||
     interfaceData.contract_id !== contract.principal
   ) {
     return {
@@ -979,7 +1118,7 @@ function verifyContractInterface(
         failure(
           "interface-mismatch",
           scope,
-          "Hiro interface response identifies a different contract principal",
+          "Hiro interface response must include contract_id exactly equal to the manifest principal",
         ),
       ],
     };
@@ -1007,9 +1146,7 @@ function verifyContractInterface(
   return {
     summary: {
       available: true,
-      ...(typeof interfaceData.contract_id === "string"
-        ? { contractId: interfaceData.contract_id }
-        : {}),
+      contractId: interfaceData.contract_id,
       functionCount: functions.length,
       expectedFunctionsChecked: expectedFunctions,
     },
@@ -1039,7 +1176,11 @@ function verifyReadOnly(
     };
   }
 
-  if (!isRecord(result.data) || result.data.okay !== true || typeof result.data.result !== "string") {
+  if (
+    !isRecord(result.data) ||
+    result.data.okay !== true ||
+    !isHex(result.data.result)
+  ) {
     return {
       failures: [
         failure(
@@ -1076,9 +1217,100 @@ function verifyReadOnly(
   };
 }
 
+export function validateEvidenceBinding(
+  manifest: DeploymentEvidenceManifest,
+  expected: EvidenceBinding,
+): VerificationFailure[] {
+  const failures: VerificationFailure[] = [];
+
+  if (manifest.network !== expected.network) {
+    failures.push(
+      failure(
+        "evidence-binding-mismatch",
+        "evidence.network",
+        "evidence network does not match the explicitly expected verification network",
+      ),
+    );
+  }
+
+  if (manifest.deployer !== expected.deployer) {
+    failures.push(
+      failure(
+        "evidence-binding-mismatch",
+        "deployer",
+        "manifest deployer does not match the explicitly expected deployer",
+      ),
+    );
+  }
+
+  if (
+    !isCanonicalStacksAddress(expected.deployer, expected.network) ||
+    !COMMIT_PATTERN.test(expected.gitCommit) ||
+    expected.planPath.length === 0 ||
+    !SHA256_PATTERN.test(expected.planSha256)
+  ) {
+    failures.push(
+      failure(
+        "evidence-binding-mismatch",
+        "expected-binding",
+        "expected verification binding is malformed",
+      ),
+    );
+  }
+
+  if (manifest.evidence.gitCommit.toLowerCase() !== expected.gitCommit.toLowerCase()) {
+    failures.push(
+      failure(
+        "evidence-binding-mismatch",
+        "evidence.gitCommit",
+        "evidence git commit does not match the explicitly deployed commit",
+      ),
+    );
+  }
+
+  if (manifest.evidence.planPath !== expected.planPath) {
+    failures.push(
+      failure(
+        "evidence-binding-mismatch",
+        "evidence.planPath",
+        "evidence plan path does not match the explicitly verified plan path",
+      ),
+    );
+  }
+
+  if (manifest.evidence.planSha256.toLowerCase() !== expected.planSha256.toLowerCase()) {
+    failures.push(
+      failure(
+        "evidence-binding-mismatch",
+        "evidence.planSha256",
+        "evidence plan SHA-256 does not match the explicitly verified plan digest",
+      ),
+    );
+  }
+
+  return failures;
+}
+
+async function safeApiCall(call: () => Promise<HttpResult>): Promise<HttpResult> {
+  try {
+    const result = await call();
+    if (
+      !isRecord(result) ||
+      typeof result.ok !== "boolean" ||
+      (typeof result.status !== "number" && result.status !== null)
+    ) {
+      return { status: null, ok: false, error: "network-error" };
+    }
+    return result as HttpResult;
+  } catch {
+    return { status: null, ok: false, error: "network-error" };
+  }
+}
+
 export async function verifyDeploymentEvidence(
   input: unknown,
   api: HiroApi,
+  expectedBinding?: EvidenceBinding,
 ): Promise<VerificationReport> {
   const validation = validateManifest(input);
   if (!validation.ok || !validation.manifest) {
@@ -1093,12 +1325,31 @@ export async function verifyDeploymentEvidence(
       ...(typeof raw?.apiBaseUrl === "string" ? { apiBaseUrl: raw.apiBaseUrl } : {}),
       ...(typeof raw?.deployer === "string" ? { deployer: raw.deployer } : {}),
       scope: "documented-transaction-ids-and-contract-addresses-only",
+      claim: "no deployment is verified",
       contracts: [],
       failures: validation.failures,
     };
   }
 
   const manifest = validation.manifest;
+  const bindingFailures = expectedBinding
+    ? validateEvidenceBinding(manifest, expectedBinding)
+    : [];
+  if (bindingFailures.length > 0) {
+    return {
+      verifierVersion: VERIFIER_VERSION,
+      schemaVersion: manifest.schemaVersion,
+      ok: false,
+      network: manifest.network,
+      apiBaseUrl: manifest.apiBaseUrl,
+      deployer: manifest.deployer,
+      scope: "documented-transaction-ids-and-contract-addresses-only",
+      claim: "no deployment is verified",
+      contracts: [],
+      failures: bindingFailures,
+    };
+  }
+
   const contracts: ContractVerificationReport[] = [];
   const failures: VerificationFailure[] = [];
 
@@ -1111,14 +1362,14 @@ export async function verifyDeploymentEvidence(
       failures: [],
     };
 
-    const transactionResult = await api.getTransaction(contract.publishTxId);
+    const transactionResult = await safeApiCall(() => api.getTransaction(contract.publishTxId));
     const transactionVerification = verifyTransaction(contract, manifest, transactionResult);
     if (transactionVerification.summary) {
       contractReport.transaction = transactionVerification.summary;
     }
     contractReport.failures.push(...transactionVerification.failures);
 
-    const interfaceResult = await api.getContractInterface(contract.principal);
+    const interfaceResult = await safeApiCall(() => api.getContractInterface(contract.principal));
     const interfaceVerification = verifyContractInterface(contract, interfaceResult);
     if (interfaceVerification.summary) {
       contractReport.contractInterface = interfaceVerification.summary;
@@ -1138,7 +1389,9 @@ export async function verifyDeploymentEvidence(
         });
       } else {
         for (const [index, check] of contract.readOnlyChecks.entries()) {
-          const readOnlyResult = await api.callReadOnly(contract.principal, check.function, check);
+          const readOnlyResult = await safeApiCall(() =>
+            api.callReadOnly(contract.principal, check.function, check),
+          );
           const readOnlyVerification = verifyReadOnly(contract, check, readOnlyResult, index);
           if (readOnlyVerification.summary) {
             contractReport.readOnlyChecks.push(readOnlyVerification.summary);
@@ -1160,28 +1413,67 @@ export async function verifyDeploymentEvidence(
     apiBaseUrl: manifest.apiBaseUrl,
     deployer: manifest.deployer,
     scope: "documented-transaction-ids-and-contract-addresses-only",
+    claim: failures.length === 0 ? "declared evidence entries verified" : "no deployment is verified",
     contracts,
     failures,
   };
 }
 
-function parseCliArgs(args: string[]): { manifestPath: string; outputPath?: string } {
+function parseCliArgs(args: string[]): {
+  manifestPath: string;
+  outputPath?: string;
+  expectedBinding?: EvidenceBinding;
+} {
   let manifestPath: string | undefined;
   let outputPath: string | undefined;
+  let expectedNetwork: DeploymentNetwork | undefined;
+  let expectedDeployer: string | undefined;
+  let expectedGitCommit: string | undefined;
+  let expectedPlanPath: string | undefined;
+  let expectedPlanSha256: string | undefined;
+
+  const valueFor = (arg: string, index: number): string => {
+    const value = args[index + 1];
+    if (!value || value.startsWith("--")) {
+      throw new Error(`${arg} requires a value`);
+    }
+    return value;
+  };
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
     if (arg === "--manifest") {
-      manifestPath = args[index + 1];
+      manifestPath = valueFor(arg, index);
       index += 1;
     } else if (arg === "--output") {
-      outputPath = args[index + 1];
+      outputPath = valueFor(arg, index);
+      index += 1;
+    } else if (arg === "--expected-network") {
+      const value = valueFor(arg, index);
+      if (!isDeploymentNetwork(value)) {
+        throw new Error("--expected-network must be testnet or mainnet");
+      }
+      expectedNetwork = value;
+      index += 1;
+    } else if (arg === "--expected-deployer") {
+      expectedDeployer = valueFor(arg, index);
+      index += 1;
+    } else if (arg === "--expected-git-commit") {
+      expectedGitCommit = valueFor(arg, index);
+      index += 1;
+    } else if (arg === "--expected-plan-path") {
+      expectedPlanPath = valueFor(arg, index);
+      index += 1;
+    } else if (arg === "--expected-plan-sha256") {
+      expectedPlanSha256 = valueFor(arg, index);
       index += 1;
     } else if (arg === "--help" || arg === "-h") {
       console.error(
-        "Usage: npx tsx scripts/verify-deployment-evidence.ts --manifest <path> [--output <path>]",
+        "Usage: npx tsx scripts/verify-deployment-evidence.ts --manifest <path> [--output <path>] [--expected-network <testnet|mainnet> --expected-deployer <address> --expected-git-commit <sha> --expected-plan-path <path> --expected-plan-sha256 <sha256>]",
       );
       process.exit(0);
+    } else {
+      throw new Error(`unknown argument: ${arg}`);
     }
   }
 
@@ -1191,11 +1483,40 @@ function parseCliArgs(args: string[]): { manifestPath: string; outputPath?: stri
     );
   }
 
-  return { manifestPath, outputPath };
+  const bindingValues = [
+    expectedNetwork,
+    expectedDeployer,
+    expectedGitCommit,
+    expectedPlanPath,
+    expectedPlanSha256,
+  ];
+  const hasSomeBinding = bindingValues.some((value) => value !== undefined);
+  const hasCompleteBinding = bindingValues.every((value) => value !== undefined);
+  if (hasSomeBinding && !hasCompleteBinding) {
+    throw new Error(
+      "expected verification binding requires network, deployer, git commit, plan path, and plan SHA-256",
+    );
+  }
+
+  return {
+    manifestPath,
+    outputPath,
+    ...(hasCompleteBinding
+      ? {
+          expectedBinding: {
+            network: expectedNetwork as DeploymentNetwork,
+            deployer: expectedDeployer as string,
+            gitCommit: expectedGitCommit as string,
+            planPath: expectedPlanPath as string,
+            planSha256: expectedPlanSha256 as string,
+          },
+        }
+      : {}),
+  };
 }
 
 export async function runCli(args = process.argv.slice(2)): Promise<number> {
-  const { manifestPath, outputPath } = parseCliArgs(args);
+  const { manifestPath, outputPath, expectedBinding } = parseCliArgs(args);
   const rawManifest = JSON.parse(readFileSync(resolve(manifestPath), "utf8")) as unknown;
 
   const validation = validateManifest(rawManifest);
@@ -1205,13 +1526,13 @@ export async function runCli(args = process.argv.slice(2)): Promise<number> {
       getTransaction: async () => ({ status: null, ok: false }),
       getContractInterface: async () => ({ status: null, ok: false }),
       callReadOnly: async () => ({ status: null, ok: false }),
-    });
+    }, expectedBinding);
   } else {
     const api = createHiroApi({
       baseUrl: validation.manifest.apiBaseUrl,
       apiKey: process.env.HIRO_API_KEY,
     });
-    report = await verifyDeploymentEvidence(validation.manifest, api);
+    report = await verifyDeploymentEvidence(validation.manifest, api, expectedBinding);
   }
 
   const serialized = `${JSON.stringify(report, null, 2)}\n`;

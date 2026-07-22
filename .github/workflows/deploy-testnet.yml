@@ -1,24 +1,36 @@
 name: Deploy Testnet
 
 on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'contracts/**'
+      - 'Clarinet.toml'
+      - 'settings/Testnet.toml'
+      - 'deployments/**'
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry run (generate plan only, no deploy)'
+        description: 'Dry run (validate and snapshot the plan only; no broadcast)'
         type: boolean
         default: true
-      evidence_manifest:
-        description: 'Path to a captured deployment evidence manifest; required when dry_run=false. Plans, workflow success, and broadcast-only IDs are not evidence.'
-        type: string
-        required: false
-        default: ''
 
 permissions:
   contents: read
 
+concurrency:
+  group: deploy-testnet-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PLAN_PATH: deployments/full-system.testnet-plan.yaml
+  EXPECTED_DEPLOYER: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
@@ -50,12 +62,37 @@ jobs:
       - name: Restore deployment plan (guard against clarinet rewrite)
         run: cp deployments/default.simnet-plan.yaml.bak deployments/default.simnet-plan.yaml
 
+      - name: Validate testnet plan principals
+        env:
+          EXPECTED_NETWORK: testnet
+          EXPECTED_DEPLOYER: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        run: |
+          set -euo pipefail
+          ruby -ryaml <<'RUBY'
+          plan = YAML.load_file(ENV.fetch("PLAN_PATH"))
+          network = ENV.fetch("EXPECTED_NETWORK")
+          deployer = ENV.fetch("EXPECTED_DEPLOYER")
+          abort "deployment plan network mismatch" unless plan["network"] == network
+          abort "deployment plan deployer mismatch" unless plan["deployer"] == deployer
+          expected_prefix = network == "testnet" ? "ST" : "SP"
+          abort "deployment plan deployer has the wrong network prefix" unless deployer.start_with?(expected_prefix)
+          batches = plan.fetch("plan").fetch("batches")
+          publishes = batches.flat_map { |batch| batch.fetch("transactions", []) }.filter_map { |tx| tx["contract-publish"] }
+          invalid = publishes.reject do |publish|
+            sender = publish["expected-sender"]
+            sender == deployer && sender.to_s.start_with?(expected_prefix)
+          end
+          abort "#{invalid.length} contract-publish entries have the wrong expected-sender" unless invalid.empty?
+          puts "Validated #{publishes.length} testnet contract-publish sender entries"
+          RUBY
+
       - name: Run Full Test Suite
         run: npm run ci
 
   deploy-testnet:
     needs: validate
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     environment: testnet
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -79,71 +116,92 @@ jobs:
           sudo mv clarinet /usr/local/bin/clarinet
           clarinet --version
 
-      - name: Deploy to Testnet
-        if: ${{ !inputs.dry_run }}
+      - name: Broadcast to Testnet
+        id: apply
+        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.dry_run == false) }}
         env:
           DEPLOYER_MNEMONIC: ${{ secrets.TESTNET_DEPLOYER_MNEMONIC }}
         run: |
+          set -euo pipefail
+          mkdir -p deployment-artifacts
           DEPLOY_LOG=$(mktemp)
-          echo y | script -q -c "clarinet deployments apply \
+          if ! (echo y | script -q -c "clarinet deployments apply \
             --manifest-path Clarinet.toml \
-            --deployment-plan-path deployments/full-system.testnet-plan.yaml" \
-            "$DEPLOY_LOG"
-          cat "$DEPLOY_LOG"
-          rm "$DEPLOY_LOG"
+            --deployment-plan-path ${PLAN_PATH}" "$DEPLOY_LOG") 2>&1 | tee deployment-artifacts/clarinet-apply.log; then
+            cp "$DEPLOY_LOG" deployment-artifacts/clarinet-session.log || true
+            rm -f "$DEPLOY_LOG"
+            echo "::error::Testnet broadcast/apply failed. Verification remains pending; no deployment is verified."
+            exit 1
+          fi
+          cp "$DEPLOY_LOG" deployment-artifacts/clarinet-session.log
+          rm -f "$DEPLOY_LOG"
 
-      - name: Run local regression tests (not deployment evidence)
-        if: ${{ !inputs.dry_run }}
-        run: |
-          echo "Running local regression tests; these do not verify remote deployment..."
-          npx vitest run tests/sanity.test.ts tests/check-compile.test.ts --config vitest.config.ts --pool=threads
-
-      - name: Verify deployment evidence
-        if: ${{ !inputs.dry_run }}
+      - name: Capture deployment attempt metadata
+        if: always()
         env:
-          EVIDENCE_MANIFEST: ${{ inputs.evidence_manifest }}
-          HIRO_API_KEY: ${{ secrets.HIRO_API_KEY }}
+          EVENT_NAME: ${{ github.event_name }}
+          DRY_RUN_INPUT: ${{ inputs.dry_run }}
+          APPLY_OUTCOME: ${{ steps.apply.outcome }}
+          DEPLOYED_COMMIT: ${{ github.sha }}
         run: |
           set -euo pipefail
-          if [[ -z "$EVIDENCE_MANIFEST" ]]; then
-            echo "::error::Confirmed receipt evidence is required before a testnet deployment can be reported as verified. Plans, workflow success, and broadcast-only IDs are not evidence."
-            exit 1
-          fi
-          if [[ ! -f "$EVIDENCE_MANIFEST" ]]; then
-            echo "::error::Evidence manifest not found at $EVIDENCE_MANIFEST"
-            exit 1
-          fi
-          npx tsx scripts/verify-deployment-evidence.ts \
-            --manifest "$EVIDENCE_MANIFEST" \
-            --output deployment-evidence-report.json
+          mkdir -p deployment-artifacts
+          PLAN_SHA256=$(sha256sum "$PLAN_PATH" | awk '{print $1}')
+          export PLAN_SHA256
+          node --input-type=module <<'NODE'
+          import { writeFileSync } from "node:fs";
+
+          const deployed = process.env.EVENT_NAME === "push" || process.env.DRY_RUN_INPUT === "false";
+          const applySucceeded = process.env.APPLY_OUTCOME === "success";
+          const status = !deployed
+            ? "dry-run"
+            : applySucceeded
+              ? "verification-pending"
+              : "apply-failed";
+          const metadata = {
+            schemaVersion: "1.0.0",
+            network: "testnet",
+            deployer: process.env.EXPECTED_DEPLOYER,
+            gitCommit: process.env.DEPLOYED_COMMIT,
+            planPath: process.env.PLAN_PATH,
+            planSha256: process.env.PLAN_SHA256,
+            broadcastStatus: status,
+            verificationStatus: status === "verification-pending"
+              ? "verification pending"
+              : "no deployment is verified",
+            verificationWorkflow: ".github/workflows/verify-deployment-evidence.yml",
+          };
+          writeFileSync(
+            "deployment-artifacts/deployment-attempt.json",
+            `${JSON.stringify(metadata, null, 2)}\n`,
+          );
+          NODE
 
       - name: Generate Deployment Report
         if: always()
         run: |
-          echo "## Testnet Deployment Report" >> $GITHUB_STEP_SUMMARY
-          echo "**Network:** Testnet" >> $GITHUB_STEP_SUMMARY
-          echo "**Plan:** deployments/full-system.testnet-plan.yaml" >> $GITHUB_STEP_SUMMARY
-          if [[ "${{ inputs.dry_run }}" == "true" ]]; then
-            echo "**Status:** dry run only; no deployment is verified." >> $GITHUB_STEP_SUMMARY
-          elif [[ -f deployment-evidence-report.json ]] && grep -q '"ok": true' deployment-evidence-report.json; then
-            echo "**Status:** confirmed receipt, interface, and declared read-only evidence passed." >> $GITHUB_STEP_SUMMARY
-          else
-            echo "**Status:** no deployment is verified." >> $GITHUB_STEP_SUMMARY
-          fi
+          node --input-type=module <<'NODE' >> "$GITHUB_STEP_SUMMARY"
+          import { readFileSync } from "node:fs";
 
-      - name: Upload Deployment Plan Artifact
+          console.log("## Testnet Deployment Report");
+          console.log("**Network:** Testnet");
+          console.log("**Plan:** `deployments/full-system.testnet-plan.yaml`");
+          try {
+            const report = JSON.parse(readFileSync("deployment-artifacts/deployment-attempt.json", "utf8"));
+            console.log(`**Broadcast status:** ${report.broadcastStatus}`);
+            console.log(`**Verification status:** ${report.verificationStatus}`);
+            console.log("**Scope:** no deployment is verified by this broadcast workflow; use the separate evidence verification workflow.");
+          } catch {
+            console.log("**Status:** no deployment is verified; deployment attempt metadata was unavailable.");
+          }
+          NODE
+
+      - name: Upload Testnet Deployment Artifacts
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: testnet-deployment-plan
-          path: deployments/full-system.testnet-plan.yaml
-
-      - name: Upload Deployment Evidence Artifact
-        if: ${{ always() && !inputs.dry_run && inputs.evidence_manifest != '' }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
-        with:
-          name: testnet-deployment-evidence
+          name: testnet-deployment-attempt
           path: |
-            ${{ inputs.evidence_manifest }}
-            deployment-evidence-report.json
-          if-no-files-found: error
+            deployment-artifacts
+            deployments/full-system.testnet-plan.yaml
+          if-no-files-found: warn

@@ -3,14 +3,77 @@
 * Broadcasts contracts in dependency order; it never proves deployment.
 */
 import "dotenv/config";
-import { makeContractDeploy, broadcastTransaction } from "@stacks/transactions";
+import {
+  AddressVersion,
+  broadcastTransaction,
+  createAddress,
+  makeContractDeploy,
+  validateStacksAddress,
+} from "@stacks/transactions";
 import { STACKS_TESTNET } from "@stacks/network";
 import { readFileSync } from "fs";
 import { join } from "path";
 
 const DEPLOYER_PRIVKEY = process.env.DEPLOYER_PRIVKEY!;
-const CORE_API_URL = process.env.CORE_API_URL || "https://api.testnet.hiro.so";
+const CORE_API_URL = (process.env.CORE_API_URL || "https://api.testnet.hiro.so").replace(/\/+$/, "");
 const HIRO_API_KEY = process.env.HIRO_API_KEY;
+const SYSTEM_ADDRESS = process.env.SYSTEM_ADDRESS;
+const REQUEST_TIMEOUT_MS = 15_000;
+const JSON_OUTPUT = process.argv.includes("--json");
+
+type BroadcastStatus = "broadcast-complete" | "broadcast-partial" | "broadcast-failed" | "broadcast-noop";
+
+interface BroadcastResult {
+  status: BroadcastStatus;
+  verification: "pending";
+  network: "testnet";
+  deployer?: string;
+  transactionIds: Record<string, string>;
+  failedContracts: string[];
+}
+
+function humanLog(message: string): void {
+  if (!JSON_OUTPUT) console.log(message);
+}
+
+function humanError(message: string): void {
+  if (!JSON_OUTPUT) console.error(message);
+}
+
+function emitResult(result: BroadcastResult): void {
+  if (JSON_OUTPUT) {
+    process.stdout.write(`${JSON.stringify(result)}\n`);
+  } else {
+    console.log(`Broadcast result: ${JSON.stringify(result)}`);
+  }
+}
+
+function isCanonicalTestnetAddress(value: string | undefined): value is string {
+  if (!value || !value.startsWith("ST") || !validateStacksAddress(value)) return false;
+  try {
+    const address = createAddress(value);
+    return (
+      (address.version === AddressVersion.TestnetSingleSig ||
+        address.version === AddressVersion.TestnetMultiSig) &&
+      address.hash160.length === 40
+    );
+  } catch {
+    return false;
+  }
+}
+
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit = {},
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 
 const network = { ...STACKS_TESTNET, coreApiUrl: CORE_API_URL };
 const apiHeaders: Record<string, string> = {};
@@ -58,20 +121,29 @@ const DEPLOYMENT_SEQUENCE = [
 ];
 
 async function getAccountNonce(address: string): Promise<number> {
-  const headers: Record<string, string> = {};
-  if (HIRO_API_KEY) headers["x-hiro-api-key"] = HIRO_API_KEY;
-  
-  const response = await fetch(`${CORE_API_URL}/v2/accounts/${address}?proof=0`, { headers });
-  const data = await response.json() as any;
-  return data.nonce || 0;
+  const response = await fetchWithTimeout(`${CORE_API_URL}/v2/accounts/${address}?proof=0`, {
+    headers: apiHeaders,
+  });
+  if (!response.ok) {
+    throw new Error("Hiro account lookup failed");
+  }
+  const data = await response.json() as { nonce?: unknown };
+  if (typeof data.nonce !== "number" || !Number.isInteger(data.nonce) || data.nonce < 0) {
+    throw new Error("Hiro account response omitted a valid nonce");
+  }
+  return data.nonce;
 }
 
 async function checkContractExists(address: string, contractName: string): Promise<boolean> {
-  const headers: Record<string, string> = {};
-  if (HIRO_API_KEY) headers["x-hiro-api-key"] = HIRO_API_KEY;
-  
-  const response = await fetch(`${CORE_API_URL}/v2/contracts/interface/${address}/${contractName}`, { headers });
-  return response.status === 200;
+  const response = await fetchWithTimeout(
+    `${CORE_API_URL}/v2/contracts/interface/${address}/${contractName}`,
+    { headers: apiHeaders },
+  );
+  if (response.status === 404) return false;
+  if (!response.ok) {
+    throw new Error("Hiro contract lookup failed");
+  }
+  return true;
 }
 
 async function deployContract(
@@ -94,29 +166,36 @@ async function deployContract(
   
   const tx = await makeContractDeploy(txOptions);
   
-  console.log(`Broadcasting ${contractName} (nonce: ${nonce})...`);
+  humanLog(`Broadcasting ${contractName} (nonce: ${nonce})...`);
   
   const broadcastResponse = await broadcastTransaction({ transaction: tx, network });
   
   if ("error" in broadcastResponse) {
-    console.error(`  ✗ Error: ${broadcastResponse.error} - ${broadcastResponse.reason}`);
+    humanError(`  ✗ Broadcast rejected for ${contractName}`);
     return null;
   }
   
-  console.log(`  ✓ Txid: ${broadcastResponse.txid}`);
+  humanLog(`  ✓ Txid: ${broadcastResponse.txid}`);
   return broadcastResponse.txid;
 }
 
 async function main() {
-  console.log("=== ConxianCSF Testnet Deployment ===");
-  console.log(`Network: ${CORE_API_URL}`);
-  console.log(`Deployer: ${process.env.SYSTEM_ADDRESS || "derived from key"}`);
-  console.log("");
+  if (!DEPLOYER_PRIVKEY || !isCanonicalTestnetAddress(SYSTEM_ADDRESS)) {
+    throw new Error("testnet deployment configuration is incomplete or not canonical");
+  }
+  if (CORE_API_URL !== "https://api.testnet.hiro.so") {
+    throw new Error("testnet broadcast helper requires the canonical Hiro testnet API URL");
+  }
+
+  humanLog("=== ConxianCSF Testnet Broadcast ===");
+  humanLog(`Network: ${CORE_API_URL}`);
+  humanLog(`Deployer: ${SYSTEM_ADDRESS}`);
+  humanLog("");
   
   // Get starting nonce
-  const deployerAddress = process.env.SYSTEM_ADDRESS!;
+  const deployerAddress = SYSTEM_ADDRESS;
   let nonce = await getAccountNonce(deployerAddress);
-  console.log(`Starting nonce: ${nonce}\n`);
+  humanLog(`Starting nonce: ${nonce}\n`);
   
   const results: Record<string, string> = {};
   const failed: string[] = [];
@@ -125,7 +204,7 @@ async function main() {
     // Check if already deployed
     const exists = await checkContractExists(deployerAddress, contract.name);
     if (exists) {
-      console.log(`  ↩ ${contract.name} - already deployed, skipping`);
+      humanLog(`  ↩ ${contract.name} - already deployed, skipping`);
       continue;
     }
     
@@ -138,39 +217,62 @@ async function main() {
       await new Promise(resolve => setTimeout(resolve, 500));
     } else {
       failed.push(contract.name);
-      console.log(`  ⚠ Skipping ${contract.name} due to error`);
+      humanError(`  ⚠ Skipping ${contract.name} due to broadcast error`);
     }
   }
   
-  console.log("\n=== Deployment Summary ===");
-  console.log(`Deployed: ${Object.keys(results).length} contracts`);
-  console.log(`Failed: ${failed.length} contracts`);
+  humanLog("\n=== Broadcast Summary ===");
+  humanLog(`Broadcast: ${Object.keys(results).length} contracts`);
+  humanLog(`Failed: ${failed.length} contracts`);
   
   if (failed.length > 0) {
-    console.log("\nFailed contracts:");
-    failed.forEach(name => console.log(`  - ${name}`));
+    humanError("\nFailed contracts:");
+    failed.forEach(name => humanError(`  - ${name}`));
   }
   
   if (Object.keys(results).length > 0) {
-    console.log("\nDeployed transaction IDs:");
+    humanLog("\nBroadcast transaction IDs:");
     Object.entries(results).forEach(([name, txid]) => {
-      console.log(`  ${name}: https://explorer.hiro.so/txid/${txid}?chain=testnet`);
+      humanLog(`  ${name}: https://explorer.hiro.so/txid/${txid}?chain=testnet`);
     });
   }
-  
-  if (failed.length > 0 || Object.keys(results).length === 0) {
-    console.error("\nDeployment broadcast did not complete for every requested contract.");
-    console.error("No deployment is verified. Capture confirmed receipt evidence before reporting success.");
+
+  const result: BroadcastResult = {
+    status:
+      failed.length > 0
+        ? Object.keys(results).length > 0
+          ? "broadcast-partial"
+          : "broadcast-failed"
+        : Object.keys(results).length > 0
+          ? "broadcast-complete"
+          : "broadcast-noop",
+    verification: "pending",
+    network: "testnet",
+    deployer: deployerAddress,
+    transactionIds: results,
+    failedContracts: failed,
+  };
+  emitResult(result);
+
+  if (failed.length > 0) {
+    humanError("No deployment is verified. Capture confirmed receipt evidence before reporting success.");
     process.exitCode = 1;
     return;
   }
 
-  console.log("\nBroadcast complete; no deployment is verified.");
-  console.log("Run scripts/verify-deployment-evidence.ts with a confirmed evidence manifest before reporting success.");
-  process.exitCode = 1;
+  humanLog("\nBroadcast complete; verification remains pending.");
+  humanLog("Run scripts/verify-deployment-evidence.ts with a confirmed evidence manifest before reporting success.");
+  process.exitCode = 0;
 }
 
 main().catch(() => {
-  console.error("Deployment broadcast failed; no deployment is verified.");
+  emitResult({
+    status: "broadcast-failed",
+    verification: "pending",
+    network: "testnet",
+    transactionIds: {},
+    failedContracts: [],
+  });
+  humanError("Deployment broadcast failed; no deployment is verified.");
   process.exitCode = 1;
 });

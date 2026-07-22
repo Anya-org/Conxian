@@ -7,17 +7,22 @@ import {
   type DeploymentEvidenceManifest,
   type FetchInitLike,
   type FetchLike,
+  isCanonicalStacksAddress,
+  validateEvidenceBinding,
   validateManifest,
   verifyDeploymentEvidence,
 } from "../scripts/verify-deployment-evidence";
 
 const deployer = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P";
+const mainnetDeployer = "SP000000000000000000002Q6VF78";
 const alternateDeployer = `ST${"1".repeat(39)}`;
 const contractName = "example-contract";
 const principal = `${deployer}.${contractName}`;
 const txId = `0x${"a".repeat(64)}`;
 const blockHash = `0x${"b".repeat(64)}`;
 const baseUrl = "https://api.testnet.hiro.so";
+const gitCommit = "c".repeat(40);
+const planSha256 = "d".repeat(64);
 
 type MockRoute = {
   status: number;
@@ -33,7 +38,9 @@ function baseManifest(): DeploymentEvidenceManifest {
     evidence: {
       source: "confirmed-receipts",
       capturedAt: "2026-07-22T00:00:00Z",
+      gitCommit,
       planPath: "deployments/full-system.testnet-plan.yaml",
+      planSha256,
     },
     contracts: [
       {
@@ -147,6 +154,7 @@ describe("deployment evidence verifier", () => {
     const report = await verifyWith(baseManifest(), defaultRoutes(), calls);
 
     expect(report.ok).toBe(true);
+    expect(report.claim).toBe("declared evidence entries verified");
     expect(report.failures).toEqual([]);
     expect(report.contracts[0]?.transaction?.canonical).toBe(true);
     expect(report.contracts[0]?.contractInterface?.available).toBe(true);
@@ -218,6 +226,75 @@ describe("deployment evidence verifier", () => {
     expect(classifications(report)).toContain("network-mismatch");
   });
 
+  it("validates Stacks checksum, canonical encoding, and network address version", () => {
+    expect(isCanonicalStacksAddress(deployer, "testnet")).toBe(true);
+    expect(isCanonicalStacksAddress(mainnetDeployer, "mainnet")).toBe(true);
+    expect(isCanonicalStacksAddress(`${deployer.slice(0, -1)}Q`, "testnet")).toBe(false);
+    expect(isCanonicalStacksAddress(deployer, "mainnet")).toBe(false);
+    expect(isCanonicalStacksAddress(mainnetDeployer, "testnet")).toBe(false);
+    expect(isCanonicalStacksAddress(deployer.toLowerCase(), "testnet")).toBe(false);
+  });
+
+  it.each([
+    ["trailing slash API URL", (manifest: DeploymentEvidenceManifest) => {
+      manifest.apiBaseUrl = `${baseUrl}/`;
+    }],
+    ["date-only timestamp", (manifest: DeploymentEvidenceManifest) => {
+      manifest.evidence.capturedAt = "2026-07-22";
+    }],
+    ["empty plan path", (manifest: DeploymentEvidenceManifest) => {
+      manifest.evidence.planPath = "";
+    }],
+    ["empty Clarity argument", (manifest: DeploymentEvidenceManifest) => {
+      manifest.contracts[0]!.readOnlyChecks![0]!.arguments = ["0x"];
+    }],
+    ["duplicate expected function", (manifest: DeploymentEvidenceManifest) => {
+      manifest.contracts[0]!.interface.expectedFunctions = ["get-version", "get-version"];
+    }],
+  ])("rejects schema/runtime drift: %s", (_name, mutate) => {
+    const manifest = baseManifest();
+    mutate(manifest);
+
+    const validation = validateManifest(manifest);
+
+    expect(validation.ok).toBe(false);
+    expect(validation.failures.some((entry) => entry.classification === "malformed-manifest" || entry.classification === "network-mismatch")).toBe(true);
+  });
+
+  it("rejects a checksum-invalid manifest deployer and principal", () => {
+    const manifest = baseManifest();
+    const invalidAddress = `${deployer.slice(0, -1)}Q`;
+    manifest.deployer = invalidAddress;
+    manifest.contracts[0]!.principal = `${invalidAddress}.${contractName}`;
+    manifest.contracts[0]!.readOnlyChecks![0]!.sender = invalidAddress;
+
+    const validation = validateManifest(manifest);
+
+    expect(validation.ok).toBe(false);
+    expect(validation.failures.filter((entry) => entry.scope.includes("deployer") || entry.scope.includes("principal") || entry.scope.includes("sender")).length).toBeGreaterThan(0);
+  });
+
+  it("rejects a testnet address set on a mainnet manifest", () => {
+    const manifest = baseManifest();
+    manifest.network = "mainnet";
+    manifest.apiBaseUrl = "https://api.mainnet.hiro.so";
+
+    const validation = validateManifest(manifest);
+
+    expect(validation.ok).toBe(false);
+    expect(validation.failures.some((entry) => entry.scope === "deployer")).toBe(true);
+  });
+
+  it("rejects a cross-network read-only sender", () => {
+    const manifest = baseManifest();
+    manifest.contracts[0]!.readOnlyChecks![0]!.sender = mainnetDeployer;
+
+    const validation = validateManifest(manifest);
+
+    expect(validation.ok).toBe(false);
+    expect(validation.failures.some((entry) => entry.scope.endsWith("sender"))).toBe(true);
+  });
+
   it("rejects a publish transaction from the wrong deployer", async () => {
     const manifest = baseManifest();
     const routes = defaultRoutes(manifest);
@@ -270,6 +347,60 @@ describe("deployment evidence verifier", () => {
     expect(missing?.message).toContain("not a claim of global nonexistence");
   });
 
+  it("rejects an interface response that omits contract_id", async () => {
+    const manifest = baseManifest();
+    const routes = defaultRoutes(manifest);
+    routes[`GET ${pathForInterface()}`] = {
+      status: 200,
+      body: { functions: [{ name: "get-version" }] },
+    };
+
+    const report = await verifyWith(manifest, routes);
+
+    expect(report.ok).toBe(false);
+    expect(classifications(report)).toContain("interface-mismatch");
+  });
+
+  it("rejects an interface response with a mismatched contract_id", async () => {
+    const manifest = baseManifest();
+    const routes = defaultRoutes(manifest);
+    routes[`GET ${pathForInterface()}`] = {
+      status: 200,
+      body: {
+        contract_id: `${deployer}.different-contract`,
+        functions: [{ name: "get-version" }],
+      },
+    };
+
+    const report = await verifyWith(manifest, routes);
+
+    expect(report.ok).toBe(false);
+    expect(classifications(report)).toContain("interface-mismatch");
+  });
+
+  it.each([
+    ["short", "0x00"],
+    ["nonhex", `0x${"g".repeat(64)}`],
+    ["missing prefix", "b".repeat(64)],
+    ["too long", `0x${"b".repeat(66)}`],
+    ["uppercase Hiro-incompatible", `0x${"B".repeat(64)}`],
+  ] as const)("rejects a %s block hash", async (_label, malformedBlockHash) => {
+    const manifest = baseManifest();
+    const routes = defaultRoutes(manifest);
+    routes[`GET ${pathForTransaction()}`] = {
+      status: 200,
+      body: {
+        ...(routes[`GET ${pathForTransaction()}`]?.body as object),
+        block_hash: malformedBlockHash,
+      },
+    };
+
+    const report = await verifyWith(manifest, routes);
+
+    expect(report.ok).toBe(false);
+    expect(classifications(report)).toContain("transaction-unconfirmed");
+  });
+
   it("rejects malformed or broadcast-only evidence", async () => {
     const manifest = baseManifest() as unknown as Record<string, unknown>;
     manifest.evidence = {
@@ -317,6 +448,81 @@ describe("deployment evidence verifier", () => {
     expect(report.ok).toBe(false);
     expect(classifications(report)).toContain("transaction-api-error");
     expect(classifications(report)).not.toContain("missing-transaction");
+  });
+
+  it("turns thrown injected API errors into fail-closed reports without leaking details", async () => {
+    const secret = "super-secret-api-key";
+    const report = await verifyDeploymentEvidence(baseManifest(), {
+      getTransaction: async () => {
+        throw new Error(`injected failure ${secret}`);
+      },
+      getContractInterface: async () => {
+        throw new Error(`injected failure ${secret}`);
+      },
+      callReadOnly: async () => {
+        throw new Error(`injected failure ${secret}`);
+      },
+    });
+
+    expect(report.ok).toBe(false);
+    expect(classifications(report)).toContain("transaction-api-error");
+    expect(JSON.stringify(report)).not.toContain(secret);
+  });
+
+  it("aborts stalled Hiro requests and returns a timeout result", async () => {
+    let signal: AbortSignal | undefined;
+    const api = createHiroApi({
+      baseUrl,
+      timeoutMs: 10,
+      fetchImpl: async (_url, init) => {
+        signal = init?.signal;
+        await new Promise(() => undefined);
+        return {
+          status: 200,
+          ok: true,
+          json: async () => ({}),
+        };
+      },
+    });
+
+    const result = await api.getTransaction(txId);
+
+    expect(result.error).toBe("timeout");
+    expect(signal?.aborted).toBe(true);
+  });
+
+  it("requires an exact verification binding before querying Hiro", async () => {
+    const manifest = baseManifest();
+    const calls: Array<{ url: string; init?: FetchInitLike }> = [];
+    const report = await verifyDeploymentEvidence(
+      manifest,
+      createHiroApi({ baseUrl, fetchImpl: mockFetch(defaultRoutes(manifest), calls) }),
+      {
+        network: "testnet",
+        deployer,
+        gitCommit: "e".repeat(40),
+        planPath: manifest.evidence.planPath,
+        planSha256: manifest.evidence.planSha256,
+      },
+    );
+
+    expect(report.ok).toBe(false);
+    expect(classifications(report)).toContain("evidence-binding-mismatch");
+    expect(calls).toHaveLength(0);
+  });
+
+  it("accepts only an exact evidence binding", () => {
+    const manifest = baseManifest();
+
+    expect(
+      validateEvidenceBinding(manifest, {
+        network: "testnet",
+        deployer,
+        gitCommit,
+        planPath: manifest.evidence.planPath,
+        planSha256,
+      }),
+    ).toEqual([]);
   });
 
   it("accepts the versioned example shape without treating it as live evidence", () => {

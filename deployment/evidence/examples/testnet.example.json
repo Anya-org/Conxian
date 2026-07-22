@@ -3,16 +3,18 @@
   "schemaVersion": "1.0.0",
   "network": "testnet",
   "apiBaseUrl": "https://api.testnet.hiro.so",
-  "deployer": "ST000000000000000000000000000000000000000",
+  "deployer": "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P",
   "evidence": {
     "source": "confirmed-receipts",
     "capturedAt": "2026-07-22T00:00:00Z",
-    "planPath": "deployments/full-system.testnet-plan.yaml"
+    "gitCommit": "0000000000000000000000000000000000000000",
+    "planPath": "deployments/full-system.testnet-plan.yaml",
+    "planSha256": "0000000000000000000000000000000000000000000000000000000000000000"
   },
   "contracts": [
     {
       "name": "example-contract",
-      "principal": "ST000000000000000000000000000000000000000.example-contract",
+      "principal": "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.example-contract",
       "publishTxId": "0x1111111111111111111111111111111111111111111111111111111111111111",
       "interface": {
         "required": true,
@@ -24,7 +26,7 @@
       "readOnlyChecks": [
         {
           "function": "get-version",
-          "sender": "ST000000000000000000000000000000000000000",
+          "sender": "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P",
           "arguments": [],
           "expectedResultHex": "0x0701"
         }

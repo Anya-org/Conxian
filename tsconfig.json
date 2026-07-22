@@ -10,8 +10,7 @@
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "outDir": "dist",
-    "rootDir": ".",
-    "baseUrl": "."
+    "rootDir": "."
   },
   "include": ["tests/**/*.ts", "scripts/**/*.ts"],
   "exclude": ["node_modules", "dist", "contracts"]

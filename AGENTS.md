@@ -121,39 +121,49 @@ ops-engine (heartbeat) / alex-adapter / governance suite
 
 ### ⚠️ CRITICAL: Mainnet Deployment Status (NOT ACTUAL)
 
-**Verification Required**: The deploy-mainnet workflow has `dry_run: true` by default. 
-The workflow runs validate-protocol successfully but **does NOT execute actual deployment** 
-unless `dry_run: false` AND `confirm: DEPLOY_MAINNET` are provided.
+**Verification Required**: The deploy-mainnet workflow has `dry_run: true` by default.
+It requires `confirm: DEPLOY_MAINNET`, an explicitly supplied canonical `SP...`
+deployer, and a network-correct plan before any apply. It **does NOT execute
+actual deployment** unless `dry_run: false` and all preflight checks pass.
 
 | Target | Plan Ready | Actually Deployed? | On-Chain Verified |
 |--------|-----------|-------------------|-------------------|
 | **Testnet** | ✅ Yes | ❌ **NOT VERIFIED** | Receipt/interface/read-only evidence manifest required |
-| **Mainnet** | ✅ Yes | ❌ **NOT VERIFIED** | 0 STX, 0 TX (user verified) |
+| **Mainnet** | ⚠️ File exists; checked-in sender is `ST...` and preflight rejects it | ❌ **NOT VERIFIED** | 0 STX, 0 TX (user verified) |
 
-### Deployer Address
+### Testnet Deployer Address
 `ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
+
+### Mainnet Deployer Address
+No current mainnet deployer/evidence binding is approved in this repository.
+Mainnet verification must supply a canonical `SP...` deployer explicitly; the
+testnet `ST...` address is never valid for mainnet evidence.
 
 ### What Was Actually Done
 - Deployment plans generated; plans are not receipts
-- CI validation passed
+- Targeted evidence/workflow validation passes; deployment status still requires live receipt evidence
 - **Actual blockchain deployment is not verified**
 
 ### To Execute Real Deployment
-1. Fund deployer address with STX (estimate ~11 STX for 214 contracts)
-2. Run workflow with `confirm: DEPLOY_MAINNET` and `dry_run: false`
-3. Verify with: `curl https://stacks-node-api.mainnet.stacks.co/accounts/ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
+1. Approve a canonical `SP...` mainnet deployer and regenerate/review a plan whose deployer and every publish sender use that network
+2. Fund the approved network-specific deployer with STX after review
+3. Run workflow with `confirm: DEPLOY_MAINNET`, the approved `deployer`, and `dry_run: false`
+4. Capture confirmed receipts and run the separate `Verify Deployment Evidence`
+   workflow with the exact commit, plan path, and plan SHA-256
 
 ### Deployment Plans
-- `deployments/full-system.testnet-plan.yaml` — 10 batches (9 contract-publish + 1 contract-call wiring)
+- `deployments/full-system.testnet-plan.yaml` — 10 batches (205 contract-publish + 10 contract-call wiring entries)
 - `deployments/full-system.mainnet-plan.yaml` — same structure, mainnet costs
 - Generated via `scripts/gen-deployment-plans.py` from `default.simnet-plan.yaml`
+- The mainnet workflow fails closed before apply until the mainnet plan's top-level deployer and every contract-publish `expected-sender` are canonical `SP...` values matching the explicitly supplied deployer; the checked-in plan currently contains the testnet `ST...` sender and is not a mainnet receipt.
 - 5 test helpers excluded: `mock-circuit-breaker`, `mock-csf-protocol`, `mock-proposal`, `mock-token`, `test-c4-helper`
 - All contracts: `clarity-version: 4`, `epoch: 3.0`, `anchor-block-only: true`
 
 ### CI Workflows
 - **Validate** (PR + push): `clarinet check` → `run-tests.sh` → `coverage`
-- **Deploy Testnet** (workflow_dispatch only): validate → optional apply → required receipt/interface/read-only evidence verification
-- **Deploy Mainnet** (workflow_dispatch only): validate → confirm `DEPLOY_MAINNET` → optional apply → required receipt/interface/read-only evidence verification
+- **Deploy Testnet** (push to `dev` and workflow_dispatch): validate → optional apply → upload non-secret attempt artifacts → verification pending
+- **Deploy Mainnet** (workflow_dispatch only): explicit confirmation → validate → optional apply → upload non-secret attempt artifacts → verification pending
+- **Verify Deployment Evidence** (manual workflow): bind exact network/deployer/commit/plan/path/hash → verify declared evidence entries only
 - **Clarinet version**: v3.21.0 (requires `script -q -c` PTY wrapper for non-interactive `deployments apply`)
 - **Runtime error detection**: `run-tests.sh` captures fd 2, allowlists 4 known benign clarinet-sdk errors, fails on new errors
 
@@ -195,8 +205,8 @@ These are clarinet-sdk v3.21.0 artifacts from plan regeneration with different r
 - Added impl-trait, transfer, get-last-token-id, get-token-uri, get-owner.
 
 ### ~~P1-4: Testnet Deployment Plan Address Mismatch~~ FIXED
-- All 18 expected-sender entries corrected to testnet deployer address.
-- Mainnet manifest expanded from 14 to 55 contracts across 9 phased batches.
+- All contract-publish `expected-sender` entries in the current testnet plan use the canonical testnet deployer.
+- Mainnet plan expansion is retained as plan-only data; the current workflow rejects it until its deployer and publish senders are network-correct.
 
 ### ~~cxd-token.clar Burn Authorization Bug~~ FIXED
 - burn function now checks burners map instead of is-minter.
@@ -356,7 +366,7 @@ The repository uses GitHub Actions for repository-level automation:
 
 ---
 
-## 15. Open Issues Summary (Session 34)
+## 15. Open Issues Summary (Session 37)
 
 | # | Title | Priority | Labels | Status |
 |---|-------|----------|--------|--------|
@@ -366,10 +376,11 @@ The repository uses GitHub Actions for repository-level automation:
 | 458 | [HIGH] Fake mock pollution: createMockSimnet() returns hardcoded success | HIGH | bug, testing | OPEN |
 
 **Deployment Status (NOT VERIFIED ON-CHAIN):**
-- Deployer: `ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
+- Testnet deployer: `ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
+- Mainnet deployer: must be supplied as a canonical `SP...` value during manual verification
 - Balance: **0 STX** | Transactions: **0**
 - Conclusion: Deployment workflow ran but `dry_run: true` prevented actual deployment
-- **ACTION**: Fund deployer, trigger workflow with `confirm: DEPLOY_MAINNET` and `dry_run: false`
+- **ACTION**: Approve a canonical mainnet `SP...` deployer and network-correct plan before any funded non-dry-run attempt
 
-**Last Updated**: 2026-07-15T13:31:00Z
+**Last Updated**: 2026-07-22
 

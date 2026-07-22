@@ -8,21 +8,28 @@ gateway ABIs. Partnership deployment readiness remains blocked on #527, #528,
 
 ## Evidence boundary
 
-Deployment is verified only when a versioned manifest passes
-`scripts/verify-deployment-evidence.ts` against the selected live Hiro API.
-The verifier requires:
+The repository uses a two-phase lifecycle. The deployment workflows may
+broadcast/apply a plan and upload non-secret attempt artifacts, but they report
+**verification pending** and never claim a verified deployment. A separate
+manual `Verify Deployment Evidence` workflow checks a versioned manifest
+against the selected live Hiro API. The verifier requires:
 
 - explicit `testnet` or `mainnet` network and matching Hiro API base URL;
 - the expected deployer address;
 - each exact contract name and principal;
 - each publish transaction ID, with `success`, `canonical: true`, and block metadata;
 - a successful interface response at the documented contract address; and
-- every declared read-only check to return its expected Clarity value.
+- every declared read-only check to return its expected Clarity value; and
+- exact binding to the expected deployed git commit, plan path, and plan
+  SHA-256 supplied to the verification workflow.
 
 A deployment plan, a green workflow, a broadcast-only transaction ID, a local
 simnet test, or a missing result is not proof. A missing transaction or
 interface is reported only for the documented transaction/address; it is not a
-claim of global nonexistence.
+claim of global nonexistence. A successful verifier report says **declared
+evidence entries verified**. It does not claim complete plan coverage unless a
+separate reliable parser/check proves every relevant plan publish and wiring
+transaction.
 
 The checked-in example at
 `deployment/evidence/examples/testnet.example.json` is a shape/template only.
@@ -30,8 +37,9 @@ It contains zero-value identifiers and must not be used as live evidence.
 
 ## 1. Preflight
 
-1. Confirm the target branch, commit SHA, selected network, and expected deployer
-   with a second operator. Do not put a mnemonic, private key, API key, or raw
+1. Confirm the target branch, exact deployed commit SHA, selected network,
+   canonical network-specific deployer, exact plan path, and plan SHA-256 with a
+   second operator. Do not put a mnemonic, private key, API key, or raw
    environment value in a manifest, log, issue, or artifact.
 2. Run the repository checks that are available in the environment:
 
@@ -42,9 +50,12 @@ It contains zero-value identifiers and must not be used as live evidence.
      --config vitest.config.ts --pool=threads
    ```
 
-3. Review the exact network plan, but treat the plan only as input to the
-   deployment. Record an optional plan hash in the manifest for correlation;
-   it does not replace receipt evidence.
+3. Review the exact network plan and calculate its SHA-256. Before any apply,
+   confirm that the plan network, top-level deployer, and every contract-publish
+   `expected-sender` match the selected network and explicitly approved deployer.
+   The workflow fails closed when they do not. The plan hash binds the evidence
+   to the deployed artifact; it does not replace receipt evidence or prove
+   complete plan coverage.
 4. Keep mainnet approval separate from testnet validation. The mainnet workflow
    is manual and requires the literal `DEPLOY_MAINNET` confirmation plus the
    protected `mainnet` environment.
@@ -53,8 +64,9 @@ It contains zero-value identifiers and must not be used as live evidence.
 
 Clarinet's current `deployments apply` output is not a reliable, machine-readable
 receipt manifest. It may broadcast transactions and print IDs without proving
-inclusion, success, canonicality, or contract contents. Do not parse that output
-as verification and do not report success from the plan artifact.
+inclusion, success, canonicality, or contract contents. The broadcast workflows
+retain the output as a non-secret attempt artifact, but do not parse it as
+verification and do not report success from the plan artifact.
 
 After an approved deployment attempt, capture the transaction IDs and query the
 matching Hiro API. For every contract publish, record the response fields that
@@ -75,16 +87,23 @@ are already approved and known. Then run:
 ```bash
 npx tsx scripts/verify-deployment-evidence.ts \
   --manifest path/to/deployment-evidence.json \
+  --expected-network testnet \
+  --expected-deployer ST... \
+  --expected-git-commit <deployed-commit> \
+  --expected-plan-path deployments/full-system.testnet-plan.yaml \
+  --expected-plan-sha256 <plan-sha256> \
   --output deployment-evidence-report.json
 ```
 
 The command exits non-zero for pending, failed, non-canonical, missing, wrong,
 or malformed evidence. Keep the JSON report beside the manifest. The report is
-bounded to the documented transaction IDs and contract addresses.
+bounded to the documented transaction IDs and contract addresses. A passing
+report says **declared evidence entries verified**, not that every relevant
+transaction in the deployment plan was covered.
 
 ## 4. Artifact retention and correction
 
-- Retain the manifest, verifier report, commit SHA, optional plan hash, and
+- Retain the manifest, verifier report, exact commit SHA, plan path, plan hash, and
   workflow run link together as a reviewable evidence pack.
 - Never retain secrets in the evidence pack. Redact or discard logs that may
   contain credentials before uploading them.
@@ -128,13 +147,31 @@ Testnet validation cannot invoke mainnet. The testnet workflow has no automatic
 promotion job. Mainnet remains a manual `workflow_dispatch` operation with:
 
 1. explicit `confirm=DEPLOY_MAINNET`;
-2. `dry_run=false` only after human approval; and
-3. a supplied evidence manifest that passes the verifier before the workflow can
-   report a verified deployment.
+2. supply the approved canonical `SP...` deployer and a plan whose network and
+   publish senders match it; and
+3. `dry_run=false` only after human approval; and
+4. a separate manual evidence workflow supplied with the exact network,
+   deployer, deployed commit, plan path, and plan hash.
 
-If Clarinet cannot supply the manifest in the same run, the workflow must fail
-closed rather than guess, forge, or infer evidence. This limitation is
-intentional until a reliable receipt-producing deployment path exists.
+If Clarinet cannot supply the manifest in the same run, the broadcast workflow
+must report **verification pending** rather than guess, forge, or infer
+evidence. The separate verification workflow rejects stale network, deployer,
+commit, plan, or plan-hash bindings.
+
+## 8. Historical versus current-run evidence
+
+An evidence manifest is current-run evidence only when its required metadata
+matches the exact commit checked out by the manual verification workflow and the
+SHA-256 of the exact plan file checked out at that commit. A valid manifest from
+another network, deployer, commit, plan path, or plan digest is rejected. The
+checked-in example is a schema fixture, not historical or live deployment
+evidence.
+
+The current verifier intentionally does not claim complete plan coverage. The
+full plan contains publish and wiring transactions; complete deployment
+verification additionally requires a reliable parser/check proving coverage of
+every relevant entry. Until that check is approved, use the scoped wording
+**declared evidence entries verified** everywhere.
 
 ## Current documentation state
 
