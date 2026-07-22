@@ -20,7 +20,7 @@ The Conxian Protocol utilizes a "Dual-Mode" testing architecture. This ensures t
 ### Intermediate Leaf Tests (DEX & Governance)
 7. ✅ **tests/dex/concentrated-liquidity-pool.test.ts**: Pool creation and state.
 8. ✅ **tests/dex/concentrated-liquidity.test.ts**: Math library for CL.
-9. ✅ **tests/tokens/cxlp-token.test.ts**: CXLP role authorization, nested mint/burn, reconciliation, rollback, and canonical proxies.
+9. ✅ **tests/tokens/cxlp-token.test.ts**: CXLP role authorization, aggregate pool/supply accounting, direct/proxy transfer preservation, rollback, and canonical proxies.
 10. ✅ **tests/dex/swap-router.test.ts**: Swap routing and fee logic.
 11. ✅ **tests/governance/reputation-engine.test.ts**: Weighted voting power.
 12. ✅ **tests/governance/proposal-engine.test.ts**: Governance signal processing.

@@ -21,7 +21,7 @@
 ;; --- State ---
 (define-data-var admin principal tx-sender)
 (define-data-var settlement-authority principal tx-sender)
-(define-data-var recorded-share-supply uint u0)
+(define-data-var total-outstanding-shares uint u0)
 
 (define-map pools
   uint
@@ -30,17 +30,11 @@
     token-1: principal,
     fee: uint, ;; bps with 1M denominator e.g. 3000 = 0.3%
     liquidity: uint,
+    outstanding-shares: uint,
     sqrt-price: uint,
     tick: int
   }
 )
-
-(define-map pool-shares
-  { pool-id: uint, owner: principal }
-  uint
-)
-
-(define-map owner-share-totals principal uint)
 
 (define-data-var pool-nonce uint u0)
 
@@ -58,20 +52,24 @@
   (ok (var-get settlement-authority))
 )
 
+(define-read-only (get-total-outstanding-shares)
+  (ok (var-get total-outstanding-shares))
+)
+
+;; Compatibility alias for integrations that used the pre-aggregate name.
 (define-read-only (get-recorded-share-supply)
-  (ok (var-get recorded-share-supply))
+  (ok (var-get total-outstanding-shares))
 )
 
 (define-read-only (get-pool (pool-id uint))
   (ok (map-get? pools pool-id))
 )
 
-(define-read-only (get-pool-share (pool-id uint) (owner principal))
-  (ok (default-to u0 (map-get? pool-shares { pool-id: pool-id, owner: owner })))
-)
-
-(define-read-only (get-owner-share-total (owner principal))
-  (ok (default-to u0 (map-get? owner-share-totals owner)))
+(define-read-only (get-pool-outstanding-shares (pool-id uint))
+  (match (map-get? pools pool-id)
+    pool (ok (get outstanding-shares pool))
+    ERR_POOL_NOT_FOUND
+  )
 )
 
 ;; --- Administrative configuration ---
@@ -191,6 +189,7 @@
         token-1: token-1,
         fee: fee,
         liquidity: u0,
+        outstanding-shares: u0,
         sqrt-price: initial-price,
         tick: initial-tick
       })
@@ -211,32 +210,27 @@
     (asserts! (> amount u0) ERR_INVALID_AMOUNT)
     (let (
       (pool (unwrap! (map-get? pools pool-id) ERR_POOL_NOT_FOUND))
-      (pool-share-balance (default-to u0 (map-get? pool-shares { pool-id: pool-id, owner: owner })))
-      (owner-share-total (default-to u0 (map-get? owner-share-totals owner)))
       (canonical-owner-balance (unwrap! (contract-call? .cxlp-token get-balance owner) ERR_TOKEN_CALL_FAILED))
       (canonical-supply (unwrap! (contract-call? .cxlp-token get-total-supply) ERR_TOKEN_CALL_FAILED))
-      (pool-liquidity (get liquidity pool))
-      (tracked-supply (var-get recorded-share-supply))
+      (pool-share-total (get outstanding-shares pool))
+      (tracked-supply (var-get total-outstanding-shares))
     )
       (begin
-        ;; A hook may only extend a state that was already reconciled. This
-        ;; prevents direct CXLP minting or an ambiguous global transfer from
-        ;; being silently absorbed into pool accounting.
-        (asserts! (is-eq canonical-owner-balance owner-share-total) ERR_SHARE_STATE_MISMATCH)
+        ;; CXLP ownership is intentionally aggregate and transferable. The
+        ;; CLP therefore tracks only pool totals and the protocol-wide total;
+        ;; it never mirrors an owner balance that a normal SIP-010 transfer
+        ;; could make stale.
         (asserts! (is-eq canonical-supply tracked-supply) ERR_SHARE_STATE_MISMATCH)
-        (asserts! (<= pool-share-balance pool-liquidity) ERR_SHARE_STATE_MISMATCH)
-        (asserts! (<= amount (- MAX_UINT pool-liquidity)) ERR_ARITHMETIC_OVERFLOW)
-        (asserts! (<= amount (- MAX_UINT pool-share-balance)) ERR_ARITHMETIC_OVERFLOW)
-        (asserts! (<= amount (- MAX_UINT owner-share-total)) ERR_ARITHMETIC_OVERFLOW)
+        (asserts! (<= amount (- MAX_UINT pool-share-total)) ERR_ARITHMETIC_OVERFLOW)
         (asserts! (<= amount (- MAX_UINT tracked-supply)) ERR_ARITHMETIC_OVERFLOW)
 
-        ;; Clarity rolls back all earlier state if this downstream call fails.
+        ;; Write local reconciliation state before the downstream token call.
+        ;; The CXLP mint has no callback path, and Clarity rolls these writes
+        ;; back together with the call if the configured minter rejects it.
+        (map-set pools pool-id
+          (merge pool { outstanding-shares: (+ pool-share-total amount) }))
+        (var-set total-outstanding-shares (+ tracked-supply amount))
         (try! (contract-call? .cxlp-token mint amount owner))
-
-        (map-set pools pool-id (merge pool { liquidity: (+ pool-liquidity amount) }))
-        (map-set pool-shares { pool-id: pool-id, owner: owner } (+ pool-share-balance amount))
-        (map-set owner-share-totals owner (+ owner-share-total amount))
-        (var-set recorded-share-supply (+ tracked-supply amount))
 
         ;; Verify the canonical token after all local writes; a failed
         ;; invariant reverts both the token call and the local reconciliation.
@@ -261,30 +255,23 @@
     (asserts! (> amount u0) ERR_INVALID_AMOUNT)
     (let (
       (pool (unwrap! (map-get? pools pool-id) ERR_POOL_NOT_FOUND))
-      (pool-share-balance (default-to u0 (map-get? pool-shares { pool-id: pool-id, owner: owner })))
-      (owner-share-total (default-to u0 (map-get? owner-share-totals owner)))
       (canonical-owner-balance (unwrap! (contract-call? .cxlp-token get-balance owner) ERR_TOKEN_CALL_FAILED))
       (canonical-supply (unwrap! (contract-call? .cxlp-token get-total-supply) ERR_TOKEN_CALL_FAILED))
-      (pool-liquidity (get liquidity pool))
-      (tracked-supply (var-get recorded-share-supply))
+      (pool-share-total (get outstanding-shares pool))
+      (tracked-supply (var-get total-outstanding-shares))
     )
       (begin
-        (asserts! (is-eq canonical-owner-balance owner-share-total) ERR_SHARE_STATE_MISMATCH)
         (asserts! (is-eq canonical-supply tracked-supply) ERR_SHARE_STATE_MISMATCH)
-        (asserts! (<= pool-share-balance pool-liquidity) ERR_SHARE_STATE_MISMATCH)
-        (asserts! (>= pool-share-balance amount) ERR_INSUFFICIENT_SHARES)
-        (asserts! (>= owner-share-total amount) ERR_INSUFFICIENT_SHARES)
+        (asserts! (>= pool-share-total amount) ERR_INSUFFICIENT_SHARES)
         (asserts! (>= canonical-owner-balance amount) ERR_INSUFFICIENT_SHARES)
         (asserts! (>= canonical-supply amount) ERR_INSUFFICIENT_SHARES)
 
-        ;; Clarity rolls back the token burn and every local write together if
-        ;; any downstream call or invariant fails.
+        ;; As with minting, local writes intentionally precede the token call
+        ;; so a rejected burn proves transaction-wide rollback in tests.
+        (map-set pools pool-id
+          (merge pool { outstanding-shares: (- pool-share-total amount) }))
+        (var-set total-outstanding-shares (- tracked-supply amount))
         (try! (contract-call? .cxlp-token burn amount owner))
-
-        (map-set pools pool-id (merge pool { liquidity: (- pool-liquidity amount) }))
-        (map-set pool-shares { pool-id: pool-id, owner: owner } (- pool-share-balance amount))
-        (map-set owner-share-totals owner (- owner-share-total amount))
-        (var-set recorded-share-supply (- tracked-supply amount))
 
         (let (
           (post-owner-balance (unwrap! (contract-call? .cxlp-token get-balance owner) ERR_TOKEN_CALL_FAILED))
@@ -318,7 +305,7 @@
 
 (define-private (swap-execute (pool-id uint) (amount-in uint) (token-in-trait <sip-010-ft-trait>) (token-out-trait <sip-010-ft-trait>) (recipient principal))
   (let (
-    (pool (match (map-get? pools pool-id) p p { token-0: tx-sender, token-1: tx-sender, fee: u3000, liquidity: u0, sqrt-price: u0, tick: 0 }))
+    (pool (match (map-get? pools pool-id) p p { token-0: tx-sender, token-1: tx-sender, fee: u3000, liquidity: u0, outstanding-shares: u0, sqrt-price: u0, tick: 0 }))
     (lp-fee (/ (* amount-in (get fee pool)) u1000000))
     ;; Mandatory Protocol Fee (Sovereign Tax) - 100 bps (1%) = 10000 / 1000000
     (gov-tax (/ (* amount-in u10000) u1000000))

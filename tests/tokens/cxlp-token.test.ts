@@ -20,6 +20,10 @@ function readPool(poolId: bigint, sender: string): string {
   return Cl.prettyPrint(result);
 }
 
+function readPoolOutstanding(poolId: bigint, sender: string): bigint {
+  return readUint(CLP, "get-pool-outstanding-shares", [Cl.uint(poolId)], sender);
+}
+
 describe("CXLP mint/burn primitive and CLP reconciliation", () => {
   let deployer: string;
   let wallet1: string;
@@ -127,9 +131,8 @@ describe("CXLP mint/burn primitive and CLP reconciliation", () => {
       wallet2,
     ).result).toEqual(Cl.ok(Cl.bool(true)));
 
-    expect(readUint(CLP, "get-pool-share", [Cl.uint(poolId), Cl.principal(wallet1)], deployer)).toBe(60n);
-    expect(readUint(CLP, "get-owner-share-total", [Cl.principal(wallet1)], deployer)).toBe(60n);
-    expect(readUint(CLP, "get-recorded-share-supply", [], deployer)).toBe(readUint(CXLP, "get-total-supply", [], deployer));
+    expect(readPoolOutstanding(poolId, deployer)).toBe(60n);
+    expect(readUint(CLP, "get-total-outstanding-shares", [], deployer)).toBe(readUint(CXLP, "get-total-supply", [], deployer));
     expect(readUint(CXLP, "get-balance", [Cl.principal(wallet1)], deployer)).toBe(60n);
 
     expect(simnet.callPublicFn(CLP, "set-settlement-authority", [Cl.principal(deployer)], deployer).result)
@@ -160,8 +163,8 @@ describe("CXLP mint/burn primitive and CLP reconciliation", () => {
     ).result).toEqual(Cl.error(Cl.uint(1005)));
 
     expect(readUint(CXLP, "get-total-supply", [], deployer)).toBe(supplyBefore);
-    expect(readUint(CLP, "get-pool-share", [Cl.uint(poolId), Cl.principal(wallet3)], deployer)).toBe(0n);
-    expect(readPool(poolId, deployer)).toContain("liquidity: u0");
+    expect(readPoolOutstanding(poolId, deployer)).toBe(0n);
+    expect(readPool(poolId, deployer)).toContain("outstanding-shares: u0");
   });
 
   it("reconciles pool, owner, canonical balance, and global supply exactly", () => {
@@ -175,10 +178,8 @@ describe("CXLP mint/burn primitive and CLP reconciliation", () => {
       deployer,
     ).result).toEqual(Cl.ok(Cl.bool(true)));
 
-    expect(readPool(poolId, deployer)).toContain("liquidity: u250");
-    expect(readUint(CLP, "get-pool-share", [Cl.uint(poolId), Cl.principal(wallet3)], deployer)).toBe(250n);
-    expect(readUint(CLP, "get-owner-share-total", [Cl.principal(wallet3)], deployer)).toBe(250n);
-    expect(readUint(CLP, "get-recorded-share-supply", [], deployer)).toBe(beforeSupply + 250n);
+    expect(readPoolOutstanding(poolId, deployer)).toBe(250n);
+    expect(readUint(CLP, "get-total-outstanding-shares", [], deployer)).toBe(beforeSupply + 250n);
     expect(readUint(CXLP, "get-balance", [Cl.principal(wallet3)], deployer)).toBe(250n);
     expect(readUint(CXLP, "get-total-supply", [], deployer)).toBe(beforeSupply + 250n);
 
@@ -189,16 +190,35 @@ describe("CXLP mint/burn primitive and CLP reconciliation", () => {
       deployer,
     ).result).toEqual(Cl.ok(Cl.bool(true)));
 
-    expect(readPool(poolId, deployer)).toContain("liquidity: u160");
-    expect(readUint(CLP, "get-pool-share", [Cl.uint(poolId), Cl.principal(wallet3)], deployer)).toBe(160n);
-    expect(readUint(CLP, "get-owner-share-total", [Cl.principal(wallet3)], deployer)).toBe(160n);
-    expect(readUint(CLP, "get-recorded-share-supply", [], deployer)).toBe(beforeSupply + 160n);
+    expect(readPoolOutstanding(poolId, deployer)).toBe(160n);
+    expect(readUint(CLP, "get-total-outstanding-shares", [], deployer)).toBe(beforeSupply + 160n);
     expect(readUint(CXLP, "get-balance", [Cl.principal(wallet3)], deployer)).toBe(160n);
     expect(readUint(CXLP, "get-total-supply", [], deployer)).toBe(beforeSupply + 160n);
   });
 
-  it("rolls back local reconciliation when the downstream token call fails", () => {
+  it("rolls back local reconciliation when downstream mint or burn authorization fails", () => {
     const poolId = createPool();
+    const clp = Cl.contractPrincipal(deployer, CLP);
+
+    const beforeMintPool = readPoolOutstanding(poolId, deployer);
+    const beforeMintGlobal = readUint(CLP, "get-total-outstanding-shares", [], deployer);
+    const beforeMintSupply = readUint(CXLP, "get-total-supply", [], deployer);
+
+    expect(simnet.callPublicFn(CXLP, "remove-minter", [clp], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(
+      CLP,
+      "mint-shares",
+      [Cl.uint(poolId), Cl.principal(wallet2), Cl.uint(75)],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(1000)));
+    expect(simnet.callPublicFn(CXLP, "add-minter", [clp], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(readPoolOutstanding(poolId, deployer)).toBe(beforeMintPool);
+    expect(readUint(CLP, "get-total-outstanding-shares", [], deployer)).toBe(beforeMintGlobal);
+    expect(readUint(CXLP, "get-total-supply", [], deployer)).toBe(beforeMintSupply);
+
     expect(simnet.callPublicFn(
       CLP,
       "mint-shares",
@@ -207,12 +227,11 @@ describe("CXLP mint/burn primitive and CLP reconciliation", () => {
     ).result).toEqual(Cl.ok(Cl.bool(true)));
 
     const beforePool = readPool(poolId, deployer);
-    const beforePoolShares = readUint(CLP, "get-pool-share", [Cl.uint(poolId), Cl.principal(wallet2)], deployer);
-    const beforeOwnerShares = readUint(CLP, "get-owner-share-total", [Cl.principal(wallet2)], deployer);
+    const beforePoolShares = readPoolOutstanding(poolId, deployer);
+    const beforeGlobal = readUint(CLP, "get-total-outstanding-shares", [], deployer);
     const beforeBalance = readUint(CXLP, "get-balance", [Cl.principal(wallet2)], deployer);
     const beforeSupply = readUint(CXLP, "get-total-supply", [], deployer);
 
-    const clp = Cl.contractPrincipal(deployer, CLP);
     expect(simnet.callPublicFn(CXLP, "remove-burner", [clp], deployer).result)
       .toEqual(Cl.ok(Cl.bool(true)));
     expect(simnet.callPublicFn(
@@ -225,13 +244,81 @@ describe("CXLP mint/burn primitive and CLP reconciliation", () => {
       .toEqual(Cl.ok(Cl.bool(true)));
 
     expect(readPool(poolId, deployer)).toBe(beforePool);
-    expect(readUint(CLP, "get-pool-share", [Cl.uint(poolId), Cl.principal(wallet2)], deployer)).toBe(beforePoolShares);
-    expect(readUint(CLP, "get-owner-share-total", [Cl.principal(wallet2)], deployer)).toBe(beforeOwnerShares);
+    expect(readPoolOutstanding(poolId, deployer)).toBe(beforePoolShares);
+    expect(readUint(CLP, "get-total-outstanding-shares", [], deployer)).toBe(beforeGlobal);
     expect(readUint(CXLP, "get-balance", [Cl.principal(wallet2)], deployer)).toBe(beforeBalance);
     expect(readUint(CXLP, "get-total-supply", [], deployer)).toBe(beforeSupply);
   });
 
-  it("keeps transfer real and exposes canonical proxy getters", () => {
+  it("keeps direct and proxy transfers aggregate-safe across multiple pools", () => {
+    const poolOne = createPool();
+    const poolTwo = createPool();
+
+    expect(simnet.callPublicFn(
+      CLP,
+      "mint-shares",
+      [Cl.uint(poolOne), Cl.principal(wallet1), Cl.uint(100)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(
+      CLP,
+      "mint-shares",
+      [Cl.uint(poolTwo), Cl.principal(wallet2), Cl.uint(50)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+
+    const wallet1BeforeTransfer = readUint(CXLP, "get-balance", [Cl.principal(wallet1)], deployer);
+    const wallet2BeforeTransfer = readUint(CXLP, "get-balance", [Cl.principal(wallet2)], deployer);
+    const wallet3BeforeTransfer = readUint(CXLP, "get-balance", [Cl.principal(wallet3)], deployer);
+    const supplyBeforeTransfer = readUint(CXLP, "get-total-supply", [], deployer);
+    const globalBeforeTransfer = readUint(CLP, "get-total-outstanding-shares", [], deployer);
+    const poolOneBeforeTransfer = readPoolOutstanding(poolOne, deployer);
+    const poolTwoBeforeTransfer = readPoolOutstanding(poolTwo, deployer);
+
+    expect(simnet.callPublicFn(
+      CXLP,
+      "transfer",
+      [Cl.uint(40), Cl.principal(wallet1), Cl.principal(wallet2), Cl.none()],
+      wallet1,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(
+      CLP,
+      "transfer",
+      [Cl.uint(10), Cl.principal(wallet2), Cl.principal(wallet3), Cl.none()],
+      wallet2,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(readUint(CXLP, "get-balance", [Cl.principal(wallet1)], deployer)).toBe(wallet1BeforeTransfer - 40n);
+    expect(readUint(CXLP, "get-balance", [Cl.principal(wallet2)], deployer)).toBe(wallet2BeforeTransfer + 30n);
+    expect(readUint(CXLP, "get-balance", [Cl.principal(wallet3)], deployer)).toBe(wallet3BeforeTransfer + 10n);
+    expect(readUint(CXLP, "get-total-supply", [], deployer)).toBe(supplyBeforeTransfer);
+    expect(readUint(CLP, "get-total-outstanding-shares", [], deployer)).toBe(globalBeforeTransfer);
+    expect(readPoolOutstanding(poolOne, deployer)).toBe(poolOneBeforeTransfer);
+    expect(readPoolOutstanding(poolTwo, deployer)).toBe(poolTwoBeforeTransfer);
+
+    // Settlement authority selects the pool; #536 will provide the position
+    // attribution and custody checks that justify that selection.
+    expect(simnet.callPublicFn(
+      CLP,
+      "burn-shares",
+      [Cl.uint(poolOne), Cl.principal(wallet3), Cl.uint(10)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(
+      CLP,
+      "mint-shares",
+      [Cl.uint(poolTwo), Cl.principal(wallet3), Cl.uint(25)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(readPoolOutstanding(poolOne, deployer)).toBe(poolOneBeforeTransfer - 10n);
+    expect(readPoolOutstanding(poolTwo, deployer)).toBe(poolTwoBeforeTransfer + 25n);
+    expect(readUint(CLP, "get-total-outstanding-shares", [], deployer)).toBe(globalBeforeTransfer + 15n);
+    expect(readUint(CXLP, "get-total-supply", [], deployer)).toBe(supplyBeforeTransfer + 15n);
+    expect(readUint(CXLP, "get-balance", [Cl.principal(wallet3)], deployer)).toBe(wallet3BeforeTransfer + 25n);
+  });
+
+  it("exposes canonical proxy getters without fabricating token state", () => {
     const poolId = createPool();
     expect(simnet.callPublicFn(
       CLP,
@@ -239,17 +326,6 @@ describe("CXLP mint/burn primitive and CLP reconciliation", () => {
       [Cl.uint(poolId), Cl.principal(wallet1), Cl.uint(30)],
       deployer,
     ).result).toEqual(Cl.ok(Cl.bool(true)));
-    const senderBeforeTransfer = readUint(CXLP, "get-balance", [Cl.principal(wallet1)], deployer);
-    const recipientBeforeTransfer = readUint(CXLP, "get-balance", [Cl.principal(wallet2)], deployer);
-
-    expect(simnet.callPublicFn(
-      CLP,
-      "transfer",
-      [Cl.uint(10), Cl.principal(wallet1), Cl.principal(wallet2), Cl.none()],
-      wallet1,
-    ).result).toEqual(Cl.ok(Cl.bool(true)));
-    expect(readUint(CLP, "get-balance", [Cl.principal(wallet1)], deployer)).toBe(senderBeforeTransfer - 10n);
-    expect(readUint(CLP, "get-balance", [Cl.principal(wallet2)], deployer)).toBe(recipientBeforeTransfer + 10n);
 
     expect(simnet.callReadOnlyFn(CLP, "get-name", [], deployer).result)
       .toEqual(simnet.callReadOnlyFn(CXLP, "get-name", [], deployer).result);
@@ -257,15 +333,5 @@ describe("CXLP mint/burn primitive and CLP reconciliation", () => {
       .toEqual(simnet.callReadOnlyFn(CXLP, "get-symbol", [], deployer).result);
     expect(simnet.callReadOnlyFn(CLP, "get-decimals", [], deployer).result)
       .toEqual(simnet.callReadOnlyFn(CXLP, "get-decimals", [], deployer).result);
-
-    // A global transferable CXLP cannot identify which pool's shares moved.
-    // The next pool hook therefore fails closed rather than inventing an
-    // owner/pool allocation.
-    expect(simnet.callPublicFn(
-      CLP,
-      "mint-shares",
-      [Cl.uint(poolId), Cl.principal(wallet1), Cl.uint(1)],
-      deployer,
-    ).result).toEqual(Cl.error(Cl.uint(1004)));
   });
 });

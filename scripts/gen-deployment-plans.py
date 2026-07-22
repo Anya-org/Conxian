@@ -84,6 +84,12 @@ GENERATED_PLAN_NAMES = (
     "full-system.mainnet-plan.yaml",
 )
 
+REQUIRED_RELEASE_ORDER = (
+    "sip-standards",
+    "cxlp-token",
+    "concentrated-liquidity-pool",
+)
+
 
 def load_simnet_plan(path):
     with path.open() as f:
@@ -115,35 +121,85 @@ def extract_contracts(simnet):
             })
         if batch_contracts:
             contracts.append(batch_contracts)
-    # The checked-in simnet plan can predate a newly added Clarinet dependency
-    # because Clarinet regenerates it locally. Enforce the static CLP -> CXLP
-    # publication edge here as well, so release output remains safe and
-    # reproducible from either plan version.
-    cxlp_batch = next(
-        (index for index, batch in enumerate(contracts)
-         if any(item["contract-name"] == "cxlp-token" for item in batch)),
-        None,
+
+    # Clarinet may emit a stale or differently grouped simnet plan after a
+    # dependency is added. Normalize the release publication sequence without
+    # disturbing the relative order of unrelated contracts. CXLP must be
+    # published after its SIP-010 trait and before the CLP that imports it.
+    locations = {}
+    for batch_index, batch in enumerate(contracts):
+        for item_index, item in enumerate(batch):
+            name = item["contract-name"]
+            if name in REQUIRED_RELEASE_ORDER:
+                locations[name] = (batch_index, item_index)
+
+    missing = [name for name in REQUIRED_RELEASE_ORDER if name not in locations]
+    if missing:
+        raise ValueError(
+            "cannot establish required release dependency order; missing: "
+            + ", ".join(missing)
+        )
+
+    first_batch_index, first_item_index = min(
+        (locations[name] for name in REQUIRED_RELEASE_ORDER),
+        key=lambda location: (location[0], location[1]),
     )
-    clp_batch = next(
-        (index for index, batch in enumerate(contracts)
-         if any(item["contract-name"] == "concentrated-liquidity-pool" for item in batch)),
-        None,
-    )
-    if cxlp_batch is not None and clp_batch is not None and cxlp_batch > clp_batch:
-        cxlp = next(item for item in contracts[cxlp_batch]
-                    if item["contract-name"] == "cxlp-token")
-        contracts[cxlp_batch] = [
-            item for item in contracts[cxlp_batch]
-            if item["contract-name"] != "cxlp-token"
+    required_items = {
+        name: next(
+            item
+            for batch in contracts
+            for item in batch
+            if item["contract-name"] == name
+        )
+        for name in REQUIRED_RELEASE_ORDER
+    }
+    for batch in contracts:
+        batch[:] = [
+            item
+            for item in batch
+            if item["contract-name"] not in REQUIRED_RELEASE_ORDER
         ]
-        contracts[clp_batch].insert(0, cxlp)
-        contracts = [batch for batch in contracts if batch]
+
+    insertion_index = sum(
+        item["contract-name"] not in REQUIRED_RELEASE_ORDER
+        for item in contracts[first_batch_index][:first_item_index]
+    )
+    contracts[first_batch_index][insertion_index:insertion_index] = [
+        required_items[name] for name in REQUIRED_RELEASE_ORDER
+    ]
+    contracts = [batch for batch in contracts if batch]
+    assert_release_dependency_order(contracts)
 
     return contracts
 
 
+def assert_release_dependency_order(contracts):
+    """Fail closed unless the release plans publish the required dependency edge."""
+    names = [item["contract-name"] for batch in contracts for item in batch]
+    positions = {}
+    for name in REQUIRED_RELEASE_ORDER:
+        try:
+            positions[name] = names.index(name)
+        except ValueError as exc:
+            raise ValueError(
+                "cannot establish required release dependency order; missing: "
+                + name
+            ) from exc
+
+    if not (
+        positions["sip-standards"]
+        < positions["cxlp-token"]
+        < positions["concentrated-liquidity-pool"]
+    ):
+        raise ValueError(
+            "invalid release dependency order: expected "
+            "sip-standards -> cxlp-token -> concentrated-liquidity-pool"
+        )
+
+
 def make_plan(contracts, network, name, stacks_node, cost):
     """Build deployment plan YAML structure."""
+    assert_release_dependency_order(contracts)
     plan = {
         "id": 1,
         "name": name,

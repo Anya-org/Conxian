@@ -38,8 +38,8 @@ The Tokens module manages all native protocol assets including CXD (Sovereign De
 | `transfer` | `(amount uint) (sender principal) (recipient principal) (memo (optional (buff 34)))` | SIP-010 compliant transfer. |
 | `get-balance` | `(who principal)` | Returns the token balance for a user. |
 | `get-total-supply` | `()` | Returns the canonical fungible-token supply. |
-| `mint` | `(amount uint) (recipient principal)` | Mints CXLP for an authorized minter contract only. |
-| `burn` | `(amount uint) (owner principal)` | Burns CXLP for an authorized burner contract only. |
+| `mint` | `(amount uint) (recipient principal)` | Mints CXLP for an authorized minter principal. |
+| `burn` | `(amount uint) (owner principal)` | Burns CXLP for an authorized burner principal. |
 | `add-minter` / `remove-minter` | `(principal)` | Admin-only minter role management, including revocation. |
 | `add-burner` / `remove-burner` | `(principal)` | Admin-only burner role management, including revocation. |
 | `initialize` / `set-admin` | `(new-admin principal)` | Rotates the admin under the current admin authorization. |
@@ -48,14 +48,21 @@ The Tokens module manages all native protocol assets including CXD (Sovereign De
 CXLP uses separate minter and burner maps. Mint and burn authorize the
 immediate `contract-caller`, not the originating `tx-sender`, so a configured
 CLP contract can call the token through a user transaction without granting
-the user direct mint or burn authority. The token's native fungible-token
-balance and supply are the accounting source of truth; no duplicate supply is
-tracked inside the token contract.
+the user direct mint or burn authority. The role maps accept either standard
+or contract principals; the Clarity type system does not enforce
+contract-only roles. Production deployment authorizes only the
+`concentrated-liquidity-pool` contract as the CXLP minter and burner. The
+token's native fungible-token balance and supply are the accounting source of
+truth; no duplicate supply is tracked inside the token contract.
 
-The token is deliberately only a primitive. Pool authorization is wired after
-publication by adding `concentrated-liquidity-pool` as both a minter and burner.
-Actual asset custody, position execution, fee settlement, and exact IL remain
-owned by issue #536.
+The token is deliberately only a primitive. CXLP balances represent aggregate
+LP ownership and remain transferable through the SIP-010 interface. Pool
+authorization is wired after publication by adding
+`concentrated-liquidity-pool` as both a minter and burner. The CLP tracks only
+per-pool outstanding share totals and a protocol-wide outstanding total; it
+does not duplicate owner or owner/pool balances that ordinary transfers could
+make stale. Issue #536 must provide per-position/per-pool attribution, custody,
+and settlement validation before a burn is treated as a user withdrawal.
 
 ### `cxtr-token.clar`
 | Function | Signature | Description |
