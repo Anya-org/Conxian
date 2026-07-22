@@ -72,6 +72,7 @@ The bundle must contain:
 - Every effective `contract-publish` and `contract-call` entry in the exact plan passed to `--plan`, bound by batch/transaction ordinal and expected contract/function identity.
 - Contract-call arguments when present, checked against the canonical Clarity representation in the Hiro transaction payload.
 - An interface expectation for every published contract, including required `public` and `read_only` functions.
+- Optional `readOnlyChecks` for deterministic node-level checks. Each check must name the expected network, the exact contract principal covered by the bound plan and evidence, a canonical sender accepted by the call-read API (a standard address such as `ST...`/`SP...` or a contract principal such as `ST....contract-name`), the Clarity function, serialized Clarity argument hex values, `expectedOkay: true`, and the exact serialized Clarity result expected from the node. The verifier validates the sender address checksum and network and validates a contract sender's name; contract senders must also be present in the bound evidence.
 - `claims.scope: checked-addresses` and `claims.globalNonexistence: false`.
 
 The last two fields are intentional: a missing interface or transaction at one checked address is bounded evidence about that lookup, not proof that the contract is absent everywhere.
@@ -88,9 +89,11 @@ npm run verify:deployment-evidence -- \
   --output deployment-artifacts/testnet-evidence.verified.json
 ```
 
-The verifier parses the exact YAML plan supplied by `--plan`, requires one and only one evidence record for every effective publish/call entry, and rejects missing, extra, duplicate, reordered, or mismatched ordinals. It uses the network-specific Hiro API, requires a transaction to be found, canonical, anchored, and successful, and checks the expected transaction type, sender, contract, function, and—where applicable—canonical call arguments. It then requires HTTP 200 for each contract interface and checks the requested function access levels. Unsupported or malformed API payloads fail closed. A successful bundle means complete plan evidence; a broadcast/partial candidate is never a deployment conclusion.
+The verifier parses the exact YAML plan supplied by `--plan`, requires one and only one evidence record for every effective publish/call entry, and rejects missing, extra, duplicate, reordered, or mismatched ordinals. It uses the network-specific Hiro API, requires a transaction to be found, canonical, anchored, and successful, and checks the expected transaction type, sender, contract, function, and—where applicable—canonical call arguments. It then requires HTTP 200 for each exact contract interface and checks the requested function access levels. Read-only checks must name a function present in that live interface as `read_only`; when the interface exposes an `args` array, the verifier also requires the declared serialized argument count to match. It deliberately does not infer Clarity type compatibility from interface type strings; the node validates the serialized Clarity arguments during execution, while the verifier enforces function, access, count, and exact node result. Unsupported or malformed API payloads fail closed. A successful bundle means complete plan evidence; a broadcast/partial candidate is never a deployment conclusion.
 
 The `--api-base-url` option exists for deterministic local HTTP tests and controlled mirrors. Do not use a non-Hiro endpoint for production acceptance unless the operator records that exception and independently establishes equivalent canonical evidence.
+
+When `readOnlyChecks` are declared, the verifier first binds each check to the live interface metadata, then performs it as a `POST /v2/contracts/call-read/{address}/{contract}/{function}` request with the declared standard or contract-principal `sender` and serialized `arguments`. A successful check proves only that the selected node evaluated that exact read-only function at that exact contract principal and returned HTTP 200, `okay: true`, and the exact declared Clarity result. It does **not** prove that a mutating/public function succeeded, that the contract was published by this run, that dependencies or economics are correct, or that any other address is empty. Missing, unknown-function, non-read-only, argument-count, HTTP, provider, timeout, malformed, `okay: false`, and result-mismatch responses fail the verifier; a declared check is never silently skipped.
 
 ## 5. Testnet proof
 
@@ -103,6 +106,7 @@ The active `scripts/deploy-testnet.ts` helper is bounded to testnet and the exis
 - Writes or updates a `broadcast`/`partial` candidate as `<evidence>.broadcast.json` after every accepted txid and on failure/finally paths.
 - Polls with a bounded timeout and can write a confirmed evidence file only after canonical transaction, interface, and complete matching-plan verification.
 - Never labels or prints a broadcast-only result as confirmed or completed.
+- Performs a bounded preflight over every helper target before the first broadcast and aborts with a machine-readable `PREEXISTING_CONTRACT` failure if any target already exists. It does not skip that target or continue with a mixed run. Independent original publish receipt and interface evidence is required for a pre-existing contract; `preexistingContracts` cannot be used as confirmed coverage.
 
 Required environment variables are `DEPLOYER_PRIVKEY`, `SYSTEM_ADDRESS`, and `DEPLOYMENT_PLAN_PATH`. The plan path must identify a generated testnet helper mini-plan whose entries exactly match the bounded sequence and whose deployer is `SYSTEM_ADDRESS`; the full-system plan is intentionally rejected. When git metadata is unavailable, `SOURCE_COMMIT` is also required. Optional controls are `CORE_API_URL`, `HIRO_API_KEY`, `DEPLOYMENT_EVIDENCE_PATH`, `DEPLOY_CONFIRM_TIMEOUT_MS`, and `DEPLOY_CONFIRM_POLL_MS`.
 
@@ -118,6 +122,8 @@ Mainnet remains manual only, and the current GitHub workflow is preflight-only:
 4. Confirm that the committed plan digest, network, source commit, and deployer identity are the approved values. The current `ST...` identity in the mainnet plan is an unresolved blocker, not an authorization to broadcast.
 5. Expect the workflow to validate the plan and emit clearly labeled plan/preflight/log artifacts only. It does not invoke `clarinet deployments apply`, load a mnemonic, sign, or broadcast.
 6. Every non-dry path must stop before signing until a structured receipt-producing broadcaster and complete evidence path exist for issue #531. Do not create placeholder txids or treat dashboard/debug logs as proof.
+
+The mainnet preflight job always starts, validates the confirmation, and fails visibly when `confirm` is missing or differs from `DEPLOY_MAINNET`; an incorrect confirmation is never represented as a green skipped deployment job. This confirmation gate does not authorize signing or broadcasting.
 
 There is no testnet-to-mainnet promotion job. A testnet result never authorizes a mainnet run.
 
@@ -138,6 +144,8 @@ For each checked contract, retain:
 - HTTP 200;
 - the function inventory and access classification;
 - confirmation that every required `public` or `read_only` function is present.
+
+For each declared read-only check, retain the sanitized endpoint, observation timestamp, canonical sender, serialized argument list, HTTP 200 status, `okay: true`, and returned serialized result. Do not retain provider credentials or raw authorization headers. A read-only result is a bounded state observation, not a substitute for a canonical publish receipt or complete plan coverage.
 
 Configuration calls are verified as `contract-call` transactions. A workflow summary or read-only smoke test without these API records is not acceptance evidence.
 
@@ -219,3 +227,5 @@ Never retain private keys, mnemonics, API keys, or secret environment values in 
 ## 10. Acceptance rule
 
 The release is accepted only when the verifier returns `evidenceStatus: confirmed` for the intended network, source commit, plan hash, deployer, transaction set, and interface set. Anything else is a plan, workflow result, broadcast, pending state, failure, or bounded checked-address observation—not proof of deployment and not a global nonexistence claim.
+
+Green CI is not on-chain deployment proof. CI can validate source, plan binding, schema shape, workflow gates, and deterministic mocks; only complete canonical network evidence for the intended plan can establish the bounded evidence conclusion described above.
