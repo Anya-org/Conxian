@@ -52,6 +52,8 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 ### `revenue-distributor.clar` STX routes
 | Function | Signature | Description |
 |----------|-----------|-------------|
+| `initialize` | `(principal)` | Performs the deployer/admin-authorized administrator handoff exactly once. |
+| `set-admin` | `(principal)` | Updates the administrator through the current-admin-only handoff path. |
 | `distribute-stx` | `(uint)` | Compatibility route for authorized legacy sources; it now terminates in the Fiscal Dam. |
 | `route-stx-revenue` | `(uint principal uint)` | Enterprise adapter hop callable only by configured `revenue-automation`. |
 

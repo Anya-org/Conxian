@@ -69,15 +69,18 @@
   uint
 )
 
+;; Usage IDs are replay-protected globally across authorized consumers within
+;; a subscriber's paid period. The consumer remains in the stored receipt for
+;; auditability, but cannot create a separate replay namespace.
 (define-map usage-records
   {
-    consumer: principal,
     subscriber: principal,
     feature-id: (string-ascii 32),
     period-start: uint,
     usage-id: (buff 32)
   }
   {
+    consumer: principal,
     units: uint,
     period-start: uint,
     recorded-at: uint
@@ -371,7 +374,6 @@
     (consumer contract-caller)
     (subscription (unwrap! (map-get? subscriptions subscriber) (err ERR_SUBSCRIPTION_NOT_FOUND)))
     (usage-key {
-      consumer: consumer,
       subscriber: subscriber,
       feature-id: feature-id,
       period-start: (get usage-period-start subscription),
@@ -401,6 +403,7 @@
             (begin
               (asserts! (<= new-used (get limit feature)) (err ERR_USAGE_LIMIT))
               (map-set usage-records usage-key {
+                consumer: consumer,
                 units: units,
                 period-start: (get usage-period-start subscription),
                 recorded-at: burn-block-height
@@ -473,13 +476,14 @@
     (feature-id (string-ascii 32))
     (period-start uint)
     (usage-id (buff 32)))
-  (ok (map-get? usage-records {
-    consumer: consumer,
+  (ok (match (map-get? usage-records {
     subscriber: subscriber,
     feature-id: feature-id,
     period-start: period-start,
     usage-id: usage-id
-  }))
+  })
+    record (if (is-eq (get consumer record) consumer) (some record) none)
+    none))
 )
 
 (define-read-only (get-usage-total

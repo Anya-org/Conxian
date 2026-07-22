@@ -5,6 +5,7 @@ import { simnet } from '../setup-test-env';
 const TIER_ID = 1;
 const SECOND_TIER_ID = 2;
 const CANCELLATION_TIER_ID = 3;
+const FEATURELESS_TIER_ID = 4;
 const PLAN_VERSION = 1;
 const MONTHLY_BLOCKS = 4320;
 const ANNUAL_BLOCKS = 51840;
@@ -171,9 +172,10 @@ describe('Enterprise prepaid subscriptions', () => {
       [principal(contractPrincipal('enterprise-facade'))],
       deployer,
     ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(publishPlan(FEATURELESS_TIER_ID, PLAN_VERSION)).toEqual(Cl.ok(Cl.bool(true)));
   });
 
-  it('enforces exactly four tier identities, nonzero versions/prices/KYC, and inactive publication', () => {
+  it('enforces exactly four tier identities, nonzero versions/prices/KYC, and feature-backed activation', () => {
     expect(publishPlan(0, 2)).toEqual(error(5006));
     expect(publishPlan(5, 2)).toEqual(error(5006));
     expect(publishPlan(TIER_ID, 0)).toEqual(error(5001));
@@ -189,6 +191,14 @@ describe('Enterprise prepaid subscriptions', () => {
       [Cl.uint(TIER_ID), Cl.uint(PLAN_VERSION)],
       deployer,
     ).result).toEqual(Cl.ok(Cl.bool(false)));
+    expect(activatePlan(FEATURELESS_TIER_ID, PLAN_VERSION, true)).toEqual(error(5001));
+    expect(simnet.callPublicFn(
+      'enterprise-plan-registry',
+      'publish-feature',
+      [Cl.uint(FEATURELESS_TIER_ID), Cl.uint(PLAN_VERSION), Cl.stringAscii(FEATURE_ID), Cl.bool(true), Cl.uint(1)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(activatePlan(FEATURELESS_TIER_ID, PLAN_VERSION, true)).toEqual(Cl.ok(Cl.bool(true)));
   });
 
   it('requires explicit activation, rejects inactive/incorrect purchases, and freezes active features', () => {
@@ -334,6 +344,20 @@ describe('Enterprise prepaid subscriptions', () => {
       [principal(wallet1), Cl.stringAscii(FEATURE_ID), usageId(1), Cl.uint(3)],
       wallet1,
     ).result).toEqual(Cl.ok(Cl.uint(3)));
+    // A top-level simnet call uses its sender as contract-caller, so this
+    // registered wallet acts as a second authorized consumer for replay scope.
+    expect(simnet.callPublicFn(
+      'enterprise-subscription',
+      'register-consumer',
+      [principal(wallet1)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(
+      'enterprise-subscription',
+      'record-usage',
+      [principal(wallet1), Cl.stringAscii(FEATURE_ID), usageId(1), Cl.uint(1)],
+      wallet1,
+    ).result).toEqual(error(5113));
     expect(simnet.callPublicFn(
       'enterprise-facade',
       'record-subscription-usage',

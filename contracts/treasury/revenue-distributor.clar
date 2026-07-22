@@ -11,6 +11,7 @@
 (define-constant MAX_UINT u340282366920938463463374607431768211455)
 
 (define-data-var admin principal tx-sender)
+(define-data-var initialized bool false)
 (define-data-var bme-vault principal .bme-engine)
 (define-data-var revenue-automation-principal principal tx-sender)
 (define-data-var next-legacy-payment-id uint u1)
@@ -98,10 +99,26 @@
   )
 )
 
-;; @desc Initializes the distributor with a designated admin.
+;; @desc Initializes the distributor with a designated admin exactly once.
 ;; @param new-admin: The admin principal.
 (define-public (initialize (new-admin principal))
   (begin
+    ;; The deployer is the initial admin at publication time. Only that
+    ;; principal may perform the one-time handoff before route wiring.
+    (asserts!
+      (and (is-eq tx-sender (var-get admin)) (not (var-get initialized)))
+      ERR_UNAUTHORIZED)
+    (var-set admin new-admin)
+    (var-set initialized true)
+    (ok true)
+  )
+)
+
+;; @desc Updates the administrator after the one-time initialization handoff.
+;; @param new-admin: The new admin principal.
+(define-public (set-admin (new-admin principal))
+  (begin
+    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
     (var-set admin new-admin)
     (ok true)
   )
@@ -144,4 +161,8 @@
 ;; @desc Returns the operational treasury reference.
 (define-read-only (get-operational-treasury)
   .operational-treasury
+)
+
+(define-read-only (get-admin)
+  (var-get admin)
 )

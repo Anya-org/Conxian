@@ -56,7 +56,7 @@ debt, and entitlement remains derived directly from
 | `get-subscription` | `(principal)` | Reads lifecycle state and current active status. |
 | `is-entitled` | `(principal (string-ascii 32))` | Reads a generic feature entitlement. |
 | `get-entitlement` | `(principal (string-ascii 32))` | Reads entitlement, limit, usage, remaining units, and paid-through. |
-| `record-usage` | `(principal (string-ascii 32) (buff 32) uint)` | Records subscriber-originated usage with an authorized consumer, period-scoped replay key, and limit check. |
+| `record-usage` | `(principal (string-ascii 32) (buff 32) uint)` | Records subscriber-originated usage with an authorized consumer, consumer-independent period-scoped replay key, and limit check. |
 
 KYC tier and AML status are checked on every subscribe and renew through
 `compliance-hooks.clar`. No PII is stored on-chain; feature identifiers are
@@ -64,7 +64,8 @@ generic strings and product-specific mappings remain in consumer contracts.
 Only explicitly registered consumer contract principals may record usage, and
 the authoritative boundary also requires `tx-sender == subscriber` for the
 MVP. Payment IDs are globally unique across the subscription route. Usage IDs
-are replay-protected within a paid period and may be reused after renewal
+are replay-protected across all authorized consumers within a paid period and
+may be reused after renewal
 because the period start is part of the key. Production deployment leaves the
 consumer allowlist empty; governance must register only audited product
 contracts. `enterprise-facade.clar` is a generic self-directed testing and

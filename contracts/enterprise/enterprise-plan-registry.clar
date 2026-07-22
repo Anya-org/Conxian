@@ -42,6 +42,13 @@
   { enabled: bool, limit: uint }
 )
 
+;; Activated plan versions must contain at least one feature. This keeps a
+;; saleable tier from being published without any usable entitlement surface.
+(define-map feature-counts
+  { tier-id: uint, version: uint }
+  uint
+)
+
 ;; Activation is a one-way publication boundary for feature records. The
 ;; active sale flag may be turned off, but a version that was ever activated
 ;; cannot be extended with new features afterward.
@@ -140,6 +147,9 @@
           version: version,
           feature-id: feature-id
         } { enabled: enabled, limit: limit })
+        (map-set feature-counts
+          { tier-id: tier-id, version: version }
+          (+ (default-to u0 (map-get? feature-counts { tier-id: tier-id, version: version })) u1))
         (ok true)
       )
     )
@@ -155,6 +165,11 @@
     (asserts! (> version u0) ERR_INVALID_PLAN)
     (let ((plan (unwrap! (map-get? plans { tier-id: tier-id, version: version }) ERR_PLAN_NOT_FOUND)))
       (begin
+        (asserts!
+          (or
+            (not active)
+            (> (default-to u0 (map-get? feature-counts { tier-id: tier-id, version: version })) u0))
+          ERR_INVALID_PLAN)
         (map-set plans { tier-id: tier-id, version: version } (merge plan { active: active }))
         (if active
           (map-set activated-plan-versions { tier-id: tier-id, version: version } true)

@@ -1,7 +1,7 @@
 ;; enterprise-subscription-trait.clar
 ;; Stable subscription entitlement and usage interface for audited consumers.
-;; Payment IDs are global across the subscription route; usage replay scope is
-;; period-specific in the implementation.
+;; Payment IDs are global across the subscription route; usage replay is
+;; consumer-independent within each paid period in the implementation.
 
 (define-trait enterprise-subscription-trait
   (
