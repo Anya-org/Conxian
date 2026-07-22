@@ -931,18 +931,26 @@
       (asserts! (is-reward-token token) ERR_INVALID_TOKEN)
       (asserts! (not (get swept pool)) ERR_REWARD_DUST_SWEPT)
       (asserts! (is-eq (get settled-count pool) (get eligible-count pool)) ERR_REWARD_DUST_NOT_READY)
-      (if (> dust u0)
-        (try! (as-contract (contract-call? token transfer dust (as-contract tx-sender) recipient none)))
-        true)
-      (map-set reward-pools key (merge pool { swept: true }))
-      (print {
-        event: "dual-stacking-reward-dust-swept",
-        cycle-id: cycle-id,
-        token: (contract-of token),
-        recipient: recipient,
-        amount: dust
-      })
-      (ok dust)
+      (let (
+          (balance (try! (contract-call? token get-balance (as-contract tx-sender))))
+          (required (unwrap! (required-balance dust (var-get reward-liquid-reserve)) ERR_ARITHMETIC_OVERFLOW))
+        )
+        (begin
+          (asserts! (>= balance required) ERR_LIQUIDITY_RESERVE)
+          (if (> dust u0)
+            (try! (as-contract (contract-call? token transfer dust (as-contract tx-sender) recipient none)))
+            true)
+          (map-set reward-pools key (merge pool { swept: true }))
+          (print {
+            event: "dual-stacking-reward-dust-swept",
+            cycle-id: cycle-id,
+            token: (contract-of token),
+            recipient: recipient,
+            amount: dust
+          })
+          (ok dust)
+        )
+      )
     )
   )
 )
@@ -958,17 +966,25 @@
       (asserts! (is-authorized-operator) ERR_UNAUTHORIZED)
       (asserts! (not (get swept pool)) ERR_REWARD_DUST_SWEPT)
       (asserts! (is-eq (get settled-count pool) (get eligible-count pool)) ERR_REWARD_DUST_NOT_READY)
-      (if (> dust u0)
-        (try! (as-contract (stx-transfer? dust (as-contract tx-sender) recipient)))
-        true)
-      (map-set stx-reward-pools cycle-id (merge pool { swept: true }))
-      (print {
-        event: "dual-stacking-stx-reward-dust-swept",
-        cycle-id: cycle-id,
-        recipient: recipient,
-        amount: dust
-      })
-      (ok dust)
+      (let (
+          (balance (stx-get-balance (as-contract tx-sender)))
+          (required (unwrap! (required-balance dust (var-get stx-liquid-reserve)) ERR_ARITHMETIC_OVERFLOW))
+        )
+        (begin
+          (asserts! (>= balance required) ERR_LIQUIDITY_RESERVE)
+          (if (> dust u0)
+            (try! (as-contract (stx-transfer? dust (as-contract tx-sender) recipient)))
+            true)
+          (map-set stx-reward-pools cycle-id (merge pool { swept: true }))
+          (print {
+            event: "dual-stacking-stx-reward-dust-swept",
+            cycle-id: cycle-id,
+            recipient: recipient,
+            amount: dust
+          })
+          (ok dust)
+        )
+      )
     )
   )
 )

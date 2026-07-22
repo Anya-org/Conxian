@@ -105,8 +105,10 @@ is accounting-only: no native BTC transfer, sBTC mint, or sBTC payout is implied
    zero-floor position records a separate settlement marker without masquerading
    as a paid claim. After every eligible position has settled, an authorized
    `sweep-reward-dust` or `sweep-stx-reward-dust` transfers exactly
-   `funded - total-claimed` once, preventing permanent remainder dust and double
-   sweeps. The native-token amount is the v1 reward-share weight; STX and
+   `funded - total-claimed` once, after proving the orchestrator balance covers
+   that remainder plus the configured reward/STX reserve floor. An insufficient
+   balance leaves the pool unswept, preventing permanent remainder dust and
+   double sweeps. The native-token amount is the v1 reward-share weight; STX and
    generic-token units are not combined.
 8. A matured operator settlement is consumed once to record a position-bound BTC
    entitlement. The later claim only marks accounting state and returns the

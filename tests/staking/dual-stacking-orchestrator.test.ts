@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { Cl } from "@stacks/transactions";
+import { Cl, cvToValue } from "@stacks/transactions";
 import { simnet } from "../setup-test-env";
 
 const ORCHESTRATOR = "dual-stacking-orchestrator";
@@ -14,6 +14,7 @@ const STACKING_ADAPTER_2 = "mock-stacking-adapter-2";
 
 const proof = (byte: number) => Cl.buffer(Buffer.alloc(32, byte));
 const contract = (deployer: string, name: string) => Cl.contractPrincipal(deployer, name);
+const contractId = (deployer: string, name: string) => `${deployer}.${name}`;
 
 function tupleValue(result: any): any {
   return result.value?.value ?? result.value;
@@ -21,6 +22,10 @@ function tupleValue(result: any): any {
 
 function tupleUint(result: any, key: string): number {
   return Number(tupleValue(result)[key].value);
+}
+
+function tupleBool(result: any, key: string): boolean {
+  return cvToValue(tupleValue(result)[key]);
 }
 
 function currentBurnHeight(): number {
@@ -362,7 +367,7 @@ describe("dual stacking and delegated native operator", () => {
       .toContain("bound: false");
   });
 
-  it("rolls back operator binding, custody, IDs, and adapter state on failures", () => {
+  it("rolls back operator binding, custody, IDs, and aggregate accounting on pre-write failures", () => {
     expect(simnet.callPublicFn(ORCHESTRATOR, "set-stx-allocation-cap", [Cl.uint(100)], deployer).result)
       .toEqual(Cl.ok(Cl.bool(true)));
     const beforeBalance = simnet.callReadOnlyFn(TOKEN, "get-balance", [Cl.principal(wallet3)], deployer).result;
@@ -399,6 +404,68 @@ describe("dual stacking and delegated native operator", () => {
     expect(Cl.prettyPrint(simnet.callReadOnlyFn(OPERATOR, "get-commit", [Cl.uint(commit3)], deployer).result))
       .toContain("bound: false");
     expect(simnet.callPublicFn(STACKING_ADAPTER, "set-failures", [Cl.bool(false), Cl.bool(false), Cl.bool(false)], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+  });
+
+  it("rolls back adapter writes and all dual-position state when prepare-stake fails after writing", () => {
+    const beforeConfig = simnet.callReadOnlyFn(ORCHESTRATOR, "get-config", [], deployer).result;
+    const beforeNextPosition = tupleUint(beforeConfig, "next-position-id");
+    const cycleId = tupleUint(beforeConfig, "reward-cycle");
+    const beforeCycleWeight = simnet.callReadOnlyFn(ORCHESTRATOR, "get-cycle-weight", [Cl.uint(cycleId)], deployer).result;
+    const beforeCycleCount = simnet.callReadOnlyFn(ORCHESTRATOR, "get-cycle-position-count", [Cl.uint(cycleId)], deployer).result;
+    const beforeAdapter = simnet.callReadOnlyFn(ORCHESTRATOR, "get-adapter", [stackingAdapter], deployer).result;
+    const beforeOperatorConfig = simnet.callReadOnlyFn(OPERATOR, "get-config", [], deployer).result;
+    const beforeCommit = simnet.callReadOnlyFn(OPERATOR, "get-commit", [Cl.uint(commit3)], deployer).result;
+    const beforeActiveCommit = simnet.callReadOnlyFn(OPERATOR, "get-active-commit", [Cl.principal(wallet3)], deployer).result;
+    const beforeWalletBalance = simnet.callReadOnlyFn(TOKEN, "get-balance", [Cl.principal(wallet3)], deployer).result;
+    const beforeCustody = simnet.callReadOnlyFn(
+      TOKEN,
+      "get-balance",
+      [contract(deployer, ORCHESTRATOR)],
+      deployer,
+    ).result;
+
+    expect(simnet.callPublicFn(STACKING_ADAPTER, "set-fail-after-prepare", [Cl.bool(true)], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(
+      ORCHESTRATOR,
+      "open-position",
+      [stackingAdapter, Cl.uint(5), token, operator, Cl.uint(commit3)],
+      wallet3,
+    ).result).toEqual(Cl.error(Cl.uint(9101)));
+
+    expect(simnet.callReadOnlyFn(ORCHESTRATOR, "get-position", [Cl.uint(beforeNextPosition)], deployer).result)
+      .toEqual(Cl.none());
+    expect(simnet.callReadOnlyFn(STACKING_ADAPTER, "get-position", [Cl.uint(beforeNextPosition)], deployer).result)
+      .toEqual(Cl.none());
+    expect(simnet.callReadOnlyFn(OPERATOR, "get-commit", [Cl.uint(commit3)], deployer).result)
+      .toEqual(beforeCommit);
+    expect(simnet.callReadOnlyFn(OPERATOR, "get-active-commit", [Cl.principal(wallet3)], deployer).result)
+      .toEqual(beforeActiveCommit);
+    expect(simnet.callReadOnlyFn(OPERATOR, "get-config", [], deployer).result)
+      .toEqual(beforeOperatorConfig);
+    expect(simnet.callReadOnlyFn(TOKEN, "get-balance", [Cl.principal(wallet3)], deployer).result)
+      .toEqual(beforeWalletBalance);
+    expect(simnet.callReadOnlyFn(
+      TOKEN,
+      "get-balance",
+      [contract(deployer, ORCHESTRATOR)],
+      deployer,
+    ).result).toEqual(beforeCustody);
+
+    const afterConfig = simnet.callReadOnlyFn(ORCHESTRATOR, "get-config", [], deployer).result;
+    for (const key of ["next-position-id", "total-exposure", "total-stx-exposure", "total-risk-exposure"]) {
+      expect(tupleUint(afterConfig, key), `${key} changed after rollback`)
+        .toBe(tupleUint(beforeConfig, key));
+    }
+    expect(simnet.callReadOnlyFn(ORCHESTRATOR, "get-adapter", [stackingAdapter], deployer).result)
+      .toEqual(beforeAdapter);
+    expect(simnet.callReadOnlyFn(ORCHESTRATOR, "get-cycle-weight", [Cl.uint(cycleId)], deployer).result)
+      .toEqual(beforeCycleWeight);
+    expect(simnet.callReadOnlyFn(ORCHESTRATOR, "get-cycle-position-count", [Cl.uint(cycleId)], deployer).result)
+      .toEqual(beforeCycleCount);
+
+    expect(simnet.callPublicFn(STACKING_ADAPTER, "set-fail-after-prepare", [Cl.bool(false)], deployer).result)
       .toEqual(Cl.ok(Cl.bool(true)));
   });
 
@@ -509,6 +576,26 @@ describe("dual stacking and delegated native operator", () => {
       [contract(deployer, ORCHESTRATOR)],
       deployer,
     ).result).toEqual(Cl.ok(Cl.uint(1)));
+    expect(simnet.callPublicFn(
+      ORCHESTRATOR,
+      "set-liquid-reserve",
+      [Cl.uint(1_000), Cl.uint(10), Cl.uint(0)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-reward-dust", [Cl.uint(0), rewardToken], deployer).result)
+      .toEqual(Cl.error(Cl.uint(1116)));
+    expect(tupleBool(simnet.callReadOnlyFn(
+      ORCHESTRATOR,
+      "get-reward-pool",
+      [Cl.uint(0), rewardToken],
+      deployer,
+    ).result, "swept")).toBe(false);
+    expect(simnet.callPublicFn(
+      REWARD_TOKEN,
+      "mint",
+      [Cl.uint(10), contract(deployer, ORCHESTRATOR)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
     expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-reward-dust", [Cl.uint(0), rewardToken], deployer).result)
       .toEqual(Cl.ok(Cl.uint(1)));
     expect(simnet.callReadOnlyFn(
@@ -516,9 +603,15 @@ describe("dual stacking and delegated native operator", () => {
       "get-balance",
       [contract(deployer, ORCHESTRATOR)],
       deployer,
-    ).result).toEqual(Cl.ok(Cl.uint(0)));
+    ).result).toEqual(Cl.ok(Cl.uint(10)));
     expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-reward-dust", [Cl.uint(0), rewardToken], deployer).result)
       .toEqual(Cl.error(Cl.uint(1137)));
+    expect(tupleBool(simnet.callReadOnlyFn(
+      ORCHESTRATOR,
+      "get-reward-pool",
+      [Cl.uint(0), rewardToken],
+      deployer,
+    ).result, "swept")).toBe(true);
     expect(tupleUint(simnet.callReadOnlyFn(ORCHESTRATOR, "get-reward-pool", [Cl.uint(0), rewardToken], deployer).result, "claimed"))
       .toBe(99);
 
@@ -533,10 +626,23 @@ describe("dual stacking and delegated native operator", () => {
       .toEqual(Cl.ok(Cl.uint(66)));
     expect(simnet.callPublicFn(ORCHESTRATOR, "claim-stx-reward", [Cl.uint(2), Cl.uint(0)], wallet2).result)
       .toEqual(Cl.error(Cl.uint(1115)));
+    expect(simnet.callPublicFn(
+      ORCHESTRATOR,
+      "set-liquid-reserve",
+      [Cl.uint(1_000), Cl.uint(10), Cl.uint(10)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-stx-reward-dust", [Cl.uint(0)], deployer).result)
+      .toEqual(Cl.error(Cl.uint(1116)));
+    expect(tupleBool(simnet.callReadOnlyFn(ORCHESTRATOR, "get-stx-reward-pool", [Cl.uint(0)], deployer).result, "swept"))
+      .toBe(false);
+    simnet.transferSTX(10, contractId(deployer, ORCHESTRATOR), deployer);
     expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-stx-reward-dust", [Cl.uint(0)], deployer).result)
       .toEqual(Cl.ok(Cl.uint(1)));
     expect(simnet.callPublicFn(ORCHESTRATOR, "sweep-stx-reward-dust", [Cl.uint(0)], deployer).result)
       .toEqual(Cl.error(Cl.uint(1137)));
+    expect(tupleBool(simnet.callReadOnlyFn(ORCHESTRATOR, "get-stx-reward-pool", [Cl.uint(0)], deployer).result, "swept"))
+      .toBe(true);
     expect(tupleUint(simnet.callReadOnlyFn(ORCHESTRATOR, "get-stx-reward-pool", [Cl.uint(0)], deployer).result, "claimed"))
       .toBe(99);
   });

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { validateIssue501RuntimePlan } from "../issue501-plan-validation";
 
 const repoRoot = resolve(__dirname, "../..");
 const issue501Contracts = [
@@ -58,5 +59,21 @@ describe("issue 501 deployment plans", () => {
     const generator = readFileSync(resolve(repoRoot, "scripts/gen-deployment-plans.py"), "utf8");
     expect(generator).toContain("load_manifest_clarity_versions");
     expect(generator).toContain('repo_root / "Clarinet.toml"');
+  });
+
+  it("checks SDK runtime artifact compatibility without pinning stale SDK versions", () => {
+    const sdkPlan = planText(plans[0]).replace(/clarity-version:\s+4/g, "clarity-version: 1");
+    expect(() => validateIssue501RuntimePlan(sdkPlan)).not.toThrow();
+
+    expect(() => validateIssue501RuntimePlan(sdkPlan.replace(
+      "contract-name: stacking-traits",
+      "contract-name: unrelated-trait",
+    ))).toThrow("missing issue-501 contract");
+
+    expect(() => validateIssue501RuntimePlan([
+      "contract-name: native-stacking-operator",
+      "contract-name: stacking-traits",
+      "contract-name: dual-stacking-orchestrator",
+    ].join("\n"))).toThrow("orders stacking-traits after native-stacking-operator");
   });
 });

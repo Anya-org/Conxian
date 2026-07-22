@@ -14,6 +14,7 @@
 (define-data-var risk-bps uint u5000)
 (define-data-var max-exposure uint u1000000)
 (define-data-var fail-prepare bool false)
+(define-data-var fail-after-prepare bool false)
 (define-data-var fail-request bool false)
 (define-data-var fail-finalize bool false)
 
@@ -65,6 +66,14 @@
   )
 )
 
+(define-public (set-fail-after-prepare (should-fail bool))
+  (begin
+    (asserts! (is-admin) ERR_UNAUTHORIZED)
+    (var-set fail-after-prepare should-fail)
+    (ok true)
+  )
+)
+
 (define-read-only (is-active)
   (ok (var-get active))
 )
@@ -84,7 +93,9 @@
     (asserts! (> amount u0) (err u9108))
     (asserts! (is-none (map-get? positions position-id)) ERR_INVALID_STATE)
     (map-set positions position-id { amount: amount, owner: owner, status: u1 })
-    (ok true)
+    (if (var-get fail-after-prepare)
+      ERR_FORCED_FAILURE
+      (ok true))
   )
 )
 

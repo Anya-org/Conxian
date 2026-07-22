@@ -141,7 +141,9 @@ state needed by off-chain keepers and reconciliation jobs.
 - Reward denominators are snapshotted before claims, later positions cannot
   dilute a funded cycle, and funding stops once claims begin. Reward claims and
   BTC entitlements have explicit replay/one-time markers and total-claimed
-  bounds.
+  bounds. Dust sweeps also require the orchestrator's actual reward-token or STX
+  balance to cover the swept remainder plus its configured reserve floor; a
+  failed solvency check leaves `swept` false.
 - An active PoX commit cannot be locally canceled. External finalization is
   authoritative and must succeed before local maturity/exit state is written.
 - The external PoX adapter remains a deployment trust boundary; mocks validate
