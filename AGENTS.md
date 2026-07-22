@@ -73,7 +73,7 @@ git var GIT_AUTHOR_EMAIL
 
 ## 3. Operational Directives
 - **Dual-Clock Heartbeat**: The `trigger-epoch-update` in `ops-engine.clar` is the protocol's heartbeat. Ensure it is efficient and incentivized.
-- **Predictive Risk**: `risk-manager.clar` consolidates liquidation decisions, factoring in `agent-risk` cybernetic scores.
+- **Predictive Risk**: `risk-unit.clar` is the canonical liquidation/risk-score unit; `risk-manager.clar` is query-compatible only, while `agent-risk` publishes normalized scores through explicit wiring.
 - **Financial Accuracy**: Always normalize asset decimals (e.g., STX u6 to CXD u8) when calculating TVL or protocol-wide metrics.
 
 ## 4. Troubleshooting
@@ -119,29 +119,20 @@ ops-engine (heartbeat) / alex-adapter / governance suite
 
 ## 8. Deployment Pipeline (July 2026 Sprint)
 
-### ⚠️ CRITICAL: Mainnet Deployment Status (NOT ACTUAL)
+### Current workflow safety state (July 22, 2026)
 
-**Verification Required**: The deploy-mainnet workflow has `dry_run: true` by default. 
-The workflow runs validate-protocol successfully but **does NOT execute actual deployment** 
-unless `dry_run: false` AND `confirm: DEPLOY_MAINNET` are provided.
+Both `.github/workflows/deploy-testnet.yml` and `.github/workflows/deploy-mainnet.yml` are **preflight/plan-only**. They validate checked-in plans and produce plan-only artifacts; neither workflow signs, broadcasts, or invokes an on-chain deployment command.
 
-| Target | Plan Ready | Actually Deployed? | On-Chain Verified |
-|--------|-----------|-------------------|-------------------|
-| **Testnet** | ✅ Yes | ⚠️ NEEDS VERIFICATION | Check 28719280478 |
-| **Mainnet** | ✅ Yes | ❌ **NO** | 0 STX, 0 TX (user verified) |
+Non-dry attempts are blocked before signing/broadcast pending issue #531's structured receipt-producing deployment path, upstream issues #527–#530, and an approved signer-derived mainnet SP/SM identity. Unresolved plan identities must not be used or capitalized, and workflow success or plan artifacts are not deployment proof.
 
-### Deployer Address
-`ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
+| Target | Plan Ready | Current Workflow State | Live Deployment Proof |
+|--------|------------|------------------------|-----------------------|
+| **Testnet** | ✅ Yes | Preflight/plan-only | None claimed by the workflow |
+| **Mainnet** | ✅ Yes | Preflight/plan-only | None claimed by the workflow |
 
-### What Was Actually Done
-- Deployment plans generated (214 contracts)
-- CI validation passed
-- **Actual blockchain deployment NOT executed**
-
-### To Execute Real Deployment
-1. Fund deployer address with STX (estimate ~11 STX for 214 contracts)
-2. Run workflow with `confirm: DEPLOY_MAINNET` and `dry_run: false`
-3. Verify with: `curl https://stacks-node-api.mainnet.stacks.co/accounts/ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
+### Historical deployment notes
+- Historical session records include deployment-plan generation and CI validation. They are retained as audit context only and do not authorize a broadcast or establish current on-chain state.
+- Any address check is scoped to the checked address or addresses; it must not be read as a claim of global nonexistence.
 
 ### Deployment Plans
 - `deployments/full-system.testnet-plan.yaml` — 10 batches (9 contract-publish + 1 contract-call wiring)
@@ -152,9 +143,9 @@ unless `dry_run: false` AND `confirm: DEPLOY_MAINNET` are provided.
 
 ### CI Workflows
 - **Validate** (PR + push): `clarinet check` → `run-tests.sh` → `coverage`
-- **Deploy Testnet** (workflow_dispatch + push to main): validate → `clarinet deployments apply`
-- **Deploy Mainnet** (workflow_dispatch only): validate → confirm `DEPLOY_MAINNET` → `clarinet deployments apply`
-- **Clarinet version**: v3.21.0 (requires `script -q -c` PTY wrapper for non-interactive `deployments apply`)
+- **Deploy Testnet**: preflight/plan-only validation and artifact generation; non-dry requests are blocked before signing/broadcast.
+- **Deploy Mainnet**: manual preflight/plan-only validation with exact confirmation, plan-hash, and identity gates; non-dry requests are blocked before signing/broadcast.
+- **Clarinet version**: v3.21.0 is pinned for validation; the deployment workflows do not invoke a broadcast command.
 - **Runtime error detection**: `run-tests.sh` captures fd 2, allowlists 4 known benign clarinet-sdk errors, fails on new errors
 
 ### Known Benign Noise
@@ -238,9 +229,13 @@ These are clarinet-sdk v3.21.0 artifacts from plan regeneration with different r
 | bme-engine.clar CXIP-013 | COMPLIANT | Weights aligned: DEX 45%, Bounty 30%, Gov 15%, Grants 10% |
 | dimensional-core.clar | SECURE | liquidation-position gated to risk-unit/risk-manager/admin |
 
-## 12. Mainnet Deployment Prerequisites -- COMPLETE
+## 12. Deployment Prerequisites and Blockers -- CURRENT STATUS
 
-All 12 prerequisites resolved. Mainnet deployed July 2026.
+Live deployment prerequisites are not complete. Both deployment workflows remain preflight/plan-only, and non-dry attempts are blocked before signing/broadcast pending issue #531's structured receipt-producing deployment path, upstream issues #527–#530, and an approved signer-derived mainnet SP/SM identity.
+
+Unresolved plan identities must not be used or capitalized, guessed signer identities are invalid, and workflow results are not deployment proof. Address checks remain scoped to the addresses checked and do not establish global nonexistence.
+
+### Historical sprint checklist (July 2026 records; not current deployment proof)
 
 1. ~~Fix cxd-token get-name/get-symbol~~ -- DONE (P0-1)
 2. ~~Add liquidation auth to dimensional-core~~ -- DONE (P0-2)
@@ -251,20 +246,20 @@ All 12 prerequisites resolved. Mainnet deployed July 2026.
 7. ~~Implement bridge-nft SIP-009~~ -- DONE (P1-3)
 8. ~~Verify BitVM2 attestation in clarity-bitcoin.clar~~ -- HARDENED
 9. ~~Finalize mainnet manifest~~ -- DONE (214 contracts, 10 batches)
-10. ~~Deploy to testnet~~ -- DONE (28719280478, 4.37 STX)
-11. ~~Deploy to mainnet~~ -- DONE (28732058625, 10.79 STX)
+10. ~~Deploy to testnet~~ -- historical record referenced block 28719280478 and 4.37 STX; not revalidated here and not current workflow proof
+11. ~~Deploy to mainnet~~ -- historical record referenced block 28732058625 and 10.79 STX; not revalidated here and not current workflow proof
 12. ~~Merge all sprint PRs (#446, #447, #448, #449, #450)~~ -- DONE
 
-### Remaining Post-Deployment Work (not blockers)
+### Remaining Protocol Work (not deployment authorization)
 - Replace 63 private/read-only unwrap-panic calls (P1-1)
 - Complete alex-adapter with real ALEX contract calls (P2-1)
 - cxs-token.clar stub implementation (P2-3)
 
-## CI Status (July 2026 -- Post-Deployment)
+## CI Status (July 2026 -- Preflight-Only Deployment State)
 - `clarinet check` passes on all active contracts in `Clarinet.toml`.
 - Test suite: 7 suites pass (236 known benign clarinet-sdk stderr warnings suppressed).
 - Runtime error detection active via `run-tests.sh`: allowlists 4 known benign contracts, fails on new errors.
-- Deploy workflows (testnet + mainnet) operational with `script -q -c` PTY wrapper for clarinet v3.21.0.
+- Deploy workflows (testnet + mainnet) validate plans and produce preflight artifacts only; non-dry attempts are blocked before signing/broadcast.
 
 ---
 
@@ -362,11 +357,10 @@ The repository uses GitHub Actions for repository-level automation:
 | 480 | [P0] Developer Sandbox: TTFV < 15 minutes | P0 | deployment, developer-experience | OPEN |
 | 458 | [HIGH] Fake mock pollution: createMockSimnet() returns hardcoded success | HIGH | bug, testing | OPEN |
 
-**Deployment Status (VERIFIED ON-CHAIN):**
-- Deployer: `ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P`
-- Balance: **0 STX** | Transactions: **0**
-- Conclusion: Deployment workflow ran but `dry_run: true` prevented actual deployment
-- **ACTION**: Fund deployer, trigger workflow with `confirm: DEPLOY_MAINNET` and `dry_run: false`
+**Historical deployment-status note (checked-address scope only):**
+- Earlier records reported a zero-balance/zero-transaction check for one unresolved deployer address. That observation is historical, scoped to the checked address, and is not a global nonexistence claim or an approved signer identity.
+- Current testnet and mainnet workflows are preflight/plan-only. Non-dry attempts are blocked before signing/broadcast pending issue #531, upstream issues #527–#530, and an approved signer-derived mainnet SP/SM identity.
+- Do not use or capitalize the unresolved address, and do not treat a non-dry request as an operational path.
 
-**Last Updated**: 2026-07-15T13:31:00Z
+**Last Updated**: 2026-07-22
 

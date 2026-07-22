@@ -23,17 +23,68 @@ ALLOWLIST="conxian-protocol|dex-factory|office-manager|mock-token"
 BATCH_BOUNDARY_CONTEXT='stderr | tests/transaction-batch-processor.test.ts > Transaction Batch Processor > rejects an eleven-item batch at the contract list boundary'
 BATCH_BOUNDARY_DIAGNOSTIC_RE='^Error: Runtime error while interpreting [A-Z0-9]+[.]batch-processor$'
 
-temp=$(mktemp)
-trap "rm -f $temp deployments/default.simnet-plan.yaml.bak" EXIT
+simnet_plan='deployments/default.simnet-plan.yaml'
+temp_dir=$(mktemp -d "${TMPDIR:-/tmp}/conxian-tests.XXXXXX") || {
+  echo "❌ Could not create a secure temporary directory" >&2
+  exit 1
+}
+temp=$(mktemp "$temp_dir/vitest-output.XXXXXX") || {
+  echo "❌ Could not create a secure test-output file" >&2
+  rm -rf -- "$temp_dir"
+  exit 1
+}
+canonical_plan=$(mktemp "$temp_dir/canonical-simnet-plan.XXXXXX") || {
+  echo "❌ Could not create a secure canonical-plan snapshot" >&2
+  rm -rf -- "$temp_dir"
+  exit 1
+}
+snapshot_ready=0
 
-# Snapshot simnet plan to prevent corruption
-cp deployments/default.simnet-plan.yaml deployments/default.simnet-plan.yaml.bak
+cleanup() {
+  local status=$?
+  local cleanup_status=0
+
+  if [ "$snapshot_ready" -eq 1 ]; then
+    if ! cp -- "$canonical_plan" "$simnet_plan"; then
+      echo "❌ Could not restore $simnet_plan from the canonical snapshot" >&2
+      cleanup_status=1
+    fi
+  else
+    echo "❌ No canonical snapshot was available for restoration" >&2
+    cleanup_status=1
+  fi
+  if ! rm -rf -- "$temp_dir"; then
+    echo "❌ Could not remove temporary test files" >&2
+    cleanup_status=1
+  fi
+
+  if [ "$status" -eq 0 ] && [ "$cleanup_status" -ne 0 ]; then
+    status=$cleanup_status
+  fi
+  exit "$status"
+}
+trap cleanup EXIT
+
+# Clarinet may rewrite the checked-in plan during Simnet initialization. Keep a
+# read-only snapshot for child tests and restore the worktree from it on exit.
+cp -- "$simnet_plan" "$canonical_plan" || {
+  echo "❌ Could not snapshot $simnet_plan" >&2
+  exit 1
+}
+snapshot_ready=1
+chmod 400 -- "$canonical_plan" || {
+  echo "❌ Could not make the canonical plan snapshot read-only" >&2
+  exit 1
+}
+export CONXIAN_CANONICAL_SIMNET_PLAN_PATH="$canonical_plan"
 
 npx vitest run --config vitest.config.ts "$@" 2>&1 | tee "$temp"
-vitest_exit=${PIPESTATUS[0]}
-
-# Restore simnet plan
-cp deployments/default.simnet-plan.yaml.bak deployments/default.simnet-plan.yaml
+pipeline_status=("${PIPESTATUS[@]}")
+vitest_exit=${pipeline_status[0]}
+tee_exit=${pipeline_status[1]}
+if [ "$vitest_exit" -eq 0 ] && [ "$tee_exit" -ne 0 ]; then
+  vitest_exit=$tee_exit
+fi
 
 total_errors=$(grep -cE '^Error: Runtime error while interpreting [^ ]+$' "$temp" || true)
 known_errors=$(grep -cE "^Error: Runtime error while interpreting [^ ]+\.($ALLOWLIST)$" "$temp" || true)

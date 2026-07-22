@@ -4,20 +4,29 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry run (generate plan only, no deploy)'
+        description: 'Dry run/preflight only (no signer, broadcast, or deployment proof)'
         type: boolean
         default: true
       confirm:
-        description: 'Type "DEPLOY_MAINNET" to confirm mainnet deployment'
+        description: 'Type "DEPLOY_MAINNET" to request a non-dry attempt'
+        type: string
+        required: true
+      expected_plan_sha256:
+        description: 'Exact SHA-256 of deployments/full-system.mainnet-plan.yaml'
         type: string
         required: true
 
 permissions:
   contents: read
 
+concurrency:
+  group: conxian-deploy-mainnet
+  cancel-in-progress: false
+
 jobs:
   validate-protocol:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
@@ -49,55 +58,108 @@ jobs:
       - name: Restore deployment plan (guard against clarinet rewrite)
         run: cp deployments/default.simnet-plan.yaml.bak deployments/default.simnet-plan.yaml
 
-      - name: Run Full Test Suite
-        run: npm run ci
+      - name: Validate checked-in deployment plans
+        run: |
+          python3 -m pip install --user --disable-pip-version-check 'PyYAML==6.0.2'
+          python3 scripts/gen-deployment-plans.py --check
 
-      - name: Run Coverage
-        run: npm run coverage
+      - name: Run focused deployment safety tests
+        run: |
+          npm run test:deployment-evidence
+          npm run test:release-plan-validation
+          npx vitest run tests/deploy-testnet-script.test.ts tests/deployment-workflows.test.ts --config vitest.config.ts --pool=threads
 
-  deploy-mainnet:
+  preflight-mainnet:
     needs: validate-protocol
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment: mainnet
-    if: ${{ inputs.confirm == 'DEPLOY_MAINNET' }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
-      - name: Set up Node.js
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Clarinet
+      - name: Require exact mainnet confirmation
+        env:
+          CONFIRM: ${{ inputs.confirm }}
         run: |
           set -euo pipefail
-          VERSION="v3.21.0"
-          curl -sSL -o clarinet.tar.gz "https://github.com/stx-labs/clarinet/releases/download/${VERSION}/clarinet-linux-x64-glibc.tar.gz"
-          tar -xzf clarinet.tar.gz clarinet
-          chmod +x clarinet
-          sudo mv clarinet /usr/local/bin/clarinet
-          clarinet --version
+          if [ "$CONFIRM" != "DEPLOY_MAINNET" ]; then
+            echo "::error::Mainnet preflight requires the exact confirmation string DEPLOY_MAINNET; no deployment action was attempted."
+            exit 1
+          fi
 
-      - name: Deploy to Mainnet
-        if: ${{ !inputs.dry_run }}
+      - name: Prepare plan-only artifacts
+        run: mkdir -p deployment-artifacts
+
+      - name: Validate exact mainnet plan, source metadata, and signer identity gate
         env:
-          DEPLOYER_MNEMONIC: ${{ secrets.MAINNET_DEPLOYER_MNEMONIC }}
+          EXPECTED_PLAN_SHA256: ${{ inputs.expected_plan_sha256 }}
+          DRY_RUN: ${{ inputs.dry_run }}
         run: |
-          DEPLOY_LOG=$(mktemp)
-          echo y | script -q -c "clarinet deployments apply \
-            --manifest-path Clarinet.toml \
-            --deployment-plan-path deployments/full-system.mainnet-plan.yaml" \
-            "$DEPLOY_LOG"
-          cat "$DEPLOY_LOG"
-          rm "$DEPLOY_LOG"
+          set -euo pipefail
+          PLAN="deployments/full-system.mainnet-plan.yaml"
+          COMMITTED=$(tr -d '[:space:]' < deployments/full-system.mainnet-plan.sha256)
+          ACTUAL=$(sha256sum "$PLAN" | awk '{print $1}')
+          if ! [[ "$EXPECTED_PLAN_SHA256" =~ ^[0-9a-f]{64}$ ]]; then
+            echo "Expected mainnet plan SHA-256 input is malformed."
+            exit 1
+          fi
+          if [ "$EXPECTED_PLAN_SHA256" != "$ACTUAL" ]; then
+            echo "Mainnet plan SHA-256 input does not match the checked-in plan."
+            exit 1
+          fi
+          if ! [[ "$COMMITTED" =~ ^[0-9a-f]{64}$ ]] || [ "$COMMITTED" != "$ACTUAL" ]; then
+            echo "Committed mainnet plan digest does not match the checked-in plan."
+            exit 1
+          fi
+          NETWORK=$(awk '$1 == "network:" { print $2; exit }' "$PLAN")
+          DEPLOYER=$(awk '$1 == "deployer:" { print $2; exit }' "$PLAN")
+          test "$NETWORK" = "mainnet"
+          case "$DEPLOYER" in
+            SP*|SM*) ;;
+            *)
+              echo "::error::Current mainnet plan identity is unresolved: $DEPLOYER is not an approved mainnet SP/SM identity. Replace it only with an approved identity derived and verified against the configured signer; do not guess an address."
+              if [ "$DRY_RUN" != "true" ]; then exit 1; fi
+              ;;
+          esac
+          printf '%s  %s\n' "$ACTUAL" "$PLAN" > deployment-artifacts/mainnet-plan.sha256
+          cat > deployment-artifacts/mainnet-preflight.json <<EOF
+          {
+            "status": "plan-only/preflight",
+            "network": "$NETWORK",
+            "deployer": "$DEPLOYER",
+            "sourceCommit": "$(git rev-parse HEAD)",
+            "plan": "$PLAN",
+            "planSha256": "$ACTUAL",
+            "broadcast": false,
+            "deploymentProof": false
+          }
+          EOF
 
-      - name: Upload Deployment Plan Artifact
+      - name: Block non-dry broadcast attempts before signing
+        if: ${{ !inputs.dry_run }}
+        run: |
+          echo "::error::Mainnet broadcast is blocked before signing. Issue #531 requires a structured receipt-producing broadcaster; follow the deployment runbook preflight and do not use a workflow success as deployment proof."
+          exit 1
+
+      - name: Write plan-only summary
+        if: always()
+        run: |
+          {
+            echo "## Mainnet preflight (plan-only)"
+            echo "- Status: plan/preflight only"
+            echo "- No mnemonic, signer, broadcast, or deployment proof was used"
+            echo "- Non-dry attempts are blocked before signing pending issue #531"
+            echo "- The current ST mainnet plan identity remains an unresolved blocker"
+            echo "- No automatic testnet-to-mainnet dispatch is defined"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload plan-only artifacts
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: mainnet-deployment-plan
-          path: deployments/full-system.mainnet-plan.yaml
+          name: mainnet-plan-preflight
+          path: |
+            deployments/full-system.mainnet-plan.yaml
+            deployments/full-system.mainnet-plan.sha256
+            deployment-artifacts/
+          if-no-files-found: warn

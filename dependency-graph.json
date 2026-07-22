@@ -109,7 +109,9 @@
   "oracle-adapter-stub": [],
   "sanctions-oracle": [],
   "travel-rule-service": [],
-  "compliance-manager": [],
+  "compliance-manager": [
+    "kyc-registry"
+  ],
   "compliance-trait": [],
   "regulatory-adapter": [],
   "compliance-api": [],
@@ -119,7 +121,10 @@
   "institutional-account-manager": [
     "block-utils"
   ],
-  "compliance-hooks": [],
+  "compliance-hooks": [
+    "compliance-manager",
+    "kyc-registry"
+  ],
   "enterprise-facade": [
     "conxian-access",
     "institutional-account-manager",
@@ -520,9 +525,9 @@
   ],
   "vault-registrar": [],
   "sbtc-vault": [
+    "core-traits",
     "regulatory-adapter",
     "sip-standards",
-    "sbtc-token",
     "vault-traits"
   ],
   "fee-manager": [],

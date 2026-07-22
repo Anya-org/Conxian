@@ -134,6 +134,10 @@ path = "contracts/yield/cross-protocol-integrator.clar"
 [contracts.vault-traits]
 path = "contracts/traits/vault-traits.clar"
 
+[contracts.compoundable-vault-trait]
+path = "contracts/traits/compoundable-vault-trait.clar"
+clarity-version = 4
+
 [contracts.enhanced-yield-strategy]
 path = "contracts/yield/enhanced-yield-strategy.clar"
 
@@ -152,7 +156,7 @@ path = "contracts/compliance/travel-rule-service.clar"
 
 [contracts.compliance-manager]
 path = "contracts/compliance/compliance-manager.clar"
-depends_on = [ "block-utils",]
+depends_on = [ "block-utils", "kyc-registry",]
 
 [contracts.compliance-trait]
 path = "contracts/compliance/compliance-trait.clar"
@@ -540,7 +544,7 @@ path = "contracts/cross-chain/bridge-nft.clar"
 
 [contracts.enterprise-compliance-manager]
 path = "contracts/compliance/compliance-manager.clar"
-depends_on = [ "block-utils",]
+depends_on = [ "block-utils", "kyc-registry",]
 
 [contracts.position-factory]
 path = "contracts/position-factory.clar"
@@ -601,13 +605,65 @@ depends_on = [ "regulatory-adapter",]
 
 [contracts.auto-compounder]
 path = "contracts/yield/auto-compounder.clar"
+clarity-version = 4
+depends_on = ["compoundable-vault-trait"]
 
 [contracts.yield-aggregator]
 path = "contracts/vaults/yield-aggregator.clar"
 
 [contracts.revenue-distributor]
 path = "contracts/treasury/revenue-distributor.clar"
-depends_on = [ "allocation-policy",]
+depends_on = [ "allocation-policy", "cxd-treasury",]
+
+[contracts.cxd-treasury]
+path = "contracts/treasury/cxd-treasury.clar"
+clarity-version = 4
+
+[contracts.revenue-automation]
+path = "contracts/treasury/revenue-automation.clar"
+clarity-version = 4
+depends_on = [ "enterprise-revenue-trait", "revenue-distributor",]
+
+[contracts.compliance-hooks]
+path = "contracts/compliance/compliance-hooks.clar"
+clarity-version = 4
+depends_on = [ "compliance-manager", "enterprise-compliance-trait", "kyc-registry",]
+
+[contracts.enterprise-plan-trait]
+path = "contracts/traits/enterprise-plan-trait.clar"
+clarity-version = 4
+
+[contracts.enterprise-compliance-trait]
+path = "contracts/traits/enterprise-compliance-trait.clar"
+clarity-version = 4
+
+[contracts.enterprise-revenue-trait]
+path = "contracts/traits/enterprise-revenue-trait.clar"
+clarity-version = 4
+
+[contracts.enterprise-subscription-trait]
+path = "contracts/traits/enterprise-subscription-trait.clar"
+clarity-version = 4
+
+[contracts.enterprise-plan-registry]
+path = "contracts/enterprise/enterprise-plan-registry.clar"
+clarity-version = 4
+depends_on = [ "enterprise-plan-trait",]
+
+[contracts.enterprise-subscription]
+path = "contracts/enterprise/enterprise-subscription.clar"
+clarity-version = 4
+depends_on = [ "compliance-hooks", "enterprise-plan-registry", "enterprise-subscription-trait", "revenue-automation",]
+
+[contracts.enterprise-facade]
+path = "contracts/enterprise/enterprise-facade.clar"
+clarity-version = 4
+depends_on = [ "enterprise-subscription",]
+
+[contracts.protocol-fee-collector]
+path = "contracts/treasury/protocol-fee-collector.clar"
+clarity-version = 4
+depends_on = [ "operational-treasury", "sip-standards",]
 
 [contracts.integration-fee-collector]
 path = "contracts/integrations/integration-fee-collector.clar"
@@ -616,7 +672,8 @@ depends_on = [ "integration-fee-trait", "integration-registry", "revenue-distrib
 
 [contracts.sbtc-vault]
 path = "contracts/vaults/sbtc-vault.clar"
-depends_on = [ "regulatory-adapter",]
+clarity-version = 4
+depends_on = [ "core-traits", "regulatory-adapter", "sip-standards", "vault-traits",]
 
 [contracts.token-system-coordinator]
 path = "contracts/tokens/token-system-coordinator.clar"
@@ -731,7 +788,7 @@ path = "contracts/core/ops-engine.clar"
 
 [contracts.cxd-staking]
 path = "contracts/yield/cxd-staking.clar"
-depends_on = [ "regulatory-adapter",]
+depends_on = [ "core-traits", "cxd-token", "regulatory-adapter", "sip-standards",]
 
 [contracts.operational-treasury]
 path = "contracts/core/operational-treasury.clar"

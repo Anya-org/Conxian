@@ -43,6 +43,8 @@ target/
 *.deployed.json
 *.deployed.yaml
 deployment-registry-*.json
+deployment/*-deployment-evidence*.json
+deployment-artifacts/
 
 # 5. TESTING & COVERAGE
 test-results/

@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "1",
+  "evidenceStatus": "broadcast",
+  "coverage": "partial",
+  "generatedAt": "2026-07-22T00:00:00.000Z",
+  "sourceCommit": "REPLACE_WITH_40_HEX_SOURCE_COMMIT",
+  "network": "testnet",
+  "deployer": "REPLACE_WITH_NETWORK_DEPLOYER_ADDRESS",
+  "plan": {
+    "path": "deployments/full-system.testnet-plan.yaml",
+    "sha256": "REPLACE_WITH_64_HEX_PLAN_SHA256"
+  },
+  "claims": {
+    "scope": "checked-addresses",
+    "globalNonexistence": false
+  },
+  "contractPublications": [
+    {
+      "kind": "contract-publish",
+      "planPosition": {
+        "batchId": 0,
+        "transactionIndex": 0
+      },
+      "contractName": "REPLACE_WITH_CONTRACT_NAME",
+      "contractId": "REPLACE_WITH_DEPLOYER.CONTRACT_NAME",
+      "expectedSender": "REPLACE_WITH_NETWORK_DEPLOYER_ADDRESS",
+      "txid": "REPLACE_WITH_0X_64_HEX_TXID"
+    }
+  ],
+  "contractCalls": [],
+  "interfaces": [
+    {
+      "contractId": "REPLACE_WITH_DEPLOYER.CONTRACT_NAME",
+      "requiredFunctions": [
+        {
+          "name": "REPLACE_WITH_FUNCTION_NAME",
+          "access": "read_only"
+        }
+      ]
+    }
+  ],
+  "readOnlyChecks": [
+    {
+      "network": "testnet",
+      "contractId": "REPLACE_WITH_DEPLOYER.CONTRACT_NAME",
+      "sender": "REPLACE_WITH_NETWORK_DEPLOYER_ADDRESS",
+      "functionName": "REPLACE_WITH_READ_ONLY_FUNCTION_NAME",
+      "arguments": [],
+      "expectedOkay": true,
+      "expectedResultHex": "REPLACE_WITH_0X_SERIALIZED_CLARITY_RESULT"
+    }
+  ],
+  "preexistingContracts": []
+}

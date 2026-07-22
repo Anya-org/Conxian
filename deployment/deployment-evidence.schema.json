@@ -1,0 +1,532 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Conxian/Conxian/blob/main/deployment/deployment-evidence.schema.json",
+  "title": "Conxian deployment evidence bundle",
+  "description": "Evidence for checked deployment addresses. A plan, workflow result, or broadcast is not canonical deployment proof.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "evidenceStatus",
+    "generatedAt",
+    "sourceCommit",
+    "network",
+    "deployer",
+    "plan",
+    "claims",
+    "contractPublications",
+    "contractCalls",
+    "interfaces"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1"
+    },
+    "evidenceStatus": {
+      "enum": ["plan", "workflow", "broadcast", "confirmed"]
+    },
+    "coverage": {
+      "enum": ["partial", "complete"]
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "verifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sourceCommit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "network": {
+      "enum": ["testnet", "mainnet"]
+    },
+    "deployer": {
+      "$ref": "#/$defs/address"
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "globalNonexistence"],
+      "properties": {
+        "scope": {
+          "const": "checked-addresses"
+        },
+        "globalNonexistence": {
+          "const": false
+        }
+      }
+    },
+    "contractPublications": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/contractPublication"
+      }
+    },
+    "contractCalls": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/contractCall"
+      }
+    },
+    "interfaces": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/interfaceExpectation"
+      }
+    },
+    "readOnlyChecks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/readOnlyCheck"
+      }
+    },
+    "preexistingContracts": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/contractId"
+      }
+    }
+  },
+  "$defs": {
+    "address": {
+      "type": "string",
+      "description": "A checksum-valid standard Stacks principal. Runtime verification uses @stacks/transactions; this schema intentionally does not impose a fixed address length.",
+      "pattern": "^S[PMTN][0-9A-Z]+$"
+    },
+    "readOnlySender": {
+      "type": "string",
+      "description": "A checksum-valid standard Stacks principal or contract principal accepted by the call-read API. Runtime verification validates the address component, network, and contract name.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/address"
+        },
+        {
+          "pattern": "^S[PMTN][0-9A-Z]+\\.[a-zA-Z][a-zA-Z0-9-]{0,39}$"
+        }
+      ]
+    },
+    "contractName": {
+      "type": "string",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9-]{0,39}$"
+    },
+    "functionName": {
+      "type": "string",
+      "pattern": "^(?:[a-zA-Z](?:[a-zA-Z0-9]|[-_!?+<>=/*])*|[-+=/*]|[<>]=?)$",
+      "maxLength": 127
+    },
+    "clarityHex": {
+      "type": "string",
+      "pattern": "^0x[0-9a-fA-F]+$"
+    },
+    "contractId": {
+      "type": "string",
+      "pattern": "^S[PMTN][0-9A-Z]+\\.[a-zA-Z][a-zA-Z0-9-]{0,39}$"
+    },
+    "txid": {
+      "type": "string",
+      "pattern": "^0x[0-9a-fA-F]{64}$"
+    },
+    "requiredFunction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "access"],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/functionName"
+        },
+        "access": {
+          "enum": ["public", "read_only"]
+        }
+      }
+    },
+    "interfaceFunction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "access"],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/functionName"
+        },
+        "access": {
+          "enum": ["public", "read_only"]
+        },
+        "argumentCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "planPosition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["batchId", "transactionIndex"],
+      "properties": {
+        "batchId": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "transactionIndex": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "canonicalFunctionArgument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type", "hex", "repr"],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/functionName"
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hex": {
+          "type": "string",
+          "pattern": "^0x[0-9a-fA-F]+$"
+        },
+        "repr": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "transactionApiEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observedAt",
+        "endpoint",
+        "txId",
+        "txStatus",
+        "canonical",
+        "isUnanchored",
+        "txType",
+        "senderAddress",
+        "contractId",
+        "functionName",
+        "blockHash",
+        "blockHeight",
+        "burnBlockHeight"
+      ],
+      "properties": {
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endpoint": {
+          "type": "string",
+          "format": "uri"
+        },
+        "txId": {
+          "$ref": "#/$defs/txid"
+        },
+        "txStatus": {
+          "const": "success"
+        },
+        "canonical": {
+          "const": true
+        },
+        "isUnanchored": {
+          "const": false
+        },
+        "txType": {
+          "enum": ["smart_contract", "contract_call"]
+        },
+        "senderAddress": {
+          "$ref": "#/$defs/address"
+        },
+        "contractId": {
+          "$ref": "#/$defs/contractId"
+        },
+        "functionName": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/functionName"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blockHash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blockHeight": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "burnBlockHash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "burnBlockHeight": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "functionArgs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/canonicalFunctionArgument"
+          }
+        },
+        "blockTimeIso": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "burnBlockTimeIso": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "interfaceApiEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observedAt", "endpoint", "httpStatus", "functions"],
+      "properties": {
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endpoint": {
+          "type": "string",
+          "format": "uri"
+        },
+        "httpStatus": {
+          "const": 200
+        },
+        "functions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/interfaceFunction"
+          }
+        }
+      }
+    },
+    "contractPublication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "planPosition", "contractName", "contractId", "expectedSender", "txid"],
+      "properties": {
+        "kind": {
+          "const": "contract-publish"
+        },
+        "planPosition": {
+          "$ref": "#/$defs/planPosition"
+        },
+        "contractName": {
+          "$ref": "#/$defs/contractName"
+        },
+        "contractId": {
+          "$ref": "#/$defs/contractId"
+        },
+        "expectedSender": {
+          "$ref": "#/$defs/address"
+        },
+        "txid": {
+          "$ref": "#/$defs/txid"
+        },
+        "apiEvidence": {
+          "$ref": "#/$defs/transactionApiEvidence"
+        }
+      }
+    },
+    "contractCall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "planPosition", "contractId", "functionName", "expectedSender", "txid"],
+      "properties": {
+        "kind": {
+          "const": "contract-call"
+        },
+        "planPosition": {
+          "$ref": "#/$defs/planPosition"
+        },
+        "contractId": {
+          "$ref": "#/$defs/contractId"
+        },
+        "functionName": {
+          "$ref": "#/$defs/functionName"
+        },
+        "expectedSender": {
+          "$ref": "#/$defs/address"
+        },
+        "txid": {
+          "$ref": "#/$defs/txid"
+        },
+        "apiEvidence": {
+          "$ref": "#/$defs/transactionApiEvidence"
+        }
+      }
+    },
+    "interfaceExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contractId", "requiredFunctions"],
+      "properties": {
+        "contractId": {
+          "$ref": "#/$defs/contractId"
+        },
+        "requiredFunctions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/requiredFunction"
+          }
+        },
+        "interfaceEvidence": {
+          "$ref": "#/$defs/interfaceApiEvidence"
+        }
+      }
+    },
+    "readOnlyApiEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observedAt",
+        "endpoint",
+        "httpStatus",
+        "sender",
+        "arguments",
+        "okay",
+        "resultHex"
+      ],
+      "properties": {
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endpoint": {
+          "type": "string",
+          "format": "uri"
+        },
+        "httpStatus": {
+          "const": 200
+        },
+        "sender": {
+          "$ref": "#/$defs/readOnlySender"
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/clarityHex"
+          }
+        },
+        "okay": {
+          "const": true
+        },
+        "resultHex": {
+          "$ref": "#/$defs/clarityHex"
+        }
+      }
+    },
+    "readOnlyCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "network",
+        "contractId",
+        "sender",
+        "functionName",
+        "arguments",
+        "expectedOkay",
+        "expectedResultHex"
+      ],
+      "properties": {
+        "network": {
+          "enum": ["testnet", "mainnet"]
+        },
+        "contractId": {
+          "$ref": "#/$defs/contractId"
+        },
+        "sender": {
+          "$ref": "#/$defs/readOnlySender"
+        },
+        "functionName": {
+          "$ref": "#/$defs/functionName"
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/clarityHex"
+          }
+        },
+        "expectedOkay": {
+          "const": true
+        },
+        "expectedResultHex": {
+          "$ref": "#/$defs/clarityHex"
+        },
+        "apiEvidence": {
+          "$ref": "#/$defs/readOnlyApiEvidence"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "evidenceStatus": {
+            "const": "confirmed"
+          }
+        }
+      },
+      "then": {
+        "required": ["coverage", "verifiedAt"],
+        "properties": {
+          "coverage": {
+            "const": "complete"
+          },
+          "preexistingContracts": {
+            "maxItems": 0
+          },
+          "readOnlyChecks": {
+            "items": {
+              "required": ["apiEvidence"]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "evidenceStatus": {
+            "const": "broadcast"
+          }
+        }
+      },
+      "then": {
+        "required": ["coverage"],
+        "properties": {
+          "coverage": {
+            "const": "partial"
+          }
+        }
+      }
+    }
+  ]
+}

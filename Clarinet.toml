@@ -65,7 +65,7 @@ clarity-version = 4
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
 clarity-version = 4
-depends_on = ["conxian-protocol", "finance-metrics"]
+depends_on = ["conxian-protocol", "core-traits", "finance-metrics"]
 
 [contracts.cxd-token]
 path = "contracts/tokens/cxd-token.clar"
@@ -80,12 +80,17 @@ depends_on = ["conxian-access", "cxd-token", "sip-standards"]
 [contracts.revenue-automation]
 path = "contracts/treasury/revenue-automation.clar"
 clarity-version = 4
-depends_on = ["revenue-distributor", "sip-standards"]
+depends_on = ["enterprise-revenue-trait", "revenue-distributor", "sip-standards"]
+
+[contracts.protocol-fee-collector]
+path = "contracts/treasury/protocol-fee-collector.clar"
+clarity-version = 4
+depends_on = ["operational-treasury", "sip-standards"]
 
 [contracts.revenue-distributor]
 path = "contracts/treasury/revenue-distributor.clar"
 clarity-version = 4
-depends_on = ["bme-engine", "conxian-protocol", "cxd-token", "operational-treasury", "sip-standards", "swap-router"]
+depends_on = ["bme-engine", "conxian-protocol", "cxd-token", "cxd-treasury", "operational-treasury", "sip-standards", "swap-router"]
 
 [contracts.integration-fee-collector]
 path = "contracts/integrations/integration-fee-collector.clar"
@@ -150,6 +155,7 @@ depends_on = ["sip-standards"]
 [contracts.auto-compounder]
 path = "contracts/yield/auto-compounder.clar"
 clarity-version = 4
+depends_on = ["compoundable-vault-trait"]
 
 [contracts.automation-manager]
 path = "contracts/automation/automation-manager.clar"
@@ -249,11 +255,12 @@ depends_on = ["core-traits", "cxvg-token", "operational-treasury", "regulatory-a
 [contracts.compliance-hooks]
 path = "contracts/compliance/compliance-hooks.clar"
 clarity-version = 4
-depends_on = ["compliance-manager", "kyc-registry"]
+depends_on = ["compliance-manager", "enterprise-compliance-trait", "kyc-registry"]
 
 [contracts.compliance-manager]
 path = "contracts/compliance/compliance-manager.clar"
 clarity-version = 4
+depends_on = ["kyc-registry"]
 
 [contracts.compliance-trait]
 path = "contracts/compliance/compliance-trait.clar"
@@ -330,7 +337,7 @@ clarity-version = 4
 [contracts.cxd-staking]
 path = "contracts/yield/cxd-staking.clar"
 clarity-version = 4
-depends_on = ["regulatory-adapter"]
+depends_on = ["core-traits", "cxd-token", "regulatory-adapter", "sip-standards"]
 
 [contracts.cxd-treasury]
 path = "contracts/treasury/cxd-treasury.clar"
@@ -456,10 +463,37 @@ depends_on = ["compliance-hooks"]
 [contracts.enterprise-facade]
 path = "contracts/enterprise/enterprise-facade.clar"
 clarity-version = 4
+depends_on = ["enterprise-subscription"]
 
 [contracts.enterprise-traits]
 path = "contracts/traits/enterprise-traits.clar"
 clarity-version = 4
+
+[contracts.enterprise-plan-trait]
+path = "contracts/traits/enterprise-plan-trait.clar"
+clarity-version = 4
+
+[contracts.enterprise-compliance-trait]
+path = "contracts/traits/enterprise-compliance-trait.clar"
+clarity-version = 4
+
+[contracts.enterprise-revenue-trait]
+path = "contracts/traits/enterprise-revenue-trait.clar"
+clarity-version = 4
+
+[contracts.enterprise-subscription-trait]
+path = "contracts/traits/enterprise-subscription-trait.clar"
+clarity-version = 4
+
+[contracts.enterprise-plan-registry]
+path = "contracts/enterprise/enterprise-plan-registry.clar"
+clarity-version = 4
+depends_on = ["enterprise-plan-trait"]
+
+[contracts.enterprise-subscription]
+path = "contracts/enterprise/enterprise-subscription.clar"
+clarity-version = 4
+depends_on = ["compliance-hooks", "enterprise-plan-registry", "enterprise-subscription-trait", "revenue-automation"]
 
 [contracts.exponentiation]
 path = "contracts/math/exponentiation.clar"
@@ -645,6 +679,16 @@ depends_on = ["core-traits"]
 path = "contracts/test-helpers/mock-token.clar"
 clarity-version = 4
 depends_on = ["sip-standards"]
+
+[contracts.mock-compoundable-vault]
+path = "contracts/test-helpers/mock-compoundable-vault.clar"
+clarity-version = 4
+depends_on = ["compoundable-vault-trait"]
+
+[contracts.mock-admin-forwarder]
+path = "contracts/test-helpers/mock-admin-forwarder.clar"
+clarity-version = 4
+depends_on = ["auto-compounder", "compoundable-vault-trait", "cxd-staking"]
 
 [contracts.mock-reward-token]
 path = "contracts/test-helpers/mock-reward-token.clar"
@@ -915,7 +959,7 @@ depends_on = ["sip-standards"]
 [contracts.sbtc-vault]
 path = "contracts/vaults/sbtc-vault.clar"
 clarity-version = 4
-depends_on = ["regulatory-adapter", "sip-standards"]
+depends_on = ["core-traits", "regulatory-adapter", "sip-standards", "vault-traits"]
 
 [contracts.self-launch-coordinator]
 path = "contracts/core/self-launch-coordinator.clar"
@@ -954,7 +998,7 @@ clarity-version = 4
 [contracts.test-c4-helper]
 path = "contracts/test-helpers/test-c4-helper.clar"
 clarity-version = 4
-depends_on = ["opex-vault", "sip-standards"]
+depends_on = ["opex-vault", "protocol-fee-collector", "sip-standards"]
 
 [contracts.timelock]
 path = "contracts/governance/timelock.clar"
@@ -998,6 +1042,10 @@ depends_on = ["circuit-breaker", "conxian-protocol", "sip-standards"]
 path = "contracts/traits/vault-traits.clar"
 clarity-version = 4
 depends_on = ["sip-standards"]
+
+[contracts.compoundable-vault-trait]
+path = "contracts/traits/compoundable-vault-trait.clar"
+clarity-version = 4
 
 [contracts.voting]
 path = "contracts/governance/voting.clar"
