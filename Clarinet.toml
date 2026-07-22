@@ -326,7 +326,7 @@ clarity-version = 4
 [contracts.cxd-staking]
 path = "contracts/yield/cxd-staking.clar"
 clarity-version = 4
-depends_on = ["regulatory-adapter"]
+depends_on = ["core-traits", "cxd-token", "regulatory-adapter", "sip-standards"]
 
 [contracts.cxd-treasury]
 path = "contracts/treasury/cxd-treasury.clar"

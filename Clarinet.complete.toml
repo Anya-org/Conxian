@@ -702,7 +702,7 @@ path = "contracts/core/ops-engine.clar"
 
 [contracts.cxd-staking]
 path = "contracts/yield/cxd-staking.clar"
-depends_on = [ "regulatory-adapter",]
+depends_on = [ "core-traits", "cxd-token", "regulatory-adapter", "sip-standards",]
 
 [contracts.operational-treasury]
 path = "contracts/core/operational-treasury.clar"
