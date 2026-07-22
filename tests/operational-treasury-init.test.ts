@@ -53,6 +53,12 @@ describe('Operational treasury initialization custody', () => {
       [Cl.uint(1)],
       deployer,
     ).result).toEqual(Cl.error(Cl.uint(ERR_TREASURY_NOT_INITIALIZED)));
+    expect(simnet.callPublicFn(
+      'protocol-fee-collector',
+      'recover-excess-stx',
+      [Cl.uint(1)],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_TREASURY_NOT_INITIALIZED)));
   });
 
   it('allows the publish-time owner to initialize and preserves withdrawal custody', () => {

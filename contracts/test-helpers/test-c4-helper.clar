@@ -34,6 +34,22 @@
   (contract-call? .protocol-fee-collector route-ft token amount)
 )
 
+(define-public (collector-recover-excess-stx (amount uint))
+  (contract-call? .protocol-fee-collector recover-excess-stx amount)
+)
+
+(define-public (collector-set-admin (new-admin principal))
+  (contract-call? .protocol-fee-collector set-admin new-admin)
+)
+
+(define-public (collector-set-authorized-source (source principal) (authorized bool))
+  (contract-call? .protocol-fee-collector set-authorized-source source authorized)
+)
+
+(define-public (deposit-stx-to-collector (amount uint))
+  (stx-transfer? amount tx-sender .protocol-fee-collector)
+)
+
 (define-read-only (test-c4)
     (ok {
         time: burn-block-height,

@@ -15,6 +15,7 @@ const ERR_INVALID_ROUTE = 4107;
 const ERR_INVALID_AMOUNT = 4109;
 const ERR_SETTLEMENT_REPLAYED = 4110;
 const ERR_STREAM_ALREADY_REGISTERED = 4117;
+const ERR_EXCESS_RECOVERY_EXCEEDS_AVAILABLE = 4122;
 
 describe('Canonical protocol fee collector', () => {
   let deployer: string;
@@ -744,5 +745,234 @@ describe('Canonical protocol fee collector', () => {
     expect(accounting?.['fee-remainder']).toEqual(Cl.uint(100));
     expect(accounting?.['last-rate-bps']).toEqual(Cl.uint(150));
     expect(accounting?.['last-phase']).toEqual(Cl.uint(2));
+  });
+
+  it('recovers only excess direct STX deposits to operational treasury', () => {
+    const streamId = 1010;
+    registerStxStream(wallet1, streamId);
+    const fee = readUint('calculate-current-fee', [Cl.uint(10_000)]);
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'settle-stx',
+      [Cl.uint(streamId), Cl.uint(10_000), settlementId(50)],
+      wallet1,
+    ).result).toEqual(Cl.ok(Cl.uint(fee)));
+
+    const directDeposit = 50n;
+    const directDepositorBefore = stxBalance(wallet1);
+    const collectorBeforeDeposit = stxBalance(collectorPrincipal);
+    expect(simnet.callPublicFn(
+      'test-c4-helper',
+      'deposit-stx-to-collector',
+      [Cl.uint(directDeposit)],
+      wallet1,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(stxBalance(wallet1)).toBe(directDepositorBefore - directDeposit);
+    expect(stxBalance(collectorPrincipal)).toBe(collectorBeforeDeposit + directDeposit);
+
+    const routedBefore = readUint('get-total-routed-stx');
+    const routesBefore = readUint('get-total-routes');
+    const recoveredBefore = readUint('get-excess-recovered-stx');
+    const collectorBeforeRejectedRecovery = stxBalance(collectorPrincipal);
+    const treasuryBeforeRejectedRecovery = stxBalance(operationalTreasury);
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'recover-excess-stx',
+      [Cl.uint(directDeposit + 1n)],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_EXCESS_RECOVERY_EXCEEDS_AVAILABLE)));
+    expect(stxBalance(collectorPrincipal)).toBe(collectorBeforeRejectedRecovery);
+    expect(stxBalance(operationalTreasury)).toBe(treasuryBeforeRejectedRecovery);
+    expect(readUint('get-excess-recovered-stx')).toBe(recoveredBefore);
+
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'recover-excess-stx',
+      [Cl.uint(directDeposit)],
+      wallet1,
+    ).result.type).toBe('err');
+    expect(stxBalance(collectorPrincipal)).toBe(collectorBeforeRejectedRecovery);
+    expect(stxBalance(operationalTreasury)).toBe(treasuryBeforeRejectedRecovery);
+
+    const collectorBeforeRecovery = stxBalance(collectorPrincipal);
+    const treasuryBeforeRecovery = stxBalance(operationalTreasury);
+    const recoveryReceipt: any = simnet.callPublicFn(
+      'test-c4-helper',
+      'collector-recover-excess-stx',
+      [Cl.uint(directDeposit)],
+      deployer,
+    );
+    expect(recoveryReceipt.result).toEqual(Cl.ok(Cl.uint(directDeposit)));
+    expect(stxBalance(collectorPrincipal)).toBe(collectorBeforeRecovery - directDeposit);
+    expect(stxBalance(operationalTreasury)).toBe(treasuryBeforeRecovery + directDeposit);
+    expect(readUint('get-total-routed-stx')).toBe(routedBefore);
+    expect(readUint('get-total-routes')).toBe(routesBefore);
+    expect(readUint('get-excess-recovered-stx')).toBe(recoveredBefore + directDeposit);
+    expect(readUint('get-total-recovered-excess-stx')).toBe(recoveredBefore + directDeposit);
+
+    const recoveryEvent: any = printEvent(recoveryReceipt);
+    expect(recoveryEvent.value.event).toEqual(Cl.stringAscii('protocol-fee-excess-recovered'));
+    expect(recoveryEvent.value['asset-kind']).toEqual(Cl.uint(ASSET_KIND_STX));
+    expect(recoveryEvent.value.asset).toEqual(Cl.none());
+    expect(recoveryEvent.value.amount).toEqual(Cl.uint(directDeposit));
+    expect(recoveryEvent.value.collector).toEqual(Cl.principal(collectorPrincipal));
+    expect(recoveryEvent.value.destination).toEqual(Cl.principal(operationalTreasury));
+    expect(recoveryEvent.value['tracked-outstanding-custody']).toEqual(Cl.uint(
+      BigInt(recoveryEvent.value['tracked-outstanding-custody'].value),
+    ));
+    expect(recoveryEvent.value['excess-before-recovery']).toEqual(Cl.uint(directDeposit));
+    expect(recoveryEvent.value['recovered-total']).toEqual(Cl.uint(recoveredBefore + directDeposit));
+
+    // The remaining collector balance is accounted fee custody, not recoverable
+    // excess. A direct recovery attempt cannot consume it.
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'recover-excess-stx',
+      [Cl.uint(1)],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_EXCESS_RECOVERY_EXCEEDS_AVAILABLE)));
+  });
+
+  it('recovers only excess direct FT deposits and rolls back failed token transfers', () => {
+    const streamId = 1011;
+    registerFtStream(wallet1, streamId);
+    const directDeposit = 75n;
+    expect(simnet.callPublicFn(
+      'mock-token',
+      'mint',
+      [Cl.uint(10_000), Cl.principal(wallet1)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+
+    const fee = readUint('calculate-current-fee', [Cl.uint(10_000)]);
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'settle-ft',
+      [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(streamId), Cl.uint(10_000), settlementId(51)],
+      wallet1,
+    ).result).toEqual(Cl.ok(Cl.uint(fee)));
+    expect(simnet.callPublicFn(
+      'mock-token',
+      'transfer',
+      [Cl.uint(directDeposit), Cl.principal(wallet1), Cl.principal(collectorPrincipal), Cl.none()],
+      wallet1,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+
+    const routedBefore = readUint('get-routed-ft', [Cl.principal(mockToken)]);
+    const routesBefore = readUint('get-total-routes');
+    const recoveredBefore = readUint('get-excess-recovered-ft', [Cl.principal(mockToken)]);
+    const collectorBeforeFailure = mockTokenBalance(collectorPrincipal);
+    const treasuryBeforeFailure = mockTokenBalance(operationalTreasury);
+
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'recover-excess-ft',
+      [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(directDeposit)],
+      wallet1,
+    ).result.type).toBe('err');
+    expect(mockTokenBalance(collectorPrincipal)).toBe(collectorBeforeFailure);
+    expect(mockTokenBalance(operationalTreasury)).toBe(treasuryBeforeFailure);
+
+    expect(simnet.callPublicFn(
+      'mock-token',
+      'set-transfer-failure',
+      [Cl.bool(true)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    const failedRecovery: any = simnet.callPublicFn(
+      COLLECTOR,
+      'recover-excess-ft',
+      [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(directDeposit)],
+      deployer,
+    );
+    expect(failedRecovery.result).toEqual(Cl.error(Cl.uint(2)));
+    expect(mockTokenBalance(collectorPrincipal)).toBe(collectorBeforeFailure);
+    expect(mockTokenBalance(operationalTreasury)).toBe(treasuryBeforeFailure);
+    expect(readUint('get-excess-recovered-ft', [Cl.principal(mockToken)])).toBe(recoveredBefore);
+    expect(readUint('get-routed-ft', [Cl.principal(mockToken)])).toBe(routedBefore);
+    expect(readUint('get-total-routes')).toBe(routesBefore);
+    expect(simnet.callPublicFn(
+      'mock-token',
+      'set-transfer-failure',
+      [Cl.bool(false)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(false)));
+
+    const collectorBeforeRecovery = mockTokenBalance(collectorPrincipal);
+    const treasuryBeforeRecovery = mockTokenBalance(operationalTreasury);
+    const recoveryReceipt: any = simnet.callPublicFn(
+      COLLECTOR,
+      'recover-excess-ft',
+      [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(directDeposit)],
+      deployer,
+    );
+    expect(recoveryReceipt.result).toEqual(Cl.ok(Cl.uint(directDeposit)));
+    expect(mockTokenBalance(collectorPrincipal)).toBe(collectorBeforeRecovery - directDeposit);
+    expect(mockTokenBalance(operationalTreasury)).toBe(treasuryBeforeRecovery + directDeposit);
+    expect(readUint('get-routed-ft', [Cl.principal(mockToken)])).toBe(routedBefore);
+    expect(readUint('get-total-routes')).toBe(routesBefore);
+    expect(readUint('get-excess-recovered-ft', [Cl.principal(mockToken)])).toBe(recoveredBefore + directDeposit);
+
+    const recoveryEvent: any = printEvent(recoveryReceipt);
+    expect(recoveryEvent.value.event).toEqual(Cl.stringAscii('protocol-fee-excess-recovered'));
+    expect(recoveryEvent.value['asset-kind']).toEqual(Cl.uint(ASSET_KIND_FT));
+    expect(recoveryEvent.value.asset).toEqual(Cl.some(Cl.principal(mockToken)));
+    expect(recoveryEvent.value.amount).toEqual(Cl.uint(directDeposit));
+    expect(recoveryEvent.value.collector).toEqual(Cl.principal(collectorPrincipal));
+    expect(recoveryEvent.value.destination).toEqual(Cl.principal(operationalTreasury));
+    expect(recoveryEvent.value['excess-before-recovery']).toEqual(Cl.uint(directDeposit));
+    expect(recoveryEvent.value['recovered-total']).toEqual(Cl.uint(recoveredBefore + directDeposit));
+
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'recover-excess-ft',
+      [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(1)],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_EXCESS_RECOVERY_EXCEEDS_AVAILABLE)));
+  });
+
+  it('supports immediate-caller admin handoff to an approved governance contract', () => {
+    expect(simnet.callReadOnlyFn(COLLECTOR, 'get-admin', [], deployer).result)
+      .toEqual(Cl.ok(Cl.principal(deployer)));
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'set-admin',
+      [Cl.principal(governanceProxy)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callReadOnlyFn(COLLECTOR, 'get-admin', [], deployer).result)
+      .toEqual(Cl.ok(Cl.principal(governanceProxy)));
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'set-authorized-source',
+      [Cl.principal(wallet2), Cl.bool(true)],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_UNAUTHORIZED)));
+    expect(simnet.callPublicFn(
+      'test-c4-helper',
+      'collector-set-authorized-source',
+      [Cl.principal(wallet2), Cl.bool(true)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callReadOnlyFn(
+      COLLECTOR,
+      'is-authorized-source',
+      [Cl.principal(wallet2)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(
+      'test-c4-helper',
+      'collector-set-admin',
+      [Cl.principal(deployer)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callReadOnlyFn(COLLECTOR, 'get-admin', [], deployer).result)
+      .toEqual(Cl.ok(Cl.principal(deployer)));
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'set-authorized-source',
+      [Cl.principal(wallet2), Cl.bool(false)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(false)));
   });
 });

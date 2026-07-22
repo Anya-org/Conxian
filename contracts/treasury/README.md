@@ -42,9 +42,12 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 | `settle-stx` | `(stream-id uint) (eligible-fee-base uint) (settlement-id (buff 32))` | Calculates residual-aware fee and atomically transfers STX from payer to `.protocol-fee-collector`. |
 | `route-ft` | `(token <sip-010-ft-trait>) (amount uint)` | After secure treasury initialization, routes still-unrouted collector-held FT custody to the immutable `.operational-treasury` destination (admin or governance contract). |
 | `route-stx` | `(amount uint)` | After secure treasury initialization, routes still-unrouted collector-held STX custody to the immutable `.operational-treasury` destination (admin or governance contract). |
+| `recover-excess-ft` | `(token <sip-010-ft-trait>) (amount uint)` | Recovers only live FT balance above tracked collected-but-not-routed custody to the immutable `.operational-treasury` destination; does not change normal route/revenue totals. |
+| `recover-excess-stx` | `(amount uint)` | Recovers only live STX balance above tracked collected-but-not-routed custody to the immutable `.operational-treasury` destination; does not change normal route/revenue totals. |
 | `get-accounting` | `(source principal) (stream-id uint) (asset-kind uint) (asset (optional principal))` | Reads cumulative eligible, assessed, settled-at-collector-ingress, residual, and settlement-count state; use `none` for native STX. |
 | `get-settlement` | `(source principal) (settlement-id (buff 32))` | Reads the immutable `(source, settlement-id)` record used by indexers. |
 | `get-asset-accounting` | `(asset-kind uint) (asset (optional principal))` | Separates collected-at-collector totals from routed-to-treasury totals and route count; use `none` for native STX. |
+| `get-excess-recovery-accounting` | `(asset-kind uint) (asset (optional principal))` | Reads separate excess-recovered totals by asset; use `none` for native STX. |
 
 The launch rate is 200 bps for the half-open interval
 `[activation, activation + 52,560)`, growth is 150 bps for
@@ -71,10 +74,22 @@ derive their own base from successful economic operations; an admin-authorized
 EOA is an operational trust boundary, not trustless KPI proof.
 
 Phase 1 does not authorize or wire DEX/lending sources and does not change
-`conxian-access.clar`. Deployment wiring initializes
-`.operational-treasury` before assigning the collector's approved timelock
-governance caller; the collector also rejects every route until the treasury's
-initialized flag is true. No source registration is included.
+`conxian-access.clar`; no source is production-authorized. The checked-in
+production deployment plans and generator intentionally do not publish or wire
+this collector yet. They are deferred until network-correct deployer identities
+and source migrations are separately approved, so those artifacts are not a
+deployability claim.
+
+Production bootstrap must initialize `.operational-treasury`, configure the
+approved governance/timelock/multisig, and then use `set-admin` to hand the
+collector admin role to that approved contract before registering any source.
+Retaining deployer admin is not production-ready. The deliberate immediate
+caller model permits the configured admin contract to perform admin operations,
+while governance and admin custody operations always use the immutable
+`.operational-treasury` destination; no caller can redirect custody to an
+arbitrary recipient. Direct deposits are recoverable only as live balance above
+tracked collected-but-not-routed custody, with separate excess-recovered
+accounting and events.
 
 See [`docs/PROTOCOL_FEE_KPI_SPEC.md`](../../docs/PROTOCOL_FEE_KPI_SPEC.md) for
 the indexed volume, fee, revenue, allocation, and USD-normalization schema.
@@ -97,7 +112,9 @@ The phase-1 collector does **not** call this route. It first transfers assessed
 FT or STX from the payer to `.protocol-fee-collector`. A later explicit
 `route-ft`/`route-stx` operation may forward only still-unrouted, collected
 custody to the fixed `.operational-treasury` destination after initialization;
-failed transfers roll back route accounting and events. Collection at ingress,
+`recover-excess-ft`/`recover-excess-stx` may forward only unaccounted live
+balance to that same fixed destination. Failed transfers roll back route or
+recovery accounting and events. Collection at ingress,
 routed treasury inflow, realized downstream revenue, and Fiscal Dam allocation
 remain separate evidence stages. This deliberate boundary removes the
 collector-to-distributor-to-DEX dependency cycle.

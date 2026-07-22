@@ -70,9 +70,6 @@ batches:
           contract-name: operational-treasury
           path: contracts/core/operational-treasury.clar
       - contract-publish:
-          contract-name: protocol-fee-collector
-          path: contracts/treasury/protocol-fee-collector.clar
-      - contract-publish:
           contract-name: federated-oracle-adapter
           path: contracts/oracle/federated-oracle-adapter.clar
       - contract-publish:
@@ -212,9 +209,6 @@ batches:
           contract-name: proposal-engine
           path: contracts/governance/proposal-engine.clar
       - contract-publish:
-          contract-name: timelock
-          path: contracts/governance/timelock.clar
-      - contract-publish:
           contract-name: proposal-executor
           path: contracts/governance/proposal-executor.clar
       - contract-publish:
@@ -233,10 +227,6 @@ batches:
           contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.operational-treasury"
           method: "initialize"
           parameters: ["'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"]
-      - contract-call:
-          contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.protocol-fee-collector"
-          method: "set-governance"
-          parameters: ["'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.timelock"]
       - contract-call:
           contract-id: "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.cxd-token"
           method: "add-minter"

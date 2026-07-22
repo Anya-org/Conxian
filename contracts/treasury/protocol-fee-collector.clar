@@ -35,6 +35,10 @@
 (define-constant ERR_STREAM_ALREADY_REGISTERED (err u4117))
 (define-constant ERR_TREASURY_NOT_INITIALIZED (err u4118))
 (define-constant ERR_ROUTE_EXCEEDS_COLLECTED (err u4119))
+(define-constant ERR_CUSTODY_ACCOUNTING_INCONSISTENT (err u4120))
+(define-constant ERR_CUSTODY_BALANCE_SHORTFALL (err u4121))
+(define-constant ERR_EXCESS_RECOVERY_EXCEEDS_AVAILABLE (err u4122))
+(define-constant ERR_ASSET_BALANCE_READ_FAILED (err u4123))
 
 ;; --- Constants ---
 
@@ -80,6 +84,7 @@
 (define-data-var total-routes uint u0)
 (define-data-var total-collected-stx uint u0)
 (define-data-var total-routed-stx uint u0)
+(define-data-var total-recovered-excess-stx uint u0)
 
 ;; An authorized source is the immediate contract caller. Direct EOAs remain
 ;; available for simnet and controlled operations, but production KPI evidence
@@ -142,6 +147,19 @@
   }
 )
 
+;; Direct deposits are not fee collection. Keep their recovery totals in a
+;; separate map so excess recovery cannot inflate normal collected/routed
+;; custody or revenue counters.
+(define-map excess-recovery-accounting
+  {
+    asset-kind: uint,
+    asset: (optional principal)
+  }
+  {
+    recovered-excess: uint
+  }
+)
+
 ;; Replay protection is scoped to the authorized source plus settlement ID.
 ;; This permits independent sources to use the same local ID while preserving
 ;; uniqueness for every source's own settlement stream.
@@ -174,6 +192,12 @@
   (if (> left (- MAX_UINT right))
     none
     (some (+ left right)))
+)
+
+(define-private (safe-sub (left uint) (right uint))
+  (if (< left right)
+    none
+    (some (- left right)))
 )
 
 (define-private (safe-multiply (left uint) (right uint))
@@ -236,6 +260,12 @@
     collected-fees: u0,
     routed-fees: u0,
     route-count: u0
+  }
+)
+
+(define-private (empty-excess-recovery)
+  {
+    recovered-excess: u0
   }
 )
 
@@ -791,6 +821,112 @@
   )
 )
 
+;; Recover only direct STX deposits that are above the collector's tracked,
+;; collected-but-not-yet-routed custody. The destination is immutable and the
+;; operation never changes normal collection or route counters.
+(define-public (recover-excess-stx (amount uint))
+  (begin
+    (asserts! (is-admin-or-governance) ERR_UNAUTHORIZED)
+    (asserts! (> amount u0) ERR_INVALID_AMOUNT)
+    (asserts! (contract-call? .operational-treasury is-initialized) ERR_TREASURY_NOT_INITIALIZED)
+    (let (
+      (asset none)
+      (asset-key {
+        asset-kind: ASSET_KIND_STX,
+        asset: asset
+      })
+      (old-asset-accounting (default-to (empty-asset-accounting) (map-get? asset-accounting asset-key)))
+      (old-recovery (default-to (empty-excess-recovery) (map-get? excess-recovery-accounting asset-key)))
+      (tracked-outstanding (unwrap! (safe-sub
+        (get collected-fees old-asset-accounting)
+        (get routed-fees old-asset-accounting)) ERR_CUSTODY_ACCOUNTING_INCONSISTENT))
+      (actual-balance (stx-get-balance COLLECTOR_INGRESS))
+      (excess-before-recovery (unwrap! (safe-sub actual-balance tracked-outstanding) ERR_CUSTODY_BALANCE_SHORTFALL))
+      (new-recovered-excess (unwrap! (safe-add
+        (get recovered-excess old-recovery)
+        amount) ERR_ACCOUNTING_OVERFLOW))
+      (new-total-recovered-excess (unwrap! (safe-add
+        (var-get total-recovered-excess-stx)
+        amount) ERR_ACCOUNTING_OVERFLOW))
+    )
+      (begin
+        (asserts! (<= amount excess-before-recovery) ERR_EXCESS_RECOVERY_EXCEEDS_AVAILABLE)
+        (try! (as-contract (stx-transfer? amount tx-sender OPERATIONAL_TREASURY)))
+        (map-set excess-recovery-accounting asset-key {
+          recovered-excess: new-recovered-excess
+        })
+        (var-set total-recovered-excess-stx new-total-recovered-excess)
+        (print {
+          event: "protocol-fee-excess-recovered",
+          asset-kind: ASSET_KIND_STX,
+          asset: asset,
+          amount: amount,
+          collector: COLLECTOR_INGRESS,
+          destination: OPERATIONAL_TREASURY,
+          actual-balance: actual-balance,
+          tracked-outstanding-custody: tracked-outstanding,
+          excess-before-recovery: excess-before-recovery,
+          recovered-total: new-recovered-excess,
+          burn-height: burn-block-height,
+          stacks-height: block-height
+        })
+        (ok amount)
+      )
+    )
+  )
+)
+
+;; Recover only direct FT deposits above the tracked collected-but-not-yet-routed
+;; custody for this token. The token transfer is attempted before recovery
+;; accounting/event writes so a failed transfer rolls the entire operation back.
+(define-public (recover-excess-ft (token <sip-010-ft-trait>) (amount uint))
+  (begin
+    (asserts! (is-admin-or-governance) ERR_UNAUTHORIZED)
+    (asserts! (> amount u0) ERR_INVALID_AMOUNT)
+    (asserts! (contract-call? .operational-treasury is-initialized) ERR_TREASURY_NOT_INITIALIZED)
+    (let (
+      (asset (some (contract-of token)))
+      (asset-key {
+        asset-kind: ASSET_KIND_FT,
+        asset: asset
+      })
+      (old-asset-accounting (default-to (empty-asset-accounting) (map-get? asset-accounting asset-key)))
+      (old-recovery (default-to (empty-excess-recovery) (map-get? excess-recovery-accounting asset-key)))
+      (tracked-outstanding (unwrap! (safe-sub
+        (get collected-fees old-asset-accounting)
+        (get routed-fees old-asset-accounting)) ERR_CUSTODY_ACCOUNTING_INCONSISTENT))
+      (actual-balance (unwrap! (contract-call? token get-balance COLLECTOR_INGRESS) ERR_ASSET_BALANCE_READ_FAILED))
+      (excess-before-recovery (unwrap! (safe-sub actual-balance tracked-outstanding) ERR_CUSTODY_BALANCE_SHORTFALL))
+      (new-recovered-excess (unwrap! (safe-add
+        (get recovered-excess old-recovery)
+        amount) ERR_ACCOUNTING_OVERFLOW))
+    )
+      (begin
+        (asserts! (<= amount excess-before-recovery) ERR_EXCESS_RECOVERY_EXCEEDS_AVAILABLE)
+        (try! (as-contract (contract-call? token transfer amount tx-sender OPERATIONAL_TREASURY none)))
+        (map-set excess-recovery-accounting asset-key {
+          recovered-excess: new-recovered-excess
+        })
+        (print {
+          event: "protocol-fee-excess-recovered",
+          asset-kind: ASSET_KIND_FT,
+          asset: asset,
+          amount: amount,
+          collector: COLLECTOR_INGRESS,
+          destination: OPERATIONAL_TREASURY,
+          actual-balance: actual-balance,
+          tracked-outstanding-custody: tracked-outstanding,
+          excess-before-recovery: excess-before-recovery,
+          recovered-total: new-recovered-excess,
+          burn-height: burn-block-height,
+          stacks-height: block-height
+        })
+        (ok amount)
+      )
+    )
+  )
+)
+
 ;; --- Read-only audit API ---
 
 (define-read-only (get-admin)
@@ -894,6 +1030,39 @@
     accounting (ok (get routed-fees accounting))
     (ok u0)
   )
+)
+
+(define-read-only (get-excess-recovery-accounting
+    (asset-kind uint)
+    (asset (optional principal)))
+  (ok (map-get? excess-recovery-accounting {
+    asset-kind: asset-kind,
+    asset: asset
+  }))
+)
+
+(define-read-only (get-excess-recovered-stx)
+  (match (map-get? excess-recovery-accounting {
+      asset-kind: ASSET_KIND_STX,
+      asset: none
+    })
+    accounting (ok (get recovered-excess accounting))
+    (ok u0)
+  )
+)
+
+(define-read-only (get-excess-recovered-ft (token principal))
+  (match (map-get? excess-recovery-accounting {
+      asset-kind: ASSET_KIND_FT,
+      asset: (some token)
+    })
+    accounting (ok (get recovered-excess accounting))
+    (ok u0)
+  )
+)
+
+(define-read-only (get-total-recovered-excess-stx)
+  (ok (var-get total-recovered-excess-stx))
 )
 
 (define-read-only (get-activation-burn-height)

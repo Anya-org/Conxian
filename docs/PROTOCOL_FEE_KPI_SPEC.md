@@ -246,11 +246,26 @@ contracts may route custody only to the immutable relative
 `.operational-treasury` principal; no function accepts an arbitrary destination.
 The collector requires the treasury's initialized flag before routing and
 rejects any amount beyond the asset's collected-but-not-yet-routed balance.
-Collection and routing totals are exposed separately by asset, and a route
-failure rolls back its accounting and event. Neither collection nor routing
-claims Fiscal Dam allocation, DEX/lending routing, burning, or downstream
-realized revenue in the same transaction. The `$1M daily eligible volume`
-milestone remains an indexed/oracle-derived KPI and is not an activation gate.
+Direct deposits are not collected fees: excess recovery computes the live
+collector balance minus tracked collected-but-not-yet-routed custody with
+checked subtraction, and only the positive remainder can be sent to that same
+fixed treasury destination. Excess-recovered totals and events are separate
+from collection and routing totals. A route or recovery transfer failure rolls
+back its accounting and event. Neither collection, routing, nor recovery claims
+Fiscal Dam allocation, DEX/lending routing, burning, or downstream realized
+revenue in the same transaction. Phase 1 leaves DEX/lending unwired and no
+source is production-authorized.
+
+The checked-in production deployment plans and generator intentionally defer
+collector publication and wiring until network-correct deployer identities and
+source migrations are approved. Production bootstrap must initialize the
+operational treasury, configure the approved governance/timelock/multisig, and
+hand collector admin to that approved contract before source registration;
+deployer admin retention is not production-ready. Governance may pause or
+execute fixed-destination custody operations but cannot redirect custody.
+
+The `$1M daily eligible volume` milestone remains an indexed/oracle-derived KPI
+and is not an activation gate.
 
 ## 7. Research and implementation references
 

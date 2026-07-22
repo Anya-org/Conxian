@@ -1342,14 +1342,6 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
-        contract-name: protocol-fee-collector
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/treasury/protocol-fee-collector.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
         contract-name: protocol-invariant-monitor
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 50000
@@ -1694,13 +1686,6 @@ plan:
         method: initialize
         parameters:
         - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P'"
-        cost: 10000
-    - contract-call:
-        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.protocol-fee-collector
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        method: set-governance
-        parameters:
-        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.timelock'"
         cost: 10000
     - contract-call:
         contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.operational-treasury
