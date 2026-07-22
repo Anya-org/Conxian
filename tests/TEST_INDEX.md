@@ -33,11 +33,14 @@ The Conxian Protocol utilizes a "Dual-Mode" testing architecture. This ensures t
 19. ✅ **tests/governance/upgrade-controller.test.ts**: Release authorization, signer thresholds, timelock, rollout, and rollback.
 20. ✅ **tests/governance/gauge-manager.test.ts**: Canonical escrowed gauge voting, caps, epoch finalization, and withdrawals.
 
+### Vault & Custody Tests
+21. ✅ **tests/vaults/sbtc-vault.test.ts**: Canonical-token-bound sBTC custody, cap/pause controls, share accounting, withdrawals, and disabled strategy allocation.
+
 ### System Root Tests (Integration)
-21. ✅ **tests/system/full-protocol-journey.test.ts**: Coordination between Heartbeat, DEX, and Agents.
-22. ✅ **tests/cybernetic-revenue.test.ts**: Dynamic "Fiscal Dam" allocation (CXIP-013).
-23. ✅ **tests/cxip-012.test.ts**: Volatility-based DEX fee adjustments.
-24. ✅ **tests/nakamoto_verification.test.ts**: Tenure info and block utility checks.
+22. ✅ **tests/system/full-protocol-journey.test.ts**: Coordination between Heartbeat, DEX, and Agents.
+23. ✅ **tests/cybernetic-revenue.test.ts**: Dynamic "Fiscal Dam" allocation (CXIP-013).
+24. ✅ **tests/cxip-012.test.ts**: Volatility-based DEX fee adjustments.
+25. ✅ **tests/nakamoto_verification.test.ts**: Tenure info and block utility checks.
 
 ## How to Run Tests
 ```bash
@@ -51,4 +54,4 @@ All tests adhere to the Conxian Standards Framework:
 - **Dynamic Addressing**: No hardcoded `ST1PQ...` principals in test logic.
 - **Verification**: Explicit assertion of `Cl.ok` and `Cl.error` responses.
 
-Last Updated: Feb 13, 2026
+Last Updated: Jul 22, 2026

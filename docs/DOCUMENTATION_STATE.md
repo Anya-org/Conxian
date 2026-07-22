@@ -1,5 +1,32 @@
 # Documentation State
 
+## Current Session (38) - Phase 2A sBTC Custody and Share Accounting (Issue #507)
+
+{
+  "status": "IMPLEMENTED_LOCALLY",
+  "session_timestamp": "2026-07-22",
+  "scope": "Implemented the selected Phase 2A candidate: a canonical-token-bound sBTC custody and share-accounting core with focused simnet tests and corrected vault/sBTC documentation.",
+  "components_modified": [
+    "contracts/vaults/sbtc-vault.clar",
+    "tests/vaults/sbtc-vault.test.ts",
+    "contracts/vaults/README.md",
+    "contracts/sbtc/README.md",
+    "docs/ISSUE_507_PHASE_2A_ACCEPTANCE.md"
+  ],
+  "security_boundary": "The vault accepts only the admin-injected token principal, normalizes compliance and token-call failures, uses explicit amount/cap/pause/share errors, and keeps strategy allocation disabled. It does not bridge BTC, mint or burn sBTC, prove settlement through DLC/BitVM2/oracle stubs, repair a peg, or allocate yield.",
+  "accounting_boundary": "First deposits mint one share per asset; later deposits use floor-pro-rata shares; withdrawals request underlying assets and burn ceiling-pro-rata shares. Accounted assets exclude direct token donations, while live token balance is checked before withdrawal.",
+  "validation": {
+    "targeted_tests": "PASS: bash scripts/run-tests.sh tests/vaults/sbtc-vault.test.ts (1 file, 7 tests; 4 known benign Clarinet SDK warnings, 0 new errors)",
+    "compile_initialization": "PASS: bash scripts/run-tests.sh tests/check-compile.test.ts tests/vaults/sbtc-vault.test.ts (2 files, 8 tests; 8 known benign Clarinet SDK warnings, 0 new errors)",
+    "contamination_guard": "PASS: python3 scripts/verify_contamination_guard.py",
+    "diff_hygiene": "PASS: git diff --check",
+    "native_clarinet": "BLOCKED: the direct Clarinet binary is not installed in the workspace",
+    "typescript": "BLOCKED by pre-existing repository tsconfig error: TypeScript 6 rejects the root baseUrl option (TS5102)",
+    "docs_validator": "BLOCKED: npm run validate:docs references missing scripts/validate-docs.js"
+  },
+  "source_control": "Local branch charlie/507-sbtc-vault-core only; no push, PR, deployment, or production-readiness claim."
+}
+
 ## Current Session (37) - Yield Infrastructure Final Review (Issue #506)
 
 {

@@ -3,8 +3,9 @@
 This document provides the formal deployment research and execution path for the Conxian Vault products, as requested in **CON-54**. It is designed to be environment-agnostic and Zero Secret Egress (ZSE) compliant.
 
 ## 1. Product Scope
-- **White-Label Vault**: Powered by `contracts/vaults/sbtc-vault.clar` and `contracts/vaults/custody.clar`.
-- **Alpha Yield Router**: Powered by `contracts/vaults/yield-aggregator.clar` and `contracts/vaults/fee-manager.clar`.
+- **Phase 2A sBTC custody core**: `contracts/vaults/sbtc-vault.clar` accepts an admin-configured canonical SIP-010 token, accounts shares, and supports safe withdrawals.
+- **Separate vault modules**: `contracts/vaults/custody.clar`, `contracts/vaults/yield-aggregator.clar`, and `contracts/vaults/fee-manager.clar` are not strategy or bridge implementations for the Phase 2A sBTC boundary.
+- **Explicit non-scope**: BTC bridging/redemption, signer logic, peg repair, official sBTC mint/burn calls, and yield allocation remain later phases.
 
 ## 2. Contract Inventory & Dependency Order
 To ensure successful deployment, contracts must be published in the following order:
@@ -19,7 +20,7 @@ To ensure successful deployment, contracts must be published in the following or
    - `contracts/vaults/fee-manager.clar`
    - `contracts/vaults/custody.clar`
 4. **Product Entry Points**
-   - `contracts/vaults/sbtc-vault.clar` (Depends on regulatory-adapter)
+   - `contracts/vaults/sbtc-vault.clar` (Depends on core-traits, regulatory-adapter, sip-standards, and vault-traits)
    - `contracts/vaults/yield-aggregator.clar` (Depends on vault-trait)
 
 ## 3. Deployment Configuration
@@ -34,7 +35,8 @@ The following snippet should be added to the production `Clarinet.toml` or a ded
 ```toml
 [contracts.sbtc-vault]
 path = "contracts/vaults/sbtc-vault.clar"
-depends_on = ["sip-010-ft-trait", "regulatory-adapter"]
+clarity-version = 4
+depends_on = ["core-traits", "regulatory-adapter", "sip-standards", "vault-traits"]
 
 [contracts.yield-aggregator]
 path = "contracts/vaults/yield-aggregator.clar"
@@ -69,19 +71,31 @@ Every non-dry path is blocked before signing until a structured receipt-producin
 The current full-system mainnet plan also contains an unresolved `ST...` deployer identity. It must be replaced only by an approved identity derived from and verified against the configured signer; do not guess an `SP...`/`SM...` address.
 
 ## 5. Post-Deployment & Role Wiring
-Once an approved, fully evidenced deployment exists, the following administrative actions are required:
+Once an approved, fully evidenced deployment exists, the operator must configure
+the vault before accepting deposits. The required administrative actions are:
 1. **Registry Update**: Call `set-protocol-principal("sbtc-vault", <deployed-address>)` in `operational-treasury`.
-2. **Fee Initialization**: Set default fees in `fee-manager.clar`.
-3. **Manager Authorization**: Add necessary managers in `custody.clar`.
+2. **Canonical token**: Call `set-approved-token` with the official sBTC SIP-010 contract reference for that network.
+3. **Deposit cap**: Call `set-deposit-cap` with an explicit nonzero cap.
+4. **Compliance**: Ensure the existing regulatory-adapter has valid compliance records for intended users.
+5. **Fee Initialization**: Set default fees in `fee-manager.clar`.
+6. **Manager Authorization**: Add necessary managers in `custody.clar`.
+7. **Strategy boundary**: Do not treat `allocate-to-strategy` as available; it remains fail-closed in Phase 2A.
 
 ## 6. Evidence Capture
-Until the broadcast gate is cleared, record only preflight artifacts for the acceptance pack:
+The Phase 2A implementation task creates no deployment evidence. Until the
+broadcast gate is cleared, record only preflight artifacts for the acceptance
+pack:
 - Source commit SHA from the preflight run
 - Exact deployment plan path and SHA-256
 - Network, approved signer-derived deployer identity, and validation results
 - Preflight logs and any explicitly labeled broadcast/partial candidate
 
-Do not record txids or deployed contract principals as acceptance proof without a structured receipt and complete plan-bound verification. A partial candidate is retained for bounded recovery and must never be labeled confirmed or completed.
+A later network-specific acceptance pack must additionally record transaction
+IDs, the configured canonical token principal, and post-deployment
+reconciliation checks before any production claim is made. Do not record txids
+or deployed contract principals as acceptance proof without a structured
+receipt and complete plan-bound verification. A partial candidate is retained
+for bounded recovery and must never be labeled confirmed or completed.
 
 ---
 *Last Updated: April 2026*
