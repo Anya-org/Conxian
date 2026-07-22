@@ -276,8 +276,10 @@ success must not be reported as an on-chain deployment.
 - [Stacks Clarity types](https://docs.stacks.co/reference/clarity/types) and
   [functions](https://docs.stacks.co/reference/clarity/functions) — response,
   lazy boolean, and safe error-return semantics used by the gate.
-- [FATF Recommendations](https://www.fatf-gafi.org/en/publications/Fatfrecommendations/Fatf-recommendations.html)
-  — primary international AML/CFT reference; not a substitute for legal advice.
+- [NIST SP 800-63 Digital Identity Guidelines](https://pages.nist.gov/800-63-4/)
+  — official U.S. government guidance on identity proofing, authentication, and
+  federation; relevant to the gate's identity-assurance boundary, but not a
+  sanctions-list or legal-compliance determination.
 - [OFAC Sanctions List Service](https://ofac.treasury.gov/sanctions-list-service)
   — primary U.S. sanctions-list source; the current contract's gate does not
   ingest this list on-chain and instead relies on the authority-owned
