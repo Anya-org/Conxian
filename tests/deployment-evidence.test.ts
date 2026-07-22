@@ -271,9 +271,9 @@ async function expectVerificationError(
 describe("deployment evidence verification", () => {
   it("parses every effective testnet plan entry and blocks the unresolved mainnet identity", () => {
     const testnetPlan = readDeploymentPlan(join(import.meta.dirname, "../deployments/full-system.testnet-plan.yaml"));
-    expect(testnetPlan.entries).toHaveLength(229);
+    expect(testnetPlan.entries).toHaveLength(233);
     expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-publish")).toHaveLength(212);
-    expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-call")).toHaveLength(17);
+    expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-call")).toHaveLength(21);
 
     expect(() => readDeploymentPlan(join(import.meta.dirname, "../deployments/full-system.mainnet-plan.yaml"))).toThrowError(
       expect.objectContaining({ code: "NETWORK_DEPLOYER_MISMATCH" }),
