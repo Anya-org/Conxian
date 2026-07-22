@@ -10,10 +10,18 @@
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_INVALID_AMOUNT (err u1001))
 (define-constant ERR_OWNER_MISMATCH (err u1002))
+(define-constant ERR_INSUFFICIENT_BALANCE (err u1003))
 (define-data-var admin principal tx-sender)
 (define-map minters principal bool)
 (define-map burners principal bool)
 (define-data-var token-uri (optional (string-ascii 256)) none)
+
+;; @desc Checks the immediate caller against the current administrator.
+;; Direct standard-principal calls continue to work because contract-caller
+;; equals tx-sender when no contract is in between.
+(define-private (is-admin-caller)
+  (is-eq contract-caller (var-get admin))
+)
 
 ;; @desc Checks whether a principal is the current administrator.
 (define-read-only (is-admin (caller principal))
@@ -48,7 +56,7 @@
 ;; @desc Adds an authorized minter. Admin only.
 (define-public (add-minter (minter principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
     (map-set minters minter true)
     (ok true)
   )
@@ -57,7 +65,7 @@
 ;; @desc Removes an authorized minter. Admin only.
 (define-public (remove-minter (minter principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
     (map-delete minters minter)
     (ok true)
   )
@@ -66,7 +74,7 @@
 ;; @desc Adds an authorized burner. Admin only.
 (define-public (add-burner (burner principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
     (map-set burners burner true)
     (ok true)
   )
@@ -75,7 +83,7 @@
 ;; @desc Removes an authorized burner. Admin only.
 (define-public (remove-burner (burner principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
     (map-delete burners burner)
     (ok true)
   )
@@ -86,7 +94,7 @@
   (begin
     (asserts! (> amount u0) ERR_INVALID_AMOUNT)
     (asserts!
-      (or (is-eq contract-caller (var-get admin)) (is-minter contract-caller))
+      (or (is-admin-caller) (is-minter contract-caller))
       ERR_UNAUTHORIZED
     )
     (ft-mint? cxlp-token amount recipient)
@@ -96,17 +104,20 @@
 ;; @desc Burns CXLP through an authorized immediate caller.
 ;; Non-admin callers must initiate burns for their own balance. This keeps an
 ;; approved pool from burning a different user's CXLP when invoked by that user.
+;; The admin path is an intentional emergency burn path and may burn any
+;; owner's balance, subject to the same explicit balance check below.
 (define-public (burn (amount uint) (owner principal))
   (begin
     (asserts! (> amount u0) ERR_INVALID_AMOUNT)
     (asserts!
-      (or (is-eq contract-caller (var-get admin)) (is-burner contract-caller))
+      (or (is-admin-caller) (is-burner contract-caller))
       ERR_UNAUTHORIZED
     )
     (asserts!
-      (or (is-eq contract-caller (var-get admin)) (is-eq tx-sender owner))
+      (or (is-admin-caller) (is-eq tx-sender owner))
       ERR_OWNER_MISMATCH
     )
+    (asserts! (>= (ft-get-balance cxlp-token owner) amount) ERR_INSUFFICIENT_BALANCE)
     (ft-burn? cxlp-token amount owner)
   )
 )
@@ -129,7 +140,7 @@
 ;; @desc Initializes the contract with a new administrator.
 (define-public (initialize (new-admin principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
     (var-set admin new-admin)
     (ok true)
   )
