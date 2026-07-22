@@ -61,7 +61,7 @@ clarity-version = 4
 [contracts.agent-risk]
 path = "contracts/agents/agent-risk.clar"
 clarity-version = 4
-depends_on = ["conxian-protocol", "finance-metrics"]
+depends_on = ["conxian-protocol", "core-traits", "finance-metrics"]
 
 [contracts.cxd-token]
 path = "contracts/tokens/cxd-token.clar"

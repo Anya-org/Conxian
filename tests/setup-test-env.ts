@@ -49,8 +49,12 @@ export async function initializeSimnet(): Promise<Simnet> {
       for (const name of contractsToInit) {
         try {
           const res = instance.callPublicFn(name, 'initialize', [Cl.principal(deployer)], deployer);
+          if (name === 'agent-risk' && Cl.prettyPrint(res.result) !== '(ok true)') {
+            throw new Error(`agent-risk bootstrap failed: ${Cl.prettyPrint(res.result)}`);
+          }
           // console.log(`Init ${name}: ${Cl.prettyPrint(res.result)}`);
         } catch (e) {
+          if (name === 'agent-risk') throw e;
           // console.log(`Skip init ${name}`);
         }
       }

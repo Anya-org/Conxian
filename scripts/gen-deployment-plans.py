@@ -72,6 +72,16 @@ INIT_CALLS = [
     {"contract-id": f"{DEPLOYER}.risk-unit", "expected-sender": DEPLOYER,
      "method": "set-ops-engine",
      "parameters": [A(".ops-engine")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.agent-risk", "expected-sender": DEPLOYER,
+     "method": "initialize", "parameters": [A("")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.agent-risk", "expected-sender": DEPLOYER,
+     "method": "set-risk-unit", "parameters": [A(".risk-unit")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.conxian-protocol", "expected-sender": DEPLOYER,
+     "method": "register-module", "parameters": [
+         q('"risk-unit"'), A(".risk-unit")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.conxian-protocol", "expected-sender": DEPLOYER,
+     "method": "register-module", "parameters": [
+         q('"risk-manager"'), A(".risk-manager")], "cost": INIT_CALL_COST},
 ]
 
 
@@ -145,7 +155,10 @@ def make_plan(contracts, network, name, stacks_node, cost):
         })
         bid += 1
 
-    # Add initialization batch (Phase N+1 — wiring)
+    # Add initialization batch (Phase N+1 — wiring). Keep the risk path in
+    # dependency-safe order: bootstrap/configure the canonical risk unit,
+    # initialize and target the agent publisher, then publish both registry
+    # keys used by current and compatibility consumers.
     init_transactions = []
     for call in INIT_CALLS:
         init_transactions.append({"contract-call": call})
