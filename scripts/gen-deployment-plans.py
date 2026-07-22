@@ -60,6 +60,10 @@ INIT_CALLS = [
      "method": "add-minter", "parameters": [A(".bme-engine")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.cxd-token", "expected-sender": DEPLOYER,
      "method": "add-burner", "parameters": [A(".bme-engine")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.cxlp-token", "expected-sender": DEPLOYER,
+     "method": "add-minter", "parameters": [A(".concentrated-liquidity-pool")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.cxlp-token", "expected-sender": DEPLOYER,
+     "method": "add-burner", "parameters": [A(".concentrated-liquidity-pool")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.bme-engine", "expected-sender": DEPLOYER,
      "method": "add-activity-reporter",
      "parameters": [A(".swap-router")], "cost": INIT_CALL_COST},
@@ -111,6 +115,30 @@ def extract_contracts(simnet):
             })
         if batch_contracts:
             contracts.append(batch_contracts)
+    # The checked-in simnet plan can predate a newly added Clarinet dependency
+    # because Clarinet regenerates it locally. Enforce the static CLP -> CXLP
+    # publication edge here as well, so release output remains safe and
+    # reproducible from either plan version.
+    cxlp_batch = next(
+        (index for index, batch in enumerate(contracts)
+         if any(item["contract-name"] == "cxlp-token" for item in batch)),
+        None,
+    )
+    clp_batch = next(
+        (index for index, batch in enumerate(contracts)
+         if any(item["contract-name"] == "concentrated-liquidity-pool" for item in batch)),
+        None,
+    )
+    if cxlp_batch is not None and clp_batch is not None and cxlp_batch > clp_batch:
+        cxlp = next(item for item in contracts[cxlp_batch]
+                    if item["contract-name"] == "cxlp-token")
+        contracts[cxlp_batch] = [
+            item for item in contracts[cxlp_batch]
+            if item["contract-name"] != "cxlp-token"
+        ]
+        contracts[clp_batch].insert(0, cxlp)
+        contracts = [batch for batch in contracts if batch]
+
     return contracts
 
 

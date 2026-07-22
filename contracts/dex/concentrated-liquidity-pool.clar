@@ -1,17 +1,28 @@
 ;; concentrated-liquidity-pool.clar
 ;; Conxian DEX: Concentrated Liquidity Pool Engine
-;; Aligned with Apex CSF (v1.1.0) and Nakamoto Standard.
+;; Aligned with Apex CSF (v1.2.0) and Nakamoto Standard.
 
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 (impl-trait .sip-standards.sip-010-ft-trait)
 (impl-trait .conxian-csf-trait.trait-csf-liquidity-v1)
 
 ;; --- Constants ---
+(define-constant MAX_UINT u340282366920938463463374607431768211455)
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_INSUFFICIENT_LIQUIDITY (err u1001))
+(define-constant ERR_INVALID_AMOUNT (err u1002))
+(define-constant ERR_POOL_NOT_FOUND (err u1003))
+(define-constant ERR_SHARE_STATE_MISMATCH (err u1004))
+(define-constant ERR_INSUFFICIENT_SHARES (err u1005))
+(define-constant ERR_TOKEN_CALL_FAILED (err u1006))
+(define-constant ERR_ARITHMETIC_OVERFLOW (err u1007))
 (define-constant PROTOCOL_FEE_SHARE u1000) ;; 10% of LP fee for BME
 
 ;; --- State ---
+(define-data-var admin principal tx-sender)
+(define-data-var settlement-authority principal tx-sender)
+(define-data-var recorded-share-supply uint u0)
+
 (define-map pools
   uint
   {
@@ -24,7 +35,70 @@
   }
 )
 
+(define-map pool-shares
+  { pool-id: uint, owner: principal }
+  uint
+)
+
+(define-map owner-share-totals principal uint)
+
 (define-data-var pool-nonce uint u0)
+
+;; --- Authorization and reconciliation reads ---
+
+(define-read-only (is-admin (caller principal))
+  (is-eq caller (var-get admin))
+)
+
+(define-read-only (is-settlement-authority (caller principal))
+  (is-eq caller (var-get settlement-authority))
+)
+
+(define-read-only (get-settlement-authority)
+  (ok (var-get settlement-authority))
+)
+
+(define-read-only (get-recorded-share-supply)
+  (ok (var-get recorded-share-supply))
+)
+
+(define-read-only (get-pool (pool-id uint))
+  (ok (map-get? pools pool-id))
+)
+
+(define-read-only (get-pool-share (pool-id uint) (owner principal))
+  (ok (default-to u0 (map-get? pool-shares { pool-id: pool-id, owner: owner })))
+)
+
+(define-read-only (get-owner-share-total (owner principal))
+  (ok (default-to u0 (map-get? owner-share-totals owner)))
+)
+
+;; --- Administrative configuration ---
+
+(define-public (initialize (new-admin principal))
+  (begin
+    (asserts! (is-admin contract-caller) ERR_UNAUTHORIZED)
+    (var-set admin new-admin)
+    (ok true)
+  )
+)
+
+(define-public (set-admin (new-admin principal))
+  (begin
+    (asserts! (is-admin contract-caller) ERR_UNAUTHORIZED)
+    (var-set admin new-admin)
+    (ok true)
+  )
+)
+
+(define-public (set-settlement-authority (authority principal))
+  (begin
+    (asserts! (is-admin contract-caller) ERR_UNAUTHORIZED)
+    (var-set settlement-authority authority)
+    (ok true)
+  )
+)
 
 ;; --- CSF Trait Implementation ---
 
@@ -67,30 +141,42 @@
   (ok true)
 )
 
-;; --- SIP-010 Trait Implementation (Stub) ---
+;; --- SIP-010 Canonical CXLP Proxy ---
 
-;; @desc Transfer tokens to a recipient
+;; @desc Transfer canonical CXLP tokens to a recipient.
 (define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
-  (ok true)
+  (contract-call? .cxlp-token transfer amount sender recipient memo)
 )
 
-;; @desc Get the name of the LP token
-(define-read-only (get-name) (ok "Conxian LP Token"))
+;; @desc Get the canonical CXLP name.
+(define-read-only (get-name)
+  (contract-call? .cxlp-token get-name)
+)
 
-;; @desc Get the symbol of the LP token
-(define-read-only (get-symbol) (ok "CXLP"))
+;; @desc Get the canonical CXLP symbol.
+(define-read-only (get-symbol)
+  (contract-call? .cxlp-token get-symbol)
+)
 
-;; @desc Get the decimals of the LP token
-(define-read-only (get-decimals) (ok u8))
+;; @desc Get the canonical CXLP decimals.
+(define-read-only (get-decimals)
+  (contract-call? .cxlp-token get-decimals)
+)
 
-;; @desc Get the balance of a user
-(define-read-only (get-balance (user principal)) (ok u0))
+;; @desc Get a canonical CXLP balance.
+(define-read-only (get-balance (user principal))
+  (contract-call? .cxlp-token get-balance user)
+)
 
-;; @desc Get the total supply of the LP token
-(define-read-only (get-total-supply) (ok u0))
+;; @desc Get the canonical CXLP total supply.
+(define-read-only (get-total-supply)
+  (contract-call? .cxlp-token get-total-supply)
+)
 
-;; @desc Get the token URI
-(define-read-only (get-token-uri) (ok none))
+;; @desc Get the canonical CXLP metadata URI.
+(define-read-only (get-token-uri)
+  (contract-call? .cxlp-token get-token-uri)
+)
 
 ;; --- Internal Logic ---
 
@@ -114,6 +200,107 @@
   )
 )
 
+;; --- CXLP share reconciliation hooks ---
+
+;; These hooks intentionally do not transfer pool assets, settle positions, or
+;; calculate fees. They are the atomic CXLP/share primitive that #536 can call
+;; after its custody and execution checks have passed.
+(define-public (mint-shares (pool-id uint) (owner principal) (amount uint))
+  (begin
+    (asserts! (is-settlement-authority contract-caller) ERR_UNAUTHORIZED)
+    (asserts! (> amount u0) ERR_INVALID_AMOUNT)
+    (let (
+      (pool (unwrap! (map-get? pools pool-id) ERR_POOL_NOT_FOUND))
+      (pool-share-balance (default-to u0 (map-get? pool-shares { pool-id: pool-id, owner: owner })))
+      (owner-share-total (default-to u0 (map-get? owner-share-totals owner)))
+      (canonical-owner-balance (unwrap! (contract-call? .cxlp-token get-balance owner) ERR_TOKEN_CALL_FAILED))
+      (canonical-supply (unwrap! (contract-call? .cxlp-token get-total-supply) ERR_TOKEN_CALL_FAILED))
+      (pool-liquidity (get liquidity pool))
+      (tracked-supply (var-get recorded-share-supply))
+    )
+      (begin
+        ;; A hook may only extend a state that was already reconciled. This
+        ;; prevents direct CXLP minting or an ambiguous global transfer from
+        ;; being silently absorbed into pool accounting.
+        (asserts! (is-eq canonical-owner-balance owner-share-total) ERR_SHARE_STATE_MISMATCH)
+        (asserts! (is-eq canonical-supply tracked-supply) ERR_SHARE_STATE_MISMATCH)
+        (asserts! (<= pool-share-balance pool-liquidity) ERR_SHARE_STATE_MISMATCH)
+        (asserts! (<= amount (- MAX_UINT pool-liquidity)) ERR_ARITHMETIC_OVERFLOW)
+        (asserts! (<= amount (- MAX_UINT pool-share-balance)) ERR_ARITHMETIC_OVERFLOW)
+        (asserts! (<= amount (- MAX_UINT owner-share-total)) ERR_ARITHMETIC_OVERFLOW)
+        (asserts! (<= amount (- MAX_UINT tracked-supply)) ERR_ARITHMETIC_OVERFLOW)
+
+        ;; Clarity rolls back all earlier state if this downstream call fails.
+        (try! (contract-call? .cxlp-token mint amount owner))
+
+        (map-set pools pool-id (merge pool { liquidity: (+ pool-liquidity amount) }))
+        (map-set pool-shares { pool-id: pool-id, owner: owner } (+ pool-share-balance amount))
+        (map-set owner-share-totals owner (+ owner-share-total amount))
+        (var-set recorded-share-supply (+ tracked-supply amount))
+
+        ;; Verify the canonical token after all local writes; a failed
+        ;; invariant reverts both the token call and the local reconciliation.
+        (let (
+          (post-owner-balance (unwrap! (contract-call? .cxlp-token get-balance owner) ERR_TOKEN_CALL_FAILED))
+          (post-supply (unwrap! (contract-call? .cxlp-token get-total-supply) ERR_TOKEN_CALL_FAILED))
+        )
+          (begin
+            (asserts! (is-eq post-owner-balance (+ canonical-owner-balance amount)) ERR_SHARE_STATE_MISMATCH)
+            (asserts! (is-eq post-supply (+ canonical-supply amount)) ERR_SHARE_STATE_MISMATCH)
+            (ok true)
+          )
+        )
+      )
+    )
+  )
+)
+
+(define-public (burn-shares (pool-id uint) (owner principal) (amount uint))
+  (begin
+    (asserts! (is-settlement-authority contract-caller) ERR_UNAUTHORIZED)
+    (asserts! (> amount u0) ERR_INVALID_AMOUNT)
+    (let (
+      (pool (unwrap! (map-get? pools pool-id) ERR_POOL_NOT_FOUND))
+      (pool-share-balance (default-to u0 (map-get? pool-shares { pool-id: pool-id, owner: owner })))
+      (owner-share-total (default-to u0 (map-get? owner-share-totals owner)))
+      (canonical-owner-balance (unwrap! (contract-call? .cxlp-token get-balance owner) ERR_TOKEN_CALL_FAILED))
+      (canonical-supply (unwrap! (contract-call? .cxlp-token get-total-supply) ERR_TOKEN_CALL_FAILED))
+      (pool-liquidity (get liquidity pool))
+      (tracked-supply (var-get recorded-share-supply))
+    )
+      (begin
+        (asserts! (is-eq canonical-owner-balance owner-share-total) ERR_SHARE_STATE_MISMATCH)
+        (asserts! (is-eq canonical-supply tracked-supply) ERR_SHARE_STATE_MISMATCH)
+        (asserts! (<= pool-share-balance pool-liquidity) ERR_SHARE_STATE_MISMATCH)
+        (asserts! (>= pool-share-balance amount) ERR_INSUFFICIENT_SHARES)
+        (asserts! (>= owner-share-total amount) ERR_INSUFFICIENT_SHARES)
+        (asserts! (>= canonical-owner-balance amount) ERR_INSUFFICIENT_SHARES)
+        (asserts! (>= canonical-supply amount) ERR_INSUFFICIENT_SHARES)
+
+        ;; Clarity rolls back the token burn and every local write together if
+        ;; any downstream call or invariant fails.
+        (try! (contract-call? .cxlp-token burn amount owner))
+
+        (map-set pools pool-id (merge pool { liquidity: (- pool-liquidity amount) }))
+        (map-set pool-shares { pool-id: pool-id, owner: owner } (- pool-share-balance amount))
+        (map-set owner-share-totals owner (- owner-share-total amount))
+        (var-set recorded-share-supply (- tracked-supply amount))
+
+        (let (
+          (post-owner-balance (unwrap! (contract-call? .cxlp-token get-balance owner) ERR_TOKEN_CALL_FAILED))
+          (post-supply (unwrap! (contract-call? .cxlp-token get-total-supply) ERR_TOKEN_CALL_FAILED))
+        )
+          (begin
+            (asserts! (is-eq post-owner-balance (- canonical-owner-balance amount)) ERR_SHARE_STATE_MISMATCH)
+            (asserts! (is-eq post-supply (- canonical-supply amount)) ERR_SHARE_STATE_MISMATCH)
+            (ok true)
+          )
+        )
+      )
+    )
+  )
+)
+
 ;; @desc Execute a swap in a concentrated liquidity pool
 (define-public (swap (pool-id uint) (is-token-0 bool) (amount-in uint) (token-in <sip-010-ft-trait>) (token-out <sip-010-ft-trait>) (recipient principal))
   (swap-execute pool-id amount-in token-in token-out recipient)
@@ -123,7 +310,7 @@
 (define-read-only (get-protocol-status)
   (ok {
     active: true,
-    version: "v1.1.0-Apex",
+    version: "v1.2.0-Apex",
     pool-count: (var-get pool-nonce),
     fee-share: PROTOCOL_FEE_SHARE
   })

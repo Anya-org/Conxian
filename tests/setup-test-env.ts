@@ -88,6 +88,14 @@ export async function initializeSimnet(): Promise<Simnet> {
         instance.callPublicFn('bme-engine', 'add-activity-reporter', [Cl.contractPrincipal(deployer, 'lending-manager')], deployer);
       } catch (e) {}
 
+      // Authorize the canonical CLP share primitive for focused simnet tests.
+      // Release deployments apply the same wiring through generated plans.
+      try {
+        const clp = Cl.contractPrincipal(deployer, 'concentrated-liquidity-pool');
+        instance.callPublicFn('cxlp-token', 'add-minter', [clp], deployer);
+        instance.callPublicFn('cxlp-token', 'add-burner', [clp], deployer);
+      } catch (e) {}
+
       console.log('✅ Bootstrap Complete');
       return instance;
     } catch (error) {
