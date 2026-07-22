@@ -1,9 +1,10 @@
 /**
 * Conxian testnet deployment helper.
 *
-* This script broadcasts only the existing deployment sequence. A broadcast
-* is never treated as completion: every new publication must be confirmed by
-* the fail-closed evidence verifier before the script exits successfully.
+* This is a bounded testnet helper/preparatory sequence, not the full-system
+* or partnership deployer. A broadcast is never treated as completion: every
+* new publication must be confirmed by the fail-closed evidence verifier
+* against an explicit matching plan before the script exits successfully.
 */
 import "dotenv/config";
 import { execFileSync } from "node:child_process";
@@ -19,9 +20,12 @@ import {
 import { STACKS_TESTNET } from "@stacks/network";
 import {
   sha256File,
+  isKnownHiroApiBaseUrl,
+  readDeploymentPlan,
   waitForDeploymentEvidence,
   type ContractPublicationEvidence,
   type DeploymentEvidence,
+  type PlanPosition,
   type InterfaceExpectation,
 } from "./deployment/verify-evidence";
 
@@ -35,10 +39,14 @@ const CORE_API_URL = process.env.CORE_API_URL || "https://api.testnet.hiro.so";
 const HIRO_API_KEY = process.env.HIRO_API_KEY;
 const network = { ...STACKS_TESTNET, coreApiUrl: CORE_API_URL };
 
-const apiHeaders: Record<string, string> = {
-  accept: "application/json",
-  ...(HIRO_API_KEY ? { "x-hiro-api-key": HIRO_API_KEY } : {}),
-};
+export const DEPLOYMENT_SCOPE = "testnet-helper-preparatory-only" as const;
+
+function apiHeaders(): Record<string, string> {
+  return {
+    accept: "application/json",
+    ...(HIRO_API_KEY && isKnownHiroApiBaseUrl(CORE_API_URL) ? { "x-hiro-api-key": HIRO_API_KEY } : {}),
+  };
+}
 
 export const DEPLOYMENT_TRANSACTION_POLICY = {
   postConditionMode: PostConditionMode.Deny,
@@ -96,7 +104,7 @@ function requiredEnvironment(name: string): string {
 async function getJson(url: string): Promise<{ status: number; body: unknown }> {
   let response: Response;
   try {
-    response = await fetch(url, { headers: apiHeaders });
+    response = await fetch(url, { headers: apiHeaders() });
   } catch {
     throw new Error(`request failed for ${url}`);
   }
@@ -172,59 +180,42 @@ function writeEvidence(path: string, evidence: DeploymentEvidence): void {
 export async function main(): Promise<void> {
   const deployerPrivateKey = requiredEnvironment("DEPLOYER_PRIVKEY");
   const deployerAddress = requiredEnvironment("SYSTEM_ADDRESS");
-  const planPath = resolve(process.env.DEPLOYMENT_PLAN_PATH || "deployments/full-system.testnet-plan.yaml");
+  const planPath = resolve(requiredEnvironment("DEPLOYMENT_PLAN_PATH"));
   const evidencePath = resolve(process.env.DEPLOYMENT_EVIDENCE_PATH || "deployment/testnet-deployment-evidence.json");
   const broadcastEvidencePath = `${evidencePath}.broadcast.json`;
-  const planSha256 = sha256File(planPath);
-  const commit = sourceCommit();
-
-  const derivedAddress = getAddressFromPrivateKey(deployerPrivateKey, STACKS_TESTNET);
-  if (derivedAddress !== deployerAddress) {
-    throw new Error("SYSTEM_ADDRESS does not match the supplied deployer key");
+  const parsedPlan = readDeploymentPlan(planPath);
+  if (parsedPlan.network !== "testnet" || parsedPlan.deployer !== deployerAddress) {
+    throw new Error("DEPLOYMENT_PLAN_PATH must point to a testnet plan for SYSTEM_ADDRESS");
   }
 
-  console.log("=== Conxian Testnet Deployment ===");
-  console.log(`Network: ${CORE_API_URL}`);
-  console.log(`Deployer: ${deployerAddress}`);
-  console.log("");
+  const helperPlanPositions = new Map<string, PlanPosition>();
+  if (parsedPlan.entries.length !== DEPLOYMENT_SEQUENCE.length) {
+    throw new Error(
+      `DEPLOYMENT_PLAN_PATH must be a matching ${DEPLOYMENT_SCOPE} mini-plan with exactly ${DEPLOYMENT_SEQUENCE.length} publish entries`,
+    );
+  }
+  for (const [index, contract] of DEPLOYMENT_SEQUENCE.entries()) {
+    const plannedEntry = parsedPlan.entries[index];
+    if (
+      plannedEntry.kind !== "contract-publish" ||
+      plannedEntry.contractName !== contract.name ||
+      plannedEntry.contractId !== `${deployerAddress}.${contract.name}`
+    ) {
+      throw new Error(`DEPLOYMENT_PLAN_PATH does not match the helper sequence at ordinal ${index}`);
+    }
+    helperPlanPositions.set(contract.name, plannedEntry.planPosition);
+  }
 
-  let nonce = await getAccountNonce(deployerAddress);
+  const planSha256 = sha256File(planPath);
+  const commit = sourceCommit();
   const contractPublications: ContractPublicationEvidence[] = [];
   const interfaces: InterfaceExpectation[] = [];
   const preexistingContracts: string[] = [];
 
-  for (const contract of DEPLOYMENT_SEQUENCE) {
-    const contractId = `${deployerAddress}.${contract.name}`;
-    interfaces.push({
-      contractId,
-      requiredFunctions: contract.requiredFunctions ?? [],
-    });
-
-    const exists = await checkContractExists(deployerAddress, contract.name);
-    if (exists) {
-      preexistingContracts.push(contractId);
-      console.log(`  ↩ ${contract.name} - already present at checked address, skipping broadcast`);
-      continue;
-    }
-
-    const txid = await deployContract(contract, nonce, deployerPrivateKey);
-    contractPublications.push({
-      kind: "contract-publish",
-      contractName: contract.name,
-      contractId,
-      expectedSender: deployerAddress,
-      txid,
-    });
-    nonce += 1;
-  }
-
-  if (contractPublications.length === 0) {
-    throw new Error("no new contract publications were broadcast; no canonical deployment evidence can be produced");
-  }
-
-  const evidence: DeploymentEvidence = {
+  const buildBroadcastEvidence = (): DeploymentEvidence => ({
     schemaVersion: "1",
     evidenceStatus: "broadcast",
+    coverage: "partial",
     generatedAt: new Date().toISOString(),
     sourceCommit: commit,
     network: "testnet",
@@ -241,25 +232,80 @@ export async function main(): Promise<void> {
     contractCalls: [],
     interfaces,
     preexistingContracts,
+  });
+
+  const writeBroadcastCandidate = (): void => {
+    // This candidate is deliberately partial/broadcast-only. It is retained
+    // after each accepted txid and on every failure/finally path, but can
+    // never be labeled confirmed or completed by this helper.
+    writeEvidence(broadcastEvidencePath, buildBroadcastEvidence());
   };
 
-  // Preserve the broadcast-only record as non-proof. The confirmed file is
-  // written only after the verifier has observed canonical successful txs.
-  writeEvidence(broadcastEvidencePath, evidence);
-  const verified = await waitForDeploymentEvidence(evidence, {
-    network: "testnet",
-    deployer: deployerAddress,
-    baseUrl: CORE_API_URL,
-    apiKey: HIRO_API_KEY,
-    planPath,
-    sourceCommit: commit,
-    timeoutMs: Number(process.env.DEPLOY_CONFIRM_TIMEOUT_MS || 10 * 60 * 1000),
-    pollIntervalMs: Number(process.env.DEPLOY_CONFIRM_POLL_MS || 15 * 1000),
-  });
-  writeEvidence(evidencePath, verified);
+  try {
+    const derivedAddress = getAddressFromPrivateKey(deployerPrivateKey, STACKS_TESTNET);
+    if (derivedAddress !== deployerAddress) {
+      throw new Error("SYSTEM_ADDRESS does not match the supplied deployer key");
+    }
 
-  console.log(`Canonical deployment evidence written to ${relative(process.cwd(), evidencePath)}`);
-  console.log("Deployment finished only after canonical receipt and interface verification.");
+    console.log("=== Conxian Testnet Helper/Preparatory Broadcast ===");
+    console.log(`Network: ${CORE_API_URL}`);
+    console.log(`Deployer: ${deployerAddress}`);
+    console.log("");
+
+    let nonce = await getAccountNonce(deployerAddress);
+    for (const contract of DEPLOYMENT_SEQUENCE) {
+      const contractId = `${deployerAddress}.${contract.name}`;
+      interfaces.push({
+        contractId,
+        requiredFunctions: contract.requiredFunctions ?? [],
+      });
+
+      const exists = await checkContractExists(deployerAddress, contract.name);
+      if (exists) {
+        preexistingContracts.push(contractId);
+        console.log(`  ↩ ${contract.name} - already present at checked address, skipping broadcast`);
+        writeBroadcastCandidate();
+        continue;
+      }
+
+      const txid = await deployContract(contract, nonce, deployerPrivateKey);
+      const planPosition = helperPlanPositions.get(contract.name);
+      if (planPosition === undefined) {
+        throw new Error(`helper plan position is missing for ${contract.name}`);
+      }
+      contractPublications.push({
+        kind: "contract-publish",
+        planPosition,
+        contractName: contract.name,
+        contractId,
+        expectedSender: deployerAddress,
+        txid,
+      });
+      nonce += 1;
+      writeBroadcastCandidate();
+    }
+
+    if (contractPublications.length === 0) {
+      throw new Error("no new contract publications were broadcast; no canonical deployment evidence can be produced");
+    }
+
+    const verified = await waitForDeploymentEvidence(buildBroadcastEvidence(), {
+      network: "testnet",
+      deployer: deployerAddress,
+      baseUrl: CORE_API_URL,
+      apiKey: HIRO_API_KEY,
+      planPath,
+      sourceCommit: commit,
+      timeoutMs: Number(process.env.DEPLOY_CONFIRM_TIMEOUT_MS || 10 * 60 * 1000),
+      pollIntervalMs: Number(process.env.DEPLOY_CONFIRM_POLL_MS || 15 * 1000),
+    });
+    writeEvidence(evidencePath, verified);
+
+    console.log(`Canonical deployment evidence written to ${relative(process.cwd(), evidencePath)}`);
+    console.log("Helper finished only after complete plan-bound receipt and interface verification.");
+  } finally {
+    writeBroadcastCandidate();
+  }
 }
 
 const isDirectRun = process.argv[1] !== undefined && resolve(process.argv[1]) === fileURLToPath(import.meta.url);

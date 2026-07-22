@@ -51,10 +51,10 @@ Capture all of the following in the evidence bundle and operator handoff:
 - Full source commit SHA (`git rev-parse HEAD`).
 - Exact plan path and SHA-256 (`sha256sum <plan>`).
 - Network (`testnet` or `mainnet`).
-- Deployer address, checked against the network prefix (`ST...` for testnet, `SP...` for mainnet).
+- Deployer address, checked with the repository's Stacks principal validator and the selected network (`ST...`/`SN...` for testnet, `SP...`/`SM...` for mainnet).
 - The approved release or change identifier that cleared the upstream gates.
 
-The mainnet workflow also compares `deployments/full-system.mainnet-plan.yaml` with the committed digest in `deployments/full-system.mainnet-plan.sha256`. A mismatch or a non-mainnet deployer identity blocks a non-dry run.
+The mainnet workflow also compares `deployments/full-system.mainnet-plan.yaml` with the committed digest in `deployments/full-system.mainnet-plan.sha256`. A mismatch or a non-mainnet deployer identity blocks a non-dry run. The current full-system mainnet plan still contains an unresolved `ST...` deployer identity; it is not a valid mainnet identity and must not be replaced by a guessed `SP...`/`SM...` address. Replace it only with an approved identity derived from, and verified against, the configured signer.
 
 ## 4. Evidence bundle
 
@@ -65,8 +65,8 @@ The bundle must contain:
 - `evidenceStatus` distinguishing `plan`, `workflow`, `broadcast`, and `confirmed`.
 - Full source commit and plan SHA-256.
 - Network and deployer identity.
-- Every contract publication transaction, with expected contract ID and sender.
-- Optional configuration/contract-call transactions, with expected contract ID, function, and sender.
+- Every effective `contract-publish` and `contract-call` entry in the exact plan passed to `--plan`, bound by batch/transaction ordinal and expected contract/function identity.
+- Contract-call arguments when present, checked against the canonical Clarity representation in the Hiro transaction payload.
 - An interface expectation for every published contract, including required `public` and `read_only` functions.
 - `claims.scope: checked-addresses` and `claims.globalNonexistence: false`.
 
@@ -84,7 +84,7 @@ npm run verify:deployment-evidence -- \
   --output deployment-artifacts/testnet-evidence.verified.json
 ```
 
-The verifier uses the network-specific Hiro API, requires a transaction to be found, canonical, anchored, and successful, and checks the expected transaction type, sender, contract, and function. It then requires HTTP 200 for each contract interface and checks the requested function access levels. Unsupported or malformed API payloads fail closed.
+The verifier parses the exact YAML plan supplied by `--plan`, requires one and only one evidence record for every effective publish/call entry, and rejects missing, extra, duplicate, reordered, or mismatched ordinals. It uses the network-specific Hiro API, requires a transaction to be found, canonical, anchored, and successful, and checks the expected transaction type, sender, contract, function, and—where applicable—canonical call arguments. It then requires HTTP 200 for each contract interface and checks the requested function access levels. Unsupported or malformed API payloads fail closed. A successful bundle means complete plan evidence; a broadcast/partial candidate is never a deployment conclusion.
 
 The `--api-base-url` option exists for deterministic local HTTP tests and controlled mirrors. Do not use a non-Hiro endpoint for production acceptance unless the operator records that exception and independently establishes equivalent canonical evidence.
 
@@ -96,23 +96,24 @@ The active `scripts/deploy-testnet.ts` helper is bounded to testnet and the exis
 - Uses the corrected `contracts/treasury/revenue-automation.clar` path.
 - Uses deny-mode post conditions.
 - Stops on the first publish failure.
-- Writes a broadcast-only candidate as `<evidence>.broadcast.json`.
-- Polls with a bounded timeout and writes the confirmed evidence file only after canonical transaction and interface verification.
-- Never prints a completion message from broadcast-only results.
+- Writes or updates a `broadcast`/`partial` candidate as `<evidence>.broadcast.json` after every accepted txid and on failure/finally paths.
+- Polls with a bounded timeout and can write a confirmed evidence file only after canonical transaction, interface, and complete matching-plan verification.
+- Never labels or prints a broadcast-only result as confirmed or completed.
 
-Required environment variables are `DEPLOYER_PRIVKEY`, `SYSTEM_ADDRESS`, and, when git metadata is unavailable, `SOURCE_COMMIT`. Optional controls are `CORE_API_URL`, `HIRO_API_KEY`, `DEPLOYMENT_PLAN_PATH`, `DEPLOYMENT_EVIDENCE_PATH`, `DEPLOY_CONFIRM_TIMEOUT_MS`, and `DEPLOY_CONFIRM_POLL_MS`.
+Required environment variables are `DEPLOYER_PRIVKEY`, `SYSTEM_ADDRESS`, and `DEPLOYMENT_PLAN_PATH`. The plan path must identify a generated testnet helper mini-plan whose entries exactly match the bounded sequence and whose deployer is `SYSTEM_ADDRESS`; the full-system plan is intentionally rejected. When git metadata is unavailable, `SOURCE_COMMIT` is also required. Optional controls are `CORE_API_URL`, `HIRO_API_KEY`, `DEPLOYMENT_EVIDENCE_PATH`, `DEPLOY_CONFIRM_TIMEOUT_MS`, and `DEPLOY_CONFIRM_POLL_MS`.
 
-Do not treat an existing interface at a checked address as proof that this run published the contract. The helper records such contracts as pre-existing and requires at least one new publication before it can produce a confirmed deployment bundle.
+Do not treat an existing interface at a checked address as proof that this run published the contract. The helper is intentionally limited to a small testnet helper/preparatory sequence, not the full-system or partnership deployer. Its broadcast candidate is partial and cannot satisfy the full-system plan unless an explicit matching plan is supplied and every plan entry is independently evidenced; otherwise verification fails closed.
 
 ## 6. Mainnet human gate
 
-Mainnet remains manual only:
+Mainnet remains manual only, and the current GitHub workflow is preflight-only:
 
 1. Keep `dry_run=true` unless the operator is ready for a real release.
 2. Supply the exact confirmation string `DEPLOY_MAINNET`.
 3. Use the protected `mainnet` GitHub environment and its required reviewers.
-4. Confirm that the committed plan digest, network, source commit, and deployer identity are the approved values.
-5. Provide a real evidence bundle to the workflow's evidence step. If the deployment tool did not produce one, the workflow must fail; do not create placeholder txids or call logs proof.
+4. Confirm that the committed plan digest, network, source commit, and deployer identity are the approved values. The current `ST...` identity in the mainnet plan is an unresolved blocker, not an authorization to broadcast.
+5. Expect the workflow to validate the plan and emit clearly labeled plan/preflight/log artifacts only. It does not invoke `clarinet deployments apply`, load a mnemonic, sign, or broadcast.
+6. Every non-dry path must stop before signing until a structured receipt-producing broadcaster and complete evidence path exist for issue #531. Do not create placeholder txids or treat dashboard/debug logs as proof.
 
 There is no testnet-to-mainnet promotion job. A testnet result never authorizes a mainnet run.
 
@@ -124,7 +125,7 @@ For each transaction, retain the verifier's sanitized API evidence:
 - successful status, `canonical: true`, and `isUnanchored: false`;
 - transaction type and expected contract/function;
 - sender address;
-- Stacks block hash/height and burn-block hash/height;
+- Stacks block hash/height and the required positive burn-block height; preserve `burn_block_hash` only when Hiro supplies a non-null value;
 - optional block timestamps.
 
 For each checked contract, retain:

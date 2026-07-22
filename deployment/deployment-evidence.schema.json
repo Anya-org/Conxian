@@ -25,6 +25,9 @@
     "evidenceStatus": {
       "enum": ["plan", "workflow", "broadcast", "confirmed"]
     },
+    "coverage": {
+      "enum": ["partial", "complete"]
+    },
     "generatedAt": {
       "type": "string",
       "format": "date-time"
@@ -73,7 +76,6 @@
     },
     "contractPublications": {
       "type": "array",
-      "minItems": 1,
       "items": {
         "$ref": "#/$defs/contractPublication"
       }
@@ -86,7 +88,6 @@
     },
     "interfaces": {
       "type": "array",
-      "minItems": 1,
       "items": {
         "$ref": "#/$defs/interfaceExpectation"
       }
@@ -102,15 +103,21 @@
   "$defs": {
     "address": {
       "type": "string",
-      "pattern": "^S[PT][0-9A-Z]{39}$"
+      "description": "A checksum-valid standard Stacks principal. Runtime verification uses @stacks/transactions; this schema intentionally does not impose a fixed address length.",
+      "pattern": "^S[PMTN][0-9A-Z]+$"
     },
     "contractName": {
       "type": "string",
       "pattern": "^[a-zA-Z][a-zA-Z0-9-]{0,39}$"
     },
+    "functionName": {
+      "type": "string",
+      "pattern": "^(?:[a-zA-Z](?:[a-zA-Z0-9]|[-_!?+<>=/*])*|[-+=/*]|[<>]=?)$",
+      "maxLength": 127
+    },
     "contractId": {
       "type": "string",
-      "pattern": "^S[PT][0-9A-Z]{39}\\.[a-zA-Z][a-zA-Z0-9-]{0,39}$"
+      "pattern": "^S[PMTN][0-9A-Z]+\\.[a-zA-Z][a-zA-Z0-9-]{0,39}$"
     },
     "txid": {
       "type": "string",
@@ -122,10 +129,47 @@
       "required": ["name", "access"],
       "properties": {
         "name": {
-          "$ref": "#/$defs/contractName"
+          "$ref": "#/$defs/functionName"
         },
         "access": {
           "enum": ["public", "read_only"]
+        }
+      }
+    },
+    "planPosition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["batchId", "transactionIndex"],
+      "properties": {
+        "batchId": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "transactionIndex": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "canonicalFunctionArgument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type", "hex", "repr"],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/functionName"
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hex": {
+          "type": "string",
+          "pattern": "^0x[0-9a-fA-F]+$"
+        },
+        "repr": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -145,7 +189,6 @@
         "functionName",
         "blockHash",
         "blockHeight",
-        "burnBlockHash",
         "burnBlockHeight"
       ],
       "properties": {
@@ -179,7 +222,14 @@
           "$ref": "#/$defs/contractId"
         },
         "functionName": {
-          "type": ["string", "null"]
+          "anyOf": [
+            {
+              "$ref": "#/$defs/functionName"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "blockHash": {
           "type": "string",
@@ -196,6 +246,12 @@
         "burnBlockHeight": {
           "type": "integer",
           "minimum": 1
+        },
+        "functionArgs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/canonicalFunctionArgument"
+          }
         },
         "blockTimeIso": {
           "type": "string",
@@ -234,10 +290,13 @@
     "contractPublication": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "contractName", "contractId", "expectedSender", "txid"],
+      "required": ["kind", "planPosition", "contractName", "contractId", "expectedSender", "txid"],
       "properties": {
         "kind": {
           "const": "contract-publish"
+        },
+        "planPosition": {
+          "$ref": "#/$defs/planPosition"
         },
         "contractName": {
           "$ref": "#/$defs/contractName"
@@ -259,16 +318,19 @@
     "contractCall": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "contractId", "functionName", "expectedSender", "txid"],
+      "required": ["kind", "planPosition", "contractId", "functionName", "expectedSender", "txid"],
       "properties": {
         "kind": {
           "const": "contract-call"
+        },
+        "planPosition": {
+          "$ref": "#/$defs/planPosition"
         },
         "contractId": {
           "$ref": "#/$defs/contractId"
         },
         "functionName": {
-          "$ref": "#/$defs/contractName"
+          "$ref": "#/$defs/functionName"
         },
         "expectedSender": {
           "$ref": "#/$defs/address"
@@ -300,5 +362,41 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "evidenceStatus": {
+            "const": "confirmed"
+          }
+        }
+      },
+      "then": {
+        "required": ["coverage", "verifiedAt"],
+        "properties": {
+          "coverage": {
+            "const": "complete"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "evidenceStatus": {
+            "const": "broadcast"
+          }
+        }
+      },
+      "then": {
+        "required": ["coverage"],
+        "properties": {
+          "coverage": {
+            "const": "partial"
+          }
+        }
+      }
+    }
+  ]
 }

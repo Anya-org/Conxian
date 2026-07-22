@@ -1,6 +1,7 @@
 {
   "schemaVersion": "1",
   "evidenceStatus": "broadcast",
+  "coverage": "partial",
   "generatedAt": "2026-07-22T00:00:00.000Z",
   "sourceCommit": "REPLACE_WITH_40_HEX_SOURCE_COMMIT",
   "network": "testnet",
@@ -16,6 +17,10 @@
   "contractPublications": [
     {
       "kind": "contract-publish",
+      "planPosition": {
+        "batchId": 0,
+        "transactionIndex": 0
+      },
       "contractName": "REPLACE_WITH_CONTRACT_NAME",
       "contractId": "REPLACE_WITH_DEPLOYER.CONTRACT_NAME",
       "expectedSender": "REPLACE_WITH_NETWORK_DEPLOYER_ADDRESS",

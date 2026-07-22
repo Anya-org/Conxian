@@ -9,12 +9,19 @@ on:
       - 'Clarinet.toml'
       - 'settings/Testnet.toml'
       - 'deployments/**'
+      - 'scripts/deployment/**'
+      - 'scripts/deploy-testnet.ts'
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry run (generate plan only, no deploy)'
+        description: 'Dry run/preflight only (no signer, broadcast, or deployment proof)'
         type: boolean
         default: true
+      expected_plan_sha256:
+        description: 'Optional exact SHA-256 of deployments/full-system.testnet-plan.yaml'
+        type: string
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -53,98 +60,84 @@ jobs:
       - name: Restore deployment plan (guard against clarinet rewrite)
         run: cp deployments/default.simnet-plan.yaml.bak deployments/default.simnet-plan.yaml
 
-      - name: Run Full Test Suite
-        run: npm run ci
+      - name: Validate checked-in deployment plans
+        run: |
+          python3 -m pip install --user --disable-pip-version-check 'PyYAML==6.0.2'
+          python3 scripts/gen-deployment-plans.py --check
 
-  deploy-testnet:
+      - name: Run focused deployment safety tests
+        run: |
+          npm run test:deployment-evidence
+          npx vitest run tests/deploy-testnet-script.test.ts tests/deployment-workflows.test.ts --config vitest.config.ts --pool=threads
+
+  preflight-testnet:
     needs: validate
     runs-on: ubuntu-latest
-    environment: testnet
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
-      - name: Set up Node.js
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Clarinet
-        run: |
-          set -euo pipefail
-          VERSION="v3.21.0"
-          curl -sSL -o clarinet.tar.gz "https://github.com/stx-labs/clarinet/releases/download/${VERSION}/clarinet-linux-x64-glibc.tar.gz"
-          tar -xzf clarinet.tar.gz clarinet
-          chmod +x clarinet
-          sudo mv clarinet /usr/local/bin/clarinet
-          clarinet --version
-
-      - name: Prepare deployment artifacts
-        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
+      - name: Prepare plan-only artifacts
         run: mkdir -p deployment-artifacts
 
-      - name: Deploy to Testnet
-        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
+      - name: Validate exact testnet plan and source metadata
         env:
-          DEPLOYER_MNEMONIC: ${{ secrets.TESTNET_DEPLOYER_MNEMONIC }}
+          EXPECTED_PLAN_SHA256: ${{ inputs.expected_plan_sha256 || '' }}
         run: |
           set -euo pipefail
-          DEPLOY_LOG="deployment-artifacts/testnet-clarinet.log"
-          if ! echo y | script -q -c "clarinet deployments apply \
-            --manifest-path Clarinet.toml \
-            --deployment-plan-path deployments/full-system.testnet-plan.yaml" \
-            "$DEPLOY_LOG"; then
-            cat "$DEPLOY_LOG"
-            echo "Clarinet deployment failed; no completion claim is emitted."
-            exit 1
+          PLAN="deployments/full-system.testnet-plan.yaml"
+          ACTUAL=$(sha256sum "$PLAN" | awk '{print $1}')
+          if [ -n "$EXPECTED_PLAN_SHA256" ]; then
+            if ! [[ "$EXPECTED_PLAN_SHA256" =~ ^[0-9a-f]{64}$ ]]; then
+              echo "Expected testnet plan SHA-256 input is malformed."
+              exit 1
+            fi
+            if [ "$EXPECTED_PLAN_SHA256" != "$ACTUAL" ]; then
+              echo "Testnet plan SHA-256 input does not match the checked-in plan."
+              exit 1
+            fi
           fi
-          cat "$DEPLOY_LOG"
+          NETWORK=$(awk '$1 == "network:" { print $2; exit }' "$PLAN")
+          DEPLOYER=$(awk '$1 == "deployer:" { print $2; exit }' "$PLAN")
+          test "$NETWORK" = "testnet"
+          case "$DEPLOYER" in
+            ST*|SN*) ;;
+            *) echo "Testnet plan deployer must be a testnet ST/SN identity."; exit 1 ;;
+          esac
+          printf '%s  %s\n' "$ACTUAL" "$PLAN" > deployment-artifacts/testnet-plan.sha256
+          cat > deployment-artifacts/testnet-preflight.json <<EOF
+          {
+            "status": "plan-only/preflight",
+            "network": "$NETWORK",
+            "deployer": "$DEPLOYER",
+            "sourceCommit": "$(git rev-parse HEAD)",
+            "plan": "$PLAN",
+            "planSha256": "$ACTUAL",
+            "broadcast": false,
+            "deploymentProof": false
+          }
+          EOF
 
-      - name: Verify canonical deployment evidence
-        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
+      - name: Block non-dry broadcast attempts before signing
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == false }}
         run: |
-          set -euo pipefail
-          EVIDENCE="deployment-artifacts/testnet-evidence.json"
-          if [ ! -s "$EVIDENCE" ]; then
-            echo "Missing deployment evidence bundle at $EVIDENCE. A plan, workflow success, or broadcast is not a receipt."
-            exit 1
-          fi
-          DEPLOYER=$(awk '$1 == "deployer:" { print $2; exit }' deployments/full-system.testnet-plan.yaml)
-          test -n "$DEPLOYER"
-          npx tsx scripts/deployment/verify-evidence.ts \
-            --evidence "$EVIDENCE" \
-            --network testnet \
-            --deployer "$DEPLOYER" \
-            --plan deployments/full-system.testnet-plan.yaml \
-            --source-commit "$GITHUB_SHA" \
-            --output deployment-artifacts/testnet-evidence.verified.json
+          echo "::error::Testnet broadcast is blocked before signing. Issue #531 requires a structured receipt-producing broadcaster; use the deployment runbook preflight until that gate is implemented."
+          exit 1
 
-      - name: Smoke Test Deployed Contracts
-        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
+      - name: Write plan-only summary
+        if: always()
         run: |
-          echo "Running post-deployment smoke tests after canonical evidence verification..."
-          npx vitest run tests/sanity.test.ts tests/check-compile.test.ts --config vitest.config.ts --pool=threads
+          {
+            echo "## Testnet preflight (plan-only)"
+            echo "- Status: plan/preflight only"
+            echo "- No mnemonic, signer, broadcast, or deployment proof was used"
+            echo "- A non-dry request is blocked before signing pending issue #531"
+          } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Generate Deployment Report
-        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
-        run: |
-          set -euo pipefail
-          DEPLOYER=$(awk '$1 == "deployer:" { print $2; exit }' deployments/full-system.testnet-plan.yaml)
-          echo "## Testnet Deployment Report" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Deployer:** $DEPLOYER" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Network:** Testnet" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Plan:** deployments/full-system.testnet-plan.yaml" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Evidence:** deployment-artifacts/testnet-evidence.verified.json" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Status:** canonical receipt and interface verification passed" >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Upload Deployment Artifacts
+      - name: Upload plan-only artifacts
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: testnet-deployment-artifacts
+          name: testnet-plan-preflight
           path: |
             deployments/full-system.testnet-plan.yaml
             deployment-artifacts/

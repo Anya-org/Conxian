@@ -2,19 +2,46 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
+import { parseDocument } from "yaml";
+import {
+  AddressVersion,
+  contractPrincipalCV,
+  createStandardPrincipal,
+  cvToHex,
+  hexToCV,
+  internal_parseCommaSeparated,
+  isClarityName,
+  standardPrincipalCV,
+  validateStacksAddress,
+  type ClarityValue,
+} from "@stacks/transactions";
 
 export type DeploymentNetwork = "testnet" | "mainnet";
 export type EvidenceStatus = "plan" | "workflow" | "broadcast" | "confirmed";
+export type EvidenceCoverage = "partial" | "complete";
 export type DeploymentTransactionKind = "contract-publish" | "contract-call";
 export type InterfaceAccess = "public" | "read_only";
+
+export interface PlanPosition {
+  batchId: number;
+  transactionIndex: number;
+}
 
 export interface RequiredFunction {
   name: string;
   access: InterfaceAccess;
 }
 
+export interface CanonicalFunctionArgument {
+  name: string;
+  type: string;
+  hex: string;
+  repr: string;
+}
+
 export interface ContractPublicationEvidence {
   kind: "contract-publish";
+  planPosition: PlanPosition;
   contractName: string;
   contractId: string;
   expectedSender: string;
@@ -24,6 +51,7 @@ export interface ContractPublicationEvidence {
 
 export interface ContractCallEvidence {
   kind: "contract-call";
+  planPosition: PlanPosition;
   contractId: string;
   functionName: string;
   expectedSender: string;
@@ -50,8 +78,9 @@ export interface TransactionApiEvidence {
   functionName: string | null;
   blockHash: string;
   blockHeight: number;
-  burnBlockHash: string;
+  burnBlockHash?: string;
   burnBlockHeight: number;
+  functionArgs?: CanonicalFunctionArgument[];
   blockTimeIso?: string;
   burnBlockTimeIso?: string;
 }
@@ -66,6 +95,7 @@ export interface InterfaceApiEvidence {
 export interface DeploymentEvidence {
   schemaVersion: "1";
   evidenceStatus: EvidenceStatus;
+  coverage?: EvidenceCoverage;
   generatedAt: string;
   verifiedAt?: string;
   sourceCommit: string;
@@ -102,15 +132,42 @@ export interface WaitForEvidenceOptions extends VerifyEvidenceOptions {
   sleep?: (milliseconds: number) => Promise<void>;
 }
 
+export interface EffectivePlanContractPublish {
+  kind: "contract-publish";
+  planPosition: PlanPosition;
+  contractName: string;
+  contractId: string;
+  expectedSender: string;
+}
+
+export interface EffectivePlanContractCall {
+  kind: "contract-call";
+  planPosition: PlanPosition;
+  contractId: string;
+  functionName: string;
+  expectedSender: string;
+  parameters: string[];
+}
+
+export type EffectivePlanEntry = EffectivePlanContractPublish | EffectivePlanContractCall;
+
+export interface ParsedDeploymentPlan {
+  network: DeploymentNetwork;
+  deployer: string;
+  entries: EffectivePlanEntry[];
+}
+
 export class DeploymentVerificationError extends Error {
   readonly code: string;
   readonly retryable: boolean;
+  readonly status?: string;
 
-  constructor(message: string, code: string, retryable = false) {
+  constructor(message: string, code: string, retryable = false, status?: string) {
     super(message);
     this.name = "DeploymentVerificationError";
     this.code = code;
     this.retryable = retryable;
+    this.status = status;
   }
 }
 
@@ -121,11 +178,18 @@ export const HIRO_API_BASE_URLS: Readonly<Record<DeploymentNetwork, string>> = {
 
 const TXID_PATTERN = /^0x[0-9a-fA-F]{64}$/;
 const HASH_PATTERN = /^[0-9a-f]{64}$/;
+const CLARITY_HEX_PATTERN = /^0x?[0-9a-fA-F]+$/;
 const COMMIT_PATTERN = /^[0-9a-f]{40}$/;
-const ADDRESS_PATTERN = /^S[PT][0-9A-Z]{39}$/;
 const CONTRACT_NAME_PATTERN = /^[a-zA-Z][a-zA-Z0-9-]{0,39}$/;
 const ISO_TIMESTAMP_PATTERN =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/;
+
+const NETWORK_ADDRESS_VERSIONS: Readonly<Record<DeploymentNetwork, ReadonlySet<number>>> = {
+  mainnet: new Set([AddressVersion.MainnetSingleSig, AddressVersion.MainnetMultiSig]),
+  testnet: new Set([AddressVersion.TestnetSingleSig, AddressVersion.TestnetMultiSig]),
+};
+
+const KNOWN_HIRO_HOSTS = new Set(Object.values(HIRO_API_BASE_URLS).map((baseUrl) => new URL(baseUrl).hostname));
 
 type JsonObject = Record<string, unknown>;
 
@@ -153,7 +217,12 @@ function assertCondition(
   }
 }
 
-function assertOnlyKeys(value: JsonObject, allowed: readonly string[], path: string, code = "MALFORMED_EVIDENCE"): void {
+function assertOnlyKeys(
+  value: JsonObject,
+  allowed: readonly string[],
+  path: string,
+  code = "MALFORMED_EVIDENCE",
+): void {
   for (const key of Object.keys(value)) {
     assertCondition(allowed.includes(key), `${path}.${key} is not allowed in the evidence schema`, code);
   }
@@ -167,17 +236,40 @@ function assertIsoTimestamp(value: unknown, path: string, code = "MALFORMED_EVID
   );
 }
 
-function assertAddress(value: unknown, path: string): asserts value is string {
-  assertCondition(
-    typeof value === "string" && ADDRESS_PATTERN.test(value),
-    `${path} must be a valid Stacks standard address`,
-  );
+function stacksAddressVersion(value: string, path: string): number {
+  assertCondition(validateStacksAddress(value), `${path} must be a valid Stacks standard address`);
+  try {
+    return createStandardPrincipal(value).address.version;
+  } catch {
+    throw new DeploymentVerificationError(`${path} must be a valid Stacks standard address`, "MALFORMED_EVIDENCE");
+  }
 }
 
-function assertContractName(value: unknown, path: string): asserts value is string {
+function assertAddress(value: unknown, path: string, network?: DeploymentNetwork): asserts value is string {
+  assertCondition(typeof value === "string", `${path} must be a valid Stacks standard address`);
+  const version = stacksAddressVersion(value, path);
+  if (network !== undefined) {
+    assertCondition(
+      NETWORK_ADDRESS_VERSIONS[network].has(version),
+      `${path} does not match the ${network} Stacks address network`,
+      "NETWORK_DEPLOYER_MISMATCH",
+    );
+  }
+}
+
+function assertContractName(value: unknown, path: string, code = "MALFORMED_EVIDENCE"): asserts value is string {
   assertCondition(
     typeof value === "string" && CONTRACT_NAME_PATTERN.test(value),
     `${path} must be a valid Clarity contract name`,
+    code,
+  );
+}
+
+function assertFunctionName(value: unknown, path: string, code = "MALFORMED_EVIDENCE"): asserts value is string {
+  assertCondition(
+    typeof value === "string" && isClarityName(value),
+    `${path} must be a valid Clarity function name`,
+    code,
   );
 }
 
@@ -202,21 +294,44 @@ function assertCommit(value: unknown, path: string): asserts value is string {
   );
 }
 
-function assertContractId(value: unknown, path: string): asserts value is string {
+function assertContractId(value: unknown, path: string, network?: DeploymentNetwork): asserts value is string {
   assertCondition(typeof value === "string" && value.includes("."), `${path} must be an address.contract-name identifier`);
   const separator = value.lastIndexOf(".");
-  assertAddress(value.slice(0, separator), `${path} address`);
+  assertAddress(value.slice(0, separator), `${path} address`, network);
   assertContractName(value.slice(separator + 1), `${path} contract name`);
 }
 
 function assertNetworkDeployer(network: DeploymentNetwork, deployer: string): void {
-  assertAddress(deployer, "deployer");
-  const expectedPrefix = network === "mainnet" ? "SP" : "ST";
+  assertAddress(deployer, "deployer", network);
+}
+
+function assertPlanPosition(value: unknown, path: string): asserts value is PlanPosition {
+  assertCondition(isObject(value), `${path} must be an object`);
+  assertOnlyKeys(value, ["batchId", "transactionIndex"], path);
+  assertCondition(Number.isInteger(value.batchId) && (value.batchId as number) >= 0, `${path}.batchId is invalid`);
   assertCondition(
-    deployer.startsWith(expectedPrefix),
-    `deployer ${deployer} does not match ${network} address prefix ${expectedPrefix}`,
-    "NETWORK_DEPLOYER_MISMATCH",
+    Number.isInteger(value.transactionIndex) && (value.transactionIndex as number) >= 0,
+    `${path}.transactionIndex is invalid`,
   );
+}
+
+function assertRecordedFunctionArguments(value: unknown, path: string): asserts value is CanonicalFunctionArgument[] {
+  assertCondition(Array.isArray(value), `${path} must be an array`);
+  for (const [index, item] of value.entries()) {
+    const itemPath = `${path}[${index}]`;
+    assertCondition(isObject(item), `${itemPath} must be an object`);
+    assertOnlyKeys(item, ["name", "type", "hex", "repr"], itemPath);
+    assertFunctionName(item.name, `${itemPath}.name`);
+    assertCondition(isNonEmptyString(item.type), `${itemPath}.type must be non-empty`);
+    assertCanonicalClarityHex(item.hex, `${itemPath}.hex`);
+    assertCondition(isNonEmptyString(item.repr), `${itemPath}.repr must be non-empty`);
+    const reprHex = clarityHexFromRepr(item.repr, `${itemPath}.repr`);
+    assertCondition(
+      reprHex === normaliseClarityHex(item.hex as string),
+      `${itemPath}.hex and ${itemPath}.repr do not describe the same Clarity value`,
+      "ARGUMENT_MISMATCH",
+    );
+  }
 }
 
 function assertRecordedTransactionEvidence(value: unknown, path: string): void {
@@ -238,6 +353,7 @@ function assertRecordedTransactionEvidence(value: unknown, path: string): void {
       "blockHeight",
       "burnBlockHash",
       "burnBlockHeight",
+      "functionArgs",
       "blockTimeIso",
       "burnBlockTimeIso",
     ],
@@ -256,13 +372,17 @@ function assertRecordedTransactionEvidence(value: unknown, path: string): void {
   assertAddress(value.senderAddress, `${path}.senderAddress`);
   assertContractId(value.contractId, `${path}.contractId`);
   assertCondition(value.functionName === null || isNonEmptyString(value.functionName), `${path}.functionName is invalid`);
+  if (value.functionName !== null) assertFunctionName(value.functionName, `${path}.functionName`);
   assertCondition(isNonEmptyString(value.blockHash), `${path}.blockHash must be non-empty`);
   assertCondition(Number.isInteger(value.blockHeight) && (value.blockHeight as number) > 0, `${path}.blockHeight is invalid`);
-  assertCondition(isNonEmptyString(value.burnBlockHash), `${path}.burnBlockHash must be non-empty`);
+  if (value.burnBlockHash !== undefined) {
+    assertCondition(isNonEmptyString(value.burnBlockHash), `${path}.burnBlockHash must be non-empty`);
+  }
   assertCondition(
     Number.isInteger(value.burnBlockHeight) && (value.burnBlockHeight as number) > 0,
     `${path}.burnBlockHeight is invalid`,
   );
+  if (value.functionArgs !== undefined) assertRecordedFunctionArguments(value.functionArgs, `${path}.functionArgs`);
   if (value.blockTimeIso !== undefined) assertIsoTimestamp(value.blockTimeIso, `${path}.blockTimeIso`);
   if (value.burnBlockTimeIso !== undefined) assertIsoTimestamp(value.burnBlockTimeIso, `${path}.burnBlockTimeIso`);
 }
@@ -286,11 +406,64 @@ function assertInterfaceFunctions(
   for (const [index, item] of value.entries()) {
     assertCondition(isObject(item), `${path}[${index}] must be an object`, code);
     assertOnlyKeys(item, ["name", "access"], `${path}[${index}]`, code);
-    assertCondition(isNonEmptyString(item.name), `${path}[${index}].name must be non-empty`, code);
-    assertCondition(item.access === "public" || item.access === "read_only", `${path}[${index}].access is unsupported`, code);
+    assertFunctionName(item.name, `${path}[${index}].name`, code);
+    assertCondition(
+      item.access === "public" || item.access === "read_only",
+      `${path}[${index}].access is unsupported`,
+      code,
+    );
     assertCondition(!names.has(item.name), `${path} contains duplicate function ${item.name}`, code);
     names.add(item.name);
   }
+}
+
+function assertHiroFunctionArguments(value: unknown, path: string, code: string): void {
+  assertCondition(Array.isArray(value), `${path} must be an array`, code);
+  for (const [index, item] of value.entries()) {
+    assertCondition(isObject(item), `${path}[${index}] must be an object`, code);
+    assertFunctionName(item.name, `${path}[${index}].name`, code);
+    assertCondition(isNonEmptyString(item.type), `${path}[${index}].type must be non-empty`, code);
+  }
+}
+
+function assertHiroOutputs(value: unknown, path: string, code: string): void {
+  if (isNonEmptyString(value)) return;
+  if (Array.isArray(value)) {
+    for (const [index, item] of value.entries()) {
+      if (isNonEmptyString(item)) continue;
+      assertCondition(isObject(item) && isNonEmptyString(item.type), `${path}[${index}] is invalid`, code);
+    }
+    return;
+  }
+  assertCondition(isObject(value) && isNonEmptyString(value.type), `${path} must contain a type`, code);
+}
+
+function readHiroInterfaceFunctions(value: unknown, path: string): RequiredFunction[] {
+  const code = "UNSUPPORTED_API_PAYLOAD";
+  assertCondition(Array.isArray(value), `${path} must be an array`, code);
+  const functions: RequiredFunction[] = [];
+  const names = new Set<string>();
+  for (const [index, item] of value.entries()) {
+    const itemPath = `${path}[${index}]`;
+    assertCondition(isObject(item), `${itemPath} must be an object`, code);
+    assertFunctionName(item.name, `${itemPath}.name`, code);
+    assertCondition(
+      item.access === "private" || item.access === "public" || item.access === "read_only",
+      `${itemPath}.access is unsupported`,
+      code,
+    );
+    if (item.args !== undefined) assertHiroFunctionArguments(item.args, `${itemPath}.args`, code);
+    if (item.outputs !== undefined) assertHiroOutputs(item.outputs, `${itemPath}.outputs`, code);
+
+    // Private functions are documented by Hiro but cannot be requested as
+    // public evidence. Validate them above, then omit them from the
+    // sanitized evidence representation.
+    if (item.access === "private") continue;
+    assertCondition(!names.has(item.name), `${path} contains duplicate function ${item.name}`, code);
+    names.add(item.name);
+    functions.push({ name: item.name, access: item.access });
+  }
+  return functions;
 }
 
 function parseEvidenceBundle(value: unknown): DeploymentEvidence {
@@ -300,6 +473,7 @@ function parseEvidenceBundle(value: unknown): DeploymentEvidence {
     [
       "schemaVersion",
       "evidenceStatus",
+      "coverage",
       "generatedAt",
       "verifiedAt",
       "sourceCommit",
@@ -322,11 +496,14 @@ function parseEvidenceBundle(value: unknown): DeploymentEvidence {
       value.evidenceStatus === "confirmed",
     "evidence bundle evidenceStatus is unsupported",
   );
+  if (value.coverage !== undefined) {
+    assertCondition(value.coverage === "partial" || value.coverage === "complete", "evidence coverage is unsupported");
+  }
   assertIsoTimestamp(value.generatedAt, "generatedAt");
   if (value.verifiedAt !== undefined) assertIsoTimestamp(value.verifiedAt, "verifiedAt");
   assertCommit(value.sourceCommit, "sourceCommit");
   assertCondition(value.network === "testnet" || value.network === "mainnet", "network must be testnet or mainnet");
-  assertAddress(value.deployer, "deployer");
+  assertAddress(value.deployer, "deployer", value.network);
   assertCondition(isObject(value.plan), "plan must be an object");
   assertOnlyKeys(value.plan, ["path", "sha256"], "plan");
   assertCondition(isNonEmptyString(value.plan.path), "plan.path must be non-empty");
@@ -335,27 +512,22 @@ function parseEvidenceBundle(value: unknown): DeploymentEvidence {
   assertOnlyKeys(value.claims, ["scope", "globalNonexistence"], "claims");
   assertCondition(value.claims.scope === "checked-addresses", "claims.scope must be checked-addresses");
   assertCondition(value.claims.globalNonexistence === false, "global nonexistence claims are not allowed");
-  assertNetworkDeployer(value.network, value.deployer);
 
   assertCondition(Array.isArray(value.contractPublications), "contractPublications must be an array");
-  assertCondition(value.contractPublications.length > 0, "at least one contract publication is required");
-  assertCondition(
-    value.contractCalls === undefined || Array.isArray(value.contractCalls),
-    "contractCalls must be an array when present",
-  );
+  assertCondition(Array.isArray(value.contractCalls), "contractCalls must be an array");
   assertCondition(Array.isArray(value.interfaces), "interfaces must be an array");
-  assertCondition(value.interfaces.length > 0, "at least one contract interface expectation is required");
 
   const txids = new Set<string>();
   const publicationIds = new Set<string>();
   for (const [index, item] of value.contractPublications.entries()) {
     const path = `contractPublications[${index}]`;
     assertCondition(isObject(item), `${path} must be an object`);
-    assertOnlyKeys(item, ["kind", "contractName", "contractId", "expectedSender", "txid", "apiEvidence"], path);
+    assertOnlyKeys(item, ["kind", "planPosition", "contractName", "contractId", "expectedSender", "txid", "apiEvidence"], path);
     assertCondition(item.kind === "contract-publish", `${path}.kind must be contract-publish`);
+    assertPlanPosition(item.planPosition, `${path}.planPosition`);
     assertContractName(item.contractName, `${path}.contractName`);
-    assertContractId(item.contractId, `${path}.contractId`);
-    assertAddress(item.expectedSender, `${path}.expectedSender`);
+    assertContractId(item.contractId, `${path}.contractId`, value.network);
+    assertAddress(item.expectedSender, `${path}.expectedSender`, value.network);
     assertTxid(item.txid, `${path}.txid`);
     assertCondition(item.expectedSender === value.deployer, `${path}.expectedSender must match deployer`, "IDENTITY_MISMATCH");
     assertCondition(
@@ -370,15 +542,16 @@ function parseEvidenceBundle(value: unknown): DeploymentEvidence {
     if (item.apiEvidence !== undefined) assertRecordedTransactionEvidence(item.apiEvidence, `${path}.apiEvidence`);
   }
 
-  const contractCalls = (value.contractCalls ?? []) as ContractCallEvidence[];
+  const contractCalls = value.contractCalls as ContractCallEvidence[];
   for (const [index, item] of contractCalls.entries()) {
     const path = `contractCalls[${index}]`;
     assertCondition(isObject(item), `${path} must be an object`);
-    assertOnlyKeys(item, ["kind", "contractId", "functionName", "expectedSender", "txid", "apiEvidence"], path);
+    assertOnlyKeys(item, ["kind", "planPosition", "contractId", "functionName", "expectedSender", "txid", "apiEvidence"], path);
     assertCondition(item.kind === "contract-call", `${path}.kind must be contract-call`);
-    assertContractId(item.contractId, `${path}.contractId`);
-    assertCondition(isNonEmptyString(item.functionName), `${path}.functionName must be non-empty`);
-    assertAddress(item.expectedSender, `${path}.expectedSender`);
+    assertPlanPosition(item.planPosition, `${path}.planPosition`);
+    assertContractId(item.contractId, `${path}.contractId`, value.network);
+    assertFunctionName(item.functionName, `${path}.functionName`);
+    assertAddress(item.expectedSender, `${path}.expectedSender`, value.network);
     assertTxid(item.txid, `${path}.txid`);
     assertCondition(item.expectedSender === value.deployer, `${path}.expectedSender must match deployer`, "IDENTITY_MISMATCH");
     assertCondition(!txids.has(item.txid), `${path}.txid is duplicated`, "DUPLICATE_TXID");
@@ -391,7 +564,7 @@ function parseEvidenceBundle(value: unknown): DeploymentEvidence {
     const path = `interfaces[${index}]`;
     assertCondition(isObject(item), `${path} must be an object`);
     assertOnlyKeys(item, ["contractId", "requiredFunctions", "interfaceEvidence"], path);
-    assertContractId(item.contractId, `${path}.contractId`);
+    assertContractId(item.contractId, `${path}.contractId`, value.network);
     assertCondition(Array.isArray(item.requiredFunctions), `${path}.requiredFunctions must be an array`);
     assertInterfaceFunctions(item.requiredFunctions, `${path}.requiredFunctions`);
     assertCondition(!interfaceIds.has(item.contractId), `${path}.contractId is duplicated`, "DUPLICATE_INTERFACE");
@@ -408,11 +581,12 @@ function parseEvidenceBundle(value: unknown): DeploymentEvidence {
   if (value.preexistingContracts !== undefined) {
     assertCondition(Array.isArray(value.preexistingContracts), "preexistingContracts must be an array");
     for (const [index, contractId] of value.preexistingContracts.entries()) {
-      assertContractId(contractId, `preexistingContracts[${index}]`);
+      assertContractId(contractId, `preexistingContracts[${index}]`, value.network);
     }
   }
 
   if (value.evidenceStatus === "confirmed") {
+    assertCondition(value.coverage === "complete", "confirmed evidence requires complete coverage");
     assertCondition(isNonEmptyString(value.verifiedAt), "confirmed evidence requires verifiedAt");
     for (const [index, item] of value.contractPublications.entries()) {
       assertCondition(item.apiEvidence !== undefined, `confirmed evidence is missing contractPublications[${index}].apiEvidence`);
@@ -423,6 +597,9 @@ function parseEvidenceBundle(value: unknown): DeploymentEvidence {
     for (const [index, item] of value.interfaces.entries()) {
       assertCondition(item.interfaceEvidence !== undefined, `confirmed evidence is missing interfaces[${index}].interfaceEvidence`);
     }
+  }
+  if (value.evidenceStatus === "broadcast") {
+    assertCondition(value.coverage === "partial", "broadcast evidence must be labeled partial");
   }
 
   return value as unknown as DeploymentEvidence;
@@ -441,6 +618,15 @@ function normaliseBaseUrl(baseUrl: string): string {
   return parsed.toString().replace(/\/$/, "");
 }
 
+export function isKnownHiroApiBaseUrl(baseUrl: string): boolean {
+  try {
+    const parsed = new URL(baseUrl);
+    return parsed.protocol === "https:" && KNOWN_HIRO_HOSTS.has(parsed.hostname.toLowerCase());
+  } catch {
+    return false;
+  }
+}
+
 function endpointUrl(baseUrl: string, path: string): string {
   return `${baseUrl}${path}`;
 }
@@ -449,15 +635,13 @@ async function fetchJson(
   fetcher: typeof fetch,
   url: string,
   apiKey: string | undefined,
+  baseUrl: string,
 ): Promise<HttpJsonResponse> {
   let response: Response;
   try {
-    response = await fetcher(url, {
-      headers: {
-        accept: "application/json",
-        ...(apiKey ? { "x-hiro-api-key": apiKey } : {}),
-      },
-    });
+    const headers: Record<string, string> = { accept: "application/json" };
+    if (apiKey && isKnownHiroApiBaseUrl(baseUrl)) headers["x-hiro-api-key"] = apiKey;
+    response = await fetcher(url, { headers });
   } catch {
     throw new DeploymentVerificationError(`request failed for ${url}`, "HTTP_REQUEST_FAILED", true);
   }
@@ -474,16 +658,113 @@ async function fetchJson(
   return { status: response.status, body };
 }
 
-function readPlanMetadata(planPath: string): { network?: string; deployer?: string } {
+function planError(message: string, code = "PLAN_MALFORMED"): never {
+  throw new DeploymentVerificationError(message, code);
+}
+
+function readYamlPlan(planPath: string): unknown {
   let contents: string;
   try {
     contents = readFileSync(planPath, "utf8");
   } catch {
     throw new DeploymentVerificationError(`deployment plan is not readable: ${planPath}`, "PLAN_UNREADABLE");
   }
-  const network = /^network:\s*([^\s#]+)\s*$/m.exec(contents)?.[1];
-  const deployer = /^deployer:\s*([^\s#]+)\s*$/m.exec(contents)?.[1];
-  return { network, deployer };
+  try {
+    const document = parseDocument(contents, { uniqueKeys: true });
+    if (document.errors.length > 0) planError("deployment plan YAML is malformed");
+    return document.toJS();
+  } catch (error) {
+    if (error instanceof DeploymentVerificationError) throw error;
+    throw new DeploymentVerificationError("deployment plan YAML is malformed", "PLAN_MALFORMED");
+  }
+}
+
+function readPlanPosition(batchId: unknown, transactionIndex: number, path: string): PlanPosition {
+  assertCondition(Number.isInteger(batchId) && (batchId as number) >= 0, `${path}.id is invalid`, "PLAN_MALFORMED");
+  return { batchId: batchId as number, transactionIndex };
+}
+
+function readPlanString(value: unknown, path: string): string {
+  if (!isNonEmptyString(value)) planError(`${path} must be a non-empty string`);
+  return value;
+}
+
+export function readDeploymentPlan(planPath: string): ParsedDeploymentPlan {
+  const root = readYamlPlan(planPath);
+  if (!isObject(root)) planError("deployment plan must be a YAML object");
+  const network = root.network;
+  const deployer = root.deployer;
+  assertCondition(network === "testnet" || network === "mainnet", "deployment plan network is invalid", "PLAN_MALFORMED");
+  assertCondition(isNonEmptyString(deployer), "deployment plan deployer is missing", "PLAN_MALFORMED");
+  assertNetworkDeployer(network, deployer);
+  assertCondition(isObject(root.plan) && Array.isArray(root.plan.batches), "deployment plan batches are missing", "PLAN_MALFORMED");
+
+  const entries: EffectivePlanEntry[] = [];
+  const batchIds = new Set<number>();
+  for (const [batchIndex, batch] of root.plan.batches.entries()) {
+    assertCondition(isObject(batch), `plan.batches[${batchIndex}] must be an object`, "PLAN_MALFORMED");
+    const batchId = batch.id;
+    assertCondition(Number.isInteger(batchId) && (batchId as number) >= 0, `plan.batches[${batchIndex}].id is invalid`, "PLAN_MALFORMED");
+    assertCondition(!batchIds.has(batchId as number), `plan batch id ${String(batchId)} is duplicated`, "PLAN_DUPLICATE_POSITION");
+    batchIds.add(batchId as number);
+    assertCondition(Array.isArray(batch.transactions), `plan.batches[${batchIndex}].transactions is missing`, "PLAN_MALFORMED");
+
+    for (const [transactionIndex, transaction] of batch.transactions.entries()) {
+      assertCondition(isObject(transaction), `plan.batches[${batchIndex}].transactions[${transactionIndex}] must be an object`, "PLAN_MALFORMED");
+      const position = readPlanPosition(batchId, transactionIndex, `plan.batches[${batchIndex}]`);
+      if (transaction["contract-publish"] !== undefined) {
+        const body = transaction["contract-publish"];
+        assertCondition(isObject(body), `plan transaction ${position.batchId}:${position.transactionIndex} publish body is invalid`, "PLAN_MALFORMED");
+        const contractName = readPlanString(body["contract-name"], "contract-publish.contract-name");
+        assertContractName(contractName, "contract-publish.contract-name", "PLAN_MALFORMED");
+        const expectedSender = readPlanString(body["expected-sender"], "contract-publish.expected-sender");
+        assertAddress(expectedSender, "contract-publish.expected-sender", network);
+        assertCondition(expectedSender === deployer, "deployment plan transaction sender does not match plan deployer", "IDENTITY_MISMATCH");
+        entries.push({
+          kind: "contract-publish",
+          planPosition: position,
+          contractName,
+          contractId: `${expectedSender}.${contractName}`,
+          expectedSender,
+        });
+      }
+      if (transaction["contract-call"] !== undefined) {
+        const body = transaction["contract-call"];
+        assertCondition(isObject(body), `plan transaction ${position.batchId}:${position.transactionIndex} call body is invalid`, "PLAN_MALFORMED");
+        const contractId = readPlanString(body["contract-id"], "contract-call.contract-id");
+        assertContractId(contractId, "contract-call.contract-id", network);
+        const expectedSender = readPlanString(body["expected-sender"], "contract-call.expected-sender");
+        assertAddress(expectedSender, "contract-call.expected-sender", network);
+        assertCondition(expectedSender === deployer, "deployment plan transaction sender does not match plan deployer", "IDENTITY_MISMATCH");
+        const functionName = readPlanString(body.method, "contract-call.method");
+        assertFunctionName(functionName, "contract-call.method", "PLAN_MALFORMED");
+        assertCondition(Array.isArray(body.parameters), "contract-call.parameters must be an array", "PLAN_ARGUMENTS_UNSUPPORTED");
+        const parameters = body.parameters.map((parameter, parameterIndex) => {
+          const repr = readPlanString(parameter, `contract-call.parameters[${parameterIndex}]`);
+          // Validate the generator's canonical Clarity representation now so
+          // a malformed call cannot become a confirmed bundle later.
+          clarityHexFromRepr(repr, `contract-call.parameters[${parameterIndex}]`);
+          return repr.trim();
+        });
+        entries.push({
+          kind: "contract-call",
+          planPosition: position,
+          contractId,
+          functionName,
+          expectedSender,
+          parameters,
+        });
+      }
+      assertCondition(
+        !(transaction["contract-publish"] !== undefined && transaction["contract-call"] !== undefined),
+        `plan transaction ${position.batchId}:${position.transactionIndex} contains multiple effective transaction kinds`,
+        "PLAN_MALFORMED",
+      );
+    }
+  }
+
+  assertCondition(entries.length > 0, "deployment plan contains no effective on-chain transactions", "PLAN_MALFORMED");
+  return { network, deployer, entries };
 }
 
 export function sha256File(path: string): string {
@@ -494,7 +775,60 @@ export function sha256File(path: string): string {
   }
 }
 
-function validatePlanAndSource(bundle: DeploymentEvidence, options: VerifyEvidenceOptions): void {
+function positionKey(position: PlanPosition): string {
+  return `${position.batchId}:${position.transactionIndex}`;
+}
+
+function planEntryKey(entry: EffectivePlanEntry): string {
+  return `${positionKey(entry.planPosition)}:${entry.kind}:${entry.contractId}:${entry.kind === "contract-call" ? entry.functionName : entry.contractName}`;
+}
+
+function evidenceEntryKey(entry: ContractPublicationEvidence | ContractCallEvidence): string {
+  return `${positionKey(entry.planPosition)}:${entry.kind}:${entry.contractId}:${entry.kind === "contract-call" ? entry.functionName : entry.contractName}`;
+}
+
+function validateCompletePlanBinding(bundle: DeploymentEvidence, plan: ParsedDeploymentPlan): void {
+  assertCondition(bundle.network === plan.network, "evidence network does not match deployment plan", "NETWORK_MISMATCH");
+  assertCondition(bundle.deployer === plan.deployer, "evidence deployer does not match deployment plan", "IDENTITY_MISMATCH");
+  assertCondition(
+    bundle.preexistingContracts === undefined || bundle.preexistingContracts.length === 0,
+    "pre-existing/skipped contracts are not modeled as independently verified plan entries",
+    "UNMODELED_PREEXISTING",
+  );
+
+  const expected = new Map<string, EffectivePlanEntry>();
+  for (const entry of plan.entries) {
+    const key = planEntryKey(entry);
+    assertCondition(!expected.has(key), `deployment plan contains duplicate effective entry ${key}`, "PLAN_DUPLICATE_ENTRY");
+    expected.set(key, entry);
+  }
+
+  const actualEntries: Array<ContractPublicationEvidence | ContractCallEvidence> = [
+    ...bundle.contractPublications,
+    ...bundle.contractCalls,
+  ];
+  const actual = new Map<string, ContractPublicationEvidence | ContractCallEvidence>();
+  for (const entry of actualEntries) {
+    const key = evidenceEntryKey(entry);
+    assertCondition(!actual.has(key), `evidence contains duplicate plan entry ${key}`, "DUPLICATE_PLAN_ENTRY");
+    actual.set(key, entry);
+    const expectedEntry = expected.get(key);
+    assertCondition(expectedEntry !== undefined, `evidence contains an extra or mismatched plan entry ${key}`, "PLAN_EVIDENCE_MISMATCH");
+    assertCondition(entry.expectedSender === expectedEntry.expectedSender, `evidence sender does not match plan entry ${key}`, "IDENTITY_MISMATCH");
+    if (entry.kind === "contract-publish" && expectedEntry.kind === "contract-publish") {
+      assertCondition(entry.contractName === expectedEntry.contractName, `evidence contract name does not match plan entry ${key}`, "IDENTITY_MISMATCH");
+    }
+    if (entry.kind === "contract-call" && expectedEntry.kind === "contract-call") {
+      assertCondition(entry.functionName === expectedEntry.functionName, `evidence function does not match plan entry ${key}`, "FUNCTION_MISMATCH");
+    }
+  }
+
+  const missing = [...expected.keys()].filter((key) => !actual.has(key));
+  assertCondition(missing.length === 0, `evidence is missing ${missing.length} effective plan transaction(s): ${missing.slice(0, 5).join(", ")}`, "PLAN_EVIDENCE_MISMATCH");
+  assertCondition(actual.size === expected.size, "evidence does not have a one-to-one mapping to the deployment plan", "PLAN_EVIDENCE_MISMATCH");
+}
+
+function validatePlanAndSource(bundle: DeploymentEvidence, options: VerifyEvidenceOptions): ParsedDeploymentPlan {
   assertCondition(bundle.network === options.network, "evidence network does not match requested network", "NETWORK_MISMATCH");
   assertCondition(bundle.deployer === options.deployer, "evidence deployer does not match requested deployer", "IDENTITY_MISMATCH");
   assertNetworkDeployer(options.network, options.deployer);
@@ -503,51 +837,146 @@ function validatePlanAndSource(bundle: DeploymentEvidence, options: VerifyEviden
     assertCondition(bundle.sourceCommit === options.sourceCommit, "evidence source commit does not match requested source commit", "SOURCE_COMMIT_MISMATCH");
   }
 
-  if (options.planPath !== undefined) {
-    assertCondition(existsSync(options.planPath), `deployment plan does not exist: ${options.planPath}`, "PLAN_UNREADABLE");
-    const expectedHash = sha256File(options.planPath);
-    assertCondition(bundle.plan.sha256 === expectedHash, "evidence plan hash does not match deployment plan", "PLAN_HASH_MISMATCH");
-    const metadata = readPlanMetadata(options.planPath);
-    if (metadata.network !== undefined) {
-      assertCondition(metadata.network === options.network, "deployment plan network does not match requested network", "NETWORK_MISMATCH");
-    }
-    if (metadata.deployer !== undefined) {
-      assertCondition(metadata.deployer === options.deployer, "deployment plan deployer does not match requested deployer", "IDENTITY_MISMATCH");
-    }
-  }
+  assertCondition(isNonEmptyString(options.planPath), "--plan is required for complete deployment evidence", "PLAN_REQUIRED");
+  assertCondition(existsSync(options.planPath), `deployment plan does not exist: ${options.planPath}`, "PLAN_UNREADABLE");
+  const expectedHash = sha256File(options.planPath);
+  assertCondition(bundle.plan.sha256 === expectedHash, "evidence plan hash does not match deployment plan", "PLAN_HASH_MISMATCH");
+  const plan = readDeploymentPlan(options.planPath);
+  validateCompletePlanBinding(bundle, plan);
+  return plan;
 }
 
-function readTransactionContractId(payload: JsonObject, kind: DeploymentTransactionKind): string {
+function readTransactionContractId(payload: JsonObject, kind: DeploymentTransactionKind, network: DeploymentNetwork): string {
   if (kind === "contract-publish") {
     const smartContract = payload.smart_contract;
     assertCondition(isObject(smartContract), "transaction response is missing smart_contract payload", "UNSUPPORTED_API_PAYLOAD");
-    assertContractId(smartContract.contract_id, "transaction smart_contract.contract_id");
+    assertContractId(smartContract.contract_id, "transaction smart_contract.contract_id", network);
     return smartContract.contract_id;
   }
 
   const contractCall = payload.contract_call;
   assertCondition(isObject(contractCall), "transaction response is missing contract_call payload", "UNSUPPORTED_API_PAYLOAD");
-  assertContractId(contractCall.contract_id, "transaction contract_call.contract_id");
-  assertCondition(isNonEmptyString(contractCall.function_name), "transaction response is missing contract_call.function_name", "UNSUPPORTED_API_PAYLOAD");
+  assertContractId(contractCall.contract_id, "transaction contract_call.contract_id", network);
+  assertFunctionName(contractCall.function_name, "transaction contract_call.function_name", "UNSUPPORTED_API_PAYLOAD");
   return contractCall.contract_id;
 }
 
 function readTransactionFunctionName(payload: JsonObject, kind: DeploymentTransactionKind): string | null {
   if (kind === "contract-publish") return null;
   const contractCall = payload.contract_call;
-  assertCondition(isObject(contractCall) && isNonEmptyString(contractCall.function_name), "transaction response is missing contract_call.function_name", "UNSUPPORTED_API_PAYLOAD");
+  assertCondition(isObject(contractCall), "transaction response is missing contract_call payload", "UNSUPPORTED_API_PAYLOAD");
+  assertFunctionName(contractCall.function_name, "transaction contract_call.function_name", "UNSUPPORTED_API_PAYLOAD");
   return contractCall.function_name;
+}
+
+function normaliseClarityHex(value: string): string {
+  return `0x${value.replace(/^0x/i, "").toLowerCase()}`;
+}
+
+function assertCanonicalClarityHex(value: unknown, path: string): asserts value is string {
+  assertCondition(typeof value === "string" && CLARITY_HEX_PATTERN.test(value) && value.replace(/^0x/i, "").length % 2 === 0, `${path} must be valid Clarity value hex`);
+  try {
+    cvToHex(hexToCV(value));
+  } catch {
+    throw new DeploymentVerificationError(`${path} must encode one valid Clarity value`, "ARGUMENT_MISMATCH");
+  }
+}
+
+function clarityHexFromRepr(value: string, path: string): string {
+  const trimmed = value.trim();
+  const contractPrincipalMatch = trimmed.match(/^'([A-Z0-9]+)\.([a-zA-Z][a-zA-Z0-9-]{0,39})'$/);
+  if (contractPrincipalMatch !== null) {
+    const [, address, contractName] = contractPrincipalMatch;
+    assertAddress(address, `${path} principal`);
+    assertContractName(contractName, `${path} contract name`, "PLAN_ARGUMENTS_UNSUPPORTED");
+    try {
+      return cvToHex(contractPrincipalCV(address, contractName)).toLowerCase();
+    } catch {
+      throw new DeploymentVerificationError(`${path} is not a supported canonical Clarity principal`, "PLAN_ARGUMENTS_UNSUPPORTED");
+    }
+  }
+
+  const standardPrincipalMatch = trimmed.match(/^'([A-Z0-9]+)'$/);
+  if (standardPrincipalMatch !== null) {
+    const [, address] = standardPrincipalMatch;
+    assertAddress(address, `${path} principal`);
+    try {
+      return cvToHex(standardPrincipalCV(address)).toLowerCase();
+    } catch {
+      throw new DeploymentVerificationError(`${path} is not a supported canonical Clarity principal`, "PLAN_ARGUMENTS_UNSUPPORTED");
+    }
+  }
+
+  try {
+    const parsed = internal_parseCommaSeparated(trimmed);
+    assertCondition(parsed.length === 1, `${path} must contain exactly one Clarity value`, "PLAN_ARGUMENTS_UNSUPPORTED");
+    return cvToHex(parsed[0] as ClarityValue).toLowerCase();
+  } catch (error) {
+    if (error instanceof DeploymentVerificationError) throw error;
+    throw new DeploymentVerificationError(`${path} is not a supported canonical Clarity representation`, "PLAN_ARGUMENTS_UNSUPPORTED");
+  }
+}
+
+function readAndVerifyCallArguments(
+  payload: JsonObject,
+  planEntry: EffectivePlanContractCall,
+): CanonicalFunctionArgument[] {
+  const contractCall = payload.contract_call;
+  assertCondition(isObject(contractCall), "transaction response is missing contract_call payload", "UNSUPPORTED_API_PAYLOAD");
+  const rawArguments = contractCall.function_args;
+  assertCondition(Array.isArray(rawArguments), `transaction ${planEntry.planPosition.batchId}:${planEntry.planPosition.transactionIndex} is missing function_args`, "UNSUPPORTED_API_PAYLOAD");
+  assertCondition(rawArguments.length === planEntry.parameters.length, "transaction function argument count does not match deployment plan", "ARGUMENT_MISMATCH");
+
+  return rawArguments.map((rawArgument, index) => {
+    const path = `transaction.contract_call.function_args[${index}]`;
+    assertCondition(isObject(rawArgument), `${path} must be an object`, "UNSUPPORTED_API_PAYLOAD");
+    assertFunctionName(rawArgument.name, `${path}.name`, "UNSUPPORTED_API_PAYLOAD");
+    assertCondition(isNonEmptyString(rawArgument.type), `${path}.type must be non-empty`, "UNSUPPORTED_API_PAYLOAD");
+    assertCanonicalClarityHex(rawArgument.hex, `${path}.hex`);
+    assertCondition(isNonEmptyString(rawArgument.repr), `${path}.repr must be non-empty`, "UNSUPPORTED_API_PAYLOAD");
+    const apiHex = cvToHex(hexToCV(rawArgument.hex)).toLowerCase();
+    const reprHex = clarityHexFromRepr(rawArgument.repr, `${path}.repr`);
+    const planHex = clarityHexFromRepr(planEntry.parameters[index], `deployment plan call argument ${index}`);
+    assertCondition(apiHex === reprHex, `${path}.hex and ${path}.repr do not match`, "ARGUMENT_MISMATCH");
+    assertCondition(apiHex === planHex, `${path} does not match the deployment plan argument`, "ARGUMENT_MISMATCH");
+    return {
+      name: rawArgument.name,
+      type: rawArgument.type,
+      hex: apiHex,
+      repr: rawArgument.repr.trim(),
+    };
+  });
+}
+
+function safeTransactionStatus(value: unknown): string {
+  if (typeof value === "string" && /^[a-z0-9_]{1,64}$/.test(value)) return value;
+  return "unknown";
+}
+
+function transactionStatusError(txid: string, statusValue: unknown): DeploymentVerificationError {
+  const status = safeTransactionStatus(statusValue);
+  const retryable = status === "pending";
+  let code = "TRANSACTION_NOT_CONFIRMED";
+  if (status === "abort_by_response" || status === "abort_by_post_condition") code = "TRANSACTION_ABORTED";
+  if (status.startsWith("dropped_")) code = "TRANSACTION_DROPPED";
+  return new DeploymentVerificationError(
+    `transaction ${txid} has status ${status}`,
+    code,
+    retryable,
+    status,
+  );
 }
 
 async function verifyTransaction(
   item: ContractPublicationEvidence | ContractCallEvidence,
+  planEntry: EffectivePlanEntry,
   options: VerifyEvidenceOptions,
   baseUrl: string,
   fetcher: typeof fetch,
   observedAt: string,
 ): Promise<TransactionApiEvidence> {
   const endpoint = endpointUrl(baseUrl, `/extended/v1/tx/${encodeURIComponent(item.txid)}`);
-  const response = await fetchJson(fetcher, endpoint, options.apiKey);
+  const response = await fetchJson(fetcher, endpoint, options.apiKey, baseUrl);
   if (response.status === 404) {
     throw new DeploymentVerificationError(`transaction ${item.txid} was not found at the checked API address`, "TRANSACTION_NOT_FOUND", true);
   }
@@ -558,19 +987,25 @@ async function verifyTransaction(
   const payload = response.body;
   assertTxid(payload.tx_id, "transaction.tx_id");
   assertCondition(payload.tx_id.toLowerCase() === item.txid.toLowerCase(), "transaction ID does not match requested txid", "IDENTITY_MISMATCH");
-  assertCondition(isNonEmptyString(payload.sender_address), "transaction API payload is missing sender_address", "UNSUPPORTED_API_PAYLOAD");
+  assertAddress(payload.sender_address, "transaction.sender_address", options.network);
   assertCondition(payload.sender_address === item.expectedSender, "transaction sender does not match expected sender", "IDENTITY_MISMATCH");
-  assertCondition(payload.tx_status === "success", `transaction ${item.txid} is not confirmed: ${String(payload.tx_status ?? "missing status")}`, "TRANSACTION_NOT_CONFIRMED", true);
+  if (payload.tx_status !== "success") throw transactionStatusError(item.txid, payload.tx_status);
   assertCondition(payload.canonical === true, `transaction ${item.txid} is not canonical`, "TRANSACTION_NOT_CANONICAL", true);
   assertCondition(payload.is_unanchored === false, `transaction ${item.txid} is unanchored`, "TRANSACTION_UNANCHORED", true);
 
   const expectedType = item.kind === "contract-publish" ? "smart_contract" : "contract_call";
   assertCondition(payload.tx_type === expectedType, `transaction ${item.txid} has unexpected type`, "TRANSACTION_TYPE_MISMATCH");
-  const actualContractId = readTransactionContractId(payload, item.kind);
+  const actualContractId = readTransactionContractId(payload, item.kind, options.network);
   assertCondition(actualContractId === item.contractId, "transaction contract identity does not match expected contract", "IDENTITY_MISMATCH");
   const actualFunctionName = readTransactionFunctionName(payload, item.kind);
   if (item.kind === "contract-call") {
     assertCondition(actualFunctionName === item.functionName, "transaction function does not match expected function", "FUNCTION_MISMATCH");
+  }
+
+  let functionArgs: CanonicalFunctionArgument[] | undefined;
+  if (item.kind === "contract-call") {
+    assertCondition(planEntry.kind === "contract-call", "plan transaction kind does not match evidence", "PLAN_EVIDENCE_MISMATCH");
+    functionArgs = readAndVerifyCallArguments(payload, planEntry);
   }
 
   const blockHash = payload.block_hash;
@@ -579,10 +1014,7 @@ async function verifyTransaction(
   const burnBlockHeight = payload.burn_block_height;
   assertCondition(isNonEmptyString(blockHash), "transaction API payload is missing block_hash", "UNSUPPORTED_API_PAYLOAD");
   assertCondition(Number.isInteger(blockHeight) && (blockHeight as number) > 0, "transaction API payload has invalid block_height", "UNSUPPORTED_API_PAYLOAD");
-  assertCondition(isNonEmptyString(burnBlockHash), "transaction API payload is missing burn_block_hash", "UNSUPPORTED_API_PAYLOAD");
   assertCondition(Number.isInteger(burnBlockHeight) && (burnBlockHeight as number) > 0, "transaction API payload has invalid burn_block_height", "UNSUPPORTED_API_PAYLOAD");
-  const confirmedBlockHeight = blockHeight as number;
-  const confirmedBurnBlockHeight = burnBlockHeight as number;
 
   const evidence: TransactionApiEvidence = {
     observedAt,
@@ -596,15 +1028,19 @@ async function verifyTransaction(
     contractId: actualContractId,
     functionName: actualFunctionName,
     blockHash,
-    blockHeight: confirmedBlockHeight,
-    burnBlockHash,
-    burnBlockHeight: confirmedBurnBlockHeight,
+    blockHeight: blockHeight as number,
+    burnBlockHeight: burnBlockHeight as number,
   };
-  if (payload.block_time_iso !== undefined) {
+  if (burnBlockHash !== undefined && burnBlockHash !== null) {
+    assertCondition(isNonEmptyString(burnBlockHash), "transaction API payload has invalid burn_block_hash", "UNSUPPORTED_API_PAYLOAD");
+    evidence.burnBlockHash = burnBlockHash;
+  }
+  if (functionArgs !== undefined) evidence.functionArgs = functionArgs;
+  if (payload.block_time_iso !== undefined && payload.block_time_iso !== null) {
     assertIsoTimestamp(payload.block_time_iso, "transaction.block_time_iso", "UNSUPPORTED_API_PAYLOAD");
     evidence.blockTimeIso = payload.block_time_iso;
   }
-  if (payload.burn_block_time_iso !== undefined) {
+  if (payload.burn_block_time_iso !== undefined && payload.burn_block_time_iso !== null) {
     assertIsoTimestamp(payload.burn_block_time_iso, "transaction.burn_block_time_iso", "UNSUPPORTED_API_PAYLOAD");
     evidence.burnBlockTimeIso = payload.burn_block_time_iso;
   }
@@ -625,7 +1061,7 @@ async function verifyInterface(
     baseUrl,
     `/v2/contracts/interface/${encodeURIComponent(address)}/${encodeURIComponent(contractName)}`,
   );
-  const response = await fetchJson(fetcher, endpoint, options.apiKey);
+  const response = await fetchJson(fetcher, endpoint, options.apiKey, baseUrl);
   if (response.status === 404) {
     throw new DeploymentVerificationError(`interface ${item.contractId} was not found at the checked API address`, "INTERFACE_NOT_FOUND", true);
   }
@@ -633,8 +1069,7 @@ async function verifyInterface(
     throw new DeploymentVerificationError(`interface lookup returned HTTP ${response.status}`, "INTERFACE_HTTP_ERROR", response.status >= 500 || response.status === 429);
   }
   assertCondition(isObject(response.body), "interface API payload must be an object", "UNSUPPORTED_API_PAYLOAD");
-  assertInterfaceFunctions(response.body.functions, "interface.functions", "UNSUPPORTED_API_PAYLOAD");
-  const functions = (response.body.functions as RequiredFunction[]).map(({ name, access }) => ({ name, access }));
+  const functions = readHiroInterfaceFunctions(response.body.functions, "interface.functions");
   for (const required of item.requiredFunctions) {
     assertCondition(
       functions.some((candidate) => candidate.name === required.name && candidate.access === required.access),
@@ -655,7 +1090,7 @@ export async function verifyDeploymentEvidence(
   options: VerifyEvidenceOptions,
 ): Promise<DeploymentEvidence> {
   const bundle = parseEvidenceBundle(input);
-  validatePlanAndSource(bundle, options);
+  const plan = validatePlanAndSource(bundle, options);
   const baseUrl = normaliseBaseUrl(options.baseUrl ?? HIRO_API_BASE_URLS[options.network]);
   const fetcher = options.fetcher ?? fetch;
   const now = options.now ?? (() => new Date());
@@ -663,19 +1098,23 @@ export async function verifyDeploymentEvidence(
 
   const contractPublications: ContractPublicationEvidence[] = [];
   for (const item of bundle.contractPublications) {
+    const planEntry = plan.entries.find((entry) => planEntryKey(entry) === evidenceEntryKey(item));
+    assertCondition(planEntry !== undefined, "publication evidence is not present in the deployment plan", "PLAN_EVIDENCE_MISMATCH");
     const observedAt = now().toISOString();
     contractPublications.push({
       ...item,
-      apiEvidence: await verifyTransaction(item, options, baseUrl, fetcher, observedAt),
+      apiEvidence: await verifyTransaction(item, planEntry, options, baseUrl, fetcher, observedAt),
     });
   }
 
   const contractCalls: ContractCallEvidence[] = [];
   for (const item of bundle.contractCalls) {
+    const planEntry = plan.entries.find((entry) => planEntryKey(entry) === evidenceEntryKey(item));
+    assertCondition(planEntry !== undefined, "call evidence is not present in the deployment plan", "PLAN_EVIDENCE_MISMATCH");
     const observedAt = now().toISOString();
     contractCalls.push({
       ...item,
-      apiEvidence: await verifyTransaction(item, options, baseUrl, fetcher, observedAt),
+      apiEvidence: await verifyTransaction(item, planEntry, options, baseUrl, fetcher, observedAt),
     });
   }
 
@@ -691,6 +1130,7 @@ export async function verifyDeploymentEvidence(
   return {
     ...bundle,
     evidenceStatus: "confirmed",
+    coverage: "complete",
     verifiedAt,
     contractPublications,
     contractCalls,
@@ -726,6 +1166,7 @@ export async function waitForDeploymentEvidence(
       `${lastError.message}; confirmation timeout exceeded`,
       "CONFIRMATION_TIMEOUT",
       false,
+      lastError.status,
     );
   }
   throw new DeploymentVerificationError("deployment confirmation timeout exceeded", "CONFIRMATION_TIMEOUT");
@@ -749,7 +1190,7 @@ async function runCli(): Promise<void> {
   try {
     if (process.argv.includes("--help") || process.argv.includes("-h")) {
       process.stdout.write(
-        "Usage: tsx scripts/deployment/verify-evidence.ts --evidence FILE --network testnet|mainnet --deployer ADDRESS [--plan FILE] [--source-commit SHA] [--api-base-url URL] [--output FILE]\n",
+        "Usage: tsx scripts/deployment/verify-evidence.ts --evidence FILE --network testnet|mainnet --deployer ADDRESS --plan FILE [--source-commit SHA] [--api-base-url URL] [--output FILE]\n",
       );
       return;
     }
@@ -760,6 +1201,7 @@ async function runCli(): Promise<void> {
     assertCondition(isNonEmptyString(evidencePath), "--evidence is required", "CLI_ARGUMENT_ERROR");
     assertCondition(network === "testnet" || network === "mainnet", "--network must be testnet or mainnet", "CLI_ARGUMENT_ERROR");
     assertCondition(isNonEmptyString(deployer), "--deployer is required", "CLI_ARGUMENT_ERROR");
+    assertCondition(isNonEmptyString(args.plan), "--plan is required", "CLI_ARGUMENT_ERROR");
 
     let input: unknown;
     try {
@@ -776,7 +1218,7 @@ async function runCli(): Promise<void> {
       planPath: args.plan,
       sourceCommit: args["source-commit"],
     });
-    const output = JSON.stringify(verified, null, 2) + "\n";
+    const output = `${JSON.stringify(verified, null, 2)}\n`;
     if (args.output) {
       writeFileSync(resolve(args.output), output, { encoding: "utf8", mode: 0o600 });
     } else {
