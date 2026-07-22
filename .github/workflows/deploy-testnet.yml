@@ -9,8 +9,12 @@ on:
       - 'Clarinet.toml'
       - 'settings/Testnet.toml'
       - 'deployments/**'
+      - 'scripts/gen-deployment-plans.py'
+      - 'scripts/release_plan_validation.py'
       - 'scripts/deployment/**'
       - 'scripts/deploy-testnet.ts'
+      - 'package.json'
+      - 'tests/test_release_plan_validation.py'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -68,6 +72,7 @@ jobs:
       - name: Run focused deployment safety tests
         run: |
           npm run test:deployment-evidence
+          npm run test:release-plan-validation
           npx vitest run tests/deploy-testnet-script.test.ts tests/deployment-workflows.test.ts --config vitest.config.ts --pool=threads
 
   preflight-testnet:

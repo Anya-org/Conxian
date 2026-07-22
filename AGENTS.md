@@ -73,7 +73,7 @@ git var GIT_AUTHOR_EMAIL
 
 ## 3. Operational Directives
 - **Dual-Clock Heartbeat**: The `trigger-epoch-update` in `ops-engine.clar` is the protocol's heartbeat. Ensure it is efficient and incentivized.
-- **Predictive Risk**: `risk-manager.clar` consolidates liquidation decisions, factoring in `agent-risk` cybernetic scores.
+- **Predictive Risk**: `risk-unit.clar` is the canonical liquidation/risk-score unit; `risk-manager.clar` is query-compatible only, while `agent-risk` publishes normalized scores through explicit wiring.
 - **Financial Accuracy**: Always normalize asset decimals (e.g., STX u6 to CXD u8) when calculating TVL or protocol-wide metrics.
 
 ## 4. Troubleshooting

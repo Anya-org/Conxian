@@ -3,20 +3,19 @@ import { Cl } from '@stacks/transactions';
 import { simnet } from '../setup-test-env';
 const COMPLIANCE_HOOKS_CONTRACT_NAME = 'compliance-hooks';
 const KYC_REGISTRY_CONTRACT_NAME = 'kyc-registry';
+const ERR_POLICY_VIOLATION = 7000;
 
 describe('P0 Policy Enforcement Bypass Mitigation Tests', () => {
     let deployer: any;
   let wallet1: any;
-  let complianceHooksContract: any;
-  let kycRegistryContract: any;
+  let untouchedWallet: any;
 
-  beforeEach(async () => {
+  beforeEach(() => {
 
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
     wallet1 = accounts.get('wallet_1')!;
-    complianceHooksContract = `${deployer}.${COMPLIANCE_HOOKS_CONTRACT_NAME}`;
-    kycRegistryContract = `${deployer}.${KYC_REGISTRY_CONTRACT_NAME}`;
+    untouchedWallet = accounts.get('wallet_2')!;
   });
 
   it('allows a KYC-verified user', () => {
@@ -38,15 +37,26 @@ describe('P0 Policy Enforcement Bypass Mitigation Tests', () => {
     expect(result.result).toEqual(Cl.ok(Cl.bool(true)));
   });
 
-  it('blocks a non-KYC-verified user', () => {
-    // Check KYC status (user has no KYC status)
+  it('blocks a user without a KYC record', () => {
+    // wallet_2 is not mutated by this suite, so this exercises the actual
+    // missing-record path rather than inheriting wallet_1's prior setup.
+    const hasRecord = simnet.callReadOnlyFn(
+        KYC_REGISTRY_CONTRACT_NAME,
+        'has-identity-status',
+        [Cl.principal(untouchedWallet)],
+        untouchedWallet
+    );
+    expect(hasRecord.result).toEqual(Cl.bool(false));
+
     const result = simnet.callReadOnlyFn(
         COMPLIANCE_HOOKS_CONTRACT_NAME,
         'check-kyc',
-        [Cl.principal(wallet1)],
-        wallet1
+        [Cl.principal(untouchedWallet)],
+        untouchedWallet
     );
-    expect(result.result).toEqual(Cl.ok(Cl.bool(true))); // ERR_UNAUTHORIZED
+    // compliance-hooks names the missing/insufficient-KYC error
+    // ERR_POLICY_VIOLATION (u7000).
+    expect(result.result).toEqual(Cl.error(Cl.uint(ERR_POLICY_VIOLATION)));
   });
 
   it('allows a non-sanctioned user', () => {
@@ -84,6 +94,6 @@ describe('P0 Policy Enforcement Bypass Mitigation Tests', () => {
         [Cl.principal(wallet1)],
         wallet1
     );
-    expect(result.result).toEqual(Cl.error(Cl.uint(7000))); // ERR_UNAUTHORIZED
+    expect(result.result).toEqual(Cl.error(Cl.uint(ERR_POLICY_VIOLATION)));
   });
 });

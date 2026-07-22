@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { beforeAll } from 'vitest';
@@ -9,10 +9,17 @@ const deploymentPlanPath = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '../deployments/default.simnet-plan.yaml',
 );
+const canonicalDeploymentPlanPath = `${deploymentPlanPath}.bak`;
 
 // Clarinet SDK may rewrite default.simnet-plan.yaml during initSimnet. Keep a
 // source snapshot available to tests that validate generator-owned artifacts.
-export const canonicalDeploymentPlan = readFileSync(deploymentPlanPath, 'utf8');
+// scripts/run-tests.sh keeps the checked-in source at the .bak path while the
+// SDK is running; direct Vitest invocations fall back to the working-tree
+// artifact.
+export const canonicalDeploymentPlan = readFileSync(
+  existsSync(canonicalDeploymentPlanPath) ? canonicalDeploymentPlanPath : deploymentPlanPath,
+  'utf8',
+);
 
 let internalSimnet: Simnet | null = null;
 let initializationPromise: Promise<Simnet> | null = null;
@@ -49,8 +56,12 @@ export async function initializeSimnet(): Promise<Simnet> {
       for (const name of contractsToInit) {
         try {
           const res = instance.callPublicFn(name, 'initialize', [Cl.principal(deployer)], deployer);
+          if (name === 'agent-risk' && Cl.prettyPrint(res.result) !== '(ok true)') {
+            throw new Error(`agent-risk bootstrap failed: ${Cl.prettyPrint(res.result)}`);
+          }
           // console.log(`Init ${name}: ${Cl.prettyPrint(res.result)}`);
         } catch (e) {
+          if (name === 'agent-risk') throw e;
           // console.log(`Skip init ${name}`);
         }
       }
@@ -87,6 +98,57 @@ export async function initializeSimnet(): Promise<Simnet> {
         instance.callPublicFn('bme-engine', 'add-activity-reporter', [Cl.contractPrincipal(deployer, 'swap-router')], deployer);
         instance.callPublicFn('bme-engine', 'add-activity-reporter', [Cl.contractPrincipal(deployer, 'lending-manager')], deployer);
       } catch (e) {}
+
+      // Wire the canonical gross-STX enterprise route. The production
+      // deployment plan performs the same explicit principal injection; the
+      // simnet bootstrap keeps focused tests independent of post-deploy calls.
+      try {
+        instance.callPublicFn(
+          'cxd-treasury',
+          'set-authorized-principals',
+          [Cl.principal(deployer), Cl.contractPrincipal(deployer, 'revenue-distributor')],
+          deployer,
+        );
+        instance.callPublicFn(
+          'cxd-treasury',
+          'authorize-stx-source',
+          [Cl.contractPrincipal(deployer, 'integration-fee-collector')],
+          deployer,
+        );
+        instance.callPublicFn(
+          'cxd-treasury',
+          'authorize-stx-source',
+          [Cl.contractPrincipal(deployer, 'enterprise-subscription')],
+          deployer,
+        );
+        instance.callPublicFn(
+          'revenue-distributor',
+          'set-revenue-automation',
+          [Cl.contractPrincipal(deployer, 'revenue-automation')],
+          deployer,
+        );
+        instance.callPublicFn(
+          'revenue-distributor',
+          'authorize-stx-source',
+          [Cl.contractPrincipal(deployer, 'integration-fee-collector')],
+          deployer,
+        );
+        instance.callPublicFn(
+          'revenue-distributor',
+          'authorize-stx-source',
+          [Cl.contractPrincipal(deployer, 'enterprise-subscription')],
+          deployer,
+        );
+        instance.callPublicFn(
+          'revenue-automation',
+          'authorize-stx-source',
+          [Cl.contractPrincipal(deployer, 'enterprise-subscription')],
+          deployer,
+        );
+      } catch (e) {
+        // Focused route tests assert the configured route and fail closed if
+        // any required principal injection cannot be applied.
+      }
 
       console.log('✅ Bootstrap Complete');
       return instance;

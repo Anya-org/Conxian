@@ -61,6 +61,7 @@ jobs:
       - name: Run focused deployment safety tests
         run: |
           npm run test:deployment-evidence
+          npm run test:release-plan-validation
           npx vitest run tests/deploy-testnet-script.test.ts tests/deployment-workflows.test.ts --config vitest.config.ts --pool=threads
 
   preflight-mainnet:

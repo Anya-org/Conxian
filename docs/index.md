@@ -18,6 +18,7 @@ Welcome to the official documentation for Conxian Finance, a Sovereign Autonomou
 ## 📊 Performance & Research
 
 - **[Performance Benchmarks](BENCHMARKS.md)**: Verified execution times and gas costs.
+- **[Protocol Fee KPI Specification](PROTOCOL_FEE_KPI_SPEC.md)**: Canonical fee-base, fee/revenue vocabulary, indexed KPI formulas, and evidence schema for the scheduled collector.
 - **[Strategic Research](RESEARCH.md)**: Analysis of the Bitcoin L2 landscape and regulatory environment (2026).
 - **[Roadmap](ROADMAP.md)**: Our path from recovery to global scale.
 
@@ -29,6 +30,7 @@ Explore the core components of the Conxian ecosystem:
 - **[DEX Module](../contracts/dex/README.md)**: Swaps, Pools, and Vaults.
 - **[Lending Module](../contracts/lending/README.md)**: Autonomous money markets.
 - **[Governance](../contracts/governance/README.md)**: Dual-Council DAO logic.
+- **[Treasury](../contracts/treasury/README.md)**: Canonical scheduled fee collection and Fiscal Dam routing.
 
 ## 🧪 Verification
 
