@@ -1,11 +1,11 @@
 # Treasury Module
 
 ## Overview (Explanation)
-The Treasury module manages the protocol's capital allocation and revenue distribution. It implements the "Fiscal Dam" (CXIP-013) and provides one canonical scheduled protocol-fee settlement path. The phase-1 collector is designed to replace a designated legacy charge on a registered fee base, never to add a second charge to the same flow.
+The Treasury module manages the protocol's capital allocation and revenue distribution. It implements the "Fiscal Dam" (CXIP-013) and provides one canonical scheduled protocol-fee settlement path. The phase-1 collector is designed to replace a designated legacy charge on a registered fee base, never to add a second charge to the same flow. The approved phase-2 source-custody API lets an authorized source prepay that collector-computed fee from its own custody without accepting a caller-selected debit or recipient.
 
 ## Architecture (Explanation)
 - **Canonical collection**: `protocol-fee-collector.clar` resolves 200/150/100 bps from an explicit activation burn-block height, enforces immutable source/stream/asset registration, pauses fail closed, prevents `(source, settlement-id)` replay, carries numerator residuals, and records native-unit accounting.
-- **Canonical custody**: FT and STX settlements transfer payer -> `.protocol-fee-collector`. The collector never accepts a caller-supplied ingress destination.
+- **Canonical custody**: Payer-custody FT/STX settlements transfer payer -> `.protocol-fee-collector`. Source-custody settlements instead invoke an authenticated source callback with the collector-computed debit and fixed `.protocol-fee-collector` recipient; the collector proves the exact live-balance delta and leaves untracked excess untouched.
 - **Explicit routing**: Authorized admin or approved governance/timelock calls route collector-held assets only to the fixed `.operational-treasury` principal after treasury initialization. Each asset's routed total cannot exceed its collected total, and collection/routing totals remain separate.
 - **Legacy compatibility**: `revenue-automation.clar` retains the legacy 100 bps token fee path and also exposes the full gross-STX enterprise adapter. It remains a compatibility surface until phase 2 migrates each approved source; do not compose it with the canonical collector on the same fee base.
 - **Registry**: `cxd-treasury.clar` maintains the global allocation policy.
@@ -40,6 +40,10 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 | `set-activation-burn-height` | `(new-height uint)` | Sets the non-retroactive schedule anchor before the first settlement (admin only). |
 | `settle-ft` | `(token <sip-010-ft-trait>) (stream-id uint) (eligible-fee-base uint) (settlement-id (buff 32))` | Calculates residual-aware fee and atomically transfers SIP-010 units from payer to `.protocol-fee-collector`. |
 | `settle-stx` | `(stream-id uint) (eligible-fee-base uint) (settlement-id (buff 32))` | Calculates residual-aware fee and atomically transfers STX from payer to `.protocol-fee-collector`. |
+| `preview-source-ft` | `(source principal) (stream-id uint) (asset principal) (eligible-fee-base uint)` | Read-only preview of the authenticated source/stream/asset schedule, assessed fee, and next residual. |
+| `preview-source-stx` | `(source principal) (stream-id uint) (eligible-fee-base uint)` | Read-only native-STX preview using the same schedule and residual arithmetic as settlement. |
+| `settle-source-ft` | `(source <protocol-fee-source-trait>) (token <sip-010-ft-trait>) (stream-id uint) (eligible-fee-base uint) (settlement-id (buff 32))` | Recomputes the fee, calls the source's exact-debit callback, and accepts custody only when the collector's live FT balance increases by exactly the assessed amount. |
+| `settle-source-stx` | `(source <protocol-fee-source-trait>) (stream-id uint) (eligible-fee-base uint) (settlement-id (buff 32))` | Native-STX equivalent of `settle-source-ft`, including exact live-balance-delta proof. |
 | `route-ft` | `(token <sip-010-ft-trait>) (amount uint)` | After secure treasury initialization, routes still-unrouted collector-held FT custody to the immutable `.operational-treasury` destination (admin or governance contract). |
 | `route-stx` | `(amount uint)` | After secure treasury initialization, routes still-unrouted collector-held STX custody to the immutable `.operational-treasury` destination (admin or governance contract). |
 | `recover-excess-ft` | `(token <sip-010-ft-trait>) (amount uint)` | Recovers only live FT balance above tracked collected-but-not-routed custody to the immutable `.operational-treasury` destination; does not change normal route/revenue totals. |
@@ -62,6 +66,23 @@ with its residual and does not attempt a zero-value transfer. Asset and route
 identity cannot be replaced after registration, so residual/accounting state
 cannot be erased by reconfiguration.
 
+### Phase-2 source-custody settlement
+
+Source custody is a callback protocol, not a second fee calculator. Before
+calling `settle-source-ft` or `settle-source-stx`, the source derives the same
+read-only preview and stores a short-lived pending debit keyed by the current
+transaction payer. The collector authenticates the immediate source caller,
+recomputes the preview, and passes only the assessed amount plus the fixed
+collector recipient to the source callback. The callback must authenticate the
+collector, recipient, asset, amount, and same-transaction pending record before
+transferring. The collector measures its live balance before and after the
+callback and requires an exact delta equal to the assessed amount; underpay,
+overpay, wrong-destination, no-transfer, callback, transfer, replay, or
+accounting failures roll back the complete settlement. A zero-assessed
+settlement skips the token/STX transfer but still consumes the authenticated
+pending record and records residual/accounting state. Any pre-existing
+untracked collector excess is not counted as a settlement.
+
 Authority is deliberately split. Configuration functions (`set-authorized-source`,
 stream registration/activation, activation height, and governance assignment)
 are admin-only: a direct admin EOA must satisfy `contract-caller = tx-sender =
@@ -73,12 +94,20 @@ emergency contract. Production source registrations should use contracts that
 derive their own base from successful economic operations; an admin-authorized
 EOA is an operational trust boundary, not trustless KPI proof.
 
-Phase 1 does not authorize or wire DEX/lending sources and does not change
-`conxian-access.clar`; no source is production-authorized. The checked-in
-production deployment plans and generator intentionally do not publish or wire
-this collector yet. They are deferred until network-correct deployer identities
-and source migrations are separately approved, so those artifacts are not a
-deployability claim.
+The approved phase-2 slice migrates only the active
+`lending-manager.repay` path: its eligible base is exactly the interest portion
+`floor(amount * 1000 / 10000)`, and `total-reserves` receives interest net of the
+scheduled collector fee. The manager requires an admin-controlled asset-to-
+stream mapping and fails closed when the mapping is absent or mismatched. It
+uses a manager-local monotonic nonce hashed to a fixed `(buff 32)` settlement
+ID and does not expose a caller-controlled fee debit. The legacy
+`revenue-automation.collect-revenue` call is not composed with this path.
+
+DEX migration remains explicitly deferred because concentrated-liquidity-pool
+custody/execution is still stubbed; `lending-orchestrator` is also outside this
+slice. The 50/30/20 partnership split and deployment broadcasting are not part
+of this implementation. The checked-in production deployment plans and
+generator remain preflight-only and are not a deployability claim.
 
 Production bootstrap must initialize `.operational-treasury`, configure the
 approved governance/timelock/multisig, and then use `set-admin` to hand the
@@ -122,8 +151,10 @@ the indexed volume, fee, revenue, allocation, and USD-normalization schema.
 | `distribute-stx` | `(uint)` | Compatibility route for authorized legacy sources; it terminates in the Fiscal Dam. |
 | `route-stx-revenue` | `(uint principal uint)` | Enterprise adapter hop callable only by configured `revenue-automation`. |
 
-The phase-1 collector does **not** call these routes. It first transfers assessed
-FT or STX from the payer to `.protocol-fee-collector`. A later explicit
+The collector does **not** call these routes during settlement. Payer-custody
+settlements transfer assessed FT or STX from the payer to
+`.protocol-fee-collector`; source-custody settlements obtain the same assessed
+amount through the authenticated source callback. A later explicit
 `route-ft`/`route-stx` operation may forward only still-unrouted, collected
 custody to the fixed `.operational-treasury` destination after initialization;
 `recover-excess-ft`/`recover-excess-stx` may forward only unaccounted live

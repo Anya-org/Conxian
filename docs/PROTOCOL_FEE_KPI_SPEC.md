@@ -4,7 +4,7 @@ title: Protocol Fee KPI Specification
 permalink: /docs/PROTOCOL_FEE_KPI_SPEC/
 ---
 
-# Protocol Fee KPI Specification (Phase 1)
+# Protocol Fee KPI Specification (Phase 1 + approved Phase 2)
 
 This document defines the evidence model for the canonical protocol-fee
 collector introduced for issue #488. It is an indexed reporting specification,
@@ -45,6 +45,31 @@ The following rules prevent double counting:
 - Internal treasury transfers, deposits, withdrawals, rewards, and downstream
   allocations are excluded unless governance registers a separate fee-bearing
   stream.
+
+### 1.1.1 Source-custody settlement contract
+
+The source-custody API preserves the same eligible-base and scheduled-rate
+policy while changing who supplies the assessed fee. A source must first call
+`preview-source-ft` or `preview-source-stx` for its registered source/stream/
+asset, store a short-lived pending record containing the exact assessed amount,
+and then call `settle-source-ft` or `settle-source-stx`. The collector
+recomputes the preview and passes only the computed amount and fixed
+`.protocol-fee-collector` recipient to the source callback.
+
+The callback authenticates the collector, fixed recipient, exact token (for
+FT), exact amount, and same-transaction pending record. The collector proves
+source custody with an exact live-balance delta around the callback: the
+collector balance must increase by exactly `assessed_native`. Underpay,
+overpay, no-transfer, wrong-destination, callback, replay, transfer, or
+accounting failure reverts the whole transaction. A zero-assessed settlement
+does not attempt a zero-value transfer, but it still records the base, residual,
+and accounting row and consumes the authenticated pending record. Existing
+untracked excess remains outside collected-fee totals.
+
+The approved lending migration uses this API only for the interest component
+`floor(amount * 1000 / 10000)`. The fee replaces the legacy 1% full-repayment
+charge on that designated base; principal is never an eligible fee base, and
+the lending manager credits reserves with net interest after the protocol fee.
 
 ### 1.2 Scheduled rates and residual arithmetic
 
@@ -106,7 +131,7 @@ not an activation gate and does not change the collector's burn-block schedule.
 | --- | --- | --- |
 | Eligible fee-base volume | Registered source base before the scheduled rate | `protocol-fee-collected.eligible-fee-base` event |
 | Fees assessed | Scheduled fee computed with the stream's residual numerator | `assessed-amount` event field and collector accounting |
-| Fees settled at collector ingress | Assessed amount atomically transferred from payer to `.protocol-fee-collector`; may be zero when only a residual is carried | `settled-amount`, fixed `recipient`, transfer event, and collector accounting |
+| Fees settled at collector ingress | Assessed amount atomically received by `.protocol-fee-collector` either from payer custody or an authenticated source callback; may be zero when only a residual is carried | `settled-amount`, fixed `recipient`, exact custody delta, transfer event when nonzero, and collector accounting |
 | Fees routed to operational treasury | Amount later forwarded from collector custody to the immutable `.operational-treasury` destination | `protocol-fee-routed-to-operational-treasury` event and asset accounting |
 | Realized downstream protocol revenue | Amount later accepted by a downstream revenue, swap, burn, or Fiscal Dam operation | Downstream transfer/route events; never inferred from ingress assessment |
 | Treasury inflows | Amount actually received by the treasury or its configured vault | Destination transfer events and vault state |
@@ -199,6 +224,7 @@ The minimum normalized settlement row is:
 | `burn_height` | uint | yes | Burn-block context emitted by Clarity |
 | `stacks_height` | uint | yes | Stacks-block context emitted by Clarity |
 | `block_time` | timestamp | yes for USD windows | Indexer-resolved block timestamp |
+| `custody_mode` | enum | yes | `payer` or `source`; identifies which atomic custody API supplied the assessed amount |
 | `decimals` | integer | yes for USD | Immutable/versioned asset metadata |
 | `oracle_source` | string | yes for USD | Price source identifier |
 | `oracle_round` | string/uint | yes for USD | Price round/version |
@@ -230,7 +256,7 @@ production index. A production KPI job must persist transaction IDs, event
 indices, block timestamps, normalization evidence, and the query version used
 to build each window.
 
-## 6. Source trust and phase-1 boundary
+## 6. Source trust and phase-2 boundary
 
 The collector accepts admin-authorized source principals so simnet fixtures and
 controlled migrations can exercise the same settlement surface. This is an
@@ -253,8 +279,13 @@ fixed treasury destination. Excess-recovered totals and events are separate
 from collection and routing totals. A route or recovery transfer failure rolls
 back its accounting and event. Neither collection, routing, nor recovery claims
 Fiscal Dam allocation, DEX/lending routing, burning, or downstream realized
-revenue in the same transaction. Phase 1 leaves DEX/lending unwired and no
-source is production-authorized.
+revenue in the same transaction. The approved phase-2 lending path is
+implemented in `lending-manager.repay` but still requires explicit admin
+asset-to-stream configuration before it can settle; no deployment or source
+authorization is implied by these checked-in contracts. DEX migration remains
+deferred because concentrated-liquidity-pool custody/execution is stubbed, and
+`lending-orchestrator`, partnership splits, and deployment broadcasting remain
+outside this slice.
 
 The checked-in production deployment plans and generator intentionally defer
 collector publication and wiring until network-correct deployer identities and
