@@ -16,7 +16,7 @@
     "focused_tests": "PASS after rebase: protocol-fee-collector plus lending-manager (2 files, 24 tests; 8 known benign Clarinet SDK runtime warnings); 0 new errors.",
     "related_tests": "Prior audit recorded the lending plus treasury revenue-distributor regression set (4 files, 31 tests; 16 known benign runtime warnings); not rerun after rebase.",
     "deployment_evidence": "PASS after rebase: tests/deployment-evidence.test.ts (18 tests; 4 known benign Clarinet SDK runtime warnings); 0 new errors.",
-    "release_plans": "PASS after rebase: uv run --with PyYAML==6.0.2 python3 scripts/gen-deployment-plans.py --check; 12 batches, 241 entries, 215 publishes, and 26 calls, with protocol-fee-source-trait and protocol-fee-collector ordered before lending-manager and test helpers excluded.",
+    "release_plans": "PASS after rebase: python3 scripts/gen-deployment-plans.py --check; 12 batches, 240 entries, 214 publishes, and 26 calls, with zkml-verifier explicitly quarantined from release artifacts, protocol-fee-source-trait and protocol-fee-collector ordered before lending-manager, and test helpers excluded.",
     "hygiene": "PASS after rebase: python3 scripts/verify_contamination_guard.py, git diff --check, and required-file checks.",
     "direct_clarinet": "BLOCKED: the direct Clarinet binary is not installed in the workspace.",
     "docs_validator": "BLOCKED: scripts/validate-docs.js is absent from the repository.",

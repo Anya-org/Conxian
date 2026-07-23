@@ -38,8 +38,10 @@ TEST_HELPERS = frozenset(
 )
 
 # These simnet entries are intentionally not promoted to the checked-in
-# testnet/mainnet release plans.  They remain an explicit classification, not
-# an implicit "missing contract" exception.
+# testnet/mainnet release plans. They remain an explicit classification, not
+# an implicit "missing contract" exception. `zkml-verifier` is retained only
+# for local compilation and fail-closed negative tests until a reviewed
+# cryptographic backend exists.
 RELEASE_PLAN_EXCLUSIONS = frozenset(
     {
         "integration-fee-trait",
@@ -51,6 +53,7 @@ RELEASE_PLAN_EXCLUSIONS = frozenset(
         "math-lib-concentrated",
         "oracle-adapter-stub",
         "integration-fee-collector",
+        "zkml-verifier",
     }
 )
 

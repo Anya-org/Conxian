@@ -66,10 +66,12 @@ TEST_HELPERS = {
 # Keep regeneration scoped to the existing full-system release set. These
 # simnet entries are useful locally but were not part of the checked-in
 # testnet/mainnet plans; promoting them is a separate deployment decision.
+# `zkml-verifier` is explicitly quarantined because unavailable ZKML must not
+# enter release artifacts or be mistaken for production verification.
 RELEASE_PLAN_EXCLUSIONS = {
     "integration-fee-trait", "integration-registry", "alex-reserve-pool",
     "alex-swap-helper", "alex-adapter", "bns-stub", "math-lib-concentrated",
-    "oracle-adapter-stub", "integration-fee-collector",
+    "oracle-adapter-stub", "integration-fee-collector", "zkml-verifier",
 }
 
 ISSUE_501_CONTRACTS = {

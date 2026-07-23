@@ -217,9 +217,10 @@ Before provider activation, release approval must include all of the following:
 
 ## 6. What the generated plans do and do not prove
 
-The generated plans now contain **241 effective entries**:
+The generated plans now contain **240 effective entries** after the explicit
+quarantine of the unavailable `zkml-verifier` scaffold:
 
-- 215 filtered contract publications; and
+- 214 filtered contract publications; and
 - 26 final-batch initialization/configuration calls, including the three
   source-independent oracle wiring calls.
 

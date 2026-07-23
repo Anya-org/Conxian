@@ -1,7 +1,16 @@
 # Conxian Systemic Alignment & Issue Audit Report (March 2026) - REMEDIATED
 
+> **Dated correction — July 23, 2026:** This historical report's CON-70
+> “IMPLEMENTED” entry records that the scaffold file was added; it must not be
+> read as evidence of a cryptographic verifier or current readiness. The
+> `zkml-verifier.clar` boundary is quarantined and fail-closed, returns
+> `ERR_VERIFIER_UNAVAILABLE` (`err u503`) for every input, emits no success
+> event, and is excluded from testnet/mainnet release artifacts. No production
+> or mainnet ZKML support is claimed. The canonical future evidence contract is
+> [`docs/ZKML_EVIDENCE_CONTRACT.md`](ZKML_EVIDENCE_CONTRACT.md).
+
 ## 1. Executive Summary
-This audit report has been updated following the April 2026 remediation sprint. All critical logic gaps and stub implementations identified in the March 2026 audit have been implemented and verified. The protocol has achieved full implementation alignment with its Apex v1.1.0 architecture and SAB design.
+This historical report was updated following the April 2026 remediation sprint. The sprint addressed the core logic gaps reviewed at that time and recorded those findings below. That historical scope is not current proof that every module is complete: the CON-70 ZKML boundary remains quarantined and unavailable pending a reviewed cryptographic implementation, as stated in the dated correction above.
 
 ## 2. Critical Discrepancies - REMEDIATION STATUS
 
@@ -13,7 +22,7 @@ This audit report has been updated following the April 2026 remediation sprint. 
 - **Revenue Automation (CON-60)**: **IMPLEMENTED**. `revenue-automation.clar` is active and integrated into `lending-manager.clar` and `dimensional-core.clar`, enforcing the mandatory 100 bps protocol fee.
 - **DLC Bond Lifecycle (CON-72, 62)**: **IMPLEMENTED**. `dlc-manager.clar` is now production-ready, supporting BitVM2 state root verification. `dlc-orchestrator.clar` and `dlc-bond.clar` are fully implemented.
 - **OData/ERP Translation (CON-63)**: **IMPLEMENTED**. The Conxian Gateway now includes a robust OData v4 parser with Zod validation and x402 Payment Mandate mapping.
-- **ZKML Verification (CON-70)**: **IMPLEMENTED**. `zkml-verifier.clar` added to the compliance module for zero-knowledge model attestation.
+- **ZKML Boundary (CON-70)**: **QUARANTINED / UNAVAILABLE**. `zkml-verifier.clar` is a fail-closed scaffold only; it has no reviewed cryptographic backend, returns `ERR_VERIFIER_UNAVAILABLE` for every input, and is excluded from testnet/mainnet release artifacts. The canonical future evidence requirements are defined in [`docs/ZKML_EVIDENCE_CONTRACT.md`](ZKML_EVIDENCE_CONTRACT.md).
 - **Tableland Persistence (CON-69)**: **IMPLEMENTED**. `tableland-sync.clar` added for decentralized state archival.
 
 ### 2.3. Telemetry & Decision Logic (AYE)
@@ -23,11 +32,11 @@ This audit report has been updated following the April 2026 remediation sprint. 
 ## 3. Tooling & Documentation Audit
 - **Neon/Supabase**: Correctly mapped.
 - **Render**: UI configuration verified.
-- **Standards**: 100% compliance achieved following the addition of structural headers and documentation synchronization.
+- **Standards**: The reviewed non-ZKML modules met their recorded criteria following the addition of structural headers and documentation synchronization. This historical finding does not establish ZKML cryptographic verification or production readiness.
 
 ## 4. Technical Verification & Simulation Results
 - **Simulation Environment**: Successfully resolved "unresolved contract" errors by implementing trait injection and correcting dependency ordering in `Clarinet.toml`. The system now initializes correctly in Simnet.
 - **Compliance Logic**: `regulatory-adapter.clar` now implements real SIP-018 signature verification using `secp256k1-verify`.
 
 ## 5. Conclusion
-The Conxian Protocol is now technically complete regarding its core SAB requirements. The system has transitioned from a set of smart contracts to a cohesive, data-driven autonomous business.
+The historical findings document remediation of the core SAB requirements within the reviewed scope. They do not establish a complete or production-ready ZKML path: `zkml-verifier.clar` remains quarantined and unavailable pending a reviewed cryptographic implementation, as corrected above. Current release evidence must be taken from the checked-in plans and [`docs/ZKML_EVIDENCE_CONTRACT.md`](ZKML_EVIDENCE_CONTRACT.md), not from the March 2026 status labels.
