@@ -149,6 +149,21 @@ class ZkmlQuarantineGuardTests(unittest.TestCase):
         self.assertTrue(errors, "the adversarial fixture unexpectedly passed")
         return errors
 
+    def assert_isolated_documentation_claim(self, statement: str) -> list[str]:
+        docs = dict(ACTIVE_DOCS)
+        docs["PRD.md"] += f"\n{statement}\n"
+        errors = self.collect_fixture_errors(docs=docs)
+
+        self.assertTrue(errors, "the documentation bypass unexpectedly passed")
+        self.assertTrue(
+            all(
+                "PRD.md contains an unnegated positive ZKML claim" in error
+                for error in errors
+            ),
+            errors,
+        )
+        return errors
+
     def verify_body(self, body: str) -> str:
         return CANONICAL_CONTRACT.replace(
             "  ERR_VERIFIER_UNAVAILABLE\n)\n\n;; Admin functions",
@@ -351,6 +366,150 @@ class ZkmlQuarantineGuardTests(unittest.TestCase):
         )
 
         self.assertTrue(any("not valid YAML" in error for error in errors))
+
+    def test_rejects_binary_contract_identifier_as_noncanonical_scalar(self) -> None:
+        errors = self.assert_rejected(
+            release_plan_text=(
+                "plan:\n"
+                "  contract-name: !!binary |\n"
+                "    emttbC12ZXJpZmllcg==\n"
+            )
+        )
+
+        self.assertTrue(
+            any("unsupported YAML scalar" in error and "!!binary" in error for error in errors)
+        )
+
+    def test_rejects_binary_source_path_as_noncanonical_scalar(self) -> None:
+        errors = self.assert_rejected(
+            release_plan_text=(
+                "plan:\n"
+                "  source: !!binary |\n"
+                "    Y29udHJhY3RzL2NvbXBsaWFuY2UvemttbC12ZXJpZmllci5jbGFy\n"
+            )
+        )
+
+        self.assertTrue(
+            any("unsupported YAML scalar" in error and "!!binary" in error for error in errors)
+        )
+
+    def test_rejects_invalid_utf8_binary_scalar(self) -> None:
+        errors = self.assert_rejected(
+            release_plan_text=(
+                "plan:\n"
+                "  contract-name: !!binary |\n"
+                "    //4=\n"
+            )
+        )
+
+        self.assertTrue(any("not valid UTF-8" in error for error in errors))
+
+    def test_rejects_timestamps_under_identifier_and_path_fields(self) -> None:
+        cases = (
+            ("contract-name", "2026-07-23"),
+            ("path", "2026-07-23T12:34:56Z"),
+        )
+        for key, value in cases:
+            with self.subTest(key=key):
+                errors = self.assert_rejected(
+                    release_plan_text=f"plan:\n  {key}: {value}\n"
+                )
+
+                self.assertTrue(
+                    any(
+                        "non-string YAML identifier/path/name field" in error
+                        and key in error
+                        for error in errors
+                    )
+                )
+                self.assertTrue(any("timestamp" in error for error in errors))
+
+    def test_rejects_numeric_identifier_value_with_typed_scalar_error(self) -> None:
+        errors = self.assert_rejected(
+            release_plan_text="plan:\n  contract-name: 123\n"
+        )
+
+        self.assertTrue(
+            any(
+                "non-string YAML identifier/path/name field" in error
+                and "contract-name" in error
+                and "int" in error
+                for error in errors
+            )
+        )
+
+    def test_allows_ordinary_numeric_plan_fields(self) -> None:
+        self.assertEqual(
+            self.collect_fixture_errors(
+                release_plan_text=(
+                    "plan:\n"
+                    "  id: 123\n"
+                    "  cost: 1\n"
+                    "  anchor-block-only: false\n"
+                )
+            ),
+            [],
+        )
+
+    def test_rejects_not_production_ready_but_active_em_dash_bypass(self) -> None:
+        errors = self.assert_isolated_documentation_claim(
+            "ZKML verifier is not production-ready — active."
+        )
+
+        self.assertTrue(any("active:" in error for error in errors))
+
+    def test_rejects_not_production_ready_colon_active_bypass(self) -> None:
+        errors = self.assert_isolated_documentation_claim(
+            "ZKML verifier is not production-ready: active."
+        )
+
+        self.assertTrue(any("active:" in error for error in errors))
+
+    def test_rejects_not_production_ready_semicolon_active_bypass(self) -> None:
+        errors = self.assert_isolated_documentation_claim(
+            "ZKML verifier is not production-ready; active."
+        )
+
+        self.assertTrue(any("active:" in error for error in errors))
+
+    def test_rejects_not_production_ready_despite_active_bypass(self) -> None:
+        errors = self.assert_isolated_documentation_claim(
+            "ZKML verifier is not production-ready, despite being active."
+        )
+
+        self.assertTrue(any("active:" in error for error in errors))
+
+    def test_rejects_positive_before_anchor_deployed_bypass(self) -> None:
+        errors = self.assert_isolated_documentation_claim(
+            "Active ZKML verifier is deployed."
+        )
+
+        self.assertTrue(any("active:" in error for error in errors))
+        self.assertTrue(any("deployed:" in error for error in errors))
+
+    def test_rejects_positive_before_anchor_production_ready_bypass(self) -> None:
+        errors = self.assert_isolated_documentation_claim(
+            "Production-ready ZKML verifier."
+        )
+
+        self.assertTrue(any("production-ready:" in error for error in errors))
+
+    def test_rejects_parenthesized_positive_after_negated_term(self) -> None:
+        errors = self.assert_isolated_documentation_claim(
+            "ZKML verifier is not compliant (active)."
+        )
+
+        self.assertTrue(any("active:" in error for error in errors))
+
+    def test_rejects_newline_contrastive_and_positive_before_anchor_variants(self) -> None:
+        cases = (
+            "ZKML verifier is not production-ready,\n but active.",
+            "Production-ready\nZKML verifier.",
+            "ZKML verifier is not compliant\n(active).",
+        )
+        for statement in cases:
+            with self.subTest(statement=statement):
+                self.assert_isolated_documentation_claim(statement)
 
     def test_rejects_positive_document_claim_split_across_lines(self) -> None:
         docs = dict(ACTIVE_DOCS)

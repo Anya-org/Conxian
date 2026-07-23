@@ -17,6 +17,7 @@ on:
       - 'scripts/verify_zkml_quarantine.py'
       - 'tests/compliance/zkml-verifier.test.ts'
       - 'tests/test_verify_zkml_quarantine.py'
+      - '.github/workflows/sovereign-guard.yml'
   pull_request:
     paths:
       - 'contracts/**'
@@ -34,6 +35,7 @@ on:
       - 'scripts/verify_zkml_quarantine.py'
       - 'tests/compliance/zkml-verifier.test.ts'
       - 'tests/test_verify_zkml_quarantine.py'
+      - '.github/workflows/sovereign-guard.yml'
 
 permissions:
   contents: read
