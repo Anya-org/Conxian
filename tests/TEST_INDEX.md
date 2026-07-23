@@ -21,29 +21,31 @@ The Conxian Protocol utilizes a "Dual-Mode" testing architecture. This ensures t
 ### Intermediate Leaf Tests (DEX & Governance)
 8. ✅ **tests/dex/concentrated-liquidity-pool.test.ts**: Pool creation and state.
 9. ✅ **tests/dex/concentrated-liquidity.test.ts**: Math library for CL.
-10. ✅ **tests/dex/swap-router.test.ts**: Swap routing and fee logic.
-11. ✅ **tests/governance/reputation-engine.test.ts**: Weighted voting power.
-12. ✅ **tests/governance/proposal-engine.test.ts**: Governance signal processing.
-13. ✅ **tests/governance/proposal-engine-core.test.ts**: Seat-based voting and submission.
-14. ✅ **tests/governance/proposal-engine-admin.test.ts**: Admin overrides.
-15. ✅ **tests/governance/enhanced-governance-nft.test.ts**: Seat minting and power tracking.
-16. ✅ **tests/governance/proposal-registry.test.ts**: Persistent proposal storage.
-17. ✅ **tests/governance/conxian-operations-engine.test.ts**: Root heartbeat coordination.
-18. ✅ **tests/governance/executive-agents.test.ts**: Autonomous Staff (CRO/Sovereign-Financial-Office) logic.
-19. ✅ **tests/governance/sab-election.test.ts**: Escrowed SAB election cycles, quorum/tie finalization, and stake claims.
-20. ✅ **tests/governance/upgrade-controller.test.ts**: Release authorization, signer thresholds, timelock, rollout, and rollback.
-21. ✅ **tests/governance/gauge-manager.test.ts**: Canonical escrowed gauge voting, caps, epoch finalization, and withdrawals.
+10. ✅ **tests/tokens/cxlp-token.test.ts**: CXLP role authorization, aggregate pool/supply accounting, direct/proxy transfer preservation, rollback, and canonical proxies.
+11. ✅ **tests/dex/swap-router.test.ts**: Swap routing and fee logic.
+12. ✅ **tests/governance/reputation-engine.test.ts**: Weighted voting power.
+13. ✅ **tests/governance/proposal-engine.test.ts**: Governance signal processing.
+14. ✅ **tests/governance/proposal-engine-core.test.ts**: Seat-based voting and submission.
+15. ✅ **tests/governance/proposal-engine-admin.test.ts**: Admin overrides.
+16. ✅ **tests/governance/enhanced-governance-nft.test.ts**: Seat minting and power tracking.
+17. ✅ **tests/governance/proposal-registry.test.ts**: Persistent proposal storage.
+18. ✅ **tests/governance/conxian-operations-engine.test.ts**: Root heartbeat coordination.
+19. ✅ **tests/governance/executive-agents.test.ts**: Autonomous Staff (CRO/Sovereign-Financial-Office) logic.
+20. ✅ **tests/governance/sab-election.test.ts**: Escrowed SAB election cycles, quorum/tie finalization, and stake claims.
+21. ✅ **tests/governance/upgrade-controller.test.ts**: Release authorization, signer thresholds, timelock, rollout, and rollback.
+22. ✅ **tests/governance/gauge-manager.test.ts**: Canonical escrowed gauge voting, caps, epoch finalization, and withdrawals.
 
 ### Vault & Custody Tests
-22. ✅ **tests/vaults/sbtc-vault.test.ts**: Canonical-token-bound sBTC custody, immutable token configuration, receipt reconciliation, token transfer/balance failure normalization, compliance adapter failure isolation, aggregate insolvency rejection, cap validation, pause controls, admin transfer, share accounting, withdrawals, and disabled strategy allocation.
+23. ✅ **tests/vaults/sbtc-vault.test.ts**: Canonical-token-bound sBTC custody, immutable token configuration, receipt reconciliation, token transfer/balance failure normalization, compliance adapter failure isolation, aggregate insolvency rejection, cap validation, pause controls, admin transfer, share accounting, withdrawals, and disabled strategy allocation.
 
 ### System Root Tests (Integration)
-23. ✅ **tests/system/full-protocol-journey.test.ts**: Coordination between Heartbeat, DEX, and Agents.
-24. ✅ **tests/cybernetic-revenue.test.ts**: Dynamic "Fiscal Dam" allocation (CXIP-013).
-25. ✅ **tests/cxip-012.test.ts**: Volatility-based DEX fee adjustments.
-26. ✅ **tests/nakamoto_verification.test.ts**: Tenure info and block utility checks.
-27. ✅ **tests/protocol-fee-collector.test.ts**: Burn-block phase boundaries, fixed collector-custody FT/STX settlement, direct-deposit excess recovery, explicit operational-treasury routing, residual and phase-change accounting, split admin/governance authorization, immediate-caller admin handoff, source-scoped replay, exact events, and rollback.
-28. ✅ **tests/operational-treasury-init.test.ts**: Publish-time-owner initialization, first-caller front-run rejection, and STX/SIP-010 withdrawal custody.
+24. ✅ **tests/system/full-protocol-journey.test.ts**: Coordination between Heartbeat, DEX, and Agents.
+25. ✅ **tests/cybernetic-revenue.test.ts**: Dynamic "Fiscal Dam" allocation (CXIP-013).
+26. ✅ **tests/cxip-012.test.ts**: Volatility-based DEX fee adjustments.
+27. ✅ **tests/nakamoto_verification.test.ts**: Tenure info and block utility checks.
+28. ✅ **tests/protocol-fee-collector.test.ts**: Burn-block phase boundaries, fixed collector-custody FT/STX settlement, direct-deposit excess recovery, explicit operational-treasury routing, residual and phase-change accounting, split admin/governance authorization, immediate-caller admin handoff, source-scoped replay, exact events, and rollback.
+29. ✅ **tests/lending/lending-manager.test.ts**: Publish-time-admin initialization handoff, fail-closed pause/health guards, wrong-source-trait rejection, interest-only `repay` fee base, atomic source-custody settlement, immutable stream binding validation, checked arithmetic rollback, scheduled launch fee replacement, net reserve accounting, principal exclusion, and absence of the legacy revenue-automation receipt.
+30. ✅ **tests/operational-treasury-init.test.ts**: Publish-time-owner initialization, first-caller front-run rejection, and STX/SIP-010 withdrawal custody.
 
 ## How to Run Tests
 ```bash

@@ -37,6 +37,11 @@ clarity-version = 4
 path = "contracts/traits/stacking-traits.clar"
 clarity-version = 4
 
+[contracts.protocol-fee-source-trait]
+path = "contracts/traits/protocol-fee-source-trait.clar"
+clarity-version = 4
+depends_on = [ "sip-standards",]
+
 [contracts.integration-fee-trait]
 path = "contracts/traits/integration-fee-trait.clar"
 clarity-version = 4
@@ -114,6 +119,7 @@ path = "contracts/tokens/cxd-price-initializer.clar"
 
 [contracts.cxlp-token]
 path = "contracts/tokens/cxlp-token.clar"
+depends_on = [ "sip-standards",]
 
 [contracts.regulatory-adapter]
 path = "contracts/compliance/regulatory-adapter.clar"
@@ -663,7 +669,7 @@ depends_on = [ "enterprise-subscription",]
 [contracts.protocol-fee-collector]
 path = "contracts/treasury/protocol-fee-collector.clar"
 clarity-version = 4
-depends_on = [ "operational-treasury", "sip-standards",]
+depends_on = [ "operational-treasury", "protocol-fee-source-trait", "sip-standards",]
 
 [contracts.integration-fee-collector]
 path = "contracts/integrations/integration-fee-collector.clar"
@@ -715,6 +721,8 @@ depends_on = [ "conxian-access",]
 
 [contracts.lending-orchestrator]
 path = "contracts/lending/lending-manager.clar"
+clarity-version = 4
+depends_on = [ "protocol-fee-collector", "protocol-fee-source-trait", "sip-standards",]
 
 [contracts.interest-rate-model]
 path = "contracts/lending/interest-rate-model.clar"
@@ -744,6 +752,7 @@ depends_on = [ "block-utils",]
 
 [contracts.concentrated-liquidity-pool]
 path = "contracts/dex/concentrated-liquidity-pool.clar"
+depends_on = [ "cxlp-token", "sip-standards",]
 
 [contracts.collateral-orchestrator]
 path = "contracts/core/collateral-manager.clar"

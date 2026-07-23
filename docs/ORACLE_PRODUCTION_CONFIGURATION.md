@@ -217,10 +217,10 @@ Before provider activation, release approval must include all of the following:
 
 ## 6. What the generated plans do and do not prove
 
-The generated plans now contain **236 effective entries**:
+The generated plans now contain **241 effective entries**:
 
-- 212 filtered contract publications; and
-- 24 final-batch initialization/configuration calls, including the three
+- 215 filtered contract publications; and
+- 26 final-batch initialization/configuration calls, including the three
   source-independent oracle wiring calls.
 
 The plans prove only that the checked-in generator can reproduce those

@@ -2,11 +2,11 @@
 
 ## Scope
 
-The DEX module currently provides **oracle, deterministic policy, and
-liquidity-intent infrastructure**. It does not yet provide a complete LP
-execution or custody system. In particular, the liquidity-manager ledger does
-not transfer tokens, custody assets, mutate a pool, collect fees, or prove that
-an LP position was executed.
+The DEX module currently provides **oracle, deterministic policy,
+liquidity-intent infrastructure, and a canonical CXLP share primitive**. It
+does not yet provide a complete LP execution or custody system. In particular,
+the liquidity-manager ledger does not transfer tokens, custody assets, mutate
+a pool, collect fees, or prove that an LP position was executed.
 
 The existing swap and concentrated-liquidity contracts remain separate
 integration surfaces. This README describes the production-safe behavior of
@@ -69,8 +69,30 @@ Native High-Efficiency Liquidity.
 | `get-csf-health` | `()` | Get the health metrics of the CSF integration. |
 | `swap` | `(pool-id uint) (is-token-0 bool) (amount-in uint) (token-in <sip-010-ft-trait>) (token-out <sip-010-ft-trait>) (recipient principal)` | Execute a swap in a concentrated liquidity pool. |
 | `create-pool` | `(token-0 principal) (token-1 principal) (fee uint) (initial-price uint) (initial-tick int)` | Create a new concentrated liquidity pool. |
+| `mint-shares` | `(pool-id uint) (owner principal) (amount uint)` | Settlement-authority-only atomic CXLP mint plus increment of the selected pool's outstanding-share total and the protocol-wide outstanding-share total. Does not custody pool assets. |
+| `burn-shares` | `(pool-id uint) (owner principal) (amount uint)` | Settlement-authority-only atomic CXLP burn after checking the canonical owner balance, selected pool total, and protocol-wide total. Does not settle a withdrawal. |
+| `get-pool-outstanding-shares` | `(pool-id uint)` | Reads the selected pool's aggregate outstanding CXLP share total. |
+| `get-total-outstanding-shares` | `()` | Reads the protocol-wide outstanding CXLP share total, which must equal canonical CXLP supply. |
+| `get-recorded-share-supply` | `()` | Compatibility alias for `get-total-outstanding-shares`. |
 | `collect-protocol-fees` | `(token <sip-010-ft-trait>)` | Collect accumulated protocol fees. |
 | `get-protocol-status` | `()` | Get the status of the CL pool contract. |
+
+The CLP's SIP-010 surface proxies transfer and read methods to `.cxlp-token`
+so it cannot return fabricated success, zero balances, or a divergent token
+identity. Canonical CXLP balances are the aggregate, transferable ownership
+record. The share hooks validate pool existence, positive amounts, the
+canonical owner balance for burns, canonical supply, and the CLP aggregate
+totals before updating the selected pool and protocol-wide totals. Clarity
+transaction rollback keeps the token and local totals atomic when a downstream
+mint or burn fails.
+
+`settlement-authority` is injected through `set-settlement-authority` by the
+CLP admin. It is trusted only to select the correct pool and position for these
+primitive hooks. This is an integration boundary for #536; it is not a
+substitute for #536's per-position/per-pool attribution, custody,
+settlement-validation, add/remove-liquidity, fee, or exact IL logic.
+`create-pool` intentionally mints no CXLP because a zero-liquidity pool has no
+backing share operation.
 
 ### `liquidity-manager.clar`
 The liquidity-manager is a validated, unexecuted intent ledger. Every recorded
@@ -183,13 +205,22 @@ those compatibility-only no-op entrypoints.
 
 ## Remaining prerequisites for full LP execution
 
-Before this module can claim full concentrated-liquidity execution, the CLP
-integration still needs:
+The CXLP primitive and atomic share reconciliation hooks are now available, but
+the CLP integration still needs:
 
-1. token custody and transfer authorization;
+1. #536-owned token custody and transfer authorization for deposits/withdrawals;
 2. on-chain LP position creation, ownership, and settlement accounting;
 3. pool reserve/liquidity reads and fee accrual/collection accounting; and
 4. a trusted current-tick/current-price observation API for rebalance advice.
+
+CXLP is one global fungible token. Direct CXLP transfers and transfers through
+the CLP proxy are real SIP-010 transfers: they change canonical owner balances
+without changing supply or either CLP aggregate total. The CLP deliberately
+does not maintain a duplicate owner or owner/pool ledger that ordinary
+transfers could stale. Before any burn is exposed to users, #536 must supply
+the per-position/per-pool attribution, custody, and settlement validation that
+identifies the correct pool and owner amount; these hooks do not invent that
+attribution.
 
 Until those prerequisites exist, `liquidity-manager` remains a validated intent
 ledger and deterministic risk proxy, not an LP executor.

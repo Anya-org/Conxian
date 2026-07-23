@@ -12,6 +12,11 @@ The module utilizes a decentralized reserve system optimized for capital efficie
 - **Economic Model**: `interest-rate-model.clar` provides **utilization-based interest curves**. These are mathematical curves that adjust interest rates dynamically: rates increase as borrowing demand grows to encourage more deposits and maintain pool liquidity.
 - **Orchestrator**: `lending-orchestrator.clar` provides an alternative, BME-integrated (Business Machine Engine) execution path for advanced protocol interactions.
 
+The approved protocol-fee migration changes only the active
+`lending-manager.repay` path. It does not migrate `lending-orchestrator`, DEX
+flows, or concentrated-liquidity-pool custody; those remain separate follow-up
+work while their execution paths are stubbed or out of scope.
+
 The module integrates with the protocol's `oracle-aggregator` for real-time asset pricing and the `enhanced-circuit-breaker` for **fail-closed security**. Fail-closed security is a safety mechanism that automatically pauses the protocol if critical price feeds or contract dependencies become unavailable, preventing incorrect executions during market volatility.
 
 ## Core Contracts (Reference)
@@ -24,7 +29,7 @@ The primary engine for money market operations.
 |----------|-----------|-------------|
 | `deposit` | `(deposit (asset-trait <sip-010-ft-trait>) (amount uint))` | Deposits tokens to earn interest and record reserve data. |
 | `borrow` | `(borrow (asset-trait <sip-010-ft-trait>) (amount uint))` | Borrows tokens against deposited collateral. |
-| `repay` | `(repay (asset-trait <sip-010-ft-trait>) (amount uint))` | Repays a borrowed position with interest. |
+| `repay` | `(repay (asset-trait <sip-010-ft-trait>) (amount uint) (source <protocol-fee-source-trait>))` | Repays a borrowed position and atomically prepays the scheduled collector fee from manager custody. |
 | `withdraw` | `(withdraw (asset-trait <sip-010-ft-trait>) (amount uint))` | Withdraws previously deposited assets. |
 | `collect-reserves` | `(collect-reserves (asset-trait <sip-010-ft-trait>))` | Transfers protocol revenue to the `revenue-distributor`. |
 | `get-total-deposits` | `(get-total-deposits (asset principal))` | Returns total deposits for a specific asset. |
@@ -34,6 +39,23 @@ The primary engine for money market operations.
 | `get-protocol-tvl` | `(get-protocol-tvl)` | Returns total value locked across all assets. |
 | `calculate-account-health` | `(calculate-account-health (user principal))` | Returns the current health factor for a user. |
 | `configure-asset-collateral` | `(configure-asset-collateral (asset principal) (collateral-factor uint) (liquidation-threshold uint))` | Configures risk and collateral parameters for a specific asset. |
+| `set-protocol-fee-stream` | `(set-protocol-fee-stream (asset principal) (stream-id uint))` | Admin-only, write-once mapping from a lending asset to an active collector FT stream whose source, asset, and route are validated before binding. Repayments fail closed without it. |
+
+For `repay`, the canonical eligible base is exactly
+`interest-portion = floor(amount * 1000 / 10000)`. The scheduled collector rate
+is applied to that interest-only base, replacing the legacy 1% full-repayment
+charge rather than being added to it. The manager keeps the user's repayment
+transfer, source-prepays the collector-computed fee through the authenticated
+callback, and credits `total-reserves` with
+`interest-portion - protocol-fee`. Principal is never included in the fee base.
+Each repayment uses a manager-local monotonic nonce hashed to a fixed
+`(buff 32)` settlement ID; the caller cannot provide the debit or choose an
+unmapped stream. Stream bindings are write-once so residual and accounting
+namespaces cannot be reset by reconfiguration. The manager creates its pending
+source debit privately and immediately invokes the collector in the same call
+stack; a `block-height` equality is not treated as proof of same-transaction
+state. The collector authenticates the source, callback, fixed recipient, and
+exact custody delta, while each source owns the atomicity of its pending record.
 
 ### `interest-rate-model.clar`
 
