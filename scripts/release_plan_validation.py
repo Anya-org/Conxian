@@ -51,6 +51,7 @@ RELEASE_PLAN_EXCLUSIONS = frozenset(
         "math-lib-concentrated",
         "oracle-adapter-stub",
         "integration-fee-collector",
+        "zkml-verifier",
     }
 )
 

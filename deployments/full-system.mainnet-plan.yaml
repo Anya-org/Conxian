@@ -1729,14 +1729,6 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
-    - contract-publish:
-        contract-name: zkml-verifier
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 50000
-        path: contracts/compliance/zkml-verifier.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
   - id: 10
     transactions:
     - contract-publish:

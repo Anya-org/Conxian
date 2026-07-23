@@ -25,7 +25,7 @@ The Conxian Protocol is baselined as a **Sovereign Autonomous Business (SAB)**. 
 ### 2.4. Compliance & Regulatory
 - **Status**: MiCA-Aligned.
 - **Identity**: SIP-018 structured data signing in `regulatory-adapter.clar`.
-- **Security**: ZKML-based model attestation for risk scoring implemented in `zkml-verifier.clar`.
+- **Security**: ZKML model attestation is not implemented or production-qualified. `zkml-verifier.clar` is a scaffold-only quarantine; all verification attempts fail closed and no production Groth16/Plonk backend, verifier qualification, or deployment/mainnet proof is claimed.
 
 ## 3. SDK & Production Infrastructure
 ### 3.1. SDK Capabilities
@@ -38,6 +38,7 @@ The Conxian Protocol is baselined as a **Sovereign Autonomous Business (SAB)**. 
 ### 3.3. Mainnet Readiness
 - **Mainnet Manifest**: V1.0.0 exists in `deployments/`.
 - **Gating**: "Sovereign Guard" contamination gating verified to prevent testnet leakage.
+- **ZKML boundary**: The presence of a local Clarinet scaffold or release-plan classification is not deployment evidence. The quarantined ZKML component has no mainnet or testnet deployment proof.
 
 ## 4. Strategic Research & Standards Alignment
 - **Universal Chain Support (ADR-006)**: confirmed EVM, Bitcoin/UTXO, and Cosmos/IBC targets using LayerZero V2 and Axelar Amplifier.
@@ -49,4 +50,4 @@ The Conxian Protocol is baselined as a **Sovereign Autonomous Business (SAB)**. 
 - **BNS Stub**: Dependency on `.btc` names for reputation boost is stubbed in `bns-stub.clar`; requires live Nakamoto BNS integration.
 - **Narrowing Tail**: Completion of the subtree split (UI/Gateway) is required before final mainnet submission.
 
-**Conclusion**: The system remains strictly aligned with the Conxian vision. No pivots are required; focus is now on the "Leaf-to-Root" verification of the narrowed protocol core.
+**Conclusion**: The system remains aligned with the Conxian vision, subject to explicit component boundaries. ZKML remains a fail-closed scaffold and future protocol/DAO follow-up, not an implemented or verified production capability.

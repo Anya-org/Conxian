@@ -1,5 +1,26 @@
 # Documentation State
 
+## Current Session (41) - Issue #557 ZKML Fail-Closed Quarantine
+
+{
+  "status": "IMPLEMENTED_LOCALLY",
+  "session_timestamp": "2026-07-23",
+  "scope": "Quarantined the unavailable ZKML verifier without changing its public ABI: verification now always fails closed, the active status is paused/non-compliant, the verified event is removed, focused regression tests and a static contamination guard were added, and generated testnet/mainnet release plans explicitly exclude the scaffold.",
+  "security_boundary": "No proof parsing, fake key registry, simulated cryptographic success, production Groth16/Plonk backend, verifier qualification, or deployment/mainnet proof is claimed. The local Clarinet contract remains available only for compile/regression testing.",
+  "documentation_boundary": "Active compliance, PRD, audit, and research documents now describe the ZKML component as scaffold-only and fail-closed. Standards Validation Session 25 is explicitly historical/superseded.",
+  "validation": {
+    "focused_zkml_tests": "PASS: bash scripts/run-tests.sh tests/compliance/zkml-verifier.test.ts (1 file, 13 tests; 4 known benign Clarinet SDK runtime warnings, 0 new errors).",
+    "full_required_tests": "PASS: uv run --with PyYAML==6.0.2 npm test (90 files passed, 8 skipped; 426 tests passed, 59 skipped; 360 known benign runtime warnings, 1 expected contract-boundary rejection, 0 new errors).",
+    "clarinet_check": "PASS: Clarinet v3.21.0 native arm64 temporary bootstrap; clarinet check --manifest-path Clarinet.toml checked 239 contracts. The expected generated default simnet-plan rewrite was restored and is not a deployment claim.",
+    "quarantine_guard": "PASS: python3 scripts/verify_zkml_quarantine.py and npm run verify:zkml-quarantine.",
+    "release_plans": "PASS: uv run --with PyYAML==6.0.2 python3 scripts/gen-deployment-plans.py --check; 214 production contracts in 11 batches. Release-plan validation unit tests: 18 passed.",
+    "contamination_guard": "PASS: python3 scripts/verify_contamination_guard.py.",
+    "docs_validation": "BLOCKED: npm run validate:docs cannot load missing scripts/validate-docs.js; this is a repository/environment blocker unrelated to the quarantine patch.",
+    "diff_hygiene": "PASS: git diff --check."
+  },
+  "source_control": "Work is isolated on charlie/557-zkml-fail-closed; no pull request or human-facing platform message was opened or posted."
+}
+
 ## Current Session (40) - Issue #488 Phase 2 Lending Protocol Fee
 
 {

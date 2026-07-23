@@ -69,7 +69,7 @@ TEST_HELPERS = {
 RELEASE_PLAN_EXCLUSIONS = {
     "integration-fee-trait", "integration-registry", "alex-reserve-pool",
     "alex-swap-helper", "alex-adapter", "bns-stub", "math-lib-concentrated",
-    "oracle-adapter-stub", "integration-fee-collector",
+    "oracle-adapter-stub", "integration-fee-collector", "zkml-verifier",
 }
 
 ISSUE_501_CONTRACTS = {

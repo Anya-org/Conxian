@@ -487,6 +487,9 @@ assert module.DEPLOYER
             ):
                 self.validate_pair(root, manifest_path, [("consumer", None)])
 
+    def test_zkml_verifier_is_explicitly_quarantined_from_release_plans(self) -> None:
+        self.assertIn("zkml-verifier", release_plan_validation.RELEASE_PLAN_EXCLUSIONS)
+
     def test_missing_source_file_is_rejected_by_manifest_parser(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)

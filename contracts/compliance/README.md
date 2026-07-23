@@ -9,7 +9,7 @@ The module follows a "Hook" pattern for non-invasive enforcement:
 - **Authoritative identity evidence**: `kyc-registry.clar` owns the KYC record-presence, tier, and sanction-flag decision consumed by the registration gate.
 - **Enforcement**: `compliance-hooks.clar` provides read-only checks (`check-kyc`, `check-aml`) that other contracts can use to verify callers.
 - **Institutional**: `regulatory-adapter.clar` handles SIP-018 compliant domain separators and structured data hashing for audits.
-- **ZKML**: `zkml-verifier.clar` added to the compliance module for zero-knowledge model attestation (CON-70).
+- **ZKML**: `zkml-verifier.clar` is a quarantined scaffold for a future zero-knowledge model-attestation boundary (CON-70). It preserves its public ABI but all verification attempts fail closed while no reviewed backend is available.
 - **Enterprise**: `travel-rule-service.clar` manages VASP registration and transaction logging.
 
 ## Core Contracts (Reference)
@@ -57,11 +57,42 @@ SIP-018 Institutional compliance adapter.
 | `verify-and-update-compliance` | `(verify-and-update-compliance (principal (string-ascii 3) uint (buff 65)) (response bool uint))` | Verifies SIP-018 attestation signature and updates registry. |
 
 ### `zkml-verifier.clar`
-Zero-knowledge machine learning proof verification.
+Zero-knowledge machine learning proof verification quarantine scaffold. This
+contract does not parse, verify, qualify, or accept Groth16/Plonk evidence.
+Its `verify-proof` entry point always returns the distinct unavailable-verifier
+error `(err u7003)` and emits no verified event. The local Clarinet contract is
+retained for regression testing, but it is excluded from generated testnet and
+mainnet release plans. No production backend, verifier qualification, or
+deployment/mainnet proof is claimed.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `verify-proof` | `(verify-proof ((string-ascii 64) (buff 32) (buff 1024)) (response bool uint))` | Verifies a ZKML proof payload for model attestation. |
+| `verify-proof` | `(verify-proof ((string-ascii 64) (buff 32) (buff 1024)) (response bool uint))` | Preserves the caller ABI and always fails closed with `(err u7003)` until a reviewed exact verifier is qualified. |
+
+#### Future canonical evidence contract (design-only; no acceptance path)
+
+Any future ZKML evidence must be specified as a versioned record before an
+acceptance path is considered. The canonical evidence contract is a protocol
+and DAO follow-up, not part of this quarantine. At minimum it must bind:
+
+- schema/version;
+- proof system (for example, Groth16 or Plonk) and curve;
+- circuit/model identity;
+- verification-key identifier or commitment;
+- proof encoding;
+- ordered public inputs;
+- statement/transcript digest binding the model ID and input hash, with explicit
+  domains, verification-key binding, and circuit binding;
+- verifier implementation and version;
+- issuance time, freshness window, and expiry;
+- replay protection and a nullifier.
+
+Structural checks such as lengths, encodings, or field presence are necessary
+but never sufficient. Only a reviewed exact verifier for the declared proof
+system, curve, circuit, key, transcript, freshness, and replay semantics may
+return `(ok true)`. Future backend engineering and verifier qualification are
+separate follow-up work; this contract intentionally provides no simulated or
+partial acceptance path.
 
 ## Integration Examples (How-to)
 
@@ -91,7 +122,8 @@ Validation is performed via compiled Clarinet SDK tests.
 | **Jurisdictional Sharding** | An architectural pattern where protocol state or transactions are partitioned based on the legal jurisdiction of the participants to ensure local compliance. |
 
 ## Status (Reference)
-- Implementation: Production-Ready (v1.2.1)
-- Audit Status: Internally Verified (April 2026)
+- Compliance core: Mixed readiness; individual components require their own evidence.
+- ZKML status: Scaffold only; quarantined and fail closed.
+- ZKML audit status: No internal verifier qualification is claimed.
 - BIP Compliance: BIP-341, BIP-342
-- Standard: Hexagonal, SIP-018, IVMS101, ZKML
+- Standard: Hexagonal, SIP-018, IVMS101; ZKML evidence remains a future design boundary.
