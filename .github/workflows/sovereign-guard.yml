@@ -13,6 +13,7 @@ on:
       - 'scripts/gen-deployment-plans.py'
       - 'scripts/release_plan_validation.py'
       - 'scripts/verify_zkml_quarantine.py'
+      - 'tests/test_verify_zkml_quarantine.py'
   pull_request:
     paths:
       - 'contracts/**'
@@ -26,6 +27,7 @@ on:
       - 'scripts/gen-deployment-plans.py'
       - 'scripts/release_plan_validation.py'
       - 'scripts/verify_zkml_quarantine.py'
+      - 'tests/test_verify_zkml_quarantine.py'
 
 permissions:
   contents: read
@@ -43,3 +45,5 @@ jobs:
         run: python3 scripts/verify_contamination_guard.py
       - name: Run ZKML Quarantine Guard
         run: npm run verify:zkml-quarantine
+      - name: Run ZKML Quarantine Regression Tests
+        run: npm run test:zkml-quarantine

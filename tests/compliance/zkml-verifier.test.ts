@@ -25,11 +25,7 @@ describe('ZKML verifier quarantine', () => {
 
   const expectUnavailable = (receipt: any) => {
     expect(receipt.result).toEqual(Cl.error(Cl.uint(ERR_VERIFIER_UNAVAILABLE)));
-    expect(
-      (receipt.events ?? []).some((event: any) =>
-        event.event === 'print_event' && JSON.stringify(event).includes('zkml-verified'),
-      ),
-    ).toBe(false);
+    expect(receipt.events ?? []).toEqual([]);
   };
 
   it.each([
