@@ -54,6 +54,7 @@ except ModuleNotFoundError as exc:
 DEPLOYER = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
 TEST_HELPERS = {
     "mock-circuit-breaker", "mock-csf-protocol",
+    "mock-fee-source",
     "mock-pox-adapter", "mock-pox-adapter-2", "mock-proposal",
     "mock-regulatory-adapter",
     "mock-settlement-intermediary",
@@ -68,7 +69,7 @@ TEST_HELPERS = {
 RELEASE_PLAN_EXCLUSIONS = {
     "integration-fee-trait", "integration-registry", "alex-reserve-pool",
     "alex-swap-helper", "alex-adapter", "bns-stub", "math-lib-concentrated",
-    "oracle-adapter-stub", "integration-fee-collector", "protocol-fee-collector",
+    "oracle-adapter-stub", "integration-fee-collector",
 }
 
 ISSUE_501_CONTRACTS = {
@@ -121,6 +122,10 @@ INIT_CALLS = [
      "method": "add-minter", "parameters": [A(".bme-engine")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.cxd-token", "expected-sender": DEPLOYER,
      "method": "add-burner", "parameters": [A(".bme-engine")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.cxlp-token", "expected-sender": DEPLOYER,
+     "method": "add-minter", "parameters": [A(".concentrated-liquidity-pool")], "cost": INIT_CALL_COST},
+    {"contract-id": f"{DEPLOYER}.cxlp-token", "expected-sender": DEPLOYER,
+     "method": "add-burner", "parameters": [A(".concentrated-liquidity-pool")], "cost": INIT_CALL_COST},
     {"contract-id": f"{DEPLOYER}.bme-engine", "expected-sender": DEPLOYER,
      "method": "add-activity-reporter",
      "parameters": [A(".swap-router")], "cost": INIT_CALL_COST},
@@ -201,6 +206,12 @@ GENERATED_PLAN_NAMES = (
 )
 GENERATED_HASH_NAME = "full-system.mainnet-plan.sha256"
 
+REQUIRED_RELEASE_ORDER = (
+    "sip-standards",
+    "cxlp-token",
+    "concentrated-liquidity-pool",
+)
+
 
 def load_simnet_plan(path):
     with path.open() as f:
@@ -228,7 +239,7 @@ def extract_contracts(simnet, manifest, repo_root, path_label="default.simnet-pl
         allow_stale_clarity_versions=True,
     )
     ordered_batches = dependency_ordered_batches(source_batches, manifest)
-    return [
+    contracts = [
         [
             {
                 "contract-name": entry.contract_name,
@@ -239,6 +250,32 @@ def extract_contracts(simnet, manifest, repo_root, path_label="default.simnet-pl
         ]
         for batch in ordered_batches
     ]
+    assert_release_dependency_order(contracts)
+    return contracts
+
+
+def assert_release_dependency_order(contracts):
+    """Fail closed unless the release plans publish the required dependency edge."""
+    names = [item["contract-name"] for batch in contracts for item in batch]
+    positions = {}
+    for name in REQUIRED_RELEASE_ORDER:
+        try:
+            positions[name] = names.index(name)
+        except ValueError as exc:
+            raise ValueError(
+                "cannot establish required release dependency order; missing: "
+                + name
+            ) from exc
+
+    if not (
+        positions["sip-standards"]
+        < positions["cxlp-token"]
+        < positions["concentrated-liquidity-pool"]
+    ):
+        raise ValueError(
+            "invalid release dependency order: expected "
+            "sip-standards -> cxlp-token -> concentrated-liquidity-pool"
+        )
 
 
 def assert_issue_501_clarity_versions(contracts):
@@ -261,6 +298,7 @@ def assert_issue_501_clarity_versions(contracts):
 
 def make_plan(contracts, network, name, stacks_node, cost):
     """Build deployment plan YAML structure."""
+    assert_release_dependency_order(contracts)
     plan = {
         "id": EXPECTED_PLAN_IDS[network],
         "name": name,

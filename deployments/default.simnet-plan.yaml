@@ -1047,6 +1047,16 @@ plan:
       path: contracts/treasury/protocol-fee-collector.clar
       clarity-version: 4
     - transaction-type: emulated-contract-publish
+      contract-name: protocol-fee-source-trait
+      emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N
+      path: contracts/traits/protocol-fee-source-trait.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: mock-fee-source
+      emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N
+      path: contracts/test-helpers/mock-fee-source.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
       contract-name: protocol-invariant-monitor
       emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N
       path: contracts/dex/protocol-invariant-monitor.clar

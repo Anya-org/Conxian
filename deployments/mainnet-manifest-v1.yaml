@@ -1,3 +1,8 @@
+# LEGACY MANIFEST — NOT AN ACTIVE DEPLOYMENT INPUT.
+# Active testnet/mainnet workflows use the generated
+# deployments/full-system.*-plan.yaml artifacts from
+# scripts/gen-deployment-plans.py. This historical manifest is retained for
+# reference and must not be used for a current deployment.
 name: Conxian Protocol Mainnet Manifest v2.0.0 (Apex CSF v1.1.0)
 network: mainnet
 stacks-node: "https://api.mainnet.hiro.so"

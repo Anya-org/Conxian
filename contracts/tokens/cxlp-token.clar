@@ -11,6 +11,8 @@
 (define-constant ERR_INVALID_AMOUNT (err u1001))
 (define-constant ERR_OWNER_MISMATCH (err u1002))
 (define-constant ERR_INSUFFICIENT_BALANCE (err u1003))
+(define-constant ERR_SUPPLY_OVERFLOW (err u1004))
+(define-constant MAX_UINT u340282366920938463463374607431768211455)
 (define-data-var admin principal tx-sender)
 (define-map minters principal bool)
 (define-map burners principal bool)
@@ -36,6 +38,11 @@
 ;; @desc Checks if a principal is an authorized burner.
 (define-read-only (is-burner (caller principal))
   (default-to false (map-get? burners caller))
+)
+
+;; @desc Compatibility query for integrations that require both roles.
+(define-read-only (is-approved-contract (caller principal))
+  (and (is-minter caller) (is-burner caller))
 )
 
 ;; @desc Returns the current administrator.
@@ -89,6 +96,26 @@
   )
 )
 
+;; @desc Compatibility helper that grants both mint and burn roles.
+(define-public (add-approved-contract (contract principal))
+  (begin
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
+    (map-set minters contract true)
+    (map-set burners contract true)
+    (ok true)
+  )
+)
+
+;; @desc Compatibility helper that revokes both mint and burn roles.
+(define-public (remove-approved-contract (contract principal))
+  (begin
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
+    (map-delete minters contract)
+    (map-delete burners contract)
+    (ok true)
+  )
+)
+
 ;; @desc Mints CXLP through the immediate caller's authorization.
 (define-public (mint (amount uint) (recipient principal))
   (begin
@@ -96,6 +123,10 @@
     (asserts!
       (or (is-admin-caller) (is-minter contract-caller))
       ERR_UNAUTHORIZED
+    )
+    (asserts!
+      (<= amount (- MAX_UINT (ft-get-supply cxlp-token)))
+      ERR_SUPPLY_OVERFLOW
     )
     (ft-mint? cxlp-token amount recipient)
   )
@@ -118,6 +149,7 @@
       ERR_OWNER_MISMATCH
     )
     (asserts! (>= (ft-get-balance cxlp-token owner) amount) ERR_INSUFFICIENT_BALANCE)
+    (asserts! (>= (ft-get-supply cxlp-token) amount) ERR_INSUFFICIENT_BALANCE)
     (ft-burn? cxlp-token amount owner)
   )
 )
@@ -139,6 +171,16 @@
 
 ;; @desc Initializes the contract with a new administrator.
 (define-public (initialize (new-admin principal))
+  (begin
+    (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
+    (var-set admin new-admin)
+    (ok true)
+  )
+)
+
+;; @desc Explicit administrator alias retained for integrations that use the
+;; conventional set-admin name.
+(define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-admin-caller) ERR_UNAUTHORIZED)
     (var-set admin new-admin)
