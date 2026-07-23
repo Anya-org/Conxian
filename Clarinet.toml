@@ -13,6 +13,11 @@ clarity-version = 4
 path = "contracts/traits/stacking-traits.clar"
 clarity-version = 4
 
+[contracts.protocol-fee-source-trait]
+path = "contracts/traits/protocol-fee-source-trait.clar"
+clarity-version = 4
+depends_on = ["sip-standards"]
+
 [contracts.integration-fee-trait]
 path = "contracts/traits/integration-fee-trait.clar"
 clarity-version = 4
@@ -85,7 +90,7 @@ depends_on = ["enterprise-revenue-trait", "revenue-distributor", "sip-standards"
 [contracts.protocol-fee-collector]
 path = "contracts/treasury/protocol-fee-collector.clar"
 clarity-version = 4
-depends_on = ["operational-treasury", "sip-standards"]
+depends_on = ["operational-treasury", "protocol-fee-source-trait", "sip-standards"]
 
 [contracts.revenue-distributor]
 path = "contracts/treasury/revenue-distributor.clar"
@@ -109,7 +114,7 @@ clarity-version = 4
 [contracts.lending-manager]
 path = "contracts/lending/lending-manager.clar"
 clarity-version = 4
-depends_on = ["bme-engine", "conxian-protocol", "enhanced-circuit-breaker", "oracle-aggregator", "revenue-automation", "sip-standards"]
+depends_on = ["bme-engine", "conxian-protocol", "enhanced-circuit-breaker", "oracle-aggregator", "protocol-fee-collector", "protocol-fee-source-trait", "sip-standards"]
 
 [contracts.access-control-trait]
 path = "contracts/traits/access-control-trait.clar"
@@ -679,6 +684,11 @@ depends_on = ["core-traits"]
 path = "contracts/test-helpers/mock-token.clar"
 clarity-version = 4
 depends_on = ["sip-standards"]
+
+[contracts.mock-fee-source]
+path = "contracts/test-helpers/mock-fee-source.clar"
+clarity-version = 4
+depends_on = ["protocol-fee-collector", "protocol-fee-source-trait", "sip-standards"]
 
 [contracts.mock-compoundable-vault]
 path = "contracts/test-helpers/mock-compoundable-vault.clar"

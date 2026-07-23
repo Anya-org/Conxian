@@ -54,6 +54,7 @@ except ModuleNotFoundError as exc:
 DEPLOYER = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
 TEST_HELPERS = {
     "mock-circuit-breaker", "mock-csf-protocol",
+    "mock-fee-source",
     "mock-pox-adapter", "mock-pox-adapter-2", "mock-proposal",
     "mock-regulatory-adapter",
     "mock-settlement-intermediary",
@@ -68,7 +69,7 @@ TEST_HELPERS = {
 RELEASE_PLAN_EXCLUSIONS = {
     "integration-fee-trait", "integration-registry", "alex-reserve-pool",
     "alex-swap-helper", "alex-adapter", "bns-stub", "math-lib-concentrated",
-    "oracle-adapter-stub", "integration-fee-collector", "protocol-fee-collector",
+    "oracle-adapter-stub", "integration-fee-collector",
 }
 
 ISSUE_501_CONTRACTS = {
