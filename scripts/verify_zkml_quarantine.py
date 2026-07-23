@@ -23,11 +23,21 @@ and its adversarial tests; it must not silently broaden this scaffold.
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 import re
 import sys
-from typing import Iterable
+from typing import Any, Iterable
+
+try:
+    import yaml
+except ModuleNotFoundError as exc:  # pragma: no cover - exercised by the CLI
+    raise SystemExit(
+        "PyYAML==6.0.2 is required for the ZKML quarantine guard; "
+        "run it with: uv run --with 'PyYAML==6.0.2' python3 "
+        "scripts/verify_zkml_quarantine.py"
+    ) from exc
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -95,13 +105,54 @@ DOC_POSITIVE_PATTERNS = (
 )
 DIRECT_NEGATION_RE = re.compile(
     r"\b(?:not|never|no|without|non|neither|unavailable|disabled|"
-    r"absent|pending)\b(?:\s+(?:a|an|the|currently|yet|longer))?\s*$",
+    r"absent|pending|cannot|can't)\b(?:\s+\w+){0,8}\s*$",
     re.IGNORECASE,
 )
 POST_NEGATION_RE = re.compile(
-    r"^\s*(?:is|are|was|were)?\s*(?:not|never)\s+"
-    r"(?:claimed|evidence|available|supported|enabled)\b",
+    r"^\s*(?:(?:is|are|was|were|remains?|seems?)\s+)?"
+    r"(?:not|never|unavailable|disabled|pending)\b",
     re.IGNORECASE,
+)
+DOC_CLAUSE_BOUNDARY_RE = re.compile(
+    r"(?P<punct>[,;:\u2013\u2014])|"
+    r"(?P<conjunction>\b(?:but|however|yet|although|while|whereas|and|or)\b)",
+    re.IGNORECASE,
+)
+DOC_CONTRASTIVE_CONJUNCTIONS = frozenset(
+    {"but", "however", "yet", "although", "while", "whereas", "and", "or"}
+)
+DOC_CONTINUATION_PREFIX_WORDS = frozenset(
+    {
+        "a",
+        "an",
+        "are",
+        "be",
+        "been",
+        "being",
+        "cannot",
+        "can't",
+        "had",
+        "has",
+        "have",
+        "is",
+        "it",
+        "must",
+        "never",
+        "no",
+        "not",
+        "now",
+        "remain",
+        "remains",
+        "seem",
+        "seems",
+        "should",
+        "still",
+        "that",
+        "the",
+        "this",
+        "was",
+        "were",
+    }
 )
 STATUS_MARKER_RE = re.compile(r"(?:active|compliant|verified)", re.IGNORECASE)
 EVENT_HEADS = frozenset({"print", "emit", "emit-event", "emit-event?"})
@@ -291,7 +342,7 @@ def read_text(path: Path, errors: list[str], root: Path = ROOT) -> str:
         return ""
     try:
         text = path.read_text(encoding="utf-8")
-    except OSError as exc:
+    except (OSError, UnicodeError) as exc:
         errors.append(f"could not read {_relative_label(path, root)}: {exc}")
         return ""
     if not text.strip():
@@ -511,6 +562,67 @@ def _verify_contract(errors: list[str], root: Path) -> None:
                     marker_reported = True
 
 
+def _yaml_string_occurrences(
+    value: Any,
+    *,
+    location: str = "$",
+    seen: set[int] | None = None,
+) -> Iterable[tuple[str, str]]:
+    """Yield decoded YAML strings, including keys, list items, and aliases."""
+
+    if isinstance(value, str):
+        if CONTRACT_IDENTIFIER_RE.search(value):
+            yield location, value
+        return
+
+    if seen is None:
+        seen = set()
+    if isinstance(value, (Mapping, Sequence)) and not isinstance(
+        value, (str, bytes, bytearray)
+    ):
+        value_id = id(value)
+        if value_id in seen:
+            return
+        seen.add(value_id)
+
+    if isinstance(value, Mapping):
+        for key, item in value.items():
+            yield from _yaml_string_occurrences(
+                key, location=f"{location}.<key>", seen=seen
+            )
+            yield from _yaml_string_occurrences(
+                item, location=f"{location}[{key!r}]", seen=seen
+            )
+    elif isinstance(value, Sequence) and not isinstance(
+        value, (str, bytes, bytearray)
+    ):
+        for index, item in enumerate(value):
+            yield from _yaml_string_occurrences(
+                item, location=f"{location}[{index}]", seen=seen
+            )
+
+
+def _verify_release_plan(
+    errors: list[str], relative_path: Path, source: str
+) -> None:
+    """Parse and inspect one release plan using only PyYAML's safe loader."""
+
+    try:
+        document = yaml.safe_load(source)
+    except Exception as exc:  # PyYAML parse, decode, and constructor failures
+        errors.append(
+            f"{relative_path} is not valid YAML for quarantine scanning: {exc}"
+        )
+        return
+
+    for location, value in _yaml_string_occurrences(document):
+        errors.append(
+            f"{relative_path} contains the quarantined zkml-verifier in decoded "
+            f"YAML string at {location} ({value!r}); release plans must exclude "
+            "the contract under every YAML key/form"
+        )
+
+
 def _verify_release_classification(errors: list[str], root: Path) -> None:
     clarinet = read_text(root / CLARINET_RELATIVE_PATH, errors, root)
     if clarinet and not CONTRACT_IDENTIFIER_RE.search(clarinet):
@@ -533,78 +645,120 @@ def _verify_release_classification(errors: list[str], root: Path) -> None:
 
     for relative_path in RELEASE_PLAN_RELATIVE_PATHS:
         plan = read_text(root / relative_path, errors, root)
-        if plan and CONTRACT_IDENTIFIER_RE.search(plan):
-            errors.append(
-                f"{relative_path} contains the quarantined zkml-verifier; "
-                "release plans must exclude the contract under every YAML key/form"
-            )
+        if plan:
+            _verify_release_plan(errors, relative_path, plan)
 
 
 def _normalize_document(text: str) -> str:
     return " ".join(re.findall(r"[a-z0-9]+", text.casefold()))
 
 
+def _document_sentences(text: str) -> Iterable[str]:
+    """Yield sentence-sized units without treating wrapped lines as claims."""
+
+    start = 0
+    for boundary in re.finditer(r"[.!?]+(?=\s|$)", text):
+        sentence = text[start : boundary.start()]
+        if sentence.strip():
+            yield sentence
+        start = boundary.end()
+    remainder = text[start:]
+    if remainder.strip():
+        yield remainder
+
+
+def _document_clauses(sentence: str) -> Iterable[tuple[str, bool]]:
+    """Yield clause text and whether a contrastive continuation precedes it."""
+
+    start = 0
+    continuation = False
+    for boundary in DOC_CLAUSE_BOUNDARY_RE.finditer(sentence):
+        segment = sentence[start : boundary.start()]
+        if segment.strip():
+            yield segment, continuation
+            continuation = False
+
+        conjunction = boundary.group("conjunction")
+        if conjunction and conjunction.casefold() in DOC_CONTRASTIVE_CONJUNCTIONS:
+            continuation = True
+        start = boundary.end()
+
+    remainder = sentence[start:]
+    if remainder.strip():
+        yield remainder, continuation
+
+
 def _is_negated_positive(normalized: str, start: int, end: int) -> bool:
-    prefix = normalized[max(0, start - 100) : start]
-    suffix = normalized[end : min(len(normalized), end + 100)]
-    prefix_words = prefix.split()
-    if any(
-        word in {"not", "never", "no", "without", "neither"}
-        for word in prefix_words[-12:]
-    ):
-        return True
+    """Apply negation only inside the current sentence clause."""
+
+    prefix = normalized[:start]
+    suffix = normalized[end:]
     if DIRECT_NEGATION_RE.search(prefix):
         return True
-    if POST_NEGATION_RE.search(suffix):
-        return True
-    return False
+    return POST_NEGATION_RE.search(suffix) is not None
+
+
+def _looks_like_continuation(
+    normalized: str, positive_start: int | None = None
+) -> bool:
+    """Recognize an elliptical continuation without importing a new subject."""
+
+    if positive_start is None:
+        positive_start = len(normalized)
+    prefix_words = normalized[:positive_start].split()
+    return len(prefix_words) <= 5 and all(
+        word in DOC_CONTINUATION_PREFIX_WORDS for word in prefix_words
+    )
 
 
 def _positive_document_claims(text: str) -> list[str]:
     claims: list[str] = []
 
-    # Keep ordinary claims local to a sentence/line. This avoids treating a
-    # compliance-module status line before a ZKML exception as a ZKML claim.
-    # A separate boundary rule below intentionally covers the adversarial
-    # ``ZKML. The verifier is production-ready.`` form.
-    units = [
-        unit
-        for unit in re.split(r"\n+|(?<=[.!?;])\s+", text.casefold())
-        if unit.strip()
-    ]
-    for unit in units:
-        normalized = _normalize_document(unit)
-        anchors = tuple(ZKML_DOC_ANCHOR_RE.finditer(normalized))
-        for label, pattern in DOC_POSITIVE_PATTERNS:
-            for match in pattern.finditer(normalized):
-                if not any(
-                    0 <= match.start() - anchor.end() <= 180
-                    for anchor in anchors
-                ):
-                    continue
-                if _is_negated_positive(normalized, match.start(), match.end()):
-                    continue
-                start = max(0, match.start() - 70)
-                end = min(len(normalized), match.end() + 70)
-                claims.append(f"{label}: {normalized[start:end]}")
+    # Keep each positive term in its own punctuation/conjunction clause. A
+    # negation attached to ``compliant`` must not suppress a later ``verified``
+    # claim in ``not compliant, but verified``. Contrastive clauses inherit the
+    # prior ZKML subject only when their wording is an elliptical continuation.
+    previous_sentence_anchor = False
+    for sentence in _document_sentences(text.casefold()):
+        previous_clause_anchor = False
+        sentence_anchor = False
+        for clause, continuation in _document_clauses(sentence):
+            normalized = _normalize_document(clause)
+            if not normalized:
+                continue
+            anchors = tuple(ZKML_DOC_ANCHOR_RE.finditer(normalized))
+            sentence_anchor = sentence_anchor or bool(anchors)
 
-    boundary_source = text.casefold()
-    boundary_pattern = re.compile(
-        r"\b(?:zkml|zero[- ]knowledge\s+machine\s+learning)\b"
-        r"\s*(?:[.!?]|\n)\s*(?:the\s+)?(?:zkml\s+)?verifier\b"
-        r"[^.!?]{0,140}",
-        re.IGNORECASE,
-    )
-    for boundary_match in boundary_pattern.finditer(boundary_source):
-        context = boundary_match.group(0)
-        normalized = _normalize_document(context)
-        for label, pattern in DOC_POSITIVE_PATTERNS:
-            positive = pattern.search(normalized)
-            if positive is None:
-                continue
-            if _is_negated_positive(normalized, positive.start(), positive.end()):
-                continue
-            claims.append(f"{label}: {normalized}")
+            clause_anchor = bool(anchors)
+            for label, pattern in DOC_POSITIVE_PATTERNS:
+                for match in pattern.finditer(normalized):
+                    direct_anchor = any(
+                        0 <= match.start() - anchor.end() <= 180
+                        for anchor in anchors
+                    )
+                    inherited_anchor = (
+                        (continuation and previous_clause_anchor)
+                        or (
+                            continuation
+                            and not previous_clause_anchor
+                            and previous_sentence_anchor
+                        )
+                    ) and _looks_like_continuation(normalized, match.start())
+                    if not direct_anchor and not inherited_anchor:
+                        continue
+                    if _is_negated_positive(
+                        normalized, match.start(), match.end()
+                    ):
+                        continue
+                    start = max(0, match.start() - 70)
+                    end = min(len(normalized), match.end() + 70)
+                    claims.append(f"{label}: {normalized[start:end]}")
+                    clause_anchor = True
+
+            previous_clause_anchor = clause_anchor or (
+                continuation and previous_clause_anchor
+            )
+        previous_sentence_anchor = sentence_anchor or previous_clause_anchor
     return claims
 
 

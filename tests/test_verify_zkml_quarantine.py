@@ -128,11 +128,15 @@ class ZkmlQuarantineGuardTests(unittest.TestCase):
         contract: str = CANONICAL_CONTRACT,
         docs: dict[str, str] | None = None,
         release_plan_mutation: tuple[str, str] | None = None,
+        release_plan_text: str | None = None,
     ) -> list[str]:
         with tempfile.TemporaryDirectory(prefix="zkml-guard-test-") as temporary_directory:
             root = Path(temporary_directory)
             self.write_fixture(root, contract=contract, docs=docs)
-            if release_plan_mutation is not None:
+            if release_plan_text is not None:
+                plan_path = root / "deployments/full-system.testnet-plan.yaml"
+                plan_path.write_text(release_plan_text, encoding="utf-8")
+            elif release_plan_mutation is not None:
                 key, value = release_plan_mutation
                 plan_path = root / "deployments/full-system.testnet-plan.yaml"
                 plan_path.write_text(
@@ -188,6 +192,56 @@ class ZkmlQuarantineGuardTests(unittest.TestCase):
 
         self.assertTrue(any("unexpected definition/callable" in error for error in errors))
         self.assertTrue(any("helper calls" in error for error in errors))
+
+    def test_rejects_an_extra_private_helper_even_when_the_public_abi_is_canonical(self) -> None:
+        contract = CANONICAL_CONTRACT.replace(
+            "\n;; Admin functions",
+            (
+                "\n(define-private (read-only-helper) ERR_VERIFIER_UNAVAILABLE)"
+                "\n\n;; Admin functions"
+            ),
+            1,
+        )
+        errors = self.assert_rejected(contract=contract)
+
+        self.assertTrue(any("read-only-helper" in error for error in errors))
+
+    def test_rejects_an_extra_renamed_read_only_function(self) -> None:
+        contract = CANONICAL_CONTRACT.replace(
+            "\n;; Admin functions",
+            (
+                "\n(define-read-only (get-protocol-status-v2) "
+                "ERR_VERIFIER_UNAVAILABLE)\n\n;; Admin functions"
+            ),
+            1,
+        )
+        errors = self.assert_rejected(contract=contract)
+
+        self.assertTrue(any("get-protocol-status-v2" in error for error in errors))
+
+    def test_rejects_exact_unavailable_mapping_mutation_from_u503(self) -> None:
+        errors = self.assert_rejected(
+            contract=CANONICAL_CONTRACT.replace("(err u503)", "(err u504)", 1)
+        )
+
+        self.assertTrue(any("map exactly to (err u503)" in error for error in errors))
+
+    def test_quoted_clarity_strings_do_not_create_fake_definition_or_event_findings(
+        self,
+    ) -> None:
+        contract = CANONICAL_CONTRACT.replace(
+            "    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)",
+            (
+                '    "(define-public (fake) (print \\"fake-event\\"))"\n'
+                "    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)"
+            ),
+            1,
+        )
+
+        errors = self.collect_fixture_errors(contract=contract)
+
+        self.assertFalse(any("unexpected definition/callable" in error for error in errors))
+        self.assertFalse(any("print/event" in error for error in errors))
 
     def test_rejects_helper_or_renamed_positive_event(self) -> None:
         contract = CANONICAL_CONTRACT.replace(
@@ -251,6 +305,53 @@ class ZkmlQuarantineGuardTests(unittest.TestCase):
                     any("every YAML key/form" in error for error in errors)
                 )
 
+    def test_rejects_yaml_contract_identifiers_with_all_double_quoted_escape_forms(
+        self,
+    ) -> None:
+        for escape in (r"\x2d", r"\u002d", r"\U0000002d"):
+            with self.subTest(escape=escape):
+                plan = (
+                    "plan:\n"
+                    "  batches:\n"
+                    "    - transactions:\n"
+                    "        - contract-publish:\n"
+                    f'            contract-name: "zkml{escape}verifier"\n'
+                )
+                errors = self.assert_rejected(release_plan_text=plan)
+
+                self.assertTrue(
+                    any(
+                        "decoded YAML string" in error
+                        and "full-system.testnet-plan.yaml" in error
+                        for error in errors
+                    )
+                )
+
+    def test_rejects_yaml_anchor_alias_block_and_list_source_forms(self) -> None:
+        plan = (
+            "plan:\n"
+            "  quarantined-name: &quarantined zkml-verifier\n"
+            "  batches:\n"
+            "    - transactions:\n"
+            "        - contract-publish:\n"
+            "            contract-name: *quarantined\n"
+            "            sources:\n"
+            "              - |\n"
+            "                contracts/compliance/zkml-verifier.clar\n"
+        )
+        errors = self.assert_rejected(release_plan_text=plan)
+
+        self.assertGreaterEqual(
+            sum("decoded YAML string" in error for error in errors), 2
+        )
+
+    def test_rejects_release_plan_yaml_parse_errors(self) -> None:
+        errors = self.assert_rejected(
+            release_plan_text='plan:\n  invalid-escape: "\\q"\n'
+        )
+
+        self.assertTrue(any("not valid YAML" in error for error in errors))
+
     def test_rejects_positive_document_claim_split_across_lines(self) -> None:
         docs = dict(ACTIVE_DOCS)
         docs["PRD.md"] += "\nZKML\nThe verifier is\nproduction-ready.\n"
@@ -270,6 +371,40 @@ class ZkmlQuarantineGuardTests(unittest.TestCase):
         docs["PRD.md"] += "\nZKML. The verifier is not production-ready.\n"
 
         self.assertEqual(self.collect_fixture_errors(docs=docs), [])
+
+    def test_accepts_only_local_negations_of_each_readiness_term(self) -> None:
+        statements = (
+            "ZKML verifier is not production-ready.",
+            "ZKML verifier is never verified.",
+            "ZKML verifier cannot be treated as active.",
+        )
+        for statement in statements:
+            with self.subTest(statement=statement):
+                docs = dict(ACTIVE_DOCS)
+                docs["PRD.md"] += f"\n{statement}\n"
+
+                self.assertEqual(self.collect_fixture_errors(docs=docs), [])
+
+    def test_rejects_positive_claims_after_local_negations_and_contrastive_boundaries(
+        self,
+    ) -> None:
+        cases = (
+            "ZKML verifier is not production-ready, but active.",
+            "The ZKML verifier is not compliant, but verified by the backend.",
+            "ZKML verifier is not production-ready,\n  but active.",
+            "The ZKML verifier is not compliant,\n  yet verified by the backend.",
+            "ZKML verifier is not production-ready; however, it is active.",
+            "ZKML verifier is not compliant, while verified by the backend.",
+        )
+        for statement in cases:
+            with self.subTest(statement=statement):
+                docs = dict(ACTIVE_DOCS)
+                docs["PRD.md"] += f"\n{statement}\n"
+                errors = self.assert_rejected(docs=docs)
+
+                self.assertTrue(
+                    any("unnegated positive ZKML claim" in error for error in errors)
+                )
 
     def test_malformed_or_ambiguous_clarity_delimiters_fail_closed(self) -> None:
         cases = (
