@@ -23,9 +23,9 @@ The Conxian Protocol is baselined as a **Sovereign Autonomous Business (SAB)**. 
 - **x402 Protocol**: Prototype mapping of HTTP 402 "Payment Required" mandates to on-chain mandates; full readiness is pending real signature verification in `gateway/src/handlers/x402.ts`.
 
 ### 2.4. Compliance & Regulatory
-- **Status**: MiCA-Aligned.
+- **Status**: MiCA-aligned regulatory controls; ZKML evidence unavailable.
 - **Identity**: SIP-018 structured data signing in `regulatory-adapter.clar`.
-- **Security**: ZKML-based model attestation for risk scoring implemented in `zkml-verifier.clar`.
+- **Security**: The ZKML model-attestation boundary is quarantined and fail-closed in `zkml-verifier.clar`; no cryptographic ZKML verification backend is implemented. Structural proof shape or length is not verification, and this boundary must not drive compliance, settlement, custody, routing, deployment, or mainnet-readiness decisions.
 
 ## 3. SDK & Production Infrastructure
 ### 3.1. SDK Capabilities

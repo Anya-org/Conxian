@@ -1,24 +1,25 @@
 ;; zkml-verifier.clar
-;; Conxian Protocol: ZKML Verification Logic
-;; satisfying CON-70 and Guardian: Attestation role.
+;; Conxian Protocol: ZKML Verification Boundary
+;; This contract is a quarantined, fail-closed scaffold. It is not a
+;; cryptographic verifier and must not produce verification evidence.
 
-(define-constant ERR_INVALID_PROOF (err u7001))
+(define-constant ERR_ZKML_VERIFICATION_UNSUPPORTED (err u501))
+(define-constant ERR_ZKML_STATUS_UNAVAILABLE (err u503))
 (define-constant ERR_UNAUTHORIZED (err u7002))
 
 (define-data-var admin principal tx-sender)
 
-;; @desc Verify a ZKML proof payload for model attestation.
+;; @desc Quarantined ZKML verification boundary for model attestation.
 ;; @param model-id: The identifier for the ML model.
 ;; @param input-hash: Hash of the input data.
 ;; @param proof: The ZK proof payload (e.g. Groth16/Plonk).
-;; @return (response bool uint) - Returns ok(true) on success.
+;; @return (response bool uint) - Always returns err u501 until a reviewed
+;; cryptographic backend is implemented.
 (define-public (verify-proof (model-id (string-ascii 64)) (input-hash (buff 32)) (proof (buff 1024)))
-  (begin
-    ;; In simulation we verify the length of the proof to simulate verification
-    (asserts! (is-eq (len proof) u1024) ERR_INVALID_PROOF)
-    (print { event: "zkml-verified", model: model-id, input: input-hash })
-    (ok true)
-  )
+  ;; Production ZKML/ZSE fail-closed rule: structural shape or length is not
+  ;; verification evidence. Do not add a success path without a real backend
+  ;; that binds model-id and input-hash to a cryptographically verified proof.
+  ERR_ZKML_VERIFICATION_UNSUPPORTED
 )
 
 ;; Admin functions
@@ -35,5 +36,7 @@
 )
 
 (define-read-only (get-protocol-status)
-  (ok { compliant: true, version: "v1.1.0-Apex", mode: "ZKML-ACTIVE" })
+  ;; The verifier boundary is unavailable and cannot advertise compliance or
+  ;; active ZKML support until the cryptographic backend exists.
+  ERR_ZKML_STATUS_UNAVAILABLE
 )

@@ -9,7 +9,7 @@ The module follows a "Hook" pattern for non-invasive enforcement:
 - **Authoritative identity evidence**: `kyc-registry.clar` owns the KYC record-presence, tier, and sanction-flag decision consumed by the registration gate.
 - **Enforcement**: `compliance-hooks.clar` provides read-only checks (`check-kyc`, `check-aml`) that other contracts can use to verify callers.
 - **Institutional**: `regulatory-adapter.clar` handles SIP-018 compliant domain separators and structured data hashing for audits.
-- **ZKML**: `zkml-verifier.clar` added to the compliance module for zero-knowledge model attestation (CON-70).
+- **ZKML**: `zkml-verifier.clar` is a quarantined, fail-closed scaffold for a future zero-knowledge model-attestation backend (CON-70).
 - **Enterprise**: `travel-rule-service.clar` manages VASP registration and transaction logging.
 
 ## Core Contracts (Reference)
@@ -57,11 +57,15 @@ SIP-018 Institutional compliance adapter.
 | `verify-and-update-compliance` | `(verify-and-update-compliance (principal (string-ascii 3) uint (buff 65)) (response bool uint))` | Verifies SIP-018 attestation signature and updates registry. |
 
 ### `zkml-verifier.clar`
-Zero-knowledge machine learning proof verification.
+Quarantined zero-knowledge machine-learning verification boundary.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `verify-proof` | `(verify-proof ((string-ascii 64) (buff 32) (buff 1024)) (response bool uint))` | Verifies a ZKML proof payload for model attestation. |
+| `verify-proof` | `(verify-proof ((string-ascii 64) (buff 32) (buff 1024)) (response bool uint))` | Quarantined boundary; always returns `(err u501)` because no cryptographic backend is implemented. |
+
+The ZKML boundary is unavailable by design. Structural proof shape or length
+is not verification, and this scaffold must not drive compliance, settlement,
+custody, routing, deployment, or mainnet-readiness decisions.
 
 ## Integration Examples (How-to)
 
@@ -91,7 +95,7 @@ Validation is performed via compiled Clarinet SDK tests.
 | **Jurisdictional Sharding** | An architectural pattern where protocol state or transactions are partitioned based on the legal jurisdiction of the participants to ensure local compliance. |
 
 ## Status (Reference)
-- Implementation: Production-Ready (v1.2.1)
-- Audit Status: Internally Verified (April 2026)
+- Implementation: Production-ready compliance controls; ZKML boundary quarantined
+- Audit Status: ZKML cryptographic backend unavailable
 - BIP Compliance: BIP-341, BIP-342
-- Standard: Hexagonal, SIP-018, IVMS101, ZKML
+- Standard: Hexagonal, SIP-018, IVMS101; ZKML scaffold only
