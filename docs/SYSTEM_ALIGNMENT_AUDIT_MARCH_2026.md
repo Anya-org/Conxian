@@ -1,5 +1,14 @@
 # Conxian Systemic Alignment & Issue Audit Report (March 2026) - REMEDIATED
 
+> **Dated correction — July 23, 2026:** This historical report's CON-70
+> “IMPLEMENTED” entry records that the scaffold file was added; it must not be
+> read as evidence of a cryptographic verifier or current readiness. The
+> `zkml-verifier.clar` boundary is quarantined and fail-closed, returns
+> `ERR_VERIFIER_UNAVAILABLE` (`err u503`) for every input, emits no success
+> event, and is excluded from testnet/mainnet release artifacts. No production
+> or mainnet ZKML support is claimed. The canonical future evidence contract is
+> [`docs/ZKML_EVIDENCE_CONTRACT.md`](ZKML_EVIDENCE_CONTRACT.md).
+
 ## 1. Executive Summary
 This audit report has been updated following the April 2026 remediation sprint. All critical logic gaps and stub implementations identified in the March 2026 audit have been implemented and verified. The protocol has achieved full implementation alignment with its Apex v1.1.0 architecture and SAB design.
 

@@ -1,5 +1,13 @@
 # Conxian System Research & Vision Alignment Synopsis (Session 27)
 
+> **Dated correction — July 23, 2026:** The ZKML statement in this historical
+> synopsis overstated readiness. `contracts/compliance/zkml-verifier.clar` is
+> now explicitly quarantined: it has no cryptographic verifier backend, always
+> returns `ERR_VERIFIER_UNAVAILABLE` (`err u503`), emits no success event, and
+> is excluded from testnet/mainnet release plans. See
+> [`docs/ZKML_EVIDENCE_CONTRACT.md`](ZKML_EVIDENCE_CONTRACT.md) for the future
+> evidence contract. No production or mainnet ZKML support is claimed.
+
 ## 1. Vision: The Sovereign Autonomous Business (SAB)
 The Conxian Protocol is baselined as a **Sovereign Autonomous Business (SAB)**. It replaces human discretion with mathematical certainty through a "Staff-vs-Board" dual-intelligence model.
 - **Vision Alignment**: 100%. The protocol has successfully transitioned from a collection of DeFi smart contracts to an integrated autonomous entity.
@@ -25,7 +33,7 @@ The Conxian Protocol is baselined as a **Sovereign Autonomous Business (SAB)**. 
 ### 2.4. Compliance & Regulatory
 - **Status**: MiCA-Aligned.
 - **Identity**: SIP-018 structured data signing in `regulatory-adapter.clar`.
-- **Security**: ZKML-based model attestation for risk scoring implemented in `zkml-verifier.clar`.
+- **Security**: ZKML model attestation is a disabled/quarantined scaffold in `zkml-verifier.clar`; cryptographic verification is unavailable and not production evidence.
 
 ## 3. SDK & Production Infrastructure
 ### 3.1. SDK Capabilities

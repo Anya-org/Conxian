@@ -1,24 +1,24 @@
 ;; zkml-verifier.clar
-;; Conxian Protocol: ZKML Verification Logic
-;; satisfying CON-70 and Guardian: Attestation role.
+;; Conxian Protocol: quarantined ZKML verification boundary.
+;;
+;; This contract is retained for local compilation and negative regression tests
+;; only. No reviewed cryptographic verifier backend exists yet, so the public
+;; boundary must never turn structural/scaffold input into an acceptance.
 
-(define-constant ERR_INVALID_PROOF (err u7001))
+(define-constant ERR_VERIFIER_UNAVAILABLE (err u503))
 (define-constant ERR_UNAUTHORIZED (err u7002))
 
 (define-data-var admin principal tx-sender)
 
-;; @desc Verify a ZKML proof payload for model attestation.
+;; @desc Fail closed until a reviewed cryptographic ZKML backend is available.
 ;; @param model-id: The identifier for the ML model.
 ;; @param input-hash: Hash of the input data.
-;; @param proof: The ZK proof payload (e.g. Groth16/Plonk).
-;; @return (response bool uint) - Returns ok(true) on success.
+;; @param proof: The reserved ZK proof payload.
+;; @return (response bool uint) - Always returns ERR_VERIFIER_UNAVAILABLE.
 (define-public (verify-proof (model-id (string-ascii 64)) (input-hash (buff 32)) (proof (buff 1024)))
-  (begin
-    ;; In simulation we verify the length of the proof to simulate verification
-    (asserts! (is-eq (len proof) u1024) ERR_INVALID_PROOF)
-    (print { event: "zkml-verified", model: model-id, input: input-hash })
-    (ok true)
-  )
+  ;; Keep the compatible input boundary, but do not inspect or accept any
+  ;; payload until the canonical evidence contract has a reviewed backend.
+  ERR_VERIFIER_UNAVAILABLE
 )
 
 ;; Admin functions
@@ -35,5 +35,7 @@
 )
 
 (define-read-only (get-protocol-status)
-  (ok { compliant: true, version: "v1.1.0-Apex", mode: "ZKML-ACTIVE" })
+  ;; Status is an unavailable error rather than a success-shaped readiness
+  ;; record. Callers must not treat this scaffold as active ZKML evidence.
+  ERR_VERIFIER_UNAVAILABLE
 )

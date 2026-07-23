@@ -9,7 +9,7 @@ The module follows a "Hook" pattern for non-invasive enforcement:
 - **Authoritative identity evidence**: `kyc-registry.clar` owns the KYC record-presence, tier, and sanction-flag decision consumed by the registration gate.
 - **Enforcement**: `compliance-hooks.clar` provides read-only checks (`check-kyc`, `check-aml`) that other contracts can use to verify callers.
 - **Institutional**: `regulatory-adapter.clar` handles SIP-018 compliant domain separators and structured data hashing for audits.
-- **ZKML**: `zkml-verifier.clar` added to the compliance module for zero-knowledge model attestation (CON-70).
+- **ZKML**: `zkml-verifier.clar` is a quarantined, fail-closed scaffold retained for local compilation and negative tests; no cryptographic model-attestation backend is enabled.
 - **Enterprise**: `travel-rule-service.clar` manages VASP registration and transaction logging.
 
 ## Core Contracts (Reference)
@@ -57,11 +57,26 @@ SIP-018 Institutional compliance adapter.
 | `verify-and-update-compliance` | `(verify-and-update-compliance (principal (string-ascii 3) uint (buff 65)) (response bool uint))` | Verifies SIP-018 attestation signature and updates registry. |
 
 ### `zkml-verifier.clar`
-Zero-knowledge machine learning proof verification.
+Quarantined zero-knowledge machine learning verification boundary. The
+contract is not production-ready and is excluded from testnet/mainnet release
+plans until a reviewed cryptographic backend exists.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `verify-proof` | `(verify-proof ((string-ascii 64) (buff 32) (buff 1024)) (response bool uint))` | Verifies a ZKML proof payload for model attestation. |
+| `verify-proof` | `(verify-proof ((string-ascii 64) (buff 32) (buff 1024)) (response bool uint))` | Always returns the stable `ERR_VERIFIER_UNAVAILABLE` (`err u503`); it does not parse, verify, accept, or emit a success event for any payload. |
+| `get-protocol-status` | `(get-protocol-status () (response ... uint))` | Always returns `ERR_VERIFIER_UNAVAILABLE`; it never reports active/compliant ZKML status. |
+
+#### Future evidence contract
+
+The canonical future evidence requirements are defined in
+[`docs/ZKML_EVIDENCE_CONTRACT.md`](../../docs/ZKML_EVIDENCE_CONTRACT.md). That
+specification is a design contract only; it does not enable a positive path in
+this scaffold. In particular, structural parsing may classify an envelope as
+malformed or unsupported, but it can never establish cryptographic acceptance.
+Only a named, reviewed backend may produce the future `accepted` outcome after
+checking the proof, verification-key commitment, circuit/model identity,
+ordered public inputs, statement/transcript binding, freshness, and replay
+rules.
 
 ## Integration Examples (How-to)
 
@@ -91,7 +106,7 @@ Validation is performed via compiled Clarinet SDK tests.
 | **Jurisdictional Sharding** | An architectural pattern where protocol state or transactions are partitioned based on the legal jurisdiction of the participants to ensure local compliance. |
 
 ## Status (Reference)
-- Implementation: Production-Ready (v1.2.1)
+- Implementation: Production-Ready (v1.2.1) for the compliance module except the quarantined ZKML scaffold; ZKML verification is unavailable.
 - Audit Status: Internally Verified (April 2026)
 - BIP Compliance: BIP-341, BIP-342
-- Standard: Hexagonal, SIP-018, IVMS101, ZKML
+- Standard: Hexagonal, SIP-018, IVMS101; ZKML scaffold quarantined and not production evidence
