@@ -44,8 +44,8 @@ Conxian Finance is a multi-dimensional, Stacks-native automated monetary platfor
 - **Details**: Production-grade OData v4 translation layer for SAP/Oracle and x402 payment mandates.
 
 ### 3.5. Guardian & Persistence (CON-70, 69)
-- **Status**: COMPLETED.
-- **Details**: ZKML verification and Tableland state synchronization implemented.
+- **Status**: PARTIAL — Tableland persistence is implemented; the ZKML verifier is quarantined and unavailable pending a reviewed cryptographic implementation.
+- **Details**: `tableland-sync.clar` provides the state-synchronization boundary. `zkml-verifier.clar` is a fail-closed scaffold that returns `ERR_VERIFIER_UNAVAILABLE` for every input and is excluded from testnet/mainnet release artifacts; no production ZKML verification is claimed.
 
 ### 3.6. SIP-018 Compliance (CON-76)
 - **Status**: COMPLETED (April 2026).
