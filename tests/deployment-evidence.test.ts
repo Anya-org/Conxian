@@ -310,9 +310,9 @@ async function expectVerificationError(
 describe("deployment evidence verification", () => {
   it("parses every effective testnet plan entry and blocks the unresolved mainnet identity", () => {
     const testnetPlan = readDeploymentPlan(join(import.meta.dirname, "../deployments/full-system.testnet-plan.yaml"));
-    expect(testnetPlan.entries).toHaveLength(238);
+    expect(testnetPlan.entries).toHaveLength(241);
     expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-publish")).toHaveLength(215);
-    expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-call")).toHaveLength(23);
+    expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-call")).toHaveLength(26);
 
     const riskOrchestrationCalls = testnetPlan.entries.flatMap((entry) =>
       entry.kind === "contract-call" &&

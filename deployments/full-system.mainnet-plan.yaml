@@ -1917,3 +1917,24 @@ plan:
         parameters:
         - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.enterprise-subscription'"
         cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.oracle-aggregator
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: set-price-decimals
+        parameters:
+        - "u8"
+        cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.twap-oracle
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: set-price-decimals
+        parameters:
+        - "u8"
+        cost: 10000
+    - contract-call:
+        contract-id: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.liquidity-manager
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        method: set-oracle
+        parameters:
+        - "'ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.oracle'"
+        cost: 10000
