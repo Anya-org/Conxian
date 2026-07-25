@@ -19,6 +19,7 @@ on:
       - 'tests/compliance/zkml-verifier.test.ts'
       - 'tests/test_verify_zkml_quarantine.py'
       - 'tests/test_verify_codeowners_policy.py'
+      - 'tests/test_main_branch_governance_policy.py'
       - 'CODEOWNERS'
       - '.github/workflows/sovereign-guard.yml'
   pull_request:
@@ -62,6 +63,8 @@ jobs:
         run: python3 scripts/verify_codeowners_policy.py
       - name: Test CODEOWNERS policy verifier
         run: python3 -m unittest tests/test_verify_codeowners_policy.py
+      - name: Test main branch governance policy
+        run: python3 -m unittest tests/test_main_branch_governance_policy.py
       - name: Install deterministic Python runner
         if: steps.filter.outputs.sovereign == 'true'
         run: |

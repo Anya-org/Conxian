@@ -5,19 +5,20 @@
 {
   "status": "PENDING_ADMIN_VERIFICATION",
   "session_timestamp": "2026-07-25",
-  "scope": "Reconciled CODEOWNERS authority, added deterministic policy verification, and stabilized the jules-audit and validate-protocol pull-request contexts for CON-1521 / GitHub issue #515.",
+  "scope": "Reconciled CODEOWNERS authority, added deterministic policy verification, and documented the stable jules-audit and protocol-merge-gate pull-request contexts for CON-1521 / GitHub issue #515.",
   "implementation": {
     "branch": "charlie/con-1521-main-merge-gates",
     "pull_request": "created from this branch and linked from CON-1521 / GitHub issue #515",
     "authoritative_codeowners": "repository-root CODEOWNERS",
     "intended_required_checks": [
-      "validate-protocol",
+      "protocol-merge-gate",
       "jules-audit",
       "gitleaks",
       "dependency-review"
-    ]
+    ],
+    "conditional_validation": "validate-protocol is conditional and must not be configured as a universally required context; protocol-merge-gate is the stable aggregator emitted for every pull request targeting main."
   },
-  "admin_follow_up": "After merge, an administrator must configure and verify rulesets 7569329 and 19251038, require at least one approval and code-owner review while retaining thread resolution, then record canary evidence in CON-1521 / issue #515.",
+  "admin_follow_up": "After merge, an administrator must configure and verify rulesets 7569329 and 19251038, require at least one approval and code-owner review while retaining thread resolution, require exactly protocol-merge-gate, jules-audit, gitleaks, and dependency-review, then record canary evidence in CON-1521 / issue #515.",
   "enforcement_boundary": "Repository changes and green CI do not prove that GitHub ruleset or branch-protection settings have been changed or are enforcing the intended policy."
 }
 

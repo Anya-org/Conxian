@@ -33,19 +33,20 @@ request.
 
 ## Intended required checks
 
-The intended exact required check contexts for pull requests targeting `main`
-are:
+The stable required check contexts intended for every pull request targeting
+`main` are exactly:
 
-- `validate-protocol`
+- `protocol-merge-gate`
 - `jules-audit`
 - `gitleaks`
 - `dependency-review`
 
-The workflows are designed to emit these contexts on every pull request to the
-governed branch. Expensive protocol and sovereign checks may skip internally
-when changes are irrelevant, but their stable job contexts must not disappear.
-All third-party GitHub Actions references remain pinned to immutable commit
-SHAs.
+`validate-protocol` is conditional and must not be configured as a universally
+required context. `protocol-merge-gate` is the stable aggregator: it is emitted
+for every pull request targeting `main`, accepts a skipped `validate-protocol`
+job for non-protocol changes, and requires it to succeed for protocol-sensitive
+changes. All third-party GitHub Actions references remain pinned to immutable
+commit SHAs.
 
 ## GitHub rulesets and admin-only steps
 
@@ -60,8 +61,9 @@ administrator must:
    owners remain eligible repository administrators.
 2. In ruleset `7569329`, require at least one approving review, require a code
    owner review, and retain required review-thread resolution.
-3. Require the four exact check contexts listed above after confirming each is
-   emitted by a fresh pull request run.
+3. Require the four exact stable check contexts listed above after confirming
+   each is emitted by a fresh pull request run. Do not require the conditional
+   `validate-protocol` context.
 4. Review ruleset `19251038` for overlap or conflict with `7569329`; preserve
    its intended default-branch review behavior without weakening the merge
    gates.
@@ -75,8 +77,8 @@ green pull request do **not** prove that GitHub settings enforcement is active.
 
 Use a canary pull request targeting `main` after the settings update:
 
-1. Confirm all four required contexts appear, including on a documentation-only
-   change.
+1. Confirm all four stable required contexts appear, including on a
+   documentation-only change, while `validate-protocol` may be skipped.
 2. Confirm a protected-path change requests review from the effective code
    owners and cannot merge without one approval and resolved review threads.
 3. Confirm a workflow or contract change runs the meaningful expensive checks,

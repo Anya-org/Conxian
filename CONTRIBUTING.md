@@ -39,19 +39,30 @@ the repository policy verifier.
 Pull requests that change contracts or GitHub Actions workflows must have:
 
 - At least one approving review and an approval from a matching code owner.
-- Successful workflow validation, including `protocol-merge-gate` when it is
-  emitted for the pull request.
+- Successful workflow validation, including the stable `protocol-merge-gate`
+  context.
 - All review threads resolved before merge.
 - Every GitHub Action pinned to an immutable 40-character commit SHA; floating tags are not allowed.
 
-The intended required check contexts for pull requests targeting `main` are
-`validate-protocol`, `jules-audit`, `gitleaks`, and `dependency-review`.
+The stable required check contexts intended for every pull request targeting
+`main` are exactly:
+
+- `protocol-merge-gate`
+- `jules-audit`
+- `gitleaks`
+- `dependency-review`
+
+`validate-protocol` is conditional and must not be configured as a universally
+required context. `protocol-merge-gate` is the stable aggregator: it is emitted
+for every pull request targeting `main` and enforces successful protocol
+validation when protocol-sensitive paths change.
+
 Repository administrators must verify the effective ruleset and any legacy
 branch protection without assuming repository files enabled those settings:
 
 - Confirm the default branch requires at least one approval for contract and workflow changes.
 - Confirm code-owner approval and resolved review threads are required.
-- Confirm the four intended contexts are emitted by a fresh pull request before
+- Confirm the four stable contexts are emitted by a fresh pull request before
   configuring them as required checks.
 - Confirm no legacy branch-protection setting conflicts with or weakens the active ruleset.
 - Record the verification evidence in [issue #515](https://github.com/Conxian/Conxian/issues/515).
