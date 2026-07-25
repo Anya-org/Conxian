@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1",
+  "source": {
+    "artifact": "evidence/sbtc/phase2/v1.3.3/sources/sbtc-withdrawal.clar",
+    "function": "validate-recipient"
+  },
+  "vectors": [
+    { "name": "p2pkh-20", "version": 0, "hashbytes": "0000000000000000000000000000000000000000", "valid": true },
+    { "name": "p2sh-20", "version": 1, "hashbytes": "1111111111111111111111111111111111111111", "valid": true },
+    { "name": "p2sh-p2wpkh-20", "version": 2, "hashbytes": "2222222222222222222222222222222222222222", "valid": true },
+    { "name": "p2sh-p2wsh-20", "version": 3, "hashbytes": "3333333333333333333333333333333333333333", "valid": true },
+    { "name": "p2wpkh-20", "version": 4, "hashbytes": "4444444444444444444444444444444444444444", "valid": true },
+    { "name": "p2wsh-32", "version": 5, "hashbytes": "5555555555555555555555555555555555555555555555555555555555555555", "valid": true },
+    { "name": "p2tr-32", "version": 6, "hashbytes": "6666666666666666666666666666666666666666666666666666666666666666", "valid": true },
+    { "name": "p2pkh-wrong-32", "version": 0, "hashbytes": "0000000000000000000000000000000000000000000000000000000000000000", "valid": false },
+    { "name": "p2tr-wrong-20", "version": 6, "hashbytes": "6666666666666666666666666666666666666666", "valid": false },
+    { "name": "unsupported-version", "version": 7, "hashbytes": "7777777777777777777777777777777777777777777777777777777777777777", "valid": false },
+    { "name": "non-byte-version", "version": 256, "hashbytes": "8888888888888888888888888888888888888888", "valid": false },
+    { "name": "non-hex-hashbytes", "version": 4, "hashbytes": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz", "valid": false }
+  ]
+}
