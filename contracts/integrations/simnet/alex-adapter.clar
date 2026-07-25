@@ -1,8 +1,8 @@
 ;; alex-adapter.clar
-;; Conxian CSF Adapter for ALEX Lab (Mainnet v1.1.0)
-;; Implements trait-csf-liquidity-v1 for trustless routing through ALEX pools.
+;; Simnet-only Conxian CSF fixture for ALEX-shaped integration tests.
+;; Implements trait-csf-liquidity-v1 with local deterministic helper/reserve stubs.
 ;;
-;; ALEX Mainnet (July 2026):
+;; Discovery references copied from ALEX documentation in July 2026:
 ;;   Deployer:   SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9
 ;;   Swap Router: .swap-helper-v1-03  (routes between pool types)
 ;;   Trade Pool:  .amm-swap-pool-v1-1  (generalized mean AMM)
@@ -15,9 +15,9 @@
 ;;   - swap-helper auto-routes between swap-x-for-y / swap-y-for-x
 ;;   - Fee model: fee on "in" leg, default 30bps for risky pairs
 ;;
-;; PRINCIPAL: Below constants are integration references to the ALEX protocol.
-;; These are deployment-time configuration, not protocol contamination.
-;; Redeploy adapter with updated constants if ALEX upgrades contracts.
+;; These references are fixture metadata only. They are not verified Conxian launch
+;; configuration, are not called by this contract, and must not be promoted into a
+;; release plan. See docs/ALEX_LAUNCH_READINESS.md for the production evidence gate.
 
 (impl-trait .conxian-csf-trait.trait-csf-liquidity-v1)
 (use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
@@ -28,8 +28,7 @@
 (define-constant ERR_ALEX_SWAP_FAILED (err u2001))
 (define-constant ERR_INACTIVE (err u2002))
 
-;; ALEX Protocol Contract References (Mainnet, July 2026)
-;; Full principals required because .prefix resolves to current deployer, not ALEX.
+;; Discovery-only ALEX reference principals (unused by this simnet fixture).
 (define-constant ALEX_DEPLOYER 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9)
 (define-constant ALEX_SWAP_HELPER 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.swap-helper-v1-03)
 (define-constant ALEX_RESERVE_POOL 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.alex-reserve-pool)
@@ -58,8 +57,8 @@
   )
 )
 
-;; @desc Executes a swap through ALEX Lab liquidity pools via swap-helper.
-;; Calls ALEX swap-helper-v1-03 which auto-routes between swap-x-for-y/swap-y-for-x.
+;; @desc Simulates a swap through the local alex-swap-helper fixture.
+;; The local fixture ABI is not the live swap-helper-v1-03 ABI.
 ;; @param token-in: The source asset trait.
 ;; @param token-out: The target asset trait.
 ;; @param amount: The quantity of tokens to swap (in token's native decimals).
@@ -72,10 +71,9 @@
   (begin
     (asserts! (var-get is-active) ERR_INACTIVE)
 
-    ;; Call ALEX swap-helper which handles pool routing and fee calculation.
-    ;; NOTE: Uses .alex-swap-helper for Clarinet static analysis.
-    ;; In production deployment, the ALEX mainnet contract 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.swap-helper-v1-03
-    ;; must be set as the deployment address for alex-swap-helper.
+    ;; Call the deterministic local simnet helper fixture.
+    ;; Production-specific calls require a separate implementation reviewed against
+    ;; the selected live helper interface and are intentionally not wired here.
     (let ((swap-result (contract-call? .alex-swap-helper swap-helper
                           (contract-of token-in) (contract-of token-out) amount u0)))
       (match swap-result
@@ -108,11 +106,10 @@
   )
 )
 
-;; @desc Claims protocol yield from ALEX reserve pool distributions.
+;; @desc Simulates a yield claim against the local reserve fixture.
 (define-public (claim-conxian-yield (token <sip-010-ft-trait>) (amount uint) (recipient principal))
   (begin
-    ;; NOTE: Uses .alex-reserve-pool for Clarinet static analysis.
-    ;; In production, set address to 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.alex-reserve-pool.
+    ;; This local claim-yield API is not evidence of a matching live reserve API.
     (let ((claim-result (contract-call? .alex-reserve-pool claim-yield
                            (contract-of token) amount recipient)))
       (match claim-result
@@ -126,7 +123,7 @@
   )
 )
 
-;; @desc Retrieves health telemetry for the ALEX integration.
+;; @desc Retrieves deterministic health telemetry from the local reserve fixture.
 (define-public (get-csf-health)
   (begin
     (let ((reserve-balance (match (contract-call? .alex-reserve-pool get-reserve-balance)
