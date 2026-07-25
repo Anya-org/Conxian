@@ -91,7 +91,6 @@ describe('proof-of-reserves cryptographic boundary', () => {
       sign(keys[1], envelope(shared(500n, 1000n, 500n, asOf, expiry, 92n), attestors[0])))).toEqual(err(8001));
 
     // Any changed signed field makes the submitted envelope invalid.
-    const baseSnapshot = shared(500n, 1000n, 500n, asOf, expiry, 93n);
     const wrongDigests = [
       shared(499n, 1000n, 500n, asOf, expiry, 93n),
       shared(500n, 999n, 500n, asOf, expiry, 93n),
