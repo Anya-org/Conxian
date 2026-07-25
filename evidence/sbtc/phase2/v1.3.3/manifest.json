@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1",
+  "upstream": {
+    "repository": "https://github.com/stacks-sbtc/sbtc",
+    "release": "v1.3.3",
+    "commit": "11567fc6a111c130177e64380503acca8546aab6"
+  },
+  "artifacts": [
+    {
+      "kind": "withdrawal-contract",
+      "path": "evidence/sbtc/phase2/v1.3.3/sources/sbtc-withdrawal.clar",
+      "sourcePath": "contracts/contracts/sbtc-withdrawal.clar",
+      "sourceUrl": "https://raw.githubusercontent.com/stacks-sbtc/sbtc/11567fc6a111c130177e64380503acca8546aab6/contracts/contracts/sbtc-withdrawal.clar",
+      "sha256": "104a89bc5b54bb5c8c8c1429e2e10e43e324e00249a096f04084d536055e1e71"
+    },
+    {
+      "kind": "registry-contract",
+      "path": "evidence/sbtc/phase2/v1.3.3/sources/sbtc-registry.clar",
+      "sourcePath": "contracts/contracts/sbtc-registry.clar",
+      "sourceUrl": "https://raw.githubusercontent.com/stacks-sbtc/sbtc/11567fc6a111c130177e64380503acca8546aab6/contracts/contracts/sbtc-registry.clar",
+      "sha256": "6769b24ae384bf5c3a15922a8ed42298b6bb7723ae30cf59c8619c172f500887"
+    },
+    {
+      "kind": "emily-public-openapi",
+      "path": "evidence/sbtc/phase2/v1.3.3/sources/public-emily-openapi-spec.json",
+      "sourcePath": "emily/openapi-gen/generated-specs/public-emily-openapi-spec.json",
+      "sourceUrl": "https://raw.githubusercontent.com/stacks-sbtc/sbtc/11567fc6a111c130177e64380503acca8546aab6/emily/openapi-gen/generated-specs/public-emily-openapi-spec.json",
+      "sha256": "9d8f1236015c38b04f8b1a75915ac66c4fcdd78c7aa922c7ab6700344aff2147"
+    }
+  ]
+}
