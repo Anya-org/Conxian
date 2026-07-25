@@ -1,14 +1,10 @@
-# Conxian Protocol Code Owners
+# This is the sole authoritative CODEOWNERS file for the repository.
 
-# Global owners
-* @Conxian/core-maintainers
+* @botshelomokoka @admin-conxian-labs
 
-# Module specific owners
-/contracts/dex/ @Conxian/dex-team
-/contracts/lending/ @Conxian/lending-team
-/contracts/governance/ @Conxian/governance-team
-/contracts/security/ @Conxian/security-team
-
-# Infrastructure and CI
-/.github/workflows/ @Conxian/devops-team
-/scripts/ @Conxian/devops-team
+/.github/ @botshelomokoka @admin-conxian-labs
+/contracts/ @botshelomokoka @admin-conxian-labs
+/docs/ @botshelomokoka @admin-conxian-labs
+/README.md @botshelomokoka @admin-conxian-labs
+/SECURITY.md @botshelomokoka @admin-conxian-labs
+/CONTRIBUTING.md @botshelomokoka @admin-conxian-labs

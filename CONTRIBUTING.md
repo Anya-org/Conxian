@@ -29,3 +29,22 @@ Please be respectful and professional in all interactions within the community.
 2. Install dependencies: `npm install`.
 3. Run tests: `npm test` or `npm run ci`.
 4. Use `clarinet check` for contract validation.
+
+## Repository Merge Policy
+
+`.github/CODEOWNERS` is the repository's only authoritative ownership file.
+
+Pull requests that change contracts or GitHub Actions workflows must have:
+
+- At least one approving review and an approval from a matching code owner.
+- A successful `protocol-merge-gate` check.
+- All review threads resolved before merge.
+- Every GitHub Action pinned to an immutable 40-character commit SHA; floating tags are not allowed.
+
+Repository administrators must verify the effective ruleset and any legacy branch protection without assuming repository files enabled those settings:
+
+- Confirm the default branch requires at least one approval for contract and workflow changes.
+- Confirm code-owner approval and resolved review threads are required.
+- Confirm `protocol-merge-gate` is a required status check.
+- Confirm no legacy branch-protection setting conflicts with or weakens the active ruleset.
+- Record the verification evidence in [issue #515](https://github.com/Conxian/Conxian/issues/515).
