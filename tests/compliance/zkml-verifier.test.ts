@@ -6,9 +6,18 @@ const ZKML_VERIFIER = 'zkml-verifier';
 const VERIFIER_UNAVAILABLE = 503;
 const DEPLOYER = () => simnet.getAccounts().get('deployer')!;
 const INPUT_HASH_A = Cl.buffer(Buffer.alloc(32, 0x11));
-const INPUT_HASH_B = Cl.buffer(Buffer.alloc(32, 0xee));
+const INPUT_HASH_B = Cl.buffer(Buffer.from('candidate-input-mutated'.padEnd(32, '0')));
 const MODEL_ID_A = Cl.stringAscii('risk-model-v1');
-const MODEL_ID_B = Cl.stringAscii('risk-model-mutated');
+const MODEL_ID_B = Cl.stringAscii('candidate-model-mutated');
+
+/*
+* These labels are quarantine-category regressions only. The current ABI has
+* model-id, input-hash, and proof fields but no key, curve, circuit,
+* freshness/replay, or backend fields. The tests must therefore prove that
+* the scaffold remains unavailable without implying that it parses evidence.
+*/
+const candidateProof = (marker: string) =>
+  Cl.buffer(Buffer.from(`candidate:${marker}`));
 
 function callVerify(
   modelId: ReturnType<typeof Cl.stringAscii>,
@@ -29,17 +38,17 @@ function expectUnavailable(result: { result: unknown; events: unknown[] }) {
 }
 
 describe('zkml-verifier quarantine', () => {
-  it('rejects a 1024-byte payload instead of treating length as verification', () => {
+  it('rejects a malformed-length candidate instead of treating length as verification', () => {
     const result = callVerify(MODEL_ID_A, INPUT_HASH_A, Cl.buffer(Buffer.alloc(1024, 0xaa)));
 
     expectUnavailable(result);
   });
 
-  it('rejects short, malformed, and mutated payloads', () => {
+  it('rejects malformed-encoding candidates', () => {
     const payloads = [
       Cl.buffer(Buffer.from([0xde, 0xad, 0xbe, 0xef])),
       Cl.buffer(Buffer.alloc(1024, 0x00)),
-      Cl.buffer(Buffer.alloc(1024, 0x01)),
+      candidateProof('malformed-encoding'),
     ];
 
     for (const proof of payloads) {
@@ -47,7 +56,19 @@ describe('zkml-verifier quarantine', () => {
     }
   });
 
-  it('cannot be made available by changing the model id or input hash', () => {
+  it('rejects a wrong-key candidate marker', () => {
+    expectUnavailable(
+      callVerify(MODEL_ID_A, INPUT_HASH_A, candidateProof('wrong-key')),
+    );
+  });
+
+  it('rejects a mutated-proof candidate marker', () => {
+    expectUnavailable(
+      callVerify(MODEL_ID_A, INPUT_HASH_A, candidateProof('mutated-proof')),
+    );
+  });
+
+  it('rejects mutated-model and mutated-input candidate markers', () => {
     const proof = Cl.buffer(Buffer.alloc(1024, 0x42));
     const results = [
       callVerify(MODEL_ID_A, INPUT_HASH_A, proof),
@@ -59,6 +80,30 @@ describe('zkml-verifier quarantine', () => {
     for (const result of results) {
       expectUnavailable(result);
     }
+  });
+
+  it('rejects a curve-mismatch candidate marker', () => {
+    expectUnavailable(
+      callVerify(MODEL_ID_A, INPUT_HASH_A, candidateProof('curve-mismatch')),
+    );
+  });
+
+  it('rejects a circuit-key-mismatch candidate marker', () => {
+    expectUnavailable(
+      callVerify(MODEL_ID_A, INPUT_HASH_A, candidateProof('circuit-key-mismatch')),
+    );
+  });
+
+  it('rejects a replay/stale-evidence candidate marker', () => {
+    expectUnavailable(
+      callVerify(MODEL_ID_A, INPUT_HASH_A, candidateProof('replay-stale-evidence')),
+    );
+  });
+
+  it('rejects an unsupported-backend candidate marker', () => {
+    expectUnavailable(
+      callVerify(MODEL_ID_A, INPUT_HASH_A, candidateProof('unsupported-backend')),
+    );
   });
 
   it('emits no success-shaped zkml-verified event', () => {

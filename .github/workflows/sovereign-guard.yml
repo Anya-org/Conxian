@@ -3,9 +3,39 @@ on:
   push:
     paths:
       - 'contracts/**'
+      - 'Clarinet.toml'
+      - 'deployments/default.simnet-plan.yaml'
+      - 'deployments/full-system.testnet-plan.yaml'
+      - 'deployments/full-system.mainnet-plan.yaml'
+      - 'deployments/mainnet-release-plan.yaml'
+      - 'docs/**'
+      - 'PRD.md'
+      - 'package.json'
+      - 'scripts/gen-deployment-plans.py'
+      - 'scripts/release_plan_validation.py'
+      - 'scripts/verify_contamination_guard.py'
+      - 'scripts/verify_zkml_quarantine.py'
+      - 'tests/compliance/zkml-verifier.test.ts'
+      - 'tests/test_verify_zkml_quarantine.py'
+      - '.github/workflows/sovereign-guard.yml'
   pull_request:
     paths:
       - 'contracts/**'
+      - 'Clarinet.toml'
+      - 'deployments/default.simnet-plan.yaml'
+      - 'deployments/full-system.testnet-plan.yaml'
+      - 'deployments/full-system.mainnet-plan.yaml'
+      - 'deployments/mainnet-release-plan.yaml'
+      - 'docs/**'
+      - 'PRD.md'
+      - 'package.json'
+      - 'scripts/gen-deployment-plans.py'
+      - 'scripts/release_plan_validation.py'
+      - 'scripts/verify_contamination_guard.py'
+      - 'scripts/verify_zkml_quarantine.py'
+      - 'tests/compliance/zkml-verifier.test.ts'
+      - 'tests/test_verify_zkml_quarantine.py'
+      - '.github/workflows/sovereign-guard.yml'
 
 permissions:
   contents: read
@@ -19,5 +49,13 @@ jobs:
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.10'
+      - name: Install deterministic Python runner
+        run: |
+          python3 -m pip install --user --disable-pip-version-check 'uv==0.7.22'
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Run Contamination Guard
         run: python3 scripts/verify_contamination_guard.py
+      - name: Run ZKML Quarantine Guard
+        run: npm run verify:zkml-quarantine
+      - name: Run ZKML Quarantine Regression Tests
+        run: npm run test:zkml-quarantine

@@ -1,5 +1,12 @@
 # Standards Validation Report - Session 25
 
+> **Historical and superseded evidence.** This report predates the Issue #557
+> ZKML quarantine and must not be read as current proof of implementation,
+> internal verification, production readiness, verifier qualification, or
+> deployment. As of July 23, 2026, `zkml-verifier.clar` is scaffold only and
+> all verification attempts fail closed; no production Groth16/Plonk backend
+> or mainnet/testnet deployment proof is claimed.
+
 **Date**: 2026-05-22T10:00:00Z
 **Task**: Security and Compliance Module Standards Remediation
 **Overall Standards Score**: 100%
@@ -59,7 +66,7 @@
 | contracts/compliance/regulatory-adapter.clar | ✓ | N/A | ✓ | ✓ | ✓ | ✓ | 100% |
 | contracts/compliance/jurisdictional-sharding.clar | ✓ | N/A | ✓ | ✓ | ✓ | ✓ | 100% |
 | contracts/compliance/travel-rule-service.clar | ✓ | N/A | ✓ | ✓ | ✓ | ✓ | 100% |
-| contracts/compliance/zkml-verifier.clar | ✓ | N/A | ✓ | ✓ | ✓ | ✓ | 100% |
+| contracts/compliance/zkml-verifier.clar | SUPERSEDED | N/A | SUPERSEDED | SUPERSEDED | SUPERSEDED | SUPERSEDED | NOT CURRENT EVIDENCE |
 
 ## Critical Issues Fixed
 - Redundant Contracts: Merged `compliance-orchestrator.clar` into `compliance-manager.clar`.
