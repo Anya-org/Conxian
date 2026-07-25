@@ -33,6 +33,7 @@ To maintain continuity without re-discovery:
 - **Clarinet SDK**: Used for Simnet-based behavioral testing.
 - **Sovereign Guard**: GitHub workflows that reject testnet residue.
 - **Audit Scripts**: Python-based tools for structural header verification.
+- **Main Branch Governance**: See [MAIN_BRANCH_GOVERNANCE.md](MAIN_BRANCH_GOVERNANCE.md) for the authoritative ownership policy, intended required checks, and admin-only ruleset verification.
 
 ---
 **Status**: Baselined (April 2026)

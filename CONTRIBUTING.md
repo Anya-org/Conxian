@@ -32,19 +32,26 @@ Please be respectful and professional in all interactions within the community.
 
 ## Repository Merge Policy
 
-`.github/CODEOWNERS` is the repository's only authoritative ownership file.
+The repository-root `CODEOWNERS` file is the only authoritative ownership
+file. Additional `CODEOWNERS` files under `.github/` or `docs/` are rejected by
+the repository policy verifier.
 
 Pull requests that change contracts or GitHub Actions workflows must have:
 
 - At least one approving review and an approval from a matching code owner.
-- A successful `protocol-merge-gate` check.
+- Successful workflow validation, including `protocol-merge-gate` when it is
+  emitted for the pull request.
 - All review threads resolved before merge.
 - Every GitHub Action pinned to an immutable 40-character commit SHA; floating tags are not allowed.
 
-Repository administrators must verify the effective ruleset and any legacy branch protection without assuming repository files enabled those settings:
+The intended required check contexts for pull requests targeting `main` are
+`validate-protocol`, `jules-audit`, `gitleaks`, and `dependency-review`.
+Repository administrators must verify the effective ruleset and any legacy
+branch protection without assuming repository files enabled those settings:
 
 - Confirm the default branch requires at least one approval for contract and workflow changes.
 - Confirm code-owner approval and resolved review threads are required.
-- Confirm `protocol-merge-gate` is a required status check.
+- Confirm the four intended contexts are emitted by a fresh pull request before
+  configuring them as required checks.
 - Confirm no legacy branch-protection setting conflicts with or weakens the active ruleset.
 - Record the verification evidence in [issue #515](https://github.com/Conxian/Conxian/issues/515).
