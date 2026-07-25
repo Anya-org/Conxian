@@ -55,23 +55,33 @@ Cryptographically binds reserve attestations to one common snapshot digest.
 The owner/governance registry binds each attestor principal to one compressed
 secp256k1 public key and each SIP-010 token principal to one unique 32-byte asset
 identity. Every signer signs a separate envelope over
-`{snapshot-digest, sha256(attestor-public-key), nonce}`; quorum is counted only
-for the shared snapshot digest. Registry, asset, network, or chain configuration
-changes advance an epoch and invalidate older proof status.
+`{attestation-domain, schema-version, signature-algorithm, snapshot-digest,
+sha256(attestor-public-key), nonce}`; quorum is counted only for the shared
+snapshot digest. The only supported algorithm identifier is `secp256k1`, using
+a compressed 33-byte public key and a recoverable 65-byte signature. Registry,
+asset, network, or chain configuration changes advance an epoch and invalidate
+older proof status.
+
+Attestor public keys are permanently retired after rotation or removal. Their
+uniqueness reservations are intentionally not released, preventing a retired
+key from being reactivated for the same identity or aliased to another one.
 
 `off-chain-backing` excludes the observed balance held by the PoR contract. The
 accepted invariant is `on-chain-balance + off-chain-backing >= total-supply`,
 implemented without overflow-prone addition.
 
-| Function | Description |
-|----------|-------------|
-| `set-attestor` / `remove-attestor` | Governance-managed authoritative key registry. Duplicate keys cannot create multiple identities. |
-| `set-asset` / `remove-asset` | Binds a SIP-010 contract principal to a unique canonical asset identity. |
-| `set-network-id` / `set-chain-id` | Explicit domain configuration; the contract remains fail closed while unset. |
-| `get-snapshot-digest` | Returns the canonical common snapshot digest for external signing. |
-| `get-attestation-digest` | Returns the signer-specific envelope digest with replay nonce. |
-| `submit-attestation` | Re-reads live SIP-010 balance/supply, verifies the signature, rejects replay/duplicates, and promotes only a newer quorum snapshot. |
-| `is-fully-backed` / `get-proof-status` | Public, non-mutating live reconciliation checks that fail closed on missing, stale, expired, reconfigured, or drifted evidence. |
+| Function | Current signature summary | Description |
+|----------|---------------------------|-------------|
+| `set-attestor` / `remove-attestor` | `(principal, (buff 33))` / `(principal)` | Governance-managed authoritative key registry with permanent key retirement. |
+| `set-asset` / `remove-asset` | `(principal, (buff 32))` / `(principal)` | Binds a SIP-010 contract principal to a unique canonical asset identity. |
+| `set-network-id` / `set-chain-id` | `((string-ascii 8))` / `(uint)` | Explicit domain configuration; the contract remains fail closed while unset. |
+| `get-snapshot-digest` | `(schema, domain, network, chain, epoch, asset-id, balance, supply, backing, height, expiry)` | Returns the canonical common snapshot digest for external signing. |
+| `get-attestation-digest` | `(schema, signature-algorithm, snapshot-digest, signer-id, nonce)` | Returns the signer-specific envelope digest. |
+| `submit-attestation` | `(asset, schema, domain, signature-algorithm, network, chain, epoch, balance, supply, backing, height, expiry, nonce, signature)` | Re-reads live SIP-010 state, verifies a direct-sender signature, rejects replay/duplicates, and promotes only a newer quorum snapshot. |
+| `is-fully-backed` / `get-proof-status` | `(<sip-010-trait>)` | Public, non-mutating live reconciliation checks that fail closed on missing, stale, expired, reconfigured, or drifted evidence. |
+
+See `docs/PROOF_OF_RESERVES_API_MIGRATION.md` for the breaking legacy
+replacement and signing-field migration table.
 
 The pinned analyzer classifies dynamic trait calls as potentially writing even
 when the selected SIP-010 methods are read-only. Consequently, the live checks

@@ -4,6 +4,12 @@
 ## Unreleased
 
 ### Added
+- **Proof-of-Reserves Binding (July 25, 2026)**: Replaced the legacy raw
+  attestation ledger with versioned snapshot and signer-envelope digests,
+  explicit `secp256k1` algorithm binding, live SIP-010 reconciliation,
+  registry-epoch invalidation, distinct quorum, nonce replay protection, and a
+  repository consumer guard. This is source/test evidence only, not deployment
+  or oracle-qualification evidence.
 - **Enterprise Subscription MVP (Issue #503)**: Added explicit STX-only prepaid
   subscribe/renew/cancel flows, immutable versioned plan and generic feature
   records, KYC/AML checks, allowlisted consumer usage metering, and

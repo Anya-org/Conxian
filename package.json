@@ -14,6 +14,8 @@
     "validate:deployment-plans": "python3 scripts/gen-deployment-plans.py --check",
     "verify:zkml-quarantine": "uv run --no-project --with 'PyYAML==6.0.2' python3 scripts/verify_zkml_quarantine.py",
     "test:zkml-quarantine": "uv run --no-project --with 'PyYAML==6.0.2' python3 -m unittest tests/test_verify_zkml_quarantine.py",
+    "verify:por-consumers": "python3 scripts/verify_por_consumer_guard.py",
+    "test:por-consumers": "python3 -m unittest tests/test_verify_por_consumer_guard.py",
     "assert:community-voting-wiring": "python3 scripts/assert-community-voting-wiring.py",
     "ci": "bash scripts/run-tests.sh",
     "coverage": "vitest run --coverage",

@@ -14,8 +14,10 @@ on:
       - 'scripts/gen-deployment-plans.py'
       - 'scripts/release_plan_validation.py'
       - 'scripts/verify_contamination_guard.py'
+      - 'scripts/verify_por_consumer_guard.py'
       - 'scripts/verify_zkml_quarantine.py'
       - 'tests/compliance/zkml-verifier.test.ts'
+      - 'tests/test_verify_por_consumer_guard.py'
       - 'tests/test_verify_zkml_quarantine.py'
       - '.github/workflows/sovereign-guard.yml'
   pull_request:
@@ -32,8 +34,10 @@ on:
       - 'scripts/gen-deployment-plans.py'
       - 'scripts/release_plan_validation.py'
       - 'scripts/verify_contamination_guard.py'
+      - 'scripts/verify_por_consumer_guard.py'
       - 'scripts/verify_zkml_quarantine.py'
       - 'tests/compliance/zkml-verifier.test.ts'
+      - 'tests/test_verify_por_consumer_guard.py'
       - 'tests/test_verify_zkml_quarantine.py'
       - '.github/workflows/sovereign-guard.yml'
 
@@ -55,6 +59,10 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Run Contamination Guard
         run: python3 scripts/verify_contamination_guard.py
+      - name: Run Proof-of-Reserves Consumer Guard
+        run: npm run verify:por-consumers
+      - name: Run Proof-of-Reserves Consumer Guard Tests
+        run: npm run test:por-consumers
       - name: Run ZKML Quarantine Guard
         run: npm run verify:zkml-quarantine
       - name: Run ZKML Quarantine Regression Tests

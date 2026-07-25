@@ -3,15 +3,17 @@
 ;;
 ;; Canonical schema v1 hashing:
 ;; - uint leaf = the Clarity-native sha256(uint) encoding
-;; - domain/network leaves use fixed ASCII byte tags after exact-value checks
+;; - accepted ASCII configuration values map to explicit tags that hash to
+;;   fixed 32-byte leaves; unsupported values use separate sentinel tags
 ;; - fixed 32-byte identities/digests are included directly
 ;; - ordered fixed-width leaves are grouped and hashed; group hashes are hashed
 ;;   once more to produce the final 32-byte digest
 ;; Snapshot leaves: domain, schema-version, chain-id, network, registry-epoch,
 ;; governance-registered asset identity, observed on-chain balance, total supply,
 ;; off-chain backing, burn height, and expiry.
-;; Envelope leaves: attestation domain, schema-version, snapshot digest,
-;; sha256(registered attestor public key), and per-attestor nonce.
+;; Envelope leaves: attestation domain, schema-version, signature algorithm,
+;; snapshot digest, sha256(registered attestor public key), and per-attestor
+;; nonce.
 ;; Each signer signs an envelope, while quorum is counted on the shared snapshot
 ;; digest so distinct signers do not create unrelated quorum buckets.
 ;;
@@ -38,12 +40,17 @@
 (define-constant ERR_INVALID_ATTESTOR u8014)
 (define-constant ERR_INVALID_NETWORK_CONFIG u8015)
 (define-constant ERR_INVALID_ASSET u8016)
+(define-constant ERR_UNSUPPORTED_SIGNATURE_ALGORITHM u8017)
 
 (define-constant SNAPSHOT_SCHEMA_VERSION u1)
 (define-constant SNAPSHOT_DOMAIN "CONXIAN-POR-SNAPSHOT")
 (define-constant ATTESTATION_DOMAIN "CONXIAN-POR-ATTESTATION")
+(define-constant SIGNATURE_ALGORITHM "secp256k1")
 (define-constant SNAPSHOT_DOMAIN_TAG 0x434f4e5849414e2d504f522d534e415053484f54)
+(define-constant OTHER_SNAPSHOT_DOMAIN_TAG 0x4f544845522d504f522d534e415053484f542d444f4d41494e)
 (define-constant ATTESTATION_DOMAIN_TAG 0x434f4e5849414e2d504f522d4154544553544154494f4e)
+(define-constant SECP256K1_TAG 0x736563703235366b31)
+(define-constant OTHER_SIGNATURE_ALGORITHM_TAG 0x756e737570706f727465642d7369676e61747572652d616c676f726974686d)
 (define-constant MAINNET_TAG 0x6d61696e6e6574)
 (define-constant TESTNET_TAG 0x746573746e6574)
 (define-constant SIMNET_TAG 0x73696d6e6574)
@@ -150,6 +157,18 @@
   (sha256 value)
 )
 
+(define-private (snapshot-domain-hash (domain (string-ascii 24)))
+  (if (is-eq domain SNAPSHOT_DOMAIN)
+    (sha256 SNAPSHOT_DOMAIN_TAG)
+    (sha256 OTHER_SNAPSHOT_DOMAIN_TAG))
+)
+
+(define-private (signature-algorithm-hash (signature-algorithm (string-ascii 16)))
+  (if (is-eq signature-algorithm SIGNATURE_ALGORITHM)
+    (sha256 SECP256K1_TAG)
+    (sha256 OTHER_SIGNATURE_ALGORITHM_TAG))
+)
+
 (define-private (network-hash (network (string-ascii 8)))
   (if (is-eq network "mainnet") (sha256 MAINNET_TAG)
     (if (is-eq network "testnet") (sha256 TESTNET_TAG) (sha256 SIMNET_TAG)))
@@ -170,7 +189,7 @@
   )
   (let (
       (identity-group (sha256 (concat
-        (sha256 SNAPSHOT_DOMAIN_TAG)
+        (snapshot-domain-hash domain)
         (concat (hash-uint schema-version)
           (concat (hash-uint expected-chain-id)
             (concat (network-hash network)
@@ -187,6 +206,7 @@
 
 (define-private (compute-envelope-digest
     (schema-version uint)
+    (signature-algorithm (string-ascii 16))
     (snapshot-digest (buff 32))
     (attestor-identity (buff 32))
     (nonce uint)
@@ -194,8 +214,16 @@
   (sha256 (concat
     (sha256 ATTESTATION_DOMAIN_TAG)
     (concat (hash-uint schema-version)
-      (concat snapshot-digest
-        (concat attestor-identity (hash-uint nonce))))))
+      (concat (signature-algorithm-hash signature-algorithm)
+        (concat snapshot-digest
+          (concat attestor-identity (hash-uint nonce)))))))
+)
+
+(define-private (key-is-current-for-attestor (attestor principal) (public-key (buff 33)))
+  (match (map-get? attestor-registry attestor)
+    registered (and (get active registered) (is-eq (get public-key registered) public-key))
+    false
+  )
 )
 
 (define-private (promote-if-newer
@@ -241,7 +269,12 @@
     (begin
       (asserts! (is-governance) (err ERR_UNAUTHORIZED))
       (asserts! (not (is-eq public-key ZERO_PUBKEY)) (err ERR_INVALID_ATTESTOR))
-      (asserts! (match existing-key-owner owner (is-eq owner attestor) true) (err ERR_INVALID_ATTESTOR))
+      ;; Keys are permanently reserved once registered. The only permitted
+      ;; reuse is an idempotent write of the currently active key by the same
+      ;; attestor; rotated and removed keys can never be reactivated or aliased.
+      (asserts! (match existing-key-owner owner
+        (and (is-eq owner attestor) (key-is-current-for-attestor attestor public-key))
+        true) (err ERR_INVALID_ATTESTOR))
       (map-set attestor-registry attestor { active: true, public-key: public-key })
       (map-set registered-attestor-keys public-key attestor)
       (advance-registry-epoch)
@@ -331,6 +364,7 @@
     (asset <sip-010-trait>)
     (schema-version uint)
     (domain (string-ascii 24))
+    (signature-algorithm (string-ascii 16))
     (network (string-ascii 8))
     (expected-chain-id uint)
     (snapshot-registry-epoch uint)
@@ -354,8 +388,12 @@
     (begin
       (asserts! (get active registered) (err ERR_UNAUTHORIZED))
       (asserts! (get active registered-asset) (err ERR_INVALID_ASSET))
+      ;; Direct wallet submission keeps signer attribution unambiguous. Proxy
+      ;; and as-contract paths cannot substitute a contract caller.
+      (asserts! (is-eq tx-sender contract-caller) (err ERR_UNAUTHORIZED))
       (asserts! (is-eq schema-version SNAPSHOT_SCHEMA_VERSION) (err ERR_INVALID_SCHEMA))
       (asserts! (is-eq domain SNAPSHOT_DOMAIN) (err ERR_INVALID_DOMAIN))
+      (asserts! (is-eq signature-algorithm SIGNATURE_ALGORITHM) (err ERR_UNSUPPORTED_SIGNATURE_ALGORITHM))
       (asserts! (not (is-eq configured-network UNCONFIGURED_NETWORK)) (err ERR_INVALID_NETWORK))
       (asserts! (is-eq network configured-network) (err ERR_INVALID_NETWORK))
       (asserts! (valid-runtime-network network) (err ERR_INVALID_NETWORK))
@@ -376,7 +414,7 @@
             schema-version domain network expected-chain-id snapshot-registry-epoch
             (get identity registered-asset) live-balance live-supply off-chain-backing snapshot-height expires-at))
           (envelope-digest (compute-envelope-digest
-            schema-version snapshot-digest (sha256 (get public-key registered)) nonce))
+            schema-version signature-algorithm snapshot-digest (sha256 (get public-key registered)) nonce))
           (approval-key { asset: asset-principal, snapshot-digest: snapshot-digest, attestor: attestor })
         )
         (begin
@@ -435,11 +473,12 @@
 
 (define-read-only (get-attestation-digest
     (schema-version uint)
+    (signature-algorithm (string-ascii 16))
     (snapshot-digest (buff 32))
     (attestor-identity (buff 32))
     (nonce uint)
   )
-  (compute-envelope-digest schema-version snapshot-digest attestor-identity nonce)
+  (compute-envelope-digest schema-version signature-algorithm snapshot-digest attestor-identity nonce)
 )
 
 ;; Dynamic trait calls are conservatively classified as potentially writing by
@@ -531,6 +570,7 @@
     schema-version: SNAPSHOT_SCHEMA_VERSION,
     snapshot-domain: SNAPSHOT_DOMAIN,
     attestation-domain: ATTESTATION_DOMAIN,
+    signature-algorithm: SIGNATURE_ALGORITHM,
     network: (var-get network-id),
     chain-id: (var-get configured-chain-id),
     registry-epoch: (var-get registry-epoch),
