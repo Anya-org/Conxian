@@ -16,6 +16,7 @@
 (define-constant ERR_INSUFFICIENT_SHARES (err u1005))
 (define-constant ERR_TOKEN_CALL_FAILED (err u1006))
 (define-constant ERR_ARITHMETIC_OVERFLOW (err u1007))
+(define-constant ERR_FEE_CUSTODY_UNAVAILABLE (err u1008))
 (define-constant PROTOCOL_FEE_SHARE u1000) ;; 10% of LP fee for BME
 
 ;; --- State ---
@@ -136,7 +137,11 @@
 
 ;; @desc Collect accumulated protocol fees
 (define-public (collect-protocol-fees (token <sip-010-ft-trait>))
-  (ok true)
+  (begin
+    ;; Fees are not segregated from pool/user custody; never transfer untracked assets.
+    (asserts! false ERR_FEE_CUSTODY_UNAVAILABLE)
+    (ok false)
+  )
 )
 
 ;; --- SIP-010 Canonical CXLP Proxy ---
