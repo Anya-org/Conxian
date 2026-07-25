@@ -20,9 +20,13 @@ the DEX contracts covered by the current implementation and tests.
   bounded scaling decisions.
 - **Liquidity intent ledger** (`liquidity-manager.clar`) — records validated
   position and rebalance intents plus a price-movement risk proxy.
-- **Execution prerequisites** — concentrated-liquidity pool custody, position
-  accounting, fee accounting, and a current-tick API are still required before
-  the intent ledger can execute or settle LP operations.
+- **CLP state foundation** (`concentrated-liquidity-pool.clar`) — authorized,
+  validated pool identity; configured current tick/price reads; and bounded
+  pure amount previews. Reserve and fee accounting are deliberately deferred
+  until custody and execution can update them atomically.
+- **Execution prerequisites** — token custody, executable position ownership,
+  reserve/fee mutation, and settlement are still required before the intent
+  ledger can execute or settle LP operations.
 
 Pool IDs and token principals accepted by the liquidity-manager are
 **caller-supplied intent metadata**. They are stored and emitted for later
@@ -67,8 +71,17 @@ Native High-Efficiency Liquidity.
 | `settle-arbitrage` | `(token-in <sip-010-ft-trait>) (token-out <sip-010-ft-trait>) (amount uint) (route (list 10 principal))` | Settle an arbitrage path through the CSF. |
 | `claim-conxian-yield` | `(reward-token <sip-010-ft-trait>) (amount uint) (recipient principal)` | Claim protocol yield through the CSF. |
 | `get-csf-health` | `()` | Get the health metrics of the CSF integration. |
-| `swap` | `(pool-id uint) (is-token-0 bool) (amount-in uint) (token-in <sip-010-ft-trait>) (token-out <sip-010-ft-trait>) (recipient principal)` | Execute a swap in a concentrated liquidity pool. |
-| `create-pool` | `(token-0 principal) (token-1 principal) (fee uint) (initial-price uint) (initial-tick int)` | Create a new concentrated liquidity pool. |
+| `swap` | `(pool-id uint) (is-token-0 bool) (amount-in uint) (token-in <sip-010-ft-trait>) (token-out <sip-010-ft-trait>) (recipient principal)` | Legacy execution path. It now requires an existing pool and binds both token contracts to the registered pair in the requested orientation before fee calculation or custody movement. It does not add reserve math, price movement, or new swap economics. |
+| `create-pool` | `(token-0 principal) (token-1 principal) (fee uint) (initial-price uint) (initial-tick int)` | Admin- or registrar-only creation of validated configured pool state. Tokens must differ, fee must be 1–10,000 on the existing 1,000,000 denominator, tick must be in the bounded execution range, initial price must match the deterministic linear tick approximation, and duplicate pair/fee pools are rejected in either token order. |
+| `initialize` | `(new-admin principal)` | One-time deployment-admin bootstrap that transfers both admin and registrar authority. Replays fail. |
+| `get-pool` | `(pool-id uint)` | Compatibility read for the original pool tuple. |
+| `get-pool-id` | `(token-a principal) (token-b principal) (fee uint)` | Resolves a pool in either token order. |
+| `get-pool-state` | `(pool-id uint)` | Returns the validated, stored pool configuration using the original pool tuple shape. It is not reserve, custody, or oracle truth. |
+| `get-current-tick` | `(pool-id uint)` | Returns the pool's stored configured tick. |
+| `get-current-sqrt-price` | `(pool-id uint)` | Returns the pool's stored configured sqrt price at the documented 1e12 scale. |
+| `preview-position-amounts` | `(pool-id uint) (tick-lower int) (tick-upper int) (liquidity uint) (round-up bool)` | Pure bounded amount preview from stored pool price and a valid range. Uses the deterministic linear tick model and explicitly does not claim exact V3 math. |
+| `get-pool-registrar` | `()` | Reads the principal authorized to create pools alongside the admin. |
+| `set-pool-registrar` | `(registrar principal)` | Admin-only principal injection for the pool-creation authority. Authorization uses the immediate contract caller. |
 | `mint-shares` | `(pool-id uint) (owner principal) (amount uint)` | Settlement-authority-only atomic CXLP mint plus increment of the selected pool's outstanding-share total and the protocol-wide outstanding-share total. Does not custody pool assets. |
 | `burn-shares` | `(pool-id uint) (owner principal) (amount uint)` | Settlement-authority-only atomic CXLP burn after checking the canonical owner balance, selected pool total, and protocol-wide total. Does not settle a withdrawal. |
 | `get-pool-outstanding-shares` | `(pool-id uint)` | Reads the selected pool's aggregate outstanding CXLP share total. |
@@ -76,6 +89,14 @@ Native High-Efficiency Liquidity.
 | `get-recorded-share-supply` | `()` | Compatibility alias for `get-total-outstanding-shares`. |
 | `collect-protocol-fees` | `(token <sip-010-ft-trait>)` | Fails closed with `u1008`; CLP fees are not segregated from pool/user custody and untracked assets must not be transferred. |
 | `get-protocol-status` | `()` | Get the status of the CL pool contract. |
+
+The existing fixed-route callers remain deliberately narrow in this phase.
+`execute-csf-swap`, `swap-and-burn`, and `swap-router.exact-input-single`
+retain their legacy pool-`u1`/token-0 assumptions; they are not general route
+selection. The CLP pool/token binding makes an unknown pool, a reverse-order
+explicit pool, or any token mismatch fail closed before CLP transfers. A later
+fee-aware routing design must select the canonical pair-and-fee pool and its
+orientation without changing this patch's public router or CSF signatures.
 
 The CLP's SIP-010 surface proxies transfer and read methods to `.cxlp-token`
 so it cannot return fabricated success, zero balances, or a divergent token
@@ -92,7 +113,20 @@ primitive hooks. This is an integration boundary for #536; it is not a
 substitute for #536's per-position/per-pool attribution, custody,
 settlement-validation, add/remove-liquidity, fee, or exact IL logic.
 `create-pool` intentionally mints no CXLP because a zero-liquidity pool has no
-backing share operation.
+backing share operation. It records no reserves, fee growth, fee dust,
+protocol-fee balances, or executed positions in this phase because the legacy
+swap path cannot update such counters atomically. Those accounting surfaces are
+deferred to the custody/execution phase while the original `get-pool` tuple ABI
+is preserved.
+
+`pool-registrar` starts as the deployment `tx-sender`. The one-time `initialize`
+bootstrap transfers both admin and registrar together; later `set-admin` calls
+do not mutate the registrar, and only the current admin may call
+`set-pool-registrar`. Future execution wiring must inject the approved registrar
+contract before delegating pool creation; this phase intentionally does not wire
+an unresolved production principal. Both admin and registrar checks use
+`contract-caller`, preventing an unconfigured forwarding contract from
+inheriting an admin transaction sender's authority.
 
 The CLP and `swap-aggregator` trait entrypoints for `collect-protocol-fees`
 remain ABI-compatible but fail closed (`u1008` and `u1003`, respectively) for
@@ -100,6 +134,8 @@ every caller. Dedicated, segregated DEX fee custody and canonical settlement
 must exist before either entrypoint can transfer assets. Until then, these
 surfaces must not be composed with legacy or canonical fee collection on the
 same base.
+Legacy swap deductions are calculation behavior only: they are not segregated,
+tracked as collectible protocol fees, or evidence that fee custody exists.
 
 ### `liquidity-manager.clar`
 The liquidity-manager is a validated, unexecuted intent ledger. Every recorded
@@ -122,7 +158,7 @@ performed.
 | `get-rebalance` | `(position-id uint)` | Reads the rebalance intent. |
 | `get-rebalance-plan` | `(position-id uint)` | Compatibility alias for `get-rebalance`. |
 | `cancel-rebalance` | `(position-id uint)` | Cancels the local rebalance intent. |
-| `get-rebalance-advice` | `(position-id uint) (observed-tick int)` | Evaluates a caller-observed tick against the stored range. The observation is advisory; the pool has no current-tick getter here and no rebalance is executed. |
+| `get-rebalance-advice` | `(position-id uint) (observed-tick int)` | Evaluates a caller-observed tick against the stored range. This intent-only advisory path deliberately does not consult or attribute a pool observation, and no rebalance is executed. `pool-current-tick-available: false` means unavailable to/unused by this path, not absent from the global pool API. |
 
 The risk endpoint fails closed when canonical aggregate/TWAP data is missing,
 stale, zero, or excessively divergent. It does not call a dynamic oracle
@@ -193,8 +229,10 @@ move assets:
   deltas, and signed direction.
 - `predictive-scaling-system.clar` — bounded activity scaling,
   volatility-adjusted fees, and depth-adjusted liquidity.
-- `concentrated-math.clar` — concentrated-liquidity tick and math helpers used
-  for input validation.
+- `concentrated-math.clar` — concentrated-liquidity tick and amount helpers.
+  Execution-facing APIs are bounded, use a 1e12 price scale, and expose
+  explicit round-down/round-up responses. Tick conversion remains a documented
+  linear approximation rather than exact V3 math.
 
 The removed `placeholder` entrypoints were nonfunctional stubs. Callers should
 use the deterministic helper functions listed above rather than relying on
@@ -212,13 +250,15 @@ those compatibility-only no-op entrypoints.
 
 ## Remaining prerequisites for full LP execution
 
-The CXLP primitive and atomic share reconciliation hooks are now available, but
-the CLP integration still needs:
+The CXLP primitive, atomic share reconciliation hooks, and trusted zero-state
+CLP read foundation are now available, but the integration still needs:
 
 1. #536-owned token custody and transfer authorization for deposits/withdrawals;
 2. on-chain LP position creation, ownership, and settlement accounting;
-3. pool reserve/liquidity reads and fee accrual/collection accounting; and
-4. a trusted current-tick/current-price observation API for rebalance advice.
+3. authorized reserve/liquidity and fee-growth mutation reconciled to custody;
+4. executable current-tick/current-price transitions for swaps and rebalance;
+5. position fee checkpoints, collection, protocol routing, and dust settlement;
+6. exact concentrated-liquidity math and realized IL accounting.
 
 CXLP is one global fungible token. Direct CXLP transfers and transfers through
 the CLP proxy are real SIP-010 transfers: they change canonical owner balances

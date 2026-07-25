@@ -454,6 +454,7 @@ describe('CXLP mint/burn primitive and CLP reconciliation', () => {
   let wallet1: string;
   let wallet2: string;
   let wallet3: string;
+  let nextPoolFee = 3001;
 
   beforeAll(() => {
     const values = simnet.getAccounts();
@@ -478,7 +479,7 @@ describe('CXLP mint/burn primitive and CLP reconciliation', () => {
       [
         Cl.contractPrincipal(deployer, 'cxd-token'),
         Cl.contractPrincipal(deployer, 'cxvg-token'),
-        Cl.uint(3000),
+        Cl.uint(nextPoolFee++),
         Cl.uint(1_000_000_000_000),
         Cl.int(0),
       ],

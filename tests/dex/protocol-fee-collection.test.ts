@@ -46,6 +46,33 @@ describe('DEX protocol-fee custody boundaries', () => {
     expect(trackedPrincipals.map(balance)).toEqual(balancesBefore);
   });
 
+  it('keeps CLP fee collection at u1008 after pool creation without moving tracked balances', () => {
+    const trackedPrincipals = [
+      deployer,
+      wallet1,
+      contractPrincipal(CLP),
+      contractPrincipal(AGGREGATOR),
+    ];
+    const created = simnet.callPublicFn(
+      CLP,
+      'create-pool',
+      [
+        Cl.principal(contractPrincipal(CXD)),
+        Cl.principal(contractPrincipal('cxlp-token')),
+        Cl.uint(9876),
+        Cl.uint(1_000_000_000_000),
+        Cl.int(0),
+      ],
+      deployer,
+    );
+    expect(created.result).toEqual(Cl.ok(Cl.uint(1)));
+
+    const balancesBefore = trackedPrincipals.map(balance);
+    expect(simnet.callPublicFn(CLP, 'collect-protocol-fees', [token], deployer).result)
+      .toEqual(Cl.error(Cl.uint(ERR_CLP_FEE_CUSTODY_UNAVAILABLE)));
+    expect(trackedPrincipals.map(balance)).toEqual(balancesBefore);
+  });
+
   it('fails aggregator fee collection closed for admin and non-admin callers without moving tokens', () => {
     const trackedPrincipals = [
       deployer,

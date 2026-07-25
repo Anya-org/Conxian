@@ -607,8 +607,8 @@
 )
 
 ;; @desc Return advisory in/out-of-range guidance from a caller-supplied
-;; observed tick. The pool has no current-tick getter, so this never claims
-;; that the observation came from the pool and never executes a rebalance.
+;; observed tick. This intent-only path deliberately does not consult or
+;; attribute a pool observation and never executes a rebalance.
 (define-read-only (get-rebalance-advice (position-id uint) (observed-tick int))
   (let ((position (unwrap! (map-get? positions position-id) ERR_POSITION_NOT_FOUND)))
     (begin
@@ -635,6 +635,8 @@
           in-range: in-range,
           should-rebalance: (not in-range),
           observation-source: "caller-observed-advisory",
+          ;; Means unavailable to/unused by this advisory path, not absent
+          ;; from the pool contract's global read API.
           pool-current-tick-available: false,
           execution: "not-executed"
         })
