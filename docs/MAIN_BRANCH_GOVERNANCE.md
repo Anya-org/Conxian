@@ -21,6 +21,11 @@ Both owners are assigned globally and explicitly to these protected paths:
 - `/deployments/`
 - `/docs/`
 
+Every non-comment rule must retain both confirmed owners. Narrower or later
+rules may add specialized owners, but they cannot omit either confirmed owner;
+this prevents GitHub's last-matching-rule precedence from weakening ownership
+for a more specific path.
+
 `scripts/verify_codeowners_policy.py` enforces this repository policy without
 calling GitHub. Its focused unit tests live in
 `tests/test_verify_codeowners_policy.py` and run in `jules-audit` on every pull

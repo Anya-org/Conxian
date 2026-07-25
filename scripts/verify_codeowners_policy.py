@@ -24,15 +24,23 @@ REQUIRED_PROTECTED_PATHS = (
 )
 
 
-def parse_rules(source: str) -> dict[str, tuple[str, ...]]:
-    """Return the final owner tuple for each literal CODEOWNERS pattern."""
-    rules: dict[str, tuple[str, ...]] = {}
-    for raw_line in source.splitlines():
+def parse_rule_lines(source: str) -> list[tuple[int, str, tuple[str, ...]]]:
+    """Return every non-comment CODEOWNERS rule with its source line."""
+    rule_lines: list[tuple[int, str, tuple[str, ...]]] = []
+    for line_number, raw_line in enumerate(source.splitlines(), start=1):
         line = raw_line.strip()
         if not line or line.startswith("#"):
             continue
         fields = line.split()
-        rules[fields[0]] = tuple(fields[1:])
+        rule_lines.append((line_number, fields[0], tuple(fields[1:])))
+    return rule_lines
+
+
+def parse_rules(source: str) -> dict[str, tuple[str, ...]]:
+    """Return the final owner tuple for each literal CODEOWNERS pattern."""
+    rules: dict[str, tuple[str, ...]] = {}
+    for _, pattern, owners in parse_rule_lines(source):
+        rules[pattern] = owners
     return rules
 
 
@@ -50,24 +58,25 @@ def verify_policy(repo_root: Path) -> list[str]:
             f"found: {rendered}"
         ]
 
-    rules = parse_rules((repo_root / AUTHORITATIVE_LOCATION).read_text(encoding="utf-8"))
+    source = (repo_root / AUTHORITATIVE_LOCATION).read_text(encoding="utf-8")
+    rule_lines = parse_rule_lines(source)
+    rules = parse_rules(source)
     errors: list[str] = []
 
-    global_owners = rules.get("*", ())
-    for owner in REQUIRED_OWNERS:
-        if owner not in global_owners:
-            errors.append(f"global rule '*' is missing required owner {owner}")
-
-    for protected_path in REQUIRED_PROTECTED_PATHS:
-        owners = rules.get(protected_path)
-        if owners is None:
-            errors.append(f"missing explicit CODEOWNERS rule for {protected_path}")
-            continue
+    for line_number, pattern, owners in rule_lines:
         for owner in REQUIRED_OWNERS:
             if owner not in owners:
                 errors.append(
-                    f"CODEOWNERS rule for {protected_path} is missing required owner {owner}"
+                    f"CODEOWNERS rule {pattern!r} on line {line_number} "
+                    f"is missing required owner {owner}"
                 )
+
+    if "*" not in rules:
+        errors.append("missing global CODEOWNERS rule '*'")
+
+    for protected_path in REQUIRED_PROTECTED_PATHS:
+        if protected_path not in rules:
+            errors.append(f"missing explicit CODEOWNERS rule for {protected_path}")
 
     return errors
 
@@ -80,7 +89,10 @@ def main(argv: list[str] | None = None) -> int:
         for error in errors:
             print(f"CODEOWNERS policy error: {error}", file=sys.stderr)
         return 1
-    print("CODEOWNERS policy verified: root CODEOWNERS is authoritative")
+    print(
+        "CODEOWNERS policy verified: root CODEOWNERS is authoritative and "
+        "every rule retains required owners"
+    )
     return 0
 
 

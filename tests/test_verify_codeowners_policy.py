@@ -76,7 +76,10 @@ class CodeownersPolicyTests(unittest.TestCase):
             )
             self.assertEqual(
                 verifier.verify_policy(root),
-                ["global rule '*' is missing required owner @admin-conxian-labs"],
+                [
+                    "CODEOWNERS rule '*' on line 2 is missing required owner "
+                    "@admin-conxian-labs"
+                ],
             )
 
     def test_rejects_missing_required_protected_path(self) -> None:
@@ -92,6 +95,43 @@ class CodeownersPolicyTests(unittest.TestCase):
                 verifier.verify_policy(root),
                 ["missing explicit CODEOWNERS rule for /deployments/"],
             )
+
+    def test_rejects_later_narrower_rules_missing_either_required_owner(self) -> None:
+        cases = (
+            ("/contracts/private/", "@botshelomokoka", "@admin-conxian-labs"),
+            ("/contracts/private/", "@admin-conxian-labs", "@botshelomokoka"),
+            ("/.github/workflows/", "@botshelomokoka", "@admin-conxian-labs"),
+            ("/.github/workflows/", "@admin-conxian-labs", "@botshelomokoka"),
+            ("CODEOWNERS", "@botshelomokoka", "@admin-conxian-labs"),
+            ("CODEOWNERS", "@admin-conxian-labs", "@botshelomokoka"),
+        )
+        for pattern, retained_owner, missing_owner in cases:
+            with self.subTest(pattern=pattern, missing_owner=missing_owner):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    content = (
+                        VALID_CODEOWNERS
+                        + f"{pattern} {retained_owner} @specialist-reviewer\n"
+                    )
+                    self.write_codeowners(root, content)
+                    self.assertEqual(
+                        verifier.verify_policy(root),
+                        [
+                            f"CODEOWNERS rule {pattern!r} on line 9 is missing "
+                            f"required owner {missing_owner}"
+                        ],
+                    )
+
+    def test_accepts_narrower_rule_with_required_and_additional_owner(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_codeowners(
+                root,
+                VALID_CODEOWNERS
+                + "/contracts/private/ @botshelomokoka @admin-conxian-labs "
+                "@specialist-reviewer\n",
+            )
+            self.assertEqual(verifier.verify_policy(root), [])
 
 
 if __name__ == "__main__":
