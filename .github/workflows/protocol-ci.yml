@@ -10,13 +10,12 @@ on:
       - 'docs/**'
       - '*.md'
   pull_request:
-    paths-ignore:
-      - 'ui/**'
-      - 'docs/**'
-      - '*.md'
+    branches:
+      - main
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   changes:
@@ -53,8 +52,12 @@ jobs:
               - 'package-lock.json'
               - 'vitest.config.ts'
               - '.github/workflows/**'
+              - 'CODEOWNERS'
+              - '.github/CODEOWNERS'
               - 'deployments/**'
               - 'scripts/**'
+              - 'docs/MAIN_BRANCH_GOVERNANCE.md'
+              - 'docs/OPERATIONS_VERIFICATION_PATH.md'
             contracts:
               - 'contracts/**'
             tests:
