@@ -7,6 +7,11 @@ secp256k1 attestors over one exact reserve snapshot. It is a cryptographic
 attestation boundary, not an audit, oracle qualification, deployment record, or
 claim that represented off-chain backing exists.
 
+The active `Clarinet.toml` entry requires Epoch 3.3 because the canonical
+SIP-005 serialization path uses `to-consensus-buff?`; release-plan generation
+copies and strictly validates each contract's manifest epoch. Checked-in plan
+metadata remains preflight-only and is not deployment evidence.
+
 ## Canonical shared snapshot
 
 Clients build the exact typed tuple below and compute
@@ -50,7 +55,8 @@ signature reuse.
 ## Registry, signatures, replay, and quorum
 
 - The owner registers at most 10 principals with active compressed secp256k1
-  public keys `(buff 33)`.
+  public keys of exactly 33 bytes. Short buffers fail before registry/list
+  mutation, and malformed rotations leave the prior key unchanged.
 - Signatures are canonical recoverable `r || s || recovery-id` values and must
   be exactly 65 bytes. Tests use `elliptic` canonical low-S signing.
 - `secp256k1-verify` succeeds before an attestation or nonce is stored.
@@ -58,7 +64,8 @@ signature reuse.
   bounded principal list. No mutable raw count is authoritative.
 - Rotation increments `key-version`; deactivation clears active status. Old
   records immediately stop counting because quorum compares current active
-  registry key and version with the validated record.
+  registry key and version with the validated record. Rotation does not
+  implicitly reactivate a deactivated signer.
 - A principal contributes at most once per shared digest. A used
   `{asset, attestor, nonce}` cannot authorize another snapshot.
 
@@ -111,12 +118,16 @@ insufficient backing, lost quorum, deactivation, or rotation.
 bash scripts/run-tests.sh tests/security/proof-of-reserves.test.ts
 python3 scripts/verify_proof_of_reserves_boundary.py
 python3 -m unittest tests/test_verify_proof_of_reserves_boundary.py
+uv run --no-project --with 'PyYAML==6.0.2' python3 -m unittest tests/test_release_plan_validation.py
+uv run --no-project --with 'PyYAML==6.0.2' python3 scripts/gen-deployment-plans.py --check
 ```
 
 Expected evidence covers same-snapshot quorum; signature, key, field, schema,
 network, verifier, and asset mutation; replay; duplicate/split signers;
-stale/future/expired evidence; rotation/deactivation; live state drift; and
-unsafe consumer rejection.
+stale/future/expired evidence; active-key rotation and deactivation; exact key
+and signature lengths; independent SIP-010 balance/supply call errors through a
+dynamically deployed test-only trait fixture; live state drift; unsafe literal
+or aliased consumers; and manifest/plan epoch mismatch rejection.
 
 ## Non-claims
 

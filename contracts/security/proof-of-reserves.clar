@@ -21,6 +21,7 @@
 (define-constant ERR_ATTESTOR_EXISTS (err u8012))
 (define-constant ERR_ATTESTOR_NOT_FOUND (err u8013))
 (define-constant ERR_UNSUPPORTED_SIGNATURE (err u8014))
+(define-constant ERR_UNSUPPORTED_PUBLIC_KEY (err u8015))
 
 ;; All validity values are burn-block heights. Observations are accepted at
 ;; age <= 1008. Expiry is exclusive: valid only while height < expiry.
@@ -146,6 +147,7 @@
 (define-public (add-attestor (attestor principal) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-eq (len public-key) u33) ERR_UNSUPPORTED_PUBLIC_KEY)
     (asserts! (is-none (map-get? attestor-registry attestor)) ERR_ATTESTOR_EXISTS)
     (match (as-max-len? (append (var-get attestor-list) attestor) u10)
       updated-list
@@ -160,11 +162,12 @@
 (define-public (rotate-attestor-key (attestor principal) (public-key (buff 33)))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-eq (len public-key) u33) ERR_UNSUPPORTED_PUBLIC_KEY)
     (match (map-get? attestor-registry attestor)
       registry
         (let ((next-version (+ (get key-version registry) u1)))
           (map-set attestor-registry attestor {
-            active: true, public-key: public-key, key-version: next-version })
+            active: (get active registry), public-key: public-key, key-version: next-version })
           (print { event: "por-attestor-key-rotated", attestor: attestor,
             key-version: next-version })
           (ok true))

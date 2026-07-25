@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { Cl, serializeCV } from '@stacks/transactions';
+import { initSimnet } from '@stacks/clarinet-sdk';
+import { Cl, ClarityVersion, serializeCV } from '@stacks/transactions';
 import { ec as EC } from 'elliptic';
 import crypto from 'node:crypto';
 import { simnet } from '../setup-test-env';
@@ -8,6 +9,21 @@ const POR = 'proof-of-reserves';
 const TOKEN = 'mock-token';
 const ec = new EC('secp256k1');
 const err = (code: number) => Cl.error(Cl.uint(code));
+
+const FAILING_TOKEN_SOURCE = `
+(impl-trait .sip-standards.sip-010-ft-trait)
+(define-data-var balance-error bool false)
+(define-data-var supply-error bool false)
+(define-public (set-balance-error (enabled bool)) (begin (var-set balance-error enabled) (ok true)))
+(define-public (set-supply-error (enabled bool)) (begin (var-set supply-error enabled) (ok true)))
+(define-public (transfer (amount uint) (from principal) (to principal) (memo (optional (buff 34)))) (ok true))
+(define-read-only (get-name) (ok "PoR Error Fixture"))
+(define-read-only (get-symbol) (ok "PORERR"))
+(define-read-only (get-decimals) (ok u8))
+(define-read-only (get-balance (user principal)) (if (var-get balance-error) (err u1) (ok u500)))
+(define-read-only (get-total-supply) (if (var-get supply-error) (err u2) (ok u1000)))
+(define-read-only (get-token-uri) (ok none))
+`;
 
 describe('proof-of-reserves cryptographic boundary', () => {
   it('binds authoritative state to a distinct-attestor quorum and fails closed', () => {
@@ -46,6 +62,12 @@ describe('proof-of-reserves cryptographic boundary', () => {
       const sig = signature ?? sign(keys[index], envelope(snapshot, attestors[index]));
       return call('submit-attestation', [token(), Cl.uint(backing), Cl.uint(asOf), Cl.uint(expiry), Cl.uint(nonce), Cl.buffer(sig)], attestors[index]);
     };
+
+    const rejectedAttestor = deployer;
+    expect(call('add-attestor', [Cl.principal(rejectedAttestor), Cl.buffer(Buffer.alloc(32, 2))]))
+      .toEqual(err(8015));
+    expect(read('get-attestors', [])).toEqual(Cl.list([]));
+    expect(read('get-attestor', [Cl.principal(rejectedAttestor)])).toEqual(Cl.none());
 
     for (let i = 0; i < attestors.length; i++) {
       expect(call('add-attestor', [Cl.principal(attestors[i]), Cl.buffer(Buffer.from(keys[i].getPublic(true, 'array')))]))
@@ -120,6 +142,27 @@ describe('proof-of-reserves cryptographic boundary', () => {
     expect(read('get-active-snapshot-digest', [Cl.principal(assetPrincipal)]))
       .toEqual(Cl.some(Cl.buffer(shared(500n, 1000n, 500n, asOf, expiry, 1n))));
 
+    // A malformed rotation is side-effect free; rotating an active signer alone
+    // immediately invalidates its old contribution and therefore the quorum.
+    const attestorBeforeShortRotation = read('get-attestor', [Cl.principal(attestors[2])]);
+    expect(call('rotate-attestor-key', [Cl.principal(attestors[2]), Cl.buffer(Buffer.alloc(32, 3))]))
+      .toEqual(err(8015));
+    expect(read('get-attestor', [Cl.principal(attestors[2])])).toEqual(attestorBeforeShortRotation);
+    const rotatedKey = ec.genKeyPair();
+    expect(call('rotate-attestor-key', [
+      Cl.principal(attestors[2]), Cl.buffer(Buffer.from(rotatedKey.getPublic(true, 'array'))),
+    ])).toEqual(Cl.ok(Cl.bool(true)));
+    keys[2] = rotatedKey;
+    const rotatedStatus: any = call('get-proof-status', [token()]);
+    expect(rotatedStatus.value.value['attestation-count']).toEqual(Cl.uint(2));
+    expect(rotatedStatus.value.value['fully-backed']).toEqual(Cl.bool(false));
+    expect(call('is-fully-backed', [token()])).toEqual(Cl.ok(Cl.bool(false)));
+
+    // A new quorum under the rotated key establishes a replacement snapshot.
+    expect((submit(0, 500n, asOf, expiry, 3n) as any).value.value.activated).toEqual(Cl.bool(false));
+    expect((submit(1, 500n, asOf, expiry, 3n) as any).value.value.activated).toEqual(Cl.bool(false));
+    expect((submit(2, 500n, asOf, expiry, 3n) as any).value.value.activated).toEqual(Cl.bool(true));
+
     // Reusing a nonce for a different snapshot is rejected.
     expect(submit(0, 501n, asOf, expiry, 1n)).toEqual(err(8009));
 
@@ -127,9 +170,18 @@ describe('proof-of-reserves cryptographic boundary', () => {
     const activeBefore = read('get-active-snapshot-digest', [Cl.principal(assetPrincipal)]);
     expect((submit(0, 600n, asOf, expiry, 2n) as any).value.value.activated).toEqual(Cl.bool(false));
     expect((submit(1, 600n, asOf, expiry, 2n) as any).value.value.activated).toEqual(Cl.bool(false));
+    expect(read('get-snapshot', [Cl.buffer(shared(500n, 1000n, 600n, asOf, expiry, 2n))]))
+      .toHaveProperty('type', 'some');
     expect(read('get-active-snapshot-digest', [Cl.principal(assetPrincipal)])).toEqual(activeBefore);
     expect((submit(2, 601n, asOf, expiry, 2n) as any).value.value.activated).toEqual(Cl.bool(false));
     expect(read('get-active-snapshot-digest', [Cl.principal(assetPrincipal)])).toEqual(activeBefore);
+
+    // At the exact exclusive expiry boundary, both authoritative APIs fail closed.
+    simnet.mineEmptyBurnBlocks(Number(expiry - BigInt(simnet.burnBlockHeight)));
+    expect(BigInt(simnet.burnBlockHeight)).toEqual(expiry);
+    expect(call('is-fully-backed', [token()])).toEqual(Cl.ok(Cl.bool(false)));
+    const expiredStatus: any = call('get-proof-status', [token()]);
+    expect(expiredStatus.value.value['fully-backed']).toEqual(Cl.bool(false));
 
     // Live state changes and registry changes immediately fail closed.
     expect(simnet.callPublicFn(TOKEN, 'mint', [Cl.uint(1), Cl.principal(deployer)], deployer).result)
@@ -147,13 +199,97 @@ describe('proof-of-reserves cryptographic boundary', () => {
     expect(deactivatedStatus.value.value['attestation-count']).toEqual(Cl.uint(2));
     expect(call('rotate-attestor-key', [Cl.principal(attestors[2]), Cl.buffer(Buffer.from(ec.genKeyPair().getPublic(true, 'array')))]))
       .toEqual(Cl.ok(Cl.bool(true)));
+    const stillDeactivated: any = read('get-attestor', [Cl.principal(attestors[2])]);
+    expect(stillDeactivated.value.value.active).toEqual(Cl.bool(false));
 
     // The API type caps signatures at 65 bytes and runtime logic requires exactly 65.
-    expect(call('submit-attestation', [token(), Cl.uint(500), Cl.uint(asOf), Cl.uint(expiry), Cl.uint(200), Cl.buffer(Buffer.alloc(64))], attestors[0]))
+    const signatureTestAsOf = BigInt(simnet.burnBlockHeight);
+    const signatureTestExpiry = signatureTestAsOf + 5n;
+    expect(call('submit-attestation', [token(), Cl.uint(500), Cl.uint(signatureTestAsOf), Cl.uint(signatureTestExpiry), Cl.uint(200), Cl.buffer(Buffer.alloc(64))], attestors[0]))
+      .toEqual(err(8014));
+    expect(call('submit-attestation', [token(), Cl.uint(500), Cl.uint(signatureTestAsOf), Cl.uint(signatureTestExpiry), Cl.uint(201), Cl.buffer(Buffer.alloc(0))], attestors[0]))
       .toEqual(err(8014));
 
     simnet.mineEmptyBurnBlocks(1009);
     const staleAsOf = BigInt(simnet.burnBlockHeight) - 1009n;
-    expect(submit(0, 500n, staleAsOf, BigInt(simnet.burnBlockHeight) + 5n, 201n)).toEqual(err(8002));
+    expect(submit(0, 500n, staleAsOf, BigInt(simnet.burnBlockHeight) + 5n, 202n)).toEqual(err(8002));
+  });
+
+  it('fails closed independently when either SIP-010 status call errors', async () => {
+    const local = await initSimnet('Clarinet.toml');
+    const deployer = local.deployer;
+    const fixture = 'por-error-token';
+    expect(local.deployContract(
+      fixture,
+      FAILING_TOKEN_SOURCE,
+      { clarityVersion: ClarityVersion.Clarity3 },
+      deployer,
+    ).result).toEqual(Cl.bool(true));
+
+    const attestors = ['wallet_1', 'wallet_2', 'wallet_3'].map((name) => local.getAccounts().get(name)!);
+    const keys = attestors.map(() => ec.genKeyPair());
+    const asset = `${deployer}.${fixture}`;
+    const token = () => Cl.contractPrincipal(deployer, fixture);
+    const call = (fn: string, args: any[], sender = deployer) => local.callPublicFn(POR, fn, args, sender).result;
+    const read = (fn: string, args: any[], sender = deployer) => local.callReadOnlyFn(POR, fn, args, sender).result as any;
+    const digestBytes = (result: any) => Buffer.from(result.value.value as string, 'hex');
+    const sign = (key: EC.KeyPair, digest: Buffer) => {
+      const sig = key.sign(digest, { canonical: true });
+      return Buffer.concat([
+        Buffer.from(sig.r.toArray('be', 32)),
+        Buffer.from(sig.s.toArray('be', 32)),
+        Buffer.from([sig.recoveryParam ?? 0]),
+      ]);
+    };
+    const asOf = BigInt(local.burnBlockHeight);
+    const expiry = asOf + 100n;
+    const snapshot = digestBytes(read('get-shared-snapshot-digest', [
+      Cl.principal(asset), Cl.uint(500), Cl.uint(1000), Cl.uint(500),
+      Cl.uint(asOf), Cl.uint(expiry), Cl.uint(1),
+    ]));
+    const submit = (index: number) => {
+      const envelope = digestBytes(read('get-attestor-envelope-digest', [
+        Cl.buffer(snapshot), Cl.principal(attestors[index]),
+      ]));
+      return call('submit-attestation', [
+        token(), Cl.uint(500), Cl.uint(asOf), Cl.uint(expiry), Cl.uint(1),
+        Cl.buffer(sign(keys[index], envelope)),
+      ], attestors[index]);
+    };
+
+    for (let index = 0; index < attestors.length; index++) {
+      expect(call('add-attestor', [
+        Cl.principal(attestors[index]), Cl.buffer(Buffer.from(keys[index].getPublic(true, 'array'))),
+      ])).toEqual(Cl.ok(Cl.bool(true)));
+    }
+    expect(call('set-quorum', [Cl.uint(3)])).toEqual(Cl.ok(Cl.bool(true)));
+
+    expect(local.callPublicFn(fixture, 'set-balance-error', [Cl.bool(true)], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(submit(0)).toEqual(err(8007));
+    expect(local.callPublicFn(fixture, 'set-balance-error', [Cl.bool(false)], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(local.callPublicFn(fixture, 'set-supply-error', [Cl.bool(true)], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(submit(0)).toEqual(err(8007));
+    expect(local.callPublicFn(fixture, 'set-supply-error', [Cl.bool(false)], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+
+    expect((submit(0) as any).value.value.activated).toEqual(Cl.bool(false));
+    expect((submit(1) as any).value.value.activated).toEqual(Cl.bool(false));
+    expect((submit(2) as any).value.value.activated).toEqual(Cl.bool(true));
+    expect(call('is-fully-backed', [token()])).toEqual(Cl.ok(Cl.bool(true)));
+
+    for (const mode of ['balance', 'supply'] as const) {
+      const setter = mode === 'balance' ? 'set-balance-error' : 'set-supply-error';
+      expect(local.callPublicFn(fixture, setter, [Cl.bool(true)], deployer).result)
+        .toEqual(Cl.ok(Cl.bool(true)));
+      expect(call('is-fully-backed', [token()])).toEqual(Cl.ok(Cl.bool(false)));
+      const status: any = call('get-proof-status', [token()]);
+      expect(status.value.value['fully-backed']).toEqual(Cl.bool(false));
+      expect(status.value.value['token-calls-ok']).toEqual(Cl.bool(false));
+      expect(local.callPublicFn(fixture, setter, [Cl.bool(false)], deployer).result)
+        .toEqual(Cl.ok(Cl.bool(true)));
+    }
   });
 });
