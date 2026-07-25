@@ -74,7 +74,7 @@ describe('proof-of-reserves cryptographic snapshot binding', () => {
   let alternateAssetIdentity: Buffer;
   let attestors: Attestor[];
 
-  beforeEach(async () => {
+  const resetSimnet = async (): Promise<void> => {
     simnet = await initSimnet('Clarinet.toml');
     const accounts = simnet.getAccounts();
     deployer = accounts.get('deployer')!;
@@ -89,7 +89,9 @@ describe('proof-of-reserves cryptographic snapshot binding', () => {
       const publicKey = Buffer.from(key.getPublic(true, 'array'));
       return { principal, key, publicKey, identity: createHash('sha256').update(publicKey).digest() };
     });
-  });
+  };
+
+  beforeEach(resetSimnet);
 
   const currentHeight = (): bigint => BigInt(simnet.mineEmptyBlocks(0));
   const config = (): { epoch: bigint; chainId: bigint; algorithm: string } => {
@@ -151,17 +153,34 @@ describe('proof-of-reserves cryptographic snapshot binding', () => {
       Cl.uint(overrides.height ?? snapshot.height), Cl.uint(overrides.expiresAt ?? snapshot.expiresAt),
       Cl.uint(nonce), Cl.buffer(signature),
     ], attestor.principal).result;
+  const proofState = (snapshot: Snapshot, attestor: Attestor): unknown => {
+    const digest = snapshotDigest(snapshot);
+    return {
+      candidate: simnet.callReadOnlyFn(CONTRACT, 'get-snapshot-candidate', [token, Cl.buffer(digest)], deployer).result,
+      attestation: simnet.callReadOnlyFn(CONTRACT, 'get-attestation', [
+        token, Cl.buffer(digest), Cl.principal(attestor.principal),
+      ], deployer).result,
+      accepted: simnet.callReadOnlyFn(CONTRACT, 'get-accepted-reserve', [token], deployer).result,
+      status: simnet.callPublicFn(CONTRACT, 'get-proof-status', [token], deployer).result,
+    };
+  };
+  const acceptSnapshot = (snapshot: Snapshot): void => {
+    for (let index = 0; index < 3; index += 1) {
+      const nonce = BigInt(index + 1);
+      expect(submit(attestors[index], snapshot, nonce, validSignature(attestors[index], snapshot, nonce)))
+        .toEqual(Cl.ok(Cl.bool(index === 2)));
+    }
+    expect(simnet.callPublicFn(CONTRACT, 'is-fully-backed', [token], deployer).result).toEqual(Cl.ok(Cl.bool(true)));
+  };
 
-  it('binds every canonical snapshot and signer-envelope field to a distinct digest', () => {
+  it('binds every valid mutable snapshot and signer-envelope field to a distinct digest', () => {
     configure();
     mintBackingState();
     const snapshot = makeSnapshot();
     const common = snapshotDigest(snapshot);
     const alternateIdentity = createHash('sha256').update('alternate-asset').digest();
     const mutations: Array<[string, Parameters<typeof snapshotDigest>[1]]> = [
-      ['schema', { schema: 2n }], ['domain', { domain: 'CONXIAN-POR-OTHER' }],
-      ['chain', { chainId: CHAIN_ID + 1n }], ['network', { network: 'testnet' }],
-      ['registry epoch', { epoch: snapshot.epoch + 1n }], ['asset identity', { assetIdentity: alternateIdentity }],
+      ['asset identity', { assetIdentity: alternateIdentity }],
       ['live balance', { balance: snapshot.balance + 1n }], ['total supply', { supply: snapshot.supply + 1n }],
       ['off-chain backing', { backing: snapshot.backing + 1n }], ['snapshot height', { height: snapshot.height + 1n }],
       ['expiry', { expiresAt: snapshot.expiresAt + 1n }],
@@ -169,10 +188,41 @@ describe('proof-of-reserves cryptographic snapshot binding', () => {
     for (const [field, mutation] of mutations) expect(snapshotDigest(snapshot, mutation), field).not.toEqual(common);
 
     const envelope = envelopeDigest(common, attestors[0], 7n);
-    expect(envelopeDigest(common, attestors[0], 7n, { algorithm: 'secp256r1' }), 'signature algorithm').not.toEqual(envelope);
     expect(envelopeDigest(common, attestors[0], 7n, { identity: attestors[1].identity }), 'signer identity').not.toEqual(envelope);
     expect(envelopeDigest(common, attestors[0], 8n), 'nonce').not.toEqual(envelope);
     expect(config().algorithm).toBe(ALGORITHM);
+  });
+
+  it('rejects invalid or inconsistent public digest helper inputs', () => {
+    const unconfigured = makeSnapshot();
+    expect(simnet.callReadOnlyFn(CONTRACT, 'get-snapshot-digest', [
+      Cl.uint(SCHEMA), Cl.stringAscii(DOMAIN), Cl.stringAscii(NETWORK), Cl.uint(CHAIN_ID), Cl.uint(unconfigured.epoch),
+      Cl.buffer(assetIdentity), Cl.uint(0), Cl.uint(0), Cl.uint(0), Cl.uint(0), Cl.uint(1),
+    ], deployer).result).toEqual(Cl.error(Cl.uint(ERR_INVALID_NETWORK)));
+
+    configure();
+    mintBackingState();
+    const snapshot = makeSnapshot();
+    const snapshotArgs = (overrides: Parameters<typeof snapshotDigest>[1]) => simnet.callReadOnlyFn(CONTRACT, 'get-snapshot-digest', [
+      Cl.uint(overrides.schema ?? SCHEMA), Cl.stringAscii(overrides.domain ?? DOMAIN),
+      Cl.stringAscii(overrides.network ?? NETWORK), Cl.uint(overrides.chainId ?? CHAIN_ID),
+      Cl.uint(overrides.epoch ?? snapshot.epoch), Cl.buffer(assetIdentity), Cl.uint(snapshot.balance), Cl.uint(snapshot.supply),
+      Cl.uint(snapshot.backing), Cl.uint(snapshot.height), Cl.uint(snapshot.expiresAt),
+    ], deployer).result;
+    expect(snapshotArgs({ schema: 999n })).toEqual(Cl.error(Cl.uint(ERR_INVALID_SCHEMA)));
+    expect(snapshotArgs({ domain: 'ARBITRARY-DOMAIN' })).toEqual(Cl.error(Cl.uint(ERR_INVALID_DOMAIN)));
+    expect(snapshotArgs({ network: 'invalid' })).toEqual(Cl.error(Cl.uint(ERR_INVALID_NETWORK)));
+    expect(snapshotArgs({ network: 'testnet' })).toEqual(Cl.error(Cl.uint(ERR_INVALID_NETWORK)));
+    expect(snapshotArgs({ chainId: CHAIN_ID + 99n })).toEqual(Cl.error(Cl.uint(ERR_INVALID_CHAIN)));
+    expect(snapshotArgs({ epoch: snapshot.epoch + 99n })).toEqual(Cl.error(Cl.uint(ERR_INVALID_ATTESTOR)));
+
+    const digest = snapshotDigest(snapshot);
+    expect(simnet.callReadOnlyFn(CONTRACT, 'get-attestation-digest', [
+      Cl.uint(999), Cl.stringAscii(ALGORITHM), Cl.buffer(digest), Cl.buffer(attestors[0].identity), Cl.uint(1),
+    ], deployer).result).toEqual(Cl.error(Cl.uint(ERR_INVALID_SCHEMA)));
+    expect(simnet.callReadOnlyFn(CONTRACT, 'get-attestation-digest', [
+      Cl.uint(SCHEMA), Cl.stringAscii('arbitrary'), Cl.buffer(digest), Cl.buffer(attestors[0].identity), Cl.uint(1),
+    ], deployer).result).toEqual(Cl.error(Cl.uint(ERR_UNSUPPORTED_SIGNATURE_ALGORITHM)));
   });
 
   it('rejects semantic mismatches, admissible mutations, token substitution, and failed-write contamination', () => {
@@ -308,5 +358,138 @@ describe('proof-of-reserves cryptographic snapshot binding', () => {
     expect(submit(attestors[0], stale, 99n, validSignature(attestors[0], stale, 99n))).toEqual(Cl.error(Cl.uint(ERR_STALE_SNAPSHOT)));
     const fresh = makeSnapshot({ height: now, expiresAt: now + 100n });
     expect(submit(attestors[0], fresh, 99n, validSignature(attestors[0], fresh, 99n))).toEqual(Cl.ok(Cl.bool(false)));
+  });
+
+  it('keeps all proof state invariant on rejected submissions and preserves each nonce', async () => {
+    const cases: Array<[string, (snapshot: Snapshot, nonce: bigint) => unknown]> = [
+      ['malformed signature length', (snapshot, nonce) => submit(attestors[0], snapshot, nonce, Buffer.alloc(64))],
+      ['random signature', (snapshot, nonce) => submit(attestors[0], snapshot, nonce, Buffer.alloc(65, 0x7f))],
+      ['wrong key', (snapshot, nonce) => {
+        const wrongKey = ec.keyFromPrivate(PRIVATE_KEYS[3], 'hex');
+        return submit(attestors[0], snapshot, nonce, sign(wrongKey, envelopeDigest(snapshotDigest(snapshot), attestors[0], nonce)));
+      }],
+      ['altered signature', (snapshot, nonce) => {
+        const altered = Buffer.from(validSignature(attestors[0], snapshot, nonce));
+        altered[10] ^= 0x01;
+        return submit(attestors[0], snapshot, nonce, altered);
+      }],
+      ['semantic rejection', (snapshot, nonce) => submit(
+        attestors[0], snapshot, nonce, validSignature(attestors[0], snapshot, nonce), { backing: snapshot.backing - 1n },
+      )],
+    ];
+
+    for (const [name, reject] of cases) {
+      await resetSimnet();
+      configure();
+      mintBackingState();
+      const snapshot = makeSnapshot();
+      const nonce = 500n;
+      const before = proofState(snapshot, attestors[0]);
+      const rejected = reject(snapshot, nonce);
+      expect(Cl.prettyPrint(rejected as any), name).not.toMatch(/^\(ok /);
+      expect(proofState(snapshot, attestors[0]), `${name} state`).toEqual(before);
+      expect(submit(attestors[0], snapshot, nonce, validSignature(attestors[0], snapshot, nonce)), `${name} nonce`)
+        .toEqual(Cl.ok(Cl.bool(false)));
+    }
+  });
+
+  it('preserves valid proof liveness across every supported no-op and rejected nonexistent removal', () => {
+    configure();
+    mintBackingState();
+    const snapshot = makeSnapshot();
+    acceptSnapshot(snapshot);
+    const epoch = config().epoch;
+    const assertProofUnchanged = (): void => {
+      expect(config().epoch).toBe(epoch);
+      expect(simnet.callPublicFn(CONTRACT, 'is-fully-backed', [token], deployer).result).toEqual(Cl.ok(Cl.bool(true)));
+    };
+
+    const noOps = [
+      () => simnet.callPublicFn(CONTRACT, 'set-network-id', [Cl.stringAscii(NETWORK)], deployer).result,
+      () => simnet.callPublicFn(CONTRACT, 'set-chain-id', [Cl.uint(CHAIN_ID)], deployer).result,
+      () => simnet.callPublicFn(CONTRACT, 'set-asset', [token, Cl.buffer(assetIdentity)], deployer).result,
+      ...attestors.slice(0, 3).map((attestor) => () => simnet.callPublicFn(CONTRACT, 'set-attestor', [
+        Cl.principal(attestor.principal), Cl.buffer(attestor.publicKey),
+      ], deployer).result),
+      () => simnet.callPublicFn(CONTRACT, 'set-governance', [Cl.principal(deployer)], deployer).result,
+      () => simnet.callPublicFn(CONTRACT, 'set-contract-owner', [Cl.principal(deployer)], deployer).result,
+    ];
+    for (const noOp of noOps) {
+      expect(noOp()).toEqual(Cl.ok(Cl.bool(false)));
+      assertProofUnchanged();
+    }
+
+    expect(simnet.callPublicFn(CONTRACT, 'remove-attestor', [Cl.principal(porPrincipal.value)], deployer).result)
+      .toEqual(Cl.error(Cl.uint(ERR_INVALID_ATTESTOR)));
+    assertProofUnchanged();
+    expect(simnet.callPublicFn(CONTRACT, 'remove-asset', [Cl.contractPrincipal(deployer, ALTERNATE_TOKEN)], deployer).result)
+      .toEqual(Cl.error(Cl.uint(ERR_INVALID_ASSET)));
+    assertProofUnchanged();
+
+    expect(simnet.callPublicFn(CONTRACT, 'set-governance', [Cl.principal(attestors[0].principal)], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(config().epoch).toBe(epoch + 1n);
+    expect(simnet.callPublicFn(CONTRACT, 'is-fully-backed', [token], deployer).result).toEqual(Cl.ok(Cl.bool(false)));
+  });
+
+  it('invalidates a valid proof for every effective registry, configuration, and control change', async () => {
+    const changes: Array<[string, () => unknown]> = [
+      ['attestor rotation', () => {
+        const replacement = ec.keyFromPrivate('0000000000000000000000000000000000000000000000000000000000000005', 'hex');
+        return simnet.callPublicFn(CONTRACT, 'set-attestor', [
+          Cl.principal(attestors[0].principal), Cl.buffer(Buffer.from(replacement.getPublic(true, 'array'))),
+        ], deployer).result;
+      }],
+      ['attestor removal', () => simnet.callPublicFn(CONTRACT, 'remove-attestor', [Cl.principal(attestors[0].principal)], deployer).result],
+      ['asset identity change', () => simnet.callPublicFn(CONTRACT, 'set-asset', [
+        token, Cl.buffer(createHash('sha256').update('replacement-asset-identity').digest()),
+      ], deployer).result],
+      ['asset removal', () => simnet.callPublicFn(CONTRACT, 'remove-asset', [token], deployer).result],
+      ['network change', () => simnet.callPublicFn(CONTRACT, 'set-network-id', [Cl.stringAscii('testnet')], deployer).result],
+      ['chain change', () => simnet.callPublicFn(CONTRACT, 'set-chain-id', [Cl.uint(CHAIN_ID + 1n)], deployer).result],
+      ['governance change', () => simnet.callPublicFn(CONTRACT, 'set-governance', [Cl.principal(attestors[0].principal)], deployer).result],
+      ['control transfer', () => simnet.callPublicFn(CONTRACT, 'set-contract-owner', [Cl.principal(attestors[0].principal)], deployer).result],
+    ];
+
+    for (const [name, change] of changes) {
+      await resetSimnet();
+      configure();
+      mintBackingState();
+      acceptSnapshot(makeSnapshot());
+      const epoch = config().epoch;
+      expect(change(), name).toEqual(Cl.ok(Cl.bool(true)));
+      expect(config().epoch, `${name} epoch`).toBe(epoch + 1n);
+      expect(simnet.callPublicFn(CONTRACT, 'is-fully-backed', [token], deployer).result, `${name} proof`)
+        .toEqual(Cl.ok(Cl.bool(false)));
+    }
+  });
+
+  it('atomically transfers all PoR authority and revokes every former-owner control path', () => {
+    configure();
+    mintBackingState();
+    const snapshot = makeSnapshot();
+    acceptSnapshot(snapshot);
+    const oldEpoch = config().epoch;
+    const newOwner = attestors[0].principal;
+    expect(simnet.callPublicFn(CONTRACT, 'set-contract-owner', [Cl.principal(newOwner)], deployer).result)
+      .toEqual(Cl.ok(Cl.bool(true)));
+    expect(config().epoch).toBe(oldEpoch + 1n);
+    expect(simnet.callPublicFn(CONTRACT, 'is-fully-backed', [token], deployer).result).toEqual(Cl.ok(Cl.bool(false)));
+
+    const formerOwnerCalls = [
+      simnet.callPublicFn(CONTRACT, 'set-attestor', [Cl.principal(attestors[3].principal), Cl.buffer(attestors[3].publicKey)], deployer).result,
+      simnet.callPublicFn(CONTRACT, 'remove-attestor', [Cl.principal(attestors[1].principal)], deployer).result,
+      simnet.callPublicFn(CONTRACT, 'set-asset', [Cl.contractPrincipal(deployer, ALTERNATE_TOKEN), Cl.buffer(alternateAssetIdentity)], deployer).result,
+      simnet.callPublicFn(CONTRACT, 'remove-asset', [token], deployer).result,
+      simnet.callPublicFn(CONTRACT, 'set-network-id', [Cl.stringAscii('testnet')], deployer).result,
+      simnet.callPublicFn(CONTRACT, 'set-chain-id', [Cl.uint(CHAIN_ID + 1n)], deployer).result,
+      simnet.callPublicFn(CONTRACT, 'set-governance', [Cl.principal(deployer)], deployer).result,
+      simnet.callPublicFn(CONTRACT, 'set-contract-owner', [Cl.principal(deployer)], deployer).result,
+    ];
+    for (const result of formerOwnerCalls) expect(result).toEqual(Cl.error(Cl.uint(ERR_UNAUTHORIZED)));
+    expect(config().epoch).toBe(oldEpoch + 1n);
+    expect(simnet.callPublicFn(CONTRACT, 'set-contract-owner', [Cl.principal(newOwner)], newOwner).result)
+      .toEqual(Cl.ok(Cl.bool(false)));
+    expect(config().epoch).toBe(oldEpoch + 1n);
   });
 });

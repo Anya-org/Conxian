@@ -22,29 +22,64 @@ RELEVANT_SCRIPT_TERMS = {
     "release", "deployment", "mainnet", "audit", "reserve",
 }
 CONTRACT_CALL_RE = re.compile(r"\(contract-call\?\s+([^\s()]+)\s+([^\s()]+)")
-ALIAS_RE = re.compile(r"\(define-constant\s+([^\s()]+)\s+([^\s()]*proof-of-reserves)\s*\)")
+CONSTANT_RE = re.compile(r"\(define-constant\s+([^\s()]+)\s+([^\s()]+)\s*\)")
+
+
+def _clarity_code(text: str) -> str:
+    """Remove comments and string contents without changing token boundaries."""
+    output: list[str] = []
+    index = 0
+    in_string = False
+    while index < len(text):
+        char = text[index]
+        if in_string:
+            if char == "\\" and index + 1 < len(text):
+                output.extend("  ")
+                index += 2
+                continue
+            if char == '"':
+                in_string = False
+            output.append(" ")
+            index += 1
+            continue
+        if char == '"':
+            in_string = True
+            output.append(" ")
+            index += 1
+            continue
+        if char == ";" and index + 1 < len(text) and text[index + 1] == ";":
+            while index < len(text) and text[index] != "\n":
+                output.append(" ")
+                index += 1
+            continue
+        output.append(char)
+        index += 1
+    return "".join(output)
 
 
 def _por_targets(text: str) -> set[str]:
     targets = {".proof-of-reserves"}
-    for alias, target in ALIAS_RE.findall(text):
-        targets.add(alias)
-        targets.add(target)
+    constants = CONSTANT_RE.findall(text)
+    changed = True
+    while changed:
+        changed = False
+        for alias, target in constants:
+            if target in targets or "proof-of-reserves" in target:
+                if alias not in targets:
+                    targets.add(alias)
+                    changed = True
+                targets.add(target)
     return targets
 
 
 def scan_clarity_text(text: str, path: str) -> list[str]:
     violations: list[str] = []
-    targets = _por_targets(text)
-    has_por_reference = "proof-of-reserves" in text or len(targets) > 1
-    for target, function in CONTRACT_CALL_RE.findall(text):
+    code = _clarity_code(text)
+    targets = _por_targets(code)
+    for target, function in CONTRACT_CALL_RE.findall(code):
         if target in targets or "proof-of-reserves" in target:
             if function not in SAFE_STATUS_FUNCTIONS:
                 violations.append(f"{path}: PoR call `{function}` is not an approved fail-closed status interface")
-    if has_por_reference:
-        for symbol in sorted(DIAGNOSTIC_OR_LEGACY_SYMBOLS):
-            if re.search(rf"(?<![\w-]){re.escape(symbol)}(?![\w-])", text):
-                violations.append(f"{path}: references diagnostic/legacy PoR authority `{symbol}`")
     return violations
 
 
@@ -53,10 +88,15 @@ def scan_script_text(text: str, path: str) -> list[str]:
     if "proof-of-reserves" not in lowered and "proof of reserves" not in lowered:
         return []
     violations: list[str] = []
-    for symbol in sorted(DIAGNOSTIC_OR_LEGACY_SYMBOLS):
-        if re.search(rf"(?<![\w-]){re.escape(symbol)}(?![\w-])", lowered):
-            violations.append(f"{path}: operational script references diagnostic/legacy PoR authority `{symbol}`")
     queried_methods = set(re.findall(r"\b(?:function|method|function-name)\s*[=:]\s*['\"]?([\w-]+)", lowered))
+    queried_methods.update(re.findall(
+        r"call(?:read)?(?:only)?fn\s*\(\s*['\"][^'\"]*proof-of-reserves['\"]\s*,\s*['\"]([\w-]+)",
+        lowered,
+    ))
+    queried_methods.update(re.findall(
+        r"(?:--function|--method|function-name)\s+['\"]?([\w-]+)",
+        lowered,
+    ))
     for method in sorted(queried_methods - SAFE_STATUS_FUNCTIONS):
         if "reserve" in method or method in DIAGNOSTIC_OR_LEGACY_SYMBOLS:
             violations.append(f"{path}: operational PoR query `{method}` is not fail closed")

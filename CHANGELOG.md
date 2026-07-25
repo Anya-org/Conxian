@@ -8,8 +8,10 @@
   attestation ledger with versioned snapshot and signer-envelope digests,
   explicit `secp256k1` algorithm binding, live SIP-010 reconciliation,
   registry-epoch invalidation, distinct quorum, nonce replay protection, and a
-  repository consumer guard. This is source/test evidence only, not deployment
-  or oracle-qualification evidence.
+  repository consumer guard. Audit hardening adds atomic owner/governance
+  handoff, effective-change-only epoch advancement, validated response-returning
+  signing helpers, and rejected-submission state-invariance regressions. This is
+  source/test evidence only, not deployment or oracle-qualification evidence.
 - **Enterprise Subscription MVP (Issue #503)**: Added explicit STX-only prepaid
   subscribe/renew/cancel flows, immutable versioned plan and generic feature
   records, KYC/AML checks, allowlisted consumer usage metering, and

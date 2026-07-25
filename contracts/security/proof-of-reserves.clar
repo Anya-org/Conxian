@@ -3,8 +3,8 @@
 ;;
 ;; Canonical schema v1 hashing:
 ;; - uint leaf = the Clarity-native sha256(uint) encoding
-;; - accepted ASCII configuration values map to explicit tags that hash to
-;;   fixed 32-byte leaves; unsupported values use separate sentinel tags
+;; - validated ASCII configuration values map to explicit tags that hash to
+;;   fixed 32-byte leaves
 ;; - fixed 32-byte identities/digests are included directly
 ;; - ordered fixed-width leaves are grouped and hashed; group hashes are hashed
 ;;   once more to produce the final 32-byte digest
@@ -47,10 +47,8 @@
 (define-constant ATTESTATION_DOMAIN "CONXIAN-POR-ATTESTATION")
 (define-constant SIGNATURE_ALGORITHM "secp256k1")
 (define-constant SNAPSHOT_DOMAIN_TAG 0x434f4e5849414e2d504f522d534e415053484f54)
-(define-constant OTHER_SNAPSHOT_DOMAIN_TAG 0x4f544845522d504f522d534e415053484f542d444f4d41494e)
 (define-constant ATTESTATION_DOMAIN_TAG 0x434f4e5849414e2d504f522d4154544553544154494f4e)
 (define-constant SECP256K1_TAG 0x736563703235366b31)
-(define-constant OTHER_SIGNATURE_ALGORITHM_TAG 0x756e737570706f727465642d7369676e61747572652d616c676f726974686d)
 (define-constant MAINNET_TAG 0x6d61696e6e6574)
 (define-constant TESTNET_TAG 0x746573746e6574)
 (define-constant SIMNET_TAG 0x73696d6e6574)
@@ -158,15 +156,11 @@
 )
 
 (define-private (snapshot-domain-hash (domain (string-ascii 24)))
-  (if (is-eq domain SNAPSHOT_DOMAIN)
-    (sha256 SNAPSHOT_DOMAIN_TAG)
-    (sha256 OTHER_SNAPSHOT_DOMAIN_TAG))
+  (sha256 SNAPSHOT_DOMAIN_TAG)
 )
 
 (define-private (signature-algorithm-hash (signature-algorithm (string-ascii 16)))
-  (if (is-eq signature-algorithm SIGNATURE_ALGORITHM)
-    (sha256 SECP256K1_TAG)
-    (sha256 OTHER_SIGNATURE_ALGORITHM_TAG))
+  (sha256 SECP256K1_TAG)
 )
 
 (define-private (network-hash (network (string-ascii 8)))
@@ -265,7 +259,10 @@
 )
 
 (define-public (set-attestor (attestor principal) (public-key (buff 33)))
-  (let ((existing-key-owner (map-get? registered-attestor-keys public-key)))
+  (let (
+      (existing-key-owner (map-get? registered-attestor-keys public-key))
+      (existing-attestor (map-get? attestor-registry attestor))
+    )
     (begin
       (asserts! (is-governance) (err ERR_UNAUTHORIZED))
       (asserts! (not (is-eq public-key ZERO_PUBKEY)) (err ERR_INVALID_ATTESTOR))
@@ -275,11 +272,18 @@
       (asserts! (match existing-key-owner owner
         (and (is-eq owner attestor) (key-is-current-for-attestor attestor public-key))
         true) (err ERR_INVALID_ATTESTOR))
-      (map-set attestor-registry attestor { active: true, public-key: public-key })
-      (map-set registered-attestor-keys public-key attestor)
-      (advance-registry-epoch)
-      (print { event: "por-attestor-set", attestor: attestor, registry-epoch: (var-get registry-epoch) })
-      (ok true)
+      (if (match existing-attestor registered
+            (and (get active registered) (is-eq (get public-key registered) public-key))
+            false)
+        (ok false)
+        (begin
+          (map-set attestor-registry attestor { active: true, public-key: public-key })
+          (map-set registered-attestor-keys public-key attestor)
+          (advance-registry-epoch)
+          (print { event: "por-attestor-set", attestor: attestor, registry-epoch: (var-get registry-epoch) })
+          (ok true)
+        )
+      )
     )
   )
 )
@@ -287,26 +291,38 @@
 (define-public (remove-attestor (attestor principal))
   (begin
     (asserts! (is-governance) (err ERR_UNAUTHORIZED))
-    (match (map-get? attestor-registry attestor)
-      registered (map-set attestor-registry attestor (merge registered { active: false }))
-      false
+    (let ((registered (unwrap! (map-get? attestor-registry attestor) (err ERR_INVALID_ATTESTOR))))
+      (begin
+        (asserts! (get active registered) (err ERR_INVALID_ATTESTOR))
+        (map-set attestor-registry attestor (merge registered { active: false }))
+        (advance-registry-epoch)
+        (print { event: "por-attestor-removed", attestor: attestor, registry-epoch: (var-get registry-epoch) })
+        (ok true)
+      )
     )
-    (advance-registry-epoch)
-    (print { event: "por-attestor-removed", attestor: attestor, registry-epoch: (var-get registry-epoch) })
-    (ok true)
   )
 )
 
 (define-public (set-asset (asset principal) (identity (buff 32)))
-  (let ((existing-identity-owner (map-get? registered-asset-identities identity)))
+  (let (
+      (existing-identity-owner (map-get? registered-asset-identities identity))
+      (existing-asset (map-get? asset-registry asset))
+    )
     (begin
       (asserts! (is-governance) (err ERR_UNAUTHORIZED))
       (asserts! (not (is-eq identity ZERO_DIGEST)) (err ERR_INVALID_ASSET))
       (asserts! (match existing-identity-owner owner (is-eq owner asset) true) (err ERR_INVALID_ASSET))
-      (map-set asset-registry asset { active: true, identity: identity })
-      (map-set registered-asset-identities identity asset)
-      (advance-registry-epoch)
-      (ok true)
+      (if (match existing-asset registered
+            (and (get active registered) (is-eq (get identity registered) identity))
+            false)
+        (ok false)
+        (begin
+          (map-set asset-registry asset { active: true, identity: identity })
+          (map-set registered-asset-identities identity asset)
+          (advance-registry-epoch)
+          (ok true)
+        )
+      )
     )
   )
 )
@@ -314,12 +330,14 @@
 (define-public (remove-asset (asset principal))
   (begin
     (asserts! (is-governance) (err ERR_UNAUTHORIZED))
-    (match (map-get? asset-registry asset)
-      registered (map-set asset-registry asset (merge registered { active: false }))
-      false
+    (let ((registered (unwrap! (map-get? asset-registry asset) (err ERR_INVALID_ASSET))))
+      (begin
+        (asserts! (get active registered) (err ERR_INVALID_ASSET))
+        (map-set asset-registry asset (merge registered { active: false }))
+        (advance-registry-epoch)
+        (ok true)
+      )
     )
-    (advance-registry-epoch)
-    (ok true)
   )
 )
 
@@ -327,9 +345,14 @@
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (asserts! (valid-runtime-network network) (err ERR_INVALID_NETWORK_CONFIG))
-    (var-set network-id network)
-    (advance-registry-epoch)
-    (ok true)
+    (if (is-eq network (var-get network-id))
+      (ok false)
+      (begin
+        (var-set network-id network)
+        (advance-registry-epoch)
+        (ok true)
+      )
+    )
   )
 )
 
@@ -337,25 +360,47 @@
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
     (asserts! (> new-chain-id u0) (err ERR_INVALID_CHAIN))
-    (var-set configured-chain-id new-chain-id)
-    (advance-registry-epoch)
-    (ok true)
+    (if (is-eq new-chain-id (var-get configured-chain-id))
+      (ok false)
+      (begin
+        (var-set configured-chain-id new-chain-id)
+        (advance-registry-epoch)
+        (ok true)
+      )
+    )
   )
 )
 
 (define-public (set-governance (new-governance principal))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (var-set governance new-governance)
-    (ok true)
+    (if (is-eq new-governance (var-get governance))
+      (ok false)
+      (begin
+        (var-set governance new-governance)
+        (advance-registry-epoch)
+        (ok true)
+      )
+    )
   )
 )
 
 (define-public (set-contract-owner (new-owner principal))
   (begin
     (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (var-set contract-owner new-owner)
-    (ok true)
+    ;; Ownership is the root of every PoR control path. Transfer owner and
+    ;; governance atomically so the former owner retains no registry authority.
+    (if (and
+          (is-eq new-owner (var-get contract-owner))
+          (is-eq new-owner (var-get governance)))
+      (ok false)
+      (begin
+        (var-set contract-owner new-owner)
+        (var-set governance new-owner)
+        (advance-registry-epoch)
+        (ok true)
+      )
+    )
   )
 )
 
@@ -467,8 +512,18 @@
     (snapshot-height uint)
     (expires-at uint)
   )
-  (compute-snapshot-digest schema-version domain network expected-chain-id snapshot-registry-epoch
-    asset-identity on-chain-balance total-supply off-chain-backing snapshot-height expires-at)
+  (begin
+    (asserts! (is-eq schema-version SNAPSHOT_SCHEMA_VERSION) (err ERR_INVALID_SCHEMA))
+    (asserts! (is-eq domain SNAPSHOT_DOMAIN) (err ERR_INVALID_DOMAIN))
+    (asserts! (valid-runtime-network network) (err ERR_INVALID_NETWORK))
+    (asserts! (not (is-eq (var-get network-id) UNCONFIGURED_NETWORK)) (err ERR_INVALID_NETWORK))
+    (asserts! (is-eq network (var-get network-id)) (err ERR_INVALID_NETWORK))
+    (asserts! (> (var-get configured-chain-id) u0) (err ERR_INVALID_CHAIN))
+    (asserts! (is-eq expected-chain-id (var-get configured-chain-id)) (err ERR_INVALID_CHAIN))
+    (asserts! (is-eq snapshot-registry-epoch (var-get registry-epoch)) (err ERR_INVALID_ATTESTOR))
+    (ok (compute-snapshot-digest schema-version domain network expected-chain-id snapshot-registry-epoch
+      asset-identity on-chain-balance total-supply off-chain-backing snapshot-height expires-at))
+  )
 )
 
 (define-read-only (get-attestation-digest
@@ -478,7 +533,11 @@
     (attestor-identity (buff 32))
     (nonce uint)
   )
-  (compute-envelope-digest schema-version signature-algorithm snapshot-digest attestor-identity nonce)
+  (begin
+    (asserts! (is-eq schema-version SNAPSHOT_SCHEMA_VERSION) (err ERR_INVALID_SCHEMA))
+    (asserts! (is-eq signature-algorithm SIGNATURE_ALGORITHM) (err ERR_UNSUPPORTED_SIGNATURE_ALGORITHM))
+    (ok (compute-envelope-digest schema-version signature-algorithm snapshot-digest attestor-identity nonce))
+  )
 )
 
 ;; Dynamic trait calls are conservatively classified as potentially writing by

@@ -59,8 +59,11 @@ identity. Every signer signs a separate envelope over
 sha256(attestor-public-key), nonce}`; quorum is counted only for the shared
 snapshot digest. The only supported algorithm identifier is `secp256k1`, using
 a compressed 33-byte public key and a recoverable 65-byte signature. Registry,
-asset, network, or chain configuration changes advance an epoch and invalidate
-older proof status.
+asset, network, chain, governance, or ownership changes advance an epoch and
+invalidate older proof status. Idempotent setters return `(ok false)` without
+advancing the epoch; nonexistent removals return an error. Ownership transfer
+atomically assigns both owner and governance authority to the new owner so the
+former owner retains no PoR control path.
 
 Attestor public keys are permanently retired after rotation or removal. Their
 uniqueness reservations are intentionally not released, preventing a retired
@@ -75,8 +78,9 @@ implemented without overflow-prone addition.
 | `set-attestor` / `remove-attestor` | `(principal, (buff 33))` / `(principal)` | Governance-managed authoritative key registry with permanent key retirement. |
 | `set-asset` / `remove-asset` | `(principal, (buff 32))` / `(principal)` | Binds a SIP-010 contract principal to a unique canonical asset identity. |
 | `set-network-id` / `set-chain-id` | `((string-ascii 8))` / `(uint)` | Explicit domain configuration; the contract remains fail closed while unset. |
-| `get-snapshot-digest` | `(schema, domain, network, chain, epoch, asset-id, balance, supply, backing, height, expiry)` | Returns the canonical common snapshot digest for external signing. |
-| `get-attestation-digest` | `(schema, signature-algorithm, snapshot-digest, signer-id, nonce)` | Returns the signer-specific envelope digest. |
+| `set-governance` / `set-contract-owner` | `(principal)` / `(principal)` | Changes governance or atomically transfers owner plus governance control; effective changes invalidate the current epoch. |
+| `get-snapshot-digest` | `(schema, domain, network, chain, epoch, asset-id, balance, supply, backing, height, expiry) -> (response (buff 32) uint)` | Returns the canonical common snapshot digest only when schema/domain/network/chain/epoch match current configuration. |
+| `get-attestation-digest` | `(schema, signature-algorithm, snapshot-digest, signer-id, nonce) -> (response (buff 32) uint)` | Returns the signer-specific envelope digest only for the supported schema and algorithm. |
 | `submit-attestation` | `(asset, schema, domain, signature-algorithm, network, chain, epoch, balance, supply, backing, height, expiry, nonce, signature)` | Re-reads live SIP-010 state, verifies a direct-sender signature, rejects replay/duplicates, and promotes only a newer quorum snapshot. |
 | `is-fully-backed` / `get-proof-status` | `(<sip-010-trait>)` | Public, non-mutating live reconciliation checks that fail closed on missing, stale, expired, reconfigured, or drifted evidence. |
 
