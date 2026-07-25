@@ -85,7 +85,7 @@
 - **Tokenomics Caps**: CXD max supply (1B tokens), allocation policy immutability lock
 - **ICO Security**: Compliance gating, purchase caps (1M/10K), buyer tracking
 - **CXLP Position NFT**: Full SIP-009 implementation with metadata and fee tracking
-- **Operational Safety**: Rate limiter (window-based), Proof-of-Reserves (multi-attestor)
+- **Operational Safety**: Rate limiter (window-based), initial Proof-of-Reserves attestation ledger
 
 ### Changed
 
@@ -97,7 +97,10 @@
 ### Security
 
 - **Rate Limiting**: Window-based operation limiting (600 block default)
-- **Proof of Reserves**: 3+ attestor requirement, 7-day validity
+- **Proof of Reserves**: Historical release note only. The January path did not
+  cryptographically verify signatures or enforce distinct-attestor quorum; it
+  was superseded in July 2026 by versioned snapshot/envelope signatures, live
+  SIP-010 reconciliation, replay protection, and quorum-scoped promotion.
 - **Sovereign Transfer**: Explicit 5-step handoff with verification
 
 ## [0.4.0] - 2026-01-20
