@@ -289,6 +289,11 @@ plan:
       path: contracts/math/concentrated-math.clar
       clarity-version: 4
     - transaction-type: emulated-contract-publish
+      contract-name: concentrated-math-v2
+      emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N
+      path: contracts/math/concentrated-math-v2.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
       contract-name: controller-traits
       emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N
       path: contracts/traits/controller-traits.clar
@@ -296,6 +301,11 @@ plan:
     epoch: '2.05'
   - id: 2
     transactions:
+    - transaction-type: emulated-contract-publish
+      contract-name: concentrated-liquidity-pool-v2
+      emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N
+      path: contracts/dex/concentrated-liquidity-pool-v2.clar
+      clarity-version: 4
     - transaction-type: emulated-contract-publish
       contract-name: queue-traits
       emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N

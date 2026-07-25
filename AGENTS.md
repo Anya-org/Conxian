@@ -135,8 +135,8 @@ Non-dry attempts are blocked before signing/broadcast pending issue #531's struc
 - Any address check is scoped to the checked address or addresses; it must not be read as a claim of global nonexistence.
 
 ### Deployment Plans
-- `deployments/full-system.testnet-plan.yaml` — 12 batches (11 contract-publish + 1 contract-call wiring; 214 publishes after quarantining `zkml-verifier`)
-- `deployments/full-system.mainnet-plan.yaml` — same 12-batch/214-publish structure, mainnet costs
+- `deployments/full-system.testnet-plan.yaml` — 12 batches (11 contract-publish + 1 contract-call wiring; 216 publishes after adding CLP V2 and quarantining `zkml-verifier`)
+- `deployments/full-system.mainnet-plan.yaml` — same 12-batch/216-publish structure, mainnet costs
 - Generated via `scripts/gen-deployment-plans.py` from `default.simnet-plan.yaml`
 - 9 test helpers excluded: `mock-circuit-breaker`, `mock-csf-protocol`, `mock-proposal`, `mock-regulatory-adapter`, `mock-token`, `mock-fee-source`, `mock-compoundable-vault`, `mock-admin-forwarder`, `test-c4-helper`
 - All contracts: `clarity-version: 4`, `epoch: 3.0`, `anchor-block-only: true`
@@ -245,7 +245,7 @@ Unresolved plan identities must not be used or capitalized, guessed signer ident
 6. ~~Fix testnet deployment plan~~ -- DONE (P1-4)
 7. ~~Implement bridge-nft SIP-009~~ -- DONE (P1-3)
 8. ~~Verify BitVM2 attestation in clarity-bitcoin.clar~~ -- HARDENED
-9. ~~Finalize mainnet manifest~~ -- DONE (214 contracts, 10 batches)
+9. ~~Finalize mainnet manifest~~ -- DONE (216 contracts, 11 publish batches)
 10. ~~Deploy to testnet~~ -- historical record referenced block 28719280478 and 4.37 STX; not revalidated here and not current workflow proof
 11. ~~Deploy to mainnet~~ -- historical record referenced block 28732058625 and 10.79 STX; not revalidated here and not current workflow proof
 12. ~~Merge all sprint PRs (#446, #447, #448, #449, #450)~~ -- DONE

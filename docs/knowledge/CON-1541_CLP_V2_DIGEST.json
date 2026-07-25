@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "issue": "CON-1541",
+  "calculationVersion": "clp-v2-linear-v1",
+  "components": {
+    "mathV2": {
+      "contract": "concentrated-math-v2",
+      "path": "contracts/math/concentrated-math-v2.clar",
+      "scale": 1000000000000,
+      "tickModel": "injective-linear-v1",
+      "tickEnvelope": [-5000, 10000],
+      "tickStep": 100000000,
+      "rounding": {
+        "mintRequirements": "ceil",
+        "burnAndSwapOutputs": "floor",
+        "liquidityFromMaxima": "floor-limiting-side"
+      }
+    },
+    "clpV2": {
+      "contract": "concentrated-liquidity-pool-v2",
+      "path": "contracts/dex/concentrated-liquidity-pool-v2.clar",
+      "execution": "exact-input-single-hop",
+      "canonicalEntitlement": "non-transferable-position-id",
+      "cxlpRole": "none",
+      "bounds": {
+        "maxInitializedTicks": 16,
+        "maxTickCrossingsPerSwap": 8,
+        "maxLiquidityPerPositionAndPool": 1000000000000,
+        "maxInputPerSwap": 1000000000000
+      }
+    },
+    "positions": {
+      "liquidityLots": "immutable",
+      "partialRemoval": false,
+      "feeAccounting": "inside-growth-checkpoints-plus-position-remainders",
+      "closedValuation": "actual-cumulative-settlement-at-close-price"
+    },
+    "ticks": {
+      "state": [
+        "initialized",
+        "liquidity-gross",
+        "signed-upward-liquidity-net",
+        "fee-growth-outside-0",
+        "fee-growth-outside-1"
+      ],
+      "crossing": "direction-correct-active-liquidity-and-outside-growth"
+    },
+    "feeCollector": {
+      "canonicalContract": "protocol-fee-collector",
+      "integrationStatus": "disabled-gate",
+      "requiredBeforeEnablement": [
+        "registered-source-stream-asset",
+        "collector-computed-amount",
+        "replay-id",
+        "private-same-transaction-pending-debit",
+        "authenticated-source-callback",
+        "exact-custody-delta"
+      ]
+    },
+    "oracle": {
+      "executionPriceSource": "pool-executable-state",
+      "priceSetter": false,
+      "oraclePriceMovementProxyIsExactIL": false
+    }
+  },
+  "decisions": [
+    "Version contracts instead of mutating the legacy compatibility CLP.",
+    "Use a bounded linear tick grid and do not claim logarithmic Uniswap semantics.",
+    "Keep CXLP outside V2 to avoid competing transferable and range-specific entitlements.",
+    "Require full atomic close and exact-input consumption.",
+    "Keep protocol-fee release and CSF compatibility fail-closed until exact semantics exist."
+  ],
+  "relationships": [
+    {
+      "from": "concentrated-liquidity-pool-v2",
+      "to": "concentrated-math-v2",
+      "type": "static-math-dependency"
+    },
+    {
+      "from": "concentrated-liquidity-pool-v2",
+      "to": "sip-standards",
+      "type": "sip-010-trait-dependency"
+    },
+    {
+      "from": "concentrated-liquidity-pool-v2",
+      "to": "protocol-fee-collector",
+      "type": "future-gated-integration"
+    },
+    {
+      "from": "legacy-concentrated-liquidity-pool",
+      "to": "concentrated-liquidity-pool-v2",
+      "type": "explicit-non-routing-version-boundary"
+    }
+  ],
+  "security": {
+    "containsSecrets": false,
+    "arbitraryPriceSetter": false,
+    "unwrapPanicInNewCriticalLogic": false
+  }
+}

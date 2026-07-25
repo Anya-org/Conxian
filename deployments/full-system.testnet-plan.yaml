@@ -322,10 +322,26 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
+        contract-name: concentrated-math-v2
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 20000
+        path: contracts/math/concentrated-math-v2.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
         contract-name: controller-traits
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 20000
         path: contracts/traits/controller-traits.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: concentrated-liquidity-pool-v2
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 20000
+        path: contracts/dex/concentrated-liquidity-pool-v2.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -369,6 +385,8 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
+  - id: 2
+    transactions:
     - contract-publish:
         contract-name: conxian-service-trait
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -377,8 +395,6 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
-  - id: 2
-    transactions:
     - contract-publish:
         contract-name: vault-traits
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P

@@ -167,6 +167,10 @@
     "sip-standards",
     "block-utils"
   ],
+  "concentrated-liquidity-pool-v2": [
+    "concentrated-math-v2",
+    "sip-standards"
+  ],
   "liquidity-manager": [
     "concentrated-math",
     "defi-traits",
@@ -320,6 +324,7 @@
   "migration-adapter": [],
   "math-utils": [],
   "concentrated-math": [],
+  "concentrated-math-v2": [],
   "default-strategy-engine": [],
   "early-lp-rewards": [],
   "rewards-distributor": [],
