@@ -709,6 +709,11 @@ path = "contracts/test-helpers/mock-admin-forwarder.clar"
 clarity-version = 4
 depends_on = ["auto-compounder", "compoundable-vault-trait", "cxd-staking"]
 
+[contracts.mock-clp-v2-intermediary]
+path = "contracts/test-helpers/mock-clp-v2-intermediary.clar"
+clarity-version = 4
+depends_on = ["liquidity-manager", "sip-standards", "swap-router"]
+
 [contracts.mock-reward-token]
 path = "contracts/test-helpers/mock-reward-token.clar"
 clarity-version = 4
