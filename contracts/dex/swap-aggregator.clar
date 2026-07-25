@@ -10,6 +10,7 @@
 (define-constant ERR_UNAUTHORIZED (err u1000))
 (define-constant ERR_INVALID_PAIR (err u1001))
 (define-constant ERR_INSUFFICIENT_LIQUIDITY (err u1002))
+(define-constant ERR_FEE_CUSTODY_UNAVAILABLE (err u1003))
 
 (define-data-var admin principal tx-sender)
 (define-data-var fee-bps uint u25) ;; 0.25%
@@ -82,8 +83,9 @@
 ;; @desc Collect protocol fees for a specific token
 (define-public (collect-protocol-fees (token <sip-010-ft-trait>))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (ok true)
+    ;; No segregated fee custody exists, so admin status cannot make collection safe.
+    (asserts! false ERR_FEE_CUSTODY_UNAVAILABLE)
+    (ok false)
   )
 )
 

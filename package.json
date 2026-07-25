@@ -21,6 +21,8 @@
     "coverage": "vitest run --coverage",
     "derive:wallets": "tsx scripts/derive_wallets.ts",
     "verify:deployment-evidence": "tsx scripts/deployment/verify-evidence.ts",
+    "verify:sbtc-phase2": "tsx scripts/sbtc-phase2/verify-evidence.ts",
+    "test:sbtc-phase2": "vitest run --config vitest.sbtc-phase2.config.ts",
     "test:deployment-evidence": "node scripts/test-deployment-evidence.mjs",
     "test:release-plan-validation": "python3 -m unittest tests/test_release_plan_validation.py"
   },

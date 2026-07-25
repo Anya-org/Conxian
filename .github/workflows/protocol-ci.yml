@@ -10,13 +10,12 @@ on:
       - 'docs/**'
       - '*.md'
   pull_request:
-    paths-ignore:
-      - 'ui/**'
-      - 'docs/**'
-      - '*.md'
+    branches:
+      - main
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   changes:
@@ -53,8 +52,12 @@ jobs:
               - 'package-lock.json'
               - 'vitest.config.ts'
               - '.github/workflows/**'
+              - 'CODEOWNERS'
+              - '.github/CODEOWNERS'
               - 'deployments/**'
               - 'scripts/**'
+              - 'docs/MAIN_BRANCH_GOVERNANCE.md'
+              - 'docs/OPERATIONS_VERIFICATION_PATH.md'
             contracts:
               - 'contracts/**'
             tests:
@@ -147,34 +150,47 @@ jobs:
 
       - name: Run Intelligent Tests (PR only)
         if: github.event_name == 'pull_request'
+        env:
+          AGENTS_CHANGED: ${{ needs.changes.outputs.agents }}
+          COMPLIANCE_CHANGED: ${{ needs.changes.outputs.compliance }}
+          CORE_CHANGED: ${{ needs.changes.outputs.core }}
+          DEX_CHANGED: ${{ needs.changes.outputs.dex }}
+          ENTERPRISE_CHANGED: ${{ needs.changes.outputs.enterprise }}
+          GOVERNANCE_CHANGED: ${{ needs.changes.outputs.governance }}
+          LENDING_CHANGED: ${{ needs.changes.outputs.lending }}
+          MONITORING_CHANGED: ${{ needs.changes.outputs.monitoring }}
+          ORACLE_CHANGED: ${{ needs.changes.outputs.oracle }}
+          PROTOCOL_CHANGED: ${{ needs.changes.outputs.any_protocol }}
         run: |
-          TEST_TARGETS=""
+          set -euo pipefail
+          test_targets=()
           # Only access has dedicated test files; tokens, treasury, dimensional
           # tests live in tests/core/ and are picked up by the fallback.
-          if [[ "${{ needs.changes.outputs.agents }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/agents/"; fi
-          if [[ "${{ needs.changes.outputs.compliance }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/compliance/"; fi
-          if [[ "${{ needs.changes.outputs.core }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/core/"; fi
-          if [[ "${{ needs.changes.outputs.dex }}" == "true" ]]; then
+          if [[ "$AGENTS_CHANGED" == "true" ]]; then test_targets+=(tests/agents/); fi
+          if [[ "$COMPLIANCE_CHANGED" == "true" ]]; then test_targets+=(tests/compliance/); fi
+          if [[ "$CORE_CHANGED" == "true" ]]; then test_targets+=(tests/core/); fi
+          if [[ "$DEX_CHANGED" == "true" ]]; then
             # predictive-scaling-system.test.ts is intentionally root-level;
             # keep it in the DEX target so a DEX-only PR cannot skip it.
-            TEST_TARGETS="$TEST_TARGETS tests/dex/ tests/predictive-scaling-system.test.ts"
+            test_targets+=(tests/dex/ tests/predictive-scaling-system.test.ts)
           fi
-          if [[ "${{ needs.changes.outputs.enterprise }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/enterprise/"; fi
-          if [[ "${{ needs.changes.outputs.governance }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/governance/"; fi
-          if [[ "${{ needs.changes.outputs.lending }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/lending/"; fi
-          if [[ "${{ needs.changes.outputs.monitoring }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/monitoring/"; fi
-          if [[ "${{ needs.changes.outputs.oracle }}" == "true" ]]; then TEST_TARGETS="$TEST_TARGETS tests/oracle/"; fi
+          if [[ "$ENTERPRISE_CHANGED" == "true" ]]; then test_targets+=(tests/enterprise/); fi
+          if [[ "$GOVERNANCE_CHANGED" == "true" ]]; then test_targets+=(tests/governance/); fi
+          if [[ "$LENDING_CHANGED" == "true" ]]; then test_targets+=(tests/lending/); fi
+          if [[ "$MONITORING_CHANGED" == "true" ]]; then test_targets+=(tests/monitoring/); fi
+          if [[ "$ORACLE_CHANGED" == "true" ]]; then test_targets+=(tests/oracle/); fi
           # tokens, treasury, dimensional have no dedicated test dirs;
           # changes there trigger the fallback below.
 
-          if [ -z "$TEST_TARGETS" ] && [[ "${{ needs.changes.outputs.any_protocol }}" == "true" ]]; then
+          if [[ ${#test_targets[@]} -eq 0 && "$PROTOCOL_CHANGED" == "true" ]]; then
             echo "Generic or infrastructure protocol change detected, running full test suite..."
-            TEST_TARGETS=""
           fi
 
-          if [ ! -z "$TEST_TARGETS" ]; then
-            echo "Running domain-specific tests: $TEST_TARGETS"
-            bash scripts/run-tests.sh $TEST_TARGETS
+          if [[ ${#test_targets[@]} -gt 0 ]]; then
+            printf 'Running domain-specific tests:'
+            printf ' %q' "${test_targets[@]}"
+            printf '\n'
+            bash scripts/run-tests.sh "${test_targets[@]}"
           else
             echo "Running full test suite..."
             bash scripts/run-tests.sh
@@ -197,3 +213,46 @@ jobs:
             *.log
             npm-debug.log*
             coverage/
+
+  protocol-merge-gate:
+    name: protocol-merge-gate
+    needs:
+      - changes
+      - validate-protocol
+    if: ${{ always() && github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    env:
+      CLASSIFIER_RESULT: ${{ needs.changes.result }}
+      PROTOCOL_CHANGED: ${{ needs.changes.outputs.any_protocol }}
+      VALIDATION_RESULT: ${{ needs.validate-protocol.result }}
+    steps:
+      - name: Enforce protocol merge gate
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "$CLASSIFIER_RESULT" != "success" ]]; then
+            echo "Path classification did not succeed: $CLASSIFIER_RESULT"
+            exit 1
+          fi
+
+          case "$PROTOCOL_CHANGED" in
+            true)
+              if [[ "$VALIDATION_RESULT" != "success" ]]; then
+                echo "Protocol-sensitive changes require successful validation; result: $VALIDATION_RESULT"
+                exit 1
+              fi
+              ;;
+            false)
+              if [[ "$VALIDATION_RESULT" != "skipped" ]]; then
+                echo "Non-sensitive changes should skip heavy validation; result: $VALIDATION_RESULT"
+                exit 1
+              fi
+              ;;
+            *)
+              echo "Path classification returned an invalid protocol flag: $PROTOCOL_CHANGED"
+              exit 1
+              ;;
+          esac
+
+          echo "Protocol merge gate passed."

@@ -8,6 +8,7 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 - **Canonical custody**: Payer-custody FT/STX settlements transfer payer -> `.protocol-fee-collector`. Source-custody settlements instead invoke an authenticated source callback with the collector-computed debit and fixed `.protocol-fee-collector` recipient; the collector proves the exact live-balance delta and leaves untracked excess untouched.
 - **Explicit routing**: Authorized admin or approved governance/timelock calls route collector-held assets only to the fixed `.operational-treasury` principal after treasury initialization. Each asset's routed total cannot exceed its collected total, and collection/routing totals remain separate.
 - **Legacy compatibility**: `revenue-automation.clar` retains the legacy 100 bps token fee path and also exposes the full gross-STX enterprise adapter. It remains a compatibility surface until phase 2 migrates each approved source; do not compose it with the canonical collector on the same fee base.
+- **DEX custody boundary**: `concentrated-liquidity-pool.collect-protocol-fees` and `swap-aggregator.collect-protocol-fees` fail closed until dedicated, segregated DEX fee custody and canonical settlement exist. Neither entrypoint is extraction evidence, and neither may be composed with a legacy or canonical charge on the same base.
 - **Registry**: `cxd-treasury.clar` maintains the global allocation policy.
 - **Distribution**: `revenue-distributor.clar` routes token assets to the BME buy-back/burn path and accepts legacy or enterprise gross-STX routes into the Fiscal Dam; native STX buyback execution is not claimed.
 - **Integration Billing**: `contracts/integrations/integration-fee-collector.clar` remains a separate legacy integration settlement surface. It sends 100% of settled STX through the distributor route; there is no partner split, 1% deduction, or direct bypass to `operational-treasury`. It is not the phase-1 protocol-fee collector and is not evidence of downstream realization for phase-1 collector events.
@@ -107,10 +108,12 @@ ID and does not expose a caller-controlled fee debit. The legacy
 `revenue-automation.collect-revenue` call is not composed with this path.
 
 DEX migration remains explicitly deferred because concentrated-liquidity-pool
-custody/execution is still stubbed; `lending-orchestrator` is also outside this
-slice. The 50/30/20 partnership split and deployment broadcasting are not part
-of this implementation. The checked-in production deployment plans and
-generator remain preflight-only and are not a deployability claim.
+custody/execution is still stubbed. Its fee-collection entrypoint and the
+swap-aggregator equivalent fail closed rather than report success without
+segregated custody; `lending-orchestrator` is also outside this slice. The
+50/30/20 partnership split and deployment broadcasting are not part of this
+implementation. The checked-in production deployment plans and generator
+remain preflight-only and are not deployment or deployability evidence.
 
 Production bootstrap must initialize `.operational-treasury`, configure the
 approved governance/timelock/multisig, and then use `set-admin` to hand the

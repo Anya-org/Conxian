@@ -74,7 +74,7 @@ Native High-Efficiency Liquidity.
 | `get-pool-outstanding-shares` | `(pool-id uint)` | Reads the selected pool's aggregate outstanding CXLP share total. |
 | `get-total-outstanding-shares` | `()` | Reads the protocol-wide outstanding CXLP share total, which must equal canonical CXLP supply. |
 | `get-recorded-share-supply` | `()` | Compatibility alias for `get-total-outstanding-shares`. |
-| `collect-protocol-fees` | `(token <sip-010-ft-trait>)` | Collect accumulated protocol fees. |
+| `collect-protocol-fees` | `(token <sip-010-ft-trait>)` | Fails closed with `u1008`; CLP fees are not segregated from pool/user custody and untracked assets must not be transferred. |
 | `get-protocol-status` | `()` | Get the status of the CL pool contract. |
 
 The CLP's SIP-010 surface proxies transfer and read methods to `.cxlp-token`
@@ -93,6 +93,13 @@ substitute for #536's per-position/per-pool attribution, custody,
 settlement-validation, add/remove-liquidity, fee, or exact IL logic.
 `create-pool` intentionally mints no CXLP because a zero-liquidity pool has no
 backing share operation.
+
+The CLP and `swap-aggregator` trait entrypoints for `collect-protocol-fees`
+remain ABI-compatible but fail closed (`u1008` and `u1003`, respectively) for
+every caller. Dedicated, segregated DEX fee custody and canonical settlement
+must exist before either entrypoint can transfer assets. Until then, these
+surfaces must not be composed with legacy or canonical fee collection on the
+same base.
 
 ### `liquidity-manager.clar`
 The liquidity-manager is a validated, unexecuted intent ledger. Every recorded
