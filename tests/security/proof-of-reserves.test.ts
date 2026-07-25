@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { initSimnet } from '@stacks/clarinet-sdk';
-import { Cl, ClarityVersion, serializeCV } from '@stacks/transactions';
+import { initSimnet, type DeployContractOptions } from '@stacks/clarinet-sdk';
+import { Cl, serializeCV } from '@stacks/transactions';
 import { ec as EC } from 'elliptic';
 import crypto from 'node:crypto';
 import { simnet } from '../setup-test-env';
@@ -9,6 +9,7 @@ const POR = 'proof-of-reserves';
 const TOKEN = 'mock-token';
 const ec = new EC('secp256k1');
 const err = (code: number) => Cl.error(Cl.uint(code));
+const CLARITY_3_DEPLOYMENT = { clarityVersion: 3 } satisfies DeployContractOptions;
 
 const FAILING_TOKEN_SOURCE = `
 (impl-trait .sip-standards.sip-010-ft-trait)
@@ -221,7 +222,7 @@ describe('proof-of-reserves cryptographic boundary', () => {
     expect(local.deployContract(
       fixture,
       FAILING_TOKEN_SOURCE,
-      { clarityVersion: ClarityVersion.Clarity3 },
+      CLARITY_3_DEPLOYMENT,
       deployer,
     ).result).toEqual(Cl.bool(true));
 
