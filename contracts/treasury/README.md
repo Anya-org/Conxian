@@ -133,17 +133,25 @@ the indexed volume, fee, revenue, allocation, and USD-normalization schema.
 | `set-authorized-principals` | `(agent principal) (distributor principal)` | Sets authorized actors (Admin only). |
 | `set-bounds` | `(uint uint)` | Sets the existing LP-minimum and insurance-maximum safety bounds (Admin only). |
 | `authorize-stx-source` | `(principal)` | Authorizes a source contract for gross-STX receipts. |
+| `revoke-stx-source` | `(source principal)` | Revokes the authorized STX source (Admin only). |
 | `record-stx-revenue` | `(principal uint uint)` | Receives distributor STX, snapshots the six-way split, and records an immutable receipt. |
+| `record-diverted-claim` | `(token principal) (amount uint)` | Records a diverted claim for priority stakers. |
 | `set-stx-bucket-recipient` | `(uint principal)` | Configures one governed destination for a stable bucket ID (Admin only). |
 | `clear-stx-bucket-recipient` | `(uint)` | Removes a bucket destination and returns releases to fail-closed state. |
 | `release-stx-bucket` | `(uint uint uint)` | Transfers custody from one configured bucket once per `{bucket, release-id}` and decrements only after success. |
 | `get-stx-receipt` | `(principal uint)` | Reads one immutable source/payment receipt. |
 | `get-stx-bucket-balances` | `()` | Reads the six accumulated gross-STX accounting buckets. |
+| `get-stx-bucket-balance` | `(bucket uint)` | Reads the accumulated balance of a specific gross-STX bucket. |
+| `get-stx-bucket-recipient` | `(bucket uint)` | Reads the configured recipient for a specific bucket. |
 | `get-stx-accounting` | `()` | Proves gross receipts equal current buckets plus governed releases. |
 | `get-stx-release-receipt` | `(uint uint)` | Reads one immutable bucket release receipt. |
 | `get-policy-version` | `()` | Reads the monotonically increasing allocation policy version. |
 | `initialize` | `(new-admin principal)` | Initializes the treasury (Admin only). |
+| `set-admin` | `(new-admin principal)` | Updates the administrative principal. |
 | `get-allocation-percentages` | `()` | Returns the current fiscal split. |
+| `get-bounds` | `()` | Reads the safety boundaries configured for the LP-minimum and insurance-maximum limits. |
+| `get-total-gross-stx-received` | `()` | Reads the lifetime gross STX receipts received. |
+| `get-total-released-stx` | `()` | Reads the lifetime gross STX released. |
 | `get-protocol-status` | `()` | Returns compliance and version status. |
 
 ### `revenue-distributor.clar` routes
@@ -247,7 +255,7 @@ the latest index keeps pair lookup useful after a terminal allocation. A
 completed or cancelled allocation clears only the active index, so reusing a
 pair creates a new ID without overwriting `get-allocation-by-id` history.
 
-### Payment-forge settlement authorization
+### @desc Payment-forge settlement authorization description
 `agents/payment-forge.clar` keeps the public
 `settle-sbc-obligation(sbc, amount, token)` signature, but settlement is
 fail-closed unless `contract-caller` is either the configured settlement

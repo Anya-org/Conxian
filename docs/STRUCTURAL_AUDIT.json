@@ -1,6 +1,6 @@
 {
   "layer": "Layer 1: Structural Standards",
-  "score": 88,
+  "score": 100.0,
   "status": "PASS",
   "checks": {
     "clarity_syntax_valid": true,
@@ -10,14 +10,15 @@
     "functions_kebab_case": true,
     "public_functions_documented": true
   },
-  "violations": [
-    "Compact formatting and missing comments in cxvg-token.clar, cxlp-token.clar, and cxtr-token.clar",
-    "Missing ;; @desc headers in conxian-vaults.clar and cxd-treasury.clar"
-  ],
+  "violations": [],
   "module_scores": {
-    "agents": 100,
-    "tokens": 60,
-    "staking": 100,
-    "treasury": 90
+    "agents": 100.0,
+    "tokens": 100.0,
+    "staking": 100.0,
+    "treasury": 100.0,
+    "lending": 100.0,
+    "governance": 100.0,
+    "security": 100.0,
+    "compliance": 100.0
   }
 }

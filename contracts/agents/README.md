@@ -41,6 +41,9 @@ The Agents module implements autonomous "Fiscal Agents" that manage protocol ris
 | `set-risk-unit` | `(risk-unit principal)` | Configures the canonical publication target (Admin only). |
 | `get-risk-unit` | `()` | Returns the configured publication target. |
 | `initialize` | `(a principal)` | One-shot initialization; only the deployment-time admin may call it. |
+| `set-mock-gcr` | `(g uint)` | Compatibility stub for GCR updates. |
+| `set-tvl` | `(c uint) (p uint) (b uint)` | Compatibility stub for TVL updates. |
+| `update-pid-rates` | `()` | Compatibility stub for PID rate updates. |
 
 ### `agent-treasury.clar` (Compatibility Layer)
 | Function | Signature | Description |
@@ -59,6 +62,7 @@ The Agents module implements autonomous "Fiscal Agents" that manage protocol ris
 | `calculate-performance-adjustment` | `(metrics-ref <finance-metrics-trait>)` | Computes yield adjustments based on risk signals. |
 | `calculate-cybernetic-policy` | `(metrics-ref <finance-metrics-trait>)` | Calculates the dynamic allocation policy. |
 | `get-protocol-status` | `()` | Returns the compliance status and version. |
+| `is-authorized-admin` | `()` | Returns whether the sender is the current administrator. |
 | `initialize` | `(new-admin principal)` | Sets the initial administrator. |
 | `set-admin` | `(new-admin principal)` | Updates the administrator principal. |
 
@@ -70,6 +74,7 @@ The Agents module implements autonomous "Fiscal Agents" that manage protocol ris
 | `deploy-symmetry` | `(sbc-name (string-ascii 32), strategy principal, amount uint)` | Deploys symmetry to a yield strategy. |
 | `harvest-sovereign-yield` | `(sbc-name (string-ascii 32), strategy principal, yield-amount uint)` | Harvests yield from strategies (Admin only). |
 | `autonomous-yield-sweep` | `(sbc-name (string-ascii 32), strategy principal)` | Executes autonomous 20% yield sweep. |
+| `set-admin` | `(new-admin principal)` | Updates the administrator principal (Admin only). |
 | `get-sbc-status` | `(name (string-ascii 32))` | Returns the status of a specific SBC. |
 | `calculate-syi` | `(name (string-ascii 32))` | Calculates the Sovereign Yield Index (SYI). |
 | `get-protocol-status` | `()` | Returns the compliance status and version. |
@@ -82,6 +87,7 @@ The Agents module implements autonomous "Fiscal Agents" that manage protocol ris
 | `settle-sbc-obligation` | `(sbc (string-ascii 32), amount uint, token <sip-010-trait>)` | Settles SBC obligations via the Fiscal-Vault. |
 | `set-settlement-authority` | `(new-authority principal)` | Rotates the primary settlement authority (Admin only). |
 | `set-settlement-operator` | `(operator principal, active bool)` | Adds or removes an EOA or contract settlement operator (Admin only). |
+| `set-admin` | `(new-admin principal)` | Updates the administrator principal (Admin only). |
 | `get-iso-hash` | `(tx-id (buff 32))` | Returns the ISO hash for a transaction. |
 | `get-settlement-authority` | `()` | Returns the configured settlement authority. |
 | `is-settlement-operator` | `(operator principal)` | Reports whether a principal is an active settlement operator. |
@@ -140,7 +146,7 @@ Creating a new fiscal unit for specialized operations:
 - **Cybernetic Risk Score**: A dynamic value representing the safety of a protocol state, calculated using feedback loops from market data.
 - **Sovereign Business Cell (SBC)**: A logical fiscal unit within the protocol used to isolate liquidity and yield strategies.
 - **Strategic Symmetry**: The balanced allocation of protocol reserves across various yield-generating strategies.
-- **x402 Settlement**: A machine-to-machine settlement protocol inspired by "402 Payment Required", used for autonomous agentic commerce.
+- **x402 Machine-to-Machine Settlement**: A machine-to-machine settlement protocol inspired by "402 Payment Required", used for autonomous agentic commerce.
 - **Global Collateral Ratio (GCR)**: A measure of the protocol's total collateralization across all assets and liabilities.
 
 ## Testing (How-to)
