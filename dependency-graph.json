@@ -172,16 +172,19 @@
     "sip-standards"
   ],
   "liquidity-manager": [
+    "concentrated-liquidity-pool-v2",
     "concentrated-math",
     "defi-traits",
     "oracle",
-    "regulatory-adapter"
+    "regulatory-adapter",
+    "sip-standards"
   ],
   "protocol-invariant-monitor": [],
   "swap-manager": [],
   "vault": [],
   "swap-router": [
     "concentrated-liquidity-pool",
+    "concentrated-liquidity-pool-v2",
     "sip-standards",
     "conxian-protocol"
   ],

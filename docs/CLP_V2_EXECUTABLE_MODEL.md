@@ -7,7 +7,7 @@
 
 ## Version boundary
 
-`concentrated-liquidity-pool-v2` is a new custody and execution source of truth. It does not mutate, wrap, or silently route through the legacy `concentrated-liquidity-pool` contract. Legacy CLP, router, liquidity-manager, and transferable CXLP APIs remain compatibility surfaces and are not executable V2 entitlements.
+`concentrated-liquidity-pool-v2` is a new custody and execution source of truth. It does not mutate, wrap, or silently route through the legacy `concentrated-liquidity-pool` contract. Legacy CLP and transferable CXLP APIs remain compatibility surfaces and are not executable V2 entitlements. The router and liquidity manager expose separately named V2 entrypoints; every legacy entrypoint and semantic remains unchanged.
 
 V2 deliberately leaves CXLP outside the model. A transferable aggregate token cannot prove ownership of a specific pool, range, entry basis, fee checkpoint, or withdrawal lot. The canonical entitlement is the non-transferable V2 position ID and its immutable owner/range/liquidity record. V2 exposes no CXLP mint, burn, transfer, or compatibility authorization path, so there is only one entitlement model.
 
@@ -122,6 +122,16 @@ There is no price setter. Executable sqrt price and current tick change only in 
 - `get-position-pnl(position-id)`
 - `get-exact-il(position-id)`
 
+### Versioned integration surfaces
+
+- `liquidity-manager.open-position-v2` validates compliance and canonical V2 pool/token state, then calls V2 without pre-custody. Its manager map is keyed by the canonical V2 position ID and stores linkage metadata only after the pool succeeds.
+- `liquidity-manager.close-position-v2` is owner-only even if the caller is the legacy manager admin. It validates the manager record against the authoritative V2 owner, active lot, pool, range, liquidity, and token order before a full close to `tx-sender`.
+- `liquidity-manager.rebalance-position-v2` closes the old immutable lot to `tx-sender`, opens the replacement from `tx-sender`, and updates manager metadata only after both calls succeed. A replacement failure rolls back the close, custody transfers, ticks, accounting, and metadata atomically.
+- `liquidity-manager.get-v2-position-pnl` and `get-v2-exact-il` proxy V2 executable-state valuation. They do not use the legacy configured oracle and do not relabel outperformance as IL.
+- `swap-router.exact-input-single-v2` reads canonical token order and current sqrt price from V2, derives direction internally, applies router pause/source-isolation policy, and calls `swap-exact-input` without router custody.
+
+These V2 entrypoints accept amount, liquidity, and price-limit constraints only. They do not accept a trusted caller-supplied tick, oracle price, execution price, sqrt price, or direction.
+
 ## PnL and exact IL semantics
 
 PnL values use token1 as the valuation unit and the executable pool price:
@@ -136,6 +146,15 @@ This is distinct from any oracle-based price-movement proxy. V2 does not use an 
 
 ## Release gates
 
-Protocol fees remain separately accounted and locked. `release-protocol-fees-disabled` always returns `ERR-PROTOCOL-RELEASE-DISABLED`; there is no sweep or no-op success path. Enabling release requires an exact integration with the canonical collector: registered source/stream/asset, collector-computed amount, replay ID, private same-transaction pending debit, authenticated callback, and exact collector custody delta.
+Protocol fees remain separately accounted and locked. `release-protocol-fees-disabled` always returns `ERR-PROTOCOL-RELEASE-DISABLED`; there is no sweep, direct transfer, or no-op success path.
 
-CSF compatibility methods return `ERR-COMPATIBILITY-UNAVAILABLE`. They do not fabricate marker registration, flash liquidity, arbitrage settlement, yield, health, or an implicit pool `u1` route. Router and liquidity-manager migration to V2 is a dependent integration change, not part of this core candidate.
+The exact blocker is a rate-base mismatch: V2 already reserves a fixed 10% share of each assessed swap fee, while `protocol-fee-collector.settle-source-ft` applies the collector's own governed schedule to an eligible fee base. Passing either the gross swap amount or the already-reserved V2 amount through that API would respectively double-rate the trade or assess the reserved amount again; transferring first would also strand or misstate source custody relative to the collector's exact-delta callback model.
+
+Governance must choose and audit one of two explicit designs before release can be enabled:
+
+1. **Collector replaces the fixed V2 share.** Remove the fixed 10% reservation from V2 accounting and let the collector compute the only protocol assessment from a precisely defined eligible base.
+2. **Collector accepts reviewed fixed-amount ingress.** Add a separately reviewed collector API that authenticates V2, accepts the already-calculated fixed amount without applying another schedule, enforces replay protection, and proves the exact same-transaction custody delta.
+
+Until one option is approved and implemented end to end, V2 must not call `settle-source-ft`, transfer or sweep protocol reserves, or publish collector accounting that implies settlement occurred.
+
+CSF compatibility methods return `ERR-COMPATIBILITY-UNAVAILABLE`. They do not fabricate marker registration, flash liquidity, arbitrage settlement, yield, health, or an implicit pool `u1` route. The versioned router/manager entrypoints call V2 directly and do not misrepresent it as a CSF-compatible source.
