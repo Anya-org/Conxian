@@ -1,5 +1,17 @@
 # Documentation State
 
+## Current Session (43) - Issue #558 Proof-of-Reserves Binding
+
+{
+  "status": "IMPLEMENTED_ON_FOCUSED_BRANCH",
+  "session_timestamp": "2026-07-25",
+  "scope": "Replaced the unsafe proof-of-reserves submission boundary with canonical shared snapshots, signer-bound secp256k1 envelopes, bounded versioned attestor authority, distinct fold-derived quorum, replay protection, live SIP-010 reconciliation, focused signing tests, and a consumer contamination guard.",
+  "branch": "fix/558-proof-of-reserves-binding",
+  "ownership": "Repository implementation and verifier tests for Conxian/Conxian issue #558.",
+  "boundary": "The verifier authenticates registered signatures and exact represented state. It does not qualify auditors/oracles, independently prove off-chain custody, provide production support, or establish mainnet/testnet deployment or broadcast.",
+  "deployment": "Not attempted. Deployment-plan inclusion remains metadata/preflight only."
+}
+
 ## Current Session (42) - Main Branch Governance (CON-1521)
 
 {
