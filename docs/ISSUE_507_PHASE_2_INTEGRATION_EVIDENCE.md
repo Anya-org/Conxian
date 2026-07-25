@@ -251,4 +251,20 @@ Before a future Phase 2 implementation PR can change the current **NO-GO**:
 | Deployment evidence | Structured receipts, source hash, plan hash, and post-initialization read-back; no plan-only claim. |
 | Decision | Named approver, date, and explicit GO or NO-GO. |
 
-*Last updated: July 25, 2026.*
+The machine gate accepts only explicit `mainnet` or `testnet` target-network
+values. Each required matrix ID must appear exactly once with its expected kind:
+`token`, `registry`, `deposit`, `withdrawal`, and `bootstrap-signers` are
+`contract`; `signer-state` is `state`; and `emily` is `service`. Unexpected,
+duplicate, missing, or wrong-kind cells fail closed.
+
+Contract cells require a network-valid contract principal, `chainVerified: true`,
+a past UTC `verifiedAt`, immutable official `stacks-sbtc/sbtc`
+provenance (`sourceUrl`, pinned `sourceCommit`, and `sourceSha256`), plus an
+on-chain `readBack` whose principal and source hash match. Signer state requires
+the same chain/provenance/timestamp guarantees and a substantive state value
+matched by its read-back; the schema does not invent a signer identity or
+threshold. Emily requires a non-placeholder HTTPS endpoint, API/schema version,
+`liveVerified: true`, a past UTC verification timestamp, and equivalent pinned
+`schemaEvidence`. Verification booleans without those fields never grant GO.
+
+**Last updated**: July 25, 2026.
