@@ -23,14 +23,14 @@ snapshot-bound verifier and must not be used as reserve authority.
 
 ## Canonical signing table
 
-domain/algorithm values map to separate sentinel tags for digest-difference
-evidence and are rejected before verification. Each `uint` uses Clarity's
 The common snapshot digest maps each accepted ASCII configuration value to an
-explicit byte tag and hashes that tag to a fixed 32-byte leaf. Public digest
-helpers reject unsupported or inconsistent schema, domain, algorithm, network,
-chain, and registry-epoch inputs instead of returning sentinel-derived hashes.
-Each `uint` uses Clarity's native `sha256(uint)` encoding; fixed identities are
-already 32 bytes. Ordered group hashes produce one `(buff 32)` snapshot digest.
+explicit byte tag and hashes the tag to a fixed 32-byte leaf. Each `uint` leaf
+uses Clarity's native `sha256(uint)` encoding, while fixed 32-byte identities
+and digests are included directly. The ordered identity and reserve leaves are
+hashed into two groups, then those group hashes are concatenated and hashed to
+produce the `(buff 32)` snapshot digest. Public helpers reject unsupported or
+inconsistent schema, domain, algorithm, network, chain, and registry-epoch
+inputs before computing a digest.
 
 | Layer | Ordered fields |
 |-------|----------------|
@@ -47,6 +47,11 @@ is rejected by both the public digest helper and attestation submission.
 
 - Effective registry/configuration/control changes increment `registry-epoch`;
   previously accepted proof status fails closed until a new quorum is promoted.
+- An accepted snapshot is replaced only by a candidate with a strictly greater
+  `snapshot-height`. This monotonic rule intentionally favors safety over
+  availability: a corrected snapshot at the same burn height cannot replace
+  the accepted snapshot, so status remains fail-closed until a later-height
+  snapshot reaches quorum.
 - Idempotent setters return `(ok false)` without invalidating proof state.
   Removing a missing or already inactive attestor/asset returns the relevant
   validation error without advancing the epoch.
