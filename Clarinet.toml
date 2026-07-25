@@ -614,6 +614,7 @@ clarity-version = 4
 [contracts.lending-orchestrator]
 path = "contracts/lending/lending-orchestrator.clar"
 clarity-version = 4
+depends_on = ["bme-engine", "enhanced-circuit-breaker", "protocol-fee-collector", "protocol-fee-source-trait", "sip-standards"]
 
 [contracts.lending-protocol-governance]
 path = "contracts/governance/lending-protocol-governance.clar"
@@ -1008,7 +1009,7 @@ clarity-version = 4
 [contracts.test-c4-helper]
 path = "contracts/test-helpers/test-c4-helper.clar"
 clarity-version = 4
-depends_on = ["opex-vault", "protocol-fee-collector", "sip-standards"]
+depends_on = ["opex-vault", "protocol-fee-collector", "protocol-fee-source-trait", "sip-standards"]
 
 [contracts.timelock]
 path = "contracts/governance/timelock.clar"

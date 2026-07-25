@@ -720,9 +720,9 @@ path = "contracts/governance/timelock.clar"
 depends_on = [ "conxian-access",]
 
 [contracts.lending-orchestrator]
-path = "contracts/lending/lending-manager.clar"
+path = "contracts/lending/lending-orchestrator.clar"
 clarity-version = 4
-depends_on = [ "protocol-fee-collector", "protocol-fee-source-trait", "sip-standards",]
+depends_on = [ "bme-engine", "enhanced-circuit-breaker", "protocol-fee-collector", "protocol-fee-source-trait", "sip-standards",]
 
 [contracts.interest-rate-model]
 path = "contracts/lending/interest-rate-model.clar"
