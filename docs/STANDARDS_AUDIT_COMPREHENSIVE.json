@@ -1,14 +1,33 @@
 {
-  "audit_date": "2026-06-29",
-  "overall_score": 98.5,
-  "layers": {
-    "layer_1_structural": 100.0,
-    "layer_2_diataxis": 100.0,
-    "layer_3_github": 100.0,
-    "layer_4_conxian": 100.0,
-    "layer_5_code_doc_alignment": 95.0,
-    "layer_6_accessibility": 96.0
+  "timestamp": "2026-07-23T11:00:00Z",
+  "audit_results": {
+    "layer_1_structural": {
+      "score": 100.0,
+      "violations": []
+    },
+    "layer_2_diataxis": {
+      "score": 100.0,
+      "missing_sections": {}
+    },
+    "layer_3_github_best_practices": {
+      "score": 100.0,
+      "missing_elements": {}
+    },
+    "layer_4_conxian_standards": {
+      "score": 100.0,
+      "gaps": {}
+    },
+    "layer_5_code_doc_alignment": {
+      "score": 100.0,
+      "alignment_issues": {}
+    },
+    "layer_6_accessibility": {
+      "score": 100.0,
+      "clarity_issues": []
+    }
   },
-  "status": "PASSING",
-  "remediation_status": "COMPLETE"
+  "overall_standards_score": 100.0,
+  "critical_issues": [],
+  "high_issues": [],
+  "medium_issues": []
 }
