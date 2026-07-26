@@ -71,6 +71,7 @@ EXPECTED_STACKS_NODES = {
 }
 EXPECTED_PUBLISH_COSTS = {"testnet": 20000, "mainnet": 50000}
 EXPECTED_CALL_COST = 10000
+SUPPORTED_EPOCHS = frozenset({2.0, 2.05, 2.1, 2.2, 2.3, 2.4, 2.5, 3.0, 3.1, 3.2, 3.3})
 
 
 class ReleasePlanValidationError(ValueError):
@@ -86,6 +87,7 @@ class ContractDefinition:
     name: str
     source_path: str
     clarity_version: int
+    epoch: float
     depends_on: tuple[str, ...]
 
 
@@ -94,6 +96,7 @@ class PublishTransaction:
     contract_name: str
     path: str
     clarity_version: int
+    epoch: float | None
     expected_sender: str
     cost: Any
     batch_index: int
@@ -245,6 +248,15 @@ def load_clarinet_manifest(manifest_path: Path, repo_root: Path | None = None) -
             errors.append(f"contract {name} clarity-version must be an integer")
             clarity_version = 4
 
+        epoch = raw_definition.get("epoch", 3.0)
+        if (
+            not isinstance(epoch, (int, float))
+            or isinstance(epoch, bool)
+            or float(epoch) not in SUPPORTED_EPOCHS
+        ):
+            errors.append(f"contract {name} epoch must be one of {sorted(SUPPORTED_EPOCHS)}")
+            epoch = 3.0
+
         dependencies = raw_definition.get("depends_on", [])
         if not isinstance(dependencies, list) or not all(isinstance(item, str) and item for item in dependencies):
             errors.append(f"contract {name} depends_on must be a list of non-empty contract names")
@@ -256,6 +268,7 @@ def load_clarinet_manifest(manifest_path: Path, repo_root: Path | None = None) -
             name=name,
             source_path=source_path,
             clarity_version=clarity_version,
+            epoch=float(epoch),
             depends_on=tuple(dependencies),
         )
 
@@ -350,6 +363,7 @@ def extract_simnet_publish_batches(document: Mapping[str, Any], path_label: str 
                     contract_name=name,
                     path=source_path,
                     clarity_version=clarity_version,
+                    epoch=None,
                     expected_sender="",
                     cost=None,
                     batch_index=batch_index,
@@ -640,11 +654,23 @@ def parse_release_plan(document: Mapping[str, Any], path_label: str) -> ParsedRe
                 if not isinstance(clarity_version, int):
                     errors.append(f"{path_label}: release publish {contract_name} clarity-version must be an integer")
                     clarity_version = 4
+                epoch = body.get("epoch")
+                if (
+                    not isinstance(epoch, (int, float))
+                    or isinstance(epoch, bool)
+                    or float(epoch) not in SUPPORTED_EPOCHS
+                ):
+                    errors.append(
+                        f"{path_label}: release publish {contract_name} epoch must be one of "
+                        f"{sorted(SUPPORTED_EPOCHS)}"
+                    )
+                    epoch = None
                 publishes.append(
                     PublishTransaction(
                         contract_name=contract_name,
                         path=source_path,
                         clarity_version=clarity_version,
+                        epoch=float(epoch) if epoch is not None else None,
                         expected_sender=expected_sender,
                         cost=cost,
                         batch_index=batch_index,
@@ -659,7 +685,7 @@ def parse_release_plan(document: Mapping[str, Any], path_label: str) -> ParsedRe
                         source_path,
                         clarity_version,
                         bool(body.get("anchor-block-only", False)),
-                        body.get("epoch"),
+                        float(epoch) if epoch is not None else None,
                         _normalize_principals(expected_sender),
                         cost,
                     )
@@ -860,6 +886,11 @@ def validate_release_plan(
             errors.append(
                 f"{parsed.path_label}: contract {entry.contract_name} clarity-version {entry.clarity_version} "
                 f"does not match active Clarinet.toml value {definition.clarity_version}"
+            )
+        if entry.epoch != definition.epoch:
+            errors.append(
+                f"{parsed.path_label}: contract {entry.contract_name} epoch {entry.epoch} "
+                f"does not match active Clarinet.toml value {definition.epoch}"
             )
         source_file = _source_file(repo_root, entry.path)
         if source_file is None or not source_file.is_file():

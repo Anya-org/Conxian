@@ -9,6 +9,10 @@ The module implements multiple layers of protection:
 - **Solvency**: `conxian-insurance-fund.clar` manages a reserve of assets to cover unexpected losses.
 - **Operational Safety**: `rate-limiter.clar` prevents large-scale drainage or spam.
 - **MEV Protection**: Dedicated NFT-based protection layers against sandwich attacks and front-running.
+- **Reserve Attestation Boundary**: `proof-of-reserves.clar` verifies a bounded
+  distinct-attestor quorum over chain-, contract-, asset-, balance-, supply-,
+  backing-, burn-height-, expiry-, and nonce-bound snapshots. See
+  `docs/PROOF_OF_RESERVES.md`; this is not an audit or deployment claim.
 
 ## Core Contracts (Reference)
 
@@ -69,13 +73,13 @@ Comprehensive validation is performed using the Vitest framework.
 |------|------------|
 | **Circuit Breaker** | An emergency mechanism that halts specific protocol functions or entire modules during a security incident to prevent further damage. |
 | **MEV (Maximal Extractable Value)** | The profit a block producer (or other actors) can extract by reordering, including, or excluding transactions within a block. |
-| **Proof of Reserves (PoR)** | A transparency mechanism that proves an entity has sufficient on-chain and off-chain assets to cover its liabilities. |
+| **Proof of Reserves (PoR)** | A cryptographic attestation mechanism that reports sufficient represented reserves only while exact live state and active signer quorum remain valid; it does not independently prove off-chain custody. |
 | **Insurance Fund** | A reserve of assets held by the protocol to cover unexpected losses, such as liquidations that fail to cover debt. |
 | **Veto Quorum** | The minimum number of authorized participants required to trigger a systemic veto and halt administrative functions. |
 | **Rate Limiting** | A defensive strategy that limits the number of operations or amount of value a user can move within a specific time window. |
 
 ## Status (Reference)
-- Implementation: Production-Ready (v1.2.0)
-- Audit Status: Internally Verified
+- Implementation: Active source with fail-closed PoR verification; deployment not claimed
+- Audit Status: No external auditor/oracle qualification claimed
 - BIP Compliance: BIP-341, BIP-342, BIP-174
 - Standard: Hexagonal, Defensive Engineering, CSF-Integrated
