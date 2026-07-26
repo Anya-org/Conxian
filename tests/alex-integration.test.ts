@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import { Cl } from "@stacks/transactions";
 import { initializeSimnet } from "./setup-test-env";
 
-describe("ALEX CSF Integration", () => {
+describe("ALEX CSF simnet fixtures", () => {
   let simnet: any;
   let deployer: any;
 
@@ -16,20 +16,20 @@ describe("ALEX CSF Integration", () => {
     simnet.callPublicFn("mock-token", "mint", [Cl.uint(100000000), Cl.principal(deployer + ".swap-router")], deployer);
   });
 
-  it("should allow registering ALEX adapter as a CSF protocol", () => {
+  it("registers the simnet ALEX adapter fixture as a CSF protocol", () => {
     const registerCall = simnet.callPublicFn(
       "dex-factory",
       "register-csf-protocol",
       [
         Cl.principal(`${deployer}.alex-adapter`),
-        Cl.stringAscii("ALEX Lab Mainnet")
+        Cl.stringAscii("ALEX simnet fixture")
       ],
       deployer
     );
     expect(registerCall.result).toEqual(Cl.ok(Cl.bool(true)));
   });
 
-  it("should execute a swap through the ALEX adapter via swap-router", () => {
+  it("executes a deterministic swap through the simnet helper fixture", () => {
     const swapCall = simnet.callPublicFn(
       "swap-router",
       "csf-swap",
@@ -45,7 +45,7 @@ describe("ALEX CSF Integration", () => {
     expect(swapCall.result).toEqual(Cl.ok(Cl.uint(1000000)));
   });
 
-  it("should return health telemetry from ALEX adapter", () => {
+  it("returns deterministic telemetry from the simnet reserve fixture", () => {
     const healthCall = simnet.callPublicFn(
       "alex-adapter",
       "get-csf-health",

@@ -27,6 +27,13 @@ const issue506ProductionContracts = [
   ["auto-compounder", "contracts/yield/auto-compounder.clar"],
   ["cxd-staking", "contracts/yield/cxd-staking.clar"],
 ] as const;
+const alexLaunchReadinessPath = path.join(repoRoot, "docs/ALEX_LAUNCH_READINESS.md");
+const alexEvidenceTemplatePath = path.join(repoRoot, "docs/ALEX_PRODUCTION_EVIDENCE_TEMPLATE.md");
+const alexSimnetAdapterPath = path.join(
+  repoRoot,
+  "contracts/integrations/simnet/alex-adapter.clar",
+);
+const alexIntegrationTestPath = path.join(repoRoot, "tests/alex-integration.test.ts");
 
 const alexProductionNames = /\b(?:alex-adapter|alex-reserve-pool|alex-swap-helper|swap-helper-v1-03)\b/i;
 const localOnlyIntegrationPath = /contracts\/integrations\/(?:simnet|stubs)\//;
@@ -105,6 +112,20 @@ function extractManifestPhases(content: string): Map<string, number> {
 }
 
 describe("ALEX release wiring guard", () => {
+  it("links the fail-closed evidence record and labels retained code as simnet fixtures", () => {
+    const readiness = readArtifact(alexLaunchReadinessPath);
+    const evidenceTemplate = readArtifact(alexEvidenceTemplatePath);
+    const adapter = readArtifact(alexSimnetAdapterPath);
+    const integrationTest = readArtifact(alexIntegrationTestPath);
+
+    expect(readiness).toContain("./ALEX_PRODUCTION_EVIDENCE_TEMPLATE.md");
+    expect(evidenceTemplate).toMatch(
+      /cannot\s+authorize generation, publish, registration, or routing/,
+    );
+    expect(adapter).toContain("Simnet-only Conxian CSF fixture");
+    expect(integrationTest).toContain('describe("ALEX CSF simnet fixtures"');
+  });
+
   it("keeps the ALEX adapter and helper/reserve stubs available only to simnet", () => {
     const simnetPlan = readCanonicalSimnetPlan();
     const simnetPublishes = extractContractPublishEntries(simnetPlan);
