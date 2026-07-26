@@ -322,10 +322,26 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
+        contract-name: concentrated-math-v2
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 20000
+        path: contracts/math/concentrated-math-v2.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
         contract-name: controller-traits
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 20000
         path: contracts/traits/controller-traits.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: concentrated-liquidity-pool-v2
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 20000
+        path: contracts/dex/concentrated-liquidity-pool-v2.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
@@ -369,6 +385,8 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
+  - id: 2
+    transactions:
     - contract-publish:
         contract-name: conxian-service-trait
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -377,8 +395,6 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
-  - id: 2
-    transactions:
     - contract-publish:
         contract-name: vault-traits
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -960,14 +976,6 @@ plan:
         clarity-version: 4
         epoch: 3.0
     - contract-publish:
-        contract-name: lending-orchestrator
-        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
-        cost: 20000
-        path: contracts/lending/lending-orchestrator.clar
-        anchor-block-only: true
-        clarity-version: 4
-        epoch: 3.0
-    - contract-publish:
         contract-name: lending-protocol-governance
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 20000
@@ -983,8 +991,6 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
-  - id: 5
-    transactions:
     - contract-publish:
         contract-name: oracle
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -993,6 +999,8 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
+  - id: 5
+    transactions:
     - contract-publish:
         contract-name: liquidity-manager
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -1145,8 +1153,6 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
-  - id: 6
-    transactions:
     - contract-publish:
         contract-name: revenue-distributor
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -1155,6 +1161,8 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
+  - id: 6
+    transactions:
     - contract-publish:
         contract-name: economic-policy-engine
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -1243,8 +1251,6 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
-  - id: 7
-    transactions:
     - contract-publish:
         contract-name: performance-optimizer
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -1253,6 +1259,8 @@ plan:
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
+  - id: 7
+    transactions:
     - contract-publish:
         contract-name: points-oracle
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -1348,7 +1356,7 @@ plan:
         path: contracts/security/proof-of-reserves.clar
         anchor-block-only: true
         clarity-version: 4
-        epoch: 3.0
+        epoch: 3.3
     - contract-publish:
         contract-name: proposal-registry
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
@@ -1410,6 +1418,14 @@ plan:
         expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
         cost: 20000
         path: contracts/lending/lending-manager.clar
+        anchor-block-only: true
+        clarity-version: 4
+        epoch: 3.0
+    - contract-publish:
+        contract-name: lending-orchestrator
+        expected-sender: ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P
+        cost: 20000
+        path: contracts/lending/lending-orchestrator.clar
         anchor-block-only: true
         clarity-version: 4
         epoch: 3.0
