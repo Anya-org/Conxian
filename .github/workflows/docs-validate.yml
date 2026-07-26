@@ -7,15 +7,34 @@ on:
       - '**.md'
       - 'docs/**'
       - 'AGENTS.md'
+      - 'contracts/**/*.clar'
+      - 'tests/**/*.test.ts'
+      - 'tests/**/*.spec.ts'
+      - 'Clarinet.toml'
+      - 'deployments/full-system.*-plan.yaml'
+      - 'scripts/validate-docs.js'
+      - 'scripts/verify-knowledge-base.py'
+      - 'tests/validate-docs.test.js'
+      - 'tests/test_verify_knowledge_base.py'
+      - 'package.json'
   pull_request:
     paths:
       - '**.md'
       - 'docs/**'
       - 'AGENTS.md'
+      - 'contracts/**/*.clar'
+      - 'tests/**/*.test.ts'
+      - 'tests/**/*.spec.ts'
+      - 'Clarinet.toml'
+      - 'deployments/full-system.*-plan.yaml'
+      - 'scripts/validate-docs.js'
+      - 'scripts/verify-knowledge-base.py'
+      - 'tests/validate-docs.test.js'
+      - 'tests/test_verify_knowledge_base.py'
+      - 'package.json'
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   docs-validate:
@@ -26,7 +45,20 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Validate Markdown Links
+      - name: Install knowledge-base validator dependency
+        run: python3 -m pip install --user --disable-pip-version-check 'PyYAML==6.0.2'
+
+      - name: Test local documentation validators
+        run: |
+          npm run test:docs-validation
+          npm run test:knowledge-base
+
+      - name: Validate local documentation and knowledge base
+        run: |
+          npm run validate:docs
+          npm run verify:knowledge-base
+
+      - name: Validate external Markdown links
         uses: gaurav-nelson/github-action-markdown-link-check@5c5dfc0ac2e225883c0e5f03a85311ec2830d368 # v1
         with:
           use-quiet-mode: yes
@@ -50,6 +82,7 @@ jobs:
             "SECURITY.md"
             "AGENTS.md"
             "docs/index.md"
+            "docs/DOCUMENTATION_STATE.md"
           )
           
           for file in "${REQUIRED_FILES[@]}"; do
@@ -60,22 +93,8 @@ jobs:
             echo "FOUND: $file"
           done
 
-      - name: Check for Broken Internal Links
-        run: |
-          # Check that all docs links point to existing files
-          grep -rhn ']\(' docs/ | while read -r line; do
-            link=$(echo "$line" | sed -n 's/.*](\([^)]*\)).*/\1/p')
-            # Skip external links and anchors
-            if [[ ! "$link" =~ ^http ]] && [[ ! "$link" =~ ^# ]]; then
-              # Remove anchors
-              link="${link%%#*}"
-              if [ -n "$link" ] && [ ! -f "$link" ]; then
-                echo "BROKEN LINK: $link (in $line)"
-              fi
-            fi
-          done || echo "Link check completed"
-
   session-state-validate:
+    needs: docs-validate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -83,27 +102,15 @@ jobs:
 
       - name: Validate DOCUMENTATION_STATE.md
         run: |
-          if [ -f "docs/DOCUMENTATION_STATE.md" ]; then
-            # Check for valid JSON blocks
-            grep -c "^{" docs/DOCUMENTATION_STATE.md || echo "No JSON blocks found"
-            
-            # Verify last session is marked COMPLETED
-            LAST_STATUS=$(grep -o '"status": "[^"]*"' docs/DOCUMENTATION_STATE.md | head -1)
-            echo "Last session status: $LAST_STATUS"
+          if [ ! -s "docs/DOCUMENTATION_STATE.md" ]; then
+            echo "MISSING OR EMPTY: docs/DOCUMENTATION_STATE.md"
+            exit 1
           fi
 
-      - name: Comment on PR
-        if: github.event_name == 'pull_request'
-        run: |
-          COMMENT="## Documentation Validation Results
-          
-          ✓ Markdown link validation passed
-          ✓ Documentation freshness verified
-          ✓ Required files present
-          ✓ Session state validated
-          
-          _Automated check by Conxian CI_"
-          
-          gh pr comment ${{ github.event.pull_request.number }} --body "$COMMENT"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LAST_STATUS=$(grep -m1 -o '"status": "[^"]*"' docs/DOCUMENTATION_STATE.md || true)
+          if [ -z "$LAST_STATUS" ]; then
+            echo "docs/DOCUMENTATION_STATE.md does not report a session status"
+            exit 1
+          fi
+
+          echo "Session state file is present; reported status: $LAST_STATUS"
