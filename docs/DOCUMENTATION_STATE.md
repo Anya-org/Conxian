@@ -34,7 +34,7 @@
     ],
     "conditional_validation": "validate-protocol is conditional and must not be configured as a universally required context; protocol-merge-gate is the stable aggregator emitted for every pull request targeting main."
   },
-  "deployment_boundary": "Testnet and mainnet workflows are preflight/plan-only. They do not sign, broadcast, invoke an on-chain deployment command, or provide deployment proof. Non-dry remains blocked pending issue #531, upstream prerequisites, and an approved signer-derived identity.",
+  "deployment_boundary": "Testnet and mainnet workflows are preflight/plan-only. They do not sign, broadcast, invoke an on-chain deployment command, or provide deployment proof. Issue #531 delivered the preflight/evidence-control foundation, but non-dry remains blocked absent an approved signer-derived SP/SM identity, an authorized receipt-producing broadcaster/execution path, complete plan-bound receipts/readbacks, and unresolved policy or implementation gates.",
   "follow_up": "The docs-CI and knowledge-base remediation on branch charlie/pr-583-cicd-kb-alignment is not claimed here to be merged into main. Historical records that reported scripts/validate-docs.js as missing describe their earlier execution context; this follow-up adds that validator."
 }
 
@@ -430,22 +430,18 @@ supersedes its trust-model and coverage claims.
       ]
     },
     "deployment_verification": {
-      "critical_finding": "MAINNET DEPLOYMENT NOT ACTUALLY EXECUTED",
+      "status": "SUPERSEDED_HISTORICAL_ADDRESS_SNAPSHOT",
+      "scope": "Historical observation recorded on 2026-07-15 for one documented ST-form address and the workflow state at that time. It does not establish global contract nonexistence or current on-chain state.",
       "evidence": {
         "deployer_address": "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P",
         "on_chain_balance": "0 STX",
         "on_chain_transactions": "0 (no transactions ever)",
         "workflow_status": "success (but dry_run: true by default)"
       },
-      "root_cause": "deploy-mainnet.yml workflow has dry_run: true by default. Actual deployment requires dry_run: false AND confirm: DEPLOY_MAINNET",
-      "impact": "No Conxian contracts exist on Stacks mainnet. alex-adapter references ALEX Lab contracts at SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9 but cannot be tested without Conxian contracts deployed",
-      "resolution_required": [
-        "Fund deployer address with ~11 STX for deployment fees",
-        "Trigger workflow with dry_run: false and confirm: DEPLOY_MAINNET",
-        "Verify deployment with blockchain API calls"
-      ]
+      "current_boundary": "As of July 2026, deploy-mainnet.yml is preflight/plan-only and rejects the unresolved ST-form plan identity before signing. Do not fund, capitalize, or use that identity for non-dry mainnet execution.",
+      "proof_requirement": "No current deployment proof exists without complete plan-bound confirmed receipts, contract interfaces, and read-only/API readbacks tied to an approved signer-derived mainnet identity and authorized execution path. Address checks remain limited to the addresses and times checked."
     },
-    "summary": "Implemented knowledge base automation AND verified deployment status. CRITICAL FINDING: Mainnet contracts NOT deployed. Updated AGENTS.md with accurate deployment status."
+    "summary": "Implemented knowledge base automation and recorded a historical address-scoped deployment observation. The former global mainnet conclusion and ST-form funding/execution recommendation are superseded by the July 2026 preflight-only workflow and evidence requirements."
   }
 }
 
