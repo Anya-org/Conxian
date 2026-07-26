@@ -4,7 +4,7 @@ This runbook defines the evidence and recovery controls for a future partnership
 
 ## 1. Scope and blocked upstream gates
 
-The current issue #531 scope is deployment safety and evidence only.
+Completed work under issue #531 provides the preflight, plan-validation, and evidence-verifier foundations; issue #531 remains open for its original deployment/evidence acceptance criteria.
 
 - Issues #527–#530 are unresolved and remain upstream blockers. Do not add partnership Clarity contracts, guessed principals, wiring, economics, or release-plan entries until those decisions are approved and implemented.
 - Release gates #515 and #526 must be explicitly cleared before a partnership release is considered.
@@ -121,7 +121,7 @@ Mainnet remains manual only, and the current GitHub workflow is preflight-only:
 3. Use the protected `mainnet` GitHub environment and its required reviewers.
 4. Confirm that the committed plan digest, network, source commit, and deployer identity are the approved values. The current `ST...` identity in the mainnet plan is an unresolved blocker, not an authorization to broadcast.
 5. Expect the workflow to validate the plan and emit clearly labeled plan/preflight/log artifacts only. It does not invoke `clarinet deployments apply`, load a mnemonic, sign, or broadcast.
-6. Every non-dry path must stop before signing until a structured receipt-producing broadcaster and complete evidence path exist for issue #531. Do not create placeholder txids or treat dashboard/debug logs as proof.
+6. Every non-dry path must stop before signing until an approved signer identity and authorized structured receipt-producing broadcaster/execution path exist and the applicable complete plan-bound evidence pack and readbacks are produced. Do not create placeholder txids or treat dashboard/debug logs as proof.
 
 The mainnet preflight job always starts, validates the confirmation, and fails visibly when `confirm` is missing or differs from `DEPLOY_MAINNET`; an incorrect confirmation is never represented as a green skipped deployment job. This confirmation gate does not authorize signing or broadcasting.
 
