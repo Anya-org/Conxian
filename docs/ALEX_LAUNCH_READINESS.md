@@ -49,10 +49,47 @@ configuration embedded in Conxian:
 The ALEX testnet can be reset. Confirm the network, contract code/version, and
 principal at the time of testing rather than relying on a stale address.
 
+## ABI and interface compatibility gate
+
+The simnet fixture APIs are not substitutes for live ALEX interfaces. In particular,
+the local helper/reserve fixtures may use different function names, argument types,
+trait shapes, optional values, and response types from the selected live contract.
+Passing fixture tests does not establish ABI compatibility.
+
+Before implementing any production-specific adapter, retrieve and digest the exact
+selected helper, pool, and reserve interfaces and sources. Review the implementation
+function-by-function against those versions, add focused compatibility and failure
+tests, and obtain independent approval. Do not adapt production calls by assuming
+that the local `claim-yield`, `get-reserve-balance`, principal arguments, or bare
+`uint` minimum-output fixture shapes exist in the live contracts.
+
+Record discovery and launch evidence in the
+[ALEX production evidence template](./ALEX_PRODUCTION_EVIDENCE_TEMPLATE.md). The
+template distinguishes timestamped interface discovery from the listing, funding,
+transaction, reconciliation, negative-path, ownership, and rollback evidence needed
+for a launch decision.
+
+### Timestamped discovery note (July 25, 2026)
+
+The official mainnet references and live Hiro interfaces reviewed for Issue #526
+were:
+
+- [ALEX mainnet deployed contracts](https://docs.alexlab.co/developers/integrations/networks/mainnet)
+- [`swap-helper-v1-03` live interface](https://api.mainnet.hiro.so/v2/contracts/interface/SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9/swap-helper-v1-03)
+- [`alex-reserve-pool` live interface](https://api.mainnet.hiro.so/v2/contracts/interface/SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9/alex-reserve-pool)
+
+At that timestamp, the live `swap-helper-v1-03.swap-helper` interface used token
+traits and an optional `min-dy`; the local helper fixture uses principals and a bare
+`uint`. The live reserve exposed `claim-staking-reward` and `get-balance(token)`, not
+the local fixture's `claim-yield` and `get-reserve-balance`. This is discovery
+evidence only. It does not verify a Conxian listing, pool, liquidity, controlled swap,
+failure transaction, or production launch configuration.
+
 ## Required launch inputs
 
 Before production wiring is considered, record all of the following with no
-placeholders:
+placeholders in the
+[ALEX production evidence template](./ALEX_PRODUCTION_EVIDENCE_TEMPLATE.md):
 
 - Exact Conxian launch token contract and asset name.
 - Target network.
