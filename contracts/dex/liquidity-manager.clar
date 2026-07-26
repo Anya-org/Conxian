@@ -12,6 +12,7 @@
 ;; on-chain pool or token registry.
 
 (use-trait oracle-trait .defi-traits.oracle-trait)
+(use-trait sip-010-ft-trait .sip-standards.sip-010-ft-trait)
 
 ;; Stable public error identifiers.
 (define-constant ERR_UNAUTHORIZED (err u1000))
@@ -32,6 +33,10 @@
 (define-constant ERR_ARITHMETIC_OVERFLOW (err u2016))
 (define-constant ERR_POSITION_ID_OVERFLOW (err u2017))
 (define-constant ERR_INVALID_OBSERVED_TICK (err u2018))
+(define-constant ERR_V2_POSITION_NOT_MANAGED (err u2019))
+(define-constant ERR_V2_STATE_MISMATCH (err u2020))
+(define-constant ERR_V2_POOL_NOT_FOUND (err u2021))
+(define-constant ERR_V2_INVALID_PAIR (err u2022))
 
 (define-constant MAX_UINT u340282366920938463463374607431768211455)
 (define-constant BASIS_POINTS u10000)
@@ -73,6 +78,28 @@
     requested-at: uint,
     cancelled-at: (optional uint),
     active: bool
+  }
+)
+
+;; V2 execution metadata is keyed by the canonical pool position ID. The V2
+;; pool remains authoritative for ownership, range, liquidity, custody, fees,
+;; settlement, and PnL; this map records only manager linkage and lifecycle.
+(define-map v2-managed-positions uint
+  {
+    owner: principal,
+    pool-id: uint,
+    token-0: principal,
+    token-1: principal,
+    tick-lower: int,
+    tick-upper: int,
+    liquidity: uint,
+    deposited-0: uint,
+    deposited-1: uint,
+    active: bool,
+    opened-at: uint,
+    closed-at: (optional uint),
+    replaces: (optional uint),
+    replaced-by: (optional uint)
   }
 )
 
@@ -642,5 +669,265 @@
         })
       )
     )
+  )
+)
+
+;; --- Executable V2 positions --------------------------------------------
+
+;; @desc Open a canonical V2 position directly from tx-sender custody. The
+;; manager never pre-custodies funds and records metadata only after the pool
+;; has created and returned the authoritative position lot.
+(define-public (open-position-v2
+    (pool-id uint)
+    (token-0 <sip-010-ft-trait>)
+    (token-1 <sip-010-ft-trait>)
+    (tick-lower int)
+    (tick-upper int)
+    (max-amount0 uint)
+    (max-amount1 uint)
+    (min-liquidity uint)
+  )
+  (begin
+    (try! (assert-compliance))
+    (let ((pool (unwrap! (contract-call? .concentrated-liquidity-pool-v2 get-pool pool-id)
+      ERR_V2_POOL_NOT_FOUND)))
+      (begin
+        (asserts! (get active pool) (err u2307))
+        (asserts! (and
+          (is-eq (contract-of token-0) (get token-0 pool))
+          (is-eq (contract-of token-1) (get token-1 pool))) ERR_V2_INVALID_PAIR)
+        (let (
+            (opened (try! (contract-call? .concentrated-liquidity-pool-v2 add-liquidity
+              pool-id token-0 token-1 tick-lower tick-upper
+              max-amount0 max-amount1 min-liquidity)))
+            (position-id (get position-id opened))
+            (position (unwrap! (contract-call? .concentrated-liquidity-pool-v2 get-position
+              (get position-id opened)) ERR_V2_STATE_MISMATCH))
+          )
+          (begin
+            (asserts! (and
+              (is-eq (get owner position) tx-sender)
+              (is-eq (get pool-id position) pool-id)
+              (is-eq (get lower-tick position) tick-lower)
+              (is-eq (get upper-tick position) tick-upper)
+              (is-eq (get liquidity position) (get liquidity opened))
+              (is-eq (get deposited-0 position) (get amount0 opened))
+              (is-eq (get deposited-1 position) (get amount1 opened))
+              (get active position)
+              (not (get closed position))) ERR_V2_STATE_MISMATCH)
+            (map-set v2-managed-positions position-id {
+              owner: tx-sender,
+              pool-id: pool-id,
+              token-0: (contract-of token-0),
+              token-1: (contract-of token-1),
+              tick-lower: tick-lower,
+              tick-upper: tick-upper,
+              liquidity: (get liquidity opened),
+              deposited-0: (get amount0 opened),
+              deposited-1: (get amount1 opened),
+              active: true,
+              opened-at: block-height,
+              closed-at: none,
+              replaces: none,
+              replaced-by: none
+            })
+            (print {
+              event: "v2-managed-position-opened",
+              position-id: position-id,
+              owner: tx-sender,
+              pool-id: pool-id,
+              liquidity: (get liquidity opened),
+              amount0: (get amount0 opened),
+              amount1: (get amount1 opened)
+            })
+            (ok opened)
+          )
+        )
+      )
+    )
+  )
+)
+
+;; @desc Close an owner-controlled V2 lot in full. Legacy manager admin rights
+;; do not apply: tx-sender must match both manager metadata and V2 ownership.
+(define-public (close-position-v2
+    (position-id uint)
+    (token-0 <sip-010-ft-trait>)
+    (token-1 <sip-010-ft-trait>)
+    (min-amount0 uint)
+    (min-amount1 uint)
+  )
+  (let (
+      (managed (unwrap! (map-get? v2-managed-positions position-id) ERR_V2_POSITION_NOT_MANAGED))
+      (position (unwrap! (contract-call? .concentrated-liquidity-pool-v2 get-position position-id)
+        ERR_V2_STATE_MISMATCH))
+      (pool (unwrap! (contract-call? .concentrated-liquidity-pool-v2 get-pool (get pool-id managed))
+        ERR_V2_POOL_NOT_FOUND))
+    )
+    (begin
+      (asserts! (is-eq tx-sender (get owner managed)) ERR_UNAUTHORIZED)
+      (asserts! (and (get active managed)
+        (get active position) (not (get closed position))
+        (is-eq (get owner position) tx-sender)
+        (is-eq (get pool-id position) (get pool-id managed))
+        (is-eq (get lower-tick position) (get tick-lower managed))
+        (is-eq (get upper-tick position) (get tick-upper managed))
+        (is-eq (get liquidity position) (get liquidity managed))
+        (is-eq (get token-0 managed) (get token-0 pool))
+        (is-eq (get token-1 managed) (get token-1 pool))
+        (is-eq (contract-of token-0) (get token-0 pool))
+        (is-eq (contract-of token-1) (get token-1 pool))) ERR_V2_STATE_MISMATCH)
+      (let ((closed (try! (contract-call? .concentrated-liquidity-pool-v2 remove-liquidity
+        position-id token-0 token-1 min-amount0 min-amount1 tx-sender))))
+        (begin
+          (map-set v2-managed-positions position-id (merge managed {
+            active: false,
+            closed-at: (some block-height)
+          }))
+          (print {
+            event: "v2-managed-position-closed",
+            position-id: position-id,
+            owner: tx-sender,
+            amount0: (get amount0 closed),
+            amount1: (get amount1 closed)
+          })
+          (ok closed)
+        )
+      )
+    )
+  )
+)
+
+;; @desc Atomically close one canonical V2 lot to tx-sender and open its
+;; replacement from tx-sender. If replacement creation fails, Clarity rolls
+;; back the close, transfers, tick changes, pool accounting, and manager maps.
+(define-public (rebalance-position-v2
+    (position-id uint)
+    (token-0 <sip-010-ft-trait>)
+    (token-1 <sip-010-ft-trait>)
+    (target-tick-lower int)
+    (target-tick-upper int)
+    (max-amount0 uint)
+    (max-amount1 uint)
+    (min-liquidity uint)
+    (min-close-amount0 uint)
+    (min-close-amount1 uint)
+  )
+  (let (
+      (managed (unwrap! (map-get? v2-managed-positions position-id) ERR_V2_POSITION_NOT_MANAGED))
+      (position (unwrap! (contract-call? .concentrated-liquidity-pool-v2 get-position position-id)
+        ERR_V2_STATE_MISMATCH))
+      (pool (unwrap! (contract-call? .concentrated-liquidity-pool-v2 get-pool (get pool-id managed))
+        ERR_V2_POOL_NOT_FOUND))
+    )
+    (begin
+      (try! (assert-compliance))
+      (asserts! (is-eq tx-sender (get owner managed)) ERR_UNAUTHORIZED)
+      (asserts! (and (get active managed)
+        (get active position) (not (get closed position))
+        (is-eq (get owner position) tx-sender)
+        (is-eq (get pool-id position) (get pool-id managed))
+        (is-eq (get lower-tick position) (get tick-lower managed))
+        (is-eq (get upper-tick position) (get tick-upper managed))
+        (is-eq (get liquidity position) (get liquidity managed))
+        (is-eq (get token-0 managed) (get token-0 pool))
+        (is-eq (get token-1 managed) (get token-1 pool))
+        (is-eq (contract-of token-0) (get token-0 pool))
+        (is-eq (contract-of token-1) (get token-1 pool))) ERR_V2_STATE_MISMATCH)
+      (let (
+          (closed (try! (contract-call? .concentrated-liquidity-pool-v2 remove-liquidity
+            position-id token-0 token-1 min-close-amount0 min-close-amount1 tx-sender)))
+          (opened (try! (contract-call? .concentrated-liquidity-pool-v2 add-liquidity
+            (get pool-id managed) token-0 token-1 target-tick-lower target-tick-upper
+            max-amount0 max-amount1 min-liquidity)))
+          (replacement-id (get position-id opened))
+          (replacement (unwrap! (contract-call? .concentrated-liquidity-pool-v2 get-position
+            (get position-id opened)) ERR_V2_STATE_MISMATCH))
+        )
+        (begin
+          (asserts! (and
+            (is-eq (get owner replacement) tx-sender)
+            (is-eq (get pool-id replacement) (get pool-id managed))
+            (is-eq (get lower-tick replacement) target-tick-lower)
+            (is-eq (get upper-tick replacement) target-tick-upper)
+            (is-eq (get liquidity replacement) (get liquidity opened))
+            (is-eq (get deposited-0 replacement) (get amount0 opened))
+            (is-eq (get deposited-1 replacement) (get amount1 opened))
+            (get active replacement)
+            (not (get closed replacement))) ERR_V2_STATE_MISMATCH)
+          (map-set v2-managed-positions position-id (merge managed {
+            active: false,
+            closed-at: (some block-height),
+            replaced-by: (some replacement-id)
+          }))
+          (map-set v2-managed-positions replacement-id {
+            owner: tx-sender,
+            pool-id: (get pool-id managed),
+            token-0: (get token-0 managed),
+            token-1: (get token-1 managed),
+            tick-lower: target-tick-lower,
+            tick-upper: target-tick-upper,
+            liquidity: (get liquidity opened),
+            deposited-0: (get amount0 opened),
+            deposited-1: (get amount1 opened),
+            active: true,
+            opened-at: block-height,
+            closed-at: none,
+            replaces: (some position-id),
+            replaced-by: none
+          })
+          (print {
+            event: "v2-managed-position-rebalanced",
+            old-position-id: position-id,
+            new-position-id: replacement-id,
+            owner: tx-sender,
+            closed-amount0: (get amount0 closed),
+            closed-amount1: (get amount1 closed),
+            opened-amount0: (get amount0 opened),
+            opened-amount1: (get amount1 opened)
+          })
+          (ok {
+            old-position-id: position-id,
+            new-position-id: replacement-id,
+            closed: closed,
+            opened: opened
+          })
+        )
+      )
+    )
+  )
+)
+
+;; @desc Read manager linkage only; use the V2 proxy reads below for economic
+;; state. The key is the canonical V2 position ID, not a manager-local ID.
+(define-read-only (get-v2-managed-position (position-id uint))
+  (map-get? v2-managed-positions position-id)
+)
+
+;; @desc Proxy the authoritative V2 lot without reinterpreting ownership,
+;; range, liquidity, fees, custody, or settlement state.
+(define-read-only (get-v2-authoritative-position (position-id uint))
+  (begin
+    (asserts! (is-some (map-get? v2-managed-positions position-id)) ERR_V2_POSITION_NOT_MANAGED)
+    (ok (unwrap! (contract-call? .concentrated-liquidity-pool-v2 get-position position-id)
+      ERR_V2_STATE_MISMATCH))
+  )
+)
+
+;; @desc Proxy V2 executable-state PnL. This is independent of the legacy
+;; configured oracle and preserves the pool's gain-versus-loss distinction.
+(define-read-only (get-v2-position-pnl (position-id uint))
+  (begin
+    (asserts! (is-some (map-get? v2-managed-positions position-id)) ERR_V2_POSITION_NOT_MANAGED)
+    (contract-call? .concentrated-liquidity-pool-v2 get-position-pnl position-id)
+  )
+)
+
+;; @desc Proxy V2 loss-only exact IL. Outperformance remains a separate field
+;; and is never mislabeled as impermanent loss.
+(define-read-only (get-v2-exact-il (position-id uint))
+  (begin
+    (asserts! (is-some (map-get? v2-managed-positions position-id)) ERR_V2_POSITION_NOT_MANAGED)
+    (contract-call? .concentrated-liquidity-pool-v2 get-exact-il position-id)
   )
 )

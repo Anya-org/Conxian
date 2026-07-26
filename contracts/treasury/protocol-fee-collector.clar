@@ -42,6 +42,7 @@
 (define-constant ERR_ASSET_BALANCE_READ_FAILED (err u4123))
 (define-constant ERR_SOURCE_CALLBACK_UNAUTHORIZED (err u4124))
 (define-constant ERR_SOURCE_CUSTODY_DELTA_MISMATCH (err u4125))
+(define-constant ERR_INVALID_RATE_POLICY (err u4126))
 (define-constant ERR_SETTLEMENT_IN_PROGRESS (err u4116))
 
 ;; --- Constants ---
@@ -61,10 +62,15 @@
 (define-constant RATE_LAUNCH_BPS u200)
 (define-constant RATE_GROWTH_BPS u150)
 (define-constant RATE_MATURE_BPS u100)
+(define-constant RATE_FIXED_100_BPS u100)
+
+(define-constant RATE_POLICY_SCHEDULED u1)
+(define-constant RATE_POLICY_FIXED u2)
 
 (define-constant PHASE_LAUNCH u1)
 (define-constant PHASE_GROWTH u2)
 (define-constant PHASE_MATURE u3)
+(define-constant PHASE_FIXED u4)
 
 (define-constant ASSET_KIND_FT u1)
 (define-constant ASSET_KIND_STX u2)
@@ -113,6 +119,20 @@
   }
 )
 
+;; Policy is separate from stream configuration so every stream registered
+;; through the existing entrypoints remains scheduled by absence. Only the
+;; dedicated fixed-100 registration entrypoint writes this map.
+(define-map stream-rate-policies
+  {
+    source: principal,
+    stream-id: uint
+  }
+  {
+    rate-policy: uint,
+    fixed-rate-bps: uint
+  }
+)
+
 ;; Asset identity is native: an FT uses (some token-contract-principal); STX
 ;; uses none together with asset-kind = ASSET_KIND_STX. The asset kind keeps
 ;; the two namespaces distinct without inventing a fake STX token principal.
@@ -129,6 +149,7 @@
     settled-fees: uint,
     settlement-count: uint,
     fee-remainder: uint,
+    last-rate-policy: uint,
     last-rate-bps: uint,
     last-phase: uint,
     last-settled-burn-height: uint,
@@ -180,6 +201,7 @@
     asset: (optional principal),
     payer: principal,
     eligible-base: uint,
+    rate-policy: uint,
     rate-bps: uint,
     phase: uint,
     assessed-amount: uint,
@@ -263,6 +285,7 @@
     settled-fees: u0,
     settlement-count: u0,
     fee-remainder: u0,
+    last-rate-policy: u0,
     last-rate-bps: u0,
     last-phase: u0,
     last-settled-burn-height: u0,
@@ -304,6 +327,39 @@
           (ok { phase: PHASE_GROWTH, rate-bps: RATE_GROWTH_BPS })
           (ok { phase: PHASE_MATURE, rate-bps: RATE_MATURE_BPS })
         )
+      )
+    )
+  )
+)
+
+;; Missing policy state is the backward-compatible scheduled policy. Present
+;; policy state must be the sole constructible fixed-100 value or resolution
+;; fails closed.
+(define-private (resolve-stream-rate-at
+    (source principal)
+    (stream-id uint)
+    (height uint))
+  (let ((key { source: source, stream-id: stream-id }))
+    (begin
+      (asserts! (is-some (map-get? stream-configs key)) ERR_STREAM_NOT_FOUND)
+      (match (map-get? stream-rate-policies key)
+        policy
+          (if
+            (and
+              (is-eq (get rate-policy policy) RATE_POLICY_FIXED)
+              (is-eq (get fixed-rate-bps policy) RATE_FIXED_100_BPS))
+            (ok {
+              rate-policy: RATE_POLICY_FIXED,
+              rate-bps: RATE_FIXED_100_BPS,
+              phase: PHASE_FIXED
+            })
+            ERR_INVALID_RATE_POLICY)
+        (let ((scheduled (try! (resolve-phase-at height))))
+          (ok {
+            rate-policy: RATE_POLICY_SCHEDULED,
+            rate-bps: (get rate-bps scheduled),
+            phase: (get phase scheduled)
+          }))
       )
     )
   )
@@ -445,6 +501,37 @@
   )
 )
 
+;; The only fixed-rate registration surface. It performs the same immutable
+;; stream validation as ordinary FT registration and writes exactly 100 bps;
+;; no caller-selected rate or later policy mutation is exposed.
+(define-public (register-ft-fixed-100-bps-stream
+    (source principal)
+    (stream-id uint)
+    (token principal)
+    (route uint))
+  (let ((key { source: source, stream-id: stream-id }))
+    (begin
+      (asserts! (is-admin-authorized) ERR_UNAUTHORIZED)
+      (asserts! (default-to false (map-get? authorized-sources source)) ERR_SOURCE_NOT_AUTHORIZED)
+      (asserts! (> stream-id u0) ERR_INVALID_CONFIG)
+      (asserts! (is-eq route ROUTE_PROTOCOL_INGRESS) ERR_INVALID_ROUTE)
+      (asserts! (is-none (map-get? stream-configs key)) ERR_STREAM_ALREADY_REGISTERED)
+      (asserts! (is-none (map-get? stream-rate-policies key)) ERR_INVALID_RATE_POLICY)
+      (map-set stream-configs key {
+        asset-kind: ASSET_KIND_FT,
+        asset: (some token),
+        active: true,
+        route: route
+      })
+      (map-set stream-rate-policies key {
+        rate-policy: RATE_POLICY_FIXED,
+        fixed-rate-bps: RATE_FIXED_100_BPS
+      })
+      (ok true)
+    )
+  )
+)
+
 ;; Activation and route/asset identity are intentionally separate controls:
 ;; this setter can pause a stream, but it cannot replace its asset or route.
 (define-public (set-stream-active
@@ -523,7 +610,7 @@
     (eligible-fee-base uint))
   (let (
     (config (try! (load-stream-config source stream-id asset-kind asset)))
-    (phase (try! (resolve-phase-at burn-block-height)))
+    (rate (try! (resolve-stream-rate-at source stream-id burn-block-height)))
     (accounting-key {
       source: source,
       stream-id: stream-id,
@@ -533,7 +620,7 @@
     (old-accounting (default-to (empty-accounting) (map-get? fee-accounting accounting-key)))
     (fee-calculation (unwrap! (calculate-fee-at-rate
       eligible-fee-base
-      (get rate-bps phase)
+      (get rate-bps rate)
       (get fee-remainder old-accounting)) ERR_ARITHMETIC_OVERFLOW))
   )
     (begin
@@ -546,8 +633,9 @@
         asset-kind: asset-kind,
         asset: asset,
         eligible-fee-base: eligible-fee-base,
-        rate-bps: (get rate-bps phase),
-        phase: (get phase phase),
+        rate-policy: (get rate-policy rate),
+        rate-bps: (get rate-bps rate),
+        phase: (get phase rate),
         assessed-amount: (get assessed-amount fee-calculation),
         fee-remainder: (get fee-remainder fee-calculation)
       })
@@ -594,7 +682,7 @@
     (source contract-caller)
     (asset (some (contract-of token)))
     (config (try! (load-stream-config source stream-id ASSET_KIND_FT asset)))
-    (phase (try! (resolve-phase-at burn-block-height)))
+    (rate (try! (resolve-stream-rate-at source stream-id burn-block-height)))
     (recipient COLLECTOR_INGRESS)
     (accounting-key {
       source: source,
@@ -614,7 +702,7 @@
     (old-asset-accounting (default-to (empty-asset-accounting) (map-get? asset-accounting asset-key)))
     (fee-calculation (unwrap! (calculate-fee-at-rate
       eligible-fee-base
-      (get rate-bps phase)
+      (get rate-bps rate)
       (get fee-remainder old-accounting)) ERR_ARITHMETIC_OVERFLOW))
     (assessed-amount (get assessed-amount fee-calculation))
     (new-remainder (get fee-remainder fee-calculation))
@@ -648,8 +736,9 @@
         asset: asset,
         payer: tx-sender,
         eligible-base: eligible-fee-base,
-        rate-bps: (get rate-bps phase),
-        phase: (get phase phase),
+        rate-policy: (get rate-policy rate),
+        rate-bps: (get rate-bps rate),
+        phase: (get phase rate),
         assessed-amount: assessed-amount,
         settled-amount: assessed-amount,
         recipient: recipient,
@@ -662,8 +751,9 @@
         settled-fees: new-settled-fees,
         settlement-count: new-settlement-count,
         fee-remainder: new-remainder,
-        last-rate-bps: (get rate-bps phase),
-        last-phase: (get phase phase),
+        last-rate-policy: (get rate-policy rate),
+        last-rate-bps: (get rate-bps rate),
+        last-phase: (get phase rate),
         last-settled-burn-height: burn-block-height,
         last-settled-stacks-height: block-height
       })
@@ -682,8 +772,9 @@
         asset-kind: ASSET_KIND_FT,
         asset: asset,
         eligible-fee-base: eligible-fee-base,
-        rate-bps: (get rate-bps phase),
-        phase: (get phase phase),
+        rate-policy: (get rate-policy rate),
+        rate-bps: (get rate-bps rate),
+        phase: (get phase rate),
         assessed-amount: assessed-amount,
         settled-amount: assessed-amount,
         recipient: recipient,
@@ -705,7 +796,7 @@
     (source contract-caller)
     (asset none)
     (config (try! (load-stream-config source stream-id ASSET_KIND_STX asset)))
-    (phase (try! (resolve-phase-at burn-block-height)))
+    (rate (try! (resolve-stream-rate-at source stream-id burn-block-height)))
     (recipient COLLECTOR_INGRESS)
     (accounting-key {
       source: source,
@@ -724,7 +815,7 @@
     })))
     (fee-calculation (unwrap! (calculate-fee-at-rate
       eligible-fee-base
-      (get rate-bps phase)
+      (get rate-bps rate)
       (get fee-remainder old-accounting)) ERR_ARITHMETIC_OVERFLOW))
     (assessed-amount (get assessed-amount fee-calculation))
     (new-remainder (get fee-remainder fee-calculation))
@@ -758,8 +849,9 @@
         asset: asset,
         payer: tx-sender,
         eligible-base: eligible-fee-base,
-        rate-bps: (get rate-bps phase),
-        phase: (get phase phase),
+        rate-policy: (get rate-policy rate),
+        rate-bps: (get rate-bps rate),
+        phase: (get phase rate),
         assessed-amount: assessed-amount,
         settled-amount: assessed-amount,
         recipient: recipient,
@@ -772,8 +864,9 @@
         settled-fees: new-settled-fees,
         settlement-count: new-settlement-count,
         fee-remainder: new-remainder,
-        last-rate-bps: (get rate-bps phase),
-        last-phase: (get phase phase),
+        last-rate-policy: (get rate-policy rate),
+        last-rate-bps: (get rate-bps rate),
+        last-phase: (get phase rate),
         last-settled-burn-height: burn-block-height,
         last-settled-stacks-height: block-height
       })
@@ -796,8 +889,9 @@
         asset-kind: ASSET_KIND_STX,
         asset: asset,
         eligible-fee-base: eligible-fee-base,
-        rate-bps: (get rate-bps phase),
-        phase: (get phase phase),
+        rate-policy: (get rate-policy rate),
+        rate-bps: (get rate-bps rate),
+        phase: (get phase rate),
         assessed-amount: assessed-amount,
         settled-amount: assessed-amount,
         recipient: recipient,
@@ -874,6 +968,7 @@
             asset: asset,
             payer: tx-sender,
             eligible-base: eligible-fee-base,
+            rate-policy: (get rate-policy preview),
             rate-bps: (get rate-bps preview),
             phase: (get phase preview),
             assessed-amount: assessed-amount,
@@ -888,6 +983,7 @@
             settled-fees: new-settled-fees,
             settlement-count: new-settlement-count,
             fee-remainder: (get fee-remainder preview),
+            last-rate-policy: (get rate-policy preview),
             last-rate-bps: (get rate-bps preview),
             last-phase: (get phase preview),
             last-settled-burn-height: burn-block-height,
@@ -908,6 +1004,7 @@
             asset-kind: ASSET_KIND_FT,
             asset: asset,
             eligible-fee-base: eligible-fee-base,
+            rate-policy: (get rate-policy preview),
             rate-bps: (get rate-bps preview),
             phase: (get phase preview),
             assessed-amount: assessed-amount,
@@ -987,6 +1084,7 @@
             asset: asset,
             payer: tx-sender,
             eligible-base: eligible-fee-base,
+            rate-policy: (get rate-policy preview),
             rate-bps: (get rate-bps preview),
             phase: (get phase preview),
             assessed-amount: assessed-amount,
@@ -1001,6 +1099,7 @@
             settled-fees: new-settled-fees,
             settlement-count: new-settlement-count,
             fee-remainder: (get fee-remainder preview),
+            last-rate-policy: (get rate-policy preview),
             last-rate-bps: (get rate-bps preview),
             last-phase: (get phase preview),
             last-settled-burn-height: burn-block-height,
@@ -1022,6 +1121,7 @@
             asset-kind: ASSET_KIND_STX,
             asset: asset,
             eligible-fee-base: eligible-fee-base,
+            rate-policy: (get rate-policy preview),
             rate-bps: (get rate-bps preview),
             phase: (get phase preview),
             assessed-amount: assessed-amount,
@@ -1280,6 +1380,41 @@
         (some config)
         none))
     (ok none))
+)
+
+;; Existing ordinary streams report scheduled/u0 because their actual rate is
+;; height-dependent. Fixed streams report fixed/u100. No stream returns none;
+;; malformed present policy state fails closed.
+(define-read-only (get-stream-rate-policy
+    (source principal)
+    (stream-id uint))
+  (let ((key { source: source, stream-id: stream-id }))
+    (match (map-get? stream-configs key)
+      config
+        (match (map-get? stream-rate-policies key)
+          policy
+            (if
+              (and
+                (is-eq (get rate-policy policy) RATE_POLICY_FIXED)
+                (is-eq (get fixed-rate-bps policy) RATE_FIXED_100_BPS))
+              (ok (some {
+                rate-policy: RATE_POLICY_FIXED,
+                rate-bps: RATE_FIXED_100_BPS
+              }))
+              ERR_INVALID_RATE_POLICY)
+          (ok (some {
+            rate-policy: RATE_POLICY_SCHEDULED,
+            rate-bps: u0
+          })))
+      (ok none))
+  )
+)
+
+(define-read-only (get-stream-rate-at-burn-height
+    (source principal)
+    (stream-id uint)
+    (height uint))
+  (resolve-stream-rate-at source stream-id height)
 )
 
 (define-read-only (get-accounting

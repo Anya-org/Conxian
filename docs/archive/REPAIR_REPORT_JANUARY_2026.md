@@ -177,7 +177,19 @@ This document details the complete Priority-Ordered Repair (P1-P6) of the Conxia
   - IMPLEMENTED: 7-day proof validity period
   - IMPLEMENTED: Events: `reserves-updated`, `attestation-received`, `attestor-added`, `attestor-removed`
 
-**Impact**: Protocol now has rate limiting and transparent proof-of-reserves for treasury assets
+> **Correction (July 25, 2026):** This archived report overstated the January
+> implementation. Its signature bytes were stored but not cryptographically
+> verified, repeated writes by one allowlisted sender could inflate the count,
+> and caller input could update backing independently of live token state. The
+> active source now supersedes that path with registered secp256k1 keys,
+> versioned snapshot/envelope digests, distinct-identity quorum, replay
+> protection, live SIP-010 reconciliation before writes, and fail-closed status.
+> This correction is source-level evidence only and makes no deployment,
+> mainnet-readiness, auditor, or oracle-qualification claim.
+
+**Historical impact claim (superseded):** The January implementation added a
+reserve-attestation ledger, but did not establish cryptographically verified
+proof-of-reserves readiness.
 
 ---
 

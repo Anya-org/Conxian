@@ -60,6 +60,7 @@ TEST_HELPERS = {
     "mock-settlement-intermediary",
     "mock-reward-token", "mock-stacking-adapter", "mock-stacking-adapter-2",
     "mock-token", "mock-compoundable-vault", "mock-admin-forwarder",
+    "mock-clp-v2-intermediary",
     "test-c4-helper",
 }
 
