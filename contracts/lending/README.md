@@ -8,14 +8,53 @@ The Lending module provides automated money markets for the Conxian Protocol. It
 
 The module utilizes a decentralized reserve system optimized for capital efficiency and risk management. It consists of three primary components:
 
-- **Lending Manager**: `lending-manager.clar` serves as the central entry point for all money market operations. It maintains user balances, dynamic risk configurations, and reserve states.
+- **Lending Manager**: `lending-manager.clar` serves as the central entry point for money market operations and remains on ordinary scheduled collector streams (200/150/100 bps).
 - **Economic Model**: `interest-rate-model.clar` provides **utilization-based interest curves**. These are mathematical curves that adjust interest rates dynamically: rates increase as borrowing demand grows to encourage more deposits and maintain pool liquidity.
-- **Orchestrator**: `lending-orchestrator.clar` provides an alternative, BME-integrated (Business Machine Engine) execution path for advanced protocol interactions.
+- **Orchestrator**: `lending-orchestrator.clar` provides an alternative, BME-integrated execution path. Repayment uses a collector stream whose immutable policy is fixed at exactly 100 bps, applied to interest only.
 
 The approved protocol-fee migration changes only the active
-`lending-manager.repay` path. It does not migrate `lending-orchestrator`, DEX
-flows, or concentrated-liquidity-pool custody; those remain separate follow-up
-work while their execution paths are stubbed or out of scope.
+`lending-manager.repay` and `lending-orchestrator.repay` paths. It does not
+migrate DEX flows or concentrated-liquidity-pool custody; those remain separate
+follow-up work while their execution paths are stubbed or out of scope.
+
+### Canonical orchestrator repayment
+
+`lending-orchestrator.repay` accepts `(asset-trait, amount, source)` and requires
+`source` to be the deployed `lending-orchestrator` contract itself. The explicit
+trait argument avoids a static self-trait dependency edge; it is not a
+caller-selectable fee source. Before fee-bearing repayments can succeed, the
+collector admin must authorize the orchestrator and call
+`register-ft-fixed-100-bps-stream` for an active FT stream
+for the exact asset, then the orchestrator admin must call
+`set-protocol-fee-stream` once to bind that asset to the registered stream. A
+scheduled stream is rejected, and the stream config plus fixed-100 policy are
+revalidated before every repayment. No deployment principal is embedded by
+this contract or documentation.
+
+The orchestrator transfers the full repayment into its own custody, computes
+interest as `floor(amount * 1000 / 10000)`, and asks the collector to assess only
+that interest. The authenticated callback transfers the exact assessed fee to
+`.protocol-fee-collector`; principal reduces debt and net interest increases
+reserves. Missing or mismatched configuration, paused collector state, replay,
+callback validation, transfer, or accounting failures roll back custody,
+nonces, pending state, and lending accounting atomically. The legacy
+`revenue-automation.collect-revenue` path is not used.
+
+The three-argument trait form of `repay(asset-trait, amount, source)` is a
+breaking ABI requirement. There is no legacy two-argument fallback. The source
+trait must resolve to `.lending-orchestrator`; it is not caller-selectable.
+
+### `lending-orchestrator.clar`
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `initialize` | `(new-admin principal)` | One-time publish-admin handoff guarded by `initialized`; arbitrary first callers are rejected. |
+| `deposit` / `borrow` / `withdraw` | SIP-010 trait plus amount | Manage orchestrator reserve custody. |
+| `repay` | `(asset-trait <sip-010-ft-trait>) (amount uint) (source <protocol-fee-source-trait>)` | Settles exactly 100 bps of the interest portion through fixed-policy source custody. |
+| `set-protocol-fee-stream` | `(asset principal) (stream-id uint)` | Admin-only write-once binding; accepts only active fixed-policy/u100 streams for this source and asset. |
+| `get-protocol-fee-stream` | `(asset principal)` | Reads the immutable local stream binding. |
+| `get-protocol-fee-nonce` | `()` | Reads the successful-settlement nonce used to derive replay IDs. |
+| `get-pending-protocol-fee` | `(payer principal)` | Reads pending callback state; successful calls clear it atomically. |
 
 The module integrates with the protocol's `oracle-aggregator` for real-time asset pricing and the `enhanced-circuit-breaker` for **fail-closed security**. Fail-closed security is a safety mechanism that automatically pauses the protocol if critical price feeds or contract dependencies become unavailable, preventing incorrect executions during market volatility.
 
@@ -122,7 +161,7 @@ Comprehensive validation is performed using the Vitest framework and Clarinet SD
 
 ## Status (Reference)
 
-- **Implementation**: Production-Ready (v1.2.1)
-- **Audit Status**: Internally Verified (April 2026)
+- **Implementation**: Simulation-tested; no deployment or bootstrap claim
+- **Audit Status**: Internal SDK regression coverage as of July 25, 2026
 - **BIP Compliance**: BIP-341 (Taproot), BIP-342 (Scripts)
 - **Standards**: Clarity 4, Diátaxis, Hexagonal Architecture

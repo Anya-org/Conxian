@@ -3,12 +3,14 @@
 
 (define-fungible-token mock)
 (define-data-var transfer-failure bool false)
+(define-data-var transfer-failure-from (optional principal) none)
 
 (define-public (transfer (amount uint) (from principal) (to principal) (memo (optional (buff 34))))
   (begin
     ;; Test-only fault injection lets custody rollback tests make the token
     ;; transfer fail after the collector has checked live balance/excess.
     (asserts! (not (var-get transfer-failure)) (err u2))
+    (asserts! (not (is-eq (var-get transfer-failure-from) (some from))) (err u2))
     (asserts! (is-eq tx-sender from) (err u1))
     (ft-transfer? mock amount from to)
   )
@@ -17,6 +19,13 @@
 (define-public (set-fail-transfer (should-fail bool))
   (begin
     (var-set transfer-failure should-fail)
+    (ok true)
+  )
+)
+
+(define-public (set-fail-transfer-from (source (optional principal)))
+  (begin
+    (var-set transfer-failure-from source)
     (ok true)
   )
 )

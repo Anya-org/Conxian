@@ -44,9 +44,10 @@ The Conxian Protocol utilizes a "Dual-Mode" testing architecture. This ensures t
 26. ✅ **tests/cybernetic-revenue.test.ts**: Dynamic "Fiscal Dam" allocation (CXIP-013).
 27. ✅ **tests/cxip-012.test.ts**: Volatility-based DEX fee adjustments.
 28. ✅ **tests/nakamoto_verification.test.ts**: Tenure info and block utility checks.
-29. ✅ **tests/protocol-fee-collector.test.ts**: Burn-block phase boundaries, fixed collector-custody FT/STX settlement, direct-deposit excess recovery, explicit operational-treasury routing, residual and phase-change accounting, split admin/governance authorization, immediate-caller admin handoff, source-scoped replay, exact events, and rollback.
+29. ✅ **tests/protocol-fee-collector.test.ts**: Scheduled FT/STX compatibility, immutable fixed-100 FT registration and phase-independent policy introspection, payer/source custody settlement, residual/accounting/policy audit fields, excess recovery, routing, authorization, replay, exact events, and rollback.
 30. ✅ **tests/lending/lending-manager.test.ts**: Publish-time-admin initialization handoff, fail-closed pause/health guards, wrong-source-trait rejection, interest-only `repay` fee base, atomic source-custody settlement, immutable stream binding validation, checked arithmetic rollback, scheduled launch fee replacement, net reserve accounting, principal exclusion, and absence of the legacy revenue-automation receipt.
-31. ✅ **tests/operational-treasury-init.test.ts**: Publish-time-owner initialization, first-caller front-run rejection, and STX/SIP-010 withdrawal custody.
+31. ✅ **tests/lending/lending-orchestrator.test.ts**: Fixed-100 interest-only source custody, scheduled-stream binding rejection, executable unauthorized-callback rejection, runtime exact payer/orchestrator/collector custody deltas, collector/orchestrator evidence correlation, pending-state clearing, net reserves, replay/pause/transfer rollback, zero-fee no-transfer evidence, arithmetic overflow, principal exclusion, and no legacy path. Recipient/asset/amount callback invariants are exercised through the authenticated successful settlement path rather than malformed callback injection.
+32. ✅ **tests/operational-treasury-init.test.ts**: Publish-time-owner initialization, first-caller front-run rejection, and STX/SIP-010 withdrawal custody.
 
 ## How to Run Tests
 ```bash
