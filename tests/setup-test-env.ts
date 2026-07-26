@@ -51,6 +51,7 @@ export async function initializeSimnet(): Promise<Simnet> {
         'dex-factory',
         'federated-oracle-adapter',
         'lending-manager',
+        'lending-orchestrator',
         'bme-engine',
         'office-manager',
         'operational-treasury',
@@ -103,6 +104,7 @@ export async function initializeSimnet(): Promise<Simnet> {
       try {
         instance.callPublicFn('bme-engine', 'add-activity-reporter', [Cl.contractPrincipal(deployer, 'swap-router')], deployer);
         instance.callPublicFn('bme-engine', 'add-activity-reporter', [Cl.contractPrincipal(deployer, 'lending-manager')], deployer);
+        instance.callPublicFn('bme-engine', 'add-activity-reporter', [Cl.contractPrincipal(deployer, 'lending-orchestrator')], deployer);
       } catch (e) {}
 
       // Authorize the canonical CLP share primitive for focused simnet tests.

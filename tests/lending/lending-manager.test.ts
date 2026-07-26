@@ -326,6 +326,9 @@ describe('lending-orchestrator', () => {
     expect(receipt.result).toEqual(Cl.ok(Cl.bool(true)));
     const feeEvent: any = printEvent(receipt, 'protocol-fee-collected');
     const settlementId = feeEvent.value['settlement-id'];
+    expect(feeEvent.value['rate-policy']).toEqual(Cl.uint(1));
+    expect(feeEvent.value['rate-bps']).toEqual(Cl.uint(200));
+    expect(feeEvent.value.phase).toEqual(Cl.uint(1));
 
     const after: any = simnet.callReadOnlyFn('lending-manager', 'get-reserve-data', [asset], deployer).result;
     expect(after.type).toBe('some');
@@ -388,6 +391,7 @@ describe('lending-orchestrator', () => {
     expect(settlement?.asset).toEqual(Cl.some(Cl.principal(mockTokenPrincipal)));
     expect(settlement?.payer).toEqual(Cl.principal(wallet2));
     expect(settlement?.['eligible-base']).toEqual(Cl.uint(100));
+    expect(settlement?.['rate-policy']).toEqual(Cl.uint(1));
     expect(settlement?.['assessed-amount']).toEqual(Cl.uint(2));
     expect(settlement?.['settled-amount']).toEqual(Cl.uint(2));
     expect(settlement?.recipient).toEqual(Cl.principal(collectorPrincipal));

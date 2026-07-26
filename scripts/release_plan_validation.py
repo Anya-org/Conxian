@@ -27,6 +27,7 @@ TEST_HELPERS = frozenset(
         "mock-token",
         "mock-compoundable-vault",
         "mock-admin-forwarder",
+        "mock-clp-v2-intermediary",
         "mock-pox-adapter",
         "mock-pox-adapter-2",
         "mock-reward-token",

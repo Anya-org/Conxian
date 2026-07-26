@@ -68,6 +68,11 @@
 | contracts/compliance/travel-rule-service.clar | ✓ | N/A | ✓ | ✓ | ✓ | ✓ | 100% |
 | contracts/compliance/zkml-verifier.clar | SUPERSEDED | N/A | SUPERSEDED | SUPERSEDED | SUPERSEDED | SUPERSEDED | NOT CURRENT EVIDENCE |
 
+> **Scope correction (July 25, 2026):** The `100%` entry above recorded
+> documentation/style checklist coverage, not cryptographic correctness,
+> deployment proof, or oracle qualification. The active proof-of-reserves
+> security behavior is defined by its current source and focused tests.
+
 ## Critical Issues Fixed
 - Redundant Contracts: Merged `compliance-orchestrator.clar` into `compliance-manager.clar`.
 - Missing Function Documentation: Added `;; @desc`, `;; @param`, and `;; @return` headers to 50+ functions.
