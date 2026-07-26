@@ -135,7 +135,7 @@ ops-engine (heartbeat) / alex-adapter / governance suite
 
 Both `.github/workflows/deploy-testnet.yml` and `.github/workflows/deploy-mainnet.yml` are **preflight/plan-only**. They validate checked-in plans and produce plan-only artifacts; neither workflow signs, broadcasts, or invokes an on-chain deployment command.
 
-Non-dry attempts are blocked before signing/broadcast pending issue #531's structured receipt-producing deployment path, upstream issues #527–#530, and an approved signer-derived mainnet SP/SM identity. Unresolved plan identities must not be used or capitalized, and workflow success or plan artifacts are not deployment proof.
+Issue #531 supplied the preflight, plan-validation, and evidence-verification control foundation; it did not add an authorized live broadcaster or establish deployment proof. Non-dry attempts remain blocked before signing/broadcast absent an approved signer-derived mainnet SP/SM identity, an authorized receipt-producing broadcaster/execution path, complete plan-bound receipts and readbacks, and resolution of still-open policy or implementation gates such as #527–#530. Unresolved plan identities must not be used or capitalized, and workflow success or plan artifacts are not deployment proof.
 
 | Target | Plan Ready | Current Workflow State | Live Deployment Proof |
 |--------|------------|------------------------|-----------------------|
@@ -245,7 +245,7 @@ These are clarinet-sdk v3.21.0 artifacts from plan regeneration with different r
 
 ## 12. Deployment Prerequisites and Blockers -- CURRENT STATUS
 
-Live deployment prerequisites are not complete. Both deployment workflows remain preflight/plan-only, and non-dry attempts are blocked before signing/broadcast pending issue #531's structured receipt-producing deployment path, upstream issues #527–#530, and an approved signer-derived mainnet SP/SM identity.
+Live deployment prerequisites are not complete. Issue #531 supplied the preflight, plan-validation, and evidence-verification control foundation; it did not add an authorized live broadcaster or establish deployment proof. Both deployment workflows remain preflight/plan-only, and non-dry attempts are blocked before signing/broadcast absent an approved signer-derived mainnet SP/SM identity, an authorized receipt-producing broadcaster/execution path, complete plan-bound receipts and readbacks, and resolution of still-open policy or implementation gates such as #527–#530.
 
 Unresolved plan identities must not be used or capitalized, guessed signer identities are invalid, and workflow results are not deployment proof. Address checks remain scoped to the addresses checked and do not establish global nonexistence.
 
