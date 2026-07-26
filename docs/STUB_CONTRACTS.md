@@ -22,7 +22,7 @@ This document catalogs the status of placeholder (stub) contracts in the Conxian
 | `automation-manager.clar` | ✅ Active | Automation coordination |
 | `batch-processor.clar` | ✅ Active | Batch transaction helper |
 | `rate-limiter.clar` | ✅ Active | Operation-specific rate limiting |
-| `proof-of-reserves.clar` | ✅ Active | Multi-attestor verification system |
+| `proof-of-reserves.clar` | ✅ Active | Snapshot-bound secp256k1 quorum with live SIP-010 reconciliation; no audit, oracle qualification, or deployment claim |
 
 ---
 
