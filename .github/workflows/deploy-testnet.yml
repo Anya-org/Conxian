@@ -131,7 +131,7 @@ jobs:
       - name: Block non-dry broadcast attempts before signing
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == false }}
         run: |
-          echo "::error::Testnet broadcast is blocked before signing. Issue #531 requires a structured receipt-producing broadcaster; use the deployment runbook preflight until that gate is implemented."
+          echo "::error::Testnet broadcast is blocked before signing. An authorized structured receipt-producing broadcaster/execution path remains required; use the deployment runbook preflight until that gate is implemented."
           exit 1
 
       - name: Write plan-only summary
@@ -141,7 +141,7 @@ jobs:
             echo "## Testnet preflight (plan-only)"
             echo "- Status: plan/preflight only"
             echo "- No mnemonic, signer, broadcast, or deployment proof was used"
-            echo "- A non-dry request is blocked before signing pending issue #531"
+            echo "- A non-dry request is blocked before signing pending an authorized structured receipt-producing broadcaster/execution path"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload plan-only artifacts

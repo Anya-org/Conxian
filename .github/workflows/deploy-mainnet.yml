@@ -138,7 +138,7 @@ jobs:
       - name: Block non-dry broadcast attempts before signing
         if: ${{ !inputs.dry_run }}
         run: |
-          echo "::error::Mainnet broadcast is blocked before signing. Issue #531 requires a structured receipt-producing broadcaster; follow the deployment runbook preflight and do not use a workflow success as deployment proof."
+          echo "::error::Mainnet broadcast is blocked before signing. An authorized structured receipt-producing broadcaster/execution path remains required; follow the deployment runbook preflight and do not use a workflow success as deployment proof."
           exit 1
 
       - name: Write plan-only summary
@@ -148,7 +148,7 @@ jobs:
             echo "## Mainnet preflight (plan-only)"
             echo "- Status: plan/preflight only"
             echo "- No mnemonic, signer, broadcast, or deployment proof was used"
-            echo "- Non-dry attempts are blocked before signing pending issue #531"
+            echo "- Non-dry attempts are blocked before signing pending an authorized structured receipt-producing broadcaster/execution path"
             echo "- The current ST mainnet plan identity remains an unresolved blocker"
             echo "- No automatic testnet-to-mainnet dispatch is defined"
           } >> "$GITHUB_STEP_SUMMARY"
