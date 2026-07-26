@@ -23,7 +23,12 @@ FIXTURE_DEPLOYER = "ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P"
 
 
 class ReleasePlanValidationTests(unittest.TestCase):
-    def write_manifest(self, root: Path, definitions: list[tuple[str, list[str]]]) -> Path:
+    def write_manifest(
+        self,
+        root: Path,
+        definitions: list[tuple[str, list[str]]],
+        epochs: dict[str, float] | None = None,
+    ) -> Path:
         lines = [
             "[project]",
             'name = "fixture"',
@@ -39,6 +44,7 @@ class ReleasePlanValidationTests(unittest.TestCase):
                     f"[contracts.{name}]",
                     f'path = "{source_path}"',
                     "clarity-version = 4",
+                    f"epoch = {(epochs or {}).get(name, 3.0)}",
                 ]
             )
             if dependencies:
@@ -54,6 +60,7 @@ class ReleasePlanValidationTests(unittest.TestCase):
         network: str,
         publishes: list[tuple[str, str | None]],
         calls: list[tuple[str, str]] | None = None,
+        epochs: dict[str, float] | None = None,
     ) -> None:
         transactions = []
         for name, source_path in publishes:
@@ -66,7 +73,7 @@ class ReleasePlanValidationTests(unittest.TestCase):
                         "path": source_path or f"contracts/{name}.clar",
                         "anchor-block-only": True,
                         "clarity-version": 4,
-                        "epoch": 3.0,
+                        "epoch": (epochs or {}).get(name, 3.0),
                     }
                 }
             )
@@ -190,6 +197,70 @@ class ReleasePlanValidationTests(unittest.TestCase):
             self.assertEqual([entry.contract_name for batch in ordered for entry in batch], ["b", "a"])
 
             self.validate_pair(root, manifest_path, [("b", None), ("a", None)])
+
+    def test_manifest_epoch_mismatch_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            manifest_path = self.write_manifest(root, [("a", [])], {"a": 3.3})
+            testnet_path = root / "testnet.yaml"
+            mainnet_path = root / "mainnet.yaml"
+            self.write_plan(testnet_path, "testnet", [("a", None)])
+            self.write_plan(mainnet_path, "mainnet", [("a", None)], epochs={"a": 3.3})
+            with self.assertRaisesRegex(
+                release_plan_validation.ReleasePlanValidationError,
+                r"contract a epoch 3\.0 does not match active Clarinet\.toml value 3\.3",
+            ):
+                release_plan_validation.validate_release_plan_files(
+                    testnet_path, mainnet_path, manifest_path, root, yaml
+                )
+
+    def test_generator_emits_manifest_epoch(self) -> None:
+        repo_root = Path(__file__).resolve().parents[1]
+        generator_path = repo_root / "scripts" / "gen-deployment-plans.py"
+        spec = importlib.util.spec_from_file_location("gen_deployment_plans_epochs", generator_path)
+        assert spec is not None and spec.loader is not None
+        generator = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = generator
+        spec.loader.exec_module(generator)
+        contracts = [[
+            {
+                "contract-name": "sip-standards",
+                "path": "contracts/traits/sip-standards.clar",
+                "clarity-version": 4,
+                "epoch": 3.3,
+            },
+            {
+                "contract-name": "cxlp-token",
+                "path": "contracts/tokens/cxlp-token.clar",
+                "clarity-version": 4,
+                "epoch": 3.0,
+            },
+            {
+                "contract-name": "concentrated-liquidity-pool",
+                "path": "contracts/dex/concentrated-liquidity-pool.clar",
+                "clarity-version": 4,
+                "epoch": 3.0,
+            },
+        ]]
+        plan = generator.make_plan(
+            contracts,
+            "testnet",
+            generator.EXPECTED_PLAN_NAMES["testnet"],
+            generator.EXPECTED_STACKS_NODES["testnet"],
+            generator.COST_TESTNET,
+        )
+        publishes = self.transaction_bodies(plan, "contract-publish")
+        self.assertEqual(publishes[0]["epoch"], 3.3)
+
+    def test_unsupported_manifest_epoch_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            manifest_path = self.write_manifest(root, [("a", [])], {"a": 9.9})
+            with self.assertRaisesRegex(
+                release_plan_validation.ReleasePlanValidationError,
+                r"contract a epoch must be one of",
+            ):
+                release_plan_validation.load_clarinet_manifest(manifest_path, root)
 
     def test_duplicate_publish_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:

@@ -145,6 +145,15 @@ This document details the complete Priority-Ordered Repair (P1-P6) of the Conxia
 
 ### ✅ P6: Operational Safety (COMPLETED)
 
+> **Historical correction (July 25, 2026):** The January report overstated the
+> then-current proof-of-reserves path. It accepted caller-supplied backing and
+> raw signatures without cryptographic snapshot binding, and repeated writes
+> could inflate its count. Issue #558 later replaced that boundary with
+> snapshot-bound secp256k1 verification, a distinct/versioned attestor quorum,
+> replay protection, and live SIP-010 reconciliation. This erratum preserves
+> the historical record; neither the old report nor the correction proves
+> deployment, custody, or auditor/oracle qualification.
+
 **Objective**: Wire circuit breaker (already exists), implement rate limiter and PoR
 
 **Contracts Modified**:

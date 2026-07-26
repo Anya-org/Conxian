@@ -871,6 +871,7 @@ depends_on = ["agent-risk", "conxian-protocol"]
 [contracts.proof-of-reserves]
 path = "contracts/security/proof-of-reserves.clar"
 clarity-version = 4
+epoch = 3.3
 depends_on = ["sip-standards"]
 
 [contracts.proposal-engine]
