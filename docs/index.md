@@ -22,6 +22,11 @@ Welcome to the official documentation for Conxian Finance, a Sovereign Autonomou
 - **[Strategic Research](RESEARCH.md)**: Analysis of the Bitcoin L2 landscape and regulatory environment (2026).
 - **[Roadmap](ROADMAP.md)**: Our path from recovery to global scale.
 
+## Decision Records
+
+- **[ADR-006: Universal Chain Interoperability](ADR_006_UNIVERSAL_CHAIN_SUPPORT.md)**: Proposed universal routing and interoperability standards.
+- **[ADR-007: Proposed Partnership Edge-Policy Baseline](ADR_007_PARTNERSHIP_EDGE_POLICY_BASELINE.md)**: Inactive, deny-by-default technical baseline and explicit approval boundaries for future partnership settlement.
+
 ## 🛠 Modules & Contracts
 
 Explore the core components of the Conxian ecosystem:
