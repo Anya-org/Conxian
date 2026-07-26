@@ -35,6 +35,34 @@
       "feeAccounting": "inside-growth-checkpoints-plus-position-remainders",
       "closedValuation": "actual-cumulative-settlement-at-close-price"
     },
+    "managerV2": {
+      "contract": "liquidity-manager",
+      "metadataKey": "canonical-v2-position-id",
+      "poolAuthority": [
+        "ownership",
+        "range",
+        "liquidity",
+        "custody",
+        "fees",
+        "pnl-and-loss-only-il"
+      ],
+      "openCustody": "v2-pulls-directly-from-tx-sender",
+      "closeAuthority": "canonical-owner-only-no-legacy-admin-override",
+      "rebalance": "atomic-full-close-to-tx-sender-then-reopen-from-tx-sender",
+      "legacyApisChanged": false
+    },
+    "routerV2": {
+      "contract": "swap-router",
+      "entrypoint": "exact-input-single-v2",
+      "directionSource": "canonical-v2-token-order",
+      "limitReference": "current-v2-sqrt-price",
+      "custody": "direct-v2-no-router-balance",
+      "policy": [
+        "swap-router-pause",
+        "v2-pool-source-isolation"
+      ],
+      "legacyApisChanged": false
+    },
     "ticks": {
       "state": [
         "initialized",
@@ -48,13 +76,24 @@
     "feeCollector": {
       "canonicalContract": "protocol-fee-collector",
       "integrationStatus": "disabled-gate",
-      "requiredBeforeEnablement": [
-        "registered-source-stream-asset",
-        "collector-computed-amount",
-        "replay-id",
-        "private-same-transaction-pending-debit",
-        "authenticated-source-callback",
-        "exact-custody-delta"
+      "v2ReservedShareBps": 1000,
+      "blocker": "V2 reserves a fixed 10% share while settle-source-ft applies the collector schedule to an eligible base; direct integration would double-rate or reassess the reserved amount and can strand custody.",
+      "forbiddenUntilGovernanceChoice": [
+        "direct-transfer",
+        "admin-sweep",
+        "settle-source-ft-on-gross-swap-base",
+        "settle-source-ft-on-already-reserved-share",
+        "collector-accounting-without-custody-settlement"
+      ],
+      "governanceOptions": [
+        {
+          "id": "collector-replaces-fixed-share",
+          "meaning": "Remove V2 fixed-share assessment and let the collector compute the sole protocol charge from a defined eligible base."
+        },
+        {
+          "id": "reviewed-fixed-amount-ingress",
+          "meaning": "Add authenticated collector ingress for the already-calculated fixed amount without applying another schedule, with replay and exact custody-delta proof."
+        }
       ]
     },
     "oracle": {
@@ -68,6 +107,8 @@
     "Use a bounded linear tick grid and do not claim logarithmic Uniswap semantics.",
     "Keep CXLP outside V2 to avoid competing transferable and range-specific entitlements.",
     "Require full atomic close and exact-input consumption.",
+    "Preserve all legacy manager/router APIs and add explicitly versioned V2 surfaces.",
+    "Derive V2 swap direction and price-limit orientation only from canonical pool state.",
     "Keep protocol-fee release and CSF compatibility fail-closed until exact semantics exist."
   ],
   "relationships": [
@@ -85,6 +126,16 @@
       "from": "concentrated-liquidity-pool-v2",
       "to": "protocol-fee-collector",
       "type": "future-gated-integration"
+    },
+    {
+      "from": "liquidity-manager",
+      "to": "concentrated-liquidity-pool-v2",
+      "type": "versioned-canonical-position-integration"
+    },
+    {
+      "from": "swap-router",
+      "to": "concentrated-liquidity-pool-v2",
+      "type": "versioned-direct-custody-route"
     },
     {
       "from": "legacy-concentrated-liquidity-pool",

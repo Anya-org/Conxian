@@ -2,11 +2,11 @@
 
 ## Scope
 
-The DEX module currently provides **oracle, deterministic policy,
-liquidity-intent infrastructure, and a canonical CXLP share primitive**. It
-does not yet provide a complete LP execution or custody system. In particular,
-the liquidity-manager ledger does not transfer tokens, custody assets, mutate
-a pool, collect fees, or prove that an LP position was executed.
+The DEX module provides **oracle, deterministic policy, legacy liquidity-intent
+infrastructure, a canonical CXLP compatibility primitive, and bounded V2
+custody/execution**. Legacy manager and router entrypoints retain their prior
+semantics. Separately named V2 surfaces execute only against
+`concentrated-liquidity-pool-v2`, whose position ID is the canonical LP lot.
 
 The existing swap and concentrated-liquidity contracts remain separate
 integration surfaces. This README describes the production-safe behavior of
@@ -18,21 +18,29 @@ the DEX contracts covered by the current implementation and tests.
   validation.
 - **Policy helpers** — pure/read-only checks for invariants, rebalancing, and
   bounded scaling decisions.
-- **Liquidity intent ledger** (`liquidity-manager.clar`) — records validated
-  position and rebalance intents plus a price-movement risk proxy.
-- **Execution prerequisites** — concentrated-liquidity pool custody, position
-  accounting, fee accounting, and a current-tick API are still required before
-  the intent ledger can execute or settle LP operations.
+- **Liquidity intent ledger** (`liquidity-manager.clar`) — preserves validated
+  legacy intents and the oracle movement proxy, while separate V2 functions
+  manage canonical pool lots without changing legacy APIs.
+- **V2 execution** (`concentrated-liquidity-pool-v2.clar`) — authoritative
+  custody, immutable full-close lots, fee accounting, tick accounting, swaps,
+  reconciliation, and executable-state PnL/IL.
 
 Pool IDs and token principals accepted by the liquidity-manager are
 **caller-supplied intent metadata**. They are stored and emitted for later
 execution, but they are not verified against an on-chain pool or token
-registry.
+registry. This statement applies only to the legacy intent functions. V2
+functions read and validate the canonical V2 pool and token order directly.
 
 ## Core Contracts (Reference)
 
 ### `swap-router.clar`
 The Apex Universal Router.
+
+`exact-input-single-v2` is a separate direct-custody route. It reads the V2
+pool, derives direction from canonical token order, validates the limit against
+the current V2 sqrt price, preserves router pause and V2-source isolation
+policy, and calls V2 without pre-transfer or `as-contract` custody. Legacy
+router behavior is unchanged.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
@@ -102,9 +110,10 @@ surfaces must not be composed with legacy or canonical fee collection on the
 same base.
 
 ### `liquidity-manager.clar`
-The liquidity-manager is a validated, unexecuted intent ledger. Every recorded
-position starts with `accounted-liquidity: u0`; no token or pool mutation is
-performed.
+The legacy liquidity-manager surface remains a validated, unexecuted intent
+ledger. Every legacy record starts with `accounted-liquidity: u0`; no token or
+pool mutation is performed. Separately named V2 functions execute against the
+authoritative V2 pool and use a separate map keyed by canonical V2 position ID.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
@@ -123,6 +132,12 @@ performed.
 | `get-rebalance-plan` | `(position-id uint)` | Compatibility alias for `get-rebalance`. |
 | `cancel-rebalance` | `(position-id uint)` | Cancels the local rebalance intent. |
 | `get-rebalance-advice` | `(position-id uint) (observed-tick int)` | Evaluates a caller-observed tick against the stored range. The observation is advisory; the pool has no current-tick getter here and no rebalance is executed. |
+| `open-position-v2` | `(pool-id uint) (token-0 <sip-010-ft-trait>) (token-1 <sip-010-ft-trait>) (tick-lower int) (tick-upper int) (max-amount0 uint) (max-amount1 uint) (min-liquidity uint)` | Compliance-gated canonical V2 open. The pool pulls directly from `tx-sender`; manager metadata is written only after success. |
+| `close-position-v2` | `(position-id uint) (token-0 <sip-010-ft-trait>) (token-1 <sip-010-ft-trait>) (min-amount0 uint) (min-amount1 uint)` | Canonical-owner-only full close to `tx-sender`; legacy manager-admin rights do not apply. |
+| `rebalance-position-v2` | `(position-id uint) ... target range/max amounts/min liquidity/min close amounts` | Atomic full close/reopen from `tx-sender`; replacement failure rolls back all pool, token, tick, and manager changes. |
+| `get-v2-managed-position` | `(position-id uint)` | Reads manager linkage metadata keyed by canonical V2 position ID. |
+| `get-v2-authoritative-position` | `(position-id uint)` | Proxies the authoritative V2 lot. |
+| `get-v2-position-pnl` / `get-v2-exact-il` | `(position-id uint)` | Proxies executable-state PnL/loss-only IL without the legacy oracle proxy. |
 
 The risk endpoint fails closed when canonical aggregate/TWAP data is missing,
 stale, zero, or excessively divergent. It does not call a dynamic oracle
@@ -210,7 +225,20 @@ those compatibility-only no-op entrypoints.
 - `tests/dex/dex-policy-stubs.test.ts` — deterministic invariant and
   rebalancing helpers.
 
-## Remaining prerequisites for full LP execution
+## V2 protocol-fee release gate
+
+V2 reserves a fixed 10% share of assessed swap fees, while
+`protocol-fee-collector.settle-source-ft` applies its own schedule to an
+eligible base. Wiring them directly would double-rate the trade or reassess an
+already-reserved amount and can strand custody relative to the collector's
+exact-delta source callback. Release therefore remains disabled with no direct
+transfer or sweep.
+
+Governance must choose either: (1) the collector replaces V2's fixed share and
+becomes the sole assessment, or (2) the collector gains a reviewed,
+authenticated fixed-amount ingress that does not apply another schedule.
+
+## Legacy CXLP integration boundary
 
 The CXLP primitive and atomic share reconciliation hooks are now available, but
 the CLP integration still needs:
@@ -229,5 +257,6 @@ the per-position/per-pool attribution, custody, and settlement validation that
 identifies the correct pool and owner amount; these hooks do not invent that
 attribution.
 
-Until those prerequisites exist, `liquidity-manager` remains a validated intent
-ledger and deterministic risk proxy, not an LP executor.
+These prerequisites still apply to the legacy CXLP/CLP path. They do not alter
+the separately versioned V2 position-ID entitlement or its manager/router
+integration.

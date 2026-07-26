@@ -834,6 +834,11 @@ plan:
       path: contracts/test-helpers/mock-csf-protocol.clar
       clarity-version: 4
     - transaction-type: emulated-contract-publish
+      contract-name: mock-clp-v2-intermediary
+      emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N
+      path: contracts/test-helpers/mock-clp-v2-intermediary.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
       contract-name: mock-pox-adapter
       emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N
       path: contracts/test-helpers/mock-pox-adapter.clar

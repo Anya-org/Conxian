@@ -632,7 +632,7 @@ depends_on = ["governance-traits"]
 [contracts.liquidity-manager]
 path = "contracts/dex/liquidity-manager.clar"
 clarity-version = 4
-depends_on = ["concentrated-math", "defi-traits", "oracle", "regulatory-adapter"]
+depends_on = ["concentrated-liquidity-pool-v2", "concentrated-math", "defi-traits", "oracle", "regulatory-adapter", "sip-standards"]
 
 [contracts.liquidity-optimization-engine]
 path = "contracts/dex/liquidity-optimization-engine.clar"
@@ -708,6 +708,11 @@ depends_on = ["compoundable-vault-trait"]
 path = "contracts/test-helpers/mock-admin-forwarder.clar"
 clarity-version = 4
 depends_on = ["auto-compounder", "compoundable-vault-trait", "cxd-staking"]
+
+[contracts.mock-clp-v2-intermediary]
+path = "contracts/test-helpers/mock-clp-v2-intermediary.clar"
+clarity-version = 4
+depends_on = ["liquidity-manager", "sip-standards", "swap-router"]
 
 [contracts.mock-reward-token]
 path = "contracts/test-helpers/mock-reward-token.clar"
@@ -1000,7 +1005,7 @@ depends_on = ["circuit-breaker", "conxian-protocol"]
 [contracts.swap-router]
 path = "contracts/dex/swap-router.clar"
 clarity-version = 4
-depends_on = ["bme-engine", "concentrated-liquidity-pool", "conxian-csf-trait", "conxian-protocol", "cxd-token", "enhanced-circuit-breaker", "oracle-aggregator", "sip-standards"]
+depends_on = ["bme-engine", "concentrated-liquidity-pool", "concentrated-liquidity-pool-v2", "conxian-csf-trait", "conxian-protocol", "cxd-token", "enhanced-circuit-breaker", "oracle-aggregator", "sip-standards"]
 
 [contracts.switchboard-oracle-adapter]
 path = "contracts/integrations/switchboard-oracle-adapter.clar"
