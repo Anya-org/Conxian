@@ -4,6 +4,13 @@
 ## Unreleased
 
 ### Added
+- **Proof-of-Reserves Cryptographic Boundary (Issue #558)**: Replaced the
+  caller-controlled raw-attestation path with canonical consensus-serialized
+  shared snapshots, signer-bound secp256k1 envelopes, a bounded/versioned
+  attestor registry, replay protection, fold-derived distinct quorum, live
+  SIP-010 reconciliation, negative signing tests, and a consumer contamination
+  guard. This is source verification work, not deployment or auditor/oracle
+  qualification.
 - **Enterprise Subscription MVP (Issue #503)**: Added explicit STX-only prepaid
   subscribe/renew/cancel flows, immutable versioned plan and generic feature
   records, KYC/AML checks, allowlisted consumer usage metering, and
