@@ -4,14 +4,13 @@
 ## Unreleased
 
 ### Added
-- **Proof-of-Reserves Binding (July 25, 2026)**: Replaced the legacy raw
-  attestation ledger with versioned snapshot and signer-envelope digests,
-  explicit `secp256k1` algorithm binding, live SIP-010 reconciliation,
-  registry-epoch invalidation, distinct quorum, nonce replay protection, and a
-  repository consumer guard. Audit hardening adds atomic owner/governance
-  handoff, effective-change-only epoch advancement, validated response-returning
-  signing helpers, and rejected-submission state-invariance regressions. This is
-  source/test evidence only, not deployment or oracle-qualification evidence.
+- **Proof-of-Reserves Cryptographic Boundary (Issue #558)**: Replaced the
+  caller-controlled raw-attestation path with canonical consensus-serialized
+  shared snapshots, signer-bound secp256k1 envelopes, a bounded/versioned
+  attestor registry, replay protection, fold-derived distinct quorum, live
+  SIP-010 reconciliation, negative signing tests, and a consumer contamination
+  guard. This is source verification work, not deployment or auditor/oracle
+  qualification.
 - **Enterprise Subscription MVP (Issue #503)**: Added explicit STX-only prepaid
   subscribe/renew/cancel flows, immutable versioned plan and generic feature
   records, KYC/AML checks, allowlisted consumer usage metering, and
@@ -93,7 +92,7 @@
 - **Tokenomics Caps**: CXD max supply (1B tokens), allocation policy immutability lock
 - **ICO Security**: Compliance gating, purchase caps (1M/10K), buyer tracking
 - **CXLP Position NFT**: Full SIP-009 implementation with metadata and fee tracking
-- **Operational Safety**: Rate limiter (window-based), initial Proof-of-Reserves attestation ledger
+- **Operational Safety**: Rate limiter (window-based), Proof-of-Reserves (multi-attestor)
 
 ### Changed
 
@@ -105,10 +104,7 @@
 ### Security
 
 - **Rate Limiting**: Window-based operation limiting (600 block default)
-- **Proof of Reserves**: Historical release note only. The January path did not
-  cryptographically verify signatures or enforce distinct-attestor quorum; it
-  was superseded in July 2026 by versioned snapshot/envelope signatures, live
-  SIP-010 reconciliation, replay protection, and quorum-scoped promotion.
+- **Proof of Reserves**: 3+ attestor requirement, 7-day validity
 - **Sovereign Transfer**: Explicit 5-step handoff with verification
 
 ## [0.4.0] - 2026-01-20

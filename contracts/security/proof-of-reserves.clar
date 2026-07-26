@@ -1,640 +1,378 @@
-;; proof-of-reserves.clar
-;; Conxian Security: quorum attestations over live-reconciled reserve snapshots.
+;; @contract proof-of-reserves
+;; @desc Fail-closed, quorum-backed reserve snapshot verification.
+;; @version 2.0.0
 ;;
-;; Canonical schema v1 hashing:
-;; - uint leaf = the Clarity-native sha256(uint) encoding
-;; - validated ASCII configuration values map to explicit tags that hash to
-;;   fixed 32-byte leaves
-;; - fixed 32-byte identities/digests are included directly
-;; - ordered fixed-width leaves are grouped and hashed; group hashes are hashed
-;;   once more to produce the final 32-byte digest
-;; Snapshot leaves: domain, schema-version, chain-id, network, registry-epoch,
-;; governance-registered asset identity, observed on-chain balance, total supply,
-;; off-chain backing, burn height, and expiry.
-;; Envelope leaves: attestation domain, schema-version, signature algorithm,
-;; snapshot digest, sha256(registered attestor public key), and per-attestor
-;; nonce.
-;; Each signer signs an envelope, while quorum is counted on the shared snapshot
-;; digest so distinct signers do not create unrelated quorum buckets.
-;;
-;; off-chain-backing excludes the observed balance held by this contract. The
-;; invariant on-chain-balance + off-chain-backing >= total-supply is evaluated
-;; without addition as backing >= supply - balance when balance is below supply.
+;; This verifies registered secp256k1 attestors over a canonical, chain-bound
+;; snapshot. It does not qualify attestors, perform audits, or prove deployment.
 
 (use-trait sip-010-trait .sip-standards.sip-010-ft-trait)
 
-(define-constant ERR_UNAUTHORIZED u8000)
-(define-constant ERR_INVALID_SIGNATURE u8001)
-(define-constant ERR_STALE_SNAPSHOT u8002)
-(define-constant ERR_DUPLICATE_ATTESTATION u8003)
-(define-constant ERR_INVALID_SCHEMA u8004)
-(define-constant ERR_INVALID_DOMAIN u8005)
-(define-constant ERR_INVALID_NETWORK u8006)
-(define-constant ERR_INVALID_CHAIN u8007)
-(define-constant ERR_FUTURE_SNAPSHOT u8008)
-(define-constant ERR_EXPIRED_SNAPSHOT u8009)
-(define-constant ERR_REPLAYED_NONCE u8010)
-(define-constant ERR_TOKEN_READ_FAILED u8011)
-(define-constant ERR_LIVE_STATE_MISMATCH u8012)
-(define-constant ERR_UNBACKED_SNAPSHOT u8013)
-(define-constant ERR_INVALID_ATTESTOR u8014)
-(define-constant ERR_INVALID_NETWORK_CONFIG u8015)
-(define-constant ERR_INVALID_ASSET u8016)
-(define-constant ERR_UNSUPPORTED_SIGNATURE_ALGORITHM u8017)
+(define-constant ERR_UNAUTHORIZED (err u8000))
+(define-constant ERR_INVALID_SIGNATURE (err u8001))
+(define-constant ERR_STALE_OBSERVATION (err u8002))
+(define-constant ERR_DUPLICATE_ATTESTATION (err u8003))
+(define-constant ERR_INVALID_ATTESTOR (err u8004))
+(define-constant ERR_REGISTRY_FULL (err u8005))
+(define-constant ERR_INVALID_QUORUM (err u8006))
+(define-constant ERR_TOKEN_CALL_FAILED (err u8007))
+(define-constant ERR_NONCE_REPLAY (err u8009))
+(define-constant ERR_SNAPSHOT_MISMATCH (err u8010))
+(define-constant ERR_SERIALIZATION_FAILED (err u8011))
+(define-constant ERR_ATTESTOR_EXISTS (err u8012))
+(define-constant ERR_ATTESTOR_NOT_FOUND (err u8013))
+(define-constant ERR_UNSUPPORTED_SIGNATURE (err u8014))
+(define-constant ERR_UNSUPPORTED_PUBLIC_KEY (err u8015))
 
-(define-constant SNAPSHOT_SCHEMA_VERSION u1)
-(define-constant SNAPSHOT_DOMAIN "CONXIAN-POR-SNAPSHOT")
-(define-constant ATTESTATION_DOMAIN "CONXIAN-POR-ATTESTATION")
-(define-constant SIGNATURE_ALGORITHM "secp256k1")
-(define-constant SNAPSHOT_DOMAIN_TAG 0x434f4e5849414e2d504f522d534e415053484f54)
-(define-constant ATTESTATION_DOMAIN_TAG 0x434f4e5849414e2d504f522d4154544553544154494f4e)
-(define-constant SECP256K1_TAG 0x736563703235366b31)
-(define-constant MAINNET_TAG 0x6d61696e6e6574)
-(define-constant TESTNET_TAG 0x746573746e6574)
-(define-constant SIMNET_TAG 0x73696d6e6574)
-(define-constant UNCONFIGURED_NETWORK "unset")
-(define-constant MAX_SNAPSHOT_AGE u1008)
-(define-constant MAX_SNAPSHOT_LIFETIME u1008)
-(define-constant MIN_ATTESTATIONS u3)
-(define-constant ZERO_PUBKEY 0x000000000000000000000000000000000000000000000000000000000000000000)
-(define-constant ZERO_DIGEST 0x0000000000000000000000000000000000000000000000000000000000000000)
+;; All validity values are burn-block heights. Observations are accepted at
+;; age <= 1008. Expiry is exclusive: valid only while height < expiry.
+(define-constant SNAPSHOT_DOMAIN "CONXIAN_POR_SNAPSHOT_V1")
+(define-constant ATTESTOR_DOMAIN "CONXIAN_POR_ATTESTOR_V1")
+(define-constant SCHEMA_VERSION u1)
+(define-constant MAX_ATTESTORS u10)
+(define-constant DEFAULT_QUORUM u3)
+(define-constant MAX_OBSERVATION_AGE_BLOCKS u1008)
+(define-constant MAX_EXPIRY_WINDOW_BLOCKS u1008)
+(define-constant VERIFYING_CONTRACT .proof-of-reserves)
 
-;; Registry or network changes advance the epoch and fail closed for every
-;; previously promoted snapshot until a new quorum attests under that epoch.
 (define-data-var contract-owner principal tx-sender)
-(define-data-var governance principal tx-sender)
-(define-data-var network-id (string-ascii 8) UNCONFIGURED_NETWORK)
-(define-data-var configured-chain-id uint u0)
-(define-data-var registry-epoch uint u0)
+(define-data-var quorum uint DEFAULT_QUORUM)
+(define-data-var attestor-list (list 10 principal) (list))
 
-(define-map attestor-registry principal { active: bool, public-key: (buff 33) })
-(define-map registered-attestor-keys (buff 33) principal)
-
-;; The pinned Clarity toolchain cannot serialize principals on chain. This
-;; registry binds a token principal to one unique canonical 32-byte identity.
-(define-map asset-registry principal { active: bool, identity: (buff 32) })
-(define-map registered-asset-identities (buff 32) principal)
-
-(define-map snapshot-candidates
-  { asset: principal, snapshot-digest: (buff 32) }
-  {
-    on-chain-balance: uint,
-    total-supply: uint,
-    off-chain-backing: uint,
-    snapshot-height: uint,
-    expires-at: uint,
-    registry-epoch: uint,
-    attestation-count: uint
-  }
-)
-
-(define-map snapshot-approvals
-  { asset: principal, snapshot-digest: (buff 32), attestor: principal }
-  { nonce: uint, envelope-digest: (buff 32) }
-)
-
-(define-map used-nonces { attestor: principal, nonce: uint } bool)
-
-;; Only this map is authoritative. Candidate and approval maps are diagnostic.
-(define-map accepted-reserves
+(define-map attestor-registry
   principal
+  { active: bool, public-key: (buff 33), key-version: uint })
+
+(define-map reserve-snapshots
+  (buff 32)
   {
-    snapshot-digest: (buff 32),
-    on-chain-balance: uint,
-    total-supply: uint,
-    off-chain-backing: uint,
-    snapshot-height: uint,
-    expires-at: uint,
-    registry-epoch: uint,
-    attestation-count: uint,
-    accepted-at: uint
-  }
-)
+    domain: (string-ascii 24), schema-version: uint, network: uint,
+    verifying-contract: principal, asset: principal,
+    on-chain-balance: uint, total-supply: uint, off-chain-backing: uint,
+    as-of-height: uint, expiry-height: uint, nonce: uint,
+    first-submitted-at: uint })
+
+(define-map validated-attestations
+  { snapshot-digest: (buff 32), attestor: principal }
+  {
+    envelope-digest: (buff 32), signature: (buff 65),
+    public-key: (buff 33), key-version: uint, submitted-at: uint })
+
+(define-map used-nonces
+  { asset: principal, attestor: principal, nonce: uint }
+  bool)
+
+(define-map active-snapshots principal (buff 32))
 
 (define-private (is-owner)
-  (is-eq tx-sender (var-get contract-owner))
-)
+  (is-eq tx-sender (var-get contract-owner)))
 
-(define-private (is-governance)
-  (or (is-owner) (is-eq tx-sender (var-get governance)))
-)
+(define-private (contract-principal)
+  VERIFYING_CONTRACT)
 
-(define-private (advance-registry-epoch)
-  (var-set registry-epoch (+ (var-get registry-epoch) u1))
-)
+(define-private (observation-window-valid
+    (as-of-height uint) (expiry-height uint) (current-height uint))
+  (and
+    (<= as-of-height current-height)
+    (<= (- current-height as-of-height) MAX_OBSERVATION_AGE_BLOCKS)
+    (> expiry-height current-height)
+    (> expiry-height as-of-height)
+    (<= (- expiry-height as-of-height) MAX_EXPIRY_WINDOW_BLOCKS)))
 
-(define-private (valid-runtime-network (network (string-ascii 8)))
-  (or (is-eq network "mainnet") (is-eq network "testnet") (is-eq network "simnet"))
-)
-
-(define-private (reserve-invariant-holds
-    (on-chain-balance uint)
-    (off-chain-backing uint)
-    (total-supply uint)
-  )
+;; Overflow-safe equivalent of on-chain-balance + off-chain-backing >= supply.
+(define-private (covers-supply
+    (on-chain-balance uint) (off-chain-backing uint) (total-supply uint))
   (or
     (>= on-chain-balance total-supply)
-    (>= off-chain-backing (- total-supply on-chain-balance))
-  )
-)
+    (>= off-chain-backing (- total-supply on-chain-balance))))
 
-(define-private (snapshot-is-current
-    (snapshot-height uint)
-    (expires-at uint)
-    (snapshot-registry-epoch uint)
-  )
-  (and
-    (is-eq snapshot-registry-epoch (var-get registry-epoch))
-    (<= snapshot-height burn-block-height)
-    (<= (- burn-block-height snapshot-height) MAX_SNAPSHOT_AGE)
-    (< burn-block-height expires-at)
-  )
-)
+(define-private (count-valid-attestor
+    (attestor principal)
+    (state { snapshot-digest: (buff 32), count: uint }))
+  (match (map-get? attestor-registry attestor)
+    registry
+      (match (map-get? validated-attestations {
+          snapshot-digest: (get snapshot-digest state), attestor: attestor })
+        record
+          (if (and
+              (get active registry)
+              (is-eq (get key-version registry) (get key-version record))
+              (is-eq (get public-key registry) (get public-key record)))
+            (merge state { count: (+ (get count state) u1) })
+            state)
+        state)
+    state))
 
-(define-private (hash-uint (value uint))
-  (sha256 value)
-)
+(define-private (valid-attestation-count (snapshot-digest (buff 32)))
+  (get count (fold count-valid-attestor (var-get attestor-list) {
+    snapshot-digest: snapshot-digest, count: u0 })))
 
-(define-private (snapshot-domain-hash (domain (string-ascii 24)))
-  (sha256 SNAPSHOT_DOMAIN_TAG)
-)
-
-(define-private (signature-algorithm-hash (signature-algorithm (string-ascii 16)))
-  (sha256 SECP256K1_TAG)
-)
-
-(define-private (network-hash (network (string-ascii 8)))
-  (if (is-eq network "mainnet") (sha256 MAINNET_TAG)
-    (if (is-eq network "testnet") (sha256 TESTNET_TAG) (sha256 SIMNET_TAG)))
-)
-
-(define-private (compute-snapshot-digest
-    (schema-version uint)
-    (domain (string-ascii 24))
-    (network (string-ascii 8))
-    (expected-chain-id uint)
-    (snapshot-registry-epoch uint)
-    (asset-identity (buff 32))
+;; Canonical shared digest. Tuple field names and types are the signed schema.
+(define-read-only (get-shared-snapshot-digest
+    (asset principal)
     (on-chain-balance uint)
     (total-supply uint)
     (off-chain-backing uint)
-    (snapshot-height uint)
-    (expires-at uint)
-  )
-  (let (
-      (identity-group (sha256 (concat
-        (snapshot-domain-hash domain)
-        (concat (hash-uint schema-version)
-          (concat (hash-uint expected-chain-id)
-            (concat (network-hash network)
-              (concat (hash-uint snapshot-registry-epoch) asset-identity)))))))
-      (reserve-group (sha256 (concat
-        (hash-uint on-chain-balance)
-        (concat (hash-uint total-supply)
-          (concat (hash-uint off-chain-backing)
-            (concat (hash-uint snapshot-height) (hash-uint expires-at)))))))
-    )
-    (sha256 (concat identity-group reserve-group))
-  )
-)
+    (as-of-height uint)
+    (expiry-height uint)
+    (nonce uint))
+  (match (to-consensus-buff? {
+      domain: SNAPSHOT_DOMAIN,
+      schema-version: SCHEMA_VERSION,
+      network: chain-id,
+      verifying-contract: (contract-principal),
+      asset: asset,
+      on-chain-balance: on-chain-balance,
+      total-supply: total-supply,
+      off-chain-backing: off-chain-backing,
+      as-of-height: as-of-height,
+      expiry-height: expiry-height,
+      nonce: nonce })
+    serialized (ok (sha256 serialized))
+    ERR_SERIALIZATION_FAILED))
 
-(define-private (compute-envelope-digest
-    (schema-version uint)
-    (signature-algorithm (string-ascii 16))
-    (snapshot-digest (buff 32))
-    (attestor-identity (buff 32))
-    (nonce uint)
-  )
-  (sha256 (concat
-    (sha256 ATTESTATION_DOMAIN_TAG)
-    (concat (hash-uint schema-version)
-      (concat (signature-algorithm-hash signature-algorithm)
-        (concat snapshot-digest
-          (concat attestor-identity (hash-uint nonce)))))))
-)
+;; The envelope binds the shared digest to one registered identity.
+(define-read-only (get-attestor-envelope-digest
+    (snapshot-digest (buff 32)) (attestor principal))
+  (let ((verifying-contract (contract-principal)))
+  (match (to-consensus-buff? {
+      domain: ATTESTOR_DOMAIN,
+      schema-version: SCHEMA_VERSION,
+      network: chain-id,
+      verifying-contract: verifying-contract,
+      snapshot-digest: snapshot-digest,
+      attestor: attestor })
+    serialized (ok (sha256 serialized))
+    ERR_SERIALIZATION_FAILED)))
 
-(define-private (key-is-current-for-attestor (attestor principal) (public-key (buff 33)))
-  (match (map-get? attestor-registry attestor)
-    registered (and (get active registered) (is-eq (get public-key registered) public-key))
-    false
-  )
-)
-
-(define-private (promote-if-newer
-    (asset principal)
-    (snapshot-digest (buff 32))
-    (candidate {
-      on-chain-balance: uint,
-      total-supply: uint,
-      off-chain-backing: uint,
-      snapshot-height: uint,
-      expires-at: uint,
-      registry-epoch: uint,
-      attestation-count: uint
-    })
-  )
-  (if (>= (get attestation-count candidate) MIN_ATTESTATIONS)
-    (match (map-get? accepted-reserves asset)
-      current
-        (if (> (get snapshot-height candidate) (get snapshot-height current))
-          (begin
-            (map-set accepted-reserves asset (merge candidate {
-              snapshot-digest: snapshot-digest,
-              accepted-at: burn-block-height
-            }))
-            true
-          )
-          false
-        )
-      (begin
-        (map-set accepted-reserves asset (merge candidate {
-          snapshot-digest: snapshot-digest,
-          accepted-at: burn-block-height
-        }))
-        true
-      )
-    )
-    false
-  )
-)
-
-(define-public (set-attestor (attestor principal) (public-key (buff 33)))
-  (let (
-      (existing-key-owner (map-get? registered-attestor-keys public-key))
-      (existing-attestor (map-get? attestor-registry attestor))
-    )
-    (begin
-      (asserts! (is-governance) (err ERR_UNAUTHORIZED))
-      (asserts! (not (is-eq public-key ZERO_PUBKEY)) (err ERR_INVALID_ATTESTOR))
-      ;; Keys are permanently reserved once registered. The only permitted
-      ;; reuse is an idempotent write of the currently active key by the same
-      ;; attestor; rotated and removed keys can never be reactivated or aliased.
-      (asserts! (match existing-key-owner owner
-        (and (is-eq owner attestor) (key-is-current-for-attestor attestor public-key))
-        true) (err ERR_INVALID_ATTESTOR))
-      (if (match existing-attestor registered
-            (and (get active registered) (is-eq (get public-key registered) public-key))
-            false)
-        (ok false)
+(define-public (add-attestor (attestor principal) (public-key (buff 33)))
+  (begin
+    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-eq (len public-key) u33) ERR_UNSUPPORTED_PUBLIC_KEY)
+    (asserts! (is-none (map-get? attestor-registry attestor)) ERR_ATTESTOR_EXISTS)
+    (match (as-max-len? (append (var-get attestor-list) attestor) u10)
+      updated-list
         (begin
-          (map-set attestor-registry attestor { active: true, public-key: public-key })
-          (map-set registered-attestor-keys public-key attestor)
-          (advance-registry-epoch)
-          (print { event: "por-attestor-set", attestor: attestor, registry-epoch: (var-get registry-epoch) })
-          (ok true)
-        )
-      )
-    )
-  )
-)
+          (var-set attestor-list updated-list)
+          (map-set attestor-registry attestor {
+            active: true, public-key: public-key, key-version: u1 })
+          (print { event: "por-attestor-added", attestor: attestor, key-version: u1 })
+          (ok true))
+      ERR_REGISTRY_FULL)))
 
-(define-public (remove-attestor (attestor principal))
+(define-public (rotate-attestor-key (attestor principal) (public-key (buff 33)))
   (begin
-    (asserts! (is-governance) (err ERR_UNAUTHORIZED))
-    (let ((registered (unwrap! (map-get? attestor-registry attestor) (err ERR_INVALID_ATTESTOR))))
-      (begin
-        (asserts! (get active registered) (err ERR_INVALID_ATTESTOR))
-        (map-set attestor-registry attestor (merge registered { active: false }))
-        (advance-registry-epoch)
-        (print { event: "por-attestor-removed", attestor: attestor, registry-epoch: (var-get registry-epoch) })
-        (ok true)
-      )
-    )
-  )
-)
+    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-eq (len public-key) u33) ERR_UNSUPPORTED_PUBLIC_KEY)
+    (match (map-get? attestor-registry attestor)
+      registry
+        (let ((next-version (+ (get key-version registry) u1)))
+          (map-set attestor-registry attestor {
+            active: (get active registry), public-key: public-key, key-version: next-version })
+          (print { event: "por-attestor-key-rotated", attestor: attestor,
+            key-version: next-version })
+          (ok true))
+      ERR_ATTESTOR_NOT_FOUND)))
 
-(define-public (set-asset (asset principal) (identity (buff 32)))
-  (let (
-      (existing-identity-owner (map-get? registered-asset-identities identity))
-      (existing-asset (map-get? asset-registry asset))
-    )
-    (begin
-      (asserts! (is-governance) (err ERR_UNAUTHORIZED))
-      (asserts! (not (is-eq identity ZERO_DIGEST)) (err ERR_INVALID_ASSET))
-      (asserts! (match existing-identity-owner owner (is-eq owner asset) true) (err ERR_INVALID_ASSET))
-      (if (match existing-asset registered
-            (and (get active registered) (is-eq (get identity registered) identity))
-            false)
-        (ok false)
+(define-public (deactivate-attestor (attestor principal))
+  (begin
+    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (match (map-get? attestor-registry attestor)
+      registry
         (begin
-          (map-set asset-registry asset { active: true, identity: identity })
-          (map-set registered-asset-identities identity asset)
-          (advance-registry-epoch)
-          (ok true)
-        )
-      )
-    )
-  )
-)
+          (map-set attestor-registry attestor (merge registry { active: false }))
+          (print { event: "por-attestor-deactivated", attestor: attestor })
+          (ok true))
+      ERR_ATTESTOR_NOT_FOUND)))
 
-(define-public (remove-asset (asset principal))
+(define-public (set-quorum (new-quorum uint))
   (begin
-    (asserts! (is-governance) (err ERR_UNAUTHORIZED))
-    (let ((registered (unwrap! (map-get? asset-registry asset) (err ERR_INVALID_ASSET))))
-      (begin
-        (asserts! (get active registered) (err ERR_INVALID_ASSET))
-        (map-set asset-registry asset (merge registered { active: false }))
-        (advance-registry-epoch)
-        (ok true)
-      )
-    )
-  )
-)
-
-(define-public (set-network-id (network (string-ascii 8)))
-  (begin
-    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (asserts! (valid-runtime-network network) (err ERR_INVALID_NETWORK_CONFIG))
-    (if (is-eq network (var-get network-id))
-      (ok false)
-      (begin
-        (var-set network-id network)
-        (advance-registry-epoch)
-        (ok true)
-      )
-    )
-  )
-)
-
-(define-public (set-chain-id (new-chain-id uint))
-  (begin
-    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (asserts! (> new-chain-id u0) (err ERR_INVALID_CHAIN))
-    (if (is-eq new-chain-id (var-get configured-chain-id))
-      (ok false)
-      (begin
-        (var-set configured-chain-id new-chain-id)
-        (advance-registry-epoch)
-        (ok true)
-      )
-    )
-  )
-)
-
-(define-public (set-governance (new-governance principal))
-  (begin
-    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    (if (is-eq new-governance (var-get governance))
-      (ok false)
-      (begin
-        (var-set governance new-governance)
-        (advance-registry-epoch)
-        (ok true)
-      )
-    )
-  )
-)
+    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (and (> new-quorum u0) (<= new-quorum MAX_ATTESTORS)) ERR_INVALID_QUORUM)
+    (var-set quorum new-quorum)
+    (print { event: "por-quorum-updated", quorum: new-quorum })
+    (ok true)))
 
 (define-public (set-contract-owner (new-owner principal))
   (begin
-    (asserts! (is-owner) (err ERR_UNAUTHORIZED))
-    ;; Ownership is the root of every PoR control path. Transfer owner and
-    ;; governance atomically so the former owner retains no registry authority.
-    (if (and
-          (is-eq new-owner (var-get contract-owner))
-          (is-eq new-owner (var-get governance)))
-      (ok false)
-      (begin
-        (var-set contract-owner new-owner)
-        (var-set governance new-owner)
-        (advance-registry-epoch)
-        (ok true)
-      )
-    )
-  )
-)
+    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (var-set contract-owner new-owner)
+    (ok true)))
 
-;; All validation and live SIP-010 reconciliation happens before proof writes.
+;; Balance and supply are sampled here. Callers cannot supply either value.
 (define-public (submit-attestation
-    (asset <sip-010-trait>)
-    (schema-version uint)
-    (domain (string-ascii 24))
-    (signature-algorithm (string-ascii 16))
-    (network (string-ascii 8))
-    (expected-chain-id uint)
-    (snapshot-registry-epoch uint)
-    (observed-on-chain-balance uint)
-    (observed-total-supply uint)
+    (asset-trait <sip-010-trait>)
     (off-chain-backing uint)
-    (snapshot-height uint)
-    (expires-at uint)
+    (as-of-height uint)
+    (expiry-height uint)
     (nonce uint)
-    (signature (buff 65))
-  )
+    (signature (buff 65)))
   (let (
-      (asset-principal (contract-of asset))
+      (asset (contract-of asset-trait))
       (attestor tx-sender)
-      (configured-network (var-get network-id))
-      (live-balance (unwrap! (contract-call? asset get-balance (as-contract tx-sender)) (err ERR_TOKEN_READ_FAILED)))
-      (live-supply (unwrap! (contract-call? asset get-total-supply) (err ERR_TOKEN_READ_FAILED)))
-      (registered (unwrap! (map-get? attestor-registry attestor) (err ERR_UNAUTHORIZED)))
-      (registered-asset (unwrap! (map-get? asset-registry asset-principal) (err ERR_INVALID_ASSET)))
+      (current-height burn-block-height)
+      (verifying-contract (contract-principal))
+      (registry (unwrap! (map-get? attestor-registry attestor) ERR_INVALID_ATTESTOR))
+      (on-chain-balance (unwrap! (contract-call? asset-trait get-balance verifying-contract) ERR_TOKEN_CALL_FAILED))
+      (total-supply (unwrap! (contract-call? asset-trait get-total-supply) ERR_TOKEN_CALL_FAILED))
+      (snapshot-digest (try! (get-shared-snapshot-digest asset on-chain-balance total-supply
+        off-chain-backing as-of-height expiry-height nonce)))
+      (envelope-digest (try! (get-attestor-envelope-digest snapshot-digest attestor)))
     )
-    (begin
-      (asserts! (get active registered) (err ERR_UNAUTHORIZED))
-      (asserts! (get active registered-asset) (err ERR_INVALID_ASSET))
-      ;; Direct wallet submission keeps signer attribution unambiguous. Proxy
-      ;; and as-contract paths cannot substitute a contract caller.
-      (asserts! (is-eq tx-sender contract-caller) (err ERR_UNAUTHORIZED))
-      (asserts! (is-eq schema-version SNAPSHOT_SCHEMA_VERSION) (err ERR_INVALID_SCHEMA))
-      (asserts! (is-eq domain SNAPSHOT_DOMAIN) (err ERR_INVALID_DOMAIN))
-      (asserts! (is-eq signature-algorithm SIGNATURE_ALGORITHM) (err ERR_UNSUPPORTED_SIGNATURE_ALGORITHM))
-      (asserts! (not (is-eq configured-network UNCONFIGURED_NETWORK)) (err ERR_INVALID_NETWORK))
-      (asserts! (is-eq network configured-network) (err ERR_INVALID_NETWORK))
-      (asserts! (valid-runtime-network network) (err ERR_INVALID_NETWORK))
-      (asserts! (> (var-get configured-chain-id) u0) (err ERR_INVALID_CHAIN))
-      (asserts! (is-eq expected-chain-id (var-get configured-chain-id)) (err ERR_INVALID_CHAIN))
-      (asserts! (is-eq snapshot-registry-epoch (var-get registry-epoch)) (err ERR_INVALID_ATTESTOR))
-      (asserts! (<= snapshot-height burn-block-height) (err ERR_FUTURE_SNAPSHOT))
-      (asserts! (<= (- burn-block-height snapshot-height) MAX_SNAPSHOT_AGE) (err ERR_STALE_SNAPSHOT))
-      (asserts! (> expires-at burn-block-height) (err ERR_EXPIRED_SNAPSHOT))
-      (asserts! (>= expires-at snapshot-height) (err ERR_EXPIRED_SNAPSHOT))
-      (asserts! (<= (- expires-at snapshot-height) MAX_SNAPSHOT_LIFETIME) (err ERR_EXPIRED_SNAPSHOT))
-      (asserts! (is-eq observed-on-chain-balance live-balance) (err ERR_LIVE_STATE_MISMATCH))
-      (asserts! (is-eq observed-total-supply live-supply) (err ERR_LIVE_STATE_MISMATCH))
-      (asserts! (reserve-invariant-holds live-balance off-chain-backing live-supply) (err ERR_UNBACKED_SNAPSHOT))
-      (asserts! (is-none (map-get? used-nonces { attestor: attestor, nonce: nonce })) (err ERR_REPLAYED_NONCE))
-      (let (
-          (snapshot-digest (compute-snapshot-digest
-            schema-version domain network expected-chain-id snapshot-registry-epoch
-            (get identity registered-asset) live-balance live-supply off-chain-backing snapshot-height expires-at))
-          (envelope-digest (compute-envelope-digest
-            schema-version signature-algorithm snapshot-digest (sha256 (get public-key registered)) nonce))
-          (approval-key { asset: asset-principal, snapshot-digest: snapshot-digest, attestor: attestor })
-        )
-        (begin
-          (asserts! (is-none (map-get? snapshot-approvals approval-key)) (err ERR_DUPLICATE_ATTESTATION))
-          (asserts! (secp256k1-verify envelope-digest signature (get public-key registered)) (err ERR_INVALID_SIGNATURE))
-          (let (
-              (candidate (default-to {
-                  on-chain-balance: live-balance,
-                  total-supply: live-supply,
-                  off-chain-backing: off-chain-backing,
-                  snapshot-height: snapshot-height,
-                  expires-at: expires-at,
-                  registry-epoch: snapshot-registry-epoch,
-                  attestation-count: u0
-                } (map-get? snapshot-candidates { asset: asset-principal, snapshot-digest: snapshot-digest })))
-              (updated-candidate (merge candidate { attestation-count: (+ (get attestation-count candidate) u1) }))
-            )
-            (map-set used-nonces { attestor: attestor, nonce: nonce } true)
-            (map-set snapshot-approvals approval-key { nonce: nonce, envelope-digest: envelope-digest })
-            (map-set snapshot-candidates { asset: asset-principal, snapshot-digest: snapshot-digest } updated-candidate)
-            (let ((promoted (promote-if-newer asset-principal snapshot-digest updated-candidate)))
-              (print {
-                event: "por-attestation-accepted",
-                asset: asset-principal,
-                snapshot-digest: snapshot-digest,
-                attestor: attestor,
-                attestation-count: (get attestation-count updated-candidate),
-                promoted: promoted
-              })
-              (ok promoted)
-            )
-          )
-        )
-      )
-    )
-  )
-)
+    (asserts! (get active registry) ERR_INVALID_ATTESTOR)
+    (asserts! (observation-window-valid as-of-height expiry-height current-height) ERR_STALE_OBSERVATION)
+    (asserts! (is-eq (len signature) u65) ERR_UNSUPPORTED_SIGNATURE)
+    (asserts! (is-none (map-get? validated-attestations {
+      snapshot-digest: snapshot-digest, attestor: attestor })) ERR_DUPLICATE_ATTESTATION)
+    (asserts! (is-none (map-get? used-nonces {
+      asset: asset, attestor: attestor, nonce: nonce })) ERR_NONCE_REPLAY)
+    (asserts! (secp256k1-verify envelope-digest signature (get public-key registry)) ERR_INVALID_SIGNATURE)
 
-;; Canonical external signing helpers.
-(define-read-only (get-snapshot-digest
-    (schema-version uint)
-    (domain (string-ascii 24))
-    (network (string-ascii 8))
-    (expected-chain-id uint)
-    (snapshot-registry-epoch uint)
-    (asset-identity (buff 32))
-    (on-chain-balance uint)
-    (total-supply uint)
-    (off-chain-backing uint)
-    (snapshot-height uint)
-    (expires-at uint)
-  )
-  (begin
-    (asserts! (is-eq schema-version SNAPSHOT_SCHEMA_VERSION) (err ERR_INVALID_SCHEMA))
-    (asserts! (is-eq domain SNAPSHOT_DOMAIN) (err ERR_INVALID_DOMAIN))
-    (asserts! (valid-runtime-network network) (err ERR_INVALID_NETWORK))
-    (asserts! (not (is-eq (var-get network-id) UNCONFIGURED_NETWORK)) (err ERR_INVALID_NETWORK))
-    (asserts! (is-eq network (var-get network-id)) (err ERR_INVALID_NETWORK))
-    (asserts! (> (var-get configured-chain-id) u0) (err ERR_INVALID_CHAIN))
-    (asserts! (is-eq expected-chain-id (var-get configured-chain-id)) (err ERR_INVALID_CHAIN))
-    (asserts! (is-eq snapshot-registry-epoch (var-get registry-epoch)) (err ERR_INVALID_ATTESTOR))
-    (ok (compute-snapshot-digest schema-version domain network expected-chain-id snapshot-registry-epoch
-      asset-identity on-chain-balance total-supply off-chain-backing snapshot-height expires-at))
-  )
-)
+    (match (map-get? reserve-snapshots snapshot-digest)
+      stored
+        (asserts! (and
+          (is-eq (get domain stored) SNAPSHOT_DOMAIN)
+          (is-eq (get schema-version stored) SCHEMA_VERSION)
+          (is-eq (get network stored) chain-id)
+          (is-eq (get verifying-contract stored) verifying-contract)
+          (is-eq (get asset stored) asset)
+          (is-eq (get on-chain-balance stored) on-chain-balance)
+          (is-eq (get total-supply stored) total-supply)
+          (is-eq (get off-chain-backing stored) off-chain-backing)
+          (is-eq (get as-of-height stored) as-of-height)
+          (is-eq (get expiry-height stored) expiry-height)
+          (is-eq (get nonce stored) nonce)) ERR_SNAPSHOT_MISMATCH)
+      (map-set reserve-snapshots snapshot-digest {
+        domain: SNAPSHOT_DOMAIN, schema-version: SCHEMA_VERSION,
+        network: chain-id, verifying-contract: verifying-contract, asset: asset,
+        on-chain-balance: on-chain-balance, total-supply: total-supply,
+        off-chain-backing: off-chain-backing, as-of-height: as-of-height,
+        expiry-height: expiry-height, nonce: nonce,
+        first-submitted-at: current-height }))
 
-(define-read-only (get-attestation-digest
-    (schema-version uint)
-    (signature-algorithm (string-ascii 16))
+    (map-set used-nonces { asset: asset, attestor: attestor, nonce: nonce } true)
+    (map-set validated-attestations {
+        snapshot-digest: snapshot-digest, attestor: attestor } {
+      envelope-digest: envelope-digest, signature: signature,
+      public-key: (get public-key registry),
+      key-version: (get key-version registry), submitted-at: current-height })
+
+    (let ((attestation-count (valid-attestation-count snapshot-digest)))
+      (if (>= attestation-count (var-get quorum))
+        (map-set active-snapshots asset snapshot-digest)
+        false)
+      (print {
+        event: "por-attestation-validated", asset: asset, attestor: attestor,
+        snapshot-digest: snapshot-digest, attestation-count: attestation-count,
+        activated: (>= attestation-count (var-get quorum)) })
+      (ok { snapshot-digest: snapshot-digest,
+        attestation-count: attestation-count,
+        activated: (>= attestation-count (var-get quorum)) }))))
+
+(define-private (snapshot-metadata-valid
+    (snapshot {
+      domain: (string-ascii 24), schema-version: uint, network: uint,
+      verifying-contract: principal, asset: principal,
+      on-chain-balance: uint, total-supply: uint, off-chain-backing: uint,
+      as-of-height: uint, expiry-height: uint, nonce: uint,
+      first-submitted-at: uint })
+    (asset principal))
+  (and
+    (is-eq (get domain snapshot) SNAPSHOT_DOMAIN)
+    (is-eq (get schema-version snapshot) SCHEMA_VERSION)
+    (is-eq (get network snapshot) chain-id)
+    (is-eq (get verifying-contract snapshot) (contract-principal))
+    (is-eq (get asset snapshot) asset)
+    (observation-window-valid (get as-of-height snapshot)
+      (get expiry-height snapshot) burn-block-height)))
+
+(define-private (snapshot-live-valid
     (snapshot-digest (buff 32))
-    (attestor-identity (buff 32))
-    (nonce uint)
-  )
-  (begin
-    (asserts! (is-eq schema-version SNAPSHOT_SCHEMA_VERSION) (err ERR_INVALID_SCHEMA))
-    (asserts! (is-eq signature-algorithm SIGNATURE_ALGORITHM) (err ERR_UNSUPPORTED_SIGNATURE_ALGORITHM))
-    (ok (compute-envelope-digest schema-version signature-algorithm snapshot-digest attestor-identity nonce))
-  )
-)
+    (snapshot {
+      domain: (string-ascii 24), schema-version: uint, network: uint,
+      verifying-contract: principal, asset: principal,
+      on-chain-balance: uint, total-supply: uint, off-chain-backing: uint,
+      as-of-height: uint, expiry-height: uint, nonce: uint,
+      first-submitted-at: uint })
+    (asset principal) (live-balance uint) (live-supply uint))
+  (and
+    (snapshot-metadata-valid snapshot asset)
+    (is-eq live-balance (get on-chain-balance snapshot))
+    (is-eq live-supply (get total-supply snapshot))
+    (covers-supply live-balance (get off-chain-backing snapshot) live-supply)
+    (>= (valid-attestation-count snapshot-digest) (var-get quorum))))
 
-;; Dynamic trait calls are conservatively classified as potentially writing by
-;; the pinned Clarity analyzer, even when invoking SIP-010 read-only methods.
-;; Therefore live reconciliation is exposed as a public, non-mutating check
-;; that can be transaction-simulated. It fails closed on every error/drift.
-(define-private (check-live-proof (asset <sip-010-trait>))
-  (let ((asset-principal (contract-of asset)))
-    (match (map-get? accepted-reserves asset-principal)
-      proof
-        (and
-          (>= (get attestation-count proof) MIN_ATTESTATIONS)
-          (snapshot-is-current (get snapshot-height proof) (get expires-at proof) (get registry-epoch proof))
-          (reserve-invariant-holds (get on-chain-balance proof) (get off-chain-backing proof) (get total-supply proof))
-          (match (contract-call? asset get-balance (as-contract tx-sender))
-            live-balance
-              (and
-                (is-eq live-balance (get on-chain-balance proof))
-                (match (contract-call? asset get-total-supply)
-                  live-supply (is-eq live-supply (get total-supply proof))
-                  read-error false
-                )
-              )
-            read-error false
-          )
-        )
-      false
-    )
-  )
-)
+(define-public (is-fully-backed (asset-trait <sip-010-trait>))
+  (ok (let ((asset (contract-of asset-trait)))
+    (match (map-get? active-snapshots asset)
+      snapshot-digest
+        (match (map-get? reserve-snapshots snapshot-digest)
+          snapshot
+            (match (contract-call? asset-trait get-balance (contract-principal))
+              live-balance
+                (match (contract-call? asset-trait get-total-supply)
+                  live-supply (snapshot-live-valid snapshot-digest snapshot asset live-balance live-supply)
+                  supply-error false)
+              balance-error false)
+          false)
+      false))))
 
-(define-public (is-fully-backed (asset <sip-010-trait>))
-  (ok (check-live-proof asset))
-)
+(define-public (get-proof-status (asset-trait <sip-010-trait>))
+  (ok (let ((asset (contract-of asset-trait)))
+    (match (map-get? active-snapshots asset)
+      snapshot-digest
+        (match (map-get? reserve-snapshots snapshot-digest)
+          snapshot
+            (match (contract-call? asset-trait get-balance (contract-principal))
+              live-balance
+                (match (contract-call? asset-trait get-total-supply)
+                  live-supply {
+                    fully-backed: (snapshot-live-valid snapshot-digest snapshot asset live-balance live-supply),
+                    token-calls-ok: true, snapshot-digest: (some snapshot-digest),
+                    attestation-count: (valid-attestation-count snapshot-digest),
+                    quorum: (var-get quorum), as-of-height: (get as-of-height snapshot),
+                    expiry-height: (get expiry-height snapshot),
+                    live-balance-matches: (is-eq live-balance (get on-chain-balance snapshot)),
+                    live-supply-matches: (is-eq live-supply (get total-supply snapshot)) }
+                  supply-error {
+                    fully-backed: false, token-calls-ok: false,
+                    snapshot-digest: (some snapshot-digest),
+                    attestation-count: (valid-attestation-count snapshot-digest),
+                    quorum: (var-get quorum), as-of-height: (get as-of-height snapshot),
+                    expiry-height: (get expiry-height snapshot),
+                    live-balance-matches: false, live-supply-matches: false })
+              balance-error {
+                fully-backed: false, token-calls-ok: false,
+                snapshot-digest: (some snapshot-digest),
+                attestation-count: (valid-attestation-count snapshot-digest),
+                quorum: (var-get quorum), as-of-height: (get as-of-height snapshot),
+                expiry-height: (get expiry-height snapshot),
+                live-balance-matches: false, live-supply-matches: false })
+          {
+            fully-backed: false, token-calls-ok: false,
+            snapshot-digest: (some snapshot-digest), attestation-count: u0,
+            quorum: (var-get quorum), as-of-height: u0, expiry-height: u0,
+            live-balance-matches: false, live-supply-matches: false })
+      {
+        fully-backed: false, token-calls-ok: false,
+        snapshot-digest: none, attestation-count: u0,
+        quorum: (var-get quorum), as-of-height: u0, expiry-height: u0,
+        live-balance-matches: false, live-supply-matches: false }))))
 
-(define-public (get-reserve-ratio (asset <sip-010-trait>))
-  (ok (if (check-live-proof asset) u10000 u0))
-)
-
-(define-public (get-proof-status (asset <sip-010-trait>))
-  (let ((asset-principal (contract-of asset)))
-    (match (map-get? accepted-reserves asset-principal)
-      proof (ok {
-        fully-backed: (check-live-proof asset),
-        reserve-ratio: (if (check-live-proof asset) u10000 u0),
-        snapshot-digest: (get snapshot-digest proof),
-        attestation-count: (get attestation-count proof),
-        snapshot-height: (get snapshot-height proof),
-        expires-at: (get expires-at proof),
-        registry-epoch: (get registry-epoch proof),
-        is-stale: (not (snapshot-is-current (get snapshot-height proof) (get expires-at proof) (get registry-epoch proof)))
-      })
-      (ok {
-        fully-backed: false,
-        reserve-ratio: u0,
-        snapshot-digest: ZERO_DIGEST,
-        attestation-count: u0,
-        snapshot-height: u0,
-        expires-at: u0,
-        registry-epoch: u0,
-        is-stale: true
-      })
-    )
-  )
-)
-
-(define-read-only (get-accepted-reserve (asset principal))
-  (map-get? accepted-reserves asset)
-)
-
-(define-read-only (get-snapshot-candidate (asset principal) (snapshot-digest (buff 32)))
-  (map-get? snapshot-candidates { asset: asset, snapshot-digest: snapshot-digest })
-)
-
-(define-read-only (get-attestation (asset principal) (snapshot-digest (buff 32)) (attestor principal))
-  (map-get? snapshot-approvals { asset: asset, snapshot-digest: snapshot-digest, attestor: attestor })
-)
-
+;; Diagnostic raw getters are non-authoritative; only the trait-based status
+;; functions above can produce a positive reserve decision.
+(define-read-only (get-active-snapshot-digest (asset principal))
+  (map-get? active-snapshots asset))
+(define-read-only (get-snapshot (snapshot-digest (buff 32)))
+  (map-get? reserve-snapshots snapshot-digest))
+(define-read-only (get-validated-attestation
+    (snapshot-digest (buff 32)) (attestor principal))
+  (map-get? validated-attestations {
+    snapshot-digest: snapshot-digest, attestor: attestor }))
 (define-read-only (get-attestor (attestor principal))
-  (map-get? attestor-registry attestor)
-)
-
-(define-read-only (get-asset (asset principal))
-  (map-get? asset-registry asset)
-)
-
-(define-read-only (get-domain-config)
-  {
-    schema-version: SNAPSHOT_SCHEMA_VERSION,
-    snapshot-domain: SNAPSHOT_DOMAIN,
-    attestation-domain: ATTESTATION_DOMAIN,
-    signature-algorithm: SIGNATURE_ALGORITHM,
-    network: (var-get network-id),
-    chain-id: (var-get configured-chain-id),
-    registry-epoch: (var-get registry-epoch),
-    minimum-attestations: MIN_ATTESTATIONS,
-    maximum-age: MAX_SNAPSHOT_AGE,
-    maximum-lifetime: MAX_SNAPSHOT_LIFETIME
-  }
-)
+  (map-get? attestor-registry attestor))
+(define-read-only (get-attestors) (var-get attestor-list))
+(define-read-only (get-quorum) (var-get quorum))
+(define-read-only (get-protocol-constants)
+  { schema-version: SCHEMA_VERSION, max-attestors: MAX_ATTESTORS,
+    max-observation-age-blocks: MAX_OBSERVATION_AGE_BLOCKS,
+    max-expiry-window-blocks: MAX_EXPIRY_WINDOW_BLOCKS })

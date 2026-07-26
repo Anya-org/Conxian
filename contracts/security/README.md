@@ -8,10 +8,11 @@ The module implements multiple layers of protection:
 - **Emergency Controls**: `circuit-breaker.clar` and `enhanced-circuit-breaker.clar` allow for halting specific functions or entire modules.
 - **Solvency**: `conxian-insurance-fund.clar` manages a reserve of assets to cover unexpected losses.
 - **Operational Safety**: `rate-limiter.clar` prevents large-scale drainage or spam.
-- **Reserve Evidence**: `proof-of-reserves.clar` verifies registered secp256k1
-  attestations over versioned, network-bound snapshots and promotes only a
-  distinct-attestor quorum after live SIP-010 balance/supply reconciliation.
 - **MEV Protection**: Dedicated NFT-based protection layers against sandwich attacks and front-running.
+- **Reserve Attestation Boundary**: `proof-of-reserves.clar` verifies a bounded
+  distinct-attestor quorum over chain-, contract-, asset-, balance-, supply-,
+  backing-, burn-height-, expiry-, and nonce-bound snapshots. See
+  `docs/PROOF_OF_RESERVES.md`; this is not an audit or deployment claim.
 
 ## Core Contracts (Reference)
 
@@ -49,50 +50,6 @@ Limits the rate of asset outflows.
 | `check-rate-limit` | `(user principal)` | Validates if a user is within their allowed rate limit. |
 | `set-custom-limit` | `(user principal) (window-size (optional uint)) (max-ops (optional uint))` | Configures a custom limit for a user. |
 
-### `proof-of-reserves.clar`
-Cryptographically binds reserve attestations to one common snapshot digest.
-
-The owner/governance registry binds each attestor principal to one compressed
-secp256k1 public key and each SIP-010 token principal to one unique 32-byte asset
-identity. Every signer signs a separate envelope over
-`{attestation-domain, schema-version, signature-algorithm, snapshot-digest,
-sha256(attestor-public-key), nonce}`; quorum is counted only for the shared
-snapshot digest. The only supported algorithm identifier is `secp256k1`, using
-a compressed 33-byte public key and a recoverable 65-byte signature. Registry,
-asset, network, chain, governance, or ownership changes advance an epoch and
-invalidate older proof status. Idempotent setters return `(ok false)` without
-advancing the epoch; nonexistent removals return an error. Ownership transfer
-atomically assigns both owner and governance authority to the new owner so the
-former owner retains no PoR control path.
-
-Attestor public keys are permanently retired after rotation or removal. Their
-uniqueness reservations are intentionally not released, preventing a retired
-key from being reactivated for the same identity or aliased to another one.
-
-`off-chain-backing` excludes the observed balance held by the PoR contract. The
-accepted invariant is `on-chain-balance + off-chain-backing >= total-supply`,
-implemented without overflow-prone addition.
-
-| Function | Current signature summary | Description |
-|----------|---------------------------|-------------|
-| `set-attestor` / `remove-attestor` | `(principal, (buff 33))` / `(principal)` | Governance-managed authoritative key registry with permanent key retirement. |
-| `set-asset` / `remove-asset` | `(principal, (buff 32))` / `(principal)` | Binds a SIP-010 contract principal to a unique canonical asset identity. |
-| `set-network-id` / `set-chain-id` | `((string-ascii 8))` / `(uint)` | Explicit domain configuration; the contract remains fail closed while unset. |
-| `set-governance` / `set-contract-owner` | `(principal)` / `(principal)` | Changes governance or atomically transfers owner plus governance control; effective changes invalidate the current epoch. |
-| `get-snapshot-digest` | `(schema, domain, network, chain, epoch, asset-id, balance, supply, backing, height, expiry) -> (response (buff 32) uint)` | Returns the canonical common snapshot digest only when schema/domain/network/chain/epoch match current configuration. |
-| `get-attestation-digest` | `(schema, signature-algorithm, snapshot-digest, signer-id, nonce) -> (response (buff 32) uint)` | Returns the signer-specific envelope digest only for the supported schema and algorithm. |
-| `submit-attestation` | `(asset, schema, domain, signature-algorithm, network, chain, epoch, balance, supply, backing, height, expiry, nonce, signature)` | Re-reads live SIP-010 state, verifies a direct-sender signature, rejects replay/duplicates, and promotes only a newer quorum snapshot. |
-| `is-fully-backed` / `get-proof-status` | `(<sip-010-trait>)` | Public, non-mutating live reconciliation checks that fail closed on missing, stale, expired, reconfigured, or drifted evidence. |
-
-See `docs/PROOF_OF_RESERVES_API_MIGRATION.md` for the breaking legacy
-replacement and signing-field migration table.
-
-The pinned analyzer classifies dynamic trait calls as potentially writing even
-when the selected SIP-010 methods are read-only. Consequently, the live checks
-are public functions intended for transaction simulation rather than
-`define-read-only` functions. Principal-only diagnostic accessors are not proof
-of backing and must not be used as production gates.
-
 ## Integration Examples (How-to)
 
 ### Checking Rate Limits for an Operation
@@ -116,13 +73,13 @@ Comprehensive validation is performed using the Vitest framework.
 |------|------------|
 | **Circuit Breaker** | An emergency mechanism that halts specific protocol functions or entire modules during a security incident to prevent further damage. |
 | **MEV (Maximal Extractable Value)** | The profit a block producer (or other actors) can extract by reordering, including, or excluding transactions within a block. |
-| **Proof of Reserves (PoR)** | A transparency mechanism that proves an entity has sufficient on-chain and off-chain assets to cover its liabilities. |
+| **Proof of Reserves (PoR)** | A cryptographic attestation mechanism that reports sufficient represented reserves only while exact live state and active signer quorum remain valid; it does not independently prove off-chain custody. |
 | **Insurance Fund** | A reserve of assets held by the protocol to cover unexpected losses, such as liquidations that fail to cover debt. |
 | **Veto Quorum** | The minimum number of authorized participants required to trigger a systemic veto and halt administrative functions. |
 | **Rate Limiting** | A defensive strategy that limits the number of operations or amount of value a user can move within a specific time window. |
 
 ## Status (Reference)
-- Implementation: Source-level security controls; deployment and external oracle qualification are not claimed
-- Audit Status: Focused simulator tests only; independent audit not claimed
+- Implementation: Active source with fail-closed PoR verification; deployment not claimed
+- Audit Status: No external auditor/oracle qualification claimed
 - BIP Compliance: BIP-341, BIP-342, BIP-174
 - Standard: Hexagonal, Defensive Engineering, CSF-Integrated

@@ -14,14 +14,14 @@ on:
       - 'scripts/gen-deployment-plans.py'
       - 'scripts/release_plan_validation.py'
       - 'scripts/verify_contamination_guard.py'
-      - 'scripts/verify_por_consumer_guard.py'
       - 'scripts/verify_zkml_quarantine.py'
       - 'scripts/verify_codeowners_policy.py'
+      - 'scripts/verify_proof_of_reserves_boundary.py'
       - 'tests/compliance/zkml-verifier.test.ts'
-      - 'tests/test_verify_por_consumer_guard.py'
       - 'tests/test_verify_zkml_quarantine.py'
       - 'tests/test_verify_codeowners_policy.py'
       - 'tests/test_main_branch_governance_policy.py'
+      - 'tests/test_verify_proof_of_reserves_boundary.py'
       - 'CODEOWNERS'
       - '.github/workflows/sovereign-guard.yml'
   pull_request:
@@ -53,11 +53,11 @@ jobs:
               - 'scripts/gen-deployment-plans.py'
               - 'scripts/release_plan_validation.py'
               - 'scripts/verify_contamination_guard.py'
-              - 'scripts/verify_por_consumer_guard.py'
               - 'scripts/verify_zkml_quarantine.py'
+              - 'scripts/verify_proof_of_reserves_boundary.py'
               - 'tests/compliance/zkml-verifier.test.ts'
-              - 'tests/test_verify_por_consumer_guard.py'
               - 'tests/test_verify_zkml_quarantine.py'
+              - 'tests/test_verify_proof_of_reserves_boundary.py'
               - '.github/workflows/sovereign-guard.yml'
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -77,15 +77,15 @@ jobs:
       - name: Run Contamination Guard
         if: steps.filter.outputs.sovereign == 'true'
         run: python3 scripts/verify_contamination_guard.py
-      - name: Run Proof-of-Reserves Consumer Guard
-        if: steps.filter.outputs.sovereign == 'true'
-        run: npm run verify:por-consumers
-      - name: Run Proof-of-Reserves Consumer Guard Tests
-        if: steps.filter.outputs.sovereign == 'true'
-        run: npm run test:por-consumers
       - name: Run ZKML Quarantine Guard
         if: steps.filter.outputs.sovereign == 'true'
         run: npm run verify:zkml-quarantine
       - name: Run ZKML Quarantine Regression Tests
         if: steps.filter.outputs.sovereign == 'true'
         run: npm run test:zkml-quarantine
+      - name: Run Proof-of-Reserves Boundary Guard
+        if: steps.filter.outputs.sovereign == 'true'
+        run: npm run verify:proof-of-reserves-boundary
+      - name: Run Proof-of-Reserves Boundary Regression Tests
+        if: steps.filter.outputs.sovereign == 'true'
+        run: npm run test:proof-of-reserves-boundary

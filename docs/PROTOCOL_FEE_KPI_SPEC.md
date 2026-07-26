@@ -48,8 +48,8 @@ The following rules prevent double counting:
 
 ### 1.1.1 Source-custody settlement contract
 
-The source-custody API preserves the same eligible-base and scheduled-rate
-policy while changing who supplies the assessed fee. A source's single atomic
+The source-custody API preserves the same eligible-base and the registered
+stream's rate policy while changing who supplies the assessed fee. A source's single atomic
 entrypoint must call `preview-source-ft` or `preview-source-stx`, store a
 private pending record containing the exact assessed amount, and immediately
 call `settle-source-ft` or `settle-source-stx` in the same call stack. The
@@ -86,10 +86,11 @@ events, and do not report that an on-chain `custody_mode` field exists. If the
 call trace cannot identify one of these four entrypoints, retain the receipt
 for audit but mark the normalized field unavailable rather than guessing.
 
-The approved lending migration uses this API only for the interest component
-`floor(amount * 1000 / 10000)`. The fee replaces the legacy 1% full-repayment
-charge on that designated base; principal is never an eligible fee base, and
-the lending manager credits reserves with net interest after the protocol fee.
+The approved lending migrations use this API only for the interest component
+`floor(amount * 1000 / 10000)`. `lending-manager` remains scheduled, while
+`lending-orchestrator` requires the immutable fixed policy at exactly 100 bps.
+Both replace the legacy charge; principal is never an eligible fee base, and
+reserves receive net interest.
 
 ### 1.2 Scheduled rates and residual arithmetic
 
@@ -104,6 +105,12 @@ The schedule is driven by the burn-block policy clock, not wall time:
 `157,680` is the three-year approximation. Bitcoin burn-block production is not
 exactly six blocks per hour, so these are policy boundaries rather than exact
 calendar dates. A future activation height returns `not active` before launch.
+
+One narrow fixed policy is available for explicitly registered FT streams:
+`rate-policy = u2`, `rate-bps = u100`, and `phase = u4` at every height.
+Ordinary streams use `rate-policy = u1`, so scheduled-mature 100 bps remains
+distinguishable from fixed 100 bps in preview, settlement, accounting, receipt,
+and event evidence.
 
 Settlement arithmetic carries a numerator remainder per registered
 `(source, stream, asset)`:
@@ -235,8 +242,9 @@ The minimum normalized settlement row is:
 | `asset_kind` | enum | yes | `ft` or `stx` |
 | `asset` | optional principal | yes | FT contract when present; `none` for native STX plus `asset_kind = stx` |
 | `eligible_base_native` | uint | yes | Fee base in the asset's native units |
+| `rate_policy` | enum | yes | Scheduled (`u1`) or immutable fixed-100 (`u2`) |
 | `rate_bps` | uint | yes | Resolved on-chain rate: 200, 150, or 100 |
-| `phase` | enum | yes | Launch, growth, or mature |
+| `phase` | enum | yes | Launch, growth, mature, or fixed (`u4`) |
 | `assessed_native` | uint | yes | Fee calculated by the collector, including zero-fee residual settlements |
 | `settled_native` | uint | yes | Amount transferred to `.protocol-fee-collector`; equal to assessed in phase 1 |
 | `fee_remainder` | uint | yes for accounting snapshots | Numerator remainder modulo 10,000 after the settlement |
@@ -299,17 +307,19 @@ fixed treasury destination. Excess-recovered totals and events are separate
 from collection and routing totals. A route or recovery transfer failure rolls
 back its accounting and event. Neither collection, routing, nor recovery claims
 Fiscal Dam allocation, DEX/lending routing, burning, or downstream realized
-revenue in the same transaction. The approved phase-2 lending path is
-implemented in `lending-manager.repay` but still requires explicit admin
-asset-to-stream configuration before it can settle; no deployment or source
-authorization is implied by these checked-in contracts. DEX migration remains
-deferred because concentrated-liquidity-pool custody/execution is stubbed, and
-`lending-orchestrator`, partnership splits, and deployment broadcasting remain
-outside this slice.
+revenue in the same transaction. The approved phase-2 lending paths are
+implemented in `lending-manager.repay` and `lending-orchestrator.repay`. Each
+requires explicit admin asset-to-stream configuration; the orchestrator rejects
+anything other than fixed-policy/u100 and revalidates it on every repayment.
+Correlate collector and orchestrator evidence by `source`, `stream-id`,
+`settlement-id`, `rate-policy`, `rate-bps`, `phase`, and `settled-amount`. No
+deployment or source authorization is implied by these checked-in contracts.
+DEX migration and partnership splits remain deferred.
 
-The checked-in production deployment plans and generator intentionally defer
-collector publication and wiring until network-correct deployer identities and
-source migrations are approved. Production bootstrap must initialize the
+The checked-in production deployment plans and generator are preflight-only;
+they do not prove publication, activation, source authorization, custody, or
+bootstrap completion. No guessed signer/governance principal or activation call
+may be inferred from them. Production bootstrap must initialize the
 operational treasury, configure the approved governance/timelock/multisig, and
 hand collector admin to that approved contract before source registration;
 deployer admin retention is not production-ready. Governance may pause or
