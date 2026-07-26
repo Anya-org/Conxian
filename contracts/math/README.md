@@ -6,6 +6,7 @@ The Math module provides high-precision mathematical utilities for the Conxian P
 ## Architecture (Explanation)
 The module is a stateless utility layer:
 - **Concentrated Math**: `concentrated-math.clar` provides bounded deterministic tick/price approximations and amount-delta previews for the DEX foundation.
+- **Concentrated Math V2**: `concentrated-math-v2.clar` defines the bounded V2 fixed-point model used by the canonical V2 pool.
 - **Utilities**: `math-utilities.clar` provides standard fixed-point arithmetic (MulDiv, Power) and scaling functions.
 
 ## Core Contracts (Reference)
@@ -26,6 +27,12 @@ Math for tick-based liquidity.
 | `is-supported-execution-tick` | `(tick int)` | Check the narrower range supported by the current bounded approximation. |
 | `get-min-tick` | `()` | Get MIN_TICK. |
 | `get-max-tick` | `()` | Get MAX_TICK. |
+
+### `concentrated-math-v2.clar`
+
+Canonical math for `concentrated-liquidity-pool-v2.clar`. It uses a fixed `1e12` sqrt-price scale and a bounded linear tick grid. It is deliberately not a Uniswap logarithmic-tick implementation and must not be described as one. The contract provides bounded tick/price conversion, principal deltas, liquidity derivation, exact-input swap steps, and checked arithmetic for V2 custody/accounting.
+
+See the [CLP V2 executable model](../../docs/CLP_V2_EXECUTABLE_MODEL.md) for the exact formulas, rounding directions, and bounds.
 
 ### `math-utilities.clar`
 Fixed-point arithmetic.

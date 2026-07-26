@@ -96,11 +96,15 @@ git var GIT_AUTHOR_EMAIL
 ## 7. Architecture Overview (July 2026 Audit)
 
 ### Repository Scale
-- **231 Clarity contract source files** across 45+ modules
-- **76+ test files** (Vitest + Clarinet SDK)
-- **2 Clarinet configs**: `Clarinet.toml` (232 contract-section entries, active) and `Clarinet.complete.toml` (231 contract-section entries, legacy)
+<!-- BEGIN GENERATED KNOWLEDGE-BASE FACTS -->
+- **Contract inventory**: 241 physical `contracts/**/*.clar` files and 242 active `Clarinet.toml` contract entries. The intentional `math-lib-concentrated` alias shares `contracts/math/concentrated-math.clar` with `concentrated-math`.
+- **Test inventory**: 113 `*.test.ts`/`*.spec.ts` source files under `tests/`.
+- **Production release plans**: 216 contract publishes in 11 publish batches and 12 total batches, including 26 wiring/call transactions, in each checked-in testnet and mainnet plan.
+- **CLP V2 release inclusion**: `concentrated-math-v2` and `concentrated-liquidity-pool-v2` are present in the active manifest and both production release plans.
+<!-- END GENERATED KNOWLEDGE-BASE FACTS -->
+- **Clarinet configs**: `Clarinet.toml` is active; `Clarinet.complete.toml` is retained as a legacy artifact.
 - **Key tokens**: CXD (stablecoin), CXLP (LP), CXVG (governance) — consolidated from 6 to 3 tokens per Sprint 2026-07
-- **Key NFTs**: position-nft (SIP-009 compliant), bridge-nft (NON-COMPLIANT), enhanced-governance-nft (soulbound)
+- **Key NFTs**: position-nft and bridge-nft (SIP-009 compliant), enhanced-governance-nft (soulbound)
 
 ### Contract Dependency Hierarchy
 ```
@@ -117,9 +121,17 @@ agent-risk / agent-treasury / risk-unit / revenue-distributor / revenue-automati
 ops-engine (heartbeat) / alex-adapter / governance suite
 ```
 
+### Concentrated Liquidity V2 Boundary
+
+- `contracts/math/concentrated-math-v2.clar` is the V2 math source of truth. It uses a fixed `1e12` sqrt-price scale and a bounded linear tick grid, not Uniswap's logarithmic ticks.
+- `contracts/dex/concentrated-liquidity-pool-v2.clar` is the V2 custody, execution, range-position, fee, and exact accounting source of truth. Canonical range positions are non-transferable records, and exact-input swaps are bounded.
+- Legacy `concentrated-liquidity-pool` and transferable CXLP semantics remain separate compatibility surfaces. `liquidity-manager` and `swap-router` expose separately named V2 entrypoints rather than changing legacy behavior.
+- Protocol-fee release remains fail-closed until governance approves collector policy and an exact, authenticated ingress/custody path.
+- Reference: [`docs/CLP_V2_EXECUTABLE_MODEL.md`](docs/CLP_V2_EXECUTABLE_MODEL.md), [`contracts/dex/README.md`](contracts/dex/README.md), and [`contracts/math/README.md`](contracts/math/README.md).
+
 ## 8. Deployment Pipeline (July 2026 Sprint)
 
-### Current workflow safety state (July 22, 2026)
+### Current workflow safety state (verified July 26, 2026)
 
 Both `.github/workflows/deploy-testnet.yml` and `.github/workflows/deploy-mainnet.yml` are **preflight/plan-only**. They validate checked-in plans and produce plan-only artifacts; neither workflow signs, broadcasts, or invokes an on-chain deployment command.
 
@@ -143,6 +155,8 @@ Non-dry attempts are blocked before signing/broadcast pending issue #531's struc
 
 ### CI Workflows
 - **Validate** (PR + push): `clarinet check` → `run-tests.sh` → `coverage`
+- **Native manifest evidence**: on July 26, 2026, the PR #583 native Clarinet job checked all 242 active manifest entries with Clarinet 3.21.0 ([run evidence](https://github.com/Conxian/Conxian/actions/runs/30199636138/job/89787240720)).
+- **Dated post-merge evidence**: on July 26, 2026, protocol CI at merge commit `2351aa279e586ebf9bf54f8b6c1dad80ef0dbe05` reported 99 passed/8 skipped test files and 509 passed/59 skipped tests ([run evidence](https://github.com/Conxian/Conxian/actions/runs/30200013711)). These totals are historical run evidence, not a timeless suite-size guarantee.
 - **Deploy Testnet**: preflight/plan-only validation and artifact generation; non-dry requests are blocked before signing/broadcast.
 - **Deploy Mainnet**: manual preflight/plan-only validation with exact confirmation, plan-hash, and identity gates; non-dry requests are blocked before signing/broadcast.
 - **Clarinet version**: v3.21.0 is pinned for validation; the deployment workflows do not invoke a broadcast command.
@@ -201,8 +215,8 @@ These are clarinet-sdk v3.21.0 artifacts from plan regeneration with different r
 - ALEX protocol addresses documented with source URLs.
 - Uses define-constant for integration references (Clarity requires static principals for contract-call?).
 
-### P2-2: Test Suite Cannot Run -- REMAINING
-- Requires clarinet binary (not installed in CI/workspace).
+### ~~P2-2: Native Clarinet Validation Unavailable~~ -- FIXED IN CI
+- Native Clarinet 3.21.0 CI validates the active manifest. Local availability remains environment-dependent; use CI evidence rather than assuming a workstation binary is installed.
 
 ### P2-3: cxs-token.clar Stub Token -- REMAINING
 - transfer is no-op; all balances return 0.
@@ -252,12 +266,11 @@ Unresolved plan identities must not be used or capitalized, guessed signer ident
 
 ### Remaining Protocol Work (not deployment authorization)
 - Replace 63 private/read-only unwrap-panic calls (P1-1)
-- Complete alex-adapter with real ALEX contract calls (P2-1)
 - cxs-token.clar stub implementation (P2-3)
 
 ## CI Status (July 2026 -- Preflight-Only Deployment State)
-- `clarinet check` passes on all active contracts in `Clarinet.toml`.
-- Test suite: 7 suites pass (236 known benign clarinet-sdk stderr warnings suppressed).
+- Native Clarinet 3.21.0 CI has checked all 242 active `Clarinet.toml` entries; use the linked run above as the durable evidence.
+- Test inventories are source counts, not execution guarantees. Record changing pass/skip totals only as dated run evidence.
 - Runtime error detection active via `run-tests.sh`: allowlists 4 known benign contracts, fails on new errors.
 - Deploy workflows (testnet + mainnet) validate plans and produce preflight artifacts only; non-dry attempts are blocked before signing/broadcast.
 
@@ -276,7 +289,7 @@ curl -X POST "${OPENHANDS_HOST}/api/automation/v1/preset/prompt" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Conxian Daily Repo Sync",
-    "prompt": "Pull latest code from origin/main. Read AGENTS.md and verify it is up-to-date with current branch. Check DOCUMENTATION_STATE.md and update if session results are missing. Verify all 4 open issues have corresponding labels. Report any misalignments found.",
+    "prompt": "Read AGENTS.md and verify generated repository facts with npm run verify:knowledge-base. Run npm run validate:docs. If GitHub access is available, inspect the live open-issue set and report label gaps without copying a static issue table into AGENTS.md. Report any misalignments found.",
     "trigger": {"type": "cron", "schedule": "0 9 * * *", "timezone": "UTC"}
   }'
 
@@ -318,7 +331,7 @@ The repository uses GitHub Actions for repository-level automation:
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
 | `validate.yml` | PR + push | `clarinet check` → `run-tests.sh` → coverage |
-| `docs-validate.yml` | Push to main | Validate doc freshness, broken links |
+| `docs-validate.yml` | PR + push to main for relevant paths | Test and run local docs/knowledge validators, check external links, and validate required state files |
 | `session-tracker.yml` | Workflow completion | Track session outcomes in DOCUMENTATION_STATE.md |
 
 ---
@@ -328,10 +341,11 @@ The repository uses GitHub Actions for repository-level automation:
 ### Every Session Checklist
 
 1. **Pull latest**: `git fetch origin && git log --oneline -1 origin/main`
-2. **Check AGENTS.md**: Verify section 13 (Automations Setup) has current automation IDs
+2. **Verify repository facts**: Run `npm run verify:knowledge-base`; use `npm run update:knowledge-base` only when the delimited generated block needs refresh.
 3. **Sync state**: Update DOCUMENTATION_STATE.md with session results
-4. **Verify issues**: Ensure all open issues have appropriate labels
-5. **Align docs**: If contract changes made, update corresponding README.md
+4. **Validate docs**: Run `npm run validate:docs`.
+5. **Verify live issues**: If authenticated GitHub access is available, use `gh issue list --repo Conxian/Conxian --state open`; do not maintain a static issue table here.
+6. **Align docs**: If contract changes were made, update the corresponding README.md.
 
 ### M2M Native Induction Pattern
 
@@ -348,19 +362,11 @@ The repository uses GitHub Actions for repository-level automation:
 
 ---
 
-## 15. Open Issues Summary (Session 34)
+## 15. Live Issue and Knowledge Verification
 
-| # | Title | Priority | Labels | Status |
-|---|-------|----------|--------|--------|
-| 489 | [P0] MAINNET DEPLOYMENT NOT EXECUTED | P0 | deployment, critical | **ACTION REQUIRED** |
-| 488 | [CON-1427] Implement 2% Protocol Fee Collection | HIGH | protocol-fee, treasury | OPEN |
-| 480 | [P0] Developer Sandbox: TTFV < 15 minutes | P0 | deployment, developer-experience | OPEN |
-| 458 | [HIGH] Fake mock pollution: createMockSimnet() returns hardcoded success | HIGH | bug, testing | OPEN |
-
-**Historical deployment-status note (checked-address scope only):**
-- Earlier records reported a zero-balance/zero-transaction check for one unresolved deployer address. That observation is historical, scoped to the checked address, and is not a global nonexistence claim or an approved signer identity.
-- Current testnet and mainnet workflows are preflight/plan-only. Non-dry attempts are blocked before signing/broadcast pending issue #531, upstream issues #527–#530, and an approved signer-derived mainnet SP/SM identity.
-- Do not use or capitalize the unresolved address, and do not treat a non-dry request as an operational path.
-
-**Last Updated**: 2026-07-22
+- Do not treat historical session issue tables as current truth. Query live issues with `gh issue list --repo Conxian/Conxian --state open` when authenticated access is available.
+- Run `npm run verify:knowledge-base` for deterministic contract, manifest, test-source, release-plan, and CLP V2 inclusion facts.
+- Run `npm run validate:docs` for local documentation targets and knowledge JSON validity.
+- `scripts/kb-sync.sh --dry-run` is a compatibility entrypoint for these read-only checks. It does not update docs, commit, push, label issues, or mutate GitHub.
+- Deployment workflows remain preflight/plan-only; issue state, CI success, and checked-in plans are not deployment proof.
 

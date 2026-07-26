@@ -1,5 +1,43 @@
 # Documentation State
 
+## PR #583 - CLP V2 and CI Knowledge Alignment (MERGED_VALIDATED)
+
+{
+  "status": "MERGED_VALIDATED",
+  "recorded_at": "2026-07-26",
+  "merge": {
+    "pull_request": "https://github.com/Conxian/Conxian/pull/583",
+    "merged_at": "2026-07-26T11:22:46Z",
+    "commit": "2351aa279e586ebf9bf54f8b6c1dad80ef0dbe05"
+  },
+  "clp_v2_boundary": {
+    "math_source": "contracts/math/concentrated-math-v2.clar",
+    "execution_state_source": "contracts/dex/concentrated-liquidity-pool-v2.clar",
+    "model": "Fixed 1e12 sqrt-price scale, bounded linear tick grid rather than Uniswap logarithmic ticks, canonical non-transferable range positions, exact custody deltas/accounting, and bounded exact-input swaps.",
+    "versioning": "Legacy CLP and transferable CXLP semantics remain distinct. Liquidity-manager and swap-router V2 entrypoints are separately named.",
+    "protocol_fee_gate": "Release remains fail-closed pending approved collector policy and an authenticated exact-ingress/custody design."
+  },
+  "validation": {
+    "native_clarinet": "PR #583 native CI checked 242 active Clarinet.toml entries with Clarinet 3.21.0: https://github.com/Conxian/Conxian/actions/runs/30199636138/job/89787240720",
+    "post_merge_protocol_ci": "Historical evidence from July 26, 2026 at the merge SHA: 99 passed/8 skipped test files and 509 passed/59 skipped tests: https://github.com/Conxian/Conxian/actions/runs/30200013711. These totals are not a timeless inventory or pass-count guarantee.",
+    "deterministic_inventory": "241 physical Clarity sources; 242 active manifest entries because contracts/math/concentrated-math.clar is intentionally registered as concentrated-math and math-lib-concentrated; 113 test/spec source files under tests/.",
+    "release_plans": "Each checked-in production plan contains 216 production publishes in 11 publish batches and 12 total batches including 26 wiring/call transactions."
+  },
+  "implementation": {
+    "branch": "charlie/pr-583-cicd-kb-alignment",
+    "pull_request": "https://github.com/Conxian/Conxian/pull/592",
+    "intended_required_checks": [
+      "protocol-merge-gate",
+      "jules-audit",
+      "gitleaks",
+      "dependency-review"
+    ],
+    "conditional_validation": "validate-protocol is conditional and must not be configured as a universally required context; protocol-merge-gate is the stable aggregator emitted for every pull request targeting main."
+  },
+  "deployment_boundary": "Testnet and mainnet workflows are preflight/plan-only. They do not sign, broadcast, invoke an on-chain deployment command, or provide deployment proof. Non-dry remains blocked pending issue #531, upstream prerequisites, and an approved signer-derived identity.",
+  "follow_up": "The docs-CI and knowledge-base remediation on branch charlie/pr-583-cicd-kb-alignment is not claimed here to be merged into main. Historical records that reported scripts/validate-docs.js as missing describe their earlier execution context; this follow-up adds that validator."
+}
+
 ## Current Session (42) - Main Branch Governance (CON-1521)
 
 {
