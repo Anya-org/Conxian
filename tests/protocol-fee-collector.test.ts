@@ -6,6 +6,9 @@ const COLLECTOR = 'protocol-fee-collector';
 const ASSET_KIND_STX = 2;
 const ASSET_KIND_FT = 1;
 const ROUTE_PROTOCOL_INGRESS = 1;
+const RATE_POLICY_SCHEDULED = 1;
+const RATE_POLICY_FIXED = 2;
+const PHASE_FIXED = 4;
 const ERR_UNAUTHORIZED = 4100;
 const ERR_PAUSED = 4101;
 const ERR_NOT_ACTIVE = 4102;
@@ -147,6 +150,21 @@ describe('Canonical protocol fee collector', () => {
       COLLECTOR,
       'register-stx-stream',
       [Cl.principal(mockFeeSource), Cl.uint(streamId), Cl.uint(ROUTE_PROTOCOL_INGRESS)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+  };
+
+  const registerFixedFtStream = (source: string, streamId: number, token = mockToken) => {
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'set-authorized-source',
+      [Cl.principal(source), Cl.bool(true)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'register-ft-fixed-100-bps-stream',
+      [Cl.principal(source), Cl.uint(streamId), Cl.principal(token), Cl.uint(ROUTE_PROTOCOL_INGRESS)],
       deployer,
     ).result).toEqual(Cl.ok(Cl.bool(true)));
   };
@@ -361,6 +379,15 @@ describe('Canonical protocol fee collector', () => {
     expect(config?.asset).toEqual(Cl.none());
     expect(config?.active).toEqual(Cl.bool(true));
     expect(config?.route).toEqual(Cl.uint(ROUTE_PROTOCOL_INGRESS));
+    expect(simnet.callReadOnlyFn(
+      COLLECTOR,
+      'get-stream-rate-policy',
+      [Cl.principal(wallet1), Cl.uint(1001)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.some(Cl.tuple({
+      'rate-policy': Cl.uint(RATE_POLICY_SCHEDULED),
+      'rate-bps': Cl.uint(0),
+    }))));
 
     expect(simnet.callPublicFn(
       COLLECTOR,
@@ -397,6 +424,92 @@ describe('Canonical protocol fee collector', () => {
       [Cl.uint(1001), Cl.uint(0), settlementId(3)],
       wallet1,
     ).result).toEqual(Cl.error(Cl.uint(ERR_INVALID_AMOUNT)));
+  });
+
+  it('registers immutable fixed-100 FT streams and resolves them independently of scheduled phase height', () => {
+    const streamId = 1538;
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'register-ft-fixed-100-bps-stream',
+      [Cl.principal(wallet2), Cl.uint(streamId), Cl.principal(mockToken), Cl.uint(ROUTE_PROTOCOL_INGRESS)],
+      wallet2,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_UNAUTHORIZED)));
+    registerFixedFtStream(wallet2, streamId);
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'register-ft-fixed-100-bps-stream',
+      [Cl.principal(wallet2), Cl.uint(streamId), Cl.principal(mockToken), Cl.uint(ROUTE_PROTOCOL_INGRESS)],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_STREAM_ALREADY_REGISTERED)));
+    expect(simnet.callPublicFn(
+      COLLECTOR,
+      'register-ft-stream',
+      [Cl.principal(wallet2), Cl.uint(streamId), Cl.principal(mockToken), Cl.uint(ROUTE_PROTOCOL_INGRESS)],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(ERR_STREAM_ALREADY_REGISTERED)));
+
+    expect(simnet.callReadOnlyFn(
+      COLLECTOR,
+      'get-stream-rate-policy',
+      [Cl.principal(wallet2), Cl.uint(streamId)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.some(Cl.tuple({
+      'rate-policy': Cl.uint(RATE_POLICY_FIXED),
+      'rate-bps': Cl.uint(100),
+    }))));
+    expect(simnet.callReadOnlyFn(
+      COLLECTOR,
+      'get-stream-rate-policy',
+      [Cl.principal(wallet2), Cl.uint(999_999)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.none()));
+
+    const schedule = readTuple('get-schedule');
+    const mature = BigInt(schedule['mature-boundary-inclusive'].value);
+    const heights = [
+      BigInt(schedule['activation-burn-height'].value),
+      BigInt(schedule['growth-boundary-inclusive'].value),
+      mature,
+      mature + 52_560n,
+    ];
+    for (const height of heights) {
+      expect(simnet.callReadOnlyFn(
+        COLLECTOR,
+        'get-stream-rate-at-burn-height',
+        [Cl.principal(wallet2), Cl.uint(streamId), Cl.uint(height)],
+        deployer,
+      ).result).toEqual(Cl.ok(Cl.tuple({
+        'rate-policy': Cl.uint(RATE_POLICY_FIXED),
+        'rate-bps': Cl.uint(100),
+        phase: Cl.uint(PHASE_FIXED),
+      })));
+    }
+
+    expect(simnet.callPublicFn(
+      'mock-token',
+      'mint',
+      [Cl.uint(10_000), Cl.principal(wallet2)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.bool(true)));
+    const id = settlementId(91);
+    const receipt: any = simnet.callPublicFn(
+      COLLECTOR,
+      'settle-ft',
+      [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(streamId), Cl.uint(10_000), id],
+      wallet2,
+    );
+    expect(receipt.result).toEqual(Cl.ok(Cl.uint(100)));
+    const settlement = readOptionalTuple('get-settlement', [Cl.principal(wallet2), id]);
+    expect(settlement?.['rate-policy']).toEqual(Cl.uint(RATE_POLICY_FIXED));
+    expect(settlement?.['rate-bps']).toEqual(Cl.uint(100));
+    expect(settlement?.phase).toEqual(Cl.uint(PHASE_FIXED));
+    const accounting = readOptionalTuple('get-accounting', [
+      Cl.principal(wallet2), Cl.uint(streamId), Cl.uint(ASSET_KIND_FT), Cl.some(Cl.principal(mockToken)),
+    ]);
+    expect(accounting?.['last-rate-policy']).toEqual(Cl.uint(RATE_POLICY_FIXED));
+    expect(accounting?.['last-rate-bps']).toEqual(Cl.uint(100));
+    expect(accounting?.['last-phase']).toEqual(Cl.uint(PHASE_FIXED));
+    expect(printEvent(receipt).value['rate-policy']).toEqual(Cl.uint(RATE_POLICY_FIXED));
   });
 
   it('settles STX to collector custody, routes explicitly, and scopes replay by source', () => {
@@ -440,6 +553,7 @@ describe('Canonical protocol fee collector', () => {
     expect(settlement?.asset).toEqual(Cl.none());
     expect(settlement?.payer).toEqual(Cl.principal(wallet1));
     expect(settlement?.['eligible-base']).toEqual(Cl.uint(base));
+    expect(settlement?.['rate-policy']).toEqual(Cl.uint(RATE_POLICY_SCHEDULED));
     expect(settlement?.['rate-bps']).toEqual(Cl.uint(200));
     expect(settlement?.phase).toEqual(Cl.uint(1));
     expect(settlement?.['assessed-amount']).toEqual(Cl.uint(fee));
@@ -457,6 +571,7 @@ describe('Canonical protocol fee collector', () => {
       'asset-kind': Cl.uint(ASSET_KIND_STX),
       asset: Cl.none(),
       'eligible-fee-base': Cl.uint(base),
+      'rate-policy': Cl.uint(RATE_POLICY_SCHEDULED),
       'rate-bps': Cl.uint(200),
       phase: Cl.uint(1),
       'assessed-amount': Cl.uint(fee),
@@ -558,6 +673,7 @@ describe('Canonical protocol fee collector', () => {
     const payerBefore = mockTokenBalance(wallet1);
     const recipientBefore = mockTokenBalance(operationalTreasury);
     const collectorBefore = mockTokenBalance(collectorPrincipal);
+    const collectedBefore = readUint('get-collected-ft', [Cl.principal(mockToken)]);
     const receipt: any = simnet.callPublicFn(
       COLLECTOR,
       'settle-ft',
@@ -583,6 +699,7 @@ describe('Canonical protocol fee collector', () => {
       'asset-kind': Cl.uint(ASSET_KIND_FT),
       asset: Cl.some(Cl.principal(mockToken)),
       'eligible-fee-base': Cl.uint(base),
+      'rate-policy': Cl.uint(RATE_POLICY_SCHEDULED),
       'rate-bps': Cl.uint(200),
       phase: Cl.uint(1),
       'assessed-amount': Cl.uint(fee),
@@ -608,7 +725,7 @@ describe('Canonical protocol fee collector', () => {
     expect(routeEvent.value.amount).toEqual(Cl.uint(fee));
     expect(routeEvent.value.collector).toEqual(Cl.principal(collectorPrincipal));
     expect(routeEvent.value.destination).toEqual(Cl.principal(operationalTreasury));
-    expect(routeEvent.value['collected-total']).toEqual(Cl.uint(fee));
+    expect(routeEvent.value['collected-total']).toEqual(Cl.uint(collectedBefore + fee));
     expect(routeEvent.value['routed-total']).toEqual(Cl.uint(fee));
     expect(routeEvent.value['route-count']).toEqual(Cl.uint(1));
     expect(simnet.callReadOnlyFn(
@@ -616,7 +733,7 @@ describe('Canonical protocol fee collector', () => {
       'get-collected-ft',
       [Cl.principal(mockToken)],
       deployer,
-    ).result).toEqual(Cl.ok(Cl.uint(fee)));
+    ).result).toEqual(Cl.ok(Cl.uint(collectedBefore + fee)));
     expect(simnet.callReadOnlyFn(
       COLLECTOR,
       'get-routed-ft',
@@ -629,7 +746,7 @@ describe('Canonical protocol fee collector', () => {
     const failedRoute: any = simnet.callPublicFn(
       COLLECTOR,
       'route-ft',
-      [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(1)],
+      [Cl.contractPrincipal(deployer, 'mock-token'), Cl.uint(collectedBefore + 1n)],
       deployer,
     );
     expect(failedRoute.result.type).toBe('err');
@@ -702,6 +819,7 @@ describe('Canonical protocol fee collector', () => {
       'asset-kind': Cl.uint(ASSET_KIND_STX),
       asset: Cl.none(),
       'eligible-fee-base': Cl.uint(49),
+      'rate-policy': Cl.uint(RATE_POLICY_SCHEDULED),
       'rate-bps': Cl.uint(200),
       phase: Cl.uint(1),
       'assessed-amount': Cl.uint(0),
@@ -796,6 +914,7 @@ describe('Canonical protocol fee collector', () => {
     expect(accounting?.['assessed-fees']).toEqual(Cl.uint(1));
     expect(accounting?.['fee-remainder']).toEqual(Cl.uint(100));
     expect(accounting?.['last-rate-bps']).toEqual(Cl.uint(150));
+    expect(accounting?.['last-rate-policy']).toEqual(Cl.uint(RATE_POLICY_SCHEDULED));
     expect(accounting?.['last-phase']).toEqual(Cl.uint(2));
   });
 

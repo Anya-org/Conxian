@@ -1,10 +1,10 @@
 # Treasury Module
 
 ## Overview (Explanation)
-The Treasury module manages the protocol's capital allocation and revenue distribution. It implements the "Fiscal Dam" (CXIP-013) and provides one canonical scheduled protocol-fee settlement path. The phase-1 collector is designed to replace a designated legacy charge on a registered fee base, never to add a second charge to the same flow. The approved phase-2 source-custody API lets an authorized source prepay that collector-computed fee from its own custody without accepting a caller-selected debit or recipient.
+The Treasury module manages the protocol's capital allocation and revenue distribution. It implements the "Fiscal Dam" (CXIP-013) and provides one canonical protocol-fee settlement engine with scheduled and narrowly fixed-100 stream policies. The phase-1 collector is designed to replace a designated legacy charge on a registered fee base, never to add a second charge to the same flow. The approved phase-2 source-custody API lets an authorized source prepay that collector-computed fee from its own custody without accepting a caller-selected debit or recipient.
 
 ## Architecture (Explanation)
-- **Canonical collection**: `protocol-fee-collector.clar` resolves 200/150/100 bps from an explicit activation burn-block height, enforces immutable source/stream/asset registration, pauses fail closed, prevents `(source, settlement-id)` replay, carries numerator residuals, and records native-unit accounting.
+- **Canonical collection**: `protocol-fee-collector.clar` keeps ordinary streams on the 200/150/100 burn-height schedule and supports one immutable fixed policy at exactly 100 bps for explicitly registered FT streams. It enforces immutable source/stream/asset/policy registration, pauses fail closed, prevents `(source, settlement-id)` replay, carries numerator residuals, and records native-unit accounting.
 - **Canonical custody**: Payer-custody FT/STX settlements transfer payer -> `.protocol-fee-collector`. Source-custody settlements instead invoke an authenticated source callback with the collector-computed debit and fixed `.protocol-fee-collector` recipient; the collector proves the exact live-balance delta and leaves untracked excess untouched.
 - **Explicit routing**: Authorized admin or approved governance/timelock calls route collector-held assets only to the fixed `.operational-treasury` principal after treasury initialization. Each asset's routed total cannot exceed its collected total, and collection/routing totals remain separate.
 - **Legacy compatibility**: `revenue-automation.clar` retains the legacy 100 bps token fee path and also exposes the full gross-STX enterprise adapter. It remains a compatibility surface until phase 2 migrates each approved source; do not compose it with the canonical collector on the same fee base.
@@ -26,8 +26,13 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 | `collect-revenue` | `(token <sip-010-ft-trait>) (amount uint) (payer principal)` | Calculates and transfers 1% fee. |
 | `route-stx-revenue` | `(uint principal uint)` | Moves a full gross STX payment from an authorized source into `revenue-distributor`. |
 | `authorize-stx-source` | `(principal)` | Authorizes an explicit source contract for the gross-STX adapter. |
-| `initialize` | `(admin principal)` | Sets the initial administrator (Admin only). |
-| `set-admin` | `(new-admin principal)` | Updates the admin principal (Admin only). |
+| `set-admin` | `(new-admin principal)` | Updates the publish-time administrator; there is no `initialize` entrypoint. |
+
+`revenue-automation` initializes `admin` directly to the contract publish
+transaction sender. It exposes `set-admin` for the current admin handoff and
+does not expose `initialize(admin)`. This contract is a legacy compatibility
+surface; new fee-bearing lending flows must use `protocol-fee-collector` and
+must not compose both paths on the same base.
 
 ### `protocol-fee-collector.clar`
 | Function | Signature | Description |
@@ -36,6 +41,7 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 | `set-authorized-source` | `(source principal) (authorized bool)` | Admin-only source authorization/revocation. Governance cannot rewrite source configuration. |
 | `register-ft-stream` | `(source principal) (stream-id uint) (token principal) (route uint)` | Registers one immutable SIP-010 asset stream on collector ingress (admin only). |
 | `register-stx-stream` | `(source principal) (stream-id uint) (route uint)` | Registers one immutable native STX stream on collector ingress (admin only). |
+| `register-ft-fixed-100-bps-stream` | `(source principal) (stream-id uint) (token principal) (route uint)` | Registers the sole fixed policy by construction: exactly 100 bps. No arbitrary-rate or policy mutation API exists. |
 | `set-stream-active` | `(source principal) (stream-id uint) (asset-kind uint) (asset (optional principal)) (active bool)` | Activates or deactivates one registered stream (admin only); use `none` for native STX. |
 | `pause` / `unpause` | `()` | Fail-closed settlement switch callable by admin or the configured governance contract. It does not change custody. |
 | `set-activation-burn-height` | `(new-height uint)` | Sets the non-retroactive schedule anchor before the first settlement (admin only). |
@@ -51,6 +57,8 @@ The Treasury module manages the protocol's capital allocation and revenue distri
 | `recover-excess-stx` | `(amount uint)` | Recovers only live STX balance above tracked collected-but-not-routed custody to the immutable `.operational-treasury` destination; does not change normal route/revenue totals. |
 | `get-accounting` | `(source principal) (stream-id uint) (asset-kind uint) (asset (optional principal))` | Reads cumulative eligible, assessed, settled-at-collector-ingress, residual, and settlement-count state; use `none` for native STX. |
 | `get-settlement` | `(source principal) (settlement-id (buff 32))` | Reads the immutable `(source, settlement-id)` record used by indexers. |
+| `get-stream-rate-policy` | `(source principal) (stream-id uint)` | Returns scheduled/u0 for an ordinary stream, fixed/u100 for a fixed stream, and `none` when no stream exists. |
+| `get-stream-rate-at-burn-height` | `(source principal) (stream-id uint) (height uint)` | Returns the exact `{rate-policy, rate-bps, phase}` tuple used for settlement. |
 | `get-asset-accounting` | `(asset-kind uint) (asset (optional principal))` | Separates collected-at-collector totals from routed-to-treasury totals and route count; use `none` for native STX. |
 | `get-excess-recovery-accounting` | `(asset-kind uint) (asset (optional principal))` | Reads separate excess-recovered totals by asset; use `none` for native STX. |
 
@@ -60,6 +68,13 @@ The launch rate is 200 bps for the half-open interval
 `activation + 157,680` onward. `52,560` is the 365-day approximation and
 `157,680` is the three-year approximation at six ten-minute burn blocks per
 hour. These are policy clocks, not exact wall-time dates.
+
+Ordinary registrations have no policy-map row and resolve as
+`RATE_POLICY_SCHEDULED = u1`. Fixed registrations resolve as
+`RATE_POLICY_FIXED = u2`, `rate-bps = u100`, and `PHASE_FIXED = u4` at every
+height. Preview, settlement, accounting, immutable receipts, and events include
+`rate-policy`, distinguishing fixed 100 bps from scheduled-mature 100 bps.
+Collector error `u4126` denotes malformed policy state and fails closed.
 
 Settlement arithmetic carries `base * rate-bps + prior-remainder` over the
 10,000 denominator. A positive base that produces zero fee is still recorded
@@ -98,26 +113,33 @@ emergency contract. Production source registrations should use contracts that
 derive their own base from successful economic operations; an admin-authorized
 EOA is an operational trust boundary, not trustless KPI proof.
 
-The approved phase-2 slice migrates only the active
-`lending-manager.repay` path: its eligible base is exactly the interest portion
+The approved phase-2 lending slices migrate both active repayment engines,
+`lending-manager.repay` and `lending-orchestrator.repay`. Their eligible base is
+exactly the interest portion
 `floor(amount * 1000 / 10000)`, and `total-reserves` receives interest net of the
-scheduled collector fee. The manager requires an admin-controlled asset-to-
-stream mapping and fails closed when the mapping is absent or mismatched. It
-uses a manager-local monotonic nonce hashed to a fixed `(buff 32)` settlement
-ID and does not expose a caller-controlled fee debit. The legacy
+collector fee. `lending-manager` remains scheduled; `lending-orchestrator`
+binds only fixed-100 streams. Each source requires an immutable admin-controlled
+asset-to-stream mapping and fails closed when the mapping is absent or
+mismatched. Each uses its own monotonic nonce hashed to a fixed `(buff 32)`
+settlement ID and does not expose a caller-controlled fee debit. Because a
+static self-trait edge is not accepted by the current dependency graph, each
+`repay` call includes the corresponding source trait and rejects any principal
+other than that same lending contract. The legacy
 `revenue-automation.collect-revenue` call is not composed with this path.
 
 DEX migration remains explicitly deferred because concentrated-liquidity-pool
-custody/execution is still stubbed. Its fee-collection entrypoint and the
+custody/execution is still stubbed. The 50/30/20 partnership split and
 swap-aggregator equivalent fail closed rather than report success without
-segregated custody; `lending-orchestrator` is also outside this slice. The
-50/30/20 partnership split and deployment broadcasting are not part of this
-implementation. The checked-in production deployment plans and generator
-remain preflight-only and are not deployment or deployability evidence.
+segregated custody. The 50/30/20 partnership split and deployment broadcasting
+are not part of this implementation. The checked-in production deployment
+plans and generator remain preflight-only and are not deployment or
+deployability evidence.
 
-Production bootstrap must initialize `.operational-treasury`, configure the
-approved governance/timelock/multisig, and then use `set-admin` to hand the
-collector admin role to that approved contract before registering any source.
+The collector admin is the contract publish transaction sender; it has no
+`initialize` entrypoint. A future checked bootstrap must initialize
+`.operational-treasury`, configure the approved governance/timelock/multisig,
+and call collector `set-admin(new-admin)` from the publish-time admin before
+registering any source.
 Retaining deployer admin is not production-ready. The deliberate immediate
 caller model permits the configured admin contract to perform admin operations,
 while governance and admin custody operations always use the immutable

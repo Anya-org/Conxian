@@ -12,6 +12,8 @@
 (define-constant ERR_NON_COMPLIANT u502)
 (define-constant ERR_PROTOCOL_PAUSED u503)
 (define-constant ERR_SOURCE_ISOLATED u504)
+(define-constant ERR_V2_INVALID_PAIR u2301)
+(define-constant ERR_V2_PRICE_LIMIT u2316)
 
 ;; --- Data Vars ---
 (define-data-var current-fee uint u30)
@@ -124,6 +126,46 @@
           (ok amount-out)
         )
       )
+    )
+  )
+)
+
+;; @desc Execute an exact-input swap against the V2 direct-custody pool. Token
+;; direction is derived only from the pool's canonical token order. The router
+;; neither pre-transfers nor retains input/output funds.
+(define-public (exact-input-single-v2
+    (pool-id uint)
+    (token-in <sip-010-ft-trait>)
+    (token-out <sip-010-ft-trait>)
+    (amount-in uint)
+    (sqrt-price-limit uint)
+    (min-amount-out uint)
+    (recipient principal)
+  )
+  (let (
+      (paused-state (unwrap! (contract-call? .enhanced-circuit-breaker
+        is-contract-paused .swap-router) (err ERR_PROTOCOL_PAUSED)))
+      (is-isolated-res (unwrap! (contract-call? .enhanced-circuit-breaker
+        is-isolated .concentrated-liquidity-pool-v2) (err ERR_SOURCE_ISOLATED)))
+      (pool (unwrap! (contract-call? .concentrated-liquidity-pool-v2 get-pool pool-id)
+        (err u2306)))
+      (zero-for-one (and
+        (is-eq (contract-of token-in) (get token-0 pool))
+        (is-eq (contract-of token-out) (get token-1 pool))))
+      (one-for-zero (and
+        (is-eq (contract-of token-in) (get token-1 pool))
+        (is-eq (contract-of token-out) (get token-0 pool))))
+    )
+    (begin
+      (asserts! (not paused-state) (err ERR_PROTOCOL_PAUSED))
+      (asserts! (not is-isolated-res) (err ERR_SOURCE_ISOLATED))
+      (asserts! (or zero-for-one one-for-zero) (err ERR_V2_INVALID_PAIR))
+      (asserts! (if zero-for-one
+        (< sqrt-price-limit (get sqrt-price pool))
+        (> sqrt-price-limit (get sqrt-price pool))) (err ERR_V2_PRICE_LIMIT))
+      (contract-call? .concentrated-liquidity-pool-v2 swap-exact-input
+        pool-id token-in token-out zero-for-one amount-in sqrt-price-limit
+        min-amount-out recipient)
     )
   )
 )
