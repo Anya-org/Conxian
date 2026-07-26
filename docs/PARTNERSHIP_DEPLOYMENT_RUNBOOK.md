@@ -4,7 +4,7 @@ This runbook defines the evidence and recovery controls for a future partnership
 
 ## 1. Scope and blocked upstream gates
 
-Issue #531 delivered deployment-safety and evidence-verifier foundations; it did not authorize live execution or establish deployment proof.
+Completed work under issue #531 provides the preflight, plan-validation, and evidence-verifier foundations; issue #531 remains open for its original deployment/evidence acceptance criteria.
 
 - Issues #527–#530 are unresolved and remain upstream blockers. Do not add partnership Clarity contracts, guessed principals, wiring, economics, or release-plan entries until those decisions are approved and implemented.
 - Release gates #515 and #526 must be explicitly cleared before a partnership release is considered.

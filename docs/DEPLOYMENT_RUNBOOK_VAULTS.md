@@ -131,7 +131,7 @@ clarinet deployments generate --mainnet
 ### Step 3: Broadcast Gate (Currently Blocked)
 The repository workflows are currently preflight-only. They validate the config and exact plan digest, then emit clearly labeled plan/preflight/log artifacts; they do **not** invoke `clarinet deployments apply`, load a mnemonic, sign, or broadcast.
 
-Issue #531 delivered the preflight, plan-validation, and evidence-verifier foundations. Every non-dry path remains blocked before signing until an approved signer identity and authorized structured receipt-producing broadcaster/execution path exist and the applicable complete plan-bound evidence pack and readbacks are produced. Do not run `clarinet deployments apply` manually as a workaround, and do not treat dashboard or debug logs as deployment proof.
+Completed work under issue #531 provides the preflight, plan-validation, and evidence-verifier foundations; issue #531 remains open for its original deployment/evidence acceptance criteria. Every non-dry path remains blocked before signing until an approved signer identity and authorized structured receipt-producing broadcaster/execution path exist and the applicable complete plan-bound evidence pack and readbacks are produced. Do not run `clarinet deployments apply` manually as a workaround, and do not treat dashboard or debug logs as deployment proof.
 
 The current full-system mainnet plan also contains an unresolved `ST...` deployer identity. It must be replaced only by an approved identity derived from and verified against the configured signer; do not guess an `SP...`/`SM...` address.
 The supported `Deploy Mainnet` workflow remains preflight-only. It requires
