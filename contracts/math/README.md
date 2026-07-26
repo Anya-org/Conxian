@@ -5,7 +5,7 @@ The Math module provides high-precision mathematical utilities for the Conxian P
 
 ## Architecture (Explanation)
 The module is a stateless utility layer:
-- **Concentrated Math**: `concentrated-math.clar` handles tick-to-price and price-to-tick conversions for the DEX.
+- **Concentrated Math**: `concentrated-math.clar` provides bounded deterministic tick/price approximations and amount-delta previews for the DEX foundation.
 - **Utilities**: `math-utilities.clar` provides standard fixed-point arithmetic (MulDiv, Power) and scaling functions.
 
 ## Core Contracts (Reference)
@@ -15,11 +15,15 @@ Math for tick-based liquidity.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `get-sqrt-ratio-at-tick` | `(tick int)` | Returns the square root of the price ratio for a specific tick. |
-| `get-tick-at-sqrt-ratio` | `(sqrt-price-x96 uint)` | Returns the tick index for a given square root ratio. |
-| `get-amount0-delta` | `(sqrt-price-a-x96 uint) (sqrt-price-b-x96 uint) (liquidity uint)` | Calculate amount0 delta for a given liquidity and price range. |
-| `get-amount1-delta` | `(sqrt-price-a-x96 uint) (sqrt-price-b-x96 uint) (liquidity uint)` | Calculate amount1 delta for a given liquidity and price range. |
+| `get-sqrt-ratio-at-tick` | `(tick int)` | Legacy ABI-shape wrapper; delegates to the bounded checked conversion and returns `u0` outside execution bounds. |
+| `get-sqrt-ratio-at-tick-checked` | `(tick int)` | Checked conversion limited to execution ticks -10,000 through 10,000. |
+| `get-tick-at-sqrt-ratio` | `(sqrt-price-x96 uint)` | Legacy ABI-shape wrapper; returns tick `0` for invalid input. The parameter name is retained for ABI compatibility but values use the 1e12 scale, not Q96. |
+| `get-tick-at-sqrt-ratio-checked` | `(sqrt-price uint)` | Checked floor-to-tick inverse within the supported price range: returns the greatest supported tick whose bounded model price is less than or equal to the input. |
+| `get-amount0-delta-down` / `get-amount0-delta-up` | `(sqrt-price-a uint) (sqrt-price-b uint) (liquidity uint)` | Bounded amount0 approximation with explicit floor/ceiling semantics. |
+| `get-amount1-delta-down` / `get-amount1-delta-up` | `(sqrt-price-a uint) (sqrt-price-b uint) (liquidity uint)` | Bounded amount1 approximation with explicit floor/ceiling semantics. |
+| `get-amount0-delta` / `get-amount1-delta` | legacy signatures | Legacy ABI-shape wrappers that round down and return `u0` for invalid input. |
 | `is-valid-tick` | `(tick int)` | Check if tick is valid. |
+| `is-supported-execution-tick` | `(tick int)` | Check the narrower range supported by the current bounded approximation. |
 | `get-min-tick` | `()` | Get MIN_TICK. |
 | `get-max-tick` | `()` | Get MAX_TICK. |
 
@@ -50,8 +54,17 @@ Comprehensive validation is performed using the Vitest framework.
 1. Install dependencies: `npm install`
 2. Run module tests: `npx vitest run tests/math`
 
-## Status (Reference)
-- Implementation: Finalized (v1.2.0)
-- Audit Status: Internally Verified
-- Precision: 128-bit internal
-- Standard: Fixed-Point Arithmetic
+## Precision and scope
+
+- Sqrt prices use a decimal fixed-point scale of `1e12`; legacy `x96` argument
+  names do not indicate Q96 values.
+- Tick conversion is a deterministic bounded **linear approximation**, not
+  exact CLMM or Uniswap V3 tick math.
+- Checked amount helpers validate sqrt-price and liquidity limits before
+  multiplication, keeping intermediates within Clarity `uint128`.
+- Raw wrappers preserve only their legacy ABI return shapes, not historical
+  behavior. Their invalid-input fallbacks can be indistinguishable from valid
+  zero results and must never be used for settlement.
+- Checked response APIs are the only execution-facing surface.
+- This module is a Phase 1 preview foundation, not exact production
+  concentrated-liquidity math.

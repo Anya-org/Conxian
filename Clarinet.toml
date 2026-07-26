@@ -274,7 +274,7 @@ clarity-version = 4
 [contracts.concentrated-liquidity-pool]
 path = "contracts/dex/concentrated-liquidity-pool.clar"
 clarity-version = 4
-depends_on = ["bme-engine", "conxian-csf-trait", "conxian-protocol", "cxlp-token", "sip-standards"]
+depends_on = ["bme-engine", "concentrated-math", "conxian-csf-trait", "conxian-protocol", "cxlp-token", "sip-standards"]
 
 [contracts.concentrated-liquidity-pool-v2]
 path = "contracts/dex/concentrated-liquidity-pool-v2.clar"
@@ -708,7 +708,7 @@ depends_on = ["compoundable-vault-trait"]
 [contracts.mock-admin-forwarder]
 path = "contracts/test-helpers/mock-admin-forwarder.clar"
 clarity-version = 4
-depends_on = ["auto-compounder", "compoundable-vault-trait", "cxd-staking"]
+depends_on = ["auto-compounder", "compoundable-vault-trait", "concentrated-liquidity-pool", "cxd-staking"]
 
 [contracts.mock-clp-v2-intermediary]
 path = "contracts/test-helpers/mock-clp-v2-intermediary.clar"

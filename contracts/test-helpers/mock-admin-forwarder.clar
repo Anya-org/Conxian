@@ -23,6 +23,24 @@
   (contract-call? .cxd-staking set-paused paused)
 )
 
+(define-public (forward-clp-create-pool
+    (token-0 principal)
+    (token-1 principal)
+    (fee uint)
+    (initial-price uint)
+    (initial-tick int)
+  )
+  (contract-call?
+    .concentrated-liquidity-pool
+    create-pool
+    token-0
+    token-1
+    fee
+    initial-price
+    initial-tick
+  )
+)
+
 (define-public (forward-staking-fund-rewards (amount uint))
   ;; Make the forwarding contract the transaction sender for its own token
   ;; balance while preserving it as cxd-staking's immediate caller.

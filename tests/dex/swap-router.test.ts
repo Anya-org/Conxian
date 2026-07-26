@@ -16,9 +16,12 @@ describe("Swap Router", () => {
     simnet.callPublicFn("mock-token", "mint", [Cl.uint(100000000), Cl.principal(deployer)], deployer);
   });
 
+  const balance = (token: string, owner: string) =>
+    simnet.callReadOnlyFn(token, "get-balance", [Cl.principal(owner)], deployer).result;
+
   it("can register a pool and execute a swap via exact-input-single", () => {
     // 1. Create Pool
-    simnet.callPublicFn(
+    const created = simnet.callPublicFn(
       "concentrated-liquidity-pool",
       "create-pool",
       [
@@ -30,6 +33,7 @@ describe("Swap Router", () => {
       ],
       deployer
     );
+    expect(created.result).toEqual(Cl.ok(Cl.uint(1)));
 
     // Also need to fund the pool in simulation to avoid "insufficient liquidity"
     // though the current stub implementation doesn't check liquidity.
@@ -55,6 +59,34 @@ describe("Swap Router", () => {
     expect(result).toEqual(Cl.ok(Cl.uint(987000)));
   });
 
+  it("returns exact pool binding errors and rolls back the router pre-transfer", () => {
+    const tokenIn = Cl.contractPrincipal(deployer, "cxd-token");
+    const tokenOut = Cl.contractPrincipal(deployer, "mock-token");
+    const before = balance("cxd-token", deployer);
+
+    expect(simnet.callPublicFn(
+      "swap-router",
+      "exact-input-single",
+      [Cl.uint(999), tokenIn, tokenOut, Cl.uint(1_000_000), Cl.uint(0)],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(1003)));
+    expect(balance("cxd-token", deployer)).toEqual(before);
+
+    expect(simnet.callPublicFn(
+      "concentrated-liquidity-pool",
+      "create-pool",
+      [tokenOut, tokenIn, Cl.uint(3001), Cl.uint(1_000_000_000_000), Cl.int(0)],
+      deployer,
+    ).result).toEqual(Cl.ok(Cl.uint(1)));
+    expect(simnet.callPublicFn(
+      "swap-router",
+      "exact-input-single",
+      [Cl.uint(1), tokenIn, tokenOut, Cl.uint(1_000_000), Cl.uint(0)],
+      deployer,
+    ).result).toEqual(Cl.error(Cl.uint(1107)));
+    expect(balance("cxd-token", deployer)).toEqual(before);
+  });
+
   it("telemetry check: get-protocol-tvl returns real values", () => {
     const { result } = simnet.callReadOnlyFn(
       "finance-metrics",
@@ -62,6 +94,6 @@ describe("Swap Router", () => {
       [],
       deployer
     );
-    expect(result).toBeDefined();
+    expect(result.type).toBe("ok");
   });
 });
