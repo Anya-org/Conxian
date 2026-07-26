@@ -1,5 +1,28 @@
 # Documentation State
 
+## Current Session (Issue #528) - Dormant Partner Policy Registry
+
+{
+  "status": "IMPLEMENTED_ON_BRANCH_NOT_DEPLOYED",
+  "recorded_at": "2026-07-26",
+  "scope": "Implemented the dormant schema/control portion of GitHub issue #528: immutable versioned partner policies, burn-block effective periods, versioned partner role bindings, dynamic authorization, fail-closed validation, audit events, and read-only defaults/split previews.",
+  "implementation": {
+    "branch": "charlie/issue-528-partner-policy-registry",
+    "contract": "contracts/integrations/partner-policy-registry.clar",
+    "defaults": "Native STX/microSTX only; per-use accounting; accepted/settled fee base; partner floor(fee / 2), protocol remainder; 4,320-burn-block periods; append-only pre-settlement corrections and future-period compensating entries; immutable versioned policy lifecycle.",
+    "authorization": "partner-policy-admin and partner-policy-registrar resolve through operational-treasury. The publish-time bootstrap path can be permanently finalized only after both routes exist.",
+    "release_boundary": "The contract is present in the active manifest and local simnet plan but explicitly excluded from generated testnet/mainnet release plans. Checked-in production plans remain unchanged at 216 publishes and 26 calls."
+  },
+  "validation": {
+    "focused_tests": "PASS: bash scripts/run-tests.sh tests/partner-policy-registry.test.ts tests/integration-fees.test.ts tests/check-compile.test.ts (3 files, 21 tests; 12 known benign Clarinet SDK runtime warnings, 0 new errors).",
+    "release_validation": "PASS: uv run --no-project --with PyYAML==6.0.2 python3 -m unittest tests/test_release_plan_validation.py (22 tests) and uv run --no-project --with PyYAML==6.0.2 python3 scripts/gen-deployment-plans.py --check (216 production contracts, checked-in plans unchanged).",
+    "contamination_guard": "PASS: python3 scripts/verify_contamination_guard.py.",
+    "knowledge_base": "PASS after installing the repository-pinned PyYAML 6.0.2 dependency: npm run update:knowledge-base and npm run verify:knowledge-base. Inventory is 242 physical Clarity sources, 243 active manifest entries, and 114 test/spec sources.",
+    "native_clarinet": "BLOCKED: the direct clarinet binary is not installed in this devbox; Clarinet SDK initialization and tests compiled the active manifest instead."
+  },
+  "non_goals": "No partner payout, custody, transfer, usage ledger, settlement algorithm, revenue-distributor change, legacy collector change, legal/jurisdiction activation, named commercial/legal owner, tax treatment, production deployment, or deployment proof is included."
+}
+
 ## PR #583 - CLP V2 and CI Knowledge Alignment (MERGED_VALIDATED)
 
 {

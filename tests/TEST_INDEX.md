@@ -56,9 +56,10 @@ These paths are source inventory entries. Executed/collected test totals are run
 27. ✅ **tests/cxip-012.test.ts**: Volatility-based DEX fee adjustments.
 28. ✅ **tests/nakamoto_verification.test.ts**: Tenure info and block utility checks.
 29. ✅ **tests/protocol-fee-collector.test.ts**: Scheduled FT/STX compatibility, immutable fixed-100 FT registration and phase-independent policy introspection, payer/source custody settlement, residual/accounting/policy audit fields, excess recovery, routing, authorization, replay, exact events, and rollback.
-30. ✅ **tests/lending/lending-manager.test.ts**: Publish-time-admin initialization handoff, fail-closed pause/health guards, wrong-source-trait rejection, interest-only `repay` fee base, atomic source-custody settlement, immutable stream binding validation, checked arithmetic rollback, scheduled launch fee replacement, net reserve accounting, principal exclusion, and absence of the legacy revenue-automation receipt.
-31. ✅ **tests/lending/lending-orchestrator.test.ts**: Fixed-100 interest-only source custody, scheduled-stream binding rejection, executable unauthorized-callback rejection, runtime exact payer/orchestrator/collector custody deltas, collector/orchestrator evidence correlation, pending-state clearing, net reserves, replay/pause/transfer rollback, zero-fee no-transfer evidence, arithmetic overflow, principal exclusion, and no legacy path. Recipient/asset/amount callback invariants are exercised through the authenticated successful settlement path rather than malformed callback injection.
-32. ✅ **tests/operational-treasury-init.test.ts**: Publish-time-owner initialization, first-caller front-run rejection, and STX/SIP-010 withdrawal custody.
+30. ✅ **tests/partner-policy-registry.test.ts**: Dormant STX/microSTX v1 defaults, exact floor/remainder preview math, dynamic authorization handoff, immutable sequential policy periods, unsupported mode and role rejection, policy/partner lifecycle transitions, fail-closed missing/future/stale/revoked validation, event-bearing success paths, beneficiary version history, and legacy collector isolation.
+31. ✅ **tests/lending/lending-manager.test.ts**: Publish-time-admin initialization handoff, fail-closed pause/health guards, wrong-source-trait rejection, interest-only `repay` fee base, atomic source-custody settlement, immutable stream binding validation, checked arithmetic rollback, scheduled launch fee replacement, net reserve accounting, principal exclusion, and absence of the legacy revenue-automation receipt.
+32. ✅ **tests/lending/lending-orchestrator.test.ts**: Fixed-100 interest-only source custody, scheduled-stream binding rejection, executable unauthorized-callback rejection, runtime exact payer/orchestrator/collector custody deltas, collector/orchestrator evidence correlation, pending-state clearing, net reserves, replay/pause/transfer rollback, zero-fee no-transfer evidence, arithmetic overflow, principal exclusion, and no legacy path. Recipient/asset/amount callback invariants are exercised through the authenticated successful settlement path rather than malformed callback injection.
+33. ✅ **tests/operational-treasury-init.test.ts**: Publish-time-owner initialization, first-caller front-run rejection, and STX/SIP-010 withdrawal custody.
 
 ## How to Run Tests
 ```bash
@@ -77,4 +78,4 @@ Risk-specific limitations and wiring requirements are documented in
 oracle-valued production solvency while `dimensional-core.get-position` is
 placeholder-backed.
 
-Last Updated: July 25, 2026
+Last Updated: July 26, 2026

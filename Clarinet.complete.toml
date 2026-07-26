@@ -50,6 +50,11 @@ clarity-version = 4
 path = "contracts/integrations/integration-registry.clar"
 clarity-version = 4
 
+[contracts.partner-policy-registry]
+path = "contracts/integrations/partner-policy-registry.clar"
+clarity-version = 4
+depends_on = [ "operational-treasury",]
+
 [contracts.btc-adapter]
 path = "contracts/interfaces/btc-adapter.clar"
 
