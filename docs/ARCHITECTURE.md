@@ -21,6 +21,15 @@ The "Arms" of the protocol.
 - `liquidity-manager.clar`: Preserves the legacy intent/risk ledger while adding separately versioned V2 open, owner-only full close, atomic full-close/reopen rebalance, and authoritative PnL/IL proxy surfaces keyed by canonical V2 position ID.
 - `lending-manager.clar`: Manages money markets.
 
+#### Concentrated Liquidity V2
+
+- `contracts/math/concentrated-math-v2.clar` is the V2 math source of truth: fixed `1e12` sqrt-price scale, bounded linear ticks, and explicitly non-Uniswap semantics.
+- `contracts/dex/concentrated-liquidity-pool-v2.clar` is the V2 execution and state source of truth for custody, canonical non-transferable range positions, exact accounting, fees, and bounded exact-input swaps.
+- The legacy CLP and transferable CXLP model remains separate. V2 manager/router entrypoints are separately named and do not silently change legacy semantics.
+- Protocol-fee release remains fail-closed until collector policy and exact authenticated ingress are approved.
+
+See the [CLP V2 executable model](CLP_V2_EXECUTABLE_MODEL.md) for formulas, bounds, custody rules, and version boundaries.
+
 ### 2.3. Agent Layer (`contracts/agents`)
 The "Senses" and "Nerves" of the protocol.
 - `agent-risk.clar` (AYE): GCR-based compatibility scoring with explicit normalized publication to canonical `risk-unit`; liquidation ownership remains in the core risk unit.

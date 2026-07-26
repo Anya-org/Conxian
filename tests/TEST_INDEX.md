@@ -24,6 +24,17 @@ The Conxian Protocol utilizes a "Dual-Mode" testing architecture. This ensures t
 10. ✅ **tests/dex/protocol-fee-collection.test.ts**: CLP and aggregator fee collection fail closed for admin/non-admin callers, preserve token balances, and stop fiscal orchestration before BME minting.
 11. ✅ **tests/tokens/cxlp-token.test.ts**: CXLP role authorization, aggregate pool/supply accounting, direct/proxy transfer preservation, rollback, and canonical proxies.
 12. ✅ **tests/dex/swap-router.test.ts**: Swap routing and fee logic.
+
+#### CLP V2 Focused Suites
+
+- ✅ **tests/math/concentrated-math-v2.test.ts**: Fixed-scale linear tick mapping, bounded math, rounding, principal/liquidity deltas, and exact-input swap-step vectors.
+- ✅ **tests/dex/concentrated-liquidity-pool-v2.test.ts**: Canonical V2 pool creation, custody deltas, range positions, tick/fee accounting, full closes, bounded swaps, and reconciliation.
+- ✅ **tests/dex/clp-v2-intermediary.test.ts**: Intermediary-call regressions for `tx-sender`, ownership, custody, and manager/router V2 isolation.
+- ✅ **tests/dex/liquidity-manager-v2.test.ts**: Separately named V2 open, owner-only full close, atomic rebalance, canonical position linkage, and PnL/IL proxies.
+- ✅ **tests/dex/swap-router-v2.test.ts**: Direct-custody V2 routing, canonical direction and price-limit orientation, pause/source isolation, recipients, and rollback.
+
+These paths are source inventory entries. Executed/collected test totals are run-specific evidence and must be recorded separately with a date and run reference.
+
 13. ✅ **tests/governance/reputation-engine.test.ts**: Weighted voting power.
 14. ✅ **tests/governance/proposal-engine.test.ts**: Governance signal processing.
 15. ✅ **tests/governance/proposal-engine-core.test.ts**: Seat-based voting and submission.
