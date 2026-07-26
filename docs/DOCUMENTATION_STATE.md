@@ -38,6 +38,24 @@
   "follow_up": "The docs-CI and knowledge-base remediation on branch charlie/pr-583-cicd-kb-alignment is not claimed here to be merged into main. Historical records that reported scripts/validate-docs.js as missing describe their earlier execution context; this follow-up adds that validator."
 }
 
+## Current Session - Issue #527 Proposed Partnership Edge-Policy Baseline
+
+{
+  "status": "PROPOSED_PENDING_HUMAN_APPROVAL",
+  "session_timestamp": "2026-07-26",
+  "scope": "Prepared a docs-only proposed decision record for issue #527 that interprets basic network variables as an inactive, versioned partnership edge-policy baseline rather than deployment configuration or live-network activation.",
+  "decision_record": "docs/ADR_007_PARTNERSHIP_EDGE_POLICY_BASELINE.md",
+  "architecture_boundary": "Merged PR #514 remains the STX-only, 100%-protocol legacy integration-fee route. Any partner split is a separate future versioned route with policy binding at registration, immutable snapshots at accrual, and fail-closed revalidation at settlement.",
+  "approval_boundary": "Safe technical defaults are distinguished from proposed commercial defaults and unset legal, compliance, tax, treasury, security, operations, partner, and launch values. The 5000/5000 basis-point split is an inactive candidate only and is not approved.",
+  "implementation_sequence": "Policy approval in #527 precedes registry/policy work in #528, ledger/settlement work in #529, and Gateway/SDK/indexing work in #530.",
+  "validation": {
+    "knowledge_base": "PASS: npm run verify:knowledge-base reported Knowledge-base facts verified successfully after installing the CI-pinned PyYAML 6.0.2 dependency.",
+    "documentation": "PASS: npm run validate:docs validated 148 Markdown files and 1 knowledge JSON file.",
+    "focused_tests": "PASS: npm run test:docs-validation passed 9 tests; npm run test:knowledge-base passed 4 tests."
+  },
+  "deployment_boundary": "No contract, deployment plan, address, secret, issue state, label, signing, broadcast, or network activation was changed or authorized. Repository documentation and workflow results are not deployment proof."
+}
+
 ## Current Session (42) - Main Branch Governance (CON-1521)
 
 {
