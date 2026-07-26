@@ -1,25 +1,5 @@
 # Documentation State
 
-## Current Session (43) - Issue #536 CLP State Primitives Phase 1
-
-{
-  "status": "PHASE_1_READY_FOR_REVIEW",
-  "session_timestamp": "2026-07-25",
-  "scope": "Prepared the reviewed Phase 1 foundation for issue #536: canonical pool registration controls, validated stored pool state, bounded position-preview math, and legacy swap-path pool binding.",
-  "implementation": {
-    "branch": "charlie/536-clp-state-primitives",
-    "pull_request": "opened from this branch against main; the pull-request body is the durable scope and validation record",
-    "boundary": "This phase does not complete issue #536. Liquidity custody, executable positions, reserve and fee-growth accounting, exact CLMM math, exact impermanent-loss calculations, dynamic fee-tier routing, and rebalance settlement remain follow-up work."
-  },
-  "validation": {
-    "full_suite": "PASS: 483 tests passed, 59 skipped, and 0 new runtime errors.",
-    "focused_tests": "PASS: protocol-fee, CLP, math, liquidity-manager, CXLP, core, and router suites (55 tests).",
-    "release_plans": "PASS: deployment-plan regeneration check matched 214 contracts across 11 batches.",
-    "guards": "PASS: contamination and ZKML quarantine checks.",
-    "review": "PASS: independent post-rebase review reported no P0, P1, or P2 findings."
-  }
-}
-
 ## Current Session (42) - Main Branch Governance (CON-1521)
 
 {
@@ -40,6 +20,26 @@
   },
   "admin_follow_up": "After merge, an administrator must configure and verify rulesets 7569329 and 19251038, require at least one approval and code-owner review while retaining thread resolution, require exactly protocol-merge-gate, jules-audit, gitleaks, and dependency-review, then record canary evidence in CON-1521 / issue #515.",
   "enforcement_boundary": "Repository changes and green CI do not prove that GitHub ruleset or branch-protection settings have been changed or are enforcing the intended policy."
+}
+
+## Current Session (43) - Issue #536 CLP State Primitives Phase 1
+
+{
+  "status": "PHASE_1_READY_FOR_REVIEW",
+  "session_timestamp": "2026-07-25",
+  "scope": "Prepared the reviewed Phase 1 foundation for issue #536: canonical pool registration controls, validated stored pool state, bounded position-preview math, and legacy swap-path pool binding.",
+  "implementation": {
+    "branch": "charlie/536-clp-state-primitives",
+    "pull_request": "opened from this branch against main; the pull-request body is the durable scope and validation record",
+    "boundary": "This phase does not complete issue #536. Liquidity custody, executable positions, reserve and fee-growth accounting, exact CLMM math, exact impermanent-loss calculations, dynamic fee-tier routing, and rebalance settlement remain follow-up work."
+  },
+  "validation": {
+    "full_suite": "PASS: 483 tests passed, 59 skipped, and 0 new runtime errors.",
+    "focused_tests": "PASS: protocol-fee, CLP, math, liquidity-manager, CXLP, core, and router suites (55 tests).",
+    "release_plans": "PASS: deployment-plan regeneration check matched 214 contracts across 11 batches.",
+    "guards": "PASS: contamination and ZKML quarantine checks.",
+    "review": "PASS: independent post-rebase review reported no P0, P1, or P2 findings."
+  }
 }
 
 ## Focused Session (43) - Issue #558 Proof-of-Reserves Binding
