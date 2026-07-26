@@ -23,6 +23,17 @@
     "deterministic_inventory": "241 physical Clarity sources; 242 active manifest entries because contracts/math/concentrated-math.clar is intentionally registered as concentrated-math and math-lib-concentrated; 113 test/spec source files under tests/.",
     "release_plans": "Each checked-in production plan contains 216 production publishes in 11 publish batches and 12 total batches including 26 wiring/call transactions."
   },
+  "implementation": {
+    "branch": "charlie/pr-583-cicd-kb-alignment",
+    "pull_request": "https://github.com/Conxian/Conxian/pull/592",
+    "intended_required_checks": [
+      "protocol-merge-gate",
+      "jules-audit",
+      "gitleaks",
+      "dependency-review"
+    ],
+    "conditional_validation": "validate-protocol is conditional and must not be configured as a universally required context; protocol-merge-gate is the stable aggregator emitted for every pull request targeting main."
+  },
   "deployment_boundary": "Testnet and mainnet workflows are preflight/plan-only. They do not sign, broadcast, invoke an on-chain deployment command, or provide deployment proof. Non-dry remains blocked pending issue #531, upstream prerequisites, and an approved signer-derived identity.",
   "follow_up": "The docs-CI and knowledge-base remediation on branch charlie/pr-583-cicd-kb-alignment is not claimed here to be merged into main. Historical records that reported scripts/validate-docs.js as missing describe their earlier execution context; this follow-up adds that validator."
 }
