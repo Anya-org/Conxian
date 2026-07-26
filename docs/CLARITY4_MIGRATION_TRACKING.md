@@ -31,7 +31,7 @@ The Conxian Protocol has fully migrated to Clarity 4 (Nakamoto Epoch 3.0). This 
 ## 4. Known Issues: The Simulation Gap
 As of February 2026, the `clarinet-sdk` (v3.14.0) does not fully resolve native Clarity 4 keywords like `stacks-block-time`.
 - **Workaround**: A shim layer in `block-utils.clar` provides temporal proxies for local testing.
-- **Production**: All contracts are ready for Nakamoto mainnet deployment.
+- **Compatibility boundary**: The migration establishes Clarity 4/Nakamoto compatibility only. It does not establish production-oracle or provider qualification, signer authorization, successful broadcast, confirmed receipts/readbacks, or mainnet production readiness.
 
 ## 5. Audit Trail
 - **Feb 2026**: "Root-to-Leaf" audit confirmed 100% C4 alignment.
