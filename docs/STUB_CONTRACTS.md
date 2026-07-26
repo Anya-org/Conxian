@@ -18,11 +18,11 @@ This document catalogs the status of placeholder (stub) contracts in the Conxian
 | `protocol-invariant-monitor.clar` | ✅ Active | Deterministic solvency and constant-product invariant helpers with bounded tolerance and overflow handling |
 | `rebalancing-rules.clar` | ✅ Active | Deterministic strict-threshold rebalance delta and direction helpers |
 | `predictive-scaling-system.clar` | ✅ Active | Deterministic bounded activity, volatility-fee, and depth-liquidity helpers |
-| `liquidity-manager.clar` | 🟡 Partial | Validated position/rebalance intent ledger and price-movement risk proxy; no LP custody, pool execution, fee accounting, or exact IL calculation |
+| `liquidity-manager.clar` | 🟢 Versioned | Legacy intent/risk semantics preserved; V2 surfaces execute canonical position-ID lots, atomic full-close/reopen rebalances, and exact V2 PnL/IL proxies. V2 protocol-fee release remains gated. |
 | `automation-manager.clar` | ✅ Active | Automation coordination |
 | `batch-processor.clar` | ✅ Active | Batch transaction helper |
 | `rate-limiter.clar` | ✅ Active | Operation-specific rate limiting |
-| `proof-of-reserves.clar` | ✅ Active | Multi-attestor verification system |
+| `proof-of-reserves.clar` | ✅ Active | Snapshot-bound secp256k1 quorum with live SIP-010 reconciliation; no audit, oracle qualification, or deployment claim |
 
 ---
 

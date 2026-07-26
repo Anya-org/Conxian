@@ -1,4 +1,7 @@
-# Code owners for the Conxian protocol repository
+# Authoritative CODEOWNERS file for the Conxian protocol repository.
+# Keep this file at the repository root; scripts/verify_codeowners_policy.py
+# rejects additional CODEOWNERS files in GitHub-supported locations. Every rule
+# must retain both required owners; specialized rules may add more owners.
 
 * @botshelomokoka @admin-conxian-labs
 
@@ -8,4 +11,6 @@
 /CONTRIBUTING.md @botshelomokoka @admin-conxian-labs
 /CODEOWNERS @botshelomokoka @admin-conxian-labs
 /contracts/ @botshelomokoka @admin-conxian-labs
+/scripts/ @botshelomokoka @admin-conxian-labs
+/deployments/ @botshelomokoka @admin-conxian-labs
 /docs/ @botshelomokoka @admin-conxian-labs

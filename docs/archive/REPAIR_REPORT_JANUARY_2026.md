@@ -145,6 +145,15 @@ This document details the complete Priority-Ordered Repair (P1-P6) of the Conxia
 
 ### ✅ P6: Operational Safety (COMPLETED)
 
+> **Historical correction (July 25, 2026):** The January report overstated the
+> then-current proof-of-reserves path. It accepted caller-supplied backing and
+> raw signatures without cryptographic snapshot binding, and repeated writes
+> could inflate its count. Issue #558 later replaced that boundary with
+> snapshot-bound secp256k1 verification, a distinct/versioned attestor quorum,
+> replay protection, and live SIP-010 reconciliation. This erratum preserves
+> the historical record; neither the old report nor the correction proves
+> deployment, custody, or auditor/oracle qualification.
+
 **Objective**: Wire circuit breaker (already exists), implement rate limiter and PoR
 
 **Contracts Modified**:
@@ -168,7 +177,19 @@ This document details the complete Priority-Ordered Repair (P1-P6) of the Conxia
   - IMPLEMENTED: 7-day proof validity period
   - IMPLEMENTED: Events: `reserves-updated`, `attestation-received`, `attestor-added`, `attestor-removed`
 
-**Impact**: Protocol now has rate limiting and transparent proof-of-reserves for treasury assets
+> **Correction (July 25, 2026):** This archived report overstated the January
+> implementation. Its signature bytes were stored but not cryptographically
+> verified, repeated writes by one allowlisted sender could inflate the count,
+> and caller input could update backing independently of live token state. The
+> active source now supersedes that path with registered secp256k1 keys,
+> versioned snapshot/envelope digests, distinct-identity quorum, replay
+> protection, live SIP-010 reconciliation before writes, and fail-closed status.
+> This correction is source-level evidence only and makes no deployment,
+> mainnet-readiness, auditor, or oracle-qualification claim.
+
+**Historical impact claim (superseded):** The January implementation added a
+reserve-attestation ledger, but did not establish cryptographically verified
+proof-of-reserves readiness.
 
 ---
 

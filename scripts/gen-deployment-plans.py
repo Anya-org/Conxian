@@ -60,6 +60,7 @@ TEST_HELPERS = {
     "mock-settlement-intermediary",
     "mock-reward-token", "mock-stacking-adapter", "mock-stacking-adapter-2",
     "mock-token", "mock-compoundable-vault", "mock-admin-forwarder",
+    "mock-clp-v2-intermediary",
     "test-c4-helper",
 }
 
@@ -357,6 +358,7 @@ def extract_contracts(simnet, manifest, repo_root, path_label="default.simnet-pl
                 "contract-name": entry.contract_name,
                 "path": entry.path,
                 "clarity-version": manifest[entry.contract_name].clarity_version,
+                "epoch": manifest[entry.contract_name].epoch,
             }
             for entry in batch
         ]
@@ -431,7 +433,7 @@ def make_plan(contracts, network, name, stacks_node, cost):
                     "path": c["path"],
                     "anchor-block-only": True,
                     "clarity-version": c["clarity-version"],
-                    "epoch": 3.0,
+                    "epoch": c["epoch"],
                 }
             })
         plan["plan"]["batches"].append({

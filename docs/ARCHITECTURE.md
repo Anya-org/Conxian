@@ -17,7 +17,8 @@ The "Brain" of the protocol.
 ### 2.2. Executive Layer (`contracts/core`, `contracts/dex`, `contracts/lending`)
 The "Arms" of the protocol.
 - `dimensional-engine.clar`: Orchestrates leveraged trading.
-- `swap-router.clar`: Optimizes DEX routing.
+- `swap-router.clar`: Preserves legacy routing and exposes a separately versioned V2 direct-custody exact-input route. V2 direction and price-limit orientation come only from canonical pool state; the router never pre-custodies V2 funds.
+- `liquidity-manager.clar`: Preserves the legacy intent/risk ledger while adding separately versioned V2 open, owner-only full close, atomic full-close/reopen rebalance, and authoritative PnL/IL proxy surfaces keyed by canonical V2 position ID.
 - `lending-manager.clar`: Manages money markets.
 
 ### 2.3. Agent Layer (`contracts/agents`)

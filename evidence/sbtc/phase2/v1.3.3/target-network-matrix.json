@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1",
+  "targetNetwork": "unresolved",
+  "upstreamRelease": "v1.3.3",
+  "upstreamCommit": "11567fc6a111c130177e64380503acca8546aab6",
+  "requiredEvidence": [
+    {
+      "id": "token",
+      "kind": "contract",
+      "principal": "unresolved",
+      "chainVerified": false,
+      "evidence": "unresolved"
+    },
+    {
+      "id": "registry",
+      "kind": "contract",
+      "principal": "unresolved",
+      "chainVerified": false,
+      "evidence": "unresolved"
+    },
+    {
+      "id": "deposit",
+      "kind": "contract",
+      "principal": "unresolved",
+      "chainVerified": false,
+      "evidence": "unresolved"
+    },
+    {
+      "id": "withdrawal",
+      "kind": "contract",
+      "principal": "unresolved",
+      "chainVerified": false,
+      "evidence": "unresolved"
+    },
+    {
+      "id": "bootstrap-signers",
+      "kind": "contract",
+      "principal": "unresolved",
+      "chainVerified": false,
+      "evidence": "unresolved"
+    },
+    {
+      "id": "signer-state",
+      "kind": "state",
+      "value": "unresolved",
+      "chainVerified": false,
+      "evidence": "unresolved"
+    },
+    {
+      "id": "emily",
+      "kind": "service",
+      "endpoint": "unresolved",
+      "version": "0.1.0",
+      "liveVerified": false,
+      "evidence": "unresolved"
+    }
+  ],
+  "stateModels": {
+    "registryWithdrawal": [
+      "pending",
+      "accepted",
+      "rejected"
+    ],
+    "registryWithdrawalEncoding": {
+      "pending": "status = none",
+      "accepted": "status = some true",
+      "rejected": "status = some false"
+    },
+    "emilyWithdrawal": [
+      "pending",
+      "accepted",
+      "confirmed",
+      "failed"
+    ]
+  },
+  "bitcoinOutputEvidence": {
+    "transaction": "unresolved",
+    "outputIndex": "unresolved",
+    "recipientTupleMatch": "unresolved",
+    "amountAndFeeMatch": "unresolved",
+    "confirmations": "unresolved",
+    "finalityPolicy": "unresolved"
+  },
+  "settlementClaims": {
+    "deploymentPlanAlone": false,
+    "ciOrWorkflowAlone": false,
+    "stacksConfirmationAlone": false,
+    "emilyStatusAlone": false
+  }
+}

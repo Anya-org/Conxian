@@ -15,47 +15,77 @@ on:
       - 'scripts/release_plan_validation.py'
       - 'scripts/verify_contamination_guard.py'
       - 'scripts/verify_zkml_quarantine.py'
+      - 'scripts/verify_codeowners_policy.py'
+      - 'scripts/verify_proof_of_reserves_boundary.py'
       - 'tests/compliance/zkml-verifier.test.ts'
       - 'tests/test_verify_zkml_quarantine.py'
+      - 'tests/test_verify_codeowners_policy.py'
+      - 'tests/test_main_branch_governance_policy.py'
+      - 'tests/test_verify_proof_of_reserves_boundary.py'
+      - 'CODEOWNERS'
       - '.github/workflows/sovereign-guard.yml'
   pull_request:
-    paths:
-      - 'contracts/**'
-      - 'Clarinet.toml'
-      - 'deployments/default.simnet-plan.yaml'
-      - 'deployments/full-system.testnet-plan.yaml'
-      - 'deployments/full-system.mainnet-plan.yaml'
-      - 'deployments/mainnet-release-plan.yaml'
-      - 'docs/**'
-      - 'PRD.md'
-      - 'package.json'
-      - 'scripts/gen-deployment-plans.py'
-      - 'scripts/release_plan_validation.py'
-      - 'scripts/verify_contamination_guard.py'
-      - 'scripts/verify_zkml_quarantine.py'
-      - 'tests/compliance/zkml-verifier.test.ts'
-      - 'tests/test_verify_zkml_quarantine.py'
-      - '.github/workflows/sovereign-guard.yml'
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   jules-audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Detect sovereign validation changes
+        id: filter
+        uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4
+        with:
+          filters: |
+            sovereign:
+              - 'contracts/**'
+              - 'Clarinet.toml'
+              - 'deployments/default.simnet-plan.yaml'
+              - 'deployments/full-system.testnet-plan.yaml'
+              - 'deployments/full-system.mainnet-plan.yaml'
+              - 'deployments/mainnet-release-plan.yaml'
+              - 'docs/**'
+              - 'PRD.md'
+              - 'package.json'
+              - 'scripts/gen-deployment-plans.py'
+              - 'scripts/release_plan_validation.py'
+              - 'scripts/verify_contamination_guard.py'
+              - 'scripts/verify_zkml_quarantine.py'
+              - 'scripts/verify_proof_of_reserves_boundary.py'
+              - 'tests/compliance/zkml-verifier.test.ts'
+              - 'tests/test_verify_zkml_quarantine.py'
+              - 'tests/test_verify_proof_of_reserves_boundary.py'
+              - '.github/workflows/sovereign-guard.yml'
       - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.10'
+      - name: Verify CODEOWNERS policy
+        run: python3 scripts/verify_codeowners_policy.py
+      - name: Test CODEOWNERS policy verifier
+        run: python3 -m unittest tests/test_verify_codeowners_policy.py
+      - name: Test main branch governance policy
+        run: python3 -m unittest tests/test_main_branch_governance_policy.py
       - name: Install deterministic Python runner
+        if: steps.filter.outputs.sovereign == 'true'
         run: |
           python3 -m pip install --user --disable-pip-version-check 'uv==0.7.22'
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Run Contamination Guard
+        if: steps.filter.outputs.sovereign == 'true'
         run: python3 scripts/verify_contamination_guard.py
       - name: Run ZKML Quarantine Guard
+        if: steps.filter.outputs.sovereign == 'true'
         run: npm run verify:zkml-quarantine
       - name: Run ZKML Quarantine Regression Tests
+        if: steps.filter.outputs.sovereign == 'true'
         run: npm run test:zkml-quarantine
+      - name: Run Proof-of-Reserves Boundary Guard
+        if: steps.filter.outputs.sovereign == 'true'
+        run: npm run verify:proof-of-reserves-boundary
+      - name: Run Proof-of-Reserves Boundary Regression Tests
+        if: steps.filter.outputs.sovereign == 'true'
+        run: npm run test:proof-of-reserves-boundary
