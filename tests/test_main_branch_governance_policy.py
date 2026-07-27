@@ -106,7 +106,21 @@ class MainBranchGovernancePolicyTests(unittest.TestCase):
         source = (REPO_ROOT / "docs/DOCUMENTATION_STATE.md").read_text(
             encoding="utf-8"
         )
-        session, _ = json.JSONDecoder().raw_decode(source[source.index("{") :])
+        # Find the JSON block that contains "implementation"
+        idx = 0
+        while True:
+            try:
+                idx = source.index("{", idx)
+            except ValueError:
+                raise AssertionError("Could not find required implementation JSON block in DOCUMENTATION_STATE.md")
+            try:
+                session, _ = json.JSONDecoder().raw_decode(source[idx:])
+                if "implementation" in session:
+                    break
+            except ValueError:
+                pass
+            idx += 1
+
         implementation = session["implementation"]
         self.assertEqual(implementation["intended_required_checks"], STABLE_CONTEXTS)
         self.assertEqual(
