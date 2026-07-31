@@ -1,4 +1,4 @@
-# Conxian Protocol: Agent Directives (July 2026 — Sprint Complete)
+# Conxian Protocol: Agent Directives (July 31, 2026 — Production Readiness Hardened)
 
 ## 0. Knowledge Base Automation (M2M Native Induction)
 
@@ -97,10 +97,12 @@ git var GIT_AUTHOR_EMAIL
 
 ### Repository Scale
 <!-- BEGIN GENERATED KNOWLEDGE-BASE FACTS -->
-- **Contract inventory**: 242 physical `contracts/**/*.clar` files and 243 active `Clarinet.toml` contract entries. The intentional `math-lib-concentrated` alias shares `contracts/math/concentrated-math.clar` with `concentrated-math`.
-- **Test inventory**: 114 `*.test.ts`/`*.spec.ts` source files under `tests/`.
-- **Production release plans**: 216 contract publishes in 11 publish batches and 12 total batches, including 26 wiring/call transactions, in each checked-in testnet and mainnet plan.
-- **CLP V2 release inclusion**: `concentrated-math-v2` and `concentrated-liquidity-pool-v2` are present in the active manifest and both production release plans.
+- **Contract inventory**: 224 physical `contracts/**/*.clar` files (31,357 lines) and 247 active `Clarinet.toml` contract entries. The 23-entry gap (247−224=23) is exclusively mock contracts, simnet-only stubs (alex-adapter, bns-stub, oracle-adapter-stub), and traits — all non-deployable by design.
+- **Test inventory**: 120 test files (25,985 lines). 12 files have skipped tests, 5 files excluded (bip21, crypto, lightning, seed, storage — missing service modules). Default vitest config excludes these 5.
+- **Production release plans**: **224 contract publishes** in 12 publish batches (batch 12 is post-deploy contract calls with 26 wiring transactions). 8 contracts were added in Session 46 (PR #609): error-codes, protocol-config, delegated-access, audit-trail, zkml-verifier, integration-registry, partner-policy-registry, integration-fee-collector.
+- **CLP V2 release inclusion**: `concentrated-math-v2` and `concentrated-liquidity-pool-v2` are present in the active manifest and all three deployment plans.
+- **CODEOWNERS**: `.github/CODEOWNERS` added (PR #609) with 8 domain teams covering all contract categories.
+- **Clarinet binary**: Removed from git tracking (45.6MB + 17.8MB). Install locally or via CI with `clarinet*` in `.gitignore`.
 <!-- END GENERATED KNOWLEDGE-BASE FACTS -->
 - **Clarinet configs**: `Clarinet.toml` is active; `Clarinet.complete.toml` is retained as a legacy artifact.
 - **Key tokens**: CXD (stablecoin), CXLP (LP), CXVG (governance) — consolidated from 6 to 3 tokens per Sprint 2026-07
@@ -243,11 +245,17 @@ These are clarinet-sdk v3.21.0 artifacts from plan regeneration with different r
 | bme-engine.clar CXIP-013 | COMPLIANT | Weights aligned: DEX 45%, Bounty 30%, Gov 15%, Grants 10% |
 | dimensional-core.clar | SECURE | liquidation-position gated to risk-unit/risk-manager/admin |
 
-## 12. Deployment Prerequisites and Blockers -- CURRENT STATUS
+## 12. Deployment Prerequisites and Blockers -- CURRENT STATUS (July 31, 2026)
 
 Live deployment prerequisites are not complete. Issue #531 supplied the preflight, plan-validation, and evidence-verification control foundation; it did not add an authorized live broadcaster or establish deployment proof. Both deployment workflows remain preflight/plan-only, and non-dry attempts are blocked before signing/broadcast absent an approved signer-derived mainnet SP/SM identity, an authorized receipt-producing broadcaster/execution path, complete plan-bound receipts and readbacks, and resolution of still-open policy or implementation gates such as #527–#530.
 
-Unresolved plan identities must not be used or capitalized, guessed signer identities are invalid, and workflow results are not deployment proof. Address checks remain scoped to the addresses checked and do not establish global nonexistence.
+### Session 46 Production Audit Findings
+- **Mainnet deployer identity**: `ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P` is a simnet-only testnet address. Cross-referenced in `docs/MAINNET_READINESS_MARCH_2026.md`. Requires legal entity establishment before SP address can be generated.
+- **Deployment plans**: 224 contracts across 12 batches in mainnet/testnet plans. 8 contracts added in PR #609.
+- **CODEOWNERS**: Domain-based review gates active. GitHub teams need population.
+- **Clarinet binary**: Removed from git. Install locally or in CI.
+- **Testnet mnemonic**: Documented as simnet-only in `settings/Testnet.toml`. The address holds no value on any live network.
+- **Staged branch**: Synced with main (was 25+ commits behind).
 
 ### Historical sprint checklist (July 2026 records; not current deployment proof)
 
@@ -268,11 +276,26 @@ Unresolved plan identities must not be used or capitalized, guessed signer ident
 - Replace 63 private/read-only unwrap-panic calls (P1-1)
 - cxs-token.clar stub implementation (P2-3)
 
-## CI Status (July 2026 -- Preflight-Only Deployment State)
-- Native Clarinet 3.21.0 CI has checked all 242 active `Clarinet.toml` entries; use the linked run above as the durable evidence.
+## CI Status (July 31, 2026 — Production Readiness Hardened)
+- Native Clarinet 3.21.0 CI has checked all 247 active `Clarinet.toml` entries; use the linked run above as the durable evidence.
 - Test inventories are source counts, not execution guarantees. Record changing pass/skip totals only as dated run evidence.
 - Runtime error detection active via `run-tests.sh`: allowlists 4 known benign contracts, fails on new errors.
 - Deploy workflows (testnet + mainnet) validate plans and produce preflight artifacts only; non-dry attempts are blocked before signing/broadcast.
+- **NEW**: `verify-deployment-evidence.yml` (PR #608) — standalone Hiro API evidence verification workflow.
+- **NEW**: `scripts/validate-deployment-plan.rb` (PR #608) — Ruby semantic plan validator.
+- **NEW**: `scripts/deployment/verify-evidence.ts` v1.1.0 (PR #608) — fail-closed evidence verifier, 19 failure classifications.
+- **NEW**: `.github/CODEOWNERS` (PR #609) — domain-based review gates.
+- **FIXED**: Clarinet binary removed from git (PR #609). Install locally or via CI setup.
+- **FIXED**: 8 contracts added to all deployment plans (PR #609).
+- `staged` branch synced with `main` on both `Conxian/Conxian` and `conxian-business` (Session 46).
+
+### Session 46 PR Summary
+| PR | Repo | Description |
+|----|------|-------------|
+| #608 | Conxian/Conxian | Deployment receipt verification pipeline |
+| #609 | Conxian/Conxian | Production readiness: CODEOWNERS, binary cleanup, deploy plans |
+| #975 | conxian-business | Submodule pin after receipt verification |
+| #976 | conxian-business | Submodule pin after production hardening |
 
 ---
 
