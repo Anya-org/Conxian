@@ -1,0 +1,47 @@
+# Conxian Protocol CODEOWNERS
+# Last reviewed: 2026-07-31 — Production readiness gate
+
+# Core protocol contracts — requires protocol maintainer review
+contracts/core/          @Conxian/protocol-maintainers
+contracts/traits/        @Conxian/protocol-maintainers
+contracts/tokens/        @Conxian/protocol-maintainers
+contracts/sbtc/          @Conxian/protocol-maintainers
+
+# Security-critical contracts — requires security review
+contracts/security/      @Conxian/security-reviewers
+contracts/compliance/    @Conxian/security-reviewers
+contracts/access/        @Conxian/security-reviewers
+contracts/audit-registry/ @Conxian/security-reviewers
+
+# DeFi contracts
+contracts/dex/           @Conxian/defi-maintainers
+contracts/lending/       @Conxian/defi-maintainers
+contracts/yield/         @Conxian/defi-maintainers
+contracts/vaults/        @Conxian/defi-maintainers
+
+# Governance
+contracts/governance/    @Conxian/governance-maintainers
+contracts/config/        @Conxian/governance-maintainers
+contracts/errors/        @Conxian/governance-maintainers
+
+# Treasury and economics
+contracts/treasury/      @Conxian/treasury-maintainers
+contracts/bonding/       @Conxian/treasury-maintainers
+contracts/rewards/       @Conxian/treasury-maintainers
+
+# Integrations
+contracts/integrations/  @Conxian/integration-maintainers
+contracts/oracle/        @Conxian/integration-maintainers
+
+# CI/CD and deployment
+.github/workflows/       @Conxian/devops
+scripts/                 @Conxian/devops
+deployments/             @Conxian/devops
+Clarinet.toml            @Conxian/devops
+settings/                @Conxian/devops
+
+# Documentation and evidence
+docs/                    @Conxian/documentation
+evidence/                @Conxian/security-reviewers
+deployment/evidence/     @Conxian/security-reviewers
+audit/                   @Conxian/security-reviewers
