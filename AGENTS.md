@@ -97,8 +97,8 @@ git var GIT_AUTHOR_EMAIL
 
 ### Repository Scale
 <!-- BEGIN GENERATED KNOWLEDGE-BASE FACTS -->
-- **Contract inventory**: 241 physical `contracts/**/*.clar` files and 242 active `Clarinet.toml` contract entries. The intentional `math-lib-concentrated` alias shares `contracts/math/concentrated-math.clar` with `concentrated-math`.
-- **Test inventory**: 113 `*.test.ts`/`*.spec.ts` source files under `tests/`.
+- **Contract inventory**: 242 physical `contracts/**/*.clar` files and 243 active `Clarinet.toml` contract entries. The intentional `math-lib-concentrated` alias shares `contracts/math/concentrated-math.clar` with `concentrated-math`.
+- **Test inventory**: 114 `*.test.ts`/`*.spec.ts` source files under `tests/`.
 - **Production release plans**: 216 contract publishes in 11 publish batches and 12 total batches, including 26 wiring/call transactions, in each checked-in testnet and mainnet plan.
 - **CLP V2 release inclusion**: `concentrated-math-v2` and `concentrated-liquidity-pool-v2` are present in the active manifest and both production release plans.
 <!-- END GENERATED KNOWLEDGE-BASE FACTS -->

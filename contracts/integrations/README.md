@@ -36,6 +36,39 @@ usage attestations are a later hardening step. Generic FT settlement is also
 future work: it will require a two-step deposit-and-route flow rather than
 accepting an FT directly in this STX-first collector.
 
+## Dormant Partner Policy Registry
+
+`partner-policy-registry.clar` is a schema/control surface for a future,
+separately versioned partnership route. It is intentionally excluded from the
+checked-in testnet and mainnet release plans and has no usage, custody, payout,
+or settlement functions.
+
+- Policy records are append-only by `(policy-id, version)`. Versions are
+  sequential, use non-overlapping burn-block effective periods, and preserve
+  immutable hashes, modes, splits, and period settings after publication.
+- Dormant v1 accepts only native STX in microSTX, per-use accounting, the
+  accepted/settled fee base, `floor(fee / 2)` partner allocation with the
+  protocol receiving the remainder, 4,320-burn-block periods, append-only
+  pre-settlement corrections, and future-period compensating entries after
+  settlement. The contract exposes this math only as a read-only preview.
+- Partner registrations separate owner, payer, beneficiary, and reporter.
+  Reporters cannot select the beneficiary, asset, split, billing mode, policy,
+  or any jurisdictional value. Beneficiary changes create a new registration
+  version and retain the preceding record.
+- Authorization resolves the `partner-policy-admin` and
+  `partner-policy-registrar` principals through `operational-treasury`. The
+  publish-time bootstrap principal can configure those routes, then finalize
+  the fallback permanently.
+- Validation fails closed for inactive registrations and missing, mismatched,
+  future, expired, revoked, or unsupported policy references.
+- Only public-safe hashes and bounded identifiers belong on-chain. Raw KYC,
+  tax, legal, sanctions, jurisdiction, and customer data remain out of scope.
+
+See [`docs/PARTNER_POLICY_REGISTRY.md`](../../docs/PARTNER_POLICY_REGISTRY.md)
+for lifecycle and activation boundaries. The existing
+`integration-fee-collector.settle-period` path remains the unchanged
+100%-protocol route.
+
 ## Core Contracts (Reference)
 
 ### `chainlink-adapter.clar`
@@ -65,7 +98,7 @@ the same price precision before it compares or returns canonical policy prices.
 The metadata is validation-only: no implicit conversion factor is applied.
 
 ## Testing (How-to)
-`npx vitest run tests/security-hardening.test.ts`
+`bash scripts/run-tests.sh tests/partner-policy-registry.test.ts tests/integration-fees.test.ts`
 
 ## Status (Reference)
 - Implementation: Production-Ready (v1.2.0)

@@ -185,12 +185,10 @@
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
     (match (map-get? asset-params asset)
-      params (begin
-        (map-set asset-params asset (merge params { enabled: enabled }))
-        (ok true)
-      )
-      ERR_ASSET_NOT_FOUND
+      params (map-set asset-params asset (merge params { enabled: enabled }))
+      (err ERR_ASSET_NOT_FOUND)
     )
+    (ok true)
   )
 )
 
@@ -284,7 +282,7 @@
 ;; @desc Get protocol status for dashboard.
 ;; @returns (ok { admin: principal })
 (define-read-only (get-protocol-status)
-  (ok {
+  (ok { 
     model-version: "v1.0.0",
     admin: (var-get admin)
   })

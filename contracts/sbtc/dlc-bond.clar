@@ -61,21 +61,43 @@
   )
 )
 
-;; @desc Distribute coupon payment to bond holders (Simulated for Apex)
+;; @desc Distribute coupon payment to bond holders.
+;; Transfers the coupon amount from the bond contract's custody to the issuer.
+;; The contract must hold sufficient token balance (pre-funded by issuer).
 ;; @param bond-id: The identifier of the target bond.
 (define-public (distribute-coupon (bond-id uint))
   (let (
     (bond (unwrap! (map-get? bonds bond-id) ERR_BOND_NOT_FOUND))
     (coupon-amount (/ (* (get principal-amount bond) (get coupon-rate bond)) u10000))
+    (token (unwrap! (map-get? bonds bond-id) ERR_BOND_NOT_FOUND))
   )
     (begin
-      (print { event: "coupon-distributed", id: bond-id, amount: coupon-amount })
+      (asserts! (not (is-eq (get status bond) "REDEEMED")) ERR_ALREADY_REDEEMED)
+      (asserts! (not (is-eq (get status bond) "MATURED")) ERR_ALREADY_REDEEMED)
+      (asserts! (> coupon-amount u0) ERR_INSUFFICIENT_FUNDS)
+
+      ;; Transfer coupon from contract custody to the bond issuer
+      (try! (as-contract (contract-call? (get token bond) transfer
+        coupon-amount
+        (as-contract tx-sender)
+        (get issuer bond)
+        none
+      )))
+
+      (print {
+        event: "coupon-distributed",
+        id: bond-id,
+        amount: coupon-amount,
+        issuer: (get issuer bond),
+        token: (get token bond)
+      })
       (ok true)
     )
   )
 )
 
-;; @desc Redeem the bond at maturity
+;; @desc Redeem the bond at maturity, returning principal to the issuer.
+;; The contract must hold sufficient token balance for principal repayment.
 ;; @param bond-id: The identifier of the target bond.
 (define-public (redeem-bond (bond-id uint))
   (let (
@@ -84,9 +106,23 @@
     (begin
       (asserts! (>= burn-block-height (get maturity bond)) ERR_NOT_MATURED)
       (asserts! (not (is-eq (get status bond) "REDEEMED")) ERR_ALREADY_REDEEMED)
+      (asserts! (not (is-eq (get status bond) "MATURED")) ERR_ALREADY_REDEEMED)
+
+      ;; Return principal from contract custody to the issuer
+      (try! (as-contract (contract-call? (get token bond) transfer
+        (get principal-amount bond)
+        (as-contract tx-sender)
+        (get issuer bond)
+        none
+      )))
 
       (map-set bonds bond-id (merge bond { status: "REDEEMED" }))
-      (print { event: "bond-redeemed", id: bond-id })
+      (print {
+        event: "bond-redeemed",
+        id: bond-id,
+        principal: (get principal-amount bond),
+        issuer: (get issuer bond)
+      })
       (ok true)
     )
   )

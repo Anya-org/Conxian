@@ -46,6 +46,9 @@ The controlled boundary for metered external usage.
   assigns the trusted reporter, and rotates stored key commitments.
 - `integration-fee-collector.clar`: Records replay-protected usage, maintains
   per-period ledgers, and settles STX fees from the configured payer.
+- `partner-policy-registry.clar`: Dormant, release-excluded schema/control
+  registry for immutable partner policy versions and versioned role bindings.
+  It has no usage, custody, payout, or settlement behavior.
 - Billing periods use `burn-block-height / 4320`; monthly settlement requires a
   closed period. Raw API keys stay off-chain and only SHA-256 hashes are stored.
 

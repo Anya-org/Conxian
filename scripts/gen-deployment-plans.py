@@ -70,7 +70,8 @@ TEST_HELPERS = {
 # `zkml-verifier` is explicitly quarantined because unavailable ZKML must not
 # enter release artifacts or be mistaken for production verification.
 RELEASE_PLAN_EXCLUSIONS = {
-    "integration-fee-trait", "integration-registry", "alex-reserve-pool",
+    "integration-fee-trait", "integration-registry", "partner-policy-registry",
+    "alex-reserve-pool",
     "alex-swap-helper", "alex-adapter", "bns-stub", "math-lib-concentrated",
     "oracle-adapter-stub", "integration-fee-collector", "zkml-verifier",
 }
