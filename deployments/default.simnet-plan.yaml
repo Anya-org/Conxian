@@ -1286,3 +1286,46 @@ plan:
       path: contracts/governance/community-voting-engine.clar
       clarity-version: 4
     epoch: '3.0'
+  - id: 11
+    transactions:
+    - transaction-type: emulated-contract-publish
+      contract-name: error-codes
+      emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N
+      path: contracts/errors/error-codes.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: protocol-config
+      emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N
+      path: contracts/config/protocol-config.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: delegated-access
+      emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N
+      path: contracts/access/delegated-access.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: audit-trail
+      emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N
+      path: contracts/audit-registry/audit-trail.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: zkml-verifier
+      emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N
+      path: contracts/compliance/zkml-verifier.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: integration-registry
+      emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N
+      path: contracts/integrations/integration-registry.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: partner-policy-registry
+      emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N
+      path: contracts/integrations/partner-policy-registry.clar
+      clarity-version: 4
+    - transaction-type: emulated-contract-publish
+      contract-name: integration-fee-collector
+      emulated-sender: ST2MNWJ2KJK3N3PHW4EK5KGEH5MJ3CQZ5PMQ88N8N
+      path: contracts/integrations/integration-fee-collector.clar
+      clarity-version: 4
+    epoch: '3.0'
