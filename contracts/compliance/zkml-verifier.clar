@@ -1,25 +1,24 @@
 ;; zkml-verifier.clar
-;; Conxian Protocol: ZKML Verification Boundary
-;; This contract is a quarantined, fail-closed scaffold. It is not a
-;; cryptographic verifier and must not produce verification evidence.
+;; Conxian Protocol: ZKML verification quarantine scaffold.
+;; This contract deliberately has no cryptographic verifier backend.
 
-(define-constant ERR_ZKML_VERIFICATION_UNSUPPORTED (err u501))
-(define-constant ERR_ZKML_STATUS_UNAVAILABLE (err u503))
+(define-constant ERR_INVALID_PROOF (err u7001))
 (define-constant ERR_UNAUTHORIZED (err u7002))
+;; The ABI is retained for callers, but no proof is accepted until a reviewed
+;; verifier implementation is qualified and wired. Structural inputs alone
+;; must never produce a successful attestation.
+(define-constant ERR_VERIFIER_UNAVAILABLE (err u7003))
 
 (define-data-var admin principal tx-sender)
 
-;; @desc Quarantined ZKML verification boundary for model attestation.
+;; @desc Quarantined ZKML proof entry point; always fails closed.
 ;; @param model-id: The identifier for the ML model.
 ;; @param input-hash: Hash of the input data.
 ;; @param proof: The ZK proof payload (e.g. Groth16/Plonk).
-;; @return (response bool uint) - Always returns err u501 until a reviewed
-;; cryptographic backend is implemented.
+;; @return (response bool uint) - Always returns ERR_VERIFIER_UNAVAILABLE.
+;; No length check, parser, key registry, or simulated success is permitted.
 (define-public (verify-proof (model-id (string-ascii 64)) (input-hash (buff 32)) (proof (buff 1024)))
-  ;; Production ZKML/ZSE fail-closed rule: structural shape or length is not
-  ;; verification evidence. Do not add a success path without a real backend
-  ;; that binds model-id and input-hash to a cryptographically verified proof.
-  ERR_ZKML_VERIFICATION_UNSUPPORTED
+  ERR_VERIFIER_UNAVAILABLE
 )
 
 ;; Admin functions
@@ -36,7 +35,5 @@
 )
 
 (define-read-only (get-protocol-status)
-  ;; The verifier boundary is unavailable and cannot advertise compliance or
-  ;; active ZKML support until the cryptographic backend exists.
-  ERR_ZKML_STATUS_UNAVAILABLE
+  (ok { compliant: false, version: "v1.1.0-Apex", mode: "ZKML-PAUSED" })
 )
