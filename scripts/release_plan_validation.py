@@ -47,6 +47,7 @@ RELEASE_PLAN_EXCLUSIONS = frozenset(
     {
         "integration-fee-trait",
         "integration-registry",
+        "partner-policy-registry",
         "alex-reserve-pool",
         "alex-swap-helper",
         "alex-adapter",

@@ -26,6 +26,11 @@ clarity-version = 4
 path = "contracts/integrations/integration-registry.clar"
 clarity-version = 4
 
+[contracts.partner-policy-registry]
+path = "contracts/integrations/partner-policy-registry.clar"
+clarity-version = 4
+depends_on = ["operational-treasury"]
+
 [contracts.core-traits]
 path = "contracts/traits/core-traits.clar"
 clarity-version = 4
@@ -1114,3 +1119,22 @@ clarity-version = 4
 [contracts.math-lib-concentrated]
 path = "contracts/math/concentrated-math.clar"
 clarity-version = 4
+
+[contracts.error-codes]
+path = "contracts/errors/error-codes.clar"
+clarity-version = 4
+
+[contracts.protocol-config]
+path = "contracts/config/protocol-config.clar"
+clarity-version = 4
+depends_on = ["conxian-access"]
+
+[contracts.delegated-access]
+path = "contracts/access/delegated-access.clar"
+clarity-version = 4
+depends_on = ["conxian-access"]
+
+[contracts.audit-trail]
+path = "contracts/audit-registry/audit-trail.clar"
+clarity-version = 4
+depends_on = ["conxian-access", "conxian-protocol", "dao-treasury", "emergency-governance", "operational-treasury", "timelock", "upgrade-controller"]
