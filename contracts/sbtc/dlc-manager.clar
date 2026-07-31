@@ -43,7 +43,7 @@
 ;; Authorized BitVM2 verifiers
 (define-map verifiers principal bool)
 
-;; Proof registry: proof-id → attestation state
+;; Proof registry: proof-id -> attestation state
 (define-map proofs
   uint
   {
@@ -59,7 +59,7 @@
   }
 )
 
-;; Per-verifier attestations: (proof-id, verifier) → attested
+;; Per-verifier attestations: (proof-id, verifier) -> attested
 (define-map attestations { proof-id: uint, verifier: principal } bool)
 
 ;; --- Verifier Management ---
@@ -124,7 +124,7 @@
 ;; The proof is recorded on-chain and awaits verifier attestations.
 ;; @param root: The 32-byte BitVM2 state root
 ;; @param proof: The SNARK-based proof payload (verified off-chain by lib-conxian-core)
-;; @returns (response uint uint) — the proof ID on success
+;; @returns (response uint uint) -- the proof ID on success
 (define-public (submit-bitvm2-proof (root (buff 32)) (proof (buff 1024)))
   (let ((proof-id (+ (var-get next-proof-id) u1)))
     (begin
@@ -158,13 +158,13 @@
 ;; @returns (response bool uint)
 (define-public (attest-proof (proof-id uint))
   (let (
-      (proof (unwrap! (map-get? proofs proof-id) (err ERR_PROOF_NOT_FOUND)))
+      (proof (unwrap! (map-get? proofs proof-id) ERR_PROOF_NOT_FOUND))
     )
     (begin
-      (asserts! (default-to false (map-get? verifiers tx-sender)) (err ERR_NOT_VERIFIER))
-      (asserts! (is-eq (get status proof) PROOF_STATUS_PENDING) (err ERR_ALREADY_ATTESTED))
+      (asserts! (default-to false (map-get? verifiers tx-sender)) ERR_NOT_VERIFIER)
+      (asserts! (is-eq (get status proof) PROOF_STATUS_PENDING) ERR_ALREADY_ATTESTED)
       (asserts! (<= (- burn-block-height (get submitted-at proof)) ATTESTATION_WINDOW)
-        (err ERR_PROOF_EXPIRED))
+        ERR_PROOF_EXPIRED)
 
       ;; Record attestation
       (map-set attestations { proof-id: proof-id, verifier: tx-sender } true)
@@ -206,7 +206,7 @@
       ))
     )
   )
-)
+
 
 ;; @desc Challenge a submitted proof within the challenge window.
 ;; Any verifier can challenge; the proof enters challenged state.
@@ -214,13 +214,13 @@
 ;; @returns (response bool uint)
 (define-public (challenge-proof (proof-id uint))
   (let (
-      (proof (unwrap! (map-get? proofs proof-id) (err ERR_PROOF_NOT_FOUND)))
+      (proof (unwrap! (map-get? proofs proof-id) ERR_PROOF_NOT_FOUND))
     )
     (begin
-      (asserts! (default-to false (map-get? verifiers tx-sender)) (err ERR_NOT_VERIFIER))
-      (asserts! (is-eq (get status proof) PROOF_STATUS_VERIFIED) (err ERR_INVALID_PROOF))
+      (asserts! (default-to false (map-get? verifiers tx-sender)) ERR_NOT_VERIFIER)
+      (asserts! (is-eq (get status proof) PROOF_STATUS_VERIFIED) ERR_INVALID_PROOF)
       (asserts! (<= (- burn-block-height (get finalized-at proof)) CHALLENGE_WINDOW)
-        (err ERR_CHALLENGE_EXPIRED))
+        ERR_CHALLENGE_EXPIRED)
 
       (map-set proofs proof-id (merge proof {
         status: PROOF_STATUS_CHALLENGED,
@@ -244,7 +244,7 @@
 ;; @returns (response bool uint)
 (define-public (reject-proof (proof-id uint))
   (let (
-      (proof (unwrap! (map-get? proofs proof-id) (err ERR_PROOF_NOT_FOUND)))
+      (proof (unwrap! (map-get? proofs proof-id) ERR_PROOF_NOT_FOUND))
     )
     (begin
       (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -276,7 +276,7 @@
       submitted-at: (get submitted-at proof),
       finalized-at: (get finalized-at proof)
     })
-    (err ERR_PROOF_NOT_FOUND)
+    ERR_PROOF_NOT_FOUND
   )
 )
 
@@ -284,7 +284,7 @@
 (define-read-only (is-proof-verified (proof-id uint))
   (match (map-get? proofs proof-id)
     proof (ok (is-eq (get status proof) PROOF_STATUS_VERIFIED))
-    (err ERR_PROOF_NOT_FOUND)
+    ERR_PROOF_NOT_FOUND
   )
 )
 
