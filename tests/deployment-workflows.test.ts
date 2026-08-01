@@ -45,9 +45,9 @@ describe("deployment workflow safety gates", () => {
     expect(source).toContain("workflow_dispatch:");
     expect(source).not.toMatch(/^\s+push:/m);
     expect(source).toContain('required: true');
-    expect(source).toContain("Require exact mainnet confirmation");
-    expect(source).toContain('CONFIRM: ${{ inputs.confirm }}');
-    expect(source).toContain('"$CONFIRM" != "DEPLOY_MAINNET"');
+    expect(source).toContain("Require explicit mainnet confirmation");
+    expect(source).toContain('CONFIRMATION: ${{ inputs.confirm }}');
+    expect(source).toContain('"$CONFIRMATION" != "DEPLOY_MAINNET"');
     expect(source).not.toContain("if: ${{ inputs.confirm == 'DEPLOY_MAINNET' }}");
     expect(source).toContain("expected_plan_sha256");
     expect(source).toContain("deployments/full-system.mainnet-plan.sha256");
