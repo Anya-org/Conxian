@@ -60,7 +60,7 @@
 )
 
 
-;; @desc Initialize — one-time admin bootstrap. Cannot be called after initial setup.
+;; @desc Initialize -- one-time admin bootstrap. Cannot be called after initial setup.
 ;; @returns (response bool uint)
 (define-public (initialize (admin principal))
   (begin
