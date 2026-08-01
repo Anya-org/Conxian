@@ -1838,21 +1838,61 @@ export function readDeploymentPlan(planPath: string): {
   });
 
   const entries: DeploymentPlanEntry[] = [];
+  const supportedKinds = new Set(["contract-publish", "contract-call"]);
   for (const batch of validatedBatches) {
     batch.transactions.forEach((tx, transactionIndex) => {
-      const keys = Object.keys(tx);
-      const kind = keys.includes("contract-publish") ? "contract-publish" : keys.includes("contract-call") ? "contract-call" : undefined;
-      if (!kind) return; // skip unrecognized transaction kinds
+      if (!tx || typeof tx !== "object" || Array.isArray(tx)) {
+        throw new DeploymentVerificationError(
+          "PLAN_MALFORMED",
+          `Transaction at ${batch.id}:${transactionIndex} must be an object`,
+        );
+      }
 
-      const txData = (tx as Record<string, Record<string, unknown>>)[kind === "contract-publish" ? "contract-publish" : "contract-call"];
+      const keys = Object.keys(tx);
+      const kindKeys = keys.filter((k) => supportedKinds.has(k));
+
+      if (kindKeys.length === 0) {
+        const unsupported = keys.filter((k) => !supportedKinds.has(k));
+        throw new DeploymentVerificationError(
+          "PLAN_MALFORMED",
+          `Unsupported transaction kind at ${batch.id}:${transactionIndex}: ${unsupported.join(", ") || "empty transaction"}`,
+        );
+      }
+
+      if (kindKeys.length > 1) {
+        throw new DeploymentVerificationError(
+          "PLAN_MALFORMED",
+          `Transaction at ${batch.id}:${transactionIndex} has multiple kinds: ${kindKeys.join(", ")}`,
+        );
+      }
+
+      const kind = kindKeys[0] as "contract-publish" | "contract-call";
+
+      const txData = tx[kind];
+      if (!txData || typeof txData !== "object" || Array.isArray(txData)) {
+        throw new DeploymentVerificationError(
+          "PLAN_MALFORMED",
+          `Transaction kind value at ${batch.id}:${transactionIndex} must be an object`,
+        );
+      }
+
+      // Reject extra keys beyond the kind key
+      const extraKeys = keys.filter((k) => !supportedKinds.has(k) && k !== kind);
+      if (extraKeys.length > 0) {
+        throw new DeploymentVerificationError(
+          "PLAN_MALFORMED",
+          `Transaction at ${batch.id}:${transactionIndex} has unexpected keys: ${extraKeys.join(", ")}`,
+        );
+      }
+
       const entry: DeploymentPlanEntry = {
         kind,
         planPosition: { batchId: batch.id, transactionIndex },
       };
 
-      if (kind === "contract-publish" && txData && typeof txData["contract-name"] === "string") {
+      if (kind === "contract-publish" && typeof txData["contract-name"] === "string") {
         entry.contractId = `${deployer}.${txData["contract-name"]}`;
-      } else if (kind === "contract-call" && txData) {
+      } else if (kind === "contract-call") {
         if (typeof txData["contract-id"] === "string") entry.contractId = txData["contract-id"];
         if (typeof txData["method"] === "string") entry.functionName = txData["method"];
       }

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { simnet, accounts } from '../setup-test-env';
 import { Cl, Clarinet } from '@stacks/transactions';
 
-const ASSET = accounts.deployer.address;
+const ASSET = () => accounts.deployer.address;
 
 describe('interest-rate-model', () => {
   beforeEach(() => {
@@ -20,7 +20,7 @@ describe('interest-rate-model', () => {
       const result = simnet.callReadOnlyFn(
         'interest-rate-model',
         'get-borrow-rate',
-        [Cl.principal(ASSET), Cl.uint(0)],
+        [Cl.principal(ASSET()), Cl.uint(0)],
         accounts.deployer.address
       );
       expect(result.result).toBe('(ok u0)');
@@ -30,7 +30,7 @@ describe('interest-rate-model', () => {
       const result = simnet.callReadOnlyFn(
         'interest-rate-model',
         'get-borrow-rate',
-        [Cl.principal(ASSET), Cl.uint(5000)],
+        [Cl.principal(ASSET()), Cl.uint(5000)],
         accounts.deployer.address
       );
       // Default: base=0, slope1=400, at 50% (5000 bps): rate = 0 + (5000 * 400 / 10000) = 200
@@ -41,7 +41,7 @@ describe('interest-rate-model', () => {
       const result = simnet.callReadOnlyFn(
         'interest-rate-model',
         'get-borrow-rate',
-        [Cl.principal(ASSET), Cl.uint(8000)],
+        [Cl.principal(ASSET()), Cl.uint(8000)],
         accounts.deployer.address
       );
       // Default: at 80% kink: rate = 0 + (8000 * 400 / 10000) = 320
@@ -52,7 +52,7 @@ describe('interest-rate-model', () => {
       const result = simnet.callReadOnlyFn(
         'interest-rate-model',
         'get-borrow-rate',
-        [Cl.principal(ASSET), Cl.uint(10000)],
+        [Cl.principal(ASSET()), Cl.uint(10000)],
         accounts.deployer.address
       );
       // At 100%: kinkRate=320 + excess(2000)*slope2(8000)/10000 = 320 + 1600 = 1920
@@ -65,7 +65,7 @@ describe('interest-rate-model', () => {
       const result = simnet.callReadOnlyFn(
         'interest-rate-model',
         'get-supply-rate',
-        [Cl.principal(ASSET), Cl.uint(0)],
+        [Cl.principal(ASSET()), Cl.uint(0)],
         accounts.deployer.address
       );
       expect(result.result).toBe('(ok u0)');
@@ -75,7 +75,7 @@ describe('interest-rate-model', () => {
       const result = simnet.callReadOnlyFn(
         'interest-rate-model',
         'get-supply-rate',
-        [Cl.principal(ASSET), Cl.uint(5000)],
+        [Cl.principal(ASSET()), Cl.uint(5000)],
         accounts.deployer.address
       );
       // borrowRate=200, utilization=5000, reserveFactor=1000(10%)
@@ -135,7 +135,7 @@ describe('interest-rate-model', () => {
         'interest-rate-model',
         'set-asset-params',
         [
-          Cl.principal(ASSET),
+          Cl.principal(ASSET()),
           Cl.uint(100),   // base-rate
           Cl.uint(500),   // slope1
           Cl.uint(8000),  // slope2
@@ -152,7 +152,7 @@ describe('interest-rate-model', () => {
         'interest-rate-model',
         'set-asset-params',
         [
-          Cl.principal(ASSET),
+          Cl.principal(ASSET()),
           Cl.uint(100),
           Cl.uint(500),
           Cl.uint(8000),
