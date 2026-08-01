@@ -43,21 +43,17 @@ export async function initializeSimnet(): Promise<Simnet> {
       const deployer = instance.deployer;
 
       const contractsToInit = [
-        'conxian-protocol',
         'conxian-access',
         'oracle-aggregator',
         'finance-metrics',
         'agent-risk',
-        'dex-factory',
         'federated-oracle-adapter',
         'lending-manager',
         'lending-orchestrator',
         'bme-engine',
-        'office-manager',
         'operational-treasury',
         'agent-treasury',
-        'cxd-token',
-        'mock-token'
+        'cxd-token'
       ];
 
       for (const name of contractsToInit) {
