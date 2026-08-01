@@ -229,7 +229,7 @@ function baseEvidence(): DeploymentEvidence {
     evidenceStatus: "broadcast",
     coverage: "partial",
     generatedAt: FIXED_TIME.toISOString(),
-    sourceCommit: "e".repeat(40),
+    sourceCommit: "0".repeat(40),
     network: "testnet",
     deployer: DEPLOYER,
     plan: {
