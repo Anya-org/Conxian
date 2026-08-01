@@ -48,10 +48,6 @@
   )
 )
 
-(define-private (assert-authorized)
-  (ok (asserts! (is-authorized) ERR_NOT_AUTHORIZED))
-)
-
 ;; --- Read-only verification ---
 
 ;; Returns the full handover state for post-state readback.
@@ -87,7 +83,7 @@
     ;; Fail closed: steps must be executed sequentially
     (asserts! (is-eq step (+ (var-get handover-step) u1)) ERR_WRONG_STEP)
 
-    (assert-authorized)
+    (asserts! (is-authorized) ERR_NOT_AUTHORIZED)
 
     (if (is-eq step STEP_ACCESS)
       (begin
@@ -146,7 +142,7 @@
   (begin
     (asserts! (not (var-get handover-sealed)) ERR_ALREADY_COMPLETE)
     (asserts! (is-eq step (var-get handover-step)) ERR_WRONG_STEP)
-    (assert-authorized)
+    (asserts! (is-authorized) ERR_NOT_AUTHORIZED)
     (var-set handover-step (- step u1))
     (ok true)
   )
