@@ -293,7 +293,7 @@ class ZkmlQuarantineGuardTests(unittest.TestCase):
 
     def test_rejects_active_or_compliant_status_marker(self) -> None:
         contract = CANONICAL_CONTRACT.replace(
-            "(define-read-only (get-protocol-status)\n  ERR_VERIFIER_UNAVAILABLE\n)",
+            '(define-read-only (get-protocol-status)\n  (ok { compliant: false, version: "v1.1.0-Apex", mode: "ZKML-PAUSED" })\n)',
             '(define-read-only (get-protocol-status)\n  "ZKML-ACTIVE"\n)',
             1,
         )
@@ -580,8 +580,8 @@ class ZkmlQuarantineGuardTests(unittest.TestCase):
     def test_malformed_or_ambiguous_clarity_delimiters_fail_closed(self) -> None:
         cases = (
             CANONICAL_CONTRACT.replace(
-                "(define-public\n  (verify-proof",
-                "(define-public\n  {verify-proof",
+                "(define-public (verify-proof",
+                "(define-public {verify-proof",
                 1,
             ),
             CANONICAL_CONTRACT + '\n(define-constant "unterminated',

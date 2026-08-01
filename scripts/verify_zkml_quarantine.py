@@ -205,6 +205,16 @@ def _check_plan_yaml_edge_cases(text: str, path_name: str) -> list[str]:
             f"decoded YAML string contains zkml-verifier in {path_name}"
         )
 
+    # 9. Numeric identifier values (e.g. contract-name: 123)
+    for m in re.finditer(
+        r'(contract-name|path):\s*(\d+)\s*$', text, re.I | re.M
+    ):
+        key = m.group(1)
+        errors.append(
+            f"non-string YAML identifier/path/name field {key} "
+            f"contains int value in {path_name}"
+        )
+
     return errors
 
 
@@ -449,6 +459,55 @@ def _parse_record_fields(record: Form) -> dict[str, Expression] | None:
     return fields
 
 
+def _check_verify_proof_body(body: Expression, errors: list[str]) -> None:
+    """Validate verify-proof body with specific error messages for each bypass."""
+    # Canonical: ERR_VERIFIER_UNAVAILABLE
+    if _is_atom(body, "ERR_VERIFIER_UNAVAILABLE", quoted=False):
+        return
+
+    # Allowed wrapper: (begin ERR_VERIFIER_UNAVAILABLE)
+    if (
+        isinstance(body, Form)
+        and body.opener == "("
+        and len(body.items) >= 1
+        and _is_atom(body.items[0], "begin", quoted=False)
+        and len(body.items) == 2
+        and _is_atom(body.items[1], "ERR_VERIFIER_UNAVAILABLE", quoted=False)
+    ):
+        return
+
+    # Not a form or empty — generic rejection
+    if not isinstance(body, Form) or body.opener != "(":
+        errors.append(
+            "verify-proof must have one direct body expression: "
+            "ERR_VERIFIER_UNAVAILABLE"
+        )
+        return
+
+    atoms = [
+        e.value if isinstance(e, Atom) and not e.quoted else None
+        for e in _walk(body)
+    ]
+
+    # Detect specific bypass patterns (check all, not just first match)
+    if "ok" in atoms:
+        errors.append("verify-proof body must not contain success paths")
+    if "if" in atoms:
+        errors.append("verify-proof body must not contain conditional branches")
+    if "len" in atoms:
+        errors.append("verify-proof body must not contain length checks")
+    if any(
+        a is not None and a not in ("begin", "ERR_VERIFIER_UNAVAILABLE", "ok", "if", "len")
+        for a in atoms
+    ):
+        errors.append("verify-proof body contains helper calls")
+    if not errors:
+        errors.append(
+            "verify-proof must have one direct body expression: "
+            "ERR_VERIFIER_UNAVAILABLE"
+        )
+
+
 def verify_contract(errors: list[str], root: Path = ROOT) -> None:
     contract_path = root / CONTRACT_RELATIVE_PATH
     source = read_text(contract_path, errors, root)
@@ -506,13 +565,10 @@ def verify_contract(errors: list[str], root: Path = ROOT) -> None:
                 "input-hash (buff 32), proof (buff 1024)"
             )
         body = function.items[2:]
-        if len(body) != 1 or not _is_atom(
-            body[0], "ERR_VERIFIER_UNAVAILABLE", quoted=False
-        ):
-            errors.append(
-                "verify-proof must have one direct body expression: "
-                "ERR_VERIFIER_UNAVAILABLE"
-            )
+        if len(body) != 1:
+            errors.append("verify-proof must have exactly one body expression")
+        else:
+            _check_verify_proof_body(body[0], errors)
 
     if any(
         isinstance(expression, Atom)
@@ -522,7 +578,7 @@ def verify_contract(errors: list[str], root: Path = ROOT) -> None:
     ):
         errors.append("quarantined zkml-verifier must not contain print/event emission")
     if ACTIVE_STATUS_RE.search(source):
-        errors.append("quarantined zkml-verifier contains an active/compliant status marker")
+        errors.append("quarantined zkml-verifier contains an active/compliant/verified status marker")
     if VERIFIED_MARKER_RE.search(source):
         errors.append("quarantined zkml-verifier contains a verified marker")
 
@@ -563,6 +619,21 @@ def verify_contract(errors: list[str], root: Path = ROOT) -> None:
                     ):
                         errors.append("protocol status version must remain a string field")
 
+    # Detect extra function definitions beyond the canonical three
+    _CANONICAL_NAMES = frozenset({"verify-proof", "set-admin", "get-protocol-status"})
+    for form in forms:
+        header = _definition_header(form)
+        if header is None:
+            continue
+        def_type, name = header
+        if def_type not in ("define-public", "define-private", "define-read-only"):
+            continue
+        if name in _CANONICAL_NAMES:
+            continue
+        errors.append(
+            f"unexpected definition/callable {name} in quarantined zkml-verifier"
+        )
+
 
 def verify_release_classification(errors: list[str], root: Path = ROOT) -> None:
     for relative_path in RELEASE_CLASSIFICATION_RELATIVE_PATHS:
@@ -593,6 +664,25 @@ def _documentation_sentences(text: str) -> Iterable[str]:
     return (sentence.strip() for sentence in re.split(r"(?<=[.!?])\s+", normalized))
 
 
+# Contrastive boundaries that split a negated claim from a positive bypass
+_CONTRASTIVE_SPLIT_RE = re.compile(
+    r"\s*(?:—|–|[;:]|\(|\)|,\s*(?:but|yet|however|while|despite)\b)\s*",
+    re.I,
+)
+
+# Positive words that the tests expect as anchor-based error messages
+_POSITIVE_ANCHOR_WORDS = re.compile(
+    r"\b(active|production-ready|verified|deployed|operational|qualified|implemented)\b",
+    re.I,
+)
+
+
+def _split_contrastive_segments(sentence: str) -> list[str]:
+    """Split a sentence at contrastive boundaries for independent checking."""
+    parts = _CONTRASTIVE_SPLIT_RE.split(sentence)
+    return [p.strip() for p in parts if p.strip()]
+
+
 def verify_active_docs(errors: list[str], root: Path = ROOT) -> None:
     for relative_path in ACTIVE_DOC_RELATIVE_PATHS:
         path = root / relative_path
@@ -607,11 +697,61 @@ def verify_active_docs(errors: list[str], root: Path = ROOT) -> None:
         for sentence in _documentation_sentences(text):
             if not ZKML_RE.search(sentence) or not POSITIVE_RE.search(sentence):
                 continue
-            if not NEGATIVE_RE.search(sentence):
-                errors.append(
-                    f"{relative_path} contains an unnegated positive ZKML claim: "
-                    f"{sentence[:240]}"
-                )
+
+            # Check if the full sentence has negation
+            full_has_negation = NEGATIVE_RE.search(sentence) is not None
+
+            if not full_has_negation:
+                # No negation anywhere — straightforward positive claim
+                positive_words = _POSITIVE_ANCHOR_WORDS.findall(sentence)
+                if positive_words:
+                    for word in set(positive_words):
+                        errors.append(
+                            f"{relative_path} contains an unnegated positive ZKML claim: "
+                            f"{word.lower()}: {sentence[:200]}"
+                        )
+                else:
+                    errors.append(
+                        f"{relative_path} contains an unnegated positive ZKML claim: "
+                        f"{sentence[:240]}"
+                    )
+                continue
+
+            # Has both negation and positive — check for contrastive bypass
+            segments = _split_contrastive_segments(sentence)
+            if len(segments) <= 1:
+                continue  # No contrastive split, honest negation
+
+            for segment in segments:
+                if not ZKML_RE.search(segment) and not POSITIVE_RE.search(segment):
+                    continue
+                if NEGATIVE_RE.search(segment):
+                    continue  # This segment is properly negated
+                if POSITIVE_RE.search(segment):
+                    # Found a bypass segment — produce anchor-based errors
+                    positive_words = _POSITIVE_ANCHOR_WORDS.findall(segment)
+                    if positive_words:
+                        for word in set(positive_words):
+                            errors.append(
+                                f"{relative_path} contains an unnegated positive ZKML claim: "
+                                f"{word.lower()}: {segment[:200]}"
+                            )
+
+        # Cross-sentence check: ZKML in one sentence + positive in the next
+        sentences = list(_documentation_sentences(text))
+        for i in range(len(sentences) - 1):
+            pair = sentences[i] + " " + sentences[i + 1]
+            if not ZKML_RE.search(pair) or not POSITIVE_RE.search(pair):
+                continue
+            if NEGATIVE_RE.search(pair):
+                continue
+            # Only flag if the individual sentences didn't already catch it
+            if ZKML_RE.search(sentences[i]) and not POSITIVE_RE.search(sentences[i]):
+                if POSITIVE_RE.search(sentences[i + 1]) and not ZKML_RE.search(sentences[i + 1]):
+                    errors.append(
+                        f"{relative_path} contains an unnegated positive ZKML claim: "
+                        f"{pair[:240]}"
+                    )
 
         if ACTIVE_STATUS_RE.search(text):
             errors.append(f"{relative_path} contains an active ZKML status marker")
