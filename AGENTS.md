@@ -278,6 +278,7 @@ Live deployment prerequisites are not complete. Issue #531 supplied the prefligh
 - Native Clarinet 3.21.0 CI has checked all 247 active `Clarinet.toml` entries; use the linked run above as the durable evidence.
 - Test inventories are source counts, not execution guarantees. Record changing pass/skip totals only as dated run evidence.
 - Runtime error detection active via `run-tests.sh`: allowlists 4 known benign contracts, fails on new errors.
+- **Session 47**: Bootstrap noise eliminated — 4 contracts (conxian-protocol, dex-factory, office-manager, mock-token) removed from `contractsToInit` in `setup-test-env.ts` since they lack `initialize()` functions. The `run-tests.sh` allowlist is retained as defense-in-depth.
 - Deploy workflows (testnet + mainnet) validate plans and produce preflight artifacts only; non-dry attempts are blocked before signing/broadcast.
 - **NEW**: `verify-deployment-evidence.yml` (PR #608) — standalone Hiro API evidence verification workflow.
 - **NEW**: `scripts/validate-deployment-plan.rb` (PR #608) — Ruby semantic plan validator.
@@ -294,6 +295,14 @@ Live deployment prerequisites are not complete. Issue #531 supplied the prefligh
 | #609 | Conxian/Conxian | Production readiness: CODEOWNERS, binary cleanup, deploy plans |
 | #975 | conxian-business | Submodule pin after receipt verification |
 | #976 | conxian-business | Submodule pin after production hardening |
+
+### Session 47 CI/CD Fixes (July 31–Aug 1, 2026)
+| PR | Repo | Description |
+|----|------|-------------|
+| #615 | Conxian/Conxian | ZKML quarantine guard: 49→0 test failures, documentation bypass detection, real-repo false positive fix, dlc-manager stub test fix, bootstrap noise elimination |
+| #980 | Conxian/conxian-business | CI/CD fixes: deepseek-triage guard, ZKML submodule bumps, conxian-market submodule bump |
+| #1211 | Conxian/conxius-platform | pnpm.overrides.next 15.5.18→16.2.12 version sync |
+| — | Conxian/conxian-market | CI: skip absolute URLs in doc link checker (pushed to main)
 
 ---
 
