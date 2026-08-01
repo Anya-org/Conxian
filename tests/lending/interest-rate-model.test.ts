@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { simnet, accounts } from '../setup-test-env';
 import { Cl, Clarinet } from '@stacks/transactions';
 
-const ASSET = 'ST1HASH00000000000000000000000000000000000001';
+const ASSET = accounts.deployer.address;
 
 describe('interest-rate-model', () => {
   beforeEach(() => {
@@ -165,7 +165,7 @@ describe('interest-rate-model', () => {
     });
 
     it('should configure STX market', () => {
-      const stxAsset = 'ST1HASH00000000000000000000000000000000000002';
+      const stxAsset = accounts.wallet_1.address;
       const result = simnet.callPublicFn(
         'interest-rate-model',
         'configure-stx-market',
@@ -176,7 +176,7 @@ describe('interest-rate-model', () => {
     });
 
     it('should configure sBTC market', () => {
-      const sbtcAsset = 'ST1HASH00000000000000000000000000000000000003';
+      const sbtcAsset = accounts.wallet_2.address;
       const result = simnet.callPublicFn(
         'interest-rate-model',
         'configure-sbtc-market',
