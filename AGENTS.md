@@ -99,7 +99,7 @@ git var GIT_AUTHOR_EMAIL
 <!-- BEGIN GENERATED KNOWLEDGE-BASE FACTS -->
 - **Contract inventory**: 246 physical `contracts/**/*.clar` files and 247 active `Clarinet.toml` contract entries. The intentional `math-lib-concentrated` alias shares `contracts/math/concentrated-math.clar` with `concentrated-math`.
 - **Test inventory**: 114 `*.test.ts`/`*.spec.ts` source files under `tests/`.
-- **Production release plans**: 224 contract publishes in 12 publish batches and 13 total batches, including 26 wiring/call transactions, in each checked-in testnet and mainnet plan.
+- **Production release plans**: 220 contract publishes in 12 publish batches and 13 total batches, including 26 wiring/call transactions, in each checked-in testnet and mainnet plan.
 - **CLP V2 release inclusion**: `concentrated-math-v2` and `concentrated-liquidity-pool-v2` are present in the active manifest and both production release plans.
 <!-- END GENERATED KNOWLEDGE-BASE FACTS -->
 - **Clarinet configs**: `Clarinet.toml` is active; `Clarinet.complete.toml` is retained as a legacy artifact.

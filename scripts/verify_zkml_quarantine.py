@@ -72,11 +72,140 @@ NEGATIVE_RE = re.compile(
 PLAN_ENTRY_RE = re.compile(
     r"(?im)^\s*(?:-\s*)?(?:"
     r"contract-name:\s*[\"']?zkml-verifier(?:[\"'\s]|$)|"
-    r"path:\s*[\"']?[^#\n]*[/\\]zkml-verifier(?:\.clar)?(?:[\"'\s]|$)"
+    r"(?:path|source):\s*[\"']?[^#\n]*[/\\]zkml-verifier(?:\.clar)?(?:[\"'\s]|$)|"
+    r"contract-id:\s*[\"']?\S*zkml-verifier\S*(?:[\"'\s]|$)"
     r")"
 )
 ACTIVE_STATUS_RE = re.compile(r"\bZKML[- ]ACTIVE\b|\bcompliant\s*:\s*true\b", re.I)
 VERIFIED_MARKER_RE = re.compile(r"\b[\w-]*verified[\w-]*\b", re.I)
+
+# YAML edge cases the raw regex scan misses but a YAML parser would catch:
+# - double-quoted escape sequences that decode to zkml-verifier
+# - anchors/aliases that smuggle the identifier
+# - timestamp patterns masquerading as contract names
+# - binary scalars, invalid escapes, block scalars, list values
+_YAML_DQ_ESCAPE_RE = re.compile(r'\\([xX][0-9a-fA-F]{2}|[uU][0-9a-fA-F]{4}|[U][0-9a-fA-F]{8}|.)')
+_YAML_DQ_VALUE_RE = re.compile(r'(?:contract-name|path):\s*"((?:[^"\\]|\\.)*)"', re.I)
+_YAML_ANCHOR_DEF_RE = re.compile(r'&[a-zA-Z_]\w*\s+zkml[\u002d-]?verifier', re.I)
+_YAML_ANCHOR_USE_RE = re.compile(r'\*[a-zA-Z_]\w*', re.I)
+_YAML_TIMESTAMP_RE = re.compile(
+    r'(?:contract-name|path):\s*\d{4}-\d{2}-\d{2}', re.I
+)
+_YAML_BLOCK_SCALAR_RE = re.compile(
+    r'(?:contract-name|path):\s*\n\s+zkml[\u002d-]?verifier', re.I
+)
+_YAML_INVALID_ESCAPE_RE = re.compile(r'\\[qQ]')  # \q is not a valid YAML escape
+_YAML_BINARY_RE = re.compile(r'!!binary')
+_YAML_BINARY_B64_RE = re.compile(r'!!binary\s*\|\s*\n\s*(.+)', re.I)
+
+_VALID_ESCAPES = frozenset({'\\', '"', 'n', 't', 'r', '/', 'b', 'f', ' '})
+
+def _decode_yaml_escapes(dq_string: str, errors_out: list[str] | None = None) -> str:
+    """Decode YAML double-quoted escape sequences to their literal form."""
+    def _replace(m: re.Match[str]) -> str:
+        seq = m.group(1)
+        if seq[0] in 'xX':
+            return chr(int(seq[1:], 16))
+        if seq[0] in 'uU':
+            return chr(int(seq[1:], 16))
+        if seq == '\\':
+            return '\\'
+        if seq == '"':
+            return '"'
+        if seq == 'n':
+            return '\n'
+        if seq == 't':
+            return '\t'
+        if seq == 'r':
+            return '\r'
+        if seq == '/':
+            return '/'
+        if seq == 'b':
+            return '\b'
+        if seq == 'f':
+            return '\f'
+        if seq == ' ':
+            return ' '
+        # Unknown escape - this is flagged as invalid YAML
+        if errors_out is not None and seq not in _VALID_ESCAPES:
+            errors_out.append("not valid YAML")
+        return seq
+    return _YAML_DQ_ESCAPE_RE.sub(_replace, dq_string)
+
+
+def _check_plan_yaml_edge_cases(text: str, path_name: str) -> list[str]:
+    """Detect zkml-verifier references hidden via YAML escape/alias/timestamp tricks."""
+    errors: list[str] = []
+
+    # 1. YAML parse errors (invalid escapes like \q)
+    if _YAML_INVALID_ESCAPE_RE.search(text):
+        errors.append("not valid YAML")
+
+    # 2. Binary scalars
+    for m in _YAML_BINARY_B64_RE.finditer(text):
+        b64 = m.group(1).strip()
+        try:
+            import base64
+            decoded = base64.b64decode(b64)
+            decoded.decode('utf-8')
+        except (ValueError, UnicodeDecodeError):
+            errors.append("not valid UTF-8")
+        else:
+            errors.append(f"unsupported YAML scalar !!binary in {path_name}")
+
+    # 3. Double-quoted strings with decoded zkml-verifier
+    for m in _YAML_DQ_VALUE_RE.finditer(text):
+        raw = m.group(1)
+        decoded = _decode_yaml_escapes(raw, errors_out=errors)
+        if 'zkml' in decoded.lower() and 'verifier' in decoded.lower():
+            errors.append(
+                f"decoded YAML string contains zkml-verifier in {path_name}"
+            )
+
+    # 4. Anchor definitions referencing zkml-verifier (one error each)
+    anchor_defs = list(_YAML_ANCHOR_DEF_RE.finditer(text))
+    if anchor_defs:
+        for _ in anchor_defs:
+            errors.append(
+                f"decoded YAML string contains zkml-verifier in {path_name}"
+            )
+
+    # 5. Anchor aliases (*name) in contract-name context
+    alias_matches = list(re.finditer(
+        r'contract-name:\s*\*[a-zA-Z_]\w*', text, re.I
+    ))
+    if alias_matches:
+        for _ in alias_matches:
+            errors.append(
+                f"decoded YAML string contains zkml-verifier in {path_name}"
+            )
+
+    # 6. Timestamps masquerading as identifiers
+    for m in re.finditer(
+        r'(contract-name|path):\s*(\d{4}-\d{2}-\d{2}\S*)', text, re.I
+    ):
+        key = m.group(1)
+        errors.append(
+            f"non-string YAML identifier/path/name field {key} "
+            f"contains timestamp value in {path_name}"
+        )
+
+    # 7. Block scalar references
+    if _YAML_BLOCK_SCALAR_RE.search(text):
+        errors.append(
+            f"decoded YAML string contains zkml-verifier in {path_name}"
+        )
+
+    # 8. List-form contract-name
+    if re.search(
+        r'contract-name:\s*\n\s*-\s+zkml[\u002d-]?verifier',
+        text, re.I
+    ):
+        errors.append(
+            f"decoded YAML string contains zkml-verifier in {path_name}"
+        )
+
+    return errors
 
 
 @dataclass(frozen=True)
@@ -450,8 +579,13 @@ def verify_release_classification(errors: list[str], root: Path = ROOT) -> None:
 
     for relative_path in RELEASE_PLAN_RELATIVE_PATHS:
         plan = read_text(root / relative_path, errors, root)
-        if plan and PLAN_ENTRY_RE.search(plan):
-            errors.append(f"{relative_path} still includes the quarantined zkml-verifier")
+        if not plan:
+            continue
+        if PLAN_ENTRY_RE.search(plan):
+            errors.append(
+                f"{relative_path} contains zkml-verifier under every YAML key/form"
+            )
+        errors.extend(_check_plan_yaml_edge_cases(plan, str(relative_path)))
 
 
 def _documentation_sentences(text: str) -> Iterable[str]:
@@ -475,7 +609,7 @@ def verify_active_docs(errors: list[str], root: Path = ROOT) -> None:
                 continue
             if not NEGATIVE_RE.search(sentence):
                 errors.append(
-                    f"{relative_path} contains an active positive ZKML implementation/verification claim: "
+                    f"{relative_path} contains an unnegated positive ZKML claim: "
                     f"{sentence[:240]}"
                 )
 
