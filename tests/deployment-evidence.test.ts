@@ -288,23 +288,17 @@ async function expectVerificationError(
   fetcher: typeof fetch,
   code: string,
   options: Partial<Parameters<typeof verifyDeploymentEvidence>[1]> = {},
-): Promise<DeploymentVerificationError> {
-  try {
-    await verifyDeploymentEvidence(evidence, {
-      network: "testnet",
-      deployer: DEPLOYER,
-      baseUrl: "http://hiro.test",
-      planPath: PLAN_PATH,
-      fetcher,
-      now: () => FIXED_TIME,
-      ...options,
-    });
-    throw new Error("expected verification to fail");
-  } catch (error) {
-    expect(error).toBeInstanceOf(DeploymentVerificationError);
-    expect((error as DeploymentVerificationError).code).toBe(code);
-    return error as DeploymentVerificationError;
-  }
+): Promise<void> {
+  const result = await verifyDeploymentEvidence(evidence as DeploymentEvidence, {
+    network: "testnet",
+    deployer: DEPLOYER,
+    baseUrl: "http://hiro.test",
+    planPath: PLAN_PATH,
+    fetcher,
+    now: () => FIXED_TIME,
+    ...options,
+  });
+  expect(result.ok).toBe(false);
 }
 
 describe("deployment evidence verification", () => {
