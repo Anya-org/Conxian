@@ -17,22 +17,34 @@ SPEC.loader.exec_module(guard)
 
 
 CANONICAL_CONTRACT = """\
-;; Comments may contain fake balanced-looking forms without changing the AST.
-;; (define-public (fake (buff 2048)) (ok true))
-(define-constant ERR_VERIFIER_UNAVAILABLE (err u503))
+;; zkml-verifier.clar
+;; Conxian Protocol: ZKML verification quarantine scaffold.
+;; This contract deliberately has no cryptographic verifier backend.
+
+(define-constant ERR_INVALID_PROOF (err u7001))
 (define-constant ERR_UNAUTHORIZED (err u7002))
+;; The ABI is retained for callers, but no proof is accepted until a reviewed
+;; verifier implementation is qualified and wired. Structural inputs alone
+;; must never produce a successful attestation.
+(define-constant ERR_VERIFIER_UNAVAILABLE (err u7003))
 
 (define-data-var admin principal tx-sender)
 
-(define-public
-  (verify-proof
-    (model-id (string-ascii 64))
-    (input-hash (buff 32))
-    (proof (buff 1024)))
+;; @desc Quarantined ZKML proof entry point; always fails closed.
+;; @param model-id: The identifier for the ML model.
+;; @param input-hash: Hash of the input data.
+;; @param proof: The ZK proof payload (e.g. Groth16/Plonk).
+;; @return (response bool uint) - Always returns ERR_VERIFIER_UNAVAILABLE.
+;; No length check, parser, key registry, or simulated success is permitted.
+(define-public (verify-proof (model-id (string-ascii 64)) (input-hash (buff 32)) (proof (buff 1024)))
   ERR_VERIFIER_UNAVAILABLE
 )
 
-;; Admin functions retain their ordinary administration response.
+;; Admin functions
+
+;; @desc Update the contract administrator. Admin only.
+;; @param new-admin: The new administrator principal.
+;; @return (response bool uint) - Returns ok(true) on success.
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -42,7 +54,7 @@ CANONICAL_CONTRACT = """\
 )
 
 (define-read-only (get-protocol-status)
-  ERR_VERIFIER_UNAVAILABLE
+  (ok { compliant: false, version: "v1.1.0-Apex", mode: "ZKML-PAUSED" })
 )
 """
 
@@ -234,12 +246,12 @@ class ZkmlQuarantineGuardTests(unittest.TestCase):
 
         self.assertTrue(any("get-protocol-status-v2" in error for error in errors))
 
-    def test_rejects_exact_unavailable_mapping_mutation_from_u503(self) -> None:
+    def test_rejects_exact_unavailable_mapping_mutation_from_u7003(self) -> None:
         errors = self.assert_rejected(
-            contract=CANONICAL_CONTRACT.replace("(err u503)", "(err u504)", 1)
+            contract=CANONICAL_CONTRACT.replace("(err u7003)", "(err u7004)", 1)
         )
 
-        self.assertTrue(any("map exactly to (err u503)" in error for error in errors))
+        self.assertTrue(any("map exactly to (err u7003)" in error for error in errors))
 
     def test_quoted_clarity_strings_do_not_create_fake_definition_or_event_findings(
         self,
@@ -281,7 +293,7 @@ class ZkmlQuarantineGuardTests(unittest.TestCase):
 
     def test_rejects_active_or_compliant_status_marker(self) -> None:
         contract = CANONICAL_CONTRACT.replace(
-            "(define-read-only (get-protocol-status)\n  ERR_VERIFIER_UNAVAILABLE\n)",
+            '(define-read-only (get-protocol-status)\n  (ok { compliant: false, version: "v1.1.0-Apex", mode: "ZKML-PAUSED" })\n)',
             '(define-read-only (get-protocol-status)\n  "ZKML-ACTIVE"\n)',
             1,
         )
@@ -568,8 +580,8 @@ class ZkmlQuarantineGuardTests(unittest.TestCase):
     def test_malformed_or_ambiguous_clarity_delimiters_fail_closed(self) -> None:
         cases = (
             CANONICAL_CONTRACT.replace(
-                "(define-public\n  (verify-proof",
-                "(define-public\n  {verify-proof",
+                "(define-public (verify-proof",
+                "(define-public {verify-proof",
                 1,
             ),
             CANONICAL_CONTRACT + '\n(define-constant "unterminated',
