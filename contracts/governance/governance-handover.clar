@@ -49,7 +49,7 @@
 )
 
 (define-private (assert-authorized)
-  (asserts! (is-authorized) ERR_NOT_AUTHORIZED)
+  (ok (asserts! (is-authorized) ERR_NOT_AUTHORIZED))
 )
 
 ;; --- Read-only verification ---
