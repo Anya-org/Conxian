@@ -1731,44 +1731,6 @@ export interface VerifyDeploymentEvidenceOptions {
   timeoutMs?: number;
 }
 
-function parsePlanEntry(raw: Record<string, unknown>): ContractPublicationEntry | ContractCallEntry {
-  const kind = raw.kind;
-  if (kind !== "contract-publish" && kind !== "contract-call") {
-    throw new DeploymentVerificationError(
-      "malformed-manifest",
-      `unsupported transaction kind: ${String(kind)}`,
-    );
-  }
-
-  const planPosition = raw.planPosition as PlanPosition;
-  if (!planPosition || typeof planPosition.batchId !== "number" || typeof planPosition.transactionIndex !== "number") {
-    throw new DeploymentVerificationError(
-      "malformed-manifest",
-      "planPosition must contain numeric batchId and transactionIndex",
-    );
-  }
-
-  if (kind === "contract-publish") {
-    return {
-      kind: "contract-publish",
-      planPosition,
-      contractName: raw.contractName as string,
-      contractId: raw.contractId as string,
-      expectedSender: raw.expectedSender as string,
-      txid: raw.txid as string,
-    };
-  }
-
-  return {
-    kind: "contract-call",
-    planPosition,
-    contractId: raw.contractId as string,
-    functionName: raw.functionName as string,
-    expectedSender: raw.expectedSender as string,
-    txid: raw.txid as string,
-  };
-}
-
 export function readDeploymentPlan(planPath: string): {
   batches: Array<{
     id: number;
