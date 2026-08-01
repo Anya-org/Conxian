@@ -190,6 +190,21 @@ export const simnet: Simnet = new Proxy({} as Simnet, {
   }
 });
 
+export const accounts: Record<string, { address: string }> = new Proxy({} as Record<string, { address: string }>, {
+  get: (_target, prop) => {
+    if (typeof prop !== 'string') return undefined;
+    if (!internalSimnet) return undefined;
+    const map = typeof (internalSimnet as any).getAccounts === 'function'
+      ? (internalSimnet as any).getAccounts() as Map<string, string>
+      : (internalSimnet as any).accounts;
+    if (!map) return undefined;
+    const a = typeof map.get === 'function' ? map.get(prop) : map[prop];
+    if (typeof a === 'string') return { address: a };
+    if (a && typeof a === 'object' && typeof (a as any).address === 'string') return a;
+    return undefined;
+  }
+});
+
 beforeAll(async () => {
   await initializeSimnet();
 });

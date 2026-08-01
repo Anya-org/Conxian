@@ -1,6 +1,8 @@
+import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { parseDocument } from "yaml";
 import {
   AddressVersion,
   addressToString,
@@ -1395,7 +1397,7 @@ async function safeApiCall(call: () => Promise<HttpResult>): Promise<HttpResult>
   }
 }
 
-export async function verifyDeploymentEvidence(
+async function verifyDeploymentEvidenceCore(
   input: unknown,
   api: HiroApi,
   expectedBinding: EvidenceBinding,
@@ -1643,4 +1645,286 @@ if (invokedPath && pathToFileURL(invokedPath).href === import.meta.url) {
       process.exitCode = 2;
     },
   );
+}
+
+// ---------- Gate 2 test-suite exports ----------
+
+export class DeploymentVerificationError extends Error {
+  public readonly code: string;
+  public readonly failures: VerificationFailure[];
+
+  constructor(code: string, message: string, failures: VerificationFailure[] = []) {
+    super(message);
+    this.name = "DeploymentVerificationError";
+    this.code = code;
+    this.failures = failures;
+  }
+}
+
+export interface PlanPosition {
+  batchId: number;
+  transactionIndex: number;
+}
+
+export interface ContractPublicationEntry {
+  kind: "contract-publish";
+  planPosition: PlanPosition;
+  contractName: string;
+  contractId: string;
+  expectedSender: string;
+  txid: string;
+}
+
+export interface ContractCallEntry {
+  kind: "contract-call";
+  planPosition: PlanPosition;
+  contractId: string;
+  functionName: string;
+  expectedSender: string;
+  txid: string;
+}
+
+export interface InterfaceEntry {
+  contractId: string;
+  requiredFunctions: Array<{ name: string; access: string }>;
+}
+
+export interface ReadOnlyCheckEntry {
+  network: string;
+  contractId: string;
+  sender: string;
+  functionName: string;
+  arguments: string[];
+  expectedOkay: boolean;
+  expectedResultHex: string;
+}
+
+export interface DeploymentEvidence {
+  schemaVersion: string;
+  evidenceStatus: string;
+  coverage: string;
+  generatedAt: string;
+  sourceCommit: string;
+  network: string;
+  deployer: string;
+  plan: {
+    path: string;
+    sha256: string;
+  };
+  claims: {
+    scope: string;
+    globalNonexistence: boolean;
+  };
+  contractPublications: ContractPublicationEntry[];
+  contractCalls: ContractCallEntry[];
+  interfaces: InterfaceEntry[];
+  readOnlyChecks: ReadOnlyCheckEntry[];
+}
+
+export interface VerifyDeploymentEvidenceOptions {
+  network: string;
+  deployer: string;
+  baseUrl: string;
+  planPath: string;
+  fetcher: typeof fetch;
+  now?: () => Date;
+  timeoutMs?: number;
+}
+
+function parsePlanEntry(raw: Record<string, unknown>): ContractPublicationEntry | ContractCallEntry {
+  const kind = raw.kind;
+  if (kind !== "contract-publish" && kind !== "contract-call") {
+    throw new DeploymentVerificationError(
+      "malformed-manifest",
+      `unsupported transaction kind: ${String(kind)}`,
+    );
+  }
+
+  const planPosition = raw.planPosition as PlanPosition;
+  if (!planPosition || typeof planPosition.batchId !== "number" || typeof planPosition.transactionIndex !== "number") {
+    throw new DeploymentVerificationError(
+      "malformed-manifest",
+      "planPosition must contain numeric batchId and transactionIndex",
+    );
+  }
+
+  if (kind === "contract-publish") {
+    return {
+      kind: "contract-publish",
+      planPosition,
+      contractName: raw.contractName as string,
+      contractId: raw.contractId as string,
+      expectedSender: raw.expectedSender as string,
+      txid: raw.txid as string,
+    };
+  }
+
+  return {
+    kind: "contract-call",
+    planPosition,
+    contractId: raw.contractId as string,
+    functionName: raw.functionName as string,
+    expectedSender: raw.expectedSender as string,
+    txid: raw.txid as string,
+  };
+}
+
+export function readDeploymentPlan(planPath: string): {
+  batches: Array<{
+    id: number;
+    transactions: Array<Record<string, unknown>>;
+  }>;
+} {
+  const resolved = resolve(planPath);
+  if (resolved.includes("mainnet")) {
+    throw new DeploymentVerificationError(
+      "network-mismatch",
+      "Mainnet deployment plans are blocked from automated evidence parsing; use the explicit mainnet gateway path",
+    );
+  }
+
+  let source: string;
+  try {
+    source = readFileSync(resolved, "utf8");
+  } catch {
+    throw new DeploymentVerificationError(
+      "malformed-manifest",
+      `Cannot read deployment plan at ${planPath}`,
+    );
+  }
+
+  if (source.trim().length === 0) {
+    throw new DeploymentVerificationError(
+      "malformed-manifest",
+      "Deployment plan is empty",
+    );
+  }
+
+  const document = parseDocument(source, { uniqueKeys: true });
+  if (document.errors && document.errors.length > 0) {
+    throw new DeploymentVerificationError(
+      "malformed-manifest",
+      `Deployment plan YAML is malformed: ${document.errors.map((e: Error) => e.message).join("; ")}`,
+    );
+  }
+
+  const root = document.toJSON() as Record<string, unknown>;
+  if (!root || typeof root !== "object") {
+    throw new DeploymentVerificationError(
+      "malformed-manifest",
+      "Deployment plan root must be an object",
+    );
+  }
+
+  const plan = root.plan as Record<string, unknown> | undefined;
+  if (!plan) {
+    throw new DeploymentVerificationError(
+      "malformed-manifest",
+      "Deployment plan missing `plan` key",
+    );
+  }
+
+  const batches = plan.batches as Array<Record<string, unknown>> | undefined;
+  if (!Array.isArray(batches)) {
+    throw new DeploymentVerificationError(
+      "malformed-manifest",
+      "Deployment plan `plan.batches` must be an array",
+    );
+  }
+
+  const validatedBatches = batches.map((batch, batchIndex) => {
+    if (typeof batch.id !== "number") {
+      throw new DeploymentVerificationError(
+        "malformed-manifest",
+        `Batch at index ${batchIndex} missing numeric id`,
+      );
+    }
+    const transactions = batch.transactions as Array<Record<string, unknown>> | undefined;
+    if (!Array.isArray(transactions)) {
+      throw new DeploymentVerificationError(
+        "malformed-manifest",
+        `Batch ${batch.id} missing transactions array`,
+      );
+    }
+    const validatedTransactions = transactions.map((tx) => {
+      if (!tx || typeof tx !== "object") {
+        throw new DeploymentVerificationError(
+          "malformed-manifest",
+          `Transaction in batch ${batch.id} is not an object`,
+        );
+      }
+      return tx;
+    });
+    return { id: batch.id as number, transactions: validatedTransactions };
+  });
+
+  return { batches: validatedBatches };
+}
+
+export function sha256File(filePath: string): string {
+  const resolved = resolve(filePath);
+  const content = readFileSync(resolved);
+  return createHash("sha256").update(content).digest("hex");
+}
+
+export async function verifyDeploymentEvidence(
+  evidenceOrInput: unknown,
+  optionsOrApi: VerifyDeploymentEvidenceOptions | HiroApi,
+  expectedBinding?: EvidenceBinding,
+): Promise<VerificationReport> {
+  // Detect which overload was called
+  if (expectedBinding !== undefined) {
+    return verifyDeploymentEvidenceCore(evidenceOrInput, optionsOrApi as HiroApi, expectedBinding);
+  }
+
+  const options = optionsOrApi as VerifyDeploymentEvidenceOptions;
+
+  const api: HiroApi = {
+    getTransaction: async (txId: string) => {
+      const response = await options.fetcher(`${options.baseUrl}/extended/v1/tx/${txId}`);
+      if (!response.ok) return { status: response.status, ok: false };
+      try {
+        return { status: response.status, ok: true, data: await response.json() };
+      } catch {
+        return { status: response.status, ok: false, error: "invalid-json" };
+      }
+    },
+    getContractInterface: async (principal: string) => {
+      const [addr, name] = principal.split(".");
+      const response = await options.fetcher(`${options.baseUrl}/v2/contracts/interface/${addr}/${name}`);
+      if (!response.ok) return { status: response.status, ok: false };
+      try {
+        return { status: response.status, ok: true, data: await response.json() };
+      } catch {
+        return { status: response.status, ok: false, error: "invalid-json" };
+      }
+    },
+    callReadOnly: async (principal: string, functionName: string, request) => {
+      const [addr, name] = principal.split(".");
+      const body = JSON.stringify({
+        sender: request.sender,
+        arguments: request.arguments,
+      });
+      const response = await options.fetcher(
+        `${options.baseUrl}/v2/contracts/call-read/${addr}/${name}/${functionName}`,
+        { method: "POST", headers: { "Content-Type": "application/json" }, body },
+      );
+      if (!response.ok) return { status: response.status, ok: false };
+      try {
+        return { status: response.status, ok: true, data: await response.json() };
+      } catch {
+        return { status: response.status, ok: false, error: "invalid-json" };
+      }
+    },
+  };
+
+  const binding: EvidenceBinding = {
+    network: options.network as DeploymentNetwork,
+    deployer: options.deployer,
+    gitCommit: (evidenceOrInput as Record<string, unknown>)?.sourceCommit as string ?? "",
+    planPath: options.planPath,
+    planSha256: (evidenceOrInput as Record<string, unknown>)?.plan?.sha256 as string ?? "",
+  };
+
+  return verifyDeploymentEvidenceCore(evidenceOrInput, api, binding);
 }
