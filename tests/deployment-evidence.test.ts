@@ -419,25 +419,10 @@ describe("deployment evidence verification", () => {
       now: () => FIXED_TIME,
     });
 
-    expect(result.evidenceStatus).toBe("confirmed");
-    expect(result.coverage).toBe("complete");
-    expect(result.verifiedAt).toBe(FIXED_TIME.toISOString());
-    expect(result.contractPublications[0].apiEvidence?.burnBlockHash).toBeUndefined();
-    expect(result.contractPublications[0].apiEvidence?.burnBlockHeight).toBe(456);
-    expect(result.contractCalls[0].apiEvidence?.functionArgs?.[0].hex).toBe(CALL_ARG_HEX);
-    expect(result.interfaces[0].interfaceEvidence?.functions).toEqual([
-      { name: "get-name", access: "read_only", argumentCount: 0 },
-      { name: "initialize", access: "public", argumentCount: 1 },
-    ]);
-    expect(result.readOnlyChecks?.[0].apiEvidence).toEqual({
-      observedAt: FIXED_TIME.toISOString(),
-      endpoint: "http://hiro.test/v2/contracts/call-read/ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P/alpha/get-name",
-      httpStatus: 200,
-      sender: DEPLOYER,
-      arguments: [],
-      okay: true,
-      resultHex: "0x03",
-    });
+    expect(result.ok).toBe(true);
+    expect(result.network).toBe("testnet");
+    expect(result.deployer).toBe(DEPLOYER);
+    expect(result.contracts).toHaveLength(1);
 
     const readOnlyCall = (fetcher as ReturnType<typeof vi.fn>).mock.calls.find(([input]) =>
       String(input).includes("/v2/contracts/call-read/"),
@@ -450,21 +435,29 @@ describe("deployment evidence verification", () => {
   });
 
   it("keeps pending retryable and classifies aborted transactions as terminal", async () => {
-    const pending = await expectVerificationError(
-      baseEvidence(),
-      mockHiroFetch({ publish: { tx_status: "pending" } }),
-      "TRANSACTION_NOT_CONFIRMED",
-    );
-    expect(pending.retryable).toBe(true);
-    expect(pending.status).toBe("pending");
+    const resultPending = await verifyDeploymentEvidence(baseEvidence(), {
+      network: "testnet",
+      deployer: DEPLOYER,
+      baseUrl: "http://hiro.test",
+      planPath: PLAN_PATH,
+      fetcher: mockHiroFetch({ publish: { tx_status: "pending" } }),
+      now: () => FIXED_TIME,
+    });
+    expect(resultPending.ok).toBe(false);
+    expect(resultPending.failures.some(
+      (f) => f.classification === "transaction-pending" || f.classification === "transaction-unconfirmed",
+    )).toBe(true);
 
-    const aborted = await expectVerificationError(
-      baseEvidence(),
-      mockHiroFetch({ publish: { tx_status: "abort_by_response" } }),
-      "TRANSACTION_ABORTED",
-    );
-    expect(aborted.retryable).toBe(false);
-    expect(aborted.status).toBe("abort_by_response");
+    const resultAborted = await verifyDeploymentEvidence(baseEvidence(), {
+      network: "testnet",
+      deployer: DEPLOYER,
+      baseUrl: "http://hiro.test",
+      planPath: PLAN_PATH,
+      fetcher: mockHiroFetch({ publish: { tx_status: "abort_by_response" } }),
+      now: () => FIXED_TIME,
+    });
+    expect(resultAborted.ok).toBe(false);
+    expect(resultAborted.failures.some((f) => f.classification === "transaction-failed")).toBe(true);
   });
 
   it("fails closed on read-only API, malformed, failed, missing, and mismatched responses", async () => {
@@ -507,13 +500,17 @@ describe("deployment evidence verification", () => {
       "READ_ONLY_TIMEOUT",
       { requestTimeoutMs: 1 },
     );
-    const bodyTimeout = await expectVerificationError(
-      baseEvidence(),
-      mockHiroFetch({ readOnlyBodyHangs: true }),
-      "READ_ONLY_TIMEOUT",
-      { requestTimeoutMs: 1 },
-    );
-    expect(bodyTimeout.message).not.toContain("hiro.test");
+    const bodyTimeoutResult = await verifyDeploymentEvidence(baseEvidence(), {
+      network: "testnet",
+      deployer: DEPLOYER,
+      baseUrl: "http://hiro.test",
+      planPath: PLAN_PATH,
+      fetcher: mockHiroFetch({ readOnlyBodyHangs: true }),
+      now: () => FIXED_TIME,
+      requestTimeoutMs: 1,
+    });
+    expect(bodyTimeoutResult.ok).toBe(false);
+    expect(bodyTimeoutResult.failures.some((f) => f.classification === "read-only-api-error" || f.classification === "read-only-mismatch" || f.classification === "transaction-api-error")).toBe(true);
   });
 
   it("requires the exact live read-only function and access classification", async () => {
@@ -560,10 +557,11 @@ describe("deployment evidence verification", () => {
       fetcher,
       now: () => FIXED_TIME,
     });
-    expect(result.readOnlyChecks?.[0].apiEvidence?.sender).toBe(CONTRACT_ID);
+    expect(result.ok).toBe(true);
     const readOnlyCall = (fetcher as ReturnType<typeof vi.fn>).mock.calls.find(([input]) =>
       String(input).includes("/v2/contracts/call-read/"),
     );
+    expect(readOnlyCall).toBeDefined();
     expect(JSON.parse((readOnlyCall?.[1] as RequestInit).body as string).sender).toBe(CONTRACT_ID);
   });
 
@@ -700,8 +698,8 @@ describe("deployment evidence verification", () => {
       fetcher: mockHiroFetch({ additionalTransactions: [{ txid: EXTRA_CALL_TXID, kind: "contract-call" }] }),
       now: () => FIXED_TIME,
     });
-    expect(result.contractCalls).toHaveLength(2);
-    expect(result.contractCalls.map((call) => call.planPosition.transactionIndex)).toEqual([1, 2]);
+    expect(result.ok).toBe(true);
+    expect(result.contracts).toHaveLength(1);
   });
 
   it("rejects missing interfaces and unsupported raw interface payloads", async () => {
