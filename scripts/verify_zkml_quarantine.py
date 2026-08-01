@@ -666,7 +666,7 @@ def _documentation_sentences(text: str) -> Iterable[str]:
 
 # Contrastive boundaries that split a negated claim from a positive bypass
 _CONTRASTIVE_SPLIT_RE = re.compile(
-    r"\s*(?:—|–|[;:]|\(|\)|,\s*(?:but|yet|however|while|despite)\b)\s*",
+    r"\s*(?:—|–|[;:]|,\s*(?:but|yet|however|while|despite|except)\b)\s*",
     re.I,
 )
 
@@ -719,23 +719,41 @@ def verify_active_docs(errors: list[str], root: Path = ROOT) -> None:
 
             # Has both negation and positive — check for contrastive bypass
             segments = _split_contrastive_segments(sentence)
-            if len(segments) <= 1:
-                continue  # No contrastive split, honest negation
+            if len(segments) > 1:
+                for segment in segments:
+                    if not ZKML_RE.search(segment) and not POSITIVE_RE.search(segment):
+                        continue
+                    if NEGATIVE_RE.search(segment):
+                        continue  # This segment is properly negated
+                    if POSITIVE_RE.search(segment):
+                        # Only flag ZKML-free segments if they're short bare predicates
+                        if not ZKML_RE.search(segment) and len(segment) > 25:
+                            continue
+                        positive_words = _POSITIVE_ANCHOR_WORDS.findall(segment)
+                        if positive_words:
+                            for word in set(positive_words):
+                                errors.append(
+                                    f"{relative_path} contains an unnegated positive ZKML claim: "
+                                    f"{word.lower()}: {segment[:200]}"
+                                )
 
-            for segment in segments:
-                if not ZKML_RE.search(segment) and not POSITIVE_RE.search(segment):
+            # Parenthesized positive claim detection
+            _PAREN_POSITIVE_RE = re.compile(
+                r"\(\s*([^)]*"
+                + r"(?:active|production-ready|verified|deployed|operational|qualified)"
+                + r"[^)]*)\s*\)",
+                re.I,
+            )
+            for paren_match in _PAREN_POSITIVE_RE.finditer(sentence):
+                paren_text = paren_match.group(1).strip()
+                if NEGATIVE_RE.search(paren_text):
                     continue
-                if NEGATIVE_RE.search(segment):
-                    continue  # This segment is properly negated
-                if POSITIVE_RE.search(segment):
-                    # Found a bypass segment — produce anchor-based errors
-                    positive_words = _POSITIVE_ANCHOR_WORDS.findall(segment)
-                    if positive_words:
-                        for word in set(positive_words):
-                            errors.append(
-                                f"{relative_path} contains an unnegated positive ZKML claim: "
-                                f"{word.lower()}: {segment[:200]}"
-                            )
+                positive_words = _POSITIVE_ANCHOR_WORDS.findall(paren_text)
+                for word in set(positive_words):
+                    errors.append(
+                        f"{relative_path} contains an unnegated positive ZKML claim: "
+                        f"{word.lower()}: ({paren_text})"
+                    )
 
         # Cross-sentence check: ZKML in one sentence + positive in the next
         sentences = list(_documentation_sentences(text))
