@@ -9,9 +9,11 @@
 
 ;; Constants
 (define-constant ERR_NOT_AUTHORIZED u1000)
+(define-constant ERR_ALREADY_INITIALIZED u1001)
 
 ;; State
 (define-data-var global-admin principal tx-sender)
+(define-data-var admin-initialized bool false)
 
 (define-map role-cache { user: principal, role: uint } bool)
 
@@ -58,12 +60,14 @@
 )
 
 
-;; @desc Initialize
+;; @desc Initialize — one-time admin bootstrap. Cannot be called after initial setup.
 ;; @returns (response bool uint)
 (define-public (initialize (admin principal))
   (begin
+    (asserts! (not (var-get admin-initialized)) (err ERR_ALREADY_INITIALIZED))
     (asserts! (is-eq tx-sender (var-get global-admin)) (err ERR_NOT_AUTHORIZED))
     (var-set global-admin admin)
+    (var-set admin-initialized true)
     (ok true)
   )
 )
