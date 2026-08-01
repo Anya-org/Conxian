@@ -579,7 +579,7 @@ clarity-version = 4
 [contracts.governance-handover]
 path = "contracts/governance/governance-handover.clar"
 clarity-version = 4
-depends_on = ["timelock"]
+depends_on = ["timelock", "conxian-access", "admin-facade"]
 
 [contracts.governance-signature-verifier]
 path = "contracts/governance/governance-signature-verifier.clar"

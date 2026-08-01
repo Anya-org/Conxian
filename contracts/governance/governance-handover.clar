@@ -2,14 +2,14 @@
 ;; Sovereign handover verification and execution controller.
 ;;
 ;; This contract records and verifies the transfer of bootstrap authority to
-;; the timelock. It does NOT execute the transfers itself — each target
+;; the timelock. It does NOT execute the transfers itself -- each target
 ;; contract must be called by its current owner. This contract witnesses the
 ;; resulting state and advances an internal handover counter.
 ;;
 ;; Handover sequence:
-;;   Step 1 — conxian-access contract-owner transferred to .timelock
-;;   Step 2 — admin-facade global-admin transferred to .timelock
-;;   Step 3 — Verify, seal, and record completion
+;;   Step 1 -- conxian-access contract-owner transferred to .timelock
+;;   Step 2 -- admin-facade global-admin transferred to .timelock
+;;   Step 3 -- Verify, seal, and record completion
 
 ;; --- Constants ---
 
@@ -105,7 +105,7 @@
         (begin
           ;; Verify admin-facade.global-admin has been transferred to timelock.
           ;; We verify this by having the timelock call admin-facade.is-authorized
-          ;; with the admin role — if the transfer succeeded, the timelock IS the
+          ;; with the admin role -- if the transfer succeeded, the timelock IS the
           ;; global admin and authorization will succeed.
           (asserts!
             (unwrap! (contract-call? .admin-facade is-authorized u1)
@@ -115,7 +115,7 @@
           (var-set handover-step STEP_ADMIN)
           (ok true)
         )
-        ;; STEP_SEAL — final verification and seal
+        ;; STEP_SEAL -- final verification and seal
         (begin
           ;; Re-verify both conditions before sealing
           (asserts!
