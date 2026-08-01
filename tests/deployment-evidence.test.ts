@@ -233,7 +233,7 @@ function baseEvidence(): DeploymentEvidence {
     network: "testnet",
     deployer: DEPLOYER,
     plan: {
-      path: "mini-plan.yaml",
+      path: PLAN_PATH,
       sha256: sha256File(PLAN_PATH),
     },
     claims: {
