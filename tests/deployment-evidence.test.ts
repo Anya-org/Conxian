@@ -222,40 +222,6 @@ function mockHiroFetch(
     return new Response(JSON.stringify({ error: "unexpected endpoint" }), { status: 500 });
   }) as typeof fetch;
 
-function cleanEvidence(o: Record<string, unknown> = {}) {
-  return {
-    schemaVersion: "1",
-    network: "testnet",
-    apiBaseUrl: "http://hiro.test",
-    deployer: DEPLOYER,
-    evidence: {
-      source: "confirmed-receipts",
-      capturedAt: FIXED_TIME.toISOString(),
-      gitCommit: "0".repeat(40),
-      planPath: PLAN_PATH,
-      planSha256: sha256File(PLAN_PATH),
-    },
-    contracts: [
-      {
-        name: "alpha",
-        principal: CONTRACT_ID,
-        publishTxId: PUBLISH_TXID,
-        interface: {
-          required: true,
-          expectedContractName: "alpha",
-          expectedFunctions: ["get-name", "initialize"],
-        },
-        readOnlyChecks: [
-          {
-            function: "get-name",
-            sender: DEPLOYER,
-            arguments: [],
-          },
-        ],
-      },
-    ],
-    ...o,
-  };
 }
 
 function baseEvidence(): DeploymentEvidence {
@@ -472,7 +438,7 @@ describe("deployment evidence verification", () => {
 
   it("confirms complete plan evidence with nullable burn hash and rich Hiro interfaces", async () => {
     const fetcher = mockHiroFetch({ publish: { burn_block_hash: null } });
-    const result = await verifyDeploymentEvidence(cleanEvidence(), {
+    const result = await verifyDeploymentEvidence(baseEvidence(), {
       network: "testnet",
       deployer: DEPLOYER,
       baseUrl: "http://hiro.test",
@@ -497,7 +463,7 @@ describe("deployment evidence verification", () => {
   });
 
   it("keeps pending retryable and classifies aborted transactions as terminal", async () => {
-    const resultPending = await verifyDeploymentEvidence(cleanEvidence(), {
+    const resultPending = await verifyDeploymentEvidence(baseEvidence(), {
       network: "testnet",
       deployer: DEPLOYER,
       baseUrl: "http://hiro.test",
@@ -510,7 +476,7 @@ describe("deployment evidence verification", () => {
       (f) => f.classification === "transaction-pending" || f.classification === "transaction-unconfirmed",
     )).toBe(true);
 
-    const resultAborted = await verifyDeploymentEvidence(cleanEvidence(), {
+    const resultAborted = await verifyDeploymentEvidence(baseEvidence(), {
       network: "testnet",
       deployer: DEPLOYER,
       baseUrl: "http://hiro.test",
@@ -562,7 +528,7 @@ describe("deployment evidence verification", () => {
       "READ_ONLY_TIMEOUT",
       { requestTimeoutMs: 1 },
     );
-    const bodyTimeoutResult = await verifyDeploymentEvidence(cleanEvidence(), {
+    const bodyTimeoutResult = await verifyDeploymentEvidence(baseEvidence(), {
       network: "testnet",
       deployer: DEPLOYER,
       baseUrl: "http://hiro.test",
@@ -608,7 +574,7 @@ describe("deployment evidence verification", () => {
   });
 
   it("accepts a canonical contract principal as a read-only sender", async () => {
-    const evidence = cleanEvidence();
+    const evidence = baseEvidence();
     evidence.contracts[0].readOnlyChecks[0].sender = CONTRACT_ID;
     const fetcher = mockHiroFetch();
     const result = await verifyDeploymentEvidence(evidence, {
@@ -744,7 +710,8 @@ describe("deployment evidence verification", () => {
   it("does not collapse duplicate method-name calls when ordinals differ", async () => {
     const duplicateCallPlanPath = join(tempDirectory, "duplicate-call-plan.yaml");
     writePlan(duplicateCallPlanPath, { includeSecondCall: true });
-    const evidence = cleanEvidence({
+    const evidence = {
+      ...baseEvidence(),
       evidence: {
         source: "confirmed-receipts",
         capturedAt: FIXED_TIME.toISOString(),
@@ -752,7 +719,7 @@ describe("deployment evidence verification", () => {
         planPath: duplicateCallPlanPath,
         planSha256: sha256File(duplicateCallPlanPath),
       },
-    });
+    };
 
     const result = await verifyDeploymentEvidence(evidence, {
       network: "testnet",
