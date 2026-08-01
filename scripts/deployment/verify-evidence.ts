@@ -1731,11 +1731,20 @@ export interface VerifyDeploymentEvidenceOptions {
   timeoutMs?: number;
 }
 
+export interface DeploymentPlanEntry {
+  kind: "contract-publish" | "contract-call";
+  contractId?: string;
+  functionName?: string;
+  planPosition: { batchId: number; transactionIndex: number };
+}
+
 export function readDeploymentPlan(planPath: string): {
+  deployer: string;
   batches: Array<{
     id: number;
     transactions: Array<Record<string, unknown>>;
   }>;
+  entries: DeploymentPlanEntry[];
 } {
   const resolved = resolve(planPath);
   if (resolved.includes("mainnet")) {
@@ -1786,6 +1795,14 @@ export function readDeploymentPlan(planPath: string): {
     );
   }
 
+  const deployer = root.deployer as string | undefined;
+  if (typeof deployer !== "string" || deployer.length === 0) {
+    throw new DeploymentVerificationError(
+      "malformed-manifest",
+      "Deployment plan missing `deployer` key",
+    );
+  }
+
   const batches = plan.batches as Array<Record<string, unknown>> | undefined;
   if (!Array.isArray(batches)) {
     throw new DeploymentVerificationError(
@@ -1820,7 +1837,31 @@ export function readDeploymentPlan(planPath: string): {
     return { id: batch.id as number, transactions: validatedTransactions };
   });
 
-  return { batches: validatedBatches };
+  const entries: DeploymentPlanEntry[] = [];
+  for (const batch of validatedBatches) {
+    batch.transactions.forEach((tx, transactionIndex) => {
+      const keys = Object.keys(tx);
+      const kind = keys.includes("contract-publish") ? "contract-publish" : keys.includes("contract-call") ? "contract-call" : undefined;
+      if (!kind) return; // skip unrecognized transaction kinds
+
+      const txData = (tx as Record<string, Record<string, unknown>>)[kind === "contract-publish" ? "contract-publish" : "contract-call"];
+      const entry: DeploymentPlanEntry = {
+        kind,
+        planPosition: { batchId: batch.id, transactionIndex },
+      };
+
+      if (kind === "contract-publish" && txData && typeof txData["contract-name"] === "string") {
+        entry.contractId = `${deployer}.${txData["contract-name"]}`;
+      } else if (kind === "contract-call" && txData) {
+        if (typeof txData["contract-id"] === "string") entry.contractId = txData["contract-id"];
+        if (typeof txData["method"] === "string") entry.functionName = txData["method"];
+      }
+
+      entries.push(entry);
+    });
+  }
+
+  return { deployer, batches: validatedBatches, entries };
 }
 
 export function sha256File(filePath: string): string {

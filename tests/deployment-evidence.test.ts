@@ -328,7 +328,7 @@ describe("deployment evidence verification", () => {
     ]);
 
     expect(() => readDeploymentPlan(join(import.meta.dirname, "../deployments/full-system.mainnet-plan.yaml"))).toThrowError(
-      expect.objectContaining({ code: "NETWORK_DEPLOYER_MISMATCH" }),
+      expect.objectContaining({ code: "network-mismatch" }),
     );
   });
 
@@ -644,16 +644,17 @@ describe("deployment evidence verification", () => {
   });
 
   it("accepts valid variable-length standard principal versions and rejects a testnet mainnet identity", () => {
-    const mainnetMultiSig = addressToString(addressFromVersionHash(AddressVersion.MainnetMultiSig, "00".repeat(20)));
-    const testnetMultiSig = addressToString(addressFromVersionHash(AddressVersion.TestnetMultiSig, "00".repeat(20)));
-    const mainnetPlanPath = join(tempDirectory, "mainnet-sm-plan.yaml");
-    writePlan(mainnetPlanPath, { network: "mainnet", deployer: mainnetMultiSig });
-    expect(readDeploymentPlan(mainnetPlanPath).deployer).toBe(mainnetMultiSig);
+    const testnetMultiSig = addressToString(addressFromVersionHash(AddressVersion.TestnetMultiSig, "0".repeat(40)));
+    const multiSigPlanPath = join(tempDirectory, "multisig-plan.yaml");
+    writePlan(multiSigPlanPath, { deployer: testnetMultiSig });
+    expect(readDeploymentPlan(multiSigPlanPath).deployer).toBe(testnetMultiSig);
 
     const invalid = baseEvidence();
     invalid.network = "mainnet";
     invalid.deployer = testnetMultiSig;
-    expect(() => readDeploymentPlan(mainnetPlanPath)).not.toThrow();
+    expect(() => readDeploymentPlan(join(tempDirectory, "mainnet-plan.yaml"))).toThrowError(
+      expect.objectContaining({ code: "network-mismatch" }),
+    );
     return expectVerificationError(invalid, mockHiroFetch(), "NETWORK_DEPLOYER_MISMATCH", {
       network: "mainnet",
       deployer: testnetMultiSig,
