@@ -226,8 +226,8 @@ function mockHiroFetch(
 function baseEvidence(): DeploymentEvidence {
   return {
     schemaVersion: "1",
-    evidenceStatus: "broadcast",
-    coverage: "partial",
+    evidenceStatus: "confirmed",
+    coverage: "complete",
     generatedAt: FIXED_TIME.toISOString(),
     sourceCommit: "0".repeat(40),
     network: "testnet",
