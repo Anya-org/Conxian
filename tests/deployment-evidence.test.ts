@@ -232,6 +232,14 @@ function baseEvidence(): DeploymentEvidence {
     sourceCommit: "0".repeat(40),
     network: "testnet",
     deployer: DEPLOYER,
+    apiBaseUrl: "http://hiro.test",
+    evidence: {
+      source: "confirmed-receipts" as const,
+      capturedAt: FIXED_TIME.toISOString(),
+      gitCommit: "0".repeat(40),
+      planPath: PLAN_PATH,
+      planSha256: sha256File(PLAN_PATH),
+    },
     plan: {
       path: PLAN_PATH,
       sha256: sha256File(PLAN_PATH),
@@ -240,6 +248,25 @@ function baseEvidence(): DeploymentEvidence {
       scope: "checked-addresses",
       globalNonexistence: false,
     },
+    contracts: [
+      {
+        name: "alpha",
+        principal: CONTRACT_ID,
+        publishTxId: PUBLISH_TXID,
+        interface: {
+          required: true as const,
+          expectedContractName: "alpha",
+          expectedFunctions: ["get-name", "initialize"],
+        },
+        readOnlyChecks: [
+          {
+            function: "get-name",
+            sender: DEPLOYER,
+            arguments: [] as string[],
+          },
+        ],
+      },
+    ],
     contractPublications: [
       {
         kind: "contract-publish",
