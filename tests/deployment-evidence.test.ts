@@ -356,6 +356,7 @@ describe("deployment evidence verification", () => {
             function: "get-name",
             sender: DEPLOYER,
             arguments: [],
+            expectedResultHex: "0x03",
           },
         ],
       },
