@@ -306,39 +306,6 @@ function baseEvidence(): DeploymentEvidence {
         expectedResultHex: "0x03",
       },
 
-const newEvidence = {
-  schemaVersion: "1",
-  network: "testnet" as const,
-  apiBaseUrl: "http://hiro.test",
-  deployer: DEPLOYER,
-  evidence: {
-    source: "confirmed-receipts" as const,
-    capturedAt: FIXED_TIME.toISOString(),
-    gitCommit: "0".repeat(40),
-    planPath: PLAN_PATH,
-    planSha256: sha256File(PLAN_PATH),
-  },
-  contracts: [
-    {
-      name: "alpha",
-      principal: CONTRACT_ID,
-      publishTxId: PUBLISH_TXID,
-      interface: {
-        required: true as const,
-        expectedContractName: "alpha",
-        expectedFunctions: ["get-name", "initialize"],
-      },
-      readOnlyChecks: [
-        {
-          function: "get-name",
-          sender: DEPLOYER,
-          arguments: [] as string[],
-        },
-      ],
-    },
-  ],
-};
-
 async function expectVerificationError(
   evidence: unknown,
   fetcher: typeof fetch,
@@ -358,6 +325,39 @@ async function expectVerificationError(
 }
 
 describe("deployment evidence verification", () => {
+  const newEvidence = {
+    schemaVersion: "1",
+    network: "testnet",
+    apiBaseUrl: "http://hiro.test",
+    deployer: DEPLOYER,
+    evidence: {
+      source: "confirmed-receipts",
+      capturedAt: FIXED_TIME.toISOString(),
+      gitCommit: "0".repeat(40),
+      planPath: PLAN_PATH,
+      planSha256: sha256File(PLAN_PATH),
+    },
+    contracts: [
+      {
+        name: "alpha",
+        principal: CONTRACT_ID,
+        publishTxId: PUBLISH_TXID,
+        interface: {
+          required: true,
+          expectedContractName: "alpha",
+          expectedFunctions: ["get-name", "initialize"],
+        },
+        readOnlyChecks: [
+          {
+            function: "get-name",
+            sender: DEPLOYER,
+            arguments: [],
+          },
+        ],
+      },
+    ],
+  };
+
   it("parses every effective testnet plan entry and blocks the unresolved mainnet identity", () => {
     const testnetPlan = readDeploymentPlan(join(import.meta.dirname, "../deployments/full-system.testnet-plan.yaml"));
     expect(testnetPlan.entries).toHaveLength(246);
