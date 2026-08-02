@@ -271,6 +271,15 @@ function isContractName(value: unknown): value is string {
   return typeof value === "string" && CONTRACT_NAME_PATTERN.test(value);
 }
 
+function isContractPrincipal(value: string, network: DeploymentNetwork): boolean {
+  const parts = value.match(/^([^.]+)\.([^.]+)$/);
+  return (
+    parts !== null &&
+    isCanonicalStacksAddress(parts[1], network) &&
+    isContractName(parts[2])
+  );
+}
+
 function isTxId(value: unknown): value is string {
   return typeof value === "string" && TX_ID_PATTERN.test(value);
 }
@@ -398,10 +407,14 @@ function validateReadOnlyCheck(
     );
   }
 
+  const senderValid =
+    typeof value.sender === "string" &&
+    network !== undefined &&
+    (isCanonicalStacksAddress(value.sender, network) ||
+      isContractPrincipal(value.sender, network));
   return (
     isContractName(value.function) &&
-    network !== undefined &&
-    isCanonicalStacksAddress(value.sender, network) &&
+    senderValid &&
     Array.isArray(value.arguments) &&
     value.arguments.every(isHex) &&
     isHex(value.expectedResultHex) &&
