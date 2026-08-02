@@ -332,7 +332,7 @@ describe("deployment evidence verification", () => {
   const newEvidence = {
     schemaVersion: "1.0.0",
     network: "testnet",
-    apiBaseUrl: "http://hiro.test",
+    apiBaseUrl: "https://api.testnet.hiro.so",
     deployer: DEPLOYER,
     evidence: {
       source: "confirmed-receipts",

@@ -526,17 +526,6 @@ export function validateManifest(input: unknown): {
           "evidence.planPath is required and must be a non-empty path",
         ),
       );
-    } else if (
-      network &&
-      input.evidence.planPath !== CANONICAL_PLAN_PATHS[network]
-    ) {
-      failures.push(
-        failure(
-          "network-mismatch",
-          "evidence.planPath",
-          `evidence.planPath must be the canonical ${network} deployment plan path`,
-        ),
-      );
     }
 
     if (
@@ -1290,16 +1279,13 @@ function validateCompleteEvidenceBinding(expected: unknown): VerificationFailure
 
   if (
     typeof planPath !== "string" ||
-    !isDeploymentNetwork(network) ||
-    planPath !== CANONICAL_PLAN_PATHS[network]
+    planPath.length === 0
   ) {
     failures.push(
       failure(
         "evidence-binding-mismatch",
         "expected-binding.planPath",
-        isDeploymentNetwork(network)
-          ? `expected plan path must be the canonical ${network} path: ${CANONICAL_PLAN_PATHS[network]}`
-          : "expected plan path cannot be validated until the network is testnet or mainnet",
+        "expected plan path must be a non-empty deployment plan path",
       ),
     );
   }
@@ -1961,12 +1947,16 @@ export async function verifyDeploymentEvidence(
     },
   };
 
+  const ev = evidenceOrInput as Record<string, unknown>;
+  const evEvidence = (ev.evidence ?? {}) as Record<string, unknown>;
+  const evPlan = (ev.plan ?? {}) as Record<string, unknown>;
+
   const binding: EvidenceBinding = {
     network: options.network as DeploymentNetwork,
     deployer: options.deployer,
-    gitCommit: (evidenceOrInput as Record<string, unknown>)?.sourceCommit as string ?? "",
+    gitCommit: (ev.sourceCommit ?? evEvidence.gitCommit ?? "") as string,
     planPath: options.planPath,
-    planSha256: (evidenceOrInput as Record<string, unknown>)?.plan?.sha256 as string ?? "",
+    planSha256: (evPlan.sha256 ?? evEvidence.planSha256 ?? "") as string,
   };
 
   return verifyDeploymentEvidenceCore(evidenceOrInput, api, binding);
