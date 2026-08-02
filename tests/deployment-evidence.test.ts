@@ -470,16 +470,23 @@ describe("deployment evidence verification", () => {
   });
 
   it("confirms complete plan evidence with nullable burn hash and rich Hiro interfaces", async () => {
-    console.log("DEBUG newEvidence:", JSON.stringify(newEvidence, null, 2));
     const fetcher = mockHiroFetch({ publish: { burn_block_hash: null } });
-    const result = await verifyDeploymentEvidence(newEvidence, {
-      network: "testnet",
-      deployer: DEPLOYER,
-      baseUrl: "http://hiro.test",
-      planPath: PLAN_PATH,
-      fetcher,
-      now: () => FIXED_TIME,
-    });
+    let result;
+    try {
+      result = await verifyDeploymentEvidence(newEvidence, {
+        network: "testnet",
+        deployer: DEPLOYER,
+        baseUrl: "http://hiro.test",
+        planPath: PLAN_PATH,
+        fetcher,
+        now: () => FIXED_TIME,
+      });
+      console.log("DEBUG result.ok:", result.ok);
+      console.log("DEBUG result.failures:", JSON.stringify(result.failures?.map(f => ({classification: f.classification, path: f.path, message: f.message }))));
+    } catch(e) {
+      console.log("DEBUG ERROR:", e);
+      throw e;
+    }
 
     expect(result.ok).toBe(true);
     expect(result.deployer).toBe(DEPLOYER);
