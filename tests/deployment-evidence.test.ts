@@ -221,6 +221,7 @@ function mockHiroFetch(
     }
     return new Response(JSON.stringify({ error: "unexpected endpoint" }), { status: 500 });
   }) as typeof fetch;
+}
 
 function baseEvidence(): DeploymentEvidence {
   return {
