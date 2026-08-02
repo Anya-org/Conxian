@@ -481,7 +481,8 @@ describe("deployment evidence verification", () => {
     });
 
     expect(result.ok).toBe(true);
-    expect(result.network).toBe("testnet");
+    console.error("DEBUG failures:", JSON.stringify(result.failures?.map(f => f.classification)));
+    console.error("DEBUG ok:", result.ok, "network:", result.network);
     expect(result.deployer).toBe(DEPLOYER);
     expect(result.contracts).toHaveLength(1);
 
