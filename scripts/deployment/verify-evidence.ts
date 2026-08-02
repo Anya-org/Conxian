@@ -377,12 +377,16 @@ function validateReadOnlyCheck(
     );
   }
 
-  if (!network || !isCanonicalStacksAddress(value.sender, network)) {
+  if (
+    !network ||
+    (!isCanonicalStacksAddress(value.sender, network) &&
+      !isContractPrincipal(value.sender, network))
+  ) {
     failures.push(
       failure(
         "malformed-manifest",
         `${scope}.sender`,
-        "read-only sender must be a valid Stacks address",
+        "read-only sender must be a valid Stacks address or contract principal",
       ),
     );
   }
