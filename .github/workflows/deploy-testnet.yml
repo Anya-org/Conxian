@@ -11,6 +11,7 @@ on:
       - 'deployments/**'
       - 'scripts/gen-deployment-plans.py'
       - 'scripts/release_plan_validation.py'
+      - 'scripts/validate-deployment-plan.rb'
       - 'scripts/deployment/**'
       - 'scripts/deploy-testnet.ts'
       - 'package.json'
@@ -33,6 +34,9 @@ permissions:
 concurrency:
   group: conxian-deploy-testnet
   cancel-in-progress: false
+
+env:
+  PLAN_PATH: deployments/full-system.testnet-plan.yaml
 
 jobs:
   validate:
@@ -73,6 +77,11 @@ jobs:
         run: |
           python3 -m pip install --user --disable-pip-version-check 'PyYAML==6.0.2'
           python3 scripts/gen-deployment-plans.py --check
+
+      - name: Validate testnet plan semantics
+        run: |
+          DEPLOYER=$(awk '$1 == "deployer:" { print $2; exit }' "$PLAN_PATH")
+          ruby scripts/validate-deployment-plan.rb "$PLAN_PATH" testnet "$DEPLOYER"
 
       - name: Run focused deployment safety tests
         run: |

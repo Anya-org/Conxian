@@ -1,23 +1,23 @@
 ;; zkml-verifier.clar
-;; Conxian Protocol: quarantined ZKML verification boundary.
-;;
-;; This contract is retained for local compilation and negative regression tests
-;; only. No reviewed cryptographic verifier backend exists yet, so the public
-;; boundary must never turn structural/scaffold input into an acceptance.
+;; Conxian Protocol: ZKML verification quarantine scaffold.
+;; This contract deliberately has no cryptographic verifier backend.
 
-(define-constant ERR_VERIFIER_UNAVAILABLE (err u503))
+(define-constant ERR_INVALID_PROOF (err u7001))
 (define-constant ERR_UNAUTHORIZED (err u7002))
+;; The ABI is retained for callers, but no proof is accepted until a reviewed
+;; verifier implementation is qualified and wired. Structural inputs alone
+;; must never produce a successful attestation.
+(define-constant ERR_VERIFIER_UNAVAILABLE (err u7003))
 
 (define-data-var admin principal tx-sender)
 
-;; @desc Fail closed until a reviewed cryptographic ZKML backend is available.
+;; @desc Quarantined ZKML proof entry point; always fails closed.
 ;; @param model-id: The identifier for the ML model.
 ;; @param input-hash: Hash of the input data.
-;; @param proof: The reserved ZK proof payload.
+;; @param proof: The ZK proof payload (e.g. Groth16/Plonk).
 ;; @return (response bool uint) - Always returns ERR_VERIFIER_UNAVAILABLE.
+;; No length check, parser, key registry, or simulated success is permitted.
 (define-public (verify-proof (model-id (string-ascii 64)) (input-hash (buff 32)) (proof (buff 1024)))
-  ;; Keep the compatible input boundary, but do not inspect or accept any
-  ;; payload until the canonical evidence contract has a reviewed backend.
   ERR_VERIFIER_UNAVAILABLE
 )
 
@@ -35,7 +35,5 @@
 )
 
 (define-read-only (get-protocol-status)
-  ;; Status is an unavailable error rather than a success-shaped readiness
-  ;; record. Callers must not treat this scaffold as active ZKML evidence.
-  ERR_VERIFIER_UNAVAILABLE
+  (ok { compliant: false, version: "v1.1.0-Apex", mode: "ZKML-PAUSED" })
 )

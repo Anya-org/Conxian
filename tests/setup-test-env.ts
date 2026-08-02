@@ -43,21 +43,17 @@ export async function initializeSimnet(): Promise<Simnet> {
       const deployer = instance.deployer;
 
       const contractsToInit = [
-        'conxian-protocol',
         'conxian-access',
         'oracle-aggregator',
         'finance-metrics',
         'agent-risk',
-        'dex-factory',
         'federated-oracle-adapter',
         'lending-manager',
         'lending-orchestrator',
         'bme-engine',
-        'office-manager',
         'operational-treasury',
         'agent-treasury',
-        'cxd-token',
-        'mock-token'
+        'cxd-token'
       ];
 
       for (const name of contractsToInit) {
@@ -191,6 +187,21 @@ export const simnet: Simnet = new Proxy({} as Simnet, {
       return value.bind(internalSimnet);
     }
     return value;
+  }
+});
+
+export const accounts: Record<string, { address: string }> = new Proxy({} as Record<string, { address: string }>, {
+  get: (_target, prop) => {
+    if (typeof prop !== 'string') return undefined;
+    if (!internalSimnet) return undefined;
+    const map = typeof (internalSimnet as any).getAccounts === 'function'
+      ? (internalSimnet as any).getAccounts() as Map<string, string>
+      : (internalSimnet as any).accounts;
+    if (!map) return undefined;
+    const a = typeof map.get === 'function' ? map.get(prop) : map[prop];
+    if (typeof a === 'string') return { address: a };
+    if (a && typeof a === 'object' && typeof (a as any).address === 'string') return a;
+    return undefined;
   }
 });
 

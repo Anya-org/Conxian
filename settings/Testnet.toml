@@ -1,6 +1,12 @@
 [network]
 name = "testnet"
 
+# SIMNET-ONLY DEPLOYER — NOT FOR MAINNET
+# This mnemonic derives ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P.
+# It is a well-known simnet address used throughout the repo for Clarity
+# tests and simnet deployment plans. It holds no value on any live network.
+# Do NOT replace this with a production key.
+# See docs/MAINNET_READINESS_MARCH_2026.md for mainnet identity requirements.
 [accounts.deployer]
 mnemonic = "cute bird surprise boring old news cake design aisle helmet choose tree"
 derivation = "m/44'/5757'/0'/0/0"

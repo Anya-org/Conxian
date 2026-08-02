@@ -1,121 +1,149 @@
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { Cl } from '@stacks/transactions';
 import { simnet } from '../setup-test-env';
 
-const ZKML_VERIFIER = 'zkml-verifier';
-const VERIFIER_UNAVAILABLE = 503;
-const DEPLOYER = () => simnet.getAccounts().get('deployer')!;
-const INPUT_HASH_A = Cl.buffer(Buffer.alloc(32, 0x11));
-const INPUT_HASH_B = Cl.buffer(Buffer.from('candidate-input-mutated'.padEnd(32, '0')));
-const MODEL_ID_A = Cl.stringAscii('risk-model-v1');
-const MODEL_ID_B = Cl.stringAscii('candidate-model-mutated');
+const CONTRACT = 'zkml-verifier';
+const ERR_VERIFIER_UNAVAILABLE = 7003;
+const ERR_UNAUTHORIZED = 7002;
 
-/*
-* These labels are quarantine-category regressions only. The current ABI has
-* model-id, input-hash, and proof fields but no key, curve, circuit,
-* freshness/replay, or backend fields. The tests must therefore prove that
-* the scaffold remains unavailable without implying that it parses evidence.
-*/
-const candidateProof = (marker: string) =>
-  Cl.buffer(Buffer.from(`candidate:${marker}`));
+describe('ZKML verifier quarantine', () => {
+  let deployer: string;
+  let wallet1: string;
 
-function callVerify(
-  modelId: ReturnType<typeof Cl.stringAscii>,
-  inputHash: ReturnType<typeof Cl.buffer>,
-  proof: ReturnType<typeof Cl.buffer>,
-) {
-  return simnet.callPublicFn(
-    ZKML_VERIFIER,
-    'verify-proof',
-    [modelId, inputHash, proof],
-    DEPLOYER(),
-  );
-}
-
-function expectUnavailable(result: { result: unknown; events: unknown[] }) {
-  expect(result.result).toEqual(Cl.error(Cl.uint(VERIFIER_UNAVAILABLE)));
-  expect(result.events).toHaveLength(0);
-}
-
-describe('zkml-verifier quarantine', () => {
-  it('rejects a malformed-length candidate instead of treating length as verification', () => {
-    const result = callVerify(MODEL_ID_A, INPUT_HASH_A, Cl.buffer(Buffer.alloc(1024, 0xaa)));
-
-    expectUnavailable(result);
+  beforeAll(() => {
+    const accounts = simnet.getAccounts();
+    deployer = accounts.get('deployer')!;
+    wallet1 = accounts.get('wallet_1')!;
   });
 
-  it('rejects malformed-encoding candidates', () => {
-    const payloads = [
-      Cl.buffer(Buffer.from([0xde, 0xad, 0xbe, 0xef])),
-      Cl.buffer(Buffer.alloc(1024, 0x00)),
-      candidateProof('malformed-encoding'),
-    ];
+  const proofWithByte = (value: number): Buffer => Buffer.alloc(1024, value);
+  const markedProof = (marker: string): Buffer => {
+    const proof = Buffer.alloc(1024);
+    Buffer.from(marker, 'ascii').copy(proof);
+    return proof;
+  };
 
-    for (const proof of payloads) {
-      expectUnavailable(callVerify(MODEL_ID_A, INPUT_HASH_A, proof));
-    }
-  });
+  const expectUnavailable = (receipt: any) => {
+    expect(receipt.result).toEqual(Cl.error(Cl.uint(ERR_VERIFIER_UNAVAILABLE)));
+    expect(receipt.events ?? []).toEqual([]);
+  };
 
-  it('rejects a wrong-key candidate marker', () => {
-    expectUnavailable(
-      callVerify(MODEL_ID_A, INPUT_HASH_A, candidateProof('wrong-key')),
+  it.each([
+    {
+      name: 'an arbitrary 1024-byte proof candidate',
+      modelId: 'model-arbitrary',
+      inputHash: Buffer.alloc(32, 0x11),
+      proof: proofWithByte(0xa5),
+    },
+    {
+      name: 'a mutated proof candidate',
+      modelId: 'model-arbitrary',
+      inputHash: Buffer.alloc(32, 0x11),
+      proof: proofWithByte(0xa4),
+    },
+    {
+      name: 'a mutated model identifier',
+      modelId: 'model-mutated',
+      inputHash: Buffer.alloc(32, 0x11),
+      proof: proofWithByte(0xa5),
+    },
+    {
+      name: 'a mutated input hash',
+      modelId: 'model-arbitrary',
+      inputHash: Buffer.alloc(32, 0x12),
+      proof: proofWithByte(0xa5),
+    },
+    {
+      name: 'an empty malformed candidate',
+      modelId: 'model-empty',
+      inputHash: Buffer.alloc(32, 0x13),
+      proof: Buffer.alloc(0),
+    },
+    {
+      name: 'a short 31-byte candidate',
+      modelId: 'model-short',
+      inputHash: Buffer.alloc(32, 0x14),
+      proof: Buffer.alloc(31, 0x14),
+    },
+    {
+      name: 'a candidate encoding standing in for a wrong verification key',
+      modelId: 'model-wrong-key',
+      inputHash: Buffer.alloc(32, 0x15),
+      proof: markedProof('wrong-key'),
+    },
+    {
+      name: 'a candidate encoding standing in for a curve mismatch',
+      modelId: 'model-curve-mismatch',
+      inputHash: Buffer.alloc(32, 0x16),
+      proof: markedProof('curve-mismatch'),
+    },
+    {
+      name: 'a candidate encoding standing in for a circuit or model mismatch',
+      modelId: 'model-circuit-mismatch',
+      inputHash: Buffer.alloc(32, 0x17),
+      proof: markedProof('circuit-mismatch'),
+    },
+    {
+      name: 'a candidate encoding standing in for replay or stale evidence',
+      modelId: 'model-replay-stale',
+      inputHash: Buffer.alloc(32, 0x18),
+      proof: markedProof('replay-stale'),
+    },
+    {
+      name: 'a candidate encoding standing in for an unsupported backend',
+      modelId: 'model-unsupported-backend',
+      inputHash: Buffer.alloc(32, 0x19),
+      proof: markedProof('unsupported-backend'),
+    },
+  ])('fails closed for $name', ({ modelId, inputHash, proof }) => {
+    // The current ABI accepts only model-id, input-hash, and proof. Key,
+    // curve, circuit, issuance, freshness, and replay fields are not
+    // accepted here; the markers above are only negative-path candidates.
+    const receipt = simnet.callPublicFn(
+      CONTRACT,
+      'verify-proof',
+      [Cl.stringAscii(modelId), Cl.buffer(inputHash), Cl.buffer(proof)],
+      deployer,
     );
+
+    expectUnavailable(receipt);
   });
 
-  it('rejects a mutated-proof candidate marker', () => {
-    expectUnavailable(
-      callVerify(MODEL_ID_A, INPUT_HASH_A, candidateProof('mutated-proof')),
+  it('reports a non-compliant paused status while the backend is unavailable', () => {
+    const status = simnet.callReadOnlyFn(CONTRACT, 'get-protocol-status', [], deployer);
+    const statusText = Cl.prettyPrint(status.result);
+
+    expect(status.result).toBeDefined();
+    expect(statusText).toContain('compliant: false');
+    expect(statusText).toContain('mode: "ZKML-PAUSED"');
+    expect(statusText).not.toContain('compliant: true');
+    expect(statusText).not.toContain('ZKML-ACTIVE');
+  });
+
+  it('preserves admin authorization while the verifier remains quarantined', () => {
+    const handoff = simnet.callPublicFn(
+      CONTRACT,
+      'set-admin',
+      [Cl.principal(wallet1)],
+      deployer,
     );
-  });
+    expect(handoff.result).toEqual(Cl.ok(Cl.bool(true)));
 
-  it('rejects mutated-model and mutated-input candidate markers', () => {
-    const proof = Cl.buffer(Buffer.alloc(1024, 0x42));
-    const results = [
-      callVerify(MODEL_ID_A, INPUT_HASH_A, proof),
-      callVerify(MODEL_ID_B, INPUT_HASH_A, proof),
-      callVerify(MODEL_ID_A, INPUT_HASH_B, proof),
-      callVerify(MODEL_ID_B, INPUT_HASH_B, proof),
-    ];
+    expect(
+      simnet.callPublicFn(
+        CONTRACT,
+        'set-admin',
+        [Cl.principal(deployer)],
+        deployer,
+      ).result,
+    ).toEqual(Cl.error(Cl.uint(ERR_UNAUTHORIZED)));
 
-    for (const result of results) {
-      expectUnavailable(result);
-    }
-  });
-
-  it('rejects a curve-mismatch candidate marker', () => {
-    expectUnavailable(
-      callVerify(MODEL_ID_A, INPUT_HASH_A, candidateProof('curve-mismatch')),
+    const restore = simnet.callPublicFn(
+      CONTRACT,
+      'set-admin',
+      [Cl.principal(deployer)],
+      wallet1,
     );
-  });
-
-  it('rejects a circuit-key-mismatch candidate marker', () => {
-    expectUnavailable(
-      callVerify(MODEL_ID_A, INPUT_HASH_A, candidateProof('circuit-key-mismatch')),
-    );
-  });
-
-  it('rejects a replay/stale-evidence candidate marker', () => {
-    expectUnavailable(
-      callVerify(MODEL_ID_A, INPUT_HASH_A, candidateProof('replay-stale-evidence')),
-    );
-  });
-
-  it('rejects an unsupported-backend candidate marker', () => {
-    expectUnavailable(
-      callVerify(MODEL_ID_A, INPUT_HASH_A, candidateProof('unsupported-backend')),
-    );
-  });
-
-  it('emits no success-shaped zkml-verified event', () => {
-    const result = callVerify(MODEL_ID_A, INPUT_HASH_A, Cl.buffer(Buffer.alloc(1024, 0x7f)));
-
-    expectUnavailable(result);
-    expect(result.events.some((event: unknown) => JSON.stringify(event).includes('zkml-verified'))).toBe(false);
-  });
-
-  it('reports unavailable status rather than active or compliant status', () => {
-    const result = simnet.callReadOnlyFn(ZKML_VERIFIER, 'get-protocol-status', [], DEPLOYER());
-
-    expect(result.result).toEqual(Cl.error(Cl.uint(VERIFIER_UNAVAILABLE)));
+    expect(restore.result).toEqual(Cl.ok(Cl.bool(true)));
   });
 });

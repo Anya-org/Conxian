@@ -558,6 +558,27 @@ assert module.DEPLOYER
             ):
                 self.validate_pair(root, manifest_path, [("consumer", None)])
 
+    def test_partner_policy_registry_is_dormant_and_explicitly_excluded(self) -> None:
+        self.assertIn("partner-policy-registry", release_plan_validation.RELEASE_PLAN_EXCLUSIONS)
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            manifest_path = self.write_manifest(
+                root,
+                [("consumer", []), ("partner-policy-registry", [])],
+            )
+            self.validate_pair(root, manifest_path, [("consumer", None)])
+
+            manifest_path = self.write_manifest(
+                root,
+                [("consumer", ["partner-policy-registry"]), ("partner-policy-registry", [])],
+            )
+            with self.assertRaisesRegex(
+                release_plan_validation.ReleasePlanValidationError,
+                r"depends on explicitly excluded contract partner-policy-registry",
+            ):
+                self.validate_pair(root, manifest_path, [("consumer", None)])
+
     def test_zkml_verifier_is_quarantined_from_release_plans(self) -> None:
         self.assertIn("zkml-verifier", release_plan_validation.RELEASE_PLAN_EXCLUSIONS)
 

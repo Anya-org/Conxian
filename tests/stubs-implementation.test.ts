@@ -19,7 +19,7 @@ describe('System Stubs Implementation (CON-502)', () => {
   });
 
   it('dlc-manager should verify bitvm2 placeholders', () => {
-    const res = simnet.callPublicFn('dlc-manager', 'verify-bitvm2-root', [Cl.buffer(new Uint8Array(32)), Cl.buffer(new Uint8Array(1024))], deployer);
-    expect(res.result).toEqual(Cl.ok(Cl.bool(true)));
+    const res = simnet.callPublicFn('dlc-manager', 'submit-bitvm2-proof', [Cl.buffer(new Uint8Array(32)), Cl.buffer(new Uint8Array(1024))], deployer);
+    expect(res.result).toEqual(Cl.ok(Cl.uint(1)));
   });
 });

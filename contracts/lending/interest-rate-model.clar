@@ -44,17 +44,15 @@
 ;; @param utilization: The market utilization in basis points (0-10000).
 ;; @returns (response uint uint) Borrow rate in basis points per year.
 (define-read-only (get-borrow-rate (asset principal) (utilization uint))
-  (match (map-get? asset-params asset)
-    params
+  (let ((params (default-to {
+    base-rate: BASE_RATE_DEFAULT,
+    slope1: SLOPE1_DEFAULT,
+    slope2: SLOPE2_DEFAULT,
+    kink: KINK_DEFAULT,
+    reserve-factor: RESERVE_FACTOR_DEFAULT,
+    enabled: true
+  } (map-get? asset-params asset))))
     (ok (calculate-borrow-rate params utilization))
-    (ok (calculate-borrow-rate {
-      base-rate: BASE_RATE_DEFAULT,
-      slope1: SLOPE1_DEFAULT,
-      slope2: SLOPE2_DEFAULT,
-      kink: KINK_DEFAULT,
-      reserve-factor: RESERVE_FACTOR_DEFAULT,
-      enabled: true
-    } utilization))
   )
 )
 
@@ -63,17 +61,15 @@
 ;; @param utilization: The market utilization in basis points (0-10000).
 ;; @returns (response uint uint) Supply rate in basis points per year.
 (define-read-only (get-supply-rate (asset principal) (utilization uint))
-  (match (map-get? asset-params asset)
-    params
+  (let ((params (default-to {
+    base-rate: BASE_RATE_DEFAULT,
+    slope1: SLOPE1_DEFAULT,
+    slope2: SLOPE2_DEFAULT,
+    kink: KINK_DEFAULT,
+    reserve-factor: RESERVE_FACTOR_DEFAULT,
+    enabled: true
+  } (map-get? asset-params asset))))
     (ok (calculate-supply-rate params utilization))
-    (ok (calculate-supply-rate {
-      base-rate: BASE_RATE_DEFAULT,
-      slope1: SLOPE1_DEFAULT,
-      slope2: SLOPE2_DEFAULT,
-      kink: KINK_DEFAULT,
-      reserve-factor: RESERVE_FACTOR_DEFAULT,
-      enabled: true
-    } utilization))
   )
 )
 
@@ -184,13 +180,10 @@
 (define-public (set-asset-enabled (asset principal) (enabled bool))
   (begin
     (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
-    (match (map-get? asset-params asset)
-      params (begin
-        (map-set asset-params asset (merge params { enabled: enabled }))
-        (ok true)
-      )
-      ERR_ASSET_NOT_FOUND
+    (let ((params (unwrap! (map-get? asset-params asset) ERR_ASSET_NOT_FOUND)))
+      (map-set asset-params asset (merge params { enabled: enabled }))
     )
+    (ok true)
   )
 )
 
@@ -284,7 +277,7 @@
 ;; @desc Get protocol status for dashboard.
 ;; @returns (ok { admin: principal })
 (define-read-only (get-protocol-status)
-  (ok {
+  (ok { 
     model-version: "v1.0.0",
     admin: (var-get admin)
   })
