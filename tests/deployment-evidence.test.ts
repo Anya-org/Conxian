@@ -331,15 +331,27 @@ async function expectVerificationError(
 describe("deployment evidence verification", () => {
   const newEvidence = {
     schemaVersion: "1",
+    evidenceStatus: "confirmed",
+    coverage: "complete",
+    generatedAt: FIXED_TIME.toISOString(),
+    sourceCommit: "0".repeat(40),
     network: "testnet",
-    apiBaseUrl: "http://hiro.test",
     deployer: DEPLOYER,
+    apiBaseUrl: "http://hiro.test",
     evidence: {
       source: "confirmed-receipts",
       capturedAt: FIXED_TIME.toISOString(),
       gitCommit: "0".repeat(40),
       planPath: PLAN_PATH,
       planSha256: sha256File(PLAN_PATH),
+    },
+    plan: {
+      path: PLAN_PATH,
+      sha256: sha256File(PLAN_PATH),
+    },
+    claims: {
+      scope: "checked-addresses",
+      globalNonexistence: false,
     },
     contracts: [
       {
@@ -358,6 +370,46 @@ describe("deployment evidence verification", () => {
             arguments: [],
           },
         ],
+      },
+    ],
+    contractPublications: [
+      {
+        kind: "contract-publish",
+        planPosition: { batchId: 0, transactionIndex: 0 },
+        contractName: "alpha",
+        contractId: CONTRACT_ID,
+        expectedSender: DEPLOYER,
+        txid: PUBLISH_TXID,
+      },
+    ],
+    contractCalls: [
+      {
+        kind: "contract-call",
+        planPosition: { batchId: 0, transactionIndex: 1 },
+        contractId: CONTRACT_ID,
+        functionName: "initialize",
+        expectedSender: DEPLOYER,
+        txid: CALL_TXID,
+      },
+    ],
+    interfaces: [
+      {
+        contractId: CONTRACT_ID,
+        requiredFunctions: [
+          { name: "get-name", access: "read_only" },
+          { name: "initialize", access: "public" },
+        ],
+      },
+    ],
+    readOnlyChecks: [
+      {
+        network: "testnet",
+        contractId: CONTRACT_ID,
+        sender: DEPLOYER,
+        functionName: "get-name",
+        arguments: [],
+        expectedOkay: true,
+        expectedResultHex: "0x03",
       },
     ],
   };
