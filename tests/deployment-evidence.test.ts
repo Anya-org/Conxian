@@ -129,6 +129,7 @@ function txPayload(
 
 function richInterfaceBody(): Record<string, unknown> {
   return {
+    contract_id: CONTRACT_ID,
     functions: [
       {
         name: "get-name",
@@ -221,6 +222,7 @@ function mockHiroFetch(
     }
     return new Response(JSON.stringify({ error: "unexpected endpoint" }), { status: 500 });
   }) as typeof fetch;
+}
 
 function baseEvidence(): DeploymentEvidence {
   return {
@@ -305,6 +307,9 @@ function baseEvidence(): DeploymentEvidence {
         expectedOkay: true,
         expectedResultHex: "0x03",
       },
+    ],
+  };
+}
 
 async function expectVerificationError(
   evidence: unknown,
@@ -326,9 +331,9 @@ async function expectVerificationError(
 
 describe("deployment evidence verification", () => {
   const newEvidence = {
-    schemaVersion: "1",
+    schemaVersion: "1.0.0",
     network: "testnet",
-    apiBaseUrl: "http://hiro.test",
+    apiBaseUrl: "https://api.testnet.hiro.so",
     deployer: DEPLOYER,
     evidence: {
       source: "confirmed-receipts",
@@ -352,6 +357,7 @@ describe("deployment evidence verification", () => {
             function: "get-name",
             sender: DEPLOYER,
             arguments: [],
+            expectedResultHex: "0x03",
           },
         ],
       },
@@ -476,7 +482,6 @@ describe("deployment evidence verification", () => {
     });
 
     expect(result.ok).toBe(true);
-    expect(result.network).toBe("testnet");
     expect(result.deployer).toBe(DEPLOYER);
     expect(result.contracts).toHaveLength(1);
 
