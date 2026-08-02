@@ -305,6 +305,9 @@ function baseEvidence(): DeploymentEvidence {
         expectedOkay: true,
         expectedResultHex: "0x03",
       },
+    ],
+  };
+}
 
 async function expectVerificationError(
   evidence: unknown,
