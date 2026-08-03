@@ -49,9 +49,11 @@
 | docs/DOCUMENTATION_STATE.md | ✓ | N/A | N/A | ✓ | ✓ | ✓ | 100% |
 | docs/STANDARDS_AUDIT_COMPREHENSIVE.json | ✓ | N/A | N/A | ✓ | ✓ | ✓ | 100% |
 | docs/STANDARDS_VALIDATION_SESSION_45.md | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | 100% |
+| tests/test_main_branch_governance_policy.py | ✓ | N/A | N/A | ✓ | ✓ | ✓ | 100% |
 
 ## Critical Issues Fixed
 - **docs/DOCUMENTATION_STATE.md**: Resolved raw, checked-in git merge conflict markers (`<<<<<<< HEAD`, `=======`, `>>>>>>>`) that broke structural parsing and readability.
+- **tests/test_main_branch_governance_policy.py**: Hardened JSON block search to skip other valid JSON blocks (such as the newly-parsed Issue #528 partner registry block) and locate the correct main branch governance session with `intended_required_checks`.
 
 ## Standards Compliance Trend
 ```
