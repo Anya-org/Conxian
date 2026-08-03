@@ -129,7 +129,6 @@ function txPayload(
 
 function richInterfaceBody(): Record<string, unknown> {
   return {
-    contract_id: CONTRACT_ID,
     functions: [
       {
         name: "get-name",
@@ -227,47 +226,20 @@ function mockHiroFetch(
 function baseEvidence(): DeploymentEvidence {
   return {
     schemaVersion: "1",
-    evidenceStatus: "confirmed",
-    coverage: "complete",
+    evidenceStatus: "broadcast",
+    coverage: "partial",
     generatedAt: FIXED_TIME.toISOString(),
-    sourceCommit: "0".repeat(40),
+    sourceCommit: "e".repeat(40),
     network: "testnet",
     deployer: DEPLOYER,
-    apiBaseUrl: "http://hiro.test",
-    evidence: {
-      source: "confirmed-receipts",
-      capturedAt: FIXED_TIME.toISOString(),
-      gitCommit: "0".repeat(40),
-      planPath: PLAN_PATH,
-      planSha256: sha256File(PLAN_PATH),
-    },
     plan: {
-      path: PLAN_PATH,
+      path: "mini-plan.yaml",
       sha256: sha256File(PLAN_PATH),
     },
     claims: {
       scope: "checked-addresses",
       globalNonexistence: false,
     },
-    contracts: [
-      {
-        name: "alpha",
-        principal: CONTRACT_ID,
-        publishTxId: PUBLISH_TXID,
-        interface: {
-          required: true as const,
-          expectedContractName: "alpha",
-          expectedFunctions: ["get-name", "initialize"],
-        },
-        readOnlyChecks: [
-          {
-            function: "get-name",
-            sender: DEPLOYER,
-            arguments: [],
-          },
-        ],
-      },
-    ],
     contractPublications: [
       {
         kind: "contract-publish",
@@ -316,58 +288,30 @@ async function expectVerificationError(
   fetcher: typeof fetch,
   code: string,
   options: Partial<Parameters<typeof verifyDeploymentEvidence>[1]> = {},
-): Promise<void> {
-  const result = await verifyDeploymentEvidence(evidence as DeploymentEvidence, {
-    network: "testnet",
-    deployer: DEPLOYER,
-    baseUrl: "http://hiro.test",
-    planPath: PLAN_PATH,
-    fetcher,
-    now: () => FIXED_TIME,
-    ...options,
-  });
-  expect(result.ok).toBe(false);
+): Promise<DeploymentVerificationError> {
+  try {
+    await verifyDeploymentEvidence(evidence, {
+      network: "testnet",
+      deployer: DEPLOYER,
+      baseUrl: "http://hiro.test",
+      planPath: PLAN_PATH,
+      fetcher,
+      now: () => FIXED_TIME,
+      ...options,
+    });
+    throw new Error("expected verification to fail");
+  } catch (error) {
+    expect(error).toBeInstanceOf(DeploymentVerificationError);
+    expect((error as DeploymentVerificationError).code).toBe(code);
+    return error as DeploymentVerificationError;
+  }
 }
 
 describe("deployment evidence verification", () => {
-  const newEvidence = {
-    schemaVersion: "1.0.0",
-    network: "testnet",
-    apiBaseUrl: "https://api.testnet.hiro.so",
-    deployer: DEPLOYER,
-    evidence: {
-      source: "confirmed-receipts",
-      capturedAt: FIXED_TIME.toISOString(),
-      gitCommit: "0".repeat(40),
-      planPath: PLAN_PATH,
-      planSha256: sha256File(PLAN_PATH),
-    },
-    contracts: [
-      {
-        name: "alpha",
-        principal: CONTRACT_ID,
-        publishTxId: PUBLISH_TXID,
-        interface: {
-          required: true,
-          expectedContractName: "alpha",
-          expectedFunctions: ["get-name", "initialize"],
-        },
-        readOnlyChecks: [
-          {
-            function: "get-name",
-            sender: DEPLOYER,
-            arguments: [],
-            expectedResultHex: "0x03",
-          },
-        ],
-      },
-    ],
-  };
-
   it("parses every effective testnet plan entry and blocks the unresolved mainnet identity", () => {
     const testnetPlan = readDeploymentPlan(join(import.meta.dirname, "../deployments/full-system.testnet-plan.yaml"));
-    expect(testnetPlan.entries).toHaveLength(246);
-    expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-publish")).toHaveLength(220);
+    expect(testnetPlan.entries).toHaveLength(240);
+    expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-publish")).toHaveLength(214);
     expect(testnetPlan.entries.filter((entry) => entry.kind === "contract-call")).toHaveLength(26);
 
     const riskOrchestrationCalls = testnetPlan.entries.flatMap((entry) =>
@@ -384,7 +328,7 @@ describe("deployment evidence verification", () => {
     ]);
 
     expect(() => readDeploymentPlan(join(import.meta.dirname, "../deployments/full-system.mainnet-plan.yaml"))).toThrowError(
-      expect.objectContaining({ code: "network-mismatch" }),
+      expect.objectContaining({ code: "NETWORK_DEPLOYER_MISMATCH" }),
     );
   });
 
@@ -472,7 +416,7 @@ describe("deployment evidence verification", () => {
 
   it("confirms complete plan evidence with nullable burn hash and rich Hiro interfaces", async () => {
     const fetcher = mockHiroFetch({ publish: { burn_block_hash: null } });
-    const result = await verifyDeploymentEvidence(newEvidence, {
+    const result = await verifyDeploymentEvidence(baseEvidence(), {
       network: "testnet",
       deployer: DEPLOYER,
       baseUrl: "http://hiro.test",
@@ -481,9 +425,25 @@ describe("deployment evidence verification", () => {
       now: () => FIXED_TIME,
     });
 
-    expect(result.ok).toBe(true);
-    expect(result.deployer).toBe(DEPLOYER);
-    expect(result.contracts).toHaveLength(1);
+    expect(result.evidenceStatus).toBe("confirmed");
+    expect(result.coverage).toBe("complete");
+    expect(result.verifiedAt).toBe(FIXED_TIME.toISOString());
+    expect(result.contractPublications[0].apiEvidence?.burnBlockHash).toBeUndefined();
+    expect(result.contractPublications[0].apiEvidence?.burnBlockHeight).toBe(456);
+    expect(result.contractCalls[0].apiEvidence?.functionArgs?.[0].hex).toBe(CALL_ARG_HEX);
+    expect(result.interfaces[0].interfaceEvidence?.functions).toEqual([
+      { name: "get-name", access: "read_only", argumentCount: 0 },
+      { name: "initialize", access: "public", argumentCount: 1 },
+    ]);
+    expect(result.readOnlyChecks?.[0].apiEvidence).toEqual({
+      observedAt: FIXED_TIME.toISOString(),
+      endpoint: "http://hiro.test/v2/contracts/call-read/ST1BK6TFDEJ4TBVWH5SHNB6SPNWGY06YZFG9WMM4P/alpha/get-name",
+      httpStatus: 200,
+      sender: DEPLOYER,
+      arguments: [],
+      okay: true,
+      resultHex: "0x03",
+    });
 
     const readOnlyCall = (fetcher as ReturnType<typeof vi.fn>).mock.calls.find(([input]) =>
       String(input).includes("/v2/contracts/call-read/"),
@@ -496,29 +456,21 @@ describe("deployment evidence verification", () => {
   });
 
   it("keeps pending retryable and classifies aborted transactions as terminal", async () => {
-    const resultPending = await verifyDeploymentEvidence(newEvidence, {
-      network: "testnet",
-      deployer: DEPLOYER,
-      baseUrl: "http://hiro.test",
-      planPath: PLAN_PATH,
-      fetcher: mockHiroFetch({ publish: { tx_status: "pending" } }),
-      now: () => FIXED_TIME,
-    });
-    expect(resultPending.ok).toBe(false);
-    expect(resultPending.failures.some(
-      (f) => f.classification === "transaction-pending" || f.classification === "transaction-unconfirmed",
-    )).toBe(true);
+    const pending = await expectVerificationError(
+      baseEvidence(),
+      mockHiroFetch({ publish: { tx_status: "pending" } }),
+      "TRANSACTION_NOT_CONFIRMED",
+    );
+    expect(pending.retryable).toBe(true);
+    expect(pending.status).toBe("pending");
 
-    const resultAborted = await verifyDeploymentEvidence(newEvidence, {
-      network: "testnet",
-      deployer: DEPLOYER,
-      baseUrl: "http://hiro.test",
-      planPath: PLAN_PATH,
-      fetcher: mockHiroFetch({ publish: { tx_status: "abort_by_response" } }),
-      now: () => FIXED_TIME,
-    });
-    expect(resultAborted.ok).toBe(false);
-    expect(resultAborted.failures.some((f) => f.classification === "transaction-failed")).toBe(true);
+    const aborted = await expectVerificationError(
+      baseEvidence(),
+      mockHiroFetch({ publish: { tx_status: "abort_by_response" } }),
+      "TRANSACTION_ABORTED",
+    );
+    expect(aborted.retryable).toBe(false);
+    expect(aborted.status).toBe("abort_by_response");
   });
 
   it("fails closed on read-only API, malformed, failed, missing, and mismatched responses", async () => {
@@ -551,27 +503,23 @@ describe("deployment evidence verification", () => {
 
   it("classifies read-only provider failures and bounded request timeouts", async () => {
     await expectVerificationError(
-      newEvidence,
+      baseEvidence(),
       mockHiroFetch({ readOnlyThrows: true }),
       "READ_ONLY_REQUEST_FAILED",
     );
     await expectVerificationError(
-      newEvidence,
+      baseEvidence(),
       mockHiroFetch({ readOnlyHangs: true }),
       "READ_ONLY_TIMEOUT",
       { requestTimeoutMs: 1 },
     );
-    const bodyTimeoutResult = await verifyDeploymentEvidence(newEvidence, {
-      network: "testnet",
-      deployer: DEPLOYER,
-      baseUrl: "http://hiro.test",
-      planPath: PLAN_PATH,
-      fetcher: mockHiroFetch({ readOnlyBodyHangs: true }),
-      now: () => FIXED_TIME,
-      requestTimeoutMs: 1,
-    });
-    expect(bodyTimeoutResult.ok).toBe(false);
-    expect(bodyTimeoutResult.failures.some((f) => f.classification === "read-only-api-error" || f.classification === "read-only-mismatch" || f.classification === "transaction-api-error")).toBe(true);
+    const bodyTimeout = await expectVerificationError(
+      baseEvidence(),
+      mockHiroFetch({ readOnlyBodyHangs: true }),
+      "READ_ONLY_TIMEOUT",
+      { requestTimeoutMs: 1 },
+    );
+    expect(bodyTimeout.message).not.toContain("hiro.test");
   });
 
   it("requires the exact live read-only function and access classification", async () => {
@@ -607,20 +555,8 @@ describe("deployment evidence verification", () => {
   });
 
   it("accepts a canonical contract principal as a read-only sender", async () => {
-    const evidence = {
-      ...newEvidence,
-      contracts: [
-        {
-          ...newEvidence.contracts[0],
-          readOnlyChecks: [
-            {
-              ...newEvidence.contracts[0].readOnlyChecks[0],
-              sender: CONTRACT_ID,
-            },
-          ],
-        },
-      ],
-    };
+    const evidence = baseEvidence();
+    evidence.readOnlyChecks![0].sender = CONTRACT_ID;
     const fetcher = mockHiroFetch();
     const result = await verifyDeploymentEvidence(evidence, {
       network: "testnet",
@@ -630,11 +566,10 @@ describe("deployment evidence verification", () => {
       fetcher,
       now: () => FIXED_TIME,
     });
-    expect(result.ok).toBe(true);
+    expect(result.readOnlyChecks?.[0].apiEvidence?.sender).toBe(CONTRACT_ID);
     const readOnlyCall = (fetcher as ReturnType<typeof vi.fn>).mock.calls.find(([input]) =>
       String(input).includes("/v2/contracts/call-read/"),
     );
-    expect(readOnlyCall).toBeDefined();
     expect(JSON.parse((readOnlyCall?.[1] as RequestInit).body as string).sender).toBe(CONTRACT_ID);
   });
 
@@ -709,17 +644,16 @@ describe("deployment evidence verification", () => {
   });
 
   it("accepts valid variable-length standard principal versions and rejects a testnet mainnet identity", () => {
-    const testnetMultiSig = addressToString(addressFromVersionHash(AddressVersion.TestnetMultiSig, "0".repeat(40)));
-    const multiSigPlanPath = join(tempDirectory, "multisig-plan.yaml");
-    writePlan(multiSigPlanPath, { deployer: testnetMultiSig });
-    expect(readDeploymentPlan(multiSigPlanPath).deployer).toBe(testnetMultiSig);
+    const mainnetMultiSig = addressToString(addressFromVersionHash(AddressVersion.MainnetMultiSig, "00".repeat(20)));
+    const testnetMultiSig = addressToString(addressFromVersionHash(AddressVersion.TestnetMultiSig, "00".repeat(20)));
+    const mainnetPlanPath = join(tempDirectory, "mainnet-sm-plan.yaml");
+    writePlan(mainnetPlanPath, { network: "mainnet", deployer: mainnetMultiSig });
+    expect(readDeploymentPlan(mainnetPlanPath).deployer).toBe(mainnetMultiSig);
 
     const invalid = baseEvidence();
     invalid.network = "mainnet";
     invalid.deployer = testnetMultiSig;
-    expect(() => readDeploymentPlan(join(tempDirectory, "mainnet-plan.yaml"))).toThrowError(
-      expect.objectContaining({ code: "network-mismatch" }),
-    );
+    expect(() => readDeploymentPlan(mainnetPlanPath)).not.toThrow();
     return expectVerificationError(invalid, mockHiroFetch(), "NETWORK_DEPLOYER_MISMATCH", {
       network: "mainnet",
       deployer: testnetMultiSig,
@@ -755,27 +689,24 @@ describe("deployment evidence verification", () => {
   it("does not collapse duplicate method-name calls when ordinals differ", async () => {
     const duplicateCallPlanPath = join(tempDirectory, "duplicate-call-plan.yaml");
     writePlan(duplicateCallPlanPath, { includeSecondCall: true });
-    const evidence = {
-      ...newEvidence,
-      evidence: {
-        source: "confirmed-receipts",
-        capturedAt: FIXED_TIME.toISOString(),
-        gitCommit: "0".repeat(40),
-        planPath: duplicateCallPlanPath,
-        planSha256: sha256File(duplicateCallPlanPath),
-      },
-    };
+    const evidence = baseEvidence();
+    evidence.plan.sha256 = sha256File(duplicateCallPlanPath);
+    evidence.contractCalls.push({
+      ...evidence.contractCalls[0],
+      planPosition: { batchId: 0, transactionIndex: 2 },
+      txid: EXTRA_CALL_TXID,
+    });
 
     const result = await verifyDeploymentEvidence(evidence, {
       network: "testnet",
       deployer: DEPLOYER,
       baseUrl: "http://hiro.test",
       planPath: duplicateCallPlanPath,
-      fetcher: mockHiroFetch(),
+      fetcher: mockHiroFetch({ additionalTransactions: [{ txid: EXTRA_CALL_TXID, kind: "contract-call" }] }),
       now: () => FIXED_TIME,
     });
-    expect(result.ok).toBe(true);
-    expect(result.contracts).toHaveLength(1);
+    expect(result.contractCalls).toHaveLength(2);
+    expect(result.contractCalls.map((call) => call.planPosition.transactionIndex)).toEqual([1, 2]);
   });
 
   it("rejects missing interfaces and unsupported raw interface payloads", async () => {

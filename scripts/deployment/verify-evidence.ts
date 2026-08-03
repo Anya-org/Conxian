@@ -1,8 +1,6 @@
-import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseDocument } from "yaml";
 import {
   AddressVersion,
   addressToString,
@@ -271,15 +269,6 @@ function isContractName(value: unknown): value is string {
   return typeof value === "string" && CONTRACT_NAME_PATTERN.test(value);
 }
 
-function isContractPrincipal(value: string, network: DeploymentNetwork): boolean {
-  const parts = value.match(/^([^.]+)\.([^.]+)$/);
-  return (
-    parts !== null &&
-    isCanonicalStacksAddress(parts[1], network) &&
-    isContractName(parts[2])
-  );
-}
-
 function isTxId(value: unknown): value is string {
   return typeof value === "string" && TX_ID_PATTERN.test(value);
 }
@@ -377,16 +366,12 @@ function validateReadOnlyCheck(
     );
   }
 
-  if (
-    !network ||
-    (!isCanonicalStacksAddress(value.sender, network) &&
-      !isContractPrincipal(value.sender, network))
-  ) {
+  if (!network || !isCanonicalStacksAddress(value.sender, network)) {
     failures.push(
       failure(
         "malformed-manifest",
         `${scope}.sender`,
-        "read-only sender must be a valid Stacks address or contract principal",
+        "read-only sender must be a valid Stacks address",
       ),
     );
   }
@@ -411,14 +396,10 @@ function validateReadOnlyCheck(
     );
   }
 
-  const senderValid =
-    typeof value.sender === "string" &&
-    network !== undefined &&
-    (isCanonicalStacksAddress(value.sender, network) ||
-      isContractPrincipal(value.sender, network));
   return (
     isContractName(value.function) &&
-    senderValid &&
+    network !== undefined &&
+    isCanonicalStacksAddress(value.sender, network) &&
     Array.isArray(value.arguments) &&
     value.arguments.every(isHex) &&
     isHex(value.expectedResultHex) &&
@@ -541,6 +522,17 @@ export function validateManifest(input: unknown): {
           "malformed-manifest",
           "evidence.planPath",
           "evidence.planPath is required and must be a non-empty path",
+        ),
+      );
+    } else if (
+      network &&
+      input.evidence.planPath !== CANONICAL_PLAN_PATHS[network]
+    ) {
+      failures.push(
+        failure(
+          "network-mismatch",
+          "evidence.planPath",
+          `evidence.planPath must be the canonical ${network} deployment plan path`,
         ),
       );
     }
@@ -1296,13 +1288,16 @@ function validateCompleteEvidenceBinding(expected: unknown): VerificationFailure
 
   if (
     typeof planPath !== "string" ||
-    planPath.length === 0
+    !isDeploymentNetwork(network) ||
+    planPath !== CANONICAL_PLAN_PATHS[network]
   ) {
     failures.push(
       failure(
         "evidence-binding-mismatch",
         "expected-binding.planPath",
-        "expected plan path must be a non-empty deployment plan path",
+        isDeploymentNetwork(network)
+          ? `expected plan path must be the canonical ${network} path: ${CANONICAL_PLAN_PATHS[network]}`
+          : "expected plan path cannot be validated until the network is testnet or mainnet",
       ),
     );
   }
@@ -1400,7 +1395,7 @@ async function safeApiCall(call: () => Promise<HttpResult>): Promise<HttpResult>
   }
 }
 
-async function verifyDeploymentEvidenceCore(
+export async function verifyDeploymentEvidence(
   input: unknown,
   api: HiroApi,
   expectedBinding: EvidenceBinding,
@@ -1648,333 +1643,4 @@ if (invokedPath && pathToFileURL(invokedPath).href === import.meta.url) {
       process.exitCode = 2;
     },
   );
-}
-
-// ---------- Gate 2 test-suite exports ----------
-
-export class DeploymentVerificationError extends Error {
-  public readonly code: string;
-  public readonly failures: VerificationFailure[];
-
-  constructor(code: string, message: string, failures: VerificationFailure[] = []) {
-    super(message);
-    this.name = "DeploymentVerificationError";
-    this.code = code;
-    this.failures = failures;
-  }
-}
-
-export interface PlanPosition {
-  batchId: number;
-  transactionIndex: number;
-}
-
-export interface ContractPublicationEntry {
-  kind: "contract-publish";
-  planPosition: PlanPosition;
-  contractName: string;
-  contractId: string;
-  expectedSender: string;
-  txid: string;
-}
-
-export interface ContractCallEntry {
-  kind: "contract-call";
-  planPosition: PlanPosition;
-  contractId: string;
-  functionName: string;
-  expectedSender: string;
-  txid: string;
-}
-
-export interface InterfaceEntry {
-  contractId: string;
-  requiredFunctions: Array<{ name: string; access: string }>;
-}
-
-export interface ReadOnlyCheckEntry {
-  network: string;
-  contractId: string;
-  sender: string;
-  functionName: string;
-  arguments: string[];
-  expectedOkay: boolean;
-  expectedResultHex: string;
-}
-
-export interface DeploymentEvidence {
-  schemaVersion: string;
-  evidenceStatus: string;
-  coverage: string;
-  generatedAt: string;
-  sourceCommit: string;
-  network: string;
-  deployer: string;
-  plan: {
-    path: string;
-    sha256: string;
-  };
-  claims: {
-    scope: string;
-    globalNonexistence: boolean;
-  };
-  contractPublications: ContractPublicationEntry[];
-  contractCalls: ContractCallEntry[];
-  interfaces: InterfaceEntry[];
-  readOnlyChecks: ReadOnlyCheckEntry[];
-}
-
-export interface VerifyDeploymentEvidenceOptions {
-  network: string;
-  deployer: string;
-  baseUrl: string;
-  planPath: string;
-  fetcher: typeof fetch;
-  now?: () => Date;
-  timeoutMs?: number;
-}
-
-export interface DeploymentPlanEntry {
-  kind: "contract-publish" | "contract-call";
-  contractId?: string;
-  functionName?: string;
-  planPosition: { batchId: number; transactionIndex: number };
-}
-
-export function readDeploymentPlan(planPath: string): {
-  deployer: string;
-  batches: Array<{
-    id: number;
-    transactions: Array<Record<string, unknown>>;
-  }>;
-  entries: DeploymentPlanEntry[];
-} {
-  const resolved = resolve(planPath);
-  if (resolved.includes("mainnet")) {
-    throw new DeploymentVerificationError(
-      "network-mismatch",
-      "Mainnet deployment plans are blocked from automated evidence parsing; use the explicit mainnet gateway path",
-    );
-  }
-
-  let source: string;
-  try {
-    source = readFileSync(resolved, "utf8");
-  } catch {
-    throw new DeploymentVerificationError(
-      "malformed-manifest",
-      `Cannot read deployment plan at ${planPath}`,
-    );
-  }
-
-  if (source.trim().length === 0) {
-    throw new DeploymentVerificationError(
-      "malformed-manifest",
-      "Deployment plan is empty",
-    );
-  }
-
-  const document = parseDocument(source, { uniqueKeys: true });
-  if (document.errors && document.errors.length > 0) {
-    throw new DeploymentVerificationError(
-      "malformed-manifest",
-      `Deployment plan YAML is malformed: ${document.errors.map((e: Error) => e.message).join("; ")}`,
-    );
-  }
-
-  const root = document.toJSON() as Record<string, unknown>;
-  if (!root || typeof root !== "object") {
-    throw new DeploymentVerificationError(
-      "malformed-manifest",
-      "Deployment plan root must be an object",
-    );
-  }
-
-  const plan = root.plan as Record<string, unknown> | undefined;
-  if (!plan) {
-    throw new DeploymentVerificationError(
-      "malformed-manifest",
-      "Deployment plan missing `plan` key",
-    );
-  }
-
-  const deployer = root.deployer as string | undefined;
-  if (typeof deployer !== "string" || deployer.length === 0) {
-    throw new DeploymentVerificationError(
-      "malformed-manifest",
-      "Deployment plan missing `deployer` key",
-    );
-  }
-
-  const batches = plan.batches as Array<Record<string, unknown>> | undefined;
-  if (!Array.isArray(batches)) {
-    throw new DeploymentVerificationError(
-      "malformed-manifest",
-      "Deployment plan `plan.batches` must be an array",
-    );
-  }
-
-  const validatedBatches = batches.map((batch, batchIndex) => {
-    if (typeof batch.id !== "number") {
-      throw new DeploymentVerificationError(
-        "malformed-manifest",
-        `Batch at index ${batchIndex} missing numeric id`,
-      );
-    }
-    const transactions = batch.transactions as Array<Record<string, unknown>> | undefined;
-    if (!Array.isArray(transactions)) {
-      throw new DeploymentVerificationError(
-        "malformed-manifest",
-        `Batch ${batch.id} missing transactions array`,
-      );
-    }
-    const validatedTransactions = transactions.map((tx) => {
-      if (!tx || typeof tx !== "object") {
-        throw new DeploymentVerificationError(
-          "malformed-manifest",
-          `Transaction in batch ${batch.id} is not an object`,
-        );
-      }
-      return tx;
-    });
-    return { id: batch.id as number, transactions: validatedTransactions };
-  });
-
-  const entries: DeploymentPlanEntry[] = [];
-  const supportedKinds = new Set(["contract-publish", "contract-call"]);
-  for (const batch of validatedBatches) {
-    batch.transactions.forEach((tx, transactionIndex) => {
-      if (!tx || typeof tx !== "object" || Array.isArray(tx)) {
-        throw new DeploymentVerificationError(
-          "PLAN_MALFORMED",
-          `Transaction at ${batch.id}:${transactionIndex} must be an object`,
-        );
-      }
-
-      const keys = Object.keys(tx);
-      const kindKeys = keys.filter((k) => supportedKinds.has(k));
-
-      if (kindKeys.length === 0) {
-        const unsupported = keys.filter((k) => !supportedKinds.has(k));
-        throw new DeploymentVerificationError(
-          "PLAN_MALFORMED",
-          `Unsupported transaction kind at ${batch.id}:${transactionIndex}: ${unsupported.join(", ") || "empty transaction"}`,
-        );
-      }
-
-      if (kindKeys.length > 1) {
-        throw new DeploymentVerificationError(
-          "PLAN_MALFORMED",
-          `Transaction at ${batch.id}:${transactionIndex} has multiple kinds: ${kindKeys.join(", ")}`,
-        );
-      }
-
-      const kind = kindKeys[0] as "contract-publish" | "contract-call";
-
-      const txData = tx[kind];
-      if (!txData || typeof txData !== "object" || Array.isArray(txData)) {
-        throw new DeploymentVerificationError(
-          "PLAN_MALFORMED",
-          `Transaction kind value at ${batch.id}:${transactionIndex} must be an object`,
-        );
-      }
-
-      // Reject extra keys beyond the kind key
-      const extraKeys = keys.filter((k) => !supportedKinds.has(k) && k !== kind);
-      if (extraKeys.length > 0) {
-        throw new DeploymentVerificationError(
-          "PLAN_MALFORMED",
-          `Transaction at ${batch.id}:${transactionIndex} has unexpected keys: ${extraKeys.join(", ")}`,
-        );
-      }
-
-      const entry: DeploymentPlanEntry = {
-        kind,
-        planPosition: { batchId: batch.id, transactionIndex },
-      };
-
-      if (kind === "contract-publish" && typeof txData["contract-name"] === "string") {
-        entry.contractId = `${deployer}.${txData["contract-name"]}`;
-      } else if (kind === "contract-call") {
-        if (typeof txData["contract-id"] === "string") entry.contractId = txData["contract-id"];
-        if (typeof txData["method"] === "string") entry.functionName = txData["method"];
-      }
-
-      entries.push(entry);
-    });
-  }
-
-  return { deployer, batches: validatedBatches, entries };
-}
-
-export function sha256File(filePath: string): string {
-  const resolved = resolve(filePath);
-  const content = readFileSync(resolved);
-  return createHash("sha256").update(content).digest("hex");
-}
-
-export async function verifyDeploymentEvidence(
-  evidenceOrInput: unknown,
-  optionsOrApi: VerifyDeploymentEvidenceOptions | HiroApi,
-  expectedBinding?: EvidenceBinding,
-): Promise<VerificationReport> {
-  // Detect which overload was called
-  if (expectedBinding !== undefined) {
-    return verifyDeploymentEvidenceCore(evidenceOrInput, optionsOrApi as HiroApi, expectedBinding);
-  }
-
-  const options = optionsOrApi as VerifyDeploymentEvidenceOptions;
-
-  const api: HiroApi = {
-    getTransaction: async (txId: string) => {
-      const response = await options.fetcher(`${options.baseUrl}/extended/v1/tx/${txId}`);
-      if (!response.ok) return { status: response.status, ok: false };
-      try {
-        return { status: response.status, ok: true, data: await response.json() };
-      } catch {
-        return { status: response.status, ok: false, error: "invalid-json" };
-      }
-    },
-    getContractInterface: async (principal: string) => {
-      const [addr, name] = principal.split(".");
-      const response = await options.fetcher(`${options.baseUrl}/v2/contracts/interface/${addr}/${name}`);
-      if (!response.ok) return { status: response.status, ok: false };
-      try {
-        return { status: response.status, ok: true, data: await response.json() };
-      } catch {
-        return { status: response.status, ok: false, error: "invalid-json" };
-      }
-    },
-    callReadOnly: async (principal: string, functionName: string, request) => {
-      const [addr, name] = principal.split(".");
-      const body = JSON.stringify({
-        sender: request.sender,
-        arguments: request.arguments,
-      });
-      const response = await options.fetcher(
-        `${options.baseUrl}/v2/contracts/call-read/${addr}/${name}/${functionName}`,
-        { method: "POST", headers: { "Content-Type": "application/json" }, body },
-      );
-      if (!response.ok) return { status: response.status, ok: false };
-      try {
-        return { status: response.status, ok: true, data: await response.json() };
-      } catch {
-        return { status: response.status, ok: false, error: "invalid-json" };
-      }
-    },
-  };
-
-  const ev = evidenceOrInput as Record<string, unknown>;
-  const evEvidence = (ev.evidence ?? {}) as Record<string, unknown>;
-  const evPlan = (ev.plan ?? {}) as Record<string, unknown>;
-
-  const binding: EvidenceBinding = {
-    network: options.network as DeploymentNetwork,
-    deployer: options.deployer,
-    gitCommit: (ev.sourceCommit ?? evEvidence.gitCommit ?? "") as string,
-    planPath: options.planPath,
-    planSha256: (evPlan.sha256 ?? evEvidence.planSha256 ?? "") as string,
-  };
-
-  return verifyDeploymentEvidenceCore(evidenceOrInput, api, binding);
 }

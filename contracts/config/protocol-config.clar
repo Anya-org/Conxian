@@ -102,7 +102,7 @@
       ))
     )
   )
-
+)
 
 ;; @desc Add a new mutable configuration entry (admin only)
 ;; @param key: The configuration key name

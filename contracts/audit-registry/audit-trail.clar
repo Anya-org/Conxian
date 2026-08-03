@@ -10,8 +10,8 @@
 ;; Audit entries are append-only and never deleted.
 
 ;; --- Constants ---
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_ENTRY_NOT_FOUND (err u1001))
+(define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR_ENTRY_NOT_FOUND u1001)
 
 ;; Event categories
 (define-constant CATEGORY_ADMIN u1)
@@ -26,7 +26,7 @@
 (define-data-var admin principal tx-sender)
 (define-data-var entry-count uint u0)
 
-;; Audit trail: entry-id -> immutable audit record
+;; Audit trail: entry-id → immutable audit record
 (define-map audit-entries
   uint
   {
@@ -79,7 +79,7 @@
         (is-eq tx-sender .conxian-access)
         (is-eq tx-sender .upgrade-controller)
         (is-eq tx-sender .emergency-governance)
-      ) ERR_UNAUTHORIZED)
+      ) (err ERR_UNAUTHORIZED))
 
       (var-set entry-count entry-id)
       (map-set audit-entries entry-id {
@@ -111,7 +111,7 @@
 (define-read-only (get-audit-entry (entry-id uint))
   (match (map-get? audit-entries entry-id)
     entry (ok entry)
-    ERR_ENTRY_NOT_FOUND
+    (err ERR_ENTRY_NOT_FOUND)
   )
 )
 
@@ -124,7 +124,7 @@
 (define-read-only (get-recent-entries (count uint))
   (let ((total (var-get entry-count)))
     (if (> count u50)
-      ERR_UNAUTHORIZED
+      (err ERR_UNAUTHORIZED)
       (ok {
         total: total,
         from: (if (> total count) (- total count) u1),
@@ -143,7 +143,7 @@
 
 (define-public (set-admin (new-admin principal))
   (begin
-    (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender (var-get admin)) (err ERR_UNAUTHORIZED))
     (var-set admin new-admin)
     (ok true)
   )

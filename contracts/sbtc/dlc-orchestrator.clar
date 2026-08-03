@@ -3,7 +3,7 @@
 ;; Aligned with Apex CSF (v1.1.0) and BitVM2 Verification Floor.
 ;;
 ;; Manages the full DLC bond lifecycle:
-;;   Launch -> Active -> Coupon Cycles -> Maturity -> Redemption
+;;   Launch → Active → Coupon Cycles → Maturity → Redemption
 ;;
 ;; Integrates with dlc-manager for BitVM2 proof verification and
 ;; dlc-bond for on-chain bond management.
@@ -96,7 +96,7 @@
 ;; @desc Process coupon distribution for a single bond
 (define-public (process-bond-coupon (bond-contract <dlc-bond-trait>) (bond-id uint))
   (let (
-      (bond (unwrap! (map-get? orchestrated-bonds bond-id) ERR_BOND_NOT_READY))
+      (bond (unwrap! (map-get? orchestrated-bonds bond-id) (err ERR_BOND_NOT_READY)))
     )
     (begin
       (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -122,7 +122,7 @@
 ;; @desc Process maturity for a bond and trigger redemption
 (define-public (mature-bond (bond-contract <dlc-bond-trait>) (bond-id uint))
   (let (
-      (bond (unwrap! (map-get? orchestrated-bonds bond-id) ERR_BOND_NOT_READY))
+      (bond (unwrap! (map-get? orchestrated-bonds bond-id) (err ERR_BOND_NOT_READY)))
     )
     (begin
       (asserts! (is-eq tx-sender (var-get admin)) ERR_UNAUTHORIZED)
@@ -150,7 +150,7 @@
 (define-read-only (get-bond-state (bond-id uint))
   (match (map-get? orchestrated-bonds bond-id)
     bond (ok bond)
-    ERR_BOND_NOT_READY
+    (err ERR_BOND_NOT_READY)
   )
 )
 

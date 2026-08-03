@@ -22,7 +22,7 @@
 ;; --- State ---
 (define-data-var admin principal tx-sender)
 
-;; Time-bound access grants: (granter, grantee, role) -> expiry-block
+;; Time-bound access grants: (granter, grantee, role) → expiry-block
 (define-map time-bound-grants
   { granter: principal, grantee: principal, role: uint }
   {
@@ -32,7 +32,7 @@
   }
 )
 
-;; Delegated authority: delegator -> delegate (one level deep)
+;; Delegated authority: delegator → delegate (one level deep)
 (define-map delegations
   principal
   {
@@ -66,7 +66,7 @@
   (begin
     (asserts! (not (is-eq tx-sender grantee)) (err ERR_SELF_DELEGATE))
     (asserts! (<= duration MAX_GRANT_DURATION) (err ERR_UNAUTHORIZED))
-    (asserts! (is-ok (contract-call? .conxian-access has-role tx-sender role)) (err ERR_UNAUTHORIZED))
+    (asserts! (contract-call? .conxian-access has-role tx-sender role) (err ERR_UNAUTHORIZED))
 
     (map-set time-bound-grants { granter: tx-sender, grantee: grantee, role: role } {
       granted-at: burn-block-height,
@@ -180,8 +180,8 @@
 (define-public (activate-emergency-escalation (reason (string-ascii 64)))
   (begin
     (asserts! (or
-      (is-ok (contract-call? .conxian-access has-role tx-sender u2))
-      (is-ok (contract-call? .conxian-access has-role tx-sender u3))
+      (contract-call? .conxian-access has-role tx-sender u2)
+      (contract-call? .conxian-access has-role tx-sender u3)
     ) (err ERR_UNAUTHORIZED))
 
     (map-set emergency-escalations tx-sender {
