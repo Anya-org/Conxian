@@ -46,7 +46,7 @@ deployment-registry-*.json
 deployment/*-deployment-evidence*.json
 deployment-artifacts/
 
-# 5. TESTING & COVERAGE
+# 5. TESTING, PLAYWRIGHT & VITEST ARTIFACTS
 test-results/
 test-results.txt
 test-run-output.txt
@@ -57,6 +57,12 @@ coverage/
 core_test_results_2.json
 temp_sanity_results.json
 test_results.json
+playwright-report/
+blob-report/
+playwright/.cache/
+.vitest-cache/
+vitest-cache/
+.vitest-result*.json
 
 # 6. IDE & EDITOR FILES
 .vscode/
