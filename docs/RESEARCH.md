@@ -4,7 +4,7 @@ title: Strategic Research
 permalink: /docs/RESEARCH/
 ---
 
-# Conxian Protocol Research & Strategic Analysis (2026 Update)
+# Conxian Protocol Research & Strategic Analysis (August 2026 Update)
 
 ## Reading guide
 
@@ -56,29 +56,43 @@ This document is a strategic research surface.
 - **Institutional "Clean-Hands" Lending:** Controlled compliance-focused lending remains a plausible segment.
 - **Cross-Chain "Staff" Orchestration:** Agent-managed cross-environment liquidity operations remain a strategic expansion path.
 
----
-© 2024-2026 Conxian Finance. All rights reserved.
-
-## 7. Universal Chain Support (June 2026 Update)
+## 7. Universal Chain Support (ADR-006 & Session 49 Synthesis)
 
 - **Tier 1 Chain Families:** ADR-006 confirmed **EVM**, **Bitcoin/UTXO**, and **Cosmos/IBC** as primary integration targets.
-- **Universal Interoperability:** **LayerZero V2** (Endpoint-Peer model) and **Axelar** (Amplifier/Verifier model) have been identified as core integration patterns for the Conxian routing layer.
-- **Verifiable Compute:** The **Nexus** network provides ZK-verifiable system state, suitable for off-chain maneuver orchestration and institutional-grade proof generation.
+- **Universal Interoperability Matrix:**
+  - **LayerZero V2:** Endpoint-Peer messaging pattern for cross-chain state synchronization and vault allocation.
+  - **Axelar Amplifier:** Decentralized verifier set for multi-chain liquidity routing and token bridging.
+  - **Nexus Network:** Zero-Knowledge verifiable compute layer for executing off-chain risk calculations and generating proofs of solvency.
 - **Trust Policy:** Tier 1 (Strict) integrations require synchronous settlement finality or sovereign proof verification.
 
-## 8. SDK and Library Alignment (June 2026 Update)
+## 8. Protocol-First Narrowing Strategy (CXIP-014)
 
-- **Protocol-First Narrowing**: Alignment with the "protocol-first" architecture requires isolating canonical protocol logic from integration runtime concerns.
-- **Client SDKs**: The Stacks.js and Clarinet SDKs remain the foundational libraries for protocol interaction and verification.
-- **Library Decoupling**: High-level service adapters (e.g., ISO 20022 parsers, OData v4 translators) are classified as "Gateway Runtime" and are scheduled for relocation to dedicated service repositories to preserve protocol purity.
+- **Isolation Principle:** Canonical protocol logic (`contracts/`) is strictly separated from gateway runtime and off-chain service layers (`gateway/`, `services/`).
+- **Client SDK Alignment:** Stacks.js v7 and Clarinet SDK remain the canonical verification tools.
+- **Decoupling Schedule:** Service adapters (ISO 20022 parsers, OData v4 translators) are isolated in `gateway/` to guarantee protocol-first compliance and zero contamination of core smart contract logic.
 
-## 9. Institutional Bridge Architecture (Research Paper Summary)
+## 9. Institutional Settlement & Compliance Architecture
 
-- **BitVM2 Integration**: Using SNARK-based state proofs to bridge Bitcoin liquidity without trusting a central federation.
-- **ISO 20022 & x402**: Standardizing institutional payment mandates for Bitcoin L2 settlement. The x402 standard provides a deterministic mapping between legacy banking instructions and on-chain payment mandates.
-- **Risk Telemetry**: Real-time monitoring of system-wide GCR (Global Collateral Ratio) and TVL (Total Value Locked) is critical for institutional risk committees to verify protocol health autonomously.
+- **BitVM2 Integration:** Uses SNARK-based state proofs to enable trust-minimized Bitcoin liquidity bridging.
+- **ISO 20022 & x402 Payment Mandates:** Standardizes institutional settlement; `x402.ts` implements HTTP 402 payment required protocols mapped directly to on-chain settlement flows.
+- **Proof-of-Reserves Boundary:** Snapshot-bound secp256k1 quorum verification with live SIP-010 reconciliation enforces complete on-chain solvency verification without testnet or simulation data leakages.
+- **ZKML Fail-Closed Quarantine:** AI model verifiers are isolated behind fail-closed quarantine boundaries (`verify_zkml_quarantine.py`) ensuring unverified AI signals cannot bypass human governance or risk limits.
 
-## 10. Cross-Chain Agentic Orchestration
+## 10. Agentic Telemetry & Sovereign Autonomy
 
-- **Autonomous Office Manager**: An orchestration layer that allows AI-driven agents to manage multi-chain positions across EVM, Stacks, and Bitcoin.
-- **Sovereign Hand-off Protocols**: Procedures for transferring management of cross-chain vaults between human councils and autonomous agents based on predefined "State Signatures".
+- **Grounded Telemetry Pattern:** Risk and fiscal agents accept a `metrics-ref <finance-metrics-trait>` parameter to query live protocol state directly from on-chain variables.
+- **Unified Theory Variables:** Real-time monitoring tracks Reserve Coverage ($C_R$), Asset Utilization ($A_S$), and Volatility Index ($V_X$) across all active vaults.
+- **AYE Agent & PID Scaling:** Predictive Scaling Engine dynamically adjusts protocol fee rates and pool parameters based on PID loop feedback loops measuring trading velocity and TVL volatility.
+
+## 11. Session 49 Gap & Opportunity Scoring Synthesis
+
+| Domain / Issue | Research Target | Impact Score (1-10) | Risk Score (1-10) | Alignment Status |
+|----------------|-----------------|---------------------|------------------|------------------|
+| ZKML Fail-Closed Boundary | Security & Quarantine | 10/10 | 1/10 (Low) | ✅ Quarantined |
+| Proof-of-Reserves Solvency | Compliance & Verification | 9/10 | 2/10 (Low) | ✅ Boundary Guarded |
+| Universal Chain Routing | ADR-006 / LayerZero V2 | 9/10 | 3/10 (Medium) | 🟢 Phase 4 Target |
+| Protocol Narrowing (CXIP-014) | Architecture / Isolation | 9/10 | 2/10 (Low) | ✅ Enforced |
+| AYE PID Telemetry Scaling | Sovereign Autonomy | 8/10 | 2/10 (Low) | ✅ Active |
+
+---
+© 2024-2026 Conxian Finance. All rights reserved.
