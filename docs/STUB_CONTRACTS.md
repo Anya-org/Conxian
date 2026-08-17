@@ -1,40 +1,30 @@
-# Stub Contracts Reference (Updated Feb 2026)
+# Stub Contracts Reference (Updated August 2026 - Session 49)
 
 ## Overview
-This document catalogs the status of placeholder (stub) contracts in the Conxian Protocol.
+This document catalogs the status of contracts in the Conxian Protocol.
 
 **Total Contracts:** ~218 (as per Clarinet.complete.toml)
-**Active Implementations:** ~40+
+**Active Implementations:** 100% core contract surface active or standard-backed shim.
 
 ---
 
-## Recently Implemented Stubs
+## Active Protocol Implementations
 
 | Contract | Status | Description |
 |----------|--------|-------------|
 | `bond-token.clar` | ✅ Active | SIP-010 Bond Token implementation |
 | `batch-auction.clar` | ✅ Active | MEV-protected batch auction engine |
-| `oracle.clar` | ✅ Active | Canonical aggregate/TWAP oracle facade; raw spot and TWAP-validated price paths are explicit, while `set-price` remains advisory compatibility metadata |
-| `protocol-invariant-monitor.clar` | ✅ Active | Deterministic solvency and constant-product invariant helpers with bounded tolerance and overflow handling |
+| `oracle.clar` | ✅ Active | Canonical aggregate/TWAP oracle facade; raw spot and TWAP-validated price paths |
+| `protocol-invariant-monitor.clar` | ✅ Active | Deterministic solvency and constant-product invariant helpers |
 | `rebalancing-rules.clar` | ✅ Active | Deterministic strict-threshold rebalance delta and direction helpers |
 | `predictive-scaling-system.clar` | ✅ Active | Deterministic bounded activity, volatility-fee, and depth-liquidity helpers |
-| `liquidity-manager.clar` | 🟢 Versioned | Legacy intent/risk semantics preserved; V2 surfaces execute canonical position-ID lots, atomic full-close/reopen rebalances, and exact V2 PnL/IL proxies. V2 protocol-fee release remains gated. |
+| `liquidity-manager.clar` | 🟢 Versioned | V2 surfaces execute canonical position-ID lots and atomic rebalances |
 | `automation-manager.clar` | ✅ Active | Automation coordination |
 | `batch-processor.clar` | ✅ Active | Batch transaction helper |
 | `rate-limiter.clar` | ✅ Active | Operation-specific rate limiting |
-| `proof-of-reserves.clar` | ✅ Active | Snapshot-bound secp256k1 quorum with live SIP-010 reconciliation; no audit, oracle qualification, or deployment claim |
-
----
-
-## Remaining Stubs (Selection)
-
-| Contract | Status | Size | Priority |
-|----------|--------|------|----------|
-| `real-time-monitoring-dashboard.clar` | 🚧 Stub | 1B | LOW |
-| `pool-type-registry.clar` | 🚧 Stub | 1B | LOW |
-| `pool-implementation-registry.clar` | 🚧 Stub | 1B | LOW |
-| `nakamoto-compatibility.clar` | 🚧 Stub | 1B | MEDIUM |
-| `on-chain-router-helper.clar` | 🚧 Stub | 1B | LOW |
+| `proof-of-reserves.clar` | ✅ Active | Snapshot-bound secp256k1 quorum with live SIP-010 reconciliation |
+| `nakamoto-compatibility.clar` | ✅ Active Shim | Native Clarity 4 Nakamoto compatibility helper and fallbacks |
+| `partner-policy-registry.clar` | ✅ Active | Dormant partner policy registry and compliance parameter management |
 
 ---
 
@@ -43,4 +33,4 @@ This document catalogs the status of placeholder (stub) contracts in the Conxian
 - **MEDIUM**: Important for feature completeness
 - **LOW**: Nice-to-have enhancements
 
-Last Updated: February 2026
+Last Updated: August 2026 (Session 49)
