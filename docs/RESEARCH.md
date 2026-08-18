@@ -4,7 +4,7 @@ title: Strategic Research
 permalink: /docs/RESEARCH/
 ---
 
-# Conxian Protocol Research & Strategic Analysis (August 2026 Update - Session 50)
+# Conxian Protocol Research & Strategic Analysis (August 2026 Update)
 
 ## Reading guide
 
@@ -56,7 +56,7 @@ This document is a strategic research surface.
 - **Institutional "Clean-Hands" Lending:** Controlled compliance-focused lending remains a plausible segment.
 - **Cross-Chain "Staff" Orchestration:** Agent-managed cross-environment liquidity operations remain a strategic expansion path.
 
-## 7. Universal Chain Support (ADR-006 & Session 50 Synthesis)
+## 7. Universal Chain Support (ADR-006 & Session 49 Synthesis)
 
 - **Tier 1 Chain Families:** ADR-006 confirmed **EVM**, **Bitcoin/UTXO**, and **Cosmos/IBC** as primary integration targets.
 - **Universal Interoperability Matrix:**
@@ -84,7 +84,7 @@ This document is a strategic research surface.
 - **Unified Theory Variables:** Real-time monitoring tracks Reserve Coverage ($C_R$), Asset Utilization ($A_S$), and Volatility Index ($V_X$) across all active vaults.
 - **AYE Agent & PID Scaling:** Predictive Scaling Engine dynamically adjusts protocol fee rates and pool parameters based on PID loop feedback loops measuring trading velocity and TVL volatility.
 
-## 11. Session 50 Gap & Opportunity Scoring Synthesis
+## 11. Session 49 Gap & Opportunity Scoring Synthesis
 
 | Domain / Issue | Research Target | Impact Score (1-10) | Risk Score (1-10) | Alignment Status |
 |----------------|-----------------|---------------------|------------------|------------------|
