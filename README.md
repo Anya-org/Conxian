@@ -1,12 +1,14 @@
 # Conxian
 
+> **REPOSITORY ARCHIVED**: This repository is officially archived and in read-only mode. No active development or updates are taking place. See [](docs/ARCHIVED_NOTICE.md) for full details.
+
+[![Protocol Status](https://img.shields.io/badge/Status-Archived--ReadOnly-red.svg)](docs/ARCHIVED_NOTICE.md)
+[![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+[![Clarity 4](https://img.shields.io/badge/Clarity-4.0-orange.svg)](https://docs.stacks.co)
+
 ## Canonical Documentation
 > - [Portfolio Business Unit Map](https://github.com/Conxian/conxian-business/blob/main/docs/PORTFOLIO_BUSINESS_UNIT_MAP.md)
 > - [BOS Knowledge Graph](https://github.com/Conxian/conxian-business/blob/main/BOS_KNOWLEDGE_GRAPH.md)
-
-[![Protocol Status](https://img.shields.io/badge/Status-Mainnet--Ready-green.svg)](https://conxian.com)
-[![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
-[![Clarity 4](https://img.shields.io/badge/Clarity-4.0-orange.svg)](https://docs.stacks.co)
 
 Conxian is the protocol, DeFi, and DAO-facing public layer.
 

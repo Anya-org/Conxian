@@ -1,4 +1,6 @@
-# Main Branch Governance
+# Main Branch Governance (Archived State)
+
+> **REPOSITORY ARCHIVED**: This repository has been officially archived and set to read-only status. All required PR checks, rulesets, and mandatory review gates are disabled.
 
 ## Repository policy
 
@@ -31,7 +33,7 @@ calling GitHub. Its focused unit tests live in
 `tests/test_verify_codeowners_policy.py` and run in `jules-audit` on every pull
 request.
 
-## Intended required checks
+## Intended required checks (Disabled for Repository Archival)
 
 The stable required check contexts intended for every pull request targeting
 `main` are exactly:
@@ -48,30 +50,22 @@ job for non-protocol changes, and requires it to succeed for protocol-sensitive
 changes. All third-party GitHub Actions references remain pinned to immutable
 commit SHAs.
 
-## GitHub rulesets and admin-only steps
+> **ARCHIVAL NOTICE**: Following repository archiving, all required status checks, required approvals, and mandatory merge gates listed above are **disabled**. The repository is read-only and no longer accepts pull requests or automated deployments.
+
+## GitHub rulesets and admin-only steps (Disabled / Read-Only)
 
 The relevant GitHub rulesets are `7569329` and `19251038`. Discovery for
 CON-1521 observed ruleset `7569329` with zero required approvals, code-owner
 review disabled, and review-thread resolution enabled. An administrator must
 refresh and verify that evidence before changing settings. Repository changes
-do not modify either ruleset. After this change merges, a repository
-administrator must:
+do not modify either ruleset.
 
-1. Confirm the root `CODEOWNERS` file is effective on `main` and both named
-   owners remain eligible repository administrators.
-2. In ruleset `7569329`, require at least one approving review, require a code
-   owner review, and retain required review-thread resolution.
-3. Require the four exact stable check contexts listed above after confirming
-   each is emitted by a fresh pull request run. Do not require the conditional
-   `validate-protocol` context.
-4. Review ruleset `19251038` for overlap or conflict with `7569329`; preserve
-   its intended default-branch review behavior without weakening the merge
-   gates.
-5. Record screenshots or exported ruleset evidence in CON-1521 / GitHub issue
-   #515, together with the canary pull request results.
+> **ARCHIVAL NOTICE**: All rulesets (`7569329` and `19251038`), required checks, and code owner review gates have been set to **disabled / inactive** to reflect the archived state of the repository.
 
-These are admin-only post-merge actions. The repository implementation and a
-green pull request do **not** prove that GitHub settings enforcement is active.
+1. All required code owner reviews are disabled.
+2. All required status checks are disabled.
+3. Branch protection rules requiring linear history or signatures for PR merges are disabled.
+4. The repository is preserved as an immutable public reference archive.
 
 ## Canary verification and rollback
 

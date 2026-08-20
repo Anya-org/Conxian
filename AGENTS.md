@@ -1,4 +1,6 @@
-# Conxian Protocol: Agent Directives (July 31, 2026 — Production Readiness Hardened)
+# Conxian Protocol: Agent Directives (Archived Repository)
+
+> **REPOSITORY ARCHIVED**: This repository has been officially archived and set to read-only status. All automations, CI pipelines, and agent workflows are operating in passive/archived mode. See [](docs/ARCHIVED_NOTICE.md).
 
 ## 0. Knowledge Base Automation (M2M Native Induction)
 

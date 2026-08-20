@@ -1,4 +1,6 @@
-# Security Policy
+# Security Policy (Archived Repository)
+
+> **NOTICE**: This repository is **ARCHIVED** and no longer receives active security patches or vulnerability responses.
 
 ## Supported Versions
 
@@ -6,7 +8,7 @@ The following versions of Conxian are currently being supported with security up
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.6.x   | :white_check_mark: |
+| 0.6.x   | :x: (Archived)     |
 | < 0.6   | :x:                |
 
 ## Reporting a Vulnerability
