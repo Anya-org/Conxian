@@ -182,6 +182,13 @@ export async function initializeSimnet(): Promise<Simnet> {
 
 export const simnet: Simnet = new Proxy({} as Simnet, {
   get: (_target, prop) => {
+    if (!internalSimnet) {
+      throw new Error(
+        `[Simnet Proxy] Attempted to access property '${String(
+          prop
+        )}' on simnet before initializeSimnet() completed. Ensure tests wait for simnet initialization.`,
+      );
+    }
     const value = (internalSimnet as any)?.[prop];
     if (typeof value === 'function') {
       return value.bind(internalSimnet);
@@ -193,7 +200,11 @@ export const simnet: Simnet = new Proxy({} as Simnet, {
 export const accounts: Record<string, { address: string }> = new Proxy({} as Record<string, { address: string }>, {
   get: (_target, prop) => {
     if (typeof prop !== 'string') return undefined;
-    if (!internalSimnet) return undefined;
+    if (!internalSimnet) {
+      throw new Error(
+        `[Accounts Proxy] Attempted to access account '${prop}' before initializeSimnet() completed. Ensure tests await simnet initialization.`,
+      );
+    }
     const map = typeof (internalSimnet as any).getAccounts === 'function'
       ? (internalSimnet as any).getAccounts() as Map<string, string>
       : (internalSimnet as any).accounts;
