@@ -42,7 +42,7 @@
     "is-generator-function": "^1.1.2",
     "js-sha256": "^1.0.0",
     "light-bolt11-decoder": "^3.2.0",
-    "mime-db": "^1.52.0",
+    "mime-db": "^1.54.0",
     "node-fetch": "^3.3.2",
     "ws": "^8.21.3"
   },
@@ -61,7 +61,7 @@
     "@types/node": "^26.2.0",
     "@types/supertest": "^7.2.1",
     "@types/xml2js": "^0.4.14",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/coverage-v8": "^4.1.11",
     "bech32": "^2.0.0",
     "bip32": "^5.0.1",
     "bip39": "^3.1.0",
