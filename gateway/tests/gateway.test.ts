@@ -1,6 +1,14 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import request from 'supertest';
+import crypto from 'crypto';
 import app from '../src/app.js';
+
+const SECRET = process.env.WEBHOOK_SECRET || 'test-webhook-secret';
+
+function signBody(body: any): string {
+  const payload = typeof body === 'string' ? body : JSON.stringify(body);
+  return crypto.createHmac('sha256', SECRET).update(payload).digest('hex');
+}
 
 describe('Gateway API', () => {
   it('should return health status', async () => {
@@ -25,9 +33,11 @@ describe('Gateway API', () => {
         </FIToFICstmrCdtTrf>
       </Document>
     `;
+    const signature = signBody(pacs008Xml);
     const res = await request(app)
       .post('/v1/iso20022/pacs008')
       .set('Content-Type', 'application/xml')
+      .set('x-conxian-signature', signature)
       .send(pacs008Xml);
 
     expect(res.status).toBe(202);
@@ -45,8 +55,10 @@ describe('Gateway API', () => {
       "Amount": "500.50",
       "Currency": "ZAR"
     };
+    const signature = signBody(erpPayload);
     const res = await request(app)
       .post('/v1/erp/sync')
+      .set('x-conxian-signature', signature)
       .send(erpPayload);
 
     expect(res.status).toBe(202);

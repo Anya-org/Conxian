@@ -2,10 +2,15 @@ import { Request, Response } from 'express';
 import { parsePacs008, parsePacs009 } from '../parsers/iso20022.js';
 import { SettlementEnvelope } from '../types/settlement.js';
 
+// In-memory registry for audited settlement envelopes in gateway runtime
+const settlementRegistry: SettlementEnvelope[] = [];
+
+export const getSettlementRegistry = (): readonly SettlementEnvelope[] => settlementRegistry;
+
 export const handlePacs008 = async (req: Request, res: Response) => {
   try {
     const envelope = await parsePacs008(req.body);
-    // TODO: Forward to on-chain intent or database
+    settlementRegistry.push(envelope);
     res.status(202).json({ status: 'ACCEPTED', envelope });
   } catch (error: any) {
     res.status(400).json({ status: 'ERROR', message: error.message });
@@ -15,6 +20,7 @@ export const handlePacs008 = async (req: Request, res: Response) => {
 export const handlePacs009 = async (req: Request, res: Response) => {
   try {
     const envelope = await parsePacs009(req.body);
+    settlementRegistry.push(envelope);
     res.status(202).json({ status: 'ACCEPTED', envelope });
   } catch (error: any) {
     res.status(400).json({ status: 'ERROR', message: error.message });
@@ -33,6 +39,7 @@ export const handlePAPSSCallback = async (req: Request, res: Response) => {
     timestamp: new Date().toISOString(),
     metadata: payload
   };
+  settlementRegistry.push(envelope);
   res.status(202).json({ status: 'ACCEPTED', envelope });
 };
 
@@ -48,5 +55,6 @@ export const handleBRICSCallback = async (req: Request, res: Response) => {
     timestamp: new Date().toISOString(),
     metadata: payload
   };
+  settlementRegistry.push(envelope);
   res.status(202).json({ status: 'ACCEPTED', envelope });
 };
