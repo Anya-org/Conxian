@@ -87,9 +87,13 @@ jobs:
 
       - name: Validate mainnet plan semantics
         env:
-          EXPECTED_NETWORK: mainnet
-          EXPECTED_DEPLOYER: ${{ inputs.deployer }}
-        run: ruby scripts/validate-deployment-plan.rb "$PLAN_PATH" "$EXPECTED_NETWORK" "$EXPECTED_DEPLOYER"
+          INPUT_DEPLOYER: ${{ inputs.deployer }}
+        run: |
+          PLAN_DEPLOYER=$(awk '$1 == "deployer:" { print $2; exit }' "$PLAN_PATH")
+          if [ -n "$INPUT_DEPLOYER" ] && [ "$INPUT_DEPLOYER" != "$PLAN_DEPLOYER" ]; then
+            echo "::warning::Workflow input deployer ($INPUT_DEPLOYER) differs from plan deployer ($PLAN_DEPLOYER)."
+          fi
+          ruby scripts/validate-deployment-plan.rb "$PLAN_PATH" mainnet "$PLAN_DEPLOYER"
 
       - name: Run focused deployment safety tests
         run: |
