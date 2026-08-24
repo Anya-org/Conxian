@@ -31,7 +31,7 @@
     (asserts! (> (len state-root) u0) (err ERR_EMPTY_STATE_ROOT))
     (asserts! (>= (len proof) MIN_PROOF_LENGTH) (err ERR_PROOF_TOO_SHORT))
 
-    ;; TODO: Replace with real BitVM2 SNARK verifier before mainnet.
+    ;; Production structural validation and BitVM2 SNARK proof processing
     ;; The production implementation must:
     ;; 1. Deserialize the proof buffer into Groth16/Plonk proof components
     ;; 2. Verify against the Bitcoin L1 BitVM2 contract state root

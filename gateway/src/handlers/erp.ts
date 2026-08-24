@@ -4,6 +4,10 @@ import { ERPIntent, SettlementEnvelope } from '../types/settlement.js';
 export const handleERPSync = async (req: Request, res: Response) => {
   try {
     const payload = req.body;
+    if (!payload || typeof payload !== 'object') {
+      return res.status(400).json({ status: 'ERROR', message: 'Invalid payload structure' });
+    }
+
     const erpSystem = payload['@odata.context']?.includes('sap') ? 'SAP' : 'ORACLE';
 
     // x402 Mandate mapping logic
@@ -30,10 +34,10 @@ export const handleERPSync = async (req: Request, res: Response) => {
       metadata: { erp_intent: intent }
     };
 
-    // Fail-closed enforcement: ensure OData parsing/mapping engine is healthy
-    const syncEngineHealthy = process.env.NODE_ENV === 'test' || true; // Placeholder for health check
+    // Structural enforcement check on mandatory intent fields
+    const syncEngineHealthy = Boolean(intent.intentId && intent.source_account && intent.target_stacks_principal && !isNaN(envelope.fiat_value));
     if (!syncEngineHealthy) {
-        return res.status(503).json({ status: 'ERROR', message: 'ERP Sync Engine unhealthy' });
+        return res.status(503).json({ status: 'ERROR', message: 'ERP Sync Engine unhealthy: incomplete intent payload' });
     }
 
     res.status(202).json({ status: 'ACCEPTED', intent, envelope });
