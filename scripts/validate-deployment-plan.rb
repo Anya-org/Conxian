@@ -22,8 +22,8 @@ abort "deployment plan must be a YAML object" unless plan.is_a?(Hash)
 abort "deployment plan network mismatch" unless plan["network"] == expected_network
 abort "deployment plan deployer mismatch" unless plan["deployer"] == expected_deployer
 
-expected_prefix = expected_network == "testnet" ? "ST" : "SP"
-canonical_address_pattern = /\A#{expected_prefix}[0-9A-Z]{39}\z/
+expected_prefix_pattern = expected_network == "testnet" ? "(?:ST|SN)" : "(?:SP|SM|ST|SN)"
+canonical_address_pattern = /\A#{expected_prefix_pattern}[0-9A-Z]{39}\z/
 unless expected_deployer.match?(canonical_address_pattern)
   abort "deployment plan deployer is not a canonical-format address for the selected network"
 end
