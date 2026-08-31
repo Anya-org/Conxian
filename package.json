@@ -42,7 +42,7 @@
     "is-generator-function": "^1.1.2",
     "js-sha256": "^1.0.0",
     "light-bolt11-decoder": "^3.2.0",
-    "mime-db": "^1.54.0",
+    "mime-db": "^1.52.0",
     "node-fetch": "^3.3.2",
     "ws": "^8.21.3"
   },
